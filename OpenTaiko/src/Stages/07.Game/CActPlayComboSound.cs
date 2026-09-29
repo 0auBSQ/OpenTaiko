@@ -11,26 +11,25 @@ internal class CActPlayComboSound : CActivity {
 
 	// メソッド
 	public void tPlay(int nCombo, int player) {
-		if (VoiceIndex[player] < ListCombo[player].Count) {
-
-			var index = ListCombo[player][VoiceIndex[player]];
-			if (nCombo == index.nCombo) {
-				index.soundComboVoice.PlayStart();
-				VoiceIndex[player]++;
-			}
-
-		}
+		tPlayReached(ListCombo[player], ref VoiceIndex[player], nCombo);
 	}
 
 	public void tPlayFloorSound() {
-		if (FloorIndex[0] < ListFloor[0].Count) {
+		tPlayReached(ListFloor[0], ref FloorIndex[0], OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor);
+	}
 
-			var index = ListFloor[0][FloorIndex[0]];
-			if (OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor == index.nCombo) {
-				index.soundComboVoice.PlayStart();
-				FloorIndex[0]++;
-			}
+	// plays the voices numbered value and steps past every number already reached, so a duplicate number or a skipped
+	// value does not hold back the later voices
+	private static void tPlayReached(List<CComboVoice> voices, ref int index, int value) {
+		for (; index < voices.Count && voices[index].nCombo <= value; index++) {
+			if (voices[index].nCombo == value)
+				voices[index].soundComboVoice.PlayStart();
 		}
+	}
+
+	// back to the first floor voice: a retry climbs from the first floor again
+	public void tResetFloor() {
+		if (FloorIndex != null) Array.Fill(FloorIndex, 0);
 	}
 
 	/// <summary>

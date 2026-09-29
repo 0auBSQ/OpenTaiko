@@ -179,6 +179,7 @@ internal class CActImplBackground : CActivity {
 		this.ctClearTiredAnimation = new CCounter();
 
 		TowerFinished = false;
+		this.lastSeenFloor = 1;
 
 		base.Activate();
 	}
@@ -233,38 +234,9 @@ internal class CActImplBackground : CActivity {
 		if (!IsUpNotFound) {
 			if (!OpenTaiko.stageGameScreen.bPAUSE) UpScript?.Update(_state);
 			UpScript?.Draw(_state);
-			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-				#region [Tower animations variables]
-
-				this.bFloorChanged = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor > 0 && (OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor < OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1);
-
-				int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5].ChartInfo.nTotalFloor;
-
-				#endregion
-
-				#region [Tower background informations]
-
-				if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-					OpenTaiko.stageGameScreen.FloorManagement.loopFrames();
-
-					if (OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives > 0) {
-						OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor = OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1;
-						if (!(OpenTaiko.stageGameScreen.IsChartEnded(0) || OpenTaiko.stageGameScreen.IsFinishedPlaying(0))) {
-							if (OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor >= maxFloor)
-								OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor = maxFloor - 1;
-						}
-					}
-
-					// the floor and lives planks (tower_hud ROActivity) read the floor and the lives from PLAYSTATE
-					if (TowerHud != null && TowerHud.IsActive) {
-						if (!OpenTaiko.stageGameScreen.bPAUSE) TowerHud.Update();
-						TowerHud.Draw();
-					}
-				}
-
-				#endregion
-			}
 		}
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
+			this.DrawTowerHud();
 
 		#endregion
 
@@ -272,10 +244,6 @@ internal class CActImplBackground : CActivity {
 
 
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-			int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5].ChartInfo.nTotalFloor;
-
-			OpenTaiko.actTextConsole.Print(0, 0, CTextConsole.EFontType.White, maxFloor.ToString());
-
 			#region [Tower lower background]
 
 			// the tower look's Down script draws the sky and the tower body (the floors sliding under the player)
@@ -290,7 +258,12 @@ internal class CActImplBackground : CActivity {
 
 			bool stageEnded = OpenTaiko.stageGameScreen.IsStageCompleted() || OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives == 0;
 
-			if (bFloorChanged == true) {
+			// the climb starts on the frame the floor goes up (the stage moves the floor before this draw)
+			int floor = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor;
+			bool bFloorChanged = floor > this.lastSeenFloor;
+			this.lastSeenFloor = floor;
+
+			if (bFloorChanged) {
 				// float floorBPM = (float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]);
 				ctClimbDuration.Start(0, 1500, OpenTaiko.stageGameScreen.actPlayInfo.msPerGameBeatAbs(0) / 500, OpenTaiko.Timer);
 				//character.TowerNextFloor();
@@ -458,6 +431,13 @@ internal class CActImplBackground : CActivity {
 
 	public bool IsFinishedTowerClimbing() => ctClimbDuration?.IsEnded ?? true;
 
+	// the floor and lives planks (tower_hud ROActivity) read the floor and the lives from PLAYSTATE
+	public void DrawTowerHud() {
+		if (TowerHud == null || !TowerHud.IsActive) return;
+		if (!OpenTaiko.stageGameScreen.bPAUSE) TowerHud.Update();
+		TowerHud.Draw();
+	}
+
 	#region[ private ]
 	//-----------------
 
@@ -497,7 +477,7 @@ internal class CActImplBackground : CActivity {
 
 	private static LuaROActivityWrapper? TowerHud => LuaROActivityWrapper.GetROActivity("tower_hud");
 
-	private bool bFloorChanged = false;
+	private int lastSeenFloor = 1;
 	private int currentCharacter;
 	private CCounter ctStandingAnimation;
 	private CCounter ctClimbingAnimation;

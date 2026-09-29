@@ -80,7 +80,7 @@ local function bindLabel(which)
 end
 
 -- space UI with a constellation theming (as it connects multiple players though the different open worlds within the open universe very poetic)
-local TEX_NAMES = { "Logo", "LogoSmall", "Sparkle", "Glow", "Link", "Chart", "SongPlate", "RosterRow", "RosterRowYou",
+local TEX_NAMES = { "Logo", "LogoSmall", "Sparkle", "Link", "Chart", "SongPlate", "RosterRow", "RosterRowYou",
     "RosterRowEmpty", "Deck", "MenuPlate", "MenuPlateOn", "CodePlate", "ResultRow", "ResultRowFirst", "HeaderPill",
     "Toast", "TabOn", "JacketFrame", "Halo", "SpeedArrow", "Difficulty/Missing", "Difficulty/Level/plus" }
 for d = 0, 4 do TEX_NAMES[#TEX_NAMES + 1] = "Difficulty/" .. d end
@@ -160,10 +160,9 @@ local function link(x1, y1, x2, y2, op, inset)
     sprite("Link", (ax + bx) / 2, (ay + by) / 2, (len - 2 * inset) / 128, 1, op, LINE_COL, -math.deg(math.atan(dy, dx)), "add")
 end
 
--- a lit star: its glow, its sparkle, and for the room's host a second, turning sparkle
+-- a lit star: its sparkle, and for the room's host a second, turning sparkle
 local function star(x, y, rgb, size, bright, host)
     local tw = 0.5 + 0.5 * math.sin(clock * 2.3 + x * 0.013)
-    sprite("Glow", x, y, size * (1.0 + 0.12 * tw), nil, bright * (0.45 + 0.15 * tw), rgb, nil, "add")
     sprite("Sparkle", x, y, size * (0.92 + 0.1 * tw), nil, 0.75 + 0.25 * bright, rgb, nil, "add")
     if host then sprite("Sparkle", x, y, size * 0.62, nil, 0.8, GOLD, 45 + clock * 14, "add") end
 end

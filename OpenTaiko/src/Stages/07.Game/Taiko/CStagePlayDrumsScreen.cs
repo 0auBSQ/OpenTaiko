@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using System.Text;
 using DiscordRPC;
 using FDK;
 using Point = System.Drawing.Point;
@@ -397,6 +396,17 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			// stage-fail check
 			bool isTower = (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower);
 
+			// the tower's invincibility and floor move every frame, whether or not the tower background is drawn
+			if (isTower) {
+				this.FloorManagement.loopFrames();
+				if (this.FloorManagement.CurrentNumberOfLives > 0) {
+					int maxFloor = OpenTaiko.SongMount.rChoosenSong!.score[(int)Difficulty.Tower].ChartInfo.nTotalFloor;
+					this.FloorManagement.LastRegisteredFloor = this.actPlayInfo.NowMeasure[0] + 1;
+					if (!(this.IsChartEnded(0) || this.IsFinishedPlaying(0)) && this.FloorManagement.LastRegisteredFloor >= maxFloor)
+						this.FloorManagement.LastRegisteredFloor = maxFloor - 1;
+				}
+			}
+
 			if (!OpenTaiko.ConfigIni.bTokkunMode) {
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i) {
 					if (this.stageAbortType[i] == EStageAbort.Max)
@@ -415,6 +425,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 			// Layer: background
 
+			bool bBackgroundDrawn = false;
 			if (BGA_Shown && !OpenTaiko.ConfigIni.bTokkunMode && this.tProgressDraw_AVI()) {
 				// BGMOVIE & #BGAON
 			} else if (!OpenTaiko.ConfigIni.bTokkunMode && this.tProgressDraw_Background()) {
@@ -422,9 +433,14 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			} else if (OpenTaiko.ConfigIni.bEnableBGA) {
 				if (OpenTaiko.ConfigIni.bTokkunMode)
 					actTokkun.OnProgressDraw_Background();
-				else
+				else {
 					actBackground.Draw();
+					bBackgroundDrawn = true;
+				}
 			}
+			// without the tower background, the floor and lives planks are drawn here
+			if (isTower && !bBackgroundDrawn)
+				actBackground.DrawTowerHud();
 
 			// Layer: below-character background elements
 			if (!BGA_Shown && !OpenTaiko.ConfigIni.bTokkunMode) {
@@ -716,7 +732,10 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 	public override bool IsEndOfPlay(bool? isChartEnded = null, bool? isFinishedPlaying = null)
 		=> base.IsEndOfPlay(isChartEnded, isFinishedPlaying)
-			&& (!(OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) || this.actBackground.IsFinishedTowerClimbing());
+			&& (!(OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
+				// the top floor is registered the frame after the chart ends; its climb starts then
+				|| ((this.FloorManagement.CurrentNumberOfLives <= 0 || this.FloorManagement.LastRegisteredFloor > this.actPlayInfo.NowMeasure[0])
+					&& this.actBackground.IsFinishedTowerClimbing()));
 
 	// その他
 

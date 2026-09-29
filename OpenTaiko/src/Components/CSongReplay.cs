@@ -157,7 +157,11 @@ class CSongReplay {
 					ReachedFloor = reader.ReadInt32();
 					RemainingLives = reader.ReadInt32();
 					DanSongCount = reader.ReadInt32();
-					if (DanSongCount > 0) tDanRegisterSongCount(DanSongCount);
+					if (DanSongCount > 0) {
+						// 8 ints per song: a count the rest of the file cannot hold means a broken file
+						if ((long)DanSongCount * 32 > fileStream.Length - fileStream.Position) throw new InvalidDataException();
+						tDanRegisterSongCount(DanSongCount);
+					}
 					for (int i = 0; i < DanSongCount; i++) {
 						IndividualGoodCount[i] = reader.ReadInt32();
 						IndividualOkCount[i] = reader.ReadInt32();

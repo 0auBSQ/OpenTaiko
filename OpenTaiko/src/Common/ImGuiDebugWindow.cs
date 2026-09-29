@@ -26,6 +26,7 @@ public static class ImGuiDebugWindow {
 	private static long currentStageMemoryUsage = 0;
 	private static long lastAllocatedBytes = 0;
 	private static long lastAllocatedAtMs = 0;
+	private static long allocWindowMs = 5000;
 	private static long allocRateBytesPerSec = 0;
 
 	private static int sortType = -1;
@@ -80,8 +81,10 @@ public static class ImGuiDebugWindow {
 		if (SoundManager.PlayTimer.SystemTimeMs - memoryReadTimer > 5000) {
 			memoryReadTimer = SoundManager.PlayTimer.SystemTimeMs;
 				long nowAllocated = GC.GetTotalAllocatedBytes(true);
-				if (lastAllocatedBytes > 0)
-					allocRateBytesPerSec = (nowAllocated - lastAllocatedBytes) * 1000 / (memoryReadTimer - lastAllocatedAtMs);
+				if (lastAllocatedBytes > 0) {
+					allocWindowMs = memoryReadTimer - lastAllocatedAtMs; // longer than 5 s when the window was hidden
+					allocRateBytesPerSec = (nowAllocated - lastAllocatedBytes) * 1000 / allocWindowMs;
+				}
 				lastAllocatedBytes = nowAllocated;
 				lastAllocatedAtMs = memoryReadTimer;
 			Task.Factory.StartNew(() => {
@@ -109,7 +112,7 @@ public static class ImGuiDebugWindow {
 			ImGui.Text($"Game Version: {OpenTaiko.VERSION}");
 			int drawFps = OpenTaiko.FPS?.NowFPS ?? 0;
 			ImGui.Text($"Managed heap: {GC.GetTotalMemory(false) / (1024 * 1024)} MB | Alloc rate: {allocRateBytesPerSec / (1024 * 1024)} MB/s, "
-				+ $"{allocRateBytesPerSec / 1024:N0} KB/s, {(drawFps > 0 ? allocRateBytesPerSec / drawFps : 0):N0} B/frame (5s avg)");
+				+ $"{allocRateBytesPerSec / 1024:N0} KB/s, {(drawFps > 0 ? allocRateBytesPerSec / drawFps : 0):N0} B/frame ({allocWindowMs / 1000.0:0.#}s avg)");
 			ImGui.Text($"GC collections — Gen0: {GC.CollectionCount(0)}  Gen1: {GC.CollectionCount(1)}  Gen2: {GC.CollectionCount(2)}");
 			ImGui.Text($"Allocated Memory: {pagedmemory} bytes ({String.Format("{0:0.###}", (float)pagedmemory / (1024 * 1024 * 1024))}GB)");
 			ImGui.Text($"Draw FPS: {(OpenTaiko.FPS != null ? OpenTaiko.FPS?.NowFPS : "???")}, Input FPS: {(OpenTaiko.FPSInput != null ? OpenTaiko.FPSInput?.NowFPS : "???")}");

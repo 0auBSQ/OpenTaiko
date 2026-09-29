@@ -162,7 +162,7 @@ internal class Dan_Cert : CActivity {
 		public int GetUpdatedNNotesRemainMax() => nNotesMax - GetUpdatedNNotesPast();
 	}
 
-	public void Update(bool resetFlash = false, bool forceFinalJudge = false) {
+	public void Update(bool resetFlash = false) {
 		DanExamScore? individual = null;
 		DanExamScore? total = null;
 
@@ -204,7 +204,7 @@ internal class Dan_Cert : CActivity {
 					Status[i].Timer_Amount = new CCounter(0, 11, 12, OpenTaiko.Timer);
 				}
 			}
-			this.UpdateReachStatus(NowShowingNumber, i, score, ExamChange[i], forceFinalJudge: forceFinalJudge);
+			this.UpdateReachStatus(NowShowingNumber, i, score, ExamChange[i]);
 			if (Challenge[i].ReachStatus != oldReachedStatus && oldReachedStatus != Exam.ReachStatus.Unknown) {
 				if (Challenge[i].ReachStatus == Exam.ReachStatus.Failure) {
 					Sound_Failed?.PlayStart();
@@ -287,7 +287,7 @@ internal class Dan_Cert : CActivity {
 		_ => 0, // no flashing
 	};
 
-	private void UpdateReachStatus(int iSong, int iExam, DanExamScore score, bool isIndividualExam, bool forceFinalJudge = false) {
+	private void UpdateReachStatus(int iSong, int iExam, DanExamScore score, bool isIndividualExam) {
 		// 条件の達成見込みがあるかどうか判断する。
 		var dan_C = this.Challenge[iExam];
 
@@ -299,7 +299,7 @@ internal class Dan_Cert : CActivity {
 		bool isAfterLastNote = (!score.hasBranch && score.nNotesRemainMax <= 0);
 		// 音源が終了したやつの分岐。
 		CChip? lastChip = score.lastChip;
-		bool isAfterLastChip = forceFinalJudge || (lastChip == null)
+		bool isAfterLastChip = (lastChip == null)
 			|| ((NotesManager.IsHittableNote(lastChip) && lastChip.bVisible) ?
 				(NotesManager.IsGenericRoll(lastChip)) ? lastChip.end.bProcessed : (lastChip.bHit || lastChip.IsMissed)
 				: lastChip.nSoundTimems <= OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)
@@ -1295,19 +1295,27 @@ internal class Dan_Cert : CActivity {
 	/// <param name="dan_C">条件。</param>
 	/// <returns>ExamStatus。</returns>
 	public Exam.Status GetResultExamStatus(ReadOnlySpan<Dan_C> dan_C, List<CTja.DanSongs> danSongs, bool forceFinalJudge = false) {
-		this.Update(forceFinalJudge: forceFinalJudge); // prevent desynced result
+		if (forceFinalJudge) {
+			// after the play the in-play exams are gone: judge the exams passed in, and the per-song exams of the songs
+			// played before the last one reached, as final
+			for (int i = 0; i < CExamInfo.cMaxExam; i++) {
+				if (dan_C[i] != null && dan_C[i].ExamIsEnable)
+					dan_C[i].ReachStatus = Exam.ToReachStatus(dan_C[i].GetExamStatus());
+				if (!ExamChange[i]) continue;
+				for (int j = 0; j < Math.Min(NowShowingNumber, danSongs.Count - 1); j++) {
+					if (danSongs[j].Dan_C[i] is Dan_C songExam)
+						songExam.ReachStatus = Exam.ToReachStatus(songExam.GetExamStatus());
+				}
+			}
+		} else {
+			this.Update(); // prevent desynced result
+		}
 
 		var status = Exam.Status.Better_Success;
 
 		for (int i = 0; i < CExamInfo.cMaxExam; i++) {
-			if (ExamChange[i] && status == Exam.Status.Better_Success) {
-				for (int j = 0; j < danSongs.Count - 1; j++) { // last song already being checked
-					if (danSongs[j].Dan_C[i]?.GetExamStatus() < status) {
-						status = danSongs[j].Dan_C[i].GetExamStatus();
-						break;
-					}
-				}
-			}
+			if (ExamChange[i])
+				status = GetEarlierSongsExamStatus(status, danSongs, i);
 
 			if (dan_C[i] == null || !dan_C[i].ExamIsEnable)
 				continue;
@@ -1318,6 +1326,16 @@ internal class Dan_Cert : CActivity {
 				return Exam.Status.Failure;
 		}
 
+		return status;
+	}
+
+	// the lowest status exam iExam reached on the songs before the last one, starting from status (the last song
+	// is judged through the exams passed to GetResultExamStatus); a song that was never played reads Failure
+	internal static Exam.Status GetEarlierSongsExamStatus(Exam.Status status, List<CTja.DanSongs> danSongs, int iExam) {
+		for (int j = 0; j < danSongs.Count - 1; j++) {
+			if (danSongs[j].Dan_C[iExam]?.GetExamStatus() is Exam.Status songStatus && songStatus < status)
+				status = songStatus;
+		}
 		return status;
 	}
 

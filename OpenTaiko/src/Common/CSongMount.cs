@@ -42,6 +42,9 @@ internal class CSongMount {
 
 	public bool bSongJumpPending { get; set; }
 	public bool bIsAfterSongJump { get; set; }
+	// the #SONGJUMP target, mounted once the play that jumped has been torn down
+	public CSongListNode? rSongJumpTarget { get; set; }
+	public int nSongJumpTargetDifficulty { get; set; }
 
 
 	// Closest level

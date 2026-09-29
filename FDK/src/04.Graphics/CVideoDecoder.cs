@@ -103,6 +103,7 @@ public unsafe class CVideoDecoder : IDisposable {
 	public CVideoDecoder(string filename) : this(filename, null) { }
 
 	public CVideoDecoder(string filename, AudioFactory? audioOut) {
+		Interlocked.Increment(ref LiveCount); // a decoder that fails to open is still finalized, which counts it down
 		if (!File.Exists(filename))
 			throw new FileNotFoundException(filename + " not found...");
 
@@ -150,7 +151,6 @@ public unsafe class CVideoDecoder : IDisposable {
 
 			if (audioOut != null) this.OpenAudio(audioOut);
 		}
-		Interlocked.Increment(ref LiveCount);
 	}
 
 	// the first audio stream, decoded to interleaved float (surround folded to stereo) and pushed into a

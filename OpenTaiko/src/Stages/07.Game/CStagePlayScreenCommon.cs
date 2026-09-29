@@ -65,6 +65,10 @@ internal abstract class CStagePlayScreenCommon : CStage {
 
 		OpenTaiko.HttpEventReporter.ReportGameplayStart();
 
+		// a #SONGJUMP left pending by a play that ended another way must not reach this one
+		OpenTaiko.SongMount.bSongJumpPending = false;
+		OpenTaiko.SongMount.rSongJumpTarget = null;
+
 		// Initialize tower-mode life from the song node so the correct value is
 		// always used regardless of what happened in the selection screens.
 		int towerLife = OpenTaiko.SongMount.rChosenScore?.ChartInfo.nLife ?? 5;
@@ -2875,11 +2879,11 @@ internal abstract class CStagePlayScreenCommon : CStage {
 								this.nCurrentTopChip[nPlayer] = tja.listChip.Count - 1;   // 終端にシーク
 								IsDanFailed = true;
 								finishedPlaying = true;
+							} else {
+								// Play next song here
+								this.actDan.Start(this.ListDan_Number);
+								this.timingZones[nPlayer] = CTja.GameDurationToTjaDuration(this.GetTimingZones(nPlayer));
 							}
-
-							// Play next song here
-							this.actDan.Start(this.ListDan_Number);
-							this.timingZones[nPlayer] = CTja.GameDurationToTjaDuration(this.GetTimingZones(nPlayer));
 						} else {
 							actDan.FirstSectionAnime = true;
 						}
@@ -3301,11 +3305,9 @@ internal abstract class CStagePlayScreenCommon : CStage {
 						if (IsCommandIfMet(pChip, dTX) && !string.IsNullOrEmpty(pChip.SongJumpUniqueId)) {
 							var targetNode = CSongDict.tGetNodeFromID(pChip.SongJumpUniqueId);
 						if (targetNode != null) {
-								int jumpDiff = CSongMount.FindClosestDifficulty(targetNode, pChip.SongJumpDifficulty);
-								OpenTaiko.SongMount.rChoosenSong = targetNode;
-								for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++)
-									OpenTaiko.SongMount.nChoosenSongDifficulty[p] = jumpDiff;
-								OpenTaiko.SongMount.rChosenScore = targetNode.score[jumpDiff];
+								// the target is mounted when the stage switches; until then this play stays itself
+								OpenTaiko.SongMount.rSongJumpTarget = targetNode;
+								OpenTaiko.SongMount.nSongJumpTargetDifficulty = CSongMount.FindClosestDifficulty(targetNode, pChip.SongJumpDifficulty);
 								OpenTaiko.SongMount.bIsAfterSongJump = true;
 								OpenTaiko.SongMount.bSongJumpPending = true;
 								for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
@@ -4285,6 +4287,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		NowAIBattleSectionTime = 0;
 
 		FloorManagement.reload();
+		this.actComboVoice.tResetFloor();
 
 		for (int i = 0; i < AIBattleSections.Count; i++) {
 			AIBattleSections[i].End = AIBattleSection.EndType.None;

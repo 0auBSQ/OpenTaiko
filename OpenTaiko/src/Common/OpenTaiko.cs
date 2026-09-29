@@ -1020,7 +1020,14 @@ internal class OpenTaiko : Game {
 								TJA?.DeActivate();
 								TJA?.ReleaseManagedResource();
 								TJA?.ReleaseUnmanagedResource();
-								UnmountAndChangeStage(stageSongLoading, "Song Loading");
+								UnmountActivity(rCurrentStage);
+								// the target replaces the song only now, so the play that jumped is torn down as itself
+								SongMount.rChoosenSong = SongMount.rSongJumpTarget;
+								for (int p = 0; p < ConfigIni.nPlayerCount; p++)
+									SongMount.nChoosenSongDifficulty[p] = SongMount.nSongJumpTargetDifficulty;
+								SongMount.rChosenScore = SongMount.rSongJumpTarget?.score[SongMount.nSongJumpTargetDifficulty];
+								SongMount.rSongJumpTarget = null;
+								this.ChangeStage(stageSongLoading, "Song Loading");
 								this.tExecuteGarbageCollection();
 								break;
 								//-----------------------------
@@ -2105,7 +2112,7 @@ internal class OpenTaiko : Game {
 	// the F11 menu shows (private bytes on Windows, working set elsewhere); gpuTextures are the texture bytes uploaded
 	// to GL; decodedTextures are the live textures' decoded size, uploaded or not. The process query takes several
 	// milliseconds, so it runs off the main thread like the F11 menu's. The counts are the live sounds, video decoders
-// and cached title textures.
+	// and cached title textures.
 	[Conditional("DEBUG")]
 	internal static void tTraceMemory(string where) {
 		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) return;

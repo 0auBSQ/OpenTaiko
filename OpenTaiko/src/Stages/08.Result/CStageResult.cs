@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
-using System.Text;
 using DiscordRPC;
 using FDK;
 
