@@ -239,7 +239,7 @@ Eine Instanz pro Host, die der Host jeden Frame an Ort und Stelle aktualisiert. 
 | `state.simplemode  -> boolean` | True, wenn Simple Mode aktiv ist. |
 | `state.puchicharaRarities  -> string[]` | Seltenheit des Puchicharas jedes Spielers. |
 | `state.characterRarities  -> string[]` | Seltenheit des Charakters jedes Spielers. |
-| `state.isClear  -> boolean[]` | Ob sich jeder Spieler gerade in der Clear-Zone befindet. |
+| `state.isClear  -> boolean[]` | Ob sich jeder Spieler gerade in der Clear-Zone befindet. In einem Dan mit normaler Gauge wird es beim ersten Treffer wahr und falsch, sobald das Spiel oder eine Prüfung scheitert. |
 | `state.gauge  -> number[]` | Gauge-Wert jedes Spielers. |
 | `state.bpm  -> number[]` | Aktuelle BPM jedes Spielers. |
 | `state.gogo  -> boolean[]` | Ob sich jeder Spieler in der Go-Go-Time befindet. |

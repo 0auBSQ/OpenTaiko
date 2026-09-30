@@ -418,7 +418,7 @@ Die Werte stammen vom Spielbildschirm und sind daher während eines Spiels und a
 | `PLAYSTATE:GetScore(player)  -> integer` | Aktueller Score. |
 | `PLAYSTATE:GetCombo(player)  -> integer` | Aktuelle Combo. |
 | `PLAYSTATE:GetHighestCombo(player)  -> integer` | Höchste erreichte Combo. |
-| `PLAYSTATE:IsClear(player)  -> bool` | Ob die Gauge die Clear-Linie erreicht. |
+| `PLAYSTATE:IsClear(player)  -> bool` | Ob die Gauge die Clear-Linie erreicht. In einem Dan mit normaler Gauge ist es wahr, solange weder das Spiel noch eine Prüfung gescheitert ist. |
 | `PLAYSTATE:IsAssistedClear(player)  -> bool` | Ob das Spiel ein Clear ist, während ein scoremindernder Mod aktiv ist. |
 | `PLAYSTATE:IsFullCombo(player)  -> bool` | Clear, nicht assistiert, ohne Bad-Wertungen und ohne getroffene Minen. |
 | `PLAYSTATE:IsPerfect(player)  -> bool` | Full Combo ohne Ok-Wertungen. |

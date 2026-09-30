@@ -239,7 +239,7 @@ One instance per host, which the host updates in place each frame. The array fie
 | `state.simplemode  -> boolean` | True when Simple Mode is on. |
 | `state.puchicharaRarities  -> string[]` | Rarity of each player's puchichara. |
 | `state.characterRarities  -> string[]` | Rarity of each player's character. |
-| `state.isClear  -> boolean[]` | Whether each player is currently in the clear zone. |
+| `state.isClear  -> boolean[]` | Whether each player is currently in the clear zone. In a dan on the normal gauge, it turns on at the first hit and off when the play or an exam fails. |
 | `state.gauge  -> number[]` | Each player's gauge value. |
 | `state.bpm  -> number[]` | Each player's current BPM. |
 | `state.gogo  -> boolean[]` | Whether each player is in go-go time. |

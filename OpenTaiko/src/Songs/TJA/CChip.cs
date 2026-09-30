@@ -126,7 +126,8 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	// #COMMANDIF — gates any command chip on a local trigger
 	public string? CommandIfTrigger;
 
-	// #NOTEIF — note is skipped (not missed) if trigger is false when note time arrives
+	// #NOTEIF — a note (not a roll) takes no hit while its trigger is false, and is skipped (not missed) if the trigger is
+	// still false when its time arrives
 	public string? NoteIfTrigger;
 
 	// #GIANTNOTE — triggers activated on note hit result

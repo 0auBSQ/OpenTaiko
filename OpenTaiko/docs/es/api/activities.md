@@ -239,7 +239,7 @@ Una instancia por anfitrión, que el anfitrión actualiza en el sitio cada fotog
 | `state.simplemode  -> boolean` | Verdadero cuando el Modo Simple está activado. |
 | `state.puchicharaRarities  -> string[]` | Rareza del puchichara de cada jugador. |
 | `state.characterRarities  -> string[]` | Rareza del personaje de cada jugador. |
-| `state.isClear  -> boolean[]` | Si cada jugador está actualmente en la zona de clear. |
+| `state.isClear  -> boolean[]` | Si cada jugador está actualmente en la zona de clear. En un dan con el medidor normal, pasa a verdadero con el primer golpe y a falso cuando se falla la partida o se suspende un examen. |
 | `state.gauge  -> number[]` | Valor del medidor de cada jugador. |
 | `state.bpm  -> number[]` | BPM actual de cada jugador. |
 | `state.gogo  -> boolean[]` | Si cada jugador está en go-go time. |

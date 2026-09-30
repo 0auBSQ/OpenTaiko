@@ -418,7 +418,7 @@ The values come from the gameplay screen, so they are meaningful during a play a
 | `PLAYSTATE:GetScore(player)  -> integer` | Current score. |
 | `PLAYSTATE:GetCombo(player)  -> integer` | Current combo. |
 | `PLAYSTATE:GetHighestCombo(player)  -> integer` | Highest combo reached. |
-| `PLAYSTATE:IsClear(player)  -> bool` | Whether the gauge meets the clear line. |
+| `PLAYSTATE:IsClear(player)  -> bool` | Whether the gauge meets the clear line. In a dan on the normal gauge, it is true while neither the play nor any exam has failed. |
 | `PLAYSTATE:IsAssistedClear(player)  -> bool` | Whether the play is a clear while a score-reducing mod is active. |
 | `PLAYSTATE:IsFullCombo(player)  -> bool` | Clear, not assisted, with no Bad judgements and no mines hit. |
 | `PLAYSTATE:IsPerfect(player)  -> bool` | Full combo with no Ok judgements. |

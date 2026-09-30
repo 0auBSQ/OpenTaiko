@@ -418,7 +418,7 @@ De waarden komen van het gameplayscherm, dus ze zijn betekenisvol tijdens een sp
 | `PLAYSTATE:GetScore(player)  -> integer` | Huidige score. |
 | `PLAYSTATE:GetCombo(player)  -> integer` | Huidige combo. |
 | `PLAYSTATE:GetHighestCombo(player)  -> integer` | Hoogste bereikte combo. |
-| `PLAYSTATE:IsClear(player)  -> bool` | Of de gauge de clearlijn haalt. |
+| `PLAYSTATE:IsClear(player)  -> bool` | Of de gauge de clearlijn haalt. In een dan met de normale gauge is het waar zolang noch het spel noch een examen is mislukt. |
 | `PLAYSTATE:IsAssistedClear(player)  -> bool` | Of de spelbeurt een clear is terwijl een scoreverlagende mod actief is. |
 | `PLAYSTATE:IsFullCombo(player)  -> bool` | Clear, niet assisted, zonder Bad-beoordelingen en zonder geraakte mijnen. |
 | `PLAYSTATE:IsPerfect(player)  -> bool` | Full combo zonder Ok-beoordelingen. |

@@ -418,7 +418,7 @@ end
 | `PLAYSTATE:GetScore(player)  -> integer` | Текущие очки. |
 | `PLAYSTATE:GetCombo(player)  -> integer` | Текущее комбо. |
 | `PLAYSTATE:GetHighestCombo(player)  -> integer` | Наибольшее достигнутое комбо. |
-| `PLAYSTATE:IsClear(player)  -> bool` | Достигает ли шкала линии клира. |
+| `PLAYSTATE:IsClear(player)  -> bool` | Достигает ли шкала линии клира. В дане с обычной шкалой — true, пока не провалены ни игра, ни один из экзаменов. |
 | `PLAYSTATE:IsAssistedClear(player)  -> bool` | Является ли прохождение клиром при активном моде, снижающем очки. |
 | `PLAYSTATE:IsFullCombo(player)  -> bool` | Клир без помощи, без оценок Bad и без задетых мин. |
 | `PLAYSTATE:IsPerfect(player)  -> bool` | Фулл-комбо без оценок Ok. |

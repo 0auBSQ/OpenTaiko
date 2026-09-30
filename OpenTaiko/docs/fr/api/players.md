@@ -418,7 +418,7 @@ Les valeurs proviennent de l'écran de jeu ; elles sont donc significatives pen
 | `PLAYSTATE:GetScore(player)  -> integer` | Score courant. |
 | `PLAYSTATE:GetCombo(player)  -> integer` | Combo courant. |
 | `PLAYSTATE:GetHighestCombo(player)  -> integer` | Combo le plus élevé atteint. |
-| `PLAYSTATE:IsClear(player)  -> bool` | Si la jauge atteint la ligne de réussite. |
+| `PLAYSTATE:IsClear(player)  -> bool` | Si la jauge atteint la ligne de réussite. Dans un dan avec la jauge normale, c'est vrai tant que ni la partie ni aucun examen n'a échoué. |
 | `PLAYSTATE:IsAssistedClear(player)  -> bool` | Si la partie est une réussite alors qu'un mod réduisant le score est actif. |
 | `PLAYSTATE:IsFullCombo(player)  -> bool` | Réussite, non assistée, sans jugement Bad et sans mine frappée. |
 | `PLAYSTATE:IsPerfect(player)  -> bool` | Full combo sans jugement Ok. |

@@ -239,7 +239,7 @@ end
 | `state.simplemode  -> boolean` | 简易模式开启时为 true。 |
 | `state.puchicharaRarities  -> string[]` | 每个玩家的小角色稀有度。 |
 | `state.characterRarities  -> string[]` | 每个玩家的角色稀有度。 |
-| `state.isClear  -> boolean[]` | 每个玩家当前是否处于过关区域。 |
+| `state.isClear  -> boolean[]` | 每个玩家当前是否处于过关区域。普通魂槽的段位中，第一次击中时变为 true，游戏失败或有考核不合格时变为 false。 |
 | `state.gauge  -> number[]` | 每个玩家的魂槽值。 |
 | `state.bpm  -> number[]` | 每个玩家当前的 BPM。 |
 | `state.gogo  -> boolean[]` | 每个玩家是否处于 GoGo 时间。 |

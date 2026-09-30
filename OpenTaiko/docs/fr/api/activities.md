@@ -239,7 +239,7 @@ Une instance par hôte, que l'hôte met à jour sur place à chaque frame. Les c
 | `state.simplemode  -> boolean` | Vrai quand le mode simple est activé. |
 | `state.puchicharaRarities  -> string[]` | Rareté du puchichara de chaque joueur. |
 | `state.characterRarities  -> string[]` | Rareté du personnage de chaque joueur. |
-| `state.isClear  -> boolean[]` | Si chaque joueur est actuellement dans la zone de réussite. |
+| `state.isClear  -> boolean[]` | Si chaque joueur est actuellement dans la zone de réussite. Dans un dan avec la jauge normale, il devient vrai au premier coup et faux dès que la partie ou un examen échoue. |
 | `state.gauge  -> number[]` | Valeur de la jauge de chaque joueur. |
 | `state.bpm  -> number[]` | BPM courant de chaque joueur. |
 | `state.gogo  -> boolean[]` | Si chaque joueur est en go-go time. |

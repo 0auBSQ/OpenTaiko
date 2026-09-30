@@ -239,7 +239,7 @@ Eén instantie per host, die de host elk frame ter plekke bijwerkt. De arrayveld
 | `state.simplemode  -> boolean` | True wanneer Simple Mode aan staat. |
 | `state.puchicharaRarities  -> string[]` | Zeldzaamheid van de puchichara van elke speler. |
 | `state.characterRarities  -> string[]` | Zeldzaamheid van het personage van elke speler. |
-| `state.isClear  -> boolean[]` | Of elke speler zich momenteel in de clear-zone bevindt. |
+| `state.isClear  -> boolean[]` | Of elke speler zich momenteel in de clear-zone bevindt. In een dan met de normale gauge wordt het waar bij de eerste hit en onwaar zodra het spel of een examen mislukt. |
 | `state.gauge  -> number[]` | De gaugewaarde van elke speler. |
 | `state.bpm  -> number[]` | De huidige BPM van elke speler. |
 | `state.gogo  -> boolean[]` | Of elke speler zich in go-go-time bevindt. |

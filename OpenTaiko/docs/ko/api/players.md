@@ -418,7 +418,7 @@ PUCHICHARALIST와 sf:GetPuchichara가 이 핸들을 반환합니다. 텍스처�
 | `PLAYSTATE:GetScore(player)  -> integer` | 현재 스코어. |
 | `PLAYSTATE:GetCombo(player)  -> integer` | 현재 콤보. |
 | `PLAYSTATE:GetHighestCombo(player)  -> integer` | 도달한 최고 콤보. |
-| `PLAYSTATE:IsClear(player)  -> bool` | 게이지가 클리어 선을 충족하는지 여부. |
+| `PLAYSTATE:IsClear(player)  -> bool` | 게이지가 클리어 선을 충족하는지 여부. 노멀 게이지의 단위에서는 플레이가 실패하지 않았고 불합격한 시험도 없는 동안 true. |
 | `PLAYSTATE:IsAssistedClear(player)  -> bool` | 스코어를 낮추는 모드가 활성인 채로 클리어했는지 여부. |
 | `PLAYSTATE:IsFullCombo(player)  -> bool` | 어시스트가 아닌 클리어이며 Bad 판정과 맞힌 지뢰가 없음. |
 | `PLAYSTATE:IsPerfect(player)  -> bool` | Ok 판정이 없는 풀 콤보. |

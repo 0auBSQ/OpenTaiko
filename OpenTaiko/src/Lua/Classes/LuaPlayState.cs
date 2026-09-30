@@ -111,7 +111,7 @@
 		}
 
 		public bool IsDanClear() {
-			return IsPass() && !IsAssistedClear(0);
+			return IsPass() && CModBalancing.tGetModMultiplier(CModBalancing.EBalancingType.SCORE, 0) >= 1f;
 		}
 
 		public bool IsDanFullCombo() {

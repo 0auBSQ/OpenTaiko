@@ -45,6 +45,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 	public int[] nBalloonHitCount_Dan = [];
 	public double[] nRollTimeMs_Dan = [];
 	public double[] nAddScoreGen4ShinUchi_Dan = [];
+	private double[] msDanSongStart = []; // [iDanSong], TJA time of the song's #NEXTSONG
 
 	/// <summary>Per-session Tower mode state. Always non-null during gameplay.</summary>
 	public CFloorManagement FloorManagement { get; private set; } = new CFloorManagement(5);
@@ -58,11 +59,9 @@ internal abstract class CStagePlayScreenCommon : CStage {
 	}
 
 	// The game-screen build as a stepped iterator: identical sequential logic to the old Activate, with
-	// `yield return progress` between the pre-setup, batches of child actors, and the note-state build, so the
-	// song load can advance it a slice per frame (smooth bar, no freeze) instead of one blocking call.
+	// `yield return progress` after the pre-setup and the child actors and again before the note-state build, so
+	// the song load can advance it a slice per frame instead of one blocking call.
 	public virtual System.Collections.Generic.IEnumerator<float> ActivateSteps() {
-		base.Activate(); // activate ChildActivities here
-
 		OpenTaiko.HttpEventReporter.ReportGameplayStart();
 
 		// a #SONGJUMP left pending by a play that ended another way must not reach this one
@@ -161,19 +160,11 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		this.rCurrentCheerChip = null;
 		this.bReverse = OpenTaiko.ConfigIni.bReverse;
 
-		yield return 0.1f;   // pre-setup done; now bring the child actors up a few per frame
+		// the child actors activate after the pre-setup, whose scoring parameters CActImplScoreRank reads, and before
+		// the first yield, so an ESC during the load always finds them active
+		base.Activate();
 
-		// Inline CActivity.Activate's child loop so it can yield between batches (the old base.Activate() activated
-		// all ~25 actors in one synchronous call → a freeze). Pre/post setup is otherwise unchanged.
-		if (!this.IsActivated) {
-			this.IsDeActivated = false;   // == IsActivated = true
-			int __done = 0, __total = this.ChildActivities.Count;
-			foreach (var __child in this.ChildActivities) {
-				__child.Activate();
-				if ((++__done & 3) == 0) yield return 0.1f + 0.7f * __done / System.Math.Max(1, __total);
-			}
-			this.IsFirstDraw = true;
-		}
+		yield return 0.1f;
 
 		this.tPanelStringSettings();
 		//this.演奏判定ライン座標();
@@ -417,6 +408,8 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		this.nBalloonHitCount_Dan = new int[OpenTaiko.SongMount.rChoosenSong.DanSongs.Count];
 		this.nRollTimeMs_Dan = new double[OpenTaiko.SongMount.rChoosenSong.DanSongs.Count];
 		this.nAddScoreGen4ShinUchi_Dan = new double[OpenTaiko.SongMount.rChoosenSong.DanSongs.Count];
+		this.msDanSongStart = new double[OpenTaiko.SongMount.rChoosenSong.DanSongs.Count];
+		Array.Fill(this.msDanSongStart, double.PositiveInfinity); // a song without a #NEXTSONG chip is never chosen
 
 		CTja tja = OpenTaiko.GetTJA(0)!;
 		this.scoreMode[0] = (tja.PlayerSideMetadata.nScoreMode >= 0) ? tja.PlayerSideMetadata.nScoreMode : OpenTaiko.ConfigIni.nScoreMode;
@@ -429,6 +422,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			if ((nextSongChip.nChannelNo == 0x9B) && iDanSong >= 0) {
 				CountGen4ShinUchiScoreNotes(_list, out this.nNoteCount_Dan[iDanSong], out this.nBalloonHitCount_Dan[iDanSong], out this.nRollTimeMs_Dan[iDanSong], iNextSongChip, iNextSongChipNext);
 				this.nAddScoreGen4ShinUchi_Dan[iDanSong] = GetAddScoreGen4ShinUchi(this.nNoteCount_Dan[iDanSong], this.nBalloonHitCount_Dan[iDanSong], this.nRollTimeMs_Dan[iDanSong]);
+				this.msDanSongStart[iDanSong] = nextSongChip.dbSoundTimems;
 			}
 		}
 	}
@@ -477,6 +471,9 @@ internal abstract class CStagePlayScreenCommon : CStage {
 	public void ftDanReSetBranches(bool hasBranches) {
 		this.tBranchReset(0);
 
+		// a #LEVELHOLD or a forced branch ends with its song
+		this.bLEVELHOLD[0] = false;
+		this.bForcedBranch[0] = false;
 		OpenTaiko.stageGameScreen.bUseBranch[0] = hasBranches;
 		OpenTaiko.stageGameScreen.ChangeBranch(CTja.ECourse.eNormal, 0, stopAnime: true);
 	}
@@ -611,7 +608,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 
 		public double GetScore(Exam.Type type) => type switch {
 			Exam.Type.Accuracy => (nGreat + nGood + nMiss == 0) ? 0 : (nGreat + nGood * 0.5) / (nGreat + nGood + nMiss) * 100.0,
-			Exam.Type.PercentPerfect => (nGreat + nGood + nMiss == 0) ? 0 : (nGreat) / (nGreat + nGood + nMiss) * 100.0,
+			Exam.Type.PercentPerfect => (nGreat + nGood + nMiss == 0) ? 0 : (double)nGreat / (nGreat + nGood + nMiss) * 100.0,
 			Exam.Type.JudgePerfect => nGreat,
 			Exam.Type.JudgeGood => nGood,
 			Exam.Type.JudgeBad => nMiss,
@@ -1040,6 +1037,26 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		return (_timingzonesAreEasy == true) ? OpenTaiko.ConfigIni.tzLevels[timingShift] : OpenTaiko.ConfigIni.tzLevels[2 + timingShift];
 	}
 
+	// the dan song a chip belongs to (the song on screen when there is no chip)
+	private int DanSongOf(CChip? chip)
+		=> (chip == null) ? this.actDan.NowShowingNumber : DanSongAt(this.msDanSongStart, chip.dbSoundTimems);
+
+	// the last song that starts before msTjaTime, else the first; a chip at a #NEXTSONG's time belongs to the song before it
+	internal static int DanSongAt(double[] msSongStarts, double msTjaTime) {
+		for (int i = msSongStarts.Length; i-- > 1;) {
+			if (msSongStarts[i] < msTjaTime)
+				return i;
+		}
+		return 0;
+	}
+
+	// adds a note's points; in a dan they also count for the note's song, which its per-song score exams read
+	private void AddPoints(CChip chip, long points, int nPlayer) {
+		long added = this.actScore.Add(points, nPlayer);
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+			this.DanSongScore[this.DanSongOf(chip)].nScore += (int)added;
+	}
+
 	private void tIncreaseComboDan(int danSong) {
 		this.DanSongScore[danSong].nCombo++;
 		if (this.DanSongScore[danSong].nCombo > this.DanSongScore[danSong].nHighestCombo)
@@ -1191,7 +1208,9 @@ internal abstract class CStagePlayScreenCommon : CStage {
 	}
 
 	protected bool AutoplayHitCritical(CChip chip, int iPlayer, EGameType gt) {
-		if (!chip.bVisible || chip.IsMissed || chip.bHit || this.bPAUSE || chip.msAutoLastHit > chip.dbSoundTimems) {
+		// a #NOTEIF note whose trigger is false is left to AutoJudge, which skips it in the same frame
+		if (!chip.bVisible || chip.IsMissed || chip.bHit || this.bPAUSE || chip.msAutoLastHit > chip.dbSoundTimems
+			|| !this.IsNoteIfMet(chip, iPlayer)) {
 			return false;
 		}
 		bool bAutoPlay = OpenTaiko.ConfigIni.bAutoPlay[iPlayer] || (iPlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode);
@@ -1415,8 +1434,8 @@ internal abstract class CStagePlayScreenCommon : CStage {
 				nAddScore = 100L;
 			}
 
-			if (!OpenTaiko.ConfigIni.ShinuchiMode && pChip.bGOGOTIME) this.actScore.Add((long)(nAddScore * 1.2f), nPlayer);
-			else this.actScore.Add(nAddScore, nPlayer);
+			if (!OpenTaiko.ConfigIni.ShinuchiMode && pChip.bGOGOTIME) this.AddPoints(pChip, (long)(nAddScore * 1.2f), nPlayer);
+			else this.AddPoints(pChip, nAddScore, nPlayer);
 
 
 			int __score = (int)(this.actScore.Get(nPlayer));
@@ -1521,7 +1540,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		}
 
 		if (nAddScore != 0) {
-		this.actScore.Add(nAddScore, player);
+		this.AddPoints(pChip, nAddScore, player);
 
 			int __score = (int)(this.actScore.Get(player));
 		this.CBranchScore[player].nScore = __score;
@@ -1606,14 +1625,14 @@ internal abstract class CStagePlayScreenCommon : CStage {
 					this.CSectionScore[nPlayer].nADLIB++;
 					this.CBranchScore[nPlayer].nADLIB++;
 					if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-						this.DanSongScore[actDan.NowShowingNumber].nADLIB++;
+						this.DanSongScore[this.DanSongOf(pChip)].nADLIB++;
 					}
 				} else if (!isDeniedJudgeCount && pChip.IsMissed) {
 					this.CChartScore[nPlayer].nADLIBMiss++;
 					this.CSectionScore[nPlayer].nADLIBMiss++;
 					this.CBranchScore[nPlayer].nADLIBMiss++;
 					if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-						this.DanSongScore[actDan.NowShowingNumber].nADLIBMiss++;
+						this.DanSongScore[this.DanSongOf(pChip)].nADLIBMiss++;
 				}
 			} else if (NotesManager.IsMine(pChip)) {
 				if (eJudgeResult != ENoteJudge.Auto && eJudgeResult != ENoteJudge.Miss) {
@@ -1630,7 +1649,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 					this.CSectionScore[nPlayer].nMine++;
 					this.CBranchScore[nPlayer].nMine++;
 					if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-						this.DanSongScore[actDan.NowShowingNumber].nMine++;
+						this.DanSongScore[this.DanSongOf(pChip)].nMine++;
 						this.AIRegisterInput(nPlayer, 0f);
 					}
 				} else if (!isDeniedJudgeCount && pChip.IsMissed) {
@@ -1638,7 +1657,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 					this.CSectionScore[nPlayer].nMineAvoid++;
 					this.CBranchScore[nPlayer].nMineAvoid++;
 					if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-						this.DanSongScore[actDan.NowShowingNumber].nMineAvoid++;
+						this.DanSongScore[this.DanSongOf(pChip)].nMineAvoid++;
 					this.AIRegisterInput(nPlayer, 1f);
 				}
 			} else {
@@ -1764,6 +1783,19 @@ internal abstract class CStagePlayScreenCommon : CStage {
 
 	protected virtual void UpdateClearAnimation(int iPlayer) { }
 
+	// a dan on the normal gauge is clear while no exam has failed; an exam can fail on a judgement, at a roll end or
+	// after the last note, so the play screen checks this every frame
+	protected void EndDanClearIfExamFailed(int nPlayer) {
+		if (!this.bIsAlreadyCleared[nPlayer] || OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan
+			|| HGaugeMethods.tGetGaugeTypeEnum(nPlayer) != HGaugeMethods.EGaugeType.NORMAL || HGaugeMethods.UNSAFE_FastNormaCheck(nPlayer))
+			return;
+		this.bIsAlreadyCleared[nPlayer] = false;
+		actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_CLEAR_OUT, true);
+		OpenTaiko.stageGameScreen.actBackground.ClearOut(nPlayer);
+		if (this.IsEndOfPlay())
+			this.UpdateClearAnimation(nPlayer);
+	}
+
 	private void UpdateJudgeCount(CChip? pChip, int nPlayer, bool bAutoPlay, bool bBombHit, ENoteJudge eJudgeResult, int? msDelta = null) {
 		OpenTaiko.HttpEventReporter.ReportNoteJudgement(eJudgeResult, nPlayer, pChip, msDelta);
 
@@ -1791,7 +1823,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 						bool isBig = NotesManager.IsBigNoteTaiko(pChip, NotesManager.GetChipGameType(pChip, nPlayer));
 						ForEachBiggable(isBig, forBigOnly => {
 							if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-								this.DanSongScore[actDan.NowShowingNumber].GetBiggable(forBigOnly).nGreat++;
+								this.DanSongScore[this.DanSongOf(pChip)].GetBiggable(forBigOnly).nGreat++;
 							this.CBranchScore[nPlayer].GetBiggable(forBigOnly).nGreat++;
 							this.CChartScore[nPlayer].GetBiggable(forBigOnly).nGreat++;
 							this.CSectionScore[nPlayer].GetBiggable(forBigOnly).nGreat++;
@@ -1802,7 +1834,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 						this.actCombo.nCurrentCombo[nPlayer]++;
 
 						if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-							this.tIncreaseComboDan(actDan.NowShowingNumber);
+							this.tIncreaseComboDan(this.DanSongOf(pChip));
 
 						if (this.actCombo.ctComboAddCounter[nPlayer].IsUnEnded) {
 							this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 1;
@@ -1842,7 +1874,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 						bool isBig = NotesManager.IsBigNoteTaiko(pChip, NotesManager.GetChipGameType(pChip, nPlayer));
 						ForEachBiggable(isBig, forBigOnly => {
 							if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-								this.DanSongScore[actDan.NowShowingNumber].GetBiggable(forBigOnly).nGood++;
+								this.DanSongScore[this.DanSongOf(pChip)].GetBiggable(forBigOnly).nGood++;
 							this.CBranchScore[nPlayer].GetBiggable(forBigOnly).nGood++;
 							this.CChartScore[nPlayer].GetBiggable(forBigOnly).nGood++;
 							this.CSectionScore[nPlayer].GetBiggable(forBigOnly).nGood++;
@@ -1853,7 +1885,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 						this.actCombo.nCurrentCombo[nPlayer]++;
 
 						if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-							this.tIncreaseComboDan(actDan.NowShowingNumber);
+							this.tIncreaseComboDan(this.DanSongOf(pChip));
 
 						if (this.actCombo.ctComboAddCounter[nPlayer].IsUnEnded) {
 							this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 1;
@@ -1896,7 +1928,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 							bool isBig = NotesManager.IsBigNoteTaiko(pChip, NotesManager.GetChipGameType(pChip, nPlayer));
 							ForEachBiggable(isBig, forBigOnly => {
 								if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-									this.DanSongScore[actDan.NowShowingNumber].GetBiggable(forBigOnly).nMiss++;
+									this.DanSongScore[this.DanSongOf(pChip)].GetBiggable(forBigOnly).nMiss++;
 								this.CBranchScore[nPlayer].GetBiggable(forBigOnly).nMiss++;
 								this.CChartScore[nPlayer].GetBiggable(forBigOnly).nMiss++;
 								this.CSectionScore[nPlayer].GetBiggable(forBigOnly).nMiss++;
@@ -1910,7 +1942,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 
 					this.actCombo.nCurrentCombo[nPlayer] = 0;
 					if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-						this.DanSongScore[actDan.NowShowingNumber].nCombo = 0;
+						this.DanSongScore[this.DanSongOf(pChip)].nCombo = 0;
 					this.actComboVoice.tReset(nPlayer);
 
 
@@ -1966,6 +1998,10 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		}
 	}
 
+	// ShinUchi off: the notes whose score is doubled, in every score mode (in Konga, the pink and clap notes)
+	internal static bool IsBigNoteForScore(NotesManager.ENoteType nt)
+		=> nt is NotesManager.ENoteType.DonBig or NotesManager.ENoteType.KaBig or NotesManager.ENoteType.DonHand or NotesManager.ENoteType.KaHand;
+
 	private void AddScore(CChip pChip, int nPlayer, ENoteJudge eJudgeResult) {
 		if ((eJudgeResult != ENoteJudge.Miss) && (eJudgeResult != ENoteJudge.Bad) && (eJudgeResult != ENoteJudge.Poor) && (NotesManager.IsMissableNote(pChip))) {
 			int nCombos = this.actCombo.nCurrentCombo[nPlayer];
@@ -1982,7 +2018,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 					nAddScore = (long)nAddScore * 10;
 				}
 
-				this.actScore.Add((long)nAddScore, nPlayer);
+				this.AddPoints(pChip, (long)nAddScore, nPlayer);
 			} else if (this.scoreMode[nPlayer] == 2) {
 				if (nCombos < 10) {
 					nAddScore = this.nScore[nPlayer, 0];
@@ -2013,17 +2049,18 @@ internal abstract class CStagePlayScreenCommon : CStage {
 					}
 					this.actScore.ctBonusAddTimer[nPlayer].CurrentValue = 0;
 					this.actScore.ctBonusAddTimer[nPlayer] = new CCounter(0, 2, 1000, OpenTaiko.Timer);
+					this.actScore.nBonusDanSong[nPlayer] = this.DanSongOf(pChip);
 				}
 
 				nAddScore = (int)(nAddScore / 10);
 				nAddScore = (int)(nAddScore * 10);
 
 				//大音符のボーナス
-				if (pChip.nChannelNo == 0x13 || pChip.nChannelNo == 0x14 || pChip.nChannelNo == 0x1A || pChip.nChannelNo == 0x1B) {
+				if (IsBigNoteForScore(pChip)) {
 					nAddScore = nAddScore * 2;
 				}
 
-				this.actScore.Add(nAddScore, nPlayer);
+				this.AddPoints(pChip, nAddScore, nPlayer);
 			} else if (this.scoreMode[nPlayer] == 1) {
 				if (nCombos < 10) {
 					nAddScore = this.nScore[nPlayer, 0];
@@ -2060,11 +2097,11 @@ internal abstract class CStagePlayScreenCommon : CStage {
 				nAddScore = (int)(nAddScore * 10);
 
 				//大音符のボーナス
-				if (pChip.nChannelNo == 0x13 || pChip.nChannelNo == 0x14 || pChip.nChannelNo == 0x1A || pChip.nChannelNo == 0x1B) {
+				if (IsBigNoteForScore(pChip)) {
 					nAddScore = nAddScore * 2;
 				}
 
-				this.actScore.Add(nAddScore, nPlayer);
+				this.AddPoints(pChip, nAddScore, nPlayer);
 			} else {
 				if (eJudgeResult == ENoteJudge.Perfect) {
 					if (nCombos < 200) {
@@ -2085,11 +2122,11 @@ internal abstract class CStagePlayScreenCommon : CStage {
 
 
 				//大音符のボーナス
-				if (pChip.nChannelNo == 0x13 || pChip.nChannelNo == 0x25) {
+				if (IsBigNoteForScore(pChip)) {
 					nAddScore = nAddScore * 2;
 				}
 
-				this.actScore.Add(nAddScore, nPlayer);
+				this.AddPoints(pChip, nAddScore, nPlayer);
 			}
 
 			int __score = (int)(this.actScore.Get(nPlayer));
@@ -2105,8 +2142,12 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		this.UpdateJudgeCount(null, nPlayer, false, false, eJudgeResult);
 	}
 
+	// a #NOTEIF note (not a roll) takes no hit while its trigger is false, read when the hit is judged: the input goes
+	// on to the next note, and the auto-miss skips it at its time. A multi-hit note already hit keeps taking hits
 	protected bool IsInputPadConsumedByChip(int nPlayer, CChip chip, EPad pad, long msTjaTime, ENoteJudge judge)
-		=> NotesManager.IsGenericBalloon(chip) || this.JudgePadInput(nPlayer, chip, pad, msTjaTime, judge, skipHit: true) is not ENoteJudge.Miss;
+		=> NotesManager.IsGenericBalloon(chip)
+			|| ((NotesManager.IsGenericRoll(chip) || chip.eNoteState == ENoteState.Wait || this.IsNoteIfMet(chip, nPlayer))
+				&& this.JudgePadInput(nPlayer, chip, pad, msTjaTime, judge, skipHit: true) is not ENoteJudge.Miss);
 
 	protected (CChip? chip, ENoteJudge rawJudge) GetChipToJudge(long msTjaTime, int nPlayer, EPad pad) {
 		var (chip, judge) = GetChipToJudgeIgnoringRollBody(msTjaTime, nPlayer, pad);
@@ -3831,7 +3872,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 				nAddScore = (pastKusudamaBorder ? 1000L : 5000L);
 			}
 
-			this.actScore.Add(nAddScore, iPlayer);
+			this.AddPoints(chip, nAddScore, iPlayer);
 
 			int __score = (int)(this.actScore.Get(iPlayer));
 			this.CBranchScore[iPlayer].nScore = __score;

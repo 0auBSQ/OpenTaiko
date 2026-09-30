@@ -420,6 +420,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 						this.SetStageFailed(i, failType);
 				}
 			}
+			this.EndDanClearIfExamFailed(0);
 
 			bool BGA_Shown = OpenTaiko.ConfigIni.bEnableAVI && OpenTaiko.TJA.listVD.Count > 0 && ShowVideo;
 
@@ -710,9 +711,14 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	// clear/fail/full-combo shown is correct); local/normal spots use the live gauge as before.
 	private void tEndClearAnim(int i, bool isTower) {
 		int onl = (LuaNetworking.Active?.IsRemoteSpot(i) == true) ? LuaNetworking.Active.GetSpotClearLevel(i) : -2;
+		// a dan ends in the pose of its result, like its end animation
+		bool danFailed = OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan
+			&& (this.IsStageFailed(i) || this.IsStageFailed_Fast() || Dan_Cert.GetFailedAllChallenges(this.actDan.GetExam(), OpenTaiko.SongMount.rChoosenSong!.DanSongs));
 		string anim;
 		if (onl >= 0)
 			anim = onl == 2 ? CCharacter.ANIM_GAME_10COMBO_MAX : onl == 1 ? CCharacter.ANIM_GAME_CLEARED : CCharacter.ANIM_GAME_FAILED;
+		else if (danFailed)
+			anim = CCharacter.ANIM_GAME_FAILED;
 		else if (isTower ? (OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives >= OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives) : HGaugeMethods.UNSAFE_IsRainbow(i))
 			anim = CCharacter.ANIM_GAME_10COMBO_MAX;
 		else if (isTower ? (OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives > 0) : HGaugeMethods.UNSAFE_FastNormaCheck(i))

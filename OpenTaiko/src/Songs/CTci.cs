@@ -199,6 +199,9 @@ internal class CTci {
 		tja.SongListCourseMetadata[difficulty].LEVELtaikoDecimal = course.LevelDecimal;
 		tja.SongListCourseMetadata[difficulty].LEVELtaikoIcon  = course.LevelIcon;
 		tja.SongListCourseMetadata[difficulty].NOTESDESIGNER   = course.NotesDesigner;
+		tja.PlayerSideMetadata.LEVELtaiko        = course.Level;
+		tja.PlayerSideMetadata.LEVELtaikoDecimal = course.LevelDecimal;
+		tja.PlayerSideMetadata.LEVELtaikoIcon    = course.LevelIcon;
 		return tja;
 	}
 

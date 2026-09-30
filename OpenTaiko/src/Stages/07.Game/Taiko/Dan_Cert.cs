@@ -166,14 +166,15 @@ internal class Dan_Cert : CActivity {
 		DanExamScore? individual = null;
 		DanExamScore? total = null;
 
+		// per-song exams read the song whose exams are shown: until the plate swaps, the previous song, so its notes
+		// judged after the next #NEXTSONG still count for it
 		DanExamScore getIndividual()
-			=> individual ??= this.GetIndividualExamScore(NowShowingNumber);
+			=> individual ??= this.GetIndividualExamScore(NowCymbolShowingNumber);
 		DanExamScore getTotal()
 			=> total ??= this.GetTotalExamScore();
 
 		for (int i = 0; i < CExamInfo.cMaxExam; i++) {
 			if (Challenge[i] == null || !Challenge[i].ExamIsEnable) continue;
-			if (ExamChange[i] && Challenge[i] != OpenTaiko.SongMount.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[i]) continue;
 
 			var oldReachedStatus = Challenge[i].ReachStatus;
 			var isChangedAmount = false;
@@ -186,7 +187,7 @@ internal class Dan_Cert : CActivity {
 				Exam.Type.JudgeBad => score.judges!.nMiss,
 				Exam.Type.JudgeADLIB => score.judges!.nADLIB,
 				Exam.Type.JudgeMine => score.judges!.nMine,
-				Exam.Type.Score => OpenTaiko.stageGameScreen.actScore.Get(0),
+				Exam.Type.Score => ExamChange[i] ? score.judges!.nScore : OpenTaiko.stageGameScreen.actScore.Get(0),
 				Exam.Type.Roll => score.judges!.nRoll,
 				Exam.Type.Hit => score.judges!.nGreat + score.judges.nGood + score.judges.nRoll,
 				Exam.Type.Combo => score.nHighestCombo,
@@ -204,7 +205,7 @@ internal class Dan_Cert : CActivity {
 					Status[i].Timer_Amount = new CCounter(0, 11, 12, OpenTaiko.Timer);
 				}
 			}
-			this.UpdateReachStatus(NowShowingNumber, i, score, ExamChange[i]);
+			this.UpdateReachStatus(ExamChange[i] ? NowCymbolShowingNumber : NowShowingNumber, i, score, ExamChange[i]);
 			if (Challenge[i].ReachStatus != oldReachedStatus && oldReachedStatus != Exam.ReachStatus.Unknown) {
 				if (Challenge[i].ReachStatus == Exam.ReachStatus.Failure) {
 					Sound_Failed?.PlayStart();

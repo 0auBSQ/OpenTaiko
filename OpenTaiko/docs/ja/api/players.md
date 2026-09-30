@@ -418,7 +418,7 @@ PUCHICHARALIST と sf:GetPuchichara がこのハンドルを返します。テ�
 | `PLAYSTATE:GetScore(player)  -> integer` | 現在のスコア。 |
 | `PLAYSTATE:GetCombo(player)  -> integer` | 現在のコンボ。 |
 | `PLAYSTATE:GetHighestCombo(player)  -> integer` | 到達した最大コンボ。 |
-| `PLAYSTATE:IsClear(player)  -> bool` | ゲージがクリアラインに達しているかどうか。 |
+| `PLAYSTATE:IsClear(player)  -> bool` | ゲージがクリアラインに達しているかどうか。ノーマルゲージの段位では、プレイが失敗しておらず、不合格の試験もない間は true。 |
 | `PLAYSTATE:IsAssistedClear(player)  -> bool` | スコアを減らす Mod が有効な状態でのクリアかどうか。 |
 | `PLAYSTATE:IsFullCombo(player)  -> bool` | アシストなしのクリアで、不可判定も地雷ヒットもない。 |
 | `PLAYSTATE:IsPerfect(player)  -> bool` | 可判定のないフルコンボ。 |

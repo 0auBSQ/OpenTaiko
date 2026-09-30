@@ -239,7 +239,7 @@ end
 | `state.simplemode  -> boolean` | 심플 모드가 켜져 있으면 true. |
 | `state.puchicharaRarities  -> string[]` | 각 플레이어 푸치캬라의 희귀도. |
 | `state.characterRarities  -> string[]` | 각 플레이어 캐릭터의 희귀도. |
-| `state.isClear  -> boolean[]` | 각 플레이어가 현재 클리어 구간에 있는지 여부. |
+| `state.isClear  -> boolean[]` | 각 플레이어가 현재 클리어 구간에 있는지 여부. 노멀 게이지의 단위에서는 첫 히트에서 true가 되고, 플레이가 실패하거나 시험이 불합격하면 false가 된다. |
 | `state.gauge  -> number[]` | 각 플레이어의 게이지 값. |
 | `state.bpm  -> number[]` | 각 플레이어의 현재 BPM. |
 | `state.gogo  -> boolean[]` | 각 플레이어가 고고타임인지 여부. |

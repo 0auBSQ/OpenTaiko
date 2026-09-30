@@ -16,6 +16,7 @@ internal class CActPlayScoreCommon : CActivity {
 	public CCounter[] ctPointsAnimeTimer;
 
 	public CCounter[] ctBonusAddTimer;
+	public int[] nBonusDanSong = new int[5]; // the dan song of the note whose 100-combo bonus is pending
 
 	protected STScore[] stScore;
 	protected int nNowDisplayedAddScore;
@@ -180,8 +181,9 @@ internal class CActPlayScoreCommon : CActivity {
 	/// <param name="part"></param>
 	/// <param name="bAutoPlay"></param>
 	/// <param name="delta"></param>
-	public void Add(long delta, int player) {
-		if (OpenTaiko.ConfigIni.bAIBattleMode && player == 1) return;
+	/// <returns>the points added, after the mod multiplier</returns>
+	public long Add(long delta, int player) {
+		if (OpenTaiko.ConfigIni.bAIBattleMode && player == 1) return 0;
 
 		double rev = 1.0;
 
@@ -206,6 +208,7 @@ internal class CActPlayScoreCommon : CActivity {
 		}
 
 		this.Set(this.Get(player) + delta * rev, player);
+		return delta;
 	}
 
 	public void BonusAdd(int player) {
@@ -228,6 +231,14 @@ internal class CActPlayScoreCommon : CActivity {
 		}
 
 		this.Set(this.Get(player) + 10000, player);
+
+		// the delayed bonus reaches the saved score at once; the branch and section records take it at the next scoring
+		// hit, as before, so score branches never depend on when it fires
+		var gs = OpenTaiko.stageGameScreen;
+		gs.CChartScore[player].nScore = (int)this.Get(player);
+		// in a dan it counts for the song of the note that earned it
+		if (player == 0 && OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan && this.nBonusDanSong[0] < gs.DanSongScore.Length)
+			gs.DanSongScore[this.nBonusDanSong[0]].nScore += 10000;
 	}
 
 	// CActivity 実装

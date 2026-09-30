@@ -418,7 +418,7 @@ Los valores provienen de la pantalla de juego, así que tienen sentido durante u
 | `PLAYSTATE:GetScore(player)  -> integer` | Puntuación actual. |
 | `PLAYSTATE:GetCombo(player)  -> integer` | Combo actual. |
 | `PLAYSTATE:GetHighestCombo(player)  -> integer` | Combo más alto alcanzado. |
-| `PLAYSTATE:IsClear(player)  -> bool` | Si el medidor alcanza la línea de clear. |
+| `PLAYSTATE:IsClear(player)  -> bool` | Si el medidor alcanza la línea de clear. En un dan con el medidor normal, es verdadero mientras no se haya fallado la partida ni suspendido ningún examen. |
 | `PLAYSTATE:IsAssistedClear(player)  -> bool` | Si la partida es un clear mientras hay activo un mod que reduce la puntuación. |
 | `PLAYSTATE:IsFullCombo(player)  -> bool` | Clear, no asistido, sin juicios Bad y sin minas golpeadas. |
 | `PLAYSTATE:IsPerfect(player)  -> bool` | Full combo sin juicios Ok. |

@@ -90,7 +90,7 @@ class HGaugeMethods {
 	};
 
 	public static float tHardGaugeGetKillscreenRatio(Difficulty diff, int level, EGaugeType gaugeType, int perfectHits, int totalNotes) {
-		if (gaugeType != EGaugeType.EXTREME) return 0f;
+		if (gaugeType != EGaugeType.EXTREME || totalNotes <= 0) return 0f;
 
 		float norma = tGetCurrentGaugeNorma(diff, level);
 		float ratio = Math.Min(1f, Math.Max(0f, perfectHits / (float)totalNotes));
@@ -409,14 +409,28 @@ class HGaugeMethods {
 
 	public static bool UNSAFE_FastNormaCheck(int player) {
 		var _dif = OpenTaiko.SongMount.nChoosenSongDifficulty[player];
+		EGaugeType gaugeType = tGetGaugeTypeEnum(player);
+		// a dan on the normal gauge is clear while neither the play nor an exam has failed, whatever the gauge value;
+		// after the play, its exams are the ones saved for the results
+		if (_dif == (int)Difficulty.Dan && gaugeType == EGaugeType.NORMAL) {
+			var actDan = OpenTaiko.stageGameScreen.actDan;
+			ReadOnlySpan<Dan_C> exams = actDan.IsDeActivated ? OpenTaiko.stageResults.stPlayRecord.Dan_C : actDan.GetExam();
+			return !OpenTaiko.stageGameScreen.IsStageFailed(player) && !Dan_Cert.GetFailedAllChallenges(exams, OpenTaiko.SongMount.rChoosenSong!.DanSongs);
+		}
 		return tNormaCheck(
 			(Difficulty)_dif,
-			OpenTaiko.SongMount.rChoosenSong.score[_dif]?.ChartInfo.nLevel[_dif] ?? -1,
-			tGetGaugeTypeEnum(player),
+			UNSAFE_PlayLevel(player),
+			gaugeType,
 			(float)OpenTaiko.stageGameScreen.actGauge.dbCurrentGaugeValue[player],
 			UNSAFE_KillZonePercent(player)
 		);
 	}
+
+	// the level the gauge rate and damage use: the chart's player-side LEVEL
+	private static int UNSAFE_PlayLevel(int player) => OpenTaiko.GetTJA(player)?.PlayerSideMetadata.LEVELtaiko ?? -1;
+
+	// the notes of the route the player is on, common notes included
+	private static int UNSAFE_RouteNotesCount(CTja dtx, int player) => dtx.nNotesCount_Branch[(int)OpenTaiko.stageGameScreen.nCurrentBranch[player]];
 
 	public static bool UNSAFE_IsRainbow(int player) {
 		if (tGetGaugeTypeEnum(player) != EGaugeType.NORMAL) return false;
@@ -428,12 +442,12 @@ class HGaugeMethods {
 
 		// Total hits and perfect hits
 		int perfectHits = OpenTaiko.stageGameScreen.CChartScore[player].nGreat;
-		int totalHits = dtx.nNotesCount_Common;
+		int totalHits = UNSAFE_RouteNotesCount(dtx, player);
 
 		// Difficulty
 		int _dif = OpenTaiko.SongMount.nChoosenSongDifficulty[player];
 		Difficulty difficulty = (Difficulty)_dif;
-		int level = OpenTaiko.SongMount.rChoosenSong.score[_dif]?.ChartInfo.nLevel[_dif] ?? -1;
+		int level = UNSAFE_PlayLevel(player);
 
 		return tHardGaugeGetKillscreenRatio(
 			difficulty,
@@ -520,7 +534,7 @@ class HGaugeMethods {
 
 		// Total hits and perfect hits
 		int perfectHits = OpenTaiko.stageGameScreen.CChartScore[player].nGreat;
-		int totalHits = dtx.nNotesCount_Common;
+		int totalHits = UNSAFE_RouteNotesCount(dtx, player);
 
 		// Scale
 		float scale = 1.0f;
@@ -531,7 +545,7 @@ class HGaugeMethods {
 		// Difficulty
 		int _dif = OpenTaiko.SongMount.nChoosenSongDifficulty[player];
 		Difficulty difficulty = (Difficulty)_dif;
-		int level = OpenTaiko.SongMount.rChoosenSong.score[_dif]?.ChartInfo.nLevel[_dif] ?? -1;
+		int level = UNSAFE_PlayLevel(player);
 
 		// Current percent
 		float currentPercent = (float)OpenTaiko.stageGameScreen.actGauge.dbCurrentGaugeValue[player];
@@ -590,7 +604,7 @@ class HGaugeMethods {
 
 		// Total hits and perfect hits
 		int perfectHits = OpenTaiko.stageGameScreen.CChartScore[player].nGreat;
-		int totalHits = dtx.nNotesCount_Common;
+		int totalHits = UNSAFE_RouteNotesCount(dtx, player);
 
 		// Gauge type
 		EGaugeType gaugeType = tGetGaugeTypeEnum(player);
@@ -607,7 +621,7 @@ class HGaugeMethods {
 		// Difficulty
 		int _dif = OpenTaiko.SongMount.nChoosenSongDifficulty[player];
 		Difficulty difficulty = (Difficulty)_dif;
-		int level = OpenTaiko.SongMount.rChoosenSong.score[_dif]?.ChartInfo.nLevel[_dif] ?? -1;
+		int level = UNSAFE_PlayLevel(player);
 
 		int gauge_x;
 		int gauge_y;
@@ -721,6 +735,6 @@ class HGaugeMethods {
 
 	#endregion
 
-	private static int[] GaugeBox = { OpenTaiko.Skin.Game_Gauge_Rect[0], OpenTaiko.Skin.Game_Gauge_Rect[1], OpenTaiko.Skin.Game_Gauge_Rect[2], OpenTaiko.Skin.Game_Gauge_Rect[3] };
+	private static int[] GaugeBox = new int[4];
 
 }

@@ -239,7 +239,7 @@ end
 | `state.simplemode  -> boolean` | シンプルモードが有効なとき true。 |
 | `state.puchicharaRarities  -> string[]` | 各プレイヤーのぷちキャラのレアリティ。 |
 | `state.characterRarities  -> string[]` | 各プレイヤーのキャラクターのレアリティ。 |
-| `state.isClear  -> boolean[]` | 各プレイヤーが現在クリアゾーンにいるかどうか。 |
+| `state.isClear  -> boolean[]` | 各プレイヤーが現在クリアゾーンにいるかどうか。ノーマルゲージの段位では、最初のヒットで true になり、プレイが失敗するか試験が不合格になると false になる。 |
 | `state.gauge  -> number[]` | 各プレイヤーのゲージ値。 |
 | `state.bpm  -> number[]` | 各プレイヤーの現在の BPM。 |
 | `state.gogo  -> boolean[]` | 各プレイヤーがゴーゴータイム中かどうか。 |
