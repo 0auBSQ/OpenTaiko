@@ -26,6 +26,7 @@ internal class CStageSongLoading : CStage {
 		Trace.Indent();
 		try {
 			CLoadingProgress.Begin();   // bar tracks the streamed game-screen texture upload % (driven in Draw)
+			_handedOver = false;
 
 			this.strSongTitle = "";
 			this.strSTAGEFILE = "";
@@ -129,6 +130,15 @@ internal class CStageSongLoading : CStage {
 				_streamingActive = false;
 				_gameScreenBuilt = false;
 				if (!TransitionDriven) Game.AsyncBudgetMs = Game.DefaultAsyncBudgetMs;
+			}
+
+			// a load that ends before gameplay (ESC, a load error) ends its play: the fun mods forced for Dynamic Beat
+			// and a watched replay's mods and name go back, and the replay is no longer armed or playing
+			if (!_handedOver) {
+				CStagePlayScreenCommon.RestoreSharedDynamicBeat(OpenTaiko.ConfigIni);
+				OpenTaiko.ReplayWatchArmed = false;
+				CSongReplay.tRestoreVirtualMods();
+				for (int i = 0; i < 5; i++) { OpenTaiko.bReplayMode[i] = false; OpenTaiko.ReplayPlayback[i] = null; }
 			}
 
 			CLoadingProgress.End();   // clear the loading bar (covers normal completion + ESC cancel)
@@ -557,6 +567,7 @@ internal class CStageSongLoading : CStage {
 					this.sdLoadSound.tDispose();
 				}
 				_gameScreenBuilt = false;   // handed over: gameplay owns the game screen now
+				_handedOver = true;
 				OpenTaiko.tTraceMemory("song loaded");
 				return (int)ESongLoadingScreenReturnValue.LoadComplete;
 		}
@@ -600,6 +611,7 @@ internal class CStageSongLoading : CStage {
 	private Task? _wavLoadTask;
 	private bool _streamingActive;             // game screen activated + textures streaming in (see LoadBMPFile)
 	private bool _gameScreenBuilt;             // game screen activated by this load and not handed over yet
+	private bool _handedOver;                  // this load reached gameplay
 	private System.Collections.Generic.IEnumerator<float>? _gsActivate;   // in-flight stepped game-screen build
 	private bool _gsPrevAutoFlush;             // Trace.AutoFlush to restore after the batched stepped build
 	private CCounter ctWait;

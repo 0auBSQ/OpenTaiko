@@ -206,14 +206,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 				if (OpenTaiko.ConfigIni.nFunMods[i] == EFunMods.DynamicBeat)
 					OpenTaiko.ConfigIni.nFunMods[i] = EFunMods.None;
 		} else {
-			bool anyDynBeat = false;
-			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-				if (OpenTaiko.ConfigIni.nFunMods[i] == EFunMods.DynamicBeat) { anyDynBeat = true; break; }
-			}
-			if (anyDynBeat) {
-				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++)
-					OpenTaiko.ConfigIni.nFunMods[i] = EFunMods.DynamicBeat;
-			}
+			ForceSharedDynamicBeat(OpenTaiko.ConfigIni);
 		}
 		Array.Fill(this.bLEVELHOLD, false);
 		Array.Fill(this.JPOSCROLLX, 0);
@@ -296,6 +289,32 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		this.tValueInitialize(true, true);
 
 		this.bPAUSE = false;
+	}
+
+	// the players' own fun mods while Dynamic Beat is forced on all of them, null when nothing is forced
+	private static EFunMods[]? funModsBeforeSharedDynBeat = null;
+
+	// when one local player picked Dynamic Beat, force it on every player for the play and keep their own picks for
+	// RestoreSharedDynamicBeat; a second call finds every player on Dynamic Beat and keeps the picks already saved
+	internal static void ForceSharedDynamicBeat(CConfigIni cfg) {
+		bool anyDynBeat = false, allDynBeat = true;
+		for (int i = 0; i < cfg.nPlayerCount; i++) {
+			if (cfg.nFunMods[i] == EFunMods.DynamicBeat) anyDynBeat = true;
+			else allDynBeat = false;
+		}
+		if (!anyDynBeat || allDynBeat)
+			return;
+		funModsBeforeSharedDynBeat = cfg.nFunMods[..cfg.nPlayerCount];
+		for (int i = 0; i < cfg.nPlayerCount; i++)
+			cfg.nFunMods[i] = EFunMods.DynamicBeat;
+	}
+
+	// put back the picks ForceSharedDynamicBeat replaced, so the forced value never reaches Config.ini; once per play
+	internal static void RestoreSharedDynamicBeat(CConfigIni cfg) {
+		if (funModsBeforeSharedDynBeat == null)
+			return;
+		Array.Copy(funModsBeforeSharedDynBeat, cfg.nFunMods, funModsBeforeSharedDynBeat.Length);
+		funModsBeforeSharedDynBeat = null;
 	}
 
 	private void ReduceMultiplayerNotes(Func<CChip, bool> isTargetNoteF, Action<CChip> reduceF, int minNeighbors = 2) {
@@ -929,7 +948,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 	}
 
 	private void AIRegisterInput(int nPlayer, float move) {
-		if (nPlayer < 2 && nPlayer >= 0) {
+		if (OpenTaiko.ConfigIni.bAIBattleMode && nPlayer < 2 && nPlayer >= 0) {
 			_AIBattleStateBatch[nPlayer].Enqueue(move);
 			while (_AIBattleStateBatch[0].Count > 0 && _AIBattleStateBatch[1].Count > 0) {
 				_AIBattleState += _AIBattleStateBatch[0].Dequeue() - _AIBattleStateBatch[1].Dequeue();
@@ -1325,10 +1344,6 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		if (remain == 0) {
 			return;
 		}
-		if (remain == 1 && NotesManager.IsFuzeRoll(pChip) && this.CanAutoplayHitMine(iPlayer, true)) {
-			pChip.msAutoLastHit = double.PositiveInfinity; // prevent clearing fuze
-			return;
-		}
 
 		var msPerRollTja = CTja.GameDurationToTjaDuration(1000.0 / rollSpeed); // min value
 		if (bAutoPlay)
@@ -1341,6 +1356,11 @@ internal abstract class CStagePlayScreenCommon : CStage {
 
 		long msLastHit = long.MinValue;
 		for (int i = 0; i < nHits; ++i) {
+			// the fuse dice is rolled once, before the final hit, however many hits this call makes
+			if (NotesManager.IsFuzeRoll(pChip) && pChip.nBalloon - pChip.nRollCount == 1 && this.CanAutoplayHitMine(iPlayer, true)) {
+				pChip.msAutoLastHit = double.PositiveInfinity; // prevent clearing fuze
+				return;
+			}
 			long msHit = Math.Min((long)(msFirstHit + i * msPerRollTja), pChip.end.nSoundTimems - 1);
 			bool didHit = (msHit == msLastHit) ? !pChip.bHit && this.AutoplayDoHit(pChip, Math.Min(msHit, pChip.end.nSoundTimems - 1), iPlayer, gt)
 				: this.AutoplayTryHit(pChip, Math.Min(msHit, pChip.end.nSoundTimems - 1), iPlayer, gt);
@@ -1590,8 +1610,9 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			eJudgeResult = (bCorrectLane && !pChip.IsMissed) ? this.eGetChipJudgeAtTime((long)msHitTjaTime, pChip, nPlayer) : ENoteJudge.Miss;
 			// for hit-type notes, check pChip.IsMissed instead to avoid repeated miss judgements
 
-			// AI judges
-			eJudgeResult = AlterJudgement(nPlayer, eJudgeResult, true);
+			// AI judges; a note that was let pass stays a miss
+			if (eJudgeResult is not ENoteJudge.Miss)
+				eJudgeResult = AlterJudgement(nPlayer, eJudgeResult, true);
 
 			if (!bAutoPlay && eJudgeResult != ENoteJudge.Miss) {
 				pChip.nLag = msDelta;
@@ -1650,7 +1671,6 @@ internal abstract class CStagePlayScreenCommon : CStage {
 					this.CBranchScore[nPlayer].nMine++;
 					if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 						this.DanSongScore[this.DanSongOf(pChip)].nMine++;
-						this.AIRegisterInput(nPlayer, 0f);
 					}
 				} else if (!isDeniedJudgeCount && pChip.IsMissed) {
 					this.CChartScore[nPlayer].nMineAvoid++;
@@ -3618,7 +3638,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 	protected abstract void MultiHitNoteTimeout(int iPlayer, CChip chip, double msTjaNowTime, double msMaxPlayedTjaTime = double.PositiveInfinity);
 
 	private void UpdateAIBattleSection(int nPlayer, long nCurrentTimems, bool endOfPlay = false) {
-		if (nPlayer != 0)
+		if (nPlayer != 0 || !OpenTaiko.ConfigIni.bAIBattleMode)
 			return;
 		bool anySectionPassed = false;
 		while (AIBattleSections.Count > NowAIBattleSectionCount && (endOfPlay || NowAIBattleSectionTime >= NowAIBattleSection.Length)) {

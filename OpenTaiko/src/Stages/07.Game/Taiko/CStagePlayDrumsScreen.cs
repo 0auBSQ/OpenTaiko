@@ -309,12 +309,18 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		this.pfReplayModeTextSmall?.Dispose(); this.pfReplayModeTextSmall = null;
 		this.ttkReplayMode = null; this.ttkReplayInvalid = null;
 
-		// leaving a replay anywhere except to the result screen (quit / retry) → drop replay mode + restore the
-		// real mods now, so the next play isn't hijacked by the recording. (the cleared→result path restores in the
-		// result screen instead, so the auto modicon + persistence-skip survive through results.)
+		// a play that does not go to the result screen puts the fun mods forced for Dynamic Beat back now, before a
+		// watched replay's mods; one that goes to results (StageCleared, fails that show results included) keeps them
+		// until the result screen has saved the replay
+		if (this.eFadeOutCompleteWhenReturnValue != EGameplayScreenReturnValue.StageCleared)
+			RestoreSharedDynamicBeat(OpenTaiko.ConfigIni);
+
+		// leaving a replay anywhere except to the result screen (quit / retry / a fail that skips results) → drop
+		// replay mode + restore the real mods now, so the next play isn't hijacked by the recording. (the
+		// cleared→result path restores in the result screen instead, so the auto modicon + persistence-skip
+		// survive through results.)
 		if (OpenTaiko.bReplayMode[0]
-			&& this.eFadeOutCompleteWhenReturnValue != EGameplayScreenReturnValue.StageCleared
-			&& this.eFadeOutCompleteWhenReturnValue != EGameplayScreenReturnValue.StageFailed) {
+			&& this.eFadeOutCompleteWhenReturnValue != EGameplayScreenReturnValue.StageCleared) {
 			CSongReplay.tRestoreVirtualMods();
 			for (int i = 0; i < 5; i++) { OpenTaiko.bReplayMode[i] = false; OpenTaiko.ReplayPlayback[i] = null; }
 		}
@@ -411,7 +417,8 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i) {
 					if (this.stageAbortType[i] == EStageAbort.Max)
 						continue;
-					EStageAbort failType = this.actGauge.IsRiskyFailed(i) ? EStageAbort.FailedStopSkipResult
+					// a replay plays without the watcher's Risky setting, which it does not record
+					EStageAbort failType = (this.actGauge.IsRiskyFailed(i) && !OpenTaiko.bReplayMode[i]) ? EStageAbort.FailedStopSkipResult
 						: (this.actGame.stTatakikiriShow.ctRemainingTime.IsEnded
 							|| (isTower && OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives <= 0)) ? EStageAbort.FailedStop
 						: this.actGauge.IsRiskyMineFailed(i) ? EStageAbort.FailedFlow
@@ -1085,8 +1092,8 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 					chipNoHit.eNoteState = ENoteState.Wait;
 					chipNoHit.msFirstMultiHit = msHitTjaTime;
 					chipNoHit.padStoredHit = nPad;
+					this.chipNowProcessingMultiHitNotes[nUsePlayer].Add(chipNoHit);
 				}
-				this.chipNowProcessingMultiHitNotes[nUsePlayer].Add(chipNoHit);
 				return ENoteJudge.ADLIB; // here for "empty hit but not a miss"
 			} else if (chipNoHit.eNoteState == ENoteState.Wait) {
 				bool _isExpected = NotesManager.IsExpectedPadMultiHit(chipNoHit.padStoredHit, nPad, chipNoHit, gameType);
