@@ -121,9 +121,11 @@ class HGaugeMethods {
 	public static EGaugeType tGetGaugeTypeEnum(CCharacter.Info? chara)
 		=> (chara == null) ? EGaugeType.NORMAL : tGetGaugeTypeEnum(chara.effect.tGetGaugeType());
 	public static EGaugeType? tGetGaugeTypeEnum(CTja? tja) => tja?.forceGauge;
+	// the chart's forced gauge, else the player's character's; the AI battle's AI plays on the normal gauge
 	public static EGaugeType tGetGaugeTypeEnum(int player)
 		=> tGetGaugeTypeEnum(OpenTaiko.GetTJA(player))
-			?? tGetGaugeTypeEnum(OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[player].data.Character]);
+			?? (AIBattleModMirror.IsAI(OpenTaiko.ConfigIni, player) ? EGaugeType.NORMAL
+				: tGetGaugeTypeEnum(OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[player].data.Character]));
 
 	public static bool tNormaCheck(Difficulty diff, int level, EGaugeType gaugeType, float percentObtained, float killZonePercent) {
 		float percent = Math.Min(100f, Math.Max(0f, percentObtained));

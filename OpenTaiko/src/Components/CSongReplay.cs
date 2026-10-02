@@ -228,7 +228,8 @@ class CSongReplay {
 
 	// RNG mods reproducible via the stored note-shuffle seed (only meaningful once a seed exists)
 	private const int RNG_SEEDABLE_MODS = (int)(EModFlag.Random | EModFlag.SuperRandom);
-	// RNG mods that aren't seeded, so their replays can never be reproduced (for now)
+	// fun mods whose replays are not watched: files recorded before they were seeded (BD8) drew them unseeded, and the
+	// format does not tell those apart
 	private const int RNG_UNSEEDED_MODS = (int)(EModFlag.Avalanche | EModFlag.Minesweeper);
 
 	// true if the replay can be played back faithfully (no unreproducible RNG)

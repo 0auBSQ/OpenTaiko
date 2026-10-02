@@ -660,8 +660,10 @@ internal class CStageResult : CStage {
 	}
 	public override void DeActivate() {
 		this.tSetMusicLevel(100);
-		// the fun mods forced for Dynamic Beat go back after the replay was saved, before a watched replay's mods
+		// the fun mods forced for Dynamic Beat, then player 2's own modes in AI battle, go back after the replay was saved,
+		// before a watched replay's mods
 		CStagePlayScreenCommon.RestoreSharedDynamicBeat(OpenTaiko.ConfigIni);
+		AIBattleModMirror.Restore(OpenTaiko.ConfigIni);
 		// leaving the result screen after watching a replay: drop replay mode + restore the real mods (kept this
 		// long so the auto modicon + persistence-skip held through results)
 		if (OpenTaiko.bReplayMode[0]) {

@@ -9,7 +9,7 @@ namespace OpenTaiko;
 /// <summary>
 /// 演奏画面の共通クラス (ドラム演奏画面, ギター演奏画面の継承元)
 /// </summary>
-internal abstract class CStagePlayScreenCommon : CStage {
+internal abstract partial class CStagePlayScreenCommon : CStage {
 	// Properties
 
 	// メソッド
@@ -521,6 +521,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 
 		listWAV = []; // the chart's own list: CTja.DeActivate disposes its sounds
 		Array.Fill(listChip, []);
+		this.ResetAIHits(); // the AI plans reference the chart's chips
 		queueMixerSound.Clear();
 		if (!(OperatingSystem.IsIOS() || OperatingSystem.IsAndroid())) System.Runtime.GCSettings.LatencyMode = this.gclatencymode;   // restore pre-gameplay GC mode (unsupported on mobile)
 
@@ -1099,28 +1100,11 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			if (NotesManager.IsRoll(nt)) {
 				return (msTjaTime >= pChip.nSoundTimems && msTjaTime < pChip.end.nSoundTimems) ? ENoteJudge.Perfect : ENoteJudge.Miss;
 			} else if (NotesManager.IsGenericBalloon(nt)) {
-				var msHeadWindowTja = (int)CTja.GameDurationToTjaDuration(17);
+				var msHeadWindowTja = (int)CTja.GameDurationToTjaDuration(JudgeWindows.MsBalloonHeadWindow);
 				return (msTjaTime >= pChip.nSoundTimems - msHeadWindowTja && msTjaTime < pChip.end.nSoundTimems) ? ENoteJudge.Perfect : ENoteJudge.Miss;
 			}
 
-			CConfigIni.CTimingZones tz = this.timingZones[player];
-
-			if (msDelta > tz.nBadZone) // fast judge for miss
-				return ENoteJudge.Miss;
-			if (msDelta <= tz.nGoodZone)
-				return ENoteJudge.Perfect;
-
-			int actual = player;
-
-			if (msDelta <= tz.nOkZone) {
-				if (OpenTaiko.ConfigIni.bJust[actual] == 1 && NotesManager.IsMissableNote(nt)) // Just
-					return ENoteJudge.Poor;
-				return ENoteJudge.Good;
-			}
-
-			if (OpenTaiko.ConfigIni.bJust[actual] == 2 || NotesManager.IsJudgedFromNearest(nt)) // Safe
-				return ENoteJudge.Good;
-			return ENoteJudge.Poor;
+			return JudgeWindows.Classify(msDelta, JudgeWindows.NoteRule.Of(nt, this.timingZones[player], OpenTaiko.ConfigIni.bJust[player]));
 		}
 	}
 
@@ -1128,7 +1112,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		if (pChip == null) return new NoteJudgeWithOffset(ENoteJudge.Miss, null);
 		var msDelta = msTjaTime - pChip.dbSoundTimems;
 		return new NoteJudgeWithOffset(
-			evaluateNodeJudge(msTjaTime, (int)Math.Abs(msDelta), pChip, player),
+			evaluateNodeJudge(msTjaTime, JudgeWindows.AbsDeltaMs(msTjaTime, pChip.dbSoundTimems), pChip, player),
 			(int)msDelta
 		);
 	}
@@ -1229,7 +1213,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 	protected bool AutoplayHitCritical(CChip chip, int iPlayer, EGameType gt) {
 		// a #NOTEIF note whose trigger is false is left to AutoJudge, which skips it in the same frame
 		if (!chip.bVisible || chip.IsMissed || chip.bHit || this.bPAUSE || chip.msAutoLastHit > chip.dbSoundTimems
-			|| !this.IsNoteIfMet(chip, iPlayer)) {
+			|| !this.IsNoteIfMet(chip, iPlayer) || this.IsAIHitPending(chip, iPlayer)) {
 			return false;
 		}
 		bool bAutoPlay = OpenTaiko.ConfigIni.bAutoPlay[iPlayer] || (iPlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode);
@@ -1255,6 +1239,8 @@ internal abstract class CStagePlayScreenCommon : CStage {
 
 		if (chip.eNoteState == ENoteState.Wait)
 			return this.AutoplayDoHit(chip, msTjaTime, iPlayer, gt); // hit waiting notes immediately
+		if (this.IsAIHitPending(chip, iPlayer)) // hit at its planned time instead
+			return false;
 		if (chip.msAutoLastHit > msTjaTime) // prevented from further attempts
 			return false;
 		if (chip.nSoundTimems > (long)msTjaTime) { // early hit check
@@ -1281,12 +1267,12 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		if (this.isDeniedPlaying[iPlayer] || this.IsStageFailed_Fast() || !pChip.bVisible || pChip.IsMissed || pChip.bHit || this.bPAUSE)
 			return;
 		bool bAutoPlay = OpenTaiko.ConfigIni.bAutoPlay[iPlayer] || (iPlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode);
-		var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(iPlayer)];
+		var puchiEffect = PuchiChara.tGetEffect(iPlayer);
 
 		bool uncappedSpeed = bAutoPlay && OpenTaiko.ConfigIni.nRollsPerSec < 0;
 		int rollSpeed = uncappedSpeed ? int.MaxValue
 			: bAutoPlay ? OpenTaiko.ConfigIni.nRollsPerSec
-			: puchichara.effect.Autoroll;
+			: puchiEffect.Autoroll;
 		if (OpenTaiko.ConfigIni.bAIBattleMode && iPlayer == 1)
 			rollSpeed = OpenTaiko.ConfigIni.apAIPerformances[OpenTaiko.ConfigIni.nAILevel - 1].nRollSpeed;
 
@@ -1320,11 +1306,11 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			return;
 
 		bool bAutoPlay = OpenTaiko.ConfigIni.bAutoPlay[iPlayer] || (iPlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode);
-		var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(iPlayer)];
+		var puchiEffect = PuchiChara.tGetEffect(iPlayer);
 		bool uncappedSpeed = bAutoPlay && OpenTaiko.ConfigIni.nBalloonHitsPerSec < 0;
 		int rollSpeed = uncappedSpeed ? int.MaxValue
 			: bAutoPlay ? OpenTaiko.ConfigIni.nBalloonHitsPerSec
-			: puchichara.effect.Autoroll;
+			: puchiEffect.Autoroll;
 		if (OpenTaiko.ConfigIni.bAIBattleMode && iPlayer == 1)
 			rollSpeed = OpenTaiko.ConfigIni.apAIPerformances[OpenTaiko.ConfigIni.nAILevel - 1].nRollSpeed;
 
@@ -1610,9 +1596,9 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			eJudgeResult = (bCorrectLane && !pChip.IsMissed) ? this.eGetChipJudgeAtTime((long)msHitTjaTime, pChip, nPlayer) : ENoteJudge.Miss;
 			// for hit-type notes, check pChip.IsMissed instead to avoid repeated miss judgements
 
-			// AI judges; a note that was let pass stays a miss
+			// the AI keeps the judge of its rolled zone, online remote spots sample theirs; a note that was let pass stays a miss
 			if (eJudgeResult is not ENoteJudge.Miss)
-				eJudgeResult = AlterJudgement(nPlayer, eJudgeResult, true);
+				eJudgeResult = this.AIJudgeOf(pChip, nPlayer) ?? AlterJudgement(nPlayer, eJudgeResult, true);
 
 			if (!bAutoPlay && eJudgeResult != ENoteJudge.Miss) {
 				pChip.nLag = msDelta;
@@ -2193,6 +2179,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 	private int GetIdxChipAfter(int iPlayer, long msTjaTime) => GetIdxChip(iPlayer, CChip.GetSearchChipAfter(msTjaTime));
 	private int GetIdxChipAtOrAfter(int iPlayer, long msTjaTime) => GetIdxChip(iPlayer, CChip.GetSearchChipAtOrAfter(msTjaTime));
 
+	// AIHitTiming.Lands mirrors this search to keep the AI's planned hits on their notes; change both together
 	protected (CChip? chip, ENoteJudge rawJudge) GetChipToJudgeIgnoringRollBody(long msTjaTime, int nPlayer, EPad pad) {
 		int count = listChip[nPlayer].Count;
 		if (count <= 0)         // 演奏データとして1個もチップがない場合は
@@ -2689,6 +2676,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			//Debug.WriteLine( "nCurrentTopChip=" + nCurrentTopChip + ", ch=" + pChip.nチャンネル番号.ToString("x2") + ", 発音位置=" + pChip.n発声位置 + ", 発声時刻ms=" + pChip.n発声時刻ms );
 			if (!hasChipBeenPlayedAt(pChip, nCurrentTimems)) // not processed yet
 				break;
+			this.DispatchAIHitsBefore(nPlayer, pChip.dbSoundTimems); // AI hits planned before this chip
 
 			// handle last chip status of dan-i exams
 			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
@@ -3524,6 +3512,8 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		#endregion
 
 		#region [update phase (notes' position & auto judgement)]
+		if (!drawOnly)
+			this.UpdateAIHits(nPlayer, nCurrentTimems); // before the auto-miss, which would take a late planned hit
 		foreach (var pChip in dTX.listNoteChip) {
 			if (drawOnly)
 				break;
@@ -4146,6 +4136,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		if (rollingNotesMadeHidden) {
 			this.UpdateRollStateAfterRemove(nPlayer);
 		}
+		this.ReplanAIHits(nPlayer);
 	}
 
 	public int GetRoll(int player) {
@@ -4234,6 +4225,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 
 	public virtual void tValueInitialize(bool bPlayRecord, bool bPlayState) {
 		this.isRewinding = true;
+		this.ResetAIHits();
 
 		if (bPlayRecord) {
 			this.bUsedKeyboardInPlay = false;
@@ -4638,20 +4630,9 @@ internal abstract class CStagePlayScreenCommon : CStage {
 	private int nDice = 0;
 
 	public ENoteJudge AlterJudgement(int player, ENoteJudge judgement, bool reroll) {
-		int AILevel = OpenTaiko.ConfigIni.nAILevel;
-		if (OpenTaiko.ConfigIni.bAIBattleMode && player == 1) {
-			if (reroll)
-				nDice = OpenTaiko.Random.Next(1000);
-
-			if (nDice < OpenTaiko.ConfigIni.apAIPerformances[AILevel - 1].nBadOdds)
-				return ENoteJudge.Poor;
-			else if (nDice - OpenTaiko.ConfigIni.apAIPerformances[AILevel - 1].nBadOdds
-					 < OpenTaiko.ConfigIni.apAIPerformances[AILevel - 1].nGoodOdds)
-				return ENoteJudge.Good;
-		}
-		// Online VS: a REMOTE player's auto-hit judge is sampled to match THEIR broadcast good/ok/bad rates (per
-		// mille), so their lane shows the chart being hit with a realistic judge mix — AI-battle-style, driven by
-		// the wire instead of an AI level. Only applies during an online play round (IsRemoteSpot is else false).
+		// Online VS: a remote player's auto-hit judge is sampled to match their broadcast good/ok/bad rates (per
+		// mille), so their lane shows the chart being hit with a realistic judge mix. Only applies during an online
+		// play round (IsRemoteSpot is else false).
 		var _onl = LuaNetworking.Active;
 		if (_onl != null && _onl.IsRemoteSpot(player)) {
 			if (reroll) nDice = OpenTaiko.Random.Next(1000);

@@ -309,11 +309,13 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		this.pfReplayModeTextSmall?.Dispose(); this.pfReplayModeTextSmall = null;
 		this.ttkReplayMode = null; this.ttkReplayInvalid = null;
 
-		// a play that does not go to the result screen puts the fun mods forced for Dynamic Beat back now, before a
-		// watched replay's mods; one that goes to results (StageCleared, fails that show results included) keeps them
-		// until the result screen has saved the replay
-		if (this.eFadeOutCompleteWhenReturnValue != EGameplayScreenReturnValue.StageCleared)
+		// a play that does not go to the result screen puts the fun mods forced for Dynamic Beat back now, then player 2's
+		// own modes in AI battle, before a watched replay's mods; one that goes to results (StageCleared, fails that show
+		// results included) keeps them until the result screen has saved the replay
+		if (this.eFadeOutCompleteWhenReturnValue != EGameplayScreenReturnValue.StageCleared) {
 			RestoreSharedDynamicBeat(OpenTaiko.ConfigIni);
+			AIBattleModMirror.Restore(OpenTaiko.ConfigIni);
+		}
 
 		// leaving a replay anywhere except to the result screen (quit / retry / a fail that skips results) → drop
 		// replay mode + restore the real mods now, so the next play isn't hijacked by the recording. (the
@@ -1159,7 +1161,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 					hiddenMode = EStealthMode.Doron;
 				#endregion
 
-				if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(nPlayer)].effect.SplitLane) {
+				if (bSplitLane[nPlayer] || PuchiChara.tGetEffect(nPlayer).SplitLane) {
 					if (NotesManager.IsAcceptRed(nt, _gt) && !NotesManager.IsAcceptBlue(nt, _gt)) {
 						y -= NotesManager.PxSplitLaneDistance;
 					} else if (NotesManager.IsAcceptBlue(nt, _gt) && !NotesManager.IsAcceptRed(nt, _gt)) {
@@ -1220,7 +1222,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				}
 			}
 
-			if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(nPlayer)].effect.SplitLane) {
+			if (bSplitLane[nPlayer] || PuchiChara.tGetEffect(nPlayer).SplitLane) {
 				if (NotesManager.IsAcceptRed(nt, _gt) && !NotesManager.IsAcceptBlue(nt, _gt) && !NotesManager.IsGenericBalloon(nt)) {
 					y -= NotesManager.PxSplitLaneDistance;
 					yEnd -= NotesManager.PxSplitLaneDistance;

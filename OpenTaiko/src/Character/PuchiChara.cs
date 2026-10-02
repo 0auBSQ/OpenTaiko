@@ -25,6 +25,12 @@ class PuchiChara : CActivity {
 		base.DeActivate();
 	}
 
+	private static readonly DBPuchichara.PuchicharaEffect NoEffect = new();
+
+	// the effects of a player's puchichara on the play; the AI battle's AI plays without any
+	internal static DBPuchichara.PuchicharaEffect tGetEffect(int p)
+		=> AIBattleModMirror.IsAI(OpenTaiko.ConfigIni, p) ? NoEffect : OpenTaiko.Tx.Puchichara[tGetPuchiCharaIndexByName(p)].effect;
+
 	public static int tGetPuchiCharaIndexByName(int p) {
 		var _pc = CVirtualSlotManager.GetPuchicharaName(p);
 		var _pcs = OpenTaiko.Skin.Puchicharas_NameToIndex;

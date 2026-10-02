@@ -132,10 +132,12 @@ internal class CStageSongLoading : CStage {
 				if (!TransitionDriven) Game.AsyncBudgetMs = Game.DefaultAsyncBudgetMs;
 			}
 
-			// a load that ends before gameplay (ESC, a load error) ends its play: the fun mods forced for Dynamic Beat
-			// and a watched replay's mods and name go back, and the replay is no longer armed or playing
+			// a load that ends before gameplay (ESC, a load error) ends its play: the fun mods forced for Dynamic Beat,
+			// player 2's own modes in AI battle and a watched replay's mods and name go back, in that order, and the replay
+			// is no longer armed or playing
 			if (!_handedOver) {
 				CStagePlayScreenCommon.RestoreSharedDynamicBeat(OpenTaiko.ConfigIni);
+				AIBattleModMirror.Restore(OpenTaiko.ConfigIni);
 				OpenTaiko.ReplayWatchArmed = false;
 				CSongReplay.tRestoreVirtualMods();
 				for (int i = 0; i < 5; i++) { OpenTaiko.bReplayMode[i] = false; OpenTaiko.ReplayPlayback[i] = null; }
@@ -457,13 +459,36 @@ internal class CStageSongLoading : CStage {
 					for (int rp = 1; rp < 5; rp++) OpenTaiko.bReplayMode[rp] = false;
 					OpenTaiko.ReplayWatchArmed = false;
 
+					// while watching a replay the seed is already set (from the replay); otherwise pick a fresh one to record
+					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+						if (!OpenTaiko.bReplayMode[i]) OpenTaiko.ReplaySeed[i] = System.Random.Shared.Next(0, int.MaxValue);
+					}
+					// in AI battle the AI plays with player 1's modes and seed (put back when the play ends)
+					AIBattleModMirror.Apply(OpenTaiko.ConfigIni, OpenTaiko.ReplaySeed);
+
+					// The chart mods draw over the chart of the player whose modes this one plays with, so the AI gets the
+					// shuffle, mines and Avalanche of player 1. Every draw is taken before any chart changes; a chart shared
+					// with that player has its mods already.
+					var modDraws = new (int[] Notes, int[] FunMods)?[OpenTaiko.ConfigIni.nPlayerCount];
+					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+						int source = AIBattleModMirror.ModSourceOf(OpenTaiko.ConfigIni, i);
+						var _dtx = OpenTaiko.GetTJA(i);
+						var sourceTja = OpenTaiko.GetTJA(source)!;
+						if (_dtx == null || (source != i && ReferenceEquals(_dtx, sourceTja)))
+							continue;
+						int seed = OpenTaiko.ReplaySeed[i];
+						modDraws[i] = (ChartModDraws.Over(_dtx.listChip, sourceTja.listChip, seed),
+							ChartModDraws.Over(_dtx.listChip, sourceTja.listChip, ChartModDraws.FunModSeed(seed)));
+					}
+
 					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 						var _dtx = OpenTaiko.GetTJA(i);
 						_dtx?.tInitLocalStores(i);
-						// while watching a replay the seed is already set (from the replay); otherwise pick a fresh one to record
-						if (!OpenTaiko.bReplayMode[i]) OpenTaiko.ReplaySeed[i] = System.Random.Shared.Next(0, int.MaxValue);
-						_dtx?.tRandomizeTaikoChips(i, OpenTaiko.ReplaySeed[i]);
-						_dtx?.tApplyFunMods(i);
+						if (modDraws[i] is { } draws) {
+							_dtx!.tRandomizeTaikoChips(i, OpenTaiko.ConfigIni.eRandom[i], draws.Notes);
+							_dtx.tApplyFunMods(OpenTaiko.ConfigIni.nFunMods[i], draws.FunMods,
+								CTja.FunModEffectOf(AIBattleModMirror.ModSourceOf(OpenTaiko.ConfigIni, i)));
+						}
 						OpenTaiko.ReplayInstances[i] = new CSongReplay(_dtx.strFullPath, i);
 					}
 

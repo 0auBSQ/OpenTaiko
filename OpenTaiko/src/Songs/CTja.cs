@@ -799,42 +799,32 @@ internal class CTja : CActivity {
 		return new string(new char[] { str[n / 36], str[n % 36] });
 	}
 
-	public void tApplyFunMods(int player = 0) {
-		Random rnd = new System.Random();
-
-		var eFun = OpenTaiko.ConfigIni.nFunMods[player];
+	// the character effect Minesweeper reads its factors from: the player's own character's
+	public static DBCharacter.CharacterEffect FunModEffectOf(int player) {
 		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[player].data.Character];
 		// The selected character or its effect data can be null (e.g. on iOS, or if Effects.json failed to
 		// load), so fall back to default effect values so fun-mods still apply.
-		var effect = chara?.effect ?? new DBCharacter.CharacterEffect();
+		return chara?.effect ?? new DBCharacter.CharacterEffect();
+	}
 
+	// draws: one in 0..99 per listChip element (ChartModDraws)
+	public void tApplyFunMods(EFunMods eFun, int[] draws, DBCharacter.CharacterEffect effect) {
 		var bombFactor = Math.Max(1, Math.Min(100, effect.BombFactor));
 		var fuseRollFactor = Math.Max(0, Math.Min(100, effect.FuseRollFactor));
 
 		switch (eFun) {
 			case EFunMods.Minesweeper:
-				foreach (var chip in this.listChip) {
-					if (NotesManager.IsMissableNote(chip)) {
-						int n = rnd.Next(100);
-
-						if (n < bombFactor) chip.nChannelNo = 0x1C;
-					}
-
-					if (NotesManager.IsBalloon(chip)) {
-						int n = rnd.Next(100);
-
-						if (n < fuseRollFactor) chip.nChannelNo = 0x1D;
-					}
-
+				for (int i = 0; i < this.listChip.Count; i++) {
+					var chip = this.listChip[i];
+					if (NotesManager.IsMissableNote(chip) && draws[i] < bombFactor)
+						chip.nChannelNo = 0x1C;
+					else if (NotesManager.IsBalloon(chip) && draws[i] < fuseRollFactor)
+						chip.nChannelNo = 0x1D;
 				}
 				break;
 			case EFunMods.Avalanche:
-				foreach (var chip in this.listChip) {
-					int n = rnd.Next(100);
-
-
-					chip.dbSCROLL *= (n + 50) / (double)100;
-				}
+				for (int i = 0; i < this.listChip.Count; i++)
+					this.listChip[i].dbSCROLL *= (draws[i] + 50) / (double)100;
 				break;
 			case EFunMods.DynamicBeat:
 			case EFunMods.None:
@@ -848,12 +838,10 @@ internal class CTja : CActivity {
 		LocalTriggers = new CLocalTriggers(player);
 	}
 
-	public void tRandomizeTaikoChips(int player = 0, int seed = -1) {
+	// player: the one who plays this chart (a TCI chart's nPlayerSide is always 0); draws: one in 0..99 per listChip
+	// element (ChartModDraws)
+	public void tRandomizeTaikoChips(int player, ERandomMode eRandom, int[] draws) {
 		//2016.02.11 kairera0467
-		// a fixed seed makes the shuffle reproducible, so Random/Super-Random replays can be watched back
-		Random rnd = seed >= 0 ? new System.Random(seed) : new System.Random();
-
-		var eRandom = OpenTaiko.ConfigIni.eRandom[player];
 
 		switch (eRandom) {
 			case ERandomMode.Mirror:
@@ -877,8 +865,9 @@ internal class CTja : CActivity {
 				}
 				break;
 			case ERandomMode.Random:
-				foreach (var chip in this.listChip) {
-					int n = rnd.Next(100);
+				for (int i = 0; i < this.listChip.Count; i++) {
+					var chip = this.listChip[i];
+					int n = draws[i];
 
 					if (n >= 0 && n <= 20) { // 21% flip
 						switch (chip.nChannelNo) {
@@ -901,8 +890,9 @@ internal class CTja : CActivity {
 				}
 				break;
 			case ERandomMode.SuperRandom:
-				foreach (var chip in this.listChip) {
-					int n = rnd.Next(100);
+				for (int i = 0; i < this.listChip.Count; i++) {
+					var chip = this.listChip[i];
+					int n = draws[i];
 
 					if (n >= 0 && n <= 50) { // 51% flip
 						switch (chip.nChannelNo) {
@@ -925,8 +915,9 @@ internal class CTja : CActivity {
 				}
 				break;
 			case ERandomMode.MirrorRandom:
-				foreach (var chip in this.listChip) {
-					int n = rnd.Next(100);
+				for (int i = 0; i < this.listChip.Count; i++) {
+					var chip = this.listChip[i];
+					int n = draws[i];
 
 					if (n >= 0 && n <= 80) { // 81% flip
 						switch (chip.nChannelNo) {
@@ -953,7 +944,7 @@ internal class CTja : CActivity {
 				break;
 		}
 
-		if (OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(nPlayerSide)].effect.AllPurple) {
+		if (PuchiChara.tGetEffect(player).AllPurple) {
 			foreach (var chip in this.listChip) {
 				if (chip.nChannelNo is 0x13 or 0x1A or 0x14 or 0x1B) {
 					chip.nChannelNo = 0x101;

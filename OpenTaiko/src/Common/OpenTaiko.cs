@@ -2057,8 +2057,10 @@ internal class OpenTaiko : Game {
 			try {
 				// quitting the game while a replay is armed/playing: put the player's real mods back before the
 				// export below persists the config (the replay's virtual mods must never reach Config.ini); the fun
-				// mods forced for Dynamic Beat go back first, as they were kept after the replay's mods were applied
+				// mods forced for Dynamic Beat go back first, as they were kept after the replay's mods were applied, then the
+				// own modes of player 2 in AI battle
 				CStagePlayScreenCommon.RestoreSharedDynamicBeat(ConfigIni);
+				AIBattleModMirror.Restore(ConfigIni);
 				CSongReplay.tRestoreVirtualMods();
 				// the exporter mutates the config (hidden window, auto, player count) — never persist that
 				if (!VideoExporter.Active) ConfigIni.tExport(str);

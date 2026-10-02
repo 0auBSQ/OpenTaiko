@@ -351,8 +351,7 @@ class NotesManager {
 			DrawFaded(OpenTaiko.Tx.Note_Kusu, opacity, t => t.t2DDraw(x, y, new Rectangle(0, frame, length, OpenTaiko.Skin.Game_Notes_Size[1])));
 			return;
 		} else if (IsADLIB(nt)) {
-			var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(player)];
-			if (puchichara.effect.ShowAdlib) {
+			if (PuchiChara.tGetEffect(player).ShowAdlib) {
 				OpenTaiko.Tx.Note_Adlib?.tUpdateOpacity(50);
 				DrawFaded(OpenTaiko.Tx.Note_Adlib, opacity, t => t.t2DDraw(x, y, new Rectangle(0, frame, length, OpenTaiko.Skin.Game_Notes_Size[1])));
 			}
@@ -503,8 +502,7 @@ class NotesManager {
 		int moveY = (int)(moveAmount * OpenTaiko.Skin.Game_Notes_Arm_Move[1]);
 
 		if (IsADLIB(chip)) {
-			var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(player)];
-			if (!puchichara.effect.ShowAdlib)
+			if (!PuchiChara.tGetEffect(player).ShowAdlib)
 				return;
 			OpenTaiko.Tx.Notes_Arm?.tUpdateOpacity(50);
 		}
