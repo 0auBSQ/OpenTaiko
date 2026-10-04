@@ -2,7 +2,7 @@
 -- pill_clouds: from the title into the regular song select (Lib/PillClouds).
 
 local PC = require("PillClouds")
-local anim = PC.new({ { 0.91, 0.25, 0.24 }, { 0.97, 0.76, 0.15 }, { 0.22, 0.71, 0.29 }, { 0.18, 0.53, 0.87 } })
+local anim = PC.new({ { 1.00, 0.80, 0.60 }, { 0.60, 0.90, 1.00 }, { 1.00, 0.80, 0.60 }, { 0.60, 0.90, 1.00 }, })
 
 FADE_OUT_SECONDS = PC.PILLS_OUT_SECONDS
 FADE_IN_SECONDS  = PC.IN_SECONDS
