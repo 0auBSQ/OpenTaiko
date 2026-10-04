@@ -36,6 +36,33 @@ internal class CActImplBackground : CActivity {
 		DownScript?.Call("clearOut", player);
 	}
 
+	/// <summary>A note hit of the player, read by the Up and Down backgrounds from their state.</summary>
+	public void AddHit(int player, NotesManager.ENoteType note, string judge) => _state.AddHit(player, note, judge);
+
+	/// <summary>A flying note of the player reached the end of its flight.</summary>
+	public void NoteLanded(int player) {
+		if (player >= 0 && player < _state.landCount.Length) _state.landCount[player]++;
+	}
+
+	/// <summary>The point the shown background wants the player's flying notes to land on, if it set one.</summary>
+	public bool FlyTarget(int player, out double x, out double y) {
+		x = y = 0;
+		return Shown && _state.TryGetFlyTarget(player, out x, out y);
+	}
+
+	/// <summary>Whether the play screen drew this background on the current frame.</summary>
+	public bool Shown;
+
+	// background folders forced on the next play (SONGMOUNT:SetBackgrounds), null for the usual pick
+	internal static string? NextUpDir, NextDownDir;
+
+	/// <summary>The forced background folders, cleared so that only one play uses them.</summary>
+	internal static (string? up, string? down) TakeForcedBackgrounds() {
+		var forced = (NextUpDir, NextDownDir);
+		NextUpDir = NextDownDir = null;
+		return forced;
+	}
+
 	/// <summary>The Down folder of the tower chart's look (its TOWERTYPE), or null when the chart names none or
 	/// the skin has no folder of that name (a preset or a random pick then applies).</summary>
 	private static string? TowerLookPath(string bgOrigindir) {
@@ -64,15 +91,21 @@ internal class CActImplBackground : CActivity {
 
 		Random random = new Random();
 		_state.RefreshConst();
+		_state.ResetHits();
 
-		if (System.IO.Directory.Exists($@"{bgOrigindir}{Path.DirectorySeparatorChar}Up")) {
-			var upDirs = System.IO.Directory.GetDirectories($@"{bgOrigindir}{Path.DirectorySeparatorChar}Up");
+		var (forcedUp, forcedDown) = TakeForcedBackgrounds();
 
-			// If there is a preset upper background and this preset exists on the skin use it, else random upper background
-			var _presetPath = (preset != null && preset.UpperBackground != null) ? $@"{bgOrigindir}{Path.DirectorySeparatorChar}Up{Path.DirectorySeparatorChar}" + preset.UpperBackground[random.Next(0, preset.UpperBackground.Length)] : "";
-			var upPath = (preset != null && System.IO.Directory.Exists(_presetPath))
-				? _presetPath
-				: upDirs[random.Next(0, upDirs.Length)];
+		if (forcedUp != null || System.IO.Directory.Exists($@"{bgOrigindir}{Path.DirectorySeparatorChar}Up")) {
+			var upPath = forcedUp;
+			if (upPath == null) {
+				var upDirs = System.IO.Directory.GetDirectories($@"{bgOrigindir}{Path.DirectorySeparatorChar}Up");
+
+				// If there is a preset upper background and this preset exists on the skin use it, else random upper background
+				var _presetPath = (preset != null && preset.UpperBackground != null) ? $@"{bgOrigindir}{Path.DirectorySeparatorChar}Up{Path.DirectorySeparatorChar}" + preset.UpperBackground[random.Next(0, preset.UpperBackground.Length)] : "";
+				upPath = (preset != null && System.IO.Directory.Exists(_presetPath))
+					? _presetPath
+					: upDirs[random.Next(0, upDirs.Length)];
+			}
 
 			UpScript = new LuaBackgroundWrapper(upPath);
 			UpScript.Activate(_state);
@@ -82,18 +115,21 @@ internal class CActImplBackground : CActivity {
 			IsUpNotFound = true;
 		}
 
-		if (System.IO.Directory.Exists($@"{bgOrigindir}{Path.DirectorySeparatorChar}Down")) {
-			var downDirs = System.IO.Directory.GetDirectories($@"{bgOrigindir}{Path.DirectorySeparatorChar}Down");
+		if (forcedDown != null || System.IO.Directory.Exists($@"{bgOrigindir}{Path.DirectorySeparatorChar}Down")) {
+			var downPath = forcedDown;
+			if (downPath == null) {
+				var downDirs = System.IO.Directory.GetDirectories($@"{bgOrigindir}{Path.DirectorySeparatorChar}Down");
 
-			// If there is a preset lower background and this preset exists on the skin use it, else random upper background
-			var _presetPath = (preset != null && preset.LowerBackground != null) ? $@"{bgOrigindir}{Path.DirectorySeparatorChar}Down{Path.DirectorySeparatorChar}" + preset.LowerBackground[random.Next(0, preset.LowerBackground.Length)] : "";
-			var downPath = (preset != null && System.IO.Directory.Exists(_presetPath))
-				? _presetPath
-				: downDirs[random.Next(0, downDirs.Length)];
+				// If there is a preset lower background and this preset exists on the skin use it, else random upper background
+				var _presetPath = (preset != null && preset.LowerBackground != null) ? $@"{bgOrigindir}{Path.DirectorySeparatorChar}Down{Path.DirectorySeparatorChar}" + preset.LowerBackground[random.Next(0, preset.LowerBackground.Length)] : "";
+				downPath = (preset != null && System.IO.Directory.Exists(_presetPath))
+					? _presetPath
+					: downDirs[random.Next(0, downDirs.Length)];
 
-			// A tower chart names its look (TOWERTYPE): the Down folder of that name holds the sky and the tower
-			var towerLook = TowerLookPath(bgOrigindir);
-			if (towerLook != null) downPath = towerLook;
+				// A tower chart names its look (TOWERTYPE): the Down folder of that name holds the sky and the tower
+				var towerLook = TowerLookPath(bgOrigindir);
+				if (towerLook != null) downPath = towerLook;
+			}
 
 			DownScript = new LuaBackgroundWrapper(downPath);
 			DownScript.Activate(_state);

@@ -35,6 +35,84 @@ public sealed class LuaBackgroundState {
 	public bool paused;
 	public int player;   // set by per-player hosts (clear animations) before Update/Draw; ignored by whole-screen bgs
 
+	// Note hits, recorded by the play screen for the gameplay Up and Down backgrounds. hitCount[p] counts player p's
+	// judged notes, roll hits and popped balloons since the background started; the n-th of them (from 0) sits at
+	// index n % hitRing of hitNote ("don", "ka" or "kadon"), hitBig and hitJudge ("perfect", "great", "good", "poor",
+	// "miss", "roll" or "balloon"), which keep the latest hitRing hits.
+	public const int HitRing = 32;
+	public int hitRing = HitRing;
+	public int[] hitCount = new int[5];
+	public string[][] hitNote = Ring("");
+	public bool[][] hitBig = Ring(false);
+	public string[][] hitJudge = Ring("");
+
+	// Flying notes: landCount[p] counts player p's flying notes that reached the end of their flight. A gameplay Up or
+	// Down background can make them land on its own art with SetFlyTarget while it is shown; the skin's landing effect
+	// is then left out.
+	public int[] landCount = new int[5];
+	private readonly double[] flyX = { double.NaN, double.NaN, double.NaN, double.NaN, double.NaN };
+	private readonly double[] flyY = { double.NaN, double.NaN, double.NaN, double.NaN, double.NaN };
+
+	public void SetFlyTarget(int player, double x, double y) {
+		if (player < 0 || player >= flyX.Length) return;
+		flyX[player] = x;
+		flyY[player] = y;
+	}
+
+	public void ClearFlyTarget(int player) => SetFlyTarget(player, double.NaN, double.NaN);
+
+	internal bool TryGetFlyTarget(int player, out double x, out double y) {
+		x = y = double.NaN;
+		if (player < 0 || player >= flyX.Length || double.IsNaN(flyX[player]) || double.IsNaN(flyY[player])) return false;
+		(x, y) = (flyX[player], flyY[player]);
+		return true;
+	}
+
+	private static T[][] Ring<T>(T value) {
+		var ring = new T[5][];
+		for (int p = 0; p < ring.Length; p++) ring[p] = Enumerable.Repeat(value, HitRing).ToArray();
+		return ring;
+	}
+
+	// a new background starts with no hits, no landings and no fly targets
+	internal void ResetHits() {
+		Array.Clear(hitCount);
+		Array.Clear(landCount);
+		for (int p = 0; p < hitCount.Length; p++) {
+			Array.Fill(hitNote[p], "");
+			Array.Clear(hitBig[p]);
+			Array.Fill(hitJudge[p], "");
+			ClearFlyTarget(p);
+		}
+	}
+
+	/// <summary>Record a hit of player (0-based): note is the note type as it flies, judge a hitJudge name.</summary>
+	internal void AddHit(int player, NotesManager.ENoteType note, string judge) {
+		if (player < 0 || player >= hitCount.Length) return;
+		int slot = hitCount[player] % HitRing;
+		(hitNote[player][slot], hitBig[player][slot]) = NoteName(note);
+		hitJudge[player][slot] = judge;
+		hitCount[player]++;
+	}
+
+	// the hitNote name and size of a flying note type; Konga's notes take the names of the Taiko notes they share a value with
+	internal static (string name, bool big) NoteName(NotesManager.ENoteType note) => note switch {
+		NotesManager.ENoteType.Don => ("don", false),
+		NotesManager.ENoteType.DonBig or NotesManager.ENoteType.DonHand => ("don", true),
+		NotesManager.ENoteType.Ka => ("ka", false),
+		NotesManager.ENoteType.KaBig or NotesManager.ENoteType.KaHand => ("ka", true),
+		NotesManager.ENoteType.Kadon => ("kadon", false),
+		_ => ("", false),
+	};
+
+	internal static string JudgeName(ENoteJudge judge) => judge switch {
+		ENoteJudge.Perfect => "perfect",
+		ENoteJudge.Great => "great",
+		ENoteJudge.Good => "good",
+		ENoteJudge.Poor => "poor",
+		_ => "miss",
+	};
+
 	/// <summary>Fill the const-ish values from config + the current character/puchichara rarities (mirrors the old
 	/// <c>setConstValues</c> push in <c>ScriptBG.Init</c>). Call once when the host activates.</summary>
 	public void RefreshConst() {

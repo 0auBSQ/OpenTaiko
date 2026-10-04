@@ -436,3 +436,4 @@ local mirrored = (flags & REPLAY.MODFLAG.Mirror) ~= 0
 | `SONGMOUNT:ChosenUniqueId()  -> string` | Возвращает уникальный идентификатор выбранной песни или пустую строку. |
 | `SONGMOUNT:ChosenDifficulty()  -> int` | Возвращает индекс сложности, выбранный для игрока 1. |
 | `SONGMOUNT:ChosenSongNode()  -> song node` | Возвращает выбранную песню как узел песни (без потомков) или nil, если ничего не выбрано. |
+| `SONGMOUNT:SetBackgrounds(up, down)  -> boolean` | Forces the upper and lower gameplay backgrounds of the next play. Each argument is a folder holding a background Script.lua, relative to the calling script's folder or absolute; nil or "" keeps the usual pick for that layer. The next play takes both when its backgrounds start, and a new call replaces both. Returns false when a given folder has no Script.lua; that layer then keeps the usual pick. |

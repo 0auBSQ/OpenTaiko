@@ -448,6 +448,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 					bBackgroundDrawn = true;
 				}
 			}
+			actBackground.Shown = bBackgroundDrawn;   // the flying notes land on its art only while it is drawn
 			// without the tower background, the floor and lives planks are drawn here
 			if (isTower && !bBackgroundDrawn)
 				actBackground.DrawTowerHud();

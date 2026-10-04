@@ -425,7 +425,7 @@ Elements of the array returned by REPLAY:ListReplays or a replay list handle's R
 
 ### SONGMOUNT
 
-Read-only global for the song currently selected for play.
+Global for the song currently selected for play and the backgrounds of the next play.
 
 <div class="callout warn">
 Available as the global SONGMOUNT. It reflects the state set by a song node's Mount(), a chart's Select() or DANBUILDER:Mount().
@@ -436,3 +436,4 @@ Available as the global SONGMOUNT. It reflects the state set by a song node's Mo
 | `SONGMOUNT:ChosenUniqueId()  -> string` | Returns the unique id of the selected song, or an empty string. |
 | `SONGMOUNT:ChosenDifficulty()  -> int` | Returns the difficulty index selected for player 1. |
 | `SONGMOUNT:ChosenSongNode()  -> song node` | Returns the selected song as a song node (without children), or nil when nothing is selected. |
+| `SONGMOUNT:SetBackgrounds(up, down)  -> boolean` | Forces the upper and lower gameplay backgrounds of the next play. Each argument is a folder holding a background Script.lua, relative to the calling script's folder or absolute; nil or "" keeps the usual pick for that layer. The next play takes both when its backgrounds start, and a new call replaces both. Returns false when a given folder has no Script.lua; that layer then keeps the usual pick. |

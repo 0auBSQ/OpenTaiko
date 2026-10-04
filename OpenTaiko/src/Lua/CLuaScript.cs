@@ -457,7 +457,7 @@ end
 				LuaScript["CONFIG"] = new LuaConfigIniFunc();
 			else
 				LuaScript["CONFIG"] = new LuaROConfigIniFunc();
-			LuaScript["SONGMOUNT"] = new LuaSongMountFunc();   // read the song the host just confirmed (for online sync)
+			LuaScript["SONGMOUNT"] = new LuaSongMountFunc(dir);   // read the song the host just confirmed (for online sync)
 			LuaScript["THEME"] = new LuaThemeFunc();
 			LuaScript["SHARED"] = new LuaSharedResourceFunc(OpenTaiko.GlobalStores.SharedTextures, OpenTaiko.GlobalStores.SharedSounds, OpenTaiko.GlobalStores.SharedStrings, OpenTaiko.GlobalStores.SharedScenes, ltf, lsf, dir);
 			if (writable)

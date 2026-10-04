@@ -1452,12 +1452,15 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 			this.PlayHitNoteSound(nPlayer, sort, msHitTjaTime);
 			this.StartHitNoteLaneFlash(nPlayer, sort, gt);
 			//赤か青かの分岐
-			if (sort is NotesManager.EInputType.Red or NotesManager.EInputType.RedBig) {
-				OpenTaiko.stageGameScreen.FlyingNotes.Start(NotesManager.IsBigRollTaiko(pChip, gt) ? NotesManager.ENoteType.DonBig : NotesManager.ENoteType.Don, gt, nPlayer);
-			} else if (sort is NotesManager.EInputType.Blue or NotesManager.EInputType.BlueBig) {
-				OpenTaiko.stageGameScreen.FlyingNotes.Start(NotesManager.IsBigRollTaiko(pChip, gt) ? NotesManager.ENoteType.KaBig : NotesManager.ENoteType.Ka, gt, nPlayer);
-			} else if (sort is NotesManager.EInputType.Clap) {
-				OpenTaiko.stageGameScreen.FlyingNotes.Start(NotesManager.ENoteType.Clap, gt, nPlayer);
+			var flyType = sort switch {
+				NotesManager.EInputType.Red or NotesManager.EInputType.RedBig => NotesManager.IsBigRollTaiko(pChip, gt) ? NotesManager.ENoteType.DonBig : NotesManager.ENoteType.Don,
+				NotesManager.EInputType.Blue or NotesManager.EInputType.BlueBig => NotesManager.IsBigRollTaiko(pChip, gt) ? NotesManager.ENoteType.KaBig : NotesManager.ENoteType.Ka,
+				NotesManager.EInputType.Clap => NotesManager.ENoteType.Clap,
+				_ => NotesManager.ENoteType.Empty,
+			};
+			if (flyType != NotesManager.ENoteType.Empty) {
+				OpenTaiko.stageGameScreen.FlyingNotes.Start(flyType, gt, nPlayer);
+				OpenTaiko.stageGameScreen.actBackground.AddHit(nPlayer, flyType, "roll");
 			}
 
 			return ENoteJudge.Perfect;
@@ -1681,6 +1684,9 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 						this.actTaikoLaneFlash.PlayerLane[nPlayer].Start(PlayerLane.FlashType.Hit, gt);
 						OpenTaiko.stageGameScreen.FlyingNotes.Start(NotesManager.GetFlyNoteType(pChip, gt, isBigInput), gt, nPlayer);
 					}
+					OpenTaiko.stageGameScreen.actBackground.AddHit(nPlayer, NotesManager.GetFlyNoteType(pChip, gt, isBigInput), LuaBackgroundState.JudgeName(eJudgeResult));
+				} else if (eJudgeResult == ENoteJudge.Miss) {
+					OpenTaiko.stageGameScreen.actBackground.AddHit(nPlayer, NotesManager.GetFlyNoteType(pChip, gt, true), "miss");
 				}
 			}
 		}
@@ -3918,6 +3924,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 			if (!OpenTaiko.Skin.soundBalloon.bIsPlaying)
 				this.PlayHitNoteSound(iPlayer, input, msHitTjaTime); // fallback sound
 			OpenTaiko.stageGameScreen.FlyingNotes.Start(NotesManager.ENoteType.DonBig, NotesManager.GetChipGameType(chip, iPlayer), iPlayer, forceFirework: true);
+			OpenTaiko.stageGameScreen.actBackground.AddHit(iPlayer, NotesManager.ENoteType.DonBig, "balloon");
 			OpenTaiko.stageGameScreen.Rainbow.Start(iPlayer);
 			//CDTXMania.stage演奏ドラム画面.actChipFireD.Start( 0, player );
 			chip.bHit = true;

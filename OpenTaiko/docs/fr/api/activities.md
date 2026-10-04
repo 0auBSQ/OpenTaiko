@@ -251,6 +251,14 @@ Une instance par hôte, que l'hôte met à jour sur place à chaque frame. Les c
 | `state.timeStamp  -> number` | Temps synchronisé sur la partition, en secondes ; -1 hors gameplay. |
 | `state.paused  -> boolean` | Vrai pendant la pause du gameplay. |
 | `state.player  -> number` | Le joueur pour lequel un hôte par joueur (animations de réussite) dessine. |
+| `state.hitRing  -> number` | Number of recent hits kept in hitNote, hitBig and hitJudge (32). |
+| `state.hitCount  -> number[]` | Each player's hits since the background started: judged notes (misses included), roll hits and popped balloons. The n-th hit, counted from 0, sits at index n % hitRing of hitNote, hitBig and hitJudge. |
+| `state.hitNote  -> string[][]` | Note of each kept hit, per player: "don", "ka" or "kadon". |
+| `state.hitBig  -> boolean[][]` | True when the kept hit was a big note, per player. |
+| `state.hitJudge  -> string[][]` | Judge of each kept hit, per player: "perfect", "great", "good", "poor", "miss", "roll" or "balloon". |
+| `state.landCount  -> number[]` | Each player's flying notes that reached the end of their flight since the background started. |
+| `state:SetFlyTarget(player, x, y)` | While this gameplay background is shown, the player's flying notes land on (x, y) in screen pixels and the skin's landing effect is left out. |
+| `state:ClearFlyTarget(player)` | The player's flying notes land at the skin's usual place again. |
 
 ## Transitions
 

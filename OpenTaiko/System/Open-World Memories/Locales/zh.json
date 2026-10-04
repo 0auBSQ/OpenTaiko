@@ -16,6 +16,12 @@
         "PAGODA_LEAVE":         "离开",
         "PAGODA_LEAVE_CONFIRM":  "确定吗？离开将失去当前进度",
         "PAGODA_EXIT":      "退出",
+        // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
+        "PAGODA_BAND_TEST":      "题",
+        "PAGODA_BAND_GATE":      "扉",
+        "PAGODA_BAND_SKY":       "穹天",
+        "PAGODA_MYSTERY_CHANCE": "神秘出现概率：%d%%",
+        "PAGODA_DESTINY":        "你无法改变自己的命运",
 
         // The Fox Dojo entrance (dan_select): the two boards and the exit
         "DANSELECT_STANDARD": "标准段位挑战",

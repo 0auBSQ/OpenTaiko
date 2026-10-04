@@ -18,6 +18,12 @@
         "PAGODA_LEAVE":         "Verlaten",
         "PAGODA_LEAVE_CONFIRM":  "Weet je het zeker? Je voortgang gaat verloren als je weggaat",
         "PAGODA_EXIT":      "Afsluiten",
+        // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
+        "PAGODA_BAND_TEST":      "Proef",
+        "PAGODA_BAND_GATE":      "Poort",
+        "PAGODA_BAND_SKY":       "Hemel",
+        "PAGODA_MYSTERY_CHANCE": "Kans op een mysterie: %d%%",
+        "PAGODA_DESTINY":        "Je kunt je lot niet veranderen",
 
         // The Fox Dojo entrance (dan_select): the two boards and the exit
         "DANSELECT_STANDARD": "Standaard dan-uitdaging",

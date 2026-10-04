@@ -436,3 +436,4 @@ Beschikbaar als de global SONGMOUNT. Hij weerspiegelt de status die is gezet doo
 | `SONGMOUNT:ChosenUniqueId()  -> string` | Geeft het unieke id van het geselecteerde nummer terug, of een lege string. |
 | `SONGMOUNT:ChosenDifficulty()  -> int` | Geeft de moeilijkheidsindex terug die voor speler 1 is geselecteerd. |
 | `SONGMOUNT:ChosenSongNode()  -> song node` | Geeft het geselecteerde nummer terug als nummerknoop (zonder kinderen), of nil wanneer er niets is geselecteerd. |
+| `SONGMOUNT:SetBackgrounds(up, down)  -> boolean` | Forces the upper and lower gameplay backgrounds of the next play. Each argument is a folder holding a background Script.lua, relative to the calling script's folder or absolute; nil or "" keeps the usual pick for that layer. The next play takes both when its backgrounds start, and a new call replaces both. Returns false when a given folder has no Script.lua; that layer then keeps the usual pick. |

@@ -436,3 +436,4 @@ REPLAY:ListReplays가 반환하는 배열이나 리플레이 목록 핸들의 Re
 | `SONGMOUNT:ChosenUniqueId()  -> string` | 선택된 곡의 고유 id를 반환하며, 없으면 빈 문자열. |
 | `SONGMOUNT:ChosenDifficulty()  -> int` | 플레이어 1에 대해 선택된 난이도 인덱스를 반환합니다. |
 | `SONGMOUNT:ChosenSongNode()  -> song node` | 선택된 곡을 곡 노드(자식 없음)로 반환하며, 선택된 것이 없으면 nil. |
+| `SONGMOUNT:SetBackgrounds(up, down)  -> boolean` | Forces the upper and lower gameplay backgrounds of the next play. Each argument is a folder holding a background Script.lua, relative to the calling script's folder or absolute; nil or "" keeps the usual pick for that layer. The next play takes both when its backgrounds start, and a new call replaces both. Returns false when a given folder has no Script.lua; that layer then keeps the usual pick. |

@@ -18,6 +18,12 @@
         "PAGODA_LEAVE":         "Уйти",
         "PAGODA_LEAVE_CONFIRM":  "Вы уверены? Если уйти, прогресс будет потерян",
         "PAGODA_EXIT":      "Выход",
+        // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
+        "PAGODA_BAND_TEST":      "Испытание",
+        "PAGODA_BAND_GATE":      "Врата",
+        "PAGODA_BAND_SKY":       "Небо",
+        "PAGODA_MYSTERY_CHANCE": "Вероятность тайны: %d%%",
+        "PAGODA_DESTINY":        "Судьбу не изменить",
 
         // The Fox Dojo entrance (dan_select): the two boards and the exit
         "DANSELECT_STANDARD": "Стандартный экзамен на дан",

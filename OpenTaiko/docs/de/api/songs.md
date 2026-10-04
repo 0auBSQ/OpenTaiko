@@ -436,3 +436,4 @@ Als globales Objekt SONGMOUNT verfügbar. Es spiegelt den Zustand wider, der dur
 | `SONGMOUNT:ChosenUniqueId()  -> string` | Gibt die eindeutige ID des ausgewählten Songs zurück, oder einen leeren String. |
 | `SONGMOUNT:ChosenDifficulty()  -> int` | Gibt den für Spieler 1 ausgewählten Schwierigkeitsindex zurück. |
 | `SONGMOUNT:ChosenSongNode()  -> song node` | Gibt den ausgewählten Song als Song-Knoten zurück (ohne Kinder), oder nil, wenn nichts ausgewählt ist. |
+| `SONGMOUNT:SetBackgrounds(up, down)  -> boolean` | Forces the upper and lower gameplay backgrounds of the next play. Each argument is a folder holding a background Script.lua, relative to the calling script's folder or absolute; nil or "" keeps the usual pick for that layer. The next play takes both when its backgrounds start, and a new call replaces both. Returns false when a given folder has no Script.lua; that layer then keeps the usual pick. |

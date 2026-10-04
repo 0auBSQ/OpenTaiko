@@ -436,3 +436,4 @@ REPLAY:ListReplays 返回的数组或回放列表句柄的 Result 的元素。�
 | `SONGMOUNT:ChosenUniqueId()  -> string` | 返回选定歌曲的唯一 id，或空字符串。 |
 | `SONGMOUNT:ChosenDifficulty()  -> int` | 返回为玩家 1 选定的难度索引。 |
 | `SONGMOUNT:ChosenSongNode()  -> song node` | 以歌曲节点（不含子节点）返回选定的歌曲；未选定时返回 nil。 |
+| `SONGMOUNT:SetBackgrounds(up, down)  -> boolean` | Forces the upper and lower gameplay backgrounds of the next play. Each argument is a folder holding a background Script.lua, relative to the calling script's folder or absolute; nil or "" keeps the usual pick for that layer. The next play takes both when its backgrounds start, and a new call replaces both. Returns false when a given folder has no Script.lua; that layer then keeps the usual pick. |

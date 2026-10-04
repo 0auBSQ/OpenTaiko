@@ -88,6 +88,8 @@ internal class FlyingNotes : CActivity {
 					if (iState == FlyingTail)
 						break;
 				} else {
+					// the shown gameplay background can make the notes land on its own art
+					bool toBackground = OpenTaiko.stageGameScreen.actBackground.FlyTarget(state.Player, out double bgX, out double bgY);
 					state.OldValue = state.Counter.CurrentValue;
 					state.Counter.Tick();
 					if (state.Counter.IsEnded) {
@@ -96,13 +98,18 @@ internal class FlyingNotes : CActivity {
 						if (iState == FlyingHead)
 							FlyingHead = (FlyingHead + 1) % FLYING_COUNT;
 						OpenTaiko.stageGameScreen.actGauge.Start(state.Lane, state.GameType, ENoteJudge.Perfect, state.Player);
-						OpenTaiko.stageGameScreen.actChipEffects.Start(state.Player, state.Lane, state.GameType);
+						if (!toBackground)
+							OpenTaiko.stageGameScreen.actChipEffects.Start(state.Player, state.Lane, state.GameType);
+						OpenTaiko.stageGameScreen.actBackground.NoteLanded(state.Player);
 					}
 
 					int endX;
 					int endY;
 
-					if (OpenTaiko.ConfigIni.bAIBattleMode) {
+					if (toBackground) {
+						endX = (int)bgX;
+						endY = (int)bgY;
+					} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
 						endX = OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X_AI[state.Player];
 						endY = OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y_AI[state.Player];
 					} else {

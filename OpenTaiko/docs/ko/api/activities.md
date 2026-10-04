@@ -251,6 +251,14 @@ end
 | `state.timeStamp  -> number` | 채보에 동기화된 시간(초). 게임플레이 밖에서는 -1. |
 | `state.paused  -> boolean` | 게임플레이가 일시정지된 동안 true. |
 | `state.player  -> number` | 플레이어별 호스트(클리어 애니메이션)가 그리고 있는 플레이어. |
+| `state.hitRing  -> number` | Number of recent hits kept in hitNote, hitBig and hitJudge (32). |
+| `state.hitCount  -> number[]` | Each player's hits since the background started: judged notes (misses included), roll hits and popped balloons. The n-th hit, counted from 0, sits at index n % hitRing of hitNote, hitBig and hitJudge. |
+| `state.hitNote  -> string[][]` | Note of each kept hit, per player: "don", "ka" or "kadon". |
+| `state.hitBig  -> boolean[][]` | True when the kept hit was a big note, per player. |
+| `state.hitJudge  -> string[][]` | Judge of each kept hit, per player: "perfect", "great", "good", "poor", "miss", "roll" or "balloon". |
+| `state.landCount  -> number[]` | Each player's flying notes that reached the end of their flight since the background started. |
+| `state:SetFlyTarget(player, x, y)` | While this gameplay background is shown, the player's flying notes land on (x, y) in screen pixels and the skin's landing effect is left out. |
+| `state:ClearFlyTarget(player)` | The player's flying notes land at the skin's usual place again. |
 
 ## 트랜지션
 

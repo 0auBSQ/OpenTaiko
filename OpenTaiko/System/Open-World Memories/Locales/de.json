@@ -16,6 +16,12 @@
         "PAGODA_LEAVE":         "Verlassen",
         "PAGODA_LEAVE_CONFIRM":  "Bist du sicher? Dein Fortschritt geht verloren, wenn du gehst",
         "PAGODA_EXIT":      "Beenden",
+        // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
+        "PAGODA_BAND_TEST":      "Prüfung",
+        "PAGODA_BAND_GATE":      "Tor",
+        "PAGODA_BAND_SKY":       "Himmel",
+        "PAGODA_MYSTERY_CHANCE": "Wahrscheinlichkeit eines Mysteriums: %d%%",
+        "PAGODA_DESTINY":        "Du kannst dein Schicksal nicht ändern",
 
         // The Fox Dojo entrance (dan_select): the two boards and the exit
         "DANSELECT_STANDARD": "Standard-Dan-Prüfung",
