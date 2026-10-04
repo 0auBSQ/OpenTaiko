@@ -2,7 +2,7 @@
 -- pill_clouds_training: from the title into the training song select (Lib/PillClouds).
 
 local PC = require("PillClouds")
-local anim = PC.new({ { 0.97, 0.76, 0.15 }, { 0.22, 0.71, 0.29 }, { 0.97, 0.76, 0.15 }, { 0.22, 0.71, 0.29 } })
+local anim = PC.new({ { 0.96, 1.0, 0.5 }, { 0.80, 1.0, 0.50 }, { 0.96, 1.0, 0.5 }, { 0.80, 1.0, 0.50 }, })
 
 FADE_OUT_SECONDS = PC.PILLS_OUT_SECONDS
 FADE_IN_SECONDS  = PC.IN_SECONDS
