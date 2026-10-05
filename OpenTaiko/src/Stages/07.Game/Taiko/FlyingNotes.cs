@@ -13,14 +13,8 @@ internal class FlyingNotes : CActivity {
 
 	// メソッド
 	public virtual void Start(NotesManager.ENoteType nLane, EGameType gameType, int nPlayer, bool? forceFirework = null) {
-		if (OpenTaiko.ConfigIni.SimpleMode || nLane is NotesManager.ENoteType.Empty or NotesManager.ENoteType.Unknown)
+		if (!Flies(OpenTaiko.ConfigIni, nLane) || nPlayer < 0 || nPlayer >= StartPointX.Length)
 			return;
-		// >2 local players share one crowded screen, so flying notes are dropped there. ONLINE each machine
-		// only renders YOU as a full player (spot 0; remote spots are compact auto lanes), so keep them —
-		// but only for spots the skin actually has fly coordinates for (StartPointX/skin arrays are 1P/2P).
-		bool online = LuaNetworking.Active?.PlaySyncActive == true;
-		if (!online && OpenTaiko.ConfigIni.nPlayerCount > 2) return;
-		if (nPlayer < 0 || nPlayer >= StartPointX.Length) return;
 
 		if (OpenTaiko.Tx.Notes[(int)gameType] != null) {
 			ref var flying = ref Flying[FlyingTail];
@@ -50,6 +44,11 @@ internal class FlyingNotes : CActivity {
 			}
 		}
 	}
+
+	// the skin has fly coordinates for the 1 and 2 player layouts only, so 3 players or more drop them
+	internal static bool Flies(CConfigIni config, NotesManager.ENoteType nLane)
+		=> config.nPlayerCount <= 2 && !config.SimpleMode
+			&& nLane is not (NotesManager.ENoteType.Empty or NotesManager.ENoteType.Unknown);
 
 	// CActivity 実装
 
