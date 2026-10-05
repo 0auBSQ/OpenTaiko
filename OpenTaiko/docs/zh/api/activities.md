@@ -251,14 +251,14 @@ end
 | `state.timeStamp  -> number` | 与谱面同步的时间（秒）；演奏之外为 -1。 |
 | `state.paused  -> boolean` | 演奏暂停期间为 true。 |
 | `state.player  -> number` | 按玩家承载的宿主（过关动画）所绘制的玩家。 |
-| `state.hitRing  -> number` | Number of recent hits kept in hitNote, hitBig and hitJudge (32). |
-| `state.hitCount  -> number[]` | Each player's hits since the background started: judged notes (misses included), roll hits and popped balloons. The n-th hit, counted from 0, sits at index n % hitRing of hitNote, hitBig and hitJudge. |
-| `state.hitNote  -> string[][]` | Note of each kept hit, per player: "don", "ka" or "kadon". |
-| `state.hitBig  -> boolean[][]` | True when the kept hit was a big note, per player. |
-| `state.hitJudge  -> string[][]` | Judge of each kept hit, per player: "perfect", "great", "good", "poor", "miss", "roll" or "balloon". |
-| `state.landCount  -> number[]` | Each player's flying notes that reached the end of their flight since the background started. |
-| `state:SetFlyTarget(player, x, y)` | While this gameplay background is shown, the player's flying notes land on (x, y) in screen pixels and the skin's landing effect is left out. |
-| `state:ClearFlyTarget(player)` | The player's flying notes land at the skin's usual place again. |
+| `state.hitRing  -> number` | hitNote、hitBig 和 hitJudge 中保留的最近击打数（32）。 |
+| `state.hitCount  -> number[]` | 自背景启动以来每个玩家的击打：已判定的音符（包括失误）、连打击打和打爆的气球。从 0 起计数的第 n 次击打位于 hitNote、hitBig 和 hitJudge 的索引 n % hitRing 处。 |
+| `state.hitNote  -> string[][]` | 每个玩家保留的各次击打的音符："don"、"ka" 或 "kadon"。 |
+| `state.hitBig  -> boolean[][]` | 每个玩家保留的击打是大音符时为 true。 |
+| `state.hitJudge  -> string[][]` | 每个玩家保留的各次击打的判定："perfect"、"great"、"good"、"poor"、"miss"、"roll" 或 "balloon"。 |
+| `state.landCount  -> number[]` | 自背景启动以来每个玩家已到达飞行终点的飞行音符。 |
+| `state:SetFlyTarget(player, x, y)` | 在此演奏背景显示期间，该玩家的飞行音符落在以屏幕像素计的 (x, y) 处，并省略皮肤的落点效果。 |
+| `state:ClearFlyTarget(player)` | 该玩家的飞行音符重新落在皮肤通常的位置。 |
 
 ## 过渡
 

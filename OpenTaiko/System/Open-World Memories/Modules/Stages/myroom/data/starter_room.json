@@ -2,7 +2,8 @@
   "_comment": "The brand-new room a save starts with (Room.newDefault). furniture = placed ground items (c,r interior cell, facing 0-3, on = powered); wallItems: c -1 means 'the right wall' (resolved to the room width); inventory/starterStock = [{id,n}] lists. starterStock is ALSO seeded into existing saves that miss the id (new-content migration), inventory only into brand-new rooms.",
   "furniture": [
     { "id": "desk", "c": 3, "r": 1, "facing": 0 },
-    { "id": "computer", "c": 3, "r": 1, "facing": 0, "on": true }
+    { "id": "computer", "c": 3, "r": 1, "facing": 2, "on": true },
+    { "id": "mirror", "c": 0, "r": 1, "facing": 0 }
   ],
   "wallItems": [
     { "id": "phone", "c": -1, "r": 3, "mount": "low" }

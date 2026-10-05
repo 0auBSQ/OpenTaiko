@@ -1,9 +1,9 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global
--- assets.lua — textures + palette + the animated character for myroom (OWM3d edition).
+-- assets.lua — textures + palette for myroom (OWM3d edition).
 --   * Floor/wall TEXTURES: procedural fallbacks are always registered first; when the CC0 files in
 --     Textures/Surfaces/ exist they overwrite the same ids (RegisterTextureFromImage + mipmap filter).
 --   * A PALETTE of solid-colour textures for the shaded-box furniture builders.
---   * The CHARACTER: the 4-direction animated walk sprites (CharaTemplate), loaded as billboards.
+--   (The walking students are avatar.lua's.)
 
 local floor, sin, random = math.floor, math.sin, math.random
 
@@ -27,8 +27,6 @@ A.PICTURE = { nokon = 246, bol = 247 }   -- character portraits (Textures/Screen
 -- solid-colour palette (texture ids) used by the shaded-box builders
 A.COL = { wood = 210, gray = 211, dark = 212, screen = 213, metal = 214, red = 215, white = 216, black = 217,
           green = 230, leaf = 231, fabric = 232, cream = 233, gold = 234, posterA = 235, posterB = 236, canvasArt = 237 }
--- character: A.CHARA[dir(1-4)][state] = spriteId ; dir 1↙ 2↘ 3↗ 4↖ ; state "idle"/"run1"/"run2"
-A.CHARA = { w = 70, h = 128 }
 
 local function rgb(r, g, b)
     local function cl(v) return floor(v < 0 and 0 or (v > 255 and 255 or v)) end
@@ -155,31 +153,12 @@ function A.buildFileTextures(scene)
     end
 end
 
--- ── character (4 dirs × idle/run1/run2) ───────────────────────────────────────────────────────────
-function A.buildCharacter(scene)
-    local states = { "idle", "run1", "run2" }
-    local id = 320
-    for dir = 1, 4 do
-        A.CHARA[dir] = {}
-        for _, st in ipairs(states) do
-            -- Sync load: RegisterSpriteFromTexture reads the pixels back immediately, so the texture must be
-            -- fully uploaded NOW (a plain async CreateTexture would register an empty sprite → invisible character).
-            local tex = TEXTURE:CreateTextureSync("Textures/CharaTemplate/" .. dir .. "/" .. st .. ".png")
-            scene:RegisterSpriteFromTexture(id, tex)
-            tex:Dispose()   -- the sprite copied the pixels; free the GPU texture so rebuilds don't accumulate
-            A.CHARA[dir][st] = id
-            id = id + 1
-        end
-    end
-end
-
 function A.buildAll(scene)
     A.buildTextures(scene)
     A.buildFileTextures(scene)
-    A.buildCharacter(scene)
 end
 
--- register the procedural + file textures into an ARBITRARY scene (no character sprites) —
+-- register the procedural + file textures into an ARBITRARY scene —
 -- ModelIcon.newBuilder icon scenes start with an empty registry and sample these ids
 function A.registerInto(scene)
     A.buildTextures(scene)

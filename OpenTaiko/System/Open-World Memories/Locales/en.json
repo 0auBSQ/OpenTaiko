@@ -16,7 +16,9 @@
         "PAGODA_NEXT":          "Next...",
         "PAGODA_START":         "Start",
         "PAGODA_LEAVE":         "Leave",
-        "PAGODA_LEAVE_CONFIRM":  "Are you sure? Your progress will be lost if you leave",
+        "PAGODA_LEAVE_CONFIRM":  "Leave the pagoda? All progress beyond the checkpoints you have discovered will be lost",
+        "PAGODA_OK":            "OK",
+        "PAGODA_ITEM_NEW":      "New item",
         "PAGODA_EXIT":      "Exit",
         // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
         "PAGODA_BAND_TEST":      "Test",

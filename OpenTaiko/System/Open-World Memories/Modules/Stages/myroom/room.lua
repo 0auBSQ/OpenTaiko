@@ -308,7 +308,8 @@ function Room.newDefault()
     else
         self.furniture = {
             { id = "desk", c = 3, r = 1, facing = 0 },                     -- ground furniture only
-            { id = "computer", c = 3, r = 1, facing = 0, on = true },      -- the PC, stacked on the desk
+            { id = "computer", c = 3, r = 1, facing = 2, on = true },      -- the PC, stacked on the desk
+            { id = "mirror", c = 0, r = 1, facing = 0 },                   -- the far corner by the window
         }
         self.wallItems = { { id = "phone", c = self.iw, r = 3, mount = "low" } }
         self.inventory = { chair = 1 }
@@ -319,6 +320,7 @@ function Room.newDefault()
     self.floorDeco = {}                                       -- ["c,r"] = flooring id (carpet); nil = wood
     self.wallPaint = {}                                       -- ["back:c"]/["right:r"] = paint id; nil = plaster
     self.claimed = {}   -- per-id coin-shop grant ledger (see drainShopGrants)
+    self.gifts = MIG.allGifts()   -- a new room already has every gift (see migration.lua)
     return self
 end
 
@@ -1233,11 +1235,12 @@ function Room:toTable()
     end
     return { v = 2, tier = self.tier, iw = self.iw, ih = self.ih, exitCol = self.exitCol,
              furniture = furn, floorDeco = self.floorDeco, wallPaint = self.wallPaint,
-             inventory = self.inventory, wallItems = wi, claimed = self.claimed }
+             inventory = self.inventory, wallItems = wi, claimed = self.claimed, gifts = self.gifts }
 end
 
+-- returns true when a gift went into the inventory (the caller saves the room)
 function Room:loadTable(t)
-    if type(t) ~= "table" then return end
+    if type(t) ~= "table" then return false end
     -- all version upgrades + retired-id cleanups live in migration.lua (REMAP/DROPPED registries,
     -- the v1→v2 wall-item split, the computer split-out, starter-stock seeding)
     MIG.remapIds(t)
@@ -1248,7 +1251,9 @@ function Room:loadTable(t)
     self.wallPaint = t.wallPaint or self.wallPaint
     MIG.applyItems(self, t, Room.CATALOG, NEW_STARTER_STOCK)
     self.claimed = t.claimed or self.claimed or {}   -- coin-shop grant ledger (see drainShopGrants)
+    local gifted = MIG.applyGifts(self, t, Room.CATALOG)
     self:ensurePhone()
+    return gifted
 end
 
 return Room

@@ -251,14 +251,14 @@ end
 | `state.timeStamp  -> number` | 譜面に同期した秒単位の時間。ゲームプレイ外では -1。 |
 | `state.paused  -> boolean` | ゲームプレイの一時停止中は true。 |
 | `state.player  -> number` | プレイヤーごとのホスト (クリアアニメーション) が描画対象としているプレイヤー。 |
-| `state.hitRing  -> number` | Number of recent hits kept in hitNote, hitBig and hitJudge (32). |
-| `state.hitCount  -> number[]` | Each player's hits since the background started: judged notes (misses included), roll hits and popped balloons. The n-th hit, counted from 0, sits at index n % hitRing of hitNote, hitBig and hitJudge. |
-| `state.hitNote  -> string[][]` | Note of each kept hit, per player: "don", "ka" or "kadon". |
-| `state.hitBig  -> boolean[][]` | True when the kept hit was a big note, per player. |
-| `state.hitJudge  -> string[][]` | Judge of each kept hit, per player: "perfect", "great", "good", "poor", "miss", "roll" or "balloon". |
-| `state.landCount  -> number[]` | Each player's flying notes that reached the end of their flight since the background started. |
-| `state:SetFlyTarget(player, x, y)` | While this gameplay background is shown, the player's flying notes land on (x, y) in screen pixels and the skin's landing effect is left out. |
-| `state:ClearFlyTarget(player)` | The player's flying notes land at the skin's usual place again. |
+| `state.hitRing  -> number` | hitNote、hitBig、hitJudge に保持される直近のヒットの数 (32)。 |
+| `state.hitCount  -> number[]` | バックグラウンドの開始以降の各プレイヤーのヒット数: 判定された音符 (ミスを含む)、連打のヒット、割れた風船。0 から数えて n 番目のヒットは、hitNote、hitBig、hitJudge のインデックス n % hitRing にあります。 |
+| `state.hitNote  -> string[][]` | 保持された各ヒットの音符 (プレイヤーごと): "don"、"ka"、"kadon" のいずれか。 |
+| `state.hitBig  -> boolean[][]` | 保持されたヒットが大きな音符だったとき true (プレイヤーごと)。 |
+| `state.hitJudge  -> string[][]` | 保持された各ヒットの判定 (プレイヤーごと): "perfect"、"great"、"good"、"poor"、"miss"、"roll"、"balloon" のいずれか。 |
+| `state.landCount  -> number[]` | バックグラウンドの開始以降に飛行の終点に達した、各プレイヤーの飛んでいく音符の数。 |
+| `state:SetFlyTarget(player, x, y)` | このゲームプレイのバックグラウンドが表示されている間、プレイヤーの飛んでいく音符はスクリーンピクセル単位の (x, y) に着地し、スキンの着地エフェクトは省かれます。 |
+| `state:ClearFlyTarget(player)` | プレイヤーの飛んでいく音符が、再びスキンの通常の位置に着地します。 |
 
 ## トランジション
 

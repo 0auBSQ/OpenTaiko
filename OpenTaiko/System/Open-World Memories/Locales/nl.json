@@ -16,7 +16,9 @@
         "PAGODA_NEXT":          "Volgende...",
         "PAGODA_START":         "Start",
         "PAGODA_LEAVE":         "Verlaten",
-        "PAGODA_LEAVE_CONFIRM":  "Weet je het zeker? Je voortgang gaat verloren als je weggaat",
+        "PAGODA_LEAVE_CONFIRM":  "De pagode verlaten? Alle voortgang voorbij de ontdekte checkpoints gaat verloren",
+        "PAGODA_OK":            "OK",
+        "PAGODA_ITEM_NEW":      "Nieuw voorwerp",
         "PAGODA_EXIT":      "Afsluiten",
         // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
         "PAGODA_BAND_TEST":      "Proef",

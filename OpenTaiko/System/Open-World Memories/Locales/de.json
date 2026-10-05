@@ -14,7 +14,9 @@
         "PAGODA_NEXT":          "Weiter…",
         "PAGODA_START":         "Start",
         "PAGODA_LEAVE":         "Verlassen",
-        "PAGODA_LEAVE_CONFIRM":  "Bist du sicher? Dein Fortschritt geht verloren, wenn du gehst",
+        "PAGODA_LEAVE_CONFIRM":  "Die Pagode verlassen? Jeder Fortschritt über die entdeckten Kontrollpunkte hinaus geht verloren",
+        "PAGODA_OK":            "OK",
+        "PAGODA_ITEM_NEW":      "Neuer Gegenstand",
         "PAGODA_EXIT":      "Beenden",
         // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
         "PAGODA_BAND_TEST":      "Prüfung",

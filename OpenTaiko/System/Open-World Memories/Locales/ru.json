@@ -16,7 +16,9 @@
         "PAGODA_NEXT":          "Дальше...",
         "PAGODA_START":         "Начать",
         "PAGODA_LEAVE":         "Уйти",
-        "PAGODA_LEAVE_CONFIRM":  "Вы уверены? Если уйти, прогресс будет потерян",
+        "PAGODA_LEAVE_CONFIRM":  "Покинуть пагоду? Весь прогресс после открытых контрольных точек будет потерян",
+        "PAGODA_OK":            "ОК",
+        "PAGODA_ITEM_NEW":      "Новый предмет",
         "PAGODA_EXIT":      "Выход",
         // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
         "PAGODA_BAND_TEST":      "Испытание",

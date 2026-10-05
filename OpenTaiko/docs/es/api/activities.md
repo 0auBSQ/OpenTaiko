@@ -251,14 +251,14 @@ Una instancia por anfitrión, que el anfitrión actualiza en el sitio cada fotog
 | `state.timeStamp  -> number` | Tiempo sincronizado con el chart en segundos; -1 fuera del juego. |
 | `state.paused  -> boolean` | Verdadero mientras el juego está en pausa. |
 | `state.player  -> number` | El jugador para el que dibuja un anfitrión por jugador (animaciones de clear). |
-| `state.hitRing  -> number` | Number of recent hits kept in hitNote, hitBig and hitJudge (32). |
-| `state.hitCount  -> number[]` | Each player's hits since the background started: judged notes (misses included), roll hits and popped balloons. The n-th hit, counted from 0, sits at index n % hitRing of hitNote, hitBig and hitJudge. |
-| `state.hitNote  -> string[][]` | Note of each kept hit, per player: "don", "ka" or "kadon". |
-| `state.hitBig  -> boolean[][]` | True when the kept hit was a big note, per player. |
-| `state.hitJudge  -> string[][]` | Judge of each kept hit, per player: "perfect", "great", "good", "poor", "miss", "roll" or "balloon". |
-| `state.landCount  -> number[]` | Each player's flying notes that reached the end of their flight since the background started. |
-| `state:SetFlyTarget(player, x, y)` | While this gameplay background is shown, the player's flying notes land on (x, y) in screen pixels and the skin's landing effect is left out. |
-| `state:ClearFlyTarget(player)` | The player's flying notes land at the skin's usual place again. |
+| `state.hitRing  -> number` | Número de golpes recientes que se guardan en hitNote, hitBig y hitJudge (32). |
+| `state.hitCount  -> number[]` | Golpes de cada jugador desde que empezó el fondo: notas juzgadas (fallos incluidos), golpes de redoble y globos reventados. El golpe n-ésimo, contando desde 0, está en el índice n % hitRing de hitNote, hitBig y hitJudge. |
+| `state.hitNote  -> string[][]` | Nota de cada golpe guardado, por jugador: "don", "ka" o "kadon". |
+| `state.hitBig  -> boolean[][]` | Verdadero cuando el golpe guardado fue una nota grande, por jugador. |
+| `state.hitJudge  -> string[][]` | Juicio de cada golpe guardado, por jugador: "perfect", "great", "good", "poor", "miss", "roll" o "balloon". |
+| `state.landCount  -> number[]` | Notas voladoras de cada jugador que llegaron al final de su vuelo desde que empezó el fondo. |
+| `state:SetFlyTarget(player, x, y)` | Mientras se muestra este fondo de juego, las notas voladoras del jugador aterrizan en (x, y) en píxeles de pantalla y se omite el efecto de aterrizaje del skin. |
+| `state:ClearFlyTarget(player)` | Las notas voladoras del jugador vuelven a aterrizar en el lugar habitual del skin. |
 
 ## Transiciones
 

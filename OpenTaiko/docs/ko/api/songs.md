@@ -425,7 +425,7 @@ REPLAY:ListReplays가 반환하는 배열이나 리플레이 목록 핸들의 Re
 
 ### SONGMOUNT
 
-현재 플레이용으로 선택된 곡에 대한 읽기 전용 전역입니다.
+현재 플레이용으로 선택된 곡과 다음 플레이의 배경을 위한 전역입니다.
 
 <div class="callout warn">
 전역 SONGMOUNT로 사용할 수 있습니다. 곡 노드의 Mount(), 채보의 Select(), DANBUILDER:Mount()가 설정한 상태를 반영합니다.
@@ -436,4 +436,4 @@ REPLAY:ListReplays가 반환하는 배열이나 리플레이 목록 핸들의 Re
 | `SONGMOUNT:ChosenUniqueId()  -> string` | 선택된 곡의 고유 id를 반환하며, 없으면 빈 문자열. |
 | `SONGMOUNT:ChosenDifficulty()  -> int` | 플레이어 1에 대해 선택된 난이도 인덱스를 반환합니다. |
 | `SONGMOUNT:ChosenSongNode()  -> song node` | 선택된 곡을 곡 노드(자식 없음)로 반환하며, 선택된 것이 없으면 nil. |
-| `SONGMOUNT:SetBackgrounds(up, down)  -> boolean` | Forces the upper and lower gameplay backgrounds of the next play. Each argument is a folder holding a background Script.lua, relative to the calling script's folder or absolute; nil or "" keeps the usual pick for that layer. The next play takes both when its backgrounds start, and a new call replaces both. Returns false when a given folder has no Script.lua; that layer then keeps the usual pick. |
+| `SONGMOUNT:SetBackgrounds(up, down)  -> boolean` | 다음 플레이의 상단과 하단 게임플레이 배경을 강제로 지정합니다. 각 인수는 배경 Script.lua가 들어 있는 폴더로, 호출하는 스크립트의 폴더 기준 상대 경로 또는 절대 경로입니다. nil 또는 ""를 받은 레이어는 평소대로 선택됩니다. 다음 플레이는 배경이 시작될 때 둘 다 가져가며, 새 호출은 둘 다 대체합니다. 지정한 폴더에 Script.lua가 없으면 false를 반환하며, 그 레이어는 평소대로 선택됩니다. |

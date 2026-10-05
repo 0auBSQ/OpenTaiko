@@ -425,7 +425,7 @@ Métadonnées d'un replay sauvegardé.
 
 ### SONGMOUNT
 
-Globale en lecture seule pour la chanson actuellement sélectionnée pour la partie.
+Globale pour la chanson actuellement sélectionnée pour la partie et les arrière-plans de la prochaine partie.
 
 <div class="callout warn">
 Disponible comme la globale SONGMOUNT. Elle reflète l'état défini par le Mount() d'un nœud de chanson, le Select() d'une partition ou DANBUILDER:Mount().
@@ -436,4 +436,4 @@ Disponible comme la globale SONGMOUNT. Elle reflète l'état défini par le Moun
 | `SONGMOUNT:ChosenUniqueId()  -> string` | Renvoie l'identifiant unique de la chanson sélectionnée, ou une chaîne vide. |
 | `SONGMOUNT:ChosenDifficulty()  -> int` | Renvoie l'indice de difficulté sélectionné pour le joueur 1. |
 | `SONGMOUNT:ChosenSongNode()  -> song node` | Renvoie la chanson sélectionnée sous forme de nœud de chanson (sans enfants), ou nil quand rien n'est sélectionné. |
-| `SONGMOUNT:SetBackgrounds(up, down)  -> boolean` | Forces the upper and lower gameplay backgrounds of the next play. Each argument is a folder holding a background Script.lua, relative to the calling script's folder or absolute; nil or "" keeps the usual pick for that layer. The next play takes both when its backgrounds start, and a new call replaces both. Returns false when a given folder has no Script.lua; that layer then keeps the usual pick. |
+| `SONGMOUNT:SetBackgrounds(up, down)  -> boolean` | Impose les arrière-plans de gameplay supérieur et inférieur de la prochaine partie. Chaque argument est un dossier contenant un Script.lua d'arrière-plan, relatif au dossier du script appelant ou absolu ; nil ou "" garde le choix habituel pour cette couche. La prochaine partie prend les deux au démarrage de ses arrière-plans, et un nouvel appel remplace les deux. Renvoie false quand un dossier donné n'a pas de Script.lua ; cette couche garde alors le choix habituel. |

@@ -1896,6 +1896,14 @@ internal class OpenTaiko : Game {
 			}
 			//---------------------
 			#endregion
+			#region [ Lua modules ]
+			// after the stage, before the textures go: the skin's modules get their onDestroy, as on a skin change
+			try {
+				CSkin.DestroyModulesOnExit();
+			} catch (Exception e) {
+				Trace.TraceError(e.ToString());
+			}
+			#endregion
 
 			#region Discordの処理
 			DiscordClient?.Dispose();

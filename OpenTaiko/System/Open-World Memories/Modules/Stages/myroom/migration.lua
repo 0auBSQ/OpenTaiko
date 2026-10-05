@@ -10,6 +10,8 @@
 --   v1 → v2   — wall-place furniture entries become wallItems; starter stock granted once
 --   computer  — the PC used to be baked into the desk: spawn one on the first desk + seed a spare
 --   starter   — any starter-stock id the save predates is seeded without touching player counts
+--   gifts     — an item every room should have (M.GIFTS) is handed over once to a saved room that has
+--               none placed and none in stock; the room remembers it (room.gifts) so it is never repeated
 
 local floor = math.floor
 
@@ -99,6 +101,40 @@ function M.applyItems(room, t, catalog, starterStock)
     -- floorings, wall paints) so existing rooms get the new content without resetting counts
     room.inventory = room.inventory or {}
     for id, n in pairs(starterStock) do if room.inventory[id] == nil then room.inventory[id] = n end end
+end
+
+-- items every room gets: brand-new rooms have them placed (starter_room.json), saved rooms receive them
+-- once through applyGifts
+M.GIFTS = { mirror = 1 }
+
+-- the gift ledger of a brand-new room: everything already given
+function M.allGifts()
+    local given = {}
+    for id in pairs(M.GIFTS) do given[id] = true end
+    return given
+end
+
+-- hands each gift the raw table `t` has not recorded yet to the room, unless one is already placed or
+-- in stock; returns true when something was added to the inventory (the caller persists it)
+function M.applyGifts(room, t, catalog)
+    local given = {}
+    if type(t.gifts) == "table" then
+        for id, v in pairs(t.gifts) do if v == true then given[id] = true end end
+    end
+    local granted = false
+    for id, n in pairs(M.GIFTS) do
+        if not given[id] and catalog[id] then
+            local held = (room.inventory[id] or 0) > 0
+            for _, it in ipairs(room.furniture) do if it.id == id then held = true end end
+            if not held then
+                room.inventory[id] = (room.inventory[id] or 0) + n
+                granted = true
+            end
+            given[id] = true
+        end
+    end
+    room.gifts = given
+    return granted
 end
 
 return M

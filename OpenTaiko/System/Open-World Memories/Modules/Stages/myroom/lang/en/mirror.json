@@ -1,0 +1,9 @@
+{
+  "_comment": "English texts for the mirror (mirror.lua). Keys are stable ids; this file is the fallback for every other language.",
+  "student": "Student",
+  "student_a": "Student A",
+  "student_b": "Student B",
+  "palette": "Palette",
+  "worn": "Wearing it",
+  "locked": "Plays with this student: %d / %d"
+}

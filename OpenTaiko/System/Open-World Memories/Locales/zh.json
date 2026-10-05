@@ -14,7 +14,9 @@
         "PAGODA_NEXT":          "下一层…",
         "PAGODA_START":         "开始",
         "PAGODA_LEAVE":         "离开",
-        "PAGODA_LEAVE_CONFIRM":  "确定吗？离开将失去当前进度",
+        "PAGODA_LEAVE_CONFIRM":  "要离开塔吗？已发现的检查点之后的进度将会丢失",
+        "PAGODA_OK":            "确定",
+        "PAGODA_ITEM_NEW":      "新道具",
         "PAGODA_EXIT":      "退出",
         // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
         "PAGODA_BAND_TEST":      "题",

@@ -311,7 +311,8 @@ local function swapPreviewCharacter(newEntry)
     buildPaletteList()
     if currentPaletteFolder ~= "" then
         local savedIdx = math.floor(save:GetGlobalCounter(".character_palette_" .. currentPaletteFolder) or 0)
-        paletteSubIdx = math.max(0, math.min(savedIdx, #paletteList - 1))
+        -- an index past the list reads as the default palette, as for the character and the story sprites
+        paletteSubIdx = (savedIdx >= 0 and savedIdx < #paletteList) and savedIdx or 0
     else
         paletteSubIdx = 0
     end
@@ -962,7 +963,7 @@ function activate(pl)
     buildPaletteList()
     if currentPaletteFolder ~= "" then
         local savedIdx = math.floor(save:GetGlobalCounter(".character_palette_" .. currentPaletteFolder) or 0)
-        paletteSubIdx = math.max(0, math.min(savedIdx, #paletteList - 1))
+        paletteSubIdx = (savedIdx >= 0 and savedIdx < #paletteList) and savedIdx or 0
     else
         paletteSubIdx = 0
     end

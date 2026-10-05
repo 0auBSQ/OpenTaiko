@@ -17,17 +17,29 @@ local sin, cos, pi, max, min, floor = math.sin, math.cos, math.pi, math.max, mat
 local Sky = {}
 
 Sky.SOURCE = [[
+// the hash needs 32-bit ints that wrap; the ES default for ints in a fragment shader is mediump
+precision highp int;
+// integer hash of the lattice cell holding p: the same bits on every backend (a sin() hash breaks
+// into facets on drivers whose sin loses precision for large arguments)
+uint hcell(vec2 p){
+    uvec2 x = uvec2(ivec2(floor(p)));
+    uvec2 q = 1103515245u * ((x >> 1u) ^ x.yx);
+    return 1103515245u * (q.x ^ (q.y >> 3u));
+}
+float h21(vec2 p){
+    return float(hcell(p) >> 8u) * (1.0 / 16777216.0);
+}
 vec2 h22(vec2 p){
-    p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
-    return fract(sin(p) * 43758.5453);
+    uint n = hcell(p);
+    return vec2(uvec2(n, n * 747796405u) >> 8u) * (1.0 / 16777216.0);
 }
 float vnoise(vec2 p){
     vec2 i = floor(p); vec2 f = fract(p);
     vec2 u = f * f * (3.0 - 2.0 * f);
-    float a = h22(i).x;
-    float b = h22(i + vec2(1.0, 0.0)).x;
-    float c = h22(i + vec2(0.0, 1.0)).x;
-    float d = h22(i + vec2(1.0, 1.0)).x;
+    float a = h21(i);
+    float b = h21(i + vec2(1.0, 0.0));
+    float c = h21(i + vec2(0.0, 1.0));
+    float d = h21(i + vec2(1.0, 1.0));
     return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
 }
 float fbm(vec2 p){
@@ -93,16 +105,19 @@ void main(){
         float horFade = smoothstep(0.015, 0.09, domeY);
         vec3 cloudDay = vec3(1.04);
         vec3 cloudLit = mix(mix(cloudDay, vec3(0.09, 0.10, 0.16), nightF), vec3(1.05, 0.60, 0.42), duskW);
-        float shade = fbm(cp * 1.15 - drift1 * 1.7);
-        cloudLit *= 0.60 + 0.55 * shade;                       // self-shading = puffier clouds
         den = den * horFade;
-        col = mix(col, cloudLit, den * 0.92);
+        if (den > 0.0){
+            float shade = fbm(cp * 1.15 - drift1 * 1.7);
+            cloudLit *= 0.60 + 0.55 * shade;                   // self-shading = puffier clouds
+            col = mix(col, cloudLit, den * 0.92);
+        }
     }
 
     // stars: two lattice scales + per-star twinkle, boosted inside the milky-way band; a faint
     // band glow sells the galaxy even between stars. Whole dome, masked by clouds.
     if (nightF > 0.2){
-        float mw = exp(-pow(dot(dir, mwAxis) / mwWidth, 2.0));
+        float mwD = dot(dir, mwAxis) / mwWidth;                // squared by hand: pow() of a negative base is undefined
+        float mw = exp(-mwD * mwD);
         float sf = (nightF - 0.2) * 1.25 * (1.0 - den) * starI;
         float s1 = starLayer(dir, domeY, 34.0, 0.80 - mw * 0.25, 2.0);
         float s2 = starLayer(dir, domeY, 90.0, 0.86 - mw * 0.30, 3.1);
@@ -152,7 +167,7 @@ void main(){
     }
 
     // DITHER: +-0.75/255 of hash noise breaks the 8-bit banding the smooth gradient otherwise shows
-    col += vec3((h22(gl_FragCoord.xy).x - 0.5) * (1.5 / 255.0));
+    col += vec3((h21(gl_FragCoord.xy) - 0.5) * (1.5 / 255.0));
 
     frag = vec4(col, 1.0);
 }

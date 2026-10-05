@@ -425,7 +425,7 @@ Elementen van de array die REPLAY:ListReplays teruggeeft of van de Result van ee
 
 ### SONGMOUNT
 
-Alleen-lezen global voor het nummer dat momenteel is geselecteerd om te spelen.
+Global voor het nummer dat momenteel is geselecteerd om te spelen en voor de achtergronden van de volgende spelbeurt.
 
 <div class="callout warn">
 Beschikbaar als de global SONGMOUNT. Hij weerspiegelt de status die is gezet door Mount() van een nummerknoop, Select() van een chart of DANBUILDER:Mount().
@@ -436,4 +436,4 @@ Beschikbaar als de global SONGMOUNT. Hij weerspiegelt de status die is gezet doo
 | `SONGMOUNT:ChosenUniqueId()  -> string` | Geeft het unieke id van het geselecteerde nummer terug, of een lege string. |
 | `SONGMOUNT:ChosenDifficulty()  -> int` | Geeft de moeilijkheidsindex terug die voor speler 1 is geselecteerd. |
 | `SONGMOUNT:ChosenSongNode()  -> song node` | Geeft het geselecteerde nummer terug als nummerknoop (zonder kinderen), of nil wanneer er niets is geselecteerd. |
-| `SONGMOUNT:SetBackgrounds(up, down)  -> boolean` | Forces the upper and lower gameplay backgrounds of the next play. Each argument is a folder holding a background Script.lua, relative to the calling script's folder or absolute; nil or "" keeps the usual pick for that layer. The next play takes both when its backgrounds start, and a new call replaces both. Returns false when a given folder has no Script.lua; that layer then keeps the usual pick. |
+| `SONGMOUNT:SetBackgrounds(up, down)  -> boolean` | Dwingt de bovenste en onderste gameplay-achtergrond van de volgende spelbeurt af. Elk argument is een map met een achtergrond-Script.lua, relatief ten opzichte van de map van het aanroepende script, of absoluut; nil of "" houdt de gebruikelijke keuze voor die laag. De volgende spelbeurt neemt beide over wanneer haar achtergronden starten, en een nieuwe aanroep vervangt beide. Geeft false terug wanneer een opgegeven map geen Script.lua bevat; die laag houdt dan de gebruikelijke keuze. |

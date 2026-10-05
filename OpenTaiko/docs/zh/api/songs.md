@@ -425,7 +425,7 @@ REPLAY:ListReplays 返回的数组或回放列表句柄的 Result 的元素。�
 
 ### SONGMOUNT
 
-当前选定用于演奏的歌曲的只读全局对象。
+当前选定用于演奏的歌曲以及下一次演奏所用背景的全局对象。
 
 <div class="callout warn">
 以全局对象 SONGMOUNT 的形式提供。它反映由歌曲节点的 Mount()、谱面的 Select() 或 DANBUILDER:Mount() 设置的状态。
@@ -436,4 +436,4 @@ REPLAY:ListReplays 返回的数组或回放列表句柄的 Result 的元素。�
 | `SONGMOUNT:ChosenUniqueId()  -> string` | 返回选定歌曲的唯一 id，或空字符串。 |
 | `SONGMOUNT:ChosenDifficulty()  -> int` | 返回为玩家 1 选定的难度索引。 |
 | `SONGMOUNT:ChosenSongNode()  -> song node` | 以歌曲节点（不含子节点）返回选定的歌曲；未选定时返回 nil。 |
-| `SONGMOUNT:SetBackgrounds(up, down)  -> boolean` | Forces the upper and lower gameplay backgrounds of the next play. Each argument is a folder holding a background Script.lua, relative to the calling script's folder or absolute; nil or "" keeps the usual pick for that layer. The next play takes both when its backgrounds start, and a new call replaces both. Returns false when a given folder has no Script.lua; that layer then keeps the usual pick. |
+| `SONGMOUNT:SetBackgrounds(up, down)  -> boolean` | 强制指定下一次演奏的上层和下层演奏背景。每个参数是一个包含背景 Script.lua 的文件夹，相对于调用脚本所在的文件夹，或为绝对路径；传入 nil 或 "" 的图层保持通常的选择。下一次演奏在其背景启动时取用这两个值，新的调用会替换这两个值。给定的文件夹中没有 Script.lua 时返回 false；该图层随后保持通常的选择。 |

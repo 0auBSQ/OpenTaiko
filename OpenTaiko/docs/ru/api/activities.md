@@ -251,14 +251,14 @@ Script.lua, который рисует один фон экрана, слой �
 | `state.timeStamp  -> number` | Время, синхронизированное с чартом, в секундах; -1 вне игрового процесса. |
 | `state.paused  -> boolean` | Истина, пока игровой процесс на паузе. |
 | `state.player  -> number` | Игрок, для которого рисует хост с привязкой к игроку (анимации клира). |
-| `state.hitRing  -> number` | Number of recent hits kept in hitNote, hitBig and hitJudge (32). |
-| `state.hitCount  -> number[]` | Each player's hits since the background started: judged notes (misses included), roll hits and popped balloons. The n-th hit, counted from 0, sits at index n % hitRing of hitNote, hitBig and hitJudge. |
-| `state.hitNote  -> string[][]` | Note of each kept hit, per player: "don", "ka" or "kadon". |
-| `state.hitBig  -> boolean[][]` | True when the kept hit was a big note, per player. |
-| `state.hitJudge  -> string[][]` | Judge of each kept hit, per player: "perfect", "great", "good", "poor", "miss", "roll" or "balloon". |
-| `state.landCount  -> number[]` | Each player's flying notes that reached the end of their flight since the background started. |
-| `state:SetFlyTarget(player, x, y)` | While this gameplay background is shown, the player's flying notes land on (x, y) in screen pixels and the skin's landing effect is left out. |
-| `state:ClearFlyTarget(player)` | The player's flying notes land at the skin's usual place again. |
+| `state.hitRing  -> number` | Число последних попаданий, которые хранятся в hitNote, hitBig и hitJudge (32). |
+| `state.hitCount  -> number[]` | Попадания каждого игрока с момента запуска фона: оценённые ноты (включая промахи), удары по дробям и лопнувшие шары. Попадание номер n, считая от 0, находится по индексу n % hitRing в hitNote, hitBig и hitJudge. |
+| `state.hitNote  -> string[][]` | Нота каждого хранимого попадания, по игрокам: "don", "ka" или "kadon". |
+| `state.hitBig  -> boolean[][]` | Истина, когда хранимое попадание пришлось на большую ноту, по игрокам. |
+| `state.hitJudge  -> string[][]` | Оценка каждого хранимого попадания, по игрокам: "perfect", "great", "good", "poor", "miss", "roll" или "balloon". |
+| `state.landCount  -> number[]` | Летящие ноты каждого игрока, долетевшие до конца своего полёта с момента запуска фона. |
+| `state:SetFlyTarget(player, x, y)` | Пока показан этот игровой фон, летящие ноты игрока приземляются в точку (x, y) в пикселях экрана, а эффект приземления скина не показывается. |
+| `state:ClearFlyTarget(player)` | Летящие ноты игрока снова приземляются в обычном месте скина. |
 
 ## Переходы
 

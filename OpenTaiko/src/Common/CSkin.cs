@@ -544,6 +544,14 @@ internal class CSkin : IDisposable {
 		LuaTransitionWrapper.ResetTransitionsDictionary();
 	}
 
+	// Closing the game tears the skin down too: every module gets its onDestroy while the engine is still up.
+	// Nothing is disposed afterwards, as the process ends.
+	public static void DestroyModulesOnExit() {
+		LuaStageWrapper.PropagateOnDestroy();
+		LuaActivityWrapper.PropagateOnDestroy();
+		LuaTransitionWrapper.PropagateOnDestroy();
+	}
+
 	/// <summary>
 	/// Loads the skin's Lua modules (Stages / Activities / ROActivities) INCREMENTALLY: instantiate each,
 	/// then onStart()/loadAssets each, yielding a 0..1 progress fraction after every unit. The boot stage

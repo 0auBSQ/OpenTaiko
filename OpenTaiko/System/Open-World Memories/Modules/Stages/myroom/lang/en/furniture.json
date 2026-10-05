@@ -56,5 +56,8 @@
   },
   "placeholder_matrix": {
     "name": "Placeholder Matrix"
+  },
+  "mirror": {
+    "name": "Mirror"
   }
 }

@@ -1149,9 +1149,30 @@ namespace OpenTaiko {
 			if (tex == null) return;
 			var rgba = tex.GetCachedPixels(out int w, out int h);
 			if (rgba == null || w <= 0 || h <= 0) return;
+			RegisterSprite(spriteId, ToSpriteArgb(rgba, w, h), w, h);
+		}
+
+		/// <summary>Like <see cref="RegisterSpriteFromTexture"/>, with the pixels recoloured through a gradient
+		/// map (<c>GRADIENT:Create</c>) the way a 2D draw under that map shows them: each pixel's luminance picks
+		/// the map's colour, mixed in by the map's blend strength. A nil map registers the plain pixels.</summary>
+		public void RegisterSpriteFromTextureGradient(int spriteId, LuaTexture tex, LuaGradientMap? gradient) {
+			if (tex == null) return;
+			var rgba = tex.GetCachedPixels(out int w, out int h);
+			if (rgba == null || w <= 0 || h <= 0) return;
+			RegisterSprite(spriteId, ToSpriteArgb(rgba, w, h, gradient?._gradientMap?.Lut, gradient?.BlendStrength ?? 0f), w, h);
+		}
+
+		/// <summary>Straight RGBA pixels as the ARGB ints the sprite registry keeps; with a gradient LUT
+		/// (<see cref="CGradientMap.Lut"/>) a copy is recoloured first, so the cached source pixels stay intact.</summary>
+		internal static int[] ToSpriteArgb(byte[] rgba, int w, int h, byte[]? lut = null, float blend = 0f) {
+			byte[] src = rgba;
+			if (lut != null && blend > 0f) {
+				src = (byte[])rgba.Clone();
+				CGradientMap.MapRgba(lut, blend, src);
+			}
 			var a = new int[w * h];
-			for (int i = 0; i < a.Length; i++) { int o = i * 4; a[i] = (rgba[o + 3] << 24) | (rgba[o] << 16) | (rgba[o + 1] << 8) | rgba[o + 2]; }
-			RegisterSprite(spriteId, a, w, h);
+			for (int i = 0; i < a.Length; i++) { int o = i * 4; a[i] = (src[o + 3] << 24) | (src[o] << 16) | (src[o + 1] << 8) | src[o + 2]; }
+			return a;
 		}
 
 		/// <summary>Generate a soft round particle: white, opaque at the centre fading to 0 at the edge.

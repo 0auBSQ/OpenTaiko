@@ -425,7 +425,7 @@ REPLAY:ListReplays が返す配列、またはリプレイリストハンドル�
 
 ### SONGMOUNT
 
-現在プレイ用に選択されている楽曲の読み取り専用グローバルです。
+現在プレイ用に選択されている楽曲と、次のプレイのバックグラウンドを扱うグローバルです。
 
 <div class="callout warn">
 グローバル SONGMOUNT として利用できます。楽曲ノードの Mount()、譜面の Select()、DANBUILDER:Mount() によって設定された状態を反映します。
@@ -436,4 +436,4 @@ REPLAY:ListReplays が返す配列、またはリプレイリストハンドル�
 | `SONGMOUNT:ChosenUniqueId()  -> string` | 選択された楽曲の固有 id を返します。なければ空文字列。 |
 | `SONGMOUNT:ChosenDifficulty()  -> int` | プレイヤー 1 に選択された難易度インデックスを返します。 |
 | `SONGMOUNT:ChosenSongNode()  -> song node` | 選択された楽曲を (子を持たない) 楽曲ノードとして返します。何も選択されていなければ nil。 |
-| `SONGMOUNT:SetBackgrounds(up, down)  -> boolean` | Forces the upper and lower gameplay backgrounds of the next play. Each argument is a folder holding a background Script.lua, relative to the calling script's folder or absolute; nil or "" keeps the usual pick for that layer. The next play takes both when its backgrounds start, and a new call replaces both. Returns false when a given folder has no Script.lua; that layer then keeps the usual pick. |
+| `SONGMOUNT:SetBackgrounds(up, down)  -> boolean` | 次のプレイの上部と下部のゲームプレイのバックグラウンドを強制します。各引数はバックグラウンドの Script.lua を含むフォルダで、呼び出し元スクリプトのフォルダからの相対パス、または絶対パスです。nil または "" を渡したレイヤーは通常どおり選ばれます。次のプレイはバックグラウンドの開始時に両方を受け取り、新しい呼び出しは両方を置き換えます。指定したフォルダに Script.lua がない場合は false を返し、そのレイヤーは通常どおり選ばれます。 |

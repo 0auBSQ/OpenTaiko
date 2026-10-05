@@ -5,6 +5,7 @@ local NavInput = require("NavInput")
 local EM       = require("EventMode")
 local PS       = require("player_select")
 local PopUI    = require("PopUI")
+local PagodaAvatar = require("PagodaAvatar")
 
 -- ── Resources ─────────────────────────────────────────────────────────────────
 
@@ -354,6 +355,8 @@ function onStart()
 end
 
 function activate()
+    -- a pagoda run an earlier session crashed in: player 1's own pair is back before anything can change it
+    PagodaAvatar.recover()
     if not EM.on() then EM.resetSession() end   -- no event running: the plays counter waits at zero
     menus     = buildMenus()
     textCache = {}

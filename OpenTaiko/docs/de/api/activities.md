@@ -251,14 +251,14 @@ Eine Instanz pro Host, die der Host jeden Frame an Ort und Stelle aktualisiert. 
 | `state.timeStamp  -> number` | Chart-synchrone Zeit in Sekunden; -1 außerhalb des Spiels. |
 | `state.paused  -> boolean` | True, während das Spiel pausiert ist. |
 | `state.player  -> number` | Der Spieler, für den ein Pro-Spieler-Host (Clear-Animationen) zeichnet. |
-| `state.hitRing  -> number` | Number of recent hits kept in hitNote, hitBig and hitJudge (32). |
-| `state.hitCount  -> number[]` | Each player's hits since the background started: judged notes (misses included), roll hits and popped balloons. The n-th hit, counted from 0, sits at index n % hitRing of hitNote, hitBig and hitJudge. |
-| `state.hitNote  -> string[][]` | Note of each kept hit, per player: "don", "ka" or "kadon". |
-| `state.hitBig  -> boolean[][]` | True when the kept hit was a big note, per player. |
-| `state.hitJudge  -> string[][]` | Judge of each kept hit, per player: "perfect", "great", "good", "poor", "miss", "roll" or "balloon". |
-| `state.landCount  -> number[]` | Each player's flying notes that reached the end of their flight since the background started. |
-| `state:SetFlyTarget(player, x, y)` | While this gameplay background is shown, the player's flying notes land on (x, y) in screen pixels and the skin's landing effect is left out. |
-| `state:ClearFlyTarget(player)` | The player's flying notes land at the skin's usual place again. |
+| `state.hitRing  -> number` | Anzahl der letzten Treffer, die hitNote, hitBig und hitJudge aufbewahren (32). |
+| `state.hitCount  -> number[]` | Treffer jedes Spielers seit dem Start des Hintergrunds: gewertete Noten (Miss eingeschlossen), Trommelwirbel-Treffer und geplatzte Ballons. Der n-te Treffer, ab 0 gezählt, steht an Index n % hitRing von hitNote, hitBig und hitJudge. |
+| `state.hitNote  -> string[][]` | Note jedes aufbewahrten Treffers, pro Spieler: "don", "ka" oder "kadon". |
+| `state.hitBig  -> boolean[][]` | True, wenn der aufbewahrte Treffer eine große Note war, pro Spieler. |
+| `state.hitJudge  -> string[][]` | Wertung jedes aufbewahrten Treffers, pro Spieler: "perfect", "great", "good", "poor", "miss", "roll" oder "balloon". |
+| `state.landCount  -> number[]` | Fliegende Noten jedes Spielers, die seit dem Start des Hintergrunds das Ende ihres Flugs erreicht haben. |
+| `state:SetFlyTarget(player, x, y)` | Solange dieser Gameplay-Hintergrund angezeigt wird, landen die fliegenden Noten des Spielers auf (x, y) in Bildschirmpixeln, und der Landeeffekt des Skins entfällt. |
+| `state:ClearFlyTarget(player)` | Die fliegenden Noten des Spielers landen wieder an der üblichen Stelle des Skins. |
 
 ## Übergänge
 

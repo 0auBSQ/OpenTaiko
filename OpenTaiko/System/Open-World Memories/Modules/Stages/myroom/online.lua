@@ -18,8 +18,13 @@
 -- SECURITY: the room layout crosses the wire as plain json only, we never load() network data (that
 -- would be remote code execution). Maps in floorDeco/wallPaint/inventory ship as [key,value] arrays so
 -- the decoder needs no key-enumeration helper; furniture/wallItems ship as object arrays.
+--
+-- Each player's roster info carries their name plus the student they walk as ("st": "a"|"b") and its
+-- palette index ("pal"), so everyone sees everyone else's avatar; info from a client that predates them
+-- reads as Student A in the default palette.
 
 local I18N = require("i18n")
+local Student = require("Student")
 local PHONE = I18N.texts("phone")   -- lang/<code>/phone.json
 
 local MO = {}
@@ -30,6 +35,7 @@ MO.net = {
     online = false, isHost = false, connecting = false, gotRoom = false, roomGone = false,
     code = nil, msg = nil,
     nameByPeer = {},        -- peerId -> display name
+    lookByPeer = {},        -- peerId -> { student, palette, set }  (set = Script's sprites for that look)
     posByPeer  = {},        -- peerId -> { x,z, tx,tz, dir, moving, frameT }  (remote avatars, lerped)
     sendT = 0,
 }
@@ -52,7 +58,22 @@ function MO.myName()
     if n == nil or n == "" then n = "Player" end
     return n
 end
-function MO.selfInfo() return '{"name":' .. jstr(MO.myName()) .. '}' end
+function MO.selfInfo()
+    local st, pal = "a", 0
+    if C and C.look then
+        local ok, s, p = pcall(C.look)
+        if ok then st, pal = Student.valid(s), math.max(0, floor(tonumber(p) or 0)) end
+    end
+    return '{"name":' .. jstr(MO.myName()) .. ',"st":' .. jstr(st) .. ',"pal":' .. string.format("%d", pal) .. '}'
+end
+
+-- the look in a peer's roster info; anything missing or malformed reads as Student A, default palette
+local function lookFromInfo(io)
+    local st = io and JSONLOADER:JsonGet(io, "st")
+    local pal = tonumber(io and JSONLOADER:JsonGet(io, "pal"))
+    if pal == nil or pal ~= pal or pal < 0 or pal > 9999 then pal = 0 end
+    return { student = Student.valid(type(st) == "string" and st or "a"), palette = floor(pal) }
+end
 function MO.isGuest() return net.online and not net.isHost end
 function MO.playerCount() local c = 0; for _ in pairs(net.nameByPeer) do c = c + 1 end return c end
 
@@ -149,7 +170,7 @@ end
 
 -- ── roster ──────────────────────────────────────────────────────────────────────────────────────
 function MO.refreshRoster()
-    local names = {}
+    local names, looks = {}, {}
     local arr = JSONLOADER:JsonParseStringAny(NET:PeersJson()); local n = arr and JSONLOADER:JsonCount(arr) or 0
     for i = 1, n do
         local e = JSONLOADER:JsonGet(arr, i); local id = e and JSONLOADER:JsonGet(e, "id")
@@ -157,9 +178,10 @@ function MO.refreshRoster()
             id = floor(id)
             local io = e and JSONLOADER:JsonGet(e, "info"); io = io and JSONLOADER:JsonParseStringAny(io) or nil
             names[id] = (io and JSONLOADER:JsonGet(io, "name")) or ("Visitor " .. id)
+            looks[id] = lookFromInfo(io)
         end
     end
-    net.nameByPeer = names
+    net.nameByPeer, net.lookByPeer = names, looks
     local selfId = NET:SelfId()
     for id in pairs(net.posByPeer) do if not names[id] or id == selfId then net.posByPeer[id] = nil end end
 end
@@ -168,7 +190,7 @@ end
 local function resetState()
     net.online, net.isHost, net.connecting, net.gotRoom, net.roomGone = false, false, false, false, false
     net.code, net.msg = nil, net.msg
-    net.nameByPeer, net.posByPeer, net.sendT = {}, {}, 0
+    net.nameByPeer, net.lookByPeer, net.posByPeer, net.sendT = {}, {}, {}, 0
 end
 
 function MO.host()
@@ -176,7 +198,7 @@ function MO.host()
     local code = NET:CreateRoom("myroom", "", 8)
     if not code or code == "" then net.msg = PHONE:tr("host_failed"); return false end
     net.code, net.online, net.isHost, net.connecting = code, true, true, false
-    net.nameByPeer, net.posByPeer = {}, {}
+    net.nameByPeer, net.lookByPeer, net.posByPeer = {}, {}, {}
     STORAGE:WriteLobbyCode("myroom.txt", code)
     STORAGE:RevealLobbyCodes()
     MO.refreshRoster()
@@ -191,7 +213,7 @@ function MO.join(code)
     if sid ~= "myroom" then net.msg = sid and ("That code is for a '" .. sid .. "' room, not My Room.") or "That code isn't valid."; return false end
     NET:SetLocalPlayer(MO.selfInfo())
     net.connecting, net.isHost, net.gotRoom = true, false, false
-    net.nameByPeer, net.posByPeer = {}, {}
+    net.nameByPeer, net.lookByPeer, net.posByPeer = {}, {}, {}
     NET:JoinRoom(code)
     net.msg = PHONE:tr("connecting")
     return true

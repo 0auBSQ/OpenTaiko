@@ -23,6 +23,9 @@ local JB       = require("jukebox")         -- the Jukebox furniture's audio pla
 local TV       = require("tv")              -- the TV: on/off screen light + the cutscene browser; see tv.lua
 local Pod      = require("pod")             -- the Mysterious Pod's entry sequence; see pod.lua
 local MX       = require("matrix")          -- the Placeholder Matrix: its glow + the debug scene list; see matrix.lua
+local MR       = require("mirror")          -- the mirror: the student and palette the player wears; see mirror.lua
+local AV       = require("avatar")          -- the students' billboard sprites (player + visitors); see avatar.lua
+local Student  = require("Student")         -- Lib: the chosen story student and its palette
 local CoinBox  = require("CoinBox")         -- Lib: the coin purse laid over the landlord's offers
 local Landlord = require("landlord")        -- the landlord's phone call; see landlord.lua
 local Integrity = require("integrity")      -- the load-time placement sweep; see integrity.lua
@@ -40,9 +43,10 @@ local room
 local edit, pcScreen, dlg
 local lastTs = 0
 local px, py, pz = 0, FY, 0    -- player world position (feet)
-local pdir = 2                 -- facing 1↙ 2↘ 3↗ 4↖ (CharaTemplate direction)
+local pdir = 2                 -- facing 1↙ 2↘ 3↗ 4↖ (the students' sprite folders)
 local pframeT = 0              -- walk-cycle timer
 local pmoving = false
+local look = { student = "a", palette = 0, set = nil }   -- the student the player walks as, its palette, its sprites
 local moveSpeed = 4.2          -- units/sec
 local prompt = nil             -- current interaction prompt ("computer"/"phone"/"exit"/"lamp")
 local focusKey = nil           -- which in-range interactable is focused (stable across frames; Tab cycles)
@@ -120,7 +124,7 @@ local function loadRoom()
     local t = deserialize(raw)
     local dirty = false
     if t then
-        room:loadTable(t)
+        if room:loadTable(t) then dirty = true end   -- a gift every room gets (the mirror) joined the stock
         -- pieces the live rules would refuse (overlaps from older builds) go back to stock
         local evicted = Integrity.sweep(room)
         if #evicted > 0 then
@@ -191,6 +195,14 @@ local function spawnAtEntrance()
     player:setPos(px, py + 0.05, pz)
 end
 
+-- the student and palette of the save whose room this is (the mirror and the customize tab set them)
+local function refreshLook()
+    local sf = curSave()
+    look.student = Student.ensure(sf)
+    look.palette = Student.index(sf, look.student)
+    look.set = AV.prepare(look.student, look.palette)
+end
+
 
 -- ── lifecycle ─────────────────────────────────────────────────────────────────────────────────────
 function onStart()
@@ -240,6 +252,7 @@ function activate()
         world:setDiorama(2.0, 1.1, 0.22, 0.26)     -- gentle cosy grade (softer bloom, not blown out)
         world:setFog(false)                        -- an interior needs no distance fog
         A.buildAll(world.scene)
+        AV.attach(world.scene)
         loadRoom()
         world:registerMap("room", { type = "proc", build = function(w) return room:buildMap(w) end })
         player = world.phys:newCharacter{ radius = 0.32, accel = 13, decel = 16 }
@@ -256,8 +269,10 @@ function activate()
             spawnAtEntrance = function() spawnAtEntrance() end,
             applyJukebox    = function(t) JB.applyNetState(t) end,   -- guest: mirror the host's player
             jukeboxState    = function() return JB.netState() end,   -- host: brief late joiners
+            look            = function() return look.student, look.palette end,   -- shown to the others
         })
         rebuild()
+        refreshLook()
         spawnAtEntrance()
         openPlayerSelect()          -- pick whose room to view/edit (skips itself when only one save)
     end)
@@ -277,6 +292,9 @@ function deactivate()
     if phoneUI then phoneUI:disposeWidgets(); phoneUI = nil end
     if hud then hud:disposeWidgets(); hud = nil end
     MX.dispose()
+    MR.dispose()
+    AV.dispose()
+    look.set = nil
     purse:dispose()
     Pod.reset()
     -- safety net: free any 3D preview icon (edit grid / popup) its owner missed
@@ -328,6 +346,8 @@ local function interactablesInRange()
                         seen[it] = true; list[#list + 1] = { kind = "pod", it = it, key = "pod:" .. tostring(it) }
                     elseif cat.interact == "matrix" then
                         seen[it] = true; list[#list + 1] = { kind = "matrix", it = it, key = "matrix:" .. tostring(it) }
+                    elseif cat.interact == "mirror" then
+                        seen[it] = true; list[#list + 1] = { kind = "mirror", it = it, key = "mirror:" .. tostring(it) }
                     end
                 end
             end
@@ -598,6 +618,15 @@ MX.init{
     displayName = function() return Room.displayName(MX.ID) end,
 }
 
+-- mirror context: the student and palette it changes belong to the save whose room this is
+MR.init{
+    theme = PHONE_THEME,
+    playerIndex = function() return playerIndex end,
+    save = function() return curSave() end,
+    displayName = function() return Room.displayName(MR.ID) end,
+    onChanged = function() refreshLook() end,
+}
+
 local buildPhoneMenu   -- forward decl (the textbox panes route Back into it)
 
 local function buildPhoneTextPane(title, hintText, maxLen, confirmLabel, onConfirm)
@@ -713,6 +742,7 @@ local function pickPlayer(i)
         loadRoom()
         rebuild()
     end
+    refreshLook()
     spawnAtEntrance()
     closePlayerSelect()
     mode = "play"
@@ -866,6 +896,8 @@ function update(ts)
     if net.online or net.connecting then
         MO.drain()
         MO.lerpRemotes(dt)
+        -- every visitor's student in their palette (registered once per look, here and never in draw)
+        for _, lk in pairs(net.lookByPeer) do lk.set = AV.prepare(lk.student, lk.palette, true) end
         if net.roomGone then backToOwnRoom(PHONE:tr("room_host_closed")) end
     end
 
@@ -937,6 +969,9 @@ function update(ts)
             return Exit("stage", stage)
         end
         if res == "closed" or not MX.isOpen() then mode = "play" end
+        settlePlayer(dt); world:update(dt, px, py, pz); return nil
+    elseif mode == "mirror" then
+        if MR.update(dt, ts) == "closed" or not MR.isOpen() then mode = "play" end
         settlePlayer(dt); world:update(dt, px, py, pz); return nil
     elseif mode == "edit" then
         if edit:update(ts, getEditCameraFuncs(dt)) == "exit" then
@@ -1063,6 +1098,10 @@ function update(ts)
             SHARED:GetSharedSound("Decide"):Play()
             MX.open()
             mode = "matrix"
+        elseif focused.kind == "mirror" then
+            SHARED:GetSharedSound("Decide"):Play()
+            MR.open()
+            mode = "mirror"
         end
     end
     if msgT > 0 then msgT = msgT - dt end
@@ -1072,23 +1111,17 @@ function update(ts)
 end
 
 -- ── draw ──────────────────────────────────────────────────────────────────────────────────────────
-local function charSprite(dir, moving, t)
-    local st = "idle"
-    if moving then st = (math.floor(t / 0.16) % 2 == 0) and "run1" or "run2" end
-    return (A.CHARA[dir] and A.CHARA[dir][st]) or (A.CHARA[2] and A.CHARA[2].idle)
-end
-
 function draw()
     if world == nil or map == nil or hud == nil then return end
     local hW = 1.7
-    local wW = hW * (A.CHARA.w / A.CHARA.h)
+    local wW = hW * (AV.W / AV.H)
     local function groundAt(x, z) return map:heightAt(x, z) end
 
     -- the dynamic actor layer (player + remote visitors). No blob shadows: the sun shadow map
     -- already grounds the sprites, so the shadow layer just stays cleared.
     world.actors:shadowsBegin()
     world.actors:actorsBegin()
-    local spr = charSprite(pdir, pmoving, pframeT)
+    local spr = AV.sprite(look.set, pdir, pmoving, pframeT)
     if mode == "pod" then
         -- stepping into the pod: the sprite slides to it and shrinks away, then stays hidden
         local vx, vz, vs = Pod.playerVisual()
@@ -1097,9 +1130,9 @@ function draw()
         world.actors:actorSprite(px, py, pz, wW, hW, spr)
     end
     if net.online then
-        for _, p in pairs(net.posByPeer) do
-            local rst = p.moving and ((math.floor(p.frameT / 0.16) % 2 == 0) and "run1" or "run2") or "idle"
-            local rspr = (A.CHARA[p.dir] and A.CHARA[p.dir][rst]) or (A.CHARA[2] and A.CHARA[2].idle)
+        for id, p in pairs(net.posByPeer) do
+            local lk = net.lookByPeer[id]
+            local rspr = AV.sprite(lk and lk.set or nil, p.dir, p.moving, p.frameT)
             local ry = groundAt(p.x, p.z)
             if rspr then world.actors:actorSprite(p.x, ry, p.z, wW, hW, rspr) end
         end
@@ -1159,6 +1192,9 @@ function draw()
     elseif mode == "matrix" then
         hud:rect(0, 0, SCREEN_W, SCREEN_H, 8, 10, 18, 130)
         MX.draw()
+    elseif mode == "mirror" then
+        hud:rect(0, 0, SCREEN_W, SCREEN_H, 8, 10, 18, 130)
+        MR.draw()
     else
         -- input instructions: TOP-RIGHT, right-aligned, one per line (readability). The contextual
         -- action prompt (bright) leads, then any [Tab] switch, then the persistent controls.
@@ -1170,6 +1206,7 @@ function draw()
         elseif prompt == "tv" then instr[#instr + 1] = { t = HUD:tr("prompt_tv"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "pod" then instr[#instr + 1] = { t = HUD:tr("prompt_pod"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "matrix" then instr[#instr + 1] = { t = HUD:tr("prompt_matrix"), c = { 150, 230, 255 }, s = 24 }
+        elseif prompt == "mirror" then instr[#instr + 1] = { t = HUD:tr("prompt_mirror"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "exit" then instr[#instr + 1] = { t = HUD:tr("prompt_exit"), c = { 255, 230, 150 }, s = 24 }
         end
         if interCount > 1 then instr[#instr + 1] = { t = HUD:tr("prompt_switch"), c = { 200, 220, 240 }, s = 18 } end

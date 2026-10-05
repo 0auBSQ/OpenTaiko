@@ -1,0 +1,9 @@
+{
+  "_comment": "Textes français du miroir (mirror.lua).",
+  "student": "Élève",
+  "student_a": "Élève A",
+  "student_b": "Élève B",
+  "palette": "Palette",
+  "worn": "Porté actuellement",
+  "locked": "Parties avec cet élève : %d / %d"
+}

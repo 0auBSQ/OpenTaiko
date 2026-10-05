@@ -251,14 +251,14 @@ end
 | `state.timeStamp  -> number` | 채보에 동기화된 시간(초). 게임플레이 밖에서는 -1. |
 | `state.paused  -> boolean` | 게임플레이가 일시정지된 동안 true. |
 | `state.player  -> number` | 플레이어별 호스트(클리어 애니메이션)가 그리고 있는 플레이어. |
-| `state.hitRing  -> number` | Number of recent hits kept in hitNote, hitBig and hitJudge (32). |
-| `state.hitCount  -> number[]` | Each player's hits since the background started: judged notes (misses included), roll hits and popped balloons. The n-th hit, counted from 0, sits at index n % hitRing of hitNote, hitBig and hitJudge. |
-| `state.hitNote  -> string[][]` | Note of each kept hit, per player: "don", "ka" or "kadon". |
-| `state.hitBig  -> boolean[][]` | True when the kept hit was a big note, per player. |
-| `state.hitJudge  -> string[][]` | Judge of each kept hit, per player: "perfect", "great", "good", "poor", "miss", "roll" or "balloon". |
-| `state.landCount  -> number[]` | Each player's flying notes that reached the end of their flight since the background started. |
-| `state:SetFlyTarget(player, x, y)` | While this gameplay background is shown, the player's flying notes land on (x, y) in screen pixels and the skin's landing effect is left out. |
-| `state:ClearFlyTarget(player)` | The player's flying notes land at the skin's usual place again. |
+| `state.hitRing  -> number` | hitNote, hitBig, hitJudge에 보관되는 최근 히트 수(32). |
+| `state.hitCount  -> number[]` | 배경이 시작된 이후 각 플레이어의 히트 수: 판정된 노트(미스 포함), 연타 히트, 터뜨린 풍선. 0부터 센 n번째 히트는 hitNote, hitBig, hitJudge의 인덱스 n % hitRing에 있습니다. |
+| `state.hitNote  -> string[][]` | 보관된 각 히트의 노트, 플레이어별: "don", "ka" 또는 "kadon". |
+| `state.hitBig  -> boolean[][]` | 보관된 히트가 큰 노트였으면 true, 플레이어별. |
+| `state.hitJudge  -> string[][]` | 보관된 각 히트의 판정, 플레이어별: "perfect", "great", "good", "poor", "miss", "roll" 또는 "balloon". |
+| `state.landCount  -> number[]` | 배경이 시작된 이후 비행의 끝에 도달한 각 플레이어의 날아가는 노트 수. |
+| `state:SetFlyTarget(player, x, y)` | 이 게임플레이 배경이 표시되는 동안 플레이어의 날아가는 노트가 화면 픽셀 단위의 (x, y)에 착지하며, 스킨의 착지 효과는 생략됩니다. |
+| `state:ClearFlyTarget(player)` | 플레이어의 날아가는 노트가 다시 스킨의 평소 위치에 착지합니다. |
 
 ## 트랜지션
 

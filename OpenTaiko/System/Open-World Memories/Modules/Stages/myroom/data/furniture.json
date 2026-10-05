@@ -19,7 +19,8 @@
     "poster_nokon",
     "poster_bol",
     "phone",
-    "placeholder_matrix"
+    "placeholder_matrix",
+    "mirror"
   ],
   "desk": {
     "w": 2,
@@ -209,5 +210,15 @@
       0.5,
       0.9
     ]
+  },
+  "mirror": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "collH": 1.8,
+    "collW": 0.8,
+    "collD": 0.5,
+    "interact": "mirror",
+    "shop": true
   }
 }

@@ -7,6 +7,7 @@ local standard_dan = require("standard_dan")
 local NavInput     = require("NavInput")
 local Easing       = require("Easing")
 local EM           = require("EventMode")
+local PagodaAvatar = require("PagodaAvatar")
 
 local TX  = "Textures/"
 local SND = "Sounds/"
@@ -78,6 +79,7 @@ local anim_t     = 0.0           -- time into the current in or out flight
 local anim_dir   = "in"          -- "in" | "out"
 local anim_delay = 0.0           -- the in flight waits this long (the doors opening)
 local out_target = nil           -- "standard" | "pagoda" | "title", acted on once the out flight ends
+local to_pagoda  = false         -- the doors are closing onto the pagoda (the student hand-off follows)
 
 -- Fade the dojo BGM out as the doors close on the way out (to the Pagoda stage or the title)
 local exiting     = false
@@ -272,12 +274,13 @@ end
 function activate()
     CONFIG.PlayerCount = 1
     CONFIG.SongSpeed   = 20   -- reset speed (pagoda may have changed it)
+    PagodaAvatar.leave()      -- player 1's own character and puchichara, if the pagoda still held them
 
     active      = true
     exiting     = false
     dan_bgm_vol = 100.0
     entries = menuEntries()   -- built on every entry so the texts follow the language
-    menu_t, out_target = 0, nil
+    menu_t, out_target, to_pagoda = 0, nil, false
     -- dan_doors shows the dojo's name first and leaves how long (s) here
     local title_sec = tonumber(SHARED:GetSharedString("dan_doors_title")) or 0
     SHARED:SetSharedString("dan_doors_title", "")
@@ -332,6 +335,9 @@ function deactivate()
     stopBGM()
     stopEventTimer()
 
+    -- into the pagoda: with the doors shut, player 1 becomes their story student, Ume beside them
+    if to_pagoda then PagodaAvatar.enter() end
+
     -- Deactivate the active sub-module (if any)
     if state == "standard_dan" then
         standard_dan.deactivate()
@@ -385,7 +391,7 @@ local function afterFlyOut()
     elseif out_target == "pagoda" then
         -- Pagoda of the Unknown is its own stage: close the dojo doors over dan_select and open
         -- onto it, fading the dojo BGM out as they close.
-        exiting, state = true, "leaving"
+        exiting, state, to_pagoda = true, "leaving", true
         return Exit("stage", "pagoda", "dan_doors_back")
     else
         exiting, state = true, "leaving"
