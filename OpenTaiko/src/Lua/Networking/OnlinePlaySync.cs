@@ -11,8 +11,8 @@ namespace OpenTaiko {
 	//   • broadcasts the local spot-0 running score + gauge + good/ok/bad counts (~6-7x/sec) on "ps";
 	//   • for each REMOTE spot, snaps its displayed score + gauge to that peer's latest broadcast (snapping = the
 	//     score updates with no count-up animation), while the spot auto-hits its own chart with judges sampled
-	//     from those broadcast rates (see CStage演奏画面共通.AlterJudgement) - flying notes are hidden in the chip
-	//     draw, so you see judge indicators only;
+	//     from those broadcast rates (see CStagePlayScreenCommon.AlterJudgement) - remote spots are lanes of the
+	//     normal N-player layout, and flying notes follow the offline rule (shown up to 2 players);
 	//   • freezes any spot whose remote player has dropped mid-play (it stops updating in real time).
 	internal static class OnlinePlaySync {
 		private static long _lastSend;

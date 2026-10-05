@@ -121,7 +121,8 @@ namespace OpenTaiko {
 		private string _selfPlayName = "";
 		private readonly ConcurrentDictionary<int, string> _liveScores = new();
 		// online play SPOT mapping: _spotPeers[i] = the peerId rendered in player spot i (index 0 = self). The
-		// gameplay screen renders spots 1.. as REMOTE players (notes suppressed, score/gauge fed from the wire).
+		// gameplay screen renders spots 1.. as REMOTE players (auto-played lanes in the normal N-player layout,
+		// score/gauge fed from the wire).
 		private int[] _spotPeers;
 		private readonly ConcurrentDictionary<int, string> _spotLive = new();   // spotIndex -> last "ps" json
 		// per-spot judge odds (per mille) derived from each remote spot's broadcast good/ok/bad counts - fed to
@@ -341,7 +342,7 @@ namespace OpenTaiko {
 		}
 		public int PlaySpotCount() => _spotPeers?.Length ?? 0;
 		/// <summary>True if player spot <paramref name="spot"/> is a remote online player (so the gameplay screen
-		/// should suppress its notes and feed its score/gauge from the wire). Always false outside a play round.</summary>
+		/// auto-plays its lane and feeds its score/gauge from the wire). Always false outside a play round.</summary>
 		public bool IsRemoteSpot(int spot) => _playSync && _spotPeers != null && spot >= 1 && spot < _spotPeers.Length;
 		/// <summary>Latest "ps" json for a remote spot (score/gauge), or "" - for the gameplay overlay.</summary>
 		public string GetSpotPlayJson(int spot) => _spotLive.TryGetValue(spot, out var v) ? v : "";

@@ -457,8 +457,10 @@ function animation_builder.animation(animation_def)
 						-- tokkkom gave a set of offset constants in decimals, which effectively offset in 1080p pixels.
 						if offset.mode == OFFSET_MODE_GAME then
 							anchor = "topleft"
-							offsetX = offsetX - 250 / 1080.0 --[[0.13020833333 * 1920 / 1080]] * theme_resolution.Y
-							offsetY = offsetY - 276 / 1080.0 --[[0.25555555555]] * theme_resolution.Y
+							-- the constants fit the 2-player size (where scaleY / baseScale is 1): shrink them with the 3+ player character
+							local size = (player_count > 2) and math.abs(scaleY) / baseScale or 1
+							offsetX = offsetX - 250 / 1080.0 --[[0.13020833333 * 1920 / 1080]] * theme_resolution.Y * size
+							offsetY = offsetY - 276 / 1080.0 --[[0.25555555555]] * theme_resolution.Y * size
 						elseif offset.mode == OFFSET_MODE_GAME_AI then
 							-- bottomleft-anchored in 0.6.0
 							anchor = "bottomleft"
@@ -650,7 +652,7 @@ function update(delta, animationType, looping)
 end
 
 function draw(animationType, x, y, scaleX, scaleY, opacity, color, contextType, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode, gradientMap)
-	-- 2 for 1/2 players (unimplemented: 4 for 3/4 players, 5 for 5 players)
+	-- 2 for 1/2 players, 4 for 3/4 players, 5 for 5 players
 	local player_count = (CONFIG.PlayerCount <= 2) and 2 or (CONFIG.PlayerCount <= 4) and 4 or 5
 	local ai_battle_mode = CONFIG.IsAIBattleMode
 	if not availableAnimation(animationType) then
