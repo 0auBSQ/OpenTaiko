@@ -216,7 +216,7 @@ local function implDrawStarFlash(x, y, titleTexIndex)
 	end
 	if c >= 85 and c <= 112 then
 		slash:SetOpacity(math.min(1.0, (1400 - (c - 85) * 50) / 255.0))
-		slash:Draw(math.floor(x + (((c - 85) * (150 / 27)) * (1920.0 / 1280.0))), math.floor(y + (7 * (1080.0 / 720.0))))
+		slash:DrawAtAnchor(x + math.floor(((c - 85) * (150 / 27)) * (1920.0 / 1280.0)), y + math.floor(7 * (1080.0 / 720.0)), "topleft")
 	end
 	if c >= 105 and c <= 120 then
 		local big = title_plate_star_big[titleTexIndex]
@@ -229,7 +229,7 @@ local function implDrawStarFlash(x, y, titleTexIndex)
 				big:SetOpacity((255 - (c - 112) * 31.875) / 255.0)
 			end
 			big:SetScale(big_scale, big_scale)
-			big:DrawAtAnchor(math.floor(x + (193 * (1920.0 / 1280.0))), math.floor(y + (6 * (1080.0 / 720.0))), "center")
+			big:DrawAtAnchor(x + math.floor(193 * (1920.0 / 1280.0)), y + math.floor(6 * (1080.0 / 720.0)), "center")
 		end
 	end
 end
@@ -257,7 +257,7 @@ local function implDrawRarityStars(o_x, o_y, opacity, rarity)
 		local op = toOpacity(opacity)
 		local ox, oy = x + config_title_plate_offset_x, y + config_title_plate_offset_y
 		tx_titlestar:SetOpacity(op)
-		tx_titlestar:Draw(ox, oy)
+		tx_titlestar:DrawAtAnchor(ox, oy, "topleft")
 		-- the glitter: each star's patch of the overlay pulses additively with its own phase, then its glints
 		local spots = STAR_SPOTS[star_count]
 		local t = star_time
@@ -288,7 +288,7 @@ local function implDrawRarityStars(o_x, o_y, opacity, rarity)
 						star_glint:SetRotation((spot[4] or 0) + gp * 90)
 						star_glint:SetScale((0.6 + 0.6 * blink) * k, (0.6 + 0.6 * blink) * k)
 						star_glint:SetOpacity(op * STAR_GLINT_OP * blink)
-						star_glint:DrawAtAnchor(math.floor(ox + spot[1] + dx), math.floor(oy + spot[2] + dy), "center")
+						star_glint:DrawAtAnchor(ox + math.floor(spot[1] + dx), oy + math.floor(spot[2] + dy), "center")
 					end
 				end
 			end
@@ -303,10 +303,10 @@ end
 local function implDrawBadges(x, y, opacity, nameplateId)
 	if tableContains(nameplates_achievement, nameplateId) then
 		title_badge_of_achievement:SetOpacity(toOpacity(opacity))
-		title_badge_of_achievement:Draw(x + config_title_plate_offset_x, y + config_title_plate_offset_y)
+		title_badge_of_achievement:DrawAtAnchor(x + config_title_plate_offset_x, y + config_title_plate_offset_y, "topleft")
 	elseif tableContains(nameplates_team_member, nameplateId) then
 		title_badge_of_team_member:SetOpacity(toOpacity(opacity))
-		title_badge_of_team_member:Draw(x + config_title_plate_offset_x, y + config_title_plate_offset_y)
+		title_badge_of_team_member:DrawAtAnchor(x + config_title_plate_offset_x, y + config_title_plate_offset_y, "topleft")
 	end
 end
 
@@ -315,28 +315,28 @@ local function implDrawTitlePlate(x, y, opacity, titleTexIndex)
 		local titleplate_frame = 1 + math.ceil(titleplate_counter * (#title_plates[titleTexIndex] - 1))
 		local tx_titleplate = title_plates[titleTexIndex][titleplate_frame]
 		tx_titleplate:SetOpacity(toOpacity(opacity))
-		tx_titleplate:Draw(x + config_title_plate_offset_x, y + config_title_plate_offset_y)
+		tx_titleplate:DrawAtAnchor(x + config_title_plate_offset_x, y + config_title_plate_offset_y, "topleft")
 	end
 end
 
 local function implDrawPlayerRing(x, y, opacity, player_lua, side_lua)
 	if CONFIG.IsAIBattleMode and player_lua == 2 then
 		players_ai:SetOpacity(toOpacity(opacity))
-		players_ai:Draw(x, y)
+		players_ai:DrawAtAnchor(x, y, "topleft")
 	elseif player_lua == 1 and side_lua == 2 then
 		players_blue:SetOpacity(toOpacity(opacity))
-		players_blue:Draw(x, y)
+		players_blue:DrawAtAnchor(x, y, "topleft")
 	else
 		players[player_lua]:SetOpacity(toOpacity(opacity))
-		players[player_lua]:Draw(x, y)
+		players[player_lua]:DrawAtAnchor(x, y, "topleft")
 	end
 end
 
 local function drawDanTitlePlate(x, y, opacity, danType)
 	dan_plate:SetOpacity(toOpacity(opacity))
 	dan_plategradation[danType]:SetOpacity(toOpacity(opacity))
-	dan_plate:Draw(x + config_title_plate_offset_x, y + config_title_plate_offset_y)
-	dan_plategradation[danType]:Draw(x + config_title_plate_offset_x, y + config_title_plate_offset_y)
+	dan_plate:DrawAtAnchor(x + config_title_plate_offset_x, y + config_title_plate_offset_y, "topleft")
+	dan_plategradation[danType]:DrawAtAnchor(x + config_title_plate_offset_x, y + config_title_plate_offset_y, "topleft")
 end
 
 -- ────────────────────────────────────────────────────────────────────────────
@@ -516,7 +516,7 @@ local function implDrawFullNameplate(x, y, opacity, player_lua, side_lua,
 	local _nodan          = (danText   == nil or danText   == "")
 	local titleplate_index = titleType + 1
 
-	base:SetOpacity(op) ; base:Draw(x, y)
+	base:SetOpacity(op) ; base:DrawAtAnchor(x, y, "topleft")
 
 	if not _notitle then
 		implDrawTitlePlate(x, y, opacity, titleplate_index)
@@ -528,8 +528,8 @@ local function implDrawFullNameplate(x, y, opacity, player_lua, side_lua,
 	implDrawBadges(x, y, opacity, nameplateId)
 
 	if not _nodan and not _notitle then
-		dan_base:SetOpacity(op) ; dan_base:Draw(x, y)
-		dan_gradation[danGradeIdx]:SetOpacity(op) ; dan_gradation[danGradeIdx]:Draw(x, y)
+		dan_base:SetOpacity(op) ; dan_base:DrawAtAnchor(x, y, "topleft")
+		dan_gradation[danGradeIdx]:SetOpacity(op) ; dan_gradation[danGradeIdx]:DrawAtAnchor(x, y, "topleft")
 	end
 
 	implDrawTitleEffect(x, y, titleplate_index)
@@ -591,12 +591,12 @@ function draw(mode, ...)
 		local op = toOpacity(opacity)
 
 		base:SetOpacity(op)
-		base:Draw(x, y)
+		base:DrawAtAnchor(x, y, "topleft")
 
 		dan_base:SetOpacity(op)
-		dan_base:Draw(x, y)
+		dan_base:DrawAtAnchor(x, y, "topleft")
 		dan_gradation[danType + 1]:SetOpacity(op)
-		dan_gradation[danType + 1]:Draw(x, y)
+		dan_gradation[danType + 1]:DrawAtAnchor(x, y, "topleft")
 
 		implDrawPlayerRing(x, y, opacity, 1, 1)
 
@@ -643,7 +643,7 @@ function draw(mode, ...)
 		local op = toOpacity(opacity)
 
 		base:SetOpacity(op)
-		base:Draw(x, y)
+		base:DrawAtAnchor(x, y, "topleft")
 
 		implDrawTitlePlate(x, y, opacity, titletype + 1)
 		implDrawRarityStars(x, y, opacity, rarityInt)

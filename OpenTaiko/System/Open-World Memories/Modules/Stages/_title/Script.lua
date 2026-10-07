@@ -97,7 +97,7 @@ local function buildMenus()
             title = tr("TITLE_STORE", "OpenTaiko's General Store"),
             desc  = tr("TITLE_STORE_DESC", "Spend your OpenTaiko coins for very nice goods! *wink*"),
             c     = col(0, 160, 170),
-            via   = "stage", stage = "coin_shop",
+            via   = "stage", stage = "coin_shop", trans = "newspaper", fastTrans = "newspaper_back",
         },
     }
 

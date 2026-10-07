@@ -120,26 +120,26 @@ class CNamePlate {
 	}
 
 	/// <summary>Draws the full nameplate for a player slot.</summary>
-	public void Draw(int x, int y, int opacity, int player, int side) {
+	public void Draw(double x, double y, int opacity, int player, int side) {
 		Script?.Draw(DrawModeFull, x, y, opacity, player, side);
 	}
 
 	/// <summary>Draws only the dan plate (used in My Room gallery).</summary>
-	public void DrawDan(int x, int y, int opacity, int danGrade, LuaTexture text) {
+	public void DrawDan(double x, double y, int opacity, int danGrade, LuaTexture text) {
 		Script?.Draw(DrawModeDan, x, y, opacity, danGrade, text);
 	}
 
-	/// <inheritdoc cref="DrawDan(int,int,int,int,LuaTexture)"/>
-	public void DrawDan(int x, int y, int opacity, int danGrade, CTexture text) =>
+	/// <inheritdoc cref="DrawDan(double,double,int,int,LuaTexture)"/>
+	public void DrawDan(double x, double y, int opacity, int danGrade, CTexture text) =>
 		DrawDan(x, y, opacity, danGrade, new LuaTexture(text));
 
 	/// <summary>Draws only the title plate (used in My Room gallery and modal).</summary>
-	public void DrawTitlePlate(int x, int y, int opacity, int type, LuaTexture text, int rarity, int nameplateId) {
+	public void DrawTitlePlate(double x, double y, int opacity, int type, LuaTexture text, int rarity, int nameplateId) {
 		Script?.Draw(DrawModeTitle, x, y, opacity, type, text, rarity, nameplateId);
 	}
 
-	/// <inheritdoc cref="DrawTitlePlate(int,int,int,int,LuaTexture,int,int)"/>
-	public void DrawTitlePlate(int x, int y, int opacity, int type, CTexture text, int rarity, int nameplateId) =>
+	/// <inheritdoc cref="DrawTitlePlate(double,double,int,int,LuaTexture,int,int)"/>
+	public void DrawTitlePlate(double x, double y, int opacity, int type, CTexture text, int rarity, int nameplateId) =>
 		DrawTitlePlate(x, y, opacity, type, new LuaTexture(text), rarity, nameplateId);
 
 	/// <summary>Advances nameplate animation state; call once per frame.</summary>
