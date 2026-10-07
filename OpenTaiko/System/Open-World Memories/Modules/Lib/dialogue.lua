@@ -38,9 +38,12 @@ local DEF_BOX_X, DEF_BOX_W = 90, 1740
 local DEF_BOX_Y, DEF_BOX_H = 770, 250
 local DEF_PORTRAIT = 210                      -- portrait square size
 local LINE_GAP = 8
+local FIT_LINES, FIT_PAD = 4, 8               -- a glyph text of this many lines or more ends FIT_PAD above the box's bottom
 local DEFAULT_CPS = 42
 -- a glyph box anchored by its middle draws its ink high; centred labels move down by this much
 local NAME_NUDGE, CHOICE_NUDGE = 9, 8
+-- the selected choice's marker: a triangle every skin font has (they lack the small one), drawn small
+local CHOICE_MARK, MARK_SCALE = "\u{25B6}", 0.55
 
 local THEME_DEFAULT = {
     face    = { 252, 248, 244, 255 },   -- box face (top of gradient; opaque — canvas bakes overwrite)
@@ -485,13 +488,19 @@ function Dialogue:draw()
         -- left light theme text as unreadable grey); pair with a light theme.text for white+border
         local oc = self:color(0, 0, 0, 255)
         local lineH = self.gfont.LineHeight + LINE_GAP
+        -- a long text moves up as far as it takes for its last line to sit inside the box
+        local ty, n = self.textY, #self.glines
+        if n >= FIT_LINES then
+            local bottom = ty + (n - 1) * lineH + self.gfont.LineHeight
+            ty = ty - math.max(0, bottom - (self.boxY + self.boxH - FIT_PAD))
+        end
         local shown = 0
         for li, line in ipairs(self.glines) do
             if shown >= upto then break end
             local take = math.min(line.n, upto - shown)
             local s = (take == line.n) and table.concat(line.chars) or table.concat(line.chars, "", 1, take)
             if #s > 0 then
-                self.gfont:Draw(s, self.textX, self.textY + (li - 1) * lineH, tc, oc, 1, 1, 0, "topleft")
+                self.gfont:Draw(s, self.textX, ty + (li - 1) * lineH, tc, oc, 1, 1, 0, "topleft")
             end
             shown = shown + line.n
         end
@@ -527,7 +536,7 @@ function Dialogue:draw()
                 local cc = self:color(t.choiceText[1], t.choiceText[2], t.choiceText[3])
                 if self.gfont then
                     if sel then
-                        self.gfont:Draw("\u{25B8}", self.textX + 22, ry + fb.rh / 2 + CHOICE_NUDGE, cc, self:color(0, 0, 0, 0), 1, 1, 0, "left")
+                        self.gfont:Draw(CHOICE_MARK, self.textX + 22, ry + fb.rh / 2 + CHOICE_NUDGE, cc, self:color(0, 0, 0, 0), 1, MARK_SCALE, 0, "left")
                     end
                     self.gfont:Draw(ch[i].label, self.textX + 54, ry + fb.rh / 2 + CHOICE_NUDGE,
                         cc, self:color(0, 0, 0, 0), 1, 1, fb.rw - 76, "left")
@@ -548,7 +557,7 @@ function Dialogue:draw()
                 -- marker drawn apart from the label so selecting never shifts/resizes the text
                 if self.gfont then
                     if sel then
-                        self.gfont:Draw("\u{25B8}", self.textX + 30, y, self:color(r, g, b), self:color(0, 0, 0, 255), 1, 1, 0, "topleft")
+                        self.gfont:Draw(CHOICE_MARK, self.textX + 30, y + self.gfont.BoxHeight / 2, self:color(r, g, b), self:color(0, 0, 0, 255), 1, MARK_SCALE, 0, "left")
                     end
                     self.gfont:Draw(ch[i].label, self.textX + 62, y, self:color(r, g, b), self:color(0, 0, 0, 255), 1, 1, 0, "topleft")
                 else
