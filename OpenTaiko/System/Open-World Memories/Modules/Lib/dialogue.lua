@@ -23,7 +23,9 @@
 --   advanceInput=fn,                -- extra advance predicate (e.g. the drum Decide pad)
 --   cps=28,                         -- typewriter speed each node starts at (default 42; {speed:} overrides)
 --   onSfx=fn, onVoice=fn, onExpr=fn, portraits={name=LuaTexture},
---   onBlip=fn, blipEvery=3 }         -- VN typing blip: onBlip() every blipEvery revealed glyphs
+--   onBlip=fn, blipEvery=3,          -- VN typing blip: onBlip() every blipEvery revealed glyphs
+--   opacity=1,                       -- the whole box's opacity (glyph path; dlg.opacity may change any frame)
+--   caret=true }                     -- false hides the advance marker (dlg.caret may change any frame)
 
 local NavInput = require("NavInput")
 local Util     = require("Util")
@@ -58,6 +60,7 @@ local THEME_DEFAULT = {
     choiceText = { 96, 72, 84 },
     caret     = { 222, 120, 152 },
     shadow    = { 70, 40, 55, 90 },
+    textEdge  = { 0, 0, 0, 255 },      -- the body text's outline (glyph path; alpha 0 = none)
 }
 
 local UTF8_PAT = "[%z\1-\127\194-\244][\128-\191]*"
@@ -115,6 +118,8 @@ function Dialogue.new(opts)
     self.onExpr = opts.onExpr
     self.onBlip = opts.onBlip             -- called every blipEvery revealed glyphs (VN typing blip)
     self.blipEvery = opts.blipEvery or 3
+    self.opacity = opts.opacity or 1
+    self.caret = opts.caret ~= false
     self.choiceY = opts.choiceY           -- plain/boxless choice list top (default: below the text)
     self.onShake = opts.onShake           -- fn(amp,dur); 2D callers shake themselves
     self._blipAt = 0
@@ -425,12 +430,14 @@ function Dialogue:draw()
     if not self.activeFlag then return end
     local node = self.node
     local t = self.theme
+    local op = self.opacity or 1
+    if op <= 0 then return end
 
     if not self.drawBox then
         -- caller renders its own box art (e.g. intro_nokon's Dialogue.png); skip the chrome
     elseif self.ui == "popui" then
         local fb = self:bakeFancyBox()
-        fb.cv:SetColor(1, 1, 1); fb.cv:SetOpacity(1); fb.cv:SetScale(1, 1)
+        fb.cv:SetColor(1, 1, 1); fb.cv:SetOpacity(op); fb.cv:SetScale(1, 1)
         fb.cv:Draw(self.boxX - fb.m, self.boxY - fb.m)
         if node.name and node.name ~= "" then
             -- the pill sits above the box, aligned with the TEXT column (right of the portrait
@@ -438,12 +445,12 @@ function Dialogue:draw()
             -- spans down to boxY+24, the frame starts at boxY+14) and the frame — drawn later —
             -- painted over the name.
             local pillX = self.boxX + (self.portraitSize > 0 and (self.portraitSize + 34) or 30)
-            fb.pill:SetColor(1, 1, 1); fb.pill:SetOpacity(1)
+            fb.pill:SetColor(1, 1, 1); fb.pill:SetOpacity(op)
             fb.pill:Draw(pillX - fb.m, self.boxY - 30 - fb.m)
             local nf = self.gfontName or self.fonts.name
             if self.gfontName then
                 nf:Draw(node.name, pillX + fb.pw / 2, self.boxY - 30 + fb.ph / 2 + NAME_NUDGE,
-                    self:color(t.nameText[1], t.nameText[2], t.nameText[3]), nil, 1, 1, fb.pw - 24, "center")
+                    self:color(t.nameText[1], t.nameText[2], t.nameText[3]), nil, op, 1, fb.pw - 24, "center")
             elseif nf then
                 nf:GetText(node.name, false, 600, self:color(t.nameText[1], t.nameText[2], t.nameText[3]), self:color(0, 0, 0)):Draw(pillX + 14, self.boxY - 24)
             end
@@ -485,8 +492,10 @@ function Dialogue:draw()
     if self.gfont ~= nil then
         local tc = (self.ui == "popui") and self:color(t.text[1], t.text[2], t.text[3]) or self:color(255, 255, 255)
         -- a BLACK outline keeps the body readable over any panel/background (the transparent outline
-        -- left light theme text as unreadable grey); pair with a light theme.text for white+border
-        local oc = self:color(0, 0, 0, 255)
+        -- left light theme text as unreadable grey); pair with a light theme.text for white+border.
+        -- theme.textEdge replaces it (e.g. none for dark ink on a light box art)
+        local te = t.textEdge or { 0, 0, 0, 255 }
+        local oc = self:color(te[1], te[2], te[3], te[4] or 255)
         local lineH = self.gfont.LineHeight + LINE_GAP
         -- a long text moves up as far as it takes for its last line to sit inside the box
         local ty, n = self.textY, #self.glines
@@ -500,7 +509,7 @@ function Dialogue:draw()
             local take = math.min(line.n, upto - shown)
             local s = (take == line.n) and table.concat(line.chars) or table.concat(line.chars, "", 1, take)
             if #s > 0 then
-                self.gfont:Draw(s, self.textX, ty + (li - 1) * lineH, tc, oc, 1, 1, 0, "topleft")
+                self.gfont:Draw(s, self.textX, ty + (li - 1) * lineH, tc, oc, op, 1, 0, "topleft")
             end
             shown = shown + line.n
         end
@@ -529,17 +538,17 @@ function Dialogue:draw()
                 local ry = cy0 + (i - 1) * (fb.rh + 10)
                 local rc = sel and t.choiceSel or t.choiceRow
                 fb.row:SetColor(rc[1] / 255, rc[2] / 255, rc[3] / 255)
-                fb.row:SetOpacity((rc[4] or 255) / 255)
+                fb.row:SetOpacity((rc[4] or 255) / 255 * op)
                 fb.row:Draw(self.textX, ry)
                 -- the marker is drawn separately so the label's x and wrap width never change
                 -- between selected and unselected (otherwise the text visibly squishes)
                 local cc = self:color(t.choiceText[1], t.choiceText[2], t.choiceText[3])
                 if self.gfont then
                     if sel then
-                        self.gfont:Draw(CHOICE_MARK, self.textX + 22, ry + fb.rh / 2 + CHOICE_NUDGE, cc, self:color(0, 0, 0, 0), 1, MARK_SCALE, 0, "left")
+                        self.gfont:Draw(CHOICE_MARK, self.textX + 22, ry + fb.rh / 2 + CHOICE_NUDGE, cc, self:color(0, 0, 0, 0), op, MARK_SCALE, 0, "left")
                     end
                     self.gfont:Draw(ch[i].label, self.textX + 54, ry + fb.rh / 2 + CHOICE_NUDGE,
-                        cc, self:color(0, 0, 0, 0), 1, 1, fb.rw - 76, "left")
+                        cc, self:color(0, 0, 0, 0), op, 1, fb.rw - 76, "left")
                 elseif self.fonts.text then
                     if sel then
                         self.fonts.text:GetText("\u{25B8}", false, 40, cc, self:color(0, 0, 0, 0)):Draw(self.textX + 22, ry + 6)
@@ -569,13 +578,13 @@ function Dialogue:draw()
                 end
             end
         end
-    elseif self.revealed >= self.total then
+    elseif self.revealed >= self.total and self.caret ~= false then
         if self.gfont then
             local blink = 0.55 + 0.45 * math.abs(math.sin((self._caretT or 0)))
             self._caretT = (self._caretT or 0) + 0.09
             local cc = (self.ui == "popui") and t.caret or { 255, 235, 160 }
             self.gfont:Draw("\u{25BC}", self.boxX + self.boxW - 60, self.boxY + self.boxH - 44,
-                self:color(cc[1], cc[2], cc[3]), nil, blink, 1, 0, "center")
+                self:color(cc[1], cc[2], cc[3]), nil, blink * op, 1, 0, "center")
         elseif self.fonts.text then
             self.fonts.text:GetText("\u{25BC}", false, 100, COLOR:CreateColorFromRGBA(255, 235, 160, 255), COLOR:CreateColorFromRGBA(0, 0, 0, 255))
                 :Draw(self.boxX + self.boxW - 60, self.boxY + self.boxH - 50)

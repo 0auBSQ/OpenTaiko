@@ -107,14 +107,14 @@ local function buildMenus()
             title = tr("TITLE_VAULT", "Secret Vault"),
             desc  = tr("TITLE_VAULT_DESC", "A place full of mysteries where keys seems to have a particular value..."),
             c     = col(80, 80, 90),
-            via   = "stage", stage = "secret_vault_rw",
+            via   = "stage", stage = "secret_vault_rw", trans = "vault_water", fastTrans = "vault_water_back",
         }
     else
         m[#m + 1] = {
             title  = "???",
             desc   = tr("TITLE_VAULT_LOCKED_DESC", "Can you hear me...?"),
             c      = col(80, 80, 90),
-            via    = "stage", stage = "secret_vault_rw",
+            via    = "stage", stage = "secret_vault_rw", trans = "vault_wood",
             static = true,
         }
     end
