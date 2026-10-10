@@ -476,8 +476,8 @@ internal class CActImplMtaiko : CActivity {
 			if (OpenTaiko.Tx.Couse_Symbol_Back_Flash[OpenTaiko.SongMount.nChoosenSongDifficulty[i]] != null && !OpenTaiko.ConfigIni.SimpleMode) {
 				int originX = 0;
 				int originY = 0;
-				int width = OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.SongMount.nChoosenSongDifficulty[i]].szTextureSize.Width;
-				int height = OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.SongMount.nChoosenSongDifficulty[i]].szTextureSize.Height;
+				int width = OpenTaiko.Tx.Couse_Symbol_Back_Flash[OpenTaiko.SongMount.nChoosenSongDifficulty[i]].szTextureSize.Width;
+				int height = OpenTaiko.Tx.Couse_Symbol_Back_Flash[OpenTaiko.SongMount.nChoosenSongDifficulty[i]].szTextureSize.Height;
 
 				if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
 					originX = OpenTaiko.Skin.Game_CourseSymbol_Back_Rect_5P[0];

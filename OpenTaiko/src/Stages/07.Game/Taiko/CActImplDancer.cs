@@ -14,10 +14,13 @@ internal class CActImplDancer : CActivity {
 	public override void Activate() {
 		//this.ct踊り子モーション = new CCounter();
 
+		// no dancers until a set is loaded
+		nDancerCount = 0;
+
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower || OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 			return;
 
-		var preset = HScenePreset.GetBGPreset();
+		var preset = OpenTaiko.stageGameScreen.ScenePreset;
 
 		if (preset == null) return;
 
@@ -90,6 +93,10 @@ internal class CActImplDancer : CActivity {
 
 		this.arDancerMotionNumber = CConversion.StringToIntArray(OpenTaiko.Skin.Game_Dancer_Motion);
 		if (this.arDancerMotionNumber == null) arDancerMotionNumber = CConversion.StringToIntArray("0,0");
+
+		ClampMotion(arMotionArray_In, nDancerInPtn);
+		ClampMotion(arMotionArray_Out, nDancerOutPtn);
+		ClampMotion(arDancerMotionNumber, nDancerPtn);
 
 		nNowDancerCounter = 0;
 		nNowDancerFrame = 0;
@@ -227,6 +234,13 @@ internal class CActImplDancer : CActivity {
 	private string Game_Dancer_In_Motion;
 	private string Game_Dancer_Out_Motion;
 
+	// keeps every motion entry inside the frames the set has
+	internal static void ClampMotion(int[] motion, int frameCount) {
+		int last = Math.Max(0, frameCount - 1);
+		for (int i = 0; i < motion.Length; i++)
+			motion[i] = Math.Clamp(motion[i], 0, last);
+	}
+
 	private void LoadDancerConifg(string dancerPath) {
 		var _str = "";
 		OpenTaiko.Skin.LoadSkinConfigFromFile(dancerPath + @$"{Path.DirectorySeparatorChar}DancerConfig.txt", ref _str);
@@ -236,7 +250,12 @@ internal class CActImplDancer : CActivity {
 
 		OpenTaiko.Skin.Game_Dancer_X = new int[] { 640, 430, 856, 215, 1070 };
 		OpenTaiko.Skin.Game_Dancer_Y = new int[] { 500, 500, 500, 500, 500 };
+		OpenTaiko.Skin.Game_Dancer_Gauge = new int[] { 0, 0, 0, 40, 80 };
+		OpenTaiko.Skin.Game_Dancer_Motion = "0";
+		Game_Dancer_In_Motion = "";
+		Game_Dancer_Out_Motion = "";
 		nDancerCount = 5;
+		nDancerBeat = 0;
 		nDancerInInterval = 0;
 		nDancerOutInterval = 0;
 
@@ -253,9 +272,10 @@ internal class CActImplDancer : CActivity {
 						strParam = strArray[1].Trim();
 
 						if (strCommand == "Game_Dancer_Count") {
-							nDancerCount = int.Parse(strParam);
+							nDancerCount = Math.Max(0, int.Parse(strParam));
 							OpenTaiko.Skin.Game_Dancer_X = new int[nDancerCount];
 							OpenTaiko.Skin.Game_Dancer_Y = new int[nDancerCount];
+							Array.Resize(ref OpenTaiko.Skin.Game_Dancer_Gauge, nDancerCount);
 						} else if (strCommand == "Game_Dancer_X") {
 							string[] strSplit = strParam.Split(',');
 							for (int i = 0; i < nDancerCount; i++) {

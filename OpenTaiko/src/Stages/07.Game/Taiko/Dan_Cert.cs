@@ -143,7 +143,7 @@ internal class Dan_Cert : CActivity {
 		// ExamCount = 0;
 
 		songsnotesremain = new int[OpenTaiko.SongMount.rChoosenSong.DanSongs.Count];
-		this.ctRainbowAnime = new CCounter(0, OpenTaiko.Skin.Game_Gauge_Dan_Rainbow_Ptn - 1, 30, OpenTaiko.Timer);
+		this.ctRainbowAnime = new CCounter(0, Math.Max(1, OpenTaiko.Skin.Game_Gauge_Dan_Rainbow_Ptn) - 1, 30, OpenTaiko.Timer);
 		this.ctRainbowOpacity = new CCounter(0, OpenTaiko.Skin.Game_Gauge_Rainbow_Timer - 1, 1, OpenTaiko.Timer);
 
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
@@ -892,18 +892,22 @@ internal class Dan_Cert : CActivity {
 						if (opacityJ <= 0)
 							continue;
 
-						OpenTaiko.Tx.DanC_SmallBase.Opacity = opacityJ;
-						OpenTaiko.Tx.DanC_Small_ExamCymbol.Opacity = opacityJ;
+						var smallRainbow = OpenTaiko.Tx.Gauge_Dan_Rainbow?[0];
+						var smallGauge = OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTextureJ];
 
-						OpenTaiko.Tx.Gauge_Dan_Rainbow[0].Opacity = opacityJ;
-						OpenTaiko.Tx.DanC_MiniNumber.Opacity = opacityJ;
+						if (OpenTaiko.Tx.DanC_SmallBase != null) OpenTaiko.Tx.DanC_SmallBase.Opacity = opacityJ;
+						if (OpenTaiko.Tx.DanC_Small_ExamCymbol != null) OpenTaiko.Tx.DanC_Small_ExamCymbol.Opacity = opacityJ;
 
-						OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTextureJ].Opacity = opacityJ;
+						if (smallRainbow != null) smallRainbow.Opacity = opacityJ;
+						if (OpenTaiko.Tx.DanC_MiniNumber != null) OpenTaiko.Tx.DanC_MiniNumber.Opacity = opacityJ;
+
+						if (smallGauge != null) smallGauge.Opacity = opacityJ;
 
 						int miniIconOpacity = opacityJ;
 
 						// Determine bars width
-						OpenTaiko.Tx.DanC_SmallBase.vcScaleRatio.X = isSmallGauge ? 0.34f : 1f;
+						float smallBaseScaleX = isSmallGauge ? 0.34f : 1f;
+						if (OpenTaiko.Tx.DanC_SmallBase != null) OpenTaiko.Tx.DanC_SmallBase.vcScaleRatio.X = smallBaseScaleX;
 
 						int smallBarGap = (int)(33f * OpenTaiko.Skin.Resolution[1] / 720f);
 
@@ -921,18 +925,19 @@ internal class Dan_Cert : CActivity {
 						OpenTaiko.Tx.DanC_Small_ExamCymbol?.t2DDraw(miniBarPositionX - 30, miniBarPositionY - 3, new RectangleF(0, j * 28, 30, 28));
 
 						// Display bar content
-						if (dan_CJ.ReachStatus == Exam.ReachStatus.Better_Success) {
-							OpenTaiko.Tx.Gauge_Dan_Rainbow[0].vcScaleRatio.X = 0.23875f * OpenTaiko.Tx.DanC_SmallBase.vcScaleRatio.X * (isSmallGauge ? 0.94f : 1f);
-							OpenTaiko.Tx.Gauge_Dan_Rainbow[0].vcScaleRatio.Y = 0.35185f;
+						// a skin without the rainbow frames shows a gold exam with the plain gauge
+						if (dan_CJ.ReachStatus == Exam.ReachStatus.Better_Success && smallRainbow != null) {
+							smallRainbow.vcScaleRatio.X = 0.23875f * smallBaseScaleX * (isSmallGauge ? 0.94f : 1f);
+							smallRainbow.vcScaleRatio.Y = 0.35185f;
 
-							OpenTaiko.Tx.Gauge_Dan_Rainbow[0]?.t2DDraw(miniBarPositionX + 3, miniBarPositionY + 2,
-								new Rectangle(0, 0, (int)(dan_CJ.GetAmountToPercent() * (OpenTaiko.Tx.Gauge_Dan_Rainbow[0].szTextureSize.Width / 100.0)), OpenTaiko.Tx.Gauge_Dan_Rainbow[0].szTextureSize.Height));
-						} else {
-							OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTextureJ].vcScaleRatio.X = 0.23875f * OpenTaiko.Tx.DanC_SmallBase.vcScaleRatio.X * (isSmallGauge ? 0.94f : 1f);
-							OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTextureJ].vcScaleRatio.Y = 0.35185f;
+							smallRainbow.t2DDraw(miniBarPositionX + 3, miniBarPositionY + 2,
+								new Rectangle(0, 0, (int)(dan_CJ.GetAmountToPercent() * (smallRainbow.szTextureSize.Width / 100.0)), smallRainbow.szTextureSize.Height));
+						} else if (smallGauge != null) {
+							smallGauge.vcScaleRatio.X = 0.23875f * smallBaseScaleX * (isSmallGauge ? 0.94f : 1f);
+							smallGauge.vcScaleRatio.Y = 0.35185f;
 
-							OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTextureJ]?.t2DDraw(miniBarPositionX + 3, miniBarPositionY + 2,
-								new Rectangle(0, 0, (int)(dan_CJ.GetAmountToPercent() * (OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTextureJ].szTextureSize.Width / 100.0)), OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTextureJ].szTextureSize.Height));
+							smallGauge.t2DDraw(miniBarPositionX + 3, miniBarPositionY + 2,
+								new Rectangle(0, 0, (int)(dan_CJ.GetAmountToPercent() * (smallGauge.szTextureSize.Width / 100.0)), smallGauge.szTextureSize.Height));
 						}
 
 						int _tmpMiniPadding = (int)(14f * OpenTaiko.Skin.Resolution[0] / 1280f);
@@ -955,9 +960,9 @@ internal class Dan_Cert : CActivity {
 
 				#region [Currently playing song icons]
 
-				OpenTaiko.Tx.DanC_ExamCymbol.Opacity = 255;
+				if (OpenTaiko.Tx.DanC_ExamCymbol != null) OpenTaiko.Tx.DanC_ExamCymbol.Opacity = 255;
 
-				if (ExamChange[i] && NowShowingNumber != 0) {
+				if (ExamChange[i] && NowShowingNumber != 0 && OpenTaiko.Tx.DanC_ExamCymbol != null) {
 					if (Counter_Wait != null) {
 						if (Counter_Wait.CurrentValue >= 800)
 							OpenTaiko.Tx.DanC_ExamCymbol.Opacity = examChangeFadeInOpacity;
@@ -969,7 +974,7 @@ internal class Dan_Cert : CActivity {
 				//75, 418
 				// 292 - 228 = 64
 				if (ExamChange[i]) {
-					OpenTaiko.Tx.DanC_ExamCymbol.t2DDraw(barXOffset + 5, lowerBarYOffset - 64, new RectangleF(0, 41 * NowCymbolShowingNumber, 197, 41));
+					OpenTaiko.Tx.DanC_ExamCymbol?.t2DDraw(barXOffset + 5, lowerBarYOffset - 64, new RectangleF(0, 41 * NowCymbolShowingNumber, 197, 41));
 				}
 
 				#endregion
@@ -1034,13 +1039,15 @@ internal class Dan_Cert : CActivity {
 					}
 				}
 
-				OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTexture].Opacity = gaugeOpacity;
+				var examGauge = OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTexture];
+				if (examGauge != null) examGauge.Opacity = gaugeOpacity;
 
-				OpenTaiko.Tx.Gauge_Dan_Rainbow[rainbowIndex].Opacity = gaugeOpacity;
+				var danRainbow = OpenTaiko.Tx.Gauge_Dan_Rainbow;
+				if (danRainbow?[rainbowIndex] != null) danRainbow[rainbowIndex].Opacity = gaugeOpacity;
 
-				OpenTaiko.Tx.DanC_Number.Opacity = opacity;
-				OpenTaiko.Tx.DanC_ExamRange.Opacity = opacity;
-				OpenTaiko.Tx.DanC_Small_Number.Opacity = opacity;
+				if (OpenTaiko.Tx.DanC_Number != null) OpenTaiko.Tx.DanC_Number.Opacity = opacity;
+				if (OpenTaiko.Tx.DanC_ExamRange != null) OpenTaiko.Tx.DanC_ExamRange.Opacity = opacity;
+				if (OpenTaiko.Tx.DanC_Small_Number != null) OpenTaiko.Tx.DanC_Small_Number.Opacity = opacity;
 
 				int iconOpacity = opacity;
 
@@ -1076,16 +1083,16 @@ internal class Dan_Cert : CActivity {
 					gaugeTexture.Opacity = opacityLast;
 				}
 
-				if (dan_C[i].ReachStatus == Exam.ReachStatus.Better_Success) {
+				if (dan_C[i].ReachStatus == Exam.ReachStatus.Better_Success && danRainbow != null) {
 					#region [Rainbow gauge display]
-					var gaugeTexture = OpenTaiko.Tx.Gauge_Dan_Rainbow[rainbowIndex];
-					if (Counter_Wait != null && !(Counter_Wait.CurrentValue <= 1055 && Counter_Wait.CurrentValue >= 800 - 255)) {
+					var gaugeTexture = danRainbow[rainbowIndex];
+					if (gaugeTexture != null && Counter_Wait != null && !(Counter_Wait.CurrentValue <= 1055 && Counter_Wait.CurrentValue >= 800 - 255)) {
 						gaugeTexture.Opacity = 255;
 					}
 					drawGauge(gaugeTexture, dan_C);
 
-					gaugeTexture = OpenTaiko.Tx.Gauge_Dan_Rainbow[rainbowBase];
-					if (Counter_Wait != null && !(Counter_Wait.CurrentValue <= 1055 && Counter_Wait.CurrentValue >= 800 - 255)) {
+					gaugeTexture = danRainbow[rainbowBase];
+					if (gaugeTexture != null && Counter_Wait != null && !(Counter_Wait.CurrentValue <= 1055 && Counter_Wait.CurrentValue >= 800 - 255)) {
 						gaugeTexture.Opacity = (ctRainbowOpacity.CurrentValue * 255 / (int)ctRainbowOpacity.EndValue) / 1;
 					}
 					drawGauge(gaugeTexture, dan_C);
@@ -1126,8 +1133,10 @@ internal class Dan_Cert : CActivity {
 
 				int offset = OpenTaiko.Skin.Game_DanC_Exam_Offset[0];
 
-				OpenTaiko.Tx.DanC_ExamType.vcScaleRatio.X = 1.0f;
-				OpenTaiko.Tx.DanC_ExamType.vcScaleRatio.Y = 1.0f;
+				if (OpenTaiko.Tx.DanC_ExamType != null) {
+					OpenTaiko.Tx.DanC_ExamType.vcScaleRatio.X = 1.0f;
+					OpenTaiko.Tx.DanC_ExamType.vcScaleRatio.Y = 1.0f;
+				}
 
 				// Exam range (Less than/More)
 				OpenTaiko.Tx.DanC_ExamRange?.t2DScaledBottomBasedDraw(
@@ -1148,7 +1157,7 @@ internal class Dan_Cert : CActivity {
 
 				int _offexX = (int)(22f * OpenTaiko.Skin.Resolution[0] / 1280f);
 				int _offexY = (int)(48f * OpenTaiko.Skin.Resolution[1] / 720f);
-				int _examX = barXOffset + OpenTaiko.Skin.Game_DanC_Exam_Offset[0] - OpenTaiko.Tx.DanC_ExamType.szTextureSize.Width + _offexX;
+				int _examX = barXOffset + OpenTaiko.Skin.Game_DanC_Exam_Offset[0] - (OpenTaiko.Tx.DanC_ExamType?.szTextureSize.Width ?? 0) + _offexX;
 				int _examY = lowerBarYOffset - OpenTaiko.Skin.Game_DanC_Exam_Offset[1] - _offexY;
 
 				// Exam type flag
@@ -1174,9 +1183,9 @@ internal class Dan_Cert : CActivity {
 
 				#region [Failed condition box]
 
-				OpenTaiko.Tx.DanC_Failed.vcScaleRatio.X = isSmallGauge ? 0.33f : 1f;
+				if (OpenTaiko.Tx.DanC_Failed != null) OpenTaiko.Tx.DanC_Failed.vcScaleRatio.X = isSmallGauge ? 0.33f : 1f;
 
-				if (dan_C[i].ReachStatus == Exam.ReachStatus.Failure) {
+				if (dan_C[i].ReachStatus == Exam.ReachStatus.Failure && OpenTaiko.Tx.DanC_Failed != null) {
 					OpenTaiko.Tx.DanC_Failed.Opacity = (isResult ? 255 : Math.Min(255, 255 * this.Status[i].Timer_Gauge.CurrentValue / 85));
 					OpenTaiko.Tx.DanC_Failed.t2DScaledBottomBasedDraw(
 						barXOffset + OpenTaiko.Skin.Game_DanC_Offset[0],

@@ -64,11 +64,14 @@ internal class CActPlayComboSound : CActivity {
 			if (Directory.Exists(currentDir)) {
 				foreach (var item in Directory.GetFiles(currentDir)) {
 					if (!int.TryParse(Path.GetFileNameWithoutExtension(item), out int threshold)) continue;
+					// a file that cannot be decoded is skipped
+					var sound = OpenTaiko.SoundManager.tCreateSound(item, ESoundGroup.Voice);
+					if (sound == null) continue;
 					var comboVoice = new CComboVoice();
 					comboVoice.bFileFound = true;
 					comboVoice.nPlayer = i;
 					comboVoice.strFilePath = item;
-					comboVoice.soundComboVoice = OpenTaiko.SoundManager.tCreateSound(item, ESoundGroup.Voice);
+					comboVoice.soundComboVoice = sound;
 					comboVoice.soundComboVoice.SoundPosition = OpenTaiko.ConfigIni.nPanning[OpenTaiko.ConfigIni.nPlayerCount - 1][i];
 					comboVoice.nCombo = threshold;
 					ListCombo[i].Add(comboVoice);
@@ -86,11 +89,13 @@ internal class CActPlayComboSound : CActivity {
 			if (Directory.Exists(floorDir)) {
 				foreach (var item in Directory.GetFiles(floorDir)) {
 					if (!int.TryParse(Path.GetFileNameWithoutExtension(item), out int threshold)) continue;
+					var sound = OpenTaiko.SoundManager.tCreateSound(item, ESoundGroup.Voice);
+					if (sound == null) continue;
 					var comboVoice = new CComboVoice();
 					comboVoice.bFileFound = true;
 					comboVoice.nPlayer = i;
 					comboVoice.strFilePath = item;
-					comboVoice.soundComboVoice = OpenTaiko.SoundManager.tCreateSound(item, ESoundGroup.Voice);
+					comboVoice.soundComboVoice = sound;
 					comboVoice.nCombo = threshold;
 					ListFloor[i].Add(comboVoice);
 				}

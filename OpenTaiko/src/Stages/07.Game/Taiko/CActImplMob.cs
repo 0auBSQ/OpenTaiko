@@ -12,7 +12,7 @@ internal class CActImplMob : CActivity {
 
 	public override void Activate() {
 		var mobDir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.MOB}");
-		var preset = HScenePreset.GetBGPreset();
+		var preset = OpenTaiko.stageGameScreen.ScenePreset;
 
 		if (preset == null) return;
 

@@ -59,31 +59,33 @@ internal class CActImplRoll : CActivity {
 				}
 				var opacity = (int)FadeOut[player].GetAnimation();
 
+				int numberOpacity = 255;
 				if (ctRollFrameCounter[player].CurrentValue == 0 || ctRollFrameCounter[player].CurrentValue == 60) {
 					bNowRollAnime = 0;
-					OpenTaiko.Tx.Balloon_Number_Roll.Opacity = 64;
+					numberOpacity = 64;
 				} else if (ctRollFrameCounter[player].CurrentValue == 1 || ctRollFrameCounter[player].CurrentValue == 59) {
 					bNowRollAnime = 1;
-					OpenTaiko.Tx.Balloon_Number_Roll.Opacity = 128;
+					numberOpacity = 128;
 				} else if (ctRollFrameCounter[player].CurrentValue == 2 || ctRollFrameCounter[player].CurrentValue == 58) {
 					bNowRollAnime = 2;
-					OpenTaiko.Tx.Balloon_Number_Roll.Opacity = 192;
+					numberOpacity = 192;
 				} else if (ctRollFrameCounter[player].CurrentValue == 3 || ctRollFrameCounter[player].CurrentValue == 57) {
 					bNowRollAnime = 3;
-					OpenTaiko.Tx.Balloon_Number_Roll.Opacity = 255;
 				} else if (ctRollFrameCounter[player].CurrentValue >= 4 || ctRollFrameCounter[player].CurrentValue <= 56) {
 					bNowRollAnime = 4;
-					OpenTaiko.Tx.Balloon_Number_Roll.Opacity = 255;
 				}
+				if (OpenTaiko.Tx.Balloon_Number_Roll != null) OpenTaiko.Tx.Balloon_Number_Roll.Opacity = numberOpacity;
 
-				float width = OpenTaiko.Tx.Balloon_Roll.szTextureSize.Width / 5.0f;
-				float height = OpenTaiko.Tx.Balloon_Roll.szTextureSize.Height;
+				if (OpenTaiko.Tx.Balloon_Roll != null) {
+					float width = OpenTaiko.Tx.Balloon_Roll.szTextureSize.Width / 5.0f;
+					float height = OpenTaiko.Tx.Balloon_Roll.szTextureSize.Height;
 
-				OpenTaiko.Tx.Balloon_Roll?.t2DDraw(OpenTaiko.Skin.Game_Balloon_Roll_Frame_X[player], OpenTaiko.Skin.Game_Balloon_Roll_Frame_Y[player], new RectangleF(0 + bNowRollAnime * width, 0, width, height));
+					OpenTaiko.Tx.Balloon_Roll.t2DDraw(OpenTaiko.Skin.Game_Balloon_Roll_Frame_X[player], OpenTaiko.Skin.Game_Balloon_Roll_Frame_Y[player], new RectangleF(0 + bNowRollAnime * width, 0, width, height));
+				}
 				this.tTextDisplay(OpenTaiko.Skin.Game_Balloon_Roll_Number_X[player], OpenTaiko.Skin.Game_Balloon_Roll_Number_Y[player], nConsecutiveHitCount, player);
 
 				// reset opacity for balloon's and fuze roll's pop count
-				OpenTaiko.Tx.Balloon_Number_Roll.Opacity = 255;
+				if (OpenTaiko.Tx.Balloon_Number_Roll != null) OpenTaiko.Tx.Balloon_Number_Roll.Opacity = 255;
 			}
 		}
 
@@ -128,6 +130,8 @@ internal class CActImplRoll : CActivity {
 	}
 
 	private void tTextDisplay(int x, int y, int num, int nPlayer) {
+		if (OpenTaiko.Tx.Balloon_Number_Roll == null) return;
+
 		OpenTaiko.Tx.Balloon_Number_Roll.vcScaleRatio.X = OpenTaiko.Skin.Game_Balloon_Roll_Number_Scale;
 		OpenTaiko.Tx.Balloon_Number_Roll.vcScaleRatio.Y = OpenTaiko.Skin.Game_Balloon_Roll_Number_Scale + RollScale[this.ctRollAnime[nPlayer].CurrentValue];
 

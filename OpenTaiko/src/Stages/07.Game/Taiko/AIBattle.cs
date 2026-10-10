@@ -59,11 +59,14 @@ class AIBattle : CStage {
 		if (nowLength < 0.75) {
 			drawBar(OpenTaiko.Tx.AIBattle_SectionTime_Bar_Normal, nowLength);
 		} else {
-			OpenTaiko.Tx.AIBattle_SectionTime_Bar_Finish.Opacity = (int)(Math.Sin((BarFlashCounter.CurrentValue / 1000.0) * Math.PI) * 255);
+			if (OpenTaiko.Tx.AIBattle_SectionTime_Bar_Finish != null)
+				OpenTaiko.Tx.AIBattle_SectionTime_Bar_Finish.Opacity = (int)(Math.Sin((BarFlashCounter.CurrentValue / 1000.0) * Math.PI) * 255);
 			drawBar(OpenTaiko.Tx.AIBattle_SectionTime_Bar_Finish, nowLength);
 		}
 
 		for (int i = 0; i < OpenTaiko.stageGameScreen.AIBattleSections.Count; i++) {
+			if (OpenTaiko.Tx.AIBattle_Batch_Base == null) break;
+
 			int upDown = (i % 2);
 
 			int base_width = OpenTaiko.Tx.AIBattle_Batch_Base.szTextureSize.Width / 6;
@@ -91,8 +94,8 @@ class AIBattle : CStage {
 
 			int upDown = (i % 2);
 
-			int width = OpenTaiko.Tx.AIBattle_Batch.szTextureSize.Width / 6;
-			int height = OpenTaiko.Tx.AIBattle_Batch.szTextureSize.Height / 2;
+			int width = (OpenTaiko.Tx.AIBattle_Batch?.szTextureSize.Width ?? 0) / 6;
+			int height = (OpenTaiko.Tx.AIBattle_Batch?.szTextureSize.Height ?? 0) / 2;
 
 			float value = 0.0f;
 
@@ -127,6 +130,9 @@ class AIBattle : CStage {
 
 			float size_y = OpenTaiko.Skin.Game_AIBattle_Batch_Anime_Size[1] +
 						   ((OpenTaiko.Skin.Game_AIBattle_Batch_Size[1] - OpenTaiko.Skin.Game_AIBattle_Batch_Anime_Size[1]) * value);
+
+			// without the badge image only the animation state above advances
+			if (OpenTaiko.Tx.AIBattle_Batch == null) continue;
 
 			OpenTaiko.Tx.AIBattle_Batch.vcScaleRatio.X = (size_x / (float)width) + inScale;
 			OpenTaiko.Tx.AIBattle_Batch.vcScaleRatio.Y = (size_y / (float)height) + inScale;
@@ -184,6 +190,8 @@ class AIBattle : CStage {
 	public CCounter BatchAnimeCounter;
 
 	private void DrawJudgeNumber(int x, int y, int num) {
+		if (OpenTaiko.Tx.AIBattle_Judge_Number == null) return;
+
 		int[] nums = CConversion.SeparateDigits(num);
 		for (int j = 0; j < nums.Length; j++) {
 			float offset = j - (nums.Length / 2.0f);

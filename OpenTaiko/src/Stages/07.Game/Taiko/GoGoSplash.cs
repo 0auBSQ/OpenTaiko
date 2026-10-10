@@ -31,7 +31,7 @@ class GoGoSplash : CActivity {
 		}
 		if (Splash.IsTicked) {
 			for (int i = 0; i < OpenTaiko.Skin.Game_Effect_GoGoSplash_X.Length; i++) {
-				if (i > OpenTaiko.Skin.Game_Effect_GoGoSplash_Y.Length) break;
+				if (i >= OpenTaiko.Skin.Game_Effect_GoGoSplash_Y.Length) break;
 				// Yの配列がiよりも小さかったらそこでキャンセルする。
 				if (OpenTaiko.Skin.Game_Effect_GoGoSplash_Rotate && OpenTaiko.Tx.Effects_GoGoSplash != null) {
 					// Switch文を使いたかったが、定数じゃないから使えねぇ!!!!

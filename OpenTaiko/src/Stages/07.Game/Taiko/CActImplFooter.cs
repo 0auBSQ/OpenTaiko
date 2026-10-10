@@ -12,7 +12,7 @@ internal class CActImplFooter : CActivity {
 
 	public override void Activate() {
 		var footerDir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.FOOTER}");
-		var preset = HScenePreset.GetBGPreset();
+		var preset = OpenTaiko.stageGameScreen.ScenePreset;
 
 		if (preset == null) return;
 

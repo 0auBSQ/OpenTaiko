@@ -1503,7 +1503,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				(vx, vy) = OpenTaiko.GetTJA(nPlayer)!.ApplyNoteXYDirection(pChip, vx, vy);
 				double theta = (vy == 0.0) ? 0 : -Math.Atan2(-vy, -vx);
 
-				CTexture tex = (isBranched) ? OpenTaiko.Tx.Bar_Branch : OpenTaiko.Tx.Bar;
+				CTexture tex = (isBranched ? OpenTaiko.Tx.Bar_Branch : null) ?? OpenTaiko.Tx.Bar;
 				int savedOpacity = tex.Opacity;
 				if (opacity < 1f) tex.Opacity = (int)(savedOpacity * opacity);
 				tex.fZAxisCenterRotate = (float)theta;

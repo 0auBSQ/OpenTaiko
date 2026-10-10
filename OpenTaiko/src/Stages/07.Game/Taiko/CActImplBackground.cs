@@ -78,7 +78,7 @@ internal class CActImplBackground : CActivity {
 			return;
 
 		var bgOrigindir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.BACKGROUND}");
-		var preset = HScenePreset.GetBGPreset();
+		var preset = OpenTaiko.stageGameScreen.ScenePreset;
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 			bgOrigindir += "Tower";
 		} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
@@ -101,16 +101,21 @@ internal class CActImplBackground : CActivity {
 				var upDirs = System.IO.Directory.GetDirectories($@"{bgOrigindir}{Path.DirectorySeparatorChar}Up");
 
 				// If there is a preset upper background and this preset exists on the skin use it, else random upper background
-				var _presetPath = (preset != null && preset.UpperBackground != null) ? $@"{bgOrigindir}{Path.DirectorySeparatorChar}Up{Path.DirectorySeparatorChar}" + preset.UpperBackground[random.Next(0, preset.UpperBackground.Length)] : "";
+				var _presetPath = (preset?.UpperBackground?.Length > 0) ? $@"{bgOrigindir}{Path.DirectorySeparatorChar}Up{Path.DirectorySeparatorChar}" + preset.UpperBackground[random.Next(0, preset.UpperBackground.Length)] : "";
 				upPath = (preset != null && System.IO.Directory.Exists(_presetPath))
 					? _presetPath
-					: upDirs[random.Next(0, upDirs.Length)];
+					: (upDirs.Length > 0 ? upDirs[random.Next(0, upDirs.Length)] : null);
 			}
 
-			UpScript = new LuaBackgroundWrapper(upPath);
-			UpScript.Activate(_state);
+			// an empty folder counts as not found
+			if (upPath != null) {
+				UpScript = new LuaBackgroundWrapper(upPath);
+				UpScript.Activate(_state);
 
-			IsUpNotFound = !UpScript.Exists;
+				IsUpNotFound = !UpScript.Exists;
+			} else {
+				IsUpNotFound = true;
+			}
 		} else {
 			IsUpNotFound = true;
 		}
@@ -121,20 +126,24 @@ internal class CActImplBackground : CActivity {
 				var downDirs = System.IO.Directory.GetDirectories($@"{bgOrigindir}{Path.DirectorySeparatorChar}Down");
 
 				// If there is a preset lower background and this preset exists on the skin use it, else random upper background
-				var _presetPath = (preset != null && preset.LowerBackground != null) ? $@"{bgOrigindir}{Path.DirectorySeparatorChar}Down{Path.DirectorySeparatorChar}" + preset.LowerBackground[random.Next(0, preset.LowerBackground.Length)] : "";
+				var _presetPath = (preset?.LowerBackground?.Length > 0) ? $@"{bgOrigindir}{Path.DirectorySeparatorChar}Down{Path.DirectorySeparatorChar}" + preset.LowerBackground[random.Next(0, preset.LowerBackground.Length)] : "";
 				downPath = (preset != null && System.IO.Directory.Exists(_presetPath))
 					? _presetPath
-					: downDirs[random.Next(0, downDirs.Length)];
+					: (downDirs.Length > 0 ? downDirs[random.Next(0, downDirs.Length)] : null);
 
 				// A tower chart names its look (TOWERTYPE): the Down folder of that name holds the sky and the tower
 				var towerLook = TowerLookPath(bgOrigindir);
 				if (towerLook != null) downPath = towerLook;
 			}
 
-			DownScript = new LuaBackgroundWrapper(downPath);
-			DownScript.Activate(_state);
+			if (downPath != null) {
+				DownScript = new LuaBackgroundWrapper(downPath);
+				DownScript.Activate(_state);
 
-			if (DownScript.Exists) IsDownNotFound = false;
+				IsDownNotFound = !DownScript.Exists;
+			} else {
+				IsDownNotFound = true;
+			}
 		} else {
 			IsDownNotFound = true;
 		}

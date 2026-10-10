@@ -47,7 +47,7 @@ internal class CActImplRunner : CActivity {
 		}
 		RunnerHead = RunnerTail = 0;
 
-		var preset = HScenePreset.GetBGPreset();
+		var preset = OpenTaiko.stageGameScreen.ScenePreset;
 
 		if (preset == null) return;
 

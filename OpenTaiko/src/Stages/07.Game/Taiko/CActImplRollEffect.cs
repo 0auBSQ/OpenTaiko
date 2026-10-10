@@ -14,6 +14,7 @@ internal class CActImplRollEffect : CActivity {
 	// メソッド
 	public virtual void Start(int player) {
 		if (OpenTaiko.ConfigIni.SimpleMode) return;
+		if (OpenTaiko.Tx.Effects_Roll == null || OpenTaiko.Tx.Effects_Roll.Length == 0) return;
 
 		for (int i = 0; i < ROLL_CHARA_COUNT; i++) {
 			ref var rollChara = ref RollCharas[RollCharaTail];

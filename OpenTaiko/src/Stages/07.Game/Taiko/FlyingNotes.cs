@@ -50,6 +50,16 @@ internal class FlyingNotes : CActivity {
 		=> config.nPlayerCount <= 2 && !config.SimpleMode
 			&& nLane is not (NotesManager.ENoteType.Empty or NotesManager.ENoteType.Unknown);
 
+	// the flight positions of one frame: every multiple of step passed since the last frame, once each, then the
+	// current position; a step of 0 or less gives no multiples
+	internal static IEnumerable<(int mid, bool onStep)> MidValues(int old, int current, int step, bool needMid) {
+		if (needMid && step > 0) {
+			for (int mid = (old / step + 1) * step; mid <= current; mid += step)
+				yield return (mid, true);
+		}
+		yield return (current, false);
+	}
+
 	// CActivity 実装
 
 	public override void Activate() {
@@ -119,19 +129,8 @@ internal class FlyingNotes : CActivity {
 					int movingDistanceX = endX - StartPointX[state.Player];
 					int movingDistanceY = endY - OpenTaiko.Skin.Game_Effect_FlyingNotes_StartPoint_Y[state.Player];
 
-					static IEnumerable<(int mid, bool onStep)> midValues(int old, int current, int step, bool needMid) {
-						if (needMid) {
-							int mid = (int)Math.Ceiling((double)old / step) * step;
-							for (; mid <= current; mid += step)
-								yield return (mid, true);
-							if (mid == current)
-								yield break;
-						}
-						yield return (current, false);
-					}
-
 					bool needFireWork = state.ForceFirework ?? NotesManager.IsBigNoteTaiko(state.Lane, state.GameType);
-					foreach ((int mid, bool onStep) in midValues(state.OldValue, state.Counter.CurrentValue, OpenTaiko.Skin.Game_Effect_FireWorks_Timing, needFireWork)) {
+					foreach ((int mid, bool onStep) in MidValues(state.OldValue, state.Counter.CurrentValue, OpenTaiko.Skin.Game_Effect_FireWorks_Timing, needFireWork)) {
 						/*
                         if (TJAPlayer3.Skin.Game_Effect_FlyingNotes_IsUsingEasing)
                         {

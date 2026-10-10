@@ -48,7 +48,7 @@ internal class CActImplGauge : CActPlayGaugeCommon {
 		if (OpenTaiko.Skin.Game_Gauge_Rainbow_Timer <= 1) {
 			throw new DivideByZeroException("SkinConfigの設定\"Game_Gauge_Rainbow_Timer\"を1以下にすることは出来ません。");
 		}
-		this.ctRainbowAnime = new CCounter(0, OpenTaiko.Skin.Game_Gauge_Rainbow_Ptn - 1, OpenTaiko.Skin.Game_Gauge_Rainbow_Timer, OpenTaiko.Timer);
+		this.ctRainbowAnime = new CCounter(0, Math.Max(1, OpenTaiko.Skin.Game_Gauge_Rainbow_Ptn) - 1, OpenTaiko.Skin.Game_Gauge_Rainbow_Timer, OpenTaiko.Timer);
 		this.ctRainbowOpacity = new CCounter(0, OpenTaiko.Skin.Game_Gauge_Rainbow_Timer - 1, 1, OpenTaiko.Timer);
 		this.ctGaugeFlash = new CCounter(0, 532, 1, OpenTaiko.Timer);
 
@@ -206,6 +206,8 @@ internal class CActImplGauge : CActPlayGaugeCommon {
 								OpenTaiko.TJA.Dan_C[i];
 
 							if (dan_c != null && dan_c.ExamType == Exam.Type.Gauge && dbCurrentGaugeValue[0] >= dan_c.GetValue()[0]) {
+								if (OpenTaiko.Tx.Gauge_Dan[3] == null) break;
+
 								OpenTaiko.Tx.Gauge_Dan[3].Opacity = 255;
 								OpenTaiko.Tx.Gauge_Dan[3]?.t2DDraw(x + (dan_c.GetValue()[0] / 2 * nWidth), y, new Rectangle(dan_c.GetValue()[0] / 2 * nWidth, 0, nRectX[0] - (dan_c.GetValue()[0] / 2 * nWidth), OpenTaiko.Skin.Game_Gauge_Rect[3]));
 
@@ -227,7 +229,7 @@ internal class CActImplGauge : CActPlayGaugeCommon {
 					if (this.dbCurrentGaugeValue[0] >= 100.0) {
 						this.ctRainbowAnime.TickLoop();
 						this.ctRainbowOpacity.TickLoop();
-						if (OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue] != null) {
+						if (OpenTaiko.Tx.Gauge_Rainbow != null && OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue] != null && OpenTaiko.Tx.Gauge_Rainbow[RainbowBase] != null) {
 							OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue].vcScaleRatio.X = scale;
 							OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue].vcScaleRatio.Y = scale;
 

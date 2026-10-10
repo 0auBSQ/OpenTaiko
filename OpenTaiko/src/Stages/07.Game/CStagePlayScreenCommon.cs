@@ -50,6 +50,9 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	/// <summary>Per-session Tower mode state. Always non-null during gameplay.</summary>
 	public CFloorManagement FloorManagement { get; private set; } = new CFloorManagement(5);
 
+	// the scene preset of this play, picked once so that every scene part comes from the same one
+	internal DBSkinPreset.SkinScene? ScenePreset;
+
 	// Synchronous activate — the default for every caller. Drains the stepped build to completion, so behaviour is
 	// identical to the old monolithic Activate; the iterator just adds pause points so the song-loading screen can
 	// spread the build across frames (see ActivateSteps + CStageSongLoading's stepped phase).
@@ -62,6 +65,8 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	// `yield return progress` after the pre-setup and the child actors and again before the note-state build, so
 	// the song load can advance it a slice per frame instead of one blocking call.
 	public virtual System.Collections.Generic.IEnumerator<float> ActivateSteps() {
+		ScenePreset = HScenePreset.GetBGPreset();
+
 		OpenTaiko.HttpEventReporter.ReportGameplayStart();
 
 		// a #SONGJUMP left pending by a play that ended another way must not reach this one

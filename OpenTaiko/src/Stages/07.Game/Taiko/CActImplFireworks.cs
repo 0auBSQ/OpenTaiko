@@ -133,10 +133,10 @@ internal class CActImplFireworks : CActivity {
 	}
 	public override int Draw() {
 		if (!base.IsDeActivated) {
-			int nWidth = (OpenTaiko.Tx.Effects_Hit_Explosion.szTextureSize.Width / 7);
-			int nHeight = (OpenTaiko.Tx.Effects_Hit_Explosion.szTextureSize.Height / 4);
-			int nBombWidth = (OpenTaiko.Tx.Effects_Hit_Bomb.szTextureSize.Width / 7);
-			int nBombHeight = (OpenTaiko.Tx.Effects_Hit_Bomb.szTextureSize.Height / 4);
+			int nWidth = ((OpenTaiko.Tx.Effects_Hit_Explosion?.szTextureSize.Width ?? 0) / 7);
+			int nHeight = ((OpenTaiko.Tx.Effects_Hit_Explosion?.szTextureSize.Height ?? 0) / 4);
+			int nBombWidth = ((OpenTaiko.Tx.Effects_Hit_Bomb?.szTextureSize.Width ?? 0) / 7);
+			int nBombHeight = ((OpenTaiko.Tx.Effects_Hit_Bomb?.szTextureSize.Height ?? 0) / 4);
 			for (int i = 0; i < 3 * 4; i++) {
 				ref STSTATUS state = ref this.stState[i];
 				if (state.bUse) {

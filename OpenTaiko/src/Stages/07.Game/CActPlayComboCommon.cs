@@ -449,8 +449,8 @@ internal class CActPlayComboCommon : CActivity {
 
 		for (int i = 0; i < nDigitCount; i++) {
 
-			OpenTaiko.Tx.Taiko_Combo[0].Opacity = 255;
-			OpenTaiko.Tx.Taiko_Combo[1].Opacity = 255;
+			if (OpenTaiko.Tx.Taiko_Combo[0] != null) OpenTaiko.Tx.Taiko_Combo[0].Opacity = 255;
+			if (OpenTaiko.Tx.Taiko_Combo[1] != null) OpenTaiko.Tx.Taiko_Combo[1].Opacity = 255;
 
 			if (nDigitCount <= 1) {
 				if (OpenTaiko.Tx.Taiko_Combo[0] != null) {
