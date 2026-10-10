@@ -19,10 +19,13 @@ public enum EScrollMode {
 	HBScroll
 }
 
-public enum EGame {
-	Off = 0,
-	Survival = 1,
-	SurvivalHard = 2
+// the special mod of the mod select; Auto is the player's autoplay flag
+public enum ESpecialMod {
+	None = 0,
+	Auto = 1,
+	Flawless = 2,
+	Timed = 3,
+	TimedHard = 4
 }
 
 public enum EDifficultyDisplayType {

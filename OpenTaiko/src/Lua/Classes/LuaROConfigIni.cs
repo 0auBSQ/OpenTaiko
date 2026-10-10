@@ -151,6 +151,13 @@ namespace OpenTaiko {
 		}
 		public virtual void SetAutoStatus(int player, bool isAuto) => BlockWrite(nameof(SetAutoStatus));
 
+		// 0 None, 1 Auto, 2 Flawless, 3 Timed, 4 Timed (Hard)
+		public int GetSpecialMod(int player) {
+			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return (int)ESpecialMod.None;
+			return (int)OpenTaiko.ConfigIni.GetSpecialMod(player);
+		}
+		public virtual void SetSpecialMod(int player, int mod) => BlockWrite(nameof(SetSpecialMod));
+
 		public class RandomMod {
 			public const int Off = (int)ERandomMode.Off;
 			public const int Random = (int)ERandomMode.Random;

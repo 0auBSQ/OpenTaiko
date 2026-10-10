@@ -192,8 +192,6 @@
 		"SETTINGS_GAME_CONTROLLERDEADZONE": "コントローラーのデッドゾーン",
 		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "接続されているすべてのコントローラーのスティックのデッドゾーンを調節します。10% ～ 90% の値が指定可能です。\n\n保存後、変更を反映するにはコントローラーを再接続するか、ゲームを再起動してください。",
 
-		"SETTINGS_GAME_BADCOUNT": "完璧モード",
-		"SETTINGS_GAME_BADCOUNT_DESC": "Riskyモードの設定:1以上の値にすると、その回数分の不可で演奏が強制終了します。0にすると無効になり、ノルマゲージのみになります。",
 		"SETTINGS_GAME_NOTELOCK": "タイト",
 		"SETTINGS_GAME_NOTELOCK_DESC": "ドラムチップのないところでパッドを叩くとミスになります。",
 		"SETTINGS_GAME_AILEVEL": "AIレベル",
@@ -238,8 +236,6 @@
 		"SETTINGS_GAME_BRANCHGUIDE_DESC": "譜面分岐の参考になる数値などを表示します。オートプレイだと表示されません。",
 		"SETTINGS_GAME_BIGNOTEJUDGE": "大音符判定",
 		"SETTINGS_GAME_BIGNOTEJUDGE_DESC": "大音符の両手判定を有効にします。",
-		"SETTINGS_GAME_SURVIVAL": "ゲームモード",
-		"SETTINGS_GAME_SURVIVAL_DESC": "(1人プレイ専用)=TYPE-A: 完走!叩ききりまショー!=TYPE-B: 完走!叩ききりまショー!(激辛)",
 		"SETTINGS_GAME_SCOREMODE": "スコア計算方法",
 		"SETTINGS_GAME_SCOREMODE_DESC": "スコア計算方法\nTYPE-A: 旧配点\nTYPE-B: 旧筐体配点\nTYPE-C: 新配点",
 		"SETTINGS_GAME_SHINUCHI": "真打モード",
@@ -554,7 +550,19 @@
 		"MOD_TIMING2": "易しい",
 		"MOD_TIMING3": "通常",
 		"MOD_TIMING4": "厳しい",
-		"MOD_TIMING5": "過酷"
+		"MOD_TIMING5": "過酷",
+		"MOD_SPECIAL": "特殊オプション",
+		"MOD_SPECIAL_DESC": "特別なルールを1つ選びます。オートプレイの鑑賞、または演奏失敗になりうる挑戦です。",
+		"MOD_SPECIAL1": "なし",
+		"MOD_SPECIAL1_DESC": "特別なルールなしで演奏します。",
+		"MOD_SPECIAL2": "オート",
+		"MOD_SPECIAL2_DESC": "CPUによる完璧なオートプレイを鑑賞します。",
+		"MOD_SPECIAL3": "完璧",
+		"MOD_SPECIAL3_DESC": "不可を1回でも出すと演奏失敗になります。",
+		"MOD_SPECIAL4": "タイマー",
+		"MOD_SPECIAL4_DESC": "音符が流れている間、タイマーが減っていきます。良い演奏で時間が戻り、0になると演奏失敗です。",
+		"MOD_SPECIAL5": "タイマー(激辛)",
+		"MOD_SPECIAL5_DESC": "タイマーと同じですが、時間を戻す条件がずっと厳しくなります。"
 	},
 	// In the case that a key is missing, this message will display, with the name of the missing/unknown key.
 	"InvalidKey": "KEY NOT FOUND: {0}",

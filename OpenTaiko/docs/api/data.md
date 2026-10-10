@@ -257,6 +257,8 @@ Properties use dot syntax (`CONFIG.PlayerCount`), methods use colon syntax. Play
 | `CONFIG:SetTimingZone(player, zone)  -> nil` | Sets the player's judgement window, clamped to 0..4. |
 | `CONFIG:GetAutoStatus(player)  -> bool` | True when the player is on auto-play or watching a replay. |
 | `CONFIG:SetAutoStatus(player, isAuto)  -> nil` | Enables or disables auto-play for the player. |
+| `CONFIG:GetSpecialMod(player)  -> int` | The player's special mod: 0 none, 1 Auto, 2 Flawless (one miss fails the play), 3 Timed, 4 Timed (Hard). 1 whenever auto-play is on; 0 for out-of-range indices. |
+| `CONFIG:SetSpecialMod(player, mod)  -> nil` | Sets the player's special mod and ignores undefined values. 1 turns auto-play on, any other value turns it off. |
 | `CONFIG:GetRandomMod(player)  -> int` | The player's random mod (see `CONFIG.RANDOM`); Off for out-of-range indices. |
 | `CONFIG:SetRandomMod(player, mode)  -> nil` | Sets the player's random mod and ignores undefined values. |
 | `CONFIG:GetFunMod(player)  -> int` | The player's fun mod (see `CONFIG.FUN`); None for out-of-range indices. |

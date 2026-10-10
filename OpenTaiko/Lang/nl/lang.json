@@ -190,8 +190,6 @@
 		"SETTINGS_GAME_CONTROLLERDEADZONE": "Dode Zone Controller",
 		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "Past de dode zone van de analoge sticks aan voor alle aangesloten controllers. Kan tussen 10% en 90% ingesteld worden.\n\nSluit na het opslaan de controller opnieuw aan of herstart het spel om de wijzigingen toe te passen.",
 
-		"SETTINGS_GAME_BADCOUNT": "Kanpeki Modus",
-		"SETTINGS_GAME_BADCOUNT_DESC": "Kies hoeveel 'BAD's zijn toegestaan voordat een lied automatisch mislukt. Zet de waarde op 0 om het uit te schakelen.",
 		"SETTINGS_GAME_NOTELOCK": "Notelock Modus",
 		"SETTINGS_GAME_NOTELOCK_DESC": "Kiest of het drummen tussen noten geldt als BAD (mis).",
 		"SETTINGS_GAME_AILEVEL": "AI Niveau",
@@ -236,8 +234,6 @@
 		"SETTINGS_GAME_BRANCHGUIDE_DESC": "Kiest of er een numerieke begeleiding wordt weergeven om te zien welke tak wordt gekozen. Niet zichtbaar in automatische modus.",
 		"SETTINGS_GAME_BIGNOTEJUDGE": "Grote Noot Beoordeling",
 		"SETTINGS_GAME_BIGNOTEJUDGE_DESC": "Kiest of grote noten met 2 toetsen een bonus geven. Als dit aan staat, zal 1 toets visueel vertraagd zijn voordat het verdwijnt. Raken met 2 toetsen geeft dubbele punten. Als dit uit staat, zal 1 toets het als een normale noot raken. Dubbele punten worden nog steeds gegeven. Als je ze met 2 toetsen raakt, wordt de volgende mogelijk ook geraakt.",
-		"SETTINGS_GAME_SURVIVAL": "Overlevingsmodus",
-		"SETTINGS_GAME_SURVIVAL_DESC": "Deze modus werkt niet. Het implementeert een timer systeem net als Stepmania koersen, maar er ontbreekt code. Functionaliteit is klein. ",
 		"SETTINGS_GAME_SCOREMODE": "Score Modus",
 		"SETTINGS_GAME_SCOREMODE_DESC": "Kiest de formule voor het berekenen van scores.\nTYPE-A: Gen-1\nTYPE-B: Gen-2\nTYPE-C: Gen-3",
 		"SETTINGS_GAME_SHINUCHI": "Shin'uchi Modus",
@@ -552,7 +548,19 @@
 		"MOD_TIMING2": "Lenig",
 		"MOD_TIMING3": "Normaal",
 		"MOD_TIMING4": "Strikt",
-		"MOD_TIMING5": "Rigoureus"
+		"MOD_TIMING5": "Rigoureus",
+		"MOD_SPECIAL": "Speciale mods",
+		"MOD_SPECIAL_DESC": "Kies één speciale regel: kijk naar een auto-play, of ga een uitdaging aan waarbij het spel kan mislukken.",
+		"MOD_SPECIAL1": "Geen",
+		"MOD_SPECIAL1_DESC": "Speel zonder speciale regel.",
+		"MOD_SPECIAL2": "Auto",
+		"MOD_SPECIAL2_DESC": "Kijk naar een perfecte auto-play van de CPU.",
+		"MOD_SPECIAL3": "Foutloos",
+		"MOD_SPECIAL3_DESC": "Eén 'BAD' of gemiste noot en het spel mislukt.",
+		"MOD_SPECIAL4": "Op tijd",
+		"MOD_SPECIAL4_DESC": "Een timer loopt af zolang er noten komen. Speel goed om tijd terug te winnen: bij nul mislukt het spel.",
+		"MOD_SPECIAL5": "Op tijd (Moeilijk)",
+		"MOD_SPECIAL5_DESC": "Op tijd, met veel strengere regels om tijd terug te winnen."
 	},
 	// In the case that a key is missing, this message will display, with the name of the missing/unknown key.
 	"InvalidKey": "KEY NOT FOUND: {0}",

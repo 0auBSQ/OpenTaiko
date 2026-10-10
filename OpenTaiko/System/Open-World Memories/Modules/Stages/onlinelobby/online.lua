@@ -46,7 +46,8 @@ LO.net = {
 local net = LO.net
 local floor = math.floor
 LO.MAXP = 5
-local function defMods() return { r = 0, st = 0, ju = 0, tz = 2, ss = 9 } end   -- none / normal timing / x1 scroll
+local function defMods() return { r = 0, st = 0, ju = 0, tz = 2, ss = 9, sm = 0 } end   -- none / normal timing / x1 scroll / no special mod
+local function modJson(m) return string.format('{"r":%d,"st":%d,"ju":%d,"tz":%d,"ss":%d,"sm":%d}', m.r or 0, m.st or 0, m.ju or 0, m.tz or 2, m.ss or 9, m.sm or 0) end
 
 -- ── identity ────────────────────────────────────────────────────────────────────────────────────
 local function jstr(s)
@@ -383,7 +384,7 @@ function LO.sendMyStateTo(peer)
     local me = NET:SelfId()
     NET:SendTo(peer, "diff", string.format('{"d":%d}', net.diffByPeer[me] or 1))
     local m = net.modByPeer[me] or defMods()
-    NET:SendTo(peer, "mod", string.format('{"r":%d,"st":%d,"ju":%d,"tz":%d,"ss":%d}', m.r or 0, m.st or 0, m.ju or 0, m.tz or 2, m.ss or 9))
+    NET:SendTo(peer, "mod", modJson(m))
     NET:SendTo(peer, "ready", string.format('{"r":%s}', net.readyByPeer[me] and "true" or "false"))
     NET:SendTo(peer, "have", string.format('{"h":%s}', net.iLackSong and "false" or "true"))
     if net.watchByPeer[me] then NET:SendTo(peer, "watch", '{"w":true}') end
@@ -399,8 +400,10 @@ end
 -- online), store + broadcast them so everyone can render the player's mod ICONS.
 function LO.broadcastMods()
     local m = { r = CONFIG:GetRandomMod(0), st = CONFIG:GetStealthMod(0), ju = CONFIG:GetJusticeMod(0), tz = CONFIG:GetTimingZone(0), ss = CONFIG:GetScrollSpeed(0) }
+    m.sm = CONFIG:GetSpecialMod(0)                    -- Flawless / Timed / Timed (Hard); Auto (1) is not sent
+    if m.sm == 1 then m.sm = 0 end
     net.modByPeer[NET:SelfId()] = m
-    NET:Broadcast("mod", string.format('{"r":%d,"st":%d,"ju":%d,"tz":%d,"ss":%d}', m.r or 0, m.st or 0, m.ju or 0, m.tz or 2, m.ss or 9))
+    NET:Broadcast("mod", modJson(m))
 end
 -- push a player's mods onto a scratch CONFIG slot so MODICONS:Draw(slot,...) can render their icons
 function LO.applyModsToSlot(slot, m)
@@ -408,6 +411,7 @@ function LO.applyModsToSlot(slot, m)
     pcall(function()
         CONFIG:SetRandomMod(slot, m.r or 0); CONFIG:SetStealthMod(slot, m.st or 0); CONFIG:SetJusticeMod(slot, m.ju or 0)
         CONFIG:SetTimingZone(slot, m.tz or 2); CONFIG:SetScrollSpeed(slot, m.ss or 9); CONFIG:SetFunMod(slot, 0); CONFIG:SetAutoStatus(slot, false)
+        CONFIG:SetSpecialMod(slot, (m.sm ~= 1) and m.sm or 0)
     end)
 end
 function LO.myReady() return net.readyByPeer[NET:SelfId()] == true end
@@ -602,7 +606,8 @@ function LO.drain()
             elseif ch == "diff" and s then net.diffByPeer[e.Peer] = floor(JSONLOADER:JsonGet(s, "d") or 1)
             elseif ch == "mod" and s then
                 net.modByPeer[e.Peer] = { r = floor(JSONLOADER:JsonGet(s, "r") or 0), st = floor(JSONLOADER:JsonGet(s, "st") or 0),
-                    ju = floor(JSONLOADER:JsonGet(s, "ju") or 0), tz = floor(JSONLOADER:JsonGet(s, "tz") or 2), ss = floor(JSONLOADER:JsonGet(s, "ss") or 9) }
+                    ju = floor(JSONLOADER:JsonGet(s, "ju") or 0), tz = floor(JSONLOADER:JsonGet(s, "tz") or 2), ss = floor(JSONLOADER:JsonGet(s, "ss") or 9),
+                    sm = floor(JSONLOADER:JsonGet(s, "sm") or 0) }
             elseif ch == "ready" and s then net.readyByPeer[e.Peer] = JSONLOADER:JsonGet(s, "r") and true or false
             elseif ch == "have" and s then net.lackByPeer[e.Peer] = (JSONLOADER:JsonGet(s, "h") == false)
             elseif ch == "watch" and s then net.watchByPeer[e.Peer] = JSONLOADER:JsonGet(s, "w") and true or nil

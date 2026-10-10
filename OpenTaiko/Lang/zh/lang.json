@@ -190,8 +190,6 @@
 		"SETTINGS_GAME_CONTROLLERDEADZONE": "控制器死区",
 		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "调整所有已连接控制器的拇指杆死区。设定范围：10—90%\n\n保存后，重新连接控制器或重新启动游戏以应用更改。",
 
-		"SETTINGS_GAME_BADCOUNT": "完美模式",
-		"SETTINGS_GAME_BADCOUNT_DESC": "选择打出多少个“不可”时会导致演奏失败。\n— 0：禁用此选项",
 		"SETTINGS_GAME_NOTELOCK": "锁定音符模式",
 		"SETTINGS_GAME_NOTELOCK_DESC": "切换在谱面空白处敲击时是否判为“不可”。",
 		"SETTINGS_GAME_AILEVEL": "AI 等级",
@@ -236,8 +234,6 @@
 		"SETTINGS_GAME_BRANCHGUIDE_DESC": "切换是否显示谱面分歧条件数值导引。自动演奏模式下此项不起作用。",
 		"SETTINGS_GAME_BIGNOTEJUDGE": "大音符判断",
 		"SETTINGS_GAME_BIGNOTEJUDGE_DESC": "切换双击大音符时是否获得奖励。开启时单击大音符会导致音符消失前出现视觉延迟，双击会获得双倍得分。关闭时单击与敲击普通音符效果一致并会获得双倍得分。尝试双击或将导致下个音符被敲击。",
-		"SETTINGS_GAME_SURVIVAL": "生存模式",
-		"SETTINGS_GAME_SURVIVAL_DESC": "此模式不可用。此模式实现了一个类似 StepMania 的计时器系统，但部分代码缺失导致功能受限。",
 		"SETTINGS_GAME_SCOREMODE": "计分模式",
 		"SETTINGS_GAME_SCOREMODE_DESC": "选择用于决定得分的公式。\n— TYPE-A：第一代\n— TYPE-B：第二代\n— TYPE-C：第三代",
 		"SETTINGS_GAME_SHINUCHI": "真打模式",
@@ -552,7 +548,19 @@
 		"MOD_TIMING2": "宽松",
 		"MOD_TIMING3": "一般",
 		"MOD_TIMING4": "严格",
-		"MOD_TIMING5": "非常严格"
+		"MOD_TIMING5": "非常严格",
+		"MOD_SPECIAL": "特殊模式",
+		"MOD_SPECIAL_DESC": "选择一条特殊规则：观看自动演奏，或接受可能导致演奏失败的挑战。",
+		"MOD_SPECIAL1": "无",
+		"MOD_SPECIAL1_DESC": "不使用特殊规则。",
+		"MOD_SPECIAL2": "自动",
+		"MOD_SPECIAL2_DESC": "观看电脑的完美自动演奏。",
+		"MOD_SPECIAL3": "无失误",
+		"MOD_SPECIAL3_DESC": "打出一个“不可”或漏掉一个音符即演奏失败。",
+		"MOD_SPECIAL4": "限时",
+		"MOD_SPECIAL4_DESC": "有音符时计时器会不断减少。打得好可以赢回时间：归零时演奏失败。",
+		"MOD_SPECIAL5": "限时（困难）",
+		"MOD_SPECIAL5_DESC": "与限时相同，但赢回时间的条件严格得多。"
 	},
   // In the case that a key is missing, this message will display, with the name of the missing/unknown key.
   "InvalidKey": "键找不到：{0}",

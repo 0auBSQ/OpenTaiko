@@ -257,6 +257,8 @@ SHARED:GetSharedSound("Decide"):Play()
 | `CONFIG:SetTimingZone(player, zone)  -> nil` | プレイヤーの判定幅を設定します。0..4 に制限されます。 |
 | `CONFIG:GetAutoStatus(player)  -> bool` | プレイヤーがオートプレイ中またはリプレイ観賞中のとき true。 |
 | `CONFIG:SetAutoStatus(player, isAuto)  -> nil` | プレイヤーのオートプレイを有効または無効にします。 |
+| `CONFIG:GetSpecialMod(player)  -> int` | プレイヤーのスペシャル Mod: 0 なし、1 Auto、2 Flawless (1 回のミスで演奏失敗)、3 Timed、4 Timed (Hard)。オートプレイ中は常に 1。範囲外のインデックスには 0。 |
+| `CONFIG:SetSpecialMod(player, mod)  -> nil` | プレイヤーのスペシャル Mod を設定し、未定義の値は無視します。1 はオートプレイを有効にし、それ以外の値は無効にします。 |
 | `CONFIG:GetRandomMod(player)  -> int` | プレイヤーのランダム Mod (`CONFIG.RANDOM` を参照)。範囲外のインデックスには Off。 |
 | `CONFIG:SetRandomMod(player, mode)  -> nil` | プレイヤーのランダム Mod を設定し、未定義の値は無視します。 |
 | `CONFIG:GetFunMod(player)  -> int` | プレイヤーの Fun Mod (`CONFIG.FUN` を参照)。範囲外のインデックスには None。 |

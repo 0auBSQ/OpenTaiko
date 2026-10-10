@@ -45,21 +45,7 @@ internal class CActPlayGaugeCommon : CActivity {
 	const double GAUGE_ZERO = 0.0;
 	const double GAUGE_DANGER = 0.3;
 
-	public bool bRisky                          // Riskyモードか否か
-	{
-		get;
-		private set;
-	}
-	public int nRiskyTimes_Initial              // Risky初期値
-	{
-		get;
-		private set;
-	}
-	public int[] nRiskyTimes                    // 残Miss回数
-	{
-		get;
-		private set;
-	} = new int [OpenTaiko.MAX_PLAYERS];
+	private readonly FlawlessState flawless = new();
 
 	public bool IsRiskyMine(int iPlayer) => this.DTX[iPlayer].boomRule is CTja.EBoomRule.Fatal;
 	public int[] timesRiskyMine
@@ -68,26 +54,14 @@ internal class CActPlayGaugeCommon : CActivity {
 		private set;
 	} = new int[OpenTaiko.MAX_PLAYERS];
 
-	public bool IsRiskyFailed() {
-		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i)
-			if (!IsRiskyFailed(i))
-				return false;
-		return true;
-	}
-	public bool IsRiskyFailed(int iPlayer) => bRisky && nRiskyTimes[iPlayer] <= 0;   // 閉店状態になったかどうか
-	public bool IsRiskyDanger(int iPlayer) => bRisky && nRiskyTimes_Initial switch {  // DANGERかどうか
-		1 => false,
-		2 or 3 => (nRiskyTimes[iPlayer] <= 1),
-		_ => (nRiskyTimes[iPlayer] <= 2),
-	};
+	public bool IsFlawlessFailed(int iPlayer) => this.flawless.IsFailed(iPlayer);
 
 	public bool IsRiskyMineFailed(int iPlayer) => IsRiskyMine(iPlayer) && timesRiskyMine[iPlayer] <= 0;
 
 	/// <summary>
 	/// ゲージの初期化
 	/// </summary>
-	/// <param name="nRiskyTimes_Initial_">Riskyの初期値(0でRisky未使用)</param>
-	public void Init(int nRiskyTimes_InitialVal, int nPlayer)       // ゲージ初期化
+	public void Init(int nPlayer)       // ゲージ初期化
 	{
 		//ダメージ値の計算
 		switch (HGaugeMethods.tGetGaugeTypeEnum(nPlayer)) {
@@ -105,11 +79,7 @@ internal class CActPlayGaugeCommon : CActivity {
 		float[] dbGaugeMaxComboValue_branch = new float[3];
 
 
-		this.bRisky = (nRiskyTimes_InitialVal > 0);
-		if (bRisky) {
-			this.nRiskyTimes[nPlayer] = OpenTaiko.ConfigIni.nRisky;
-			this.nRiskyTimes_Initial = OpenTaiko.ConfigIni.nRisky;
-		}
+		this.flawless.Reset(nPlayer);
 
 		if (this.IsRiskyMine(nPlayer))
 			this.timesRiskyMine[nPlayer] = Math.Max(1, (int)this.DTX[nPlayer].boomRuleValue);
@@ -270,8 +240,7 @@ internal class CActPlayGaugeCommon : CActivity {
 				break;
 		}
 
-		if (this.bRisky)
-			this.nRiskyTimes[nPlayer]--;
+		this.flawless.OnMiss(nPlayer, OpenTaiko.stageGameScreen.JudgedSpecialMod(nPlayer));
 
 		this.Damage(nPlayer, fDamage);
 	}
@@ -304,9 +273,7 @@ internal class CActPlayGaugeCommon : CActivity {
 							break;
 					}
 
-					if (this.bRisky) {
-						this.nRiskyTimes[nPlayer]--;
-					}
+					this.flawless.OnMiss(nPlayer, OpenTaiko.stageGameScreen.JudgedSpecialMod(nPlayer));
 				}
 
 				break;

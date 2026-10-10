@@ -239,12 +239,9 @@ public static class CConfigOptionBuilder {
 		O.Add(CLuaConfigOption.Choice_(GAME, secGameplay,L("SETTINGS_GAME_SCOREMODE"), L("SETTINGS_GAME_SCOREMODE_DESC"),
 			new[] { "TYPE-A", "TYPE-B", "TYPE-C" }, cfg.nScoreMode, idx => cfg.nScoreMode = idx));
 		O.Add(CLuaConfigOption.Toggle_(GAME, secGameplay,L("SETTINGS_GAME_SHINUCHI"), L("SETTINGS_GAME_SHINUCHI_DESC"), cfg.ShinuchiMode, v => cfg.ShinuchiMode = v));
-		O.Add(CLuaConfigOption.Choice_(GAME, secGameplay,L("SETTINGS_GAME_SURVIVAL"), L("SETTINGS_GAME_SURVIVAL_DESC"),
-			new[] { "OFF", "TYPE-A", "TYPE-B" }, (int)cfg.eGameMode, idx => cfg.eGameMode = (EGame)idx));
 		O.Add(CLuaConfigOption.Toggle_(GAME, secGameplay,L("SETTINGS_GAME_NORMALGAUGE"), L("SETTINGS_GAME_NORMALGAUGE_DESC"), cfg.bForceNormalGauge, v => cfg.bForceNormalGauge = v));
 		O.Add(CLuaConfigOption.Toggle_(GAME, secGameplay,L("SETTINGS_GAME_BIGNOTEJUDGE"), L("SETTINGS_GAME_BIGNOTEJUDGE_DESC"), cfg.bJudgeBigNotes, v => cfg.bJudgeBigNotes = v));
 		O.Add(CLuaConfigOption.Toggle_(GAME, secGameplay,L("SETTINGS_GAME_NOTELOCK"), L("SETTINGS_GAME_NOTELOCK_DESC"), cfg.bTight, v => cfg.bTight = v));
-		O.Add(CLuaConfigOption.Int_(GAME, secGameplay,L("SETTINGS_GAME_BADCOUNT"), L("SETTINGS_GAME_BADCOUNT_DESC"), cfg.nRisky, 0, 10, 1, v => cfg.nRisky = v));
 
 		// Display & Feedback
 		O.Add(CLuaConfigOption.Int_(GAME, secFeedback,L("SETTINGS_GAME_COMBODISPLAY"), L("SETTINGS_GAME_COMBODISPLAY_DESC"), cfg.nMinDisplayedCombo, 1, 99999, 1, v => cfg.nMinDisplayedCombo = v));

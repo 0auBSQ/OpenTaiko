@@ -469,7 +469,12 @@ local function drawRoster(ids, me)
             if modicons then
                 pcall(function()
                     if mine then modicons:Draw(ROW_X + 510, cy - 18, 0, "menu", 255)
-                    else LO.applyModsToSlot(4, net.modByPeer[id]); modicons:Draw(ROW_X + 510, cy - 18, 4, "menu", 255) end
+                    else
+                        -- the scratch slot is the local 5th player's: their special mod is put back after the draw
+                        local keep = CONFIG:GetSpecialMod(4)
+                        LO.applyModsToSlot(4, net.modByPeer[id]); modicons:Draw(ROW_X + 510, cy - 18, 4, "menu", 255)
+                        CONFIG:SetSpecialMod(4, (keep ~= 1) and keep or 0)
+                    end
                 end)
             end
             local st, sc = seatStatus(id)

@@ -4,13 +4,13 @@ local NavInput = require("NavInput")
 local reactive = false
 local player = 0
 local save = nil
-local restrictMods = false   -- online lobby: when true, only the Auto option is hidden (Fun Mod incl. Dynamic Beat stays, per-player)
+local restrictMods = false   -- online lobby: when true, only the Auto choice of Special Mods is hidden (Fun Mod incl. Dynamic Beat stays, per-player)
 
 -- Mod options
 local options = {}
 
 local SETTER_MAP = {
-    ["auto"]         = "SetAutoStatus",
+    ["special"]      = "SetSpecialMod",
     ["scroll-speed"] = "SetScrollSpeed",
     ["game-mode"]    = "SetGameType",
     ["timing"]       = "SetTimingZone",
@@ -67,17 +67,18 @@ local COL_RED        = "FFFF5555"
 -- ============================================================
 -- Static option definitions (choices, colors, per-choice desc)
 -- ============================================================
+-- Special Mods: the values of CONFIG:GetSpecialMod / SetSpecialMod. The label of value n is the locale key
+-- MOD_SPECIAL<n+1>, its description MOD_SPECIAL<n+1>_DESC.
+local SPECIAL_AUTO = 1
+local SPECIAL_MODS = {
+    { id = 0, color = COL_WHITE },    -- None
+    { id = 1, color = COL_WHITE },    -- Auto
+    { id = 2, color = COL_RED },      -- Flawless
+    { id = 3, color = COL_ORANGE },   -- Timed
+    { id = 4, color = COL_RED },      -- Timed (Hard)
+}
+
 local OPTION_DEFS = {
-    {
-        meta = "auto",
-        text = "Auto",
-        desc = "Watch a perfect play of the selected chart.",
-        type = "multi",
-        choices = {
-            { label = "No",  color = COL_WHITE, desc = "Play the chart yourself." },
-            { label = "Yes", color = COL_WHITE, desc = "Watch a CPU perfect auto-play." },
-        }
-    },
     {
         meta = "scroll-speed",
         text = "Scroll Speed",
@@ -158,6 +159,10 @@ local OPTION_DEFS = {
             { label = "Dynamic Beat", color = COL_WHITE, desc = "The song speeds up as you play well, and slows down on mistakes. Shared among all players in local play; per-player online." },
         }
     },
+    {
+        meta = "special",
+        type = "multi",
+    },
 }
 
 -- Total selectable items in step 1 (8 options + OK + Cancel)
@@ -236,9 +241,20 @@ end
 local function loadOptions()
     options = {}
     for _, def in ipairs(OPTION_DEFS) do
-      if not (restrictMods and def.meta == "auto") then   -- online: hide Auto only; Fun Mod (incl. Dynamic Beat) is a per-player choice
         local val
-        if     def.meta == "auto"         then val = CONFIG:GetAutoStatus(player) and 1 or 0
+        local label, desc, choices = def.text, def.desc, def.choices
+        if def.meta == "special" then
+            -- the choices carry their CONFIG value in id; online, Auto is not offered
+            local current = CONFIG:GetSpecialMod(player)
+            label, desc, choices = LANG:GetString("MOD_SPECIAL"), LANG:GetString("MOD_SPECIAL_DESC"), {}
+            val = 0
+            for _, mod in ipairs(SPECIAL_MODS) do
+                if not (restrictMods and mod.id == SPECIAL_AUTO) then
+                    local key = "MOD_SPECIAL" .. (mod.id + 1)
+                    table.insert(choices, { id = mod.id, label = LANG:GetString(key), color = mod.color, desc = LANG:GetString(key .. "_DESC") })
+                    if mod.id == current then val = #choices - 1 end
+                end
+            end
         elseif def.meta == "scroll-speed" then val = CONFIG:GetScrollSpeed(player)
         elseif def.meta == "game-mode"    then val = CONFIG:GetGameType(player)
         elseif def.meta == "timing"       then val = CONFIG:GetTimingZone(player)
@@ -250,17 +266,16 @@ local function loadOptions()
         table.insert(options, {
             meta    = def.meta,
             value   = val,
-            text    = def.text,
-            desc    = def.desc,
+            text    = label,
+            desc    = desc,
             type    = def.type,
-            choices = def.choices,  -- nil for scroll type
+            choices = choices,      -- nil for scroll type
+            spacing = def.spacing or MENU_CHOICE_SPACING_X,
             min     = def.min,      -- scroll only
             max     = def.max,      -- scroll only
         })
-      end
     end
-    -- recompute the navigation counts from the (possibly filtered) option list, else OK/Cancel indices and
-    -- options[selectedIndex+1] desync when restrictMods drops Auto + Fun-Mod → nil access / lua error
+    -- recompute the navigation counts from the option list, so the OK/Cancel indices always follow it
     OPTION_COUNT = #options
     OK_INDEX     = OPTION_COUNT
     CANCEL_INDEX = OPTION_COUNT + 1
@@ -275,7 +290,7 @@ local function saveOptions()
         local methodName = SETTER_MAP[option.meta]
         if methodName and CONFIG[methodName] then
             local value = option.value
-            if option.meta == "auto" then value = (value == 1) end  -- convert back to bool
+            if option.meta == "special" then value = option.choices[value + 1].id end  -- the choice's CONFIG value
             CONFIG[methodName](CONFIG, player, value)
         else
             debugLog("No setter mapping found for: " .. tostring(option.meta))
@@ -345,10 +360,10 @@ function draw()
                     choiceCol = COLOR:CreateColorFromHex(COL_GRAY)
                 end
 
-                local choiceTx = text:GetText(choice.label, false, MENU_CHOICE_SPACING_X - 10, choiceCol)
+                local choiceTx = text:GetText(choice.label, false, opt.spacing - 10, choiceCol)
                 choiceTx:SetOpacity(alpha)
                 choiceTx:Draw(xpos, ypos)
-                xpos = xpos + MENU_CHOICE_SPACING_X
+                xpos = xpos + opt.spacing
             end
         end
     end

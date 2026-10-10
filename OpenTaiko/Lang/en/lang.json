@@ -190,8 +190,6 @@
 		"SETTINGS_GAME_CONTROLLERDEADZONE": "Controller Deadzone",
 		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "Adjust the thumbstick deadzone for all connected controllers. Can be between 10% to 90%.\n\nAfter saving, reconnect the controller or restart the game to apply changes.",
 
-		"SETTINGS_GAME_BADCOUNT": "Kanpeki Mode",
-		"SETTINGS_GAME_BADCOUNT_DESC": "Choose how many BADs are allowed before a song is automatically failed. Set this to 0 to disable the mode.",
 		"SETTINGS_GAME_NOTELOCK": "Notelock Mode",
 		"SETTINGS_GAME_NOTELOCK_DESC": "Toggle whether hitting in the space between notes counts as a BAD.",
 		"SETTINGS_GAME_AILEVEL": "AI Level",
@@ -236,8 +234,6 @@
 		"SETTINGS_GAME_BRANCHGUIDE_DESC": "Toggle whether a numerical guide is displayed to view which branch is going to be picked. It doesn't display on auto mode.",
 		"SETTINGS_GAME_BIGNOTEJUDGE": "Big Note Judgement",
 		"SETTINGS_GAME_BIGNOTEJUDGE_DESC": "Toggle whether big notes reward being hit with 2 keys. If this is on, using 1 key will cause a visual delay before they disappear. Hits with 2 keys will award double points. If this is off, using 1 key will hit them like a regular note. Double points will still be awarded Attempting to hit them with 2 keys may cause the next note to be hit instead.",
-		"SETTINGS_GAME_SURVIVAL": "Survival Mode",
-		"SETTINGS_GAME_SURVIVAL_DESC": "This mode is broken. It implements a timer system similar to StepMania courses, but some code is missing, so the functionality is limited.",
 		"SETTINGS_GAME_SCOREMODE": "Score Mode",
 		"SETTINGS_GAME_SCOREMODE_DESC": "Chooses the formula used to determine scores.\nTYPE-A: Gen-1\nTYPE-B: Gen-2\nTYPE-C: Gen-3",
 		"SETTINGS_GAME_SHINUCHI": "Shin'uchi Mode",
@@ -552,7 +548,19 @@
 		"MOD_TIMING2": "Lenient",
 		"MOD_TIMING3": "Normal",
 		"MOD_TIMING4": "Strict",
-		"MOD_TIMING5": "Rigorous"
+		"MOD_TIMING5": "Rigorous",
+		"MOD_SPECIAL": "Special Mods",
+		"MOD_SPECIAL_DESC": "Pick one special rule: watch an auto-play, or take on a challenge that can fail the play.",
+		"MOD_SPECIAL1": "None",
+		"MOD_SPECIAL1_DESC": "Play with no special rule.",
+		"MOD_SPECIAL2": "Auto",
+		"MOD_SPECIAL2_DESC": "Watch a CPU perfect auto-play.",
+		"MOD_SPECIAL3": "Flawless",
+		"MOD_SPECIAL3_DESC": "A single BAD or missed note fails the play.",
+		"MOD_SPECIAL4": "Timed",
+		"MOD_SPECIAL4_DESC": "A timer runs down while notes are coming. Play well to win back time: at zero, the play fails.",
+		"MOD_SPECIAL5": "Timed (Hard)",
+		"MOD_SPECIAL5_DESC": "Timed, with much stricter rules to win back time."
 	},
 	// In the case that a key is missing, this message will display, with the name of the missing/unknown key.
 	"InvalidKey": "KEY NOT FOUND: {0}",

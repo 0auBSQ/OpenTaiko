@@ -19,7 +19,7 @@ local colWhite        -- white text colour
 -- ─── Layouts ─────────────────────────────────────────────────────────────────
 -- Each table has 8 entries (one per slot, Lua-1-based):
 --   Slot 1: HS   2: Stealth   3: Random   4: Fun
---   Slot 5: Just  6: Timing   7: SongSpeed  8: Auto
+--   Slot 5: Just  6: Timing   7: SongSpeed  8: Auto / special mod
 --
 -- "menu" : single horizontal row, 45 px between slots
 local OFFSET_X_MENU = {  0, 45, 90, 135, 180, 225, 270, 315 }
@@ -36,6 +36,9 @@ local OFFSET_Y_GAME = {  0,  0,  0,   0,  45,  45,  45,  45 }
 local SCROLL_SPEED_NORMAL = CONFIG.SCROLLSPEED.Normal
 local SONG_SPEED_NORMAL = CONFIG.SONGSPEED.Normal
 local VALUE_FONT_SIZE = 16
+
+-- Icon of each CONFIG:GetSpecialMod value shown in the Auto slot (Auto itself follows CONFIG:GetAutoStatus)
+local SPECIAL_ICONS = { [2] = "Flawless", [3] = "Timed", [4] = "TimedHard" }
 
 -- ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -143,16 +146,19 @@ function draw(x, y, player, layout, alpha)
     drawIcon(ssIcon, x + ox[7], y + oy[7], alpha)
     drawValue(songValueText(songSpeed), ssIcon, x + ox[7], y + oy[7], alpha)
 
-    -- Slot 8: Auto
-    if CONFIG:GetAutoStatus(player) then drawIcon(tx["Auto"], x + ox[8], y + oy[8], alpha)
-    else                                 drawIcon(tx["None"], x + ox[8], y + oy[8], alpha)
+    -- Slot 8: the special mod, else Auto (auto-play or a replay). The AI battle's AI plays under none of its own.
+    local special = SPECIAL_ICONS[CONFIG:GetSpecialMod(player)]
+    if CONFIG.IsAIBattleMode and player == 1 then special = nil end
+    if special ~= nil then                   drawIcon(tx[special], x + ox[8], y + oy[8], alpha)
+    elseif CONFIG:GetAutoStatus(player) then drawIcon(tx["Auto"],  x + ox[8], y + oy[8], alpha)
+    else                                     drawIcon(tx["None"],  x + ox[8], y + oy[8], alpha)
     end
 end
 
 -- Draw the mod icons for an arbitrary recorded play (e.g. a replay) instead of a live player's CONFIG.
 -- mods   : the replay's ModFlags bitfield (see CSongReplay.EModFlag)
 -- scroll : scroll-speed value (9 = x1), song : song-speed value (20 = x1), timing : timing zone (2 = Normal)
--- The Auto slot is intentionally omitted here (replay cards don't show Auto).
+-- The last slot shows the play's special mod when it has one; Auto is never recorded, so it stays empty otherwise.
 function drawFlags(x, y, mods, scroll, song, timing, layout, alpha)
     if not _isActive then return end
     mods = mods or 0
@@ -213,7 +219,12 @@ function drawFlags(x, y, mods, scroll, song, timing, layout, alpha)
         or tx["None"]
     drawIcon(ssIcon, x + ox[7], y + oy[7], alpha)
     drawValue(songValueText(sp), ssIcon, x + ox[7], y + oy[7], alpha)
-    -- (Slot 8 / Auto intentionally not drawn for replay cards)
+
+    -- Slot 8: Flawless / Timed / Timed (Hard)
+    for _, v in ipairs{ { MOD.Flawless or -1, "Flawless" }, { MOD.TimedHard or -1, "TimedHard" }, { MOD.Timed or -1, "Timed" } } do
+        local bit, name = table.unpack(v)
+        if has(bit) then drawIcon(tx[name], x + ox[8], y + oy[8], alpha); break end
+    end
 end
 
 function update(...) end
@@ -221,6 +232,9 @@ function update(...) end
 function onStart()
     tx["None"]    = TEXTURE:CreateTexture("Textures/Mods/None.png")
     tx["Auto"]    = TEXTURE:CreateTexture("Textures/Mods/Auto.png")
+    tx["Flawless"]  = TEXTURE:CreateTexture("Textures/Mods/Flawless.png")
+    tx["Timed"]     = TEXTURE:CreateTexture("Textures/Mods/Timed.png")
+    tx["TimedHard"] = TEXTURE:CreateTexture("Textures/Mods/TimedHard.png")
     tx["Doron"]   = TEXTURE:CreateTexture("Textures/Mods/Doron.png")
     tx["Stealth"] = TEXTURE:CreateTexture("Textures/Mods/Stealth.png")
     tx["Hidden"]  = TEXTURE:CreateTexture("Textures/Mods/Hidden.png")

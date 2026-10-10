@@ -19,7 +19,7 @@ namespace OpenTaikoTests {
 			return (dir, tja);
 		}
 
-		private static CSongReplay Save(string tja, string uid, int diff, int score, int mods, int seed, long ts, int version = 601) {
+		private static CSongReplay Save(string tja, string uid, int diff, int score, int mods, int seed, long ts, int version = CSongReplay.STORED_GAME_VERSION) {
 			var r = new CSongReplay(tja, 0) {
 				GameMode = 0, GameVersion = version, PlayerName = "Tester",
 				GoodCount = 50, OkCount = 10, BadCount = 2, RollCount = 5, MaxCombo = 60, BoomCount = 1, ADLibCount = 3,
@@ -199,6 +199,64 @@ namespace OpenTaikoTests {
 				var list = CSongReplay.tListReplays(dir, "uid-A", 3, 50);
 				Assert.Single(list);
 				Assert.True(list[0].OldVersion);
+			} finally { Directory.Delete(dir, true); }
+		}
+
+		// a replay with a real (empty) input log, so the full load reads past it
+		private static string SaveLoadable(string tja, int mods, int version) {
+			var r = new CSongReplay(tja, 0) {
+				GameMode = 0, GameVersion = version, PlayerName = "Tester", Score = 100, Timestamp = 1,
+				ModFlags = mods, ChartUniqueID = "uid-S", ChartDifficulty = 3, RandomSeed = 7,
+				CompressedInputs = SevenZip.Compression.LZMA.SevenZipHelper.Compress(Array.Empty<byte>()),
+			};
+			r.CompressedInputsSize = r.CompressedInputs.Length;
+			r.tSaveReplayFile();
+			return Directory.GetFiles(Path.Combine(Path.GetDirectoryName(tja), "Replay"), "Replay_*.optkr")[0];
+		}
+
+		// the special mod is saved in the mod flags and read back by the full load and by the header
+		[Theory]
+		[InlineData(ESpecialMod.Flawless)]
+		[InlineData(ESpecialMod.Timed)]
+		[InlineData(ESpecialMod.TimedHard)]
+		public void SpecialMod_RoundTripsThroughTheFile(ESpecialMod mod) {
+			var (dir, tja) = NewSong();
+			try {
+				int mods = (int)CSongReplay.EModFlag.Mirror | CSongReplay.SpecialModFlags(mod);
+				string file = SaveLoadable(tja, mods, CSongReplay.STORED_GAME_VERSION);
+
+				var rep = new CSongReplay();
+				rep.tLoadReplayFile(file);
+				Assert.Equal(mod, CSongReplay.SpecialModOf(rep.ModFlags));
+				Assert.Equal(7, rep.RandomSeed);
+
+				var h = CSongReplay.tParseHeader(file);
+				Assert.Equal(mod, CSongReplay.SpecialModOf(h.ModFlags));
+				Assert.True(h.Watchable);
+				Assert.False(h.OldVersion);
+			} finally { Directory.Delete(dir, true); }
+		}
+
+		// a replay of version 601 holds no special mod: it loads, plays as None and is flagged as older
+		[Fact]
+		public void Version601Replay_LoadsWithoutASpecialMod() {
+			var (dir, tja) = NewSong();
+			try {
+				string file = SaveLoadable(tja, (int)CSongReplay.EModFlag.Mirror, 601);
+
+				var rep = new CSongReplay();
+				rep.tLoadReplayFile(file);
+				Assert.Equal(601, rep.GameVersion);
+				Assert.Equal((int)CSongReplay.EModFlag.Mirror, rep.ModFlags);
+				Assert.Equal(ESpecialMod.None, CSongReplay.SpecialModOf(rep.ModFlags));
+				Assert.Equal(7, rep.RandomSeed);
+				rep.tEvaluateWarnings(tja);
+				Assert.True(rep.WarnOldVersion);
+
+				var h = CSongReplay.tParseHeader(file);
+				Assert.True(h.OldVersion);
+				Assert.True(h.Watchable);
+				Assert.Equal(ESpecialMod.None, CSongReplay.SpecialModOf(h.ModFlags));
 			} finally { Directory.Delete(dir, true); }
 		}
 

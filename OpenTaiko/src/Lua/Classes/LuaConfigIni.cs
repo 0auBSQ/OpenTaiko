@@ -91,6 +91,11 @@ namespace OpenTaiko {
 			OpenTaiko.ConfigIni.bAutoPlay[player] = isAuto;
 		}
 
+		public override void SetSpecialMod(int player, int mod) {
+			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return;
+			if (Enum.IsDefined(typeof(ESpecialMod), (ESpecialMod)mod)) OpenTaiko.ConfigIni.SetSpecialMod(player, (ESpecialMod)mod);
+		}
+
 		public override void SetRandomMod(int player, int mode) {
 			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return;
 			if (Enum.IsDefined(typeof(ERandomMode), (ERandomMode)mode)) OpenTaiko.ConfigIni.eRandom[player] = (ERandomMode)mode;

@@ -217,7 +217,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		}
 
 		if (bPlayState) {
-			this.actGame.tTatakikiriShow_Initialize();
+			this.actGame.Initialize();
 
 			for (int i = 0; i < 5; i++) {
 				if (bIsAlreadyCleared[i]) {
@@ -421,10 +421,11 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i) {
 					if (this.stageAbortType[i] == EStageAbort.Max)
 						continue;
-					// a replay plays without the watcher's Risky setting, which it does not record
-					EStageAbort failType = (this.actGauge.IsRiskyFailed(i) && !OpenTaiko.bReplayMode[i]) ? EStageAbort.FailedStopSkipResult
-						: (this.actGame.stTatakikiriShow.ctRemainingTime.IsEnded
-							|| (isTower && OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives <= 0)) ? EStageAbort.FailedStop
+					// Flawless and Timed: with several players the player fails like on a hard gauge, alone the play stops;
+					// a watched Flawless replay was recorded with several players, so it fails the same way
+					EStageAbort failType = this.actGauge.IsFlawlessFailed(i) ? ((this.isMultiPlay || OpenTaiko.bReplayMode[i]) ? EStageAbort.FailedFlow : EStageAbort.FailedStopSkipResult)
+						: this.actGame.IsTimeUp(i) ? (this.isMultiPlay ? EStageAbort.FailedFlow : EStageAbort.FailedStop)
+						: (isTower && OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives <= 0) ? EStageAbort.FailedStop
 						: this.actGauge.IsRiskyMineFailed(i) ? EStageAbort.FailedFlow
 						: EStageAbort.None;
 					if (failType > this.stageAbortType[i])
@@ -484,8 +485,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			if (!BGA_Shown && !OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.ConfigIni.ShowMob)
 				this.actMob.Draw();
 
-			if (OpenTaiko.ConfigIni.eGameMode != EGame.Off)
-				this.actGame.Draw();
+			this.actGame.Draw();
 
 			this.tProgressDraw_ChartScrollSpeed();
 			this.tProgressDraw_ChipAnime();
@@ -511,6 +511,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			// bIsFinishedPlaying was dependent on 2P in this case
 
 			this.actDan.Draw();
+			this.actGame.DrawTimers();
 
 			// Layer: notes & bar lines. Players under the Flashlight canvas draw first, then the canvas,
 			// then the players it must not darken (their judge frames included).
@@ -780,7 +781,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	public CActImplLaneTaiko actLaneTaiko;
 	public CActImplFlashlight actFlashlight;
 	public CActImplClearAnimation actEnd;
-	private CActPlayDrumsGameMode actGame;
+	public CActPlayDrumsGameMode actGame;
 	public CActImplTrainingMode actTokkun;
 	public CActImplBackground actBackground;
 	public GoGoSplash GoGoSplash;
@@ -834,9 +835,12 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		if (eJudge == ENoteJudge.Miss)
 			return ENoteJudge.Miss;
 
-		this.actGame.tTatakikiriShow_IncreaseValuesFromJudge(eJudge, (int)((long)nHitTime - pChip.nSoundTimems));
+		this.actGame.OnJudge(nPlayer, eJudge, (int)((long)nHitTime - pChip.nSoundTimems), (long)nHitTime);
 		return eJudge;
 	}
+
+	protected override void OnNoteMissed(int nPlayer, double msTjaTime)
+		=> this.actGame.OnJudge(nPlayer, ENoteJudge.Miss, 0, (long)msTjaTime);
 
 	protected override void DrumsScrollSpeedUp() {
 		OpenTaiko.ConfigIni.nScrollSpeed[0] = Math.Min(OpenTaiko.ConfigIni.nScrollSpeed[0] + 1, CConfigIni.MaximumScrollSpeed);
@@ -1203,7 +1207,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				}
 
 				if (pChip.nSoundTimems < (long)nPlayTime) {
-					this.actGame.stTatakikiriShow.bFirstChipHit = true;
+					this.actGame.OnNoteReached(nPlayer);
 				}
 
 				if (x > 0 - OpenTaiko.Skin.Game_Notes_Size[0] && x < OpenTaiko.Skin.Resolution[0]) {

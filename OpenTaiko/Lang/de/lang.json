@@ -190,8 +190,6 @@
 		"SETTINGS_GAME_CONTROLLERDEADZONE": "Controller-Totzone",
 		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "Passt die Totzone der Analogsticks für alle verbundenen Controller an. Kann zwischen 10% und 90% eingestellt werden.\n\nVerbinde den Controller nach dem Speichern erneut oder starte das Spiel neu, um die Änderungen zu übernehmen.",
 
-		"SETTINGS_GAME_BADCOUNT": "Kanpeki-Modus",
-		"SETTINGS_GAME_BADCOUNT_DESC": "Bestimmt, wie viele ÜBEL erlaubt sind, bevor ein Lied automatisch scheitert. Setze dies auf 0, um den Modus zu deaktivieren.",
 		"SETTINGS_GAME_NOTELOCK": "Notelock-Modus",
 		"SETTINGS_GAME_NOTELOCK_DESC": "Bestimmt, ob das Treffen im Raum zwischen den Noten als ÜBEL gewertet wird.",
 		"SETTINGS_GAME_AILEVEL": "KI-Level",
@@ -236,8 +234,6 @@
 		"SETTINGS_GAME_BRANCHGUIDE_DESC": "Bestimmt, ob ein numerischer Leitfaden angezeigt wird, um zu sehen, welcher Zweig gewählt wird. Im Auto-Modus wird er nicht angezeigt.",
 		"SETTINGS_GAME_BIGNOTEJUDGE": "Große Noten-Bewertung",
 		"SETTINGS_GAME_BIGNOTEJUDGE_DESC": "Bestimmt, ob große Noten durch das Treffen mit 2 Tasten belohnt werden. Wenn dies aktiviert ist, führt das Treffen mit 1 Taste zu einer visuellen Verzögerung, bevor sie verschwinden. Treffer mit 2 Tasten bringen doppelte Punkte. Wenn dies deaktiviert ist, werden sie mit 1 Taste wie normale Noten getroffen. Doppelte Punkte werden trotzdem vergeben. Versuche, sie mit 2 Tasten zu treffen, können dazu führen, dass die nächste Note getroffen wird.",
-		"SETTINGS_GAME_SURVIVAL": "Überlebensmodus",
-		"SETTINGS_GAME_SURVIVAL_DESC": "Dieser Modus ist defekt. Er implementiert ein Timersystem ähnlich wie Stepmania-Kurse, aber einige Codes fehlen, sodass die Funktionalität begrenzt ist.",
 		"SETTINGS_GAME_SCOREMODE": "Punkte-Modus",
 		"SETTINGS_GAME_SCOREMODE_DESC": "Wählt die Formel, die zur Berechnung der Punkte verwendet wird.\nTYP-A: 1. Generation\nTYP-B: 2. Generation\nTYP-C: 3. Generation",
 		"SETTINGS_GAME_SHINUCHI": "Shin'uchi-Modus",
@@ -552,7 +548,19 @@
 		"MOD_TIMING2": "Nachsichtig",
 		"MOD_TIMING3": "Normal",
 		"MOD_TIMING4": "Streng",
-		"MOD_TIMING5": "Genau"
+		"MOD_TIMING5": "Genau",
+		"MOD_SPECIAL": "Spezial-Mods",
+		"MOD_SPECIAL_DESC": "Wähle eine Sonderregel: einem Auto-Play zusehen oder eine Herausforderung annehmen, an der das Spiel scheitern kann.",
+		"MOD_SPECIAL1": "Keine",
+		"MOD_SPECIAL1_DESC": "Ohne Sonderregel spielen.",
+		"MOD_SPECIAL2": "Auto",
+		"MOD_SPECIAL2_DESC": "Sieh einem perfekten Auto-Play der CPU zu.",
+		"MOD_SPECIAL3": "Makellos",
+		"MOD_SPECIAL3_DESC": "Ein einziges ÜBEL oder eine verpasste Note lässt das Spiel scheitern.",
+		"MOD_SPECIAL4": "Auf Zeit",
+		"MOD_SPECIAL4_DESC": "Ein Timer läuft ab, solange Noten kommen. Gutes Spiel bringt Zeit zurück: Bei null scheitert das Spiel.",
+		"MOD_SPECIAL5": "Auf Zeit (Schwer)",
+		"MOD_SPECIAL5_DESC": "Auf Zeit, mit deutlich strengeren Regeln für den Zeitgewinn."
 	},
 	// In the case that a key is missing, this message will display, with the name of the missing/unknown key.
 	"InvalidKey": "TASTE NICHT GEFUNDEN: {0}",

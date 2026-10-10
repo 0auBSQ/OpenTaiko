@@ -257,6 +257,8 @@ SHARED:GetSharedSound("Decide"):Play()
 | `CONFIG:SetTimingZone(player, zone)  -> nil` | 设置该玩家的判定区间，限制在 0..4。 |
 | `CONFIG:GetAutoStatus(player)  -> bool` | 该玩家处于自动演奏或正在观看回放时为 true。 |
 | `CONFIG:SetAutoStatus(player, isAuto)  -> nil` | 为该玩家启用或禁用自动演奏。 |
+| `CONFIG:GetSpecialMod(player)  -> int` | 该玩家的特殊 Mod：0 无，1 Auto，2 Flawless（一次失误即演奏失败），3 Timed，4 Timed (Hard)。自动演奏开启时始终为 1；索引超出范围时为 0。 |
+| `CONFIG:SetSpecialMod(player, mod)  -> nil` | 设置该玩家的特殊 Mod，并忽略未定义的值。1 开启自动演奏，其他值将其关闭。 |
 | `CONFIG:GetRandomMod(player)  -> int` | 该玩家的随机 Mod（见 `CONFIG.RANDOM`）；索引超出范围时为 Off。 |
 | `CONFIG:SetRandomMod(player, mode)  -> nil` | 设置该玩家的随机 Mod，并忽略未定义的值。 |
 | `CONFIG:GetFunMod(player)  -> int` | 该玩家的趣味 Mod（见 `CONFIG.FUN`）；索引超出范围时为 None。 |

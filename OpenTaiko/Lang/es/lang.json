@@ -190,8 +190,6 @@
 		"SETTINGS_GAME_CONTROLLERDEADZONE": "Zona muerta del Mando",
 		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "Ajusta la zona muerta del joystick para todos los mandos conectados. Puede ser de 10% a 90%.\n\nDespués de guardar, vuelva a conectar el mando o reinicia el juego para aplicar los cambios.",
 
-		"SETTINGS_GAME_BADCOUNT": "Modo Kanpeki",
-		"SETTINGS_GAME_BADCOUNT_DESC": "Elige cuántos MALos se permiten antes de una canción se pierde automáticamente. Establezca esto en 0 para deshabilitar el modo.",
 		"SETTINGS_GAME_NOTELOCK": "Modo de Bloqueo de Notas",
 		"SETTINGS_GAME_NOTELOCK_DESC": "Activa si golpear en espacios entre notas cuenta como un MAL.",
 		"SETTINGS_GAME_AILEVEL": "Nivel de IA",
@@ -236,8 +234,6 @@
 		"SETTINGS_GAME_BRANCHGUIDE_DESC": "Activa una guía numérica que se muestra para ver cuál rama se va a escoger. No se muestra en modo auto.",
 		"SETTINGS_GAME_BIGNOTEJUDGE": "Juicio de Nota Grande",
 		"SETTINGS_GAME_BIGNOTEJUDGE_DESC": "Alterna si las notas grandes recompensan ser golpeadas con 2 teclas. Si está activado, usar 1 tecla provocará un retraso visual antes de que desaparezcan. Golpes con 2 teclas otorgarán el doble de puntos. Si está desactivado, usar 1 tecla los golpeará como una nota normal. Aún se otorgarán puntos dobles. Intentar golpearlos con 2 teclas puede hacer que se golpee la siguiente nota.",
-		"SETTINGS_GAME_SURVIVAL": "Modo Supervivencia",
-		"SETTINGS_GAME_SURVIVAL_DESC": "Este modo está roto. Implementa un sistema medidor parecido a los cursos de StepMania, pero hay código faltante así que su funcionamiento es limitado.",
 		"SETTINGS_GAME_SCOREMODE": "Modo de Puntos",
 		"SETTINGS_GAME_SCOREMODE_DESC": "Elige el método para calcular los puntos.\nTYPE-A: Gen-1\nTYPE-B: Gen-2\nTYPE-C: Gen-3",
 		"SETTINGS_GAME_SHINUCHI": "Modo Shin'uchi",
@@ -552,7 +548,19 @@
 		"MOD_TIMING2": "Permisivo",
 		"MOD_TIMING3": "Normal",
 		"MOD_TIMING4": "Estricto",
-		"MOD_TIMING5": "Riguroso"
+		"MOD_TIMING5": "Riguroso",
+		"MOD_SPECIAL": "Mods especiales",
+		"MOD_SPECIAL_DESC": "Elige una regla especial: mirar un auto-play o aceptar un desafío que puede hacer fallar la partida.",
+		"MOD_SPECIAL1": "Ninguno",
+		"MOD_SPECIAL1_DESC": "Juega sin regla especial.",
+		"MOD_SPECIAL2": "Auto",
+		"MOD_SPECIAL2_DESC": "Mira un auto-play perfecto de la CPU.",
+		"MOD_SPECIAL3": "Impecable",
+		"MOD_SPECIAL3_DESC": "Un solo MALO o una nota perdida hace fallar la partida.",
+		"MOD_SPECIAL4": "Contrarreloj",
+		"MOD_SPECIAL4_DESC": "Un temporizador avanza mientras llegan notas. Juega bien para recuperar tiempo: al llegar a cero, la partida falla.",
+		"MOD_SPECIAL5": "Contrarreloj (Difícil)",
+		"MOD_SPECIAL5_DESC": "Contrarreloj, con reglas mucho más estrictas para recuperar tiempo."
 	},
 	// In the case that a key is missing, this message will display, with the name of the missing/unknown key.
 	"InvalidKey": "La clave no se ha encontrado: {0}",

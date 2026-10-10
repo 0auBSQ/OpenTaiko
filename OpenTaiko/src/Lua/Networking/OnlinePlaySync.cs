@@ -8,7 +8,9 @@ namespace OpenTaiko {
 	// One guarded call from the drum performance screen's Draw(). No-op unless LuaNetworking.Active.PlaySyncActive
 	// (i.e. the onlinelobby bracketed this play round with NET:BeginPlaySync), so normal solo/local play is
 	// untouched. Each frame it:
-	//   • broadcasts the local spot-0 running score + gauge + good/ok/bad counts (~6-7x/sec) on "ps";
+	//   • broadcasts the local spot-0 running score + gauge + good/ok/bad counts (~6-7x/sec) on "ps", with its Timed
+	//     timer when it plays under that special mod: a remote spot's timer is only shown, never computed here,
+	//     and with "f" once it has failed, which fails the remote spot the way a hard gauge at 0 does;
 	//   • for each REMOTE spot, snaps its displayed score + gauge to that peer's latest broadcast (snapping = the
 	//     score updates with no count-up animation), while the spot auto-hits its own chart with judges sampled
 	//     from those broadcast rates (see CStagePlayScreenCommon.AlterJudgement) - remote spots are lanes of the
@@ -35,7 +37,23 @@ namespace OpenTaiko {
 			} catch { }
 		}
 
-		public static void Tick(CStagePlayScreenCommon screen) {
+		// The Timed timer on "ps": "tm" is the owner's timer in ms (below 0 while its digits are hidden) and "ta" the
+		// added seconds it shows. Each is left out when it does not apply, as for a player not under Timed.
+		internal static void WriteTimer(JObject ps, (int msElapsed, int? addedSeconds)? timer) {
+			if (timer == null) return;
+			ps["tm"] = timer.Value.msElapsed;
+			if (timer.Value.addedSeconds != null) ps["ta"] = timer.Value.addedSeconds.Value;
+		}
+		internal static (int? msElapsed, int? addedSeconds) ReadTimer(JObject ps)
+			=> ((int?)ps["tm"], (int?)ps["ta"]);
+
+		// The owner's failed status on "ps": "f" is written once the player has failed and left out before.
+		internal static void WriteFailed(JObject ps, bool failed) {
+			if (failed) ps["f"] = 1;
+		}
+		internal static bool ReadFailed(JObject ps) => (int?)ps["f"] == 1;
+
+		public static void Tick(CStagePlayDrumsScreen screen) {
 			var net = LuaNetworking.Active;
 			if (net == null || !net.PlaySyncActive) return;
 			try {
@@ -55,6 +73,9 @@ namespace OpenTaiko {
 						// snap the combo counter too, so a remote spot's combo tracks the wire like its score
 						if (o["co"] != null && screen.actCombo != null)
 							screen.actCombo.nCurrentCombo[spot] = (int)o["co"];
+						var (msTimer, addedSeconds) = ReadTimer(o);
+						screen.actGame.SetRemoteTimer(spot, msTimer, addedSeconds);
+						if (ReadFailed(o) && !screen.IsStageFailed(spot)) screen.SetStageFailed(spot);
 					} catch { }
 				}
 
@@ -70,6 +91,8 @@ namespace OpenTaiko {
 					gauge = screen.actGauge.dbCurrentGaugeValue[0];
 				} catch { }
 				var p = new JObject { ["n"] = net.SelfPlayName, ["s"] = score, ["g"] = gauge, ["a"] = Math.Round(acc, 2), ["gr"] = gr, ["gd"] = gd, ["ms"] = ms, ["co"] = combo };
+				WriteTimer(p, screen.actGame.OwnTimer());
+				WriteFailed(p, screen.IsStageFailed(0));
 				net.PushPlayScore(p.ToString(Newtonsoft.Json.Formatting.None));
 			} catch { }
 		}

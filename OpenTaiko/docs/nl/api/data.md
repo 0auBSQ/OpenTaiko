@@ -257,6 +257,8 @@ Eigenschappen gebruiken puntsyntaxis (`CONFIG.PlayerCount`), methoden gebruiken 
 | `CONFIG:SetTimingZone(player, zone)  -> nil` | Stelt het beoordelingsvenster van de speler in, begrensd op 0..4. |
 | `CONFIG:GetAutoStatus(player)  -> bool` | True wanneer de speler op auto-play staat of een replay bekijkt. |
 | `CONFIG:SetAutoStatus(player, isAuto)  -> nil` | Schakelt auto-play voor de speler in of uit. |
+| `CONFIG:GetSpecialMod(player)  -> int` | De speciale mod van de speler: 0 geen, 1 Auto, 2 Flawless (één misser en het spel mislukt), 3 Timed, 4 Timed (Hard). 1 zodra auto-play aan staat; 0 voor indices buiten bereik. |
+| `CONFIG:SetSpecialMod(player, mod)  -> nil` | Stelt de speciale mod van de speler in en negeert niet-gedefinieerde waarden. 1 zet auto-play aan, elke andere waarde zet het uit. |
 | `CONFIG:GetRandomMod(player)  -> int` | De random-mod van de speler (zie `CONFIG.RANDOM`); Off voor indices buiten bereik. |
 | `CONFIG:SetRandomMod(player, mode)  -> nil` | Stelt de random-mod van de speler in en negeert niet-gedefinieerde waarden. |
 | `CONFIG:GetFunMod(player)  -> int` | De fun-mod van de speler (zie `CONFIG.FUN`); None voor indices buiten bereik. |

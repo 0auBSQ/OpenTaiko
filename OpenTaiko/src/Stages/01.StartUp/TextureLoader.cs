@@ -597,7 +597,6 @@ class TextureLoader {
 
 		#region GameMode
 
-		GameMode_Timer_Tick = TxC(GAME + GAMEMODE + @$"Timer_Tick.png");
 		GameMode_Timer_Frame = TxC(GAME + GAMEMODE + @$"Timer_Frame.png");
 
 		#endregion
@@ -1075,8 +1074,7 @@ class TextureLoader {
 		Lane_Background_GoGo;
 	#endregion
 	#region ゲームモード
-	public CTexture GameMode_Timer_Frame,
-		GameMode_Timer_Tick;
+	public CTexture GameMode_Timer_Frame;
 	#endregion
 	#region ランナー
 	//public CTexture Runner;

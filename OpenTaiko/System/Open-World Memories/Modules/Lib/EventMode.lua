@@ -84,6 +84,7 @@ function EM.resetMods()
             CONFIG:SetFunMod(p, 0)
             CONFIG:SetGameType(p, 0)
             CONFIG:SetAutoStatus(p, false)
+            CONFIG:SetSpecialMod(p, 0)
         end
         CONFIG.SongSpeed = 20
     end)

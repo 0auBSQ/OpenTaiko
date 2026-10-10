@@ -257,6 +257,8 @@ Eigenschaften verwenden Punktsyntax (`CONFIG.PlayerCount`), Methoden Doppelpunkt
 | `CONFIG:SetTimingZone(player, zone)  -> nil` | Setzt das Trefferfenster des Spielers, begrenzt auf 0..4. |
 | `CONFIG:GetAutoStatus(player)  -> bool` | True, wenn der Spieler auf Auto-Play steht oder ein Replay ansieht. |
 | `CONFIG:SetAutoStatus(player, isAuto)  -> nil` | Aktiviert oder deaktiviert Auto-Play für den Spieler. |
+| `CONFIG:GetSpecialMod(player)  -> int` | Der Spezial-Mod des Spielers: 0 keiner, 1 Auto, 2 Flawless (ein Fehler lässt das Spiel scheitern), 3 Timed, 4 Timed (Hard). 1, sobald Auto-Play an ist; 0 für Indizes außerhalb des Bereichs. |
+| `CONFIG:SetSpecialMod(player, mod)  -> nil` | Setzt den Spezial-Mod des Spielers und ignoriert undefinierte Werte. 1 schaltet Auto-Play ein, jeder andere Wert schaltet es aus. |
 | `CONFIG:GetRandomMod(player)  -> int` | Der Random-Mod des Spielers (siehe `CONFIG.RANDOM`); Off für Indizes außerhalb des Bereichs. |
 | `CONFIG:SetRandomMod(player, mode)  -> nil` | Setzt den Random-Mod des Spielers und ignoriert undefinierte Werte. |
 | `CONFIG:GetFunMod(player)  -> int` | Der Fun-Mod des Spielers (siehe `CONFIG.FUN`); None für Indizes außerhalb des Bereichs. |

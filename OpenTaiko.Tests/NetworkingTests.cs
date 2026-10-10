@@ -311,6 +311,41 @@ namespace OpenTaikoTests {
 				Assert.Equal(50, host.GetSpotBadOdds(1));    // 5 / 100 → 50 per mille
 				Assert.Equal(150, host.GetSpotGoodOdds(1));  // 15 / 100 → 150 per mille
 
+				// a frame without the Timed fields (a player not under Timed, or an older build): no timer for the spot
+				var (noTimer, noAdded) = OnlinePlaySync.ReadTimer(live);
+				Assert.Null(noTimer);
+				Assert.Null(noAdded);
+
+				// TIMED: the owner's timer value and the shown added seconds ride the same frame; the host only reads them
+				var timed = JObject.Parse("{\"n\":\"C\",\"s\":130000,\"g\":50.0,\"a\":97.5,\"gr\":85,\"gd\":15,\"ms\":5,\"co\":47}");
+				OnlinePlaySync.WriteTimer(timed, (21500, 12));
+				cli.PushPlayScore(timed.ToString(Newtonsoft.Json.Formatting.None));
+				Assert.True(WaitUntil(() => host.GetSpotPlayJson(1).Contains("\"tm\"")));
+				live = JObject.Parse(host.GetSpotPlayJson(1));
+				var (msTimer, addedSeconds) = OnlinePlaySync.ReadTimer(live);
+				Assert.Equal(21500, msTimer);
+				Assert.Equal(12, addedSeconds);
+				Assert.Equal(47, (int)live["co"]);           // the other fields are untouched
+
+				// hidden digits (-1) with nothing added, and a player not under Timed (no field written)
+				var held = new JObject();
+				OnlinePlaySync.WriteTimer(held, (-1, null));
+				Assert.Equal(-1, OnlinePlaySync.ReadTimer(held).msElapsed);
+				Assert.Null(OnlinePlaySync.ReadTimer(held).addedSeconds);
+				var none = new JObject();
+				OnlinePlaySync.WriteTimer(none, null);
+				Assert.False(none.HasValues);
+
+				// FAILED: nothing is written before the failure (so the frames above carry none), then "f" rides the same frame
+				Assert.False(OnlinePlaySync.ReadFailed(live));
+				OnlinePlaySync.WriteFailed(none, false);
+				Assert.False(none.HasValues);
+				var failed = JObject.Parse("{\"n\":\"C\",\"s\":130000,\"g\":0.0,\"a\":97.5,\"gr\":85,\"gd\":15,\"ms\":6,\"co\":0}");
+				OnlinePlaySync.WriteFailed(failed, true);
+				cli.PushPlayScore(failed.ToString(Newtonsoft.Json.Formatting.None));
+				Assert.True(WaitUntil(() => host.GetSpotPlayJson(1).Contains("\"f\"")));
+				Assert.True(OnlinePlaySync.ReadFailed(JObject.Parse(host.GetSpotPlayJson(1))));
+
 				// FINISH: client reports its real final tally → host can read every result field for that spot
 				cli.ReportFinished("{\"cl\":true,\"fc\":false,\"pf\":false,\"mx\":false,\"gr\":820,\"gd\":30,\"ms\":4,\"rl\":12,\"bl\":3,\"ad\":2,\"hc\":777,\"sc\":998877}");
 				Assert.True(WaitUntil(() => host.GetSpotJudge(1, "gr") >= 0));

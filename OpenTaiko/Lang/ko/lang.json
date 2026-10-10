@@ -192,8 +192,6 @@
 		"SETTINGS_GAME_CONTROLLERDEADZONE": "컨트롤러 데드존",
 		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "연결된 컨트롤러의 조이스틱 데드존을 조정할 수 있습니다. 범위는 10%에서 90% 사이로 설정할 수 있습니다. 게임을 재시작하여야 변경 사항이 적용됩니다.",
 
-		"SETTINGS_GAME_BADCOUNT": "완벽하게 모드",
-		"SETTINGS_GAME_BADCOUNT_DESC": "노래가 자동으로 실패하기 전에 허용되는 BAD 수를 선택합니다. 모드를 비활성화하려면 이 값을 0으로 설정하세요.",
 		"SETTINGS_GAME_NOTELOCK": "노트잠금 모드",
 		"SETTINGS_GAME_NOTELOCK_DESC": "음표 사이의 공백에서 치는 것을 BAD로 간주할지 설정합니다.",
 		"SETTINGS_GAME_AILEVEL": "AI 레벨",
@@ -238,8 +236,6 @@
 		"SETTINGS_GAME_BRANCHGUIDE_DESC": "어떤 분기를 선택할지 보기 위해 숫자 가이드를 표시할지 여부를 설정합니다. 자동 모드에서는 표시되지 않습니다.",
 		"SETTINGS_GAME_BIGNOTEJUDGE": "큰 노트 판정",
 		"SETTINGS_GAME_BIGNOTEJUDGE_DESC": "큰 음표를 두 개의 키로 칠지 여부를 설정합니다. 이 옵션이 겨져있으면, 한 개의 키를 사용하면 사라지기 전에 시각적 지연이 발생합니다(콘솔 버전처럼). 두 개의 키로 치면 두 배의 점수가 부여됩니다. 이 옵션이 꺼져있으면, 한 개의 키를 사용해도 일반 음표처럼 치게 됩니다. 두 배의 점수는 여전히 부여됩니다. 2개로 치려고 하면 다음 음표가 대신 치게 될 수 있습니다.",
-		"SETTINGS_GAME_SURVIVAL": "서바이벌 모드",
-		"SETTINGS_GAME_SURVIVAL_DESC": "이 모드는 작동하지 않습니다.",
 		"SETTINGS_GAME_SCOREMODE": "스코어 방식",
 		"SETTINGS_GAME_SCOREMODE_DESC": "점수 결정에 사용되는 방식을 선택합니다.\nTYPE-A: Gen-1\nTYPE-B: Gen-2\nTYPE-C: Gen-3",
 		"SETTINGS_GAME_SHINUCHI": "진타 모드",
@@ -554,7 +550,19 @@
 		"MOD_TIMING2": "느슨하게",
 		"MOD_TIMING3": "보통",
 		"MOD_TIMING4": "엄격하게",
-		"MOD_TIMING5": "더 엄격하게"
+		"MOD_TIMING5": "더 엄격하게",
+		"MOD_SPECIAL": "스페셜 모드",
+		"MOD_SPECIAL_DESC": "특별 규칙을 하나 고릅니다. 오토 플레이를 감상하거나, 플레이에 실패할 수 있는 도전에 나서 보세요.",
+		"MOD_SPECIAL1": "없음",
+		"MOD_SPECIAL1_DESC": "특별 규칙 없이 플레이합니다.",
+		"MOD_SPECIAL2": "오토",
+		"MOD_SPECIAL2_DESC": "CPU의 완벽한 오토 플레이를 감상합니다.",
+		"MOD_SPECIAL3": "완벽",
+		"MOD_SPECIAL3_DESC": "BAD나 놓친 음표가 하나라도 나오면 플레이에 실패합니다.",
+		"MOD_SPECIAL4": "타이머",
+		"MOD_SPECIAL4_DESC": "음표가 나오는 동안 타이머가 줄어듭니다. 잘 연주하면 시간을 되찾고, 0이 되면 플레이에 실패합니다.",
+		"MOD_SPECIAL5": "타이머 (하드)",
+		"MOD_SPECIAL5_DESC": "타이머와 같지만 시간을 되찾는 조건이 훨씬 엄격합니다."
 	},
   // In the case that a key is missing, this message will display, with the name of the missing/unknown key.
   "InvalidKey": "KEY NOT FOUND: {0}",

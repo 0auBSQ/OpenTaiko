@@ -230,7 +230,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		this.nLoopCount_Clear = 1;
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			actGauge.Init(OpenTaiko.ConfigIni.nRisky, i);                                  // #23559 2011.7.28 yyagi
+			actGauge.Init(i);
 		}
 		this.nPolyphonicSounds = OpenTaiko.ConfigIni.nPoliphonicSounds;
 
@@ -816,7 +816,6 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 
 	protected CTexture? txBgImage;
 
-	//		protected int nRisky_InitialVar, nRiskyTime;		// #23559 2011.7.28 yyagi → CAct演奏ゲージ共通クラスに隠蔽
 	protected int nPolyphonicSounds;
 	protected List<CChip>[] listChip = Enumerable.Repeat(new List<CChip> { }, OpenTaiko.MAX_PLAYERS).ToArray();
 	protected Dictionary<int, CTja.CWAV> listWAV = [];
@@ -2309,11 +2308,13 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		return (msTjaDTime_Future < msTjaDTime_Past) ? futureFirstUnhit : pastFirstUnhit;
 	}
 
+	// whether a note still to be judged lies between the bad zone behind the given time and the range ahead of it
 	public bool rIsChipInSearchRange(long msTjaTime, int nSearchRangeTimems, int nPlayer) {
 		int idxFirstAfterRange = GetIdxChipAtOrAfter(nPlayer, msTjaTime + nSearchRangeTimems);
-		for (int i = idxFirstAfterRange; i-- > 0;) {
+		int idxFirstPending = GetIdxChipAtOrAfter(nPlayer, msTjaTime - (this.timingZones[nPlayer]?.nBadZone ?? 0));
+		for (int i = idxFirstPending; i < idxFirstAfterRange; ++i) {
 			CChip chip = listChip[nPlayer][i];
-			if (chip.bVisible && !chip.bHit && NotesManager.IsMissableNote(chip)) {
+			if (chip.bVisible && !chip.bHit && !chip.IsMissed && NotesManager.IsMissableNote(chip)) {
 				return true;
 			}
 		}
@@ -2601,6 +2602,9 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		}
 	}
 	public bool IsStageFailed(int iPlayer) => stageAbortType[iPlayer] != EStageAbort.None;
+	// the special mod this machine judges the player under
+	public ESpecialMod JudgedSpecialMod(int iPlayer)
+		=> SpecialMods.Judged(OpenTaiko.ConfigIni, iPlayer, LuaNetworking.Active?.IsRemoteSpot(iPlayer) == true);
 	public EStageAbort MinStageAbortType => stageAbortType.Take(OpenTaiko.ConfigIni.nPlayerCount).Min();
 	public bool IsStageFailed() => MinStageAbortType != EStageAbort.None;
 	public bool IsFailStopped() => !OpenTaiko.ConfigIni.bAIBattleMode && MinStageAbortType >= EStageAbort.FailedStop;
@@ -3669,11 +3673,16 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 						pChip.IsMissed = true;
 						this.tChipHitProcess(msTjaHitTime, pChip, EKeyConfigPart.Taiko, false, 0, nPlayer);
 						pChip.eNoteState = ENoteState.Bad; // set after hit processing for detecting duplicated misses
+						if (NotesManager.IsMissableNote(pChip))
+							this.OnNoteMissed(nPlayer, msTjaHitTime);
 					}
 				}
 			}
 		}
 	}
+
+	// a note the player let pass was counted as a miss
+	protected virtual void OnNoteMissed(int nPlayer, double msTjaTime) { }
 
 	protected abstract void MultiHitNoteTimeout(int iPlayer, CChip chip, double msTjaNowTime, double msMaxPlayedTjaTime = double.PositiveInfinity);
 
@@ -4311,7 +4320,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 			this.actCombo.Activate();
 			this.actScore.Activate();
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-				this.actGauge.Init(OpenTaiko.ConfigIni.nRisky, i);
+				this.actGauge.Init(i);
 			}
 		}
 		if (bPlayState) {

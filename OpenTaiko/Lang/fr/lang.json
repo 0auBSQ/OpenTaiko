@@ -192,8 +192,6 @@
 		"SETTINGS_GAME_CONTROLLERDEADZONE": "Zone morte des manettes",
 		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "Ajuste la zone morte des sticks pour toutes les manettes connectées. Entre 10 % et 90 %.\n\nAprès l'enregistrement, reconnectez la manette ou redémarrez le jeu pour appliquer les changements.",
 
-		"SETTINGS_GAME_BADCOUNT": "Mort subite",
-		"SETTINGS_GAME_BADCOUNT_DESC": "Mode mort subite : Si 1 ou plus, spécifiez le nombre de notes ratées maximales autorisées avant de perdre la partie. Si 0 le mode mort subite est désactivé.",
 		"SETTINGS_GAME_NOTELOCK": "Notes vérouillées",
 		"SETTINGS_GAME_NOTELOCK_DESC": "Si activé, taper le tambour entre deux notes ajoute un MAUVAIS.",
 		"SETTINGS_GAME_AILEVEL": "Niveau de l'IA",
@@ -238,8 +236,6 @@
 		"SETTINGS_GAME_BRANCHGUIDE_DESC": "Affiche un guide numérique afin de voir quelle branche sera choisie. Désactivé en mode automatique.",
 		"SETTINGS_GAME_BIGNOTEJUDGE": "Double frappes",
 		"SETTINGS_GAME_BIGNOTEJUDGE_DESC": "Impose de frapper les deux côtés du tambour afin d'obtenir le bonus x2 points pour les grandes notes.",
-		"SETTINGS_GAME_SURVIVAL": "Mode survie",
-		"SETTINGS_GAME_SURVIVAL_DESC": "Non fonctionnel.",
 		"SETTINGS_GAME_SCOREMODE": "Méthode de Scoring",
 		"SETTINGS_GAME_SCOREMODE_DESC": "Choisir la formule de calcul du score.\nTYPE-A: Gen-1\nTYPE-B: Gen-2\nTYPE-C: Gen-3",
 		"SETTINGS_GAME_SHINUCHI": "Mode Shin'uchi",
@@ -554,7 +550,19 @@
 		"MOD_TIMING2": "Permissif",
 		"MOD_TIMING3": "Normal",
 		"MOD_TIMING4": "Strict",
-		"MOD_TIMING5": "Rigoureux"
+		"MOD_TIMING5": "Rigoureux",
+		"MOD_SPECIAL": "Mods spéciaux",
+		"MOD_SPECIAL_DESC": "Choisissez une règle spéciale : regarder un jeu automatique, ou relever un défi qui peut faire échouer la partie.",
+		"MOD_SPECIAL1": "Aucun",
+		"MOD_SPECIAL1_DESC": "Jouer sans règle spéciale.",
+		"MOD_SPECIAL2": "Auto",
+		"MOD_SPECIAL2_DESC": "Regarder un jeu automatique parfait.",
+		"MOD_SPECIAL3": "Sans faute",
+		"MOD_SPECIAL3_DESC": "Une seule note ratée fait échouer la partie.",
+		"MOD_SPECIAL4": "Chrono",
+		"MOD_SPECIAL4_DESC": "Un chronomètre s'écoule tant que des notes arrivent. Jouez bien pour regagner du temps : à zéro, la partie échoue.",
+		"MOD_SPECIAL5": "Chrono (Difficile)",
+		"MOD_SPECIAL5_DESC": "Chrono, avec des règles bien plus strictes pour regagner du temps."
 	},
 	// In the case that a key is missing, this message will display, with the name of the missing/unknown key.
 	"InvalidKey": "KEY NOT FOUND: {0}",

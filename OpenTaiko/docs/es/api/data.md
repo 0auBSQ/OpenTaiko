@@ -257,6 +257,8 @@ Las propiedades usan la sintaxis de punto (`CONFIG.PlayerCount`), los métodos l
 | `CONFIG:SetTimingZone(player, zone)  -> nil` | Establece la ventana de juicio del jugador, limitada a 0..4. |
 | `CONFIG:GetAutoStatus(player)  -> bool` | Verdadero cuando el jugador está en auto-play o viendo una repetición. |
 | `CONFIG:SetAutoStatus(player, isAuto)  -> nil` | Activa o desactiva el auto-play para el jugador. |
+| `CONFIG:GetSpecialMod(player)  -> int` | El mod especial del jugador: 0 ninguno, 1 Auto, 2 Flawless (un fallo hace perder la partida), 3 Timed, 4 Timed (Hard). 1 siempre que el auto-play esté activo; 0 para índices fuera de rango. |
+| `CONFIG:SetSpecialMod(player, mod)  -> nil` | Establece el mod especial del jugador e ignora los valores no definidos. 1 activa el auto-play, cualquier otro valor lo desactiva. |
 | `CONFIG:GetRandomMod(player)  -> int` | El mod aleatorio del jugador (consulta `CONFIG.RANDOM`); Off para índices fuera de rango. |
 | `CONFIG:SetRandomMod(player, mode)  -> nil` | Establece el mod aleatorio del jugador e ignora los valores no definidos. |
 | `CONFIG:GetFunMod(player)  -> int` | El mod fun del jugador (consulta `CONFIG.FUN`); None para índices fuera de rango. |

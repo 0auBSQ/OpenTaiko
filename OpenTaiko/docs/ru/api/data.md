@@ -257,6 +257,8 @@ SHARED:GetSharedSound("Decide"):Play()
 | `CONFIG:SetTimingZone(player, zone)  -> nil` | Задаёт окно тайминга игрока, ограниченное диапазоном 0..4. |
 | `CONFIG:GetAutoStatus(player)  -> bool` | Истина, если игрок в режиме автоигры или смотрит реплей. |
 | `CONFIG:SetAutoStatus(player, isAuto)  -> nil` | Включает или выключает автоигру для игрока. |
+| `CONFIG:GetSpecialMod(player)  -> int` | Особый мод игрока: 0 нет, 1 Auto, 2 Flawless (один промах проваливает игру), 3 Timed, 4 Timed (Hard). 1, пока включена автоигра; 0 для индексов вне диапазона. |
+| `CONFIG:SetSpecialMod(player, mod)  -> nil` | Задаёт особый мод игрока и игнорирует неопределённые значения. 1 включает автоигру, любое другое значение выключает её. |
 | `CONFIG:GetRandomMod(player)  -> int` | Мод Random игрока (см. `CONFIG.RANDOM`); Off для индексов вне диапазона. |
 | `CONFIG:SetRandomMod(player, mode)  -> nil` | Задаёт мод Random игрока и игнорирует неопределённые значения. |
 | `CONFIG:GetFunMod(player)  -> int` | Фан-мод игрока (см. `CONFIG.FUN`); None для индексов вне диапазона. |

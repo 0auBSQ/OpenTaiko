@@ -8,10 +8,11 @@ class CSongReplay {
 	 * 540 = 0.5.4
 	 * 600 = 0.6.0
 	 * 601 = 0.6.1 (adds the note-shuffle RandomSeed at the end of the file)
+	 * 602 = 0.6.1 (the special mod in ModFlags; judgement, fail and clear rules changed since 601)
 	 * 700 = 0.7.0
 	 * 1000 = 1.0.0
 	 */
-	public const int STORED_GAME_VERSION = 601;
+	public const int STORED_GAME_VERSION = 602;
 	public string REPLAY_FOLDER_NAME = "Replay";
 
 	/* Mod Flags
@@ -28,6 +29,9 @@ class CSongReplay {
 	 * - 9 (512) : Dynamic Beat
 	 * - 10 (1024) : Hidden (notes fade out before the judge zone)
 	 * - 11 (2048) : Flashlight (only a circle around the judge zone is lit)
+	 * - 12 (4096) : Flawless (one miss fails)
+	 * - 13 (8192) : Timed
+	 * - 14 (16384) : Timed (Hard)
 	 */
 	[Flags]
 	public enum EModFlag {
@@ -43,8 +47,25 @@ class CSongReplay {
 		Safe = 1 << 8,
 		DynamicBeat = 1 << 9,
 		Hidden = 1 << 10,
-		Flashlight = 1 << 11
+		Flashlight = 1 << 11,
+		Flawless = 1 << 12,
+		Timed = 1 << 13,
+		TimedHard = 1 << 14
 	}
+
+	// the special mod recorded in mod flags; Auto is never recorded, and files from before 602 hold none
+	public static ESpecialMod SpecialModOf(int modFlags)
+		=> (modFlags & (int)EModFlag.Flawless) != 0 ? ESpecialMod.Flawless
+		: (modFlags & (int)EModFlag.TimedHard) != 0 ? ESpecialMod.TimedHard
+		: (modFlags & (int)EModFlag.Timed) != 0 ? ESpecialMod.Timed
+		: ESpecialMod.None;
+
+	public static int SpecialModFlags(ESpecialMod mod) => mod switch {
+		ESpecialMod.Flawless => (int)EModFlag.Flawless,
+		ESpecialMod.Timed => (int)EModFlag.Timed,
+		ESpecialMod.TimedHard => (int)EModFlag.TimedHard,
+		_ => (int)EModFlag.None,
+	};
 
 	public CSongReplay() {
 		replayFolder = "";
@@ -450,6 +471,9 @@ class CSongReplay {
 		 * - 9 (512) : Dynamic Beat
 		 * - 10 (1024) : Hidden (notes fade out before the judge zone)
 		 * - 11 (2048) : Flashlight (only a circle around the judge zone is lit)
+		 * - 12 (4096) : Flawless (one miss fails)
+		 * - 13 (8192) : Timed
+		 * - 14 (16384) : Timed (Hard)
 		 */
 		ModFlags = (int)EModFlag.None;
 		if (OpenTaiko.ConfigIni.eRandom[actualPlayer] == ERandomMode.Mirror) ModFlags |= (int)EModFlag.Mirror;
@@ -465,6 +489,7 @@ class CSongReplay {
 		if (OpenTaiko.ConfigIni.nFunMods[actualPlayer] == EFunMods.DynamicBeat) ModFlags |= (int)EModFlag.DynamicBeat;
 		if (OpenTaiko.ConfigIni.bJust[actualPlayer] == 1) ModFlags |= (int)EModFlag.Just;
 		if (OpenTaiko.ConfigIni.bJust[actualPlayer] == 2) ModFlags |= (int)EModFlag.Safe;
+		ModFlags |= SpecialModFlags(OpenTaiko.ConfigIni.GetSpecialMod(actualPlayer));
 		/* Gauge type
 		 * - 0 : Normal
 		 * - 1 : Hard
@@ -513,6 +538,7 @@ class CSongReplay {
 	private static ERandomMode _snapRandom;
 	private static EStealthMode _snapStealth;
 	private static EFunMods _snapFunMods;
+	private static ESpecialMod _snapSpecialMod;
 	private static int _snapJust, _snapScroll, _snapTimingZones, _snapSongSpeed, _snapSeed;
 	private static string _snapName;
 
@@ -522,6 +548,7 @@ class CSongReplay {
 		if (!_modsSnapped) {
 			_snapAuto = cfg.bAutoPlay[0]; _snapRandom = cfg.eRandom[0]; _snapStealth = cfg.eSTEALTH[0];
 			_snapFunMods = cfg.nFunMods[0]; _snapJust = cfg.bJust[0]; _snapScroll = cfg.nScrollSpeed[0];
+			_snapSpecialMod = cfg.eSpecialMod[0];
 			_snapTimingZones = cfg.nTimingZones[0]; _snapSongSpeed = cfg.nSongSpeed; _snapSeed = OpenTaiko.ReplaySeed[0];
 			_snapName = OpenTaiko.SaveFileInstances[0].data.Name;
 			_modsSnapped = true;
@@ -554,6 +581,7 @@ class CSongReplay {
 		cfg.nSongSpeed = SongSpeedValue;
 		cfg.nTimingZones[0] = JudgeStrictnessAdjust;
 		cfg.bAutoPlay[0] = false;   // the recorded inputs do the judging, not auto (the auto icon shows via bReplayMode)
+		cfg.eSpecialMod[0] = SpecialModOf(ModFlags);   // the replay is judged under its own special mod, not the watcher's
 		OpenTaiko.ReplaySeed[0] = RandomSeed;
 	}
 
@@ -563,6 +591,7 @@ class CSongReplay {
 		var cfg = OpenTaiko.ConfigIni;
 		cfg.bAutoPlay[0] = _snapAuto; cfg.eRandom[0] = _snapRandom; cfg.eSTEALTH[0] = _snapStealth;
 		cfg.nFunMods[0] = _snapFunMods; cfg.bJust[0] = _snapJust; cfg.nScrollSpeed[0] = _snapScroll;
+		cfg.eSpecialMod[0] = _snapSpecialMod;
 		cfg.nTimingZones[0] = _snapTimingZones; cfg.nSongSpeed = _snapSongSpeed; OpenTaiko.ReplaySeed[0] = _snapSeed;
 		if (_snapName != null) {
 			// defensive: this also runs from the game-exit path, where nameplate/save structures may be tearing down
@@ -700,6 +729,9 @@ class CSongReplay {
 	 * - 9 (512) : Dynamic Beat
 	 * - 10 (1024) : Hidden (notes fade out before the judge zone)
 	 * - 11 (2048) : Flashlight (only a circle around the judge zone is lit)
+	 * - 12 (4096) : Flawless (one miss fails)
+	 * - 13 (8192) : Timed
+	 * - 14 (16384) : Timed (Hard)
 	 */
 	public int ModFlags;
 	/* Gauge type

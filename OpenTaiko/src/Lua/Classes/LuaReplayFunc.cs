@@ -63,6 +63,9 @@ namespace OpenTaiko {
 			public const long DynamicBeat = (long)CSongReplay.EModFlag.DynamicBeat;
 			public const long Hidden = (long)CSongReplay.EModFlag.Hidden;
 			public const long Flashlight = (long)CSongReplay.EModFlag.Flashlight;
+			public const long Flawless = (long)CSongReplay.EModFlag.Flawless;
+			public const long Timed = (long)CSongReplay.EModFlag.Timed;
+			public const long TimedHard = (long)CSongReplay.EModFlag.TimedHard;
 		}
 
 		public readonly ModFlag MODFLAG = new();

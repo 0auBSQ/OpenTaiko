@@ -388,6 +388,21 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 	public bool[] bAutoPlay = new bool[5];
 
+	// each player's special mod other than Auto, which bAutoPlay holds
+	public ESpecialMod[] eSpecialMod = new ESpecialMod[5];
+
+	public ESpecialMod GetSpecialMod(int player)
+		=> this.bAutoPlay[player] ? ESpecialMod.Auto : this.eSpecialMod[player];
+
+	public void SetSpecialMod(int player, ESpecialMod mod) {
+		this.bAutoPlay[player] = (mod == ESpecialMod.Auto);
+		this.eSpecialMod[player] = (mod == ESpecialMod.Auto) ? ESpecialMod.None : mod;
+	}
+
+	// a SpecialMod value of Config.ini: Flawless, Timed or Timed (Hard), anything else is None
+	internal static ESpecialMod ParseSpecialMod(string value)
+		=> (ESpecialMod)CConversion.ParseIntInRange(value, (int)ESpecialMod.Flawless, (int)ESpecialMod.TimedHard, (int)ESpecialMod.None);
+
 	public bool bTaikoAutoCanSkipHit;
 	public bool bAutoSenseiRoll;
 	public int nRollsPerSec;
@@ -452,10 +467,8 @@ internal class CConfigIni : INotifyPropertyChanged {
 	public bool bNoInfo;
 
 	public int nRecentlyPlayedMax;
-	public EGame eGameMode;
 	public int TokkunSkipMeasures;
 	public int TokkunMashInterval;
-	public bool bSuperHard = false;
 	public bool bTokkunMode = false;
 	public int[] bJust = new int[5] { 0, 0, 0, 0, 0 };
 
@@ -537,7 +550,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 	public int nGraphicsDeviceType;
 	public bool biOSUnlimitedFrameRate; // iOS only: CADisplayLink device-max fps vs 60 (host reads at launch)
 	public bool bShowDebugHud; // iOS only: on-screen FPS/mem/stage debug overlay
-	public int nRisky; // #23559 2011.6.20 yyagi Riskyでの残ミス数。0で閉店
 	public bool bIsAllowedDoubleClickFullscreen; // #26752 2011.11.27 yyagi ダブルクリックしてもフルスクリーンに移行しない
 
 	public int
@@ -906,6 +918,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 		for (int i = 0; i < 5; i++) {
 			this.bAutoPlay[i] = false;
+			this.eSpecialMod[i] = ESpecialMod.None;
 		}
 
 		this.bAutoSenseiRoll = true;
@@ -954,7 +967,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 		#endregion
 
-		this.nRisky = 0; // #23539 2011.7.26 yyagi RISKYモード
 		this.bIsAutoResultCapture = false; // #25399 2011.6.9 yyagi リザルト画像自動保存機能ON/OFF
 
 		this.bBufferedInputs = true;
@@ -1033,7 +1045,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 		this.nMasterVolume = 100; // #33700 2014.4.26 yyagi マスターボリュームの設定(WASAPI/ASIO用)
 		this.bHispeedRandom = false;
 		this.nRecentlyPlayedMax = 5;
-		this.eGameMode = EGame.Off;
 		this.TokkunMashInterval = 750;
 		this.bEndingAnime = false;
 		this.nPlayerCount = 1; //2017.08.18 kairera0467 マルチプレイ対応
@@ -1520,6 +1531,12 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("Taiko3P={0}", this.bAutoPlay[2] ? 1 : 0);
 		sw.WriteLine("Taiko4P={0}", this.bAutoPlay[3] ? 1 : 0);
 		sw.WriteLine("Taiko5P={0}", this.bAutoPlay[4] ? 1 : 0);
+		sw.WriteLine("; Special mod (0:None, 2:Flawless, 3:Timed, 4:Timed (Hard))");
+		sw.WriteLine("SpecialMod1P={0}", (int)this.eSpecialMod[0]);
+		sw.WriteLine("SpecialMod2P={0}", (int)this.eSpecialMod[1]);
+		sw.WriteLine("SpecialMod3P={0}", (int)this.eSpecialMod[2]);
+		sw.WriteLine("SpecialMod4P={0}", (int)this.eSpecialMod[3]);
+		sw.WriteLine("SpecialMod5P={0}", (int)this.eSpecialMod[4]);
 		sw.WriteLine("TaikoAutoCanSkipHit={0}", this.bTaikoAutoCanSkipHit ? 1 : 0);
 		sw.WriteLine("TaikoAutoRoll={0}", this.bAutoSenseiRoll ? 1 : 0);
 		sw.WriteLine("RollsPerSec={0}", this.nRollsPerSec);
@@ -1574,10 +1591,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine();
 		sw.WriteLine("; ドラムREVERSEモード(0:OFF, 1:ON)");
 		sw.WriteLine("DrumsReverse={0}", this.bReverse ? 1 : 0);
-		sw.WriteLine();
-		sw.WriteLine("; RISKYモード(0:OFF, 1-10)"); // #23559 2011.6.23 yyagi
-		sw.WriteLine("; RISKY mode. 0=OFF, 1-10 is the times of misses to be Failed."); //
-		sw.WriteLine("Risky={0}", this.nRisky); //
 		sw.WriteLine();
 		sw.WriteLine("; TIGHTモード(0:OFF, 1:ON)"); // #29500 2012.9.11 kairera0467
 		sw.WriteLine("; TIGHT mode. 0=OFF, 1=ON ");
@@ -1663,9 +1676,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("TaikoStealth3P={0}", (int)this.eSTEALTH[2]);
 		sw.WriteLine("TaikoStealth4P={0}", (int)this.eSTEALTH[3]);
 		sw.WriteLine("TaikoStealth5P={0}", (int)this.eSTEALTH[4]);
-		sw.WriteLine();
-		sw.WriteLine("; ゲーム(0:OFF, 1:完走!叩ききりまショー!, 2:完走!叩ききりまショー!(激辛) )");
-		sw.WriteLine("GameMode={0}", (int)this.eGameMode);
 		sw.WriteLine();
 		sw.WriteLine();
 		sw.WriteLine("; 特訓モード時にPgUp/PgDnで何小節飛ばすか");
@@ -2372,6 +2382,21 @@ internal class CConfigIni : INotifyPropertyChanged {
 			case "Taiko5P":
 				this.bAutoPlay[4] = CConversion.bONorOFF(value[0]);
 				break;
+			case "SpecialMod1P":
+				this.eSpecialMod[0] = ParseSpecialMod(value);
+				break;
+			case "SpecialMod2P":
+				this.eSpecialMod[1] = ParseSpecialMod(value);
+				break;
+			case "SpecialMod3P":
+				this.eSpecialMod[2] = ParseSpecialMod(value);
+				break;
+			case "SpecialMod4P":
+				this.eSpecialMod[3] = ParseSpecialMod(value);
+				break;
+			case "SpecialMod5P":
+				this.eSpecialMod[4] = ParseSpecialMod(value);
+				break;
 			case "TaikoAutoCanSkipHit":
 				this.bTaikoAutoCanSkipHit = CConversion.bONorOFF(value[0]);
 				break;
@@ -2626,9 +2651,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 			case "PlaySpeedNotEqualOneNoSound":
 				this.bNoAudioIfNot1xSpeed = CConversion.bONorOFF(value[0]);
 				break;
-			case "Risky":
-				this.nRisky = CConversion.ParseIntInRange(value, 0, 10, this.nRisky);
-				break;
 			case "DrumsTight":
 				this.bTight = CConversion.bONorOFF(value[0]);
 				break;
@@ -2665,10 +2687,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 			case "RecentlyPlayedMax":
 				this.nRecentlyPlayedMax =
 					CConversion.ParseIntInRange(value, 0, 9999, this.nRecentlyPlayedMax);
-				break;
-			case "GameMode":
-				this.eGameMode =
-					(EGame)CConversion.ParseIntInRange(value, 0, 2, (int)this.eGameMode);
 				break;
 			case "TokkunSkipMeasures":
 				this.TokkunSkipMeasures =

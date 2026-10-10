@@ -257,6 +257,8 @@ SHARED:GetSharedSound("Decide"):Play()
 | `CONFIG:SetTimingZone(player, zone)  -> nil` | 플레이어의 판정 범위를 설정합니다. 0..4로 제한됩니다. |
 | `CONFIG:GetAutoStatus(player)  -> bool` | 플레이어가 오토 플레이 중이거나 리플레이를 보고 있으면 true. |
 | `CONFIG:SetAutoStatus(player, isAuto)  -> nil` | 플레이어의 오토 플레이를 켜거나 끕니다. |
+| `CONFIG:GetSpecialMod(player)  -> int` | 플레이어의 스페셜 모드: 0 없음, 1 Auto, 2 Flawless(한 번의 미스로 플레이 실패), 3 Timed, 4 Timed (Hard). 오토 플레이가 켜져 있으면 항상 1. 범위 밖 인덱스는 0. |
+| `CONFIG:SetSpecialMod(player, mod)  -> nil` | 플레이어의 스페셜 모드를 설정하고 정의되지 않은 값은 무시합니다. 1은 오토 플레이를 켜고, 그 밖의 값은 끕니다. |
 | `CONFIG:GetRandomMod(player)  -> int` | 플레이어의 랜덤 모드(`CONFIG.RANDOM` 참고). 범위 밖 인덱스는 Off. |
 | `CONFIG:SetRandomMod(player, mode)  -> nil` | 플레이어의 랜덤 모드를 설정하고 정의되지 않은 값은 무시합니다. |
 | `CONFIG:GetFunMod(player)  -> int` | 플레이어의 펀 모드(`CONFIG.FUN` 참고). 범위 밖 인덱스는 None. |
