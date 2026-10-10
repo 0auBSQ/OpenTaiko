@@ -416,7 +416,7 @@ Die Werte stammen vom Spielbildschirm und sind daher während eines Spiels und a
 | `PLAYSTATE:GetBoomCount(player)  -> integer` | Anzahl der getroffenen Minen-Noten. |
 | `PLAYSTATE:GetAvoidedBoomCount(player)  -> integer` | Anzahl der vermiedenen Minen-Noten. |
 | `PLAYSTATE:GetScore(player)  -> integer` | Aktueller Score. |
-| `PLAYSTATE:GetCombo(player)  -> integer` | Aktuelle Combo. |
+| `PLAYSTATE:GetCombo(player)  -> integer` | Aktuelle Combo, der auf der Spur angezeigte Zähler, in jedem Spielmodus. |
 | `PLAYSTATE:GetHighestCombo(player)  -> integer` | Höchste erreichte Combo. |
 | `PLAYSTATE:IsClear(player)  -> bool` | Ob die Gauge die Clear-Linie erreicht. In einem Dan mit normaler Gauge ist es wahr, solange weder das Spiel noch eine Prüfung gescheitert ist. |
 | `PLAYSTATE:IsAssistedClear(player)  -> bool` | Ob das Spiel ein Clear ist, während ein scoremindernder Mod aktiv ist. |

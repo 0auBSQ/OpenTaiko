@@ -416,7 +416,7 @@ end
 | `PLAYSTATE:GetBoomCount(player)  -> integer` | Число задетых мин. |
 | `PLAYSTATE:GetAvoidedBoomCount(player)  -> integer` | Число избегнутых мин. |
 | `PLAYSTATE:GetScore(player)  -> integer` | Текущие очки. |
-| `PLAYSTATE:GetCombo(player)  -> integer` | Текущее комбо. |
+| `PLAYSTATE:GetCombo(player)  -> integer` | Текущее комбо: счётчик, показанный на дорожке, в любом режиме игры. |
 | `PLAYSTATE:GetHighestCombo(player)  -> integer` | Наибольшее достигнутое комбо. |
 | `PLAYSTATE:IsClear(player)  -> bool` | Достигает ли шкала линии клира. В дане с обычной шкалой — true, пока не провалены ни игра, ни один из экзаменов. |
 | `PLAYSTATE:IsAssistedClear(player)  -> bool` | Является ли прохождение клиром при активном моде, снижающем очки. |

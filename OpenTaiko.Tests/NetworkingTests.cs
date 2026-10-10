@@ -346,6 +346,12 @@ namespace OpenTaikoTests {
 				Assert.True(WaitUntil(() => host.GetSpotPlayJson(1).Contains("\"f\"")));
 				Assert.True(OnlinePlaySync.ReadFailed(JObject.Parse(host.GetSpotPlayJson(1))));
 
+				// the receiver parses a frame once: the same string comes back until the next frame arrives
+				string kept = host.GetSpotPlayJson(1);
+				Assert.Same(kept, host.GetSpotPlayJson(1));
+				Assert.True(OnlinePlaySync.TryParseFrame(kept, out var frame));
+				Assert.Equal(new OnlinePlaySync.PlayFrame(130000, 0.0, 0, null, null, true), frame);
+
 				// FINISH: client reports its real final tally → host can read every result field for that spot
 				cli.ReportFinished("{\"cl\":true,\"fc\":false,\"pf\":false,\"mx\":false,\"gr\":820,\"gd\":30,\"ms\":4,\"rl\":12,\"bl\":3,\"ad\":2,\"hc\":777,\"sc\":998877}");
 				Assert.True(WaitUntil(() => host.GetSpotJudge(1, "gr") >= 0));
@@ -359,6 +365,73 @@ namespace OpenTaikoTests {
 				Assert.Equal(998877, host.GetSpotJudge(1, "sc")); // final score
 				Assert.Equal(1, host.GetSpotClearLevel(1));      // cl=true, mx=false → cleared (not rainbow)
 			} finally { cli.Leave(); host.Leave(); }
+		}
+
+		// ── the parsed "ps" frame and the remote combo rule ───────────────────────────────────────────
+		[Fact]
+		public void PlayFrame_ReadsEveryField_AndLeavesOutTheMissingOnes() {
+			var full = JObject.Parse("{\"n\":\"C\",\"s\":130000,\"g\":62.5,\"a\":97.5,\"gr\":85,\"gd\":15,\"ms\":5,\"co\":47}");
+			OnlinePlaySync.WriteTimer(full, (21500, 12));
+			OnlinePlaySync.WriteFailed(full, true);
+			Assert.True(OnlinePlaySync.TryParseFrame(full.ToString(Newtonsoft.Json.Formatting.None), out var frame));
+			Assert.Equal(new OnlinePlaySync.PlayFrame(130000, 62.5, 47, 21500, 12, true), frame);
+
+			// an older build's frame, or a player not under Timed and not failed
+			Assert.True(OnlinePlaySync.TryParseFrame("{\"n\":\"C\",\"s\":10}", out frame));
+			Assert.Equal(new OnlinePlaySync.PlayFrame(10, null, null, null, null, false), frame);
+
+			Assert.False(OnlinePlaySync.TryParseFrame("{\"s\":", out _));
+			Assert.False(OnlinePlaySync.TryParseFrame("{\"s\":\"x\"}", out _));
+		}
+
+		[Theory]
+		[InlineData(52, 3, 50, 3)]      // the wire dropped: the lane drops to it
+		[InlineData(2, 3, 50, 3)]
+		[InlineData(0, 0, 50, 0)]
+		[InlineData(40, 47, 42, 47)]    // the lane is behind a new wire value: it rises to it
+		[InlineData(0, 47, 42, 47)]
+		[InlineData(52, 47, 42, 52)]    // the lane is ahead: it keeps counting
+		[InlineData(47, 47, 42, 47)]
+		[InlineData(60, 47, 47, 60)]    // the wire did not change: nothing happens, in either direction
+		[InlineData(0, 47, 47, 0)]
+		[InlineData(5, 0, 0, 5)]
+		public void FollowCombo_ReactsOnlyToANewWireValue(int local, int wire, int lastWire, int expected) {
+			Assert.Equal(expected, OnlinePlaySync.FollowCombo(local, wire, lastWire));
+		}
+
+		[Theory]
+		[InlineData(0, 12, 12)]         // the first frame raises a lane that is behind
+		[InlineData(15, 12, 15)]        // and leaves one that is ahead
+		[InlineData(3, 0, 3)]
+		public void FollowCombo_FirstFrame(int local, int wire, int expected) {
+			Assert.Equal(expected, OnlinePlaySync.FollowCombo(local, wire, null));
+		}
+
+		[Theory]
+		[InlineData(3, 50, true)]
+		[InlineData(50, 50, false)]
+		[InlineData(51, 50, false)]
+		[InlineData(0, null, false)]     // the first frame is never a drop
+		public void WireDropped_OnlyWhenTheWireWentDown(int wire, int? lastWire, bool expected) {
+			Assert.Equal(expected, OnlinePlaySync.WireDropped(wire, lastWire));
+		}
+
+		// a new connection numbers its rounds from 1 again: the same number on another connection is a new round
+		[Fact]
+		public void IsNewRound_SeesANewNumberOrANewConnection() {
+			var a = new LuaNetworking();
+			var b = new LuaNetworking();
+			try {
+				a.BeginPlaySync("A");
+				b.BeginPlaySync("B");
+				Assert.Equal(a.PlaySyncEpoch, b.PlaySyncEpoch);
+				Assert.True(OnlinePlaySync.IsNewRound(null, -1, a));
+				Assert.False(OnlinePlaySync.IsNewRound(a, a.PlaySyncEpoch, a));
+				Assert.True(OnlinePlaySync.IsNewRound(a, a.PlaySyncEpoch, b));
+				int first = a.PlaySyncEpoch;
+				a.BeginPlaySync("A");
+				Assert.True(OnlinePlaySync.IsNewRound(a, first, a));
+			} finally { a.Leave(); b.Leave(); }
 		}
 
 		// ── pure helpers (privacy + zero-config rendezvous agreement) ─────────────────────────────────

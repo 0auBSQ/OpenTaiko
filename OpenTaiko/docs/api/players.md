@@ -416,7 +416,7 @@ The values come from the gameplay screen, so they are meaningful during a play a
 | `PLAYSTATE:GetBoomCount(player)  -> integer` | Number of mine notes hit. |
 | `PLAYSTATE:GetAvoidedBoomCount(player)  -> integer` | Number of mine notes avoided. |
 | `PLAYSTATE:GetScore(player)  -> integer` | Current score. |
-| `PLAYSTATE:GetCombo(player)  -> integer` | Current combo. |
+| `PLAYSTATE:GetCombo(player)  -> integer` | Current combo, the counter shown on the lane, in every play mode. |
 | `PLAYSTATE:GetHighestCombo(player)  -> integer` | Highest combo reached. |
 | `PLAYSTATE:IsClear(player)  -> bool` | Whether the gauge meets the clear line. In a dan on the normal gauge, it is true while neither the play nor any exam has failed. |
 | `PLAYSTATE:IsAssistedClear(player)  -> bool` | Whether the play is a clear while a score-reducing mod is active. |

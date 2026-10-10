@@ -416,7 +416,7 @@ Les valeurs proviennent de l'écran de jeu ; elles sont donc significatives pen
 | `PLAYSTATE:GetBoomCount(player)  -> integer` | Nombre de notes mine frappées. |
 | `PLAYSTATE:GetAvoidedBoomCount(player)  -> integer` | Nombre de notes mine évitées. |
 | `PLAYSTATE:GetScore(player)  -> integer` | Score courant. |
-| `PLAYSTATE:GetCombo(player)  -> integer` | Combo courant. |
+| `PLAYSTATE:GetCombo(player)  -> integer` | Combo courant, le compteur affiché sur la piste, dans tous les modes de jeu. |
 | `PLAYSTATE:GetHighestCombo(player)  -> integer` | Combo le plus élevé atteint. |
 | `PLAYSTATE:IsClear(player)  -> bool` | Si la jauge atteint la ligne de réussite. Dans un dan avec la jauge normale, c'est vrai tant que ni la partie ni aucun examen n'a échoué. |
 | `PLAYSTATE:IsAssistedClear(player)  -> bool` | Si la partie est une réussite alors qu'un mod réduisant le score est actif. |

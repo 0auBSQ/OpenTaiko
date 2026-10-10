@@ -1252,6 +1252,8 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 
 	// returns whether the note is actually hit
 	protected bool AutoplayHitNonCriticalCanHit(CChip chip, double msTjaTime, int iPlayer, EGameType gt) {
+		if (this.isDeniedPlaying[iPlayer] || this.IsStageFailed_Fast())
+			return false;
 		bool bAutoPlay = OpenTaiko.ConfigIni.bAutoPlay[iPlayer] || (iPlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode);
 		if (!bAutoPlay)
 			return false;
@@ -1711,10 +1713,11 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		}
 
 		bool leftMax = this.UpdateGauge(pChip, screenmode, nPlayer, eJudgeResult);
-		if (!isDeniedJudgeCount)
+		if (!isDeniedJudgeCount) {
 		this.UpdateJudgeCount(pChip, nPlayer, bAutoPlay, bBombHit, eJudgeResult, leftMax, msDelta);
-		this.UpdateComboMilestone(pChip, nPlayer, isDeniedJudgeCount);
+		this.UpdateComboMilestone(pChip, nPlayer);
 		this.AddScore(pChip, nPlayer, eJudgeResult);
+		}
 
 		// Dynamic Beat: immediate and section tracking
 		if (!isDeniedJudgeCount && OpenTaiko.ConfigIni.nFunMods[nPlayer] == EFunMods.DynamicBeat) {
@@ -1741,7 +1744,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	protected bool UpdateGauge(CChip? pChip, EKeyConfigPart screenmode, int nPlayer, ENoteJudge eJudgeResult) {
 		bool leftMax = false;
 		bool hasFailed = this.IsStageFailed(nPlayer);
-		if (!hasFailed) { // prevent gauge change if song aborted
+		if (!hasFailed && !this.isDeniedPlaying[nPlayer]) { // no gauge change for a failed or frozen player
 			if (eJudgeResult is ENoteJudge.Bad && (NotesManager.IsMine(pChip) || NotesManager.IsFuzeRoll(pChip))) {
 				actGauge.MineDamage(nPlayer, (pChip == null || pChip.IsEndedBranching) ? null : pChip.nBranch);
 			} else if (pChip == null || NotesManager.IsMissableNote(pChip)) {
@@ -2012,8 +2015,15 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 			this.UpdateClearAnimation(nPlayer);
 	}
 
-	private void UpdateComboMilestone(CChip pChip, int nPlayer, bool isDeniedJudgeCount) {
+	private void UpdateComboMilestone(CChip pChip, int nPlayer) {
 		if (NotesManager.IsMissableNote(pChip)) {
+			// a remote lane that fell back by its own sampled miss does not show again the milestones it already showed
+			if (LuaNetworking.Active?.IsRemoteSpot(nPlayer) == true) {
+				if (this.actCombo.nCurrentCombo[nPlayer] <= this.onlineComboMark[nPlayer])
+					return;
+				this.onlineComboMark[nPlayer] = this.actCombo.nCurrentCombo[nPlayer];
+			}
+
 			if ((this.actCombo.nCurrentCombo[nPlayer] % 100 == 0 || this.actCombo.nCurrentCombo[nPlayer] == 50) && this.actCombo.nCurrentCombo[nPlayer] > 0) {
 				this.actComboBalloon.Start(this.actCombo.nCurrentCombo[nPlayer], nPlayer);
 			}
@@ -2023,7 +2033,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 
 			//CDTXMania.act文字コンソール.tPrint(620, 80, C文字コンソール.Eフォント種別.白, "BPM: " + dbUnit.ToString());
 
-			if (!isDeniedJudgeCount && this.actCombo.nCurrentCombo[nPlayer] is 50 or 300) {
+			if (this.actCombo.nCurrentCombo[nPlayer] is 50 or 300) {
 				ctChipAnimeLag[nPlayer] = new CCounter(0, 664, 1, OpenTaiko.Timer);
 			}
 
@@ -4387,6 +4397,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 				this.isChartEnded[i] = false;
 				this.isFinishedPlaying[i] = false;
 				this.isDeniedPlaying[i] = false;
+				this.onlineComboMark[i] = 0;
 				this.stageAbortType[i] = EStageAbort.None;
 			}
 
@@ -4718,6 +4729,19 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	// Online VS: freeze a player spot whose remote player disconnected mid-play — stops its auto-hits so it stops
 	// updating, while staying flagged auto (still excluded from saving). Called each frame by OnlinePlaySync.
 	public void OnlineFreezeSpot(int spot) { if (spot >= 0 && spot < this.isDeniedPlaying.Length) this.isDeniedPlaying[spot] = true; }
+
+	// Online VS: the highest combo a remote lane showed since its owner's combo last went down
+	private readonly int[] onlineComboMark = new int[5];
+
+	// Online VS: sets a remote lane's combo from the wire. When the owner's combo went down, the lane's combo voices
+	// and milestones start over.
+	public void OnlineSetCombo(int spot, int combo, bool ownerDropped) {
+		if (ownerDropped) {
+			this.actComboVoice.tReset(spot);
+			this.onlineComboMark[spot] = combo;
+		}
+		this.actCombo.nCurrentCombo[spot] = combo;
+	}
 
 	public bool CanAutoplayHitMine(int player, bool reroll) {
 		if (this.isDeniedPlaying[player] || this.IsStageFailed_Fast())

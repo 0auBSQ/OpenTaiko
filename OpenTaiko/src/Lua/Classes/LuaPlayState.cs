@@ -54,7 +54,7 @@
 		}
 
 		public int GetCombo(int player) {
-			return OpenTaiko.stageGameScreen.CChartScore[player].nCombo;
+			return OpenTaiko.stageGameScreen.actCombo.nCurrentCombo[player];
 		}
 
 		public int GetHighestCombo(int player) {

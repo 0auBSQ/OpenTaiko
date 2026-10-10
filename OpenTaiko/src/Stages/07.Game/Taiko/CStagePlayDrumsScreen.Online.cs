@@ -24,7 +24,7 @@ internal partial class CStagePlayDrumsScreen {
 		bool fc = clear && cs != null && cs.nMiss == 0;
 		bool pf = fc && cs.nGood == 0;
 		int gr = cs?.nGreat ?? 0, gd = cs?.nGood ?? 0, ms = cs?.nMiss ?? 0;
-		int rl = cs?.nRoll ?? 0, bl = cs?.nBalloon ?? 0, ad = cs?.nADLIB ?? 0, hc = cs?.nHighestCombo ?? 0, sc = (int)this.actScore.GetDisplayedScore(0);
+		int rl = cs?.nRoll ?? 0, bl = cs?.nBalloon ?? 0, ad = cs?.nADLIB ?? 0, hc = this.actCombo.nCurrentCombo.MaxValue[0], sc = (int)this.actScore.GetDisplayedScore(0);
 		return string.Format("{{\"cl\":{0},\"fc\":{1},\"pf\":{2},\"mx\":{3},\"gr\":{4},\"gd\":{5},\"ms\":{6},\"rl\":{7},\"bl\":{8},\"ad\":{9},\"hc\":{10},\"sc\":{11}}}",
 			clear ? "true" : "false", fc ? "true" : "false", pf ? "true" : "false", rainbow ? "true" : "false", gr, gd, ms, rl, bl, ad, hc, sc);
 	}
@@ -46,7 +46,7 @@ internal partial class CStagePlayDrumsScreen {
 			if (rl >= 0) cs.nRoll = rl;
 			if (bl >= 0) cs.nBalloon = bl;
 			if (ad >= 0) cs.nADLIB = ad;
-			if (hc >= 0) { cs.nHighestCombo = hc; cs.nCombo = hc; }
+			if (hc >= 0) this.actCombo.nCurrentCombo.MaxValue[i] = hc; // the results read the max combo here
 			if (sc >= 0) this.actScore.Set(sc, i);
 		}
 	}

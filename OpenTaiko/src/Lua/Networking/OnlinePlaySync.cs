@@ -12,16 +12,21 @@ namespace OpenTaiko {
 	//     timer when it plays under that special mod: a remote spot's timer is only shown, never computed here,
 	//     and with "f" once it has failed, which fails the remote spot the way a hard gauge at 0 does;
 	//   • for each REMOTE spot, snaps its displayed score + gauge to that peer's latest broadcast (snapping = the
-	//     score updates with no count-up animation), while the spot auto-hits its own chart with judges sampled
+	//     score updates with no count-up animation) and lets its combo follow the broadcast one (see FollowCombo);
+	//     a frame is parsed once, when it arrives, while the spot auto-hits its own chart with judges sampled
 	//     from those broadcast rates (see CStagePlayScreenCommon.AlterJudgement) - remote spots are lanes of the
 	//     normal N-player layout, and flying notes follow the offline rule (shown up to 2 players);
 	//   • freezes any spot whose remote player has dropped mid-play (it stops updating in real time).
 	internal static class OnlinePlaySync {
 		private static long _lastSend;
 		private static int _epoch = -1;
+		private static LuaNetworking? _net;
 		private static CCachedFontRenderer _waitFont;
 		private static CTexture _waitTex;
 		private static string _waitText;
+		// per remote spot: the last "ps" string seen and what it held
+		private static readonly string[] _frameJson = new string[OpenTaiko.MAX_PLAYERS];
+		private static readonly PlayFrame?[] _frames = new PlayFrame?[OpenTaiko.MAX_PLAYERS];
 
 		/// <summary>Centered overlay shown while the gameplay screen holds at the loading/start barrier.</summary>
 		public static void DrawWaiting(string text) {
@@ -53,29 +58,69 @@ namespace OpenTaiko {
 		}
 		internal static bool ReadFailed(JObject ps) => (int?)ps["f"] == 1;
 
+		// What a "ps" frame holds for the remote spot's lane; a field the frame leaves out is null.
+		internal readonly record struct PlayFrame(double? Score, double? Gauge, int? Combo, int? MsTimer, int? AddedSeconds, bool Failed);
+
+		internal static bool TryParseFrame(string json, out PlayFrame frame) {
+			frame = default;
+			try {
+				JObject o = JObject.Parse(json);
+				var (msTimer, addedSeconds) = ReadTimer(o);
+				frame = new PlayFrame((double?)o["s"], (double?)o["g"], (int?)o["co"], msTimer, addedSeconds, ReadFailed(o));
+				return true;
+			} catch { return false; }
+		}
+
+		// The combo a remote lane shows once a frame arrived. Only a combo that differs from the previous frame's
+		// acts: the lane drops to it when the owner's combo went down, and rises to it when the lane is behind.
+		// Otherwise the lane keeps counting its own hits.
+		internal static int FollowCombo(int local, int wire, int? lastWire) {
+			if (wire == lastWire) return local;
+			if (WireDropped(wire, lastWire)) return wire;
+			return Math.Max(local, wire);
+		}
+		internal static bool WireDropped(int wire, int? lastWire) => lastWire != null && wire < lastWire;
+
+		// A new play round: its number changed, or it runs on another connection, whose rounds are numbered from 1 again.
+		internal static bool IsNewRound(LuaNetworking? lastNet, int lastEpoch, LuaNetworking net)
+			=> !ReferenceEquals(lastNet, net) || lastEpoch != net.PlaySyncEpoch;
+
 		public static void Tick(CStagePlayDrumsScreen screen) {
 			var net = LuaNetworking.Active;
 			if (net == null || !net.PlaySyncActive) return;
 			try {
-				if (_epoch != net.PlaySyncEpoch) { _epoch = net.PlaySyncEpoch; _lastSend = 0; }
+				if (IsNewRound(_net, _epoch, net)) {
+					_net = net; _epoch = net.PlaySyncEpoch; _lastSend = 0;
+					Array.Clear(_frameJson); Array.Clear(_frames);
+				}
 
 				// remote spots: snap score + gauge from the wire (or freeze on disconnect) - every frame
-				int count = net.PlaySpotCount();
+				int count = Math.Min(net.PlaySpotCount(), _frames.Length);
 				for (int spot = 1; spot < count; spot++) {
 					if (!net.IsSpotActive(spot)) { screen.OnlineFreezeSpot(spot); continue; }   // dropped mid-play → freeze
 					string json = net.GetSpotPlayJson(spot);
 					if (string.IsNullOrEmpty(json)) continue;
-					JObject o; try { o = JObject.Parse(json); } catch { continue; }
 					try {
-						if (o["s"] != null) screen.actScore.Set((double)o["s"], spot);
-						if (o["g"] != null && screen.actGauge?.dbCurrentGaugeValue != null && spot < screen.actGauge.dbCurrentGaugeValue.Length)
-							screen.actGauge.dbCurrentGaugeValue[spot] = (double)o["g"];
-						// snap the combo counter too, so a remote spot's combo tracks the wire like its score
-						if (o["co"] != null && screen.actCombo != null)
-							screen.actCombo.nCurrentCombo[spot] = (int)o["co"];
-						var (msTimer, addedSeconds) = ReadTimer(o);
-						screen.actGame.SetRemoteTimer(spot, msTimer, addedSeconds);
-						if (ReadFailed(o) && !screen.IsStageFailed(spot)) screen.SetStageFailed(spot);
+						// the same string comes back until the peer's next frame; a frame that does not parse leaves the last one
+						if (!ReferenceEquals(json, _frameJson[spot])) {
+							_frameJson[spot] = json;
+							if (TryParseFrame(json, out PlayFrame parsed)) {
+								if (parsed.Combo != null && screen.actCombo != null) {
+									int local = screen.actCombo.nCurrentCombo[spot];
+									int? lastWire = _frames[spot]?.Combo;
+									int followed = FollowCombo(local, parsed.Combo.Value, lastWire);
+									bool dropped = WireDropped(parsed.Combo.Value, lastWire);
+									if (followed != local || dropped) screen.OnlineSetCombo(spot, followed, dropped);
+								}
+								_frames[spot] = parsed;
+							}
+						}
+						if (_frames[spot] is not PlayFrame f) continue;
+						if (f.Score != null) screen.actScore.Set(f.Score.Value, spot);
+						if (f.Gauge != null && screen.actGauge?.dbCurrentGaugeValue != null && spot < screen.actGauge.dbCurrentGaugeValue.Length)
+							screen.actGauge.dbCurrentGaugeValue[spot] = f.Gauge.Value;
+						screen.actGame.SetRemoteTimer(spot, f.MsTimer, f.AddedSeconds);
+						if (f.Failed && !screen.IsStageFailed(spot)) screen.SetStageFailed(spot);
 					} catch { }
 				}
 
@@ -87,7 +132,8 @@ namespace OpenTaiko {
 				try {
 					score = screen.actScore.GetDisplayedScore(0);
 					var cs = screen.CChartScore[0];
-					if (cs != null) { gr = cs.nGreat; gd = cs.nGood; ms = cs.nMiss; combo = cs.nCombo; acc = cs.GetScore(Exam.Type.Accuracy); }
+					if (cs != null) { gr = cs.nGreat; gd = cs.nGood; ms = cs.nMiss; acc = cs.GetScore(Exam.Type.Accuracy); }
+					if (screen.actCombo != null) combo = screen.actCombo.nCurrentCombo[0];
 					gauge = screen.actGauge.dbCurrentGaugeValue[0];
 				} catch { }
 				var p = new JObject { ["n"] = net.SelfPlayName, ["s"] = score, ["g"] = gauge, ["a"] = Math.Round(acc, 2), ["gr"] = gr, ["gd"] = gd, ["ms"] = ms, ["co"] = combo };

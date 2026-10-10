@@ -416,7 +416,7 @@ De waarden komen van het gameplayscherm, dus ze zijn betekenisvol tijdens een sp
 | `PLAYSTATE:GetBoomCount(player)  -> integer` | Aantal geraakte mijnnoten. |
 | `PLAYSTATE:GetAvoidedBoomCount(player)  -> integer` | Aantal ontweken mijnnoten. |
 | `PLAYSTATE:GetScore(player)  -> integer` | Huidige score. |
-| `PLAYSTATE:GetCombo(player)  -> integer` | Huidige combo. |
+| `PLAYSTATE:GetCombo(player)  -> integer` | Huidige combo, de teller die op de baan wordt getoond, in elke speelmodus. |
 | `PLAYSTATE:GetHighestCombo(player)  -> integer` | Hoogste bereikte combo. |
 | `PLAYSTATE:IsClear(player)  -> bool` | Of de gauge de clearlijn haalt. In een dan met de normale gauge is het waar zolang noch het spel noch een examen is mislukt. |
 | `PLAYSTATE:IsAssistedClear(player)  -> bool` | Of de spelbeurt een clear is terwijl een scoreverlagende mod actief is. |

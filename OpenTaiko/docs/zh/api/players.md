@@ -416,7 +416,7 @@ PUCHICHARALIST 和 sf:GetPuchichara 返回这些句柄。列表拥有这些纹�
 | `PLAYSTATE:GetBoomCount(player)  -> integer` | 击中的地雷音符数量。 |
 | `PLAYSTATE:GetAvoidedBoomCount(player)  -> integer` | 避开的地雷音符数量。 |
 | `PLAYSTATE:GetScore(player)  -> integer` | 当前分数。 |
-| `PLAYSTATE:GetCombo(player)  -> integer` | 当前连击。 |
+| `PLAYSTATE:GetCombo(player)  -> integer` | 当前连击，即轨道上显示的计数，适用于所有游玩模式。 |
 | `PLAYSTATE:GetHighestCombo(player)  -> integer` | 达到过的最高连击。 |
 | `PLAYSTATE:IsClear(player)  -> bool` | 魂槽是否达到过关线。普通魂槽的段位中，只要游戏未失败且没有考核不合格即为 true。 |
 | `PLAYSTATE:IsAssistedClear(player)  -> bool` | 是否在启用降分 Mod 的情况下过关。 |

@@ -416,7 +416,7 @@ PUCHICHARALIST と sf:GetPuchichara がこのハンドルを返します。テ�
 | `PLAYSTATE:GetBoomCount(player)  -> integer` | 叩いた地雷音符の数。 |
 | `PLAYSTATE:GetAvoidedBoomCount(player)  -> integer` | 避けた地雷音符の数。 |
 | `PLAYSTATE:GetScore(player)  -> integer` | 現在のスコア。 |
-| `PLAYSTATE:GetCombo(player)  -> integer` | 現在のコンボ。 |
+| `PLAYSTATE:GetCombo(player)  -> integer` | 現在のコンボ。レーンに表示されるカウンターで、すべてのプレイモードで使えます。 |
 | `PLAYSTATE:GetHighestCombo(player)  -> integer` | 到達した最大コンボ。 |
 | `PLAYSTATE:IsClear(player)  -> bool` | ゲージがクリアラインに達しているかどうか。ノーマルゲージの段位では、プレイが失敗しておらず、不合格の試験もない間は true。 |
 | `PLAYSTATE:IsAssistedClear(player)  -> bool` | スコアを減らす Mod が有効な状態でのクリアかどうか。 |

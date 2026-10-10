@@ -416,7 +416,7 @@ PUCHICHARALIST와 sf:GetPuchichara가 이 핸들을 반환합니다. 텍스처�
 | `PLAYSTATE:GetBoomCount(player)  -> integer` | 맞힌 지뢰 노트 수. |
 | `PLAYSTATE:GetAvoidedBoomCount(player)  -> integer` | 피한 지뢰 노트 수. |
 | `PLAYSTATE:GetScore(player)  -> integer` | 현재 스코어. |
-| `PLAYSTATE:GetCombo(player)  -> integer` | 현재 콤보. |
+| `PLAYSTATE:GetCombo(player)  -> integer` | 현재 콤보. 레인에 표시되는 카운터이며 모든 플레이 모드에서 쓸 수 있습니다. |
 | `PLAYSTATE:GetHighestCombo(player)  -> integer` | 도달한 최고 콤보. |
 | `PLAYSTATE:IsClear(player)  -> bool` | 게이지가 클리어 선을 충족하는지 여부. 노멀 게이지의 단위에서는 플레이가 실패하지 않았고 불합격한 시험도 없는 동안 true. |
 | `PLAYSTATE:IsAssistedClear(player)  -> bool` | 스코어를 낮추는 모드가 활성인 채로 클리어했는지 여부. |
