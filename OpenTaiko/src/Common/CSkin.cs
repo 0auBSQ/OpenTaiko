@@ -994,7 +994,8 @@ internal class CSkin : IDisposable {
 		for (int i = 0; i < this.listSystemSound.Count; ++i) { // concurrent
 			try {
 				var snd = this.listSystemSound.ElementAtOrDefault(i);
-				if (snd?.bLoadedSuccessfuly ?? false) {
+				// a one-shot sound still playing (the loading jingle) is left to finish
+				if ((snd?.bLoadedSuccessfuly ?? false) && !(snd.bIsPlaying && !snd.bLoop)) {
 					snd.tStop();
 					snd.tRemoveMixer();
 				}

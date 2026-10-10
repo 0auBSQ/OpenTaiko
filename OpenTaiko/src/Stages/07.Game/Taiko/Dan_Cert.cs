@@ -146,6 +146,11 @@ internal class Dan_Cert : CActivity {
 
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) IsAnimating = true;
 
+		// the curtain and exam-failed sounds, made per play
+		Sound_Section = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Section.ogg"), ESoundGroup.SoundEffect);
+		Sound_Section_First = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Section_First.wav"), ESoundGroup.SoundEffect);
+		Sound_Failed = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Failed.ogg"), ESoundGroup.SoundEffect);
+
 		base.Activate();
 	}
 
@@ -605,21 +610,12 @@ internal class Dan_Cert : CActivity {
 
 		OpenTaiko.tDisposeSafely(ref this.pfExamFont);
 
+		Sound_Section?.tDispose(deleteInstance: true);
+		Sound_Section_First?.tDispose(deleteInstance: true);
+		Sound_Failed?.tDispose(deleteInstance: true);
+		Sound_Section = Sound_Section_First = Sound_Failed = null;
+
 		base.DeActivate();
-	}
-
-	public override void CreateManagedResource() {
-		Sound_Section = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Section.ogg"), ESoundGroup.SoundEffect);
-		Sound_Section_First = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Section_First.wav"), ESoundGroup.SoundEffect);
-		Sound_Failed = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Failed.ogg"), ESoundGroup.SoundEffect);
-		base.CreateManagedResource();
-	}
-
-	public override void ReleaseManagedResource() {
-		Sound_Section_First?.Dispose();
-		Sound_Section?.tDispose();
-		Sound_Failed?.tDispose();
-		base.ReleaseManagedResource();
 	}
 
 	public override int Draw() {
@@ -1390,9 +1386,9 @@ internal class Dan_Cert : CActivity {
 	};
 
 	//音声関連
-	private CSound Sound_Section;
-	private CSound Sound_Section_First;
-	private CSound Sound_Failed;
+	private CSound? Sound_Section;
+	private CSound? Sound_Section_First;
+	private CSound? Sound_Failed;
 
 	private CCounter ctRainbowAnime;
 	private CCounter ctRainbowOpacity;

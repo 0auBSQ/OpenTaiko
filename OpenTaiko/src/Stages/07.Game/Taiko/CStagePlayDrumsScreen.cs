@@ -590,10 +590,17 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 			// LYRIC[S/FILE]: & #LYRIC
 
-			if (!this.IsFailStopped()
-				&& OpenTaiko.TJA.listLyric2.Count > ShownLyric2 && OpenTaiko.TJA.listLyric2[ShownLyric2].Time < this.GetChartTimeNow(0)
-				) {
-				this.actPanel.tLyricsTextureCreate(OpenTaiko.TJA.listLyric2[ShownLyric2++].TextTex);
+			// every line now due is passed at once and only the last one is shown (a training seek passes many)
+			var lyrics = OpenTaiko.TJA!.listLyric2;
+			if (!this.IsFailStopped() && lyrics.Count > ShownLyric2) {
+				long msNow = this.GetChartTimeNow(0);
+				int idx = ShownLyric2;
+				while (idx < lyrics.Count && lyrics[idx].Time < msNow)
+					idx++;
+				if (idx != ShownLyric2) {
+					ShownLyric2 = idx;
+					this.actPanel.tLyricsTextureCreate(lyrics[idx - 1].TextTex);
+				}
 			}
 
 			this.actPanel.tLyricsTextureDraw();
@@ -655,7 +662,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 					this.actFO.tFadeOutStart();
 				}
 			} else if (base.ePhaseID == CStage.EPhase.Game_EndChart) {
-				if (bIsFinishedPlaying) {
+				if (bIsFinishedPlaying || this.IsTrainingAudioDone()) {
 					if (OpenTaiko.ConfigIni.bTokkunMode) {
 						isChartEnded[0] = isFinishedPlaying[0] = false;
 						actTokkun.tPausePlay();
@@ -894,6 +901,21 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	}
 
 	#endregion
+
+	// training, not paused: every chip processed and no chart sound playing. Checked every frame, since the song end
+	// chip can pass while the audio still reports playing.
+	private bool IsTrainingAudioDone() {
+		CTja tja = OpenTaiko.TJA!;
+		if (!OpenTaiko.ConfigIni.bTokkunMode || this.bPAUSE || this.nCurrentTopChip[0] < tja.listChip.Count)
+			return false;
+		foreach (CTja.CWAV cwav in tja.listWAV.Values) {
+			for (int i = 0; i < this.nPolyphonicSounds; i++) {
+				if (cwav.rSound[i]?.IsPlaying ?? false)
+					return false;
+			}
+		}
+		return true;
+	}
 
 	// one player's bar lines and notes (and their update phase)
 	private void tProgressDraw_Chips(int i) {

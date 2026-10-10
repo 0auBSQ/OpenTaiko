@@ -328,7 +328,7 @@ class CActImplTrainingMode : CActivity {
 
 		this.nScrollAfterms = SoundManager.PlayTimer.NowTimeMs;
 
-		OpenTaiko.stageGameScreen.Activate();
+		OpenTaiko.stageGameScreen.tValueInitialize(true, true);
 		OpenTaiko.stageGameScreen.Pause();
 		OpenTaiko.Timer.Resume(); // to continue animation 
 
@@ -336,10 +336,6 @@ class CActImplTrainingMode : CActivity {
 			CChip pChip = dTX.listChip[i];
 			pChip.bHit = false;
 			pChip.ResetRollEffect();
-			if (dTX.listChip[i].nChannelNo != 0x50) {
-				pChip.bShow = true;
-				pChip.bVisible = true;
-			}
 		}
 
 		OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;

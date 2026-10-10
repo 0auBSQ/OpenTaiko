@@ -63,6 +63,8 @@ internal class CActImplGauge : CActPlayGaugeCommon {
 		this.ctFlame = null;
 
 		this.ctRainbowAnime = null;
+
+		base.DeActivate();
 	}
 	public override void CreateManagedResource() {
 		//this.tx音符 = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_taiko_notes.png"));

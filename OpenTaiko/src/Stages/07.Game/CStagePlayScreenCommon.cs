@@ -273,9 +273,13 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		// Reduce .NET GC hitches during the song: ask the GC to avoid blocking gen-2 collections while
 		// playing. Restored to the previous mode in DeActivate. (SustainedLowLatency, not Batch — Batch
 		// favors throughput and still permits the blocking gen-2 collections we're trying to avoid.)
-		this.gclatencymode = System.Runtime.GCSettings.LatencyMode;
 		// GCSettings.LatencyMode is unsupported on iOS (throws PlatformNotSupportedException); it's only a GC-pause tweak.
-		if (!(OperatingSystem.IsIOS() || OperatingSystem.IsAndroid())) System.Runtime.GCSettings.LatencyMode = System.Runtime.GCLatencyMode.SustainedLowLatency;
+		// Saved once per play; DeActivate restores it only when it was saved.
+		if (!this.gcLatencyModeSaved && !(OperatingSystem.IsIOS() || OperatingSystem.IsAndroid())) {
+			this.gclatencymode = System.Runtime.GCSettings.LatencyMode;
+			this.gcLatencyModeSaved = true;
+			System.Runtime.GCSettings.LatencyMode = System.Runtime.GCLatencyMode.SustainedLowLatency;
+		}
 		Array.Fill(this.bIsAlreadyCleared, false);
 		Array.Fill(this.bIsAlreadyMaxed, false);
 
@@ -526,11 +530,15 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		Array.Fill(listChip, []);
 		this.ResetAIHits(); // the AI plans reference the chart's chips
 		queueMixerSound.Clear();
-		if (!(OperatingSystem.IsIOS() || OperatingSystem.IsAndroid())) System.Runtime.GCSettings.LatencyMode = this.gclatencymode;   // restore pre-gameplay GC mode (unsupported on mobile)
+		// restore pre-gameplay GC mode (unsupported on mobile) if it was saved; a load cancelled early never saved it
+		if (this.gcLatencyModeSaved && !(OperatingSystem.IsIOS() || OperatingSystem.IsAndroid())) {
+			System.Runtime.GCSettings.LatencyMode = this.gclatencymode;
+			this.gcLatencyModeSaved = false;
+		}
 
 		this.actAVI.rVD = null; // Will be disposed by TJA.DeActivate() later
 
-		var meanLag = CLagLogger.LogAndReturnMeanLag();
+		CLagLogger.LogAndReturnMeanLag();
 
 		this.actDan.IsAnimating = false;// IsAnimating=trueのときにそのまま選曲画面に戻ると、文字列が描画されない問題修正用。
 		OpenTaiko.tTextureRelease(ref this.txBgImage);
@@ -894,6 +902,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	public bool isMultiPlay; // 2016.08.21 kairera0467 表示だけ。
 	protected Stopwatch sw = new();     // 2011.6.13 最適化検討用のストップウォッチ
 	protected System.Runtime.GCLatencyMode gclatencymode;   // saved GC latency mode, restored on DeActivate
+	private bool gcLatencyModeSaved;                       // gclatencymode holds a mode to restore
 	public int ListDan_Number;
 	private bool IsDanFailed;
 
@@ -993,7 +1002,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 			//Debug.WriteLine( "☆queueLength=" + queueMixerSound.Count );
 			DateTime dtnow = DateTime.Now;
 			TimeSpan ts = dtnow - dtLastQueueOperation;
-			if (ts.Milliseconds > 7) {
+			if (ts.TotalMilliseconds > 7) {
 				for (int i = 0; i < 2 && queueMixerSound.Count > 0; i++) {
 					dtLastQueueOperation = dtnow;
 					stmixer stm = queueMixerSound.Dequeue();
@@ -3970,7 +3979,8 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 			this.actBalloon.KusuMiss();
 		}
 
-		if (!resetStates && !chip.end.bProcessed && chip.end.bVisible) {
+		// while paused the end is not marked processed, so it is counted once, on the first frame after the resume
+		if (!resetStates && !this.bPAUSE && !chip.end.bProcessed && chip.end.bVisible) {
 			if (NotesManager.IsGenericBalloon(chip)) {
 				this.CChartScore[iPlayer].nBalloonHitPass += chip.nBalloon;
 				this.CSectionScore[iPlayer].nBalloonHitPass += chip.nBalloon;
