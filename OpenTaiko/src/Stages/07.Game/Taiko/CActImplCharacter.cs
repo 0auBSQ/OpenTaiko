@@ -114,8 +114,8 @@ internal class CActImplCharacter : CActivity {
 		base.ReleaseManagedResource();
 	}
 
-	public override int Draw() {
-
+	// advances the kusudama counters and the characters' animations; runs every frame, whether or not they are drawn
+	public void Update() {
 		ctKusuIn.Tick();
 		foreach (var (ctKusuOut, resetKusuOut) in new (CCounter?, Action)[] {
 			(ctKusuSuccess, () => ctKusuSuccess = null),
@@ -132,16 +132,21 @@ internal class CActImplCharacter : CActivity {
 			}
 		}
 
+		if (OpenTaiko.Tx.Characters.Length == 0 || OpenTaiko.stageGameScreen.bPAUSE)
+			return;
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			CharacterControllers[i].dbDuration = OpenTaiko.stageGameScreen.actPlayInfo.msPerGameBeatAbs(i);
+			CharacterControllers[i].Update();
+		}
+	}
+
+	public override int Draw() {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			int Character = this.iCurrentCharacter[i];
 
 			if (OpenTaiko.Tx.Characters.Length == 0)
 				break;
 
-			if (!OpenTaiko.stageGameScreen.bPAUSE) {
-				CharacterControllers[i].dbDuration = OpenTaiko.stageGameScreen.actPlayInfo.msPerGameBeatAbs(i);
-				CharacterControllers[i].Update();
-			}
 			//CCharacter.GetCharacter(i).Update(i, animation);
 
 			// Blinking animation during invincibility frames
@@ -443,7 +448,8 @@ internal class CActImplCharacter : CActivity {
 			}
 
 
-			if (!isInGenericBalloon || OpenTaiko.ConfigIni.nPlayerCount > 2) {
+			// with 3 or more players the kusudama draws its own PuchiChara
+			if (!isInGenericBalloon || (OpenTaiko.ConfigIni.nPlayerCount > 2 && !visibleKusuChara(i))) {
 				if (OpenTaiko.ConfigIni.nPlayerCount <= 2) {
 					OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(OpenTaiko.Skin.Game_PuchiChara_X[i], OpenTaiko.Skin.Game_PuchiChara_Y[i], OpenTaiko.stageGameScreen.bIsAlreadyMaxed[i], player: i);
 				} else if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
@@ -469,6 +475,8 @@ internal class CActImplCharacter : CActivity {
 		=> IsNonKusuBalloonAction(CharacterControllers[i].strActionAnimation);
 
 	public void OnDraw_Balloon() {
+		if (!OpenTaiko.ConfigIni.ShowChara)
+			return;
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			if (!bBalloonRoll[i] && !IsPlayingBalloonAction(i)) continue;
 

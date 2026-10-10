@@ -472,6 +472,8 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			//this.t進行描画_DANGER();
 			//this.t進行描画_判定ライン();
 
+			this.actChara.Update();
+
 			// 1/2-player mode character
 			if (OpenTaiko.ConfigIni.ShowChara && OpenTaiko.ConfigIni.nPlayerCount <= 2) {
 				this.actChara.Draw();

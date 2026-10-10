@@ -75,6 +75,13 @@ internal class CActImplBalloon : CActivity {
 		KusudamaScript?.Call("kusuMiss");
 		KusudamaIsActive = false;
 	}
+	// ends the kusudama for a restart or a rewind: the script's activate puts it back to its start state, and a
+	// script without one plays its miss animation
+	public void KusuReset() {
+		KusudamaScript?.Call("kusuMiss");
+		KusudamaScript?.Activate(_state);
+		KusudamaIsActive = false;
+	}
 
 	public bool KusudamaIsActive { get; private set; } = false;
 

@@ -68,6 +68,12 @@ function onStart()
     fadeValue = 0
 end
 
+function activate(state)
+    kusuState = 0
+    animeValue = 0
+    fadeValue = 0
+end
+
 function update(timestamp, state)
     if kusuState == 1 then
         animeValue = animeValue + (fps.deltaTime * 2)

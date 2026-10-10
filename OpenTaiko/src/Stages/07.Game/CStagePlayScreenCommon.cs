@@ -1706,10 +1706,10 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 			}
 		}
 
-		this.UpdateGauge(pChip, screenmode, nPlayer, eJudgeResult);
+		bool leftMax = this.UpdateGauge(pChip, screenmode, nPlayer, eJudgeResult);
 		if (!isDeniedJudgeCount)
-		this.UpdateJudgeCount(pChip, nPlayer, bAutoPlay, bBombHit, eJudgeResult, msDelta);
-		this.UpdateComboMilestone(pChip, nPlayer);
+		this.UpdateJudgeCount(pChip, nPlayer, bAutoPlay, bBombHit, eJudgeResult, leftMax, msDelta);
+		this.UpdateComboMilestone(pChip, nPlayer, isDeniedJudgeCount);
 		this.AddScore(pChip, nPlayer, eJudgeResult);
 
 		// Dynamic Beat: immediate and section tracking
@@ -1733,7 +1733,9 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	}
 
 	// Note: use ENoteJudge.Auto to simply update gauge status
-	protected void UpdateGauge(CChip? pChip, EKeyConfigPart screenmode, int nPlayer, ENoteJudge eJudgeResult) {
+	// returns true when the gauge left its maximum on this judgement
+	protected bool UpdateGauge(CChip? pChip, EKeyConfigPart screenmode, int nPlayer, ENoteJudge eJudgeResult) {
+		bool leftMax = false;
 		bool hasFailed = this.IsStageFailed(nPlayer);
 		if (!hasFailed) { // prevent gauge change if song aborted
 			if (eJudgeResult is ENoteJudge.Bad && (NotesManager.IsMine(pChip) || NotesManager.IsFuzeRoll(pChip))) {
@@ -1781,15 +1783,10 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 				this.actRunner.Start(nPlayer, true, pChip);
 			if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && this.bIsAlreadyMaxed[nPlayer] == true) {
 				this.bIsAlreadyMaxed[nPlayer] = false;
+				leftMax = true;
 				actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MAX_OUT, true);
 				if (isEndOfPlay ??= this.IsEndOfPlay())
 					this.UpdateClearAnimation(nPlayer);
-			} else if (!bIsGOGOTIME[nPlayer]) {
-				if (Chara_MissCount[nPlayer] == 1 - 1) {
-					actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MISS_IN, true);
-				} else if (Chara_MissCount[nPlayer] == 6 - 1) {
-					actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MISS_DOWN_IN, true);
-				}
 			}
 			if (!cleared && this.bIsAlreadyCleared[nPlayer] == true) {
 				this.bIsAlreadyCleared[nPlayer] = false;
@@ -1806,6 +1803,28 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 				}
 			}
 		}
+		return leftMax;
+	}
+
+	// the character's reaction to a counted miss, from the number of misses in a row including this one: none when the
+	// gauge left its maximum on it (that reaction plays) or in go-go time
+	internal static string? MissReactionAnimation(bool leftMax, bool isGoGoTime, int missCount) {
+		if (leftMax || isGoGoTime)
+			return null;
+		return missCount switch {
+			1 => CCharacter.ANIM_GAME_MISS_IN,
+			6 => CCharacter.ANIM_GAME_MISS_DOWN_IN,
+			_ => null,
+		};
+	}
+
+	// called once per counted miss, after the miss count and the miss flag are updated
+	private void PlayMissReaction(int nPlayer, bool leftMax) {
+		if (leftMax)
+			actChara.ReturnDefaultAnime(nPlayer); // the loop after the max-out reaction is the miss one
+		string? reaction = MissReactionAnimation(leftMax, bIsGOGOTIME[nPlayer], Chara_MissCount[nPlayer]);
+		if (reaction != null)
+			actChara.PlayGameAction(nPlayer, reaction, true);
 	}
 
 	protected virtual void UpdateClearAnimation(int iPlayer) { }
@@ -1823,7 +1842,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 			this.UpdateClearAnimation(nPlayer);
 	}
 
-	private void UpdateJudgeCount(CChip? pChip, int nPlayer, bool bAutoPlay, bool bBombHit, ENoteJudge eJudgeResult, int? msDelta = null) {
+	private void UpdateJudgeCount(CChip? pChip, int nPlayer, bool bAutoPlay, bool bBombHit, ENoteJudge eJudgeResult, bool leftMax, int? msDelta = null) {
 		OpenTaiko.HttpEventReporter.ReportNoteJudgement(eJudgeResult, nPlayer, pChip, msDelta);
 
 		void returnChara() {
@@ -1975,17 +1994,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 
 					this.bIsMiss[nPlayer] = true;
 
-					CCharacter character = CCharacter.GetCharacter(nPlayer);
-					if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && this.bIsAlreadyMaxed[nPlayer] == true) {
-						this.bIsAlreadyMaxed[nPlayer] = false;
-						actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MAX_OUT, true);
-					} else if (!bIsGOGOTIME[nPlayer]) {
-						if (Chara_MissCount[nPlayer] == 1) {
-							actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MISS_IN, true);
-						} else if (Chara_MissCount[nPlayer] == 6) {
-							actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MISS_DOWN_IN, true);
-						}
-					}
+					this.PlayMissReaction(nPlayer, leftMax);
 
 				}
 				break;
@@ -1999,7 +2008,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 			this.UpdateClearAnimation(nPlayer);
 	}
 
-	private void UpdateComboMilestone(CChip pChip, int nPlayer) {
+	private void UpdateComboMilestone(CChip pChip, int nPlayer, bool isDeniedJudgeCount) {
 		if (NotesManager.IsMissableNote(pChip)) {
 			if ((this.actCombo.nCurrentCombo[nPlayer] % 100 == 0 || this.actCombo.nCurrentCombo[nPlayer] == 50) && this.actCombo.nCurrentCombo[nPlayer] > 0) {
 				this.actComboBalloon.Start(this.actCombo.nCurrentCombo[nPlayer], nPlayer);
@@ -2010,10 +2019,8 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 
 			//CDTXMania.act文字コンソール.tPrint(620, 80, C文字コンソール.Eフォント種別.白, "BPM: " + dbUnit.ToString());
 
-			for (int i = 0; i < 5; i++) {
-				if (this.actCombo.nCurrentCombo[i] == 50 || this.actCombo.nCurrentCombo[i] == 300) {
-					ctChipAnimeLag[i] = new CCounter(0, 664, 1, OpenTaiko.Timer);
-				}
+			if (!isDeniedJudgeCount && this.actCombo.nCurrentCombo[nPlayer] is 50 or 300) {
+				ctChipAnimeLag[nPlayer] = new CCounter(0, 664, 1, OpenTaiko.Timer);
 			}
 
 			if (this.actCombo.nCurrentCombo[nPlayer] % 10 == 0 && this.actCombo.nCurrentCombo[nPlayer] > 0) {
@@ -2165,8 +2172,8 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 
 	protected void tChipHitProcess_BadAndTightWhenMiss(EKeyConfigPart screenmode, ENoteJudge eJudgeResult, int nPlayer, CTja.ECourse? eCourse) {
 		this.actJudgeString.Start(nPlayer, eJudgeResult);
-		this.UpdateGauge(null, screenmode, nPlayer, eJudgeResult);
-		this.UpdateJudgeCount(null, nPlayer, false, false, eJudgeResult);
+		bool leftMax = this.UpdateGauge(null, screenmode, nPlayer, eJudgeResult);
+		this.UpdateJudgeCount(null, nPlayer, false, false, eJudgeResult, leftMax);
 	}
 
 	// a #NOTEIF note (not a roll) takes no hit while its trigger is false, read when the hit is judged: the input goes
@@ -3832,6 +3839,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		if (!NotesManager.IsGenericRoll(chip))
 			return;
 
+		bool wasVisible = chip.bVisible; // a roll of a branch that is not played has no end effects
 		if (!resetStates)
 			chip.bHit = true;
 		if (chip.bVisible && !chip.IsHitted) {
@@ -3863,8 +3871,8 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 						OpenTaiko.stageGameScreen.actChipFireD.Start(chip, gt, ENoteJudge.Mine, false, iPlayer);
 						OpenTaiko.Skin.soundBomb?.tPlay(TjaTimeToFrameworkTime(OpenTaiko.GetTJA(iPlayer)!, chip.end.dbSoundTimems));
 						chip.bVisible = false;
-						this.Chara_MissCount[iPlayer]++;
-						if (!(this.isDeniedPlaying[iPlayer] || this.IsStageFailed_Fast())) {
+						bool isCounted = !(this.isDeniedPlaying[iPlayer] || this.IsStageFailed_Fast());
+						if (isCounted) {
 						this.CChartScore[iPlayer].nMine++;
 						this.CSectionScore[iPlayer].nMine++;
 						this.CBranchScore[iPlayer].nMine++;
@@ -3875,18 +3883,23 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 							this.actDan.Update();
 							if (this.IsChartEnded())
 								this.UpdateClearAnimation(iPlayer);
+
+							if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
+								FloorManagement.damage();
+							this.actCombo.nCurrentCombo[iPlayer] = 0;
+							if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+								this.DanSongScore[actDan.NowShowingNumber].nCombo = 0;
 						}
-						if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
-							FloorManagement.damage();
-						this.actCombo.nCurrentCombo[iPlayer] = 0;
-						if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-							this.DanSongScore[actDan.NowShowingNumber].nCombo = 0;
 						this.actComboVoice.tReset(iPlayer);
 						this.bIsMiss[iPlayer] = true;
 
-						UpdateGauge(chip, EKeyConfigPart.Taiko, iPlayer, ENoteJudge.Bad);
-						if (OpenTaiko.ConfigIni.nFunMods[iPlayer] == EFunMods.DynamicBeat)
-							ApplyDynamicBeatFactor(-0.05);
+						bool leftMax = UpdateGauge(chip, EKeyConfigPart.Taiko, iPlayer, ENoteJudge.Bad);
+						if (isCounted) {
+							this.Chara_MissCount[iPlayer]++;
+							this.PlayMissReaction(iPlayer, leftMax);
+							if (OpenTaiko.ConfigIni.nFunMods[iPlayer] == EFunMods.DynamicBeat)
+								ApplyDynamicBeatFactor(-0.05);
+						}
 					}
 				}
 			}
@@ -3894,7 +3907,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		this.RemoveNowProcessingRollChip(iPlayer, chip, resetStates);
 
 		// process here for the correct default animation
-		if (!this.bPAUSE && !this.isRewinding) {
+		if (!this.bPAUSE && !this.isRewinding && wasVisible) {
 			if (NotesManager.IsKusudama(chip)) {
 				actChara.KusuMiss(iPlayer);
 			} else if (NotesManager.IsGenericBalloon(chip)) {
@@ -3985,8 +3998,13 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		if (NotesManager.IsRollEnd(chip))
 			chip = chip.start;
 
-		if (NotesManager.IsKusudama(chip) && this.actBalloon.KusudamaIsActive) {
-			this.actBalloon.KusuMiss();
+		// only a kusudama that was being played ends the shown one; a restart or a rewind ends it without the miss animation
+		bool wasProcessing = this.chipCurrentProcessingRollChip[iPlayer].Contains(chip);
+		if (wasProcessing && NotesManager.IsKusudama(chip) && this.actBalloon.KusudamaIsActive) {
+			if (resetStates)
+				this.actBalloon.KusuReset();
+			else
+				this.actBalloon.KusuMiss();
 		}
 
 		// while paused the end is not marked processed, so it is counted once, on the first frame after the resume
