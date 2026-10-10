@@ -483,14 +483,23 @@ internal class OpenTaiko : Game {
 		this.ChangeStage(Stage, traceMessage);
 	}
 
-	// ESC during a song load: drop the half-loaded chart (the loader already tore the game screen down)
+	// Stops, deactivates and releases the charts of every player; a chart that several slots share (.tcm and built
+	// dans) is handled once
+	internal static void tReleaseAllCharts(Action<CTja>? stopChips = null) {
+		for (int i = 0; i < tja.Length; i++) {
+			CTja? chart = tja[i];
+			if (chart == null || Array.IndexOf(tja, chart) < i) continue;
+			stopChips?.Invoke(chart);
+			chart.DeActivate();
+			chart.ReleaseManagedResource();
+			chart.ReleaseUnmanagedResource();
+		}
+	}
+
+	// ESC during a song load: drop the half-loaded charts (the loader already tore the game screen down)
 	internal static void tDropCanceledSongLoad() {
 		OpenTaiko.Pad.detectedDevice.Clear();
-		if (TJA != null) {
-			TJA.DeActivate();
-			TJA.ReleaseManagedResource();
-			TJA.ReleaseUnmanagedResource();
-		}
+		tReleaseAllCharts();
 		SongMount.bIsAfterSongJump = false;
 	}
 
@@ -913,11 +922,7 @@ internal class OpenTaiko : Game {
 							if (this.nDrawLoopReturnValue == (int)ESongLoadingScreenReturnValue.LoadCanceled) {
 								UnmountActivity(rCurrentStage);
 
-								if (TJA != null) {
-									TJA.DeActivate();
-									TJA.ReleaseManagedResource();
-									TJA.ReleaseUnmanagedResource();
-								}
+								tReleaseAllCharts();
 
 								SongMount.bIsAfterSongJump = false;
 								UnmountAndChangeStage(OpenTaiko.latestSongSelect, "Return to song select menu");
@@ -954,10 +959,7 @@ internal class OpenTaiko : Game {
 						switch (this.nDrawLoopReturnValue) {
 							case (int)EGameplayScreenReturnValue.ReloadAndReplay:
 								#region [ Restart play ]
-								TJA.tStopAllChips();
-								TJA.DeActivate();
-								TJA.ReleaseManagedResource();
-								TJA.ReleaseUnmanagedResource();
+								tReleaseAllCharts(chart => chart.tStopAllChips());
 								UnmountAndChangeStage(stageSongLoading);
 								this.tExecuteGarbageCollection();
 								break;
@@ -971,10 +973,7 @@ internal class OpenTaiko : Game {
 								#region [ Play cancelled ]
 								//-----------------------------
 
-								TJA.tStopAllChips();
-								TJA.DeActivate();
-								TJA.ReleaseManagedResource();
-								TJA.ReleaseUnmanagedResource();
+								tReleaseAllCharts(chart => chart.tStopAllChips());
 								SongMount.bIsAfterSongJump = false;
 								UnmountAndChangeStage(OpenTaiko.latestSongSelect, "Return to song select menu");
 
@@ -987,10 +986,7 @@ internal class OpenTaiko : Game {
 								#region [ Stage failed (skip results) ]
 								//-----------------------------
 
-								TJA.tStopAllChips();
-								TJA.DeActivate();
-								TJA.ReleaseManagedResource();
-								TJA.ReleaseUnmanagedResource();
+								tReleaseAllCharts(chart => chart.tStopAllChips());
 								SongMount.bIsAfterSongJump = false;
 								UnmountAndChangeStage(OpenTaiko.latestSongSelect, "Return to song select menu");
 								this.tExecuteGarbageCollection();
@@ -1016,10 +1012,7 @@ internal class OpenTaiko : Game {
 								#region [ Song jump (skip results, load new song) ]
 								//-----------------------------
 								SongMount.bSongJumpPending = false;
-								TJA?.tStopAllChipsAndRemoveFromMixer();
-								TJA?.DeActivate();
-								TJA?.ReleaseManagedResource();
-								TJA?.ReleaseUnmanagedResource();
+								tReleaseAllCharts(chart => chart.tStopAllChipsAndRemoveFromMixer());
 								UnmountActivity(rCurrentStage);
 								// the target replaces the song only now, so the play that jumped is torn down as itself
 								SongMount.rChoosenSong = SongMount.rSongJumpTarget;
@@ -1042,10 +1035,7 @@ internal class OpenTaiko : Game {
 						//-----------------------------
 						if (this.nDrawLoopReturnValue != 0) {
 							//DTX.t全チップの再生一時停止();
-							TJA.tStopAllChipsAndRemoveFromMixer();
-							TJA.DeActivate();
-							TJA.ReleaseManagedResource();
-							TJA.ReleaseUnmanagedResource();
+							tReleaseAllCharts(chart => chart.tStopAllChipsAndRemoveFromMixer());
 							UnmountActivity(rCurrentStage);
 							this.tExecuteGarbageCollection();
 

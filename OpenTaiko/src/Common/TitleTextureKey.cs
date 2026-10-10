@@ -42,6 +42,13 @@ public sealed class TitleTextureKey {
 		return texture;
 	}
 
+	// Frees the texture cached for a key, if there is one, without creating it; its Dispose drops the entry.
+	internal static void Release(TitleTextureKey? key) {
+		if (key is null || !_titledictionary.TryGetValue(key, out var texture)) return;
+		texture?.Dispose();
+		_titledictionary.Remove(key);
+	}
+
 	private static CTexture GenerateTitleTextureTate(TitleTextureKey titleTextureKey, bool keepCenter = false) {
 		if (titleTextureKey == null) return null;
 		using (var bmp = titleTextureKey.cPrivateFastFont.DrawText_V(

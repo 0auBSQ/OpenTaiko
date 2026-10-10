@@ -25,9 +25,9 @@ internal class HPrivateFastFont {
 
 	public static CCachedFontRenderer tInstantiateBoxFont(int scale, CFontRenderer.FontStyle style = CFontRenderer.FontStyle.Regular) {
 		if (FontExists(OpenTaiko.Skin.BoxFontName))
-			return (new CCachedFontRenderer(OpenTaiko.Skin.FontName, scale, style));
+			return (new CCachedFontRenderer(OpenTaiko.Skin.BoxFontName, scale, style));
 		if (FontExists(CLangManager.LangInstance.BoxFontName))
-			return (new CCachedFontRenderer(CLangManager.LangInstance.FontName, scale, style));
+			return (new CCachedFontRenderer(CLangManager.LangInstance.BoxFontName, scale, style));
 		return (new CCachedFontRenderer(DefaultFont, scale, style));
 	}
 }

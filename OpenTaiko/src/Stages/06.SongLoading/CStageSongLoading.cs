@@ -372,6 +372,9 @@ internal class CStageSongLoading : CStage {
 
 					for (int i = 0; i < _loadedTjas!.Length; i++)
 						OpenTaiko.SetTJA(i, _loadedTjas[i]);
+					// players not in this play drop the previous play's charts (already deactivated when it ended)
+					for (int i = _loadedTjas.Length; i < OpenTaiko.MAX_PLAYERS; i++)
+						OpenTaiko.SetTJA(i, null);
 
 					_dtxLoadTask = null;
 					_loadedTjas = null;

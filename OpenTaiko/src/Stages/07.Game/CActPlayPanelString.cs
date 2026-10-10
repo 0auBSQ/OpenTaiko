@@ -27,7 +27,10 @@ internal class CActPlayPanelString : CActivity {
 	/// <param name="stageText">曲数</param>
 	public void SetPanelString(string songName, string genreName, string stageText = null, CSongListNode songNode = null) {
 		if (base.IsActivated) {
-			OpenTaiko.tTextureRelease(ref this.txPanel);
+			OpenTaiko.tDisposeSafely(ref this.txMusicName);
+			OpenTaiko.tDisposeSafely(ref this.txStage);
+			OpenTaiko.tDisposeSafely(ref this.txGENRE);
+			this.tReleaseGenre();
 			if ((songName != null) && (songName.Length > 0)) {
 				try {
 					using (var bmpSongTitle = pfMusicName.DrawText(songName, OpenTaiko.Skin.Game_MusicName_ForeColor, OpenTaiko.Skin.Game_MusicName_BackColor, null, 30)) {
@@ -37,41 +40,10 @@ internal class CActPlayPanelString : CActivity {
 						this.txMusicName.vcScaleRatio.X = OpenTaiko.GetSongNameXScaling(ref txMusicName);
 					}
 
-					SKBitmap bmpDiff;
-					string strDiff = "";
-					if (OpenTaiko.Skin.eDiffDispMode == EDifficultyDisplayType.TextOnNthSong) {
-						switch (OpenTaiko.SongMount.nChoosenSongDifficulty[0]) {
-							case 0:
-								strDiff = "かんたん ";
-								break;
-							case 1:
-								strDiff = "ふつう ";
-								break;
-							case 2:
-								strDiff = "むずかしい ";
-								break;
-							case 3:
-								strDiff = "おに ";
-								break;
-							case 4:
-								strDiff = "えでぃと ";
-								break;
-							default:
-								strDiff = "おに ";
-								break;
-						}
-						bmpDiff = pfMusicName.DrawText(strDiff + stageText, OpenTaiko.Skin.Game_StageText_ForeColor, OpenTaiko.Skin.Game_StageText_BackColor, null, 30);
-					} else {
-						bmpDiff = pfMusicName.DrawText(stageText, OpenTaiko.Skin.Game_StageText_ForeColor, OpenTaiko.Skin.Game_StageText_BackColor, null, 30);
-					}
-
-					using (bmpDiff) {
-						txStage = OpenTaiko.Tx.TxCGen("Songs");
-					}
+					txStage = OpenTaiko.Tx.TxCGen("Songs");
 				} catch (CTextureCreateFailedException e) {
 					Trace.TraceError(e.ToString());
 					Trace.TraceError("パネル文字列テクスチャの生成に失敗しました。");
-					this.txPanel = null;
 				}
 			}
 
@@ -82,7 +54,8 @@ internal class CActPlayPanelString : CActivity {
 			if (songNode != null && songNode.isChangedBoxColor)
 				stageColor = songNode.BoxColor;
 
-			this.txGENRE.color4 = CConversion.ColorToColor4(stageColor);
+			if (this.txGENRE != null)
+				this.txGENRE.color4 = CConversion.ColorToColor4(stageColor);
 
 			pfGENRE = HPrivateFastFont.tInstantiateBoxFont(OpenTaiko.Skin.Game_GenreText_FontSize);
 
@@ -94,6 +67,13 @@ internal class CActPlayPanelString : CActivity {
 
 
 		}
+	}
+
+	// frees the genre label's cached texture, then its font
+	private void tReleaseGenre() {
+		TitleTextureKey.Release(this.ttkGENRE);
+		this.ttkGENRE = null!;
+		OpenTaiko.tDisposeSafely(ref this.pfGENRE);
 	}
 
 	public void tLyricsTextureCreate(SKBitmap bmplyric) {
@@ -130,7 +110,6 @@ internal class CActPlayPanelString : CActivity {
 
 	public override void Activate() {
 		this.pfMusicName = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Game_MusicName_FontSize);
-		this.txPanel = null;
 		this.ctForProgress = new CCounter();
 		this.Start();
 		this.bFirst = true;
@@ -138,11 +117,10 @@ internal class CActPlayPanelString : CActivity {
 	}
 	public override void DeActivate() {
 		this.ctForProgress = null;
-		OpenTaiko.tDisposeSafely(ref this.txPanel);
 		OpenTaiko.tDisposeSafely(ref this.txMusicName);
+		OpenTaiko.tDisposeSafely(ref this.txStage);
 		OpenTaiko.tDisposeSafely(ref this.txGENRE);
-		OpenTaiko.tDisposeSafely(ref this.pfGENRE);
-		OpenTaiko.tDisposeSafely(ref this.txPanel);
+		this.tReleaseGenre();
 		OpenTaiko.tDisposeSafely(ref this.pfMusicName);
 		OpenTaiko.tDisposeSafely(ref this.pfLyricsFont);
 		OpenTaiko.tDisposeSafely(ref this.txLyricsTexture);
@@ -232,14 +210,13 @@ internal class CActPlayPanelString : CActivity {
 	//-----------------
 	private CCounter ctForProgress;
 
-	private CTexture txPanel;
 	private bool bMute;
 	private bool bFirst;
 
-	private CTexture txMusicName;
-	private CTexture txStage;
-	private CTexture txGENRE;
-	private CCachedFontRenderer pfGENRE;
+	private CTexture? txMusicName;
+	private CTexture? txStage;
+	private CTexture? txGENRE;
+	private CCachedFontRenderer? pfGENRE;
 	private TitleTextureKey ttkGENRE;
 	private CTexture txLyricsTexture;
 	private CCachedFontRenderer pfMusicName;

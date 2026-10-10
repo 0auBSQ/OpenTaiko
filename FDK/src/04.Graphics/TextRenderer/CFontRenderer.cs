@@ -275,7 +275,7 @@ public class CFontRenderer : IDisposable {
 		return SKBitmap.FromImage(image);
 	}
 
-	public void Dispose() {
+	public virtual void Dispose() {
 		this.textRenderer.Dispose();
 	}
 

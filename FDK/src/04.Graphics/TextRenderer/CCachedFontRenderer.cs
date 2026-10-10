@@ -185,7 +185,7 @@ public class CCachedFontRenderer : CFontRenderer {
 
 	#region [ IDisposable 実装 ]
 	//-----------------
-	public new void Dispose() {
+	public override void Dispose() {
 		if (!this.bDisposed_CCachedFontRenderer) {
 			if (listFontCache != null) {
 				//Debug.WriteLine( "Disposing CCachedFontRenderer()" );

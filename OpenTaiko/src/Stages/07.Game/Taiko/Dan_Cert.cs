@@ -101,6 +101,29 @@ internal class Dan_Cert : CActivity {
 		return folder;
 	}
 
+	// one exam font and label set for the session (the result screen draws them after DeActivate); made again, after
+	// freeing the old labels' textures and font, when the language, the skin's font or the exam font size changes
+	private void tPrepareExamFont() {
+		int size = OpenTaiko.Skin.Game_DanC_ExamFont_Size;
+		CLang lang = CLangManager.LangInstance;
+		string fontName = OpenTaiko.Skin.FontName;
+		if (this.pfExamFont != null && this.examFontLang == lang && this.examFontName == fontName && this.examFontSize == size)
+			return;
+
+		foreach (var key in this.ttkExams ?? [])
+			TitleTextureKey.Release(key);
+		OpenTaiko.tDisposeSafely(ref this.pfExamFont);
+
+		this.pfExamFont = HPrivateFastFont.tInstantiateMainFont(size);
+		this.ttkExams = new TitleTextureKey[(int)Exam.Type.Total];
+		for (int i = 0; i < this.ttkExams.Length; i++) {
+			this.ttkExams[i] = new TitleTextureKey(lang.GetExamName(i), this.pfExamFont, Color.White, Color.SaddleBrown, 1000);
+		}
+		this.examFontLang = lang;
+		this.examFontName = fontName;
+		this.examFontSize = size;
+	}
+
 	public override void Activate() {
 		for (int i = 0; i < CExamInfo.cMaxExam; i++) {
 			if (OpenTaiko.TJA.Dan_C[i] != null) Challenge[i] = new Dan_C(OpenTaiko.TJA.Dan_C[i]);
@@ -123,12 +146,8 @@ internal class Dan_Cert : CActivity {
 		this.ctRainbowAnime = new CCounter(0, OpenTaiko.Skin.Game_Gauge_Dan_Rainbow_Ptn - 1, 30, OpenTaiko.Timer);
 		this.ctRainbowOpacity = new CCounter(0, OpenTaiko.Skin.Game_Gauge_Rainbow_Timer - 1, 1, OpenTaiko.Timer);
 
-		this.pfExamFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Game_DanC_ExamFont_Size);
-
-		this.ttkExams = new TitleTextureKey[(int)Exam.Type.Total];
-		for (int i = 0; i < this.ttkExams.Length; i++) {
-			this.ttkExams[i] = new TitleTextureKey(CLangManager.LangInstance.GetExamName(i), this.pfExamFont, Color.White, Color.SaddleBrown, 1000);
-		}
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+			this.tPrepareExamFont();
 
 		NowCymbolShowingNumber = NowShowingNumber = 0;
 		bExamChangeCheck = false;
@@ -607,8 +626,6 @@ internal class Dan_Cert : CActivity {
 		}
 		for (int i = 0; i < IsEnded.Length; i++)
 			IsEnded[i] = false;
-
-		OpenTaiko.tDisposeSafely(ref this.pfExamFont);
 
 		Sound_Section?.tDispose(deleteInstance: true);
 		Sound_Section_First?.tDispose(deleteInstance: true);
@@ -1393,8 +1410,11 @@ internal class Dan_Cert : CActivity {
 	private CCounter ctRainbowAnime;
 	private CCounter ctRainbowOpacity;
 
-	private CCachedFontRenderer pfExamFont;
+	private CCachedFontRenderer? pfExamFont;
 	private TitleTextureKey[] ttkExams;
+	private CLang? examFontLang;
+	private string? examFontName;
+	private int examFontSize;
 
 	//-----------------
 	#endregion

@@ -305,6 +305,8 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	public override void DeActivate() {
 		this.ctHandHold = null;
 
+		TitleTextureKey.Release(this.ttkReplayMode);
+		TitleTextureKey.Release(this.ttkReplayInvalid);
 		this.pfReplayModeText?.Dispose(); this.pfReplayModeText = null;
 		this.pfReplayModeTextSmall?.Dispose(); this.pfReplayModeTextSmall = null;
 		this.ttkReplayMode = null; this.ttkReplayInvalid = null;

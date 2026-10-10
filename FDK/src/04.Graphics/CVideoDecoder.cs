@@ -405,7 +405,7 @@ public unsafe class CVideoDecoder : IDisposable {
 		if (Texture == lastTexture)
 			return;
 
-		Texture?.Dispose();
+		// a frame texture from another decoder stays that decoder's to free
 		Texture = lastTexture;
 
 	}
