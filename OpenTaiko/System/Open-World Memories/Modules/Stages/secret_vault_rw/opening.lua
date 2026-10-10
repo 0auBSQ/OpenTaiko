@@ -147,7 +147,6 @@ local function landed(now)
             d.vx, d.vy, d.k, d.grow, d.life = side * rnd(10, 60), -rnd(160, 260), rnd(0.4, 0.8), 0, rnd(0.8, 1.2)
         end
     end
-    Cabin.hop(now)
     if GLOBALCAMERA ~= nil then
         pcall(function() GLOBALCAMERA:Shake(8, 0.3) end)
         camT = now

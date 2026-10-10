@@ -3,14 +3,13 @@ local Tex = require("tex")
 
 local C = {}
 
-C.DESK_Y = 742
+C.DESK_Y = 778
 local VPX, VPY = 960, 430
 local HALF_W, FLOOR_Y, CEIL_Y = 1200, 660, -840
 C.FLOOR_Y = FLOOR_Y
 local KICK_Y = 520                             -- the glass's bottom edge (the kick plate's top)
 local F = 1663                                 -- depth of z = 1 in px: world speeds along the walls are px / F
-local TABLE_X, TABLE_Y = 960, 1050
-local TREASURE_L_X, TREASURE_R_X, TREASURE_Y = 556, 1364, 750
+local TABLE_X, TABLE_Y = 960, 1080
 local FISH_KINDS = 6
 
 -- seaweed out on the sea floor: side, distance behind the glass, depth, kind, height (px at z = 1), sway, period;
@@ -40,7 +39,6 @@ local fish, bubbles = {}, {}
 local nextFish, bubbleAcc = 0, 0
 local clock = 0
 local weedPhase = {}
-local hopT = nil
 local triedWater = false
 
 local function rnd(a, b) return a + (b - a) * math.random() end
@@ -114,7 +112,6 @@ end
 function C.reset()
     fish, bubbles = {}, {}
     clock = 0
-    hopT = nil
     triedWater = false
     for i = 1, 5 do spawnFish(rnd(0.1, 0.85)) end
     for i = 1, 22 do spawnBubble(rnd(CEIL_Y, KICK_Y)) end
@@ -122,8 +119,6 @@ function C.reset()
     bubbleAcc = 0
     for i = 1, #WEEDS do weedPhase[i] = rnd(0, 6.283) end
 end
-
-function C.hop(now) hopT = now end
 
 local function step(dt)
     clock = clock + dt
@@ -250,24 +245,9 @@ function C.drawBack(now, dt)
     Tex.place(tex["Cabin/Room"], 0, 0, "topleft")
 end
 
--- how high the desk's treasure is off the desk, a moment after a landing (delay in seconds)
-local function hopLift(now, delay, h)
-    if hopT == nil then return 0 end
-    local a = now - hopT - delay
-    if a < 0 or a > 0.42 then return 0 end
-    if a < 0.26 then
-        local u = a / 0.26
-        return h * 4 * u * (1 - u)
-    end
-    local u = (a - 0.26) / 0.16
-    return h * 0.25 * 4 * u * (1 - u)
-end
-
 function C.drawFront(now)
     local tex = ctx.tex
     Tex.place(tex["Cabin/Table"], TABLE_X, TABLE_Y, "bottom")
-    Tex.place(tex["Cabin/TreasureLeft"], TREASURE_L_X, TREASURE_Y - hopLift(now, 0.0, 18), "bottom")
-    Tex.place(tex["Cabin/TreasureRight"], TREASURE_R_X, TREASURE_Y - hopLift(now, 0.04, 22), "bottom")
 end
 
 return C

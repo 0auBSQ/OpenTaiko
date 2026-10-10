@@ -227,7 +227,9 @@ function activate()
 	text = TEXT:Create(32)
 	text_enter = text:GetText("Press Enter to Start!")
 	-- the intro plays its own audio track, clocked together with the picture
-	video = VIDEO:CreateVideo("Videos/intro.mp4", true)
+	local intro = "Videos/intro.mp4"
+	if LANG:GetLanguageId() == "en" then intro = "Videos/intro_en.mp4" end
+	video = VIDEO:CreateVideo(intro, true)
 	
 	sounds.Decide = SHARED:GetSharedSound("Decide")
 	sounds.Skip = SHARED:GetSharedSound("Skip")

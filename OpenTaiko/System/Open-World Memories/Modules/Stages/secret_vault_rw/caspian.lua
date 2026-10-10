@@ -6,7 +6,7 @@ local Tex = require("tex")
 
 local C = {}
 
-local FOOT_X, FOOT_Y = 960, 905
+local FOOT_X, FOOT_Y = 1555, 855
 local FRAMES = { neutral = "Neutral", happy = "Happy", laugh = "Laugh", grumpy = "Grumpy" }
 local BOX = { x = 300, y = 822, w = 1320, h = 210 }
 local CPS = 38
