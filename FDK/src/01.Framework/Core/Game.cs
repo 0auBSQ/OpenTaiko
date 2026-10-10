@@ -778,6 +778,11 @@ public abstract partial class Game : IDisposable {
 		Initialize();
 		LoadContent();
 
+		if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()) {
+			Trace.TraceWarning("Input thread is not started. This prevents the crash when poll inputs using non-main thread on Linux or MacOS. Fell back to poll input per draw frame.");
+			return;
+		}
+
 		try {
 			this.thInputCancel = new CancellationTokenSource();
 			ThreadStart thInputFunc = new (async () => {
