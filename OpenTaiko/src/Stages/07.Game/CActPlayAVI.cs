@@ -21,7 +21,7 @@ internal class CActPlayAVI : CActivity {
 		if (this.isCutScene || OpenTaiko.ConfigIni.bEnableAVI) {
 			this.rVD = rVD;
 			if (this.rVD != null) {
-				this.ratio1 = Math.Min((float)GameWindowSize.Height / ((float)this.rVD.FrameSize.Height), (float)GameWindowSize.Width / ((float)this.rVD.FrameSize.Height));
+				this.ratio1 = Math.Min((float)GameWindowSize.Height / ((float)this.rVD.FrameSize.Height), (float)GameWindowSize.Width / ((float)this.rVD.FrameSize.Width));
 
 				if (!rVD.bPlaying) this.rVD.Start();
 			}

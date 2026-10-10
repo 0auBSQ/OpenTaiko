@@ -3932,7 +3932,8 @@ internal class CTja : CActivity {
 				// for play. During metadata enumeration (bLoadChart == false) the decoder is never used
 				// (tAVILoad is itself gated on bLoadChart) and would leak native memory, since the parsed
 				// CTja is discarded without Dispose. Enumeration still records strBGVIDEO_PATH above.
-				if (this.bLoadChart) {
+				// Only the first player's chart shows videos, so the other players' charts open none.
+				if (this.bLoadChart && this.nPlayerSide == 0) {
 					CVideoDecoder vd = new CVideoDecoder(strVideoFilename);
 
 					if (this.listVD.ContainsKey(1))
@@ -3963,7 +3964,7 @@ internal class CTja : CActivity {
 
 			try {
 				// As with BGMOVIE: only open the native decoder for actual play, not metadata enumeration.
-				if (this.bLoadChart) {
+				if (this.bLoadChart && this.nPlayerSide == 0) {
 					CVideoDecoder vd = new CVideoDecoder(strVideoFilename);
 
 					var indexText = strCommandName.Remove(0, 3);

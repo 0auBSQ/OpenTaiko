@@ -2510,7 +2510,11 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		SoundManager.PlayTimer.Pause();
 		OpenTaiko.Timer.Pause();
 		OpenTaiko.TJA.tAllChipPlaybackPause();
-		this.actAVI.Pause();
+		// every running video of the drawn chart, so that one hidden under another does not run ahead
+		foreach (var vd in OpenTaiko.TJA.listVD.Values) {
+			if (vd.bPlaying)
+				vd.Pause();
+		}
 	}
 
 	public void Resume(long? msStartGameTime = null) {
@@ -2523,7 +2527,10 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		SoundManager.PlayTimer.Reset();
 		SoundManager.PlayTimer.NowTimeMs = OpenTaiko.Timer.NowTimeMs; // sync with game time
 
-		this.actAVI.Resume();
+		foreach (var vd in OpenTaiko.TJA.listVD.Values) {
+			if (vd.bDrawing && !vd.bPlaying)
+				vd.Resume();
+		}
 		this.actPanel.Start();
 		this.bPAUSE = false;                                // システムがPAUSE状態だったら、強制解除
 		_pauseCooldown.Restart();
@@ -2858,12 +2865,14 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 				case 0x54:  // 動画再生
 					if (!this.bPAUSE && !pChip.bHit) { // can't play while paused
 						pChip.bHit = true;
-						if (configIni.bEnableAVI) {
+						// the videos are the drawn chart's: the other players' charts only mark the chip
+						if (configIni.bEnableAVI && ReferenceEquals(dTX, OpenTaiko.TJA)) {
 							if ((dTX.listVD.TryGetValue(pChip.nIntValue_InternalNumber, out CVideoDecoder vd))) {
 								ShowVideo = true;
-								if (OpenTaiko.ConfigIni.bEnableAVI && vd != null) {
+								if (vd != null) {
 									this.actAVI.Start(vd);
-									this.actAVI.Seek(pChip.VideoStartTimeMs);
+									// the chip's offset plus the chart time already past the chip (a training resume replays it late)
+									this.actAVI.Seek(pChip.VideoStartTimeMs + (int)Math.Max(0, nCurrentTimems - pChip.dbSoundTimems));
 								}
 							}
 						}
@@ -2872,18 +2881,26 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 				case 0x55:
 					if (!this.bPAUSE && !pChip.bHit) { // can't play while paused
 						pChip.bHit = true;
-						if (configIni.bEnableAVI) {
-							if ((dTX.listVD.TryGetValue(pChip.nIntValue_InternalNumber, out CVideoDecoder vd))) {
+						if (configIni.bEnableAVI && ReferenceEquals(dTX, OpenTaiko.TJA)) {
+							dTX.listVD.TryGetValue(1, out CVideoDecoder? vdMain);
+							if (dTX.listVD.ContainsKey(pChip.nIntValue_InternalNumber)) {
 								ShowVideo = false;
-								if (OpenTaiko.ConfigIni.bEnableAVI && vd != null) {
+								// stops the video on screen, unless it is the main one
+								if (!ReferenceEquals(this.actAVI.rVD, vdMain))
 									this.actAVI.Stop();
-								}
 							}
 
-							if ((dTX.listVD.TryGetValue(1, out CVideoDecoder vd2))) {
+							// back to the main video, if it is running; its clock went on under the one just stopped
+							if (vdMain != null) {
 								ShowVideo = true;
-								if (OpenTaiko.ConfigIni.bEnableAVI && vd != null) {
-									this.actAVI.Start(vd);
+								bool wasHidden = !ReferenceEquals(this.actAVI.rVD, vdMain);
+								if (vdMain.bPlaying) {
+									this.actAVI.Start(vdMain);
+									// its queued frames date from when it was covered: decode again from its clock
+									if (wasHidden) vdMain.Seek((long)vdMain.msPlayPosition);
+								} else if (wasHidden) {
+									// not started yet, or stopped: nothing on screen until its own chip
+									this.actAVI.rVD = null;
 								}
 							}
 						}
@@ -3041,7 +3058,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 				case 0xb0: //camera horizontal scaling start
 					if (!pChip.bHit) {
 						pChip.bHit = true;
-						this.objHandlers[GetObjHandlerKeys(pChip)[0]] = (pChip, new CCounter(0, pChip.fObjTimeMs, CTja.TjaDurationToGameDuration(1), OpenTaiko.Timer), GetObjHandlerSetter(pChip));
+						this.objHandlers[GetObjHandlerKeys(pChip)[0]] = (pChip, nPlayer, GetObjHandlerSetter(pChip));
 					}
 					break;
 				case 0xa1: //camera vertical move end
@@ -3068,7 +3085,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 				case 0xb8: //set camera y scale
 					if (!pChip.bHit) {
 						pChip.bHit = true;
-						this.objHandlers[GetObjHandlerKeys(pChip)[0]] = (pChip, new CCounter(0, 0, 0, OpenTaiko.Timer), GetObjHandlerSetter(pChip));
+						this.objHandlers[GetObjHandlerKeys(pChip)[0]] = (pChip, nPlayer, GetObjHandlerSetter(pChip));
 					}
 					break;
 				case 0xb9: //reset camera
@@ -3122,8 +3139,9 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 					if (!pChip.bHit) {
 						pChip.bHit = true;
 
-						if (dTX.listObj.TryGetValue(pChip.strObjName, out pChip.obj))
-							objHandlers[GetObjHandlerKeys(pChip)[0]] = (pChip, new CCounter(0, pChip.fObjTimeMs, CTja.TjaDurationToGameDuration(1), OpenTaiko.Timer), GetObjHandlerSetter(pChip));
+						// only the drawn chart's objects are on screen
+						if (ReferenceEquals(dTX, OpenTaiko.TJA) && dTX.listObj.TryGetValue(pChip.strObjName, out pChip.obj))
+							objHandlers[GetObjHandlerKeys(pChip)[0]] = (pChip, nPlayer, GetObjHandlerSetter(pChip));
 					}
 					break;
 				case 0xbf: //object animation end
@@ -3154,8 +3172,8 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 					if (!pChip.bHit) {
 						pChip.bHit = true;
 
-						if (dTX.listObj.TryGetValue(pChip.strObjName, out pChip.obj)) {
-							this.objHandlers[GetObjHandlerKeys(pChip)[0]] = (pChip, new CCounter(0, 0, 0, OpenTaiko.Timer), GetObjHandlerSetter(pChip));
+						if (ReferenceEquals(dTX, OpenTaiko.TJA) && dTX.listObj.TryGetValue(pChip.strObjName, out pChip.obj)) {
+							this.objHandlers[GetObjHandlerKeys(pChip)[0]] = (pChip, nPlayer, GetObjHandlerSetter(pChip));
 						}
 					}
 					break;
@@ -3597,20 +3615,12 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 
 		#region [ EXTENDED CONTROLS ]
 		List<string> keysToRemove = new();
-		foreach (var (key, (chip, counter, setter)) in this.objHandlers) {
-			counter.Tick();
-
-			float value = 0.0f;
-			if (counter.IsEnded) {
-				value = chip.fObjEnd;
+		foreach (var (key, (chip, player, setter)) in this.objHandlers) {
+			// a tween follows the chart time of the player whose chart started it
+			if (player != nPlayer)
+				continue;
+			if (Easing.EvaluateTween(nCurrentTimems - chip.dbSoundTimems, chip.fObjTimeMs, chip.strObjEaseType, chip.fObjStart, chip.fObjEnd, chip.objCalcType, out float value))
 				keysToRemove.Add(key);
-			} else {
-				if (chip.strObjEaseType.Equals("IN")) value = Easing.EaseIn(counter, chip.fObjStart, chip.fObjEnd, chip.objCalcType);
-				if (chip.strObjEaseType.Equals("OUT")) value = Easing.EaseOut(counter, chip.fObjStart, chip.fObjEnd, chip.objCalcType);
-				if (chip.strObjEaseType.Equals("IN_OUT")) value = Easing.EaseInOut(counter, chip.fObjStart, chip.fObjEnd, chip.objCalcType);
-				value = float.IsNaN(value) ? chip.fObjStart : value;
-			}
-
 
 			setter(value);
 		}
@@ -4716,7 +4726,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 
 
 	#region [EXTENDED COMMANDS]
-	private Dictionary<string, (CChip chip, CCounter counter, Action<float> setter)> objHandlers = new();
+	private Dictionary<string, (CChip chip, int player, Action<float> setter)> objHandlers = new();
 
 	public bool[] bCustomDoron = new bool[OpenTaiko.MAX_PLAYERS];
 	private bool bConfigUpdated = false;

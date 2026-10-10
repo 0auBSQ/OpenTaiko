@@ -176,6 +176,25 @@ static class Easing {
 		return (float)Value;
 	}
 
+	// Value of a chart tween msElapsed after its start. Returns true once the tween is over (the value is then the end
+	// value). An ease type other than IN, OUT or IN_OUT goes from start to end linearly.
+	public static bool EvaluateTween(double msElapsed, double msDuration, string? easeType, float startPoint, float endPoint, CalcType type, out float value) {
+		if (!(msDuration > 0) || msElapsed >= msDuration) {
+			value = endPoint;
+			return true;
+		}
+		double progress = Math.Max(0, msElapsed / msDuration);
+		value = easeType switch {
+			"IN" => EaseIn(progress, startPoint, endPoint, type),
+			"OUT" => EaseOut(progress, startPoint, endPoint, type),
+			"IN_OUT" => EaseInOut(progress, startPoint, endPoint, type),
+			_ => EaseIn(progress, startPoint, endPoint, CalcType.Linear),
+		};
+		if (float.IsNaN(value))
+			value = startPoint;
+		return false;
+	}
+
 	public enum CalcType {
 		Quadratic,
 		Cubic,
