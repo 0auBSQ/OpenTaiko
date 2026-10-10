@@ -9,7 +9,7 @@ namespace OpenTaikoTests {
 		readonly record struct Note(long T, bool Don);
 		readonly record struct In(long T, bool Don);
 		readonly record struct Roll(long Start, long End);
-		enum Mode { Precise, OldOrder, Fix }
+		enum Mode { Precise, OldOrder, Fix, LiveCap }
 
 		static int JudgeBad(List<Note> notes, List<In> inputsIn, List<Roll> rolls, Mode mode, double frameStep, double phase) {
 			var hit = new bool[notes.Count]; var missed = new bool[notes.Count];
@@ -38,9 +38,11 @@ namespace OpenTaikoTests {
 				foreach (var inp in inputs) { AutoMiss(inp.T); Judge(inp); }   // frame-independent reference
 			} else {
 				double end = notes[^1].T + 1000;
+				double consumed = double.NegativeInfinity;
 				for (double clock = phase; clock <= end; clock += Math.Max(1, frameStep)) {
 					if (clock < 0) continue;
 					if (mode == Mode.Fix) { Pump(clock, true); AutoMiss(clock); }   // interleaved pump BEFORE auto-miss
+					else if (mode == Mode.LiveCap) { AutoMiss(Math.Min(clock, consumed)); Pump(clock, false); consumed = clock; }
 					else { AutoMiss(clock); Pump(clock, false); }                    // OLD: auto-miss THEN batch pump
 				}
 				Pump(double.MaxValue, mode == Mode.Fix); AutoMiss(double.MaxValue);
@@ -97,6 +99,19 @@ namespace OpenTaikoTests {
 			foreach (var f in Cadences)
 				for (double phase = 0; phase < f; phase += 1)
 					Assert.Equal(precise, JudgeBad(DRIFT, DRIFT_IN, NONE, Mode.Fix, f, phase));
+		}
+
+		// live play: each frame auto-misses only up to the input consumed in the previous frame, then judges the
+		// frame's input in a batch; it must give the frame-independent result on both slices
+		[Fact]
+		public void LiveCap_ReproducesPreciseResult_AtEveryCadenceAndPhase() {
+			foreach (var (notes, inputs, rolls) in new[] { (RICH, RICH_IN, RICH_ROLLS), (DRIFT, DRIFT_IN, NONE) }) {
+				int precise = JudgeBad(notes, inputs, rolls, Mode.Precise, 0, 0);
+				foreach (var f in Cadences)
+					for (double phase = 0; phase < f; phase += 1)
+						Assert.True(JudgeBad(notes, inputs, rolls, Mode.LiveCap, f, phase) == precise,
+							$"live cap drifted at {f}ms/frame phase {phase}");
+			}
 		}
 	}
 }

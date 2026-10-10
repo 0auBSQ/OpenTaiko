@@ -187,6 +187,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		Array.Fill(this.nCurrentRollCount, 0);
 		Array.Fill(this.idxLastBranchSection, 0);
 		Array.Fill(this.Chara_MissCount, 0);
+		this.msIgnoreInputUpToTime = long.MinValue;
 		dbDynamicBeatFactor   = 1.0;
 		dbDynBeatTjaOffset    = 0.0;
 		msDynBeatRawGameTime  = 0;
@@ -208,6 +209,8 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		} else {
 			ForceSharedDynamicBeat(OpenTaiko.ConfigIni);
 		}
+		// the spots playing with Dynamic Beat share each factor change: every spot in local co-op, only yours online
+		this.nDynBeatPlayers = OpenTaiko.ConfigIni.nFunMods.Take(OpenTaiko.ConfigIni.nPlayerCount).Count(m => m == EFunMods.DynamicBeat);
 		Array.Fill(this.bLEVELHOLD, false);
 		Array.Fill(this.JPOSCROLLX, 0);
 		Array.Fill(this.JPOSCROLLY, 0);
@@ -751,6 +754,8 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	// Tracks time since last Resume() to enforce a 1-second anti-buffering cooldown on pause re-open.
 	// Initialized with a high elapsed value so the first pause is never blocked.
 	private System.Diagnostics.Stopwatch _pauseCooldown = System.Diagnostics.Stopwatch.StartNew();
+	// input events stamped (sound-timer time) up to this time were polled before the last resume
+	protected long msIgnoreInputUpToTime = long.MinValue;
 	public bool[] bIsAlreadyCleared = new bool[OpenTaiko.MAX_PLAYERS];
 	public bool[] bIsAlreadyMaxed = new bool[OpenTaiko.MAX_PLAYERS];
 	protected bool bUsedMidiInputInPlay;
@@ -832,6 +837,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	protected double dbDynBeatTjaOffset     = 0.0; // TJA-time continuity offset when factor changes mid-song (double for precision)
 	protected long   msDynBeatRawGameTime   = 0;   // rawGameTime captured at the start of the current frame's chip processing
 	protected long   msDynBeatSectionStart  = 0;
+	protected int    nDynBeatPlayers        = 0;   // spots playing with Dynamic Beat, counted in Activate
 
 	/// <summary>Current chart (TJA) time for a player, including the Dynamic Beat warp (factor + offset)
 	/// applied by tProgressDraw_Chip — any comparison against chip times must use this, not the raw clock.</summary>
@@ -2512,6 +2518,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		this.actPanel.Start();
 		this.bPAUSE = false;                                // システムがPAUSE状態だったら、強制解除
 		_pauseCooldown.Restart();
+		this.msIgnoreInputUpToTime = SoundManager.PlayTimer.msGetPreciseNowSoundTimerTime();
 	}
 
 	private void TrainingSwitchBranch(CTja.ECourse branch) {
@@ -2615,10 +2622,13 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		this.actScore.Draw();
 	}
 
-	// Per-player scan time for the replay precise auto-miss/timeout (see tReplayAutoMissBefore). Reset per play.
+	// Per-player chart time up to which input (live or a replay's) has been consumed: automatic misses and big-note
+	// timeouts are judged no later than it. Autoplay and AI players hit inside the chip pass and are not capped.
+	// Reset per play.
 	protected readonly double[] msReplayTjaTime = new double[5];
 	protected double msMaxPlayedTjaTime(int nPlayer)
-		=> OpenTaiko.bReplayMode[nPlayer] ? this.msReplayTjaTime[nPlayer] : double.PositiveInfinity;
+		=> (OpenTaiko.ConfigIni.bAutoPlay[nPlayer] || (nPlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode))
+			? double.PositiveInfinity : this.msReplayTjaTime[nPlayer];
 
 	protected bool tProgressDraw_Chip(EKeyConfigPart ePlayMode, int nPlayer) {
 		bool finishedPlaying = false;
@@ -2693,12 +2703,15 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 				}
 			}
 
-			// accurate auto hit
-			if (NotesManager.IsHittableNote(pChip) && !NotesManager.IsRollEnd(pChip) && this.WithinInputFrame())
-				if (NotesManager.IsGenericRoll(pChip))
-					this.Autoroll(pChip, pChip.dbSoundTimems, nPlayer, NotesManager.GetChipGameType(pChip, nPlayer));
-				else
-				this.AutoplayHitCritical(pChip, nPlayer, NotesManager.GetChipGameType(pChip, nPlayer));
+			// accurate auto hit; rolls also for human players with a puchichara autoroll
+			if (NotesManager.IsHittableNote(pChip) && !NotesManager.IsRollEnd(pChip)) {
+				if (NotesManager.IsGenericRoll(pChip)) {
+					if (this.WithinInputFrame())
+						this.Autoroll(pChip, pChip.dbSoundTimems, nPlayer, NotesManager.GetChipGameType(pChip, nPlayer));
+				} else if (bAutoPlay && this.WithinInputFrame()) {
+					this.AutoplayHitCritical(pChip, nPlayer, NotesManager.GetChipGameType(pChip, nPlayer));
+				}
+			}
 
 			switch (pChip.nChannelNo) {
 				#region [ 01: BGM ]
@@ -3671,7 +3684,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	};
 
 	protected void ApplyDynamicBeatFactor(double delta) {
-		int playerCount = Math.Max(1, OpenTaiko.ConfigIni.nPlayerCount);
+		int playerCount = Math.Max(1, this.nDynBeatPlayers);
 		double newFactor = Math.Max(1.0, dbDynamicBeatFactor + delta / playerCount);
 		if (newFactor == dbDynamicBeatFactor) return;
 		// Offset must cancel the jump that multiplying by the new factor would introduce.

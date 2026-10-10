@@ -591,7 +591,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			// LYRIC[S/FILE]: & #LYRIC
 
 			if (!this.IsFailStopped()
-				&& OpenTaiko.TJA.listLyric2.Count > ShownLyric2 && OpenTaiko.TJA.listLyric2[ShownLyric2].Time < (long)OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)
+				&& OpenTaiko.TJA.listLyric2.Count > ShownLyric2 && OpenTaiko.TJA.listLyric2[ShownLyric2].Time < this.GetChartTimeNow(0)
 				) {
 				this.actPanel.tLyricsTextureCreate(OpenTaiko.TJA.listLyric2[ShownLyric2++].TextTex);
 			}
@@ -1015,6 +1015,8 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 		foreach (var (nPad, inputEvent, order) in OpenTaiko.Pad.GetEvents(EKeyConfigPart.Taiko)) {      // #27029 2012.1.4 from: <10 to <=10; Eパッドの要素が１つ（HP）増えたため。
 																//		  2012.1.5 yyagi: (int)Eパッド.MAX に変更。Eパッドの要素数への依存を無くすため。
+			if (inputEvent.nTimeStamp <= this.msIgnoreInputUpToTime)
+				continue; // polled before the last resume, such as the press that chose Resume
 			int nUsePlayer = NotesManager.GetPadPlayer(nPad);
 			if (nUsePlayer >= OpenTaiko.ConfigIni.nPlayerCount
 				|| OpenTaiko.stageGameScreen.isDeniedPlaying[nUsePlayer] || OpenTaiko.stageGameScreen.IsStageFailed_Fast()
@@ -1044,6 +1046,10 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			OpenTaiko.ReplayInstances[nUsePlayer]?.tRegisterInput(msHitTjaTime, (byte)nPadAs1P);
 			this.ProcessPadInput(nUsePlayer, nPadAs1P, msHitTjaTime);
 		}
+
+		// polled input is consumed up to now: the next automatic misses and big-note timeouts are judged up to it
+		for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++)
+			this.msReplayTjaTime[p] = this.GetChartTimeNow(p);
 	}
 
 	protected override void ProcessPadInput(int nUsePlayer, EPad nPad, double msHitTjaTime, CChip? chipNoHit, ENoteJudge? eJudge) {
@@ -1587,8 +1593,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		//常時イベントが発生しているメソッドのほうがいいんじゃないかという予想。
 		//CDTX.CChip chipNoHit = this.r指定時刻に一番近い未ヒットChip((int)CSound管理.rc演奏用タイマ.n現在時刻ms, 0);
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			CTja tja = OpenTaiko.GetTJA(i)!;
-			var timeNow = tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
+			var timeNow = this.GetChartTimeNow(i); // warped under Dynamic Beat, like the first hit's time
 			for (int iChip = 0; iChip < this.chipNowProcessingMultiHitNotes[i].Count; ++iChip) {
 				this.MultiHitNoteTimeout(i, this.chipNowProcessingMultiHitNotes[i][iChip], timeNow, msMaxPlayedTjaTime: this.msMaxPlayedTjaTime(i));
 			}

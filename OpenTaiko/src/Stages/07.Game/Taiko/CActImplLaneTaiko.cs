@@ -263,7 +263,7 @@ internal class CActImplLaneTaiko : CActivity {
 			if (this.nTotalMoveTime[i] == -1) {
 				continue;
 			}
-			var nTime = (int)(long)OpenTaiko.GetTJA(i)!.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
+			var nTime = (int)OpenTaiko.stageGameScreen.GetChartTimeNow(i);
 			if (nTime < this.nMoveStartTime[i]) { // in case of rewinding
 				OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.nMoveStartX[i];
 				OpenTaiko.stageGameScreen.JPOSCROLLY[i] = this.nMoveStartY[i];
