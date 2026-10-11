@@ -5,15 +5,16 @@ local C = {}
 
 C.DESK_Y = 778
 local VPX, VPY = 960, 430
-local HALF_W, FLOOR_Y, CEIL_Y = 1200, 660, -840
+local HALF_W, FLOOR_Y, CEIL_Y = 1200, 779, -840
 C.FLOOR_Y = FLOOR_Y
-local KICK_Y = 520                             -- the glass's bottom edge (the kick plate's top)
+local KICK_Y = 520                             -- the height the sea's things are laid out from
+local FOOT_Y = 800                             -- seaweed stands on this screen row, behind the counter
 local F = 1663                                 -- depth of z = 1 in px: world speeds along the walls are px / F
 local TABLE_X, TABLE_Y = 960, 1080
 local FISH_KINDS = 6
 
 -- seaweed out on the sea floor: side, distance behind the glass, depth, kind, height (px at z = 1), sway, period;
--- the sea floor falls away from the glass, so a weed's foot always stays hidden behind the kick plate
+-- the sea floor falls away from the glass, so a weed's foot always stays hidden behind the counter
 local WEEDS = {
     { side = -1, d = 60,  z = 1.30, kind = 2, h = 470, sway = 5, period = 4.6 },
     { side = -1, d = 260, z = 1.75, kind = 1, h = 520, sway = 7, period = 3.8 },
@@ -184,7 +185,7 @@ local function drawWeed(i, w)
     local tex = ctx.tex["Cabin/Seaweed" .. w.kind]
     if not Tex.ok(tex) or tex.Height <= 0 then return end
     local X = w.side * (HALF_W + w.d)
-    local foot = (KICK_Y + 50) * (HALF_W + w.d) / HALF_W
+    local foot = (FOOT_Y - VPY) * w.z
     local x, y = project(X, foot, w.z)
     local k = ((w.h + foot - KICK_Y) / w.z) / tex.Height
     local deg = w.sway * math.sin(2 * math.pi * clock / w.period + weedPhase[i])

@@ -111,6 +111,7 @@ local remarkBlipAt = 0
 local clock = 0
 C.expr = "neutral"
 local exprT, hopT, hopAmp = -10, nil, 0
+local canCut, cut = false, false
 
 local function name() return Tex.tr("VAULT_CASPIAN", "Mr.Caspian") end
 
@@ -213,10 +214,15 @@ function C.talkFirst(gifted)
     start(nodes, "talk")
 end
 
-function C.talk(event)
+-- cuttable: pressing Decide while the line is still being typed ends the talk there (see C.wasCut)
+function C.talk(event, cuttable)
     if LINES[event] == nil then return end
     start({ node(event, pick(event), false) }, "talk")
+    canCut, cut = cuttable == true, false
 end
+
+-- the last talk was cut short by the player
+function C.wasCut() return cut end
 
 function C.remark(event)
     if LINES[event] == nil then return end
@@ -229,7 +235,10 @@ function C.update(dt, now)
     clock = now
     if mode == "talk" then
         if fresh then fresh = false; return nil end
-        if dlg:update(dt) == "done" then
+        local cutNow = canCut and (dlg.revealed or 0) < (dlg.total or 0)
+            and (NavInput.decide() or INPUT:KeyboardPressed("Space"))
+        if cutNow then canCut, cut = false, true end
+        if cutNow or dlg:update(dt) == "done" then
             -- the last line stays up as a remark, so the box can fade out with it
             local last = dlg.node
             mode = nil

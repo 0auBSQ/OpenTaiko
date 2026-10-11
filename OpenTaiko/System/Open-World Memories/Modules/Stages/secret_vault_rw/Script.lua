@@ -103,7 +103,7 @@ local function stopMusic()
 end
 
 local function talk(event, after)
-    Caspian.talk(event)
+    Caspian.talk(event, event == "snap")
     afterTalk = after
     boxTarget = 1
     state = "talk"
@@ -288,9 +288,10 @@ function update()
         local ev = Opening.update(now)
         if ev == "talk" then
             local snapped = not (reward and reward.type == "key")
-            if snapped then snaps = snaps + 1 end
             talk(snapped and "snap" or "keygot", function()
-                if snapped then
+                -- cutting his taunt short punches the chest away; hearing it out leaves the chest be
+                if snapped and Caspian.wasCut() then
+                    snaps = snaps + 1
                     Opening.punch(now)      -- the box stays up for his "hey"
                 else
                     boxTarget = 0
