@@ -15,6 +15,7 @@ local Dialogue = require("dialogue")
 local PCS      = require("pc")
 local Edit     = require("editmode")
 local PopUI    = require("PopUI")
+local SavePicker = require("SavePicker")
 local I18N      = require("i18n")
 local PHONE    = I18N.texts("phone")        -- lang/<code>/phone.json
 local HUD      = I18N.texts("hud")          -- lang/<code>/hud.json
@@ -148,6 +149,15 @@ end
 saveRoom = function()
     if net.online and not net.isHost then return end   -- a visitor must never overwrite their own save with the host's room
     if store and room then store:Write(saveKey(), serialize(room:toTable())) end
+    -- the room's size and placed pieces, for the title's save list
+    local sf = curSave()
+    if sf and room then
+        pcall(function()
+            sf:SetGlobalCounter(".myroom_iw", room.iw)
+            sf:SetGlobalCounter(".myroom_ih", room.ih)
+            sf:SetGlobalCounter(".myroom_items", #room.furniture + #room.wallItems)
+        end)
+    end
 end
 
 -- ── build / rebuild the 3D room ───────────────────────────────────────────────────────────────────
@@ -726,11 +736,8 @@ local function openPhone()
     buildPhoneMenu()
 end
 
--- ── player-save selector (choose whose room to view/edit; local multiplayer) ──────────────────────
-local playerSelUI = nil
-local function closePlayerSelect()
-    if playerSelUI then playerSelUI:disposeWidgets(); playerSelUI = nil end
-end
+-- ── whose room: chosen on the title, or kept across a trip to another stage ───────────────────────
+local RETURN_KEY = "myroom_return"
 -- commit to a player: read THAT save (coins/unlocks via GetSaveFile(playerIndex)) and load its room
 local function pickPlayer(i)
     MO.playerIndex = i
@@ -744,31 +751,31 @@ local function pickPlayer(i)
     end
     refreshLook()
     spawnAtEntrance()
-    closePlayerSelect()
     mode = "play"
 end
+-- leaving for a stage that comes back here: remember whose room it is and where the player stands
+local function rememberPlace()
+    pcall(function()
+        SHARED:SetSharedString(RETURN_KEY, string.format("%d,%.3f,%.3f,%.3f", playerIndex, px, py, pz))
+    end)
+end
 openPlayerSelect = function()
-    local entries = {}
-    for i = 0, 4 do
-        local sf = GetSaveFile(i)
-        if sf and sf.SaveUID and sf.SaveUID ~= "" then
-            entries[#entries + 1] = { text = HUD:trf("player_entry", i + 1, sf.Name or ""), value = i }
-        end
+    local ok, s = pcall(function() return SHARED:GetSharedString(RETURN_KEY) end)
+    pcall(function() SHARED:SetSharedString(RETURN_KEY, "") end)
+    local slot, x, y, z = nil, nil, nil, nil
+    if ok and type(s) == "string" then
+        local a, b, c, d = s:match("^(%d+),([%-%d%.]+),([%-%d%.]+),([%-%d%.]+)$")
+        slot, x, y, z = tonumber(a), tonumber(b), tonumber(c), tonumber(d)
     end
-    if #entries <= 1 then                          -- 0 or 1 save → nothing to choose, just enter
-        pickPlayer(entries[1] and entries[1].value or 0)
+    local sf = slot and GetSaveFile(slot) or nil
+    if sf and sf.SaveUID and sf.SaveUID ~= "" and x and y and z then
+        SavePicker.take()
+        pickPlayer(slot)
+        px, py, pz = x, y, z
+        player:setPos(px, py + 0.05, pz)
         return
     end
-    closePlayerSelect()
-    local ui = PopUI.new{ theme = PHONE_THEME, navPlayer = nil } -- accessible by all players
-    playerSelUI = ui
-    local x, y, w = SCREEN_W / 2 - 380, 210, 760
-    local h = 120 + #entries * 78 + 40
-    ui:panel{ x = x, y = y, w = w, h = h, title = HUD:tr("whose_room") }
-    ui:menu{ x = x + 36, y = y + 92, w = w - 72, h = #entries * 78, rowHeight = 78, items = entries,
-             onSelect = function(_, it) pickPlayer(it.value) end }
-    mode = "playerselect"
-    phoneJustOpened = true                          -- consume the keypress edge that opened My Room
+    pickPlayer(SavePicker.take() or SavePicker.first())
 end
 
 local function onDialogueDone(result)
@@ -910,19 +917,7 @@ function update(ts)
     MX.tick(dt)                    -- the matrix glow breathes in every mode
 
     -- ── modal overlays ──
-    if mode == "playerselect" then
-        if playerSelUI then
-            if phoneJustOpened then
-                phoneJustOpened = false                 -- consume the edge that opened My Room
-            elseif playerSelUI:update(ts) == "cancel" then
-                closePlayerSelect(); MO.leave(); GLOBALCAMERA:Reset(); SHARED:GetSharedSound("Cancel"):Play()
-                return Exit("stage", "_title", "myroom_door")
-            end
-        else
-            mode = "play"
-        end
-        settlePlayer(dt); world:update(dt, px, py, pz); return nil
-    elseif mode == "dialogue" then
+    if mode == "dialogue" then
         purse:update(dt)
         if ringT > 0 then
             ringT = ringT - dt
@@ -932,7 +927,7 @@ function update(ts)
         settlePlayer(dt); world:update(dt, px, py, pz); return nil
     elseif mode == "pod" then
         if Pod.update(dt) == "go" then
-            MO.leave(); GLOBALCAMERA:Reset(); saveRoom()
+            MO.leave(); GLOBALCAMERA:Reset(); saveRoom(); rememberPlace()
             return Exit("stage", Pod.stageName(), "default")
         end
         settlePlayer(dt); world:update(dt, px, py, pz); return nil
@@ -965,7 +960,7 @@ function update(ts)
             -- a debug scene was chosen: leave the room for it the way the door does
             SHARED:GetSharedSound("Decide"):Play()
             mode = "play"
-            MO.leave(); GLOBALCAMERA:Reset(); saveRoom()
+            MO.leave(); GLOBALCAMERA:Reset(); saveRoom(); rememberPlace()
             return Exit("stage", stage)
         end
         if res == "closed" or not MX.isOpen() then mode = "play" end
@@ -1165,10 +1160,7 @@ function draw()
     end
 
     -- modal overlays on top of the world
-    if mode == "playerselect" then
-        hud:rect(0, 0, SCREEN_W, SCREEN_H, 8, 10, 18, 150)
-        if playerSelUI then playerSelUI:draw() end
-    elseif mode == "dialogue" then
+    if mode == "dialogue" then
         if ringT > 0 then
             hud:drawTextEx(26, PHONE:tr("calling"), SCREEN_W / 2, SCREEN_H - 200, { 255, 235, 160 }, { 0, 0, 0, 255 }, 1, 1, 0, "top")
         end

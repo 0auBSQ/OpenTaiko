@@ -6,6 +6,7 @@ local EM       = require("EventMode")
 local PS       = require("player_select")
 local PopUI    = require("PopUI")
 local PagodaAvatar = require("PagodaAvatar")
+local SavePicker = require("SavePicker")
 
 -- ── Resources ─────────────────────────────────────────────────────────────────
 
@@ -91,13 +92,13 @@ local function buildMenus()
             title = tr("TITLE_MYROOM", "My Room"),
             desc  = tr("TITLE_MYROOM_DESC", "Decorate your personal room, place furniture, and visit other players' rooms!"),
             c     = col(30, 150, 60),
-            via   = "stage", stage = "myroom", trans = "myroom_door",
+            via   = "stage", stage = "myroom", trans = "myroom_door", pickSave = "room",
         },
         {
             title = tr("TITLE_STORE", "OpenTaiko's General Store"),
             desc  = tr("TITLE_STORE_DESC", "Spend your OpenTaiko coins for very nice goods! *wink*"),
             c     = col(0, 160, 170),
-            via   = "stage", stage = "coin_shop", trans = "newspaper", fastTrans = "newspaper_back",
+            via   = "stage", stage = "coin_shop", trans = "newspaper", fastTrans = "newspaper_back", pickSave = "shop",
         },
     }
 
@@ -312,6 +313,28 @@ local function openNotice()
     noticeDone, noticeFresh = false, true
 end
 
+-- ── Save choice ───────────────────────────────────────────────────────────────
+-- Entries marked pickSave ask whose save to open before leaving the title; with one save there is
+-- nothing to ask and its slot is returned at once.
+
+-- the room of a save as My Room last stored it: its size and how many pieces are placed
+local function roomInfo(_, sf)
+    local w = math.floor(tonumber(sf:GetGlobalCounter(".myroom_iw")) or 0)
+    local h = math.floor(tonumber(sf:GetGlobalCounter(".myroom_ih")) or 0)
+    local n = math.floor(tonumber(sf:GetGlobalCounter(".myroom_items")) or 0)
+    if w <= 0 or h <= 0 then return tr("TITLE_SAVE_ROOM_NONE", "Room not visited yet") end
+    return string.format(tr("TITLE_SAVE_ROOM_INFO", "%d×%d room · %d placed"), w, h, n)
+end
+
+local function openSavePicker(kind)
+    if kind == "room" then
+        -- coming from the title, My Room opens at its entrance
+        pcall(function() SHARED:SetSharedString("myroom_return", "") end)
+        return SavePicker.open{ title = tr("TITLE_SAVE_ROOM", "Whose room?"), info = roomInfo }
+    end
+    return SavePicker.open{ title = tr("SHOP_UI_WHOSE", "Whose shop?"), coins = true }
+end
+
 -- ── Navigation helpers ────────────────────────────────────────────────────────
 
 local function moveMenu(d)
@@ -373,6 +396,7 @@ end
 
 function deactivate()
     closeNotice()
+    SavePicker.close()
     if sounds.BGM ~= nil then sounds.BGM:Stop() end
     PS.clearSounds()
 end
@@ -411,6 +435,11 @@ function draw()
         drawBgTile(0.6)
         notice:draw()
     end
+
+    if SavePicker.isOpen() then
+        drawBgTile(0.6)
+        SavePicker.draw()
+    end
 end
 
 -- ── Update ────────────────────────────────────────────────────────────────────
@@ -441,6 +470,19 @@ function update(ts)
             sounds.Cancel:Play()
             closeNotice()
             holdDir = 0
+        end
+        return nil
+    end
+
+    -- ── Save choice ───────────────────────────────────────────────────────────
+    if SavePicker.isOpen() then
+        local r = SavePicker.update(ts)
+        if r == "cancel" then
+            sounds.Cancel:Play()
+            holdDir = 0
+        elseif r ~= nil then
+            SavePicker.pass(r)
+            return doExit()
         end
         return nil
     end
@@ -518,6 +560,15 @@ function update(ts)
             return nil
         end
         sounds.Decide:Play()
+        if m.pickSave then
+            local slot = openSavePicker(m.pickSave)
+            if slot ~= nil then
+                SavePicker.pass(slot)
+                return doExit()
+            end
+            holdDir = 0
+            return nil
+        end
         if m.playerPrompt then
             inPrompt  = true
             PS.open(CONFIG.PlayerCount or 1)

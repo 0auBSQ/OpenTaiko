@@ -3,6 +3,7 @@ local DBItems = require("DBControllers/dbItems")
 local Almanac  = require("almanac")     -- date patterns
 local SEASONAL = require("seasonal")    -- featured big-slot items, by date
 local PopUI = require("PopUI")
+local SavePicker = require("SavePicker")
 local NavInput = require("NavInput")
 local Util = require("Util")
 local Magazine = require("magazine")   -- the catalog page
@@ -445,7 +446,7 @@ function draw()
 	drawDesk()
 
 	-- the page; before a save is chosen only its masthead shows
-	view.ready = save ~= nil and currentScreen ~= "playerselect"
+	view.ready = save ~= nil
 	view.big, view.normals, view.icons, view.selected = bigItem, normalItems, icons, selected
 	Magazine.draw(now, lastDt, view)
 
@@ -698,17 +699,6 @@ local function decideOn(id)
 end
 
 function update(ts)
-	if currentScreen == "playerselect" then
-		if confirmUI then
-			local res = confirmUI:update(ts)
-			if currentScreen ~= "playerselect" then       -- a save was picked (enterShopFor ran)
-				confirmUI:disposeWidgets(); confirmUI = nil
-			elseif res == "cancel" then
-				return leave()
-			end
-		end
-		return
-	end
 	if currentScreen == "confirm" or currentScreen == "refresh" then
 		if confirmUI then
 			if confirmUI:update(ts) == "cancel" then      -- Escape: PopUI reports it; the buttons handle the rest
@@ -802,27 +792,9 @@ local function enterShopFor(index)
 	idleT, idleNext = 0, 15
 end
 
--- on entering the shop, pick WHICH of the 5 local saves to browse (its coins/unlocks). Skips itself
--- when 0/1 saves exist.
-local function openShopPlayerSelect()
-	local entries = {}
-	for i = 0, 4 do
-		local sf = GetSaveFile(i)
-		if sf and sf.SaveUID and sf.SaveUID ~= "" then
-			entries[#entries + 1] = { text = trf("SHOP_UI_PLAYER", "Player %d — %s", i + 1, sf.Name or ""), value = i }
-		end
-	end
-	if #entries <= 1 then enterShopFor(entries[1] and entries[1].value or 0); return end
-	if confirmUI then confirmUI:disposeWidgets() end
-	confirmUI = PopUI.new{ theme = MAG_THEME, sfx = SHOP_SFX, navPlayer = nil } -- accessible by all players
-	local x, y, w = CONFIRM_CX - 380, 210, 760
-	local h = 120 + #entries * 78 + 40
-	confirmUI:panel{ x = x, y = y, w = w, h = h, title = tr("SHOP_UI_WHOSE", "Whose shop?") }
-	confirmUI:menu{ x = x + 36, y = y + 92, w = w - 72, h = #entries * 78, rowHeight = 78, items = entries,
-					onSelect = function(_, it) enterShopFor(it.value) end }
-	confirmUI:_setFocusIndex(1)
-	currentScreen = "playerselect"
-	sayOnReveal("whose")
+-- the save chosen on the title; opened without one, the first save
+local function openShopForChosenSave()
+	enterShopFor(SavePicker.take() or SavePicker.first())
 end
 
 -- ── Lifecycle ─────────────────────────────────────────────────────────────────
@@ -870,7 +842,7 @@ function activate()
 	sounds.BGM:SetLoop(true)
 	sounds.BGM:Play()
 
-	openShopPlayerSelect()   -- pick whose shop to browse (per-SaveUID rolls); enters directly if ≤1 save
+	openShopForChosenSave()
 end
 
 function deactivate()
