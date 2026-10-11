@@ -242,6 +242,10 @@ local function buildPaletteList()
     for i = 1, rawData.Count do
         local e        = rawData[i]
         local name     = tostring(jsGet(e, "name", "Palette " .. i))
+        -- "names" holds the name per language id
+        local names    = jsGet(e, "names", nil)
+        local own      = names ~= nil and JSONLOADER:JsonGet(names, LANG:GetLanguageId()) or nil
+        if own ~= nil and tostring(own) ~= "" then name = tostring(own) end
         local plays    = math.floor(tonumber(tostring(jsGet(e, "plays", 0))) or 0)
         local blend    = tonumber(tostring(jsGet(e, "blend", 0))) or 0.0
         local rawStops = jsGet(e, "stops", nil)

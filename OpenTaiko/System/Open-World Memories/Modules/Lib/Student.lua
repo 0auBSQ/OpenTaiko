@@ -108,7 +108,11 @@ local function parseFile(path)
     for i = 1, jcount(doc) do
         local e = jget(doc, i)
         if e == nil then return nil end
+        -- "names" holds the name per language id; "name" is the one shown when a language has none
         local name = jget(e, "name")
+        local okLang, lang = pcall(function() return LANG:GetLanguageId() end)
+        local own = okLang and jget(jget(e, "names"), lang) or nil
+        if own ~= nil and tostring(own) ~= "" then name = own end
         list[#list + 1] = {
             name = (name ~= nil) and tostring(name) or ("Palette " .. i),
             plays = math.max(0, floor(num(jget(e, "plays")) or 0)),

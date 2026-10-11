@@ -1,10 +1,12 @@
 [
   {
     "name": "Student 1",
+    "names": {"fr": "Élève 1", "ja": "学生1", "es": "Estudiante 1", "ru": "Студент 1", "ko": "학생 1", "zh": "学生1"},
     "stops": null
   },
   {
     "name": "Student 2",
+    "names": {"fr": "Élève 2", "ja": "学生2", "es": "Estudiante 2", "ru": "Студент 2", "ko": "학생 2", "zh": "学生2"},
     "blend": 0.15,
     "stops": [
       [0, 0, 0, 0],
@@ -17,6 +19,7 @@
   },
   {
     "name": "Student 3",
+    "names": {"fr": "Élève 3", "ja": "学生3", "es": "Estudiante 3", "ru": "Студент 3", "ko": "학생 3", "zh": "学生3"},
     "blend": 0.25,
     "stops": [
       [0, 0, 0, 0],
@@ -29,6 +32,7 @@
   },
   {
     "name": "Student 4",
+    "names": {"fr": "Élève 4", "ja": "学生4", "es": "Estudiante 4", "ru": "Студент 4", "ko": "학생 4", "zh": "学生4"},
     "blend": 0.4,
     "stops": [
       [0, 0, 0, 0],
@@ -41,6 +45,7 @@
   },
   {
     "name": "Student 5",
+    "names": {"fr": "Élève 5", "ja": "学生5", "es": "Estudiante 5", "ru": "Студент 5", "ko": "학생 5", "zh": "学生5"},
     "blend": 0.45,
     "stops": [
       [0, 0, 0, 0],
@@ -53,6 +58,7 @@
   },
   {
     "name": "Student 6",
+    "names": {"fr": "Élève 6", "ja": "学生6", "es": "Estudiante 6", "ru": "Студент 6", "ko": "학생 6", "zh": "学生6"},
     "blend": 0.5,
     "stops": [
       [0, 0, 0, 0],
@@ -65,6 +71,7 @@
   },
   {
     "name": "Student 7",
+    "names": {"fr": "Élève 7", "ja": "学生7", "es": "Estudiante 7", "ru": "Студент 7", "ko": "학생 7", "zh": "学生7"},
     "blend": 0.55,
     "stops": [
       [0, 0, 0, 0],
@@ -78,6 +85,7 @@
   },
   {
     "name": "Cozy",
+    "names": {"fr": "Douillet", "ja": "ぬくぬく", "de": "Gemütlich", "es": "Acogedor", "nl": "Knus", "ru": "Уют", "ko": "포근함", "zh": "温馨"},
     "blend": 0.45,
     "stops": [
       [0, 38, 84, 115],
@@ -96,6 +104,7 @@
   },
   {
     "name": "Cherry Float",
+    "names": {"fr": "Float cerise", "ja": "チェリーフロート", "de": "Kirsch-Float", "es": "Flotante de cereza", "nl": "Kersenfloat", "ru": "Вишнёвый флоат", "ko": "체리 플로트", "zh": "樱桃漂浮"},
     "blend": 0.83,
     "stops": [
       [0, 68, 3, 67],
@@ -109,6 +118,7 @@
   },
   {
     "name": "Berry Night",
+    "names": {"fr": "Nuit de baies", "ja": "ベリーナイト", "de": "Beerennacht", "es": "Noche de bayas", "nl": "Bessennacht", "ru": "Ягодная ночь", "ko": "베리 나이트", "zh": "莓果之夜"},
     "blend": 1.0,
     "stops": [
       [0, 0, 0, 0],
@@ -123,6 +133,7 @@
   },
   {
     "name": "Strawberry Parfait",
+    "names": {"fr": "Parfait à la fraise", "ja": "いちごパフェ", "de": "Erdbeer-Parfait", "es": "Parfait de fresa", "nl": "Aardbeienparfait", "ru": "Клубничное парфе", "ko": "딸기 파르페", "zh": "草莓芭菲"},
     "blend": 1.0,
     "stops": [
       [0, 50, 83, 112],
@@ -148,6 +159,7 @@
   },
   {
     "name": "Cotton Candy",
+    "names": {"fr": "Barbe à papa", "ja": "わたあめ", "de": "Zuckerwatte", "es": "Algodón de azúcar", "nl": "Suikerspin", "ru": "Сахарная вата", "ko": "솜사탕", "zh": "棉花糖"},
     "blend": 1.0,
     "stops": [
       [0, 0, 0, 0],
@@ -165,6 +177,7 @@
   },
   {
     "name": "Little Alien",
+    "names": {"fr": "Petit alien", "ja": "リトルエイリアン", "de": "Kleiner Alien", "es": "Pequeño alien", "nl": "Kleine alien", "ru": "Маленький пришелец", "ko": "꼬마 외계인", "zh": "小小外星人"},
     "blend": 0.8,
     "stops": [
       [0, 50, 83, 112],
@@ -177,6 +190,7 @@
   },
   {
     "name": "Far",
+    "names": {"fr": "Lointain", "ja": "遠く", "de": "Fern", "es": "Lejano", "nl": "Ver", "ru": "Даль", "ko": "저 멀리", "zh": "远方"},
     "blend": 1.0,
     "stops": [
       [0, 83, 43, 26],
@@ -191,6 +205,7 @@
   },
   {
     "name": "Lapis Blue",
+    "names": {"fr": "Bleu lapis", "ja": "ラピスブルー", "de": "Lapisblau", "es": "Azul lapislázuli", "nl": "Lapisblauw", "ru": "Лазурит", "ko": "라피스 블루", "zh": "青金石蓝"},
     "blend": 1.0,
     "stops": [
       [0, 0, 56, 141],
@@ -202,6 +217,7 @@
   },
   {
     "name": "Melon Soda",
+    "names": {"fr": "Soda au melon", "ja": "メロンソーダ", "de": "Melonenlimo", "es": "Soda de melón", "nl": "Meloensoda", "ru": "Дынная газировка", "ko": "멜론 소다", "zh": "蜜瓜苏打"},
     "blend": 1.0,
     "stops": [
       [0, 35, 85, 122],
@@ -214,6 +230,7 @@
   },
   {
     "name": "Cherry Bomb",
+    "names": {"fr": "Bombe cerise", "ja": "チェリーボム", "de": "Kirschbombe", "es": "Bomba de cereza", "nl": "Kersenbom", "ru": "Вишнёвая бомба", "ko": "체리 밤", "zh": "樱桃炸弹"},
     "blend": 1.0,
     "stops": [
       [0, 129, 23, 68],
@@ -225,6 +242,7 @@
   },
   {
     "name": "Scarlet Moon",
+    "names": {"fr": "Lune écarlate", "ja": "緋色の月", "de": "Scharlachmond", "es": "Luna escarlata", "nl": "Scharlaken maan", "ru": "Алая луна", "ko": "주홍빛 달", "zh": "绯红之月"},
     "blend": 1.0,
     "stops": [
       [0, 217, 70, 70],
@@ -238,6 +256,7 @@
   },
   {
     "name": "Grayscale",
+    "names": {"fr": "Niveaux de gris", "ja": "グレースケール", "de": "Graustufen", "es": "Escala de grises", "nl": "Grijstinten", "ru": "Оттенки серого", "ko": "그레이스케일", "zh": "灰阶"},
     "blend": 1.0,
     "stops": [
       [0, 88, 88, 88],
@@ -247,6 +266,7 @@
   },
   {
     "name": "Ventured Traveller",
+    "names": {"fr": "Voyageur aguerri", "ja": "旅慣れた旅人", "de": "Weitgereister", "es": "Viajero curtido", "nl": "Bereisde reiziger", "ru": "Бывалый путник", "ko": "노련한 여행자", "zh": "历练的旅人"},
     "blend": 1.0,
     "stops": [
       [0.0, 0, 32, 140],
@@ -257,6 +277,7 @@
   },
   {
     "name": "Origin",
+    "names": {"fr": "Origine", "ja": "オリジン", "de": "Ursprung", "es": "Origen", "nl": "Oorsprong", "ru": "Исток", "ko": "오리진", "zh": "起源"},
     "blend": 0.6,
     "stops": [
       [0, 0, 0, 0],
@@ -273,6 +294,7 @@
   },
   {
     "name": "Golden",
+    "names": {"fr": "Doré", "ja": "ゴールデン", "de": "Golden", "es": "Dorado", "nl": "Gouden", "ru": "Золотой", "ko": "골든", "zh": "黄金"},
     "blend": 1.0,
     "stops": [
       [0, 0, 0, 0],
