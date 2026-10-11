@@ -800,7 +800,16 @@ function PC:activateSelected()
     if tab == 1 then
         unlockEquip(save:IsCharacterUnlocked(e.FolderName), e.UnlockCondition, e.Rarity,
             function() return save:UnlockCharacter(e.FolderName) end,
-            function() save:ChangeCharacter(e.FolderName) end)
+            function()
+                -- the engine frees every animation of the character taken off, its preview included: give the
+                -- preview back first, so hovering that character again loads it anew
+                local old = self.loadedAnims[save.CharacterName]
+                if old ~= nil and old.FolderName ~= e.FolderName then
+                    pcall(function() old.Character:DisposeAnimation(CHARACTER.ANIM_MENU_NORMAL) end)
+                    self.loadedAnims[old.FolderName] = nil
+                end
+                save:ChangeCharacter(e.FolderName)
+            end)
     elseif tab == 2 then
         unlockEquip(save:IsPuchicharaUnlocked(e.FolderName), e.UnlockCondition, e.Rarity,
             function() return save:UnlockPuchichara(e.FolderName) end,
