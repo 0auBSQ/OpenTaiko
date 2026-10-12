@@ -405,8 +405,7 @@ local function interactGlow(focused)
         end
         if focused.kind == "matrix" and inst.parts then
             partBase = {}
-            local g = MX.glowNow()
-            for _, pp in ipairs(inst.parts) do partBase[pp.obj] = g end
+            for _, pp in ipairs(inst.parts) do partBase[pp.obj] = MX.glowNow(pp.material) end
         end
         -- an on TV's screen keeps its own light: only the body pulses
         local skipObj = (focused.kind == "tv") and TV.screenObj(focused.it) or nil

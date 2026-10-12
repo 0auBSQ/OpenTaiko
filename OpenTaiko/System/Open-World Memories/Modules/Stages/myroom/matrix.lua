@@ -37,10 +37,22 @@ local PURSE_Y = (1080 + PANEL.h) / 2 - 30
 local GLOW = { 0.3, 1.0, 0.5 }
 local GLOW_SCALE = 0.9
 local LIGHT_INTENSITY, LIGHT_RANGE = 0.6, 3.5
+-- the cubes glow in their own colours
+local PART_GLOW = {
+    MatrixCubeGrey  = { 0.85, 0.92, 0.88 },
+    MatrixCubeGreen = { 0.15, 0.85, 0.40 },
+}
 
 local ctx = nil             -- Script.lua closures (see M.init)
 local clock = 0
 local lightDefs = {}        -- furniture entry → the live light def handed to daynight
+
+-- the beam: a see-through sprite standing on the pad, turned to the camera
+local BEAM_SPRITE = 3990
+local BEAM_W, BEAM_H, BEAM_FOOT = 1.2, 1.35, 0.13
+local BEAM_ALPHA = 200
+local beams = {}            -- scene objects, one per placed matrix
+local beamScene = nil       -- the scene they and the sprite belong to
 
 local function tr(id) return T:tr(id) end
 
@@ -55,10 +67,35 @@ end
 
 local function pulse() return 0.75 + 0.25 * math.sin(clock * 2.4) end
 
+local function clearBeams(scene)
+    if scene ~= nil and scene == beamScene then
+        for _, obj in ipairs(beams) do pcall(function() scene:DeleteObject(obj) end) end
+    end
+    beams = {}
+end
+
+local function addBeam(scene, inst)
+    if scene == nil or scene.ObjAddSprite == nil then return end
+    if scene ~= beamScene then
+        beamScene = scene
+        local tex = TEXTURE:CreateTextureSync("Textures/Matrix/Beam.png")
+        scene:RegisterSpriteFromTexture(BEAM_SPRITE, tex)
+        tex:Dispose()
+    end
+    local s = inst.scale or 1
+    local obj = scene:NewObject()
+    scene:ObjBegin(obj)
+    scene:ObjAddSprite(obj, inst.x, inst.y + BEAM_FOOT * s, inst.z, BEAM_W * s, BEAM_H * s, BEAM_SPRITE, 1, 0)
+    scene:ObjSetPass(obj, 1, 1, 1, 1, BEAM_ALPHA)
+    scene:ObjSetTint(obj, GLOW[1] + 0.3, GLOW[2], GLOW[3] + 0.25)
+    beams[#beams + 1] = obj
+end
+
 -- the glow part's current emissive, for the focus highlight to keep as its base
-function M.glowNow()
+function M.glowNow(material)
+    local c = PART_GLOW[material] or GLOW
     local p = pulse() * GLOW_SCALE
-    return { GLOW[1] * p, GLOW[2] * p, GLOW[3] * p }
+    return { c[1] * p, c[2] * p, c[3] * p }
 end
 
 -- the light of every placed matrix; Script.rebuild appends them to the room's lights. Their
@@ -66,9 +103,12 @@ end
 function M.lights(world)
     local out = {}
     lightDefs = {}
+    local scene = ctx.scene()
+    clearBeams(scene)
     for _, it in ipairs(placed()) do
         local inst = ctx.propInstFor(it)
         if inst then
+            pcall(addBeam, scene, inst)
             if inst.anim == nil and inst.play then pcall(function() inst:play(0) end) end
             local s = inst.scale or 1
             local def = { x = inst.x, y = inst.y + 0.7 * s, z = inst.z, r = GLOW[1], g = GLOW[2], b = GLOW[3],
@@ -80,19 +120,25 @@ function M.lights(world)
     return out
 end
 
--- every frame: the glow part and the light breathe
+-- every frame: the glow part, the beam and the light breathe
 function M.tick(dt)
     if ctx == nil then return end
     clock = clock + dt
     local scene = ctx.scene()
-    local g = M.glowNow()
     for _, it in ipairs(placed()) do
         local inst = ctx.propInstFor(it)
         if inst and inst.parts and scene and scene.ObjSetEmissive then
-            for _, p in ipairs(inst.parts) do pcall(function() scene:ObjSetEmissive(p.obj, g[1], g[2], g[3]) end) end
+            for _, p in ipairs(inst.parts) do
+                local g = M.glowNow(p.material)
+                pcall(function() scene:ObjSetEmissive(p.obj, g[1], g[2], g[3]) end)
+            end
         end
         local def = lightDefs[it]
         if def then def.intensity = LIGHT_INTENSITY * pulse() end
+    end
+    if scene ~= nil and scene == beamScene then
+        local a = math.floor(BEAM_ALPHA * pulse())
+        for _, obj in ipairs(beams) do scene:ObjSetPass(obj, 1, 1, 1, 1, a) end
     end
 end
 
@@ -327,6 +373,8 @@ function M.dispose()
     M.close(true)
     if purse then purse:dispose(); purse = nil end
     lightDefs = {}
+    clearBeams(ctx and ctx.scene() or nil)
+    beamScene = nil
 end
 
 return M

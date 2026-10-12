@@ -178,6 +178,19 @@ local function buildCatalogFromJson()
                 e.emissiveColor = { jnum(jget(glow, 1)) or 1, jnum(jget(glow, 2)) or 1, jnum(jget(glow, 3)) or 1,
                                     jnum(jget(glow, 4)) or 1 }
             end
+            -- more glow parts: a list of { material, color [r,g,b,scale] }
+            local more = jget(node, "emissiveParts")
+            if more then
+                e.emissiveParts = {}
+                for i = 1, JSONLOADER:JsonCount(more) do
+                    local p = jget(more, i)
+                    local c = p and jget(p, "color")
+                    if p and c then
+                        e.emissiveParts[#e.emissiveParts + 1] = { material = jget(p, "material"),
+                            color = { jnum(jget(c, 1)) or 1, jnum(jget(c, 2)) or 1, jnum(jget(c, 3)) or 1, jnum(jget(c, 4)) or 1 } }
+                    end
+                end
+            end
             local pic = jget(node, "picture")
             if pic and A.PICTURE[pic] then e.picture = A.PICTURE[pic] end
             local wg = jget(node, "wallGlb")
@@ -900,6 +913,10 @@ local function tryModel(world, id, cx, cz, yaw, cat, baseY, it)
     if cat and cat.emissivePart then
         parts = parts or {}
         parts[#parts + 1] = { material = cat.emissivePart, emissive = cat.emissiveColor or { 1, 0.95, 0.8, 0.12 } }
+    end
+    if cat and cat.emissiveParts then
+        parts = parts or {}
+        for _, p in ipairs(cat.emissiveParts) do parts[#parts + 1] = { material = p.material, emissive = p.color } end
     end
     -- catalog screenPart: while the item is on (it.tvOn) its screen ignores the sun and the shadow map
     -- and draws a flat colour pushed over the bloom threshold; tv.lua writes the colour every frame
