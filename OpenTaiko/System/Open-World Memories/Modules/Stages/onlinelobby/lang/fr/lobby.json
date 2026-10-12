@@ -36,6 +36,7 @@
   "hint_host": "Haut/Bas menu   %s chanson   %s vitesse   %s quitter",
   "hint_guest": "Haut/Bas menu   choisissez difficulté et mods, puis soyez prêt   %s annuler / quitter",
   "connecting": "Connexion...",
+  "hint_connecting": "%s annuler",
   "results_title": "Résultats",
   "results_combo": "%.2f%%   combo %d",
   "badge_perfect": "Parfait",

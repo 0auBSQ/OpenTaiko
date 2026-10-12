@@ -22,6 +22,23 @@ namespace OpenTaiko {
 		private ushort _packetId = 1;
 		public string ConnectedBroker { get; private set; } = "";
 
+		// keep-alive: a ping every PingIntervalMs; no packet at all within PongTimeoutMs of a ping means the link is dead
+		internal int PingIntervalMs = 30000;
+		internal int PongTimeoutMs = 15000;
+		private long _pingSentAt;                             // tick of the unanswered ping, 0 when none
+
+		/// <summary>True while the receive loop runs on a connected socket and the broker answers the pings.</summary>
+		public bool Alive {
+			get {
+				if (!_running) return false;
+				var tcp = _tcp; var rx = _rx;
+				if (tcp == null || rx == null || !rx.IsAlive) return false;
+				try { if (!tcp.Connected) return false; } catch { return false; }
+				long sent = Interlocked.Read(ref _pingSentAt);
+				return sent == 0 || Environment.TickCount64 - sent <= PongTimeoutMs;
+			}
+		}
+
 		private readonly Dictionary<string, Action<byte[]>> _subs = new();
 
 		/// <summary>Connects to the first reachable broker of the list; false if none answered.</summary>
@@ -78,10 +95,22 @@ namespace OpenTaiko {
 			long lastPing = Environment.TickCount64;
 			while (_running) {
 				try {
-					if (Environment.TickCount64 - lastPing > 30000) { Send(_ns, 0xC0, Array.Empty<byte>()); lastPing = Environment.TickCount64; }
-					if (!_ns.DataAvailable) { Thread.Sleep(50); continue; }
+					long now = Environment.TickCount64;
+					long sent = Interlocked.Read(ref _pingSentAt);
+					if (sent != 0 && now - sent > PongTimeoutMs) break;
+					if (now - lastPing > PingIntervalMs) {
+						Send(_ns, 0xC0, Array.Empty<byte>());
+						lastPing = now;
+						if (sent == 0) Interlocked.Exchange(ref _pingSentAt, now);
+					}
+					if (!_ns.DataAvailable) {
+						// readable with nothing to read: the broker closed the connection
+						if (_tcp.Client.Poll(0, SelectMode.SelectRead) && _tcp.Client.Available == 0) break;
+						Thread.Sleep(50); continue;
+					}
 					var (type, body) = ReadPacket(_ns);
 					if (type < 0) break;
+					Interlocked.Exchange(ref _pingSentAt, 0);     // any packet proves the link
 					if (type == 0x30) {                       // PUBLISH (QoS 0: no packet id)
 						if (body.Length < 2) continue;
 						int tl = (body[0] << 8) | body[1];
@@ -97,6 +126,7 @@ namespace OpenTaiko {
 				} catch { break; }
 			}
 			_running = false;
+			try { _tcp?.Close(); } catch { }
 		}
 
 		// ── wire helpers ─────────────────────────────────────────────────────────────────────────────

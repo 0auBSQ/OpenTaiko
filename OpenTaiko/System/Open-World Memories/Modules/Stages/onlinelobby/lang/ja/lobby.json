@@ -36,6 +36,7 @@
   "hint_host": "上/下 メニュー   %s 曲   %s 速度   %s 退出",
   "hint_guest": "上/下 メニュー   難易度とモッドを選んで準備完了に   %s 取り消し/退出",
   "connecting": "接続中...",
+  "hint_connecting": "%s キャンセル",
   "results_title": "リザルト",
   "results_combo": "%.2f%%   コンボ %d",
   "badge_perfect": "パーフェクト",

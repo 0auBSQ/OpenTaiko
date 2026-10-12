@@ -36,6 +36,7 @@
   "hint_host": "上/下 菜单   %s 歌曲   %s 速度   %s 离开",
   "hint_guest": "上/下 菜单   选择难度和模组后准备   %s 撤销准备 / 离开",
   "connecting": "连接中...",
+  "hint_connecting": "%s 取消",
   "results_title": "结果",
   "results_combo": "%.2f%%   连击 %d",
   "badge_perfect": "完美",

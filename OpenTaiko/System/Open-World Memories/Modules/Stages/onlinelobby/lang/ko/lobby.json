@@ -36,6 +36,7 @@
   "hint_host": "위/아래 메뉴   %s 곡   %s 속도   %s 나가기",
   "hint_guest": "위/아래 메뉴   난이도와 모드를 고른 뒤 준비하세요   %s 준비 취소 / 나가기",
   "connecting": "연결 중...",
+  "hint_connecting": "%s 취소",
   "results_title": "결과",
   "results_combo": "%.2f%%   콤보 %d",
   "badge_perfect": "퍼펙트",

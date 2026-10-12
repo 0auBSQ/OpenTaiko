@@ -137,7 +137,7 @@ local function buildMenus()
         desc  = tr("TITLE_ONLINE_LOBBY_DESC", "(Beta, Share your room code only with people you trust)"),
         requiresOnline = true,
         c     = col(72, 36, 112),
-        via   = "stage", stage = "onlinelobby", trans = "space_voyage", fastTrans = "space_voyage_back",
+        via   = "stage", stage = "onlinelobby",
     }
 
     if EM.on() then

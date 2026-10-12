@@ -36,6 +36,7 @@
   "hint_host": "Up/Down menu   %s song   %s speed   %s leave",
   "hint_guest": "Up/Down menu   choose your difficulty and mods, then get ready   %s undo ready / leave",
   "connecting": "Connecting...",
+  "hint_connecting": "%s cancel",
   "results_title": "Results",
   "results_combo": "%.2f%%   combo %d",
   "badge_perfect": "Perfect",

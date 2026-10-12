@@ -36,6 +36,7 @@
   "hint_host": "Omhoog/Omlaag menu   %s nummer   %s snelheid   %s verlaten",
   "hint_guest": "Omhoog/Omlaag menu   kies moeilijkheid en mods, ga dan klaarstaan   %s annuleren / verlaten",
   "connecting": "Verbinden...",
+  "hint_connecting": "%s annuleren",
   "results_title": "Resultaten",
   "results_combo": "%.2f%%   combo %d",
   "badge_perfect": "Perfect",

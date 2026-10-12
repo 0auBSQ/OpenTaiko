@@ -8,12 +8,11 @@
 
 local NavInput = require("NavInput")
 local LO = require("online")
-local Space = require("SpaceSky")
+local PopUI = require("PopUI")
 local net = LO.net
 local L, LF = LO.tr, LO.trf
 
 local SCREEN_W, SCREEN_H = 1920, 1080
-local dim
 local mode = "menu"                         -- "menu" | "code" | "lobby" | "songselect" | "results"
 local lastTs = nil                          -- nil right after activate
 local menuSel = 1
@@ -25,8 +24,6 @@ local modWasActive = false
 local modicons = nil                        -- modicons ROActivity (draws a player's mod icons)
 local pendingReturn = false
 local msg, msgT = nil, 0
-
-local function panel(x, y, w, h, r, g, b, a) dim:SetColor(r, g, b); dim:SetOpacity(a); dim:SetScale(w / 2, h / 2); dim:Draw(x, y) end
 
 -- ── keys: theme settings of type "key" ("" = unbound); the song speed keys are the song select's, and
 -- choosing / confirming is the decide button ─────────────────────────────────────────────────────────────
@@ -79,92 +76,50 @@ local function bindLabel(which)
     return s
 end
 
--- space UI with a constellation theming (as it connects multiple players though the different open worlds within the open universe very poetic)
-local TEX_NAMES = { "Logo", "LogoSmall", "Sparkle", "Link", "Chart", "SongPlate", "RosterRow", "RosterRowYou",
-    "RosterRowEmpty", "Deck", "MenuPlate", "MenuPlateOn", "CodePlate", "ResultRow", "ResultRowFirst", "HeaderPill",
-    "Toast", "TabOn", "JacketFrame", "Halo", "SpeedArrow", "Difficulty/Missing", "Difficulty/Level/plus" }
+-- ── look: PopUI panels on a flat background ───────────────────────────────────────────────────────
+local TEX_NAMES = { "Difficulty/Missing", "Difficulty/Level/plus" }
 for d = 0, 4 do TEX_NAMES[#TEX_NAMES + 1] = "Difficulty/" .. d end
 for n = 0, 9 do TEX_NAMES[#TEX_NAMES + 1] = "Difficulty/Level/" .. n end
 local tex = {}
-local fonts = {}
-local colors = {}
-local clock = 0
+local ui = nil                               -- the panels of the screen shown
+local builtFor = nil                         -- the screen they were built for
 
-local CREAM, GOLD, LAVENDER, DIM = { 250, 238, 206 }, { 255, 214, 122 }, { 184, 192, 232 }, { 128, 136, 178 }
-local GREEN, RED, AMBER = { 142, 230, 160 }, { 255, 132, 120 }, { 240, 206, 128 }
-local LINE_COL = { 240, 226, 180 }
-local OUTLINE = { 6, 8, 26, 210 }
+local INK, DIM, WHITE = { 74, 38, 72 }, { 150, 132, 150 }, { 255, 255, 255 }
+local ACCENT, ACCENT_SOFT = { 244, 78, 150 }, { 255, 226, 242 }
+local GREEN, RED, AMBER = { 34, 150, 84 }, { 214, 60, 60 }, { 196, 124, 16 }
+local BG = { 255, 240, 248 }
+local ROW_FACE, ROW_EMPTY = { 250, 244, 250 }, { 244, 236, 244 }
+local NONE = { 0, 0, 0, 0 }
 local TEXT_PAD = 25                          -- a glyph box's side padding
--- each difficulty's text colour: its emblem's hue (Easy blue, Normal green, Hard amber, Extreme coral, Extra
--- purple), lightened for the dark panels
-local DIFF_COL = { [0] = { 110, 178, 255 }, [1] = { 84, 230, 180 }, [2] = { 250, 196, 76 }, [3] = { 255, 122, 112 }, [4] = { 180, 124, 255 } }
+-- each difficulty's text colour: its emblem's hue, darkened for the light panels
+local DIFF_COL = { [0] = { 40, 110, 210 }, [1] = { 20, 150, 110 }, [2] = { 196, 124, 16 }, [3] = { 214, 60, 60 }, [4] = { 130, 70, 210 } }
 
-local SEAT_X = { 814, 1042, 1270, 1498, 1726 }
-local SEAT_Y = { 176, 262, 200, 272, 164 }
-local SEAT_COL = { { 170, 200, 255 }, { 236, 242, 255 }, { 255, 236, 170 }, { 255, 200, 140 }, { 255, 160, 140 } }
-local ROW_X, ROW_TOP, ROW_PITCH, ROW_W, ROW_H = 680, 330, 92, 1160, 86
-local DECK_X, DECK_Y, DECK_W, DECK_H, DECK_SPLIT = 80, 809, 1760, 140, 440
+local SONG = { x = 80, y = 100, w = 560, h = 690 }
+local ROSTER = { x = 680, y = 100, w = 1160, h = 690 }
+local ROW_X, ROW_TOP, ROW_PITCH, ROW_W, ROW_H = 704, 186, 118, 1112, 106
+local DECK_X, DECK_Y, DECK_W, DECK_H, DECK_SPLIT = 80, 809, 1760, 150, 440
 
 local function loadArt()
     for _, n in ipairs(TEX_NAMES) do tex[n] = TEXTURE:CreateTexture("Textures/" .. n .. ".png") end
 end
 
-local function font(size)
-    local f = fonts[size]
-    if f == nil then f = TEXT:CreateGlyphCached(size); fonts[size] = f end
-    return f
-end
-
-local function color(c, a)
-    a = a or c[4] or 255
-    local key = c[1] .. "," .. c[2] .. "," .. c[3] .. "," .. a
-    local v = colors[key]
-    if v == nil then v = COLOR:CreateColorFromRGBA(c[1], c[2], c[3], a); colors[key] = v end
-    return v
-end
+local function rect(x, y, w, h, c, a) ui:rect(x, y, w, h, c[1], c[2], c[3], a or 255) end
 
 -- text with its ink centred on y; align "left" puts the ink's left edge at x, "right" its right edge
 local function text(size, str, x, y, c, align, op, maxW)
-    local f = font(size)
     align = align or "left"
     local ax = (align == "left") and (x - TEXT_PAD) or (align == "right") and (x + TEXT_PAD) or x
-    local nudge = math.floor((f.BoxHeight - math.ceil(f.LineHeight)) / 2) - 1
-    f:Draw(tostring(str), ax, y + nudge, color(c), color(OUTLINE), op or 1, 1, maxW and (maxW + 2 * TEXT_PAD) or 0, align)
+    ui:drawTextEx(size, tostring(str), ax, y + ui:textNudge(size), c, NONE, op or 1, 1,
+        maxW and (maxW + 2 * TEXT_PAD) or 0, align)
 end
 
-local function textW(size, str) return font(size):Measure(tostring(str)) end
-
--- a texture centred on (x, y), scaled, faded, tinted, turned (degrees, counter-clockwise) and blended
-local function sprite(name, x, y, sx, sy, op, rgb, rot, blend)
+-- a texture centred on (x, y), scaled and faded
+local function sprite(name, x, y, k, op)
     local t = tex[name]
     if t == nil then return end
-    t:SetScale(sx or 1, sy or sx or 1); t:SetOpacity(op or 1)
-    if rgb then t:SetColor(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255) end
-    if rot then t:SetRotation(rot) end
-    if blend then t:SetBlendMode(blend) end
+    t:SetScale(k or 1, k or 1); t:SetOpacity(op or 1)
     t:DrawAtAnchor(x, y, "center")
     t:SetScale(1, 1); t:SetOpacity(1)
-    if rgb then t:SetColor(1, 1, 1) end
-    if rot then t:SetRotation(0) end
-    if blend then t:SetBlendMode("normal") end
-end
-
--- a constellation line between two stars, stopping short of both
-local function link(x1, y1, x2, y2, op, inset)
-    local dx, dy = x2 - x1, y2 - y1
-    local len = math.sqrt(dx * dx + dy * dy)
-    inset = inset or 20
-    if len <= 2 * inset then return end
-    local ux, uy = dx / len, dy / len
-    local ax, ay, bx, by = x1 + ux * inset, y1 + uy * inset, x2 - ux * inset, y2 - uy * inset
-    sprite("Link", (ax + bx) / 2, (ay + by) / 2, (len - 2 * inset) / 128, 1, op, LINE_COL, -math.deg(math.atan(dy, dx)), "add")
-end
-
--- a lit star: its sparkle, and for the room's host a second, turning sparkle
-local function star(x, y, rgb, size, bright, host)
-    local tw = 0.5 + 0.5 * math.sin(clock * 2.3 + x * 0.013)
-    sprite("Sparkle", x, y, size * (0.92 + 0.1 * tw), nil, 0.75 + 0.25 * bright, rgb, nil, "add")
-    if host then sprite("Sparkle", x, y, size * 0.62, nil, 0.8, GOLD, 45 + clock * 14, "add") end
 end
 
 -- a difficulty emblem centred on (cx, cy) at scale k with its level inside, the digits set like the song
@@ -172,7 +127,7 @@ end
 -- level nil = the emblem alone
 local PLUS_DX, PLUS_DY = -8, -14
 local function drawEmblem(d, level, isPlus, cx, cy, k, op)
-    sprite(d ~= nil and ("Difficulty/" .. d) or "Difficulty/Missing", cx, cy, k, nil, op)
+    sprite(d ~= nil and ("Difficulty/" .. d) or "Difficulty/Missing", cx, cy, k, op)
     if level == nil then return end
     local s = tostring(level)
     local total, prev, last = 0, 0, 0
@@ -193,200 +148,107 @@ local function drawEmblem(d, level, isPlus, cx, cy, k, op)
         if t then
             local w = (t.Width or 0) * k
             if i > 1 then cursor = cursor + prev * 0.5 end
-            sprite(name, cursor + w / 2, cy, k, nil, op)
+            sprite(name, cursor + w / 2, cy, k, op)
             prev = w
         end
     end
-    if isPlus then sprite("Difficulty/Level/plus", cx + total / 2 + PLUS_DX * k, cy + PLUS_DY * k, k, nil, op) end
+    if isPlus then sprite("Difficulty/Level/plus", cx + total / 2 + PLUS_DX * k, cy + PLUS_DY * k, k, op) end
 end
 
--- ── the sky: Lib/SpaceSky renders it; the 2D screens only keep a clock for their own twinkles ───────
-local SKY_SPRITES = { dot = "Textures/StarDot.png", sparkle = "Textures/Sparkle.png" }
-
-local function tickLook(dt)
-    clock = clock + dt
-    if not Space.driving() then Space.claim("lobby") end
-    Space.update(dt)
+-- the panels of each screen; they are built from update when the screen changes (never from draw)
+local PANELS = {}
+local function prepare()
+    if ui == nil or builtFor == mode then return end
+    ui:disposeWidgets()
+    ui:clear()                               -- disposing frees their canvases; the list is emptied here
+    builtFor = mode
+    local build = PANELS[mode]
+    if build then build() end
 end
 
-local function drawSky()
-    Space.render()
-    if not Space.draw(0, 1) then panel(0, 0, SCREEN_W, SCREEN_H, 0.02, 0.03, 0.09, 1) end
-end
-
--- wordmarks over Logo/LogoSmall
-local GILD = "<g.#FFFFFF.#BE7007>%s</g>"
-local ASCENT = 0.7706
-local WORD_GAP = 0.30
-local WHITE, SHADOW = { 255, 255, 255 }, { 18, 16, 46 }
-local LOGO_W, LOGO_H, LOGO_BASE = 1560, 380, 237
-local LOGO_WORDS = { 66, 80, 0.24 }
-local LOGO_STARS = { { 780, 62, 1.0 }, { 520, 83, 0.5 }, { 1040, 83, 0.5 }, { 64, 206, 0.6 }, { 1496, 206, 0.6 },
-    { 702, 288, 0.4 }, { 741, 309, 0.4 }, { 780, 294, 0.4 }, { 819, 312, 0.4 }, { 858, 284, 0.4 } }
-local SMALL_W, SMALL_H, SMALL_BASE, SMALL_X = 620, 100, 66, 58
-local SMALL_WORDS = { 24, 29, 0.16 }
-local SMALL_STARS = { { 28, 55, 0.7 }, { 594, 55, 0.45 } }
-local LOGO_MAX_W, SMALL_MAX_W = 840, 280     -- room left for the text
-local advances = {}
-
-local function advance(size, ch)
-    local key = size .. ch
-    local a = advances[key]
-    if a == nil then a = font(size):Measure(ch); advances[key] = a end
-    return a
-end
-
--- a letter with a capital form: ASCII, Latin-1 and Cyrillic capitals (the scripts without case get no initials)
-local function isCapital(ch)
-    local b1, b2 = ch:byte(1, 2)
-    if #ch == 1 then return b1 >= 65 and b1 <= 90 end
-    if b1 == 0xC3 then return b2 >= 0x80 and b2 <= 0x9E and b2 ~= 0x97 end
-    if b1 == 0xD0 then return (b2 >= 0x90 and b2 <= 0xAF) or b2 == 0x81 end
-    return false
-end
-
--- the localized title as characters; a capital that starts a word (after a space or a hyphen) is an initial
-local titleChars = { src = nil, list = {} }
-local function title()
-    local s = L("logo_title")
-    if titleChars.src ~= s then
-        local list, prev = {}, " "
-        for ch in s:gmatch("[%z\1-\127\194-\244][\128-\191]*") do
-            list[#list + 1] = { ch = ch, initial = (prev == " " or prev == "-") and isCapital(ch) }
-            prev = ch
-        end
-        titleChars.src, titleChars.list = s, list
-    end
-    return titleChars.list
-end
-
--- the title from x (its left end, or its middle for "center") on the baseline, shrunk to maxW when longer
-local function drawWords(x, baseline, size, initial, track, align, maxW)
-    local chars = title()
-    local tr, gap = track * size * 1.3, WORD_GAP * size * 1.3
-    local w = 0
-    for i, c in ipairs(chars) do
-        if c.ch == " " then w = w + gap
-        else w = w + advance(c.initial and initial or size, c.ch) + (i < #chars and tr or 0) end
-    end
-    local f = (maxW and w > maxW) and maxW / w or 1
-    local x0 = (align == "center") and (x - w * f / 2) or x
-    local pen = 0
-    for _, c in ipairs(chars) do
-        if c.ch == " " then pen = pen + gap
-        else
-            local s = c.initial and initial or size
-            local fnt = font(s)
-            local top = baseline - fnt.LineHeight * ASCENT * f
-            local bx = x0 + pen * f - TEXT_PAD * f
-            fnt:Draw(c.ch, bx, top + 3 * f, color(SHADOW), color(SHADOW, 0), 0.85, f, 0, "topleft")
-            fnt:Draw(string.format(GILD, c.ch), bx, top, color(WHITE), color(SHADOW, 0), 1, f, 0, "topleft")
-            pen = pen + advance(s, c.ch) + tr
-        end
-    end
-end
-
-local function twinkleAt(x, y, s, i)
-    local tw = 0.5 + 0.5 * math.sin(clock * (1.7 + i * 0.37) + i * 1.9)
-    sprite("Sparkle", x, y, s * (0.8 + 0.35 * tw), nil, 0.25 + 0.55 * tw, GOLD, nil, "add")
-end
-
-local function drawLogo(cx, cy, k)
-    sprite("Logo", cx, cy, k)
-    drawWords(cx, cy + (LOGO_BASE - LOGO_H / 2) * k, math.floor(LOGO_WORDS[1] * k + 0.5), math.floor(LOGO_WORDS[2] * k + 0.5),
-        LOGO_WORDS[3], "center", LOGO_MAX_W * k)
-    for i, st in ipairs(LOGO_STARS) do
-        twinkleAt(cx + (st[1] - LOGO_W / 2) * k, cy + (st[2] - LOGO_H / 2) * k, st[3] * 0.6 * k, i)
-    end
-end
-
-local function drawSmallLogo(left, cy)
-    sprite("LogoSmall", left + SMALL_W / 2, cy)
-    drawWords(left + SMALL_X, cy + SMALL_BASE - SMALL_H / 2, SMALL_WORDS[1], SMALL_WORDS[2], SMALL_WORDS[3], "left", SMALL_MAX_W)
-    for i, st in ipairs(SMALL_STARS) do twinkleAt(left + st[1], cy + st[2] - SMALL_H / 2, st[3] * 0.5, i) end
-end
-
--- a message on one line, or on two split at the space nearest its middle when it is too long
+-- a message on one line, or wrapped onto as many as it needs when it is too long; the lines are kept
+-- until the message changes
 local TOAST_W = 1120
+local toastOf, toastRows, toastSize = nil, nil, 22
 local function toastLines(s)
-    if textW(22, s) <= TOAST_W then return { s } end
-    local best, bestD = nil, math.huge
-    for i in s:gmatch("() ") do
-        local d = math.abs(i - #s / 2)
-        if d < bestD then best, bestD = i, d end
+    if toastOf ~= s then
+        toastOf = s
+        if ui:gfont(22):Measure(s) <= TOAST_W then toastRows, toastSize = { s }, 22
+        else
+            toastRows, toastSize = ui:wrapLines(20, s, TOAST_W), 20
+            if #toastRows == 0 then toastRows = { s } end
+        end
     end
-    if best == nil then return { s } end
-    return { s:sub(1, best - 1), s:sub(best + 1) }
+    return toastRows, toastSize
 end
 
+-- the bar keeps its bottom edge and grows upwards with the lines
 local function drawToast()
     if not (msgT and msgT > 0 and msg) then return end
     local op = math.min(1, msgT / 0.4)
-    sprite("Toast", 960, 988, 1, 1, op)
-    local lines = toastLines(msg)
-    if #lines == 1 then text(22, lines[1], 960, 988, GOLD, "center", op, TOAST_W)
+    local lines, size = toastLines(msg)
+    local h = math.max(88, 24 + #lines * 32)
+    local top = 1032 - h
+    rect(960 - 616, top, 1232, h, INK, 235 * op)
+    if #lines == 1 then text(size, lines[1], 960, 988, WHITE, "center", op, TOAST_W)
     else
-        text(20, lines[1], 960, 972, GOLD, "center", op, TOAST_W)
-        text(20, lines[2], 960, 1004, GOLD, "center", op, TOAST_W)
+        for i, line in ipairs(lines) do text(size, line, 960, top + 28 + (i - 1) * 32, WHITE, "center", op, TOAST_W) end
     end
 end
 
 local function drawHint(s) text(20, s, 960, 1052, DIM, "center", 1, 1800) end
 
 -- ── menu / code ─────────────────────────────────────────────────────────────────────────────────────
+local MENU = { x = 560, y = 250, w = 800, h = 500 }
+
+PANELS.menu = function() ui:panel{ x = MENU.x, y = MENU.y, w = MENU.w, h = MENU.h, pad = 30, title = L("logo_title") } end
+
 local function drawMenu()
-    drawLogo(960, 250, 1)
-    text(22, L("menu_subtitle"), 960, 470, LAVENDER, "center", 1, 1500)
+    if builtFor ~= "menu" then return end
+    ui:draw()
+    text(22, L("menu_subtitle"), 960, MENU.y + 130, DIM, "center", 1, MENU.w - 80)
     local items = { L("menu_create"), L("menu_join") }
     for i, label in ipairs(items) do
         local sel = (i == menuSel)
-        local y = 590 + (i - 1) * 110
-        sprite(sel and "MenuPlateOn" or "MenuPlate", 960, y)
-        if sel then sprite("Sparkle", 960 - 350 + 44, y, 0.42 + 0.06 * math.sin(clock * 4), nil, 1, GOLD, nil, "add") end
-        text(30, label, 960, y, sel and CREAM or LAVENDER, "center", 1, 560)
+        local y = MENU.y + 240 + (i - 1) * 110
+        rect(960 - 320, y - 42, 640, 84, sel and ACCENT or ROW_FACE)
+        text(30, label, 960, y, sel and WHITE or INK, "center", 1, 580)
     end
     drawHint(LF("hint_menu", bindLabel("DECIDE"), bindLabel("CANCEL")))
 end
 
+local CODE = { x = 320, y = 300, w = 1280, h = 420 }
+
+PANELS.code = function() ui:panel{ x = CODE.x, y = CODE.y, w = CODE.w, h = CODE.h, pad = 30, title = L("code_title") } end
+
 local function drawCode()
-    drawLogo(960, 210, 0.8)
-    text(44, L("code_title"), 960, 420, CREAM, "center", 1, 1400)
-    text(24, L("code_prompt"), 960, 486, LAVENDER, "center", 1, 1400)
-    sprite("CodePlate", 960, 600)
+    if builtFor ~= "code" then return end
+    ui:draw()
+    text(24, L("code_prompt"), 960, CODE.y + 140, DIM, "center", 1, CODE.w - 100)
+    rect(960 - 566, CODE.y + 220, 1132, 96, INK)
+    rect(960 - 562, CODE.y + 224, 1124, 88, WHITE)
     local shown = (ti and ti.DisplayText) or ""
     if #shown > 64 then shown = "..." .. string.sub(shown, #shown - 63) end
-    text(28, shown .. " ", 960, 600, CREAM, "center", 1, 1040)
+    text(28, shown .. " ", 960, CODE.y + 268, INK, "center", 1, 1040)
     drawHint(LF("hint_code", bindLabel("CANCEL")))
 end
 
 -- ── lobby ───────────────────────────────────────────────────────────────────────────────────────────
-local JK_X, JK_Y, JK_S = 210, 200, 300        -- the jacket window inside its frame
+local JK_X, JK_Y, JK_S = 210, 190, 300        -- the jacket
 
--- the song speed as the song select shows it: white at x1.00, pink faster, blue slower; the two arrows
--- behind a changed value pulse half a beat apart (the chase runs backward when slowed down)
-local SPEED_FAST, SPEED_SLOW = { 255, 158, 195 }, { 149, 204, 255 }
+-- the song speed: its multiplier, pink when faster and blue when slower
+local SPEED_FAST, SPEED_SLOW = { 220, 70, 130 }, { 40, 110, 210 }
 local function drawSpeed(x, labelY, valueY)
     local mult = net.song.speed and CONFIG.SONGSPEED:ToActual(net.song.speed) or 1
     local changed = math.abs(mult - 1) > 1e-4
-    local col = not changed and WHITE or (mult > 1 and SPEED_FAST or SPEED_SLOW)
-    if changed then
-        local bpm = (net.songBpm or 0) * mult
-        local beat = (bpm > 0) and math.max(150, math.min(2000, 60000 / bpm)) or 600
-        local phase = ((clock * 1000) % beat) / beat
-        if mult < 1 then phase = 1 - phase end
-        for i = 0, 1 do
-            local p = (phase - i * 0.5) % 1
-            sprite("SpeedArrow", x + (i - 0.5) * 40, valueY, 1, nil, 0.25 + 0.75 * (0.5 + 0.5 * math.cos(2 * math.pi * p)), col)
-        end
-    end
+    local col = not changed and INK or (mult > 1 and SPEED_FAST or SPEED_SLOW)
     text(16, L("song_speed_label"), x, labelY, col, "center")
     text(26, string.format("x%.2f", mult), x, valueY, col, "center")
 end
 
 local function drawSong()
-    sprite("SongPlate", 360, 465)
-    text(18, L("song_label"), 360, 166, GOLD, "center")
-    sprite("JacketFrame", JK_X + JK_S / 2, JK_Y + JK_S / 2)
+    rect(JK_X - 4, JK_Y - 4, JK_S + 8, JK_S + 8, INK)
+    rect(JK_X, JK_Y, JK_S, JK_S, ROW_EMPTY)
     if net.song and not net.iLackSong then
         local jk = SHARED:GetSharedTexture("preimage")     -- same path as regular song select
         if jk then pcall(function()
@@ -397,15 +259,12 @@ local function drawSong()
             end
         end) end
     elseif net.song and net.iLackSong then
-        panel(JK_X, JK_Y, JK_S, JK_S, 0.16, 0.05, 0.08, 0.9)
         text(26, L("song_not_found"), JK_X + JK_S / 2, JK_Y + JK_S / 2, RED, "center", 1, JK_S - 20)
-    else
-        star(JK_X + JK_S / 2, JK_Y + JK_S / 2, LAVENDER, 1.3, 0.5, false)
     end
     if net.song then
-        text(28, net.song.title or "?", 360, 544, CREAM, "center", 1, 500)
-        if net.songSubtitle and net.songSubtitle ~= "" then text(20, net.songSubtitle, 360, 579, LAVENDER, "center", 1, 500) end
-        drawSpeed(360, 614, 644)
+        text(28, net.song.title or "?", 360, 534, INK, "center", 1, 500)
+        if net.songSubtitle and net.songSubtitle ~= "" then text(20, net.songSubtitle, 360, 569, DIM, "center", 1, 500) end
+        drawSpeed(360, 606, 636)
         -- every difficulty's emblem with its level; the ones this chart lacks show the empty emblem
         for d = 0, 4 do
             local lv = net.songLevels[d]
@@ -423,56 +282,37 @@ local function seatStatus(id)
     return L("status_not_ready"), DIM
 end
 
--- the figure over the roster: one star per seat, lit by its player
-local function drawFigure(ids)
-    for i = 1, 4 do
-        local lit = ids[i] ~= nil and ids[i + 1] ~= nil
-        link(SEAT_X[i], SEAT_Y[i], SEAT_X[i + 1], SEAT_Y[i + 1], lit and 0.7 or 0.22, 30)
-    end
-    for i = 1, LO.MAXP do
-        local x, y, id = SEAT_X[i], SEAT_Y[i], ids[i]
-        if id == nil then
-            sprite("Sparkle", x, y, 0.45, nil, 0.45, nil, nil, "add")
-            text(18, L("seat_open"), x, y + 34, DIM, "center", 0.8, 210)
-        else
-            local ready = net.readyByPeer[id] == true
-            star(x, y, SEAT_COL[i], ready and 1.2 or 0.95, ready and 1 or 0.55, NET:HostRoleId() == id)
-            text(18, net.nameByPeer[id] or ("P" .. id), x, y + 36, CREAM, "center", 1, 210)
-        end
-    end
-end
-
 -- the roster: a row per seat with the player's nameplate, difficulty, mods and status
 local function drawRoster(ids, me)
     local cx = ROW_X + ROW_W / 2
     for i = 1, LO.MAXP do
         local id = ids[i]
-        local cy = ROW_TOP + (i - 1) * ROW_PITCH + ROW_H / 2
+        local top = ROW_TOP + (i - 1) * ROW_PITCH
+        local cy = top + ROW_H / 2
         if id == nil then
-            sprite("RosterRowEmpty", cx, cy)
-            sprite("Sparkle", ROW_X + 30, cy, 0.32, nil, 0.4, nil, nil, "add")
-            text(20, L("seat_waiting"), cx, cy, DIM, "center", 0.85, 600)
+            rect(ROW_X, top, ROW_W, ROW_H, ROW_EMPTY)
+            text(20, L("seat_waiting"), cx, cy, DIM, "center", 1, 600)
         else
             local mine, host = (id == me), (NET:HostRoleId() == id)
-            sprite(mine and "RosterRowYou" or "RosterRow", cx, cy)
-            star(ROW_X + 30, cy, SEAT_COL[i], 0.5, net.readyByPeer[id] and 1 or 0.6, false)
+            rect(ROW_X, top, ROW_W, ROW_H, mine and ACCENT_SOFT or ROW_FACE)
+            if mine then rect(ROW_X, top, 8, ROW_H, ACCENT) end
             local spot = LO.spotOf[id]
             local drawn = false
             if spot ~= nil then
-                drawn = pcall(function() NAMEPLATE:DrawPlayerNameplate(ROW_X + 52, math.floor(cy - 40), 255, spot) end)
+                drawn = pcall(function() NAMEPLATE:DrawPlayerNameplate(ROW_X + 28, math.floor(cy - 40), 255, spot) end)
             end
-            if not drawn then text(24, net.nameByPeer[id] or ("P" .. id), ROW_X + 64, cy, mine and GOLD or CREAM, "left", 1, 310) end
+            if not drawn then text(24, net.nameByPeer[id] or ("P" .. id), ROW_X + 40, cy, INK, "left", 1, 310) end
             local d = net.diffByPeer[id] or 1
             local lv = (net.song ~= nil and not net.iLackSong) and net.songLevels[d] or nil
-            drawEmblem(d, lv, net.songPlus[d], ROW_X + 448, cy, 0.68, 1)
+            drawEmblem(d, lv, net.songPlus[d], ROW_X + 430, cy, 0.68, 1)
             -- mod icons (real icons): self uses CONFIG[0], others use a scratch slot
             if modicons then
                 pcall(function()
-                    if mine then modicons:Draw(ROW_X + 510, cy - 18, 0, "menu", 255)
+                    if mine then modicons:Draw(ROW_X + 496, cy - 18, 0, "menu", 255)
                     else
                         -- the scratch slot is the local 5th player's: their special mod is put back after the draw
                         local keep = CONFIG:GetSpecialMod(4)
-                        LO.applyModsToSlot(4, net.modByPeer[id]); modicons:Draw(ROW_X + 510, cy - 18, 4, "menu", 255)
+                        LO.applyModsToSlot(4, net.modByPeer[id]); modicons:Draw(ROW_X + 496, cy - 18, 4, "menu", 255)
                         CONFIG:SetSpecialMod(4, (keep ~= 1) and keep or 0)
                     end
                 end)
@@ -480,8 +320,8 @@ local function drawRoster(ids, me)
             local st, sc = seatStatus(id)
             local right = ROW_X + ROW_W - 26
             if host then
-                text(20, st, right, cy - 12, sc, "right", 1, 250)
-                text(16, L("tag_host"), right, cy + 16, GOLD, "right", 1, 250)
+                text(20, st, right, cy - 14, sc, "right", 1, 250)
+                text(16, L("tag_host"), right, cy + 16, ACCENT, "right", 1, 250)
             else
                 text(20, st, right, cy, sc, "right", 1, 250)
             end
@@ -489,26 +329,16 @@ local function drawRoster(ids, me)
     end
 end
 
--- the difficulty row of the deck: all five emblems, the chosen one full size under a halo that glides to
--- it, the others scaled down; the ones the song lacks stay greyed (the cursor never stops on them)
+-- the difficulty row of the deck: all five emblems, the chosen one full size on a marker, the others
+-- scaled down; the ones the song lacks stay greyed (the cursor never stops on them)
 local DIFF_STEP = 128
-local diffView = { haloX = nil, scale = {}, t = nil }
 local function drawDiffRow(x0, cy)
     local d = LO.myDiff()
-    local dt = diffView.t and (clock - diffView.t) or 0
-    diffView.t = clock
-    local k = 1 - math.exp(-dt * 14)
-    local target = x0 + d * DIFF_STEP
-    diffView.haloX = diffView.haloX and (diffView.haloX + (target - diffView.haloX) * k) or target
-    local pulse = 0.5 + 0.5 * math.sin(clock * 3)
-    sprite("Halo", diffView.haloX, cy, 1.0 + 0.05 * pulse, nil, 0.7 + 0.3 * pulse, GOLD, nil, "add")
+    rect(x0 + d * DIFF_STEP - 58, cy - 56, 116, 112, ACCENT_SOFT)
     local known = net.song ~= nil and not net.iLackSong
     for i = 0, 4 do
         local has = LO.diffAvailable(i)
-        local want = (i == d) and 1.0 or (has and 0.72 or 0.6)
-        local s = diffView.scale[i] or want
-        s = s + (want - s) * k
-        diffView.scale[i] = s
+        local s = (i == d) and 1.0 or (has and 0.72 or 0.6)
         local x = x0 + i * DIFF_STEP
         if has then drawEmblem(i, known and net.songLevels[i] or nil, net.songPlus[i], x, cy, s, (i == d) and 1 or 0.75)
         else drawEmblem(nil, nil, false, x, cy, s, 0.45) end
@@ -516,17 +346,14 @@ local function drawDiffRow(x0, cy)
 end
 
 local function drawDeck()
-    sprite("Deck", DECK_X + DECK_W / 2, DECK_Y + DECK_H / 2)
     local tabs = { LO.amController() and L("tab_start") or L("tab_ready"), L("tab_difficulty"), L("tab_mods") }
     for i, tn in ipairs(tabs) do
         local sel = (i == tab)
-        local y = DECK_Y + 30 + (i - 1) * 40
-        if sel then
-            sprite("TabOn", DECK_X + 20 + 190, y)
-            sprite("Sparkle", DECK_X + 44, y, 0.3 + 0.05 * math.sin(clock * 5), nil, 1, GOLD, nil, "add")
-        end
-        text(26, tn, DECK_X + 70, y, sel and CREAM or DIM, "left", 1, DECK_SPLIT - 90)
+        local y = DECK_Y + 35 + (i - 1) * 40
+        if sel then rect(DECK_X + 24, y - 19, DECK_SPLIT - 60, 38, ACCENT) end
+        text(26, tn, DECK_X + 46, y, sel and WHITE or DIM, "left", 1, DECK_SPLIT - 110)
     end
+    rect(DECK_X + DECK_SPLIT, DECK_Y + 24, 3, DECK_H - 48, ROW_EMPTY)
     local cx = DECK_X + DECK_SPLIT + (DECK_W - DECK_SPLIT) / 2
     local cy = DECK_Y + DECK_H / 2
     local roomW = DECK_W - DECK_SPLIT - 80
@@ -536,11 +363,11 @@ local function drawDeck()
         drawDiffRow(x0, cy)
         local tx = x0 + 4 * DIFF_STEP + 96
         local w = DECK_X + DECK_W - 40 - tx
-        text(34, LO.diffName(d), tx, cy - 18, DIFF_COL[d] or CREAM, "left", 1, w)
-        text(20, L("deck_diff_help"), tx, cy + 26, LAVENDER, "left", 1, w)
+        text(34, LO.diffName(d), tx, cy - 18, DIFF_COL[d] or INK, "left", 1, w)
+        text(20, L("deck_diff_help"), tx, cy + 26, DIM, "left", 1, w)
         return
     end
-    local main, sub, mc = nil, nil, CREAM
+    local main, sub, mc = nil, nil, INK
     if tab == 1 then
         if LO.amController() then
             local why = LO.startProblem()
@@ -559,104 +386,74 @@ local function drawDeck()
     end
     if sub then
         text(30, main, cx, cy - 18, mc, "center", 1, roomW)
-        text(20, sub, cx, cy + 24, LAVENDER, "center", 1, roomW)
+        text(20, sub, cx, cy + 24, DIM, "center", 1, roomW)
     else
         text(30, main, cx, cy, mc, "center", 1, roomW)
     end
 end
 
+PANELS.lobby = function()
+    ui:panel{ x = SONG.x, y = SONG.y, w = SONG.w, h = SONG.h, pad = 24, title = L("song_label") }
+    ui:panel{ x = ROSTER.x, y = ROSTER.y, w = ROSTER.w, h = ROSTER.h, pad = 24 }
+    ui:panel{ x = DECK_X, y = DECK_Y, w = DECK_W, h = DECK_H, pad = 20 }
+end
+
 local function drawLobby()
     local ids, me = LO.peerIds(), NET:SelfId()
-    drawSmallLogo(80, 62)
-    sprite("HeaderPill", 1544, 62)
-    text(20, LO.amController() and L("role_host") or L("role_guest"), 1292, 62, LAVENDER, "left", 1, 390)
-    local count = LO.count() .. " / " .. LO.MAXP
-    text(22, count, 1796, 62, CREAM, "right")
-    sprite("Sparkle", 1796 - textW(22, count) - 22, 62, 0.26, nil, 1, GOLD, nil, "add")
-    sprite("Chart", 1260, 470, 1, 1, 0.8)
+    if builtFor ~= "lobby" then return end
+    ui:draw()
+    text(30, L("logo_title"), 84, 52, INK, "left", 1, 700)
+    text(20, LO.amController() and L("role_host") or L("role_guest"), 1700, 52, DIM, "right", 1, 600)
+    text(24, LO.count() .. " / " .. LO.MAXP, 1836, 52, INK, "right")
     drawSong()
-    drawFigure(ids)
     drawRoster(ids, me)
     drawDeck()
     if LO.amController() then drawHint(LF("hint_host", keyLabel("song"), speedLabel(), bindLabel("CANCEL")))
     else drawHint(LF("hint_guest", bindLabel("CANCEL"))) end
     if net.connecting then
-        panel(0, 0, SCREEN_W, SCREEN_H, 0.02, 0.03, 0.08, 0.72)
-        sprite("Sparkle", 960, 470, 1.3, nil, 1, GOLD, clock * 60, "add")
-        text(44, L("connecting"), 960, 570, CREAM, "center")
+        rect(0, 0, SCREEN_W, SCREEN_H, BG, 225)
+        text(44, L("connecting"), 960, 540, INK, "center")
+        text(22, LF("hint_connecting", bindLabel("CANCEL")), 960, 620, DIM, "center", 1, 1200)
     end
 end
 
 -- ── results ─────────────────────────────────────────────────────────────────────────────────────────
-local RANK_SIZE = { 0.5, 0.42, 0.38, 0.35, 0.32 }
-local RANK_STAR = { 1.5, 1.15, 1.0, 0.9, 0.85 }
-local RESULTS_FIG_Y = { 236, 372, 282, 392, 214 }   -- the figure's full height, under the results table
+local RESULTS = { x = 220, y = 90, w = 1480, h = 600 }
 
--- the room's figure under the table: every player's star shines by their rank
-local function drawRankFigure(rows)
-    local ids = LO.peerIds()
-    local rankOf, first = {}, nil
-    for i, row in ipairs(rows) do
-        if row.id then rankOf[row.id] = i end
-        if i == 1 and row.r and not row.r.ab then first = row.id end
-    end
-    local k, cx, cy = 0.8, 960, 770
-    local function at(i) return cx + (SEAT_X[i] - 1270) * k, cy + (RESULTS_FIG_Y[i] - 300) * k end
-    for i = 1, 4 do
-        local x1, y1 = at(i); local x2, y2 = at(i + 1)
-        link(x1, y1, x2, y2, (ids[i] and ids[i + 1]) and 0.6 or 0.18, 26)
-    end
-    for i = 1, LO.MAXP do
-        local x, y = at(i)
-        local id = ids[i]
-        if id == nil then
-            sprite("Sparkle", x, y, 0.4, nil, 0.4, nil, nil, "add")
-        else
-            local rank = rankOf[id] or LO.MAXP
-            star(x, y, SEAT_COL[i], RANK_STAR[rank] or 0.85, rank == 1 and 1 or 0.7, id == first)
-            text(20, net.nameByPeer[id] or ("P" .. id), x, y + 50, id == first and GOLD or CREAM, "center", 1, 190)
-        end
-    end
+PANELS.results = function()
+    ui:panel{ x = RESULTS.x, y = RESULTS.y, w = RESULTS.w, h = RESULTS.h, pad = 24, title = L("results_title") }
 end
 
 local function drawResults()
-    local title = L("results_title")
-    text(48, title, 960, 84, CREAM, "center")
-    local w = textW(48, title)
-    sprite("Sparkle", 960 - w / 2 - 40, 84, 0.4, nil, 1, GOLD, nil, "add")
-    sprite("Sparkle", 960 + w / 2 + 40, 84, 0.4, nil, 1, GOLD, nil, "add")
-    if net.song then text(26, net.song.title or "", 960, 146, LAVENDER, "center", 1, 1200) end
+    if builtFor ~= "results" then return end
+    ui:draw()
+    if net.song then text(24, net.song.title or "", 960, RESULTS.y + 104, DIM, "center", 1, 1200) end
     local rows = LO.standings()
     for i, row in ipairs(rows) do
         local r = row.r
-        local y = 236 + (i - 1) * 76
+        local y = RESULTS.y + 180 + (i - 1) * 80
         local first = (i == 1 and r and not r.ab)
-        sprite(first and "ResultRowFirst" or "ResultRow", 960, y)
-        sprite("Sparkle", 292, y, RANK_SIZE[i] or 0.32, nil, first and 1 or 0.7, first and GOLD or LAVENDER, nil, "add")
-        text(24, i, 328, y, first and GOLD or CREAM, "center")
-        text(26, row.name or "?", 370, y, first and GOLD or CREAM, "left", 1, 440)
+        rect(RESULTS.x + 30, y - 36, RESULTS.w - 60, 72, first and ACCENT_SOFT or ROW_FACE)
+        if first then rect(RESULTS.x + 30, y - 36, 8, 72, ACCENT) end
+        text(26, i, RESULTS.x + 86, y, first and ACCENT or INK, "center")
+        text(26, row.name or "?", RESULTS.x + 140, y, INK, "left", 1, 440)
         if r and not r.ab then
-            text(28, string.format("%d", r.sc), 1060, y, CREAM, "right")
-            text(20, LF("results_combo", r.ac, r.co), 1110, y, LAVENDER, "left", 1, 330)
+            text(28, string.format("%d", r.sc), RESULTS.x + 830, y, INK, "right")
+            text(20, LF("results_combo", r.ac, r.co), RESULTS.x + 880, y, DIM, "left", 1, 330)
             local badge = r.pf and L("badge_perfect") or r.fc and L("badge_fc") or r.cl and L("badge_clear") or L("badge_failed")
-            local bc = r.pf and { 255, 220, 120 } or r.fc and { 130, 235, 235 } or r.cl and GREEN or RED
-            text(20, badge, 1630, y, bc, "right", 1, 180)
+            local bc = r.pf and AMBER or r.fc and { 20, 140, 160 } or r.cl and GREEN or RED
+            text(20, badge, RESULTS.x + RESULTS.w - 60, y, bc, "right", 1, 180)
         else
-            text(20, r and L("results_aborted") or L("results_playing"), 1110, y, AMBER, "left", 1, 500)
+            text(20, r and L("results_aborted") or L("results_playing"), RESULTS.x + 880, y, AMBER, "left", 1, 500)
         end
     end
-    drawRankFigure(rows)
     if net.resultsReadyT == nil then drawHint(L("hint_results_wait"))
     else drawHint(LF("hint_results_back", bindLabel("DECIDE"))) end
 end
 
 -- ── lifecycle ─────────────────────────────────────────────────────────────────────────────────────
 function onStart()
-    dim = CANVAS:CreateCanvas(2, 2); dim:Clear(255, 255, 255, 255); dim:Upload()
     loadArt()
-    -- build the sky early so the way in never waits for it
-    local ok, online = pcall(function() return CONFIG.AreLuaNetworkingConnectionsAllowed end)
-    if ok and online then Space.create(SKY_SPRITES) end
     -- NOTE: do NOT fetch activities here. At skin load, stages' PropagateOnStart runs BEFORE Activities and
     -- ROActivities are registered (see CSkin.FetchMenusAndModules), so GetActivity/GetROActivity return nil in
     -- onStart. We fetch them in activate() (runs on entry, after everything is loaded) — same as song_select_core.
@@ -667,9 +464,10 @@ function activate()
     LO.resetTexts()
     keyLabels, bindNames = {}, {}
     reloadKeys()
+    if ui == nil then ui = PopUI.new{} end
+    builtFor = nil
     if not modDlg then modDlg = ACTIVITY:GetActivity("mod_select_dialog") end
     if not modicons then modicons = ROACTIVITY:GetROActivity("modicons"); if modicons then pcall(function() modicons:Activate() end) end end
-    Space.create(SKY_SPRITES)                -- in case online was turned on after boot
     if pendingReturn then                    -- returned from a song
         pendingReturn = false
         if net.online then LO.broadcastResult(); LO.setWatching(true) end
@@ -677,9 +475,14 @@ function activate()
         mode = "results"
     end
 end
-function deactivate() LO.stopPreview(); if act and mode == "songselect" then act:Deactivate() end; Space.release() end
+function deactivate()
+    LO.stopPreview()
+    if act and mode == "songselect" then act:Deactivate() end
+    if ui then ui:disposeWidgets(); ui:clear() end
+    builtFor = nil
+end
 function afterSongEnum() end
-function onDestroy() if modicons then pcall(function() modicons:Deactivate() end) end LO.leave(); Space.forget() end
+function onDestroy() if modicons then pcall(function() modicons:Deactivate() end) end LO.leave() end
 
 -- ── helpers ────────────────────────────────────────────────────────────────────────────────────────
 local function setMsg(m, t) msg = m; msgT = t or 4 end
@@ -689,12 +492,12 @@ local function getSignal(result)
     local ok, val = pcall(function() return result[0] end)
     return ok and val or nil
 end
-local function backToMenu(m) LO.leave(); mode = "menu"; menuSel = 1; if m then setMsg(m, 5) end end
+local function backToMenu(m, t) LO.leave(); mode = "menu"; menuSel = 1; if m then setMsg(m, t or 5) end end
 local function playSfx(name) pcall(function() SHARED:GetSharedSound(name):Play() end) end
 local function playError() playSfx("Error") end
 
 -- ── host song select (song only — no difficulty prompt; Auto disabled) ────────────────────────────────
--- The song select runs over the lobby's sky and shares the room's song speed through CONFIG.SongSpeed.
+-- The song select shares the room's song speed through CONFIG.SongSpeed.
 local function enterSongSelect()
     if act == nil then act = ACTIVITY:GetActivity("song_select_core") end
     CONFIG.IsAIBattleMode = false
@@ -721,8 +524,8 @@ local function updateSongSelect()
 end
 
 -- ── update ───────────────────────────────────────────────────────────────────────────────────────
-function update(ts)
-    -- first frame: use the real frame time so the handed-over sky does not jump
+local function step(ts)
+    -- first frame: the real frame time
     local dt
     if lastTs == nil then
         local ok, d = pcall(function() return fps.deltaTime end)
@@ -733,7 +536,6 @@ function update(ts)
     lastTs = ts
     if dt < 0 then dt = 0 elseif dt > 0.1 then dt = 0.1 end
     if msgT > 0 then msgT = msgT - dt end
-    tickLook(dt)
 
     if net.online or net.connecting then
         LO.drain()
@@ -741,6 +543,7 @@ function update(ts)
             if mode == "songselect" and act then act:Deactivate() end
             backToMenu(L("msg_room_closed")); return nil
         end
+        if net.notice then setMsg(net.notice, 8); net.notice = nil end
     end
     if mode == "lobby" or mode == "results" then LO.tickPreview(dt) end   -- loop the jacket preview (song select owns its own)
 
@@ -752,13 +555,13 @@ function update(ts)
                 if LO.host() then mode = "lobby"; tab = 1 else playError(); setMsg(net.msg or L("msg_open_failed"), 6) end
             else mode = "code"; ti = INPUT:CreateTextInput("", 4096) end
         end
-        if navPn.cancel() then return Exit("stage", "_title", "space_voyage_back") end
+        if navPn.cancel() then return Exit("stage", "_title") end
 
     elseif mode == "code" then
         if ti:Update() then
             local code = (ti.Text ~= "" and ti.Text) or nil
             if code and LO.join(code) then mode = "lobby"; tab = 1
-            else playError(); setMsg(code and (net.msg or L("msg_join_failed")) or L("msg_no_code"), 5); mode = "menu" end
+            else playError(); setMsg(code and (net.msg or L("msg_join_failed")) or L("msg_no_code"), code and 8 or 5); mode = "menu" end
         end
         if navPn.cancel() then mode = "menu" end
 
@@ -767,7 +570,9 @@ function update(ts)
 
     elseif mode == "lobby" then
         if not net.online then
-            if not net.connecting then backToMenu(net.msg or L("msg_disconnected")) end
+            -- a failed join comes back with its reason, shown long enough to read; Cancel gives up the wait
+            if not net.connecting then backToMenu(net.msg or L("msg_disconnected"), 12)
+            elseif navPn.cancel() then backToMenu() end
             return nil
         end
         -- Play start is handled FIRST, even if the mod dialog is open (it is then force-closed WITHOUT saving).
@@ -836,10 +641,17 @@ function update(ts)
     return nil
 end
 
+function update(ts)
+    local r = step(ts)
+    prepare()
+    return r
+end
+
 -- ── draw ───────────────────────────────────────────────────────────────────────────────────────────
 function draw()
-    drawSky()
-    if mode == "songselect" then act:Draw("no_bg"); drawToast(); return end
+    if ui == nil then return end
+    if mode == "songselect" then act:Draw(); drawToast(); return end
+    rect(0, 0, SCREEN_W, SCREEN_H, BG)
     if mode == "menu" then drawMenu()
     elseif mode == "code" then drawCode()
     elseif mode == "lobby" then drawLobby()

@@ -36,6 +36,7 @@ function LO.resetTexts() I18N.detect(); texts, diffNames = {}, {} end
 
 LO.net = {
     online = false, isHost = false, connecting = false, roomGone = false, code = nil, msg = nil,
+    notice = nil,                     -- a message NET sent while in a room, for the lobby to show once
     nameByPeer = {}, infoByPeer = {}, diffByPeer = {}, modByPeer = {}, readyByPeer = {}, resultByPeer = {},
     lackByPeer = {}, watchByPeer = {},
     song = nil,                       -- {uid, title, diff, speed, dyn(0/1)}
@@ -259,6 +260,7 @@ function LO.peerIds() local ids = {} for id in pairs(net.nameByPeer) do ids[#ids
 local function reset()
     net.online, net.isHost, net.connecting, net.roomGone = false, false, false, false
     net.code = nil
+    net.notice = nil
     net.nameByPeer, net.infoByPeer, net.diffByPeer, net.modByPeer, net.readyByPeer = {}, {}, {}, {}, {}
     net.resultByPeer, net.lackByPeer, net.watchByPeer = {}, {}, {}
     net.song = nil; net.songLevels = {}; net.songPlus = {}; net.iLackSong = false
@@ -297,11 +299,16 @@ function LO.join(code)
     NET:SetLocalPlayer(LO.selfInfo())
     net.connecting, net.isHost = true, false
     net.nameByPeer, net.infoByPeer, net.diffByPeer, net.modByPeer, net.readyByPeer = {}, {}, {}, {}, {}
-    NET:JoinRoom(code)
+    if not NET:JoinRoom(code) then
+        net.connecting = false
+        net.msg = takeError() or LO.tr("msg_join_failed")
+        return false
+    end
     net.msg = LO.tr("connecting")
     return true
 end
-function LO.leave() if net.online or net.connecting then NET:Leave() end reset(); LO.restoreSpots() end
+-- always ends the NET session: after a failed join its workers are still there
+function LO.leave() NET:Leave(); reset(); LO.restoreSpots() end
 
 -- ── selections ────────────────────────────────────────────────────────────────────────────────────
 local function songJson(s)
@@ -596,7 +603,8 @@ function LO.drain()
         elseif ty == "roomclosed" then
             net.roomGone = true
         elseif ty == "error" then
-            net.msg = e.Data or LO.tr("msg_network_error"); if not net.online then net.connecting = false end
+            net.msg = e.Data or LO.tr("msg_network_error")
+            if net.online then net.notice = net.msg else net.connecting = false end
         elseif ty == "message" then
             local ch = e.Channel; local s = JSONLOADER:JsonParseStringAny(e.Data)
             if ch == "song" and s then

@@ -36,6 +36,7 @@
   "hint_host": "Arriba/Abajo menú   %s canción   %s velocidad   %s salir",
   "hint_guest": "Arriba/Abajo menú   elige dificultad y mods, y prepárate   %s cancelar / salir",
   "connecting": "Conectando...",
+  "hint_connecting": "%s cancelar",
   "results_title": "Resultados",
   "results_combo": "%.2f%%   combo %d",
   "badge_perfect": "Perfecto",

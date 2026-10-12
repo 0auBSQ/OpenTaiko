@@ -36,6 +36,7 @@
   "hint_host": "Hoch/Runter Menü   %s Song   %s Tempo   %s verlassen",
   "hint_guest": "Hoch/Runter Menü   wähle Schwierigkeit und Mods, dann mach dich bereit   %s abbrechen / verlassen",
   "connecting": "Verbinde...",
+  "hint_connecting": "%s abbrechen",
   "results_title": "Ergebnisse",
   "results_combo": "%.2f%%   Combo %d",
   "badge_perfect": "Perfekt",
