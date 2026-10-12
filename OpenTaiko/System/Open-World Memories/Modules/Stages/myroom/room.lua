@@ -191,6 +191,7 @@ local function buildCatalogFromJson()
                     end
                 end
             end
+            e.iconYaw = jnum(jget(node, "iconYaw"))      -- the icon's camera yaw, for a model that faces another way
             local pic = jget(node, "picture")
             if pic and A.PICTURE[pic] then e.picture = A.PICTURE[pic] end
             local wg = jget(node, "wallGlb")

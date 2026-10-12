@@ -109,10 +109,11 @@ local function fitDistance(corners, yaw, pitch, fov, margin)
     return dist * margin
 end
 -- FRONT-3/4 auto view: among front-hemisphere 3/4 yaws, pick the one whose projected footprint is
--- largest (shows the most of the model). Stays in front (never the back); 45 wins ties (room default).
+-- largest (shows the most of the model). The models face +z, so the camera stands on that side;
+-- 225 wins ties.
 local function bestFrontYaw(corners, pitch)
-    local best, bestArea = 45, -1
-    for _, yaw in ipairs({ 45, 30, 60, 315, 330, 300 }) do
+    local best, bestArea = 225, -1
+    for _, yaw in ipairs({ 225, 210, 240, 135, 150, 120 }) do
         local rx, rz, ux, uy, uz = camBasis(yaw, pitch)
         local minr, maxr, minu, maxu = huge, -huge, huge, -huge
         for _, o in ipairs(corners) do
@@ -156,9 +157,9 @@ function ModelIcon:_render()
         local corners = aabbCorners(minX, minY, minZ, maxX, maxY, maxZ, cx, cy, cz)
         if self.faceThin then
             -- flat wall item (a clock, thin in X): look along the THINNEST axis so its FACE is shown
-            -- head-on, not edge-on (the vertical-bar silhouette). WALL_GLB says the face is the − side
-            -- for X (default cam sees the −x front) and the + side for Z.
-            if rx <= ry and rx <= rz then self.yaw, self.pitch = 90, -6      -- thin X → face on −x
+            -- head-on, not edge-on (the vertical-bar silhouette). The wall models' face is the + side
+            -- of that axis.
+            if rx <= ry and rx <= rz then self.yaw, self.pitch = 270, -6     -- thin X → face on +x
             elseif rz <= rx and rz <= ry then self.yaw, self.pitch = 180, -6 -- thin Z → face on +z
             else self.yaw, self.pitch = 0, -78 end                          -- thin Y → look down
         elseif self.autoFrame then

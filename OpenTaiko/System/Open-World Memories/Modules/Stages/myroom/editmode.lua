@@ -381,8 +381,9 @@ local function iconOptsFor(id)
     if cat.place ~= "wall" then
         local stem = Room.modelStem(id)   -- variant items (arcade_neon → arcade.glb) share one GLB
         if Room.modelAvailable(id, stem) then
-            -- autoFrame: pick the front-3/4 yaw that shows the most of the model + tight projected-AABB fit
-            return "new", { file = "Models/" .. stem .. ".glb", res = 128, autoFrame = true }
+            -- autoFrame: pick the front-3/4 yaw that shows the most of the model + tight projected-AABB fit;
+            -- a catalog iconYaw sets the view itself
+            return "new", { file = "Models/" .. stem .. ".glb", res = 128, yaw = cat.iconYaw, autoFrame = cat.iconYaw == nil }
         elseif cat.build then
             local w, h = cat.w or 1, cat.h or 1
             local ch = cat.collH or 1.0

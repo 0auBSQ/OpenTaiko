@@ -239,6 +239,7 @@
     "collW": 0.8,
     "collD": 0.5,
     "interact": "mirror",
-    "shop": true
+    "shop": true,
+    "iconYaw": 30
   }
 }
