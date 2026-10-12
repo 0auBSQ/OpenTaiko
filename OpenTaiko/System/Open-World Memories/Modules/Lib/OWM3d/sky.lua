@@ -1,10 +1,30 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- OWM3d/sky.lua — the procedural GPU sky v2: a full-screen fragment shader (SetSkyShader) drawn
--- behind the 3D pass and mirrored into reflections. The day palette now lives HERE in Lua as
--- Catmull-Rom keyframes over 11 hour stops (smooth dawn→sunrise→day→sunset→dusk→night hue travel,
--- no binary steps), and the shader gets: gradient DITHERING (kills banding), TWO fbm cloud layers
--- drifting against each other with weather-driven coverage, a TWO-SCALE star field with per-star
--- twinkle plus a milky-way band, a sun disc + halo + lens ghosts, and a PHASED moon.
+-- OWM3d/sky.lua — the GPU sky: a full-screen fragment shader (SetSkyShader) drawn behind the 3D pass and
+-- mirrored into reflections. The colours come from the hour palette below.
+--
+-- The clouds are adapted from opengl_sky by Silvio Henrique Ferreira (https://github.com/shff/opengl_sky):
+--
+--   MIT License
+--
+--   Copyright (c) 2019 Silvio Henrique Ferreira
+--
+--   Permission is hereby granted, free of charge, to any person obtaining a copy
+--   of this software and associated documentation files (the "Software"), to deal
+--   in the Software without restriction, including without limitation the rights
+--   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--   copies of the Software, and to permit persons to whom the Software is
+--   furnished to do so, subject to the following conditions:
+--
+--   The above copyright notice and this permission notice shall be included in all
+--   copies or substantial portions of the Software.
+--
+--   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--   SOFTWARE.
 --
 -- uUser packing (8 slots):
 --   [0] camera forward xyz, tan(fov/2)        [4] zenith rgb, star intensity
@@ -42,14 +62,38 @@ float vnoise(vec2 p){
     float d = h21(i + vec2(1.0, 1.0));
     return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
 }
-float fbm(vec2 p){
-    float v = 0.0; float amp = 0.55;
-    for (int i = 0; i < 4; i++){
-        v += vnoise(p) * amp;
-        p = p * 2.13 + vec2(17.3, 9.1);
-        amp *= 0.5;
-    }
-    return v;
+float hash(ivec3 p){
+    uvec3 x = uvec3(p);
+    uint q = x.x * 747796405u + 2891336453u;
+    q = (q ^ (q >> 16u)) * 2246822519u + x.y;
+    q = (q ^ (q >> 13u)) * 3266489917u + x.z;
+    q = (q ^ (q >> 16u)) * 2246822519u;
+    return float((q ^ (q >> 15u)) >> 8u) * (1.0 / 16777216.0);
+}
+float noise(vec3 x){
+    vec3 f = fract(x);
+    ivec3 i = ivec3(floor(x));
+    return mix(mix(mix(hash(i), hash(i + ivec3(1, 0, 0)), f.x),
+                   mix(hash(i + ivec3(0, 1, 0)), hash(i + ivec3(1, 1, 0)), f.x), f.y),
+               mix(mix(hash(i + ivec3(0, 0, 1)), hash(i + ivec3(1, 0, 1)), f.x),
+                   mix(hash(i + ivec3(0, 1, 1)), hash(i + ivec3(1, 1, 1)), f.x), f.y), f.z);
+}
+const mat3 m = mat3(0.0, 1.60, 1.20, -1.6, 0.72, -0.96, -1.2, -0.96, 1.28);
+float fbm(vec3 p){
+    float f = 0.0;
+    f += noise(p) / 2.0; p = m * p * 1.1;
+    f += noise(p) / 4.0; p = m * p * 1.2;
+    f += noise(p) / 6.0; p = m * p * 1.3;
+    f += noise(p) / 12.0;
+    return f * 1.04;
+}
+// the thin high layer needs less detail
+float fbmLow(vec3 p){
+    float f = 0.0;
+    f += noise(p) / 2.0; p = m * p * 1.1;
+    f += noise(p) / 4.0; p = m * p * 1.2;
+    f += noise(p) / 4.0;
+    return f;
 }
 // one star lattice at the given cell scale; thr gates star density (lower = more stars)
 float starLayer(vec3 dir, float domeY, float scale, float thr, float tw0){
@@ -91,26 +135,21 @@ void main(){
     float sunSide = max(dot(normalize(vec3(dir.x, 0.0, dir.z) + 1e-5), normalize(vec3(sunD.x, 0.0, sunD.z) + 1e-5)), 0.0);
     col += vec3(0.9, 0.4, 0.15) * duskW * pow(sunSide, 3.0) * (1.0 - t) * 0.6;
 
-    // clouds: TWO fbm layers drifting against each other (a high slow deck + low fast wisps),
-    // coverage driven from Lua (weather overcasts the sky before the rain lands)
+    // clouds: a thin high layer under three puffy ones, the amount driven from Lua
     float den = 0.0;
     {
-        vec2 cp = dir.xz / (domeY + 0.22);
-        vec2 drift1 = vec2(uTime * 0.008, uTime * 0.0032);
-        vec2 drift2 = vec2(-uTime * 0.013, uTime * 0.006);
-        float lo = 0.62 - cover * 0.34;
-        float d1 = smoothstep(lo, lo + 0.24, fbm(cp * 0.55 + drift1));
-        float d2 = smoothstep(lo + 0.10, lo + 0.30, fbm(cp * 1.7 + drift2)) * 0.6;
-        den = clamp(d1 + d2 * (1.0 - d1), 0.0, 1.0);
-        float horFade = smoothstep(0.015, 0.09, domeY);
-        vec3 cloudDay = vec3(1.04);
-        vec3 cloudLit = mix(mix(cloudDay, vec3(0.09, 0.10, 0.16), nightF), vec3(1.05, 0.60, 0.42), duskW);
-        den = den * horFade;
-        if (den > 0.0){
-            float shade = fbm(cp * 1.15 - drift1 * 1.7);
-            cloudLit *= 0.60 + 0.55 * shade;                   // self-shading = puffier clouds
-            col = mix(col, cloudLit, den * 0.92);
-        }
+        vec3 pos = vec3(dir.x, max(domeY, 0.004), dir.z);
+        float time = uTime * 0.2;
+        vec3 cloudLit = mix(mix(vec3(1.04), vec3(0.09, 0.10, 0.16), nightF), vec3(1.05, 0.60, 0.42), duskW);
+        float cirrus = smoothstep(0.6, 1.0, fbmLow(pos / pos.y * 2.0 + time * 0.05)) * 0.3;
+        den = cirrus * pos.y;
+        col = mix(col, cloudLit, den);
+        float amount = min(1.0, cover + 0.30);
+        float d = smoothstep(1.0 - amount, 1.0, fbm(0.71 * pos / pos.y + time * 0.3));
+        float a = d * pos.y;
+        a = 1.0 - (1.0 - a) * (1.0 - a) * (1.0 - a);
+        col = mix(col, cloudLit * (0.7 + 0.3 * d), a);
+        den = max(den, a);
     }
 
     // stars: two lattice scales + per-star twinkle, boosted inside the milky-way band; a faint
