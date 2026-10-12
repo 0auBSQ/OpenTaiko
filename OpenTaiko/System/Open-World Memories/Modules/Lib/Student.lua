@@ -4,10 +4,10 @@
 -- The chosen student is the global counter "story_student" (the one Lib/PagodaAvatar reads): 1 = B, and
 -- any other value (an unset counter included) reads as A. A student's palette index is the counter its
 -- character uses, ".character_palette_<folder>", so the customize tab and every story scene stay in step;
--- A and B each keep their own. The player's own student reads the palettes its character reads: the installed
--- character's Palettes.json (just the default palette when it has none), or the copy in Lib/Student/<id>/ when
--- the character is not installed. A visitor's student (an index picked from another player's list) reads the
--- character's file when there is one, else the copy. An index outside the list reads as the default palette (0).
+-- A and B each keep their own. A student's palettes are the character's Palettes.json followed by the palettes
+-- of the copy in Lib/Student/<id>/ that the character's file does not have (matched by name), so a character
+-- without palettes, or one that is not installed, still has the copy's. An index outside the list reads as the
+-- default palette (0).
 --
 --   local Student = require("Student")
 --   local id  = Student.current(save)            -- "a" | "b"
@@ -84,7 +84,7 @@ end
 
 -- ── palettes ───────────────────────────────────────────────────────────────────────────────────
 local lists = {}           -- "id:own" | "id:visitor" → { {name, plays, blend, stops|nil}, ... } (entry i = index i-1)
-local sources = {}         -- the same keys → "character" | "copy" | "none"
+local sources = {}         -- the same keys → "character" | "merged" | "copy" | "none"
 local gradients = {}       -- "source:id:idx" → LuaGradientMap | false
 
 local function parseStops(node)
@@ -114,6 +114,7 @@ local function parseFile(path)
         local own = okLang and jget(jget(e, "names"), lang) or nil
         if own ~= nil and tostring(own) ~= "" then name = own end
         list[#list + 1] = {
+            key = tostring(jget(e, "name") or ""),
             name = (name ~= nil) and tostring(name) or ("Palette " .. i),
             plays = math.max(0, floor(num(jget(e, "plays")) or 0)),
             blend = math.max(0, math.min(1, num(jget(e, "blend")) or 0)),
@@ -124,30 +125,30 @@ local function parseFile(path)
     return list
 end
 
--- the game has the student's character: its character list knows the folder, or, before that list is
--- filled, the folder holds the Metadata.json every character carries
-local function installed(id)
-    local folder = INFO[id].folder
-    local ok, known = pcall(function()
-        if CHARACTERLIST == nil or (CHARACTERLIST.Count or 0) <= 0 then return nil end
-        return CHARACTERLIST:GetByName(folder) ~= nil
-    end)
-    if ok and known ~= nil then return known end
-    local okm, doc = pcall(function() return JSONLOADER:JsonParseFileAny(CHARA_DIR .. folder .. "/Metadata.json") end)
-    return okm and doc ~= nil
+-- the character's palettes, then the copy's that it lacks; returns the list and where it came from
+local function merged(own, copy)
+    if own == nil then return copy, copy and "copy" or "none" end
+    if copy == nil then return own, "character" end
+    local have, src = {}, "character"
+    for _, e in ipairs(own) do have[e.key] = true end
+    for _, e in ipairs(copy) do
+        if not have[e.key] then
+            own[#own + 1] = e
+            src = "merged"
+        end
+    end
+    return own, src
 end
 
 local function listKey(id, visitor) return id .. (visitor and ":visitor" or ":own") end
 
--- visitor: the list for another player's student (see the header)
+-- visitor: the list for another player's student
 function S.palettes(id, visitor)
     id = S.valid(id)
     local key = listKey(id, visitor)
     if lists[key] == nil then
-        local list, src = parseFile(CHARA_DIR .. INFO[id].folder .. "/Palettes.json"), "character"
-        if list == nil and (visitor or not installed(id)) then
-            list, src = parseFile(OWN_DIR .. id .. "/Palettes.json"), "copy"
-        end
+        local list, src = merged(parseFile(CHARA_DIR .. INFO[id].folder .. "/Palettes.json"),
+                                 parseFile(OWN_DIR .. id .. "/Palettes.json"))
         if list == nil then
             list, src = { { name = "Default", plays = 0, blend = 0, stops = nil } }, "none"
         end
@@ -156,7 +157,7 @@ function S.palettes(id, visitor)
     return lists[key]
 end
 
--- where the palette list came from: "character", "copy" or "none"
+-- where the palette list came from: "character", "merged", "copy" or "none"
 function S.paletteSource(id, visitor)
     S.palettes(id, visitor)
     return sources[listKey(S.valid(id), visitor)]

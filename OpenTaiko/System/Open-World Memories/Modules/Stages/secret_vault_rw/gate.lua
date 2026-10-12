@@ -9,7 +9,8 @@ local CX, CY = 960, 610                      -- the doorway's centre
 local DOOR_R = 330                           -- the door; the doorway shows it within 304 px
 local TRAVEL = 650                           -- the door rolls this far, into the wall beside the doorway
 local ZOOM_IN = 3.95                         -- moving in this far, the doorway fills the screen
-local BOLT_OUT, BOLT_IN = 310, 210           -- a bolt's centre from the door's, locked / drawn back
+local BOLT_OUT, BOLT_IN = 297, 197           -- a bolt's centre from the door's, locked / drawn back
+local GUIDE_R = 260                          -- the clamp each bolt slides through; the bolt's collar stops against it
 local WHEEL_SHADOW = { 8, 10 }
 local KEY_SHADOW = { 7, 9 }
 local TURNED = -90                           -- a turned key, a quarter turn clockwise
@@ -22,7 +23,7 @@ local FAST = { turns = 1.5, spin = 1.0, boltsAt = 0.6, bolts = 0.38, rollAt = 1.
                spinSnd = "WheelSpinShort", rollSnd = "GateRollShort" }
 local CLOSE = { push = 0.55, rollAt = 0.4, roll = 1.2, boltsAt = 1.62, bolts = 0.2, spinAt = 1.7, spin = 0.6, turns = -0.5 }
 
-local OWN_TEXTURES = { "Gate/Wall", "Gate/Wheel", "Gate/Bolt" }
+local OWN_TEXTURES = { "Gate/Wall", "Gate/Wheel", "Gate/Bolt", "Gate/Guide" }
 local OWN_SOUNDS = { "WheelSpin", "WheelSpinShort", "BoltsOpen", "BoltsShut", "GateRoll", "GateRollShort", "GateRollShut" }
 
 local PANEL_TOP = 18
@@ -258,7 +259,7 @@ local function shake(now)
     return x
 end
 
--- the bolts and the wheel, on the door at (x, y) turned by rot
+-- the bolts, their clamps and the wheel, on the door at (x, y) turned by rot
 local function drawDoorFront(now, x, y, rot, z)
     local bolt = ctx.tex["Gate/Bolt"]
     local r = (BOLT_IN + (BOLT_OUT - BOLT_IN) * value("bolts", now)) * z
@@ -266,6 +267,12 @@ local function drawDoorFront(now, x, y, rot, z)
         local a = 22.5 + 45 * i + rot
         local rad = math.rad(a)
         Tex.sprite(bolt, Tex.frame(x + r * math.cos(rad), y - r * math.sin(rad), a, z))
+    end
+    local guide = ctx.tex["Gate/Guide"]
+    for i = 0, 7 do
+        local a = 22.5 + 45 * i + rot
+        local rad = math.rad(a)
+        Tex.sprite(guide, Tex.frame(x + GUIDE_R * z * math.cos(rad), y - GUIDE_R * z * math.sin(rad), a, z))
     end
     local wheel = ctx.tex["Gate/Wheel"]
     local w = value("spin", now) + rot
