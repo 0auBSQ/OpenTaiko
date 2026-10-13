@@ -381,9 +381,27 @@ function M:_setFocusIndex(i)
 end
 
 function M:clearPrevFocus() if self._focusW then self._focusW:setFocus(false); self._focusW = nil end end
-function M:focusStay() self:_setFocusIndex(self.focusIdx < 1 and 1 or self.focusIdx) end
-function M:focusNext() self:_setFocusIndex(self.focusIdx < 1 and 1 or self.focusIdx + 1) end
-function M:focusPrev() self:_setFocusIndex(self.focusIdx < 1 and 1 or self.focusIdx - 1) end
+-- the device used last, shared by every PopUI of the script: the pointer only hovers while it is the mouse
+local lastInputMouse = false
+
+-- moves the key focus by dir (0 = stay) to the nearest widget keys may stop on: a widget made with
+-- mouseOnly = true is hovered and clicked like any other, but the keys step over it
+function M:_stepFocus(dir)
+    local n = #self.focusables
+    local i = self.focusIdx < 1 and 1 or self.focusIdx + dir
+    for _ = 1, n do
+        i = ((i - 1) % n) + 1
+        if not self.focusables[i].mouseOnly then self.focusIdx = i; return end
+        i = i + (dir < 0 and -1 or 1)
+    end
+    self.focusIdx = 0
+end
+function M:focusStay() self:_stepFocus(0) end
+function M:focusNext() self:_stepFocus(1) end
+function M:focusPrev() self:_stepFocus(-1) end
+
+--- True while the mouse is the device used last (moved, scrolled or pressed after the last key or pad input).
+function M:mouseActive() return lastInputMouse end
 
 function M:captureKeys(w) self._captureWidget = w end
 function M:releaseKeys(w) if self._captureWidget == w then self._captureWidget = nil end end
@@ -420,6 +438,8 @@ function M:update(ts)
     c.mPressing = INPUT:MousePressing("Left")
     c.mReleased = INPUT:MouseReleased("Left")
     c.scrollDx, c.scrollDy = INPUT:GetScrollDelta()
+    local mouseUsed = c.moved or c.mPressed or c.mPressing or c.mReleased
+        or (c.scrollDx or 0) ~= 0 or (c.scrollDy or 0) ~= 0
     -- one-frame mouse suppression: a caller (e.g. a stage dragging its own scrollbar) sets self._suppressMouse
     -- = true BEFORE ui:update so nothing under the cursor hovers/presses/clicks/scrolls/drags this frame. We
     -- neutralise the ctx mouse fields at the source (covers the hover scan, the press/release block, AND every
@@ -446,6 +466,18 @@ function M:update(ts)
     c.navUpOrPadLeft = (not captured) and self:_repeatKey("upOrPadLeft", dt) or false
     c.navLeft  = (not captured) and self:_repeatKey("leftKeyboard", dt) or false
     c.navRight = (not captured) and self:_repeatKey("rightKeyboard", dt) or false
+
+    -- the mouse takes over when it moves, scrolls or presses; a key or pad input takes it back. While the
+    -- keys lead, the pointer's place is ignored, so a mouse left resting on a widget does not hover it
+    if mouseUsed then lastInputMouse = true
+    elseif c.decide or c.cancel or c.navDown or c.navDownOrPadRight or c.navUp or c.navUpOrPadLeft
+        or c.navLeft or c.navRight then lastInputMouse = false end
+    if not lastInputMouse then
+        c.mx, c.my = -100000, -100000
+        c.inside = false
+        local fw = self.focusables[self.focusIdx]
+        if fw and fw.mouseOnly then self:focusStay() end
+    end
 
     self.cancelRequested = false
 

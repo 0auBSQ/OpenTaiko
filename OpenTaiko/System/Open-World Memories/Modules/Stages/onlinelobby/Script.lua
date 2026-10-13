@@ -15,7 +15,6 @@ local L, LF = LO.tr, LO.trf
 local SCREEN_W, SCREEN_H = 1920, 1080
 local mode = "menu"                         -- "menu" | "code" | "lobby" | "songselect" | "results"
 local lastTs = nil                          -- nil right after activate
-local menuSel = 1
 local tab = 1                               -- per-player menu: 1 Ready/Start, 2 Difficulty, 3 Mods
 local ti = nil
 local act = nil                             -- song_select_core (host)
@@ -81,8 +80,11 @@ local TEX_NAMES = { "Difficulty/Missing", "Difficulty/Level/plus" }
 for d = 0, 4 do TEX_NAMES[#TEX_NAMES + 1] = "Difficulty/" .. d end
 for n = 0, 9 do TEX_NAMES[#TEX_NAMES + 1] = "Difficulty/Level/" .. n end
 local tex = {}
-local ui = nil                               -- the panels of the screen shown
+local ui = nil                               -- the panels and menus of the screen shown
 local builtFor = nil                         -- the screen they were built for
+local builtHost = false                      -- and whether they were built for the room's controller
+local click = {}                             -- what the menus and buttons were asked this frame
+local nextBtn = nil                          -- the results' way back to the lobby, for the mouse
 
 local INK, DIM, WHITE = { 74, 38, 72 }, { 150, 132, 150 }, { 255, 255, 255 }
 local ACCENT, ACCENT_SOFT = { 244, 78, 150 }, { 255, 226, 242 }
@@ -158,10 +160,12 @@ end
 -- the panels of each screen; they are built from update when the screen changes (never from draw)
 local PANELS = {}
 local function prepare()
-    if ui == nil or builtFor == mode then return end
+    local host = (mode == "lobby" and LO.amController()) and true or false
+    if ui == nil or (builtFor == mode and builtHost == host) then return end
     ui:disposeWidgets()
     ui:clear()                               -- disposing frees their canvases; the list is emptied here
-    builtFor = mode
+    builtFor, builtHost = mode, host
+    nextBtn = nil
     local build = PANELS[mode]
     if build then build() end
 end
@@ -200,26 +204,41 @@ local function drawHint(s) text(20, s, 960, 1052, DIM, "center", 1, 1800) end
 
 -- ── menu / code ─────────────────────────────────────────────────────────────────────────────────────
 local MENU = { x = 560, y = 250, w = 800, h = 500 }
+local MENU_ROW = 100
 
-PANELS.menu = function() ui:panel{ x = MENU.x, y = MENU.y, w = MENU.w, h = MENU.h, pad = 30, title = L("logo_title") } end
+-- the way back at the top left of every screen, for the mouse; the keys use the cancel button
+local function backButton()
+    ui:button{ icon = "back", x = 80, y = 20, w = 76, h = 64, mouseOnly = true, onClick = function() click.back = true end }
+end
+
+-- a menu whose cursor goes round from one end to the other
+local function wrapping(o)
+    o.onNavDownOrPadRight = function(m) m:setSelected(m.selected % #m.items + 1); return true end
+    o.onNavUpOrPadLeft = function(m) m:setSelected((m.selected - 2) % #m.items + 1); return true end
+    return o
+end
+
+PANELS.menu = function()
+    ui:panel{ x = MENU.x, y = MENU.y, w = MENU.w, h = MENU.h, pad = 30, title = L("logo_title") }
+    ui:menu(wrapping{ x = 960 - 320, y = MENU.y + 190, w = 640, h = 2 * MENU_ROW, rowHeight = MENU_ROW,
+        items = { L("menu_create"), L("menu_join") }, selected = 1, onSelect = function(i) click.pick = i end })
+    backButton()
+    ui:focusStay()
+end
 
 local function drawMenu()
     if builtFor ~= "menu" then return end
     ui:draw()
     text(22, L("menu_subtitle"), 960, MENU.y + 130, DIM, "center", 1, MENU.w - 80)
-    local items = { L("menu_create"), L("menu_join") }
-    for i, label in ipairs(items) do
-        local sel = (i == menuSel)
-        local y = MENU.y + 240 + (i - 1) * 110
-        rect(960 - 320, y - 42, 640, 84, sel and ACCENT or ROW_FACE)
-        text(30, label, 960, y, sel and WHITE or INK, "center", 1, 580)
-    end
     drawHint(LF("hint_menu", bindLabel("DECIDE"), bindLabel("CANCEL")))
 end
 
 local CODE = { x = 320, y = 300, w = 1280, h = 420 }
 
-PANELS.code = function() ui:panel{ x = CODE.x, y = CODE.y, w = CODE.w, h = CODE.h, pad = 30, title = L("code_title") } end
+PANELS.code = function()
+    ui:panel{ x = CODE.x, y = CODE.y, w = CODE.w, h = CODE.h, pad = 30, title = L("code_title") }
+    backButton()
+end
 
 local function drawCode()
     if builtFor ~= "code" then return end
@@ -332,6 +351,9 @@ end
 -- the difficulty row of the deck: all five emblems, the chosen one full size on a marker, the others
 -- scaled down; the ones the song lacks stay greyed (the cursor never stops on them)
 local DIFF_STEP = 128
+local DIFF_X0, DIFF_CY = DECK_X + DECK_SPLIT + 110, DECK_Y + DECK_H / 2
+local DECK_ROW = 44
+local SPEED_Y = 596                           -- the host's song speed buttons
 local function drawDiffRow(x0, cy)
     local d = LO.myDiff()
     rect(x0 + d * DIFF_STEP - 58, cy - 56, 116, 112, ACCENT_SOFT)
@@ -346,20 +368,13 @@ local function drawDiffRow(x0, cy)
 end
 
 local function drawDeck()
-    local tabs = { LO.amController() and L("tab_start") or L("tab_ready"), L("tab_difficulty"), L("tab_mods") }
-    for i, tn in ipairs(tabs) do
-        local sel = (i == tab)
-        local y = DECK_Y + 35 + (i - 1) * 40
-        if sel then rect(DECK_X + 24, y - 19, DECK_SPLIT - 60, 38, ACCENT) end
-        text(26, tn, DECK_X + 46, y, sel and WHITE or DIM, "left", 1, DECK_SPLIT - 110)
-    end
     rect(DECK_X + DECK_SPLIT, DECK_Y + 24, 3, DECK_H - 48, ROW_EMPTY)
     local cx = DECK_X + DECK_SPLIT + (DECK_W - DECK_SPLIT) / 2
     local cy = DECK_Y + DECK_H / 2
     local roomW = DECK_W - DECK_SPLIT - 80
     if tab == 2 then
         local d = LO.myDiff()
-        local x0 = DECK_X + DECK_SPLIT + 110
+        local x0 = DIFF_X0
         drawDiffRow(x0, cy)
         local tx = x0 + 4 * DIFF_STEP + 96
         local w = DECK_X + DECK_W - 40 - tx
@@ -396,13 +411,26 @@ PANELS.lobby = function()
     ui:panel{ x = SONG.x, y = SONG.y, w = SONG.w, h = SONG.h, pad = 24, title = L("song_label") }
     ui:panel{ x = ROSTER.x, y = ROSTER.y, w = ROSTER.w, h = ROSTER.h, pad = 24 }
     ui:panel{ x = DECK_X, y = DECK_Y, w = DECK_W, h = DECK_H, pad = 20 }
+    -- the deck's menu: choosing a row confirms it, Left / Right change the difficulty on its row
+    ui:menu(wrapping{ x = DECK_X + 24, y = DECK_Y + (DECK_H - 3 * DECK_ROW) / 2, w = DECK_SPLIT - 60, h = 3 * DECK_ROW,
+        rowHeight = DECK_ROW, selected = tab,
+        items = { builtHost and L("tab_start") or L("tab_ready"), L("tab_difficulty"), L("tab_mods") },
+        onChange = function(i) tab = i end, onSelect = function() click.confirm = true end,
+        onNavLeft = function() click.diff = -1; return true end,
+        onNavRight = function() click.diff = 1; return true end })
+    backButton()
+    if builtHost then
+        ui:button{ icon = "rewind", x = 360 - 158, y = SPEED_Y, w = 56, h = 52, mouseOnly = true, onClick = function() click.speed = -1 end }
+        ui:button{ icon = "forward", x = 360 + 102, y = SPEED_Y, w = 56, h = 52, mouseOnly = true, onClick = function() click.speed = 1 end }
+    end
+    ui:focusStay()
 end
 
 local function drawLobby()
     local ids, me = LO.peerIds(), NET:SelfId()
     if builtFor ~= "lobby" then return end
     ui:draw()
-    text(30, L("logo_title"), 84, 52, INK, "left", 1, 700)
+    text(30, L("logo_title"), 176, 52, INK, "left", 1, 700)
     text(20, LO.amController() and L("role_host") or L("role_guest"), 1700, 52, DIM, "right", 1, 600)
     text(24, LO.count() .. " / " .. LO.MAXP, 1836, 52, INK, "right")
     drawSong()
@@ -422,6 +450,9 @@ local RESULTS = { x = 220, y = 90, w = 1480, h = 600 }
 
 PANELS.results = function()
     ui:panel{ x = RESULTS.x, y = RESULTS.y, w = RESULTS.w, h = RESULTS.h, pad = 24, title = L("results_title") }
+    nextBtn = ui:button{ icon = "play", accent = true, x = 960 - 90, y = RESULTS.y + RESULTS.h + 30, w = 180, h = 88,
+        mouseOnly = true, visible = false, onClick = function() click.next = true end }
+    backButton()
 end
 
 local function drawResults()
@@ -492,9 +523,21 @@ local function getSignal(result)
     local ok, val = pcall(function() return result[0] end)
     return ok and val or nil
 end
-local function backToMenu(m, t) LO.leave(); mode = "menu"; menuSel = 1; if m then setMsg(m, t or 5) end end
+local function backToMenu(m, t) LO.leave(); mode = "menu"; if m then setMsg(m, t or 5) end end
 local function playSfx(name) pcall(function() SHARED:GetSharedSound(name):Play() end) end
 local function playError() playSfx("Error") end
+
+-- the screen's menus and buttons take the keys and the mouse; what they were asked is left in click
+local function widgets(ts)
+    if builtFor == mode then ui:update(ts) end
+end
+
+-- a left click inside a box this frame, while the mouse is the device in use
+local function clickedIn(x, y, w, h)
+    if not (ui:mouseActive() and INPUT:MousePressed("Left")) then return false end
+    local mx, my = INPUT:GetMouseXY()
+    return mx >= x and mx < x + w and my >= y and my < y + h
+end
 
 -- ── host song select (song only — no difficulty prompt; Auto disabled) ────────────────────────────────
 -- The song select shares the room's song speed through CONFIG.SongSpeed.
@@ -548,22 +591,22 @@ local function step(ts)
     if mode == "lobby" or mode == "results" then LO.tickPreview(dt) end   -- loop the jacket preview (song select owns its own)
 
     local navPn = NavInput.p[1]
+    click.back, click.pick, click.confirm, click.diff, click.speed, click.next = nil, nil, nil, nil, nil, nil
     if mode == "menu" then
-        if navPn.upOrPadLeft() or navPn.downOrPadRight() then menuSel = (menuSel == 1) and 2 or 1 end
-        if navPn.decide() then
-            if menuSel == 1 then
-                if LO.host() then mode = "lobby"; tab = 1 else playError(); setMsg(net.msg or L("msg_open_failed"), 6) end
-            else mode = "code"; ti = INPUT:CreateTextInput("", 4096) end
-        end
-        if navPn.cancel() then return Exit("stage", "_title") end
+        widgets(ts)
+        if click.pick == 1 then
+            if LO.host() then mode = "lobby"; tab = 1 else playError(); setMsg(net.msg or L("msg_open_failed"), 6) end
+        elseif click.pick == 2 then mode = "code"; ti = INPUT:CreateTextInput("", 4096) end
+        if navPn.cancel() or click.back then return Exit("stage", "_title") end
 
     elseif mode == "code" then
+        widgets(ts)
         if ti:Update() then
             local code = (ti.Text ~= "" and ti.Text) or nil
             if code and LO.join(code) then mode = "lobby"; tab = 1
             else playError(); setMsg(code and (net.msg or L("msg_join_failed")) or L("msg_no_code"), code and 8 or 5); mode = "menu" end
         end
-        if navPn.cancel() then mode = "menu" end
+        if navPn.cancel() or click.back then mode = "menu" end
 
     elseif mode == "songselect" then
         updateSongSelect()
@@ -589,9 +632,8 @@ local function step(ts)
         if modWasActive then modWasActive = false; LO.broadcastMods() end
         LO.fixDiff()                                -- a song change can take my difficulty away
 
-        if navPn.up() then tab = (tab - 2) % 3 + 1 end
-        if navPn.down() then tab = tab % 3 + 1 end
-        local confirm = navPn.decide()
+        widgets(ts)
+        local confirm = click.confirm
         if tab == 1 then
             if LO.amController() then
                 if confirm then
@@ -604,8 +646,13 @@ local function step(ts)
             end
         elseif tab == 2 then
             -- only the difficulties the song has: the cursor steps over the others and stops at the ends
-            if navPn.left() and LO.stepDiff(-1) then playSfx("Move") end
-            if navPn.right() and LO.stepDiff(1) then playSfx("Move") end
+            if click.diff and LO.stepDiff(click.diff) then playSfx("Move") end
+            -- the mouse picks an emblem directly
+            for d = 0, 4 do
+                if clickedIn(DIFF_X0 + d * DIFF_STEP - 58, DIFF_CY - 56, 116, 112) and LO.diffAvailable(d) and d ~= LO.myDiff() then
+                    LO.setDiff(d); playSfx("Move")
+                end
+            end
         elseif tab == 3 then
             if confirm then
                 if not modDlg then modDlg = ACTIVITY:GetActivity("mod_select_dialog") end   -- lazily (re)fetch if onStart missed it
@@ -614,14 +661,15 @@ local function step(ts)
         end
         -- controller-only song controls
         if LO.amController() then
-            if pressed("song") then enterSongSelect(); return nil end
+            -- the mouse opens the song select from the jacket
+            if pressed("song") or clickedIn(JK_X, JK_Y, JK_S, JK_S) then enterSongSelect(); return nil end
             if net.song then
-                if pressed("speed_down") then LO.adjustSpeed(-1) end
-                if pressed("speed_up") then LO.adjustSpeed(1) end
+                if pressed("speed_down") or click.speed == -1 then LO.adjustSpeed(-1) end
+                if pressed("speed_up") or click.speed == 1 then LO.adjustSpeed(1) end
             end
         end
         -- Escape: un-ready if readied (Ready is reversible), otherwise leave the room
-        if navPn.cancel() then
+        if navPn.cancel() or click.back then
             if LO.myReady() then LO.setReady(false) else backToMenu() end
         end
 
@@ -633,10 +681,12 @@ local function step(ts)
             backToMenu(L("msg_kicked_round")); return nil
         end
         -- stay as long as you want; press Enter (once results are in) to return to the lobby
-        if net.resultsReadyT ~= nil and navPn.decide() then
+        if nextBtn then nextBtn.visible = net.resultsReadyT ~= nil end
+        widgets(ts)
+        if net.resultsReadyT ~= nil and (navPn.decide() or click.next) then
             LO.nextRound(); mode = "lobby"; tab = 1
         end
-        if navPn.cancel() then backToMenu(); return nil end
+        if navPn.cancel() or click.back then backToMenu(); return nil end
     end
     return nil
 end
