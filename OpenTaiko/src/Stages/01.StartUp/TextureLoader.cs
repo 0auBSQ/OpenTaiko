@@ -20,7 +20,6 @@ class TextureLoader {
 	public static string DANISELECT = @$"3_DaniSelect{Path.DirectorySeparatorChar}";
 	public static string GAME = @$"5_Game{Path.DirectorySeparatorChar}";
 	public static string RESULT = @$"6_Result{Path.DirectorySeparatorChar}";
-	public static string EXIT = @$"7_Exit{Path.DirectorySeparatorChar}";
 	public static string DANRESULT = @$"7_DanResult{Path.DirectorySeparatorChar}";
 	public static string TOWERRESULT = @$"8_TowerResult{Path.DirectorySeparatorChar}";
 	public static string HEYA = @$"10_Heya{Path.DirectorySeparatorChar}";

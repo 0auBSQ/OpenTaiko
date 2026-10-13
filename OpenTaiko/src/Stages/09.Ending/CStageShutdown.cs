@@ -21,8 +21,8 @@ internal class CStageShutdown : CStage {
 		try {
 			this.ctTimeStall = new CCounter();
 
-			Background = new LuaBackgroundWrapper(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.EXIT}"));
-			Background.Activate(_state.Refreshed());
+			if (Screen == null) Trace.TraceWarning("No exit_screen ROActivity in this skin; the closing screen stays empty.");
+			Screen?.Activate();
 
 			base.Activate();
 		} finally {
@@ -34,7 +34,7 @@ internal class CStageShutdown : CStage {
 		Trace.TraceInformation("終了ステージを非活性化します。");
 		Trace.Indent();
 		try {
-			OpenTaiko.tDisposeSafely(ref Background);
+			Screen?.Deactivate();
 			base.DeActivate();
 		} finally {
 			Trace.TraceInformation("終了ステージの非活性化を完了しました。");
@@ -79,8 +79,8 @@ internal class CStageShutdown : CStage {
 
 			this.ctTimeStall.Tick();
 
-			Background.Update(_state);
-			Background.Draw(_state);
+			Screen?.Update();
+			Screen?.Draw();
 
 			//TJAPlayer3.Tx.Exit_Background?.t2D描画( 0, 0 );
 
@@ -96,8 +96,8 @@ internal class CStageShutdown : CStage {
 
 	#region [ private ]
 	//-----------------
-	private LuaBackgroundWrapper Background;
-	private readonly LuaBackgroundState _state = new();
+	// the picture is the skin's exit_screen ROActivity; this stage plays the closing sound and times the stay
+	private static LuaROActivityWrapper? Screen => LuaROActivityWrapper.GetROActivity("exit_screen");
 	private CCounter ctTimeStall;
 	//private CTexture tx背景;
 	//      private CTexture tx文字;

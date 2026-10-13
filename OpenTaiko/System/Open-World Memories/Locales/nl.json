@@ -34,10 +34,8 @@
         "DANSELECT_EXIT": "Afsluiten",
         "DANSELECT_CONFIRM": "De uitdaging aangaan?",
 
-        // Event mode: the plays-left line of the clock and the thank-you screen
+        // Event mode: the plays-left line of the clock
         "EVENT_PLAYS_LEFT": "Resterende beurten: %d",
-        "EVENT_THANKS": "Bedankt voor het spelen!",
-        "EVENT_THANKS_SUB": "Tot de volgende keer!",
 
         "SETTINGS_UI_KEYS": "Besturing",
         "SETTINGS_UI_EXIT": "Afsluiten",

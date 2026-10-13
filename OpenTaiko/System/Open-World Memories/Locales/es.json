@@ -32,10 +32,8 @@
         "DANSELECT_EXIT": "Salir",
         "DANSELECT_CONFIRM": "¿Aceptas el desafío?",
 
-        // Event mode: the plays-left line of the clock and the thank-you screen
+        // Event mode: the plays-left line of the clock
         "EVENT_PLAYS_LEFT": "Partidas restantes: %d",
-        "EVENT_THANKS": "¡Gracias por jugar!",
-        "EVENT_THANKS_SUB": "¡Hasta la próxima!",
 
         "SETTINGS_UI_KEYS": "Entrada",
         "SETTINGS_UI_EXIT": "Volver",
