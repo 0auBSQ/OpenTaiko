@@ -274,7 +274,9 @@ local function drawPreimage()
         -- Pop-in: scale the jacket around its centre from pop_start_scale up to 1.0 with a short overshoot
         -- when a new one appears (navigation.lua drives G.preimagePopScale). Centre-anchored so it grows in place.
         local pop = G.preimagePopScale or 1
-        tex:SetScale(PREIMAGE_SIZE_X / tex.Height * pop, PREIMAGE_SIZE_Y / tex.Width * pop)
+        -- one scale for both axes: a jacket that is not square fits inside the frame, centred
+        local fit = math.min(PREIMAGE_SIZE_X / tex.Width, PREIMAGE_SIZE_Y / tex.Height) * pop
+        tex:SetScale(fit, fit)
         tex:DrawAtAnchor(PREIMAGE_ORIGIN_X - G.songSelectShift + PREIMAGE_SIZE_X / 2,
                          PREIMAGE_ORIGIN_Y + PREIMAGE_SIZE_Y / 2, "center")
         tex:SetScale(1, 1)

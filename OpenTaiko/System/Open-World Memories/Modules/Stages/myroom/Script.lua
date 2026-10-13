@@ -161,6 +161,21 @@ saveRoom = function()
 end
 
 -- ── build / rebuild the 3D room ───────────────────────────────────────────────────────────────────
+-- the room's lights: the ceiling lamp, the window's spill, and what the furniture gives off right now
+local function applyLights()
+    local cx, cz = room:centerWorld(world)
+    local gh = room:gridH()
+    local lights = {
+        { x = cx, y = FY + 2.7, z = cz, r = 1.0, g = 0.86, b = 0.62, intensity = 0.95, range = 8 },
+        { x = (room.winC0 + room.winC1 + 1) / 2, y = FY + 1.9, z = gh - 1.7,
+          r = 0.75, g = 0.85, b = 1.0, intensity = 0.4, range = 5.5 },
+    }
+    for _, l in ipairs(room:lampLights(world)) do lights[#lights + 1] = l end   -- lit floor lamps
+    for _, l in ipairs(TV.lights(world)) do lights[#lights + 1] = l end         -- screens of TVs that are on
+    for _, l in ipairs(MX.lights(world)) do lights[#lights + 1] = l end         -- the green glow of each matrix
+    world.daynight:setLights(lights)
+end
+
 local function rebuild()
     -- a rebuild (edit / lamp toggle / extend) must NOT jolt the camera: preserve the live orbit,
     -- ZOOM and focus when the room already exists; only frame fresh on the first build.
@@ -186,16 +201,7 @@ local function rebuild()
     if world.scene.SetShadowArea then world.scene:SetShadowArea(math.max(room.iw, room.ih) + 5) end
     -- warm cosy interior: a soft ceiling lamp + a cool spill from the window (re-set after every
     -- loadMap — unloading a map clears the scene light list). Kept gentle so the room isn't blown out.
-    local gh = room:gridH()
-    local lights = {
-        { x = cx, y = FY + 2.7, z = cz, r = 1.0, g = 0.86, b = 0.62, intensity = 0.95, range = 8 },
-        { x = (room.winC0 + room.winC1 + 1) / 2, y = FY + 1.9, z = gh - 1.7,
-          r = 0.75, g = 0.85, b = 1.0, intensity = 0.4, range = 5.5 },
-    }
-    for _, l in ipairs(room:lampLights(world)) do lights[#lights + 1] = l end   -- lit floor lamps
-    for _, l in ipairs(TV.lights(world)) do lights[#lights + 1] = l end         -- screens of TVs that are on
-    for _, l in ipairs(MX.lights(world)) do lights[#lights + 1] = l end         -- the green glow of each matrix
-    world.daynight:setLights(lights)
+    applyLights()
 end
 
 local function spawnAtEntrance()
@@ -1070,7 +1076,15 @@ function update(ts)
         elseif focused.kind == "lamp" then
             SHARED:GetSharedSound("Move"):Play()
             focused.it.lit = (focused.it.lit == false) and true or false   -- toggle on/off
-            rebuild(); saveRoom(); MO.onRoomChanged()
+            -- only the lamp and the room's lights change: the rest of the room is left as it is
+            local lamp = world._propInst and world._propInst[focused.it] or nil
+            if lamp ~= nil then
+                Room.lampLook(world, focused.it, lamp)
+                applyLights()
+            else
+                rebuild()
+            end
+            saveRoom(); MO.onRoomChanged()
         elseif focused.kind == "pod" then
             SHARED:GetSharedSound("Decide"):Play()
             if Pod.stageExists() then

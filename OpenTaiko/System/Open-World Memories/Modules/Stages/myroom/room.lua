@@ -996,14 +996,7 @@ function Room:buildOneProp(world, phys, gh, it, baseY, stacked)
     it._topY = (inst and inst._fitTop) or (baseY + (cat.surfaceH or (cat.collH or 0.85)))
     -- floor lamp on/off: a lit lamp glows (emissive shade + a point light added in rebuild); an off
     -- lamp is dark. lit defaults ON (nil ~= false), so old saves keep their lamps lit.
-    if it.id == "floorlamp" and inst then
-        local isLit = it.lit ~= false
-        if world.scene.ObjSetEmissive then
-            if isLit then world.scene:ObjSetEmissive(inst.obj, 0.9, 0.72, 0.36)
-            else world.scene:ObjSetEmissive(inst.obj, 0, 0, 0) end
-        end
-        if not isLit and world.scene.ObjSetTint then world.scene:ObjSetTint(inst.obj, 0.6, 0.6, 0.66) end
-    end
+    if it.id == "floorlamp" and inst then Room.lampLook(world, it, inst) end
     -- (per-variant ACCENT recolour is applied inside tryModel via the routed "Blue" part.)
     -- per-variant SCREEN: the cab's screen is a SEPARATE UV-mapped plane in arcade.glb; map the art
     -- onto its EXACT local rectangle transformed by the instance's real world transform (perfect fit at
@@ -1049,6 +1042,19 @@ function Room:buildOneProp(world, phys, gh, it, baseY, stacked)
     else
         local z0 = gh - it.r - h
         phys:addBox(it.c, FY, z0, it.c + w, FY + (cat.collH or 0.85), z0 + h)
+    end
+end
+
+-- a floor lamp's own look, lit or off, on its placed model (when it is built, and when it is switched)
+function Room.lampLook(world, it, inst)
+    local isLit = it.lit ~= false
+    if world.scene.ObjSetEmissive then
+        if isLit then world.scene:ObjSetEmissive(inst.obj, 0.9, 0.72, 0.36)
+        else world.scene:ObjSetEmissive(inst.obj, 0, 0, 0) end
+    end
+    if world.scene.ObjSetTint then
+        if isLit then world.scene:ObjSetTint(inst.obj, 1, 1, 1)
+        else world.scene:ObjSetTint(inst.obj, 0.6, 0.6, 0.66) end
     end
 end
 
