@@ -24,6 +24,15 @@ namespace OpenTaiko {
 		private int _texBase = -1;
 		private static int _nextBase = 6000;   // own texture-id range (distinct from GltfModel's 4000+)
 
+		// the triangles as they were read: nine numbers each into `positions`, one colour each into `colours`
+		public void CopyTriangles(List<float> positions, List<int> colours) {
+			foreach (var g in _groups) {
+				int rgb = g.Mat >= 0 && g.Mat < _matRgb.Length ? _matRgb[g.Mat] : 0xFFFFFF;
+				positions.AddRange(g.V);
+				for (int t = 0; t < g.V.Count / 9; t++) colours.Add(rgb);
+			}
+		}
+
 		public int AnimCount() => 0;
 		public string AnimName(int i) => "";
 		public double Duration(int i) => 0;

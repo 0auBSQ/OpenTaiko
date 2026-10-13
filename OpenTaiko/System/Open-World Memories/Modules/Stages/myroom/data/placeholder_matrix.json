@@ -84,6 +84,12 @@
       "name": "Video Player",
       "desc": "The boot intro in a player: play, pause, seek on the timeline, speed and volume.",
       "price": 50
+    },
+    {
+      "stage": "aviutl2_player",
+      "name": "AviUtl2 Player",
+      "desc": "AviUtl2 projects (.aup2) played in the video player.",
+      "price": 0
     }
   ]
 }

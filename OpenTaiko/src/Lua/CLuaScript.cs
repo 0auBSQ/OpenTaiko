@@ -26,6 +26,7 @@ public abstract class CLuaScript : IDisposable {
 	public HashSet<Lua3DScene> Scene3DList = [];
 	public HashSet<LuaSound> SoundList = [];
 	public HashSet<LuaVideo> VideoList = [];
+	public HashSet<LuaAviUtl2Project> AviUtl2List = [];
 	public HashSet<LuaText> TextList = [];
 	public HashSet<LuaGlyphText> GlyphTextList = [];
 	public HashSet<LuaGradientMap> GradientList = [];
@@ -434,6 +435,7 @@ end
 			LuaScript["MODEL"] = new LuaModelFunc(dir);
 			LuaScript["SOUND"] = lsf;
 			LuaScript["VIDEO"] = new LuaVideoFunc(VideoList, dir);
+			LuaScript["AVIUTL2"] = new LuaAviUtl2Func(AviUtl2List, dir);   // AviUtl2 projects (.aup2), played like a video
 			LuaScript["TEXT"] = new LuaTextFunc(TextList, GlyphTextList, dir);
 			LuaScript["JSONLOADER"] = new LuaJsonLoaderFunc(dir);
 			LuaScript["INILOADER"] = new LuaIniLoaderFunc(dir);
@@ -540,6 +542,8 @@ end
 		freeDisposableList(this.Scene3DList);
 		freeDisposableList(this.SoundList);
 		freeDisposableList(this.VideoList);
+		freeDisposableList(new List<LuaAviUtl2Project>(this.AviUtl2List));   // a project leaves the list as it is freed
+		this.AviUtl2List.Clear();
 		freeDisposableList(this.TextList);
 		freeDisposableList(this.GlyphTextList);
 		freeDisposableList(this.GradientList);

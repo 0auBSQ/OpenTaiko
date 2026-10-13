@@ -20,6 +20,7 @@
   - [歌曲与谱面](api/songs.md)
   - [玩家与档案](api/players.md)
   - [数学](api/math.md)
+  - [AviUtl2 项目](api/aviutl2.md)
   - [在线联机](api/networking.md) <span class="badge-exp">实验性</span>
   - [3D 引擎：光栅化世界](api/3d.md) <span class="badge-exp">实验性</span>
   - [3D 引擎：光线追踪世界](api/3d-raytrace.md) <span class="badge-exp">实验性</span>

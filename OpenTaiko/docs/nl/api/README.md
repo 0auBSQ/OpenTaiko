@@ -28,6 +28,7 @@ Globale namen zijn in hoofdletters (`TEXTURE`, `SOUND`, `INPUT`). De runtime bie
 | [Nummers en charts](songs.md) | De nummerlijst, nummerknopen en charts, scores, en het bouwen van dan-cursussen (examens). |
 | [Spelers en profielen](players.md) | Opslagbestanden, naamplaatjes, personages, puchichara's, spelstatus, thema's en taal. |
 | [Wiskunde](math.md) | Vectoren, matrices en quaternions. |
+| [AviUtl2-projecten](aviutl2.md) | Projectbestanden van de video-editor AviUtl2 afspelen, waarbij het script erin tekent. |
 | [Online netwerken](networking.md) | De `NET`-global voor OpenTaiko Online-sessies. Momenteel experimenteel. |
 | [3D-engine: rasterizerwereld](3d.md) | Scènes, objecten, modellen, lichten, camera's, sprites, hoogtekaarten en render targets. Momenteel experimenteel. |
 | [3D-engine: raytracerwereld](3d-raytrace.md) | De path tracer: materialen, analytische primitieven en de luchtgradiënt. Momenteel experimenteel. |

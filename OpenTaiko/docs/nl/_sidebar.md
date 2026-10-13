@@ -20,6 +20,7 @@
   - [Nummers en charts](api/songs.md)
   - [Spelers en profielen](api/players.md)
   - [Wiskunde](api/math.md)
+  - [AviUtl2-projecten](api/aviutl2.md)
   - [Online netwerken](api/networking.md) <span class="badge-exp">Experimenteel</span>
   - [3D-engine: rasterizerwereld](api/3d.md) <span class="badge-exp">Experimenteel</span>
   - [3D-engine: raytracerwereld](api/3d-raytrace.md) <span class="badge-exp">Experimenteel</span>

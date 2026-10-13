@@ -20,6 +20,7 @@
   - [Songs and charts](api/songs.md)
   - [Players and profiles](api/players.md)
   - [Math](api/math.md)
+  - [AviUtl2 projects](api/aviutl2.md)
   - [Online networking](api/networking.md) <span class="badge-exp">Experimental</span>
   - [3D engine: rasterizer world](api/3d.md) <span class="badge-exp">Experimental</span>
   - [3D engine: raytracer world](api/3d-raytrace.md) <span class="badge-exp">Experimental</span>

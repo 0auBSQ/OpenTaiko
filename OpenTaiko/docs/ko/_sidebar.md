@@ -20,6 +20,7 @@
   - [곡과 채보](api/songs.md)
   - [플레이어와 프로필](api/players.md)
   - [수학](api/math.md)
+  - [AviUtl2 프로젝트](api/aviutl2.md)
   - [온라인 네트워킹](api/networking.md) <span class="badge-exp">실험적</span>
   - [3D 엔진: 래스터라이저 월드](api/3d.md) <span class="badge-exp">실험적</span>
   - [3D 엔진: 레이트레이서 월드](api/3d-raytrace.md) <span class="badge-exp">실험적</span>

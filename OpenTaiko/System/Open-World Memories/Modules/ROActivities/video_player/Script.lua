@@ -4,7 +4,8 @@
 -- A video player: the picture in a 16:9 view above a control strip with icon buttons (restart, 10 s back,
 -- play/pause, 10 s ahead, stop), a timeline that can be clicked and dragged, a speed dropdown, a mute
 -- button, a volume slider and a close button. The video plays its own audio track and is clocked by it,
--- so every control acts on picture and sound together. Driven by any stage: activate(absolutePath), then
+-- so every control acts on picture and sound together. A path ending in .aup2 plays that AviUtl2 project
+-- the same way. Driven by any stage: activate(absolutePath), then
 -- update() and draw() every frame while IsActive; it deactivates itself when closed (the X button, or
 -- cancel on a keyboard or pad; both play the cancel sound). deactivate() frees the video.
 -- Everything works without a mouse: focus starts on play/pause, pad left/right or the arrow keys walk the
@@ -30,6 +31,7 @@ local TIMELINE_KEY_STEP = 5000
 local CLOSE_STYLE = { colors = { primary = { 236, 76, 76 }, primary2 = { 196, 40, 48 } } }   -- a red face for the X
 
 local ui, video
+local isProject = false     -- video is an AviUtl2 project: it draws itself
 local fill
 local durationMs = 0
 local playing, stopped = false, false   -- the transport as this player last set it
@@ -211,6 +213,7 @@ function onStart()
     speedMenu:setEnabled(false)
 end
 
+-- returns the loaded video or project, for a caller that wants to set it up further
 function activate(path)
     durationMs = 0
     stopped, closing = false, false
@@ -224,10 +227,13 @@ function activate(path)
     muted, volumeBeforeMute = false, 100
     muteBtn:setIcon("volume")
     focusWidget(playBtn)
-    video = VIDEO:CreateVideoFromAbsolutePath(path, true)
+    isProject = tostring(path):lower():match("%.aup2$") ~= nil
+    if isProject then video = AVIUTL2:LoadProjectFromAbsolutePath(path)
+    else video = VIDEO:CreateVideoFromAbsolutePath(path, true) end
     video:SetVolumePercent(100)
     video:Start()
     setPlaying(true)
+    return video
 end
 
 function deactivate()
@@ -278,8 +284,10 @@ function draw()
 
     -- the picture keeps its shape inside the view: one scale for both axes, centred, black around it
     ui:rect(VIEW_X, VIEW_Y, VIEW_W, VIEW_H, 0, 0, 0, 255)
-    local tex = video.Texture
-    if video.Width > 0 and video.Height > 0 then
+    if isProject then
+        video:DrawFit(VIEW_X, VIEW_Y, VIEW_W, VIEW_H)
+    elseif video.Width > 0 and video.Height > 0 then
+        local tex = video.Texture
         local s = math.min(VIEW_W / video.Width, VIEW_H / video.Height)
         local w, h = video.Width * s, video.Height * s
         tex:SetScale(s, s)

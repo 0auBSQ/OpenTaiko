@@ -20,6 +20,7 @@
   - [楽曲と譜面](api/songs.md)
   - [プレイヤーとプロフィール](api/players.md)
   - [数学](api/math.md)
+  - [AviUtl2 プロジェクト](api/aviutl2.md)
   - [オンラインネットワーク](api/networking.md) <span class="badge-exp">実験的</span>
   - [3D エンジン: ラスタライザーの世界](api/3d.md) <span class="badge-exp">実験的</span>
   - [3D エンジン: レイトレーサーの世界](api/3d-raytrace.md) <span class="badge-exp">実験的</span>

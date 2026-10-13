@@ -28,6 +28,7 @@ Global names are upper case (`TEXTURE`, `SOUND`, `INPUT`). The runtime provides 
 | [Songs and charts](songs.md) | The song list, song nodes and charts, scores, and dan (exam) building. |
 | [Players and profiles](players.md) | Save files, nameplates, characters, puchicharas, play state, themes and language. |
 | [Math](math.md) | Vectors, matrices and quaternions. |
+| [AviUtl2 projects](aviutl2.md) | Playing project files of the AviUtl2 video editor, with the script drawing into them. |
 | [Online networking](networking.md) | The `NET` global for OpenTaiko Online sessions. Currently experimental. |
 | [3D engine: rasterizer world](3d.md) | Scenes, objects, models, lights, cameras, sprites, heightmaps and render targets. Currently experimental. |
 | [3D engine: raytracer world](3d-raytrace.md) | The path tracer: materials, analytic primitives and the sky gradient. Currently experimental. |

@@ -28,6 +28,7 @@ Les noms des globales sont en majuscules (`TEXTURE`, `SOUND`, `INPUT`). L'enviro
 | [Chansons et partitions](songs.md) | La liste des chansons, les nœuds de chanson et les partitions, les scores, et la construction de dan (examens). |
 | [Joueurs et profils](players.md) | Fichiers de sauvegarde, plaques de nom, personnages, puchicharas, état de la partie, thèmes et langue. |
 | [Mathématiques](math.md) | Vecteurs, matrices et quaternions. |
+| [Projets AviUtl2](aviutl2.md) | Lecture des fichiers de projet de l'éditeur vidéo AviUtl2, avec le script qui dessine dedans. |
 | [Réseau en ligne](networking.md) | La globale `NET` pour les sessions OpenTaiko Online. Actuellement expérimental. |
 | [Moteur 3D : monde du rastériseur](3d.md) | Scènes, objets, modèles, lumières, caméras, sprites, champs de hauteur et cibles de rendu. Actuellement expérimental. |
 | [Moteur 3D : monde du path tracer](3d-raytrace.md) | Le path tracer : matériaux, primitives analytiques et dégradé de ciel. Actuellement expérimental. |

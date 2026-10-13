@@ -28,6 +28,7 @@ Globale Namen sind in Großbuchstaben geschrieben (`TEXTURE`, `SOUND`, `INPUT`).
 | [Songs und Charts](songs.md) | Die Songliste, Song-Knoten und Charts, Scores und der Aufbau von Dan-Kursen (Prüfungen). |
 | [Spieler und Profile](players.md) | Spielstände, Namensschilder, Charaktere, Puchicharas, Spielzustand, Themes und Sprache. |
 | [Mathematik](math.md) | Vektoren, Matrizen und Quaternionen. |
+| [AviUtl2-Projekte](aviutl2.md) | Projektdateien des Videoeditors AviUtl2 abspielen, wobei das Skript in sie hineinzeichnet. |
 | [Online-Netzwerk](networking.md) | Das globale Objekt `NET` für OpenTaiko-Online-Sitzungen. Derzeit experimentell. |
 | [3D-Engine: Rasterizer-Welt](3d.md) | Szenen, Objekte, Modelle, Lichter, Kameras, Sprites, Höhenfelder und Render-Targets. Derzeit experimentell. |
 | [3D-Engine: Raytracer-Welt](3d-raytrace.md) | Der Pathtracer: Materialien, analytische Primitive und der Himmelsverlauf. Derzeit experimentell. |

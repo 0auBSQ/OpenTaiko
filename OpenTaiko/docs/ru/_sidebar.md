@@ -20,6 +20,7 @@
   - [Песни и чарты](api/songs.md)
   - [Игроки и профили](api/players.md)
   - [Математика](api/math.md)
+  - [Проекты AviUtl2](api/aviutl2.md)
   - [Сетевая игра](api/networking.md) <span class="badge-exp">Экспериментально</span>
   - [3D-движок: мир растеризатора](api/3d.md) <span class="badge-exp">Экспериментально</span>
   - [3D-движок: мир трассировщика лучей](api/3d-raytrace.md) <span class="badge-exp">Экспериментально</span>

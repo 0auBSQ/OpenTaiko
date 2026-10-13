@@ -28,6 +28,7 @@ Los nombres de las globales van en mayúsculas (`TEXTURE`, `SOUND`, `INPUT`). El
 | [Canciones y charts](songs.md) | La lista de canciones, los nodos de canción y los charts, las puntuaciones y la construcción de dan (exámenes). |
 | [Jugadores y perfiles](players.md) | Archivos de guardado, placas de nombre, personajes, puchicharas, estado de la partida, temas e idioma. |
 | [Matemáticas](math.md) | Vectores, matrices y cuaterniones. |
+| [Proyectos de AviUtl2](aviutl2.md) | Reproducción de archivos de proyecto del editor de vídeo AviUtl2, con el script dibujando dentro de ellos. |
 | [Red en línea](networking.md) | La global `NET` para las sesiones de OpenTaiko Online. Actualmente experimental. |
 | [Motor 3D: mundo del rasterizador](3d.md) | Escenas, objetos, modelos, luces, cámaras, sprites, mapas de alturas y render targets. Actualmente experimental. |
 | [Motor 3D: mundo del trazador de rutas](3d-raytrace.md) | El trazador de rutas: materiales, primitivas analíticas y el degradado de cielo. Actualmente experimental. |
