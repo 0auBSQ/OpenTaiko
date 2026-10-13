@@ -59,5 +59,8 @@
   },
   "mirror": {
     "name": "Miroir"
+  },
+  "backpack": {
+    "name": "Sac à dos"
   }
 }

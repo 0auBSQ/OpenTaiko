@@ -73,7 +73,7 @@ Hat der Ordner keine `Script.lua`, rendert das Spiel den Charakter mit seinem ei
 | Entry/Normal, Entry/Jump | `Title_Normal`, `Title_Entry` |
 | Result/Normal, Result/Clear, Result/Failed_In, Result/Failed | `Result_Normal`, `Result_Clear`, `Result_Failed_In`, `Result_Failed` |
 
-Das eingebaute Skript liest zwei Standbilder aus der Ordnerwurzel: `Render.png` (das Porträt in voller Größe, das überall dort gezeichnet wird, wo das Spiel den Animationstyp Render anfordert, zum Beispiel im Raum) und `Preview.png` (das Vorschaubild; fehlt es, verwendet das Skript `Normal/0.png`).
+Das eingebaute Skript liest zwei Standbilder aus der Ordnerwurzel: `Render.png` (das Porträt in voller Größe, das überall dort gezeichnet wird, wo das Spiel den Animationstyp Render anfordert, zum Beispiel auf dem Ladebildschirm eines Songs) und `Preview.png` (das Vorschaubild; fehlt es, verwendet das Skript `Normal/0.png`).
 
 Fehlende Zustände fallen auf einen anderen Zustand zurück, sodass ein Charakter nur eine Teilmenge mitliefern kann. Die Rückfallkette lautet: Clear -> Normal, Max -> Clear, Miss -> Normal, Miss_Down -> Miss, Gogo -> Normal, Gogo_Max -> Gogo, 10combo_Max -> 10combo, GoGoStart_Clear -> GoGoStart, GoGoStart_Max -> GoGoStart_Clear, die Tower-`_Tired`-Zustände -> ihr normaler Zustand, Tower/Fail -> Tower/Standing_Tired, Kusudama_Idle -> Normal, Menu/Wait -> Gogo, Menu/Start und Menu/Select und Entry/Jump -> 10combo, Menu/Normal und Entry/Normal und Result/Normal -> Normal, Result/Clear -> Clear, Result/Failed_In -> Miss_In, Result/Failed -> Miss. Zustände ohne Rückfall (zum Beispiel Cleared, Failed, Return, die Ballon-Zustände) zeichnen nichts, wenn sie fehlen. Das Minimum für einen funktionierenden Charakter ist `Normal/0.png`.
 
@@ -100,7 +100,7 @@ Fehlende Zustände fallen auf einen anderen Zustand zurück, sodass ein Charakte
 - `Game_Chara_X=...` / `Game_Chara_Y=...`: Gameplay-Position; das Skript verwendet den ersten Wert jeder Liste. `Game_Chara_Offset=X,Y` ist eine alternative Form.
 - `Game_Chara_X_AI=...` / `Game_Chara_Y_AI=...`: ein Wert pro Spieler für den KI-Kampf. Sind beide Schlüssel vorhanden, ersetzen sie für diesen Charakter die KI-Kampf-Position des Skins.
 - `Game_Chara_Balloon_X` / `Game_Chara_Balloon_Y`, `Game_Chara_Kusudama_X` / `Game_Chara_Kusudama_Y`: Positionen während Ballon- und Kusudama-Sequenzen (erster Wert wird verwendet). `Game_Chara_Balloon_Offset`, `Game_Chara_Kusudama_Offset` und `Game_Chara_Tower_Offset` nehmen ein `X,Y`-Paar.
-- `Menu_Offset=X,Y`, `Menu_Chara_Scale`, `Result_Offset=X,Y`, `Heya_Chara_Render_Offset=X,Y`: Offsets für Menü, Ergebnis und das Render im Raum.
+- `Menu_Offset=X,Y`, `Menu_Chara_Scale`, `Result_Offset=X,Y`: Offsets für Menü und Ergebnis.
 - `Game_Chara_Motion_<State>=0,1,2,...`: die Reihenfolge, in der die Frames eines Zustands abgespielt werden, als 0-basierte Frame-Indizes. Fehlt der Schlüssel, werden die Frames in Dateireihenfolge abgespielt. Zustandsnamen folgen den Ordnernamen, zum Beispiel `Game_Chara_Motion_Normal`, `Game_Chara_Motion_GoGo`, `Game_Chara_Motion_Miss_Down`, `Game_Chara_Motion_Balloon_Broke`, `Game_Chara_Motion_Tower_Climbing`.
 - `Game_Chara_Beat_<State>=N`: über wie viele Beats sich ein Durchlauf des Zustands erstreckt, zum Beispiel `Game_Chara_Beat_Normal=1`, `Game_Chara_Beat_GoGo=2`.
 - Menü-, Titel- und Ergebniszustände verwenden `Menu_Chara_Motion_Loop/Wait/Start/Select`, `Title_Chara_Motion_Normal/Entry`, `Result_Chara_Motion_Normal/Clear/Failed_In/Failed`, mit passenden `_Beat_`-Schlüsseln oder festen Dauern in Millisekunden: `Chara_Menu_Loop_AnimationDuration`, `Chara_Menu_Wait_AnimationDuration`, `Chara_Menu_Start_AnimationDuration`, `Chara_Menu_Select_AnimationDuration`, `Chara_Normal_AnimationDuration`, `Chara_Entry_AnimationDuration`, `Chara_Result_Normal_AnimationDuration`, `Chara_Result_Clear_AnimationDuration`, `Chara_Result_Failed_In_AnimationDuration`, `Chara_Result_Failed_AnimationDuration`.
@@ -135,7 +135,7 @@ Existiert `Script.lua` im Charakterordner, ersetzt sie das eingebaute Skript vol
 - `update(delta, animationType, looping)`, gibt `true` zurück, wenn eine nicht schleifende Animation beendet ist
 - `draw(animationType, x, y, scaleX, scaleY, opacity, color, contextType, anchor, clipW, clipH, clipX, clipY, rotation, blendMode, wrapMode, gradientMap)`
 - `getDrawSize(animationType)`, gibt Breite und Höhe zurück
-- `getHeyaRenderOffset()`, gibt x und y zurück; `getAIBattlePosition(player, charaScale)`, gibt x und y zurück, oder `nil`, um die Position des Skins zu verwenden
+- `getAIBattlePosition(player, charaScale)`, gibt x und y zurück, oder `nil`, um die Position des Skins zu verwenden
 - `loadVoice(voiceType)`, `disposeVoice(voiceType)`, `playVoice(voiceType)`
 
 Animationstypen sind die Strings hinter den Konstanten `CHARACTER.ANIM_*` (`"Game/Normal"`, `"Menu/Normal"`, ...), plus die beiden Sondertypen `CHARACTER.ANIM_PREVIEW` (Vorschaubild) und `CHARACTER.ANIM_RENDER` (vollständiges Porträt). Stimmentypen sind die Konstanten `CHARACTER.VOICE_*`. Die Rückfallkette aus Schritt 3 gilt auch für geskriptete Charaktere: Das Spiel fragt `availableAnimation` und durchläuft die Alternativen, bis eine verfügbar ist.

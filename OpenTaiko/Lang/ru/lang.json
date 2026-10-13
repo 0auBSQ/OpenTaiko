@@ -408,16 +408,7 @@
 		"DAN_CONDITION_NAME_ADLIB": "Количество ADLIB",
 		"DAN_CONDITION_NAME_BOMB": "Удары бомб",
 
-		// Heya / Quick Heya
-		"HEYA_PUCHI": "Пти-персонаж",
-		"HEYA_CHARA": "Персонаж",
-		"HEYA_DAN": "Ранг дан",
-		"HEYA_NAMEPLATE": "Ранг таблички",
-		"HEYA_NAME": "Имя",
-		"HEYA_NAME_INFO": "Введите своё имя (Enter для сохранения, Esc для отмены изменений):",
-
-		// {0}: Asset name
-		"HEYA_DESCRIPTION_NAME": "Имя: {0}",
+		// Asset descriptions
 		// {0}: Asset rarity
 		"HEYA_DESCRIPTION_RARITY": "Редкость: {0}",
 		"HEYA_DESCRIPTION_RARITY0": "Плохо",
@@ -429,25 +420,6 @@
 		"HEYA_DESCRIPTION_RARITY6": "Миф",
 		// {0}: Asset author
 		"HEYA_DESCRIPTION_AUTHOR": "Автор: {0}",
-		// {0}: Gauge type
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE": "Тип датчика: {0}",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL": "Нормально",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "Трудно",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "Экстремально",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "Заканчивать игру в завершенной зоне, чтобы передать песню!",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "Датчик начинает с полно и резко истощается при каждом промахе!\nБудьте осторожны, если значение датчика достигает 0, игра – автоматически проиграна!",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "Датчик начинает с полно и резко истощается при каждом промахе!\nСтранная сила, кажется, уменьшает вероятность ошибки в этой песне...",
-		// {0}: Percentage of mines
-		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Фактор бомба: {0}% нот, превращенные в бомбы в Тральщике",
-		// {0}: Percentage of fuse rolls
-		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Фактор взрыватели: {0}% шариков, превращенные в дроби с взрывателем в Тральщике",
-		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "Все большие ноты становятся <c.#c800ff>Самоблокирующимися</c> нотами",
-		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c> ноты становятся видимыми",
-		// {0}: # of auto-rolls per second
-		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "Автоматически <c.#ffff00>дробит</c> со скоростью {0} удар./с",
-		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Разделяет</c> <c.#0088ff>трассы</c>",
-		// {0}: Coin multiplier
-		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "Множитель монет: x{0}",
 
 		// Unlock requirements & messages (Any Menu)
 		"UNLOCK_CONDITION_INVALID": "[ОШИБКА] Недопустимое условие",

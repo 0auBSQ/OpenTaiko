@@ -19,7 +19,7 @@ OpenTaiko dessine presque tous les écrans situés en dehors du cœur du gamepla
 | Domaine | Emplacement | Description |
 | --- | --- | --- |
 | Modules | Le dossier `Modules/` du skin | Des stages (des écrans complets avec leurs propres entrées, leur dessin et leur état : une sélection de chansons, une chambre, une scène d'histoire), des activités (des sous-écrans et des superpositions comme les boîtes de dialogue et les plaques de nom) et des transitions (les écrans de fondu et de chargement entre deux stages). |
-| Arrière-plans | Le dossier `Graphics/` du skin | Des scripts qui décorent un écran : l'écran de démarrage, la chambre, le décor et la foule du gameplay, l'écran de résultats. |
+| Arrière-plans | Le dossier `Graphics/` du skin | Des scripts qui décorent un écran : l'écran de démarrage, le décor et la foule du gameplay, l'écran de résultats. |
 | Skins et thèmes | `System/`, à côté du jeu | Un ensemble visuel complet qu'un joueur installe et sélectionne, avec les réglages de thème qu'il expose dans l'écran des options. |
 | Personnages et puchicharas | `Global/Characters/` et `Global/PuchiChara/`, partagés par tous les skins | Les danseurs et les petites mascottes qui réagissent pendant la partie. |
 | Déblocage de partitions | Le dossier de la chanson, à côté de la partition | Un `Unlock.json` qui garde une chanson verrouillée jusqu'à ce que le joueur l'ait méritée. |

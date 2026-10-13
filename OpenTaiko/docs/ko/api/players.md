@@ -378,6 +378,9 @@ PUCHICHARALIST와 sf:GetPuchichara가 이 핸들을 반환합니다. 텍스처�
 | --- | --- |
 | `puchi.tx  -> texture` | Chara.png에서 로드한 스프라이트 시트. |
 | `puchi.render  -> texture` | Render.png에서 로드한 전체 렌더. |
+| `puchi.HasWelcome  -> bool` | 푸치캬라에 Welcome.ogg 클립이 있으면 true. |
+| `puchi:PlayWelcome()  -> nil` | 환영 클립을 음성 사운드 그룹에서 재생합니다. 클립이 없으면 아무 일도 하지 않습니다. |
+| `puchi:StopWelcome()  -> nil` | 환영 클립을 정지합니다. |
 | `puchi.Name  -> string` | 지역화된 표시 이름. |
 | `puchi.Author  -> string` | 지역화된 제작자 이름. |
 | `puchi.Description  -> string` | 현지화된 설명. 푸치캐릭에 설명이 없으면 빈 문자열. |

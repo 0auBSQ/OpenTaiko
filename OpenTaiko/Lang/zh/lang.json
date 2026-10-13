@@ -408,16 +408,7 @@
 		"DAN_CONDITION_NAME_ADLIB": "ADLib音符",
 		"DAN_CONDITION_NAME_BOMB": "击中炸弹",
 
-		// Heya / Quick Heya
-		"HEYA_PUCHI": "迷你角色",
-		"HEYA_CHARA": "角色",
-		"HEYA_DAN": "段位称号",
-		"HEYA_NAMEPLATE": "名牌称号",
-		"HEYA_NAME": "姓名",
-		"HEYA_NAME_INFO": "输入您的姓名（Enter保存，Esc放弃更改）：",
-
-		// {0}: Asset name
-		"HEYA_DESCRIPTION_NAME": "姓名：{0}",
+		// Asset descriptions
 		// {0}: Asset rarity
 		"HEYA_DESCRIPTION_RARITY": "稀有度：{0}",
 		"HEYA_DESCRIPTION_RARITY0": "低下",
@@ -429,25 +420,6 @@
 		"HEYA_DESCRIPTION_RARITY6": "神话",
 		// {0}: Asset author
 		"HEYA_DESCRIPTION_AUTHOR": "作者：{0}",
-		// {0}: Gauge type
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE": "魂条种类：{0}",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL": "普通",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "困难",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "魔王",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "在过关区域完成演奏！",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "魂条从满开始，并在每次失误大量减少！\n小心，如果魂条值到达零，演奏自动失败！",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "魂条从满开始，并在每次失误大量减少！\n一种奇怪的力量似乎减少整首歌的误差幅度……",
-		// {0}: Percentage of mines
-		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "炸弹因子：{0}%的音符在扫雷模式中转换为炸弹",
-		// {0}: Percentage of fuse rolls
-		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "引线因子：{0}%的气球在扫雷模式中转换为定时炸弹",
-		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "所有大音符变成<c.#c800ff>交换</c>音符",
-		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c>音符变为可视",
-		// {0}: # of auto-rolls per second
-		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "自动以 {0} 打／秒<c.#ffff00>连打</c>",
-		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>分开</c><c.#0088ff>跑道</c>",
-		// {0}: Coin multiplier
-		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "金币倍数：×{0}",
 
 		// Unlock requirements & messages (Any Menu)
 		"UNLOCK_CONDITION_INVALID": "【错误】未达成条件",

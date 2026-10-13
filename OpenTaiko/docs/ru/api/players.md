@@ -378,6 +378,9 @@ end
 | --- | --- |
 | `puchi.tx  -> texture` | Спрайт-лист, загруженный из Chara.png. |
 | `puchi.render  -> texture` | Полный рендер, загруженный из Render.png. |
+| `puchi.HasWelcome  -> bool` | True, если у пучичары есть реплика Welcome.ogg. |
+| `puchi:PlayWelcome()  -> nil` | Проигрывает приветственную реплику в группе звуков Voice; без реплики ничего не делает. |
+| `puchi:StopWelcome()  -> nil` | Останавливает приветственную реплику. |
 | `puchi.Name  -> string` | Локализованное отображаемое имя. |
 | `puchi.Author  -> string` | Локализованное имя автора. |
 | `puchi.Description  -> string` | Локализованное описание; пусто, если у пучичары его нет. |

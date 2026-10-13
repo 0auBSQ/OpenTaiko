@@ -22,7 +22,6 @@ class TextureLoader {
 	public static string RESULT = @$"6_Result{Path.DirectorySeparatorChar}";
 	public static string DANRESULT = @$"7_DanResult{Path.DirectorySeparatorChar}";
 	public static string TOWERRESULT = @$"8_TowerResult{Path.DirectorySeparatorChar}";
-	public static string HEYA = @$"10_Heya{Path.DirectorySeparatorChar}";
 
 	public static string MODALS = @$"11_Modals{Path.DirectorySeparatorChar}";
 	public static string ONLINELOUNGE = @$"12_OnlineLounge{Path.DirectorySeparatorChar}";
@@ -790,19 +789,6 @@ class TextureLoader {
 
 		#endregion
 
-		#region [10_Heya]
-
-		//Heya_Background = TxC(HEYA + @$"Background.png");
-		Heya_Center_Menu_Box_Slot = TxC(HEYA + @$"Center_Menu_Box_Slot.png");
-		Heya_Side_Menu = TxC(HEYA + @$"Side_Menu.png");
-		Heya_Render_Field = TxC(HEYA + @$"Render_Field.png");
-		Heya_Center_Menu_Background = TxC(HEYA + @$"Center_Menu_Background.png");
-		Heya_Description_Panel = TxC(HEYA + @$"Description_Panel.png");
-		Heya_Box = TxC(HEYA + @$"Box.png");
-		Heya_Lock = TxC(HEYA + @$"Lock.png");
-
-		#endregion
-
 		#region [11_Characters]
 
 		string[] charaDirs = OpenTaiko.GetMergedDirectories(OpenTaiko.strEXEFolder + GLOBAL + CHARACTERS);
@@ -1208,20 +1194,6 @@ Result_Mountain = new CTexture[4]*/;
 
 	#endregion
 
-	#region [10_Heya]
-
-	public CTexture
-		//Heya_Background,
-		Heya_Center_Menu_Box_Slot,
-		Heya_Side_Menu,
-		Heya_Box,
-		Heya_Render_Field,
-		Heya_Center_Menu_Background,
-		Heya_Description_Panel,
-		Heya_Lock;
-
-	#endregion
-
 	#region [11_Characters]
 
 	/*
@@ -1271,9 +1243,7 @@ Result_Mountain = new CTexture[4]*/;
 		Characters_Tower_Climbing_Tired,
 		Characters_Tower_Running_Tired,
 		Characters_Tower_Clear_Tired;
-	public CTexture[] Characters_Heya_Preview,
-		Characters_Heya_Render,
-		Characters_Result_Clear_1P,
+	public CTexture[] Characters_Result_Clear_1P,
 		Characters_Result_Failed_1P,
 		Characters_Result_Clear_2P,
 		Characters_Result_Failed_2P;

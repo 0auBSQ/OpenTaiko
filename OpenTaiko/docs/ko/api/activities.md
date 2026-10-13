@@ -54,14 +54,14 @@
 
 ### 캐릭터
 
-캐릭터의 Script.lua는 다른 집합을 정의합니다. loadAnimation, disposeAnimation, availableAnimation, setAnimationDuration, resetAnimationCounter, update, draw, getDrawSize, getHeyaRenderOffset, getAIBattlePosition, loadVoice, disposeVoice, playVoice입니다. [캐릭터 추가하기](../guides/characters.md)에서 다룹니다.
+캐릭터의 Script.lua는 다른 집합을 정의합니다. loadAnimation, disposeAnimation, availableAnimation, setAnimationDuration, resetAnimationCounter, update, draw, getDrawSize, getAIBattlePosition, loadVoice, disposeVoice, playVoice입니다. [캐릭터 추가하기](../guides/characters.md)에서 다룹니다.
 
 ### Exit
 
 엔진이 스테이지 스크립트에만 등록하는 함수입니다. 호출하면 엔진에 스테이지를 떠나도록 요청합니다.
 
 <div class="callout warn">
-Modules/Stages 스크립트에서만 사용할 수 있습니다. 액티비티와 ROActivity는 호스트가 구동하므로 이 함수를 받지 않습니다. 0~3개의 인자를 받고 어느 위치에서든 nil을 허용합니다. 호출 자체가 종료를 요청합니다. 기본 제공 스테이지는 그 프레임에서 다른 것이 실행되지 않도록 update 안에서 `return Exit(...)`를 씁니다. target은 "title", "play", "stage", "legacy" 중 하나이며, nil이나 다른 값은 "title"을 뜻합니다. target이 "stage"이면 name은 이동할 Modules/Stages 모듈이고, "legacy"이면 name은 "heya", "config", "exit", "onlinelounge" 중 하나입니다(다른 값은 타이틀로 갑니다). transition은 Modules/Transitions 모듈을 지정합니다. 생략했거나 엔진이 찾을 수 없으면 엔진은 "default"라는 이름의 모듈을 사용하고, 스킨에 트랜지션이 전혀 없으면 단순한 검은 페이드아웃이 재생됩니다.
+Modules/Stages 스크립트에서만 사용할 수 있습니다. 액티비티와 ROActivity는 호스트가 구동하므로 이 함수를 받지 않습니다. 0~3개의 인자를 받고 어느 위치에서든 nil을 허용합니다. 호출 자체가 종료를 요청합니다. 기본 제공 스테이지는 그 프레임에서 다른 것이 실행되지 않도록 update 안에서 `return Exit(...)`를 씁니다. target은 "title", "play", "stage", "legacy" 중 하나이며, nil이나 다른 값은 "title"을 뜻합니다. target이 "stage"이면 name은 이동할 Modules/Stages 모듈이고, "legacy"이면 name은 "heya", "config", "exit", "onlinelounge" 중 하나입니다(다른 값은 타이틀로 갑니다). transition은 Modules/Transitions 모듈을 지정합니다. 생략했거나 엔진이 찾을 수 없으면 엔진은 "default"라는 이름의 모듈을 사용하고, 스킨에 트랜지션이 전혀 없으면 단순한 검은 페이드아웃이 재생됩니다. "heya" 키는 별칭으로 남아 있습니다. Modules/Stages에 있는 스킨의 `myroom` 모듈을 열며, 스킨에 그 모듈이 없으면 타이틀로 갑니다.
 </div>
 
 | 메서드 | 설명 |
@@ -212,7 +212,7 @@ end
 화면 배경, 게임플레이 레이어, 몹, 클리어 애니메이션, 쿠스다마 효과 중 하나를 그리는 Script.lua로, 엔진 자체 화면이 호스팅합니다.
 
 <div class="callout warn">
-배경은 Modules 폴더 밖, 스킨의 Graphics 폴더 아래 꾸미는 화면의 디렉터리에 있습니다. 예를 들어 Graphics/0_Startup/Script.lua, Graphics/10_Heya/Script.lua, Graphics/6_Result/Script.lua, Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua, Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua, Graphics/5_Game/3_Mob/{variant}/Script.lua, Graphics/5_Game/9_End/{result}/Script.lua, Graphics/5_Game/11_Balloon/Kusudama/Script.lua입니다. 폴더에 여러 변형이 있으면 엔진이 플레이마다 하나를 무작위로(또는 채보의 장면 프리셋에서) 고릅니다. 호스트 화면이 배경 인스턴스를 생성하고(게임플레이 배경은 엔진이 게임 화면에 들어갈 때마다) 화면과 함께 해제하므로, 게임플레이 중에는 여러 개가 동시에 살아 있습니다. 배경 스크립트는 ROActivity와 같은 전역(읽기 전용 CONFIG, DATABASE, GetSaveFile; ACTIVITY 없음)을 받습니다. 아래 이벤트 훅은 선택 사항이며, 엔진은 각 훅을 해당 이벤트가 일어날 때 한 번 호출합니다. 타워에서는 채보의 `TOWERTYPE`이 Down 폴더를 지정합니다.
+배경은 Modules 폴더 밖, 스킨의 Graphics 폴더 아래 꾸미는 화면의 디렉터리에 있습니다. 예를 들어 Graphics/0_Startup/Script.lua, Graphics/6_Result/Script.lua, Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua, Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua, Graphics/5_Game/3_Mob/{variant}/Script.lua, Graphics/5_Game/9_End/{result}/Script.lua, Graphics/5_Game/11_Balloon/Kusudama/Script.lua입니다. 폴더에 여러 변형이 있으면 엔진이 플레이마다 하나를 무작위로(또는 채보의 장면 프리셋에서) 고릅니다. 호스트 화면이 배경 인스턴스를 생성하고(게임플레이 배경은 엔진이 게임 화면에 들어갈 때마다) 화면과 함께 해제하므로, 게임플레이 중에는 여러 개가 동시에 살아 있습니다. 배경 스크립트는 ROActivity와 같은 전역(읽기 전용 CONFIG, DATABASE, GetSaveFile; ACTIVITY 없음)을 받습니다. 아래 이벤트 훅은 선택 사항이며, 엔진은 각 훅을 해당 이벤트가 일어날 때 한 번 호출합니다. 타워에서는 채보의 `TOWERTYPE`이 Down 폴더를 지정합니다.
 </div>
 
 | 메서드 | 설명 |

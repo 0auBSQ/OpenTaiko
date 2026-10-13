@@ -73,7 +73,7 @@
 | Entry/Normal、Entry/Jump | `Title_Normal`、`Title_Entry` |
 | Result/Normal、Result/Clear、Result/Failed_In、Result/Failed | `Result_Normal`、`Result_Clear`、`Result_Failed_In`、`Result_Failed` |
 
-内置脚本从文件夹根目录读取两张静态图片：`Render.png`（完整尺寸的立绘，在游戏请求 Render 动画类型的任何地方绘制，例如房间中）和 `Preview.png`（缩略图；缺失时脚本使用 `Normal/0.png`）。
+内置脚本从文件夹根目录读取两张静态图片：`Render.png`（完整尺寸的立绘，在游戏请求 Render 动画类型的任何地方绘制，例如歌曲加载界面中）和 `Preview.png`（缩略图；缺失时脚本使用 `Normal/0.png`）。
 
 缺失的状态会回退到另一个状态，因此角色可以只提供一个子集。回退链为：Clear -> Normal，Max -> Clear，Miss -> Normal，Miss_Down -> Miss，Gogo -> Normal，Gogo_Max -> Gogo，10combo_Max -> 10combo，GoGoStart_Clear -> GoGoStart，GoGoStart_Max -> GoGoStart_Clear，塔的 `_Tired` 状态 -> 其普通状态，Tower/Fail -> Tower/Standing_Tired，Kusudama_Idle -> Normal，Menu/Wait -> Gogo，Menu/Start、Menu/Select 和 Entry/Jump -> 10combo，Menu/Normal、Entry/Normal 和 Result/Normal -> Normal，Result/Clear -> Clear，Result/Failed_In -> Miss_In，Result/Failed -> Miss。没有回退的状态（例如 Cleared、Failed、Return、气球状态）缺失时不绘制任何内容。一个可用角色的最低要求是 `Normal/0.png`。
 
@@ -100,7 +100,7 @@
 - `Game_Chara_X=...` / `Game_Chara_Y=...`：演奏位置；脚本使用每个列表的第一个值。`Game_Chara_Offset=X,Y` 是另一种写法。
 - `Game_Chara_X_AI=...` / `Game_Chara_Y_AI=...`：AI 对战中每个玩家一个值。两个键都存在时，它们会为此角色替换皮肤的 AI 对战位置。
 - `Game_Chara_Balloon_X` / `Game_Chara_Balloon_Y`、`Game_Chara_Kusudama_X` / `Game_Chara_Kusudama_Y`：气球和花球段落期间的位置（使用第一个值）。`Game_Chara_Balloon_Offset`、`Game_Chara_Kusudama_Offset` 和 `Game_Chara_Tower_Offset` 接受一对 `X,Y`。
-- `Menu_Offset=X,Y`、`Menu_Chara_Scale`、`Result_Offset=X,Y`、`Heya_Chara_Render_Offset=X,Y`：菜单、结算和房间立绘的偏移。
+- `Menu_Offset=X,Y`、`Menu_Chara_Scale`、`Result_Offset=X,Y`：菜单和结算的偏移。
 - `Game_Chara_Motion_<State>=0,1,2,...`：某个状态的帧播放顺序，为从 0 起的帧索引。省略时按文件顺序播放。状态名称遵循文件夹名称，例如 `Game_Chara_Motion_Normal`、`Game_Chara_Motion_GoGo`、`Game_Chara_Motion_Miss_Down`、`Game_Chara_Motion_Balloon_Broke`、`Game_Chara_Motion_Tower_Climbing`。
 - `Game_Chara_Beat_<State>=N`：该状态一个循环跨越多少拍，例如 `Game_Chara_Beat_Normal=1`、`Game_Chara_Beat_GoGo=2`。
 - 菜单、标题和结算状态使用 `Menu_Chara_Motion_Loop/Wait/Start/Select`、`Title_Chara_Motion_Normal/Entry`、`Result_Chara_Motion_Normal/Clear/Failed_In/Failed`，配以对应的 `_Beat_` 键或以毫秒计的固定时长：`Chara_Menu_Loop_AnimationDuration`、`Chara_Menu_Wait_AnimationDuration`、`Chara_Menu_Start_AnimationDuration`、`Chara_Menu_Select_AnimationDuration`、`Chara_Normal_AnimationDuration`、`Chara_Entry_AnimationDuration`、`Chara_Result_Normal_AnimationDuration`、`Chara_Result_Clear_AnimationDuration`、`Chara_Result_Failed_In_AnimationDuration`、`Chara_Result_Failed_AnimationDuration`。
@@ -135,7 +135,7 @@ Game_Chara_Beat_GoGo=2
 - `update(delta, animationType, looping)`，非循环动画播放完毕时返回 `true`
 - `draw(animationType, x, y, scaleX, scaleY, opacity, color, contextType, anchor, clipW, clipH, clipX, clipY, rotation, blendMode, wrapMode, gradientMap)`
 - `getDrawSize(animationType)`，返回宽度和高度
-- `getHeyaRenderOffset()`，返回 x 和 y；`getAIBattlePosition(player, charaScale)`，返回 x 和 y，或返回 `nil` 以使用皮肤的位置
+- `getAIBattlePosition(player, charaScale)`，返回 x 和 y，或返回 `nil` 以使用皮肤的位置
 - `loadVoice(voiceType)`、`disposeVoice(voiceType)`、`playVoice(voiceType)`
 
 动画类型是 `CHARACTER.ANIM_*` 常量背后的字符串（`"Game/Normal"`、`"Menu/Normal"`、...），再加上两个特殊类型 `CHARACTER.ANIM_PREVIEW`（缩略图）和 `CHARACTER.ANIM_RENDER`（完整立绘）。语音类型是 `CHARACTER.VOICE_*` 常量。第 3 步的回退链同样适用于脚本化角色：游戏询问 `availableAnimation`，并沿备选项逐一尝试直到某个可用。

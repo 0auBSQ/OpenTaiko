@@ -408,16 +408,7 @@
 		"DAN_CONDITION_NAME_ADLIB": "ADLIB count",
 		"DAN_CONDITION_NAME_BOMB": "Bombs hit",
 
-		// Heya / Quick Heya
-		"HEYA_PUCHI": "Puchichara",
-		"HEYA_CHARA": "Character",
-		"HEYA_DAN": "Dan Title",
-		"HEYA_NAMEPLATE": "Nameplate Title",
-		"HEYA_NAME": "Name",
-		"HEYA_NAME_INFO": "Type your name (Enter to save, Escape to discard changes):",
-
-		// {0}: Asset name
-		"HEYA_DESCRIPTION_NAME": "Name: {0}",
+		// Asset descriptions
 		// {0}: Asset rarity
 		"HEYA_DESCRIPTION_RARITY": "Rarity: {0}",
 		"HEYA_DESCRIPTION_RARITY0": "Poor",
@@ -429,25 +420,6 @@
 		"HEYA_DESCRIPTION_RARITY6": "Mythical",
 		// {0}: Asset author
 		"HEYA_DESCRIPTION_AUTHOR": "Author: {0}",
-		// {0}: Gauge type
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE": "Gauge Type: {0}",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL": "Normal",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "Hard",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "Extreme",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "Finish the play within the clear zone to pass the song!",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "The gauge starts full and sharply depletes at each miss!\nBe careful, if the gauge value reaches 0, the play is automatically failed!",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "The gauge starts full and sharply depletes at each miss!\nA strange power seems to reduce the margin of error through the song...",
-		// {0}: Percentage of mines
-		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Bomb Factor: {0}% of notes converted to mines in Minesweeper",
-		// {0}: Percentage of fuse rolls
-		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Fuse Factor: {0}% of balloons converted to fuse rolls in Minesweeper",
-		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "All big notes become <c.#c800ff>Swap</c> notes",
-		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c> notes become visible",
-		// {0}: # of auto-rolls per second
-		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "Automatic <c.#ffff00>Rolls</c> at {0} hits/s",
-		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Split</c> <c.#0088ff>Lanes</c>",
-		// {0}: Coin multiplier
-		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "Coin multiplier: x{0}",
 
 		// Unlock requirements & messages (Any Menu)
 		"UNLOCK_CONDITION_INVALID": "[ERROR] Invalid condition",

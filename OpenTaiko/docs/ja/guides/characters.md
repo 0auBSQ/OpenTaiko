@@ -73,7 +73,7 @@
 | Entry/Normal、Entry/Jump | `Title_Normal`、`Title_Entry` |
 | Result/Normal、Result/Clear、Result/Failed_In、Result/Failed | `Result_Normal`、`Result_Clear`、`Result_Failed_In`、`Result_Failed` |
 
-組み込みのスクリプトはフォルダのルートから 2 つの静止画を読み込みます: `Render.png` (フルサイズのポートレート。部屋画面など、ゲームが Render アニメーションタイプを要求する場所で描画されます) と `Preview.png` (サムネイル。ない場合、スクリプトは `Normal/0.png` を使います)。
+組み込みのスクリプトはフォルダのルートから 2 つの静止画を読み込みます: `Render.png` (フルサイズのポートレート。楽曲の読み込み画面など、ゲームが Render アニメーションタイプを要求する場所で描画されます) と `Preview.png` (サムネイル。ない場合、スクリプトは `Normal/0.png` を使います)。
 
 存在しない状態は別の状態にフォールバックするため、キャラクターは一部だけを同梱できます。フォールバックの連鎖は次のとおりです: Clear -> Normal、Max -> Clear、Miss -> Normal、Miss_Down -> Miss、Gogo -> Normal、Gogo_Max -> Gogo、10combo_Max -> 10combo、GoGoStart_Clear -> GoGoStart、GoGoStart_Max -> GoGoStart_Clear、Tower の `_Tired` 状態 -> 対応する通常状態、Tower/Fail -> Tower/Standing_Tired、Kusudama_Idle -> Normal、Menu/Wait -> Gogo、Menu/Start と Menu/Select と Entry/Jump -> 10combo、Menu/Normal と Entry/Normal と Result/Normal -> Normal、Result/Clear -> Clear、Result/Failed_In -> Miss_In、Result/Failed -> Miss。フォールバックのない状態 (例えば Cleared、Failed、Return、風船の各状態) は、存在しなければ何も描画しません。動作するキャラクターの最小構成は `Normal/0.png` です。
 
@@ -100,7 +100,7 @@
 - `Game_Chara_X=...` / `Game_Chara_Y=...`: ゲームプレイでの位置。スクリプトは各リストの最初の値を使います。`Game_Chara_Offset=X,Y` は別の書き方です。
 - `Game_Chara_X_AI=...` / `Game_Chara_Y_AI=...`: AI バトル用のプレイヤーごとの値。両方のキーがあるとき、このキャラクターについてスキンの AI バトル位置を置き換えます。
 - `Game_Chara_Balloon_X` / `Game_Chara_Balloon_Y`、`Game_Chara_Kusudama_X` / `Game_Chara_Kusudama_Y`: 風船とくす玉のシーケンス中の位置 (最初の値が使われます)。`Game_Chara_Balloon_Offset`、`Game_Chara_Kusudama_Offset`、`Game_Chara_Tower_Offset` は `X,Y` の組を取ります。
-- `Menu_Offset=X,Y`、`Menu_Chara_Scale`、`Result_Offset=X,Y`、`Heya_Chara_Render_Offset=X,Y`: メニュー、リザルト、部屋画面のレンダーのオフセット。
+- `Menu_Offset=X,Y`、`Menu_Chara_Scale`、`Result_Offset=X,Y`: メニューとリザルトのオフセット。
 - `Game_Chara_Motion_<State>=0,1,2,...`: 状態のフレームを再生する順序を、0 始まりのフレームインデックスで指定します。省略するとフレームはファイル順に再生されます。状態名はフォルダ名に従います。例: `Game_Chara_Motion_Normal`、`Game_Chara_Motion_GoGo`、`Game_Chara_Motion_Miss_Down`、`Game_Chara_Motion_Balloon_Broke`、`Game_Chara_Motion_Tower_Climbing`。
 - `Game_Chara_Beat_<State>=N`: 状態の 1 ループが何拍にわたるか。例: `Game_Chara_Beat_Normal=1`、`Game_Chara_Beat_GoGo=2`。
 - メニュー、タイトル、リザルトの状態は `Menu_Chara_Motion_Loop/Wait/Start/Select`、`Title_Chara_Motion_Normal/Entry`、`Result_Chara_Motion_Normal/Clear/Failed_In/Failed` を使い、対応する `_Beat_` キーか、ミリ秒単位の固定時間 `Chara_Menu_Loop_AnimationDuration`、`Chara_Menu_Wait_AnimationDuration`、`Chara_Menu_Start_AnimationDuration`、`Chara_Menu_Select_AnimationDuration`、`Chara_Normal_AnimationDuration`、`Chara_Entry_AnimationDuration`、`Chara_Result_Normal_AnimationDuration`、`Chara_Result_Clear_AnimationDuration`、`Chara_Result_Failed_In_AnimationDuration`、`Chara_Result_Failed_AnimationDuration` を指定します。
@@ -135,7 +135,7 @@ Game_Chara_Beat_GoGo=2
 - ループしないアニメーションが終了したときに `true` を返す `update(delta, animationType, looping)`
 - `draw(animationType, x, y, scaleX, scaleY, opacity, color, contextType, anchor, clipW, clipH, clipX, clipY, rotation, blendMode, wrapMode, gradientMap)`
 - 幅と高さを返す `getDrawSize(animationType)`
-- x と y を返す `getHeyaRenderOffset()`。x と y、またはスキンの位置を使う場合は `nil` を返す `getAIBattlePosition(player, charaScale)`
+- x と y、またはスキンの位置を使う場合は `nil` を返す `getAIBattlePosition(player, charaScale)`
 - `loadVoice(voiceType)`、`disposeVoice(voiceType)`、`playVoice(voiceType)`
 
 アニメーションタイプは `CHARACTER.ANIM_*` 定数の背後にある文字列 (`"Game/Normal"`、`"Menu/Normal"`、...) と、2 つの特別なタイプ `CHARACTER.ANIM_PREVIEW` (サムネイル) と `CHARACTER.ANIM_RENDER` (全身のポートレート) です。ボイスタイプは `CHARACTER.VOICE_*` 定数です。ステップ 3 のフォールバックの連鎖はスクリプト化されたキャラクターにも適用されます。ゲームは `availableAnimation` に問い合わせ、利用可能なものが見つかるまで代替をたどります。

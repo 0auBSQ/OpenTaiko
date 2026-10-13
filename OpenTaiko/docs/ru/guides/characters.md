@@ -73,7 +73,7 @@
 | Entry/Normal, Entry/Jump | `Title_Normal`, `Title_Entry` |
 | Result/Normal, Result/Clear, Result/Failed_In, Result/Failed | `Result_Normal`, `Result_Clear`, `Result_Failed_In`, `Result_Failed` |
 
-Встроенный скрипт читает два статичных изображения из корня папки: `Render.png` (полноразмерный портрет, рисуемый везде, где игра запрашивает тип анимации Render, например в комнате) и `Preview.png` (миниатюра; при отсутствии скрипт использует `Normal/0.png`).
+Встроенный скрипт читает два статичных изображения из корня папки: `Render.png` (полноразмерный портрет, рисуемый везде, где игра запрашивает тип анимации Render, например на экране загрузки песни) и `Preview.png` (миниатюра; при отсутствии скрипт использует `Normal/0.png`).
 
 Отсутствующие состояния откатываются к другому состоянию, поэтому персонаж может поставлять лишь часть набора. Цепочка откатов: Clear -> Normal, Max -> Clear, Miss -> Normal, Miss_Down -> Miss, Gogo -> Normal, Gogo_Max -> Gogo, 10combo_Max -> 10combo, GoGoStart_Clear -> GoGoStart, GoGoStart_Max -> GoGoStart_Clear, состояния Tower `_Tired` -> их обычное состояние, Tower/Fail -> Tower/Standing_Tired, Kusudama_Idle -> Normal, Menu/Wait -> Gogo, Menu/Start, Menu/Select и Entry/Jump -> 10combo, Menu/Normal, Entry/Normal и Result/Normal -> Normal, Result/Clear -> Clear, Result/Failed_In -> Miss_In, Result/Failed -> Miss. Состояния без отката (например Cleared, Failed, Return, состояния шара) при отсутствии ничего не рисуют. Минимум для работающего персонажа — `Normal/0.png`.
 
@@ -100,7 +100,7 @@
 - `Game_Chara_X=...` / `Game_Chara_Y=...`: позиция в игре; скрипт использует первое значение каждого списка. `Game_Chara_Offset=X,Y` — альтернативная форма.
 - `Game_Chara_X_AI=...` / `Game_Chara_Y_AI=...`: по одному значению на игрока для битвы с ИИ. Когда присутствуют оба ключа, они заменяют позицию битвы с ИИ из скина для этого персонажа.
 - `Game_Chara_Balloon_X` / `Game_Chara_Balloon_Y`, `Game_Chara_Kusudama_X` / `Game_Chara_Kusudama_Y`: позиции во время последовательностей шара и кусудамы (используется первое значение). `Game_Chara_Balloon_Offset`, `Game_Chara_Kusudama_Offset` и `Game_Chara_Tower_Offset` принимают пару `X,Y`.
-- `Menu_Offset=X,Y`, `Menu_Chara_Scale`, `Result_Offset=X,Y`, `Heya_Chara_Render_Offset=X,Y`: смещения для меню, результатов и рендера в комнате.
+- `Menu_Offset=X,Y`, `Menu_Chara_Scale`, `Result_Offset=X,Y`: смещения для меню и результатов.
 - `Game_Chara_Motion_<State>=0,1,2,...`: порядок, в котором проигрываются кадры состояния, в виде индексов кадров от 0. Если опущен, кадры проигрываются в порядке файлов. Имена состояний повторяют имена папок, например `Game_Chara_Motion_Normal`, `Game_Chara_Motion_GoGo`, `Game_Chara_Motion_Miss_Down`, `Game_Chara_Motion_Balloon_Broke`, `Game_Chara_Motion_Tower_Climbing`.
 - `Game_Chara_Beat_<State>=N`: сколько битов занимает один цикл состояния, например `Game_Chara_Beat_Normal=1`, `Game_Chara_Beat_GoGo=2`.
 - Состояния меню, титульного экрана и результатов используют `Menu_Chara_Motion_Loop/Wait/Start/Select`, `Title_Chara_Motion_Normal/Entry`, `Result_Chara_Motion_Normal/Clear/Failed_In/Failed` с соответствующими ключами `_Beat_` или фиксированными длительностями в миллисекундах: `Chara_Menu_Loop_AnimationDuration`, `Chara_Menu_Wait_AnimationDuration`, `Chara_Menu_Start_AnimationDuration`, `Chara_Menu_Select_AnimationDuration`, `Chara_Normal_AnimationDuration`, `Chara_Entry_AnimationDuration`, `Chara_Result_Normal_AnimationDuration`, `Chara_Result_Clear_AnimationDuration`, `Chara_Result_Failed_In_AnimationDuration`, `Chara_Result_Failed_AnimationDuration`.
@@ -135,7 +135,7 @@ Game_Chara_Beat_GoGo=2
 - `update(delta, animationType, looping)`, возвращающая `true`, когда незацикленная анимация закончилась
 - `draw(animationType, x, y, scaleX, scaleY, opacity, color, contextType, anchor, clipW, clipH, clipX, clipY, rotation, blendMode, wrapMode, gradientMap)`
 - `getDrawSize(animationType)`, возвращающая ширину и высоту
-- `getHeyaRenderOffset()`, возвращающая x и y; `getAIBattlePosition(player, charaScale)`, возвращающая x и y или `nil`, чтобы использовать позицию из скина
+- `getAIBattlePosition(player, charaScale)`, возвращающая x и y или `nil`, чтобы использовать позицию из скина
 - `loadVoice(voiceType)`, `disposeVoice(voiceType)`, `playVoice(voiceType)`
 
 Типы анимаций — это строки, стоящие за константами `CHARACTER.ANIM_*` (`"Game/Normal"`, `"Menu/Normal"`, ...), плюс два специальных типа `CHARACTER.ANIM_PREVIEW` (миниатюра) и `CHARACTER.ANIM_RENDER` (полный портрет). Типы голосов — константы `CHARACTER.VOICE_*`. Цепочка откатов из шага 3 действует и для скриптовых персонажей: игра запрашивает `availableAnimation` и перебирает альтернативы, пока одна не окажется доступной.

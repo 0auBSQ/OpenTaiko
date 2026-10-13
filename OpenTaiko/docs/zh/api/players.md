@@ -378,6 +378,9 @@ PUCHICHARALIST 和 sf:GetPuchichara 返回这些句柄。列表拥有这些纹�
 | --- | --- |
 | `puchi.tx  -> texture` | 从 Chara.png 加载的精灵图集。 |
 | `puchi.render  -> texture` | 从 Render.png 加载的完整立绘。 |
+| `puchi.HasWelcome  -> bool` | 该小角色带有 Welcome.ogg 片段时为 true。 |
+| `puchi:PlayWelcome()  -> nil` | 在语音音量组中播放欢迎片段；没有片段时不执行任何操作。 |
+| `puchi:StopWelcome()  -> nil` | 停止欢迎片段。 |
 | `puchi.Name  -> string` | 本地化显示名称。 |
 | `puchi.Author  -> string` | 本地化作者名称。 |
 | `puchi.Description  -> string` | 本地化的描述；小角色没有描述时为空。 |

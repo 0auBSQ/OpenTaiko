@@ -34,6 +34,12 @@ namespace OpenTaiko {
 		public Dictionary<string, object> Effects => _effects ??= LuaEffectDict.From(_puchi.effect);
 		public float CoinMultiplier => _puchi.GetEffectCoinMultiplier();
 
+		/// <summary>True when the puchichara has a welcome clip (Welcome.ogg).</summary>
+		public bool HasWelcome => File.Exists(Path.Combine(_puchi._path, "Welcome.ogg"));
+		/// <summary>Plays the welcome clip; does nothing without one.</summary>
+		public void PlayWelcome() => _puchi.welcome?.tPlay();
+		public void StopWelcome() => _puchi.welcome?.tStop();
+
 		private readonly DBPuchichara.PuchicharaData _metadata;
 		private readonly CPuchichara _puchi;
 		private Dictionary<string, object>? _effects;

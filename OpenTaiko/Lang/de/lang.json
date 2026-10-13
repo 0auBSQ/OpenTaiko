@@ -408,16 +408,7 @@
 		"DAN_CONDITION_NAME_ADLIB": "ADLIB-Anzahl",
 		"DAN_CONDITION_NAME_BOMB": "Bomben getroffen",
 
-		// Heya / Quick Heya
-		"HEYA_PUCHI": "Puchichara",
-		"HEYA_CHARA": "Charakter",
-		"HEYA_DAN": "Dan-Titel",
-		"HEYA_NAMEPLATE": "Namensschild-Titel",
-		"HEYA_NAME": "Name",
-		"HEYA_NAME_INFO": "Geben Sie Ihren Namen ein (Enter zum Speichern, Escape zum Verwerfen der Änderungen):",
-
-		// {0}: Asset name
-		"HEYA_DESCRIPTION_NAME": "Name: {0}",
+		// Asset descriptions
 		// {0}: Asset rarity
 		"HEYA_DESCRIPTION_RARITY": "Seltenheit: {0}",
 		"HEYA_DESCRIPTION_RARITY0": "Schlecht",
@@ -429,25 +420,6 @@
 		"HEYA_DESCRIPTION_RARITY6": "Mythisch",
 		// {0}: Asset author
 		"HEYA_DESCRIPTION_AUTHOR": "Autor: {0}",
-		// {0}: Gauge type
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE": "Leistentyp: {0}",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL": "Normal",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "Schwierig",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "Extrem",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "Beende das Spiel innerhalb der Clear-Zone, um das Lied zu bestehen!",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "Die Leiste beginnt voll und verringert sich stark bei jedem Fehler!\nSei vorsichtig, wenn der Wert der Leiste 0 erreicht, scheitert das Spiel automatisch!",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "Die Leiste beginnt voll und verringert sich stark bei jedem Fehler!\nEine seltsame Kraft scheint den Fehlerspielraum während des Liedes zu verringern...",
-		// {0}: Percentage of mines
-		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Bombenfaktor: {0}% der Noten werden in Minen umgewandelt im Minensucher-Modus",
-		// {0}: Percentage of fuse rolls
-		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Zündschnurfaktor: {0}% der Ballons werden in Zündschnur-Rollen umgewandelt im Minensucher-Modus",
-		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "Alle großen Noten werden zu <c.#c800ff>Swap</c>-Noten",
-		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c> Noten werden sichtbar",
-		// {0}: # of auto-rolls per second
-		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "Automatische <c.#ffff00>Rolls</c> mit {0} Schlägen",
-		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Geteilte</c> <c.#0088ff>Spuren</c>",
-		// {0}: Coin multiplier
-		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "Münz-Multiplikator: x{0}",
 
 		// Unlock requirements & messages (Any Menu)
 		"UNLOCK_CONDITION_INVALID": "[FEHLER] Ungültige Bedingung",

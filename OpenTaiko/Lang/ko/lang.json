@@ -410,16 +410,7 @@
 		"DAN_CONDITION_NAME_ADLIB": "애드립 개수",
 		"DAN_CONDITION_NAME_BOMB": "두드린 폭탄",
 
-		// Heya / Quick Heya
-		"HEYA_PUCHI": "푸치 캐릭터",
-		"HEYA_CHARA": "캐릭터",
-		"HEYA_DAN": "단위 제목",
-		"HEYA_NAMEPLATE": "칭호 타이틀",
-		"HEYA_NAME": "이름",
-		"HEYA_NAME_INFO": "이름을 입력하세요 (Enter로 저장, Esc로 변경 취소):",
-
-		// {0}: Asset name
-		"HEYA_DESCRIPTION_NAME": "이름: {0}",
+		// Asset descriptions
 		// {0}: Asset rarity
 		"HEYA_DESCRIPTION_RARITY": "희귀도: {0}",
 		"HEYA_DESCRIPTION_RARITY0": "일반",
@@ -431,25 +422,6 @@
 		"HEYA_DESCRIPTION_RARITY6": "신화",
 		// {0}: Asset author
 		"HEYA_DESCRIPTION_AUTHOR": "제작자: {0}",
-		// {0}: Gauge type
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE": "게이지 타입: {0}",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL": "보통",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "어려움",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "귀신",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "클리어 게이지를 통과하여 곡을 클리어합니다!",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "게이지가 가득 차면서 시작하고 미스할 때마다 급격히 고갈됩니다!\n 게이지 값이 0에 도달하면 자동으로 플레이가 실패하니 주의하세요!",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "게이지가 가득 차면서 시작하고 미스할 때마다 급격하게 고갈됩니다!\n 이상한 힘이 노래를 통해 판정 범위를 줄이는 것 같습니다...",
-		// {0}: Percentage of mines
-		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "폭탄 요소: 지뢰 찾기에서 {0}% 확률로 지뢰로 변환되는 노트",
-		// {0}: Percentage of fuse rolls
-		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "퓨즈 요소: 지뢰 찾기에서 {0}% 확률로 퓨즈로 변환되는 풍선",
-		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "모든 큰 노트는 <c.#c800ff>스왑</c> 노트로 변경됩니다.",
-		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>애드립</c> 노트가 보이게 됩니다.",
-		// {0}: # of auto-rolls per second
-		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": " {0} 히트에서 자동으로 <c.#ffff00>연타가</c>됩니다.",
-		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>분리된</c> <c.#0088ff>레인</c>",
-		// {0}: Coin multiplier
-		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "코인 배율: x{0}",
 
 		// Unlock requirements & messages (Any Menu)
 		"UNLOCK_CONDITION_INVALID": "[오류] 잘못된 조건",

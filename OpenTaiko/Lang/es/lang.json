@@ -408,16 +408,7 @@
 		"DAN_CONDITION_NAME_ADLIB": "Cantidad de ADLIBs",
 		"DAN_CONDITION_NAME_BOMB": "Bombas golpeadas",
 
-		// Heya / Quick Heya
-		"HEYA_PUCHI": "Puchichara",
-		"HEYA_CHARA": "Personaje",
-		"HEYA_DAN": "Título de Dan",
-		"HEYA_NAMEPLATE": "Título de Placa",
-		"HEYA_NAME": "Nombre",
-		"HEYA_NAME_INFO": "Escribe tu nombre (Enter para guardar, Esc para descartar cambios):",
-
-		// {0}: Asset name
-		"HEYA_DESCRIPTION_NAME": "Nombre: {0}",
+		// Asset descriptions
 		// {0}: Asset rarity
 		"HEYA_DESCRIPTION_RARITY": "Rareza: {0}",
 		"HEYA_DESCRIPTION_RARITY0": "Malo",
@@ -429,25 +420,6 @@
 		"HEYA_DESCRIPTION_RARITY6": "Mítico",
 		// {0}: Asset author
 		"HEYA_DESCRIPTION_AUTHOR": "Autor: {0}",
-		// {0}: Gauge type
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE": "Tipo de Medidor: {0}",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL": "Normal",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "Difícil",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "Extremo",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "¡Termina la canción dentro de la zona de completado del medidor!",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "¡El medidor empieza lleno y se agota bruscamente en cada falla!\n¡Ten cuidado, si el valor del medidor llega a 0, tu partida está automáticamente perdida!",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "¡El medidor empieza lleno y se agota bruscamente en cada falla!\nUn poder extraño parece reducir el margen de error durante la canción...",
-		// {0}: Percentage of mines
-		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Factor de Bomba: {0}% de notas se convierten a minas en Buscaminas",
-		// {0}: Percentage of fuse rolls
-		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Factor de Fusible: {0}% de globos se convierten a redobles de fusibles en Buscaminas",
-		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "Todas las notas grandes se vuelven notas de <c.#c800ff>Intercambio</c>",
-		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "Notas de <c.#c4ffe2>ADLib</c> se vuelven visibles",
-		// {0}: # of auto-rolls per second
-		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "<c.#ffff00>Redoble</c> automáticamente en {0} golpes/s",
-		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Separar</c> <c.#0088ff>Carriles</c>",
-		// {0}: Coin multiplier
-		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "Multiplicador de Monedas: x{0}",
 
 		// Unlock requirements & messages (Any Menu)
 		"UNLOCK_CONDITION_INVALID": "[ERROR] Condición no valida",

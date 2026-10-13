@@ -59,5 +59,8 @@
   },
   "mirror": {
     "name": "姿見"
+  },
+  "backpack": {
+    "name": "リュックサック"
   }
 }

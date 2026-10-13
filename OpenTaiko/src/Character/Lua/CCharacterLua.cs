@@ -52,10 +52,6 @@ class CCharacterLua : CCharacter {
 		return Script.GetDrawSize(resolvedAnimation);
 	}
 
-	public override (float x, float y) GetHeyaRenderOffset() {
-		return Script.GetHeyaRenderOffset();
-	}
-
 	public override (float x, float y)? GetAIBattlePosition(int player, float charaScale = 1.0f) {
 		return Script.GetAIBattlePosition(player, charaScale);
 	}

@@ -88,7 +88,7 @@ Chara.png : 512 x 256 PNG，透明背景
 
 ## 第 5 步（可选）：添加 Welcome.ogg 和 Render.png
 
-- `Welcome.ogg`：游戏加载到语音音量组中的一段语音片段。游戏内置的房间界面在玩家选中该小角色时播放它；Lua 舞台无法访问它，因此自带房间界面的皮肤不会播放它。
+- `Welcome.ogg`：游戏加载到语音音量组中的一段语音片段。目前没有任何界面播放它；Lua 舞台可以用 `puchi:PlayWelcome()` 播放它。
 - `Render.png`：Lua 舞台可以作为立绘绘制的完整尺寸静态图片（`PUCHICHARALIST` 条目的 `render` 纹理）。它是一张任意尺寸的单张图片。自带的小角色都没有包含它。
 
 两个文件都是可选的。

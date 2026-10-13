@@ -410,16 +410,7 @@
 		"DAN_CONDITION_NAME_ADLIB": "ADLIBの数",
 		"DAN_CONDITION_NAME_BOMB": "叩けた爆弾",
 
-		// Heya / Quick Heya
-		"HEYA_PUCHI": "プチキャラ",
-		"HEYA_CHARA": "キャラクター",
-		"HEYA_DAN": "段位称号",
-		"HEYA_NAMEPLATE": "名札称号",
-		"HEYA_NAME": "名前",
-		"HEYA_NAME_INFO": "名前を入力してください（Enterで保存、Escで変更を破棄）：",
-
-		// {0}: Asset name
-		"HEYA_DESCRIPTION_NAME": "名前：{0}",
+		// Asset descriptions
 		// {0}: Asset rarity
 		"HEYA_DESCRIPTION_RARITY": "レア度：{0}",
 		"HEYA_DESCRIPTION_RARITY0": "駄作",
@@ -431,25 +422,6 @@
 		"HEYA_DESCRIPTION_RARITY6": "究極",
 		// {0}: Asset author
 		"HEYA_DESCRIPTION_AUTHOR": "作者：{0}",
-		// {0}: Gauge type
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE": "ゲージタイプ：{0}",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL": "ノーマル",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "ハード",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "激ムズ",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "クリアラインより上でプレーを終え、クリア成功になる！",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "ゲージは満タンから始まり、不可ごとに急激に落ちっていく！\nゲージが0になると失敗になる！",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "ゲージは満タンから始まり、不可ごとに急激に落ちっていく！\n不思議な力が曲を通してゲージの容量を消費していくようだ...",
-		// {0}: Percentage of mines
-		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "爆弾ファクター：掃海で音符の{0}%は爆弾になる",
-		// {0}: Percentage of fuse rolls
-		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "時爆弾ファクター：掃海でふうせんの{0}%は時爆弾になる",
-		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "すべての大音符が<c.#c800ff>スワップ</c>音符になる",
-		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c>音符が見えるようになる",
-		// {0}: # of auto-rolls per second
-		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "毎秒{0}打の自動<c.#ffff00>連打</c>",
-		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>分割</c><c.#0088ff>レーン</c>",
-		// {0}: Coin multiplier
-		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "コイン乗数：x{0}",
 
 		// Unlock requirements & messages (Any Menu)
 		"UNLOCK_CONDITION_INVALID": "[エラー] 無効な条件",

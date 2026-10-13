@@ -96,6 +96,9 @@
     "choice_yes": "Marché conclu",
     "choice_no": "Pas de marché"
   },
+  "backpack": {
+    "look": "Le sac à dos avec lequel j'ai emménagé ici ; le regarder me rappelle toujours des souvenirs"
+  },
   "pod": {
     "locked": "Vous appuyez sur le panneau de la capsule mystérieuse, mais il ne se passe rien."
   },

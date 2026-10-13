@@ -98,7 +98,6 @@ local function load_chara_config_defs(L --[[chara_config_loader]]) return { -- n
 	{ key = "chara_version", default = "", config = "Chara_Version", loader = L.string };
 	{ key = "resolution", default = VECTOR2:CreateVector2(1280, 720), config = "Chara_Resolution", loader = L.int_xy };
 	{ key = "legacy_mode", default = true, config = "Chara_LegacyMode", loader = L.bool };
-	{ key = "heya_render_offset", default = VECTOR2:CreateVector2(0, 0), config = "Heya_Chara_Render_Offset", loader = L.int_xy };
 
 	{ key = "menu_offset", default = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_MENU; v1_scale = 1.0; },
 		config = "Menu_Offset", loader = L.offset, v1_scale = "Menu_Chara_Scale" };
@@ -695,15 +694,6 @@ function getDrawSize(animationType)
 
 	if frame == nil then return 0, 0 end
 	return frame.Width * baseScale, frame.Height * baseScale
-end
-
--- Returns the heya render offset in theme pixels (already scaled to the current resolution).
--- Called by C# (CStageHeya) so the offset can be applied on the C# side.
-function getHeyaRenderOffset()
-	local theme_resolution = THEME:GetResolution()
-	local scaledX = chara_config.heya_render_offset.X * (theme_resolution.X / chara_config.resolution.X)
-	local scaledY = chara_config.heya_render_offset.Y * (theme_resolution.Y / chara_config.resolution.Y)
-	return scaledX, scaledY
 end
 
 -- Returns the AI battle base position (theme pixels) for the given 0-based player index

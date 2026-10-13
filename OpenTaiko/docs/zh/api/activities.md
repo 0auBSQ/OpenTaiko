@@ -54,14 +54,14 @@
 
 ### 角色
 
-角色的 Script.lua 定义另一组函数：loadAnimation、disposeAnimation、availableAnimation、setAnimationDuration、resetAnimationCounter、update、draw、getDrawSize、getHeyaRenderOffset、getAIBattlePosition、loadVoice、disposeVoice 和 playVoice。[添加角色](../guides/characters.md)对此有详细介绍。
+角色的 Script.lua 定义另一组函数：loadAnimation、disposeAnimation、availableAnimation、setAnimationDuration、resetAnimationCounter、update、draw、getDrawSize、getAIBattlePosition、loadVoice、disposeVoice 和 playVoice。[添加角色](../guides/characters.md)对此有详细介绍。
 
 ### Exit
 
 引擎只在舞台脚本中注册的函数；调用它即是请求引擎离开舞台。
 
 <div class="callout warn">
-仅在 Modules/Stages 脚本中可用；活动和只读活动由宿主驱动，不会获得它。接受 0 到 3 个参数，任意位置都可以是 nil。调用本身即是请求退出；自带舞台在 update 中写 `return Exit(...)`，以便该帧内不再运行其他内容。target 为 "title"、"play"、"stage" 或 "legacy"；nil 或任何其他值都表示 "title"。target 为 "stage" 时，name 是要跳转到的 Modules/Stages 模块；target 为 "legacy" 时，name 是 "heya"、"config"、"exit" 或 "onlinelounge" 之一（其他值都会进入标题界面）。transition 指定一个 Modules/Transitions 模块；如果你省略它或引擎找不到它，引擎会使用名为 "default" 的模块，如果皮肤完全没有过渡，则播放纯黑色淡出。
+仅在 Modules/Stages 脚本中可用；活动和只读活动由宿主驱动，不会获得它。接受 0 到 3 个参数，任意位置都可以是 nil。调用本身即是请求退出；自带舞台在 update 中写 `return Exit(...)`，以便该帧内不再运行其他内容。target 为 "title"、"play"、"stage" 或 "legacy"；nil 或任何其他值都表示 "title"。target 为 "stage" 时，name 是要跳转到的 Modules/Stages 模块；target 为 "legacy" 时，name 是 "heya"、"config"、"exit" 或 "onlinelounge" 之一（其他值都会进入标题界面）。transition 指定一个 Modules/Transitions 模块；如果你省略它或引擎找不到它，引擎会使用名为 "default" 的模块，如果皮肤完全没有过渡，则播放纯黑色淡出。"heya" 键作为别名保留：它会打开皮肤在 Modules/Stages 中的 `myroom` 模块，皮肤没有该模块时则进入标题界面。
 </div>
 
 | 方法 | 说明 |
@@ -212,7 +212,7 @@ end
 绘制一个界面背景、演奏图层、观众、过关动画或花球效果的 Script.lua，由引擎自身的界面承载。
 
 <div class="callout warn">
-背景位于 Modules 文件夹之外，在皮肤的 Graphics 文件夹下、其所装饰界面的目录中，例如 Graphics/0_Startup/Script.lua、Graphics/10_Heya/Script.lua、Graphics/6_Result/Script.lua、Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua、Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua、Graphics/5_Game/3_Mob/{variant}/Script.lua、Graphics/5_Game/9_End/{result}/Script.lua 和 Graphics/5_Game/11_Balloon/Kusudama/Script.lua。当一个文件夹包含多个变体时，引擎每次演奏随机挑选一个（或按谱面的场景预设挑选）。宿主界面创建背景实例（演奏背景在每次引擎进入游戏界面时创建）并随界面一起释放，因此演奏期间会同时存在多个实例。背景脚本获得与只读活动相同的全局对象（只读的 CONFIG、DATABASE 和 GetSaveFile；没有 ACTIVITY）。下面的事件钩子是可选的，引擎在对应事件发生时调用每个钩子一次。 对塔而言，谱面的 `TOWERTYPE` 指定 Down 文件夹。
+背景位于 Modules 文件夹之外，在皮肤的 Graphics 文件夹下、其所装饰界面的目录中，例如 Graphics/0_Startup/Script.lua、Graphics/6_Result/Script.lua、Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua、Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua、Graphics/5_Game/3_Mob/{variant}/Script.lua、Graphics/5_Game/9_End/{result}/Script.lua 和 Graphics/5_Game/11_Balloon/Kusudama/Script.lua。当一个文件夹包含多个变体时，引擎每次演奏随机挑选一个（或按谱面的场景预设挑选）。宿主界面创建背景实例（演奏背景在每次引擎进入游戏界面时创建）并随界面一起释放，因此演奏期间会同时存在多个实例。背景脚本获得与只读活动相同的全局对象（只读的 CONFIG、DATABASE 和 GetSaveFile；没有 ACTIVITY）。下面的事件钩子是可选的，引擎在对应事件发生时调用每个钩子一次。 对塔而言，谱面的 `TOWERTYPE` 指定 Down 文件夹。
 </div>
 
 | 方法 | 说明 |

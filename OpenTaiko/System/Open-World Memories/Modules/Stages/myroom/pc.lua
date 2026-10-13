@@ -5,8 +5,7 @@
 --   Characters — browse CHARACTERLIST (rarity + unlock state); select → LuaSaveFile:ChangeCharacter.
 --   Puchichara — same via PUCHICHARALIST / ChangePuchichara.
 --   Dan Titles — the earned dan ranks (ChangeDan), previewed with the REAL dan plate renderer
---                (NAMEPLATE:DrawDanPlate with the clear-status grade + the gold gradient text markup,
---                exactly how C# CStageHeya bakes its gallery).
+--                (NAMEPLATE:DrawDanPlate with the clear-status grade + the gold gradient text markup).
 --   Nameplates — NAMEPLATESLIST / ChangeNameplate with a DrawTitlePlate preview. Unowned MYTHICAL
 --                plates stay hidden and opaque conditions (ig/gt/gc) read "???".
 --   Rename     — a PopUI textbox (engine text input) → ChangeName.
@@ -88,8 +87,8 @@ local RARITY_ORDER = { Poor = 1, Common = 2, Uncommon = 3, Rare = 4, Epic = 5, L
 -- Rarity string → modal integer (matches HRarity.RarityToModalInt in C#)
 -- Poor=0, Common=0, Uncommon=1, Rare=2, Epic=3, Legendary=4, Mythical=4
 local RARITY_MODAL = { Poor = 0, Common = 0, Uncommon = 1, Rare = 2, Epic = 3, Legendary = 4, Mythical = 4 }
-local GOLD_MARKUP = "<g.#FFE34A.#EA9622>%s</g>"      -- the gold dan-title gradient (as C# Heya bakes it)
--- gallery text bakes 1:1 with C# CStageHeya (pfHeyaFont at Heya_Font_Scale default = 14):
+local GOLD_MARKUP = "<g.#FFE34A.#EA9622>%s</g>"      -- the gold dan-title gradient
+-- gallery text, at font size 14:
 --   title plates: Color.Black on Color.Transparent    dan rows: White (gold rows: Color.Gold) on Black
 local HEYA_FONT = 14
 local plateFg, plateBg, danFg, danGoldFg, danBg = nil, nil, nil, nil, nil
@@ -311,8 +310,7 @@ function ClippedMenu:update(ctx)
 end
 
 -- ── the MyRoom BGM with CROSSFADES (created lazily ONCE; disposed via PC.disposeBgm) ──────────────
--- stage-local copy (Sounds/bgm.ogg — the jukebox BGM tab plays the same file); the skin-level
--- Sounds/Heya/BGM.ogg stays for the C# CStageHeya room. Opening the computer fades this BGM IN
+-- stage-local copy (Sounds/bgm.ogg — the jukebox BGM tab plays the same file). Opening the computer fades this BGM IN
 -- (slightly delayed so the room's jukebox — ducked by Script via JB.setDuck — fades down first);
 -- closing fades it OUT and stops the stream at silence. Script pumps PC.tickBgmFade(dt) EVERY
 -- frame so the fade-out finishes after the screen has closed.
@@ -678,7 +676,7 @@ function PC:refreshDetail()
         d.rarity = e.Rarity
         uc = e.UnlockCondition
     elseif self.tab == 3 then
-        -- dan plate preview, baked 1:1 with C# CStageHeya's gallery (CStageHeya.cs:71-81):
+        -- dan plate preview:
         -- gold ranks: TitleTextureKey("<g...>title</g>", font14, Color.Gold, Color.Black, 1000)
         -- normal:     TitleTextureKey(title, font14, Color.White, Color.Black, 1000)
         d.danGrade = e.ClearStatus or 0
@@ -1023,7 +1021,7 @@ function PC:draw()
             elseif self.tab == 3 then
                 if d.plateTx then
                     pcall(function()
-                        -- the exact customize-screen call (CStageHeya's dan row → NamePlate.DrawDan):
+                        -- the dan row (NamePlate.DrawDan):
                         -- the skin's mode-1 handler shares the mode-2 geometry (Base.png 330x81 drawn
                         -- top-left at (x-180, y+5)) — pass the plate's centre point like the titles
                         NAMEPLATE:DrawDanPlate(math.floor(DETAIL_CX + 15),
@@ -1033,10 +1031,10 @@ function PC:draw()
             elseif self.tab == 4 then
                 if d.plateTx then
                     pcall(function()
-                        -- the exact customize-screen call (CStageHeya:429): the skin's mode-2
+                        -- the title plate: the skin's mode-2
                         -- handler draws Base.png (330x81) top-left at (x-180, y+5) and centres
                         -- the text itself — pass the plate's centre point, never hand-place by
-                        -- the text texture's height. Unowned plates use Heya's fallback args
+                        -- the text texture's height. Unowned plates use the fallback args
                         -- (type -1, rarity 1, id -1: base plate only, no type art / badges).
                         local px2 = math.floor(DETAIL_CX + 15)
                         local py2 = math.floor(boxTop + boxH / 2 - 46)

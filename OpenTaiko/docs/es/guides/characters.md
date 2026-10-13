@@ -73,7 +73,7 @@ Cuando la carpeta no tiene `Script.lua`, el juego renderiza el personaje con su 
 | Entry/Normal, Entry/Jump | `Title_Normal`, `Title_Entry` |
 | Result/Normal, Result/Clear, Result/Failed_In, Result/Failed | `Result_Normal`, `Result_Clear`, `Result_Failed_In`, `Result_Failed` |
 
-El script integrado lee dos imágenes fijas de la raíz de la carpeta: `Render.png` (el retrato a tamaño completo, dibujado siempre que el juego pide el tipo de animación Render, por ejemplo en la habitación) y `Preview.png` (la miniatura; cuando falta, el script usa `Normal/0.png`).
+El script integrado lee dos imágenes fijas de la raíz de la carpeta: `Render.png` (el retrato a tamaño completo, dibujado siempre que el juego pide el tipo de animación Render, por ejemplo en la pantalla de carga de una canción) y `Preview.png` (la miniatura; cuando falta, el script usa `Normal/0.png`).
 
 Los estados ausentes recurren a otro estado, así que un personaje puede incluir solo un subconjunto. La cadena de alternativas es: Clear -> Normal, Max -> Clear, Miss -> Normal, Miss_Down -> Miss, Gogo -> Normal, Gogo_Max -> Gogo, 10combo_Max -> 10combo, GoGoStart_Clear -> GoGoStart, GoGoStart_Max -> GoGoStart_Clear, los estados `_Tired` de Torre -> su estado normal, Tower/Fail -> Tower/Standing_Tired, Kusudama_Idle -> Normal, Menu/Wait -> Gogo, Menu/Start y Menu/Select y Entry/Jump -> 10combo, Menu/Normal y Entry/Normal y Result/Normal -> Normal, Result/Clear -> Clear, Result/Failed_In -> Miss_In, Result/Failed -> Miss. Los estados sin alternativa (por ejemplo Cleared, Failed, Return, los estados de globo) no dibujan nada cuando faltan. El mínimo para un personaje funcional es `Normal/0.png`.
 
@@ -100,7 +100,7 @@ Los estados ausentes recurren a otro estado, así que un personaje puede incluir
 - `Game_Chara_X=...` / `Game_Chara_Y=...`: posición durante el juego; el script usa el primer valor de cada lista. `Game_Chara_Offset=X,Y` es una forma alternativa.
 - `Game_Chara_X_AI=...` / `Game_Chara_Y_AI=...`: un valor por jugador para la batalla contra la IA. Cuando ambas claves están presentes reemplazan la posición de batalla contra la IA del skin para este personaje.
 - `Game_Chara_Balloon_X` / `Game_Chara_Balloon_Y`, `Game_Chara_Kusudama_X` / `Game_Chara_Kusudama_Y`: posiciones durante las secuencias de globo y kusudama (se usa el primer valor). `Game_Chara_Balloon_Offset`, `Game_Chara_Kusudama_Offset` y `Game_Chara_Tower_Offset` reciben un par `X,Y`.
-- `Menu_Offset=X,Y`, `Menu_Chara_Scale`, `Result_Offset=X,Y`, `Heya_Chara_Render_Offset=X,Y`: desplazamientos para el menú, los resultados y el render de la habitación.
+- `Menu_Offset=X,Y`, `Menu_Chara_Scale`, `Result_Offset=X,Y`: desplazamientos para el menú y los resultados.
 - `Game_Chara_Motion_<State>=0,1,2,...`: el orden en que se reproducen los fotogramas de un estado, como índices de fotograma desde 0. Cuando se omite, los fotogramas se reproducen en el orden de los archivos. Los nombres de estado siguen los nombres de carpeta, por ejemplo `Game_Chara_Motion_Normal`, `Game_Chara_Motion_GoGo`, `Game_Chara_Motion_Miss_Down`, `Game_Chara_Motion_Balloon_Broke`, `Game_Chara_Motion_Tower_Climbing`.
 - `Game_Chara_Beat_<State>=N`: cuántos pulsos abarca un bucle del estado, por ejemplo `Game_Chara_Beat_Normal=1`, `Game_Chara_Beat_GoGo=2`.
 - Los estados de menú, título y resultados usan `Menu_Chara_Motion_Loop/Wait/Start/Select`, `Title_Chara_Motion_Normal/Entry`, `Result_Chara_Motion_Normal/Clear/Failed_In/Failed`, con claves `_Beat_` correspondientes o duraciones fijas en milisegundos: `Chara_Menu_Loop_AnimationDuration`, `Chara_Menu_Wait_AnimationDuration`, `Chara_Menu_Start_AnimationDuration`, `Chara_Menu_Select_AnimationDuration`, `Chara_Normal_AnimationDuration`, `Chara_Entry_AnimationDuration`, `Chara_Result_Normal_AnimationDuration`, `Chara_Result_Clear_AnimationDuration`, `Chara_Result_Failed_In_AnimationDuration`, `Chara_Result_Failed_AnimationDuration`.
@@ -135,7 +135,7 @@ Cuando existe `Script.lua` en la carpeta del personaje, reemplaza por completo e
 - `update(delta, animationType, looping)` que devuelve `true` cuando una animación sin bucle ha terminado
 - `draw(animationType, x, y, scaleX, scaleY, opacity, color, contextType, anchor, clipW, clipH, clipX, clipY, rotation, blendMode, wrapMode, gradientMap)`
 - `getDrawSize(animationType)` que devuelve anchura y altura
-- `getHeyaRenderOffset()` que devuelve x e y; `getAIBattlePosition(player, charaScale)` que devuelve x e y, o `nil` para usar la posición del skin
+- `getAIBattlePosition(player, charaScale)` que devuelve x e y, o `nil` para usar la posición del skin
 - `loadVoice(voiceType)`, `disposeVoice(voiceType)`, `playVoice(voiceType)`
 
 Los tipos de animación son las cadenas que hay detrás de las constantes `CHARACTER.ANIM_*` (`"Game/Normal"`, `"Menu/Normal"`, ...), más los dos tipos especiales `CHARACTER.ANIM_PREVIEW` (miniatura) y `CHARACTER.ANIM_RENDER` (retrato completo). Los tipos de voz son las constantes `CHARACTER.VOICE_*`. La cadena de alternativas del Paso 3 también se aplica a los personajes con script: el juego consulta `availableAnimation` y recorre las alternativas hasta que una está disponible.

@@ -19,7 +19,7 @@ OpenTaiko tekent bijna elk scherm buiten de kerngameplay met Lua-scripts die in 
 | Gebied | Waar het staat | Wat het is |
 | --- | --- | --- |
 | Modules | De map `Modules/` van de skin | Stages (volledige schermen met eigen invoer, tekenwerk en status: een nummerselectie, een kamer, een verhaalscène), activities (subschermen en overlays zoals dialoogvensters en naamplaatjes) en transities (de fade- en laadschermen tussen stages). |
-| Achtergronden | De map `Graphics/` van de skin | Scripts die een scherm aankleden: het opstartscherm, de kamer, de gameplay-achtergrond en de mob, het resultatenscherm. |
+| Achtergronden | De map `Graphics/` van de skin | Scripts die een scherm aankleden: het opstartscherm, de gameplay-achtergrond en de mob, het resultatenscherm. |
 | Skins en thema's | `System/`, naast het spel | Een compleet visueel pakket dat een speler installeert en activeert, met de thema-instellingen die het in het optiescherm aanbiedt. |
 | Personages en puchichara's | `Global/Characters/` en `Global/PuchiChara/`, gedeeld door elke skin | De dansers en de kleine mascottes die tijdens het spelen reageren. |
 | Ontgrendelvoorwaarden voor charts | De nummermap, naast de chart | Een `Unlock.json` die een nummer vergrendeld houdt tot de speler het heeft verdiend. |

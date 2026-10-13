@@ -20,7 +20,6 @@ namespace OpenTaiko {
 		private NamedLuaFunction lfUpdate = new("update");
 		private NamedLuaFunction lfDraw = new("draw");
 		private NamedLuaFunction lfGetDrawSize = new("getDrawSize");
-		private NamedLuaFunction lfGetHeyaRenderOffset = new("getHeyaRenderOffset");
 		private NamedLuaFunction lfGetAIBattlePosition = new("getAIBattlePosition");
 
 		private NamedLuaFunction lfLoadVoice = new("loadVoice");
@@ -99,16 +98,6 @@ namespace OpenTaiko {
 			return null;
 		}
 
-		public (float x, float y) GetHeyaRenderOffset() {
-			object[] result = RunLuaCode(lfGetHeyaRenderOffset) ?? [];
-			if (result != null && result.Length >= 2) {
-				float x = result[0] is double dx ? (float)dx : 0f;
-				float y = result[1] is double dy ? (float)dy : 0f;
-				return (x, y);
-			}
-			return (0f, 0f);
-		}
-
 		public CLuaCharacterScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) : base(dir, texturesDir, soundsDir, false, DefaultScript) {
 			try {
 				lfLoadAnimation.Load(LuaScript);
@@ -120,7 +109,6 @@ namespace OpenTaiko {
 				lfUpdate.Load(LuaScript);
 				lfDraw.Load(LuaScript);
 				lfGetDrawSize.Load(LuaScript);
-				lfGetHeyaRenderOffset.Load(LuaScript);
 				lfGetAIBattlePosition.Load(LuaScript);
 
 				lfLoadVoice.Load(LuaScript);

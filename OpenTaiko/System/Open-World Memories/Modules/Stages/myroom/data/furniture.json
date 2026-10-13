@@ -1,5 +1,5 @@
 {
-  "_comment": "AUTHORITATIVE furniture catalog (room.lua builds Room.CATALOG from this; the Lua DEFAULTS are only an emergency fallback). Fields: w/h footprint cells, place ground|wall, name, collH/collW/collD collision, surface+surfaceH (stackables sit on top), stackOn (may ride a surface), computer/fixed/interact behavior flags, emissiveColor [r,g,b,scale] = the emissivePart's glow (default a dim warm white), model = GLB stem override (Models/<id>.glb is auto-used when present), screen {tex,emit} + accent [r,g,b] arcade variants (tex resolves via A.SCREEN), picture resolves via A.PICTURE, wallGlb {file,h,axis,flip} wall-mounted GLB metadata, legacyMirror mirrors into the v1 furniture array, shop = sold in the coin shop (3D thumbnail baked at onStart). New items: add an entry AND its id to _order plus a GLB in Models/ (a plain placeholder box renders until the model exists). Display names live in lang/<code>/furniture.json.",
+  "_comment": "AUTHORITATIVE furniture catalog (room.lua builds Room.CATALOG from this; the Lua DEFAULTS are only an emergency fallback). Fields: w/h footprint cells, place ground|wall, name, collH/collW/collD collision, surface+surfaceH (stackables sit on top), stackOn (may ride a surface), computer/fixed/interact behavior flags, emissiveColor [r,g,b,scale] = the emissivePart's glow (default a dim warm white), model = GLB stem override (Models/<id>.glb is auto-used when present), screen {tex,emit} + accent [r,g,b] arcade variants (tex resolves via A.SCREEN), picture resolves via A.PICTURE, wallGlb {file,h,axis,flip} wall-mounted GLB metadata, legacyMirror mirrors into the v1 furniture array, fit = the share of its footprint the model fills (0.92 when absent), shop = sold in the coin shop (3D thumbnail baked at onStart). New items: add an entry AND its id to _order plus a GLB in Models/ (a plain placeholder box renders until the model exists). Display names live in lang/<code>/furniture.json.",
   "_order": [
     "desk",
     "chair",
@@ -20,7 +20,8 @@
     "poster_bol",
     "phone",
     "placeholder_matrix",
-    "mirror"
+    "mirror",
+    "backpack"
   ],
   "desk": {
     "w": 2,
@@ -241,5 +242,16 @@
     "interact": "mirror",
     "shop": true,
     "iconYaw": 30
+  },
+  "backpack": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "collH": 0.55,
+    "collW": 0.6,
+    "collD": 0.45,
+    "fit": 0.6,
+    "stackOn": true,
+    "interact": "look"
   }
 }

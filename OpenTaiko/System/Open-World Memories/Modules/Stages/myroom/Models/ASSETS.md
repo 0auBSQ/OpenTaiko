@@ -22,6 +22,7 @@ Models taken from `Models/GLTF format/`.
 | table.glb | table.glb | Kenney Furniture Kit | Kenney | CC0 1.0 |
 | tv.glb | televisionModern.glb | Kenney Furniture Kit | Kenney | CC0 1.0 |
 | pod.glb | Scifi Pod | poly.pizza (Quaternius) | Quaternius | CC0 1.0 |
+| backpack.glb | Backpack (https://poly.pizza/m/vF7TuXCPDH) | poly.pizza (Quaternius) | Quaternius | CC0 1.0 |
 | mirror.glb | Mirror A.fbx | Anker's Assets — Low Poly Household Items Pack | Anker's Assets | CC0 1.0 |
 
 mirror.glb source pack: **Anker's Assets — Low Poly Household Items Pack**, license **CC0 1.0** (the asset license
@@ -29,6 +30,8 @@ stated on the pack page: Creative Commons Zero v1.0 Universal).
 Pack page: https://ankersassets.itch.io/low-poly-household-item-pack
 Downloaded from that page: `Low Poly Household Items.zip`; model taken from `Low Poly Furniture/Miscellaneous/Mirror A.fbx`,
 converted from FBX to binary glTF (turned to face -z, scaled, base on the floor).
+
+backpack.glb's pins use **Coin** by Quaternius (https://poly.pizza/m/7IrL01B97W, CC0 1.0) as their base.
 
 ## CC BY models
 

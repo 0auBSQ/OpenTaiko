@@ -409,8 +409,6 @@ internal class CSkin : IDisposable {
 	public CSystemSound bgmResult = null;
 	public CSystemSound bgmResultIn = null;
 
-	public CSystemSound SoundBanapas = null;
-
 	public CSystemSound soundTrainingPlaybackSound = null;
 	public CSystemSound soundTrainingStopSound = null;
 	public CSystemSound soundTrainingToggleBookmarkSFX = null;
@@ -428,7 +426,6 @@ internal class CSkin : IDisposable {
 	public CSystemSound soundDanSelectBGM = null;
 	public CSystemSound soundDanSongSelect = null;
 
-	public CSystemSound soundHeyaBGM = null;
 	public CSystemSound soundOnlineLoungeBGM = null;
 	public CSystemSound soundTowerSelectBGM = null;
 
@@ -741,7 +738,6 @@ internal class CSkin : IDisposable {
 		//this.bgm選曲画面 = new Cシステムサウンド(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Select BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
 		//this.soundSongSelectChara = new Cシステムサウンド(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongSelect Chara.ogg", false, false, false, ESoundGroup.SongPlayback);
 		this.soundSkip = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Skip.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.SoundBanapas = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Banapas.ogg", false, false, false, ESoundGroup.SoundEffect);
 		this.soundEntry = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Entry.ogg", true, false, false, ESoundGroup.Voice);
 		this.soundError = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Error.ogg", false, false, false, ESoundGroup.SoundEffect);
 		//this.soundsanka = new Cシステムサウンド(@$"Sounds{System.IO.Path.DirectorySeparatorChar}sanka.ogg", false, false, false, ESoundGroup.Voice);
@@ -790,7 +786,6 @@ internal class CSkin : IDisposable {
 		this.soundDanSelectBGM = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Dan{System.IO.Path.DirectorySeparatorChar}DanSelectBGM.ogg", true, false, false, ESoundGroup.SongPlayback);
 		this.soundDanSongSelect = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Dan{System.IO.Path.DirectorySeparatorChar}DanSongSelect.ogg", false, false, false, ESoundGroup.SoundEffect);
 
-		this.soundHeyaBGM = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Heya{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
 		this.soundOnlineLoungeBGM = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}OnlineLounge{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
 		this.soundTowerSelectBGM = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Tower{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
 
@@ -2075,20 +2070,6 @@ internal class CSkin : IDisposable {
 									string[] strSplit = strParam.Split(',');
 									for (int i = 0; i < 2; i++) {
 										SongSelect_Box_Chara_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NamePlate_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
-										SongSelect_NamePlate_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NamePlate_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
-										SongSelect_NamePlate_Y[i] = int.Parse(strSplit[i]);
 									}
 									break;
 								}
@@ -6829,112 +6810,6 @@ internal class CSkin : IDisposable {
 								}
 							#endregion
 
-							#region Heya
-							case "Heya_Main_Menu_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Math.Min(6, strSplit.Length); i++) {
-										Heya_Main_Menu_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_Main_Menu_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Math.Min(6, strSplit.Length); i++) {
-										Heya_Main_Menu_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_Main_Menu_Font_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Heya_Main_Menu_Font_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_Font_Scale": {
-									Heya_Font_Scale = int.Parse(strParam);
-									break;
-								}
-							case "Heya_Center_Menu_Box_Count": {
-									Heya_Center_Menu_Box_Count = int.Parse(strParam);
-									break;
-								}
-							case "Heya_Center_Menu_Box_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Heya_Center_Menu_Box_Count; i++) {
-										Heya_Center_Menu_Box_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_Center_Menu_Box_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Heya_Center_Menu_Box_Count; i++) {
-										Heya_Center_Menu_Box_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_Center_Menu_Box_Item_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Heya_Center_Menu_Box_Item_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_Center_Menu_Box_Name_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Heya_Center_Menu_Box_Name_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_Center_Menu_Box_Authors_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Heya_Center_Menu_Box_Authors_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_Side_Menu_Count": {
-									Heya_Side_Menu_Count = int.Parse(strParam);
-									break;
-								}
-							case "Heya_Side_Menu_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Heya_Side_Menu_Count; i++) {
-										Heya_Side_Menu_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_Side_Menu_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Heya_Side_Menu_Count; i++) {
-										Heya_Side_Menu_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_Side_Menu_Font_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Heya_Side_Menu_Font_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_InfoSection": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Heya_InfoSection[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_DescriptionTextOrigin": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Heya_DescriptionTextOrigin[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							#endregion
-
 							#region OnlineLounge
 							case "OnlineLounge_Side_Menu": {
 									string[] strSplit = strParam.Split(',');
@@ -7626,7 +7501,6 @@ internal class CSkin : IDisposable {
 	// Config
 
 	public int[][] Characters_Resolution;
-	public int[][] Characters_Heya_Render_Offset;
 	public bool[] Characters_UseResult1P;
 	public int[][] Characters_Menu_Offset;
 	public int[][] Characters_Result_Offset;
@@ -7879,8 +7753,6 @@ internal class CSkin : IDisposable {
 
 	public int SongSelect_BoxExplanation_Interval = 30;
 
-	public int[] SongSelect_NamePlate_X = new int[] { 36, 1020, 216, 840, 396 };
-	public int[] SongSelect_NamePlate_Y = new int[] { 615, 615, 561, 561, 615 };
 	public int[] SongSelect_Auto_X = new int[] { 60, 950 };
 	public int[] SongSelect_Auto_Y = new int[] { 650, 650 };
 	public int[] SongSelect_ModIcons_X = new int[] { 40, 1020, 220, 840, 400 };
@@ -8999,27 +8871,6 @@ internal class CSkin : IDisposable {
 	public int TowerResult_Font_TowerText = 28;
 	public int TowerResult_Font_TowerText48 = 48;
 	public int TowerResult_Font_TowerText72 = 72;
-
-	#endregion
-
-	#region Heya
-
-	public int[] Heya_Main_Menu_X = new int[] { 164, 164, 164, 164, 164, 164 };
-	public int[] Heya_Main_Menu_Y = new int[] { 26, 106, 186, 266, 346, 426 };
-	public int[] Heya_Main_Menu_Font_Offset = new int[] { 0, 14 };
-	public int Heya_Center_Menu_Box_Count = 11;
-	public int[] Heya_Center_Menu_Box_X = new int[] { -890, -588, -286, 16, 318, 620, 922, 1224, 1526, 1828, 2130 };
-	public int[] Heya_Center_Menu_Box_Y = new int[] { 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200 };
-	public int[] Heya_Center_Menu_Box_Item_Offset = new int[] { 0, 120 };
-	public int[] Heya_Center_Menu_Box_Name_Offset = new int[] { 0, 234 };
-	public int[] Heya_Center_Menu_Box_Authors_Offset = new int[] { 0, 260 };
-	public int Heya_Side_Menu_Count = 13;
-	public int[] Heya_Side_Menu_X = new int[] { 670, 680, 690, 700, 710, 720, 730, 720, 710, 700, 690, 680, 670 };
-	public int[] Heya_Side_Menu_Y = new int[] { -80, -10, 60, 130, 200, 270, 340, 410, 480, 550, 620, 690, 760 };
-	public int[] Heya_Side_Menu_Font_Offset = new int[] { 0, 14 };
-	public int[] Heya_InfoSection = new int[] { 620, 560 };
-	public int[] Heya_DescriptionTextOrigin = new int[] { 0, 0 };
-	public int Heya_Font_Scale = 14;
 
 	#endregion
 

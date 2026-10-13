@@ -97,6 +97,9 @@
     "choice_yes": "Deal",
     "choice_no": "No deal"
   },
+  "backpack": {
+    "look": "The backpack with which I moved here, looking at it always brings me memories"
+  },
   "pod": {
     "locked": "You press the panel on the Mysterious pod, but it does nothing."
   },

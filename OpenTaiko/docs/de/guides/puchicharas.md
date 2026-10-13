@@ -88,7 +88,7 @@ Lassen Sie die Datei bei einem rein kosmetischen Begleiter weg.
 
 ## Schritt 5 (optional): Welcome.ogg und Render.png hinzufügen
 
-- `Welcome.ogg`: ein Sprachclip, den das Spiel in der Lautstärkegruppe Stimme lädt. Der eingebaute Raum-Bildschirm des Spiels spielt ihn ab, wenn der Spieler den Puchichara auswählt; Lua-Stages können nicht darauf zugreifen, sodass ein Skin mit eigenem Raum-Bildschirm ihn nicht abspielt.
+- `Welcome.ogg`: ein Sprachclip, den das Spiel in der Lautstärkegruppe Stimme lädt. Derzeit spielt ihn kein Bildschirm ab; eine Lua-Stage kann ihn mit `puchi:PlayWelcome()` abspielen.
 - `Render.png`: ein Standbild in voller Größe, das Lua-Stages als Porträt zeichnen können (die `render`-Textur eines `PUCHICHARALIST`-Eintrags). Es ist ein einzelnes Bild beliebiger Größe. Keiner der mitgelieferten Puchicharas enthält eines.
 
 Beide Dateien sind optional.

@@ -352,7 +352,6 @@ end
 local function doExit()
     local m = menus[curIdx]
     if     m.via == "stage"       then return Exit("stage",  m.stage, (m.fastTrans and fastTransitions()) and m.fastTrans or m.trans)
-    elseif m.via == "heya"        then return Exit("legacy", "heya", m.trans)
     elseif m.via == "config"      then return Exit("legacy", "config", m.trans)
     elseif m.via == "exit"        then return Exit("legacy", "exit", m.trans)
     elseif m.via == "onlinelounge"then return Exit("legacy", "onlinelounge", m.trans)

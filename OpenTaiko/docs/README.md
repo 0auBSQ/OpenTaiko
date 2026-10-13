@@ -19,7 +19,7 @@ OpenTaiko draws almost every screen outside of core gameplay with Lua scripts th
 | Area | Where it lives | What it is |
 | --- | --- | --- |
 | Modules | The skin's `Modules/` folder | Stages (full screens with their own input, drawing and state: a song select, a room, a story scene), activities (sub-screens and overlays such as dialogs and nameplates) and transitions (the fade and loading screens between stages). |
-| Backgrounds | The skin's `Graphics/` folder | Scripts that decorate a screen: the startup screen, the room, the gameplay backdrop and mob, the results screen. |
+| Backgrounds | The skin's `Graphics/` folder | Scripts that decorate a screen: the startup screen, the gameplay backdrop and mob, the results screen. |
 | Skins and themes | `System/`, next to the game | A complete visual package a player installs and switches to, with the theme settings it exposes in the options screen. |
 | Characters and puchicharas | `Global/Characters/` and `Global/PuchiChara/`, shared by every skin | The dancers and the small mascots that react during play. |
 | Chart unlockables | The song folder, next to the chart | An `Unlock.json` that keeps a song locked until the player earns it. |

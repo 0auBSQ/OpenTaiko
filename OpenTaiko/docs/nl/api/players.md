@@ -378,6 +378,9 @@ PUCHICHARALIST en sf:GetPuchichara geven deze handles terug. De lijst is eigenaa
 | --- | --- |
 | `puchi.tx  -> texture` | Spritesheet geladen uit Chara.png. |
 | `puchi.render  -> texture` | Volledige render geladen uit Render.png. |
+| `puchi.HasWelcome  -> bool` | True wanneer de puchichara een Welcome.ogg-fragment heeft. |
+| `puchi:PlayWelcome()  -> nil` | Speelt het welkomstfragment af in de geluidsgroep Voice; zonder fragment gebeurt er niets. |
+| `puchi:StopWelcome()  -> nil` | Stopt het welkomstfragment. |
 | `puchi.Name  -> string` | Gelokaliseerde weergavenaam. |
 | `puchi.Author  -> string` | Gelokaliseerde auteursnaam. |
 | `puchi.Description  -> string` | Gelokaliseerde beschrijving; leeg wanneer de puchichara er geen heeft. |

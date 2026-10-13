@@ -54,14 +54,14 @@ The Transitions section below describes the timing of the phases.
 
 ### Characters
 
-A character's Script.lua defines a different set: loadAnimation, disposeAnimation, availableAnimation, setAnimationDuration, resetAnimationCounter, update, draw, getDrawSize, getHeyaRenderOffset, getAIBattlePosition, loadVoice, disposeVoice and playVoice. [Adding characters](../guides/characters.md) covers it.
+A character's Script.lua defines a different set: loadAnimation, disposeAnimation, availableAnimation, setAnimationDuration, resetAnimationCounter, update, draw, getDrawSize, getAIBattlePosition, loadVoice, disposeVoice and playVoice. [Adding characters](../guides/characters.md) covers it.
 
 ### Exit
 
 A function the engine registers only in Stage scripts; calling it asks the engine to leave the stage.
 
 <div class="callout warn">
-Available in Modules/Stages scripts only; their host drives Activities and ROActivities, which do not get it. Accepts 0 to 3 arguments and tolerates nil in any position. The call itself requests the exit; the bundled stages write `return Exit(...)` inside update so nothing else runs that frame. target is "title", "play", "stage" or "legacy"; nil or any other value means "title". When target is "stage", name is the Modules/Stages module to jump to; when target is "legacy", name is one of "heya", "config", "exit" or "onlinelounge" (any other value goes to the title). transition names a Modules/Transitions module; if you omit it or the engine cannot find it, the engine uses the module named "default", and if the skin has no transitions at all a plain black fade-out plays.
+Available in Modules/Stages scripts only; their host drives Activities and ROActivities, which do not get it. Accepts 0 to 3 arguments and tolerates nil in any position. The call itself requests the exit; the bundled stages write `return Exit(...)` inside update so nothing else runs that frame. target is "title", "play", "stage" or "legacy"; nil or any other value means "title". When target is "stage", name is the Modules/Stages module to jump to; when target is "legacy", name is one of "heya", "config", "exit" or "onlinelounge" (any other value goes to the title). transition names a Modules/Transitions module; if you omit it or the engine cannot find it, the engine uses the module named "default", and if the skin has no transitions at all a plain black fade-out plays. The "heya" key remains as an alias: it opens the skin's `myroom` module in Modules/Stages, or the title when the skin has none.
 </div>
 
 | Method | Description |
@@ -212,7 +212,7 @@ The engine looks up some ROActivities by fixed folder name and drives them itsel
 A Script.lua that draws one screen background, gameplay layer, mob, clear animation or kusudama effect, hosted by the engine's own screens.
 
 <div class="callout warn">
-Backgrounds live outside the Modules folder, under the skin's Graphics folder in the directory of the screen they decorate, for example Graphics/0_Startup/Script.lua, Graphics/10_Heya/Script.lua, Graphics/6_Result/Script.lua, Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua, Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua, Graphics/5_Game/3_Mob/{variant}/Script.lua, Graphics/5_Game/9_End/{result}/Script.lua and Graphics/5_Game/11_Balloon/Kusudama/Script.lua. Where a folder holds several variants, the engine picks one at random (or from the chart's scene preset) each play. The host screen creates a background instance (the gameplay backgrounds each time the engine enters the game screen) and disposes it with the screen, so several are live at once during gameplay. A background script receives the same globals as an ROActivity (read-only CONFIG, DATABASE and GetSaveFile; no ACTIVITY). The event hooks below are optional, and the engine calls each one once when its event happens. For the tower, the chart's `TOWERTYPE` names the Down folder.
+Backgrounds live outside the Modules folder, under the skin's Graphics folder in the directory of the screen they decorate, for example Graphics/0_Startup/Script.lua, Graphics/6_Result/Script.lua, Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua, Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua, Graphics/5_Game/3_Mob/{variant}/Script.lua, Graphics/5_Game/9_End/{result}/Script.lua and Graphics/5_Game/11_Balloon/Kusudama/Script.lua. Where a folder holds several variants, the engine picks one at random (or from the chart's scene preset) each play. The host screen creates a background instance (the gameplay backgrounds each time the engine enters the game screen) and disposes it with the screen, so several are live at once during gameplay. A background script receives the same globals as an ROActivity (read-only CONFIG, DATABASE and GetSaveFile; no ACTIVITY). The event hooks below are optional, and the engine calls each one once when its event happens. For the tower, the chart's `TOWERTYPE` names the Down folder.
 </div>
 
 | Method | Description |

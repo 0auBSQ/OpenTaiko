@@ -19,7 +19,7 @@ OpenTaiko dibuja casi todas las pantallas ajenas al juego principal con scripts 
 | Área | Dónde vive | Qué es |
 | --- | --- | --- |
 | Módulos | La carpeta `Modules/` del skin | Stages (pantallas completas con su propia entrada, dibujo y estado: una selección de canciones, una habitación, una escena de historia), activities (subpantallas y superposiciones como los diálogos y las placas de nombre) y transiciones (las pantallas de fundido y de carga entre stages). |
-| Fondos | La carpeta `Graphics/` del skin | Scripts que decoran una pantalla: la pantalla de arranque, la habitación, el fondo de juego y el mob, la pantalla de resultados. |
+| Fondos | La carpeta `Graphics/` del skin | Scripts que decoran una pantalla: la pantalla de arranque, el fondo de juego y el mob, la pantalla de resultados. |
 | Skins y temas | `System/`, junto al juego | Un paquete visual completo que un jugador instala y activa, con los ajustes de tema que expone en la pantalla de opciones. |
 | Personajes y puchicharas | `Global/Characters/` y `Global/PuchiChara/`, compartidas por todos los skins | Los bailarines y las pequeñas mascotas que reaccionan durante la partida. |
 | Desbloqueables de charts | La carpeta de la canción, junto al chart | Un `Unlock.json` que mantiene bloqueada una canción hasta que el jugador se la gana. |

@@ -73,7 +73,7 @@ Wanneer de map geen `Script.lua` heeft, rendert het spel het personage met zijn 
 | Entry/Normal, Entry/Jump | `Title_Normal`, `Title_Entry` |
 | Result/Normal, Result/Clear, Result/Failed_In, Result/Failed | `Result_Normal`, `Result_Clear`, `Result_Failed_In`, `Result_Failed` |
 
-Het ingebouwde script leest twee stilstaande afbeeldingen uit de hoofdmap: `Render.png` (het portret op volledige grootte, getekend waar het spel om het animatietype Render vraagt, bijvoorbeeld in de kamer) en `Preview.png` (de miniatuur; indien afwezig gebruikt het script `Normal/0.png`).
+Het ingebouwde script leest twee stilstaande afbeeldingen uit de hoofdmap: `Render.png` (het portret op volledige grootte, getekend waar het spel om het animatietype Render vraagt, bijvoorbeeld op het laadscherm van een nummer) en `Preview.png` (de miniatuur; indien afwezig gebruikt het script `Normal/0.png`).
 
 Ontbrekende statussen vallen terug op een andere status, zodat een personage een deelverzameling kan meeleveren. De terugvalketen is: Clear -> Normal, Max -> Clear, Miss -> Normal, Miss_Down -> Miss, Gogo -> Normal, Gogo_Max -> Gogo, 10combo_Max -> 10combo, GoGoStart_Clear -> GoGoStart, GoGoStart_Max -> GoGoStart_Clear, de Tower-`_Tired`-statussen -> hun normale status, Tower/Fail -> Tower/Standing_Tired, Kusudama_Idle -> Normal, Menu/Wait -> Gogo, Menu/Start en Menu/Select en Entry/Jump -> 10combo, Menu/Normal en Entry/Normal en Result/Normal -> Normal, Result/Clear -> Clear, Result/Failed_In -> Miss_In, Result/Failed -> Miss. Statussen zonder terugval (bijvoorbeeld Cleared, Failed, Return, de ballonstatussen) tekenen niets wanneer ze ontbreken. Het minimum voor een werkend personage is `Normal/0.png`.
 
@@ -100,7 +100,7 @@ Ontbrekende statussen vallen terug op een andere status, zodat een personage een
 - `Game_Chara_X=...` / `Game_Chara_Y=...`: gameplaypositie; het script gebruikt de eerste waarde van elke lijst. `Game_Chara_Offset=X,Y` is een alternatieve vorm.
 - `Game_Chara_X_AI=...` / `Game_Chara_Y_AI=...`: één waarde per speler voor het AI-gevecht. Wanneer beide sleutels aanwezig zijn, vervangen ze de AI-gevechtspositie van de skin voor dit personage.
 - `Game_Chara_Balloon_X` / `Game_Chara_Balloon_Y`, `Game_Chara_Kusudama_X` / `Game_Chara_Kusudama_Y`: posities tijdens ballon- en kusudama-sequenties (eerste waarde gebruikt). `Game_Chara_Balloon_Offset`, `Game_Chara_Kusudama_Offset` en `Game_Chara_Tower_Offset` nemen een `X,Y`-paar.
-- `Menu_Offset=X,Y`, `Menu_Chara_Scale`, `Result_Offset=X,Y`, `Heya_Chara_Render_Offset=X,Y`: offsets voor het menu, de resultaten en de kamerrender.
+- `Menu_Offset=X,Y`, `Menu_Chara_Scale`, `Result_Offset=X,Y`: offsets voor het menu en de resultaten.
 - `Game_Chara_Motion_<State>=0,1,2,...`: de volgorde waarin de frames van een status worden afgespeeld, als 0-gebaseerde frame-indices. Indien weggelaten worden de frames in bestandsvolgorde afgespeeld. Statusnamen volgen de mapnamen, bijvoorbeeld `Game_Chara_Motion_Normal`, `Game_Chara_Motion_GoGo`, `Game_Chara_Motion_Miss_Down`, `Game_Chara_Motion_Balloon_Broke`, `Game_Chara_Motion_Tower_Climbing`.
 - `Game_Chara_Beat_<State>=N`: hoeveel beats één lus van de status beslaat, bijvoorbeeld `Game_Chara_Beat_Normal=1`, `Game_Chara_Beat_GoGo=2`.
 - Menu-, titel- en resultaatstatussen gebruiken `Menu_Chara_Motion_Loop/Wait/Start/Select`, `Title_Chara_Motion_Normal/Entry`, `Result_Chara_Motion_Normal/Clear/Failed_In/Failed`, met bijpassende `_Beat_`-sleutels of vaste duren in milliseconden: `Chara_Menu_Loop_AnimationDuration`, `Chara_Menu_Wait_AnimationDuration`, `Chara_Menu_Start_AnimationDuration`, `Chara_Menu_Select_AnimationDuration`, `Chara_Normal_AnimationDuration`, `Chara_Entry_AnimationDuration`, `Chara_Result_Normal_AnimationDuration`, `Chara_Result_Clear_AnimationDuration`, `Chara_Result_Failed_In_AnimationDuration`, `Chara_Result_Failed_AnimationDuration`.
@@ -135,7 +135,7 @@ Wanneer `Script.lua` in de personagemap bestaat, vervangt het het ingebouwde scr
 - `update(delta, animationType, looping)` dat `true` teruggeeft wanneer een niet-herhalende animatie is afgelopen
 - `draw(animationType, x, y, scaleX, scaleY, opacity, color, contextType, anchor, clipW, clipH, clipX, clipY, rotation, blendMode, wrapMode, gradientMap)`
 - `getDrawSize(animationType)` dat breedte en hoogte teruggeeft
-- `getHeyaRenderOffset()` dat x en y teruggeeft; `getAIBattlePosition(player, charaScale)` dat x en y teruggeeft, of `nil` om de positie van de skin te gebruiken
+- `getAIBattlePosition(player, charaScale)` dat x en y teruggeeft, of `nil` om de positie van de skin te gebruiken
 - `loadVoice(voiceType)`, `disposeVoice(voiceType)`, `playVoice(voiceType)`
 
 Animatietypes zijn de strings achter de constanten `CHARACTER.ANIM_*` (`"Game/Normal"`, `"Menu/Normal"`, ...), plus de twee speciale types `CHARACTER.ANIM_PREVIEW` (miniatuur) en `CHARACTER.ANIM_RENDER` (volledig portret). Stemtypes zijn de constanten `CHARACTER.VOICE_*`. De terugvalketen uit Stap 3 geldt ook voor gescripte personages: het spel vraagt `availableAnimation` en doorloopt de alternatieven tot er een beschikbaar is.

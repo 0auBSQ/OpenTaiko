@@ -408,16 +408,7 @@
 		"DAN_CONDITION_NAME_ADLIB": "Aantal ADLIB",
 		"DAN_CONDITION_NAME_BOMB": "Geraakte bommen",
 
-		// Heya / Quick Heya
-		"HEYA_PUCHI": "Puchichara",
-		"HEYA_CHARA": "Karakter",
-		"HEYA_DAN": "Dan Titel",
-		"HEYA_NAMEPLATE": "Naambordje Titel",
-		"HEYA_NAME": "Naam",
-		"HEYA_NAME_INFO": "Typ je naam (Enter om op te slaan, Escape om wijzigingen te negeren):",
-
-		// {0}: Asset name
-		"HEYA_DESCRIPTION_NAME": "Naam: {0}",
+		// Asset descriptions
 		// {0}: Asset rarity
 		"HEYA_DESCRIPTION_RARITY": "Zeldzaamheid: {0}",
 		"HEYA_DESCRIPTION_RARITY0": "Matig",
@@ -429,25 +420,6 @@
 		"HEYA_DESCRIPTION_RARITY6": "Mythisch",
 		// {0}: Asset author
 		"HEYA_DESCRIPTION_AUTHOR": "Auteur: {0}",
-		// {0}: Gauge type
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE": "Metertype: {0}",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL": "Normaal",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "Moeilijk",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "Extreem",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "Eindig de speelbeurt binnen de clear-zone om het nummer te halen!",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "De meter begint vol en loopt bij elke misser flink leeg!\nPas op: als de meter op 0 komt, is de speelbeurt automatisch mislukt!",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "De meter begint vol en loopt bij elke misser flink leeg!\nEen vreemde kracht lijkt de foutmarge in de loop van het nummer te verkleinen...",
-		// {0}: Percentage of mines
-		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Bomfactor: {0}% van de noten omgezet in mijnen in Mijnenveger",
-		// {0}: Percentage of fuse rolls
-		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Lontfactor: {0}% van de ballonnen omgezet in lontrollen in Mijnenveger",
-		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "Alle grote noten worden <c.#c800ff>Wissel</c>-noten",
-		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c>-noten worden zichtbaar",
-		// {0}: # of auto-rolls per second
-		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "Automatische <c.#ffff00>Rollen</c> met {0} slagen/s",
-		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Gesplitste</c> <c.#0088ff>Banen</c>",
-		// {0}: Coin multiplier
-		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "Munten Vermenigvuldiger: x{0}",
 
 		// Unlock requirements & messages (Any Menu)
 		"UNLOCK_CONDITION_INVALID": "[ERROR] Onjuiste conditie.",

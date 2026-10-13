@@ -99,31 +99,6 @@ class PuchiChara : CActivity {
 		return base.Draw();
 	}
 
-	public void DrawPuchichara(int index, int x, int y, float scale = 1.0f, int alpha = 255, bool useSine = true) {
-		DrawPuchichara(index, x, y, Counter.CurrentValue % OpenTaiko.Skin.Game_PuchiChara[2], scale, alpha, useSine);
-	}
-	public void DrawPuchichara(int index, int x, int y, int sprite, float scale = 1.0f, int alpha = 255, bool useSine = true) {
-		if (OpenTaiko.Tx.Puchichara.Length <= index || index < 0) return;
-		if (OpenTaiko.Tx.Puchichara[index].tx == null) return;
-
-		CTexture puchi = OpenTaiko.Tx.Puchichara[index].tx;
-
-		puchi.vcScaleRatio = new(1);
-		puchi.vcScaleRatio.X *= scale;
-		puchi.vcScaleRatio.Y *= scale;
-		puchi.Opacity = alpha;
-
-		sineY = (double)SineCounterIdle.CurrentValue;
-		sineY = (Math.Sin(sineY * (Math.PI / 180)) * (OpenTaiko.Skin.Game_PuchiChara_Sine * OpenTaiko.Skin.Game_PuchiChara_Scale[0]));
-
-		puchi.t2DScaledCenterBasedDraw(x, y + (useSine ? (int)sineY : 0),
-			new((puchi.szTextureSize.Width / OpenTaiko.Skin.Game_PuchiChara[2]) * sprite, 0,
-			puchi.szTextureSize.Width / OpenTaiko.Skin.Game_PuchiChara[2], puchi.szTextureSize.Height));
-
-		puchi.vcScaleRatio = new(1);
-		puchi.Opacity = 255;
-	}
-
 	public double sineY;
 
 	public CCounter Counter;

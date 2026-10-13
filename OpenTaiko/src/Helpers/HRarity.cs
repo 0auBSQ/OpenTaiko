@@ -1,18 +1,6 @@
-﻿using Color = System.Drawing.Color;
-
-namespace OpenTaiko;
+﻿namespace OpenTaiko;
 
 internal class HRarity {
-	private static Dictionary<string, Color> RarityToColor = new Dictionary<string, Color> {
-		["Poor"] = Color.Gray,
-		["Common"] = Color.White,
-		["Uncommon"] = Color.Lime,
-		["Rare"] = Color.FromArgb(0xFF, 0x00, 0x88, 0xFF),
-		["Epic"] = Color.FromArgb(0xFF, 0xC8, 0x00, 0xFF),
-		["Legendary"] = Color.Orange,
-		["Mythical"] = Color.Pink,
-	};
-
 	private static Dictionary<string, int> RarityToModalInt = new Dictionary<string, int> {
 		["Poor"] = 0,
 		["Common"] = 0,
@@ -42,17 +30,6 @@ internal class HRarity {
 		["Legendary"] = 1f,
 		["Mythical"] = 1f,
 	};
-
-	public static Color tRarityToColor(string rarity) {
-
-		Color textColor = Color.White;
-
-		if (RarityToColor.ContainsKey(rarity))
-			textColor = RarityToColor[rarity];
-
-		return textColor;
-
-	}
 
 	public static int tRarityToModalInt(string rarity) {
 		int modalInt = 0;

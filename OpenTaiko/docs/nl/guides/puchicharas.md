@@ -88,7 +88,7 @@ Laat het bestand weg voor een puur cosmetische metgezel.
 
 ## Stap 5 (optioneel): Voeg Welcome.ogg en Render.png toe
 
-- `Welcome.ogg`: een stemfragment dat het spel in de geluidsgroep Voice laadt. Het ingebouwde kamerscherm van het spel speelt het af wanneer de speler de puchichara selecteert; Lua-stages kunnen er niet bij, dus een skin met een eigen kamerscherm speelt het niet af.
+- `Welcome.ogg`: een stemfragment dat het spel in de geluidsgroep Voice laadt. Op dit moment speelt geen enkel scherm het af; een Lua-stage kan het afspelen met `puchi:PlayWelcome()`.
 - `Render.png`: een stilstaande afbeelding op volledige grootte die Lua-stages als portret kunnen tekenen (de `render`-textuur van een `PUCHICHARALIST`-item). Het is één enkele afbeelding van willekeurige grootte. Geen van de meegeleverde puchichara's bevat er een.
 
 Beide bestanden zijn optioneel.

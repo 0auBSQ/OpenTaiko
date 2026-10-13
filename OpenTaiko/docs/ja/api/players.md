@@ -378,6 +378,9 @@ PUCHICHARALIST と sf:GetPuchichara がこのハンドルを返します。テ�
 | --- | --- |
 | `puchi.tx  -> texture` | Chara.png から読み込まれたスプライトシート。 |
 | `puchi.render  -> texture` | Render.png から読み込まれた全身のレンダー。 |
+| `puchi.HasWelcome  -> bool` | ぷちキャラに Welcome.ogg のクリップがあるとき true。 |
+| `puchi:PlayWelcome()  -> nil` | ウェルカムクリップをボイス音量グループで再生します。クリップがなければ何もしません。 |
+| `puchi:StopWelcome()  -> nil` | ウェルカムクリップを停止します。 |
 | `puchi.Name  -> string` | ローカライズされた表示名。 |
 | `puchi.Author  -> string` | ローカライズされた作者名。 |
 | `puchi.Description  -> string` | ローカライズされた説明。ぷちキャラに説明がなければ空文字列。 |

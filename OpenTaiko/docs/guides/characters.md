@@ -73,7 +73,7 @@ When the folder has no `Script.lua`, the game renders the character with its bui
 | Entry/Normal, Entry/Jump | `Title_Normal`, `Title_Entry` |
 | Result/Normal, Result/Clear, Result/Failed_In, Result/Failed | `Result_Normal`, `Result_Clear`, `Result_Failed_In`, `Result_Failed` |
 
-The built-in script reads two still images from the folder root: `Render.png` (the full-size portrait, drawn wherever the game asks for the Render animation type, for example in the room) and `Preview.png` (the thumbnail; when absent, the script uses `Normal/0.png`).
+The built-in script reads two still images from the folder root: `Render.png` (the full-size portrait, drawn wherever the game asks for the Render animation type, for example on the song loading screen) and `Preview.png` (the thumbnail; when absent, the script uses `Normal/0.png`).
 
 Missing states fall back to another state, so a character can ship a subset. The fallback chain is: Clear -> Normal, Max -> Clear, Miss -> Normal, Miss_Down -> Miss, Gogo -> Normal, Gogo_Max -> Gogo, 10combo_Max -> 10combo, GoGoStart_Clear -> GoGoStart, GoGoStart_Max -> GoGoStart_Clear, the Tower `_Tired` states -> their normal state, Tower/Fail -> Tower/Standing_Tired, Kusudama_Idle -> Normal, Menu/Wait -> Gogo, Menu/Start and Menu/Select and Entry/Jump -> 10combo, Menu/Normal and Entry/Normal and Result/Normal -> Normal, Result/Clear -> Clear, Result/Failed_In -> Miss_In, Result/Failed -> Miss. States without a fallback (for example Cleared, Failed, Return, the balloon states) draw nothing when absent. The minimum for a working character is `Normal/0.png`.
 
@@ -100,7 +100,7 @@ Missing states fall back to another state, so a character can ship a subset. The
 - `Game_Chara_X=...` / `Game_Chara_Y=...`: gameplay position; the script uses the first value of each list. `Game_Chara_Offset=X,Y` is an alternative form.
 - `Game_Chara_X_AI=...` / `Game_Chara_Y_AI=...`: one value per player for AI battle. When both keys are present they replace the skin's AI-battle position for this character.
 - `Game_Chara_Balloon_X` / `Game_Chara_Balloon_Y`, `Game_Chara_Kusudama_X` / `Game_Chara_Kusudama_Y`: positions during balloon and kusudama sequences (first value used). `Game_Chara_Balloon_Offset`, `Game_Chara_Kusudama_Offset` and `Game_Chara_Tower_Offset` take an `X,Y` pair.
-- `Menu_Offset=X,Y`, `Menu_Chara_Scale`, `Result_Offset=X,Y`, `Heya_Chara_Render_Offset=X,Y`: offsets for the menu, results and room render.
+- `Menu_Offset=X,Y`, `Menu_Chara_Scale`, `Result_Offset=X,Y`: offsets for the menu and results.
 - `Game_Chara_Motion_<State>=0,1,2,...`: the order in which frames play for a state, as 0-based frame indices. When omitted the frames play in file order. State names follow the folder names, for example `Game_Chara_Motion_Normal`, `Game_Chara_Motion_GoGo`, `Game_Chara_Motion_Miss_Down`, `Game_Chara_Motion_Balloon_Broke`, `Game_Chara_Motion_Tower_Climbing`.
 - `Game_Chara_Beat_<State>=N`: how many beats one loop of the state spans, for example `Game_Chara_Beat_Normal=1`, `Game_Chara_Beat_GoGo=2`.
 - Menu, title and result states use `Menu_Chara_Motion_Loop/Wait/Start/Select`, `Title_Chara_Motion_Normal/Entry`, `Result_Chara_Motion_Normal/Clear/Failed_In/Failed`, with matching `_Beat_` keys or fixed durations in milliseconds: `Chara_Menu_Loop_AnimationDuration`, `Chara_Menu_Wait_AnimationDuration`, `Chara_Menu_Start_AnimationDuration`, `Chara_Menu_Select_AnimationDuration`, `Chara_Normal_AnimationDuration`, `Chara_Entry_AnimationDuration`, `Chara_Result_Normal_AnimationDuration`, `Chara_Result_Clear_AnimationDuration`, `Chara_Result_Failed_In_AnimationDuration`, `Chara_Result_Failed_AnimationDuration`.
@@ -135,7 +135,7 @@ When `Script.lua` exists in the character folder it replaces the built-in script
 - `update(delta, animationType, looping)` returning `true` when a non-looping animation has finished
 - `draw(animationType, x, y, scaleX, scaleY, opacity, color, contextType, anchor, clipW, clipH, clipX, clipY, rotation, blendMode, wrapMode, gradientMap)`
 - `getDrawSize(animationType)` returning width and height
-- `getHeyaRenderOffset()` returning x and y; `getAIBattlePosition(player, charaScale)` returning x and y, or `nil` to use the skin's position
+- `getAIBattlePosition(player, charaScale)` returning x and y, or `nil` to use the skin's position
 - `loadVoice(voiceType)`, `disposeVoice(voiceType)`, `playVoice(voiceType)`
 
 Animation types are the strings behind the `CHARACTER.ANIM_*` constants (`"Game/Normal"`, `"Menu/Normal"`, ...), plus the two special types `CHARACTER.ANIM_PREVIEW` (thumbnail) and `CHARACTER.ANIM_RENDER` (full portrait). Voice types are the `CHARACTER.VOICE_*` constants. The fallback chain from Step 3 applies to scripted characters too: the game asks `availableAnimation` and walks the alternatives until one is available.

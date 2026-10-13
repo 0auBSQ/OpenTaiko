@@ -19,7 +19,7 @@ OpenTaiko zeichnet fast jeden Bildschirm außerhalb des eigentlichen Spielgesche
 | Bereich | Wo es liegt | Was es ist |
 | --- | --- | --- |
 | Module | Der Ordner `Modules/` des Skins | Stages (vollständige Bildschirme mit eigener Eingabe, eigenem Zeichnen und eigenem Zustand: eine Songauswahl, ein Raum, eine Story-Szene), Activities (Unterbildschirme und Overlays wie Dialoge und Namensschilder) und Übergänge (die Überblendungen und Ladebildschirme zwischen Stages). |
-| Hintergründe | Der Ordner `Graphics/` des Skins | Skripte, die einen Bildschirm dekorieren: den Startbildschirm, den Raum, den Gameplay-Hintergrund und den Mob, den Ergebnisbildschirm. |
+| Hintergründe | Der Ordner `Graphics/` des Skins | Skripte, die einen Bildschirm dekorieren: den Startbildschirm, den Gameplay-Hintergrund und den Mob, den Ergebnisbildschirm. |
 | Skins und Themes | `System/`, neben dem Spiel | Ein vollständiges visuelles Paket, das ein Spieler installiert und auswählt, mit den Theme-Einstellungen, die es im Optionsbildschirm bereitstellt. |
 | Charaktere und Puchicharas | `Global/Characters/` und `Global/PuchiChara/`, von allen Skins gemeinsam genutzt | Die Tänzer und die kleinen Maskottchen, die während des Spiels reagieren. |
 | Chart-Freischaltungen | Der Songordner, neben dem Chart | Eine `Unlock.json`, die einen Song gesperrt hält, bis der Spieler ihn sich verdient hat. |

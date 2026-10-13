@@ -105,7 +105,7 @@ end
 
 -- items every room gets: brand-new rooms have them placed (starter_room.json), saved rooms receive them
 -- once through applyGifts
-M.GIFTS = { mirror = 1 }
+M.GIFTS = { mirror = 1, backpack = 1 }
 
 -- the gift ledger of a brand-new room: everything already given
 function M.allGifts()

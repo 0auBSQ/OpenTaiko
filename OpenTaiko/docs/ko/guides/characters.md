@@ -73,7 +73,7 @@
 | Entry/Normal, Entry/Jump | `Title_Normal`, `Title_Entry` |
 | Result/Normal, Result/Clear, Result/Failed_In, Result/Failed | `Result_Normal`, `Result_Clear`, `Result_Failed_In`, `Result_Failed` |
 
-내장 스크립트는 폴더 루트에서 정지 이미지 두 개를 읽습니다. `Render.png`(전체 크기 초상화. 예를 들어 방에서처럼 게임이 Render 애니메이션 타입을 요청하는 곳에 그려짐)와 `Preview.png`(썸네일. 없으면 스크립트가 `Normal/0.png`를 사용함)입니다.
+내장 스크립트는 폴더 루트에서 정지 이미지 두 개를 읽습니다. `Render.png`(전체 크기 초상화. 예를 들어 곡 로딩 화면에서처럼 게임이 Render 애니메이션 타입을 요청하는 곳에 그려짐)와 `Preview.png`(썸네일. 없으면 스크립트가 `Normal/0.png`를 사용함)입니다.
 
 없는 상태는 다른 상태로 대체되므로 캐릭터는 일부만 제공해도 됩니다. 대체 체인은 다음과 같습니다: Clear -> Normal, Max -> Clear, Miss -> Normal, Miss_Down -> Miss, Gogo -> Normal, Gogo_Max -> Gogo, 10combo_Max -> 10combo, GoGoStart_Clear -> GoGoStart, GoGoStart_Max -> GoGoStart_Clear, Tower `_Tired` 상태 -> 해당 일반 상태, Tower/Fail -> Tower/Standing_Tired, Kusudama_Idle -> Normal, Menu/Wait -> Gogo, Menu/Start와 Menu/Select와 Entry/Jump -> 10combo, Menu/Normal과 Entry/Normal과 Result/Normal -> Normal, Result/Clear -> Clear, Result/Failed_In -> Miss_In, Result/Failed -> Miss. 대체가 없는 상태(예: Cleared, Failed, Return, 풍선 상태)는 없으면 아무것도 그리지 않습니다. 동작하는 캐릭터의 최소 조건은 `Normal/0.png`입니다.
 
@@ -100,7 +100,7 @@
 - `Game_Chara_X=...` / `Game_Chara_Y=...`: 게임플레이 위치. 스크립트는 각 목록의 첫 값을 사용합니다. `Game_Chara_Offset=X,Y`는 대안 형식입니다.
 - `Game_Chara_X_AI=...` / `Game_Chara_Y_AI=...`: AI 배틀용 플레이어별 값 하나. 두 키가 모두 있으면 이 캐릭터에 대해 스킨의 AI 배틀 위치를 대체합니다.
 - `Game_Chara_Balloon_X` / `Game_Chara_Balloon_Y`, `Game_Chara_Kusudama_X` / `Game_Chara_Kusudama_Y`: 풍선과 쿠스다마 시퀀스 동안의 위치(첫 값 사용). `Game_Chara_Balloon_Offset`, `Game_Chara_Kusudama_Offset`, `Game_Chara_Tower_Offset`은 `X,Y` 쌍을 받습니다.
-- `Menu_Offset=X,Y`, `Menu_Chara_Scale`, `Result_Offset=X,Y`, `Heya_Chara_Render_Offset=X,Y`: 메뉴, 결과, 방 렌더의 오프셋.
+- `Menu_Offset=X,Y`, `Menu_Chara_Scale`, `Result_Offset=X,Y`: 메뉴와 결과의 오프셋.
 - `Game_Chara_Motion_<State>=0,1,2,...`: 상태의 프레임 재생 순서를 0부터 시작하는 프레임 인덱스로. 생략하면 프레임이 파일 순서로 재생됩니다. 상태 이름은 폴더 이름을 따릅니다. 예: `Game_Chara_Motion_Normal`, `Game_Chara_Motion_GoGo`, `Game_Chara_Motion_Miss_Down`, `Game_Chara_Motion_Balloon_Broke`, `Game_Chara_Motion_Tower_Climbing`.
 - `Game_Chara_Beat_<State>=N`: 상태의 한 루프가 차지하는 박자 수. 예: `Game_Chara_Beat_Normal=1`, `Game_Chara_Beat_GoGo=2`.
 - 메뉴, 타이틀, 결과 상태는 `Menu_Chara_Motion_Loop/Wait/Start/Select`, `Title_Chara_Motion_Normal/Entry`, `Result_Chara_Motion_Normal/Clear/Failed_In/Failed`를 사용하며, 대응하는 `_Beat_` 키 또는 밀리초 단위 고정 길이를 씁니다: `Chara_Menu_Loop_AnimationDuration`, `Chara_Menu_Wait_AnimationDuration`, `Chara_Menu_Start_AnimationDuration`, `Chara_Menu_Select_AnimationDuration`, `Chara_Normal_AnimationDuration`, `Chara_Entry_AnimationDuration`, `Chara_Result_Normal_AnimationDuration`, `Chara_Result_Clear_AnimationDuration`, `Chara_Result_Failed_In_AnimationDuration`, `Chara_Result_Failed_AnimationDuration`.
@@ -135,7 +135,7 @@ Game_Chara_Beat_GoGo=2
 - 루프하지 않는 애니메이션이 끝났을 때 `true`를 반환하는 `update(delta, animationType, looping)`
 - `draw(animationType, x, y, scaleX, scaleY, opacity, color, contextType, anchor, clipW, clipH, clipX, clipY, rotation, blendMode, wrapMode, gradientMap)`
 - 너비와 높이를 반환하는 `getDrawSize(animationType)`
-- x와 y를 반환하는 `getHeyaRenderOffset()`; x와 y를 반환하거나 스킨의 위치를 쓰려면 `nil`을 반환하는 `getAIBattlePosition(player, charaScale)`
+- x와 y를 반환하거나 스킨의 위치를 쓰려면 `nil`을 반환하는 `getAIBattlePosition(player, charaScale)`
 - `loadVoice(voiceType)`, `disposeVoice(voiceType)`, `playVoice(voiceType)`
 
 애니메이션 타입은 `CHARACTER.ANIM_*` 상수 뒤의 문자열(`"Game/Normal"`, `"Menu/Normal"`, ...)과 두 특수 타입 `CHARACTER.ANIM_PREVIEW`(썸네일), `CHARACTER.ANIM_RENDER`(전체 초상화)입니다. 음성 타입은 `CHARACTER.VOICE_*` 상수입니다. 3단계의 대체 체인은 스크립트 캐릭터에도 적용됩니다. 게임은 `availableAnimation`에 묻고 사용 가능한 것이 나올 때까지 대안을 순회합니다.

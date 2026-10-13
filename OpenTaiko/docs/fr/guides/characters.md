@@ -73,7 +73,7 @@ Quand le dossier n'a pas de `Script.lua`, le jeu rend le personnage avec son scr
 | Entry/Normal, Entry/Jump | `Title_Normal`, `Title_Entry` |
 | Result/Normal, Result/Clear, Result/Failed_In, Result/Failed | `Result_Normal`, `Result_Clear`, `Result_Failed_In`, `Result_Failed` |
 
-Le script intégré lit deux images fixes à la racine du dossier : `Render.png` (le portrait en taille réelle, dessiné partout où le jeu demande le type d'animation Render, par exemple dans la chambre) et `Preview.png` (la vignette ; en son absence, le script utilise `Normal/0.png`).
+Le script intégré lit deux images fixes à la racine du dossier : `Render.png` (le portrait en taille réelle, dessiné partout où le jeu demande le type d'animation Render, par exemple sur l'écran de chargement d'une chanson) et `Preview.png` (la vignette ; en son absence, le script utilise `Normal/0.png`).
 
 Les états manquants retombent sur un autre état, si bien qu'un personnage peut n'en fournir qu'un sous-ensemble. La chaîne de repli est : Clear -> Normal, Max -> Clear, Miss -> Normal, Miss_Down -> Miss, Gogo -> Normal, Gogo_Max -> Gogo, 10combo_Max -> 10combo, GoGoStart_Clear -> GoGoStart, GoGoStart_Max -> GoGoStart_Clear, les états Tower `_Tired` -> leur état normal, Tower/Fail -> Tower/Standing_Tired, Kusudama_Idle -> Normal, Menu/Wait -> Gogo, Menu/Start et Menu/Select et Entry/Jump -> 10combo, Menu/Normal et Entry/Normal et Result/Normal -> Normal, Result/Clear -> Clear, Result/Failed_In -> Miss_In, Result/Failed -> Miss. Les états sans repli (par exemple Cleared, Failed, Return, les états de ballon) ne dessinent rien quand ils sont absents. Le minimum pour un personnage fonctionnel est `Normal/0.png`.
 
@@ -100,7 +100,7 @@ Les états manquants retombent sur un autre état, si bien qu'un personnage peut
 - `Game_Chara_X=...` / `Game_Chara_Y=...` : position en jeu ; le script utilise la première valeur de chaque liste. `Game_Chara_Offset=X,Y` est une forme alternative.
 - `Game_Chara_X_AI=...` / `Game_Chara_Y_AI=...` : une valeur par joueur pour la bataille contre l'IA. Quand les deux clés sont présentes, elles remplacent la position de bataille contre l'IA du skin pour ce personnage.
 - `Game_Chara_Balloon_X` / `Game_Chara_Balloon_Y`, `Game_Chara_Kusudama_X` / `Game_Chara_Kusudama_Y` : positions pendant les séquences de ballon et de kusudama (première valeur utilisée). `Game_Chara_Balloon_Offset`, `Game_Chara_Kusudama_Offset` et `Game_Chara_Tower_Offset` prennent une paire `X,Y`.
-- `Menu_Offset=X,Y`, `Menu_Chara_Scale`, `Result_Offset=X,Y`, `Heya_Chara_Render_Offset=X,Y` : décalages pour le menu, les résultats et le rendu dans la chambre.
+- `Menu_Offset=X,Y`, `Menu_Chara_Scale`, `Result_Offset=X,Y` : décalages pour le menu et les résultats.
 - `Game_Chara_Motion_<State>=0,1,2,...` : l'ordre de lecture des frames d'un état, sous forme d'indices de frame à partir de 0. Quand elle est omise, les frames sont lues dans l'ordre des fichiers. Les noms d'état suivent les noms de dossier, par exemple `Game_Chara_Motion_Normal`, `Game_Chara_Motion_GoGo`, `Game_Chara_Motion_Miss_Down`, `Game_Chara_Motion_Balloon_Broke`, `Game_Chara_Motion_Tower_Climbing`.
 - `Game_Chara_Beat_<State>=N` : le nombre de temps que couvre une boucle de l'état, par exemple `Game_Chara_Beat_Normal=1`, `Game_Chara_Beat_GoGo=2`.
 - Les états de menu, de titre et de résultats utilisent `Menu_Chara_Motion_Loop/Wait/Start/Select`, `Title_Chara_Motion_Normal/Entry`, `Result_Chara_Motion_Normal/Clear/Failed_In/Failed`, avec les clés `_Beat_` correspondantes ou des durées fixes en millisecondes : `Chara_Menu_Loop_AnimationDuration`, `Chara_Menu_Wait_AnimationDuration`, `Chara_Menu_Start_AnimationDuration`, `Chara_Menu_Select_AnimationDuration`, `Chara_Normal_AnimationDuration`, `Chara_Entry_AnimationDuration`, `Chara_Result_Normal_AnimationDuration`, `Chara_Result_Clear_AnimationDuration`, `Chara_Result_Failed_In_AnimationDuration`, `Chara_Result_Failed_AnimationDuration`.
@@ -135,7 +135,7 @@ Quand `Script.lua` existe dans le dossier du personnage, il remplace entièremen
 - `update(delta, animationType, looping)` renvoyant `true` quand une animation non bouclée est terminée
 - `draw(animationType, x, y, scaleX, scaleY, opacity, color, contextType, anchor, clipW, clipH, clipX, clipY, rotation, blendMode, wrapMode, gradientMap)`
 - `getDrawSize(animationType)` renvoyant la largeur et la hauteur
-- `getHeyaRenderOffset()` renvoyant x et y ; `getAIBattlePosition(player, charaScale)` renvoyant x et y, ou `nil` pour utiliser la position du skin
+- `getAIBattlePosition(player, charaScale)` renvoyant x et y, ou `nil` pour utiliser la position du skin
 - `loadVoice(voiceType)`, `disposeVoice(voiceType)`, `playVoice(voiceType)`
 
 Les types d'animation sont les chaînes derrière les constantes `CHARACTER.ANIM_*` (`"Game/Normal"`, `"Menu/Normal"`, ...), plus les deux types spéciaux `CHARACTER.ANIM_PREVIEW` (vignette) et `CHARACTER.ANIM_RENDER` (portrait complet). Les types de voix sont les constantes `CHARACTER.VOICE_*`. La chaîne de repli de l'étape 3 s'applique aussi aux personnages scriptés : le jeu interroge `availableAnimation` et parcourt les alternatives jusqu'à en trouver une disponible.

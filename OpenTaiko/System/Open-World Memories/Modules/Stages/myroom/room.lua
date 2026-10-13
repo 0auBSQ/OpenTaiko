@@ -192,6 +192,7 @@ local function buildCatalogFromJson()
                 end
             end
             e.iconYaw = jnum(jget(node, "iconYaw"))      -- the icon's camera yaw, for a model that faces another way
+            e.fit = jnum(jget(node, "fit"))              -- the share of its footprint the model fills (0.92 when absent)
             local pic = jget(node, "picture")
             if pic and A.PICTURE[pic] then e.picture = A.PICTURE[pic] end
             local wg = jget(node, "wallGlb")
@@ -868,7 +869,8 @@ function Room.modelFit(model, cat)
         local mnx, mny, mnz, mxx, mxy, mxz = model:GetBounds()
         local sx, sy, sz = mxx - mnx, mxy - mny, mxz - mnz
         if sx < 0.01 or sz < 0.01 then return nil end
-        local sc = math.min(0.92 * cat.w / sx, 0.92 * cat.h / sz)
+        local fill = cat.fit or 0.92
+        local sc = math.min(fill * cat.w / sx, fill * cat.h / sz)
         if sy * sc > 2.4 then sc = 2.4 / sy end
         if sc > 2.5 then sc = 2.5 end
         return sc, sy * sc

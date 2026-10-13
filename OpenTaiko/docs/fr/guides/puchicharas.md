@@ -88,7 +88,7 @@ Omettez le fichier pour un compagnon purement cosmétique.
 
 ## Étape 5 (facultatif) : Ajouter Welcome.ogg et Render.png
 
-- `Welcome.ogg` : un extrait vocal que le jeu charge dans le groupe de sons Voix. L'écran de la chambre intégré au jeu le joue quand le joueur sélectionne le puchichara ; les stages Lua ne peuvent pas y accéder, si bien qu'un skin doté de son propre écran de chambre ne le joue pas.
+- `Welcome.ogg` : un extrait vocal que le jeu charge dans le groupe de sons Voix. Aucun écran ne le joue pour l'instant ; un stage Lua peut le jouer avec `puchi:PlayWelcome()`.
 - `Render.png` : une image fixe en taille réelle que les stages Lua peuvent dessiner comme portrait (la texture `render` d'une entrée de `PUCHICHARALIST`). C'est une image unique de taille quelconque. Aucun des puchicharas fournis n'en inclut.
 
 Les deux fichiers sont facultatifs.

@@ -378,6 +378,9 @@ PUCHICHARALIST and sf:GetPuchichara return these handles. The list owns the text
 | --- | --- |
 | `puchi.tx  -> texture` | Sprite sheet loaded from Chara.png. |
 | `puchi.render  -> texture` | Full render loaded from Render.png. |
+| `puchi.HasWelcome  -> bool` | True when the puchichara has a Welcome.ogg clip. |
+| `puchi:PlayWelcome()  -> nil` | Plays the welcome clip in the Voice sound group; does nothing without one. |
+| `puchi:StopWelcome()  -> nil` | Stops the welcome clip. |
 | `puchi.Name  -> string` | Localized display name. |
 | `puchi.Author  -> string` | Localized author name. |
 | `puchi.Description  -> string` | Localized description; empty when the puchichara has none. |

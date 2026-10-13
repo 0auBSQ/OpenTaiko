@@ -378,6 +378,9 @@ PUCHICHARALIST y sf:GetPuchichara devuelven estos handles. La lista es propietar
 | --- | --- |
 | `puchi.tx  -> texture` | Hoja de sprites cargada desde Chara.png. |
 | `puchi.render  -> texture` | Render completo cargado desde Render.png. |
+| `puchi.HasWelcome  -> bool` | True cuando el puchichara tiene un clip Welcome.ogg. |
+| `puchi:PlayWelcome()  -> nil` | Reproduce el clip de bienvenida en el grupo de sonido Voice; sin clip no hace nada. |
+| `puchi:StopWelcome()  -> nil` | Detiene el clip de bienvenida. |
 | `puchi.Name  -> string` | Nombre de visualización localizado. |
 | `puchi.Author  -> string` | Nombre de autor localizado. |
 | `puchi.Description  -> string` | Descripción localizada; vacía cuando el puchichara no tiene. |

@@ -3,7 +3,8 @@
   "furniture": [
     { "id": "desk", "c": 3, "r": 1, "facing": 0 },
     { "id": "computer", "c": 3, "r": 1, "facing": 2, "on": true },
-    { "id": "mirror", "c": 0, "r": 1, "facing": 0 }
+    { "id": "mirror", "c": 0, "r": 1, "facing": 0 },
+    { "id": "backpack", "c": 2, "r": 1, "facing": 0 }
   ],
   "wallItems": [
     { "id": "phone", "c": -1, "r": 3, "mount": "low" }

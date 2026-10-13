@@ -80,16 +80,6 @@ internal class SaveFile {
 		DBSaves.AlterCoinsAndTotalPlayCount(data.SaveId, amount, 1);
 	}
 
-	// Return false if the current amount of coins is to low
-	public bool tSpendCoins(int amount) {
-		if (data.Medals < amount)
-			return false;
-
-		data.Medals -= amount;
-		DBSaves.AlterCoinsAndTotalPlayCount(data.SaveId, -amount, 0);
-		return true;
-	}
-
 	public void tRegisterAIBattleModePlay(bool IsWon) {
 		data.AIBattleModePlaycount++;
 		if (IsWon) data.AIBattleModeWins++;

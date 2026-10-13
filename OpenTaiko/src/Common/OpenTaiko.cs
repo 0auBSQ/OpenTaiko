@@ -216,11 +216,6 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
-	public static CStageHeya stageHeya {
-		get;
-		private set;
-	}
-
 	public static CStageOnlineLounge stageOnlineLounge {
 		get;
 		private set;
@@ -760,7 +755,6 @@ internal class OpenTaiko : Game {
 					case CStage.EStage.Config:
 					case CStage.EStage.SongSelect:
 					case CStage.EStage.SongLoading:
-					case CStage.EStage.Heya:
 					case CStage.EStage.CUSTOM:
 						if (EnumSongs != null) {
 							#region [ Start the thread for song enumaration ]
@@ -876,22 +870,6 @@ internal class OpenTaiko : Game {
 							return;
 						}
 						//-----------------------------
-						#endregion
-						break;
-
-					case CStage.EStage.Heya:
-						#region [ *** ]
-						switch (this.nDrawLoopReturnValue) {
-							case (int)EReturnValue.BackToTitle:
-								#region [ *** ]
-								//-----------------------------
-								UnmountAndChangeLuaStageOrError("_title", "Title", CSystemError.Errno.ENO_TITLENOTFOUND);
-
-								this.tExecuteGarbageCollection();
-								break;
-								//-----------------------------
-								#endregion
-						}
 						#endregion
 						break;
 
@@ -1104,10 +1082,6 @@ internal class OpenTaiko : Game {
 							case (int)EReturnValue.JumpToLuaStage: // Transition to another Lua Stage
 								UnmountAndChangeLuaStageOrError(LuaStageWrapper.GetNextRequestedStageName());
 								this.tExecuteGarbageCollection();
-								break;
-
-							case (int)EReturnValue.HEYA:
-								UnmountAndChangeStage(stageHeya, "Taiko Heya");
 								break;
 
 							case (int)EReturnValue.ONLINELOUNGE:
@@ -1762,7 +1736,6 @@ internal class OpenTaiko : Game {
 		stageStartup = new CStageStartup();
 		stageConfig = new CStageConfig();
 		SongMount = new CSongMount();
-		stageHeya = new CStageHeya();
 		stageOnlineLounge = new CStageOnlineLounge();
 		stageCutScene = new CStageCutScene();
 		stageSongLoading = new CStageSongLoading();
@@ -1777,7 +1750,6 @@ internal class OpenTaiko : Game {
 		this.listTopLevelActivities.Add(actTextConsole);
 		this.listTopLevelActivities.Add(stageStartup);
 		this.listTopLevelActivities.Add(stageConfig);
-		this.listTopLevelActivities.Add(stageHeya);
 		this.listTopLevelActivities.Add(stageOnlineLounge);
 		this.listTopLevelActivities.Add(stageSongLoading);
 		this.listTopLevelActivities.Add(stageGameScreen);

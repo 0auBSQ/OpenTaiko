@@ -14,6 +14,7 @@
   "prompt_pod": "[Enter] 調べる",
   "prompt_matrix": "[Enter] プレースホルダー・マトリクスを使う",
   "prompt_mirror": "[Enter] 鏡を見る",
+  "prompt_look": "[Enter] 見る",
   "prompt_exit": "[Enter] 部屋を出る",
   "prompt_switch": "[Tab] フォーカス切り替え",
   "player_entry": "プレイヤー%d — %s",

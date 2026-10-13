@@ -54,14 +54,14 @@
 
 ### キャラクター
 
-キャラクターの Script.lua は別のセットを定義します: loadAnimation、disposeAnimation、availableAnimation、setAnimationDuration、resetAnimationCounter、update、draw、getDrawSize、getHeyaRenderOffset、getAIBattlePosition、loadVoice、disposeVoice、playVoice。[キャラクターの追加](../guides/characters.md)で扱います。
+キャラクターの Script.lua は別のセットを定義します: loadAnimation、disposeAnimation、availableAnimation、setAnimationDuration、resetAnimationCounter、update、draw、getDrawSize、getAIBattlePosition、loadVoice、disposeVoice、playVoice。[キャラクターの追加](../guides/characters.md)で扱います。
 
 ### Exit
 
 エンジンがステージスクリプトにのみ登録する関数で、呼び出すとエンジンにステージを離れるよう要求します。
 
 <div class="callout warn">
-Modules/Stages のスクリプトでのみ利用できます。アクティビティと ROActivity はホストが駆動するため、これを持ちません。0 から 3 個の引数を受け付け、どの位置の nil も許容します。呼び出すこと自体が退出の要求になります。同梱ステージは、そのフレーム内で他に何も実行されないよう update の中で `return Exit(...)` と書いています。target は "title"、"play"、"stage"、"legacy" のいずれかで、nil やその他の値は "title" を意味します。target が "stage" のとき、name は移動先の Modules/Stages モジュールです。target が "legacy" のとき、name は "heya"、"config"、"exit"、"onlinelounge" のいずれかです (それ以外の値はタイトルへ移動します)。transition は Modules/Transitions モジュールの名前です。省略するかエンジンが見つけられない場合、エンジンは "default" という名前のモジュールを使い、スキンにトランジションがまったくない場合は単純な黒のフェードアウトが再生されます。
+Modules/Stages のスクリプトでのみ利用できます。アクティビティと ROActivity はホストが駆動するため、これを持ちません。0 から 3 個の引数を受け付け、どの位置の nil も許容します。呼び出すこと自体が退出の要求になります。同梱ステージは、そのフレーム内で他に何も実行されないよう update の中で `return Exit(...)` と書いています。target は "title"、"play"、"stage"、"legacy" のいずれかで、nil やその他の値は "title" を意味します。target が "stage" のとき、name は移動先の Modules/Stages モジュールです。target が "legacy" のとき、name は "heya"、"config"、"exit"、"onlinelounge" のいずれかです (それ以外の値はタイトルへ移動します)。transition は Modules/Transitions モジュールの名前です。省略するかエンジンが見つけられない場合、エンジンは "default" という名前のモジュールを使い、スキンにトランジションがまったくない場合は単純な黒のフェードアウトが再生されます。"heya" キーはエイリアスとして残っています。Modules/Stages にあるスキンの `myroom` モジュールを開き、スキンにそのモジュールがない場合はタイトルへ移動します。
 </div>
 
 | メソッド | 説明 |
@@ -212,7 +212,7 @@ end
 エンジン自身の画面にホストされ、画面背景、ゲームプレイのレイヤー、モブ、クリアアニメーション、くす玉エフェクトのいずれか 1 つを描画する Script.lua です。
 
 <div class="callout warn">
-バックグラウンドは Modules フォルダの外、スキンの Graphics フォルダの下の、装飾する画面のディレクトリに置かれます。例えば Graphics/0_Startup/Script.lua、Graphics/10_Heya/Script.lua、Graphics/6_Result/Script.lua、Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua、Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua、Graphics/5_Game/3_Mob/{variant}/Script.lua、Graphics/5_Game/9_End/{result}/Script.lua、Graphics/5_Game/11_Balloon/Kusudama/Script.lua です。フォルダが複数のバリアントを持つ場合、エンジンはプレイごとにランダムに (または譜面のシーンプリセットから) 1 つを選びます。ホスト画面がバックグラウンドのインスタンスを作成し (ゲームプレイのバックグラウンドはエンジンがゲーム画面に入るたびに)、画面とともに破棄するため、ゲームプレイ中は複数が同時に生存します。バックグラウンドスクリプトは ROActivity と同じグローバルを受け取ります (読み取り専用の CONFIG、DATABASE、GetSaveFile。ACTIVITY はなし)。以下のイベントフックは任意で、エンジンはそれぞれをイベントが発生したときに 1 回呼びます。 塔では、譜面の `TOWERTYPE` が Down フォルダを指定します。
+バックグラウンドは Modules フォルダの外、スキンの Graphics フォルダの下の、装飾する画面のディレクトリに置かれます。例えば Graphics/0_Startup/Script.lua、Graphics/6_Result/Script.lua、Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua、Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua、Graphics/5_Game/3_Mob/{variant}/Script.lua、Graphics/5_Game/9_End/{result}/Script.lua、Graphics/5_Game/11_Balloon/Kusudama/Script.lua です。フォルダが複数のバリアントを持つ場合、エンジンはプレイごとにランダムに (または譜面のシーンプリセットから) 1 つを選びます。ホスト画面がバックグラウンドのインスタンスを作成し (ゲームプレイのバックグラウンドはエンジンがゲーム画面に入るたびに)、画面とともに破棄するため、ゲームプレイ中は複数が同時に生存します。バックグラウンドスクリプトは ROActivity と同じグローバルを受け取ります (読み取り専用の CONFIG、DATABASE、GetSaveFile。ACTIVITY はなし)。以下のイベントフックは任意で、エンジンはそれぞれをイベントが発生したときに 1 回呼びます。 塔では、譜面の `TOWERTYPE` が Down フォルダを指定します。
 </div>
 
 | メソッド | 説明 |

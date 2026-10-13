@@ -80,9 +80,17 @@
 			base.ChildActivities.Add(this.actFOtoTitle = new CActFIFOBlack());
 		}
 
+		// "heya" opens the skin's "myroom" stage, or the title when the skin has none
+		private static EReturnValue _MyRoomOrTitle() {
+			if (GetLuaStage("myroom") == null)
+				return EReturnValue.BackToTitle;
+			_nextRequestedStage = "myroom";
+			return EReturnValue.JumpToLuaStage;
+		}
+
 		private EReturnValue _StringToLegacyValue(string rv) {
 			return rv switch {
-				"heya" => EReturnValue.HEYA,
+				"heya" => _MyRoomOrTitle(),
 				"config" => EReturnValue.CONFIG,
 				"exit" => EReturnValue.EXIT,
 				"onlinelounge" => EReturnValue.ONLINELOUNGE,

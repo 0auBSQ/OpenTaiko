@@ -358,6 +358,8 @@ local function interactablesInRange()
                         seen[it] = true; list[#list + 1] = { kind = "matrix", it = it, key = "matrix:" .. tostring(it) }
                     elseif cat.interact == "mirror" then
                         seen[it] = true; list[#list + 1] = { kind = "mirror", it = it, key = "mirror:" .. tostring(it) }
+                    elseif cat.interact == "look" then
+                        seen[it] = true; list[#list + 1] = { kind = "look", it = it, key = "look:" .. tostring(it) }
                     end
                 end
             end
@@ -1096,6 +1098,14 @@ function update(ts)
             SHARED:GetSharedSound("Decide"):Play()
             MR.open()
             mode = "mirror"
+        elseif focused.kind == "look" then
+            -- a keepsake: looking at it says its line (dialogs.json, <item id>.look)
+            local line = dlgLoc(focused.it.id, "look", nil)
+            if line ~= nil then
+                SHARED:GetSharedSound("Decide"):Play()
+                mode = "dialogue"; phoneFlow = nil
+                dlg:start({ { name = "", text = line } })
+            end
         end
     end
     if msgT > 0 then msgT = msgT - dt end
@@ -1198,6 +1208,7 @@ function draw()
         elseif prompt == "pod" then instr[#instr + 1] = { t = HUD:tr("prompt_pod"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "matrix" then instr[#instr + 1] = { t = HUD:tr("prompt_matrix"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "mirror" then instr[#instr + 1] = { t = HUD:tr("prompt_mirror"), c = { 150, 230, 255 }, s = 24 }
+        elseif prompt == "look" then instr[#instr + 1] = { t = HUD:tr("prompt_look"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "exit" then instr[#instr + 1] = { t = HUD:tr("prompt_exit"), c = { 255, 230, 150 }, s = 24 }
         end
         if interCount > 1 then instr[#instr + 1] = { t = HUD:tr("prompt_switch"), c = { 200, 220, 240 }, s = 18 } end
