@@ -354,18 +354,62 @@ public abstract partial class Game : IDisposable {
 		SetClassLongPtr(hwnd, -14 /* GCLP_HICON */, hIcon);
 	}
 
-	private RawImage? GetIconData(string fileName) {
+	// Every picture of the icon file, one per size, so the window takes the one made for the size it
+	// shows (title bar, task bar) and no other gets shrunk into it.
+	private RawImage[] GetIconData(string fileName) {
+		var icons = new List<RawImage>();
 		try {
 			string path = Path.IsPathRooted(fileName) ? fileName : Path.Combine(AppContext.BaseDirectory, fileName);
-			using var src = SKBitmap.Decode(path);
-			if (src == null) return null;
-			using var rgba = src.Copy(SKColorType.Rgba8888);
-			if (rgba == null) return null;
-			return new RawImage(rgba.Width, rgba.Height, rgba.Bytes);
+			byte[] file = File.ReadAllBytes(path);
+			if (file.Length > 6 && file[0] == 0 && file[1] == 0 && file[2] == 1 && file[3] == 0) {
+				int count = BitConverter.ToUInt16(file, 4);
+				for (int i = 0; i < count; i++) {
+					int entry = 6 + i * 16;
+					if (entry + 16 > file.Length) break;
+					int size = BitConverter.ToInt32(file, entry + 8), offset = BitConverter.ToInt32(file, entry + 12);
+					if (size <= 0 || offset < 0 || (long)offset + size > file.Length) continue;
+					if (AddIconBitmap(icons, file, offset, size)) continue;
+					using var one = SKBitmap.Decode(new ReadOnlySpan<byte>(file, offset, size));
+					AddIcon(icons, one);
+				}
+			}
+			if (icons.Count == 0) {
+				using var whole = SKBitmap.Decode(file);
+				AddIcon(icons, whole);
+			}
 		} catch (Exception ex) {
 			Trace.TraceWarning($"[GetIconData] {ex.Message}");
-			return null;
 		}
+		// largest first: a windowing backend that takes one picture only takes the first
+		icons.Sort((x, y) => y.Width.CompareTo(x.Width));
+		return icons.ToArray();
+	}
+
+	// an entry stored the classic way: a 32-bit bitmap with no file header, bottom row first, blue first
+	private static bool AddIconBitmap(List<RawImage> icons, byte[] file, int offset, int size) {
+		if (size < 40 || BitConverter.ToInt32(file, offset) != 40) return false;
+		int w = BitConverter.ToInt32(file, offset + 4), h = BitConverter.ToInt32(file, offset + 8) / 2;
+		if (BitConverter.ToInt16(file, offset + 14) != 32 || BitConverter.ToInt32(file, offset + 16) != 0) return false;
+		if (w <= 0 || h <= 0 || w > 1024 || h > 1024 || 40L + (long)w * h * 4 > size) return false;
+		var rgba = new byte[w * h * 4];
+		for (int y = 0; y < h; y++) {
+			int from = offset + 40 + (h - 1 - y) * w * 4, to = y * w * 4;
+			for (int x = 0; x < w; x++, from += 4, to += 4) {
+				rgba[to] = file[from + 2]; rgba[to + 1] = file[from + 1]; rgba[to + 2] = file[from]; rgba[to + 3] = file[from + 3];
+			}
+		}
+		icons.Add(new RawImage(w, h, rgba));
+		return true;
+	}
+
+	// the window wants colours that are not multiplied by their opacity
+	private static void AddIcon(List<RawImage> icons, SKBitmap? src) {
+		if (src == null || src.Width <= 0 || src.Height <= 0) return;
+		var info = new SKImageInfo(src.Width, src.Height, SKColorType.Rgba8888, SKAlphaType.Unpremul);
+		using var rgba = new SKBitmap(info);
+		using var pixels = src.PeekPixels();
+		if (pixels == null || !pixels.ReadPixels(info, rgba.GetPixels(), rgba.RowBytes)) return;
+		icons.Add(new RawImage(rgba.Width, rgba.Height, rgba.Bytes));
 	}
 
 	/// <summary>
@@ -711,9 +755,9 @@ public abstract partial class Game : IDisposable {
 	public void Window_Load() {
 		// a hidden run stays hidden whatever the windowing backend applied after creating the window
 		if (StartHidden && Window_.IsVisible) Window_.IsVisible = false;
-		var icon = GetIconData(strIconFileName);
-		if (icon.HasValue) {
-			Window_.SetWindowIcon(new ReadOnlySpan<RawImage>(icon.Value));
+		var icons = GetIconData(strIconFileName);
+		if (icons.Length > 0) {
+			Window_.SetWindowIcon(new ReadOnlySpan<RawImage>(icons));
 			if (OperatingSystem.IsWindows() && Window_.Native?.Win32 is { } w && w.Hwnd != 0)
 				SyncTaskbarIcon(w.Hwnd);
 		}

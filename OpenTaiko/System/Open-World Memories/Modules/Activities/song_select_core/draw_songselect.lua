@@ -53,6 +53,10 @@ local BACKDROP_DX        = CFG.num("song_list.backdrop_offset_x", 0)
 local BACKDROP_COLOR     = CFG.numList("song_list.backdrop_color", { 88, 88, 96 })
 local BACKDROP_ALPHA     = CFG.num("song_list.backdrop_alpha", 150)
 local BACKDROP_FADE      = CFG.num("song_list.backdrop_fade", 36)
+-- "normal" lays the colour over the background at that alpha; "screen" lightens the background by the
+-- colour times the alpha, and never darkens it; "multi" multiplies the background by the colour, the
+-- alpha saying how far (255 = the colour itself), and never lightens it
+local BACKDROP_BLEND     = CFG.str("song_list.backdrop_blend", "normal")
 -- Easy / Normal / Hard levels from which the tag plays its checker animation (bar_levelbgchecker<diff>.png)
 local SONGBAR_CHECKER_LEVEL       = {
     [0] = CFG.num("song_list.checker_level_easy", 6),
@@ -373,7 +377,8 @@ end
 
 -- ── The song list backdrop: a translucent grey band behind the bars, along their diagonal ──
 -- Baked once as a screen-high canvas: every row is the band shifted by the bars' slope (offset_x per
--- offset_y), so its edges are the list's own diagonal; the edges fade over BACKDROP_FADE px in 4 px steps.
+-- offset_y), so its edges are the list's own diagonal; the edges fade over BACKDROP_FADE px in 4 px steps
+-- (0 = a clean hard edge).
 local backdrop = nil           -- { canvas, x0 }: x0 = the canvas' screen x before the panel shift
 local function drawListBackdrop(opacity)
     if backdrop == nil then
@@ -382,17 +387,38 @@ local function drawListBackdrop(opacity)
         local span = math.ceil(H * slope)
         local cv = CANVAS:CreateCanvas(W + span + 2, H)
         cv:ClearTransparent()
-        local fade = math.max(4, math.min(math.floor(BACKDROP_FADE), math.floor(W / 4)))
+        local fade = math.max(0, math.min(math.floor(BACKDROP_FADE), math.floor(W / 4)))
         local step = 4
         local cr, cg, cb = BACKDROP_COLOR[1] or 0, BACKDROP_COLOR[2] or 0, BACKDROP_COLOR[3] or 0
+        -- a screen blend reads the colour alone: the alpha goes into the colour, on solid pixels
+        local screen = BACKDROP_BLEND == "screen"
+        -- a multiply reads the colour times the alpha, next to the alpha
+        local multi = BACKDROP_BLEND == "multi"
+        local function fill(x, y, w, a)
+            if screen or multi then
+                local k = a / 255
+                cv:FillRect(x, y, w, 1, math.floor(cr * k + 0.5), math.floor(cg * k + 0.5), math.floor(cb * k + 0.5), multi and a or 255)
+            else
+                cv:FillRect(x, y, w, 1, cr, cg, cb, a)
+            end
+        end
         for y = 0, H - 1 do
+            if fade == 0 then
+                -- a hard edge: the pixel each edge crosses is filled by the share the band covers
+                local xf = y * slope
+                local x = math.floor(xf)
+                local part = xf - x
+                fill(x, y, 1, math.floor(BACKDROP_ALPHA * (1 - part) + 0.5))
+                fill(x + 1, y, W - 1, BACKDROP_ALPHA)
+                fill(x + W, y, 1, math.floor(BACKDROP_ALPHA * part + 0.5))
+            end
             local x = math.floor(y * slope + 0.5)
-            cv:FillRect(x + fade, y, W - 2 * fade, 1, cr, cg, cb, BACKDROP_ALPHA)
+            if fade > 0 then fill(x + fade, y, W - 2 * fade, BACKDROP_ALPHA) end
             for f = 0, fade - 1, step do
                 local a = math.floor(BACKDROP_ALPHA * (f + step) / (fade + step) + 0.5)
                 local wdt = math.min(step, fade - f)
-                cv:FillRect(x + f, y, wdt, 1, cr, cg, cb, a)
-                cv:FillRect(x + W - f - wdt, y, wdt, 1, cr, cg, cb, a)
+                fill(x + f, y, wdt, a)
+                fill(x + W - f - wdt, y, wdt, a)
             end
         end
         cv:Upload()
@@ -400,6 +426,16 @@ local function drawListBackdrop(opacity)
         backdrop = { canvas = cv, x0 = SONGLIST_ORIGIN_X + BACKDROP_DX - SONGLIST_ORIGIN_Y * slope - W / 2 }
     end
     local cv = backdrop.canvas
+    if BACKDROP_BLEND == "screen" or BACKDROP_BLEND == "multi" then
+        cv:SetBlendMode(BACKDROP_BLEND)
+        cv:SetColor(opacity, opacity, opacity)
+        if BACKDROP_BLEND == "multi" then cv:SetOpacity(opacity) end
+        cv:Draw(math.floor(backdrop.x0 - G.songSelectShift + 0.5), 0)
+        cv:SetOpacity(1)
+        cv:SetColor(1, 1, 1)
+        cv:SetBlendMode("normal")
+        return
+    end
     cv:SetOpacity(opacity)
     cv:Draw(math.floor(backdrop.x0 - G.songSelectShift + 0.5), 0)
     cv:SetOpacity(1)
