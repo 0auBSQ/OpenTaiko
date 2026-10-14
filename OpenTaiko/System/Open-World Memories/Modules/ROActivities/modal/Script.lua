@@ -2,13 +2,16 @@
 -- Modal ROActivity — the unlock and reward pop-ups. Activated by the engine after a result screen
 -- (one modal per queued reward) and by Lua stages (shops, the vault) with the same signature:
 --
---   activate(player1to, rarity, type, info, secondary)
+--   activate(player1to, rarity, type, info, secondary, picture, header)
 --     type 0 coins:      info = amount, secondary = the balance after the reward; a negative amount is
 --                        a payment (coins leave the piggy bank), secondary = the balance after paying
 --     type 1 character:  info = LuaCharacter (owned: disposed when the modal closes)
 --     type 2 puchichara: info = LuaPuchichara
 --     type 3 nameplate:  info = LuaNameplateInfo
 --     type 4 song:       info = LuaSongNode
+--     type 5 custom:     anything else a stage hands over: info = its name as shown, secondary = its
+--                        rarity name, picture = the key of the shared texture that shows it
+--                        (SHARED:SetSharedTexture), header = the card's title
 --     rarity = modal int 0..4 (common, uncommon, rare, epic, legendary); the item's own Rarity
 --       string (all seven, poor to mythical) is what picks the chest and colours when it is known:
 --       puchicharas, nameplates and songs carry it, characters are looked up in CHARACTERLIST.
@@ -91,7 +94,7 @@ local function itemRarity(modal_type, info)
     return r
 end
 
-function activate(player1to, rarity, modal_type, info, secondary)
+function activate(player1to, rarity, modal_type, info, secondary, picture, header)
     player = math.max(0, math.min(5, math.floor(tonumber(player1to) or 1)))
     nav = NavInput.p[player] or NavInput.p[""]
     rarity = math.floor(tonumber(rarity) or 0)
@@ -102,7 +105,7 @@ function activate(player1to, rarity, modal_type, info, secondary)
     else
         local key = Fx.rarityKey(rarity, itemRarity(modal_type, info))
         if type(secondary) == "string" and Fx.RARITY_COLOR[secondary:lower()] then key = secondary:lower() end
-        pending = { kind = modal_type, rarity = rarity, key = key, info = info }
+        pending = { kind = modal_type, rarity = rarity, key = key, info = info, picture = picture, header = header }
         -- a character's menu animation loads now, so the work hides behind the reveal instead of
         -- landing on the card's pop-in frame
         if modal_type == 1 and info ~= nil then pcall(function() info:LoadAnimation(CHARACTER.ANIM_MENU_NORMAL) end) end
@@ -139,7 +142,7 @@ function update()
     elseif state == "chest" then
         if chest:update(dt, decide) then
             chest:stop()
-            card:start(pending.kind, pending.rarity, pending.key, pending.info)
+            card:start(pending.kind, pending.rarity, pending.key, pending.info, pending.picture, pending.header)
             state = "card"
         end
     elseif state == "card" then

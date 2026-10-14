@@ -28,5 +28,10 @@
   "egg_nice_try": "Nice try!",
   "egg_ootd": "OOTD is a 10+",
   "egg_canabi": "DIE DIE DIE DIE GET OUT OF MY HEAD KILL ILL KILL",
-  "egg_dragoon": "GOON?!"
+  "egg_dragoon": "GOON?!",
+  "egg_piano_1": "You put in the code, and heard a gentle piano performance from the other side.",
+  "egg_piano_2": "Ah! T-The telephone is hanging... I hope it's not broken...",
+  "egg_piano_3": "The call hangs up.",
+  "reward_furniture": "New Furniture!",
+  "quest_cleared": "You already cleared this quest."
 }

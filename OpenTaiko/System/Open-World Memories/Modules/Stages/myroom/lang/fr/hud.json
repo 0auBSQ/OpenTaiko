@@ -15,6 +15,7 @@
   "prompt_matrix": "[Entrée] Utiliser la Placeholder Matrix",
   "prompt_mirror": "[Entrée] Se regarder dans le miroir",
   "prompt_look": "[Entrée] Regarder",
+  "prompt_fishtank": "[Entrée] Allumer ou éteindre l'aquarium",
   "prompt_exit": "[Entrée] Quitter la chambre",
   "prompt_switch": "[Tab] Changer de cible",
   "player_entry": "Joueur %d — %s",

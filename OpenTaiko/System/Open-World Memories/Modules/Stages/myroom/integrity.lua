@@ -7,8 +7,10 @@
 -- when any of its cells is off the floor or already taken by another ground piece. Stacked pieces
 -- follow: one is evicted when it cannot stack, when its cells are not all hosted by the same surface,
 -- or when another stacked piece already holds one of them. An evicted surface takes its riders with
--- it, as removing it in edit mode would. Wall items are not touched (they hold one tile each and the
--- phone is managed by Room:ensurePhone).
+-- it, as removing it in edit mode would. Wall items come last: one is evicted when its tile is not a
+-- wall tile, when an earlier item already takes one of its tiles and bands, or when a piece in front
+-- of it stands higher than its mount. The phone (Room:ensurePhone keeps it on the walls) and the
+-- windows (part of the room's walls) are never evicted: the pieces they would run into go instead.
 --
 --   Integrity.sweep(room) -> { id, ... }   the ids returned to stock, in eviction order
 
@@ -81,6 +83,37 @@ function M.sweep(room)
             else
                 for _, cell in ipairs(cells) do taken[key(cell[1], cell[2])] = true end
             end
+        end
+    end
+
+    local walls = {}
+    for _, it in ipairs(room.wallItems) do walls[#walls + 1] = it end
+    taken = {}
+    for _, it in ipairs(walls) do
+        local tiles = room:wallItemTiles(it.id, it.c, it.r)
+        local mounts = room.wallItemMounts(it.id, it.mount)
+        local slots, blocked, front = {}, false, {}
+        for _, t in ipairs(tiles or {}) do
+            for _, m in ipairs(mounts) do
+                local slot = key(t[1], t[2]) .. m
+                if taken[slot] then blocked = true end
+                slots[#slots + 1] = slot
+                for _, p in ipairs(room:piecesInFrontOf(t[1], t[2], m, it.id)) do front[#front + 1] = p end
+            end
+        end
+        local cat = catalog[it.id]
+        if it.id == "phone" or (cat and cat.window) then
+            for _, p in ipairs(front) do
+                if not gone[p] then evict(room, catalog, p, out, gone) end
+            end
+            for _, s in ipairs(slots) do taken[s] = true end
+        elseif tiles == nil or blocked or #front > 0 then
+            if room:removeWallItem(it) then
+                room:invAdd(it.id)
+                out[#out + 1] = it.id
+            end
+        else
+            for _, s in ipairs(slots) do taken[s] = true end
         end
     end
     return out

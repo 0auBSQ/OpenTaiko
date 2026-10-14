@@ -203,18 +203,32 @@ local function itemAABB(world, room, it)
     end
     return x0 + 0.05, by, z0 + 0.05, x1 - 0.05, top, z1 - 0.05
 end
--- a mount-height band on a wall tile: slot = {wall, c, r, mount} (or a Room:wallItemSlots() entry)
--- *Into = append the band quad only (caller owns ObjSetPass+ObjBegin).
+-- a mount-height band on a wall tile: slot = {wall, c, r, mount, w, h} (or a Room:wallItemSlots() entry);
+-- w tiles along the wall (default 1), h bands (2 = low and high). *Into = append the band quad only
+-- (caller owns ObjSetPass+ObjBegin).
 local function wallSlotInto(world, s)
-    local y0 = FY + Room.MOUNT_Y[s.mount] - 0.08
-    local y1 = y0 + 0.86
+    local w, h = s.w or 1, s.h or 1
+    local y0 = FY + Room.MOUNT_Y[(h >= 2) and "low" or s.mount] - 0.08
+    local y1 = ((h >= 2) and (FY + Room.MOUNT_Y.high - 0.08) or y0) + 0.86
     if s.wall == "back" then
         local c, z = s.c, world.gridH - 1 - 0.02
-        world.scene:ObjAddQuadFlat(world.hiliteObj, c + 0.05, y0, z, c + 0.95, y0, z, c + 0.95, y1, z, c + 0.05, y1, z)
+        world.scene:ObjAddQuadFlat(world.hiliteObj, c + 0.05, y0, z, c + w - 0.05, y0, z, c + w - 0.05, y1, z, c + 0.05, y1, z)
     else
-        local x, z0 = world.gridW - 1 - 0.02, (world.gridH - 1 - s.r)
-        world.scene:ObjAddQuadFlat(world.hiliteObj, x, y0, z0 + 0.05, x, y0, z0 + 0.95, x, y1, z0 + 0.95, x, y1, z0 + 0.05)
+        local x, z0 = world.gridW - 1 - 0.02, (world.gridH - 1 - (s.r + w - 1))
+        world.scene:ObjAddQuadFlat(world.hiliteObj, x, y0, z0 + 0.05, x, y0, z0 + w - 0.05, x, y1, z0 + w - 0.05, x, y1, z0 + 0.05)
     end
+end
+-- the slot an item of `id` takes when hung from (c, r, mount): its whole size on its wall
+local function itemSlot(room, id, c, r, mount)
+    local w, h = Room.wallSize(id)
+    return { wall = (c == room.iw and r >= 1) and "right" or "back", c = c, r = r,
+             mount = Room.wallMountFor(id, mount), w = w, h = h }
+end
+-- a hovered slot moved to where an item of `id` can hang from it (kept on its wall)
+local function anchoredSlot(room, id, s)
+    if s == nil then return nil end
+    local c, r, m = room:wallAnchor(id, s.c, s.r, s.mount)
+    return itemSlot(room, id, c, r, m)
 end
 local function hiliteWallSlot(world, s, valid, blue)
     local rC, gC, bC
@@ -288,14 +302,17 @@ function Edit:leave()
     if self.ui then self.ui:disposeWidgets(); self.ui = nil end
 end
 
--- every room mutation funnels through here: the rebuild (onChange → loadMap) deletes ALL model
--- instances including the cached ghost models, so drop those references BEFORE it runs
+-- every room mutation funnels through here. A full rebuild (onChange → loadMap) deletes ALL model
+-- instances including the cached ghost models, so their references go; when only the furniture
+-- was updated ("kept") the ghosts are still standing and stay cached
 function Edit:commit()
-    self.activeGhost = nil
-    self.ghostModels = {}
-    self.activeWallGhost = nil
-    self.ghostWallModels = {}
-    self.onChange()
+    self:hideGhostModel()
+    if self.onChange() ~= "kept" then
+        self.activeGhost = nil
+        self.ghostModels = {}
+        self.activeWallGhost = nil
+        self.ghostWallModels = {}
+    end
 end
 
 -- ── ghost model instances (the REAL GLB previews placement, bounds-anchored like the placed one) ──
@@ -418,11 +435,15 @@ local function iconOptsFor(id)
             }
         elseif cat.wallBuild then
             local wallBuild = cat.wallBuild
+            -- the frame grows with the item's size (a window spans two tiles and both bands)
+            local sw, sh = Room.wallSize(id)
+            local big = math.max(sw, sh)
             return "builder", {
                 res = 128, yaw = 16, pitch = -10,
-                frame = { cx = 0, cy = 0.32, cz = -0.12, radius = 0.62 },
+                frame = { cx = 0, cy = (sh >= 2) and 0.82 or 0.32, cz = -0.12, radius = 0.62 * big },
                 populate = function(wld)
                     A.registerInto(wld.scene)
+                    wld.icon = true                       -- builders may add what only an icon needs
                     -- a synthetic back-wall frame at the origin (inward normal -z)
                     wallBuild(wld, { ax = 0, az = 0, nx = 0, nz = -1, tx = 1, tz = 0 }, 0)
                 end,
@@ -583,6 +604,16 @@ function Edit:rotateRefused(it)
     errPlay()
 end
 
+-- the riders a held surface carries, in the form Room:canPlace takes
+local function heldRiders(h)
+    if h == nil or h.riders == nil then return nil end
+    local out = {}
+    for _, rd in ipairs(h.riders) do
+        out[#out + 1] = { id = rd.it.id, dc = rd.dc, dr = rd.dr, facing = rd.it.facing or 0 }
+    end
+    return out
+end
+
 function Edit:doRotate(it)
     local room = self.room
     local cat = Room.CATALOG[it.id]
@@ -611,9 +642,13 @@ function Edit:doRotate(it)
                 occ[k] = true
             end
             if not ok then break end
+            -- nor run into what hangs on the walls behind
+            if not room:clearOfWallItems(p.it.id, room:footprint(p.it.id, p.nc, p.nr, p.nf), p.nf, it.id) then ok = false; break end
         end
     end
     if ok then
+        -- turned fully onto a surface (or off one), the piece rides it (or stands on the floor)
+        it.on = (room:surfaceUnder(it.id, it.c, it.r, newFacing) ~= nil) and true or nil
         for _, p in ipairs(plan) do
             p.it.c, p.it.r, p.it.facing = p.nc, p.nr, p.nf
             room:attachFurniture(p.it)             -- re-stacks onto the rotated surface
@@ -704,7 +739,7 @@ function Edit:dropHold()
     if h == nil then return false end
     local room = self.room
     if h.kind == "wall" then
-        local s = self.hoverSlot or h.lastSlot                   -- released off-screen → last valid slot
+        local s = anchoredSlot(room, h.it.id, self.hoverSlot) or h.lastSlot   -- released off-screen → last valid slot
         if s and room:canPlaceWall(h.it.id, s.c, s.r, s.mount) then
             h.it.c, h.it.r, h.it.mount = s.c, s.r, s.mount
             room.wallItems[#room.wallItems + 1] = h.it
@@ -718,7 +753,7 @@ function Edit:dropHold()
     else
         local c, r = self.hoverC, self.hoverR
         if not c then c, r = h.lastC, h.lastR end                -- released off-screen → last valid cell
-        if c and room:canPlace(h.it.id, c, r, h.it.facing or 0) then
+        if c and room:canPlace(h.it.id, c, r, h.it.facing or 0, nil, heldRiders(h)) then
             h.it.c, h.it.r = c, r
             room:attachFurniture(h.it)      -- lands stacked when dropped onto a surface
             -- riders travel with their surface: same relative cells, re-stacked on top
@@ -990,8 +1025,9 @@ function Edit:updatePlace(mx, my, sdy, lpressed, lpressing, zoomCamera, dmx, dmy
         end
         self.hoverSlot = s
         if lpressed and s then
-            if room:canPlaceWall(self.sel, s.c, s.r, s.mount) and room:invTake(self.sel) then
-                room:addWallItem(self.sel, s.c, s.r, s.mount); self:commit()
+            local a = anchoredSlot(room, self.sel, s)
+            if room:canPlaceWall(self.sel, a.c, a.r, a.mount) and room:invTake(self.sel) then
+                room:addWallItem(self.sel, a.c, a.r, a.mount); self:commit()
                 Sfx.play("hang")
             end
             self.sel = nil; self._barDirty = true
@@ -1055,7 +1091,8 @@ function Edit:updateHold(mx, my, sdy, lpressed, lreleased, zoomCamera)
         end
         self.hoverSlot = s                       -- the slot's own mount: drag to the height you want
         self.hoverC, self.hoverR = nil, nil
-        if s and room:canPlaceWall(h.it.id, s.c, s.r, s.mount) then h.lastSlot = s end   -- remember last valid target
+        local a = anchoredSlot(room, h.it.id, s)
+        if a and room:canPlaceWall(h.it.id, a.c, a.r, a.mount) then h.lastSlot = a end   -- remember last valid target
     else
         if sdy ~= 0 then
             h.it.facing = ((h.it.facing or 0) + (sdy > 0 and 1 or 3)) % 4
@@ -1067,7 +1104,7 @@ function Edit:updateHold(mx, my, sdy, lpressed, lreleased, zoomCamera)
         end
         self.hoverC, self.hoverR = c, r
         self.hoverSlot = nil
-        if c and room:canPlace(h.it.id, c, r, h.it.facing or 0) then h.lastC, h.lastR = c, r end   -- remember last valid target
+        if c and room:canPlace(h.it.id, c, r, h.it.facing or 0, nil, heldRiders(h)) then h.lastC, h.lastR = c, r end   -- remember last valid target
     end
     if h.drag then
         if lreleased then
@@ -1264,7 +1301,7 @@ function Edit:buildOverlays()
     if self.hold then                                           -- in-hand: the ghost is the candidate
         local h = self.hold
         if h.kind == "wall" then
-            local s = self.hoverSlot or h.lastSlot               -- off-screen: keep the ghost at the last valid slot
+            local s = anchoredSlot(room, h.it.id, self.hoverSlot) or h.lastSlot   -- off-screen: keep the ghost at the last valid slot
             if s then
                 local ok = room:canPlaceWall(h.it.id, s.c, s.r, s.mount)
                 self:ghostWallItem(h.it.id, s.c, s.r, s.mount, ok)
@@ -1274,7 +1311,7 @@ function Edit:buildOverlays()
             local c, r = self.hoverC, self.hoverR
             if not c then c, r = h.lastC, h.lastR end            -- off-screen: park the ghost at the last valid cell
             if c then
-                local ok = room:canPlace(h.it.id, c, r, h.it.facing or 0)
+                local ok = room:canPlace(h.it.id, c, r, h.it.facing or 0, nil, heldRiders(h))
                 self:ghostFurniture(h.it.id, c, r, h.it.facing or 0, ok)
                 -- BLUE wireframe box at the drop candidate (red if it can't drop there)
                 local cat = Room.CATALOG[h.it.id]
@@ -1298,7 +1335,8 @@ function Edit:buildOverlays()
             hilite(world, room:footprint(self.delTarget.id, self.delTarget.c, self.delTarget.r, self.delTarget.facing or 0),
                 235, 95, 95, 150, itemHiliteY(room, self.delTarget))
         elseif self.delKind == "wall" and self.hoverSlot then
-            hiliteWallSlot(world, self.hoverSlot, false)
+            local d = self.delTarget
+            hiliteWallSlot(world, itemSlot(room, d.id, d.c, d.r, d.mount), false)
         elseif self.delKind == "floor" and self.hoverC then
             hiliteTile(world, self.hoverC, self.hoverR, false)
         elseif self.delKind == "paint" and self.hoverTile then
@@ -1323,6 +1361,7 @@ function Edit:buildOverlays()
         elseif key == "wall" then
             local s = self.hoverSlot
             if s then
+                s = anchoredSlot(room, self.sel, s)
                 local ok = room:canPlaceWall(self.sel, s.c, s.r, s.mount)
                 self:ghostWallItem(self.sel, s.c, s.r, s.mount, ok)
                 hiliteWallSlot(world, s, ok)
@@ -1355,7 +1394,8 @@ function Edit:buildOverlays()
             local x0, y0, z0, x1, y1, z1 = itemAABB(world, room, self.hoverItem)
             wireBox(world, x0, y0, z0, x1, y1, z1, 150, 210, 255, 150, 0.026)   -- hover: soft box
         elseif self.hoverWallItem and self.hoverSlot then
-            hiliteWallSlot(world, self.hoverSlot, true)
+            local w = self.hoverWallItem
+            hiliteWallSlot(world, itemSlot(room, w.id, w.c, w.r, w.mount), true)
         elseif self.hoverExit then
             hilite(world, { { self.hoverC, self.hoverR } }, 255, 225, 150, 140)
         end
@@ -1365,8 +1405,7 @@ function Edit:buildOverlays()
         local it = self._rotFlash.it
         local cat = Room.CATALOG[it.id]
         if cat and cat.place == "wall" then
-            hiliteWallSlot(world, { wall = (it.c == room.iw) and "right" or "back",
-                                    c = it.c, r = it.r, mount = it.mount or "low" }, false)
+            hiliteWallSlot(world, itemSlot(room, it.id, it.c, it.r, it.mount), false)
         else
             hilite(world, room:footprint(it.id, it.c, it.r, it.facing or 0), 235, 60, 60, 175,
                 itemHiliteY(room, it))

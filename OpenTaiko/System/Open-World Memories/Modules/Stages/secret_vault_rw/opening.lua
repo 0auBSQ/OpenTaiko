@@ -79,7 +79,7 @@ function O.start(chest, reward, now)
     local t = reward and reward.type or "snap"
     run.opens = t ~= "snap"
     run.talkAt = (t == "snap") and (SHATTER_AT + 0.9) or (t == "key" and (OPEN_AT + 0.8)) or nil
-    run.modalAt = (t == "coins" or t == "nameplate" or t == "song") and (OPEN_AT + 0.6) or nil
+    run.modalAt = (t == "coins" or t == "nameplate" or t == "song" or t == "furniture") and (OPEN_AT + 0.6) or nil
 end
 
 local function once(key, cond, fn)

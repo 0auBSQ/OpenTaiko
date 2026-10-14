@@ -62,5 +62,56 @@
   },
   "backpack": {
     "name": "Backpack"
+  },
+  "toybox": {
+    "name": "Toy Block"
+  },
+  "window": {
+    "name": "Window"
+  },
+  "lsofa": {
+    "name": "L-shape Sofa"
+  },
+  "wooden_chest": {
+    "name": "Wooden Chest"
+  },
+  "barrel": {
+    "name": "Barrel"
+  },
+  "coin_piles": {
+    "name": "Coin Piles"
+  },
+  "pirate_key": {
+    "name": "Key"
+  },
+  "pirate_swords": {
+    "name": "Pirate Swords"
+  },
+  "gold_bag": {
+    "name": "Gold Bag"
+  },
+  "skull": {
+    "name": "Skull Model"
+  },
+  "anchor": {
+    "name": "Anchor"
+  },
+  "gold_key": {
+    "name": "Gold Key"
+  },
+  "cannon": {
+    "name": "Cannon"
+  },
+  "caspian_mug": {
+    "name": "Mr.Caspian's Mug"
+  },
+  "chalice": {
+    "name": "Chalice"
+  },
+  "crystal": {
+    "name": "Crystal"
+  },
+  "fishtank": {
+    "name": "Fish Tank"
   }
 }

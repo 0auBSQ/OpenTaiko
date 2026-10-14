@@ -216,7 +216,11 @@ local function confirmInput()
         reward = Vault.roll(c)   -- roll at once (anti save-scum)
         play("Decide")
         Cards.setConfirm(false, now)
-        refreshInfo()
+        -- the key is spent now; what is left in the chests shows once the chest is open
+        for i = 1, 3 do
+            keys[i] = Vault.keyCount(i)
+            if info[i] then info[i].keys = keys[i] end
+        end
         Opening.start(c, reward, now)
         menuTarget, boxTarget = 0, 0
         nextRemark = "prompt"
@@ -319,6 +323,7 @@ function update()
             Opening.leave(now)
         elseif ev == "done" then
             reward = nil
+            refreshInfo()
             -- behind the kick the punched chest ends while he talks: the menu does not come back
             if state == "opening" then
                 openMenu(nextRemark)

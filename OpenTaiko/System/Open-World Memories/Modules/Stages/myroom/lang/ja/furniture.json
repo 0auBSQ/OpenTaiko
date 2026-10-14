@@ -62,5 +62,56 @@
   },
   "backpack": {
     "name": "リュックサック"
+  },
+  "toybox": {
+    "name": "積み木"
+  },
+  "window": {
+    "name": "窓"
+  },
+  "lsofa": {
+    "name": "L字型ソファ"
+  },
+  "wooden_chest": {
+    "name": "木の宝箱"
+  },
+  "barrel": {
+    "name": "樽"
+  },
+  "coin_piles": {
+    "name": "硬貨の山"
+  },
+  "pirate_key": {
+    "name": "鍵"
+  },
+  "pirate_swords": {
+    "name": "海賊の剣"
+  },
+  "gold_bag": {
+    "name": "金貨袋"
+  },
+  "skull": {
+    "name": "ドクロの置物"
+  },
+  "anchor": {
+    "name": "錨"
+  },
+  "gold_key": {
+    "name": "金の鍵"
+  },
+  "cannon": {
+    "name": "大砲"
+  },
+  "caspian_mug": {
+    "name": "Mr.Caspianのジョッキ"
+  },
+  "chalice": {
+    "name": "聖杯"
+  },
+  "crystal": {
+    "name": "クリスタル"
+  },
+  "fishtank": {
+    "name": "水槽"
   }
 }

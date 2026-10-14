@@ -101,7 +101,25 @@ local function pictureVisual(world, f, y, picTex)
 end
 Room.pictureVisual = pictureVisual   -- editmode's preview-icon builder renders the same framed picture
 
-local WALL_BUILDERS = {}   -- per-id override hooks (none by default)
+local WALL_BUILDERS = {}   -- per-id override hooks
+
+-- the window: a white frame and cross mullions around the opening its wall leaves (the sky shows
+-- through it). `f` is centred on the window's tiles, `y` is its low mount height. An icon has no
+-- sky behind it, so it gets a pale pane.
+WALL_BUILDERS.window = function(world, f, y)
+    local ow = (Room.CATALOG.window and Room.CATALOG.window.wallW) or 2
+    local y0 = y + (Room.WIN_Y0 - Room.MOUNT_Y.low)
+    local h = Room.WIN_Y1 - Room.WIN_Y0
+    local fc, d = A.COL.white, 0.16
+    local back = -d * 0.5                                                             -- the frame straddles the wall
+    wb(world, f, y0, 0, h, back, ow + 0.16, 0.1, d, fc, 1.0, 0.85)                   -- top bar
+    wb(world, f, y0, 0, -0.1, back, ow + 0.16, 0.1, d, fc, 1.0, 0.85)                -- bottom bar
+    wb(world, f, y0, -ow * 0.5, -0.1, back, 0.12, h + 0.2, d, fc, 1.0, 0.8)          -- left bar
+    wb(world, f, y0, ow * 0.5, -0.1, back, 0.12, h + 0.2, d, fc, 1.0, 0.8)           -- right bar
+    wb(world, f, y0, 0, 0, -0.05, 0.05, h, 0.1, fc, 0.95, 0.8)                       -- vertical mullion
+    wb(world, f, y0, 0, h * 0.5, -0.05, ow, 0.05, 0.1, fc, 0.95, 0.8)                -- horizontal mullion
+    if world.icon then wb(world, f, y0, 0, 0, -0.01, ow, h, 0.02, A.COL.screen, 1.0, 1.0) end
+end
 
 
 -- ── catalog: data/furniture.json is AUTHORITATIVE ─────────────────────────────────────────────────
@@ -123,6 +141,7 @@ local DEFAULTS = {
 Room.CATALOG = {}
 Room.WALL_GLB = {}              -- wall items with a real GLB (metadata parsed from furniture.json)
 Room.SHOP_MODEL_IDS = {}        -- shop-sold ids that get a 3D thumbnail baked at onStart
+Room.REWARD_IDS = {}            -- ids handed over as rewards (furniture.json `rarity`): thumbnail baked too
 Room.SHOP_SWATCH_TEX = {}       -- shop-sold paint/flooring ids → flat preview PNG (from deco JSONs)
 -- infinite "revert to default" swatches shown first in the Floor/Paint tabs (safer than a global eraser)
 Room.DEFAULT_FLOOR, Room.DEFAULT_PAINT = "default_floor", "default_paint"
@@ -159,6 +178,10 @@ local function buildCatalogFromJson()
                 surface = jflag(node, "surface"), surfaceH = jnum(jget(node, "surfaceH")),
                 stackOn = jflag(node, "stackOn"), computer = jflag(node, "computer"), fixed = jflag(node, "fixed"),
                 interact = jget(node, "interact"), model = jget(node, "model"),
+                -- a wall item's size: tiles along the wall, mount bands (2 = low and high)
+                wallW = floor(jnum(jget(node, "wallW")) or 1), wallH = floor(jnum(jget(node, "wallH")) or 1),
+                window = jflag(node, "window"),              -- opens the wall behind it
+                rarity = jget(node, "rarity"),               -- shown when the item is handed over as a reward
                 emissivePart = jget(node, "emissivePart"),   -- GLB material routed to its own part
                                                              -- object (runtime glow, e.g. jukebox screen)
                 screenPart = jget(node, "screenPart"),       -- GLB material shown unlit + flat-coloured
@@ -193,6 +216,37 @@ local function buildCatalogFromJson()
             end
             e.iconYaw = jnum(jget(node, "iconYaw"))      -- the icon's camera yaw, for a model that faces another way
             e.fit = jnum(jget(node, "fit"))              -- the share of its footprint the model fills (0.92 when absent)
+            -- a footprint that is not a full rectangle: one string per row of the w×h box (front of the
+            -- list = the row nearest the back wall), "X" for a covered cell, "." for an empty one
+            local sh = jget(node, "shape")
+            if sh then
+                e.shape = {}
+                for i = 1, JSONLOADER:JsonCount(sh) do
+                    local row = tostring(jget(sh, i) or "")
+                    for x = 1, #row do
+                        if row:sub(x, x) == "X" then e.shape[#e.shape + 1] = { x - 1, i - 1 } end
+                    end
+                end
+            end
+            -- see-through parts: a list of { material, alpha 0..255 }
+            local see = jget(node, "alphaParts")
+            if see then
+                e.alphaParts = {}
+                for i = 1, JSONLOADER:JsonCount(see) do
+                    local p = jget(see, i)
+                    if p and jget(p, "material") then
+                        e.alphaParts[#e.alphaParts + 1] = { material = jget(p, "material"), alpha = jnum(jget(p, "alpha")) or 128 }
+                    end
+                end
+            end
+            -- a light the item always gives off: { color [r,g,b], intensity, range, y (above its base) }
+            local lt = jget(node, "light")
+            if lt then
+                local c = jget(lt, "color")
+                e.light = { r = c and jnum(jget(c, 1)) or 1, g = c and jnum(jget(c, 2)) or 1, b = c and jnum(jget(c, 3)) or 1,
+                            intensity = jnum(jget(lt, "intensity")) or 0.5, range = jnum(jget(lt, "range")) or 3,
+                            y = jnum(jget(lt, "y")) or 0.5 }
+            end
             local pic = jget(node, "picture")
             if pic and A.PICTURE[pic] then e.picture = A.PICTURE[pic] end
             local wg = jget(node, "wallGlb")
@@ -202,6 +256,7 @@ local function buildCatalogFromJson()
             end
             if jflag(node, "legacyMirror") then LEGACY_WALL_IDS[id] = true end
             if jflag(node, "shop") then Room.SHOP_MODEL_IDS[#Room.SHOP_MODEL_IDS + 1] = id end
+            if e.rarity then Room.REWARD_IDS[#Room.REWARD_IDS + 1] = id end
             Room.CATALOG[id] = e
         end
     end
@@ -299,7 +354,6 @@ function Room.newDefault()
     self.tier = 1
     self.iw, self.ih = 5, 5
     self.exitCol = 2
-    self.winC0, self.winC1 = 2, 3
     -- the starter layout comes from data/starter_room.json (STARTER); the literals below are the
     -- emergency fallback for a missing/broken file
     if STARTER then
@@ -336,6 +390,7 @@ function Room.newDefault()
     self.wallPaint = {}                                       -- ["back:c"]/["right:r"] = paint id; nil = plaster
     self.claimed = {}   -- per-id coin-shop grant ledger (see drainShopGrants)
     self.gifts = MIG.allGifts()   -- a new room already has every gift (see migration.lua)
+    self:migrateWindow(nil)
     return self
 end
 
@@ -353,9 +408,7 @@ function Room:gridH() return self.ih + 2 end
 function Room:cellType(c, r)
     local gw, gh = self:gridW(), self:gridH()
     if c < 0 or r < 0 or c >= gw or r >= gh then return "X" end
-    if r == 0 then
-        if c >= self.winC0 and c <= self.winC1 then return "F" else return "W" end
-    end
+    if r == 0 then return "W" end
     if c == self.iw then return "W" end
     if r == gh - 1 then return (c == self.exitCol) and "E" or "X" end
     return "O"
@@ -368,11 +421,37 @@ function Room:walkable(c, r)
     return true
 end
 
+-- the cells a piece covers inside its box at a facing, as offsets from the box's corner: every cell
+-- of the w×h box, or its catalog shape turned with it. One turn takes cell (x, y) of a W×H box to
+-- (H-1-y, x) of the H×W box (the same turn Room:rotatedRiderCell follows).
+function Room.shapeCells(id, facing)
+    local cat = Room.CATALOG[id]
+    local w, h = 1, 1
+    if cat then w, h = cat.w, cat.h end
+    local cells = {}
+    if cat and cat.shape then
+        for _, s in ipairs(cat.shape) do cells[#cells + 1] = { s[1], s[2] } end
+    else
+        for y = 0, h - 1 do for x = 0, w - 1 do cells[#cells + 1] = { x, y } end end
+    end
+    for _ = 1, (facing or 0) % 4 do
+        for _, s in ipairs(cells) do s[1], s[2] = h - 1 - s[2], s[1] end
+        w, h = h, w
+    end
+    return cells, w, h
+end
+
 local function itemCovers(it, cat, c, r)
     local w, h = 1, 1
     if cat then w, h = cat.w, cat.h; if (it.facing or 0) % 2 == 1 then w, h = h, w end end
-    return c >= it.c and c < it.c + w and r >= it.r and r < it.r + h
+    if not (c >= it.c and c < it.c + w and r >= it.r and r < it.r + h) then return false end
+    if not (cat and cat.shape) then return true end
+    for _, s in ipairs(Room.shapeCells(it.id, it.facing)) do
+        if it.c + s[1] == c and it.r + s[2] == r then return true end
+    end
+    return false
 end
+Room.itemCovers = itemCovers
 
 -- the TOP occupant of a cell: a stacked item (on = riding a surface) wins over its surface —
 -- the eraser removes stacked-first and the PC interact finds the computer, not the desk
@@ -424,15 +503,10 @@ function Room:stackedItemsOn(surf)
     local out = {}
     local scat = Room.CATALOG[surf.id]
     if not (scat and scat.surface) then return out end
-    local w, h = scat.w, scat.h
-    if (surf.facing or 0) % 2 == 1 then w, h = h, w end
     for _, it in ipairs(self.furniture) do
         if it.on and it ~= surf then
-            local cat = Room.CATALOG[it.id]
-            local iw2, ih2 = 1, 1
-            if cat then iw2, ih2 = cat.w, cat.h; if (it.facing or 0) % 2 == 1 then iw2, ih2 = ih2, iw2 end end
-            if it.c < surf.c + w and it.c + iw2 > surf.c and it.r < surf.r + h and it.r + ih2 > surf.r then
-                out[#out + 1] = it
+            for _, cell in ipairs(self:footprint(it.id, it.c, it.r, it.facing or 0)) do
+                if itemCovers(surf, scat, cell[1], cell[2]) then out[#out + 1] = it; break end
             end
         end
     end
@@ -451,32 +525,190 @@ function Room:surfaceTopY(surf)
     return FY + ((cat and cat.surfaceH) or 0.8)
 end
 
+-- ── what hangs on a wall and what stands in front of it ─────────────────────────────────────────
+-- A piece in the row along a wall runs into a wall item on the tile behind it when it comes closer
+-- to the wall than the item stands out of it, and stands higher than the item's mount. A piece's size
+-- is its model as the room fits it (Room.modelFit), else the catalog (surfaceH/collH, collW/collD).
+local WALL_GAP = 0.12       -- how far a wall item stands out of the wall
+local WALL_TOL = 0.08       -- how far above a mount a piece may stand before it touches the item
+
+local shapes = {}           -- id → { h = height, dx = width along x, dz = depth along z } at facing 0
+function Room.shapeOf(id)
+    local s = shapes[id]
+    if s then return s end
+    local cat = Room.CATALOG[id]
+    if cat == nil then return nil end
+    s = { h = (cat.surface and cat.surfaceH) or cat.collH or 0.85, dx = cat.collW or cat.w, dz = cat.collD or cat.h }
+    local stem = Room.modelStem(id)
+    if Room.modelAvailable(id, stem) then
+        pcall(function()
+            local m = MODEL:Load("Models/" .. stem .. ".glb")
+            local mnx, _, mnz, mxx, _, mxz = m:GetBounds()
+            local sc, hs = Room.modelFit(m, cat)
+            if sc then s.h, s.dx, s.dz = hs, (mxx - mnx) * sc, (mxz - mnz) * sc end
+        end)
+    end
+    shapes[id] = s
+    return s
+end
+
+-- how close a piece comes to the back wall (along z) or the right wall (along x): the gap left
+-- between its back and the wall, the piece centred in its cells
+local function gapToWall(id, facing, wall)
+    local cat, s = Room.CATALOG[id], Room.shapeOf(id)
+    local w, h, dx, dz = cat.w, cat.h, s.dx, s.dz
+    if (facing or 0) % 2 == 1 then w, h, dx, dz = h, w, dz, dx end
+    if wall == "back" then return (h - dz) * 0.5 end
+    return (w - dx) * 0.5
+end
+
+-- the height above the platform where what hangs on a wall begins: a window's frame starts under
+-- its opening, any other item at its mount
+local function hangBase(wallId, mount)
+    local cat = wallId and Room.CATALOG[wallId]
+    if cat and cat.window then return Room.WIN_Y0 - 0.1 end
+    return Room.MOUNT_Y[(mount == "high") and "high" or "low"]
+end
+
+local function clashes(id, facing, hostId, wall, mount, wallId)
+    local s = Room.shapeOf(id)
+    if s == nil or gapToWall(id, facing, wall) >= WALL_GAP then return false end
+    local top = s.h
+    if hostId then
+        local hs = Room.shapeOf(hostId)
+        top = top + (hs and hs.h or 0.8)
+    end
+    return top > hangBase(wallId, mount) + WALL_TOL
+end
+
+-- the wall tiles behind a cell, with the wall they are on
+function Room:wallTilesBehind(c, r)
+    local out = {}
+    if r == 1 then out[#out + 1] = { c, 0, "back" } end
+    if c == self.iw - 1 then out[#out + 1] = { self.iw, r, "right" } end
+    return out
+end
+
+-- can piece `id` (facing, riding the surface piece hostId, or the floor when nil) stand on these
+-- cells without running into a wall item?
+function Room:clearOfWallItems(id, cells, facing, hostId)
+    if Room.CATALOG[id] == nil then return true end
+    for _, cell in ipairs(cells) do
+        for _, t in ipairs(self:wallTilesBehind(cell[1], cell[2])) do
+            for _, w in ipairs(self.wallItems) do
+                for _, m in ipairs(Room.wallItemMounts(w.id, w.mount)) do
+                    if self:wallItemCovers(w, t[1], t[2], m) and clashes(id, facing, hostId, t[3], m, w.id) then return false end
+                end
+            end
+        end
+    end
+    return true
+end
+
+-- the pieces standing in front of a wall tile that wall item `wallId` on `mount` would run into
+function Room:piecesInFrontOf(c, r, mount, wallId)
+    local fc, fr, wall
+    if r == 0 then fc, fr, wall = c, 1, "back" elseif c == self.iw then fc, fr, wall = self.iw - 1, r, "right" else return {} end
+    local out = {}
+    for _, it in ipairs(self.furniture) do
+        local cat = Room.CATALOG[it.id]
+        if cat and cat.place ~= "wall" then
+            if itemCovers(it, cat, fc, fr) then
+                local surf = it.on and self:surfaceUnder(it.id, it.c, it.r, it.facing or 0) or nil
+                if clashes(it.id, it.facing, surf and surf.id or nil, wall, mount, wallId) then out[#out + 1] = it end
+            end
+        end
+    end
+    return out
+end
+
 -- ── wall items ────────────────────────────────────────────────────────────────────────────────────
 function Room:wallTileValid(c, r)
-    if r == 0 and c >= 0 and c < self.iw then
-        return not (c >= self.winC0 and c <= self.winC1)      -- window columns hold nothing
-    end
+    if r == 0 then return c >= 0 and c < self.iw end
     return c == self.iw and r >= 1 and r <= self.ih
+end
+
+-- A wall item hangs from its anchor tile (c, r) and runs along its wall: rightward on the back wall,
+-- toward the front on the right wall. Its size (furniture.json wallW/wallH) is the tiles it covers
+-- and the mount bands it takes; a two-band item always hangs from the low band.
+function Room.wallSize(id)
+    local cat = Room.CATALOG[id]
+    return (cat and cat.wallW) or 1, (cat and cat.wallH) or 1
+end
+function Room.wallMountFor(id, mount)
+    local _, h = Room.wallSize(id)
+    if h >= 2 then return "low" end
+    return (mount == "high") and "high" or "low"
+end
+function Room.wallItemMounts(id, mount)
+    local _, h = Room.wallSize(id)
+    if h >= 2 then return { "low", "high" } end
+    return { (mount == "high") and "high" or "low" }
+end
+-- the tiles a wall item would cover from that anchor, nil when it runs off its wall
+function Room:wallItemTiles(id, c, r)
+    local w = Room.wallSize(id)
+    local out = {}
+    for i = 0, w - 1 do
+        local tc, tr = c, r
+        if c == self.iw and r >= 1 then tr = r + i else tc = c + i end
+        if not self:wallTileValid(tc, tr) then return nil end
+        out[#out + 1] = { tc, tr }
+    end
+    return out
+end
+-- does wall item `it` take tile (c, r) on band `mount` (nil = any band)?
+function Room:wallItemCovers(it, c, r, mount)
+    for _, t in ipairs(self:wallItemTiles(it.id, it.c, it.r) or { { it.c, it.r } }) do
+        if t[1] == c and t[2] == r then
+            if mount == nil then return true end
+            for _, m in ipairs(Room.wallItemMounts(it.id, it.mount)) do
+                if m == mount then return true end
+            end
+        end
+    end
+    return false
+end
+-- the anchor that keeps an item on its wall when pointed at tile (c, r): moved back from the wall's end
+function Room:wallAnchor(id, c, r, mount)
+    local w = Room.wallSize(id)
+    if c == self.iw and r >= 1 then r = math.max(1, math.min(r, self.ih - w + 1))
+    else c = math.max(0, math.min(c, self.iw - w)) end
+    return c, r, Room.wallMountFor(id, mount)
+end
+-- the window covering a wall tile, if any
+function Room:windowAt(c, r)
+    for _, it in ipairs(self.wallItems) do
+        local cat = Room.CATALOG[it.id]
+        if cat and cat.window and self:wallItemCovers(it, c, r) then return it end
+    end
+    return nil
 end
 
 function Room:wallItemAt(c, r, mount)
     for _, it in ipairs(self.wallItems) do
-        if it.c == c and it.r == r and (mount == nil or (it.mount or "low") == mount) then return it end
+        if self:wallItemCovers(it, c, r, mount) then return it end
     end
     return nil
 end
 
 function Room:canPlaceWall(id, c, r, mount, ignore)
-    if not self:wallTileValid(c, r) then return false end
-    local occ = nil
-    for _, it in ipairs(self.wallItems) do
-        if it ~= ignore and it.c == c and it.r == r and (it.mount or "low") == mount then occ = it end
+    local tiles = self:wallItemTiles(id, c, r)
+    if tiles == nil then return false end
+    for _, t in ipairs(tiles) do
+        for _, m in ipairs(Room.wallItemMounts(id, mount)) do
+            for _, it in ipairs(self.wallItems) do
+                if it ~= ignore and self:wallItemCovers(it, t[1], t[2], m) then return false end
+            end
+            -- nor behind a piece that stands in front of it, higher than the mount
+            if #self:piecesInFrontOf(t[1], t[2], m, id) > 0 then return false end
+        end
     end
-    return occ == nil
+    return true
 end
 
 function Room:addWallItem(id, c, r, mount)
-    self.wallItems[#self.wallItems + 1] = { id = id, c = c, r = r, mount = mount or "low" }
+    self.wallItems[#self.wallItems + 1] = { id = id, c = c, r = r, mount = Room.wallMountFor(id, mount) }
 end
 function Room:removeWallItem(it)
     if it.id == "phone" then return false end                 -- the phone can never be removed
@@ -505,14 +737,35 @@ function Room:ensurePhone()
             if phone ~= nil then table.remove(self.wallItems, i) else phone = it end
         end
     end
-    if phone == nil then
+    local fresh = phone == nil
+    if fresh then
         phone = { id = "phone", c = self.iw, r = math.min(3, self.ih), mount = "low" }
         self.wallItems[#self.wallItems + 1] = phone
     end
-    if not self:wallTileValid(phone.c, phone.r) then
-        phone.c, phone.r = self.iw, math.min(3, self.ih)
-    end
     phone.mount = (phone.mount == "high") and "high" or "low"
+    -- a phone off the walls (or a new one) goes to its usual spot, or to the first free slot when
+    -- another wall item already hangs there
+    if fresh or not self:wallTileValid(phone.c, phone.r) then
+        local function free(c, r, m)
+            if not self:wallTileValid(c, r) then return false end
+            for _, it in ipairs(self.wallItems) do
+                if it ~= phone and self:wallItemCovers(it, c, r, m) then return false end
+            end
+            return true
+        end
+        local slots = { { self.iw, math.min(3, self.ih) } }
+        for r = 1, self.ih do slots[#slots + 1] = { self.iw, r } end
+        for c = 0, self.iw - 1 do slots[#slots + 1] = { c, 0 } end
+        local placed = false
+        for _, m in ipairs({ "low", "high" }) do
+            for _, s in ipairs(slots) do
+                if not placed and free(s[1], s[2], m) then
+                    phone.c, phone.r, phone.mount = s[1], s[2], m
+                    placed = true
+                end
+            end
+        end
+    end
 end
 
 -- the interior cell the player must stand next to for the phone interact
@@ -525,24 +778,17 @@ end
 
 -- ── edit-mode placement API (ground) ──────────────────────────────────────────────────────────────
 function Room:footprint(id, c, r, facing)
-    local cat = Room.CATALOG[id]
-    local w, h = 1, 1
-    if cat then w, h = cat.w, cat.h; if (facing or 0) % 2 == 1 then w, h = h, w end end
+    local offs, w, h = Room.shapeCells(id, facing)
     local cells = {}
-    for dr = 0, h - 1 do for dc = 0, w - 1 do cells[#cells + 1] = { c + dc, r + dr } end end
+    for _, s in ipairs(offs) do cells[#cells + 1] = { c + s[1], r + s[2] } end
     return cells, w, h
 end
 -- does the candidate footprint (id at c,r,facing) fully contain item `it`'s footprint?
 function Room:footprintContains(id, c, r, facing, it)
     local cells = {}
     for _, cell in ipairs(self:footprint(id, c, r, facing)) do cells[cell[1] .. "," .. cell[2]] = true end
-    local cat = Room.CATALOG[it.id]
-    local w, h = 1, 1
-    if cat then w, h = cat.w, cat.h; if (it.facing or 0) % 2 == 1 then w, h = h, w end end
-    for dr = 0, h - 1 do
-        for dc = 0, w - 1 do
-            if not cells[(it.c + dc) .. "," .. (it.r + dr)] then return false end
-        end
+    for _, cell in ipairs(self:footprint(it.id, it.c, it.r, it.facing or 0)) do
+        if not cells[cell[1] .. "," .. cell[2]] then return false end
     end
     return true
 end
@@ -566,15 +812,17 @@ end
 -- surface item fully hosts, provided that surface carries no other stacked item yet. A surface
 -- may rotate/move under its OWN rider (ignore = itself) as long as the rider stays inside the
 -- new footprint.
-function Room:canPlace(id, c, r, facing, ignore)
+-- riders: the pieces a moved surface carries, as { id, dc, dr, facing } relative to its cell
+function Room:canPlace(id, c, r, facing, ignore, riders)
     local cat = Room.CATALOG[id]; if cat == nil or cat.place == "wall" then return false end
     -- our own riders (when we're a surface moving under them) never count as obstacles
     local ownRiders = {}
     if cat.surface and ignore ~= nil then
         for _, st in ipairs(self:stackedItemsOn(ignore)) do ownRiders[st] = true end
     end
-    local surf = nil
-    for _, cell in ipairs(self:footprint(id, c, r, facing)) do
+    local surf, hosted = nil, 0
+    local cells = self:footprint(id, c, r, facing)
+    for _, cell in ipairs(cells) do
         if self:cellType(cell[1], cell[2]) ~= "O" then return false end
         -- the lookups skip `ignore` themselves: the item being turned or moved (already carrying its
         -- new facing) must not shadow another occupant of the cell
@@ -593,6 +841,15 @@ function Room:canPlace(id, c, r, facing, ignore)
             if not (cat.stackOn and gcat and gcat.surface) then return false end
             if surf ~= nil and surf ~= g then return false end
             surf = g
+            hosted = hosted + 1
+        end
+    end
+    -- on a surface with every cell or not at all: half on a table, the piece would stand in it
+    if surf ~= nil and hosted < #cells then return false end
+    if not self:clearOfWallItems(id, cells, facing, surf and surf.id or nil) then return false end
+    for _, rd in ipairs(riders or {}) do
+        if not self:clearOfWallItems(rd.id, self:footprint(rd.id, c + rd.dc, r + rd.dr, rd.facing), rd.facing, id) then
+            return false
         end
     end
     return true
@@ -626,6 +883,23 @@ function Room:removeFurniture(it)
     end
 end
 function Room:invAdd(id, n) self.inventory[id] = (self.inventory[id] or 0) + (n or 1) end
+-- how many of an item the room has, in stock and placed
+function Room:heldCount(id)
+    local n = self.inventory[id] or 0
+    for _, it in ipairs(self.furniture) do if it.id == id then n = n + 1 end end
+    for _, it in ipairs(self.wallItems) do if it.id == id then n = n + 1 end end
+    return n
+end
+-- the counter other stages read to know whether the save owns an item (My Room writes it on save)
+function Room.heldCounter(id) return ".myroom_held_" .. id end
+
+-- true when the item is in stock or placed in the room
+function Room:holds(id)
+    if (self.inventory[id] or 0) > 0 then return true end
+    for _, it in ipairs(self.furniture) do if it.id == id then return true end end
+    for _, it in ipairs(self.wallItems) do if it.id == id then return true end end
+    return false
+end
 function Room:invTake(id) if (self.inventory[id] or 0) > 0 then self.inventory[id] = self.inventory[id] - 1; return true end return false end
 
 -- Claim coin-shop purchases: each shop item bumps a per-id global counter; the delta since our last
@@ -635,7 +909,13 @@ function Room:invTake(id) if (self.inventory[id] or 0) > 0 then self.inventory[i
 function Room:drainShopGrants(getCounter)
     self.claimed = self.claimed or {}
     local gained = false
-    for _, id in ipairs(Room.SHOP_IDS) do
+    local ids, seen = {}, {}
+    for _, list in ipairs({ Room.SHOP_IDS, Room.REWARD_IDS }) do
+        for _, id in ipairs(list) do
+            if not seen[id] then seen[id] = true; ids[#ids + 1] = id end
+        end
+    end
+    for _, id in ipairs(ids) do
         local total = floor((getCounter(Room.shopCounter(id)) or 0) + 0.5)
         local had = self.claimed[id] or 0
         if total > had then
@@ -756,9 +1036,38 @@ end
 -- ══ geometry + physics build (the proc-map builder; runs inside the physics static session) ═══════
 local FENCE_H = FY + 1.4
 
+-- the shell (floor, walls, window, door) decides whether an edit needs the full build: a change to
+-- the furniture alone keeps the shell and only updates the pieces (Room:syncProps)
+function Room:shellKey()
+    local parts = { self.iw, self.ih, self.exitCol, self.tier or "" }
+    for _, it in ipairs(self.wallItems) do                   -- the windows open the walls
+        local cat = Room.CATALOG[it.id]
+        if cat and cat.window then parts[#parts + 1] = "win" .. it.c .. ":" .. it.r end
+    end
+    local function add(t)
+        local keys = {}
+        for k in pairs(t or {}) do keys[#keys + 1] = k end
+        table.sort(keys)
+        for _, k in ipairs(keys) do parts[#parts + 1] = k .. "=" .. tostring(t[k]) end
+    end
+    add(self.floorDeco); parts[#parts + 1] = "|"; add(self.wallPaint)
+    return table.concat(parts, ",")
+end
+
+-- the shell's collision is kept as it is added, so Room:syncProps can lay it again without
+-- building the shell's geometry
+local function recordingPhys(room, phys)
+    local rec = {}
+    room._shellPhys = rec
+    return {
+        addQuad = function(_, ...) rec[#rec + 1] = { "addQuad", { ... } }; phys:addQuad(...) end,
+        addBox = function(_, ...) rec[#rec + 1] = { "addBox", { ... } }; phys:addBox(...) end,
+    }
+end
+
 function Room:buildMap(world)
     local scene = world.scene
-    local phys = world.phys
+    local phys = recordingPhys(self, world.phys)
     world:setGridSize(self:gridW(), self:gridH())
     local gw, gh = self:gridW(), self:gridH()
     scene:ObjBegin(world.floorObj)
@@ -791,7 +1100,7 @@ function Room:buildMap(world)
                 }
                 for _, e in ipairs(edges) do
                     local nt = self:cellType(c + e.dc, r + e.dr)
-                    if nt ~= "O" and nt ~= "E" and nt ~= "W" and nt ~= "F" then
+                    if nt ~= "O" and nt ~= "E" and nt ~= "W" then
                         local q = e.q
                         scene:ObjAddQuadTex(world.wallObj, q[1], q[2], q[3], q[4], q[5], q[6], q[7], q[8], q[9], q[10], q[11], q[12], A.TEX.skirt, 1, FY, e.sh)
                         phys:addQuad(q[1], q[2], q[3], q[4], q[5], q[6], q[7], q[8], q[9], q[10], q[11], q[12])
@@ -810,7 +1119,7 @@ function Room:buildMap(world)
     local zb = gh - 1                                        -- back wall plane (interior back edge)
     for c = 0, self.iw - 1 do
         local tex = A.WALLPAINT[self.wallPaint["back:" .. c]] or A.TEX.wall
-        if c >= self.winC0 and c <= self.winC1 then          -- window column: split around the opening
+        if self:windowAt(c, 0) then                          -- window column: split around the opening
             wallQuad(c, zb, c + 1, zb, 0, FY + Room.WIN_Y0, tex)
             wallQuad(c, zb, c + 1, zb, FY + Room.WIN_Y1, wallTop, tex)
         else
@@ -821,7 +1130,12 @@ function Room:buildMap(world)
     for r = 1, self.ih do                                    -- right wall, per interior row
         local tex = A.WALLPAINT[self.wallPaint["right:" .. r]] or A.TEX.wall
         local z0 = gh - 1 - r
-        wallQuad(self.iw, z0, self.iw, z0 + 1, 0, wallTop, tex)
+        if self:windowAt(self.iw, r) then                    -- window row: split around the opening
+            wallQuad(self.iw, z0, self.iw, z0 + 1, 0, FY + Room.WIN_Y0, tex)
+            wallQuad(self.iw, z0, self.iw, z0 + 1, FY + Room.WIN_Y1, wallTop, tex)
+        else
+            wallQuad(self.iw, z0, self.iw, z0 + 1, 0, wallTop, tex)
+        end
         phys:addBox(self.iw, 0, z0, self.iw + 1, wallTop, z0 + 1)
     end
     phys:addBox(self.iw, 0, zb, self.iw + 1, wallTop, zb + 1)    -- far corner cell
@@ -837,7 +1151,6 @@ function Room:buildMap(world)
     phys:addBox(self.exitCol, 0, -0.06, self.exitCol + 1, FENCE_H, 0)                 -- exit cell front
 
     self:buildProps(world)
-    self:buildWindow(world)
 
     -- map handle (proc-map contract): heightAt + spawns
     local room = self
@@ -921,6 +1234,10 @@ local function tryModel(world, id, cx, cz, yaw, cat, baseY, it)
         parts = parts or {}
         for _, p in ipairs(cat.emissiveParts) do parts[#parts + 1] = { material = p.material, emissive = p.color } end
     end
+    if cat and cat.alphaParts then
+        parts = parts or {}
+        for _, p in ipairs(cat.alphaParts) do parts[#parts + 1] = { material = p.material, alpha = p.alpha } end
+    end
     -- catalog screenPart: while the item is on (it.tvOn) its screen ignores the sun and the shadow map
     -- and draws a flat colour pushed over the bloom threshold; tv.lua writes the colour every frame
     if cat and cat.screenPart and it and it.tvOn then
@@ -984,7 +1301,19 @@ function Room:buildOneProp(world, phys, gh, it, baseY, stacked)
     if (it.facing or 0) % 2 == 1 then w, h = h, w end
     local cx, cz = world:footprintCenter(it.c, it.r, w, h)
     local yaw = (it.facing or 0) * 90
-    local inst = tryModel(world, it.id, cx, cz, yaw, cat, baseY, it)
+    -- the model already standing for this piece is moved in place, unless its parts must change
+    -- (an on TV routes its screen to its own part)
+    local key = it.id .. (it.tvOn and ":on" or "")
+    local inst = world._propOld and world._propOld[it]
+    if inst and inst._key == key then
+        world._propOld[it] = nil
+        Room.poseFitted(inst, cx, cz, yaw, cat, baseY)
+    else
+        inst = tryModel(world, it.id, cx, cz, yaw, cat, baseY, it)
+        if inst then inst._key = key end
+        local k = inst and world._animKeep and world._animKeep[it]
+        if k and inst.play then pcall(function() inst:play(k.index); inst.anim.t = k.t end) end
+    end
     if inst == nil then
         if cat.build then cat.build(world, cx, cz, yaw, baseY)
         else   -- model file absent: a plain box the size of the footprint marks the spot
@@ -1021,6 +1350,13 @@ function Room:buildOneProp(world, phys, gh, it, baseY, stacked)
     -- the same maths models.lua emitCollision uses) clamped to the cells + a 0.05 inflate — a thin
     -- floorlamp pole no longer blocks its whole tile. Box-fallback items honour per-catalog
     -- collW/collD overrides, else keep the full cell footprint. collH is unchanged.
+    if cat.shape then
+        for _, cell in ipairs(self:footprint(it.id, it.c, it.r, it.facing or 0)) do
+            local z0 = gh - cell[2] - 1
+            phys:addBox(cell[1] + 0.03, FY, z0 + 0.03, cell[1] + 0.97, FY + (cat.collH or 0.85), z0 + 0.97)
+        end
+        return
+    end
     local hx, hz = nil, nil
     if inst ~= nil then
         pcall(function()
@@ -1058,6 +1394,28 @@ function Room.lampLook(world, it, inst)
     end
 end
 
+-- the lights placed items always give off (furniture.json `light`)
+function Room:itemLights(world)
+    local out = {}
+    for _, it in ipairs(self.furniture) do
+        local cat = Room.CATALOG[it.id]
+        local l = cat and cat.light
+        if l then
+            local inst = world._propInst and world._propInst[it] or nil
+            local x, y, z
+            if inst then x, y, z = inst.x, inst.y, inst.z
+            else
+                local w, h = cat.w, cat.h
+                if (it.facing or 0) % 2 == 1 then w, h = h, w end
+                x, z = world:footprintCenter(it.c, it.r, w, h)
+                y = FY
+            end
+            out[#out + 1] = { x = x, y = y + l.y, z = z, r = l.r, g = l.g, b = l.b, intensity = l.intensity, range = l.range }
+        end
+    end
+    return out
+end
+
 -- point lights for every LIT floor lamp (Script.rebuild appends these to the room's light list,
 -- so a lamp actually illuminates when on and goes dark when off)
 function Room:lampLights(world)
@@ -1074,11 +1432,19 @@ function Room:lampLights(world)
     return out
 end
 
-function Room:buildProps(world)
+-- keep = true: the models of the last build are still standing (Room:syncProps) and are reused
+function Room:buildProps(world, keep)
     local phys = world.phys
     local gh = self:gridH()
     world._boxTarget = world.prop3dObj
-    self:invalidateWallGlb()          -- full rebuild: the old wall-GLB instances died with models:clear()
+    if not keep then self:invalidateWallGlb() end   -- full rebuild: the old wall-GLB instances died with models:clear()
+    -- animations carry on through a rebuild (a piece moved or turned): each item's clip and time
+    local anims = {}
+    for it, inst in pairs(world._propInst or {}) do
+        if inst.anim then anims[it] = { index = inst.anim.index, t = inst.anim.t } end
+    end
+    world._animKeep = anims
+    world._propOld = keep and (world._propInst or {}) or nil
     world._propInst = {}              -- furniture entry → its GLB instance (play-mode interact glow)
     -- the arcade screen layer: one persistent, slightly-emissive object reused every rebuild (so it
     -- never accumulates); buildOneProp adds each cab's screen quad into it
@@ -1103,6 +1469,27 @@ function Room:buildProps(world)
     for _, it in ipairs(self.wallItems) do
         self:buildWallItemVisual(world, it)
     end
+    -- what is no longer in the room goes
+    if keep then
+        for _, inst in pairs(world._propOld or {}) do pcall(function() world.models:remove(inst) end) end
+        local present = {}
+        for _, it in ipairs(self.wallItems) do present[it] = true end
+        for it in pairs(self._wallGlb or {}) do
+            if not present[it] then self:removeWallGlbInstance(world, it) end
+        end
+    end
+    world._propOld = nil
+end
+
+-- a change to the furniture alone: the shell's geometry stays; the pieces are moved, added or
+-- removed one by one (unchanged models keep standing) and the collision is laid again
+function Room:syncProps(world)
+    local phys = world.phys
+    phys:beginStatic()
+    for _, op in ipairs(self._shellPhys or {}) do phys[op[1]](phys, table.unpack(op[2])) end
+    world.scene:ObjBegin(world.prop3dObj)
+    self:buildProps(world, true)
+    phys:endStatic()
 end
 
 -- ghost-able visuals (edit ghosts and previews when the GLB ghost is unavailable);
@@ -1133,10 +1520,22 @@ end
 local WALL_GLB = Room.WALL_GLB
 
 -- pose an existing wall-GLB instance onto a wall tile/mount (shared by placed items + ghosts)
+-- the wall frame centred on the tiles a wall item covers
+function Room:wallItemFrame(id, c, r)
+    local f = wallFrame(self, c, r)
+    local w = Room.wallSize(id)
+    if w > 1 then
+        local right = (c == self.iw and r >= 1)
+        local g = wallFrame(self, right and c or c + w - 1, right and r + w - 1 or r)
+        f = { ax = (f.ax + g.ax) * 0.5, az = (f.az + g.az) * 0.5, nx = f.nx, nz = f.nz, tx = f.tx, tz = f.tz }
+    end
+    return f
+end
+
 function Room:poseWallGlb(inst, id, c, r, mount)
     local g = WALL_GLB[id]
     if inst == nil or g == nil then return false end
-    local f = wallFrame(self, c, r)
+    local f = self:wallItemFrame(id, c, r)
     local y = FY + Room.MOUNT_Y[(mount == "high") and "high" or "low"]
     local sc, halfD = nil, nil
     local okB = pcall(function()
@@ -1207,8 +1606,8 @@ function Room:buildWallItemVisual(world, it, ghost)
             return
         end
     end
-    local f = wallFrame(self, it.c, it.r)
-    local y = FY + Room.MOUNT_Y[(it.mount == "high") and "high" or "low"]
+    local f = self:wallItemFrame(it.id, it.c, it.r)
+    local y = FY + Room.MOUNT_Y[Room.wallMountFor(it.id, it.mount)]
     -- picture wall items (souvenir posters/paintings): a gold frame box + a textured quad standing
     -- slightly off the wall. Story mode adds more variants by defining picture = <texture id>.
     if cat and cat.picture then
@@ -1224,22 +1623,27 @@ function Room:buildWallItemVisual(world, it, ghost)
     end
 end
 
--- a framed window model set into the back-wall opening (frame border + cross mullions; the gap behind
--- it shows the day/night sky). Built as thin boxes on the back-wall plane.
-function Room:buildWindow(world)
-    local zbw = self:gridH() - 1
-    local x0, x1 = self.winC0, self.winC1 + 1                 -- opening x-extent (world)
-    local cw, ow = (x0 + x1) * 0.5, (x1 - x0)
-    local y0, y1 = FY + Room.WIN_Y0, FY + Room.WIN_Y1
-    local h = y1 - y0
-    local fc, dz = A.COL.white, 0.16
-    world._boxTarget = world.prop3dObj
-    bx(world, cw, y1, zbw, ow + 0.16, 0.1, dz, 0, fc, 1.0, 0.85)                 -- top bar
-    bx(world, cw, y0 - 0.1, zbw, ow + 0.16, 0.1, dz, 0, fc, 1.0, 0.85)           -- bottom bar
-    bx(world, x0, y0 - 0.1, zbw, 0.12, h + 0.2, dz, 0, fc, 1.0, 0.8)             -- left bar
-    bx(world, x1, y0 - 0.1, zbw, 0.12, h + 0.2, dz, 0, fc, 1.0, 0.8)             -- right bar
-    bx(world, cw, y0, zbw, 0.05, h, 0.1, 0, fc, 0.95, 0.8)                       -- vertical mullion
-    bx(world, cw, (y0 + y1) * 0.5, zbw, ow, 0.05, 0.1, 0, fc, 0.95, 0.8)         -- horizontal mullion
+-- the cool daylight spilling in through each window
+function Room:windowLights()
+    local out = {}
+    for _, it in ipairs(self.wallItems) do
+        local cat = Room.CATALOG[it.id]
+        if cat and cat.window then
+            local f = self:wallItemFrame(it.id, it.c, it.r)
+            out[#out + 1] = { x = f.ax + f.nx * 0.7, y = FY + 1.9, z = f.az + f.nz * 0.7,
+                              r = 0.75, g = 0.85, b = 1.0, intensity = 0.4, range = 5.5 }
+        end
+    end
+    return out
+end
+
+-- rooms from before windows were wall items had theirs fixed on the back wall's columns 2 and 3: it
+-- becomes a placed window, once (the room records it in `win`); a new room gets one there too
+function Room:migrateWindow(t)
+    if t and t.win then return end
+    if Room.CATALOG.window == nil then return end
+    for _, it in ipairs(self.wallItems) do if it.id == "window" then return end end
+    table.insert(self.wallItems, 1, { id = "window", c = 2, r = 0, mount = "low" })
 end
 
 function Room:centerWorld(world)
@@ -1261,7 +1665,7 @@ function Room:toTable()
     end
     return { v = 2, tier = self.tier, iw = self.iw, ih = self.ih, exitCol = self.exitCol,
              furniture = furn, floorDeco = self.floorDeco, wallPaint = self.wallPaint,
-             inventory = self.inventory, wallItems = wi, claimed = self.claimed, gifts = self.gifts }
+             inventory = self.inventory, wallItems = wi, claimed = self.claimed, gifts = self.gifts, win = 1 }
 end
 
 -- returns true when a gift went into the inventory (the caller saves the room)
@@ -1278,6 +1682,7 @@ function Room:loadTable(t)
     MIG.applyItems(self, t, Room.CATALOG, NEW_STARTER_STOCK)
     self.claimed = t.claimed or self.claimed or {}   -- coin-shop grant ledger (see drainShopGrants)
     local gifted = MIG.applyGifts(self, t, Room.CATALOG)
+    self:migrateWindow(t)
     self:ensurePhone()
     return gifted
 end

@@ -62,5 +62,56 @@
   },
   "backpack": {
     "name": "Sac à dos"
+  },
+  "toybox": {
+    "name": "Cube à lettres"
+  },
+  "window": {
+    "name": "Fenêtre"
+  },
+  "lsofa": {
+    "name": "Canapé d'angle"
+  },
+  "wooden_chest": {
+    "name": "Coffre en bois"
+  },
+  "barrel": {
+    "name": "Tonneau"
+  },
+  "coin_piles": {
+    "name": "Piles de pièces"
+  },
+  "pirate_key": {
+    "name": "Clé"
+  },
+  "pirate_swords": {
+    "name": "Sabres de pirate"
+  },
+  "gold_bag": {
+    "name": "Sac d'or"
+  },
+  "skull": {
+    "name": "Crâne décoratif"
+  },
+  "anchor": {
+    "name": "Ancre"
+  },
+  "gold_key": {
+    "name": "Clé dorée"
+  },
+  "cannon": {
+    "name": "Canon"
+  },
+  "caspian_mug": {
+    "name": "La chope de Mr.Caspian"
+  },
+  "chalice": {
+    "name": "Calice"
+  },
+  "crystal": {
+    "name": "Cristal"
+  },
+  "fishtank": {
+    "name": "Aquarium"
   }
 }

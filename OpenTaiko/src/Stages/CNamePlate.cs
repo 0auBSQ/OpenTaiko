@@ -25,6 +25,14 @@ class CNamePlate {
 		}
 	}
 
+	// the equipped title in the language in use: a save keeps the text of the language it was equipped in
+	private static string tLocalizedTitle(SaveFile.Data data) {
+		var db = OpenTaiko.Databases?.DBNameplateUnlockables?.data;
+		if (data.TitleId > 0 && db != null && db.TryGetValue((Int64)data.TitleId, out var nameplate))
+			data.Title = nameplate.nameplateInfo.cld.GetString(data.Title);
+		return data.Title;
+	}
+
 	public void tNamePlateRefreshTitles(int player) {
 		int actualPlayer = player;
 
@@ -86,12 +94,12 @@ class CNamePlate {
 						srcPlayer = mount[0] - '1';
 					data = OpenTaiko.SaveFileInstances[srcPlayer].data;
 					name  = data.Name;
-					title = data.Title;
+					title = tLocalizedTitle(data);
 					dan   = data.Dan;
 				} else {
 					data  = OpenTaiko.SaveFileInstances[actualPlayer].data;
 					name  = data.Name;
-					title = data.Title;
+					title = tLocalizedTitle(data);
 					dan   = data.Dan;
 				}
 

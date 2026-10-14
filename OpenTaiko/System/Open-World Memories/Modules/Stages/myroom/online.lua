@@ -104,7 +104,7 @@ local function encMap(m, valIsNum)
 end
 function MO.roomToJson(room)
     local t = room:toTable()
-    return string.format('{"v":2,"tier":%d,"iw":%d,"ih":%d,"exitCol":%d,"furniture":%s,"floorDeco":%s,"wallPaint":%s,"inventory":%s,"wallItems":%s}',
+    return string.format('{"v":2,"win":1,"tier":%d,"iw":%d,"ih":%d,"exitCol":%d,"furniture":%s,"floorDeco":%s,"wallPaint":%s,"inventory":%s,"wallItems":%s}',
         t.tier or 1, t.iw or 5, t.ih or 5, t.exitCol or 2,
         encFurniture(t.furniture or {}), encMap(t.floorDeco or {}, false), encMap(t.wallPaint or {}, false),
         encMap(t.inventory or {}, true), encWallItems(t.wallItems or {}))
@@ -165,6 +165,7 @@ function MO.roomFromJson(json)
         t.v = floor(v)
         t.wallItems = decWallItems(JSONLOADER:JsonGet(root, "wallItems"))
     end
+    if JSONLOADER:JsonGet(root, "win") ~= nil then t.win = 1 end   -- windows are wall items already
     return t
 end
 

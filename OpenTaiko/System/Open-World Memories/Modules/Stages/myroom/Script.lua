@@ -25,6 +25,7 @@ local TV       = require("tv")              -- the TV: on/off screen light + the
 local Pod      = require("pod")             -- the Mysterious Pod's entry sequence; see pod.lua
 local MX       = require("matrix")          -- the Placeholder Matrix: its glow + the debug scene list; see matrix.lua
 local MR       = require("mirror")          -- the mirror: the student and palette the player wears; see mirror.lua
+local FT       = require("fishtank")        -- the Fish Tank: its fish, kelp and blue lights; see fishtank.lua
 local AV       = require("avatar")          -- the students' billboard sprites (player + visitors); see avatar.lua
 local Student  = require("Student")         -- Lib: the chosen story student and its palette
 local CoinBox  = require("CoinBox")         -- Lib: the coin purse laid over the landlord's offers
@@ -105,6 +106,7 @@ end
 -- edit/MO references stay valid); a player with no saved room gets a fresh default. Coin-shop furniture
 -- purchases (per-save global counters) are claimed into the inventory here, then persisted right away.
 local saveRoom   -- forward decl (loadRoom persists the shop-grant claim through it)
+local heldWritten = {}   -- the owned counts last written for the room shown (written again when they change)
 -- the jukebox's playing song persists alongside the room (own key, same LMDB): every playback op
 -- writes it (JB ctx.onState) and loadRoom resumes it, so leaving/re-entering keeps the music going
 local function jukeboxKey() return (saveKey():gsub("^room_", "jukebox_")) end
@@ -119,6 +121,7 @@ local function persistJukebox()
 end
 local function loadRoom()
     persistLocked = false          -- fresh stage entry / room switch: persisting is live again
+    heldWritten = {}
     if room == nil then room = Room.newDefault() else room:reset() end
     store = store or DATABASE:OpenLocalDatabase("myroom")
     local raw = store and store:Read(saveKey()) or nil
@@ -156,6 +159,14 @@ saveRoom = function()
             sf:SetGlobalCounter(".myroom_iw", room.iw)
             sf:SetGlobalCounter(".myroom_ih", room.ih)
             sf:SetGlobalCounter(".myroom_items", #room.furniture + #room.wallItems)
+            -- how many of each reward item the save owns (the secret vault reads these)
+            for _, id in ipairs(Room.REWARD_IDS) do
+                local n = room:heldCount(id)
+                if heldWritten[id] ~= n then
+                    sf:SetGlobalCounter(Room.heldCounter(id), n)
+                    heldWritten[id] = n
+                end
+            end
         end)
     end
 end
@@ -167,16 +178,29 @@ local function applyLights()
     local gh = room:gridH()
     local lights = {
         { x = cx, y = FY + 2.7, z = cz, r = 1.0, g = 0.86, b = 0.62, intensity = 0.95, range = 8 },
-        { x = (room.winC0 + room.winC1 + 1) / 2, y = FY + 1.9, z = gh - 1.7,
-          r = 0.75, g = 0.85, b = 1.0, intensity = 0.4, range = 5.5 },
     }
+    for _, l in ipairs(room:windowLights()) do lights[#lights + 1] = l end      -- daylight through each window
     for _, l in ipairs(room:lampLights(world)) do lights[#lights + 1] = l end   -- lit floor lamps
     for _, l in ipairs(TV.lights(world)) do lights[#lights + 1] = l end         -- screens of TVs that are on
     for _, l in ipairs(MX.lights(world)) do lights[#lights + 1] = l end         -- the green glow of each matrix
+    for _, l in ipairs(FT.lights(world)) do lights[#lights + 1] = l end         -- fish tanks with their lights on
+    for _, l in ipairs(room:itemLights(world)) do lights[#lights + 1] = l end   -- items that always glow
     world.daynight:setLights(lights)
+    FT.refresh()
 end
 
+local shellBuilt = nil   -- the shell the room was last fully built with (Room:shellKey)
+-- returns "kept" when only the furniture was updated (the models standing were kept)
 local function rebuild()
+    if map ~= nil and room._shellPhys ~= nil and shellBuilt == room:shellKey() then
+        room:syncProps(world)
+        applyLights()
+        TV.tick(0)
+        MX.tick(0)
+        JB.refreshGlow()
+        return "kept"
+    end
+    shellBuilt = room:shellKey()
     -- a rebuild (edit / lamp toggle / extend) must NOT jolt the camera: preserve the live orbit,
     -- ZOOM and focus when the room already exists; only frame fresh on the first build.
     local hadRoom = (map ~= nil) and (world.cam ~= nil)
@@ -202,6 +226,11 @@ local function rebuild()
     -- warm cosy interior: a soft ceiling lamp + a cool spill from the window (re-set after every
     -- loadMap — unloading a map clears the scene light list). Kept gentle so the room isn't blown out.
     applyLights()
+    -- the new models start at their catalog glow: give them this frame's glow and colours right away,
+    -- so a moved or turned piece does not make every light blink
+    TV.tick(0)
+    MX.tick(0)
+    JB.refreshGlow()
 end
 
 local function spawnAtEntrance()
@@ -233,9 +262,11 @@ function onStart()
                          onSfx = function(name)
                              if name == "purse" then Landlord.showPurse() else playPhoneSound(name) end
                          end,
-                         -- the landlord's voice: deep, through a scrambler; nobody else on the line blips
+                         -- the landlord's voice: deep, through a scrambler; any other line types with
+                         -- the voice it names, or in silence
                          onBlip = function()
-                             if phoneFlow == "landlord" then playPhoneSound("blip_landlord" .. math.random(3)) end
+                             if phoneFlow == "landlord" then playPhoneSound("blip_landlord" .. math.random(3))
+                             elseif dlg.node ~= nil and dlg.node.blip ~= nil then playPhoneSound(dlg.node.blip) end
                          end, blipEvery = 3 })
 
     -- Bake the coin-shop furniture previews ONCE as SHARED textures (the shop reads them by key,
@@ -244,6 +275,14 @@ function onStart()
     -- their surface PNGs. Shared textures outlive this stage, so one bake serves the whole session.
     local ok, err = pcall(function()
         local n = Edit.bakeThumbnails(Room.SHOP_MODEL_IDS, "myroom_thumb_", 256)
+        -- the items handed over as rewards, shown by the reward pop-up (the secret vault uses them too)
+        local extra = {}
+        for _, id in ipairs(Room.REWARD_IDS) do
+            local sold = false
+            for _, s in ipairs(Room.SHOP_MODEL_IDS) do if s == id then sold = true end end
+            if not sold then extra[#extra + 1] = id end
+        end
+        n = n + Edit.bakeThumbnails(extra, "myroom_thumb_", 256)
         for id, file in pairs(Room.SHOP_SWATCH_TEX) do
             SHARED:SetSharedTexture("myroom_thumb_" .. id, file)
         end
@@ -275,8 +314,9 @@ function activate()
         hud = PopUI.new{}
         pcScreen = PCS.new()
         edit = Edit.new(room, world, function()
-            rebuild(); saveRoom(); MO.onRoomChanged()
+            local how = rebuild(); saveRoom(); MO.onRoomChanged()
             JB.onRoomEdited(room)      -- stop playback if its jukebox got removed; refresh its cell
+            return how
         end)
         MO.init({
             getRoom         = function() return room end,
@@ -296,6 +336,11 @@ end
 
 function deactivate()
     GLOBALCAMERA:Reset()
+    if mode == "reward" then
+        local modal = ROACTIVITY:GetROActivity("modal")
+        if modal ~= nil and modal.IsActive then modal:Deactivate() end
+        mode = "play"
+    end
     saveRoom()
     if pcScreen and pcScreen:active() then pcScreen:close() end
     if mode == "edit" and edit then edit:leave() end
@@ -366,6 +411,8 @@ local function interactablesInRange()
                         seen[it] = true; list[#list + 1] = { kind = "mirror", it = it, key = "mirror:" .. tostring(it) }
                     elseif cat.interact == "look" then
                         seen[it] = true; list[#list + 1] = { kind = "look", it = it, key = "look:" .. tostring(it) }
+                    elseif cat.interact == "fishtank" then
+                        seen[it] = true; list[#list + 1] = { kind = "fishtank", it = it, key = "fishtank:" .. tostring(it) }
                     end
                 end
             end
@@ -410,6 +457,10 @@ local function interactGlow(focused)
         if focused.kind == "jukebox" and inst.parts then
             partBase = {}
             for _, pp in ipairs(inst.parts) do partBase[pp.obj] = { 0.12, 0.114, 0.096 } end
+        end
+        if focused.kind == "fishtank" and inst.parts then
+            partBase = {}
+            for _, pp in ipairs(inst.parts) do partBase[pp.obj] = FT.glowNow(focused.it, pp.material) end
         end
         if focused.kind == "matrix" and inst.parts then
             partBase = {}
@@ -488,6 +539,26 @@ playPhoneSound = function(stem)
     return false
 end
 local function startBombs() bombFx = { t = 0, dur = 3.0, next = 0 } end  -- { t, dur, next }
+
+-- hands a furniture item over with the reward pop-up; false when it cannot be given here
+local RARITY_MODAL = { Poor = 0, Common = 0, Uncommon = 1, Rare = 2, Epic = 3, Legendary = 4, Mythical = 4 }
+local function giveFurniture(id)
+    local cat = Room.CATALOG[id]
+    if cat == nil or (net.online and not net.isHost) then return false end
+    room:invAdd(id, 1)
+    saveRoom()
+    local rarity = cat.rarity or "Common"
+    local modal = ROACTIVITY:GetROActivity("modal")
+    if modal ~= nil then
+        pcall(function() Edit.bakeThumbnails({ id }, "myroom_thumb_", 512) end)
+        modal:Activate(playerIndex + 1, RARITY_MODAL[rarity] or 0, 5, Room.displayName(id), rarity, "myroom_thumb_" .. id,
+            PHONE:tr("reward_furniture"))
+        mode = "reward"
+    else
+        mode = "play"
+    end
+    return true
+end
 local function dialPhone(input)
     local key = tostring(input or ""):gsub("%s+", ""):lower()
     local doc = phoneNumbersDoc()
@@ -496,13 +567,15 @@ local function dialPhone(input)
     if ev == nil then                                 -- unassigned number → the placeholder
         local n = (input and input ~= "" and input) or PHONE:tr("the_number")
         mode = "dialogue"; phoneFlow = nil
-        dlg:start({ { name = "", text = PHONE:trf("no_answer", n) } })
+        dlg:start({ { name = "", text = PHONE:trf("no_answer", n), blip = "blip_narrator" } })
         return false
     end
     -- guarded like every other data-file read: a malformed entry (bare string, nested field) must
     -- degrade to the no-answer placeholder, not error out of the update path
-    local name, text, sound, effect
+    local name, text, sound, effect, blip, give
     local okEv = pcall(function()
+        give   = JSONLOADER:ExtractText(ev["give"])
+        blip   = JSONLOADER:ExtractText(ev["blip"])
         name   = JSONLOADER:ExtractText(ev["name"])
         text   = JSONLOADER:ExtractText(ev["text"])
         sound  = JSONLOADER:ExtractText(ev["sound"])
@@ -511,17 +584,47 @@ local function dialPhone(input)
     if not okEv then
         local n = (input and input ~= "" and input) or PHONE:tr("the_number")
         mode = "dialogue"; phoneFlow = nil
-        dlg:start({ { name = "", text = PHONE:trf("no_answer", n) } })
+        dlg:start({ { name = "", text = PHONE:trf("no_answer", n), blip = "blip_narrator" } })
+        return
+    end
+    if okEv and give ~= nil and give ~= "" then
+        -- a reward number: the item once, then a line saying so for as long as the room holds it
+        phoneFlow = nil
+        if room:holds(give) or not giveFurniture(give) then
+            mode = "dialogue"
+            dlg:start({ { name = "", text = PHONE:tr("quest_cleared"), blip = "blip_narrator" } })
+        end
         return
     end
     if text then text = PHONE:tr(text) end       -- the entry's text is a phone.json id (egg_*); names stay as written
+    -- a call of several messages: each line has its own name and text id
+    local script = nil
+    pcall(function()
+        local list = ev["lines"]
+        if list == nil then return end
+        local nodes = {}
+        for i = 0, list.Count - 1 do
+            local id = JSONLOADER:ExtractText(list[i]["text"])
+            if id and id ~= "" then
+                local who = JSONLOADER:ExtractText(list[i]["name"]) or ""
+                local blip = JSONLOADER:ExtractText(list[i]["blip"])
+                if (blip == nil or blip == "") and who == "" then blip = "blip_narrator" end
+                if blip == "" then blip = nil end
+                nodes[#nodes + 1] = { name = who, text = PHONE:tr(id), blip = blip }
+            end
+        end
+        if #nodes > 0 then script = nodes end
+    end)
     local wantSilent
     if sound and sound ~= "" then wantSilent = playPhoneSound(sound) end
     if effect == "bombs" then startBombs() end
-    if text == nil or text == "" then mode = "play"  -- sound-only (e.g. 1122 → egg.ogg), no message
+    if script then
+        mode = "dialogue"; phoneFlow = nil
+        dlg:start(script)
+    elseif text == nil or text == "" then mode = "play"  -- sound-only (e.g. 1122 → egg.ogg), no message
     else
         mode = "dialogue"; phoneFlow = nil
-        dlg:start({ { name = name or "", text = text or "" } })
+        dlg:start({ { name = name or "", text = text or "", blip = (blip ~= nil and blip ~= "") and blip or "blip_narrator" } })
     end
     return wantSilent
 end
@@ -633,6 +736,13 @@ MX.init{
     scene = function() return world and world.scene or nil end,
     propInstFor = function(it) return world and world._propInst and world._propInst[it] or nil end,
     displayName = function() return Room.displayName(MX.ID) end,
+}
+
+-- Fish Tank context: the placed tanks and their models
+FT.init{
+    room = function() return room end,
+    scene = function() return world and world.scene or nil end,
+    propInstFor = function(it) return world and world._propInst and world._propInst[it] or nil end,
 }
 
 -- mirror context: the student and palette it changes belong to the save whose room this is
@@ -922,6 +1032,7 @@ function update(ts)
     PCS.tickBgmFade(dt)
     TV.tick(dt)                    -- the screens of TVs that are on drift their colour in every mode
     MX.tick(dt)                    -- the matrix glow breathes in every mode
+    FT.tick(dt)                    -- the fish swim and the kelp sways in every mode
 
     -- ── modal overlays ──
     if mode == "dialogue" then
@@ -931,6 +1042,10 @@ function update(ts)
             if ringDue and ringT <= 1.6 then ringDue = false ; playPhoneSound("phone_ring") end
             if ringT <= 0 and ringScript then dlg:start(ringScript) ; ringScript = nil end
         elseif dlg:update(dt) == "done" then onDialogueDone(dlg.result) end
+        settlePlayer(dt); world:update(dt, px, py, pz); return nil
+    elseif mode == "reward" then
+        local modal = ROACTIVITY:GetROActivity("modal")
+        if modal ~= nil and modal.IsActive then modal:Update() else mode = "play" end
         settlePlayer(dt); world:update(dt, px, py, pz); return nil
     elseif mode == "pod" then
         if Pod.update(dt) == "go" then
@@ -1112,6 +1227,11 @@ function update(ts)
             SHARED:GetSharedSound("Decide"):Play()
             MR.open()
             mode = "mirror"
+        elseif focused.kind == "fishtank" then
+            SHARED:GetSharedSound("Move"):Play()
+            FT.toggle(focused.it)
+            applyLights()                  -- the tank's light and its water's glow
+            saveRoom(); MO.onRoomChanged()
         elseif focused.kind == "look" then
             -- a keepsake: looking at it says its line (dialogs.json, <item id>.look)
             local line = dlgLoc(focused.it.id, "look", nil)
@@ -1156,6 +1276,7 @@ function draw()
         end
     end
 
+    FT.draw()                      -- the fish and kelp inside the tanks
     world:render()
     world:blit()
 
@@ -1189,6 +1310,9 @@ function draw()
         end
         dlg:draw()
         purse:draw()
+    elseif mode == "reward" then
+        local modal = ROACTIVITY:GetROActivity("modal")
+        if modal ~= nil and modal.IsActive then modal:Draw() end
     elseif mode == "pod" then
         Pod.draw(hud, SCREEN_W, SCREEN_H)
     elseif mode == "pc" then
@@ -1223,6 +1347,7 @@ function draw()
         elseif prompt == "matrix" then instr[#instr + 1] = { t = HUD:tr("prompt_matrix"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "mirror" then instr[#instr + 1] = { t = HUD:tr("prompt_mirror"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "look" then instr[#instr + 1] = { t = HUD:tr("prompt_look"), c = { 150, 230, 255 }, s = 24 }
+        elseif prompt == "fishtank" then instr[#instr + 1] = { t = HUD:tr("prompt_fishtank"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "exit" then instr[#instr + 1] = { t = HUD:tr("prompt_exit"), c = { 255, 230, 150 }, s = 24 }
         end
         if interCount > 1 then instr[#instr + 1] = { t = HUD:tr("prompt_switch"), c = { 200, 220, 240 }, s = 18 } end

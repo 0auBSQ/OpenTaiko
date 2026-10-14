@@ -13,6 +13,20 @@ local NAMEPLATE_POOLS = {
     {376, 377, 378, 379, 380},                    -- OpTk
 }
 
+-- My Room furniture found in each chest, with its rarity. My Room hands over what a grant counter adds
+-- (.myroom_<id>) and writes how many the save owns (.myroom_held_<id>); one in stock or placed counts
+-- as obtained. Furniture can come again: an owned piece keeps a fifth of its chance.
+local FURNITURE_POOLS = {
+    { { "wooden_chest", "Common" }, { "barrel", "Common" }, { "coin_piles", "Uncommon" },
+      { "pirate_key", "Uncommon" }, { "pirate_swords", "Uncommon" } },                       -- Simple
+    { { "gold_bag", "Uncommon" }, { "skull", "Uncommon" }, { "anchor", "Uncommon" },
+      { "gold_key", "Rare" }, { "cannon", "Rare" } },                                        -- Gold
+    { { "caspian_mug", "Rare" }, { "chalice", "Rare" }, { "crystal", "Epic" },
+      { "fishtank", "Legendary" } },                                                        -- OpTk
+}
+local NAMEPLATE_W = 15    -- the chance of a chest's nameplates (one draw among those not unlocked)
+local OWNED_SHARE = 1 / 5 -- what is left of an owned piece's chance
+
 -- Rarity string → modal integer (matches HRarity.RarityToModalInt in C#)
 -- Poor=0, Common=0, Uncommon=1, Rare=2, Epic=3, Legendary=4, Mythical=4
 local RARITY_MAP = {Poor=0, Common=0, Uncommon=1, Rare=2, Epic=3, Legendary=4, Mythical=4}
@@ -110,6 +124,22 @@ local function getUnobtainedNameplates(poolIdx)
     return out
 end
 
+local function counter(name)
+    return math.floor((tonumber(sf():GetGlobalCounter(name)) or 0) + 0.5)
+end
+
+local function furnitureOwned(id)
+    return counter(".myroom_held_" .. id) > 0
+end
+
+local function getUnobtainedFurniture(poolIdx)
+    local out = {}
+    for _, f in ipairs(FURNITURE_POOLS[poolIdx]) do
+        if not furnitureOwned(f[1]) then table.insert(out, f) end
+    end
+    return out
+end
+
 local function buildChestPool(idx)
     local pool = {}
 
@@ -130,7 +160,14 @@ local function buildChestPool(idx)
     -- nameplate
     local uNp = getUnobtainedNameplates(idx)
     if #uNp > 0 then
-        table.insert(pool, {w = 15, type = "nameplate", pool = uNp})
+        table.insert(pool, {w = NAMEPLATE_W, type = "nameplate", pool = uNp})
+    end
+
+    -- furniture: each piece with the chance one nameplate of the chest has, a fifth of it once owned
+    local per = NAMEPLATE_W / #NAMEPLATE_POOLS[idx]
+    for _, f in ipairs(FURNITURE_POOLS[idx]) do
+        local w = furnitureOwned(f[1]) and per * OWNED_SHARE or per
+        table.insert(pool, {w = w, type = "furniture", id = f[1], rarity = f[2]})
     end
 
     -- song
@@ -147,11 +184,11 @@ local function rollFromPool(pool)
     local total = 0
     for _, e in ipairs(pool) do total = total + e.w end
     if total == 0 then return {type = "snap"} end
-    local r = math.random(1, total)
+    local r = math.random() * total
     local cum = 0
     for _, e in ipairs(pool) do
         cum = cum + e.w
-        if r <= cum then return e end
+        if r < cum then return e end
     end
     return pool[#pool]
 end
@@ -176,6 +213,11 @@ local function processRoll(idx)
         local id = entry.pool[math.random(1, #entry.pool)]
         save:UnlockNameplate(id)
         return {type = "nameplate", id = id, info = NAMEPLATESLIST:GetById(id), openedChest = idx}
+    elseif entry.type == "furniture" then
+        -- My Room adds it to the room's stock on its next visit; owned from now on
+        save:SetGlobalCounter(".myroom_" .. entry.id, counter(".myroom_" .. entry.id) + 1)
+        save:SetGlobalCounter(".myroom_held_" .. entry.id, counter(".myroom_held_" .. entry.id) + 1)
+        return {type = "furniture", id = entry.id, rarity = entry.rarity, openedChest = idx}
     elseif entry.type == "song" then
         local node = entry.pool[math.random(1, #entry.pool)]
         save:SetGlobalTrigger(".vault_song_unlocked_" .. node.UniqueId, true)
@@ -206,8 +248,8 @@ function M.keyCount(idx)
 end
 
 function M.stock(idx)
-    local left  = #getUnobtainedSongs(idx) + #getUnobtainedNameplates(idx)
-    local total = #songPools[idx] + #NAMEPLATE_POOLS[idx]
+    local left  = #getUnobtainedSongs(idx) + #getUnobtainedNameplates(idx) + #getUnobtainedFurniture(idx)
+    local total = #songPools[idx] + #NAMEPLATE_POOLS[idx] + #FURNITURE_POOLS[idx]
     return left, total
 end
 
@@ -227,6 +269,11 @@ function M.showReward(reward)
     elseif rtype == "song" then
         local songRarity = songLevelToRarity(getMaxChartLevel(reward.node))
         modal:Activate(0, songRarity, 4, reward.node, nil)
+    elseif rtype == "furniture" then
+        -- the picture is the one My Room shares for each of its reward items
+        local Tex = require("tex")
+        modal:Activate(0, RARITY_MAP[reward.rarity] or 1, 5, Tex.tr("VAULT_ITEM_" .. reward.id:upper(), reward.id), reward.rarity,
+            "myroom_thumb_" .. reward.id, Tex.tr("VAULT_NEW_FURNITURE", "New Furniture!"))
     else
         return false
     end

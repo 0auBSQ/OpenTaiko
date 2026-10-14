@@ -1,5 +1,5 @@
 {
-  "_comment": "Dialable phone numbers/codes → events. Keys are matched case-INSENSITIVELY and with whitespace stripped. Fields: name (messenger; '' = no name shown, not localized), text (an id in lang/<code>/phone.json), sound (a stem in the STAGE's Sounds/ folder e.g. myroom/Sounds/egg.ogg, played with no message when there is no text), effect ('bombs' = the Canabi bomb-storm). Any number NOT listed here falls back to the 'nobody picks up' placeholder. Add story-mode easter eggs here without touching code.",
+  "_comment": "Dialable phone numbers/codes → events. Keys are matched case-INSENSITIVELY and with whitespace stripped. Fields: name (messenger; '' = no name shown, not localized), text (an id in lang/<code>/phone.json), sound (a stem in the STAGE's Sounds/ folder e.g. myroom/Sounds/egg.ogg, played with no message when there is no text), lines (a call of several messages, used instead of name/text: a list of { name, text, blip } shown one after the other; blip is the typing sound's stem in the stage's Sounds/ folder, and a line without a name types with the narrator's unless it gives its own; an entry with a single text types with the narrator's too, or with its own blip field), effect ('bombs' = the Canabi bomb-storm), give (a furniture id handed over with the reward pop-up when none is placed or in stock; otherwise the call shows the 'quest_cleared' text). Any number NOT listed here falls back to the 'nobody picks up' placeholder. Add story-mode easter eggs here without touching code.",
   "1122": {
     "sound": "egg"
   },
@@ -27,5 +27,15 @@
   "889": {
     "name": "",
     "text": "egg_nice_try"
+  },
+  "133221333123111": {
+    "give": "toybox"
+  },
+  "78222286": {
+    "lines": [
+      { "name": "", "text": "egg_piano_1" },
+      { "name": "???", "text": "egg_piano_2", "blip": "blip1" },
+      { "name": "", "text": "egg_piano_3" }
+    ]
   }
 }

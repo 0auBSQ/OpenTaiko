@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global, lowercase-global, need-check-nil, undefined-field
 -- modal_test — a debug stage that plays the reward and unlock modals on demand: the coin piggy
 -- bank with three amounts, and the chest reveal plus item card for each of the seven rarities of
--- every item type (character, puchichara, nameplate, song). Each button picks the first installed
+-- every item type (character, puchichara, nameplate, song, and a custom item). Each button picks the first installed
 -- item of that rarity, or the first item at all when none matches, and passes the rarity name to
 -- the modal so the chest and colours always follow the button; nothing is written to the save
 -- file. Esc returns to My Room.
@@ -89,6 +89,10 @@ local function showItem(kind, rarityName)
     elseif kind == 3 then
         info = pick(lists.plate, rarityName)
         if info == nil then return setStatus("No nameplate found") end
+    elseif kind == 5 then
+        -- a custom item: one of My Room's shop pictures, shared while the room was open
+        modal:Activate(1, RARITY_TO_INT[rarityName], 5, "Sofa", rarityName, "myroom_thumb_sofa", "Custom item")
+        return setStatus("Custom / " .. rarityName)
     else
         if #lists.song == 0 then refreshSongs() end
         info = pick(lists.song, rarityName)
@@ -112,9 +116,9 @@ function onStart()
         ui:button{ text = "-" .. amount, x = 80 + (#COIN_AMOUNTS + i - 1) * 200, y = 200, w = 180, h = 64, onClick = function() showCoins(-amount) end }
     end
 
-    local kinds = { { 1, "Character" }, { 2, "Puchichara" }, { 3, "Nameplate" }, { 4, "Song" } }
+    local kinds = { { 1, "Character" }, { 2, "Puchichara" }, { 3, "Nameplate" }, { 4, "Song" }, { 5, "Custom" } }
     for row, k in ipairs(kinds) do
-        local y = 330 + (row - 1) * 150
+        local y = 300 + (row - 1) * 136
         ui:label{ text = k[2], x = 80, y = y, size = "button" }
         for r, name in ipairs(RARITY_NAMES) do
             local c = RARITY_COLORS[r]

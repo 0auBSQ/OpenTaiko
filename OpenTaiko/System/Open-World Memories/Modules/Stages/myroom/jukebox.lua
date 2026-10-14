@@ -361,7 +361,9 @@ local function setScreenGlow(item, r, g, b)
 end
 
 local IDLE_GLOW = { 0.12, 0.114, 0.096 }   -- matches the build-time dim glow (emissive 1,0.95,0.8 × 0.12)
+local glowT = 0                 -- the time of the last glow update
 local function tickGlow(t)
+    glowT = t
     local item = pb.item or (pb.cell and ctx and ctx.jukeboxItemAt(pb.cell.c, pb.cell.r)) or nil
     if glowItem and glowItem ~= item then
         setScreenGlow(glowItem, IDLE_GLOW[1], IDLE_GLOW[2], IDLE_GLOW[3]); glowItem = nil
@@ -717,6 +719,8 @@ end
 --        cellToWorld(c,r)->x,z, propInstFor(item)->inst|nil, jukeboxItemAt(c,r)->item|nil,
 --        scene()->scene|nil, currentJukeboxItem()->item|nil }
 function JB.init(c) ctx = c end
+-- the screen's glow put back at once on rebuilt models (they start at the idle glow)
+function JB.refreshGlow() tickGlow(glowT) end
 
 function JB.isOpen() return isOpen end
 function JB.isActive() return pb.playing or pb.paused end   -- pc.lua BGM suppression probe

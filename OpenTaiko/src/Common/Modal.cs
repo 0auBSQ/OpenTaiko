@@ -19,7 +19,8 @@ internal class Modal {
 		Puchichara = 2,
 		Title = 3,
 		Song = 4,
-		Total = 5,
+		Custom = 5,
+		Total = 6,
 	}
 
 	#endregion

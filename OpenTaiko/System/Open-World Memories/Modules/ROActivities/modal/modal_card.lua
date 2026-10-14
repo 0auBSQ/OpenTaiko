@@ -9,7 +9,8 @@
 -- Item visuals: characters draw their menu animation the way My Room's PC previews them; songs
 -- are a CD jewel case in fake 3D, facing slightly down and to the left so its top edge and right
 -- edge show as parallelograms, the jacket behind the case's front (case_*.png); puchicharas bounce
--- between their two frames; nameplates go through the real plate renderer. The poor tier's card is an abandoned one: a sepia-tinted panel, cobwebs in
+-- between their two frames; nameplates go through the real plate renderer; a custom item is the
+-- picture the caller shared, fitted to a square. The poor tier's card is an abandoned one: a sepia-tinted panel, cobwebs in
 -- its corners, dust motes drifting, no wheel of light.
 
 local Fx = require("modal_fx")
@@ -33,6 +34,7 @@ local ATTIC_TINT = { 186, 170, 146 }
 local ATTIC_DUST = { 168, 154, 132 }
 local PANEL_PASTEL = 0.58                      -- how far the rarity colour is pulled toward white on the panel
 local PUCHI_SCALE = 1.5                        -- a 256px frame drawn at 384
+local PICTURE_BOX = 400                        -- the square a custom item's picture is fitted to
 local PILL_H, PILL_GAP = 50, 16
 local FADE_OUT = 0.3
 local T_HEAD, T_BODY, T_ITEM, T_NAME, T_PILL, T_DETAIL = 0.05, 0.22, 0.5, 0.78, 0.92, 1.06
@@ -80,9 +82,10 @@ local function genreOf(info)
     return title, color or { 120, 126, 150 }
 end
 
--- kind: 1 character (LuaCharacter), 2 puchichara, 3 nameplate, 4 song
+-- kind: 1 character (LuaCharacter), 2 puchichara, 3 nameplate, 4 song, 5 custom (info = its name,
+-- picture = the shared texture's key, header = the card's title)
 -- key (one of Fx.RARITIES) picks the colour, label and fanfare; modalInt is kept for callers
-function M:start(kind, modalInt, key, info)
+function M:start(kind, modalInt, key, info, picture, header)
     self.kind, self.info, self.key = kind, info, key
     self.rarity = max(0, min(4, modalInt or 0))
     self.rainbow = key == "mythical"
@@ -99,7 +102,7 @@ function M:start(kind, modalInt, key, info)
     self.itemShown = false
     self.panel = self.A.tex.panel
     self.name, self.detail = "", nil
-    self.plateTex, self.preimage = nil, nil
+    self.plateTex, self.preimage, self.picture = nil, nil, nil
     self.genreTitle, self.genreColor = nil, nil
     self.frame = 0
 
@@ -124,6 +127,10 @@ function M:start(kind, modalInt, key, info)
             if sub ~= nil and sub ~= "" then self.detail = sub end
             self.preimage = info:GetPreimage()
             self.genreTitle, self.genreColor = genreOf(info)
+        elseif kind == 5 then
+            self.header = tostring(header or "")
+            self.name = tostring(info or "")
+            if picture ~= nil then self.picture = SHARED:GetSharedTexture(tostring(picture)) end
         end
     end)
     if not ok then self.header = self.header or "" end
@@ -288,6 +295,12 @@ function M:drawItem(alpha, s)
         NAMEPLATE:DrawTitlePlate(ITEM_CX, ITEM_CY, floor(alpha * 255), info.Type, self.plateTex, self.langInt, info.Id)
     elseif kind == 4 then
         self:drawCase(alpha, s)
+    elseif kind == 5 and self.picture ~= nil then
+        local tx = self.picture
+        local w, h = tx.Width or 0, tx.Height or 0
+        if w > 0 and h > 0 then
+            Fx.draw(tx, ITEM_CX, ITEM_CY + 10, { s = min(PICTURE_BOX / w, PICTURE_BOX / h) * s, opacity = alpha })
+        end
     end
 end
 
@@ -359,7 +372,7 @@ function M:stop()
         pcall(function() info:Dispose() end)
     end
     if self.preimage ~= nil then pcall(function() self.preimage:Dispose() end) ; self.preimage = nil end
-    self.info, self.plateTex = nil, nil
+    self.info, self.plateTex, self.picture = nil, nil, nil
     self.sparks:clear()
 end
 

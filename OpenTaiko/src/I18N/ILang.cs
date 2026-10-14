@@ -31,6 +31,7 @@ static internal class CLangManager {
 	public static void langAttach(string lang) {
 		_langId = lang;
 		CLuaScript.tReloadLanguage(lang);
+		OpenTaiko.NamePlate?.RefreshSkin();   // the equipped titles follow the language
 	}
 
 	public static int langToInt(string lang) {
