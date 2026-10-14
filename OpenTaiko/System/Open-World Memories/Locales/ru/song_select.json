@@ -1,0 +1,69 @@
+{
+    // Skin locale file — Russian: Song select
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/ru/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Song select: the shortcuts helper and panel, the curated boxes
+        "SONGSELECT_SHORTCUTS_HELPER": "Показать горячие клавиши",
+        "SONGSELECT_SHORTCUTS_TITLE": "Горячие клавиши",
+        "SONGSELECT_SHORTCUTS_CLOSE": "Закрыть",
+        "SONGSELECT_UNBOUND": "(не назначено)",
+        "SONGSELECT_SC_HELP": "Показать этот список",
+        "SONGSELECT_SC_SORT": "Сортировать песни",
+        "SONGSELECT_SC_SEARCH": "Поиск в текущей папке",
+        "SONGSELECT_SC_FAVORITE": "Добавить выбранную песню в избранное или убрать её оттуда",
+        "SONGSELECT_SC_FAVORITES_FOLDER": "Открыть избранное",
+        "SONGSELECT_SC_AUTO_P1": "Вкл./выкл. автоигру для игрока 1",
+        "SONGSELECT_SC_AUTO_P2": "Вкл./выкл. автоигру для игрока 2",
+        "SONGSELECT_SC_COURSE": "Сменить сложность, показанную на полосах песен",
+        "SONGSELECT_SC_PLAYER": "Переключить настраиваемого игрока",
+        "SONGSELECT_SC_SPEED_DOWN": "Уменьшить скорость песни",
+        "SONGSELECT_SC_SPEED_UP": "Увеличить скорость песни",
+        "SONGSELECT_SONG_SPEED": "Скорость",
+        "SONGSELECT_SC_PLAYER_COUNT": "Изменить число игроков",
+        "SONGSELECT_BOX_BEGINNERS": "Песни, рекомендуемые новичкам",
+
+        // Song select: the sort and search dialogs
+        "SONGSELECT_SORT_TITLE": "Сортировка песен",
+        "SONGSELECT_SORT_FILEPATH": "Путь к файлу",
+        "SONGSELECT_SORT_SONG_TITLE": "Название",
+        "SONGSELECT_SORT_SUBTITLE": "Подзаголовок",
+        "SONGSELECT_SORT_LEVEL": "Показанный уровень",
+        "SONGSELECT_SORT_BPM": "Базовый BPM",
+        "SONGSELECT_SORT_BEST_SCORE": "Лучший счёт",
+        "SONGSELECT_SORT_CLEAR_STATUS": "Статус прохождения",
+        "SONGSELECT_SORT_ASC": "по возрастанию",
+        "SONGSELECT_SORT_DESC": "по убыванию",
+        "SONGSELECT_SORT_OFF": "выкл.",
+        "SONGSELECT_SORT_OK": "OK",
+        "SONGSELECT_SEARCH_TITLE": "Поиск песен",
+        "SONGSELECT_SEARCH_DIFFICULTY": "Сложность",
+        "SONGSELECT_SEARCH_LEVEL_FROM": "Уровень от",
+        "SONGSELECT_SEARCH_LEVEL_TO": "Уровень до",
+        "SONGSELECT_SEARCH_SONG_TITLE": "Название",
+        "SONGSELECT_SEARCH_SUBTITLE": "Подзаголовок",
+        "SONGSELECT_SEARCH_CHARTER": "Автор карты",
+        "SONGSELECT_SEARCH_ANY": "Любая",
+        "SONGSELECT_SEARCH_OK": "Найти",
+        "SONGSELECT_SEARCH_CANCEL": "Отмена",
+        "SONGSELECT_SEARCH_COUNT": "Найдено песен: %d",
+        "SONGSELECT_DIFF_EASY": "Лёгкий",
+        "SONGSELECT_DIFF_NORMAL": "Обычный",
+        "SONGSELECT_DIFF_HARD": "Сложный",
+        "SONGSELECT_DIFF_ONI_EDIT": "Oni + Edit",
+
+        // Song select: the best-plays panel on difficulty select
+        "SONGSELECT_REPLAY_TITLE": "Лучшие игры",
+        "SONGSELECT_REPLAY_LOADING": "Загрузка повторов",
+        "SONGSELECT_REPLAY_NONE": "Повторов пока нет",
+        "SONGSELECT_REPLAY_SCORE": "счёт",
+        "SONGSELECT_REPLAY_CONFIRM": "Посмотреть этот повтор?",
+        "SONGSELECT_REPLAY_WATCH": "Смотреть",
+        "SONGSELECT_REPLAY_UNWATCHABLE": "Этот повтор нельзя посмотреть",
+        "SONGSELECT_REPLAY_OLD_VERSION": "Записан в более старой версии игры",
+        "SONGSELECT_REPLAY_CHART_CHANGED": "Карта была изменена после этой игры",
+        "SONGSELECT_REPLAY_REASON_RNG": "Используются случайные моды, которые нельзя воспроизвести",
+        "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT": "Повтор Dynamic Beat из другой версии игры",
+        "SONGSELECT_REPLAY_REASON_UNSEEDED": "Записан до того, как перемешивание нот получило зерно"
+    }
+}

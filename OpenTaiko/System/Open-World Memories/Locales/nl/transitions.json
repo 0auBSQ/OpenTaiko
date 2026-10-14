@@ -1,0 +1,14 @@
+{
+    // Skin locale file — Dutch: Stage transitions: the titles they show
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/nl/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Stage transitions: the titles shown while one plays
+        "TRANSITION_TOWERS_TITLE": "OVERLEVINGS-\nMODUS",
+        "TRANSITION_ONLINE_TITLE": "ONLINE LOBBY",
+        "TRANSITION_DOJO_TITLE": "DE VOSSEN-\nDOJO",
+        "TRANSITION_AI_IN": "AItritus wordt geïnitialiseerd...",
+        "TRANSITION_AI_OUT": "AItritus wordt losgekoppeld...",
+        "TRANSITION_NOKON_TITLE": "INTRO NOKON"
+    }
+}

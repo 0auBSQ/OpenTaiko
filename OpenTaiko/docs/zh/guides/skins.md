@@ -118,7 +118,7 @@ AIBattleCharacter=10v2 - AItritus
 - `Graphics/`：按编号的界面文件夹分组的图像（`0_Startup`、`1_Title`、`2_Config`、`3_DaniSelect`、`5_Game`、`6_Result`、`7_DanResult`、`8_TowerResult`、`12_OnlineLounge`），加上顶层的几张共享图像。动画背景是位于其所属文件夹图像旁边的 `Script.lua` 文件（例如 `Graphics/0_Startup/Script.lua` 和 `Graphics/5_Game/5_Background/` 下的文件夹）。 塔外观是 `Graphics/5_Game/5_Background/Tower/Down/` 下的一个文件夹，包含天空、楼层（`Base/`）、屋顶（`Top.png`）、可选的装饰（`Deco/`）以及 `Config.json` 中的布局；谱面用 `TOWERTYPE:` 选择外观，塔选择、加载画面和结算画面则用 `Modules/Lib/TowerArt/` 下同名文件夹中的专用副本画出同一座塔（部件为一半尺寸，另有自己的 `Config.json`：`floor_height`，以及装饰相对其楼层底部中心的偏移 `deco_dx`/`deco_dy`，均以这些部件的像素为单位），因此新外观需要这两个文件夹。
 - `Sounds/`：游戏按固定文件名加载的系统声音和 BGM，例如 `Sounds/Move.ogg`、`Sounds/Decide.ogg`、`Sounds/Cancel.ogg`、`Sounds/BGM/Title.ogg`、`Sounds/BGM/SongSelect.ogg`、`Sounds/BGM/Result.ogg`。如果某个文件缺失，该声音就不播放。
 - `Fonts/`：`FontName` 键引用的 `.ttf` 文件。
-- `Locales/`：每种语言一个 JSON 文件（`en.json`、`ja.json`、...），形如 `{ "Entries": { "KEY": "text" } }`。这些字符串为皮肤自己的设置提供标签，Lua 通过 `THEME:GetSkinString(key)` 读取它们。当前语言中缺失某个键时，游戏会在 `DefaultLocale` 文件中查找它。
+- `Locales/`：每种语言一个文件夹（`en/`、`ja/`、...），其中可放任意数量的 JSON 文件，每个界面或功能一个（`coin_shop.json`、`items.json`、...），形如 `{ "Entries": { "KEY": "text" } }`；游戏会读取文件夹中的所有文件（也会读取单个 `Locales/<lang>.json` 文件）。这些字符串为皮肤自己的界面和设置提供标签，Lua 通过 `THEME:GetSkinString(key)` 读取它们。当前语言中缺失某个键时，游戏会在 `DefaultLocale` 语言中查找它。
 - `Modules/`：Lua 模块树（第 8 步）。
 - `ThemeSettings.json`：选项界面在“主题设置”下显示的设置数组。每个条目有 `id`、`type`（`bool`、`int`、`double`、`string`、`enum`，或 `key`：选项界面捕获的一个键盘按键，以其名称保存供 `INPUT:KeyboardPressed` 使用）、`scope`（`global`，默认，或 `save` 表示每个存档一个值）、本地化的 `label` 和 `description`、`default`，以及视类型而定的 `min`/`max` 或 `options`。 文件也可以是包含 `sections`（id 到本地化标题，只声明一次）和 `settings`（数组）的对象；条目的可选 `section` 引用其中一个 id，或直接写标题文本，并把它归到主题页面中该小标题下。 `session: true` 只把值留在内存中（每次启动恢复默认），`hidden: true` 让它不出现在设置菜单中、由皮肤自行读写，`step` 设定 int 的步长。
 - `SkinConfig.ini` 及其包含的 `*Config.ini` 文件。
@@ -131,7 +131,7 @@ My New Skin/
   Graphics/           按界面分组的图像；部分文件夹带有背景 Script.lua
   Sounds/             固定文件名的 .ogg 系统声音和 BGM/
   Fonts/              由 FontName 键指定的 .ttf 文件
-  Locales/            en.json、ja.json、...（{ "Entries": { ... } }）
+  Locales/            en/、ja/、...，每个界面一个 .json（{ "Entries": { ... } }）
   Modules/            Lua 模块树（第 8 步）
   <screen>Config.ini  通过 #include 引入的布局文件
 ```

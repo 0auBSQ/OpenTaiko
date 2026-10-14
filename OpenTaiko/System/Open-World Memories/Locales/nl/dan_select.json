@@ -1,0 +1,13 @@
+{
+    // Skin locale file — Dutch: The Fox Dojo entrance (dan_select)
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/nl/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // The Fox Dojo entrance (dan_select): the two boards and the exit
+        "DANSELECT_STANDARD": "Standaard dan-uitdaging",
+        "DANSELECT_STANDARD_DESC": "Bewijs je kunnen met de selectie van de dojo!",
+        "DANSELECT_PAGODA_DESC": "Doorloop meerdere willekeurige dans achter elkaar!",
+        "DANSELECT_EXIT": "Afsluiten",
+        "DANSELECT_CONFIRM": "De uitdaging aangaan?"
+    }
+}

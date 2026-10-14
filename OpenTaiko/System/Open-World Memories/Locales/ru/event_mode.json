@@ -1,0 +1,9 @@
+{
+    // Skin locale file — Russian: Event mode
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/ru/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Event mode: the plays-left line of the clock
+        "EVENT_PLAYS_LEFT": "Осталось игр: %d"
+    }
+}

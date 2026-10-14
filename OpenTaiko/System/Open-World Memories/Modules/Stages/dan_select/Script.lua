@@ -42,7 +42,7 @@ local OFF_X = 1000              -- a board's resting offset off screen: the left
 local OUT_HOLD_SEC = 0.1        -- a beat with the dojo empty before what was chosen happens
 
 -- ── Locale ────────────────────────────────────────────────────────────────────
--- the skin's Locales/<code>.json through THEME; the English text stays in the code as the fallback
+-- the skin's Locales/<code>/ through THEME; the English text stays in the code as the fallback
 
 local function tr(key, fallback)
     local ok, s = pcall(function() return THEME:GetSkinString(key) end)

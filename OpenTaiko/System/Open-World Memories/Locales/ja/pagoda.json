@@ -1,0 +1,31 @@
+{
+    // Skin locale file — Japanese: Pagoda of the Unknown
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/ja/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Pagoda of the Unknown (title screen)
+        "PAGODA_TITLE":     "未知の塔",
+        "PAGODA_BEST":      "最高到達",
+        "PAGODA_CHALLENGE": "挑戦",
+        "PAGODA_PRACTICE":  "練習",
+        "PAGODA_START_AT":   "開始地点…",
+        "PAGODA_LEVEL":      "レベル",
+        "PAGODA_ACCEPT":     "挑戦を受けますか？",
+        "PAGODA_YES":        "はい",
+        "PAGODA_NO":         "いいえ",
+        "PAGODA_NEXT":          "次へ…",
+        "PAGODA_START":         "はじめる",
+        "PAGODA_LEAVE":         "戻る",
+        "PAGODA_LEAVE_CONFIRM":  "塔を出ますか？発見したチェックポイントより先の進行状況は失われます",
+        "PAGODA_OK":            "OK",
+        "PAGODA_ITEM_NEW":      "新しいアイテム",
+        "PAGODA_EXIT":      "退出",
+
+        // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
+        "PAGODA_BAND_TEST":      "題",
+        "PAGODA_BAND_GATE":      "扉",
+        "PAGODA_BAND_SKY":       "穹天",
+        "PAGODA_MYSTERY_CHANCE": "謎の出現率：%d%%",
+        "PAGODA_DESTINY":        "運命は変えられない"
+    }
+}

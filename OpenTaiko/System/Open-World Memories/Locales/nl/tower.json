@@ -1,0 +1,17 @@
+{
+    // Skin locale file — Dutch: Tower
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/nl/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Tower gameplay: the floor and lives planks (tower_hud ROActivity)
+        "TOWER_HUD_REACHED": "Bereikte verdieping",
+        "TOWER_HUD_FLOOR_PREFIX": "Niveau ",
+        "TOWER_HUD_FLOOR_SUFFIX": "",
+        "TOWER_HUD_LIVES": "Levens",
+
+        // Tower select
+        "TOWERSELECT_CONFIRM": "De toren uitdagen?",
+        "TOWERSELECT_RANDOM": "Willekeurige toren",
+        "TOWERSELECT_RETURN": "Terug"
+    }
+}

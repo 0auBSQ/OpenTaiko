@@ -1,0 +1,31 @@
+{
+    // Skin locale file — Korean: Pagoda of the Unknown
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/ko/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Pagoda of the Unknown (title screen)
+        "PAGODA_TITLE":     "미지의 탑",
+        "PAGODA_BEST":      "최고 도달",
+        "PAGODA_CHALLENGE": "도전",
+        "PAGODA_PRACTICE":  "연습",
+        "PAGODA_START_AT":   "시작 지점…",
+        "PAGODA_LEVEL":      "레벨",
+        "PAGODA_ACCEPT":     "도전을 받아들이시겠습니까?",
+        "PAGODA_YES":        "예",
+        "PAGODA_NO":         "아니오",
+        "PAGODA_NEXT":          "다음…",
+        "PAGODA_START":         "시작",
+        "PAGODA_LEAVE":         "나가기",
+        "PAGODA_LEAVE_CONFIRM":  "탑을 나가시겠습니까? 발견한 체크포인트 이후의 진행 상황은 사라집니다",
+        "PAGODA_OK":            "확인",
+        "PAGODA_ITEM_NEW":      "새 아이템",
+        "PAGODA_EXIT":      "나가기",
+
+        // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
+        "PAGODA_BAND_TEST":      "시험",
+        "PAGODA_BAND_GATE":      "문",
+        "PAGODA_BAND_SKY":       "하늘",
+        "PAGODA_MYSTERY_CHANCE": "미스터리 확률: %d%%",
+        "PAGODA_DESTINY":        "운명은 바꿀 수 없다"
+    }
+}

@@ -1,0 +1,44 @@
+{
+    // Skin locale file — Russian: The settings menu (config_ui)
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/ru/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // The settings menu: its buttons, the key binding pages and their help lines
+        "SETTINGS_UI_KEYS": "Управление",
+        "SETTINGS_UI_EXIT": "Выход",
+        "SETTINGS_UI_BACK": "< Назад",
+        "SETTINGS_UI_RUN": "Запустить",
+        "SETTINGS_UI_CONFIGURE": "Настроить",
+        "SETTINGS_UI_KEYS_INDEX_HEADER": "Настройки управления",
+        "SETTINGS_UI_KEYS_GROUP_SYSTEM": "Системное управление",
+        "SETTINGS_UI_KEYS_GROUP_GAME": "Управление в игре",
+        "SETTINGS_UI_KEYS_GROUP_TRAINING": "Управление в режиме тренировки",
+        "SETTINGS_UI_KEYS_GROUP_DEFAULT": "Настройки управления",
+        "SETTINGS_UI_KEYS_PREVIEW_DESC": "Настройте управление.",
+        "SETTINGS_UI_KEYS_BIND_DESC": "Выберите действие. У каждого может быть несколько клавиш: Enter добавляет клавишу, Delete убирает последнюю.",
+        "SETTINGS_UI_KEYS_MULTIBIND_HINT": "Enter: добавить клавишу    Delete: убрать последнюю",
+        "SETTINGS_UI_KEYS_CAPTURE_PROMPT": "Нажмите клавишу...  (Esc — отмена)",
+        "SETTINGS_SECTION_APPEARANCE": "Внешний вид",
+        "SETTINGS_SECTION_SONGS": "Песни и обслуживание",
+        "SETTINGS_SECTION_LANGUAGE": "Язык",
+        "SETTINGS_SECTION_DISPLAY": "Экран и окно",
+        "SETTINGS_SECTION_BACKGROUND": "Фон и видео",
+        "SETTINGS_SECTION_AUDIO": "Звук",
+        "SETTINGS_SECTION_VOLUME": "Громкость",
+        "SETTINGS_SECTION_CHARACTERS": "Персонажи и HUD",
+        "SETTINGS_SECTION_INTEGRATIONS": "Интеграции и дополнительно",
+        "SETTINGS_SECTION_INPUT": "Управление",
+        "SETTINGS_SECTION_GAMEPLAY": "Игровой процесс",
+        "SETTINGS_SECTION_FEEDBACK": "Отображение и отклик",
+        "SETTINGS_SECTION_TIMING": "Тайминг",
+        "SETTINGS_SECTION_AUTOAI": "Авто и ИИ",
+        "SETTINGS_SECTION_UNLOCKABLES": "Открываемое",
+        "SETTINGS_SECTION_TRAINING": "Тренировка",
+        "SETTINGS_SECTION_THEME": "Настройки темы",
+        "SETTINGS_KEYGROUP_SYSTEM": "Система",
+        "SETTINGS_KEYGROUP_DRUMS": "Барабаны {0}P",
+        "SETTINGS_KEYGROUP_MENU": "Меню",
+        "SETTINGS_KEYGROUP_TRAINING": "Тренировка",
+        "SETTINGS_KEYASSIGN_NONE": "(нет)"
+    }
+}

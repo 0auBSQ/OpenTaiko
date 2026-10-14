@@ -1,0 +1,9 @@
+{
+  "_comment": "German texts for the Placeholder Matrix (matrix.lua). Keys are stable ids; a missing id shows the English text (lang/en).",
+  "hint": "Wähle eine Szene zum Projizieren.",
+  "unlock_title": "Gesperrte Szene",
+  "unlock_q": "„%s“ freischalten?",
+  "unlock_yes": "Freischalten",
+  "unlock_no": "Zurück",
+  "broke": "Nicht genug Münzen."
+}

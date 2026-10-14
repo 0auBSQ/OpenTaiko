@@ -1,0 +1,123 @@
+{
+  "_comment": "Nameplate type names, German; missing ids fall back to lang/en.",
+  "0": {
+    "name": "Holz"
+  },
+  "1": {
+    "name": "Kupfer"
+  },
+  "2": {
+    "name": "Amethyst"
+  },
+  "3": {
+    "name": "Natur"
+  },
+  "6": {
+    "name": "Asche"
+  },
+  "7": {
+    "name": "Regenbogen"
+  },
+  "8": {
+    "name": "Weltraum"
+  },
+  "9": {
+    "name": "Diamant"
+  },
+  "10": {
+    "name": "Misery"
+  },
+  "11": {
+    "name": "Gold"
+  },
+  "12": {
+    "name": "Perle"
+  },
+  "13": {
+    "name": "Platin"
+  },
+  "15": {
+    "name": "Dashy"
+  },
+  "16": {
+    "name": "Blau"
+  },
+  "17": {
+    "name": "Rot"
+  },
+  "19": {
+    "name": "KI"
+  },
+  "20": {
+    "name": "Himmel"
+  },
+  "21": {
+    "name": "Gelb"
+  },
+  "22": {
+    "name": "Creme"
+  },
+  "23": {
+    "name": "Meer"
+  },
+  "24": {
+    "name": "Grün"
+  },
+  "25": {
+    "name": "Kapitel I"
+  },
+  "26": {
+    "name": "Kapitel II"
+  },
+  "27": {
+    "name": "Kapitel III"
+  },
+  "28": {
+    "name": "OpTk Hell"
+  },
+  "29": {
+    "name": "OpTk Dunkel"
+  },
+  "31": {
+    "name": "Nacht"
+  },
+  "32": {
+    "name": "Kapitel IV"
+  },
+  "33": {
+    "name": "Clear-Performance"
+  },
+  "34": {
+    "name": "Full-Combo-Performance"
+  },
+  "35": {
+    "name": "Perfect-Performance"
+  },
+  "37": {
+    "name": "Kapitel V"
+  },
+  "38": {
+    "name": "V-ENTURE"
+  },
+  "39": {
+    "name": "Clear-Historie"
+  },
+  "40": {
+    "name": "Full-Combo-Historie"
+  },
+  "41": {
+    "name": "Perfect-Historie"
+  },
+  "42": {
+    "name": "Ryuto Setsujin"
+  },
+  "43": {
+    "name": "Sonnenaufgang"
+  },
+  "44": {
+    "name": "Kapitel VI"
+  },
+  "45": {
+    "name": "Eine neue Welt"
+  }
+}

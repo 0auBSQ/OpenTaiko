@@ -272,8 +272,8 @@ function M.showReward(reward)
     elseif rtype == "furniture" then
         -- the picture is the one My Room shares for each of its reward items
         local Tex = require("tex")
-        modal:Activate(0, RARITY_MAP[reward.rarity] or 1, 5, Tex.tr("VAULT_ITEM_" .. reward.id:upper(), reward.id), reward.rarity,
-            "myroom_thumb_" .. reward.id, Tex.tr("VAULT_NEW_FURNITURE", "New Furniture!"))
+        modal:Activate(0, RARITY_MAP[reward.rarity] or 1, 5, Tex.tr("ITEM_" .. reward.id:upper(), reward.id), reward.rarity,
+            "myroom_thumb_" .. reward.id, Tex.tr("ITEM_NEW_FURNITURE", "New Furniture!"))
     else
         return false
     end

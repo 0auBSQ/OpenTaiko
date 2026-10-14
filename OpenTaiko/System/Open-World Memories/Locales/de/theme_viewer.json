@@ -1,0 +1,15 @@
+﻿{
+    // Skin locale file — German: Theme Settings Viewer stage
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/de/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Themeneinstell-Anzeige-Stage
+        "VIEWER_TITLE":     "Themeneinstellungs-Anzeige",
+        "VIEWER_COL_ID":    "ID",
+        "VIEWER_COL_SCOPE": "Bereich",
+        "VIEWER_COL_TYPE":  "Typ",
+        "VIEWER_COL_VALUE": "Wert",
+        "VIEWER_HINT_SCROLL": "oben/unten scrollen   Abbrechen zum Beenden",
+        "VIEWER_HINT_EXIT":   "Abbrechen zum Beenden"
+    }
+}

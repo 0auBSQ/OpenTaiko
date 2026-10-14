@@ -1,0 +1,31 @@
+{
+    // Skin locale file — Dutch: Pagoda of the Unknown
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/nl/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Pagoda of the Unknown (title screen)
+        "PAGODA_TITLE":     "Pagode van het Onbekende",
+        "PAGODA_BEST":      "Beste",
+        "PAGODA_CHALLENGE": "Uitdaging",
+        "PAGODA_PRACTICE":  "Oefenen",
+        "PAGODA_START_AT":   "Beginnen bij...",
+        "PAGODA_LEVEL":      "Niveau",
+        "PAGODA_ACCEPT":     "De uitdaging aannemen?",
+        "PAGODA_YES":        "Ja",
+        "PAGODA_NO":         "Nee",
+        "PAGODA_NEXT":          "Volgende...",
+        "PAGODA_START":         "Start",
+        "PAGODA_LEAVE":         "Verlaten",
+        "PAGODA_LEAVE_CONFIRM":  "De pagode verlaten? Alle voortgang voorbij de ontdekte checkpoints gaat verloren",
+        "PAGODA_OK":            "OK",
+        "PAGODA_ITEM_NEW":      "Nieuw voorwerp",
+        "PAGODA_EXIT":      "Afsluiten",
+
+        // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
+        "PAGODA_BAND_TEST":      "Proef",
+        "PAGODA_BAND_GATE":      "Poort",
+        "PAGODA_BAND_SKY":       "Hemel",
+        "PAGODA_MYSTERY_CHANCE": "Kans op een mysterie: %d%%",
+        "PAGODA_DESTINY":        "Je kunt je lot niet veranderen"
+    }
+}

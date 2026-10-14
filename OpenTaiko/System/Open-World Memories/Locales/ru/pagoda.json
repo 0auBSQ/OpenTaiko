@@ -1,0 +1,31 @@
+{
+    // Skin locale file — Russian: Pagoda of the Unknown
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/ru/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Pagoda of the Unknown (title screen)
+        "PAGODA_TITLE":     "Пагода Неизвестного",
+        "PAGODA_BEST":      "Лучший",
+        "PAGODA_CHALLENGE": "Испытание",
+        "PAGODA_PRACTICE":  "Тренировка",
+        "PAGODA_START_AT":   "Начать с...",
+        "PAGODA_LEVEL":      "Уровень",
+        "PAGODA_ACCEPT":     "Принять испытание?",
+        "PAGODA_YES":        "Да",
+        "PAGODA_NO":         "Нет",
+        "PAGODA_NEXT":          "Дальше...",
+        "PAGODA_START":         "Начать",
+        "PAGODA_LEAVE":         "Уйти",
+        "PAGODA_LEAVE_CONFIRM":  "Покинуть пагоду? Весь прогресс после открытых контрольных точек будет потерян",
+        "PAGODA_OK":            "ОК",
+        "PAGODA_ITEM_NEW":      "Новый предмет",
+        "PAGODA_EXIT":      "Выход",
+
+        // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
+        "PAGODA_BAND_TEST":      "Испытание",
+        "PAGODA_BAND_GATE":      "Врата",
+        "PAGODA_BAND_SKY":       "Небо",
+        "PAGODA_MYSTERY_CHANCE": "Вероятность тайны: %d%%",
+        "PAGODA_DESTINY":        "Судьбу не изменить"
+    }
+}

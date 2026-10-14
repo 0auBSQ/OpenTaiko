@@ -1,0 +1,46 @@
+﻿{
+    // Skin locale file — English: Title screen
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/en/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Title screen: the menu boxes (the debug entries stay English)
+        "TITLE_PERFORMANCE": "Performance Mode",
+        "TITLE_PERFORMANCE_DESC": "Play Taiko charts with your preferred settings!\nPlayable between 1 and 5 players.",
+        "TITLE_DOJO": "The Fox Dojo",
+        "TITLE_DOJO_DESC": "Challenge various dan exams tailored by the Fox Band!\nSingle player only.",
+        "TITLE_TOWERS": "Survival Mode",
+        "TITLE_TOWERS_DESC": "Climb the towers through survival challenges and try getting to the top!\nSingle player only.",
+        "TITLE_AI_BATTLE": "AI Battle Mode",
+        "TITLE_AI_BATTLE_DESC": "Fight AItritus on your favorite charts and try to get the W!\nSingle player only.",
+        "TITLE_TRAINING": "Training Mode",
+        "TITLE_TRAINING_DESC": "Practice your favorite charts to get the hang of them!\nSingle player only.",
+        "TITLE_INTRO_NOKON": "Intro Nokon",
+        "TITLE_INTRO_NOKON_DESC": "It's show time! Show your musical knowledge through Nokon's best show!\nPlayable between 1 and 5 players.",
+        "TITLE_MYROOM": "My Room",
+        "TITLE_MYROOM_DESC": "Decorate your personal room, place furniture, and visit other players' rooms!",
+        "TITLE_STORE": "OpenTaiko's General Store",
+        "TITLE_STORE_DESC": "Spend your OpenTaiko coins for very nice goods! *wink*",
+        "TITLE_SAVE_ROOM": "Whose room?",
+        "TITLE_SAVE_ROOM_INFO": "%d×%d room · %d placed",
+        "TITLE_SAVE_ROOM_NONE": "Room not visited yet",
+        "TITLE_VAULT": "Secret Vault",
+        "TITLE_VAULT_DESC": "A place full of mysteries where keys seems to have a particular value...",
+        "TITLE_SETTINGS": "Settings",
+        "TITLE_SETTINGS_DESC": "Adjust your settings to fit with your play experience!",
+        "TITLE_EXIT": "Exit",
+        "TITLE_EXIT_DESC": "See you next time!",
+        "TITLE_ONLINE_LOBBY": "Online Lobby",
+        "TITLE_ONLINE_LOBBY_DESC": "(Beta, Share your room code only with people you trust)",
+        "TITLE_ONLINE_OFF_TITLE": "Online play is off",
+        "TITLE_ONLINE_OFF_DESC": "Online play is turned off. To open the Online Lobby, turn on \"{setting}\" in Settings ({section}). Only play online with people you trust.",
+        "TITLE_ONLINE_OFF_OK": "OK",
+        "TITLE_VAULT_LOCKED_DESC": "Can you hear me...?",
+        "TITLE_PLAYERS_PROMPT": "How many drummers take the stage?",
+        "TITLE_PLAYERS_BACK": "Back",
+        "TITLE_PLAYERS_1": "1 Player",
+        "TITLE_PLAYERS_2": "2 Players",
+        "TITLE_PLAYERS_3": "3 Players",
+        "TITLE_PLAYERS_4": "4 Players",
+        "TITLE_PLAYERS_5": "5 Players"
+    }
+}

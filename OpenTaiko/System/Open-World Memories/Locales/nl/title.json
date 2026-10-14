@@ -1,0 +1,46 @@
+{
+    // Skin locale file — Dutch: Title screen
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/nl/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Title screen: the menu boxes (the debug entries stay English)
+        "TITLE_PERFORMANCE": "Speelmodus",
+        "TITLE_PERFORMANCE_DESC": "Speel Taiko-charts met je eigen instellingen!\nSpeelbaar met 1 tot 5 spelers.",
+        "TITLE_DOJO": "De Vossendojo",
+        "TITLE_DOJO_DESC": "Ga de dan-examens van de Fox Band aan!\nAlleen voor één speler.",
+        "TITLE_TOWERS": "Overlevingsmodus",
+        "TITLE_TOWERS_DESC": "Beklim de torens in overlevingsuitdagingen en probeer de top te halen!\nAlleen voor één speler.",
+        "TITLE_AI_BATTLE": "AI-gevechtsmodus",
+        "TITLE_AI_BATTLE_DESC": "Neem het op je favoriete charts op tegen AItritus en pak de winst!\nAlleen voor één speler.",
+        "TITLE_TRAINING": "Oefenmodus",
+        "TITLE_TRAINING_DESC": "Oefen je favoriete charts tot je ze onder de knie hebt!\nAlleen voor één speler.",
+        "TITLE_INTRO_NOKON": "Intro Nokon",
+        "TITLE_INTRO_NOKON_DESC": "Showtime! Laat je muziekkennis zien in de beste show van Nokon!\nSpeelbaar met 1 tot 5 spelers.",
+        "TITLE_MYROOM": "Mijn kamer",
+        "TITLE_MYROOM_DESC": "Richt je eigen kamer in, zet meubels neer en bezoek de kamers van andere spelers!",
+        "TITLE_STORE": "OpenTaiko's Warenhuis",
+        "TITLE_STORE_DESC": "Geef je OpenTaiko-munten uit aan hele mooie spullen! *knipoog*",
+        "TITLE_SAVE_ROOM": "Wiens kamer?",
+        "TITLE_SAVE_ROOM_INFO": "Kamer van %d×%d · %d geplaatst",
+        "TITLE_SAVE_ROOM_NONE": "Kamer nog niet bezocht",
+        "TITLE_VAULT": "Geheime kluis",
+        "TITLE_VAULT_DESC": "Een plek vol mysteries waar sleutels een bijzondere waarde lijken te hebben...",
+        "TITLE_SETTINGS": "Instellingen",
+        "TITLE_SETTINGS_DESC": "Pas je instellingen aan je speelervaring aan!",
+        "TITLE_EXIT": "Afsluiten",
+        "TITLE_EXIT_DESC": "Tot de volgende keer!",
+        "TITLE_ONLINE_LOBBY": "Online lobby",
+        "TITLE_ONLINE_LOBBY_DESC": "(Bèta, deel je kamercode alleen met mensen die je vertrouwt)",
+        "TITLE_ONLINE_OFF_TITLE": "Online spelen staat uit",
+        "TITLE_ONLINE_OFF_DESC": "Online spelen staat uit. Zet „{setting}” aan in de instellingen ({section}) om de online lobby te openen. Speel alleen online met mensen die je vertrouwt.",
+        "TITLE_ONLINE_OFF_OK": "OK",
+        "TITLE_VAULT_LOCKED_DESC": "Hoor je me...?",
+        "TITLE_PLAYERS_PROMPT": "Hoeveel drummers betreden het podium?",
+        "TITLE_PLAYERS_BACK": "Terug",
+        "TITLE_PLAYERS_1": "1 Speler",
+        "TITLE_PLAYERS_2": "2 Spelers",
+        "TITLE_PLAYERS_3": "3 Spelers",
+        "TITLE_PLAYERS_4": "4 Spelers",
+        "TITLE_PLAYERS_5": "5 Spelers"
+    }
+}

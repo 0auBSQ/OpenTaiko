@@ -1,0 +1,23 @@
+{
+  "_comment": "화면 조작 안내, 상호작용 프롬프트, 방 선택기(Script.lua)의 한국어 텍스트. 키는 고정 ID이며, 없는 ID는 영어 텍스트(lang/en)로 표시됩니다.",
+  "ctl_move": "WASD — 이동",
+  "ctl_orbit": "우클릭 / Q·E — 시점 회전",
+  "ctl_zoom": "휠 — 확대/축소",
+  "ctl_edit": "Tab — 방 편집",
+  "ctl_leave": "Esc — 나가기",
+  "ctl_leave_visit": "Esc / 문 — 방문 종료",
+  "prompt_computer": "[Enter] 컴퓨터 사용",
+  "prompt_phone": "[Enter] 전화 사용",
+  "prompt_lamp": "[Enter] 램프 켜기/끄기",
+  "prompt_jukebox": "[Enter] 음악 재생",
+  "prompt_tv": "[Enter] TV 사용",
+  "prompt_pod": "[Enter] 조사하기",
+  "prompt_matrix": "[Enter] Placeholder Matrix 사용",
+  "prompt_mirror": "[Enter] 거울 보기",
+  "prompt_look": "[Enter] 보기",
+  "prompt_fishtank": "[Enter] 어항 조명 켜기/끄기",
+  "prompt_exit": "[Enter] 방 나가기",
+  "prompt_switch": "[Tab] 포커스 전환",
+  "player_entry": "플레이어 %d — %s",
+  "whose_room": "누구의 방?"
+}

@@ -118,7 +118,7 @@ AIBattleCharacter=10v2 - AItritus
 - `Graphics/`: 番号付きの画面ごとのフォルダ (`0_Startup`、`1_Title`、`2_Config`、`3_DaniSelect`、`5_Game`、`6_Result`、`7_DanResult`、`8_TowerResult`、`12_OnlineLounge`) にまとめられた画像と、最上位にあるいくつかの共有画像。アニメーションする背景は、それが属するフォルダの画像の隣に置かれた `Script.lua` ファイルです (例えば `Graphics/0_Startup/Script.lua` や `Graphics/5_Game/5_Background/` の下のフォルダ)。 塔のルックは `Graphics/5_Game/5_Background/Tower/Down/` 配下の 1 つのフォルダで、空、階 (`Base/`)、屋根 (`Top.png`)、任意の装飾 (`Deco/`)、そして `Config.json` のレイアウトを持ちます。譜面は `TOWERTYPE:` でルックを選び、塔選択、ロード画面、リザルトは `Modules/Lib/TowerArt/` 配下の同名フォルダにある専用のコピー（部品を半分のサイズにしたものと、独自の `Config.json`：`floor_height` と、階の下端中央からの装飾のずれ `deco_dx`/`deco_dy`。いずれもその部品のピクセル単位）から同じ塔を描きます。そのため、新しいルックには両方のフォルダが必要です。
 - `Sounds/`: ゲームが決まったファイル名で読み込むシステムサウンドと BGM。例: `Sounds/Move.ogg`、`Sounds/Decide.ogg`、`Sounds/Cancel.ogg`、`Sounds/BGM/Title.ogg`、`Sounds/BGM/SongSelect.ogg`、`Sounds/BGM/Result.ogg`。ファイルがなければそのサウンドは再生されません。
 - `Fonts/`: `FontName` キーで参照される `.ttf` ファイル。
-- `Locales/`: 言語ごとに 1 つの JSON ファイル (`en.json`、`ja.json`、...) で、形式は `{ "Entries": { "KEY": "text" } }`。これらの文字列はスキン自身の設定のラベルとなり、Lua は `THEME:GetSkinString(key)` を通じてこれらを読み取ります。アクティブな言語にキーがない場合、ゲームは `DefaultLocale` のファイルからそれを検索します。
+- `Locales/`: 言語ごとに 1 つのフォルダ (`en/`、`ja/`、...) で、画面や機能ごとの JSON ファイル (`coin_shop.json`、`items.json`、...) をいくつでも置け、形式はどれも `{ "Entries": { "KEY": "text" } }`。ゲームはフォルダ内のすべてのファイルを読みます (単一の `Locales/<lang>.json` ファイルも読みます)。これらの文字列はスキン自身の画面と設定のラベルとなり、Lua は `THEME:GetSkinString(key)` を通じてこれらを読み取ります。アクティブな言語にキーがない場合、ゲームは `DefaultLocale` の言語からそれを探します。
 - `Modules/`: Lua モジュールツリー (ステップ 8)。
 - `ThemeSettings.json`: オプション画面がテーマ設定の下に表示する設定の配列。各エントリは `id`、`type` (`bool`、`int`、`double`、`string`、`enum`、または `key`: オプション画面が取り込むキーボードのキー 1 つで、`INPUT:KeyboardPressed` 用の名前として保存されます)、`scope` (既定の `global`、またはセーブファイルごとに 1 つの値を持つ `save`)、ローカライズされた `label` と `description`、`default`、そして型に応じて `min`/`max` または `options` を持ちます。 ファイルは代わりに `sections` (id からローカライズ済み見出しへ、一度だけ宣言) と `settings` (配列) を持つオブジェクトにもできます。エントリの任意の `section` はその id のひとつ、または見出しの文字列そのもので、テーマページでその小見出しの下にまとめられます。 `session: true` は値をメモリにだけ保持し (起動のたびに既定値に戻ります)、`hidden: true` は設定メニューに載せずスキン自身が読み書きし、`step` は int の増分を決めます。
 - `SkinConfig.ini` とインクルードされる `*Config.ini` ファイル。
@@ -131,7 +131,7 @@ My New Skin/
   Graphics/           images by screen; some folders carry a background Script.lua
   Sounds/             fixed-name .ogg system sounds and BGM/
   Fonts/              .ttf files named by the FontName keys
-  Locales/            en.json, ja.json, ... ({ "Entries": { ... } })
+  Locales/            en/, ja/, ... one .json per screen ({ "Entries": { ... } })
   Modules/            the Lua module tree (Step 8)
   <screen>Config.ini  layout files pulled in via #include
 ```

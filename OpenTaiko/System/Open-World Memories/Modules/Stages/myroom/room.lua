@@ -24,7 +24,6 @@ local A = require("assets")
 local TVMod = require("tv")           -- the TV screen constant (room.lua routes the screen part with it)
 local IsoMap = require("OWM3d.isomap")
 local MIG = require("migration")       -- save-table migrations (retired ids, v1→v2, starter seeding)
-local I18N = require("i18n")           -- item names: lang/<code>/<file>.json (English fallback)
 local cos, sin, pi, floor = math.cos, math.sin, math.pi, math.floor
 
 local Room = {}
@@ -155,12 +154,10 @@ local STARTER = nil
 local NEW_STARTER_STOCK = {}
 
 -- data/*.json access: JsonParseFileAny gives plain dictionaries (arrays 1-indexed), JsonGet is a
--- nil-safe lookup. Display names come from lang/<code>/<file>.json (same ids, "name" field) through a
--- handle resolved at call time, so a language change shows on the next draw.
+-- nil-safe lookup. Display names are the skin's ITEM_<ID> strings (Room.displayName).
 local function jget(d, k) return JSONLOADER:JsonGet(d, k) end
 local function jnum(v) return tonumber(v) end
 local function jflag(node, k) if jget(node, k) == true then return true end return nil end
-local function jloc(file, id) return I18N.texts(file):loc(id, "name") end
 
 local function buildCatalogFromJson()
     local doc = JSONLOADER:JsonParseFileAny("data/furniture.json")
@@ -186,7 +183,6 @@ local function buildCatalogFromJson()
                                                              -- object (runtime glow, e.g. jukebox screen)
                 screenPart = jget(node, "screenPart"),       -- GLB material shown unlit + flat-coloured
                                                              -- while the item is on (the TV screen)
-                nameLoc = jloc("furniture", id),
                 build = GROUND_BUILDERS[id], wallBuild = WALL_BUILDERS[id],
             }
             local scr = jget(node, "screen")
@@ -263,8 +259,7 @@ local function buildCatalogFromJson()
     return next(Room.CATALOG) ~= nil
 end
 
--- floorings/paints: id registry + localized names (+ shop swatch). NOTE: only the name (lang/) and
--- `swatch` are live data — texture binding stays in assets.lua (A.FLOORPAINT/A.WALLPAINT) and the infinite
+-- floorings/paints: id registry (+ shop swatch). NOTE: only `swatch` is live data — texture binding stays in assets.lua (A.FLOORPAINT/A.WALLPAINT) and the infinite
 -- "revert to default" entries are the DEFAULT_FLOOR/DEFAULT_PAINT constants above.
 local function buildDecoFromJson(file, target)
     local doc = JSONLOADER:JsonParseFileAny("data/" .. file .. ".json")
@@ -274,7 +269,7 @@ local function buildDecoFromJson(file, target)
         local id = jget(order, i)
         local node = id and jget(doc, id)
         if node then
-            target[id] = { tex = jget(node, "tex"), nameLoc = jloc(file, id) }
+            target[id] = { tex = jget(node, "tex") }
             local sw = jget(node, "swatch")
             if sw then Room.SHOP_SWATCH_TEX[id] = sw end
         end
@@ -341,10 +336,12 @@ for _, id in ipairs(Room.SHOP_MODEL_IDS) do Room.SHOP_IDS[#Room.SHOP_IDS + 1] = 
 for id in pairs(Room.SHOP_SWATCH_TEX) do Room.SHOP_IDS[#Room.SHOP_IDS + 1] = id end
 function Room.shopCounter(id) return ".myroom_" .. id end
 
--- localized display name for a furniture / floor / wall-paint id (falls back to the id)
+-- localized display name for a furniture / floor / wall-paint id (falls back to the id). The names
+-- are the skin's ITEM_<ID> strings (Locales/<code>/), shared with the coin shop and the vault.
 function Room.displayName(id)
-    local cat = Room.CATALOG[id] or Room.FLOORDECO[id] or Room.WALLPAINT[id]
-    if cat and cat.nameLoc then return cat.nameLoc:GetString(id) end
+    local key = "ITEM_" .. tostring(id):upper()
+    local ok, v = pcall(function() return THEME:GetSkinString(key) end)
+    if ok and type(v) == "string" and v ~= "" and v ~= key and v:sub(1, 1) ~= "[" then return v end
     return id
 end
 

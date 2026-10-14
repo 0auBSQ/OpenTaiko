@@ -1,0 +1,9 @@
+{
+  "_comment": "镜子（mirror.lua）的中文文本。键为固定 ID；缺少的 ID 显示英文文本（lang/en）。",
+  "student": "学生",
+  "student_a": "学生 A",
+  "student_b": "学生 B",
+  "palette": "调色板",
+  "worn": "穿戴中",
+  "locked": "使用该学生的游玩次数：%d / %d"
+}

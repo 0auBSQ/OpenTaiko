@@ -552,7 +552,7 @@ local function giveFurniture(id)
     if modal ~= nil then
         pcall(function() Edit.bakeThumbnails({ id }, "myroom_thumb_", 512) end)
         modal:Activate(playerIndex + 1, RARITY_MODAL[rarity] or 0, 5, Room.displayName(id), rarity, "myroom_thumb_" .. id,
-            PHONE:tr("reward_furniture"))
+            Room.displayName("new_furniture"))
         mode = "reward"
     else
         mode = "play"

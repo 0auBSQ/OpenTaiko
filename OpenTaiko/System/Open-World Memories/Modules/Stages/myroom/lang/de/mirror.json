@@ -1,0 +1,9 @@
+{
+  "_comment": "German texts for the mirror (mirror.lua). Keys are stable ids; a missing id shows the English text (lang/en).",
+  "student": "Schüler",
+  "student_a": "Schüler A",
+  "student_b": "Schüler B",
+  "palette": "Palette",
+  "worn": "Wird getragen",
+  "locked": "Spiele mit diesem Schüler: %d / %d"
+}

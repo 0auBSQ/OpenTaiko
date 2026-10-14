@@ -1,0 +1,46 @@
+﻿{
+    // Skin locale file — French: Title screen
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/fr/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Title screen: the menu boxes (the debug entries stay English)
+        "TITLE_PERFORMANCE": "Mode Performance",
+        "TITLE_PERFORMANCE_DESC": "Jouez des partitions de Taiko avec vos réglages préférés !\nJouable de 1 à 5 joueurs.",
+        "TITLE_DOJO": "Le Dojo du Renard",
+        "TITLE_DOJO_DESC": "Relevez les examens de dan concoctés par la Fox Band !\nUn seul joueur.",
+        "TITLE_TOWERS": "Mode Survie",
+        "TITLE_TOWERS_DESC": "Gravissez les tours en mode survie et tentez d'atteindre le sommet !\nUn seul joueur.",
+        "TITLE_AI_BATTLE": "Mode Combat IA",
+        "TITLE_AI_BATTLE_DESC": "Affrontez AItritus sur vos partitions préférées et décrochez la victoire !\nUn seul joueur.",
+        "TITLE_TRAINING": "Mode Entraînement",
+        "TITLE_TRAINING_DESC": "Entraînez-vous sur vos partitions préférées pour les maîtriser !\nUn seul joueur.",
+        "TITLE_INTRO_NOKON": "Intro Nokon",
+        "TITLE_INTRO_NOKON_DESC": "C'est l'heure du show ! Prouvez votre culture musicale dans le meilleur show de Nokon !\nJouable de 1 à 5 joueurs.",
+        "TITLE_MYROOM": "Ma Chambre",
+        "TITLE_MYROOM_DESC": "Décorez votre chambre, placez des meubles et visitez celles des autres joueurs !",
+        "TITLE_STORE": "Le Bazar d'OpenTaiko",
+        "TITLE_STORE_DESC": "Dépensez vos pièces OpenTaiko pour de très jolis articles ! *clin d'œil*",
+        "TITLE_SAVE_ROOM": "La chambre de qui ?",
+        "TITLE_SAVE_ROOM_INFO": "Chambre %d×%d · %d objets placés",
+        "TITLE_SAVE_ROOM_NONE": "Chambre pas encore visitée",
+        "TITLE_VAULT": "Fort Boyaux",
+        "TITLE_VAULT_DESC": "Un lieu plein de mystères où les clés semblent avoir une valeur particulière...",
+        "TITLE_SETTINGS": "Paramètres",
+        "TITLE_SETTINGS_DESC": "Ajustez vos réglages pour une expérience de jeu sur mesure !",
+        "TITLE_EXIT": "Quitter",
+        "TITLE_EXIT_DESC": "À la prochaine !",
+        "TITLE_ONLINE_LOBBY": "Salon en ligne",
+        "TITLE_ONLINE_LOBBY_DESC": "(Bêta, ne partagez votre code de salon qu'avec des personnes de confiance)",
+        "TITLE_ONLINE_OFF_TITLE": "Le jeu en ligne est désactivé",
+        "TITLE_ONLINE_OFF_DESC": "Le jeu en ligne est désactivé. Pour ouvrir le salon en ligne, activez « {setting} » dans les paramètres ({section}). Ne jouez en ligne qu'avec des personnes de confiance.",
+        "TITLE_ONLINE_OFF_OK": "OK",
+        "TITLE_VAULT_LOCKED_DESC": "Vous m'entendez... ?",
+        "TITLE_PLAYERS_PROMPT": "Combien de batteurs montent sur scène ?",
+        "TITLE_PLAYERS_BACK": "Retour",
+        "TITLE_PLAYERS_1": "1 Joueur",
+        "TITLE_PLAYERS_2": "2 Joueurs",
+        "TITLE_PLAYERS_3": "3 Joueurs",
+        "TITLE_PLAYERS_4": "4 Joueurs",
+        "TITLE_PLAYERS_5": "5 Joueurs"
+    }
+}

@@ -118,7 +118,7 @@ AIBattleCharacter=10v2 - AItritus
 - `Graphics/`: 번호가 매겨진 화면별 폴더(`0_Startup`, `1_Title`, `2_Config`, `3_DaniSelect`, `5_Game`, `6_Result`, `7_DanResult`, `8_TowerResult`, `12_OnlineLounge`)로 묶인 이미지와 상단의 몇몇 공용 이미지. 애니메이션 배경은 속한 폴더의 이미지 옆에 놓인 `Script.lua` 파일입니다(예: `Graphics/0_Startup/Script.lua`와 `Graphics/5_Game/5_Background/` 아래 폴더). 타워 룩은 `Graphics/5_Game/5_Background/Tower/Down/` 아래의 폴더 하나로, 하늘, 층(`Base/`), 지붕(`Top.png`), 선택적인 장식(`Deco/`), 그리고 `Config.json`의 배치를 담습니다. 채보는 `TOWERTYPE:`으로 룩을 고르고, 타워 선택, 로딩 화면, 결과 화면은 `Modules/Lib/TowerArt/` 아래 같은 이름의 폴더에 있는 전용 사본(조각을 절반 크기로 줄인 것과 자체 `Config.json`: `floor_height`, 그리고 층의 아래쪽 가운데에서 장식까지의 오프셋 `deco_dx`/`deco_dy`, 모두 그 조각의 픽셀 단위)으로 같은 타워를 그립니다. 따라서 새 룩에는 두 폴더가 모두 필요합니다.
 - `Sounds/`: 게임이 고정 파일 이름으로 로드하는 시스템 소리와 BGM. 예: `Sounds/Move.ogg`, `Sounds/Decide.ogg`, `Sounds/Cancel.ogg`, `Sounds/BGM/Title.ogg`, `Sounds/BGM/SongSelect.ogg`, `Sounds/BGM/Result.ogg`. 파일이 없으면 그 소리는 재생되지 않습니다.
 - `Fonts/`: `FontName` 키가 참조하는 `.ttf` 파일.
-- `Locales/`: 언어별 JSON 파일(`en.json`, `ja.json`, ...) 하나씩, 형태는 `{ "Entries": { "KEY": "text" } }`. 이 문자열은 스킨 자체 설정의 라벨이며 Lua는 `THEME:GetSkinString(key)`로 이를 읽습니다. 활성 언어에 키가 없으면 게임은 `DefaultLocale` 파일에서 찾습니다.
+- `Locales/`: 언어별 폴더 하나(`en/`, `ja/`, ...)에 화면이나 기능마다 JSON 파일(`coin_shop.json`, `items.json`, ...)을 원하는 만큼 두며, 형태는 모두 `{ "Entries": { "KEY": "text" } }`입니다. 게임은 폴더의 모든 파일을 읽습니다(단일 `Locales/<lang>.json` 파일도 읽습니다). 이 문자열은 스킨 자체 화면과 설정의 라벨이며 Lua는 `THEME:GetSkinString(key)`로 이를 읽습니다. 활성 언어에 키가 없으면 게임은 `DefaultLocale` 언어에서 찾습니다.
 - `Modules/`: Lua 모듈 트리(8단계).
 - `ThemeSettings.json`: 옵션 화면이 테마 설정 아래에 표시하는 설정 배열. 각 항목은 `id`, `type`(`bool`, `int`, `double`, `string`, `enum`, 또는 `key`: 옵션 화면이 캡처하는 키보드 키 하나로, `INPUT:KeyboardPressed`용 이름으로 저장됩니다), `scope`(기본값 `global`, 또는 세이브 파일마다 값 하나인 `save`), 지역화된 `label`과 `description`, `default`, 그리고 타입에 따라 `min`/`max` 또는 `options`를 가집니다. 파일은 대신 `sections`(id에서 현지화된 제목으로, 한 번만 선언)와 `settings`(배열)를 가진 객체일 수 있습니다. 항목의 선택적 `section`은 그 id 중 하나이거나 제목 문자열 자체이며, 테마 페이지에서 그 소제목 아래로 묶입니다. `session: true`는 값을 메모리에만 두고 (실행할 때마다 기본값으로 복귀), `hidden: true`는 설정 메뉴에서 빼서 스킨이 직접 읽고 쓰게 하며, `step`은 int의 증감 폭을 정합니다.
 - `SkinConfig.ini`와 포함되는 `*Config.ini` 파일.
@@ -131,7 +131,7 @@ My New Skin/
   Graphics/           화면별 이미지. 일부 폴더는 배경 Script.lua를 가짐
   Sounds/             고정 이름 .ogg 시스템 소리와 BGM/
   Fonts/              FontName 키가 지정하는 .ttf 파일
-  Locales/            en.json, ja.json, ... ({ "Entries": { ... } })
+  Locales/            en/, ja/, ... one .json per screen ({ "Entries": { ... } })
   Modules/            Lua 모듈 트리 (8단계)
   <screen>Config.ini  #include로 끌어오는 레이아웃 파일
 ```

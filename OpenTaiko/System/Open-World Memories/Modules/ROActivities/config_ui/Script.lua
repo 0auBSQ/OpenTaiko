@@ -92,7 +92,7 @@ local function clamp(v, lo, hi) if v < lo then return lo elseif v > hi then retu
 -- ── skin locale ─────────────────────────────────────────────────────────────────────
 -- option name/desc text arrives localized from C#; the menu chrome below (tabs, buttons, headers, prompts) is
 -- authored here, so it is translated through the skin locale. the global THEME is the engine's LuaThemeFunc
--- (its GetSkinString reads the skin's Locales/<lang>.json) — distinct from the local THEME colour table above,
+-- (its GetSkinString reads the skin's Locales/<lang>/) — distinct from the local THEME colour table above,
 -- which shadows it in this file. tr(key, fallback) returns the skin string, or the fallback when the skin has
 -- no such key (GetSkinString returns a "[LOCALE NOT FOUND: key]" sentinel, which we reject).
 local function tr(key, fallback)

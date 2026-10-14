@@ -1,0 +1,23 @@
+{
+  "_comment": "Spanish texts for on-screen controls, interaction prompts and the room picker (Script.lua). Keys are stable ids; a missing id shows the English text (lang/en).",
+  "ctl_move": "WASD — Moverse",
+  "ctl_orbit": "Clic der. / Q·E — Orbitar",
+  "ctl_zoom": "Rueda — Zoom",
+  "ctl_edit": "Tab — Editar habitación",
+  "ctl_leave": "Esc — Salir",
+  "ctl_leave_visit": "Esc / Puerta — Terminar visita",
+  "prompt_computer": "[Enter] Usar el ordenador",
+  "prompt_phone": "[Enter] Usar el teléfono",
+  "prompt_lamp": "[Enter] Encender/apagar la lámpara",
+  "prompt_jukebox": "[Enter] Poner música",
+  "prompt_tv": "[Enter] Usar la tele",
+  "prompt_pod": "[Enter] Examinar",
+  "prompt_matrix": "[Enter] Usar la Placeholder Matrix",
+  "prompt_mirror": "[Enter] Mirarse al espejo",
+  "prompt_look": "[Enter] Mirar",
+  "prompt_fishtank": "[Enter] Encender/apagar el acuario",
+  "prompt_exit": "[Enter] Salir de la habitación",
+  "prompt_switch": "[Tab] Cambiar de objetivo",
+  "player_entry": "Jugador %d — %s",
+  "whose_room": "¿La habitación de quién?"
+}

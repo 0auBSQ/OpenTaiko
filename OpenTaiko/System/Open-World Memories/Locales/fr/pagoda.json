@@ -1,0 +1,31 @@
+﻿{
+    // Skin locale file — French: Pagoda of the Unknown
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/fr/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Pagoda of the Unknown (title screen)
+        "PAGODA_TITLE":     "Pagode de l'Inconnu",
+        "PAGODA_BEST":      "Meilleur",
+        "PAGODA_CHALLENGE": "Défi",
+        "PAGODA_PRACTICE":  "Entraînement",
+        "PAGODA_START_AT":   "Commencer à…",
+        "PAGODA_LEVEL":      "Niveau",
+        "PAGODA_ACCEPT":     "Relever le défi ?",
+        "PAGODA_YES":        "Oui",
+        "PAGODA_NO":         "Non",
+        "PAGODA_NEXT":          "Suivant…",
+        "PAGODA_START":         "Commencer",
+        "PAGODA_LEAVE":         "Partir",
+        "PAGODA_LEAVE_CONFIRM":  "Quitter la pagode ? Toute progression au-delà des points de contrôle découverts sera perdue",
+        "PAGODA_OK":            "OK",
+        "PAGODA_ITEM_NEW":      "Nouvel objet",
+        "PAGODA_EXIT":      "Quitter",
+
+        // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
+        "PAGODA_BAND_TEST":      "Épreuve",
+        "PAGODA_BAND_GATE":      "Porte",
+        "PAGODA_BAND_SKY":       "Ciel",
+        "PAGODA_MYSTERY_CHANCE": "Probabilité d'un mystère : %d%%",
+        "PAGODA_DESTINY":        "Tu ne peux pas changer ton destin"
+    }
+}

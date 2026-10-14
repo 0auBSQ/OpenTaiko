@@ -19,7 +19,7 @@ public static class CConfigOptionBuilder {
 
 	// Settings strings come from the global game translations (Lang/*/lang.json). Anything NOT defined there
 	// (e.g. settings strings authored per-skin) falls back to the active skin's theme translations
-	// (System/<skin>/Locales/<lang>.json via CSkinLocaleManager), so a skin can localize its own settings.
+	// (System/<skin>/Locales/<lang>/ via CSkinLocaleManager), so a skin can localize its own settings.
 	internal static string L(string k) {
 		var lang = CLangManager.LangInstance;
 		if (lang != null && lang.HasString(k)) return lang.GetString(k);

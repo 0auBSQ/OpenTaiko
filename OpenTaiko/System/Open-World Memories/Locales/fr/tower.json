@@ -1,0 +1,17 @@
+﻿{
+    // Skin locale file — French: Tower
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/fr/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Tower gameplay: the floor and lives planks (tower_hud ROActivity)
+        "TOWER_HUD_REACHED": "Étage atteint",
+        "TOWER_HUD_FLOOR_PREFIX": "Étage ",
+        "TOWER_HUD_FLOOR_SUFFIX": "",
+        "TOWER_HUD_LIVES": "Vies",
+
+        // Tower select
+        "TOWERSELECT_CONFIRM": "Défier la tour ?",
+        "TOWERSELECT_RANDOM": "Tour aléatoire",
+        "TOWERSELECT_RETURN": "Retour"
+    }
+}

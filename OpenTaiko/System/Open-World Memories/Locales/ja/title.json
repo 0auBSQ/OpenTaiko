@@ -1,0 +1,46 @@
+{
+    // Skin locale file — Japanese: Title screen
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/ja/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Title screen: the menu boxes (the debug entries stay English)
+        "TITLE_PERFORMANCE": "演奏モード",
+        "TITLE_PERFORMANCE_DESC": "好きな設定で太鼓の譜面をプレイしよう！\n1〜5人でプレイできます。",
+        "TITLE_DOJO": "狐の道場",
+        "TITLE_DOJO_DESC": "狐バンドが仕立てた段位認定に挑戦しよう！\n1人プレイ専用。",
+        "TITLE_TOWERS": "サバイバルモード",
+        "TITLE_TOWERS_DESC": "サバイバル形式でタワーを登り、頂上を目指そう！\n1人プレイ専用。",
+        "TITLE_AI_BATTLE": "AIバトルモード",
+        "TITLE_AI_BATTLE_DESC": "お気に入りの譜面でAItritusと対戦して勝利をつかめ！\n1人プレイ専用。",
+        "TITLE_TRAINING": "特訓モード",
+        "TITLE_TRAINING_DESC": "お気に入りの譜面を練習して身につけよう！\n1人プレイ専用。",
+        "TITLE_INTRO_NOKON": "イントロ・ノコン",
+        "TITLE_INTRO_NOKON_DESC": "ショータイム！ノコンのベストショーで音楽の知識を披露しよう！\n1〜5人でプレイできます。",
+        "TITLE_MYROOM": "マイルーム",
+        "TITLE_MYROOM_DESC": "自分の部屋を飾って家具を置き、他のプレイヤーの部屋を訪ねよう！",
+        "TITLE_STORE": "OpenTaiko雑貨店",
+        "TITLE_STORE_DESC": "OpenTaikoコインを使って素敵な品物を手に入れよう！ *ウィンク*",
+        "TITLE_SAVE_ROOM": "誰の部屋？",
+        "TITLE_SAVE_ROOM_INFO": "%d×%dの部屋 · 設置 %d 個",
+        "TITLE_SAVE_ROOM_NONE": "まだ部屋を訪れていません",
+        "TITLE_VAULT": "ムショ行要素",
+        "TITLE_VAULT_DESC": "鍵が特別な価値を持つらしい、謎に満ちた場所…",
+        "TITLE_SETTINGS": "設定",
+        "TITLE_SETTINGS_DESC": "プレイ環境に合わせて設定を調整しよう！",
+        "TITLE_EXIT": "終了",
+        "TITLE_EXIT_DESC": "またね！",
+        "TITLE_ONLINE_LOBBY": "オンラインロビー",
+        "TITLE_ONLINE_LOBBY_DESC": "（ベータ版・ルームコードは信頼できる人にだけ共有してください）",
+        "TITLE_ONLINE_OFF_TITLE": "オンラインプレイはオフです",
+        "TITLE_ONLINE_OFF_DESC": "オンラインプレイがオフになっています。オンラインロビーを開くには、設定（{section}）で「{setting}」をオンにしてください。オンラインでは信頼できる人とだけ遊んでください。",
+        "TITLE_ONLINE_OFF_OK": "OK",
+        "TITLE_VAULT_LOCKED_DESC": "聞こえますか…？",
+        "TITLE_PLAYERS_PROMPT": "何人でステージに立つ？",
+        "TITLE_PLAYERS_BACK": "戻る",
+        "TITLE_PLAYERS_1": "1人プレイ",
+        "TITLE_PLAYERS_2": "2人プレイ",
+        "TITLE_PLAYERS_3": "3人プレイ",
+        "TITLE_PLAYERS_4": "4人プレイ",
+        "TITLE_PLAYERS_5": "5人プレイ"
+    }
+}

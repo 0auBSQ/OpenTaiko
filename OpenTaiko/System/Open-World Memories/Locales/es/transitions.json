@@ -1,0 +1,14 @@
+﻿{
+    // Skin locale file — Spanish: Stage transitions: the titles they show
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/es/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Stage transitions: the titles shown while one plays
+        "TRANSITION_TOWERS_TITLE": "MODO\nSUPERVIVENCIA",
+        "TRANSITION_ONLINE_TITLE": "SALA EN LÍNEA",
+        "TRANSITION_DOJO_TITLE": "EL DOJO\nDEL ZORRO",
+        "TRANSITION_AI_IN": "Inicializando AItritus...",
+        "TRANSITION_AI_OUT": "Desconectando AItritus...",
+        "TRANSITION_NOKON_TITLE": "INTRO NOKON"
+    }
+}

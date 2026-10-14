@@ -1,0 +1,46 @@
+{
+    // Skin locale file — Korean: Title screen
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/ko/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Title screen: the menu boxes (the debug entries stay English)
+        "TITLE_PERFORMANCE": "연주 모드",
+        "TITLE_PERFORMANCE_DESC": "원하는 설정으로 태고 채보를 플레이하세요!\n1~5명이 플레이할 수 있습니다.",
+        "TITLE_DOJO": "여우 도장",
+        "TITLE_DOJO_DESC": "폭스 밴드가 준비한 단위 인정에 도전하세요!\n1인 전용.",
+        "TITLE_TOWERS": "서바이벌 모드",
+        "TITLE_TOWERS_DESC": "서바이벌 도전으로 타워를 오르며 정상을 노려보세요!\n1인 전용.",
+        "TITLE_AI_BATTLE": "AI 배틀 모드",
+        "TITLE_AI_BATTLE_DESC": "좋아하는 채보에서 AItritus와 맞서 승리를 거머쥐세요!\n1인 전용.",
+        "TITLE_TRAINING": "트레이닝 모드",
+        "TITLE_TRAINING_DESC": "좋아하는 채보를 연습해서 완벽하게 익히세요!\n1인 전용.",
+        "TITLE_INTRO_NOKON": "인트로 노콘",
+        "TITLE_INTRO_NOKON_DESC": "쇼 타임! 노콘의 최고의 쇼에서 음악 지식을 뽐내세요!\n1~5명이 플레이할 수 있습니다.",
+        "TITLE_MYROOM": "마이 룸",
+        "TITLE_MYROOM_DESC": "나만의 방을 꾸미고 가구를 배치하고 다른 플레이어의 방을 방문하세요!",
+        "TITLE_STORE": "OpenTaiko 잡화점",
+        "TITLE_STORE_DESC": "OpenTaiko 코인으로 멋진 물건을 장만하세요! *윙크*",
+        "TITLE_SAVE_ROOM": "누구의 방?",
+        "TITLE_SAVE_ROOM_INFO": "%d×%d 방 · 배치 %d개",
+        "TITLE_SAVE_ROOM_NONE": "아직 방문하지 않은 방",
+        "TITLE_VAULT": "비밀 금고",
+        "TITLE_VAULT_DESC": "열쇠가 특별한 가치를 지닌 듯한, 수수께끼로 가득한 곳...",
+        "TITLE_SETTINGS": "설정",
+        "TITLE_SETTINGS_DESC": "플레이 환경에 맞게 설정을 조정하세요!",
+        "TITLE_EXIT": "종료",
+        "TITLE_EXIT_DESC": "다음에 또 만나요!",
+        "TITLE_ONLINE_LOBBY": "온라인 로비",
+        "TITLE_ONLINE_LOBBY_DESC": "(베타, 방 코드는 신뢰할 수 있는 사람에게만 공유하세요)",
+        "TITLE_ONLINE_OFF_TITLE": "온라인 플레이가 꺼져 있습니다",
+        "TITLE_ONLINE_OFF_DESC": "온라인 플레이가 꺼져 있습니다. 온라인 로비를 열려면 설정({section})에서 「{setting}」을(를) 켜 주세요. 온라인에서는 신뢰할 수 있는 사람과만 플레이하세요.",
+        "TITLE_ONLINE_OFF_OK": "확인",
+        "TITLE_VAULT_LOCKED_DESC": "내 말 들려...?",
+        "TITLE_PLAYERS_PROMPT": "몇 명이 무대에 오를까요?",
+        "TITLE_PLAYERS_BACK": "뒤로",
+        "TITLE_PLAYERS_1": "1인 플레이",
+        "TITLE_PLAYERS_2": "2인 플레이",
+        "TITLE_PLAYERS_3": "3인 플레이",
+        "TITLE_PLAYERS_4": "4인 플레이",
+        "TITLE_PLAYERS_5": "5인 플레이"
+    }
+}

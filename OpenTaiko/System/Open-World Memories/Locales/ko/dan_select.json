@@ -1,0 +1,13 @@
+{
+    // Skin locale file — Korean: The Fox Dojo entrance (dan_select)
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/ko/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // The Fox Dojo entrance (dan_select): the two boards and the exit
+        "DANSELECT_STANDARD": "일반 단위 도전",
+        "DANSELECT_STANDARD_DESC": "도장이 고른 과제로 실력을 증명하세요!",
+        "DANSELECT_PAGODA_DESC": "무작위 단위를 연속으로 돌파하세요!",
+        "DANSELECT_EXIT": "나가기",
+        "DANSELECT_CONFIRM": "도전하시겠습니까?"
+    }
+}

@@ -1,0 +1,11 @@
+{
+  "_comment": "点唱机播放器（jukebox.lua）的中文文本；其对话文本在 dialogs.json 中。键为固定 ID；缺少的 ID 显示英文文本（lang/en）。",
+  "title": "点唱机",
+  "tab_bgm": "BGM",
+  "tab_songs": "歌曲",
+  "bgm_title": "我的房间 BGM",
+  "nothing_playing": "没有正在播放的曲目",
+  "waiting": "正在整理唱片……歌曲列表仍在准备中。",
+  "no_songs": "未找到可播放的歌曲。",
+  "speed": "速度"
+}

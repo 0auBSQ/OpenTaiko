@@ -1,0 +1,69 @@
+{
+    // Skin locale file — Dutch: Song select
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/nl/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Song select: the shortcuts helper and panel, the curated boxes
+        "SONGSELECT_SHORTCUTS_HELPER": "Sneltoetsen tonen",
+        "SONGSELECT_SHORTCUTS_TITLE": "Sneltoetsen",
+        "SONGSELECT_SHORTCUTS_CLOSE": "Sluiten",
+        "SONGSELECT_UNBOUND": "(niet toegewezen)",
+        "SONGSELECT_SC_HELP": "Deze lijst tonen",
+        "SONGSELECT_SC_SORT": "De nummers sorteren",
+        "SONGSELECT_SC_SEARCH": "In de huidige map zoeken",
+        "SONGSELECT_SC_FAVORITE": "Het gekozen nummer aan je favorieten toevoegen of eruit halen",
+        "SONGSELECT_SC_FAVORITES_FOLDER": "Je favorieten openen",
+        "SONGSELECT_SC_AUTO_P1": "Automatisch spelen voor speler 1 aan/uit",
+        "SONGSELECT_SC_AUTO_P2": "Automatisch spelen voor speler 2 aan/uit",
+        "SONGSELECT_SC_COURSE": "De moeilijkheid op de nummerbalken wijzigen",
+        "SONGSELECT_SC_PLAYER": "Wisselen van speler die wordt ingesteld",
+        "SONGSELECT_SC_SPEED_DOWN": "De nummersnelheid verlagen",
+        "SONGSELECT_SC_SPEED_UP": "De nummersnelheid verhogen",
+        "SONGSELECT_SONG_SPEED": "Snelheid",
+        "SONGSELECT_SC_PLAYER_COUNT": "Het aantal spelers wijzigen",
+        "SONGSELECT_BOX_BEGINNERS": "Aanbevolen nummers voor beginners",
+
+        // Song select: the sort and search dialogs
+        "SONGSELECT_SORT_TITLE": "Nummers sorteren",
+        "SONGSELECT_SORT_FILEPATH": "Bestandspad",
+        "SONGSELECT_SORT_SONG_TITLE": "Titel",
+        "SONGSELECT_SORT_SUBTITLE": "Ondertitel",
+        "SONGSELECT_SORT_LEVEL": "Getoond niveau",
+        "SONGSELECT_SORT_BPM": "Basis-BPM",
+        "SONGSELECT_SORT_BEST_SCORE": "Beste score",
+        "SONGSELECT_SORT_CLEAR_STATUS": "Clearstatus",
+        "SONGSELECT_SORT_ASC": "oplopend",
+        "SONGSELECT_SORT_DESC": "aflopend",
+        "SONGSELECT_SORT_OFF": "uit",
+        "SONGSELECT_SORT_OK": "OK",
+        "SONGSELECT_SEARCH_TITLE": "Nummers zoeken",
+        "SONGSELECT_SEARCH_DIFFICULTY": "Moeilijkheid",
+        "SONGSELECT_SEARCH_LEVEL_FROM": "Niveau vanaf",
+        "SONGSELECT_SEARCH_LEVEL_TO": "Niveau tot",
+        "SONGSELECT_SEARCH_SONG_TITLE": "Titel",
+        "SONGSELECT_SEARCH_SUBTITLE": "Ondertitel",
+        "SONGSELECT_SEARCH_CHARTER": "Charter",
+        "SONGSELECT_SEARCH_ANY": "Alle",
+        "SONGSELECT_SEARCH_OK": "Zoeken",
+        "SONGSELECT_SEARCH_CANCEL": "Annuleren",
+        "SONGSELECT_SEARCH_COUNT": "%d nummers gevonden",
+        "SONGSELECT_DIFF_EASY": "Makkelijk",
+        "SONGSELECT_DIFF_NORMAL": "Normaal",
+        "SONGSELECT_DIFF_HARD": "Moeilijk",
+        "SONGSELECT_DIFF_ONI_EDIT": "Oni + Edit",
+
+        // Song select: the best-plays panel on difficulty select
+        "SONGSELECT_REPLAY_TITLE": "Beste spellen",
+        "SONGSELECT_REPLAY_LOADING": "Replays laden",
+        "SONGSELECT_REPLAY_NONE": "Nog geen replays",
+        "SONGSELECT_REPLAY_SCORE": "score",
+        "SONGSELECT_REPLAY_CONFIRM": "Deze replay bekijken?",
+        "SONGSELECT_REPLAY_WATCH": "Bekijken",
+        "SONGSELECT_REPLAY_UNWATCHABLE": "Deze replay kan niet worden bekeken",
+        "SONGSELECT_REPLAY_OLD_VERSION": "Opgenomen met een oudere versie van het spel",
+        "SONGSELECT_REPLAY_CHART_CHANGED": "De chart is na dit spel gewijzigd",
+        "SONGSELECT_REPLAY_REASON_RNG": "Gebruikt willekeurige mods die niet opnieuw afgespeeld kunnen worden",
+        "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT": "Dynamic Beat-replay uit een andere versie van het spel",
+        "SONGSELECT_REPLAY_REASON_UNSEEDED": "Opgenomen voordat het husselen van noten een seed kreeg"
+    }
+}

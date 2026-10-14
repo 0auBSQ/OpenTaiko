@@ -1,5 +1,5 @@
 {
-  "_comment": "Wall paints (Paint tab). LIVE fields: swatch = flat PNG used as this item's coin-shop preview (shop-sold ids only). tex is informational: texture ids bind in assets.lua (A.WALLPAINT), and the default_* entries are wired to the DEFAULT_FLOOR/DEFAULT_PAINT constants in room.lua. Add an entry AND its id to _order. Display names live in lang/<code>/wallpaint.json.",
+  "_comment": "Wall paints (Paint tab). LIVE fields: swatch = flat PNG used as this item's coin-shop preview (shop-sold ids only). tex is informational: texture ids bind in assets.lua (A.WALLPAINT), and the default_* entries are wired to the DEFAULT_FLOOR/DEFAULT_PAINT constants in room.lua. Add an entry AND its id to _order. Display names are the skin's ITEM_<ID> strings (Locales/<code>/).",
   "_order": [
     "plaster",
     "blue",

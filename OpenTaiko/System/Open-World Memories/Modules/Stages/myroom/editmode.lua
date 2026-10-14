@@ -88,6 +88,14 @@ end
 
 -- y defaults to just above the floor; stacked items pass their surface's top so the highlight
 -- visibly wraps the PC/TV instead of hiding under the desk
+-- the floor squares of `cells` at height y, appended to the highlight layer (caller owns ObjSetPass+ObjBegin)
+local function cellsInto(world, cells, y)
+    for _, cell in ipairs(cells) do
+        local x0, z0 = cell[1], (world.gridH - 1 - cell[2])
+        world.scene:ObjAddQuadFlat(world.hiliteObj, x0 + 0.04, y, z0 + 0.04, x0 + 0.96, y, z0 + 0.04,
+            x0 + 0.96, y, z0 + 0.96, x0 + 0.04, y, z0 + 0.96)
+    end
+end
 local function hilite(world, cells, r, g, b, a, y)
     y = y or (FY + 0.05)
     world.scene:ObjSetPass(world.hiliteObj, 1, r, g, b, a)
@@ -1377,17 +1385,19 @@ function Edit:buildOverlays()
         world.scene:ObjSetPass(world.hiliteObj, 1, 120, 200, 255, 220)
         world.scene:ObjBegin(world.hiliteObj)                     -- one pass: selected + hover accumulate
         if self.selected.kind == "wall" then
-            wallSlotInto(world, { wall = (it.c == room.iw) and "right" or "back",
-                                  c = it.c, r = it.r, mount = it.mount or "low" })
+            wallSlotInto(world, itemSlot(room, it.id, it.c, it.r, it.mount))   -- every tile it covers
         else
             local x0, y0, z0, x1, y1, z1 = itemAABB(world, room, it)
             wireBoxInto(world, x0, y0, z0, x1, y1, z1, 0.032)     -- selected: thicker box
+            -- and every cell it stands on (a shaped piece shows its shape)
+            cellsInto(world, room:footprint(it.id, it.c, it.r, it.facing or 0), itemHiliteY(room, it))
         end
         if self.hoverItem and self.hoverItem ~= it then          -- hovering a different ground item
             local a0, b0, c0, a1, b1, c1 = itemAABB(world, room, self.hoverItem)
             wireBoxInto(world, a0, b0, c0, a1, b1, c1, 0.024)     -- hover: thinner box
         elseif self.hoverWallItem and self.hoverWallItem ~= it and self.hoverSlot then
-            wallSlotInto(world, self.hoverSlot)
+            local w = self.hoverWallItem
+            wallSlotInto(world, itemSlot(room, w.id, w.c, w.r, w.mount))
         end
     else                                                         -- browse hover
         if self.hoverItem then

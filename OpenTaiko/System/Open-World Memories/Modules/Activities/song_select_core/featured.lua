@@ -7,7 +7,7 @@
 --
 --   { "boxes": [ { "id": "beginners", "genre": "Recommended", "title_key": "SONGSELECT_BOX_BEGINNERS",
 --                  "title": "Recommended songs for beginners", "uids": [ "...", ... ] } ] }
---   title_key = a skin locale key (Locales/<code>.json); title = the fallback text.
+--   title_key = a skin locale key (Locales/<code>/); title = the fallback text.
 
 local M = {}
 local G

@@ -1,0 +1,15 @@
+﻿{
+    // Skin locale file — Spanish: Theme Settings Viewer stage
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/es/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Escena del visor de configuración del tema
+        "VIEWER_TITLE":     "Visor de configuración del tema",
+        "VIEWER_COL_ID":    "ID",
+        "VIEWER_COL_SCOPE": "Alcance",
+        "VIEWER_COL_TYPE":  "Tipo",
+        "VIEWER_COL_VALUE": "Valor",
+        "VIEWER_HINT_SCROLL": "arriba/abajo para desplazar   Cancelar para salir",
+        "VIEWER_HINT_EXIT":   "Cancelar para salir"
+    }
+}

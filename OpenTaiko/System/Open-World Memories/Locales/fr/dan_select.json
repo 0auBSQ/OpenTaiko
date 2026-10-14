@@ -1,0 +1,13 @@
+﻿{
+    // Skin locale file — French: The Fox Dojo entrance (dan_select)
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/fr/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // The Fox Dojo entrance (dan_select): the two boards and the exit
+        "DANSELECT_STANDARD": "Épreuve de dan standard",
+        "DANSELECT_STANDARD_DESC": "Prouve ton niveau avec la sélection du dojo !",
+        "DANSELECT_PAGODA_DESC": "Enchaîne plusieurs dans aléatoires à la suite !",
+        "DANSELECT_EXIT": "Quitter",
+        "DANSELECT_CONFIRM": "Relever le défi ?"
+    }
+}

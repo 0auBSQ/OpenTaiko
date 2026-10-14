@@ -1,0 +1,13 @@
+{
+  "_comment": "TV(tv.lua)의 한국어 텍스트: 메뉴와 컷신 브라우저. 키는 고정 ID이며, 없는 ID는 영어 텍스트(lang/en)로 표시됩니다.",
+  "title": "TV",
+  "menu_on": "켜기",
+  "menu_off": "끄기",
+  "menu_rewatch": "컷신 다시 보기",
+  "tab_songs": "곡 컷신",
+  "intro": "인트로",
+  "outro": "아웃트로 %d",
+  "unknown_song": "???",
+  "empty": "컷신이 없습니다.",
+  "waiting": "채널 맞추는 중... 곡 목록을 아직 준비하고 있습니다."
+}

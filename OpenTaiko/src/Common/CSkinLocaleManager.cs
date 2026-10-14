@@ -5,7 +5,8 @@ using System.Text.Json.Nodes;
 namespace OpenTaiko;
 
 /// <summary>
-/// Manages skin-scoped locale files loaded from {skinFolder}/Locales/{langId}.json.
+/// Manages skin-scoped locale files: every {skinFolder}/Locales/{langId}/*.json (one file per screen
+/// or feature), and {skinFolder}/Locales/{langId}.json when a skin keeps a single file.
 ///
 /// Lookup priority:
 ///   1. File for the currently active game language.
@@ -57,23 +58,39 @@ internal class CSkinLocaleManager {
 		if (_cache.TryGetValue(langId, out var cached))
 			return cached;
 
-		string path = System.IO.Path.Combine(_skinFolder, "Locales", $"{langId}.json");
-		if (!File.Exists(path)) {
+		var files = new List<string>();
+		string single = System.IO.Path.Combine(_skinFolder, "Locales", $"{langId}.json");
+		if (File.Exists(single)) files.Add(single);
+		string folder = System.IO.Path.Combine(_skinFolder, "Locales", langId);
+		if (Directory.Exists(folder)) {
+			var inFolder = Directory.GetFiles(folder, "*.json");
+			Array.Sort(inFolder, StringComparer.OrdinalIgnoreCase);
+			files.AddRange(inFolder);
+		}
+		if (files.Count == 0) {
 			_cache[langId] = null;
 			return null;
 		}
 
-		try {
-			JsonNodeOptions nodeOpts = new() { PropertyNameCaseInsensitive = false };
-			JsonDocumentOptions docOpts = new() { CommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true };
-			JsonNode? node = JsonNode.Parse(File.ReadAllText(path), nodeOpts, docOpts);
-			var entries = node?["Entries"]?.Deserialize<Dictionary<string, string>>() ?? new();
-			_cache[langId] = entries;
-			return entries;
-		} catch (Exception ex) {
-			Trace.TraceWarning($"CSkinLocaleManager: failed to load '{path}': {ex.Message}");
-			_cache[langId] = null;
-			return null;
+		// every file adds its entries; a key defined twice keeps the last file's value (files in name order)
+		var entries = new Dictionary<string, string>();
+		foreach (string path in files) {
+			try {
+				JsonNodeOptions nodeOpts = new() { PropertyNameCaseInsensitive = false };
+				JsonDocumentOptions docOpts = new() { CommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true };
+				JsonNode? node = JsonNode.Parse(File.ReadAllText(path), nodeOpts, docOpts);
+				var part = node?["Entries"]?.Deserialize<Dictionary<string, string>>();
+				if (part == null) continue;
+				foreach (var kv in part) {
+					if (entries.ContainsKey(kv.Key))
+						Trace.TraceWarning($"CSkinLocaleManager: '{kv.Key}' is defined again in '{path}'");
+					entries[kv.Key] = kv.Value;
+				}
+			} catch (Exception ex) {
+				Trace.TraceWarning($"CSkinLocaleManager: failed to load '{path}': {ex.Message}");
+			}
 		}
+		_cache[langId] = entries;
+		return entries;
 	}
 }

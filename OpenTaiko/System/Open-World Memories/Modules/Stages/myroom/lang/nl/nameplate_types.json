@@ -1,0 +1,123 @@
+{
+  "_comment": "Nameplate type names, Dutch; missing ids fall back to lang/en.",
+  "0": {
+    "name": "Hout"
+  },
+  "1": {
+    "name": "Koper"
+  },
+  "2": {
+    "name": "Amethist"
+  },
+  "3": {
+    "name": "Natuur"
+  },
+  "6": {
+    "name": "As"
+  },
+  "7": {
+    "name": "Regenboog"
+  },
+  "8": {
+    "name": "Ruimte"
+  },
+  "9": {
+    "name": "Diamant"
+  },
+  "10": {
+    "name": "Misery"
+  },
+  "11": {
+    "name": "Goud"
+  },
+  "12": {
+    "name": "Parel"
+  },
+  "13": {
+    "name": "Platina"
+  },
+  "15": {
+    "name": "Dashy"
+  },
+  "16": {
+    "name": "Blauw"
+  },
+  "17": {
+    "name": "Rood"
+  },
+  "19": {
+    "name": "AI"
+  },
+  "20": {
+    "name": "Hemel"
+  },
+  "21": {
+    "name": "Geel"
+  },
+  "22": {
+    "name": "Crème"
+  },
+  "23": {
+    "name": "Zee"
+  },
+  "24": {
+    "name": "Groen"
+  },
+  "25": {
+    "name": "Hoofdstuk I"
+  },
+  "26": {
+    "name": "Hoofdstuk II"
+  },
+  "27": {
+    "name": "Hoofdstuk III"
+  },
+  "28": {
+    "name": "OpTk Licht"
+  },
+  "29": {
+    "name": "OpTk Donker"
+  },
+  "31": {
+    "name": "Nacht"
+  },
+  "32": {
+    "name": "Hoofdstuk IV"
+  },
+  "33": {
+    "name": "Clear-prestatie"
+  },
+  "34": {
+    "name": "Full Combo-prestatie"
+  },
+  "35": {
+    "name": "Perfect-prestatie"
+  },
+  "37": {
+    "name": "Hoofdstuk V"
+  },
+  "38": {
+    "name": "V-ENTURE"
+  },
+  "39": {
+    "name": "Clear-geschiedenis"
+  },
+  "40": {
+    "name": "Full Combo-geschiedenis"
+  },
+  "41": {
+    "name": "Perfect-geschiedenis"
+  },
+  "42": {
+    "name": "Ryuto Setsujin"
+  },
+  "43": {
+    "name": "Zonsopgang"
+  },
+  "44": {
+    "name": "Hoofdstuk VI"
+  },
+  "45": {
+    "name": "Een nieuwe wereld"
+  }
+}

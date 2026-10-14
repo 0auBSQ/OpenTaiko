@@ -1,0 +1,14 @@
+{
+    // Skin locale file — Korean: Stage transitions: the titles they show
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/ko/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Stage transitions: the titles shown while one plays
+        "TRANSITION_TOWERS_TITLE": "서바이벌\n모드",
+        "TRANSITION_ONLINE_TITLE": "온라인 로비",
+        "TRANSITION_DOJO_TITLE": "여우\n도장",
+        "TRANSITION_AI_IN": "AItritus 초기화 중...",
+        "TRANSITION_AI_OUT": "AItritus 연결 해제 중...",
+        "TRANSITION_NOKON_TITLE": "인트로 노콘"
+    }
+}

@@ -1,0 +1,17 @@
+{
+    // Skin locale file — Chinese: Tower
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/zh/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Tower gameplay: the floor and lives planks (tower_hud ROActivity)
+        "TOWER_HUD_REACHED": "到达楼层",
+        "TOWER_HUD_FLOOR_PREFIX": "",
+        "TOWER_HUD_FLOOR_SUFFIX": "层",
+        "TOWER_HUD_LIVES": "生命",
+
+        // Tower select
+        "TOWERSELECT_CONFIRM": "挑战高塔？",
+        "TOWERSELECT_RANDOM": "随机高塔",
+        "TOWERSELECT_RETURN": "返回"
+    }
+}

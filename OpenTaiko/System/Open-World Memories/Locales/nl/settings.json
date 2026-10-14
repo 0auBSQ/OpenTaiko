@@ -1,0 +1,44 @@
+{
+    // Skin locale file — Dutch: The settings menu (config_ui)
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/nl/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // The settings menu: its buttons, the key binding pages and their help lines
+        "SETTINGS_UI_KEYS": "Besturing",
+        "SETTINGS_UI_EXIT": "Afsluiten",
+        "SETTINGS_UI_BACK": "< Terug",
+        "SETTINGS_UI_RUN": "Uitvoeren",
+        "SETTINGS_UI_CONFIGURE": "Instellen",
+        "SETTINGS_UI_KEYS_INDEX_HEADER": "Besturingsinstellingen",
+        "SETTINGS_UI_KEYS_GROUP_SYSTEM": "Systeembesturing",
+        "SETTINGS_UI_KEYS_GROUP_GAME": "Besturing tijdens het spelen",
+        "SETTINGS_UI_KEYS_GROUP_TRAINING": "Besturing in de oefenmodus",
+        "SETTINGS_UI_KEYS_GROUP_DEFAULT": "Besturingsinstellingen",
+        "SETTINGS_UI_KEYS_PREVIEW_DESC": "Stel je besturing in.",
+        "SETTINGS_UI_KEYS_BIND_DESC": "Kies een actie. Elke actie kan meerdere toetsen hebben: Enter voegt er een toe, Delete verwijdert de laatste.",
+        "SETTINGS_UI_KEYS_MULTIBIND_HINT": "Enter: toets toevoegen    Delete: laatste verwijderen",
+        "SETTINGS_UI_KEYS_CAPTURE_PROMPT": "Druk op een toets...  (Esc om te annuleren)",
+        "SETTINGS_SECTION_APPEARANCE": "Uiterlijk",
+        "SETTINGS_SECTION_SONGS": "Nummers & onderhoud",
+        "SETTINGS_SECTION_LANGUAGE": "Taal",
+        "SETTINGS_SECTION_DISPLAY": "Beeld & venster",
+        "SETTINGS_SECTION_BACKGROUND": "Achtergrond & video",
+        "SETTINGS_SECTION_AUDIO": "Audio",
+        "SETTINGS_SECTION_VOLUME": "Volume",
+        "SETTINGS_SECTION_CHARACTERS": "Personages & HUD",
+        "SETTINGS_SECTION_INTEGRATIONS": "Integraties & geavanceerd",
+        "SETTINGS_SECTION_INPUT": "Besturing",
+        "SETTINGS_SECTION_GAMEPLAY": "Gameplay",
+        "SETTINGS_SECTION_FEEDBACK": "Weergave & feedback",
+        "SETTINGS_SECTION_TIMING": "Timing",
+        "SETTINGS_SECTION_AUTOAI": "Auto & AI",
+        "SETTINGS_SECTION_UNLOCKABLES": "Vrijspeelbare items",
+        "SETTINGS_SECTION_TRAINING": "Oefenen",
+        "SETTINGS_SECTION_THEME": "Thema-instellingen",
+        "SETTINGS_KEYGROUP_SYSTEM": "Systeem",
+        "SETTINGS_KEYGROUP_DRUMS": "Trommels {0}P",
+        "SETTINGS_KEYGROUP_MENU": "Menu",
+        "SETTINGS_KEYGROUP_TRAINING": "Oefenen",
+        "SETTINGS_KEYASSIGN_NONE": "(geen)"
+    }
+}

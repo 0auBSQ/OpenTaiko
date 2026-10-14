@@ -1,0 +1,14 @@
+{
+    // Skin locale file — Chinese: Stage transitions: the titles they show
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/zh/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Stage transitions: the titles shown while one plays
+        "TRANSITION_TOWERS_TITLE": "生存\n模式",
+        "TRANSITION_ONLINE_TITLE": "在线大厅",
+        "TRANSITION_DOJO_TITLE": "狐之\n道场",
+        "TRANSITION_AI_IN": "正在初始化 AItritus...",
+        "TRANSITION_AI_OUT": "正在断开 AItritus...",
+        "TRANSITION_NOKON_TITLE": "INTRO NOKON"
+    }
+}

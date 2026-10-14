@@ -1,0 +1,9 @@
+{
+  "_comment": "Russian texts for the mirror (mirror.lua). Keys are stable ids; a missing id shows the English text (lang/en).",
+  "student": "Ученик",
+  "student_a": "Ученик A",
+  "student_b": "Ученик B",
+  "palette": "Палитра",
+  "worn": "Сейчас надето",
+  "locked": "Игр за этого ученика: %d / %d"
+}

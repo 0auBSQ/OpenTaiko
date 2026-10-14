@@ -1,0 +1,17 @@
+{
+    // Skin locale file — Russian: Tower
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/ru/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Tower gameplay: the floor and lives planks (tower_hud ROActivity)
+        "TOWER_HUD_REACHED": "Достигнутый этаж",
+        "TOWER_HUD_FLOOR_PREFIX": "Этаж ",
+        "TOWER_HUD_FLOOR_SUFFIX": "",
+        "TOWER_HUD_LIVES": "Жизни",
+
+        // Tower select
+        "TOWERSELECT_CONFIRM": "Бросить вызов башне?",
+        "TOWERSELECT_RANDOM": "Случайная башня",
+        "TOWERSELECT_RETURN": "Назад"
+    }
+}

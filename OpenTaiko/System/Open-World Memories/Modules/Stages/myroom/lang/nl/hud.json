@@ -1,0 +1,23 @@
+{
+  "_comment": "Dutch texts for on-screen controls, interaction prompts and the room picker (Script.lua). Keys are stable ids; a missing id shows the English text (lang/en).",
+  "ctl_move": "WASD — Lopen",
+  "ctl_orbit": "Rechtsklik / Q·E — Draaien",
+  "ctl_zoom": "Scrollwiel — Zoom",
+  "ctl_edit": "Tab — Kamer bewerken",
+  "ctl_leave": "Esc — Verlaten",
+  "ctl_leave_visit": "Esc / Deur — Bezoek beëindigen",
+  "prompt_computer": "[Enter] Computer gebruiken",
+  "prompt_phone": "[Enter] Telefoon gebruiken",
+  "prompt_lamp": "[Enter] Lamp aan/uit",
+  "prompt_jukebox": "[Enter] Muziek afspelen",
+  "prompt_tv": "[Enter] Tv gebruiken",
+  "prompt_pod": "[Enter] Onderzoeken",
+  "prompt_matrix": "[Enter] Placeholder Matrix gebruiken",
+  "prompt_mirror": "[Enter] In de spiegel kijken",
+  "prompt_look": "[Enter] Bekijken",
+  "prompt_fishtank": "[Enter] Aquariumlampen aan/uit",
+  "prompt_exit": "[Enter] Kamer verlaten",
+  "prompt_switch": "[Tab] Ander doel kiezen",
+  "player_entry": "Speler %d — %s",
+  "whose_room": "Wiens kamer?"
+}

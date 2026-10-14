@@ -1,0 +1,46 @@
+﻿{
+    // Skin locale file — Spanish: Title screen
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/es/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Title screen: the menu boxes (the debug entries stay English)
+        "TITLE_PERFORMANCE": "Modo Actuación",
+        "TITLE_PERFORMANCE_DESC": "¡Juega partituras de Taiko con tus ajustes preferidos!\nDe 1 a 5 jugadores.",
+        "TITLE_DOJO": "El Dojo del Zorro",
+        "TITLE_DOJO_DESC": "¡Enfréntate a los exámenes de dan preparados por la Fox Band!\nSolo un jugador.",
+        "TITLE_TOWERS": "Modo Supervivencia",
+        "TITLE_TOWERS_DESC": "¡Escala las torres en desafíos de supervivencia e intenta llegar a la cima!\nSolo un jugador.",
+        "TITLE_AI_BATTLE": "Modo Batalla contra IA",
+        "TITLE_AI_BATTLE_DESC": "¡Lucha contra AItritus en tus partituras favoritas y llévate la victoria!\nSolo un jugador.",
+        "TITLE_TRAINING": "Modo Entrenamiento",
+        "TITLE_TRAINING_DESC": "¡Practica tus partituras favoritas hasta dominarlas!\nSolo un jugador.",
+        "TITLE_INTRO_NOKON": "Intro Nokon",
+        "TITLE_INTRO_NOKON_DESC": "¡Es hora del show! ¡Demuestra tus conocimientos musicales en el mejor show de Nokon!\nDe 1 a 5 jugadores.",
+        "TITLE_MYROOM": "Mi Habitación",
+        "TITLE_MYROOM_DESC": "¡Decora tu habitación, coloca muebles y visita las habitaciones de otros jugadores!",
+        "TITLE_STORE": "La Tienda General de OpenTaiko",
+        "TITLE_STORE_DESC": "¡Gasta tus monedas OpenTaiko en artículos muy bonitos! *guiño*",
+        "TITLE_SAVE_ROOM": "¿La habitación de quién?",
+        "TITLE_SAVE_ROOM_INFO": "Habitación %d×%d · %d colocados",
+        "TITLE_SAVE_ROOM_NONE": "Habitación aún sin visitar",
+        "TITLE_VAULT": "Bóveda Secreta",
+        "TITLE_VAULT_DESC": "Un lugar lleno de misterios donde las llaves parecen tener un valor especial...",
+        "TITLE_SETTINGS": "Ajustes",
+        "TITLE_SETTINGS_DESC": "¡Ajusta la configuración a tu experiencia de juego!",
+        "TITLE_EXIT": "Salir",
+        "TITLE_EXIT_DESC": "¡Hasta la próxima!",
+        "TITLE_ONLINE_LOBBY": "Sala en línea",
+        "TITLE_ONLINE_LOBBY_DESC": "(Beta, comparte tu código de sala solo con personas de confianza)",
+        "TITLE_ONLINE_OFF_TITLE": "El juego en línea está desactivado",
+        "TITLE_ONLINE_OFF_DESC": "El juego en línea está desactivado. Para abrir la sala en línea, activa «{setting}» en los ajustes ({section}). Juega en línea solo con personas de confianza.",
+        "TITLE_ONLINE_OFF_OK": "Aceptar",
+        "TITLE_VAULT_LOCKED_DESC": "¿Me oyes...?",
+        "TITLE_PLAYERS_PROMPT": "¿Cuántos tamborileros suben al escenario?",
+        "TITLE_PLAYERS_BACK": "Volver",
+        "TITLE_PLAYERS_1": "1 Jugador",
+        "TITLE_PLAYERS_2": "2 Jugadores",
+        "TITLE_PLAYERS_3": "3 Jugadores",
+        "TITLE_PLAYERS_4": "4 Jugadores",
+        "TITLE_PLAYERS_5": "5 Jugadores"
+    }
+}

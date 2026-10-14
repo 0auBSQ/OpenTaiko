@@ -1,0 +1,23 @@
+{
+  "_comment": "Russian texts for on-screen controls, interaction prompts and the room picker (Script.lua). Keys are stable ids; a missing id shows the English text (lang/en).",
+  "ctl_move": "WASD — Ходьба",
+  "ctl_orbit": "ПКМ / Q·E — Обзор",
+  "ctl_zoom": "Колесо — Масштаб",
+  "ctl_edit": "Tab — Правка комнаты",
+  "ctl_leave": "Esc — Выйти",
+  "ctl_leave_visit": "Esc / Дверь — Завершить визит",
+  "prompt_computer": "[Enter] Сесть за компьютер",
+  "prompt_phone": "[Enter] Взять телефон",
+  "prompt_lamp": "[Enter] Включить/выключить лампу",
+  "prompt_jukebox": "[Enter] Включить музыку",
+  "prompt_tv": "[Enter] Использовать телевизор",
+  "prompt_pod": "[Enter] Осмотреть",
+  "prompt_matrix": "[Enter] Использовать Placeholder Matrix",
+  "prompt_mirror": "[Enter] Посмотреться в зеркало",
+  "prompt_look": "[Enter] Посмотреть",
+  "prompt_fishtank": "[Enter] Свет в аквариуме",
+  "prompt_exit": "[Enter] Выйти из комнаты",
+  "prompt_switch": "[Tab] Сменить цель",
+  "player_entry": "Игрок %d — %s",
+  "whose_room": "Чья комната?"
+}

@@ -1,0 +1,31 @@
+{
+    // Skin locale file — Chinese: Pagoda of the Unknown
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/zh/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Pagoda of the Unknown (title screen)
+        "PAGODA_TITLE":     "未知之塔",
+        "PAGODA_BEST":      "最佳",
+        "PAGODA_CHALLENGE": "挑战",
+        "PAGODA_PRACTICE":  "练习",
+        "PAGODA_START_AT":   "从此开始…",
+        "PAGODA_LEVEL":      "关卡",
+        "PAGODA_ACCEPT":     "接受挑战吗？",
+        "PAGODA_YES":        "是",
+        "PAGODA_NO":         "否",
+        "PAGODA_NEXT":          "下一层…",
+        "PAGODA_START":         "开始",
+        "PAGODA_LEAVE":         "离开",
+        "PAGODA_LEAVE_CONFIRM":  "要离开塔吗？已发现的检查点之后的进度将会丢失",
+        "PAGODA_OK":            "确定",
+        "PAGODA_ITEM_NEW":      "新道具",
+        "PAGODA_EXIT":      "退出",
+
+        // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
+        "PAGODA_BAND_TEST":      "题",
+        "PAGODA_BAND_GATE":      "扉",
+        "PAGODA_BAND_SKY":       "穹天",
+        "PAGODA_MYSTERY_CHANCE": "神秘出现概率：%d%%",
+        "PAGODA_DESTINY":        "你无法改变自己的命运"
+    }
+}

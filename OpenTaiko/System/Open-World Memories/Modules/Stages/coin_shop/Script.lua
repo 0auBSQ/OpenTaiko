@@ -80,7 +80,7 @@ local function markSoldOut(mask, slot)
 	return mask | (1 << (slot - 1))
 end
 
--- the skin's Locales/<code>.json through THEME; the English text stays in the code as the fallback
+-- the skin's Locales/<code>/ through THEME; the English text stays in the code as the fallback
 local function tr(key, fallback)
 	local ok, s = pcall(function() return THEME:GetSkinString(key) end)
 	if ok and type(s) == "string" and s ~= "" and s:sub(1, 1) ~= "[" then return s end
@@ -174,10 +174,22 @@ local function furnitureId(code)
 	return nil
 end
 
+-- an item's shown name: My Room pieces and the vault keys use the skin's strings (the same ones My Room
+-- and the vault show), anything else the name in its database row
+local KEY_NAMES = { vault_key_greed = "VAULT_KEY_GREED", vault_key_simple = "VAULT_KEY_1",
+	vault_key_gold = "VAULT_KEY_2", vault_key_optk = "VAULT_KEY_3" }
+local function itemName(item)
+	local own = LANG:FromString(item.Name):GetString("")
+	local fid = furnitureId(item.Code)
+	if fid then return tr("ITEM_" .. fid:upper(), own) end
+	if KEY_NAMES[item.Code] then return tr(KEY_NAMES[item.Code], own) end
+	return own
+end
+
 local function setupItem(entry, iconIdx)
 	if entry == nil then return nil end
 	local item = Util.deepcopy(entry)
-	item.LocalizedName = LANG:FromString(item.Name):GetString("")
+	item.LocalizedName = itemName(item)
 	item.SoldOut = false
 	if icons[iconIdx] ~= nil and not sharedIcon[iconIdx] then icons[iconIdx]:Dispose() end   -- the slot's previous picture
 	icons[iconIdx] = nil

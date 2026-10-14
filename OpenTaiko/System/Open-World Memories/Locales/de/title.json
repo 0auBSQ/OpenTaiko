@@ -1,0 +1,46 @@
+﻿{
+    // Skin locale file — German: Title screen
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/de/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Title screen: the menu boxes (the debug entries stay English)
+        "TITLE_PERFORMANCE": "Performance-Modus",
+        "TITLE_PERFORMANCE_DESC": "Spiele Taiko-Charts mit deinen bevorzugten Einstellungen!\nSpielbar mit 1 bis 5 Spielern.",
+        "TITLE_DOJO": "Das Fuchs-Dojo",
+        "TITLE_DOJO_DESC": "Stelle dich den Dan-Prüfungen der Fox Band!\nNur für einen Spieler.",
+        "TITLE_TOWERS": "Überlebensmodus",
+        "TITLE_TOWERS_DESC": "Erklimme die Türme in Überlebens-Challenges und versuche, die Spitze zu erreichen!\nNur für einen Spieler.",
+        "TITLE_AI_BATTLE": "KI-Kampfmodus",
+        "TITLE_AI_BATTLE_DESC": "Tritt auf deinen Lieblings-Charts gegen AItritus an und hol dir den Sieg!\nNur für einen Spieler.",
+        "TITLE_TRAINING": "Trainingsmodus",
+        "TITLE_TRAINING_DESC": "Übe deine Lieblings-Charts, bis du sie beherrschst!\nNur für einen Spieler.",
+        "TITLE_INTRO_NOKON": "Intro Nokon",
+        "TITLE_INTRO_NOKON_DESC": "Showtime! Zeig dein Musikwissen in Nokons bester Show!\nSpielbar mit 1 bis 5 Spielern.",
+        "TITLE_MYROOM": "Mein Zimmer",
+        "TITLE_MYROOM_DESC": "Richte dein eigenes Zimmer ein, stelle Möbel auf und besuche die Zimmer anderer Spieler!",
+        "TITLE_STORE": "OpenTaikos Gemischtwarenladen",
+        "TITLE_STORE_DESC": "Gib deine OpenTaiko-Münzen für richtig schöne Waren aus! *zwinker*",
+        "TITLE_SAVE_ROOM": "Wessen Zimmer?",
+        "TITLE_SAVE_ROOM_INFO": "%d×%d-Zimmer · %d platziert",
+        "TITLE_SAVE_ROOM_NONE": "Zimmer noch nicht besucht",
+        "TITLE_VAULT": "Geheimtresor",
+        "TITLE_VAULT_DESC": "Ein Ort voller Rätsel, an dem Schlüssel einen besonderen Wert zu haben scheinen...",
+        "TITLE_SETTINGS": "Einstellungen",
+        "TITLE_SETTINGS_DESC": "Passe deine Einstellungen an dein Spielerlebnis an!",
+        "TITLE_EXIT": "Beenden",
+        "TITLE_EXIT_DESC": "Bis zum nächsten Mal!",
+        "TITLE_ONLINE_LOBBY": "Online-Lobby",
+        "TITLE_ONLINE_LOBBY_DESC": "(Beta, teile deinen Raumcode nur mit Personen, denen du vertraust)",
+        "TITLE_ONLINE_OFF_TITLE": "Online-Spiel ist deaktiviert",
+        "TITLE_ONLINE_OFF_DESC": "Das Online-Spiel ist deaktiviert. Um die Online-Lobby zu öffnen, aktiviere „{setting}“ in den Einstellungen ({section}). Spiele online nur mit Personen, denen du vertraust.",
+        "TITLE_ONLINE_OFF_OK": "OK",
+        "TITLE_VAULT_LOCKED_DESC": "Kannst du mich hören...?",
+        "TITLE_PLAYERS_PROMPT": "Wie viele Trommler betreten die Bühne?",
+        "TITLE_PLAYERS_BACK": "Zurück",
+        "TITLE_PLAYERS_1": "1 Spieler",
+        "TITLE_PLAYERS_2": "2 Spieler",
+        "TITLE_PLAYERS_3": "3 Spieler",
+        "TITLE_PLAYERS_4": "4 Spieler",
+        "TITLE_PLAYERS_5": "5 Spieler"
+    }
+}

@@ -1,0 +1,14 @@
+{
+    // Skin locale file — Russian: Stage transitions: the titles they show
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/ru/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Stage transitions: the titles shown while one plays
+        "TRANSITION_TOWERS_TITLE": "РЕЖИМ\nВЫЖИВАНИЯ",
+        "TRANSITION_ONLINE_TITLE": "ОНЛАЙН-ЛОББИ",
+        "TRANSITION_DOJO_TITLE": "ЛИСЬЕ\nДОДЗЁ",
+        "TRANSITION_AI_IN": "Инициализация AItritus...",
+        "TRANSITION_AI_OUT": "Отключение AItritus...",
+        "TRANSITION_NOKON_TITLE": "ИНТРО НОКОН"
+    }
+}

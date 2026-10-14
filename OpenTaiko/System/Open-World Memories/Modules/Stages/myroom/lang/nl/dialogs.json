@@ -1,0 +1,109 @@
+{
+  "_comment": "Dialog lines, Dutch. Same structure as lang/en/dialogs.json; a missing key or line falls back to the English file. {size}/{cost} are filled by the code; {shake:..} is dialogue markup; {sfx:purse} at the start of a line brings the purse up.",
+  "landlord": {
+    "_comment": "The landlord's phone call. Lists are said line by line. first_call plays once per save file (no offer); greetings picks one line at random; tiers.<n> is the offer for room tier n (2 = 6x6, 3 = 7x7, 4 = 8x8, more = every 10k tier): pitch, then broke (not enough coins, no choice) or the Yes/No choice on the last pitch line, then accepted. refuse_first/second after a No (the count resets on entering the room); refused_out replaces the call after two refusals; maxed when no bigger tier exists. {sfx:purse} at the start of a line brings the purse up (the caller's onSfx handles it).",
+    "name": "Huisbaas",
+    "first_call": [
+      "Dus u bent de nieuwe huurder...",
+      "Ik hoop dat u niet te luidruchtig bent, weet u, dat is niet zo goed voor de zaken...",
+      "De kamer is te klein, zegt u? Hmmm...",
+      "Bel me terug, en zorg dat u glimmende dubloenen meeneemt.",
+      "Als u een royale toeslag kunt betalen, denk ik er misschien over na.",
+      "En nu wegwezen, tijd is geld, en dit gesprek maakt me arm."
+    ],
+    "greetings": [
+      "O, u bent het. Eens kijken waar het vandaag om gaat.",
+      "U belt voor een uitbreiding? Eens kijken hoe rijk u me vandaag maakt.",
+      "Hier voor een deal? Tijd voor echte zaken.",
+      "Ik ruik... de geur van verse bankbiljetten.",
+      "U wilt een grotere kamer? Ik wil een dikkere portemonnee! Laten we praten."
+    ],
+    "tiers": {
+      "2": {
+        "pitch": [
+          "{sfx:purse}We beginnen eenvoudig. Voor honderd van uw glimmertjes geef ik u een eerste fatsoenlijke uitbreiding van uw huis.",
+          "Ik ben heel gul, weet u, het is hier een beetje krap, nietwaar?...",
+          "Dus, wat denkt u ervan? Deal?"
+        ],
+        "broke": [
+          "... Wacht",
+          "Laat maar, armoedzaaier.",
+          "Dag."
+        ],
+        "accepted": [
+          "Uitstekend, geniet van uw grotere kamer, terwijl ik geniet van mijn dikkere zakken...",
+          "Hoe ik hem zo heb kunnen uitbreiden? U zou stoppen met betalen als ik mijn geheimen verklapte.",
+          "Bel me terug als het nog te krap aanvoelt..."
+        ]
+      },
+      "3": {
+        "pitch": [
+          "Dus de huidige kamer is te klein voor u?",
+          "{sfx:purse}Begrepen. Maar deze keer kost het een mille, voor grootse ambities!",
+          "Genoeg gepraat, laat de poen maar beslissen!"
+        ],
+        "broke": [
+          "Ah! Geen poen?",
+          "Jammer, maar adelaars vliegen niet met duiven!",
+          "Sayonara, boerenkinkel!"
+        ],
+        "accepted": [
+          "Heeft u hem gekocht? Ongelooflijk...",
+          "Hoe ik de ruimte vond om uw kamer uit te breiden, vraagt u?",
+          "Maakt u zich daar maar geen zorgen over.",
+          "Ik heb gewoon uw buurman eruit gezet, hij was toch al luidruchtig! Haha",
+          "Dan slaapt u voortaan in ieder geval ook beter, toch?"
+        ]
+      },
+      "4": {
+        "pitch": [
+          "Het lijkt wel alsof het nooit genoeg is voor u...",
+          "{sfx:purse}5 mille. Graag of niet."
+        ],
+        "broke": [
+          "... Ha!",
+          "Natuurlijk heeft zo'n snotneus als u dat soort geld niet.",
+          "Dan moet u maar harder werken bij OpenBurgers, jochie!"
+        ],
+        "accepted": [
+          "Wacht, heeft u echt betaald?",
+          "Niet dat het mij wat uitmaakt, maar weet u...",
+          "Als u zo goedgelovig blijft, ga ik me er nog schuldig over voelen!",
+          "Ach, het lijkt u toch niks te kunnen schelen! Kom maar op met die centen!"
+        ]
+      },
+      "more": {
+        "pitch": [
+          "...",
+          "{sfx:purse}10 mille. Op mijn OpenBank, zoals altijd."
+        ],
+        "broke": [
+          "...",
+          "*hangt op*"
+        ],
+        "accepted": [
+          "Bedankt.",
+          "..."
+        ]
+      }
+    },
+    "maxed": "Sorry, er is geen grotere uitbreiding beschikbaar.",
+    "refuse_first": "Jammer. Bel me gerust terug als u zich bedenkt.",
+    "refuse_second": "...",
+    "refused_out": [
+      "... Nee, verspil mijn tijd niet.",
+      "Bel nooit meer."
+    ],
+    "choice_yes": "Deal",
+    "choice_no": "Geen deal"
+  },
+  "backpack": {
+    "look": "De rugzak waarmee ik hier kwam wonen; als ik ernaar kijk, komen er altijd herinneringen boven"
+  },
+  "pod": {
+    "locked": "Je drukt op het paneel van de mysterieuze capsule, maar er gebeurt niets."
+  },
+  "phone": {
+    "enum_wait": "Naast de telefoon ligt een briefje: „Niet gebruiken terwijl de muziekcatalogus laadt”."
+  }
+}

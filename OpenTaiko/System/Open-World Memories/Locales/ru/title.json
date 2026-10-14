@@ -1,0 +1,46 @@
+{
+    // Skin locale file — Russian: Title screen
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/ru/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Title screen: the menu boxes (the debug entries stay English)
+        "TITLE_PERFORMANCE": "Режим исполнения",
+        "TITLE_PERFORMANCE_DESC": "Играйте карты Тайко со своими настройками!\nОт 1 до 5 игроков.",
+        "TITLE_DOJO": "Лисье додзё",
+        "TITLE_DOJO_DESC": "Пройдите экзамены на дан, подготовленные Fox Band!\nТолько для одного игрока.",
+        "TITLE_TOWERS": "Режим выживания",
+        "TITLE_TOWERS_DESC": "Взбирайтесь на башни в испытаниях на выживание и попробуйте добраться до вершины!\nТолько для одного игрока.",
+        "TITLE_AI_BATTLE": "Битва с ИИ",
+        "TITLE_AI_BATTLE_DESC": "Сразитесь с AItritus на любимых картах и вырвите победу!\nТолько для одного игрока.",
+        "TITLE_TRAINING": "Режим тренировки",
+        "TITLE_TRAINING_DESC": "Отрабатывайте любимые карты, пока не освоите их!\nТолько для одного игрока.",
+        "TITLE_INTRO_NOKON": "Интро Нокон",
+        "TITLE_INTRO_NOKON_DESC": "Шоу начинается! Покажите знание музыки в лучшем шоу Нокона!\nОт 1 до 5 игроков.",
+        "TITLE_MYROOM": "Моя комната",
+        "TITLE_MYROOM_DESC": "Обустройте свою комнату, расставьте мебель и заглядывайте в комнаты других игроков!",
+        "TITLE_STORE": "Лавка OpenTaiko",
+        "TITLE_STORE_DESC": "Потратьте монеты OpenTaiko на очень приятные товары! *подмигивает*",
+        "TITLE_SAVE_ROOM": "Чья комната?",
+        "TITLE_SAVE_ROOM_INFO": "Комната %d×%d · размещено: %d",
+        "TITLE_SAVE_ROOM_NONE": "Комната ещё не посещена",
+        "TITLE_VAULT": "Секретное хранилище",
+        "TITLE_VAULT_DESC": "Место, полное тайн, где ключи, похоже, имеют особую ценность...",
+        "TITLE_SETTINGS": "Настройки",
+        "TITLE_SETTINGS_DESC": "Настройте игру под себя!",
+        "TITLE_EXIT": "Выход",
+        "TITLE_EXIT_DESC": "До следующего раза!",
+        "TITLE_ONLINE_LOBBY": "Онлайн-лобби",
+        "TITLE_ONLINE_LOBBY_DESC": "(Бета. Делитесь кодом комнаты только с теми, кому доверяете)",
+        "TITLE_ONLINE_OFF_TITLE": "Сетевая игра выключена",
+        "TITLE_ONLINE_OFF_DESC": "Сетевая игра выключена. Чтобы открыть онлайн-лобби, включите «{setting}» в настройках ({section}). Играйте онлайн только с теми, кому доверяете.",
+        "TITLE_ONLINE_OFF_OK": "ОК",
+        "TITLE_VAULT_LOCKED_DESC": "Ты меня слышишь...?",
+        "TITLE_PLAYERS_PROMPT": "Сколько барабанщиков выйдет на сцену?",
+        "TITLE_PLAYERS_BACK": "Назад",
+        "TITLE_PLAYERS_1": "1 игрок",
+        "TITLE_PLAYERS_2": "2 игрока",
+        "TITLE_PLAYERS_3": "3 игрока",
+        "TITLE_PLAYERS_4": "4 игрока",
+        "TITLE_PLAYERS_5": "5 игроков"
+    }
+}

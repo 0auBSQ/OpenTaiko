@@ -1,0 +1,9 @@
+﻿{
+    // Skin locale file — German: Event mode
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/de/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Event mode: the plays-left line of the clock
+        "EVENT_PLAYS_LEFT": "Verbleibende Spiele: %d"
+    }
+}

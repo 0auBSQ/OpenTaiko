@@ -1,0 +1,14 @@
+﻿{
+    // Skin locale file — German: Stage transitions: the titles they show
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/de/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Stage transitions: the titles shown while one plays
+        "TRANSITION_TOWERS_TITLE": "ÜBERLEBENS-\nMODUS",
+        "TRANSITION_ONLINE_TITLE": "ONLINE-LOBBY",
+        "TRANSITION_DOJO_TITLE": "DAS FUCHS-\nDOJO",
+        "TRANSITION_AI_IN": "AItritus wird initialisiert...",
+        "TRANSITION_AI_OUT": "AItritus wird getrennt...",
+        "TRANSITION_NOKON_TITLE": "INTRO NOKON"
+    }
+}

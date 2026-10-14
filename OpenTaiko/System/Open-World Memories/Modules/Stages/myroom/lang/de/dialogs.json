@@ -1,0 +1,109 @@
+{
+  "_comment": "Dialog lines, German. Same structure as lang/en/dialogs.json; a missing key or line falls back to the English file. {size}/{cost} are filled by the code; {shake:..} is dialogue markup; {sfx:purse} at the start of a line brings the purse up.",
+  "landlord": {
+    "_comment": "The landlord's phone call. Lists are said line by line. first_call plays once per save file (no offer); greetings picks one line at random; tiers.<n> is the offer for room tier n (2 = 6x6, 3 = 7x7, 4 = 8x8, more = every 10k tier): pitch, then broke (not enough coins, no choice) or the Yes/No choice on the last pitch line, then accepted. refuse_first/second after a No (the count resets on entering the room); refused_out replaces the call after two refusals; maxed when no bigger tier exists. {sfx:purse} at the start of a line brings the purse up (the caller's onSfx handles it).",
+    "name": "Vermieter",
+    "first_call": [
+      "Sie sind also der neue Mieter...",
+      "Ich hoffe, Sie sind nicht zu laut, wissen Sie, das ist nicht gut fürs Geschäft...",
+      "Das Zimmer ist zu klein, sagen Sie? Hmmm...",
+      "Rufen Sie mich wieder an, und bringen Sie ja glänzende Dublonen mit.",
+      "Wenn Sie einen großzügigen Aufpreis zahlen, denke ich vielleicht darüber nach.",
+      "Und jetzt raus, Zeit ist Geld, und dieser Anruf ruiniert mich."
+    ],
+    "greetings": [
+      "Ach, Sie sind es. Mal sehen, worum es heute geht.",
+      "Sie rufen wegen einer Erweiterung an? Mal sehen, wie reich Sie mich heute machen.",
+      "Wegen eines Deals hier? Dann kommen wir zum Geschäft.",
+      "Ich rieche... den Duft frischer Banknoten.",
+      "Sie wollen ein größeres Zimmer? Ich will einen dickeren Geldbeutel! Reden wir."
+    ],
+    "tiers": {
+      "2": {
+        "pitch": [
+          "{sfx:purse}Fangen wir einfach an. Für hundert Ihrer Glitzerstücke biete ich Ihnen eine erste anständige Erweiterung Ihrer Bleibe.",
+          "Ich bin wirklich sehr großzügig, wissen Sie, es ist ein bisschen eng hier, nicht wahr?...",
+          "Also, was meinen Sie? Abgemacht?"
+        ],
+        "broke": [
+          "... Moment",
+          "Egal, Pleitegeier.",
+          "Auf Wiederhören."
+        ],
+        "accepted": [
+          "Ausgezeichnet, genießen Sie Ihr größeres Zimmer, während ich meine volleren Taschen genieße...",
+          "Wie ich es so vergrößern konnte? Sie würden aufhören zu zahlen, wenn ich meine Geheimnisse verriete.",
+          "Rufen Sie wieder an, wenn es sich noch zu klein anfühlt..."
+        ]
+      },
+      "3": {
+        "pitch": [
+          "Das jetzige Zimmer ist Ihnen also zu klein?",
+          "{sfx:purse}Verstehe. Aber diesmal kostet es einen Riesen, für riesige Ambitionen!",
+          "Genug geredet, jetzt soll die Kohle entscheiden!"
+        ],
+        "broke": [
+          "Ah! Keine Kohle?",
+          "Wie bedauerlich, aber Adler fliegen nicht mit Tauben!",
+          "Sayonara, Bauerntrampel!"
+        ],
+        "accepted": [
+          "Sie haben es gekauft? Unglaublich...",
+          "Wie ich den Platz für Ihre Erweiterung gefunden habe, fragen Sie?",
+          "Machen Sie sich darüber keine Gedanken.",
+          "Ich habe einfach Ihren Nachbarn rausgeworfen, der war sowieso laut! Haha",
+          "Dann schlafen Sie ab jetzt wenigstens auch besser, oder?"
+        ]
+      },
+      "4": {
+        "pitch": [
+          "Klingt, als wäre es Ihnen nie genug...",
+          "{sfx:purse}5 Riesen. Friss oder stirb."
+        ],
+        "broke": [
+          "... Ha!",
+          "Natürlich hat so ein Grünschnabel wie Sie nicht so viel Geld.",
+          "Da müssen Sie wohl mehr bei OpenBurgers schuften, Kleiner!"
+        ],
+        "accepted": [
+          "Moment, Sie haben tatsächlich bezahlt?",
+          "Nicht, dass es mich stört, aber wissen Sie...",
+          "Wenn Sie weiter so leichtgläubig sind, bekomme ich noch ein schlechtes Gewissen!",
+          "Egal, Ihnen scheint es ja sowieso nichts auszumachen! Her mit den Moneten!"
+        ]
+      },
+      "more": {
+        "pitch": [
+          "...",
+          "{sfx:purse}10 Riesen. Auf meine OpenBank, wie immer."
+        ],
+        "broke": [
+          "...",
+          "*legt auf*"
+        ],
+        "accepted": [
+          "Danke.",
+          "..."
+        ]
+      }
+    },
+    "maxed": "Tut mir leid, eine größere Erweiterung gibt es nicht.",
+    "refuse_first": "Wie bedauerlich. Rufen Sie mich ruhig wieder an, falls Sie es sich anders überlegen.",
+    "refuse_second": "...",
+    "refused_out": [
+      "... Nein, verschwenden Sie nicht meine Zeit.",
+      "Rufen Sie nie wieder an."
+    ],
+    "choice_yes": "Abgemacht",
+    "choice_no": "Kein Deal"
+  },
+  "backpack": {
+    "look": "Der Rucksack, mit dem ich hier eingezogen bin; bei seinem Anblick kommen immer Erinnerungen hoch"
+  },
+  "pod": {
+    "locked": "Du drückst auf das Bedienfeld der mysteriösen Kapsel, aber nichts passiert."
+  },
+  "phone": {
+    "enum_wait": "Neben dem Telefon liegt ein Zettel: „Nicht benutzen, während der Songkatalog lädt“."
+  }
+}

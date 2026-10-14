@@ -1,0 +1,17 @@
+{
+    // Skin locale file — Japanese: Tower
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/ja/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Tower gameplay: the floor and lives planks (tower_hud ROActivity)
+        "TOWER_HUD_REACHED": "到達階数",
+        "TOWER_HUD_FLOOR_PREFIX": "",
+        "TOWER_HUD_FLOOR_SUFFIX": "階",
+        "TOWER_HUD_LIVES": "ライフ",
+
+        // Tower select
+        "TOWERSELECT_CONFIRM": "タワーに挑戦しますか？",
+        "TOWERSELECT_RANDOM": "おまかせ",
+        "TOWERSELECT_RETURN": "とじる"
+    }
+}

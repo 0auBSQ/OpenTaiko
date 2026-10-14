@@ -220,7 +220,7 @@ function A.fitBox(font, str, w, h, kmax, kmin)
     return best.lines, best.k, best.pitch
 end
 
--- the skin's Locales/<code>.json through THEME, looked up once per visit (A.resetStrings); the English text
+-- the skin's Locales/<code>/ through THEME, looked up once per visit (A.resetStrings); the English text
 -- stays in the code as the fallback
 local strings = {}
 function A.tr(key, fallback)

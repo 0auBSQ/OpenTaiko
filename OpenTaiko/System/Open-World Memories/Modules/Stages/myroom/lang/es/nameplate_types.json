@@ -1,0 +1,123 @@
+{
+  "_comment": "Nameplate type names (es); missing ids fall back to lang/en.",
+  "0": {
+    "name": "Madera"
+  },
+  "1": {
+    "name": "Cobre"
+  },
+  "2": {
+    "name": "Amatista"
+  },
+  "3": {
+    "name": "Naturaleza"
+  },
+  "6": {
+    "name": "Ceniza"
+  },
+  "7": {
+    "name": "Arcoíris"
+  },
+  "8": {
+    "name": "Espacio"
+  },
+  "9": {
+    "name": "Diamante"
+  },
+  "10": {
+    "name": "Misery"
+  },
+  "11": {
+    "name": "Oro"
+  },
+  "12": {
+    "name": "Perla"
+  },
+  "13": {
+    "name": "Platino"
+  },
+  "15": {
+    "name": "Dashy"
+  },
+  "16": {
+    "name": "Azul"
+  },
+  "17": {
+    "name": "Rojo"
+  },
+  "19": {
+    "name": "IA"
+  },
+  "20": {
+    "name": "Cielo"
+  },
+  "21": {
+    "name": "Amarillo"
+  },
+  "22": {
+    "name": "Crema"
+  },
+  "23": {
+    "name": "Mar"
+  },
+  "24": {
+    "name": "Verde"
+  },
+  "25": {
+    "name": "Capítulo I"
+  },
+  "26": {
+    "name": "Capítulo II"
+  },
+  "27": {
+    "name": "Capítulo III"
+  },
+  "28": {
+    "name": "OpTk claro"
+  },
+  "29": {
+    "name": "OpTk oscuro"
+  },
+  "31": {
+    "name": "Noche"
+  },
+  "32": {
+    "name": "Capítulo IV"
+  },
+  "33": {
+    "name": "Actuación Clear"
+  },
+  "34": {
+    "name": "Actuación Full Combo"
+  },
+  "35": {
+    "name": "Actuación Perfect"
+  },
+  "37": {
+    "name": "Capítulo V"
+  },
+  "38": {
+    "name": "V-ENTURE"
+  },
+  "39": {
+    "name": "Historial Clear"
+  },
+  "40": {
+    "name": "Historial Full Combo"
+  },
+  "41": {
+    "name": "Historial Perfect"
+  },
+  "42": {
+    "name": "Ryuto Setsujin"
+  },
+  "43": {
+    "name": "Amanecer"
+  },
+  "44": {
+    "name": "Capítulo VI"
+  },
+  "45": {
+    "name": "Un nuevo mundo"
+  }
+}

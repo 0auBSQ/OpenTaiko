@@ -1,0 +1,23 @@
+{
+  "_comment": "屏幕操作说明、交互提示和房间选择器（Script.lua）的中文文本。键为固定 ID；缺少的 ID 显示英文文本（lang/en）。",
+  "ctl_move": "WASD — 移动",
+  "ctl_orbit": "右键 / Q·E — 旋转视角",
+  "ctl_zoom": "滚轮 — 缩放",
+  "ctl_edit": "Tab — 编辑房间",
+  "ctl_leave": "Esc — 离开",
+  "ctl_leave_visit": "Esc / 门 — 结束拜访",
+  "prompt_computer": "[Enter] 使用电脑",
+  "prompt_phone": "[Enter] 使用电话",
+  "prompt_lamp": "[Enter] 开关灯",
+  "prompt_jukebox": "[Enter] 播放音乐",
+  "prompt_tv": "[Enter] 使用电视",
+  "prompt_pod": "[Enter] 调查",
+  "prompt_matrix": "[Enter] 使用 Placeholder Matrix",
+  "prompt_mirror": "[Enter] 照镜子",
+  "prompt_look": "[Enter] 查看",
+  "prompt_fishtank": "[Enter] 开关鱼缸灯",
+  "prompt_exit": "[Enter] 离开房间",
+  "prompt_switch": "[Tab] 切换焦点",
+  "player_entry": "玩家 %d — %s",
+  "whose_room": "谁的房间？"
+}

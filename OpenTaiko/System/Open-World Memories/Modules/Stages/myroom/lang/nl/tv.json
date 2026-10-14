@@ -1,0 +1,13 @@
+{
+  "_comment": "Dutch texts for the TV (tv.lua): its menu and the cutscene browser. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "title": "Tv",
+  "menu_on": "Aanzetten",
+  "menu_off": "Uitzetten",
+  "menu_rewatch": "Tussenfilmpjes terugkijken",
+  "tab_songs": "Tussenfilmpjes van nummers",
+  "intro": "Intro",
+  "outro": "Outro %d",
+  "unknown_song": "???",
+  "empty": "Geen tussenfilmpjes gevonden.",
+  "waiting": "Zenders afstemmen... de lijst met nummers wordt nog voorbereid."
+}
