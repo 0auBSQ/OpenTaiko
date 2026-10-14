@@ -16,6 +16,7 @@
   "prompt_mirror": "[Enter] 照镜子",
   "prompt_look": "[Enter] 查看",
   "prompt_fishtank": "[Enter] 开关鱼缸灯",
+  "prompt_workbench": "[Enter] 使用工作台",
   "prompt_exit": "[Enter] 离开房间",
   "prompt_switch": "[Tab] 切换焦点",
   "player_entry": "玩家 %d — %s",

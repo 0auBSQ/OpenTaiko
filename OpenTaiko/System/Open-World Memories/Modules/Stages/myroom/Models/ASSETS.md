@@ -45,7 +45,7 @@ Downloaded from that page: `Low Poly Household Items.zip`; model taken from `Low
 converted from FBX to binary glTF (turned to face -z, scaled, base on the floor).
 
 The models coloured only by material colours (wooden_chest, coin_piles, pirate_key, caspian_mug, chalice, crystal,
-fishtank, toybox, lsofa) have those colours converted from linear to sRGB values, the colours the game draws.
+fishtank, toybox, lsofa, workbench) have those colours converted from linear to sRGB values, the colours the game draws.
 
 backpack.glb's pins use **Coin** by Quaternius (https://poly.pizza/m/7IrL01B97W, CC0 1.0) as their base.
 
@@ -64,6 +64,7 @@ License: **CC BY 3.0** (https://creativecommons.org/licenses/by/3.0/) unless not
 | toybox.glb | Toy Block | GreatGavino | https://poly.pizza/m/RtwMoLvuTl | CC BY 3.0 |
 | caspian_mug.glb | Mug | Poly by Google | https://poly.pizza/m/b_NQfHVaX6t | CC BY 3.0 |
 | fishtank.glb | Fish Tank | J-Toastie | https://poly.pizza/m/FLnlsLbY2s | CC BY 3.0 |
+| workbench.glb | Workbench | sirkitree | https://poly.pizza/m/24I9X8aeWTR | CC BY 3.0 |
 | jukebox.glb | Jukebox | Rescue3D Assets (https://sketchfab.com/rescue3d) | https://sketchfab.com/3d-models/jukebox-188e71ce378f4b6786054d9f74dd3a25 | CC BY 4.0 |
 
 jukebox.glb credit line (per the download's license.txt): This work is based on "Jukebox"

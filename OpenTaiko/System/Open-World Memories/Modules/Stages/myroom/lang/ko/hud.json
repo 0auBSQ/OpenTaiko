@@ -16,6 +16,7 @@
   "prompt_mirror": "[Enter] 거울 보기",
   "prompt_look": "[Enter] 보기",
   "prompt_fishtank": "[Enter] 어항 조명 켜기/끄기",
+  "prompt_workbench": "[Enter] 작업대 사용",
   "prompt_exit": "[Enter] 방 나가기",
   "prompt_switch": "[Tab] 포커스 전환",
   "player_entry": "플레이어 %d — %s",

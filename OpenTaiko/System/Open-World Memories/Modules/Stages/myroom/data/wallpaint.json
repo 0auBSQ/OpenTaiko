@@ -1,5 +1,5 @@
 {
-  "_comment": "Wall paints (Paint tab). LIVE fields: swatch = flat PNG used as this item's coin-shop preview (shop-sold ids only). tex is informational: texture ids bind in assets.lua (A.WALLPAINT), and the default_* entries are wired to the DEFAULT_FLOOR/DEFAULT_PAINT constants in room.lua. Add an entry AND its id to _order. Display names are the skin's ITEM_<ID> strings (Locales/<code>/).",
+  "_comment": "Wall paints (Paint tab). LIVE fields: swatch = flat PNG used as this item's coin-shop preview (shop-sold ids only). tex is informational: texture ids bind in assets.lua (A.WALLPAINT), and the default_* entries are wired to the DEFAULT_FLOOR/DEFAULT_PAINT constants in room.lua. Add an entry AND its id to _order. colors = the rrggbb colours the workbench can give it besides its default one (each colour is stocked and placed as '<id>:<rrggbb>'). Display names are the skin's ITEM_<ID> strings (Locales/<code>/).",
   "_order": [
     "plaster",
     "blue",
@@ -8,6 +8,7 @@
     "brick",
     "rock",
     "stonewall",
+    "plaster_c",
     "default_paint"
   ],
   "plaster": {
@@ -32,6 +33,11 @@
   },
   "stonewall": {
     "tex": "stonewall"
+  },
+  "plaster_c": {
+    "tex": "wall",
+    "swatch": "Textures/Surfaces/plaster.png",
+    "colors": ["c94a4a", "e8945a", "f0d36a", "7fbf6a", "5fa8d8", "5a6cc8", "a070c8", "f2a6c4", "4a4a52"]
   },
   "default_paint": {
     "tex": "wall"

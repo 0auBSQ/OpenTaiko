@@ -1455,7 +1455,7 @@ end
 
 -- icon for an item id: flooring/paint use a colour swatch, furniture the drawn art (fallback)
 local function iconFor(id)
-    local sw = A.SWATCH[id]
+    local sw = A.swatchFor(id)
     if sw then return I.swatch(id, sw[1], sw[2], sw[3]) end
     return I.get(id)
 end
@@ -1516,7 +1516,15 @@ function Edit:draw()
         end
         local fg = s.sel and { 255, 255, 255 } or { 92, 62, 46 }
         local bg = s.sel and { 120, 60, 20, 220 } or { 255, 255, 255, 160 }
-        ui:drawTextEx(15, Room.displayName(s.id), floor(s.x + s.w / 2), s.y + s.h - 42, fg, bg, 1, 1, s.w - 10, "top")
+        -- the name on up to two lines across the whole slot (a longer one squeezes its last line)
+        local lines = ui:wrapLines(15, Room.displayName(s.id), s.w - 10)
+        if #lines <= 1 then
+            ui:drawTextEx(15, lines[1] or "", floor(s.x + s.w / 2), s.y + s.h - 42, fg, bg, 1, 1, s.w - 10, "top")
+        else
+            local rest = table.concat(lines, " ", 2)
+            ui:drawTextEx(15, lines[1], floor(s.x + s.w / 2), s.y + s.h - 50, fg, bg, 1, 1, s.w - 10, "top")
+            ui:drawTextEx(15, rest, floor(s.x + s.w / 2), s.y + s.h - 30, fg, bg, 1, 1, s.w - 10, "top")
+        end
         if s.n >= 0 then                                        -- infinite default swatches show no count
             local pill = self:badgePill()
             pill:SetColor(1, 1, 1); pill:SetScale(1, 1); pill:SetOpacity(1)

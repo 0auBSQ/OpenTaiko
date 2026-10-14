@@ -25,6 +25,7 @@
     "toybox",
     "window",
     "lsofa",
+    "workbench",
     "wooden_chest",
     "barrel",
     "coin_piles",
@@ -300,6 +301,14 @@
       "XXX"
     ],
     "collH": 0.85,
+    "shop": true
+  },
+  "workbench": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "collH": 1.6,
+    "interact": "workbench",
     "shop": true
   },
   "wooden_chest": {

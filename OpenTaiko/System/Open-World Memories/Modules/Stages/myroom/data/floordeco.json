@@ -1,5 +1,5 @@
 {
-  "_comment": "Floorings (Floor tab). LIVE fields: swatch = flat PNG used as this item's coin-shop preview (shop-sold ids only). tex is informational: texture ids bind in assets.lua (A.FLOORPAINT), and the default_* entries are wired to the DEFAULT_FLOOR/DEFAULT_PAINT constants in room.lua. Add an entry AND its id to _order. Display names are the skin's ITEM_<ID> strings (Locales/<code>/).",
+  "_comment": "Floorings (Floor tab). LIVE fields: swatch = flat PNG used as this item's coin-shop preview (shop-sold ids only). tex is informational: texture ids bind in assets.lua (A.FLOORPAINT), and the default_* entries are wired to the DEFAULT_FLOOR/DEFAULT_PAINT constants in room.lua. Add an entry AND its id to _order. colors = the rrggbb colours the workbench can give it besides its default one (each colour is stocked and placed as '<id>:<rrggbb>'). Display names are the skin's ITEM_<ID> strings (Locales/<code>/).",
   "_order": [
     "wood",
     "carpet",
@@ -7,6 +7,7 @@
     "grass",
     "sand",
     "snow",
+    "woodfloor_c",
     "default_floor"
   ],
   "wood": {
@@ -14,7 +15,8 @@
   },
   "carpet": {
     "tex": "carpet",
-    "swatch": "Textures/Surfaces/rug.png"
+    "swatch": "Textures/Surfaces/rug.png",
+    "colors": ["c94a4a", "e8945a", "f0d36a", "7fbf6a", "5fa8d8", "5a6cc8", "a070c8", "f2a6c4", "4a4a52"]
   },
   "stone": {
     "tex": "stone",
@@ -26,11 +28,17 @@
   },
   "sand": {
     "tex": "sand",
-    "swatch": "Textures/Surfaces/sand.png"
+    "swatch": "Textures/Surfaces/sand.png",
+    "colors": ["e88a3a"]
   },
   "snow": {
     "tex": "snow",
     "swatch": "Textures/Surfaces/snow.png"
+  },
+  "woodfloor_c": {
+    "tex": "wood",
+    "swatch": "Textures/Surfaces/woodfloor.png",
+    "colors": ["3b2a24", "f0a8bc", "d9823f"]
   },
   "default_floor": {
     "tex": "wood"

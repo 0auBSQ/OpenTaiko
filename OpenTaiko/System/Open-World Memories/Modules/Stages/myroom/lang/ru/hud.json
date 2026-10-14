@@ -16,6 +16,7 @@
   "prompt_mirror": "[Enter] Посмотреться в зеркало",
   "prompt_look": "[Enter] Посмотреть",
   "prompt_fishtank": "[Enter] Свет в аквариуме",
+  "prompt_workbench": "[Enter] Использовать верстак",
   "prompt_exit": "[Enter] Выйти из комнаты",
   "prompt_switch": "[Tab] Сменить цель",
   "player_entry": "Игрок %d — %s",

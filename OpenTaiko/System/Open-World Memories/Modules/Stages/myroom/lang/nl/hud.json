@@ -16,6 +16,7 @@
   "prompt_mirror": "[Enter] In de spiegel kijken",
   "prompt_look": "[Enter] Bekijken",
   "prompt_fishtank": "[Enter] Aquariumlampen aan/uit",
+  "prompt_workbench": "[Enter] Werkbank gebruiken",
   "prompt_exit": "[Enter] Kamer verlaten",
   "prompt_switch": "[Tab] Ander doel kiezen",
   "player_entry": "Speler %d — %s",

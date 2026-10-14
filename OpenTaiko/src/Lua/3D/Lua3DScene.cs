@@ -671,6 +671,28 @@ namespace OpenTaiko {
 			_texPix[id] = px; _texW[id] = w; _texH[id] = h; BumpTexRev(id);
 		}
 
+		/// <summary>Register texture <paramref name="id"/> as a recolour of the registered texture
+		/// <paramref name="srcId"/>: every texel takes the colour (r, g, b 0..255) scaled by how bright it is
+		/// against the source's average, so the grain stays and the average becomes the colour. Cut-out texels
+		/// stay cut out. Does nothing when <paramref name="srcId"/> is not registered.</summary>
+		public void RegisterTextureTinted(int id, int srcId, int r, int g, int b) {
+			if (!_texPix.TryGetValue(srcId, out var src)) return;
+			double sum = 0;
+			for (int i = 0; i < src.Length; i++) {
+				int p = src[i];
+				sum += 0.299 * ((p >> 16) & 255) + 0.587 * ((p >> 8) & 255) + 0.114 * (p & 255);
+			}
+			double avg = Math.Max(1.0, sum / Math.Max(1, src.Length));
+			var px = new int[src.Length];
+			for (int i = 0; i < src.Length; i++) {
+				int p = src[i];
+				double k = (0.299 * ((p >> 16) & 255) + 0.587 * ((p >> 8) & 255) + 0.114 * (p & 255)) / avg;
+				int nr = (int)Math.Clamp(r * k, 0, 255), ng = (int)Math.Clamp(g * k, 0, 255), nb = (int)Math.Clamp(b * k, 0, 255);
+				px[i] = (p & unchecked((int)0x80000000)) | (nr << 16) | (ng << 8) | nb;
+			}
+			_texPix[id] = px; _texW[id] = _texW[srcId]; _texH[id] = _texH[srcId]; BumpTexRev(id); Revision++;
+		}
+
 		/// <summary>
 		/// Register a texture for the rasterizer from an existing <see cref="LuaTexture"/> by
 		/// reading its pixels back from the GPU (alpha is dropped — the rasterizer treats textures

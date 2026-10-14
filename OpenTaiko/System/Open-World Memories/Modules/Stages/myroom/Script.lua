@@ -26,6 +26,7 @@ local Pod      = require("pod")             -- the Mysterious Pod's entry sequen
 local MX       = require("matrix")          -- the Placeholder Matrix: its glow + the debug scene list; see matrix.lua
 local MR       = require("mirror")          -- the mirror: the student and palette the player wears; see mirror.lua
 local FT       = require("fishtank")        -- the Fish Tank: its fish, kelp and blue lights; see fishtank.lua
+local WB       = require("workbench")       -- the Workbench: recolours floorings and paints; see workbench.lua
 local AV       = require("avatar")          -- the students' billboard sprites (player + visitors); see avatar.lua
 local Student  = require("Student")         -- Lib: the chosen story student and its palette
 local CoinBox  = require("CoinBox")         -- Lib: the coin purse laid over the landlord's offers
@@ -354,6 +355,7 @@ function deactivate()
     if hud then hud:disposeWidgets(); hud = nil end
     MX.dispose()
     MR.dispose()
+    WB.dispose()
     AV.dispose()
     look.set = nil
     purse:dispose()
@@ -411,6 +413,8 @@ local function interactablesInRange()
                         seen[it] = true; list[#list + 1] = { kind = "mirror", it = it, key = "mirror:" .. tostring(it) }
                     elseif cat.interact == "look" then
                         seen[it] = true; list[#list + 1] = { kind = "look", it = it, key = "look:" .. tostring(it) }
+                    elseif cat.interact == "workbench" then
+                        seen[it] = true; list[#list + 1] = { kind = "workbench", it = it, key = "workbench:" .. tostring(it) }
                     elseif cat.interact == "fishtank" then
                         seen[it] = true; list[#list + 1] = { kind = "fishtank", it = it, key = "fishtank:" .. tostring(it) }
                     end
@@ -754,6 +758,14 @@ MR.init{
     onChanged = function() refreshLook() end,
 }
 
+-- Workbench context: the stock it recolours belongs to the room shown
+WB.init{
+    theme = PHONE_THEME,
+    playerIndex = function() return playerIndex end,
+    room = function() return room end,
+    onChanged = function() saveRoom() end,
+}
+
 local buildPhoneMenu   -- forward decl (the textbox panes route Back into it)
 
 local function buildPhoneTextPane(title, hintText, maxLen, confirmLabel, onConfirm)
@@ -1090,6 +1102,9 @@ function update(ts)
     elseif mode == "mirror" then
         if MR.update(dt, ts) == "closed" or not MR.isOpen() then mode = "play" end
         settlePlayer(dt); world:update(dt, px, py, pz); return nil
+    elseif mode == "workbench" then
+        if WB.update(dt, ts) == "closed" or not WB.isOpen() then mode = "play" end
+        settlePlayer(dt); world:update(dt, px, py, pz); return nil
     elseif mode == "edit" then
         if edit:update(ts, getEditCameraFuncs(dt)) == "exit" then
             mode = "play"; pmoving = false
@@ -1227,6 +1242,10 @@ function update(ts)
             SHARED:GetSharedSound("Decide"):Play()
             MR.open()
             mode = "mirror"
+        elseif focused.kind == "workbench" then
+            SHARED:GetSharedSound("Decide"):Play()
+            WB.open()
+            mode = "workbench"
         elseif focused.kind == "fishtank" then
             SHARED:GetSharedSound("Move"):Play()
             FT.toggle(focused.it)
@@ -1334,6 +1353,9 @@ function draw()
     elseif mode == "mirror" then
         hud:rect(0, 0, SCREEN_W, SCREEN_H, 8, 10, 18, 130)
         MR.draw()
+    elseif mode == "workbench" then
+        hud:rect(0, 0, SCREEN_W, SCREEN_H, 8, 10, 18, 130)
+        WB.draw()
     else
         -- input instructions: TOP-RIGHT, right-aligned, one per line (readability). The contextual
         -- action prompt (bright) leads, then any [Tab] switch, then the persistent controls.
@@ -1348,6 +1370,7 @@ function draw()
         elseif prompt == "mirror" then instr[#instr + 1] = { t = HUD:tr("prompt_mirror"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "look" then instr[#instr + 1] = { t = HUD:tr("prompt_look"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "fishtank" then instr[#instr + 1] = { t = HUD:tr("prompt_fishtank"), c = { 150, 230, 255 }, s = 24 }
+        elseif prompt == "workbench" then instr[#instr + 1] = { t = HUD:tr("prompt_workbench"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "exit" then instr[#instr + 1] = { t = HUD:tr("prompt_exit"), c = { 255, 230, 150 }, s = 24 }
         end
         if interCount > 1 then instr[#instr + 1] = { t = HUD:tr("prompt_switch"), c = { 200, 220, 240 }, s = 18 } end

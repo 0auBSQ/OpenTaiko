@@ -269,7 +269,13 @@ local function buildDecoFromJson(file, target)
         local id = jget(order, i)
         local node = id and jget(doc, id)
         if node then
-            target[id] = { tex = jget(node, "tex") }
+            target[id] = { tex = jget(node, "tex"), colors = {} }
+            -- the colours the workbench can give it (rrggbb), besides its default one
+            local cl = jget(node, "colors")
+            for c = 1, (cl and JSONLOADER:JsonCount(cl) or 0) do
+                local hex = tostring(jget(cl, c) or ""):lower()
+                if hex:match("^%x%x%x%x%x%x$") then target[id].colors[#target[id].colors + 1] = hex end
+            end
             local sw = jget(node, "swatch")
             if sw then Room.SHOP_SWATCH_TEX[id] = sw end
         end
@@ -336,9 +342,27 @@ for _, id in ipairs(Room.SHOP_MODEL_IDS) do Room.SHOP_IDS[#Room.SHOP_IDS + 1] = 
 for id in pairs(Room.SHOP_SWATCH_TEX) do Room.SHOP_IDS[#Room.SHOP_IDS + 1] = id end
 function Room.shopCounter(id) return ".myroom_" .. id end
 
+-- A flooring or paint in a colour is kept as "<id>:<rrggbb>" (in the inventory and on the tiles); the
+-- plain id is its default colour. Every colour of an item shares its name.
+function Room.splitColor(key)
+    local id, hex = tostring(key):match("^([^:]+):(%x%x%x%x%x%x)$")
+    if id then return id, hex:lower() end
+    return key, nil
+end
+function Room.colorKey(id, hex)
+    if hex == nil or hex == "" then return id end
+    return id .. ":" .. hex
+end
+-- the colours a flooring or paint can take besides its default one
+function Room.decoColors(id)
+    local d = Room.FLOORDECO[id] or Room.WALLPAINT[id]
+    return (d and d.colors) or {}
+end
+
 -- localized display name for a furniture / floor / wall-paint id (falls back to the id). The names
 -- are the skin's ITEM_<ID> strings (Locales/<code>/), shared with the coin shop and the vault.
 function Room.displayName(id)
+    id = Room.splitColor(id)
     local key = "ITEM_" .. tostring(id):upper()
     local ok, v = pcall(function() return THEME:GetSkinString(key) end)
     if ok and type(v) == "string" and v ~= "" and v ~= key and v:sub(1, 1) ~= "[" then return v end
@@ -977,13 +1001,14 @@ function Room:categoryItems(cat)
             local c = Room.CATALOG[id]
             if c and c.place == want and (self.inventory[id] or 0) > 0 then out[#out + 1] = id end
         end
-    elseif cat == "floor" then
-        for id in pairs(A.FLOORPAINT) do if (self.inventory[id] or 0) > 0 then out[#out + 1] = id end end
-        table.sort(out); table.insert(out, 1, Room.DEFAULT_FLOOR)   -- infinite "revert to wood" first
-        return out
-    elseif cat == "paint" then
-        for id in pairs(A.WALLPAINT) do if (self.inventory[id] or 0) > 0 then out[#out + 1] = id end end
-        table.sort(out); table.insert(out, 1, Room.DEFAULT_PAINT)   -- infinite "revert to plaster" first
+    elseif cat == "floor" or cat == "paint" then
+        -- every colour of an item is its own entry (the default colour first: "<id>" sorts before "<id>:..")
+        local known = (cat == "floor") and A.FLOORPAINT or A.WALLPAINT
+        for key, n in pairs(self.inventory) do
+            if (n or 0) > 0 and known[Room.splitColor(key)] then out[#out + 1] = key end
+        end
+        table.sort(out)
+        table.insert(out, 1, (cat == "floor") and Room.DEFAULT_FLOOR or Room.DEFAULT_PAINT)   -- infinite "revert" first
         return out
     end
     table.sort(out)
@@ -1085,7 +1110,7 @@ function Room:buildMap(world)
                 local x0, z0 = c, gh - 1 - r
                 -- flooring = a FLAT RE-TEXTURE of the tile itself (no raised rug slab); default = wood
                 local fid = self.floorDeco[c .. "," .. r]
-                local ftex = (fid and A.FLOORPAINT[fid]) or A.TEX.wood
+                local ftex = (fid and A.surfaceTex(scene, "floor", fid)) or A.TEX.wood
                 scene:ObjAddQuadTex(world.floorObj, x0, FY, z0, x0, FY, z0 + 1, x0 + 1, FY, z0 + 1, x0 + 1, FY, z0, ftex, 1, 1, 1.0)
                 phys:addQuad(x0, FY, z0, x0, FY, z0 + 1, x0 + 1, FY, z0 + 1, x0 + 1, FY, z0)
                 -- side skirts where the platform edge is exposed (not backed by a wall cell)
@@ -1115,7 +1140,7 @@ function Room:buildMap(world)
     end
     local zb = gh - 1                                        -- back wall plane (interior back edge)
     for c = 0, self.iw - 1 do
-        local tex = A.WALLPAINT[self.wallPaint["back:" .. c]] or A.TEX.wall
+        local tex = A.surfaceTex(scene, "paint", self.wallPaint["back:" .. c]) or A.TEX.wall
         if self:windowAt(c, 0) then                          -- window column: split around the opening
             wallQuad(c, zb, c + 1, zb, 0, FY + Room.WIN_Y0, tex)
             wallQuad(c, zb, c + 1, zb, FY + Room.WIN_Y1, wallTop, tex)
@@ -1125,7 +1150,7 @@ function Room:buildMap(world)
         phys:addBox(c, 0, zb, c + 1, wallTop, zb + 1)        -- solid even under the window sill
     end
     for r = 1, self.ih do                                    -- right wall, per interior row
-        local tex = A.WALLPAINT[self.wallPaint["right:" .. r]] or A.TEX.wall
+        local tex = A.surfaceTex(scene, "paint", self.wallPaint["right:" .. r]) or A.TEX.wall
         local z0 = gh - 1 - r
         if self:windowAt(self.iw, r) then                    -- window row: split around the opening
             wallQuad(self.iw, z0, self.iw, z0 + 1, 0, FY + Room.WIN_Y0, tex)

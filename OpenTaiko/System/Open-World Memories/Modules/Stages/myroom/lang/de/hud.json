@@ -16,6 +16,7 @@
   "prompt_mirror": "[Enter] In den Spiegel schauen",
   "prompt_look": "[Enter] Ansehen",
   "prompt_fishtank": "[Enter] Aquariumlicht an/aus",
+  "prompt_workbench": "[Enter] Werkbank benutzen",
   "prompt_exit": "[Enter] Zimmer verlassen",
   "prompt_switch": "[Tab] Ziel wechseln",
   "player_entry": "Spieler %d — %s",

@@ -6,6 +6,8 @@
 -- a padlock at its right end, or whatever drawLocked(item, right, cy, menu) draws there (e.g. a price),
 -- with lockedW pixels kept free for it.
 --   ui:menu{ x=, y=, w=, h=, items={"One",{text="Two",value=2}}, selected=1, onChange=fn, onSelect=fn }
+-- hoverSelects = false: the mouse picks a row by clicking it only (hovering moves nothing);
+-- textReserve = pixels kept free at the right end of every row (for what the caller draws there).
 
 local Widget = require("PopUI.widget")
 local U      = require("PopUI.util")
@@ -106,12 +108,12 @@ function Menu:update(ctx)
         self:_clampScroll()
     end
     -- mouse hover row → preview-select; click sets selection
-    if self.hovered and ctx.inside and (ctx.moved or not self._wasHovered) then
+    if self.hovered and ctx.inside and (ctx.moved or ctx.mPressed or not self._wasHovered) then
         local rel = ctx.my - self.y + self._scrollCur
         local row = math.floor(rel / self.rowHeight) + 1
         if row >= 1 and row <= self:_count() then
             if ctx.mPressed then self:setSelected(row) end
-            if row ~= self.selected and not ctx.mPressing then self:setSelected(row) end
+            if self.hoverSelects ~= false and row ~= self.selected and not ctx.mPressing then self:setSelected(row) end
         end
     end
     self._wasHovered = self.hovered
@@ -168,7 +170,7 @@ function Menu:draw()
             local bg = isSel and U.shade(c.primary2, 0.5) or { 255, 255, 255, 150 }
             if marked and not isSel then bg = { 90, 62, 8, 200 } end
             if locked then fg = { 120, 122, 130 } end
-            local textW = locked and (self.w - 48 - (self.lockedW or self.rowHeight)) or (self.w - 48)
+            local textW = locked and (self.w - 48 - (self.lockedW or self.rowHeight)) or (self.w - 48 - (self.textReserve or 0))
             self.mgr:drawTextEx(self.eff.font.label, it.text, math.floor(self.x + 28), tcy,
                 fg, bg, 1, 1, textW, "left", vy0, vy1)
             if locked and self.drawLocked then

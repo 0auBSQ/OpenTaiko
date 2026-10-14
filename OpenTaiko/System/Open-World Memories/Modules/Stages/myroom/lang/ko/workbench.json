@@ -1,0 +1,8 @@
+{
+  "_comment": "Korean texts for the workbench window (workbench.lua). Keys are stable ids; lang/en is the fallback for every other language.",
+  "stock": "보유",
+  "color": "색",
+  "amount": "수량",
+  "recolor": "색 바꾸기",
+  "empty": "색을 바꿀 것이 없습니다. 색이 있는 바닥과 벽지가 여기에 표시됩니다."
+}

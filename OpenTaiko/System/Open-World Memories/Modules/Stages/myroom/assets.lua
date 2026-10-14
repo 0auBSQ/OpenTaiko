@@ -13,13 +13,14 @@ A.TEX = { wood = 200, carpet = 201, wall = 202, skirt = 203 }
 -- floor "paints" (flooring) and wall paints, by id → texture id. The DEFAULT floor (wood) and wall
 -- (plaster) are NOT paints — they are the empty state, so they are not listed here. The 24x ids are
 -- the CC0 surface photos (stone/grass/sand/snow/brick/rock), loaded in FILE_TEX below.
-A.FLOORPAINT = { carpet = 201, stone = 240, grass = 241, sand = 242, snow = 243 }
-A.WALLPAINT  = { blue = 220, beige = 221, sage = 222, brick = 244, rock = 245, stonewall = 240 }
+A.FLOORPAINT = { carpet = 201, stone = 240, grass = 241, sand = 242, snow = 243, woodfloor_c = 200 }
+A.WALLPAINT  = { blue = 220, beige = 221, sage = 222, brick = 244, rock = 245, stonewall = 240, plaster_c = 202 }
 -- representative RGB for the flooring/paint icon swatches (id → {r,g,b})
 A.SWATCH = { carpet = { 243, 246, 250 }, blue = { 120, 150, 205 }, beige = { 212, 196, 164 }, sage = { 150, 185, 150 },
              stone = { 150, 148, 142 }, grass = { 96, 150, 78 }, sand = { 214, 196, 150 }, snow = { 200, 200, 201 },
              brick = { 150, 86, 70 }, rock = { 120, 116, 112 }, stonewall = { 150, 148, 142 },
-             default_floor = { 150, 110, 66 }, default_paint = { 196, 188, 176 } }   -- "revert to default" swatches
+             default_floor = { 150, 110, 66 }, default_paint = { 196, 188, 176 },
+             woodfloor_c = { 150, 110, 66 }, plaster_c = { 196, 188, 176 } }   -- "revert to default" swatches
 -- arcade screen art (procedural, generated in buildTextures) + poster/painting picture textures
 -- (reuse the CC0 surface photos as landscape "souvenirs"); ids the item definitions reference
 A.SCREEN  = { taiko = 250, retro = 251 }
@@ -118,6 +119,7 @@ end
 -- Each file load is pcall-guarded and the procedural texture stays if anything is missing/fails.
 -- A surface with a `normal` file gets that normal map (DirectX convention) as texture id + NORMAL_OFFSET.
 local NORMAL_OFFSET = 100
+A.NORMAL_OF = {}   -- texture id → its normal map's id, once registered
 local FILE_TEX = {
     { file = "Textures/Surfaces/woodfloor.png", id = 200, normal = "Textures/Surfaces/woodfloor_normal.png" },   -- A.TEX.wood
     { file = "Textures/Surfaces/plaster.png",   id = 202, normal = "Textures/Surfaces/plaster_normal.png" },     -- A.TEX.wall
@@ -162,10 +164,50 @@ function A.buildFileTextures(scene)
                     scene:RegisterTextureFromImage(e.id + NORMAL_OFFSET, n)
                     scene:SetTextureFilter(e.id + NORMAL_OFFSET, "mipmap")
                     scene:SetTextureNormalMap(e.id, e.id + NORMAL_OFFSET)
+                    A.NORMAL_OF[e.id] = e.id + NORMAL_OFFSET
                 end)
             end
         end
     end
+end
+
+-- ── colours: a flooring or paint stored as "<id>:<rrggbb>" draws a recolour of its texture (the same
+-- grain and normal map), registered on first use under ids from TINT_BASE ──────────────────────────────
+local TINT_BASE = 400
+local tintIds, tintNext = {}, TINT_BASE
+local tintScene, tintDone = nil, {}
+
+local function splitKey(key)
+    local id, hex = tostring(key):match("^([^:]+):(%x%x%x%x%x%x)$")
+    if id then return id, hex:lower() end
+    return key, nil
+end
+
+-- the texture id a floor ("floor") or wall paint ("paint") key draws with, nil when it has none
+function A.surfaceTex(scene, kind, key)
+    local id, hex = splitKey(key)
+    local base = ((kind == "floor") and A.FLOORPAINT or A.WALLPAINT)[id]
+    if base == nil or hex == nil or scene.RegisterTextureTinted == nil then return base end
+    if tintScene ~= scene then tintScene, tintDone = scene, {} end
+    local k = base .. ":" .. hex
+    local tid = tintIds[k]
+    if tid == nil then tid = tintNext; tintNext = tintNext + 1; tintIds[k] = tid end
+    if not tintDone[tid] then
+        tintDone[tid] = true
+        pcall(function()
+            scene:RegisterTextureTinted(tid, base, tonumber(hex:sub(1, 2), 16), tonumber(hex:sub(3, 4), 16), tonumber(hex:sub(5, 6), 16))
+            scene:SetTextureFilter(tid, "mipmap")
+            if A.NORMAL_OF[base] and scene.SetTextureNormalMap then scene:SetTextureNormalMap(tid, A.NORMAL_OF[base]) end
+        end)
+    end
+    return tid
+end
+
+-- the swatch colour of a floor or paint key: its colour, or the item's own swatch
+function A.swatchFor(key)
+    local id, hex = splitKey(key)
+    if hex then return { tonumber(hex:sub(1, 2), 16), tonumber(hex:sub(3, 4), 16), tonumber(hex:sub(5, 6), 16) } end
+    return A.SWATCH[id]
 end
 
 function A.buildAll(scene)
