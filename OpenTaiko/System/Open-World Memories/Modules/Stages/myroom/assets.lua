@@ -16,8 +16,8 @@ A.TEX = { wood = 200, carpet = 201, wall = 202, skirt = 203 }
 A.FLOORPAINT = { carpet = 201, stone = 240, grass = 241, sand = 242, snow = 243 }
 A.WALLPAINT  = { blue = 220, beige = 221, sage = 222, brick = 244, rock = 245, stonewall = 240 }
 -- representative RGB for the flooring/paint icon swatches (id → {r,g,b})
-A.SWATCH = { carpet = { 158, 44, 50 }, blue = { 120, 150, 205 }, beige = { 212, 196, 164 }, sage = { 150, 185, 150 },
-             stone = { 150, 148, 142 }, grass = { 96, 150, 78 }, sand = { 214, 196, 150 }, snow = { 226, 232, 240 },
+A.SWATCH = { carpet = { 243, 246, 250 }, blue = { 120, 150, 205 }, beige = { 212, 196, 164 }, sage = { 150, 185, 150 },
+             stone = { 150, 148, 142 }, grass = { 96, 150, 78 }, sand = { 214, 196, 150 }, snow = { 200, 200, 201 },
              brick = { 150, 86, 70 }, rock = { 120, 116, 112 }, stonewall = { 150, 148, 142 },
              default_floor = { 150, 110, 66 }, default_paint = { 196, 188, 176 } }   -- "revert to default" swatches
 -- arcade screen art (procedural, generated in buildTextures) + poster/painting picture textures
@@ -48,10 +48,10 @@ function A.buildTextures(scene)
         end end
         scene:RegisterTexture(A.TEX.wood, t, w, w)
     end
-    -- red carpet: deep red weave speckle
+    -- rug: white weave speckle (the same white as rug.png)
     do
         local w = 16; local t = {}
-        for i = 1, w * w do local n = (random() * 2 - 1) * 14; t[i] = rgb(150 + n, 32 + n, 38 + n) end
+        for i = 1, w * w do local n = (random() * 2 - 1) * 6; t[i] = rgb(238 + n, 241 + n, 246 + n) end
         scene:RegisterTexture(A.TEX.carpet, t, w, w)
     end
     -- plaster wall
@@ -116,16 +116,18 @@ end
 
 -- ── file texture pass: overwrite the procedural ids with the CC0 surfaces when present ────────────
 -- Each file load is pcall-guarded and the procedural texture stays if anything is missing/fails.
+-- A surface with a `normal` file gets that normal map (DirectX convention) as texture id + NORMAL_OFFSET.
+local NORMAL_OFFSET = 100
 local FILE_TEX = {
-    { file = "Textures/Surfaces/woodfloor.png", id = 200 },   -- A.TEX.wood
-    { file = "Textures/Surfaces/plaster.png",   id = 202 },   -- A.TEX.wall
-    { file = "Textures/Surfaces/rug.png",       id = 201 },   -- A.TEX.carpet / FLOORPAINT.carpet
-    { file = "Textures/Surfaces/paving.png",    id = 240 },   -- stone floor / stone wall
-    { file = "Textures/Surfaces/grass.png",     id = 241 },   -- grass floor / meadow poster
-    { file = "Textures/Surfaces/sand.png",      id = 242 },   -- sand floor / dunes poster
-    { file = "Textures/Surfaces/snow.png",      id = 243 },   -- snow floor / snowfield poster
-    { file = "Textures/Surfaces/brick.png",     id = 244 },   -- brick wall
-    { file = "Textures/Surfaces/rock.png",      id = 245 },   -- rock wall
+    { file = "Textures/Surfaces/woodfloor.png", id = 200, normal = "Textures/Surfaces/woodfloor_normal.png" },   -- A.TEX.wood
+    { file = "Textures/Surfaces/plaster.png",   id = 202, normal = "Textures/Surfaces/plaster_normal.png" },     -- A.TEX.wall
+    { file = "Textures/Surfaces/rug.png",       id = 201, normal = "Textures/Surfaces/rug_normal.png" },         -- A.TEX.carpet / FLOORPAINT.carpet
+    { file = "Textures/Surfaces/paving.png",    id = 240, normal = "Textures/Surfaces/paving_normal.png" },      -- stone floor / stone wall
+    { file = "Textures/Surfaces/grass.png",     id = 241, normal = "Textures/Surfaces/grass_normal.png" },       -- grass floor
+    { file = "Textures/Surfaces/sand.png",      id = 242, normal = "Textures/Surfaces/sand_normal.png" },        -- sand floor
+    { file = "Textures/Surfaces/snow.png",      id = 243, normal = "Textures/Surfaces/snow_normal.png" },        -- snow floor
+    { file = "Textures/Surfaces/brick.png",     id = 244, normal = "Textures/Surfaces/brick_normal.png" },       -- brick wall
+    { file = "Textures/Surfaces/rock.png",      id = 245, normal = "Textures/Surfaces/rock_normal.png" },        -- rock wall
     { file = "Textures/Screens/nokon.png",      id = 246 },   -- Nokon portrait (picture wall item)
     { file = "Textures/Screens/bol.png",        id = 247 },   -- Bol portrait (picture wall item)
 }
@@ -140,6 +142,11 @@ function A.buildFileTextures(scene)
             local t = nil
             pcall(function() t = TEXTURE:CreateTextureSync(e.file) end)
             fileCache[e.id] = t or false
+            if e.normal then
+                local n = nil
+                pcall(function() n = TEXTURE:CreateTextureSync(e.normal) end)
+                fileCache[e.id + NORMAL_OFFSET] = n or false
+            end
         end
     end
     for _, e in ipairs(FILE_TEX) do
@@ -149,6 +156,14 @@ function A.buildFileTextures(scene)
                 scene:RegisterTextureFromImage(e.id, t)
                 scene:SetTextureFilter(e.id, "mipmap")
             end)
+            local n = e.normal and fileCache[e.id + NORMAL_OFFSET]
+            if n and scene.SetTextureNormalMap then
+                pcall(function()
+                    scene:RegisterTextureFromImage(e.id + NORMAL_OFFSET, n)
+                    scene:SetTextureFilter(e.id + NORMAL_OFFSET, "mipmap")
+                    scene:SetTextureNormalMap(e.id, e.id + NORMAL_OFFSET)
+                end)
+            end
         end
     end
 end

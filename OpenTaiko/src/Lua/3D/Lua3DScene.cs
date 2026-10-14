@@ -60,6 +60,7 @@ namespace OpenTaiko {
 		internal readonly Dictionary<int, int> _texH = new();
 		// per-texture GPU sampling filter: 0 nearest (default), 1 linear, 2 mipmap. CPU renderers ignore it.
 		internal readonly Dictionary<int, int> _texFilter = new();
+		internal readonly Dictionary<int, int> _texNormal = new();   // texture id -> its normal map's texture id
 		// bumped whenever a texture's pixels change (e.g. a per-frame mirror RTT); the GPU renderer compares
 		// it to know when to re-upload that texture's GL copy instead of using its cached (stale) upload.
 		internal readonly Dictionary<int, int> _texRev = new();
@@ -464,6 +465,16 @@ namespace OpenTaiko {
 		public void SetTextureFilter(int id, string mode) {
 			_texFilter[id] = mode == "mipmap" ? 2 : (mode == "linear" ? 1 : 0);
 			BumpTexRev(id); Revision++;
+		}
+
+		/// <summary>Give texture <paramref name="id"/> a normal map: <paramref name="normalId"/> is another
+		/// registered texture holding a tangent-space normal map in the DirectX convention (green points down
+		/// the image, like the texture rows). On the GPU rasterizer every surface drawn with <paramref name="id"/>
+		/// then bends its lighting along the map's relief; an unlit surface gets a gentle relief shade from a
+		/// light fixed to the surface. The CPU rasterizer ignores it. A negative normalId removes the map.</summary>
+		public void SetTextureNormalMap(int id, int normalId) {
+			if (normalId < 0) _texNormal.Remove(id); else _texNormal[id] = normalId;
+			Revision++;
 		}
 
 		/// <summary>Emissive add for an object's surfaces: col += base * (r,g,b). Values &gt; 1 push the

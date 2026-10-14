@@ -5,7 +5,8 @@ No attribution required; listed here for provenance.
 
 Source: **ambientCG** (https://ambientcg.com), author **Lennart Demes / ambientCG**, license **CC0 1.0**
 (https://docs.ambientcg.com/license/). Each file is the base-color (`_Color`) map from the asset's
-1K-PNG download, resized to 512x512 RGB PNG.
+1K-PNG download, resized to 512x512 RGB PNG. Each `<name>_normal.png` is the same asset's `_NormalDX` map
+(DirectX convention) from that download, resized to 512x512 with its vectors renormalized.
 
 | File | ambientCG asset | Asset page | License |
 |---|---|---|---|

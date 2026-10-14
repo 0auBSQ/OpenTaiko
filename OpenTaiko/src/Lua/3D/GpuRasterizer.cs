@@ -42,6 +42,7 @@ namespace OpenTaiko {
 		private int _uClip, _uFres, _uFlat2, _uDeepOn;                 // reflection clip plane + water fresnel/depth tint
 		private int _uFlatCol;                                         // per-object flat albedo override (recolour a routed GLB part)
 		private int _uTex2, _uTex3, _uTex4, _uSplat, _uSplatSize, _uTexScale;   // terrain splat blending
+		private int _uNormOn;                                                   // normal-mapped textures
 		private readonly Dictionary<int, int> _glTexRev = new();   // uploaded revision per texId (for live mirror RTTs)
 		private readonly List<SceneObject> _screenTex = new(8);    // ScreenTex mirror/portal surfaces
 		private readonly float[] _lpos = new float[MAXL * 4], _lcol = new float[MAXL * 3];
@@ -100,10 +101,11 @@ namespace OpenTaiko {
 		private readonly List<float> _casterVerts = new(512);
 		private readonly List<CBatch> _casterBatches = new(16);
 		// cached world-program uniform locations per variant; BindWorldProgram copies the active set into _u*
-		private struct WLoc { public int Cam, R, U, F, Sx, Sy, A, B, Model, Mode, Tex, Cutout, Tint, Alpha, Flat, Fog, FogCol, FogStart, FogInv, Rsh, Lit, SunDir, SunCol, Amb, NumLights, LightPosR, LightCol, LightVP, Shadow, ShadowTexel, Emissive, Wet, Time, Ripple, RttFlip, Clip, Fres, Flat2, DeepOn, Tex2, Tex3, Tex4, Splat, SplatSize, TexScale, FlatCol; }
+		private struct WLoc { public int Cam, R, U, F, Sx, Sy, A, B, Model, Mode, Tex, Cutout, Tint, Alpha, Flat, Fog, FogCol, FogStart, FogInv, Rsh, Lit, SunDir, SunCol, Amb, NumLights, LightPosR, LightCol, LightVP, Shadow, ShadowTexel, Emissive, Wet, Time, Ripple, RttFlip, Clip, Fres, Flat2, DeepOn, Tex2, Tex3, Tex4, Splat, SplatSize, TexScale, FlatCol, NormOn, NormTex; }
 		private WLoc _locDef, _locSh;
 
 		private readonly Dictionary<int, uint> _glTex = new();
+		private readonly Dictionary<uint, int> _glTexId = new();   // uploaded texture -> the scene texture id
 		private readonly Dictionary<int, uint> _glSprite = new();
 
 		private struct OBatch { public int Mode; public uint Tex; public int Start, Count; }
@@ -179,6 +181,8 @@ uniform vec3 uFlat2;          // screen-tex water deep colour (vShade lerps uFla
 uniform int uDeepOn;          // 1 = uFlat2 depth tint active
 uniform sampler2D uTex2, uTex3, uTex4, uSplat;   // terrain splat: 3 extra layers + the weight image
 uniform vec2 uSplatSize;      // splat world coverage (world.xz -> splat uv)
+uniform int uNormOn;          // 1 = the bound texture has a normal map (SetTextureNormalMap) on uNormTex
+uniform sampler2D uNormTex;
 uniform float uTexScale;      // world units -> layer uv repeats
 out vec4 frag;
 #ifdef SHADOWS
@@ -273,7 +277,24 @@ void main(){
     }
     else { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; base = t.rgb * uTint; }
     if (uFlatCol.a > 0.5) base = uFlatCol.rgb;   // flat albedo override: recolour a routed part (still shades)
-    vec3 col = (uLit == 1) ? base * lightAt(normalize(vNormal), vWorld) : base * vShade;
+    vec3 N = normalize(vNormal);
+    float relief = 1.0;
+    if (uNormOn == 1 && uMode == 1){
+        // the normal map, turned onto the surface: the surface frame comes from the screen derivatives of
+        // the position and the uv (the vertices carry no tangents); B runs down the image like the map's green
+        vec3 m = texture(uNormTex, vUV).rgb * 2.0 - 1.0;
+        vec3 dp1 = dFdx(vWorld), dp2 = dFdy(vWorld); vec2 du1 = dFdx(vUV), du2 = dFdy(vUV);
+        vec3 c2 = cross(dp2, N), c1 = cross(N, dp1);
+        vec3 T = c2 * du1.x + c1 * du2.x, B = c2 * du1.y + c1 * du2.y;
+        float k = inversesqrt(max(max(dot(T, T), dot(B, B)), 1e-20));
+        T *= k; B *= k;
+        vec3 Nm = normalize(T * m.x + B * m.y + N * m.z);
+        // relief shade: a light fixed to the surface, from the image's upper left (the same on every wall)
+        vec3 Ls = normalize(-0.35 * T - 0.45 * B + 0.82 * N);
+        relief = clamp(dot(Nm, Ls) / max(dot(N, Ls), 0.2), 0.6, 1.4);
+        N = Nm;
+    }
+    vec3 col = (uLit == 1) ? base * lightAt(N, vWorld) * mix(1.0, relief, 0.5) : base * vShade * relief;
     if (uWet > 0.0 && uLit == 1){   // rain-wet surfaces: darker diffuse + a sun specular sheen (ALU only)
         col *= 1.0 - 0.30 * uWet;
         vec3 N = normalize(vNormal);
@@ -499,6 +520,7 @@ void main(){ frag = uColor; }";
 				Clip = g("uClip"), Fres = g("uFres"), Flat2 = g("uFlat2"), DeepOn = g("uDeepOn"),
 				Tex2 = g("uTex2"), Tex3 = g("uTex3"), Tex4 = g("uTex4"), Splat = g("uSplat"),
 				SplatSize = g("uSplatSize"), TexScale = g("uTexScale"), FlatCol = g("uFlatCol"),
+				NormOn = g("uNormOn"), NormTex = g("uNormTex"),
 			};
 		}
 		// bind the chosen world variant AND point the active _u* fields at that program's locations, so every
@@ -517,6 +539,9 @@ void main(){ frag = uColor; }";
 			_uClip = L.Clip; _uFres = L.Fres; _uFlat2 = L.Flat2; _uDeepOn = L.DeepOn;
 			_uTex2 = L.Tex2; _uTex3 = L.Tex3; _uTex4 = L.Tex4; _uSplat = L.Splat;
 			_uSplatSize = L.SplatSize; _uTexScale = L.TexScale; _uFlatCol = L.FlatCol;
+			_uNormOn = L.NormOn;
+			Gl.Uniform1(L.NormTex, 6);   // normal maps sit on texture unit 6
+			Gl.Uniform1(L.NormOn, 0);
 		}
 
 		// The GLSL programs are byte-identical for every GpuRasterizer and stay valid for the whole GL
@@ -830,11 +855,21 @@ void main(){ frag = uColor; }";
 			s._texRev.TryGetValue(id, out int rev);
 			if (_glTex.TryGetValue(id, out var t)) {
 				if (!_glTexRev.TryGetValue(id, out int got) || got == rev) return t;   // current (or untracked) → reuse
-				Gl.DeleteTexture(t);   // pixels changed (e.g. a live mirror RTT) → re-upload
+				Gl.DeleteTexture(t); _glTexId.Remove(t);   // pixels changed (e.g. a live mirror RTT) → re-upload
 			}
 			if (!s._texPix.TryGetValue(id, out var px)) return 0;
 			s._texFilter.TryGetValue(id, out int filt);
-			t = UploadTexture(px, s._texW[id], s._texH[id], false, filt); _glTex[id] = t; _glTexRev[id] = rev; return t;
+			t = UploadTexture(px, s._texW[id], s._texH[id], false, filt); _glTex[id] = t; _glTexRev[id] = rev; _glTexId[t] = id; return t;
+		}
+		// a textured draw's normal map (SetTextureNormalMap) on unit 6, or none. Call it BEFORE binding the
+		// colour texture on unit 0: a first use uploads the map, which binds it on the active unit.
+		private void BindNormalFor(Lua3DScene s, uint gt) {
+			uint n = 0;
+			if (s._texNormal.Count > 0 && _glTexId.TryGetValue(gt, out int id) && s._texNormal.TryGetValue(id, out int nid)) {
+				n = TexFor(s, nid);
+				if (n != 0) { Gl.ActiveTexture(TextureUnit.Texture6); Gl.BindTexture(TextureTarget.Texture2D, n); }
+			}
+			Gl.Uniform1(_uNormOn, n != 0 ? 1 : 0);
 		}
 		private uint SpriteFor(Lua3DScene s, int id) {
 			if (_glSprite.TryGetValue(id, out var t)) return t;
@@ -1355,6 +1390,7 @@ void main(){ frag = uColor; }";
 			foreach (var kv in _merge) {
 				if (kv.Value.Count == 0) continue;
 				Bind3D(kv.Value.Vbo);
+				BindNormalFor(s, kv.Key.gt);
 				Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, kv.Key.gt);
 				Gl.DrawArrays(PrimitiveType.Triangles, 0, (uint)kv.Value.Count);
 			}
@@ -1560,7 +1596,7 @@ void main(){ frag = uColor; }";
 			foreach (var bt in c.Batches) {
 				Gl.Uniform1(_uMode, bt.Mode);
 				if (bt.Mode == 0) Gl.Uniform3(_uFlat, fr, fg, fb);
-				else { Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, bt.Tex); }
+				else { BindNormalFor(s, bt.Tex); Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, bt.Tex); }
 				Gl.DrawArrays(PrimitiveType.Triangles, bt.Start, (uint)bt.Count);
 			}
 			if (o.DepthBias != 0f) Gl.Disable(EnableCap.PolygonOffsetFill);
@@ -1740,7 +1776,7 @@ void main(){ frag = uColor; }";
 		/// <summary>Delete this texId's GL upload and any reflection RTT target bound to it. The next
 		/// TexFor for a (re-registered) id re-uploads lazily.</summary>
 		public void DropTexture(int id) {
-			if (_glTex.TryGetValue(id, out var t)) { Gl.DeleteTexture(t); _glTex.Remove(id); }
+			if (_glTex.TryGetValue(id, out var t)) { Gl.DeleteTexture(t); _glTex.Remove(id); _glTexId.Remove(t); }
 			_glTexRev.Remove(id);
 			if (_rttColor.TryGetValue(id, out var c)) { Gl.DeleteTexture(c); _rttColor.Remove(id); }
 			if (_rttFbos.TryGetValue(id, out var f)) { Gl.DeleteFramebuffer(f); _rttFbos.Remove(id); }
@@ -1799,7 +1835,7 @@ void main(){ frag = uColor; }";
 			_merge.Clear(); _scratch.Clear(); _scratch.TrimExcess(); _mergeCache.Clear(); _dirtyKeys.Clear(); _staticSig = long.MinValue;
 			foreach (var t in _glTex.Values) Gl.DeleteTexture(t);
 			foreach (var t in _glSprite.Values) Gl.DeleteTexture(t);
-			_glTex.Clear(); _glSprite.Clear(); _glTexRev.Clear();
+			_glTex.Clear(); _glSprite.Clear(); _glTexRev.Clear(); _glTexId.Clear();
 		}
 
 		// Free EVERY GL resource, including the one-time programs/VAOs/buffers EnsureGL creates. Called

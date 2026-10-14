@@ -13,7 +13,8 @@
     "tex": "wood"
   },
   "carpet": {
-    "tex": "carpet"
+    "tex": "carpet",
+    "swatch": "Textures/Surfaces/rug.png"
   },
   "stone": {
     "tex": "stone",
@@ -28,7 +29,8 @@
     "swatch": "Textures/Surfaces/sand.png"
   },
   "snow": {
-    "tex": "snow"
+    "tex": "snow",
+    "swatch": "Textures/Surfaces/snow.png"
   },
   "default_floor": {
     "tex": "wood"
