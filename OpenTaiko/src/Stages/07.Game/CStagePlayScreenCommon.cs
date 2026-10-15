@@ -2480,7 +2480,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	private readonly long msBgmDriftThreshold = OpenTaiko.ConfigIni.tzLevels.Last().nGoodZone;
 
 	protected void tCheckBgmDrift() {
-		if (this.bPAUSE || this.isRewinding || this.IsFailStopped()) {
+		if (Game.VirtualClockEnabled || this.bPAUSE || this.isRewinding || this.IsFailStopped()) {
 			this.nBgmDriftStrikes = 0;
 			return;
 		}
