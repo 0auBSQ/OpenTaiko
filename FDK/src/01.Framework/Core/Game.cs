@@ -476,6 +476,7 @@ public abstract partial class Game : IDisposable {
 			throw;
         }
 
+		// temporary values until the window has been loaded or the host sets the viewport
 		WindowBorderSize = Window_.Size;
 		ViewPortSize.X = Window_.Size.X;
 		ViewPortSize.Y = Window_.Size.Y;
@@ -811,7 +812,7 @@ public abstract partial class Game : IDisposable {
 		Gl.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 		if (!OperatingSystem.IsMacOS())
-			Gl.Viewport(0, 0, (uint)Window_.Size.X, (uint)Window_.Size.Y);
+			this.ResizeViewport(Window_.Size.X, Window_.Size.Y);
 
 		Context.SwapInterval(VSync ? 1 : 0);
 

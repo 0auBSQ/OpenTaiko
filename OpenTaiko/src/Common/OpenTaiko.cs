@@ -2127,6 +2127,8 @@ internal class OpenTaiko : Game {
 		Game.RenderScale = (float)snapped;
 
 		//WindowSize = new Silk.NET.Maths.Vector2D<int>(nWidth, nHeight);
+		if (!OperatingSystem.IsMacOS()) // TODO: check whether this condition is necessary with MacOS build
+			this.ResizeViewport(WindowBorderSize.X, WindowBorderSize.Y);
 	}
 
 	public void RefreshSkin() {
