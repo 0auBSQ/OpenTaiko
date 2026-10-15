@@ -449,7 +449,9 @@ public abstract partial class Game : IDisposable {
 
 		if (!OperatingSystem.IsMacOS()) options.API = GraphicsAPI.None;
 
-		options.WindowBorder = (WindowMode == 2) ? WindowBorder.Hidden : WindowBorder.Resizable;
+		// border already invisible if window is hidden
+		// but for exporting video, this prevent the window from being shrunk to fit inside the monitor due to the window border
+		options.WindowBorder = (WindowMode == 2 || StartHidden) ? WindowBorder.Hidden : WindowBorder.Resizable;
 		options.Title = Text;
 		options.IsVisible = !StartHidden;
 
