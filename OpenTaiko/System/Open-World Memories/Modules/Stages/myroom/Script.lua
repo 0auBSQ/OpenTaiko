@@ -307,6 +307,7 @@ function activate()
                                fov = FOV, yaw = 45, pitch = -33, lit = true }
         world:setDiorama(2.0, 1.1, 0.22, 0.26)     -- gentle cosy grade (softer bloom, not blown out)
         world:setFog(false)                        -- an interior needs no distance fog
+        world.scene:SetAntialias(true)             -- FXAA: smooths the stair steps on edges
         A.buildAll(world.scene)
         AV.attach(world.scene)
         loadRoom()

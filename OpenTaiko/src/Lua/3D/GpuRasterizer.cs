@@ -99,6 +99,11 @@ namespace OpenTaiko {
 			Gl.SamplerParameter(_postSampler, SamplerParameterI.MagFilter, (int)GLEnum.Nearest);
 			Gl.SamplerParameter(_postSampler, SamplerParameterI.WrapS, (int)GLEnum.Repeat);
 			Gl.SamplerParameter(_postSampler, SamplerParameterI.WrapT, (int)GLEnum.Repeat);
+			_postLinSampler = Gl.GenSampler();
+			Gl.SamplerParameter(_postLinSampler, SamplerParameterI.MinFilter, (int)GLEnum.Linear);
+			Gl.SamplerParameter(_postLinSampler, SamplerParameterI.MagFilter, (int)GLEnum.Linear);
+			Gl.SamplerParameter(_postLinSampler, SamplerParameterI.WrapS, (int)GLEnum.ClampToEdge);
+			Gl.SamplerParameter(_postLinSampler, SamplerParameterI.WrapT, (int)GLEnum.ClampToEdge);
 			// grass program + VAO: one instance per blade (pos3, height+phase 2, shade1), separate format so a draw of a
 			// run of cells only moves the buffer offset
 			_progGrass = CachedProg(Ascii(VSGRASS), Ascii(FSGRASS));
@@ -305,6 +310,7 @@ namespace OpenTaiko {
 			if (_vbo2d != 0) Gl.DeleteBuffer(_vbo2d);
 			if (_partVbo != 0) Gl.DeleteBuffer(_partVbo);
 			if (_postSampler != 0) { Gl.DeleteSampler(_postSampler); _postSampler = 0; }
+			if (_postLinSampler != 0) { Gl.DeleteSampler(_postLinSampler); _postLinSampler = 0; }
 			// NOTE: the shader PROGRAMS (_prog/_progShadow/_progDepth/_progDepthSpr/_prog2d/_progP/_progPost/
 			// _progDiorama/_progOutline/_progGrass) are SHARED via s_progCache (compiled once for the whole
 			// context) — do NOT delete them here or the next scene's cache hit would be a dangling handle.

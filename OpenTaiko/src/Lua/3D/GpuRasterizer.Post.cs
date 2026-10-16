@@ -10,6 +10,7 @@ namespace OpenTaiko {
 		// ping-pongs with the canvas (PostChain)
 		private uint _progPost, _vaoPost, _fxaaTex, _fxaaFbo; private int _postTex, _postMode, _postRes; private int _fxaaW, _fxaaH;
 		private uint _postSampler;   // post passes read the canvas and the temp target alike: nearest, repeat
+		private uint _postLinSampler;   // FXAA reads between pixels: linear, clamped
 		// the frame's 3D is drawn into the temp target instead of the canvas (DrawFrame, PostChain)
 		private bool _frameInTemp;
 		// diorama post pass (SetDiorama, "diorama"): a cheap SCREEN-SPACE tilt-shift (blur grows toward
@@ -204,11 +205,14 @@ namespace OpenTaiko {
 				if (_upUser >= 0) Gl.Uniform4(_upUser, 4u, (ReadOnlySpan<float>)s._postUser);
 				PostPass(s, ref inCanvas);
 			}
-			// FXAA-lite post pass (before the stage's 2D overlay so the crosshair stays sharp): edge-blend
+			// FXAA post pass (before the stage's 2D overlay so the crosshair stays sharp): edge search along each
+			// edge, then a sample shifted across it
 			if (aa) {
 				Gl.UseProgram(_progPost);
 				Gl.Uniform1(_postTex, 0); Gl.Uniform2(_postRes, (float)s._w, (float)s._h); Gl.Uniform1(_postMode, 1);
+				Gl.BindSampler(0, _postLinSampler);
 				PostPass(s, ref inCanvas);
+				Gl.BindSampler(0, _postSampler);
 			}
 			// toon outline post pass (3D characters): ink around the shapes
 			if (outline) {
