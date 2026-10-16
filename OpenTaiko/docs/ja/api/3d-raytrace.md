@@ -9,21 +9,20 @@
 | メソッド | 説明 |
 | --- | --- |
 | `scene:GetRaytracerStatus()  -> string` | レイトレースモードのバックエンドの状態 (GPU コンピュートのタイミング、CPU フォールバック、または CPU パストレーサー)。ラスタモードでは空。 |
-| `scene:RenderViewRT(texId, cx, cy, cz, yawDeg, pitchDeg, fovDeg, clr, clg, clb, flipX)  -> nil` | RenderView と同様ですが、CPU パストレーサーが反射解像度の 4 分の 1 で描画します。 |
 
 ## パストレーサーのマテリアルとプリミティブ
 
-マテリアル、解析的プリミティブ、空のグラデーションを使うのはパストレーサーだけです。パストレーサーは保持されるオブジェクトもトレースし、ObjSetMaterial で割り当てられたマテリアル、または設定されていなければテクスチャと単色を使います。マテリアルとプリミティブの id は 0 から始まります。
+マテリアル、解析的プリミティブ、空のグラデーションを使うのはパストレーサーだけです。パストレーサーは保持されるオブジェクトもトレースし、ObjSetMaterial で割り当てられたマテリアル、または設定されていなければテクスチャと単色を使います。マテリアルとプリミティブの id は 0 から始まります。パストレーサーはスプライトをアルファテストした四角形として描き、テクスチャとスプライトの切り抜かれたテクセルでは光線を通し、ObjSetTint、ObjSetColor、ObjSetEmissive を適用します。パストレーサーは実際の影を落とすため、影やデカールの代わりとなる、地面に平らに置くスプライト (billboard 3) と cutout が 0 の ObjAddSpriteQuad スプライトは省きます。点光源に加えて、SetSun は影付きの平行光源として、SetAmbient は拡散面にあらゆる方向から届く光としてシーンを照らします。直接見える空や鏡に映る空は、グラデーションのままです。
 
 | メソッド | 説明 |
 | --- | --- |
 | `scene:SetSky(tr, tg, tb, br, bg, bb, strength)  -> nil` | 上の色から下の色への空のグラデーション (リニア 0-1) を `strength` でスケールしたもの。レイが抜けたときにシーンを照らします。強さ 0 は黒いスタジオになります。 |
 | `scene:NewMaterial()  -> id` | マテリアル (既定は中間グレーの拡散反射) を作成し、その id を返します。 |
-| `scene:MatSetType(id, type)  -> nil` | `"diffuse"`、`"metal"`、`"glass"`、`"emissive"`。 |
+| `scene:MatSetType(id, type)  -> nil` | `"diffuse"`、`"metal"`、`"glass"`、`"emissive"`。ガラスのメッシュでは、三角形の頂点 a、b、c が外から見て画面上で時計回りに並び、`(b - a) × (c - a)` がガラスの外側を向く必要があります。パストレーサーはこの向きで内側を判断します。 |
 | `scene:MatSetAlbedo(id, r, g, b)  -> nil` | ベース色 (リニア 0-1)。金属では反射に色を付けます。 |
 | `scene:MatSetRoughness(id, rough)  -> nil` | 0 = 鋭い鏡または透明なガラス、1 = 完全に粗い。 |
 | `scene:MatSetIOR(id, ior)  -> nil` | ガラスの屈折率 (最小 1)。 |
-| `scene:MatSetEmission(id, r, g, b, strength)  -> nil` | 発光色に強さを掛けたもの。発光するサーフェスはシーンを照らします。 |
+| `scene:MatSetEmission(id, r, g, b, strength)  -> nil` | 発光色に強さを掛けたもの。発光するサーフェスはシーンを照らします。点光源を遮らないので、ライトを電球の中に置けます。 |
 | `scene:MatSetTexture(id, texId)  -> nil` | UV でサンプリングされるアルベドテクスチャ (登録済みのテクスチャ id)。-1 = なし。 |
 | `scene:MatSetNormalMap(id, preset)  -> nil` | プロシージャルな法線マップ: `"none"`、`"wood"`、`"perlin"`、`"waves"`。 |
 | `scene:MatSetNormalMapTexture(id, texId)  -> nil` | テクスチャ付きジオメトリ用のタンジェント空間の法線マップテクスチャ (RGB エンコードされた法線)。プリセットを上書きします。-1 でクリア。 |

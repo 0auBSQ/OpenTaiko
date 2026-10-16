@@ -9,8 +9,9 @@ namespace OpenTaiko {
 	/// (vt) and faces (f, any polygon — triangulated as a fan), grouped by material (usemtl), and reads
 	/// flat diffuse colours (Kd) from the referenced .mtl (mtllib). Like <see cref="GltfModel"/> it
 	/// represents each material as a solid 2×2 texture, so OBJ models render through the exact same
-	/// rasterizer path. OBJ is static, so it has no animations — <see cref="Pose"/> just applies the
-	/// world transform (translation, Y-rotation, uniform scale) and flat-shades each face.
+	/// rasterizer path. OBJ is static, so it has no animations — <see cref="Pose"/> writes the flat-shaded
+	/// faces and places them with the object's transform (translation, Y-rotation, uniform scale). Faces without a
+	/// material (before any usemtl, or naming one the .mtl lacks) use a neutral default colour.
 	///
 	/// Not handled (kept intentionally small): image textures (map_Kd), smoothing groups/vertex normals
 	/// (faces are flat-shaded from the geometric normal, matching GltfModel), and free-form surfaces.
@@ -21,13 +22,13 @@ namespace OpenTaiko {
 
 		private readonly List<Group> _groups = new();
 		private int[] _matRgb = Array.Empty<int>();
-		private int _texBase = -1;
-		private static int _nextBase = 6000;   // own texture-id range (distinct from GltfModel's 4000+)
+		private string _key = "";   // the model file: names its block of texture ids in each scene
+		private const int DefaultRgb = 0xB0A090;   // faces without a material (Mat -1)
 
 		// the triangles as they were read: nine numbers each into `positions`, one colour each into `colours`
 		public void CopyTriangles(List<float> positions, List<int> colours) {
 			foreach (var g in _groups) {
-				int rgb = g.Mat >= 0 && g.Mat < _matRgb.Length ? _matRgb[g.Mat] : 0xFFFFFF;
+				int rgb = g.Mat >= 0 && g.Mat < _matRgb.Length ? _matRgb[g.Mat] : DefaultRgb;
 				positions.AddRange(g.V);
 				for (int t = 0; t < g.V.Count / 9; t++) colours.Add(rgb);
 			}
@@ -37,51 +38,62 @@ namespace OpenTaiko {
 		public string AnimName(int i) => "";
 		public double Duration(int i) => 0;
 
+		// material m is texture TexBase(scene) + m, in the scene's block for this model file; the default
+		// material comes right after the file's own
+		private int TexBase(Lua3DScene scene) => scene.ModelTextureBase(_key, _matRgb.Length + 1);
 		public void Register(Lua3DScene scene) {
-			if (_texBase < 0) { _texBase = _nextBase; _nextBase += 256; }
-			int n = Math.Max(1, _matRgb.Length);
-			for (int m = 0; m < n; m++) {
-				int rgb = m < _matRgb.Length ? _matRgb[m] : 0xB0A090;
-				scene.RegisterTexturePixels(_texBase + m, new int[4] { rgb, rgb, rgb, rgb }, 2, 2);
+			int tb = TexBase(scene);
+			for (int m = 0; m <= _matRgb.Length; m++) {
+				int rgb = m < _matRgb.Length ? _matRgb[m] : DefaultRgb;
+				scene.RegisterTexturePixels(tb + m, new int[4] { rgb, rgb, rgb, rgb }, 2, 2);
 			}
 		}
 
 		public void Pose(Lua3DScene scene, int objId, int anim, double time, double x, double y, double z, double yawDeg, double scale) {
-			// world transform W = T(x,y,z) · Ry(yaw) · S(scale)  (same convention as GltfModel)
-			double yr = yawDeg * Math.PI / 180.0, c = Math.Cos(yr), s = Math.Sin(yr);
-			double a0 = c * scale, a8 = s * scale, a2 = -s * scale, a10 = c * scale, a5 = scale;
-			var light = (lx: 0.35, ly: 0.82, lz: 0.45);
-
-			scene.ObjBegin(objId);
-			foreach (var g in _groups) {
-				int texId = _texBase + (g.Mat >= 0 ? g.Mat : 0);
-				var V = g.V; var Uv = g.Uv; int triCount = V.Count / 9;
-				for (int t = 0; t < triCount; t++) {
-					int p = t * 9, q = t * 6;
-					double px0 = V[p],     py0 = V[p + 1], pz0 = V[p + 2];
-					double px1 = V[p + 3], py1 = V[p + 4], pz1 = V[p + 5];
-					double px2 = V[p + 6], py2 = V[p + 7], pz2 = V[p + 8];
-					double x0 = a0 * px0 + a8 * pz0 + x, y0 = a5 * py0 + y, z0 = a2 * px0 + a10 * pz0 + z;
-					double x1 = a0 * px1 + a8 * pz1 + x, y1 = a5 * py1 + y, z1 = a2 * px1 + a10 * pz1 + z;
-					double x2 = a0 * px2 + a8 * pz2 + x, y2 = a5 * py2 + y, z2 = a2 * px2 + a10 * pz2 + z;
-					// flat shade from the world-space face normal
-					double ex1 = x1 - x0, ey1 = y1 - y0, ez1 = z1 - z0, ex2 = x2 - x0, ey2 = y2 - y0, ez2 = z2 - z0;
-					double nx = ey1 * ez2 - ez1 * ey2, ny = ez1 * ex2 - ex1 * ez2, nz = ex1 * ey2 - ey1 * ex2;
-					double nl = Math.Sqrt(nx * nx + ny * ny + nz * nz); if (nl > 1e-9) { nx /= nl; ny /= nl; nz /= nl; }
-					double nd = nx * light.lx + ny * light.ly + nz * light.lz; if (nd < 0) nd = -nd;
-					double shade = 0.5 + 0.5 * nd;
-					scene.ObjAddTriTex(objId,
-						x0, y0, z0, Uv[q],     Uv[q + 1],
-						x1, y1, z1, Uv[q + 2], Uv[q + 3],
-						x2, y2, z2, Uv[q + 4], Uv[q + 5],
-						texId, shade);
+			// the triangles stay in model space and the object's transform places them (same convention as GltfModel);
+			// they are rewritten only when the yaw (the face shades) or the mirror changed since the last Pose
+			bool mirror = scale < 0;
+			if (!scene.PoseIsCurrent(objId, this, -1, 0, yawDeg, mirror, null)) {
+				ModelPlacement.Light(yawDeg, out double lx, out double ly, out double lz);
+				double sg = mirror ? -1 : 1;
+				scene.ObjBegin(objId);
+				int tb = TexBase(scene);
+				foreach (var g in _groups) {
+					int texId = tb + (g.Mat >= 0 ? g.Mat : _matRgb.Length);
+					var V = g.V; var Uv = g.Uv; int triCount = V.Count / 9;
+					for (int t = 0; t < triCount; t++) {
+						int p = t * 9, q = t * 6;
+						double x0 = sg * V[p],     y0 = sg * V[p + 1], z0 = sg * V[p + 2];
+						double x1 = sg * V[p + 3], y1 = sg * V[p + 4], z1 = sg * V[p + 5];
+						double x2 = sg * V[p + 6], y2 = sg * V[p + 7], z2 = sg * V[p + 8];
+						double shade = ModelPlacement.Shade(x0, y0, z0, x1, y1, z1, x2, y2, z2, lx, ly, lz);
+						scene.ObjAddTriTex(objId,
+							x0, y0, z0, Uv[q],     Uv[q + 1],
+							x1, y1, z1, Uv[q + 2], Uv[q + 3],
+							x2, y2, z2, Uv[q + 4], Uv[q + 5],
+							texId, shade);
+					}
 				}
+				scene.StampPose(objId, this, -1, 0, yawDeg, mirror, null);
 			}
+			scene.PlaceModel(objId, x, y, z, yawDeg, scale);
 		}
 
 		// ── parsing ────────────────────────────────────────────────────────────────────────────────
+		// Like GltfModel, Load returns one shared instance per file until PurgeFileCache, so reloading a
+		// model on every map load does not re-parse it.
+		private static readonly Dictionary<string, ObjModel> _fileCache = new(StringComparer.OrdinalIgnoreCase);
+		public static void PurgeFileCache() { lock (_fileCache) _fileCache.Clear(); }
+		private static string KeyOf(string path) { try { return Path.GetFullPath(path); } catch { return path; } }
 		public static ObjModel Load(string path) {
-			var g = new ObjModel();
+			string key = KeyOf(path);
+			lock (_fileCache) if (_fileCache.TryGetValue(key, out var hit)) return hit;
+			var fresh = LoadUncached(path);
+			lock (_fileCache) _fileCache[key] = fresh;
+			return fresh;
+		}
+		internal static ObjModel LoadUncached(string path) {
+			var g = new ObjModel { _key = KeyOf(path) };
 			var pos = new List<float>();   // v   (x y z)
 			var uv = new List<float>();    // vt  (u v)
 			var matIndex = new Dictionary<string, int>();
@@ -93,7 +105,7 @@ namespace OpenTaiko {
 				if (!groupByMat.TryGetValue(mat, out var grp)) { grp = new Group { Mat = mat }; groupByMat[mat] = grp; g._groups.Add(grp); }
 				return grp;
 			}
-			cur = GroupFor(0);   // default material 0 until a usemtl appears
+			cur = GroupFor(-1);   // the default material until a usemtl appears
 
 			// .mtl: newmtl name / Kd r g b  →  packed colour per material name
 			void LoadMtl(string mtlPath) {
@@ -130,7 +142,7 @@ namespace OpenTaiko {
 						break;
 					case "usemtl":
 						if (tok.Length > 1 && matIndex.TryGetValue(tok[1], out var mi)) cur = GroupFor(mi);
-						else cur = GroupFor(0);
+						else cur = GroupFor(-1);
 						break;
 					case "f":
 						EmitFace(tok, pos, uv, cur);
@@ -139,10 +151,10 @@ namespace OpenTaiko {
 			}
 
 			// finalise materials → packed colour array (index order matches matIndex)
-			g._matRgb = matColor.Count > 0 ? matColor.ToArray() : new int[] { 0xB0A090 };
+			g._matRgb = matColor.ToArray();
 			// drop empty groups (e.g. the default group if every face had a material)
 			g._groups.RemoveAll(grp => grp.V.Count == 0);
-			if (g._groups.Count == 0) g._groups.Add(new Group { Mat = 0 });
+			if (g._groups.Count == 0) g._groups.Add(new Group { Mat = -1 });
 			return g;
 		}
 

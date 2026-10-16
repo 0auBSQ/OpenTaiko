@@ -62,21 +62,19 @@ float vnoise(vec2 p){
     float d = h21(i + vec2(1.0, 1.0));
     return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
 }
-float hash(ivec3 p){
-    uvec3 x = uvec3(p);
-    uint q = x.x * 747796405u + 2891336453u;
-    q = (q ^ (q >> 16u)) * 2246822519u + x.y;
-    q = (q ^ (q >> 13u)) * 3266489917u + x.z;
-    q = (q ^ (q >> 16u)) * 2246822519u;
-    return float((q ^ (q >> 15u)) >> 8u) * (1.0 / 16777216.0);
-}
+// the engine's noise texture: a random value per point of a 256x256 lattice that wraps; texel (x, y) holds the
+// values of points (x, y), (x + 1, y), (x, y + 1) and (x + 1, y + 1)
+uniform highp sampler2D uNoise;
+// value noise: 3D lattice point (x, y, z) takes the value of 2D point (x + 37z, y + 17z)
 float noise(vec3 x){
     vec3 f = fract(x);
     ivec3 i = ivec3(floor(x));
-    return mix(mix(mix(hash(i), hash(i + ivec3(1, 0, 0)), f.x),
-                   mix(hash(i + ivec3(0, 1, 0)), hash(i + ivec3(1, 1, 0)), f.x), f.y),
-               mix(mix(hash(i + ivec3(0, 0, 1)), hash(i + ivec3(1, 0, 1)), f.x),
-                   mix(hash(i + ivec3(0, 1, 1)), hash(i + ivec3(1, 1, 1)), f.x), f.y), f.z);
+    ivec2 c = (i.xy + ivec2(37, 17) * i.z) & 255;
+    vec4 a = texelFetch(uNoise, c, 0);                             // the cell's corners x0y0 x1y0 x0y1 x1y1 at z
+    vec4 b = texelFetch(uNoise, (c + ivec2(37, 17)) & 255, 0);     // and at z + 1
+    vec4 hx = mix(vec4(a.xz, b.xz), vec4(a.yw, b.yw), f.x);
+    vec2 hy = mix(hx.xz, hx.yw, f.y);
+    return mix(hy.x, hy.y, f.z);
 }
 const mat3 m = mat3(0.0, 1.60, 1.20, -1.6, 0.72, -0.96, -1.2, -0.96, 1.28);
 float fbm(vec3 p){
@@ -102,9 +100,10 @@ float starLayer(vec3 dir, float domeY, float scale, float thr, float tw0){
     vec2 rnd = h22(cell);
     vec2 pos = cell + rnd;
     float d = length(sp - pos);
-    if (rnd.y <= thr) return 0.0;
+    float r = 0.055 + rnd.x * 0.05;                               // the star's radius
+    if (rnd.y <= thr || d >= r) return 0.0;
     float tw = 0.72 + 0.28 * sin(uTime * (tw0 + rnd.x * 4.0) + rnd.y * 40.0);
-    return (1.0 - smoothstep(0.0, 0.055 + rnd.x * 0.05, d)) * tw * (0.55 + 0.45 * rnd.x);
+    return (1.0 - smoothstep(0.0, r, d)) * tw * (0.55 + 0.45 * rnd.x);
 }
 void main(){
     vec2 uv = gl_FragCoord.xy / uRes;
@@ -132,8 +131,10 @@ void main(){
     float domeY = abs(up);
 
     // warm scatter around the sun's horizon point at dawn/dusk
-    float sunSide = max(dot(normalize(vec3(dir.x, 0.0, dir.z) + 1e-5), normalize(vec3(sunD.x, 0.0, sunD.z) + 1e-5)), 0.0);
-    col += vec3(0.9, 0.4, 0.15) * duskW * pow(sunSide, 3.0) * (1.0 - t) * 0.6;
+    if (duskW > 0.0){
+        float sunSide = max(dot(normalize(vec3(dir.x, 0.0, dir.z) + 1e-5), normalize(vec3(sunD.x, 0.0, sunD.z) + 1e-5)), 0.0);
+        col += vec3(0.9, 0.4, 0.15) * duskW * pow(sunSide, 3.0) * (1.0 - t) * 0.6;
+    }
 
     // clouds: a thin high layer under three puffy ones, the amount driven from Lua
     float den = 0.0;
@@ -198,11 +199,10 @@ void main(){
             vec3 shadowD = normalize(moonD + R * (0.028 * (1.0 - full) * (moonPh < 0.5 ? 1.0 : -1.0)));
             float sdisc = smoothstep(0.99950, 0.99978, dot(dir, shadowD));
             mdisc *= clamp(1.0 - sdisc * (1.0 - full * full), 0.06, 1.0);
+            mdisc *= 0.85 + 0.15 * vnoise(dir.xz * 300.0);           // craters
         }
         float mglow = pow(max(cosMoon, 0.0), 260.0) * 0.35;
-        vec2 mp = dir.xz * 300.0;
-        float crater = 0.85 + 0.15 * vnoise(mp);
-        col += vec3(0.86, 0.89, 0.95) * (mdisc * crater + mglow) * (nightF - 0.3) * 1.5;
+        col += vec3(0.86, 0.89, 0.95) * (mdisc + mglow) * (nightF - 0.3) * 1.5;
     }
 
     // DITHER: +-0.75/255 of hash noise breaks the 8-bit banding the smooth gradient otherwise shows

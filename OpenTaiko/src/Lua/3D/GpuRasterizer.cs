@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using FDK;
 using Silk.NET.OpenGLES;
 
@@ -22,542 +20,27 @@ namespace OpenTaiko {
 	/// (packed&lt;0) uploads as alpha 0 and is alpha-tested away. Output goes into the scene's canvas GL
 	/// texture via an FBO over the Lua-drawn background; projection matches the CPU (vertically flipped to
 	/// match the 2D draw).
+	///
+	/// The class is split by pass over the GpuRasterizer.*.cs files.
 	/// </summary>
-	internal sealed class GpuRasterizer : IRenderer {
+	internal sealed partial class GpuRasterizer : IRenderer, IRenderTargets, ICanvasOverlay {
 		private GL Gl => Game.Gl;
 		private const int STRIDE = 9;        // pos(3) uv(2) shade(1) normal(3)
-		// Projection far plane. Kept as tight as every stage allows (the iso faked-ortho camera sits ~46 back of a
-		// ~400-wide world → ~600 max; the FPS/kart stages are smaller) because a huge FAR with a tiny near wastes almost all
-		// the 24-bit depth range up close — that hyperbolic crush is the #1 cause of z-fighting on near-coplanar
-		// surfaces. 3000 keeps generous headroom while giving ~3x the depth resolution the old 10000 did.
+		// Largest projection far plane. Each pass pulls its far plane (_far) in to the farthest camera depth that anything
+		// it draws reaches (bounds of the drawn objects, buckets, sprites, particles and grass cells), so nothing drawn is
+		// ever clipped by it; this cap keeps one huge object from stretching the range.
 		private const double FAR = 3000.0;
-		private const int MAXL = 64;         // max point lights sent to the shader
+		private double _far = FAR;           // this pass's far plane
+		private double _reach;               // farthest camera depth reached by what this pass draws
+		private ViewFrustum _view;           // this pass's camera, for culling and _reach
 
 		private bool _init;
 		private uint _prog, _vao, _spriteVbo;
-		private int _uCam, _uR, _uU, _uF, _uSx, _uSy, _uA, _uB, _uModel;
-		private int _uMode, _uTex, _uCutout, _uTint, _uAlpha, _uFlat, _uFog, _uFogCol, _uFogStart, _uFogInv, _uRsh;
-		private int _uLit, _uSunDir, _uSunCol, _uAmb, _uNumLights, _uLightPosR, _uLightCol;
-		private int _uEmissive, _uWet, _uTimeW, _uRipple, _uRttFlip;   // stylized-world uniforms (emissive / wetness / clock / mirror ripple / RTT row order)
-		private int _uClip, _uFres, _uFlat2, _uDeepOn;                 // reflection clip plane + water fresnel/depth tint
-		private int _uFlatCol;                                         // per-object flat albedo override (recolour a routed GLB part)
-		private int _uTex2, _uTex3, _uTex4, _uSplat, _uSplatSize, _uTexScale;   // terrain splat blending
-		private int _uNormOn;                                                   // normal-mapped textures
-		private readonly Dictionary<int, int> _glTexRev = new();   // uploaded revision per texId (for live mirror RTTs)
-		private readonly List<SceneObject> _screenTex = new(8);    // ScreenTex mirror/portal surfaces
-		private readonly float[] _lpos = new float[MAXL * 4], _lcol = new float[MAXL * 3];
-
-		// 2D overlay (DrawLine/FillRect issued AFTER the 3D, e.g. crosshair/selection): composited onto
-		// the canvas texture via the FBO, since the CPU buffer no longer holds the 3D in GPU mode.
-		private uint _prog2d, _vbo2d, _vao2d; private int _uRes2d, _uColor2d; private bool _2dActive; private uint _prevFbo2; private readonly int[] _vp2 = new int[4];
-
-		// particles: camera-facing billboards with per-particle RGBA, additive or alpha blend; own shader
-		private uint _progP, _vaoP, _partVbo;
-		private int _pCam, _pR, _pU, _pF, _pSx, _pSy, _pA, _pB, _pTextured, _pTex;
-		private readonly Dictionary<(int add, int tex), List<float>> _partBatches = new();
-
-		// FXAA-lite post pass (optional, SetAntialias): copy scene→temp, then edge-aware blend temp→canvas
-		private uint _progPost, _vaoPost, _fxaaTex, _fxaaFbo; private int _postTex, _postMode, _postRes; private int _fxaaW, _fxaaH;
-		// diorama post pass (SetDiorama, "diorama"): a cheap SCREEN-SPACE tilt-shift (blur grows toward
-		// the top/bottom, a sharp middle band) + saturation/contrast/vignette grade. No depth sample (the old
-		// depth blur was too costly + the depth-texture FBO slowed the main pass), so the main FBO is back to a
-		// plain depth renderbuffer.
-		private uint _progDiorama; private int _hTex, _hRes, _hTilt, _hSat, _hVig, _hBloom, _hExp, _hGrade;
-		// Lua-attached CUSTOM post pass (SetPostShader): compiled lazily when the source revision changes;
-		// a compile failure traces once and disables the pass until the source changes again.
-		private uint _progUser; private int _upTex, _upRes, _upTime, _upUser; private int _userPostRev = -1; private bool _userPostOk;
-		// Lua-attached SKY pass (SetSkyShader): same lifecycle, drawn into the FBO before the 3D pass.
-		private uint _progSky; private int _skRes, _skTime, _skUser; private int _skyRev = -1; private bool _skyOk;
-		// GRASS: one static VBO of camera-facing blades, billboarded + wind-swayed in the vertex shader.
-		private uint _progGrass, _grassVbo;
-		private int _gCam, _gR, _gU, _gF, _gSx, _gSy, _gA, _gB, _gTime, _gTex, _gSun, _gAmb, _gFade;
-		private int _grassRevSeen = -1; private int _grassVerts;
-		// toon OUTLINE post pass (3D characters): true-distance silhouette ink with an AA rim
-		private uint _progOutline; private int _oTex, _oRes, _oColor, _oThick;
 
 		private uint _fbo, _depthRb;
 		private int _fboW, _fboH; private uint _fboColorTex;
 
-		// ── sun SHADOW MAP. The lit fragment shader is compiled in TWO variants: the DEFAULT _prog has NO shadow
-		// code at all (so stages that don't use shadows are byte-identical to before — no predicated texture
-		// taps), and _progShadow adds the depth-map sampling. We SWITCH PROGRAMS per frame (BindWorldProgram)
-		// rather than branch on a uniform inside one shared shader: a uniform branch is PREDICATED on GLES/ANGLE,
-		// so the 4 shadow taps + the light-space transform would run for EVERY fragment of EVERY stage — that was
-		// the 10× regression. Variants confine the cost to scenes that actually want shadows.
-		private uint _progDepth, _progDepthSpr, _progShadow, _shadowFbo, _shadowTex;
-		private int _uDLightVP, _uDModel, _uDSLightVP, _uDSTex;
-		private int _uLightVP, _uShadow, _uShadowTexel;
-		private bool _shadowOk = true;
-		private bool _worldShadow;       // which world variant is currently bound (so a mid-pass rebind matches)
-		private const int SHADOW_SIZE = 1920;   // full-HD shadow map over a tight player-centred box (HALF 60) = ~16 texels/unit
-		// shadow half-extent now lives on the scene (Lua3DScene._shadowHalf, SetShadowArea)
-		private readonly float[] _lightVP = new float[16];
-		private double _lightFx, _lightFz;       // shadow-map focus XZ (for culling far merge buckets out of the depth pass)
-		// sun-facing silhouette casters for billboard characters, rebuilt per shadow frame: a camera-facing quad
-		// presents the wrong outline to the sun (and thins/warps as you orbit), so the depth pass instead draws a
-		// quad turned to face the sun's azimuth → a stable, correctly-shaped cast shadow on the ground.
-		private uint _casterVbo;
-		private struct CBatch { public uint Tex; public int Start, Count; }
-		private readonly List<float> _casterVerts = new(512);
-		private readonly List<CBatch> _casterBatches = new(16);
-		// cached world-program uniform locations per variant; BindWorldProgram copies the active set into _u*
-		private struct WLoc { public int Cam, R, U, F, Sx, Sy, A, B, Model, Mode, Tex, Cutout, Tint, Alpha, Flat, Fog, FogCol, FogStart, FogInv, Rsh, Lit, SunDir, SunCol, Amb, NumLights, LightPosR, LightCol, LightVP, Shadow, ShadowTexel, Emissive, Wet, Time, Ripple, RttFlip, Clip, Fres, Flat2, DeepOn, Tex2, Tex3, Tex4, Splat, SplatSize, TexScale, FlatCol, NormOn, NormTex; }
-		private WLoc _locDef, _locSh;
-
-		private readonly Dictionary<int, uint> _glTex = new();
-		private readonly Dictionary<uint, int> _glTexId = new();   // uploaded texture -> the scene texture id
-		private readonly Dictionary<int, uint> _glSprite = new();
-
-		private struct OBatch { public int Mode; public uint Tex; public int Start, Count; }
-		private sealed class ObjCache { public uint Vbo; public int Version = int.MinValue; public readonly List<OBatch> Batches = new(); }
-		private readonly Dictionary<SceneObject, ObjCache> _cache = new();
-		private readonly List<float> _tmp = new(4096);
-		private readonly List<SceneObject> _opaque = new(256), _trans = new(64), _overlay = new(16);
 		private int _frame, _pruneAt;
-
-		// Static opaque geometry is merged per (spatial bucket × texture) so a block edit only re-uploads
-		// the small affected bucket(s), synchronously (no whole-world spike, and no stale-frame "x-ray").
-		// Cheap separate-format binding keeps the extra draw calls (one per non-empty bucket·texture) free.
-		private const double BS = 32.0;   // bucket size in world units (2×2 voxel chunks)
-		private struct MergeBuf { public uint Vbo; public int Count; }
-		private readonly Dictionary<(int bx, int bz, uint gt), MergeBuf> _merge = new();
-		private readonly List<float> _scratch = new(8192);   // single reused concat buffer (no persistent per-key copy)
-		private long _staticSig = long.MinValue;
-		// per-object cached emit (verts grouped by texture) + which bucket the object is in
-		private sealed class MergeEmit { public int Version = int.MinValue; public int Bx, Bz; public readonly Dictionary<uint, List<float>> ByTex = new(); }
-		private readonly Dictionary<SceneObject, MergeEmit> _mergeCache = new();
-		private readonly HashSet<(int bx, int bz, uint gt)> _dirtyKeys = new();
-		private readonly HashSet<SceneObject> _live = new();   // reused each rebuild/prune (no per-edit alloc)
-
-		private readonly List<float> _sprVerts = new(2048);
-		private struct SprBatch { public SceneObject Obj; public int Cutout, Start, Count, Pass; public uint Tex; }
-		private readonly List<SprBatch> _sprBatches = new(64);
-
-		private static readonly float[] _ident = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
-		private readonly float[] _mtx = new float[16];
-
-		private const string VS = @"#version 300 es
-layout(location=0) in vec3 aPos;
-layout(location=1) in vec2 aUV;
-layout(location=2) in float aShade;
-layout(location=3) in vec3 aNormal;
-uniform mat4 uModel;
-uniform vec3 uCam, uR, uU, uF;
-uniform float uSx, uSy, uA, uB;
-out vec2 vUV; out float vShade; out float vCamZ; out vec3 vWorld; out vec3 vNormal;
-void main(){
-    vUV = aUV; vShade = aShade;
-    vec3 wp = (uModel * vec4(aPos, 1.0)).xyz;
-    vWorld = wp; vNormal = mat3(uModel) * aNormal;
-    vec3 r = wp - uCam;
-    float cx = dot(r, uR), cy = dot(r, uU), cz = dot(r, uF);
-    vCamZ = cz;
-    gl_Position = vec4(cx * uSx, cy * uSy, uA * cz + uB, cz);
-}";
-		// Lit/textured world FS. Compiled TWICE: as-is (default — no shadow code) and with `#define SHADOWS`
-		// prepended (adds the sun depth-map sampling). The `#version` is prepended at compile time so the define
-		// can sit right after it. A separate VARIANT — not a `uShadowOn` uniform branch — is what keeps the shadow
-		// taps from running (predicated) on every stage's fragments. In the default variant shf folds to 1.0.
-		private const string FS = @"
-precision highp float;
-in vec2 vUV; in float vShade; in float vCamZ; in vec3 vWorld; in vec3 vNormal;
-uniform int uMode;            // 0 flat, 1 textured, 2 sprite, 3 screen-tex mirror
-uniform sampler2D uTex;
-uniform vec3 uTint; uniform float uAlpha; uniform vec3 uFlat; uniform int uCutout;
-uniform vec4 uFlatCol;         // per-object flat albedo OVERRIDE (rgb; w>0.5 = active) — recolours a routed GLB part
-uniform int uRsh;             // mirror/portal RTT is rendered at 1/2^uRsh res; sample by gl_FragCoord>>uRsh
-uniform int uFog; uniform vec3 uFogCol; uniform float uFogStart; uniform float uFogInv;
-uniform int uLit; uniform vec3 uSunDir, uSunCol, uAmb;
-uniform int uNumLights; uniform vec4 uLightPosR[64]; uniform vec3 uLightCol[64];
-uniform vec3 uCam;            // eye (wetness specular); same value the VS binds
-uniform vec3 uEmissive;       // per-object emissive add: col += base * uEmissive (>1 feeds bloom)
-uniform float uWet;           // global 0..1: darken lit diffuse + sun specular sheen (rain)
-uniform float uTime;          // shader clock (ripple / custom post share it)
-uniform vec3 uRipple;         // screen-tex distortion: amp(px), world freq, speed (x=0 off)
-uniform int uRttFlip;         // 1 = the RTT came from a GPU FBO (bottom-up rows) — flip the sample
-uniform vec4 uClip;           // reflection clip plane: discard when dot(wp,xyz)+w < 0 (w <= -9e29 = off)
-uniform vec2 uFres;           // screen-tex fresnel: x = F0, y = 1 enable (0 = legacy shade reflectivity)
-uniform vec3 uFlat2;          // screen-tex water deep colour (vShade lerps uFlat -> uFlat2 when enabled)
-uniform int uDeepOn;          // 1 = uFlat2 depth tint active
-uniform sampler2D uTex2, uTex3, uTex4, uSplat;   // terrain splat: 3 extra layers + the weight image
-uniform vec2 uSplatSize;      // splat world coverage (world.xz -> splat uv)
-uniform int uNormOn;          // 1 = the bound texture has a normal map (SetTextureNormalMap) on uNormTex
-uniform sampler2D uNormTex;
-uniform float uTexScale;      // world units -> layer uv repeats
-out vec4 frag;
-#ifdef SHADOWS
-uniform mat4 uLightVP; uniform sampler2D uShadow; uniform float uShadowTexel;
-float sunShadow(vec3 wp, vec3 N){
-    // NORMAL-OFFSET sampling (~1.6 shadow texels along the surface normal) carries most of the
-    // acne fight, so the DEPTH bias can be ~5x smaller — the old 0.0008..0.0026 range was 0.2-0.7
-    // world units of light-space depth, which pushed every contact shadow visibly away from the
-    // object's base (the gap-between-object-and-shadow bug).
-    vec3 wpo = wp + N * 0.10;
-    vec4 lp = uLightVP * vec4(wpo, 1.0);
-    vec3 p = lp.xyz / lp.w * 0.5 + 0.5;
-    if (p.z > 1.0 || p.x < 0.0 || p.x > 1.0 || p.y < 0.0 || p.y > 1.0) return 1.0;   // outside the map -> lit (ASCII only! ANGLE rejects bytes>127 even in comments)
-    float ndl = max(dot(N, uSunDir), 0.0);
-    float bias = max(0.00012, 0.0006 * (1.0 - ndl)); float t = p.z - bias; float ts = uShadowTexel; float sh = 0.0;
-    sh += step(t, texture(uShadow, p.xy + vec2(-0.5, -0.5) * ts).r);
-    sh += step(t, texture(uShadow, p.xy + vec2( 0.5, -0.5) * ts).r);
-    sh += step(t, texture(uShadow, p.xy + vec2(-0.5,  0.5) * ts).r);
-    sh += step(t, texture(uShadow, p.xy + vec2( 0.5,  0.5) * ts).r);
-    return sh * 0.25;
-}
-#endif
-vec3 lightAt(vec3 N, vec3 wp){
-    float e = sqrt(max(vShade, 0.0));
-#ifdef SHADOWS
-    float shf = sunShadow(wp, N);
-#else
-    float shf = 1.0;
-#endif
-    vec3 l = e * (uAmb + max(dot(N, uSunDir), 0.0) * uSunCol * shf);
-    for (int i = 0; i < uNumLights; i++){
-        vec3 dp = uLightPosR[i].xyz - wp; float range = uLightPosR[i].w;
-        float d2 = dot(dp, dp);
-        if (range > 0.0){
-            if (d2 >= range*range) continue;
-            float dl = sqrt(d2); float ndl = max(dot(N, dp/dl), 0.0); if (ndl <= 0.0) continue;
-            float f = 1.0 - dl/range; l += uLightCol[i] * (f*f*ndl);
-        } else {
-            float inv = inversesqrt(max(d2, 1e-6)); float ndl = max(dot(N, dp*inv), 0.0); if (ndl <= 0.0) continue;
-            l += uLightCol[i] * (ndl / (d2 + 1.0));
-        }
-    }
-    return l;
-}
-void main(){
-    if (uClip.w > -8.9e29 && dot(vWorld, uClip.xyz) + uClip.w < 0.0) discard;   // reflection clip plane
-    if (uMode == 3){   // screen-texture mirror: sample the RTT by screen pixel, blend over the base colour
-        ivec2 ts = textureSize(uTex, 0);
-        ivec2 fc = ivec2(int(gl_FragCoord.x) >> uRsh, int(gl_FragCoord.y) >> uRsh);
-        if (uRttFlip == 1) fc.y = ts.y - 1 - fc.y;   // GPU-FBO capture: rows are bottom-up vs the CPU upload
-        if (uRipple.x > 0.0){   // water: wobble the sample point with two crossed world-space waves
-            vec2 ro = vec2(sin(vWorld.x * uRipple.y + uTime * uRipple.z) + sin(vWorld.z * uRipple.y * 1.31 + uTime * uRipple.z * 0.83),
-                           cos(vWorld.z * uRipple.y + uTime * uRipple.z * 0.91) + cos(vWorld.x * uRipple.y * 1.73 + uTime * uRipple.z * 1.13));
-            fc += ivec2(ro * uRipple.x);
-        }
-        ivec2 mp = clamp(fc, ivec2(0), ts - 1);
-        vec3 m = texelFetch(uTex, mp, 0).rgb;
-        // reflection amount: legacy = tint * per-vertex shade; fresnel mode = per-pixel Schlick
-        // (grazing views mirror fully, top-down shows the water colour — the physical look)
-        vec3 fm = uTint * vShade;
-        if (uFres.y > 0.5){
-            vec3 Vv = normalize(uCam - vWorld);
-            float cosT = max(dot(Vv, normalize(vNormal)), 0.0);
-            float F = uFres.x + (1.0 - uFres.x) * pow(1.0 - cosT, 5.0);
-            fm = uTint * clamp(F * 1.15 + 0.08, 0.0, 1.0);   // small floor so calm water still mirrors a touch
-        }
-        // base colour under the mirror: flat, or the depth tint (shallow uFlat -> deep uFlat2 by vShade)
-        vec3 baseC = (uDeepOn == 1) ? mix(uFlat, uFlat2, clamp(vShade, 0.0, 1.0)) : uFlat;
-        vec3 col = m * fm + baseC * (1.0 - fm);
-        if (uFog == 1){ float f = clamp((vCamZ - uFogStart) * uFogInv, 0.0, 1.0); col = mix(col, uFogCol, f); }
-        frag = vec4(col, uAlpha); return;
-    }
-    if (uMode == 2){ vec4 t = texture(uTex, vUV); vec4 c = vec4(t.rgb * uTint, t.a * uAlpha); if (uCutout == 1 && c.a < 0.5) discard;
-#ifdef SHADOWS
-        // characters RECEIVE the sun shadow (a wall's shade dims them). Sample 0.6 units TOWARD the
-        // sun: the sprite's own sun-facing caster quad passes through its centre, so sampling at the
-        // fragment itself made every character shade ITSELF; real occluders sit further than 0.6.
-        c.rgb *= (0.55 + 0.45 * sunShadow(vWorld + uSunDir * 0.6, vNormal));
-#endif
-        if (uFog == 1){ float f = clamp((vCamZ - uFogStart) * uFogInv, 0.0, 1.0); c.rgb = mix(c.rgb, uFogCol, f); } frag = c; return; }
-    vec3 base;
-    if (uMode == 0){ base = uFlat; }
-    else if (uMode == 5){
-        // TERRAIN SPLAT: blend the four layer textures per pixel by the (linear-filtered) weight
-        // image — painted roads/beaches feather smoothly instead of cutting at quad edges
-        vec2 luv = vWorld.xz * uTexScale;
-        vec4 w = texture(uSplat, vWorld.xz / uSplatSize);
-        float ws = max(w.r + w.g + w.b + w.a, 1e-4);
-        base = (texture(uTex, luv).rgb * w.r + texture(uTex2, luv).rgb * w.g
-              + texture(uTex3, luv).rgb * w.b + texture(uTex4, luv).rgb * w.a) / ws;
-        base *= uTint;
-    }
-    else { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; base = t.rgb * uTint; }
-    if (uFlatCol.a > 0.5) base = uFlatCol.rgb;   // flat albedo override: recolour a routed part (still shades)
-    vec3 N = normalize(vNormal);
-    float relief = 1.0;
-    if (uNormOn == 1 && uMode == 1){
-        // the normal map, turned onto the surface: the surface frame comes from the screen derivatives of
-        // the position and the uv (the vertices carry no tangents); B runs down the image like the map's green
-        vec3 m = texture(uNormTex, vUV).rgb * 2.0 - 1.0;
-        vec3 dp1 = dFdx(vWorld), dp2 = dFdy(vWorld); vec2 du1 = dFdx(vUV), du2 = dFdy(vUV);
-        vec3 c2 = cross(dp2, N), c1 = cross(N, dp1);
-        vec3 T = c2 * du1.x + c1 * du2.x, B = c2 * du1.y + c1 * du2.y;
-        float k = inversesqrt(max(max(dot(T, T), dot(B, B)), 1e-20));
-        T *= k; B *= k;
-        vec3 Nm = normalize(T * m.x + B * m.y + N * m.z);
-        // relief shade: a light fixed to the surface, from the image's upper left (the same on every wall)
-        vec3 Ls = normalize(-0.35 * T - 0.45 * B + 0.82 * N);
-        relief = clamp(dot(Nm, Ls) / max(dot(N, Ls), 0.2), 0.6, 1.4);
-        N = Nm;
-    }
-    vec3 col = (uLit == 1) ? base * lightAt(N, vWorld) * mix(1.0, relief, 0.5) : base * vShade * relief;
-    if (uWet > 0.0 && uLit == 1){   // rain-wet surfaces: darker diffuse + a sun specular sheen (ALU only)
-        col *= 1.0 - 0.30 * uWet;
-        vec3 N = normalize(vNormal);
-        vec3 V = normalize(uCam - vWorld);
-        vec3 H = normalize(V + uSunDir);
-        col += uSunCol * (pow(max(dot(N, H), 0.0), 48.0) * 0.7 * uWet * sqrt(max(vShade, 0.0)));
-    }
-    col += base * uEmissive;
-    if (uFog == 1){ float f = clamp((vCamZ - uFogStart) * uFogInv, 0.0, 1.0); col = mix(col, uFogCol, f); }
-    frag = vec4(col, uAlpha);
-}";
-
-		// shadow depth pass — opaque casters (terrain/objects): write depth from the light's POV
-		private const string VSD = @"#version 300 es
-layout(location=0) in vec3 aPos;
-uniform mat4 uLightVP, uModel;
-void main(){ gl_Position = uLightVP * uModel * vec4(aPos, 1.0); }";
-		private const string FSD = @"#version 300 es
-precision highp float;
-void main(){}";
-		// shadow depth pass — SPRITE casters (the character): alpha-test so the SILHOUETTE is what casts
-		private const string VSDS = @"#version 300 es
-layout(location=0) in vec3 aPos;
-layout(location=1) in vec2 aUV;
-uniform mat4 uLightVP;
-out vec2 vUV;
-void main(){ vUV = aUV; gl_Position = uLightVP * vec4(aPos, 1.0); }";
-		private const string FSDS = @"#version 300 es
-precision highp float;
-in vec2 vUV; uniform sampler2D uTex;
-void main(){ if (texture(uTex, vUV).a < 0.5) discard; }";
-
-		private const string VSP = @"#version 300 es
-layout(location=0) in vec3 aPos;
-layout(location=1) in vec2 aUV;
-layout(location=2) in vec4 aColor;
-uniform vec3 uCam, uR, uU, uF;
-uniform float uSx, uSy, uA, uB;
-out vec2 vUV; out vec4 vColor;
-void main(){
-    vUV = aUV; vColor = aColor;
-    vec3 r = aPos - uCam;
-    float cx = dot(r, uR), cy = dot(r, uU), cz = dot(r, uF);
-    gl_Position = vec4(cx * uSx, cy * uSy, uA * cz + uB, cz);
-}";
-		private const string FSP = @"#version 300 es
-precision highp float;
-in vec2 vUV; in vec4 vColor;
-uniform int uTextured; uniform sampler2D uTex;
-out vec4 frag;
-void main(){
-    vec4 c = vColor;
-    if (uTextured == 1) { vec4 t = texture(uTex, vUV); c = vec4(t.rgb * vColor.rgb, t.a * vColor.a); }
-    frag = c;
-}";
-		private const string VSPOST = @"#version 300 es
-const vec2 P[3] = vec2[3](vec2(-1.0,-1.0), vec2(3.0,-1.0), vec2(-1.0,3.0));
-void main(){ gl_Position = vec4(P[gl_VertexID], 0.0, 1.0); }";
-		private const string FSPOST = @"#version 300 es
-precision highp float;
-uniform sampler2D uTex; uniform int uMode; uniform vec2 uRes;
-out vec4 frag;
-float luma(vec3 c){ return (c.r + 2.0*c.g + c.b) * 255.0; }   // 0..1020, matches the CPU's R+2G+B bytes
-void main(){
-    ivec2 p = ivec2(gl_FragCoord.xy);
-    vec3 c = texelFetch(uTex, p, 0).rgb;
-    if (uMode == 2){ frag = texelFetch(uTex, p, 0); return; } // RGBA copy (alpha preserved: outline pass)
-    if (uMode == 0){ frag = vec4(c, 1.0); return; }            // plain copy
-    if (p.x < 1 || p.y < 1 || p.x >= int(uRes.x)-1 || p.y >= int(uRes.y)-1){ frag = vec4(c,1.0); return; }
-    vec3 cn = texelFetch(uTex, p+ivec2(0,-1),0).rgb, cs = texelFetch(uTex, p+ivec2(0,1),0).rgb;
-    vec3 ce = texelFetch(uTex, p+ivec2(1,0),0).rgb,  cw = texelFetch(uTex, p+ivec2(-1,0),0).rgb;
-    float lC=luma(c), lN=luma(cn), lS=luma(cs), lE=luma(ce), lW=luma(cw);
-    float mn=min(lC,min(min(lN,lS),min(lE,lW))), mx=max(lC,max(max(lN,lS),max(lE,lW)));
-    float range = mx-mn;
-    if (range < 64.0 || range*8.0 < mx){ frag = vec4(c,1.0); return; }
-    vec3 a, b;
-    if (abs(lN+lS-2.0*lC) >= abs(lE+lW-2.0*lC)){ a=cn; b=cs; } else { a=ce; b=cw; }
-    frag = vec4((c*2.0 + a + b) * 0.25, 1.0);
-}";
-		// 'Diorama' grade: SCREEN-SPACE tilt-shift (sharp middle band, blur ramping to the
-		// top/bottom — only the edge bands pay the 4 taps, the centre is 1 tap) + saturation/contrast/vignette.
-		// No depth sample, so it's cheap and needs no special FBO.
-		private const string FSOUTLINE = @"#version 300 es
-precision highp float;
-uniform sampler2D uTex; uniform vec2 uRes; uniform vec3 uColor; uniform float uThick;
-out vec4 frag;
-void main(){
-    ivec2 p = ivec2(gl_FragCoord.xy);
-    vec4 c = texelFetch(uTex, p, 0);
-    if (c.a > 0.001) { frag = c; return; }
-    int T = int(ceil(uThick)) + 1;
-    if (T > 12) T = 12;
-    float best = 1e9;
-    for (int dy = -12; dy <= 12; dy++) {
-        if (dy < -T || dy > T) continue;
-        for (int dx = -12; dx <= 12; dx++) {
-            if (dx < -T || dx > T) continue;
-            ivec2 q = p + ivec2(dx, dy);
-            if (q.x < 0 || q.y < 0 || q.x >= int(uRes.x) || q.y >= int(uRes.y)) continue;
-            if (texelFetch(uTex, q, 0).a > 0.5) {
-                float d = length(vec2(float(dx), float(dy)));
-                if (d < best) best = d;
-            }
-        }
-    }
-    float a = clamp(uThick + 0.5 - best, 0.0, 1.0);
-    frag = vec4(uColor, a);
-}";
-		private const string FSDIORAMA = @"#version 300 es
-precision highp float;
-uniform sampler2D uTex; uniform vec2 uRes; uniform float uTilt, uSat, uVig, uBloom;
-uniform float uExposure; uniform vec3 uGrade;   // SetColorGrade: exposure multiply + day/night tint
-out vec4 frag;
-void main(){
-    vec2 uv = (gl_FragCoord.xy) / uRes;
-    float dy = abs(uv.y - 0.5) * 2.0;                 // 0 centre .. 1 top/bottom
-    float band = smoothstep(0.34, 1.0, dy);           // middle ~34% stays sharp, ramps out
-    float rad = band * uTilt;
-    vec3 c = texture(uTex, uv).rgb;
-    if (rad > 0.5){
-        vec2 inv = 1.0 / uRes;
-        c = (c + texture(uTex, uv + vec2(0.0, rad) * inv).rgb + texture(uTex, uv + vec2(0.0, -rad) * inv).rgb
-               + texture(uTex, uv + vec2(rad, 0.0) * inv).rgb + texture(uTex, uv + vec2(-rad, 0.0) * inv).rgb) * 0.2;
-    }
-    // BLOOM (the diorama glow): a sparse 12-tap ring gathers thresholded brightness around the pixel and
-    // adds it back as a soft halo. One pass, no extra FBO; only diorama scenes pay for it (and only if uBloom>0).
-    if (uBloom > 0.001){
-        vec2 inv = 1.0 / uRes;
-        vec3 acc = vec3(0.0);
-        const float R1 = 7.0; const float R2 = 15.0;
-        for (int i = 0; i < 6; i++){
-            float a = float(i) * 1.0471975;            // 6 taps on the inner ring (60 deg apart)
-            vec2 o = vec2(cos(a), sin(a));
-            acc += max(texture(uTex, uv + o * R1 * inv).rgb - 0.62, 0.0);
-            acc += max(texture(uTex, uv + o * R2 * inv).rgb - 0.62, 0.0) * 0.6;
-        }
-        c += acc * (uBloom * 0.22);
-    }
-    c *= uExposure * uGrade;                           // colour grade (before saturation/contrast)
-    float l = dot(c, vec3(0.299, 0.587, 0.114));
-    c = mix(vec3(l), c, uSat);                         // saturation
-    c = (c - 0.5) * 1.08 + 0.5;                        // gentle contrast
-    vec2 d = uv - 0.5;
-    c *= 1.0 - uVig * dot(d, d) * 2.2;                 // vignette
-    frag = vec4(clamp(c, 0.0, 1.0), 1.0);
-}";
-		// GRASS: base pos + packed corner/height/phase/shade; the VS billboards each blade around its
-		// foot with the camera right axis, sways the top with two crossed sines, and shrinks blades
-		// toward zero between uFade.x..uFade.y so the field pops nothing at the draw distance.
-		private const string VSGRASS = @"#version 300 es
-layout(location=0) in vec3 aBase;
-layout(location=1) in vec4 aBlade;   // corner.x (-1..1), corner.y (0..1), height, phase
-layout(location=2) in float aShade;
-uniform vec3 uCam, uR, uU, uF;
-uniform float uSx, uSy, uA, uB, uTime;
-uniform vec2 uFade;
-out vec2 vUV; out float vShade;
-void main(){
-    float dist = length(aBase - uCam);
-    float k = clamp(1.0 - (dist - uFade.x) / (uFade.y - uFade.x), 0.0, 1.0);
-    float h = aBlade.z * k;
-    // per-blade character derived from the (hashed) sway phase: width varies +-30%, each blade
-    // leans its own way, and the two sway sines run de-correlated — kills the synchronized-lawn look
-    float wf = 0.70 + 0.60 * fract(aBlade.w * 1.6180339);
-    float lean = (fract(aBlade.w * 2.3999632) - 0.5) * 0.36;
-    float sway = sin(uTime * 1.7 + aBlade.w) * 0.14 + sin(uTime * 3.1 + aBlade.w * 1.7) * 0.05;
-    vec3 wp = aBase
-        + uR * (aBlade.x * 0.055 * aBlade.z * wf)
-        + vec3(0.0, aBlade.y * h, 0.0)
-        + uR * ((sway + lean) * aBlade.y * aBlade.y * h);
-    vUV = vec2(aBlade.x * 0.5 + 0.5, 1.0 - aBlade.y);
-    vShade = aShade;
-    vec3 r = wp - uCam;
-    float cx = dot(r, uR), cy = dot(r, uU), cz = dot(r, uF);
-    gl_Position = vec4(cx * uSx, cy * uSy, uA * cz + uB, cz);
-}";
-		private const string FSGRASS = @"#version 300 es
-precision highp float;
-in vec2 vUV; in float vShade;
-uniform sampler2D uTex;
-uniform vec3 uSunCol, uAmb;
-out vec4 frag;
-void main(){
-    vec4 t = texture(uTex, vUV);
-    if (t.a < 0.5) discard;
-    vec3 li = uAmb + uSunCol * (0.35 + 0.45 * (1.0 - vUV.y));   // tips catch more sun
-    frag = vec4(t.rgb * vShade * li, 1.0);
-}";
-		private const string VS2D = @"#version 300 es
-layout(location=0) in vec2 aPx;
-uniform vec2 uRes;
-void main(){ gl_Position = vec4(aPx.x / uRes.x * 2.0 - 1.0, aPx.y / uRes.y * 2.0 - 1.0, 0.0, 1.0); }";
-		private const string FS2D = @"#version 300 es
-precision highp float;
-uniform vec4 uColor;
-out vec4 frag;
-void main(){ frag = uColor; }";
-
-		// ANGLE's GLSL ES translator rejects ANY byte >127 (even inside // comments) -> the shader fails to
-		// compile -> EnsureGL throws -> the WHOLE GPU rasterizer silently falls back to the CPU one (no shadows,
-		// CPU-speed lag). That bug has bitten twice (a stray arrow/em-dash in a comment), so strip non-ASCII
-		// defensively here — harmless in comments, and code shouldn't contain any.
-		private static string Ascii(string s) {
-			bool clean = true; foreach (char c in s) if (c > 127) { clean = false; break; }
-			if (clean) return s;
-			var sb = new System.Text.StringBuilder(s.Length);
-			foreach (char c in s) if (c <= 127) sb.Append(c);
-			return sb.ToString();
-		}
-
-		// look up every world-program uniform for one variant (locations differ between the two compiled programs)
-		private WLoc QueryWLoc(uint p) {
-			int g(string n) => Gl.GetUniformLocation(p, n);
-			return new WLoc {
-				Cam = g("uCam"), R = g("uR"), U = g("uU"), F = g("uF"), Sx = g("uSx"), Sy = g("uSy"), A = g("uA"), B = g("uB"), Model = g("uModel"),
-				Mode = g("uMode"), Tex = g("uTex"), Cutout = g("uCutout"), Tint = g("uTint"), Alpha = g("uAlpha"), Flat = g("uFlat"),
-				Fog = g("uFog"), FogCol = g("uFogCol"), FogStart = g("uFogStart"), FogInv = g("uFogInv"), Rsh = g("uRsh"),
-				Lit = g("uLit"), SunDir = g("uSunDir"), SunCol = g("uSunCol"), Amb = g("uAmb"),
-				NumLights = g("uNumLights"), LightPosR = g("uLightPosR[0]"), LightCol = g("uLightCol[0]"),
-				LightVP = g("uLightVP"), Shadow = g("uShadow"), ShadowTexel = g("uShadowTexel"),
-				Emissive = g("uEmissive"), Wet = g("uWet"), Time = g("uTime"), Ripple = g("uRipple"),
-				RttFlip = g("uRttFlip"),
-				Clip = g("uClip"), Fres = g("uFres"), Flat2 = g("uFlat2"), DeepOn = g("uDeepOn"),
-				Tex2 = g("uTex2"), Tex3 = g("uTex3"), Tex4 = g("uTex4"), Splat = g("uSplat"),
-				SplatSize = g("uSplatSize"), TexScale = g("uTexScale"), FlatCol = g("uFlatCol"),
-				NormOn = g("uNormOn"), NormTex = g("uNormTex"),
-			};
-		}
-		// bind the chosen world variant AND point the active _u* fields at that program's locations, so every
-		// Gl.Uniform* in the draw code targets the bound program (locations are NOT guaranteed equal across variants)
-		private void BindWorldProgram(bool shadow) {
-			_worldShadow = shadow && _shadowOk;
-			Gl.UseProgram(_worldShadow ? _progShadow : _prog);
-			var L = _worldShadow ? _locSh : _locDef;
-			_uCam = L.Cam; _uR = L.R; _uU = L.U; _uF = L.F; _uSx = L.Sx; _uSy = L.Sy; _uA = L.A; _uB = L.B; _uModel = L.Model;
-			_uMode = L.Mode; _uTex = L.Tex; _uCutout = L.Cutout; _uTint = L.Tint; _uAlpha = L.Alpha; _uFlat = L.Flat;
-			_uFog = L.Fog; _uFogCol = L.FogCol; _uFogStart = L.FogStart; _uFogInv = L.FogInv; _uRsh = L.Rsh;
-			_uLit = L.Lit; _uSunDir = L.SunDir; _uSunCol = L.SunCol; _uAmb = L.Amb;
-			_uNumLights = L.NumLights; _uLightPosR = L.LightPosR; _uLightCol = L.LightCol;
-			_uLightVP = L.LightVP; _uShadow = L.Shadow; _uShadowTexel = L.ShadowTexel;
-			_uEmissive = L.Emissive; _uWet = L.Wet; _uTimeW = L.Time; _uRipple = L.Ripple; _uRttFlip = L.RttFlip;
-			_uClip = L.Clip; _uFres = L.Fres; _uFlat2 = L.Flat2; _uDeepOn = L.DeepOn;
-			_uTex2 = L.Tex2; _uTex3 = L.Tex3; _uTex4 = L.Tex4; _uSplat = L.Splat;
-			_uSplatSize = L.SplatSize; _uTexScale = L.TexScale; _uFlatCol = L.FlatCol;
-			_uNormOn = L.NormOn;
-			Gl.Uniform1(L.NormTex, 6);   // normal maps sit on texture unit 6
-			Gl.Uniform1(L.NormOn, 0);
-		}
-
-		// The GLSL programs are byte-identical for every GpuRasterizer and stay valid for the whole GL
-		// context, yet each offscreen scene (every ModelIcon preview) used to be a fresh renderer that
-		// RECOMPILED all ~10 programs — GLSL compile+link is 100s of ms each, so a handful of previews
-		// stalled for seconds (and a shop of previews would be unusable). Compile each source pair ONCE
-		// and share the handle. The glIsProgram guard recompiles automatically if the GL context is
-		// recreated (the old handle is no longer a program), so context loss stays correct.
-		private static readonly Dictionary<string, uint> s_progCache = new();
-		private uint CachedProg(string vs, string fs) {   // instance method: Gl is a per-instance handle to the shared context
-			string key = vs + " " + fs;
-			if (s_progCache.TryGetValue(key, out var p) && p != 0 && Gl.IsProgram(p)) return p;
-			p = ShaderHelper.CreateShaderProgramFromSource(vs, fs);
-			s_progCache[key] = p;
-			return p;
-		}
 
 		private void EnsureGL() {
 			if (_init) return;
@@ -573,6 +56,7 @@ void main(){ frag = uColor; }";
 				_uDLightVP = Gl.GetUniformLocation(_progDepth, "uLightVP"); _uDModel = Gl.GetUniformLocation(_progDepth, "uModel");
 				_progDepthSpr = CachedProg(VSDS, FSDS);
 				_uDSLightVP = Gl.GetUniformLocation(_progDepthSpr, "uLightVP"); _uDSTex = Gl.GetUniformLocation(_progDepthSpr, "uTex");
+				_uDSModel = Gl.GetUniformLocation(_progDepthSpr, "uModel");
 			} catch (Exception e) { Trace.TraceError("Shadow programs failed: " + e); _shadowOk = false; }
 			BindWorldProgram(false);   // populate the active _u* set from the default variant
 			// 3D VAO uses separate attribute format (GLES 3.1): the vertex layout is fixed once here, so
@@ -589,7 +73,7 @@ void main(){ frag = uColor; }";
 			// particle program + its own VAO (pos3, uv2, rgba4)
 			_progP = CachedProg(VSP, FSP);
 			int P(string n) => Gl.GetUniformLocation(_progP, n);
-			_pCam = P("uCam"); _pR = P("uR"); _pU = P("uU"); _pF = P("uF"); _pSx = P("uSx"); _pSy = P("uSy"); _pA = P("uA"); _pB = P("uB"); _pTextured = P("uTextured"); _pTex = P("uTex");
+			_pFrame = FrameLoc.Of(Gl, _progP); _pTextured = P("uTextured"); _pTex = P("uTex"); _pAdd = P("uAdd");
 			_vaoP = Gl.GenVertexArray(); _partVbo = Gl.GenBuffer();
 			Gl.BindVertexArray(_vaoP); Gl.BindBuffer(BufferTargetARB.ArrayBuffer, _partVbo);
 			unsafe {
@@ -610,36 +94,26 @@ void main(){ frag = uColor; }";
 			_hBloom = Gl.GetUniformLocation(_progDiorama, "uBloom");
 			_hExp = Gl.GetUniformLocation(_progDiorama, "uExposure"); _hGrade = Gl.GetUniformLocation(_progDiorama, "uGrade");
 			_vaoPost = Gl.GenVertexArray();
-			// grass program + VAO (pos3, blade4, shade1 — classic pointers, static buffer)
+			_postSampler = Gl.GenSampler();
+			Gl.SamplerParameter(_postSampler, SamplerParameterI.MinFilter, (int)GLEnum.Nearest);
+			Gl.SamplerParameter(_postSampler, SamplerParameterI.MagFilter, (int)GLEnum.Nearest);
+			Gl.SamplerParameter(_postSampler, SamplerParameterI.WrapS, (int)GLEnum.Repeat);
+			Gl.SamplerParameter(_postSampler, SamplerParameterI.WrapT, (int)GLEnum.Repeat);
+			// grass program + VAO: one instance per blade (pos3, height+phase 2, shade1), separate format so a draw of a
+			// run of cells only moves the buffer offset
 			_progGrass = CachedProg(Ascii(VSGRASS), Ascii(FSGRASS));
 			int G(string n) => Gl.GetUniformLocation(_progGrass, n);
-			_gCam = G("uCam"); _gR = G("uR"); _gU = G("uU"); _gF = G("uF");
-			_gSx = G("uSx"); _gSy = G("uSy"); _gA = G("uA"); _gB = G("uB");
+			_gFrame = FrameLoc.Of(Gl, _progGrass);
 			_gTime = G("uTime"); _gTex = G("uTex"); _gSun = G("uSunCol"); _gAmb = G("uAmb"); _gFade = G("uFade");
 			_grassVbo = Gl.GenBuffer();
 			_vaoGrass = Gl.GenVertexArray();
-			Gl.BindVertexArray(_vaoGrass); Gl.BindBuffer(BufferTargetARB.ArrayBuffer, _grassVbo);
-			unsafe {
-				Gl.EnableVertexAttribArray(0); Gl.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), (void*)0);
-				Gl.EnableVertexAttribArray(1); Gl.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-				Gl.EnableVertexAttribArray(2); Gl.VertexAttribPointer(2, 1, VertexAttribPointerType.Float, false, 8 * sizeof(float), (void*)(7 * sizeof(float)));
-			}
+			Gl.BindVertexArray(_vaoGrass);
+			Gl.EnableVertexAttribArray(0); Gl.VertexAttribFormat(0, 3, VertexAttribType.Float, false, 0); Gl.VertexAttribBinding(0, 0);
+			Gl.EnableVertexAttribArray(1); Gl.VertexAttribFormat(1, 2, VertexAttribType.Float, false, (uint)(3 * sizeof(float))); Gl.VertexAttribBinding(1, 0);
+			Gl.EnableVertexAttribArray(2); Gl.VertexAttribFormat(2, 1, VertexAttribType.Float, false, (uint)(5 * sizeof(float))); Gl.VertexAttribBinding(2, 0);
+			Gl.VertexBindingDivisor(0, 1);
 			Gl.BindVertexArray(0);
 			_init = true;
-		}
-		private uint _vaoGrass;
-
-		private unsafe void EnsureFxaaTarget(Lua3DScene s) {
-			if (_fxaaTex != 0 && _fxaaW == s._w && _fxaaH == s._h) return;
-			if (_fxaaTex == 0) _fxaaTex = Gl.GenTexture();
-			Gl.BindTexture(TextureTarget.Texture2D, _fxaaTex);
-			Gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Rgba8, (uint)s._w, (uint)s._h, 0, PixelFormat.Rgba, PixelType.UnsignedByte, (void*)0);
-			Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Nearest);
-			Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Nearest);
-			if (_fxaaFbo == 0) _fxaaFbo = Gl.GenFramebuffer();
-			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fxaaFbo);
-			Gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, _fxaaTex, 0);
-			_fxaaW = s._w; _fxaaH = s._h;
 		}
 
 		// point the 3D VAO (separate format) at a vertex buffer — one call per draw
@@ -648,112 +122,10 @@ void main(){ frag = uColor; }";
 		/// <summary>Last sky/post shader compile error ("" when clean) — surfaced to Lua so a broken
 		/// stage shader is debuggable in-game instead of silently degrading.</summary>
 		public string LastShaderError = "";
-
-		// (re)compile the Lua-attached post shader when its source revision changes. Accepts a full
-		// GLSL ES 3.00 fragment source, or just a main() body-holder — the standard prelude (uTex =
-		// the rendered frame, uRes, uTime, uUser[4], out frag) is prepended when no #version is given.
-		private void EnsureUserPost(Lua3DScene s) {
-			if (s._postSrcRev == _userPostRev) return;
-			_userPostRev = s._postSrcRev;
-			if (_progUser != 0) { Gl.DeleteProgram(_progUser); _progUser = 0; }
-			_userPostOk = false;
-			if (string.IsNullOrEmpty(s._postSrc)) return;
-			string src = s._postSrc.Contains("#version") ? s._postSrc
-				: "#version 300 es\nprecision highp float;\nuniform sampler2D uTex; uniform vec2 uRes; uniform float uTime; uniform vec4 uUser[4];\nout vec4 frag;\n" + s._postSrc;
-			try {
-				_progUser = ShaderHelper.CreateShaderProgramFromSource(Ascii(VSPOST), Ascii(src));
-				_upTex = Gl.GetUniformLocation(_progUser, "uTex"); _upRes = Gl.GetUniformLocation(_progUser, "uRes");
-				_upTime = Gl.GetUniformLocation(_progUser, "uTime"); _upUser = Gl.GetUniformLocation(_progUser, "uUser[0]");
-				_userPostOk = true;
-			} catch (Exception e) {
-				LastShaderError = "post: " + e.Message;
-				Trace.TraceError("SetPostShader: custom post shader failed to compile, pass disabled.\n" + e);
-			}
-		}
-
-		// (re)compile the Lua-attached SKY shader (same prelude rules as the post pass, minus uTex;
-		// the sky gets EIGHT uUser slots — camera basis + sun + palette + clouds/stars need the room)
-		private void EnsureSky(Lua3DScene s) {
-			if (s._skySrcRev == _skyRev) return;
-			_skyRev = s._skySrcRev;
-			if (_progSky != 0) { Gl.DeleteProgram(_progSky); _progSky = 0; }
-			_skyOk = false;
-			if (string.IsNullOrEmpty(s._skySrc)) { s._skyCompiled = null; return; }
-			string src = s._skySrc.Contains("#version") ? s._skySrc
-				: "#version 300 es\nprecision highp float;\nuniform vec2 uRes; uniform float uTime; uniform vec4 uUser[8];\nout vec4 frag;\n" + s._skySrc;
-			try {
-				_progSky = ShaderHelper.CreateShaderProgramFromSource(Ascii(VSPOST), Ascii(src));
-				_skRes = Gl.GetUniformLocation(_progSky, "uRes");
-				_skTime = Gl.GetUniformLocation(_progSky, "uTime");
-				_skUser = Gl.GetUniformLocation(_progSky, "uUser[0]");
-				_skyOk = true;
-			} catch (Exception e) {
-				LastShaderError = "sky: " + e.Message;
-				Trace.TraceError("SetSkyShader: sky shader failed to compile, pass disabled.\n" + e);
-			}
-			s._skyCompiled = _skyOk;   // SkyShaderActive tells the stage to fall back to 2D bands on failure
-		}
-
-		// (re)build the grass VBO when blades changed; draw is one call in the opaque pass
-		private void EnsureGrass(Lua3DScene s) {
-			if (s._grassRev == _grassRevSeen) return;
-			_grassRevSeen = s._grassRev;
-			var src = s._grass;
-			int n = src.Count / 6;
-			_grassVerts = n * 6;
-			if (n == 0) return;
-			var v = new float[_grassVerts * 8];
-			int o = 0;
-			// two triangles per blade; corner.x fans the width, corner.y the height
-			Span<(float cx, float cy)> corners = stackalloc (float, float)[6]
-				{ (-1, 0), (1, 0), (1, 1), (-1, 0), (1, 1), (-1, 1) };
-			static float Hash(float a, float b) {
-				double nH = Math.Sin(a * 127.1 + b * 311.7) * 43758.5453;
-				return (float)(nH - Math.Floor(nH));
-			}
-			for (int i = 0; i < n; i++) {
-				int k = i * 6;
-				float bx = src[k], by = src[k + 1], bz = src[k + 2];
-				float h = src[k + 3], ph = src[k + 4], sh = src[k + 5];
-				// de-grid: jitter the foot position and re-hash the sway phase from the position, so
-				// even grid-planted callers (hand-placed rows) read organic
-				bx += (Hash(bx * 3.1f, bz * 5.7f) - 0.5f) * 0.44f;
-				bz += (Hash(bz * 7.3f, bx * 2.3f) - 0.5f) * 0.44f;
-				ph += Hash(bx, bz) * 6.2831853f;
-				for (int c = 0; c < 6; c++) {
-					v[o] = bx; v[o + 1] = by; v[o + 2] = bz;
-					v[o + 3] = corners[c].cx; v[o + 4] = corners[c].cy; v[o + 5] = h; v[o + 6] = ph;
-					v[o + 7] = sh;
-					o += 8;
-				}
-			}
-			Gl.BindBuffer(BufferTargetARB.ArrayBuffer, _grassVbo);
-			Gl.BufferData<float>(BufferTargetARB.ArrayBuffer, (ReadOnlySpan<float>)v, BufferUsageARB.StaticDraw);
-		}
-
-		private void DrawGrass(Lua3DScene s) {
-			if (_grassVerts == 0 || s._grassSprite < 0) return;
-			uint gt = SpriteFor(s, s._grassSprite); if (gt == 0) return;
-			Gl.UseProgram(_progGrass);
-			Gl.Uniform3(_gCam, (float)s._camX, (float)s._camY, (float)s._camZ);
-			Gl.Uniform3(_gR, (float)s._Rx, (float)s._Ry, (float)s._Rz);
-			Gl.Uniform3(_gU, (float)s._Ux, (float)s._Uy, (float)s._Uz);
-			Gl.Uniform3(_gF, (float)s._Fx, (float)s._Fy, (float)s._Fz);
-			Gl.Uniform1(_gSx, (float)(2.0 * s._scale / s._w)); Gl.Uniform1(_gSy, (float)(-2.0 * s._scale / s._h));
-			double n = s._near, A = (FAR + n) / (FAR - n), B = -2.0 * FAR * n / (FAR - n);
-			Gl.Uniform1(_gA, (float)A); Gl.Uniform1(_gB, (float)B);
-			Gl.Uniform1(_gTime, (float)s._shaderTime);
-			Gl.Uniform2(_gFade, (float)s._grassFadeStart, (float)s._grassFadeEnd);
-			Gl.Uniform3(_gSun, (float)s._sunR, (float)s._sunG, (float)s._sunB);
-			Gl.Uniform3(_gAmb, (float)s._ambR, (float)s._ambG, (float)s._ambB);
-			Gl.Uniform1(_gTex, 0);
-			Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, gt);
-			Gl.BindVertexArray(_vaoGrass);
-			Gl.Disable(EnableCap.Blend); Gl.DepthMask(true);
-			Gl.DrawArrays(PrimitiveType.Triangles, 0, (uint)_grassVerts);
-			// restore the world program's VAO for the passes that follow
-			Gl.UseProgram(_worldShadow ? _progShadow : _prog); Gl.BindVertexArray(_vao);
-		}
+		public string ShaderError => LastShaderError;
+		public string Name => "GPU rasterizer";
+		public string Mode => "raster";
+		public bool DrawsSkyShader => true;
 
 		private void EnsureFbo(Lua3DScene s) {
 			uint colorTex = s._canvas.Pointer;
@@ -770,496 +142,45 @@ void main(){ frag = uColor; }";
 			_fboW = s._w; _fboH = s._h; _fboColorTex = colorTex;
 		}
 
-		private unsafe bool EnsureShadowFbo() {
-			if (!_shadowOk) return false;
-			if (_shadowFbo != 0) return true;
-			try {
-				_shadowTex = Gl.GenTexture();
-				Gl.BindTexture(TextureTarget.Texture2D, _shadowTex);
-				Gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.DepthComponent24, SHADOW_SIZE, SHADOW_SIZE, 0, PixelFormat.DepthComponent, PixelType.UnsignedInt, (void*)0);
-				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Nearest);
-				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Nearest);
-				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
-				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
-				_shadowFbo = Gl.GenFramebuffer();
-				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _shadowFbo);
-				Gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, TextureTarget.Texture2D, _shadowTex, 0);
-				var st = Gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
-				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-				if (st != GLEnum.FramebufferComplete) { Trace.TraceError("Shadow FBO incomplete: " + st); _shadowOk = false; return false; }
-				return true;
-			} catch (Exception e) { Trace.TraceError("Shadow FBO failed: " + e); _shadowOk = false; return false; }
-		}
-
-		// orthographic light view-projection (column-major), looking along the sun, covering an area in front of
-		// the camera. Maps a world point so clip.xy∈[-1,1] over ±HALF and clip.z (=p.z after *0.5+0.5) over [0,1].
-		private void BuildLightVP(Lua3DScene s) {
-			const double DEPTH = 260.0; double HALF = s._shadowHalf;
-			// centre on the player (SetShadowFocus) when given — the faked-ortho iso camera sits far back, so
-			// camera+forward*38 lands behind the action and the map would miss the player entirely.
-			double fxC, fyC, fzC;
-			if (s._shadowFocusSet) { fxC = s._sfx; fyC = s._sfy; fzC = s._sfz; }
-			else { fxC = s._camX + s._Fx * 38; fyC = s._camY + s._Fy * 38; fzC = s._camZ + s._Fz * 38; }
-			_lightFx = fxC; _lightFz = fzC;   // remember the focus so the depth pass can skip far-away merge buckets
-			double lx = s._sunX, ly = s._sunY, lz = s._sunZ;
-			double ll = Math.Sqrt(lx * lx + ly * ly + lz * lz); if (ll < 1e-6) { lx = 0; ly = 1; lz = 0; } else { lx /= ll; ly /= ll; lz /= ll; }
-			double fX = -lx, fY = -ly, fZ = -lz;
-			double ex = fxC + lx * DEPTH * 0.5, ey = fyC + ly * DEPTH * 0.5, ez = fzC + lz * DEPTH * 0.5;
-			double upx = 0, upy = 1, upz = 0; if (Math.Abs(fY) > 0.95) { upx = 0; upy = 0; upz = 1; }
-			double rX = fY * upz - fZ * upy, rY = fZ * upx - fX * upz, rZ = fX * upy - fY * upx;
-			double rl = Math.Sqrt(rX * rX + rY * rY + rZ * rZ); rX /= rl; rY /= rl; rZ /= rl;
-			double uX = rY * fZ - rZ * fY, uY = rZ * fX - rX * fZ, uZ = rX * fY - rY * fX;
-			double sH = 1.0 / HALF, sD = 2.0 / DEPTH;
-			double er = ex * rX + ey * rY + ez * rZ, eu = ex * uX + ey * uY + ez * uZ, ef = ex * fX + ey * fY + ez * fZ;
-			// TEXEL-SNAP the light-space origin: the map is player-centred, so without snapping every
-			// step re-rasterizes the depth map on a sub-texel offset and all shadow edges shimmer/crawl
-			double texel = (2.0 * HALF) / SHADOW_SIZE;
-			er = Math.Floor(er / texel) * texel;
-			eu = Math.Floor(eu / texel) * texel;
-			var m = _lightVP;   // column-major (m[col*4+row])
-			m[0] = (float)(rX * sH); m[1] = (float)(uX * sH); m[2] = (float)(fX * sD); m[3] = 0;
-			m[4] = (float)(rY * sH); m[5] = (float)(uY * sH); m[6] = (float)(fY * sD); m[7] = 0;
-			m[8] = (float)(rZ * sH); m[9] = (float)(uZ * sH); m[10] = (float)(fZ * sD); m[11] = 0;
-			m[12] = (float)(-er * sH); m[13] = (float)(-eu * sH); m[14] = (float)(-ef * sD - 1.0); m[15] = 1;
-		}
-
-		private unsafe uint UploadTexture(int[] px, int w, int h, bool sprite, int filter = 0) {
-			byte[] b = new byte[w * h * 4];
-			for (int i = 0; i < w * h; i++) {
-				int p = px[i];
-				b[i * 4] = (byte)(p >> 16); b[i * 4 + 1] = (byte)(p >> 8); b[i * 4 + 2] = (byte)p;
-				b[i * 4 + 3] = sprite ? (byte)(p >> 24) : (p < 0 ? (byte)0 : (byte)255);
-			}
-			uint tex = Gl.GenTexture();
-			Gl.BindTexture(TextureTarget.Texture2D, tex);
-			fixed (byte* dp = b)
-				Gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Rgba8, (uint)w, (uint)h, 0, PixelFormat.Rgba, PixelType.UnsignedByte, dp);
-			Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.Repeat);
-			Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.Repeat);
-			// SetTextureFilter opt-in: 1 linear, 2 trilinear mipmap (photo textures); default stays nearest (pixel art)
-			if (filter == 2) {
-				Gl.GenerateMipmap(TextureTarget.Texture2D);
-				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.LinearMipmapLinear);
-				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
-			} else if (filter == 1) {
-				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
-				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
-			} else {
-				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Nearest);
-				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Nearest);
-			}
-			return tex;
-		}
-		private uint TexFor(Lua3DScene s, int id) {
-			if (_rttColor.TryGetValue(id, out var rttTex)) return rttTex;   // live GPU reflection/portal target (RenderToTexture)
-			s._texRev.TryGetValue(id, out int rev);
-			if (_glTex.TryGetValue(id, out var t)) {
-				if (!_glTexRev.TryGetValue(id, out int got) || got == rev) return t;   // current (or untracked) → reuse
-				Gl.DeleteTexture(t); _glTexId.Remove(t);   // pixels changed (e.g. a live mirror RTT) → re-upload
-			}
-			if (!s._texPix.TryGetValue(id, out var px)) return 0;
-			s._texFilter.TryGetValue(id, out int filt);
-			t = UploadTexture(px, s._texW[id], s._texH[id], false, filt); _glTex[id] = t; _glTexRev[id] = rev; _glTexId[t] = id; return t;
-		}
-		// a textured draw's normal map (SetTextureNormalMap) on unit 6, or none. Call it BEFORE binding the
-		// colour texture on unit 0: a first use uploads the map, which binds it on the active unit.
-		private void BindNormalFor(Lua3DScene s, uint gt) {
-			uint n = 0;
-			if (s._texNormal.Count > 0 && _glTexId.TryGetValue(gt, out int id) && s._texNormal.TryGetValue(id, out int nid)) {
-				n = TexFor(s, nid);
-				if (n != 0) { Gl.ActiveTexture(TextureUnit.Texture6); Gl.BindTexture(TextureTarget.Texture2D, n); }
-			}
-			Gl.Uniform1(_uNormOn, n != 0 ? 1 : 0);
-		}
-		private uint SpriteFor(Lua3DScene s, int id) {
-			if (_glSprite.TryGetValue(id, out var t)) return t;
-			if (!s._spritePix.TryGetValue(id, out var px)) return 0;
-			// per-sprite filter opt-in (SetSpriteFilter): particles/foam/grass want LINEAR soft edges,
-			// while the pixel-art character billboards stay crisp NEAREST (the diorama look)
-			s._spriteFilter.TryGetValue(id, out int filt);
-			t = UploadTexture(px, s._spriteW[id], s._spriteH[id], true, filt); _glSprite[id] = t; return t;
-		}
-
-		private float[] ModelMatrix(double[] t) {
-			if (t == null) return _ident;
-			var m = _mtx;
-			m[0] = (float)t[0]; m[1] = (float)t[4]; m[2] = (float)t[8]; m[3] = 0;
-			m[4] = (float)t[1]; m[5] = (float)t[5]; m[6] = (float)t[9]; m[7] = 0;
-			m[8] = (float)t[2]; m[9] = (float)t[6]; m[10] = (float)t[10]; m[11] = 0;
-			m[12] = (float)t[3]; m[13] = (float)t[7]; m[14] = (float)t[11]; m[15] = 1;
-			return m;
-		}
-
-		private void Vtx(List<float> d, double x, double y, double z, double u, double v, double sh, double nx, double ny, double nz) {
-			d.Add((float)x); d.Add((float)y); d.Add((float)z); d.Add((float)u); d.Add((float)v); d.Add((float)sh);
-			d.Add((float)nx); d.Add((float)ny); d.Add((float)nz);
-		}
-		// per-primitive normal: the object's own normal if set, else the triangle's geometric normal
-		private static void Nrm(SceneObject o, double ax, double ay, double az, double bx, double by, double bz, double cx, double cy, double cz, out double nx, out double ny, out double nz) {
-			if (o.HasNormal) { nx = o.Nx; ny = o.Ny; nz = o.Nz; return; }
-			double e1x = bx - ax, e1y = by - ay, e1z = bz - az, e2x = cx - ax, e2y = cy - ay, e2z = cz - az;
-			nx = e1y * e2z - e1z * e2y; ny = e1z * e2x - e1x * e2z; nz = e1x * e2y - e1y * e2x;
-			double l = Math.Sqrt(nx * nx + ny * ny + nz * nz); if (l > 1e-9) { nx /= l; ny /= l; nz /= l; }
-		}
-
-		// emit one object's primitives (model-space) into `dst`, grouping by texture via `use`
-		private void Emit(Lua3DScene s, SceneObject o, List<float> dst, Action<int, uint> use) {
-			var d = o.D;
-			if (o.Kind == 0) {
-				for (int i = 0; i < o.N; i++) {
-					int k = i * 16; uint gt = TexFor(s, (int)d[k + 12]); if (gt == 0) continue;
-					double uM = d[k + 13], vM = d[k + 14], sh = d[k + 15]; use(1, gt);
-					Nrm(o, d[k], d[k + 1], d[k + 2], d[k + 3], d[k + 4], d[k + 5], d[k + 9], d[k + 10], d[k + 11], out double nx, out double ny, out double nz);
-					Vtx(dst, d[k], d[k + 1], d[k + 2], 0, vM, sh, nx, ny, nz); Vtx(dst, d[k + 3], d[k + 4], d[k + 5], uM, vM, sh, nx, ny, nz); Vtx(dst, d[k + 6], d[k + 7], d[k + 8], uM, 0, sh, nx, ny, nz);
-					Vtx(dst, d[k], d[k + 1], d[k + 2], 0, vM, sh, nx, ny, nz); Vtx(dst, d[k + 6], d[k + 7], d[k + 8], uM, 0, sh, nx, ny, nz); Vtx(dst, d[k + 9], d[k + 10], d[k + 11], 0, 0, sh, nx, ny, nz);
-				}
-			} else if (o.Kind == 1) {
-				use(0, 0);
-				for (int i = 0; i < o.N; i++) {
-					int k = i * 12;
-					Nrm(o, d[k], d[k + 1], d[k + 2], d[k + 3], d[k + 4], d[k + 5], d[k + 9], d[k + 10], d[k + 11], out double nx, out double ny, out double nz);
-					Vtx(dst, d[k], d[k + 1], d[k + 2], 0, 0, 1, nx, ny, nz); Vtx(dst, d[k + 3], d[k + 4], d[k + 5], 0, 0, 1, nx, ny, nz); Vtx(dst, d[k + 6], d[k + 7], d[k + 8], 0, 0, 1, nx, ny, nz);
-					Vtx(dst, d[k], d[k + 1], d[k + 2], 0, 0, 1, nx, ny, nz); Vtx(dst, d[k + 6], d[k + 7], d[k + 8], 0, 0, 1, nx, ny, nz); Vtx(dst, d[k + 9], d[k + 10], d[k + 11], 0, 0, 1, nx, ny, nz);
-				}
-			} else if (o.Kind == 2) {
-				for (int i = 0; i < o.N; i++) {
-					int k = i * 17; uint gt = TexFor(s, (int)d[k + 15]); if (gt == 0) continue;
-					double sh = d[k + 16]; use(1, gt);
-					Nrm(o, d[k], d[k + 1], d[k + 2], d[k + 5], d[k + 6], d[k + 7], d[k + 10], d[k + 11], d[k + 12], out double nx, out double ny, out double nz);
-					Vtx(dst, d[k], d[k + 1], d[k + 2], d[k + 3], d[k + 4], sh, nx, ny, nz);
-					Vtx(dst, d[k + 5], d[k + 6], d[k + 7], d[k + 8], d[k + 9], sh, nx, ny, nz);
-					Vtx(dst, d[k + 10], d[k + 11], d[k + 12], d[k + 13], d[k + 14], sh, nx, ny, nz);
-				}
-			}
-		}
-
-		private ObjCache EnsureObj(Lua3DScene s, SceneObject o) {
-			if (!_cache.TryGetValue(o, out var c)) { c = new ObjCache { Vbo = Gl.GenBuffer() }; _cache[o] = c; }
-			if (c.Version == o.GeomVersion) return c;
-			c.Version = o.GeomVersion; c.Batches.Clear(); _tmp.Clear();
-			int curMode = -1, start = 0; uint curTex = uint.MaxValue;
-			void Flush() { int cnt = _tmp.Count / STRIDE - start; if (cnt > 0) c.Batches.Add(new OBatch { Mode = curMode, Tex = curTex, Start = start, Count = cnt }); start = _tmp.Count / STRIDE; }
-			void Use(int mode, uint tex) { if (mode != curMode || tex != curTex) { Flush(); curMode = mode; curTex = tex; } }
-			Emit(s, o, _tmp, Use); Flush();
-			Gl.BindBuffer(BufferTargetARB.ArrayBuffer, c.Vbo);
-			Gl.BufferData<float>(BufferTargetARB.ArrayBuffer, (ReadOnlySpan<float>)CollectionsMarshal.AsSpan(_tmp), BufferUsageARB.StaticDraw);
-			return c;
-		}
-
-		// ── merged static opaque geometry ────────────────────────────────────────────────────────
-		private static bool StaticMerged(SceneObject o) {
-			return (o.Kind == 0 || o.Kind == 2) && o.N > 0 && o.Visible && o.Pass == 0 && o.Transform == null && o.Lit
-				&& !o.Overlay && !o.ScreenTex && o.A == 255 && o.TintR == 1.0 && o.TintG == 1.0 && o.TintB == 1.0
-				&& o.EmR == 0.0 && o.EmG == 0.0 && o.EmB == 0.0    // emissive objects draw solo (per-object uEmissive)
-				&& o.FlatR < 0                                     // flat-albedo-override objects draw solo (per-object uFlatCol)
-				&& o.SplatSprite < 0;                              // splat terrain draws solo (its own shader mode)
-		}
-		private long ComputeStaticSig(Lua3DScene s) {
-			long sig = 0;
-			foreach (var kv in s._objects) if (StaticMerged(kv.Value)) sig += (long)kv.Key * 1000003L + kv.Value.GeomVersion + 1;
-			return sig;
-		}
-		private static List<float> SubList(Dictionary<uint, List<float>> map, uint gt) { if (!map.TryGetValue(gt, out var l)) { l = new List<float>(256); map[gt] = l; } return l; }
-		// Re-emit objects whose geometry changed, then SYNCHRONOUSLY rebuild only the affected
-		// (bucket × texture) buffers. Each is small (one bucket's worth), so there's no whole-world upload
-		// spike and the geometry is always current (no stale-frame x-ray). Called only when geometry changes.
-		private void RebuildMerged(Lua3DScene s) {
-			_dirtyKeys.Clear();
-			foreach (var o in s._objects.Values) {
-				if (!StaticMerged(o)) continue;
-				if (!_mergeCache.TryGetValue(o, out var em)) { em = new MergeEmit(); _mergeCache[o] = em; }
-				int bx = (int)Math.Floor(o.CenX / BS), bz = (int)Math.Floor(o.CenZ / BS);
-				if (em.Version != o.GeomVersion || em.Bx != bx || em.Bz != bz) {
-					foreach (var kv in em.ByTex) { if (kv.Value.Count > 0) _dirtyKeys.Add((em.Bx, em.Bz, kv.Key)); kv.Value.Clear(); }
-					em.Version = o.GeomVersion; em.Bx = bx; em.Bz = bz;
-					EmitObjectByTex(s, o, em.ByTex);
-					foreach (var key in em.ByTex.Keys) _dirtyKeys.Add((bx, bz, key));
-				}
-			}
-			_live.Clear(); foreach (var v in s._objects.Values) _live.Add(v);
-			List<SceneObject> gone = null;
-			foreach (var kv in _mergeCache)
-				if (!_live.Contains(kv.Key) || !StaticMerged(kv.Key)) { (gone ??= new()).Add(kv.Key); foreach (var t in kv.Value.ByTex) if (t.Value.Count > 0) _dirtyKeys.Add((kv.Value.Bx, kv.Value.Bz, t.Key)); }
-			if (gone != null) foreach (var o in gone) _mergeCache.Remove(o);
-			foreach (var key in _dirtyKeys) {
-				_scratch.Clear();
-				foreach (var kv in _mergeCache) { var em = kv.Value; if (em.Bx != key.bx || em.Bz != key.bz) continue; if (em.ByTex.TryGetValue(key.gt, out var tl) && tl.Count > 0) _scratch.AddRange(tl); }
-				if (!_merge.TryGetValue(key, out var mb)) mb = new MergeBuf { Vbo = Gl.GenBuffer() };
-				mb.Count = _scratch.Count / STRIDE;
-				Gl.BindBuffer(BufferTargetARB.ArrayBuffer, mb.Vbo);
-				Gl.BufferData<float>(BufferTargetARB.ArrayBuffer, (ReadOnlySpan<float>)CollectionsMarshal.AsSpan(_scratch), BufferUsageARB.DynamicDraw);
-				_merge[key] = mb;
-			}
-		}
-		// emit one object's textured primitives into per-texture lists (its own cache)
-		private void EmitObjectByTex(Lua3DScene s, SceneObject o, Dictionary<uint, List<float>> byTex) {
-			var d = o.D;
-			if (o.Kind == 0) {
-				for (int i = 0; i < o.N; i++) {
-					int k = i * 16; uint gt = TexFor(s, (int)d[k + 12]); if (gt == 0) continue;
-					double uM = d[k + 13], vM = d[k + 14], sh = d[k + 15]; var L = SubList(byTex, gt);
-					Nrm(o, d[k], d[k + 1], d[k + 2], d[k + 3], d[k + 4], d[k + 5], d[k + 9], d[k + 10], d[k + 11], out double nx, out double ny, out double nz);
-					Vtx(L, d[k], d[k + 1], d[k + 2], 0, vM, sh, nx, ny, nz); Vtx(L, d[k + 3], d[k + 4], d[k + 5], uM, vM, sh, nx, ny, nz); Vtx(L, d[k + 6], d[k + 7], d[k + 8], uM, 0, sh, nx, ny, nz);
-					Vtx(L, d[k], d[k + 1], d[k + 2], 0, vM, sh, nx, ny, nz); Vtx(L, d[k + 6], d[k + 7], d[k + 8], uM, 0, sh, nx, ny, nz); Vtx(L, d[k + 9], d[k + 10], d[k + 11], 0, 0, sh, nx, ny, nz);
-				}
-			} else {
-				for (int i = 0; i < o.N; i++) {
-					int k = i * 17; uint gt = TexFor(s, (int)d[k + 15]); if (gt == 0) continue;
-					double sh = d[k + 16]; var L = SubList(byTex, gt);
-					Nrm(o, d[k], d[k + 1], d[k + 2], d[k + 5], d[k + 6], d[k + 7], d[k + 10], d[k + 11], d[k + 12], out double nx, out double ny, out double nz);
-					Vtx(L, d[k], d[k + 1], d[k + 2], d[k + 3], d[k + 4], sh, nx, ny, nz);
-					Vtx(L, d[k + 5], d[k + 6], d[k + 7], d[k + 8], d[k + 9], sh, nx, ny, nz);
-					Vtx(L, d[k + 10], d[k + 11], d[k + 12], d[k + 13], d[k + 14], sh, nx, ny, nz);
-				}
-			}
-		}
-
-		private static void XfPt(double[] t, double px, double py, double pz, out double x, out double y, out double z) {
-			if (t == null) { x = px; y = py; z = pz; return; }
-			x = t[0] * px + t[1] * py + t[2] * pz + t[3];
-			y = t[4] * px + t[5] * py + t[6] * pz + t[7];
-			z = t[8] * px + t[9] * py + t[10] * pz + t[11];
-		}
-		private void BuildSprites(Lua3DScene s) {
-			_sprVerts.Clear(); _sprBatches.Clear();
-			foreach (var o in s._objects.Values) {
-				if ((o.Kind != 3 && o.Kind != 4) || o.N <= 0 || !o.Visible) continue;
-				var d = o.D; var t = o.Transform;
-				int curCut = -1; uint curTex = uint.MaxValue; int start = _sprVerts.Count / STRIDE;
-				void Flush() { int cnt = _sprVerts.Count / STRIDE - start; if (cnt > 0) _sprBatches.Add(new SprBatch { Obj = o, Cutout = curCut, Tex = curTex, Start = start, Count = cnt, Pass = o.Pass }); start = _sprVerts.Count / STRIDE; }
-				void Use(uint tex, int cut) { if (tex != curTex || cut != curCut) { Flush(); curTex = tex; curCut = cut; } }
-				if (o.Kind == 4) {
-					// sprite drawn on an EXPLICIT world quad (4 corners) — e.g. a shadow draped over the terrain
-					for (int i = 0; i < o.N; i++) {
-						int k = i * 14; uint gt = SpriteFor(s, (int)d[k + 12]); if (gt == 0) continue;
-						int cut = d[k + 13] != 0 ? 1 : 0; Use(gt, cut);
-						XfPt(t, d[k], d[k + 1], d[k + 2], out double q0x, out double q0y, out double q0z);
-						XfPt(t, d[k + 3], d[k + 4], d[k + 5], out double q1x, out double q1y, out double q1z);
-						XfPt(t, d[k + 6], d[k + 7], d[k + 8], out double q2x, out double q2y, out double q2z);
-						XfPt(t, d[k + 9], d[k + 10], d[k + 11], out double q3x, out double q3y, out double q3z);
-						Vtx(_sprVerts, q0x, q0y, q0z, 0, 1, 1, 0, 0, 0); Vtx(_sprVerts, q1x, q1y, q1z, 1, 1, 1, 0, 0, 0); Vtx(_sprVerts, q2x, q2y, q2z, 1, 0, 1, 0, 0, 0);
-						Vtx(_sprVerts, q0x, q0y, q0z, 0, 1, 1, 0, 0, 0); Vtx(_sprVerts, q2x, q2y, q2z, 1, 0, 1, 0, 0, 0); Vtx(_sprVerts, q3x, q3y, q3z, 0, 0, 1, 0, 0, 0);
-					}
-					Flush(); continue;
-				}
-				for (int i = 0; i < o.N; i++) {
-					int k = i * 8; uint gt = SpriteFor(s, (int)d[k + 5]); if (gt == 0) continue;
-					double w = d[k + 3], hgt = d[k + 4]; int bb = (int)d[k + 6]; int cut = d[k + 7] != 0 ? 1 : 0;
-					double cx, cy, cz;
-					if (t == null) { cx = d[k]; cy = d[k + 1]; cz = d[k + 2]; }
-					else { cx = t[0] * d[k] + t[1] * d[k + 1] + t[2] * d[k + 2] + t[3]; cy = t[4] * d[k] + t[5] * d[k + 1] + t[6] * d[k + 2] + t[7]; cz = t[8] * d[k] + t[9] * d[k + 1] + t[10] * d[k + 2] + t[11]; }
-					double rx, ry, rz, ux, uy, uz;
-					if (bb == 2) { rx = s._Rx; ry = s._Ry; rz = s._Rz; ux = s._Ux; uy = s._Uy; uz = s._Uz; }
-					else if (bb == 1) { rx = s._Rx; ry = 0; rz = s._Rz; double rl = Math.Sqrt(rx * rx + rz * rz); if (rl > 1e-6) { rx /= rl; rz /= rl; } ux = 0; uy = 1; uz = 0; }
-					else if (bb == 3) { rx = s._GsLz; ry = 0; rz = -s._GsLx; ux = s._GsLx * s._GsLen; uy = 0; uz = s._GsLz * s._GsLen; }   // ground-flat cast shadow: lies on XZ, stretched along the light
-					else { rx = 1; ry = 0; rz = 0; ux = 0; uy = 1; uz = 0; }
-					double hw = w * 0.5;
-					double b0x = cx - rx * hw, b0y = cy - ry * hw, b0z = cz - rz * hw;
-					double b1x = cx + rx * hw, b1y = cy + ry * hw, b1z = cz + rz * hw;
-					double tx = ux * hgt, ty = uy * hgt, tz = uz * hgt;
-					Use(gt, cut);
-					Vtx(_sprVerts, b0x, b0y, b0z, 0, 1, 1, 0, 0, 0); Vtx(_sprVerts, b1x, b1y, b1z, 1, 1, 1, 0, 0, 0); Vtx(_sprVerts, b1x + tx, b1y + ty, b1z + tz, 1, 0, 1, 0, 0, 0);
-					Vtx(_sprVerts, b0x, b0y, b0z, 0, 1, 1, 0, 0, 0); Vtx(_sprVerts, b1x + tx, b1y + ty, b1z + tz, 1, 0, 1, 0, 0, 0); Vtx(_sprVerts, b0x + tx, b0y + ty, b0z + tz, 0, 0, 1, 0, 0, 0);
-				}
-				Flush();
-			}
-			if (_sprVerts.Count > 0) { Gl.BindBuffer(BufferTargetARB.ArrayBuffer, _spriteVbo); Gl.BufferData<float>(BufferTargetARB.ArrayBuffer, (ReadOnlySpan<float>)CollectionsMarshal.AsSpan(_sprVerts), BufferUsageARB.StreamDraw); }
-		}
-
-		// Build SUN-FACING silhouette quads for the upright billboard sprites (characters/NPCs/props), used only
-		// as shadow-map casters. A standing billboard is camera-facing in the main pass, which would present an
-		// edge-on or skewed outline to the sun (a thin/warped, orbit-dependent shadow). Here each sprite becomes a
-		// vertical quad whose width axis is perpendicular to the sun's azimuth, so the sun sees its full outline
-		// and the cast shadow keeps the character's shape and stretches away from the light. Grouped by texture
-		// for the alpha-test discard in the depth-sprite program.
-		private void BuildCasters(Lua3DScene s) {
-			_casterVerts.Clear(); _casterBatches.Clear();
-			double sdx = s._sunX, sdz = s._sunZ;
-			double shl = Math.Sqrt(sdx * sdx + sdz * sdz);
-			double rx, rz; if (shl > 1e-6) { rx = sdz / shl; rz = -sdx / shl; } else { rx = 1; rz = 0; }   // horizontal ⟂ to sun
-			foreach (var o in s._objects.Values) {
-				if (o.Kind != 3 || o.N <= 0 || !o.Visible || !o.CastShadow) continue;   // only billboard sprites (Kind 3); Kind 4 = flat decals; CastShadow=false skips UI markers/bubbles
-				var d = o.D; var t = o.Transform;
-				uint curTex = uint.MaxValue; int start = _casterVerts.Count / STRIDE;
-				void Flush() { int cnt = _casterVerts.Count / STRIDE - start; if (cnt > 0) _casterBatches.Add(new CBatch { Tex = curTex, Start = start, Count = cnt }); start = _casterVerts.Count / STRIDE; }
-				for (int i = 0; i < o.N; i++) {
-					int k = i * 8; uint gt = SpriteFor(s, (int)d[k + 5]); if (gt == 0) continue;
-					int bb = (int)d[k + 6]; if (bb != 1 && bb != 2) continue;   // only UPRIGHT billboards cast (skip ground-flat bb=3)
-					double w = d[k + 3], hgt = d[k + 4];
-					double cx, cy, cz;
-					if (t == null) { cx = d[k]; cy = d[k + 1]; cz = d[k + 2]; }
-					else { cx = t[0] * d[k] + t[1] * d[k + 1] + t[2] * d[k + 2] + t[3]; cy = t[4] * d[k] + t[5] * d[k + 1] + t[6] * d[k + 2] + t[7]; cz = t[8] * d[k] + t[9] * d[k + 1] + t[10] * d[k + 2] + t[11]; }
-					if (gt != curTex) { Flush(); curTex = gt; }
-					double hw = w * 0.5;
-					double b0x = cx - rx * hw, b0z = cz - rz * hw, b1x = cx + rx * hw, b1z = cz + rz * hw;
-					Vtx(_casterVerts, b0x, cy, b0z, 0, 1, 1, 0, 0, 0); Vtx(_casterVerts, b1x, cy, b1z, 1, 1, 1, 0, 0, 0); Vtx(_casterVerts, b1x, cy + hgt, b1z, 1, 0, 1, 0, 0, 0);
-					Vtx(_casterVerts, b0x, cy, b0z, 0, 1, 1, 0, 0, 0); Vtx(_casterVerts, b1x, cy + hgt, b1z, 1, 0, 1, 0, 0, 0); Vtx(_casterVerts, b0x, cy + hgt, b0z, 0, 0, 1, 0, 0, 0);
-				}
-				Flush();
-			}
-			if (_casterVerts.Count > 0) {
-				if (_casterVbo == 0) _casterVbo = Gl.GenBuffer();
-				Gl.BindBuffer(BufferTargetARB.ArrayBuffer, _casterVbo);
-				Gl.BufferData<float>(BufferTargetARB.ArrayBuffer, (ReadOnlySpan<float>)CollectionsMarshal.AsSpan(_casterVerts), BufferUsageARB.StreamDraw);
-			}
-		}
-
-		// ── particles (camera-facing billboards; built per frame, drawn last in the transparent pass) ──
-		private List<float> PartList((int, int) key) { if (!_partBatches.TryGetValue(key, out var l)) { l = new List<float>(512); _partBatches[key] = l; } return l; }
-		private static void PV(List<float> d, double x, double y, double z, double u, double v, double r, double g, double b, double a) {
-			d.Add((float)x); d.Add((float)y); d.Add((float)z); d.Add((float)u); d.Add((float)v); d.Add((float)r); d.Add((float)g); d.Add((float)b); d.Add((float)a);
-		}
-		private void BuildParticles(Lua3DScene s) {
-			foreach (var l in _partBatches.Values) l.Clear();
-			var systems = s._particleSystems; if (systems == null) return;
-			double Rx = s._Rx, Ry = s._Ry, Rz = s._Rz, Ux = s._Ux, Uy = s._Uy, Uz = s._Uz;
-			for (int si = 0; si < systems.Count; si++) {
-				var ps = systems[si]; var arr = ps.P; int cnt = ps.Count;
-				for (int i = 0; i < cnt; i++) {
-					ref var p = ref arr[i];
-					double lf = p.MaxLife > 0 ? p.Life / p.MaxLife : 0; if (lf < 0) lf = 0; else if (lf > 1) lf = 1;
-					double t = 1.0 - lf;   // 0 birth → 1 death
-					// opacity over life: 0 linear (old), 1 smooth in/out, 2 flash (bright pop, long tail)
-					double fade = p.FadeCurve switch {
-						1 => Math.Min(t * 6.0, 1.0) * (lf * lf * (3 - 2 * lf)),
-						2 => Math.Pow(t + 1e-6, 0.35) * lf,
-						_ => lf,
-					};
-					double a = p.A0 * fade; if (a <= 0) continue; if (a > 1) a = 1;
-					// size over life: 0 linear (old), 1 ease-out toward Size1, 2 pop (grow then die)
-					double st = p.SizeCurve switch {
-						1 => 1.0 - lf * lf,                       // fast toward Size1, settles
-						2 => Math.Sin(Math.PI * Math.Pow(t, 0.75)),
-						_ => t,
-					};
-					double hw = (p.SizeCurve == 2
-						? Math.Max(p.Size0, p.Size1) * st + Math.Min(p.Size0, p.Size1) * (1 - st)
-						: p.Size0 + (p.Size1 - p.Size0) * st) * 0.5;
-					if (hw <= 0) continue;
-					double cx = p.X, cy = p.Y, cz = p.Z;
-					// per-particle spin: rotate the billboard axes in the camera plane
-					double axRx = Rx, axRy = Ry, axRz = Rz, axUx = Ux, axUy = Uy, axUz = Uz;
-					if (p.RotVel != 0 || p.Rot != 0) {
-						double ang = p.Rot + p.RotVel * (p.MaxLife - p.Life);
-						double ca = Math.Cos(ang), sa = Math.Sin(ang);
-						axRx = Rx * ca + Ux * sa; axRy = Ry * ca + Uy * sa; axRz = Rz * ca + Uz * sa;
-						axUx = Ux * ca - Rx * sa; axUy = Uy * ca - Ry * sa; axUz = Uz * ca - Rz * sa;
-					}
-					double rX = axRx * hw, rY = axRy * hw, rZ = axRz * hw, uX = axUx * hw, uY = axUy * hw, uZ = axUz * hw;
-					double cr = p.R / 255.0, cg = p.G / 255.0, cb = p.B / 255.0;
-					var L = PartList((p.Additive ? 1 : 0, p.Sprite));
-					PV(L, cx - rX - uX, cy - rY - uY, cz - rZ - uZ, 0, 1, cr, cg, cb, a);
-					PV(L, cx + rX - uX, cy + rY - uY, cz + rZ - uZ, 1, 1, cr, cg, cb, a);
-					PV(L, cx + rX + uX, cy + rY + uY, cz + rZ + uZ, 1, 0, cr, cg, cb, a);
-					PV(L, cx - rX - uX, cy - rY - uY, cz - rZ - uZ, 0, 1, cr, cg, cb, a);
-					PV(L, cx + rX + uX, cy + rY + uY, cz + rZ + uZ, 1, 0, cr, cg, cb, a);
-					PV(L, cx - rX + uX, cy - rY + uY, cz - rZ + uZ, 0, 0, cr, cg, cb, a);
-				}
-			}
-		}
-		private void DrawParticles(Lua3DScene s) {
-			bool any = false; foreach (var l in _partBatches.Values) if (l.Count > 0) { any = true; break; }
-			if (!any) return;
-			Gl.UseProgram(_progP);
-			Gl.Uniform3(_pCam, (float)s._camX, (float)s._camY, (float)s._camZ);
-			Gl.Uniform3(_pR, (float)s._Rx, (float)s._Ry, (float)s._Rz);
-			Gl.Uniform3(_pU, (float)s._Ux, (float)s._Uy, (float)s._Uz);
-			Gl.Uniform3(_pF, (float)s._Fx, (float)s._Fy, (float)s._Fz);
-			Gl.Uniform1(_pSx, (float)(2.0 * s._scale / s._w)); Gl.Uniform1(_pSy, (float)(-2.0 * s._scale / s._h));
-			double n = s._near, A = (FAR + n) / (FAR - n), B = -2.0 * FAR * n / (FAR - n);
-			Gl.Uniform1(_pA, (float)A); Gl.Uniform1(_pB, (float)B); Gl.Uniform1(_pTex, 0);
-			Gl.BindVertexArray(_vaoP);
-			Gl.Enable(EnableCap.Blend); Gl.DepthMask(false);
-			foreach (var kv in _partBatches) {
-				var L = kv.Value; if (L.Count == 0) continue;
-				var (add, tex) = kv.Key;
-				if (add == 1) Gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.One);
-				else Gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-				Gl.Uniform1(_pTextured, tex >= 0 ? 1 : 0);
-				if (tex >= 0) { uint gt = SpriteFor(s, tex); Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, gt); }
-				Gl.BindBuffer(BufferTargetARB.ArrayBuffer, _partVbo);
-				Gl.BufferData<float>(BufferTargetARB.ArrayBuffer, (ReadOnlySpan<float>)CollectionsMarshal.AsSpan(L), BufferUsageARB.StreamDraw);
-				Gl.DrawArrays(PrimitiveType.Triangles, 0, (uint)(L.Count / 9));
-			}
-		}
-
 		private bool _logged;
 		public unsafe void Render(Lua3DScene s) {
 			if (!_logged) { _logged = true; Trace.TraceInformation("GpuRasterizer ACTIVE (hardware pipeline, merged + lit)"); }
 			EnsureGL();
+			End2D();   // 2D drawn after an earlier Render goes back to its target first
 			_frame++;
-			Span<int> vp = stackalloc int[4];
-			Gl.GetInteger(GLEnum.Viewport, vp);
-			uint prevFbo = (uint)Gl.GetInteger(GLEnum.FramebufferBinding);
+			var pass = GlPass.Begin(Gl);
+			try { DrawFrame(s); }
+			finally { pass.End(Gl); }
+			s._gpuOwnsCanvas = true;
 
+			if (_frame >= _pruneAt) { _pruneAt = _frame + 120; Prune(s); }
+		}
+
+		// every pass of one frame into the canvas; the caller restores its GL state around it
+		private void DrawFrame(Lua3DScene s) {
 			s._canvas.Upload();
 			EnsureFbo(s);
-			BuildSprites(s);
-			BuildParticles(s);
-			long sig = ComputeStaticSig(s);
-			if (sig != _staticSig) { RebuildMerged(s); _staticSig = sig; }   // synchronous, per-bucket → no spike
+			PreparePass(s);
 
-			GatherObjects(s);
-
-			// ── SUN SHADOW MAP: depth from the light's POV. Casters = merged terrain (opaque) + the character
-			// sprites (alpha-tested silhouette). Skipped unless the scene opted in + is lit + has a sun.
+			// ── SUN SHADOW MAP: depth from the light's POV. Casters = merged terrain, splat terrain, the other lit
+			// opaque objects (models, props) + the character sprites (alpha-tested silhouette). Skipped unless the
+			// scene opted in + is lit + has a sun, and redrawn only when what it shows changed.
 			bool shadows = s._shadows && s._useLights && (s._sunR + s._sunG + s._sunB) > 0.0 && !s._rttPass && EnsureShadowFbo();
 			if (shadows) {
 				BuildLightVP(s);
-				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _shadowFbo);
-				Gl.Viewport(0, 0, SHADOW_SIZE, SHADOW_SIZE);
-				Gl.Clear((uint)ClearBufferMask.DepthBufferBit);
-				Gl.Enable(EnableCap.DepthTest); Gl.DepthFunc(DepthFunction.Lequal); Gl.DepthMask(true);
-				Gl.Disable(EnableCap.CullFace); Gl.Disable(EnableCap.Blend);
-				Gl.UseProgram(_progDepth); Gl.BindVertexArray(_vao);
-				Gl.UniformMatrix4(_uDLightVP, 1, false, (ReadOnlySpan<float>)_lightVP);
-				Gl.UniformMatrix4(_uDModel, 1, false, (ReadOnlySpan<float>)_ident);
-				// only the geometry NEAR the player matters for the shadow box → skip merge buckets outside it.
-				// This is the key perf fix for big worlds (the 400x400 volcano was drawn whole into the map each
-				// frame). Buckets are 32u; keep any within HALF + a bucket of the focus (a point beyond samples
-				// "outside the map" and reads as lit anyway, so culling is visually consistent).
-				double cullR = s._shadowHalf + BS, cullR2 = cullR * cullR;
-				foreach (var kv in _merge) {
-					if (kv.Value.Count == 0) continue;
-					double bcx = (kv.Key.bx + 0.5) * BS - _lightFx, bcz = (kv.Key.bz + 0.5) * BS - _lightFz;
-					if (bcx * bcx + bcz * bcz > cullR2) continue;
-					Bind3D(kv.Value.Vbo); Gl.DrawArrays(PrimitiveType.Triangles, 0, (uint)kv.Value.Count);
-				}
-				// splat-shaded terrain draws solo (not merged) but must still CAST — hills shadow valleys
-				foreach (var o in s._objects.Values) {
-					if (o.SplatSprite < 0 || !o.Visible || o.N <= 0) continue;
-					var tc = EnsureObj(s, o);
-					if (tc.Batches.Count == 0) continue;
-					Bind3D(tc.Vbo);
-					int tot = 0; foreach (var bt in tc.Batches) tot += bt.Count;
-					Gl.DrawArrays(PrimitiveType.Triangles, 0, (uint)tot);
-				}
-				BuildCasters(s);   // sun-facing silhouette quads for the characters (camera-facing sprites cast wrong)
-				if (_casterVerts.Count > 0) {
-					Gl.UseProgram(_progDepthSpr); Gl.BindVertexArray(_vao); Bind3D(_casterVbo);
-					Gl.UniformMatrix4(_uDSLightVP, 1, false, (ReadOnlySpan<float>)_lightVP);
-					Gl.Uniform1(_uDSTex, 0); Gl.ActiveTexture(TextureUnit.Texture0);
-					foreach (var bt in _casterBatches) { Gl.BindTexture(TextureTarget.Texture2D, bt.Tex); Gl.DrawArrays(PrimitiveType.Triangles, bt.Start, (uint)bt.Count); }
-				}
+				GatherCasters(s);
+				UpdateShadowMap(s);
 			}
 
-			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fbo);
-			Gl.Viewport(0, 0, (uint)s._w, (uint)s._h);
-			// procedural SKY pass: paints the whole canvas before the 3D (replaces the 2D gradient fill)
+			GlPass.Target(Gl, _fbo, s._w, s._h);
+			// procedural SKY pass (replaces the 2D gradient fill): DrawWorld draws it behind the opaque world, and the frame
+			// under it starts opaque black
 			EnsureSky(s);
-			if (_skyOk) {
-				Gl.Disable(EnableCap.DepthTest); Gl.DepthMask(false); Gl.Disable(EnableCap.Blend);
-				Gl.UseProgram(_progSky); Gl.BindVertexArray(_vaoPost);
-				Gl.Uniform2(_skRes, (float)s._w, (float)s._h);
-				Gl.Uniform1(_skTime, (float)s._shaderTime);
-				if (_skUser >= 0) Gl.Uniform4(_skUser, 8u, (ReadOnlySpan<float>)s._skyUser);
-				Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
-			}
-			// glClear honours the depth WRITE MASK — it must be re-enabled before the clear, or the
-			// depth buffer keeps last frame's values and the whole world z-fails invisible
-			Gl.DepthMask(true);
-			Gl.Clear((uint)ClearBufferMask.DepthBufferBit);
-			Gl.Enable(EnableCap.DepthTest); Gl.DepthFunc(DepthFunction.Lequal); Gl.DepthMask(true); Gl.Disable(EnableCap.CullFace);
+			_frameInTemp = FrameInTemp(s);
+			if (_frameInTemp) { EnsureFxaaTarget(s); GlPass.Target(Gl, _fxaaFbo, s._w, s._h); }
+			if (_skyOk) GlPass.ClearColorDepth(Gl, 0, 0, 0);
+			else GlPass.ClearDepth(Gl);
+			GlPass.DepthTested(Gl); Gl.DepthMask(true); Gl.Disable(EnableCap.CullFace);
 			BindWorldProgram(shadows); Gl.BindVertexArray(_vao);
 			SetFrameUniforms(s);
 			if (_worldShadow) {   // only the shadow variant reads these: the light matrix + the depth map on unit 1
@@ -1270,572 +191,102 @@ void main(){ frag = uColor; }";
 			}
 
 			int litScene = s._useLights ? 1 : 0;
-			DrawWorld(s, litScene);
+			DrawWorld(s, litScene, s._w, s._h, false);
 
 			// overlay pass: viewmodels over a freshly-cleared depth buffer → always on top of the world
 			if (_overlay.Count > 0) {
 				BindWorldProgram(false); Gl.BindVertexArray(_vao);   // viewmodels: no world shadows
-				Gl.Clear((uint)ClearBufferMask.DepthBufferBit);
-				Gl.Enable(EnableCap.DepthTest); Gl.DepthMask(true); Gl.Disable(EnableCap.Blend);
+				SetFrameUniforms(s);                                 // this program may still hold another pass's camera
+				GlPass.ClearDepth(Gl);
+				Gl.Enable(EnableCap.DepthTest); Gl.Enable(EnableCap.Blend); GlPass.BlendCover(Gl);
 				foreach (var o in _overlay) DrawObj(s, o, litScene);
 			}
-
-			// diorama post pass ('diorama' grade): tilt-shift + colour grade. Copy canvas->temp, then
-			// grade temp->canvas. No depth, cheap. Only diorama scenes opt in, so others pay nothing.
-			if (s._diorama && !s._rttPass) {
-				EnsureFxaaTarget(s);
-				Gl.Disable(EnableCap.DepthTest); Gl.DepthMask(false); Gl.Disable(EnableCap.Blend);
-				Gl.UseProgram(_progPost); Gl.BindVertexArray(_vaoPost);     // copy canvas -> temp
-				Gl.Uniform1(_postTex, 0); Gl.Uniform2(_postRes, (float)s._w, (float)s._h); Gl.Uniform1(_postMode, 0);
-				Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, s._canvas.Pointer);
-				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fxaaFbo);
-				Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
-				Gl.UseProgram(_progDiorama);                                    // grade temp -> canvas
-				Gl.Uniform1(_hTex, 0); Gl.Uniform2(_hRes, (float)s._w, (float)s._h);
-				Gl.Uniform1(_hTilt, (float)s._hdTilt); Gl.Uniform1(_hSat, (float)s._hdSat); Gl.Uniform1(_hVig, (float)s._hdVig);
-				Gl.Uniform1(_hBloom, (float)s._hdBloom);
-				Gl.Uniform1(_hExp, (float)s._gradeExp); Gl.Uniform3(_hGrade, (float)s._gradeR, (float)s._gradeG, (float)s._gradeB);
-				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fbo);
-				Gl.BindTexture(TextureTarget.Texture2D, _fxaaTex);
-				Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
-			}
-
-			// Lua-attached CUSTOM post pass (SetPostShader): copy canvas→temp, run the user shader temp→canvas.
-			// After the diorama grade (it sees the graded frame), before FXAA/outline.
-			EnsureUserPost(s);
-			if (_userPostOk && !s._rttPass) {
-				EnsureFxaaTarget(s);
-				Gl.Disable(EnableCap.DepthTest); Gl.DepthMask(false); Gl.Disable(EnableCap.Blend);
-				Gl.UseProgram(_progPost); Gl.BindVertexArray(_vaoPost);     // copy canvas -> temp
-				Gl.Uniform1(_postTex, 0); Gl.Uniform2(_postRes, (float)s._w, (float)s._h); Gl.Uniform1(_postMode, 0);
-				Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, s._canvas.Pointer);
-				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fxaaFbo);
-				Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
-				Gl.UseProgram(_progUser);                                    // user shader: temp -> canvas
-				Gl.Uniform1(_upTex, 0); Gl.Uniform2(_upRes, (float)s._w, (float)s._h);
-				Gl.Uniform1(_upTime, (float)s._shaderTime);
-				if (_upUser >= 0) Gl.Uniform4(_upUser, 4u, (ReadOnlySpan<float>)s._postUser);
-				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fbo);
-				Gl.BindTexture(TextureTarget.Texture2D, _fxaaTex);
-				Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
-			}
-
-			// FXAA-lite post pass (before the stage's 2D overlay so the crosshair stays sharp):
-			// copy canvas→temp, then edge-blend temp→canvas.
-			if (s._aa) {
-				EnsureFxaaTarget(s);
-				Gl.Disable(EnableCap.DepthTest); Gl.DepthMask(false); Gl.Disable(EnableCap.Blend);
-				Gl.UseProgram(_progPost); Gl.BindVertexArray(_vaoPost);
-				Gl.Uniform1(_postTex, 0); Gl.Uniform2(_postRes, (float)s._w, (float)s._h);
-				Gl.ActiveTexture(TextureUnit.Texture0);
-				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fxaaFbo);     // copy: canvas → temp
-				Gl.BindTexture(TextureTarget.Texture2D, s._canvas.Pointer); Gl.Uniform1(_postMode, 0);
-				Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
-				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fbo);          // fxaa: temp → canvas
-				Gl.BindTexture(TextureTarget.Texture2D, _fxaaTex); Gl.Uniform1(_postMode, 1);
-				Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
-			}
-
-			// toon OUTLINE post pass (3D characters): copy canvas→temp with alpha, ink temp→canvas
-			if (s._outlineTh > 0 && !s._rttPass) {
-				EnsureFxaaTarget(s);
-				Gl.Disable(EnableCap.DepthTest); Gl.DepthMask(false); Gl.Disable(EnableCap.Blend);
-				Gl.UseProgram(_progPost); Gl.BindVertexArray(_vaoPost);
-				Gl.Uniform1(_postTex, 0); Gl.Uniform2(_postRes, (float)s._w, (float)s._h); Gl.Uniform1(_postMode, 2);
-				Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, s._canvas.Pointer);
-				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fxaaFbo);
-				Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
-				Gl.UseProgram(_progOutline);
-				Gl.Uniform1(_oTex, 0); Gl.Uniform2(_oRes, (float)s._w, (float)s._h);
-				Gl.Uniform3(_oColor, (float)(s._outlineR / 255.0), (float)(s._outlineG / 255.0), (float)(s._outlineB / 255.0));
-				Gl.Uniform1(_oThick, (float)s._outlineTh);
-				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fbo);
-				Gl.BindTexture(TextureTarget.Texture2D, _fxaaTex);
-				Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
-			}
-
-			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, prevFbo);
-			Gl.Viewport(vp[0], vp[1], (uint)vp[2], (uint)vp[3]);
-			Gl.UseProgram(0); Gl.BindVertexArray(0); Gl.BindBuffer(BufferTargetARB.ArrayBuffer, 0);
-			Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, 0);
-			Gl.Disable(EnableCap.DepthTest); Gl.DepthMask(true); Gl.Disable(EnableCap.CullFace);
-			Gl.Enable(EnableCap.Blend); BlendHelper.SetBlend(BlendType.Normal);
-			s._gpuOwnsCanvas = true;
-
-			if (_frame >= _pruneAt) { _pruneAt = _frame + 120; Prune(s); }
+			InvalidateDepth();   // nothing reads this frame's depth again: a tiler need not store it
+			PostChain(s);
 		}
 
-		// Split the per-frame object scan + the world draw out of Render so the off-screen reflection
-		// pass (RenderToTexture) can reuse them with a different camera/target.
-		private void GatherObjects(Lua3DScene s) {
-			_opaque.Clear(); _trans.Clear(); _overlay.Clear(); _screenTex.Clear();
-			foreach (var o in s._objects.Values) {
-				if (o.Kind < 0 || o.Kind == 3 || o.Kind == 4 || o.N <= 0) continue;   // 3/4 = sprites, drawn in the sprite pass
-				if (o.ScreenTex) { if (o.Visible && !s._rttPass) _screenTex.Add(o); continue; }   // mirror/portal surfaces: own draw (never inside an RTT)
-				if (StaticMerged(o)) continue;
-				if (o.Overlay) { if (o.Visible) _overlay.Add(o); continue; }   // viewmodels: own pass
-				if (!Drawable(s, o)) continue;
-				if (o.Pass == 0) _opaque.Add(o); else _trans.Add(o);
-			}
-			_trans.Sort((a, b) => Dist(s, b).CompareTo(Dist(s, a)));
-		}
-
-		// Opaque (merged + per-object + screen-tex + sprites) then transparent (glass writes depth, then
-		// sprites/particles). Assumes the program/VAO are bound and SetFrameUniforms already ran.
-		private void DrawWorld(Lua3DScene s, int litScene) {
-			Gl.DepthMask(true); Gl.Disable(EnableCap.Blend);
-			// merged static opaque (one draw per texture)
-			Gl.Uniform1(_uMode, 1); Gl.Uniform1(_uCutout, 0); Gl.Uniform3(_uTint, 1f, 1f, 1f); Gl.Uniform1(_uAlpha, 1f);
-			Gl.Uniform1(_uLit, litScene); Gl.UniformMatrix4(_uModel, 1, false, (ReadOnlySpan<float>)_ident);
-			foreach (var kv in _merge) {
-				if (kv.Value.Count == 0) continue;
-				Bind3D(kv.Value.Vbo);
-				BindNormalFor(s, kv.Key.gt);
-				Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, kv.Key.gt);
-				Gl.DrawArrays(PrimitiveType.Triangles, 0, (uint)kv.Value.Count);
-			}
-			foreach (var o in _opaque) DrawObj(s, o, litScene);
-			EnsureGrass(s); DrawGrass(s);                        // wind-swayed blade field (cutout, depth-written)
-			foreach (var o in _screenTex) if (o.Pass == 0) DrawScreenTex(s, o);   // OPAQUE mirrors/portals (depth-written)
-			Gl.DepthMask(true); Gl.Disable(EnableCap.Blend);     // pass boundary: assert opaque state (never assume)
-			Bind3D(_spriteVbo);
-			foreach (var bt in _sprBatches) if (bt.Pass == 0) DrawSprite(bt);
-
-			// Transparent pass, back-to-front, no depth write. ORDER matters: soft sprites + particles are
-			// drawn BEFORE the alpha-blended glass objects, so a glass pane drawn afterward blends OVER the
-			// stuff behind it (death fog, bolts) — they read as dimmed THROUGH the glass instead of either
-			// popping in front of it (no ordering) or vanishing (if glass wrote depth). Glass panes are
-			// back-to-front sorted among themselves so a nearer pane layers over a farther one.
-			Gl.Enable(EnableCap.Blend); Gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-			Gl.DepthMask(false);
-			// TRANSLUCENT screen-tex surfaces (water): the reflection blends over the bottom/shore
-			// drawn beneath, so water reads as water, not as an opaque mirror slab. Drawn first in
-			// the pass so foam/sprites/particles layer on top of the surface.
-			foreach (var o in _screenTex) if (o.Pass == 1) DrawScreenTex(s, o);
-			Bind3D(_spriteVbo);
-			foreach (var bt in _sprBatches) if (bt.Pass == 1) DrawSprite(bt);
-			DrawParticles(s);   // additive/alpha billboards, depth-tested against opaque (switches to the particle program)
-			// glass last, over the particles/sprites behind it — rebind the active world program/VAO + blend
-			// state that DrawParticles left on the particle program (_u* are still this frame's variant).
-			Gl.UseProgram(_worldShadow ? _progShadow : _prog); Gl.BindVertexArray(_vao);
-			Gl.Enable(EnableCap.Blend); Gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha); Gl.DepthMask(false);
-			foreach (var o in _trans) DrawObj(s, o, litScene);
-
-			// X-RAY silhouettes: sprites flagged ObjSetXray re-draw ONLY where they lost the depth test
-			// (DepthFunc GREATER, no depth write) as a faint ghost — the player reads through walls/hills.
-			bool anyXray = false;
-			foreach (var bt in _sprBatches) if (bt.Obj.XrayAlpha > 0) { anyXray = true; break; }
-			if (anyXray && !s._rttPass) {
-				Gl.DepthFunc(DepthFunction.Greater);
-				Bind3D(_spriteVbo);
-				Gl.UniformMatrix4(_uModel, 1, false, (ReadOnlySpan<float>)_ident);
-				Gl.Uniform1(_uMode, 2); Gl.Uniform1(_uCutout, 0); Gl.Uniform1(_uLit, 0);
-				foreach (var bt in _sprBatches) {
-					var o = bt.Obj;
-					if (o.XrayAlpha <= 0) continue;
-					Gl.Uniform3(_uTint, (float)(o.TintR * 0.75), (float)(o.TintG * 0.85), (float)o.TintB);
-					Gl.Uniform1(_uAlpha, (float)(o.A / 255.0 * o.XrayAlpha));
-					Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, bt.Tex);
-					Gl.DrawArrays(PrimitiveType.Triangles, bt.Start, (uint)bt.Count);
-				}
-				Gl.DepthFunc(DepthFunction.Lequal);
-			}
-		}
-
-		// ── GPU off-screen reflection/portal render — replaces the CPU RenderView for mirrors/portals ──
-		// Renders the scene from the camera CURRENTLY set on `s` (Lua3DScene.RenderView positions it) into a
-		// dedicated rgba8 colour texture sized rw×rh, then registers that texture as texId's GL texture so the
-		// mirror/portal surface (uMode 3) samples it directly — no CPU rasterise, no pixel readback. ScreenTex
-		// objects are skipped (no mirrors-in-mirrors) because s._rttPass is true while this runs. This is the
-		// fix for the manor's 25fps: a 233-sector reflection re-render is now a GPU pass, not a CPU one.
-		private int _rttW, _rttH;
-		private readonly Dictionary<int, uint> _rttColor = new();   // texId → colour texture
-		private readonly Dictionary<int, uint> _rttFbos = new();    // texId → its OWN FBO (no attachment swapping)
-		private readonly Dictionary<int, uint> _rttDepth = new();   // texId → its OWN depth RB (no shared GL state across FBOs)
-		public unsafe void RenderToTexture(Lua3DScene s, int texId, int rw, int rh, int clr, int clg, int clb) {
-			EnsureGL();
-			if (rw < 1) rw = 1; if (rh < 1) rh = 1;
-			Span<int> vp = stackalloc int[4]; Gl.GetInteger(GLEnum.Viewport, vp);
-			uint prevFbo = (uint)Gl.GetInteger(GLEnum.FramebufferBinding);
-
-			if (_rttW != rw || _rttH != rh) {                       // size changed → drop all targets
-				foreach (var t in _rttColor.Values) Gl.DeleteTexture(t); _rttColor.Clear();
-				foreach (var f in _rttFbos.Values) Gl.DeleteFramebuffer(f); _rttFbos.Clear();
-				foreach (var d in _rttDepth.Values) Gl.DeleteRenderbuffer(d); _rttDepth.Clear();
-				_rttW = rw; _rttH = rh;
-			}
-			// Each mirror/portal texId owns its OWN FBO + colour texture + DEPTH renderbuffer, built once.
-			// Sharing a single FBO (attachment swapping) OR a single depth RB across FBOs corrupted the frame
-			// once 2+ reflections were live (ANGLE/D3D11 mis-validates shared targets rendered in sequence).
-			// Fully independent targets fix the multi-mirror/portal break.
-			if (!_rttFbos.TryGetValue(texId, out uint fbo)) {
-				uint color = Gl.GenTexture();
-				Gl.BindTexture(TextureTarget.Texture2D, color);
-				Gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Rgba8, (uint)rw, (uint)rh, 0, PixelFormat.Rgba, PixelType.UnsignedByte, null);
-				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Nearest);
-				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Nearest);
-				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
-				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
-				uint depth = Gl.GenRenderbuffer();
-				Gl.BindRenderbuffer(RenderbufferTarget.Renderbuffer, depth);
-				Gl.RenderbufferStorage(RenderbufferTarget.Renderbuffer, InternalFormat.DepthComponent24, (uint)rw, (uint)rh);
-				fbo = Gl.GenFramebuffer();
-				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, fbo);
-				Gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, color, 0);
-				Gl.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, depth);
-				if (Gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != GLEnum.FramebufferComplete)
-					Trace.TraceError($"GpuRasterizer RTT FBO incomplete for texId {texId}");
-				_rttColor[texId] = color; _rttFbos[texId] = fbo; _rttDepth[texId] = depth;
-			}
-
-			BuildSprites(s); BuildParticles(s);
-			long sig = ComputeStaticSig(s);
-			if (sig != _staticSig) { RebuildMerged(s); _staticSig = sig; }
+		// What a pass draws, gathered from its camera: the view, the sprites, the current merge, the objects, merge
+		// buckets and grass cells in view, the transparent queue with the particles placed in it, and the far plane that
+		// holds everything drawn.
+		private void PreparePass(Lua3DScene s) {
+			_scene = s;
+			_view = ViewFrustum.Of(s);
+			_reach = 0;
+			BuildSprites(s);
+			UpdateMerged(s);   // synchronous, per-bucket → no spike
 			GatherObjects(s);
+			BuildQueue(s);
+			BuildParticles(s);
+			GatherGrass(s);
+			// rounded up to a quarter octave, so the depth mapping (and any coplanar z-fight pattern) holds still while
+			// a particle or a walking sprite moves the farthest point a little
+			double far = Math.Max(_reach * 1.02 + 1.0, s._near + 1.0);
+			_far = Math.Min(FAR, Math.Pow(2, Math.Ceiling(Math.Log2(far) * 4) / 4));
+		}
+		private void Reach(double depth) { if (depth > _reach) _reach = depth; }
+		private void ReachPt(double x, double y, double z) => Reach(_view.Depth(x, y, z));
 
-			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, fbo);
-			Gl.Viewport(0, 0, (uint)rw, (uint)rh);
-			Gl.ClearColor(clr / 255f, clg / 255f, clb / 255f, 1f);
-			Gl.Clear((uint)(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit));
-			// the reflection needs the sky behind the geometry too (water mirrors mostly sky). The sky
-			// shader ray-marches from CAMERA-BASIS uniforms that sky.lua packed for the MAIN view —
-			// override the basis slots with the CURRENT (reflected/RTT) camera so the mirrored sky is
-			// oriented correctly instead of stale (the "black voids / wrong sky" mirror bug).
-			EnsureSky(s);
-			if (_skyOk) {
-				Gl.Disable(EnableCap.DepthTest); Gl.DepthMask(false); Gl.Disable(EnableCap.Blend);
-				Gl.UseProgram(_progSky); Gl.BindVertexArray(_vaoPost);
-				Gl.Uniform2(_skRes, (float)rw, (float)rh);
-				Gl.Uniform1(_skTime, (float)s._shaderTime);
-				if (_skUser >= 0) {
-					Span<float> su = stackalloc float[32];
-					for (int i = 0; i < 32; i++) su[i] = s._skyUser[i];
-					su[0] = (float)s._Fx; su[1] = (float)s._Fy; su[2] = (float)s._Fz;      // [0].xyz forward
-					su[4] = (float)s._Rx; su[5] = (float)s._Ry; su[6] = (float)s._Rz;      // [1].xyz right
-					su[8] = (float)s._Ux; su[9] = (float)s._Uy; su[10] = (float)s._Uz;     // [2].xyz up
-					Gl.Uniform4(_skUser, 8u, (ReadOnlySpan<float>)su);
-				}
-				Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
-				Gl.DepthMask(true);
-			}
-			Gl.Enable(EnableCap.DepthTest); Gl.DepthFunc(DepthFunction.Lequal); Gl.Disable(EnableCap.CullFace);
-			BindWorldProgram(false); Gl.BindVertexArray(_vao);   // mirror/portal RTT never casts/receives shadows
-			SetFrameUniforms(s);
-			DrawWorld(s, s._useLights ? 1 : 0);
-			// the colour texture lives in _rttColor; DrawScreenTex's TexFor returns it directly for texId,
-			// so the mirror/portal surface samples this live GPU target with no CPU pixel-upload path.
-
-			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, prevFbo);
-			Gl.Viewport(vp[0], vp[1], (uint)vp[2], (uint)vp[3]);
-			Gl.UseProgram(0); Gl.BindVertexArray(0);
-			Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, 0);
+		// the bound target's depth is not needed any more: the driver may drop it instead of storing it
+		private unsafe void InvalidateDepth() {
+			var att = InvalidateFramebufferAttachment.DepthAttachment;
+			Gl.InvalidateFramebuffer(FramebufferTarget.Framebuffer, 1, &att);
 		}
 
-		private void SetFrameUniforms(Lua3DScene s) {
-			Gl.Uniform3(_uCam, (float)s._camX, (float)s._camY, (float)s._camZ);
-			Gl.Uniform3(_uR, (float)s._Rx, (float)s._Ry, (float)s._Rz);
-			Gl.Uniform3(_uU, (float)s._Ux, (float)s._Uy, (float)s._Uz);
-			Gl.Uniform3(_uF, (float)s._Fx, (float)s._Fy, (float)s._Fz);
-			Gl.Uniform1(_uSx, (float)(2.0 * s._scale / s._w));
-			Gl.Uniform1(_uSy, (float)(-2.0 * s._scale / s._h));
-			double n = s._near, A = (FAR + n) / (FAR - n), B = -2.0 * FAR * n / (FAR - n);
-			Gl.Uniform1(_uA, (float)A); Gl.Uniform1(_uB, (float)B); Gl.Uniform1(_uTex, 0);
-			Gl.Uniform1(_uRsh, s._rttShift);   // mirror screen-tex sampling shift
-			Gl.Uniform1(_uWet, (float)s._wetness);
-			Gl.Uniform1(_uTimeW, (float)s._shaderTime);
-			Gl.Uniform3(_uEmissive, 0f, 0f, 0f);   // per-object; DrawObj overrides
-			Gl.Uniform4(_uFlatCol, 0f, 0f, 0f, 0f);   // per-object flat-albedo override off by default; DrawObj sets it
-			Gl.Uniform3(_uRipple, 0f, 0f, 0f);     // per-surface; DrawScreenTex overrides
-			// reflection clip plane: active only inside a RenderViewReflect pass
-			if (s._clipOn) Gl.Uniform4(_uClip, (float)s._clipNx, (float)s._clipNy, (float)s._clipNz, (float)s._clipD);
-			else Gl.Uniform4(_uClip, 0f, 0f, 0f, -1e30f);
-			Gl.Uniform2(_uFres, 0f, 0f);           // per-surface; DrawScreenTex overrides
-			Gl.Uniform1(_uDeepOn, 0);
-			// fog colour is stored in 0-255 (the CPU blends in pixel space); our shader works in 0-1
-			if (s._fog) { Gl.Uniform1(_uFog, 1); Gl.Uniform3(_uFogCol, (float)(s._fogR / 255.0), (float)(s._fogG / 255.0), (float)(s._fogB / 255.0)); Gl.Uniform1(_uFogStart, (float)s._fogStart); Gl.Uniform1(_uFogInv, (float)s._fogInv); }
-			else Gl.Uniform1(_uFog, 0);
-			// lighting: sun + ambient + point lights
-			Gl.Uniform3(_uSunDir, (float)s._sunX, (float)s._sunY, (float)s._sunZ);
-			Gl.Uniform3(_uSunCol, (float)s._sunR, (float)s._sunG, (float)s._sunB);
-			Gl.Uniform3(_uAmb, (float)s._ambR, (float)s._ambG, (float)s._ambB);
-			var lights = s._lights; int nl = lights.Count < MAXL ? lights.Count : MAXL;
-			for (int i = 0; i < nl; i++) {
-				var L = lights[i];
-				_lpos[i * 4] = (float)L.X; _lpos[i * 4 + 1] = (float)L.Y; _lpos[i * 4 + 2] = (float)L.Z; _lpos[i * 4 + 3] = (float)L.Range;
-				_lcol[i * 3] = (float)L.R; _lcol[i * 3 + 1] = (float)L.G; _lcol[i * 3 + 2] = (float)L.B;
-			}
-			Gl.Uniform1(_uNumLights, nl);
-			if (nl > 0) { Gl.Uniform4(_uLightPosR, (uint)nl, new ReadOnlySpan<float>(_lpos, 0, nl * 4)); Gl.Uniform3(_uLightCol, (uint)nl, new ReadOnlySpan<float>(_lcol, 0, nl * 3)); }
-			// (the shadow map + light matrix are bound by the main pass only when the shadow variant is active;
-			// the default variant has no shadow uniforms at all, so there's nothing to reset here.)
-		}
-
-		private bool Drawable(Lua3DScene s, SceneObject o) {
-			if (!o.Visible || o.Overlay || o.ScreenTex) return false;
-			if (s._renderDist > 0 && o.HasBounds) { double rr = s._renderDist + o.Radius; if (Dist(s, o) > rr * rr) return false; }
-			return true;
-		}
-		private static double Dist(Lua3DScene s, SceneObject o) { double dx = o.CenX - s._camX, dy = o.CenY - s._camY, dz = o.CenZ - s._camZ; return dx * dx + dy * dy + dz * dz; }
-
-		private void DrawObj(Lua3DScene s, SceneObject o, int litScene) {
-			var c = EnsureObj(s, o);
-			if (c.Batches.Count == 0) return;
-			Bind3D(c.Vbo);
-			Gl.UniformMatrix4(_uModel, 1, false, (ReadOnlySpan<float>)ModelMatrix(o.Transform));
-			Gl.Uniform3(_uTint, (float)o.TintR, (float)o.TintG, (float)o.TintB);
-			Gl.Uniform1(_uAlpha, o.A / 255.0f); Gl.Uniform1(_uCutout, 1);   // alpha-test: free for opaque texels, makes VRM hair/lashes cut out
-			Gl.Uniform1(_uLit, (litScene == 1 && o.Lit) ? 1 : 0);
-			Gl.Uniform3(_uEmissive, (float)o.EmR, (float)o.EmG, (float)o.EmB);
-			if (o.FlatR >= 0) Gl.Uniform4(_uFlatCol, (float)o.FlatR, (float)o.FlatG, (float)o.FlatB, 1f);
-			else Gl.Uniform4(_uFlatCol, 0f, 0f, 0f, 0f);
-			if (o.SplatSprite >= 0) { DrawSplatObj(s, o, c); return; }   // terrain splat: its own shader mode
-			// per-object depth bias (polygon offset): lets a coplanar decal/marking sit cleanly on its surface
-			// instead of z-fighting it (road stripes on the road, ground shadows, etc.).
-			if (o.DepthBias != 0f) { Gl.Enable(EnableCap.PolygonOffsetFill); Gl.PolygonOffset(o.DepthBias, o.DepthBias); }
-			float fr = (float)(o.R / 255.0), fg = (float)(o.G / 255.0), fb = (float)(o.B / 255.0);
-			foreach (var bt in c.Batches) {
-				Gl.Uniform1(_uMode, bt.Mode);
-				if (bt.Mode == 0) Gl.Uniform3(_uFlat, fr, fg, fb);
-				else { BindNormalFor(s, bt.Tex); Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, bt.Tex); }
-				Gl.DrawArrays(PrimitiveType.Triangles, bt.Start, (uint)bt.Count);
-			}
-			if (o.DepthBias != 0f) Gl.Disable(EnableCap.PolygonOffsetFill);
-		}
-		// terrain floor with splat shading: bind the four layer textures + the weight sprite and draw
-		// the whole object in ONE call (per-quad texture batching is irrelevant — the shader blends)
-		private void DrawSplatObj(Lua3DScene s, SceneObject o, ObjCache c) {
-			uint t1 = TexFor(s, o.LayerTex1), t2 = TexFor(s, o.LayerTex2), t3 = TexFor(s, o.LayerTex3), t4 = TexFor(s, o.LayerTex4);
-			uint sp = SpriteFor(s, o.SplatSprite);
-			if (t1 == 0 || sp == 0) return;
-			Gl.Uniform1(_uMode, 5);
-			Gl.Uniform1(_uTex2, 2); Gl.Uniform1(_uTex3, 3); Gl.Uniform1(_uTex4, 4); Gl.Uniform1(_uSplat, 5);
-			Gl.Uniform2(_uSplatSize, o.SplatW, o.SplatH);
-			Gl.Uniform1(_uTexScale, o.LayerUvScale);
-			Gl.ActiveTexture(TextureUnit.Texture2); Gl.BindTexture(TextureTarget.Texture2D, t2 != 0 ? t2 : t1);
-			Gl.ActiveTexture(TextureUnit.Texture3); Gl.BindTexture(TextureTarget.Texture2D, t3 != 0 ? t3 : t1);
-			Gl.ActiveTexture(TextureUnit.Texture4); Gl.BindTexture(TextureTarget.Texture2D, t4 != 0 ? t4 : t1);
-			Gl.ActiveTexture(TextureUnit.Texture5); Gl.BindTexture(TextureTarget.Texture2D, sp);
-			Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, t1);
-			int total = 0; foreach (var bt in c.Batches) total += bt.Count;
-			Gl.DrawArrays(PrimitiveType.Triangles, 0, (uint)total);
-		}
-
-		private void DrawSprite(SprBatch bt) {
-			var o = bt.Obj;
-			Gl.UniformMatrix4(_uModel, 1, false, (ReadOnlySpan<float>)_ident);
-			Gl.Uniform1(_uMode, 2); Gl.Uniform1(_uCutout, bt.Cutout); Gl.Uniform1(_uLit, 0);
-			Gl.Uniform3(_uTint, (float)o.TintR, (float)o.TintG, (float)o.TintB); Gl.Uniform1(_uAlpha, o.A / 255.0f);
-			Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, bt.Tex);
-			Gl.DrawArrays(PrimitiveType.Triangles, bt.Start, (uint)bt.Count);
-		}
-		// ── custom SURFACE shader programs (ObjSetSurfaceShader) ──────────────────────────────────
-		// One compiled program per DISTINCT fragment source (surfaces sharing a source share it). The
-		// standard world VS feeds the same varyings the built-in FS gets, so a custom water/mirror
-		// shader is a drop-in replacement for the built-in ripple/fresnel path.
-		private struct SurfProg { public uint Prog; public int Cam, R, U, F, Sx, Sy, A, B, Model, Tex, Time, User, Rsh, RttFlip, Alpha, Tint, Flat; }
-		private readonly Dictionary<string, SurfProg> _surfProgs = new();
-		private const string SURF_PRELUDE = "#version 300 es\nprecision highp float;\n" +
-			"in vec2 vUV; in float vShade; in float vCamZ; in vec3 vWorld; in vec3 vNormal;\n" +
-			"uniform sampler2D uTex; uniform int uRsh; uniform int uRttFlip;\n" +
-			"uniform vec3 uCam, uTint, uFlat; uniform float uTime, uAlpha; uniform vec4 uUser[4];\n" +
-			"out vec4 frag;\n";
-		private SurfProg SurfFor(string src) {
-			if (_surfProgs.TryGetValue(src, out var hit)) return hit;
-			var sp = new SurfProg();
-			string full = src.Contains("#version") ? src : SURF_PRELUDE + src;
-			try {
-				sp.Prog = ShaderHelper.CreateShaderProgramFromSource(Ascii(VS), Ascii(full));
-				int g(string nm) => Gl.GetUniformLocation(sp.Prog, nm);
-				sp.Cam = g("uCam"); sp.R = g("uR"); sp.U = g("uU"); sp.F = g("uF");
-				sp.Sx = g("uSx"); sp.Sy = g("uSy"); sp.A = g("uA"); sp.B = g("uB"); sp.Model = g("uModel");
-				sp.Tex = g("uTex"); sp.Time = g("uTime"); sp.User = g("uUser[0]");
-				sp.Rsh = g("uRsh"); sp.RttFlip = g("uRttFlip");
-				sp.Alpha = g("uAlpha"); sp.Tint = g("uTint"); sp.Flat = g("uFlat");
-			} catch (Exception e) {
-				LastShaderError = "surface: " + e.Message;
-				Trace.TraceError("ObjSetSurfaceShader: surface shader failed to compile, using the built-in path.\n" + e);
-				sp.Prog = 0;
-			}
-			_surfProgs[src] = sp;   // failures cache too (no per-frame recompile storm)
-			return sp;
-		}
-		// draw one surface through its custom program, then hand the pass back to the world program
-		private void DrawSurfaceCustom(Lua3DScene s, SceneObject o, ObjCache c, in SurfProg sp, int texId, uint gt) {
-			Gl.UseProgram(sp.Prog);
-			Gl.Uniform3(sp.Cam, (float)s._camX, (float)s._camY, (float)s._camZ);
-			Gl.Uniform3(sp.R, (float)s._Rx, (float)s._Ry, (float)s._Rz);
-			Gl.Uniform3(sp.U, (float)s._Ux, (float)s._Uy, (float)s._Uz);
-			Gl.Uniform3(sp.F, (float)s._Fx, (float)s._Fy, (float)s._Fz);
-			Gl.Uniform1(sp.Sx, (float)(2.0 * s._scale / s._w));
-			Gl.Uniform1(sp.Sy, (float)(-2.0 * s._scale / s._h));
-			double n2 = s._near, A2 = (FAR + n2) / (FAR - n2), B2 = -2.0 * FAR * n2 / (FAR - n2);
-			Gl.Uniform1(sp.A, (float)A2); Gl.Uniform1(sp.B, (float)B2);
-			Gl.UniformMatrix4(sp.Model, 1, false, (ReadOnlySpan<float>)ModelMatrix(o.Transform));
-			Gl.Uniform1(sp.Tex, 0);
-			Gl.Uniform1(sp.Time, (float)s._shaderTime);
-			if (sp.User >= 0) Gl.Uniform4(sp.User, 4u, (ReadOnlySpan<float>)s._surfUser);
-			Gl.Uniform1(sp.Rsh, s._rttShift);
-			bool gpuT = _rttColor.ContainsKey(texId);
-			bool trueR = s._reflectTrue.Contains(texId);
-			Gl.Uniform1(sp.RttFlip, gpuT != trueR ? 1 : 0);
-			Gl.Uniform1(sp.Alpha, o.A / 255.0f);
-			Gl.Uniform3(sp.Tint, (float)o.TintR, (float)o.TintG, (float)o.TintB);
-			Gl.Uniform3(sp.Flat, (float)(o.R / 255.0), (float)(o.G / 255.0), (float)(o.B / 255.0));
-			Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, gt);
-			Bind3D(c.Vbo);
-			int total = 0; foreach (var bt in c.Batches) total += bt.Count;
-			Gl.DrawArrays(PrimitiveType.Triangles, 0, (uint)total);
-			Gl.UseProgram(_worldShadow ? _progShadow : _prog);
-		}
-
-		// A screen-texture mirror/portal surface (uMode 3): the FS samples the live RTT texture by screen
-		// pixel and blends it over the base colour by the per-channel mirror factor (the object's tint). The
-		// texture is the per-frame RenderView capture, re-uploaded by TexFor when its revision changes.
-		private void DrawScreenTex(Lua3DScene s, SceneObject o) {
-			var c = EnsureObj(s, o);
-			if (c.Batches.Count == 0) return;
-			int texId = (int)o.D[12];                       // Kind-0 quad texId = the mirror RTT
-			uint gt = TexFor(s, texId); if (gt == 0) return;
-			if (o.SurfaceSrc != null) {
-				var sp = SurfFor(o.SurfaceSrc);
-				if (sp.Prog != 0) { DrawSurfaceCustom(s, o, c, sp, texId, gt); return; }
-			}
-			Bind3D(c.Vbo);
-			Gl.UniformMatrix4(_uModel, 1, false, (ReadOnlySpan<float>)ModelMatrix(o.Transform));
-			Gl.Uniform1(_uMode, 3); Gl.Uniform1(_uCutout, 0); Gl.Uniform1(_uLit, 0);
-			Gl.Uniform3(_uTint, (float)o.TintR, (float)o.TintG, (float)o.TintB);          // mirror factor (fm)
-			Gl.Uniform3(_uFlat, (float)(o.R / 255.0), (float)(o.G / 255.0), (float)(o.B / 255.0));   // base colour under the mirror
-			Gl.Uniform1(_uAlpha, o.A / 255.0f);
-			Gl.Uniform3(_uRipple, (float)o.RippleAmp, (float)o.RippleFreq, (float)o.RippleSpeed);   // water wobble (0 = flat mirror)
-			// flip convention: legacy captures need the row-order swap only on the GPU-FBO path; TRUE
-			// reflections (RenderViewReflect) are same-pixel-exact on the GPU path and need the swap
-			// only for the top-down CPU upload — i.e. the two flags XOR.
-			bool gpuTarget = _rttColor.ContainsKey(texId);
-			bool trueReflect = s._reflectTrue.Contains(texId);
-			Gl.Uniform1(_uRttFlip, gpuTarget != trueReflect ? 1 : 0);
-			Gl.Uniform2(_uFres, (float)(o.FresnelF0 < 0 ? 0 : o.FresnelF0), o.FresnelF0 < 0 ? 0f : 1f);
-			if (o.DeepR >= 0) {
-				Gl.Uniform1(_uDeepOn, 1);
-				Gl.Uniform3(_uFlat2, (float)(o.DeepR / 255.0), (float)(o.DeepG / 255.0), (float)(o.DeepB / 255.0));
-			} else Gl.Uniform1(_uDeepOn, 0);
-			Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, gt);
-			int total = 0; foreach (var bt in c.Batches) total += bt.Count;
-			Gl.DrawArrays(PrimitiveType.Triangles, 0, (uint)total);   // single mirror texture → one contiguous draw
-		}
-
-		private void Prune(Lua3DScene s) {
-			if (_cache.Count <= s._objects.Count) return;
-			_live.Clear(); foreach (var v in s._objects.Values) _live.Add(v);
-			List<SceneObject> dead = null;
-			foreach (var kv in _cache) if (!_live.Contains(kv.Key)) { (dead ??= new()).Add(kv.Key); Gl.DeleteBuffer(kv.Value.Vbo); }
-			if (dead != null) foreach (var o in dead) _cache.Remove(o);
-		}
-
-		// ── 2D overlay onto the canvas texture (crosshair/selection/etc. drawn after the 3D) ──────────
-		private unsafe void Begin2D(Lua3DScene s) {
-			if (_2dActive) return;
-			EnsureGL(); EnsureFbo(s);
-			Span<int> v = stackalloc int[4]; Gl.GetInteger(GLEnum.Viewport, v); _vp2[0] = v[0]; _vp2[1] = v[1]; _vp2[2] = v[2]; _vp2[3] = v[3];
-			_prevFbo2 = (uint)Gl.GetInteger(GLEnum.FramebufferBinding);
-			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fbo);
-			Gl.Viewport(0, 0, (uint)s._w, (uint)s._h);
-			Gl.Disable(EnableCap.DepthTest);
-			Gl.Enable(EnableCap.Blend); Gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-			Gl.UseProgram(_prog2d); Gl.Uniform2(_uRes2d, (float)s._w, (float)s._h);
-			Gl.BindVertexArray(_vao2d);   // separate VAO so we don't disturb the 3D VAO's format
-			Gl.BindBuffer(BufferTargetARB.ArrayBuffer, _vbo2d);
-			Gl.EnableVertexAttribArray(0); Gl.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), (void*)0);
-			_2dActive = true;
-		}
-		public void Line2D(Lua3DScene s, int x0, int y0, int x1, int y1, int r, int g, int b) {
-			Begin2D(s);
-			Span<float> v = stackalloc float[] { x0, y0, x1, y1 };
-			Gl.BufferData<float>(BufferTargetARB.ArrayBuffer, (ReadOnlySpan<float>)v, BufferUsageARB.StreamDraw);
-			Gl.Uniform4(_uColor2d, r / 255f, g / 255f, b / 255f, 1f);
-			Gl.DrawArrays(PrimitiveType.Lines, 0, 2);
-		}
-		public void Rect2D(Lua3DScene s, int x, int y, int w, int h, int r, int g, int b, int a) {
-			Begin2D(s);
-			float x0 = x, y0 = y, x1 = x + w, y1 = y + h;
-			Span<float> v = stackalloc float[] { x0, y0, x1, y0, x1, y1, x0, y0, x1, y1, x0, y1 };
-			Gl.BufferData<float>(BufferTargetARB.ArrayBuffer, (ReadOnlySpan<float>)v, BufferUsageARB.StreamDraw);
-			Gl.Uniform4(_uColor2d, r / 255f, g / 255f, b / 255f, a / 255f);
-			Gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
-		}
-		public void End2D() {   // called by Lua3DScene.Upload() in GPU mode after the stage's 2D overlay
-			if (!_2dActive) return;
-			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _prevFbo2);
-			Gl.Viewport(_vp2[0], _vp2[1], (uint)_vp2[2], (uint)_vp2[3]);
-			Gl.UseProgram(0); Gl.BindVertexArray(0); Gl.BindBuffer(BufferTargetARB.ArrayBuffer, 0);
-			Gl.Disable(EnableCap.DepthTest); Gl.DepthMask(true); Gl.Disable(EnableCap.CullFace);
-			Gl.Enable(EnableCap.Blend); BlendHelper.SetBlend(BlendType.Normal);
-			_2dActive = false;
-		}
-
-		// ── per-map cache release (Lua3DScene.ClearRenderCaches / UnregisterTexture) ──────────────
-		/// <summary>Delete this texId's GL upload and any reflection RTT target bound to it. The next
-		/// TexFor for a (re-registered) id re-uploads lazily.</summary>
-		public void DropTexture(int id) {
-			if (_glTex.TryGetValue(id, out var t)) { Gl.DeleteTexture(t); _glTex.Remove(id); _glTexId.Remove(t); }
-			_glTexRev.Remove(id);
-			if (_rttColor.TryGetValue(id, out var c)) { Gl.DeleteTexture(c); _rttColor.Remove(id); }
-			if (_rttFbos.TryGetValue(id, out var f)) { Gl.DeleteFramebuffer(f); _rttFbos.Remove(id); }
-			if (_rttDepth.TryGetValue(id, out var d)) { Gl.DeleteRenderbuffer(d); _rttDepth.Remove(id); }
-		}
-		/// <summary>Delete this sprite id's GL upload (re-uploads lazily if re-registered).</summary>
-		public void DropSprite(int id) {
-			if (_glSprite.TryGetValue(id, out var t)) { Gl.DeleteTexture(t); _glSprite.Remove(id); }
-		}
 		/// <summary>Free every REBUILDABLE buffer: per-object VBOs, merged static buffers, reflection
 		/// RTT targets and the grass VBO state. Programs, the main FBO, the shadow map and uploaded
 		/// textures/sprites survive (per-stage). Everything re-creates lazily next frame.</summary>
 		public void ClearTransient() {
-			foreach (var c in _cache.Values) Gl.DeleteBuffer(c.Vbo);
+			foreach (var c in _cache.Values) FreeBuffers(c);
 			_cache.Clear();
-			foreach (var sp in _surfProgs.Values) if (sp.Prog != 0) Gl.DeleteProgram(sp.Prog);
+			ClearPalette();
+			foreach (var sp in _surfProgs.Values) { sp.Dead = true; if (sp.Prog != 0) Gl.DeleteProgram(sp.Prog); }
 			_surfProgs.Clear();
-			foreach (var mb in _merge.Values) Gl.DeleteBuffer(mb.Vbo);
-			_merge.Clear(); _mergeCache.Clear(); _dirtyKeys.Clear(); _staticSig = long.MinValue;
-			_scratch.Clear(); _scratch.TrimExcess();
+			ClearMerge();
 			_tmp.Clear(); _tmp.TrimExcess();
+			_uploadBuf = null;
 			_sprVerts.Clear(); _sprVerts.TrimExcess(); _sprBatches.Clear();
-			foreach (var l in _partBatches.Values) l.Clear();
-			_partBatches.Clear();
+			_partGroup.Clear(); _partGroupTex.Clear(); _partRunOf.Clear(); _partRuns.Clear(); _partAll.Clear(); _partAll.TrimExcess();
+			_pRec = new PartRec[256]; _pFar = new uint[256]; _pOrd = new int[256]; _pN = 0; _runRank = new int[32];
 			foreach (var f in _rttFbos.Values) Gl.DeleteFramebuffer(f); _rttFbos.Clear();
 			foreach (var d in _rttDepth.Values) Gl.DeleteRenderbuffer(d); _rttDepth.Clear();
 			foreach (var t in _rttColor.Values) Gl.DeleteTexture(t); _rttColor.Clear();
-			_rttW = _rttH = 0;
-			_grassRevSeen = -1; _grassVerts = 0;
+			_rttW = _rttH = 0; _rttRev++;
+			ClearGrass();
 		}
+
 		/// <summary>Cache counts for the memory readout.</summary>
-		public string StatsString() => $"glTex={_glTex.Count} glSprite={_glSprite.Count} rtt={_rttColor.Count} vbo={_cache.Count} merge={_merge.Count}";
+		public string Stats => $"glTex={_glTex.Count} glSprite={_glSprite.Count} rtt={_rttColor.Count} vbo={_cache.Count} merge={_merge.Count}";
 
 		public void Invalidate() {
-			foreach (var sp in _surfProgs.Values) if (sp.Prog != 0) Gl.DeleteProgram(sp.Prog);
+			foreach (var sp in _surfProgs.Values) { sp.Dead = true; if (sp.Prog != 0) Gl.DeleteProgram(sp.Prog); }
 			_surfProgs.Clear();
 			if (_progUser != 0) { Gl.DeleteProgram(_progUser); _progUser = 0; }
 			_userPostRev = -1; _userPostOk = false;   // force a recompile against the (possibly new) GL context
 			if (_progSky != 0) { Gl.DeleteProgram(_progSky); _progSky = 0; }
 			_skyRev = -1; _skyOk = false;
-			_grassRevSeen = -1; _grassVerts = 0;      // grass VBO re-uploads on next use
+			if (_noiseTex != 0) { Gl.DeleteTexture(_noiseTex); _noiseTex = 0; }
+			ClearGrass();                             // grass VBO re-uploads on next use
 			if (_fbo != 0) { Gl.DeleteFramebuffer(_fbo); _fbo = 0; }
 			if (_depthRb != 0) { Gl.DeleteRenderbuffer(_depthRb); _depthRb = 0; }
 			if (_shadowFbo != 0) { Gl.DeleteFramebuffer(_shadowFbo); _shadowFbo = 0; }
 			if (_shadowTex != 0) { Gl.DeleteTexture(_shadowTex); _shadowTex = 0; }
+			if (_shadowStaticFbo != 0) { Gl.DeleteFramebuffer(_shadowStaticFbo); _shadowStaticFbo = 0; }
+			if (_shadowStaticTex != 0) { Gl.DeleteTexture(_shadowStaticTex); _shadowStaticTex = 0; }
+			_casterVboSet = false;
 			if (_fxaaFbo != 0) { Gl.DeleteFramebuffer(_fxaaFbo); _fxaaFbo = 0; }
 			if (_fxaaTex != 0) { Gl.DeleteTexture(_fxaaTex); _fxaaTex = 0; }
 			foreach (var f in _rttFbos.Values) Gl.DeleteFramebuffer(f); _rttFbos.Clear();
 			foreach (var d in _rttDepth.Values) Gl.DeleteRenderbuffer(d); _rttDepth.Clear();
 			foreach (var t in _rttColor.Values) Gl.DeleteTexture(t);
-			_rttColor.Clear(); _rttW = _rttH = 0;
+			_rttColor.Clear(); _rttW = _rttH = 0; _rttRev++;
 			_fboW = _fboH = 0; _fboColorTex = 0; _fxaaW = _fxaaH = 0;
-			foreach (var c in _cache.Values) Gl.DeleteBuffer(c.Vbo);
+			foreach (var c in _cache.Values) FreeBuffers(c);
 			_cache.Clear();
-			foreach (var mb in _merge.Values) Gl.DeleteBuffer(mb.Vbo);
-			_merge.Clear(); _scratch.Clear(); _scratch.TrimExcess(); _mergeCache.Clear(); _dirtyKeys.Clear(); _staticSig = long.MinValue;
-			foreach (var t in _glTex.Values) Gl.DeleteTexture(t);
-			foreach (var t in _glSprite.Values) Gl.DeleteTexture(t);
-			_glTex.Clear(); _glSprite.Clear(); _glTexRev.Clear(); _glTexId.Clear();
+			ClearPalette();
+			ClearMerge();
+			foreach (var e in _glTex.Values) Gl.DeleteTexture(e.Tex);
+			foreach (var e in _glSprite.Values) Gl.DeleteTexture(e.Tex);
+			_glTex.Clear(); _glSprite.Clear(); _uploadBuf = null;
 		}
 
 		// Free EVERY GL resource, including the one-time programs/VAOs/buffers EnsureGL creates. Called
@@ -1853,6 +304,7 @@ void main(){ frag = uColor; }";
 			if (_casterVbo != 0) Gl.DeleteBuffer(_casterVbo);
 			if (_vbo2d != 0) Gl.DeleteBuffer(_vbo2d);
 			if (_partVbo != 0) Gl.DeleteBuffer(_partVbo);
+			if (_postSampler != 0) { Gl.DeleteSampler(_postSampler); _postSampler = 0; }
 			// NOTE: the shader PROGRAMS (_prog/_progShadow/_progDepth/_progDepthSpr/_prog2d/_progP/_progPost/
 			// _progDiorama/_progOutline/_progGrass) are SHARED via s_progCache (compiled once for the whole
 			// context) — do NOT delete them here or the next scene's cache hit would be a dangling handle.

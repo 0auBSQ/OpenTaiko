@@ -9,21 +9,20 @@
 | 方法 | 说明 |
 | --- | --- |
 | `scene:GetRaytracerStatus()  -> string` | 光线追踪模式的后端读数（GPU 计算耗时、CPU 回退，或 CPU 路径追踪器）；光栅模式下为空。 |
-| `scene:RenderViewRT(texId, cx, cy, cz, yawDeg, pitchDeg, fovDeg, clr, clg, clb, flipX)  -> nil` | 与 RenderView 类似，但由 CPU 路径追踪器以反射分辨率的四分之一渲染。 |
 
 ## 路径追踪器材质与图元
 
-只有路径追踪器使用材质、解析图元和天空渐变。路径追踪器同样会追踪保留对象，使用 ObjSetMaterial 指定的材质，未指定时使用其纹理和纯色。材质和图元 id 从 0 起。
+只有路径追踪器使用材质、解析图元和天空渐变。路径追踪器同样会追踪保留对象，使用 ObjSetMaterial 指定的材质，未指定时使用其纹理和纯色。材质和图元 id 从 0 起。路径追踪器把精灵绘制为经过 alpha 测试的四边形，让光线穿过纹理和精灵中被镂空的纹素，并应用 ObjSetTint、ObjSetColor 和 ObjSetEmissive。路径追踪器投射真实的阴影，因此略过充当阴影和贴花的精灵：平铺在地面上的精灵（billboard 3）和 cutout 为 0 的 ObjAddSpriteQuad 精灵。除点光源外，SetSun 以带阴影的方向光照亮场景，SetAmbient 则作为从各个方向照到漫反射表面上的光；直接看到或在镜中看到的天空仍是原本的渐变。
 
 | 方法 | 说明 |
 | --- | --- |
 | `scene:SetSky(tr, tg, tb, br, bg, bb, strength)  -> nil` | 从顶部颜色到底部颜色的天空渐变（线性 0-1），乘以 `strength`；光线逃逸时它照亮场景。强度 0 得到黑色摄影棚。 |
 | `scene:NewMaterial()  -> id` | 创建一个材质（默认为漫反射中灰色）并返回其 id。 |
-| `scene:MatSetType(id, type)  -> nil` | `"diffuse"`、`"metal"`、`"glass"` 或 `"emissive"`。 |
+| `scene:MatSetType(id, type)  -> nil` | `"diffuse"`、`"metal"`、`"glass"` 或 `"emissive"`。玻璃网格的三角形顶点 a、b、c 从外部看在屏幕上需按顺时针方向排列，使 `(b - a) × (c - a)` 指向玻璃外侧：路径追踪器据此方向判断哪一侧是内部。 |
 | `scene:MatSetAlbedo(id, r, g, b)  -> nil` | 基色（线性 0-1）；对金属会为反射着色。 |
 | `scene:MatSetRoughness(id, rough)  -> nil` | 0 = 清晰的镜面或透明玻璃，1 = 完全粗糙。 |
 | `scene:MatSetIOR(id, ior)  -> nil` | 玻璃的折射率（最小 1）。 |
-| `scene:MatSetEmission(id, r, g, b, strength)  -> nil` | 发光颜色乘以强度；自发光表面会照亮场景。 |
+| `scene:MatSetEmission(id, r, g, b, strength)  -> nil` | 发光颜色乘以强度；自发光表面会照亮场景。它们不会遮挡点光源，因此光源可以放在灯泡内部。 |
 | `scene:MatSetTexture(id, texId)  -> nil` | 按 UV 采样的反照率纹理（已注册的纹理 id）；-1 = 无。 |
 | `scene:MatSetNormalMap(id, preset)  -> nil` | 程序化法线贴图：`"none"`、`"wood"`、`"perlin"` 或 `"waves"`。 |
 | `scene:MatSetNormalMapTexture(id, texId)  -> nil` | 用于带纹理几何体的切线空间法线贴图纹理（RGB 编码的法线）；覆盖预设。-1 清除。 |

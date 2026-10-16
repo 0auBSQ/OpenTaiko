@@ -414,7 +414,7 @@ namespace OpenTaiko {
 				try {
 					var positions = new List<float>();
 					var colours = new List<int>();
-					ObjModel.Load(path).CopyTriangles(positions, colours);
+					ObjModel.LoadUncached(path).CopyTriangles(positions, colours);
 					var data = new float[positions.Count / 9 * 27];
 					bool coloured = false;
 					for (int t = 0; t < positions.Count / 9; t++) {

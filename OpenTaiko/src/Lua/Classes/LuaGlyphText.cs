@@ -310,13 +310,15 @@ namespace OpenTaiko {
 
 		// Draws the placed glyphs: every edge first, then every fill on top. Every glyph keeps its exact
 		// (fractional) pen position, so text that moves a little every frame glides instead of stepping.
-		// Rotated text ignores the clip band.
+		// Rotated text ignores the clip band. Upright text goes out batched (GlyphQuadBatch), most strings in
+		// one draw call.
 		private void Compose(double opacity, float sx, float sy, bool clip, double rotationDeg, double ox, double oy) {
 			bool rot = rotationDeg != 0;
 			double rad = rotationDeg * Math.PI / 180.0;
 			double cosR = Math.Cos(rad), sinR = Math.Sin(rad);
 			bool anyEdge = false;
 			foreach (var p in _placements) if (p.Edge != null) { anyEdge = true; break; }
+			bool batch = !rot && GlyphQuadBatch.Usable;
 
 			// the slots hold tight boxes (margin around the ink); the layout positions the string renderer's
 			// 25 px box, so every slot draws shifted right by the padding it no longer carries
@@ -327,9 +329,12 @@ namespace OpenTaiko {
 					if (slot == null) continue;
 					var page = slot.Page;
 					Color tint = pass == 0 ? p.Outline : p.Fore;
-					page.tSetScale(sx, sy);
-					page.tUpdateColor4(new(tint.R / 255f, tint.G / 255f, tint.B / 255f, 1f));
-					page.tUpdateOpacity((int)((pass == 0 ? opacity * tint.A / 255.0 : opacity) * 255));
+					int opacity255 = (int)((pass == 0 ? opacity * tint.A / 255.0 : opacity) * 255);
+					if (!batch) {
+						page.tSetScale(sx, sy);
+						page.tUpdateColor4(new(tint.R / 255f, tint.G / 255f, tint.B / 255f, 1f));
+						page.tUpdateOpacity(opacity255);
+					}
 					double px = p.X + padShift * sx;
 					if (rot) {
 						// rotate this glyph's centre about the anchor, then spin the glyph to match.
@@ -354,7 +359,7 @@ namespace OpenTaiko {
 						if (clip && (bot <= _clipY0 || top >= _clipY1)) {
 							// fully outside the clip band: culled
 						} else if (!clip || (top >= _clipY0 && bot <= _clipY1)) {
-							page.t2DDraw((float)gx, (float)top, 1f, slot.Rect);
+							Emit(batch, page, (float)gx, (float)top, slot.Rect, sx, sy, tint, opacity255);
 						} else {
 							// edge glyph: slice the visible band via a source rect (exact at sy=1,
 							// the menu/list case; scaled draws slice in source pixels)
@@ -362,15 +367,27 @@ namespace OpenTaiko {
 							int srcY = (int)Math.Floor((v0 - top) / sy);
 							int srcH = Math.Min(slot.H - srcY, (int)Math.Ceiling((v1 - v0) / sy));
 							if (srcH > 0)
-								page.t2DDraw((float)gx, (float)v0, 1f, new RectangleF(slot.Rect.X, slot.Rect.Y + srcY, slot.Rect.Width, srcH));
+								Emit(batch, page, (float)gx, (float)v0, new RectangleF(slot.Rect.X, slot.Rect.Y + srcY, slot.Rect.Width, srcH), sx, sy, tint, opacity255);
 						}
 					}
-					page.tSetScale(1, 1);
-					page.tUpdateColor4(new(1f, 1f, 1f, 1f));
-					page.tUpdateOpacity(255);
+					if (!batch) {
+						page.tSetScale(1, 1);
+						page.tUpdateColor4(new(1f, 1f, 1f, 1f));
+						page.tUpdateOpacity(255);
+					}
 				}
 			}
+			if (batch) GlyphQuadBatch.Flush();
 			_placements.Clear();
+		}
+
+		// one upright glyph piece: queued in the batch with the tint and opacity t2DDraw would use, or drawn
+		// by the page with the state set above
+		private static void Emit(bool batch, CTexture page, float x, float y, RectangleF rect, float sx, float sy, Color tint, int opacity255) {
+			if (batch)
+				GlyphQuadBatch.Add(page, x, y, rect, sx, sy, tint.R / 255f, tint.G / 255f, tint.B / 255f, Math.Clamp(opacity255, 0, 255) / 255f);
+			else
+				page.t2DDraw(x, y, 1f, rect);
 		}
 
 		// ── word-wrapped block ──────────────────────────────────────────────────────

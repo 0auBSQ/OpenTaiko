@@ -14,6 +14,7 @@ namespace OpenTaiko {
 		public byte R, G, B; public bool IsTex; public bool Additive; public bool ScreenTex;
 		public byte BaseR, BaseG, BaseB;   // base colour blended under a ScreenTex (mirror) sample
 		public bool Sprite, Cutout;        // Sprite: Tex is ARGB (per-texel alpha). Cutout: alpha-test + depth write (2D-in-3D); else blend
+		public bool Recol; public double RcR, RcG, RcB;   // ObjSetColor: this colour (0-255) replaces the texels' RGB
 	}
 
 	/// <summary>
@@ -26,6 +27,13 @@ namespace OpenTaiko {
 		private Lua3DScene s;
 		private bool _lit, _gour, _screenT;
 		private byte _baseR, _baseG, _baseB;
+		// the object's surface colour, as on the GPU: albedo (the texel times the tint, or the ObjSetColor colour) times
+		// the light, plus the albedo times the emissive. _k* is the albedo factor on top of the texel, _e* the emissive.
+		private bool _recol; private double _rcR, _rcG, _rcB;
+		private double _kR, _kG, _kB, _eR, _eG, _eB;
+		// the reflection clip plane of a RenderViewReflect pass in camera space: a*x + b*y + c*z + e >= 0 is kept
+		private bool _clip; private double _pa, _pb, _pc, _pe;
+		private readonly double[] _pd = new double[8];
 
 		private readonly double[] _vx = new double[8], _vy = new double[8], _vz = new double[8], _vu = new double[8], _vv = new double[8];
 		private readonly double[] _ox = new double[8], _oy = new double[8], _oz = new double[8], _ou = new double[8], _ov = new double[8];
@@ -37,8 +45,21 @@ namespace OpenTaiko {
 
 		public RTri[] Tris = new RTri[2048];
 		public int TriN;
+		// the triangles of each row band, in draw order: band b holds BinIdx[BinStart[b] .. BinStart[b + 1])
+		public int[] BinStart = Array.Empty<int>(), BinIdx = Array.Empty<int>();
+		private int[] _binAt = Array.Empty<int>(), _binLo = Array.Empty<int>(), _binHi = Array.Empty<int>();
 
-		public void Reset(Lua3DScene scene, bool lit) { s = scene; _lit = lit; TriN = 0; }
+		public void Reset(Lua3DScene scene, bool lit) {
+			s = scene; _lit = lit; TriN = 0;
+			_clip = scene._clipOn;
+			if (_clip) {
+				double nx = scene._clipNx, ny = scene._clipNy, nz = scene._clipNz;
+				_pa = nx * scene._Rx + ny * scene._Ry + nz * scene._Rz;
+				_pb = nx * scene._Ux + ny * scene._Uy + nz * scene._Uz;
+				_pc = nx * scene._Fx + ny * scene._Fy + nz * scene._Fz;
+				_pe = nx * scene._camX + ny * scene._camY + nz * scene._camZ + scene._clipD;
+			}
+		}
 
 		// painter's order for the transparent pass: farthest first (smaller W = 1/z = farther)
 		private sealed class TriDepthCmp : System.Collections.Generic.IComparer<RTri> {
@@ -49,6 +70,30 @@ namespace OpenTaiko {
 		}
 		private static readonly TriDepthCmp _triCmp = new();
 		public void SortByDepth() { if (TriN > 1) Array.Sort(Tris, 0, TriN, _triCmp); }
+
+		/// <summary>Sort the triangles into the row bands their rows reach (<paramref name="rowBand"/> gives the band of
+		/// each of the <paramref name="h"/> rows), keeping the draw order inside each band.</summary>
+		public void Bin(int[] rowBand, int bands, int h) {
+			if (BinStart.Length < bands + 1) { BinStart = new int[bands + 1]; _binAt = new int[bands]; }
+			Array.Clear(BinStart, 0, bands + 1);
+			if (_binLo.Length < TriN) { _binLo = new int[Tris.Length]; _binHi = new int[Tris.Length]; }
+			for (int i = 0; i < TriN; i++) {
+				ref RTri t = ref Tris[i];
+				int y0 = (int)Math.Floor(Math.Min(t.Y0, Math.Min(t.Y1, t.Y2))); if (y0 < 0) y0 = 0;
+				int y1 = (int)Math.Ceiling(Math.Max(t.Y0, Math.Max(t.Y1, t.Y2))); if (y1 > h - 1) y1 = h - 1;
+				if (y0 > y1) { _binLo[i] = -1; continue; }   // off screen
+				int b0 = rowBand[y0], b1 = rowBand[y1];
+				_binLo[i] = b0; _binHi[i] = b1;
+				for (int b = b0; b <= b1; b++) BinStart[b + 1]++;
+			}
+			for (int b = 0; b < bands; b++) BinStart[b + 1] += BinStart[b];
+			if (BinIdx.Length < BinStart[bands]) BinIdx = new int[Math.Max(BinStart[bands], BinIdx.Length * 2)];
+			Array.Copy(BinStart, _binAt, bands);
+			for (int i = 0; i < TriN; i++) {
+				int b0 = _binLo[i]; if (b0 < 0) continue;
+				for (int b = b0, b1 = _binHi[i]; b <= b1; b++) BinIdx[_binAt[b]++] = i;
+			}
+		}
 
 		private void ToCam(double wx, double wy, double wz, out double cx, out double cy, out double cz) {
 			double rx = wx - s._camX, ry = wy - s._camY, rz = wz - s._camZ;
@@ -86,6 +131,53 @@ namespace OpenTaiko {
 			return m;
 		}
 
+		// cut the polygon in _v* to the front of the reflection clip plane, in place; returns its corner count
+		private int ClipPlane(int n) {
+			int inside = 0;
+			for (int i = 0; i < n; i++) {
+				double pd = _pa * _vx[i] + _pb * _vy[i] + _pc * _vz[i] + _pe;
+				_pd[i] = pd; if (pd >= 0) inside++;
+			}
+			if (inside == n || inside == 0) return inside;
+			int m = 0;
+			for (int i = 0; i < n; i++) {
+				int j = (i + 1) % n;
+				double di = _pd[i], dj = _pd[j];
+				bool inI = di >= 0, inJ = dj >= 0;
+				if (inI) {
+					_ox[m] = _vx[i]; _oy[m] = _vy[i]; _oz[m] = _vz[i]; _ou[m] = _vu[i]; _ov[m] = _vv[i];
+					if (_gour) { _olr[m] = _vlr[i]; _olg[m] = _vlg[i]; _olb[m] = _vlb[i]; }
+					m++;
+				}
+				if (inI != inJ) {
+					double t = di / (di - dj);
+					_ox[m] = _vx[i] + (_vx[j] - _vx[i]) * t;
+					_oy[m] = _vy[i] + (_vy[j] - _vy[i]) * t;
+					_oz[m] = _vz[i] + (_vz[j] - _vz[i]) * t;
+					_ou[m] = _vu[i] + (_vu[j] - _vu[i]) * t;
+					_ov[m] = _vv[i] + (_vv[j] - _vv[i]) * t;
+					if (_gour) {
+						_olr[m] = _vlr[i] + (_vlr[j] - _vlr[i]) * t;
+						_olg[m] = _vlg[i] + (_vlg[j] - _vlg[i]) * t;
+						_olb[m] = _vlb[i] + (_vlb[j] - _vlb[i]) * t;
+					}
+					m++;
+				}
+			}
+			for (int i = 0; i < m; i++) {
+				_vx[i] = _ox[i]; _vy[i] = _oy[i]; _vz[i] = _oz[i]; _vu[i] = _ou[i]; _vv[i] = _ov[i];
+				if (_gour) { _vlr[i] = _olr[i]; _vlg[i] = _olg[i]; _vlb[i] = _olb[i]; }
+			}
+			return m;
+		}
+
+		// the polygon in _v* cut to the near plane, and in a reflection pass to the clip plane first: the result is
+		// in _o*; returns its corner count
+		private int Clip(int n) {
+			if (_clip && (n = ClipPlane(n)) < 3) return 0;
+			return ClipNear(n);
+		}
+
 		private void Project(int m) {
 			double hw = s._w * 0.5, hh = s._h * 0.5, scale = s._scale;
 			for (int i = 0; i < m; i++) {
@@ -105,6 +197,7 @@ namespace OpenTaiko {
 			ref RTri t = ref Tris[TriN++];
 			t.IsTex = true; t.Sprite = false; t.Tex = tex; t.Tw = tw; t.Th = th; t.Shade = shade; t.Alpha = alpha; t.ScreenTex = _screenT;
 			t.BaseR = _baseR; t.BaseG = _baseG; t.BaseB = _baseB;
+			t.Recol = _recol; t.RcR = _rcR; t.RcG = _rcG; t.RcB = _rcB;
 			t.X0 = _sx[i0]; t.Y0 = _sy[i0]; t.W0 = _sw[i0]; t.U0 = _su[i0]; t.V0 = _sv[i0];
 			t.X1 = _sx[i1]; t.Y1 = _sy[i1]; t.W1 = _sw[i1]; t.U1 = _su[i1]; t.V1 = _sv[i1];
 			t.X2 = _sx[i2]; t.Y2 = _sy[i2]; t.W2 = _sw[i2]; t.U2 = _su[i2]; t.V2 = _sv[i2];
@@ -147,7 +240,7 @@ namespace OpenTaiko {
 
 		private static void FaceNormal(SceneObject o, double ax, double ay, double az, double bx, double by, double bz,
 			double cx, double cy, double cz, out double nx, out double ny, out double nz) {
-			if (o.HasNormal) { nx = o.Nx; ny = o.Ny; nz = o.Nz; }
+			if (o.HasNormal) { nx = o.Nx; ny = o.Ny; nz = o.Nz; o.NormalToWorld(ref nx, ref ny, ref nz); }
 			else {
 				double e1x = bx - ax, e1y = by - ay, e1z = bz - az;
 				double e2x = cx - ax, e2y = cy - ay, e2z = cz - az;
@@ -195,12 +288,25 @@ namespace OpenTaiko {
 			return true;
 		}
 
+		// the light at each corner turned into the surface's colour factor: albedo factor times (light + emissive)
+		private void Surface(int n) {
+			for (int i = 0; i < n; i++) {
+				_vlr[i] = _kR * (_vlr[i] + _eR); _vlg[i] = _kG * (_vlg[i] + _eG); _vlb[i] = _kB * (_vlb[i] + _eB);
+			}
+		}
+
 		private void GatherObjLights(SceneObject o) {
 			_objLights.Clear();
 			var lights = s._lights;
+			// a transformed object's bounds are in its own space: test the lights against its world sphere instead
+			double scx = 0, scy = 0, scz = 0, sr = 0;
+			bool sphere = o.Transform != null && o.WorldSphere(out scx, out scy, out scz, out sr);
 			for (int i = 0; i < lights.Count; i++) {
 				var L = lights[i];
-				if (L.Range > 0 && o.HasBounds) {
+				if (L.Range > 0 && sphere) {
+					double dx = L.X - scx, dy = L.Y - scy, dz = L.Z - scz, reach = L.Range + sr;
+					if (dx * dx + dy * dy + dz * dz >= reach * reach) continue;
+				} else if (L.Range > 0 && o.HasBounds && o.Transform == null) {
 					double cx = L.X < o.MinX ? o.MinX : (L.X > o.MaxX ? o.MaxX : L.X);
 					double cy = L.Y < o.MinY ? o.MinY : (L.Y > o.MaxY ? o.MaxY : L.Y);
 					double cz = L.Z < o.MinZ ? o.MinZ : (L.Z > o.MaxZ ? o.MaxZ : L.Z);
@@ -215,15 +321,21 @@ namespace OpenTaiko {
 			var d = o.D; var t = o.Transform;
 			_screenT = o.ScreenTex;
 			if (_screenT) { _baseR = RenderUtil.CB(o.R); _baseG = RenderUtil.CB(o.G); _baseB = RenderUtil.CB(o.B); }
+			// screen-tex mirrors take neither the colour override nor the emissive, as on the GPU
+			_recol = o.FlatR >= 0 && !_screenT;
+			if (_recol) { _rcR = o.FlatR * 255; _rcG = o.FlatG * 255; _rcB = o.FlatB * 255; }
+			if (_screenT) { _eR = _eG = _eB = 0; } else { _eR = o.EmR; _eG = o.EmG; _eB = o.EmB; }
+			// the tint multiplies textured surfaces, unless the colour override replaces their texels
+			if (o.Kind == 1 || _recol) { _kR = _kG = _kB = 1; } else { _kR = o.TintR; _kG = o.TintG; _kB = o.TintB; }
 			bool objLit = _lit && o.Lit;
 			if (objLit) GatherObjLights(o); else _objLights.Clear();
 			bool perVertex = objLit && _objLights.Count > 0;   // per-vertex only where a torch reaches
 			if (o.Kind == 0) {                                  // textured quads
 				for (int i = 0; i < o.N; i++) {
-					int k = i * 16; int texId = (int)d[k+12];
-					if (!s._texPix.TryGetValue(texId, out var tex)) continue;
-					int tw = s._texW[texId], th = s._texH[texId];
-					double uMax = d[k+13], vMax = d[k+14], shade = d[k+15];
+					int k = i * PrimLayout.TexQuadStride;
+					if (!s.TryTex((int)d[k + PrimLayout.TexQuadTex], out var te)) continue;
+					int[] tex = te.Pix!; int tw = te.W, th = te.H;
+					double uMax = d[k + PrimLayout.TexQuadUMax], vMax = d[k + PrimLayout.TexQuadVMax], shade = d[k + PrimLayout.TexQuadShade];
 					Xform(t, d[k],   d[k+1], d[k+2],  out double wx0, out double wy0, out double wz0);
 					Xform(t, d[k+3], d[k+4], d[k+5],  out double wx1, out double wy1, out double wz1);
 					Xform(t, d[k+6], d[k+7], d[k+8],  out double wx2, out double wy2, out double wz2);
@@ -232,7 +344,7 @@ namespace OpenTaiko {
 					ToCam(wx1,wy1,wz1, out _vx[1], out _vy[1], out _vz[1]); _vu[1]=uMax; _vv[1]=vMax;
 					ToCam(wx2,wy2,wz2, out _vx[2], out _vy[2], out _vz[2]); _vu[2]=uMax; _vv[2]=0;
 					ToCam(wx3,wy3,wz3, out _vx[3], out _vy[3], out _vz[3]); _vu[3]=0;    _vv[3]=0;
-					double flR = shade * o.TintR, flG = shade * o.TintG, flB = shade * o.TintB; bool fg = false;
+					double flR = _kR * (shade + _eR), flG = _kG * (shade + _eG), flB = _kB * (shade + _eB); bool fg = false;
 					if (objLit) {
 						FaceNormal(o, wx0,wy0,wz0, wx1,wy1,wz1, wx3,wy3,wz3, out double nx, out double ny, out double nz);
 						if (perVertex) {
@@ -240,20 +352,23 @@ namespace OpenTaiko {
 							LightAt(wx1,wy1,wz1, nx,ny,nz, shade, out _vlr[1], out _vlg[1], out _vlb[1]);
 							LightAt(wx2,wy2,wz2, nx,ny,nz, shade, out _vlr[2], out _vlg[2], out _vlb[2]);
 							LightAt(wx3,wy3,wz3, nx,ny,nz, shade, out _vlr[3], out _vlg[3], out _vlb[3]);
-							fg = !Uniform(4); flR = _vlr[0]; flG = _vlg[0]; flB = _vlb[0];
+							Surface(4); fg = !Uniform(4); flR = _vlr[0]; flG = _vlg[0]; flB = _vlb[0];
 						} else {
 							LightAt(wx0,wy0,wz0, nx,ny,nz, shade, out flR, out flG, out flB);
+							flR = _kR * (flR + _eR); flG = _kG * (flG + _eG); flB = _kB * (flB + _eB);
 						}
 					}
 					_gour = fg;
-					int m = ClipNear(4); if (m < 3) continue;
+					int m = Clip(4); if (m < 3) continue;
 					Project(m);
 					for (int tri = 1; tri < m - 1; tri++) AddTexTri(0, tri, tri+1, tex, tw, th, shade, o.A, fg, flR, flG, flB);
 				}
 			} else if (o.Kind == 1) {                           // flat quads (water)
-				byte br = RenderUtil.CB(o.R), bg = RenderUtil.CB(o.G), bb = RenderUtil.CB(o.B);
+				byte br, bg, bb;
+				if (_recol) { br = RenderUtil.CB(_rcR); bg = RenderUtil.CB(_rcG); bb = RenderUtil.CB(_rcB); }
+				else { br = RenderUtil.CB(o.R); bg = RenderUtil.CB(o.G); bb = RenderUtil.CB(o.B); }
 				for (int i = 0; i < o.N; i++) {
-					int k = i * 12;
+					int k = i * PrimLayout.FlatQuadStride;
 					Xform(t, d[k],   d[k+1], d[k+2],  out double wx0, out double wy0, out double wz0);
 					Xform(t, d[k+3], d[k+4], d[k+5],  out double wx1, out double wy1, out double wz1);
 					Xform(t, d[k+6], d[k+7], d[k+8],  out double wx2, out double wy2, out double wz2);
@@ -262,7 +377,7 @@ namespace OpenTaiko {
 					ToCam(wx1,wy1,wz1, out _vx[1], out _vy[1], out _vz[1]);
 					ToCam(wx2,wy2,wz2, out _vx[2], out _vy[2], out _vz[2]);
 					ToCam(wx3,wy3,wz3, out _vx[3], out _vy[3], out _vz[3]);
-					double flR = 1.0, flG = 1.0, flB = 1.0; bool fg = false;
+					double flR = 1.0 + _eR, flG = 1.0 + _eG, flB = 1.0 + _eB; bool fg = false;
 					if (objLit) {
 						FaceNormal(o, wx0,wy0,wz0, wx1,wy1,wz1, wx3,wy3,wz3, out double nx, out double ny, out double nz);
 						if (perVertex) {
@@ -270,50 +385,52 @@ namespace OpenTaiko {
 							LightAt(wx1,wy1,wz1, nx,ny,nz, 1.0, out _vlr[1], out _vlg[1], out _vlb[1]);
 							LightAt(wx2,wy2,wz2, nx,ny,nz, 1.0, out _vlr[2], out _vlg[2], out _vlb[2]);
 							LightAt(wx3,wy3,wz3, nx,ny,nz, 1.0, out _vlr[3], out _vlg[3], out _vlb[3]);
-							fg = !Uniform(4); flR = _vlr[0]; flG = _vlg[0]; flB = _vlb[0];
+							Surface(4); fg = !Uniform(4); flR = _vlr[0]; flG = _vlg[0]; flB = _vlb[0];
 						} else {
 							LightAt(wx0,wy0,wz0, nx,ny,nz, 1.0, out flR, out flG, out flB);
+							flR += _eR; flG += _eG; flB += _eB;
 						}
 					}
 					_gour = fg;
-					int m = ClipNear(4); if (m < 3) continue;
+					int m = Clip(4); if (m < 3) continue;
 					Project(m);
 					for (int tri = 1; tri < m - 1; tri++) AddFlatTri(0, tri, tri+1, br, bg, bb, o.A, fg, flR, flG, flB);
 				}
 			} else if (o.Kind == 2) {                           // textured triangles (models)
 				for (int i = 0; i < o.N; i++) {
-					int k = i * 17; int texId = (int)d[k+15];
-					if (!s._texPix.TryGetValue(texId, out var tex)) continue;
-					int tw = s._texW[texId], th = s._texH[texId]; double shade = d[k+16];
+					int k = i * PrimLayout.TexTriStride;
+					if (!s.TryTex((int)d[k + PrimLayout.TexTriTex], out var te)) continue;
+					int[] tex = te.Pix!; int tw = te.W, th = te.H; double shade = d[k + PrimLayout.TexTriShade];
 					Xform(t, d[k],    d[k+1],  d[k+2],  out double wx0, out double wy0, out double wz0);
 					Xform(t, d[k+5],  d[k+6],  d[k+7],  out double wx1, out double wy1, out double wz1);
 					Xform(t, d[k+10], d[k+11], d[k+12], out double wx2, out double wy2, out double wz2);
 					ToCam(wx0,wy0,wz0, out _vx[0], out _vy[0], out _vz[0]); _vu[0]=d[k+3];  _vv[0]=d[k+4];
 					ToCam(wx1,wy1,wz1, out _vx[1], out _vy[1], out _vz[1]); _vu[1]=d[k+8];  _vv[1]=d[k+9];
 					ToCam(wx2,wy2,wz2, out _vx[2], out _vy[2], out _vz[2]); _vu[2]=d[k+13]; _vv[2]=d[k+14];
-					double flR = shade * o.TintR, flG = shade * o.TintG, flB = shade * o.TintB; bool fg = false;
+					double flR = _kR * (shade + _eR), flG = _kG * (shade + _eG), flB = _kB * (shade + _eB); bool fg = false;
 					if (objLit) {
 						FaceNormal(o, wx0,wy0,wz0, wx1,wy1,wz1, wx2,wy2,wz2, out double nx, out double ny, out double nz);
 						if (perVertex) {
 							LightAt(wx0,wy0,wz0, nx,ny,nz, shade, out _vlr[0], out _vlg[0], out _vlb[0]);
 							LightAt(wx1,wy1,wz1, nx,ny,nz, shade, out _vlr[1], out _vlg[1], out _vlb[1]);
 							LightAt(wx2,wy2,wz2, nx,ny,nz, shade, out _vlr[2], out _vlg[2], out _vlb[2]);
-							fg = !Uniform(3); flR = _vlr[0]; flG = _vlg[0]; flB = _vlb[0];
+							Surface(3); fg = !Uniform(3); flR = _vlr[0]; flG = _vlg[0]; flB = _vlb[0];
 						} else {
 							LightAt(wx0,wy0,wz0, nx,ny,nz, shade, out flR, out flG, out flB);
+							flR = _kR * (flR + _eR); flG = _kG * (flG + _eG); flB = _kB * (flB + _eB);
 						}
 					}
 					_gour = fg;
-					int m = ClipNear(3); if (m < 3) continue;
+					int m = Clip(3); if (m < 3) continue;
 					Project(m);
 					for (int tri = 1; tri < m - 1; tri++) AddTexTri(0, tri, tri+1, tex, tw, th, shade, o.A, fg, flR, flG, flB);
 				}
 			} else if (o.Kind == 3) {                           // billboarded alpha sprites (2D-in-3D)
 				for (int i = 0; i < o.N; i++) {
-					int k = i * 8; int spriteId = (int)d[k + 5];
-					if (!s._spritePix.TryGetValue(spriteId, out var tex)) continue;
-					int tw = s._spriteW[spriteId], th = s._spriteH[spriteId];
-					double w = d[k + 3], hgt = d[k + 4]; int bb = (int)d[k + 6]; bool cut = d[k + 7] != 0;
+					int k = i * PrimLayout.SpriteStride;
+					if (!s.TrySprite((int)d[k + PrimLayout.SpriteId], out var se)) continue;
+					int[] tex = se.Pix!; int tw = se.W, th = se.H;
+					double w = d[k + PrimLayout.SpriteW], hgt = d[k + PrimLayout.SpriteH]; int bb = (int)d[k + PrimLayout.SpriteBillboard]; bool cut = d[k + PrimLayout.SpriteCutout] != 0;
 					Xform(t, d[k], d[k + 1], d[k + 2], out double wcx, out double wcy, out double wcz);
 					// billboard basis: 2 = full (camera right/up), 1 = Y-axis (face camera, upright; 2D-in-3D), else fixed XY
 					double rx, ry, rz, ux, uy, uz;
@@ -330,7 +447,25 @@ namespace OpenTaiko {
 					ToCam(b1x + tux, b1y + tuy, b1z + tuz, out _vx[2], out _vy[2], out _vz[2]); _vu[2] = 1; _vv[2] = 0;
 					ToCam(b0x + tux, b0y + tuy, b0z + tuz, out _vx[3], out _vy[3], out _vz[3]); _vu[3] = 0; _vv[3] = 0;
 					_gour = false;
-					int m = ClipNear(4); if (m < 3) continue;
+					int m = Clip(4); if (m < 3) continue;
+					Project(m);
+					for (int tri = 1; tri < m - 1; tri++) AddSpriteTri(0, tri, tri + 1, tex, tw, th, o.TintR, o.TintG, o.TintB, o.A, false, cut);
+				}
+			} else if (o.Kind == 4) {                           // sprites on explicit world quads (shadows draped over slopes, decals)
+				for (int i = 0; i < o.N; i++) {
+					int k = i * PrimLayout.SpriteQuadStride;
+					if (!s.TrySprite((int)d[k + PrimLayout.SpriteQuadId], out var se)) continue;
+					int[] tex = se.Pix!; int tw = se.W, th = se.H; bool cut = d[k + PrimLayout.SpriteQuadCutout] != 0;
+					Xform(t, d[k],     d[k + 1],  d[k + 2],  out double wx0, out double wy0, out double wz0);
+					Xform(t, d[k + 3], d[k + 4],  d[k + 5],  out double wx1, out double wy1, out double wz1);
+					Xform(t, d[k + 6], d[k + 7],  d[k + 8],  out double wx2, out double wy2, out double wz2);
+					Xform(t, d[k + 9], d[k + 10], d[k + 11], out double wx3, out double wy3, out double wz3);
+					ToCam(wx0, wy0, wz0, out _vx[0], out _vy[0], out _vz[0]); _vu[0] = 0; _vv[0] = 1;
+					ToCam(wx1, wy1, wz1, out _vx[1], out _vy[1], out _vz[1]); _vu[1] = 1; _vv[1] = 1;
+					ToCam(wx2, wy2, wz2, out _vx[2], out _vy[2], out _vz[2]); _vu[2] = 1; _vv[2] = 0;
+					ToCam(wx3, wy3, wz3, out _vx[3], out _vy[3], out _vz[3]); _vu[3] = 0; _vv[3] = 0;
+					_gour = false;
+					int m = Clip(4); if (m < 3) continue;
 					Project(m);
 					for (int tri = 1; tri < m - 1; tri++) AddSpriteTri(0, tri, tri + 1, tex, tw, th, o.TintR, o.TintG, o.TintB, o.A, false, cut);
 				}
@@ -355,6 +490,10 @@ namespace OpenTaiko {
 	/// triangles with a perspective-correct, z-buffered, fog-aware rasterizer parallelised over
 	/// horizontal bands. Opaque builders are kept in near→far order for early-z; the transparent
 	/// pass is built serially (sorted) and drawn last.
+	/// What the GPU rasterizer draws and this one leaves out: depth bias (ObjSetDepthBias), terrain splat shading (a
+	/// splat object shows its per-quad textures), grass fields, sun shadow maps, normal maps, wetness, x-ray silhouettes,
+	/// the water look of screen-tex surfaces (ripple, fresnel, depth tint, custom surface shaders), the sky and post
+	/// shaders, the diorama and colour grade, and texture filtering (always nearest).
 	/// </summary>
 	internal sealed class Rasterizer : IRenderer {
 		private Lua3DScene _s;
@@ -370,6 +509,9 @@ namespace OpenTaiko {
 		private static readonly Comparison<SceneObject> _farFirst = (a, b) => b.Dist.CompareTo(a.Dist);
 
 		public void Invalidate() { }   // stateless between frames
+		public void Dispose() { }
+		public string Name => "CPU rasterizer";
+		public string Mode => "raster_cpu";
 
 		public void Render(Lua3DScene s) {
 			_s = s;
@@ -381,8 +523,10 @@ namespace OpenTaiko {
 				if (!o.Visible || o.N == 0) continue;
 				if (s._rttPass && (o.Overlay || o.ScreenTex)) continue;   // no viewmodels/mirrors inside RTT views
 				if (o.Overlay) { _overlay.Add(o); continue; }   // viewmodel: drawn last, depth-cleared
-				if (Culled(o)) continue;
-				o.Dist = DistSq(o);
+				bool bounded = o.WorldSphere(out double cx, out double cy, out double cz, out double radius);
+				if (Culled(o, bounded, cx, cy, cz, radius)) continue;
+				double vx = cx - s._camX, vy = cy - s._camY, vz = cz - s._camZ;
+				o.Dist = vx * vx + vy * vy + vz * vz;   // an unbounded object sorts by its origin
 				if (o.Pass == 0) _opaque.Add(o); else _transp.Add(o);
 			}
 			_opaque.Sort(_nearFirst);
@@ -395,6 +539,11 @@ namespace OpenTaiko {
 				_builders = nbld;
 			}
 			_transBuilder ??= new Builder();
+			// one row band per thread; with several, each builder sorts its triangles into the bands they reach, so a
+			// band sets up only the triangles that cross it
+			int n = s._threads;
+			bool binned = n > 1;
+			if (binned) _rowBand = RowBands(_rowBand, n, s._h);
 
 			// Parallel build: partition the (near→far sorted) opaque list into contiguous slices, one
 			// per builder, so iterating builders 0..nb-1 stays roughly near→far for early-z.
@@ -402,22 +551,22 @@ namespace OpenTaiko {
 			for (int i = 0; i < _nb; i++) _builders[i].Reset(s, _lit);
 			if (_nb == 1) {
 				for (int k = 0; k < _opaque.Count; k++) _builders[0].Build(_opaque[k]);
+				if (binned) _builders[0].Bin(_rowBand, n, s._h);
 			} else if (_nb > 1) {
 				Parallel.For(0, _nb, s._po, slot => {
 					var bld = _builders[slot];
 					int lo = slot * _opaque.Count / _nb, hi = (slot + 1) * _opaque.Count / _nb;
 					for (int k = lo; k < hi; k++) bld.Build(_opaque[k]);
+					if (binned) bld.Bin(_rowBand, n, s._h);
 				});
 			}
 			_transBuilder.Reset(s, _lit);
 			for (int k = 0; k < _transp.Count; k++) _transBuilder.Build(_transp[k]);
 			_transBuilder.SortByDepth();    // back→front so glass dims what's behind it
+			if (binned) _transBuilder.Bin(_rowBand, n, s._h);
 
-			int n = s._threads;
-			if (n <= 1) RasterizeBand(0, s._h);
-			else Parallel.For(0, n, s._po, bi => RasterizeBand(bi * s._h / n, (bi + 1) * s._h / n));
-			// NB: one band per thread (not n×4). RasterizeBand re-scans EVERY triangle per band, so more
-			// bands = more per-triangle rescans — costly for many-triangle scenes like voxel.
+			if (!binned) RasterizeBand(-1, 0, s._h);
+			else Parallel.For(0, n, s._po, bi => RasterizeBand(bi, bi * s._h / n, (bi + 1) * s._h / n));
 
 			// Particles: a dedicated point-sprite pass. Billboards are camera-facing flat quads → they
 			// project to axis-aligned screen rectangles at a single depth, so we skip the whole triangle
@@ -438,10 +587,12 @@ namespace OpenTaiko {
 				_overlayBuilder.Reset(s, _lit);
 				for (int k = 0; k < _overlay.Count; k++) _overlayBuilder.Build(_overlay[k]);
 				int on = s._threads;
-				if (on <= 1) RasterTris(_overlayBuilder, 0, s._h);
+				if (on <= 1) RasterTris(_overlayBuilder, -1, 0, s._h);
 				else {
 					int ob = on * 4;
-					Parallel.For(0, ob, s._po, bi => RasterTris(_overlayBuilder, bi * s._h / ob, (bi + 1) * s._h / ob));
+					_rowBand = RowBands(_rowBand, ob, s._h);
+					_overlayBuilder.Bin(_rowBand, ob, s._h);
+					Parallel.For(0, ob, s._po, bi => RasterTris(_overlayBuilder, bi, bi * s._h / ob, (bi + 1) * s._h / ob));
 				}
 			}
 			// Optional post-process antialiasing (smooths the low-res render's edges before upscale).
@@ -454,11 +605,13 @@ namespace OpenTaiko {
 		// A billboard uses the camera right/up axes, so in camera space its 4 corners share the particle's
 		// depth and project to an axis-aligned screen rectangle. We exploit that: project each particle to
 		// (centre, half-size, 1/z), depth-sort once, then fill rectangles with affine sprite UVs — no
-		// triangles, no invA setup, no per-pixel divide, no per-band triangle rescan.
+		// triangles, no invA setup, no per-pixel divide, no per-band triangle rescan. A spinning particle turns in the
+		// camera plane, so it projects to that square turned by its angle (Ca, Sa) inside a box of half-size Ext.
 		private struct PP {
-			public double Sx, Sy, Half; public float W;
+			public double Sx, Sy, Half, Ext; public float W;
 			public int[]? Spr; public int Sw, Sh;
 			public double R, G, B, A; public bool Add;
+			public bool Turned; public double Ca, Sa;
 		}
 		private PP[] _pp = new PP[2048];
 		private int _ppN;
@@ -479,21 +632,26 @@ namespace OpenTaiko {
 				var psys = systems[si]; var arr = psys.P; int cnt = psys.Count;
 				for (int i = 0; i < cnt; i++) {
 					ref Particle p = ref arr[i];
-					double lf = p.MaxLife > 0 ? p.Life / p.MaxLife : 0; if (lf < 0) lf = 0; else if (lf > 1) lf = 1;
-					double a = p.A0 * lf; if (a <= 0) continue; if (a > 1) a = 1;
+					double lf = p.LifeLeft;
+					double a = p.A0 * p.FadeAt(lf); if (a <= 0) continue; if (a > 1) a = 1;   // opacity and size over life
+					double size = p.SizeAt(lf); if (size <= 0) continue;
 					double rxw = p.X - cxp, ryw = p.Y - cyp, rzw = p.Z - czp;
 					double cz = rxw * Fx + ryw * Fy + rzw * Fz; if (cz < near) continue;
 					double w = 1.0 / cz;
 					double sx = hw + (rxw * Rx + ryw * Ry + rzw * Rz) * w * scale;
 					double sy = hh - (rxw * Ux + ryw * Uy + rzw * Uz) * w * scale;
-					double half = (p.Size0 + (p.Size1 - p.Size0) * (1.0 - lf)) * 0.5 * w * scale;
+					double half = size * 0.5 * w * scale;
 					if (half < 0.5) half = 0.5;   // keep tiny/distant particles at least ~1px (stars, sparks)
-					if (sx + half < 0 || sx - half >= W || sy + half < 0 || sy - half >= H) continue;
+					bool turned = p.RotVel != 0 || p.Rot != 0;
+					double ca = 1, sa = 0, ext = half;
+					if (turned) { double ang = p.Angle; ca = Math.Cos(ang); sa = Math.Sin(ang); ext = half * (Math.Abs(ca) + Math.Abs(sa)); }
+					if (sx + ext < 0 || sx - ext >= W || sy + ext < 0 || sy - ext >= H) continue;
 					if (_ppN == _pp.Length) { System.Array.Resize(ref _pp, _pp.Length * 2); System.Array.Resize(ref _ppIdx, _pp.Length); System.Array.Resize(ref _ppDepth, _pp.Length); }
 					int[]? spr = null; int sw = 0, sh = 0;
-					if (p.Sprite >= 0 && s._spritePix.TryGetValue(p.Sprite, out var sp)) { spr = sp; sw = s._spriteW[p.Sprite]; sh = s._spriteH[p.Sprite]; }
+					if (p.Sprite >= 0 && s.TrySprite(p.Sprite, out var se)) { spr = se.Pix; sw = se.W; sh = se.H; }
 					_ppDepth[_ppN] = cz;
-					_pp[_ppN++] = new PP { Sx = sx, Sy = sy, Half = half, W = (float)w, Spr = spr, Sw = sw, Sh = sh, R = p.R, G = p.G, B = p.B, A = a, Add = p.Additive };
+					_pp[_ppN++] = new PP { Sx = sx, Sy = sy, Half = half, Ext = ext, W = (float)w, Spr = spr, Sw = sw, Sh = sh, R = p.R, G = p.G, B = p.B, A = a, Add = p.Additive,
+						Turned = turned, Ca = ca, Sa = sa };
 				}
 			}
 		}
@@ -509,12 +667,13 @@ namespace OpenTaiko {
 			fixed (byte* B = s._canvas._buf) fixed (float* Dp = s._depth) {
 				for (int k = 0; k < _ppN; k++) {
 					ref PP p = ref _pp[_ppIdx[k]];
-					double half = p.Half, left = p.Sx - half, top = p.Sy - half, inv = 1.0 / (2 * half);
-					int x0 = (int)System.Math.Floor(p.Sx - half); if (x0 < 0) x0 = 0;
-					int x1 = (int)System.Math.Ceiling(p.Sx + half); if (x1 > W - 1) x1 = W - 1;
-					int y0 = (int)System.Math.Floor(p.Sy - half); if (y0 < by0) y0 = by0;
-					int y1 = (int)System.Math.Ceiling(p.Sy + half); if (y1 > by1 - 1) y1 = by1 - 1;
+					double half = p.Half, ext = p.Ext, left = p.Sx - half, top = p.Sy - half, inv = 1.0 / (2 * half);
+					int x0 = (int)System.Math.Floor(p.Sx - ext); if (x0 < 0) x0 = 0;
+					int x1 = (int)System.Math.Ceiling(p.Sx + ext); if (x1 > W - 1) x1 = W - 1;
+					int y0 = (int)System.Math.Floor(p.Sy - ext); if (y0 < by0) y0 = by0;
+					int y1 = (int)System.Math.Ceiling(p.Sy + ext); if (y1 > by1 - 1) y1 = by1 - 1;
 					if (x0 > x1 || y0 > y1) continue;
+					if (p.Turned) { TurnedParticle(ref p, B, Dp, W, x0, x1, y0, y1); continue; }
 					float fw = p.W; bool add = p.Add; double a = p.A;
 					if (p.Spr != null) {
 						int sw = p.Sw, sh = p.Sh;
@@ -535,7 +694,7 @@ namespace OpenTaiko {
 											double sr = ((pk >> 16) & 0xFF) * tr, sg = ((pk >> 8) & 0xFF) * tg, sb = (pk & 0xFF) * tb;
 											int o = idx * 4;
 											if (add) { B[o] = RenderUtil.CB(sr * pa + B[o]); B[o + 1] = RenderUtil.CB(sg * pa + B[o + 1]); B[o + 2] = RenderUtil.CB(sb * pa + B[o + 2]); B[o + 3] = 255; }
-											else { double ia = 1 - pa; B[o] = (byte)(sr * pa + B[o] * ia); B[o + 1] = (byte)(sg * pa + B[o + 1] * ia); B[o + 2] = (byte)(sb * pa + B[o + 2] * ia); B[o + 3] = 255; }
+											else { double ia = 1 - pa; B[o] = RenderUtil.CB(sr * pa + B[o] * ia); B[o + 1] = RenderUtil.CB(sg * pa + B[o + 1] * ia); B[o + 2] = RenderUtil.CB(sb * pa + B[o + 2] * ia); B[o + 3] = 255; }
 										}
 									}
 								}
@@ -550,10 +709,45 @@ namespace OpenTaiko {
 								if (fw > Dp[idx]) {
 									int o = idx * 4;
 									if (add) { B[o] = RenderUtil.CB(sr * a + B[o]); B[o + 1] = RenderUtil.CB(sg * a + B[o + 1]); B[o + 2] = RenderUtil.CB(sb * a + B[o + 2]); B[o + 3] = 255; }
-									else { double ia = 1 - a; B[o] = (byte)(sr * a + B[o] * ia); B[o + 1] = (byte)(sg * a + B[o + 1] * ia); B[o + 2] = (byte)(sb * a + B[o + 2] * ia); B[o + 3] = 255; }
+									else { double ia = 1 - a; B[o] = RenderUtil.CB(sr * a + B[o] * ia); B[o + 1] = RenderUtil.CB(sg * a + B[o + 1] * ia); B[o + 2] = RenderUtil.CB(sb * a + B[o + 2] * ia); B[o + 3] = 255; }
 								}
 							}
 						}
+					}
+				}
+			}
+		}
+
+		// a spinning particle over the pixels [x0, x1] x [y0, y1] of its box: each pixel turns back by the particle's
+		// angle into the image (u, v in 0..1 across the square); pixels outside the turned square are skipped
+		private static unsafe void TurnedParticle(ref PP p, byte* B, float* Dp, int W, int x0, int x1, int y0, int y1) {
+			double k = 0.5 / p.Half, c = p.Ca * k, sn = p.Sa * k;   // a one-pixel step in image units
+			float fw = p.W; bool add = p.Add; double a = p.A;
+			int sw = p.Sw, sh = p.Sh;
+			double tr = p.R * (1.0 / 255), tg = p.G * (1.0 / 255), tb = p.B * (1.0 / 255);
+			fixed (int* T = p.Spr) {
+				for (int py = y0; py <= y1; py++) {
+					double dx = x0 + 0.5 - p.Sx, dy = py + 0.5 - p.Sy;
+					double u = 0.5 + dx * c - dy * sn, v = 0.5 + dx * sn + dy * c;
+					int rowB = py * W;
+					for (int px = x0; px <= x1; px++, u += c, v += sn) {
+						if (u < 0 || u >= 1 || v < 0 || v >= 1) continue;
+						int idx = rowB + px;
+						if (!(fw > Dp[idx])) continue;
+						double sr, sg, sb, pa;
+						if (T != null) {
+							int sxi = (int)(u * sw); if (sxi >= sw) sxi = sw - 1;
+							int syi = (int)(v * sh); if (syi >= sh) syi = sh - 1;
+							int pk = T[syi * sw + sxi]; int ta = (pk >> 24) & 0xFF;
+							if (ta == 0) continue;
+							pa = (ta * 0.003921568627) * a;
+							sr = ((pk >> 16) & 0xFF) * tr; sg = ((pk >> 8) & 0xFF) * tg; sb = (pk & 0xFF) * tb;
+						} else {
+							pa = a; sr = p.R; sg = p.G; sb = p.B;
+						}
+						int o = idx * 4;
+						if (add) { B[o] = RenderUtil.CB(sr * pa + B[o]); B[o + 1] = RenderUtil.CB(sg * pa + B[o + 1]); B[o + 2] = RenderUtil.CB(sb * pa + B[o + 2]); B[o + 3] = 255; }
+						else { double ia = 1 - pa; B[o] = RenderUtil.CB(sr * pa + B[o] * ia); B[o + 1] = RenderUtil.CB(sg * pa + B[o + 1] * ia); B[o + 2] = RenderUtil.CB(sb * pa + B[o + 2] * ia); B[o + 3] = 255; }
 					}
 				}
 			}
@@ -602,45 +796,51 @@ namespace OpenTaiko {
 			}
 		}
 
-		private void RasterTris(Builder bld, int by0, int by1) {
-			var ts = bld.Tris; int tn = bld.TriN;
-			for (int i = 0; i < tn; i++) {
+		private int[] _rowBand = Array.Empty<int>();
+		/// <summary>Fill <paramref name="table"/>[y] with the band of row y when the <paramref name="h"/> rows split into
+		/// <paramref name="n"/> bands of rows [b*h/n, (b+1)*h/n). Returns the table, a larger one when it was too short.</summary>
+		internal static int[] RowBands(int[] table, int n, int h) {
+			if (table.Length < h) table = new int[h];
+			for (int b = 0; b < n; b++)
+				for (int y = b * h / n, end = (b + 1) * h / n; y < end; y++) table[y] = b;
+			return table;
+		}
+
+		// the builder's triangles in rows [by0, by1): the ones binned into band `band`, or all of them when it is -1
+		private void RasterTris(Builder bld, int band, int by0, int by1) {
+			var ts = bld.Tris;
+			if (band < 0) {
+				for (int i = 0, tn = bld.TriN; i < tn; i++) {
+					if (ts[i].IsTex) RasterTexBand(ref ts[i], by0, by1);
+					else RasterFlatBand(ref ts[i], by0, by1);
+				}
+				return;
+			}
+			var idx = bld.BinIdx;
+			for (int k = bld.BinStart[band], end = bld.BinStart[band + 1]; k < end; k++) {
+				int i = idx[k];
 				if (ts[i].IsTex) RasterTexBand(ref ts[i], by0, by1);
 				else RasterFlatBand(ref ts[i], by0, by1);
 			}
 		}
 
-		private void RasterizeBand(int by0, int by1) {
-			for (int bi = 0; bi < _nb; bi++) RasterTris(_builders[bi], by0, by1);
-			RasterTris(_transBuilder, by0, by1);
+		private void RasterizeBand(int band, int by0, int by1) {
+			for (int bi = 0; bi < _nb; bi++) RasterTris(_builders[bi], band, by0, by1);
+			RasterTris(_transBuilder, band, by0, by1);
 		}
 
-		private bool Culled(SceneObject o) {
+		// (cx, cy, cz, radius): the object's world bounding sphere, when it has bounds
+		private bool Culled(SceneObject o, bool bounded, double cx, double cy, double cz, double radius) {
 			var s = _s;
-			if (o.HasBounds) {
-				double vx = o.CenX - s._camX, vy = o.CenY - s._camY, vz = o.CenZ - s._camZ;
-				double radius = o.Radius;
+			if (bounded) {
+				double vx = cx - s._camX, vy = cy - s._camY, vz = cz - s._camZ;
 				if (s._renderDist > 0) {
 					double rr = s._renderDist + radius;           // sqrt-free distance cull
 					if (vx*vx + vy*vy + vz*vz > rr*rr) return true;
 				}
 				if (s._Fx*vx + s._Fy*vy + s._Fz*vz < -radius) return true;
 			}
-			if (o.HasNormal) {
-				if (o.Nx > 0 && s._camX <= o.MinX) return true;
-				if (o.Nx < 0 && s._camX >= o.MaxX) return true;
-				if (o.Ny > 0 && s._camY <= o.MinY) return true;
-				if (o.Ny < 0 && s._camY >= o.MaxY) return true;
-				if (o.Nz > 0 && s._camZ <= o.MinZ) return true;
-				if (o.Nz < 0 && s._camZ >= o.MaxZ) return true;
-			}
-			return false;
-		}
-
-		private double DistSq(SceneObject o) {
-			var s = _s;
-			double vx = o.CenX - s._camX, vy = o.CenY - s._camY, vz = o.CenZ - s._camZ;
-			return vx*vx + vy*vy + vz*vz;   // CenX/Y/Z are 0 for unbounded objects (same as before)
+			return o.FacesAway(s._camX, s._camY, s._camZ);
 		}
 
 		private unsafe void RasterFlatBand(ref RTri t, int by0, int by1) {
@@ -680,7 +880,7 @@ namespace OpenTaiko {
 				lgR = invA * (e0r * lg0 + e1r * lg1 + e2r * lg2); lgDx = invA * (d0x * lg0 + d1x * lg1 + d2x * lg2); lgDy = invA * (d0y * lg0 + d1y * lg1 + d2y * lg2);
 				lbR = invA * (e0r * lb0 + e1r * lb1 + e2r * lb2); lbDx = invA * (d0x * lb0 + d1x * lb1 + d2x * lb2); lbDy = invA * (d0y * lb0 + d1y * lb1 + d2y * lb2);
 			}
-			double fmR = _lit ? flR : 1.0, fmG = _lit ? flG : 1.0, fmB = _lit ? flB : 1.0;
+			double fmR = flR, fmG = flG, fmB = flB;   // the light (1 unlit) plus the emissive
 			bool opaque = alpha >= 255; double a = alpha / 255.0, ia = 1.0 - a; bool add = t.Additive;
 			bool fog = s._fog; double fr = s._fogR, fg = s._fogG, fb = s._fogB, fstart = s._fogStart, finv = s._fogInv;
 			int W = s._w;
@@ -703,7 +903,7 @@ namespace OpenTaiko {
 								}
 								if (opaque) { D[idx] = fid; B[o] = RenderUtil.CB(cr); B[o + 1] = RenderUtil.CB(cg); B[o + 2] = RenderUtil.CB(cb); B[o + 3] = 255; }
 								else if (add) { B[o] = RenderUtil.CB(cr * a + B[o]); B[o + 1] = RenderUtil.CB(cg * a + B[o + 1]); B[o + 2] = RenderUtil.CB(cb * a + B[o + 2]); B[o + 3] = 255; }
-								else { B[o] = (byte)(cr * a + B[o] * ia); B[o + 1] = (byte)(cg * a + B[o + 1] * ia); B[o + 2] = (byte)(cb * a + B[o + 2] * ia); B[o + 3] = 255; }
+								else { B[o] = RenderUtil.CB(cr * a + B[o] * ia); B[o + 1] = RenderUtil.CB(cg * a + B[o + 1] * ia); B[o + 2] = RenderUtil.CB(cb * a + B[o + 2] * ia); B[o + 3] = 255; }
 							}
 						}
 						E0 += d0x; E1 += d1x; E2 += d2x; ID += idDx;
@@ -738,6 +938,7 @@ namespace OpenTaiko {
 			bool sprite = t.Sprite, cutout = t.Cutout, add = t.Additive;   // alpha-textured 2D-in-3D sprite quad
 			int rsh = s._rttShift;   // mirror/portal screen-tex is rendered at 1/2^rsh res -> sample px>>rsh
 			double bR = t.BaseR, bG = t.BaseG, bB = t.BaseB;
+			bool recol = t.Recol; double rcR = t.RcR, rcG = t.RcG, rcB = t.RcB;
 			double invA = 1.0 / area;
 			double d0x = y1 - y2, d0y = x2 - x1;
 			double d1x = y2 - y0, d1y = x0 - x2;
@@ -755,7 +956,7 @@ namespace OpenTaiko {
 				lgR = invA * (e0r * lg0 + e1r * lg1 + e2r * lg2); lgDx = invA * (d0x * lg0 + d1x * lg1 + d2x * lg2); lgDy = invA * (d0y * lg0 + d1y * lg1 + d2y * lg2);
 				lbR = invA * (e0r * lb0 + e1r * lb1 + e2r * lb2); lbDx = invA * (d0x * lb0 + d1x * lb1 + d2x * lb2); lbDy = invA * (d0y * lb0 + d1y * lb1 + d2y * lb2);
 			}
-			double fmR = flR, fmG = flG, fmB = flB;   // flR/G/B already = shade*tint (unlit) or sun/ambient (lit-flat)
+			double fmR = flR, fmG = flG, fmB = flB;   // flR/G/B already = tint * (shade (unlit) or sun/ambient (lit-flat) + emissive)
 			bool opaque = alpha >= 255; double a = alpha / 255.0, ia = 1.0 - a;
 			bool fog = s._fog; double fr = s._fogR, fg = s._fogG, fb = s._fogB, fstart = s._fogStart, finv = s._fogInv;
 			int W = s._w;
@@ -785,7 +986,7 @@ namespace OpenTaiko {
 										double sr = ((pk >> 16) & 0xFF) * fmR, sg = ((pk >> 8) & 0xFF) * fmG, sb = (pk & 0xFF) * fmB;
 										int o = idx * 4;
 										if (add) { B[o] = RenderUtil.CB(sr * pa + B[o]); B[o + 1] = RenderUtil.CB(sg * pa + B[o + 1]); B[o + 2] = RenderUtil.CB(sb * pa + B[o + 2]); B[o + 3] = 255; }
-										else { double pia = 1 - pa; B[o] = (byte)(sr * pa + B[o] * pia); B[o + 1] = (byte)(sg * pa + B[o + 1] * pia); B[o + 2] = (byte)(sb * pa + B[o + 2] * pia); B[o + 3] = 255; }
+										else { double pia = 1 - pa; B[o] = RenderUtil.CB(sr * pa + B[o] * pia); B[o + 1] = RenderUtil.CB(sg * pa + B[o + 1] * pia); B[o + 2] = RenderUtil.CB(sb * pa + B[o + 2] * pia); B[o + 3] = 255; }
 									}
 								} else {
 									int txi, tyi;
@@ -794,14 +995,16 @@ namespace OpenTaiko {
 								else { txi = (int)(UZ * iw * tw) % tw; if (txi < 0) txi += tw; tyi = (int)(VZ * iw * th) % th; if (tyi < 0) tyi += th; }
 								int packed = T[tyi * tw + txi];
 								if (packed >= 0) {
-									double pr = (packed >> 16) & 0xFF, pg = (packed >> 8) & 0xFF, pb = packed & 0xFF, tr, tg, tb;
+									double pr, pg, pb, tr, tg, tb;
+									if (recol) { pr = rcR; pg = rcG; pb = rcB; }
+									else { pr = (packed >> 16) & 0xFF; pg = (packed >> 8) & 0xFF; pb = packed & 0xFF; }
 									if (gour) { tr = pr * (LR * iw); tg = pg * (LG * iw); tb = pb * (LB * iw); }
 									else if (screenT) { tr = pr * fmR + bR * (1 - fmR); tg = pg * fmG + bG * (1 - fmG); tb = pb * fmB + bB * (1 - fmB); }
 									else { tr = pr * fmR; tg = pg * fmG; tb = pb * fmB; }
 									if (fog) { double f = (iw - fstart) * finv; if (f > 0) { if (f > 1) f = 1; tr += (fr - tr) * f; tg += (fg - tg) * f; tb += (fb - tb) * f; } }
 									int o = idx * 4;
 									if (opaque) { D[idx] = fw; B[o] = RenderUtil.CB(tr); B[o + 1] = RenderUtil.CB(tg); B[o + 2] = RenderUtil.CB(tb); B[o + 3] = 255; }
-									else { B[o] = (byte)(tr * a + B[o] * ia); B[o + 1] = (byte)(tg * a + B[o + 1] * ia); B[o + 2] = (byte)(tb * a + B[o + 2] * ia); B[o + 3] = 255; }
+									else { B[o] = RenderUtil.CB(tr * a + B[o] * ia); B[o + 1] = RenderUtil.CB(tg * a + B[o + 1] * ia); B[o + 2] = RenderUtil.CB(tb * a + B[o + 2] * ia); B[o + 3] = 255; }
 								}
 								}
 							}

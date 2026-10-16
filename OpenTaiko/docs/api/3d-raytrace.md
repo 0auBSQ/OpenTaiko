@@ -9,21 +9,20 @@ The path tracer renders the same scene data as the rasterizer, with materials, a
 | Method | Description |
 | --- | --- |
 | `scene:GetRaytracerStatus()  -> string` | Backend readout for raytrace mode (GPU compute timing, CPU fallback, or CPU path tracer); empty in raster modes. |
-| `scene:RenderViewRT(texId, cx, cy, cz, yawDeg, pitchDeg, fovDeg, clr, clg, clb, flipX)  -> nil` | Like RenderView, but the CPU path tracer renders it at a quarter of the reflection resolution. |
 
 ## Path tracer materials and primitives
 
-Only the path tracer uses materials, analytic primitives and the sky gradient. The path tracer also traces retained objects, using the material assigned with ObjSetMaterial, or their texture and flat colour when none is set. Material and primitive ids start at 0.
+Only the path tracer uses materials, analytic primitives and the sky gradient. The path tracer also traces retained objects, using the material assigned with ObjSetMaterial, or their texture and flat colour when none is set. Material and primitive ids start at 0. The path tracer draws sprites as alpha-tested quads, lets rays through the cut-out texels of textures and sprites, and applies ObjSetTint, ObjSetColor and ObjSetEmissive. It casts real shadows, so it leaves out ground-flat sprites (billboard 3) and ObjAddSpriteQuad sprites with cutout 0, which stand in for shadows and decals. Besides the point lights, SetSun lights the scene as a directional light with shadows, and SetAmbient as light from every direction on diffuse surfaces; the sky seen directly or in a mirror stays the plain gradient.
 
 | Method | Description |
 | --- | --- |
 | `scene:SetSky(tr, tg, tb, br, bg, bb, strength)  -> nil` | Sky gradient (linear 0-1) from the top colour to the bottom colour, scaled by `strength`; it lights the scene when rays escape. Strength 0 gives a black studio. |
 | `scene:NewMaterial()  -> id` | Create a material (default diffuse mid-grey) and return its id. |
-| `scene:MatSetType(id, type)  -> nil` | `"diffuse"`, `"metal"`, `"glass"` or `"emissive"`. |
+| `scene:MatSetType(id, type)  -> nil` | `"diffuse"`, `"metal"`, `"glass"` or `"emissive"`. A glass mesh needs triangles whose corners a, b, c run clockwise on screen when seen from outside, so that `(b - a) × (c - a)` points out of the glass: the path tracer uses this direction to tell which side is inside. |
 | `scene:MatSetAlbedo(id, r, g, b)  -> nil` | Base colour (linear 0-1); tints the reflection for metal. |
 | `scene:MatSetRoughness(id, rough)  -> nil` | 0 = sharp mirror or clear glass, 1 = fully rough. |
 | `scene:MatSetIOR(id, ior)  -> nil` | Index of refraction for glass (minimum 1). |
-| `scene:MatSetEmission(id, r, g, b, strength)  -> nil` | Emission colour times strength; emissive surfaces light the scene. |
+| `scene:MatSetEmission(id, r, g, b, strength)  -> nil` | Emission colour times strength; emissive surfaces light the scene. They do not block point lights, so a light can sit inside its bulb. |
 | `scene:MatSetTexture(id, texId)  -> nil` | Albedo texture (a registered texture id) sampled by UV; -1 = none. |
 | `scene:MatSetNormalMap(id, preset)  -> nil` | Procedural normal map: `"none"`, `"wood"`, `"perlin"` or `"waves"`. |
 | `scene:MatSetNormalMapTexture(id, texId)  -> nil` | Tangent-space normal-map texture (RGB-encoded normal) for textured geometry; overrides the preset. -1 clears. |

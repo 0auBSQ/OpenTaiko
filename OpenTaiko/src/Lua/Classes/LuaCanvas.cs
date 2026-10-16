@@ -20,6 +20,8 @@ namespace OpenTaiko {
 		private bool _dirty;
 		// dirty rectangle (inclusive) so Upload only sends the changed region
 		private int _dx0, _dy0, _dx1, _dy1;
+		// counts MarkDirty calls: a writer can tell whether anything drew into the buffer since it last did
+		internal int _writes;
 
 		public override int Width => Loaded ? _logW : -1;
 		public override int Height => Loaded ? _logH : -1;
@@ -44,6 +46,7 @@ namespace OpenTaiko {
 		}
 
 		internal void MarkDirty(int x0, int y0, int x1, int y1) {
+			_writes++;
 			if (!_dirty) {
 				_dx0 = x0; _dy0 = y0; _dx1 = x1; _dy1 = y1; _dirty = true;
 			} else {

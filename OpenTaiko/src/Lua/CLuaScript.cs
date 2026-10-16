@@ -126,15 +126,9 @@ public abstract class CLuaScript : IDisposable {
 				luaFunction.LoadNoop(LuaScript); // silence further warnings
 				return null;
 			}
-			var ret = luaFunction.Func.Call(args);
-			// Run ONE incremental GC step per call instead of a full collection. This was previously
-			// LuaGC.Collect — a FULL Lua-heap collection on every single Lua call. Per-frame callbacks
-			// (stage + background Draw/Update, every character's Update/Draw, nameplates, modals) all go
-			// through here, so it meant dozens of full collections per frame, with cost scaling to the
-			// Lua heap — a direct cause of irregular gameplay hitches (and audio/visual desync). An
-			// incremental step spreads collection cheaply while still keeping the Lua heap bounded.
-			LuaScript?.State?.GarbageCollector(KeraLua.LuaGC.Step, 0);
-			return ret;
+			// Lua's own incremental collector runs as the script allocates and keeps the heap within about twice
+			// its live data (Lua's default pause of 200)
+			return luaFunction.Func.Call(args);
 		} catch (Exception exception) {
 			var argsAsReprStrings = args.Select(v => JsonConvert.SerializeObject(v));
 			Crash(exception, $"RunLuaCode - {luaFunction.Name}({string.Join(", ", argsAsReprStrings)})");
@@ -225,11 +219,14 @@ end
 	// The coroutine thread we own + drive for the current hook (onStart). One at a time per script instance.
 	private KeraLua.Lua? _hookCo;
 	private LuaThread? _hookThread = null;
+	private bool _hookCollect;
 
 	/// <summary>Begin running a hook function (e.g. onStart) as a coroutine on a dedicated, engine-owned Lua
-	/// thread. Call tStepYieldable() repeatedly until it returns false.</summary>
-	protected void tBeginYieldable(NamedLuaFunction luaFunction) {
+	/// thread. Call tStepYieldable() repeatedly until it returns false. With <paramref name="collectWhenDone"/>
+	/// the script's heap gets one full collection when the hook ends.</summary>
+	protected void tBeginYieldable(NamedLuaFunction luaFunction, bool collectWhenDone = true) {
 		tEndYieldable();
+		_hookCollect = collectWhenDone;
 		var L = LuaScript?.State;
 		if (LuaScript == null || L == null || luaFunction.Func == null)
 			return;   // undefined hook ⇒ no-op (treated as done)
@@ -273,7 +270,6 @@ end
 		try {
 			_resumeStartTs = Stopwatch.GetTimestamp();   // YieldHook yields once this resume runs past YieldBudgetMs
 			var status = co.Resume(LuaScript.State, 0, out int nresults);
-			LuaScript?.State?.GarbageCollector(KeraLua.LuaGC.Step, 0);
 			if (status == KeraLua.LuaStatus.Yield) {
 				if (nresults > 0) {
 					try { progress = (float)co.ToNumber(-nresults); } catch { /* keep 0 */ }
@@ -286,12 +282,19 @@ end
 				Trace.TraceError($"{this.strScriptShort} hook error: {co.ToString(-1)}");
 			}
 			tEndYieldable();
+			if (_hookCollect) CollectLoadGarbage();
 			return false;
 		} catch (Exception exception) {
 			Crash(exception, $"tStepYieldable({progress})");
 			tEndYieldable();
 			return false;
 		}
+	}
+
+	// Lua's collector runs only when the script allocates, so a script that sits idle after loading would keep
+	// its loading garbage: one full collection when the script chunk (+ loadAssets) ends and when onStart ends
+	private void CollectLoadGarbage() {
+		try { LuaScript?.State?.GarbageCollector(KeraLua.LuaGC.Collect, 0); } catch { /* the state is gone */ }
 	}
 
 	private void tEndYieldable() {
@@ -508,6 +511,7 @@ end
 			lfReloadLanguage.Load(LuaScript);
 
 			if (loadAssets) LoadAssets();
+			CollectLoadGarbage();
 
 			listScripts.Add(this);
 		} catch (Exception e) {

@@ -438,8 +438,11 @@ local function interactGlow(focused)
         end
         world._glow = nil
     end
-    scene:ObjSetPass(world.hiliteObj, 1, 110, 185, 255, 0)   -- clear the footprint layer
-    scene:ObjBegin(world.hiliteObj)
+    if world._footprint ~= false then                     -- clear the footprint layer unless it is known empty
+        scene:ObjSetPass(world.hiliteObj, 1, 110, 185, 255, 0)
+        scene:ObjBegin(world.hiliteObj)
+        world._footprint = false
+    end
     if not focused then return end
 
     -- the focused item's live model instance: a ground GLB (_propInst) or the wall phone (_wallGlb)
@@ -491,6 +494,7 @@ local function interactGlow(focused)
     local pulse = 70 + math.floor(80 * (0.5 + 0.5 * sin(lastTs * 0.006)))
     scene:ObjSetPass(world.hiliteObj, 1, 110, 185, 255, pulse)
     scene:ObjBegin(world.hiliteObj)
+    world._footprint = true
     if focused.kind == "exit" then
         local pc, pr = world:worldToCell(px, pz)
         local x0, z0 = pc, gh - 1 - pr
@@ -1268,32 +1272,51 @@ function update(ts)
 end
 
 -- ── draw ──────────────────────────────────────────────────────────────────────────────────────────
+-- this frame's actor sprites, six numbers each (x, y, z, w, h, sprite), and the ones the actor layer holds;
+-- a map load empties the layer
+local actorNow, actorShown, actorNowN, actorShownN, actorMap = {}, {}, 0, 0, nil
+local function actorsBegin() actorNowN = 0 end
+local function actorSprite(x, y, z, w, h, spr)
+    local t, n = actorNow, actorNowN
+    t[n + 1], t[n + 2], t[n + 3], t[n + 4], t[n + 5], t[n + 6] = x, y or 0, z, w, h, spr
+    actorNowN = n + 6
+end
+local function actorsEnd()
+    local t, n = actorNow, actorNowN
+    local same = actorMap == map and n == actorShownN
+    if same then for i = 1, n do if t[i] ~= actorShown[i] then same = false; break end end end
+    if same then return end
+    world.actors:actorsBegin()
+    for i = 1, n, 6 do world.actors:actorSprite(t[i], t[i + 1], t[i + 2], t[i + 3], t[i + 4], t[i + 5]) end
+    actorNow, actorShown, actorShownN, actorMap = actorShown, t, n, map
+end
+
 function draw()
     if world == nil or map == nil or hud == nil then return end
     local hW = 1.7
     local wW = hW * (AV.W / AV.H)
     local function groundAt(x, z) return map:heightAt(x, z) end
 
-    -- the dynamic actor layer (player + remote visitors). No blob shadows: the sun shadow map
-    -- already grounds the sprites, so the shadow layer just stays cleared.
-    world.actors:shadowsBegin()
-    world.actors:actorsBegin()
+    -- the dynamic actor layer (player + remote visitors), written when its sprites change. No blob
+    -- shadows: the sun shadow map already grounds the sprites, so the shadow layer stays empty.
+    actorsBegin()
     local spr = AV.sprite(look.set, pdir, pmoving, pframeT)
     if mode == "pod" then
         -- stepping into the pod: the sprite slides to it and shrinks away, then stays hidden
         local vx, vz, vs = Pod.playerVisual()
-        if spr and vx then world.actors:actorSprite(vx, py, vz, wW * vs, hW * vs, spr) end
+        if spr and vx then actorSprite(vx, py, vz, wW * vs, hW * vs, spr) end
     elseif spr then
-        world.actors:actorSprite(px, py, pz, wW, hW, spr)
+        actorSprite(px, py, pz, wW, hW, spr)
     end
     if net.online then
         for id, p in pairs(net.posByPeer) do
             local lk = net.lookByPeer[id]
             local rspr = AV.sprite(lk and lk.set or nil, p.dir, p.moving, p.frameT)
             local ry = groundAt(p.x, p.z)
-            if rspr then world.actors:actorSprite(p.x, ry, p.z, wW, hW, rspr) end
+            if rspr then actorSprite(p.x, ry, p.z, wW, hW, rspr) end
         end
     end
+    actorsEnd()
 
     FT.draw()                      -- the fish and kelp inside the tanks
     world:render()

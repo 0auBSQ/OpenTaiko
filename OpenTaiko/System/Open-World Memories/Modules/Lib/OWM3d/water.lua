@@ -41,11 +41,12 @@ function Water.new(world)
 end
 
 local FOAM_SPR = 916
+local foamScenes = setmetatable({}, { __mode = "k" })   -- the scenes that have the foam sprite (a new world has a new scene)
 
 local function ensureFoamSprite(scene)
     if scene.SetSpriteRGBA == nil then return false end
-    if Water._foamSprDone then return true end
-    Water._foamSprDone = true
+    if foamScenes[scene] then return true end
+    foamScenes[scene] = true
     if scene.MakeSoftCircle then scene:MakeSoftCircle(FOAM_SPR, 32, 2.2) end
     return true
 end

@@ -41,7 +41,9 @@ namespace OpenTaiko {
 			// Refresh globals that are populated by TextureLoader after script construction.
 			LuaScript["CHARACTERLIST"] = OpenTaiko.Tx?.LuaCharacterDb;
 			LuaScript["PUCHICHARALIST"] = OpenTaiko.Tx?.LuaPuchicharaDb;
-			tBeginYieldable(lfActivate);
+			// No full collection after activate: the active stage allocates every frame, so its own collector
+			// clears what activate left, without a full-heap pause on every stage entry
+			tBeginYieldable(lfActivate, collectWhenDone: false);
 		}
 		public bool StepActivate(out float progress) => tStepYieldable(out progress);
 

@@ -18,13 +18,13 @@
 -- ════════════════════════════════════════════════════════════════════════════════
 
 local SCREEN_W, SCREEN_H = 1920, 1080
-local RW, RH      = 1920, 1080        -- internal path-trace resolution (kept low; tracing is heavy)
+local RW, RH      = 1920, 1080        -- internal path-trace resolution (full screen: the CPU path tracer is slow at this size)
 local FOV         = 65.0
 local NEAR        = 0.05
 local MOUSE_SENS  = 0.14            -- deg per mouse pixel
 local MOVE_SPEED  = 4.0             -- units / sec
 local FAST_MULT   = 3.0
-local THREADS     = 8               -- path-trace threads (screen split into row bands)
+local THREADS     = 8               -- CPU rasterizer threads (the CPU path tracer uses every core)
 
 -- procedurally-generated texture ids (built once in onStart)
 local CHECKER    = 1                 -- material-scene floor
@@ -38,7 +38,8 @@ local BRICK_NRM  = 7                 -- brick tangent-space normal map
 local sin, cos, rad, floor, rnd = math.sin, math.cos, math.rad, math.floor, math.random
 
 local scene
-local fontMid, fontSmall
+local fontMid, fontSmall            -- glyph fonts: the sample count and status change every frame
+local colors = {}                   -- text colours by "r,g,b", made once
 local objs = {}                     -- scene-object ids of the current scene (deleted on switch)
 local sceneName = ""
 local cam = { x = 0, y = 2, z = 6, yaw = 180, pitch = -6 }
@@ -48,10 +49,15 @@ local lastTs = 0
 -- Helpers
 -- ════════════════════════════════════════════════════════════════════════════════
 
-local function txt(font, str, r, g, b)
-    return font:GetText(str, false, 1800,
-        COLOR:CreateColorFromRGBA(r or 255, g or 255, b or 255, 255),
-        COLOR:CreateColorFromRGBA(0, 0, 0, 255))
+local function color(r, g, b)
+    local key = r .. "," .. g .. "," .. b
+    local c = colors[key]
+    if not c then c = COLOR:CreateColorFromRGBA(r, g, b, 255); colors[key] = c end
+    return c
+end
+
+local function txt(font, str, x, y, r, g, b)
+    font:Draw(str, x, y, color(r, g, b), color(0, 0, 0), 1.0, 1.0, 1800)
 end
 
 local function clearObjs()
@@ -139,7 +145,9 @@ local function buildMuseum()
     local ph, pr, sr = 2.4, 0.45, 0.7
     local mGlass = glass(1.5)
     local mAlu   = metal(0.91, 0.92, 0.93, 0.04)
-    local mEmis  = emissive(1.0, 0.84, 0.34, 9.0)
+    -- the yellow lamp: its glow plus the light of a strength-70 point light, spread over the sphere
+    -- (a point light of strength s matches an emissive sphere of radius r at strength s / (pi r^2))
+    local mEmis  = emissive(1.0, 0.84, 0.34, 9.0 + 70.0 / (math.pi * sr * sr))
     local mWood  = scene:NewMaterial()
     scene:MatSetType(mWood, "diffuse"); scene:MatSetAlbedo(mWood, 0.46, 0.28, 0.13)
     scene:MatSetNormalMap(mWood, "wood")
@@ -153,10 +161,8 @@ local function buildMuseum()
         scene:AddSphere(cx, ph + sr, cz, sr, mat)
     end
 
-    -- lights: a soft white ceiling fill + a strong yellow light co-located with the emissive
-    -- sphere so the room is lit (and tinted) by it quickly.
+    -- lights: a soft white ceiling fill; the emissive sphere lights (and tints) the room too
     scene:AddLight(0, H - 0.4, 0, 1.0, 0.98, 0.92, 55.0)
-    scene:AddLight(d, ph + sr, d, 1.0, 0.84, 0.34, 70.0)
     scene:SetSky(0.10, 0.11, 0.14, 0.05, 0.05, 0.06, 1.0)   -- dim studio ambient
 
     cam = { x = 0, y = 2.4, z = W - 1.6, yaw = 180, pitch = -6 }
@@ -464,8 +470,8 @@ end
 
 function onStart()
     scene = SCENE3D:CreateScene(RW, RH)
-    fontMid   = TEXT:Create(26)
-    fontSmall = TEXT:Create(18)
+    fontMid   = TEXT:CreateGlyphCached(26)
+    fontSmall = TEXT:CreateGlyphCached(18)
 
     scene:SetCameraFov(FOV)
     scene:SetCameraNear(NEAR)
@@ -541,10 +547,10 @@ function draw()
     scene:SetScale(SCREEN_W / RW, SCREEN_H / RH)
     scene:Draw(0, 0)
 
-    txt(fontMid, "Raytracer " .. sceneName, 255, 255, 255):Draw(24, 16)
-    txt(fontSmall, "samples: " .. scene:GetSampleCount() .. "  (hold still to converge)", 220, 230, 245):Draw(24, 52)
+    txt(fontMid, "Raytracer " .. sceneName, 24, 16, 255, 255, 255)
+    txt(fontSmall, "samples: " .. scene:GetSampleCount() .. "  (hold still to converge)", 24, 52, 220, 230, 245)
     -- backend readout: confirms GPU compute vs CPU fallback + the measured per-sample GPU cost
-    txt(fontSmall, scene:GetRaytracerStatus(), 180, 255, 200):Draw(24, 80)
+    txt(fontSmall, scene:GetRaytracerStatus(), 24, 80, 180, 255, 200)
     txt(fontSmall, "WASD move   Space/LCtrl up·down   Shift faster   hold L-click + drag to look   1-8 scenes   Esc quit",
-        220, 220, 225):Draw(24, SCREEN_H - 40)
+        24, SCREEN_H - 40, 220, 220, 225)
 end

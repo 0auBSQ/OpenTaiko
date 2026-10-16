@@ -45,6 +45,10 @@
     <ApplicationIcon>OpenTaiko.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <!-- GLSL sources of the 3D renderers, read through ShaderSources -->
+    <EmbeddedResource Include="src/Lua/3D/Shaders/*.vert;src/Lua/3D/Shaders/*.frag;src/Lua/3D/Shaders/*.comp" LogicalName="OpenTaiko.Shaders.%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup>
     <InternalsVisibleTo Include="OpenTaiko.iOS" />
     <InternalsVisibleTo Include="OpenTaiko.Android" />
   </ItemGroup>

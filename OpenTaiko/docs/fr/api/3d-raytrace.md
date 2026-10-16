@@ -9,21 +9,20 @@ Le path tracer rend les mêmes données de scène que le rastériseur, avec des 
 | Méthode | Description |
 | --- | --- |
 | `scene:GetRaytracerStatus()  -> string` | Relevé du back-end en mode raytrace (chronométrage du calcul GPU, repli CPU, ou path tracer CPU) ; vide en modes raster. |
-| `scene:RenderViewRT(texId, cx, cy, cz, yawDeg, pitchDeg, fovDeg, clr, clg, clb, flipX)  -> nil` | Comme RenderView, mais le path tracer CPU le rend au quart de la résolution des reflets. |
 
 ## Matériaux et primitives du path tracer
 
-Seul le path tracer utilise les matériaux, les primitives analytiques et le dégradé de ciel. Le path tracer trace aussi les objets retenus, avec le matériau affecté par ObjSetMaterial, ou leur texture et leur couleur unie quand aucun n'est défini. Les identifiants de matériau et de primitive commencent à 0.
+Seul le path tracer utilise les matériaux, les primitives analytiques et le dégradé de ciel. Le path tracer trace aussi les objets retenus, avec le matériau affecté par ObjSetMaterial, ou leur texture et leur couleur unie quand aucun n'est défini. Les identifiants de matériau et de primitive commencent à 0. Le path tracer dessine les sprites comme des quads à test alpha, laisse passer les rayons par les texels découpés des textures et des sprites, et applique ObjSetTint, ObjSetColor et ObjSetEmissive. Comme il projette de vraies ombres, il omet les sprites posés à plat au sol (billboard 3) et les sprites d'ObjAddSpriteQuad avec cutout 0, qui tiennent lieu d'ombres et de décals. En plus des lumières ponctuelles, SetSun éclaire la scène comme une lumière directionnelle avec ombres, et SetAmbient comme une lumière venant de toutes les directions sur les surfaces diffuses ; le ciel vu directement ou dans un miroir reste le simple dégradé.
 
 | Méthode | Description |
 | --- | --- |
 | `scene:SetSky(tr, tg, tb, br, bg, bb, strength)  -> nil` | Dégradé de ciel (linéaire 0-1) de la couleur du haut à la couleur du bas, multiplié par `strength` ; il éclaire la scène quand les rayons s'échappent. Une intensité de 0 donne un studio noir. |
 | `scene:NewMaterial()  -> id` | Crée un matériau (diffus gris moyen par défaut) et renvoie son identifiant. |
-| `scene:MatSetType(id, type)  -> nil` | `"diffuse"`, `"metal"`, `"glass"` ou `"emissive"`. |
+| `scene:MatSetType(id, type)  -> nil` | `"diffuse"`, `"metal"`, `"glass"` ou `"emissive"`. Un maillage de verre a besoin de triangles dont les sommets a, b, c tournent dans le sens horaire à l'écran vus de l'extérieur, pour que `(b - a) × (c - a)` pointe hors du verre : le path tracer utilise cette direction pour savoir quel côté est l'intérieur. |
 | `scene:MatSetAlbedo(id, r, g, b)  -> nil` | Couleur de base (linéaire 0-1) ; teinte le reflet pour le métal. |
 | `scene:MatSetRoughness(id, rough)  -> nil` | 0 = miroir net ou verre clair, 1 = entièrement rugueux. |
 | `scene:MatSetIOR(id, ior)  -> nil` | Indice de réfraction pour le verre (minimum 1). |
-| `scene:MatSetEmission(id, r, g, b, strength)  -> nil` | Couleur d'émission multipliée par l'intensité ; les surfaces émissives éclairent la scène. |
+| `scene:MatSetEmission(id, r, g, b, strength)  -> nil` | Couleur d'émission multipliée par l'intensité ; les surfaces émissives éclairent la scène. Elles ne bloquent pas les lumières ponctuelles, une lumière peut donc se trouver dans son ampoule. |
 | `scene:MatSetTexture(id, texId)  -> nil` | Texture d'albédo (un identifiant de texture enregistrée) échantillonnée par UV ; -1 = aucune. |
 | `scene:MatSetNormalMap(id, preset)  -> nil` | Carte de normales procédurale : `"none"`, `"wood"`, `"perlin"` ou `"waves"`. |
 | `scene:MatSetNormalMapTexture(id, texId)  -> nil` | Texture de carte de normales en espace tangent (normale encodée en RGB) pour la géométrie texturée ; remplace le préréglage. -1 efface. |

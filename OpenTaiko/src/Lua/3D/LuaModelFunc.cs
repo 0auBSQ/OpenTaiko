@@ -9,9 +9,9 @@ namespace OpenTaiko {
 		private readonly string _dir;
 		public LuaModelFunc(string dir) { _dir = dir; }
 
-		/// <summary>Drop the process-wide GLB file cache (stage exit). Worlds that keep running must
-		/// reload their models afterwards — OWM3d calls this from World:dispose() only.</summary>
-		public void PurgeCache() => GltfModel.PurgeFileCache();
+		/// <summary>Drop the process-wide model file caches (GLB and OBJ; stage exit). Worlds that keep running
+		/// must reload their models afterwards — OWM3d calls this from World:dispose() only.</summary>
+		public void PurgeCache() { GltfModel.PurgeFileCache(); ObjModel.PurgeFileCache(); }
 
 		public IModel? Load(string relPath) {
 			try {

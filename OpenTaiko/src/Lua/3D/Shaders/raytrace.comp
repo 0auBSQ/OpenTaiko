@@ -1,0 +1,624 @@
+#version 310 es
+precision highp float;
+precision highp int;
+layout(local_size_x=8, local_size_y=8) in;
+// GLES forbids readwrite on rgba32f images -- ping-pong a readonly previous + a writeonly output image.
+// rgb is the radiance sum, a the number of samples in it.
+layout(rgba32f, binding=0) readonly  uniform highp image2D uPrev;
+layout(rgba32f, binding=1) writeonly uniform highp image2D uOut;
+
+// Geo: [bottom-level BVH nodes of every object][object-space triangles]. Top: [primitives][instances][top-level
+// BVH nodes]. Aux: [materials][lights][texture slots]. GLES 3.1 only guarantees 4 compute storage blocks
+// (ANGLE/D3D11 maps SSBOs to UAVs), so the data stays in 3: 5 separate SSBOs failed to link on ANGLE.
+layout(std430, binding=1) readonly buffer Geo { float geo[]; };
+layout(std430, binding=2) readonly buffer Top { float top[]; };
+layout(std430, binding=3) readonly buffer Aux { float aux[]; };
+uniform highp sampler2D uAtlas;
+
+uniform vec3 uEye, uR, uU, uF;
+uniform int uW, uH, uSPP, uReset, uHalf, uRowOff, uTraceY0, uTraceY1;
+uniform float uScale;
+uniform int uTriOff, uNumInst, uInstOff, uTlasOff;
+uniform int uNumPrim, uNumMat, uNumLight, uNumRect, uLightOff, uRectOff;
+uniform vec3 uSkyB, uSkyT; uniform float uSkyStrength;
+uniform vec3 uSunDir, uSunCol, uAmb;   // directional sun (direction toward it), ambient light from every direction
+
+const int TRI=18, NODE=8, INST=38, PRM=16, MTL=12, LGT=6, RECT=6, MAXD=8, STK=48;
+const float BOX_SLACK=1.000001, DET_EPS=0.0000001, NOHIT=1e30;
+const float PI=3.14159265358979;
+const float MIN_LIGHT_D2=1e-4;   // light samples nearer than 1 cm count as 1 cm away
+#ifdef HAS_SDF
+const vec4 GEM[33]=vec4[33](vec4(0.0,0.0,1.0,0.42),vec4(0.545,0.0,0.838,0.62),vec4(0.385373196,0.385373196,0.838,0.62),vec4(0.0,0.545,0.838,0.62),vec4(-0.385373196,0.385373196,0.838,0.62),vec4(-0.545,0.0,0.838,0.62),vec4(-0.385373196,-0.385373196,0.838,0.62),vec4(0.0,-0.545,0.838,0.62),vec4(0.385373196,-0.385373196,0.838,0.62),vec4(1.0,0.0,0.0,0.5),vec4(0.923879533,0.382683432,0.0,0.5),vec4(0.707106781,0.707106781,0.0,0.5),vec4(0.382683432,0.923879533,0.0,0.5),vec4(0.0,1.0,0.0,0.5),vec4(-0.382683432,0.923879533,0.0,0.5),vec4(-0.707106781,0.707106781,0.0,0.5),vec4(-0.923879533,0.382683432,0.0,0.5),vec4(-1.0,0.0,0.0,0.5),vec4(-0.923879533,-0.382683432,0.0,0.5),vec4(-0.707106781,-0.707106781,0.0,0.5),vec4(-0.382683432,-0.923879533,0.0,0.5),vec4(0.0,-1.0,0.0,0.5),vec4(0.382683432,-0.923879533,0.0,0.5),vec4(0.707106781,-0.707106781,0.0,0.5),vec4(0.923879533,-0.382683432,0.0,0.5),vec4(0.594054539,0.246065447,-0.766,0.5),vec4(0.246065447,0.594054539,-0.766,0.5),vec4(-0.246065447,0.594054539,-0.766,0.5),vec4(-0.594054539,0.246065447,-0.766,0.5),vec4(-0.594054539,-0.246065447,-0.766,0.5),vec4(-0.246065447,-0.594054539,-0.766,0.5),vec4(0.246065447,-0.594054539,-0.766,0.5),vec4(0.594054539,-0.246065447,-0.766,0.5));
+#endif
+
+// prim: the analytic primitive hit, or -1
+struct Hit { float t; vec3 p; vec3 n; int mat; bool hasUV; vec2 uv; int tex; float shade; vec3 fall; int ti; int inst; int prim; };
+
+uint hashu(uint x){ x^=x>>16; x*=0x7feb352du; x^=x>>15; x*=0x846ca68bu; x^=x>>16; return x; }
+float nextd(inout uint s){ s^=s<<13; s^=s>>17; s^=s<<5; return float(s & 0xffffffu)/16777216.0; }
+// normalize that gives a zero vector back unchanged instead of NaN, like the CPU tracer's Norm
+vec3 safeNorm(vec3 v){ float l2=dot(v,v); return l2>1e-36 ? v*inversesqrt(l2) : v; }
+// self-intersection offset at p: 1e-4 near the origin, growing with the coordinates as the float spacing does
+float rayEps(vec3 p){ return max(1e-4, 1e-5*max(abs(p.x),max(abs(p.y),abs(p.z)))); }
+
+vec3 sky(vec3 d){ float t=clamp(0.5*(d.y+1.0),0.0,1.0); return mix(uSkyB,uSkyT,t)*uSkyStrength; }
+
+bool emissiveMat(int m){ return m>=0 && m<uNumMat && int(aux[m*MTL])==3; }
+// atlas slot id holds a registered texture
+bool hasRect(int id){ return id>=0 && id<uNumRect && aux[uRectOff+id*RECT+2]>=1.0 && aux[uRectOff+id*RECT+3]>=1.0; }
+// texel 0..n-1 for texture coordinate u with repeat wrap (the CPU tracer's WrapTexel)
+int wrapTexel(float u, int n){ return clamp(int((u-floor(u))*float(n)), 0, n-1); }
+vec3 sampleAlbedo(int id, vec2 uv){
+    int b=uRectOff+id*RECT;
+    int x=wrapTexel(uv.x,int(aux[b+2])), y=wrapTexel(uv.y,int(aux[b+3]));
+    vec3 c=texelFetch(uAtlas, ivec2(int(aux[b])+x, int(aux[b+1])+y), 0).rgb;
+    return pow(max(c,vec3(0.0)), vec3(2.2));
+}
+
+bool boxHit(vec3 o, vec3 d, vec3 bmin, vec3 bmax, float tmin, float tmax, out float t, out vec3 n){
+    t=0.0; n=vec3(0.0);
+    float tx1=(bmin.x-o.x)/d.x, tx2=(bmax.x-o.x)/d.x;
+    float tlo=min(tx1,tx2), thi=max(tx1,tx2); int axis=0; float sgn=(tx1>tx2)?1.0:-1.0;
+    float ty1=(bmin.y-o.y)/d.y, ty2=(bmax.y-o.y)/d.y;
+    float tylo=min(ty1,ty2), tyhi=max(ty1,ty2);
+    if(tylo>tlo){ tlo=tylo; axis=1; sgn=(ty1>ty2)?1.0:-1.0; }
+    thi=min(thi,tyhi);
+    float tz1=(bmin.z-o.z)/d.z, tz2=(bmax.z-o.z)/d.z;
+    float tzlo=min(tz1,tz2), tzhi=max(tz1,tz2);
+    if(tzlo>tlo){ tlo=tzlo; axis=2; sgn=(tz1>tz2)?1.0:-1.0; }
+    thi=min(thi,tzhi);
+    if(thi<tlo||thi<tmin) return false;
+    bool ent=tlo>tmin;
+    float tt=ent?tlo:thi;
+    if(tt<=tmin||tt>=tmax) return false;
+    t=tt; float sg=ent?sgn:-sgn;
+    n = (axis==0)?vec3(sg,0.0,0.0):((axis==1)?vec3(0.0,sg,0.0):vec3(0.0,0.0,sg));
+    return true;
+}
+
+// ---- BVH traversal (RtScene.ClosestTri / AnyTri on the CPU, line by line) ----
+// 1/d with no zero component, so a slab test never multiplies 0 by infinity
+float safeInv(float v){ return 1.0/(v>=0.0 ? max(v,1e-20) : min(v,-1e-20)); }
+vec3 invDir(vec3 d){ return vec3(safeInv(d.x),safeInv(d.y),safeInv(d.z)); }
+// entry distance of the ray into the box, or NOHIT when it misses it within [tmin, tmax]
+float slab(vec3 bmin, vec3 bmax, vec3 o, vec3 id, float tmin, float tmax){
+    vec3 t0=(bmin-o)*id, t1=(bmax-o)*id;
+    vec3 lo=min(t0,t1), hi=max(t0,t1);
+    float a=max(max(lo.x,lo.y),max(lo.z,tmin)), c=min(min(hi.x,hi.y),min(hi.z,tmax));
+    return a<=c*BOX_SLACK ? a : NOHIT;
+}
+// box test of node n of the bottom levels (Geo) and of the top level (Top)
+float geoSlab(int n, vec3 o, vec3 id, float tmin, float tmax){ int b=n*NODE; return slab(vec3(geo[b],geo[b+1],geo[b+2]), vec3(geo[b+3],geo[b+4],geo[b+5]), o, id, tmin, tmax); }
+float topSlab(int n, vec3 o, vec3 id, float tmin, float tmax){ int b=uTlasOff+n*NODE; return slab(vec3(top[b],top[b+1],top[b+2]), vec3(top[b+3],top[b+4],top[b+5]), o, id, tmin, tmax); }
+// Moller-Trumbore against triangle k (object space; d need not be unit length, dl is its length), t in (tmin, tmax)
+bool triHit(int k, vec3 o, vec3 d, float dl, float tmin, float tmax, out float t, out float u, out float v){
+    int b=uTriOff+k*TRI;
+    vec3 e1=vec3(geo[b+3],geo[b+4],geo[b+5]), e2=vec3(geo[b+6],geo[b+7],geo[b+8]);
+    vec3 pv=cross(d,e2); float det=dot(e1,pv);
+    t=0.0; u=0.0; v=0.0;
+    if(abs(det)<=DET_EPS*dl*geo[b+17]) return false;
+    float idet=1.0/det;
+    vec3 tv=o-vec3(geo[b],geo[b+1],geo[b+2]); u=dot(tv,pv)*idet; if(u<0.0||u>1.0) return false;
+    vec3 qv=cross(tv,e1); v=dot(d,qv)*idet; if(v<0.0||u+v>1.0) return false;
+    t=dot(e2,qv)*idet;
+    return t>tmin && t<tmax;
+}
+// the world ray in instance ib's own space
+vec3 instPoint(int ib, vec3 p){ return vec3(top[ib]*p.x+top[ib+1]*p.y+top[ib+2]*p.z+top[ib+3], top[ib+4]*p.x+top[ib+5]*p.y+top[ib+6]*p.z+top[ib+7], top[ib+8]*p.x+top[ib+9]*p.y+top[ib+10]*p.z+top[ib+11]); }
+vec3 instDir(int ib, vec3 d){ return vec3(top[ib]*d.x+top[ib+1]*d.y+top[ib+2]*d.z, top[ib+4]*d.x+top[ib+5]*d.y+top[ib+6]*d.z, top[ib+8]*d.x+top[ib+9]*d.y+top[ib+10]*d.z); }
+#ifdef HAS_CUT
+// whether the hit at barycentrics (u, v) of triangle k lands on a hole of its texture or sprite: a texel whose alpha
+// is under cut (the instance's alpha cut), or any texel of a sprite that is not registered
+bool cutOut(int k, float u, float v, float cut){
+    int b=uTriOff+k*TRI; int slot=int(geo[b+16]);
+    if(slot<0 || slot>=uNumRect) return false;
+    int r=uRectOff+slot*RECT; float mode=aux[r+4];
+    if(mode<0.5) return false;
+    if(mode>1.5) return true;
+    if(aux[r+2]<1.0 || aux[r+3]<1.0) return false;
+    float w=1.0-u-v;
+    vec2 uv=vec2(geo[b+9]*w+geo[b+11]*u+geo[b+13]*v, geo[b+10]*w+geo[b+12]*u+geo[b+14]*v);
+    int x=wrapTexel(uv.x,int(aux[r+2])), y=wrapTexel(uv.y,int(aux[r+3]));
+    return texelFetch(uAtlas, ivec2(int(aux[r])+x, int(aux[r+1])+y), 0).a < cut;
+}
+#else
+bool cutOut(int k, float u, float v, float cut){ return false; }
+#endif
+
+// The nearest triangle a world ray hits with t in (tmin, tbest): on a hit tbest becomes its distance and hInst,
+// hTri, hu, hv name it. One stack serves both levels: the build keeps the top level within 16 levels and every
+// object's tree within 32, so it never overflows.
+bool closestTri(vec3 o, vec3 d, float tmin, inout float tbest, out int hInst, out int hTri, out float hu, out float hv){
+    hInst=-1; hTri=-1; hu=0.0; hv=0.0;
+    if(uNumInst==0) return false;
+    int st[STK]; int sp=0, node=0;
+    vec3 id=invDir(d);
+    while(true){
+        int b=uTlasOff+node*NODE;
+        int cnt=int(top[b+7]);
+        if(cnt>0){
+            int first=int(top[b+6]);
+            for(int k=0;k<cnt;k++){
+                int ib=uInstOff+(first+k)*INST;
+                vec3 lo=instPoint(ib,o), ld=instDir(ib,d), lid=invDir(ld);
+                float dl=length(ld);
+                int nb=int(top[ib+21]), tb=int(top[ib+22]);
+                float cut=top[ib+37];
+                if(geoSlab(nb,lo,lid,tmin,tbest)>=NOHIT) continue;
+                int bas=sp, bn=0;
+                while(true){
+                    int c=(nb+bn)*NODE;
+                    int bc=int(geo[c+7]), bf=int(geo[c+6]);
+                    if(bc>0){
+                        for(int j=0;j<bc;j++){
+                            float tt,uu,vv;
+                            if(triHit(tb+bf+j,lo,ld,dl,tmin,tbest,tt,uu,vv) && !cutOut(tb+bf+j,uu,vv,cut)){ tbest=tt; hInst=first+k; hTri=tb+bf+j; hu=uu; hv=vv; }
+                        }
+                    } else {
+                        float d1=geoSlab(nb+bf,lo,lid,tmin,tbest), d2=geoSlab(nb+bf+1,lo,lid,tmin,tbest);
+                        int n1=bf, n2=bf+1;
+                        if(d2<d1){ float x=d1; d1=d2; d2=x; n1=bf+1; n2=bf; }
+                        if(d1<NOHIT){
+                            if(d2<NOHIT && sp<STK) st[sp++]=n2;
+                            bn=n1; continue;
+                        }
+                    }
+                    if(sp==bas) break;
+                    bn=st[--sp];
+                }
+            }
+        } else {
+            int l=int(top[b+6]);
+            float d1=topSlab(l,o,id,tmin,tbest), d2=topSlab(l+1,o,id,tmin,tbest);
+            int n1=l, n2=l+1;
+            if(d2<d1){ float x=d1; d1=d2; d2=x; n1=l+1; n2=l; }
+            if(d1<NOHIT){
+                if(d2<NOHIT && sp<STK) st[sp++]=n2;
+                node=n1; continue;
+            }
+        }
+        if(sp==0) break;
+        node=st[--sp];
+    }
+    return hInst>=0;
+}
+
+// Whether a world ray hits any triangle with t in (tmin, tmax). The holes of textures and sprites let it through,
+// and with passEmis so do instances with an emissive material (on a ray toward a light they stand for).
+bool anyTri(vec3 o, vec3 d, float tmin, float tmax, bool passEmis){
+    if(uNumInst==0) return false;
+    int st[STK]; int sp=0, node=0;
+    vec3 id=invDir(d);
+    while(true){
+        int b=uTlasOff+node*NODE;
+        int cnt=int(top[b+7]);
+        if(cnt>0){
+            int first=int(top[b+6]);
+            for(int k=0;k<cnt;k++){
+                int ib=uInstOff+(first+k)*INST;
+                if(passEmis && emissiveMat(int(top[ib+23]))) continue;
+                vec3 lo=instPoint(ib,o), ld=instDir(ib,d), lid=invDir(ld);
+                float dl=length(ld);
+                int nb=int(top[ib+21]), tb=int(top[ib+22]);
+                float cut=top[ib+37];
+                if(geoSlab(nb,lo,lid,tmin,tmax)>=NOHIT) continue;
+                int bas=sp, bn=0;
+                while(true){
+                    int c=(nb+bn)*NODE;
+                    int bc=int(geo[c+7]), bf=int(geo[c+6]);
+                    if(bc>0){
+                        for(int j=0;j<bc;j++){
+                            float tt,uu,vv;
+                            if(triHit(tb+bf+j,lo,ld,dl,tmin,tmax,tt,uu,vv) && !cutOut(tb+bf+j,uu,vv,cut)) return true;
+                        }
+                    } else {
+                        bool h1=geoSlab(nb+bf,lo,lid,tmin,tmax)<NOHIT, h2=geoSlab(nb+bf+1,lo,lid,tmin,tmax)<NOHIT;
+                        if(h1 || h2){
+                            if(h1 && h2 && sp<STK) st[sp++]=bf+1;
+                            bn=h1 ? bf : bf+1; continue;
+                        }
+                    }
+                    if(sp==bas) break;
+                    bn=st[--sp];
+                }
+            }
+        } else {
+            int l=int(top[b+6]);
+            bool h1=topSlab(l,o,id,tmin,tmax)<NOHIT, h2=topSlab(l+1,o,id,tmin,tmax)<NOHIT;
+            if(h1 || h2){
+                if(h1 && h2 && sp<STK) st[sp++]=l+1;
+                node=h1 ? l : l+1; continue;
+            }
+        }
+        if(sp==0) break;
+        node=st[--sp];
+    }
+    return false;
+}
+
+#ifdef HAS_SDF
+// ---- SDF primitives (Kind 3 torus, Kind 4 presets), each marched inside its own bounding sphere ----
+float torusSDF(vec3 q, float R, float r, int axis){
+    float a,b;
+    if(axis==0){ a=sqrt(q.y*q.y+q.z*q.z)-R; b=q.x; }
+    else if(axis==2){ a=sqrt(q.x*q.x+q.y*q.y)-R; b=q.z; }
+    else { a=sqrt(q.x*q.x+q.z*q.z)-R; b=q.y; }
+    return sqrt(a*a+b*b)-r;
+}
+float gemSDF(vec3 q, float A){
+    float s=1.0/max(A,1e-3); vec3 p=q*s; float d=-1e30;
+    for(int i=0;i<33;i++){ vec4 f=GEM[i]; d=max(d, f.x*p.x+f.y*p.y+f.z*p.z-f.w); }
+    return d*A;
+}
+float primSDF(int b, vec3 p){
+    vec3 c=vec3(top[b+1],top[b+2],top[b+3]); vec3 q=p-c;
+    int kind=int(top[b]); float A=top[b+4], B=top[b+5], C=top[b+6];
+    if(kind==3) return torusSDF(q,A,B,int(C));
+    int preset=int(top[b+13]);
+    if(preset==1){ float r=0.15*A; float dx=abs(q.x)-(A-r), dy=abs(q.y)-(B-r), dz=abs(q.z)-(C-r);
+        float ox=max(dx,0.0),oy=max(dy,0.0),oz=max(dz,0.0);
+        return sqrt(ox*ox+oy*oy+oz*oz)+min(max(dx,max(dy,dz)),0.0)-r; }
+    if(preset==2) return torusSDF(q,A,B,1);
+    if(preset==3){ float yy=q.y; if(yy>A) yy-=A; else if(yy<-A) yy+=A; else yy=0.0; return sqrt(q.x*q.x+yy*yy+q.z*q.z)-B; }
+    if(preset==4){ float f=1.0/max(A,1e-3); float g=sin(q.x*f)*cos(q.y*f)+sin(q.y*f)*cos(q.z*f)+sin(q.z*f)*cos(q.x*f);
+        float shell=(abs(g)-0.25)*A*0.5; float bound=length(q)-A*2.2; return max(shell,bound); }
+    if(preset==5){ float m=abs(q.x)+abs(q.y)+abs(q.z)-A; return m*0.57735026; }
+    if(preset==6) return gemSDF(q,A);
+    return length(q)-A;
+}
+// sphere-trace the primitive at b between where the ray enters and leaves its bounding sphere, clipped to [tmin, tmax)
+bool marchPrim(int b, vec3 o, vec3 d, float tmin, float tmax, out float tHit){
+    tHit=0.0;
+    vec3 oc=o-vec3(top[b+1],top[b+2],top[b+3]); float R=top[b+15];
+    float bb=dot(oc,d), disc=bb*bb-(dot(oc,oc)-R*R);
+    if(disc<0.0) return false;
+    float sq=sqrt(disc);
+    float t=max(tmin,-bb-sq), t1=min(tmax,-bb+sq);
+    if(t>=t1) return false;
+    // +1 outside the solid, -1 when the ray starts inside it (a refracted ray in the glass diamond): stepping by
+    // sign*dist always advances toward the next boundary
+    float s0=(primSDF(b,o+d*t)<0.0)?-1.0:1.0;
+    for(int i=0;i<160 && t<t1;i++){
+        float dist=primSDF(b,o+d*t);
+        if(abs(dist)<1e-4*(1.0+t)){ tHit=t; return true; }
+        t+=s0*dist;
+    }
+    return false;
+}
+// tetrahedral gradient of the primitive's SDF: four samples
+vec3 primNormal(int b, vec3 p){
+    const float e=5e-4;
+    vec3 k0=vec3(1.0,-1.0,-1.0), k1=vec3(-1.0,-1.0,1.0), k2=vec3(-1.0,1.0,-1.0), k3=vec3(1.0,1.0,1.0);
+    return safeNorm(k0*primSDF(b,p+k0*e)+k1*primSDF(b,p+k1*e)+k2*primSDF(b,p+k2*e)+k3*primSDF(b,p+k3*e));
+}
+// the nearest SDF surface in [tmin, tmax), its normal and material
+bool marchHit(vec3 o, vec3 d, float tmin, float tmax, out float tHit, out vec3 n, out int mat){
+    tHit=0.0; n=vec3(0.0); mat=-1; int hb=-1;
+    for(int i=0;i<uNumPrim;i++){
+        int b=i*PRM; if(int(top[b])<3) continue;
+        float t; if(marchPrim(b,o,d,tmin,tmax,t)){ tmax=t; tHit=t; hb=b; }
+    }
+    if(hb<0) return false;
+    n=primNormal(hb,o+d*tHit); mat=int(top[hb+14]); return true;
+}
+// shadow rays: with passEmis, SDF shapes with an emissive material let them through
+bool marchAny(vec3 o, vec3 d, float tmin, float tmax, bool passEmis){
+    for(int i=0;i<uNumPrim;i++){
+        int b=i*PRM; if(int(top[b])<3 || (passEmis && emissiveMat(int(top[b+14])))) continue;
+        float t; if(marchPrim(b,o,d,tmin,tmax,t)) return true;
+    }
+    return false;
+}
+#endif
+
+bool closest(vec3 o, vec3 d, float tmin, inout Hit h){
+    bool hit=false;
+    int hi, ht; float hu, hv;
+    if(closestTri(o,d,tmin,h.t,hi,ht,hu,hv)){
+        int ib=uInstOff+hi*INST, b=uTriOff+ht*TRI;
+        hit=true; h.p=o+d*h.t;
+        vec3 n=cross(vec3(geo[b+3],geo[b+4],geo[b+5]), vec3(geo[b+6],geo[b+7],geo[b+8]));
+        // the object-space normal through the inverse transpose; the sign keeps the world winding of a mirroring transform
+        h.n=safeNorm((vec3(top[ib],top[ib+1],top[ib+2])*n.x + vec3(top[ib+4],top[ib+5],top[ib+6])*n.y
+            + vec3(top[ib+8],top[ib+9],top[ib+10])*n.z)*top[ib+27]);
+        h.mat=int(top[ib+23]); h.fall=vec3(top[ib+24],top[ib+25],top[ib+26]);
+        h.shade=geo[b+15]; h.tex=int(geo[b+16]); h.hasUV=hasRect(h.tex);
+        float w=1.0-hu-hv;
+        h.uv=vec2(geo[b+9]*w+geo[b+11]*hu+geo[b+13]*hv, geo[b+10]*w+geo[b+12]*hu+geo[b+14]*hv);
+        h.ti=ht; h.inst=hi; h.prim=-1;
+    }
+    for(int i=0;i<uNumPrim;i++){
+        int b=i*PRM; int kind=int(top[b]); vec3 c=vec3(top[b+1],top[b+2],top[b+3]);
+        if(kind==0){
+            float rad=top[b+4]; vec3 oc=o-c; float bb=dot(oc,d), cc=dot(oc,oc)-rad*rad; float disc=bb*bb-cc; if(disc<0.0) continue;
+            float sq=sqrt(disc); float tt=-bb-sq; if(tt<=tmin) tt=-bb+sq; if(tt<=tmin||tt>=h.t) continue;
+            h.t=tt; hit=true; h.p=o+d*tt; h.n=safeNorm((h.p-c)/rad); h.mat=int(top[b+14]); h.hasUV=false; h.tex=-1; h.ti=-1; h.inst=-1; h.prim=i;
+        } else if(kind==1){
+            vec3 nrm=vec3(top[b+4],top[b+5],top[b+6]); float den=dot(d,nrm); if(abs(den)<1e-9) continue;
+            float tt=dot(c-o,nrm)/den; if(tt<=tmin||tt>=h.t) continue;
+            h.t=tt; hit=true; h.p=o+d*tt; h.n=nrm; h.mat=int(top[b+14]); h.hasUV=false; h.tex=-1; h.ti=-1; h.inst=-1; h.prim=i;
+        } else if(kind==2){
+            vec3 bmin=vec3(top[b+7],top[b+8],top[b+9]), bmax=vec3(top[b+10],top[b+11],top[b+12]);
+            float tt; vec3 bn;
+            if(boxHit(o,d,bmin,bmax,tmin,h.t,tt,bn)){ h.t=tt; hit=true; h.p=o+d*tt; h.n=bn; h.mat=int(top[b+14]); h.hasUV=false; h.tex=-1; h.ti=-1; h.inst=-1; h.prim=i; }
+        }
+    }
+#ifdef HAS_SDF
+    float mt; vec3 mn; int mm;
+    if(marchHit(o,d,tmin,h.t,mt,mn,mm)){ h.t=mt; hit=true; h.p=o+d*mt; h.n=mn; h.mat=mm; h.hasUV=false; h.tex=-1; h.ti=-1; h.inst=-1; h.prim=-1; }
+#endif
+    return hit;
+}
+
+// Shadow-ray test toward a light, t in (tmin, tmax). With passEmis, emissive surfaces let it through: toward a point
+// light or an emissive sphere they stand for the light itself, so a lamp can sit inside its bulb. The sun's ray
+// passes false: emissive surfaces cast sun shadows.
+bool occluded(vec3 o, vec3 d, float tmin, float tmax, bool passEmis){
+    if(anyTri(o,d,tmin,tmax,passEmis)) return true;
+    for(int i=0;i<uNumPrim;i++){
+        int b=i*PRM; int kind=int(top[b]);
+        if(passEmis && emissiveMat(int(top[b+14]))) continue;
+        if(kind==0){ vec3 c=vec3(top[b+1],top[b+2],top[b+3]); float rad=top[b+4]; vec3 oc=o-c; float bb=dot(oc,d), cc=dot(oc,oc)-rad*rad; float disc=bb*bb-cc; if(disc<0.0) continue; float sq=sqrt(disc); float tt=-bb-sq; if(tt<=tmin) tt=-bb+sq; if(tt>tmin&&tt<tmax) return true; }
+        else if(kind==1){ vec3 nrm=vec3(top[b+4],top[b+5],top[b+6]); float den=dot(d,nrm); if(abs(den)<1e-9) continue; float tt=dot(vec3(top[b+1],top[b+2],top[b+3])-o,nrm)/den; if(tt>tmin&&tt<tmax) return true; }
+        else if(kind==2){ vec3 bmin=vec3(top[b+7],top[b+8],top[b+9]), bmax=vec3(top[b+10],top[b+11],top[b+12]); float tt; vec3 bn; if(boxHit(o,d,bmin,bmax,tmin,tmax,tt,bn)) return true; }
+    }
+#ifdef HAS_SDF
+    if(marchAny(o,d,tmin,tmax,passEmis)) return true;
+#endif
+    return false;
+}
+
+// an orthonormal pair perpendicular to the unit vector w
+void frame(vec3 w, out vec3 u, out vec3 v){ vec3 a=(abs(w.x)>0.9)?vec3(0.0,1.0,0.0):vec3(1.0,0.0,0.0); u=safeNorm(cross(a,w)); v=cross(w,u); }
+// v turned to the side of nf: unchanged above the surface, mirrored across it below
+vec3 above(vec3 v, vec3 nf){ float k=dot(v,nf); return k>0.0 ? v : v-nf*(2.0*k); }
+// 1 - cos of the half angle of the cone that the sphere (c, r) fills seen from p; 0 from inside it
+float coneOmc(vec3 p, vec3 c, float r){
+    vec3 v=c-p; float d2=dot(v,v), r2=r*r;
+    if(d2<=r2) return 0.0;
+    float s2=r2/d2; return s2/(1.0+sqrt(1.0-s2));
+}
+
+// Next-event estimation for a diffuse hit at p with shading normal n and surface normal nf on the ray's side (e: the
+// offset at p): the point lights, the sun, and one direction toward each emissive sphere, drawn uniformly in the cone
+// the sphere fills and weighted against the cosine bounce that can reach it too (power heuristic, see bounceWeight).
+vec3 directLight(vec3 p, vec3 n, vec3 nf, float e, inout uint seed){
+    vec3 sum=vec3(0.0), po=p+nf*e;
+    for(int i=0;i<uNumLight;i++){
+        int b=uLightOff+i*LGT; vec3 lp=vec3(aux[b],aux[b+1],aux[b+2]);
+        vec3 to=lp-p; float dist=length(to); if(dist<1e-6) continue;
+        vec3 l=to/dist; float ndl=dot(n,l); if(ndl<=0.0 || dot(nf,l)<=0.0) continue;
+        if(occluded(po, l, e, dist-20.0*e, true)) continue;
+        float inv=ndl/(PI*max(dist*dist,MIN_LIGHT_D2));
+        sum += vec3(aux[b+3],aux[b+4],aux[b+5])*inv;
+    }
+    if(uSunCol.x+uSunCol.y+uSunCol.z>0.0){   // the sun: a direction, its shadow ray runs to infinity
+        float ndl=dot(n,uSunDir);
+        if(ndl>0.0 && dot(nf,uSunDir)>0.0 && !occluded(po, uSunDir, e, NOHIT, false)) sum += uSunCol*ndl;
+    }
+    for(int i=0;i<uNumPrim;i++){
+        int b=i*PRM; int m=int(top[b+14]);
+        if(int(top[b])!=0 || !emissiveMat(m)) continue;
+        vec3 c=vec3(top[b+1],top[b+2],top[b+3]); float r=top[b+4];
+        float omc=coneOmc(p,c,r); if(omc<=0.0) continue;
+        vec3 w=safeNorm(c-p), tu, tv; frame(w,tu,tv);
+        float om=nextd(seed)*omc, ph=2.0*PI*nextd(seed), st=sqrt(max(0.0,om*(2.0-om)));
+        vec3 l=safeNorm(tu*(st*cos(ph))+tv*(st*sin(ph))+w*(1.0-om));
+        float ndl=dot(n,l); if(ndl<=0.0 || dot(nf,l)<=0.0) continue;
+        vec3 oc=p-c; float bq=dot(oc,l), tl=-bq-sqrt(max(bq*bq-(dot(oc,oc)-r*r),0.0));
+        if(occluded(po, l, e, tl-e, true)) continue;
+        // emission * (cos/PI) / pdf, times the light's weight pl^2/(pl^2+pb^2), with q = pb/pl
+        float q=2.0*ndl*omc;
+        sum += vec3(aux[m*MTL+6],aux[m*MTL+7],aux[m*MTL+8])*(q/(1.0+q*q));
+    }
+    return sum;
+}
+// The share of the emission that a cosine bounce from the diffuse vertex (pp, normals pn, pnf) in direction d finds
+// on primitive i, when directLight there sampled it too (an emissive sphere): pb^2/(pb^2+pl^2). 1 for a direction
+// directLight cannot draw.
+float bounceWeight(int i, vec3 pp, vec3 pn, vec3 pnf, vec3 d){
+    int b=i*PRM;
+    if(int(top[b])!=0) return 1.0;
+    float omc=coneOmc(pp,vec3(top[b+1],top[b+2],top[b+3]),top[b+4]), ndl=dot(pn,d);
+    if(omc<=0.0 || ndl<=0.0 || dot(pnf,d)<=0.0) return 1.0;
+    float q=2.0*ndl*omc;
+    return q*q/(1.0+q*q);
+}
+
+#ifdef HAS_NMAP
+uint vhash(int x,int y,int z){ int v=x*374761393+y*668265263+z*1274126177; uint h=uint(v); h=(h^(h>>13))*1274126177u; return (h^(h>>16))&0xffffffu; }
+float vhashf(int x,int y,int z){ return float(vhash(x,y,z))/16777216.0; }
+float noise3(vec3 p){
+    int xi=int(floor(p.x)),yi=int(floor(p.y)),zi=int(floor(p.z));
+    float fx=p.x-float(xi),fy=p.y-float(yi),fz=p.z-float(zi);
+    float sx=fx*fx*(3.0-2.0*fx),sy=fy*fy*(3.0-2.0*fy),sz=fz*fz*(3.0-2.0*fz);
+    float c000=vhashf(xi,yi,zi),c100=vhashf(xi+1,yi,zi),c010=vhashf(xi,yi+1,zi),c110=vhashf(xi+1,yi+1,zi);
+    float c001=vhashf(xi,yi,zi+1),c101=vhashf(xi+1,yi,zi+1),c011=vhashf(xi,yi+1,zi+1),c111=vhashf(xi+1,yi+1,zi+1);
+    float x00=mix(c000,c100,sx),x10=mix(c010,c110,sx),x01=mix(c001,c101,sx),x11=mix(c011,c111,sx);
+    float y0=mix(x00,x10,sy),y1=mix(x01,x11,sy);
+    return mix(y0,y1,sz)*2.0-1.0;
+}
+float fbm(vec3 p){ return noise3(p)*0.5+noise3(p*2.03)*0.25+noise3(p*4.01)*0.125; }
+float heightField(vec3 p, int kind){
+    if(kind==1){ float rad=sqrt(p.x*p.x+p.z*p.z); return sin(rad*14.0+sin(p.y*3.0)*1.5)*0.05; }
+    if(kind==3){ return (sin(p.x*5.0)+sin(p.z*5.0+p.x*1.3)+sin((p.x+p.z)*3.5))*0.05; }
+    return fbm(p*2.2)*0.5;
+}
+vec3 perturbNormal(vec3 p, vec3 n, int kind){
+    float e=0.04, amp=0.6; float f0=heightField(p,kind);
+    vec3 g=vec3((heightField(p+vec3(e,0.0,0.0),kind)-f0)/e,(heightField(p+vec3(0.0,e,0.0),kind)-f0)/e,(heightField(p+vec3(0.0,0.0,e),kind)-f0)/e);
+    vec3 gt=g-n*dot(g,n);
+    return safeNorm(n-gt*amp);
+}
+vec3 woodAlbedo(vec3 p, vec3 baseAlb){
+    float rad=sqrt(p.x*p.x+p.z*p.z); float rings=sin(rad*14.0+sin(p.y*3.0)*1.5);
+    float f=0.55+0.45*(rings*0.5+0.5); return baseAlb*f;
+}
+vec3 texNormalRaw(int id, vec2 uv){
+    int b=uRectOff+id*RECT;
+    int x=wrapTexel(uv.x,int(aux[b+2])), y=wrapTexel(uv.y,int(aux[b+3]));
+    vec3 c=texelFetch(uAtlas, ivec2(int(aux[b])+x, int(aux[b+1])+y), 0).rgb;
+    return c*2.0-1.0;
+}
+// the object-space vector v into the world through instance ib's transform
+vec3 instToWorld(int ib, vec3 v){ return vec3(top[ib+12]*v.x+top[ib+13]*v.y+top[ib+14]*v.z, top[ib+15]*v.x+top[ib+16]*v.y+top[ib+17]*v.z, top[ib+18]*v.x+top[ib+19]*v.y+top[ib+20]*v.z); }
+// tangent-space normal map on the front of the hit triangle (n: its winding normal): a tangent frame from the
+// triangle's edges and UV gradients (taken into the world by the instance's transform), the decoded RGB normal
+// rotated into it. Green runs along n x tangent, or down the image (the texture's v) for a map in the DirectX
+// convention (dx).
+vec3 texNormal(int inst, int tri, vec3 n, int texId, vec2 uv, bool dx){
+    if(!hasRect(texId)) return n;
+    int ib=uInstOff+inst*INST, b=uTriOff+tri*TRI;
+    vec3 e1=vec3(geo[b+3],geo[b+4],geo[b+5]), e2=vec3(geo[b+6],geo[b+7],geo[b+8]);
+    float du1=geo[b+11]-geo[b+9], dv1=geo[b+12]-geo[b+10], du2=geo[b+13]-geo[b+9], dv2=geo[b+14]-geo[b+10];
+    float det=du1*dv2-du2*dv1; if(abs(det)<1e-12) return n;
+    float r=1.0/det;
+    vec3 tang=instToWorld(ib,(e1*dv2 - e2*dv1)*r);
+    tang=safeNorm(tang - n*dot(tang,n));
+    vec3 bit=cross(n,tang);
+    if(dx){ vec3 bw=instToWorld(ib,(e2*du1 - e1*du2)*r); bit=safeNorm(bw - n*dot(bw,n) - tang*dot(bw,tang)); }
+    vec3 nm=texNormalRaw(texId, uv);
+    return safeNorm(tang*nm.x + bit*nm.y + n*max(nm.z,0.05));
+}
+#endif
+
+vec3 cosineHemisphere(vec3 n, inout uint seed){
+    float r1=nextd(seed), r2=nextd(seed);
+    float r=sqrt(r1), phi=2.0*PI*r2;
+    float x=r*cos(phi), y=r*sin(phi), z=sqrt(max(0.0,1.0-r1));
+    vec3 u, v; frame(n,u,v);
+    return safeNorm(u*x+v*y+n*z);
+}
+// Smith's Lambda for GGX roughness a and a direction at cosine c to the normal
+float smithLambda(float c, float a){ float c2=max(c*c,1e-12); return 0.5*(sqrt(1.0+a*a*(1.0-c2)/c2)-1.0); }
+// A rough-metal bounce: a GGX microfacet normal drawn from those the view v (toward the eye, above n) sees (Heitz
+// 2018), and v mirrored about it. w is the bounce's weight G2/G1; 0 when the bounce leaves below n.
+vec3 ggxReflect(vec3 v, vec3 n, float a, inout uint seed, out float w){
+    vec3 t1, t2; frame(n,t1,t2);
+    vec3 vl=vec3(dot(v,t1),dot(v,t2),dot(v,n));
+    vec3 vh=safeNorm(vec3(a*vl.x,a*vl.y,vl.z));
+    float l2=vh.x*vh.x+vh.y*vh.y;
+    vec3 b1=l2>0.0 ? vec3(-vh.y,vh.x,0.0)*inversesqrt(l2) : vec3(1.0,0.0,0.0), b2=cross(vh,b1);
+    float r=sqrt(nextd(seed)), ph=2.0*PI*nextd(seed);
+    float p1=r*cos(ph), p2=r*sin(ph), s=0.5*(1.0+vh.z);
+    p2=(1.0-s)*sqrt(max(0.0,1.0-p1*p1))+s*p2;
+    vec3 nh=b1*p1+b2*p2+vh*sqrt(max(0.0,1.0-p1*p1-p2*p2));
+    vec3 m=safeNorm(vec3(a*nh.x,a*nh.y,max(nh.z,0.0)));
+    vec3 ll=reflect(-vl,m);
+    if(ll.z<=0.0){ w=0.0; return n; }
+    float lv=smithLambda(vl.z,a), lw=smithLambda(ll.z,a);
+    w=(1.0+lv)/(1.0+lv+lw);
+    return safeNorm(t1*ll.x+t2*ll.y+n*ll.z);
+}
+
+// The hit's material: type, albedo (with the object's colour override or tint), emission (the material's plus the
+// object's emissive), roughness, IOR and normal map (normTex: a texture slot; dx: its green runs down the image).
+void resolve(Hit h, out int type, out vec3 alb, out vec3 emis, out float rough, out float ior, out int nmap, out int normTex, out bool dx){
+    type=0; rough=1.0; ior=1.5; nmap=0; normTex=-1; dx=false; emis=vec3(0.0); alb=vec3(0.8);
+    bool texd=false; float sh=1.0;
+    if(h.mat>=0 && h.mat<uNumMat){
+        int b=h.mat*MTL;   // materials live at the start of the aux buffer (offset 0)
+        type=int(aux[b]); rough=aux[b+4]; ior=aux[b+5]; nmap=int(aux[b+10]); normTex=int(aux[b+11]);
+        emis=vec3(aux[b+6],aux[b+7],aux[b+8]);
+        int mtex=int(aux[b+9]);
+        if(h.hasUV && hasRect(mtex)){ alb=sampleAlbedo(mtex, h.uv); texd=true; }
+        else alb=vec3(aux[b+1],aux[b+2],aux[b+3]);   // no texture, or one that isn't registered: the material colour
+    } else if(hasRect(h.tex)){
+        sh=h.shade; alb=sampleAlbedo(h.tex, h.uv)*sh; texd=true;
+    } else {
+        alb=h.fall;
+    }
+    if(h.inst>=0){
+        int ib=uInstOff+h.inst*INST;
+        if(top[ib+31]>=0.0) alb=vec3(top[ib+31],top[ib+32],top[ib+33])*sh;
+        else if(texd) alb*=vec3(top[ib+28],top[ib+29],top[ib+30]);
+        emis+=alb*vec3(top[ib+34],top[ib+35],top[ib+36]);
+        // the normal map SetTextureNormalMap gave the triangle's texture, when the material has none
+        if(normTex<0 && nmap==0 && hasRect(h.tex)){ int ns=int(aux[uRectOff+h.tex*RECT+5]); if(ns>=0){ normTex=ns; dx=true; } }
+    }
+}
+
+vec3 trace(vec3 o, vec3 d, inout uint seed){
+    vec3 L=vec3(0.0), thr=vec3(1.0);
+    float tmin=rayEps(o);
+    // the last diffuse vertex, whose directLight sampled the emissive spheres: its point and normals
+    bool pd=false; vec3 pp=vec3(0.0), pn=vec3(0.0), pnf=vec3(0.0);
+    bool lit=false;   // a diffuse vertex on the path: rays escaping after it bring the ambient light
+    for(int bounce=0; bounce<MAXD; bounce++){
+        Hit h; h.t=NOHIT; h.ti=-1; h.inst=-1; h.prim=-1; h.mat=-1; h.hasUV=false; h.tex=-1; h.shade=1.0; h.fall=vec3(0.8); h.uv=vec2(0.0); h.p=vec3(0.0); h.n=vec3(0.0,1.0,0.0);
+        if(!closest(o,d,tmin,h)){ L+=thr*(sky(d) + (lit ? uAmb : vec3(0.0))); break; }   // the camera and its mirrors see the plain sky
+        int type,nmap,normTex; vec3 alb,emis; float rough,ior; bool dx;
+        resolve(h,type,alb,emis,rough,ior,nmap,normTex,dx);
+        vec3 ng=h.n; float cosI=-dot(d,ng); bool inside=cosI<0.0;
+        vec3 nf = inside ? -ng : ng;   // the surface normal on the ray's side: ray offsets and the side checks use it
+        vec3 n = nf;                   // the shading normal
+#ifdef HAS_NMAP
+        if(normTex>=0 && h.ti>=0){ n=texNormal(h.inst,h.ti,ng,normTex,h.uv,dx); if(inside) n=-n; }
+        else if(nmap!=0){ if(nmap==1) alb=woodAlbedo(h.p,alb); n=perturbNormal(h.p,nf,nmap); }
+#endif
+        L+=thr*emis*((pd && type==3 && h.prim>=0) ? bounceWeight(h.prim,pp,pn,pnf,d) : 1.0);
+        if(type==3) break;
+        vec3 p=h.p; float e=rayEps(p); tmin=e;
+        pd=false;
+        if(type==2){
+            float eta = inside ? ior : 1.0/ior;
+            float c=-dot(d,n);
+            if(c<=0.0){ n=nf; c=abs(cosI); }   // a bent normal facing away from the ray: the surface's own
+            float k=1.0-eta*eta*(1.0-c*c);
+            vec3 refl=above(reflect(d,n),nf);
+            if(k<0.0){ o=p+nf*e; d=refl; }
+            else {
+                float cosT=sqrt(k);
+                float r0=(eta-1.0)/(eta+1.0); r0*=r0;
+                float cs=(eta>1.0)?cosT:c;   // Schlick takes the cosine on the thinner side
+                float fr=r0+(1.0-r0)*pow(1.0-cs,5.0);
+                if(nextd(seed)<fr){ o=p+nf*e; d=refl; }
+                else { o=p-nf*e; d=-above(-safeNorm(d*eta + n*(eta*c-cosT)),nf); }
+            }
+            thr*=alb;
+        } else if(type==1){
+            if(dot(d,n)>=0.0) n=nf;   // a bent normal facing away from the ray: the surface's own
+            if(rough>0.0){
+                float w; d=ggxReflect(-d,n,max(rough*rough,1e-4),seed,w);
+                if(w<=0.0) break;
+                thr*=alb*w;
+            } else { d=reflect(d,n); thr*=alb; }
+            d=above(d,nf); o=p+nf*e;
+        } else {
+            L+=thr*alb*directLight(p,n,nf,e,seed);
+            d=above(cosineHemisphere(n,seed),nf);
+            pd=true; lit=true; pp=p; pn=n; pnf=nf;
+            o=p+nf*e; thr*=alb;
+        }
+        if(bounce>=3){
+            float q=max(thr.x,max(thr.y,thr.z));
+            if(q<1.0){ if(nextd(seed)>q) break; thr*=1.0/max(q,1e-4); }
+        }
+    }
+    return L;
+}
+
+void main(){
+    ivec2 gid=ivec2(gl_GlobalInvocationID.xy)+ivec2(0,uRowOff);
+    if(gid.x>=uW || gid.y>=uH) return;
+    vec4 prev=(uReset!=0) ? vec4(0.0) : imageLoad(uPrev, gid);   // the first frame after a reset starts from zero
+    // rows outside this frame's band, and three pixels of every 2x2 block in a heavy scene's moving pass, keep their sum
+    if(gid.y<uTraceY0 || gid.y>=uTraceY1 || (uHalf!=0 && ((gid.x|gid.y)&1)!=0)){ imageStore(uOut, gid, prev); return; }
+    int px=gid.x, py=gid.y;
+    uint idx=uint(py*uW+px);
+    float hw=float(uW)*0.5, hh=float(uH)*0.5;
+    uint n0=uint(prev.a);
+    vec3 sum=vec3(0.0);
+    for(int sp=0; sp<uSPP; sp++){
+        uint si=n0+uint(sp)+1u;                         // 1-based sample index of this pixel (matches the CPU seed)
+        uint seed=hashu(idx*2654435761u ^ si*40503u) | 1u;   // xorshift stays at 0 from a 0 seed
+        float jx=nextd(seed), jy=nextd(seed);
+        float sx=(float(px)+jx-hw)/uScale;
+        float sy=-(float(py)+jy-hh)/uScale;
+        vec3 dir=safeNorm(uR*sx + uU*sy + uF);
+        vec3 c=trace(uEye, dir, seed);
+        float cs=c.x+c.y+c.z;
+        if(!isnan(cs) && !isinf(cs)) sum += c;   // a NaN would stay in the sum until the next reset
+    }
+    imageStore(uOut, gid, vec4(prev.rgb+sum, prev.a+float(uSPP)));
+}

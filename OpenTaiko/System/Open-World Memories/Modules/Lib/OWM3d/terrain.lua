@@ -15,6 +15,7 @@ local Terrain = {}
 Terrain.__index = Terrain
 
 local GRASS_SPR = 915
+local grassScenes = setmetatable({}, { __mode = "k" })   -- the scenes that have the blade sprite (a new world has a new scene)
 
 local function makeHeightAt(hf, terr)
     local sx = 1.0 / (terr.cellSize or 1)
@@ -34,8 +35,8 @@ end
 -- a tapered grass-blade sprite (cutout, slightly curved, two green tones)
 local function ensureGrassSprite(scene)
     if scene.GrassSprite == nil or scene.SetSpriteRGBA == nil then return false end
-    if Terrain._sprDone then return true end
-    Terrain._sprDone = true
+    if grassScenes[scene] then return true end
+    grassScenes[scene] = true
     -- higher-res, smoothly tapered blade with a soft edge falloff (reads granular, not chunky)
     local w, h = 24, 64
     local t = {}

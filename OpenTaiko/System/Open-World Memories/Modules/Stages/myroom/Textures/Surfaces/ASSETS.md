@@ -7,6 +7,8 @@ Source: **ambientCG** (https://ambientcg.com), author **Lennart Demes / ambientC
 (https://docs.ambientcg.com/license/). Each file is the base-color (`_Color`) map from the asset's
 1K-PNG download, resized to 512x512 RGB PNG. Each `<name>_normal.png` is the same asset's `_NormalDX` map
 (DirectX convention) from that download, resized to 512x512 with its vectors renormalized.
+The maps My Room uses (woodfloor, plaster, rug, paving, grass, sand, snow, brick, rock and their normal maps)
+were then reduced to 128x128: colours averaged in linear light, normals averaged and renormalized.
 
 | File | ambientCG asset | Asset page | License |
 |---|---|---|---|

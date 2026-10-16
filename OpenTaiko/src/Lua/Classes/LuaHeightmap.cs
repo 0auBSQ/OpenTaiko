@@ -85,6 +85,10 @@ namespace OpenTaiko {
 		public int BuildTerrain(Lua3DScene scene, int floorObj, PhysicsWorld phys,
 			LuaHeightfield hf, LuaSplatmap splat, int w, int h, double minY, double maxY, double cellSize,
 			int tex1, int tex2, int tex3, int tex4, double grassDensity, double grassClump) {
+			if (scene == null || phys == null || hf == null) {
+				System.Diagnostics.Trace.TraceWarning("HEIGHTMAP: BuildTerrain needs a scene, a physics world and a heightfield; nothing built");
+				return 0;
+			}
 			int W = w - 1, H = h - 1;
 			double range = maxY - minY;
 			double cs = cellSize <= 0 ? 1 : cellSize;
@@ -173,9 +177,10 @@ namespace OpenTaiko {
 				int w = bmp.Width, h = bmp.Height;
 				var d = new byte[w * h];
 				var ch = new byte[w * h * 4];
+				var px = bmp.Pixels;   // every pixel in one read
 				for (int z = 0; z < h; z++) {
 					for (int x = 0; x < w; x++) {
-						var c = bmp.GetPixel(x, z);
+						var c = px[z * w + x];
 						byte a = c.Alpha == 255 ? (byte)0 : c.Alpha;      // fully-opaque alpha = "no alpha layer"
 						byte best = c.Red; byte li = 1;
 						if (c.Green > best) { best = c.Green; li = 2; }
