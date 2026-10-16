@@ -105,7 +105,7 @@ MyMascot/
 
 ## 第 6 步（可选）：添加解锁条件（Unlock.json）
 
-没有 `Unlock.json` 时小角色立即可用。要锁定它，添加一个包含 `condition`、`type`、`values` 和 `references` 字段的 `Unlock.json`；格式和条件 id 与歌曲和角色相同（见解锁条件指南）。下面的示例在玩家累计获得 500 金币后解锁。自带示例：OpenTaiko-Kun 售价 100 金币（`"condition": "ch"`），Bol 要求过关 20 首谱师为 `bol` 的谱面（`"condition": "sc"`），Tinyfox 要求在分类 `Project Outfox Serenity` 中演奏一首歌曲（`"condition": "sg"`）。
+没有 `Unlock.json` 时小角色立即可用。要锁定它，添加一个包含 `condition`、`type`、`values` 和 `references` 字段的 `Unlock.json`；格式和条件 id 与歌曲和角色相同（见[解锁条件参考](unlockables-reference.md)）。下面的示例在玩家累计获得 500 金币后解锁。自带示例：OpenTaiko-Kun 售价 100 金币（`"condition": "ch"`），Bol 要求过关 20 首谱师为 `bol` 的谱面（`"condition": "sc"`），Tinyfox 要求在分类 `Project Outfox Serenity` 中演奏一首歌曲（`"condition": "sg"`）。
 
 玩家在房间界面购买金币条件。游戏在每次演奏后于结算界面检查其他条件；玩家满足某个条件时，游戏把小角色加入存档的已解锁列表并显示一条通知。
 

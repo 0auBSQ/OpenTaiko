@@ -12,7 +12,7 @@ Ein Namensschildtitel ist das Textschild, das auf dem Namensschild eines Spieler
 
 ## Schritt 1: Den Paketordner anlegen
 
-Legen Sie im Ordner `Global/Nameplates/` neben dem Spiel einen Ordner an. Den Ordnernamen können Sie frei wählen. Das Paket enthält eine erforderliche Datei und einen optionalen Ordner `Lang/` für Übersetzungen (Schritt 3):
+Legen Sie im Ordner `Global/Nameplates/` einen Ordner an (der Ordner `Global` liegt neben dem Spiel). Den Ordnernamen können Sie frei wählen. Das Paket enthält eine erforderliche Datei und einen optionalen Ordner `Lang/` für Übersetzungen (Schritt 3):
 
 ```
 Global/
@@ -35,9 +35,9 @@ Ein Skin liefert sein Paket auf dieselbe Weise mit, als Ordner `Nameplates/` in 
 - `nameplates` (array, erforderlich): ein Objekt pro Namensschild, mit diesen Feldern:
   - `key` (string, erforderlich): ein Name für das Namensschild, eindeutig innerhalb des Pakets. Die vollständige ID des Namensschilds ist `<pack>:<key>`, zum Beispiel `example_pack:night_sky`. Spielstände speichern diese ID; behalten Sie einen Schlüssel also bei, sobald Spieler das Namensschild besitzen können, und geben Sie ihn nie einem anderen Namensschild.
   - `title` (string, erforderlich): der Titeltext. Jede Sprache ohne Übersetzung zeigt ihn an.
-  - `type` (int, Standard 0): die Grafik des Schilds, eine Ordnernummer in den Namensschild-Texturen des Skins. Im mitgelieferten Skin sind die Ordner `Modules/ROActivities/nameplate/Textures/Title/0` bis `45`, und für eine Nummer ohne Ordner zeichnet der Skin kein Schild.
+  - `type` (int, Standard 0): die Grafik des Schilds, eine Ordnernummer in den Namensschild-Texturen des Skins. Im mitgelieferten Skin sind die Ordner `Modules/ROActivities/nameplate/Textures/Title/0` bis `45`, und für eine Nummer ohne Ordner zeichnet der Skin kein Schild. Die Tabelle unten listet die Schilder des mitgelieferten Skins auf.
   - `rarity` (string, Standard `Common`): der Name der Seltenheit (siehe Tabelle unten). Ein unbekannter Name wird zu `Common`.
-  - `unlock` (object, optional): die Freischaltbedingung, mit denselben Feldern wie in einer `Unlock.json`: `condition`, `values`, `type` und `references` (die Bedingungs-IDs stehen in der Anleitung [Chart-Freischaltungen](unlockables.md)). Ohne `unlock` besitzt jeder Spieler das Namensschild von Anfang an.
+  - `unlock` (object, optional): die Freischaltbedingung, mit denselben Feldern wie in einer `Unlock.json`: `condition`, `values`, `type` und `references` (die Bedingungs-IDs stehen in der [Referenz der Freischaltbedingungen](unlockables-reference.md)). Ohne `unlock` besitzt jeder Spieler das Namensschild von Anfang an.
 
 Seltenheitswerte (die Sterne sind die des mitgelieferten Skins):
 
@@ -50,6 +50,57 @@ Seltenheitswerte (die Sterne sind die des mitgelieferten Skins):
 | <span class="rarity rarity-epic">Epic</span> | 2 | 3 |
 | <span class="rarity rarity-legendary">Legendary</span> | 3 | 4 |
 | <span class="rarity rarity-mythical">Mythical</span> | 4 | 4 |
+
+Schildtypen (`type`) des mitgelieferten Skins, Open-World Memories. Der PC in My Room gruppiert die Namensschilder nach Typ, unter den Abschnittsnamen aus `Modules/Stages/myroom/lang/<code>/nameplate_types.json` des Skins. Ein Typ ohne Namen dort erscheint als "Schildtyp" mit seiner Nummer, und die Abschnitte der Typen 10 und 38 zeigen "???", bis der Spieler ein Namensschild dieses Typs besitzt.
+
+| Typ | Name | Effekt |
+| --- | --- | --- |
+| 0 | Holz |  |
+| 1 | Kupfer | Glanz |
+| 2 | Amethyst | Glanz |
+| 3 | Natur | Glanz |
+| 4 | Rot | Glanz |
+| 5 | Blau | Glanz |
+| 6 | Asche | Glanz |
+| 7 | Regenbogen | Animiert |
+| 8 | Weltraum |  |
+| 9 | Diamant |  |
+| 10 | Misery |  |
+| 11 | Gold |  |
+| 12 | Perle |  |
+| 13 | Platin |  |
+| 14 | Kohaku (Charakterschild) |  |
+| 15 | Dashy |  |
+| 16 | Blau |  |
+| 17 | Rot |  |
+| 18 | Himmelslila |  |
+| 19 | KI |  |
+| 20 | Himmel |  |
+| 21 | Gelb |  |
+| 22 | Creme |  |
+| 23 | Meer |  |
+| 24 | Grün |  |
+| 25 | Kapitel I |  |
+| 26 | Kapitel II |  |
+| 27 | Kapitel III |  |
+| 28 | OpTk Hell |  |
+| 29 | OpTk Dunkel |  |
+| 30 | NEP0 |  |
+| 31 | Nacht |  |
+| 32 | Kapitel IV |  |
+| 33 | Clear-Performance |  |
+| 34 | Full-Combo-Performance |  |
+| 35 | Perfect-Performance |  |
+| 36 | Vorlage |  |
+| 37 | Kapitel V |  |
+| 38 | V-ENTURE |  |
+| 39 | Clear-Historie |  |
+| 40 | Full-Combo-Historie |  |
+| 41 | Perfect-Historie |  |
+| 42 | Ryuto Setsujin |  |
+| 43 | Sonnenaufgang |  |
+| 44 | Kapitel VI |  |
+| 45 | Eine neue Welt |  |
 
 Das Spiel prüft die Freischaltbedingungen nach jedem Spiel auf dem Ergebnisbildschirm. Erfüllt der Spieler eine, schaltet das Spiel das Namensschild frei und zeigt eine Benachrichtigung an. Münzbedingungen (`ch`, `cs`, `cm`) schalten nur durch einen Kauf frei: Im mitgelieferten Skin kauft der Spieler das Namensschild am PC in My Room. Der PC in My Room lässt außerdem gesperrte Mythical-Namensschilder aus seiner Liste, bis der Spieler sie besitzt.
 

@@ -10,6 +10,7 @@
   - [Adding nameplates](guides/nameplates.md)
   - [Adding skins and themes](guides/skins.md)
   - [Chart unlockables](guides/unlockables.md)
+  - [Unlockables reference](guides/unlockables-reference.md)
 
 - Lua API reference
   - [Overview](api/README.md)

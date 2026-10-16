@@ -105,7 +105,7 @@ MyMascot/
 
 ## Étape 6 (facultatif) : Ajouter une condition de déblocage (Unlock.json)
 
-Sans `Unlock.json`, le puchichara est disponible immédiatement. Pour le verrouiller, ajoutez un `Unlock.json` avec les champs `condition`, `type`, `values` et `references` ; le format et les identifiants de condition sont les mêmes que pour les chansons et les personnages (voir le guide sur le déblocage). L'exemple ci-dessous se débloque une fois que le joueur a gagné 500 pièces au total. Exemples fournis : OpenTaiko-Kun coûte 100 pièces (`"condition": "ch"`), Bol exige 20 partitions réussies du créateur `bol` (`"condition": "sc"`), et Tinyfox exige une chanson jouée dans le genre `Project Outfox Serenity` (`"condition": "sg"`).
+Sans `Unlock.json`, le puchichara est disponible immédiatement. Pour le verrouiller, ajoutez un `Unlock.json` avec les champs `condition`, `type`, `values` et `references` ; le format et les identifiants de condition sont les mêmes que pour les chansons et les personnages (voir la [Référence des déblocages](unlockables-reference.md)). L'exemple ci-dessous se débloque une fois que le joueur a gagné 500 pièces au total. Exemples fournis : OpenTaiko-Kun coûte 100 pièces (`"condition": "ch"`), Bol exige 20 partitions réussies du créateur `bol` (`"condition": "sc"`), et Tinyfox exige une chanson jouée dans le genre `Project Outfox Serenity` (`"condition": "sg"`).
 
 Le joueur achète les conditions de pièces dans l'écran de la chambre. Le jeu vérifie les autres conditions sur l'écran de résultats après chaque partie ; quand le joueur en remplit une, il ajoute le puchichara à la liste des déblocages du fichier de sauvegarde et affiche une notification.
 

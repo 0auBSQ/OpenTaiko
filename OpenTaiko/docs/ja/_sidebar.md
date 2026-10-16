@@ -10,6 +10,7 @@
   - [ネームプレートの追加](guides/nameplates.md)
   - [スキンとテーマの追加](guides/skins.md)
   - [譜面のアンロック要素](guides/unlockables.md)
+  - [アンロック要素リファレンス](guides/unlockables-reference.md)
 
 - Lua API リファレンス
   - [概要](api/README.md)

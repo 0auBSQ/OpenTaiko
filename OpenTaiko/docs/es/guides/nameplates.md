@@ -12,7 +12,7 @@ Un título de placa de nombre es la placa de texto que aparece en la placa de no
 
 ## Paso 1: Crear la carpeta del paquete
 
-Crea una carpeta dentro de `Global/Nameplates/`, junto al juego. El nombre de la carpeta es libre. El paquete contiene un archivo obligatorio y una carpeta `Lang/` opcional para las traducciones (Paso 3):
+Crea una carpeta dentro de `Global/Nameplates/` (la carpeta `Global` está junto al juego). El nombre de la carpeta es libre. El paquete contiene un archivo obligatorio y una carpeta `Lang/` opcional para las traducciones (Paso 3):
 
 ```
 Global/
@@ -35,9 +35,9 @@ Un skin incluye su paquete de la misma forma, como una carpeta `Nameplates/` en 
 - `nameplates` (array, obligatorio): un objeto por placa de nombre, con estos campos:
   - `key` (string, obligatorio): un nombre para la placa de nombre, único dentro del paquete. El id completo de la placa es `<pack>:<key>`, por ejemplo `example_pack:night_sky`. Los archivos de guardado almacenan este id, así que no cambies una clave una vez que los jugadores puedan tener la placa, y nunca se la des a otra placa.
   - `title` (string, obligatorio): el texto del título. Todos los idiomas sin traducción lo muestran.
-  - `type` (int, por defecto 0): el arte de la placa, un número de carpeta en las texturas de placas de nombre del skin. En el skin incluido las carpetas van de `Modules/ROActivities/nameplate/Textures/Title/0` a `45`, y un número sin carpeta no dibuja ninguna placa.
+  - `type` (int, por defecto 0): el arte de la placa, un número de carpeta en las texturas de placas de nombre del skin. En el skin incluido las carpetas van de `Modules/ROActivities/nameplate/Textures/Title/0` a `45`, y un número sin carpeta no dibuja ninguna placa. La tabla siguiente enumera las placas del skin incluido.
   - `rarity` (string, por defecto `Common`): el nombre de la rareza (véase la tabla siguiente). Un nombre desconocido se convierte en `Common`.
-  - `unlock` (object, opcional): la condición de desbloqueo, con los mismos campos que un `Unlock.json`: `condition`, `values`, `type` y `references` (consulta la guía [Desbloqueables de charts](unlockables.md) para los ids de condición). Sin `unlock`, todos los jugadores poseen la placa de nombre desde el principio.
+  - `unlock` (object, opcional): la condición de desbloqueo, con los mismos campos que un `Unlock.json`: `condition`, `values`, `type` y `references` (consulta la [Referencia de desbloqueables](unlockables-reference.md) para los ids de condición). Sin `unlock`, todos los jugadores poseen la placa de nombre desde el principio.
 
 Valores de rareza (las estrellas son las del skin incluido):
 
@@ -50,6 +50,57 @@ Valores de rareza (las estrellas son las del skin incluido):
 | <span class="rarity rarity-epic">Epic</span> | 2 | 3 |
 | <span class="rarity rarity-legendary">Legendary</span> | 3 | 4 |
 | <span class="rarity rarity-mythical">Mythical</span> | 4 | 4 |
+
+Tipos de placa (`type`) del skin incluido, Open-World Memories. El ordenador de Mi Habitación agrupa las placas de nombre por tipo, bajo los nombres de sección del archivo `Modules/Stages/myroom/lang/<code>/nameplate_types.json` del skin. Un tipo sin nombre en ese archivo aparece como "Placa tipo" seguido de su número, y las secciones de los tipos 10 y 38 muestran "???" hasta que el jugador posea una placa de nombre de ese tipo.
+
+| Tipo | Nombre | Efecto |
+| --- | --- | --- |
+| 0 | Madera |  |
+| 1 | Cobre | Brillo |
+| 2 | Amatista | Brillo |
+| 3 | Naturaleza | Brillo |
+| 4 | Rojo | Brillo |
+| 5 | Azul | Brillo |
+| 6 | Ceniza | Brillo |
+| 7 | Arcoíris | Animada |
+| 8 | Espacio |  |
+| 9 | Diamante |  |
+| 10 | Misery |  |
+| 11 | Oro |  |
+| 12 | Perla |  |
+| 13 | Platino |  |
+| 14 | Kohaku (placa de personaje) |  |
+| 15 | Dashy |  |
+| 16 | Azul |  |
+| 17 | Rojo |  |
+| 18 | Morado cielo |  |
+| 19 | IA |  |
+| 20 | Cielo |  |
+| 21 | Amarillo |  |
+| 22 | Crema |  |
+| 23 | Mar |  |
+| 24 | Verde |  |
+| 25 | Capítulo I |  |
+| 26 | Capítulo II |  |
+| 27 | Capítulo III |  |
+| 28 | OpTk claro |  |
+| 29 | OpTk oscuro |  |
+| 30 | NEP0 |  |
+| 31 | Noche |  |
+| 32 | Capítulo IV |  |
+| 33 | Actuación Clear |  |
+| 34 | Actuación Full Combo |  |
+| 35 | Actuación Perfect |  |
+| 36 | Plantilla |  |
+| 37 | Capítulo V |  |
+| 38 | V-ENTURE |  |
+| 39 | Historial Clear |  |
+| 40 | Historial Full Combo |  |
+| 41 | Historial Perfect |  |
+| 42 | Ryuto Setsujin |  |
+| 43 | Amanecer |  |
+| 44 | Capítulo VI |  |
+| 45 | Un nuevo mundo |  |
 
 El juego comprueba las condiciones de desbloqueo en la pantalla de resultados tras cada partida. Cuando el jugador cumple una, el juego desbloquea la placa de nombre y muestra una notificación. Las condiciones de monedas (`ch`, `cs`, `cm`) solo se desbloquean mediante una compra: en el skin incluido, el jugador compra la placa de nombre en el ordenador de Mi Habitación. El ordenador de Mi Habitación también deja fuera de su lista las placas Mythical bloqueadas hasta que el jugador las posee.
 

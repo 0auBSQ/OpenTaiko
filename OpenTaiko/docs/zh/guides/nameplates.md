@@ -12,7 +12,7 @@
 
 ## 第 1 步：创建名牌包文件夹
 
-在游戏旁边的 `Global/Nameplates/` 中创建一个文件夹。文件夹名称可以任意取。名牌包包含一个必需的文件，以及一个用于翻译的可选 `Lang/` 文件夹（第 3 步）：
+在 `Global/Nameplates/` 中创建一个文件夹（`Global` 文件夹位于游戏旁边）。文件夹名称可以任意取。名牌包包含一个必需的文件，以及一个用于翻译的可选 `Lang/` 文件夹（第 3 步）：
 
 ```
 Global/
@@ -35,9 +35,9 @@ Global/
 - `nameplates`（array，必需）：每个名牌一个对象，包含以下字段：
   - `key`（string，必需）：名牌的名称，在包内唯一。名牌的完整 id 是 `<pack>:<key>`，例如 `example_pack:night_sky`。存档会保存这个 id，因此一旦玩家可以获得该名牌，就不要再更改它的键，也永远不要把这个键用于其他名牌。
   - `title`（string，必需）：称号文本。没有翻译的每种语言都显示它。
-  - `type`（int，默认 0）：牌的美术，即皮肤名牌纹理中的文件夹编号。自带皮肤中的文件夹是 `Modules/ROActivities/nameplate/Textures/Title/0` 到 `45`，没有对应文件夹的编号不绘制牌。
+  - `type`（int，默认 0）：牌的美术，即皮肤名牌纹理中的文件夹编号。自带皮肤中的文件夹是 `Modules/ROActivities/nameplate/Textures/Title/0` 到 `45`，没有对应文件夹的编号不绘制牌。下表列出自带皮肤的牌。
   - `rarity`（string，默认 `Common`）：稀有度名称（见下表）。未知的名称变为 `Common`。
-  - `unlock`（object，可选）：解锁条件，字段与 `Unlock.json` 相同：`condition`、`values`、`type` 和 `references`（条件 id 见[谱面解锁条件](unlockables.md)指南）。没有 `unlock` 时，每个玩家从一开始就拥有该名牌。
+  - `unlock`（object，可选）：解锁条件，字段与 `Unlock.json` 相同：`condition`、`values`、`type` 和 `references`（条件 id 见[解锁条件参考](unlockables-reference.md)）。没有 `unlock` 时，每个玩家从一开始就拥有该名牌。
 
 稀有度值（星数为自带皮肤的设定）：
 
@@ -50,6 +50,57 @@ Global/
 | <span class="rarity rarity-epic">Epic</span> | 2 | 3 |
 | <span class="rarity rarity-legendary">Legendary</span> | 3 | 4 |
 | <span class="rarity rarity-mythical">Mythical</span> | 4 | 4 |
+
+自带皮肤 Open-World Memories 的牌类型（`type`）。我的房间的电脑按类型对名牌分组，分区名称来自皮肤的 `Modules/Stages/myroom/lang/<code>/nameplate_types.json`。在那里没有名称的类型显示为 "名牌类型" 加上编号，类型 10 和 38 的分区在玩家拥有该类型的名牌之前显示为 "???"。
+
+| 类型 | 名称 | 效果 |
+| --- | --- | --- |
+| 0 | 木 |  |
+| 1 | 铜 | 闪光 |
+| 2 | 紫水晶 | 闪光 |
+| 3 | 自然 | 闪光 |
+| 4 | 红色 | 闪光 |
+| 5 | 蓝色 | 闪光 |
+| 6 | 灰烬 | 闪光 |
+| 7 | 彩虹 | 动画 |
+| 8 | 宇宙 |  |
+| 9 | 钻石 |  |
+| 10 | 悲惨 |  |
+| 11 | 金 |  |
+| 12 | 珍珠 |  |
+| 13 | 铂金 |  |
+| 14 | Kohaku（角色牌） |  |
+| 15 | Dashy |  |
+| 16 | 蓝 |  |
+| 17 | 红 |  |
+| 18 | 天空紫 |  |
+| 19 | AI |  |
+| 20 | 天空 |  |
+| 21 | 黄 |  |
+| 22 | 奶油 |  |
+| 23 | 海洋 |  |
+| 24 | 绿 |  |
+| 25 | 第一章 |  |
+| 26 | 第二章 |  |
+| 27 | 第三章 |  |
+| 28 | OpTk 亮色 |  |
+| 29 | OpTk 暗色 |  |
+| 30 | NEP0 |  |
+| 31 | 夜晚 |  |
+| 32 | 第四章 |  |
+| 33 | 过关表现 |  |
+| 34 | 全连表现 |  |
+| 35 | 全良表现 |  |
+| 36 | 模板 |  |
+| 37 | 第五章 |  |
+| 38 | V-ENTURE |  |
+| 39 | 过关记录 |  |
+| 40 | 全连记录 |  |
+| 41 | 全良记录 |  |
+| 42 | 竜斗雪刃 |  |
+| 43 | 日出 |  |
+| 44 | 第六章 |  |
+| 45 | 新世界 |  |
 
 游戏在每次演奏后于结算界面检查解锁条件。玩家满足某个条件时，游戏解锁该名牌并显示一条通知。金币条件（`ch`、`cs`、`cm`）只能通过购买解锁：在自带皮肤中，玩家在我的房间的电脑上购买名牌。在玩家拥有之前，我的房间的电脑也不会在列表中显示锁定的 Mythical 名牌。
 

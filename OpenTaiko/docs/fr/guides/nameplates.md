@@ -12,7 +12,7 @@ Un titre de plaque de nom est la plaque de texte affichée sur la plaque de nom 
 
 ## Étape 1 : Créer le dossier du pack
 
-Créez un dossier dans `Global/Nameplates/`, à côté du jeu. Le nom du dossier est libre. Le pack contient un fichier requis et un dossier `Lang/` facultatif pour les traductions (étape 3) :
+Créez un dossier dans `Global/Nameplates/` (le dossier `Global` se trouve à côté du jeu). Le nom du dossier est libre. Le pack contient un fichier requis et un dossier `Lang/` facultatif pour les traductions (étape 3) :
 
 ```
 Global/
@@ -35,9 +35,9 @@ Un skin fournit son pack de la même façon, sous la forme d'un dossier `Namepla
 - `nameplates` (array, requis) : un objet par plaque de nom, avec ces champs :
   - `key` (string, requis) : un nom pour la plaque de nom, unique dans le pack. L'identifiant complet de la plaque de nom est `<pack>:<key>`, par exemple `example_pack:night_sky`. Les fichiers de sauvegarde stockent cet identifiant ; gardez donc une clé dès que des joueurs peuvent posséder la plaque de nom, et ne la donnez jamais à une autre plaque de nom.
   - `title` (string, requis) : le texte du titre. Toute langue sans traduction l'affiche.
-  - `type` (int, par défaut 0) : le graphisme de la plaque, un numéro de dossier dans les textures de plaques de nom du skin. Dans le skin fourni, les dossiers vont de `Modules/ROActivities/nameplate/Textures/Title/0` à `45`, et le skin ne dessine aucune plaque pour un numéro sans dossier.
+  - `type` (int, par défaut 0) : le graphisme de la plaque, un numéro de dossier dans les textures de plaques de nom du skin. Dans le skin fourni, les dossiers vont de `Modules/ROActivities/nameplate/Textures/Title/0` à `45`, et le skin ne dessine aucune plaque pour un numéro sans dossier. Le tableau ci-dessous liste les plaques du skin fourni.
   - `rarity` (string, par défaut `Common`) : le nom de la rareté (voir le tableau ci-dessous). Un nom inconnu devient `Common`.
-  - `unlock` (object, facultatif) : la condition de déblocage, avec les mêmes champs que dans un `Unlock.json` : `condition`, `values`, `type` et `references` (le guide [Déblocage de partitions](unlockables.md) liste les identifiants de condition). Sans `unlock`, chaque joueur possède la plaque de nom dès le départ.
+  - `unlock` (object, facultatif) : la condition de déblocage, avec les mêmes champs que dans un `Unlock.json` : `condition`, `values`, `type` et `references` (la [Référence des déblocages](unlockables-reference.md) liste les identifiants de condition). Sans `unlock`, chaque joueur possède la plaque de nom dès le départ.
 
 Valeurs de rareté (les étoiles sont celles du skin fourni) :
 
@@ -50,6 +50,57 @@ Valeurs de rareté (les étoiles sont celles du skin fourni) :
 | <span class="rarity rarity-epic">Epic</span> | 2 | 3 |
 | <span class="rarity rarity-legendary">Legendary</span> | 3 | 4 |
 | <span class="rarity rarity-mythical">Mythical</span> | 4 | 4 |
+
+Types de plaque (`type`) du skin fourni, Open-World Memories. Le PC de My Room regroupe les plaques de nom par type, sous les noms de section du fichier `Modules/Stages/myroom/lang/<code>/nameplate_types.json` du skin. Un type sans nom dans ce fichier s'affiche sous la forme "Type de plaque" suivi de son numéro, et les sections des types 10 et 38 affichent "???" jusqu'à ce que le joueur possède une plaque de nom de ce type.
+
+| Type | Nom | Effet |
+| --- | --- | --- |
+| 0 | Bois |  |
+| 1 | Cuivre | Éclat |
+| 2 | Améthyste | Éclat |
+| 3 | Nature | Éclat |
+| 4 | Rouge | Éclat |
+| 5 | Bleu | Éclat |
+| 6 | Cendre | Éclat |
+| 7 | Arc-en-ciel | Animée |
+| 8 | Espace |  |
+| 9 | Diamant |  |
+| 10 | Misery |  |
+| 11 | Or |  |
+| 12 | Perle |  |
+| 13 | Platine |  |
+| 14 | Kohaku (plaque de personnage) |  |
+| 15 | Dashy |  |
+| 16 | Bleu |  |
+| 17 | Rouge |  |
+| 18 | Violet ciel |  |
+| 19 | IA |  |
+| 20 | Ciel |  |
+| 21 | Jaune |  |
+| 22 | Crème |  |
+| 23 | Mer |  |
+| 24 | Vert |  |
+| 25 | Chapitre I |  |
+| 26 | Chapitre II |  |
+| 27 | Chapitre III |  |
+| 28 | OpTk clair |  |
+| 29 | OpTk sombre |  |
+| 30 | NEP0 |  |
+| 31 | Nuit |  |
+| 32 | Chapitre IV |  |
+| 33 | Performance Clear |  |
+| 34 | Performance Full Combo |  |
+| 35 | Performance Perfect |  |
+| 36 | Modèle |  |
+| 37 | Chapitre V |  |
+| 38 | V-ENTURE |  |
+| 39 | Historique Clear |  |
+| 40 | Historique Full Combo |  |
+| 41 | Historique Perfect |  |
+| 42 | Ryuto Setsujin |  |
+| 43 | Lever de soleil |  |
+| 44 | Chapitre VI |  |
+| 45 | Un nouveau monde |  |
 
 Le jeu vérifie les conditions de déblocage sur l'écran de résultats après chaque partie. Quand le joueur en remplit une, le jeu débloque la plaque de nom et affiche une notification. Les conditions de pièces (`ch`, `cs`, `cm`) ne se débloquent que par un achat : dans le skin fourni, le joueur achète la plaque de nom depuis le PC de My Room. Le PC de My Room garde aussi les plaques de nom Mythical verrouillées hors de sa liste jusqu'à ce que le joueur les possède.
 

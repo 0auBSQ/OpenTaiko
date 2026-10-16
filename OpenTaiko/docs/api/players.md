@@ -441,7 +441,7 @@ The values come from the gameplay screen, so they are meaningful during a play a
 The unlock requirement of a nameplate, character or puchichara.
 
 <div class="callout warn">
-The UnlockCondition property of nameplate info handles, character list entries and puchichara handles returns this handle. An item without a condition (HasCondition false) is available by default: IsUnlockable returns true and the messages are empty. The condition vocabulary matches Unlock.json and chart unlockables; see the <a href="../guides/unlockables.md">Chart unlockables</a> guide.
+The UnlockCondition property of nameplate info handles, character list entries and puchichara handles returns this handle. An item without a condition (HasCondition false) is available by default: IsUnlockable returns true and the messages are empty. The condition vocabulary matches Unlock.json and chart unlockables; see the <a href="../guides/unlockables-reference.md">Unlockables reference</a>.
 </div>
 
 | Method | Description |

@@ -441,7 +441,7 @@ PUCHICHARALIST と sf:GetPuchichara がこのハンドルを返します。テ�
 ネームプレート、キャラクター、ぷちキャラのアンロック要件です。
 
 <div class="callout warn">
-ネームプレート情報ハンドル、キャラクターリストエントリ、ぷちキャラハンドルの UnlockCondition プロパティがこのハンドルを返します。条件のないアイテム (HasCondition が false) は既定で利用可能です。IsUnlockable は true を返し、メッセージは空です。条件の語彙は Unlock.json と譜面のアンロック要素と同じです。<a href="../guides/unlockables.md">譜面のアンロック要素</a>ガイドを参照してください。
+ネームプレート情報ハンドル、キャラクターリストエントリ、ぷちキャラハンドルの UnlockCondition プロパティがこのハンドルを返します。条件のないアイテム (HasCondition が false) は既定で利用可能です。IsUnlockable は true を返し、メッセージは空です。条件の語彙は Unlock.json と譜面のアンロック要素と同じです。<a href="../guides/unlockables-reference.md">アンロック要素リファレンス</a>を参照してください。
 </div>
 
 | メソッド | 説明 |

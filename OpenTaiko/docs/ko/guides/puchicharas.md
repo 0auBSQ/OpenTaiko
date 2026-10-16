@@ -105,7 +105,7 @@ MyMascot/
 
 ## 6단계(선택): 잠금 해제 조건 추가하기(Unlock.json)
 
-`Unlock.json`이 없으면 푸치캬라는 즉시 사용할 수 있습니다. 잠그려면 `condition`, `type`, `values`, `references` 필드를 가진 `Unlock.json`을 추가하십시오. 형식과 조건 id는 곡과 캐릭터와 같습니다(잠금 해제 요소 가이드 참고). 아래 예는 플레이어가 총 500코인을 획득하면 잠금 해제됩니다. 기본 제공 예: OpenTaiko-Kun은 100코인(`"condition": "ch"`), Bol은 채보 제작자 `bol`의 클리어한 채보 20개(`"condition": "sc"`), Tinyfox는 장르 `Project Outfox Serenity`의 곡 한 곡 플레이(`"condition": "sg"`)를 요구합니다.
+`Unlock.json`이 없으면 푸치캬라는 즉시 사용할 수 있습니다. 잠그려면 `condition`, `type`, `values`, `references` 필드를 가진 `Unlock.json`을 추가하십시오. 형식과 조건 id는 곡과 캐릭터와 같습니다([잠금 해제 요소 레퍼런스](unlockables-reference.md) 참고). 아래 예는 플레이어가 총 500코인을 획득하면 잠금 해제됩니다. 기본 제공 예: OpenTaiko-Kun은 100코인(`"condition": "ch"`), Bol은 채보 제작자 `bol`의 클리어한 채보 20개(`"condition": "sc"`), Tinyfox는 장르 `Project Outfox Serenity`의 곡 한 곡 플레이(`"condition": "sg"`)를 요구합니다.
 
 코인 조건은 플레이어가 방 화면에서 구매합니다. 다른 조건은 게임이 플레이마다 결과 화면에서 검사합니다. 플레이어가 조건을 충족하면 게임은 푸치캬라를 세이브 파일의 잠금 해제 목록에 추가하고 알림을 표시합니다.
 

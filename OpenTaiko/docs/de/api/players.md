@@ -441,7 +441,7 @@ Die Werte stammen vom Spielbildschirm und sind daher während eines Spiels und a
 Die Freischaltanforderung eines Namensschilds, Charakters oder Puchicharas.
 
 <div class="callout warn">
-Die Eigenschaft UnlockCondition von Namensschild-Info-Handles, Charakterlisten-Einträgen und Puchichara-Handles gibt dieses Handle zurück. Ein Gegenstand ohne Bedingung (HasCondition false) ist standardmäßig verfügbar: IsUnlockable gibt true zurück und die Meldungen sind leer. Das Bedingungsvokabular entspricht dem von Unlock.json und Chart-Freischaltungen; siehe die Anleitung <a href="../guides/unlockables.md">Chart-Freischaltungen</a>.
+Die Eigenschaft UnlockCondition von Namensschild-Info-Handles, Charakterlisten-Einträgen und Puchichara-Handles gibt dieses Handle zurück. Ein Gegenstand ohne Bedingung (HasCondition false) ist standardmäßig verfügbar: IsUnlockable gibt true zurück und die Meldungen sind leer. Das Bedingungsvokabular entspricht dem von Unlock.json und Chart-Freischaltungen; siehe die <a href="../guides/unlockables-reference.md">Referenz der Freischaltbedingungen</a>.
 </div>
 
 | Methode | Beschreibung |

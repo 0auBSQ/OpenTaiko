@@ -441,7 +441,7 @@ De waarden komen van het gameplayscherm, dus ze zijn betekenisvol tijdens een sp
 De ontgrendelvereiste van een naamplaatje, personage of puchichara.
 
 <div class="callout warn">
-De eigenschap UnlockCondition van naamplaatje-info-handles, personagelijstitems en puchichara-handles geeft deze handle terug. Een item zonder voorwaarde (HasCondition false) is standaard beschikbaar: IsUnlockable geeft true terug en de berichten zijn leeg. Het voorwaardenvocabulaire komt overeen met Unlock.json en ontgrendelvoorwaarden voor charts; zie de handleiding <a href="../guides/unlockables.md">Ontgrendelvoorwaarden voor charts</a>.
+De eigenschap UnlockCondition van naamplaatje-info-handles, personagelijstitems en puchichara-handles geeft deze handle terug. Een item zonder voorwaarde (HasCondition false) is standaard beschikbaar: IsUnlockable geeft true terug en de berichten zijn leeg. Het voorwaardenvocabulaire komt overeen met Unlock.json en ontgrendelvoorwaarden voor charts; zie de <a href="../guides/unlockables-reference.md">Referentie voor ontgrendelvoorwaarden</a>.
 </div>
 
 | Methode | Beschrijving |

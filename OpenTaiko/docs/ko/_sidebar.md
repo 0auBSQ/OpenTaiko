@@ -10,6 +10,7 @@
   - [네임플레이트 추가하기](guides/nameplates.md)
   - [스킨과 테마 추가하기](guides/skins.md)
   - [채보 잠금 해제 요소](guides/unlockables.md)
+  - [잠금 해제 요소 레퍼런스](guides/unlockables-reference.md)
 
 - Lua API 레퍼런스
   - [개요](api/README.md)

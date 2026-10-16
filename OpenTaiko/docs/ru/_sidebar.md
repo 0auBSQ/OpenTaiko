@@ -10,6 +10,7 @@
   - [Добавление табличек имени](guides/nameplates.md)
   - [Добавление скинов и тем](guides/skins.md)
   - [Разблокировка чартов](guides/unlockables.md)
+  - [Справочник по разблокировке](guides/unlockables-reference.md)
 
 - Справочник Lua API
   - [Обзор](api/README.md)

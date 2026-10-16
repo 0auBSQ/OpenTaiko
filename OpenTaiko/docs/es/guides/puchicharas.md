@@ -105,7 +105,7 @@ MyMascot/
 
 ## Paso 6 (opcional): Añadir una condición de desbloqueo (Unlock.json)
 
-Sin `Unlock.json` el puchichara está disponible de inmediato. Para bloquearlo, añade un `Unlock.json` con los campos `condition`, `type`, `values` y `references`; el formato y los ids de condición son los mismos que para las canciones y los personajes (consulta la guía de desbloqueables). El ejemplo de abajo se desbloquea una vez que el jugador ha ganado 500 monedas en total. Ejemplos incluidos: OpenTaiko-Kun cuesta 100 monedas (`"condition": "ch"`), Bol requiere 20 charts superados del autor `bol` (`"condition": "sc"`), y Tinyfox requiere una canción jugada del género `Project Outfox Serenity` (`"condition": "sg"`).
+Sin `Unlock.json` el puchichara está disponible de inmediato. Para bloquearlo, añade un `Unlock.json` con los campos `condition`, `type`, `values` y `references`; el formato y los ids de condición son los mismos que para las canciones y los personajes (consulta la [Referencia de desbloqueables](unlockables-reference.md)). El ejemplo de abajo se desbloquea una vez que el jugador ha ganado 500 monedas en total. Ejemplos incluidos: OpenTaiko-Kun cuesta 100 monedas (`"condition": "ch"`), Bol requiere 20 charts superados del autor `bol` (`"condition": "sc"`), y Tinyfox requiere una canción jugada del género `Project Outfox Serenity` (`"condition": "sg"`).
 
 El jugador compra las condiciones de monedas en la pantalla de la habitación. El juego comprueba las demás condiciones en la pantalla de resultados tras cada partida; cuando el jugador cumple una, añade el puchichara a la lista de desbloqueados del archivo de guardado y muestra una notificación.
 

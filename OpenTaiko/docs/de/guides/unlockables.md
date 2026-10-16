@@ -19,7 +19,7 @@ Legen Sie `Unlock.json` im Songordner an. Jedes Feld ist optional und hat einen 
 - `rarity` (string, Standard `Common`): der Name der Seltenheit (siehe Tabelle unten). Sie legt die Farbe der Seltenheitsanzeige und die Stufe der Freischaltbenachrichtigung fest. Ein leerer Wert wird zu `Common`.
 - `condition` (string, Standard `ch`): die Bedingungs-ID (Schritt 2).
 - `values` (int array, Standard `[100]`): die numerischen Parameter der Bedingung.
-- `type` (string, Standard `me`): der Vergleich, den wertbasierte Bedingungen verwenden: `l` kleiner als, `le` kleiner oder gleich, `e` gleich, `me` größer oder gleich, `m` größer als, `d` ungleich. Münzbedingungen verwenden immer `me`.
+- `type` (string, Standard `me`): der Vergleich, den wertbasierte Bedingungen verwenden (siehe die [Referenz der Freischaltbedingungen](unlockables-reference.md)). Münzbedingungen verwenden immer `me`.
 - `references` (string array, Standard `[""]`): Song-IDs, Genrenamen, Chart-Autorennamen oder Flag-Namen, je nach Bedingung.
 - `custom_unlock_text` (object, optional): ersetzt den generierten Hinweistext. Ein lokalisiertes Objekt `{ "strings": { "default": "...", "ja": "..." } }`; das Spiel verwendet den Schlüssel der aktiven Sprache, dann `default`, und zeigt den generierten Text an, wenn keiner von beiden existiert.
 
@@ -65,48 +65,7 @@ Seltenheitswerte:
 
 ## Schritt 2: Eine Bedingung wählen
 
-| ID | Bedeutung | `values` | `references` |
-|----|---------|----------|--------------|
-| `ch`, `cs`, `cm` | Münzkauf. Das Spiel wertet die drei IDs identisch aus (Preis in Münzen, `type` auf `me` erzwungen, nie automatisch gewährt). `cm` ist die für Songs vorgesehene ID; Skin-Skripte können die ID lesen und damit entscheiden, wo sie den Kauf anbieten. | `[price]` | unbenutzt |
-| `ce` | Insgesamt seit Erstellung des Spielstands verdiente Münzen | `[coins]` | unbenutzt |
-| `tp` | Gesamtspielanzahl | `[plays]` | unbenutzt |
-| `ap` | Anzahl der KI-Kampf-Spiele | `[plays]` | unbenutzt |
-| `aw` | Anzahl der KI-Kampf-Siege | `[wins]` | unbenutzt |
-| `sd` | Verschiedene Charts, die einen Clear-Status erreicht haben | `[chart count, clear status]` | unbenutzt |
-| `dp` | Charts eines Schwierigkeitsgrads, die einen Clear-Status erreicht haben | `[difficulty, clear status, chart count]` | unbenutzt |
-| `lp` | Charts eines Sternelevels, die einen Clear-Status erreicht haben | `[level, clear status, chart count]` | unbenutzt |
-| `sp` | Bestimmte Songs, die einen Clear-Status erreicht haben | `[difficulty, clear status]` pro Song (`-1` = beliebiger Schwierigkeitsgrad) | eine Song-ID pro Paar |
-| `sg` | Songs in benannten Genres, die einen Clear-Status erreicht haben | `[song count, clear status]` pro Genre | ein Genrename pro Paar |
-| `sc` | Charts benannter Chart-Autoren, die einen Clear-Status erreicht haben | `[chart count, clear status]` pro Chart-Autor | ein Chart-Autorenname pro Paar |
-| `gt` | Globaler Trigger (ein benanntes Ein/Aus-Flag im Spielstand, das Skripte setzen) | `[1]` für EIN, `[0]` für AUS | `[trigger name]` |
-| `gc` | Globaler Zähler (eine benannte Zahl im Spielstand, die Skripte setzen) | `[value]`, verglichen mit `type` | `[counter name]` |
-| `ig` | Unerreichbar: schaltet nie frei | keine | keine |
-| `andcomb` | Der Spieler muss alle Kindbedingungen erfüllen (siehe die kombinierten Beispiele) | `[]` | eine Kindbedingung pro Eintrag, als JSON-String |
-| `orcomb` | Der Spieler muss mindestens eine Kindbedingung erfüllen (siehe die kombinierten Beispiele) | `[]` | eine Kindbedingung pro Eintrag, als JSON-String |
-
-Clear-Status-Werte (eine Statusanforderung bedeutet diesen Status oder besser):
-
-| Wert | Clear-Status |
-| --- | --- |
-| 0 | gespielt |
-| 1 | assistierter Clear |
-| 2 | Clear |
-| 3 | Full Combo |
-| 4 | All Perfect |
-
-Schwierigkeitswerte:
-
-| Wert | Schwierigkeitsgrad |
-| --- | --- |
-| 0 | Easy |
-| 1 | Normal |
-| 2 | Hard |
-| 3 | Extreme |
-| 4 | Extra Extreme |
-
-Bei `dp` zählt Schwierigkeitsgrad 3 auch Extra-Extreme-Charts. `dp` und `lp` zählen nur reguläre Charts und überspringen Dan- und Tower-Charts. `sp` akzeptiert `-1` für einen beliebigen Schwierigkeitsgrad.
-
-Das Spiel prüft die Anzahl der Werte: `ch`/`cs`/`cm`/`ce`/`tp`/`ap`/`aw`/`gt`/`gc` brauchen genau 1 Wert, `sd` genau 2, `dp`/`lp` genau 3, und `sp`/`sg`/`sc` brauchen 2 Werte pro Referenz mit so vielen Referenzen wie Paaren. Eine falsche Anzahl lässt die Bedingung mit einer Fehlermeldung im Spiel scheitern.
+Die [Referenz der Freischaltbedingungen](unlockables-reference.md) listet jede Bedingungs-ID mit den Werten und Referenzen, die sie annimmt, sowie die Zahlen für Clear-Status und Schwierigkeitsgrad. Der Abschnitt Beispiele unten zeigt die Muster, die die mitgelieferten Songs verwenden.
 
 Nur ein expliziter Kauf in einem Bildschirm, der ihn anbietet, schaltet eine Münzbedingung frei (der mitgelieferte Skin bietet gesperrte Songs in der Songauswahl zum Kauf an, unabhängig davon, welche Münz-ID Sie verwenden). Alle anderen Bedingungen prüft das Spiel nach jedem Spiel auf dem Ergebnisbildschirm; erfüllt der Spieler eine, fügt das Spiel die Song-ID zum Spielstand hinzu und zeigt eine Benachrichtigung an.
 
@@ -287,7 +246,7 @@ Dies sind die Bedingungsmuster, die die mitgelieferten Songs verwenden, geschrie
 ## Fehlerbehebung und Hinweise
 
 - Der Song ist nicht gesperrt: Die Datei heißt nicht `Unlock.json`, sie liegt nicht in dem Ordner, der die `.tja` und `uniqueID.json` enthält, oder `Ignore Song Unlockables` ist aktiv.
-- Der Hinweis meldet, die Bedingung sei ungültig: Die Anzahl der Werte passt nicht zur Bedingung (siehe Schritt 2), oder `sp`/`sg`/`sc` haben eine andere Anzahl Referenzen als Wertepaare.
+- Der Hinweis meldet, die Bedingung sei ungültig: Die Anzahl der Werte passt nicht zur Bedingung (siehe die [Referenz der Freischaltbedingungen](unlockables-reference.md)), oder `sp`/`sg`/`sc` haben eine andere Anzahl Referenzen als Wertepaare.
 - Ein Schlüssel hat keine Wirkung: Die Schlüssel sind `hidden_index`, `rarity`, `condition`, `values`, `type`, `references`, `custom_unlock_text`, alle kleingeschrieben. Alles andere ignoriert das Spiel und wendet den Standard an.
 - `sp` schaltet nie frei: Die Referenz muss die `uniqueID.json`-ID des Zielsongs sein (ein Titel oder Dateiname passt nie), und der Spieler muss Schwierigkeitsgrad und Status erreichen können (Status 3 ist eine Full Combo, sodass ein Chart, das der Spieler nur geschafft hat, nicht zählt).
 - `sg` schaltet nie frei: Der Genrename muss dem Genre entsprechen, das das Spiel für die gespielten Songs festhält (das `#GENRE` der `box.def` des Ordners, oder das `#GENRE` des Charts, wenn es kein Ordner-Genre gibt).

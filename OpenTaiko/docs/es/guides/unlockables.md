@@ -19,7 +19,7 @@ Crea `Unlock.json` en la carpeta de la canción. Todos los campos son opcionales
 - `rarity` (string, por defecto `Common`): el nombre de la rareza (véase la tabla siguiente). Establece el color con que se muestra la rareza y el nivel de la notificación de desbloqueo. Un valor vacío se convierte en `Common`.
 - `condition` (string, por defecto `ch`): el id de la condición (Paso 2).
 - `values` (int array, por defecto `[100]`): los parámetros numéricos de la condición.
-- `type` (string, por defecto `me`): la comparación que usan las condiciones basadas en valores: `l` menor que, `le` menor o igual, `e` igual, `me` mayor o igual, `m` mayor que, `d` distinto. Las condiciones de monedas siempre usan `me`.
+- `type` (string, por defecto `me`): la comparación que usan las condiciones basadas en valores (consulta la [Referencia de desbloqueables](unlockables-reference.md)). Las condiciones de monedas siempre usan `me`.
 - `references` (string array, por defecto `[""]`): ids de canción, nombres de género, nombres de autor o nombres de bandera, según la condición.
 - `custom_unlock_text` (object, opcional): reemplaza el texto de pista generado. Un objeto localizado `{ "strings": { "default": "...", "ja": "..." } }`; el juego usa la clave del idioma activo, luego `default`, y muestra el texto generado si no existe ninguna.
 
@@ -65,48 +65,7 @@ Valores de rareza:
 
 ## Paso 2: Elegir una condición
 
-| Id | Significado | `values` | `references` |
-|----|---------|----------|--------------|
-| `ch`, `cs`, `cm` | Compra con monedas. El juego evalúa los tres ids de forma idéntica (precio en monedas, `type` forzado a `me`, nunca se concede automáticamente). `cm` es el id pensado para canciones; los scripts del skin pueden leer el id y usarlo para decidir dónde ofrecen la compra. | `[price]` | sin uso |
-| `ce` | Monedas ganadas en total desde la creación del archivo de guardado | `[coins]` | sin uso |
-| `tp` | Número total de partidas | `[plays]` | sin uso |
-| `ap` | Número de partidas de batalla contra la IA | `[plays]` | sin uso |
-| `aw` | Número de victorias en batalla contra la IA | `[wins]` | sin uso |
-| `sd` | Charts distintos que alcanzaron un estado de clear | `[chart count, clear status]` | sin uso |
-| `dp` | Charts de una dificultad que alcanzaron un estado de clear | `[difficulty, clear status, chart count]` | sin uso |
-| `lp` | Charts de un nivel de estrellas que alcanzaron un estado de clear | `[level, clear status, chart count]` | sin uso |
-| `sp` | Canciones concretas que alcanzaron un estado de clear | `[difficulty, clear status]` por canción (`-1` = cualquier dificultad) | un id de canción por par |
-| `sg` | Canciones dentro de géneros con nombre que alcanzaron un estado de clear | `[song count, clear status]` por género | un nombre de género por par |
-| `sc` | Charts de autores con nombre que alcanzaron un estado de clear | `[chart count, clear status]` por autor | un nombre de autor por par |
-| `gt` | Trigger global (una bandera con nombre de sí/no en el archivo de guardado que establecen los scripts) | `[1]` para ON, `[0]` para OFF | `[trigger name]` |
-| `gc` | Contador global (un número con nombre en el archivo de guardado que establecen los scripts) | `[value]`, comparado con `type` | `[counter name]` |
-| `ig` | Imposible de obtener: nunca se desbloquea | ninguno | ninguno |
-| `andcomb` | El jugador debe cumplir todas las condiciones hijas (consulta los ejemplos combinados) | `[]` | una condición hija por entrada, como cadena JSON |
-| `orcomb` | El jugador debe cumplir al menos una condición hija (consulta los ejemplos combinados) | `[]` | una condición hija por entrada, como cadena JSON |
-
-Valores de estado de clear (un requisito de estado significa este estado o mejor):
-
-| Valor | Estado de clear |
-| --- | --- |
-| 0 | jugada |
-| 1 | clear asistido |
-| 2 | clear |
-| 3 | full combo |
-| 4 | todo perfecto |
-
-Valores de dificultad:
-
-| Valor | Dificultad |
-| --- | --- |
-| 0 | Easy |
-| 1 | Normal |
-| 2 | Hard |
-| 3 | Extreme |
-| 4 | Extra Extreme |
-
-Para `dp`, la dificultad 3 también cuenta los charts Extra Extreme. `dp` y `lp` solo cuentan charts normales y omiten los charts Dan y Torre. `sp` acepta `-1` para indicar cualquier dificultad.
-
-El juego comprueba el número de valores: `ch`/`cs`/`cm`/`ce`/`tp`/`ap`/`aw`/`gt`/`gc` necesitan exactamente 1 valor, `sd` exactamente 2, `dp`/`lp` exactamente 3, y `sp`/`sg`/`sc` necesitan 2 valores por referencia con tantas referencias como pares. Un número incorrecto hace que la condición falle con un mensaje de error en el juego.
+La [Referencia de desbloqueables](unlockables-reference.md) enumera cada id de condición con los valores y las referencias que admite, y los números de estado de clear y de dificultad. La sección Ejemplos de abajo muestra los patrones que usan las canciones incluidas.
 
 Solo una compra explícita en una pantalla que la ofrezca desbloquea una condición de monedas (el skin incluido ofrece las canciones bloqueadas para su compra desde la selección de canciones, sea cual sea el id de monedas que uses). El juego comprueba todas las demás condiciones en la pantalla de resultados tras cada partida; cuando el jugador cumple una, el juego añade el id de la canción al archivo de guardado y muestra una notificación.
 
@@ -287,7 +246,7 @@ Estos son los patrones de condición que usan las canciones incluidas, escritos 
 ## Resolución de problemas y notas
 
 - La canción no está bloqueada: el archivo no se llama `Unlock.json`, no está en la carpeta que contiene el `.tja` y el `uniqueID.json`, o `Ignore Song Unlockables` está activado.
-- La pista dice que la condición es inválida: el número de valores no coincide con la condición (consulta el Paso 2), o `sp`/`sg`/`sc` tienen un número de referencias distinto del de pares de valores.
+- La pista dice que la condición es inválida: el número de valores no coincide con la condición (consulta la [Referencia de desbloqueables](unlockables-reference.md)), o `sp`/`sg`/`sc` tienen un número de referencias distinto del de pares de valores.
 - Una clave no tiene efecto: las claves son `hidden_index`, `rarity`, `condition`, `values`, `type`, `references`, `custom_unlock_text`, todas en minúsculas. El juego ignora cualquier otra cosa y aplica el valor por defecto.
 - `sp` nunca se desbloquea: la referencia debe ser el id del `uniqueID.json` de la canción objetivo (un título o un nombre de archivo nunca coincide), y el jugador debe poder alcanzar la dificultad y el estado (el estado 3 es un full combo, así que un chart que el jugador solo ha superado no cuenta).
 - `sg` nunca se desbloquea: el nombre del género debe coincidir con el género que el juego registra para las canciones jugadas (el `#GENRE` del `box.def` de la carpeta, o el `#GENRE` del chart cuando no hay género de carpeta).

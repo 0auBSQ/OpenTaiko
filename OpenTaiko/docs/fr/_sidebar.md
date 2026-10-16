@@ -10,6 +10,7 @@
   - [Ajouter des plaques de nom](guides/nameplates.md)
   - [Ajouter des skins et des thèmes](guides/skins.md)
   - [Déblocage de partitions](guides/unlockables.md)
+  - [Référence des déblocages](guides/unlockables-reference.md)
 
 - Référence de l'API Lua
   - [Vue d'ensemble](api/README.md)

@@ -19,7 +19,7 @@ Maak `Unlock.json` in de nummermap. Elk veld is optioneel en heeft een standaard
 - `rarity` (string, standaard `Common`): de naam van de zeldzaamheid (zie de tabel hieronder). Die bepaalt de kleur van de zeldzaamheidsweergave en het niveau van de ontgrendelmelding. Een lege waarde wordt `Common`.
 - `condition` (string, standaard `ch`): het voorwaarde-id (Stap 2).
 - `values` (int-array, standaard `[100]`): de numerieke parameters van de voorwaarde.
-- `type` (string, standaard `me`): de vergelijking die waardegebaseerde voorwaarden gebruiken: `l` kleiner dan, `le` kleiner dan of gelijk aan, `e` gelijk aan, `me` groter dan of gelijk aan, `m` groter dan, `d` verschillend. Muntvoorwaarden gebruiken altijd `me`.
+- `type` (string, standaard `me`): de vergelijking die waardegebaseerde voorwaarden gebruiken (zie de [Referentie voor ontgrendelvoorwaarden](unlockables-reference.md)). Muntvoorwaarden gebruiken altijd `me`.
 - `references` (string-array, standaard `[""]`): nummer-id's, genrenamen, charternamen of vlagnamen, afhankelijk van de voorwaarde.
 - `custom_unlock_text` (object, optioneel): vervangt de gegenereerde hinttekst. Een gelokaliseerd object `{ "strings": { "default": "...", "ja": "..." } }`; het spel gebruikt de sleutel voor de actieve taal, daarna `default`, en toont de gegenereerde tekst als geen van beide bestaat.
 
@@ -65,48 +65,7 @@ Zeldzaamheidswaarden:
 
 ## Stap 2: Kies een voorwaarde
 
-| Id | Betekenis | `values` | `references` |
-|----|---------|----------|--------------|
-| `ch`, `cs`, `cm` | Aankoop met munten. Het spel evalueert de drie id's identiek (prijs in munten, `type` afgedwongen op `me`, nooit automatisch toegekend). `cm` is het id dat voor nummers is bedoeld; skinscripts kunnen het id lezen en gebruiken om te bepalen waar ze de aankoop aanbieden. | `[price]` | ongebruikt |
-| `ce` | In totaal verdiende munten sinds het aanmaken van het opslagbestand | `[coins]` | ongebruikt |
-| `tp` | Totaal aantal spelbeurten | `[plays]` | ongebruikt |
-| `ap` | Aantal AI-gevechten | `[plays]` | ongebruikt |
-| `aw` | Aantal gewonnen AI-gevechten | `[wins]` | ongebruikt |
-| `sd` | Afzonderlijke charts die een clearstatus hebben bereikt | `[chart count, clear status]` | ongebruikt |
-| `dp` | Charts van één moeilijkheid die een clearstatus hebben bereikt | `[difficulty, clear status, chart count]` | ongebruikt |
-| `lp` | Charts van één sterrenniveau die een clearstatus hebben bereikt | `[level, clear status, chart count]` | ongebruikt |
-| `sp` | Specifieke nummers die een clearstatus hebben bereikt | `[difficulty, clear status]` per nummer (`-1` = elke moeilijkheid) | één nummer-id per paar |
-| `sg` | Nummers binnen benoemde genres die een clearstatus hebben bereikt | `[song count, clear status]` per genre | één genrenaam per paar |
-| `sc` | Charts van benoemde charters die een clearstatus hebben bereikt | `[chart count, clear status]` per charter | één charternaam per paar |
-| `gt` | Globale trigger (een benoemde aan/uit-vlag in het opslagbestand die scripts zetten) | `[1]` voor AAN, `[0]` voor UIT | `[trigger name]` |
-| `gc` | Globale teller (een benoemd getal in het opslagbestand dat scripts zetten) | `[value]`, vergeleken met `type` | `[counter name]` |
-| `ig` | Onmogelijk te verkrijgen: ontgrendelt nooit | geen | geen |
-| `andcomb` | De speler moet aan alle kindvoorwaarden voldoen (zie de gecombineerde voorbeelden) | `[]` | één kindvoorwaarde per item, als JSON-string |
-| `orcomb` | De speler moet aan minstens één kindvoorwaarde voldoen (zie de gecombineerde voorbeelden) | `[]` | één kindvoorwaarde per item, als JSON-string |
-
-Clearstatuswaarden (een statusvereiste betekent deze status of beter):
-
-| Waarde | Clearstatus |
-| --- | --- |
-| 0 | gespeeld |
-| 1 | assisted clear |
-| 2 | clear |
-| 3 | full combo |
-| 4 | all perfect |
-
-Moeilijkheidswaarden:
-
-| Waarde | Moeilijkheid |
-| --- | --- |
-| 0 | Easy |
-| 1 | Normal |
-| 2 | Hard |
-| 3 | Extreme |
-| 4 | Extra Extreme |
-
-Voor `dp` telt moeilijkheid 3 ook Extra Extreme-charts mee. `dp` en `lp` tellen alleen gewone charts en slaan Dan- en Tower-charts over. `sp` accepteert `-1` als elke moeilijkheid.
-
-Het spel controleert de aantallen waarden: `ch`/`cs`/`cm`/`ce`/`tp`/`ap`/`aw`/`gt`/`gc` hebben precies 1 waarde nodig, `sd` precies 2, `dp`/`lp` precies 3, en `sp`/`sg`/`sc` hebben 2 waarden per referentie nodig met evenveel referenties als paren. Een verkeerd aantal laat de voorwaarde mislukken met een foutmelding in het spel.
+De [Referentie voor ontgrendelvoorwaarden](unlockables-reference.md) geeft elk voorwaarde-id met de waarden en referenties die het aanneemt, en de getallen voor clearstatus en moeilijkheid. Het gedeelte Voorbeelden hieronder toont de patronen die de meegeleverde nummers gebruiken.
 
 Alleen een expliciete aankoop in een scherm dat die aanbiedt, ontgrendelt een muntvoorwaarde (de meegeleverde skin biedt vergrendelde nummers te koop aan vanuit de nummerselectie, ongeacht welk munt-id je gebruikt). Het spel controleert alle andere voorwaarden na elke spelbeurt op het resultatenscherm; wanneer de speler aan een ervan voldoet, voegt het spel het nummer-id aan het opslagbestand toe en toont het een melding.
 
@@ -287,7 +246,7 @@ Dit zijn de voorwaardepatronen die de meegeleverde nummers gebruiken, geschreven
 ## Probleemoplossing en opmerkingen
 
 - Het nummer is niet vergrendeld: het bestand heet niet `Unlock.json`, het staat niet in de map die de `.tja` en `uniqueID.json` bevat, of `Ignore Song Unlockables` staat aan.
-- De hint zegt dat de voorwaarde ongeldig is: het aantal waarden komt niet overeen met de voorwaarde (zie Stap 2), of `sp`/`sg`/`sc` hebben een ander aantal referenties dan waardeparen.
+- De hint zegt dat de voorwaarde ongeldig is: het aantal waarden komt niet overeen met de voorwaarde (zie de [Referentie voor ontgrendelvoorwaarden](unlockables-reference.md)), of `sp`/`sg`/`sc` hebben een ander aantal referenties dan waardeparen.
 - Een sleutel heeft geen effect: de sleutels zijn `hidden_index`, `rarity`, `condition`, `values`, `type`, `references`, `custom_unlock_text`, allemaal in kleine letters. Het spel negeert al het andere en past de standaardwaarde toe.
 - `sp` ontgrendelt nooit: de referentie moet het `uniqueID.json`-id van het doelnummer zijn (een titel of bestandsnaam komt nooit overeen), en de speler moet de moeilijkheid en status kunnen bereiken (status 3 is een full combo, dus een chart die de speler alleen heeft gecleard telt niet).
 - `sg` ontgrendelt nooit: de genrenaam moet overeenkomen met het genre dat het spel voor de gespeelde nummers registreert (de `#GENRE` van de `box.def` van de map, of de `#GENRE` van de chart wanneer er geen mapgenre is).

@@ -441,7 +441,7 @@ Les valeurs proviennent de l'écran de jeu ; elles sont donc significatives pen
 La condition de déblocage d'une plaque de nom, d'un personnage ou d'un puchichara.
 
 <div class="callout warn">
-La propriété UnlockCondition des handles d'informations de plaque de nom, des entrées de liste de personnages et des handles de puchichara renvoie ce handle. Un objet sans condition (HasCondition false) est disponible par défaut : IsUnlockable renvoie true et les messages sont vides. Le vocabulaire des conditions correspond à celui d'Unlock.json et du déblocage de partitions ; voir le guide <a href="../guides/unlockables.md">Déblocage de partitions</a>.
+La propriété UnlockCondition des handles d'informations de plaque de nom, des entrées de liste de personnages et des handles de puchichara renvoie ce handle. Un objet sans condition (HasCondition false) est disponible par défaut : IsUnlockable renvoie true et les messages sont vides. Le vocabulaire des conditions correspond à celui d'Unlock.json et du déblocage de partitions ; voir la <a href="../guides/unlockables-reference.md">Référence des déblocages</a>.
 </div>
 
 | Méthode | Description |

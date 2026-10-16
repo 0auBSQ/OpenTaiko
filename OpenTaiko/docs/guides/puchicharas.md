@@ -105,7 +105,7 @@ MyMascot/
 
 ## Step 6 (optional): Add an unlock condition (Unlock.json)
 
-Without `Unlock.json` the puchichara is available immediately. To lock it, add an `Unlock.json` with the fields `condition`, `type`, `values` and `references`; the format and the condition ids are the same as for songs and characters (see the unlockables guide). The example below unlocks once the player has earned 500 coins in total. Shipped examples: OpenTaiko-Kun costs 100 coins (`"condition": "ch"`), Bol requires 20 cleared charts by the charter `bol` (`"condition": "sc"`), and Tinyfox requires one song played in the genre `Project Outfox Serenity` (`"condition": "sg"`).
+Without `Unlock.json` the puchichara is available immediately. To lock it, add an `Unlock.json` with the fields `condition`, `type`, `values` and `references`; the format and the condition ids are the same as for songs and characters (see the [Unlockables reference](unlockables-reference.md)). The example below unlocks once the player has earned 500 coins in total. Shipped examples: OpenTaiko-Kun costs 100 coins (`"condition": "ch"`), Bol requires 20 cleared charts by the charter `bol` (`"condition": "sc"`), and Tinyfox requires one song played in the genre `Project Outfox Serenity` (`"condition": "sg"`).
 
 The player buys coin conditions in the room screen. The game checks the other conditions on the results screen after each play; when the player meets one, it adds the puchichara to the save file's unlocked list and shows a notification.
 

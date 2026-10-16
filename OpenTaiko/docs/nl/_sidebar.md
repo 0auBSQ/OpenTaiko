@@ -10,6 +10,7 @@
   - [Naamplaatjes toevoegen](guides/nameplates.md)
   - [Skins en thema's toevoegen](guides/skins.md)
   - [Ontgrendelvoorwaarden voor charts](guides/unlockables.md)
+  - [Referentie voor ontgrendelvoorwaarden](guides/unlockables-reference.md)
 
 - Lua-API-referentie
   - [Overzicht](api/README.md)

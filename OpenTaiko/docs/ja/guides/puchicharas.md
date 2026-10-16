@@ -105,7 +105,7 @@ MyMascot/
 
 ## ステップ 6 (任意): アンロック条件 (Unlock.json) を追加する
 
-`Unlock.json` がなければ、ぷちキャラは直ちに利用可能です。ロックするには、`condition`、`type`、`values`、`references` のフィールドを持つ `Unlock.json` を追加します。形式と条件 id は楽曲やキャラクターと同じです (アンロック要素のガイドを参照)。以下の例はプレイヤーが合計 500 コインを獲得するとアンロックされます。同梱の例: OpenTaiko-Kun は 100 コイン (`"condition": "ch"`)、Bol は譜面作者 `bol` の譜面を 20 曲クリア (`"condition": "sc"`)、Tinyfox はジャンル `Project Outfox Serenity` の楽曲を 1 曲プレイ (`"condition": "sg"`) が必要です。
+`Unlock.json` がなければ、ぷちキャラは直ちに利用可能です。ロックするには、`condition`、`type`、`values`、`references` のフィールドを持つ `Unlock.json` を追加します。形式と条件 id は楽曲やキャラクターと同じです ([アンロック要素リファレンス](unlockables-reference.md)を参照)。以下の例はプレイヤーが合計 500 コインを獲得するとアンロックされます。同梱の例: OpenTaiko-Kun は 100 コイン (`"condition": "ch"`)、Bol は譜面作者 `bol` の譜面を 20 曲クリア (`"condition": "sc"`)、Tinyfox はジャンル `Project Outfox Serenity` の楽曲を 1 曲プレイ (`"condition": "sg"`) が必要です。
 
 コイン条件はプレイヤーが部屋画面で購入します。他の条件はゲームが各プレイ後のリザルト画面で確認します。プレイヤーが条件を満たすと、ゲームはぷちキャラをセーブファイルのアンロック済みリストに追加し、通知を表示します。
 

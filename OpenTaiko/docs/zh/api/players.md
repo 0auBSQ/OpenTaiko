@@ -441,7 +441,7 @@ PUCHICHARALIST 和 sf:GetPuchichara 返回这些句柄。列表拥有这些纹�
 名牌、角色或小角色的解锁要求。
 
 <div class="callout warn">
-名牌信息句柄、角色列表条目和小角色句柄的 UnlockCondition 属性返回此句柄。没有条件的项目（HasCondition 为 false）默认可用：IsUnlockable 返回 true，消息为空。条件的词汇与 Unlock.json 和谱面解锁条件一致；见<a href="../guides/unlockables.md">谱面解锁条件</a>指南。
+名牌信息句柄、角色列表条目和小角色句柄的 UnlockCondition 属性返回此句柄。没有条件的项目（HasCondition 为 false）默认可用：IsUnlockable 返回 true，消息为空。条件的词汇与 Unlock.json 和谱面解锁条件一致；见<a href="../guides/unlockables-reference.md">解锁条件参考</a>。
 </div>
 
 | 方法 | 说明 |

@@ -441,7 +441,7 @@ PUCHICHARALIST와 sf:GetPuchichara가 이 핸들을 반환합니다. 텍스처�
 네임플레이트, 캐릭터, 푸치캬라의 잠금 해제 요건입니다.
 
 <div class="callout warn">
-네임플레이트 정보 핸들, 캐릭터 목록 항목, 푸치캬라 핸들의 UnlockCondition 프로퍼티가 이 핸들을 반환합니다. 조건이 없는 항목(HasCondition false)은 기본적으로 사용 가능합니다. IsUnlockable은 true를 반환하고 메시지는 비어 있습니다. 조건 어휘는 Unlock.json과 채보 잠금 해제 요소의 것과 같습니다. <a href="../guides/unlockables.md">채보 잠금 해제 요소</a> 가이드를 참고하십시오.
+네임플레이트 정보 핸들, 캐릭터 목록 항목, 푸치캬라 핸들의 UnlockCondition 프로퍼티가 이 핸들을 반환합니다. 조건이 없는 항목(HasCondition false)은 기본적으로 사용 가능합니다. IsUnlockable은 true를 반환하고 메시지는 비어 있습니다. 조건 어휘는 Unlock.json과 채보 잠금 해제 요소의 것과 같습니다. <a href="../guides/unlockables-reference.md">잠금 해제 요소 레퍼런스</a>를 참고하십시오.
 </div>
 
 | 메서드 | 설명 |

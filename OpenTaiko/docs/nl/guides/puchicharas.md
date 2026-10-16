@@ -105,7 +105,7 @@ MyMascot/
 
 ## Stap 6 (optioneel): Voeg een ontgrendelvoorwaarde toe (Unlock.json)
 
-Zonder `Unlock.json` is de puchichara meteen beschikbaar. Om hem te vergrendelen, voeg je een `Unlock.json` toe met de velden `condition`, `type`, `values` en `references`; het formaat en de voorwaarde-id's zijn dezelfde als voor nummers en personages (zie de handleiding over ontgrendelvoorwaarden). Het onderstaande voorbeeld ontgrendelt zodra de speler in totaal 500 munten heeft verdiend. Meegeleverde voorbeelden: OpenTaiko-Kun kost 100 munten (`"condition": "ch"`), Bol vereist 20 gecleardde charts van de charter `bol` (`"condition": "sc"`), en Tinyfox vereist één gespeeld nummer in het genre `Project Outfox Serenity` (`"condition": "sg"`).
+Zonder `Unlock.json` is de puchichara meteen beschikbaar. Om hem te vergrendelen, voeg je een `Unlock.json` toe met de velden `condition`, `type`, `values` en `references`; het formaat en de voorwaarde-id's zijn dezelfde als voor nummers en personages (zie de [Referentie voor ontgrendelvoorwaarden](unlockables-reference.md)). Het onderstaande voorbeeld ontgrendelt zodra de speler in totaal 500 munten heeft verdiend. Meegeleverde voorbeelden: OpenTaiko-Kun kost 100 munten (`"condition": "ch"`), Bol vereist 20 gecleardde charts van de charter `bol` (`"condition": "sc"`), en Tinyfox vereist één gespeeld nummer in het genre `Project Outfox Serenity` (`"condition": "sg"`).
 
 De speler koopt muntvoorwaarden in het kamerscherm. Het spel controleert de andere voorwaarden na elke spelbeurt op het resultatenscherm; wanneer de speler aan een ervan voldoet, voegt het de puchichara toe aan de ontgrendellijst van het opslagbestand en toont het een melding.
 

@@ -105,7 +105,7 @@ MyMascot/
 
 ## Schritt 6 (optional): Freischaltbedingung hinzufügen (Unlock.json)
 
-Ohne `Unlock.json` ist der Puchichara sofort verfügbar. Um ihn zu sperren, fügen Sie eine `Unlock.json` mit den Feldern `condition`, `type`, `values` und `references` hinzu; Format und Bedingungs-IDs sind dieselben wie bei Songs und Charakteren (siehe die Anleitung zu Freischaltungen). Das Beispiel unten schaltet frei, sobald der Spieler insgesamt 500 Münzen verdient hat. Mitgelieferte Beispiele: OpenTaiko-Kun kostet 100 Münzen (`"condition": "ch"`), Bol verlangt 20 geschaffte Charts des Chart-Autors `bol` (`"condition": "sc"`), und Tinyfox verlangt einen gespielten Song im Genre `Project Outfox Serenity` (`"condition": "sg"`).
+Ohne `Unlock.json` ist der Puchichara sofort verfügbar. Um ihn zu sperren, fügen Sie eine `Unlock.json` mit den Feldern `condition`, `type`, `values` und `references` hinzu; Format und Bedingungs-IDs sind dieselben wie bei Songs und Charakteren (siehe die [Referenz der Freischaltbedingungen](unlockables-reference.md)). Das Beispiel unten schaltet frei, sobald der Spieler insgesamt 500 Münzen verdient hat. Mitgelieferte Beispiele: OpenTaiko-Kun kostet 100 Münzen (`"condition": "ch"`), Bol verlangt 20 geschaffte Charts des Chart-Autors `bol` (`"condition": "sc"`), und Tinyfox verlangt einen gespielten Song im Genre `Project Outfox Serenity` (`"condition": "sg"`).
 
 Münzbedingungen kauft der Spieler im Raum-Bildschirm. Die anderen Bedingungen prüft das Spiel nach jedem Spiel auf dem Ergebnisbildschirm; erfüllt der Spieler eine, fügt es den Puchichara zur Freischaltliste des Spielstands hinzu und zeigt eine Benachrichtigung an.
 

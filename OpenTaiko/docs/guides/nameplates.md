@@ -35,9 +35,9 @@ A skin ships its pack the same way, as a `Nameplates/` folder at the root of the
 - `nameplates` (array, required): one object per nameplate, with these fields:
   - `key` (string, required): a name for the nameplate, unique inside the pack. The nameplate's full id is `<pack>:<key>`, for example `example_pack:night_sky`. Save files store this id, so do not change a key once players can have the nameplate, and never give it to another nameplate.
   - `title` (string, required): the title text. Every language without a translation shows it.
-  - `type` (int, default 0): the plate art, a folder number in the skin's nameplate textures. In the shipped skin the folders are `Modules/ROActivities/nameplate/Textures/Title/0` to `45`, and a number without a folder draws no plate.
+  - `type` (int, default 0): the plate art, a folder number in the skin's nameplate textures. In the shipped skin the folders are `Modules/ROActivities/nameplate/Textures/Title/0` to `45`, and a number without a folder draws no plate. The table below lists the shipped skin's plates.
   - `rarity` (string, default `Common`): the rarity name (see the table below). An unknown name becomes `Common`.
-  - `unlock` (object, optional): the unlock condition, with the same fields as in an `Unlock.json`: `condition`, `values`, `type` and `references` (see the [Chart unlockables](unlockables.md) guide for the condition ids). Without `unlock`, every player owns the nameplate from the start.
+  - `unlock` (object, optional): the unlock condition, with the same fields as in an `Unlock.json`: `condition`, `values`, `type` and `references` (see the [Unlockables reference](unlockables-reference.md) for the condition ids). Without `unlock`, every player owns the nameplate from the start.
 
 Rarity values (the stars are the shipped skin's):
 
@@ -50,6 +50,57 @@ Rarity values (the stars are the shipped skin's):
 | <span class="rarity rarity-epic">Epic</span> | 2 | 3 |
 | <span class="rarity rarity-legendary">Legendary</span> | 3 | 4 |
 | <span class="rarity rarity-mythical">Mythical</span> | 4 | 4 |
+
+Plate types (`type`) of the shipped skin, Open-World Memories. The PC in My Room groups nameplates by type, under the section names of the skin's `Modules/Stages/myroom/lang/<code>/nameplate_types.json`. A type without a name there shows as "Plate Type" and its number, and the sections of types 10 and 38 read "???" until the player owns a nameplate of that type.
+
+| Type | Name | Effect |
+| --- | --- | --- |
+| 0 | Wood |  |
+| 1 | Copper | Shine |
+| 2 | Amethyst | Shine |
+| 3 | Nature | Shine |
+| 4 | Red | Shine |
+| 5 | Blue | Shine |
+| 6 | Ash | Shine |
+| 7 | Rainbow | Animated |
+| 8 | Space |  |
+| 9 | Diamond |  |
+| 10 | Misery |  |
+| 11 | Gold |  |
+| 12 | Pearl |  |
+| 13 | Platinum |  |
+| 14 | Kohaku (Character plate) |  |
+| 15 | Dashy |  |
+| 16 | Blue |  |
+| 17 | Red |  |
+| 18 | Sky Purple |  |
+| 19 | AI |  |
+| 20 | Sky |  |
+| 21 | Yellow |  |
+| 22 | Cream |  |
+| 23 | Sea |  |
+| 24 | Green |  |
+| 25 | Chapter I |  |
+| 26 | Chapter II |  |
+| 27 | Chapter III |  |
+| 28 | OpTk Light |  |
+| 29 | OpTk Dark |  |
+| 30 | NEP0 |  |
+| 31 | Night |  |
+| 32 | Chapter IV |  |
+| 33 | Clear Performance |  |
+| 34 | Full Combo Performance |  |
+| 35 | Perfect Performance |  |
+| 36 | Template |  |
+| 37 | Chapter V |  |
+| 38 | V-ENTURE |  |
+| 39 | Clear History |  |
+| 40 | Full Combo History |  |
+| 41 | Perfect History |  |
+| 42 | Ryuto Setsujin |  |
+| 43 | Sunrise |  |
+| 44 | Chapter VI |  |
+| 45 | A new world |  |
 
 The game checks the unlock conditions on the results screen after each play. When the player meets one, the game unlocks the nameplate and shows a notification. Coin conditions (`ch`, `cs`, `cm`) only unlock through a purchase: in the shipped skin, the player buys the nameplate from the PC in My Room. The PC in My Room also keeps locked Mythical nameplates out of its list until the player owns them.
 

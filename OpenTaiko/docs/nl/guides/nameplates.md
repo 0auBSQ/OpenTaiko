@@ -12,7 +12,7 @@ Een naamplaatjestitel is het tekstplaatje dat op het naamplaatje van een speler 
 
 ## Stap 1: Maak de pakketmap
 
-Maak een map in `Global/Nameplates/`, naast het spel. De mapnaam kies je zelf. Het pakket bevat één vereist bestand en een optionele map `Lang/` voor vertalingen (Stap 3):
+Maak een map in `Global/Nameplates/` (de map `Global` staat naast het spel). De mapnaam kies je zelf. Het pakket bevat één vereist bestand en een optionele map `Lang/` voor vertalingen (Stap 3):
 
 ```
 Global/
@@ -35,9 +35,9 @@ Een skin levert zijn pakket op dezelfde manier mee, als map `Nameplates/` in de 
 - `nameplates` (array, vereist): één object per naamplaatje, met deze velden:
   - `key` (string, vereist): een naam voor het naamplaatje, uniek binnen het pakket. Het volledige id van het naamplaatje is `<pack>:<key>`, bijvoorbeeld `example_pack:night_sky`. Opslagbestanden bewaren dit id, dus houd een sleutel ongewijzigd zodra spelers het naamplaatje kunnen hebben, en geef hem nooit aan een ander naamplaatje.
   - `title` (string, vereist): de titeltekst. Elke taal zonder vertaling toont die.
-  - `type` (int, standaard 0): de afbeelding van het plaatje, een mapnummer in de naamplaatjestexturen van de skin. In de meegeleverde skin zijn de mappen `Modules/ROActivities/nameplate/Textures/Title/0` tot `45`, en voor een nummer zonder map tekent de skin geen plaatje.
+  - `type` (int, standaard 0): de afbeelding van het plaatje, een mapnummer in de naamplaatjestexturen van de skin. In de meegeleverde skin zijn de mappen `Modules/ROActivities/nameplate/Textures/Title/0` tot `45`, en voor een nummer zonder map tekent de skin geen plaatje. De tabel hieronder toont de plaatjes van de meegeleverde skin.
   - `rarity` (string, standaard `Common`): de naam van de zeldzaamheid (zie de tabel hieronder). Een onbekende naam wordt `Common`.
-  - `unlock` (object, optioneel): de ontgrendelvoorwaarde, met dezelfde velden als in een `Unlock.json`: `condition`, `values`, `type` en `references` (de handleiding [Ontgrendelvoorwaarden voor charts](unlockables.md) geeft de voorwaarde-id's). Zonder `unlock` bezit elke speler het naamplaatje vanaf het begin.
+  - `unlock` (object, optioneel): de ontgrendelvoorwaarde, met dezelfde velden als in een `Unlock.json`: `condition`, `values`, `type` en `references` (de [Referentie voor ontgrendelvoorwaarden](unlockables-reference.md) geeft de voorwaarde-id's). Zonder `unlock` bezit elke speler het naamplaatje vanaf het begin.
 
 Zeldzaamheidswaarden (de sterren zijn die van de meegeleverde skin):
 
@@ -50,6 +50,57 @@ Zeldzaamheidswaarden (de sterren zijn die van de meegeleverde skin):
 | <span class="rarity rarity-epic">Epic</span> | 2 | 3 |
 | <span class="rarity rarity-legendary">Legendary</span> | 3 | 4 |
 | <span class="rarity rarity-mythical">Mythical</span> | 4 | 4 |
+
+Plaattypen (`type`) van de meegeleverde skin, Open-World Memories. De pc in My Room groepeert naamplaatjes per type, onder de sectienamen uit `Modules/Stages/myroom/lang/<code>/nameplate_types.json` van de skin. Een type zonder naam daarin verschijnt als "Plaattype" met zijn nummer, en de secties van de typen 10 en 38 tonen "???" tot de speler een naamplaatje van dat type bezit.
+
+| Type | Naam | Effect |
+| --- | --- | --- |
+| 0 | Hout |  |
+| 1 | Koper | Glans |
+| 2 | Amethist | Glans |
+| 3 | Natuur | Glans |
+| 4 | Rood | Glans |
+| 5 | Blauw | Glans |
+| 6 | As | Glans |
+| 7 | Regenboog | Geanimeerd |
+| 8 | Ruimte |  |
+| 9 | Diamant |  |
+| 10 | Misery |  |
+| 11 | Goud |  |
+| 12 | Parel |  |
+| 13 | Platina |  |
+| 14 | Kohaku (personageplaatje) |  |
+| 15 | Dashy |  |
+| 16 | Blauw |  |
+| 17 | Rood |  |
+| 18 | Hemelpaars |  |
+| 19 | AI |  |
+| 20 | Hemel |  |
+| 21 | Geel |  |
+| 22 | Crème |  |
+| 23 | Zee |  |
+| 24 | Groen |  |
+| 25 | Hoofdstuk I |  |
+| 26 | Hoofdstuk II |  |
+| 27 | Hoofdstuk III |  |
+| 28 | OpTk Licht |  |
+| 29 | OpTk Donker |  |
+| 30 | NEP0 |  |
+| 31 | Nacht |  |
+| 32 | Hoofdstuk IV |  |
+| 33 | Clear-prestatie |  |
+| 34 | Full Combo-prestatie |  |
+| 35 | Perfect-prestatie |  |
+| 36 | Sjabloon |  |
+| 37 | Hoofdstuk V |  |
+| 38 | V-ENTURE |  |
+| 39 | Clear-geschiedenis |  |
+| 40 | Full Combo-geschiedenis |  |
+| 41 | Perfect-geschiedenis |  |
+| 42 | Ryuto Setsujin |  |
+| 43 | Zonsopgang |  |
+| 44 | Hoofdstuk VI |  |
+| 45 | Een nieuwe wereld |  |
 
 Het spel controleert de ontgrendelvoorwaarden na elke spelbeurt op het resultatenscherm. Wanneer de speler aan een ervan voldoet, ontgrendelt het spel het naamplaatje en toont het een melding. Muntvoorwaarden (`ch`, `cs`, `cm`) ontgrendelen alleen via een aankoop: in de meegeleverde skin koopt de speler het naamplaatje via de pc in My Room. De pc in My Room houdt vergrendelde Mythical-naamplaatjes ook uit zijn lijst tot de speler ze bezit.
 

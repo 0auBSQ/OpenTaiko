@@ -10,6 +10,7 @@
   - [Añadir placas de nombre](guides/nameplates.md)
   - [Añadir skins y temas](guides/skins.md)
   - [Desbloqueables de charts](guides/unlockables.md)
+  - [Referencia de desbloqueables](guides/unlockables-reference.md)
 
 - Referencia de la API Lua
   - [Introducción](api/README.md)

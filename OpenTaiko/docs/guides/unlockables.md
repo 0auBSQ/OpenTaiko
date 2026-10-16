@@ -19,7 +19,7 @@ Create `Unlock.json` in the song folder. Every field is optional and has a defau
 - `rarity` (string, default `Common`): the rarity name (see the table below). It sets the colour of the rarity display and the tier of the unlock notification. An empty value becomes `Common`.
 - `condition` (string, default `ch`): the condition id (Step 2).
 - `values` (int array, default `[100]`): the numeric parameters of the condition.
-- `type` (string, default `me`): the comparison that value-based conditions use: `l` less than, `le` less or equal, `e` equal, `me` more or equal, `m` more than, `d` different. Coin conditions always use `me`.
+- `type` (string, default `me`): the comparison that value-based conditions use (see the [Unlockables reference](unlockables-reference.md)). Coin conditions always use `me`.
 - `references` (string array, default `[""]`): song ids, genre names, charter names or flag names, depending on the condition.
 - `custom_unlock_text` (object, optional): replaces the generated hint text. A localized object `{ "strings": { "default": "...", "ja": "..." } }`; the game uses the key for the active language, then `default`, and shows the generated text if neither exists.
 
@@ -65,48 +65,7 @@ Rarity values:
 
 ## Step 2: Pick a condition
 
-| Id | Meaning | `values` | `references` |
-|----|---------|----------|--------------|
-| `ch`, `cs`, `cm` | Coin purchase. The game evaluates the three ids identically (price in coins, `type` forced to `me`, never granted automatically). `cm` is the id intended for songs; skin scripts can read the id and use it to decide where they offer the purchase. | `[price]` | unused |
-| `ce` | Coins earned in total since the save file's creation | `[coins]` | unused |
-| `tp` | Total play count | `[plays]` | unused |
-| `ap` | AI battle play count | `[plays]` | unused |
-| `aw` | AI battle win count | `[wins]` | unused |
-| `sd` | Distinct charts that reached a clear status | `[chart count, clear status]` | unused |
-| `dp` | Charts of one difficulty that reached a clear status | `[difficulty, clear status, chart count]` | unused |
-| `lp` | Charts of one star level that reached a clear status | `[level, clear status, chart count]` | unused |
-| `sp` | Specific songs that reached a clear status | `[difficulty, clear status]` per song (`-1` = any difficulty) | one song id per pair |
-| `sg` | Songs inside named genres that reached a clear status | `[song count, clear status]` per genre | one genre name per pair |
-| `sc` | Charts by named charters that reached a clear status | `[chart count, clear status]` per charter | one charter name per pair |
-| `gt` | Global trigger (a named on/off flag in the save file that scripts set) | `[1]` for ON, `[0]` for OFF | `[trigger name]` |
-| `gc` | Global counter (a named number in the save file that scripts set) | `[value]`, compared with `type` | `[counter name]` |
-| `ig` | Impossible to get: never unlocks | none | none |
-| `andcomb` | The player must meet all child conditions (see the combined examples) | `[]` | one child condition per entry, as a JSON string |
-| `orcomb` | The player must meet at least one child condition (see the combined examples) | `[]` | one child condition per entry, as a JSON string |
-
-Clear status values (a status requirement means this status or better):
-
-| Value | Clear status |
-| --- | --- |
-| 0 | played |
-| 1 | assisted clear |
-| 2 | clear |
-| 3 | full combo |
-| 4 | all perfect |
-
-Difficulty values:
-
-| Value | Difficulty |
-| --- | --- |
-| 0 | Easy |
-| 1 | Normal |
-| 2 | Hard |
-| 3 | Extreme |
-| 4 | Extra Extreme |
-
-For `dp`, difficulty 3 also counts Extra Extreme charts. `dp` and `lp` only count regular charts and skip Dan and Tower charts. `sp` accepts `-1` to mean any difficulty.
-
-The game checks value counts: `ch`/`cs`/`cm`/`ce`/`tp`/`ap`/`aw`/`gt`/`gc` need exactly 1 value, `sd` exactly 2, `dp`/`lp` exactly 3, and `sp`/`sg`/`sc` need 2 values per reference with as many references as pairs. A wrong count makes the condition fail with an error message in game.
+The [Unlockables reference](unlockables-reference.md) lists every condition id with the values and references it takes, and the clear status and difficulty numbers. The Examples section below shows the patterns the bundled songs use.
 
 Only an explicit purchase in a screen that offers it unlocks a coin condition (the shipped skin offers locked songs for purchase from song select, whichever coin id you use). The game checks all other conditions on the results screen after each play; when the player meets one, the game adds the song id to the save file and shows a notification.
 
@@ -287,7 +246,7 @@ These are the condition patterns the bundled songs use, written as `Unlock.json`
 ## Troubleshooting and notes
 
 - The song is not locked: the file is not named `Unlock.json`, it is not in the folder that holds the `.tja` and `uniqueID.json`, or `Ignore Song Unlockables` is on.
-- The hint says the condition is invalid: the number of values does not match the condition (see Step 2), or `sp`/`sg`/`sc` have a different number of references than value pairs.
+- The hint says the condition is invalid: the number of values does not match the condition (see the [Unlockables reference](unlockables-reference.md)), or `sp`/`sg`/`sc` have a different number of references than value pairs.
 - A key has no effect: the keys are `hidden_index`, `rarity`, `condition`, `values`, `type`, `references`, `custom_unlock_text`, all lower-case. The game ignores anything else and applies the default.
 - `sp` never unlocks: the reference must be the target song's `uniqueID.json` id (a title or file name never matches), and the player must be able to reach the difficulty and status (status 3 is a full combo, so a chart the player has only cleared does not count).
 - `sg` never unlocks: the genre name must match the genre the game records for the played songs (the folder's `box.def` `#GENRE`, or the chart `#GENRE` when there is no folder genre).

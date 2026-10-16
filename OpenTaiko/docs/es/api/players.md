@@ -441,7 +441,7 @@ Los valores provienen de la pantalla de juego, así que tienen sentido durante u
 El requisito de desbloqueo de una placa de nombre, un personaje o un puchichara.
 
 <div class="callout warn">
-La propiedad UnlockCondition de los handles de información de placa de nombre, las entradas de lista de personajes y los handles de puchichara devuelve este handle. Un objeto sin condición (HasCondition false) está disponible por defecto: IsUnlockable devuelve true y los mensajes están vacíos. El vocabulario de condiciones coincide con el de Unlock.json y los desbloqueables de charts; consulta la guía <a href="../guides/unlockables.md">Desbloqueables de charts</a>.
+La propiedad UnlockCondition de los handles de información de placa de nombre, las entradas de lista de personajes y los handles de puchichara devuelve este handle. Un objeto sin condición (HasCondition false) está disponible por defecto: IsUnlockable devuelve true y los mensajes están vacíos. El vocabulario de condiciones coincide con el de Unlock.json y los desbloqueables de charts; consulta la <a href="../guides/unlockables-reference.md">Referencia de desbloqueables</a>.
 </div>
 
 | Método | Descripción |
