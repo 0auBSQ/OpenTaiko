@@ -42,6 +42,7 @@ System/
 - `Resolution=W,H`: 레이아웃 값을 작성하는 기준 해상도(기본값 `1280,720`). 기본 제공 스킨은 `1920,1080`을 사용합니다.
 - `Resolutions=`: 선택 가능한 렌더 스케일 배율(4단계).
 - `AIBattleCharacter=`: AI 상대에 사용하는 캐릭터 폴더(5단계).
+- `AIBattleNameplate=`: AI 상대가 장착하는 네임플레이트의 id(5단계).
 - `FontName<LANG>=`과 `BoxFontName<LANG>=`: 게임 언어별 폰트 파일. `<LANG>`은 대문자 언어 코드(`EN`, `JA`, `FR`, `ES`, `NL`, `DE`, `RU`, `KO`, `ZH`)입니다. 경로는 스킨 루트 기준 상대 경로이며(절대 경로도 가능) 파일이 존재해야 합니다. 없으면 파서가 키를 버립니다.
 
 다른 모든 키(`Game_*`, `Result_*`, `Title_*` 등)는 화면 레이아웃 값입니다. 같은 파서가 읽으므로 6단계의 포함 파일에 둘 수 있습니다.
@@ -57,6 +58,8 @@ Resolution=1920,1080
 Resolutions=1,2/3,1/3
 ;AI 배틀 슬롯에 사용하는 캐릭터 폴더.
 AIBattleCharacter=10v2 - AItritus
+;AI 배틀 상대가 사용하는 네임플레이트 (네임플레이트 목록의 id).
+AIBattleNameplate=66
 FontNameEN=Fonts/MPLUSRounded1c-Medium.ttf
 FontNameJA=Fonts/MPLUSRounded1c-Medium.ttf
 BoxFontNameEN=Fonts/MPLUSRounded1c-Regular.ttf
@@ -76,13 +79,17 @@ Resolutions=1,2/3,1/3
 ;   1/3   -> 640x360
 ```
 
-## 5단계: AIBattleCharacter 옵션
+## 5단계: AI 배틀 옵션
 
 `AIBattleCharacter=`는 AI 배틀 모드의 AI 상대에 게임이 사용하는 `Global/Characters/` 아래 폴더를 지정합니다. 기본값은 `10v2 - AItritus`입니다. 지정한 폴더가 존재해야 합니다.
+
+`AIBattleNameplate=`는 AI 상대가 장착하는 네임플레이트를 id로 지정합니다([네임플레이트 추가하기](nameplates.md) 참고). 기본값은 `66`입니다. 네임플레이트 목록에 없는 id를 지정하면 AI의 플레이트가 칭호 없이 표시됩니다.
 
 ```ini
 ;AI 배틀 슬롯에 사용하는 캐릭터 폴더.
 AIBattleCharacter=10v2 - AItritus
+;AI 배틀 상대가 사용하는 네임플레이트 (네임플레이트 목록의 id).
+AIBattleNameplate=66
 ```
 
 ## 6단계: #include로 설정 나누기

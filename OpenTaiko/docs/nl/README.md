@@ -12,7 +12,7 @@ OpenTaiko tekent bijna elk scherm buiten de kerngameplay met Lua-scripts die in 
 
 - Als je nog geen module hebt geschreven, lees dan [Hoe modules werken](getting-started.md): de mapindeling van een skin, de soorten modules en de levenscyclus-callbacks die een script ontvangt.
 - Om een functie op te zoeken, open je de [API-referentie](api/) en kies je een categorie in de zijbalk.
-- Voor een concreet doel lopen de handleidingen stap voor stap door [personages](guides/characters.md), [puchichara's](guides/puchicharas.md), [skins en thema's](guides/skins.md) en [ontgrendelvoorwaarden voor charts](guides/unlockables.md).
+- Voor een concreet doel lopen de handleidingen stap voor stap door [personages](guides/characters.md), [puchichara's](guides/puchicharas.md), [naamplaatjes](guides/nameplates.md), [skins en thema's](guides/skins.md) en [ontgrendelvoorwaarden voor charts](guides/unlockables.md).
 
 ## Wat je kunt bouwen
 
@@ -22,6 +22,7 @@ OpenTaiko tekent bijna elk scherm buiten de kerngameplay met Lua-scripts die in 
 | Achtergronden | De map `Graphics/` van de skin | Scripts die een scherm aankleden: het opstartscherm, de gameplay-achtergrond en de mob, het resultatenscherm. |
 | Skins en thema's | `System/`, naast het spel | Een compleet visueel pakket dat een speler installeert en activeert, met de thema-instellingen die het in het optiescherm aanbiedt. |
 | Personages en puchichara's | `Global/Characters/` en `Global/PuchiChara/`, gedeeld door elke skin | De dansers en de kleine mascottes die tijdens het spelen reageren. |
+| Naamplaatjes | `Global/Nameplates/`, of de map `Nameplates/` van de skin | Pakketten met naamplaatjestitels die spelers ontgrendelen en uitrusten. |
 | Ontgrendelvoorwaarden voor charts | De nummermap, naast de chart | Een `Unlock.json` die een nummer vergrendeld houdt tot de speler het heeft verdiend. |
 
 ## Experimentele secties

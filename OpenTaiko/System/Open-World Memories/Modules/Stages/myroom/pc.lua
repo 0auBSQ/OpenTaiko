@@ -6,8 +6,9 @@
 --   Puchichara — same via PUCHICHARALIST / ChangePuchichara.
 --   Dan Titles — the earned dan ranks (ChangeDan), previewed with the REAL dan plate renderer
 --                (NAMEPLATE:DrawDanPlate with the clear-status grade + the gold gradient text markup).
---   Nameplates — NAMEPLATESLIST / ChangeNameplate with a DrawTitlePlate preview. Unowned MYTHICAL
---                plates stay hidden and opaque conditions (ig/gt/gc) read "???".
+--   Nameplates — NAMEPLATESLIST / ChangeNameplate with a DrawTitlePlate preview, one pack at a time
+--                (the pack strip above the list). Unowned MYTHICAL plates stay hidden and opaque
+--                conditions (ig/gt/gc) read "???".
 --   Rename     — a PopUI textbox (engine text input) → ChangeName.
 --
 -- Interaction pattern copied from ROActivities/config_ui: Left/Right move between tabs while a tab
@@ -80,8 +81,6 @@ local RARITY_COL = {
     Poor = { 150, 150, 150 }, Common = { 200, 205, 210 }, Uncommon = { 120, 220, 130 }, Rare = { 110, 170, 255 },
     Epic = { 200, 130, 255 }, Legendary = { 255, 200, 90 }, Mythical = { 255, 120, 120 },
 }
--- rarity → the lang-int DrawTitlePlate expects (matches HRarity.RarityToLangInt)
-local RARITY_LANG = { Poor = 0, Common = 1, Uncommon = 2, Rare = 3, Epic = 4, Legendary = 5, Mythical = 6 }
 -- rarity sort order inside a nameplate type group (Poor → Mythical; DB order is the tiebreak)
 local RARITY_ORDER = { Poor = 1, Common = 2, Uncommon = 3, Rare = 4, Epic = 5, Legendary = 6, Mythical = 7 }
 -- Rarity string → modal integer (matches HRarity.RarityToModalInt in C#)
@@ -309,6 +308,120 @@ function ClippedMenu:update(ctx)
     end
 end
 
+-- ── PackStrip: the nameplate packs as a row of chips above the list, scrolled sideways ─────────────
+-- The keyboard's Left/Right pick a pack. On a pad, Decide puts the strip in its edit mode first (PopUI's
+-- editable pattern), so the pad's Left/Right still move between the widgets until then. The wheel scrolls
+-- the strip and a click picks the chip under the pointer. Chips outside the strip are cut by the clip.
+local CHIP_W, CHIP_GAP, STRIP_H = 200, 12, 54
+local PackStrip = setmetatable({}, { __index = PopUI.Widget })
+PackStrip.__index = PackStrip
+
+function PackStrip.new(o)
+    local self = PopUI.Widget.new(o)
+    setmetatable(self, PackStrip)
+    self.labels = o.labels or {}
+    self.index = math.max(1, math.min(o.index or 1, math.max(1, #self.labels)))
+    self.noPop = true
+    self._scrollCur, self._scrollTarget = 0, 0
+    return self
+end
+
+function PackStrip:hitTest(px, py)
+    return px >= self.x and px < self.x + self.w and py >= self.y and py < self.y + self.h
+end
+
+function PackStrip:restyle()
+    self:resolveStyle()
+    local c = self.eff.colors
+    local ch = self.h - 8
+    local r = math.min(self.eff.radiusSmall, ch * 0.5)
+    local m = 6
+    local function chip(field, top, bot)
+        self:bakeShared(field, "packstrip.chip", CHIP_W + 2 * m, ch + 2 * m, function(cv)
+            PopUI.Shape.panel(cv, m, m, CHIP_W, ch, {
+                radius = r, outline = { col = c.outline, width = 3 }, top = top, bottom = bot })
+        end, { m = m }, top, bot, r)
+    end
+    chip("_chip", c.surface, c.surface2)
+    chip("_chipSel", c.primary, c.primary2)
+    local rw = 4
+    self:bakeShared("_chipRing", "packstrip.ring", CHIP_W + 2 * m, ch + 2 * m, function(cv)
+        PopUI.Shape.fillRoundAA(cv, m - 4, m - 4, CHIP_W + 8, ch + 8, r + 4, c.focusRing)
+        PopUI.Shape.fillRound(cv, m - 4 + rw, m - 4 + rw, CHIP_W + 8 - 2 * rw, ch + 8 - 2 * rw, r + 4 - rw, { 0, 0, 0, 0 })
+    end, { m = m }, r)
+end
+
+function PackStrip:_clamp()
+    local contentW = #self.labels * (CHIP_W + CHIP_GAP) - CHIP_GAP
+    self._scrollTarget = math.max(0, math.min(math.max(0, contentW - self.w), self._scrollTarget))
+end
+
+-- scrolls chip i into the strip (instant = no easing)
+function PackStrip:showChip(i, instant)
+    local x0 = (i - 1) * (CHIP_W + CHIP_GAP)
+    if x0 < self._scrollTarget then self._scrollTarget = x0 end
+    if x0 + CHIP_W > self._scrollTarget + self.w then self._scrollTarget = x0 + CHIP_W - self.w end
+    self:_clamp()
+    if instant then self._scrollCur = self._scrollTarget end
+end
+
+function PackStrip:setIndex(i)
+    local n = #self.labels
+    if n == 0 then return end
+    i = math.max(1, math.min(n, i))
+    if i == self.index then return end
+    self.index = i
+    self:showChip(i)
+    self:playSfx("skip")
+    if self.onChange then self.onChange(i) end
+end
+
+PopUI.Widget.editable(PackStrip, function(self, dir) self:setIndex(self.index + dir) end)
+
+-- a click picks the chip under the pointer (Decide goes to onDecide, the edit mode, instead)
+function PackStrip:onActivate()
+    if self._mx == nil then return end
+    local rel = self._mx - self.x + self._scrollCur
+    local i = math.floor(rel / (CHIP_W + CHIP_GAP)) + 1
+    if rel - (i - 1) * (CHIP_W + CHIP_GAP) <= CHIP_W then self:setIndex(i) end
+end
+
+function PackStrip:update(ctx)
+    PopUI.Widget.update(self, ctx)
+    if not self.focused and self.capturing then self:setCapturing(false, true) end   -- leaving the strip ends the edit mode
+    if self.hovered then
+        self._mx = ctx.mx
+        local d = ((ctx.scrollDx or 0) ~= 0) and ctx.scrollDx or (ctx.scrollDy or 0)
+        if d ~= 0 then
+            self._scrollTarget = self._scrollTarget - d * (CHIP_W + CHIP_GAP)
+            self:_clamp()
+        end
+    end
+    self._scrollCur = self._scrollCur + (self._scrollTarget - self._scrollCur) * math.min(1, (ctx.dt or 0) * 14)
+end
+
+function PackStrip:draw()
+    if not self.visible then return end
+    local c = self.eff.colors
+    local clip = GRAPHICS ~= nil and GRAPHICS.SetClip ~= nil
+    if clip then GRAPHICS:SetClip(self.x - 6, self.y - 6, self.w + 12, self.h + 12) end
+    local cy = math.floor(self.y + self.h * 0.5)
+    local ty = math.floor(cy + self.mgr:textNudge(self.eff.font.small))
+    for i, label in ipairs(self.labels) do
+        local x0 = self.x + (i - 1) * (CHIP_W + CHIP_GAP) - self._scrollCur
+        if x0 + CHIP_W >= self.x - 8 and x0 <= self.x + self.w + 8 then
+            local cx = math.floor(x0 + CHIP_W * 0.5)
+            local sel = (i == self.index)
+            if sel and self._hiCur > 0.01 then self:drawPiece(self._chipRing, cx, cy, 1, self._hiCur) end
+            self:drawPiece(sel and self._chipSel or self._chip, cx, cy, 1, 1)
+            local fg = sel and c.textOnAccent or c.text
+            local bg = sel and PopUI.Util.shade(c.primary2, 0.5) or { 255, 255, 255, 150 }
+            self.mgr:drawTextEx(self.eff.font.small, label, cx, ty, fg, bg, 1, 1, CHIP_W - 28, "center")
+        end
+    end
+    if clip then GRAPHICS:ClearClip() end
+end
+
 -- ── the MyRoom BGM with CROSSFADES (created lazily ONCE; disposed via PC.disposeBgm) ──────────────
 -- stage-local copy (Sounds/bgm.ogg — the jukebox BGM tab plays the same file). Opening the computer fades this BGM IN
 -- (slightly delayed so the room's jukebox — ducked by Script via JB.setDuck — fades down first);
@@ -419,16 +532,43 @@ function PC:buildLists()
             end
         end
     end)
-    -- Nameplates grouped by their TYPE (nameplateInfo.iType — the plate art family the customize
-    -- screen keys on): a named header row opens each type section; entries sort by rarity
-    -- ascending (Poor → Mythical) with DB order as the tiebreak.
+    -- the packs of the listed nameplates, in catalogue order (the shipped one first); the strip above
+    -- the list picks one, starting on the pack of the equipped nameplate
+    self.packs = {}
+    local seen = {}
+    for _, np in ipairs(self.nps) do
+        local id, name = "", ""
+        pcall(function() id = np.Pack or ""; name = np.PackName or "" end)
+        if not seen[id] then
+            seen[id] = true
+            self.packs[#self.packs + 1] = { id = id, name = (name ~= "" and name) or id }
+        end
+    end
+    if self.packSel == nil or self.packs[self.packSel] == nil then
+        self.packSel = 1
+        local equipped = nil
+        pcall(function() equipped = save.NameplateInfo.Pack end)
+        for i, pk in ipairs(self.packs) do if pk.id == equipped then self.packSel = i end end
+    end
+    self:buildNameplateRows()
+end
+
+-- the rows of the chosen pack's nameplates, grouped by their TYPE (nameplateInfo.iType — the plate art
+-- family the customize screen keys on): a named header row opens each type section; entries sort by
+-- rarity ascending (Poor → Mythical) with DB order as the tiebreak.
+function PC:buildNameplateRows()
+    local pack = self.packs[self.packSel]
     self.npRows = {}
     local byType = {}
     for idx, np in ipairs(self.nps) do
-        local t = 0
-        pcall(function() t = np.Type or 0 end)
-        byType[t] = byType[t] or {}
-        byType[t][#byType[t] + 1] = { np = np, idx = idx }
+        local id = ""
+        pcall(function() id = np.Pack or "" end)
+        if pack ~= nil and id == pack.id then
+            local t = 0
+            pcall(function() t = np.Type or 0 end)
+            byType[t] = byType[t] or {}
+            byType[t][#byType[t] + 1] = { np = np, idx = idx }
+        end
     end
     local types = {}
     for t in pairs(byType) do types[#types + 1] = t end
@@ -608,8 +748,22 @@ function PC:buildUI()
             end
             sel = found or sel
         end
+        -- nameplates: the pack strip sits above the list, which loses its top row to it
+        local listY, listH = LIST.y, LIST.h
+        self.strip = nil
+        if self.tab == 4 and #(self.packs or {}) > 0 then
+            local labels = {}
+            for _, pk in ipairs(self.packs) do labels[#labels + 1] = pk.name end
+            self.strip = PackStrip.new{ x = LIST.x, y = LIST.y, w = LIST.w, h = STRIP_H, labels = labels,
+                index = self.packSel, onChange = function(i) pc:selectPack(i) end }
+            ui:add(self.strip)
+            self.strip:showChip(self.packSel, true)
+            self.strip.onNavDownOrPadRight = function() setFocusTo(ui, pc.menu); return true end
+            self.strip.onNavUpOrPadLeft = function() setFocusTo(ui, pc.tabBtns[pc.tab]); return true end
+            listY, listH = LIST.y + ROW_H, LIST.h - ROW_H
+        end
         local menu = ClippedMenu.new{
-            x = LIST.x, y = LIST.y, w = LIST.w, h = LIST.h, items = items, rowHeight = ROW_H,
+            x = LIST.x, y = listY, w = LIST.w, h = listH, items = items, rowHeight = ROW_H,
             selected = sel,
             rowStyle = function(i) return pc:rowStyleFor(i) end,
             onChange = function(i) pc.sel = i; pc:refreshDetail() end,
@@ -623,7 +777,7 @@ function PC:buildUI()
             local i = m.selected - 1
             while i >= 1 and not pc:rowSelectable(i) do i = i - 1 end
             if i >= 1 then m:setSelected(i); return true end
-            setFocusTo(ui, pc.tabBtns[pc.tab]); return true
+            setFocusTo(ui, pc.strip or pc.tabBtns[pc.tab]); return true
         end
         menu.onNavDownOrPadRight = function(m)
             local i = m.selected + 1
@@ -642,6 +796,7 @@ function PC:buildUI()
 end
 
 function PC:focusList()
+    if self.strip then setFocusTo(self.ui, self.strip); return true end
     if self.menu then setFocusTo(self.ui, self.menu); return true end
     if self.tb then setFocusTo(self.ui, self.tb); return true end
     return false
@@ -656,6 +811,37 @@ function PC:setTab(i)
         return true
     end
     return false
+end
+
+-- the strip picked another pack: the list shows its nameplates (rows, cursor and scroll replaced in
+-- place, so the strip keeps its focus and edit mode), the cursor on the equipped one when it is there
+function PC:selectPack(i)
+    self.packSel = i
+    self:buildNameplateRows()
+    local m = self.menu
+    if m == nil then return end
+    m.items = {}
+    for _, row in ipairs(self.npRows) do
+        m.items[#m.items + 1] = { text = row.e and entryName(self.save, self.tab, row.e) or row.header }
+    end
+    local sel = nil
+    for r = 1, #m.items do
+        local e = self:entryAt(r)
+        if e ~= nil and isEquipped(self.save, self.tab, e) then sel = r; break end
+    end
+    if sel == nil then
+        sel = 1
+        while sel < #m.items and not self:rowSelectable(sel) do sel = sel + 1 end
+    end
+    m.selected = sel
+    m._scrollCur, m._scrollTarget = 0, 0
+    m:_showRow(sel)
+    m._scrollCur = m._scrollTarget
+    if m._sbTrack then m._sbTrack:Dispose(); m._sbTrack = nil end
+    if m._sbThumb then m._sbThumb:Dispose(); m._sbThumb = nil end
+    m._sbDone = false
+    self.sel = sel
+    self:refreshDetail()
 end
 
 -- ── detail state (recomputed on selection change, drawn every frame) ──────────────────────────────
@@ -848,6 +1034,7 @@ function PC:openScreen()
     self.isOpen = true
     self.tab = 1
     self.sel = 1
+    self.packSel = nil
     self.msg = nil
     self._wantClose = false
     self._justOpened = true
@@ -866,7 +1053,7 @@ end
 function PC:close()
     self.isOpen = false
     if self.ui then self.ui:disposeWidgets(); self.ui = nil end
-    self.menu, self.actionBtn, self.tb, self.tabBtns = nil, nil, nil, nil
+    self.menu, self.actionBtn, self.tb, self.tabBtns, self.strip = nil, nil, nil, nil, nil
     if self.purse then self.purse:dispose(); self.purse = nil end
     for _, tex in pairs(self.icons or {}) do pcall(function() tex:Dispose() end) end
     for _, cv in pairs(self.tagPills or {}) do pcall(function() cv:Dispose() end) end
@@ -1040,7 +1227,7 @@ function PC:draw()
                         local py2 = math.floor(boxTop + boxH / 2 - 46)
                         if d.owned then
                             NAMEPLATE:DrawTitlePlate(px2, py2, 255, e.Type or 0, d.plateTx,
-                                RARITY_LANG[e.Rarity] or 1, e.Id or -1)
+                                e.RarityInt or 1, e.Id or -1)
                         else
                             NAMEPLATE:DrawTitlePlate(px2, py2, 130, -1, d.plateTx, 1, -1)
                         end

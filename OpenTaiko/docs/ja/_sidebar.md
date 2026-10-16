@@ -7,6 +7,7 @@
 - ガイド
   - [キャラクターの追加](guides/characters.md)
   - [ぷちキャラの追加](guides/puchicharas.md)
+  - [ネームプレートの追加](guides/nameplates.md)
   - [スキンとテーマの追加](guides/skins.md)
   - [譜面のアンロック要素](guides/unlockables.md)
 

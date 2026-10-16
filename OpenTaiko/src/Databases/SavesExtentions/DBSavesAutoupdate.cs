@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using Microsoft.Data.Sqlite;
 
 namespace OpenTaiko {
@@ -28,7 +30,38 @@ namespace OpenTaiko {
 				AddSaveUidColumn(connection);
 				SetDBVersion(connection, "v0.6.1.1");
 			}
+
+			// 0.6.1.2 - Nameplate ids as text; the equipped nameplate is looked up by its id only
+			if (VersionComparer.CompareVersions(version, "v0.6.1.2") < 0) {
+				BackupSavesDB(connection, "v0.6.1.2");
+				NameplateIdsAsText(connection);
+			}
 		}
+
+		#region [Helpers]
+
+		// a copy of the save database before the step for that version runs: Saves.db3.before-<version>.bak
+		private static void BackupSavesDB(SqliteConnection connection, string version) {
+			string path = connection.DataSource;
+			if (string.IsNullOrEmpty(path) || !File.Exists(path)) return;
+			try {
+				File.Copy(path, $"{path}.before-{version}.bak", true);
+			} catch (Exception ex) {
+				Trace.TraceWarning($"Saves.db3 could not be backed up before {version}: {ex.Message}");
+			}
+		}
+
+		// the declared type of a column ("INTEGER", "TEXT", …), or null when the table has no such column
+		private static string? ColumnType(SqliteConnection connection, SqliteTransaction transaction, string table, string column) {
+			using var command = connection.CreateCommand();
+			command.Transaction = transaction;
+			command.CommandText = "SELECT type FROM pragma_table_info($table) WHERE name = $column;";
+			command.Parameters.AddWithValue("$table", table);
+			command.Parameters.AddWithValue("$column", column);
+			return command.ExecuteScalar() as string;
+		}
+
+		#endregion
 
 		#region [DB Version]
 
@@ -115,6 +148,58 @@ namespace OpenTaiko {
 				up.Parameters.AddWithValue("$id", id);
 				up.ExecuteNonQuery();
 			}
+		}
+
+		#endregion
+
+		#region [0.6.1.2 - Nameplate ids as text]
+
+		// Runs in one transaction with the version update, so an interrupted start runs it again from the start.
+		// Each change checks the columns first.
+		private static void NameplateIdsAsText(SqliteConnection connection) {
+			using var transaction = connection.BeginTransaction();
+			void Run(string sql) {
+				using var command = connection.CreateCommand();
+				command.Transaction = transaction;
+				command.CommandText = sql;
+				command.ExecuteNonQuery();
+			}
+			bool IsText(string table, string column) =>
+				string.Equals(ColumnType(connection, transaction, table, column), "TEXT", StringComparison.OrdinalIgnoreCase);
+
+			// unlocks: NameplateId INTEGER -> TEXT, one row per save and nameplate
+			if (!IsText("nameplate_titles", "NameplateId")) {
+				Run("ALTER TABLE nameplate_titles ADD COLUMN NameplateKey TEXT NOT NULL DEFAULT '';");
+				Run("UPDATE nameplate_titles SET NameplateKey = CAST(NameplateId AS TEXT);");
+				Run("ALTER TABLE nameplate_titles DROP COLUMN NameplateId;");
+				Run("ALTER TABLE nameplate_titles RENAME COLUMN NameplateKey TO NameplateId;");
+			}
+			Run("DELETE FROM nameplate_titles WHERE rowid NOT IN (SELECT MIN(rowid) FROM nameplate_titles GROUP BY SaveId, NameplateId);");
+			Run("CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_nameplate ON nameplate_titles (SaveId, NameplateId);");
+
+			// equipped nameplate: PlayerNameplateId INTEGER -> TEXT, '' = none, '0' = the free "Beginner" nameplate
+			if (!IsText("saves", "PlayerNameplateId")) {
+				string beginner = ColumnType(connection, transaction, "saves", "PlayerNameplateTitle") != null
+					? "WHEN PlayerNameplateTitle IN ('Beginner', '初心者') THEN '0'"
+					: "";
+				Run("ALTER TABLE saves ADD COLUMN NameplateKey TEXT NOT NULL DEFAULT '0';");
+				Run($"""
+				UPDATE saves SET NameplateKey = CASE
+					WHEN PlayerNameplateId >= 0 THEN CAST(PlayerNameplateId AS TEXT)
+					{beginner}
+					ELSE '' END;
+				""");
+				Run("ALTER TABLE saves DROP COLUMN PlayerNameplateId;");
+				Run("ALTER TABLE saves RENAME COLUMN NameplateKey TO PlayerNameplateId;");
+			}
+
+			// the copies of the equipped nameplate's title, type and rarity
+			foreach (string column in new[] { "PlayerNameplateTitle", "PlayerNameplateType", "PlayerNameplateRarityInt" })
+				if (ColumnType(connection, transaction, "saves", column) != null)
+					Run($"ALTER TABLE saves DROP COLUMN {column};");
+
+			Run("UPDATE opentaiko_version SET SupportedVersion = 'v0.6.1.2';");
+			transaction.Commit();
 		}
 
 		#endregion

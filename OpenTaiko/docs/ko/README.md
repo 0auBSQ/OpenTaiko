@@ -12,7 +12,7 @@ OpenTaiko는 핵심 게임플레이를 제외한 거의 모든 화면(메뉴, �
 
 - 아직 모듈을 작성해 본 적이 없다면 [모듈의 동작 방식](getting-started.md)을 읽어 보십시오. 스킨의 폴더 구조, 모듈 종류, 스크립트가 받는 생명 주기 콜백을 설명합니다.
 - 함수를 찾아보려면 [API 레퍼런스](api/)를 열고 사이드바에서 분류를 고르십시오.
-- 구체적인 목표가 있다면 가이드가 [캐릭터](guides/characters.md), [푸치캬라](guides/puchicharas.md), [스킨과 테마](guides/skins.md), [채보 잠금 해제 요소](guides/unlockables.md)를 단계별로 안내합니다.
+- 구체적인 목표가 있다면 가이드가 [캐릭터](guides/characters.md), [푸치캬라](guides/puchicharas.md), [네임플레이트](guides/nameplates.md), [스킨과 테마](guides/skins.md), [채보 잠금 해제 요소](guides/unlockables.md)를 단계별로 안내합니다.
 
 ## 만들 수 있는 것
 
@@ -22,6 +22,7 @@ OpenTaiko는 핵심 게임플레이를 제외한 거의 모든 화면(메뉴, �
 | 배경 | 스킨의 `Graphics/` 폴더 | 화면을 꾸미는 스크립트. 시작 화면, 게임플레이 배경과 몹, 결과 화면. |
 | 스킨과 테마 | 게임 옆의 `System/` | 플레이어가 설치하고 전환하는 완전한 비주얼 패키지와, 그것이 옵션 화면에 노출하는 테마 설정. |
 | 캐릭터와 푸치캬라 | 모든 스킨이 공유하는 `Global/Characters/`와 `Global/PuchiChara/` | 플레이 중에 반응하는 댄서와 작은 마스코트. |
+| 네임플레이트 | `Global/Nameplates/` 또는 스킨의 `Nameplates/` 폴더 | 플레이어가 잠금 해제하고 장착하는 네임플레이트 칭호 팩. |
 | 채보 잠금 해제 요소 | 곡 폴더의 채보 옆 | 플레이어가 조건을 달성할 때까지 곡을 잠가 두는 `Unlock.json`. |
 
 ## 실험적 절

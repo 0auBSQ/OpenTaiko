@@ -7,6 +7,7 @@
 - Guías
   - [Añadir personajes](guides/characters.md)
   - [Añadir puchicharas](guides/puchicharas.md)
+  - [Añadir placas de nombre](guides/nameplates.md)
   - [Añadir skins y temas](guides/skins.md)
   - [Desbloqueables de charts](guides/unlockables.md)
 

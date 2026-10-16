@@ -42,6 +42,7 @@ System/
 - `Resolution=W,H`：你编写布局值时所依据的分辨率（默认 `1280,720`）。自带皮肤使用 `1920,1080`。
 - `Resolutions=`：可选的渲染缩放倍率（第 4 步）。
 - `AIBattleCharacter=`：AI 对手使用的角色文件夹（第 5 步）。
+- `AIBattleNameplate=`：AI 对手装备的名牌的 id（第 5 步）。
 - `FontName<LANG>=` 和 `BoxFontName<LANG>=`：每种游戏语言的字体文件，其中 `<LANG>` 是大写的语言代码（`EN`、`JA`、`FR`、`ES`、`NL`、`DE`、`RU`、`KO`、`ZH`）。路径相对于皮肤根目录（绝对路径也可以），且文件必须存在，否则解析器会丢弃该键。
 
 其他所有键（`Game_*`、`Result_*`、`Title_*` 等）都是界面布局值。同一个解析器读取它们，因此它们可以放在第 6 步的被包含文件中。
@@ -57,6 +58,8 @@ Resolution=1920,1080
 Resolutions=1,2/3,1/3
 ;AI 对战槽位使用的角色文件夹。
 AIBattleCharacter=10v2 - AItritus
+;AI 对战对手佩戴的名牌（名牌列表中的 id）。
+AIBattleNameplate=66
 FontNameEN=Fonts/MPLUSRounded1c-Medium.ttf
 FontNameJA=Fonts/MPLUSRounded1c-Medium.ttf
 BoxFontNameEN=Fonts/MPLUSRounded1c-Regular.ttf
@@ -76,13 +79,17 @@ Resolutions=1,2/3,1/3
 ;   1/3   -> 640x360
 ```
 
-## 第 5 步：AIBattleCharacter 选项
+## 第 5 步：AI 对战选项
 
 `AIBattleCharacter=` 指定游戏在 AI 对战模式中用于 AI 对手的 `Global/Characters/` 下的文件夹。默认为 `10v2 - AItritus`。指定的文件夹必须存在。
+
+`AIBattleNameplate=` 按 id 指定 AI 对手装备的名牌（见[添加名牌](nameplates.md)）。默认为 `66`。id 不在名牌列表中时，AI 的名牌不显示称号。
 
 ```ini
 ;AI 对战槽位使用的角色文件夹。
 AIBattleCharacter=10v2 - AItritus
+;AI 对战对手佩戴的名牌（名牌列表中的 id）。
+AIBattleNameplate=66
 ```
 
 ## 第 6 步：用 #include 拆分配置

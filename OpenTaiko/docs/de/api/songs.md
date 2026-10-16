@@ -328,7 +328,7 @@ Als globales Objekt VIRTUALSLOTS verfügbar. Slot-Indizes reichen von 1 bis 5; S
 | `VIRTUALSLOTS:SetNameplateTitle(slot, title)  -> void` | Setzt den Titeltext des Namensschilds des Slots. |
 | `VIRTUALSLOTS:GetNameplateDan(slot)  -> string` | Gibt den Dan-Text des Namensschilds des Slots zurück. |
 | `VIRTUALSLOTS:SetNameplateDan(slot, dan)  -> void` | Setzt den Dan-Text des Namensschilds des Slots. |
-| `VIRTUALSLOTS:SetNameplateById(slot, nameplateId)  -> void` | Wendet ein Namensschild aus der Namensschild-Datenbank per ID an: setzt Titeltext, Typ und Seltenheit. Eine unbekannte ID zeichnet nur die ID auf. |
+| `VIRTUALSLOTS:SetNameplateById(slot, nameplateId)  -> void` | Wendet ein Namensschild aus der Namensschildliste per ID an (ein String oder die Nummer eines mitgelieferten Namensschilds): setzt Titeltext, Typ und Seltenheit. Eine leere oder unbekannte ID zeigt das Schild ohne Titel. |
 | `VIRTUALSLOTS:SetNameplateType(slot, type)  -> void` | Setzt den Titeltyp des Namensschilds (Stilindex) direkt. |
 | `VIRTUALSLOTS:SetNameplateRarity(slot, rarity)  -> void` | Setzt den Seltenheitsindex des Namensschildtitels direkt. |
 | `VIRTUALSLOTS:SetNameplateDanType(slot, danType)  -> void` | Setzt den Typ des Dan-Schilds. |

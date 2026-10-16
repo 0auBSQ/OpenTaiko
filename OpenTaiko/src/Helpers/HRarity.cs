@@ -31,6 +31,8 @@ internal class HRarity {
 		["Mythical"] = 1f,
 	};
 
+	public static bool tIsRarity(string rarity) => RarityToLangInt.ContainsKey(rarity);
+
 	public static int tRarityToModalInt(string rarity) {
 		int modalInt = 0;
 

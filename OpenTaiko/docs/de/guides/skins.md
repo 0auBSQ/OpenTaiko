@@ -42,6 +42,7 @@ Kopieren Sie `System/Open-World Memories/` in einen neuen Nachbarordner, zum Bei
 - `Resolution=W,H`: die Auflösung, für die Sie die Layout-Werte erstellen (Standard `1280,720`). Der mitgelieferte Skin verwendet `1920,1080`.
 - `Resolutions=`: auswählbare Render-Skalierungsfaktoren (Schritt 4).
 - `AIBattleCharacter=`: Charakterordner für den KI-Gegner (Schritt 5).
+- `AIBattleNameplate=`: ID des Namensschilds, das der KI-Gegner trägt (Schritt 5).
 - `FontName<LANG>=` und `BoxFontName<LANG>=`: Schriftdatei pro Spielsprache, wobei `<LANG>` der großgeschriebene Sprachcode ist (`EN`, `JA`, `FR`, `ES`, `NL`, `DE`, `RU`, `KO`, `ZH`). Der Pfad ist relativ zur Skin-Wurzel (ein absoluter Pfad funktioniert ebenfalls), und die Datei muss existieren, andernfalls verwirft der Parser den Schlüssel.
 
 Jeder andere Schlüssel (`Game_*`, `Result_*`, `Title_*` und so weiter) ist ein Bildschirm-Layout-Wert. Derselbe Parser liest sie, weshalb sie in den eingebundenen Dateien aus Schritt 6 liegen können.
@@ -57,6 +58,8 @@ Resolution=1920,1080
 Resolutions=1,2/3,1/3
 ;Charakterordner für den KI-Kampf-Slot.
 AIBattleCharacter=10v2 - AItritus
+;Namensschild, das der KI-Gegner trägt (eine ID aus der Namensschildliste).
+AIBattleNameplate=66
 FontNameEN=Fonts/MPLUSRounded1c-Medium.ttf
 FontNameJA=Fonts/MPLUSRounded1c-Medium.ttf
 BoxFontNameEN=Fonts/MPLUSRounded1c-Regular.ttf
@@ -76,13 +79,17 @@ Resolutions=1,2/3,1/3
 ;   1/3   -> 640x360
 ```
 
-## Schritt 5: Die Option AIBattleCharacter
+## Schritt 5: Die KI-Kampf-Optionen
 
 `AIBattleCharacter=` benennt den Ordner unter `Global/Characters/`, den das Spiel für den KI-Gegner im KI-Kampf-Modus verwendet. Der Standard ist `10v2 - AItritus`. Der benannte Ordner muss existieren.
+
+`AIBattleNameplate=` benennt über seine ID das Namensschild, das der KI-Gegner trägt (siehe [Namensschilder hinzufügen](nameplates.md)). Der Standard ist `66`. Bei einer ID, die nicht in der Namensschildliste steht, zeigt das Spiel das Schild der KI ohne Titel.
 
 ```ini
 ;Charakterordner für den KI-Kampf-Slot.
 AIBattleCharacter=10v2 - AItritus
+;Namensschild, das der KI-Gegner trägt (eine ID aus der Namensschildliste).
+AIBattleNameplate=66
 ```
 
 ## Schritt 6: Die Konfiguration mit #include aufteilen

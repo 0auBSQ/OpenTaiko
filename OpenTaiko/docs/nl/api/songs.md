@@ -328,7 +328,7 @@ Beschikbaar als de global VIRTUALSLOTS. Slotindices lopen van 1 tot 5; setters n
 | `VIRTUALSLOTS:SetNameplateTitle(slot, title)  -> void` | Stelt de titeltekst op het naamplaatje van het slot in. |
 | `VIRTUALSLOTS:GetNameplateDan(slot)  -> string` | Geeft de dan-tekst op het naamplaatje van het slot terug. |
 | `VIRTUALSLOTS:SetNameplateDan(slot, dan)  -> void` | Stelt de dan-tekst op het naamplaatje van het slot in. |
-| `VIRTUALSLOTS:SetNameplateById(slot, nameplateId)  -> void` | Past een naamplaatje uit de naamplaatjesdatabase toe op id: stelt de titeltekst, het type en de zeldzaamheid in. Een onbekend id registreert alleen het id. |
+| `VIRTUALSLOTS:SetNameplateById(slot, nameplateId)  -> void` | Past een naamplaatje uit de naamplaatjeslijst toe op id (een string, of het nummer van een meegeleverd naamplaatje): stelt de titeltekst, het type en de zeldzaamheid in. Een leeg of onbekend id toont het plaatje zonder titel. |
 | `VIRTUALSLOTS:SetNameplateType(slot, type)  -> void` | Stelt het titeltype (stijlindex) van het naamplaatje rechtstreeks in. |
 | `VIRTUALSLOTS:SetNameplateRarity(slot, rarity)  -> void` | Stelt de zeldzaamheidsindex van de naamplaatjestitel rechtstreeks in. |
 | `VIRTUALSLOTS:SetNameplateDanType(slot, danType)  -> void` | Stelt het type van het dan-plaatje in. |

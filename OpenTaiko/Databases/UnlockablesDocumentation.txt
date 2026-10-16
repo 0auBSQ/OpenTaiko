@@ -4,6 +4,7 @@
 * cs : "Coins shop", coin requirement, payable only within the Medal shop selection screen
 * cm : "Coins menu", coin requirement, payable only within the song select screen (used only for songs)
 * ce : "Coins earned", coins earned since the creation of the save file, 1 value : [Total earned coins]
+* sd : "Song distinct (performance)", count of distinct charts where a given status was got, condition 2 values : [Song count, Clear status (0~4)], input 1 value [Count of fullfiled songs]
 * dp : "Difficulty pass", count of difficulties pass, unlock check during the results screen, condition 3 values : [Difficulty int (0~4), Clear status (0~4), Number of performances], input 1 value [Plays fitting the condition]
 * lp : "Level pass", count of level pass, unlock check during the results screen, condition 3 values : [Star rating, Clear status (0~4), Number of performances], input 1 value [Plays fitting the condition]
 * sp : "Song performance", count of a specific song pass, unlock check during the results screen, condition 2 x n values for n songs  : [Difficulty int (0~4, if -1 : Any), Clear status (0~2), ...], input 1 value [Count of fullfiled songs], n references for n songs (Song ids)
@@ -12,6 +13,9 @@
 * tp : "Total plays", 1 value : [Total playcount]
 * ap : "AI battle plays", 1 value : [AI battle playcount]
 * aw : "AI battle wins", 1 value : [AI battle wins count]
+* ig : "Impossible to Get", can't be unlocked by playing, only a script can give it (for example a shop or a chest), no values
+* gt : "Global trigger", 1 value : [0: OFF, 1: ON], 1 reference : [Global trigger name]
+* gc : "Global counter", 1 value : [Value to compare], 1 reference : [Global counter name]
 
 == UnlockType ==
 * l : "Less than"
@@ -32,3 +36,37 @@ A 8 bytes value, from upper to lower bytes:
 * Byte 6: Just: The mod value (0 - 2 for None/Just/Safe)
 * Byte 7: Unused
 * Byte 8: Fun mods: The mod value (0 - 2 for None/Avalanche/Minesweeper)
+
+== Nameplates ==
+
+Nameplates are listed in Databases/Nameplates/Nameplates.json:
+
+{
+	"pack": "opentaiko",
+	"name": { "strings": { "default": "OpenTaiko" } },
+	"nameplates": [
+		{
+			"key": "1",
+			"title": "First steps",
+			"type": 39,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [0, 2, 1], "type": "me", "references": [] }
+		}
+	]
+}
+
+"pack" is the pack id and "name" the pack name the game shows (optional, the pack id when it is missing), per language: { "strings": { "default": "...", "<language code>": "..." } }.
+
+* key : the nameplate id, unique (the shipped nameplates use numbers, "0" to "380"). Saves and scripts refer to the nameplate by it, so never change or reuse one
+* title : the title text, shown in every language that has no translation
+* type : the plate art, a folder number in the skin's nameplate Title textures
+* rarity : Poor, Common, Uncommon, Rare, Epic, Legendary or Mythical
+* unlock : the unlock condition, with the codes above (the same fields as an Unlock.json). Without "unlock", everyone owns the nameplate, like "0" (Beginner)
+
+A save stores only the id of the equipped nameplate. If that id is not in the list (removed, or from another machine online), the plate is shown without a title.
+
+Custom nameplates go in packs: a folder in Global/Nameplates/ (or a Nameplates/ folder at the root of a skin) with its own Nameplates.json, which also needs a "pack" id. The ids of its nameplates are <pack>:<key>.
+The "Adding nameplates" guide of the documentation (docs/guides/nameplates.md) explains packs with examples.
+
+Translations go in Databases/Nameplates/Lang/<language code>.json, one line per nameplate: { "1": "...", "2": "..." }
+An entry with a mistake is skipped, and the reason is written to OpenTaiko.log.

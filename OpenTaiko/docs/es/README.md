@@ -12,7 +12,7 @@ OpenTaiko dibuja casi todas las pantallas ajenas al juego principal con scripts 
 
 - Si todavía no has escrito un módulo, lee [Cómo funcionan los módulos](getting-started.md): la estructura de carpetas de un skin, los tipos de módulo y los callbacks del ciclo de vida que recibe un script.
 - Para buscar una función, abre la [referencia de la API](api/) y elige una categoría en la barra lateral.
-- Para un objetivo concreto, las guías explican paso a paso los [personajes](guides/characters.md), los [puchicharas](guides/puchicharas.md), los [skins y temas](guides/skins.md) y los [desbloqueables de charts](guides/unlockables.md).
+- Para un objetivo concreto, las guías explican paso a paso los [personajes](guides/characters.md), los [puchicharas](guides/puchicharas.md), las [placas de nombre](guides/nameplates.md), los [skins y temas](guides/skins.md) y los [desbloqueables de charts](guides/unlockables.md).
 
 ## Qué puedes crear
 
@@ -22,6 +22,7 @@ OpenTaiko dibuja casi todas las pantallas ajenas al juego principal con scripts 
 | Fondos | La carpeta `Graphics/` del skin | Scripts que decoran una pantalla: la pantalla de arranque, el fondo de juego y el mob, la pantalla de resultados. |
 | Skins y temas | `System/`, junto al juego | Un paquete visual completo que un jugador instala y activa, con los ajustes de tema que expone en la pantalla de opciones. |
 | Personajes y puchicharas | `Global/Characters/` y `Global/PuchiChara/`, compartidas por todos los skins | Los bailarines y las pequeñas mascotas que reaccionan durante la partida. |
+| Placas de nombre | `Global/Nameplates/`, o la carpeta `Nameplates/` del skin | Paquetes de títulos de placa de nombre que los jugadores desbloquean y equipan. |
 | Desbloqueables de charts | La carpeta de la canción, junto al chart | Un `Unlock.json` que mantiene bloqueada una canción hasta que el jugador se la gana. |
 
 ## Secciones experimentales

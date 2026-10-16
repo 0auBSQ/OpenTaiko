@@ -12,7 +12,7 @@ OpenTaiko draws almost every screen outside of core gameplay with Lua scripts th
 
 - If you have not written a module yet, read [How modules work](getting-started.md): the folder layout of a skin, the module types, and the lifecycle callbacks a script receives.
 - To look up a function, open the [API reference](api/) and pick a category from the sidebar.
-- For a concrete goal, the guides walk through [characters](guides/characters.md), [puchicharas](guides/puchicharas.md), [skins and themes](guides/skins.md) and [chart unlockables](guides/unlockables.md) step by step.
+- For a concrete goal, the guides walk through [characters](guides/characters.md), [puchicharas](guides/puchicharas.md), [nameplates](guides/nameplates.md), [skins and themes](guides/skins.md) and [chart unlockables](guides/unlockables.md) step by step.
 
 ## What you can build
 
@@ -22,6 +22,7 @@ OpenTaiko draws almost every screen outside of core gameplay with Lua scripts th
 | Backgrounds | The skin's `Graphics/` folder | Scripts that decorate a screen: the startup screen, the gameplay backdrop and mob, the results screen. |
 | Skins and themes | `System/`, next to the game | A complete visual package a player installs and switches to, with the theme settings it exposes in the options screen. |
 | Characters and puchicharas | `Global/Characters/` and `Global/PuchiChara/`, shared by every skin | The dancers and the small mascots that react during play. |
+| Nameplates | `Global/Nameplates/`, or the skin's `Nameplates/` folder | Packs of nameplate titles that players unlock and equip. |
 | Chart unlockables | The song folder, next to the chart | An `Unlock.json` that keeps a song locked until the player earns it. |
 
 ## Experimental sections

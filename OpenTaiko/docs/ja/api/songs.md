@@ -328,7 +328,7 @@ node.UnlockCondition がこのオブジェクトを返します。HasCondition �
 | `VIRTUALSLOTS:SetNameplateTitle(slot, title)  -> void` | スロットのネームプレートの称号テキストを設定します。 |
 | `VIRTUALSLOTS:GetNameplateDan(slot)  -> string` | スロットのネームプレートの段位テキストを返します。 |
 | `VIRTUALSLOTS:SetNameplateDan(slot, dan)  -> void` | スロットのネームプレートの段位テキストを設定します。 |
-| `VIRTUALSLOTS:SetNameplateById(slot, nameplateId)  -> void` | ネームプレートデータベースのネームプレートを id で適用します: 称号テキスト、種類、レアリティを設定します。不明な id は id のみを記録します。 |
+| `VIRTUALSLOTS:SetNameplateById(slot, nameplateId)  -> void` | ネームプレートリストのネームプレートを id (文字列、または同梱のネームプレートの番号) で適用します: 称号テキスト、種類、レアリティを設定します。空または不明な id では称号のないプレートを表示します。 |
 | `VIRTUALSLOTS:SetNameplateType(slot, type)  -> void` | ネームプレートの称号の種類 (スタイルインデックス) を直接設定します。 |
 | `VIRTUALSLOTS:SetNameplateRarity(slot, rarity)  -> void` | ネームプレートの称号のレアリティインデックスを直接設定します。 |
 | `VIRTUALSLOTS:SetNameplateDanType(slot, danType)  -> void` | 段位プレートの種類を設定します。 |

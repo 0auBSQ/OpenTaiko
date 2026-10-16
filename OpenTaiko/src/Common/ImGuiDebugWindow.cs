@@ -33,47 +33,6 @@ public static class ImGuiDebugWindow {
 	private static readonly string[] sortNames = ["Memory Usage (Highest -> Lowest)", "Memory Usage (Lowest -> Highest)", "Pointer ID"];
 	private static string reloadResourcePath = "";
 
-	private static Dictionary<int, string> nameplate_Rarities = new() {
-		[0] = "Poor",
-		[1] = "Common",
-		[2] = "Uncommon",
-		[3] = "Rare",
-		[4] = "Epic",
-		[5] = "Legendary",
-		[6] = "Mythical"
-	};
-
-	private static Dictionary<string, string> nameplate_unlockCondition = new() {
-		{ "ch (Coins here)", "ch" },
-		{ "cs (Coins shop)", "cs" },
-		{ "cm (Coins menu)", "cm" },
-		{ "ce (Coins earned)", "ce" },
-		{ "dp (Difficulty pass)", "dp" },
-		{ "lp (Level pass)", "lp" },
-		{ "sp (Song performance)", "sp" },
-		{ "sg (Song genre (performance))", "sg" },
-		{ "sc (Song charter (performance))", "sc" },
-		{ "tp (Total plays)", "tp" },
-		{ "ap (AI battle plays)", "ap" },
-		{ "aw (AI battle wins)", "aw" }
-	};
-	private static int nameplate_ucId = 4;
-
-	private static Dictionary<string, string> nameplate_unlockType = new() {
-		{ "l (Less than)", "l" },
-		{ "le (Less or equal)", "le" },
-		{ "e (Equal)", "e" },
-		{ "me (More or equal)", "me" },
-		{ "m (More than)", "m" },
-		{ "d (Different)", "d" },
-	};
-	private static int nameplate_utId = 3;
-
-	private static string nameplate_unlockValues = "[]";
-	private static string nameplate_unlockReferences = "[]";
-	private static Dictionary<string, string> nameplate_Translations = [];
-	private static string translation_id = "";
-
 	public static void Draw() {
 		if (Game.ImGuiController == null) return;
 
@@ -271,34 +230,23 @@ public static class ImGuiDebugWindow {
 
 					string preview = OpenTaiko.SaveFileInstances[save].data.Title;
 
+					var nameplates = OpenTaiko.Databases.DBNameplateUnlockables;
+					var saveData = OpenTaiko.SaveFileInstances[save].data;
+
 					if (ImGui.BeginCombo($"Nameplate###NAMEPLATE{i}", preview)) {
 						if (ImGui.Selectable("(Clear Title)")) {
-							OpenTaiko.SaveFileInstances[save].data.TitleId = -1;
-							OpenTaiko.SaveFileInstances[save].data.Title = "";
-							OpenTaiko.SaveFileInstances[save].data.TitleRarityInt = 1;
-							OpenTaiko.SaveFileInstances[save].data.TitleType = 0;
+							saveData.TitleId = "";
+							nameplates.tResolveNameplate(saveData);
 
 							OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
 							OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
 						}
-						if (ImGui.Selectable("初心者")) {
-							OpenTaiko.SaveFileInstances[save].data.TitleId = -1;
-							OpenTaiko.SaveFileInstances[save].data.Title = "初心者";
-							OpenTaiko.SaveFileInstances[save].data.TitleRarityInt = 1;
-							OpenTaiko.SaveFileInstances[save].data.TitleType = 0;
+						foreach (string id in nameplates.KeysInOrder) {
+							bool unlocked = saveData.UnlockedNameplateIds.Contains(id);
 
-							OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
-							OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
-						}
-						foreach (long id in OpenTaiko.Databases.DBNameplateUnlockables.data.Keys) {
-							bool unlocked = OpenTaiko.SaveFileInstances[save].data.UnlockedNameplateIds.Contains((int)id);
-
-							if (ImGui.Selectable(OpenTaiko.Databases.DBNameplateUnlockables.data[id].nameplateInfo.cld.GetString("") + (!unlocked ? " [Locked]" : ""), OpenTaiko.SaveFileInstances[save].data.TitleId == (int)id)) {
-								var nameplate = OpenTaiko.Databases.DBNameplateUnlockables.data[id];
-								OpenTaiko.SaveFileInstances[save].data.TitleId = (int)id;
-								OpenTaiko.SaveFileInstances[save].data.Title = nameplate.nameplateInfo.cld.GetString("");
-								OpenTaiko.SaveFileInstances[save].data.TitleRarityInt = HRarity.tRarityToLangInt(nameplate.rarity);
-								OpenTaiko.SaveFileInstances[save].data.TitleType = nameplate.nameplateInfo.iType;
+							if (ImGui.Selectable(nameplates.data[id].nameplateInfo.cld.GetString("") + (!unlocked ? " [Locked]" : ""), saveData.TitleId == id)) {
+								saveData.TitleId = id;
+								nameplates.tResolveNameplate(saveData);
 
 								OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
 								OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
@@ -309,77 +257,13 @@ public static class ImGuiDebugWindow {
 
 					if (ImGui.TreeNodeEx($"Edit Nameplate###EDIT_NAMEPLATE{i}")) {
 
-						ImGui.InputInt($"Title Id###TITLE_ID{i}", ref OpenTaiko.SaveFileInstances[save].data.TitleId);
-
-						ImGui.InputText($"Title###TITLE{i}", ref OpenTaiko.SaveFileInstances[save].data.Title, 1024);
-
-						ImGui.InputInt($"Title Rarity###TITLE_RARITY{i}", ref OpenTaiko.SaveFileInstances[save].data.TitleRarityInt);
-
-						ImGui.InputInt($"Title Type###TITLE_TYPE{i}", ref OpenTaiko.SaveFileInstances[save].data.TitleType);
+						ImGui.InputText($"Title Id###TITLE_ID{i}", ref saveData.TitleId, 256);
 
 						if (ImGui.Button($"Update###UPDATE_NAMEPLATE{i}")) {
+							nameplates.tResolveNameplate(saveData);
 							OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
 							OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
 						}
-
-						#region NameplateUnlockables.db3
-						ImGui.SeparatorText("Add to NameplateUnlockables.db3");
-
-						if (ImGui.BeginCombo("Unlock Condition", nameplate_unlockCondition.Keys.ElementAt(nameplate_ucId))) {
-							foreach (var item in nameplate_unlockCondition) {
-								bool selected = nameplate_unlockCondition.Keys.ElementAt(nameplate_ucId) == item.Key;
-								if (ImGui.Selectable(item.Key, selected)) {
-									nameplate_ucId = nameplate_unlockCondition.ToList().IndexOf(item);
-								}
-							}
-							ImGui.EndCombo();
-						}
-
-						if (ImGui.BeginCombo("Unlock Type", nameplate_unlockType.Keys.ElementAt(nameplate_utId))) {
-							foreach (var item in nameplate_unlockType) {
-								bool selected = nameplate_unlockType.Keys.ElementAt(nameplate_utId) == item.Key;
-								if (ImGui.Selectable(item.Key, selected)) {
-									nameplate_utId = nameplate_unlockType.ToList().IndexOf(item);
-								}
-							}
-							ImGui.EndCombo();
-						}
-
-						ImGui.InputTextWithHint("Unlock Values", "[0,0,0]", ref nameplate_unlockValues, 256);
-
-						ImGui.InputTextWithHint("Unlock References", "[\"songId\"]", ref nameplate_unlockReferences, 2048);
-
-						ImGui.Text("Translations");
-						foreach (var translation in nameplate_Translations) {
-							string value = translation.Value;
-							if (ImGui.InputText(translation.Key + $"###NAMEPLATE_TRANSLATE_{translation.Key.ToUpper()}", ref value, 1024)) {
-								nameplate_Translations[translation.Key] = value;
-							}
-						}
-
-						ImGui.InputText("Id to Add/Remove", ref translation_id, 32);
-						if (ImGui.Button("Add")) {
-							nameplate_Translations.TryAdd(translation_id, "");
-						}
-						if (ImGui.Button("Remove")) {
-							nameplate_Translations.Remove(translation_id);
-						}
-
-						ImGui.SeparatorText("");
-
-						if (ImGui.Button("Add Current Nameplate to Database###NAMEPLATE_DATABASE_ADD")) {
-							OpenTaiko.Databases.DBNameplateUnlockables.AddToDatabase(
-								OpenTaiko.SaveFileInstances[save].data.Title,
-								OpenTaiko.SaveFileInstances[save].data.TitleType,
-								nameplate_Rarities[OpenTaiko.SaveFileInstances[save].data.TitleRarityInt],
-								nameplate_unlockCondition.Values.ToList()[nameplate_ucId],
-								nameplate_unlockType.Values.ToList()[nameplate_utId],
-								nameplate_unlockValues,
-								nameplate_unlockReferences,
-								nameplate_Translations
-								);
-						}
-						#endregion
 
 						ImGui.TreePop();
 

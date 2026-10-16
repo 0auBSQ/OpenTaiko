@@ -132,11 +132,7 @@ internal class CStageConfig : CStage {
 			FDK.SoundManager.bIsTimeStretch = OpenTaiko.ConfigIni.bTimeStretch;
 
 			for (int i = 0; i < OpenTaiko.MAX_PLAYERS; i++) {
-				int id = OpenTaiko.SaveFileInstances[i].data.TitleId;
-				if (id > 0) {
-					var title = OpenTaiko.Databases.DBNameplateUnlockables.data[id];
-					OpenTaiko.SaveFileInstances[i].data.Title = title.nameplateInfo.cld.GetString("");
-				}
+				OpenTaiko.Databases.DBNameplateUnlockables.tResolveNameplate(OpenTaiko.SaveFileInstances[i].data);
 				OpenTaiko.NamePlate.tNamePlateRefreshTitles(i);
 			}
 

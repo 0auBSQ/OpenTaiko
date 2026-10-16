@@ -52,12 +52,6 @@ local function rarityToInt(rarity)
     return map[rarity] or 0
 end
 
--- Maps rarity strings to the integer expected by DrawTitlePlate (matches HRarity.RarityToLangInt).
-local function rarityToLangInt(rarity)
-    local map = { Poor=0, Common=1, Uncommon=2, Rare=3, Epic=4, Legendary=5, Mythical=6 }
-    return map[rarity] or 1
-end
-
 local function getGrayColor()
     return COLOR:CreateColorFromRGBA(120, 120, 120, 255)
 end
@@ -391,7 +385,7 @@ local function drawNameplateRow(dataIdx, rowY, isSelected)
     local plateY   = rowY  - math.floor(plateH * scale / 2)
     plateTx:SetScale(scale, scale)
     NAMEPLATE:DrawTitlePlate(plateX, plateY, opacity, entry.Type, plateTx,
-                             rarityToLangInt(entry.Rarity), entry.Id)
+                             entry.RarityInt, entry.Id)
 
     if isSelected then
         -- Equipped badge

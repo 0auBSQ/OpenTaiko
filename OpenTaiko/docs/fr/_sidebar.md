@@ -7,6 +7,7 @@
 - Guides
   - [Ajouter des personnages](guides/characters.md)
   - [Ajouter des puchicharas](guides/puchicharas.md)
+  - [Ajouter des plaques de nom](guides/nameplates.md)
   - [Ajouter des skins et des thèmes](guides/skins.md)
   - [Déblocage de partitions](guides/unlockables.md)
 

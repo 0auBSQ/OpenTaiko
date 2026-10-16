@@ -12,7 +12,7 @@ OpenTaiko dessine presque tous les écrans situés en dehors du cœur du gamepla
 
 - Si vous n'avez pas encore écrit de module, lisez [Fonctionnement des modules](getting-started.md) : l'organisation des dossiers d'un skin, les types de modules et les fonctions de rappel du cycle de vie qu'un script reçoit.
 - Pour retrouver une fonction, ouvrez la [référence de l'API](api/) et choisissez une catégorie dans la barre latérale.
-- Pour un objectif précis, les guides parcourent pas à pas les [personnages](guides/characters.md), les [puchicharas](guides/puchicharas.md), les [skins et thèmes](guides/skins.md) et le [déblocage de partitions](guides/unlockables.md).
+- Pour un objectif précis, les guides parcourent pas à pas les [personnages](guides/characters.md), les [puchicharas](guides/puchicharas.md), les [plaques de nom](guides/nameplates.md), les [skins et thèmes](guides/skins.md) et le [déblocage de partitions](guides/unlockables.md).
 
 ## Ce que vous pouvez construire
 
@@ -22,6 +22,7 @@ OpenTaiko dessine presque tous les écrans situés en dehors du cœur du gamepla
 | Arrière-plans | Le dossier `Graphics/` du skin | Des scripts qui décorent un écran : l'écran de démarrage, le décor et la foule du gameplay, l'écran de résultats. |
 | Skins et thèmes | `System/`, à côté du jeu | Un ensemble visuel complet qu'un joueur installe et sélectionne, avec les réglages de thème qu'il expose dans l'écran des options. |
 | Personnages et puchicharas | `Global/Characters/` et `Global/PuchiChara/`, partagés par tous les skins | Les danseurs et les petites mascottes qui réagissent pendant la partie. |
+| Plaques de nom | `Global/Nameplates/`, ou le dossier `Nameplates/` du skin | Des packs de titres de plaques de nom que les joueurs débloquent et équipent. |
 | Déblocage de partitions | Le dossier de la chanson, à côté de la partition | Un `Unlock.json` qui garde une chanson verrouillée jusqu'à ce que le joueur l'ait méritée. |
 
 ## Sections expérimentales

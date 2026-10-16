@@ -82,17 +82,12 @@ public static class CVirtualSlotManager {
 	}
 
 	/// <summary>
-	/// Populates the AI slot's <see cref="CVirtualSlotData.VirtualData"/> with nameplate #66
-	/// visuals (title text, type, rarity).  Call after the nameplate database is loaded.
+	/// Populates the AI slot's <see cref="CVirtualSlotData.VirtualData"/> with the nameplate the skin names
+	/// (SkinConfig.ini <c>AIBattleNameplate=</c>): title text, type, rarity. Call after the nameplate database is loaded.
 	/// </summary>
 	public static void RefreshAINameplate() {
-		var npDb = OpenTaiko.Databases?.DBNameplateUnlockables?.data;
-		if (npDb != null && npDb.TryGetValue(66L, out var np66)) {
-			AI.VirtualData.Title         = np66.nameplateInfo.cld.GetString("");
-			AI.VirtualData.TitleId       = 66;
-			AI.VirtualData.TitleType     = np66.nameplateInfo.iType;
-			AI.VirtualData.TitleRarityInt = HRarity.tRarityToLangInt(np66.rarity);
-		}
+		AI.VirtualData.TitleId = OpenTaiko.Skin?.AIBattleNameplate ?? "";
+		OpenTaiko.Databases?.DBNameplateUnlockables?.tResolveNameplate(AI.VirtualData);
 	}
 
 	// ── Mount / unmount ───────────────────────────────────────────────────────

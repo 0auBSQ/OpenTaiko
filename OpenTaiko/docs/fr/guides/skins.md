@@ -42,6 +42,7 @@ Copiez `System/Open-World Memories/` vers un nouveau dossier voisin, par exemple
 - `Resolution=W,H` : la résolution pour laquelle vous définissez les valeurs de disposition (par défaut `1280,720`). Le skin fourni utilise `1920,1080`.
 - `Resolutions=` : multiplicateurs d'échelle de rendu sélectionnables (étape 4).
 - `AIBattleCharacter=` : dossier de personnage utilisé pour l'adversaire IA (étape 5).
+- `AIBattleNameplate=` : identifiant de la plaque de nom que porte l'adversaire IA (étape 5).
 - `FontName<LANG>=` et `BoxFontName<LANG>=` : fichier de police par langue du jeu, où `<LANG>` est le code de langue en majuscules (`EN`, `JA`, `FR`, `ES`, `NL`, `DE`, `RU`, `KO`, `ZH`). Le chemin est relatif à la racine du skin (un chemin absolu fonctionne aussi) et le fichier doit exister, sinon l'analyseur abandonne la clé.
 
 Toute autre clé (`Game_*`, `Result_*`, `Title_*` et ainsi de suite) est une valeur de disposition d'écran. Le même analyseur les lit, ce qui explique qu'elles puissent vivre dans les fichiers inclus de l'étape 6.
@@ -57,6 +58,8 @@ Resolution=1920,1080
 Resolutions=1,2/3,1/3
 ;Dossier de personnage utilisé pour l'emplacement de bataille contre l'IA.
 AIBattleCharacter=10v2 - AItritus
+;Plaque de nom que porte l'adversaire de la bataille contre l'IA (un id de la liste des plaques de nom).
+AIBattleNameplate=66
 FontNameEN=Fonts/MPLUSRounded1c-Medium.ttf
 FontNameJA=Fonts/MPLUSRounded1c-Medium.ttf
 BoxFontNameEN=Fonts/MPLUSRounded1c-Regular.ttf
@@ -76,13 +79,17 @@ Resolutions=1,2/3,1/3
 ;   1/3   -> 640x360
 ```
 
-## Étape 5 : L'option AIBattleCharacter
+## Étape 5 : Les options de bataille contre l'IA
 
 `AIBattleCharacter=` nomme le dossier sous `Global/Characters/` que le jeu utilise pour l'adversaire IA en mode bataille contre l'IA. La valeur par défaut est `10v2 - AItritus`. Le dossier nommé doit exister.
+
+`AIBattleNameplate=` désigne par son identifiant la plaque de nom que porte l'adversaire IA (voir [Ajouter des plaques de nom](nameplates.md)). La valeur par défaut est `66`. Avec un identifiant absent de la liste des plaques de nom, le jeu affiche la plaque de l'IA sans titre.
 
 ```ini
 ;Dossier de personnage utilisé pour l'emplacement de bataille contre l'IA.
 AIBattleCharacter=10v2 - AItritus
+;Plaque de nom que porte l'adversaire de la bataille contre l'IA (un id de la liste des plaques de nom).
+AIBattleNameplate=66
 ```
 
 ## Étape 6 : Scinder la configuration avec #include

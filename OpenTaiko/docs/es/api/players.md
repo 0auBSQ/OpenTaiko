@@ -33,7 +33,7 @@ Lee las propiedades con sintaxis de punto (sf.Name, sf.Coins). Los métodos de e
 | `sf.Name  -> string` | El nombre mostrado del jugador. |
 | `sf.SaveId  -> integer` | El id numérico de base de datos de este guardado. |
 | `sf.SaveUID  -> string` | El id de cadena único de este guardado. |
-| `sf.NameplateInfo  -> nameplateInfo` | La placa de nombre equipada (consulta Handle de información de placa de nombre), o la placa de principiante por defecto si el id guardado es desconocido. |
+| `sf.NameplateInfo  -> nameplateInfo` | La placa de nombre equipada (consulta Handle de información de placa de nombre). Si no hay ninguna equipada, o su id no está en la lista de placas de nombre, un handle con un id vacío y sin título. |
 | `sf.DanplateInfo  -> danplateInfo` | El título de dan actual (consulta Handle de información de placa de dan). |
 | `sf.TotalPlaycount  -> integer` | Número total de partidas en este guardado. |
 | `sf.AIBattlePlaycount  -> integer` | Número de partidas de batalla contra la IA. |
@@ -42,8 +42,8 @@ Lee las propiedades con sintaxis de punto (sf.Name, sf.Coins). Los métodos de e
 | `sf.TotalEarnedCoins  -> integer` | Total de monedas ganadas durante la vida del guardado. |
 | `sf:SpendCoins(price)  -> nil` | Descuenta monedas (el saldo nunca baja de 0) y persiste. |
 | `sf:EarnCoins(amount)  -> nil` | Añade monedas al saldo y al total ganado, y persiste. |
-| `sf:IsNameplateUnlocked(id)  -> bool` | Si la placa de nombre con este id está desbloqueada. |
-| `sf:UnlockNameplate(id)  -> nil` | Desbloquea una placa de nombre y persiste (sin efecto si ya está desbloqueada). |
+| `sf:IsNameplateUnlocked(id)  -> bool` | Si la placa de nombre con este id está desbloqueada. Una placa sin condición de desbloqueo devuelve false aquí, aunque todos los jugadores la poseen (comprueba UnlockCondition.HasCondition). |
+| `sf:UnlockNameplate(id)  -> nil` | Desbloquea una placa de nombre y persiste (sin efecto si ya está desbloqueada). Un id que no está en la lista de placas de nombre registra una advertencia y no hace nada. |
 | `sf:IsSongUnlocked(uniqueId)  -> bool` | Si la canción con este id único está desbloqueada. |
 | `sf:UnlockSong(uniqueId)  -> nil` | Desbloquea una canción y persiste (sin efecto si ya está desbloqueada). |
 | `sf.SelectedHitsounds  -> string` | Nombre de carpeta del conjunto de hitsounds seleccionado. Asignar un nombre distinto lo persiste y recarga los hitsounds del jugador. |
@@ -67,7 +67,7 @@ Lee las propiedades con sintaxis de punto (sf.Name, sf.Coins). Los métodos de e
 | `sf.SelectedDan  -> string` | Texto del título de dan activo. |
 | `sf:ChangeDan(title)  -> nil` | Activa el título indicado, copiando sus indicadores de dorado y estado de clear si es uno que el jugador ganó, actualiza la placa de nombre y persiste. |
 | `sf:ChangeName(name)  -> nil` | Cambia el nombre mostrado, actualiza la placa de nombre y persiste. El método ignora los nombres vacíos o sin cambios. |
-| `sf:ChangeNameplate(id)  -> nil` | Equipa la placa de nombre con este id, actualiza la placa de nombre y persiste. Un id ausente de la base de datos borra el texto de título en caché. |
+| `sf:ChangeNameplate(id)  -> nil` | Equipa la placa de nombre con este id, actualiza la placa de nombre y persiste. Un id vacío o -1 quita la placa; un id que no está en la lista de placas de nombre registra una advertencia y no cambia nada. |
 
 ```lua
 local save = GetSaveFile(0)
@@ -93,17 +93,17 @@ La ROActivity nameplate del skin (Modules/ROActivities/nameplate) se encarga del
 
 | Método | Descripción |
 | --- | --- |
-| `NAMEPLATE:DrawTitlePlate(x, y, opacity, type, text, rarity, nameplateId)  -> nil` | Dibuja una placa de título con el tipo de visualización, la textura de título prerrenderizada, el índice de rareza y el id de placa indicados. |
+| `NAMEPLATE:DrawTitlePlate(x, y, opacity, type, text, rarity, nameplateId)  -> nil` | Dibuja una placa de título con el tipo de visualización, la textura de título prerrenderizada, el índice de rareza y el id de placa indicados (el id elige la insignia). |
 | `NAMEPLATE:DrawDanPlate(x, y, opacity, danGrade, text)  -> nil` | Dibuja una placa de dan para el grado indicado usando una textura de título prerrenderizada. |
 | `NAMEPLATE:DrawPlayerNameplate(x, y, opacity, player)  -> nil` | Dibuja la placa de nombre completa de una ranura de jugador; el lado rojo o azul sigue el ajuste de lado 1P del juego. |
-| `NAMEPLATE:DrawNameplateTitleById(id, x, y, opacity, font)  -> nil` | Renderiza el título localizado de la placa con este id usando un objeto de texto y lo dibuja como placa de título. El id debe existir en la base de datos de placas. |
+| `NAMEPLATE:DrawNameplateTitleById(id, x, y, opacity, font)  -> nil` | Renderiza el título localizado de la placa con este id usando un objeto de texto y lo dibuja como placa de título. No dibuja nada para un id que no está en la lista de placas de nombre. |
 
 ### NAMEPLATESLIST
 
-La base de datos de todas las placas de nombre que conoce el juego, con búsquedas por índice o id y filtrado.
+La lista de todas las placas de nombre que cargó el juego (las placas incluidas, luego el paquete del skin activo y luego los paquetes de Global/Nameplates), con búsquedas por índice o id y filtrado.
 
 <div class="callout warn">
-Los métodos de consulta devuelven handles de información de placa de nombre. FindWhere llama a una función Lua una vez por placa y conserva las entradas para las que devuelve true.
+Los métodos de consulta devuelven handles de información de placa de nombre. FindWhere llama a una función Lua una vez por placa y conserva las entradas para las que devuelve true. Los ids de placa de nombre son cadenas: una placa incluida usa su número como texto ("66"), una placa de un paquete `<pack>:<key>` (consulta la guía <a href="../guides/nameplates.md">Añadir placas de nombre</a>). Todos los métodos de esta página que reciben un id de placa de nombre aceptan también el número de una placa incluida.
 </div>
 
 | Método | Descripción |
@@ -119,15 +119,18 @@ Los métodos de consulta devuelven handles de información de placa de nombre. F
 Un título de placa de nombre: texto localizado, tipo de visualización, id, rareza y condición de desbloqueo.
 
 <div class="callout warn">
-sf.NameplateInfo y NAMEPLATESLIST devuelven estos handles. La placa de principiante por defecto tiene id -1, rareza "Common" y ninguna condición de desbloqueo.
+sf.NameplateInfo y NAMEPLATESLIST devuelven estos handles. Si no hay ninguna placa de nombre equipada, sf.NameplateInfo devuelve un handle con un id vacío, sin título, rareza "Common" y sin condición de desbloqueo.
 </div>
 
 | Método | Descripción |
 | --- | --- |
 | `info.Title  -> string` | Texto del título en el idioma actual. |
 | `info.Type  -> integer` | Código de tipo de visualización que se pasa a NAMEPLATE:DrawTitlePlate. |
-| `info.Id  -> integer` | Id de la placa (-1 para la placa de principiante por defecto). |
+| `info.Id  -> string` | Id de la placa: el número como texto para una placa incluida ("66"), `<pack>:<key>` para una placa de un paquete, "" si no hay ninguna equipada. |
 | `info.Rarity  -> string` | Nombre de rareza: "Poor", "Common", "Uncommon", "Rare", "Epic", "Legendary" o "Mythical". |
+| `info.RarityInt  -> integer` | La rareza como el índice que recibe NAMEPLATE:DrawTitlePlate (de 0 Poor a 6 Mythical). |
+| `info.Pack  -> string` | El id del paquete del que procede la placa, o "" para una placa incluida. |
+| `info.PackName  -> string` | El nombre del paquete en el idioma actual (su `name` en Nameplates.json o, si no lo tiene, su id); "OpenTaiko" para una placa incluida. |
 | `info.UnlockCondition  -> unlockCondition` | La condición de desbloqueo (consulta Handle de condición de desbloqueo). |
 
 ### Handle de información de placa de dan

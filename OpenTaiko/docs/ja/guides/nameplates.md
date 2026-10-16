@@ -1,0 +1,212 @@
+<!-- guides/nameplates.md -->
+
+# ネームプレートの追加
+
+ネームプレートの称号は、プレイヤーのネームプレートにプレイヤー名と段位称号と一緒に表示されるテキストのプレートです。プレイヤーは、プレイする、購入する、スクリプトから受け取る、のいずれかで称号をアンロックし、マイルームでそのうち 1 つを装備します。ネームプレートパックを使うと独自の称号を追加できます。パックは `Nameplates.json` ファイルを含むフォルダで、`Global/Nameplates/` に置きます。スキンは独自のパックを同梱できます。ゲームはネームプレートを表示するすべての画面で、すべてのパックのネームプレートを同梱のネームプレートと並べて一覧表示します。
+
+## 始める前に
+
+- UTF-8 で保存できるテキストエディタ。
+- パック id: 小文字、数字、`_` からなり、他のパックが使っていない短い名前。たとえば自分の名前や自分の譜面パックの名前です。ゲームはこれをもとにパック内のすべてのネームプレートの id を作ります。
+- ゲームはパックを起動時とスキンの読み込み時に読み取ります。変更を確認するには、変更のたびにゲームを再起動してください。
+
+## ステップ 1: パックのフォルダを作成する
+
+ゲーム本体の隣にある `Global/Nameplates/` の中にフォルダを作成します。フォルダ名は自由です。パックには必須のファイルが 1 つと、翻訳用の任意の `Lang/` フォルダ (ステップ 3) が入ります。
+
+```
+Global/
+  Nameplates/
+    Example Pack/
+      Nameplates.json
+      Lang/
+        fr.json
+        ja.json
+```
+
+スキンも同じ方法でパックを同梱します。スキンのルートに `Nameplates/` フォルダを置きます (`System/<skin>/Nameplates/Nameplates.json`)。ゲームはアクティブなスキンのパックだけを読み込むため、別のスキンがアクティブな間はスキンパックのネームプレートが消えます。
+
+## ステップ 2: Nameplates.json を書く
+
+`Nameplates.json` にはパック id とネームプレートのリストを書きます。
+
+- `pack` (string、必須): パック id。
+- `name` (object、任意): パックの名前で、マイルームのパソコンのパック選択バーに表示されます。`{ "strings": { "default": "...", "<code>": "..." } }` の形で書くと、パック選択バーには現在の言語の名前、なければ `default` が表示されます。名前がなければ、パック選択バーにはパック id が表示されます。
+- `nameplates` (array、必須): ネームプレートごとに 1 つのオブジェクトで、次のフィールドを持ちます。
+  - `key` (string、必須): パック内で一意なネームプレートの名前。ネームプレートの完全な id は `<pack>:<key>` で、たとえば `example_pack:night_sky` です。セーブファイルはこの id を保存するため、プレイヤーがネームプレートを入手できるようになったらキーを変えず、そのキーを別のネームプレートに付けないでください。
+  - `title` (string、必須): 称号のテキスト。翻訳のないすべての言語でこれが表示されます。
+  - `type` (int、既定 0): プレートのアートで、スキンのネームプレートテクスチャ内のフォルダ番号です。同梱スキンのフォルダは `Modules/ROActivities/nameplate/Textures/Title/0` から `45` までで、フォルダのない番号ではプレートが描画されません。
+  - `rarity` (string、既定 `Common`): レアリティ名 (下の表を参照)。不明な名前は `Common` になります。
+  - `unlock` (object、任意): アンロック条件で、`Unlock.json` と同じフィールド `condition`、`values`、`type`、`references` を持ちます (条件 id は[譜面のアンロック要素](unlockables.md)ガイドを参照)。`unlock` がなければ、すべてのプレイヤーが最初からネームプレートを所有します。
+
+レアリティの値 (星の数は同梱スキンのものです):
+
+| レアリティ | プレートの星 | 通知の段階 |
+| --- | --- | --- |
+| <span class="rarity rarity-poor">Poor</span> | 0 | 0 |
+| <span class="rarity rarity-common">Common</span> | 0 | 0 |
+| <span class="rarity rarity-uncommon">Uncommon</span> | 0 | 1 |
+| <span class="rarity rarity-rare">Rare</span> | 1 | 2 |
+| <span class="rarity rarity-epic">Epic</span> | 2 | 3 |
+| <span class="rarity rarity-legendary">Legendary</span> | 3 | 4 |
+| <span class="rarity rarity-mythical">Mythical</span> | 4 | 4 |
+
+ゲームは各プレイ後のリザルト画面でアンロック条件を確認します。プレイヤーが条件を満たすと、ゲームはネームプレートをアンロックして通知を表示します。コイン条件 (`ch`、`cs`、`cm`) は購入でのみアンロックされます。同梱スキンでは、プレイヤーはマイルームのパソコンでネームプレートを購入します。マイルームのパソコンは、ロックされた Mythical のネームプレートを、プレイヤーが所有するまでリストに表示しません。
+
+```json
+{
+  "pack": "example_pack",
+  "name": { "strings": { "default": "Example Pack", "fr": "Pack d'exemple" } },
+  "nameplates": [
+    {
+      "key": "night_sky",
+      "title": "Night Sky Walker",
+      "type": 8,
+      "rarity": "Rare",
+      "unlock": { "condition": "tp", "values": [50] }
+    },
+    {
+      "key": "hello",
+      "title": "Hello There"
+    }
+  ]
+}
+```
+
+## ステップ 3: 翻訳を追加する
+
+翻訳は任意です。パックの `Lang/` フォルダの各ファイルには 1 つの言語の称号を、ネームプレートごとに 1 行ずつ、パックのキー (パック id なし) で書きます。ファイル名は言語コードです。
+
+| ファイル | 言語 |
+| --- | --- |
+| `de.json` | ドイツ語 |
+| `en.json` | 英語 |
+| `es.json` | スペイン語 |
+| `fr.json` | フランス語 |
+| `ja.json` | 日本語 |
+| `ko.json` | 韓国語 |
+| `nl.json` | オランダ語 |
+| `ru.json` | ロシア語 |
+| `zh.json` | 中国語 |
+
+```json
+{
+  "night_sky": "Promeneur du ciel nocturne",
+  "hello": "Bonjour"
+}
+```
+
+ある言語のファイルにないネームプレートは、その言語では `title` を表示します。
+
+## ステップ 4: ゲーム内でテストする
+
+ゲームを起動し、マイルームのパソコンを開きます。「ネームプレート」タブで、リストの上にあるパック選択バーから自分のパックを選びます。リストにそのパックのネームプレートが表示され、ロックされたものにはアンロックのヒントが付きます。1 つを装備し、プレイヤーのネームプレート上で称号、プレート、星を確認します。翻訳を確認するには、ゲームの言語を切り替えます。
+
+ゲームは読み取れないパックをスキップし、そのパックの名前を示すエラー通知を表示します。有効な `pack` id がないパックや、ゲームがすでに読み込んだパックと同じ id を持つパックは、読み取れないものとして扱われます。`key` か `title` がないネームプレートや、パック内にすでにあるキーを持つネームプレートは、ゲームがそのネームプレートだけをスキップし、理由を `OpenTaiko.log` に書き込みます。
+
+## スクリプトからのネームプレート
+
+Lua スクリプトも同じ id を使います。ネームプレート id を取るすべてのメソッドは完全な id を文字列で受け付け、同梱のネームプレートは番号でも指定できます。スクリプトは、プレイでは決してアンロックされない `ig` 条件のネームプレートを付与できます。
+
+```lua
+local save = GetSaveFile(0)
+local id = "example_pack:night_sky"
+if not save:IsNameplateUnlocked(id) then
+    save:UnlockNameplate(id)
+end
+save:ChangeNameplate(id)
+```
+
+UnlockNameplate は通知を表示しないため、通知が必要なスクリプトは自分で表示します。ネームプレートのメソッドは[プレイヤーとプロフィール](../api/players.md)を参照してください。
+
+## 例
+
+以下のパックはよく使うパターンを示しています。id、称号、数値は自分のものに置き換えてください。
+
+**無料のネームプレート。** `unlock` がなければ、すべてのプレイヤーがネームプレートを所有し、すぐに装備できます。
+
+```json
+{
+  "pack": "example_pack",
+  "nameplates": [
+    { "key": "welcome", "title": "Welcome Aboard", "type": 0, "rarity": "Common" }
+  ]
+}
+```
+
+**プレイでアンロックする (`tp`)。** ネームプレートは 100 回のプレイ後にアンロックされます。`ap` (AI バトルのプレイ回数)、`aw` (AI バトルの勝利数)、`ce` (獲得したコインの合計) も同じ単一値の形式を使います。
+
+```json
+{
+  "pack": "example_pack",
+  "nameplates": [
+    { "key": "regular", "title": "Regular Drummer", "type": 3, "rarity": "Uncommon",
+      "unlock": { "condition": "tp", "values": [100] } }
+  ]
+}
+```
+
+**自分の譜面パックの楽曲をクリアする (`sp`)。** 譜面パックは自身の楽曲に報酬を用意できます。参照は楽曲の `uniqueID.json` の `id` フィールドで、`[3, 3]` は Extreme (3) でのフルコンボ (3) を要求します。
+
+```json
+{
+  "pack": "example_charts",
+  "nameplates": [
+    { "key": "storm_fc", "title": "Storm Chaser", "type": 33, "rarity": "Epic",
+      "unlock": { "condition": "sp", "values": [3, 3],
+                  "references": ["4xtDLgcLGqMLaXd7mq344TtjhhR4dopA4ykf5wTCfFq8UOdHFBlwpW2lSJ9ndcVU"] } }
+  ]
+}
+```
+
+**コインで購入する (`ch`)。** 価格が唯一の値です。同梱スキンでは、プレイヤーはマイルームのパソコンでネームプレートを購入します。
+
+```json
+{
+  "pack": "example_pack",
+  "nameplates": [
+    { "key": "golden", "title": "Golden Touch", "type": 11, "rarity": "Rare",
+      "unlock": { "condition": "ch", "values": [800] } }
+  ]
+}
+```
+
+**スクリプトだけが与える報酬 (`ig`)。** プレイで `ig` のネームプレートがアンロックされることはないため、スクリプトが UnlockNameplate で付与します (「スクリプトからのネームプレート」を参照)。付与されるまで、マイルームのパソコンはそのネームプレートに、条件が無効であることを示す汎用のヒントを表示します。
+
+```json
+{
+  "pack": "example_story",
+  "nameplates": [
+    { "key": "finale", "title": "Curtain Call", "type": 19, "rarity": "Legendary",
+      "unlock": { "condition": "ig", "values": [] } }
+  ]
+}
+```
+
+**翻訳付きのスキンパック。** スキンはパックを `System/<skin>/Nameplates/` に、その翻訳を `System/<skin>/Nameplates/Lang/` に置きます。
+
+```json
+{
+  "pack": "example_skin",
+  "nameplates": [
+    { "key": "visitor", "title": "First Visit", "type": 22, "rarity": "Common",
+      "unlock": { "condition": "tp", "values": [1] } }
+  ]
+}
+```
+
+```json
+{
+  "visitor": "初めての訪問"
+}
+```
+
+## トラブルシューティングと注意点
+
+- パックが表示されない: フォルダが `Global/Nameplates/` の直下にない、ファイル名が `Nameplates.json` でない、`pack` id がないか小文字、数字、`_` 以外の文字を使っている、または別のパックがすでに同じ id を使っています。エラー通知がそのパックの名前を示します。
+- ネームプレートがリストにない: `key` か `title` がないか、キーが前のエントリと重複しています。`OpenTaiko.log` にそのエントリの名前が記録されます。
+- 翻訳が表示されない: `Lang` ファイルのキーはパック id を除いたパックのキー (`example_pack:night_sky` なら `night_sky`) でなければならず、ファイル名は言語コードでなければなりません。
+- プレートにアートが表示されない: スキンにその `type` のフォルダがありません。
+- オンラインでは、他のプレイヤーは同じパックを持っている場合にのみパックのネームプレートの称号を見られます。それ以外の場合は、そのプレイヤーのネームプレートが称号なしで表示されます。
+- パックを削除すると、そのパックのネームプレートを装備していたプレイヤーは、パックが戻るまで称号なしで表示されます。アンロックはセーブファイルに残ります。
+- ゲームの JSON パーサーはコメントと末尾のカンマを受け付けます。厳密なバリデータは拒否します。

@@ -33,7 +33,7 @@ Lesen Sie Eigenschaften mit Punktsyntax (sf.Name, sf.Coins). Schreibmethoden spe
 | `sf.Name  -> string` | Der angezeigte Name des Spielers. |
 | `sf.SaveId  -> integer` | Die numerische Datenbank-ID dieses Spielstands. |
 | `sf.SaveUID  -> string` | Die eindeutige String-ID dieses Spielstands. |
-| `sf.NameplateInfo  -> nameplateInfo` | Das ausgerüstete Namensschild (siehe Namensschild-Info-Handle), oder das Standard-Anfängernamensschild, wenn die gespeicherte ID unbekannt ist. |
+| `sf.NameplateInfo  -> nameplateInfo` | Das ausgerüstete Namensschild (siehe Namensschild-Info-Handle). Ist keines ausgerüstet oder steht seine ID nicht in der Namensschildliste, ein Handle mit leerer ID und ohne Titel. |
 | `sf.DanplateInfo  -> danplateInfo` | Der aktuelle Dan-Titel (siehe Dan-Schild-Info-Handle). |
 | `sf.TotalPlaycount  -> integer` | Gesamtzahl der Spiele auf diesem Spielstand. |
 | `sf.AIBattlePlaycount  -> integer` | Anzahl der KI-Kampf-Spiele. |
@@ -42,8 +42,8 @@ Lesen Sie Eigenschaften mit Punktsyntax (sf.Name, sf.Coins). Schreibmethoden spe
 | `sf.TotalEarnedCoins  -> integer` | Insgesamt über die Lebensdauer des Spielstands verdiente Münzen. |
 | `sf:SpendCoins(price)  -> nil` | Zieht Münzen ab (der Stand fällt nie unter 0) und speichert. |
 | `sf:EarnCoins(amount)  -> nil` | Fügt dem Stand und der Gesamtsumme Münzen hinzu und speichert. |
-| `sf:IsNameplateUnlocked(id)  -> bool` | Ob das Namensschild mit dieser ID freigeschaltet ist. |
-| `sf:UnlockNameplate(id)  -> nil` | Schaltet ein Namensschild frei und speichert (No-op, wenn bereits freigeschaltet). |
+| `sf:IsNameplateUnlocked(id)  -> bool` | Ob das Namensschild mit dieser ID freigeschaltet ist. Für ein Namensschild ohne Freischaltbedingung gibt die Methode hier false zurück, obwohl jeder Spieler es besitzt (prüfen Sie UnlockCondition.HasCondition). |
+| `sf:UnlockNameplate(id)  -> nil` | Schaltet ein Namensschild frei und speichert (No-op, wenn bereits freigeschaltet). Eine ID, die nicht in der Namensschildliste steht, protokolliert eine Warnung und bewirkt nichts. |
 | `sf:IsSongUnlocked(uniqueId)  -> bool` | Ob der Song mit dieser eindeutigen ID freigeschaltet ist. |
 | `sf:UnlockSong(uniqueId)  -> nil` | Schaltet einen Song frei und speichert (No-op, wenn bereits freigeschaltet). |
 | `sf.SelectedHitsounds  -> string` | Ordnername des ausgewählten Hitsound-Sets. Das Zuweisen eines anderen Namens speichert ihn und lädt die Hitsounds des Spielers neu. |
@@ -67,7 +67,7 @@ Lesen Sie Eigenschaften mit Punktsyntax (sf.Name, sf.Coins). Schreibmethoden spe
 | `sf.SelectedDan  -> string` | Text des aktiven Dan-Titels. |
 | `sf:ChangeDan(title)  -> nil` | Macht den angegebenen Titel aktiv, übernimmt dessen Gold- und Clear-Status-Flags, wenn es ein vom Spieler verdienter ist, aktualisiert das Namensschild und speichert. |
 | `sf:ChangeName(name)  -> nil` | Ändert den angezeigten Namen, aktualisiert das Namensschild und speichert. Die Methode ignoriert leere oder unveränderte Namen. |
-| `sf:ChangeNameplate(id)  -> nil` | Rüstet das Namensschild mit dieser ID aus, aktualisiert das Namensschild und speichert. Eine in der Datenbank fehlende ID leert den zwischengespeicherten Titeltext. |
+| `sf:ChangeNameplate(id)  -> nil` | Rüstet das Namensschild mit dieser ID aus, aktualisiert das Namensschild und speichert. Eine leere ID oder -1 legt das Namensschild ab; eine ID, die nicht in der Namensschildliste steht, protokolliert eine Warnung und ändert nichts. |
 
 ```lua
 local save = GetSaveFile(0)
@@ -93,17 +93,17 @@ Die ROActivity nameplate des Skins (Modules/ROActivities/nameplate) übernimmt d
 
 | Methode | Beschreibung |
 | --- | --- |
-| `NAMEPLATE:DrawTitlePlate(x, y, opacity, type, text, rarity, nameplateId)  -> nil` | Zeichnet ein Titelschild mit dem angegebenen Anzeigetyp, der vorgerenderten Titeltextur, dem Seltenheitsindex und der Namensschild-ID. |
+| `NAMEPLATE:DrawTitlePlate(x, y, opacity, type, text, rarity, nameplateId)  -> nil` | Zeichnet ein Titelschild mit dem angegebenen Anzeigetyp, der vorgerenderten Titeltextur, dem Seltenheitsindex und der Namensschild-ID (die ID bestimmt das Abzeichen). |
 | `NAMEPLATE:DrawDanPlate(x, y, opacity, danGrade, text)  -> nil` | Zeichnet ein Dan-Schild für den angegebenen Grad mit einer vorgerenderten Titeltextur. |
 | `NAMEPLATE:DrawPlayerNameplate(x, y, opacity, player)  -> nil` | Zeichnet das vollständige Namensschild eines Spielerslots; die rote oder blaue Seite folgt der 1P-Seiteneinstellung des Spiels. |
-| `NAMEPLATE:DrawNameplateTitleById(id, x, y, opacity, font)  -> nil` | Rendert den lokalisierten Titel des Namensschilds mit dieser ID mit einem Textobjekt und zeichnet ihn als Titelschild. Die ID muss in der Namensschild-Datenbank existieren. |
+| `NAMEPLATE:DrawNameplateTitleById(id, x, y, opacity, font)  -> nil` | Rendert den lokalisierten Titel des Namensschilds mit dieser ID mit einem Textobjekt und zeichnet ihn als Titelschild. Für eine ID, die nicht in der Namensschildliste steht, zeichnet die Methode nichts. |
 
 ### NAMEPLATESLIST
 
-Die Datenbank aller Namensschilder, die das Spiel kennt, mit Abfragen per Index oder ID und Filterung.
+Die Liste aller Namensschilder, die das Spiel geladen hat (die mitgelieferten Namensschilder, dann das Paket des aktiven Skins, dann die Pakete in Global/Nameplates), mit Abfragen per Index oder ID und Filterung.
 
 <div class="callout warn">
-Abfragemethoden geben Namensschild-Info-Handles zurück. FindWhere ruft eine Lua-Funktion einmal pro Namensschild auf und behält die Einträge, für die sie true zurückgibt.
+Abfragemethoden geben Namensschild-Info-Handles zurück. FindWhere ruft eine Lua-Funktion einmal pro Namensschild auf und behält die Einträge, für die sie true zurückgibt. Namensschild-IDs sind Strings: Ein mitgeliefertes Namensschild verwendet seine Nummer als Text ("66"), ein Paket-Namensschild `<pack>:<key>` (siehe die Anleitung <a href="../guides/nameplates.md">Namensschilder hinzufügen</a>). Jede Methode auf dieser Seite, die eine Namensschild-ID nimmt, akzeptiert auch die Nummer eines mitgelieferten Namensschilds.
 </div>
 
 | Methode | Beschreibung |
@@ -119,15 +119,18 @@ Abfragemethoden geben Namensschild-Info-Handles zurück. FindWhere ruft eine Lua
 Ein Namensschildtitel: lokalisierter Text, Anzeigetyp, ID, Seltenheit und Freischaltbedingung.
 
 <div class="callout warn">
-sf.NameplateInfo und NAMEPLATESLIST geben diese Handles zurück. Das Standard-Anfängernamensschild hat die ID -1, die Seltenheit "Common" und keine Freischaltbedingung.
+sf.NameplateInfo und NAMEPLATESLIST geben diese Handles zurück. Ist kein Namensschild ausgerüstet, gibt sf.NameplateInfo ein Handle mit leerer ID, ohne Titel, mit der Seltenheit "Common" und ohne Freischaltbedingung zurück.
 </div>
 
 | Methode | Beschreibung |
 | --- | --- |
 | `info.Title  -> string` | Titeltext in der aktuellen Sprache. |
 | `info.Type  -> integer` | Anzeigetyp-Code, der an NAMEPLATE:DrawTitlePlate übergeben wird. |
-| `info.Id  -> integer` | Namensschild-ID (-1 für das Standard-Anfängernamensschild). |
+| `info.Id  -> string` | Namensschild-ID: die Nummer als Text für ein mitgeliefertes Namensschild ("66"), `<pack>:<key>` für ein Paket-Namensschild, "", wenn keines ausgerüstet ist. |
 | `info.Rarity  -> string` | Seltenheitsname: "Poor", "Common", "Uncommon", "Rare", "Epic", "Legendary" oder "Mythical". |
+| `info.RarityInt  -> integer` | Die Seltenheit als der Index, den NAMEPLATE:DrawTitlePlate nimmt (0 Poor bis 6 Mythical). |
+| `info.Pack  -> string` | Die ID des Pakets, aus dem das Namensschild stammt, oder "" für ein mitgeliefertes Namensschild. |
+| `info.PackName  -> string` | Der Name des Pakets in der aktuellen Sprache (sein `name` in Nameplates.json, sonst seine ID); "OpenTaiko" für ein mitgeliefertes Namensschild. |
 | `info.UnlockCondition  -> unlockCondition` | Die Freischaltbedingung (siehe Freischaltbedingungs-Handle). |
 
 ### Dan-Schild-Info-Handle

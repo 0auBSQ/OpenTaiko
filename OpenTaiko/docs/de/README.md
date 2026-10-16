@@ -12,7 +12,7 @@ OpenTaiko zeichnet fast jeden Bildschirm außerhalb des eigentlichen Spielgesche
 
 - Falls Sie noch kein Modul geschrieben haben, lesen Sie [So funktionieren Module](getting-started.md): die Ordnerstruktur eines Skins, die Modularten und die Lebenszyklus-Callbacks, die ein Skript erhält.
 - Um eine Funktion nachzuschlagen, öffnen Sie die [API-Referenz](api/) und wählen Sie in der Seitenleiste eine Kategorie.
-- Für ein konkretes Ziel führen die Anleitungen Schritt für Schritt durch [Charaktere](guides/characters.md), [Puchicharas](guides/puchicharas.md), [Skins und Themes](guides/skins.md) sowie [Chart-Freischaltungen](guides/unlockables.md).
+- Für ein konkretes Ziel führen die Anleitungen Schritt für Schritt durch [Charaktere](guides/characters.md), [Puchicharas](guides/puchicharas.md), [Namensschilder](guides/nameplates.md), [Skins und Themes](guides/skins.md) sowie [Chart-Freischaltungen](guides/unlockables.md).
 
 ## Was Sie bauen können
 
@@ -22,6 +22,7 @@ OpenTaiko zeichnet fast jeden Bildschirm außerhalb des eigentlichen Spielgesche
 | Hintergründe | Der Ordner `Graphics/` des Skins | Skripte, die einen Bildschirm dekorieren: den Startbildschirm, den Gameplay-Hintergrund und den Mob, den Ergebnisbildschirm. |
 | Skins und Themes | `System/`, neben dem Spiel | Ein vollständiges visuelles Paket, das ein Spieler installiert und auswählt, mit den Theme-Einstellungen, die es im Optionsbildschirm bereitstellt. |
 | Charaktere und Puchicharas | `Global/Characters/` und `Global/PuchiChara/`, von allen Skins gemeinsam genutzt | Die Tänzer und die kleinen Maskottchen, die während des Spiels reagieren. |
+| Namensschilder | `Global/Nameplates/` oder der Ordner `Nameplates/` des Skins | Pakete mit Namensschildtiteln, die Spieler freischalten und ausrüsten. |
 | Chart-Freischaltungen | Der Songordner, neben dem Chart | Eine `Unlock.json`, die einen Song gesperrt hält, bis der Spieler ihn sich verdient hat. |
 
 ## Experimentelle Abschnitte

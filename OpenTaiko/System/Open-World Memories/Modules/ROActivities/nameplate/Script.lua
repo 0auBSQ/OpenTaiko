@@ -82,9 +82,9 @@ local STAR_GLINT_OFFSETS = { { 9, -11 }, { -9, 6 } }
 local STAR_TIME_WRAP = 45000                       -- a multiple of both periods
 
 local title_badge_of_achievement = nil
-local nameplates_achievement = {134,135,136,78,66,71,44,11,215,218,220,225,229,234,239,246,251,256,260,292}
+local nameplates_achievement = {"134","135","136","78","66","71","44","11","215","218","220","225","229","234","239","246","251","256","260","292"}
 local title_badge_of_team_member = nil
-local nameplates_team_member = {291}
+local nameplates_team_member = {"291"}
 
 local font_name_normal_size = nil
 local font_name_withtitle = nil
@@ -495,7 +495,7 @@ local function implDrawFullNameplate(x, y, opacity, player_lua, side_lua,
 	local titleText   = titleTextOvr   ~= nil and titleTextOvr   or title_text[player_lua]
 	local titleType   = titleTypeOvr   ~= nil and titleTypeOvr   or data.TitleType
 	local rarityInt   = rarityIntOvr   ~= nil and rarityIntOvr   or data.TitleRarityInt
-	local nameplateId = nameplateIdOvr ~= nil and nameplateIdOvr or (data.TitleId or -1)
+	local nameplateId = nameplateIdOvr ~= nil and nameplateIdOvr or (data.TitleId or "")
 	local danText     = danTextOvr     ~= nil and danTextOvr     or dan_text[player_lua]
 	local danShortTxt = danTextOvr     ~= nil and danTextOvr     or dan_short_text[player_lua]
 	-- In AI battle the dan reflects the current AI level, which may change during song select.

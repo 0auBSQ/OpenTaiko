@@ -1,4 +1,6 @@
-﻿namespace OpenTaiko {
+﻿using System.Diagnostics;
+
+namespace OpenTaiko {
 	/// <summary>
 	/// Writable derivation of <see cref="LuaROSaveFile"/>.
 	/// </summary>
@@ -20,11 +22,14 @@
 
 		#region [Unlockables]
 
-		public override void UnlockNameplate(int id) {
-			if (!IsNameplateUnlocked(id)) {
-				_sf.data.UnlockedNameplateIds.Add(id);
-				DBSaves.RegisterUnlockedNameplate(_sf.data.SaveId, id);
+		public override void UnlockNameplate(object id) {
+			string key = DBNameplateUnlockables.tKey(id);
+			if (!OpenTaiko.Databases.DBNameplateUnlockables.data.ContainsKey(key)) {
+				Trace.TraceWarning($"UnlockNameplate: no nameplate has the id \"{key}\".");
+				return;
 			}
+			if (_sf.data.UnlockedNameplateIds.Add(key))
+				DBSaves.RegisterUnlockedNameplate(_sf.data.SaveId, key);
 		}
 
 		public override void UnlockSong(string uniqueId) {
@@ -137,18 +142,16 @@
 			_sf.tApplyHeyaChanges();
 		}
 
-		public override void ChangeNameplate(int id) {
-			if (_sf.data.TitleId == id) return;
-			_sf.data.TitleId = id;
-			if (OpenTaiko.Databases.DBNameplateUnlockables.data.TryGetValue((Int64)id, out var nameplate)) {
-				_sf.data.Title = nameplate.nameplateInfo.cld.GetString("");
-				_sf.data.TitleType = nameplate.nameplateInfo.iType;
-				_sf.data.TitleRarityInt = HRarity.tRarityToLangInt(nameplate.rarity);
-			} else {
-				_sf.data.Title = "";
-				_sf.data.TitleType = 0;
-				_sf.data.TitleRarityInt = 1;
+		/// <summary>Equips the nameplate with the given id; "" or -1 takes the nameplate off.</summary>
+		public override void ChangeNameplate(object id) {
+			string key = DBNameplateUnlockables.tKey(id);
+			if (_sf.data.TitleId == key) return;
+			if (key != "" && !OpenTaiko.Databases.DBNameplateUnlockables.data.ContainsKey(key)) {
+				Trace.TraceWarning($"ChangeNameplate: no nameplate has the id \"{key}\".");
+				return;
 			}
+			_sf.data.TitleId = key;
+			OpenTaiko.Databases.DBNameplateUnlockables.tResolveNameplate(_sf.data);
 			OpenTaiko.NamePlate?.tNamePlateRefreshTitles(_mounted);
 			_sf.tApplyHeyaChanges();
 		}

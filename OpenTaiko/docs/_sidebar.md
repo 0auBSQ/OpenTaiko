@@ -7,6 +7,7 @@
 - Guides
   - [Adding characters](guides/characters.md)
   - [Adding puchicharas](guides/puchicharas.md)
+  - [Adding nameplates](guides/nameplates.md)
   - [Adding skins and themes](guides/skins.md)
   - [Chart unlockables](guides/unlockables.md)
 

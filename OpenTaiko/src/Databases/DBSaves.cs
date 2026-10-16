@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using Microsoft.Data.Sqlite;
 using Newtonsoft.Json;
 
@@ -78,8 +79,8 @@ internal class DBSaves {
 
 	#region [Unlocked Nameplates]
 
-	public static List<int> FetchUnlockedNameplateIds(Int64 sid) {
-		List<int> _nps = new List<int>();
+	public static HashSet<string> FetchUnlockedNameplateIds(Int64 sid) {
+		HashSet<string> _nps = new HashSet<string>();
 		SqliteConnection? connection = GetSavesDBConnection();
 		if (connection == null) return _nps;
 
@@ -87,19 +88,21 @@ internal class DBSaves {
 		command.CommandText = @$"SELECT * FROM nameplate_titles WHERE SaveId={sid};";
 		SqliteDataReader reader = command.ExecuteReader();
 		while (reader.Read()) {
-			_nps.Add((int)(Int64)reader["NameplateId"]);
+			_nps.Add(Convert.ToString(reader["NameplateId"], CultureInfo.InvariantCulture) ?? "");
 		}
 		reader.Close();
 
 		return _nps;
 	}
 
-	public static void RegisterUnlockedNameplate(Int64 SaveId, Int64 NameplateId) {
+	public static void RegisterUnlockedNameplate(Int64 SaveId, string NameplateId) {
 		SqliteConnection? connection = GetSavesDBConnection();
 		if (connection == null) return;
 
 		var command = connection.CreateCommand();
-		command.CommandText = @$"INSERT INTO nameplate_titles(NameplateId,SaveId) VALUES({NameplateId}, {SaveId});";
+		command.CommandText = "INSERT OR IGNORE INTO nameplate_titles(NameplateId,SaveId) VALUES($id, $save);";
+		command.Parameters.AddWithValue("$id", NameplateId);
+		command.Parameters.AddWithValue("$save", SaveId);
 		command.ExecuteNonQuery();
 	}
 
@@ -151,11 +154,9 @@ internal class DBSaves {
 			sf.data.SaveId = (Int64)reader["SaveId"];
 			sf.data.SaveUID = reader["SaveUID"] as string ?? "";
 			sf.data.Name = (string)reader["PlayerName"];
-			sf.data.Title = (string)reader["PlayerNameplateTitle"];
 			sf.data.Dan = (string)reader["PlayerDanTitle"];
 			sf.data.DanGold = Convert.ToBoolean((Int64)reader["PlayerDanGold"]);
 			sf.data.DanType = (int)(Int64)reader["PlayerDanType"];
-			sf.data.TitleType = (int)(Int64)reader["PlayerNameplateType"];
 			sf.data.PuchiChara = (string)reader["PlayerPuchichara"];
 			sf.data.Character = (int)(Int64)reader["PlayerCharacter"];
 			sf.data.CharacterName = (string)reader["PlayerCharacterName"];
@@ -164,11 +165,11 @@ internal class DBSaves {
 			sf.data.TotalPlaycount = (int)(Int64)reader["TotalPlaycount"];
 			sf.data.AIBattleModePlaycount = (int)(Int64)reader["AIBattleModePlaycount"];
 			sf.data.AIBattleModeWins = (int)(Int64)reader["AIBattleModeWins"];
-			sf.data.TitleRarityInt = (int)(Int64)reader["PlayerNameplateRarityInt"];
-			sf.data.TitleId = (int)(Int64)reader["PlayerNameplateId"];
+			sf.data.TitleId = Convert.ToString(reader["PlayerNameplateId"], CultureInfo.InvariantCulture) ?? "";
 			sf.data.SelectedHitsounds = reader["SelectedHitsounds"] as string ?? "Taiko";
 			sf.tInitSaveFile();
 			sf.tLoadUnlockables();
+			OpenTaiko.Databases?.DBNameplateUnlockables?.tResolveNameplate(sf.data);
 
 			_instances[_file] = sf;
 			_file++;
@@ -221,15 +222,12 @@ internal class DBSaves {
 		var command = connection.CreateCommand();
 		command.CommandText = $@" UPDATE saves SET
                 PlayerName = '{SaveData.Name.EscapeSingleQuotes()}',
-                PlayerNameplateTitle = '{SaveData.Title.EscapeSingleQuotes()}',
                 PlayerDanTitle = '{SaveData.Dan.EscapeSingleQuotes()}',
                 PlayerDanGold = {SaveData.DanGold},
                 PlayerDanType = {SaveData.DanType},
-                PlayerNameplateType = {SaveData.TitleType},
                 PlayerPuchichara = '{SaveData.PuchiChara.EscapeSingleQuotes()}',
                 PlayerCharacter = {SaveData.Character},
-                PlayerNameplateRarityInt = {SaveData.TitleRarityInt},
-                PlayerNameplateId = {SaveData.TitleId},
+                PlayerNameplateId = '{(SaveData.TitleId ?? "").EscapeSingleQuotes()}',
                 PlayerCharacterName = '{SaveData.CharacterName.EscapeSingleQuotes()}'
                 WHERE SaveId = {SaveData.SaveId};
             ;";

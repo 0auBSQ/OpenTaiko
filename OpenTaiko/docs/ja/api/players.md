@@ -33,7 +33,7 @@
 | `sf.Name  -> string` | プレイヤーの表示名。 |
 | `sf.SaveId  -> integer` | このセーブの数値データベース id。 |
 | `sf.SaveUID  -> string` | このセーブの一意な文字列 id。 |
-| `sf.NameplateInfo  -> nameplateInfo` | 装備中のネームプレート (ネームプレート情報ハンドルを参照)。保存された id が不明な場合は既定の初心者ネームプレート。 |
+| `sf.NameplateInfo  -> nameplateInfo` | 装備中のネームプレート (ネームプレート情報ハンドルを参照)。何も装備していないか、その id がネームプレートリストにない場合は、id が空で称号のないハンドル。 |
 | `sf.DanplateInfo  -> danplateInfo` | 現在の段位称号 (段位プレート情報ハンドルを参照)。 |
 | `sf.TotalPlaycount  -> integer` | このセーブの合計プレイ回数。 |
 | `sf.AIBattlePlaycount  -> integer` | AI バトルのプレイ回数。 |
@@ -42,8 +42,8 @@
 | `sf.TotalEarnedCoins  -> integer` | セーブの生涯で獲得したコインの合計。 |
 | `sf:SpendCoins(price)  -> nil` | コインを差し引き (残高は 0 未満にならない)、永続化します。 |
 | `sf:EarnCoins(amount)  -> nil` | 残高と獲得合計にコインを加え、永続化します。 |
-| `sf:IsNameplateUnlocked(id)  -> bool` | この id のネームプレートがアンロック済みかどうか。 |
-| `sf:UnlockNameplate(id)  -> nil` | ネームプレートをアンロックして永続化します (アンロック済みなら何もしません)。 |
+| `sf:IsNameplateUnlocked(id)  -> bool` | この id のネームプレートがアンロック済みかどうか。アンロック条件のないネームプレートはすべてのプレイヤーが所有していますが、ここでは false を返します (UnlockCondition.HasCondition を確認してください)。 |
+| `sf:UnlockNameplate(id)  -> nil` | ネームプレートをアンロックして永続化します (アンロック済みなら何もしません)。ネームプレートリストにない id は警告をログに出力し、何もしません。 |
 | `sf:IsSongUnlocked(uniqueId)  -> bool` | この固有 id の楽曲がアンロック済みかどうか。 |
 | `sf:UnlockSong(uniqueId)  -> nil` | 楽曲をアンロックして永続化します (アンロック済みなら何もしません)。 |
 | `sf.SelectedHitsounds  -> string` | 選択中のヒットサウンドセットのフォルダ名。別の名前を代入すると永続化され、プレイヤーのヒットサウンドが再読み込みされます。 |
@@ -67,7 +67,7 @@
 | `sf.SelectedDan  -> string` | アクティブな段位称号のテキスト。 |
 | `sf:ChangeDan(title)  -> nil` | 指定した称号をアクティブにし、プレイヤーが獲得したものであれば金とクリア状態のフラグをコピーし、ネームプレートを更新して永続化します。 |
 | `sf:ChangeName(name)  -> nil` | 表示名を変更し、ネームプレートを更新して永続化します。このメソッドは空または変更のない名前を無視します。 |
-| `sf:ChangeNameplate(id)  -> nil` | この id のネームプレートを装備し、ネームプレートを更新して永続化します。データベースにない id はキャッシュされた称号テキストをクリアします。 |
+| `sf:ChangeNameplate(id)  -> nil` | この id のネームプレートを装備し、ネームプレートを更新して永続化します。空の id または -1 はネームプレートを外します。ネームプレートリストにない id は警告をログに出力し、何も変更しません。 |
 
 ```lua
 local save = GetSaveFile(0)
@@ -93,17 +93,17 @@ end
 
 | メソッド | 説明 |
 | --- | --- |
-| `NAMEPLATE:DrawTitlePlate(x, y, opacity, type, text, rarity, nameplateId)  -> nil` | 指定した表示タイプ、事前描画した称号テクスチャ、レアリティインデックス、ネームプレート id で称号プレートを描画します。 |
+| `NAMEPLATE:DrawTitlePlate(x, y, opacity, type, text, rarity, nameplateId)  -> nil` | 指定した表示タイプ、事前描画した称号テクスチャ、レアリティインデックス、ネームプレート id で称号プレートを描画します (id がバッジを決めます)。 |
 | `NAMEPLATE:DrawDanPlate(x, y, opacity, danGrade, text)  -> nil` | 事前描画した称号テクスチャを使い、指定した段位の段位プレートを描画します。 |
 | `NAMEPLATE:DrawPlayerNameplate(x, y, opacity, player)  -> nil` | プレイヤースロットの完全なネームプレートを描画します。赤側か青側かはゲームの 1P 側設定に従います。 |
-| `NAMEPLATE:DrawNameplateTitleById(id, x, y, opacity, font)  -> nil` | この id のネームプレートのローカライズされた称号をテキストオブジェクトで描画し、称号プレートとして描きます。id はネームプレートデータベースに存在する必要があります。 |
+| `NAMEPLATE:DrawNameplateTitleById(id, x, y, opacity, font)  -> nil` | この id のネームプレートのローカライズされた称号をテキストオブジェクトで描画し、称号プレートとして描きます。ネームプレートリストにない id では何も描画しません。 |
 
 ### NAMEPLATESLIST
 
-ゲームが知っているすべてのネームプレートのデータベースで、インデックスや id による検索とフィルタリングを備えます。
+ゲームが読み込んだすべてのネームプレートのリスト (同梱のネームプレート、次にアクティブなスキンのパック、次に Global/Nameplates のパック) で、インデックスや id による検索とフィルタリングを備えます。
 
 <div class="callout warn">
-問い合わせメソッドはネームプレート情報ハンドルを返します。FindWhere はネームプレートごとに Lua 関数を 1 回呼び、true を返したエントリを残します。
+問い合わせメソッドはネームプレート情報ハンドルを返します。FindWhere はネームプレートごとに Lua 関数を 1 回呼び、true を返したエントリを残します。ネームプレート id は文字列です。同梱のネームプレートは番号をテキストにしたもの ("66")、パックのネームプレートは `<pack>:<key>` を使います (<a href="../guides/nameplates.md">ネームプレートの追加</a>ガイドを参照)。このページでネームプレート id を取るすべてのメソッドは、同梱のネームプレートの番号も受け付けます。
 </div>
 
 | メソッド | 説明 |
@@ -119,15 +119,18 @@ end
 1 つのネームプレート称号: ローカライズされたテキスト、表示タイプ、id、レアリティ、アンロック条件。
 
 <div class="callout warn">
-sf.NameplateInfo と NAMEPLATESLIST がこのハンドルを返します。既定の初心者ネームプレートは id -1、レアリティ "Common" で、アンロック条件を持ちません。
+sf.NameplateInfo と NAMEPLATESLIST がこのハンドルを返します。ネームプレートを何も装備していないとき、sf.NameplateInfo は id が空で、称号がなく、レアリティが "Common" で、アンロック条件のないハンドルを返します。
 </div>
 
 | メソッド | 説明 |
 | --- | --- |
 | `info.Title  -> string` | 現在の言語での称号テキスト。 |
 | `info.Type  -> integer` | NAMEPLATE:DrawTitlePlate に渡す表示タイプコード。 |
-| `info.Id  -> integer` | ネームプレート id (既定の初心者ネームプレートは -1)。 |
+| `info.Id  -> string` | ネームプレート id。同梱のネームプレートは番号のテキスト ("66")、パックのネームプレートは `<pack>:<key>`、何も装備していないときは ""。 |
 | `info.Rarity  -> string` | レアリティ名: "Poor"、"Common"、"Uncommon"、"Rare"、"Epic"、"Legendary"、"Mythical"。 |
+| `info.RarityInt  -> integer` | NAMEPLATE:DrawTitlePlate が取るインデックスとしてのレアリティ (0 Poor から 6 Mythical)。 |
+| `info.Pack  -> string` | ネームプレートが属するパックの id。同梱のネームプレートでは ""。 |
+| `info.PackName  -> string` | 現在の言語でのパックの名前 (Nameplates.json の `name`、なければパックの id)。同梱のネームプレートでは "OpenTaiko"。 |
 | `info.UnlockCondition  -> unlockCondition` | アンロック条件 (アンロック条件ハンドルを参照)。 |
 
 ### 段位プレート情報ハンドル

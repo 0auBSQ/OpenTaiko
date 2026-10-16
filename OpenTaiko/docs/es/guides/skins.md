@@ -42,6 +42,7 @@ Copia `System/Open-World Memories/` a una nueva carpeta hermana, por ejemplo `Sy
 - `Resolution=W,H`: la resolución para la que diseñas los valores de disposición (por defecto `1280,720`). El skin incluido usa `1920,1080`.
 - `Resolutions=`: multiplicadores de escala de renderizado seleccionables (Paso 4).
 - `AIBattleCharacter=`: carpeta de personaje usada para el oponente IA (Paso 5).
+- `AIBattleNameplate=`: id de la placa de nombre que lleva el oponente IA (Paso 5).
 - `FontName<LANG>=` y `BoxFontName<LANG>=`: archivo de fuente por idioma del juego, donde `<LANG>` es el código de idioma en mayúsculas (`EN`, `JA`, `FR`, `ES`, `NL`, `DE`, `RU`, `KO`, `ZH`). La ruta es relativa a la raíz del skin (una ruta absoluta también funciona) y el archivo debe existir; si no, el analizador descarta la clave.
 
 Todas las demás claves (`Game_*`, `Result_*`, `Title_*`, etc.) son valores de disposición de pantalla. El mismo analizador las lee, y por eso pueden vivir en los archivos incluidos del Paso 6.
@@ -57,6 +58,8 @@ Resolution=1920,1080
 Resolutions=1,2/3,1/3
 ;Carpeta de personaje usada para la ranura de batalla contra la IA.
 AIBattleCharacter=10v2 - AItritus
+;Placa de nombre que lleva el rival de la batalla contra la IA (un id de la lista de placas de nombre).
+AIBattleNameplate=66
 FontNameEN=Fonts/MPLUSRounded1c-Medium.ttf
 FontNameJA=Fonts/MPLUSRounded1c-Medium.ttf
 BoxFontNameEN=Fonts/MPLUSRounded1c-Regular.ttf
@@ -76,13 +79,17 @@ Resolutions=1,2/3,1/3
 ;   1/3   -> 640x360
 ```
 
-## Paso 5: La opción AIBattleCharacter
+## Paso 5: Las opciones de la batalla contra la IA
 
 `AIBattleCharacter=` nombra la carpeta dentro de `Global/Characters/` que el juego usa para el oponente IA en el modo de batalla contra la IA. El valor por defecto es `10v2 - AItritus`. La carpeta indicada debe existir.
+
+`AIBattleNameplate=` indica por su id la placa de nombre que lleva el oponente IA (consulta [Añadir placas de nombre](nameplates.md)). El valor por defecto es `66`. Con un id que no figura en la lista de placas de nombre, el juego muestra la placa de la IA sin título.
 
 ```ini
 ;Carpeta de personaje usada para la ranura de batalla contra la IA.
 AIBattleCharacter=10v2 - AItritus
+;Placa de nombre que lleva el rival de la batalla contra la IA (un id de la lista de placas de nombre).
+AIBattleNameplate=66
 ```
 
 ## Paso 6: Dividir la configuración con #include

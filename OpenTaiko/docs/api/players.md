@@ -33,7 +33,7 @@ Read properties with dot syntax (sf.Name, sf.Coins). Write methods persist immed
 | `sf.Name  -> string` | The player's displayed name. |
 | `sf.SaveId  -> integer` | The numeric database id of this save. |
 | `sf.SaveUID  -> string` | The unique string id of this save. |
-| `sf.NameplateInfo  -> nameplateInfo` | The equipped nameplate (see Nameplate info handle), or the default beginner nameplate if the stored id is unknown. |
+| `sf.NameplateInfo  -> nameplateInfo` | The equipped nameplate (see Nameplate info handle). When none is equipped, or its id is not in the nameplate list, it returns a handle with an empty id and no title. |
 | `sf.DanplateInfo  -> danplateInfo` | The current dan title (see Danplate info handle). |
 | `sf.TotalPlaycount  -> integer` | Total number of plays on this save. |
 | `sf.AIBattlePlaycount  -> integer` | Number of AI battle plays. |
@@ -42,8 +42,8 @@ Read properties with dot syntax (sf.Name, sf.Coins). Write methods persist immed
 | `sf.TotalEarnedCoins  -> integer` | Total coins earned over the life of the save. |
 | `sf:SpendCoins(price)  -> nil` | Deducts coins (the balance never goes below 0) and persists. |
 | `sf:EarnCoins(amount)  -> nil` | Adds coins to the balance and to the total earned, and persists. |
-| `sf:IsNameplateUnlocked(id)  -> bool` | Whether the nameplate with this id is unlocked. |
-| `sf:UnlockNameplate(id)  -> nil` | Unlocks a nameplate and persists (no-op if already unlocked). |
+| `sf:IsNameplateUnlocked(id)  -> bool` | Whether the nameplate with this id is unlocked. A nameplate without an unlock condition returns false here, although every player owns it (check UnlockCondition.HasCondition). |
+| `sf:UnlockNameplate(id)  -> nil` | Unlocks a nameplate and persists (no-op if already unlocked). An id that is not in the nameplate list logs a warning and does nothing. |
 | `sf:IsSongUnlocked(uniqueId)  -> bool` | Whether the song with this unique id is unlocked. |
 | `sf:UnlockSong(uniqueId)  -> nil` | Unlocks a song and persists (no-op if already unlocked). |
 | `sf.SelectedHitsounds  -> string` | Folder name of the selected hitsound set. Assigning a different name persists it and reloads the player's hitsounds. |
@@ -67,7 +67,7 @@ Read properties with dot syntax (sf.Name, sf.Coins). Write methods persist immed
 | `sf.SelectedDan  -> string` | Text of the active dan title. |
 | `sf:ChangeDan(title)  -> nil` | Makes the given title active, copying its gold and clear-status flags if it is one the player earned, refreshes the nameplate and persists. |
 | `sf:ChangeName(name)  -> nil` | Changes the displayed name, refreshes the nameplate and persists. The method ignores empty or unchanged names. |
-| `sf:ChangeNameplate(id)  -> nil` | Equips the nameplate with this id, refreshes the nameplate and persists. An id missing from the database clears the cached title text. |
+| `sf:ChangeNameplate(id)  -> nil` | Equips the nameplate with this id, refreshes the nameplate and persists. An empty id or -1 takes the nameplate off; an id that is not in the nameplate list logs a warning and changes nothing. |
 
 ```lua
 local save = GetSaveFile(0)
@@ -93,17 +93,17 @@ The skin's nameplate ROActivity (Modules/ROActivities/nameplate) does the drawin
 
 | Method | Description |
 | --- | --- |
-| `NAMEPLATE:DrawTitlePlate(x, y, opacity, type, text, rarity, nameplateId)  -> nil` | Draws a title plate with the given display type, pre-rendered title texture, rarity index and nameplate id. |
+| `NAMEPLATE:DrawTitlePlate(x, y, opacity, type, text, rarity, nameplateId)  -> nil` | Draws a title plate with the given display type, pre-rendered title texture, rarity index and nameplate id (the id selects the badge). |
 | `NAMEPLATE:DrawDanPlate(x, y, opacity, danGrade, text)  -> nil` | Draws a dan plate for the given grade using a pre-rendered title texture. |
 | `NAMEPLATE:DrawPlayerNameplate(x, y, opacity, player)  -> nil` | Draws the complete nameplate of a player slot; the red or blue side follows the game's 1P side setting. |
-| `NAMEPLATE:DrawNameplateTitleById(id, x, y, opacity, font)  -> nil` | Renders the localized title of the nameplate with this id using a text object and draws it as a title plate. The id must exist in the nameplate database. |
+| `NAMEPLATE:DrawNameplateTitleById(id, x, y, opacity, font)  -> nil` | Renders the localized title of the nameplate with this id using a text object and draws it as a title plate. Draws nothing for an id that is not in the nameplate list. |
 
 ### NAMEPLATESLIST
 
-The database of every nameplate the game knows, with lookups by index or id and filtering.
+The list of every nameplate the game loaded (the shipped nameplates, then the active skin's pack, then the packs in Global/Nameplates), with lookups by index or id and filtering.
 
 <div class="callout warn">
-Query methods return nameplate info handles. FindWhere calls a Lua function once per nameplate and keeps the entries for which it returns true.
+Query methods return nameplate info handles. FindWhere calls a Lua function once per nameplate and keeps the entries for which it returns true. Nameplate ids are strings: a shipped nameplate uses its number as text ("66"), a pack nameplate `<pack>:<key>` (see the <a href="../guides/nameplates.md">Adding nameplates</a> guide). Every method on this page that takes a nameplate id also accepts the number of a shipped nameplate.
 </div>
 
 | Method | Description |
@@ -119,15 +119,18 @@ Query methods return nameplate info handles. FindWhere calls a Lua function once
 One nameplate title: localized text, display type, id, rarity and unlock condition.
 
 <div class="callout warn">
-sf.NameplateInfo and NAMEPLATESLIST return these handles. The default beginner nameplate has id -1, rarity "Common" and no unlock condition.
+sf.NameplateInfo and NAMEPLATESLIST return these handles. When no nameplate is equipped, sf.NameplateInfo returns a handle with an empty id, no title, rarity "Common" and no unlock condition.
 </div>
 
 | Method | Description |
 | --- | --- |
 | `info.Title  -> string` | Title text in the current language. |
 | `info.Type  -> integer` | Display type code passed to NAMEPLATE:DrawTitlePlate. |
-| `info.Id  -> integer` | Nameplate id (-1 for the default beginner nameplate). |
+| `info.Id  -> string` | Nameplate id: the number as text for a shipped nameplate ("66"), `<pack>:<key>` for a pack nameplate, "" when none is equipped. |
 | `info.Rarity  -> string` | Rarity name: "Poor", "Common", "Uncommon", "Rare", "Epic", "Legendary" or "Mythical". |
+| `info.RarityInt  -> integer` | The rarity as the index NAMEPLATE:DrawTitlePlate takes (0 Poor to 6 Mythical). |
+| `info.Pack  -> string` | The id of the pack the nameplate comes from, or "" for a shipped nameplate. |
+| `info.PackName  -> string` | The name of the pack in the current language (its `name` in Nameplates.json, else its id); "OpenTaiko" for a shipped nameplate. |
 | `info.UnlockCondition  -> unlockCondition` | The unlock condition (see Unlock condition handle). |
 
 ### Danplate info handle

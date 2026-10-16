@@ -25,11 +25,9 @@ class CNamePlate {
 		}
 	}
 
-	// the equipped title in the language in use: a save keeps the text of the language it was equipped in
-	private static string tLocalizedTitle(SaveFile.Data data) {
-		var db = OpenTaiko.Databases?.DBNameplateUnlockables?.data;
-		if (data.TitleId > 0 && db != null && db.TryGetValue((Int64)data.TitleId, out var nameplate))
-			data.Title = nameplate.nameplateInfo.cld.GetString(data.Title);
+	// the equipped title in the language in use, with its plate type and rarity
+	private static string tResolvedTitle(SaveFile.Data data) {
+		OpenTaiko.Databases?.DBNameplateUnlockables?.tResolveNameplate(data);
 		return data.Title;
 	}
 
@@ -51,11 +49,11 @@ class CNamePlate {
 
 			dan = stages[Math.Max(0, OpenTaiko.ConfigIni.nAILevel - 1)] + "面";
 
-			// The AI virtual slot owns a permanent SaveFile.Data (VirtualData) whose
-			// title/rarity/type fields were pre-set to nameplate #66 by RefreshAINameplate().
+			// The AI virtual slot owns a permanent SaveFile.Data (VirtualData) whose nameplate
+			// is #66 (RefreshAINameplate); resolving it again follows the language in use.
 			// Lua stores VirtualData by reference, so updates here are visible in draw().
 			var aiVData = CVirtualSlotManager.AI.VirtualData;
-			title           = aiVData.Title;
+			title           = tResolvedTitle(aiVData);
 			aiVData.Name    = name;
 			aiVData.Dan     = dan;
 
@@ -94,12 +92,12 @@ class CNamePlate {
 						srcPlayer = mount[0] - '1';
 					data = OpenTaiko.SaveFileInstances[srcPlayer].data;
 					name  = data.Name;
-					title = tLocalizedTitle(data);
+					title = tResolvedTitle(data);
 					dan   = data.Dan;
 				} else {
 					data  = OpenTaiko.SaveFileInstances[actualPlayer].data;
 					name  = data.Name;
-					title = tLocalizedTitle(data);
+					title = tResolvedTitle(data);
 					dan   = data.Dan;
 				}
 
@@ -142,12 +140,12 @@ class CNamePlate {
 		DrawDan(x, y, opacity, danGrade, new LuaTexture(text));
 
 	/// <summary>Draws only the title plate (used in My Room gallery and modal).</summary>
-	public void DrawTitlePlate(double x, double y, int opacity, int type, LuaTexture text, int rarity, int nameplateId) {
+	public void DrawTitlePlate(double x, double y, int opacity, int type, LuaTexture text, int rarity, string nameplateId) {
 		Script?.Draw(DrawModeTitle, x, y, opacity, type, text, rarity, nameplateId);
 	}
 
-	/// <inheritdoc cref="DrawTitlePlate(double,double,int,int,LuaTexture,int,int)"/>
-	public void DrawTitlePlate(double x, double y, int opacity, int type, CTexture text, int rarity, int nameplateId) =>
+	/// <inheritdoc cref="DrawTitlePlate(double,double,int,int,LuaTexture,int,string)"/>
+	public void DrawTitlePlate(double x, double y, int opacity, int type, CTexture text, int rarity, string nameplateId) =>
 		DrawTitlePlate(x, y, opacity, type, new LuaTexture(text), rarity, nameplateId);
 
 	/// <summary>Advances nameplate animation state; call once per frame.</summary>

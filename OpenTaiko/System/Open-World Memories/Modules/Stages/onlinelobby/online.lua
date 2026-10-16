@@ -61,17 +61,18 @@ function LO.myName() local sf = GetSaveFile(0); local n = sf and sf.Name; if n =
 -- full join info so the host can mount each remote player onto a virtual slot (character + puchi + nameplate)
 function LO.selfInfo()
     local sf = GetSaveFile(0)
-    local char, puchi, title, dan = "None", "None", "", ""
-    local npid, dgold, dtype = -1, false, 0
+    local char, puchi, dan = "None", "None", ""
+    local npk, dgold, dtype = "", false, 0
     pcall(function() char = sf.CharacterName or "None" end)
     pcall(function() local p = sf:GetPuchichara(); if p then puchi = p.FolderName or "None" end end)
-    pcall(function() local np = sf.NameplateInfo; if np then title = np.Title or ""; npid = np.Id or -1 end end)
+    pcall(function() local np = sf.NameplateInfo; if np then npk = np.Id or "" end end)
     pcall(function() dan = sf.SelectedDan or "" end)
     pcall(function() local dp = sf.DanplateInfo; if dp then dgold = dp.Gold and true or false; dtype = dp.ClearStatus or 0 end end)
-    -- npid lets the receiver resolve nameplate type+rarity+text from its (identical) catalogue; dgold/dtype style the dan plate
+    -- npk is the nameplate id: the receiver takes title, type and rarity from its own catalogue, and shows no title when it
+    -- doesn't have that id; dgold/dtype style the dan plate
     -- pal carries the character palette gradient (stops+blend) so remote V-slots render in the right colours.
-    return string.format('{"name":%s,"char":%s,"puchi":%s,"title":%s,"dan":%s,"npid":%d,"dgold":%s,"dtype":%d,"pal":%s}',
-        jstr(LO.myName()), jstr(char), jstr(puchi), jstr(title), jstr(dan), npid, tostring(dgold), dtype, LO.selfPaletteJson())
+    return string.format('{"name":%s,"char":%s,"puchi":%s,"dan":%s,"npk":%s,"dgold":%s,"dtype":%d,"pal":%s}',
+        jstr(LO.myName()), jstr(char), jstr(puchi), jstr(dan), jstr(npk), tostring(dgold), dtype, LO.selfPaletteJson())
 end
 -- the local player's selected character palette, as a self-contained JSON object {"b":blend,"s":[[pos,r,g,b(,a)],...]}
 -- (or "null"). Read from the char's own Palettes.json by the persisted selection index, so the receiver can apply
@@ -234,9 +235,8 @@ function LO.refreshRoster()
             net.infoByPeer[id] = { name = names[id],
                 char  = (io and JSONLOADER:JsonGet(io, "char"))  or "None",
                 puchi = (io and JSONLOADER:JsonGet(io, "puchi")) or "None",
-                title = (io and JSONLOADER:JsonGet(io, "title")) or "",
                 dan   = (io and JSONLOADER:JsonGet(io, "dan"))   or "",
-                npid  = floor((io and JSONLOADER:JsonGet(io, "npid")) or -1),
+                npk   = tostring((io and JSONLOADER:JsonGet(io, "npk")) or ""),
                 dgold = (io and JSONLOADER:JsonGet(io, "dgold")) and true or false,
                 dtype = floor((io and JSONLOADER:JsonGet(io, "dtype")) or 0),
                 palStops = palStops, palBlend = palBlend }
@@ -453,8 +453,8 @@ function LO.mountRemotes()
         if i > LO.MAXP - 1 then break end
         spots[id] = i
         local inf = net.infoByPeer[id] or {}
-        key = key .. id .. "|" .. tostring(inf.name) .. "|" .. tostring(inf.npid) .. "|" .. tostring(inf.char) .. "|"
-            .. tostring(inf.title) .. "|" .. tostring(inf.dan) .. ";"
+        key = key .. id .. "|" .. tostring(inf.name) .. "|" .. tostring(inf.npk) .. "|" .. tostring(inf.char) .. "|"
+            .. tostring(inf.dan) .. ";"
     end
     LO.spotOf = spots
     if key == mountedKey then return end
@@ -466,9 +466,8 @@ function LO.mountRemotes()
             VIRTUALSLOTS:SetCharacter(i, inf.char or "None")
             VIRTUALSLOTS:SetPuchichara(i, inf.puchi or "None")
             VIRTUALSLOTS:SetNameplateName(i, inf.name or ("P" .. id))
-            VIRTUALSLOTS:SetNameplateTitle(i, inf.title or "")
             VIRTUALSLOTS:SetNameplateDan(i, inf.dan or "")
-            if (inf.npid or -1) >= 0 then VIRTUALSLOTS:SetNameplateById(i, inf.npid) end
+            VIRTUALSLOTS:SetNameplateById(i, inf.npk or "")
             VIRTUALSLOTS:SetNameplateDanType(i, inf.dtype or 0)
             VIRTUALSLOTS:SetNameplateDanGold(i, inf.dgold and true or false)
             VIRTUALSLOTS:MountSlot(i + 1, "V" .. i)
@@ -516,10 +515,9 @@ function LO.launchPlay()
             VIRTUALSLOTS:SetCharacter(slot, inf.char or "None")
             VIRTUALSLOTS:SetPuchichara(slot, inf.puchi or "None")
             VIRTUALSLOTS:SetNameplateName(slot, inf.name or ("P" .. id))
-            VIRTUALSLOTS:SetNameplateTitle(slot, inf.title or "")
             VIRTUALSLOTS:SetNameplateDan(slot, inf.dan or "")
-            -- share nameplate styling: id resolves type+rarity (+title text) from the catalogue; dan plate type/gold
-            if (inf.npid or -1) >= 0 then VIRTUALSLOTS:SetNameplateById(slot, inf.npid) end
+            -- the nameplate id resolves title, type and rarity from this machine's catalogue (no title if unknown); dan plate type/gold
+            VIRTUALSLOTS:SetNameplateById(slot, inf.npk or "")
             VIRTUALSLOTS:SetNameplateDanType(slot, inf.dtype or 0)
             VIRTUALSLOTS:SetNameplateDanGold(slot, inf.dgold and true or false)
             VIRTUALSLOTS:MountSlot(i, "V" .. slot)

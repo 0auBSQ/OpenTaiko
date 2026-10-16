@@ -7,6 +7,7 @@
 - 가이드
   - [캐릭터 추가하기](guides/characters.md)
   - [푸치캬라 추가하기](guides/puchicharas.md)
+  - [네임플레이트 추가하기](guides/nameplates.md)
   - [스킨과 테마 추가하기](guides/skins.md)
   - [채보 잠금 해제 요소](guides/unlockables.md)
 

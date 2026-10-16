@@ -7,6 +7,7 @@
 - 指南
   - [添加角色](guides/characters.md)
   - [添加小角色](guides/puchicharas.md)
+  - [添加名牌](guides/nameplates.md)
   - [添加皮肤与主题](guides/skins.md)
   - [谱面解锁条件](guides/unlockables.md)
 

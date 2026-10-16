@@ -7,6 +7,7 @@
 - Anleitungen
   - [Charaktere hinzufügen](guides/characters.md)
   - [Puchicharas hinzufügen](guides/puchicharas.md)
+  - [Namensschilder hinzufügen](guides/nameplates.md)
   - [Skins und Themes hinzufügen](guides/skins.md)
   - [Chart-Freischaltungen](guides/unlockables.md)
 

@@ -42,6 +42,7 @@ System/
 - `Resolution=W,H`: レイアウト値を作成する基準となる解像度 (既定 `1280,720`)。同梱スキンは `1920,1080` を使っています。
 - `Resolutions=`: 選択可能なレンダースケールの倍率 (ステップ 4)。
 - `AIBattleCharacter=`: AI の対戦相手に使うキャラクターフォルダ (ステップ 5)。
+- `AIBattleNameplate=`: AI の対戦相手が装備するネームプレートの id (ステップ 5)。
 - `FontName<LANG>=` と `BoxFontName<LANG>=`: ゲーム言語ごとのフォントファイル。`<LANG>` は大文字の言語コード (`EN`、`JA`、`FR`、`ES`、`NL`、`DE`、`RU`、`KO`、`ZH`) です。パスはスキンのルートからの相対パス (絶対パスも可) で、ファイルが存在しなければパーサーはキーを破棄します。
 
 それ以外のすべてのキー (`Game_*`、`Result_*`、`Title_*` など) は画面のレイアウト値です。同じパーサーがこれらを読み取るため、ステップ 6 のインクルードされるファイルに置くことができます。
@@ -57,6 +58,8 @@ Resolution=1920,1080
 Resolutions=1,2/3,1/3
 ;Character folder used for the AI battle slot.
 AIBattleCharacter=10v2 - AItritus
+;Nameplate the AI battle opponent wears (an id from the nameplate list).
+AIBattleNameplate=66
 FontNameEN=Fonts/MPLUSRounded1c-Medium.ttf
 FontNameJA=Fonts/MPLUSRounded1c-Medium.ttf
 BoxFontNameEN=Fonts/MPLUSRounded1c-Regular.ttf
@@ -76,13 +79,17 @@ Resolutions=1,2/3,1/3
 ;   1/3   -> 640x360
 ```
 
-## ステップ 5: AIBattleCharacter オプション
+## ステップ 5: AI バトルのオプション
 
 `AIBattleCharacter=` は、AI バトルモードで AI の対戦相手にゲームが使う `Global/Characters/` の下のフォルダを指定します。既定は `10v2 - AItritus` です。指定したフォルダは存在している必要があります。
+
+`AIBattleNameplate=` は、AI の対戦相手が装備するネームプレートを id で指定します ([ネームプレートの追加](nameplates.md)を参照)。既定は `66` です。ネームプレートリストにない id を指定すると、AI のプレートは称号なしで表示されます。
 
 ```ini
 ;Character folder used for the AI battle slot.
 AIBattleCharacter=10v2 - AItritus
+;Nameplate the AI battle opponent wears (an id from the nameplate list).
+AIBattleNameplate=66
 ```
 
 ## ステップ 6: #include で設定を分割する

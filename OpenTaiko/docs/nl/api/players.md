@@ -33,7 +33,7 @@ Lees eigenschappen met puntsyntaxis (sf.Name, sf.Coins). Schrijfmethoden slaan o
 | `sf.Name  -> string` | De weergegeven naam van de speler. |
 | `sf.SaveId  -> integer` | Het numerieke database-id van dit opslagbestand. |
 | `sf.SaveUID  -> string` | Het unieke string-id van dit opslagbestand. |
-| `sf.NameplateInfo  -> nameplateInfo` | Het uitgeruste naamplaatje (zie Naamplaatje-info-handle), of het standaard beginnersnaamplaatje als het opgeslagen id onbekend is. |
+| `sf.NameplateInfo  -> nameplateInfo` | Het uitgeruste naamplaatje (zie Naamplaatje-info-handle). Als er geen is uitgerust, of als het id ervan niet in de naamplaatjeslijst staat, een handle met een leeg id en zonder titel. |
 | `sf.DanplateInfo  -> danplateInfo` | De huidige dan-titel (zie Dan-plaatje-info-handle). |
 | `sf.TotalPlaycount  -> integer` | Totaal aantal spelbeurten op dit opslagbestand. |
 | `sf.AIBattlePlaycount  -> integer` | Aantal AI-gevechten. |
@@ -42,8 +42,8 @@ Lees eigenschappen met puntsyntaxis (sf.Name, sf.Coins). Schrijfmethoden slaan o
 | `sf.TotalEarnedCoins  -> integer` | Totaal aantal munten verdiend over de levensduur van het opslagbestand. |
 | `sf:SpendCoins(price)  -> nil` | Trekt munten af (het saldo komt nooit onder 0) en slaat op. |
 | `sf:EarnCoins(amount)  -> nil` | Voegt munten toe aan het saldo en aan het totaal verdiende, en slaat op. |
-| `sf:IsNameplateUnlocked(id)  -> bool` | Of het naamplaatje met dit id is ontgrendeld. |
-| `sf:UnlockNameplate(id)  -> nil` | Ontgrendelt een naamplaatje en slaat op (no-op als het al ontgrendeld is). |
+| `sf:IsNameplateUnlocked(id)  -> bool` | Of het naamplaatje met dit id is ontgrendeld. Voor een naamplaatje zonder ontgrendelvoorwaarde geeft de methode hier false terug, hoewel elke speler het bezit (controleer UnlockCondition.HasCondition). |
+| `sf:UnlockNameplate(id)  -> nil` | Ontgrendelt een naamplaatje en slaat op (no-op als het al ontgrendeld is). Een id dat niet in de naamplaatjeslijst staat, logt een waarschuwing en doet niets. |
 | `sf:IsSongUnlocked(uniqueId)  -> bool` | Of het nummer met dit unieke id is ontgrendeld. |
 | `sf:UnlockSong(uniqueId)  -> nil` | Ontgrendelt een nummer en slaat op (no-op als het al ontgrendeld is). |
 | `sf.SelectedHitsounds  -> string` | Mapnaam van de geselecteerde hitsound-set. Het toewijzen van een andere naam slaat die op en herlaadt de hitsounds van de speler. |
@@ -67,7 +67,7 @@ Lees eigenschappen met puntsyntaxis (sf.Name, sf.Coins). Schrijfmethoden slaan o
 | `sf.SelectedDan  -> string` | Tekst van de actieve dan-titel. |
 | `sf:ChangeDan(title)  -> nil` | Maakt de gegeven titel actief, kopieert zijn goud- en clearstatusvlaggen als het er een is die de speler heeft verdiend, vernieuwt het naamplaatje en slaat op. |
 | `sf:ChangeName(name)  -> nil` | Wijzigt de weergegeven naam, vernieuwt het naamplaatje en slaat op. De methode negeert lege of ongewijzigde namen. |
-| `sf:ChangeNameplate(id)  -> nil` | Rust het naamplaatje met dit id uit, vernieuwt het naamplaatje en slaat op. Een id dat in de database ontbreekt, wist de gecachte titeltekst. |
+| `sf:ChangeNameplate(id)  -> nil` | Rust het naamplaatje met dit id uit, vernieuwt het naamplaatje en slaat op. Een leeg id of -1 legt het naamplaatje af; een id dat niet in de naamplaatjeslijst staat, logt een waarschuwing en verandert niets. |
 
 ```lua
 local save = GetSaveFile(0)
@@ -93,17 +93,17 @@ De ROActivity nameplate van de skin (Modules/ROActivities/nameplate) doet het te
 
 | Methode | Beschrijving |
 | --- | --- |
-| `NAMEPLATE:DrawTitlePlate(x, y, opacity, type, text, rarity, nameplateId)  -> nil` | Tekent een titelplaatje met het gegeven weergavetype, de vooraf gerenderde titeltextuur, de zeldzaamheidsindex en het naamplaatje-id. |
+| `NAMEPLATE:DrawTitlePlate(x, y, opacity, type, text, rarity, nameplateId)  -> nil` | Tekent een titelplaatje met het gegeven weergavetype, de vooraf gerenderde titeltextuur, de zeldzaamheidsindex en het naamplaatje-id (het id bepaalt de badge). |
 | `NAMEPLATE:DrawDanPlate(x, y, opacity, danGrade, text)  -> nil` | Tekent een dan-plaatje voor de gegeven graad met een vooraf gerenderde titeltextuur. |
 | `NAMEPLATE:DrawPlayerNameplate(x, y, opacity, player)  -> nil` | Tekent het complete naamplaatje van een spelerslot; de rode of blauwe kant volgt de 1P-kantinstelling van het spel. |
-| `NAMEPLATE:DrawNameplateTitleById(id, x, y, opacity, font)  -> nil` | Rendert de gelokaliseerde titel van het naamplaatje met dit id met een tekstobject en tekent die als titelplaatje. Het id moet in de naamplaatjesdatabase bestaan. |
+| `NAMEPLATE:DrawNameplateTitleById(id, x, y, opacity, font)  -> nil` | Rendert de gelokaliseerde titel van het naamplaatje met dit id met een tekstobject en tekent die als titelplaatje. Tekent niets voor een id dat niet in de naamplaatjeslijst staat. |
 
 ### NAMEPLATESLIST
 
-De database van elk naamplaatje dat het spel kent, met opzoeken op index of id en filteren.
+De lijst van elk naamplaatje dat het spel heeft geladen (de meegeleverde naamplaatjes, dan het pakket van de actieve skin, dan de pakketten in Global/Nameplates), met opzoeken op index of id en filteren.
 
 <div class="callout warn">
-Zoekmethoden geven naamplaatje-info-handles terug. FindWhere roept een Lua-functie eenmaal per naamplaatje aan en behoudt de items waarvoor die true teruggeeft.
+Zoekmethoden geven naamplaatje-info-handles terug. FindWhere roept een Lua-functie eenmaal per naamplaatje aan en behoudt de items waarvoor die true teruggeeft. Naamplaatje-id's zijn strings: een meegeleverd naamplaatje gebruikt zijn nummer als tekst ("66"), een pakketnaamplaatje `<pack>:<key>` (zie de handleiding <a href="../guides/nameplates.md">Naamplaatjes toevoegen</a>). Elke methode op deze pagina die een naamplaatje-id aanneemt, accepteert ook het nummer van een meegeleverd naamplaatje.
 </div>
 
 | Methode | Beschrijving |
@@ -119,15 +119,18 @@ Zoekmethoden geven naamplaatje-info-handles terug. FindWhere roept een Lua-funct
 Eén naamplaatjestitel: gelokaliseerde tekst, weergavetype, id, zeldzaamheid en ontgrendelvoorwaarde.
 
 <div class="callout warn">
-sf.NameplateInfo en NAMEPLATESLIST geven deze handles terug. Het standaard beginnersnaamplaatje heeft id -1, zeldzaamheid "Common" en geen ontgrendelvoorwaarde.
+sf.NameplateInfo en NAMEPLATESLIST geven deze handles terug. Als er geen naamplaatje is uitgerust, geeft sf.NameplateInfo een handle terug met een leeg id, geen titel, zeldzaamheid "Common" en geen ontgrendelvoorwaarde.
 </div>
 
 | Methode | Beschrijving |
 | --- | --- |
 | `info.Title  -> string` | Titeltekst in de huidige taal. |
 | `info.Type  -> integer` | Weergavetypecode die aan NAMEPLATE:DrawTitlePlate wordt doorgegeven. |
-| `info.Id  -> integer` | Naamplaatje-id (-1 voor het standaard beginnersnaamplaatje). |
+| `info.Id  -> string` | Naamplaatje-id: het nummer als tekst voor een meegeleverd naamplaatje ("66"), `<pack>:<key>` voor een pakketnaamplaatje, "" als er geen is uitgerust. |
 | `info.Rarity  -> string` | Zeldzaamheidsnaam: "Poor", "Common", "Uncommon", "Rare", "Epic", "Legendary" of "Mythical". |
+| `info.RarityInt  -> integer` | De zeldzaamheid als de index die NAMEPLATE:DrawTitlePlate aanneemt (0 Poor tot 6 Mythical). |
+| `info.Pack  -> string` | Het id van het pakket waaruit het naamplaatje komt, of "" voor een meegeleverd naamplaatje. |
+| `info.PackName  -> string` | De naam van het pakket in de huidige taal (zijn `name` in Nameplates.json, anders zijn id); "OpenTaiko" voor een meegeleverd naamplaatje. |
 | `info.UnlockCondition  -> unlockCondition` | De ontgrendelvoorwaarde (zie Ontgrendelvoorwaarde-handle). |
 
 ### Dan-plaatje-info-handle

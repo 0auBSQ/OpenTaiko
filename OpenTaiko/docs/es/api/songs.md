@@ -328,7 +328,7 @@ Disponible como la global VIRTUALSLOTS. Los índices de ranura van de 1 a 5; los
 | `VIRTUALSLOTS:SetNameplateTitle(slot, title)  -> void` | Establece el texto del título de la placa de nombre de la ranura. |
 | `VIRTUALSLOTS:GetNameplateDan(slot)  -> string` | Devuelve el texto de dan de la placa de nombre de la ranura. |
 | `VIRTUALSLOTS:SetNameplateDan(slot, dan)  -> void` | Establece el texto de dan de la placa de nombre de la ranura. |
-| `VIRTUALSLOTS:SetNameplateById(slot, nameplateId)  -> void` | Aplica una placa de nombre de la base de datos de placas por id: establece el texto del título, el tipo y la rareza. Un id desconocido solo registra el id. |
+| `VIRTUALSLOTS:SetNameplateById(slot, nameplateId)  -> void` | Aplica una placa de nombre de la lista de placas por id (una cadena, o el número de una placa incluida): establece el texto del título, el tipo y la rareza. Un id vacío o desconocido muestra la placa sin título. |
 | `VIRTUALSLOTS:SetNameplateType(slot, type)  -> void` | Establece directamente el tipo de título de la placa de nombre (índice de estilo). |
 | `VIRTUALSLOTS:SetNameplateRarity(slot, rarity)  -> void` | Establece directamente el índice de rareza del título de la placa de nombre. |
 | `VIRTUALSLOTS:SetNameplateDanType(slot, danType)  -> void` | Establece el tipo de la placa de dan. |

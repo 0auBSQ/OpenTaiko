@@ -328,7 +328,7 @@ node.UnlockCondition 返回此对象。HasCondition 是属性；其余是方法�
 | `VIRTUALSLOTS:SetNameplateTitle(slot, title)  -> void` | 设置该槽位名牌的称号文本。 |
 | `VIRTUALSLOTS:GetNameplateDan(slot)  -> string` | 返回该槽位名牌的段位文本。 |
 | `VIRTUALSLOTS:SetNameplateDan(slot, dan)  -> void` | 设置该槽位名牌的段位文本。 |
-| `VIRTUALSLOTS:SetNameplateById(slot, nameplateId)  -> void` | 按 id 从名牌数据库应用一个名牌：设置称号文本、类型和稀有度。未知的 id 只记录该 id。 |
+| `VIRTUALSLOTS:SetNameplateById(slot, nameplateId)  -> void` | 按 id（字符串，或自带名牌的编号）从名牌列表应用一个名牌：设置称号文本、类型和稀有度。空 id 或未知的 id 显示没有称号的牌。 |
 | `VIRTUALSLOTS:SetNameplateType(slot, type)  -> void` | 直接设置名牌称号类型（样式索引）。 |
 | `VIRTUALSLOTS:SetNameplateRarity(slot, rarity)  -> void` | 直接设置名牌称号的稀有度索引。 |
 | `VIRTUALSLOTS:SetNameplateDanType(slot, danType)  -> void` | 设置段位牌类型。 |

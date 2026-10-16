@@ -33,7 +33,7 @@ Lisez les propriétés avec la syntaxe à point (sf.Name, sf.Coins). Les méthod
 | `sf.Name  -> string` | Le nom affiché du joueur. |
 | `sf.SaveId  -> integer` | L'identifiant numérique de base de données de cette sauvegarde. |
 | `sf.SaveUID  -> string` | L'identifiant chaîne unique de cette sauvegarde. |
-| `sf.NameplateInfo  -> nameplateInfo` | La plaque de nom équipée (voir Handle d'informations de plaque de nom), ou la plaque de débutant par défaut si l'identifiant stocké est inconnu. |
+| `sf.NameplateInfo  -> nameplateInfo` | La plaque de nom équipée (voir Handle d'informations de plaque de nom). Quand aucune n'est équipée, ou que son identifiant n'est pas dans la liste des plaques de nom, un handle avec un identifiant vide et sans titre. |
 | `sf.DanplateInfo  -> danplateInfo` | Le titre de dan courant (voir Handle d'informations de plaque de dan). |
 | `sf.TotalPlaycount  -> integer` | Nombre total de parties sur cette sauvegarde. |
 | `sf.AIBattlePlaycount  -> integer` | Nombre de parties en bataille contre l'IA. |
@@ -42,8 +42,8 @@ Lisez les propriétés avec la syntaxe à point (sf.Name, sf.Coins). Les méthod
 | `sf.TotalEarnedCoins  -> integer` | Total des pièces gagnées sur toute la vie de la sauvegarde. |
 | `sf:SpendCoins(price)  -> nil` | Déduit des pièces (le solde ne descend jamais sous 0) et persiste. |
 | `sf:EarnCoins(amount)  -> nil` | Ajoute des pièces au solde et au total gagné, et persiste. |
-| `sf:IsNameplateUnlocked(id)  -> bool` | Si la plaque de nom portant cet identifiant est débloquée. |
-| `sf:UnlockNameplate(id)  -> nil` | Débloque une plaque de nom et persiste (sans effet si déjà débloquée). |
+| `sf:IsNameplateUnlocked(id)  -> bool` | Si la plaque de nom portant cet identifiant est débloquée. Pour une plaque de nom sans condition de déblocage, la méthode renvoie false ici, bien que chaque joueur la possède (vérifiez UnlockCondition.HasCondition). |
+| `sf:UnlockNameplate(id)  -> nil` | Débloque une plaque de nom et persiste (sans effet si déjà débloquée). Un identifiant absent de la liste des plaques de nom journalise un avertissement et ne fait rien. |
 | `sf:IsSongUnlocked(uniqueId)  -> bool` | Si la chanson portant cet identifiant unique est débloquée. |
 | `sf:UnlockSong(uniqueId)  -> nil` | Débloque une chanson et persiste (sans effet si déjà débloquée). |
 | `sf.SelectedHitsounds  -> string` | Nom de dossier du jeu de sons de frappe sélectionné. Affecter un nom différent le persiste et recharge les sons de frappe du joueur. |
@@ -67,7 +67,7 @@ Lisez les propriétés avec la syntaxe à point (sf.Name, sf.Coins). Les méthod
 | `sf.SelectedDan  -> string` | Texte du titre de dan actif. |
 | `sf:ChangeDan(title)  -> nil` | Rend actif le titre donné, en copiant ses drapeaux or et statut de réussite s'il s'agit d'un titre gagné par le joueur, rafraîchit la plaque de nom et persiste. |
 | `sf:ChangeName(name)  -> nil` | Change le nom affiché, rafraîchit la plaque de nom et persiste. La méthode ignore les noms vides ou inchangés. |
-| `sf:ChangeNameplate(id)  -> nil` | Équipe la plaque de nom portant cet identifiant, rafraîchit la plaque de nom et persiste. Un identifiant absent de la base de données efface le texte de titre mis en cache. |
+| `sf:ChangeNameplate(id)  -> nil` | Équipe la plaque de nom portant cet identifiant, rafraîchit la plaque de nom et persiste. Un identifiant vide ou -1 retire la plaque de nom ; un identifiant absent de la liste des plaques de nom journalise un avertissement et ne change rien. |
 
 ```lua
 local save = GetSaveFile(0)
@@ -93,17 +93,17 @@ La ROActivity nameplate du skin (Modules/ROActivities/nameplate) se charge du de
 
 | Méthode | Description |
 | --- | --- |
-| `NAMEPLATE:DrawTitlePlate(x, y, opacity, type, text, rarity, nameplateId)  -> nil` | Dessine une plaque de titre avec le type d'affichage donné, la texture de titre pré-rendue, l'indice de rareté et l'identifiant de plaque de nom. |
+| `NAMEPLATE:DrawTitlePlate(x, y, opacity, type, text, rarity, nameplateId)  -> nil` | Dessine une plaque de titre avec le type d'affichage donné, la texture de titre pré-rendue, l'indice de rareté et l'identifiant de plaque de nom (l'identifiant choisit le badge). |
 | `NAMEPLATE:DrawDanPlate(x, y, opacity, danGrade, text)  -> nil` | Dessine une plaque de dan pour le grade donné avec une texture de titre pré-rendue. |
 | `NAMEPLATE:DrawPlayerNameplate(x, y, opacity, player)  -> nil` | Dessine la plaque de nom complète d'un emplacement de joueur ; le côté rouge ou bleu suit le réglage de côté 1P du jeu. |
-| `NAMEPLATE:DrawNameplateTitleById(id, x, y, opacity, font)  -> nil` | Rend le titre localisé de la plaque de nom portant cet identifiant avec un objet texte et le dessine sous forme de plaque de titre. L'identifiant doit exister dans la base de données des plaques de nom. |
+| `NAMEPLATE:DrawNameplateTitleById(id, x, y, opacity, font)  -> nil` | Rend le titre localisé de la plaque de nom portant cet identifiant avec un objet texte et le dessine sous forme de plaque de titre. Ne dessine rien pour un identifiant absent de la liste des plaques de nom. |
 
 ### NAMEPLATESLIST
 
-La base de données de toutes les plaques de nom que le jeu connaît, avec recherche par indice ou identifiant et filtrage.
+La liste de toutes les plaques de nom que le jeu a chargées (les plaques de nom fournies, puis le pack du skin actif, puis les packs de Global/Nameplates), avec recherche par indice ou identifiant et filtrage.
 
 <div class="callout warn">
-Les méthodes de requête renvoient des handles d'informations de plaque de nom. FindWhere appelle une fonction Lua une fois par plaque de nom et conserve les entrées pour lesquelles elle renvoie true.
+Les méthodes de requête renvoient des handles d'informations de plaque de nom. FindWhere appelle une fonction Lua une fois par plaque de nom et conserve les entrées pour lesquelles elle renvoie true. Les identifiants de plaque de nom sont des chaînes : une plaque de nom fournie utilise son numéro sous forme de texte ("66"), une plaque de nom de pack `<pack>:<key>` (voir le guide <a href="../guides/nameplates.md">Ajouter des plaques de nom</a>). Chaque méthode de cette page qui prend un identifiant de plaque de nom accepte aussi le numéro d'une plaque de nom fournie.
 </div>
 
 | Méthode | Description |
@@ -119,15 +119,18 @@ Les méthodes de requête renvoient des handles d'informations de plaque de nom.
 Un titre de plaque de nom : texte localisé, type d'affichage, identifiant, rareté et condition de déblocage.
 
 <div class="callout warn">
-sf.NameplateInfo et NAMEPLATESLIST renvoient ces handles. La plaque de débutant par défaut a l'identifiant -1, la rareté "Common" et aucune condition de déblocage.
+sf.NameplateInfo et NAMEPLATESLIST renvoient ces handles. Quand aucune plaque de nom n'est équipée, sf.NameplateInfo renvoie un handle avec un identifiant vide, sans titre, avec la rareté "Common" et sans condition de déblocage.
 </div>
 
 | Méthode | Description |
 | --- | --- |
 | `info.Title  -> string` | Texte du titre dans la langue courante. |
 | `info.Type  -> integer` | Code de type d'affichage passé à NAMEPLATE:DrawTitlePlate. |
-| `info.Id  -> integer` | Identifiant de la plaque de nom (-1 pour la plaque de débutant par défaut). |
+| `info.Id  -> string` | Identifiant de la plaque de nom : le numéro sous forme de texte pour une plaque de nom fournie ("66"), `<pack>:<key>` pour une plaque de nom de pack, "" quand aucune n'est équipée. |
 | `info.Rarity  -> string` | Nom de rareté : "Poor", "Common", "Uncommon", "Rare", "Epic", "Legendary" ou "Mythical". |
+| `info.RarityInt  -> integer` | La rareté sous la forme de l'indice que prend NAMEPLATE:DrawTitlePlate (0 Poor à 6 Mythical). |
+| `info.Pack  -> string` | L'identifiant du pack dont provient la plaque de nom, ou "" pour une plaque de nom fournie. |
+| `info.PackName  -> string` | Le nom du pack dans la langue courante (son `name` dans Nameplates.json, sinon son identifiant), ou "OpenTaiko" pour une plaque de nom fournie. |
 | `info.UnlockCondition  -> unlockCondition` | La condition de déblocage (voir Handle de condition de déblocage). |
 
 ### Handle d'informations de plaque de dan

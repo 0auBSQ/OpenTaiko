@@ -33,14 +33,12 @@ namespace OpenTaiko {
 			}
 		}
 
+		/// <summary>The equipped nameplate; one with an empty <c>Id</c> and no title when none is equipped or its id is unknown.</summary>
 		public LuaNameplateInfo NameplateInfo {
 			get {
-				int _npId = _sf.data.TitleId;
-				var _dbNp = OpenTaiko.Databases.DBNameplateUnlockables.data;
-				if (_dbNp.ContainsKey(_npId)) {
-					var _entry = _dbNp[_npId];
+				string _npId = _sf.data.TitleId ?? "";
+				if (OpenTaiko.Databases.DBNameplateUnlockables.data.TryGetValue(_npId, out var _entry))
 					return new LuaNameplateInfo(_entry, _npId);
-				}
 				return new LuaNameplateInfo();
 			}
 		}
@@ -96,11 +94,12 @@ namespace OpenTaiko {
 
 		#region [Unlockables]
 
-		public bool IsNameplateUnlocked(int id) {
-			return _sf.data.UnlockedNameplateIds.Contains(id);
+		/// <summary>Whether the nameplate is unlocked; the id is a string, or a whole number for the shipped ones.</summary>
+		public bool IsNameplateUnlocked(object id) {
+			return _sf.data.UnlockedNameplateIds.Contains(DBNameplateUnlockables.tKey(id));
 		}
 
-		public virtual void UnlockNameplate(int id) => BlockWrite(nameof(UnlockNameplate));
+		public virtual void UnlockNameplate(object id) => BlockWrite(nameof(UnlockNameplate));
 
 		public bool IsSongUnlocked(string uniqueId) {
 			return _sf.data.UnlockedSongs.Contains(uniqueId);
@@ -224,7 +223,7 @@ namespace OpenTaiko {
 		/// <summary>Changes the player's displayed name and persists the change.</summary>
 		public virtual void ChangeName(string name) => BlockWrite(nameof(ChangeName));
 
-		public virtual void ChangeNameplate(int id) => BlockWrite(nameof(ChangeNameplate));
+		public virtual void ChangeNameplate(object id) => BlockWrite(nameof(ChangeNameplate));
 
 		#endregion
 

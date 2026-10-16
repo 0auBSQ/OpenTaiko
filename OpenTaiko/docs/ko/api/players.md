@@ -33,7 +33,7 @@
 | `sf.Name  -> string` | 플레이어의 표시 이름. |
 | `sf.SaveId  -> integer` | 이 세이브의 숫자 데이터베이스 id. |
 | `sf.SaveUID  -> string` | 이 세이브의 고유 문자열 id. |
-| `sf.NameplateInfo  -> nameplateInfo` | 장착한 네임플레이트(네임플레이트 정보 핸들 참고). 저장된 id를 알 수 없으면 기본 초보자 네임플레이트. |
+| `sf.NameplateInfo  -> nameplateInfo` | 장착한 네임플레이트(네임플레이트 정보 핸들 참고). 아무것도 장착하지 않았거나 그 id가 네임플레이트 목록에 없으면 id가 비어 있고 칭호가 없는 핸들. |
 | `sf.DanplateInfo  -> danplateInfo` | 현재 단위 칭호(단위 플레이트 정보 핸들 참고). |
 | `sf.TotalPlaycount  -> integer` | 이 세이브의 총 플레이 수. |
 | `sf.AIBattlePlaycount  -> integer` | AI 배틀 플레이 수. |
@@ -42,8 +42,8 @@
 | `sf.TotalEarnedCoins  -> integer` | 세이브 생성 이후 획득한 총 코인. |
 | `sf:SpendCoins(price)  -> nil` | 코인을 차감하고(잔액은 0 아래로 내려가지 않음) 저장합니다. |
 | `sf:EarnCoins(amount)  -> nil` | 잔액과 총 획득량에 코인을 더하고 저장합니다. |
-| `sf:IsNameplateUnlocked(id)  -> bool` | 이 id의 네임플레이트가 잠금 해제되었는지 여부. |
-| `sf:UnlockNameplate(id)  -> nil` | 네임플레이트를 잠금 해제하고 저장합니다(이미 해제되었으면 no-op). |
+| `sf:IsNameplateUnlocked(id)  -> bool` | 이 id의 네임플레이트가 잠금 해제되었는지 여부. 잠금 해제 조건이 없는 네임플레이트는 모든 플레이어가 소유하지만 여기서는 false를 반환합니다(UnlockCondition.HasCondition을 확인하십시오). |
+| `sf:UnlockNameplate(id)  -> nil` | 네임플레이트를 잠금 해제하고 저장합니다(이미 해제되었으면 no-op). 네임플레이트 목록에 없는 id는 경고를 기록하고 아무것도 하지 않습니다. |
 | `sf:IsSongUnlocked(uniqueId)  -> bool` | 이 고유 id의 곡이 잠금 해제되었는지 여부. |
 | `sf:UnlockSong(uniqueId)  -> nil` | 곡을 잠금 해제하고 저장합니다(이미 해제되었으면 no-op). |
 | `sf.SelectedHitsounds  -> string` | 선택한 히트사운드 세트의 폴더 이름. 다른 이름을 대입하면 저장하고 플레이어의 히트사운드를 다시 로드합니다. |
@@ -67,7 +67,7 @@
 | `sf.SelectedDan  -> string` | 활성 단위 칭호의 텍스트. |
 | `sf:ChangeDan(title)  -> nil` | 지정한 칭호를 활성화하고, 플레이어가 획득한 것이면 금색과 클리어 상태 플래그를 복사하며, 네임플레이트를 갱신하고 저장합니다. |
 | `sf:ChangeName(name)  -> nil` | 표시 이름을 바꾸고, 네임플레이트를 갱신하고 저장합니다. 이 메서드는 빈 이름이나 바뀌지 않은 이름을 무시합니다. |
-| `sf:ChangeNameplate(id)  -> nil` | 이 id의 네임플레이트를 장착하고, 네임플레이트를 갱신하고 저장합니다. 데이터베이스에 없는 id는 캐시된 칭호 텍스트를 비웁니다. |
+| `sf:ChangeNameplate(id)  -> nil` | 이 id의 네임플레이트를 장착하고, 네임플레이트를 갱신하고 저장합니다. 빈 id나 -1은 네임플레이트 장착을 풉니다. 네임플레이트 목록에 없는 id는 경고를 기록하고 아무것도 바꾸지 않습니다. |
 
 ```lua
 local save = GetSaveFile(0)
@@ -93,17 +93,17 @@ end
 
 | 메서드 | 설명 |
 | --- | --- |
-| `NAMEPLATE:DrawTitlePlate(x, y, opacity, type, text, rarity, nameplateId)  -> nil` | 지정한 표시 타입, 미리 렌더링한 칭호 텍스처, 희귀도 인덱스, 네임플레이트 id로 칭호 플레이트를 그립니다. |
+| `NAMEPLATE:DrawTitlePlate(x, y, opacity, type, text, rarity, nameplateId)  -> nil` | 지정한 표시 타입, 미리 렌더링한 칭호 텍스처, 희귀도 인덱스, 네임플레이트 id로 칭호 플레이트를 그립니다(id가 배지를 정합니다). |
 | `NAMEPLATE:DrawDanPlate(x, y, opacity, danGrade, text)  -> nil` | 미리 렌더링한 칭호 텍스처를 사용해 지정한 등급의 단위 플레이트를 그립니다. |
 | `NAMEPLATE:DrawPlayerNameplate(x, y, opacity, player)  -> nil` | 플레이어 슬롯의 완전한 네임플레이트를 그립니다. 빨간 쪽인지 파란 쪽인지는 게임의 1P 쪽 설정을 따릅니다. |
-| `NAMEPLATE:DrawNameplateTitleById(id, x, y, opacity, font)  -> nil` | 이 id의 네임플레이트의 지역화된 칭호를 텍스트 객체로 렌더링해 칭호 플레이트로 그립니다. id는 네임플레이트 데이터베이스에 존재해야 합니다. |
+| `NAMEPLATE:DrawNameplateTitleById(id, x, y, opacity, font)  -> nil` | 이 id의 네임플레이트의 지역화된 칭호를 텍스트 객체로 렌더링해 칭호 플레이트로 그립니다. 네임플레이트 목록에 없는 id에는 아무것도 그리지 않습니다. |
 
 ### NAMEPLATESLIST
 
-게임이 아는 모든 네임플레이트의 데이터베이스로, 인덱스나 id로 조회하고 필터링할 수 있습니다.
+게임이 로드한 모든 네임플레이트의 목록(기본 제공 네임플레이트, 그다음 활성 스킨의 팩, 그다음 Global/Nameplates의 팩)으로, 인덱스나 id로 조회하고 필터링할 수 있습니다.
 
 <div class="callout warn">
-조회 메서드는 네임플레이트 정보 핸들을 반환합니다. FindWhere는 네임플레이트마다 Lua 함수를 한 번 호출하고 true를 반환한 항목을 남깁니다.
+조회 메서드는 네임플레이트 정보 핸들을 반환합니다. FindWhere는 네임플레이트마다 Lua 함수를 한 번 호출하고 true를 반환한 항목을 남깁니다. 네임플레이트 id는 문자열입니다. 기본 제공 네임플레이트는 번호를 텍스트로 쓴 것("66"), 팩 네임플레이트는 `<pack>:<key>`를 사용합니다(<a href="../guides/nameplates.md">네임플레이트 추가하기</a> 가이드 참고). 이 페이지에서 네임플레이트 id를 받는 모든 메서드는 기본 제공 네임플레이트의 번호도 받습니다.
 </div>
 
 | 메서드 | 설명 |
@@ -119,15 +119,18 @@ end
 네임플레이트 칭호 하나: 지역화된 텍스트, 표시 타입, id, 희귀도, 잠금 해제 조건입니다.
 
 <div class="callout warn">
-sf.NameplateInfo와 NAMEPLATESLIST가 이 핸들을 반환합니다. 기본 초보자 네임플레이트는 id -1, 희귀도 "Common"이며 잠금 해제 조건이 없습니다.
+sf.NameplateInfo와 NAMEPLATESLIST가 이 핸들을 반환합니다. 장착한 네임플레이트가 없으면 sf.NameplateInfo는 id가 비어 있고, 칭호가 없고, 희귀도가 "Common"이며, 잠금 해제 조건이 없는 핸들을 반환합니다.
 </div>
 
 | 메서드 | 설명 |
 | --- | --- |
 | `info.Title  -> string` | 현재 언어의 칭호 텍스트. |
 | `info.Type  -> integer` | NAMEPLATE:DrawTitlePlate에 넘기는 표시 타입 코드. |
-| `info.Id  -> integer` | 네임플레이트 id(기본 초보자 네임플레이트는 -1). |
+| `info.Id  -> string` | 네임플레이트 id: 기본 제공 네임플레이트는 번호의 텍스트("66"), 팩 네임플레이트는 `<pack>:<key>`, 아무것도 장착하지 않았으면 "". |
 | `info.Rarity  -> string` | 희귀도 이름: "Poor", "Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythical". |
+| `info.RarityInt  -> integer` | NAMEPLATE:DrawTitlePlate가 받는 인덱스 형태의 희귀도(0 Poor에서 6 Mythical). |
+| `info.Pack  -> string` | 네임플레이트가 속한 팩의 id. 기본 제공 네임플레이트는 "". |
+| `info.PackName  -> string` | 현재 언어로 된 팩의 이름(Nameplates.json의 `name`, 없으면 팩 id). 기본 제공 네임플레이트는 "OpenTaiko". |
 | `info.UnlockCondition  -> unlockCondition` | 잠금 해제 조건(잠금 해제 조건 핸들 참고). |
 
 ### 단위 플레이트 정보 핸들

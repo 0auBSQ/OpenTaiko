@@ -328,7 +328,7 @@ Disponible comme la globale VIRTUALSLOTS. Les indices d'emplacement vont de 1 à
 | `VIRTUALSLOTS:SetNameplateTitle(slot, title)  -> void` | Définit le texte de titre de la plaque de nom de l'emplacement. |
 | `VIRTUALSLOTS:GetNameplateDan(slot)  -> string` | Renvoie le texte de dan de la plaque de nom de l'emplacement. |
 | `VIRTUALSLOTS:SetNameplateDan(slot, dan)  -> void` | Définit le texte de dan de la plaque de nom de l'emplacement. |
-| `VIRTUALSLOTS:SetNameplateById(slot, nameplateId)  -> void` | Applique une plaque de nom depuis la base de données des plaques par identifiant : définit le texte de titre, le type et la rareté. Un identifiant inconnu n'enregistre que l'identifiant. |
+| `VIRTUALSLOTS:SetNameplateById(slot, nameplateId)  -> void` | Applique une plaque de nom de la liste des plaques de nom par identifiant (une chaîne, ou le numéro d'une plaque de nom fournie) : définit le texte de titre, le type et la rareté. Un identifiant vide ou inconnu affiche la plaque sans titre. |
 | `VIRTUALSLOTS:SetNameplateType(slot, type)  -> void` | Définit directement le type de titre de la plaque de nom (indice de style). |
 | `VIRTUALSLOTS:SetNameplateRarity(slot, rarity)  -> void` | Définit directement l'indice de rareté du titre de la plaque de nom. |
 | `VIRTUALSLOTS:SetNameplateDanType(slot, danType)  -> void` | Définit le type de la plaque de dan. |

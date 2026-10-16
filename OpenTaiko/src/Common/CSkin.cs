@@ -564,6 +564,9 @@ internal class CSkin : IDisposable {
 	public static volatile int LoadingModuleTotal = 0;
 
 	internal IEnumerator<float> LoadModulesIncrementally() {
+		// the nameplate list with this skin's pack, before the skin's scripts read it
+		OpenTaiko.Databases?.DBNameplateUnlockables?.tReload(CSkin.Path(""));
+
 		// Main Menu Settings
 		MainMenuSettings = new CMainMenuSettings();
 		MainMenuSettings.tReloadMenus();
@@ -1102,6 +1105,10 @@ internal class CSkin : IDisposable {
 									}
 								case "AIBattleCharacter": {
 										this.AIBattleCharacter = strParam;
+										break;
+									}
+								case "AIBattleNameplate": {
+										this.AIBattleNameplate = strParam;
 										break;
 									}
 								case "Resolution": {
@@ -7388,6 +7395,8 @@ internal class CSkin : IDisposable {
 		public List<(double val, string label)> Resolutions = new List<(double, string)> { (1.0, "1") };
 		/// <summary>Character folder name used for the AI battle slot; set via <c>AIBattleCharacter=</c> in SkinConfig.ini.</summary>
 		public string AIBattleCharacter = "10v2 - AItritus";
+		/// <summary>Id of the nameplate the AI battle opponent wears; set via <c>AIBattleNameplate=</c> in SkinConfig.ini.</summary>
+		public string AIBattleNameplate = "66";
 	public string FontName { get { return _fontNameLocalized.TryGetValue(CLangManager.fetchLang(), out string value) ? value : ""; } }
 	private Dictionary<string, string> _fontNameLocalized = new Dictionary<string, string>();
 	public string BoxFontName { get { return _boxFontNameLocalized.TryGetValue(CLangManager.fetchLang(), out string value) ? value : ""; } }

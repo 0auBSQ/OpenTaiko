@@ -7,6 +7,7 @@
 - Handleidingen
   - [Personages toevoegen](guides/characters.md)
   - [Puchichara's toevoegen](guides/puchicharas.md)
+  - [Naamplaatjes toevoegen](guides/nameplates.md)
   - [Skins en thema's toevoegen](guides/skins.md)
   - [Ontgrendelvoorwaarden voor charts](guides/unlockables.md)
 

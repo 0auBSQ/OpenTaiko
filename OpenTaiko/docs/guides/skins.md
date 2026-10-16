@@ -42,6 +42,7 @@ Copy `System/Open-World Memories/` to a new sibling folder, for example `System/
 - `Resolution=W,H`: the resolution you author the layout values for (default `1280,720`). The shipped skin uses `1920,1080`.
 - `Resolutions=`: selectable render-scale multipliers (Step 4).
 - `AIBattleCharacter=`: character folder used for the AI opponent (Step 5).
+- `AIBattleNameplate=`: id of the nameplate the AI opponent wears (Step 5).
 - `FontName<LANG>=` and `BoxFontName<LANG>=`: font file per game language, where `<LANG>` is the upper-cased language code (`EN`, `JA`, `FR`, `ES`, `NL`, `DE`, `RU`, `KO`, `ZH`). The path is relative to the skin root (an absolute path also works) and the file must exist, otherwise the parser drops the key.
 
 Every other key (`Game_*`, `Result_*`, `Title_*` and so on) is a screen layout value. The same parser reads them, which is why they can live in the included files of Step 6.
@@ -57,6 +58,8 @@ Resolution=1920,1080
 Resolutions=1,2/3,1/3
 ;Character folder used for the AI battle slot.
 AIBattleCharacter=10v2 - AItritus
+;Nameplate the AI battle opponent wears (an id from the nameplate list).
+AIBattleNameplate=66
 FontNameEN=Fonts/MPLUSRounded1c-Medium.ttf
 FontNameJA=Fonts/MPLUSRounded1c-Medium.ttf
 BoxFontNameEN=Fonts/MPLUSRounded1c-Regular.ttf
@@ -76,13 +79,17 @@ Resolutions=1,2/3,1/3
 ;   1/3   -> 640x360
 ```
 
-## Step 5: The AIBattleCharacter option
+## Step 5: The AI battle options
 
 `AIBattleCharacter=` names the folder under `Global/Characters/` that the game uses for the AI opponent in AI battle mode. The default is `10v2 - AItritus`. The named folder must exist.
+
+`AIBattleNameplate=` names the nameplate the AI opponent wears, by its id (see [Adding nameplates](nameplates.md)). The default is `66`. An id that is not in the nameplate list shows the AI's plate without a title.
 
 ```ini
 ;Character folder used for the AI battle slot.
 AIBattleCharacter=10v2 - AItritus
+;Nameplate the AI battle opponent wears (an id from the nameplate list).
+AIBattleNameplate=66
 ```
 
 ## Step 6: Split the configuration with #include

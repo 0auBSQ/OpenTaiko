@@ -7,6 +7,7 @@
 - Руководства
   - [Добавление персонажей](guides/characters.md)
   - [Добавление пучичар](guides/puchicharas.md)
+  - [Добавление табличек имени](guides/nameplates.md)
   - [Добавление скинов и тем](guides/skins.md)
   - [Разблокировка чартов](guides/unlockables.md)
 

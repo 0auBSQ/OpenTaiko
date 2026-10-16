@@ -42,6 +42,7 @@ Kopieer `System/Open-World Memories/` naar een nieuwe map ernaast, bijvoorbeeld 
 - `Resolution=W,H`: de resolutie waarvoor je de lay-outwaarden maakt (standaard `1280,720`). De meegeleverde skin gebruikt `1920,1080`.
 - `Resolutions=`: selecteerbare renderschaalfactoren (Stap 4).
 - `AIBattleCharacter=`: personagemap die voor de AI-tegenstander wordt gebruikt (Stap 5).
+- `AIBattleNameplate=`: id van het naamplaatje dat de AI-tegenstander draagt (Stap 5).
 - `FontName<LANG>=` en `BoxFontName<LANG>=`: lettertypebestand per speltaal, waarbij `<LANG>` de taalcode in hoofdletters is (`EN`, `JA`, `FR`, `ES`, `NL`, `DE`, `RU`, `KO`, `ZH`). Het pad is relatief ten opzichte van de skinroot (een absoluut pad werkt ook) en het bestand moet bestaan, anders laat de parser de sleutel weg.
 
 Elke andere sleutel (`Game_*`, `Result_*`, `Title_*` enzovoort) is een lay-outwaarde van een scherm. Dezelfde parser leest ze, en daarom kunnen ze in de ingesloten bestanden van Stap 6 staan.
@@ -57,6 +58,8 @@ Resolution=1920,1080
 Resolutions=1,2/3,1/3
 ;Personagemap die voor het AI-gevechtsslot wordt gebruikt.
 AIBattleCharacter=10v2 - AItritus
+;Naamplaatje dat de AI-tegenstander draagt (een id uit de lijst met naamplaatjes).
+AIBattleNameplate=66
 FontNameEN=Fonts/MPLUSRounded1c-Medium.ttf
 FontNameJA=Fonts/MPLUSRounded1c-Medium.ttf
 BoxFontNameEN=Fonts/MPLUSRounded1c-Regular.ttf
@@ -76,13 +79,17 @@ Resolutions=1,2/3,1/3
 ;   1/3   -> 640x360
 ```
 
-## Stap 5: De optie AIBattleCharacter
+## Stap 5: De AI-gevechtsopties
 
 `AIBattleCharacter=` noemt de map onder `Global/Characters/` die het spel voor de AI-tegenstander in de AI-gevechtsmodus gebruikt. De standaard is `10v2 - AItritus`. De genoemde map moet bestaan.
+
+`AIBattleNameplate=` noemt via zijn id het naamplaatje dat de AI-tegenstander draagt (zie [Naamplaatjes toevoegen](nameplates.md)). De standaard is `66`. Bij een id dat niet in de naamplaatjeslijst staat, toont het spel het plaatje van de AI zonder titel.
 
 ```ini
 ;Personagemap die voor het AI-gevechtsslot wordt gebruikt.
 AIBattleCharacter=10v2 - AItritus
+;Naamplaatje dat de AI-tegenstander draagt (een id uit de lijst met naamplaatjes).
+AIBattleNameplate=66
 ```
 
 ## Stap 6: Splits de configuratie met #include

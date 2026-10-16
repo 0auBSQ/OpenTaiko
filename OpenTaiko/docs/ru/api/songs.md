@@ -328,7 +328,7 @@ end
 | `VIRTUALSLOTS:SetNameplateTitle(slot, title)  -> void` | Задаёт текст титула на табличке слота. |
 | `VIRTUALSLOTS:GetNameplateDan(slot)  -> string` | Возвращает текст дана на табличке слота. |
 | `VIRTUALSLOTS:SetNameplateDan(slot, dan)  -> void` | Задаёт текст дана на табличке слота. |
-| `VIRTUALSLOTS:SetNameplateById(slot, nameplateId)  -> void` | Применяет табличку из базы данных табличек по идентификатору: задаёт текст титула, тип и редкость. Неизвестный идентификатор только записывает идентификатор. |
+| `VIRTUALSLOTS:SetNameplateById(slot, nameplateId)  -> void` | Применяет табличку из списка табличек по идентификатору (строке или номеру поставляемой таблички): задаёт текст титула, тип и редкость. Пустой или неизвестный идентификатор показывает табличку без титула. |
 | `VIRTUALSLOTS:SetNameplateType(slot, type)  -> void` | Задаёт тип титула таблички (индекс стиля) напрямую. |
 | `VIRTUALSLOTS:SetNameplateRarity(slot, rarity)  -> void` | Задаёт индекс редкости титула таблички напрямую. |
 | `VIRTUALSLOTS:SetNameplateDanType(slot, danType)  -> void` | Задаёт тип таблички дана. |

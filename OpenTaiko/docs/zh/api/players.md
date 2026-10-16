@@ -33,7 +33,7 @@
 | `sf.Name  -> string` | 玩家的显示名称。 |
 | `sf.SaveId  -> integer` | 本存档的数字数据库 id。 |
 | `sf.SaveUID  -> string` | 本存档的唯一字符串 id。 |
-| `sf.NameplateInfo  -> nameplateInfo` | 装备的名牌（见“名牌信息句柄”）；存储的 id 未知时为默认的初学者名牌。 |
+| `sf.NameplateInfo  -> nameplateInfo` | 装备的名牌（见“名牌信息句柄”）；未装备名牌，或其 id 不在名牌列表中时，则是一个 id 为空且没有称号的句柄。 |
 | `sf.DanplateInfo  -> danplateInfo` | 当前的段位称号（见“段位牌信息句柄”）。 |
 | `sf.TotalPlaycount  -> integer` | 本存档的总演奏次数。 |
 | `sf.AIBattlePlaycount  -> integer` | AI 对战次数。 |
@@ -42,8 +42,8 @@
 | `sf.TotalEarnedCoins  -> integer` | 本存档生命周期内获得的金币总数。 |
 | `sf:SpendCoins(price)  -> nil` | 扣除金币（余额不会低于 0）并持久化。 |
 | `sf:EarnCoins(amount)  -> nil` | 把金币加到余额和总获得数上，并持久化。 |
-| `sf:IsNameplateUnlocked(id)  -> bool` | 此 id 的名牌是否已解锁。 |
-| `sf:UnlockNameplate(id)  -> nil` | 解锁一个名牌并持久化（已解锁时为空操作）。 |
+| `sf:IsNameplateUnlocked(id)  -> bool` | 此 id 的名牌是否已解锁。没有解锁条件的名牌虽然每个玩家都拥有，在这里却返回 false（请检查 UnlockCondition.HasCondition）。 |
+| `sf:UnlockNameplate(id)  -> nil` | 解锁一个名牌并持久化（已解锁时为空操作）。不在名牌列表中的 id 会记录一条警告并且不做任何事。 |
 | `sf:IsSongUnlocked(uniqueId)  -> bool` | 此唯一 id 的歌曲是否已解锁。 |
 | `sf:UnlockSong(uniqueId)  -> nil` | 解锁一首歌曲并持久化（已解锁时为空操作）。 |
 | `sf.SelectedHitsounds  -> string` | 选定的打击音效组的文件夹名称。赋予不同的名称会持久化并重新加载该玩家的打击音效。 |
@@ -67,7 +67,7 @@
 | `sf.SelectedDan  -> string` | 当前段位称号的文本。 |
 | `sf:ChangeDan(title)  -> nil` | 把给定称号设为当前称号；若它是玩家获得过的称号，则复制其金色和过关状态标志；然后刷新名牌并持久化。 |
 | `sf:ChangeName(name)  -> nil` | 更改显示名称，刷新名牌并持久化。该方法会忽略空名称或未变化的名称。 |
-| `sf:ChangeNameplate(id)  -> nil` | 装备此 id 的名牌，刷新名牌并持久化。数据库中不存在的 id 会清除缓存的称号文本。 |
+| `sf:ChangeNameplate(id)  -> nil` | 装备此 id 的名牌，刷新名牌并持久化。空 id 或 -1 会卸下名牌；不在名牌列表中的 id 会记录一条警告并且不做任何更改。 |
 
 ```lua
 local save = GetSaveFile(0)
@@ -93,17 +93,17 @@ end
 
 | 方法 | 说明 |
 | --- | --- |
-| `NAMEPLATE:DrawTitlePlate(x, y, opacity, type, text, rarity, nameplateId)  -> nil` | 以给定的显示类型、预渲染的称号纹理、稀有度索引和名牌 id 绘制一块称号牌。 |
+| `NAMEPLATE:DrawTitlePlate(x, y, opacity, type, text, rarity, nameplateId)  -> nil` | 以给定的显示类型、预渲染的称号纹理、稀有度索引和名牌 id 绘制一块称号牌（id 决定徽章）。 |
 | `NAMEPLATE:DrawDanPlate(x, y, opacity, danGrade, text)  -> nil` | 使用预渲染的称号纹理为给定等级绘制一块段位牌。 |
 | `NAMEPLATE:DrawPlayerNameplate(x, y, opacity, player)  -> nil` | 绘制某个玩家槽位的完整名牌；红侧或蓝侧遵循游戏的 1P 侧设置。 |
-| `NAMEPLATE:DrawNameplateTitleById(id, x, y, opacity, font)  -> nil` | 用一个文本对象渲染此 id 名牌的本地化称号，并将其绘制为称号牌。该 id 必须存在于名牌数据库中。 |
+| `NAMEPLATE:DrawNameplateTitleById(id, x, y, opacity, font)  -> nil` | 用一个文本对象渲染此 id 名牌的本地化称号，并将其绘制为称号牌。对于不在名牌列表中的 id 不绘制任何内容。 |
 
 ### NAMEPLATESLIST
 
-游戏已知的所有名牌的数据库，支持按索引或 id 查找以及过滤。
+游戏已加载的所有名牌的列表（先是自带的名牌，然后是当前皮肤的名牌包，再是 Global/Nameplates 中的名牌包），支持按索引或 id 查找以及过滤。
 
 <div class="callout warn">
-查询方法返回名牌信息句柄。FindWhere 对每个名牌调用一次 Lua 函数，并保留其返回 true 的条目。
+查询方法返回名牌信息句柄。FindWhere 对每个名牌调用一次 Lua 函数，并保留其返回 true 的条目。名牌 id 是字符串：自带名牌使用其编号的文本形式（"66"），名牌包中的名牌使用 `<pack>:<key>`（见<a href="../guides/nameplates.md">添加名牌</a>指南）。本页所有接受名牌 id 的方法也都接受自带名牌的编号。
 </div>
 
 | 方法 | 说明 |
@@ -119,15 +119,18 @@ end
 一个名牌称号：本地化文本、显示类型、id、稀有度和解锁条件。
 
 <div class="callout warn">
-sf.NameplateInfo 和 NAMEPLATESLIST 返回这些句柄。默认的初学者名牌的 id 为 -1，稀有度为 "Common"，没有解锁条件。
+sf.NameplateInfo 和 NAMEPLATESLIST 返回这些句柄。未装备名牌时，sf.NameplateInfo 返回一个 id 为空、没有称号、稀有度为 "Common" 且没有解锁条件的句柄。
 </div>
 
 | 方法 | 说明 |
 | --- | --- |
 | `info.Title  -> string` | 当前语言的称号文本。 |
 | `info.Type  -> integer` | 传给 NAMEPLATE:DrawTitlePlate 的显示类型代码。 |
-| `info.Id  -> integer` | 名牌 id（默认初学者名牌为 -1）。 |
+| `info.Id  -> string` | 名牌 id：自带名牌为编号的文本形式（"66"），名牌包中的名牌为 `<pack>:<key>`，未装备时为 ""。 |
 | `info.Rarity  -> string` | 稀有度名称："Poor"、"Common"、"Uncommon"、"Rare"、"Epic"、"Legendary" 或 "Mythical"。 |
+| `info.RarityInt  -> integer` | NAMEPLATE:DrawTitlePlate 所接受的索引形式的稀有度（0 Poor 到 6 Mythical）。 |
+| `info.Pack  -> string` | 名牌所属名牌包的 id；自带名牌为 ""。 |
+| `info.PackName  -> string` | 当前语言的名牌包名称（Nameplates.json 中的 `name`，没有时为名牌包 id）；自带名牌为 "OpenTaiko"。 |
 | `info.UnlockCondition  -> unlockCondition` | 解锁条件（见“解锁条件句柄”）。 |
 
 ### 段位牌信息句柄

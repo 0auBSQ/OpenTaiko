@@ -196,8 +196,9 @@ internal class SaveFile {
 		[JsonProperty("name")]
 		public string Name = "プレイヤー1";
 
+		// Title, TitleType and TitleRarityInt are filled from the nameplate catalogue by TitleId (DBNameplateUnlockables.tResolveNameplate)
 		[JsonProperty("title")]
-		public string Title = "初心者";
+		public string Title = "";
 
 		[JsonProperty("dan")]
 		public string Dan = "新人";
@@ -214,8 +215,9 @@ internal class SaveFile {
 		[JsonIgnore]
 		public int TitleRarityInt = 1;
 
+		// the equipped nameplate's id, "" = none
 		[JsonIgnore]
-		public int TitleId = -1;
+		public string TitleId = "";
 
 		[JsonProperty("puchiChara")]
 		public string PuchiChara = "0";
@@ -264,7 +266,7 @@ internal class SaveFile {
 		public List<string> UnlockedSongs = new List<string>();
 
 		[JsonIgnore]
-		public List<int> UnlockedNameplateIds = new List<int>();
+		public HashSet<string> UnlockedNameplateIds = new HashSet<string>();
 
 		// Global Triggers
 		[JsonProperty("activeTriggers")]

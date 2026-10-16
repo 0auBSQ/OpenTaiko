@@ -328,7 +328,7 @@ Available as the global VIRTUALSLOTS. Slot indices run from 1 to 5; setters igno
 | `VIRTUALSLOTS:SetNameplateTitle(slot, title)  -> void` | Sets the nameplate title text of the slot. |
 | `VIRTUALSLOTS:GetNameplateDan(slot)  -> string` | Returns the nameplate dan text of the slot. |
 | `VIRTUALSLOTS:SetNameplateDan(slot, dan)  -> void` | Sets the nameplate dan text of the slot. |
-| `VIRTUALSLOTS:SetNameplateById(slot, nameplateId)  -> void` | Applies a nameplate from the nameplate database by id: sets the title text, type and rarity. An unknown id only records the id. |
+| `VIRTUALSLOTS:SetNameplateById(slot, nameplateId)  -> void` | Applies a nameplate from the nameplate list by id (a string, or the number of a shipped nameplate): sets the title text, type and rarity. An empty or unknown id shows the plate without a title. |
 | `VIRTUALSLOTS:SetNameplateType(slot, type)  -> void` | Sets the nameplate title type (style index) directly. |
 | `VIRTUALSLOTS:SetNameplateRarity(slot, rarity)  -> void` | Sets the nameplate title rarity index directly. |
 | `VIRTUALSLOTS:SetNameplateDanType(slot, danType)  -> void` | Sets the dan plate type. |

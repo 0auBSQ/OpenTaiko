@@ -328,7 +328,7 @@ node.UnlockCondition이 이 객체를 반환합니다. HasCondition은 프로퍼
 | `VIRTUALSLOTS:SetNameplateTitle(slot, title)  -> void` | 슬롯의 네임플레이트 칭호 텍스트를 설정합니다. |
 | `VIRTUALSLOTS:GetNameplateDan(slot)  -> string` | 슬롯의 네임플레이트 단위 텍스트를 반환합니다. |
 | `VIRTUALSLOTS:SetNameplateDan(slot, dan)  -> void` | 슬롯의 네임플레이트 단위 텍스트를 설정합니다. |
-| `VIRTUALSLOTS:SetNameplateById(slot, nameplateId)  -> void` | 네임플레이트 데이터베이스의 id로 네임플레이트를 적용합니다. 칭호 텍스트, 타입, 희귀도를 설정합니다. 알 수 없는 id는 id만 기록합니다. |
+| `VIRTUALSLOTS:SetNameplateById(slot, nameplateId)  -> void` | 네임플레이트 목록의 네임플레이트를 id(문자열, 또는 기본 제공 네임플레이트의 번호)로 적용합니다. 칭호 텍스트, 타입, 희귀도를 설정합니다. 비어 있거나 알 수 없는 id는 칭호 없는 플레이트를 표시합니다. |
 | `VIRTUALSLOTS:SetNameplateType(slot, type)  -> void` | 네임플레이트 칭호 타입(스타일 인덱스)을 직접 설정합니다. |
 | `VIRTUALSLOTS:SetNameplateRarity(slot, rarity)  -> void` | 네임플레이트 칭호 희귀도 인덱스를 직접 설정합니다. |
 | `VIRTUALSLOTS:SetNameplateDanType(slot, danType)  -> void` | 단위 플레이트 타입을 설정합니다. |

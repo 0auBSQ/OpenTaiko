@@ -1,0 +1,2672 @@
+{
+	"pack": "opentaiko",
+	"name": { "strings": { "default": "OpenTaiko" } },
+	"nameplates": [
+		{
+			"key": "0",
+			"title": "Beginner",
+			"type": 0,
+			"rarity": "Common"
+		},
+		{
+			"key": "1",
+			"title": "First steps",
+			"type": 39,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [0, 2, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "2",
+			"title": "A Normal Player",
+			"type": 39,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [1, 2, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "3",
+			"title": "A very Normal Player",
+			"type": 39,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [1, 2, 10], "type": "me", "references": [] }
+		},
+		{
+			"key": "4",
+			"title": "An extremely Normal player",
+			"type": 39,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "dp", "values": [1, 2, 100], "type": "me", "references": [] }
+		},
+		{
+			"key": "5",
+			"title": "Hard-boiled",
+			"type": 39,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [2, 2, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "6",
+			"title": "Hard as rock",
+			"type": 39,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [2, 2, 10], "type": "me", "references": [] }
+		},
+		{
+			"key": "7",
+			"title": "Hard as diamonds",
+			"type": 39,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "dp", "values": [2, 2, 100], "type": "me", "references": [] }
+		},
+		{
+			"key": "8",
+			"title": "My first Extreme",
+			"type": 39,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [3, 2, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "9",
+			"title": "An Extreme player",
+			"type": 39,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "dp", "values": [3, 2, 10], "type": "me", "references": [] }
+		},
+		{
+			"key": "10",
+			"title": "A very Extreme player",
+			"type": 39,
+			"rarity": "Rare",
+			"unlock": { "condition": "dp", "values": [3, 2, 100], "type": "me", "references": [] }
+		},
+		{
+			"key": "11",
+			"title": "The grind never ends!",
+			"type": 39,
+			"rarity": "Legendary",
+			"unlock": { "condition": "dp", "values": [3, 2, 1000], "type": "me", "references": [] }
+		},
+		{
+			"key": "12",
+			"title": "Free from errors",
+			"type": 40,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [3, 3, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "13",
+			"title": "Full Combo Warrior!!",
+			"type": 40,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "dp", "values": [3, 3, 10], "type": "me", "references": [] }
+		},
+		{
+			"key": "14",
+			"title": "Full Combo Dragon",
+			"type": 40,
+			"rarity": "Rare",
+			"unlock": { "condition": "dp", "values": [3, 3, 100], "type": "me", "references": [] }
+		},
+		{
+			"key": "15",
+			"title": "Flawless",
+			"type": 41,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [3, 4, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "16",
+			"title": "Perfect Warrior!!",
+			"type": 41,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "dp", "values": [3, 4, 10], "type": "me", "references": [] }
+		},
+		{
+			"key": "17",
+			"title": "Perfect Dragon",
+			"type": 41,
+			"rarity": "Rare",
+			"unlock": { "condition": "dp", "values": [3, 4, 100], "type": "me", "references": [] }
+		},
+		{
+			"key": "18",
+			"title": "Eight stars",
+			"type": 1,
+			"rarity": "Common",
+			"unlock": { "condition": "lp", "values": [8, 2, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "19",
+			"title": "Nine stars",
+			"type": 1,
+			"rarity": "Common",
+			"unlock": { "condition": "lp", "values": [9, 2, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "20",
+			"title": "Challenger",
+			"type": 2,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "lp", "values": [10, 2, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "21",
+			"title": "Sweaty challenger",
+			"type": 6,
+			"rarity": "Rare",
+			"unlock": { "condition": "lp", "values": [11, 2, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "22",
+			"title": "Challenger from another world",
+			"type": 13,
+			"rarity": "Epic",
+			"unlock": { "condition": "lp", "values": [12, 2, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "23",
+			"title": "Unbeatable warrior",
+			"type": 13,
+			"rarity": "Epic",
+			"unlock": { "condition": "lp", "values": [13, 2, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "24",
+			"title": "Eight shining stars",
+			"type": 2,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "lp", "values": [8, 3, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "25",
+			"title": "Nine shining stars",
+			"type": 2,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "lp", "values": [9, 3, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "26",
+			"title": "Talented drummer",
+			"type": 12,
+			"rarity": "Rare",
+			"unlock": { "condition": "lp", "values": [10, 3, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "27",
+			"title": "Tenacious warrior",
+			"type": 7,
+			"rarity": "Epic",
+			"unlock": { "condition": "lp", "values": [11, 3, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "28",
+			"title": "Drummer from another world",
+			"type": 8,
+			"rarity": "Legendary",
+			"unlock": { "condition": "lp", "values": [12, 3, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "29",
+			"title": "Celestial divinity",
+			"type": 9,
+			"rarity": "Legendary",
+			"unlock": { "condition": "lp", "values": [13, 3, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "30",
+			"title": "Eight sparkling stars",
+			"type": 3,
+			"rarity": "Rare",
+			"unlock": { "condition": "lp", "values": [8, 4, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "31",
+			"title": "Nine sparkling stars",
+			"type": 7,
+			"rarity": "Epic",
+			"unlock": { "condition": "lp", "values": [9, 4, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "32",
+			"title": "Outstanding drummer",
+			"type": 7,
+			"rarity": "Epic",
+			"unlock": { "condition": "lp", "values": [10, 4, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "33",
+			"title": "Eternal legend",
+			"type": 8,
+			"rarity": "Legendary",
+			"unlock": { "condition": "lp", "values": [11, 4, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "34",
+			"title": "Drummer from another dimension",
+			"type": 8,
+			"rarity": "Legendary",
+			"unlock": { "condition": "lp", "values": [12, 4, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "35",
+			"title": "I sold my real life",
+			"type": 10,
+			"rarity": "Poor",
+			"unlock": { "condition": "lp", "values": [13, 4, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "36",
+			"title": "First Depiction",
+			"type": 15,
+			"rarity": "Common",
+			"unlock": { "condition": "sg", "values": [1, 2], "type": "me", "references": ["Dashy's Secrets"] }
+		},
+		{
+			"key": "37",
+			"title": "Seven stars",
+			"type": 1,
+			"rarity": "Common",
+			"unlock": { "condition": "lp", "values": [7, 2, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "38",
+			"title": "Visitor of the empty world",
+			"type": 15,
+			"rarity": "Common",
+			"unlock": { "condition": "sg", "values": [5, 2], "type": "me", "references": ["Dashy's Secrets"] }
+		},
+		{
+			"key": "39",
+			"title": "Forever, Endless, Illimitable.",
+			"type": 15,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sg", "values": [8, 3], "type": "me", "references": ["Dashy's Secrets"] }
+		},
+		{
+			"key": "40",
+			"title": "Welcome to OpenTaiko!",
+			"type": 28,
+			"rarity": "Common",
+			"unlock": { "condition": "tp", "values": [1], "type": "me", "references": [] }
+		},
+		{
+			"key": "41",
+			"title": "Into OpenTaiko!",
+			"type": 29,
+			"rarity": "Common",
+			"unlock": { "condition": "tp", "values": [10], "type": "me", "references": [] }
+		},
+		{
+			"key": "42",
+			"title": "Never enough music!",
+			"type": 21,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "tp", "values": [100], "type": "me", "references": [] }
+		},
+		{
+			"key": "43",
+			"title": "The melody of all",
+			"type": 7,
+			"rarity": "Rare",
+			"unlock": { "condition": "tp", "values": [1000], "type": "me", "references": [] }
+		},
+		{
+			"key": "44",
+			"title": "The rhapsody of everything",
+			"type": 8,
+			"rarity": "Epic",
+			"unlock": { "condition": "tp", "values": [10000], "type": "me", "references": [] }
+		},
+		{
+			"key": "45",
+			"title": "(´• ω •`)",
+			"type": 22,
+			"rarity": "Common",
+			"unlock": { "condition": "sc", "values": [3, 2], "type": "me", "references": ["bol"] }
+		},
+		{
+			"key": "46",
+			"title": "I Got That Dawg in Me",
+			"type": 21,
+			"rarity": "Common",
+			"unlock": { "condition": "sc", "values": [3, 2], "type": "me", "references": ["Colin"] }
+		},
+		{
+			"key": "47",
+			"title": "A true Komitment",
+			"type": 20,
+			"rarity": "Common",
+			"unlock": { "condition": "sc", "values": [3, 2], "type": "me", "references": ["Komi"] }
+		},
+		{
+			"key": "48",
+			"title": "<c.#FFFFFF.#0F1F3B>Rock The Dragon</c>",
+			"type": 31,
+			"rarity": "Common",
+			"unlock": { "condition": "sc", "values": [3, 2], "type": "me", "references": ["DragonRatTiger"] }
+		},
+		{
+			"key": "49",
+			"title": "N1nja Enthus1ast",
+			"type": 16,
+			"rarity": "Common",
+			"unlock": { "condition": "sc", "values": [3, 2], "type": "me", "references": ["DiamondN1nja"] }
+		},
+		{
+			"key": "50",
+			"title": "Tech Tryharder",
+			"type": 17,
+			"rarity": "Common",
+			"unlock": { "condition": "sc", "values": [3, 2], "type": "me", "references": ["sadkay"] }
+		},
+		{
+			"key": "51",
+			"title": "Shoxking!",
+			"type": 23,
+			"rarity": "Common",
+			"unlock": { "condition": "sc", "values": [3, 2], "type": "me", "references": ["Shoxk"] }
+		},
+		{
+			"key": "52",
+			"title": "Keep your rhythm up!",
+			"type": 24,
+			"rarity": "Common",
+			"unlock": { "condition": "sc", "values": [3, 2], "type": "me", "references": ["berdstep"] }
+		},
+		{
+			"key": "53",
+			"title": "sleepy",
+			"type": 22,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sc", "values": [10, 2], "type": "me", "references": ["bol"] }
+		},
+		{
+			"key": "54",
+			"title": "On a Roll",
+			"type": 21,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sc", "values": [10, 2], "type": "me", "references": ["Colin"] }
+		},
+		{
+			"key": "55",
+			"title": "HeroiKomical",
+			"type": 20,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sc", "values": [10, 2], "type": "me", "references": ["Komi"] }
+		},
+		{
+			"key": "56",
+			"title": "Algorithmic soul v0.1",
+			"type": 19,
+			"rarity": "Common",
+			"unlock": { "condition": "aw", "values": [1], "type": "me", "references": [] }
+		},
+		{
+			"key": "57",
+			"title": "Algorithmic soul v1.0",
+			"type": 19,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "aw", "values": [10], "type": "me", "references": [] }
+		},
+		{
+			"key": "58",
+			"title": "Algorithmic soul v1.1",
+			"type": 19,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "aw", "values": [50], "type": "me", "references": [] }
+		},
+		{
+			"key": "59",
+			"title": "Algorithmic soul v2.0",
+			"type": 19,
+			"rarity": "Rare",
+			"unlock": { "condition": "aw", "values": [100], "type": "me", "references": [] }
+		},
+		{
+			"key": "60",
+			"title": "Algorithmic soul v2.1",
+			"type": 19,
+			"rarity": "Rare",
+			"unlock": { "condition": "aw", "values": [200], "type": "me", "references": [] }
+		},
+		{
+			"key": "61",
+			"title": "Algorithmic soul v2.2",
+			"type": 19,
+			"rarity": "Rare",
+			"unlock": { "condition": "aw", "values": [500], "type": "me", "references": [] }
+		},
+		{
+			"key": "62",
+			"title": "Algorithmic soul v3.0",
+			"type": 19,
+			"rarity": "Epic",
+			"unlock": { "condition": "aw", "values": [1000], "type": "me", "references": [] }
+		},
+		{
+			"key": "63",
+			"title": "Algorithmic soul v3.1",
+			"type": 19,
+			"rarity": "Epic",
+			"unlock": { "condition": "aw", "values": [2000], "type": "me", "references": [] }
+		},
+		{
+			"key": "64",
+			"title": "Algorithmic soul v3.2",
+			"type": 19,
+			"rarity": "Epic",
+			"unlock": { "condition": "aw", "values": [3000], "type": "me", "references": [] }
+		},
+		{
+			"key": "65",
+			"title": "Algorithmic soul v3.3",
+			"type": 19,
+			"rarity": "Epic",
+			"unlock": { "condition": "aw", "values": [5000], "type": "me", "references": [] }
+		},
+		{
+			"key": "66",
+			"title": "Forged in Silicon",
+			"type": 19,
+			"rarity": "Legendary",
+			"unlock": { "condition": "aw", "values": [10000], "type": "me", "references": [] }
+		},
+		{
+			"key": "67",
+			"title": "MAInus' apprentice",
+			"type": 19,
+			"rarity": "Common",
+			"unlock": { "condition": "ap", "values": [1], "type": "me", "references": [] }
+		},
+		{
+			"key": "68",
+			"title": "MAInus' companion",
+			"type": 19,
+			"rarity": "Common",
+			"unlock": { "condition": "ap", "values": [10], "type": "me", "references": [] }
+		},
+		{
+			"key": "69",
+			"title": "MAInus' homeboy",
+			"type": 19,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ap", "values": [100], "type": "me", "references": [] }
+		},
+		{
+			"key": "70",
+			"title": "AItritus' rival",
+			"type": 19,
+			"rarity": "Rare",
+			"unlock": { "condition": "ap", "values": [1000], "type": "me", "references": [] }
+		},
+		{
+			"key": "71",
+			"title": "AItritus' crush",
+			"type": 19,
+			"rarity": "Epic",
+			"unlock": { "condition": "ap", "values": [10000], "type": "me", "references": [] }
+		},
+		{
+			"key": "72",
+			"title": "First savings",
+			"type": 11,
+			"rarity": "Common",
+			"unlock": { "condition": "ce", "values": [50], "type": "me", "references": [] }
+		},
+		{
+			"key": "73",
+			"title": "Hard worker",
+			"type": 11,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ce", "values": [1000], "type": "me", "references": [] }
+		},
+		{
+			"key": "74",
+			"title": "Upper class",
+			"type": 11,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ce", "values": [5000], "type": "me", "references": [] }
+		},
+		{
+			"key": "75",
+			"title": "Gold digger",
+			"type": 11,
+			"rarity": "Rare",
+			"unlock": { "condition": "ce", "values": [20000], "type": "me", "references": [] }
+		},
+		{
+			"key": "76",
+			"title": "Real estate investor",
+			"type": 11,
+			"rarity": "Rare",
+			"unlock": { "condition": "ce", "values": [100000], "type": "me", "references": [] }
+		},
+		{
+			"key": "77",
+			"title": "Venture capitalist",
+			"type": 11,
+			"rarity": "Epic",
+			"unlock": { "condition": "ce", "values": [500000], "type": "me", "references": [] }
+		},
+		{
+			"key": "78",
+			"title": "OpenMillionaire",
+			"type": 11,
+			"rarity": "Legendary",
+			"unlock": { "condition": "ce", "values": [2000000], "type": "me", "references": [] }
+		},
+		{
+			"key": "79",
+			"title": "Chapter I Enjoyer",
+			"type": 25,
+			"rarity": "Common",
+			"unlock": { "condition": "sg", "values": [5, 2], "type": "me", "references": ["OpenTaiko Chapter I"] }
+		},
+		{
+			"key": "80",
+			"title": "Chapter I Enthusiast",
+			"type": 25,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sg", "values": [15, 2], "type": "me", "references": ["OpenTaiko Chapter I"] }
+		},
+		{
+			"key": "81",
+			"title": "Chapter I Lover",
+			"type": 25,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sg", "values": [34, 2], "type": "me", "references": ["OpenTaiko Chapter I"] }
+		},
+		{
+			"key": "82",
+			"title": "Chapter I Professional",
+			"type": 25,
+			"rarity": "Rare",
+			"unlock": { "condition": "sg", "values": [34, 3], "type": "me", "references": ["OpenTaiko Chapter I"] }
+		},
+		{
+			"key": "83",
+			"title": "Chapter I Completionist",
+			"type": 25,
+			"rarity": "Epic",
+			"unlock": { "condition": "sg", "values": [34, 4], "type": "me", "references": ["OpenTaiko Chapter I"] }
+		},
+		{
+			"key": "84",
+			"title": "Chapter II Enjoyer",
+			"type": 26,
+			"rarity": "Common",
+			"unlock": { "condition": "sg", "values": [5, 2], "type": "me", "references": ["OpenTaiko Chapter II"] }
+		},
+		{
+			"key": "85",
+			"title": "Chapter II Enthusiast",
+			"type": 26,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sg", "values": [15, 2], "type": "me", "references": ["OpenTaiko Chapter II"] }
+		},
+		{
+			"key": "86",
+			"title": "Chapter II Lover",
+			"type": 26,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sg", "values": [38, 2], "type": "me", "references": ["OpenTaiko Chapter II"] }
+		},
+		{
+			"key": "87",
+			"title": "Chapter II Professional",
+			"type": 26,
+			"rarity": "Rare",
+			"unlock": { "condition": "sg", "values": [38, 3], "type": "me", "references": ["OpenTaiko Chapter II"] }
+		},
+		{
+			"key": "88",
+			"title": "Chapter II Completionist",
+			"type": 26,
+			"rarity": "Epic",
+			"unlock": { "condition": "sg", "values": [38, 4], "type": "me", "references": ["OpenTaiko Chapter II"] }
+		},
+		{
+			"key": "89",
+			"title": "Chapter III Enjoyer",
+			"type": 27,
+			"rarity": "Common",
+			"unlock": { "condition": "sg", "values": [5, 2], "type": "me", "references": ["OpenTaiko Chapter III"] }
+		},
+		{
+			"key": "90",
+			"title": "Chapter III Enthusiast",
+			"type": 27,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sg", "values": [15, 2], "type": "me", "references": ["OpenTaiko Chapter III"] }
+		},
+		{
+			"key": "91",
+			"title": "Chapter III Lover",
+			"type": 27,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sg", "values": [34, 2], "type": "me", "references": ["OpenTaiko Chapter III"] }
+		},
+		{
+			"key": "92",
+			"title": "Chapter III Professional",
+			"type": 27,
+			"rarity": "Rare",
+			"unlock": { "condition": "sg", "values": [34, 3], "type": "me", "references": ["OpenTaiko Chapter III"] }
+		},
+		{
+			"key": "93",
+			"title": "Chapter III Completionist",
+			"type": 27,
+			"rarity": "Epic",
+			"unlock": { "condition": "sg", "values": [34, 4], "type": "me", "references": ["OpenTaiko Chapter III"] }
+		},
+		{
+			"key": "94",
+			"title": "Trapped in the past",
+			"type": 33,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["dlbTFD"] }
+		},
+		{
+			"key": "95",
+			"title": "In the shadows",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["yamiTfd"] }
+		},
+		{
+			"key": "96",
+			"title": "16th memory",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["DY9VMPUEg3M5EoNVgpSXvmKlJ9IciHx8o15hoUFcOJtDlp499vilAM6w24BDLOkR"] }
+		},
+		{
+			"key": "97",
+			"title": "Exiled",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["h4HQFxFFIVo5F7SuBGf8eWfHeXsmZQDkg9JG7IOI79zutvCrIa6l2L0FfQlrgPpx"] }
+		},
+		{
+			"key": "98",
+			"title": "Nekromancer",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["drWxV66Sy701Xb5Bt1tU0Bu7K7zzVHgCJtofHu82DJ9xzdCODrrupFXdu9UatSsC"] }
+		},
+		{
+			"key": "99",
+			"title": "3.14",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [3, 2], "type": "me", "references": ["dIoFTbrjyB3SB4LOBBHFVWh48zMWujgzriflF3wYql0zUEZfH7O96NTc3Sq8cBaC"] }
+		},
+		{
+			"key": "100",
+			"title": "Breaking the quietude",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["2A4IMmyhJ7df3mbWKgrctA1uZJU0kWjRpZWYUEk49yQO3DEdlsie38wJ5kZC9Lqk"] }
+		},
+		{
+			"key": "101",
+			"title": "Vanir's guest",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["BpeNYGTWmesmiavWRa5YI9awPs0e3cWOeAMEERlzksSI9bHk7npADQYMQT6igVZS"] }
+		},
+		{
+			"key": "102",
+			"title": "Scarlet hopes",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [3, 2], "type": "me", "references": ["qrUWiAJZhmf5rDImhpw07ohxRhCHp9qhZHhODJsLlt7IPogXNVwHgmrSD06zFOAh"] }
+		},
+		{
+			"key": "103",
+			"title": "Fragmented spirit",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["rN0fIoR0ggXJRzhxaXZbBGQYqYuIrnsm8ruys29zdtb2bPXBZv40b15QxGpqpd0t"] }
+		},
+		{
+			"key": "104",
+			"title": "Never too fast",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["g5g9LONlUIpjDQWp4sTjx0xjkkkHVZQZtLePUlwsjWVtJmcJ9GjxTfLOFfMJKWXt"] }
+		},
+		{
+			"key": "105",
+			"title": "Fractured soul",
+			"type": 33,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["j9FAa9tm4m5dsKGLhy9Z5kuqq6ryIMnm7Qdm5FlGaFJqdgLKdMnrlQ8kBEHakXzO"] }
+		},
+		{
+			"key": "106",
+			"title": "PARANOiAC",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["ZtPIqdYGeZOkWIn26wUfSWDxwB6PsILjmYQGW3CPHSANm2J4SwiFYEe0qZt4PVTQ"] }
+		},
+		{
+			"key": "107",
+			"title": "Collapsing again",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["recollapseh888"] }
+		},
+		{
+			"key": "108",
+			"title": "Emily's rendez-vous",
+			"type": 33,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["Wov6iflCWYNC8eiSjATxEzMQuvVwk3AyNcZbAHJdsjylweCb08WSSPc8DoJ1Fp2Z"] }
+		},
+		{
+			"key": "109",
+			"title": "Secret mirage",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [3, 2], "type": "me", "references": ["7TgDUfiEAVn0sV6HqfRVLV61HeshX8eJhEB7POVVIQmvpgu8W94Wryb8gEXj0KPh"] }
+		},
+		{
+			"key": "110",
+			"title": "Blooming feelings",
+			"type": 33,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["9zkgZxZzVy108OW0SCPlPsooKRgplzWcuvVXjmBsUIPWZdFtrwYm6kPcXcfMgVEH"] }
+		},
+		{
+			"key": "111",
+			"title": "Turbulent rain",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [3, 2], "type": "me", "references": ["KJpnHoe2G9s5q6l3ChajeT3KyHmGrvBh7x45rYznQGdXPb6mW2AKtfEJ6QiGGBbg"] }
+		},
+		{
+			"key": "112",
+			"title": "Suspicious gourmet",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["touhou12"] }
+		},
+		{
+			"key": "113",
+			"title": "Taming the shadows",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["yamiTfd"] }
+		},
+		{
+			"key": "114",
+			"title": "DON'T LOOK BACK",
+			"type": 34,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["dlbTFD"] }
+		},
+		{
+			"key": "115",
+			"title": "16th eternity",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["DY9VMPUEg3M5EoNVgpSXvmKlJ9IciHx8o15hoUFcOJtDlp499vilAM6w24BDLOkR"] }
+		},
+		{
+			"key": "116",
+			"title": "Exiled forever",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["h4HQFxFFIVo5F7SuBGf8eWfHeXsmZQDkg9JG7IOI79zutvCrIa6l2L0FfQlrgPpx"] }
+		},
+		{
+			"key": "117",
+			"title": "NEKROMANCER",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["drWxV66Sy701Xb5Bt1tU0Bu7K7zzVHgCJtofHu82DJ9xzdCODrrupFXdu9UatSsC"] }
+		},
+		{
+			"key": "118",
+			"title": "3.1415926535",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [3, 3], "type": "me", "references": ["dIoFTbrjyB3SB4LOBBHFVWh48zMWujgzriflF3wYql0zUEZfH7O96NTc3Sq8cBaC"] }
+		},
+		{
+			"key": "119",
+			"title": "Transcending the quietude",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["2A4IMmyhJ7df3mbWKgrctA1uZJU0kWjRpZWYUEk49yQO3DEdlsie38wJ5kZC9Lqk"] }
+		},
+		{
+			"key": "120",
+			"title": "Yggdrasil's sovereign",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["BpeNYGTWmesmiavWRa5YI9awPs0e3cWOeAMEERlzksSI9bHk7npADQYMQT6igVZS"] }
+		},
+		{
+			"key": "121",
+			"title": "Scarlet heart",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [3, 3], "type": "me", "references": ["qrUWiAJZhmf5rDImhpw07ohxRhCHp9qhZHhODJsLlt7IPogXNVwHgmrSD06zFOAh"] }
+		},
+		{
+			"key": "122",
+			"title": "Fragmented memory",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["rN0fIoR0ggXJRzhxaXZbBGQYqYuIrnsm8ruys29zdtb2bPXBZv40b15QxGpqpd0t"] }
+		},
+		{
+			"key": "123",
+			"title": "Faster than light",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["g5g9LONlUIpjDQWp4sTjx0xjkkkHVZQZtLePUlwsjWVtJmcJ9GjxTfLOFfMJKWXt"] }
+		},
+		{
+			"key": "124",
+			"title": "Fractured entity",
+			"type": 34,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["j9FAa9tm4m5dsKGLhy9Z5kuqq6ryIMnm7Qdm5FlGaFJqdgLKdMnrlQ8kBEHakXzO"] }
+		},
+		{
+			"key": "125",
+			"title": "Perpetually PARANOiAC",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["ZtPIqdYGeZOkWIn26wUfSWDxwB6PsILjmYQGW3CPHSANm2J4SwiFYEe0qZt4PVTQ"] }
+		},
+		{
+			"key": "126",
+			"title": "Collapsing forever",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["recollapseh888"] }
+		},
+		{
+			"key": "127",
+			"title": "Emily's confession",
+			"type": 34,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["Wov6iflCWYNC8eiSjATxEzMQuvVwk3AyNcZbAHJdsjylweCb08WSSPc8DoJ1Fp2Z"] }
+		},
+		{
+			"key": "128",
+			"title": "Forsaken mirage",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [3, 3], "type": "me", "references": ["7TgDUfiEAVn0sV6HqfRVLV61HeshX8eJhEB7POVVIQmvpgu8W94Wryb8gEXj0KPh"] }
+		},
+		{
+			"key": "129",
+			"title": "Blooming feelings",
+			"type": 34,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["9zkgZxZzVy108OW0SCPlPsooKRgplzWcuvVXjmBsUIPWZdFtrwYm6kPcXcfMgVEH"] }
+		},
+		{
+			"key": "130",
+			"title": "Turbulent rain",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [3, 3], "type": "me", "references": ["KJpnHoe2G9s5q6l3ChajeT3KyHmGrvBh7x45rYznQGdXPb6mW2AKtfEJ6QiGGBbg"] }
+		},
+		{
+			"key": "131",
+			"title": "Fallacious critique",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["touhou12"] }
+		},
+		{
+			"key": "132",
+			"title": "MAXIMUM VELOCITY",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["PumWZwvVeA2i6vZVjDruLIDifDCUcMbd6SGyuyAHXQuiYixVyKJdAkDqW7Bmftyb"] }
+		},
+		{
+			"key": "133",
+			"title": "INFINITE VELOCITY",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["PumWZwvVeA2i6vZVjDruLIDifDCUcMbd6SGyuyAHXQuiYixVyKJdAkDqW7Bmftyb"] }
+		},
+		{
+			"key": "134",
+			"title": "#1 Chapter I Lover",
+			"type": 25,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [3, 2], "type": "me", "references": ["weAREOptkdashYdeSu2022suBMiSSIoNMEMORialMedLEy"] }
+		},
+		{
+			"key": "135",
+			"title": "I AM OPTK!!",
+			"type": 25,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [3, 3], "type": "me", "references": ["weAREOptkdashYdeSu2022suBMiSSIoNMEMORialMedLEy"] }
+		},
+		{
+			"key": "136",
+			"title": "WE ARE OPTK!!",
+			"type": 25,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [3, 4], "type": "me", "references": ["weAREOptkdashYdeSu2022suBMiSSIoNMEMORialMedLEy"] }
+		},
+		{
+			"key": "137",
+			"title": "Chapter IV Enjoyer",
+			"type": 32,
+			"rarity": "Common",
+			"unlock": { "condition": "sg", "values": [5, 2], "type": "me", "references": ["OpenTaiko Chapter IV"] }
+		},
+		{
+			"key": "138",
+			"title": "Chapter IV Enthusiast",
+			"type": 32,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sg", "values": [15, 2], "type": "me", "references": ["OpenTaiko Chapter IV"] }
+		},
+		{
+			"key": "139",
+			"title": "Chapter IV Lover",
+			"type": 32,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sg", "values": [39, 2], "type": "me", "references": ["OpenTaiko Chapter IV"] }
+		},
+		{
+			"key": "140",
+			"title": "Chapter IV Professional",
+			"type": 32,
+			"rarity": "Rare",
+			"unlock": { "condition": "sg", "values": [39, 3], "type": "me", "references": ["OpenTaiko Chapter IV"] }
+		},
+		{
+			"key": "141",
+			"title": "Chapter IV Completionist",
+			"type": 32,
+			"rarity": "Epic",
+			"unlock": { "condition": "sg", "values": [39, 4], "type": "me", "references": ["OpenTaiko Chapter IV"] }
+		},
+		{
+			"key": "142",
+			"title": "I enjoy endings at double BPM",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["yamiTfd"] }
+		},
+		{
+			"key": "143",
+			"title": "DON'T LOOK BACK bruh",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["dlbTFD"] }
+		},
+		{
+			"key": "144",
+			"title": "Freaking birthday cake",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["DY9VMPUEg3M5EoNVgpSXvmKlJ9IciHx8o15hoUFcOJtDlp499vilAM6w24BDLOkR"] }
+		},
+		{
+			"key": "145",
+			"title": "Exiled from society",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["h4HQFxFFIVo5F7SuBGf8eWfHeXsmZQDkg9JG7IOI79zutvCrIa6l2L0FfQlrgPpx"] }
+		},
+		{
+			"key": "146",
+			"title": "Unnecessary 11 star lover",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["drWxV66Sy701Xb5Bt1tU0Bu7K7zzVHgCJtofHu82DJ9xzdCODrrupFXdu9UatSsC"] }
+		},
+		{
+			"key": "147",
+			"title": "3.14159265358979323846",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [3, 4], "type": "me", "references": ["dIoFTbrjyB3SB4LOBBHFVWh48zMWujgzriflF3wYql0zUEZfH7O96NTc3Sq8cBaC"] }
+		},
+		{
+			"key": "148",
+			"title": "BBQ",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["2A4IMmyhJ7df3mbWKgrctA1uZJU0kWjRpZWYUEk49yQO3DEdlsie38wJ5kZC9Lqk"] }
+		},
+		{
+			"key": "149",
+			"title": "Yggdrasil's creator",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["BpeNYGTWmesmiavWRa5YI9awPs0e3cWOeAMEERlzksSI9bHk7npADQYMQT6igVZS"] }
+		},
+		{
+			"key": "150",
+			"title": "Cusi's champion",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [3, 4], "type": "me", "references": ["qrUWiAJZhmf5rDImhpw07ohxRhCHp9qhZHhODJsLlt7IPogXNVwHgmrSD06zFOAh"] }
+		},
+		{
+			"key": "151",
+			"title": "Fragmented sanity",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["rN0fIoR0ggXJRzhxaXZbBGQYqYuIrnsm8ruys29zdtb2bPXBZv40b15QxGpqpd0t"] }
+		},
+		{
+			"key": "152",
+			"title": "At 2025 BPM",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["g5g9LONlUIpjDQWp4sTjx0xjkkkHVZQZtLePUlwsjWVtJmcJ9GjxTfLOFfMJKWXt"] }
+		},
+		{
+			"key": "153",
+			"title": "How did you perfect this!?",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["j9FAa9tm4m5dsKGLhy9Z5kuqq6ryIMnm7Qdm5FlGaFJqdgLKdMnrlQ8kBEHakXzO"] }
+		},
+		{
+			"key": "154",
+			"title": "TaikoTaikoRevolution",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["ZtPIqdYGeZOkWIn26wUfSWDxwB6PsILjmYQGW3CPHSANm2J4SwiFYEe0qZt4PVTQ"] }
+		},
+		{
+			"key": "155",
+			"title": "Apocalypse",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["recollapseh888"] }
+		},
+		{
+			"key": "156",
+			"title": "Cheated on Emily",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["Wov6iflCWYNC8eiSjATxEzMQuvVwk3AyNcZbAHJdsjylweCb08WSSPc8DoJ1Fp2Z"] }
+		},
+		{
+			"key": "157",
+			"title": "What should I do?",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [3, 4], "type": "me", "references": ["7TgDUfiEAVn0sV6HqfRVLV61HeshX8eJhEB7POVVIQmvpgu8W94Wryb8gEXj0KPh"] }
+		},
+		{
+			"key": "158",
+			"title": "I can't breathe",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["9zkgZxZzVy108OW0SCPlPsooKRgplzWcuvVXjmBsUIPWZdFtrwYm6kPcXcfMgVEH"] }
+		},
+		{
+			"key": "159",
+			"title": "The perpetual cycle of rain",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [3, 4], "type": "me", "references": ["KJpnHoe2G9s5q6l3ChajeT3KyHmGrvBh7x45rYznQGdXPb6mW2AKtfEJ6QiGGBbg"] }
+		},
+		{
+			"key": "160",
+			"title": "Too salty yakitori",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["touhou12"] }
+		},
+		{
+			"key": "161",
+			"title": "INFINITE VOLUME",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["PumWZwvVeA2i6vZVjDruLIDifDCUcMbd6SGyuyAHXQuiYixVyKJdAkDqW7Bmftyb"] }
+		},
+		{
+			"key": "162",
+			"title": "Understood the Major Event",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["OfficialAz3MajETC"] }
+		},
+		{
+			"key": "163",
+			"title": "Recovered from the Major Event",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["OfficialAz3MajETC"] }
+		},
+		{
+			"key": "164",
+			"title": "Overcame the Major Event",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["OfficialAz3MajETC"] }
+		},
+		{
+			"key": "165",
+			"title": "Cracked Eternity",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [3, 2], "type": "me", "references": ["j9FAa9tm4m5dsKGLhy9Z5kuqq6ryIMnm7Qdm5FlGaFJqdgLKdMnrlQ8kBEHakXzO"] }
+		},
+		{
+			"key": "166",
+			"title": "Shattered Eternity",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [3, 3], "type": "me", "references": ["j9FAa9tm4m5dsKGLhy9Z5kuqq6ryIMnm7Qdm5FlGaFJqdgLKdMnrlQ8kBEHakXzO"] }
+		},
+		{
+			"key": "167",
+			"title": "Fractured Eternity",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [3, 4], "type": "me", "references": ["j9FAa9tm4m5dsKGLhy9Z5kuqq6ryIMnm7Qdm5FlGaFJqdgLKdMnrlQ8kBEHakXzO"] }
+		},
+		{
+			"key": "168",
+			"title": "--Regnol On-og Lliw Ti",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["tsolYLN0"] }
+		},
+		{
+			"key": "169",
+			"title": "T'sol Niamer-I",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["tsolYLN0"] }
+		},
+		{
+			"key": "170",
+			"title": "Such is my truth.",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["tsolYLN0"] }
+		},
+		{
+			"key": "171",
+			"title": "Seven shining stars",
+			"type": 2,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "lp", "values": [7, 3, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "172",
+			"title": "Seven sparkling stars",
+			"type": 3,
+			"rarity": "Rare",
+			"unlock": { "condition": "lp", "values": [7, 4, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "173",
+			"title": "Six stars",
+			"type": 1,
+			"rarity": "Common",
+			"unlock": { "condition": "lp", "values": [6, 2, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "174",
+			"title": "Six shining stars",
+			"type": 2,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "lp", "values": [6, 3, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "175",
+			"title": "Six sparkling stars",
+			"type": 3,
+			"rarity": "Rare",
+			"unlock": { "condition": "lp", "values": [6, 4, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "176",
+			"title": "Five stars",
+			"type": 1,
+			"rarity": "Common",
+			"unlock": { "condition": "lp", "values": [5, 2, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "177",
+			"title": "Five shining stars",
+			"type": 2,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "lp", "values": [5, 3, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "178",
+			"title": "Five sparkling stars",
+			"type": 3,
+			"rarity": "Rare",
+			"unlock": { "condition": "lp", "values": [5, 4, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "179",
+			"title": "Four stars",
+			"type": 1,
+			"rarity": "Common",
+			"unlock": { "condition": "lp", "values": [4, 2, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "180",
+			"title": "Four shining stars",
+			"type": 2,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "lp", "values": [4, 3, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "181",
+			"title": "Four sparkling stars",
+			"type": 3,
+			"rarity": "Rare",
+			"unlock": { "condition": "lp", "values": [4, 4, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "182",
+			"title": "Three stars",
+			"type": 1,
+			"rarity": "Common",
+			"unlock": { "condition": "lp", "values": [3, 2, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "183",
+			"title": "Three shining stars",
+			"type": 2,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "lp", "values": [3, 3, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "184",
+			"title": "Three sparkling stars",
+			"type": 3,
+			"rarity": "Rare",
+			"unlock": { "condition": "lp", "values": [3, 4, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "185",
+			"title": "Two stars",
+			"type": 1,
+			"rarity": "Common",
+			"unlock": { "condition": "lp", "values": [2, 2, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "186",
+			"title": "Two shining stars",
+			"type": 2,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "lp", "values": [2, 3, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "187",
+			"title": "Two sparkling stars",
+			"type": 3,
+			"rarity": "Rare",
+			"unlock": { "condition": "lp", "values": [2, 4, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "188",
+			"title": "My first star",
+			"type": 1,
+			"rarity": "Common",
+			"unlock": { "condition": "lp", "values": [1, 2, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "189",
+			"title": "My first shining star",
+			"type": 2,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "lp", "values": [1, 3, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "190",
+			"title": "My first sparkling star",
+			"type": 3,
+			"rarity": "Rare",
+			"unlock": { "condition": "lp", "values": [1, 4, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "191",
+			"title": "Magnitude 3",
+			"type": 33,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sp", "values": [3, 2], "type": "me", "references": ["ssDeBisco"] }
+		},
+		{
+			"key": "192",
+			"title": "Magnitude 5",
+			"type": 34,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [3, 3], "type": "me", "references": ["ssDeBisco"] }
+		},
+		{
+			"key": "193",
+			"title": "Magnitude 7",
+			"type": 35,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [3, 4], "type": "me", "references": ["ssDeBisco"] }
+		},
+		{
+			"key": "194",
+			"title": "Rews'na na Ezila-usiv",
+			"type": 33,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sp", "values": [3, 2], "type": "me", "references": ["tsolYLN0"] }
+		},
+		{
+			"key": "195",
+			"title": "Fo h'Tap tah't Wollof",
+			"type": 34,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [3, 3], "type": "me", "references": ["tsolYLN0"] }
+		},
+		{
+			"key": "196",
+			"title": "Noitome na.",
+			"type": 35,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [3, 4], "type": "me", "references": ["tsolYLN0"] }
+		},
+		{
+			"key": "197",
+			"title": "HELIX",
+			"type": 33,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["agQmcnW1DEWvmXt6HVR7yyNntpqZEbNV4xUBmOMpxKbpfohxKXBs3msadhWMLvpR"] }
+		},
+		{
+			"key": "198",
+			"title": "DOUBLE HELIX",
+			"type": 34,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["agQmcnW1DEWvmXt6HVR7yyNntpqZEbNV4xUBmOMpxKbpfohxKXBs3msadhWMLvpR"] }
+		},
+		{
+			"key": "199",
+			"title": "TRIPLE HELIX",
+			"type": 35,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["agQmcnW1DEWvmXt6HVR7yyNntpqZEbNV4xUBmOMpxKbpfohxKXBs3msadhWMLvpR"] }
+		},
+		{
+			"key": "200",
+			"title": "NEP01 - Front Door - ★☆☆",
+			"type": 33,
+			"rarity": "Common",
+			"unlock": { "condition": "sp", "values": [3, 2], "type": "me", "references": ["optkhq01matsuri"] }
+		},
+		{
+			"key": "201",
+			"title": "NEP01 - Front Door - ★★☆",
+			"type": 34,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sp", "values": [3, 3], "type": "me", "references": ["optkhq01matsuri"] }
+		},
+		{
+			"key": "202",
+			"title": "NEP01 - Front Door - ★★★",
+			"type": 35,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [3, 4], "type": "me", "references": ["optkhq01matsuri"] }
+		},
+		{
+			"key": "203",
+			"title": "NEP01 - Back Door - ★☆☆",
+			"type": 33,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["optkhq01matsuri"] }
+		},
+		{
+			"key": "204",
+			"title": "NEP01 - Back Door - ★★☆",
+			"type": 34,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["optkhq01matsuri"] }
+		},
+		{
+			"key": "205",
+			"title": "NEP01 - Back Door - ★★★",
+			"type": 35,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["optkhq01matsuri"] }
+		},
+		{
+			"key": "206",
+			"title": "NEP02 - Front Door - ★☆☆",
+			"type": 33,
+			"rarity": "Common",
+			"unlock": { "condition": "sp", "values": [3, 2], "type": "me", "references": ["optkhq02frozen"] }
+		},
+		{
+			"key": "207",
+			"title": "NEP02 - Front Door - ★★☆",
+			"type": 34,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sp", "values": [3, 3], "type": "me", "references": ["optkhq02frozen"] }
+		},
+		{
+			"key": "208",
+			"title": "NEP02 - Front Door - ★★★",
+			"type": 35,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [3, 4], "type": "me", "references": ["optkhq02frozen"] }
+		},
+		{
+			"key": "209",
+			"title": "NEP02 - Back Door - ★☆☆",
+			"type": 33,
+			"rarity": "Common",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["optkhq02frozen"] }
+		},
+		{
+			"key": "210",
+			"title": "NEP02 - Back Door - ★★☆",
+			"type": 34,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["optkhq02frozen"] }
+		},
+		{
+			"key": "211",
+			"title": "NEP02 - Back Door - ★★★",
+			"type": 35,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["optkhq02frozen"] }
+		},
+		{
+			"key": "212",
+			"title": "Diligent learner",
+			"type": 39,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [0, 2, 10], "type": "me", "references": [] }
+		},
+		{
+			"key": "213",
+			"title": "In the comfort zone",
+			"type": 39,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [0, 2, 100], "type": "me", "references": [] }
+		},
+		{
+			"key": "214",
+			"title": "Effortless grinder",
+			"type": 39,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "dp", "values": [0, 2, 300], "type": "me", "references": [] }
+		},
+		{
+			"key": "215",
+			"title": "Eternal beginner",
+			"type": 39,
+			"rarity": "Rare",
+			"unlock": { "condition": "dp", "values": [0, 2, 500], "type": "me", "references": [] }
+		},
+		{
+			"key": "216",
+			"title": "A surprisingly Extreme player",
+			"type": 39,
+			"rarity": "Epic",
+			"unlock": { "condition": "dp", "values": [3, 2, 300], "type": "me", "references": [] }
+		},
+		{
+			"key": "217",
+			"title": "Mild spice enjoyer",
+			"type": 39,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "dp", "values": [1, 2, 300], "type": "me", "references": [] }
+		},
+		{
+			"key": "218",
+			"title": "Moderate completionist",
+			"type": 39,
+			"rarity": "Rare",
+			"unlock": { "condition": "dp", "values": [1, 2, 500], "type": "me", "references": [] }
+		},
+		{
+			"key": "219",
+			"title": "Harder than diamonds",
+			"type": 39,
+			"rarity": "Rare",
+			"unlock": { "condition": "dp", "values": [2, 2, 300], "type": "me", "references": [] }
+		},
+		{
+			"key": "220",
+			"title": "Singularity",
+			"type": 39,
+			"rarity": "Epic",
+			"unlock": { "condition": "dp", "values": [2, 2, 500], "type": "me", "references": [] }
+		},
+		{
+			"key": "221",
+			"title": "Full Combo Apprentice",
+			"type": 40,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [0, 3, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "222",
+			"title": "Full Combo Chef!!",
+			"type": 40,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [0, 3, 10], "type": "me", "references": [] }
+		},
+		{
+			"key": "223",
+			"title": "Full Combo Butterfly",
+			"type": 40,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [0, 3, 100], "type": "me", "references": [] }
+		},
+		{
+			"key": "224",
+			"title": "Shining Sunny Day",
+			"type": 40,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "dp", "values": [0, 3, 300], "type": "me", "references": [] }
+		},
+		{
+			"key": "225",
+			"title": "Full Combo Covered sky",
+			"type": 40,
+			"rarity": "Rare",
+			"unlock": { "condition": "dp", "values": [0, 3, 500], "type": "me", "references": [] }
+		},
+		{
+			"key": "226",
+			"title": "Bonds of Inferno",
+			"type": 40,
+			"rarity": "Rare",
+			"unlock": { "condition": "dp", "values": [3, 3, 200], "type": "me", "references": [] }
+		},
+		{
+			"key": "227",
+			"title": "Shining Incaendium",
+			"type": 40,
+			"rarity": "Epic",
+			"unlock": { "condition": "dp", "values": [3, 3, 300], "type": "me", "references": [] }
+		},
+		{
+			"key": "228",
+			"title": "Shining, Burning Blaze",
+			"type": 40,
+			"rarity": "Epic",
+			"unlock": { "condition": "dp", "values": [3, 3, 500], "type": "me", "references": [] }
+		},
+		{
+			"key": "229",
+			"title": "Recreation of the Core",
+			"type": 40,
+			"rarity": "Legendary",
+			"unlock": { "condition": "dp", "values": [3, 3, 1000], "type": "me", "references": [] }
+		},
+		{
+			"key": "230",
+			"title": "Full Combo Connoisseur",
+			"type": 40,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [1, 3, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "231",
+			"title": "Full Combo Fighter!!",
+			"type": 40,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [1, 3, 10], "type": "me", "references": [] }
+		},
+		{
+			"key": "232",
+			"title": "Full Combo Songbird",
+			"type": 40,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "dp", "values": [1, 3, 100], "type": "me", "references": [] }
+		},
+		{
+			"key": "233",
+			"title": "Connections of wildlife",
+			"type": 40,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "dp", "values": [1, 3, 300], "type": "me", "references": [] }
+		},
+		{
+			"key": "234",
+			"title": "Shining Nature's Bloom",
+			"type": 40,
+			"rarity": "Rare",
+			"unlock": { "condition": "dp", "values": [1, 3, 500], "type": "me", "references": [] }
+		},
+		{
+			"key": "235",
+			"title": "Full Combo Expert",
+			"type": 40,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [2, 3, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "236",
+			"title": "Full Combo Soldier!!",
+			"type": 40,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [2, 3, 10], "type": "me", "references": [] }
+		},
+		{
+			"key": "237",
+			"title": "Full Combo Falcon",
+			"type": 40,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "dp", "values": [2, 3, 100], "type": "me", "references": [] }
+		},
+		{
+			"key": "238",
+			"title": "Chains above the sky",
+			"type": 40,
+			"rarity": "Rare",
+			"unlock": { "condition": "dp", "values": [2, 3, 300], "type": "me", "references": [] }
+		},
+		{
+			"key": "239",
+			"title": "Golden-Painted Scenery",
+			"type": 40,
+			"rarity": "Epic",
+			"unlock": { "condition": "dp", "values": [2, 3, 500], "type": "me", "references": [] }
+		},
+		{
+			"key": "240",
+			"title": "A considerably Extreme player",
+			"type": 39,
+			"rarity": "Rare",
+			"unlock": { "condition": "dp", "values": [3, 2, 200], "type": "me", "references": [] }
+		},
+		{
+			"key": "241",
+			"title": "An extremely Extreme player",
+			"type": 39,
+			"rarity": "Epic",
+			"unlock": { "condition": "dp", "values": [3, 2, 500], "type": "me", "references": [] }
+		},
+		{
+			"key": "242",
+			"title": "Perfect Apprentice",
+			"type": 41,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [0, 4, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "243",
+			"title": "Perfect Chef!!",
+			"type": 41,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [0, 4, 10], "type": "me", "references": [] }
+		},
+		{
+			"key": "244",
+			"title": "Perfect Butterfly",
+			"type": 41,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [0, 4, 100], "type": "me", "references": [] }
+		},
+		{
+			"key": "245",
+			"title": "Sun-Drenched Serenity",
+			"type": 41,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "dp", "values": [0, 4, 300], "type": "me", "references": [] }
+		},
+		{
+			"key": "246",
+			"title": "Perfect Covered sky",
+			"type": 41,
+			"rarity": "Rare",
+			"unlock": { "condition": "dp", "values": [0, 4, 500], "type": "me", "references": [] }
+		},
+		{
+			"key": "247",
+			"title": "Perfect Connoisseur",
+			"type": 41,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [1, 4, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "248",
+			"title": "Perfect Fighter!!",
+			"type": 41,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [1, 4, 10], "type": "me", "references": [] }
+		},
+		{
+			"key": "249",
+			"title": "Perfect Songbird",
+			"type": 41,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "dp", "values": [1, 4, 100], "type": "me", "references": [] }
+		},
+		{
+			"key": "250",
+			"title": "Whispers of the Wild Bond",
+			"type": 41,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "dp", "values": [1, 4, 300], "type": "me", "references": [] }
+		},
+		{
+			"key": "251",
+			"title": "Radiance of Nature’s Awakening",
+			"type": 41,
+			"rarity": "Rare",
+			"unlock": { "condition": "dp", "values": [1, 4, 500], "type": "me", "references": [] }
+		},
+		{
+			"key": "252",
+			"title": "Perfect Combo Expert",
+			"type": 41,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [2, 4, 1], "type": "me", "references": [] }
+		},
+		{
+			"key": "253",
+			"title": "Perfect Soldier!!",
+			"type": 41,
+			"rarity": "Common",
+			"unlock": { "condition": "dp", "values": [2, 4, 10], "type": "me", "references": [] }
+		},
+		{
+			"key": "254",
+			"title": "Perfect Falcon",
+			"type": 41,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "dp", "values": [2, 4, 100], "type": "me", "references": [] }
+		},
+		{
+			"key": "255",
+			"title": "Shackles of the Heavens",
+			"type": 41,
+			"rarity": "Rare",
+			"unlock": { "condition": "dp", "values": [2, 4, 300], "type": "me", "references": [] }
+		},
+		{
+			"key": "256",
+			"title": "Sunlit Canvas of Earth",
+			"type": 41,
+			"rarity": "Epic",
+			"unlock": { "condition": "dp", "values": [2, 4, 500], "type": "me", "references": [] }
+		},
+		{
+			"key": "257",
+			"title": "Flame-Forged Alliances",
+			"type": 41,
+			"rarity": "Rare",
+			"unlock": { "condition": "dp", "values": [3, 4, 200], "type": "me", "references": [] }
+		},
+		{
+			"key": "258",
+			"title": "Celestial Incaendium",
+			"type": 41,
+			"rarity": "Epic",
+			"unlock": { "condition": "dp", "values": [3, 4, 300], "type": "me", "references": [] }
+		},
+		{
+			"key": "259",
+			"title": "Inferno’s Gleaming Heart",
+			"type": 41,
+			"rarity": "Epic",
+			"unlock": { "condition": "dp", "values": [3, 4, 500], "type": "me", "references": [] }
+		},
+		{
+			"key": "260",
+			"title": "Luceat Lux Vestra in Aeternum",
+			"type": 41,
+			"rarity": "Legendary",
+			"unlock": { "condition": "dp", "values": [3, 4, 1000], "type": "me", "references": [] }
+		},
+		{
+			"key": "261",
+			"title": "Chapter V Enjoyer",
+			"type": 37,
+			"rarity": "Common",
+			"unlock": { "condition": "sg", "values": [5, 2], "type": "me", "references": ["OpenTaiko Chapter V"] }
+		},
+		{
+			"key": "262",
+			"title": "Chapter V Enthusiast",
+			"type": 37,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sg", "values": [15, 2], "type": "me", "references": ["OpenTaiko Chapter V"] }
+		},
+		{
+			"key": "263",
+			"title": "Chapter V Lover",
+			"type": 37,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sg", "values": [38, 2], "type": "me", "references": ["OpenTaiko Chapter V"] }
+		},
+		{
+			"key": "264",
+			"title": "Chapter V Professional",
+			"type": 37,
+			"rarity": "Rare",
+			"unlock": { "condition": "sg", "values": [38, 3], "type": "me", "references": ["OpenTaiko Chapter V"] }
+		},
+		{
+			"key": "265",
+			"title": "Chapter V Completionist",
+			"type": 37,
+			"rarity": "Epic",
+			"unlock": { "condition": "sg", "values": [38, 4], "type": "me", "references": ["OpenTaiko Chapter V"] }
+		},
+		{
+			"key": "266",
+			"title": "<c.#FFFFFF.#000000>RENA5CENTIA</c>",
+			"type": 43,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["optkch5secret01"] }
+		},
+		{
+			"key": "267",
+			"title": "<c.#FFFFFF.#000000>QUINQUE NOCTE5</c>",
+			"type": 43,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["optkch5secret01"] }
+		},
+		{
+			"key": "268",
+			"title": "<c.#FFFFFF.#000000>5OL HIC LUCEBIT</c>",
+			"type": 43,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["optkch5secret01"] }
+		},
+		{
+			"key": "269",
+			"title": "Open-World's V-ENTURER",
+			"type": 38,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [-1, 2], "type": "me", "references": ["optkch5secret02"] }
+		},
+		{
+			"key": "270",
+			"title": "「APPREHENSION」",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["beaniDD"] }
+		},
+		{
+			"key": "271",
+			"title": "「ABANDONED CHAINS」",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["beaniDD"] }
+		},
+		{
+			"key": "272",
+			"title": "「ACCEPTANCE」",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["beaniDD"] }
+		},
+		{
+			"key": "273",
+			"title": "Staging the Octans",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["oCtaNsCelGRIFtbiLLiuMMOto"] }
+		},
+		{
+			"key": "274",
+			"title": "Conflicting Octans",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["oCtaNsCelGRIFtbiLLiuMMOto"] }
+		},
+		{
+			"key": "275",
+			"title": "l’Octans de Reflexion",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["oCtaNsCelGRIFtbiLLiuMMOto"] }
+		},
+		{
+			"key": "276",
+			"title": "Know The Difference",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [3, 2], "type": "me", "references": ["BaNneRbomboPEntAiKoeditstUcuPId"] }
+		},
+		{
+			"key": "277",
+			"title": "I Know The Difference",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [3, 3], "type": "me", "references": ["BaNneRbomboPEntAiKoeditstUcuPId"] }
+		},
+		{
+			"key": "278",
+			"title": "I Knew The Difference",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [3, 4], "type": "me", "references": ["BaNneRbomboPEntAiKoeditstUcuPId"] }
+		},
+		{
+			"key": "279",
+			"title": "Outfit of the Day",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["pUrgATORYOftheOOTdMasAmuNEVsH5"] }
+		},
+		{
+			"key": "280",
+			"title": "Offer of the Day",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["pUrgATORYOftheOOTdMasAmuNEVsH5"] }
+		},
+		{
+			"key": "281",
+			"title": "Dream Catcher",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["pUrgATORYOftheOOTdMasAmuNEVsH5"] }
+		},
+		{
+			"key": "282",
+			"title": "Back from the Abyss",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [3, 2], "type": "me", "references": ["doNsTrgustAIcHEnko"] }
+		},
+		{
+			"key": "283",
+			"title": "Frantic Comeback",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [3, 3], "type": "me", "references": ["doNsTrgustAIcHEnko"] }
+		},
+		{
+			"key": "284",
+			"title": "Astonishing Glow up",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [3, 4], "type": "me", "references": ["doNsTrgustAIcHEnko"] }
+		},
+		{
+			"key": "285",
+			"title": "Frantic Fantasy",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [3, 2], "type": "me", "references": ["GOOdbYemyPhANtaSIaFaLLFeAtYUfuSEKka"] }
+		},
+		{
+			"key": "286",
+			"title": "Vivid Dance",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [3, 3], "type": "me", "references": ["GOOdbYemyPhANtaSIaFaLLFeAtYUfuSEKka"] }
+		},
+		{
+			"key": "287",
+			"title": "Goodbye My Stamina",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [3, 4], "type": "me", "references": ["GOOdbYemyPhANtaSIaFaLLFeAtYUfuSEKka"] }
+		},
+		{
+			"key": "288",
+			"title": "Rhythmic Fantasy",
+			"type": 33,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["GOOdbYemyPhANtaSIaFaLLFeAtYUfuSEKka"] }
+		},
+		{
+			"key": "289",
+			"title": "Elegant Dance",
+			"type": 34,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["GOOdbYemyPhANtaSIaFaLLFeAtYUfuSEKka"] }
+		},
+		{
+			"key": "290",
+			"title": "Goodbye My Phantasia",
+			"type": 35,
+			"rarity": "Legendary",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["GOOdbYemyPhANtaSIaFaLLFeAtYUfuSEKka"] }
+		},
+		{
+			"key": "291",
+			"title": "<c.#FFFFFF.#0F1F3B>Blatant MisKominication</c>",
+			"type": 8,
+			"rarity": "Mythical",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "292",
+			"title": "Masterpiece Charter",
+			"type": 28,
+			"rarity": "Mythical",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "293",
+			"title": "NEP03 - Front Door - ★☆☆",
+			"type": 33,
+			"rarity": "Common",
+			"unlock": { "condition": "sp", "values": [3, 2], "type": "me", "references": ["optkhq03nephtys"] }
+		},
+		{
+			"key": "294",
+			"title": "NEP03 - Front Door - ★★☆",
+			"type": 34,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sp", "values": [3, 3], "type": "me", "references": ["optkhq03nephtys"] }
+		},
+		{
+			"key": "295",
+			"title": "NEP03 - Front Door - ★★★",
+			"type": 35,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [3, 4], "type": "me", "references": ["optkhq03nephtys"] }
+		},
+		{
+			"key": "296",
+			"title": "NEP03 - Back Door - ★☆☆",
+			"type": 33,
+			"rarity": "Common",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["optkhq03nephtys"] }
+		},
+		{
+			"key": "297",
+			"title": "NEP03 - Back Door - ★★☆",
+			"type": 34,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["optkhq03nephtys"] }
+		},
+		{
+			"key": "298",
+			"title": "NEP03 - Back Door - ★★★",
+			"type": 35,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["optkhq03nephtys"] }
+		},
+		{
+			"key": "299",
+			"title": "NEP04 - Front Door - ★☆☆",
+			"type": 33,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sp", "values": [3, 2], "type": "me", "references": ["optkhq04feral"] }
+		},
+		{
+			"key": "300",
+			"title": "NEP04 - Front Door - ★★☆",
+			"type": 34,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [3, 3], "type": "me", "references": ["optkhq04feral"] }
+		},
+		{
+			"key": "301",
+			"title": "NEP04 - Front Door - ★★★",
+			"type": 35,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [3, 4], "type": "me", "references": ["optkhq04feral"] }
+		},
+		{
+			"key": "302",
+			"title": "NEP04 - Back Door - ★☆☆",
+			"type": 33,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["optkhq04feral"] }
+		},
+		{
+			"key": "303",
+			"title": "NEP04 - Back Door - ★★☆",
+			"type": 34,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["optkhq04feral"] }
+		},
+		{
+			"key": "304",
+			"title": "NEP04 - Back Door - ★★★",
+			"type": 35,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["optkhq04feral"] }
+		},
+		{
+			"key": "305",
+			"title": "NEP06 - Front Door - ★☆☆",
+			"type": 33,
+			"rarity": "Common",
+			"unlock": { "condition": "sp", "values": [3, 2], "type": "me", "references": ["optkhq06coldrain"] }
+		},
+		{
+			"key": "306",
+			"title": "NEP06 - Front Door - ★★☆",
+			"type": 34,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sp", "values": [3, 3], "type": "me", "references": ["optkhq06coldrain"] }
+		},
+		{
+			"key": "307",
+			"title": "NEP06 - Front Door - ★★★",
+			"type": 35,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [3, 4], "type": "me", "references": ["optkhq06coldrain"] }
+		},
+		{
+			"key": "308",
+			"title": "NEP06 - Back Door - ★☆☆",
+			"type": 33,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["optkhq06coldrain"] }
+		},
+		{
+			"key": "309",
+			"title": "NEP06 - Back Door - ★★☆",
+			"type": 34,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["optkhq06coldrain"] }
+		},
+		{
+			"key": "310",
+			"title": "NEP06 - Back Door - ★★★",
+			"type": 35,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["optkhq06coldrain"] }
+		},
+		{
+			"key": "311",
+			"title": "NEP07 - Front Door - ★☆☆",
+			"type": 33,
+			"rarity": "Common",
+			"unlock": { "condition": "sp", "values": [3, 2], "type": "me", "references": ["optkhq07yokairanbu"] }
+		},
+		{
+			"key": "312",
+			"title": "NEP07 - Front Door - ★★☆",
+			"type": 34,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sp", "values": [3, 3], "type": "me", "references": ["optkhq07yokairanbu"] }
+		},
+		{
+			"key": "313",
+			"title": "NEP07 - Front Door - ★★★",
+			"type": 35,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [3, 4], "type": "me", "references": ["optkhq07yokairanbu"] }
+		},
+		{
+			"key": "314",
+			"title": "NEP07 - Back Door - ★☆☆",
+			"type": 33,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sp", "values": [4, 2], "type": "me", "references": ["optkhq07yokairanbu"] }
+		},
+		{
+			"key": "315",
+			"title": "NEP07 - Back Door - ★★☆",
+			"type": 34,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [4, 3], "type": "me", "references": ["optkhq07yokairanbu"] }
+		},
+		{
+			"key": "316",
+			"title": "NEP07 - Back Door - ★★★",
+			"type": 35,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [4, 4], "type": "me", "references": ["optkhq07yokairanbu"] }
+		},
+		{
+			"key": "317",
+			"title": "N1nja 2ealot",
+			"type": 16,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sc", "values": [10, 2], "type": "me", "references": ["DiamondN1nja"] }
+		},
+		{
+			"key": "318",
+			"title": "Kominity Manager",
+			"type": 20,
+			"rarity": "Rare",
+			"unlock": { "condition": "sc", "values": [50, 2], "type": "me", "references": ["Komi"] }
+		},
+		{
+			"key": "319",
+			"title": "bad chart endurer",
+			"type": 17,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sc", "values": [10, 2], "type": "me", "references": ["sadkay"] }
+		},
+		{
+			"key": "320",
+			"title": "888.",
+			"type": 15,
+			"rarity": "Rare",
+			"unlock": { "condition": "sg", "values": [18, 3], "type": "me", "references": ["Dashy's Secrets"] }
+		},
+		{
+			"key": "321",
+			"title": "<c.#FFFFFF.#000000>congraturaisins</c>",
+			"type": 42,
+			"rarity": "Common",
+			"unlock": { "condition": "sc", "values": [3, 2], "type": "me", "references": ["Ryuto Setsujin"] }
+		},
+		{
+			"key": "322",
+			"title": "<c.#FFFFFF.#000000>Virtually Insane</c>",
+			"type": 42,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sc", "values": [10, 2], "type": "me", "references": ["Ryuto Setsujin"] }
+		},
+		{
+			"key": "323",
+			"title": "<c.#FFFFFF.#000000>#1 Chapter V Lover</c>",
+			"type": 43,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sp", "values": [3, 2], "type": "me", "references": ["optkch5secret01"] }
+		},
+		{
+			"key": "324",
+			"title": "<c.#FFFFFF.#000000>The sun rises...</c>",
+			"type": 43,
+			"rarity": "Rare",
+			"unlock": { "condition": "sp", "values": [3, 3], "type": "me", "references": ["optkch5secret01"] }
+		},
+		{
+			"key": "325",
+			"title": "<c.#FFFFFF.#000000>Gleaming Ressurection</c>",
+			"type": 43,
+			"rarity": "Epic",
+			"unlock": { "condition": "sp", "values": [3, 4], "type": "me", "references": ["optkch5secret01"] }
+		},
+		{
+			"key": "326",
+			"title": "<c.#FFFFFF.#000000>Chapter VI Enjoyer</c>",
+			"type": 44,
+			"rarity": "Common",
+			"unlock": { "condition": "sg", "values": [5, 2], "type": "me", "references": ["OpenTaiko Chapter VI"] }
+		},
+		{
+			"key": "327",
+			"title": "<c.#FFFFFF.#000000>Chapter VI Enthusiast</c>",
+			"type": 44,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sg", "values": [15, 2], "type": "me", "references": ["OpenTaiko Chapter VI"] }
+		},
+		{
+			"key": "328",
+			"title": "<c.#FFFFFF.#000000>Chapter VI Lover</c>",
+			"type": 44,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "sg", "values": [999, 2], "type": "me", "references": ["OpenTaiko Chapter VI"] }
+		},
+		{
+			"key": "329",
+			"title": "<c.#FFFFFF.#000000>Chapter VI Professional</c>",
+			"type": 44,
+			"rarity": "Rare",
+			"unlock": { "condition": "sg", "values": [999, 3], "type": "me", "references": ["OpenTaiko Chapter VI"] }
+		},
+		{
+			"key": "330",
+			"title": "<c.#FFFFFF.#000000>Chapter VI Completionist</c>",
+			"type": 44,
+			"rarity": "Epic",
+			"unlock": { "condition": "sg", "values": [999, 4], "type": "me", "references": ["OpenTaiko Chapter VI"] }
+		},
+		{
+			"key": "331",
+			"title": "<c.#FFFFFF.#000000>IT'S AN OPEN-WORLD!!</c>",
+			"type": 45,
+			"rarity": "Common",
+			"unlock": { "condition": "sp", "values": [-1, 2], "type": "me", "references": ["GlIDETHRouGhAskYdAShyDESu"] }
+		},
+		{
+			"key": "332",
+			"title": "Cardboard Samurai",
+			"type": 0,
+			"rarity": "Poor",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "333",
+			"title": "Sock Collector",
+			"type": 2,
+			"rarity": "Poor",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "334",
+			"title": "Frog Prince",
+			"type": 3,
+			"rarity": "Poor",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "335",
+			"title": "Invisible Friend",
+			"type": 6,
+			"rarity": "Poor",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "336",
+			"title": "Trash Goblin",
+			"type": 6,
+			"rarity": "Poor",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "337",
+			"title": "<c.#FFFFFF.#0F1F3B>Night Owl</c>",
+			"type": 31,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "338",
+			"title": "Early Bird",
+			"type": 22,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "339",
+			"title": "Bubble Popper",
+			"type": 16,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "340",
+			"title": "<c.#FFFFFF.#0F1F3B>Dreamgazer</c>",
+			"type": 8,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "341",
+			"title": "Note Catcher",
+			"type": 7,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "342",
+			"title": "Ramen Ruler",
+			"type": 21,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "343",
+			"title": "Burger Buddy",
+			"type": 17,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "344",
+			"title": "Donut Fanatic",
+			"type": 21,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "345",
+			"title": "Error 404",
+			"type": 24,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "346",
+			"title": "Cool Guy",
+			"type": 7,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "347",
+			"title": "Coffee Addict",
+			"type": 22,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "348",
+			"title": "Banana King",
+			"type": 21,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "349",
+			"title": "Bongo Buddy",
+			"type": 24,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "350",
+			"title": "Jellyfish Drifter",
+			"type": 16,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "351",
+			"title": "Pancake Master",
+			"type": 21,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "352",
+			"title": "<c.#FFFFFF.#0F1F3B>Lucky Star</c>",
+			"type": 8,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "353",
+			"title": "Bargain Bandit",
+			"type": 11,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "354",
+			"title": "Forever Parfait",
+			"type": 21,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "355",
+			"title": "Retry Lord",
+			"type": 17,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "356",
+			"title": "<c.#FFFFFF.#0F1F3B>Coupon King</c>",
+			"type": 9,
+			"rarity": "Epic",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "357",
+			"title": "＼(＾▽＾)／",
+			"type": 24,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "358",
+			"title": "(´ - ω - `)zzz",
+			"type": 22,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "359",
+			"title": "Σ(°ロ°)!!!",
+			"type": 17,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "360",
+			"title": "<c.#FFFFFF.#0F1F3B>(´Д )</c>",
+			"type": 23,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "361",
+			"title": "Vault placeholder 1",
+			"type": 0,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "362",
+			"title": "Vault placeholder 2",
+			"type": 0,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "363",
+			"title": "Vault placeholder 3",
+			"type": 0,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "364",
+			"title": "Vault placeholder 4",
+			"type": 0,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "365",
+			"title": "Vault placeholder 5",
+			"type": 0,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "366",
+			"title": "Vault placeholder 6",
+			"type": 0,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "367",
+			"title": "Vault placeholder 7",
+			"type": 0,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "368",
+			"title": "Vault placeholder 8",
+			"type": 0,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "369",
+			"title": "Vault placeholder 9",
+			"type": 0,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "370",
+			"title": "Vault placeholder 10",
+			"type": 0,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "371",
+			"title": "Vault placeholder 11",
+			"type": 0,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "372",
+			"title": "Vault placeholder 12",
+			"type": 0,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "373",
+			"title": "Vault placeholder 13",
+			"type": 0,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "374",
+			"title": "Vault placeholder 14",
+			"type": 0,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "375",
+			"title": "Vault placeholder 15",
+			"type": 0,
+			"rarity": "Epic",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "376",
+			"title": "Vault placeholder 16",
+			"type": 0,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "377",
+			"title": "Vault placeholder 17",
+			"type": 0,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "378",
+			"title": "Vault placeholder 18",
+			"type": 0,
+			"rarity": "Epic",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "379",
+			"title": "Vault placeholder 19",
+			"type": 0,
+			"rarity": "Epic",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "380",
+			"title": "Vault placeholder 20",
+			"type": 0,
+			"rarity": "Legendary",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		}
+	]
+}

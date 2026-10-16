@@ -12,7 +12,7 @@ OpenTaiko 中除核心演奏之外的几乎每一个界面都由随皮肤一起�
 
 - 如果你还没有写过模块，请阅读[模块的工作原理](getting-started.md)：皮肤的文件夹布局、模块类型，以及脚本会收到的生命周期回调。
 - 要查找某个函数，请打开 [API 参考](api/)，从侧边栏中选择一个分类。
-- 对于明确的目标，各篇指南会一步一步地讲解[角色](guides/characters.md)、[小角色](guides/puchicharas.md)、[皮肤与主题](guides/skins.md)以及[谱面解锁条件](guides/unlockables.md)。
+- 对于明确的目标，各篇指南会一步一步地讲解[角色](guides/characters.md)、[小角色](guides/puchicharas.md)、[名牌](guides/nameplates.md)、[皮肤与主题](guides/skins.md)以及[谱面解锁条件](guides/unlockables.md)。
 
 ## 你可以构建的内容
 
@@ -22,6 +22,7 @@ OpenTaiko 中除核心演奏之外的几乎每一个界面都由随皮肤一起�
 | 背景 | 皮肤的 `Graphics/` 文件夹 | 装饰某个界面的脚本：启动界面、演奏背景与观众、结算界面。 |
 | 皮肤与主题 | 游戏安装目录下的 `System/` | 玩家安装并切换到的完整视觉套件，以及它在选项界面中提供的主题设置。 |
 | 角色与小角色 | `Global/Characters/` 和 `Global/PuchiChara/`，由所有皮肤共享 | 演奏时随之起舞的角色，以及会做出反应的小吉祥物。 |
+| 名牌 | `Global/Nameplates/`，或皮肤的 `Nameplates/` 文件夹 | 玩家解锁并装备的名牌称号包。 |
 | 谱面解锁条件 | 歌曲文件夹中，谱面旁边 | 在玩家达成条件之前让歌曲保持锁定的 `Unlock.json`。 |
 
 ## 实验性章节
