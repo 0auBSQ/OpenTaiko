@@ -27,28 +27,32 @@ function Label.new(o)
     return self
 end
 
-function Label:setText(t) self.text = tostring(t); self:restyle() end
+-- a new text re-measures the label (and its chip); the theme is not resolved again
+function Label:setText(t)
+    t = tostring(t)
+    if t == self.text then return end
+    self.text = t
+    if self.eff then self:_layout() end
+end
 
 function Label:_fontSize()
     if type(self.size) == "number" then return self.size end
     return self.eff.font[self.size] or self.eff.font.label
 end
 
-local function drop(self, field)
-    local e = self[field]
-    if e == nil then return end
-    if e.key then self.mgr.releaseBaked(e.key) else self.mgr.releaseCanvas(e.canvas) end
-    self[field] = nil
-end
-
 function Label:restyle()
     self:resolveStyle()
     local c = self.eff.colors
-    local sz = self:_fontSize()
     self._fg = self.color or c.text
-    -- chip labels keep the (former GetText-default) black outline; plain labels draw with none
+    -- chip labels keep a black outline; plain labels draw with none
     self._bg = self.chip and { 0, 0, 0, 255 } or U.withAlpha(c.surface, 0)
-    -- the box a GetText texture would have had (ink + 50 padding, squished down to maxWidth)
+    self:_layout()
+end
+
+function Label:_layout()
+    local c = self.eff.colors
+    local sz = self:_fontSize()
+    -- the glyph box: the ink + 50 px of padding, squeezed down to maxWidth
     self.w = math.min(self.mgr:measureText(sz, self.text) + 50, self.maxWidth)
     self.h = self.mgr:textHeight(sz)
     if self.chip then
@@ -63,7 +67,7 @@ function Label:restyle()
             })
         end, { m = m })
     else
-        drop(self, "_chip")
+        self:dropPiece("_chip")
     end
 end
 
@@ -75,8 +79,7 @@ function Label:draw()
     if self.chip then
         -- the chip is centred on the glyph line, not on the text box (which carries the bottom padding)
         local lineH = self.mgr:gfont(self:_fontSize()).LineHeight
-        self._chip.canvas:SetColor(1, 1, 1); self._chip.canvas:SetOpacity(1); self._chip.canvas:SetScale(1, 1)
-        self._chip.canvas:DrawAtAnchor(math.floor(self.x + self.w * 0.5), math.floor(self.y + lineH * 0.5), "center")
+        self:drawPiece(self._chip, self.x + self.w * 0.5, self.y + lineH * 0.5, 1, 1)
     end
     local anchor = (self.align == "center") and "top" or (self.align == "right") and "topright" or "topleft"
     self.mgr:drawTextEx(self:_fontSize(), self.text, x, y, self._fg, self._bg, 1, 1, self.maxWidth, anchor)

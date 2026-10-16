@@ -138,6 +138,13 @@ Colour arguments r, g, b, a are 0-255 integers. Pixel edits accumulate in a dirt
 | `canvas:CopyFrom(other)  -> nil` | Copies the pixels of another canvas of the same size into this one. The call does nothing when the sizes differ. |
 | `canvas:BlitPacked(data, count)  -> nil` | Fills the surface from a 1-indexed Lua array of packed `0xRRGGBB` integers in row-major order (pixels become opaque; a negative value becomes a transparent pixel), then uploads. |
 | `canvas:Upload()  -> nil` | Pushes pending edits (only the changed region) to the GPU. No-op when nothing changed. |
+| `canvas:Upload(options)  -> nil` | Uploads like `Upload()`. Options (all optional): `extendEdges = true` runs `ExtendEdges` first; `release = true` then frees the CPU copy of the pixels, for a canvas that is drawn but no longer edited (editing it again starts from a transparent canvas). |
+| `canvas:FillRoundRect(x, y, w, h, radius, r, g, b, a [, options])  -> nil` | Fills a rounded rectangle with smooth edges, blended into the canvas (see the shape options below). `options.radii = {topLeft, topRight, bottomRight, bottomLeft}` gives each corner its own radius. |
+| `canvas:FillEllipse(x, y, w, h, r, g, b, a [, options])  -> nil` | Fills the ellipse inside the box (x, y, w, h) with smooth edges. |
+| `canvas:FillTriangle(x1, y1, x2, y2, x3, y3, r, g, b, a [, options])  -> nil` | Fills a triangle with smooth edges. |
+| `canvas:FillCapsule(x0, y0, x1, y1, radius, r, g, b, a [, options])  -> nil` | Fills a line from (x0, y0) to (x1, y1) with round ends, `radius` thick on each side, with smooth edges. |
+| `canvas:FillPolygon(points, r, g, b, a [, options])  -> nil` | Fills a polygon given as a flat list `{x1, y1, x2, y2, ...}` (even-odd rule) with smooth edges. The `soft` option does not apply. |
+| `canvas:ExtendEdges()  -> nil` | Gives every fully transparent pixel next to a visible one the colour of its visible neighbours (it stays transparent), so a canvas drawn scaled or between pixels shows no dark rim at its edges. |
 | `canvas:Draw(x, y)  -> nil` | Draws the canvas with its top-left at (x, y). |
 | `canvas:DrawRect(x, y, rect_x, rect_y, rect_width, rect_height)  -> nil` | Draws a source sub-rectangle (in canvas pixels) with its top-left at (x, y). |
 | `canvas:DrawAtAnchor(x, y, anchor)  -> nil` | Draws the canvas so the named anchor point lands on (x, y). |
@@ -145,6 +152,8 @@ Colour arguments r, g, b, a are 0-255 integers. Pixel edits accumulate in a dirt
 | `canvas:SetOpacity(opacity)  -> nil` | Sets the opacity, 0..1. |
 | `canvas:SetColor(red, green, blue)  -> nil` | Sets the tint from three 0..1 values. |
 | `canvas:Dispose()  -> nil` | Frees the canvas's GPU texture and CPU buffer. |
+
+Shape options, the last argument of the smooth fills (all optional): `mode` is "over" (the default: blends into what is under it), "replace" (takes the place of what it covers, like FillRect, with a smooth edge) or "cut" (erases what it covers); `soft` is the width of the edge in pixels (default 1, a crisp edge; a wider edge fades out, e.g. for a shadow); `bottom = {r, g, b, a}` makes a vertical gradient from the call's colour, and `fromY` / `toY` say where it starts and ends (default: the top and bottom of the shape). The smooth fills take fractional coordinates.
 
 ### GRAPHICS
 

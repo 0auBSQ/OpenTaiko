@@ -138,6 +138,13 @@ De kleurargumenten r, g, b, a zijn gehele getallen 0-255. Pixelbewerkingen stape
 | `canvas:CopyFrom(other)  -> nil` | Kopieert de pixels van een ander canvas met dezelfde afmeting naar dit canvas. De aanroep doet niets wanneer de afmetingen verschillen. |
 | `canvas:BlitPacked(data, count)  -> nil` | Vult het oppervlak vanuit een 1-geïndexeerde Lua-array van gepackte `0xRRGGBB`-integers in rij-volgorde (pixels worden ondoorzichtig; een negatieve waarde wordt een transparante pixel), en uploadt daarna. |
 | `canvas:Upload()  -> nil` | Stuurt de openstaande bewerkingen (alleen het gewijzigde gebied) naar de GPU. No-op wanneer er niets is veranderd. |
+| `canvas:Upload(options)  -> nil` | Uploadt zoals `Upload()`. Opties (allemaal optioneel): `extendEdges = true` voert eerst `ExtendEdges` uit; `release = true` geeft daarna de CPU-kopie van de pixels vrij, voor een canvas dat getekend maar niet meer bewerkt wordt (wie het weer bewerkt, begint met een transparant canvas). |
+| `canvas:FillRoundRect(x, y, w, h, radius, r, g, b, a [, options])  -> nil` | Vult een afgeronde rechthoek met gladde randen, gemengd in het canvas (zie de vormopties hieronder). `options.radii = {linksBoven, rechtsBoven, rechtsOnder, linksOnder}` geeft elke hoek een eigen straal. |
+| `canvas:FillEllipse(x, y, w, h, r, g, b, a [, options])  -> nil` | Vult de ellips binnen het vak (x, y, w, h) met gladde randen. |
+| `canvas:FillTriangle(x1, y1, x2, y2, x3, y3, r, g, b, a [, options])  -> nil` | Vult een driehoek met gladde randen. |
+| `canvas:FillCapsule(x0, y0, x1, y1, radius, r, g, b, a [, options])  -> nil` | Vult een lijn van (x0, y0) naar (x1, y1) met ronde uiteinden, aan elke kant `radius` dik, met gladde randen. |
+| `canvas:FillPolygon(points, r, g, b, a [, options])  -> nil` | Vult een veelhoek, gegeven als platte lijst `{x1, y1, x2, y2, ...}` (even-oneven-regel), met gladde randen. De optie `soft` geldt hier niet. |
+| `canvas:ExtendEdges()  -> nil` | Geeft elke volledig transparante pixel naast een zichtbare de kleur van zijn zichtbare buren (hij blijft transparant), zodat een canvas dat geschaald of tussen pixels wordt getekend geen donkere rand langs zijn randen toont. |
 | `canvas:Draw(x, y)  -> nil` | Tekent het canvas met de linkerbovenhoek op (x, y). |
 | `canvas:DrawRect(x, y, rect_x, rect_y, rect_width, rect_height)  -> nil` | Tekent een bron-subrechthoek (in canvaspixels) met de linkerbovenhoek op (x, y). |
 | `canvas:DrawAtAnchor(x, y, anchor)  -> nil` | Tekent het canvas zo dat het benoemde ankerpunt op (x, y) landt. |
@@ -145,6 +152,8 @@ De kleurargumenten r, g, b, a zijn gehele getallen 0-255. Pixelbewerkingen stape
 | `canvas:SetOpacity(opacity)  -> nil` | Stelt de dekking in, 0..1. |
 | `canvas:SetColor(red, green, blue)  -> nil` | Stelt de tint in vanuit drie waarden 0..1. |
 | `canvas:Dispose()  -> nil` | Geeft de GPU-textuur en de CPU-buffer van het canvas vrij. |
+
+Vormopties, het laatste argument van de gladde vullingen (allemaal optioneel): `mode` is "over" (standaard: mengt met wat eronder ligt), "replace" (neemt de plaats in van wat hij bedekt, zoals FillRect, met een gladde rand) of "cut" (wist wat hij bedekt); `soft` is de breedte van de rand in pixels (standaard 1, een scherpe rand; een bredere rand vervaagt, bijvoorbeeld voor een schaduw); `bottom = {r, g, b, a}` maakt een verticaal verloop vanaf de kleur van de aanroep, en `fromY` / `toY` geven aan waar het begint en eindigt (standaard: de boven- en onderkant van de vorm). De gladde vullingen nemen coördinaten met decimalen.
 
 ### GRAPHICS
 

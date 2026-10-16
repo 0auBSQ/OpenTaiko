@@ -7,13 +7,16 @@
 --   .Kind ("Toggle"/"Int"/"Choice"/"Action"/"KeyConfig"), .Name, .Desc, .Index, .ChoiceCount
 --   :Display() -> string, :Toggle(), :Add(d), :SetIndex(i), :Activate()
 -- Callbacks: onFocusRow(opt) when the selection changes; onActivateRow(opt) for Action/KeyConfig rows.
+-- scrollbar = true: a scrollbar beside the list while its rows don't all fit.
 
-local Widget = require("PopUI.widget")
-local U      = require("PopUI.util")
-local Shape  = require("PopUI.shape")
+local Widget   = require("PopUI.widget")
+local U        = require("PopUI.util")
+local Shape    = require("PopUI.shape")
+local ListBase = require("PopUI.widgets.listbase")
 
 local List = setmetatable({}, { __index = Widget })
 List.__index = List
+ListBase.install(List)
 
 function List.new(o)
     o = o or {}
@@ -62,6 +65,7 @@ function List:restyle()
         Shape.fillRoundAA(ring, m - 2, m - 2, rw + 4, rh + 4, ir + 2, c.focusRing)
         Shape.fillRound(ring, m - 2 + rwid, m - 2 + rwid, rw + 4 - 2 * rwid, rh + 4 - 2 * rwid, math.max(1, ir + 2 - rwid), { 0, 0, 0, 0 })
     end, { m = m })
+    self:_bakeBar()
 end
 
 function List:_count() return #self.rows end
@@ -75,15 +79,7 @@ end
 function List:onNavDownOrPadRight() self:setCapturing(false, true); if self.selected < #self._focusable then self:_setSelected(self.selected + 1); return true end return false end
 function List:onNavUpOrPadLeft() self:setCapturing(false, true); if self.selected > 1 then self:_setSelected(self.selected - 1); return true end return false end
 
-function List:_ensureVisible()
-    local rowIdx = self:_selRowIndex() or 1
-    local top = (rowIdx - 1) * self.rowHeight
-    local bot = top + self.rowHeight
-    if top < self._scrollTarget then self._scrollTarget = top end
-    if bot > self._scrollTarget + self.h then self._scrollTarget = bot - self.h end
-    local maxS = math.max(0, #self.rows * self.rowHeight - self.h)
-    self._scrollTarget = U.clamp(self._scrollTarget, 0, maxS)
-end
+function List:_ensureVisible() self:_showRow(self:_selRowIndex() or 1) end
 
 -- editing the selected option
 local function editOpt(opt, dir)
@@ -108,36 +104,11 @@ function List:onActivate()
     end
 end
 
-function List:onCapturing(silence)
-    if not silence then self:playSfx("click") end
-end
-function List:onEndCapturing(silence)
-    if not silence then self:playSfx("cancel") end
-end
-
--- consume Left/Right (also for pad Left/Right in capturing mode), so focus stays on the chooser
--- consume Cancel to quit capturing mode
-function List:onDecide() self:setCapturing(not self.capturing); return true end
-function List:onCancel()
-    if self.capturing then self:setCapturing(false); return true end
-    return false
-end
-function List:onNavLeft(forPad)
-    if not forPad or self.capturing then self:setCapturing(true, true); editOpt(self:_selOpt(), -1); self:playSfx("move"); return true end
-    return false
-end
-function List:onNavRight(forPad)
-    if not forPad or self.capturing then self:setCapturing(true, true); editOpt(self:_selOpt(), 1); self:playSfx("move"); return true end
-    return false
-end
+local function step(self, dir) editOpt(self:_selOpt(), dir); self:playSfx("move") end
+Widget.editable(List, step)
 
 function List:update(ctx)
     Widget.update(self, ctx)
-    if self.hovered and ctx.scrollDy and ctx.scrollDy ~= 0 then
-        self._scrollTarget = self._scrollTarget - ctx.scrollDy * self.rowHeight
-        local maxS = math.max(0, #self.rows * self.rowHeight - self.h)
-        self._scrollTarget = U.clamp(self._scrollTarget, 0, maxS)
-    end
     local capturing, silence = self.capturing, false
     -- mouse hover row -> preview-select; click activates
     if not self.focused or ctx.mPressed then capturing = false end  -- reset first
@@ -161,7 +132,7 @@ function List:update(ctx)
     end
     self:setCapturing(capturing, silence)
     self._wasHovered = self.hovered
-    self._scrollCur = self._scrollCur + (self._scrollTarget - self._scrollCur) * math.min(1, ctx.dt * 16)
+    self:_updateScroll(ctx, 16)
 end
 
 function List:draw()
@@ -173,6 +144,9 @@ function List:draw()
     local hsz = self.eff.font.small
     local th = self.mgr:textHeight(sz)
     local selRowIdx = self:_selRowIndex()
+    -- rows are cut at the list's box (the ring's margin stays visible at the sides)
+    local clip = GRAPHICS ~= nil and GRAPHICS.SetClip ~= nil
+    if clip then GRAPHICS:SetClip(self.x - 8, self.y, self.w + 16, self.h) end
     for i = firstVis, lastVis do
         local r = self.rows[i]
         local ry = self.y + (i - 1) * self.rowHeight - self._scrollCur
@@ -187,11 +161,8 @@ function List:draw()
         else
             local isSel = (i == selRowIdx)
             local piece = isSel and self._rowSel or self._row
-            piece.canvas:SetColor(1, 1, 1); piece.canvas:SetOpacity(1); piece.canvas:SetScale(1, 1)
-            piece.canvas:DrawAtAnchor(rcx, rcy, "center")
-            if isSel and self.focused and self._hiCur > 0.01 then
-                self._ring.canvas:SetOpacity(self._hiCur); self._ring.canvas:SetScale(1, 1); self._ring.canvas:DrawAtAnchor(rcx, rcy, "center")
-            end
+            self:drawPiece(piece, rcx, rcy, 1, 1)
+            if isSel and self.focused and self._hiCur > 0.01 then self:drawPiece(self._ring, rcx, rcy, 1, self._hiCur) end
             local opt = r.opt
             local nameCol = isSel and self._hiCapCur > 0.01
                 and U.lerpColor(self.eff.colors.text, self.eff.colors.primary2, self._hiCapCur)
@@ -201,11 +172,9 @@ function List:draw()
             if val ~= "" then
                 local vw = self.mgr:measureText(sz, val)
                 local vx = self.x + self.w - 36 - vw
-                local prefix = ""
-                if isSel and self.focused and (opt.Kind == "Int" or opt.Kind == "Choice") then prefix = "‹ " end
-                local suffix = ""
-                if isSel and self.focused and (opt.Kind == "Int" or opt.Kind == "Choice") then suffix = " ›" end
-                if prefix ~= "" then
+                local editing = isSel and self.focused and (opt.Kind == "Int" or opt.Kind == "Choice")
+                if editing then
+                    local prefix, suffix = "‹ ", " ›"
                     self.mgr:drawText(sz, prefix, math.floor(vx - self.mgr:measureText(sz, prefix)), ty, nameCol)
                     self.mgr:drawText(sz, val .. suffix, math.floor(vx), ty, nameCol)
                 else
@@ -214,6 +183,8 @@ function List:draw()
             end
         end
     end
+    if clip then GRAPHICS:ClearClip() end
+    self:_drawBar()
 end
 
 return List

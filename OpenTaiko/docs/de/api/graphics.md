@@ -138,6 +138,13 @@ Die Farbargumente r, g, b, a sind Ganzzahlen von 0 bis 255. Pixeländerungen sam
 | `canvas:CopyFrom(other)  -> nil` | Kopiert die Pixel eines anderen Canvas gleicher Größe in dieses. Der Aufruf tut nichts, wenn die Größen abweichen. |
 | `canvas:BlitPacked(data, count)  -> nil` | Füllt die Fläche aus einem 1-indizierten Lua-Array gepackter `0xRRGGBB`-Ganzzahlen in Zeilenreihenfolge (Pixel werden deckend; ein negativer Wert wird zu einem transparenten Pixel) und lädt dann hoch. |
 | `canvas:Upload()  -> nil` | Überträgt ausstehende Änderungen (nur den geänderten Bereich) zur GPU. No-op, wenn sich nichts geändert hat. |
+| `canvas:Upload(options)  -> nil` | Lädt hoch wie `Upload()`. Optionen (alle optional): `extendEdges = true` führt zuerst `ExtendEdges` aus; `release = true` gibt danach die CPU-Kopie der Pixel frei, für eine Leinwand, die gezeichnet, aber nicht mehr bearbeitet wird (wer sie wieder bearbeitet, beginnt mit einer transparenten Leinwand). |
+| `canvas:FillRoundRect(x, y, w, h, radius, r, g, b, a [, options])  -> nil` | Füllt ein abgerundetes Rechteck mit glatten Kanten und mischt es in die Leinwand (siehe die Formoptionen unten). `options.radii = {obenLinks, obenRechts, untenRechts, untenLinks}` gibt jeder Ecke einen eigenen Radius. |
+| `canvas:FillEllipse(x, y, w, h, r, g, b, a [, options])  -> nil` | Füllt die Ellipse im Rechteck (x, y, w, h) mit glatten Kanten. |
+| `canvas:FillTriangle(x1, y1, x2, y2, x3, y3, r, g, b, a [, options])  -> nil` | Füllt ein Dreieck mit glatten Kanten. |
+| `canvas:FillCapsule(x0, y0, x1, y1, radius, r, g, b, a [, options])  -> nil` | Füllt eine Linie von (x0, y0) nach (x1, y1) mit runden Enden, auf jeder Seite `radius` dick, mit glatten Kanten. |
+| `canvas:FillPolygon(points, r, g, b, a [, options])  -> nil` | Füllt ein Polygon aus einer flachen Liste `{x1, y1, x2, y2, ...}` (Gerade-Ungerade-Regel) mit glatten Kanten. Die Option `soft` gilt hier nicht. |
+| `canvas:ExtendEdges()  -> nil` | Gibt jedem vollständig transparenten Pixel neben einem sichtbaren die Farbe seiner sichtbaren Nachbarn (er bleibt transparent), damit eine skaliert oder zwischen Pixeln gezeichnete Leinwand keinen dunklen Rand an ihren Kanten zeigt. |
 | `canvas:Draw(x, y)  -> nil` | Zeichnet das Canvas mit seiner linken oberen Ecke bei (x, y). |
 | `canvas:DrawRect(x, y, rect_x, rect_y, rect_width, rect_height)  -> nil` | Zeichnet einen Quell-Teilbereich (in Canvas-Pixeln) mit seiner linken oberen Ecke bei (x, y). |
 | `canvas:DrawAtAnchor(x, y, anchor)  -> nil` | Zeichnet das Canvas so, dass der benannte Ankerpunkt auf (x, y) liegt. |
@@ -145,6 +152,8 @@ Die Farbargumente r, g, b, a sind Ganzzahlen von 0 bis 255. Pixeländerungen sam
 | `canvas:SetOpacity(opacity)  -> nil` | Setzt die Deckkraft, 0..1. |
 | `canvas:SetColor(red, green, blue)  -> nil` | Setzt die Einfärbung aus drei Werten 0..1. |
 | `canvas:Dispose()  -> nil` | Gibt die GPU-Textur und den CPU-Puffer des Canvas frei. |
+
+Formoptionen, das letzte Argument der glatten Füllungen (alle optional): `mode` ist "over" (Standard: mischt sich in das, was darunter liegt), "replace" (tritt an die Stelle dessen, was sie bedeckt, wie FillRect, mit glatter Kante) oder "cut" (löscht, was sie bedeckt); `soft` ist die Breite der Kante in Pixeln (Standard 1, eine scharfe Kante; eine breitere Kante blendet aus, etwa für einen Schatten); `bottom = {r, g, b, a}` erzeugt einen senkrechten Verlauf von der Farbe des Aufrufs, und `fromY` / `toY` legen fest, wo er beginnt und endet (Standard: Ober- und Unterkante der Form). Die glatten Füllungen nehmen Koordinaten mit Nachkommastellen.
 
 ### GRAPHICS
 

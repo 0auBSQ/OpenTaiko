@@ -26,8 +26,8 @@ function Bubble.new(o)
     self._shown = 0
     self._done = false
     self._draft = false
-    -- fixed canvas reserve (current size + headroom). The body canvas is sized for this once, so tail-drag AND
-    -- resize stay within it → reuseCanvas always reuses the same GL texture (no per-frame dispose/create churn).
+    -- while dragged (draft), the bubble bakes into a canvas with room to grow (its size + headroom), so a
+    -- tail drag or a resize keeps reusing one GL texture; at rest the canvas fits the bubble
     self.minW, self.minH = o.minW or 160, o.minH or 90
     self._reserveW = math.max(self.w + 360, 900)
     self._reserveH = math.max(self.h + 260, 520)
@@ -48,7 +48,7 @@ function Bubble:setTail(side, pos, size, draft)
     self:restyle()
 end
 
--- resize the bubble (drag handle). Clamped to [min, reserve] so the fixed canvas always fits → no churn.
+-- resize the bubble (drag handle), clamped to [min, reserve]
 function Bubble:setSize(w, h, draft)
     self.w = U.clamp(math.floor(w or self.w), self.minW, self._reserveW)
     self.h = U.clamp(math.floor(h or self.h), self.minH, self._reserveH)
@@ -68,7 +68,7 @@ end
 function Bubble:_rewrap()
     local c = self.eff.colors
     local size = self.eff.font.label
-    local maxW = self.w - 2 * self.pad - 50   -- glyph box pads 25px per side; keep both margins equal
+    local maxW = self.w - 2 * self.pad - 50   -- the glyph box pads 25px per side; keep both margins equal
     self._size = size
     self._fg = c.text
     self._lines = self.mgr:wrapLines(size, self.text, maxW)   -- glyph-measured wrap (no texture allocation)
@@ -85,26 +85,23 @@ end
 
 function Bubble:_popIn()
     self._scaleFrom, self._scaleTo = 0.6, 1.0
-    local cc = self._scaleC
-    cc.Begin, cc.End, cc.Interval = 0, 1, self.eff.anim.popInEase and 0.5 or 0.3
-    cc:SetEasing(self.eff.anim.popInEase[1], self.eff.anim.popInEase[2]); cc:Start()
+    local a = self.eff.anim
+    Widget.startTween(self._scaleT, a.popInEase and 0.5 or 0.3, a.popInEase)
 end
 
 function Bubble:restyle()
     self:resolveStyle()
-    self._scaleC = self._scaleC or COUNTER:EmptyCounter()
     local c = self.eff.colors
     local sh = self.eff.shadow
-    -- margin must cover the tail AND its shadow (tail + grow + offset can stack on the same side). Reserve a
-    -- fixed max-tail margin so dragging the tail size never resizes the canvas → reuseCanvas always reuses it
-    -- (same GL texture, just cleared+redrawn) instead of dispose+recreate every frame, which churned memory.
+    -- the margin covers the longest tail and its shadow (tail + grow + offset can stack on one side), so a
+    -- tail-size drag never resizes the canvas
     local sExt = (sh.layers or 4) * (sh.grow or 3) + math.max(math.abs(sh.dx or 0), math.abs(sh.dy or 6))
-    local m = math.ceil(100 + sExt + self.eff.outlineWidth + 6)   -- fixed margin (max tail 100 + shadow)
+    local m = math.ceil(100 + sExt + self.eff.outlineWidth + 6)
     self._m = m
-    -- fixed canvas sized for reserve+margin → reuseCanvas always reuses it (tail-drag + resize cause no
-    -- per-frame dispose/create churn). The body is baked centered in the canvas so the centred draw lands right.
-    local cw = math.floor(self._reserveW + 2 * m)
-    local ch = math.floor(self._reserveH + 2 * m)
+    local bw = self._draft and self._reserveW or self.w
+    local bh = self._draft and self._reserveH or self.h
+    local cw = math.floor(bw + 2 * m)
+    local ch = math.floor(bh + 2 * m)
     local cv = self.mgr:reuseCanvas(self._body and self._body.canvas, cw, ch)
     local ox = math.floor((cw - self.w) * 0.5)
     local oy = math.floor((ch - self.h) * 0.5)
@@ -118,16 +115,15 @@ function Bubble:restyle()
         maxPoints = self._draft and 48 or 200,
         shadowLayers = self._draft and 1 or nil,
     })
-    cv:Upload()
-    self._body = { canvas = cv, m = m }
+    Shape.upload(cv, false)
+    self._body = { canvas = cv, m = m, cap = false }
     self:_rewrap()
     -- keep typewriter progress across re-bakes (tail/resize drag) — only setText restarts it
     if self.typewriter and self._done then self._shown = self._fullLen or 0 end
 end
 
 function Bubble:update(ctx)
-    self._scaleC:Tick()
-    self._scaleCur = U.lerp(self._scaleFrom or 1, self._scaleTo or 1, self._scaleC.Value)
+    self._scaleCur = U.lerp(self._scaleFrom or 1, self._scaleTo or 1, Widget.tickTween(self._scaleT, ctx.dt or 0))
     if self.typewriter and not self._done then
         self._shown = self._shown + (self.cps or self.eff.anim.typewriterCps) * ctx.dt
         if self._shown >= (self._fullLen or 0) then
@@ -139,10 +135,7 @@ end
 
 function Bubble:draw()
     if not self.visible then return end
-    local cx, cy = self:centerX(), self:centerY()
-    local s = self._scaleCur or 1
-    self._body.canvas:SetColor(1, 1, 1); self._body.canvas:SetOpacity(1); self._body.canvas:SetScale(s, s)
-    self._body.canvas:DrawAtAnchor(math.floor(cx), math.floor(cy), "center")
+    self:drawPiece(self._body, self:centerX(), self:centerY(), self._scaleCur or 1, 1)
     local x = math.floor(self.x + self.pad)
     local y = math.floor(self.y + self.pad)
     local fg = self._fg or self.eff.colors.text

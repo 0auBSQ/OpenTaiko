@@ -138,6 +138,13 @@ Les arguments de couleur r, g, b, a sont des entiers 0-255. Les modifications de
 | `canvas:CopyFrom(other)  -> nil` | Copie dans celui-ci les pixels d'un autre canvas de même taille. L'appel ne fait rien quand les tailles diffèrent. |
 | `canvas:BlitPacked(data, count)  -> nil` | Remplit la surface à partir d'un tableau Lua indexé à partir de 1 d'entiers `0xRRGGBB` compactés, ligne par ligne (les pixels deviennent opaques ; une valeur négative devient un pixel transparent), puis envoie. |
 | `canvas:Upload()  -> nil` | Pousse les modifications en attente (seulement la région modifiée) vers le GPU. Sans effet quand rien n'a changé. |
+| `canvas:Upload(options)  -> nil` | Envoie comme `Upload()`. Options (toutes facultatives) : `extendEdges = true` exécute d'abord `ExtendEdges` ; `release = true` libère ensuite la copie CPU des pixels, pour un canevas qui est dessiné mais plus modifié (le modifier de nouveau repart d'un canevas transparent). |
+| `canvas:FillRoundRect(x, y, w, h, radius, r, g, b, a [, options])  -> nil` | Remplit un rectangle arrondi aux bords lisses, mélangé au canevas (voir les options de forme ci-dessous). `options.radii = {hautGauche, hautDroit, basDroit, basGauche}` donne à chaque coin son propre rayon. |
+| `canvas:FillEllipse(x, y, w, h, r, g, b, a [, options])  -> nil` | Remplit l'ellipse inscrite dans le rectangle (x, y, w, h) avec des bords lisses. |
+| `canvas:FillTriangle(x1, y1, x2, y2, x3, y3, r, g, b, a [, options])  -> nil` | Remplit un triangle avec des bords lisses. |
+| `canvas:FillCapsule(x0, y0, x1, y1, radius, r, g, b, a [, options])  -> nil` | Remplit une ligne de (x0, y0) à (x1, y1) aux bouts arrondis, épaisse de `radius` de chaque côté, avec des bords lisses. |
+| `canvas:FillPolygon(points, r, g, b, a [, options])  -> nil` | Remplit un polygone donné comme liste plate `{x1, y1, x2, y2, ...}` (règle pair-impair) avec des bords lisses. L'option `soft` ne s'applique pas. |
+| `canvas:ExtendEdges()  -> nil` | Donne à chaque pixel entièrement transparent voisin d'un pixel visible la couleur de ses voisins visibles (il reste transparent), pour qu'un canevas dessiné à l'échelle ou entre deux pixels ne montre pas de liseré sombre sur ses bords. |
 | `canvas:Draw(x, y)  -> nil` | Dessine le canvas avec son coin supérieur gauche en (x, y). |
 | `canvas:DrawRect(x, y, rect_x, rect_y, rect_width, rect_height)  -> nil` | Dessine un sous-rectangle source (en pixels de canvas) avec son coin supérieur gauche en (x, y). |
 | `canvas:DrawAtAnchor(x, y, anchor)  -> nil` | Dessine le canvas de sorte que le point d'ancrage nommé tombe en (x, y). |
@@ -145,6 +152,8 @@ Les arguments de couleur r, g, b, a sont des entiers 0-255. Les modifications de
 | `canvas:SetOpacity(opacity)  -> nil` | Définit l'opacité, 0..1. |
 | `canvas:SetColor(red, green, blue)  -> nil` | Définit la teinte à partir de trois valeurs 0..1. |
 | `canvas:Dispose()  -> nil` | Libère la texture GPU et le tampon CPU du canvas. |
+
+Options de forme, le dernier argument des remplissages lisses (toutes facultatives) : `mode` vaut "over" (par défaut : se mélange à ce qui est dessous), "replace" (prend la place de ce qu'il couvre, comme FillRect, avec un bord lisse) ou "cut" (efface ce qu'il couvre) ; `soft` est la largeur du bord en pixels (1 par défaut, un bord net ; un bord plus large s'estompe, par exemple pour une ombre) ; `bottom = {r, g, b, a}` crée un dégradé vertical depuis la couleur de l'appel, et `fromY` / `toY` indiquent où il commence et finit (par défaut : le haut et le bas de la forme). Les remplissages lisses acceptent des coordonnées décimales.
 
 ### GRAPHICS
 

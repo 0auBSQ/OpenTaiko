@@ -10,6 +10,8 @@ local Shape  = require("PopUI.shape")
 local Toggle = setmetatable({}, { __index = Widget })
 Toggle.__index = Toggle
 
+local LABEL_BG = { 255, 255, 255, 160 }
+
 function Toggle.new(o)
     o = o or {}
     o.w = o.w or 320; o.h = o.h or 56
@@ -29,9 +31,7 @@ function Toggle:setValue(v, silent)
     if v == self.value then return end
     self.value = v
     self._valFrom = self._valCur; self._valTo = v and 1 or 0
-    local cc = self._valC
-    cc.Begin, cc.End, cc.Interval = 0, 1, 0.22
-    cc:SetEasing("OUT", "BACK"); cc:Start()
+    Widget.startTween(self._valT, 0.22, { "OUT", "BACK" })
     if not silent then
         if self.onChange and self.onChange(self.value, self) then return end
         self:playSfx("toggle")
@@ -42,11 +42,25 @@ function Toggle:onActivate()
     self:setValue(not self.value)
 end
 
+-- the tick: two strokes with round ends
+local function bakeCheck(cv, m, cw, ch, a)
+    local x0, y0 = m + cw * 0.24, m + ch * 0.52
+    local x1, y1 = m + cw * 0.42, m + ch * 0.72
+    local x2, y2 = m + cw * 0.78, m + ch * 0.26
+    if Shape.smooth(cv) then
+        cv:FillCapsule(x0, y0, x1, y1, 4.5, a[1], a[2], a[3], 255)
+        cv:FillCapsule(x1, y1, x2, y2, 4.5, a[1], a[2], a[3], 255)
+    else
+        cv:StrokeLine(x0, y0, x1, y1, 4, a[1], a[2], a[3], 255)
+        cv:StrokeLine(x1, y1, x2, y2, 4, a[1], a[2], a[3], 255)
+    end
+end
+
 function Toggle:restyle()
     self:resolveStyle()
-    self._valC = self._valC or COUNTER:EmptyCounter()
+    self._valT = self._valT or Widget.newTween()
     local c = self.eff.colors
-    local ch = (self.variant == "checkbox") and 48 or 48
+    local ch = 48
     local cw = (self.variant == "checkbox") and 48 or 92
     self._ctrlW, self._ctrlH = cw, ch
     local ow = math.max(3, self.eff.outlineWidth - 1)
@@ -57,9 +71,7 @@ function Toggle:restyle()
             Shape.panel(box, m, m, cw, ch, { radius = rs, outline = { col = c.outline, width = ow }, top = c.surface, bottom = c.surface2 })
         end, { m = m })
         self:bakeShared("_check", "toggle.check", cw + 2 * m, ch + 2 * m, function(chk)
-            local a = c.primary
-            chk:StrokeLine(m + cw * 0.24, m + ch * 0.52, m + cw * 0.42, m + ch * 0.72, 4, a[1], a[2], a[3], 255)
-            chk:StrokeLine(m + cw * 0.42, m + ch * 0.72, m + cw * 0.78, m + ch * 0.26, 4, a[1], a[2], a[3], 255)
+            bakeCheck(chk, m, cw, ch, c.primary)
         end, { m = m })
     else
         local function pill(field, top, bot)
@@ -75,7 +87,7 @@ function Toggle:restyle()
             Shape.fillRound(knob, m + 3, m + 3, kd - 6, kd - 6, (kd - 6) * 0.5, { 255, 255, 255, 255 })
         end, { m = m, d = kd })
     end
-    -- side label (glyph-composed; +50 = the box padding a GetText texture carried)
+    -- side label (glyph-composed; +50 = the padding the glyph box keeps)
     self._labelInk = self.mgr:measureText(self.eff.font.label, self.text)
     self.h = math.max(ch, self.mgr:textHeight(self.eff.font.label))
     self.w = cw + self.gap + (self._labelInk > 0 and self._labelInk + 50 or 0)
@@ -83,47 +95,35 @@ function Toggle:restyle()
 end
 
 function Toggle:update(ctx)
-    self._scaleC:Tick(); self._hiC:Tick(); self._valC:Tick()
-    self._scaleCur = U.lerp(self._scaleFrom, self._scaleTo, self._scaleC.Value)
-    self._hiCur    = U.lerp(self._hiFrom, self._hiTo, self._hiC.Value)
-    self._valCur   = U.lerp(self._valFrom, self._valTo, self._valC.Value)
+    Widget.update(self, ctx)
+    self._valCur = U.lerp(self._valFrom, self._valTo, Widget.tickTween(self._valT, ctx.dt or 0))
 end
 
 function Toggle:draw()
     if not self.visible then return end
-    local cw, ch = self._ctrlW, self._ctrlH
+    local cw = self._ctrlW
     local ctrlCX = self.x + cw * 0.5
     local ctrlCY = self.y + self.h * 0.5
     local s = self._scaleCur
+    local op = self.enabled and 1 or 0.5      -- a disabled toggle fades its label
     -- focus ring around the control
     if self._ring and self._hiCur > 0.01 then
-        self._ring.canvas:SetOpacity(self._hiCur); self._ring.canvas:SetScale(s, s)
-        self._ring.canvas:DrawAtAnchor(math.floor(self.x + self.w * 0.5), math.floor(self.y + self.h * 0.5), "center")
+        self:drawPiece(self._ring, self.x + self.w * 0.5, self.y + self.h * 0.5, s, self._hiCur)
     end
     if self.variant == "checkbox" then
-        self._box.canvas:SetColor(1, 1, 1); self._box.canvas:SetOpacity(1); self._box.canvas:SetScale(s, s)
-        self._box.canvas:DrawAtAnchor(math.floor(ctrlCX), math.floor(ctrlCY), "center")
+        self:drawPiece(self._box, ctrlCX, ctrlCY, s, 1)
         local v = self._valCur
-        if v > 0.01 then
-            self._check.canvas:SetColor(1, 1, 1); self._check.canvas:SetOpacity(v); self._check.canvas:SetScale(s * (0.6 + 0.4 * v), s * (0.6 + 0.4 * v))
-            self._check.canvas:DrawAtAnchor(math.floor(ctrlCX), math.floor(ctrlCY), "center")
-        end
+        if v > 0.01 then self:drawPiece(self._check, ctrlCX, ctrlCY, s * (0.6 + 0.4 * v), math.min(1, v)) end
     else
-        self._trackOff.canvas:SetColor(1, 1, 1); self._trackOff.canvas:SetOpacity(1); self._trackOff.canvas:SetScale(s, s)
-        self._trackOff.canvas:DrawAtAnchor(math.floor(ctrlCX), math.floor(ctrlCY), "center")
-        if self._valCur > 0.01 then
-            self._trackOn.canvas:SetColor(1, 1, 1); self._trackOn.canvas:SetOpacity(self._valCur); self._trackOn.canvas:SetScale(s, s)
-            self._trackOn.canvas:DrawAtAnchor(math.floor(ctrlCX), math.floor(ctrlCY), "center")
-        end
-        local kx = U.lerp(self.x + ch * 0.5, self.x + cw - ch * 0.5, self._valCur)
-        self._knob.canvas:SetColor(1, 1, 1); self._knob.canvas:SetOpacity(1); self._knob.canvas:SetScale(s, s)
-        self._knob.canvas:DrawAtAnchor(math.floor(kx), math.floor(ctrlCY), "center")
+        self:drawPiece(self._trackOff, ctrlCX, ctrlCY, s, 1)
+        if self._valCur > 0.01 then self:drawPiece(self._trackOn, ctrlCX, ctrlCY, s, math.min(1, self._valCur)) end
+        local kx = U.lerp(self.x + self._ctrlH * 0.5, self.x + cw - self._ctrlH * 0.5, self._valCur)
+        self:drawPiece(self._knob, kx, ctrlCY, s, 1)
     end
     if self.text and self.text ~= "" then
-        local U160 = { 255, 255, 255, 160 }
         self.mgr:drawTextEx(self.eff.font.label, self.text,
             math.floor(self.x + cw + self.gap), math.floor(ctrlCY + self.mgr:textNudge(self.eff.font.label)),
-            self.eff.colors.text, U160, self.enabled and 1 or 0.5, 1, 1200, "left")
+            self.eff.colors.text, LABEL_BG, op, 1, 1200, "left")
     end
 end
 

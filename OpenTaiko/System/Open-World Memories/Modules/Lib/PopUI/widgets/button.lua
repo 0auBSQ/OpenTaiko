@@ -11,6 +11,8 @@ local Shape  = require("PopUI.shape")
 local Button = setmetatable({}, { __index = Widget })
 Button.__index = Button
 
+local CLEAR = { 255, 255, 255, 0 }
+
 function Button.new(o)
     o = o or {}
     o._autoW = (o.w == nil)
@@ -26,17 +28,16 @@ function Button.new(o)
     return self
 end
 
-function Button:setText(t) self.text = tostring(t); self:restyle() end
+-- a new text re-sizes (and re-bakes) the button only when it sizes itself to its label
+function Button:setText(t)
+    t = tostring(t)
+    if t == self.text then return end
+    self.text = t
+    if self._autoW and self.mgr then self:restyle() end
+end
 function Button:setIcon(k)
     if self.icon == k then return end
     self.icon = k; self:restyle()
-end
-
-local function drop(self, field)
-    local e = self[field]
-    if e == nil then return end
-    if e.key then self.mgr.releaseBaked(e.key) else self.mgr.releaseCanvas(e.canvas) end
-    self[field] = nil
 end
 
 function Button:restyle()
@@ -46,7 +47,7 @@ function Button:restyle()
     -- text colours: dark outlined text on light face, white outlined text on accent face
     self._fg = self.accent and c.textOnAccent or c.text
     self._bg = self.accent and U.shade(c.primary2, 0.55) or U.withAlpha({ 255, 255, 255 }, 200)
-    -- glyph-composed label: measure for auto-sizing (+50 = the box padding a GetText texture carried)
+    -- glyph-composed label: measure for auto-sizing (+50 = the padding the glyph box keeps)
     local ink = self.mgr:measureText(size, self.icon and "" or self.text)
     if self._autoW then self.w = math.max(140, ink + 50 + self.padX * 2) end
     if self._autoH then self.h = math.max(64, self.mgr:textHeight(size) + self.padY * 2) end
@@ -60,23 +61,22 @@ function Button:restyle()
         self:bakeShared("_icon", "button.icon", isz + 2 * pad, isz + 2 * pad, function(cv)
             Shape.icon(cv, icon, (isz + 2 * pad) * 0.5, (isz + 2 * pad) * 0.5, isz, fg)
         end, nil, icon, fg)
-    elseif self._icon then
-        drop(self, "_icon")
+    else
+        self:dropPiece("_icon")
     end
 end
 
 function Button:drawContent(cx, cy, s)
+    -- on the muted face of a disabled button the label is the plain text colour, half see-through
+    local muted = not self.enabled and self._bodyOff ~= nil
     if self.icon and self._icon then
-        local cv = self._icon.canvas
-        cv:SetOpacity(self.enabled and 1.0 or 0.5)
-        cv:SetScale(s, s)
-        cv:DrawAtAnchor(cx, cy, "center")
-        cv:SetScale(1, 1); cv:SetOpacity(1)
+        self:drawPiece(self._icon, cx, cy, s, self.enabled and 1.0 or 0.5)
         return
     end
     if not self.text or self.text == "" then return end
     local size = self.eff.font.button
-    self.mgr:drawTextEx(size, self.text, cx, cy + self.mgr:textNudge(size), self._fg, self._bg,
+    self.mgr:drawTextEx(size, self.text, cx, cy + self.mgr:textNudge(size),
+        muted and self.eff.colors.text or self._fg, muted and CLEAR or self._bg,
         self.enabled and 1.0 or 0.5, s, 700, "center")
 end
 

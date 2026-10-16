@@ -46,6 +46,9 @@ Theme.DEFAULT = {
 Theme.clone = Util.deepcopy
 Theme.merge = Util.merge
 
+-- the style of every widget made without one (the manager resolves it once for all of them)
+Theme.NONE = {}
+
 -- resolve an effective theme = DEFAULT < manager theme < per-widget theme/style.
 -- NOTICE: colors defined in {r,g,b} have the alpha inherited from base styles
 function Theme.resolve(userTheme, style)

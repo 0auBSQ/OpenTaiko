@@ -9,6 +9,8 @@ local Shape  = require("PopUI.shape")
 local Chooser = setmetatable({}, { __index = Widget })
 Chooser.__index = Chooser
 
+local CLEAR = { 255, 255, 255, 0 }
+
 function Chooser.new(o)
     o = o or {}
     o.w = o.w or 320; o.h = o.h or 64
@@ -17,7 +19,7 @@ function Chooser.new(o)
     self.options = o.options or {}
     self.index = math.max(1, math.min(o.index or 1, math.max(1, #self.options)))
     self.wrap = (o.wrap ~= false)
-    self.noPop = true   -- value is DrawDirect-style atlas text; don't zoom the body
+    self.noPop = true   -- the body stays still; the arrows pop on their own
     return self
 end
 
@@ -70,28 +72,8 @@ function Chooser:restyle()
     cap("_capR", 1)
 end
 
-function Chooser:onCapturing(silence)
-    if not silence then self:playSfx("click") end
-end
-function Chooser:onEndCapturing(silence)
-    if not silence then self:playSfx("cancel") end
-end
-
--- consume Left/Right (also for pad Left/Right in capturing mode), so focus stays on the chooser
--- consume Cancel to quit capturing mode
-function Chooser:onDecide() self:setCapturing(not self.capturing); return true end
-function Chooser:onCancel()
-    if self.capturing then self:setCapturing(false); return true end
-    return false
-end
-function Chooser:onNavLeft(forPad)
-    if not forPad or self.capturing then self:setCapturing(true, true); self:setIndex(self.index - 1); return true end
-    return false
-end
-function Chooser:onNavRight(forPad)
-    if not forPad or self.capturing then self:setCapturing(true, true); self:setIndex(self.index + 1); return true end
-    return false
-end
+local function step(self, dir) self:setIndex(self.index + dir) end
+Widget.editable(Chooser, step)
 
 function Chooser:update(ctx)
     Widget.update(self, ctx)
@@ -129,26 +111,19 @@ end
 function Chooser:draw()
     if not self.visible then return end
     local cx, cy = self:centerX(), self:centerY()
-    local s = 1
-    if self._ring and self._hiCur > 0.01 then
-        self._ring.canvas:SetOpacity(self._hiCur); self._ring.canvas:SetScale(1, 1)
-        self._ring.canvas:DrawAtAnchor(math.floor(cx), math.floor(cy), "center")
-    end
-    self._body.canvas:SetColor(1, 1, 1); self._body.canvas:SetOpacity(self.enabled and 1 or 0.5); self._body.canvas:SetScale(1, 1)
-    self._body.canvas:DrawAtAnchor(math.floor(cx), math.floor(cy), "center")
+    if self._ring and self._hiCur > 0.01 then self:drawPiece(self._ring, cx, cy, 1, self._hiCur) end
+    local body, op = self:_bodyNow()
+    self:drawPiece(body, cx, cy, 1, op)
     -- arrows: idle slightly dim; brighten + pop on hover; shrink on press (per-arrow tactile feedback)
     local function drawCap(cap, ax, side)
         local hot = (self._hoverThird == side)
         local pressed = (self._pressThird == side)
         local sc = pressed and 0.86 or (hot and 1.12 or 1.0)
-        cap.canvas:SetOpacity(self.enabled and (hot and 1.0 or 0.8) or 0.4)
-        cap.canvas:SetScale(sc, sc)
-        cap.canvas:DrawAtAnchor(math.floor(ax), math.floor(cy), "center")
-        cap.canvas:SetScale(1, 1); cap.canvas:SetOpacity(1)
+        self:drawPiece(cap, ax, cy, sc, self.enabled and (hot and 1.0 or 0.8) or 0.4)
     end
     drawCap(self._capL, self.x + 6 + self._arrowW * 0.5, "left")
     drawCap(self._capR, self.x + self.w - 6 - self._arrowW * 0.5, "right")
-    -- value text (centred), glyph-composed: no per-string textures, CJK-correct, squished to the avail width
+    -- value text (centred), glyph-composed: no per-string textures, CJK-correct, squeezed to the free width
     local txt = tostring(self:value() or "")
     local sz = self.eff.font.button
     local avail = math.max(20, self.w - 2 * self._arrowW - 24)
@@ -156,7 +131,7 @@ function Chooser:draw()
         and U.lerpColor(self.eff.colors.text, self.eff.colors.primary2, self._hiCapCur)
         or self.eff.colors.text
     self.mgr:drawTextEx(sz, txt, math.floor(cx), math.floor(cy + self.mgr:textNudge(sz)),
-        textColor, U.withAlpha({ 255, 255, 255 }, 0), self.enabled and 1 or 0.5, 1, avail, "center")
+        textColor, CLEAR, self.enabled and 1 or 0.5, 1, avail, "center")
 end
 
 return Chooser

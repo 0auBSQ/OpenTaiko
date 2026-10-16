@@ -41,13 +41,6 @@ local pending = nil                 -- "list" (a stack was picked) / "done" (rec
 local function tr(id) return T:tr(id) end
 local function playSfx(name) pcall(function() SHARED:GetSharedSound(name):Play() end) end
 
-local function focusWidget(mgr, w)
-    if mgr == nil or w == nil then return end
-    for i, f in ipairs(mgr.focusables) do
-        if f == w then mgr:_setFocusIndex(i); return end
-    end
-end
-
 -- every recolourable stack in stock, by item then colour (the default colour first)
 local function collect()
     local room = ctx.room()
@@ -85,7 +78,7 @@ local function build()
     if ui then pcall(function() ui:disposeWidgets() end) end
     W = {}
     stacks = collect()
-    ui = PopUI.new{ theme = ctx.theme, navPlayer = ctx.playerIndex() + 1 }
+    ui = PopUI.new{ theme = ctx.theme, navPlayer = ctx.playerIndex() + 1, nav = "spatial" }
     local x, y = (1920 - PANEL.w) / 2, (1080 - PANEL.h) / 2
     local panel = ui:panel{ x = x, y = y, w = PANEL.w, h = PANEL.h, pad = 30, title = Room.displayName(M.ID) }
     local cx, cy, cw, ch = panel:content()
@@ -115,7 +108,7 @@ local function build()
         local dark = { math.floor(col[1] * 0.75), math.floor(col[2] * 0.75), math.floor(col[3] * 0.75) }
         local bx = rx + ((i - 1) % CHIPS_PER_ROW) * (CHIP + CHIP_GAP)
         local by = cy + 44 + math.floor((i - 1) / CHIPS_PER_ROW) * (CHIP + CHIP_GAP)
-        local b = ui:button{ text = "", x = bx, y = by, w = CHIP, h = CHIP, accent = true,
+        local b = ui:button{ text = "", x = bx, y = by, w = CHIP, h = CHIP, accent = true, disabledLook = "fade",
             style = { colors = { primary = col, primary2 = dark } },
             onClick = function() target = hex; refreshAmount() end }
         if hex == s.hex then b:setEnabled(false) end
@@ -170,7 +163,7 @@ function M.open()
     local st = collect()[1]
     if st then amount = st.n end
     build()
-    focusWidget(ui, W.list)
+    if W.list then ui:focus(W.list) end
 end
 
 function M.close(silent)
@@ -190,7 +183,7 @@ function M.update(dt, ts)
         pending = nil
         build()
         -- the focus stays where the player was: the list, or the button they just pressed
-        if why == "done" and W.go and W.go.enabled then focusWidget(ui, W.go) else focusWidget(ui, W.list) end
+        if not (why == "done" and W.go and ui:focus(W.go)) and W.list then ui:focus(W.list) end
     end
     if r == "cancel" then M.close(); return "closed" end
     return nil

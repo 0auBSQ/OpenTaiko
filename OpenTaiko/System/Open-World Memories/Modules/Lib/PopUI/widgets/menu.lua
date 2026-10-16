@@ -7,25 +7,29 @@
 -- with lockedW pixels kept free for it.
 --   ui:menu{ x=, y=, w=, h=, items={"One",{text="Two",value=2}}, selected=1, onChange=fn, onSelect=fn }
 -- hoverSelects = false: the mouse picks a row by clicking it only (hovering moves nothing);
--- textReserve = pixels kept free at the right end of every row (for what the caller draws there).
+-- textReserve = pixels kept free at the right end of every row (for what the caller draws there);
+-- scrollbar = true: a scrollbar beside the menu while its rows don't all fit.
 
-local Widget = require("PopUI.widget")
-local U      = require("PopUI.util")
-local Shape  = require("PopUI.shape")
+local Widget   = require("PopUI.widget")
+local U        = require("PopUI.util")
+local Shape    = require("PopUI.shape")
+local ListBase = require("PopUI.widgets.listbase")
 
 local Menu = setmetatable({}, { __index = Widget })
 Menu.__index = Menu
+ListBase.install(Menu)
+
+local HOVER_TICK = 0.06   -- s between two move sounds while the pointer sweeps over rows
 
 function Menu.new(o)
     o = o or {}
     o.w = o.w or 480; o.h = o.h or 600
-    local srcItems = o.items or {}   -- capture before Widget.new (self === o, so self.items= would clobber o.items)
     local self = Widget.new(o)
     setmetatable(self, Menu)
     self.rowHeight = o.rowHeight or 72
     self.selected = o.selected or 1
     self.items = {}
-    for _, it in ipairs(srcItems) do
+    for _, it in ipairs(o.items or {}) do
         -- mark = highlighted row (e.g. a music player's now-playing entry): gold face + gold text.
         -- It lives on the item table so callers can flip it live without rebuilding the menu.
         if type(it) == "table" then self.items[#self.items + 1] = { text = it.text or "", value = it.value, mark = it.mark, locked = it.locked }
@@ -37,7 +41,8 @@ end
 
 function Menu:_count() return #self.items end
 
-function Menu:setSelected(i, fireChange)
+-- quiet = true: no move sound
+function Menu:setSelected(i, fireChange, quiet)
     local n = self:_count(); if n == 0 then return end
     i = U.clamp(i, 1, n)
     if i == self.selected then return end
@@ -45,22 +50,11 @@ function Menu:setSelected(i, fireChange)
     self:_ensureVisible()
     if fireChange ~= false then
         if self.onChange and self.onChange(self.selected, self.items[self.selected], self) then return end
-        self:playSfx("move")
+        if not quiet then self:playSfx("move") end
     end
 end
 
-function Menu:_ensureVisible()
-    local top = (self.selected - 1) * self.rowHeight
-    local bot = top + self.rowHeight
-    if top < self._scrollTarget then self._scrollTarget = top end
-    if bot > self._scrollTarget + self.h then self._scrollTarget = bot - self.h end
-    self:_clampScroll()
-end
-
-function Menu:_clampScroll()
-    local maxScroll = math.max(0, self:_count() * self.rowHeight - self.h)
-    self._scrollTarget = U.clamp(self._scrollTarget, 0, maxScroll)
-end
+function Menu:_ensureVisible() self:_showRow(self.selected) end
 
 function Menu:onNavDownOrPadRight() if self.selected < self:_count() then self:setSelected(self.selected + 1); return true end return false end
 function Menu:onNavUpOrPadLeft() if self.selected > 1 then self:setSelected(self.selected - 1); return true end return false end
@@ -90,39 +84,37 @@ function Menu:restyle()
     row("_row", c.surface, c.surface2, c.outline)
     row("_rowSel", c.primary, c.primary2, c.outline)
     self:_clampScroll()
-    -- ROW-sized focus ring (drawn on the selected row) — not a full-menu ring
+    -- a row-sized focus ring (drawn on the selected row), not a ring around the whole menu
     local rwid = self.eff.outlineWidth + 4
     local ir = self.eff.radiusSmall
     self:bakeShared("_ring", "menu.ring", rw + 2 * m, rh + 2 * m, function(ring)
         Shape.fillRoundAA(ring, m - 2, m - 2, rw + 4, rh + 4, ir + 2, c.focusRing)
         Shape.fillRound(ring, m - 2 + rwid, m - 2 + rwid, rw + 4 - 2 * rwid, rh + 4 - 2 * rwid, math.max(1, ir + 2 - rwid), { 0, 0, 0, 0 })
     end, { m = m })
+    self:_bakeBar()
 end
 
 function Menu:update(ctx)
-    self._scaleC:Tick(); self._hiC:Tick()
-    self._hiCur = U.lerp(self._hiFrom, self._hiTo, self._hiC.Value)
-    -- wheel scroll while hovered
-    if self.hovered and ctx.scrollDy and ctx.scrollDy ~= 0 then
-        self._scrollTarget = self._scrollTarget - ctx.scrollDy * self.rowHeight
-        self:_clampScroll()
-    end
-    -- mouse hover row → preview-select; click sets selection
+    Widget.update(self, ctx)
+    -- the pointer over a row previews it (unless hoverSelects = false); a click picks it
     if self.hovered and ctx.inside and (ctx.moved or ctx.mPressed or not self._wasHovered) then
         local rel = ctx.my - self.y + self._scrollCur
         local row = math.floor(rel / self.rowHeight) + 1
         if row >= 1 and row <= self:_count() then
             if ctx.mPressed then self:setSelected(row) end
-            if self.hoverSelects ~= false and row ~= self.selected and not ctx.mPressing then self:setSelected(row) end
+            if self.hoverSelects ~= false and row ~= self.selected and not ctx.mPressing then
+                local quiet = (ctx.ts or 0) - (self._tickTs or -1e9) < HOVER_TICK * 1000
+                if not quiet then self._tickTs = ctx.ts end
+                self:setSelected(row, true, quiet)
+            end
         end
     end
     self._wasHovered = self.hovered
-    -- smooth scroll
-    self._scrollCur = self._scrollCur + (self._scrollTarget - self._scrollCur) * math.min(1, ctx.dt * 14)
+    self:_updateScroll(ctx, 14)
 end
 
--- draw one baked row piece clipped to the menu viewport: fully-visible rows blit whole, edge rows
--- are SLICED via LuaCanvas:DrawRect (source-rect draw) so nothing bleeds past the list box
+-- draw one baked row piece clipped to the menu viewport: fully-visible rows blit whole, edge rows are
+-- sliced with a source-rect draw so nothing shows past the list box
 local function drawPieceClipped(piece, rcx, rcy, vy0, vy1)
     local cv = piece.canvas
     local cw, ch = cv.Width, cv.Height
@@ -161,6 +153,7 @@ function Menu:draw()
         piece.canvas:SetScale(1.0, 1.0)
         drawPieceClipped(piece, rcx, rcy, vy0, vy1)
         if isSel and self.focused and self._hiCur > 0.01 then
+            self._ring.canvas:SetColor(1, 1, 1)
             self._ring.canvas:SetOpacity(self._hiCur); self._ring.canvas:SetScale(1, 1)
             drawPieceClipped(self._ring, rcx, rcy, vy0, vy1)
         end
@@ -190,6 +183,7 @@ function Menu:draw()
             end
         end
     end
+    self:_drawBar()
 end
 
 return Menu

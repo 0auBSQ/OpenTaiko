@@ -138,6 +138,13 @@ end
 | `canvas:CopyFrom(other)  -> nil` | 같은 크기의 다른 캔버스 픽셀을 이 캔버스로 복사합니다. 크기가 다르면 이 호출은 아무것도 하지 않습니다. |
 | `canvas:BlitPacked(data, count)  -> nil` | 행 우선 순서의 패킹된 `0xRRGGBB` 정수로 이루어진 1부터 시작하는 Lua 배열로 표면을 채우고(픽셀은 불투명이 되며, 음수 값은 투명 픽셀이 됨) 업로드합니다. |
 | `canvas:Upload()  -> nil` | 대기 중인 편집(변경된 영역만)을 GPU에 밀어 넣습니다. 바뀐 것이 없으면 no-op입니다. |
+| `canvas:Upload(options)  -> nil` | `Upload()`처럼 업로드합니다. 옵션(모두 선택): `extendEdges = true`는 먼저 `ExtendEdges`를 실행하고, `release = true`는 그다음 픽셀의 CPU 사본을 해제합니다(그리기만 하고 더는 편집하지 않는 캔버스용이며, 다시 편집하면 투명한 캔버스에서 시작합니다). |
+| `canvas:FillRoundRect(x, y, w, h, radius, r, g, b, a [, options])  -> nil` | 가장자리가 매끄러운 둥근 사각형을 채워 캔버스에 섞습니다(아래 도형 옵션 참고). `options.radii = {왼쪽위, 오른쪽위, 오른쪽아래, 왼쪽아래}`로 모서리마다 반지름을 줄 수 있습니다. |
+| `canvas:FillEllipse(x, y, w, h, r, g, b, a [, options])  -> nil` | 상자 (x, y, w, h) 안의 타원을 매끄러운 가장자리로 채웁니다. |
+| `canvas:FillTriangle(x1, y1, x2, y2, x3, y3, r, g, b, a [, options])  -> nil` | 삼각형을 매끄러운 가장자리로 채웁니다. |
+| `canvas:FillCapsule(x0, y0, x1, y1, radius, r, g, b, a [, options])  -> nil` | (x0, y0)에서 (x1, y1)까지 양 끝이 둥근 선을 양쪽으로 `radius` 두께로, 매끄러운 가장자리로 채웁니다. |
+| `canvas:FillPolygon(points, r, g, b, a [, options])  -> nil` | 평평한 목록 `{x1, y1, x2, y2, ...}`로 준 다각형(짝홀 규칙)을 매끄러운 가장자리로 채웁니다. `soft` 옵션은 적용되지 않습니다. |
+| `canvas:ExtendEdges()  -> nil` | 보이는 픽셀 옆의 완전히 투명한 픽셀마다 보이는 이웃의 색을 줍니다(투명한 상태는 그대로). 크기를 바꾸거나 픽셀 사이에 그린 캔버스의 가장자리에 어두운 테두리가 생기지 않습니다. |
 | `canvas:Draw(x, y)  -> nil` | 왼쪽 위를 (x, y)에 두고 캔버스를 그립니다. |
 | `canvas:DrawRect(x, y, rect_x, rect_y, rect_width, rect_height)  -> nil` | 원본의 부분 사각형(캔버스 픽셀 단위)을 왼쪽 위가 (x, y)에 오도록 그립니다. |
 | `canvas:DrawAtAnchor(x, y, anchor)  -> nil` | 지정한 앵커 지점이 (x, y)에 오도록 캔버스를 그립니다. |
@@ -145,6 +152,8 @@ end
 | `canvas:SetOpacity(opacity)  -> nil` | 불투명도를 설정합니다, 0..1. |
 | `canvas:SetColor(red, green, blue)  -> nil` | 0..1 값 세 개로 틴트를 설정합니다. |
 | `canvas:Dispose()  -> nil` | 캔버스의 GPU 텍스처와 CPU 버퍼를 해제합니다. |
+
+도형 옵션은 매끄러운 채우기의 마지막 인수입니다(모두 선택): `mode`는 "over"(기본값: 아래에 있는 것과 섞임), "replace"(FillRect처럼 덮은 부분을 대신하되 가장자리는 매끄러움), "cut"(덮은 부분을 지움) 중 하나입니다. `soft`는 가장자리 폭(픽셀, 기본값 1은 선명한 가장자리이며, 넓으면 서서히 사라져 그림자 등에 씁니다)입니다. `bottom = {r, g, b, a}`는 호출한 색에서 시작하는 세로 그라데이션을 만들고, `fromY` / `toY`는 그 시작과 끝 위치입니다(기본값: 도형의 위와 아래). 매끄러운 채우기는 소수 좌표를 받습니다.
 
 ### GRAPHICS
 

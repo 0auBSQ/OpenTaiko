@@ -1,13 +1,74 @@
 ---@diagnostic disable: undefined-global, lowercase-global
--- PopUI/shape.lua — bakes the look into a LuaCanvas using the engine's software pixel ops.
+-- PopUI/shape.lua — bakes the look into a LuaCanvas using the engine's pixel ops.
+--
+-- On an engine whose canvases have the smooth shape calls (FillRoundRect, FillEllipse, FillTriangle,
+-- FillCapsule, FillPolygon), every shape here is drawn with anti-aliased edges that blend into what is
+-- already on the canvas. An older engine gets the plain pixel fills below each smooth branch.
 
 local U = require("PopUI.util")
 local Shape = {}
 
 local floor, ceil, min, max, sqrt = math.floor, math.ceil, math.min, math.max, math.sqrt
 
--- ── rounded rect (hard) — for inset face / interior fills where the edge is hidden ──────────────────
+-- ── smooth canvas calls ─────────────────────────────────────────────────────────────────────────────
+local smoothKnown, smoothHas = false, false
+
+-- true when the canvas has the smooth shape calls (checked once: every canvas of the engine has them or none)
+function Shape.smooth(cv)
+    if not smoothKnown then
+        local ok, f = pcall(function() return cv.FillRoundRect end)
+        smoothHas = ok and f ~= nil
+        smoothKnown = true
+    end
+    return smoothHas
+end
+
+-- uploads a finished bake. On a smooth engine the shapes' edge colours first extend into the clear pixels
+-- around them (no dark rim when the canvas is drawn scaled), and `release` lets go of the CPU copy of a
+-- canvas that is not drawn into again.
+function Shape.upload(cv, release)
+    if Shape.smooth(cv) then cv:Upload({ extendEdges = true, release = release == true }) else cv:Upload() end
+end
+
+local function rgba(c)
+    return floor((c[1] or 0) + 0.5), floor((c[2] or 0) + 0.5), floor((c[3] or 0) + 0.5), floor((c[4] or 255) + 0.5)
+end
+
+-- a fill takes the place of what it covers (the plain fills' behaviour); a fully clear colour erases instead
+local REPLACE, CUT = { mode = "replace" }, { mode = "cut" }
+local function fillMode(c) return ((c[4] or 255) <= 0) and CUT or REPLACE end
+
+local function smoothRound(cv, x, y, w, h, r, c)
+    local mode = fillMode(c)
+    if mode == CUT then cv:FillRoundRect(x, y, w, h, r, 0, 0, 0, 255, CUT)
+    else
+        local cr, cg, cb, ca = rgba(c)
+        cv:FillRoundRect(x, y, w, h, r, cr, cg, cb, ca, REPLACE)
+    end
+end
+
+local function gradientOpts(botC, y0, y1, extra)
+    local br, bg, bb, ba = rgba(botC)
+    local o = extra or {}
+    o.mode = o.mode or "replace"
+    o.bottom = { br, bg, bb, ba }
+    o.fromY, o.toY = y0, y1
+    return o
+end
+
+-- a disc around a pixel: the plain fill's FillCircle(cx, cy, r), or the same disc with a smooth edge
+local function disc(cv, cx, cy, r, c)
+    local cr, cg, cb, ca = rgba(c)
+    if Shape.smooth(cv) then cv:FillEllipse(cx - r, cy - r, 2 * r + 1, 2 * r + 1, cr, cg, cb, ca, fillMode(c))
+    else cv:FillCircle(cx, cy, r, cr, cg, cb, ca) end
+end
+
+-- ── rounded rect ────────────────────────────────────────────────────────────────────────────────────
 local function fillRound(cv, x, y, w, h, r, c)
+    if Shape.smooth(cv) then
+        if w > 0 and h > 0 then smoothRound(cv, x, y, w, h, min(r, w * 0.5, h * 0.5), c) end
+        return
+    end
     x, y, w, h = floor(x), floor(y), floor(w), floor(h)
     r = floor(min(r, w * 0.5, h * 0.5))
     local cr, cg, cb, ca = c[1], c[2], c[3], c[4] or 255
@@ -21,8 +82,8 @@ local function fillRound(cv, x, y, w, h, r, c)
 end
 Shape.fillRound = fillRound
 
--- one anti-aliased corner-band row: solid span [x0..x1] (fractional) with the two end pixels alpha-weighted
--- by sub-pixel coverage. e = distance of this row from the flat top/bottom edge (0..r).
+-- one corner-band row of the plain fill: solid span [x0..x1] (fractional) with the two end pixels
+-- alpha-weighted by their horizontal coverage. e = distance of this row from the flat top/bottom edge (0..r).
 local function aaRow(cv, x, w, py, r, e, cr, cg, cb, ca)
     local k = r - e
     local inset = r - sqrt(max(0, r * r - k * k))
@@ -33,9 +94,9 @@ local function aaRow(cv, x, w, py, r, e, cr, cg, cb, ca)
     cv:SetPixel(ix1, py, cr, cg, cb, floor(ca * (x1 - ix1) + 0.5))
 end
 
--- rounded rect with anti-aliased outer corners, for the silhouette / border layer. Per-row: one
--- big fill for the straight middle + AA spans only across the top/bottom corner bands (cheap to bake).
+-- rounded rect with a smooth outer edge, for the silhouette / border layer
 local function fillRoundAA(cv, x, y, w, h, r, c)
+    if Shape.smooth(cv) then return fillRound(cv, x, y, w, h, r, c) end
     x, y, w, h = floor(x), floor(y), floor(w), floor(h)
     r = floor(min(r, w * 0.5, h * 0.5))
     local cr, cg, cb, ca = c[1], c[2], c[3], c[4] or 255
@@ -48,8 +109,14 @@ local function fillRoundAA(cv, x, y, w, h, r, c)
 end
 Shape.fillRoundAA = fillRoundAA
 
--- vertical-gradient rounded rect (hard interior; the face under the AA outline)
+-- vertical-gradient rounded rect (the face under the outline)
 local function fillRoundGradient(cv, x, y, w, h, r, topC, botC)
+    if Shape.smooth(cv) then
+        if w <= 0 or h <= 0 then return end
+        local cr, cg, cb, ca = rgba(topC)
+        cv:FillRoundRect(x, y, w, h, min(r, w * 0.5, h * 0.5), cr, cg, cb, ca, gradientOpts(botC, y + 0.5, y + h - 0.5))
+        return
+    end
     x, y, w, h = floor(x), floor(y), floor(w), floor(h)
     r = floor(min(r, w * 0.5, h * 0.5))
     for iy = 0, h - 1 do
@@ -64,8 +131,15 @@ local function fillRoundGradient(cv, x, y, w, h, r, topC, botC)
 end
 Shape.fillRoundGradient = fillRoundGradient
 
--- gradient bar
+-- gradient bar, rounded on the left only
 function Shape.fillFillBar(cv, x, y, w, h, r, topC, botC)
+    if Shape.smooth(cv) then
+        if w <= 0 or h <= 0 then return end
+        local rr = min(r, h * 0.5)
+        local cr, cg, cb, ca = rgba(topC)
+        cv:FillRoundRect(x, y, w, h, rr, cr, cg, cb, ca, gradientOpts(botC, y + 0.5, y + h - 0.5, { radii = { rr, 0, 0, rr } }))
+        return
+    end
     x, y, w, h = floor(x), floor(y), floor(w), floor(h)
     r = floor(min(r, h * 0.5))
     for iy = 0, h - 1 do
@@ -75,11 +149,12 @@ function Shape.fillFillBar(cv, x, y, w, h, r, topC, botC)
         local edge = min(iy, h - 1 - iy); local inset = 0
         if edge < r then local k = r - edge; inset = r - sqrt(max(0, r * r - k * k)) end
         local ix = floor(inset)
-        if w - ix > 0 then cv:FillRect(x + ix, y + iy, w - ix, 1, cr, cg, cb, ca) end   -- inset LEFT only
+        if w - ix > 0 then cv:FillRect(x + ix, y + iy, w - ix, 1, cr, cg, cb, ca) end   -- inset on the left only
     end
 end
 
--- ── ellipse (per-row, AA end pixels) ────────────────────────────────────────────────────────────────
+-- ── ellipse ─────────────────────────────────────────────────────────────────────────────────────────
+-- plain fill: per row, with the two end pixels weighted by their horizontal coverage
 local function ellipseRow(cv, cx, cy, rx, ry, iyTop, h, colFn)
     for iy = 0, floor(h) - 1 do
         local py = iyTop + iy
@@ -97,43 +172,45 @@ local function ellipseRow(cv, cx, cy, rx, ry, iyTop, h, colFn)
 end
 
 local function fillEllipse(cv, x, y, w, h, c)
+    if Shape.smooth(cv) then
+        local cr, cg, cb, ca = rgba(c)
+        cv:FillEllipse(x, y, w, h, cr, cg, cb, ca, fillMode(c))
+        return
+    end
     local cr, cg, cb, ca = c[1], c[2], c[3], c[4] or 255
     ellipseRow(cv, x + w * 0.5, y + h * 0.5, w * 0.5, h * 0.5, floor(y), h, function() return cr, cg, cb, ca end)
 end
 Shape.fillEllipse = fillEllipse
 
-local function fillEllipseGradient(cv, x, y, w, h, topC, botC)
-    ellipseRow(cv, x + w * 0.5, y + h * 0.5, w * 0.5, h * 0.5, floor(y), h, function(iy)
-        local t = (h > 1) and (iy / (h - 1)) or 0
-        return U.lerp(topC[1], botC[1], t), U.lerp(topC[2], botC[2], t), U.lerp(topC[3], botC[3], t), U.lerp(topC[4] or 255, botC[4] or 255, t)
-    end)
-end
-
 local function drawCloud(cv, x, y, w, h, c, grow)
     x, y, w, h = floor(x), floor(y), floor(w), floor(h)
     grow = grow or 0
-    local cr, cg, cb, ca = c[1], c[2], c[3], c[4] or 255
     local bump = max(6, floor(min(w, h) * 0.20))
-    -- solid core (guarantees the whole shape is connected — no split), grown by `grow`
+    -- solid core (keeps the whole shape connected), grown by `grow`
     fillRound(cv, x + bump - grow, y + bump - grow, w - 2 * bump + 2 * grow, h - 2 * bump + 2 * grow, bump + grow, c)
     -- bumps around the perimeter (centres independent of `grow`), spaced so neighbours always overlap
     local nx = max(1, floor((w - 2 * bump) / (bump * 1.3)))
     local ny = max(1, floor((h - 2 * bump) / (bump * 1.3)))
     for i = 0, nx do
         local bx = x + bump + (w - 2 * bump) * (i / nx)
-        cv:FillCircle(floor(bx), y + bump, bump + grow, cr, cg, cb, ca)
-        cv:FillCircle(floor(bx), y + h - bump, bump + grow, cr, cg, cb, ca)
+        disc(cv, floor(bx), y + bump, bump + grow, c)
+        disc(cv, floor(bx), y + h - bump, bump + grow, c)
     end
     for j = 0, ny do
         local by = y + bump + (h - 2 * bump) * (j / ny)
-        cv:FillCircle(x + bump, floor(by), bump + grow, cr, cg, cb, ca)
-        cv:FillCircle(x + w - bump, floor(by), bump + grow, cr, cg, cb, ca)
+        disc(cv, x + bump, floor(by), bump + grow, c)
+        disc(cv, x + w - bump, floor(by), bump + grow, c)
     end
 end
 Shape.drawCloud = drawCloud
 
--- ── triangle (scanline) — for the seamless tail ─────────────────────────────────────────────────────
+-- ── triangle ────────────────────────────────────────────────────────────────────────────────────────
 local function fillTriangle(cv, x1, y1, x2, y2, x3, y3, c)
+    if Shape.smooth(cv) then
+        local cr, cg, cb, ca = rgba(c)
+        cv:FillTriangle(x1, y1, x2, y2, x3, y3, cr, cg, cb, ca, fillMode(c))
+        return
+    end
     local cr, cg, cb, ca = c[1], c[2], c[3], c[4] or 255
     local miny, maxy = floor(min(y1, y2, y3)), ceil(max(y1, y2, y3))
     for py = miny, maxy do
@@ -151,10 +228,36 @@ local function fillTriangle(cv, x1, y1, x2, y2, x3, y3, c)
 end
 Shape.fillTriangle = fillTriangle
 
--- ── soft drop shadow (layered silhouettes; blurred so hard corners don't matter) ──────────────────────
+-- a thick line with round ends, `t` wide: a capsule on a smooth engine, else two triangles and two round caps
+local function bar(cv, x0, y0, x1, y1, t, c)
+    if Shape.smooth(cv) then
+        local cr, cg, cb, ca = rgba(c)
+        cv:FillCapsule(x0, y0, x1, y1, t * 0.5, cr, cg, cb, ca, REPLACE)
+        return
+    end
+    local dx, dy = x1 - x0, y1 - y0
+    local len = sqrt(dx * dx + dy * dy)
+    if len <= 0 then return end
+    local nx, ny = -dy / len * t * 0.5, dx / len * t * 0.5
+    fillTriangle(cv, x0 + nx, y0 + ny, x1 + nx, y1 + ny, x1 - nx, y1 - ny, c)
+    fillTriangle(cv, x0 + nx, y0 + ny, x1 - nx, y1 - ny, x0 - nx, y0 - ny, c)
+    fillRoundAA(cv, x0 - t * 0.5, y0 - t * 0.5, t, t, t * 0.5, c)
+    fillRoundAA(cv, x1 - t * 0.5, y1 - t * 0.5, t, t, t * 0.5, c)
+end
+Shape.bar = bar
+
+-- ── soft drop shadow ────────────────────────────────────────────────────────────────────────────────
+-- smooth engine: one shape whose edge fades over the shadow's whole spread; plain fills: layered silhouettes
 function Shape.dropShadow(cv, x, y, w, h, r, sh)
     local col = sh.col; local layers = sh.layers or 4; local grow = sh.grow or 3
     local dx, dy = sh.dx or 0, sh.dy or 6; local baseA = col[4] or 90
+    if Shape.smooth(cv) then
+        local spread = layers * grow
+        local cr, cg, cb = rgba(col)
+        cv:FillRoundRect(x + dx - spread * 0.5, y + dy - spread * 0.5, w + spread, h + spread, r + spread * 0.5,
+            cr, cg, cb, floor(baseA * 0.6), { soft = spread })
+        return
+    end
     for i = layers, 1, -1 do
         local g = i * grow
         local a = floor(baseA * (1 - (i - 1) / layers) * 0.6)
@@ -162,14 +265,20 @@ function Shape.dropShadow(cv, x, y, w, h, r, sh)
     end
 end
 
--- Top sheen. Canvas pixel ops OVERWRITE (no blending), so a translucent gloss drawn raw would
--- REPLACE the opaque face pixels and leave the top of the box see-through on screen. When the face
--- colors are known (topC/botC = the face gradient), the sheen is pre-blended row by row and written
--- back opaque instead. Without them, falls back to the raw write (legacy behaviour).
+-- Top sheen. The smooth engine blends it over the face. The plain fills overwrite (no blending), so there
+-- the sheen is pre-blended with the face colours (topC/botC) row by row and written back opaque; without
+-- them it is written raw.
 local function gloss(cv, x, y, w, h, r, col, topC, botC)
     local gh = floor(h * 0.46); if gh < 4 then return end
     local pad = floor(r * 0.4)
     local gx, gy, gw, gr = x + pad, y + floor(r * 0.3), w - 2 * pad, max(2, r - pad)
+    if Shape.smooth(cv) then
+        gx, gy, gw = floor(gx), floor(gy), floor(gw)
+        if gw <= 0 then return end
+        local cr, cg, cb, ca = rgba(col)
+        cv:FillRoundRect(gx, gy, gw, gh, min(gr, gw * 0.5, gh * 0.5), cr, cg, cb, ca)
+        return
+    end
     if topC == nil then
         fillRound(cv, gx, gy, gw, gh, gr, col)
         return
@@ -179,7 +288,7 @@ local function gloss(cv, x, y, w, h, r, col, topC, botC)
     gx, gy, gw, gh = floor(gx), floor(gy), floor(gw), floor(gh)
     gr = floor(min(gr, gw * 0.5, gh * 0.5))
     for iy = 0, gh - 1 do
-        -- face gradient sampled at this row's position within the FACE rect (y..y+h-1)
+        -- face gradient sampled at this row's position within the face rect (y..y+h-1)
         local t = (h > 1) and ((gy + iy - y) / (h - 1)) or 0
         local fr = U.lerp(topC[1], botC[1], t); local fg = U.lerp(topC[2], botC[2], t)
         local fb = U.lerp(topC[3], botC[3], t); local fa = U.lerp(topC[4] or 255, botC[4] or 255, t)
@@ -195,7 +304,7 @@ local function gloss(cv, x, y, w, h, r, col, topC, botC)
 end
 Shape.gloss = gloss
 
--- Bake a bordered, gradient, glossy rounded panel into cv at (x,y,w,h). Smooth outer border.
+-- Bake a bordered, gradient, glossy rounded panel into cv at (x,y,w,h).
 function Shape.panel(cv, x, y, w, h, opts)
     local r = opts.radius or 24
     local ow = (opts.outline and opts.outline.width) or 0
@@ -243,7 +352,7 @@ local function bodyPath(shape, x, y, w, h, r, maxPoints)
     return p
 end
 
--- where the tail attaches on the body edge + the OUTWARD normal (for placing the apex)
+-- where the tail attaches on the body edge + the outward normal (for placing the apex)
 local function tailAnchor(shape, x, y, w, h, side, pos)
     local cx, cy, rx, ry = x + w * 0.5, y + h * 0.5, w * 0.5, h * 0.5
     pos = U.clamp(pos, 0.18, 0.82)
@@ -303,8 +412,15 @@ local function offsetPoly(pts, d)
     return out
 end
 
--- scanline polygon fill (even-odd); AA the span ends when aa=true (smooth outer silhouette over transparent)
+-- polygon fill (even-odd); the plain fill smooths the span ends only when aa = true
 local function fillPoly(cv, pts, topY, botY, topC, botC, aa)
+    if Shape.smooth(cv) then
+        local flat = {}
+        for i, p in ipairs(pts) do flat[2 * i - 1] = p[1]; flat[2 * i] = p[2] end
+        local cr, cg, cb, ca = rgba(topC)
+        cv:FillPolygon(flat, cr, cg, cb, ca, botC and gradientOpts(botC, topY, botY) or REPLACE)
+        return
+    end
     local miny, maxy = huge, -huge
     for _, p in ipairs(pts) do if p[2] < miny then miny = p[2] end; if p[2] > maxy then maxy = p[2] end end
     local n = #pts
@@ -337,7 +453,7 @@ local function fillPoly(cv, pts, topY, botY, topC, botC, aa)
 end
 
 -- ── speech bubble: round | oval (one continuous polygon silhouette + spliced tail) or cloud (concentric
--- discs + trailing dots). Uniform border that hugs the shape THROUGH the tail; shape-matched drop shadow.
+-- discs + trailing dots). Uniform border that hugs the shape through the tail; shape-matched drop shadow.
 -- opts: shape, radius, outline={col,width}, top, bottom, gloss, tail={side,pos,size}, shadow={col,dx,dy,layers,grow}
 function Shape.bubble(cv, x, y, w, h, opts)
     local shape = opts.shape or "round"
@@ -351,7 +467,7 @@ function Shape.bubble(cv, x, y, w, h, opts)
     local sh = opts.shadow
 
     if shape == "cloud" then
-        -- concentric outline (radius+ow) UNDER face (radius) = uniform border hugging the lumps.
+        -- concentric outline (radius+ow) under the face (radius) = a uniform border hugging the lumps.
         -- tail = a few shrinking dots toward the apex (a thought-bubble pointer).
         local ax, ay, nx, ny = tailAnchor("cloud", x, y, w, h, tside, tpos)
         local dots = {}
@@ -363,15 +479,15 @@ function Shape.bubble(cv, x, y, w, h, opts)
             local g = (sh.layers or 4) * (sh.grow or 3) * 0.5
             local sc = { sh.col[1], sh.col[2], sh.col[3], floor((sh.col[4] or 90) * 0.5) }
             drawCloud(cv, x + (sh.dx or 0), y + (sh.dy or 0), w, h, sc, g)
-            for _, d in ipairs(dots) do cv:FillCircle(floor(d.x + (sh.dx or 0)), floor(d.y + (sh.dy or 0)), floor(d.rr + g), sc[1], sc[2], sc[3], sc[4]) end
+            for _, d in ipairs(dots) do disc(cv, floor(d.x + (sh.dx or 0)), floor(d.y + (sh.dy or 0)), floor(d.rr + g), sc) end
         end
         if ow > 0 then
             drawCloud(cv, x, y, w, h, oc, ow)
-            for _, d in ipairs(dots) do cv:FillCircle(floor(d.x), floor(d.y), floor(d.rr + ow), oc[1], oc[2], oc[3], oc[4] or 255) end
+            for _, d in ipairs(dots) do disc(cv, floor(d.x), floor(d.y), floor(d.rr + ow), oc) end
         end
         local fc = opts.top
         drawCloud(cv, x, y, w, h, fc, 0)
-        for _, d in ipairs(dots) do cv:FillCircle(floor(d.x), floor(d.y), floor(d.rr), fc[1], fc[2], fc[3], fc[4] or 255) end
+        for _, d in ipairs(dots) do disc(cv, floor(d.x), floor(d.y), floor(d.rr), fc) end
         return
     end
 
@@ -392,9 +508,9 @@ function Shape.bubble(cv, x, y, w, h, opts)
         end
     end
 
-    if ow > 0 then fillPoly(cv, P, 0, 1, oc, nil, true) end                       -- AA outline silhouette
+    if ow > 0 then fillPoly(cv, P, 0, 1, oc, nil, true) end                       -- outline silhouette
     local face = (ow > 0) and offsetPoly(P, ow) or P
-    fillPoly(cv, face, y + ow, y + h - ow, opts.top, opts.bottom, false)          -- gradient face (interior)
+    fillPoly(cv, face, y + ow, y + h - ow, opts.top, opts.bottom, false)          -- gradient face
 
     if opts.gloss and shape == "round" then
         gloss(cv, x + ow, y + ow, w - 2 * ow, h - 2 * ow, max(1, r - ow), opts.gloss, opts.top, opts.bottom)
@@ -402,9 +518,9 @@ function Shape.bubble(cv, x, y, w, h, opts)
 end
 
 -- ── audio/video-player transport icons (language-agnostic glyphs baked onto widget canvases) ───────
--- kind: "play" | "pause" | "stop" | "repeat" | "back" | "restart" | "rewind" | "forward" | "lock".
--- Drawn centered at (cx,cy), overall size s, color c = {r,g,b[,a]}. Buttons pass their text color so
--- icons match either face; menus draw "lock" over rows that cannot be chosen.
+-- kind: "play" | "pause" | "stop" | "repeat" | "back" | "restart" | "rewind" | "forward" | "close" |
+-- "volume" | "muted" | "lock". Drawn centred at (cx,cy), overall size s, colour c = {r,g,b[,a]}. Buttons
+-- pass their text colour so icons match either face; menus draw "lock" over rows that cannot be chosen.
 function Shape.icon(cv, kind, cx, cy, s, c)
     local h = s * 0.5
     if kind == "restart" then
@@ -424,35 +540,36 @@ function Shape.icon(cv, kind, cx, cy, s, c)
         -- two diagonal bars with round ends: close / dismiss
         local t = s * 0.16
         local r = h * 0.6
-        local function bar(x0, y0, x1, y1)
-            local dx, dy = x1 - x0, y1 - y0
-            local len = math.sqrt(dx * dx + dy * dy)
-            local nx, ny = -dy / len * t * 0.5, dx / len * t * 0.5
-            fillTriangle(cv, x0 + nx, y0 + ny, x1 + nx, y1 + ny, x1 - nx, y1 - ny, c)
-            fillTriangle(cv, x0 + nx, y0 + ny, x1 - nx, y1 - ny, x0 - nx, y0 - ny, c)
-            Shape.fillRoundAA(cv, x0 - t * 0.5, y0 - t * 0.5, t, t, t * 0.5, c)
-            Shape.fillRoundAA(cv, x1 - t * 0.5, y1 - t * 0.5, t, t, t * 0.5, c)
-        end
-        bar(cx - r, cy - r, cx + r, cy + r)
-        bar(cx - r, cy + r, cx + r, cy - r)
+        bar(cv, cx - r, cy - r, cx + r, cy + r, t, c)
+        bar(cv, cx - r, cy + r, cx + r, cy - r, t, c)
     elseif kind == "volume" or kind == "muted" then
         -- a speaker: a small box with a cone; sound waves beside it, or a cross when muted
         local bw, bh = s * 0.18, s * 0.34
         local sx = cx - s * 0.42
         Shape.fillRoundAA(cv, sx, cy - bh * 0.5, bw, bh, bw * 0.3, c)
-        fillTriangle(cv, sx + bw * 0.8, cy - bh * 0.5, sx + bw * 0.8, cy + bh * 0.5, sx + bw * 0.8, cy, c)
-        fillTriangle(cv, sx + bw * 0.6, cy - bh * 0.5, sx + bw * 0.6 + s * 0.28, cy - s * 0.42, sx + bw * 0.6 + s * 0.28, cy + s * 0.42, c)
-        fillTriangle(cv, sx + bw * 0.6, cy + bh * 0.5, sx + bw * 0.6 + s * 0.28, cy - s * 0.42, sx + bw * 0.6 + s * 0.28, cy + s * 0.42, c)
+        local x0, x1 = sx + bw * 0.6, sx + bw * 0.6 + s * 0.28
+        if Shape.smooth(cv) then
+            -- the cone as one shape, so no seam runs through it
+            local cr, cg, cb, ca = rgba(c)
+            cv:FillPolygon({ x0, cy - bh * 0.5, x1, cy - s * 0.42, x1, cy + s * 0.42, x0, cy + bh * 0.5 }, cr, cg, cb, ca, REPLACE)
+        else
+            fillTriangle(cv, x0, cy - bh * 0.5, x1, cy - s * 0.42, x1, cy + s * 0.42, c)
+            fillTriangle(cv, x0, cy + bh * 0.5, x1, cy - s * 0.42, x1, cy + s * 0.42, c)
+        end
         local t = s * 0.09
         if kind == "volume" then
             Shape.fillRoundAA(cv, cx + s * 0.1, cy - s * 0.16, t, s * 0.32, t * 0.5, c)
             Shape.fillRoundAA(cv, cx + s * 0.26, cy - s * 0.3, t, s * 0.6, t * 0.5, c)
+        elseif Shape.smooth(cv) then
+            local mx0, my0, mx1, my1 = cx + s * 0.1 + t * 0.5, cy - s * 0.2, cx + s * 0.42 + t * 0.5, cy + s * 0.2
+            bar(cv, mx0, my0, mx1, my1, t * 1.2, c)
+            bar(cv, mx0, my1, mx1, my0, t * 1.2, c)
         else
-            local x0, y0, x1, y1 = cx + s * 0.1, cy - s * 0.2, cx + s * 0.42, cy + s * 0.2
-            fillTriangle(cv, x0, y0, x0 + t, y0 - t * 0.2, x1 + t, y1 - t * 0.2, c)
-            fillTriangle(cv, x0, y0, x1 + t, y1 - t * 0.2, x1, y1, c)
-            fillTriangle(cv, x0, y1, x0 + t, y1 + t * 0.2, x1 + t, y0 + t * 0.2, c)
-            fillTriangle(cv, x0, y1, x1 + t, y0 + t * 0.2, x1, y0, c)
+            local mx0, my0, mx1, my1 = cx + s * 0.1, cy - s * 0.2, cx + s * 0.42, cy + s * 0.2
+            fillTriangle(cv, mx0, my0, mx0 + t, my0 - t * 0.2, mx1 + t, my1 - t * 0.2, c)
+            fillTriangle(cv, mx0, my0, mx1 + t, my1 - t * 0.2, mx1, my1, c)
+            fillTriangle(cv, mx0, my1, mx0 + t, my1 + t * 0.2, mx1 + t, my0 + t * 0.2, c)
+            fillTriangle(cv, mx0, my1, mx1 + t, my0 + t * 0.2, mx1, my0, c)
         end
     elseif kind == "lock" then
         -- a padlock: body, shackle (a ring with its lower half hidden by the body), keyhole, and a chain

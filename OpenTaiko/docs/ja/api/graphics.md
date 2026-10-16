@@ -138,6 +138,13 @@ end
 | `canvas:CopyFrom(other)  -> nil` | 同じサイズの別のキャンバスのピクセルをこのキャンバスにコピーします。サイズが異なる場合、この呼び出しは何もしません。 |
 | `canvas:BlitPacked(data, count)  -> nil` | 1 始まりの Lua 配列に行優先で並んだパックされた `0xRRGGBB` 整数からサーフェスを埋め (ピクセルは不透明になり、負の値は透明なピクセルになります)、アップロードします。 |
 | `canvas:Upload()  -> nil` | 保留中の編集 (変更された領域のみ) を GPU に送ります。変更がなければ何もしません。 |
+| `canvas:Upload(options)  -> nil` | `Upload()` と同じくアップロードします。オプション (すべて省略可): `extendEdges = true` は先に `ExtendEdges` を実行します。`release = true` はその後ピクセルの CPU 側コピーを解放します (描画はするがもう編集しないキャンバス向け。再び編集すると透明なキャンバスから始まります)。 |
+| `canvas:FillRoundRect(x, y, w, h, radius, r, g, b, a [, options])  -> nil` | 滑らかな縁の角丸矩形を塗り、キャンバスに合成します (下の図形オプションを参照)。`options.radii = {左上, 右上, 右下, 左下}` で角ごとに半径を指定できます。 |
+| `canvas:FillEllipse(x, y, w, h, r, g, b, a [, options])  -> nil` | 矩形 (x, y, w, h) に内接する楕円を滑らかな縁で塗ります。 |
+| `canvas:FillTriangle(x1, y1, x2, y2, x3, y3, r, g, b, a [, options])  -> nil` | 三角形を滑らかな縁で塗ります。 |
+| `canvas:FillCapsule(x0, y0, x1, y1, radius, r, g, b, a [, options])  -> nil` | (x0, y0) から (x1, y1) への両端の丸い線を、片側 `radius` の太さで、滑らかな縁で塗ります。 |
+| `canvas:FillPolygon(points, r, g, b, a [, options])  -> nil` | フラットなリスト `{x1, y1, x2, y2, ...}` で与えた多角形 (偶奇規則) を滑らかな縁で塗ります。`soft` オプションは使えません。 |
+| `canvas:ExtendEdges()  -> nil` | 見えるピクセルに隣接する完全に透明なピクセルに、隣の見えるピクセルの色を与えます (透明のまま)。拡大縮小やピクセルの間に描いたキャンバスの縁に暗い縁取りが出なくなります。 |
 | `canvas:Draw(x, y)  -> nil` | キャンバスを、左上を (x, y) に合わせて描画します。 |
 | `canvas:DrawRect(x, y, rect_x, rect_y, rect_width, rect_height)  -> nil` | ソースの部分矩形 (キャンバスピクセル単位) を、左上を (x, y) に合わせて描画します。 |
 | `canvas:DrawAtAnchor(x, y, anchor)  -> nil` | 指定したアンカー点が (x, y) に来るようにキャンバスを描画します。 |
@@ -145,6 +152,8 @@ end
 | `canvas:SetOpacity(opacity)  -> nil` | 不透明度を設定します (0..1)。 |
 | `canvas:SetColor(red, green, blue)  -> nil` | 0..1 の 3 つの値からティントを設定します。 |
 | `canvas:Dispose()  -> nil` | キャンバスの GPU テクスチャと CPU バッファを解放します。 |
+
+図形オプションは滑らかな塗りの最後の引数です (すべて省略可): `mode` は "over" (既定: 下にあるものに合成)、"replace" (FillRect のように覆った部分を置き換え、縁は滑らか)、"cut" (覆った部分を消す) のいずれかです。`soft` は縁の幅 (ピクセル、既定 1 でくっきりした縁。広くするとフェードし、影などに使えます) です。`bottom = {r, g, b, a}` は呼び出しの色からの縦グラデーションを作り、`fromY` / `toY` がその開始と終了の位置です (既定: 図形の上端と下端)。滑らかな塗りは小数の座標を受け付けます。
 
 ### GRAPHICS
 

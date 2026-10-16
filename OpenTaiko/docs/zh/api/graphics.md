@@ -138,6 +138,13 @@ end
 | `canvas:CopyFrom(other)  -> nil` | 把另一张相同尺寸画布的像素复制到本画布。尺寸不同时该调用不做任何事。 |
 | `canvas:BlitPacked(data, count)  -> nil` | 用一个以 1 起始、按行主序排列、打包为 `0xRRGGBB` 整数的 Lua 数组填充表面（像素变为不透明；负值变为透明像素），然后上传。 |
 | `canvas:Upload()  -> nil` | 把待处理的编辑（仅变更区域）推送到 GPU。没有变更时为空操作。 |
+| `canvas:Upload(options)  -> nil` | 与 `Upload()` 一样上传。选项（均可省略）：`extendEdges = true` 先执行 `ExtendEdges`；`release = true` 随后释放像素的 CPU 副本，适用于只绘制、不再编辑的画布（再次编辑会从透明画布开始）。 |
+| `canvas:FillRoundRect(x, y, w, h, radius, r, g, b, a [, options])  -> nil` | 以平滑边缘填充圆角矩形，并混合到画布中（参见下方的图形选项）。`options.radii = {左上, 右上, 右下, 左下}` 可为每个角指定各自的半径。 |
+| `canvas:FillEllipse(x, y, w, h, r, g, b, a [, options])  -> nil` | 以平滑边缘填充矩形 (x, y, w, h) 内的椭圆。 |
+| `canvas:FillTriangle(x1, y1, x2, y2, x3, y3, r, g, b, a [, options])  -> nil` | 以平滑边缘填充三角形。 |
+| `canvas:FillCapsule(x0, y0, x1, y1, radius, r, g, b, a [, options])  -> nil` | 以平滑边缘填充从 (x0, y0) 到 (x1, y1)、两端为圆形、每侧粗 `radius` 的线条。 |
+| `canvas:FillPolygon(points, r, g, b, a [, options])  -> nil` | 以平滑边缘填充由扁平列表 `{x1, y1, x2, y2, ...}` 给出的多边形（奇偶规则）。`soft` 选项不适用。 |
+| `canvas:ExtendEdges()  -> nil` | 让每个紧邻可见像素的完全透明像素取其可见邻居的颜色（仍保持透明），这样缩放绘制或在像素之间绘制的画布边缘不会出现暗边。 |
 | `canvas:Draw(x, y)  -> nil` | 以 (x, y) 为左上角绘制画布。 |
 | `canvas:DrawRect(x, y, rect_x, rect_y, rect_width, rect_height)  -> nil` | 以 (x, y) 为左上角绘制源子矩形（以画布像素为单位）。 |
 | `canvas:DrawAtAnchor(x, y, anchor)  -> nil` | 绘制画布，使指定锚点落在 (x, y)。 |
@@ -145,6 +152,8 @@ end
 | `canvas:SetOpacity(opacity)  -> nil` | 设置不透明度，0..1。 |
 | `canvas:SetColor(red, green, blue)  -> nil` | 从三个 0..1 的值设置着色。 |
 | `canvas:Dispose()  -> nil` | 释放画布的 GPU 纹理和 CPU 缓冲区。 |
+
+图形选项是平滑填充的最后一个参数（均可省略）：`mode` 为 "over"（默认：与下方内容混合）、"replace"（像 FillRect 一样取代所覆盖的部分，边缘平滑）或 "cut"（擦除所覆盖的部分）；`soft` 是边缘宽度（像素，默认 1，为清晰边缘；更宽的边缘会渐隐，例如用于阴影）；`bottom = {r, g, b, a}` 生成从调用颜色开始的竖直渐变，`fromY` / `toY` 指定其起点和终点（默认：图形的顶部和底部）。平滑填充接受小数坐标。
 
 ### GRAPHICS
 

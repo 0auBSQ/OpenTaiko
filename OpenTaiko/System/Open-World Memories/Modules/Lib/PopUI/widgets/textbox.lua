@@ -17,7 +17,7 @@ function TextBox.new(o)
     self.placeholder = o.placeholder or ""
     self.maxLen = o.maxLen or 64
     self.padX = o.padX or 24
-    self.noPop = true   -- don't hover-zoom the box: DrawDirect text can't scale to match, so keep both static
+    self.noPop = true   -- the field stays still while typing: the text is drawn unscaled
     return self
 end
 
@@ -64,7 +64,7 @@ function TextBox:update(ctx)
             end
         elseif INPUT:KeyboardPressed("Escape") then
             self.value = t; self:setCapturing(false)
-        elseif INPUT:MousePressed("Left") and not self:hitTest(INPUT:GetMouseXY()) then
+        elseif ctx.mPressed and not self:hitTest(ctx.mx, ctx.my) then
             self.value = t; self:setCapturing(false)
         end
     end

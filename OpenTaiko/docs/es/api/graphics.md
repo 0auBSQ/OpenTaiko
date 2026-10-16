@@ -138,6 +138,13 @@ Los argumentos de color r, g, b, a son enteros 0-255. Las ediciones de píxeles 
 | `canvas:CopyFrom(other)  -> nil` | Copia en este canvas los píxeles de otro canvas del mismo tamaño. La llamada no hace nada cuando los tamaños difieren. |
 | `canvas:BlitPacked(data, count)  -> nil` | Rellena la superficie desde un array Lua indexado desde 1 de enteros empaquetados `0xRRGGBB` en orden por filas (los píxeles pasan a ser opacos; un valor negativo se convierte en un píxel transparente) y después sube. |
 | `canvas:Upload()  -> nil` | Envía las ediciones pendientes (solo la región cambiada) a la GPU. Operación nula cuando nada cambió. |
+| `canvas:Upload(options)  -> nil` | Sube como `Upload()`. Opciones (todas opcionales): `extendEdges = true` ejecuta antes `ExtendEdges`; `release = true` libera después la copia en CPU de los píxeles, para un lienzo que se dibuja pero ya no se edita (editarlo de nuevo empieza desde un lienzo transparente). |
+| `canvas:FillRoundRect(x, y, w, h, radius, r, g, b, a [, options])  -> nil` | Rellena un rectángulo redondeado con bordes suaves, mezclado con el lienzo (consulta las opciones de forma más abajo). `options.radii = {arribaIzq, arribaDer, abajoDer, abajoIzq}` da a cada esquina su propio radio. |
+| `canvas:FillEllipse(x, y, w, h, r, g, b, a [, options])  -> nil` | Rellena la elipse dentro del rectángulo (x, y, w, h) con bordes suaves. |
+| `canvas:FillTriangle(x1, y1, x2, y2, x3, y3, r, g, b, a [, options])  -> nil` | Rellena un triángulo con bordes suaves. |
+| `canvas:FillCapsule(x0, y0, x1, y1, radius, r, g, b, a [, options])  -> nil` | Rellena una línea de (x0, y0) a (x1, y1) con extremos redondos, de `radius` de grosor a cada lado, con bordes suaves. |
+| `canvas:FillPolygon(points, r, g, b, a [, options])  -> nil` | Rellena un polígono dado como lista plana `{x1, y1, x2, y2, ...}` (regla par-impar) con bordes suaves. La opción `soft` no se aplica. |
+| `canvas:ExtendEdges()  -> nil` | Da a cada píxel totalmente transparente junto a uno visible el color de sus vecinos visibles (sigue transparente), para que un lienzo dibujado escalado o entre píxeles no muestre un borde oscuro en sus bordes. |
 | `canvas:Draw(x, y)  -> nil` | Dibuja el canvas con su esquina superior izquierda en (x, y). |
 | `canvas:DrawRect(x, y, rect_x, rect_y, rect_width, rect_height)  -> nil` | Dibuja un subrectángulo de origen (en píxeles del canvas) con su esquina superior izquierda en (x, y). |
 | `canvas:DrawAtAnchor(x, y, anchor)  -> nil` | Dibuja el canvas de modo que el punto de ancla indicado caiga en (x, y). |
@@ -145,6 +152,8 @@ Los argumentos de color r, g, b, a son enteros 0-255. Las ediciones de píxeles 
 | `canvas:SetOpacity(opacity)  -> nil` | Establece la opacidad, 0..1. |
 | `canvas:SetColor(red, green, blue)  -> nil` | Establece el tinte a partir de tres valores 0..1. |
 | `canvas:Dispose()  -> nil` | Libera la textura GPU y el búfer CPU del canvas. |
+
+Opciones de forma, el último argumento de los rellenos suaves (todas opcionales): `mode` es "over" (por defecto: se mezcla con lo que hay debajo), "replace" (ocupa el lugar de lo que cubre, como FillRect, con borde suave) o "cut" (borra lo que cubre); `soft` es el ancho del borde en píxeles (por defecto 1, un borde nítido; un borde más ancho se desvanece, por ejemplo para una sombra); `bottom = {r, g, b, a}` crea un degradado vertical desde el color de la llamada, y `fromY` / `toY` indican dónde empieza y termina (por defecto: la parte superior e inferior de la forma). Los rellenos suaves aceptan coordenadas fraccionarias.
 
 ### GRAPHICS
 

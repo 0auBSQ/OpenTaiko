@@ -22,6 +22,7 @@ PopUI.Shape   = require("PopUI.shape")
 PopUI.Util    = require("PopUI.util")
 PopUI.Widget  = require("PopUI.widget")
 PopUI.Manager = require("PopUI.manager")
+PopUI.Cache   = require("PopUI.cache")
 
 -- widget classes (for advanced users who want to subclass)
 PopUI.Button  = require("PopUI.widgets.button")
@@ -34,8 +35,10 @@ PopUI.Bubble  = require("PopUI.widgets.bubble")
 PopUI.Menu    = require("PopUI.widgets.menu")
 PopUI.Chooser = require("PopUI.widgets.chooser")
 PopUI.SettingsList = require("PopUI.widgets.settingslist")
+PopUI.ListBase = require("PopUI.widgets.listbase")
 
---- Create a UI manager. opts = { theme = {…}?, sfx = { hover, click, move, toggle, error }?, bg = bool? }
+--- Create a UI manager. opts = { theme = {…}?, sfx = { hover, click, move, toggle, error }?, bg = bool?,
+--- navPlayer = n?, nav = "spatial"? (the arrow keys move to the nearest widget in their direction) }
 function PopUI.new(opts) return PopUI.Manager.new(opts) end
 
 --- Dispose + drop the shared font caches (call when the language — and thus the main font — changes)
