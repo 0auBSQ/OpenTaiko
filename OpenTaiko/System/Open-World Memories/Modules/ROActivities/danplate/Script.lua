@@ -8,7 +8,8 @@
 -- danTick values beyond frame_count wrap via modulo.
 --
 -- While the SHARED string "danplate_style" is "rainbow" (the pagoda sets it for its roof floors),
--- the foreground runs a diagonal rainbow instead of DANTICKCOLOR, with glitter over its frame.
+-- the plate of the chart it was set for (Lib/PlayStrings.lua) runs a diagonal rainbow instead of
+-- DANTICKCOLOR, with glitter over its frame.
 --
 -- draw(x, y, opacity, danTick, r, g, b, titleText)
 --   x, y       – centre position (pixels)
@@ -18,6 +19,7 @@
 --   titleText  – dan title drawn vertically on the plate
 
 local Rainbow = require("Rainbow")
+local PlayStrings = require("PlayStrings")
 
 local TEXTURES_DIR = "Textures/"
 
@@ -196,7 +198,7 @@ function draw(x, y, opacity, danTick, r, g, b, titleText)
     -- Foreground (tinted by DANTICKCOLOR, or the rainbow while the style asks for it)
     if tx_plate ~= nil and tx_plate.Loaded then
         local tx_ramp = ramp_frames[tick + 1]
-        if tx_ramp ~= nil and tx_ramp.Loaded and SHARED:GetSharedString(STYLE_KEY) == "rainbow" then
+        if tx_ramp ~= nil and tx_ramp.Loaded and PlayStrings.forTitle(STYLE_KEY, titleText) == "rainbow" then
             drawRainbowPlate(tx_plate, tx_ramp, x, y, op)
         else
             tx_plate:SetOpacity(op)

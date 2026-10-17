@@ -22,7 +22,7 @@
         "PAGODA_EXIT":      "나가기",
 
         // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
-        "PAGODA_BAND_TEST":      "시험",
+        "PAGODA_BAND_TEST":      "길",
         "PAGODA_BAND_GATE":      "문",
         "PAGODA_BAND_SKY":       "하늘",
         "PAGODA_MYSTERY_CHANCE": "미스터리 확률: %d%%",

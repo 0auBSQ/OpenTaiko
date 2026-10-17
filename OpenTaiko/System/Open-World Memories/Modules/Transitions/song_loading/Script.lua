@@ -12,10 +12,14 @@ FADE_OUT_SECONDS = 1.0
 FADE_IN_SECONDS  = 1.0
 
 local TA = require("TransitionArt")
+local PlayStrings = require("PlayStrings")
 
 local TEXTURES_DIR = "Textures/"
 local DIFF_TOWER, DIFF_DAN = 5, 6
 local BG_FILES = { normal = "BgWait.jpg", ai = "BgWait_AI.jpg", dan = "BgWait_Dan.jpg" }   -- tower mode draws tower_view
+-- a stage can give the dan it mounts its own loading background: this shared string holds its path from the
+-- Modules folder, read only for the chart the stage stamped (Lib/PlayStrings.lua)
+local DAN_BG_KEY = "song_loading_dan_bg"
 
 -- Textures
 local pixel                                   -- 1x1 white, for fades + bar
@@ -94,10 +98,19 @@ local function freeTextures()
 	pixel, tx_bg, tx_plate, titleTex, subtitleTex = nil, nil, nil, nil, nil
 end
 
+-- the dan background a stage asked for, or nil
+local function danBackground()
+	local path = PlayStrings.get(DAN_BG_KEY)
+	if path ~= "" then return path end
+	return nil
+end
+
 local function loadTextures()
 	pixel = TEXTURE:CreateTexture("pixel.png")
 	tx_plate = TEXTURE:CreateTexture(TEXTURES_DIR .. "Plate.png")
-	if BG_FILES[mode] then tx_bg = TEXTURE:CreateTexture(TEXTURES_DIR .. BG_FILES[mode]) end
+	local own = (mode == "dan") and danBackground() or nil
+	if own ~= nil then tx_bg = TEXTURE:CreateTexture("../../" .. own)
+	elseif BG_FILES[mode] then tx_bg = TEXTURE:CreateTexture(TEXTURES_DIR .. BG_FILES[mode]) end
 end
 
 -- (Re)build the per-player character renders + slide-in animations for the current player count.

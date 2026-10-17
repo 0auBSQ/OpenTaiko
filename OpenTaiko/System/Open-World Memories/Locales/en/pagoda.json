@@ -22,7 +22,7 @@
         "PAGODA_EXIT":      "Exit",
 
         // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
-        "PAGODA_BAND_TEST":      "Test",
+        "PAGODA_BAND_TEST":      "Trail",
         "PAGODA_BAND_GATE":      "Gate",
         "PAGODA_BAND_SKY":       "Sky",
         "PAGODA_MYSTERY_CHANCE": "Probability of a mystery: %d%%",

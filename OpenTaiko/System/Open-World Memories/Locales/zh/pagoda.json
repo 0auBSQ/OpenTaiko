@@ -22,7 +22,7 @@
         "PAGODA_EXIT":      "退出",
 
         // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
-        "PAGODA_BAND_TEST":      "题",
+        "PAGODA_BAND_TEST":      "道",
         "PAGODA_BAND_GATE":      "扉",
         "PAGODA_BAND_SKY":       "穹天",
         "PAGODA_MYSTERY_CHANCE": "神秘出现概率：%d%%",

@@ -1,5 +1,7 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
 -- Dan Fail end animation: the two gates slam shut, foxes peek/wave, then a localized speech bubble fades in.
+-- In a pagoda play (the "pagoda_play_level" shared string is set for this chart) the foxes and their
+-- speech stay away.
 -- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API. Group C (clear/end anime):
 --   playEndAnime(player) is the per-play (re)start (called by the host with the index directly) — counters
 --   AND the per-play speech randomization (seed/special_chance/random line) reset here. update/draw take the
@@ -18,8 +20,11 @@
 --Star position: (1430,427.5)(489,571)
 --Star rect: ()
 
+local PlayStrings = require("PlayStrings")
+
 local speech_rect = {0,33,607,220,608,0,630,253}
 local speech_pos = {329.5,812,1566,935.5}
+local foxes_shown = true      -- false in a pagoda play (set per play in playEndAnime)
 
 -- x,y,w,h
 local tsubaki_body_rect = {692,0,884,1017}
@@ -80,8 +85,14 @@ local function speechKey(lang)
     end
 end
 
+-- true while a pagoda play runs: the pagoda stage sets this shared string for the chart it mounts
+local function pagodaPlay()
+    return PlayStrings.get("pagoda_play_level") ~= ""
+end
+
 function playEndAnime(player)
     animeCounter = 0
+    foxes_shown = not pagodaPlay()
 
     dan_in_move = 0
     dan_first_in_move = 0
@@ -143,27 +154,29 @@ function draw(state)
     local speech_text = speechKey(state.lang)
 
     -- Foxes (back)
-    if animeCounter >= 0.2 and 0.275 >= animeCounter then
-      tx["Foxes.png"]:DrawRect(tsubaki_body_pos[5], tsubaki_body_pos[6], tsubaki_body_rect[1], tsubaki_body_rect[2], tsubaki_body_rect[3], tsubaki_body_rect[4])
-      tx["Foxes.png"]:DrawRect(ume_body_pos[5], ume_body_pos[6], ume_body_rect[1], ume_body_rect[2], ume_body_rect[3], ume_body_rect[4])
-      -- Draw these arms behind the wall
-      tx["Foxes.png"]:DrawRect(tsubaki_arm_pos[5], tsubaki_arm_pos[6], tsubaki_arm3_rect[1], tsubaki_arm3_rect[2], tsubaki_arm3_rect[3], tsubaki_arm3_rect[4])
-      tx["Foxes.png"]:DrawRect(ume_arm_pos[5], ume_arm_pos[6], ume_arm3_rect[1], ume_arm3_rect[2], ume_arm3_rect[3], ume_arm3_rect[4])
-    elseif animeCounter >= 0.275 and 0.35 >= animeCounter then
-      tx["Foxes.png"]:DrawRect(tsubaki_body_pos[3], tsubaki_body_pos[4], tsubaki_body_rect[1], tsubaki_body_rect[2], tsubaki_body_rect[3], tsubaki_body_rect[4])
-      tx["Foxes.png"]:DrawRect(ume_body_pos[3], ume_body_pos[4], ume_body_rect[1], ume_body_rect[2], ume_body_rect[3], ume_body_rect[4])
-    elseif animeCounter >= 0.35 and 0.95 >= animeCounter then
-      tx["Foxes.png"]:DrawRect(tsubaki_body_pos[1], tsubaki_body_pos[2], tsubaki_body_rect[1], tsubaki_body_rect[2], tsubaki_body_rect[3], tsubaki_body_rect[4])
-      tx["Foxes.png"]:DrawRect(ume_body_pos[1], ume_body_pos[2], ume_body_rect[1], ume_body_rect[2], ume_body_rect[3], ume_body_rect[4])
-    elseif animeCounter >= 0.95 and 1.025 >= animeCounter then
-      tx["Foxes.png"]:DrawRect(tsubaki_body_pos[3], tsubaki_body_pos[4], tsubaki_body_rect[1], tsubaki_body_rect[2], tsubaki_body_rect[3], tsubaki_body_rect[4])
-      tx["Foxes.png"]:DrawRect(ume_body_pos[3], ume_body_pos[4], ume_body_rect[1], ume_body_rect[2], ume_body_rect[3], ume_body_rect[4])
-    elseif animeCounter >= 1.025 and 1.1 >= animeCounter then
-      tx["Foxes.png"]:DrawRect(tsubaki_body_pos[5], tsubaki_body_pos[6], tsubaki_body_rect[1], tsubaki_body_rect[2], tsubaki_body_rect[3], tsubaki_body_rect[4])
-      tx["Foxes.png"]:DrawRect(ume_body_pos[5], ume_body_pos[6], ume_body_rect[1], ume_body_rect[2], ume_body_rect[3], ume_body_rect[4])
-      -- Draw these arms behind the wall
-      tx["Foxes.png"]:DrawRect(tsubaki_arm_pos[5], tsubaki_arm_pos[6], tsubaki_arm3_rect[1], tsubaki_arm3_rect[2], tsubaki_arm3_rect[3], tsubaki_arm3_rect[4])
-      tx["Foxes.png"]:DrawRect(ume_arm_pos[5], ume_arm_pos[6], ume_arm3_rect[1], ume_arm3_rect[2], ume_arm3_rect[3], ume_arm3_rect[4])
+    if foxes_shown then
+      if animeCounter >= 0.2 and 0.275 >= animeCounter then
+        tx["Foxes.png"]:DrawRect(tsubaki_body_pos[5], tsubaki_body_pos[6], tsubaki_body_rect[1], tsubaki_body_rect[2], tsubaki_body_rect[3], tsubaki_body_rect[4])
+        tx["Foxes.png"]:DrawRect(ume_body_pos[5], ume_body_pos[6], ume_body_rect[1], ume_body_rect[2], ume_body_rect[3], ume_body_rect[4])
+        -- Draw these arms behind the wall
+        tx["Foxes.png"]:DrawRect(tsubaki_arm_pos[5], tsubaki_arm_pos[6], tsubaki_arm3_rect[1], tsubaki_arm3_rect[2], tsubaki_arm3_rect[3], tsubaki_arm3_rect[4])
+        tx["Foxes.png"]:DrawRect(ume_arm_pos[5], ume_arm_pos[6], ume_arm3_rect[1], ume_arm3_rect[2], ume_arm3_rect[3], ume_arm3_rect[4])
+      elseif animeCounter >= 0.275 and 0.35 >= animeCounter then
+        tx["Foxes.png"]:DrawRect(tsubaki_body_pos[3], tsubaki_body_pos[4], tsubaki_body_rect[1], tsubaki_body_rect[2], tsubaki_body_rect[3], tsubaki_body_rect[4])
+        tx["Foxes.png"]:DrawRect(ume_body_pos[3], ume_body_pos[4], ume_body_rect[1], ume_body_rect[2], ume_body_rect[3], ume_body_rect[4])
+      elseif animeCounter >= 0.35 and 0.95 >= animeCounter then
+        tx["Foxes.png"]:DrawRect(tsubaki_body_pos[1], tsubaki_body_pos[2], tsubaki_body_rect[1], tsubaki_body_rect[2], tsubaki_body_rect[3], tsubaki_body_rect[4])
+        tx["Foxes.png"]:DrawRect(ume_body_pos[1], ume_body_pos[2], ume_body_rect[1], ume_body_rect[2], ume_body_rect[3], ume_body_rect[4])
+      elseif animeCounter >= 0.95 and 1.025 >= animeCounter then
+        tx["Foxes.png"]:DrawRect(tsubaki_body_pos[3], tsubaki_body_pos[4], tsubaki_body_rect[1], tsubaki_body_rect[2], tsubaki_body_rect[3], tsubaki_body_rect[4])
+        tx["Foxes.png"]:DrawRect(ume_body_pos[3], ume_body_pos[4], ume_body_rect[1], ume_body_rect[2], ume_body_rect[3], ume_body_rect[4])
+      elseif animeCounter >= 1.025 and 1.1 >= animeCounter then
+        tx["Foxes.png"]:DrawRect(tsubaki_body_pos[5], tsubaki_body_pos[6], tsubaki_body_rect[1], tsubaki_body_rect[2], tsubaki_body_rect[3], tsubaki_body_rect[4])
+        tx["Foxes.png"]:DrawRect(ume_body_pos[5], ume_body_pos[6], ume_body_rect[1], ume_body_rect[2], ume_body_rect[3], ume_body_rect[4])
+        -- Draw these arms behind the wall
+        tx["Foxes.png"]:DrawRect(tsubaki_arm_pos[5], tsubaki_arm_pos[6], tsubaki_arm3_rect[1], tsubaki_arm3_rect[2], tsubaki_arm3_rect[3], tsubaki_arm3_rect[4])
+        tx["Foxes.png"]:DrawRect(ume_arm_pos[5], ume_arm_pos[6], ume_arm3_rect[1], ume_arm3_rect[2], ume_arm3_rect[3], ume_arm3_rect[4])
+      end
     end
 
     -- The Gates
@@ -171,19 +184,21 @@ function draw(state)
     tx["Dan_In.png"]:DrawRect(bg_width - dan_in_move, 0, dan_in_width, 0, dan_in_width, dan_in_height)
 
     -- Foxes (front)
-    if animeCounter >= 0.2 and 0.275 >= animeCounter then
-      -- none
-    elseif animeCounter >= 0.275 and 0.35 >= animeCounter then
-      tx["Foxes.png"]:DrawRect(tsubaki_arm_pos[3], tsubaki_arm_pos[4], tsubaki_arm2_rect[1], tsubaki_arm2_rect[2], tsubaki_arm2_rect[3], tsubaki_arm2_rect[4])
-      tx["Foxes.png"]:DrawRect(ume_arm_pos[3], ume_arm_pos[4], ume_arm2_rect[1], ume_arm2_rect[2], ume_arm2_rect[3], ume_arm2_rect[4])
-    elseif animeCounter >= 0.35 and 0.95 >= animeCounter then
-      tx["Foxes.png"]:DrawRect(tsubaki_arm_pos[1], tsubaki_arm_pos[2], tsubaki_arm1_rect[1], tsubaki_arm1_rect[2], tsubaki_arm1_rect[3], tsubaki_arm1_rect[4])
-      tx["Foxes.png"]:DrawRect(ume_arm_pos[1], ume_arm_pos[2], ume_arm1_rect[1], ume_arm1_rect[2], ume_arm1_rect[3], ume_arm1_rect[4])
-    elseif animeCounter >= 0.95 and 1.025 >= animeCounter then
-      tx["Foxes.png"]:DrawRect(tsubaki_arm_pos[3], tsubaki_arm_pos[4], tsubaki_arm2_rect[1], tsubaki_arm2_rect[2], tsubaki_arm2_rect[3], tsubaki_arm2_rect[4])
-      tx["Foxes.png"]:DrawRect(ume_arm_pos[3], ume_arm_pos[4], ume_arm2_rect[1], ume_arm2_rect[2], ume_arm2_rect[3], ume_arm2_rect[4])
-    elseif animeCounter >= 1.025 and 1.1 >= animeCounter then
-      -- none
+    if foxes_shown then
+      if animeCounter >= 0.2 and 0.275 >= animeCounter then
+        -- none
+      elseif animeCounter >= 0.275 and 0.35 >= animeCounter then
+        tx["Foxes.png"]:DrawRect(tsubaki_arm_pos[3], tsubaki_arm_pos[4], tsubaki_arm2_rect[1], tsubaki_arm2_rect[2], tsubaki_arm2_rect[3], tsubaki_arm2_rect[4])
+        tx["Foxes.png"]:DrawRect(ume_arm_pos[3], ume_arm_pos[4], ume_arm2_rect[1], ume_arm2_rect[2], ume_arm2_rect[3], ume_arm2_rect[4])
+      elseif animeCounter >= 0.35 and 0.95 >= animeCounter then
+        tx["Foxes.png"]:DrawRect(tsubaki_arm_pos[1], tsubaki_arm_pos[2], tsubaki_arm1_rect[1], tsubaki_arm1_rect[2], tsubaki_arm1_rect[3], tsubaki_arm1_rect[4])
+        tx["Foxes.png"]:DrawRect(ume_arm_pos[1], ume_arm_pos[2], ume_arm1_rect[1], ume_arm1_rect[2], ume_arm1_rect[3], ume_arm1_rect[4])
+      elseif animeCounter >= 0.95 and 1.025 >= animeCounter then
+        tx["Foxes.png"]:DrawRect(tsubaki_arm_pos[3], tsubaki_arm_pos[4], tsubaki_arm2_rect[1], tsubaki_arm2_rect[2], tsubaki_arm2_rect[3], tsubaki_arm2_rect[4])
+        tx["Foxes.png"]:DrawRect(ume_arm_pos[3], ume_arm_pos[4], ume_arm2_rect[1], ume_arm2_rect[2], ume_arm2_rect[3], ume_arm2_rect[4])
+      elseif animeCounter >= 1.025 and 1.1 >= animeCounter then
+        -- none
+      end
     end
 
     -- Gates Slam
@@ -208,15 +223,17 @@ function draw(state)
     end
 
     -- Speech Bubble
-    if dan_in_slam > 1.2 then
-      local speech_fadein = math.max(math.min((dan_in_slam - 1.7) * 1020, 255), 0)
+    if foxes_shown then
+      if dan_in_slam > 1.2 then
+        local speech_fadein = math.max(math.min((dan_in_slam - 1.7) * 1020, 255), 0)
 
-      tx["Speech/Speech.png"]:SetOpacity(speech_fadein / 255)
-      tx[speech_text]:SetOpacity(speech_fadein / 255)
-      tx["Speech/Speech.png"]:DrawRectAtAnchor(speech_pos[1], speech_pos[2], speech_rect[1], speech_rect[2], speech_rect[3], speech_rect[4], "center")
-      tx["Speech/Speech.png"]:DrawRectAtAnchor(speech_pos[3], speech_pos[4], speech_rect[5], speech_rect[6], speech_rect[7], speech_rect[8], "center")
-      tx[speech_text]:DrawRectAtAnchor(speech_pos[1], speech_pos[2], speech_rect[1], speech_rect[2], speech_rect[3], speech_rect[4], "center")
-      tx[speech_text]:DrawRectAtAnchor(speech_pos[3], speech_pos[4], speech_rect[5], speech_rect[6], speech_rect[7], speech_rect[8], "center")
+        tx["Speech/Speech.png"]:SetOpacity(speech_fadein / 255)
+        tx[speech_text]:SetOpacity(speech_fadein / 255)
+        tx["Speech/Speech.png"]:DrawRectAtAnchor(speech_pos[1], speech_pos[2], speech_rect[1], speech_rect[2], speech_rect[3], speech_rect[4], "center")
+        tx["Speech/Speech.png"]:DrawRectAtAnchor(speech_pos[3], speech_pos[4], speech_rect[5], speech_rect[6], speech_rect[7], speech_rect[8], "center")
+        tx[speech_text]:DrawRectAtAnchor(speech_pos[1], speech_pos[2], speech_rect[1], speech_rect[2], speech_rect[3], speech_rect[4], "center")
+        tx[speech_text]:DrawRectAtAnchor(speech_pos[3], speech_pos[4], speech_rect[5], speech_rect[6], speech_rect[7], speech_rect[8], "center")
+      end
     end
 end
 

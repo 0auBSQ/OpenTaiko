@@ -22,7 +22,7 @@
         "PAGODA_EXIT":      "Afsluiten",
 
         // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
-        "PAGODA_BAND_TEST":      "Proef",
+        "PAGODA_BAND_TEST":      "Pad",
         "PAGODA_BAND_GATE":      "Poort",
         "PAGODA_BAND_SKY":       "Hemel",
         "PAGODA_MYSTERY_CHANCE": "Kans op een mysterie: %d%%",
