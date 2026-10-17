@@ -152,7 +152,9 @@ Wanneer de skin laadt, scant het spel vier submappen van `Modules/` en behandelt
 - `Modules/Activities/`: herbruikbare subschermen die over een stage heen liggen (bijvoorbeeld `confirm_dialog`, `mod_select_dialog`, `song_select_core`).
 - `Modules/ROActivities/`: alleen-lezen overlays die het spel rechtstreeks aanstuurt.
 
-Het spel scant `Modules/Lib/` niet. Bestanden daar laad je met `require`: het zoekpad van een module is zijn eigen map gevolgd door `Modules/Lib/`, dus `require("dialogue")` leidt naar `Modules/Lib/dialogue.lua`. Je kunt stages en activities ook onder `Global/Stages/` en `Global/Activities/` in de installatiemap van het spel plaatsen; het spel laadt die voor elke skin.
+Het spel scant `Modules/Lib/` niet. Bestanden daar laad je met `require`: een module zoekt in zijn eigen map, daarna in `Modules/Lib/` en daarna in `Global/Modules/Lib/` (zie hieronder), dus `require("dialogue")` leidt naar `Modules/Lib/dialogue.lua`.
+
+De spelmap kan ook modules bevatten die elke skin laadt. `Global/Modules/` in de installatiemap van het spel heeft dezelfde submappen `Transitions/`, `Stages/`, `Activities/`, `ROActivities/` en `Lib/` als de `Modules/` van een skin, en het spel laadt elke globale categorie direct na die van de skin. Een naam kan op beide plaatsen bestaan. Vraagt een module van de skin een stage, activity, ROActivity of transition op naam op, dan krijgt die de module van de skin, en een globale module krijgt de globale; elk valt terug op de andere plaats als de eigen plaats geen module met die naam heeft. `require` volgt dezelfde regel: een globale module zoekt in `Global/Modules/Lib/` vóór de `Modules/Lib/` van de skin. De modules die het spel zelf op naam zoekt (hieronder vermeld) komen eerst uit de skin. `_boot` en `_title` moeten in de skin blijven: als `Global/Modules/Stages/` een van beide bevat, stopt het spel bij het opstarten met een fout.
 
 Binnen elke categorie maakt het spel eerst elke module aan en draait daarna `onStart` op elk ervan, in de volgorde Transitions, Stages, Activities, ROActivities.
 

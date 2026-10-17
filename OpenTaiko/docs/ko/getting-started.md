@@ -111,7 +111,7 @@ return Exit("title", nil)           -- 타이틀 화면으로 돌아가기
 
 - os에는 time, date, difftime만 남습니다. 샌드박스는 io, debug, loadfile, dofile을 제거하며, import는 아무것도 하지 않습니다.
 - package는 커스텀 로더로 축소됩니다. package.path와 package.cpath는 비어 있고 샌드박스가 표준 searcher를 교체하므로, 아래 경로만 검색할 수 있습니다.
-- require는 먼저 모듈 자체 폴더를, 그다음 스킨의 Modules/Lib 폴더를 찾아 처음 발견한 파일을 로드합니다. 같은 이름의 모듈 파일과 Lib 파일이 있으면 모듈 파일로 해석됩니다. 이름의 점은 경로 구분자가 되므로 require("DBControllers.dbScores")와 require("DBControllers/dbScores")는 둘 다 DBControllers/dbScores.lua를 로드합니다. 비ASCII 경로도 동작합니다.
+- require는 먼저 모듈 자체 폴더를, 그다음 스킨의 Modules/Lib 폴더를, 그다음 게임 폴더의 Global/Modules/Lib를 찾아 처음 발견한 파일을 로드합니다. Global/Modules의 모듈은 스킨의 Modules/Lib보다 먼저 Global/Modules/Lib를 찾습니다. 같은 이름의 모듈 파일과 Lib 파일이 있으면 모듈 파일로 해석됩니다. 이름의 점은 경로 구분자가 되므로 require("DBControllers.dbScores")와 require("DBControllers/dbScores")는 둘 다 DBControllers/dbScores.lua를 로드합니다. 비ASCII 경로도 동작합니다.
 
 ```lua
 -- intro_nokon/Script.lua에서 발췌

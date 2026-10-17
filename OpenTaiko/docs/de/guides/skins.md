@@ -152,7 +152,9 @@ Beim Laden des Skins scannt das Spiel vier Unterordner von `Modules/` und behand
 - `Modules/Activities/`: wiederverwendbare Unterbildschirme, die über einer Stage liegen (zum Beispiel `confirm_dialog`, `mod_select_dialog`, `song_select_core`).
 - `Modules/ROActivities/`: schreibgeschützte Overlays, die das Spiel direkt steuert.
 
-Das Spiel scannt `Modules/Lib/` nicht. Dateien dort laden Sie mit `require`: Der Suchpfad eines Moduls ist sein eigener Ordner, gefolgt von `Modules/Lib/`, sodass `require("dialogue")` zu `Modules/Lib/dialogue.lua` auflöst. Sie können Stages und Activities auch unter `Global/Stages/` und `Global/Activities/` im Installationsordner des Spiels ablegen; diese lädt das Spiel für jeden Skin.
+Das Spiel scannt `Modules/Lib/` nicht. Dateien dort laden Sie mit `require`: Ein Modul sucht in seinem eigenen Ordner, dann in `Modules/Lib/`, dann in `Global/Modules/Lib/` (siehe unten), sodass `require("dialogue")` zu `Modules/Lib/dialogue.lua` auflöst.
+
+Der Spielordner kann auch Module enthalten, die jeder Skin lädt. `Global/Modules/` im Installationsordner des Spiels hat dieselben Unterordner `Transitions/`, `Stages/`, `Activities/`, `ROActivities/` und `Lib/` wie das `Modules/` eines Skins, und das Spiel lädt jede globale Kategorie direkt nach der des Skins. Ein Name kann an beiden Orten vorkommen. Fragt ein Modul des Skins eine Stage, Activity, ROActivity oder Transition beim Namen an, erhält es das Modul des Skins, und ein globales Modul erhält das globale; beide greifen auf den anderen Ort zurück, wenn der eigene kein Modul dieses Namens hat. `require` folgt derselben Regel: Ein globales Modul sucht in `Global/Modules/Lib/` vor dem `Modules/Lib/` des Skins. Die Module, die das Spiel selbst beim Namen sucht (unten aufgeführt), kommen zuerst aus dem Skin. `_boot` und `_title` müssen im Skin bleiben: Enthält `Global/Modules/Stages/` eine der beiden, bricht das Spiel beim Start mit einem Fehler ab.
 
 Innerhalb jeder Kategorie erzeugt das Spiel zuerst jedes Modul und führt dann `onStart` auf jedem aus, in der Reihenfolge Transitions, Stages, Activities, ROActivities.
 

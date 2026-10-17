@@ -111,7 +111,7 @@ Every Script.lua runs in a restricted Lua state:
 
 - os keeps only time, date and difftime. The sandbox removes io, debug, loadfile and dofile, and import does nothing.
 - package shrinks to a custom loader: package.path and package.cpath are empty and the sandbox replaces the standard searchers, so only the paths below are searchable.
-- require first looks in the module's own folder, then in the skin's Modules/Lib folder, and loads the first file it finds. A module file and a Lib file with the same name resolve to the module file. Dots in the name become path separators, so require("DBControllers.dbScores") and require("DBControllers/dbScores") both load DBControllers/dbScores.lua. Non-ASCII paths work.
+- require first looks in the module's own folder, then in the skin's Modules/Lib folder, then in Global/Modules/Lib in the game folder, and loads the first file it finds. A module in Global/Modules checks Global/Modules/Lib before the skin's Modules/Lib. A module file and a Lib file with the same name resolve to the module file. Dots in the name become path separators, so require("DBControllers.dbScores") and require("DBControllers/dbScores") both load DBControllers/dbScores.lua. Non-ASCII paths work.
 
 ```lua
 -- from intro_nokon/Script.lua

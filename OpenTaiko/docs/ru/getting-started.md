@@ -111,7 +111,7 @@ return Exit("title", nil)           -- назад на титульный экр
 
 - В os остаются только time, date и difftime. Песочница удаляет io, debug, loadfile и dofile, а import ничего не делает.
 - package сводится к пользовательскому загрузчику: package.path и package.cpath пусты, а песочница заменяет стандартные искатели, поэтому поиск возможен только по путям ниже.
-- require сначала ищет в папке самого модуля, затем в папке Modules/Lib скина и загружает первый найденный файл. Файл модуля и файл из Lib с одинаковым именем разрешаются в файл модуля. Точки в имени становятся разделителями пути, поэтому require("DBControllers.dbScores") и require("DBControllers/dbScores") загружают один и тот же DBControllers/dbScores.lua. Пути с символами не из ASCII работают.
+- require сначала ищет в папке самого модуля, затем в папке Modules/Lib скина, затем в Global/Modules/Lib в папке игры и загружает первый найденный файл. Модуль из Global/Modules ищет в Global/Modules/Lib раньше, чем в Modules/Lib скина. Файл модуля и файл из Lib с одинаковым именем разрешаются в файл модуля. Точки в имени становятся разделителями пути, поэтому require("DBControllers.dbScores") и require("DBControllers/dbScores") загружают один и тот же DBControllers/dbScores.lua. Пути с символами не из ASCII работают.
 
 ```lua
 -- из intro_nokon/Script.lua

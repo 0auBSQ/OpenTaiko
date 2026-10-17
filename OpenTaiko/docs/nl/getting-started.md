@@ -111,7 +111,7 @@ Elke Script.lua draait in een beperkte Lua-state:
 
 - os behoudt alleen time, date en difftime. De sandbox verwijdert io, debug, loadfile en dofile, en import doet niets.
 - package krimpt tot een aangepaste loader: package.path en package.cpath zijn leeg en de sandbox vervangt de standaard searchers, zodat alleen de onderstaande paden doorzoekbaar zijn.
-- require kijkt eerst in de eigen map van de module, daarna in de map Modules/Lib van de skin, en laadt het eerste bestand dat het vindt. Een modulebestand en een Lib-bestand met dezelfde naam leiden naar het modulebestand. Punten in de naam worden padscheidingstekens, dus require("DBControllers.dbScores") en require("DBControllers/dbScores") laden beide DBControllers/dbScores.lua. Niet-ASCII-paden werken.
+- require kijkt eerst in de eigen map van de module, daarna in de map Modules/Lib van de skin, daarna in Global/Modules/Lib in de spelmap, en laadt het eerste bestand dat het vindt. Een module in Global/Modules kijkt in Global/Modules/Lib vóór de Modules/Lib van de skin. Een modulebestand en een Lib-bestand met dezelfde naam leiden naar het modulebestand. Punten in de naam worden padscheidingstekens, dus require("DBControllers.dbScores") en require("DBControllers/dbScores") laden beide DBControllers/dbScores.lua. Niet-ASCII-paden werken.
 
 ```lua
 -- uit intro_nokon/Script.lua

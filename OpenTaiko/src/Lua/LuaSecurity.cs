@@ -57,7 +57,8 @@ _csPackagePaths = nil
 import = function () end
 """;
 
-		public static void Secure(Lua lua, string directory) {
+		// fromGlobal: the script is a global module (Global/Modules), its require looks in Global/Modules/Lib before the skin's Modules/Lib
+		public static void Secure(Lua lua, string directory, bool fromGlobal = false) {
 			string normalizedDirectory = directory.Replace('\\', '/');
 
 			// Lua's built-in require uses fopen() which is ANSI code-page-limited on Windows.
@@ -68,13 +69,19 @@ import = function () end
 				catch { return null; }
 			});
 
-			// build path
+			// build path: the script's own folder, then the skin's Modules/Lib and Global/Modules/Lib (that one first for a global module)
 			List<string> paths = new() { $"{normalizedDirectory}/?.lua" };
-			bool underSkinDir = Path.GetRelativePath(OpenTaiko.ConfigIni.strSystemSkinSubfolderFullName, normalizedDirectory) != normalizedDirectory;
-			if (underSkinDir)
-				paths.Add($"{OpenTaiko.ConfigIni.strSystemSkinSubfolderFullName}Modules/Lib/?.lua");
-			else
-				paths.AddRange(OpenTaiko.GetMergedDirectories("", "Global/Lib/").Select(v => $"{v}?.lua"));
+			string skinLib = $"{OpenTaiko.ConfigIni.strSystemSkinSubfolderFullName}Modules/Lib/?.lua";
+			List<string> globalLib = new() { Path.Combine(CSkin.GlobalModulesFolder("Lib"), "?.lua").Replace('\\', '/') };
+			if (OpenTaiko.strBundleFolder != null)
+				globalLib.Add(Path.Combine(OpenTaiko.strBundleFolder, "Global", "Modules", "Lib", "?.lua").Replace('\\', '/'));
+			if (fromGlobal) {
+				paths.AddRange(globalLib);
+				paths.Add(skinLib);
+			} else {
+				paths.Add(skinLib);
+				paths.AddRange(globalLib);
+			}
 			lua["_csPackagePaths"] = paths;
 
 			lua.DoString(luaScriptSecure, nameof(luaScriptSecure));

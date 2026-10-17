@@ -152,7 +152,9 @@ My New Skin/
 - `Modules/Activities/`: 스테이지 위에 겹치는 재사용 가능한 하위 화면(예: `confirm_dialog`, `mod_select_dialog`, `song_select_core`).
 - `Modules/ROActivities/`: 게임이 직접 구동하는 읽기 전용 오버레이.
 
-게임은 `Modules/Lib/`를 스캔하지 않습니다. 그곳의 파일은 `require`로 로드합니다. 모듈의 검색 경로는 자체 폴더 다음에 `Modules/Lib/`이므로 `require("dialogue")`는 `Modules/Lib/dialogue.lua`로 해석됩니다. 스테이지와 액티비티는 게임 설치 폴더의 `Global/Stages/`와 `Global/Activities/`에 둘 수도 있으며, 게임은 그것들을 모든 스킨에 대해 로드합니다.
+게임은 `Modules/Lib/`를 스캔하지 않습니다. 그곳의 파일은 `require`로 로드합니다. 모듈은 자체 폴더, 다음에 `Modules/Lib/`, 다음에 `Global/Modules/Lib/`(아래 참고)를 찾으므로 `require("dialogue")`는 `Modules/Lib/dialogue.lua`로 해석됩니다.
+
+게임 폴더에는 모든 스킨이 로드하는 모듈도 둘 수 있습니다. 게임 설치 폴더의 `Global/Modules/`에는 스킨의 `Modules/`와 같은 `Transitions/`, `Stages/`, `Activities/`, `ROActivities/`, `Lib/` 하위 폴더가 있으며, 게임은 각 범주에서 스킨의 모듈 바로 다음에 전역 모듈을 로드합니다. 같은 이름이 두 곳에 모두 있을 수 있습니다. 스킨 모듈이 스테이지, 액티비티, ROActivity, 트랜지션을 이름으로 요청하면 스킨의 모듈을, 전역 모듈이 요청하면 전역 모듈을 받으며, 자기 쪽에 그 이름의 모듈이 없으면 다른 쪽을 찾습니다. `require`도 같은 규칙을 따르므로 전역 모듈은 스킨의 `Modules/Lib/`보다 먼저 `Global/Modules/Lib/`를 찾습니다. 게임이 직접 이름으로 찾는 모듈(아래 목록)은 스킨의 것이 우선입니다. `_boot`와 `_title`은 스킨에 있어야 하며, `Global/Modules/Stages/`에 둘 중 하나가 있으면 게임은 시작할 때 오류로 멈춥니다.
 
 각 범주 안에서 게임은 모든 모듈을 먼저 만든 뒤 각각에 `onStart`를 실행합니다. 순서는 Transitions, Stages, Activities, ROActivities입니다.
 

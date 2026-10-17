@@ -111,7 +111,7 @@ Cada Script.lua se ejecuta en un estado Lua restringido:
 
 - os conserva solo time, date y difftime. El sandbox elimina io, debug, loadfile y dofile, e import no hace nada.
 - package se reduce a un cargador personalizado: package.path y package.cpath están vacíos y el sandbox reemplaza los buscadores estándar, así que solo se pueden buscar las rutas indicadas más abajo.
-- require busca primero en la propia carpeta del módulo, luego en la carpeta Modules/Lib del skin, y carga el primer archivo que encuentra. Un archivo del módulo y un archivo de Lib con el mismo nombre se resuelven al archivo del módulo. Los puntos del nombre se convierten en separadores de ruta, así que require("DBControllers.dbScores") y require("DBControllers/dbScores") cargan ambos DBControllers/dbScores.lua. Las rutas no ASCII funcionan.
+- require busca primero en la propia carpeta del módulo, luego en la carpeta Modules/Lib del skin, luego en Global/Modules/Lib en la carpeta del juego, y carga el primer archivo que encuentra. Un módulo de Global/Modules busca en Global/Modules/Lib antes que en el Modules/Lib del skin. Un archivo del módulo y un archivo de Lib con el mismo nombre se resuelven al archivo del módulo. Los puntos del nombre se convierten en separadores de ruta, así que require("DBControllers.dbScores") y require("DBControllers/dbScores") cargan ambos DBControllers/dbScores.lua. Las rutas no ASCII funcionan.
 
 ```lua
 -- de intro_nokon/Script.lua

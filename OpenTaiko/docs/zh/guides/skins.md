@@ -152,7 +152,9 @@ My New Skin/
 - `Modules/Activities/`：叠加在舞台上的可复用子界面（例如 `confirm_dialog`、`mod_select_dialog`、`song_select_core`）。
 - `Modules/ROActivities/`：由游戏直接驱动的只读覆盖层。
 
-游戏不扫描 `Modules/Lib/`。你通过 `require` 加载其中的文件：模块的搜索路径是其自己的文件夹，其次是 `Modules/Lib/`，因此 `require("dialogue")` 解析为 `Modules/Lib/dialogue.lua`。你也可以把舞台和活动放在游戏安装目录的 `Global/Stages/` 和 `Global/Activities/` 下；游戏会为每个皮肤加载那些。
+游戏不扫描 `Modules/Lib/`。你通过 `require` 加载其中的文件：模块先在自己的文件夹中查找，其次是 `Modules/Lib/`，然后是 `Global/Modules/Lib/`（见下文），因此 `require("dialogue")` 解析为 `Modules/Lib/dialogue.lua`。
+
+游戏文件夹中也可以放置所有皮肤都会加载的模块。游戏安装目录中的 `Global/Modules/` 与皮肤的 `Modules/` 有相同的子文件夹 `Transitions/`、`Stages/`、`Activities/`、`ROActivities/` 和 `Lib/`，游戏会在每个分类中紧接着皮肤的模块加载全局模块。同一个名称可以同时存在于两处。皮肤的模块按名称请求舞台、活动、ROActivity 或过渡时得到皮肤的模块，全局模块则得到全局模块；自己一侧没有该名称的模块时，各自会去另一侧查找。`require` 遵循同样的规则：全局模块先在 `Global/Modules/Lib/` 中查找，再查找皮肤的 `Modules/Lib/`。游戏自身按名称查找的模块（见下方列表）优先来自皮肤。`_boot` 和 `_title` 必须留在皮肤中：如果 `Global/Modules/Stages/` 中有其中任何一个，游戏会在启动时报错停止。
 
 在每个分类内，游戏先创建所有模块，然后对每个模块运行 `onStart`，顺序为 Transitions、Stages、Activities、ROActivities。
 

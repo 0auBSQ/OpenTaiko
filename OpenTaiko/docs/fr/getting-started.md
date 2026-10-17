@@ -111,7 +111,7 @@ Chaque Script.lua s'exécute dans un état Lua restreint :
 
 - os ne conserve que time, date et difftime. Le bac à sable retire io, debug, loadfile et dofile, et import ne fait rien.
 - package se réduit à un chargeur personnalisé : package.path et package.cpath sont vides et le bac à sable remplace les chercheurs standard, si bien que seuls les chemins ci-dessous sont consultables.
-- require cherche d'abord dans le dossier du module lui-même, puis dans le dossier Modules/Lib du skin, et charge le premier fichier trouvé. Un fichier du module et un fichier de Lib portant le même nom se résolvent vers le fichier du module. Les points du nom deviennent des séparateurs de chemin : require("DBControllers.dbScores") et require("DBControllers/dbScores") chargent tous deux DBControllers/dbScores.lua. Les chemins non ASCII fonctionnent.
+- require cherche d'abord dans le dossier du module lui-même, puis dans le dossier Modules/Lib du skin, puis dans Global/Modules/Lib dans le dossier du jeu, et charge le premier fichier trouvé. Un module de Global/Modules cherche dans Global/Modules/Lib avant le Modules/Lib du skin. Un fichier du module et un fichier de Lib portant le même nom se résolvent vers le fichier du module. Les points du nom deviennent des séparateurs de chemin : require("DBControllers.dbScores") et require("DBControllers/dbScores") chargent tous deux DBControllers/dbScores.lua. Les chemins non ASCII fonctionnent.
 
 ```lua
 -- extrait de intro_nokon/Script.lua

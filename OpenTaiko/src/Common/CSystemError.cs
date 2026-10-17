@@ -20,7 +20,8 @@ internal class CSystemError : CStage {
 		ENO_SONGLISTINITFAILED = 5,
 		ENO_INVALIDSTAGENAME = 6,
 		ENO_BOOTNOTFOUND = 7,
-		ENO_TITLENOTFOUND = 8
+		ENO_TITLENOTFOUND = 8,
+		ENO_GLOBALCORESTAGE = 9
 	};
 
 	public void LoadError(Errno errno, Exception? exception = null, string? message = null) {
@@ -94,6 +95,14 @@ internal class CSystemError : CStage {
 					ErrorMessage += "The title stage was not found in the selected skin.\n";
 					ErrorMessage += "Please ensure that your skin is compatible with your current OpenTaiko version.\n";
 					ErrorMessage += "If you are currently making a skin, please ensure that stage is present in your Modules/Stages/_title folder.";
+					break;
+				}
+			case Errno.ENO_GLOBALCORESTAGE: {
+					ErrorMessage += "A _boot or _title stage was found in the Global/Modules/Stages folder.\n";
+					if (!string.IsNullOrEmpty(message))
+						ErrorMessage += "Folder: " + message + "\n";
+					ErrorMessage += "These two stages belong to each skin and cannot be shared between skins.\n";
+					ErrorMessage += "Please move that folder into your skin's Modules/Stages folder, or remove it.";
 					break;
 				}
 		};

@@ -187,7 +187,7 @@ internal class CStageConfig : CStage {
 					var r = UI?.Update();
 					if (r != null && r.Length > 0 && (r[0] as string) == "exit") {
 						string? name = r.Length > 1 ? r[1] as string : null;
-						var tr = !string.IsNullOrEmpty(name) && !tHeavyApplyPending() ? LuaTransitionWrapper.Get(name) : null;
+						var tr = !string.IsNullOrEmpty(name) && !tHeavyApplyPending() ? LuaTransitionWrapper.Get(name, UI?.IsGlobal ?? false) : null;
 						if (tr != null) {
 							CStageTransition.SetPendingScript(this, tr);
 							_leaving = true;   // drawn (not updated) while the transition covers it

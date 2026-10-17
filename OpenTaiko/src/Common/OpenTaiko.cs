@@ -517,8 +517,12 @@ internal class OpenTaiko : Game {
 		}
 	}
 
-	public void UnmountAndChangeLuaStageOrError(string name, string? traceMessage = null, CSystemError.Errno errno = CSystemError.Errno.ENO_INVALIDSTAGENAME) {
-		LuaStageWrapper.ForceSetNextRequestedStage(name);
+	public void UnmountAndChangeLuaStageOrError(string name, string? traceMessage = null, CSystemError.Errno errno = CSystemError.Errno.ENO_INVALIDSTAGENAME, bool fromGlobal = false) {
+		if (LuaStageWrapper.GlobalCoreStage != null) {
+			TriggerSystemError(CSystemError.Errno.ENO_GLOBALCORESTAGE, null, CSkin.GlobalModulePath("Stages", LuaStageWrapper.GlobalCoreStage));
+			return;
+		}
+		LuaStageWrapper.ForceSetNextRequestedStage(name, fromGlobal);
 		LuaStageWrapper? _stage = LuaStageWrapper.GetNextRequestedStage();
 		if (_stage != null) {
 			UnmountAndChangeStage(_stage, traceMessage ?? $"Lua Stage: {name}");
@@ -1080,7 +1084,7 @@ internal class OpenTaiko : Game {
 							#endregion
 
 							case (int)EReturnValue.JumpToLuaStage: // Transition to another Lua Stage
-								UnmountAndChangeLuaStageOrError(LuaStageWrapper.GetNextRequestedStageName());
+								UnmountAndChangeLuaStageOrError(LuaStageWrapper.GetNextRequestedStageName(), fromGlobal: LuaStageWrapper.IsNextRequestedStageFromGlobal());
 								this.tExecuteGarbageCollection();
 								break;
 

@@ -111,7 +111,7 @@ Jede Script.lua läuft in einem eingeschränkten Lua-Zustand:
 
 - os behält nur time, date und difftime. Die Sandbox entfernt io, debug, loadfile und dofile, und import tut nichts.
 - package schrumpft auf einen eigenen Lader: package.path und package.cpath sind leer und die Sandbox ersetzt die Standard-Searcher, sodass nur die unten genannten Pfade durchsucht werden.
-- require sucht zuerst im eigenen Ordner des Moduls, dann im Ordner Modules/Lib des Skins, und lädt die erste gefundene Datei. Eine Moduldatei und eine Lib-Datei mit demselben Namen lösen zur Moduldatei auf. Punkte im Namen werden zu Pfadtrennzeichen, sodass require("DBControllers.dbScores") und require("DBControllers/dbScores") beide DBControllers/dbScores.lua laden. Nicht-ASCII-Pfade funktionieren.
+- require sucht zuerst im eigenen Ordner des Moduls, dann im Ordner Modules/Lib des Skins, dann in Global/Modules/Lib im Spielordner, und lädt die erste gefundene Datei. Ein Modul in Global/Modules sucht in Global/Modules/Lib vor dem Modules/Lib des Skins. Eine Moduldatei und eine Lib-Datei mit demselben Namen lösen zur Moduldatei auf. Punkte im Namen werden zu Pfadtrennzeichen, sodass require("DBControllers.dbScores") und require("DBControllers/dbScores") beide DBControllers/dbScores.lua laden. Nicht-ASCII-Pfade funktionieren.
 
 ```lua
 -- aus intro_nokon/Script.lua

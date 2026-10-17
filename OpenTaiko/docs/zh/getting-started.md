@@ -111,7 +111,7 @@ return Exit("title", nil)           -- 返回标题界面
 
 - os 只保留 time、date 和 difftime。沙箱移除了 io、debug、loadfile 和 dofile，import 不做任何事。
 - package 缩减为一个自定义加载器：package.path 和 package.cpath 为空，沙箱替换了标准搜索器，因此只有下面列出的路径可以被搜索。
-- require 先在模块自己的文件夹中查找，再在皮肤的 Modules/Lib 文件夹中查找，并加载找到的第一个文件。同名的模块文件和 Lib 文件会解析为模块文件。名称中的点会变成路径分隔符，因此 require("DBControllers.dbScores") 和 require("DBControllers/dbScores") 都会加载 DBControllers/dbScores.lua。非 ASCII 路径可以正常使用。
+- require 先在模块自己的文件夹中查找，再在皮肤的 Modules/Lib 文件夹中查找，然后在游戏文件夹的 Global/Modules/Lib 中查找，并加载找到的第一个文件。Global/Modules 中的模块会先查找 Global/Modules/Lib，再查找皮肤的 Modules/Lib。同名的模块文件和 Lib 文件会解析为模块文件。名称中的点会变成路径分隔符，因此 require("DBControllers.dbScores") 和 require("DBControllers/dbScores") 都会加载 DBControllers/dbScores.lua。非 ASCII 路径可以正常使用。
 
 ```lua
 -- 摘自 intro_nokon/Script.lua

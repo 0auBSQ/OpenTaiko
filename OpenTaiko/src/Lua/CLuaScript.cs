@@ -403,7 +403,8 @@ end
 
 		LuaScript = new Lua();
 		LuaScript.State.Encoding = Encoding.UTF8;
-		LuaSecurity.Secure(LuaScript, dir);
+		bool fromGlobal = CSkin.IsGlobalModuleFolder(dir);
+		LuaSecurity.Secure(LuaScript, dir, fromGlobal);
 
 		try {
 			LuaScript["info"] = luaInfo = new CLuaInfo(strDir);
@@ -478,8 +479,8 @@ end
 			LuaScript["SQL"] = new LuaSQLFunc(dir);
 			LuaScript["LANG"] = new LuaLangFunc();
 			// ROActivity scripts may not use ACTIVITY (use ROACTIVITY instead) or write to DATABASE
-			LuaScript["ACTIVITY"] = writable ? new LuaActivityFunc() : null;
-			LuaScript["ROACTIVITY"] = new LuaROActivityFunc();
+			LuaScript["ACTIVITY"] = writable ? new LuaActivityFunc(fromGlobal) : null;
+			LuaScript["ROACTIVITY"] = new LuaROActivityFunc(fromGlobal);
 			LuaScript["MODICONS"] = new LuaModIconsFunc();
 			LuaScript["HITSOUNDSLIST"] = new LuaHitsoundsDatabase();
 			LuaScript["VIRTUALSLOTS"] = new LuaVirtualSlotManager();

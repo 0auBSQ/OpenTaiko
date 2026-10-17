@@ -563,6 +563,29 @@ internal class CSkin : IDisposable {
 	public static volatile int LoadingModuleStep = 0;
 	public static volatile int LoadingModuleTotal = 0;
 
+	// <game>/Global/Modules/<type>: the Lua modules every skin loads, laid out like a skin's Modules folder
+	public static string GlobalModulesFolder(string type) =>
+		System.IO.Path.Combine(OpenTaiko.strEXEFolder, "Global", "Modules", type);
+
+	public static string GlobalModulePath(string type, string name) =>
+		OpenTaiko.ResolveAssetPath(System.IO.Path.Combine(GlobalModulesFolder(type), name));
+
+	// true for a script under Global/Modules: its lookups by name and its require look at the global modules first
+	public static bool IsGlobalModuleFolder(string dir) {
+		if (string.IsNullOrWhiteSpace(dir)) return false;
+		string full = System.IO.Path.GetFullPath(dir);
+		bool under(string? root) => root != null && full.StartsWith(
+			System.IO.Path.GetFullPath(System.IO.Path.Combine(root, "Global", "Modules")) + System.IO.Path.DirectorySeparatorChar,
+			StringComparison.OrdinalIgnoreCase);
+		return under(OpenTaiko.strEXEFolder) || under(OpenTaiko.strBundleFolder);
+	}
+
+	private static string[] SkinModuleNames(string type) =>
+		DirectoryUtils.SafeGetDirectories(CSkin.Path($"Modules/{type}")).Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
+
+	private static string[] GlobalModuleNames(string type) =>
+		OpenTaiko.GetMergedDirectories(GlobalModulesFolder(type)).Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
+
 	internal IEnumerator<float> LoadModulesIncrementally() {
 		// the nameplate list with this skin's pack, before the skin's scripts read it
 		OpenTaiko.Databases?.DBNameplateUnlockables?.tReload(CSkin.Path(""));
@@ -571,15 +594,26 @@ internal class CSkin : IDisposable {
 		MainMenuSettings = new CMainMenuSettings();
 		MainMenuSettings.tReloadMenus();
 
-		string[] _transitionsList = DirectoryUtils.SafeGetDirectories(CSkin.Path($"Modules/Transitions")).Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
-		string[] _modulesList = DirectoryUtils.SafeGetDirectories(CSkin.Path($"Modules/Stages")).Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
-		string[] _globalModulesList = DirectoryUtils.SafeGetDirectories($"Global/Stages").Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
-		string[] _actList = DirectoryUtils.SafeGetDirectories(CSkin.Path($"Modules/Activities")).Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
-		string[] _globalActList = DirectoryUtils.SafeGetDirectories($"Global/Activities").Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
-		string[] _roActList = DirectoryUtils.SafeGetDirectories(CSkin.Path($"Modules/ROActivities")).Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
+		string[] _transitionsList = SkinModuleNames("Transitions");
+		string[] _globalTransitionsList = GlobalModuleNames("Transitions");
+		string[] _modulesList = SkinModuleNames("Stages");
+		string[] _globalModulesList = GlobalModuleNames("Stages");
+		string[] _actList = SkinModuleNames("Activities");
+		string[] _globalActList = GlobalModuleNames("Activities");
+		string[] _roActList = SkinModuleNames("ROActivities");
+		string[] _globalRoActList = GlobalModuleNames("ROActivities");
+
+		// _boot and _title belong to the skin: with either in Global/Modules/Stages no module loads,
+		// and the first stage change shows the error instead
+		LuaStageWrapper.GlobalCoreStage = _globalModulesList.FirstOrDefault(n => LuaStageWrapper.CoreStages.Contains(n));
+		if (LuaStageWrapper.GlobalCoreStage != null) {
+			Trace.TraceError($"Global/Modules/Stages/{LuaStageWrapper.GlobalCoreStage}: _boot and _title must be in the skin's Modules/Stages folder.");
+			yield break;
+		}
 
 		// Each item is processed twice (instantiate, then onStart).
-		int total = (_transitionsList.Length + _modulesList.Length + _globalModulesList.Length + _actList.Length + _globalActList.Length + _roActList.Length) * 2;
+		int total = (_transitionsList.Length + _globalTransitionsList.Length + _modulesList.Length + _globalModulesList.Length
+			+ _actList.Length + _globalActList.Length + _roActList.Length + _globalRoActList.Length) * 2;
 		if (total <= 0) yield break;
 		int done = 0;
 
@@ -607,7 +641,11 @@ internal class CSkin : IDisposable {
 		// Transitions FIRST — onStart runs before Stages/Activities so they're ready for the first stage switch.
 		var transitions = new List<(string name, LuaTransitionWrapper w)>();
 		foreach (string _t in _transitionsList) {
-			beginStep("transition", _t, "load"); transitions.Add((_t, new LuaTransitionWrapper(_t))); logStep("transition", _t, "load");
+			beginStep("transition", _t, "load"); transitions.Add((_t, new LuaTransitionWrapper(_t, false))); logStep("transition", _t, "load");
+			yield return ++done / (float)total;
+		}
+		foreach (string _t in _globalTransitionsList) {
+			beginStep("global transition", _t, "load"); transitions.Add((_t, new LuaTransitionWrapper(_t, true))); logStep("global transition", _t, "load");
 			yield return ++done / (float)total;
 		}
 		foreach (var (name, _t) in transitions) {
@@ -654,7 +692,11 @@ internal class CSkin : IDisposable {
 		// Lua RO Activities
 		var roActs = new List<(string name, LuaROActivityWrapper w)>();
 		foreach (string _act in _roActList) {
-			beginStep("roactivity", _act, "load"); roActs.Add((_act, new LuaROActivityWrapper(_act))); logStep("roactivity", _act, "load");
+			beginStep("roactivity", _act, "load"); roActs.Add((_act, new LuaROActivityWrapper(_act, false))); logStep("roactivity", _act, "load");
+			yield return ++done / (float)total;
+		}
+		foreach (string _act in _globalRoActList) {
+			beginStep("global roactivity", _act, "load"); roActs.Add((_act, new LuaROActivityWrapper(_act, true))); logStep("global roactivity", _act, "load");
 			yield return ++done / (float)total;
 		}
 		foreach (var (name, _a) in roActs) {

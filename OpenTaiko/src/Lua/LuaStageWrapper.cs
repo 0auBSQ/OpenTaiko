@@ -1,36 +1,52 @@
 ﻿namespace OpenTaiko {
 	internal class LuaStageWrapper : CStage {
 		// Used to toggle stages in the OpenTaiko.cs file
-		public static Dictionary<string, LuaStageWrapper> _allLuaStages = new Dictionary<string, LuaStageWrapper>();
+		// The skin's stages and the global ones (Global/Modules/Stages) are kept apart, as a name can be in both
+		public static Dictionary<string, LuaStageWrapper> _skinLuaStages = new Dictionary<string, LuaStageWrapper>();
+		public static Dictionary<string, LuaStageWrapper> _globalLuaStages = new Dictionary<string, LuaStageWrapper>();
+
+		private static IEnumerable<LuaStageWrapper> _allLuaStages => _skinLuaStages.Values.Concat(_globalLuaStages.Values);
+
+		// the stages only a skin may have: one of them in Global/Modules/Stages stops the game from starting
+		public static readonly string[] CoreStages = { "_boot", "_title" };
+
+		// the core stage found in Global/Modules/Stages by the last module load, null when there is none
+		public static string? GlobalCoreStage = null;
 
 		private static string _nextRequestedStage = "";
+		private static bool _nextRequestedFromGlobal = false;
 
 		#region [Setters]
 
-		public static void ForceSetNextRequestedStage(string name) {
+		// fromGlobal: a global stage asks, so a name in both folders opens the global stage
+		public static void ForceSetNextRequestedStage(string name, bool fromGlobal = false) {
 			_nextRequestedStage = name;
+			_nextRequestedFromGlobal = fromGlobal;
 		}
 
 		public static void ResetLuaStagesDictionary() {
-			foreach (KeyValuePair<string, LuaStageWrapper> _stage in _allLuaStages) {
-				_stage.Value.DisposeStage();
+			foreach (LuaStageWrapper _stage in _allLuaStages) {
+				_stage.DisposeStage();
 			}
-			_allLuaStages.Clear();
+			_skinLuaStages.Clear();
+			_globalLuaStages.Clear();
 		}
 
 		#endregion
 
 		#region [Getters]
 
-		public static LuaStageWrapper? GetLuaStage(string name) {
-			if (_allLuaStages.TryGetValue(name, out var _stage)) {
+		// A stage by name: the skin's first, unless preferGlobal (the lookup comes from a global module)
+		public static LuaStageWrapper? GetLuaStage(string name, bool preferGlobal = false) {
+			var (first, second) = preferGlobal ? (_globalLuaStages, _skinLuaStages) : (_skinLuaStages, _globalLuaStages);
+			if (first.TryGetValue(name, out var _stage) || second.TryGetValue(name, out _stage)) {
 				return _stage;
 			}
 			return null;
 		}
 
 		public static LuaStageWrapper? GetNextRequestedStage() {
-			LuaStageWrapper? _stage = GetLuaStage(_nextRequestedStage);
+			LuaStageWrapper? _stage = GetLuaStage(_nextRequestedStage, _nextRequestedFromGlobal);
 
 			if (_stage == null) {
 				LogNotification.PopError($"The requested Lua Stage {_nextRequestedStage} is not present in the Modules folder");
@@ -42,25 +58,32 @@
 			return _nextRequestedStage;
 		}
 
+		public static bool IsNextRequestedStageFromGlobal() {
+			return _nextRequestedFromGlobal;
+		}
+
 		#endregion
 
 		#region [Executers]
 
 		public static void PropagateAfterSongEnumEvent() {
-			foreach (KeyValuePair<string, LuaStageWrapper> _stage in _allLuaStages) {
-				_stage.Value.AfterSongsEnum();
+			foreach (LuaStageWrapper _stage in _allLuaStages) {
+				_stage.AfterSongsEnum();
 			}
 		}
 
 		public static void PropagateOnDestroy() {
-			foreach (KeyValuePair<string, LuaStageWrapper> _stage in _allLuaStages) {
-				_stage.Value.OnDestroy();
+			foreach (LuaStageWrapper _stage in _allLuaStages) {
+				_stage.OnDestroy();
 			}
 		}
 
 		#endregion
 
 		private CLuaStageScript lcStageScript;
+
+		// loaded from Global/Modules/Stages
+		public readonly bool IsGlobal;
 
 		public void DisposeStage() {
 			lcStageScript?.Dispose();
@@ -70,21 +93,22 @@
 			base.eStageID = EStage.CUSTOM;
 			base.ePhaseID = CStage.EPhase.Common_NORMAL;
 			base.customStageName = name;
+			IsGlobal = isGlobal;
 
 			if (isGlobal == false) lcStageScript = new CLuaStageScript(CSkin.Path($"Modules/Stages/{name}"), name);
-			else lcStageScript = new CLuaStageScript(CSkin.Path($"Global/Stages/{name}"), $"[GLOBAL]{name}");
+			else lcStageScript = new CLuaStageScript(CSkin.GlobalModulePath("Stages", name), $"[GLOBAL]{name}");
 			lcStageScript.AttachExitCallBack(RequestExitStage);
 
-			_allLuaStages.Add(name, this);
+			(isGlobal ? _globalLuaStages : _skinLuaStages).Add(name, this);
 
 			base.ChildActivities.Add(this.actFOtoTitle = new CActFIFOBlack());
 		}
 
-		// "heya" opens the skin's "myroom" stage, or the title when the skin has none
-		private static EReturnValue _MyRoomOrTitle() {
-			if (GetLuaStage("myroom") == null)
+		// "heya" opens the "myroom" stage (a global stage looks in Global/Modules/Stages first), or the title when there is none
+		private EReturnValue _MyRoomOrTitle() {
+			if (GetLuaStage("myroom", IsGlobal) == null)
 				return EReturnValue.BackToTitle;
-			_nextRequestedStage = "myroom";
+			ForceSetNextRequestedStage("myroom", IsGlobal);
 			return EReturnValue.JumpToLuaStage;
 		}
 
@@ -108,7 +132,7 @@
 
 			if (moduleName != null) {
 				if (transition == "stage") {
-					_nextRequestedStage = moduleName;
+					ForceSetNextRequestedStage(moduleName, IsGlobal);
 				} else if (transition == "legacy") {
 					return _StringToLegacyValue(moduleName);
 				}
@@ -122,7 +146,7 @@
 		private int RequestExitStage(string target, string? moduleName, string? transitionName) {
 			this.eFadeOutReturnValue = _StringToReturnValue(target, moduleName);
 
-			var tr = LuaTransitionWrapper.Get(transitionName);
+			var tr = LuaTransitionWrapper.Get(transitionName, IsGlobal);
 			if (tr != null) {
 				// Hand off this frame so CStageTransition plays the fade-out/loading/fade-in (skip the legacy fade).
 				CStageTransition.SetPendingScript(this, tr);

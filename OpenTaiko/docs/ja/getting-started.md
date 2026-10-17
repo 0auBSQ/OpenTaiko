@@ -111,7 +111,7 @@ return Exit("title", nil)           -- back to the title screen
 
 - os には time、date、difftime だけが残ります。サンドボックスは io、debug、loadfile、dofile を取り除き、import は何もしません。
 - package はカスタムローダーに縮小されます。package.path と package.cpath は空で、サンドボックスが標準のサーチャーを置き換えるため、以下のパスだけが検索対象です。
-- require はまずモジュール自身のフォルダを探し、次にスキンの Modules/Lib フォルダを探して、最初に見つかったファイルを読み込みます。同じ名前のモジュールファイルと Lib ファイルがあればモジュールファイルが優先されます。名前のドットはパス区切りになるため、require("DBControllers.dbScores") と require("DBControllers/dbScores") はどちらも DBControllers/dbScores.lua を読み込みます。非 ASCII のパスも動作します。
+- require はまずモジュール自身のフォルダを探し、次にスキンの Modules/Lib フォルダ、次にゲームフォルダの Global/Modules/Lib を探して、最初に見つかったファイルを読み込みます。Global/Modules のモジュールは、スキンの Modules/Lib より先に Global/Modules/Lib を探します。同じ名前のモジュールファイルと Lib ファイルがあればモジュールファイルが優先されます。名前のドットはパス区切りになるため、require("DBControllers.dbScores") と require("DBControllers/dbScores") はどちらも DBControllers/dbScores.lua を読み込みます。非 ASCII のパスも動作します。
 
 ```lua
 -- from intro_nokon/Script.lua

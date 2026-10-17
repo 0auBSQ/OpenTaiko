@@ -152,7 +152,9 @@ When the skin loads, the game scans four subfolders of `Modules/` and treats eve
 - `Modules/Activities/`: reusable sub-screens layered on a stage (for example `confirm_dialog`, `mod_select_dialog`, `song_select_core`).
 - `Modules/ROActivities/`: read-only overlays the game drives directly.
 
-The game does not scan `Modules/Lib/`. You load files there with `require`: a module's search path is its own folder followed by `Modules/Lib/`, so `require("dialogue")` resolves to `Modules/Lib/dialogue.lua`. You can also place stages and activities under `Global/Stages/` and `Global/Activities/` in the game's install folder; the game loads those for every skin.
+The game does not scan `Modules/Lib/`. You load files there with `require`: a module looks in its own folder, then in `Modules/Lib/`, then in `Global/Modules/Lib/` (see below), so `require("dialogue")` resolves to `Modules/Lib/dialogue.lua`.
+
+The game folder can also hold modules that every skin loads. `Global/Modules/` in the game's install folder has the same `Transitions/`, `Stages/`, `Activities/`, `ROActivities/` and `Lib/` subfolders as a skin's `Modules/`, and the game loads each global category right after the skin's. A name can exist in both places. When a skin module asks for a stage, activity, ROActivity or transition by name, it gets the skin's module, and a global module gets the global one; each falls back to the other place when its own has no module of that name. `require` follows the same rule: a global module looks in `Global/Modules/Lib/` before the skin's `Modules/Lib/`. The modules the game itself looks up by name (listed below) come from the skin first. `_boot` and `_title` must stay in the skin: when `Global/Modules/Stages/` holds either of them, the game stops with an error at startup.
 
 Within each category the game creates every module first and then runs `onStart` on each, in the order Transitions, Stages, Activities, ROActivities.
 

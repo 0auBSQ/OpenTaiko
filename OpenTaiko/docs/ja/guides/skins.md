@@ -152,7 +152,9 @@ My New Skin/
 - `Modules/Activities/`: ステージの上に重ねる再利用可能なサブ画面 (例えば `confirm_dialog`、`mod_select_dialog`、`song_select_core`)。
 - `Modules/ROActivities/`: ゲームが直接駆動する読み取り専用のオーバーレイ。
 
-ゲームは `Modules/Lib/` を走査しません。そこにあるファイルは `require` で読み込みます。モジュールの検索パスは自身のフォルダ、次に `Modules/Lib/` なので、`require("dialogue")` は `Modules/Lib/dialogue.lua` に解決されます。ステージとアクティビティはゲームのインストールフォルダの `Global/Stages/` と `Global/Activities/` の下にも置くことができ、ゲームはそれらをすべてのスキンで読み込みます。
+ゲームは `Modules/Lib/` を走査しません。そこにあるファイルは `require` で読み込みます。モジュールは自身のフォルダ、次に `Modules/Lib/`、次に `Global/Modules/Lib/`（後述）を探すので、`require("dialogue")` は `Modules/Lib/dialogue.lua` に解決されます。
+
+ゲームフォルダには、すべてのスキンが読み込むモジュールも置けます。ゲームのインストールフォルダの `Global/Modules/` には、スキンの `Modules/` と同じ `Transitions/`、`Stages/`、`Activities/`、`ROActivities/`、`Lib/` のサブフォルダがあり、ゲームは各カテゴリでスキンのモジュールの直後にグローバルのモジュールを読み込みます。同じ名前が両方にあってもかまいません。スキンのモジュールがステージ、アクティビティ、ROActivity、トランジションを名前で求めるとスキンのモジュールを、グローバルのモジュールが求めるとグローバルのモジュールを受け取り、自分の側にその名前のモジュールがなければもう一方を探します。`require` も同じ規則に従い、グローバルのモジュールはスキンの `Modules/Lib/` より先に `Global/Modules/Lib/` を探します。ゲーム自身が名前で探すモジュール（下記）はスキンのものが優先です。`_boot` と `_title` はスキンに置く必要があり、`Global/Modules/Stages/` にどちらかがあると、ゲームは起動時にエラーで停止します。
 
 各カテゴリ内で、ゲームはまずすべてのモジュールを作成し、その後 Transitions、Stages、Activities、ROActivities の順にそれぞれの `onStart` を実行します。
 

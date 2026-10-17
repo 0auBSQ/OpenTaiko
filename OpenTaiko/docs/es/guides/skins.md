@@ -152,7 +152,9 @@ Cuando se carga el skin, el juego escanea cuatro subcarpetas de `Modules/` y tra
 - `Modules/Activities/`: subpantallas reutilizables superpuestas a un stage (por ejemplo `confirm_dialog`, `mod_select_dialog`, `song_select_core`).
 - `Modules/ROActivities/`: superposiciones de solo lectura que el juego dirige directamente.
 
-El juego no escanea `Modules/Lib/`. Los archivos de ahí los cargas con `require`: la ruta de búsqueda de un módulo es su propia carpeta seguida de `Modules/Lib/`, así que `require("dialogue")` se resuelve a `Modules/Lib/dialogue.lua`. También puedes colocar stages y activities en `Global/Stages/` y `Global/Activities/` en la carpeta de instalación del juego; el juego los carga para todos los skins.
+El juego no escanea `Modules/Lib/`. Los archivos de ahí los cargas con `require`: un módulo busca en su propia carpeta, luego en `Modules/Lib/` y luego en `Global/Modules/Lib/` (ver más abajo), así que `require("dialogue")` se resuelve a `Modules/Lib/dialogue.lua`.
+
+La carpeta del juego también puede contener módulos que cargan todos los skins. `Global/Modules/` en la carpeta de instalación del juego tiene las mismas subcarpetas `Transitions/`, `Stages/`, `Activities/`, `ROActivities/` y `Lib/` que el `Modules/` de un skin, y el juego carga cada categoría global justo después de la del skin. Un nombre puede existir en los dos sitios. Cuando un módulo del skin pide un stage, una activity, una ROActivity o una transition por su nombre, obtiene el módulo del skin, y un módulo global obtiene el global; cada uno recurre al otro sitio cuando el suyo no tiene un módulo con ese nombre. `require` sigue la misma regla: un módulo global busca en `Global/Modules/Lib/` antes que en el `Modules/Lib/` del skin. Los módulos que el propio juego busca por nombre (en la lista de abajo) vienen primero del skin. `_boot` y `_title` deben quedarse en el skin: cuando `Global/Modules/Stages/` contiene alguno de los dos, el juego se detiene con un error al arrancar.
 
 Dentro de cada categoría el juego crea primero todos los módulos y después ejecuta `onStart` en cada uno, en el orden Transitions, Stages, Activities, ROActivities.
 

@@ -5,53 +5,74 @@ namespace OpenTaiko {
 	/// These methods are also accessible in the <c>ACTIVITY</c> global in writable Lua scripts.
 	/// </summary>
 	public class LuaROActivityFunc {
+		// the script is a global module: a name in both folders gives the global module
+		protected readonly bool _fromGlobal;
+
+		public LuaROActivityFunc(bool fromGlobal = false) {
+			_fromGlobal = fromGlobal;
+		}
+
 		public LuaROActivityWrapper? GetROActivity(string name) =>
-			LuaROActivityWrapper.GetROActivity(name);
+			LuaROActivityWrapper.GetROActivity(name, _fromGlobal);
 	}
 
 	/// <summary>
-	/// The public constructor wraps a <see cref="CLuaROActivityScript"/> loaded from <c>Modules/ROActivities/{name}/Script.lua</c>.
+	/// The public constructor wraps a <see cref="CLuaROActivityScript"/> loaded from <c>Modules/ROActivities/{name}/Script.lua</c>
+	/// (or <c>Global/Modules/ROActivities/{name}/Script.lua</c> in the game folder for a global one).
 	/// Scripts in ROActivities receive read-only views of CONFIG and GetSaveFile — any attempt
 	/// to write through those globals produces an error rather than modifying game state.
 	/// </summary>
 	public class LuaROActivityWrapper {
-		public static Dictionary<string, LuaROActivityWrapper> _allROActivities = new Dictionary<string, LuaROActivityWrapper>();
+		// The skin's ROActivities and the global ones (Global/Modules/ROActivities) are kept apart, as a name can be in both
+		public static Dictionary<string, LuaROActivityWrapper> _skinROActivities = new Dictionary<string, LuaROActivityWrapper>();
+		public static Dictionary<string, LuaROActivityWrapper> _globalROActivities = new Dictionary<string, LuaROActivityWrapper>();
+
+		private static IEnumerable<LuaROActivityWrapper> _allROActivities => _skinROActivities.Values.Concat(_globalROActivities.Values);
 
 		#region [Static management]
 
 		public static void ResetROActivityDictionary() {
-			foreach (var pair in _allROActivities)
-				pair.Value.DisposeActivity();
-			_allROActivities.Clear();
+			foreach (var act in _allROActivities)
+				act.DisposeActivity();
+			_skinROActivities.Clear();
+			_globalROActivities.Clear();
 		}
 
-		public static LuaROActivityWrapper? GetROActivity(string name) {
-			_allROActivities.TryGetValue(name, out var act);
-			return act;
+		// A ROActivity by name: the skin's first, unless preferGlobal (the lookup comes from a global module)
+		public static LuaROActivityWrapper? GetROActivity(string name, bool preferGlobal = false) {
+			var (first, second) = preferGlobal ? (_globalROActivities, _skinROActivities) : (_skinROActivities, _globalROActivities);
+			if (first.TryGetValue(name, out var act) || second.TryGetValue(name, out act))
+				return act;
+			return null;
 		}
 
 		public static void PropagateAfterSongEnumEvent() {
-			foreach (var pair in _allROActivities)
-				pair.Value.AfterSongsEnum();
+			foreach (var act in _allROActivities)
+				act.AfterSongsEnum();
 		}
 
 
 		public static void PropagateOnDestroy() {
-			foreach (var pair in _allROActivities)
-				pair.Value.OnDestroy();
+			foreach (var act in _allROActivities)
+				act.OnDestroy();
 		}
 
 		#endregion
 
 		protected CLuaActivityScriptBase lcActScript;
 
+		// loaded from the game's Global/Modules folder
+		internal bool IsGlobal { get; private protected set; }
+
 		public void DisposeActivity() {
 			lcActScript?.Dispose();
 		}
 
-		public LuaROActivityWrapper(string name) {
-			lcActScript = new CLuaROActivityScript(CSkin.Path($"Modules/ROActivities/{name}"), name);
-			_allROActivities[name] = this;
+		public LuaROActivityWrapper(string name, bool isGlobal = false) {
+			IsGlobal = isGlobal;
+			if (isGlobal == false) lcActScript = new CLuaROActivityScript(CSkin.Path($"Modules/ROActivities/{name}"), name);
+			else lcActScript = new CLuaROActivityScript(CSkin.GlobalModulePath("ROActivities", name), $"[GLOBAL]{name}");
+			(isGlobal ? _globalROActivities : _skinROActivities)[name] = this;
 		}
 
 		protected LuaROActivityWrapper() { } // initialized by derived class

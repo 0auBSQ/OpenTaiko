@@ -39,9 +39,9 @@ namespace OpenTaikoTests {
 		}
 
 		public void Dispose() {
-			if (LuaStageWrapper._allLuaStages.TryGetValue(Stage, out var stage)) {
+			if (LuaStageWrapper._skinLuaStages.TryGetValue(Stage, out var stage)) {
 				stage.DisposeStage();
-				LuaStageWrapper._allLuaStages.Remove(Stage);
+				LuaStageWrapper._skinLuaStages.Remove(Stage);
 			}
 			OpenTaiko.OpenTaiko.ConfigIni.strSystemSkinSubfolderFullName = _oldConfigSkin;
 			_skinPath.SetValue(null, _oldSkinPath);
