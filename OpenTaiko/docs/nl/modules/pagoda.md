@@ -78,7 +78,7 @@ Een uitdagingsbeklimming begint op een van de open startverdiepingen, stijgt é�
 | Functie | Beschrijving |
 | --- | --- |
 | `Rewards.grant(level)  -> table` | Kent de beloningen van een clear toe op het opslagbestand van speler 1, slaat ze op en geeft de pop-ups terug die op volgorde getoond moeten worden: `{ kind = "nameplate", id }`, `{ kind = "furniture", id }`, `{ kind = "key", key, count }`, `{ kind = "coins", amount }`. |
-| `Rewards.setup()` | Deelt de sleutelafbeeldingen één keer (`pagoda_reward_key_<id>`); roep het aan voordat je een sleutelpop-up toont. |
+| `Rewards.KEY_PICTURE` | Het voorvoegsel van de gedeelde texturen die de sleutelpop-ups tonen (`pagoda_reward_key_<id>`). De modules leveren geen sleutelafbeeldingen: de skin deelt er één per sleutel voordat hij een sleutelpop-up toont. |
 | `Rewards.show(r)  -> bool` | Start de pop-up van één beloning via de ROActivity `modal`. |
 | `Rewards.update()  -> bool`, `Rewards.draw()`, `Rewards.stop()` | Laat de pop-up lopen (true zolang hij speelt; hij leest zijn eigen invoer), tekent hem, laat hem vallen. |
 | `Rewards.poolOf(level)`, `Rewards.nameplateOf(level)` | De beloningspool van een verdieping, en het naamplaatje dat haar eerste clear geeft. |
@@ -114,6 +114,6 @@ if run:buildDan() and DANBUILDER:Mount() then return Exit("play") end
 
 -- back from the play
 local r = run:clear()            -- or run:fail()
-Rewards.setup()
+for id in pairs(Rewards.KEYS) do SHARED:SetSharedTexture(Rewards.KEY_PICTURE .. id, "Textures/key_" .. id .. ".png") end
 for _, reward in ipairs(r.rewards) do queue[#queue + 1] = reward end   -- then Rewards.show / update / draw
 ```

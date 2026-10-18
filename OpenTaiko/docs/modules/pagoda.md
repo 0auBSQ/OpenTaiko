@@ -78,7 +78,7 @@ A challenge run starts on one of the open starting floors, climbs one floor per 
 | Function | Description |
 | --- | --- |
 | `Rewards.grant(level)  -> table` | Grants and saves a clear's rewards on player 1's save, and returns the pop-ups to show in order: `{ kind = "nameplate", id }`, `{ kind = "furniture", id }`, `{ kind = "key", key, count }`, `{ kind = "coins", amount }`. |
-| `Rewards.setup()` | Shares the key pictures once (`pagoda_reward_key_<id>`); call it before showing a key pop-up. |
+| `Rewards.KEY_PICTURE` | The prefix of the shared textures the key pop-ups show (`pagoda_reward_key_<id>`). The modules ship no key pictures: the skin shares one per key before showing a key pop-up. |
 | `Rewards.show(r)  -> bool` | Starts the pop-up of one reward through the `modal` ROActivity. |
 | `Rewards.update()  -> bool`, `Rewards.draw()`, `Rewards.stop()` | Runs the pop-up (true while it plays; it reads its own input), draws it, drops it. |
 | `Rewards.poolOf(level)`, `Rewards.nameplateOf(level)` | A floor's reward pool, and the nameplate its first clear gives. |
@@ -114,6 +114,6 @@ if run:buildDan() and DANBUILDER:Mount() then return Exit("play") end
 
 -- back from the play
 local r = run:clear()            -- or run:fail()
-Rewards.setup()
+for id in pairs(Rewards.KEYS) do SHARED:SetSharedTexture(Rewards.KEY_PICTURE .. id, "Textures/key_" .. id .. ".png") end
 for _, reward in ipairs(r.rewards) do queue[#queue + 1] = reward end   -- then Rewards.show / update / draw
 ```

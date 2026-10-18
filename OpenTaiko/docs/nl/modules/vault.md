@@ -8,7 +8,7 @@ De geheime kluis bevat drie kisten, die je opent met sleutels die de speler elde
 
 | Module | Wat het bevat |
 | --- | --- |
-| `Vault.Keys` | De drie sleutels: hun aantallen, namen en afbeeldingen, en of de kluis open is. |
+| `Vault.Keys` | De drie sleutels: hun aantallen en namen, en of de kluis open is. |
 | `Vault.Chests` | De drie kisten, hun gewogen beloningspools en de beloningspop-ups. |
 | `Vault.Texts` | De eigen strings van de modules (`lang/<code>/vault.json`). |
 
@@ -21,7 +21,6 @@ Een sleutel wordt aangeduid met zijn nummer of zijn id: 1 `"simple"`, 2 `"gold"`
 | `Keys.count(key)  -> number` | Hoeveel van die sleutel speler 1 heeft. |
 | `Keys.set(key, n)`, `Keys.add(key, n?)` | Stelt het aantal in; telt `n` op (standaard 1). |
 | `Keys.name(key)  -> string` | De naam van de sleutel in de taal van het spel. |
-| `Keys.picture(key)  -> string` | Het absolute pad van de afbeelding van de sleutel, voor `TEXTURE:CreateTextureFromAbsolutePath` of `SHARED:SetSharedTextureUsingAbsolutePath`. |
 | `Keys.vaultOpen()  -> bool` | Of de kluis open is: de trigger `.vault_opened`, die de eigen weg van de skin naar de kluis zet. Zolang ze dicht is, geven andere modules munten in plaats van sleutels. |
 | `Keys.index(key)  -> number` | Het nummer van de sleutel. |
 

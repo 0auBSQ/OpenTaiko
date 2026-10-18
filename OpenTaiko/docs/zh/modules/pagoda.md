@@ -78,7 +78,7 @@
 | 函数 | 说明 |
 | --- | --- |
 | `Rewards.grant(level)  -> table` | 在玩家 1 的存档上发放并保存一次过关的奖励，并按顺序返回要显示的弹窗：`{ kind = "nameplate", id }`、`{ kind = "furniture", id }`、`{ kind = "key", key, count }`、`{ kind = "coins", amount }`。 |
-| `Rewards.setup()` | 一次性共享钥匙图片（`pagoda_reward_key_<id>`）；请在显示钥匙弹窗之前调用。 |
+| `Rewards.KEY_PICTURE` | 钥匙弹窗显示的共享纹理的前缀（`pagoda_reward_key_<id>`）。模块不附带钥匙图片：皮肤在显示钥匙弹窗之前为每把钥匙共享一张。 |
 | `Rewards.show(r)  -> bool` | 通过 `modal` 只读活动开始播放一个奖励的弹窗。 |
 | `Rewards.update()  -> bool`, `Rewards.draw()`, `Rewards.stop()` | 运行弹窗（播放期间为 true；它自己读取输入）、绘制它、丢弃它。 |
 | `Rewards.poolOf(level)`, `Rewards.nameplateOf(level)` | 某层的奖励池，以及首次通过该层所得的名牌。 |
@@ -114,6 +114,6 @@ if run:buildDan() and DANBUILDER:Mount() then return Exit("play") end
 
 -- back from the play
 local r = run:clear()            -- or run:fail()
-Rewards.setup()
+for id in pairs(Rewards.KEYS) do SHARED:SetSharedTexture(Rewards.KEY_PICTURE .. id, "Textures/key_" .. id .. ".png") end
 for _, reward in ipairs(r.rewards) do queue[#queue + 1] = reward end   -- then Rewards.show / update / draw
 ```

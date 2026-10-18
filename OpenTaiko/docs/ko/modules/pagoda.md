@@ -78,7 +78,7 @@
 | 함수 | 설명 |
 | --- | --- |
 | `Rewards.grant(level)  -> table` | 클리어 보상을 플레이어 1의 세이브에 지급하고 저장한 뒤, 보여 줄 팝업을 순서대로 반환합니다: `{ kind = "nameplate", id }`, `{ kind = "furniture", id }`, `{ kind = "key", key, count }`, `{ kind = "coins", amount }`. |
-| `Rewards.setup()` | 열쇠 그림을 한 번 공유합니다(`pagoda_reward_key_<id>`). 열쇠 팝업을 보여 주기 전에 호출하십시오. |
+| `Rewards.KEY_PICTURE` | 열쇠 팝업이 보여 주는 공유 텍스처의 접두사(`pagoda_reward_key_<id>`). 모듈에는 열쇠 그림이 없습니다. 열쇠 팝업을 보여 주기 전에 스킨이 열쇠마다 하나씩 공유합니다. |
 | `Rewards.show(r)  -> bool` | `modal` ROActivity로 보상 하나의 팝업을 시작합니다. |
 | `Rewards.update()  -> bool`, `Rewards.draw()`, `Rewards.stop()` | 팝업을 진행하고(재생 중에는 true. 입력은 스스로 읽습니다), 그리고, 버립니다. |
 | `Rewards.poolOf(level)`, `Rewards.nameplateOf(level)` | 층의 보상 풀, 그리고 그 층의 첫 클리어로 얻는 네임플레이트. |
@@ -114,6 +114,6 @@ if run:buildDan() and DANBUILDER:Mount() then return Exit("play") end
 
 -- back from the play
 local r = run:clear()            -- or run:fail()
-Rewards.setup()
+for id in pairs(Rewards.KEYS) do SHARED:SetSharedTexture(Rewards.KEY_PICTURE .. id, "Textures/key_" .. id .. ".png") end
 for _, reward in ipairs(r.rewards) do queue[#queue + 1] = reward end   -- then Rewards.show / update / draw
 ```

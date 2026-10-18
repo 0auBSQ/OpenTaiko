@@ -8,7 +8,7 @@
 
 | 模块 | 内容 |
 | --- | --- |
-| `Vault.Keys` | 三种钥匙：它们的数量、名称和图片，以及金库是否已开启。 |
+| `Vault.Keys` | 三种钥匙：它们的数量和名称，以及金库是否已开启。 |
 | `Vault.Chests` | 三个宝箱、它们的加权奖励池和奖励弹窗。 |
 | `Vault.Texts` | 模块自己的字符串（`lang/<code>/vault.json`）。 |
 
@@ -21,7 +21,6 @@
 | `Keys.count(key)  -> number` | 玩家 1 持有的该钥匙数量。 |
 | `Keys.set(key, n)`, `Keys.add(key, n?)` | 设置数量；增加 `n`（默认 1）。 |
 | `Keys.name(key)  -> string` | 钥匙在游戏语言中的名称。 |
-| `Keys.picture(key)  -> string` | 钥匙图片的绝对路径，用于 `TEXTURE:CreateTextureFromAbsolutePath` 或 `SHARED:SetSharedTextureUsingAbsolutePath`。 |
 | `Keys.vaultOpen()  -> bool` | 金库是否已开启：即由皮肤自己的金库入口设置的触发器 `.vault_opened`。金库关闭期间，其他模块会给金币而不是钥匙。 |
 | `Keys.index(key)  -> number` | 钥匙的编号。 |
 

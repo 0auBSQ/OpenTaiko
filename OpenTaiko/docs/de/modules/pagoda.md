@@ -78,7 +78,7 @@ Ein Herausforderungslauf beginnt auf einer der offenen Startetagen, steigt pro C
 | Funktion | Beschreibung |
 | --- | --- |
 | `Rewards.grant(level)  -> table` | Vergibt und speichert die Belohnungen eines Clears auf dem Spielstand von Spieler 1 und gibt die anzuzeigenden Pop-ups in Reihenfolge zurück: `{ kind = "nameplate", id }`, `{ kind = "furniture", id }`, `{ kind = "key", key, count }`, `{ kind = "coins", amount }`. |
-| `Rewards.setup()` | Teilt die Schlüsselbilder einmalig (`pagoda_reward_key_<id>`); rufen Sie es auf, bevor Sie ein Schlüssel-Pop-up zeigen. |
+| `Rewards.KEY_PICTURE` | Das Präfix der geteilten Texturen, die die Schlüssel-Pop-ups zeigen (`pagoda_reward_key_<id>`). Die Module liefern keine Schlüsselbilder: Der Skin teilt eines pro Schlüssel, bevor er ein Schlüssel-Pop-up zeigt. |
 | `Rewards.show(r)  -> bool` | Startet das Pop-up einer Belohnung über die ROActivity `modal`. |
 | `Rewards.update()  -> bool`, `Rewards.draw()`, `Rewards.stop()` | Führt das Pop-up aus (true, solange es läuft; es liest seine eigene Eingabe), zeichnet es, verwirft es. |
 | `Rewards.poolOf(level)`, `Rewards.nameplateOf(level)` | Der Belohnungspool einer Etage und das Namensschild, das ihr erster Clear vergibt. |
@@ -114,6 +114,6 @@ if run:buildDan() and DANBUILDER:Mount() then return Exit("play") end
 
 -- back from the play
 local r = run:clear()            -- or run:fail()
-Rewards.setup()
+for id in pairs(Rewards.KEYS) do SHARED:SetSharedTexture(Rewards.KEY_PICTURE .. id, "Textures/key_" .. id .. ".png") end
 for _, reward in ipairs(r.rewards) do queue[#queue + 1] = reward end   -- then Rewards.show / update / draw
 ```

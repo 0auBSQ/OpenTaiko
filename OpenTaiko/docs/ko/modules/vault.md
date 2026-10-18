@@ -8,7 +8,7 @@
 
 | 모듈 | 내용 |
 | --- | --- |
-| `Vault.Keys` | 열쇠 세 가지: 개수, 이름, 그림, 그리고 금고가 열려 있는지 여부. |
+| `Vault.Keys` | 열쇠 세 가지: 개수와 이름, 그리고 금고가 열려 있는지 여부. |
 | `Vault.Chests` | 상자 세 개, 그 가중치 보상 풀, 보상 팝업. |
 | `Vault.Texts` | 모듈 자체의 문자열(`lang/<code>/vault.json`). |
 
@@ -21,7 +21,6 @@
 | `Keys.count(key)  -> number` | 플레이어 1이 가진 그 열쇠의 개수. |
 | `Keys.set(key, n)`, `Keys.add(key, n?)` | 개수를 설정합니다; `n`(기본값 1)을 더합니다. |
 | `Keys.name(key)  -> string` | 게임 언어로 된 열쇠의 이름. |
-| `Keys.picture(key)  -> string` | 열쇠 그림의 절대 경로로, `TEXTURE:CreateTextureFromAbsolutePath`나 `SHARED:SetSharedTextureUsingAbsolutePath`에 씁니다. |
 | `Keys.vaultOpen()  -> bool` | 금고가 열려 있는지 여부: 스킨 고유의 금고 입구가 설정하는 트리거 `.vault_opened`. 닫혀 있는 동안 다른 모듈은 열쇠 대신 코인을 줍니다. |
 | `Keys.index(key)  -> number` | 열쇠의 번호. |
 

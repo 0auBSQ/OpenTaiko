@@ -8,7 +8,7 @@
 
 | モジュール | 内容 |
 | --- | --- |
-| `Vault.Keys` | 3 種類の鍵: その数、名前、画像、そして金庫が開いているかどうか。 |
+| `Vault.Keys` | 3 種類の鍵: その数と名前、そして金庫が開いているかどうか。 |
 | `Vault.Chests` | 3 つの宝箱、その重み付きの報酬プール、報酬のポップアップ。 |
 | `Vault.Texts` | モジュール自身の文字列 (`lang/<code>/vault.json`)。 |
 
@@ -21,7 +21,6 @@
 | `Keys.count(key)  -> number` | プレイヤー 1 が持っているその鍵の数。 |
 | `Keys.set(key, n)`, `Keys.add(key, n?)` | 数を設定します。`n` (既定は 1) を加えます。 |
 | `Keys.name(key)  -> string` | ゲームの言語での鍵の名前。 |
-| `Keys.picture(key)  -> string` | 鍵の画像の絶対パス。`TEXTURE:CreateTextureFromAbsolutePath` や `SHARED:SetSharedTextureUsingAbsolutePath` に使います。 |
 | `Keys.vaultOpen()  -> bool` | 金庫が開いているかどうか: スキン独自の金庫への入り口が設定するトリガー `.vault_opened`。閉じている間、他のモジュールは鍵の代わりにコインを与えます。 |
 | `Keys.index(key)  -> number` | 鍵の番号。 |
 

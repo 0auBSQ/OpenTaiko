@@ -8,7 +8,7 @@ La chambre forte secrète contient trois coffres, que l'on ouvre avec des clés 
 
 | Module | Ce qu'il contient |
 | --- | --- |
-| `Vault.Keys` | Les trois clés : leur nombre, leurs noms et leurs images, et si la chambre forte est ouverte. |
+| `Vault.Keys` | Les trois clés : leur nombre et leurs noms, et si la chambre forte est ouverte. |
 | `Vault.Chests` | Les trois coffres, leurs pools de récompenses pondérés et les pop-ups de récompense. |
 | `Vault.Texts` | Les chaînes propres aux modules (`lang/<code>/vault.json`). |
 
@@ -21,7 +21,6 @@ Une clé se désigne par son numéro ou son identifiant : 1 `"simple"`, 2 `"gold
 | `Keys.count(key)  -> number` | Combien de clés de ce type possède le joueur 1. |
 | `Keys.set(key, n)`, `Keys.add(key, n?)` | Définit le nombre ; ajoute `n` (1 par défaut). |
 | `Keys.name(key)  -> string` | Le nom de la clé dans la langue du jeu. |
-| `Keys.picture(key)  -> string` | Le chemin absolu de l'image de la clé, pour `TEXTURE:CreateTextureFromAbsolutePath` ou `SHARED:SetSharedTextureUsingAbsolutePath`. |
 | `Keys.vaultOpen()  -> bool` | Si la chambre forte est ouverte : le déclencheur `.vault_opened`, que définit le chemin propre au skin vers la chambre forte. Tant qu'elle est fermée, les autres modules donnent des pièces au lieu de clés. |
 | `Keys.index(key)  -> number` | Le numéro de la clé. |
 

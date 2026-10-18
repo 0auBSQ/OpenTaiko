@@ -3,7 +3,6 @@
 -- vault is open once the trigger .vault_opened is set (the skin's gate sets it).
 
 local Texts = require("Vault.Texts")
-local HERE = require("Core.Here")(...)
 
 local M = {}
 
@@ -38,11 +37,6 @@ end
 function M.name(key)
     local i = M.index(key)
     return Texts.get("key_" .. i, FALLBACK[i])
-end
-
--- the key's picture (an absolute path: SHARED:SetSharedTextureUsingAbsolutePath, TEXTURE:CreateTextureFromAbsolutePath)
-function M.picture(key)
-    return (HERE or "") .. "Textures/key_" .. M.IDS[M.index(key)] .. ".png"
 end
 
 function M.vaultOpen()

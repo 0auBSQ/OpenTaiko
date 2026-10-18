@@ -40,7 +40,7 @@ M.KEYS = {
     gold   = { rarity = "Rare", coins = 100 },
     optk   = { rarity = "Epic", coins = 300 },
 }
-M.KEY_PICTURE = "pagoda_reward_key_"      -- the shared textures the key pop-ups show
+M.KEY_PICTURE = "pagoda_reward_key_"      -- the shared textures the key pop-ups show, one per key, shared by the skin
 
 -- the modal's rarity numbers
 local RARITY_INT = { Poor = 0, Common = 0, Uncommon = 1, Rare = 2, Epic = 3, Legendary = 4, Mythical = 4 }
@@ -106,15 +106,6 @@ local function counter(sf, name)
     return math.floor((tonumber(sf:GetGlobalCounter(name)) or 0) + 0.5)
 end
 
-local _shared = false
-
--- the key pictures, shared once per session
-function M.setup()
-    if _shared then return end
-    _shared = true
-    for id in pairs(M.KEYS) do SHARED:SetSharedTextureUsingAbsolutePath(M.KEY_PICTURE .. id, Keys.picture(id)) end
-end
-
 -- the rewards of a challenge clear of level, saved now; returns the pop-ups to show, in order:
 -- { kind = "nameplate", id }, { kind = "furniture", id }, { kind = "key", key, count }, { kind = "coins", amount }
 function M.grant(level)
@@ -162,7 +153,7 @@ function M.grant(level)
 end
 
 -- starts the pop-up of one reward from grant(); false when it can't show. The furniture pop-up shows My
--- Room's shared thumbnail "myroom_thumb_<id>", the key pop-up the picture setup() shared.
+-- Room's shared thumbnail "myroom_thumb_<id>", the key pop-up the skin's shared texture KEY_PICTURE .. key.
 function M.show(r)
     local modal = ROACTIVITY:GetROActivity("modal")
     if modal == nil or r == nil then return false end

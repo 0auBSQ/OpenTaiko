@@ -8,7 +8,7 @@ La bóveda secreta guarda tres cofres, que se abren con llaves que el jugador ga
 
 | Módulo | Qué contiene |
 | --- | --- |
-| `Vault.Keys` | Las tres llaves: sus cantidades, nombres e imágenes, y si la bóveda está abierta. |
+| `Vault.Keys` | Las tres llaves: sus cantidades y nombres, y si la bóveda está abierta. |
 | `Vault.Chests` | Los tres cofres, sus conjuntos ponderados de recompensas y las ventanas emergentes de recompensa. |
 | `Vault.Texts` | Las cadenas propias de los módulos (`lang/<code>/vault.json`). |
 
@@ -21,7 +21,6 @@ Una llave se nombra por su número o por su id: 1 `"simple"`, 2 `"gold"`, 3 `"op
 | `Keys.count(key)  -> number` | Cuántas llaves de ese tipo tiene el jugador 1. |
 | `Keys.set(key, n)`, `Keys.add(key, n?)` | Establece la cantidad; suma `n` (1 por defecto). |
 | `Keys.name(key)  -> string` | El nombre de la llave en el idioma del juego. |
-| `Keys.picture(key)  -> string` | La ruta absoluta de la imagen de la llave, para `TEXTURE:CreateTextureFromAbsolutePath` o `SHARED:SetSharedTextureUsingAbsolutePath`. |
 | `Keys.vaultOpen()  -> bool` | Si la bóveda está abierta: el trigger `.vault_opened`, que activa la propia vía de acceso del skin a la bóveda. Mientras está cerrada, los demás módulos dan monedas en lugar de llaves. |
 | `Keys.index(key)  -> number` | El número de la llave. |
 

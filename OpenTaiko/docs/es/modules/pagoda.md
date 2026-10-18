@@ -78,7 +78,7 @@ Un intento de desafío empieza en uno de los pisos iniciales disponibles, sube u
 | Función | Descripción |
 | --- | --- |
 | `Rewards.grant(level)  -> table` | Concede y guarda las recompensas de un clear en la partida guardada del jugador 1, y devuelve las ventanas emergentes que se deben mostrar, en orden: `{ kind = "nameplate", id }`, `{ kind = "furniture", id }`, `{ kind = "key", key, count }`, `{ kind = "coins", amount }`. |
-| `Rewards.setup()` | Comparte las imágenes de las llaves una vez (`pagoda_reward_key_<id>`); llámala antes de mostrar la ventana de una llave. |
+| `Rewards.KEY_PICTURE` | El prefijo de las texturas compartidas que muestran las ventanas de las llaves (`pagoda_reward_key_<id>`). Los módulos no incluyen imágenes de llaves: el skin comparte una por llave antes de mostrar la ventana de una llave. |
 | `Rewards.show(r)  -> bool` | Inicia la ventana emergente de una recompensa a través de la ROActivity `modal`. |
 | `Rewards.update()  -> bool`, `Rewards.draw()`, `Rewards.stop()` | Ejecuta la ventana emergente (true mientras se reproduce; lee su propia entrada), la dibuja, la descarta. |
 | `Rewards.poolOf(level)`, `Rewards.nameplateOf(level)` | El conjunto de recompensas de un piso, y la placa de nombre que da su primer clear. |
@@ -114,6 +114,6 @@ if run:buildDan() and DANBUILDER:Mount() then return Exit("play") end
 
 -- back from the play
 local r = run:clear()            -- or run:fail()
-Rewards.setup()
+for id in pairs(Rewards.KEYS) do SHARED:SetSharedTexture(Rewards.KEY_PICTURE .. id, "Textures/key_" .. id .. ".png") end
 for _, reward in ipairs(r.rewards) do queue[#queue + 1] = reward end   -- then Rewards.show / update / draw
 ```

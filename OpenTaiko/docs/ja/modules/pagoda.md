@@ -78,7 +78,7 @@
 | 関数 | 説明 |
 | --- | --- |
 | `Rewards.grant(level)  -> table` | プレイヤー 1 のセーブにクリアの報酬を付与して保存し、表示するポップアップを順番に返します: `{ kind = "nameplate", id }`、`{ kind = "furniture", id }`、`{ kind = "key", key, count }`、`{ kind = "coins", amount }`。 |
-| `Rewards.setup()` | 鍵の画像を一度共有します (`pagoda_reward_key_<id>`)。鍵のポップアップを表示する前に呼び出してください。 |
+| `Rewards.KEY_PICTURE` | 鍵のポップアップが表示する共有テクスチャの接頭辞 (`pagoda_reward_key_<id>`)。モジュールは鍵の画像を含みません。鍵のポップアップを表示する前に、スキンが鍵ごとに 1 枚共有します。 |
 | `Rewards.show(r)  -> bool` | `modal` ROActivity で 1 つの報酬のポップアップを開始します。 |
 | `Rewards.update()  -> bool`, `Rewards.draw()`, `Rewards.stop()` | ポップアップを動かし (再生中は true。入力は自分で読みます)、描画し、破棄します。 |
 | `Rewards.poolOf(level)`, `Rewards.nameplateOf(level)` | 階の報酬プールと、その初回クリアで得られるネームプレート。 |
@@ -114,6 +114,6 @@ if run:buildDan() and DANBUILDER:Mount() then return Exit("play") end
 
 -- back from the play
 local r = run:clear()            -- or run:fail()
-Rewards.setup()
+for id in pairs(Rewards.KEYS) do SHARED:SetSharedTexture(Rewards.KEY_PICTURE .. id, "Textures/key_" .. id .. ".png") end
 for _, reward in ipairs(r.rewards) do queue[#queue + 1] = reward end   -- then Rewards.show / update / draw
 ```

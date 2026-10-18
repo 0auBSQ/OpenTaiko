@@ -8,7 +8,7 @@ The secret vault holds three chests, opened with keys the player wins elsewhere 
 
 | Module | What it holds |
 | --- | --- |
-| `Vault.Keys` | The three keys: their counts, names and pictures, and whether the vault is open. |
+| `Vault.Keys` | The three keys: their counts and names, and whether the vault is open. |
 | `Vault.Chests` | The three chests, their weighted reward pools and the reward pop-ups. |
 | `Vault.Texts` | The modules' own strings (`lang/<code>/vault.json`). |
 
@@ -21,7 +21,6 @@ A key is named by its number or its id: 1 `"simple"`, 2 `"gold"`, 3 `"optk"`. Ea
 | `Keys.count(key)  -> number` | How many of that key player 1 holds. |
 | `Keys.set(key, n)`, `Keys.add(key, n?)` | Sets the count; adds `n` (1 by default). |
 | `Keys.name(key)  -> string` | The key's name in the game's language. |
-| `Keys.picture(key)  -> string` | The absolute path of the key's picture, for `TEXTURE:CreateTextureFromAbsolutePath` or `SHARED:SetSharedTextureUsingAbsolutePath`. |
 | `Keys.vaultOpen()  -> bool` | Whether the vault is open: the trigger `.vault_opened`, which the skin's own way into the vault sets. While it is shut, other modules give coins instead of keys. |
 | `Keys.index(key)  -> number` | The key's number. |
 

@@ -8,7 +8,7 @@ Der Geheimtresor enthält drei Truhen, die mit Schlüsseln geöffnet werden, die
 
 | Modul | Inhalt |
 | --- | --- |
-| `Vault.Keys` | Die drei Schlüssel: ihre Anzahl, Namen und Bilder, und ob der Tresor offen ist. |
+| `Vault.Keys` | Die drei Schlüssel: ihre Anzahl und Namen, und ob der Tresor offen ist. |
 | `Vault.Chests` | Die drei Truhen, ihre gewichteten Belohnungspools und die Belohnungs-Pop-ups. |
 | `Vault.Texts` | Die eigenen Strings der Module (`lang/<code>/vault.json`). |
 
@@ -21,7 +21,6 @@ Ein Schlüssel wird über seine Nummer oder seine ID benannt: 1 `"simple"`, 2 `"
 | `Keys.count(key)  -> number` | Wie viele dieser Schlüssel Spieler 1 besitzt. |
 | `Keys.set(key, n)`, `Keys.add(key, n?)` | Setzt die Anzahl; addiert `n` (standardmäßig 1). |
 | `Keys.name(key)  -> string` | Der Name des Schlüssels in der Sprache des Spiels. |
-| `Keys.picture(key)  -> string` | Der absolute Pfad des Schlüsselbilds, für `TEXTURE:CreateTextureFromAbsolutePath` oder `SHARED:SetSharedTextureUsingAbsolutePath`. |
 | `Keys.vaultOpen()  -> bool` | Ob der Tresor offen ist: der Trigger `.vault_opened`, den der skineigene Weg in den Tresor setzt. Solange er verschlossen ist, vergeben andere Module Münzen statt Schlüsseln. |
 | `Keys.index(key)  -> number` | Die Nummer des Schlüssels. |
 

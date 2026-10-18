@@ -78,7 +78,7 @@ Une ascension en mode défi commence sur l'un des étages de départ ouverts, mo
 | Fonction | Description |
 | --- | --- |
 | `Rewards.grant(level)  -> table` | Accorde et enregistre les récompenses d'une réussite sur la sauvegarde du joueur 1, et renvoie les pop-ups à afficher dans l'ordre : `{ kind = "nameplate", id }`, `{ kind = "furniture", id }`, `{ kind = "key", key, count }`, `{ kind = "coins", amount }`. |
-| `Rewards.setup()` | Partage une fois les images des clés (`pagoda_reward_key_<id>`) ; appelez-la avant d'afficher un pop-up de clé. |
+| `Rewards.KEY_PICTURE` | Le préfixe des textures partagées qu'affichent les pop-ups de clé (`pagoda_reward_key_<id>`). Les modules ne fournissent aucune image de clé : le skin en partage une par clé avant d'afficher un pop-up de clé. |
 | `Rewards.show(r)  -> bool` | Lance le pop-up d'une récompense via la ROActivity `modal`. |
 | `Rewards.update()  -> bool`, `Rewards.draw()`, `Rewards.stop()` | Fait tourner le pop-up (true tant qu'il joue ; il lit ses propres entrées), le dessine, l'abandonne. |
 | `Rewards.poolOf(level)`, `Rewards.nameplateOf(level)` | Le pool de récompenses d'un étage, et la plaque de nom que donne sa première réussite. |
@@ -114,6 +114,6 @@ if run:buildDan() and DANBUILDER:Mount() then return Exit("play") end
 
 -- back from the play
 local r = run:clear()            -- or run:fail()
-Rewards.setup()
+for id in pairs(Rewards.KEYS) do SHARED:SetSharedTexture(Rewards.KEY_PICTURE .. id, "Textures/key_" .. id .. ".png") end
 for _, reward in ipairs(r.rewards) do queue[#queue + 1] = reward end   -- then Rewards.show / update / draw
 ```

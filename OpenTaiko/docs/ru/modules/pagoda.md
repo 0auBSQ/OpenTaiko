@@ -78,7 +78,7 @@
 | Функция | Описание |
 | --- | --- |
 | `Rewards.grant(level)  -> table` | Выдаёт и сохраняет награды клира в сохранении игрока 1 и возвращает всплывающие окна, которые нужно показать по порядку: `{ kind = "nameplate", id }`, `{ kind = "furniture", id }`, `{ kind = "key", key, count }`, `{ kind = "coins", amount }`. |
-| `Rewards.setup()` | Один раз делает картинки ключей общими (`pagoda_reward_key_<id>`); вызывайте перед показом окна ключа. |
+| `Rewards.KEY_PICTURE` | Префикс общих текстур, которые показывают окна ключей (`pagoda_reward_key_<id>`). Модули не содержат картинок ключей: скин делает общей по одной на ключ перед показом окна ключа. |
 | `Rewards.show(r)  -> bool` | Запускает всплывающее окно одной награды через ROActivity `modal`. |
 | `Rewards.update()  -> bool`, `Rewards.draw()`, `Rewards.stop()` | Обрабатывает всплывающее окно (true, пока оно идёт; ввод оно читает само), рисует его, убирает его. |
 | `Rewards.poolOf(level)`, `Rewards.nameplateOf(level)` | Пул наград этажа и табличка имени, которую даёт его первый клир. |
@@ -114,6 +114,6 @@ if run:buildDan() and DANBUILDER:Mount() then return Exit("play") end
 
 -- back from the play
 local r = run:clear()            -- or run:fail()
-Rewards.setup()
+for id in pairs(Rewards.KEYS) do SHARED:SetSharedTexture(Rewards.KEY_PICTURE .. id, "Textures/key_" .. id .. ".png") end
 for _, reward in ipairs(r.rewards) do queue[#queue + 1] = reward end   -- then Rewards.show / update / draw
 ```
