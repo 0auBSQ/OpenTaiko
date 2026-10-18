@@ -156,6 +156,13 @@ My New Skin/
 
 게임 폴더에는 모든 스킨이 로드하는 모듈도 둘 수 있습니다. 게임 설치 폴더의 `Global/Modules/`에는 스킨의 `Modules/`와 같은 `Transitions/`, `Stages/`, `Activities/`, `ROActivities/`, `Lib/` 하위 폴더가 있으며, 게임은 각 범주에서 스킨의 모듈 바로 다음에 전역 모듈을 로드합니다. 같은 이름이 두 곳에 모두 있을 수 있습니다. 스킨 모듈이 스테이지, 액티비티, ROActivity, 트랜지션을 이름으로 요청하면 스킨의 모듈을, 전역 모듈이 요청하면 전역 모듈을 받으며, 자기 쪽에 그 이름의 모듈이 없으면 다른 쪽을 찾습니다. `require`도 같은 규칙을 따르므로 전역 모듈은 스킨의 `Modules/Lib/`보다 먼저 `Global/Modules/Lib/`를 찾습니다. 게임이 직접 이름으로 찾는 모듈(아래 목록)은 스킨의 것이 우선입니다. `_boot`와 `_title`은 스킨에 있어야 하며, `Global/Modules/Stages/`에 둘 중 하나가 있으면 게임은 시작할 때 오류로 멈춥니다.
 
+게임이 `Global/Modules/Lib/`에 함께 제공하는 Lib 파일은 [제공 모듈](../modules/README.md)에서 설명합니다. UI 라이브러리, 대화 상자, 입력과 현지화 헬퍼, 3D 월드 엔진, 그리고 미지의 탑, 금고, 코인 숍의 규칙이며, `require("UI.Pick")`이나 `require("Core.Easing")` 같은 이름 공간이 붙은 이름으로 불러옵니다. 전역 파일이 놓이는 위치에서 몇 가지 규칙이 나옵니다.
+
+- Lib 파일은 자신을 require하는 모듈의 Lua 상태에서 실행됩니다. 그 안의 require는 그 모듈의 검색 순서를 따르고, `TEXTURE`, `SOUND`, `JSONLOADER` 등의 로더에 주는 상대 경로는 그 모듈의 폴더를 기준으로 해석됩니다. 에셋을 함께 제공하는 Lib 파일은 `require("Core.Here")(...)`와 절대 경로 로더로 에셋에 접근합니다.
+- 전역 모듈에는 `Locales/`도 `ThemeSettings.json`도 없습니다. `THEME:GetSkinString`과 테마 설정은 활성 스킨의 것을 읽습니다. 전역 모듈은 문자열을 자체 `lang/` 폴더에 둡니다(10단계).
+- `SHARED`의 텍스처, 소리, 문자열은 스킨과 모든 전역 모듈이 함께 쓰는 하나의 이름 공간입니다. 키에 접두사를 붙이십시오.
+- 업데이트는 파일을 추가하고 교체하지만 예전 파일을 지우지는 않으며, 스킨 모듈은 `Global/Modules/Lib/`보다 먼저 스킨의 `Modules/Lib/`를 찾으므로 같은 이름의 오래된 스킨 파일이 우선하게 됩니다. 그래서 제공 모듈은 어떤 스킨 파일과도 겹치지 않는 이름 공간 폴더에 있고, 기본 제공 스킨은 예전 Lib 이름의 파일을 지우는 대신 제공 모듈로 넘겨주는 두 줄짜리 전달 파일로 남겨 둡니다.
+
 각 범주 안에서 게임은 모든 모듈을 먼저 만든 뒤 각각에 `onStart`를 실행합니다. 순서는 Transitions, Stages, Activities, ROActivities입니다.
 
 게임은 이 모듈들을 이름으로 찾으며, 기본 제공 스킨은 모두 제공합니다.
@@ -217,13 +224,14 @@ function onDestroy() end
 
 ## 10단계: lang/으로 모듈 지역화하기
 
-모듈은 `Script.lua` 옆의 `lang/` 하위 폴더에 자체 번역을 둘 수 있습니다. 모듈 자체 폴더가 `require` 경로에 있으므로 `require("lang.ja")`는 `lang/ja.lua`로 해석됩니다. 기본 제공 스킨은 헬퍼 `Modules/Lib/i18n.lua`를 통해 큰 스테이지에서 이렇게 합니다(예: `Modules/Stages/myroom/lang/ja.lua`와 `Modules/Stages/intro_nokon/lang/ja.lua`). 이는 7단계의 스킨 전체 `Locales/` 폴더와는 별개입니다.
+모듈은 `Script.lua` 옆의 `lang/` 하위 폴더에 자체 번역을 둘 수 있으며, 이를 제공 모듈 [Locale.i18n](../modules/locale.md)으로 읽습니다. 기능과 언어마다 `lang/<code>/<name>.json` 파일 하나를 고정된 id를 키로 하여 두고, `lang/en/`의 영어가 폴백이 됩니다. 이는 7단계의 스킨 전체 `Locales/` 폴더와는 별개이며, 전역 모듈이 텍스트를 번역할 수 있는 유일한 방법입니다. 기본 제공 스킨의 일부 예전 스테이지(예: `Modules/Stages/intro_nokon/lang/ja.lua`)는 라이브러리의 첫 번째 방식, 즉 각 영어 문자열에서 번역으로 가는 Lua 테이블을 씁니다.
 
 ```
 Modules/Stages/my_stage/
   Script.lua
   lang/
-    ja.lua        -- require("lang.ja")
+    en/my_stage.json   -- require("Locale.i18n").texts("my_stage")
+    ja/my_stage.json
 ```
 
 ## 11단계: 스킨 설치와 선택

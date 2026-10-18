@@ -67,7 +67,7 @@ namespace OpenTaikoTests {
 
 			using var version = connection.CreateCommand();
 			version.CommandText = "SELECT SupportedVersion FROM opentaiko_version;";
-			Assert.Equal("v0.6.1.2", version.ExecuteScalar());
+			Assert.Equal("v0.6.1.3", version.ExecuteScalar());
 
 			// the unique index keeps one row per save and nameplate
 			using var duplicate = connection.CreateCommand();

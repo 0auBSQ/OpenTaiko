@@ -61,7 +61,7 @@ El Script.lua de un personaje define un conjunto distinto: loadAnimation, dispos
 Una función que el motor registra solo en los scripts de Stage; llamarla pide al motor abandonar el stage.
 
 <div class="callout warn">
-Disponible solo en los scripts de Modules/Stages; a las Activities y ROActivities las dirige su anfitrión y no la reciben. Acepta de 0 a 3 argumentos y tolera nil en cualquier posición. La propia llamada solicita la salida; los stages incluidos escriben `return Exit(...)` dentro de update para que nada más se ejecute en ese fotograma. target es "title", "play", "stage" o "legacy"; nil o cualquier otro valor significa "title". Cuando target es "stage", name es el módulo de Modules/Stages al que saltar; cuando target es "legacy", name es uno de "heya", "config", "exit" u "onlinelounge" (cualquier otro valor va al título). transition nombra un módulo de Modules/Transitions; si lo omites o el motor no lo encuentra, el motor usa el módulo llamado "default", y si el skin no tiene ninguna transición se reproduce un fundido a negro simple. La clave "heya" se mantiene como alias: abre el módulo `myroom` del skin en Modules/Stages, o el título cuando el skin no tiene ninguno.
+Disponible solo en los scripts de Modules/Stages; a las Activities y ROActivities las dirige su anfitrión y no la reciben. Acepta de 0 a 3 argumentos y tolera nil en cualquier posición. La propia llamada solicita la salida; los stages incluidos escriben `return Exit(...)` dentro de update para que nada más se ejecute en ese fotograma. target es "title", "play", "stage" o "legacy"; nil o cualquier otro valor significa "title". Cuando target es "stage", name es el módulo de Modules/Stages al que saltar; cuando target es "legacy", name es uno de "heya", "config", "exit" u "onlinelounge" (cualquier otro valor va al título). transition nombra un módulo de Modules/Transitions; si lo omites o el motor no lo encuentra, el motor usa el módulo llamado "default", y si el skin no tiene ninguna transición se reproduce un fundido a negro simple. Los nombres de stage y de transición dan preferencia al lado del llamador: un stage del skin encuentra primero el módulo del skin con ese nombre, y un stage de Global/Modules el global, y cada uno recurre al otro. La clave "heya" se mantiene como alias: abre el módulo `myroom` del skin en Modules/Stages, o el título cuando el skin no tiene ninguno.
 </div>
 
 | Método | Descripción |
@@ -71,7 +71,7 @@ Disponible solo en los scripts de Modules/Stages; a las Activities y ROActivitie
 ```lua
 function update(timestamp)
     if INPUT:KeyboardPressed("S") then
-        return Exit("stage", "demo2")          -- salta a Modules/Stages/demo2
+        return Exit("stage", "mystage")        -- salta a Modules/Stages/mystage
     end
     if INPUT:Pressed("Cancel") then
         return Exit("title", nil, "nokon_curtain")   -- vuelve al título con una transición concreta
@@ -115,7 +115,7 @@ end
 Global para buscar por nombre una Activity cargada.
 
 <div class="callout warn">
-Registrada como la global ACTIVITY en todos los módulos excepto las ROActivities y los fondos, donde es nil; esos módulos usan ROACTIVITY. El motor carga las Activities desde Modules/Activities/{name}. ACTIVITY también expone GetROActivity, que se comporta como ROACTIVITY:GetROActivity.
+Registrada como la global ACTIVITY en todos los módulos excepto las ROActivities y los fondos, donde es nil; esos módulos usan ROACTIVITY. El motor carga las Activities desde Modules/Activities/{name}. ACTIVITY también expone GetROActivity, que se comporta como ROACTIVITY:GetROActivity. Una búsqueda da preferencia al lado del llamador: un módulo del skin obtiene la Activity del skin con ese nombre, y un módulo de Global/Modules la de Global/Modules/Activities, y cada uno recurre al otro cuando su lado no tiene ninguna. Un archivo de Lib busca desde el lado del módulo que lo cargó.
 </div>
 
 | Método | Descripción |
@@ -128,7 +128,7 @@ Registrada como la global ACTIVITY en todos los módulos excepto las ROActivitie
 Global para buscar por nombre una Activity de solo lectura (ROActivity) cargada.
 
 <div class="callout warn">
-Registrada como la global ROACTIVITY en todos los módulos. El motor carga las ROActivities desde Modules/ROActivities/{name} y les da las globales CONFIG, DATABASE y GetSaveFile de solo lectura, así que sus scripts no pueden cambiar el estado del juego (consulta la sección de módulos de solo lectura de Cómo funcionan los módulos). Las Activities y ROActivities son singletons por nombre: una instancia por carpeta, que comparten todos los anfitriones.
+Registrada como la global ROACTIVITY en todos los módulos. El motor carga las ROActivities desde Modules/ROActivities/{name} y les da las globales CONFIG, DATABASE y GetSaveFile de solo lectura, así que sus scripts no pueden cambiar el estado del juego (consulta la sección de módulos de solo lectura de Cómo funcionan los módulos). Las Activities y ROActivities son singletons por nombre: una instancia por carpeta, que comparten todos los anfitriones. GetROActivity da preferencia al lado del llamador igual que ACTIVITY:GetActivity, entre Modules/ROActivities y Global/Modules/ROActivities.
 </div>
 
 | Método | Descripción |

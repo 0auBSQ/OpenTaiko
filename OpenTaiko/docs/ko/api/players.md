@@ -25,7 +25,7 @@
 플레이어 한 명의 프로필: 이름, 코인, 잠금 해제한 항목, 트리거와 카운터, 클리어 통계, 장착한 캐릭터, 푸치캬라, 네임플레이트, 단위 칭호입니다.
 
 <div class="callout warn">
-프로퍼티는 점 문법으로 읽으십시오(sf.Name, sf.Coins). 쓰기 메서드는 즉시 저장합니다. 읽기 전용 모듈은 다음을 차단합니다: SpendCoins, EarnCoins, UnlockNameplate, UnlockSong, SelectedHitsounds 대입, SetGlobalTrigger, SetGlobalCounter, ChangeCharacter(false를 반환), UnlockPuchichara, ChangePuchichara, UnlockCharacter, ChangeDan, ChangeName, ChangeNameplate.
+프로퍼티는 점 문법으로 읽으십시오(sf.Name, sf.Coins). 쓰기 메서드는 즉시 저장합니다. 읽기 전용 모듈은 다음을 차단합니다: SpendCoins, EarnCoins, UnlockNameplate, UnlockSong, SelectedHitsounds 대입, SetGlobalTrigger, SetGlobalCounter, SetGlobalString, ChangeCharacter(false를 반환), UnlockPuchichara, ChangePuchichara, UnlockCharacter, ChangeDan, ChangeName, ChangeNameplate.
 </div>
 
 | 메서드 | 설명 |
@@ -49,8 +49,10 @@
 | `sf.SelectedHitsounds  -> string` | 선택한 히트사운드 세트의 폴더 이름. 다른 이름을 대입하면 저장하고 플레이어의 히트사운드를 다시 로드합니다. |
 | `sf:GetGlobalTrigger(name)  -> bool` | 이름이 지정된 불리언 트리거를 읽습니다. |
 | `sf:GetGlobalCounter(name)  -> number` | 이름이 지정된 숫자 카운터를 읽습니다. |
+| `sf:GetGlobalString(name)  -> string` | 이름이 지정된 텍스트 값을 읽습니다. 세이브에 없으면 "" 입니다(예: JSON으로 저장한 모듈의 데이터). |
 | `sf:SetGlobalTrigger(name, value)  -> nil` | 이름이 지정된 불리언 트리거를 설정합니다. |
 | `sf:SetGlobalCounter(name, value)  -> nil` | 이름이 지정된 숫자 카운터를 설정합니다. |
+| `sf:SetGlobalString(name, value)  -> nil` | 이름이 지정된 텍스트 값을 설정하고 저장합니다. |
 | `sf:GetClearStatusCount(difficulty, clearStatus)  -> integer` | 최고 클리어 상태가 정확히 clearStatus(0 없음, 1 어시스트, 2 클리어, 3 풀 콤보, 4 퍼펙트)인 난이도(0 Easy에서 4 Extra Extreme)의 채보 수. 범위 밖 인자는 0. |
 | `sf:GetDanBestPlay(node)  -> danBestPlay` | 단위 곡 노드의 모드 없는 최고 플레이(단위 최고 플레이 핸들 참고). 없으면 HasRecord가 false인 핸들. |
 | `sf:GetCharacter()  -> character` | 이 슬롯의 플레이어 바인딩 캐릭터 핸들(캐릭터 핸들 참고). |

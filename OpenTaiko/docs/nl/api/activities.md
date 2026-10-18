@@ -61,7 +61,7 @@ De Script.lua van een personage definieert een andere set: loadAnimation, dispos
 Een functie die de engine alleen in Stage-scripts registreert; het aanroepen ervan vraagt de engine de stage te verlaten.
 
 <div class="callout warn">
-Alleen beschikbaar in Modules/Stages-scripts; hun host stuurt Activities en ROActivities aan, en die krijgen hem niet. Accepteert 0 tot 3 argumenten en verdraagt nil op elke positie. De aanroep zelf vraagt de exit aan; de meegeleverde stages schrijven `return Exit(...)` binnen update, zodat er verder niets meer in dat frame draait. target is "title", "play", "stage" of "legacy"; nil of elke andere waarde betekent "title". Wanneer target "stage" is, is name de Modules/Stages-module waarnaar je springt; wanneer target "legacy" is, is name een van "heya", "config", "exit" of "onlinelounge" (elke andere waarde gaat naar het titelscherm). transition noemt een Modules/Transitions-module; als je die weglaat of de engine hem niet kan vinden, gebruikt de engine de module met de naam "default", en als de skin helemaal geen transities heeft, speelt de engine een gewone zwarte fade-out af. De sleutel "heya" blijft bestaan als alias: hij opent de `myroom`-module van de skin in Modules/Stages, of het titelscherm wanneer de skin er geen heeft.
+Alleen beschikbaar in Modules/Stages-scripts; hun host stuurt Activities en ROActivities aan, en die krijgen hem niet. Accepteert 0 tot 3 argumenten en verdraagt nil op elke positie. De aanroep zelf vraagt de exit aan; de meegeleverde stages schrijven `return Exit(...)` binnen update, zodat er verder niets meer in dat frame draait. target is "title", "play", "stage" of "legacy"; nil of elke andere waarde betekent "title". Wanneer target "stage" is, is name de Modules/Stages-module waarnaar je springt; wanneer target "legacy" is, is name een van "heya", "config", "exit" of "onlinelounge" (elke andere waarde gaat naar het titelscherm). transition noemt een Modules/Transitions-module; als je die weglaat of de engine hem niet kan vinden, gebruikt de engine de module met de naam "default", en als de skin helemaal geen transities heeft, speelt de engine een gewone zwarte fade-out af. De namen van stage en transitie geven de voorkeur aan de kant van de aanroeper: een stage van de skin vindt eerst de module met die naam in de skin, een stage in Global/Modules de globale, en elk valt terug op de andere kant. De sleutel "heya" blijft bestaan als alias: hij opent de `myroom`-module van de skin in Modules/Stages, of het titelscherm wanneer de skin er geen heeft.
 </div>
 
 | Methode | Beschrijving |
@@ -71,7 +71,7 @@ Alleen beschikbaar in Modules/Stages-scripts; hun host stuurt Activities en ROAc
 ```lua
 function update(timestamp)
     if INPUT:KeyboardPressed("S") then
-        return Exit("stage", "demo2")          -- spring naar Modules/Stages/demo2
+        return Exit("stage", "mystage")        -- spring naar Modules/Stages/mystage
     end
     if INPUT:Pressed("Cancel") then
         return Exit("title", nil, "nokon_curtain")   -- terug naar het titelscherm via een benoemde transitie
@@ -115,7 +115,7 @@ end
 Global om een geladen Activity op naam op te zoeken.
 
 <div class="callout warn">
-Geregistreerd als de ACTIVITY-global in elke module behalve ROActivities en achtergronden, waar hij nil is; die modules gebruiken ROACTIVITY. De engine laadt Activities uit Modules/Activities/{name}. ACTIVITY stelt ook GetROActivity beschikbaar, dat zich gedraagt als ROACTIVITY:GetROActivity.
+Geregistreerd als de ACTIVITY-global in elke module behalve ROActivities en achtergronden, waar hij nil is; die modules gebruiken ROACTIVITY. De engine laadt Activities uit Modules/Activities/{name}. ACTIVITY stelt ook GetROActivity beschikbaar, dat zich gedraagt als ROACTIVITY:GetROActivity. Een opzoeking geeft de voorkeur aan de kant van de aanroeper: een module van de skin krijgt de Activity met die naam uit de skin, een module in Global/Modules die uit Global/Modules/Activities, en elk valt terug op de andere kant als de eigen kant er geen heeft. Een Lib-bestand zoekt vanaf de kant van de module die het met require heeft geladen.
 </div>
 
 | Methode | Beschrijving |
@@ -128,7 +128,7 @@ Geregistreerd als de ACTIVITY-global in elke module behalve ROActivities en acht
 Global om een geladen alleen-lezen Activity (ROActivity) op naam op te zoeken.
 
 <div class="callout warn">
-Geregistreerd als de ROACTIVITY-global in elke module. De engine laadt ROActivities uit Modules/ROActivities/{name} en geeft ze de alleen-lezen globals CONFIG, DATABASE en GetSaveFile, zodat hun scripts de spelstatus niet kunnen wijzigen (zie de sectie over alleen-lezen modules van Hoe modules werken). Activities en ROActivities zijn singletons op naam: één instantie per map, die elke host deelt.
+Geregistreerd als de ROACTIVITY-global in elke module. De engine laadt ROActivities uit Modules/ROActivities/{name} en geeft ze de alleen-lezen globals CONFIG, DATABASE en GetSaveFile, zodat hun scripts de spelstatus niet kunnen wijzigen (zie de sectie over alleen-lezen modules van Hoe modules werken). Activities en ROActivities zijn singletons op naam: één instantie per map, die elke host deelt. GetROActivity geeft op dezelfde manier als ACTIVITY:GetActivity de voorkeur aan de kant van de aanroeper, tussen Modules/ROActivities en Global/Modules/ROActivities.
 </div>
 
 | Methode | Beschrijving |

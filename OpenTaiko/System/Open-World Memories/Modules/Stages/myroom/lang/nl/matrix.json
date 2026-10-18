@@ -1,9 +1,0 @@
-{
-  "_comment": "Dutch texts for the Placeholder Matrix (matrix.lua). Keys are stable ids; a missing id shows the English text (lang/en).",
-  "hint": "Kies een scène om te projecteren.",
-  "unlock_title": "Vergrendelde scène",
-  "unlock_q": "„%s” ontgrendelen?",
-  "unlock_yes": "Ontgrendelen",
-  "unlock_no": "Terug",
-  "broke": "Niet genoeg munten."
-}

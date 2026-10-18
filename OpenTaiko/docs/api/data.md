@@ -4,7 +4,7 @@
 
 Saving data that survives a restart, querying SQLite files, reading files, JSON and INI from the module folder, sharing resources between modules, and reading or changing the game configuration.
 
-Relative paths passed to DATABASE, SQL, STORAGE, JSONLOADER, INILOADER and SHARED resolve against the directory of the running module (the folder that holds its `Script.lua`).
+Relative paths passed to DATABASE, SQL, STORAGE, JSONLOADER, INILOADER and SHARED resolve against the directory of the running module (the folder that holds its `Script.lua`). A Lib file loaded with `require` has no directory of its own here: its calls resolve against the module that required it (see [Provided modules](../modules/README.md)).
 
 Some methods on this page return .NET collections, which behave differently from Lua tables:
 
@@ -37,6 +37,8 @@ Every Read and Write opens and closes its own LMDB environment, so each call is 
 | --- | --- |
 | `DATABASE:OpenLocalDatabase(path)  -> database` | Opens (creating if needed) a store at a path relative to the module directory. |
 | `DATABASE:OpenGlobalDatabase(path)  -> database` | Opens (creating if needed) a store under `Global/ApplicationData/LMDB/` in the game folder, shared by every module. |
+
+A local store lives inside its module's folder, so it moves with the module: a stage that moves (from a skin to `Global/Modules/`, or to a new name) starts with empty local stores, and the old data stays readable only from the old folder. A Lib file that opens a local store opens the calling module's: `Shop.Daily` keeps its state in the calling stage's `shop_state`. Data every skin must see belongs in the save file (`sf:SetGlobalString`, see [Players and profiles](players.md)) or in a global store.
 
 ### Database handle
 

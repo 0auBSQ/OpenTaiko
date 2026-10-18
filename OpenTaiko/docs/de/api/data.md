@@ -4,7 +4,7 @@
 
 Speichern von Daten, die einen Neustart überdauern, Abfragen von SQLite-Dateien, Lesen von Dateien, JSON und INI aus dem Modulordner, gemeinsame Nutzung von Ressourcen zwischen Modulen sowie Lesen oder Ändern der Spielkonfiguration.
 
-Relative Pfade, die an DATABASE, SQL, STORAGE, JSONLOADER, INILOADER und SHARED übergeben werden, werden gegen das Verzeichnis des laufenden Moduls aufgelöst (der Ordner, der seine `Script.lua` enthält).
+Relative Pfade, die an DATABASE, SQL, STORAGE, JSONLOADER, INILOADER und SHARED übergeben werden, werden gegen das Verzeichnis des laufenden Moduls aufgelöst (der Ordner, der seine `Script.lua` enthält). Eine mit `require` geladene Lib-Datei hat hier kein eigenes Verzeichnis: Ihre Aufrufe werden gegen das Modul aufgelöst, das sie per require geladen hat (siehe [Bereitgestellte Module](../modules/README.md)).
 
 Einige Methoden auf dieser Seite geben .NET-Collections zurück, die sich anders verhalten als Lua-Tabellen:
 
@@ -37,6 +37,8 @@ Jedes Read und Write öffnet und schließt seine eigene LMDB-Umgebung, sodass je
 | --- | --- |
 | `DATABASE:OpenLocalDatabase(path)  -> database` | Öffnet (und erzeugt bei Bedarf) einen Speicher unter einem Pfad relativ zum Modulverzeichnis. |
 | `DATABASE:OpenGlobalDatabase(path)  -> database` | Öffnet (und erzeugt bei Bedarf) einen Speicher unter `Global/ApplicationData/LMDB/` im Spielordner, der von jedem Modul gemeinsam genutzt wird. |
+
+Ein lokaler Speicher liegt im Ordner seines Moduls und zieht daher mit dem Modul um: Eine Stage, die umzieht (aus einem Skin nach `Global/Modules/` oder unter einen neuen Namen), beginnt mit leeren lokalen Speichern, und die alten Daten bleiben nur aus dem alten Ordner lesbar. Eine Lib-Datei, die einen lokalen Speicher öffnet, öffnet den des aufrufenden Moduls: `Shop.Daily` hält seinen Zustand im `shop_state` der aufrufenden Stage. Daten, die jeder Skin sehen muss, gehören in den Spielstand (`sf:SetGlobalString`, siehe [Spieler und Profile](players.md)) oder in einen globalen Speicher.
 
 ### Database-Handle
 

@@ -1,0 +1,8 @@
+{
+  "_comment": "Japanese texts for demo_overall. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "demo_theme_settings": "テーマ設定",
+  "demo_gradient": "グラデーションマップ",
+  "demo_database": "データベース",
+  "demo_dan_plate": "段位プレート",
+  "demo_first_demo": "最初のデモ"
+}

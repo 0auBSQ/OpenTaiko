@@ -8,7 +8,7 @@ OpenTaiko 0.6.1 permite que un skin añada y reemplace pantallas con Lua. La car
 
 - OpenTaiko 0.6.1 y una carpeta de skin con un directorio Modules. El skin incluido es System/Open-World Memories.
 - Un editor de texto y nociones básicas de Lua (funciones, tablas, require).
-- Los stages incluidos en System/Open-World Memories/Modules/Stages. Los pequeños, demo1 y demo3, muestran la forma de los callbacks; los grandes muestran cómo se organizan pantallas reales.
+- Los stages incluidos en System/Open-World Memories/Modules/Stages y Global/Modules/Stages. Las pequeñas demos de Global/Modules/Stages/demo_overall muestran la forma de los callbacks; los stages grandes muestran cómo se organizan pantallas reales.
 
 ## Dónde viven los módulos
 
@@ -34,7 +34,7 @@ Dos tipos de script viven en otro lugar:
 
 El Script.lua de un módulo define funciones globales de nivel superior con nombres fijos, y el juego lee cada una como una global. El juego nunca encuentra una función envuelta en una tabla local y devuelta, y nunca llama a un nombre mal escrito (OnStart en lugar de onStart), porque trata un callback no definido como una operación nula y no informa de nada. Todo lo demás en el archivo puede ser local, y puedes repartir el módulo en varios archivos cargados con require.
 
-demo3 es la forma mínima que conviene copiar:
+Esta es la forma mínima que conviene copiar:
 
 ```lua
 -- Modules/Stages/mystage/Script.lua
@@ -73,9 +73,9 @@ end
 - activate(): el juego lo llama cada vez que se entra en el stage. Reinicia aquí el estado por visita, arranca la música y abre las bases de datos. También se ejecuta como corrutina y puede usar LOADING. El juego actualiza las listas de personajes y puchicharas (CHARACTERLIST, PUCHICHARALIST) justo antes de que se ejecute activate, así que léelas aquí; onStart se ejecuta antes de esa actualización.
 - update(timestamp): el juego lo llama cada fotograma antes de draw y le pasa el reloj del juego en milisegundos. Gestiona aquí la entrada y cambia el estado. Una vez que el stage ha llamado a Exit, el juego deja de llamar a update y sigue llamando a draw durante el fundido de salida.
 - draw(): el juego lo llama cada fotograma. Solo dibuja, y mantén bajas las asignaciones por fotograma.
-- deactivate(): el juego lo llama al abandonar el stage. demo3 libera aquí sus bases de datos; demo1 detiene su música y su vídeo.
+- deactivate(): el juego lo llama al abandonar el stage. La demo de bases de datos de demo_overall libera aquí sus bases de datos; su primera demo detiene su música y su vídeo.
 - afterSongEnum(): el juego lo llama cada vez que termina la enumeración de canciones, en el arranque y tras una recarga suave o completa, incluso cuando el stage no está activo. Úsalo cuando el módulo dependa de la lista de canciones.
-- onDestroy(): el juego lo llama antes de descargar el skin. demo1 libera aquí su textura, su vídeo, su textura de texto y sus sonidos.
+- onDestroy(): el juego lo llama antes de descargar el skin. La primera demo de demo_overall libera aquí su textura, su vídeo, su textura de texto y sus sonidos.
 - reloadLanguage(lang): el juego lo llama cuando cambia el idioma (consulta la sección de localización más abajo).
 
 Cuando se carga un skin, el juego crea los módulos tipo por tipo: primero Transitions, luego Stages, Activities y ROActivities. Dentro de cada tipo ejecuta todos los Script.lua antes de llamar a ningún onStart. Por tanto, las Activities y ROActivities aún no existen mientras se ejecuta el onStart de un stage; búscalas en activate.
@@ -96,10 +96,10 @@ Los demás tipos usan variaciones de este conjunto. Las Activities y ROActivitie
 Solo los stages tienen la global Exit. Acepta hasta tres argumentos y admite nil en cualquier posición: el destino ("title", "play", "stage" o "legacy"; nil significa "title"), el nombre del stage de destino cuando el destino es "stage" (o una clave legacy cuando es "legacy"), y el nombre de un módulo de transición. Los stages incluidos escriben `return Exit(...)` dentro de update para que nada más se ejecute en ese fotograma.
 
 ```lua
--- de demo1/Script.lua, dentro de update()
+-- dentro de update() de un stage
 if INPUT:KeyboardPressed("S") == true then
     sounds.Skip:Play()
-    return Exit("stage", "demo2")   -- salta a Modules/Stages/demo2
+    return Exit("stage", "mystage") -- salta a Modules/Stages/mystage
 end
 -- ...
 return Exit("title", nil)           -- vuelve a la pantalla de título
@@ -111,7 +111,8 @@ Cada Script.lua se ejecuta en un estado Lua restringido:
 
 - os conserva solo time, date y difftime. El sandbox elimina io, debug, loadfile y dofile, e import no hace nada.
 - package se reduce a un cargador personalizado: package.path y package.cpath están vacíos y el sandbox reemplaza los buscadores estándar, así que solo se pueden buscar las rutas indicadas más abajo.
-- require busca primero en la propia carpeta del módulo, luego en la carpeta Modules/Lib del skin, luego en Global/Modules/Lib en la carpeta del juego, y carga el primer archivo que encuentra. Un módulo de Global/Modules busca en Global/Modules/Lib antes que en el Modules/Lib del skin. Un archivo del módulo y un archivo de Lib con el mismo nombre se resuelven al archivo del módulo. Los puntos del nombre se convierten en separadores de ruta, así que require("DBControllers.dbScores") y require("DBControllers/dbScores") cargan ambos DBControllers/dbScores.lua. Las rutas no ASCII funcionan.
+- require busca primero en la propia carpeta del módulo, luego en la carpeta Modules/Lib del skin, luego en Global/Modules/Lib en la carpeta del juego, y carga el primer archivo que encuentra. Un módulo de Global/Modules busca en Global/Modules/Lib antes que en el Modules/Lib del skin. Un archivo del módulo y un archivo de Lib con el mismo nombre se resuelven al archivo del módulo. Los puntos del nombre se convierten en separadores de ruta, así que require("DBControllers.dbScores") y require("DBControllers/dbScores") cargan ambos DBControllers/dbScores.lua. La búsqueda no distingue mayúsculas de minúsculas, y las rutas no ASCII funcionan.
+- Un archivo de Lib se ejecuta en el estado Lua del módulo que lo cargó con require, así que los require que contiene siguen el orden de ese módulo. El juego incluye una biblioteca de archivos de Lib en Global/Modules/Lib con nombres organizados por espacios de nombres, como require("Core.Easing") y require("UI.Pick"); [Módulos proporcionados](modules/README.md) los describe.
 
 ```lua
 -- de intro_nokon/Script.lua
@@ -127,40 +128,40 @@ El juego crea las ROActivities y los fondos con globales restringidas antes de q
 
 ## Localización con lang/
 
-El skin incluido traduce las cadenas propias de cada módulo con la biblioteca compartida Modules/Lib/i18n.lua. La cadena en inglés del código es la clave: el módulo incluye un lang/ja.lua que devuelve una tabla que asocia cada cadena en inglés con su traducción al japonés, y la biblioteca busca las cadenas en esa tabla.
+Un módulo traduce sus propias cadenas con el módulo proporcionado [Locale.i18n](modules/locale.md) en lugar de la carpeta Locales del skin, así que las traducciones viajan con el módulo. Sus textos viven en lang/<code>/<name>.json junto a Script.lua, un archivo por funcionalidad, con ids estables como claves; lang/en contiene el inglés, que es la reserva para todos los demás idiomas.
 
-La biblioteca tiene tres funciones:
+Las funciones principales de la biblioteca:
 
-- detect() lee el idioma actual del juego a través de la global LANG y carga el diccionario correspondiente. Cuando el idioma es japonés, hace require de lang/ja, que se resuelve dentro de la carpeta del módulo, así que cada módulo tiene su propio diccionario; para cualquier otro idioma no carga nada. Hasta que la llames, no hay ningún diccionario cargado y todas las cadenas siguen en inglés.
-- tr(s) devuelve la traducción de s del diccionario cargado, o la propia s cuando el diccionario no tiene entrada para ella o no hay ningún diccionario cargado.
-- trf(fmt, ...) traduce la cadena de formato fmt de la misma manera y luego la formatea con string.format.
+- texts(name) devuelve los textos de lang/<code>/<name>.json en la propia carpeta del módulo. Un archivo de Lib pasa su propia carpeta como segundo argumento (consulta [Módulos proporcionados](modules/README.md)).
+- detect() lee el idioma actual del juego a través de la global LANG, y a partir de entonces todas las búsquedas lo usan. Hasta que la llames, las búsquedas usan el inglés.
+- texts:tr(id) devuelve el texto de id, o el propio id cuando ningún idioma lo tiene; texts:trf(id, ...) usa ese texto como patrón de string.format.
 
-Llama a detect() en activate y luego construye tu texto con tr y trf. activate se ejecuta en cada entrada al módulo, así que un idioma que el jugador cambió en los ajustes surte efecto en la siguiente visita y el módulo no necesita ningún otro gancho. Las claves deben coincidir exactamente con el texto original en inglés, incluidos puntuación, espacios y saltos de línea, y la traducción debe conservar tal cual los marcadores como %s o {Player 1 name}.
+Llama a detect() en activate y luego construye tu texto con texts:tr y texts:trf. activate se ejecuta en cada entrada al módulo, así que un idioma que el jugador cambió en los ajustes surte efecto en la siguiente visita y el módulo no necesita ningún otro gancho. Cada archivo de idioma repite las claves del archivo en inglés, y una traducción debe conservar tal cual los marcadores como %s.
 
-```lua
--- Modules/Stages/mystage/lang/ja.lua
-local T = {}
-T["Nokon"] = "ノコン"
-T["Alright, quiz time!"] = "さあ、クイズの時間である！"
-return T
+```
+Modules/Stages/mystage/lang/en/quiz.json   { "speaker": "Nokon", "start": "Alright, quiz time!" }
+Modules/Stages/mystage/lang/ja/quiz.json   { "speaker": "ノコン", "start": "さあ、クイズの時間である！" }
 ```
 
 ```lua
 -- Modules/Stages/mystage/Script.lua
-local I18N = require("i18n")
+local I18N = require("Locale.i18n")
+local T = I18N.texts("quiz")
 local title
 
 function activate()
     I18N.detect()
-    title = I18N.tr("Alright, quiz time!")
+    title = T:tr("start")
 end
 ```
+
+Algunos stages más antiguos del skin incluido, como intro_nokon, usan en su lugar la primera forma de la biblioteca: un lang/ja.lua que devuelve una tabla que asocia cada cadena en inglés con su traducción, leída con I18N.tr(s). [Locale.i18n](modules/locale.md) documenta ambas.
 
 El juego también llama a una global reloadLanguage(lang) en cada módulo cargado cuando cambia el idioma. Solo la necesita un módulo que permanece en pantalla mientras cambia el idioma, como una pantalla con un selector de idioma; ahí, vuelve a llamar a detect() y reconstruye el texto prerrenderizado.
 
 ## Cosas a tener en cuenta
 
-- El juego libera las texturas, sonidos, vídeos y objetos de texto que creó un módulo cuando libera el propio módulo, así que una recarga del skin no los filtra. Libera en deactivate los recursos que abres por visita, como las bases de datos, como hace demo3, y libera en onDestroy lo que creaste, como hace demo1.
+- El juego libera las texturas, sonidos, vídeos y objetos de texto que creó un módulo cuando libera el propio módulo, así que una recarga del skin no los filtra. Libera en deactivate los recursos que abres por visita, como las bases de datos, como hace la demo de bases de datos de demo_overall, y libera en onDestroy lo que creaste, como hace su primera demo.
 - GetText guarda en caché una textura por cada cadena distinta en su objeto de texto. Una cadena que cambia cada fotograma añade una textura cada fotograma y el juego se ralentiza progresivamente. Dibuja los valores cambiantes con el renderizador de glifos (TEXT:CreateGlyphCached) o conserva una textura hasta que el valor cambie.
 - LOADING solo funciona en callbacks que se ejecutan como corrutinas: el onStart de cualquier módulo y el activate de un stage. Llamar a LOADING:Tick desde el activate de una Activity, o desde update o draw, lanza un error de Lua.
 - onStart y afterSongEnum se ejecutan mientras el módulo está fuera de pantalla. Escríbelos de forma que funcionen sin que el stage esté visible.

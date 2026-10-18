@@ -25,7 +25,7 @@ Appelez-la comme une simple fonction (`GetSaveFile(0)`). Un indice hors limites 
 Le profil d'un joueur : nom, pièces, objets débloqués, déclencheurs et compteurs, statistiques de réussite, personnage équipé, puchichara, plaque de nom et titre de dan.
 
 <div class="callout warn">
-Lisez les propriétés avec la syntaxe à point (sf.Name, sf.Coins). Les méthodes d'écriture persistent immédiatement. Les modules en lecture seule bloquent les suivantes : SpendCoins, EarnCoins, UnlockNameplate, UnlockSong, l'affectation de SelectedHitsounds, SetGlobalTrigger, SetGlobalCounter, ChangeCharacter (renvoie false), UnlockPuchichara, ChangePuchichara, UnlockCharacter, ChangeDan, ChangeName et ChangeNameplate.
+Lisez les propriétés avec la syntaxe à point (sf.Name, sf.Coins). Les méthodes d'écriture persistent immédiatement. Les modules en lecture seule bloquent les suivantes : SpendCoins, EarnCoins, UnlockNameplate, UnlockSong, l'affectation de SelectedHitsounds, SetGlobalTrigger, SetGlobalCounter, SetGlobalString, ChangeCharacter (renvoie false), UnlockPuchichara, ChangePuchichara, UnlockCharacter, ChangeDan, ChangeName et ChangeNameplate.
 </div>
 
 | Méthode | Description |
@@ -49,8 +49,10 @@ Lisez les propriétés avec la syntaxe à point (sf.Name, sf.Coins). Les méthod
 | `sf.SelectedHitsounds  -> string` | Nom de dossier du jeu de sons de frappe sélectionné. Affecter un nom différent le persiste et recharge les sons de frappe du joueur. |
 | `sf:GetGlobalTrigger(name)  -> bool` | Lit un déclencheur booléen nommé. |
 | `sf:GetGlobalCounter(name)  -> number` | Lit un compteur numérique nommé. |
+| `sf:GetGlobalString(name)  -> string` | Lit une valeur texte nommée, "" si la sauvegarde n'en a pas (par exemple les données d'un module enregistrées en JSON). |
 | `sf:SetGlobalTrigger(name, value)  -> nil` | Définit un déclencheur booléen nommé. |
 | `sf:SetGlobalCounter(name, value)  -> nil` | Définit un compteur numérique nommé. |
+| `sf:SetGlobalString(name, value)  -> nil` | Définit une valeur texte nommée et la persiste. |
 | `sf:GetClearStatusCount(difficulty, clearStatus)  -> integer` | Nombre de partitions d'une difficulté (0 Easy à 4 Extra Extreme) dont le meilleur statut de réussite vaut exactement clearStatus (0 aucun, 1 assisté, 2 réussite, 3 full combo, 4 perfect). 0 pour des arguments hors limites. |
 | `sf:GetDanBestPlay(node)  -> danBestPlay` | La meilleure partie sans mod pour un nœud de chanson dan (voir Handle de meilleure partie de dan) ; un handle avec HasRecord à false s'il n'y en a pas. |
 | `sf:GetCharacter()  -> character` | Le handle de personnage lié au joueur pour cet emplacement (voir Handle de personnage). |

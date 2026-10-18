@@ -8,7 +8,7 @@ OpenTaiko 0.6.1 lets a skin add and replace screens with Lua. A skin's Modules f
 
 - OpenTaiko 0.6.1 and a skin folder with a Modules directory. The bundled skin is System/Open-World Memories.
 - A text editor and basic Lua (functions, tables, require).
-- The bundled stages under System/Open-World Memories/Modules/Stages. The small ones, demo1 and demo3, show the callback shape; the larger ones show how real screens are organized.
+- The bundled stages under System/Open-World Memories/Modules/Stages and Global/Modules/Stages. The small demos in Global/Modules/Stages/demo_overall show the callback shape; the larger stages show how real screens are organized.
 
 ## Where modules live
 
@@ -34,7 +34,7 @@ Two kinds of script live elsewhere:
 
 A module's Script.lua defines top-level global functions with fixed names, and the game reads each one as a global. The game never finds a function you wrap in a local table and return, and it never calls a misspelled name (OnStart in place of onStart), because it treats an undefined callback as a no-op and reports nothing. Everything else in the file can be local, and you can split the module across files loaded with require.
 
-demo3 is the minimal shape to copy:
+This is the minimal shape to copy:
 
 ```lua
 -- Modules/Stages/mystage/Script.lua
@@ -73,9 +73,9 @@ end
 - activate(): the game calls it on every entry into the stage. Reset per-visit state, start music and open databases here. It also runs as a coroutine and can use LOADING. The game refreshes the character and puchichara lists (CHARACTERLIST, PUCHICHARALIST) right before activate runs, so read them here; onStart runs before that refresh.
 - update(timestamp): the game calls it every frame before draw and passes the game clock in milliseconds. Handle input and change state here. Once the stage has called Exit, the game stops calling update and keeps calling draw through the fade-out.
 - draw(): the game calls it every frame. Draw only, and keep per-frame allocations low.
-- deactivate(): the game calls it when leaving the stage. demo3 disposes its databases here; demo1 stops its music and video.
+- deactivate(): the game calls it when leaving the stage. demo_overall's database demo disposes its databases here; its first demo stops its music and video.
 - afterSongEnum(): the game calls it every time song enumeration finishes, at boot and after a soft or hard reload, even when the stage is not active. Use it when the module depends on the song list.
-- onDestroy(): the game calls it before it unloads the skin. demo1 disposes its texture, video, text texture and sounds here.
+- onDestroy(): the game calls it before it unloads the skin. demo_overall's first demo disposes its texture, video, text texture and sounds here.
 - reloadLanguage(lang): the game calls it when the language changes (see the localization section below).
 
 When a skin loads, the game creates the modules kind by kind, Transitions first, then Stages, Activities and ROActivities. Within a kind it runs every Script.lua before calling any onStart. Activities and ROActivities therefore do not exist yet while a stage's onStart runs; look them up in activate.
@@ -96,10 +96,10 @@ The other kinds use variations of this set. Activities and ROActivities have the
 Only stages have the Exit global. It takes up to three arguments and accepts nil in any position: the target ("title", "play", "stage" or "legacy"; nil means "title"), the name of the destination stage when the target is "stage" (or a legacy key when it is "legacy"), and the name of a transition module. The bundled stages write `return Exit(...)` inside update so that nothing else runs in that frame.
 
 ```lua
--- from demo1/Script.lua, inside update()
+-- inside a stage's update()
 if INPUT:KeyboardPressed("S") == true then
     sounds.Skip:Play()
-    return Exit("stage", "demo2")   -- jump to Modules/Stages/demo2
+    return Exit("stage", "mystage") -- jump to Modules/Stages/mystage
 end
 -- ...
 return Exit("title", nil)           -- back to the title screen
@@ -111,7 +111,8 @@ Every Script.lua runs in a restricted Lua state:
 
 - os keeps only time, date and difftime. The sandbox removes io, debug, loadfile and dofile, and import does nothing.
 - package shrinks to a custom loader: package.path and package.cpath are empty and the sandbox replaces the standard searchers, so only the paths below are searchable.
-- require first looks in the module's own folder, then in the skin's Modules/Lib folder, then in Global/Modules/Lib in the game folder, and loads the first file it finds. A module in Global/Modules checks Global/Modules/Lib before the skin's Modules/Lib. A module file and a Lib file with the same name resolve to the module file. Dots in the name become path separators, so require("DBControllers.dbScores") and require("DBControllers/dbScores") both load DBControllers/dbScores.lua. Non-ASCII paths work.
+- require first looks in the module's own folder, then in the skin's Modules/Lib folder, then in Global/Modules/Lib in the game folder, and loads the first file it finds. A module in Global/Modules checks Global/Modules/Lib before the skin's Modules/Lib. A module file and a Lib file with the same name resolve to the module file. Dots in the name become path separators, so require("DBControllers.dbScores") and require("DBControllers/dbScores") both load DBControllers/dbScores.lua. The lookup ignores case, and non-ASCII paths work.
+- A Lib file runs in the Lua state of the module that required it, so the requires inside it follow that module's order. The game ships a library of Lib files in Global/Modules/Lib under namespaced names such as require("Core.Easing") and require("UI.Pick"); [Provided modules](modules/README.md) describes them.
 
 ```lua
 -- from intro_nokon/Script.lua
@@ -127,40 +128,40 @@ The game creates ROActivities and backgrounds with restricted globals before the
 
 ## Localization with lang/
 
-The bundled skin translates each module's own strings with the shared library Modules/Lib/i18n.lua. The English string in the code is the key: the module ships a lang/ja.lua that returns a table mapping each English string to its Japanese translation, and the library looks strings up in that table.
+A module translates its own strings with the provided module [Locale.i18n](modules/locale.md) rather than the skin's Locales folder, so the translations travel with the module. Its texts live in lang/<code>/<name>.json next to Script.lua, one file per feature, keyed by stable ids; lang/en holds the English, which is the fallback for every other language.
 
-The library has three functions:
+The library's main functions:
 
-- detect() reads the current game language through the LANG global and loads the dictionary for it. When the language is Japanese it requires lang/ja, which resolves inside the module folder, so each module has its own dictionary; for any other language it loads nothing. Until you call it, no dictionary is loaded and every string stays English.
-- tr(s) returns the translation of s from the loaded dictionary, or s itself when the dictionary has no entry for it or no dictionary is loaded.
-- trf(fmt, ...) translates the format string fmt the same way, then formats it with string.format.
+- texts(name) returns the texts of lang/<code>/<name>.json in the module's own folder. A Lib file passes its own folder as a second argument (see [Provided modules](modules/README.md)).
+- detect() reads the current game language through the LANG global, and every lookup uses it from then on. Until you call it, lookups use English.
+- texts:tr(id) returns the text of id, or the id itself when no language has it; texts:trf(id, ...) uses that text as a string.format pattern.
 
-Call detect() in activate, then build your text with tr and trf. activate runs on every entry into the module, so a language the player changed in the settings takes effect on the next visit, and the module needs no other hook. Keys must match the English source exactly, including punctuation, spacing and newlines, and the translation must keep placeholders such as %s or {Player 1 name} verbatim.
+Call detect() in activate, then build your text with texts:tr and texts:trf. activate runs on every entry into the module, so a language the player changed in the settings takes effect on the next visit, and the module needs no other hook. Every language file mirrors the keys of the English one, and a translation must keep placeholders such as %s verbatim.
 
-```lua
--- Modules/Stages/mystage/lang/ja.lua
-local T = {}
-T["Nokon"] = "ノコン"
-T["Alright, quiz time!"] = "さあ、クイズの時間である！"
-return T
+```
+Modules/Stages/mystage/lang/en/quiz.json   { "speaker": "Nokon", "start": "Alright, quiz time!" }
+Modules/Stages/mystage/lang/ja/quiz.json   { "speaker": "ノコン", "start": "さあ、クイズの時間である！" }
 ```
 
 ```lua
 -- Modules/Stages/mystage/Script.lua
-local I18N = require("i18n")
+local I18N = require("Locale.i18n")
+local T = I18N.texts("quiz")
 local title
 
 function activate()
     I18N.detect()
-    title = I18N.tr("Alright, quiz time!")
+    title = T:tr("start")
 end
 ```
+
+Some older stages of the bundled skin, such as intro_nokon, use the library's first form instead: a lang/ja.lua returning a table from each English string to its translation, read with I18N.tr(s). [Locale.i18n](modules/locale.md) documents both.
 
 The game also calls a global reloadLanguage(lang) on every loaded module when the language changes. Only a module that stays on screen while the language changes needs it, such as a screen with a language selector; there, call detect() again and rebuild the pre-rendered text.
 
 ## Things to watch out for
 
-- The game frees the textures, sounds, videos and text objects a module created when it disposes the module, so a skin reload does not leak them. Dispose resources you open per visit, such as databases, in deactivate, as demo3 does, and dispose what you created in onDestroy, as demo1 does.
+- The game frees the textures, sounds, videos and text objects a module created when it disposes the module, so a skin reload does not leak them. Dispose resources you open per visit, such as databases, in deactivate, as demo_overall's database demo does, and dispose what you created in onDestroy, as its first demo does.
 - GetText caches one texture per distinct string on its text object. A string that changes every frame adds a texture every frame and the game slows down progressively. Draw changing values with the glyph renderer (TEXT:CreateGlyphCached), or keep one texture until the value changes.
 - LOADING only works in callbacks that run as coroutines: onStart of any module, and a stage's activate. Calling LOADING:Tick from an Activity's activate, or from update or draw, raises a Lua error.
 - onStart and afterSongEnum run while the module is off screen. Write them so they work without the stage being visible.

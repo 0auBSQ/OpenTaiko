@@ -156,6 +156,13 @@ Het spel scant `Modules/Lib/` niet. Bestanden daar laad je met `require`: een mo
 
 De spelmap kan ook modules bevatten die elke skin laadt. `Global/Modules/` in de installatiemap van het spel heeft dezelfde submappen `Transitions/`, `Stages/`, `Activities/`, `ROActivities/` en `Lib/` als de `Modules/` van een skin, en het spel laadt elke globale categorie direct na die van de skin. Een naam kan op beide plaatsen bestaan. Vraagt een module van de skin een stage, activity, ROActivity of transition op naam op, dan krijgt die de module van de skin, en een globale module krijgt de globale; elk valt terug op de andere plaats als de eigen plaats geen module met die naam heeft. `require` volgt dezelfde regel: een globale module zoekt in `Global/Modules/Lib/` vóór de `Modules/Lib/` van de skin. De modules die het spel zelf op naam zoekt (hieronder vermeld) komen eerst uit de skin. `_boot` en `_title` moeten in de skin blijven: als `Global/Modules/Stages/` een van beide bevat, stopt het spel bij het opstarten met een fout.
 
+De Lib-bestanden die het spel in `Global/Modules/Lib/` meelevert, staan beschreven in [Meegeleverde modules](../modules/README.md): een UI-bibliotheek, een dialoogvenster, helpers voor invoer en lokalisatie, de 3D-wereldengine, en de regels van de pagode, de kluis en de muntwinkel, onder namen met een naamruimte zoals `require("UI.Pick")` of `require("Core.Easing")`. Uit de plek waar globale bestanden staan, volgen een paar regels:
+
+- Een Lib-bestand draait in de Lua-state van de module die het met require laadt. Zijn eigen requires volgen de zoekvolgorde van die module, en de relatieve paden die het aan `TEXTURE`, `SOUND`, `JSONLOADER` en de andere loaders geeft, worden opgelost ten opzichte van de map van die module. Een Lib-bestand dat assets meelevert, bereikt ze via `require("Core.Here")(...)` en de loaders voor absolute paden.
+- Globale modules hebben geen `Locales/` en geen `ThemeSettings.json`: `THEME:GetSkinString` en de thema-instellingen lezen die van de actieve skin. Een globale module bewaart zijn strings in zijn eigen map `lang/` (Stap 10).
+- De texturen, geluiden en strings van `SHARED` vormen één naamruimte voor de skin en elke globale module: geef je sleutels een prefix.
+- Een update voegt bestanden toe en vervangt ze, maar verwijdert nooit oude, en modules van de skin zoeken in de `Modules/Lib/` van de skin vóór `Global/Modules/Lib/`, dus een verouderd skinbestand met dezelfde naam zou winnen. Daarom staan de meegeleverde modules in naamruimtemappen die geen enkel skinbestand deelt, en daarom houdt de meegeleverde skin zijn oude Lib-namen als doorverwijzingen van twee regels naar die modules in plaats van de bestanden te verwijderen.
+
 Binnen elke categorie maakt het spel eerst elke module aan en draait daarna `onStart` op elk ervan, in de volgorde Transitions, Stages, Activities, ROActivities.
 
 Het spel zoekt deze modules op naam op, en de meegeleverde skin levert ze allemaal:
@@ -217,13 +224,14 @@ function onDestroy() end
 
 ## Stap 10: Lokaliseer een module met lang/
 
-Een module kan zijn eigen vertalingen bewaren in een submap `lang/` naast `Script.lua`. Omdat de eigen map van de module op zijn `require`-pad staat, leidt `require("lang.ja")` naar `lang/ja.lua`. De meegeleverde skin doet dit voor zijn grotere stages (bijvoorbeeld `Modules/Stages/myroom/lang/ja.lua` en `Modules/Stages/intro_nokon/lang/ja.lua`) via de helper `Modules/Lib/i18n.lua`. Dit staat los van de skinbrede map `Locales/` uit Stap 7.
+Een module kan zijn eigen vertalingen bewaren in een submap `lang/` naast `Script.lua`, gelezen via de meegeleverde module [Locale.i18n](../modules/locale.md): één bestand `lang/<code>/<name>.json` per onderdeel en taal, met stabiele id's als sleutels en het Engels in `lang/en/` als terugval. Dit staat los van de skinbrede map `Locales/` uit Stap 7, en het is de enige manier waarop een globale module zijn tekst kan vertalen. Enkele oudere stages van de meegeleverde skin (bijvoorbeeld `Modules/Stages/intro_nokon/lang/ja.lua`) gebruiken de eerste vorm van de bibliotheek, een Lua-tabel die elke Engelse string aan zijn vertaling koppelt.
 
 ```
 Modules/Stages/my_stage/
   Script.lua
   lang/
-    ja.lua        -- require("lang.ja")
+    en/my_stage.json   -- require("Locale.i18n").texts("my_stage")
+    ja/my_stage.json
 ```
 
 ## Stap 11: Installeer en selecteer de skin

@@ -1,16 +1,15 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local, inject-field, param-type-mismatch
-local DBItems = require("DBControllers/dbItems")
-local Almanac  = require("almanac")     -- date patterns
-local SEASONAL = require("seasonal")    -- featured big-slot items, by date
+local Daily = require("Shop.Daily")       -- the day's stock, its saved state and the purchases
+local Catalog = require("Shop.Catalog")   -- the items
 local PopUI = require("PopUI")
 local SavePicker = require("SavePicker")
 local NavInput = require("NavInput")
-local Util = require("Util")
 local Magazine = require("magazine")   -- the catalog page
 local Keeper = require("keeper")       -- the shopkeeper and its speech bubble
 local Easing = require("Easing")
 
 local save = nil
+local shop = nil               -- Shop.Daily for the chosen save
 local playerIndex = 0          -- which of the 5 local saves' shop we're browsing (chosen on entry)
 local confirmUI = nil          -- PopUI modal for the buy-confirm / reroll-confirm / player-select
 
@@ -28,7 +27,6 @@ local fonts = {}               -- glyph fonts: mast, big, mid, small, talk
 local cols = {}
 
 -- Menu navigation
-local layoutSize = 5
 local selected = "back"        -- the listing in focus: "big", "n1".."n6", "reroll" or "back"
 
 -- Animation clock (seconds, advanced in draw so the page keeps moving while the stage fades out)
@@ -41,44 +39,18 @@ local idleT, idleNext = 0, 15
 local revealAt = 0                    -- when the way-in transition stops hiding the page (on this clock)
 local pendingLine = nil               -- a keeper line held until then
 
--- Items
-local bigItem = nil
-local normalItems = {}
-
 -- Confirm screen
 local toBuyItem = nil
 local toBuyItemIcon = nil
 local toBuySlot = 0   -- 1‥6 = normal slot, SLOT_BIG = big item
 local confirmIdx = 0
 
--- Rerolls
-local executedRerolls = 0
-
 -- Current Screen
 local currentScreen = "shop"
 
--- Daily shop persistence
-local shopDB           = nil
-local currentFreezeKey = 0
-local soldOutMask      = 0   -- bitmask: bits 0‥5 = normalItems[1‥6], bit 6 = bigItem
-
-local SLOT_BIG = 7   -- bit index 6 in the bitmask
+local SLOT_BIG = Daily.SLOT_BIG
 
 -- ── Helpers ───────────────────────────────────────────────────────────────────
-
-local function getJstFreezeKey()
-	-- UTC+9; "!" forces UTC interpretation in os.date so we can add the offset manually
-	local jst = os.date("!*t", os.time() + 9 * 3600)
-	return jst.year * 10000 + jst.month * 100 + jst.day
-end
-
-local function isSoldOut(mask, slot)
-	return ((mask >> (slot - 1)) & 1) == 1
-end
-
-local function markSoldOut(mask, slot)
-	return mask | (1 << (slot - 1))
-end
 
 -- the skin's Locales/<code>/ through THEME; the English text stays in the code as the fallback
 local function tr(key, fallback)
@@ -94,48 +66,6 @@ local function trf(key, fallback, ...)
 	return string.format(fallback, ...)
 end
 
--- items buyable only ONCE ever, then never repooled: itempool.OneTime = 1 (e.g. the pod) — a plain DB
--- column so new one-time items need no code change. (Named OneTime, not "Unique": UNIQUE is a reserved
--- SQL word, and isUnique below already means "pulled from the pool within a roll".) A furniture grant
--- counter (.myroom_<id>) is drained by My Room and cannot signal lasting ownership, so a bought
--- one-time item sets a persistent "<RefText>_owned" trigger; isOwned reads it and isEntryIncluded then
--- drops the item from every future roll.
-local function isOneTime(entry) return tonumber(entry.OneTime or 0) == 1 end
-local function ownedTrigger(entry) return entry.RefText .. "_owned" end
-
-local function isUnique(entry)
-	if isOneTime(entry) then
-		return true              -- treat as unique so it is pulled from the pool once picked / once owned
-	end
-	if entry.Type == "counterable" then
-		return false
-	end
-	return true
-end
-
-local function isOwned(entry)
-	if isOneTime(entry) then
-		return save:GetGlobalTrigger(ownedTrigger(entry))
-	end
-	if entry.Type == "triggerable" then
-		return save:GetGlobalTrigger(entry.RefText)
-	end
-	if entry.Type == "nameplate" then
-		return save:IsNameplateUnlocked(entry.RefInt)
-	end
-	return false
-end
-
-local function isEntryIncluded(entry)
-	if entry.Condition ~= nil then
-		return save:GetGlobalTrigger(entry.Condition)
-	end
-	if isUnique(entry) then
-		return not isOwned(entry)
-	end
-	return true
-end
-
 local function entryHasicon(entry)
 	if entry.Type == "nameplate" then
 		return false
@@ -143,258 +73,37 @@ local function entryHasicon(entry)
 	return true
 end
 
--- ── Item pool cache ───────────────────────────────────────────────────────────
+-- ── Icons ─────────────────────────────────────────────────────────────────────
 
-local _cachedPools = nil
-
-local function ensureCachedPools()
-	if _cachedPools == nil then
-		_cachedPools = {
-			normal = Util.cloneTable(DBItems:GetItems("regular")),
-			big    = Util.cloneTable(DBItems:GetItems("major"))
-		}
+-- an item's picture: My Room furniture shows the shared thumbnail My Room baked at onStart
+-- (myroom_thumb_<id>, never disposed here; none before My Room was opened), other items
+-- Textures/Icons/<code>.png
+local function iconFor(item)
+	if not entryHasicon(item) then return nil, nil end
+	local fid = Catalog.furnitureId(item.Code)
+	if fid then
+		local shared = SHARED:GetSharedTexture("myroom_thumb_"..fid)
+		if shared and shared.Loaded then return shared, true end
+		return nil, nil
 	end
+	return TEXTURE:CreateTexture("Textures/Icons/"..item.Code..".png"), nil
 end
 
-local function findItemByCode(code)
-	if code == nil or code == "" then return nil end
-	ensureCachedPools()
-	for _, pool in pairs(_cachedPools) do
-		for i = 1, #pool do
-			if pool[i].Code == code then return pool[i] end
-		end
+local function freeIcons()
+	for k, v in pairs(icons) do
+		if not sharedIcon[k] then v:Dispose() end
 	end
-	return nil
+	icons = {}
+	sharedIcon = {}
 end
 
--- My Room furniture rows use the code "furn_<id>"; the shop draws their preview from a shared texture
--- baked by My Room (myroom_thumb_<id>) instead of loading a per-shop model/PNG.
-local function furnitureId(code)
-	if code and code:sub(1, 5) == "furn_" then return code:sub(6) end
-	return nil
-end
-
--- an item's shown name: My Room pieces and the vault keys use the skin's strings (the same ones My Room
--- and the vault show), anything else the name in its database row
-local KEY_NAMES = { vault_key_greed = "VAULT_KEY_GREED", vault_key_simple = "VAULT_KEY_1",
-	vault_key_gold = "VAULT_KEY_2", vault_key_optk = "VAULT_KEY_3" }
-local function itemName(item)
-	local own = LANG:FromString(item.Name):GetString("")
-	local fid = furnitureId(item.Code)
-	if fid then return tr("ITEM_" .. fid:upper(), own) end
-	if KEY_NAMES[item.Code] then return tr(KEY_NAMES[item.Code], own) end
-	return own
-end
-
-local function setupItem(entry, iconIdx)
-	if entry == nil then return nil end
-	local item = Util.deepcopy(entry)
-	item.LocalizedName = itemName(item)
-	item.SoldOut = false
-	if icons[iconIdx] ~= nil and not sharedIcon[iconIdx] then icons[iconIdx]:Dispose() end   -- the slot's previous picture
-	icons[iconIdx] = nil
-	sharedIcon[iconIdx] = nil
-	if entryHasicon(item) then
-		local fid = furnitureId(item.Code)
-		if fid then
-			-- furniture preview = the shared texture My Room baked at onStart (myroom_thumb_<id>)
-			local shared = SHARED:GetSharedTexture("myroom_thumb_"..fid)
-			if shared and shared.Loaded then
-				icons[iconIdx] = shared
-				sharedIcon[iconIdx] = true         -- shared: never Dispose in deactivate
-				item._shared = true                -- draw centered+scaled (thumbnails aren't full-stand art)
-			else
-				icons[iconIdx] = nil               -- not baked yet (My Room not opened) → name-only
-			end
-		else
-			icons[iconIdx] = TEXTURE:CreateTexture("Textures/Icons/"..item.Code..".png")
-		end
-	else
-		icons[iconIdx] = nil
-	end
-	return item
-end
-
--- roll a slot's stock: ranged items (StockMax>0, e.g. paints/floorings) get a random quantity you buy
--- one unit at a time; everything else is a single purchase (Stock 1 → sold out on first buy).
-local function rollStock(item)
-	if item == nil then return end
-	local smin = tonumber(item.StockMin) or 0
-	local smax = tonumber(item.StockMax) or 0
-	if smax > 0 then
-		smin = math.max(1, smin)
-		if smax < smin then smax = smin end
-		item.Stock = math.random(smin, smax)
-	else
-		item.Stock = 1
-	end
-end
-
--- ── Shop generation ───────────────────────────────────────────────────────────
-
-local function poolItems()
-	-- Address-of-a-table as extra seed entropy. %p formatting is platform-dependent (bionic
-	-- prints "0x..." where MSVC prints bare hex), so grab the trailing hex digits explicitly.
-	local ptr = tonumber(tostring({}):match("(%x+)%s*$") or "0", 16) or 0
-	math.randomseed(os.time() + ptr % 0x7FFFFFFF)
-
-	ensureCachedPools()
-	local _pools = _cachedPools
-
-	local itemPools = {
-		normal = {},
-		big = {}
-	}
-
-	local poolSizes = {
-		normal = 0,
-		big = 0
-	}
-
-	for pool, entries in pairs(_pools) do
-		local _count = #entries
-		for i = 1, _count do
-			local _e = entries[i]
-
-			if isEntryIncluded(_e) then
-				local _size = poolSizes[pool]
-				itemPools[pool][_size] = _e
-				poolSizes[pool] = _size + _e.PoolSize
-			end
-		end
-	end
-
-	debugLog(poolSizes["normal"] .. " - " .. poolSizes["big"])
-
-	-- helper to roll from weighted pool
-	local function pickFromPool(pool, roll)
-		local chosen = nil
-		local lastKey = -1
-		for key, e in pairs(pool) do
-			if key <= roll and key >= lastKey then
-				chosen = e
-				lastKey = key
-			end
-		end
-		return chosen
-	end
-
-	-- pick big item
-	if poolSizes.big > 0 then
-		local roll = math.random(0, poolSizes.big - 1)
-		bigItem = pickFromPool(itemPools.big, roll)
-		if bigItem.Type == "empty" then
-			-- a nothing is picked (can happen to have days with 6 small slots)
-			bigItem = nil
-		else
-			bigItem = setupItem(bigItem, 5)
-			rollStock(bigItem)
-		end
-	else
-		bigItem = nil
-	end
-
-	-- decide number of normal items
-	local count = bigItem and 4 or 6
-	layoutSize = bigItem and 5 or 6
-	normalItems = {}
-
-	-- copy normal pool
-	local pool = {}
-	for k, v in pairs(itemPools.normal) do
-		pool[k] = v
-	end
-	local poolSize = poolSizes.normal
-
-	-- pick normal items one by one
-	for n = 1, count do
-		if poolSize == 0 then
-			normalItems[n] = nil
-		else
-			local roll = math.random(0, poolSize - 1)
-			debugLog("Pool " .. poolSize .. " - " .. roll)
-			local chosen = pickFromPool(pool, roll)
-			normalItems[n] = setupItem(chosen, n)
-			rollStock(normalItems[n])
-
-			if chosen and isUnique(chosen) then
-				-- rebuild pool without this entry
-				local newPool = {}
-				local newSize = 0
-				for _, e in pairs(pool) do
-					if e ~= chosen then
-						newPool[newSize] = e
-						newSize = newSize + e.PoolSize
-					end
-				end
-				pool = newPool
-				poolSize = newSize
-			end
-		end
-	end
-
-	debugLog("Big: " .. tostring(bigItem and bigItem.LocalizedName or "nil"))
-	debugLog("Normal count: " .. tostring(#normalItems))
-	for _, v in pairs(normalItems) do
-		debugLog(v.LocalizedName .. " (" .. v.Code .. ")")
-	end
-end
-
--- ── Featured items ────────────────────────────────────────────────────────────
--- The best active entry of seasonal.lua (highest priority, not owned) takes the big slot. A fresh
--- roll and a reroll can both displace it, so this runs after every roll/load.
-local function applySeasonal()
-	if save == nil then return end
-	local pick = Almanac.pick(SEASONAL, save, function(e)
-		local item = findItemByCode(Almanac.plain(e.code))
-		return item == nil or isOwned(item)
-	end)
-	if pick == nil then return end
-	local code = Almanac.plain(pick.code)
-	if bigItem ~= nil and bigItem.Code == code then return end
-	bigItem = setupItem(findItemByCode(code), 5)
-	rollStock(bigItem)
-	soldOutMask = soldOutMask & ~(1 << (SLOT_BIG - 1))
-	layoutSize = 5
-	for i = 5, 6 do normalItems[i] = nil end
-end
-
--- ── Persistence helpers ───────────────────────────────────────────────────────
-
-local DB_PREFIX = ""   -- set in activate() from save.SaveId so each save file has its own shop state
-
-local function storeShopState(db)
-	db:Write(DB_PREFIX .. "day",     tostring(currentFreezeKey))
-	db:Write(DB_PREFIX .. "rerolls", tostring(executedRerolls))
-	db:Write(DB_PREFIX .. "soldout", tostring(soldOutMask))
-	db:Write(DB_PREFIX .. "big",       bigItem and bigItem.Code or "")
-	db:Write(DB_PREFIX .. "big_stock", tostring(bigItem and bigItem.Stock or 0))
+-- the pictures of the listed items: the featured one in icon 5, the entries in 1..6
+local function refreshIcons()
+	freeIcons()
+	if shop.big then icons[5], sharedIcon[5] = iconFor(shop.big) end
 	for i = 1, 6 do
-		db:Write(DB_PREFIX .. "n" .. i,          normalItems[i] and normalItems[i].Code or "")
-		db:Write(DB_PREFIX .. "n" .. i .. "s",   tostring(normalItems[i] and normalItems[i].Stock or 0))
+		if shop.normals[i] then icons[i], sharedIcon[i] = iconFor(shop.normals[i]) end
 	end
-end
-
-local function loadShopState(db)
-	soldOutMask = tonumber(db:Read(DB_PREFIX .. "soldout") or "0") or 0
-
-	bigItem = setupItem(findItemByCode(db:Read(DB_PREFIX .. "big")), 5)
-	if bigItem then bigItem.Stock = tonumber(db:Read(DB_PREFIX .. "big_stock") or "1") or 1 end
-
-	normalItems = {}
-	for i = 1, 6 do
-		normalItems[i] = setupItem(findItemByCode(db:Read(DB_PREFIX .. "n" .. i)), i)
-		if normalItems[i] then normalItems[i].Stock = tonumber(db:Read(DB_PREFIX .. "n" .. i .. "s") or "1") or 1 end
-	end
-
-	-- Apply soldout flags from saved mask
-	if bigItem and isSoldOut(soldOutMask, SLOT_BIG) then bigItem.SoldOut = true end
-	for i = 1, 6 do
-		if normalItems[i] and isSoldOut(soldOutMask, i) then normalItems[i].SoldOut = true end
-	end
-
-	layoutSize = bigItem and 5 or 6
-	executedRerolls = tonumber(db:Read(DB_PREFIX .. "rerolls") or "0") or 0
 end
 
 -- ── Draw ──────────────────────────────────────────────────────────────────────
@@ -405,7 +114,7 @@ local TILL_X, TILL_Y = 1738, 944          -- the coin counter on the desk's fron
 local CONFIRM_CX, BTN_W = 614, 340        -- the modals sit over the page, leaving the keeper in view
 
 local function rerollPrice()
-	return math.floor(10 * (2 ^ executedRerolls))
+	return shop and shop:rerollPrice() or Daily.rerollPrice(0)
 end
 
 -- draw a flat texture centered on (cx,cy), scaled to fit a boxSize square (the confirm preview)
@@ -459,7 +168,7 @@ function draw()
 
 	-- the page; before a save is chosen only its masthead shows
 	view.ready = save ~= nil
-	view.big, view.normals, view.icons, view.selected = bigItem, normalItems, icons, selected
+	view.big, view.normals, view.icons, view.selected = shop and shop.big, shop and shop.normals or {}, icons, selected
 	Magazine.draw(now, lastDt, view)
 
 	if currentScreen ~= "shop" and confirmUI then
@@ -494,15 +203,15 @@ local function idOfSlot(slot)
 end
 
 local function itemOf(id)
-	if id == "big" then return bigItem, icons[5], SLOT_BIG end
+	if id == "big" then return shop.big, icons[5], SLOT_BIG end
 	local k = slotOf(id)
-	return normalItems[k], icons[k], k
+	return shop.normals[k], icons[k], k
 end
 
 -- lay the page out for the current items (featured + 4 entries, or 6 entries); the focus stays where it was
 -- when that listing still exists
 local function relayout(reshuffle)
-	local ids = Magazine.layout(bigItem ~= nil, reshuffle)
+	local ids = Magazine.layout(shop.big ~= nil, reshuffle)
 	for _, id in ipairs(ids) do
 		if id == selected then return end
 	end
@@ -533,29 +242,6 @@ local function browseEvent(id)
 	local item = itemOf(id)
 	if item == nil or item.SoldOut then return nil end
 	return id == "big" and "featured" or "browse"
-end
-
--- buy `qty` units of a slot at once: grants qty (counterable → +qty to the counter; single-buy types
--- ignore qty), spends price×qty, decrements the slot stock, and marks it sold out only when depleted.
-local function purchaseItemMultiple(item, slot, qty)
-	qty = math.max(1, math.min(math.floor(qty or 1), item.Stock or 1))
-	if item.Type == "nameplate" then
-		save:UnlockNameplate(item.RefInt)
-	elseif item.Type == "triggerable" then
-		save:SetGlobalTrigger(item.RefText, true)
-	elseif item.Type == "counterable" then
-		-- My Room claims the counter deltas into its inventory
-		save:SetGlobalCounter(item.RefText, save:GetGlobalCounter(item.RefText) + qty)
-	end
-	if isOneTime(item) then save:SetGlobalTrigger(ownedTrigger(item), true) end   -- bought once, never repooled
-	save:SpendCoins(item.Price * qty)
-	item.Stock = (item.Stock or 1) - qty
-	if item.Stock <= 0 then
-		item.SoldOut = true
-		soldOutMask = markSoldOut(soldOutMask, slot)
-	end
-	storeShopState(shopDB)   -- persist the new stock + soldout so a reopen shows the same counts
-	sounds.Buy:Play()
 end
 
 local function closeConfirm()
@@ -613,11 +299,11 @@ local function buildConfirmUI(item, slot)
 	local buyBtn = confirmUI:button{ text = tr("SHOP_UI_BUY", "Buy"), x = bx, y = buyY, w = BTN_W, h = 76, accent = true,
 		onClick = function()
 			local qty = (qtyChooser and tonumber(qtyChooser:value())) or 1
-			if item.Price * qty > save.Coins then   -- can't afford (guarded)
+			local before = save.Coins
+			if not shop:buy(slot, qty) then   -- can't afford (guarded)
 				sounds.SoldOut:Play(); Keeper.say("poor", now); return
 			end
-			local before = save.Coins
-			purchaseItemMultiple(item, slot, qty)
+			sounds.Buy:Play()
 			coinFrom, coinT = before, now
 			Magazine.poke(idOfSlot(slot), "bought", now, item.SoldOut)
 			Keeper.say("bought", now)
@@ -645,8 +331,7 @@ local function buildRefreshUI()
 		onClick = function()
 			if price > save.Coins then sounds.SoldOut:Play(); Keeper.say("poor", now); return end
 			local before = save.Coins
-			save:SpendCoins(price); executedRerolls = executedRerolls + 1; soldOutMask = 0
-			poolItems(); applySeasonal(); storeShopState(shopDB); sounds.Buy:Play()
+			shop:reroll(); refreshIcons(); sounds.Buy:Play()
 			coinFrom, coinT = before, now
 			closeConfirm()
 			relayout(true)
@@ -778,22 +463,12 @@ end
 
 -- ── Player select + per-save shop state ────────────────────────────────────────
 
--- commit to a save file: the shop DB is keyed by the save's SaveUID, so each save has its OWN daily
--- rolls (falls back to slot index for saves predating the SaveUID migration).
+-- commit to a save file: each save has its OWN daily shop (Shop.Daily)
 local function enterShopFor(index)
 	playerIndex = index
-	save = GetSaveFile(index)
-	local uid = (save.SaveUID and save.SaveUID ~= "") and save.SaveUID or ("slot" .. index)
-	DB_PREFIX = uid .. "_"
-	shopDB = DATABASE:OpenLocalDatabase("shop_state")
-	currentFreezeKey = getJstFreezeKey()
-	local storedDay = tonumber(shopDB:Read(DB_PREFIX .. "day") or "0") or 0
-	if storedDay ~= currentFreezeKey then
-		executedRerolls = 0; soldOutMask = 0; poolItems(); applySeasonal(); storeShopState(shopDB)
-	else
-		loadShopState(shopDB)
-		applySeasonal(); storeShopState(shopDB)
-	end
+	shop = Daily.open(index)
+	save = shop.save
+	refreshIcons()
 	selected = "back"
 	currentScreen = "shop"
 	relayout(true)
@@ -849,7 +524,7 @@ function activate()
 	Magazine.init(ctx)
 	ctx.nudge = Magazine.nudge
 	Keeper.init(ctx)
-	Keeper.load(getJstFreezeKey())
+	Keeper.load(Daily.freezeKey())
 
 	sounds.BGM:SetLoop(true)
 	sounds.BGM:Play()
@@ -865,16 +540,12 @@ function deactivate()
 	coinTex = nil
 	Keeper.free()
 
-	for k, v in pairs(icons) do
-		if not sharedIcon[k] then v:Dispose() end   -- shared My Room textures are owned by the global store
-	end
-	icons = {}
-	sharedIcon = {}
+	freeIcons()   -- shared My Room textures are owned by the global store
 
 	if confirmUI then confirmUI:disposeWidgets(); confirmUI = nil end
 
-	if shopDB then shopDB:Dispose() end
-	shopDB = nil
+	if shop then shop:close() end
+	shop = nil
 
 	sounds.BGM:Stop()
 end

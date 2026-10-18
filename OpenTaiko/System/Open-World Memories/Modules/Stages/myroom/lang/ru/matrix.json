@@ -1,9 +1,0 @@
-{
-  "_comment": "Russian texts for the Placeholder Matrix (matrix.lua). Keys are stable ids; a missing id shows the English text (lang/en).",
-  "hint": "Выберите сцену для проекции.",
-  "unlock_title": "Закрытая сцена",
-  "unlock_q": "Открыть «%s»?",
-  "unlock_yes": "Открыть",
-  "unlock_no": "Назад",
-  "broke": "Недостаточно монет."
-}

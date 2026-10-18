@@ -92,7 +92,8 @@ local function buildMenus()
             title = tr("TITLE_MYROOM", "My Room"),
             desc  = tr("TITLE_MYROOM_DESC", "Decorate your personal room, place furniture, and visit other players' rooms!"),
             c     = col(30, 150, 60),
-            via   = "stage", stage = "myroom", trans = "myroom_door", pickSave = "room",
+            via   = "stage", stage = "my_room", trans = "myroom_door", pickSave = "room",
+            back  = "_title|myroom_door",   -- My Room's way back (the shared string my_room_return)
         },
         {
             title = tr("TITLE_STORE", "OpenTaiko's General Store"),
@@ -329,7 +330,7 @@ end
 local function openSavePicker(kind)
     if kind == "room" then
         -- coming from the title, My Room opens at its entrance
-        pcall(function() SHARED:SetSharedString("myroom_return", "") end)
+        pcall(function() SHARED:SetSharedString("my_room_place", "") end)
         return SavePicker.open{ title = tr("TITLE_SAVE_ROOM", "Whose room?"), info = roomInfo }
     end
     return SavePicker.open{ title = tr("SHOP_UI_WHOSE", "Whose shop?"), coins = true }
@@ -351,6 +352,7 @@ end
 
 local function doExit()
     local m = menus[curIdx]
+    if m.back then pcall(function() SHARED:SetSharedString("my_room_return", m.back) end) end
     if     m.via == "stage"       then return Exit("stage",  m.stage, (m.fastTrans and fastTransitions()) and m.fastTrans or m.trans)
     elseif m.via == "config"      then return Exit("legacy", "config", m.trans)
     elseif m.via == "exit"        then return Exit("legacy", "exit", m.trans)

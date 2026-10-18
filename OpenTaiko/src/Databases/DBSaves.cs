@@ -239,9 +239,13 @@ internal class DBSaves {
 	#region [global_counters Table]
 
 	public static Dictionary<string, double> GetGlobalCountersDict(Int64 saveId) {
-		Dictionary<string, double> _globalCounters = new Dictionary<string, double>();
 		SqliteConnection? connection = GetSavesDBConnection();
-		if (connection == null) return _globalCounters;
+		if (connection == null) return new Dictionary<string, double>();
+		return GetGlobalCountersDict(connection, saveId);
+	}
+
+	internal static Dictionary<string, double> GetGlobalCountersDict(SqliteConnection connection, Int64 saveId) {
+		Dictionary<string, double> _globalCounters = new Dictionary<string, double>();
 
 		var command = connection.CreateCommand();
 		command.CommandText =
@@ -264,26 +268,31 @@ internal class DBSaves {
 	public static void DBSetGlobalCounter(Int64 saveId, string counterName, double counterValue) {
 		SqliteConnection? connection = GetSavesDBConnection();
 		if (connection == null) return;
+		DBSetGlobalCounter(connection, saveId, counterName, counterValue);
+	}
 
-		var command = connection.CreateCommand();
-		command.CommandText =
-			@$"
-                BEGIN TRANSACTION;
+	// the name and value go in as parameters: a quote in the name or a culture's decimal comma can't break the SQL
+	internal static void DBSetGlobalCounter(SqliteConnection connection, Int64 saveId, string counterName, double counterValue) {
+		using var transaction = connection.BeginTransaction();
+		using var command = connection.CreateCommand();
+		command.Transaction = transaction;
+		command.CommandText = """
+			UPDATE global_counters
+			SET CounterValue = $value
+			WHERE CounterName = $name AND SaveId = $save;
 
-				UPDATE global_counters
-				SET CounterValue = {counterValue}
-				WHERE CounterName = '{counterName}' AND SaveId = {saveId};
-
-				INSERT INTO global_counters (CounterName, SaveId, CounterValue)
-				SELECT '{counterName}', {saveId}, {counterValue}
-				WHERE NOT EXISTS (
-					SELECT 1 FROM global_counters
-					WHERE CounterName = '{counterName}' AND SaveId = {saveId}
-				);
-
-				COMMIT;
-            ";
+			INSERT INTO global_counters (CounterName, SaveId, CounterValue)
+			SELECT $name, $save, $value
+			WHERE NOT EXISTS (
+				SELECT 1 FROM global_counters
+				WHERE CounterName = $name AND SaveId = $save
+			);
+			""";
+		command.Parameters.AddWithValue("$name", counterName);
+		command.Parameters.AddWithValue("$save", saveId);
+		command.Parameters.AddWithValue("$value", counterValue);
 		command.ExecuteNonQuery();
+		transaction.Commit();
 	}
 
 
@@ -292,9 +301,13 @@ internal class DBSaves {
 	#region [active_triggers Table]
 
 	public static HashSet<string> GetActiveTriggersSet(Int64 saveId) {
-		HashSet<string> _activeTriggers = new HashSet<string>();
 		SqliteConnection? connection = GetSavesDBConnection();
-		if (connection == null) return _activeTriggers;
+		if (connection == null) return new HashSet<string>();
+		return GetActiveTriggersSet(connection, saveId);
+	}
+
+	internal static HashSet<string> GetActiveTriggersSet(SqliteConnection connection, Int64 saveId) {
+		HashSet<string> _activeTriggers = new HashSet<string>();
 
 		var command = connection.CreateCommand();
 		command.CommandText =
@@ -316,24 +329,60 @@ internal class DBSaves {
 	public static void DBToggleGlobalTrigger(Int64 saveId, string triggerName, bool triggerValue) {
 		SqliteConnection? connection = GetSavesDBConnection();
 		if (connection == null) return;
+		DBToggleGlobalTrigger(connection, saveId, triggerName, triggerValue);
+	}
 
-		var command = connection.CreateCommand();
-		if (triggerValue) {
-			command.CommandText =
-			@$"
-                    INSERT INTO active_triggers (Trigger, SaveId)
-					SELECT '{triggerName}', {saveId}
-					WHERE NOT EXISTS (
-						SELECT 1 FROM active_triggers WHERE Trigger='{triggerName}' AND SaveId={saveId}
-					);
-                ";
-		} else {
-			command.CommandText =
-			@$"
-                    DELETE FROM active_triggers
-					WHERE Trigger='{triggerName}' AND SaveId={saveId};
-                ";
-		}
+	internal static void DBToggleGlobalTrigger(SqliteConnection connection, Int64 saveId, string triggerName, bool triggerValue) {
+		using var command = connection.CreateCommand();
+		command.CommandText = triggerValue
+			? """
+				INSERT INTO active_triggers (Trigger, SaveId)
+				SELECT $name, $save
+				WHERE NOT EXISTS (
+					SELECT 1 FROM active_triggers WHERE Trigger = $name AND SaveId = $save
+				);
+				"""
+			: "DELETE FROM active_triggers WHERE Trigger = $name AND SaveId = $save;";
+		command.Parameters.AddWithValue("$name", triggerName);
+		command.Parameters.AddWithValue("$save", saveId);
+		command.ExecuteNonQuery();
+	}
+
+	#endregion
+
+	#region [global_strings Table]
+
+	public static Dictionary<string, string> GetGlobalStringsDict(Int64 saveId) {
+		SqliteConnection? connection = GetSavesDBConnection();
+		if (connection == null) return new Dictionary<string, string>();
+		return GetGlobalStringsDict(connection, saveId);
+	}
+
+	internal static Dictionary<string, string> GetGlobalStringsDict(SqliteConnection connection, Int64 saveId) {
+		var strings = new Dictionary<string, string>();
+		using var command = connection.CreateCommand();
+		command.CommandText = "SELECT StringName, StringValue FROM global_strings WHERE SaveId = $save;";
+		command.Parameters.AddWithValue("$save", saveId);
+		using var reader = command.ExecuteReader();
+		while (reader.Read()) strings[reader.GetString(0)] = reader.GetString(1);
+		return strings;
+	}
+
+	public static void DBSetGlobalString(Int64 saveId, string stringName, string stringValue) {
+		SqliteConnection? connection = GetSavesDBConnection();
+		if (connection == null) return;
+		DBSetGlobalString(connection, saveId, stringName, stringValue);
+	}
+
+	internal static void DBSetGlobalString(SqliteConnection connection, Int64 saveId, string stringName, string stringValue) {
+		using var command = connection.CreateCommand();
+		command.CommandText = """
+			INSERT INTO global_strings (StringName, SaveId, StringValue) VALUES ($name, $save, $value)
+			ON CONFLICT (SaveId, StringName) DO UPDATE SET StringValue = excluded.StringValue;
+			""";
+		command.Parameters.AddWithValue("$name", stringName);
+		command.Parameters.AddWithValue("$save", saveId);
+		command.Parameters.AddWithValue("$value", stringValue);
 		command.ExecuteNonQuery();
 	}
 

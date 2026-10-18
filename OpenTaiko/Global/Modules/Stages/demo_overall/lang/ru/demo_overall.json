@@ -1,0 +1,8 @@
+{
+  "_comment": "Russian texts for demo_overall. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "demo_theme_settings": "Настройки темы",
+  "demo_gradient": "Градиентные карты",
+  "demo_database": "Базы данных",
+  "demo_dan_plate": "Таблички дан",
+  "demo_first_demo": "Первое демо"
+}

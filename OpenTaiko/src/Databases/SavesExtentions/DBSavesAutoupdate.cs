@@ -36,6 +36,11 @@ namespace OpenTaiko {
 				BackupSavesDB(connection, "v0.6.1.2");
 				NameplateIdsAsText(connection);
 			}
+
+			// 0.6.1.3 - Global strings: a save's named text values (a module's data as JSON, for example)
+			if (VersionComparer.CompareVersions(version, "v0.6.1.3") < 0) {
+				AddGlobalStringsTable(connection);
+			}
 		}
 
 		#region [Helpers]
@@ -199,6 +204,32 @@ namespace OpenTaiko {
 					Run($"ALTER TABLE saves DROP COLUMN {column};");
 
 			Run("UPDATE opentaiko_version SET SupportedVersion = 'v0.6.1.2';");
+			transaction.Commit();
+		}
+
+		#endregion
+
+		#region [0.6.1.3 - Global strings]
+
+		// one value per save and name; runs in one transaction with the version update
+		private static void AddGlobalStringsTable(SqliteConnection connection) {
+			using var transaction = connection.BeginTransaction();
+			using (var command = connection.CreateCommand()) {
+				command.Transaction = transaction;
+				command.CommandText = """
+				CREATE TABLE IF NOT EXISTS "global_strings" (
+					"EntryId"		INTEGER NOT NULL UNIQUE,
+					"StringName"	TEXT NOT NULL,
+					"StringValue"	TEXT NOT NULL DEFAULT '',
+					"SaveId"		INTEGER,
+					FOREIGN KEY("SaveId") REFERENCES "saves"("SaveId"),
+					PRIMARY KEY("EntryId" AUTOINCREMENT),
+					UNIQUE("SaveId", "StringName")
+				);
+				UPDATE opentaiko_version SET SupportedVersion = 'v0.6.1.3';
+				""";
+				command.ExecuteNonQuery();
+			}
 			transaction.Commit();
 		}
 

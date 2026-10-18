@@ -156,6 +156,13 @@ The game does not scan `Modules/Lib/`. You load files there with `require`: a mo
 
 The game folder can also hold modules that every skin loads. `Global/Modules/` in the game's install folder has the same `Transitions/`, `Stages/`, `Activities/`, `ROActivities/` and `Lib/` subfolders as a skin's `Modules/`, and the game loads each global category right after the skin's. A name can exist in both places. When a skin module asks for a stage, activity, ROActivity or transition by name, it gets the skin's module, and a global module gets the global one; each falls back to the other place when its own has no module of that name. `require` follows the same rule: a global module looks in `Global/Modules/Lib/` before the skin's `Modules/Lib/`. The modules the game itself looks up by name (listed below) come from the skin first. `_boot` and `_title` must stay in the skin: when `Global/Modules/Stages/` holds either of them, the game stops with an error at startup.
 
+The Lib files the game ships in `Global/Modules/Lib/` are documented in [Provided modules](../modules/README.md): a UI library, a dialogue box, input and localization helpers, the 3D world engine, and the rules of the pagoda, the vault and the coin shop, under namespaced names such as `require("UI.Pick")` or `require("Core.Easing")`. A few rules follow from where global files live:
+
+- A Lib file runs in the Lua state of the module that requires it. Its own requires follow that module's search order, and the relative paths it gives `TEXTURE`, `SOUND`, `JSONLOADER` and the other loaders resolve against that module's folder. A Lib file that ships assets reaches them through `require("Core.Here")(...)` and the absolute-path loaders.
+- Global modules have no `Locales/` and no `ThemeSettings.json`: `THEME:GetSkinString` and the theme settings read the active skin's. A global module keeps its strings in its own `lang/` folder (Step 10).
+- `SHARED` textures, sounds and strings are one namespace for the skin and every global module: prefix your keys.
+- An update adds and replaces files but never deletes old ones, and skin modules search the skin's `Modules/Lib/` before `Global/Modules/Lib/`, so a stale skin file of the same name would win. That is why the provided modules live in namespace folders no skin file shares, and why the shipped skin keeps its old Lib names as two-line forwarders to them rather than deleting the files.
+
 Within each category the game creates every module first and then runs `onStart` on each, in the order Transitions, Stages, Activities, ROActivities.
 
 The game looks up these modules by name, and the shipped skin provides all of them:
@@ -217,13 +224,14 @@ function onDestroy() end
 
 ## Step 10: Localize a module with lang/
 
-A module can keep its own translations in a `lang/` subfolder next to `Script.lua`. Because the module's own folder is on its `require` path, `require("lang.ja")` resolves to `lang/ja.lua`. The shipped skin does this for its larger stages (for example `Modules/Stages/myroom/lang/ja.lua` and `Modules/Stages/intro_nokon/lang/ja.lua`) through the helper `Modules/Lib/i18n.lua`. This is separate from the skin-wide `Locales/` folder of Step 7.
+A module can keep its own translations in a `lang/` subfolder next to `Script.lua`, read through the provided module [Locale.i18n](../modules/locale.md): one `lang/<code>/<name>.json` file per feature and language, keyed by stable ids, with the English in `lang/en/` as the fallback. This is separate from the skin-wide `Locales/` folder of Step 7, and it is the only way a global module has to translate its text. Some older stages of the shipped skin (for example `Modules/Stages/intro_nokon/lang/ja.lua`) use the library's first form, a Lua table from each English string to its translation.
 
 ```
 Modules/Stages/my_stage/
   Script.lua
   lang/
-    ja.lua        -- require("lang.ja")
+    en/my_stage.json   -- require("Locale.i18n").texts("my_stage")
+    ja/my_stage.json
 ```
 
 ## Step 11: Install and select the skin

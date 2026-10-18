@@ -156,6 +156,13 @@ My New Skin/
 
 ゲームフォルダには、すべてのスキンが読み込むモジュールも置けます。ゲームのインストールフォルダの `Global/Modules/` には、スキンの `Modules/` と同じ `Transitions/`、`Stages/`、`Activities/`、`ROActivities/`、`Lib/` のサブフォルダがあり、ゲームは各カテゴリでスキンのモジュールの直後にグローバルのモジュールを読み込みます。同じ名前が両方にあってもかまいません。スキンのモジュールがステージ、アクティビティ、ROActivity、トランジションを名前で求めるとスキンのモジュールを、グローバルのモジュールが求めるとグローバルのモジュールを受け取り、自分の側にその名前のモジュールがなければもう一方を探します。`require` も同じ規則に従い、グローバルのモジュールはスキンの `Modules/Lib/` より先に `Global/Modules/Lib/` を探します。ゲーム自身が名前で探すモジュール（下記）はスキンのものが優先です。`_boot` と `_title` はスキンに置く必要があり、`Global/Modules/Stages/` にどちらかがあると、ゲームは起動時にエラーで停止します。
 
+ゲームが `Global/Modules/Lib/` に同梱する Lib ファイルは[提供モジュール](../modules/README.md)で説明しています。UI ライブラリ、ダイアログボックス、入力とローカライズのヘルパー、3D ワールドエンジン、そして未知の塔、金庫、コインショップのルールで、`require("UI.Pick")` や `require("Core.Easing")` のような名前空間付きの名前で読み込みます。グローバルのファイルの置き場所から、いくつかの規則が導かれます。
+
+- Lib ファイルは、それを require するモジュールの Lua ステートで実行されます。その中の require はそのモジュールの検索順に従い、`TEXTURE`、`SOUND`、`JSONLOADER` などのローダーに渡す相対パスはそのモジュールのフォルダを基準に解決されます。アセットを同梱する Lib ファイルは、`require("Core.Here")(...)` と絶対パスのローダーでそれらにアクセスします。
+- グローバルのモジュールには `Locales/` も `ThemeSettings.json` もありません。`THEME:GetSkinString` とテーマ設定は有効なスキンのものを読みます。グローバルのモジュールは文字列を自身の `lang/` フォルダに置きます (ステップ 10)。
+- `SHARED` のテクスチャ、サウンド、文字列は、スキンとすべてのグローバルのモジュールで 1 つの名前空間です。キーには接頭辞を付けてください。
+- アップデートはファイルを追加・置換しますが古いファイルを削除することはなく、スキンのモジュールは `Global/Modules/Lib/` より先にスキンの `Modules/Lib/` を探すため、同じ名前の古いスキンのファイルが優先されてしまいます。提供モジュールがどのスキンのファイルとも重ならない名前空間フォルダにあるのも、同梱スキンが古い Lib の名前をファイルを削除せずに 2 行の転送ファイルとして残しているのも、そのためです。
+
 各カテゴリ内で、ゲームはまずすべてのモジュールを作成し、その後 Transitions、Stages、Activities、ROActivities の順にそれぞれの `onStart` を実行します。
 
 ゲームは次のモジュールを名前で参照し、同梱スキンはそのすべてを提供しています。
@@ -217,13 +224,14 @@ function onDestroy() end
 
 ## ステップ 10: lang/ でモジュールをローカライズする
 
-モジュールは `Script.lua` の隣の `lang/` サブフォルダに独自の翻訳を置けます。モジュール自身のフォルダが `require` パスにあるため、`require("lang.ja")` は `lang/ja.lua` に解決されます。同梱スキンは大きなステージ (例えば `Modules/Stages/myroom/lang/ja.lua` や `Modules/Stages/intro_nokon/lang/ja.lua`) で、ヘルパー `Modules/Lib/i18n.lua` を通じてこれを行っています。これはステップ 7 のスキン全体の `Locales/` フォルダとは別のものです。
+モジュールは `Script.lua` の隣の `lang/` サブフォルダに独自の翻訳を置けます。読み込みは提供モジュール [Locale.i18n](../modules/locale.md) で行います。機能と言語ごとに 1 つの `lang/<code>/<name>.json` ファイルを、安定した id をキーとして置き、`lang/en/` の英語がフォールバックになります。これはステップ 7 のスキン全体の `Locales/` フォルダとは別のもので、グローバルのモジュールがテキストを翻訳する唯一の方法です。同梱スキンの一部の古いステージ (例えば `Modules/Stages/intro_nokon/lang/ja.lua`) は、ライブラリの最初の形式、つまり各英語文字列からその訳への Lua テーブルを使います。
 
 ```
 Modules/Stages/my_stage/
   Script.lua
   lang/
-    ja.lua        -- require("lang.ja")
+    en/my_stage.json   -- require("Locale.i18n").texts("my_stage")
+    ja/my_stage.json
 ```
 
 ## ステップ 11: スキンをインストールして選択する

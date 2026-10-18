@@ -129,8 +129,14 @@ namespace OpenTaiko {
 			return _sf.tGetGlobalCounter(counterName);
 		}
 
+		/// <summary>The save's text value of that name, "" when it has none (a module's data as JSON, for example).</summary>
+		public string GetGlobalString(string stringName) {
+			return _sf.tGetGlobalString(stringName);
+		}
+
 		public virtual void SetGlobalTrigger(string triggerName, bool triggerValue) => BlockWrite(nameof(SetGlobalTrigger));
 		public virtual void SetGlobalCounter(string counterName, double counterValue) => BlockWrite(nameof(SetGlobalCounter));
+		public virtual void SetGlobalString(string stringName, string stringValue) => BlockWrite(nameof(SetGlobalString));
 
 		/// <summary>
 		/// Returns the number of charts cleared at exactly <paramref name="clearStatus"/>

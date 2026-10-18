@@ -25,7 +25,7 @@ Llámala como función simple (`GetSaveFile(0)`). Un índice fuera de rango regi
 El perfil de un jugador: nombre, monedas, objetos desbloqueados, triggers y contadores, estadísticas de clear, personaje equipado, puchichara, placa de nombre y título de dan.
 
 <div class="callout warn">
-Lee las propiedades con sintaxis de punto (sf.Name, sf.Coins). Los métodos de escritura persisten de inmediato. Los módulos de solo lectura bloquean los siguientes: SpendCoins, EarnCoins, UnlockNameplate, UnlockSong, asignar SelectedHitsounds, SetGlobalTrigger, SetGlobalCounter, ChangeCharacter (devuelve false), UnlockPuchichara, ChangePuchichara, UnlockCharacter, ChangeDan, ChangeName y ChangeNameplate.
+Lee las propiedades con sintaxis de punto (sf.Name, sf.Coins). Los métodos de escritura persisten de inmediato. Los módulos de solo lectura bloquean los siguientes: SpendCoins, EarnCoins, UnlockNameplate, UnlockSong, asignar SelectedHitsounds, SetGlobalTrigger, SetGlobalCounter, SetGlobalString, ChangeCharacter (devuelve false), UnlockPuchichara, ChangePuchichara, UnlockCharacter, ChangeDan, ChangeName y ChangeNameplate.
 </div>
 
 | Método | Descripción |
@@ -49,8 +49,10 @@ Lee las propiedades con sintaxis de punto (sf.Name, sf.Coins). Los métodos de e
 | `sf.SelectedHitsounds  -> string` | Nombre de carpeta del conjunto de hitsounds seleccionado. Asignar un nombre distinto lo persiste y recarga los hitsounds del jugador. |
 | `sf:GetGlobalTrigger(name)  -> bool` | Lee un trigger booleano con nombre. |
 | `sf:GetGlobalCounter(name)  -> number` | Lee un contador numérico con nombre. |
+| `sf:GetGlobalString(name)  -> string` | Lee un valor de texto con nombre, "" si la partida no tiene ninguno (por ejemplo, los datos de un módulo guardados como JSON). |
 | `sf:SetGlobalTrigger(name, value)  -> nil` | Establece un trigger booleano con nombre. |
 | `sf:SetGlobalCounter(name, value)  -> nil` | Establece un contador numérico con nombre. |
+| `sf:SetGlobalString(name, value)  -> nil` | Establece un valor de texto con nombre y lo persiste. |
 | `sf:GetClearStatusCount(difficulty, clearStatus)  -> integer` | Número de charts de una dificultad (0 Easy a 4 Extra Extreme) cuyo mejor estado de clear es exactamente clearStatus (0 ninguno, 1 asistido, 2 clear, 3 full combo, 4 perfecto). 0 para argumentos fuera de rango. |
 | `sf:GetDanBestPlay(node)  -> danBestPlay` | La mejor partida sin mods de un nodo de canción dan (consulta Handle de mejor partida de dan); un handle con HasRecord false si no hay ninguna. |
 | `sf:GetCharacter()  -> character` | El handle de personaje vinculado al jugador de esta ranura (consulta Handle de personaje). |

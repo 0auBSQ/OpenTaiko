@@ -4,7 +4,7 @@
 
 Data opslaan die een herstart overleeft, SQLite-bestanden bevragen, bestanden, JSON en INI uit de modulemap lezen, resources delen tussen modules, en de spelconfiguratie lezen of wijzigen.
 
-Relatieve paden die aan DATABASE, SQL, STORAGE, JSONLOADER, INILOADER en SHARED worden doorgegeven, worden opgelost ten opzichte van de map van de draaiende module (de map die zijn `Script.lua` bevat).
+Relatieve paden die aan DATABASE, SQL, STORAGE, JSONLOADER, INILOADER en SHARED worden doorgegeven, worden opgelost ten opzichte van de map van de draaiende module (de map die zijn `Script.lua` bevat). Een Lib-bestand dat met `require` is geladen, heeft hier geen eigen map: zijn aanroepen worden opgelost ten opzichte van de module die het heeft geladen (zie [Meegeleverde modules](../modules/README.md)).
 
 Sommige methoden op deze pagina geven .NET-collecties terug, die zich anders gedragen dan Lua-tabellen:
 
@@ -37,6 +37,8 @@ Elke Read en Write opent en sluit een eigen LMDB-omgeving, dus elke aanroep is d
 | --- | --- |
 | `DATABASE:OpenLocalDatabase(path)  -> database` | Opent (en maakt zo nodig aan) een store op een pad relatief ten opzichte van de modulemap. |
 | `DATABASE:OpenGlobalDatabase(path)  -> database` | Opent (en maakt zo nodig aan) een store onder `Global/ApplicationData/LMDB/` in de spelmap, gedeeld door elke module. |
+
+Een lokale store staat in de map van zijn module en verhuist dus mee met de module: een stage die verhuist (van een skin naar `Global/Modules/`, of naar een nieuwe naam) begint met lege lokale stores, en de oude data blijft alleen vanuit de oude map leesbaar. Een Lib-bestand dat een lokale store opent, opent die van de aanroepende module: `Shop.Daily` bewaart zijn status in de `shop_state` van de aanroepende stage. Data die elke skin moet zien, hoort in het opslagbestand (`sf:SetGlobalString`, zie [Spelers en profielen](players.md)) of in een globale store.
 
 ### Database-handle
 

@@ -289,7 +289,7 @@ namespace OpenTaikoTests {
 			string dir = AppContext.BaseDirectory;
 			string? path = null;
 			for (int i = 0; i < 8 && dir != null; i++, dir = System.IO.Path.GetDirectoryName(dir)) {
-				string p = System.IO.Path.Combine(dir!, "OpenTaiko", "System", "Open-World Memories", "Modules", "Stages", "aviutl2_player", "Camera", "camera.aup2");
+				string p = System.IO.Path.Combine(dir!, "OpenTaiko", "Global", "Modules", "Stages", "demo_aviutl2", "Camera", "camera.aup2");
 				if (System.IO.File.Exists(p)) { path = p; break; }
 			}
 			if (path == null) return;

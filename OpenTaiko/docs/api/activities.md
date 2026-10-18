@@ -61,7 +61,7 @@ A character's Script.lua defines a different set: loadAnimation, disposeAnimatio
 A function the engine registers only in Stage scripts; calling it asks the engine to leave the stage.
 
 <div class="callout warn">
-Available in Modules/Stages scripts only; their host drives Activities and ROActivities, which do not get it. Accepts 0 to 3 arguments and tolerates nil in any position. The call itself requests the exit; the bundled stages write `return Exit(...)` inside update so nothing else runs that frame. target is "title", "play", "stage" or "legacy"; nil or any other value means "title". When target is "stage", name is the Modules/Stages module to jump to; when target is "legacy", name is one of "heya", "config", "exit" or "onlinelounge" (any other value goes to the title). transition names a Modules/Transitions module; if you omit it or the engine cannot find it, the engine uses the module named "default", and if the skin has no transitions at all a plain black fade-out plays. The "heya" key remains as an alias: it opens the skin's `myroom` module in Modules/Stages, or the title when the skin has none.
+Available in Modules/Stages scripts only; their host drives Activities and ROActivities, which do not get it. Accepts 0 to 3 arguments and tolerates nil in any position. The call itself requests the exit; the bundled stages write `return Exit(...)` inside update so nothing else runs that frame. target is "title", "play", "stage" or "legacy"; nil or any other value means "title". When target is "stage", name is the Modules/Stages module to jump to; when target is "legacy", name is one of "heya", "config", "exit" or "onlinelounge" (any other value goes to the title). transition names a Modules/Transitions module; if you omit it or the engine cannot find it, the engine uses the module named "default", and if the skin has no transitions at all a plain black fade-out plays. The stage and transition names prefer the caller's side: a skin stage finds the skin's module of that name first, a stage in Global/Modules the global one, each falling back to the other. The "heya" key remains as an alias: it opens the skin's `myroom` module in Modules/Stages, or the title when the skin has none.
 </div>
 
 | Method | Description |
@@ -71,7 +71,7 @@ Available in Modules/Stages scripts only; their host drives Activities and ROAct
 ```lua
 function update(timestamp)
     if INPUT:KeyboardPressed("S") then
-        return Exit("stage", "demo2")          -- jump to Modules/Stages/demo2
+        return Exit("stage", "mystage")        -- jump to Modules/Stages/mystage
     end
     if INPUT:Pressed("Cancel") then
         return Exit("title", nil, "nokon_curtain")   -- back to the title through a named transition
@@ -115,7 +115,7 @@ end
 Global for looking up a loaded Activity by name.
 
 <div class="callout warn">
-Registered as the ACTIVITY global in every module except ROActivities and backgrounds, where it is nil; those modules use ROACTIVITY. The engine loads Activities from Modules/Activities/{name}. ACTIVITY also exposes GetROActivity, which behaves like ROACTIVITY:GetROActivity.
+Registered as the ACTIVITY global in every module except ROActivities and backgrounds, where it is nil; those modules use ROACTIVITY. The engine loads Activities from Modules/Activities/{name}. ACTIVITY also exposes GetROActivity, which behaves like ROACTIVITY:GetROActivity. A lookup prefers the caller's side: a skin module gets the skin's Activity of that name, a module in Global/Modules the one in Global/Modules/Activities, each falling back to the other when its side has none. A Lib file looks up from the side of the module that required it.
 </div>
 
 | Method | Description |
@@ -128,7 +128,7 @@ Registered as the ACTIVITY global in every module except ROActivities and backgr
 Global for looking up a loaded read-only Activity (ROActivity) by name.
 
 <div class="callout warn">
-Registered as the ROACTIVITY global in every module. The engine loads ROActivities from Modules/ROActivities/{name} and gives them the read-only CONFIG, DATABASE and GetSaveFile globals, so their scripts cannot change game state (see the read-only modules section of How modules work). Activities and ROActivities are name-keyed singletons: one instance per folder, which every host shares.
+Registered as the ROACTIVITY global in every module. The engine loads ROActivities from Modules/ROActivities/{name} and gives them the read-only CONFIG, DATABASE and GetSaveFile globals, so their scripts cannot change game state (see the read-only modules section of How modules work). Activities and ROActivities are name-keyed singletons: one instance per folder, which every host shares. GetROActivity prefers the caller's side as ACTIVITY:GetActivity does, between Modules/ROActivities and Global/Modules/ROActivities.
 </div>
 
 | Method | Description |

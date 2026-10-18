@@ -1,0 +1,8 @@
+{
+  "_comment": "French texts for demo_overall. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "demo_theme_settings": "Paramètres du thème",
+  "demo_gradient": "Cartes de dégradé",
+  "demo_database": "Bases de données",
+  "demo_dan_plate": "Plaques de Dan",
+  "demo_first_demo": "Première démo"
+}

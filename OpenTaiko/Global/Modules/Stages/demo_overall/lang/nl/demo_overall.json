@@ -1,0 +1,8 @@
+{
+  "_comment": "Dutch texts for demo_overall. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "demo_theme_settings": "Thema-instellingen",
+  "demo_gradient": "Verloopkaarten",
+  "demo_database": "Databases",
+  "demo_dan_plate": "Dan-platen",
+  "demo_first_demo": "Eerste demo"
+}

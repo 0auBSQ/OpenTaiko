@@ -61,7 +61,7 @@
 エンジンがステージスクリプトにのみ登録する関数で、呼び出すとエンジンにステージを離れるよう要求します。
 
 <div class="callout warn">
-Modules/Stages のスクリプトでのみ利用できます。アクティビティと ROActivity はホストが駆動するため、これを持ちません。0 から 3 個の引数を受け付け、どの位置の nil も許容します。呼び出すこと自体が退出の要求になります。同梱ステージは、そのフレーム内で他に何も実行されないよう update の中で `return Exit(...)` と書いています。target は "title"、"play"、"stage"、"legacy" のいずれかで、nil やその他の値は "title" を意味します。target が "stage" のとき、name は移動先の Modules/Stages モジュールです。target が "legacy" のとき、name は "heya"、"config"、"exit"、"onlinelounge" のいずれかです (それ以外の値はタイトルへ移動します)。transition は Modules/Transitions モジュールの名前です。省略するかエンジンが見つけられない場合、エンジンは "default" という名前のモジュールを使い、スキンにトランジションがまったくない場合は単純な黒のフェードアウトが再生されます。"heya" キーはエイリアスとして残っています。Modules/Stages にあるスキンの `myroom` モジュールを開き、スキンにそのモジュールがない場合はタイトルへ移動します。
+Modules/Stages のスクリプトでのみ利用できます。アクティビティと ROActivity はホストが駆動するため、これを持ちません。0 から 3 個の引数を受け付け、どの位置の nil も許容します。呼び出すこと自体が退出の要求になります。同梱ステージは、そのフレーム内で他に何も実行されないよう update の中で `return Exit(...)` と書いています。target は "title"、"play"、"stage"、"legacy" のいずれかで、nil やその他の値は "title" を意味します。target が "stage" のとき、name は移動先の Modules/Stages モジュールです。target が "legacy" のとき、name は "heya"、"config"、"exit"、"onlinelounge" のいずれかです (それ以外の値はタイトルへ移動します)。transition は Modules/Transitions モジュールの名前です。省略するかエンジンが見つけられない場合、エンジンは "default" という名前のモジュールを使い、スキンにトランジションがまったくない場合は単純な黒のフェードアウトが再生されます。ステージとトランジションの名前は呼び出し元の側が優先されます。スキンのステージはその名前のスキンのモジュールを、Global/Modules のステージはグローバルのモジュールを先に見つけ、それぞれもう一方にフォールバックします。"heya" キーはエイリアスとして残っています。Modules/Stages にあるスキンの `myroom` モジュールを開き、スキンにそのモジュールがない場合はタイトルへ移動します。
 </div>
 
 | メソッド | 説明 |
@@ -71,7 +71,7 @@ Modules/Stages のスクリプトでのみ利用できます。アクティビ�
 ```lua
 function update(timestamp)
     if INPUT:KeyboardPressed("S") then
-        return Exit("stage", "demo2")          -- jump to Modules/Stages/demo2
+        return Exit("stage", "mystage")        -- jump to Modules/Stages/mystage
     end
     if INPUT:Pressed("Cancel") then
         return Exit("title", nil, "nokon_curtain")   -- back to the title through a named transition
@@ -115,7 +115,7 @@ end
 読み込み済みのアクティビティを名前で参照するためのグローバルです。
 
 <div class="callout warn">
-ROActivity とバックグラウンドを除くすべてのモジュールに ACTIVITY グローバルとして登録されています。ROActivity とバックグラウンドでは nil で、これらのモジュールは ROACTIVITY を使います。エンジンはアクティビティを Modules/Activities/{name} から読み込みます。ACTIVITY は GetROActivity も公開しており、ROACTIVITY:GetROActivity と同じように動作します。
+ROActivity とバックグラウンドを除くすべてのモジュールに ACTIVITY グローバルとして登録されています。ROActivity とバックグラウンドでは nil で、これらのモジュールは ROACTIVITY を使います。エンジンはアクティビティを Modules/Activities/{name} から読み込みます。ACTIVITY は GetROActivity も公開しており、ROACTIVITY:GetROActivity と同じように動作します。参照は呼び出し元の側が優先されます。スキンのモジュールはその名前のスキンのアクティビティを、Global/Modules のモジュールは Global/Modules/Activities のものを受け取り、自分の側にない場合はそれぞれもう一方にフォールバックします。Lib ファイルは、それを require したモジュールの側から参照します。
 </div>
 
 | メソッド | 説明 |
@@ -128,7 +128,7 @@ ROActivity とバックグラウンドを除くすべてのモジュールに AC
 読み込み済みの読み取り専用アクティビティ (ROActivity) を名前で参照するためのグローバルです。
 
 <div class="callout warn">
-すべてのモジュールに ROACTIVITY グローバルとして登録されています。エンジンは ROActivity を Modules/ROActivities/{name} から読み込み、読み取り専用の CONFIG、DATABASE、GetSaveFile グローバルを与えるため、そのスクリプトはゲームの状態を変更できません (「モジュールの仕組み」の読み取り専用モジュールの節を参照)。アクティビティと ROActivity は名前をキーとするシングルトンです。フォルダごとに 1 つのインスタンスがあり、すべてのホストがそれを共有します。
+すべてのモジュールに ROACTIVITY グローバルとして登録されています。エンジンは ROActivity を Modules/ROActivities/{name} から読み込み、読み取り専用の CONFIG、DATABASE、GetSaveFile グローバルを与えるため、そのスクリプトはゲームの状態を変更できません (「モジュールの仕組み」の読み取り専用モジュールの節を参照)。アクティビティと ROActivity は名前をキーとするシングルトンです。フォルダごとに 1 つのインスタンスがあり、すべてのホストがそれを共有します。GetROActivity は、ACTIVITY:GetActivity と同じように、Modules/ROActivities と Global/Modules/ROActivities の間で呼び出し元の側を優先します。
 </div>
 
 | メソッド | 説明 |

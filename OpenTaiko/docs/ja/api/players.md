@@ -25,7 +25,7 @@
 1 人のプレイヤーのプロフィール: 名前、コイン、アンロックしたアイテム、トリガーとカウンター、クリア統計、装備中のキャラクター、ぷちキャラ、ネームプレート、段位称号。
 
 <div class="callout warn">
-プロパティはドット構文で読み取ります (sf.Name、sf.Coins)。書き込みメソッドは直ちに永続化されます。読み取り専用モジュールは以下をブロックします: SpendCoins、EarnCoins、UnlockNameplate、UnlockSong、SelectedHitsounds への代入、SetGlobalTrigger、SetGlobalCounter、ChangeCharacter (false を返す)、UnlockPuchichara、ChangePuchichara、UnlockCharacter、ChangeDan、ChangeName、ChangeNameplate。
+プロパティはドット構文で読み取ります (sf.Name、sf.Coins)。書き込みメソッドは直ちに永続化されます。読み取り専用モジュールは以下をブロックします: SpendCoins、EarnCoins、UnlockNameplate、UnlockSong、SelectedHitsounds への代入、SetGlobalTrigger、SetGlobalCounter、SetGlobalString、ChangeCharacter (false を返す)、UnlockPuchichara、ChangePuchichara、UnlockCharacter、ChangeDan、ChangeName、ChangeNameplate。
 </div>
 
 | メソッド | 説明 |
@@ -49,8 +49,10 @@
 | `sf.SelectedHitsounds  -> string` | 選択中のヒットサウンドセットのフォルダ名。別の名前を代入すると永続化され、プレイヤーのヒットサウンドが再読み込みされます。 |
 | `sf:GetGlobalTrigger(name)  -> bool` | 名前付きの真偽値トリガーを読み取ります。 |
 | `sf:GetGlobalCounter(name)  -> number` | 名前付きの数値カウンターを読み取ります。 |
+| `sf:GetGlobalString(name)  -> string` | 名前付きのテキスト値を読み取ります。セーブにない場合は "" です (例えば JSON として保存したモジュールのデータ)。 |
 | `sf:SetGlobalTrigger(name, value)  -> nil` | 名前付きの真偽値トリガーを設定します。 |
 | `sf:SetGlobalCounter(name, value)  -> nil` | 名前付きの数値カウンターを設定します。 |
+| `sf:SetGlobalString(name, value)  -> nil` | 名前付きのテキスト値を設定し、永続化します。 |
 | `sf:GetClearStatusCount(difficulty, clearStatus)  -> integer` | ある難易度 (0 Easy から 4 Extra Extreme) の譜面のうち、最高のクリア状態がちょうど clearStatus (0 なし、1 アシストクリア、2 クリア、3 フルコンボ、4 全良) であるものの数。範囲外の引数には 0。 |
 | `sf:GetDanBestPlay(node)  -> danBestPlay` | 段位楽曲ノードに対する Mod なしのベストプレイ (段位ベストプレイハンドルを参照)。なければ HasRecord が false のハンドル。 |
 | `sf:GetCharacter()  -> character` | このスロットに紐づくプレイヤーキャラクターハンドル (キャラクターハンドルを参照)。 |

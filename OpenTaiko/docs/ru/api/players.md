@@ -25,7 +25,7 @@
 Профиль одного игрока: имя, монеты, разблокированные предметы, триггеры и счётчики, статистика клиров, экипированные персонаж, пучичара, табличка имени и титул дана.
 
 <div class="callout warn">
-Читайте свойства через точку (sf.Name, sf.Coins). Методы записи сохраняют изменения немедленно. Модули только для чтения блокируют следующее: SpendCoins, EarnCoins, UnlockNameplate, UnlockSong, присваивание SelectedHitsounds, SetGlobalTrigger, SetGlobalCounter, ChangeCharacter (возвращает false), UnlockPuchichara, ChangePuchichara, UnlockCharacter, ChangeDan, ChangeName и ChangeNameplate.
+Читайте свойства через точку (sf.Name, sf.Coins). Методы записи сохраняют изменения немедленно. Модули только для чтения блокируют следующее: SpendCoins, EarnCoins, UnlockNameplate, UnlockSong, присваивание SelectedHitsounds, SetGlobalTrigger, SetGlobalCounter, SetGlobalString, ChangeCharacter (возвращает false), UnlockPuchichara, ChangePuchichara, UnlockCharacter, ChangeDan, ChangeName и ChangeNameplate.
 </div>
 
 | Метод | Описание |
@@ -49,8 +49,10 @@
 | `sf.SelectedHitsounds  -> string` | Имя папки выбранного набора хитсаундов. Присваивание другого имени сохраняет его и перезагружает хитсаунды игрока. |
 | `sf:GetGlobalTrigger(name)  -> bool` | Читает именованный логический триггер. |
 | `sf:GetGlobalCounter(name)  -> number` | Читает именованный числовой счётчик. |
+| `sf:GetGlobalString(name)  -> string` | Читает именованное текстовое значение, "" если в сохранении его нет (например, данные модуля в виде JSON). |
 | `sf:SetGlobalTrigger(name, value)  -> nil` | Задаёт именованный логический триггер. |
 | `sf:SetGlobalCounter(name, value)  -> nil` | Задаёт именованный числовой счётчик. |
+| `sf:SetGlobalString(name, value)  -> nil` | Задаёт именованное текстовое значение и сохраняет его. |
 | `sf:GetClearStatusCount(difficulty, clearStatus)  -> integer` | Число чартов сложности (от 0 Easy до 4 Extra Extreme), лучший статус клира которых равен ровно clearStatus (0 нет, 1 клир с помощью, 2 клир, 3 фулл-комбо, 4 перфект). 0 для аргументов вне диапазона. |
 | `sf:GetDanBestPlay(node)  -> danBestPlay` | Лучшее прохождение без модов для узла дан-песни (см. «Дескриптор лучшего дан-прохождения»); дескриптор с HasRecord false, если записи нет. |
 | `sf:GetCharacter()  -> character` | Дескриптор персонажа, привязанного к игроку этого слота (см. «Дескриптор персонажа»). |

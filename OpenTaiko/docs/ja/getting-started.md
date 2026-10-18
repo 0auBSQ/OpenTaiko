@@ -8,7 +8,7 @@ OpenTaiko 0.6.1 では、スキンが Lua で画面を追加したり置き換�
 
 - OpenTaiko 0.6.1 と、Modules ディレクトリを持つスキンフォルダ。同梱スキンは System/Open-World Memories です。
 - テキストエディタと、基本的な Lua の知識 (関数、テーブル、require)。
-- System/Open-World Memories/Modules/Stages にある同梱ステージ。小さな demo1 と demo3 はコールバックの形を示し、大きなものは実際の画面がどう構成されているかを示します。
+- System/Open-World Memories/Modules/Stages と Global/Modules/Stages にある同梱ステージ。Global/Modules/Stages/demo_overall の小さなデモはコールバックの形を示し、大きなステージは実際の画面がどう構成されているかを示します。
 
 ## モジュールの置き場所
 
@@ -34,7 +34,7 @@ Modules/
 
 モジュールの Script.lua は決まった名前のトップレベルのグローバル関数を定義し、ゲームはそれぞれをグローバルとして読み取ります。ローカルテーブルに包んで返した関数をゲームは見つけられず、名前を間違えた関数 (onStart の代わりに OnStart など) は呼びません。未定義のコールバックは何もしない扱いになり、何も報告されないためです。ファイル内のそれ以外はすべてローカルにでき、モジュールを require で読み込む複数のファイルに分割できます。
 
-demo3 がコピーすべき最小の形です。
+これがコピーすべき最小の形です。
 
 ```lua
 -- Modules/Stages/mystage/Script.lua
@@ -73,9 +73,9 @@ end
 - activate(): ゲームはステージに入るたびにこれを呼びます。訪問ごとの状態のリセット、音楽の開始、データベースのオープンはここで行います。これもコルーチンとして実行され、LOADING を使えます。ゲームはキャラクターとぷちキャラのリスト (CHARACTERLIST、PUCHICHARALIST) を activate の実行直前に更新するので、ここで読み取ってください。onStart はその更新より前に実行されます。
 - update(timestamp): ゲームは毎フレーム draw の前にこれを呼び、ミリ秒単位のゲームクロックを渡します。入力の処理と状態の変更はここで行います。ステージが Exit を呼んだ後、ゲームは update を呼ぶのをやめ、draw はフェードアウトの間も呼び続けます。
 - draw(): ゲームは毎フレームこれを呼びます。描画のみを行い、フレームごとのアロケーションは少なく保ってください。
-- deactivate(): ゲームはステージを離れるときにこれを呼びます。demo3 はここでデータベースを破棄し、demo1 は音楽と動画を停止します。
+- deactivate(): ゲームはステージを離れるときにこれを呼びます。demo_overall のデータベースデモはここでデータベースを破棄し、最初のデモは音楽と動画を停止します。
 - afterSongEnum(): ゲームは起動時とソフト/ハードリロード後を含め、楽曲の列挙が完了するたびに、ステージがアクティブでなくてもこれを呼びます。モジュールが楽曲リストに依存する場合に使います。
-- onDestroy(): ゲームはスキンをアンロードする前にこれを呼びます。demo1 はここでテクスチャ、動画、テキストテクスチャ、サウンドを破棄します。
+- onDestroy(): ゲームはスキンをアンロードする前にこれを呼びます。demo_overall の最初のデモはここでテクスチャ、動画、テキストテクスチャ、サウンドを破棄します。
 - reloadLanguage(lang): ゲームは言語が変更されたときにこれを呼びます (下のローカライズの節を参照)。
 
 スキンが読み込まれると、ゲームはモジュールを種類ごとに、Transitions、次に Stages、Activities、ROActivities の順に作成します。種類の中では、どの onStart を呼ぶよりも先にすべての Script.lua を実行します。したがって、ステージの onStart の実行中はアクティビティと ROActivity はまだ存在しません。activate で参照してください。
@@ -96,10 +96,10 @@ end
 Exit グローバルを持つのはステージだけです。最大 3 つの引数を取り、どの位置にも nil を受け付けます。引数は、遷移先 ("title"、"play"、"stage"、"legacy"。nil は "title")、遷移先が "stage" のときの目的ステージの名前 ("legacy" のときはレガシーキー)、そしてトランジションモジュールの名前です。同梱ステージは、そのフレーム内で他に何も実行されないよう、update の中で `return Exit(...)` と書いています。
 
 ```lua
--- from demo1/Script.lua, inside update()
+-- inside a stage's update()
 if INPUT:KeyboardPressed("S") == true then
     sounds.Skip:Play()
-    return Exit("stage", "demo2")   -- jump to Modules/Stages/demo2
+    return Exit("stage", "mystage") -- jump to Modules/Stages/mystage
 end
 -- ...
 return Exit("title", nil)           -- back to the title screen
@@ -111,7 +111,8 @@ return Exit("title", nil)           -- back to the title screen
 
 - os には time、date、difftime だけが残ります。サンドボックスは io、debug、loadfile、dofile を取り除き、import は何もしません。
 - package はカスタムローダーに縮小されます。package.path と package.cpath は空で、サンドボックスが標準のサーチャーを置き換えるため、以下のパスだけが検索対象です。
-- require はまずモジュール自身のフォルダを探し、次にスキンの Modules/Lib フォルダ、次にゲームフォルダの Global/Modules/Lib を探して、最初に見つかったファイルを読み込みます。Global/Modules のモジュールは、スキンの Modules/Lib より先に Global/Modules/Lib を探します。同じ名前のモジュールファイルと Lib ファイルがあればモジュールファイルが優先されます。名前のドットはパス区切りになるため、require("DBControllers.dbScores") と require("DBControllers/dbScores") はどちらも DBControllers/dbScores.lua を読み込みます。非 ASCII のパスも動作します。
+- require はまずモジュール自身のフォルダを探し、次にスキンの Modules/Lib フォルダ、次にゲームフォルダの Global/Modules/Lib を探して、最初に見つかったファイルを読み込みます。Global/Modules のモジュールは、スキンの Modules/Lib より先に Global/Modules/Lib を探します。同じ名前のモジュールファイルと Lib ファイルがあればモジュールファイルが優先されます。名前のドットはパス区切りになるため、require("DBControllers.dbScores") と require("DBControllers/dbScores") はどちらも DBControllers/dbScores.lua を読み込みます。検索は大文字と小文字を区別せず、非 ASCII のパスも動作します。
+- Lib ファイルは、それを require したモジュールの Lua ステートで実行されるため、その中の require はそのモジュールの順序に従います。ゲームは Global/Modules/Lib に Lib ファイルのライブラリを同梱しており、require("Core.Easing") や require("UI.Pick") のような名前空間付きの名前で読み込めます。[提供モジュール](modules/README.md)で説明しています。
 
 ```lua
 -- from intro_nokon/Script.lua
@@ -127,40 +128,40 @@ local Dialogue  = require("nokon_dialogue")           -- the module folder
 
 ## lang/ によるローカライズ
 
-同梱スキンは、各モジュール自身の文字列を共有ライブラリ Modules/Lib/i18n.lua で翻訳します。コード中の英語の文字列がキーです。モジュールは、各英語文字列をその日本語訳に対応付けるテーブルを返す lang/ja.lua を同梱し、ライブラリはそのテーブルで文字列を引きます。
+モジュールは、スキンの Locales フォルダではなく提供モジュール [Locale.i18n](modules/locale.md) で自身の文字列を翻訳するため、翻訳はモジュールと一緒に移動します。テキストは Script.lua の隣の lang/<code>/<name>.json に、機能ごとに 1 ファイル、安定した id をキーとして置きます。lang/en が英語を持ち、他のすべての言語のフォールバックになります。
 
-ライブラリには 3 つの関数があります。
+ライブラリの主な関数は次のとおりです。
 
-- detect() はグローバルの LANG を通じて現在のゲーム言語を読み取り、その言語の辞書を読み込みます。言語が日本語のときは lang/ja を require します。これはモジュールフォルダ内で解決されるため、各モジュールが自分の辞書を持ちます。それ以外の言語では何も読み込みません。呼び出すまでは辞書が読み込まれておらず、すべての文字列は英語のままです。
-- tr(s) は読み込まれた辞書から s の訳を返します。辞書に s の項目がない場合や辞書が読み込まれていない場合は s をそのまま返します。
-- trf(fmt, ...) は書式文字列 fmt を同じ方法で翻訳し、その後 string.format で書式化します。
+- texts(name) は、モジュール自身のフォルダにある lang/<code>/<name>.json のテキストを返します。Lib ファイルは 2 番目の引数として自身のフォルダを渡します ([提供モジュール](modules/README.md)を参照)。
+- detect() はグローバルの LANG を通じて現在のゲーム言語を読み取り、以降のすべての参照がその言語を使います。呼び出すまでは、参照は英語を使います。
+- texts:tr(id) は id のテキストを返し、どの言語にもない場合は id そのものを返します。texts:trf(id, ...) はそのテキストを string.format のパターンとして使います。
 
-activate で detect() を呼び、その後 tr と trf でテキストを作ります。activate はモジュールに入るたびに実行されるため、プレイヤーが設定で変更した言語は次の訪問時に反映され、モジュールに他のフックは不要です。キーは句読点、空白、改行を含めて英語の原文と完全に一致する必要があり、翻訳は %s や {Player 1 name} のようなプレースホルダをそのまま保持しなければなりません。
+activate で detect() を呼び、その後 texts:tr と texts:trf でテキストを作ります。activate はモジュールに入るたびに実行されるため、プレイヤーが設定で変更した言語は次の訪問時に反映され、モジュールに他のフックは不要です。各言語のファイルは英語のファイルと同じキーを持ち、翻訳は %s のようなプレースホルダをそのまま保持しなければなりません。
 
-```lua
--- Modules/Stages/mystage/lang/ja.lua
-local T = {}
-T["Nokon"] = "ノコン"
-T["Alright, quiz time!"] = "さあ、クイズの時間である！"
-return T
+```
+Modules/Stages/mystage/lang/en/quiz.json   { "speaker": "Nokon", "start": "Alright, quiz time!" }
+Modules/Stages/mystage/lang/ja/quiz.json   { "speaker": "ノコン", "start": "さあ、クイズの時間である！" }
 ```
 
 ```lua
 -- Modules/Stages/mystage/Script.lua
-local I18N = require("i18n")
+local I18N = require("Locale.i18n")
+local T = I18N.texts("quiz")
 local title
 
 function activate()
     I18N.detect()
-    title = I18N.tr("Alright, quiz time!")
+    title = T:tr("start")
 end
 ```
+
+intro_nokon など、同梱スキンの一部の古いステージは、代わりにライブラリの最初の形式を使います。各英語文字列からその訳へのテーブルを返す lang/ja.lua を、I18N.tr(s) で読む形式です。[Locale.i18n](modules/locale.md) は両方を説明しています。
 
 ゲームは言語が変更されると、すべての読み込み済みモジュールでグローバルの reloadLanguage(lang) も呼びます。必要なのは、言語セレクターのある画面のように、言語変更中も画面に表示されたままのモジュールだけです。そこでは detect() をもう一度呼び、事前描画したテキストを作り直してください。
 
 ## 注意点
 
-- モジュールが作成したテクスチャ、サウンド、動画、テキストオブジェクトは、ゲームがそのモジュールを破棄するときに解放するため、スキンの再読み込みでリークすることはありません。データベースなど訪問ごとに開くリソースは、demo3 のように deactivate で破棄し、作成したものは demo1 のように onDestroy で破棄してください。
+- モジュールが作成したテクスチャ、サウンド、動画、テキストオブジェクトは、ゲームがそのモジュールを破棄するときに解放するため、スキンの再読み込みでリークすることはありません。データベースなど訪問ごとに開くリソースは、demo_overall のデータベースデモのように deactivate で破棄し、作成したものは その最初のデモのように onDestroy で破棄してください。
 - GetText は、テキストオブジェクト上で相異なる文字列ごとに 1 つのテクスチャをキャッシュします。毎フレーム変わる文字列は毎フレームテクスチャを追加し、ゲームは徐々に遅くなります。変化する値はグリフレンダラー (TEXT:CreateGlyphCached) で描画するか、値が変わるまで 1 つのテクスチャを保持してください。
 - LOADING はコルーチンとして実行されるコールバック、つまり任意のモジュールの onStart とステージの activate でのみ動作します。アクティビティの activate や、update、draw から LOADING:Tick を呼ぶと Lua エラーになります。
 - onStart と afterSongEnum はモジュールが画面外にある間に実行されます。ステージが表示されていなくても動作するように書いてください。

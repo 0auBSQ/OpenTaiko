@@ -25,7 +25,7 @@ Roep het aan als gewone functie (`GetSaveFile(0)`). Een index buiten bereik logt
 Het profiel van één speler: naam, munten, ontgrendelde items, triggers en tellers, clearstatistieken, uitgerust personage, puchichara, naamplaatje en dan-titel.
 
 <div class="callout warn">
-Lees eigenschappen met puntsyntaxis (sf.Name, sf.Coins). Schrijfmethoden slaan onmiddellijk op. Alleen-lezen modules blokkeren de volgende: SpendCoins, EarnCoins, UnlockNameplate, UnlockSong, het toewijzen van SelectedHitsounds, SetGlobalTrigger, SetGlobalCounter, ChangeCharacter (geeft false terug), UnlockPuchichara, ChangePuchichara, UnlockCharacter, ChangeDan, ChangeName en ChangeNameplate.
+Lees eigenschappen met puntsyntaxis (sf.Name, sf.Coins). Schrijfmethoden slaan onmiddellijk op. Alleen-lezen modules blokkeren de volgende: SpendCoins, EarnCoins, UnlockNameplate, UnlockSong, het toewijzen van SelectedHitsounds, SetGlobalTrigger, SetGlobalCounter, SetGlobalString, ChangeCharacter (geeft false terug), UnlockPuchichara, ChangePuchichara, UnlockCharacter, ChangeDan, ChangeName en ChangeNameplate.
 </div>
 
 | Methode | Beschrijving |
@@ -49,8 +49,10 @@ Lees eigenschappen met puntsyntaxis (sf.Name, sf.Coins). Schrijfmethoden slaan o
 | `sf.SelectedHitsounds  -> string` | Mapnaam van de geselecteerde hitsound-set. Het toewijzen van een andere naam slaat die op en herlaadt de hitsounds van de speler. |
 | `sf:GetGlobalTrigger(name)  -> bool` | Leest een benoemde booleaanse trigger. |
 | `sf:GetGlobalCounter(name)  -> number` | Leest een benoemde numerieke teller. |
+| `sf:GetGlobalString(name)  -> string` | Leest een benoemde tekstwaarde, "" als de save er geen heeft (bijvoorbeeld de gegevens van een module als JSON). |
 | `sf:SetGlobalTrigger(name, value)  -> nil` | Zet een benoemde booleaanse trigger. |
 | `sf:SetGlobalCounter(name, value)  -> nil` | Zet een benoemde numerieke teller. |
+| `sf:SetGlobalString(name, value)  -> nil` | Zet een benoemde tekstwaarde en slaat die op. |
 | `sf:GetClearStatusCount(difficulty, clearStatus)  -> integer` | Aantal charts van een moeilijkheid (0 Easy tot 4 Extra Extreme) waarvan de beste clearstatus exact clearStatus is (0 geen, 1 assisted, 2 clear, 3 full combo, 4 perfect). 0 voor argumenten buiten bereik. |
 | `sf:GetDanBestPlay(node)  -> danBestPlay` | De beste spelbeurt zonder mods voor een dan-nummerknoop (zie Beste-dan-spelbeurt-handle); een handle met HasRecord false als er geen is. |
 | `sf:GetCharacter()  -> character` | De aan de speler gebonden personage-handle voor dit slot (zie Personage-handle). |

@@ -12,6 +12,24 @@
   - [譜面のアンロック要素](guides/unlockables.md)
   - [アンロック要素リファレンス](guides/unlockables-reference.md)
 
+- 提供モジュール
+  - [概要](modules/README.md)
+  - [Core](modules/core.md)
+  - [Input](modules/input.md)
+  - [Audio](modules/audio.md)
+  - [Locale](modules/locale.md)
+  - [Calendar](modules/calendar.md)
+  - [Songs](modules/songs.md)
+  - [World](modules/world.md) <span class="badge-exp">実験的</span>
+  - [UI](modules/ui.md)
+  - [Saves](modules/saves.md)
+  - [Characters](modules/characters.md)
+  - [VN](modules/vn.md)
+  - [Pagoda](modules/pagoda.md)
+  - [Vault](modules/vault.md)
+  - [Shop](modules/shop.md)
+  - [マイルーム](modules/my-room.md)
+
 - Lua API リファレンス
   - [概要](api/README.md)
   - [モジュールとライフサイクル](api/activities.md)

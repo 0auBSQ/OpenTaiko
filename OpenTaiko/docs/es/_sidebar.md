@@ -12,6 +12,24 @@
   - [Desbloqueables de charts](guides/unlockables.md)
   - [Referencia de desbloqueables](guides/unlockables-reference.md)
 
+- Módulos proporcionados
+  - [Introducción](modules/README.md)
+  - [Core](modules/core.md)
+  - [Input](modules/input.md)
+  - [Audio](modules/audio.md)
+  - [Locale](modules/locale.md)
+  - [Calendar](modules/calendar.md)
+  - [Songs](modules/songs.md)
+  - [World](modules/world.md) <span class="badge-exp">Experimental</span>
+  - [UI](modules/ui.md)
+  - [Saves](modules/saves.md)
+  - [Characters](modules/characters.md)
+  - [VN](modules/vn.md)
+  - [Pagoda](modules/pagoda.md)
+  - [Vault](modules/vault.md)
+  - [Shop](modules/shop.md)
+  - [Mi Habitación](modules/my-room.md)
+
 - Referencia de la API Lua
   - [Introducción](api/README.md)
   - [Módulos y ciclo de vida](api/activities.md)

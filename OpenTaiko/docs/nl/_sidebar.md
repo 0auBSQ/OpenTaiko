@@ -12,6 +12,24 @@
   - [Ontgrendelvoorwaarden voor charts](guides/unlockables.md)
   - [Referentie voor ontgrendelvoorwaarden](guides/unlockables-reference.md)
 
+- Meegeleverde modules
+  - [Overzicht](modules/README.md)
+  - [Core](modules/core.md)
+  - [Input](modules/input.md)
+  - [Audio](modules/audio.md)
+  - [Locale](modules/locale.md)
+  - [Calendar](modules/calendar.md)
+  - [Songs](modules/songs.md)
+  - [World](modules/world.md) <span class="badge-exp">Experimenteel</span>
+  - [UI](modules/ui.md)
+  - [Saves](modules/saves.md)
+  - [Characters](modules/characters.md)
+  - [VN](modules/vn.md)
+  - [Pagoda](modules/pagoda.md)
+  - [Vault](modules/vault.md)
+  - [Shop](modules/shop.md)
+  - [Mijn kamer](modules/my-room.md)
+
 - Lua-API-referentie
   - [Overzicht](api/README.md)
   - [Modules en levenscyclus](api/activities.md)

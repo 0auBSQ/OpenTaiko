@@ -1,0 +1,8 @@
+{
+  "_comment": "English texts for demo_overall: the names of its five demos, keyed by folder. Keys are stable ids; this file is the fallback for every other language.",
+  "demo_theme_settings": "Theme settings",
+  "demo_gradient": "Gradient maps",
+  "demo_database": "Databases",
+  "demo_dan_plate": "Dan plates",
+  "demo_first_demo": "First demo"
+}

@@ -25,7 +25,7 @@ Call it as a plain function (`GetSaveFile(0)`). An out-of-range index logs an er
 The profile of one player: name, coins, unlocked items, triggers and counters, clear statistics, equipped character, puchichara, nameplate and dan title.
 
 <div class="callout warn">
-Read properties with dot syntax (sf.Name, sf.Coins). Write methods persist immediately. Read-only modules block the following: SpendCoins, EarnCoins, UnlockNameplate, UnlockSong, assigning SelectedHitsounds, SetGlobalTrigger, SetGlobalCounter, ChangeCharacter (returns false), UnlockPuchichara, ChangePuchichara, UnlockCharacter, ChangeDan, ChangeName and ChangeNameplate.
+Read properties with dot syntax (sf.Name, sf.Coins). Write methods persist immediately. Read-only modules block the following: SpendCoins, EarnCoins, UnlockNameplate, UnlockSong, assigning SelectedHitsounds, SetGlobalTrigger, SetGlobalCounter, SetGlobalString, ChangeCharacter (returns false), UnlockPuchichara, ChangePuchichara, UnlockCharacter, ChangeDan, ChangeName and ChangeNameplate.
 </div>
 
 | Method | Description |
@@ -49,8 +49,10 @@ Read properties with dot syntax (sf.Name, sf.Coins). Write methods persist immed
 | `sf.SelectedHitsounds  -> string` | Folder name of the selected hitsound set. Assigning a different name persists it and reloads the player's hitsounds. |
 | `sf:GetGlobalTrigger(name)  -> bool` | Reads a named boolean trigger. |
 | `sf:GetGlobalCounter(name)  -> number` | Reads a named numeric counter. |
+| `sf:GetGlobalString(name)  -> string` | Reads a named text value, "" when the save has none (a module's data stored as JSON, for example). |
 | `sf:SetGlobalTrigger(name, value)  -> nil` | Sets a named boolean trigger. |
 | `sf:SetGlobalCounter(name, value)  -> nil` | Sets a named numeric counter. |
+| `sf:SetGlobalString(name, value)  -> nil` | Sets a named text value and persists it. |
 | `sf:GetClearStatusCount(difficulty, clearStatus)  -> integer` | Number of charts of a difficulty (0 Easy to 4 Extra Extreme) whose best clear status is exactly clearStatus (0 none, 1 assisted, 2 clear, 3 full combo, 4 perfect). 0 for out-of-range arguments. |
 | `sf:GetDanBestPlay(node)  -> danBestPlay` | The no-mod best play for a dan song node (see Dan best play handle); a handle with HasRecord false if there is none. |
 | `sf:GetCharacter()  -> character` | The player-bound character handle for this slot (see Character handle). |

@@ -12,6 +12,7 @@ OpenTaiko tekent bijna elk scherm buiten de kerngameplay met Lua-scripts die in 
 
 - Als je nog geen module hebt geschreven, lees dan [Hoe modules werken](getting-started.md): de mapindeling van een skin, de soorten modules en de levenscyclus-callbacks die een script ontvangt.
 - Om een functie op te zoeken, open je de [API-referentie](api/) en kies je een categorie in de zijbalk.
+- Om voort te bouwen op wat het spel meelevert (een UI-bibliotheek, een dialoogvenster, de regels van de pagode, de kluis en de winkel, Mijn kamer), lees je [Meegeleverde modules](modules/).
 - Voor een concreet doel lopen de handleidingen stap voor stap door [personages](guides/characters.md), [puchichara's](guides/puchicharas.md), [naamplaatjes](guides/nameplates.md), [skins en thema's](guides/skins.md) en [ontgrendelvoorwaarden voor charts](guides/unlockables.md).
 
 ## Wat je kunt bouwen

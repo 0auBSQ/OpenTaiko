@@ -22,7 +22,7 @@ def read(p):
 
 def pages():
     out = ["README.md", "getting-started.md"]
-    for sub in ("api", "guides"):
+    for sub in ("api", "guides", "modules"):
         out += sorted(os.path.join(sub, f) for f in os.listdir(os.path.join(HERE, sub)) if f.endswith(".md"))
     return out
 

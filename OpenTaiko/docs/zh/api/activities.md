@@ -61,7 +61,7 @@
 引擎只在舞台脚本中注册的函数；调用它即是请求引擎离开舞台。
 
 <div class="callout warn">
-仅在 Modules/Stages 脚本中可用；活动和只读活动由宿主驱动，不会获得它。接受 0 到 3 个参数，任意位置都可以是 nil。调用本身即是请求退出；自带舞台在 update 中写 `return Exit(...)`，以便该帧内不再运行其他内容。target 为 "title"、"play"、"stage" 或 "legacy"；nil 或任何其他值都表示 "title"。target 为 "stage" 时，name 是要跳转到的 Modules/Stages 模块；target 为 "legacy" 时，name 是 "heya"、"config"、"exit" 或 "onlinelounge" 之一（其他值都会进入标题界面）。transition 指定一个 Modules/Transitions 模块；如果你省略它或引擎找不到它，引擎会使用名为 "default" 的模块，如果皮肤完全没有过渡，则播放纯黑色淡出。"heya" 键作为别名保留：它会打开皮肤在 Modules/Stages 中的 `myroom` 模块，皮肤没有该模块时则进入标题界面。
+仅在 Modules/Stages 脚本中可用；活动和只读活动由宿主驱动，不会获得它。接受 0 到 3 个参数，任意位置都可以是 nil。调用本身即是请求退出；自带舞台在 update 中写 `return Exit(...)`，以便该帧内不再运行其他内容。target 为 "title"、"play"、"stage" 或 "legacy"；nil 或任何其他值都表示 "title"。target 为 "stage" 时，name 是要跳转到的 Modules/Stages 模块；target 为 "legacy" 时，name 是 "heya"、"config"、"exit" 或 "onlinelounge" 之一（其他值都会进入标题界面）。transition 指定一个 Modules/Transitions 模块；如果你省略它或引擎找不到它，引擎会使用名为 "default" 的模块，如果皮肤完全没有过渡，则播放纯黑色淡出。舞台和过渡的名称优先取调用方一侧：皮肤舞台先找到皮肤中该名称的模块，Global/Modules 中的舞台先找到全局模块，各自再回退到另一侧。"heya" 键作为别名保留：它会打开皮肤在 Modules/Stages 中的 `myroom` 模块，皮肤没有该模块时则进入标题界面。
 </div>
 
 | 方法 | 说明 |
@@ -71,7 +71,7 @@
 ```lua
 function update(timestamp)
     if INPUT:KeyboardPressed("S") then
-        return Exit("stage", "demo2")          -- 跳转到 Modules/Stages/demo2
+        return Exit("stage", "mystage")        -- 跳转到 Modules/Stages/mystage
     end
     if INPUT:Pressed("Cancel") then
         return Exit("title", nil, "nokon_curtain")   -- 通过指定名称的过渡返回标题界面
@@ -115,7 +115,7 @@ end
 按名称查找已加载活动的全局对象。
 
 <div class="callout warn">
-在除只读活动和背景之外的每个模块中注册为 ACTIVITY 全局对象；在只读活动和背景中它为 nil，这些模块使用 ROACTIVITY。引擎从 Modules/Activities/{name} 加载活动。ACTIVITY 也公开了 GetROActivity，其行为与 ROACTIVITY:GetROActivity 相同。
+在除只读活动和背景之外的每个模块中注册为 ACTIVITY 全局对象；在只读活动和背景中它为 nil，这些模块使用 ROACTIVITY。引擎从 Modules/Activities/{name} 加载活动。ACTIVITY 也公开了 GetROActivity，其行为与 ROACTIVITY:GetROActivity 相同。查找优先取调用方一侧：皮肤模块得到皮肤中该名称的活动，Global/Modules 中的模块得到 Global/Modules/Activities 中的那个，自己一侧没有时各自回退到另一侧。Lib 文件从 require 它的模块一侧查找。
 </div>
 
 | 方法 | 说明 |
@@ -128,7 +128,7 @@ end
 按名称查找已加载只读活动（ROActivity）的全局对象。
 
 <div class="callout warn">
-在每个模块中注册为 ROACTIVITY 全局对象。引擎从 Modules/ROActivities/{name} 加载只读活动，并给它们只读的 CONFIG、DATABASE 和 GetSaveFile 全局对象，因此其脚本无法更改游戏状态（见“模块的工作原理”中的只读模块一节）。活动和只读活动都是以名称为键的单例：每个文件夹一个实例，由所有宿主共享。
+在每个模块中注册为 ROACTIVITY 全局对象。引擎从 Modules/ROActivities/{name} 加载只读活动，并给它们只读的 CONFIG、DATABASE 和 GetSaveFile 全局对象，因此其脚本无法更改游戏状态（见“模块的工作原理”中的只读模块一节）。活动和只读活动都是以名称为键的单例：每个文件夹一个实例，由所有宿主共享。GetROActivity 与 ACTIVITY:GetActivity 一样，在 Modules/ROActivities 和 Global/Modules/ROActivities 之间优先取调用方一侧。
 </div>
 
 | 方法 | 说明 |

@@ -8,7 +8,7 @@ OpenTaiko 0.6.1 允许皮肤用 Lua 添加和替换界面。皮肤的 Modules �
 
 - OpenTaiko 0.6.1，以及一个带有 Modules 目录的皮肤文件夹。自带皮肤位于 System/Open-World Memories。
 - 一个文本编辑器和基础的 Lua 知识（函数、表、require）。
-- System/Open-World Memories/Modules/Stages 下的自带舞台。其中较小的 demo1 和 demo3 展示了回调的形态；较大的舞台展示了真实界面的组织方式。
+- System/Open-World Memories/Modules/Stages 和 Global/Modules/Stages 下的自带舞台。Global/Modules/Stages/demo_overall 中的小演示展示了回调的形态；较大的舞台展示了真实界面的组织方式。
 
 ## 模块存放在哪里
 
@@ -34,7 +34,7 @@ Modules/
 
 模块的 Script.lua 定义固定名称的顶层全局函数，游戏把每一个都当作全局变量读取。包在局部表中再返回的函数游戏永远找不到；拼错的名称（例如把 onStart 写成 OnStart）游戏也永远不会调用，因为它把未定义的回调视为空操作，并且不报告任何信息。文件中的其他内容都可以是局部的，你也可以用 require 把模块拆分到多个文件中。
 
-demo3 是可供复制的最小形态：
+下面是可供复制的最小形态：
 
 ```lua
 -- Modules/Stages/mystage/Script.lua
@@ -73,9 +73,9 @@ end
 - activate()：游戏在每次进入舞台时调用它。在这里重置每次访问的状态、开始播放音乐并打开数据库。它同样以协程方式运行，并且可以使用 LOADING。游戏会在 activate 运行前刷新角色和小角色列表（CHARACTERLIST、PUCHICHARALIST），因此请在这里读取它们；onStart 在该刷新之前运行。
 - update(timestamp)：游戏每帧在 draw 之前调用它，并传入以毫秒计的游戏时钟。在这里处理输入并改变状态。舞台一旦调用了 Exit，游戏就停止调用 update，而在淡出期间继续调用 draw。
 - draw()：游戏每帧调用它。只做绘制，并尽量减少每帧的内存分配。
-- deactivate()：游戏在离开舞台时调用它。demo3 在这里释放数据库；demo1 在这里停止音乐和视频。
+- deactivate()：游戏在离开舞台时调用它。demo_overall 的数据库演示在这里释放数据库；它的第一个演示在这里停止音乐和视频。
 - afterSongEnum()：游戏在每次歌曲枚举完成时调用它，包括启动时以及软重载或硬重载之后，即使舞台并未激活。当模块依赖歌曲列表时使用它。
-- onDestroy()：游戏在卸载皮肤之前调用它。demo1 在这里释放它的纹理、视频、文本纹理和声音。
+- onDestroy()：游戏在卸载皮肤之前调用它。demo_overall 的第一个演示在这里释放它的纹理、视频、文本纹理和声音。
 - reloadLanguage(lang)：游戏在语言变更时调用它（见下文的本地化一节）。
 
 皮肤加载时，游戏按类型逐一创建模块：先是 Transitions，然后是 Stages、Activities 和 ROActivities。在每一类型内部，它先运行所有的 Script.lua，再调用各自的 onStart。因此舞台的 onStart 运行时，Activities 和 ROActivities 尚不存在；请在 activate 中查找它们。
@@ -96,10 +96,10 @@ end
 只有舞台拥有 Exit 全局函数。它最多接受三个参数，任意位置都可以是 nil：目标（"title"、"play"、"stage" 或 "legacy"；nil 表示 "title"），目标为 "stage" 时的目的舞台名称（目标为 "legacy" 时则是一个旧版界面键），以及过渡模块的名称。自带舞台在 update 中写 `return Exit(...)`，以便该帧内不再运行其他内容。
 
 ```lua
--- 摘自 demo1/Script.lua，位于 update() 内
+-- 位于某个舞台的 update() 内
 if INPUT:KeyboardPressed("S") == true then
     sounds.Skip:Play()
-    return Exit("stage", "demo2")   -- 跳转到 Modules/Stages/demo2
+    return Exit("stage", "mystage") -- 跳转到 Modules/Stages/mystage
 end
 -- ...
 return Exit("title", nil)           -- 返回标题界面
@@ -111,7 +111,8 @@ return Exit("title", nil)           -- 返回标题界面
 
 - os 只保留 time、date 和 difftime。沙箱移除了 io、debug、loadfile 和 dofile，import 不做任何事。
 - package 缩减为一个自定义加载器：package.path 和 package.cpath 为空，沙箱替换了标准搜索器，因此只有下面列出的路径可以被搜索。
-- require 先在模块自己的文件夹中查找，再在皮肤的 Modules/Lib 文件夹中查找，然后在游戏文件夹的 Global/Modules/Lib 中查找，并加载找到的第一个文件。Global/Modules 中的模块会先查找 Global/Modules/Lib，再查找皮肤的 Modules/Lib。同名的模块文件和 Lib 文件会解析为模块文件。名称中的点会变成路径分隔符，因此 require("DBControllers.dbScores") 和 require("DBControllers/dbScores") 都会加载 DBControllers/dbScores.lua。非 ASCII 路径可以正常使用。
+- require 先在模块自己的文件夹中查找，再在皮肤的 Modules/Lib 文件夹中查找，然后在游戏文件夹的 Global/Modules/Lib 中查找，并加载找到的第一个文件。Global/Modules 中的模块会先查找 Global/Modules/Lib，再查找皮肤的 Modules/Lib。同名的模块文件和 Lib 文件会解析为模块文件。名称中的点会变成路径分隔符，因此 require("DBControllers.dbScores") 和 require("DBControllers/dbScores") 都会加载 DBControllers/dbScores.lua。查找不区分大小写，非 ASCII 路径也可以正常使用。
+- Lib 文件运行在 require 它的模块的 Lua 状态中，因此其中的 require 遵循该模块的顺序。游戏在 Global/Modules/Lib 中自带一套 Lib 文件库，使用带命名空间的名称，例如 require("Core.Easing") 和 require("UI.Pick")；[内置模块](modules/README.md)对它们做了说明。
 
 ```lua
 -- 摘自 intro_nokon/Script.lua
@@ -127,40 +128,40 @@ local Dialogue  = require("nokon_dialogue")           -- 模块文件夹
 
 ## 通过 lang/ 进行本地化
 
-自带皮肤使用共享库 Modules/Lib/i18n.lua 翻译每个模块自己的字符串。代码中的英文字符串就是键：模块附带一个 lang/ja.lua，它返回一张把每个英文字符串映射到其日文翻译的表，库就在这张表中查找字符串。
+模块用内置模块 [Locale.i18n](modules/locale.md) 而不是皮肤的 Locales 文件夹来翻译自己的字符串，因此译文随模块一起移动。它的文本放在 Script.lua 旁边的 lang/<code>/<name>.json 中，每个功能一个文件，以稳定的 id 为键；lang/en 存放英文，并作为所有其他语言的回退。
 
-这个库有三个函数：
+这个库的主要函数：
 
-- detect() 通过全局对象 LANG 读取当前游戏语言，并加载对应的字典。语言为日文时，它会 require lang/ja；该路径在模块文件夹内解析，因此每个模块都有自己的字典。其他语言则不加载任何内容。在你调用它之前，没有字典被加载，所有字符串都保持英文。
-- tr(s) 从已加载的字典中返回 s 的翻译；字典中没有对应条目或没有加载字典时，返回 s 本身。
-- trf(fmt, ...) 以同样的方式翻译格式字符串 fmt，然后用 string.format 进行格式化。
+- texts(name) 返回模块自己文件夹中 lang/<code>/<name>.json 的文本。Lib 文件把自己的文件夹作为第二个参数传入（见[内置模块](modules/README.md)）。
+- detect() 通过全局对象 LANG 读取当前游戏语言，此后的每次查找都使用它。在你调用它之前，查找使用英文。
+- texts:tr(id) 返回 id 的文本，没有任何语言包含它时返回 id 本身；texts:trf(id, ...) 把该文本用作 string.format 模式。
 
-在 activate 中调用 detect()，然后用 tr 和 trf 构建文本。activate 在每次进入模块时运行，因此玩家在设置中更改的语言会在下次进入时生效，模块不需要其他钩子。键必须与英文原文完全一致，包括标点、空格和换行；译文必须原样保留 %s 或 {Player 1 name} 之类的占位符。
+在 activate 中调用 detect()，然后用 texts:tr 和 texts:trf 构建文本。activate 在每次进入模块时运行，因此玩家在设置中更改的语言会在下次进入时生效，模块不需要其他钩子。每个语言文件都与英文文件拥有相同的键，译文必须原样保留 %s 之类的占位符。
 
-```lua
--- Modules/Stages/mystage/lang/ja.lua
-local T = {}
-T["Nokon"] = "ノコン"
-T["Alright, quiz time!"] = "さあ、クイズの時間である！"
-return T
+```
+Modules/Stages/mystage/lang/en/quiz.json   { "speaker": "Nokon", "start": "Alright, quiz time!" }
+Modules/Stages/mystage/lang/ja/quiz.json   { "speaker": "ノコン", "start": "さあ、クイズの時間である！" }
 ```
 
 ```lua
 -- Modules/Stages/mystage/Script.lua
-local I18N = require("i18n")
+local I18N = require("Locale.i18n")
+local T = I18N.texts("quiz")
 local title
 
 function activate()
     I18N.detect()
-    title = I18N.tr("Alright, quiz time!")
+    title = T:tr("start")
 end
 ```
+
+自带皮肤中一些较旧的舞台（例如 intro_nokon）改用这个库的第一种形式：一个返回从每个英文字符串映射到其译文的表的 lang/ja.lua，用 I18N.tr(s) 读取。[Locale.i18n](modules/locale.md) 对两种形式都做了说明。
 
 语言变更时，游戏还会对每个已加载模块调用全局函数 reloadLanguage(lang)。只有在语言变更期间仍停留在屏幕上的模块才需要它，例如带有语言选择器的界面；在那里再次调用 detect() 并重建预渲染的文本。
 
 ## 注意事项
 
-- 游戏在释放模块时会释放该模块创建的纹理、声音、视频和文本对象，因此重新加载皮肤不会泄漏它们。每次访问时打开的资源（例如数据库）请像 demo3 那样在 deactivate 中释放；你创建的对象请像 demo1 那样在 onDestroy 中释放。
+- 游戏在释放模块时会释放该模块创建的纹理、声音、视频和文本对象，因此重新加载皮肤不会泄漏它们。每次访问时打开的资源（例如数据库）请像 demo_overall 的数据库演示那样在 deactivate 中释放；你创建的对象请像它的第一个演示那样在 onDestroy 中释放。
 - GetText 会在其文本对象上为每个不同的字符串缓存一张纹理。每帧都在变化的字符串会每帧新增一张纹理，游戏会逐渐变慢。请用字形渲染器（TEXT:CreateGlyphCached）绘制变化的数值，或者在数值变化之前一直保留同一张纹理。
 - LOADING 只在以协程方式运行的回调中可用：任意模块的 onStart，以及舞台的 activate。在活动的 activate 中，或者在 update 或 draw 中调用 LOADING:Tick 会抛出 Lua 错误。
 - onStart 和 afterSongEnum 会在模块不在屏幕上时运行。编写时要保证它们在舞台不可见的情况下也能正常工作。

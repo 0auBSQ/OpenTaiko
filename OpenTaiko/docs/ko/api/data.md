@@ -4,7 +4,7 @@
 
 재시작 후에도 남는 데이터 저장, SQLite 파일 질의, 모듈 폴더의 파일·JSON·INI 읽기, 모듈 간 리소스 공유, 게임 설정 읽기와 변경.
 
-DATABASE, SQL, STORAGE, JSONLOADER, INILOADER, SHARED에 전달하는 상대 경로는 실행 중인 모듈의 디렉터리(그 `Script.lua`가 있는 폴더)를 기준으로 해석됩니다.
+DATABASE, SQL, STORAGE, JSONLOADER, INILOADER, SHARED에 전달하는 상대 경로는 실행 중인 모듈의 디렉터리(그 `Script.lua`가 있는 폴더)를 기준으로 해석됩니다. `require`로 로드한 Lib 파일은 여기서 자체 디렉터리를 갖지 않으며, 그 호출은 자신을 require한 모듈을 기준으로 해석됩니다([제공 모듈](../modules/README.md) 참고).
 
 이 페이지의 일부 메서드는 .NET 컬렉션을 반환하며, 이는 Lua 테이블과 다르게 동작합니다.
 
@@ -37,6 +37,8 @@ end
 | --- | --- |
 | `DATABASE:OpenLocalDatabase(path)  -> database` | 모듈 디렉터리 기준 상대 경로에 저장소를 엽니다(필요하면 생성). |
 | `DATABASE:OpenGlobalDatabase(path)  -> database` | 게임 폴더의 `Global/ApplicationData/LMDB/` 아래에, 모든 모듈이 공유하는 저장소를 엽니다(필요하면 생성). |
+
+로컬 저장소는 그 모듈의 폴더 안에 있으므로 모듈과 함께 옮겨집니다. 옮겨진 스테이지(스킨에서 `Global/Modules/`로, 또는 새 이름으로)는 빈 로컬 저장소로 시작하고, 예전 데이터는 예전 폴더에서만 읽을 수 있습니다. 로컬 저장소를 여는 Lib 파일은 호출한 모듈의 저장소를 엽니다. `Shop.Daily`는 상태를 호출한 스테이지의 `shop_state`에 보관합니다. 모든 스킨이 봐야 하는 데이터는 세이브 파일(`sf:SetGlobalString`, [플레이어와 프로필](players.md) 참고)이나 전역 저장소에 두십시오.
 
 ### 데이터베이스 핸들
 
@@ -153,7 +155,7 @@ end
 모듈 디렉터리에서 평면적인 `key=value` 파일을 로드합니다.
 
 <div class="callout warn">
-로더는 각 줄을 첫 `=`에서 나누고, `=`가 없는 줄은 건너뛰며, 반복되는 키는 이전 값을 덮어쓰게 합니다. 섹션, 주석, 인용은 없습니다. 없는 파일은 빈 핸들이 됩니다.
+로더는 각 줄을 첫 `=`에서 나누고, 등호가 없는 줄은 건너뛰며, 반복되는 키는 이전 값을 덮어쓰게 합니다. 섹션, 주석, 인용은 없습니다. 없는 파일은 빈 핸들이 됩니다.
 </div>
 
 | 메서드 | 설명 |

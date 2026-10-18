@@ -1,8 +1,10 @@
 ---@diagnostic disable: lowercase-global
 -- PopUI/theme.lua — the look of the UI in one table. Colors are {r,g,b,a} 0-255 (the form the canvas
 -- pixel ops want directly). Everything is tweakable; per-widget `theme/style` tables override per-field.
+-- PopUI is UI.SimpleUI with this theme as the base every theme resolves over.
 
 local Util = require "Util"
+local Base = require("UI.SimpleUI.theme")
 
 local Theme = {}
 
@@ -47,14 +49,12 @@ Theme.clone = Util.deepcopy
 Theme.merge = Util.merge
 
 -- the style of every widget made without one (the manager resolves it once for all of them)
-Theme.NONE = {}
+Theme.NONE = Base.NONE
 
 -- resolve an effective theme = DEFAULT < manager theme < per-widget theme/style.
 -- NOTICE: colors defined in {r,g,b} have the alpha inherited from base styles
 function Theme.resolve(userTheme, style)
-    local t = Util.merge(Theme.DEFAULT, userTheme or {})
-    if style then t = Util.merge(t, style) end
-    return t
+    return Base.resolve(userTheme, style, Theme.DEFAULT)
 end
 
 return Theme

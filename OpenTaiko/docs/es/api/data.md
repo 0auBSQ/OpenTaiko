@@ -4,7 +4,7 @@
 
 Guardar datos que sobreviven a un reinicio, consultar archivos SQLite, leer archivos, JSON e INI desde la carpeta del módulo, compartir recursos entre módulos, y leer o cambiar la configuración del juego.
 
-Las rutas relativas que se pasan a DATABASE, SQL, STORAGE, JSONLOADER, INILOADER y SHARED se resuelven respecto al directorio del módulo en ejecución (la carpeta que contiene su `Script.lua`).
+Las rutas relativas que se pasan a DATABASE, SQL, STORAGE, JSONLOADER, INILOADER y SHARED se resuelven respecto al directorio del módulo en ejecución (la carpeta que contiene su `Script.lua`). Un archivo de Lib cargado con `require` no tiene aquí un directorio propio: sus llamadas se resuelven respecto al módulo que lo cargó (consulta [Módulos proporcionados](../modules/README.md)).
 
 Algunos métodos de esta página devuelven colecciones .NET, que se comportan de forma distinta a las tablas Lua:
 
@@ -37,6 +37,8 @@ Cada Read y Write abre y cierra su propio entorno LMDB, así que cada llamada es
 | --- | --- |
 | `DATABASE:OpenLocalDatabase(path)  -> database` | Abre (creándolo si es necesario) un almacén en una ruta relativa al directorio del módulo. |
 | `DATABASE:OpenGlobalDatabase(path)  -> database` | Abre (creándolo si es necesario) un almacén dentro de `Global/ApplicationData/LMDB/` en la carpeta del juego, compartido por todos los módulos. |
+
+Un almacén local vive dentro de la carpeta de su módulo, así que se mueve con el módulo: un stage que se mueve (de un skin a `Global/Modules/`, o a un nombre nuevo) empieza con almacenes locales vacíos, y los datos antiguos solo pueden leerse desde la carpeta antigua. Un archivo de Lib que abre un almacén local abre el del módulo que llama: `Shop.Daily` guarda su estado en el `shop_state` del stage que llama. Los datos que todos los skins deben ver pertenecen al archivo de guardado (`sf:SetGlobalString`, consulta [Jugadores y perfiles](players.md)) o a un almacén global.
 
 ### Handle de base de datos
 

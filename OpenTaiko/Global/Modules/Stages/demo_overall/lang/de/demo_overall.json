@@ -1,0 +1,8 @@
+{
+  "_comment": "German texts for demo_overall. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "demo_theme_settings": "Theme-Einstellungen",
+  "demo_gradient": "Gradient-Maps",
+  "demo_database": "Datenbanken",
+  "demo_dan_plate": "Dan-Schilder",
+  "demo_first_demo": "Erste Demo"
+}

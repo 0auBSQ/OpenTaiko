@@ -12,6 +12,24 @@
   - [Chart-Freischaltungen](guides/unlockables.md)
   - [Referenz der Freischaltbedingungen](guides/unlockables-reference.md)
 
+- Bereitgestellte Module
+  - [Überblick](modules/README.md)
+  - [Core](modules/core.md)
+  - [Input](modules/input.md)
+  - [Audio](modules/audio.md)
+  - [Locale](modules/locale.md)
+  - [Calendar](modules/calendar.md)
+  - [Songs](modules/songs.md)
+  - [World](modules/world.md) <span class="badge-exp">Experimentell</span>
+  - [UI](modules/ui.md)
+  - [Saves](modules/saves.md)
+  - [Characters](modules/characters.md)
+  - [VN](modules/vn.md)
+  - [Pagoda](modules/pagoda.md)
+  - [Vault](modules/vault.md)
+  - [Shop](modules/shop.md)
+  - [Mein Zimmer](modules/my-room.md)
+
 - Lua-API-Referenz
   - [Überblick](api/README.md)
   - [Module und Lebenszyklus](api/activities.md)

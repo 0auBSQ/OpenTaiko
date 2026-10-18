@@ -12,6 +12,7 @@ OpenTaiko dibuja casi todas las pantallas ajenas al juego principal con scripts 
 
 - Si todavía no has escrito un módulo, lee [Cómo funcionan los módulos](getting-started.md): la estructura de carpetas de un skin, los tipos de módulo y los callbacks del ciclo de vida que recibe un script.
 - Para buscar una función, abre la [referencia de la API](api/) y elige una categoría en la barra lateral.
+- Para construir sobre lo que incluye el juego (una biblioteca de interfaz, un cuadro de diálogo, las reglas de la pagoda, la bóveda y la tienda, Mi Habitación), lee [Módulos proporcionados](modules/).
 - Para un objetivo concreto, las guías explican paso a paso los [personajes](guides/characters.md), los [puchicharas](guides/puchicharas.md), las [placas de nombre](guides/nameplates.md), los [skins y temas](guides/skins.md) y los [desbloqueables de charts](guides/unlockables.md).
 
 ## Qué puedes crear

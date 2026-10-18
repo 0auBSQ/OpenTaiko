@@ -1,0 +1,8 @@
+{
+  "_comment": "Spanish texts for demo_overall. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "demo_theme_settings": "Ajustes del tema",
+  "demo_gradient": "Mapas de degradado",
+  "demo_database": "Bases de datos",
+  "demo_dan_plate": "Placas de Dan",
+  "demo_first_demo": "Primera demo"
+}

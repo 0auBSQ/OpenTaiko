@@ -1,0 +1,10 @@
+{
+  "_comment": "Spanish texts for the theme settings viewer. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "title": "Visor de configuración del tema",
+  "col_id": "ID",
+  "col_scope": "Alcance",
+  "col_type": "Tipo",
+  "col_value": "Valor",
+  "hint_scroll": "arriba/abajo para desplazar   Cancelar para salir",
+  "hint_exit": "Cancelar para salir"
+}

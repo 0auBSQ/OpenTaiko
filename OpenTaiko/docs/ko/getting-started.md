@@ -8,7 +8,7 @@ OpenTaiko 0.6.1에서는 스킨이 Lua로 화면을 추가하고 교체할 수 �
 
 - OpenTaiko 0.6.1과 Modules 디렉터리가 있는 스킨 폴더. 기본 제공 스킨은 System/Open-World Memories입니다.
 - 텍스트 편집기와 기초적인 Lua 지식(함수, 테이블, require).
-- System/Open-World Memories/Modules/Stages 아래의 기본 제공 스테이지. 작은 것(demo1, demo3)은 콜백의 형태를 보여 주고, 큰 것은 실제 화면이 어떻게 구성되는지 보여 줍니다.
+- System/Open-World Memories/Modules/Stages와 Global/Modules/Stages 아래의 기본 제공 스테이지. Global/Modules/Stages/demo_overall의 작은 데모들은 콜백의 형태를 보여 주고, 큰 스테이지는 실제 화면이 어떻게 구성되는지 보여 줍니다.
 
 ## 모듈이 있는 위치
 
@@ -34,7 +34,7 @@ Modules/
 
 모듈의 Script.lua는 정해진 이름의 최상위 전역 함수를 정의하고, 게임은 각각을 전역으로 읽습니다. 게임은 로컬 테이블에 담아 반환한 함수를 찾지 못하며, 이름을 잘못 쓴 함수(onStart 대신 OnStart)도 호출하지 않습니다. 정의되지 않은 콜백을 no-op으로 처리하고 아무것도 보고하지 않기 때문입니다. 파일의 나머지 부분은 모두 로컬이어도 되고, require로 로드하는 여러 파일로 모듈을 나눌 수도 있습니다.
 
-demo3가 복사해서 쓰기 좋은 최소 형태입니다.
+다음은 복사해서 쓰기 좋은 최소 형태입니다.
 
 ```lua
 -- Modules/Stages/mystage/Script.lua
@@ -73,9 +73,9 @@ end
 - activate(): 게임은 스테이지에 들어갈 때마다 이 함수를 호출합니다. 방문마다 초기화할 상태를 재설정하고, 음악을 시작하고, 데이터베이스를 여는 곳입니다. 역시 코루틴으로 실행되며 LOADING을 사용할 수 있습니다. 게임은 캐릭터와 푸치캬라 목록(CHARACTERLIST, PUCHICHARALIST)을 activate 실행 직전에 갱신하므로 여기서 읽으십시오. onStart는 그 갱신보다 먼저 실행됩니다.
 - update(timestamp): 게임은 매 프레임 draw 앞에서 이 함수를 호출하며 밀리초 단위 게임 시계를 전달합니다. 여기서 입력을 처리하고 상태를 바꾸십시오. 스테이지가 Exit를 호출한 뒤에는 게임이 update 호출을 멈추고 페이드아웃 동안 draw만 계속 호출합니다.
 - draw(): 게임은 매 프레임 이 함수를 호출합니다. 그리기만 하고, 프레임당 할당을 적게 유지하십시오.
-- deactivate(): 게임은 스테이지를 떠날 때 이 함수를 호출합니다. demo3는 여기서 데이터베이스를 해제하고, demo1은 음악과 비디오를 정지합니다.
+- deactivate(): 게임은 스테이지를 떠날 때 이 함수를 호출합니다. demo_overall의 데이터베이스 데모는 여기서 데이터베이스를 해제하고, 첫 데모는 음악과 비디오를 정지합니다.
 - afterSongEnum(): 게임은 곡 열거가 끝날 때마다, 부팅 시와 소프트 또는 하드 리로드 후에, 스테이지가 활성 상태가 아니어도 이 함수를 호출합니다. 모듈이 곡 목록에 의존할 때 사용하십시오.
-- onDestroy(): 게임은 스킨을 언로드하기 전에 이 함수를 호출합니다. demo1은 여기서 텍스처, 비디오, 텍스트 텍스처, 소리를 해제합니다.
+- onDestroy(): 게임은 스킨을 언로드하기 전에 이 함수를 호출합니다. demo_overall의 첫 데모는 여기서 텍스처, 비디오, 텍스트 텍스처, 소리를 해제합니다.
 - reloadLanguage(lang): 게임은 언어가 바뀔 때 이 함수를 호출합니다(아래 지역화 절 참고).
 
 스킨이 로드되면 게임은 모듈을 종류별로, Transitions를 먼저, 그다음 Stages, Activities, ROActivities 순으로 생성합니다. 한 종류 안에서는 모든 Script.lua를 먼저 실행한 뒤에 onStart를 호출합니다. 따라서 스테이지의 onStart가 실행되는 동안에는 액티비티와 ROActivity가 아직 존재하지 않으므로, activate에서 찾으십시오.
@@ -96,10 +96,10 @@ end
 Exit 전역은 스테이지에만 있습니다. 최대 세 개의 인자를 받고 어느 위치에서든 nil을 허용합니다. 대상("title", "play", "stage", "legacy"; nil은 "title"을 뜻함), 대상이 "stage"일 때의 목적지 스테이지 이름(또는 "legacy"일 때의 레거시 키), 트랜지션 모듈 이름입니다. 기본 제공 스테이지는 그 프레임에서 다른 것이 실행되지 않도록 update 안에서 `return Exit(...)`를 씁니다.
 
 ```lua
--- demo1/Script.lua의 update() 안에서
+-- 스테이지의 update() 안에서
 if INPUT:KeyboardPressed("S") == true then
     sounds.Skip:Play()
-    return Exit("stage", "demo2")   -- Modules/Stages/demo2로 이동
+    return Exit("stage", "mystage") -- Modules/Stages/mystage로 이동
 end
 -- ...
 return Exit("title", nil)           -- 타이틀 화면으로 돌아가기
@@ -111,7 +111,8 @@ return Exit("title", nil)           -- 타이틀 화면으로 돌아가기
 
 - os에는 time, date, difftime만 남습니다. 샌드박스는 io, debug, loadfile, dofile을 제거하며, import는 아무것도 하지 않습니다.
 - package는 커스텀 로더로 축소됩니다. package.path와 package.cpath는 비어 있고 샌드박스가 표준 searcher를 교체하므로, 아래 경로만 검색할 수 있습니다.
-- require는 먼저 모듈 자체 폴더를, 그다음 스킨의 Modules/Lib 폴더를, 그다음 게임 폴더의 Global/Modules/Lib를 찾아 처음 발견한 파일을 로드합니다. Global/Modules의 모듈은 스킨의 Modules/Lib보다 먼저 Global/Modules/Lib를 찾습니다. 같은 이름의 모듈 파일과 Lib 파일이 있으면 모듈 파일로 해석됩니다. 이름의 점은 경로 구분자가 되므로 require("DBControllers.dbScores")와 require("DBControllers/dbScores")는 둘 다 DBControllers/dbScores.lua를 로드합니다. 비ASCII 경로도 동작합니다.
+- require는 먼저 모듈 자체 폴더를, 그다음 스킨의 Modules/Lib 폴더를, 그다음 게임 폴더의 Global/Modules/Lib를 찾아 처음 발견한 파일을 로드합니다. Global/Modules의 모듈은 스킨의 Modules/Lib보다 먼저 Global/Modules/Lib를 찾습니다. 같은 이름의 모듈 파일과 Lib 파일이 있으면 모듈 파일로 해석됩니다. 이름의 점은 경로 구분자가 되므로 require("DBControllers.dbScores")와 require("DBControllers/dbScores")는 둘 다 DBControllers/dbScores.lua를 로드합니다. 검색은 대소문자를 구분하지 않으며, 비ASCII 경로도 동작합니다.
+- Lib 파일은 자신을 require한 모듈의 Lua 상태에서 실행되므로, 그 안의 require는 그 모듈의 순서를 따릅니다. 게임은 Global/Modules/Lib에 require("Core.Easing")이나 require("UI.Pick") 같은 이름 공간이 붙은 이름의 Lib 파일 라이브러리를 함께 제공하며, [제공 모듈](modules/README.md)에서 이를 설명합니다.
 
 ```lua
 -- intro_nokon/Script.lua에서 발췌
@@ -127,40 +128,40 @@ local Dialogue  = require("nokon_dialogue")           -- 모듈 폴더
 
 ## lang/을 이용한 지역화
 
-기본 제공 스킨은 공유 라이브러리 Modules/Lib/i18n.lua로 각 모듈 자체의 문자열을 번역합니다. 코드의 영어 문자열이 키입니다. 모듈은 각 영어 문자열을 일본어 번역에 대응시키는 테이블을 반환하는 lang/ja.lua를 함께 제공하고, 라이브러리는 그 테이블에서 문자열을 찾습니다.
+모듈은 스킨의 Locales 폴더가 아니라 제공 모듈 [Locale.i18n](modules/locale.md)으로 자체 문자열을 번역하므로, 번역이 모듈과 함께 옮겨 다닙니다. 텍스트는 Script.lua 옆의 lang/<code>/<name>.json에 기능마다 파일 하나씩, 고정된 id를 키로 하여 둡니다. lang/en에는 영어가 있고, 다른 모든 언어의 폴백이 됩니다.
 
-라이브러리에는 세 가지 함수가 있습니다.
+라이브러리의 주요 함수:
 
-- detect()는 전역 LANG을 통해 현재 게임 언어를 읽고 그 언어의 사전을 로드합니다. 언어가 일본어이면 lang/ja를 require하며, 이는 모듈 폴더 안에서 해석되므로 모듈마다 자기 사전을 가집니다. 그 밖의 언어에서는 아무것도 로드하지 않습니다. 이 함수를 호출하기 전에는 사전이 로드되지 않아 모든 문자열이 영어로 남습니다.
-- tr(s)는 로드된 사전에서 s의 번역을 반환하고, 사전에 항목이 없거나 사전이 로드되지 않았으면 s를 그대로 반환합니다.
-- trf(fmt, ...)는 서식 문자열 fmt를 같은 방식으로 번역한 뒤 string.format으로 서식을 적용합니다.
+- texts(name)은 모듈 자체 폴더에 있는 lang/<code>/<name>.json의 텍스트를 반환합니다. Lib 파일은 두 번째 인자로 자신의 폴더를 넘깁니다([제공 모듈](modules/README.md) 참고).
+- detect()는 전역 LANG을 통해 현재 게임 언어를 읽으며, 그 뒤로 모든 조회가 그 언어를 씁니다. 호출하기 전에는 조회가 영어를 씁니다.
+- texts:tr(id)는 id의 텍스트를 반환하고, 어느 언어에도 없으면 id 자체를 반환합니다. texts:trf(id, ...)는 그 텍스트를 string.format 패턴으로 씁니다.
 
-activate에서 detect()를 호출한 뒤 tr과 trf로 텍스트를 만드십시오. activate는 모듈에 들어갈 때마다 실행되므로, 플레이어가 설정에서 바꾼 언어는 다음 방문에 적용되고 모듈에는 다른 훅이 필요 없습니다. 키는 구두점, 공백, 줄바꿈까지 영어 원문과 정확히 일치해야 하고, 번역은 %s나 {Player 1 name} 같은 자리 표시자를 그대로 유지해야 합니다.
+activate에서 detect()를 호출한 뒤 texts:tr과 texts:trf로 텍스트를 만드십시오. activate는 모듈에 들어갈 때마다 실행되므로, 플레이어가 설정에서 바꾼 언어는 다음 방문에 적용되고 모듈에는 다른 훅이 필요 없습니다. 모든 언어 파일은 영어 파일과 같은 키를 가지며, 번역은 %s 같은 자리 표시자를 그대로 유지해야 합니다.
 
-```lua
--- Modules/Stages/mystage/lang/ja.lua
-local T = {}
-T["Nokon"] = "ノコン"
-T["Alright, quiz time!"] = "さあ、クイズの時間である！"
-return T
+```
+Modules/Stages/mystage/lang/en/quiz.json   { "speaker": "Nokon", "start": "Alright, quiz time!" }
+Modules/Stages/mystage/lang/ja/quiz.json   { "speaker": "ノコン", "start": "さあ、クイズの時間である！" }
 ```
 
 ```lua
 -- Modules/Stages/mystage/Script.lua
-local I18N = require("i18n")
+local I18N = require("Locale.i18n")
+local T = I18N.texts("quiz")
 local title
 
 function activate()
     I18N.detect()
-    title = I18N.tr("Alright, quiz time!")
+    title = T:tr("start")
 end
 ```
+
+intro_nokon 같은 기본 제공 스킨의 일부 예전 스테이지는 대신 라이브러리의 첫 번째 방식을 씁니다. 각 영어 문자열에서 번역으로 가는 테이블을 반환하는 lang/ja.lua를 I18N.tr(s)로 읽는 방식입니다. [Locale.i18n](modules/locale.md)에서 두 방식을 모두 설명합니다.
 
 게임은 언어가 바뀔 때 로드된 모든 모듈에서 전역 reloadLanguage(lang)도 호출합니다. 언어 선택기가 있는 화면처럼 언어가 바뀌는 동안 화면에 남아 있는 모듈만 이 함수가 필요합니다. 거기서는 detect()를 다시 호출하고 미리 렌더링한 텍스트를 다시 만드십시오.
 
 ## 주의할 점
 
-- 게임은 모듈이 생성한 텍스처, 소리, 비디오, 텍스트 객체를 모듈을 해제할 때 함께 해제하므로, 스킨 리로드로 누수가 생기지는 않습니다. 데이터베이스처럼 방문마다 여는 리소스는 demo3처럼 deactivate에서 해제하고, 생성한 것은 demo1처럼 onDestroy에서 해제하십시오.
+- 게임은 모듈이 생성한 텍스처, 소리, 비디오, 텍스트 객체를 모듈을 해제할 때 함께 해제하므로, 스킨 리로드로 누수가 생기지는 않습니다. 데이터베이스처럼 방문마다 여는 리소스는 demo_overall의 데이터베이스 데모처럼 deactivate에서 해제하고, 생성한 것은 그 첫 데모처럼 onDestroy에서 해제하십시오.
 - GetText는 텍스트 객체에 서로 다른 문자열마다 텍스처 하나를 캐시합니다. 매 프레임 바뀌는 문자열은 매 프레임 텍스처를 추가하고 게임은 점점 느려집니다. 변하는 값은 글리프 렌더러(TEXT:CreateGlyphCached)로 그리거나, 값이 바뀔 때까지 텍스처 하나를 유지하십시오.
 - LOADING은 코루틴으로 실행되는 콜백에서만 동작합니다. 모든 모듈의 onStart와 스테이지의 activate입니다. 액티비티의 activate나 update, draw에서 LOADING:Tick을 호출하면 Lua 오류가 발생합니다.
 - onStart와 afterSongEnum은 모듈이 화면에 없는 동안 실행됩니다. 스테이지가 보이지 않아도 동작하도록 작성하십시오.

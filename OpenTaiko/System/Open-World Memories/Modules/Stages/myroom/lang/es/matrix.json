@@ -1,9 +1,0 @@
-{
-  "_comment": "Spanish texts for the Placeholder Matrix (matrix.lua). Keys are stable ids; a missing id shows the English text (lang/en).",
-  "hint": "Elige una escena para proyectarla.",
-  "unlock_title": "Escena bloqueada",
-  "unlock_q": "¿Desbloquear «%s»?",
-  "unlock_yes": "Desbloquear",
-  "unlock_no": "Volver",
-  "broke": "No tienes suficientes monedas."
-}

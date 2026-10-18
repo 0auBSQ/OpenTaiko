@@ -1,9 +1,0 @@
-{
-  "_comment": "Placeholder Matrix（matrix.lua）的中文文本。键为固定 ID；缺少的 ID 显示英文文本（lang/en）。",
-  "hint": "选择要投影的场景。",
-  "unlock_title": "未解锁的场景",
-  "unlock_q": "解锁“%s”？",
-  "unlock_yes": "解锁",
-  "unlock_no": "返回",
-  "broke": "金币不足。"
-}

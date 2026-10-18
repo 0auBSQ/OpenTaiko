@@ -61,7 +61,7 @@
 엔진이 스테이지 스크립트에만 등록하는 함수입니다. 호출하면 엔진에 스테이지를 떠나도록 요청합니다.
 
 <div class="callout warn">
-Modules/Stages 스크립트에서만 사용할 수 있습니다. 액티비티와 ROActivity는 호스트가 구동하므로 이 함수를 받지 않습니다. 0~3개의 인자를 받고 어느 위치에서든 nil을 허용합니다. 호출 자체가 종료를 요청합니다. 기본 제공 스테이지는 그 프레임에서 다른 것이 실행되지 않도록 update 안에서 `return Exit(...)`를 씁니다. target은 "title", "play", "stage", "legacy" 중 하나이며, nil이나 다른 값은 "title"을 뜻합니다. target이 "stage"이면 name은 이동할 Modules/Stages 모듈이고, "legacy"이면 name은 "heya", "config", "exit", "onlinelounge" 중 하나입니다(다른 값은 타이틀로 갑니다). transition은 Modules/Transitions 모듈을 지정합니다. 생략했거나 엔진이 찾을 수 없으면 엔진은 "default"라는 이름의 모듈을 사용하고, 스킨에 트랜지션이 전혀 없으면 단순한 검은 페이드아웃이 재생됩니다. "heya" 키는 별칭으로 남아 있습니다. Modules/Stages에 있는 스킨의 `myroom` 모듈을 열며, 스킨에 그 모듈이 없으면 타이틀로 갑니다.
+Modules/Stages 스크립트에서만 사용할 수 있습니다. 액티비티와 ROActivity는 호스트가 구동하므로 이 함수를 받지 않습니다. 0~3개의 인자를 받고 어느 위치에서든 nil을 허용합니다. 호출 자체가 종료를 요청합니다. 기본 제공 스테이지는 그 프레임에서 다른 것이 실행되지 않도록 update 안에서 `return Exit(...)`를 씁니다. target은 "title", "play", "stage", "legacy" 중 하나이며, nil이나 다른 값은 "title"을 뜻합니다. target이 "stage"이면 name은 이동할 Modules/Stages 모듈이고, "legacy"이면 name은 "heya", "config", "exit", "onlinelounge" 중 하나입니다(다른 값은 타이틀로 갑니다). transition은 Modules/Transitions 모듈을 지정합니다. 생략했거나 엔진이 찾을 수 없으면 엔진은 "default"라는 이름의 모듈을 사용하고, 스킨에 트랜지션이 전혀 없으면 단순한 검은 페이드아웃이 재생됩니다. 스테이지와 트랜지션 이름은 호출한 쪽을 우선합니다. 스킨 스테이지는 그 이름의 스킨 모듈을, Global/Modules의 스테이지는 전역 모듈을 먼저 찾으며, 각각 다른 쪽으로 폴백합니다. "heya" 키는 별칭으로 남아 있습니다. Modules/Stages에 있는 스킨의 `myroom` 모듈을 열며, 스킨에 그 모듈이 없으면 타이틀로 갑니다.
 </div>
 
 | 메서드 | 설명 |
@@ -71,7 +71,7 @@ Modules/Stages 스크립트에서만 사용할 수 있습니다. 액티비티와
 ```lua
 function update(timestamp)
     if INPUT:KeyboardPressed("S") then
-        return Exit("stage", "demo2")          -- Modules/Stages/demo2로 이동
+        return Exit("stage", "mystage")        -- Modules/Stages/mystage로 이동
     end
     if INPUT:Pressed("Cancel") then
         return Exit("title", nil, "nokon_curtain")   -- 지정한 트랜지션을 거쳐 타이틀로 돌아가기
@@ -115,7 +115,7 @@ end
 로드된 액티비티를 이름으로 찾는 전역입니다.
 
 <div class="callout warn">
-ROActivity와 배경을 제외한 모든 모듈에 ACTIVITY 전역으로 등록됩니다. ROActivity와 배경에서는 nil이며, 그 모듈들은 ROACTIVITY를 사용합니다. 엔진은 액티비티를 Modules/Activities/{name}에서 로드합니다. ACTIVITY는 ROACTIVITY:GetROActivity와 같은 동작을 하는 GetROActivity도 노출합니다.
+ROActivity와 배경을 제외한 모든 모듈에 ACTIVITY 전역으로 등록됩니다. ROActivity와 배경에서는 nil이며, 그 모듈들은 ROACTIVITY를 사용합니다. 엔진은 액티비티를 Modules/Activities/{name}에서 로드합니다. ACTIVITY는 ROACTIVITY:GetROActivity와 같은 동작을 하는 GetROActivity도 노출합니다. 조회는 호출한 쪽을 우선합니다. 스킨 모듈은 그 이름의 스킨 액티비티를, Global/Modules의 모듈은 Global/Modules/Activities의 것을 받으며, 자기 쪽에 없으면 각각 다른 쪽으로 폴백합니다. Lib 파일은 자신을 require한 모듈의 쪽에서 조회합니다.
 </div>
 
 | 메서드 | 설명 |
@@ -128,7 +128,7 @@ ROActivity와 배경을 제외한 모든 모듈에 ACTIVITY 전역으로 등록�
 로드된 읽기 전용 액티비티(ROActivity)를 이름으로 찾는 전역입니다.
 
 <div class="callout warn">
-모든 모듈에 ROACTIVITY 전역으로 등록됩니다. 엔진은 ROActivity를 Modules/ROActivities/{name}에서 로드하고 읽기 전용 CONFIG, DATABASE, GetSaveFile 전역을 주므로, 그 스크립트는 게임 상태를 바꿀 수 없습니다(모듈의 동작 방식의 읽기 전용 모듈 절 참고). 액티비티와 ROActivity는 이름을 키로 하는 싱글턴입니다. 폴더마다 인스턴스 하나가 있고 모든 호스트가 이를 공유합니다.
+모든 모듈에 ROACTIVITY 전역으로 등록됩니다. 엔진은 ROActivity를 Modules/ROActivities/{name}에서 로드하고 읽기 전용 CONFIG, DATABASE, GetSaveFile 전역을 주므로, 그 스크립트는 게임 상태를 바꿀 수 없습니다(모듈의 동작 방식의 읽기 전용 모듈 절 참고). 액티비티와 ROActivity는 이름을 키로 하는 싱글턴입니다. 폴더마다 인스턴스 하나가 있고 모든 호스트가 이를 공유합니다. GetROActivity는 ACTIVITY:GetActivity와 마찬가지로 Modules/ROActivities와 Global/Modules/ROActivities 사이에서 호출한 쪽을 우선합니다.
 </div>
 
 | 메서드 | 설명 |

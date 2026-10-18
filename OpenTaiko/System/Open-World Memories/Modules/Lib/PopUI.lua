@@ -14,34 +14,15 @@
 -- Everything is theme-customizable: pass `theme = { colors = { primary = {…} }, radius = 30, … }` to
 -- PopUI.new (merged over the default "Bubblegum" palette), or `style = {…}` per widget. Hover (mouse) and
 -- focus (keyboard/gamepad: arrows + Decide/Cancel) share one highlight, so both feel identical.
+--
+-- PopUI is the global UI.SimpleUI (the widgets, the manager, focus and input) with OWM's Bubblegum theme
+-- (PopUI/theme.lua) and CoinBox's look for ui:coins (PopUI/widgets/coins.lua). OWM's _boot names it the
+-- skin's UI library, so global modules taking theirs through UI.Pick build on it too.
 
-local PopUI = {}
+local SimpleUI = require("UI.SimpleUI")
 
-PopUI.Theme   = require("PopUI.theme")
-PopUI.Shape   = require("PopUI.shape")
-PopUI.Util    = require("PopUI.util")
-PopUI.Widget  = require("PopUI.widget")
-PopUI.Manager = require("PopUI.manager")
-PopUI.Cache   = require("PopUI.cache")
-
--- widget classes (for advanced users who want to subclass)
-PopUI.Button  = require("PopUI.widgets.button")
-PopUI.Label   = require("PopUI.widgets.label")
-PopUI.Toggle  = require("PopUI.widgets.toggle")
-PopUI.Slider  = require("PopUI.widgets.slider")
-PopUI.TextBox = require("PopUI.widgets.textbox")
-PopUI.Panel   = require("PopUI.widgets.panel")
-PopUI.Bubble  = require("PopUI.widgets.bubble")
-PopUI.Menu    = require("PopUI.widgets.menu")
-PopUI.Chooser = require("PopUI.widgets.chooser")
-PopUI.SettingsList = require("PopUI.widgets.settingslist")
-PopUI.ListBase = require("PopUI.widgets.listbase")
-
---- Create a UI manager. opts = { theme = {…}?, sfx = { hover, click, move, toggle, error }?, bg = bool?,
---- navPlayer = n?, nav = "spatial"? (the arrow keys move to the nearest widget in their direction) }
-function PopUI.new(opts) return PopUI.Manager.new(opts) end
-
---- Dispose + drop the shared font caches (call when the language — and thus the main font — changes)
-function PopUI.flushSharedFonts() return PopUI.Manager.flushSharedFonts() end
-
-return PopUI
+return SimpleUI.derive{
+    name  = "PopUI",
+    Theme = require("PopUI.theme"),
+    Coins = require("PopUI.widgets.coins"),
+}

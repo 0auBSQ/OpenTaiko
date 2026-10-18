@@ -1,0 +1,39 @@
+{
+  "_comment": "プレースホルダー・マトリクス（matrix.lua）の日本語テキスト。",
+  "hint": "投影するシーンを選んでください。",
+  "unlock_title": "ロック中のシーン",
+  "unlock_q": "「%s」を解放しますか？",
+  "unlock_yes": "解放する",
+  "unlock_no": "戻る",
+  "broke": "コインが足りません。",
+  "scenes": {
+    "demo_overall": {
+      "name": "総合デモ",
+      "desc": "5つの小さなデモを 1つのステージに。 1〜5キーで 切り替えます。"
+    },
+    "demo_canvas": {
+      "name": "キャンバスデモ",
+      "desc": "小さなお絵かきプログラム。 マウスで白い紙に 描けます。 （LuaCanvas と マウス入力）"
+    },
+    "demo_particles": {
+      "name": "パーティクルデモ",
+      "desc": "Lua3DScene の パーティクルエンジンの 負荷テスト。"
+    },
+    "demo_modal": {
+      "name": "モーダルデモ",
+      "desc": "全レアリティ・全種類の 報酬と解放の モーダルを再生します。"
+    },
+    "demo_aviutl2": {
+      "name": "AviUtl2デモ",
+      "desc": "AviUtl2 プロジェクト （.aup2） を 動画プレイヤーで再生。"
+    },
+    "demo_rt": {
+      "name": "レイトレーサーデモ",
+      "desc": "Lua3DScene の パストレーシング レイトレーサーモード。"
+    },
+    "demo_dan_builder": {
+      "name": "段位ビルダーデモ",
+      "desc": "ミニマルな ランダム段位プレイヤー。"
+    }
+  }
+}

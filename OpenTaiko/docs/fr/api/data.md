@@ -4,7 +4,7 @@
 
 Sauvegarder des données qui survivent à un redémarrage, interroger des fichiers SQLite, lire des fichiers, du JSON et de l'INI depuis le dossier du module, partager des ressources entre modules, et lire ou modifier la configuration du jeu.
 
-Les chemins relatifs passés à DATABASE, SQL, STORAGE, JSONLOADER, INILOADER et SHARED sont résolus par rapport au répertoire du module en cours d'exécution (le dossier qui contient son `Script.lua`).
+Les chemins relatifs passés à DATABASE, SQL, STORAGE, JSONLOADER, INILOADER et SHARED sont résolus par rapport au répertoire du module en cours d'exécution (le dossier qui contient son `Script.lua`). Un fichier de Lib chargé avec `require` n'a pas de répertoire propre ici : ses appels se résolvent par rapport au module qui l'a chargé (voir [Modules fournis](../modules/README.md)).
 
 Certaines méthodes de cette page renvoient des collections .NET, qui se comportent différemment des tables Lua :
 
@@ -37,6 +37,8 @@ Chaque Read et chaque Write ouvre et ferme son propre environnement LMDB ; chaq
 | --- | --- |
 | `DATABASE:OpenLocalDatabase(path)  -> database` | Ouvre (en le créant si nécessaire) un magasin à un chemin relatif au répertoire du module. |
 | `DATABASE:OpenGlobalDatabase(path)  -> database` | Ouvre (en le créant si nécessaire) un magasin sous `Global/ApplicationData/LMDB/` dans le dossier du jeu, partagé par tous les modules. |
+
+Un magasin local vit dans le dossier de son module, si bien qu'il se déplace avec le module : un stage qui se déplace (d'un skin vers `Global/Modules/`, ou vers un nouveau nom) démarre avec des magasins locaux vides, et les anciennes données ne restent lisibles que depuis l'ancien dossier. Un fichier de Lib qui ouvre un magasin local ouvre celui du module appelant : `Shop.Daily` garde son état dans le `shop_state` du stage appelant. Les données que tous les skins doivent voir ont leur place dans le fichier de sauvegarde (`sf:SetGlobalString`, voir [Joueurs et profils](players.md)) ou dans un magasin global.
 
 ### Handle de base de données
 
@@ -153,7 +155,7 @@ end
 Charge un fichier `key=value` plat depuis le répertoire du module.
 
 <div class="callout warn">
-Le chargeur scinde chaque ligne au premier `=`, ignore les lignes sans `=`, et laisse une clé répétée écraser la valeur précédente. Il n'a ni sections, ni commentaires, ni guillemets. Un fichier absent donne un handle vide.
+Le chargeur scinde chaque ligne au premier `=`, ignore les lignes qui n'en ont pas, et laisse une clé répétée écraser la valeur précédente. Il n'a ni sections, ni commentaires, ni guillemets. Un fichier absent donne un handle vide.
 </div>
 
 | Méthode | Description |

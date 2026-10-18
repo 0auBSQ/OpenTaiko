@@ -25,7 +25,7 @@
 一个玩家的档案：名称、金币、已解锁项目、触发器和计数器、过关统计、装备的角色、小角色、名牌和段位称号。
 
 <div class="callout warn">
-用点语法读取属性（sf.Name、sf.Coins）。写入方法会立即持久化。只读模块阻止以下方法：SpendCoins、EarnCoins、UnlockNameplate、UnlockSong、对 SelectedHitsounds 赋值、SetGlobalTrigger、SetGlobalCounter、ChangeCharacter（返回 false）、UnlockPuchichara、ChangePuchichara、UnlockCharacter、ChangeDan、ChangeName 和 ChangeNameplate。
+用点语法读取属性（sf.Name、sf.Coins）。写入方法会立即持久化。只读模块阻止以下方法：SpendCoins、EarnCoins、UnlockNameplate、UnlockSong、对 SelectedHitsounds 赋值、SetGlobalTrigger、SetGlobalCounter、SetGlobalString、ChangeCharacter（返回 false）、UnlockPuchichara、ChangePuchichara、UnlockCharacter、ChangeDan、ChangeName 和 ChangeNameplate。
 </div>
 
 | 方法 | 说明 |
@@ -49,8 +49,10 @@
 | `sf.SelectedHitsounds  -> string` | 选定的打击音效组的文件夹名称。赋予不同的名称会持久化并重新加载该玩家的打击音效。 |
 | `sf:GetGlobalTrigger(name)  -> bool` | 读取一个具名的布尔触发器。 |
 | `sf:GetGlobalCounter(name)  -> number` | 读取一个具名的数值计数器。 |
+| `sf:GetGlobalString(name)  -> string` | 读取一个具名的文本值，存档中没有时为 ""（例如以 JSON 保存的模块数据）。 |
 | `sf:SetGlobalTrigger(name, value)  -> nil` | 设置一个具名的布尔触发器。 |
 | `sf:SetGlobalCounter(name, value)  -> nil` | 设置一个具名的数值计数器。 |
+| `sf:SetGlobalString(name, value)  -> nil` | 设置一个具名的文本值并持久化。 |
 | `sf:GetClearStatusCount(difficulty, clearStatus)  -> integer` | 某个难度（0 Easy 到 4 Extra Extreme）中最佳过关状态恰好为 clearStatus（0 无，1 辅助过关，2 过关，3 全连击，4 全良）的谱面数量。参数超出范围时为 0。 |
 | `sf:GetDanBestPlay(node)  -> danBestPlay` | 某个段位歌曲节点的无 Mod 最佳成绩（见“段位最佳成绩句柄”）；没有时返回 HasRecord 为 false 的句柄。 |
 | `sf:GetCharacter()  -> character` | 绑定到该槽位玩家的角色句柄（见“角色句柄”）。 |

@@ -33,7 +33,7 @@ local SCREEN_W     = 1920
 local SCREEN_H     = 1080
 local TILE_OPACITY = 0.65
 
--- Rarity string → modal integer (matches HRarity.RarityToModalInt in character_shop)
+-- Rarity string → modal integer (matches HRarity.RarityToModalInt in C#)
 local rarityToInt = { Poor=0, Common=0, Uncommon=1, Rare=2, Epic=3, Legendary=4, Mythical=4 }
 
 -- ── Lifecycle ─────────────────────────────────────────────────────────────────

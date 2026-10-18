@@ -1,0 +1,10 @@
+{
+  "_comment": "French texts for the theme settings viewer. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "title": "Visionneuse des paramètres du thème",
+  "col_id": "ID",
+  "col_scope": "Portée",
+  "col_type": "Type",
+  "col_value": "Valeur",
+  "hint_scroll": "haut/bas pour défiler   Annuler pour quitter",
+  "hint_exit": "Annuler pour quitter"
+}

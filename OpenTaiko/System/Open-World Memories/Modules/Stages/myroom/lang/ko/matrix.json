@@ -1,9 +1,0 @@
-{
-  "_comment": "Placeholder Matrix(matrix.lua)의 한국어 텍스트. 키는 고정 ID이며, 없는 ID는 영어 텍스트(lang/en)로 표시됩니다.",
-  "hint": "투영할 장면을 고르세요.",
-  "unlock_title": "잠긴 장면",
-  "unlock_q": "\"%s\"을(를) 해제할까요?",
-  "unlock_yes": "해제",
-  "unlock_no": "뒤로",
-  "broke": "코인이 부족합니다."
-}

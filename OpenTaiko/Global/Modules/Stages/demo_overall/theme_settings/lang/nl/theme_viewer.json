@@ -1,0 +1,10 @@
+{
+  "_comment": "Dutch texts for the theme settings viewer. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "title": "Thema-instellingen bekijken",
+  "col_id": "ID",
+  "col_scope": "Bereik",
+  "col_type": "Type",
+  "col_value": "Waarde",
+  "hint_scroll": "omhoog/omlaag om te scrollen   Annuleren om af te sluiten",
+  "hint_exit": "Annuleren om af te sluiten"
+}

@@ -295,6 +295,8 @@ function onStart()
 	SHARED:SetSharedSFX("EventTick", "Sounds/EventTick.ogg")   -- Event Mode: the countdown's last ten seconds
 	-- the coin icon every purse and coin reward draws (Lib/CoinBox, the coin modal)
 	SHARED:SetSharedTexture("Coin", "Textures/Coin.png")
+	-- the UI library global modules build on (UI.Pick): OWM's PopUI
+	SHARED:SetSharedString("ui_library", "PopUI")
 
 	database = DATABASE:OpenGlobalDatabase("GameStatus")
 	if database:Read("new_user") == nil or CONFIG.ConfigIsNew then

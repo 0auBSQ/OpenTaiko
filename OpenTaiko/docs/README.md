@@ -12,6 +12,7 @@ OpenTaiko draws almost every screen outside of core gameplay with Lua scripts th
 
 - If you have not written a module yet, read [How modules work](getting-started.md): the folder layout of a skin, the module types, and the lifecycle callbacks a script receives.
 - To look up a function, open the [API reference](api/) and pick a category from the sidebar.
+- To build on what the game ships (a UI library, a dialogue box, the pagoda, vault and shop rules, My Room), read [Provided modules](modules/).
 - For a concrete goal, the guides walk through [characters](guides/characters.md), [puchicharas](guides/puchicharas.md), [nameplates](guides/nameplates.md), [skins and themes](guides/skins.md) and [chart unlockables](guides/unlockables.md) step by step.
 
 ## What you can build

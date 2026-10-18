@@ -12,6 +12,24 @@
   - [채보 잠금 해제 요소](guides/unlockables.md)
   - [잠금 해제 요소 레퍼런스](guides/unlockables-reference.md)
 
+- 제공 모듈
+  - [개요](modules/README.md)
+  - [Core](modules/core.md)
+  - [Input](modules/input.md)
+  - [Audio](modules/audio.md)
+  - [Locale](modules/locale.md)
+  - [Calendar](modules/calendar.md)
+  - [Songs](modules/songs.md)
+  - [World](modules/world.md) <span class="badge-exp">실험적</span>
+  - [UI](modules/ui.md)
+  - [Saves](modules/saves.md)
+  - [Characters](modules/characters.md)
+  - [VN](modules/vn.md)
+  - [Pagoda](modules/pagoda.md)
+  - [Vault](modules/vault.md)
+  - [Shop](modules/shop.md)
+  - [마이 룸](modules/my-room.md)
+
 - Lua API 레퍼런스
   - [개요](api/README.md)
   - [모듈과 생명 주기](api/activities.md)

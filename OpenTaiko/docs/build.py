@@ -8,7 +8,7 @@ Run it after editing any .md file:
     python build.py            (from the docs folder)
 
 Sources:
-  README.md, getting-started.md, api/*.md, guides/*.md   English pages
+  README.md, getting-started.md, api/*.md, guides/*.md, modules/*.md   English pages
   <lang>/...                                                       translations (same paths)
   _sidebar.md / <lang>/_sidebar.md                                 navigation (groups + links)
   ui.json                                                          per-language UI strings

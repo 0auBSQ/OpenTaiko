@@ -12,6 +12,24 @@
   - [Разблокировка чартов](guides/unlockables.md)
   - [Справочник по разблокировке](guides/unlockables-reference.md)
 
+- Поставляемые модули
+  - [Обзор](modules/README.md)
+  - [Core](modules/core.md)
+  - [Input](modules/input.md)
+  - [Audio](modules/audio.md)
+  - [Locale](modules/locale.md)
+  - [Calendar](modules/calendar.md)
+  - [Songs](modules/songs.md)
+  - [World](modules/world.md) <span class="badge-exp">Экспериментально</span>
+  - [UI](modules/ui.md)
+  - [Saves](modules/saves.md)
+  - [Characters](modules/characters.md)
+  - [VN](modules/vn.md)
+  - [Pagoda](modules/pagoda.md)
+  - [Vault](modules/vault.md)
+  - [Shop](modules/shop.md)
+  - [Моя комната](modules/my-room.md)
+
 - Справочник Lua API
   - [Обзор](api/README.md)
   - [Модули и жизненный цикл](api/activities.md)

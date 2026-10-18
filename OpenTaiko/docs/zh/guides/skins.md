@@ -156,6 +156,13 @@ My New Skin/
 
 游戏文件夹中也可以放置所有皮肤都会加载的模块。游戏安装目录中的 `Global/Modules/` 与皮肤的 `Modules/` 有相同的子文件夹 `Transitions/`、`Stages/`、`Activities/`、`ROActivities/` 和 `Lib/`，游戏会在每个分类中紧接着皮肤的模块加载全局模块。同一个名称可以同时存在于两处。皮肤的模块按名称请求舞台、活动、ROActivity 或过渡时得到皮肤的模块，全局模块则得到全局模块；自己一侧没有该名称的模块时，各自会去另一侧查找。`require` 遵循同样的规则：全局模块先在 `Global/Modules/Lib/` 中查找，再查找皮肤的 `Modules/Lib/`。游戏自身按名称查找的模块（见下方列表）优先来自皮肤。`_boot` 和 `_title` 必须留在皮肤中：如果 `Global/Modules/Stages/` 中有其中任何一个，游戏会在启动时报错停止。
 
+游戏在 `Global/Modules/Lib/` 中自带的 Lib 文件见[内置模块](../modules/README.md)：一个 UI 库、一个对话框、输入和本地化辅助工具、3D 世界引擎，以及未知之塔、金库和金币商店的规则，使用带命名空间的名称，例如 `require("UI.Pick")` 或 `require("Core.Easing")`。全局文件所在的位置带来了几条规则：
+
+- Lib 文件运行在 require 它的模块的 Lua 状态中。它自己的 require 遵循该模块的查找顺序，它传给 `TEXTURE`、`SOUND`、`JSONLOADER` 及其他加载器的相对路径相对于该模块的文件夹解析。自带资源的 Lib 文件通过 `require("Core.Here")(...)` 和绝对路径加载器访问它们。
+- 全局模块没有 `Locales/`，也没有 `ThemeSettings.json`：`THEME:GetSkinString` 和主题设置读取的是当前皮肤的。全局模块把自己的字符串放在自己的 `lang/` 文件夹中（第 10 步）。
+- `SHARED` 的纹理、声音和字符串对皮肤和所有全局模块来说是同一个命名空间：请给你的键加上前缀。
+- 更新会添加和替换文件，但从不删除旧文件，而且皮肤模块会先查找皮肤的 `Modules/Lib/`，再查找 `Global/Modules/Lib/`，因此同名的过时皮肤文件会胜出。这就是为什么内置模块放在任何皮肤文件都不会占用的命名空间文件夹中，也是为什么自带皮肤把它的旧 Lib 名称保留为转发到内置模块的两行文件，而不是删除这些文件。
+
 在每个分类内，游戏先创建所有模块，然后对每个模块运行 `onStart`，顺序为 Transitions、Stages、Activities、ROActivities。
 
 游戏按名称查找以下模块，自带皮肤提供了全部：
@@ -217,13 +224,14 @@ function onDestroy() end
 
 ## 第 10 步：用 lang/ 本地化模块
 
-模块可以把自己的翻译放在 `Script.lua` 旁边的 `lang/` 子文件夹中。由于模块自己的文件夹在其 `require` 路径上，`require("lang.ja")` 会解析为 `lang/ja.lua`。自带皮肤通过辅助文件 `Modules/Lib/i18n.lua` 为其较大的舞台这样做（例如 `Modules/Stages/myroom/lang/ja.lua` 和 `Modules/Stages/intro_nokon/lang/ja.lua`）。这与第 7 步中皮肤范围的 `Locales/` 文件夹是分开的。
+模块可以把自己的翻译放在 `Script.lua` 旁边的 `lang/` 子文件夹中，通过内置模块 [Locale.i18n](../modules/locale.md) 读取：每个功能和语言一个 `lang/<code>/<name>.json` 文件，以稳定的 id 为键，`lang/en/` 中的英文作为回退。这与第 7 步中皮肤范围的 `Locales/` 文件夹是分开的，也是全局模块翻译其文本的唯一方式。自带皮肤中一些较旧的舞台（例如 `Modules/Stages/intro_nokon/lang/ja.lua`）使用这个库的第一种形式，即一张从每个英文字符串映射到其译文的 Lua 表。
 
 ```
 Modules/Stages/my_stage/
   Script.lua
   lang/
-    ja.lua        -- require("lang.ja")
+    en/my_stage.json   -- require("Locale.i18n").texts("my_stage")
+    ja/my_stage.json
 ```
 
 ## 第 11 步：安装并选择皮肤

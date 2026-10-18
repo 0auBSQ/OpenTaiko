@@ -68,6 +68,10 @@ namespace OpenTaiko {
 			_sf.tSetGlobalTrigger(triggerName, triggerValue);
 		}
 
+		public override void SetGlobalString(string stringName, string stringValue) {
+			_sf.tSetGlobalString(stringName, stringValue ?? "");
+		}
+
 		public override void SetGlobalCounter(string counterName, double counterValue) {
 			_sf.tSetGlobalCounter(counterName, counterValue);
 		}

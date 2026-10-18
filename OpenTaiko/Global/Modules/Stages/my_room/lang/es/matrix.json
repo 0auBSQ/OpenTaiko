@@ -1,0 +1,39 @@
+{
+  "_comment": "Spanish texts for the Placeholder Matrix (matrix.lua). Keys are stable ids; a missing id shows the English text (lang/en).",
+  "hint": "Elige una escena para proyectarla.",
+  "unlock_title": "Escena bloqueada",
+  "unlock_q": "¿Desbloquear «%s»?",
+  "unlock_yes": "Desbloquear",
+  "unlock_no": "Volver",
+  "broke": "No tienes suficientes monedas.",
+  "scenes": {
+    "demo_overall": {
+      "name": "Demo general",
+      "desc": "Cinco pequeñas demos en un solo stage; las teclas 1 a 5 cambian entre ellas."
+    },
+    "demo_canvas": {
+      "name": "Demo de canvas",
+      "desc": "Un pequeño programa de dibujo: dibuja con el ratón en una hoja blanca, con LuaCanvas y el ratón."
+    },
+    "demo_particles": {
+      "name": "Demo de partículas",
+      "desc": "Una prueba de carga del motor de partículas de Lua3DScene."
+    },
+    "demo_modal": {
+      "name": "Demo de modales",
+      "desc": "Reproduce los modales de recompensa y desbloqueo de cada rareza y tipo."
+    },
+    "demo_aviutl2": {
+      "name": "Demo de AviUtl2",
+      "desc": "Proyectos de AviUtl2 (.aup2) reproducidos en el reproductor de vídeo."
+    },
+    "demo_rt": {
+      "name": "Demo del raytracer",
+      "desc": "El modo raytracer con trazado de rutas de Lua3DScene."
+    },
+    "demo_dan_builder": {
+      "name": "Demo del Dan Builder",
+      "desc": "Un reproductor de Dan aleatorio minimalista."
+    }
+  }
+}

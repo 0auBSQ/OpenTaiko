@@ -156,6 +156,13 @@ El juego no escanea `Modules/Lib/`. Los archivos de ahí los cargas con `require
 
 La carpeta del juego también puede contener módulos que cargan todos los skins. `Global/Modules/` en la carpeta de instalación del juego tiene las mismas subcarpetas `Transitions/`, `Stages/`, `Activities/`, `ROActivities/` y `Lib/` que el `Modules/` de un skin, y el juego carga cada categoría global justo después de la del skin. Un nombre puede existir en los dos sitios. Cuando un módulo del skin pide un stage, una activity, una ROActivity o una transition por su nombre, obtiene el módulo del skin, y un módulo global obtiene el global; cada uno recurre al otro sitio cuando el suyo no tiene un módulo con ese nombre. `require` sigue la misma regla: un módulo global busca en `Global/Modules/Lib/` antes que en el `Modules/Lib/` del skin. Los módulos que el propio juego busca por nombre (en la lista de abajo) vienen primero del skin. `_boot` y `_title` deben quedarse en el skin: cuando `Global/Modules/Stages/` contiene alguno de los dos, el juego se detiene con un error al arrancar.
 
+Los archivos de Lib que el juego incluye en `Global/Modules/Lib/` están documentados en [Módulos proporcionados](../modules/README.md): una biblioteca de interfaz, un cuadro de diálogo, utilidades de entrada y de localización, el motor de mundos 3D, y las reglas de la pagoda, la bóveda y la tienda de monedas, con nombres organizados por espacios de nombres como `require("UI.Pick")` o `require("Core.Easing")`. Del lugar donde viven los archivos globales se derivan algunas reglas:
+
+- Un archivo de Lib se ejecuta en el estado Lua del módulo que lo carga con require. Sus propios require siguen el orden de búsqueda de ese módulo, y las rutas relativas que pasa a `TEXTURE`, `SOUND`, `JSONLOADER` y los demás cargadores se resuelven respecto a la carpeta de ese módulo. Un archivo de Lib que incluye recursos llega a ellos con `require("Core.Here")(...)` y los cargadores de ruta absoluta.
+- Los módulos globales no tienen `Locales/` ni `ThemeSettings.json`: `THEME:GetSkinString` y los ajustes del tema leen los del skin activo. Un módulo global guarda sus cadenas en su propia carpeta `lang/` (Paso 10).
+- Las texturas, sonidos y cadenas de `SHARED` son un único espacio de nombres para el skin y todos los módulos globales: pon un prefijo a tus claves.
+- Una actualización añade y reemplaza archivos pero nunca borra los antiguos, y los módulos del skin buscan en el `Modules/Lib/` del skin antes que en `Global/Modules/Lib/`, así que un archivo obsoleto del skin con el mismo nombre ganaría. Por eso los módulos proporcionados viven en carpetas de espacio de nombres que ningún archivo del skin comparte, y por eso el skin incluido conserva sus antiguos nombres de Lib como reenvíos de dos líneas hacia ellos en lugar de borrar los archivos.
+
 Dentro de cada categoría el juego crea primero todos los módulos y después ejecuta `onStart` en cada uno, en el orden Transitions, Stages, Activities, ROActivities.
 
 El juego busca estos módulos por nombre, y el skin incluido los proporciona todos:
@@ -217,13 +224,14 @@ function onDestroy() end
 
 ## Paso 10: Localizar un módulo con lang/
 
-Un módulo puede guardar sus propias traducciones en una subcarpeta `lang/` junto a `Script.lua`. Como la propia carpeta del módulo está en su ruta de `require`, `require("lang.ja")` se resuelve a `lang/ja.lua`. El skin incluido hace esto en sus stages grandes (por ejemplo `Modules/Stages/myroom/lang/ja.lua` y `Modules/Stages/intro_nokon/lang/ja.lua`) mediante la utilidad `Modules/Lib/i18n.lua`. Esto es independiente de la carpeta `Locales/` de todo el skin del Paso 7.
+Un módulo puede guardar sus propias traducciones en una subcarpeta `lang/` junto a `Script.lua`, leídas con el módulo proporcionado [Locale.i18n](../modules/locale.md): un archivo `lang/<code>/<name>.json` por funcionalidad y por idioma, con ids estables como claves, y el inglés de `lang/en/` como reserva. Esto es independiente de la carpeta `Locales/` de todo el skin del Paso 7, y es la única forma que tiene un módulo global de traducir su texto. Algunos stages más antiguos del skin incluido (por ejemplo `Modules/Stages/intro_nokon/lang/ja.lua`) usan la primera forma de la biblioteca, una tabla Lua que asocia cada cadena en inglés con su traducción.
 
 ```
 Modules/Stages/my_stage/
   Script.lua
   lang/
-    ja.lua        -- require("lang.ja")
+    en/my_stage.json   -- require("Locale.i18n").texts("my_stage")
+    ja/my_stage.json
 ```
 
 ## Paso 11: Instalar y seleccionar el skin

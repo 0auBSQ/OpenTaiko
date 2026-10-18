@@ -61,7 +61,7 @@ Die Script.lua eines Charakters definiert einen anderen Satz: loadAnimation, dis
 Eine Funktion, die die Engine nur in Stage-Skripten registriert; ihr Aufruf bittet die Engine, die Stage zu verlassen.
 
 <div class="callout warn">
-Nur in Skripten unter Modules/Stages verfügbar; Activities und ROActivities steuert ihr Host, und sie erhalten sie nicht. Akzeptiert 0 bis 3 Argumente und toleriert nil an jeder Position. Der Aufruf selbst fordert das Verlassen an; die mitgelieferten Stages schreiben `return Exit(...)` innerhalb von update, damit in diesem Frame nichts anderes mehr läuft. target ist "title", "play", "stage" oder "legacy"; nil oder ein beliebiger anderer Wert bedeutet "title". Ist target "stage", so ist name das Modul unter Modules/Stages, zu dem gesprungen wird; ist target "legacy", so ist name eines von "heya", "config", "exit" oder "onlinelounge" (jeder andere Wert führt zum Titel). transition benennt ein Modul unter Modules/Transitions; lassen Sie es weg oder findet die Engine es nicht, verwendet die Engine das Modul namens "default", und hat der Skin gar keine Übergänge, wird ein einfaches schwarzes Ausblenden abgespielt. Der Schlüssel "heya" bleibt als Alias erhalten: Er öffnet das Modul `myroom` des Skins unter Modules/Stages, oder den Titel, wenn der Skin keines hat.
+Nur in Skripten unter Modules/Stages verfügbar; Activities und ROActivities steuert ihr Host, und sie erhalten sie nicht. Akzeptiert 0 bis 3 Argumente und toleriert nil an jeder Position. Der Aufruf selbst fordert das Verlassen an; die mitgelieferten Stages schreiben `return Exit(...)` innerhalb von update, damit in diesem Frame nichts anderes mehr läuft. target ist "title", "play", "stage" oder "legacy"; nil oder ein beliebiger anderer Wert bedeutet "title". Ist target "stage", so ist name das Modul unter Modules/Stages, zu dem gesprungen wird; ist target "legacy", so ist name eines von "heya", "config", "exit" oder "onlinelounge" (jeder andere Wert führt zum Titel). transition benennt ein Modul unter Modules/Transitions; lassen Sie es weg oder findet die Engine es nicht, verwendet die Engine das Modul namens "default", und hat der Skin gar keine Übergänge, wird ein einfaches schwarzes Ausblenden abgespielt. Die Namen von Stage und Übergang bevorzugen die Seite des Aufrufers: Eine Stage des Skins findet zuerst das Modul dieses Namens im Skin, eine Stage in Global/Modules das globale, und jede greift auf die andere Seite zurück. Der Schlüssel "heya" bleibt als Alias erhalten: Er öffnet das Modul `myroom` des Skins unter Modules/Stages, oder den Titel, wenn der Skin keines hat.
 </div>
 
 | Methode | Beschreibung |
@@ -71,7 +71,7 @@ Nur in Skripten unter Modules/Stages verfügbar; Activities und ROActivities ste
 ```lua
 function update(timestamp)
     if INPUT:KeyboardPressed("S") then
-        return Exit("stage", "demo2")          -- Sprung zu Modules/Stages/demo2
+        return Exit("stage", "mystage")        -- Sprung zu Modules/Stages/mystage
     end
     if INPUT:Pressed("Cancel") then
         return Exit("title", nil, "nokon_curtain")   -- zurück zum Titel über einen benannten Übergang
@@ -115,7 +115,7 @@ end
 Globales Objekt zum Nachschlagen einer geladenen Activity per Name.
 
 <div class="callout warn">
-In jedem Modul als globales Objekt ACTIVITY registriert, außer in ROActivities und Hintergründen, wo es nil ist; diese Module verwenden ROACTIVITY. Die Engine lädt Activities aus Modules/Activities/{name}. ACTIVITY stellt außerdem GetROActivity bereit, das sich wie ROACTIVITY:GetROActivity verhält.
+In jedem Modul als globales Objekt ACTIVITY registriert, außer in ROActivities und Hintergründen, wo es nil ist; diese Module verwenden ROACTIVITY. Die Engine lädt Activities aus Modules/Activities/{name}. ACTIVITY stellt außerdem GetROActivity bereit, das sich wie ROACTIVITY:GetROActivity verhält. Eine Suche bevorzugt die Seite des Aufrufers: Ein Modul des Skins erhält die Activity dieses Namens aus dem Skin, ein Modul in Global/Modules die aus Global/Modules/Activities, und jede Seite greift auf die andere zurück, wenn sie keine hat. Eine Lib-Datei sucht von der Seite des Moduls aus, das sie per require geladen hat.
 </div>
 
 | Methode | Beschreibung |
@@ -128,7 +128,7 @@ In jedem Modul als globales Objekt ACTIVITY registriert, außer in ROActivities 
 Globales Objekt zum Nachschlagen einer geladenen schreibgeschützten Activity (ROActivity) per Name.
 
 <div class="callout warn">
-In jedem Modul als globales Objekt ROACTIVITY registriert. Die Engine lädt ROActivities aus Modules/ROActivities/{name} und gibt ihnen die schreibgeschützten globalen Objekte CONFIG, DATABASE und GetSaveFile, sodass ihre Skripte den Spielzustand nicht ändern können (siehe den Abschnitt zu schreibgeschützten Modulen unter So funktionieren Module). Activities und ROActivities sind per Name identifizierte Singletons: eine Instanz pro Ordner, die jeder Host gemeinsam nutzt.
+In jedem Modul als globales Objekt ROACTIVITY registriert. Die Engine lädt ROActivities aus Modules/ROActivities/{name} und gibt ihnen die schreibgeschützten globalen Objekte CONFIG, DATABASE und GetSaveFile, sodass ihre Skripte den Spielzustand nicht ändern können (siehe den Abschnitt zu schreibgeschützten Modulen unter So funktionieren Module). Activities und ROActivities sind per Name identifizierte Singletons: eine Instanz pro Ordner, die jeder Host gemeinsam nutzt. GetROActivity bevorzugt die Seite des Aufrufers so, wie es ACTIVITY:GetActivity tut, zwischen Modules/ROActivities und Global/Modules/ROActivities.
 </div>
 
 | Methode | Beschreibung |

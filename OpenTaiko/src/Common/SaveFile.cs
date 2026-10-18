@@ -29,6 +29,9 @@ internal class SaveFile {
 
 		// Global counters
 		data.GlobalCounters = DBSaves.GetGlobalCountersDict(data.SaveId);
+
+		// Global strings
+		data.GlobalStrings = DBSaves.GetGlobalStringsDict(data.SaveId);
 	}
 	}
 
@@ -63,6 +66,16 @@ internal class SaveFile {
 	public double tGetGlobalCounter(string counterName) {
 		data.GlobalCounters.TryGetValue(counterName, out double counterValue);
 		return counterValue;
+	}
+
+	public void tSetGlobalString(string stringName, string stringValue) {
+		data.GlobalStrings[stringName] = stringValue;
+		DBSaves.DBSetGlobalString(data.SaveId, stringName, stringValue);
+	}
+
+	// "" when the save has no value of that name
+	public string tGetGlobalString(string stringName) {
+		return data.GlobalStrings.TryGetValue(stringName, out string? stringValue) ? stringValue : "";
 	}
 
 	#endregion
@@ -274,6 +287,9 @@ internal class SaveFile {
 
 		[JsonIgnore]
 		public Dictionary<string, double> GlobalCounters = new Dictionary<string, double>();
+
+		[JsonIgnore]
+		public Dictionary<string, string> GlobalStrings = new Dictionary<string, string>();
 
 		[JsonIgnore]
 		public Dictionary<string, BestPlayRecords.CBestPlayRecord> bestPlays = new Dictionary<string, BestPlayRecords.CBestPlayRecord>();

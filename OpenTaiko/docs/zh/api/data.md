@@ -4,7 +4,7 @@
 
 保存在重启后仍保留的数据、查询 SQLite 文件、从模块文件夹读取文件、JSON 和 INI、在模块之间共享资源，以及读取或更改游戏配置。
 
-传给 DATABASE、SQL、STORAGE、JSONLOADER、INILOADER 和 SHARED 的相对路径相对于正在运行的模块的目录（存放其 `Script.lua` 的文件夹）解析。
+传给 DATABASE、SQL、STORAGE、JSONLOADER、INILOADER 和 SHARED 的相对路径相对于正在运行的模块的目录（存放其 `Script.lua` 的文件夹）解析。用 `require` 加载的 Lib 文件在这里没有自己的目录：它的调用相对于 require 它的模块解析（见[内置模块](../modules/README.md)）。
 
 本页的某些方法返回 .NET 集合，其行为与 Lua 表不同：
 
@@ -37,6 +37,8 @@ end
 | --- | --- |
 | `DATABASE:OpenLocalDatabase(path)  -> database` | 在相对于模块目录的路径上打开（必要时创建）一个存储。 |
 | `DATABASE:OpenGlobalDatabase(path)  -> database` | 在游戏文件夹的 `Global/ApplicationData/LMDB/` 下打开（必要时创建）一个存储，由所有模块共享。 |
+
+本地存储位于其模块的文件夹内，因此会随模块一起移动：被移动的舞台（从皮肤移到 `Global/Modules/`，或改了名字）会以空的本地存储开始，旧数据只能从旧文件夹读取。打开本地存储的 Lib 文件打开的是调用方模块的存储：`Shop.Daily` 把状态保存在调用方舞台的 `shop_state` 中。每个皮肤都必须能看到的数据应放在存档中（`sf:SetGlobalString`，见[玩家与档案](players.md)）或全局存储中。
 
 ### 数据库句柄
 
@@ -153,7 +155,7 @@ end
 从模块目录加载一个扁平的 `key=value` 文件。
 
 <div class="callout warn">
-加载器在第一个 `=` 处分割每一行，跳过没有 `=` 的行，并让重复的键覆盖先前的值。它没有节、注释或引号。文件缺失时得到一个空句柄。
+加载器在第一个 `=` 处分割每一行，跳过没有等号的行，并让重复的键覆盖先前的值。它没有节、注释或引号。文件缺失时得到一个空句柄。
 </div>
 
 | 方法 | 说明 |
