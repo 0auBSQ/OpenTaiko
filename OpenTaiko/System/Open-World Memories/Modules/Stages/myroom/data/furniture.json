@@ -39,7 +39,17 @@
     "caspian_mug",
     "chalice",
     "crystal",
-    "fishtank"
+    "fishtank",
+    "tree",
+    "large_tree",
+    "small_rock",
+    "large_rock",
+    "log",
+    "mini_pagoda",
+    "stone_lantern",
+    "bonsai",
+    "fox",
+    "fox_statue"
   ],
   "desk": {
     "w": 2,
@@ -466,5 +476,90 @@
       }
     ],
     "rarity": "Legendary"
+  },
+  "tree": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "collH": 1.5,
+    "fit": 0.6,
+    "rarity": "Common"
+  },
+  "large_tree": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "collH": 2.4,
+    "rarity": "Uncommon"
+  },
+  "small_rock": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "collH": 0.35,
+    "fit": 0.7,
+    "rarity": "Common"
+  },
+  "large_rock": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "collH": 1.05,
+    "rarity": "Uncommon"
+  },
+  "log": {
+    "w": 3,
+    "h": 1,
+    "place": "ground",
+    "collH": 0.75,
+    "fit": 0.85,
+    "rarity": "Rare"
+  },
+  "mini_pagoda": {
+    "w": 2,
+    "h": 2,
+    "place": "ground",
+    "collH": 2.4,
+    "rarity": "Legendary"
+  },
+  "stone_lantern": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "collH": 1.45,
+    "fit": 0.45,
+    "interact": "lantern",
+    "rarity": "Rare"
+  },
+  "bonsai": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "collH": 0.5,
+    "collW": 0.55,
+    "collD": 0.45,
+    "fit": 0.55,
+    "stackOn": true,
+    "rarity": "Common"
+  },
+  "fox": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "collH": 0.55,
+    "collW": 0.35,
+    "collD": 0.4,
+    "fit": 0.4,
+    "stackOn": true,
+    "iconYaw": 45,
+    "rarity": "Uncommon"
+  },
+  "fox_statue": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "collH": 1.35,
+    "fit": 0.6,
+    "rarity": "Uncommon"
   }
 }

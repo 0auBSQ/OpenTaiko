@@ -16,6 +16,7 @@
   "prompt_mirror": "[Entrée] Se regarder dans le miroir",
   "prompt_look": "[Entrée] Regarder",
   "prompt_fishtank": "[Entrée] Allumer ou éteindre l'aquarium",
+  "prompt_lantern": "[Entrée] Allumer ou éteindre la lanterne",
   "prompt_workbench": "[Entrée] Utiliser l'établi",
   "prompt_exit": "[Entrée] Quitter la chambre",
   "prompt_switch": "[Tab] Changer de cible",

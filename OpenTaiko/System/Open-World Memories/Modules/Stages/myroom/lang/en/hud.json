@@ -16,6 +16,7 @@
   "prompt_mirror": "[Enter] Look in the mirror",
   "prompt_look": "[Enter] Look",
   "prompt_fishtank": "[Enter] Switch the tank lights",
+  "prompt_lantern": "[Enter] Light or put out the lantern",
   "prompt_workbench": "[Enter] Use the workbench",
   "prompt_exit": "[Enter] Leave the room",
   "prompt_switch": "[Tab] Switch focus",

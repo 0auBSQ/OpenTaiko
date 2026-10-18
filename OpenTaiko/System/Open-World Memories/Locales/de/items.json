@@ -3,8 +3,9 @@
     // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/de/ is read; a key
     // missing here falls back to the skin's default locale.
     "Entries": {
-        // Item names (ITEM_<ID>, the id in upper case) and the reward pop-up's furniture header
+        // Item names (ITEM_<ID>, the id in upper case) and the reward pop-ups' furniture and key headers
         "ITEM_NEW_FURNITURE": "Neues Möbelstück!",
+        "ITEM_NEW_KEY": "Neuer Schlüssel!",
         "ITEM_DESK": "Schreibtisch",
         "ITEM_CHAIR": "Stuhl",
         "ITEM_TABLE": "Tisch",
@@ -46,6 +47,16 @@
         "ITEM_CHALICE": "Kelch",
         "ITEM_CRYSTAL": "Kristall",
         "ITEM_FISHTANK": "Aquarium",
+        "ITEM_TREE": "Baum",
+        "ITEM_LARGE_TREE": "Großer Baum",
+        "ITEM_SMALL_ROCK": "Stein",
+        "ITEM_LARGE_ROCK": "Großer Felsen",
+        "ITEM_LOG": "Baumstamm",
+        "ITEM_MINI_PAGODA": "Miniaturpagode",
+        "ITEM_STONE_LANTERN": "Steinlaterne",
+        "ITEM_BONSAI": "Bonsai",
+        "ITEM_FOX": "Fuchs-Modell",
+        "ITEM_FOX_STATUE": "Fuchsstatue",
         "ITEM_WOOD": "Holzboden",
         "ITEM_CARPET": "Teppich",
         "ITEM_STONE": "Steinboden",

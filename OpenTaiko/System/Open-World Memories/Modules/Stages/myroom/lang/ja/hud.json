@@ -16,6 +16,7 @@
   "prompt_mirror": "[Enter] 鏡を見る",
   "prompt_look": "[Enter] 見る",
   "prompt_fishtank": "[Enter] 水槽のライトを切り替える",
+  "prompt_lantern": "[Enter] 灯籠の火をつける/消す",
   "prompt_workbench": "[Enter] 作業台を使う",
   "prompt_exit": "[Enter] 部屋を出る",
   "prompt_switch": "[Tab] フォーカス切り替え",

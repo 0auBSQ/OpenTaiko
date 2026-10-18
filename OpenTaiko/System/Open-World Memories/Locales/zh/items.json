@@ -3,8 +3,9 @@
     // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/zh/ is read; a key
     // missing here falls back to the skin's default locale.
     "Entries": {
-        // Item names (ITEM_<ID>, the id in upper case) and the reward pop-up's furniture header
+        // Item names (ITEM_<ID>, the id in upper case) and the reward pop-ups' furniture and key headers
         "ITEM_NEW_FURNITURE": "获得新家具！",
+        "ITEM_NEW_KEY": "获得新钥匙！",
         "ITEM_DESK": "书桌",
         "ITEM_CHAIR": "椅子",
         "ITEM_TABLE": "桌子",
@@ -46,6 +47,16 @@
         "ITEM_CHALICE": "圣杯",
         "ITEM_CRYSTAL": "水晶",
         "ITEM_FISHTANK": "鱼缸",
+        "ITEM_TREE": "树",
+        "ITEM_LARGE_TREE": "大树",
+        "ITEM_SMALL_ROCK": "石头",
+        "ITEM_LARGE_ROCK": "大岩石",
+        "ITEM_LOG": "原木",
+        "ITEM_MINI_PAGODA": "微缩宝塔",
+        "ITEM_STONE_LANTERN": "石灯笼",
+        "ITEM_BONSAI": "盆景",
+        "ITEM_FOX": "狐狸摆件",
+        "ITEM_FOX_STATUE": "狐狸雕像",
         "ITEM_WOOD": "木地板",
         "ITEM_CARPET": "地毯",
         "ITEM_STONE": "石地板",

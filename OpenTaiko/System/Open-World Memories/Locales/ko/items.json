@@ -3,8 +3,9 @@
     // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/ko/ is read; a key
     // missing here falls back to the skin's default locale.
     "Entries": {
-        // Item names (ITEM_<ID>, the id in upper case) and the reward pop-up's furniture header
+        // Item names (ITEM_<ID>, the id in upper case) and the reward pop-ups' furniture and key headers
         "ITEM_NEW_FURNITURE": "새 가구!",
+        "ITEM_NEW_KEY": "새 열쇠!",
         "ITEM_DESK": "책상",
         "ITEM_CHAIR": "의자",
         "ITEM_TABLE": "테이블",
@@ -46,6 +47,16 @@
         "ITEM_CHALICE": "성배",
         "ITEM_CRYSTAL": "크리스털",
         "ITEM_FISHTANK": "어항",
+        "ITEM_TREE": "나무",
+        "ITEM_LARGE_TREE": "큰 나무",
+        "ITEM_SMALL_ROCK": "바위",
+        "ITEM_LARGE_ROCK": "큰 바위",
+        "ITEM_LOG": "통나무",
+        "ITEM_MINI_PAGODA": "미니어처 탑",
+        "ITEM_STONE_LANTERN": "석등",
+        "ITEM_BONSAI": "분재",
+        "ITEM_FOX": "여우 장식",
+        "ITEM_FOX_STATUE": "여우 석상",
         "ITEM_WOOD": "나무 바닥",
         "ITEM_CARPET": "러그",
         "ITEM_STONE": "돌바닥",

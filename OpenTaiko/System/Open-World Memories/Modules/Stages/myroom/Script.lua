@@ -26,6 +26,7 @@ local Pod      = require("pod")             -- the Mysterious Pod's entry sequen
 local MX       = require("matrix")          -- the Placeholder Matrix: its glow + the debug scene list; see matrix.lua
 local MR       = require("mirror")          -- the mirror: the student and palette the player wears; see mirror.lua
 local FT       = require("fishtank")        -- the Fish Tank: its fish, kelp and blue lights; see fishtank.lua
+local LT       = require("lantern")         -- the Stone Lantern: its fire and warm light; see lantern.lua
 local WB       = require("workbench")       -- the Workbench: recolours floorings and paints; see workbench.lua
 local AV       = require("avatar")          -- the students' billboard sprites (player + visitors); see avatar.lua
 local Student  = require("Student")         -- Lib: the chosen story student and its palette
@@ -185,6 +186,7 @@ local function applyLights()
     for _, l in ipairs(TV.lights(world)) do lights[#lights + 1] = l end         -- screens of TVs that are on
     for _, l in ipairs(MX.lights(world)) do lights[#lights + 1] = l end         -- the green glow of each matrix
     for _, l in ipairs(FT.lights(world)) do lights[#lights + 1] = l end         -- fish tanks with their lights on
+    for _, l in ipairs(LT.lights(world)) do lights[#lights + 1] = l end         -- stone lanterns that are lit
     for _, l in ipairs(room:itemLights(world)) do lights[#lights + 1] = l end   -- items that always glow
     world.daynight:setLights(lights)
     FT.refresh()
@@ -418,6 +420,8 @@ local function interactablesInRange()
                         seen[it] = true; list[#list + 1] = { kind = "workbench", it = it, key = "workbench:" .. tostring(it) }
                     elseif cat.interact == "fishtank" then
                         seen[it] = true; list[#list + 1] = { kind = "fishtank", it = it, key = "fishtank:" .. tostring(it) }
+                    elseif cat.interact == "lantern" then
+                        seen[it] = true; list[#list + 1] = { kind = "lantern", it = it, key = "lantern:" .. tostring(it) }
                     end
                 end
             end
@@ -754,6 +758,13 @@ FT.init{
     propInstFor = function(it) return world and world._propInst and world._propInst[it] or nil end,
 }
 
+-- Stone Lantern context: the placed lanterns and their models
+LT.init{
+    room = function() return room end,
+    scene = function() return world and world.scene or nil end,
+    propInstFor = function(it) return world and world._propInst and world._propInst[it] or nil end,
+}
+
 -- mirror context: the student and palette it changes belong to the save whose room this is
 MR.init{
     theme = PHONE_THEME,
@@ -1050,6 +1061,7 @@ function update(ts)
     TV.tick(dt)                    -- the screens of TVs that are on drift their colour in every mode
     MX.tick(dt)                    -- the matrix glow breathes in every mode
     FT.tick(dt)                    -- the fish swim and the kelp sways in every mode
+    LT.tick(dt)                    -- the lanterns' fires burn in every mode
 
     -- ── modal overlays ──
     if mode == "dialogue" then
@@ -1256,6 +1268,11 @@ function update(ts)
             FT.toggle(focused.it)
             applyLights()                  -- the tank's light and its water's glow
             saveRoom(); MO.onRoomChanged()
+        elseif focused.kind == "lantern" then
+            SHARED:GetSharedSound("Move"):Play()
+            LT.toggle(focused.it)
+            applyLights()                  -- the lantern's light; its fire is drawn while it is lit
+            saveRoom(); MO.onRoomChanged()
         elseif focused.kind == "look" then
             -- a keepsake: looking at it says its line (dialogs.json, <item id>.look)
             local line = dlgLoc(focused.it.id, "look", nil)
@@ -1320,6 +1337,7 @@ function draw()
     actorsEnd()
 
     FT.draw()                      -- the fish and kelp inside the tanks
+    LT.draw()                      -- the fire inside the lit stone lanterns
     world:render()
     world:blit()
 
@@ -1394,6 +1412,7 @@ function draw()
         elseif prompt == "mirror" then instr[#instr + 1] = { t = HUD:tr("prompt_mirror"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "look" then instr[#instr + 1] = { t = HUD:tr("prompt_look"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "fishtank" then instr[#instr + 1] = { t = HUD:tr("prompt_fishtank"), c = { 150, 230, 255 }, s = 24 }
+        elseif prompt == "lantern" then instr[#instr + 1] = { t = HUD:tr("prompt_lantern"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "workbench" then instr[#instr + 1] = { t = HUD:tr("prompt_workbench"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "exit" then instr[#instr + 1] = { t = HUD:tr("prompt_exit"), c = { 255, 230, 150 }, s = 24 }
         end

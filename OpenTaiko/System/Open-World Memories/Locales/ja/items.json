@@ -3,8 +3,9 @@
     // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/ja/ is read; a key
     // missing here falls back to the skin's default locale.
     "Entries": {
-        // Item names (ITEM_<ID>, the id in upper case) and the reward pop-up's furniture header
+        // Item names (ITEM_<ID>, the id in upper case) and the reward pop-ups' furniture and key headers
         "ITEM_NEW_FURNITURE": "家具取得！",
+        "ITEM_NEW_KEY": "鍵取得！",
         "ITEM_DESK": "机",
         "ITEM_CHAIR": "椅子",
         "ITEM_TABLE": "テーブル",
@@ -46,6 +47,16 @@
         "ITEM_CHALICE": "聖杯",
         "ITEM_CRYSTAL": "クリスタル",
         "ITEM_FISHTANK": "水槽",
+        "ITEM_TREE": "木",
+        "ITEM_LARGE_TREE": "大きな木",
+        "ITEM_SMALL_ROCK": "岩",
+        "ITEM_LARGE_ROCK": "大きな岩",
+        "ITEM_LOG": "丸太",
+        "ITEM_MINI_PAGODA": "ミニ五重塔",
+        "ITEM_STONE_LANTERN": "石灯籠",
+        "ITEM_BONSAI": "盆栽",
+        "ITEM_FOX": "キツネの置物",
+        "ITEM_FOX_STATUE": "キツネの石像",
         "ITEM_WOOD": "木の床",
         "ITEM_CARPET": "ラグ",
         "ITEM_STONE": "石の床",

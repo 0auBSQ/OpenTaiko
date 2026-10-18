@@ -2667,6 +2667,125 @@
 			"type": 0,
 			"rarity": "Legendary",
 			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "381",
+			"title": "Pagoda Placeholder 1",
+			"type": 0,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "382",
+			"title": "Pagoda Placeholder 2",
+			"type": 0,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "383",
+			"title": "Pagoda Placeholder 3",
+			"type": 0,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "384",
+			"title": "Pagoda Placeholder 4",
+			"type": 0,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "385",
+			"title": "Pagoda Placeholder 5",
+			"type": 0,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "386",
+			"title": "Pagoda Placeholder 6",
+			"type": 0,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "387",
+			"title": "Pagoda Placeholder 7",
+			"type": 0,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "388",
+			"title": "Pagoda Placeholder 8",
+			"type": 0,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "389",
+			"title": "Pagoda Placeholder 9",
+			"type": 0,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "390",
+			"title": "Pagoda Placeholder 10",
+			"type": 0,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "391",
+			"title": "Pagoda Placeholder 11",
+			"type": 0,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "392",
+			"title": "Pagoda Placeholder 12",
+			"type": 0,
+			"rarity": "Epic",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "393",
+			"title": "Pagoda Placeholder 13",
+			"type": 0,
+			"rarity": "Epic",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "394",
+			"title": "Pagoda Placeholder 14",
+			"type": 0,
+			"rarity": "Legendary",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "395",
+			"title": "Pagoda Placeholder 15",
+			"type": 0,
+			"rarity": "Legendary",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "396",
+			"title": "Pagoda Placeholder 16",
+			"type": 0,
+			"rarity": "Legendary",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "397",
+			"title": "Pagoda Placeholder 17",
+			"type": 0,
+			"rarity": "Legendary",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
 		}
 	]
 }

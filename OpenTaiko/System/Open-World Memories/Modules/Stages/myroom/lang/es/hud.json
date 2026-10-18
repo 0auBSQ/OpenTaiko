@@ -16,6 +16,7 @@
   "prompt_mirror": "[Enter] Mirarse al espejo",
   "prompt_look": "[Enter] Mirar",
   "prompt_fishtank": "[Enter] Encender/apagar el acuario",
+  "prompt_lantern": "[Enter] Encender/apagar el farol",
   "prompt_workbench": "[Enter] Usar el banco de trabajo",
   "prompt_exit": "[Enter] Salir de la habitación",
   "prompt_switch": "[Tab] Cambiar de objetivo",
