@@ -121,7 +121,7 @@ internal static class VideoExporter {
 		try { Console.OutputEncoding = System.Text.Encoding.UTF8; } catch { /* legacy console */ }
 		_lineMode = Console.IsOutputRedirected;
 		Console.WriteLine();
-		Status($"video export: uid={_uid} difficulties={string.Join(",", _diffs)} fps={_fps} -> {_outPath}");
+		Status($"video export: uid={_uid} difficulties={string.Join(",", _diffs)} fps={_fps} sample-rate={_sampleRate} -> {_outPath}");
 		Status("booting the game (hidden)...");
 		return true;
 	}
@@ -366,7 +366,7 @@ internal static class VideoExporter {
 
 		SoundEvent[] events;
 		lock (_eventsLock) events = _events.ToArray();
-		Trace.TraceInformation($"[export] mixing {events.Length} sound events");
+		Trace.TraceInformation($"[export] mixing {events.Length} sound events in {_sampleRate} Hz");
 		foreach (var e in events.Take(12))
 			Trace.TraceInformation($"[export]   t={e.TimeMs - _t0Ms,8:F1}ms vol={e.Vol:F2} pan={e.Pan:F2} {Path.GetFileName(e.Path)}");
 

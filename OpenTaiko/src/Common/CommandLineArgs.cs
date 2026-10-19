@@ -16,7 +16,7 @@ internal enum AppMode {
 /// inside <see cref="FDK.Game"/>; this only owns the app-level switches.
 ///
 /// Forms accepted for every option: <c>--name value</c> and <c>--name=value</c> (case-insensitive).
-///   --mode=record  --uid &lt;id&gt;  [--difficulties 3,4] [--fps 60] [--size 1920x1080] [--sample-rate 48000] [--clip-volume=true] [--out file.mp4]
+///   --mode=record  --uid &lt;id&gt;  [--difficulties 3,4] [--fps 60] [--size 1920x1080] [--sample-rate 48000] [--out file.mp4]
 ///   --mode=checkgl
 ///   --hidden       run without showing the window or making a sound (automated boot checks; the log still records everything)
 /// </summary>
