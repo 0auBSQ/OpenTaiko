@@ -32,8 +32,6 @@ internal static class VideoExporter {
 	private static int _fps = 60;
 	private static int _reqW = 0, _reqH = 0;
 	private static int _sampleRate = 48000;
-	private static bool _clipVolume = true; // somehow the final video's audio has a limiter applied (on Windows), possibly from AAC encoder
-											// unsure for other platforms, so still clip the volume by default
 	private static string _outPath = "";
 
 	private enum Phase { Boot, WaitSongs, Loading, Capturing, Done }
@@ -114,7 +112,6 @@ internal static class VideoExporter {
 		_fps = cli.Fps;
 		_reqW = cli.Width; _reqH = cli.Height;
 		_sampleRate = cli.SampleRate;
-		_clipVolume = cli.ClipVolume;
 		_outPath = cli.OutPath;
 		Active = true;
 
@@ -410,12 +407,6 @@ internal static class VideoExporter {
 			long o = (samples - 1 - i) * 2;
 			mixL[o] *= g; mixL[o + 1] *= g;
 		}
-		if (_clipVolume) {
-			// hard safety clamp
-			for (long i = 0; i < mixL.LongLength; i++) {
-				if (mixL[i] > 1f) mixL[i] = 1f; else if (mixL[i] < -1f) mixL[i] = -1f;
-			}
-		}
 		return mixL;
 	}
 }
@@ -450,6 +441,13 @@ internal unsafe sealed class FFVideoWriter {
 	private long _pts;
 
 	private static readonly string[] VideoCodecPreference = { "h264_mf", "libx264", "libopenh264", "mpeg4" };
+
+	private static void Warn(string msg) {
+		msg = $"[{nameof(VideoExporter)}] {msg}";
+		Console.Error.WriteLine(msg);
+		try { Console.Error.Flush(); } catch { }
+		Trace.TraceWarning(msg);
+	}
 
 	private static int Check(int err, string what) {
 		if (err < 0) {
@@ -593,6 +591,9 @@ internal unsafe sealed class FFVideoWriter {
 	}
 
 	// ── phase B: copy the temp video stream + encode the mixed PCM to AAC into the final MP4 ────
+	private const double dBFSMax = -1; // headroom for AAC encoder reshaping the waveform
+	private static readonly float ampHardClip = (float)double.Pow(10, dBFSMax / 20);
+	private static readonly double ampLimitTarget = double.Pow(10, dBFSMax / 20);
 
 	public static void MuxWithAudio(string videoPath, string finalPath, float[] pcmInterleaved, int sampleRate) {
 		AVFormatContext* inFmt = null;
@@ -632,10 +633,19 @@ internal unsafe sealed class FFVideoWriter {
 
 		AVPacket* pkt = ffmpeg.av_packet_alloc();
 		AVFrame* af = ffmpeg.av_frame_alloc();
+		AVFrame* afFilter = ffmpeg.av_frame_alloc();
 		int frameSize = aenc->frame_size > 0 ? aenc->frame_size : 1024;
 		long totalSamples = pcmInterleaved.Length / 2;
 		long sent = 0;
-		long aPts = 0;
+		long sentFiltered = 0;
+
+		AVFilterGraph* agraph = null;
+		AVFilterContext* asrc = null, asink = null;
+		try {
+			InitFilterGraph(aenc, frameSize, out agraph, out asrc, out asink);
+		} catch (Exception e) {
+			Warn($"init volume limiter filters failed, proceed with simple volume clamp: {e}");
+		}
 
 		// static local functions: pointer params keep them closure-free (CS1686)
 		static void DrainAudio(AVCodecContext* aenc, AVPacket* pkt, AVFormatContext* outFmt, AVStream* outA) {
@@ -650,13 +660,41 @@ internal unsafe sealed class FFVideoWriter {
 			}
 		}
 
-		static void SendNextAudioChunk(AVCodecContext* aenc, AVFrame* af, AVPacket* pkt, AVFormatContext* outFmt,
-			AVStream* outA, float[] pcm, int sampleRate, int frameSize, long totalSamples, ref long sent, ref long aPts) {
+		static void DrainAudioFilter(AVCodecContext* aenc, AVPacket* pkt, AVFormatContext* outFmt, AVStream* outA, AVFilterContext* asink, AVFrame* afFilter, ref long sentFiltered) {
+			while (true) {
+				int err = ffmpeg.av_buffersink_get_frame(asink, afFilter);
+				if (err == ffmpeg.AVERROR(ffmpeg.EAGAIN) || err == ffmpeg.AVERROR_EOF)
+					return;
+				Check(err, "filter audio data");
+				try {
+					afFilter->pts = sentFiltered;
+					Check(ffmpeg.avcodec_send_frame(aenc, afFilter), "send audio frame");
+					DrainAudio(aenc, pkt, outFmt, outA);
+					sentFiltered += afFilter->nb_samples;
+				} finally {
+					ffmpeg.av_frame_unref(afFilter);
+				}
+			}
+		}
+
+		// hard safety clamp
+		static void HardClipAudio(int nSamples, float* l, float* r) {
+			for (int i = 0; i < nSamples; ++i) {
+				l[i] = float.Clamp(l[i], -ampHardClip, ampHardClip);
+				r[i] = float.Clamp(r[i], -ampHardClip, ampHardClip);
+			}
+		}
+
+		static void SendNextAudioChunk(AVCodecContext* aenc, AVFrame* af, AVPacket* pkt, AVFormatContext* outFmt, AVStream* outA, float[] pcm,
+			int sampleRate, int frameSize, long totalSamples, ref long sent, AVFilterGraph* agraph, AVFilterContext* asrc,
+			AVFilterContext* asink, AVFrame* afFilter, ref long sentFiltered
+			) {
 			int n = (int)Math.Min(frameSize, totalSamples - sent);
 			if (n <= 0) return;
 			af->nb_samples = n;
 			af->format = (int)AVSampleFormat.AV_SAMPLE_FMT_FLTP;
 			af->sample_rate = sampleRate;
+			af->time_base = new AVRational { num = 1, den = sampleRate };
 			ffmpeg.av_channel_layout_default(&af->ch_layout, 2);
 			Check(ffmpeg.av_frame_get_buffer(af, 0), "audio frame buffer");
 			float* l = (float*)af->data[0];
@@ -665,10 +703,16 @@ internal unsafe sealed class FFVideoWriter {
 				l[i] = pcm[(sent + i) * 2];
 				r[i] = pcm[(sent + i) * 2 + 1];
 			}
-			af->pts = aPts;
-			aPts += n;
+			af->pts = sent;
 			sent += n;
-			Check(ffmpeg.avcodec_send_frame(aenc, af), "send audio frame");
+
+			if (agraph == null) { // filter not available
+				HardClipAudio(n, l, r);
+				Check(ffmpeg.avcodec_send_frame(aenc, af), "send audio frame");
+			} else {
+				Check(ffmpeg.av_buffersrc_write_frame(asrc, af), "submit frame to filtergraph");
+				DrainAudioFilter(aenc, pkt, outFmt, outA, asink, afFilter, ref sentFiltered);
+			}
 			ffmpeg.av_frame_unref(af);
 			DrainAudio(aenc, pkt, outFmt, outA);
 		}
@@ -686,7 +730,7 @@ internal unsafe sealed class FFVideoWriter {
 			ffmpeg.av_packet_unref(pkt);
 
 			while (sent < totalSamples && (double)sent / sampleRate <= vidSec)
-				SendNextAudioChunk(aenc, af, pkt, outFmt, outA, pcmInterleaved, sampleRate, frameSize, totalSamples, ref sent, ref aPts);
+				SendNextAudioChunk(aenc, af, pkt, outFmt, outA, pcmInterleaved, sampleRate, frameSize, totalSamples, ref sent, agraph, asrc, asink, afFilter, ref sentFiltered);
 
 			ffmpeg.av_packet_rescale_ts(vcopy, inV->time_base, outV->time_base);
 			vcopy->stream_index = outV->index;
@@ -694,7 +738,11 @@ internal unsafe sealed class FFVideoWriter {
 			ffmpeg.av_packet_free(&vcopy);
 		}
 		while (sent < totalSamples)
-			SendNextAudioChunk(aenc, af, pkt, outFmt, outA, pcmInterleaved, sampleRate, frameSize, totalSamples, ref sent, ref aPts);
+			SendNextAudioChunk(aenc, af, pkt, outFmt, outA, pcmInterleaved, sampleRate, frameSize, totalSamples, ref sent, agraph, asrc, asink, afFilter, ref sentFiltered);
+		if (agraph != null) {
+			ffmpeg.av_buffersrc_write_frame(asrc, null);
+			DrainAudioFilter(aenc, pkt, outFmt, outA, asink, afFilter, ref sentFiltered);
+		}
 		ffmpeg.avcodec_send_frame(aenc, null);
 		DrainAudio(aenc, pkt, outFmt, outA);
 
@@ -702,9 +750,74 @@ internal unsafe sealed class FFVideoWriter {
 
 		ffmpeg.av_packet_free(&pkt);
 		ffmpeg.av_frame_free(&af);
+		ffmpeg.av_frame_free(&afFilter);
+		ffmpeg.avfilter_graph_free(&agraph);
 		ffmpeg.avcodec_free_context(&aenc);
 		ffmpeg.avio_closep(&outFmt->pb);
 		ffmpeg.avformat_free_context(outFmt);
 		ffmpeg.avformat_close_input(&inFmt);
+	}
+
+	// (input) -> abuffer(src) -> alimiter -> aformat -> abuffersink -> (output)
+	// * abuffer(src): to feed the decoded samples
+	// * alimiter: to prevent input volume from exceeding the threshold
+	// * aformat: make the sample input format same as input (otherwise the float input would become double output)
+	// * abuffersink: to read the filtered samples
+	private static void InitFilterGraph(AVCodecContext* aenc, int frameSize, out AVFilterGraph* agraph, out AVFilterContext* asrc, out AVFilterContext* asink) {
+		AVFilterGraph* filter_graph = ffmpeg.avfilter_graph_alloc();
+		if (filter_graph == null)
+			Check(ffmpeg.AVERROR(ffmpeg.ENOMEM), "create filter graph");
+
+		try {
+			// abuffer(src) filter
+			AVFilter* abuffer = ffmpeg.avfilter_get_by_name("abuffer");
+			if (abuffer == null)
+				Check(ffmpeg.AVERROR_FILTER_NOT_FOUND, "find abuffer filter");
+			AVFilterContext* abuffer_ctx = ffmpeg.avfilter_graph_alloc_filter(filter_graph, abuffer, "src");
+			if (abuffer_ctx == null)
+				Check(ffmpeg.AVERROR(ffmpeg.ENOMEM), "alloc abuffer instance");
+			AVBufferSrcParameters* srcParams = ffmpeg.av_buffersrc_parameters_alloc();
+			if (srcParams == null)
+				Check(ffmpeg.AVERROR(ffmpeg.ENOMEM), "alloc abuffer parameters instance");
+			try {
+				srcParams->format = (int)aenc->sample_fmt;
+				srcParams->time_base = aenc->time_base;
+				srcParams->sample_rate = aenc->sample_rate;
+				Check(ffmpeg.av_channel_layout_copy(&srcParams->ch_layout, &aenc->ch_layout), "copy abuffer channel layout params");
+				Check(ffmpeg.av_buffersrc_parameters_set(abuffer_ctx, srcParams), "set abuffer filter parameters");
+				Check(ffmpeg.avfilter_init_str(abuffer_ctx, null), "init abuffer filter");
+			} finally {
+				ffmpeg.av_free(srcParams);
+			}
+
+			AVFilterContext*[] ctxs = [abuffer_ctx, null, null, null];
+			foreach (var (i, filterName, nodeName, args) in new[] {
+				// alimiter available options: https://ffmpeg.org/doxygen/5.1/af__alimiter_8c_source.html#l00081
+				(1, "alimiter", "alimiter", $"limit={ampLimitTarget}:asc=1:asc_level=1:level=0:latency=1"),
+				(2, "aformat", "aformat", $"sample_fmts={ffmpeg.av_get_sample_fmt_name(aenc->sample_fmt)}"),
+				(3, "abuffersink", "sink", null),
+				}) {
+				AVFilter* filter = ffmpeg.avfilter_get_by_name(filterName);
+				if (filter == null)
+					Check(ffmpeg.AVERROR_FILTER_NOT_FOUND, $"find {filterName} filter for {nodeName}");
+				fixed (AVFilterContext** pctx = &ctxs[i])
+					Check(ffmpeg.avfilter_graph_create_filter(pctx, filter, nodeName, args, null, filter_graph), $"create {filterName} filter for {nodeName}");
+			}
+
+			for (int i = 1; i < ctxs.Length; ++i)
+				Check(ffmpeg.avfilter_link(ctxs[i - 1], 0, ctxs[i], 0), "connect filters");
+
+			Check(ffmpeg.avfilter_graph_config(filter_graph, null), "configure filter graph");
+
+			AVFilterContext* abuffersink_ctx = ctxs[ctxs.Length - 1];
+			ffmpeg.av_buffersink_set_frame_size(abuffersink_ctx, (uint)frameSize); // same frame size except last needed for AAC encoder
+
+			agraph = filter_graph;
+			filter_graph = null; // ensure agraph will not be freed
+			asrc = abuffer_ctx;
+			asink = abuffersink_ctx;
+		} finally {
+			ffmpeg.avfilter_graph_free(&filter_graph);
+		}
 	}
 }
