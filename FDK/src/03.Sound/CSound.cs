@@ -355,23 +355,23 @@ public class CSound : IDisposable {
 		tPlay(looped, msFrameworkTime);
 	}
 
-	public void StopReset() {
-		tStop();
+	public void StopReset(double? msFrameworkTime = null) {
+		tStop(msFrameworkTime);
 		tSetPositionToBegin();
 	}
-	public void Pause() {
-		tStop(true);
+	public void Pause(double? msFrameworkTime = null) {
+		tStop(true, msFrameworkTime);
 		this.PauseCount++;
 	}
 	public void Resume(bool looped, double? msFrameworkTime = null) {
 		tPlay(looped, msFrameworkTime);
 		this.PauseCount--;
 	}
-	public void Resume(long t)  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+	public void Resume(long t, double? msFrameworkTime = null)  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	{
 		Debug.WriteLine("t再生を再開する(long " + t + ")");
 		tSetPosition(t);
-		tPlay();
+		tPlay(msFrameworkTime);
 		this.PauseCount--;
 	}
 	public bool IsPaused {
@@ -444,9 +444,10 @@ public class CSound : IDisposable {
 	}
 
 	// ── offline-export capture ──────────────────────────────────────────────────────────────────
-	// Every actual playback start funnels through tPlaySound(); the video exporter subscribes here
+	// Every actual playback start and/or stop funnels through tPlay()/tStop(); the video exporter subscribes here
 	// to log (file, virtual time, volume, pan) and later reproduce the session's audio offline.
 	public static Action<CSound, double>? SoundPlayCapture = null;
+	public static Action<CSound, double>? SoundStopCapture = null;
 
 	/// <summary>Current effective BASS channel volume/pan of this sound (1.0/0.0 when unavailable).</summary>
 	public (float volume, float pan) tGetChannelLevels() {
@@ -459,6 +460,7 @@ public class CSound : IDisposable {
 	}
 
 	public void tPlay(bool bLoop, double? msFrameworkTime = null) {
+		SoundStopCapture?.Invoke(this, msFrameworkTime ?? Game.dbTimeMs);
 		SoundPlayCapture?.Invoke(this, msFrameworkTime ?? Game.dbTimeMs);
 		this.SetLoop(bLoop);
 		if (this.IsBassSound)           // BASSサウンド時のループ処理は、t再生を開始する()側に実装。ここでは「bループする」は未使用。
@@ -491,16 +493,17 @@ public class CSound : IDisposable {
 			}
 		}
 	}
-	public void tStopAndRemoveFromMixer() {
-		tStop(false);
+	public void tStopAndRemoveFromMixer(double? msFrameworkTime = null) {
+		tStop(false, msFrameworkTime);
 		if (IsBassSound) {
 			tRemoveFromMixer();
 		}
 	}
-	public void tStop() {
-		tStop(false);
+	public void tStop(double? msFrameworkTime = null) {
+		tStop(false, msFrameworkTime);
 	}
-	private void tStop(bool pause) {
+	private void tStop(bool pause, double? msFrameworkTime = null) {
+		SoundStopCapture?.Invoke(this, msFrameworkTime ?? Game.dbTimeMs);
 		if (this.IsBassSound) {
 			if (this.hMixer == NoMixerHandle) {
 				Bass.ChannelPause(this.hBassStream);

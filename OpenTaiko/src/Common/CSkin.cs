@@ -221,7 +221,7 @@ internal class CSkin : IDisposable {
 			}
 			if (this.bExclusive) {
 				if (rLastPlaybackExclusiveSystemSound != null)
-					rLastPlaybackExclusiveSystemSound.tStop();
+					rLastPlaybackExclusiveSystemSound.tStop(msFrameworkTime);
 
 				rLastPlaybackExclusiveSystemSound = this;
 			}
@@ -237,21 +237,22 @@ internal class CSkin : IDisposable {
 		}
 		public void tPlay(double? msFrameworkTime = null) => tPlay(resume: false, msFrameworkTime: msFrameworkTime);
 		public void tResume(double? msFrameworkTime = null) => tPlay(resume: true, msFrameworkTime: msFrameworkTime);
-		public void tStop(bool pause = false) {
+		public void tStop(bool pause, double? msFrameworkTime = null) {
 			DropHold();
 			this.bPlayed = false;
 
 			if (pause) {
-				this.rSound[0]?.Pause();
-				this.rSound[1]?.Pause();
+				this.rSound[0]?.Pause(msFrameworkTime);
+				this.rSound[1]?.Pause(msFrameworkTime);
 			} else {
-				this.rSound[0]?.tStop();
-				this.rSound[1]?.tStop();
+				this.rSound[0]?.tStop(msFrameworkTime);
+				this.rSound[1]?.tStop(msFrameworkTime);
 			}
 			if (rLastPlaybackExclusiveSystemSound == this)
 				rLastPlaybackExclusiveSystemSound = null;
 		}
-		public void tPause() => tStop(pause: true);
+		public void tStop(double? msFrameworkTime = null) => tStop(pause: false, msFrameworkTime: msFrameworkTime);
+		public void tPause(double? msFrameworkTime = null) => tStop(pause: true, msFrameworkTime: msFrameworkTime);
 
 		public void SetPanning(int pan) {
 			nPosition_CurrentlyPlayingSound = pan;

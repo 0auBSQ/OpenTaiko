@@ -42,7 +42,7 @@ internal static class VideoExporter {
 	private static byte[]? _bgra;
 	private static string _tempVideoPath = "";
 
-	private readonly record struct SoundEvent(string Path, double TimeMs, double msSeek, float Vol, float Pan, double Speed);
+	private readonly record struct SoundEvent(string Path, double TimeMs, double msSeek, float Vol, float Pan, double Speed, double TimeMsEnd = double.PositiveInfinity);
 	private static readonly List<SoundEvent> _events = new();
 	private static readonly object _eventsLock = new();
 
@@ -157,6 +157,7 @@ internal static class VideoExporter {
 					SoundManager.MuteMasterOutput();
 					try { Bass.GlobalStreamVolume = 0; } catch { /* keep exporting even if mute fails */ }
 					CSound.SoundPlayCapture = OnSoundPlay;
+					CSound.SoundStopCapture = OnSoundStop;
 					Status("waiting for the song list...");
 					_phase = Phase.WaitSongs;
 					break;
@@ -226,6 +227,8 @@ internal static class VideoExporter {
 
 	// ── sound capture ────────────────────────────────────────────────────────────────────────────
 
+	private static readonly Dictionary<CSound, int> _sndToEventIdx = [];
+
 	private static void OnSoundPlay(CSound snd, double msFrameworkTime) {
 		if (_phase != Phase.Capturing && _phase != Phase.Loading) return;
 		string? f = snd.FileName;
@@ -233,8 +236,20 @@ internal static class VideoExporter {
 		var (vol, pan) = snd.tGetChannelLevels();
 		if (vol <= 0.0001f) return;
 		snd.tGetPlayPosition(out var bytesSeek, out var msSeek);
-		lock (_eventsLock)
+		lock (_eventsLock) {
+			_sndToEventIdx[snd] = _events.Count;
 			_events.Add(new SoundEvent(f, msFrameworkTime, msSeek, vol, pan, snd.PlaySpeed * snd.Frequency));
+		}
+	}
+
+	private static void OnSoundStop(CSound snd, double msFrameworkTime) {
+		if (_phase != Phase.Capturing && _phase != Phase.Loading) return;
+		lock (_eventsLock) {
+			if (!_sndToEventIdx.TryGetValue(snd, out int idx))
+				return;
+			_events[idx] = _events[idx] with { TimeMsEnd = msFrameworkTime };
+			_sndToEventIdx.Remove(snd);
+		}
 	}
 
 	// ── chart lookup ─────────────────────────────────────────────────────────────────────────────
@@ -285,16 +300,27 @@ internal static class VideoExporter {
 
 	// ── finalization ─────────────────────────────────────────────────────────────────────────────
 
+	private static void EndAudioCapture() {
+		lock (_eventsLock) {
+			CSound.SoundPlayCapture = null;
+			CSound.SoundStopCapture = null;
+			_sndToEventIdx.Clear();
+		}
+	}
+
 	private static void Finish(OpenTaiko game) {
 		DrawProgress(true);
 		Trace.TraceInformation($"[export] play finished after {_frames} frames; mixing audio + muxing...");
 		Status($"play captured ({_frames} frames). finalizing video...");
-		_video?.FinishVideo();
+		EndAudioCapture();
+		_video?.FinishVideo(); // can throw errors
 
 		double durationSec = (double)_frames / _fps;
 		int eventCount; lock (_eventsLock) eventCount = _events.Count;
 		Status($"mixing audio ({eventCount} sound events)...");
 		float[] pcm = MixAudio(durationSec, _sampleRate);
+		lock (_eventsLock)
+			_events.Clear();
 
 		Status("muxing final mp4...");
 		FFVideoWriter.MuxWithAudio(_tempVideoPath, _outPath, pcm, _sampleRate);
@@ -306,7 +332,6 @@ internal static class VideoExporter {
 		Status($"done: {full}");
 		Status($"{durationSec:F1}s of video in {Fmt(wallTotal)} ({durationSec / Math.Max(0.1, wallTotal):F2}x realtime)");
 		_phase = Phase.Done;
-		CSound.SoundPlayCapture = null;
 		// hard exit: the output is written and a one-shot export process has nothing worth saving;
 		// the normal teardown path (GL/DB/Lua finalizers) is not worth crashing over after the fact
 		Trace.Flush();
@@ -318,10 +343,10 @@ internal static class VideoExporter {
 		Trace.TraceError("[export] FAILED: " + message);
 		Status("FAILED: " + message);
 		Console.Error.WriteLine("Export failed: " + message);
+		EndAudioCapture();
 		try { _video?.FinishVideo(); } catch { }
 		try { if (_tempVideoPath != "" && File.Exists(_tempVideoPath)) File.Delete(_tempVideoPath); } catch { }
 		_phase = Phase.Done;
-		CSound.SoundPlayCapture = null;
 		Trace.Flush();
 		Environment.Exit(2);
 	}
@@ -368,7 +393,7 @@ internal static class VideoExporter {
 		lock (_eventsLock) events = _events.ToArray();
 		Trace.TraceInformation($"[export] mixing {events.Length} sound events in {_sampleRate} Hz");
 		foreach (var e in events.Take(12))
-			Trace.TraceInformation($"[export]   t={e.TimeMs - _t0Ms,8:F1}ms vol={e.Vol:F2} pan={e.Pan:F2} {Path.GetFileName(e.Path)}");
+			Trace.TraceInformation($"[export]   t={e.TimeMs - _t0Ms,8:F1}ms - {e.TimeMsEnd - _t0Ms,8:F1}ms vol={e.Vol:F2} pan={e.Pan:F2} {Path.GetFileName(e.Path)}");
 
 		foreach (var ev in events) {
 			double relMs = ev.TimeMs - _t0Ms;
@@ -377,23 +402,30 @@ internal static class VideoExporter {
 			long start = (long)(relMs / 1000.0 * samplingRate);
 			if (start >= samples) continue;
 
-			float[] pcm = DecodeToStereoResampled(ev.Path, samplingRate);
+			double relMsEnd = ev.TimeMsEnd - _t0Ms;
+			double end = Math.Truncate(relMsEnd / 1000.0 * samplingRate);
+
 			long frameSeek = (long)(samplingRate * (ev.msSeek / 1000.0));
-			long byteSeek = 2 * frameSeek;
-			if (pcm.Length < byteSeek) continue;
+			float[] pcm = DecodeToStereoResampled(ev.Path, samplingRate);
+			long srcSampleFrames = pcm.Length / 2;
+			if (srcSampleFrames < frameSeek)
+				continue;
 
 			float volL = ev.Vol * Math.Min(1f, 1f - ev.Pan);
 			float volR = ev.Vol * Math.Min(1f, 1f + ev.Pan);
 			double speed = (ev.Speed > 0.01 && Math.Abs(ev.Speed - 1.0) > 0.001) ? ev.Speed : 1.0;
-			long origFrames = pcm.Length / 2;
-			long srcFrames = origFrames - frameSeek;
+
+			long destSustainedFrames = (end - start >= long.MaxValue) ? long.MaxValue : (long)(end - start);
+			long srcSustainedFrames = (destSustainedFrames * speed >= long.MaxValue) ? long.MaxValue : (long)(destSustainedFrames * speed);
+			long srcFrames = Math.Min(srcSampleFrames - frameSeek, srcSustainedFrames);
 			long dstFrames = (long)(srcFrames / speed);
 			long room = samples - start;
 			if (dstFrames > room) dstFrames = room;
 
 			for (long i = 0; i < dstFrames; i++) {
-				long s = frameSeek + ((speed == 1.0) ? i : (long)(i * speed));
-				if (s >= origFrames) break;
+				long offset = ((speed == 1.0) ? i : (long)(i * speed));
+				long s = frameSeek + offset;
+				if (offset >= srcFrames) break;
 				long o = (start + i) * 2;
 				mixL[o] += pcm[s * 2] * volL;
 				mixL[o + 1] += pcm[s * 2 + 1] * volR;
