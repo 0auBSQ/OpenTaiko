@@ -25,6 +25,8 @@
         "TITLE_SAVE_ROOM_NONE": "まだ部屋を訪れていません",
         "TITLE_VAULT": "ムショ行要素",
         "TITLE_VAULT_DESC": "鍵が特別な価値を持つらしい、謎に満ちた場所…",
+        "TITLE_CUSTOM_STAGES": "カスタムステージ",
+        "TITLE_CUSTOM_STAGES_DESC": "みんなが作ったステージで遊んだり、自分で作る方法を学んだりしよう！",
         "TITLE_SETTINGS": "設定",
         "TITLE_SETTINGS_DESC": "プレイ環境に合わせて設定を調整しよう！",
         "TITLE_EXIT": "終了",

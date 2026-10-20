@@ -481,6 +481,7 @@ end
 			// ROActivity scripts may not use ACTIVITY (use ROACTIVITY instead) or write to DATABASE
 			LuaScript["ACTIVITY"] = writable ? new LuaActivityFunc(fromGlobal) : null;
 			LuaScript["ROACTIVITY"] = new LuaROActivityFunc(fromGlobal);
+			LuaScript["STAGES"] = new LuaStagesFunc(LuaScript, fromGlobal, this as CLuaStageScript);   // stage namespaces
 			LuaScript["MODICONS"] = new LuaModIconsFunc();
 			LuaScript["HITSOUNDSLIST"] = new LuaHitsoundsDatabase();
 			LuaScript["VIRTUALSLOTS"] = new LuaVirtualSlotManager();

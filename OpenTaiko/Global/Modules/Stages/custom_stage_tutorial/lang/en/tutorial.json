@@ -1,0 +1,22 @@
+{
+    "stage_title": "Making custom stages",
+    "stage_desc": "The four things to know to make a custom stage and share it.",
+    "topics": "Topics",
+    "back": "Back",
+    "prev": "Previous",
+    "next": "Next",
+    "page": "%d / %d",
+    "hint": "Up/Down: topics    Left/Right or Enter: next    Esc: back",
+    "place_title": "Where to put it",
+    "place_1_head": "Its own folder in Global/Modules/Stages",
+    "place_1_text": "Put the stage in Global/Modules/Stages/<name>/ in the OpenTaiko folder, with Script.lua right inside, not in an extra folder. Not in a skin's folders: it is meant for every skin. Give it a distinctive name, never _boot, _title or the name of a shipped stage. Restart the game to see it.",
+    "namespace_title": "Set the namespace",
+    "namespace_1_head": "STAGES:SetNamespace(\"CStage\", ...)",
+    "namespace_1_text": "Call it at the top of Script.lua, outside any function, with the title and the description the Custom Stages menu shows: strings, or tables by language code. Without it, the stage never appears in Custom Stages.",
+    "inside_title": "Keep everything inside",
+    "inside_1_head": "Everything in the stage's folder",
+    "inside_1_text": "Its textures, sounds, fonts and strings live in its own folder and load by paths relative to it. Beyond that, use only the modules of Global/Modules/Lib (UI.Pick, Input.NavInput, Locale.i18n...) and the engine's activities: never a skin's Lib or another stage's files, which other players may not have.",
+    "docs_title": "Read the documentation",
+    "docs_1_head": "In the OpenTaiko Hub",
+    "docs_1_text": "The rest is in the documentation, in the OpenTaiko Hub: select your OpenTaiko instance and open the Documentation tab on the Home page (it appears when your build ships the documentation). Start with the pages Custom stages and How modules work."
+}

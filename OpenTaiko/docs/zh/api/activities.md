@@ -79,6 +79,31 @@ function update(timestamp)
 end
 ```
 
+### STAGES
+
+用于舞台命名空间的全局对象：舞台声明一个命名空间，任何模块都能列出某个命名空间的舞台，例如用来制作为它而做的舞台菜单。
+
+<div class="callout warn">
+在每个模块中注册为全局 STAGES，但只有舞台脚本才有命名空间：在其他模块中，SetNamespace 什么也不做并返回 false。一个舞台同时只有一个命名空间；之后的调用会替换它，nil 或 "" 会清除它。该调用在 Script.lua 顶部、任何函数之外，以及任何回调中都有效；Script.lua 的顶部在加载皮肤、引擎创建舞台时运行，因此舞台在任何 onStart 运行之前就已在列表中。引擎把 info 作为普通数据保存而不读取：字符串、数字、布尔值以及由它们组成的表，最多嵌套 8 层；函数和引擎对象会被略去。ListNamespace 为每个舞台名返回一个条目，即从调用模块执行 Exit("stage", name) 会打开的舞台：皮肤模块得到该名称的皮肤舞台，全局模块得到全局舞台，各自找不到时转向另一侧，并且只有声明了该命名空间的舞台才会列出。条目按名称排序，每个 info 都是新的副本。皮肤的舞台全部创建后所有舞台才都存在，所以请在 onStart 或之后获取列表；在 Script.lua 顶部，只有比调用者先创建的舞台。皮肤的自定义舞台菜单所列出的 CStage 命名空间在 [自定义舞台](../modules/custom-stages.md) 中介绍。
+</div>
+
+| 方法 | 说明 |
+| --- | --- |
+| `STAGES:SetNamespace(namespace, info?)  -> boolean` | 声明调用舞台的命名空间，可选的 info 表会返回给列出它的舞台；在舞台脚本之外返回 false。 |
+| `STAGES:ListNamespace(namespace)  -> table` | 以从 1 开始索引的 `{ name, isGlobal, info }` 表数组返回该命名空间的舞台：文件夹名、位于 Global/Modules/Stages 的舞台为 true，以及声明的 info（未提供时为空表）。 |
+
+```lua
+-- Modules/Stages/color_tool/Script.lua, at the top
+STAGES:SetNamespace("MyTools", { title = { en = "Colour picker", fr = "Pipette" } })
+
+-- another stage lists them
+function activate()
+    for _, s in ipairs(STAGES:ListNamespace("MyTools")) do
+        debugLog(s.name .. (s.isGlobal and " (global)" or ""))
+    end
+end
+```
+
 ### LOADING
 
 供以协程方式运行的回调使用的加载进度条辅助对象：每种模块类型的 onStart，以及舞台的 activate。

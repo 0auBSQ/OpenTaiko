@@ -25,6 +25,8 @@
         "TITLE_SAVE_ROOM_NONE": "Zimmer noch nicht besucht",
         "TITLE_VAULT": "Geheimtresor",
         "TITLE_VAULT_DESC": "Ein Ort voller Rätsel, an dem Schlüssel einen besonderen Wert zu haben scheinen...",
+        "TITLE_CUSTOM_STAGES": "Eigene Stages",
+        "TITLE_CUSTOM_STAGES_DESC": "Spiele Stages aus der Community oder lerne, deine eigenen zu bauen!",
         "TITLE_SETTINGS": "Einstellungen",
         "TITLE_SETTINGS_DESC": "Passe deine Einstellungen an dein Spielerlebnis an!",
         "TITLE_EXIT": "Beenden",

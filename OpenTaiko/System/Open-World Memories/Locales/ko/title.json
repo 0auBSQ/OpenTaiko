@@ -25,6 +25,8 @@
         "TITLE_SAVE_ROOM_NONE": "아직 방문하지 않은 방",
         "TITLE_VAULT": "비밀 금고",
         "TITLE_VAULT_DESC": "열쇠가 특별한 가치를 지닌 듯한, 수수께끼로 가득한 곳...",
+        "TITLE_CUSTOM_STAGES": "커스텀 스테이지",
+        "TITLE_CUSTOM_STAGES_DESC": "커뮤니티가 만든 스테이지를 즐기거나, 직접 만드는 법을 배워 보세요!",
         "TITLE_SETTINGS": "설정",
         "TITLE_SETTINGS_DESC": "플레이 환경에 맞게 설정을 조정하세요!",
         "TITLE_EXIT": "종료",

@@ -1,0 +1,22 @@
+{
+    "stage_title": "Crear stages personalizados",
+    "stage_desc": "Las cuatro cosas que saber para crear un stage personalizado y compartirlo.",
+    "topics": "Temas",
+    "back": "Volver",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "page": "%d / %d",
+    "hint": "Arriba/Abajo: temas    Izquierda/Derecha o Enter: siguiente    Esc: volver",
+    "place_title": "Dónde ponerlo",
+    "place_1_head": "Su propia carpeta en Global/Modules/Stages",
+    "place_1_text": "Pon el stage en Global/Modules/Stages/<name>/ de la carpeta de OpenTaiko, con Script.lua justo dentro, no en una carpeta de más. No en las carpetas de una skin: es para todas las skins. Dale un nombre único, nunca _boot, _title ni el de un stage incluido. Reinicia el juego para verlo.",
+    "namespace_title": "Fijar el espacio de nombres",
+    "namespace_1_head": "STAGES:SetNamespace(\"CStage\", ...)",
+    "namespace_1_text": "Llámalo arriba en Script.lua, fuera de toda función, con el título y la descripción que muestra el menú Stages personalizados: cadenas, o tablas por código de idioma. Sin esto, el stage nunca aparece en Stages personalizados.",
+    "inside_title": "Todo dentro",
+    "inside_1_head": "Todo en la carpeta del stage",
+    "inside_1_text": "Sus texturas, sonidos, fuentes y textos están en su propia carpeta y se cargan con rutas relativas a ella. Fuera de eso, usa solo los módulos de Global/Modules/Lib (UI.Pick, Input.NavInput, Locale.i18n...) y las activities del motor: nunca la Lib de una skin ni archivos de otro stage, que otros jugadores quizá no tengan.",
+    "docs_title": "Leer la documentación",
+    "docs_1_head": "En el OpenTaiko Hub",
+    "docs_1_text": "El resto está en la documentación, en el OpenTaiko Hub: elige tu instancia de OpenTaiko y abre la pestaña Documentación en la página Inicio (aparece cuando tu versión incluye la documentación). Empieza por las páginas Stages personalizados y Cómo funcionan los módulos."
+}

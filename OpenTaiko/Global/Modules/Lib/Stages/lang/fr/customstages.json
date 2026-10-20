@@ -1,0 +1,6 @@
+{
+    "title": "Stages personnalisés",
+    "empty": "Aucun stage personnalisé n'est encore installé.",
+    "empty_hint": "Placez le dossier d'un stage dans Global/Modules/Stages, puis relancez le jeu.",
+    "ok": "OK"
+}

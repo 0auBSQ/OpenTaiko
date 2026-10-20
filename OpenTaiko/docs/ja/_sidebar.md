@@ -28,7 +28,9 @@
   - [Pagoda](modules/pagoda.md)
   - [Vault](modules/vault.md)
   - [Shop](modules/shop.md)
+  - [Online](modules/online.md) <span class="badge-exp">実験的</span>
   - [マイルーム](modules/my-room.md)
+  - [カスタムステージ](modules/custom-stages.md)
 
 - Lua API リファレンス
   - [概要](api/README.md)

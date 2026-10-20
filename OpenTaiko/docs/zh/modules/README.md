@@ -41,6 +41,8 @@ Lib 文件没有自己的 Lua 状态：它运行在 require 它的模块的状�
 | `Pagoda` | `Levels`, `Floor`, `Rewards`, `Progress`, `Songs`, `Run`, `Texts` | [Pagoda](pagoda.md) |
 | `Vault` | `Keys`, `Chests`, `Texts` | [Vault](vault.md) |
 | `Shop` | `Daily`, `Catalog`, `Texts`, `Seasonal`, `Popup` | [Shop](shop.md) |
+| `Online` | `Lobby`, `Protocol`, `Identity`, `Media`, `Texts` | [Online](online.md) |
+| `Stages` | `CustomStages` | [自定义舞台](custom-stages.md) |
 
 ## Open-World Memories 保留的名称
 

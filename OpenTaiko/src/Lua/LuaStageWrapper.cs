@@ -45,6 +45,18 @@
 			return null;
 		}
 
+		// The stages of a namespace as a caller reaches them: one per name, the one GetLuaStage gives, kept when
+		// it declared the namespace; ordered by name
+		public static List<LuaStageWrapper> GetStagesInNamespace(string ns, bool preferGlobal = false) {
+			var found = new List<LuaStageWrapper>();
+			if (string.IsNullOrEmpty(ns)) return found;
+			foreach (string name in _skinLuaStages.Keys.Union(_globalLuaStages.Keys).OrderBy(n => n, StringComparer.Ordinal)) {
+				var stage = GetLuaStage(name, preferGlobal);
+				if (stage != null && stage.Namespace == ns) found.Add(stage);
+			}
+			return found;
+		}
+
 		public static LuaStageWrapper? GetNextRequestedStage() {
 			LuaStageWrapper? _stage = GetLuaStage(_nextRequestedStage, _nextRequestedFromGlobal);
 
@@ -84,6 +96,10 @@
 
 		// loaded from Global/Modules/Stages
 		public readonly bool IsGlobal;
+
+		// the namespace the stage declared with STAGES:SetNamespace ("" for none) and the info it gave
+		public string Namespace => lcStageScript?.StageNamespace ?? "";
+		internal Dictionary<object, object>? NamespaceInfo => lcStageScript?.StageNamespaceInfo;
 
 		public void DisposeStage() {
 			lcStageScript?.Dispose();

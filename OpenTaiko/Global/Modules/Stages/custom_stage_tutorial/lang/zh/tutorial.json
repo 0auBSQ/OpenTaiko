@@ -1,0 +1,22 @@
+{
+    "stage_title": "制作自定义舞台",
+    "stage_desc": "制作并分享自定义舞台需要知道的四件事。",
+    "topics": "主题",
+    "back": "返回",
+    "prev": "上一页",
+    "next": "下一页",
+    "page": "%d / %d",
+    "hint": "上/下：主题    左/右或 Enter：下一项    Esc：返回",
+    "place_title": "放在哪里",
+    "place_1_head": "Global/Modules/Stages 中的专属文件夹",
+    "place_1_text": "把舞台放进 OpenTaiko 文件夹的 Global/Modules/Stages/<name>/，Script.lua 直接位于其中，不要多套一层文件夹。不要放进皮肤的文件夹：它面向所有皮肤。给它起一个独特的名字，绝不要用 _boot、_title 或内置舞台的名字。重启游戏后即可看到。",
+    "namespace_title": "设置命名空间",
+    "namespace_1_head": "STAGES:SetNamespace(\"CStage\", ...)",
+    "namespace_1_text": "在 Script.lua 顶部、任何函数之外调用它，并传入自定义舞台菜单显示的标题和说明：字符串，或按语言代码组织的表。没有这个调用，舞台永远不会出现在自定义舞台中。",
+    "inside_title": "一切都放在里面",
+    "inside_1_head": "一切都在舞台文件夹中",
+    "inside_1_text": "它的纹理、声音、字体和文本都放在它自己的文件夹中，并以相对于该文件夹的路径加载。除此之外，只使用 Global/Modules/Lib 中的模块（UI.Pick、Input.NavInput、Locale.i18n 等）和引擎的 activity：绝不要用皮肤的 Lib 或其他舞台的文件，其他玩家可能没有它们。",
+    "docs_title": "阅读文档",
+    "docs_1_head": "在 OpenTaiko Hub 中",
+    "docs_1_text": "其余内容都在 OpenTaiko Hub 的文档中：选择你的 OpenTaiko 实例，打开主页上的“文档”标签（当你的版本附带文档时才会出现）。先从“自定义舞台”和“模块的工作原理”这两页开始。"
+}

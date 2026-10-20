@@ -1,5 +1,5 @@
 {
-  "_comment": "English texts of the Online Lobby (Script.lua, online.lua). Keys are stable ids; this file is the fallback for every other language.",
+  "_comment": "English texts of the Online Lobby (Script.lua). Keys are stable ids; this file is the fallback for every other language.",
   "menu_subtitle": "Beta - share your room code only with people you trust",
   "menu_create": "Create a room (host)",
   "menu_join": "Join a room (enter a code)",
@@ -58,13 +58,7 @@
   "msg_kicked_round": "A new round started without you.",
   "msg_open_failed": "Could not open the room.",
   "msg_join_failed": "Could not join the room.",
-  "msg_room_open": "Room open! The code was saved to a folder - share it so friends can join.",
   "msg_no_code": "No code entered.",
-  "msg_code_other": "That code is for a '%s' room.",
-  "msg_code_invalid": "That code isn't valid.",
-  "msg_chart_failed": "Could not load the chart.",
-  "msg_network_error": "Network error.",
-  "unknown_song": "Unknown song",
   "key_unbound": "(not bound)",
   "logo_title": "ONLINE LOBBY"
 }

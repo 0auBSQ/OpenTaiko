@@ -79,6 +79,31 @@ function update(timestamp)
 end
 ```
 
+### STAGES
+
+ステージの名前空間のためのグローバルです。ステージは名前空間を宣言し、どのモジュールも名前空間のステージを一覧にできます。たとえば、その名前空間向けに作られたステージのメニューを作るために使います。
+
+<div class="callout warn">
+すべてのモジュールに STAGES グローバルとして登録されますが、名前空間を持てるのはステージのスクリプトだけです。ほかのモジュールでは SetNamespace は何もせず false を返します。ステージが持つ名前空間は一度に1つで、後の呼び出しで置き換わり、nil か "" で消えます。呼び出しは Script.lua の先頭、関数の外でも、どのコールバックの中でも動きます。Script.lua の先頭はスキンの読み込み時にエンジンがステージを作るときに実行されるので、どの onStart よりも前にステージが一覧に載ります。エンジンは info を読まずに単純なデータとして保存します。文字列、数値、真偽値と、それらのテーブル (入れ子は8段まで) で、関数とエンジンのオブジェクトは除かれます。ListNamespace はステージ名ごとに1つのエントリを返します。それは呼び出し元のモジュールから Exit("stage", name) で開かれるステージです。スキンのモジュールはその名前のスキンのステージを、グローバルのモジュールはグローバルのステージを得て、それぞれもう一方にフォールバックし、そのステージが名前空間を宣言しているときだけ一覧に載ります。エントリは名前順で、各 info は新しいコピーです。スキンのステージがすべて作られた時点で全ステージがそろうので、一覧は onStart 以降で取ってください。Script.lua の先頭では、呼び出し元より前に作られたステージしかありません。スキンのカスタムステージのメニューが一覧にする CStage 名前空間については [カスタムステージ](../modules/custom-stages.md) で説明しています。
+</div>
+
+| メソッド | 説明 |
+| --- | --- |
+| `STAGES:SetNamespace(namespace, info?)  -> boolean` | 呼び出し元のステージの名前空間を宣言します。任意の info テーブルは、それを一覧にするステージに返されます。ステージのスクリプト以外では false を返します。 |
+| `STAGES:ListNamespace(namespace)  -> table` | 名前空間のステージを `{ name, isGlobal, info }` テーブルの配列 (1 始まり) で返します。フォルダー名、Global/Modules/Stages にあるステージなら true、宣言された info (指定がなければ空のテーブル) です。 |
+
+```lua
+-- Modules/Stages/color_tool/Script.lua, at the top
+STAGES:SetNamespace("MyTools", { title = { en = "Colour picker", fr = "Pipette" } })
+
+-- another stage lists them
+function activate()
+    for _, s in ipairs(STAGES:ListNamespace("MyTools")) do
+        debugLog(s.name .. (s.isGlobal and " (global)" or ""))
+    end
+end
+```
+
 ### LOADING
 
 コルーチンとして実行されるコールバック (すべてのモジュール種類の onStart と、ステージの activate) 用のローディングバーヘルパーです。

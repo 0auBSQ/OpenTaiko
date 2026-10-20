@@ -28,7 +28,9 @@
   - [Pagoda](modules/pagoda.md)
   - [Vault](modules/vault.md)
   - [Shop](modules/shop.md)
+  - [Online](modules/online.md) <span class="badge-exp">실험적</span>
   - [마이 룸](modules/my-room.md)
+  - [커스텀 스테이지](modules/custom-stages.md)
 
 - Lua API 레퍼런스
   - [개요](api/README.md)

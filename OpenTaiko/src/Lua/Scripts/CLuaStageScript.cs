@@ -6,6 +6,10 @@ namespace OpenTaiko {
 		// Used to identify the lua stage, 
 		internal string _stageName;
 
+		// set by STAGES:SetNamespace, also from the top of Script.lua (which runs inside the base constructor)
+		internal string StageNamespace = "";
+		internal Dictionary<object, object>? StageNamespaceInfo = null;
+
 		// Activation / Deactivation (when met/unmet)
 		private NamedLuaFunction lfActivate = new("activate");
 		private NamedLuaFunction lfDeactivate = new("deactivate");

@@ -28,7 +28,9 @@
   - [Pagoda](modules/pagoda.md)
   - [Vault](modules/vault.md)
   - [Shop](modules/shop.md)
+  - [Online](modules/online.md) <span class="badge-exp">Expérimental</span>
   - [Ma Chambre](modules/my-room.md)
+  - [Stages personnalisés](modules/custom-stages.md)
 
 - Référence de l'API Lua
   - [Vue d'ensemble](api/README.md)

@@ -58,13 +58,7 @@
   "msg_kicked_round": "Une nouvelle manche a commencé sans vous.",
   "msg_open_failed": "Impossible d'ouvrir le salon.",
   "msg_join_failed": "Impossible de rejoindre le salon.",
-  "msg_room_open": "Salon ouvert ! Le code a été enregistré dans un dossier - partagez-le pour que vos amis puissent vous rejoindre.",
   "msg_no_code": "Aucun code saisi.",
-  "msg_code_other": "Ce code correspond à un salon « %s ».",
-  "msg_code_invalid": "Ce code n'est pas valide.",
-  "msg_chart_failed": "Impossible de charger la partition.",
-  "msg_network_error": "Erreur réseau.",
-  "unknown_song": "Chanson inconnue",
   "key_unbound": "(non assignée)",
   "logo_title": "SALON EN LIGNE"
 }

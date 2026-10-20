@@ -79,6 +79,31 @@ function update(timestamp)
 end
 ```
 
+### STAGES
+
+Global for stage namespaces: a stage declares a namespace, and any module lists the stages of a namespace, for example to build a menu of the stages made for it.
+
+<div class="callout warn">
+Registered as the STAGES global in every module, but only a Stage script has a namespace: in another module SetNamespace does nothing and returns false. A stage has one namespace at a time; a later call replaces it, and nil or "" clears it. The call works at the top of Script.lua, outside any function, as well as in any callback; the top of Script.lua runs when the engine creates the stage at skin load, so the stage is listed before any onStart runs. The engine keeps info as plain data without reading it: strings, numbers, booleans and tables of them, nested up to 8 levels; functions and engine objects are left out. ListNamespace returns one entry per stage name, the stage that Exit("stage", name) from the calling module would open: a skin module gets the skin's stage of that name and a global module the global one, each falling back to the other side, and that stage is listed only when it declared the namespace. The entries are ordered by name, and each info is a fresh copy. Every stage exists once the skin's stages are created, so list them in onStart or later; at the top of Script.lua, only the stages created before the caller are there. [Custom stages](../modules/custom-stages.md) describes the CStage namespace, which the skins' Custom Stages menus list.
+</div>
+
+| Method | Description |
+| --- | --- |
+| `STAGES:SetNamespace(namespace, info?)  -> boolean` | Declares the calling stage's namespace, with an optional info table given back to the stages that list it; false outside a Stage script. |
+| `STAGES:ListNamespace(namespace)  -> table` | The stages of the namespace as an array of `{ name, isGlobal, info }` tables, indexed from 1: the folder name, true for a stage in Global/Modules/Stages, and the declared info (an empty table when none was given). |
+
+```lua
+-- Modules/Stages/color_tool/Script.lua, at the top
+STAGES:SetNamespace("MyTools", { title = { en = "Colour picker", fr = "Pipette" } })
+
+-- another stage lists them
+function activate()
+    for _, s in ipairs(STAGES:ListNamespace("MyTools")) do
+        debugLog(s.name .. (s.isGlobal and " (global)" or ""))
+    end
+end
+```
+
 ### LOADING
 
 Loading-bar helper for the callbacks that run as coroutines: onStart of every module kind, and a Stage's activate.

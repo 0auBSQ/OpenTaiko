@@ -25,6 +25,8 @@
         "TITLE_SAVE_ROOM_NONE": "尚未进入过房间",
         "TITLE_VAULT": "秘密金库",
         "TITLE_VAULT_DESC": "一个充满谜团的地方，钥匙在这里似乎有着特别的价值……",
+        "TITLE_CUSTOM_STAGES": "自定义舞台",
+        "TITLE_CUSTOM_STAGES_DESC": "游玩社区制作的舞台，或学习如何制作属于你的舞台！",
         "TITLE_SETTINGS": "设置",
         "TITLE_SETTINGS_DESC": "调整设置，打造适合你的游戏体验！",
         "TITLE_EXIT": "退出",

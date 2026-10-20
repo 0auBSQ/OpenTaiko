@@ -41,6 +41,8 @@ Jede Komponente ist ein Ordner von `Global/Modules/Lib/`, und ihre Module werden
 | `Pagoda` | `Levels`, `Floor`, `Rewards`, `Progress`, `Songs`, `Run`, `Texts` | [Pagoda](pagoda.md) |
 | `Vault` | `Keys`, `Chests`, `Texts` | [Vault](vault.md) |
 | `Shop` | `Daily`, `Catalog`, `Texts`, `Seasonal`, `Popup` | [Shop](shop.md) |
+| `Online` | `Lobby`, `Protocol`, `Identity`, `Media`, `Texts` | [Online](online.md) |
+| `Stages` | `CustomStages` | [Eigene Stages](custom-stages.md) |
 
 ## Die Namen, die Open-World Memories beibehält
 

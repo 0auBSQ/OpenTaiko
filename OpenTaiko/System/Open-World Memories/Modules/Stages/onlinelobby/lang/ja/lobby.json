@@ -58,13 +58,7 @@
   "msg_kicked_round": "あなた抜きで新しいラウンドが始まりました。",
   "msg_open_failed": "ルームを開けませんでした。",
   "msg_join_failed": "ルームに参加できませんでした。",
-  "msg_room_open": "ルームを開きました！コードはフォルダに保存されました - 共有して友達を招待しましょう。",
   "msg_no_code": "コードが入力されていません。",
-  "msg_code_other": "このコードは「%s」のルームです。",
-  "msg_code_invalid": "このコードは無効です。",
-  "msg_chart_failed": "譜面を読み込めませんでした。",
-  "msg_network_error": "ネットワークエラー。",
-  "unknown_song": "不明な曲",
   "key_unbound": "（未設定）",
   "logo_title": "オンラインロビー"
 }

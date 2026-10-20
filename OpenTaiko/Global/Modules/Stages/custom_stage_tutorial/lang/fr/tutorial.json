@@ -1,0 +1,22 @@
+{
+    "stage_title": "Créer des stages personnalisés",
+    "stage_desc": "Les quatre choses à savoir pour créer un stage personnalisé et le partager.",
+    "topics": "Sujets",
+    "back": "Retour",
+    "prev": "Précédent",
+    "next": "Suivant",
+    "page": "%d / %d",
+    "hint": "Haut/Bas : sujets    Gauche/Droite ou Entrée : suivant    Échap : retour",
+    "place_title": "Où le mettre",
+    "place_1_head": "Son propre dossier dans Global/Modules/Stages",
+    "place_1_text": "Placez le stage dans Global/Modules/Stages/<name>/ du dossier OpenTaiko, avec Script.lua juste dedans, pas dans un dossier de plus. Pas dans les dossiers d'un skin : il est fait pour tous les skins. Donnez-lui un nom distinctif, jamais _boot, _title ni celui d'un stage fourni. Relancez le jeu pour le voir.",
+    "namespace_title": "Définir l'espace de noms",
+    "namespace_1_head": "STAGES:SetNamespace(\"CStage\", ...)",
+    "namespace_1_text": "Appelez-le en haut de Script.lua, hors de toute fonction, avec le titre et la description qu'affiche le menu Stages personnalisés : des chaînes, ou des tables par code de langue. Sans cet appel, le stage n'apparaît jamais dans Stages personnalisés.",
+    "inside_title": "Tout garder dedans",
+    "inside_1_head": "Tout dans le dossier du stage",
+    "inside_1_text": "Ses textures, sons, polices et textes sont dans son propre dossier et se chargent par des chemins relatifs à lui. En dehors de cela, n'utilisez que les modules de Global/Modules/Lib (UI.Pick, Input.NavInput, Locale.i18n...) et les activities du moteur : jamais la Lib d'un skin ni les fichiers d'un autre stage, que d'autres joueurs n'ont peut-être pas.",
+    "docs_title": "Lire la documentation",
+    "docs_1_head": "Dans l'OpenTaiko Hub",
+    "docs_1_text": "Le reste est dans la documentation, dans l'OpenTaiko Hub : choisissez votre instance d'OpenTaiko et ouvrez l'onglet Documentation de la page Accueil (il apparaît quand votre version fournit la documentation). Commencez par les pages Stages personnalisés et Fonctionnement des modules."
+}

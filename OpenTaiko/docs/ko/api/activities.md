@@ -79,6 +79,31 @@ function update(timestamp)
 end
 ```
 
+### STAGES
+
+스테이지 네임스페이스를 위한 전역입니다. 스테이지는 네임스페이스를 선언하고, 어떤 모듈이든 네임스페이스의 스테이지 목록을 얻을 수 있습니다. 예를 들어 그 네임스페이스를 위해 만든 스테이지들의 메뉴를 만들 때 씁니다.
+
+<div class="callout warn">
+모든 모듈에 STAGES 전역으로 등록되지만, 네임스페이스를 가질 수 있는 것은 스테이지 스크립트뿐입니다. 다른 모듈에서 SetNamespace는 아무것도 하지 않고 false를 반환합니다. 스테이지는 한 번에 하나의 네임스페이스를 가지며, 나중의 호출이 이를 바꾸고 nil 또는 ""는 지웁니다. 호출은 Script.lua 맨 위, 함수 밖에서도 모든 콜백 안에서도 작동합니다. Script.lua의 맨 위는 스킨을 불러올 때 엔진이 스테이지를 만들면서 실행되므로, 스테이지는 어떤 onStart보다도 먼저 목록에 오릅니다. 엔진은 info를 읽지 않고 단순한 데이터로 보관합니다. 문자열, 숫자, 불리언과 그것들의 테이블(최대 8단계 중첩)이며, 함수와 엔진 객체는 빠집니다. ListNamespace는 스테이지 이름마다 하나의 항목을 반환하는데, 호출한 모듈에서 Exit("stage", name)이 열 스테이지입니다. 스킨 모듈은 그 이름의 스킨 스테이지를, 전역 모듈은 전역 스테이지를 받고 각각 반대쪽으로 대체하며, 그 스테이지가 네임스페이스를 선언했을 때만 목록에 오릅니다. 항목은 이름순이며 각 info는 새 사본입니다. 스킨의 스테이지가 모두 만들어지면 모든 스테이지가 존재하므로 목록은 onStart 이후에 얻으세요. Script.lua 맨 위에서는 호출자보다 먼저 만들어진 스테이지만 있습니다. 스킨의 커스텀 스테이지 메뉴가 보여 주는 CStage 네임스페이스는 [커스텀 스테이지](../modules/custom-stages.md)에서 설명합니다.
+</div>
+
+| 메서드 | 설명 |
+| --- | --- |
+| `STAGES:SetNamespace(namespace, info?)  -> boolean` | 호출한 스테이지의 네임스페이스를 선언하며, 선택적인 info 테이블은 목록을 얻는 스테이지에 돌려줍니다. 스테이지 스크립트 밖에서는 false입니다. |
+| `STAGES:ListNamespace(namespace)  -> table` | 네임스페이스의 스테이지를 1부터 시작하는 `{ name, isGlobal, info }` 테이블 배열로 반환합니다. 폴더 이름, Global/Modules/Stages의 스테이지이면 true, 그리고 선언된 info(주어지지 않았으면 빈 테이블)입니다. |
+
+```lua
+-- Modules/Stages/color_tool/Script.lua, at the top
+STAGES:SetNamespace("MyTools", { title = { en = "Colour picker", fr = "Pipette" } })
+
+-- another stage lists them
+function activate()
+    for _, s in ipairs(STAGES:ListNamespace("MyTools")) do
+        debugLog(s.name .. (s.isGlobal and " (global)" or ""))
+    end
+end
+```
+
 ### LOADING
 
 코루틴으로 실행되는 콜백(모든 모듈 종류의 onStart, 그리고 스테이지의 activate)을 위한 로딩 바 헬퍼입니다.

@@ -1,0 +1,22 @@
+{
+    "stage_title": "커스텀 스테이지 만들기",
+    "stage_desc": "커스텀 스테이지를 만들고 공유하기 위해 알아야 할 네 가지.",
+    "topics": "주제",
+    "back": "뒤로",
+    "prev": "이전",
+    "next": "다음",
+    "page": "%d / %d",
+    "hint": "위/아래: 주제    왼쪽/오른쪽 또는 Enter: 다음    Esc: 뒤로",
+    "place_title": "둘 곳",
+    "place_1_head": "Global/Modules/Stages 안의 전용 폴더",
+    "place_1_text": "스테이지는 OpenTaiko 폴더의 Global/Modules/Stages/<name>/에 두고, Script.lua는 그 바로 안에 둡니다. 폴더를 한 단계 더 넣지 마세요. 모든 스킨용이므로 스킨의 폴더에는 두지 않습니다. 이름은 겹치지 않게 하고 _boot, _title, 기본 제공 스테이지의 이름은 쓰지 마세요. 게임을 다시 시작하면 나타납니다.",
+    "namespace_title": "네임스페이스 설정",
+    "namespace_1_head": "STAGES:SetNamespace(\"CStage\", ...)",
+    "namespace_1_text": "Script.lua 맨 위, 함수 밖에서 호출하고, 커스텀 스테이지 메뉴에 보일 제목과 설명을 넘기세요. 문자열이나 언어 코드별 테이블입니다. 이 호출이 없으면 스테이지는 커스텀 스테이지에 나타나지 않습니다.",
+    "inside_title": "모두 안에 두기",
+    "inside_1_head": "모든 것을 스테이지 폴더에",
+    "inside_1_text": "텍스처, 소리, 글꼴, 텍스트는 스테이지 자신의 폴더에 두고 그 폴더 기준의 상대 경로로 불러옵니다. 그 밖에는 Global/Modules/Lib의 모듈(UI.Pick, Input.NavInput, Locale.i18n 등)과 엔진의 액티비티만 쓰세요. 스킨의 Lib나 다른 스테이지의 파일은 다른 플레이어에게 없을 수 있으니 쓰지 마세요.",
+    "docs_title": "문서 읽기",
+    "docs_1_head": "OpenTaiko Hub에서",
+    "docs_1_text": "나머지는 OpenTaiko Hub의 문서에 있습니다. OpenTaiko 인스턴스를 고르고 홈 페이지의 문서 탭을 여세요(빌드에 문서가 포함되어 있을 때 나타납니다). 커스텀 스테이지와 모듈의 동작 방식 페이지부터 보세요."
+}

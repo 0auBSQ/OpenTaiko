@@ -41,6 +41,8 @@ OpenTaiko поставляется с библиотекой Lua-модулей,
 | `Pagoda` | `Levels`, `Floor`, `Rewards`, `Progress`, `Songs`, `Run`, `Texts` | [Pagoda](pagoda.md) |
 | `Vault` | `Keys`, `Chests`, `Texts` | [Vault](vault.md) |
 | `Shop` | `Daily`, `Catalog`, `Texts`, `Seasonal`, `Popup` | [Shop](shop.md) |
+| `Online` | `Lobby`, `Protocol`, `Identity`, `Media`, `Texts` | [Online](online.md) |
+| `Stages` | `CustomStages` | [Пользовательские сцены](custom-stages.md) |
 
 ## Имена, которые сохраняет Open-World Memories
 

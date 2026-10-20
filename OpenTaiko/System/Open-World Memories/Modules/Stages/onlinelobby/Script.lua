@@ -4,13 +4,37 @@
 -- sets speed/dynamic-beat; every player picks their own difficulty + mods (real mod_select_dialog) + ready. The
 -- host's first menu state is "Start play!" (selectable anytime). On start everyone plays the SAME song; remote
 -- players render as real virtual-slot spots whose judges are sampled from the broadcast accuracy (no flying notes),
--- with synced loading/finish + results + host rotation. Net logic lives in online.lua (LO). See LuaNetworking.
+-- with synced loading/finish + results + host rotation. The session logic is the global Online.Lobby (LO).
 
 local NavInput = require("NavInput")
-local LO = require("online")
+local LO = require("Online.Lobby")
 local PopUI = require("PopUI")
+local I18N = require("Locale.i18n")
+local T = I18N.texts("lobby")     -- lang/<code>/lobby.json
 local net = LO.net
-local L, LF = LO.tr, LO.trf
+
+-- the lobby's texts, looked up once per visit (resetTexts on activate); the engine's own words for the
+-- difficulty names
+local texts = {}
+local function L(id)
+    local s = texts[id]
+    if s == nil then s = T:tr(id); texts[id] = s end
+    return s
+end
+local function LF(id, ...) return string.format(L(id), ...) end
+local DIFF_KEYS = { [0] = "DIFF_EASY", [1] = "DIFF_NORMAL", [2] = "DIFF_HARD", [3] = "DIFF_EX", [4] = "DIFF_EXTRA" }
+local DIFF_FALLBACK = { [0] = "Easy", [1] = "Normal", [2] = "Hard", [3] = "Extreme", [4] = "Extra" }
+local diffNames = {}
+local function diffName(d)
+    local s = diffNames[d]
+    if s == nil then
+        local ok, v = pcall(function() return LANG:GetString(DIFF_KEYS[d]) end)
+        s = (ok and type(v) == "string" and v ~= "" and v ~= DIFF_KEYS[d]) and v or (DIFF_FALLBACK[d] or "?")
+        diffNames[d] = s
+    end
+    return s
+end
+local function resetTexts() I18N.detect(); texts, diffNames = {}, {} end
 
 local SCREEN_W, SCREEN_H = 1920, 1080
 local mode = "menu"                         -- "menu" | "code" | "lobby" | "songselect" | "results"
@@ -378,7 +402,7 @@ local function drawDeck()
         drawDiffRow(x0, cy)
         local tx = x0 + 4 * DIFF_STEP + 96
         local w = DECK_X + DECK_W - 40 - tx
-        text(34, LO.diffName(d), tx, cy - 18, DIFF_COL[d] or INK, "left", 1, w)
+        text(34, diffName(d), tx, cy - 18, DIFF_COL[d] or INK, "left", 1, w)
         text(20, L("deck_diff_help"), tx, cy + 26, DIM, "left", 1, w)
         return
     end
@@ -492,7 +516,7 @@ end
 
 function activate()
     lastTs = nil; INPUT:SetMouseLocked(false)
-    LO.resetTexts()
+    resetTexts()
     keyLabels, bindNames = {}, {}
     reloadKeys()
     if ui == nil then ui = PopUI.new{} end
@@ -501,8 +525,7 @@ function activate()
     if not modicons then modicons = ROACTIVITY:GetROActivity("modicons"); if modicons then pcall(function() modicons:Activate() end) end end
     if pendingReturn then                    -- returned from a song
         pendingReturn = false
-        if net.online then LO.broadcastResult(); LO.setWatching(true) end
-        net.resultsT, net.resultsReadyT = 0, nil
+        LO.returnedFromPlay()
         mode = "results"
     end
 end
@@ -543,26 +566,18 @@ end
 -- The song select shares the room's song speed through CONFIG.SongSpeed.
 local function enterSongSelect()
     if act == nil then act = ACTIVITY:GetActivity("song_select_core") end
-    CONFIG.IsAIBattleMode = false
-    if net.song and net.song.speed then pcall(function() CONFIG.SongSpeed = net.song.speed end) end
-    act:Activate(false, 1, false, true)      -- allowPlayerCount=false, lockedPlayerCount=1, no AI slot, songOnly=true
-    CONFIG:SetAutoStatus(0, false)
+    -- allowPlayerCount=false, lockedPlayerCount=1, no AI slot, songOnly=true
+    LO.openSongSelect(function() act:Activate(false, 1, false, true) end)
     mode = "songselect"
 end
 local function updateSongSelect()
     local sig = getSignal(act:Update())
     if sig == "play" then                    -- a SONG was confirmed (no difficulty step)
-        local uid  = SONGMOUNT:ChosenUniqueId()
-        local title = LO.resolveTitle(uid) or L("unknown_song")
-        local sp = CONFIG.SongSpeed or (net.song and net.song.speed) or 20
-        local dy = (net.song and net.song.dyn == 1) or false
         act:Deactivate(); mode = "lobby"
-        LO.setSong(uid, title, 0, sp, dy)
-        LO.setDiff(LO.myDiff())
+        LO.songPicked()
     elseif sig == "cancel" then
         act:Deactivate(); mode = "lobby"
-        if net.song and CONFIG.SongSpeed ~= net.song.speed then LO.setSpeed(CONFIG.SongSpeed) end
-        LO.restoreMedia()                   -- its jacket and preview come back if the song select moved away
+        LO.songPickCancelled()              -- its jacket and preview come back if the song select moved away
     end
 end
 
@@ -619,8 +634,7 @@ local function step(ts)
             return nil
         end
         -- Play start is handled FIRST, even if the mod dialog is open (it is then force-closed WITHOUT saving).
-        if net.goSignal then
-            net.goSignal = false
+        if LO.takeGo() then
             if modDlg and modDlg.IsActive then pcall(function() modDlg:Deactivate() end); modWasActive = false end
             local r = LO.launchPlay()
             if r == true then pendingReturn = true; return Exit("play", nil)
@@ -674,10 +688,8 @@ local function step(ts)
         end
 
     elseif mode == "results" then
-        net.resultsT = net.resultsT + dt
-        if net.resultsReadyT == nil and (LO.haveAllResults() or net.resultsT > 20) then net.resultsReadyT = net.resultsT end
-        if net.goSignal then        -- a new round started while we lingered on the results → kicked
-            net.goSignal = false
+        LO.tickResults(dt)
+        if LO.takeGo() then         -- a new round started while we lingered on the results → kicked
             backToMenu(L("msg_kicked_round")); return nil
         end
         -- stay as long as you want; press Enter (once results are in) to return to the lobby

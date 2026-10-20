@@ -1,0 +1,6 @@
+{
+    "title": "Eigene Stages",
+    "empty": "Es sind noch keine eigenen Stages installiert.",
+    "empty_hint": "Lege einen Stage-Ordner in Global/Modules/Stages ab und starte das Spiel neu.",
+    "ok": "OK"
+}

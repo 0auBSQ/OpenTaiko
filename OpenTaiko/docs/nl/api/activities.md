@@ -79,6 +79,31 @@ function update(timestamp)
 end
 ```
 
+### STAGES
+
+Globaal voor naamruimten van stages: een stage declareert een naamruimte, en elke module somt de stages van een naamruimte op, bijvoorbeeld om een menu te bouwen van de stages die ervoor gemaakt zijn.
+
+<div class="callout warn">
+In elke module geregistreerd als de globale STAGES, maar alleen een Stage-script heeft een naamruimte: in een andere module doet SetNamespace niets en geeft false terug. Een stage heeft één naamruimte tegelijk; een latere aanroep vervangt die, en nil of "" wist hem. De aanroep werkt bovenaan Script.lua, buiten elke functie, net als in elke callback; de top van Script.lua draait wanneer de engine de stage maakt bij het laden van de skin, zodat de stage al in de lijst staat voordat een onStart draait. De engine bewaart info als eenvoudige gegevens zonder ze te lezen: strings, getallen, booleans en tabellen daarvan, tot 8 niveaus genest; functies en engine-objecten vallen weg. ListNamespace geeft één item per stagenaam, de stage die Exit("stage", name) vanuit de aanroepende module zou openen: een skinmodule krijgt de stage van die naam uit de skin en een globale module de globale, elk met terugval op de andere kant, en die stage staat alleen in de lijst als hij de naamruimte declareerde. De items zijn op naam gesorteerd, en elke info is een verse kopie. Alle stages bestaan zodra de stages van de skin gemaakt zijn, dus som ze op in onStart of later; bovenaan Script.lua zijn alleen de stages die vóór de aanroeper gemaakt zijn er. [Eigen stages](../modules/custom-stages.md) beschrijft de naamruimte CStage, die de menu's Eigen stages van de skins tonen.
+</div>
+
+| Methode | Beschrijving |
+| --- | --- |
+| `STAGES:SetNamespace(namespace, info?)  -> boolean` | Declareert de naamruimte van de aanroepende stage, met een optionele info-tabel die teruggaat naar de stages die hem opsommen; false buiten een Stage-script. |
+| `STAGES:ListNamespace(namespace)  -> table` | De stages van de naamruimte als een array van `{ name, isGlobal, info }`-tabellen, vanaf 1 geïndexeerd: de mapnaam, true voor een stage in Global/Modules/Stages, en de gedeclareerde info (een lege tabel als er geen gegeven is). |
+
+```lua
+-- Modules/Stages/color_tool/Script.lua, at the top
+STAGES:SetNamespace("MyTools", { title = { en = "Colour picker", fr = "Pipette" } })
+
+-- another stage lists them
+function activate()
+    for _, s in ipairs(STAGES:ListNamespace("MyTools")) do
+        debugLog(s.name .. (s.isGlobal and " (global)" or ""))
+    end
+end
+```
+
 ### LOADING
 
 Laadbalkhelper voor de callbacks die als coroutine draaien: onStart van elke soort module, en activate van een Stage.

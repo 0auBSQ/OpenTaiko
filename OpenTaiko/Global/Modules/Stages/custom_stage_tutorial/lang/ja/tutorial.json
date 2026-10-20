@@ -1,0 +1,22 @@
+{
+    "stage_title": "カスタムステージの作り方",
+    "stage_desc": "カスタムステージを作って共有するために知っておく4つのこと。",
+    "topics": "トピック",
+    "back": "戻る",
+    "prev": "前へ",
+    "next": "次へ",
+    "page": "%d / %d",
+    "hint": "上下：トピック    左右／Enter：次へ    Esc：戻る",
+    "place_title": "置き場所",
+    "place_1_head": "Global/Modules/Stages に専用フォルダー",
+    "place_1_text": "ステージは OpenTaiko フォルダーの Global/Modules/Stages/<name>/ に置き、Script.lua はそのすぐ中に置きます。フォルダーを1段余分に挟まないこと。すべてのスキン向けなので、スキンのフォルダーには置きません。名前はほかと重ならないものにし、_boot、_title、同梱ステージの名前は使わないでください。ゲームを再起動すると現れます。",
+    "namespace_title": "名前空間を設定する",
+    "namespace_1_head": "STAGES:SetNamespace(\"CStage\", ...)",
+    "namespace_1_text": "Script.lua の先頭、関数の外で呼び、カスタムステージのメニューに出すタイトルと説明を渡します。文字列か、言語コードごとのテーブルです。これがないと、ステージはカスタムステージに出てきません。",
+    "inside_title": "すべてを中に収める",
+    "inside_1_head": "すべてをステージのフォルダーに",
+    "inside_1_text": "テクスチャ、音、フォント、テキストはステージ自身のフォルダーに置き、そこからの相対パスで読み込みます。それ以外は Global/Modules/Lib のモジュール (UI.Pick、Input.NavInput、Locale.i18n など) とエンジンのアクティビティだけを使い、スキンの Lib やほかのステージのファイルは使わないでください。ほかのプレイヤーは持っていないかもしれません。",
+    "docs_title": "ドキュメントを読む",
+    "docs_1_head": "OpenTaiko Hub で",
+    "docs_1_text": "続きは OpenTaiko Hub のドキュメントにあります。OpenTaiko のインスタンスを選び、ホームの「ドキュメント」タブを開きます (ビルドにドキュメントが含まれているときに表示されます)。まずは「カスタムステージ」と「モジュールの仕組み」のページから。"
+}

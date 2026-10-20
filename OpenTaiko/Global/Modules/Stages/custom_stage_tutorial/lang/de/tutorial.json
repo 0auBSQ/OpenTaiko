@@ -1,0 +1,22 @@
+{
+    "stage_title": "Eigene Stages erstellen",
+    "stage_desc": "Die vier Dinge, die du wissen musst, um eine eigene Stage zu bauen und zu teilen.",
+    "topics": "Themen",
+    "back": "Zurück",
+    "prev": "Vorherige",
+    "next": "Weiter",
+    "page": "%d / %d",
+    "hint": "Hoch/Runter: Themen    Links/Rechts oder Enter: weiter    Esc: zurück",
+    "place_title": "Wohin damit",
+    "place_1_head": "Ein eigener Ordner in Global/Modules/Stages",
+    "place_1_text": "Lege die Stage in Global/Modules/Stages/<name>/ im OpenTaiko-Ordner ab, mit Script.lua direkt darin, nicht in einem zusätzlichen Ordner. Nicht in die Ordner eines Skins: Sie ist für jeden Skin gedacht. Gib ihr einen unverwechselbaren Namen, nie _boot, _title oder den einer mitgelieferten Stage. Starte das Spiel neu, um sie zu sehen.",
+    "namespace_title": "Den Namespace setzen",
+    "namespace_1_head": "STAGES:SetNamespace(\"CStage\", ...)",
+    "namespace_1_text": "Rufe es oben in Script.lua auf, außerhalb jeder Funktion, mit dem Titel und der Beschreibung, die das Menü Eigene Stages zeigt: Strings oder Tabellen nach Sprachcode. Ohne diesen Aufruf erscheint die Stage nie in Eigene Stages.",
+    "inside_title": "Alles drinnen behalten",
+    "inside_1_head": "Alles im Ordner der Stage",
+    "inside_1_text": "Ihre Texturen, Sounds, Schriften und Texte liegen in ihrem eigenen Ordner und werden relativ dazu geladen. Darüber hinaus nutze nur die Module aus Global/Modules/Lib (UI.Pick, Input.NavInput, Locale.i18n...) und die Activities der Engine: nie die Lib eines Skins oder Dateien einer anderen Stage, die andere Spieler vielleicht nicht haben.",
+    "docs_title": "Die Dokumentation lesen",
+    "docs_1_head": "Im OpenTaiko Hub",
+    "docs_1_text": "Der Rest steht in der Dokumentation im OpenTaiko Hub: Wähle deine OpenTaiko-Instanz und öffne auf der Seite Start den Tab Dokumentation (er erscheint, wenn dein Build die Dokumentation mitliefert). Beginne mit den Seiten Eigene Stages und So funktionieren Module."
+}

@@ -7,6 +7,7 @@ local PS       = require("player_select")
 local PopUI    = require("PopUI")
 local PagodaAvatar = require("PagodaAvatar")
 local SavePicker = require("SavePicker")
+local CustomStages = require("Stages.CustomStages")
 
 -- ── Resources ─────────────────────────────────────────────────────────────────
 
@@ -121,6 +122,12 @@ local function buildMenus()
         }
     end
 
+    m[#m + 1] = {
+        title = tr("TITLE_CUSTOM_STAGES", "Custom Stages"),
+        desc  = tr("TITLE_CUSTOM_STAGES_DESC", "Play stages made by the community, or learn how to make your own!"),
+        c     = col(210, 90, 160),
+        via   = "custom",
+    }
     m[#m + 1] = {
         title = tr("TITLE_SETTINGS", "Settings"),
         desc  = tr("TITLE_SETTINGS_DESC", "Adjust your settings to fit with your play experience!"),
@@ -398,6 +405,7 @@ end
 function deactivate()
     closeNotice()
     SavePicker.close()
+    CustomStages.close()
     if sounds.BGM ~= nil then sounds.BGM:Stop() end
     PS.clearSounds()
 end
@@ -440,6 +448,11 @@ function draw()
     if SavePicker.isOpen() then
         drawBgTile(0.6)
         SavePicker.draw()
+    end
+
+    if CustomStages.isOpen() then
+        drawBgTile(0.6)
+        CustomStages.draw()
     end
 end
 
@@ -484,6 +497,19 @@ function update(ts)
         elseif r ~= nil then
             SavePicker.pass(r)
             return doExit()
+        end
+        return nil
+    end
+
+    -- ── Custom stages ─────────────────────────────────────────────────────────
+    -- the stages of the "CStage" namespace; the one picked comes back here (custom_stage_return)
+    if CustomStages.isOpen() then
+        local r = CustomStages.update(ts)
+        if r == "cancel" then
+            sounds.Cancel:Play()
+            holdDir = 0
+        elseif r ~= nil then
+            return CustomStages.enter(r.name, "_title")
         end
         return nil
     end
@@ -561,6 +587,11 @@ function update(ts)
             return nil
         end
         sounds.Decide:Play()
+        if m.via == "custom" then
+            CustomStages.open{ ui = PopUI, title = m.title, navPlayer = "" }
+            holdDir = 0
+            return nil
+        end
         if m.pickSave then
             local slot = openSavePicker(m.pickSave)
             if slot ~= nil then

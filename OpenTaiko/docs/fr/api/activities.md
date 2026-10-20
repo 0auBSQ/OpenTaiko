@@ -79,6 +79,31 @@ function update(timestamp)
 end
 ```
 
+### STAGES
+
+Global des espaces de noms de stages : un stage déclare un espace de noms, et tout module liste les stages d'un espace de noms, par exemple pour construire un menu des stages faits pour lui.
+
+<div class="callout warn">
+Enregistré comme global STAGES dans chaque module, mais seul un script de Stage a un espace de noms : dans un autre module, SetNamespace ne fait rien et renvoie false. Un stage a un seul espace de noms à la fois ; un appel ultérieur le remplace, et nil ou "" l'efface. L'appel fonctionne en haut de Script.lua, hors de toute fonction, comme dans n'importe quel callback ; le haut de Script.lua s'exécute quand le moteur crée le stage au chargement du skin, si bien que le stage est listé avant tout onStart. Le moteur garde info comme des données simples sans les lire : chaînes, nombres, booléens et tables de ceux-ci, imbriquées jusqu'à 8 niveaux ; les fonctions et les objets du moteur sont laissés de côté. ListNamespace renvoie une entrée par nom de stage, le stage que Exit("stage", name) ouvrirait depuis le module appelant : un module de skin obtient le stage de ce nom du skin et un module global celui de Global, chacun se rabattant sur l'autre côté, et ce stage n'est listé que s'il a déclaré l'espace de noms. Les entrées sont triées par nom, et chaque info est une copie neuve. Tous les stages existent une fois ceux du skin créés : listez-les dans onStart ou plus tard ; en haut de Script.lua, seuls les stages créés avant l'appelant sont là. [Stages personnalisés](../modules/custom-stages.md) décrit l'espace de noms CStage, que listent les menus Stages personnalisés des skins.
+</div>
+
+| Méthode | Description |
+| --- | --- |
+| `STAGES:SetNamespace(namespace, info?)  -> boolean` | Déclare l'espace de noms du stage appelant, avec une table info facultative rendue aux stages qui le listent ; false hors d'un script de Stage. |
+| `STAGES:ListNamespace(namespace)  -> table` | Les stages de l'espace de noms sous forme de tableau de tables `{ name, isGlobal, info }`, indexé à partir de 1 : le nom du dossier, true pour un stage de Global/Modules/Stages, et l'info déclarée (une table vide si aucune n'a été donnée). |
+
+```lua
+-- Modules/Stages/color_tool/Script.lua, at the top
+STAGES:SetNamespace("MyTools", { title = { en = "Colour picker", fr = "Pipette" } })
+
+-- another stage lists them
+function activate()
+    for _, s in ipairs(STAGES:ListNamespace("MyTools")) do
+        debugLog(s.name .. (s.isGlobal and " (global)" or ""))
+    end
+end
+```
+
 ### LOADING
 
 Assistant de barre de chargement pour les fonctions de rappel qui s'exécutent en coroutine : le onStart de chaque type de module, et l'activate d'un Stage.

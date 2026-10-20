@@ -25,6 +25,8 @@
         "TITLE_SAVE_ROOM_NONE": "Chambre pas encore visitée",
         "TITLE_VAULT": "Fort Boyaux",
         "TITLE_VAULT_DESC": "Un lieu plein de mystères où les clés semblent avoir une valeur particulière...",
+        "TITLE_CUSTOM_STAGES": "Stages personnalisés",
+        "TITLE_CUSTOM_STAGES_DESC": "Jouez aux stages créés par la communauté, ou apprenez à créer les vôtres !",
         "TITLE_SETTINGS": "Paramètres",
         "TITLE_SETTINGS_DESC": "Ajustez vos réglages pour une expérience de jeu sur mesure !",
         "TITLE_EXIT": "Quitter",

@@ -41,6 +41,8 @@ Lib 파일에는 자체 Lua 상태가 없습니다. 자신을 require한 모듈�
 | `Pagoda` | `Levels`, `Floor`, `Rewards`, `Progress`, `Songs`, `Run`, `Texts` | [Pagoda](pagoda.md) |
 | `Vault` | `Keys`, `Chests`, `Texts` | [Vault](vault.md) |
 | `Shop` | `Daily`, `Catalog`, `Texts`, `Seasonal`, `Popup` | [Shop](shop.md) |
+| `Online` | `Lobby`, `Protocol`, `Identity`, `Media`, `Texts` | [Online](online.md) |
+| `Stages` | `CustomStages` | [커스텀 스테이지](custom-stages.md) |
 
 ## Open-World Memories가 유지하는 이름
 

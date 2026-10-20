@@ -58,13 +58,7 @@
   "msg_kicked_round": "Eine neue Runde hat ohne dich begonnen.",
   "msg_open_failed": "Der Raum konnte nicht geöffnet werden.",
   "msg_join_failed": "Beitritt zum Raum fehlgeschlagen.",
-  "msg_room_open": "Raum geöffnet! Der Code wurde in einem Ordner gespeichert - teile ihn, damit Freunde beitreten können.",
   "msg_no_code": "Kein Code eingegeben.",
-  "msg_code_other": "Dieser Code gehört zu einem „%s“-Raum.",
-  "msg_code_invalid": "Dieser Code ist ungültig.",
-  "msg_chart_failed": "Das Chart konnte nicht geladen werden.",
-  "msg_network_error": "Netzwerkfehler.",
-  "unknown_song": "Unbekannter Song",
   "key_unbound": "(nicht belegt)",
   "logo_title": "ONLINE-LOBBY"
 }

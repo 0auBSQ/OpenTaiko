@@ -25,6 +25,8 @@
         "TITLE_SAVE_ROOM_NONE": "Room not visited yet",
         "TITLE_VAULT": "Secret Vault",
         "TITLE_VAULT_DESC": "A place full of mysteries where keys seems to have a particular value...",
+        "TITLE_CUSTOM_STAGES": "Custom Stages",
+        "TITLE_CUSTOM_STAGES_DESC": "Play stages made by the community, or learn how to make your own!",
         "TITLE_SETTINGS": "Settings",
         "TITLE_SETTINGS_DESC": "Adjust your settings to fit with your play experience!",
         "TITLE_EXIT": "Exit",

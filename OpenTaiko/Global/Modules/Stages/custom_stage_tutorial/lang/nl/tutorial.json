@@ -1,0 +1,22 @@
+{
+    "stage_title": "Eigen stages maken",
+    "stage_desc": "De vier dingen die je moet weten om een eigen stage te maken en te delen.",
+    "topics": "Onderwerpen",
+    "back": "Terug",
+    "prev": "Vorige",
+    "next": "Volgende",
+    "page": "%d / %d",
+    "hint": "Omhoog/omlaag: onderwerpen    Links/rechts of Enter: volgende    Esc: terug",
+    "place_title": "Waar hij hoort",
+    "place_1_head": "Een eigen map in Global/Modules/Stages",
+    "place_1_text": "Zet de stage in Global/Modules/Stages/<name>/ in de OpenTaiko-map, met Script.lua er direct in, niet in een extra map. Niet in de mappen van een skin: hij is voor elke skin bedoeld. Geef hem een herkenbare naam, nooit _boot, _title of die van een meegeleverde stage. Start het spel opnieuw om hem te zien.",
+    "namespace_title": "De naamruimte instellen",
+    "namespace_1_head": "STAGES:SetNamespace(\"CStage\", ...)",
+    "namespace_1_text": "Roep het bovenaan Script.lua aan, buiten elke functie, met de titel en de beschrijving die het menu Eigen stages toont: strings, of tabellen per taalcode. Zonder deze aanroep verschijnt de stage nooit in Eigen stages.",
+    "inside_title": "Alles erin houden",
+    "inside_1_head": "Alles in de map van de stage",
+    "inside_1_text": "Zijn texturen, geluiden, lettertypen en teksten staan in zijn eigen map en laden via paden relatief daaraan. Gebruik verder alleen de modules van Global/Modules/Lib (UI.Pick, Input.NavInput, Locale.i18n...) en de activities van de engine: nooit de Lib van een skin of bestanden van een andere stage, die andere spelers misschien niet hebben.",
+    "docs_title": "De documentatie lezen",
+    "docs_1_head": "In de OpenTaiko Hub",
+    "docs_1_text": "De rest staat in de documentatie, in de OpenTaiko Hub: kies je OpenTaiko-instantie en open het tabblad Documentatie op de pagina Home (het verschijnt als je build de documentatie meelevert). Begin met de pagina's Eigen stages en Hoe modules werken."
+}

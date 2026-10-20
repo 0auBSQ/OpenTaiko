@@ -1,0 +1,13 @@
+{
+  "_comment": "English texts of the Online modules (Online.Lobby). Keys are stable ids; this file is the fallback for every other language.",
+  "msg_open_failed": "Could not open the room.",
+  "msg_room_open": "Room open! The code was saved to a folder - share it so friends can join.",
+  "msg_no_code": "No code entered.",
+  "msg_code_other": "That code is for a '%s' room.",
+  "msg_code_invalid": "That code isn't valid.",
+  "msg_join_failed": "Could not join the room.",
+  "connecting": "Connecting...",
+  "msg_chart_failed": "Could not load the chart.",
+  "msg_network_error": "Network error.",
+  "unknown_song": "Unknown song"
+}

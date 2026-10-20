@@ -1,0 +1,12 @@
+{
+  "msg_open_failed": "无法打开房间。",
+  "msg_room_open": "房间已开启！代码已保存到文件夹 - 分享给朋友即可加入。",
+  "msg_no_code": "未输入代码。",
+  "msg_code_other": "该代码属于「%s」房间。",
+  "msg_code_invalid": "该代码无效。",
+  "msg_join_failed": "无法加入房间。",
+  "connecting": "连接中...",
+  "msg_chart_failed": "无法加载谱面。",
+  "msg_network_error": "网络错误。",
+  "unknown_song": "未知歌曲"
+}
