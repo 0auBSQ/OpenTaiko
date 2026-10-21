@@ -16,7 +16,7 @@ internal enum AppMode {
 /// inside <see cref="FDK.Game"/>; this only owns the app-level switches.
 ///
 /// Forms accepted for every option: <c>--name value</c> and <c>--name=value</c> (case-insensitive).
-///   --mode=record  --uid &lt;id&gt;  [--difficulties 3,4] [--fps 60] [--size 1920x1080] [--sample-rate 48000] [--clip-volume=true] [--out file.mp4]
+///   --mode=record  --uid &lt;id&gt;  [--difficulties 3,4] [--fps 60] [--size 1920x1080] [--sample-rate 48000] [--out file.mp4]
 ///   --mode=checkgl
 ///   --hidden       run without showing the window or making a sound (automated boot checks; the log still records everything)
 /// </summary>
@@ -30,7 +30,6 @@ internal sealed class CommandLineArgs {
 	public int Fps = 60;
 	public int Width = 1920, Height = 1080;
 	public int SampleRate = 48000;
-	public bool ClipVolume = true;
 	public string OutPath = "";
 	public string? DifficultiesError;   // set when --difficulties was malformed (surfaced by the consumer)
 	public List<string> Warns = [];
@@ -81,13 +80,6 @@ internal sealed class CommandLineArgs {
 				cli.SampleRate = sampleRate;
 			else
 				cli.Warns.Add($"--sample-rate must be a valid whole number between {sampleRateMin} and {sampleRateMax}; defaulted to {cli.SampleRate}.");
-		}
-		string? strClipVolume = Get(args, "--clip-volume");
-		if (strClipVolume != null) {
-			if (bool.TryParse(strClipVolume, out bool clipVolume))
-				cli.ClipVolume = clipVolume;
-			else
-				cli.Warns.Add($"--clip-volume must be true or false (case-insensitive); defaulted to {cli.ClipVolume}.");
 		}
 
 		cli.OutPath = Get(args, "--out") ?? $"export_{cli.Uid}_{string.Join("-", cli.Difficulties)}.mp4";
