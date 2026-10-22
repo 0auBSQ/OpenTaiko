@@ -17,6 +17,7 @@
         "shortcuts_helper_x": 44, "shortcuts_helper_y": 178, "shortcuts_helper_pulse_ms": 2400, "shortcuts_helper_opacity_min": 0.45,
         "shortcuts_helper_pad_x": 16, "shortcuts_helper_pad_y": 8, "shortcuts_helper_box_alpha": 150, "shortcuts_helper_box_radius": 10,
         "backdrop_width": 980, "backdrop_offset_x": 0, "backdrop_color": [255, 255, 255], "backdrop_alpha": 90, "backdrop_fade": 0, "backdrop_blend": "normal",
+        "select_band_color": [72, 210, 104], "select_band_alpha": 170, "select_band_min": 0.5, "select_band_ms": 900,
         "checker_level_easy": 6,
         "checker_level_normal": 8,
         "checker_level_hard": 9,

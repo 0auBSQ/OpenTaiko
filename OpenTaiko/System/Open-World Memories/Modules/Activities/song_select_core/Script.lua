@@ -318,8 +318,6 @@ function onStart()
     G.bars["random"]           = TEXTURE:CreateTexture("Textures/random.png")
     G.bars["back"]             = TEXTURE:CreateTexture("Textures/back.png")
     G.bars["locked"]           = TEXTURE:CreateTexture("Textures/locked.png")
-    G.bars["selected"]         = TEXTURE:CreateTexture("Textures/selected.png")
-    G.bars["selectedlarge"]    = TEXTURE:CreateTexture("Textures/selectedlarge.png")
     G.bars["selected-arrow-l"] = TEXTURE:CreateTexture("Textures/selected-arrow-l.png")
     G.bars["selected-arrow-r"] = TEXTURE:CreateTexture("Textures/selected-arrow-r.png")
     G.bars["levellabels"]        = TEXTURE:CreateTexture("Textures/bar_levelbg.png")
@@ -453,10 +451,10 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly
         local fadeIn = val - 745; local fadeOut = 2000 - val
         G.difficultyFade4 = math.max(0, math.min(255, fadeIn, fadeOut))
     end)
-    G.startCounter("selectbox_animation", 2000, 0, 1/600, "loop", function(val)
-        local n = 1.01 + math.sin(val * (math.pi * 2 / 2000)) * 0.01
-        if G.bars["selected"]      then G.bars["selected"]:SetScale(n, n)      end
-        if G.bars["selectedlarge"] then G.bars["selectedlarge"]:SetScale(n, n) end
+    -- the selected row's green: from select_band_min to full and back, eased at both ends
+    local bandMin = CFG.num("song_list.select_band_min", 0.5)
+    G.startCounter("selectband_animation", 0, 1000, CFG.num("song_list.select_band_ms", 900) / 1000000, "bounce", function(val)
+        G.selectBandPulse = bandMin + (1 - bandMin) * (0.5 - 0.5 * math.cos(math.pi * val / 1000))
     end)
     G.startCounter("arrows_animation", 10, 0, 1/10, "bounce", function(val)
         G.arrowsDistance = val

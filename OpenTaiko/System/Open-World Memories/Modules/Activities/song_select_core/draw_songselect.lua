@@ -460,6 +460,60 @@ function M.hitTest(mx, my)
     return nil
 end
 
+-- ── The selected row: a segment of the band at the centre bar's height, its green bouncing in and out ──
+-- Baked once like the backdrop (same width, slope and edges), as high as the bar plate plus half the gap to
+-- the next bar above and below (one row of the list); G.selectBandPulse
+-- (0..1, the "selectband_animation" counter) scales its alpha.
+local SELECT_BAND_COLOR = CFG.numList("song_list.select_band_color", { 72, 210, 104 })
+local SELECT_BAND_ALPHA = CFG.num("song_list.select_band_alpha", 170)
+local selectBand = nil         -- { canvas, dx, y }: dx = its offset from the band's canvas x, y = its screen row
+local function drawSelectBand(opacity)
+    local a = opacity * (G.selectBandPulse or 0) * SELECT_BAND_ALPHA / 255
+    if a <= 0 then return end
+    local slope = SONGLIST_OFFSET_X / SONGLIST_OFFSET_Y
+    local W = math.floor(BACKDROP_W)
+    if selectBand == nil then
+        local plateH = BAR_PLATE.bottom - BAR_PLATE.top + 1
+        local gap = math.max(0, math.floor((SONGLIST_OFFSET_Y - plateH) / 2))
+        local top = math.floor(SONGLIST_ORIGIN_Y - G.bars["bar"].Height / 2 + BAR_PLATE.top) - gap
+        local H = plateH + 2 * gap
+        local dx = math.floor(top * slope)
+        local cv = CANVAS:CreateCanvas(W + math.ceil(H * slope) + 2, H)
+        cv:ClearTransparent()
+        local fade = math.max(0, math.min(math.floor(BACKDROP_FADE), math.floor(W / 4)))
+        local step = 4
+        local cr, cg, cb = SELECT_BAND_COLOR[1] or 0, SELECT_BAND_COLOR[2] or 0, SELECT_BAND_COLOR[3] or 0
+        local function fill(x, y, w, al) cv:FillRect(x, y, w, 1, cr, cg, cb, al) end
+        for r = 0, H - 1 do
+            -- the band's own row top + r, so both edges line up with the backdrop's
+            local xf = (top + r) * slope - dx
+            if fade == 0 then
+                local x = math.floor(xf)
+                local part = xf - x
+                fill(x, r, 1, math.floor(255 * (1 - part) + 0.5))
+                fill(x + 1, r, W - 1, 255)
+                fill(x + W, r, 1, math.floor(255 * part + 0.5))
+            else
+                local x = math.floor(xf + 0.5)
+                fill(x + fade, r, W - 2 * fade, 255)
+                for f = 0, fade - 1, step do
+                    local al = math.floor(255 * (f + step) / (fade + step) + 0.5)
+                    local wdt = math.min(step, fade - f)
+                    fill(x + f, r, wdt, al)
+                    fill(x + W - f - wdt, r, wdt, al)
+                end
+            end
+        end
+        cv:Upload()
+        selectBand = { canvas = cv, dx = dx, y = top }
+    end
+    local x0 = SONGLIST_ORIGIN_X + BACKDROP_DX - SONGLIST_ORIGIN_Y * slope - W / 2
+    local cv = selectBand.canvas
+    cv:SetOpacity(a)
+    cv:Draw(math.floor(x0 - G.songSelectShift + 0.5) + selectBand.dx, selectBand.y)
+    cv:SetOpacity(1)
+end
+
 -- ── Folder open/close animation ─────────────────────────────────────────────────
 -- Driven by G.folderAnim (set up in navigation.lua): { mode="open"/"close", phase=1/2, t=0..1,
 -- oldBars/newBars = { {i, pt}, ... } sorted outer-first, folderPt = the folder's own bar }.
@@ -565,6 +619,7 @@ function M.drawPanel()
 
     -- the translucent band the bars sit on: under everything else of the panel, the song info included
     if opacityNorm > 0 then drawListBackdrop(opacityNorm) end
+    if G.folderAnim == nil and G.pageTexts ~= nil then drawSelectBand(opacityNorm) end
 
     -- Random / song info panels (all node-derived data comes from the selection cache — see navigation.lua)
     if sel ~= nil and sel.isRandom then
@@ -651,7 +706,7 @@ function M.drawPanel()
     drawPreimage()
 
     -- Song list bars. While a folder is opening/closing, the animation owns the list (and hides the
-    -- selected-bar frame + arrows); otherwise draw the normal diagonal list.
+    -- selected row's band + arrows); otherwise draw the normal diagonal list.
     if G.folderAnim ~= nil then
         drawFolderAnim()
     elseif G.pageTexts ~= nil then
@@ -660,20 +715,13 @@ function M.drawPanel()
             drawBar(tx, xpos, ypos)
         end
 
-        -- Selected bar + animated arrows
+        -- the animated arrows around the selected bar
         local x0     = SONGLIST_ORIGIN_X + SONGLIST_SELECTED_X_DIFF - G.songSelectShift
         local y0     = SONGLIST_ORIGIN_Y
         local ax     = G.arrowsDistance
         local xlshift = ax * math.cos(7 * math.pi / 12)
         local ylshift = ax * math.sin(7 * math.pi / 12)
         local isUnlockedSong = sel ~= nil and sel.isSong and sel.isUnlockedSong
-        if isUnlockedSong then
-            -- selectedlarge covers bar + barleft; align its right edge with selected's right edge
-            local largeCenterX = x0 - (G.bars["selectedlarge"].Width - G.bars["selected"].Width) / 2
-            G.bars["selectedlarge"]:DrawAtAnchor(largeCenterX, y0, "center")
-        else
-            G.bars["selected"]:DrawAtAnchor(x0, y0, "center")
-        end
         -- Left arrow shifts 67px further left when an unlocked song is selected to clear barleft
         local arrowLOffset = isUnlockedSong and BARLEFT_X_OFFSET or 0
         G.bars["selected-arrow-l"]:DrawAtAnchor(x0 - SONGLIST_SELECTED_ARROW_GAP/2 + xlshift + arrowLOffset, y0 - ylshift, "left")
