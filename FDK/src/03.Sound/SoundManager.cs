@@ -13,6 +13,30 @@ public class SoundManager   // : CSound
 			or ESoundDeviceType.ExclusiveWASAPI
 			or ESoundDeviceType.SharedWASAPI;
 
+	/// <summary>The devices tried in turn for a requested one: WASAPI and ASIO mean BASS outside Windows (a
+	/// Config.ini copied from Windows); then the requested device, the ones after it in the setting's order,
+	/// BASS when it was not among them, and none (Unknown) last.</summary>
+	public static List<ESoundDeviceType> DeviceTryOrder(ESoundDeviceType requested, bool isWindows) {
+		ESoundDeviceType[] order = {
+			ESoundDeviceType.Bass,
+			ESoundDeviceType.ExclusiveWASAPI,
+			ESoundDeviceType.SharedWASAPI,
+			ESoundDeviceType.ASIO,
+		};
+		if (!isWindows && requested is ESoundDeviceType.ExclusiveWASAPI or ESoundDeviceType.SharedWASAPI or ESoundDeviceType.ASIO)
+			requested = ESoundDeviceType.Bass;
+		var list = new List<ESoundDeviceType>();
+		int start = Array.IndexOf(order, requested);
+		if (start >= 0) {
+			for (int i = start; i < order.Length; i++)
+				list.Add(order[i]);
+		}
+		if (!list.Contains(ESoundDeviceType.Bass))
+			list.Add(ESoundDeviceType.Bass);
+		list.Add(ESoundDeviceType.Unknown);
+		return list;
+	}
+
 	private static ISoundDevice SoundDevice {
 		get; set;
 	}
@@ -227,41 +251,17 @@ public class SoundManager   // : CSound
 		ASIODevice = _nASIODevice;
 		bUseOSTimer = _bUseOSTimer;
 
-		ESoundDeviceType[] ESoundDeviceTypes = new ESoundDeviceType[5]
-		{
-			ESoundDeviceType.Bass,
-			ESoundDeviceType.ExclusiveWASAPI,
-			ESoundDeviceType.SharedWASAPI,
-			ESoundDeviceType.ASIO,
-			ESoundDeviceType.Unknown
-		};
-
-		int initialDevice;
-		switch (soundDeviceType) {
-			case ESoundDeviceType.Bass:
-				initialDevice = 0;
-				break;
-			case ESoundDeviceType.ExclusiveWASAPI:
-				initialDevice = 1;
-				break;
-			case ESoundDeviceType.SharedWASAPI:
-				initialDevice = 2;
-				break;
-			case ESoundDeviceType.ASIO:
-				initialDevice = 3;
-				break;
-			default:
-				initialDevice = 4;
-				break;
-		}
-		for (SoundDeviceType = ESoundDeviceTypes[initialDevice]; ; SoundDeviceType = ESoundDeviceTypes[++initialDevice]) {
+		if (!OperatingSystem.IsWindows() && soundDeviceType is ESoundDeviceType.ExclusiveWASAPI or ESoundDeviceType.SharedWASAPI or ESoundDeviceType.ASIO)
+			Trace.TraceInformation($"{soundDeviceType} is only available on Windows; using BASS.");
+		foreach (var deviceType in DeviceTryOrder(soundDeviceType, OperatingSystem.IsWindows())) {
+			SoundDeviceType = deviceType;
 			try {
 				tReloadSoundDeviceAndSound();
 				break;
 			} catch (Exception e) {
 				Trace.TraceError(e.ToString());
 				Trace.TraceError("例外が発生しましたが処理を継続します。 (2609806d-23e8-45c2-9389-b427e80915bc)");
-				if (ESoundDeviceTypes[initialDevice] == ESoundDeviceType.Unknown) {
+				if (deviceType == ESoundDeviceType.Unknown) {
 					Trace.TraceError(string.Format("サウンドデバイスの初期化に失敗しました。"));
 					break;
 				}

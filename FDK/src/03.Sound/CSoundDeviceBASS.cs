@@ -93,6 +93,26 @@ public partial class CSoundDeviceBASS : ISoundDevice {
 		// CSoundDeviceBASS.Android.cs) — the configs must be applied BEFORE Bass.Init.
 		if (OperatingSystem.IsAndroid())
 			freq = ConfigureAndroidLowLatency();
+		// Linux: PipeWire and PulseAudio run at 48 kHz, so asking for it saves them a resampling step
+		else if (OperatingSystem.IsLinux())
+			freq = 48000;
+
+		// Desktop: configured before Bass.Init, since the device buffer (Linux) only applies to devices
+		// opened afterwards; the other options are global and unchanged by the order
+		bool isMobile = OperatingSystem.IsIOS() || OperatingSystem.IsAndroid();
+		if (!isMobile) {
+			if (!Bass.Configure(Configuration.UpdatePeriod, updatePeriod)) {
+				Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdatePeriod)}) に失敗しました。[{Bass.LastError}]");
+			}
+			if (!Bass.Configure(Configuration.UpdateThreads, 1)) {
+				Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdateThreads)}) に失敗しました。[{Bass.LastError}]");
+			}
+
+			Bass.Configure(Configuration.PlaybackBufferLength, bufferSize);
+			if (OperatingSystem.IsLinux())
+				Bass.Configure(Configuration.DeviceBufferLength, bufferSize);
+			Bass.Configure(Configuration.LogarithmicVolumeCurve, true);
+		}
 
 		if (!Bass.Init(-1, freq, DeviceInitFlags.Latency)) {
 			// The tuned Android config can be rejected by some devices/HALs — fall back to safe
@@ -105,21 +125,14 @@ public partial class CSoundDeviceBASS : ISoundDevice {
 		// Mobile plays each sound straight through Bass.ChannelPlay: BassMix's manual
 		// StreamProc→device pump produces no audio on iOS or Android (verified — the mixer runs but
 		// emits pure silence and is pulled well below realtime). Desktop keeps the mixer pipeline.
-		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) {
+		if (isMobile) {
 			InitializeDirectPlayback();
 			return;
 		}
 
-		if (!Bass.Configure(Configuration.UpdatePeriod, updatePeriod)) {
-			Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdatePeriod)}) に失敗しました。[{Bass.LastError}]");
-		}
-		if (!Bass.Configure(Configuration.UpdateThreads, 1)) {
-			Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdateThreads)}) に失敗しました。[{Bass.LastError}]");
-		}
-
-		Bass.Configure(Configuration.PlaybackBufferLength, bufferSize);
-		Bass.Configure(Configuration.DeviceBufferLength, bufferSize);
-		Bass.Configure(Configuration.LogarithmicVolumeCurve, true);
+		// macOS outputs at the device's own rate whatever was asked: the mixers run at it too
+		if (OperatingSystem.IsMacOS() && Bass.GetInfo(out var deviceInfo) && deviceInfo.SampleRate > 0)
+			freq = deviceInfo.SampleRate;
 
 		this.STREAMPROC = new StreamProcedure(StreamProc);
 		this.MainStreamHandle = Bass.CreateStream(freq, 2, BassFlags.Default, this.STREAMPROC, IntPtr.Zero);
@@ -181,6 +194,7 @@ public partial class CSoundDeviceBASS : ISoundDevice {
 			this.BufferSize = this.OutputDelay = info.Latency + bufferSize;//求め方があっているのだろうか…
 
 			Trace.TraceInformation("BASS デバイス出力開始:[{0}ms]", this.OutputDelay);
+			Trace.TraceInformation($"BASS device: mixer {freq} Hz, device rate {info.SampleRate} Hz, latency {info.Latency} ms, minimum buffer {info.MinBufferLength} ms, buffer setting {bufferSize} ms");
 		}
 
 		Bass.ChannelPlay(this.MainStreamHandle, false);
