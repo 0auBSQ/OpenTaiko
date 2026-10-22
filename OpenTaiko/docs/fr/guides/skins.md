@@ -44,6 +44,8 @@ Copiez `System/Open-World Memories/` vers un nouveau dossier voisin, par exemple
 - `AIBattleCharacter=` : dossier de personnage utilisé pour l'adversaire IA (étape 5).
 - `AIBattleNameplate=` : identifiant de la plaque de nom que porte l'adversaire IA (étape 5).
 - `FontName<LANG>=` et `BoxFontName<LANG>=` : fichier de police par langue du jeu, où `<LANG>` est le code de langue en majuscules (`EN`, `JA`, `FR`, `ES`, `NL`, `DE`, `RU`, `KO`, `ZH`). Le chemin est relatif à la racine du skin (un chemin absolu fonctionne aussi) et le fichier doit exister, sinon l'analyseur abandonne la clé.
+- `FontKerning=` : `1` (par défaut) applique le crénage de la police entre lettres voisines, de sorte que des paires comme `AV` ou `Ta` se rapprochent ; `0` le désactive. Le texte vertical est toujours composé un caractère par case, sans crénage.
+- `FontPalt=` : `1` active les chasses proportionnelles de la police pour le japonais (la fonctionnalité OpenType `palt`) : kana, ponctuation et crochets prennent leur propre largeur au lieu d'un carré entier. `0` (par défaut) garde l'espacement pleine chasse. Seules les polices qui ont cette fonctionnalité changent.
 
 Toute autre clé (`Game_*`, `Result_*`, `Title_*` et ainsi de suite) est une valeur de disposition d'écran. Le même analyseur les lit, ce qui explique qu'elles puissent vivre dans les fichiers inclus de l'étape 6.
 
@@ -64,6 +66,8 @@ FontNameEN=Fonts/MPLUSRounded1c-Medium.ttf
 FontNameJA=Fonts/MPLUSRounded1c-Medium.ttf
 BoxFontNameEN=Fonts/MPLUSRounded1c-Regular.ttf
 BoxFontNameJA=Fonts/MPLUSRounded1c-Regular.ttf
+FontKerning=1
+FontPalt=0
 ```
 
 ## Étape 4 : L'option Resolutions

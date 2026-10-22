@@ -44,6 +44,8 @@ System/
 - `AIBattleCharacter=`: AI の対戦相手に使うキャラクターフォルダ (ステップ 5)。
 - `AIBattleNameplate=`: AI の対戦相手が装備するネームプレートの id (ステップ 5)。
 - `FontName<LANG>=` と `BoxFontName<LANG>=`: ゲーム言語ごとのフォントファイル。`<LANG>` は大文字の言語コード (`EN`、`JA`、`FR`、`ES`、`NL`、`DE`、`RU`、`KO`、`ZH`) です。パスはスキンのルートからの相対パス (絶対パスも可) で、ファイルが存在しなければパーサーはキーを破棄します。
+- `FontKerning=`: `1` (既定) は隣り合う文字の間にフォントのカーニングを適用し、`AV` や `Ta` のような組が詰まります。`0` で無効になります。縦書きのテキストはカーニングなしで常に 1 文字ずつ組まれます。
+- `FontPalt=`: `1` は日本語用のフォントのプロポーショナル幅 (OpenType 機能 `palt`) を有効にし、かな・句読点・括弧が全角の正方形ではなくそれぞれの幅になります。`0` (既定) は全角の字送りのままです。この機能を持つフォントだけが変わります。
 
 それ以外のすべてのキー (`Game_*`、`Result_*`、`Title_*` など) は画面のレイアウト値です。同じパーサーがこれらを読み取るため、ステップ 6 のインクルードされるファイルに置くことができます。
 
@@ -64,6 +66,8 @@ FontNameEN=Fonts/MPLUSRounded1c-Medium.ttf
 FontNameJA=Fonts/MPLUSRounded1c-Medium.ttf
 BoxFontNameEN=Fonts/MPLUSRounded1c-Regular.ttf
 BoxFontNameJA=Fonts/MPLUSRounded1c-Regular.ttf
+FontKerning=1
+FontPalt=0
 ```
 
 ## ステップ 4: Resolutions オプション

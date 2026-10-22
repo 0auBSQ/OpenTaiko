@@ -79,6 +79,7 @@ public class CCachedFontRenderer : CFontRenderer {
 	#endregion
 
 	protected new SKBitmap DrawText(string drawstr, DrawMode drawmode, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradationBottomColor, int edge_Ratio, bool keepCenter = false) {
+		this.DropCacheOnShapingChange();
 		#region [ 以前レンダリングしたことのある文字列/フォントか? (キャッシュにヒットするか?) ]
 		int index = listFontCache.FindIndex(
 			delegate (FontCache fontcache) {
@@ -132,6 +133,7 @@ public class CCachedFontRenderer : CFontRenderer {
 	}
 
 	protected new SKBitmap DrawText_V(string drawstr, DrawMode drawmode, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradationBottomColor, int edge_Ratio, bool keepCenter = false) {
+		this.DropCacheOnShapingChange();
 		#region [ 以前レンダリングしたことのある文字列/フォントか? (キャッシュにヒットするか?) ]
 		int index = listFontCache.FindIndex(
 			delegate (FontCache fontcache) {
@@ -182,6 +184,18 @@ public class CCachedFontRenderer : CFontRenderer {
 			#endregion
 		}
 	}
+
+	// the cached bitmaps were shaped with other font features: render again from now on
+	private void DropCacheOnShapingChange() {
+		int generation = ShapingGeneration;
+		if (generation == this.shapingGeneration)
+			return;
+		this.shapingGeneration = generation;
+		foreach (FontCache bc in listFontCache)
+			bc.bmp?.Dispose();
+		listFontCache.Clear();
+	}
+	private int shapingGeneration = ShapingGeneration;
 
 	#region [ IDisposable 実装 ]
 	//-----------------

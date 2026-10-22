@@ -44,6 +44,8 @@ Kopieren Sie `System/Open-World Memories/` in einen neuen Nachbarordner, zum Bei
 - `AIBattleCharacter=`: Charakterordner für den KI-Gegner (Schritt 5).
 - `AIBattleNameplate=`: ID des Namensschilds, das der KI-Gegner trägt (Schritt 5).
 - `FontName<LANG>=` und `BoxFontName<LANG>=`: Schriftdatei pro Spielsprache, wobei `<LANG>` der großgeschriebene Sprachcode ist (`EN`, `JA`, `FR`, `ES`, `NL`, `DE`, `RU`, `KO`, `ZH`). Der Pfad ist relativ zur Skin-Wurzel (ein absoluter Pfad funktioniert ebenfalls), und die Datei muss existieren, andernfalls verwirft der Parser den Schlüssel.
+- `FontKerning=`: `1` (Standard) wendet das Kerning der Schrift zwischen benachbarten Buchstaben an, sodass Paare wie `AV` oder `Ta` enger stehen; `0` schaltet es aus. Vertikaler Text wird immer ein Zeichen pro Zelle gesetzt, ohne Kerning.
+- `FontPalt=`: `1` schaltet die proportionalen Breiten der Schrift für Japanisch ein (das OpenType-Feature `palt`): Kana, Satzzeichen und Klammern nehmen ihre eigene Breite statt eines vollen Quadrats ein. `0` (Standard) behält die volle Breite bei. Nur Schriften mit diesem Feature ändern sich.
 
 Jeder andere Schlüssel (`Game_*`, `Result_*`, `Title_*` und so weiter) ist ein Bildschirm-Layout-Wert. Derselbe Parser liest sie, weshalb sie in den eingebundenen Dateien aus Schritt 6 liegen können.
 
@@ -64,6 +66,8 @@ FontNameEN=Fonts/MPLUSRounded1c-Medium.ttf
 FontNameJA=Fonts/MPLUSRounded1c-Medium.ttf
 BoxFontNameEN=Fonts/MPLUSRounded1c-Regular.ttf
 BoxFontNameJA=Fonts/MPLUSRounded1c-Regular.ttf
+FontKerning=1
+FontPalt=0
 ```
 
 ## Schritt 4: Die Option Resolutions

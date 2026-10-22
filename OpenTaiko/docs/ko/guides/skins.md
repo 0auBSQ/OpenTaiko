@@ -44,6 +44,8 @@ System/
 - `AIBattleCharacter=`: AI 상대에 사용하는 캐릭터 폴더(5단계).
 - `AIBattleNameplate=`: AI 상대가 장착하는 네임플레이트의 id(5단계).
 - `FontName<LANG>=`과 `BoxFontName<LANG>=`: 게임 언어별 폰트 파일. `<LANG>`은 대문자 언어 코드(`EN`, `JA`, `FR`, `ES`, `NL`, `DE`, `RU`, `KO`, `ZH`)입니다. 경로는 스킨 루트 기준 상대 경로이며(절대 경로도 가능) 파일이 존재해야 합니다. 없으면 파서가 키를 버립니다.
+- `FontKerning=`: `1`(기본값)은 이웃한 글자 사이에 폰트의 커닝을 적용해 `AV`나 `Ta` 같은 쌍이 더 가깝게 붙습니다. `0`은 커닝을 끕니다. 세로 텍스트는 커닝 없이 항상 한 칸에 한 글자씩 배치됩니다.
+- `FontPalt=`: `1`은 일본어용 폰트의 비례 폭(OpenType 기능 `palt`)을 켜서 가나, 구두점, 괄호가 전각 정사각형 대신 각자의 폭을 차지합니다. `0`(기본값)은 전각 간격을 유지합니다. 이 기능이 있는 폰트만 달라집니다.
 
 다른 모든 키(`Game_*`, `Result_*`, `Title_*` 등)는 화면 레이아웃 값입니다. 같은 파서가 읽으므로 6단계의 포함 파일에 둘 수 있습니다.
 
@@ -64,6 +66,8 @@ FontNameEN=Fonts/MPLUSRounded1c-Medium.ttf
 FontNameJA=Fonts/MPLUSRounded1c-Medium.ttf
 BoxFontNameEN=Fonts/MPLUSRounded1c-Regular.ttf
 BoxFontNameJA=Fonts/MPLUSRounded1c-Regular.ttf
+FontKerning=1
+FontPalt=0
 ```
 
 ## 4단계: Resolutions 옵션

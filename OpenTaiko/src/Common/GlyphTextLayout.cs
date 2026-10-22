@@ -7,8 +7,8 @@ using System.Text.RegularExpressions;
 namespace OpenTaiko;
 
 // Pure layout helpers for glyph-composed text rendering (LuaGlyphText): color-tag tokenizing, word wrap and
-// squish math. No font or GPU dependencies — advances are supplied by the caller — so all of it is
-// unit-testable headless.
+// squish math. No font or GPU dependencies — advances and pair kerning are supplied by the caller — so all of it
+// is unit-testable headless.
 public static class GlyphTextLayout {
 	// keep in sync with CSkiaSharpTextRenderer.TagRegex and StringExtensions.TagRegex
 	private static readonly Regex TagRegex = new(@"<(/?)([gc](?:\.#[0-9a-fA-F]{6})*?)>", RegexOptions.Compiled);
@@ -65,27 +65,38 @@ public static class GlyphTextLayout {
 		}
 	}
 
-	// a wrapped line: runes[Start .. Start+Count), Width = advance sum incl. inner spaces (edge spaces dropped)
+	// a wrapped line: runes[Start .. Start+Count), Width = advance sum incl. inner spaces and the kerning between the
+	// line's runes (edge spaces dropped)
 	public readonly record struct Line(int Start, int Count, double Width);
+
+	// The kerning between runes[i] and runes[i + 1], from kern(first, second): only between neighbours of one style,
+	// since the string renderer shapes the text between colour tags on its own, and never across a line break.
+	public static double PairKern(IReadOnlyList<StyledRune> runes, int i, Func<int, int, double>? kern) {
+		if (kern == null || i < 0 || i + 1 >= runes.Count) return 0;
+		StyledRune a = runes[i], b = runes[i + 1];
+		if (a.StyleId != b.StyleId || a.CodePoint == '\n' || b.CodePoint == '\n') return 0;
+		return kern(a.CodePoint, b.CodePoint);
+	}
 
 	// Greedy word wrap. '\n' always breaks; spaces are break points and are dropped at line edges; CJK runes
 	// may break between any two runes; an unbreakable run wider than maxWidth hard-breaks mid-run.
 	// maxWidth <= 0 disables width wrapping (only '\n' splits). advance() supplies each rune's width in the
-	// same unit as maxWidth.
-	public static List<Line> Wrap(IReadOnlyList<StyledRune> runes, double maxWidth, Func<int, double> advance) {
+	// same unit as maxWidth, kern() the kerning between two neighbouring runes (none when null).
+	public static List<Line> Wrap(IReadOnlyList<StyledRune> runes, double maxWidth, Func<int, double> advance, Func<int, int, double>? kern = null) {
 		var lines = new List<Line>();
 		int n = runes.Count;
 		int lineStart = -1, lineEnd = -1;   // current line rune range (-1 = empty line so far)
 		double lineWidth = 0;
 		int pendingSpaces = 0;              // spaces seen since the last word, not yet committed to the line
 		double pendingWidth = 0;
+		double K(int at) => PairKern(runes, at, kern);   // kerning between runes[at] and runes[at + 1]
 
 		void Flush() {
 			lines.Add(lineStart < 0 ? new Line(0, 0, 0) : new Line(lineStart, lineEnd - lineStart, lineWidth));
 			lineStart = lineEnd = -1; lineWidth = 0; pendingSpaces = 0; pendingWidth = 0;
 		}
 		void Append(int start, int endEx, double width) {
-			if (lineStart < 0) { lineStart = start; lineWidth = 0; } else { lineWidth += pendingWidth; }
+			if (lineStart < 0) { lineStart = start; lineWidth = 0; } else { lineWidth += pendingWidth + K(start - 1); }
 			lineEnd = endEx; lineWidth += width;
 			pendingSpaces = 0; pendingWidth = 0;
 		}
@@ -94,7 +105,10 @@ public static class GlyphTextLayout {
 		while (i < n) {
 			int cp = runes[i].CodePoint;
 			if (cp == '\n') { Flush(); i++; continue; }
-			if (cp == ' ') { pendingSpaces++; pendingWidth += advance(cp); i++; continue; }
+			if (cp == ' ') {
+				// a space joins the line after its predecessor (the line's end or an earlier pending space)
+				pendingSpaces++; pendingWidth += (lineStart >= 0 ? K(i - 1) : 0) + advance(cp); i++; continue;
+			}
 
 			// collect one unbreakable word: a single CJK rune, or a run of non-space non-CJK runes
 			int wordStart = i;
@@ -104,12 +118,12 @@ public static class GlyphTextLayout {
 				i++;
 			} else {
 				while (i < n && runes[i].CodePoint != ' ' && runes[i].CodePoint != '\n' && !IsCjk(runes[i].CodePoint)) {
-					wordWidth += advance(runes[i].CodePoint);
+					wordWidth += (i > wordStart ? K(i - 1) : 0) + advance(runes[i].CodePoint);
 					i++;
 				}
 			}
 
-			if (maxWidth > 0 && lineStart >= 0 && lineWidth + pendingWidth + wordWidth > maxWidth) {
+			if (maxWidth > 0 && lineStart >= 0 && lineWidth + pendingWidth + K(wordStart - 1) + wordWidth > maxWidth) {
 				Flush();   // drops the pending spaces at the break
 			}
 			if (maxWidth > 0 && lineStart < 0 && wordWidth > maxWidth && (i - wordStart) > 1) {
@@ -119,11 +133,12 @@ public static class GlyphTextLayout {
 				int chunkStart = wordStart;
 				while (j < i) {
 					double a = advance(runes[j].CodePoint);
-					if (w > 0 && w + a > maxWidth) {
+					double k = j > chunkStart ? K(j - 1) : 0;
+					if (w > 0 && w + k + a > maxWidth) {
 						lines.Add(new Line(chunkStart, j - chunkStart, w));
-						chunkStart = j; w = 0;
+						chunkStart = j; w = 0; k = 0;
 					}
-					w += a; j++;
+					w += k + a; j++;
 				}
 				Append(chunkStart, i, w);
 				continue;

@@ -44,6 +44,8 @@ Copia `System/Open-World Memories/` a una nueva carpeta hermana, por ejemplo `Sy
 - `AIBattleCharacter=`: carpeta de personaje usada para el oponente IA (Paso 5).
 - `AIBattleNameplate=`: id de la placa de nombre que lleva el oponente IA (Paso 5).
 - `FontName<LANG>=` y `BoxFontName<LANG>=`: archivo de fuente por idioma del juego, donde `<LANG>` es el código de idioma en mayúsculas (`EN`, `JA`, `FR`, `ES`, `NL`, `DE`, `RU`, `KO`, `ZH`). La ruta es relativa a la raíz del skin (una ruta absoluta también funciona) y el archivo debe existir; si no, el analizador descarta la clave.
+- `FontKerning=`: `1` (por defecto) aplica el interletraje (kerning) de la fuente entre letras vecinas, de modo que pares como `AV` o `Ta` quedan más juntos; `0` lo desactiva. El texto vertical siempre se compone un carácter por celda, sin kerning.
+- `FontPalt=`: `1` activa los anchos proporcionales de la fuente para el japonés (la característica OpenType `palt`): los kana, la puntuación y los corchetes ocupan su propio ancho en lugar de un cuadrado completo. `0` (por defecto) mantiene el espaciado de ancho completo. Solo cambian las fuentes que tienen esa característica.
 
 Todas las demás claves (`Game_*`, `Result_*`, `Title_*`, etc.) son valores de disposición de pantalla. El mismo analizador las lee, y por eso pueden vivir en los archivos incluidos del Paso 6.
 
@@ -64,6 +66,8 @@ FontNameEN=Fonts/MPLUSRounded1c-Medium.ttf
 FontNameJA=Fonts/MPLUSRounded1c-Medium.ttf
 BoxFontNameEN=Fonts/MPLUSRounded1c-Regular.ttf
 BoxFontNameJA=Fonts/MPLUSRounded1c-Regular.ttf
+FontKerning=1
+FontPalt=0
 ```
 
 ## Paso 4: La opción Resolutions

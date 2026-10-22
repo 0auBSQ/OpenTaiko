@@ -44,6 +44,8 @@ Copy `System/Open-World Memories/` to a new sibling folder, for example `System/
 - `AIBattleCharacter=`: character folder used for the AI opponent (Step 5).
 - `AIBattleNameplate=`: id of the nameplate the AI opponent wears (Step 5).
 - `FontName<LANG>=` and `BoxFontName<LANG>=`: font file per game language, where `<LANG>` is the upper-cased language code (`EN`, `JA`, `FR`, `ES`, `NL`, `DE`, `RU`, `KO`, `ZH`). The path is relative to the skin root (an absolute path also works) and the file must exist, otherwise the parser drops the key.
+- `FontKerning=`: `1` (default) applies the font's kerning between neighbouring letters, so pairs such as `AV` or `Ta` sit closer; `0` turns it off. Vertical text is always set one character per cell, without kerning.
+- `FontPalt=`: `1` turns on the font's proportional widths for Japanese (the OpenType feature `palt`): kana, punctuation and brackets take their own width instead of a full square. `0` (default) keeps the full-width spacing. Only fonts that have the feature change.
 
 Every other key (`Game_*`, `Result_*`, `Title_*` and so on) is a screen layout value. The same parser reads them, which is why they can live in the included files of Step 6.
 
@@ -64,6 +66,8 @@ FontNameEN=Fonts/MPLUSRounded1c-Medium.ttf
 FontNameJA=Fonts/MPLUSRounded1c-Medium.ttf
 BoxFontNameEN=Fonts/MPLUSRounded1c-Regular.ttf
 BoxFontNameJA=Fonts/MPLUSRounded1c-Regular.ttf
+FontKerning=1
+FontPalt=0
 ```
 
 ## Step 4: The Resolutions option

@@ -88,6 +88,13 @@ public class CFontRenderer : IDisposable {
 	public static SKTypeface TypefaceFor(SKTypeface typeface, int codepoint, FallbackList list = FallbackList.Main)
 		=> CSkiaSharpTextRenderer.TypefaceFor(typeface, codepoint, list);
 
+	/// <summary>The font features text is shaped with, from the skin: the font's kerning, and its proportional widths for
+	/// Japanese (the OpenType feature palt). Text drawn or measured afterwards uses them.</summary>
+	public static void SetShapingFeatures(bool kerning, bool proportionalJapanese) => CTextShaper.SetFeatures(kerning, proportionalJapanese);
+
+	/// <summary>Changes whenever the shaping features change: text measured or drawn under another value is out of date.</summary>
+	public static int ShapingGeneration => CTextShaper.Generation;
+
 	/// <summary>The fallback list this renderer uses (Main unless set); set it before drawing.</summary>
 	public FallbackList Fallbacks {
 		get => this.textRenderer.Fallbacks;
@@ -160,6 +167,9 @@ public class CFontRenderer : IDisposable {
 	// advance width of s in px (no padding; includes trailing spaces) — for glyph-composed layout
 	public float MeasureText(string s) => this.textRenderer?.MeasureText(s) ?? 0f;
 
+	// how far the font's kerning moves `second` when it follows `first` in DrawText (negative tucks it in)
+	public float MeasureKerning(string first, string second) => this.textRenderer?.PairKerning(first, second) ?? 0f;
+
 	// ink line height (ascent + descent); a 1-line DrawText bitmap is this + TextPadding tall
 	public float GetLineHeight() => this.textRenderer?.GetLineHeight() ?? 0f;
 
@@ -201,7 +211,7 @@ public class CFontRenderer : IDisposable {
 			string[] splitted = TextElements(tok.s);
 
 			for (int i = 0; i < splitted.Length; i++) {
-				strImageList[_idx] = this.textRenderer.DrawText(splitted[i], drawmode, tok.TextColor, tok.OutlineColor, secondEdgeColor, tok.GradiantTop, tok.GradiantBottom, edge_Ratio, false);
+				strImageList[_idx] = this.textRenderer.DrawText(splitted[i], drawmode, tok.TextColor, tok.OutlineColor, secondEdgeColor, tok.GradiantTop, tok.GradiantBottom, edge_Ratio, false, perCharacter: true);
 
 				//回転する文字
 				if (Rotate_Chara_List_Vertical.Contains(splitted[i])) {

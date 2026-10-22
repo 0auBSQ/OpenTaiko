@@ -1,4 +1,5 @@
 using FDK;
+using Xunit;
 
 namespace OpenTaiko.Tests;
 

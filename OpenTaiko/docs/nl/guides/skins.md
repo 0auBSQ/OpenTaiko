@@ -44,6 +44,8 @@ Kopieer `System/Open-World Memories/` naar een nieuwe map ernaast, bijvoorbeeld 
 - `AIBattleCharacter=`: personagemap die voor de AI-tegenstander wordt gebruikt (Stap 5).
 - `AIBattleNameplate=`: id van het naamplaatje dat de AI-tegenstander draagt (Stap 5).
 - `FontName<LANG>=` en `BoxFontName<LANG>=`: lettertypebestand per speltaal, waarbij `<LANG>` de taalcode in hoofdletters is (`EN`, `JA`, `FR`, `ES`, `NL`, `DE`, `RU`, `KO`, `ZH`). Het pad is relatief ten opzichte van de skinroot (een absoluut pad werkt ook) en het bestand moet bestaan, anders laat de parser de sleutel weg.
+- `FontKerning=`: `1` (standaard) past de kerning van het lettertype toe tussen naburige letters, zodat paren als `AV` of `Ta` dichter bij elkaar staan; `0` zet het uit. Verticale tekst wordt altijd één teken per vak gezet, zonder kerning.
+- `FontPalt=`: `1` zet de proportionele breedtes van het lettertype voor Japans aan (de OpenType-functie `palt`): kana, leestekens en haakjes krijgen hun eigen breedte in plaats van een vol vierkant. `0` (standaard) houdt de volle breedte aan. Alleen lettertypen met deze functie veranderen.
 
 Elke andere sleutel (`Game_*`, `Result_*`, `Title_*` enzovoort) is een lay-outwaarde van een scherm. Dezelfde parser leest ze, en daarom kunnen ze in de ingesloten bestanden van Stap 6 staan.
 
@@ -64,6 +66,8 @@ FontNameEN=Fonts/MPLUSRounded1c-Medium.ttf
 FontNameJA=Fonts/MPLUSRounded1c-Medium.ttf
 BoxFontNameEN=Fonts/MPLUSRounded1c-Regular.ttf
 BoxFontNameJA=Fonts/MPLUSRounded1c-Regular.ttf
+FontKerning=1
+FontPalt=0
 ```
 
 ## Stap 4: De optie Resolutions

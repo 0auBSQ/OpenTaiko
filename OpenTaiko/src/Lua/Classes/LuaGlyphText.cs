@@ -10,7 +10,8 @@ namespace OpenTaiko {
 	// of caching one texture per string (LuaText.GetText) which grows without bound. Post-processing applies
 	// per letter: the maxWidth squish scales every glyph individually. Glyph bitmaps share GetText's geometry
 	// (25px left/right/bottom padding, ink top at y=0), so a glyph drawn at (x + pen, y) lands exactly where
-	// the equivalent string texture drawn at (x, y) would put that character.
+	// the equivalent string texture drawn at (x, y) would put that character. Neighbouring characters of one style
+	// keep the font's kerning, measured once per pair by the string renderer, so the pen moves as it does there.
 	//
 	// Each character bakes a white fill (tinted with the fore colour at draw) and, on first use with a visible
 	// outline, a white edge stroke (tinted with the outline colour). Gradient fills bake their colours in.
@@ -50,6 +51,10 @@ namespace OpenTaiko {
 		private readonly Dictionary<FillKey, Slot?> _fills = [];   // null = whitespace or a failed bake
 		private readonly Dictionary<int, Slot?> _edges = [];
 		private readonly Dictionary<int, double> _advances = [];
+		private readonly Dictionary<(int, int), double> _kerns = [];
+		private readonly Func<int, double> _advanceOf;
+		private readonly Func<int, int, double> _kernOf;
+		private int _shapingGeneration = CFontRenderer.ShapingGeneration;   // the font features the caches were made with
 
 		private struct Placement {
 			public Slot? Fill, Edge;
@@ -61,8 +66,10 @@ namespace OpenTaiko {
 		private static readonly Color DefaultFore = Color.White;
 		private static readonly Color DefaultOutline = Color.Black;
 
-		public LuaGlyphText() { _font = null; }
+		public LuaGlyphText() { _font = null; _advanceOf = AdvanceOf; _kernOf = KernOf; }
 		public LuaGlyphText(int size, params string[] style) {
+			_advanceOf = AdvanceOf;
+			_kernOf = KernOf;
 			CFontRenderer.FontStyle fontstyle = CFontRenderer.FontStyle.Regular;
 			foreach (string input in style) {
 				fontstyle |= input.ToLower() switch {
@@ -93,14 +100,37 @@ namespace OpenTaiko {
 			return a;
 		}
 
+		// the font's kerning between two neighbouring characters, from the string renderer (0 when the font has none)
+		private double KernOf(int first, int second) {
+			if (_kerns.TryGetValue((first, second), out double k)) return k;
+			try { k = _font?.MeasureKerning(char.ConvertFromUtf32(first), char.ConvertFromUtf32(second)) ?? 0; } catch { k = 0; }
+			_kerns[(first, second)] = k;
+			return k;
+		}
+
+		// the pen's move after runes[i] on a line ending before `end`: its advance, plus the kerning with the next rune
+		private double Step(List<GlyphTextLayout.StyledRune> runes, int i, int end)
+			=> AdvanceOf(runes[i].CodePoint) + (i + 1 < end ? GlyphTextLayout.PairKern(runes, i, _kernOf) : 0);
+
+		// the skin changed the font features (kerning, proportional widths): measure and bake again
+		private void Revalidate() {
+			int generation = CFontRenderer.ShapingGeneration;
+			if (generation == _shapingGeneration) return;
+			_shapingGeneration = generation;
+			_advances.Clear();
+			_kerns.Clear();
+			ClearGlyphs();
+		}
+
 		// ink advance of the widest \n-line, color tags stripped (a GetText texture is this + 50 wide)
 		public double Measure(string text, double scale = 1.0) {
 			if (string.IsNullOrEmpty(text) || _font == null) return 0;
+			Revalidate();
 			var (runes, _) = GlyphTextLayout.Tokenize(text);
 			double best = 0, w = 0;
-			foreach (var r in runes) {
-				if (r.CodePoint == '\n') { best = Math.Max(best, w); w = 0; continue; }
-				w += AdvanceOf(r.CodePoint);
+			for (int i = 0; i < runes.Count; i++) {
+				if (runes[i].CodePoint == '\n') { best = Math.Max(best, w); w = 0; continue; }
+				w += Step(runes, i, runes.Count);
 			}
 			return Math.Max(best, w) * scale;
 		}
@@ -255,12 +285,13 @@ namespace OpenTaiko {
 			double opacity = 1.0, double scale = 1.0, double maxWidth = 0, string anchor = "topleft", double scaleY = 0,
 			double rotationDeg = 0) {
 			if (string.IsNullOrEmpty(text) || _font == null) return x;
+			Revalidate();
 			Color fore = FromLua(forecolor, DefaultFore);
 			Color outline = FromLua(backcolor, DefaultOutline);
 			double sy = scaleY > 0 ? scaleY : scale;
 
 			var (runes, styles) = GlyphTextLayout.Tokenize(text);
-			var lines = GlyphTextLayout.Wrap(runes, 0, AdvanceOf);   // '\n' splits only
+			var lines = GlyphTextLayout.Wrap(runes, 0, _advanceOf, _kernOf);   // '\n' splits only
 
 			double inkW = 0;
 			foreach (var line in lines) inkW = Math.Max(inkW, line.Width);
@@ -301,7 +332,7 @@ namespace OpenTaiko {
 						gGradTop = st.GradTop; gGradBottom = st.GradBottom;
 					}
 					Place(cp, startX + padShift + pen * f * scale, lineY, gFore, gOutline, gGradTop, gGradBottom);
-					pen += AdvanceOf(cp);
+					pen += Step(runes, i, line.Start + line.Count);
 				}
 			}
 			Compose(opacity, (float)(f * scale), (float)sy, clip: true, rotationDeg, x, y);
@@ -395,8 +426,9 @@ namespace OpenTaiko {
 		/// <summary>The wrapped lines as plain strings (color tags stripped) — for typewriter-style callers.</summary>
 		public string[] WrapToLines(string text, double wrapWidth, double scale = 1.0) {
 			if (string.IsNullOrEmpty(text) || _font == null) return [];
+			Revalidate();
 			var (runes, _) = GlyphTextLayout.Tokenize(text);
-			var lines = GlyphTextLayout.Wrap(runes, scale > 0 ? wrapWidth / scale : wrapWidth, AdvanceOf);
+			var lines = GlyphTextLayout.Wrap(runes, scale > 0 ? wrapWidth / scale : wrapWidth, _advanceOf, _kernOf);
 			var result = new string[lines.Count];
 			var sb = new System.Text.StringBuilder();
 			for (int li = 0; li < lines.Count; li++) {
@@ -411,8 +443,9 @@ namespace OpenTaiko {
 		/// <summary>Height DrawWrapped would use, without drawing (for layout).</summary>
 		public double MeasureWrapped(string text, double wrapWidth, double scale = 1.0, double lineSpacing = 1.0) {
 			if (string.IsNullOrEmpty(text) || _font == null) return 0;
+			Revalidate();
 			var (runes, _) = GlyphTextLayout.Tokenize(text);
-			var lines = GlyphTextLayout.Wrap(runes, scale > 0 ? wrapWidth / scale : wrapWidth, AdvanceOf);
+			var lines = GlyphTextLayout.Wrap(runes, scale > 0 ? wrapWidth / scale : wrapWidth, _advanceOf, _kernOf);
 			return (lines.Count - 1) * LineHeight * scale * lineSpacing + BoxHeight * scale;
 		}
 
@@ -422,11 +455,12 @@ namespace OpenTaiko {
 			LuaColor? forecolor = null, LuaColor? backcolor = null,
 			double opacity = 1.0, double scale = 1.0, double lineSpacing = 1.0) {
 			if (string.IsNullOrEmpty(text) || _font == null) return 0;
+			Revalidate();
 			Color fore = FromLua(forecolor, DefaultFore);
 			Color outline = FromLua(backcolor, DefaultOutline);
 
 			var (runes, styles) = GlyphTextLayout.Tokenize(text);
-			var lines = GlyphTextLayout.Wrap(runes, scale > 0 ? wrapWidth / scale : wrapWidth, AdvanceOf);
+			var lines = GlyphTextLayout.Wrap(runes, scale > 0 ? wrapWidth / scale : wrapWidth, _advanceOf, _kernOf);
 			double pitch = LineHeight * scale * lineSpacing;
 
 			for (int li = 0; li < lines.Count; li++) {
@@ -445,7 +479,7 @@ namespace OpenTaiko {
 						gGradTop = st.GradTop; gGradBottom = st.GradBottom;
 					}
 					Place(cp, x + pen * scale, lineY, gFore, gOutline, gGradTop, gGradBottom);
-					pen += AdvanceOf(cp);
+					pen += Step(runes, i, line.Start + line.Count);
 				}
 			}
 			Compose(opacity, (float)scale, (float)scale, clip: false, 0, x, y);
@@ -457,29 +491,35 @@ namespace OpenTaiko {
 		// Live baked-glyph gauge for the [MEMTRACE] debug line (attributes CTexture growth to glyphs vs images).
 		public static int LiveGlyphs;
 
+		// frees every baked glyph and its atlas pages
+		private void ClearGlyphs() {
+			// glyphs on a shared page free with the page; an oversized glyph owns its texture
+			var pageTex = new HashSet<CTexture>();
+			foreach (var pg in _pages) pageTex.Add(pg.Tex);
+			foreach (var slot in _fills.Values) {
+				if (slot != null) {
+					if (!pageTex.Contains(slot.Page)) slot.Page.Dispose();
+					Interlocked.Decrement(ref LiveGlyphs);
+				}
+			}
+			foreach (var slot in _edges.Values) {
+				if (slot != null) {
+					if (!pageTex.Contains(slot.Page)) slot.Page.Dispose();
+					Interlocked.Decrement(ref LiveGlyphs);
+				}
+			}
+			foreach (var pg in _pages) pg.Tex.Dispose();
+			_pages.Clear();
+			_fills.Clear();
+			_edges.Clear();
+		}
+
 		protected virtual void Dispose(bool disposing) {
 			if (!_disposedValue) {
-				// glyphs on a shared page free with the page; an oversized glyph owns its texture
-				var pageTex = new HashSet<CTexture>();
-				foreach (var pg in _pages) pageTex.Add(pg.Tex);
-				foreach (var slot in _fills.Values) {
-					if (slot != null) {
-						if (!pageTex.Contains(slot.Page)) slot.Page.Dispose();
-						Interlocked.Decrement(ref LiveGlyphs);
-					}
-				}
-				foreach (var slot in _edges.Values) {
-					if (slot != null) {
-						if (!pageTex.Contains(slot.Page)) slot.Page.Dispose();
-						Interlocked.Decrement(ref LiveGlyphs);
-					}
-				}
-				foreach (var pg in _pages) pg.Tex.Dispose();
-				_pages.Clear();
-				_fills.Clear();
-				_edges.Clear();
+				ClearGlyphs();
 				_placements.Clear();
 				_advances.Clear();
+				_kerns.Clear();
 				_font?.Dispose();
 				_disposeList?.Remove(this);
 				_disposedValue = true;

@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <PackageReference Include="SkiaSharp.NativeAssets.iOS" Version="2.88.8" />
+    <PackageReference Include="HarfBuzzSharp.NativeAssets.iOS" Version="7.3.0.2" />
     <!-- Exclude KeraLua's device-only liblua54.framework; we provide our own xcframework
          with both device and simulator slices (built from source by scripts/build-lua54.sh) -->
     <PackageReference Include="KeraLua" Version="1.4.1" ExcludeAssets="native" />

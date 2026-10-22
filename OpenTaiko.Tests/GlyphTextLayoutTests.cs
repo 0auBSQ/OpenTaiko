@@ -89,6 +89,36 @@ namespace OpenTaikoTests {
 			Assert.Equal(new[] { "ab 日", "本語の" }, lines);
 		}
 
+		// pair kerning: -3 between A and V, nothing else
+		private static double Kern(int a, int b) => a == 'A' && b == 'V' ? -3 : 0;
+
+		[Fact]
+		public void Wrap_LineWidth_IncludesPairKerning() {
+			var (runes, _) = Tok("AV AV");
+			var lines = GlyphTextLayout.Wrap(runes, 0, Adv, Kern);
+			Assert.Single(lines);
+			Assert.Equal(44, lines[0].Width);   // 5 runes at 10, two kerned pairs
+		}
+
+		[Fact]
+		public void Wrap_KerningDecidesTheBreak() {
+			// "AVAV AV" is 70 wide unkerned, 61 kerned: a 65 box fits it only with kerning
+			var (runes, _) = Tok("AVAV AV");
+			Assert.Single(GlyphTextLayout.Wrap(runes, 65, Adv, Kern));
+			Assert.Equal(2, GlyphTextLayout.Wrap(runes, 65, Adv).Count);
+		}
+
+		[Fact]
+		public void PairKern_NotAcrossStylesOrLines() {
+			var (runes, _) = Tok("A<c.#ff0000>V</c>AV\nAV");
+			Assert.Equal(0, GlyphTextLayout.PairKern(runes, 0, Kern));    // A | coloured V
+			Assert.Equal(-3, GlyphTextLayout.PairKern(runes, 2, Kern));   // A V of one style
+			var lines = GlyphTextLayout.Wrap(runes, 0, Adv, Kern);
+			Assert.Equal(2, lines.Count);
+			Assert.Equal(37, lines[0].Width);
+			Assert.Equal(17, lines[1].Width);
+		}
+
 		// ── tokenize ────────────────────────────────────────────────────────────────
 
 		[Fact]
@@ -204,7 +234,9 @@ namespace OpenTaikoTests {
 			float b = font.MeasureText("b");
 			float ab = font.MeasureText("ab");
 			Assert.True(a > 0 && b > 0);
-			Assert.True(Math.Abs((a + b) - ab) < 1.5f);   // no kerning surprises for this pair
+			// "ab" is no kerning pair: the pair is the two advances plus the kerning the renderer reports (none)
+			Assert.Equal(0, font.MeasureKerning("a", "b"));
+			Assert.Equal(a + b + font.MeasureKerning("a", "b"), ab, 3);
 			Assert.True(font.MeasureText(" ") > 0);        // advance includes spaces
 			Assert.True(font.GetLineHeight() > 0);
 		}

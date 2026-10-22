@@ -44,6 +44,8 @@ System/
 - `AIBattleCharacter=`：AI 对手使用的角色文件夹（第 5 步）。
 - `AIBattleNameplate=`：AI 对手装备的名牌的 id（第 5 步）。
 - `FontName<LANG>=` 和 `BoxFontName<LANG>=`：每种游戏语言的字体文件，其中 `<LANG>` 是大写的语言代码（`EN`、`JA`、`FR`、`ES`、`NL`、`DE`、`RU`、`KO`、`ZH`）。路径相对于皮肤根目录（绝对路径也可以），且文件必须存在，否则解析器会丢弃该键。
+- `FontKerning=`：`1`（默认）在相邻字母之间应用字体的字距调整，使 `AV` 或 `Ta` 这样的字母对靠得更近；`0` 关闭它。竖排文字始终每格一个字符，不做字距调整。
+- `FontPalt=`：`1` 开启字体的日文比例宽度（OpenType 特性 `palt`）：假名、标点和括号使用各自的宽度，而不是整个方格。`0`（默认）保持全角间距。只有带此特性的字体会变化。
 
 其他所有键（`Game_*`、`Result_*`、`Title_*` 等）都是界面布局值。同一个解析器读取它们，因此它们可以放在第 6 步的被包含文件中。
 
@@ -64,6 +66,8 @@ FontNameEN=Fonts/MPLUSRounded1c-Medium.ttf
 FontNameJA=Fonts/MPLUSRounded1c-Medium.ttf
 BoxFontNameEN=Fonts/MPLUSRounded1c-Regular.ttf
 BoxFontNameJA=Fonts/MPLUSRounded1c-Regular.ttf
+FontKerning=1
+FontPalt=0
 ```
 
 ## 第 4 步：Resolutions 选项

@@ -1077,9 +1077,12 @@ internal class CSkin : IDisposable {
 		LoadSkinConfigFromFile(Path(@$"SkinConfig.ini"), ref str);
 		_fontFallbacksMain = new List<string>();
 		_fontFallbacksSub = null;
+		_fontKerning = true;
+		_fontPalt = false;
 		this.tLoadFromString(str);
 		CFontRenderer.SetFallbackFonts(CFontRenderer.FallbackList.Main, _fontFallbacksMain);
 		CFontRenderer.SetFallbackFonts(CFontRenderer.FallbackList.Sub, _fontFallbacksSub ?? _fontFallbacksMain);
+		CFontRenderer.SetShapingFeatures(_fontKerning, _fontPalt);
 
 	}
 
@@ -7275,6 +7278,12 @@ internal class CSkin : IDisposable {
 										_fontFallbacksSub = fonts;
 									break;
 								}
+							case "FontKerning":
+								_fontKerning = strParam != "0";
+								break;
+							case "FontPalt":
+								_fontPalt = strParam == "1";
+								break;
 							default:
 								foreach (string code in CLangManager.Langcodes) {
 									if (strCommand == "FontName" + code.ToUpper()) {
@@ -7467,6 +7476,9 @@ internal class CSkin : IDisposable {
 	// FontFallbacksMain / FontFallbacksSub (null: the Main list)
 	private List<string> _fontFallbacksMain = new List<string>();
 	private List<string>? _fontFallbacksSub;
+	// FontKerning (the font's kerning, on unless 0) / FontPalt (the font's proportional widths for Japanese, off unless 1)
+	private bool _fontKerning = true;
+	private bool _fontPalt;
 	#endregion
 
 	#region Config

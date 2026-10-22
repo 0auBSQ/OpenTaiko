@@ -28,6 +28,10 @@
     <ProjectReference Include="$(MSBuildThisFileDirectory)../third_party/FFmpeg.AutoGen/FFmpeg.AutoGen.csproj" Condition="'$(UseVendoredFFmpeg)' == 'true'" />
     <PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="2.88.8" />
     <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.8" />
+    <!-- Text shaping (kerning, marks, complex scripts); the HarfBuzz natives ship like SkiaSharp's. -->
+    <PackageReference Include="SkiaSharp.HarfBuzz" Version="2.88.8" />
+    <PackageReference Include="HarfBuzzSharp.NativeAssets.macOS" Version="7.3.0.2" />
+    <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="7.3.0.2" />
   </ItemGroup>
   <ItemGroup Label="Resources">
     <EmbeddedResource Include="mplus-1p-medium.ttf" />
