@@ -1576,9 +1576,10 @@ internal class OpenTaiko : Game {
 				// Mobile: use externally-provided input devices (touch) instead of Silk.NET
 				InputManager = new CInputManager(ExternalInputDevices);
 			} else {
-				InputManager = new CInputManager(Window_, OpenTaiko.ConfigIni.bBufferedInputs, true, OpenTaiko.ConfigIni.nControllerDeadzone / 100.0f);
+				InputManager = new CInputManager(Window_, WindowInput!, OpenTaiko.ConfigIni.bBufferedInputs, true, OpenTaiko.ConfigIni.nControllerDeadzone / 100.0f);
 			}
 			InputManager.SetID(ConfigIni.StableIdToGuid);
+			CInputButtonsBase.PressArrived = HitSoundOnArrival.OnPress;
 			Trace.TraceInformation("DirectInput has been initialized.");
 		} catch (Exception ex) {
 			Trace.TraceError(ex.ToString());

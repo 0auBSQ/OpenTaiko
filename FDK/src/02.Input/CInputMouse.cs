@@ -8,8 +8,18 @@ public class CInputMouse : CInputButtonsBase, IInputDevice, IDisposable {
 	public const int MouseButtonCount = 8;
 	public (int x, int y) Position = (-1, -1);
 
-	/// <summary>Wheel movement accumulated since the consumer last reset it (notch units).</summary>
-	public double ScrollAccumX, ScrollAccumY;
+	// wheel movement since the last TakeScroll (notch units): added on the window thread, taken on the game thread
+	private readonly object scrollLock = new();
+	private double scrollX, scrollY;
+
+	/// <summary>Wheel movement since the last call (notch units); resets it.</summary>
+	public (double x, double y) TakeScroll() {
+		lock (this.scrollLock) {
+			var moved = (this.scrollX, this.scrollY);
+			this.scrollX = this.scrollY = 0;
+			return moved;
+		}
+	}
 
 	public CInputMouse(IMouse mouse) : base(12) {
 		this.Device = mouse;
@@ -32,7 +42,9 @@ public class CInputMouse : CInputButtonsBase, IInputDevice, IDisposable {
 	/// or restore the normal cursor.</summary>
 	public void SetCursorLocked(bool locked) {
 		if (this.Device is IMouse m && m.Cursor != null) {
-			try { m.Cursor.CursorMode = locked ? CursorMode.Disabled : CursorMode.Normal; } catch { }
+			Game.RunOnWindowThread(() => {
+				try { m.Cursor.CursorMode = locked ? CursorMode.Disabled : CursorMode.Normal; } catch { }
+			});
 		}
 	}
 
@@ -61,7 +73,9 @@ public class CInputMouse : CInputButtonsBase, IInputDevice, IDisposable {
 	}
 
 	private void Mouse_Scroll(IMouse mouse, ScrollWheel wheel) {
-		ScrollAccumX += wheel.X;
-		ScrollAccumY += wheel.Y;
+		lock (this.scrollLock) {
+			this.scrollX += wheel.X;
+			this.scrollY += wheel.Y;
+		}
 	}
 }

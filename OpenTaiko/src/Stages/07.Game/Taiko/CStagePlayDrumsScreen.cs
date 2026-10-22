@@ -204,6 +204,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		// IsFirstDraw (the old "base.Activate() // to unpause at end").
 		var it = base.ActivateSteps();
 		while (it.MoveNext()) yield return it.Current;
+		HitSoundOnArrival.Publish(OpenTaiko.ConfigIni, this.soundRed, this.soundBlue);
 	}
 
 	public override void tValueInitialize(bool bPlayRecord, bool bPlayState) {
@@ -303,6 +304,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	}
 
 	public override void DeActivate() {
+		HitSoundOnArrival.Clear(); // before the hit sounds are freed
 		this.ctHandHold = null;
 
 		TitleTextureKey.Release(this.ttkReplayMode);
@@ -1048,15 +1050,8 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			if (inputEvent.nTimeStamp <= this.msIgnoreInputUpToTime)
 				continue; // polled before the last resume, such as the press that chose Resume
 			int nUsePlayer = NotesManager.GetPadPlayer(nPad);
-			if (nUsePlayer >= OpenTaiko.ConfigIni.nPlayerCount
-				|| OpenTaiko.stageGameScreen.isDeniedPlaying[nUsePlayer] || OpenTaiko.stageGameScreen.IsStageFailed_Fast()
-				|| ((!OpenTaiko.ConfigIni.bTokkunMode || nUsePlayer > 0) && OpenTaiko.ConfigIni.bAutoPlay[nUsePlayer]) //2020.05.18 Mr-Ojii オート時の入力キャンセル
-				|| OpenTaiko.bReplayMode[nUsePlayer]   // replay playback: ignore live input, inputs come from the recording
-				|| (nUsePlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode)
-				|| (LuaNetworking.Active != null && LuaNetworking.Active.IsRemoteSpot(nUsePlayer))   // online VS: spots 2-5 are remote players — ignore any local input mapped to them
-				) {
+			if (!this.AcceptsLiveInput(nUsePlayer))
 				continue; // skip input
-			}
 
 			this.tInputMethodStore(EKeyConfigPart.Taiko);
 
@@ -1074,7 +1069,9 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			EPad nPadAs1P = NotesManager.PadTo1P(nPad);
 			// Register to replay file
 			OpenTaiko.ReplayInstances[nUsePlayer]?.tRegisterInput(msHitTjaTime, (byte)nPadAs1P);
+			this.bDrumSoundPlayedOnArrival = inputEvent.HandledOnArrival;
 			this.ProcessPadInput(nUsePlayer, nPadAs1P, msHitTjaTime);
+			this.bDrumSoundPlayedOnArrival = false;
 		}
 
 		// polled input is consumed up to now: the next automatic misses and big-note timeouts are judged up to it

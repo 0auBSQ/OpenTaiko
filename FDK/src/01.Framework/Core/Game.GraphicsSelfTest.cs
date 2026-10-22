@@ -33,6 +33,6 @@ public abstract partial class Game {
 			Console.Error.WriteLine("[checkgl] FAILED: " + ex.Message);
 			Environment.ExitCode = 70;
 		}
-		try { Window_.Close(); } catch { }
+		this.Exit();
 	}
 }

@@ -191,8 +191,7 @@ namespace OpenTaiko {
 		/// dy is positive when scrolling up/away. Reading resets the accumulator.</summary>
 		public (double, double) GetScrollDelta() {
 			var m = MouseDevice; if (m == null) return (0, 0);
-			double x = m.ScrollAccumX, y = m.ScrollAccumY;
-			m.ScrollAccumX = 0; m.ScrollAccumY = 0;
+			var (x, y) = m.TakeScroll();
 			return Blocked ? (0, 0) : (x, y);
 		}
 

@@ -21,6 +21,7 @@
 */
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
@@ -65,6 +66,7 @@ public abstract partial class Game : IDisposable {
 		if (ImGuiController != null) return;
 
 		ImGuiController = new ImGuiController(Gl, window, context);
+		BridgeImGuiChars(context);
 		ImGuiIO = ImGui.GetIO();
 		ImGui.StyleColorsDark();
 #if DEBUG
@@ -100,6 +102,33 @@ public abstract partial class Game : IDisposable {
 #endif
 	}
 
+	// Silk's ImGui controller collects typed characters in a list that its keyboard handler fills. The handler runs on the
+	// window thread while the controller reads the list on the game thread, so the characters are queued instead and
+	// handed to the controller before each of its updates.
+	private static readonly ConcurrentQueue<char> _imguiChars = new();
+	private static Action<char>? _imguiPressChar;
+
+	private static void BridgeImGuiChars(IInputContext context) {
+		const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
+		var onKeyChar = typeof(ImGuiController).GetMethod("OnKeyChar", flags);
+		var pressChar = typeof(ImGuiController).GetMethod("PressChar", flags);
+		if (onKeyChar == null || pressChar == null || context.Keyboards.Count == 0) {
+			Trace.TraceWarning("ImGui text input could not be moved to the game thread.");
+			return;
+		}
+		IKeyboard keyboard = context.Keyboards[0];
+		keyboard.KeyChar -= onKeyChar.CreateDelegate<Action<IKeyboard, char>>(ImGuiController);
+		keyboard.KeyChar += (_, c) => _imguiChars.Enqueue(c);
+		_imguiPressChar = pressChar.CreateDelegate<Action<char>>(ImGuiController);
+	}
+
+	private static void DrainImGuiChars() {
+		if (_imguiPressChar == null)
+			return;
+		while (_imguiChars.TryDequeue(out char c))
+			_imguiPressChar(c);
+	}
+
 	public static ConcurrentQueue<Action> AsyncActions { get; private set; } = new ConcurrentQueue<Action>();
 
 	// Per-frame time budget for draining AsyncActions (the single render-thread "finalize" queue: deferred GL
@@ -108,9 +137,23 @@ public abstract partial class Game : IDisposable {
 	public const double DefaultAsyncBudgetMs = 3.0;
 	public static double AsyncBudgetMs = DefaultAsyncBudgetMs;
 
-	public SemaphoreSlim thInputLock = new(1, 1);
-	public Thread thInput { get; private set; }
-	private CancellationTokenSource thInputCancel;
+	// Desktop threads: the main thread keeps the window, waits for its events and stamps input as it arrives; the game
+	// thread owns the GL context and runs Update and Draw. Window calls made on the game thread are queued for the
+	// window thread (RunOnWindowThread).
+	private static readonly ConcurrentQueue<Action> _windowCommands = new();
+	private static int _windowThreadId;
+	private static volatile bool _gameThreadStarted;
+	private static bool _usingGlfw;
+	private Thread? _gameThread;
+	private volatile bool _quitRequested;
+	private volatile bool _gameThreadDone;
+	private ExceptionDispatchInfo? _gameThreadException;
+	private CultureInfo? _gameCulture, _gameUICulture;
+	private readonly object _resizeLock = new();
+	private Vector2D<int>? _pendingResize;
+
+	/// <summary>The window's input context, created on the window thread before the game thread starts.</summary>
+	protected IInputContext? WindowInput { get; private set; }
 
 	private string strIconFileName;
 
@@ -122,7 +165,7 @@ public abstract partial class Game : IDisposable {
 		set {
 			_Text = value;
 			if (Window_ != null) {
-				Window_.Title = value;
+				RunOnWindowThread(() => Window_.Title = value);
 			}
 		}
 	}
@@ -139,7 +182,7 @@ public abstract partial class Game : IDisposable {
 		set {
 			_WindowSize = value;
 			if (Window_ != null) {
-				Window_.Size = value;
+				RunOnWindowThread(() => Window_.Size = value);
 			}
 		}
 	}
@@ -152,7 +195,7 @@ public abstract partial class Game : IDisposable {
 		set {
 			_WindowPosition = value;
 			if (Window_ != null) {
-				Window_.Position = value;
+				RunOnWindowThread(() => Window_.Position = value);
 			}
 		}
 	}
@@ -193,6 +236,10 @@ public abstract partial class Game : IDisposable {
 		// WindowState/WindowBorder/Size/Position setters below force a hidden GLFW window to show itself,
 		// which would pop the export window open. Export only reads the backbuffer, so it needs no mode.
 		if (Window_ == null || StartHidden) return;
+		RunOnWindowThread(this.ApplyWindowModeOnWindowThread);
+	}
+
+	private void ApplyWindowModeOnWindowThread() {
 		switch (_windowMode) {
 			case 1:   // exclusive fullscreen
 				Window_.WindowBorder = WindowBorder.Resizable;
@@ -232,6 +279,7 @@ public abstract partial class Game : IDisposable {
 		}
 	}
 
+	// the thread that owns the GL context: the game thread on desktop
 	public static int MainThreadID { get; private set; }
 
 	// ── virtual clock (offline video export) ────────────────────────────────────────────────────
@@ -428,6 +476,7 @@ public abstract partial class Game : IDisposable {
 		parameters = args;
 
 		MainThreadID = Thread.CurrentThread.ManagedThreadId;
+		_windowThreadId = MainThreadID;
 		Configuration();
 
 		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) {
@@ -467,6 +516,7 @@ public abstract partial class Game : IDisposable {
 			Trace.TraceInformation("SDL selected for Windowing");
 		} else {
 			Silk.NET.Windowing.Glfw.GlfwWindowing.Use();
+			_usingGlfw = true;
 			Trace.TraceInformation("GLFW selected for Windowing");
 		}
 
@@ -490,8 +540,6 @@ public abstract partial class Game : IDisposable {
 
 		Window_.Load += Window_Load;
 		Window_.Closing += Window_Closing;
-		Window_.Update += Window_Update;
-		Window_.Render += Window_Render;
 		Window_.Resize += Window_Resize;
 		Window_.Move += Window_Move;
 		Window_.FramebufferResize += Window_FramebufferResize;
@@ -527,7 +575,8 @@ public abstract partial class Game : IDisposable {
 			HostExitRequested?.Invoke();
 			return;
 		}
-		Window_.Close();
+		// the game thread ends after this frame and shuts down; the window thread then closes the window
+		this._quitRequested = true;
 	}
 
 	/// <summary>
@@ -557,7 +606,7 @@ public abstract partial class Game : IDisposable {
 		Trace.TraceInformation($"Compute shaders available (hosted): {ComputeShadersAvailable}");
 
 		Gl.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		Window_Resize(new Vector2D<int>(viewportWidth, viewportHeight));
+		this.ApplyViewport(new Vector2D<int>(viewportWidth, viewportHeight));
 
 		Context.SwapInterval(VSync ? 1 : 0);
 
@@ -628,7 +677,7 @@ public abstract partial class Game : IDisposable {
 	/// Called by the host when the viewport size changes.
 	/// </summary>
 	public void ResizeViewport(int width, int height) {
-		Window_Resize(new Vector2D<int>(width, height));
+		this.ApplyViewport(new Vector2D<int>(width, height));
 	}
 
 	protected void ToggleWindowMode() {
@@ -667,42 +716,97 @@ public abstract partial class Game : IDisposable {
 			// Run() is a no-op; the host calls InitWithExternalContext() then RenderHostedFrame() each frame.
 			return;
 		}
-		// adapted from Window_.Run();
+		// This thread keeps the window: it waits for window events (waking on input, or after 1 ms to poll the pads),
+		// and the device callbacks stamp each press as it arrives. The game runs on its own thread (GameThreadMain).
 		Window_.Initialize();
-		try {
-			Window_.Run(delegate {
-				this.EventsNoWait();
-				if (!Window_.IsClosing) {
-					Window_.DoUpdate();
-					this.RethrowFrameException();
-				}
+		if (OperatingSystem.IsMacOS())
+			Window_.GLContext?.Clear(); // made current on the game thread
+		WindowInput = Window_.CreateInput();
 
-				if (!Window_.IsClosing) {
-					Window_.DoRender();
-					this.RethrowFrameException();
+		_gameCulture = Thread.CurrentThread.CurrentCulture;
+		_gameUICulture = Thread.CurrentThread.CurrentUICulture;
+		_gameThread = new Thread(this.GameThreadMain, 8 * 1024 * 1024) { Name = "GameThread" };
+		if (OperatingSystem.IsWindows())
+			_gameThread.SetApartmentState(ApartmentState.STA); // as the main thread it takes over from
+		_gameThreadStarted = true;
+		_gameThread.Start();
+
+		try {
+			while (!this._gameThreadDone) {
+				while (_windowCommands.TryDequeue(out var command)) {
+					try {
+						command();
+					} catch (Exception e) {
+						Trace.TraceWarning($"Window command failed: {e}");
+					}
 				}
-			});
-		} catch {
-			// a frame crashed: still shut down normally, then report the original error
-			try {
-				this.Window_Closing();
-			} catch (Exception e) {
-				Trace.TraceError($"Shutdown after a crash failed: {e}");
+				// a hidden run stays hidden whatever the windowing backend applied
+				if (StartHidden && Window_.IsVisible) Window_.IsVisible = false;
+				if (_usingGlfw)
+					GlfwProvider.GLFW.Value.WaitEventsTimeout(0.001);
+				else
+					Thread.Sleep(1);
+				this.OnEvents();
+				if (Window_.IsClosing)
+					this._quitRequested = true;
 			}
-			throw;
+		} finally {
+			// also when this loop fails: the game thread still shuts down before the window goes away
+			this._quitRequested = true;
+			_gameThread.Join();
 		}
-		this.EventsNoWait();
+		WindowInput?.Dispose();
+		_gameThreadException?.Throw();
 		Window_.Reset();
 	}
 
-	// Silk's DoUpdate/DoRender have no finally: an exception thrown through them leaves the window "inside the render
-	// loop", and its Reset then throws over the real error. The frame callbacks keep the exception; it is rethrown here.
-	private ExceptionDispatchInfo? _frameException;
+	// game thread: owns the GL context and runs Update and Draw until a quit is requested, then shuts the game down
+	private void GameThreadMain() {
+		Thread.CurrentThread.CurrentCulture = _gameCulture!;
+		Thread.CurrentThread.CurrentUICulture = _gameUICulture!;
+		MainThreadID = Environment.CurrentManagedThreadId;
+		try {
+			this.InitializeGraphics();
+			this.Initialize();
+			this.LoadContent();
+			var clock = Stopwatch.StartNew();
+			double last = 0;
+			while (!this._quitRequested) {
+				double now = clock.Elapsed.TotalSeconds;
+				double delta = Math.Max(now - last, 1e-6);
+				last = now;
+				this.ApplyPendingResize();
+				this.Window_Update(delta);
+				if (this._quitRequested)
+					break;
+				this.Window_Render(delta);
+			}
+		} catch (Exception e) {
+			this._gameThreadException = ExceptionDispatchInfo.Capture(e);
+		} finally {
+			try {
+				this.ShutdownGame();
+			} catch (Exception e) {
+				Trace.TraceError($"Shutdown failed: {e}");
+			}
+			this._gameThreadDone = true;
+			if (_usingGlfw)
+				GlfwProvider.GLFW.Value.PostEmptyEvent();
+		}
+	}
 
-	private void RethrowFrameException() {
-		var e = this._frameException;
-		this._frameException = null;
-		e?.Throw();
+	/// <summary>
+	/// Runs a call that the windowing backend only allows on the window thread: at once when called there (or before the
+	/// game thread exists), otherwise on the window thread's next pass, in order.
+	/// </summary>
+	public static void RunOnWindowThread(Action action) {
+		if (!_gameThreadStarted || Environment.CurrentManagedThreadId == _windowThreadId) {
+			action();
+			return;
+		}
+		_windowCommands.Enqueue(action);
+		if (_usingGlfw)
+			GlfwProvider.GLFW.Value.PostEmptyEvent();
 	}
 
 	protected virtual void Configuration() {
@@ -728,25 +832,6 @@ public abstract partial class Game : IDisposable {
 
 	protected virtual void OnExiting() {
 
-	}
-
-	public void EventsNoWait() {
-		if (this.thInputLock.Wait(0)) {
-			try {
-				this.OnEvents();
-			} finally {
-				this.thInputLock.Release();
-			}
-		}
-	}
-
-	public void Events() {
-		this.thInputLock.Wait();
-		try {
-			this.OnEvents();
-		} finally {
-			this.thInputLock.Release();
-		}
 	}
 
 	protected virtual void OnEvents() {
@@ -778,6 +863,7 @@ public abstract partial class Game : IDisposable {
 	}
 
 
+	// window thread, inside Window_.Initialize
 	public void Window_Load() {
 		// a hidden run stays hidden whatever the windowing backend applied after creating the window
 		if (StartHidden && Window_.IsVisible) Window_.IsVisible = false;
@@ -788,12 +874,20 @@ public abstract partial class Game : IDisposable {
 				SyncTaskbarIcon(w.Hwnd);
 		}
 
-		if (OperatingSystem.IsMacOS()) {
-			if (Window_.GLContext == null) {
-				throw new Exception("No native OpenGL context available");
-			}
+		if (OperatingSystem.IsMacOS() && Window_.GLContext == null) {
+			throw new Exception("No native OpenGL context available");
+		}
 
-			Context = Window_.GLContext;
+		// Finalise the window mode now that the window + monitor exist (esp. Borderless, which needs the monitor
+		// bounds to size the undecorated window — WindowOptions can't query the monitor before creation).
+		ApplyWindowMode();
+	}
+
+	// game thread: the GL context and the state that needs it
+	private void InitializeGraphics() {
+		if (OperatingSystem.IsMacOS()) {
+			Context = Window_.GLContext!;
+			Context.MakeCurrent();
 		} else {
 			#region Override Platform
 			GraphicsDeviceType_ = GetParameterValue("-p", "--platform") switch {
@@ -837,74 +931,34 @@ public abstract partial class Game : IDisposable {
 		Gl.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 		if (!OperatingSystem.IsMacOS())
-			this.ResizeViewport(Window_.Size.X, Window_.Size.Y);
+			this.ApplyViewport(WindowBorderSize);
 
 		Context.SwapInterval(VSync ? 1 : 0);
-
-		// Finalise the window mode now that the window + monitor exist (esp. Borderless, which needs the monitor
-		// bounds to size the undecorated window — WindowOptions can't query the monitor before creation).
-		ApplyWindowMode();
-
-		Initialize();
-		LoadContent();
-
-		try {
-			this.thInputCancel = new CancellationTokenSource();
-			ThreadStart thInputFunc = new (async () => {
-				using PeriodicTimer timer = new(TimeSpan.FromMilliseconds(1));
-				while (!this.thInputCancel.IsCancellationRequested) { // ensure alive
-					try {
-						while (await timer.WaitForNextTickAsync(this.thInputCancel.Token))
-							this.Events();
-					} catch (OperationCanceledException) {
-						// ignore
-					} finally {
-						if (this.thInputCancel.IsCancellationRequested)
-							Trace.TraceInformation("Input thread terminated.");
-					}
-				}
-			});
-			this.thInput = new Thread(thInputFunc) {
-				Name = "InputThread",
-				IsBackground = true,
-			};
-			this.thInput.Start();
-			Trace.TraceInformation("Input thread started.");
-		} catch (Exception ex) {
-			Trace.TraceWarning(ex.ToString());
-			Trace.TraceWarning("Input thread failed to start. Fell back to poll input per draw frame.");
-		}
 	}
 
-	private bool _closed;
+	// the window was asked to close (its close button, the system): the game thread ends after its frame and shuts down
 	public void Window_Closing() {
-		if (_closed) return;
-		_closed = true;
+		this._quitRequested = true;
+	}
+
+	// game thread, after its last frame
+	private void ShutdownGame() {
 		CTexture.Terminate();
 		DeleteRenderScaleFbo();
 
 		UnloadContent();
 		OnExiting();
 
-		this.thInputCancel?.Cancel();
-		Context.Dispose();
+		Context?.Dispose();
 	}
 
 	public void Window_Update(double deltaTime) {
-		try {
-			this.UpdateFrame(deltaTime);
-		} catch (Exception e) {
-			this._frameException = ExceptionDispatchInfo.Capture(e);
-		}
-	}
-
-	private void UpdateFrame(double deltaTime) {
-		if (StartHidden && Window_.IsVisible) Window_.IsVisible = false;
 		double fps = 1.0f / deltaTime;
 		dbTimeMs = dbGetTimeMsReal!();
 		TimeMs = (long)dbTimeMs;
 		Update();
 
+		DrainImGuiChars();
 		ImGuiController?.Update((float)deltaTime);
 	}
 
@@ -954,14 +1008,6 @@ public abstract partial class Game : IDisposable {
 	}
 
 	public void Window_Render(double deltaTime) {
-		try {
-			this.RenderFrame(deltaTime);
-		} catch (Exception e) {
-			this._frameException = ExceptionDispatchInfo.Capture(e);
-		}
-	}
-
-	private void RenderFrame(double deltaTime) {
 		if (GraphicsSelfTest) { RunGraphicsSelfTest(); return; }   // --mode=checkgl (see Game.GraphicsSelfTest.cs)
 		Gl.Disable(EnableCap.ScissorTest);   // a leaked UI clip (GRAPHICS:SetClip) must never survive the frame
 		Camera = Matrix4X4<float>.Identity;
@@ -1022,10 +1068,27 @@ public abstract partial class Game : IDisposable {
 		Gl.Viewport(ViewPortOffset.X, ViewPortOffset.Y, (uint)ViewPortSize.X, (uint)ViewPortSize.Y); // restore for post
 #endif
 
-		if (!OperatingSystem.IsMacOS()) Context.SwapBuffers();
+		Context.SwapBuffers();
 	}
 
+	// window thread: the game thread applies the size at its next frame
 	public void Window_Resize(Vector2D<int> size) {
+		lock (this._resizeLock)
+			this._pendingResize = size;
+	}
+
+	private void ApplyPendingResize() {
+		Vector2D<int>? size;
+		lock (this._resizeLock) {
+			size = this._pendingResize;
+			this._pendingResize = null;
+		}
+		if (size.HasValue)
+			this.ApplyViewport(size.Value);
+	}
+
+	// GL thread: the letterboxed viewport for a window of this size
+	private void ApplyViewport(Vector2D<int> size) {
 		if (size.X > 0 && size.Y > 0) {
 			WindowBorderSize = size;
 			float resolutionAspect = (float)GameWindowSize.Width / GameWindowSize.Height;

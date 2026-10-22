@@ -24,8 +24,8 @@ public class CInputManager : IDisposable {
 
 
 	// Constructor
-	public CInputManager(IWindow window, bool useBufferedInput, bool bUseMidiIn = true, float gamepad_deadzone = 0.5f) {
-		Initialize(window, useBufferedInput, bUseMidiIn, gamepad_deadzone);
+	public CInputManager(IWindow window, IInputContext context, bool useBufferedInput, bool bUseMidiIn = true, float gamepad_deadzone = 0.5f) {
+		Initialize(window, context, useBufferedInput, bUseMidiIn, gamepad_deadzone);
 	}
 
 	/// <summary>
@@ -41,8 +41,9 @@ public class CInputManager : IDisposable {
 		}
 	}
 
-	public void Initialize(IWindow window, bool useBufferedInput, bool bUseMidiIn, float controller_deadzone) {
-		Context = window.CreateInput();
+	// the context is created and disposed by the window thread, which runs its device callbacks
+	public void Initialize(IWindow window, IInputContext context, bool useBufferedInput, bool bUseMidiIn, float controller_deadzone) {
+		Context = context;
 		Context.ConnectionChanged += this.ConnectionChanged;
 		Deadzone = controller_deadzone;
 
@@ -204,8 +205,6 @@ public class CInputManager : IDisposable {
 				lock (this.lockInputDevices) {
 					this.InputDevices.Clear();
 				}
-
-				Context?.Dispose();
 			}
 			this.bDisposedDone = true;
 		}

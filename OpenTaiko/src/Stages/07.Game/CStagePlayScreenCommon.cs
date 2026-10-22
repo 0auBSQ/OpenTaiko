@@ -1384,8 +1384,14 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 			NotesManager.EInputType.Clap => this.soundClap[iPlayer],
 			_ => null,
 		};
-		sound?.PlayStart(TjaTimeToFrameworkTime(OpenTaiko.GetTJA(iPlayer)!, msTjaTime));
+		if (sound == null || (this.bDrumSoundPlayedOnArrival && input is not NotesManager.EInputType.Clap))
+			return; // a live press already played its don/ka when it arrived (HitSoundOnArrival)
+		lock (HitSoundOnArrival.Gate)
+			sound.PlayStart(TjaTimeToFrameworkTime(OpenTaiko.GetTJA(iPlayer)!, msTjaTime));
 	}
+
+	// set while tInputProcess_Drums processes a press whose don/ka was played on arrival
+	protected bool bDrumSoundPlayedOnArrival;
 
 	protected void StartHitNoteLaneFlash(int iPlayer, NotesManager.EInputType input, EGameType gt) {
 		this.actTaikoLaneFlash.PlayerLane[iPlayer].Start(NotesManager.InputToLane(input), gt);
@@ -2345,10 +2351,28 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		OpenTaiko.ConfigIni.nInputAdjustTimeMs = newInputAdjustTimeMs;
 	}
 
+	// whether a live press of this player's pads is processed now
+	protected bool AcceptsLiveInput(int nUsePlayer)
+		=> !(nUsePlayer >= OpenTaiko.ConfigIni.nPlayerCount
+			|| OpenTaiko.stageGameScreen.isDeniedPlaying[nUsePlayer] || OpenTaiko.stageGameScreen.IsStageFailed_Fast()
+			|| ((!OpenTaiko.ConfigIni.bTokkunMode || nUsePlayer > 0) && OpenTaiko.ConfigIni.bAutoPlay[nUsePlayer]) //2020.05.18 Mr-Ojii オート時の入力キャンセル
+			|| OpenTaiko.bReplayMode[nUsePlayer]   // replay playback: ignore live input, inputs come from the recording
+			|| (nUsePlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode)
+			|| (LuaNetworking.Active != null && LuaNetworking.Active.IsRemoteSpot(nUsePlayer))   // online VS: spots 2-5 are remote players — ignore any local input mapped to them
+			);
+
+	// tells HitSoundOnArrival whose drum presses are processed now
+	private void PublishLiveDrums() {
+		bool accepting = !this.IsQuittingStage() && !this.bPAUSE;
+		for (int p = 0; p < 5; p++)
+			HitSoundOnArrival.SetLive(p, accepting && this.AcceptsLiveInput(p));
+	}
+
 	protected abstract void tInputProcess_Drums();
 	protected abstract void DrumsScrollSpeedUp();
 	protected abstract void DrumsScrollSpeedDown();
 	protected void tKeyInput() {
+		this.PublishLiveDrums();
 		// Inputs
 		if (this.IsQuittingStage())
 			return;
@@ -2466,6 +2490,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		KeyboardSoundGroupLevelControlHandler.Handle(
 			keyboard, OpenTaiko.SoundGroupLevelController, OpenTaiko.Skin, false);
 		#endregion
+		this.PublishLiveDrums(); // a pause or quit started this frame stops the drum sounds of later presses
 	}
 
 	// ── BGM drift watchdog ─────────────────────────────────────────────────────────

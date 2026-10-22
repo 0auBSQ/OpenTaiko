@@ -85,7 +85,7 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 		}
 	}
 
-	protected void AddPressedEvent(int idxBtn, long msTimestamp, int velocity = 0) {
+	protected void AddPressedEvent(int idxBtn, long msTimestamp, int velocity = 0, bool handledOnArrival = false) {
 		lock (this.eventLock) { // update thread and input thread
 			this.EventBuffer.Add(new STInputEvent() {
 				nKey = idxBtn,
@@ -93,6 +93,7 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 				Released = false,
 				nTimeStamp = msTimestamp,
 				nVelocity = velocity,
+				HandledOnArrival = handledOnArrival,
 			});
 		}
 	}
@@ -104,9 +105,24 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 			if (isPressed == 0)
 				this.pressedSincePoll[idxBtn] = true;
 		}
-		if (isPressed == 0)
-			this.AddPressedEvent(idxBtn, SoundManager.PlayTimer.msGetPreciseNowSoundTimerTime(), velocity);
+		if (isPressed == 0) {
+			long msTimestamp = SoundManager.PlayTimer.msGetPreciseNowSoundTimerTime();
+			this.AddPressedEvent(idxBtn, msTimestamp, velocity, this.HandleOnArrival(idxBtn));
+		}
 		this.SetVelocity(idxBtn, velocity);
+	}
+
+	/// <summary>Called on the thread that delivers a new press, before its event is queued. Returns true when the press
+	/// was handled there; its event then carries <see cref="STInputEvent.HandledOnArrival"/>.</summary>
+	public static Func<IInputDevice, int, bool>? PressArrived;
+
+	private bool HandleOnArrival(int idxBtn) {
+		try {
+			return PressArrived?.Invoke(this, idxBtn) ?? false;
+		} catch (Exception e) {
+			System.Diagnostics.Trace.TraceWarning($"Input press handler failed: {e}");
+			return false;
+		}
 	}
 
 	protected void ButtonUp(int idxBtn) {
