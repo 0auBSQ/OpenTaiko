@@ -1,5 +1,5 @@
 {
-  "_comment": "Dialable phone numbers/codes → events. Keys are matched case-INSENSITIVELY and with whitespace stripped. Fields: name (messenger; '' = no name shown, not localized), text (an id in lang/<code>/phone.json), sound (a stem in the STAGE's Sounds/ folder e.g. myroom/Sounds/egg.ogg, played with no message when there is no text), lines (a call of several messages, used instead of name/text: a list of { name, text, blip } shown one after the other; blip is the typing sound's stem in the stage's Sounds/ folder, and a line without a name types with the narrator's unless it gives its own; an entry with a single text types with the narrator's too, or with its own blip field), effect ('bombs' = the Canabi bomb-storm), give (a furniture id handed over with the reward pop-up when none is placed or in stock; otherwise the call shows the 'quest_cleared' text). Any number NOT listed here falls back to the 'nobody picks up' placeholder. Add story-mode easter eggs here without touching code.",
+  "_comment": "The numbers the My Room phone can dial, and what each one does.",
   "1122": {
     "sound": "egg"
   },
@@ -23,6 +23,30 @@
   "887": {
     "name": "",
     "text": "egg_nice_try"
+  },
+  "888": {
+    "name": "Dashy",
+    "blip": "blip_narrator",
+    "start": "dashy_hello",
+    "close": "dashy_bye",
+    "daily": "dashy_busy",
+    "choices": {
+      "dashy_hello": [
+        { "label": "dashy_ask_ribbons", "next": "dashy_ribbons" },
+        { "label": "dashy_ask_met", "next": "dashy_met" },
+        { "label": "dashy_ask_depiction", "next": "dashy_depiction" }
+      ],
+      "dashy_met": [
+        { "label": "dashy_ask_riku", "next": "dashy_riku" },
+        { "label": "dashy_ask_calla", "next": "dashy_calla" },
+        { "label": "dashy_ask_hikaru", "next": "dashy_hikaru" }
+      ],
+      "dashy_depiction": [
+        { "label": "dashy_ask_own", "next": "dashy_own" },
+        { "label": "dashy_ask_apeiroscopy", "next": "dashy_apeiroscopy" },
+        { "label": "dashy_ask_love_songs", "next": "dashy_love_songs" }
+      ]
+    }
   },
   "889": {
     "name": "",

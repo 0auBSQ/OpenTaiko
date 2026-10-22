@@ -32,5 +32,77 @@
   "egg_piano_1": "You put in the code, and heard a gentle piano performance from the other side.",
   "egg_piano_2": "Ah! T-The telephone is hanging... I hope it's not broken...",
   "egg_piano_3": "The call hangs up.",
-  "quest_cleared": "You already cleared this quest."
+  "quest_cleared": "You already cleared this quest.",
+  "dashy_hello": "Hello again-- Can you hear me alright? Is something the matter? Something you need help with, maybe?",
+  "dashy_ask_ribbons": "What is that place with the ribbons?",
+  "dashy_ask_met": "I met someone in town.",
+  "dashy_ask_depiction": "I want to know about one of your depictions.",
+  "dashy_ribbons": [
+    "That's a realm of my own. It's called the Garden of Lemniscatus. Simply put, it's sort of like my headspace.",
+    "You may notice it's not limited to this Open-World. I'm aware that you may have visited before through means aside from this window.",
+    "It's a place where after a day in a broken machine-like world, I can return to depicting memories and emotions that get lost in the \"real world\" through music and art.",
+    "It's quiet, but it's the place that feels the most like home to me. I've got a lot of things on my mind, so sometimes my ribbons get in the way.",
+    "Thanks for always checking on me there, though. I've been happy to share my creations with you. I'd be happy to know that one resonated with you."
+  ],
+  "dashy_met": [
+    "Ah, is that so? What did this someone look like, perhaps?",
+    "I can tell you a bit about what they're like or how they came to be."
+  ],
+  "dashy_ask_riku": "His name was Riku.",
+  "dashy_ask_calla": "Her name was Calla.",
+  "dashy_ask_hikaru": "His name was Mr. Hikaru.",
+  "dashy_riku": [
+    "Ah, Riku. He's pretty quiet, isn't he? He seems to be the type who's always lost in thought, but believe it or not, he's still incredibly full of intention.",
+    "He's got a lot on his plate, so help him out when you can.",
+    "Tell him I said hi!"
+  ],
+  "dashy_calla": [
+    "Oh, but of course! She's quite flashy with her street dancing, isn't she? Sometimes she's out dancing with Shadow Dancer too. They make a great duo.",
+    "She seems pretty cold on the outside, but I'm sure she's a lot of fun to spend time with once you get to know her.",
+    "There's a good friend of mine that reminds me a lot of her. Maybe you've heard her voice in this realm before.",
+    "Tell her I said hi!"
+  ],
+  "dashy_hikaru": [
+    "Yeah, it's true that he is always wandering. It's pretty hard not to see him.",
+    "Mr. Hikaru and the one he loves are very much inspired by a love story of my own.",
+    "Lovesickness is challenging. It can feel so miserable being strayed from someone you truly love.",
+    "And so, Mr. Hikaru is a being that I hope can inspire others who are lovesick to look brightly ahead (with glowing eyes), awaiting their loved one instead of being stuck in pain without them.",
+    "I won't say too much about what he's been through or what he's up to other than that. I believe when you get to know him better, you should ask him.",
+    "Tell him I said hi!"
+  ],
+  "dashy_depiction": "Wonderful, which one might that be?",
+  "dashy_ask_own": "Tell me about \"Own,\"",
+  "dashy_ask_apeiroscopy": "Tell me about \"Apeiroscopy\".",
+  "dashy_ask_love_songs": "Tell me about your love songs.",
+  "dashy_own": [
+    "\"Own,\" is a song I wrote to encapsulate all the things about me in a single piece.",
+    "The lyrics are mostly about the time I spend in the Garden of Lemniscatus (more realistically, in my creative solitude) in juxtaposition to the real world.",
+    "The lyrics are about how I spend a lot of time \"reminiscing in my own eyes\", wondering about human choices, and wanting to melt away all the regrets and words of reality in a world of my own."
+  ],
+  "dashy_apeiroscopy": [
+    "\"Apeiroscopy\" is the theme song of OpenTaiko Shining Sky.",
+    "It's an upbeat song about how there are an unlimited number of connected stories and experiences you can enjoy in this place, hence the name \"Apeiroscopy\".",
+    "\"Apeiro-\" is a Greek prefix meaning \"unlimited\" or \"boundless\" (which may be why you see it associated with me at times), and \"-scopy\" is a suffix that defines something as a thing you see, or someone's perspective.",
+    "Meaning, the title of the song means \"an unlimited number of perspectives\"."
+  ],
+  "dashy_love_songs": [
+    "Oh wow, what a treat! I love talking about love, especially my own love. Sorry if I ramble a little.",
+    "First, there was \"Trapped Passion\". It's simply a song about how it feels to be so in love, but unable to properly share it because of being apart.",
+    "There were a lot of difficult things in the way of our relationship at the time, which is what really drove me to write it.",
+    "Originally, when I planned to write a love-themed song for my collection \"Shinjitsu II\", it was going to be written about a different, more sad kind of lovesickness I was stuck with.",
+    "I was rather desperate, wishing to be in a loving relationship, so I wrote the song to express that. But around the time I was writing it, my lovely boyfriend confessed to me.",
+    "So, naturally, I rewrote and recomposed the whole song, and wrote it about a much more suitable lovesickness for my new scenario.",
+    "Then, there was \"Reverie XXIII\", which is a song about how we came to be. I wrote it for our anniversary.",
+    "Me and him are childhood friends, and we were naturally hanging out with our other childhood friends for a sleepover.",
+    "Though, once night fell and the others were asleep, it turned into a very deep conversation between the two of us, where he opened up about some things he had been struggling with.",
+    "One thing led to another, and I asked if I could give him a hug, wanting to comfort him, but also being quite touch-starved myself.",
+    "We didn't really let go though, and soon after, he confessed. Thus, a wonderful mutual love had begun.",
+    "Finally, \"cocoa break\" is a song about the dates we went on, written for our second anniversary.",
+    "Sometimes I or he would be pretty troubled with the usual burdens of life, and we would help ease that pain with a table for two, a sweet treat, and as much comfort as we could give.",
+    "Truth be told, \"cocoa break\" was actually written as a duet for that reason, but Mr. Lovey-Dove was a little too shy. If you ask him enough, maybe we'll make a duet version someday!",
+    "We went on after-school dates in all kinds of places, but almost every time we'd go to a cafe, boba shop, or somewhere we could get something sweet, hence the pastel pastry cafe vibe.",
+    "That's all of them for now, but it certainly won't be the last of them! I'll write another one as soon as February 23rd rolls around again, so keep your eyes peeled!"
+  ],
+  "dashy_bye": "I'm pretty busy at the moment, so I'll have to hang up for now. If you call again tomorrow, I'll pick up the phone just like this.",
+  "dashy_busy": "Dashy seems busy for the moment. I should call again tomorrow."
 }

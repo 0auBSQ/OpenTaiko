@@ -204,7 +204,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		// IsFirstDraw (the old "base.Activate() // to unpause at end").
 		var it = base.ActivateSteps();
 		while (it.MoveNext()) yield return it.Current;
-		HitSoundOnArrival.Publish(OpenTaiko.ConfigIni, this.soundRed, this.soundBlue);
+		HitSoundOnArrival.Publish(OpenTaiko.ConfigIni, this.soundRed, this.soundBlue, this.soundClap);
 	}
 
 	public override void tValueInitialize(bool bPlayRecord, bool bPlayState) {

@@ -32,5 +32,77 @@
   "egg_piano_1": "Vous composez le code, et entendez un doux morceau de piano à l'autre bout du fil.",
   "egg_piano_2": "Ah ! L-Le téléphone est décroché... J'espère qu'il n'est pas cassé...",
   "egg_piano_3": "L'appel se coupe.",
-  "quest_cleared": "Vous avez déjà terminé cette quête."
+  "quest_cleared": "Vous avez déjà terminé cette quête.",
+  "dashy_hello": "Re-bonjour-- tu m'entends bien ? Il y a quelque chose qui ne va pas ? Tu as besoin d'aide pour quelque chose, peut-être ?",
+  "dashy_ask_ribbons": "Quel est cet endroit avec les rubans ?",
+  "dashy_ask_met": "J'ai rencontré quelqu'un en ville.",
+  "dashy_ask_depiction": "Parle-moi d'une de tes créations.",
+  "dashy_ribbons": [
+    "C'est un royaume bien à moi. Il s'appelle le Garden of Lemniscatus. Pour faire simple, c'est un peu comme l'intérieur de ma tête.",
+    "Tu remarqueras peut-être qu'il ne se limite pas à cet Open-World. Je sais que tu as peut-être déjà pu le visiter par d'autres moyens que cette fenêtre.",
+    "C'est un endroit où, après une journée dans un monde brisé et mécanique, je peux revenir à la représentation des souvenirs et des émotions qui se perdent dans le « monde réel », à travers la musique et l'art.",
+    "C'est calme, mais c'est l'endroit où je me sens le plus chez moi. J'ai beaucoup de choses en tête, alors parfois mes rubans me gênent.",
+    "Merci de toujours venir prendre de mes nouvelles là-bas, en tout cas. J'ai été heureuse de partager mes créations avec toi. Ça me ferait plaisir de savoir que l'une d'elles a résonné en toi."
+  ],
+  "dashy_met": [
+    "Ah, vraiment ? À quoi ressemblait cette personne, peut-être ?",
+    "Je peux te raconter un peu comment elle est, ou comment elle est née."
+  ],
+  "dashy_ask_riku": "Il s'appelait Riku.",
+  "dashy_ask_calla": "Elle s'appelait Calla.",
+  "dashy_ask_hikaru": "Il s'appelait Mr. Hikaru.",
+  "dashy_riku": [
+    "Ah, Riku. Il est plutôt calme, hein ? Il a l'air du genre à être toujours perdu dans ses pensées, mais crois-le ou non, il est quand même incroyablement plein d'intentions.",
+    "Il a beaucoup de choses sur les épaules, alors aide-le quand tu peux.",
+    "Passe-lui le bonjour de ma part !"
+  ],
+  "dashy_calla": [
+    "Oh, mais bien sûr ! Elle en met plein la vue avec sa danse de rue, pas vrai ? Parfois, elle danse aussi avec Shadow Dancer. Ça fait un super duo.",
+    "Elle a l'air plutôt froide de l'extérieur, mais je suis sûre qu'on s'amuse beaucoup avec elle une fois qu'on la connaît.",
+    "Une bonne amie à moi me fait beaucoup penser à elle. Tu as peut-être déjà entendu sa voix dans ce royaume.",
+    "Passe-lui le bonjour de ma part !"
+  ],
+  "dashy_hikaru": [
+    "Oui, c'est vrai qu'il est toujours en train d'errer. C'est difficile de ne pas le voir.",
+    "Mr. Hikaru et la personne qu'il aime sont très inspirés d'une histoire d'amour à moi.",
+    "Le mal d'amour, c'est dur. On peut se sentir si malheureux d'être éloigné de quelqu'un qu'on aime vraiment.",
+    "Alors, Mr. Hikaru est un être qui, je l'espère, pourra inspirer ceux qui ont le mal d'amour à regarder devant eux avec espoir (les yeux brillants), en attendant l'être aimé, au lieu de rester coincés dans la douleur sans lui.",
+    "Je n'en dirai pas plus sur ce qu'il a vécu ou sur ce qu'il fait en ce moment. Quand tu le connaîtras mieux, je pense que tu devrais lui demander.",
+    "Passe-lui le bonjour de ma part !"
+  ],
+  "dashy_depiction": "Merveilleux, laquelle ça pourrait être ?",
+  "dashy_ask_own": "Parle-moi de « Own, »",
+  "dashy_ask_apeiroscopy": "Parle-moi d'« Apeiroscopy ».",
+  "dashy_ask_love_songs": "Parle-moi de tes chansons d'amour.",
+  "dashy_own": [
+    "« Own, » est une chanson que j'ai écrite pour réunir tout ce qui me définit en un seul morceau.",
+    "Les paroles parlent surtout du temps que je passe dans le Garden of Lemniscatus (plus concrètement, dans ma solitude créative), en contraste avec le monde réel.",
+    "Elles racontent comment je passe beaucoup de temps à « me remémorer à travers mes propres yeux », à m'interroger sur les choix humains, et à vouloir faire fondre tous les regrets et les mots de la réalité dans un monde à moi."
+  ],
+  "dashy_apeiroscopy": [
+    "« Apeiroscopy » est la chanson thème d'OpenTaiko Shining Sky.",
+    "C'est une chanson entraînante sur le nombre illimité d'histoires et d'expériences liées entre elles que tu peux vivre ici, d'où le nom « Apeiroscopy ».",
+    "« Apeiro- » est un préfixe grec qui signifie « illimité » ou « sans bornes » (c'est peut-être pour ça que tu le vois parfois associé à moi), et « -scopy » est un suffixe qui désigne une chose que l'on voit, ou le point de vue de quelqu'un.",
+    "Autrement dit, le titre de la chanson signifie « un nombre illimité de points de vue »."
+  ],
+  "dashy_love_songs": [
+    "Oh là là, quel bonheur ! J'adore parler d'amour, surtout du mien. Désolée si je divague un peu.",
+    "D'abord, il y a eu « Trapped Passion ». C'est simplement une chanson sur ce que ça fait d'être si amoureuse, mais incapable de vraiment le partager parce qu'on est séparés.",
+    "À l'époque, beaucoup de choses difficiles se mettaient en travers de notre relation, et c'est vraiment ce qui m'a poussée à l'écrire.",
+    "Au départ, quand j'ai prévu d'écrire une chanson sur l'amour pour ma collection « Shinjitsu II », elle devait parler d'un autre mal d'amour, plus triste, dans lequel j'étais coincée.",
+    "J'étais plutôt désespérée, je rêvais d'une relation amoureuse, alors j'ai écrit la chanson pour l'exprimer. Mais à peu près au moment où je l'écrivais, mon adorable petit ami s'est déclaré.",
+    "Alors, naturellement, j'ai réécrit et recomposé toute la chanson, sur un mal d'amour bien plus adapté à ma nouvelle situation.",
+    "Ensuite, il y a eu « Reverie XXIII », une chanson sur la façon dont tout a commencé entre nous. Je l'ai écrite pour notre anniversaire.",
+    "Lui et moi, on est amis d'enfance, et on passait tout naturellement une soirée pyjama avec nos autres amis d'enfance.",
+    "Mais une fois la nuit tombée et les autres endormis, ça s'est transformé en une conversation très profonde entre nous deux, où il s'est confié sur des choses avec lesquelles il se débattait.",
+    "Une chose en entraînant une autre, je lui ai demandé si je pouvais le serrer dans mes bras, pour le réconforter, mais aussi parce que je manquais moi-même pas mal de tendresse.",
+    "On ne s'est pas vraiment lâchés, et peu après, il s'est déclaré. Et c'est ainsi qu'un merveilleux amour partagé a commencé.",
+    "Enfin, « cocoa break » est une chanson sur nos rendez-vous, écrite pour notre deuxième anniversaire.",
+    "Parfois, lui ou moi étions pas mal accablés par les soucis habituels de la vie, et on apaisait cette peine avec une table pour deux, une douceur sucrée et tout le réconfort qu'on pouvait se donner.",
+    "À vrai dire, c'est pour ça que « cocoa break » a été écrite en duo, mais Mr. Lovey-Dove était un peu trop timide. Si tu lui demandes assez souvent, on en fera peut-être une version en duo un jour !",
+    "On avait des rendez-vous après les cours dans plein d'endroits, mais presque à chaque fois, on allait dans un café, un bar à bubble tea, ou n'importe où on pouvait avoir quelque chose de sucré, d'où l'ambiance de café-pâtisserie pastel.",
+    "C'est tout pour l'instant, mais ce ne sera certainement pas la dernière ! J'en écrirai une autre dès que le 23 février reviendra, alors ouvre l'œil !"
+  ],
+  "dashy_bye": "Je suis assez occupée en ce moment, alors je vais devoir raccrocher. Si tu rappelles demain, je décrocherai exactement comme ça.",
+  "dashy_busy": "Dashy a l'air occupée pour le moment. Je devrais rappeler demain."
 }

@@ -1384,13 +1384,13 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 			NotesManager.EInputType.Clap => this.soundClap[iPlayer],
 			_ => null,
 		};
-		if (sound == null || (this.bDrumSoundPlayedOnArrival && input is not NotesManager.EInputType.Clap))
-			return; // a live press already played its don/ka when it arrived (HitSoundOnArrival)
+		if (sound == null || this.bDrumSoundPlayedOnArrival)
+			return; // a live press already played its sound when it arrived (HitSoundOnArrival)
 		lock (HitSoundOnArrival.Gate)
 			sound.PlayStart(TjaTimeToFrameworkTime(OpenTaiko.GetTJA(iPlayer)!, msTjaTime));
 	}
 
-	// set while tInputProcess_Drums processes a press whose don/ka was played on arrival
+	// set while tInputProcess_Drums processes a press whose sound was played on arrival
 	protected bool bDrumSoundPlayedOnArrival;
 
 	protected void StartHitNoteLaneFlash(int iPlayer, NotesManager.EInputType input, EGameType gt) {

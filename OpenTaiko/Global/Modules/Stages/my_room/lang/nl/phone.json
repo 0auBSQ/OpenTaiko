@@ -32,5 +32,77 @@
   "egg_piano_1": "Je voert de code in en hoort aan de andere kant een zacht pianospel.",
   "egg_piano_2": "Ah! D-De verbinding hapert... Ik hoop dat er niks kapot is...",
   "egg_piano_3": "De verbinding wordt verbroken.",
-  "quest_cleared": "Je hebt deze quest al voltooid."
+  "quest_cleared": "Je hebt deze quest al voltooid.",
+  "dashy_hello": "Hallo weer-- kun je me goed horen? Is er iets aan de hand? Heb je misschien ergens hulp bij nodig?",
+  "dashy_ask_ribbons": "Wat is die plek met de linten?",
+  "dashy_ask_met": "Ik heb iemand in de stad ontmoet.",
+  "dashy_ask_depiction": "Vertel over een van je verbeeldingen.",
+  "dashy_ribbons": [
+    "Dat is een rijk van mezelf. Het heet de Garden of Lemniscatus. Simpel gezegd is het een soort binnenwereld van mij.",
+    "Misschien merk je dat het niet beperkt is tot deze Open-World. Ik weet dat je er misschien al eens bent geweest via andere wegen dan dit venster.",
+    "Het is een plek waar ik, na een dag in een kapotte, machineachtige wereld, kan terugkeren naar het verbeelden van herinneringen en gevoelens die in de \"echte wereld\" verloren gaan, met muziek en kunst.",
+    "Het is er stil, maar het is de plek die voor mij het meest als thuis voelt. Er speelt veel in mijn hoofd, dus soms zitten mijn linten in de weg.",
+    "Toch bedankt dat je daar altijd even bij me komt kijken. Ik vond het fijn om mijn creaties met je te delen. Ik zou het fijn vinden om te weten dat er een je heeft geraakt."
+  ],
+  "dashy_met": [
+    "O, is dat zo? Hoe zag die iemand er dan uit?",
+    "Ik kan je wat vertellen over hoe die persoon is of hoe die is ontstaan."
+  ],
+  "dashy_ask_riku": "Hij heette Riku.",
+  "dashy_ask_calla": "Zij heette Calla.",
+  "dashy_ask_hikaru": "Hij heette Mr. Hikaru.",
+  "dashy_riku": [
+    "Ah, Riku. Hij is best stil, hè? Hij lijkt het type dat altijd in gedachten verzonken is, maar geloof het of niet, hij zit nog steeds ontzettend vol bedoelingen.",
+    "Hij heeft veel op zijn bord, dus help hem waar je kunt.",
+    "Doe hem de groeten van me!"
+  ],
+  "dashy_calla": [
+    "O, maar natuurlijk! Ze valt behoorlijk op met haar streetdance, hè? Soms danst ze ook samen met Shadow Dancer. Ze vormen een geweldig duo.",
+    "Ze lijkt van buiten nogal koel, maar ik weet zeker dat het heel leuk is om met haar op te trekken als je haar eenmaal leert kennen.",
+    "Er is een goede vriendin van me die me erg aan haar doet denken. Misschien heb je haar stem al eens in dit rijk gehoord.",
+    "Doe haar de groeten van me!"
+  ],
+  "dashy_hikaru": [
+    "Ja, het klopt dat hij altijd rondzwerft. Het is best moeilijk om hem niet te zien.",
+    "Mr. Hikaru en degene van wie hij houdt, zijn sterk geïnspireerd op een liefdesverhaal van mezelf.",
+    "Liefdesverdriet is zwaar. Het kan zo ellendig voelen om weg te zijn van iemand van wie je echt houdt.",
+    "En dus is Mr. Hikaru een wezen dat hopelijk anderen met liefdesverdriet kan inspireren om stralend vooruit te kijken (met gloeiende ogen) en op hun geliefde te wachten, in plaats van zonder hen vast te zitten in de pijn.",
+    "Meer zeg ik niet over wat hij heeft meegemaakt of waar hij mee bezig is. Als je hem beter leert kennen, moet je het hem maar vragen.",
+    "Doe hem de groeten van me!"
+  ],
+  "dashy_depiction": "Geweldig, welke zou dat zijn?",
+  "dashy_ask_own": "Vertel me over \"Own,\"",
+  "dashy_ask_apeiroscopy": "Vertel me over \"Apeiroscopy\".",
+  "dashy_ask_love_songs": "Vertel me over je liefdesliedjes.",
+  "dashy_own": [
+    "\"Own,\" is een nummer dat ik schreef om alles wat mij maakt tot wie ik ben in één stuk te vangen.",
+    "De tekst gaat vooral over de tijd die ik doorbreng in de Garden of Lemniscatus (realistischer gezegd: in mijn creatieve eenzaamheid), tegenover de echte wereld.",
+    "Het gaat over hoe ik veel tijd besteed aan \"mijmeren in mijn eigen ogen\", nadenken over menselijke keuzes, en alle spijt en woorden van de werkelijkheid willen laten wegsmelten in een eigen wereld."
+  ],
+  "dashy_apeiroscopy": [
+    "\"Apeiroscopy\" is het themalied van OpenTaiko Shining Sky.",
+    "Het is een vrolijk nummer over hoe je hier kunt genieten van een onbeperkt aantal verbonden verhalen en ervaringen, vandaar de naam \"Apeiroscopy\".",
+    "\"Apeiro-\" is een Grieks voorvoegsel dat \"onbeperkt\" of \"grenzeloos\" betekent (misschien zie je het daarom soms met mij in verband gebracht), en \"-scopy\" is een achtervoegsel voor iets wat je ziet, of iemands perspectief.",
+    "De titel van het nummer betekent dus \"een onbeperkt aantal perspectieven\"."
+  ],
+  "dashy_love_songs": [
+    "O wauw, wat een traktatie! Ik praat zo graag over de liefde, vooral over mijn eigen liefde. Sorry als ik een beetje doorratel.",
+    "Eerst was er \"Trapped Passion\". Het is gewoon een nummer over hoe het voelt om zo verliefd te zijn, maar het niet echt te kunnen delen omdat je van elkaar gescheiden bent.",
+    "Er stonden toen veel moeilijke dingen onze relatie in de weg, en dat is wat me echt aanzette om het te schrijven.",
+    "Toen ik eerst van plan was een liefdeslied te schrijven voor mijn verzameling \"Shinjitsu II\", zou het gaan over een ander, droeviger soort liefdesverdriet waar ik in vastzat.",
+    "Ik was nogal wanhopig en wenste een liefdevolle relatie, dus schreef ik het nummer om dat uit te drukken. Maar rond de tijd dat ik het schreef, verklaarde mijn lieve vriendje me zijn liefde.",
+    "Dus heb ik natuurlijk het hele nummer herschreven en opnieuw gecomponeerd, over een soort liefdesverdriet dat veel beter bij mijn nieuwe situatie paste.",
+    "Daarna was er \"Reverie XXIII\", een nummer over hoe wij samen zijn gekomen. Ik schreef het voor ons jubileum.",
+    "Hij en ik zijn jeugdvrienden, en we bleven natuurlijk logeren met onze andere jeugdvrienden.",
+    "Maar toen de nacht viel en de anderen sliepen, werd het een heel diep gesprek tussen ons tweeën, waarin hij zich openstelde over een paar dingen waar hij mee worstelde.",
+    "Het een leidde tot het ander, en ik vroeg of ik hem een knuffel mocht geven, om hem te troosten, maar ook omdat ik zelf behoorlijk snakte naar aanraking.",
+    "We lieten elkaar eigenlijk niet meer los, en kort daarna verklaarde hij me zijn liefde. Zo begon een prachtige wederzijdse liefde.",
+    "En tot slot is \"cocoa break\" een nummer over onze dates, geschreven voor ons tweede jubileum.",
+    "Soms zaten hij of ik flink in de knoop met de gewone lasten van het leven, en dan verzachtten we die pijn met een tafel voor twee, iets zoets en zoveel troost als we konden geven.",
+    "Eerlijk gezegd was \"cocoa break\" daarom eigenlijk als duet geschreven, maar Mr. Lovey-Dove was iets te verlegen. Als je het hem vaak genoeg vraagt, maken we misschien ooit een duetversie!",
+    "We gingen na school op dates op allerlei plekken, maar bijna altijd naar een café, een bubbelthee-winkel of ergens waar we iets zoets konden halen, vandaar die sfeer van een pastelkleurig gebakcafé.",
+    "Dat zijn ze voorlopig allemaal, maar het zijn zeker niet de laatste! Ik schrijf er weer een zodra het weer 23 februari is, dus hou je ogen open!"
+  ],
+  "dashy_bye": "Ik heb het nu nogal druk, dus ik moet zo ophangen. Als je morgen weer belt, neem ik precies zo weer op.",
+  "dashy_busy": "Dashy lijkt het nu druk te hebben. Ik bel morgen maar opnieuw."
 }

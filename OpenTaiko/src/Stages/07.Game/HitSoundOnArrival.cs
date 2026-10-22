@@ -2,24 +2,24 @@ using FDK;
 
 namespace OpenTaiko;
 
-// The plain don/ka of a live drum press, played the moment the press arrives on whichever thread delivers it (window,
+// The don, ka or clap sound of a live press, played the moment the press arrives on whichever thread delivers it (window,
 // MIDI or host thread) instead of when the frame processes the hit. Judgement is unchanged: it still uses the press's
-// own timestamp, and the play screen skips the drum sound of presses played here.
+// own timestamp, and the play screen skips the hit sound of presses played here.
 internal static class HitSoundOnArrival {
 	// held while a hit sound starts, here and on the game thread, and while the play screen changes what is published
 	internal static readonly object Gate = new();
 
-	private static Dictionary<(InputDeviceType type, int id, int key), (int player, bool red)[]>? _keys;
-	private static CSound?[]? _red, _blue;
+	private static Dictionary<(InputDeviceType type, int id, int key), (int player, NotesManager.EInputType input)[]>? _keys;
+	private static CSound?[]? _red, _blue, _clap;
 	private static readonly bool[] _live = new bool[5];
 
 	// game thread, when the play screen activates: the drum keys of the current bindings and its hit sound slots
-	internal static void Publish(CConfigIni config, CSound?[] red, CSound?[] blue) {
-		var keys = new Dictionary<(InputDeviceType, int, int), List<(int, bool)>>();
+	internal static void Publish(CConfigIni config, CSound?[] red, CSound?[] blue, CSound?[] clap) {
+		var keys = new Dictionary<(InputDeviceType, int, int), List<(int, NotesManager.EInputType)>>();
 		for (EKeyConfigPart part = 0; part < EKeyConfigPart.System; ++part) {
 			for (EPad pad = 0; pad < EPad.Max; ++pad) {
 				var input = NotesManager.PadToInputType(pad);
-				if (input is not (NotesManager.EInputType.Red or NotesManager.EInputType.Blue))
+				if (input is not (NotesManager.EInputType.Red or NotesManager.EInputType.Blue or NotesManager.EInputType.Clap))
 					continue;
 				int player = NotesManager.GetPadPlayer(pad);
 				foreach (var k in config.KeyAssign[(int)part][(int)pad]) {
@@ -28,7 +28,7 @@ internal static class HitSoundOnArrival {
 					var key = (k.InputDevice, k.ID, k.Code);
 					if (!keys.TryGetValue(key, out var targets))
 						keys[key] = targets = new();
-					targets.Add((player, input == NotesManager.EInputType.Red));
+					targets.Add((player, input));
 				}
 			}
 		}
@@ -36,6 +36,7 @@ internal static class HitSoundOnArrival {
 			_keys = keys.ToDictionary(e => e.Key, e => e.Value.ToArray());
 			_red = red;
 			_blue = blue;
+			_clap = clap;
 			Array.Clear(_live);
 		}
 	}
@@ -46,12 +47,12 @@ internal static class HitSoundOnArrival {
 	internal static void Clear() {
 		lock (Gate) {
 			_keys = null;
-			_red = _blue = null;
+			_red = _blue = _clap = null;
 			Array.Clear(_live);
 		}
 	}
 
-	// any input thread: true when the press played its drum sound
+	// any input thread: true when the press played its hit sound
 	internal static bool OnPress(IInputDevice device, int key) {
 		if (Volatile.Read(ref _keys) == null)
 			return false;
@@ -59,10 +60,15 @@ internal static class HitSoundOnArrival {
 			if (_keys == null || !_keys.TryGetValue((device.CurrentType, device.ID, key), out var targets))
 				return false;
 			bool played = false;
-			foreach (var (player, red) in targets) {
+			foreach (var (player, input) in targets) {
 				if (!Volatile.Read(ref _live[player]))
 					continue;
-				var sound = (red ? _red : _blue)?[player];
+				var sounds = input switch {
+					NotesManager.EInputType.Red => _red,
+					NotesManager.EInputType.Blue => _blue,
+					_ => _clap,
+				};
+				var sound = sounds?[player];
 				if (sound == null)
 					continue;
 				sound.PlayStart();

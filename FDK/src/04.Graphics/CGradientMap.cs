@@ -21,7 +21,15 @@ public class CGradientMap : IDisposable {
 		if (stops.Count < 2)
 			throw new ArgumentException("A gradient needs at least 2 stops.", nameof(stops));
 		Lut = BuildLut(stops);
-		TextureId = Upload(Lut);
+		// GL works on the render thread only: a gradient made on a loader thread (the boot's async texture load
+		// restores the saved palettes) is uploaded there on the next frame, and has no texture until then
+		if (Environment.CurrentManagedThreadId == Game.MainThreadID) {
+			TextureId = Upload(Lut);
+		} else {
+			Game.AsyncActions.Enqueue(() => {
+				if (!_disposed && TextureId == 0) TextureId = Upload(Lut);
+			});
+		}
 	}
 
 	/// <summary>The 256×1 RGBA texels for the given stops (sorted by position here).</summary>

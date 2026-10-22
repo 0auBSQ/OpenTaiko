@@ -76,6 +76,7 @@ local playPhoneSound           -- forward decl: Sounds/<stem>.ogg, lazily loaded
 local ringT, ringScript, ringDue = 0, nil, false  -- an outgoing call: coin, then the ring, then the answer
 local phoneSfx = {}            -- cached dialable-number SFX (stem → sound|false); disposed in onDestroy
 local bombFx = nil             -- the "Canabi" bomb-storm state (declared here so onDestroy sees it)
+local branchCall = nil         -- the running call that branches (data/phone_numbers.json "start")
 
 -- ── persistence (local save only; the network payload goes through online.lua as JSON) ────────────
 -- the room and the jukebox's song live in one string of the save (store.lua); a visitor never writes,
@@ -295,6 +296,7 @@ function activate()
     Landlord.reset()                             -- the landlord forgives on every visit
     purse:hide()
     ringT, ringScript, ringDue = 0, nil, false
+    branchCall = nil
     if world ~= nil then return end
     LOADING:Add("Room", 5, function()
         world = OWM.World.new{ rw = RW, rh = RH, screenW = SCREEN_W, screenH = SCREEN_H,
@@ -562,6 +564,75 @@ local function giveFurniture(id)
     end
     return true
 end
+-- a call that branches (an entry with "start"): every step is a phone.json id holding one line or a
+-- list of lines, all said by the entry's name. A step listed under "choices" ends on those choices,
+-- each leading to the step its "next" names; any other step is an answer, followed by the "close"
+-- step. With "daily", one answer a day (the shop's day): a later call that day shows the "daily" text
+-- with no name, then hangs up
+local function evText(v)
+    local s = nil
+    pcall(function() s = JSONLOADER:ExtractText(v) end)
+    if s == "" then return nil end
+    return s
+end
+local function callDay() return require("Shop.Daily").freezeKey() end
+local function callCounter(key) return ".myroom_call_" .. key end
+local function answeredToday(key)
+    local ok, v = pcall(function() return curSave():GetGlobalCounter(callCounter(key)) end)
+    return ok and tonumber(v) == callDay()
+end
+local function callLines(call, step, nodes)
+    local lines = PHONE:list(step)
+    if #lines == 0 then lines = { PHONE:tr(step) } end
+    for _, s in ipairs(lines) do nodes[#nodes + 1] = { name = call.name, text = s, blip = call.blip } end
+    return nodes
+end
+local function callStep(call, step)
+    local nodes = callLines(call, step, {})
+    local choices = {}
+    pcall(function()
+        local list = call.ev["choices"][step]
+        for i = 0, list.Count - 1 do
+            local label, nxt = evText(list[i]["label"]), evText(list[i]["next"])
+            if label and nxt then choices[#choices + 1] = { label = PHONE:tr(label), value = nxt } end
+        end
+    end)
+    if #choices > 0 then
+        nodes[#nodes].choices = choices
+        return nodes
+    end
+    if call.close then callLines(call, call.close, nodes) end
+    call.answered = true
+    if call.daily and canPersist() then
+        pcall(function() curSave():SetGlobalCounter(callCounter(call.key), callDay()) end)
+    end
+    return nodes
+end
+local function endCall()
+    branchCall = nil
+    mode = "play"; phoneFlow = nil
+    playPhoneSound("phone_cut")
+end
+local function startBranchCall(key, ev)
+    local call = { key = key, ev = ev, name = evText(ev["name"]) or "", blip = evText(ev["blip"]),
+                   close = evText(ev["close"]), daily = evText(ev["daily"]) }
+    mode = "dialogue"; phoneFlow = nil
+    if call.daily and answeredToday(key) then
+        call.answered = true
+        branchCall = call
+        phoneFlow = "branch"
+        dlg:start(callLines({ name = "" }, call.daily, {}))
+        return
+    end
+    branchCall = call
+    phoneFlow = "branch"
+    dlg:start(callStep(call, evText(ev["start"])))
+end
+-- the call goes on with the step a choice named; nil when the call is over
+local function branchNext(result)
+    if branchCall == nil or branchCall.answered or type(result) ~= "string" then return nil end
+    return callStep(branchCall, result)
+end
 local function dialPhone(input)
     local key = tostring(input or ""):gsub("%s+", ""):lower()
     local doc = phoneNumbersDoc()
@@ -597,6 +668,10 @@ local function dialPhone(input)
             mode = "dialogue"
             dlg:start({ { name = "", text = PHONE:tr("quest_cleared"), blip = "blip_narrator" } })
         end
+        return
+    end
+    if evText(ev["start"]) then
+        startBranchCall(key, ev)
         return
     end
     if text then text = PHONE:tr(text) end       -- the entry's text is a phone.json id (egg_*); names stay as written
@@ -929,6 +1004,12 @@ openPlayerSelect = function()
 end
 
 local function onDialogueDone(result)
+    if phoneFlow == "branch" then
+        local nxt = branchNext(result)
+        if nxt then dlg:start(nxt) ; return end
+        endCall()
+        return
+    end
     if phoneFlow == "landlord" then
         local nxt = Landlord.onDone(result)
         if nxt then dlg:start(nxt) ; return end

@@ -1,9 +1,10 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
 -- coin_shop/keeper.lua: the shopkeeper's spot behind the desk and its speech bubble.
--- The keeper is one of the folders Textures/Keepers/0, 1, 2..., picked from the day when the shop opens (the same
--- one all day); each folder holds one picture per expression: Neutral, Happy, Surprised and Sad (.png), a missing
--- one showing Neutral. Every event picks a short line and an expression; the keeper hops (squash and stretch) when
--- the expression changes and nods when it keeps it, and the bubble types the line in letter by letter.
+-- The keeper is one of the part-timers in Textures/Keepers/0, 1, 2..., picked from the day when the shop opens (the
+-- same one all day); each folder holds one picture per expression: Neutral, Happy, Surprised and Sad (.png), a
+-- missing one showing Neutral. Every event picks one of that part-timer's own lines and its expression (PART_TIMERS
+-- below); the keeper hops (squash and stretch) when the expression changes and nods when it keeps it, and the
+-- bubble types the line in letter by letter.
 
 local Easing = require("Easing")
 
@@ -21,23 +22,28 @@ local HOLD, HOLD_PER_CHAR = 2.6, 0.045
 local POP, CLOSE = 0.24, 0.18
 local LOW_GAP = 1.0           -- a low-priority line waits this long after the last line finished typing
 
--- event -> expression, then the English lines (keys SHOP_TALK_<EVENT>_<n>)
-local LINES = {
-	greet     = { "happy", "Welcome! Fresh picks in today's issue.", "Oh, a customer! Take a look around.", "Hello there! Everything's on the page." },
-	browse    = { "happy", "Ooh, that one's lovely.", "Good eye!", "A popular pick, that one." },
-	featured  = { "surprised", "Today's special! Don't miss it.", "The star of this issue!" },
-	coupon    = { "neutral", "Want a new page of goods?", "A fresh batch? It'll cost you." },
-	backtab   = { "sad", "Leaving already?", "Done browsing?" },
-	trybuy    = { "happy", "Shall I wrap it up?", "Excellent choice!", "Ready when you are!" },
-	poor      = { "sad", "Hmm, you're a little short...", "Not enough coins, I'm afraid.", "Come back with a few more coins!" },
-	bought    = { "happy", "Thank you kindly!", "Pleasure doing business!", "Enjoy it!" },
-	soldout   = { "sad", "Sorry, that one's gone!", "All sold out, I'm afraid.", "Too late for that one!" },
-	rerollask = { "surprised", "A whole new page? Sure!", "Shall I shuffle the stock?" },
-	reroll    = { "surprised", "Fresh stock, coming right up!", "Let's see what we have now!", "Brand new picks!" },
-	cancel    = { "neutral", "No rush, take your time.", "Maybe next time!" },
-	leave     = { "happy", "See you soon!", "Come back anytime!", "Thanks for stopping by!" },
-	idle      = { "neutral", "Take your time, no rush.", "Psst... the stock changes every day.", "Hmm hm hmm...", "Anything catch your eye?" },
-	whose     = { "neutral", "Who's shopping today?", "Whose wallet are we using?" },
+-- part-timer 0, Calla: event -> expression, then her English lines; quiet and tired, says as little as she
+-- can (keys SHOP_TALK_CALLA_<EVENT>_<n>)
+local CALLA = {
+	greet     = { "neutral", "...Welcome.", "Oh. Hi. Everything's on the page.", "Welcome in. Look around, if you want." },
+	browse    = { "neutral", "That one's nice. I think.", "People like that one.", "Mm. Good pick." },
+	featured  = { "neutral", "Today's special. ...So I'm told.", "That's the featured one. It's, um... good." },
+	coupon    = { "neutral", "New picks cost extra. Just so you know.", "A new page? ...If you want." },
+	backtab   = { "sad", "Leaving?", "Done already? ...Okay." },
+	trybuy    = { "neutral", "That one? Okay.", "I'll ring it up.", "Sure. One sec." },
+	poor      = { "sad", "You're a bit short. ...Sorry.", "Not enough coins. I could-- Tss... Never mind.", "It's a lot, huh. I get it." },
+	bought    = { "happy", "Thanks. ...Really.", "Here. Hope you like it.", "Thank you for shopping wi-- ...Thanks." },
+	soldout   = { "sad", "That one's gone. Sorry.", "Sold out. ...Yeah.", "Someone got it first." },
+	rerollask = { "surprised", "All of it? ...Okay.", "A whole new page? Sure." },
+	reroll    = { "neutral", "...There. New stuff.", "Okay. Fresh page.", "Restocked. That's... all." },
+	cancel    = { "neutral", "Okay. No rush.", "That's fine." },
+	leave     = { "sad", "Bye. ...Take care.", "See you.", "Thanks for coming by." },
+	idle      = { "neutral", "Hah... Sorry. Long day.", "Take your time. I'm not going anywhere.", "Nice song. You could almost-- ...Never mind.", "Anything you want? ...No pressure.", "My shift ends at-- Tss... Doesn't matter." },
+	whose     = { "neutral", "Whose coins today?", "Who's paying?" },
+}
+-- folder number -> the key prefix of its lines, how much it hops, its lines; a folder missing here uses 0's
+local PART_TIMERS = {
+	[0] = { prefix = "SHOP_TALK_CALLA_", hop = 0.4, lines = CALLA },
 }
 local KEEPERS = "Textures/Keepers/"
 local FRAMES = { neutral = "Neutral", happy = "Happy", surprised = "Surprised", sad = "Sad" }
@@ -45,6 +51,8 @@ local FRAMES = { neutral = "Neutral", happy = "Happy", surprised = "Surprised", 
 local ctx = nil
 local lastPick = {}
 local frames = {}        -- expression -> picture of today's keeper
+local who = PART_TIMERS[0]   -- today's part-timer
+K.id = 0
 
 K.expr = "neutral"
 local hopT, hopAmp = nil, 0
@@ -66,6 +74,7 @@ end
 -- day: a whole number for the day (e.g. 20261007); only the picked keeper's pictures are loaded
 function K.load(day)
 	K.free()
+	K.id, who, lastPick = 0, PART_TIMERS[0], {}
 	local n = 0
 	while STORAGE:DirectoryExists(KEEPERS .. n) do n = n + 1 end
 	if n == 0 then return end
@@ -73,7 +82,9 @@ function K.load(day)
 	h = ((h ~ (h >> 16)) * 0x45d9f3b) & 0xffffffff
 	h = ((h ~ (h >> 16)) * 0x45d9f3b) & 0xffffffff
 	h = h ~ (h >> 16)
-	local dir = KEEPERS .. (h % n) .. "/"
+	K.id = h % n
+	who = PART_TIMERS[K.id] or PART_TIMERS[0]
+	local dir = KEEPERS .. K.id .. "/"
 	for expr, name in pairs(FRAMES) do
 		local path = dir .. name .. ".png"
 		if STORAGE:FileExists(path) then frames[expr] = TEXTURE:CreateTexture(path) end
@@ -103,8 +114,8 @@ local function lineList(arr)
 end
 
 function K.text(event, i)
-	local set = LINES[event]
-	return ctx.tr("SHOP_TALK_" .. event:upper() .. "_" .. i, set[i + 1])
+	local set = who.lines[event]
+	return ctx.tr(who.prefix .. event:upper() .. "_" .. i, set[i + 1])
 end
 
 -- true while a line is still typing or was only just finished
@@ -115,7 +126,7 @@ end
 
 -- low: browsing / idle chatter, skipped while another line is being said
 function K.say(event, now, low)
-	local set = LINES[event]
+	local set = who.lines[event]
 	if set == nil then return false end
 	if low and K.busy(now) then return false end
 	local n = #set - 1
@@ -127,9 +138,9 @@ function K.say(event, now, low)
 	local expr = set[1]
 	if expr ~= K.expr then
 		K.expr = expr
-		hopT, hopAmp = now, 1
+		hopT, hopAmp = now, who.hop
 	else
-		hopT, hopAmp = now, 0.4
+		hopT, hopAmp = now, 0.4 * who.hop
 	end
 
 	local lines = {}
