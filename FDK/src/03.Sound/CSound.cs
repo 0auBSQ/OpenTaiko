@@ -247,10 +247,14 @@ public class CSound : IDisposable {
 		lufsVolume = finalGain;
 	}
 
+	// the value is linear to Lufs for some reason
+	private static double LufsToBassVolume(Lufs lufs) => (lufs.ToDouble() / 100.0) + 1.0; // 0: -100 dB, 1: 0dB
+	private static Lufs BassVolumeToLufs(float bassVolume) => new((bassVolume - 1.0) * 100.0);
+
 	private Lufs lufsVolume {
 		set {
 			if (this.IsBassSound) {
-				var dbVolume = ((value.ToDouble() / 100.0) + 1.0).Clamp(0, 1);
+				var dbVolume = LufsToBassVolume(value).Clamp(0, 1);
 				Bass.ChannelSetAttribute(this._hBassStream, ChannelAttribute.Volume, (float)dbVolume);
 				Bass.ChannelSetAttribute(this._hTempoStream, ChannelAttribute.Volume, (float)dbVolume);
 			}
@@ -453,7 +457,10 @@ public class CSound : IDisposable {
 	public (float volume, float pan) tGetChannelLevels() {
 		float vol = 1f, pan = 0f;
 		if (this.IsBassSound && this.hBassStream != 0) {
-			if (!Bass.ChannelGetAttribute(this.hBassStream, ChannelAttribute.Volume, out vol)) vol = 1f;
+			if (Bass.ChannelGetAttribute(this.hBassStream, ChannelAttribute.Volume, out vol))
+				vol = (float)(LufsToLinearIntergerPercent(BassVolumeToLufs(vol)) / 100.0);
+			else
+				vol = 1f;
 			if (!Bass.ChannelGetAttribute(this.hBassStream, ChannelAttribute.Pan, out pan)) pan = 0f;
 		}
 		return (vol, pan);
