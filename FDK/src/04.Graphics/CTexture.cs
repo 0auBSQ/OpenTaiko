@@ -131,11 +131,11 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 
 					vec4 rawColor = texture2D(texture1, rect);
 
+					// texels hold straight colour (not multiplied by their alpha)
 					if (gradientBlend > 0.0) {
-						vec3 straight = rawColor.a > 0.001 ? rawColor.rgb / rawColor.a : vec3(0.0);
-						float luma = dot(straight, vec3(0.299, 0.587, 0.114));
+						float luma = dot(rawColor.rgb, vec3(0.299, 0.587, 0.114));
 						vec4 mapped = texture2D(gradientMap, vec2(luma, 0.5));
-						rawColor = vec4(mix(straight, mapped.rgb, gradientBlend), rawColor.a * mapped.a);
+						rawColor = vec4(mix(rawColor.rgb, mapped.rgb, gradientBlend), rawColor.a * mapped.a);
 					}
 
 					vec4 texColor = rawColor * color;
@@ -146,6 +146,8 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 						// texColor.a = 1.0;
 					}
 
+					// the output colour is multiplied by its alpha: the blend modes expect it
+					texColor.rgb *= texColor.a;
                     gl_FragColor = texColor;
                 }"
 		);
@@ -966,7 +968,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		return handle;
 	}
 
-	/// <summary>Create a GL texture from a bitmap, ZERO-COPY when possible. The engine blends with straight
+	/// <summary>Create a GL texture from a bitmap, ZERO-COPY when possible. Textures hold straight
 	/// (unpremultiplied) alpha, so: if the bitmap is already Unpremul Bgra/Rgba, hand GL its native buffer via
 	/// GetPixels() (no managed copy); otherwise read .Pixels, which converts to unpremultiplied BGRA (correct,
 	/// but copies the whole image — the old behavior, kept as a safe fallback). Render thread only (calls GL).</summary>
@@ -1338,7 +1340,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 			}
 		}
 
-		BlendHelper.SetBlend(blend_type);
+		BlendHelper.SetPremultipliedBlend(blend_type);
 
 		Game.Gl.UseProgram(ShaderProgram);//Uniform4よりこれが先
 
@@ -1521,7 +1523,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 			blendType = BlendType.Normal;
 		}
 
-		BlendHelper.SetBlend(blendType);
+		BlendHelper.SetPremultipliedBlend(blendType);
 
 		Game.Gl.UseProgram(ShaderProgram);//Uniform4よりこれが先
 

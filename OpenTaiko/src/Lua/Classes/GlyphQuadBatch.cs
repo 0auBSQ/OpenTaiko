@@ -50,6 +50,7 @@ void main() {
 	vec4 rawColor = texture(tex0, rect) * pick.x + texture(tex1, rect) * pick.y
 		+ texture(tex2, rect) * pick.z + texture(tex3, rect) * pick.w;
 	frag = rawColor * color;
+	frag.rgb *= frag.a;
 }";
 
 		internal const int FloatsPerQuad = 16;       // NDC box (left, top, right, bottom), texture rect, tint, slot
@@ -167,7 +168,7 @@ void main() {
 		public static void Flush() {
 			if (_runs.Count == 0) return;
 			try {
-				BlendHelper.SetBlend(BlendType.Normal);
+				BlendHelper.SetPremultipliedBlend(BlendType.Normal);
 				Gl.UseProgram(_prog);
 				var camera = Game.Camera;
 				unsafe { Gl.UniformMatrix4(_camLoc, 1, false, (float*)&camera); }
@@ -184,6 +185,7 @@ void main() {
 					unsafe { Gl.DrawElements(PrimitiveType.Triangles, (uint)(n * 6), DrawElementsType.UnsignedShort, (void*)0); }
 				}
 			} finally {
+				BlendHelper.SetBlend(BlendType.Normal);
 				foreach (var run in _runs) _spare.Push(run);
 				_runs.Clear();
 				_runQuads.Clear();
