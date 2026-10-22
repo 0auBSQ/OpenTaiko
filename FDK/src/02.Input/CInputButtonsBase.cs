@@ -7,6 +7,7 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 
 	public CInputButtonsBase(int nButtonStates) {
 		this.ButtonStates = Enumerable.Range(0, nButtonStates).Select(_ => (0U, -2)).ToArray();
+		this.pressedSincePoll = new bool[nButtonStates];
 		this.EventBuffer = new List<STInputEvent>(nButtonStates);
 		this.InputEvents = [];
 	}
@@ -38,27 +39,33 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 			this.ProcessButtonState(i, this.GetVelocity(i), accumulate);
 		}
 		// swap input buffer
-		if (!accumulate)
-		this.InputEvents = Interlocked.Exchange(ref this.EventBuffer, this.InputEvents);
+		if (!accumulate) {
+			lock (this.eventLock) { // update thread and input thread
+				(this.InputEvents, this.EventBuffer) = (this.EventBuffer, this.InputEvents);
+			}
+		}
 	}
 
-	// 0 (temporary): press start this frame, 1: press start, 2: press continue
+	// 1: press start, 2: press continue
 	// -1: release start, -2: release continue, -3: press start & end
+	// Only polling changes the state; the input thread only records that a press happened since the last poll.
 	protected void ProcessButtonState(int idxBtn, int velocity = 0, bool accumulate = false) {
 		lock (this.ButtonStates) { // update thread, concurrent with input thread
+			bool pressedSincePoll = this.pressedSincePoll[idxBtn];
+			this.pressedSincePoll[idxBtn] = false;
 			var isPressed = Volatile.Read(ref ButtonStates[idxBtn].isPressed);
 			var state = Volatile.Read(ref ButtonStates[idxBtn].state);
 			if (isPressed != 0) {
-				if (state == 2 || (state == 1 && !accumulate)) {
+				if (!pressedSincePoll && (state == 2 || (state == 1 && !accumulate))) {
 					Volatile.Write(ref ButtonStates[idxBtn].state, 2);
 				} else {
 					Volatile.Write(ref ButtonStates[idxBtn].state, 1);
 				}
 			} else {
-				if (state == -2 || ((state == -1 || state == -3) && !accumulate)) {
-					Volatile.Write(ref ButtonStates[idxBtn].state, -2);
-				} else if (state == 0) {
+				if (pressedSincePoll || (accumulate && (state == 1 || state == -3))) {
 					Volatile.Write(ref ButtonStates[idxBtn].state, -3);
+				} else if (state == -2 || ((state == -1 || state == -3) && !accumulate)) {
+					Volatile.Write(ref ButtonStates[idxBtn].state, -2);
 				} else {
 					Volatile.Write(ref ButtonStates[idxBtn].state, -1);
 				}
@@ -67,7 +74,7 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 	}
 
 	protected void AddReleasedEvent(int idxBtn, long msTImestamp) {
-		lock (this.EventBuffer) { // update thread and input thread
+		lock (this.eventLock) { // update thread and input thread
 			this.EventBuffer.Add(new STInputEvent() {
 				nKey = idxBtn,
 				Pressed = false,
@@ -79,7 +86,7 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 	}
 
 	protected void AddPressedEvent(int idxBtn, long msTimestamp, int velocity = 0) {
-		lock (this.EventBuffer) { // update thread and input thread
+		lock (this.eventLock) { // update thread and input thread
 			this.EventBuffer.Add(new STInputEvent() {
 				nKey = idxBtn,
 				Pressed = true,
@@ -95,7 +102,7 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 		lock (this.ButtonStates) { // update thread and input thread
 			isPressed = Interlocked.Exchange(ref this.ButtonStates[idxBtn].isPressed, 1U);
 			if (isPressed == 0)
-				Volatile.Write(ref ButtonStates[idxBtn].state, 0);
+				this.pressedSincePoll[idxBtn] = true;
 		}
 		if (isPressed == 0)
 			this.AddPressedEvent(idxBtn, SoundManager.PlayTimer.msGetPreciseNowSoundTimerTime(), velocity);
@@ -131,7 +138,7 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 	public virtual void Dispose() {
 		if (!this.IsDisposed) {
 			this.InputEvents.Clear();
-			lock (this.EventBuffer) // update thread and input thread
+			lock (this.eventLock) // update thread and input thread
 				this.EventBuffer.Clear();
 			this.IsDisposed = true;
 		}
@@ -145,7 +152,9 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 	#region [ private ]
 	//-----------------
 	public List<STInputEvent> EventBuffer;
+	private readonly object eventLock = new();
 	public (uint isPressed, int state)[] ButtonStates { get; protected set; }
+	private readonly bool[] pressedSincePoll;
 	protected bool IsDisposed;
 	//-----------------
 	#endregion

@@ -133,6 +133,7 @@ internal static class VideoExporter {
 		cfg.bFullScreen = false;
 		cfg.bEnableVSync = false;
 		cfg.bUseOSTimer = true;                  // CSoundTimer follows Game.TimeMs → our virtual clock
+		cfg.fRenderScale = 1f;                   // frames are read back from the window at full size
 		cfg.bTokkunMode = false;
 		cfg.bAIBattleMode = false;
 		cfg.nPlayerCount = _diffs.Length;

@@ -73,11 +73,11 @@ public class CPad {
 		return list;
 	}
 
-	// Each pad below EPad.Max has separate keybinds for different instruments
-	// Each pad at EPad.Max and above has unified System keybinds
+	// Each pad below EPad.Max, and each training key, has separate keybinds for different instruments
+	// The System keys (Capture to CycleVideoDisplayMode) have unified System keybinds
 	public static EKeyConfigPart ResolveKeyConfigPart(EKeyConfigPart part, EKeyConfigPad pad)
 		=> (pad >= EKeyConfigPad.Max) ? EKeyConfigPart.Unknown
-			: (pad >= (EKeyConfigPad)EPad.Max) ? EKeyConfigPart.System
+			: (pad >= (EKeyConfigPad)EPad.Max && pad < EKeyConfigPad.TrainingIncreaseScrollSpeed) ? EKeyConfigPart.System
 			: part;
 
 	public bool HasInput(EKeyConfigPart part, EKeyConfigPad pad, Func<IInputDevice?, int, bool> predicate) {

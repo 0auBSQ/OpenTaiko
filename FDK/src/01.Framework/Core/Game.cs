@@ -22,6 +22,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using ImGuiNET;
 using Silk.NET.Core;
@@ -668,18 +669,40 @@ public abstract partial class Game : IDisposable {
 		}
 		// adapted from Window_.Run();
 		Window_.Initialize();
-		Window_.Run(delegate {
-			this.EventsNoWait();
-			if (!Window_.IsClosing) {
-				Window_.DoUpdate();
-			}
+		try {
+			Window_.Run(delegate {
+				this.EventsNoWait();
+				if (!Window_.IsClosing) {
+					Window_.DoUpdate();
+					this.RethrowFrameException();
+				}
 
-			if (!Window_.IsClosing) {
-				Window_.DoRender();
+				if (!Window_.IsClosing) {
+					Window_.DoRender();
+					this.RethrowFrameException();
+				}
+			});
+		} catch {
+			// a frame crashed: still shut down normally, then report the original error
+			try {
+				this.Window_Closing();
+			} catch (Exception e) {
+				Trace.TraceError($"Shutdown after a crash failed: {e}");
 			}
-		});
+			throw;
+		}
 		this.EventsNoWait();
 		Window_.Reset();
+	}
+
+	// Silk's DoUpdate/DoRender have no finally: an exception thrown through them leaves the window "inside the render
+	// loop", and its Reset then throws over the real error. The frame callbacks keep the exception; it is rethrown here.
+	private ExceptionDispatchInfo? _frameException;
+
+	private void RethrowFrameException() {
+		var e = this._frameException;
+		this._frameException = null;
+		e?.Throw();
 	}
 
 	protected virtual void Configuration() {
@@ -853,18 +876,29 @@ public abstract partial class Game : IDisposable {
 		}
 	}
 
+	private bool _closed;
 	public void Window_Closing() {
+		if (_closed) return;
+		_closed = true;
 		CTexture.Terminate();
 		DeleteRenderScaleFbo();
 
 		UnloadContent();
 		OnExiting();
 
-		this.thInputCancel.Cancel();
+		this.thInputCancel?.Cancel();
 		Context.Dispose();
 	}
 
 	public void Window_Update(double deltaTime) {
+		try {
+			this.UpdateFrame(deltaTime);
+		} catch (Exception e) {
+			this._frameException = ExceptionDispatchInfo.Capture(e);
+		}
+	}
+
+	private void UpdateFrame(double deltaTime) {
 		if (StartHidden && Window_.IsVisible) Window_.IsVisible = false;
 		double fps = 1.0f / deltaTime;
 		dbTimeMs = dbGetTimeMsReal!();
@@ -920,6 +954,14 @@ public abstract partial class Game : IDisposable {
 	}
 
 	public void Window_Render(double deltaTime) {
+		try {
+			this.RenderFrame(deltaTime);
+		} catch (Exception e) {
+			this._frameException = ExceptionDispatchInfo.Capture(e);
+		}
+	}
+
+	private void RenderFrame(double deltaTime) {
 		if (GraphicsSelfTest) { RunGraphicsSelfTest(); return; }   // --mode=checkgl (see Game.GraphicsSelfTest.cs)
 		Gl.Disable(EnableCap.ScissorTest);   // a leaked UI clip (GRAPHICS:SetClip) must never survive the frame
 		Camera = Matrix4X4<float>.Identity;

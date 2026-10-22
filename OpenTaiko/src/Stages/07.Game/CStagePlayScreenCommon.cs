@@ -1155,8 +1155,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		if (!within && !allowSkip) {
 			bool skipKeyChecked = (msGameTime - msAutoInputSkipKeyPollTime) < msWithinMax;
 			if (!skipKeyChecked) {
-				// Synchronized polling, to avoid threading penalties
-				OpenTaiko.app.EventsNoWait();
+				// presses recorded since the frame's poll; window events are only pumped by the frame loop
 				OpenTaiko.InputManager.Polling(accumulate: true);
 				msAutoInputSkipKeyPollTime = msGameTime;
 			}

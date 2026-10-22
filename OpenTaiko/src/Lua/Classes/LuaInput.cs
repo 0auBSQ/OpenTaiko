@@ -106,7 +106,7 @@ namespace OpenTaiko {
 					_repeatKbCounters[input] = counter;
 				}
 
-				_repeatCounters[input].Tick();
+				_repeatKbCounters[input].Tick();
 			} else {
 				if (_repeatKbCounters.ContainsKey(input)) {
 					_repeatKbCounters[input].Stop();

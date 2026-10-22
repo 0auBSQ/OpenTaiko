@@ -32,6 +32,14 @@ public class CInputJoystick : CInputButtonsBase, IInputDevice, IDisposable {
 		}
 	}
 
+	public override void Dispose() {
+		if (!this.IsDisposed && this.Device is IJoystick joystick) {
+			joystick.ButtonDown -= Joystick_ButtonDown;
+			joystick.ButtonUp -= Joystick_ButtonUp;
+		}
+		base.Dispose();
+	}
+
 	public string GetButtonName(int index) {
 		return $"Button{index}";
 	}

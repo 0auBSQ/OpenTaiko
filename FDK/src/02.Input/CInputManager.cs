@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using Silk.NET.Input;
 using Silk.NET.Windowing;
 using Commons.Music.Midi;
@@ -95,7 +96,11 @@ public class CInputManager : IDisposable {
 		Game.InitImGuiController(window, Context);
 	}
 
-	private void ConnectionChanged(Silk.NET.Input.IInputDevice device, bool connected) {
+	// Silk raises this on whichever thread pumps events; the device list only changes in Polling, on the update thread
+	private void ConnectionChanged(Silk.NET.Input.IInputDevice device, bool connected)
+		=> this.pendingConnectionChanges.Enqueue((device, connected));
+
+	private void ApplyConnectionChange(Silk.NET.Input.IInputDevice device, bool connected) {
 		if (connected) {
 			if (device is IKeyboard) {
 				if (Keyboard == null) {
@@ -161,6 +166,10 @@ public class CInputManager : IDisposable {
 
 	public void Polling(bool accumulate = false) {
 		lock (this.lockInputDevices) {
+			if (!accumulate) {
+				while (this.pendingConnectionChanges.TryDequeue(out var change))
+					this.ApplyConnectionChange(change.device, change.connected);
+			}
 			//				foreach( IInputDevice device in this.list入力デバイス )
 			for (int i = this.InputDevices.Count - 1; i >= 0; i--)    // #24016 2011.1.6 yyagi: change not to use "foreach" to avoid InvalidOperation exception by Remove().
 			{
@@ -246,6 +255,7 @@ public class CInputManager : IDisposable {
 	private IInputDevice? _Mouse;
 	private bool bDisposedDone;
 	private object lockInputDevices = new object();
+	private readonly ConcurrentQueue<(Silk.NET.Input.IInputDevice device, bool connected)> pendingConnectionChanges = new();
 	//private CTimer timer;
 
 	//-----------------
