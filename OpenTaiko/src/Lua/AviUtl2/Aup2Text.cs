@@ -137,6 +137,10 @@ namespace OpenTaiko.AviUtl2 {
 				paint.Typeface = face;
 				paint.TextSize = size;
 				var m = paint.FontMetrics;
+				// a letter the font lacks comes from a fallback font, on the font's own line
+				int codepoint = cluster.Length == 2 && char.IsSurrogatePair(cluster[0], cluster[1]) ? char.ConvertToUtf32(cluster[0], cluster[1]) : cluster[0];
+				face = FDK.CFontRenderer.TypefaceFor(face, codepoint);
+				paint.Typeface = face;
 				float adv = paint.MeasureText(cluster);
 				float h = m.Descent - m.Ascent;
 				var g = new Glyph { Text = cluster, Color = color, Size = size, Face = face, W = adv, H = h, Ascent = -m.Ascent, Line = line };

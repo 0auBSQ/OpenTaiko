@@ -1075,7 +1075,11 @@ internal class CSkin : IDisposable {
 	public void tReadSkinConfig() {
 		var str = "";
 		LoadSkinConfigFromFile(Path(@$"SkinConfig.ini"), ref str);
+		_fontFallbacksMain = new List<string>();
+		_fontFallbacksSub = null;
 		this.tLoadFromString(str);
+		CFontRenderer.SetFallbackFonts(CFontRenderer.FallbackList.Main, _fontFallbacksMain);
+		CFontRenderer.SetFallbackFonts(CFontRenderer.FallbackList.Sub, _fontFallbacksSub ?? _fontFallbacksMain);
 
 	}
 
@@ -7255,6 +7259,22 @@ internal class CSkin : IDisposable {
 									break;
 								}
 							#endregion
+							case "FontFallbacksMain":
+							case "FontFallbacksSub": {
+									var fonts = new List<string>();
+									foreach (string font in strParam.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)) {
+										string fontPath = font.Replace('/', System.IO.Path.DirectorySeparatorChar).Replace('\\', System.IO.Path.DirectorySeparatorChar);
+										if (HPrivateFastFont.FontExists(fontPath))
+											fonts.Add(fontPath);
+										else if (HPrivateFastFont.FontExists(Path(fontPath)))
+											fonts.Add(Path(fontPath));
+									}
+									if (strCommand == "FontFallbacksMain")
+										_fontFallbacksMain = fonts;
+									else
+										_fontFallbacksSub = fonts;
+									break;
+								}
 							default:
 								foreach (string code in CLangManager.Langcodes) {
 									if (strCommand == "FontName" + code.ToUpper()) {
@@ -7444,6 +7464,9 @@ internal class CSkin : IDisposable {
 	private Dictionary<string, string> _fontNameLocalized = new Dictionary<string, string>();
 	public string BoxFontName { get { return _boxFontNameLocalized.TryGetValue(CLangManager.fetchLang(), out string value) ? value : ""; } }
 	private Dictionary<string, string> _boxFontNameLocalized = new Dictionary<string, string>();
+	// FontFallbacksMain / FontFallbacksSub (null: the Main list)
+	private List<string> _fontFallbacksMain = new List<string>();
+	private List<string>? _fontFallbacksSub;
 	#endregion
 
 	#region Config

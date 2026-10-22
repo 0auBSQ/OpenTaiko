@@ -72,6 +72,28 @@ public class CFontRenderer : IDisposable {
 		return SKFontManager.Default.FontFamilies.Contains(fontpath) || File.Exists(fontpath);
 	}
 
+	/// <summary>The fallback font lists: Main for the text in the main fonts, Sub for the text in the box fonts.</summary>
+	public enum FallbackList {
+		Main,
+		Sub
+	}
+
+	/// <summary>Fonts (font files or installed family names) that draw, in order, the characters a renderer's own font
+	/// lacks, for the renderers using this list; after them comes the font the system offers for each character. Set by
+	/// the game from its skin.</summary>
+	public static void SetFallbackFonts(FallbackList list, IEnumerable<string> fonts) => CSkiaSharpTextRenderer.SetFallbackFonts(list, fonts);
+
+	/// <summary>The typeface that draws this character for a text in <paramref name="typeface"/>: the typeface itself when
+	/// it has the character, else the fallback font or the system font that has it.</summary>
+	public static SKTypeface TypefaceFor(SKTypeface typeface, int codepoint, FallbackList list = FallbackList.Main)
+		=> CSkiaSharpTextRenderer.TypefaceFor(typeface, codepoint, list);
+
+	/// <summary>The fallback list this renderer uses (Main unless set); set it before drawing.</summary>
+	public FallbackList Fallbacks {
+		get => this.textRenderer.Fallbacks;
+		set => this.textRenderer.Fallbacks = value;
+	}
+
 	#region [ コンストラクタ ]
 	public CFontRenderer(string fontpath, int pt, FontStyle style) {
 		Initialize(fontpath, pt, style);
@@ -168,19 +190,15 @@ public class CFontRenderer : IDisposable {
 		List<CSkiaSharpTextRenderer.SStringToken> tokens = new List<CSkiaSharpTextRenderer.SStringToken>();
 		tokens = this.textRenderer.Tokenize(drawstr, fontColor, edgeColor, secondEdgeColor, gradationTopColor, gradationBottomColor);
 
-		string purified = this.textRenderer.Purify(drawstr);
-		string[] strList = new string[purified.Length];
-		for (int i = 0; i < purified.Length; i++)
-			strList[i] = purified.Substring(i, 1);
-		SKBitmap[] strImageList = new SKBitmap[purified.Length];
+		// one cell per character, with its marks and both halves of a surrogate pair
+		string[] strList = tokens.SelectMany(tok => TextElements(tok.s)).ToArray();
+		SKBitmap[] strImageList = new SKBitmap[strList.Length];
 
 		int nWidth = 0;
 		int nHeight = 0;
 		int _idx = 0;
 		foreach (SStringToken tok in tokens) {
-			string[] splitted = new string[tok.s.Length];
-			for (int i = 0; i < tok.s.Length; i++)
-				splitted[i] = tok.s.Substring(i, 1);
+			string[] splitted = TextElements(tok.s);
 
 			for (int i = 0; i < splitted.Length; i++) {
 				strImageList[_idx] = this.textRenderer.DrawText(splitted[i], drawmode, tok.TextColor, tok.OutlineColor, secondEdgeColor, tok.GradiantTop, tok.GradiantBottom, edge_Ratio, false);
@@ -273,6 +291,14 @@ public class CFontRenderer : IDisposable {
 		using SKImage image = skSurface.Snapshot();
 		//返します
 		return SKBitmap.FromImage(image);
+	}
+
+	private static string[] TextElements(string s) {
+		var elements = new List<string>();
+		var enumerator = System.Globalization.StringInfo.GetTextElementEnumerator(s);
+		while (enumerator.MoveNext())
+			elements.Add(enumerator.GetTextElement());
+		return elements.ToArray();
 	}
 
 	public virtual void Dispose() {

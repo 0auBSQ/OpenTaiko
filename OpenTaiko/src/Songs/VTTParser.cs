@@ -371,12 +371,12 @@ public class VTTParser {
 		string text = String.Empty;
 
 		foreach (LyricData data in datalist) {
-			using (CCachedFontRenderer fastdraw = HPrivateFastFont.tInstantiateFont(OpenTaiko.Skin.Game_Lyric_FontName, OpenTaiko.Skin.Game_Lyric_FontSize, data.Style)) {
+			using (CCachedFontRenderer fastdraw = HPrivateFastFont.tInstantiateLyricFont(OpenTaiko.Skin.Game_Lyric_FontSize, data.Style)) {
 				SKBitmap textdrawing = fastdraw.DrawText(data.Text, data.ForeColor, data.BackColor, null, 30); // Draw main text
 
 				if (data.IsRuby) // ruby time
 				{
-					using (CCachedFontRenderer rubydraw = HPrivateFastFont.tInstantiateFont(OpenTaiko.Skin.Game_Lyric_FontName, OpenTaiko.Skin.Game_Lyric_FontSize / 2, data.Style)) {
+					using (CCachedFontRenderer rubydraw = HPrivateFastFont.tInstantiateLyricFont(OpenTaiko.Skin.Game_Lyric_FontSize / 2, data.Style)) {
 						SKBitmap ruby = rubydraw.DrawText(data.RubyText, data.ForeColor, data.BackColor, null, 30);
 						Size size = new Size(textdrawing.Width > ruby.Width ? textdrawing.Width : ruby.Width, textdrawing.Height + (OpenTaiko.Skin.Game_Lyric_VTTRubyOffset + (ruby.Height / 2)));
 						SKBitmap fullruby = new SKBitmap(size.Width, size.Height);

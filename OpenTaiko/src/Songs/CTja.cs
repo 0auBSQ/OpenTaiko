@@ -4584,11 +4584,7 @@ internal class CTja : CActivity {
 			// Skin can be null here (the skin-reload race described above, and headless test runs):
 			// skip the lyric font then; normal loads create it as before.
 			if (OpenTaiko.Skin != null) {
-				if (!string.IsNullOrEmpty(OpenTaiko.Skin.Game_Lyric_FontName)) {
-					this.pfLyricsFont = new CCachedFontRenderer(OpenTaiko.Skin.Game_Lyric_FontName, OpenTaiko.Skin.Game_Lyric_FontSize);
-				} else {
-					this.pfLyricsFont = new CCachedFontRenderer(CFontRenderer.DefaultFontName, OpenTaiko.Skin.Game_Lyric_FontSize);
-				}
+				this.pfLyricsFont = HPrivateFastFont.tInstantiateLyricFont(OpenTaiko.Skin.Game_Lyric_FontSize);
 			}
 		}
 		this.listWAV = new Dictionary<int, CWAV>();

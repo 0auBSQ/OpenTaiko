@@ -19,4 +19,7 @@ internal interface ITextRenderer : IDisposable {
 	float MeasureText(string s);
 
 	float GetLineHeight();
+
+	// the fallback fonts that draw the characters the font lacks
+	CFontRenderer.FallbackList Fallbacks { get; set; }
 }

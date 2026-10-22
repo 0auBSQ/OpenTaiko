@@ -23,11 +23,22 @@ internal class HPrivateFastFont {
 		return (new CCachedFontRenderer(DefaultFont, scale, style));
 	}
 
+	// the skin's lyric font, or its main font when it names none
+	public static CCachedFontRenderer tInstantiateLyricFont(int scale, CFontRenderer.FontStyle style = CFontRenderer.FontStyle.Regular) {
+		if (FontExists(OpenTaiko.Skin.Game_Lyric_FontName))
+			return (new CCachedFontRenderer(OpenTaiko.Skin.Game_Lyric_FontName, scale, style));
+		return tInstantiateMainFont(scale, style);
+	}
+
 	public static CCachedFontRenderer tInstantiateBoxFont(int scale, CFontRenderer.FontStyle style = CFontRenderer.FontStyle.Regular) {
+		CCachedFontRenderer font;
 		if (FontExists(OpenTaiko.Skin.BoxFontName))
-			return (new CCachedFontRenderer(OpenTaiko.Skin.BoxFontName, scale, style));
-		if (FontExists(CLangManager.LangInstance.BoxFontName))
-			return (new CCachedFontRenderer(CLangManager.LangInstance.BoxFontName, scale, style));
-		return (new CCachedFontRenderer(DefaultFont, scale, style));
+			font = new CCachedFontRenderer(OpenTaiko.Skin.BoxFontName, scale, style);
+		else if (FontExists(CLangManager.LangInstance.BoxFontName))
+			font = new CCachedFontRenderer(CLangManager.LangInstance.BoxFontName, scale, style);
+		else
+			font = new CCachedFontRenderer(DefaultFont, scale, style);
+		font.Fallbacks = CFontRenderer.FallbackList.Sub;
+		return font;
 	}
 }
