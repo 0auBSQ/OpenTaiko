@@ -442,7 +442,7 @@ internal static class VideoExporter {
 	}
 
 	private static float[] MixAudio(double secMixLength, int samplingRate) {
-		long frameMixLength = (long)(secMixLength * samplingRate) + 4800; // small tail headroom
+		long frameMixLength = long.CreateSaturating(secMixLength * samplingRate + 4800); // small tail headroom
 		var mixL = new float[frameMixLength * 2];             // interleaved L/R
 
 		SoundEvent[] events;
@@ -452,20 +452,15 @@ internal static class VideoExporter {
 			Trace.TraceInformation($"[export]   t={e.msFrameworkTime - _msFrameworkTime0,8:F1}ms - {e.msFrameworkTimeEnd - _msFrameworkTime0,8:F1}ms vol={e.Vol:F2} pan={e.Pan:F2} {Path.GetFileName(e.Path)}");
 
 		foreach (var ev in events) {
+			const double Err = 1e-9;
 			// fx time is related to a single fx audio, mix time is related to the whole mix audio
 			double msMixStart = ev.msFrameworkTime - _msFrameworkTime0;
-			if (msMixStart < -0.5)              // pre-capture noise (loading screen)
+			long frameMixStart = long.CreateSaturating(Math.Floor(msMixStart / 1000.0 * samplingRate));
+			if (frameMixStart < -Err || frameMixStart >= frameMixLength) // pre-capture noise (loading screen), or post-capture sounds
 				continue;
-			if (msMixStart < 0)
-				msMixStart = 0;
-			long frameMixStart = (long)(msMixStart / 1000.0 * samplingRate);
-			if (frameMixStart >= frameMixLength)
-				continue;
+			// timestamp are now positive, can omit Math.Floor() before long.CreateSaturating() below
 
-			double msMixEnd = ev.msFrameworkTimeEnd - _msFrameworkTime0;
-			double frameMixEnd = Math.Truncate(msMixEnd / 1000.0 * samplingRate);
-
-			long frameFxSeek = (long)(samplingRate * (ev.msFxSeek / 1000.0));
+			long frameFxSeek = long.CreateSaturating(samplingRate * (ev.msFxSeek / 1000.0));
 			float[] pcm = DecodeToStereoResampled(ev.Path, samplingRate);
 			long frameFxLength = pcm.Length / 2;
 			if (frameFxLength < frameFxSeek)
@@ -475,22 +470,21 @@ internal static class VideoExporter {
 			float volR = ev.Vol * Math.Min(1f, 1f + ev.Pan);
 			double speed = (ev.Speed > 0.01 && Math.Abs(ev.Speed - 1.0) > 0.001) ? ev.Speed : 1.0;
 
-			long frameMixSustained = (frameMixEnd - frameMixStart >= long.MaxValue) ? long.MaxValue : (long)(frameMixEnd - frameMixStart);
-			long frameFxSustained = (frameMixSustained * speed >= long.MaxValue) ? long.MaxValue : (long)(frameMixSustained * speed);
-			long frameFxPlayed = Math.Min(frameFxLength - frameFxSeek, frameFxSustained);
-			long frameMixPlayed = (long)(frameFxPlayed / speed);
+			double msMixEnd = ev.msFrameworkTimeEnd - _msFrameworkTime0;
+			double frameMixEnd = Math.Floor(msMixEnd / 1000.0 * samplingRate);
+			double frameMixSustained = frameMixEnd - frameMixStart;
+
+			long frameFxSustainable = frameFxLength - frameFxSeek;
+			double frameFxSustained = Math.Min(frameFxSustainable, frameMixSustained * speed);
 			long frameMixPlayable = frameMixLength - frameMixStart;
-			if (frameMixPlayed > frameMixPlayable)
-				frameMixPlayed = frameMixPlayable;
+			long frameMixPlayed = Math.Min(frameMixPlayable, long.CreateSaturating(frameFxSustained / speed));
 
 			for (long frameMixI = 0; frameMixI < frameMixPlayed; ++frameMixI) {
-				long frameFxRelI = ((speed == 1.0) ? frameMixI : (long)(frameMixI * speed));
-				long frameFxI = frameFxSeek + frameFxRelI;
-				if (frameFxRelI >= frameFxPlayed)
-					break;
+				long frameFxOffset = (speed == 1.0) ? frameMixI : long.CreateSaturating(frameMixI * speed);
+				long frameFxPos = frameFxSeek + frameFxOffset;
 				long sampleMixI = (frameMixStart + frameMixI) * 2;
-				mixL[sampleMixI] += pcm[frameFxI * 2] * volL;
-				mixL[sampleMixI + 1] += pcm[frameFxI * 2 + 1] * volR;
+				mixL[sampleMixI] += pcm[frameFxPos * 2] * volL;
+				mixL[sampleMixI + 1] += pcm[frameFxPos * 2 + 1] * volR;
 			}
 		}
 
