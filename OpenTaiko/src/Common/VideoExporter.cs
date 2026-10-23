@@ -440,7 +440,7 @@ internal static class VideoExporter {
 	}
 
 	private static float[] MixAudio(double secMixLength, int samplingRate) {
-		long frameMixLength = (long)(secMixLength * samplingRate) + 4800; // small tail headroom
+		long frameMixLength = long.CreateSaturating(secMixLength * samplingRate + 4800); // small tail headroom
 		var mixL = new float[frameMixLength * 2];             // interleaved L/R
 
 		SoundEvent[] events;
@@ -452,18 +452,13 @@ internal static class VideoExporter {
 		foreach (var ev in events) {
 			// fx time is related to a single fx audio, mix time is related to the whole mix audio
 			double msMixStart = ev.msFrameworkTime - _msFrameworkTime0;
-			if (msMixStart < -0.5)              // pre-capture noise (loading screen)
+			double frameMixStart_db = msMixStart / 1000.0 * samplingRate;
+			long frameMixStart = long.CreateSaturating(Math.Floor(frameMixStart_db));
+			if (frameMixStart < 0 || frameMixStart >= frameMixLength) // pre-capture noise (loading screen), or post-capture sounds
 				continue;
-			if (msMixStart < 0)
-				msMixStart = 0;
-			long frameMixStart = (long)(msMixStart / 1000.0 * samplingRate);
-			if (frameMixStart >= frameMixLength)
-				continue;
+			// timestamp are now positive, can replaced Math.Floor() by long.CreateSaturating()
 
-			double msMixEnd = ev.msFrameworkTimeEnd - _msFrameworkTime0;
-			double frameMixEnd = Math.Truncate(msMixEnd / 1000.0 * samplingRate);
-
-			long frameFxSeek = (long)(samplingRate * (ev.msFxSeek / 1000.0));
+			long frameFxSeek = long.CreateSaturating(samplingRate * (ev.msFxSeek / 1000.0));
 			float[] pcm = DecodeToStereoResampled(ev.Path, samplingRate);
 			long frameFxLength = pcm.Length / 2;
 			if (frameFxLength < frameFxSeek)
@@ -473,22 +468,50 @@ internal static class VideoExporter {
 			float volR = ev.Vol * Math.Min(1f, 1f + ev.Pan);
 			double speed = (ev.Speed > 0.01 && Math.Abs(ev.Speed - 1.0) > 0.001) ? ev.Speed : 1.0;
 
-			long frameMixSustained = (frameMixEnd - frameMixStart >= long.MaxValue) ? long.MaxValue : (long)(frameMixEnd - frameMixStart);
-			long frameFxSustained = (frameMixSustained * speed >= long.MaxValue) ? long.MaxValue : (long)(frameMixSustained * speed);
-			long frameFxPlayed = Math.Min(frameFxLength - frameFxSeek, frameFxSustained);
-			long frameMixPlayed = (long)(frameFxPlayed / speed);
-			long frameMixPlayable = frameMixLength - frameMixStart;
-			if (frameMixPlayed > frameMixPlayable)
-				frameMixPlayed = frameMixPlayable;
+			double msMixEnd = ev.msFrameworkTimeEnd - _msFrameworkTime0;
+			double frameMixEnd = msMixEnd / 1000.0 * samplingRate;
 
-			for (long frameMixI = 0; frameMixI < frameMixPlayed; ++frameMixI) {
-				long frameFxRelI = ((speed == 1.0) ? frameMixI : (long)(frameMixI * speed));
-				long frameFxI = frameFxSeek + frameFxRelI;
-				if (frameFxRelI >= frameFxPlayed)
+			double frameMixSustained = frameMixEnd - frameMixStart;
+			double frameFxSustained = frameMixSustained * speed;
+			double frameFxSustainable = frameFxLength - frameFxSeek;
+			frameFxSustained = Math.Min(frameFxSustained, frameFxSustainable);
+			double frameMixPlayed_db = frameFxSustained / speed;
+			double frameMixPlayable = frameMixLength - frameMixStart_db;
+			frameMixPlayed_db = Math.Min(frameMixPlayed_db, frameMixPlayable);
+
+			// simplified from Lanczos resampling with kernal size 1:
+			// * fx sample points are kept aligned to mix sample points
+			// * only interpolate the initial and/or final mix samples (if start and/or end is not aligned) by scaling their volume
+			static float SincNorm(float x) {
+				const float Err = 1e-9f;
+				if (Math.Abs(x) < Err)
+					return 1.0f;
+				float piMulX = MathF.PI * x;
+				return MathF.Sin(piMulX) / piMulX;
+			}
+			static float Lanczos1(float x) => (Math.Abs(x) < 1) ? MathF.Pow(SincNorm(x), 2) : 0;
+
+			float frameMixStartFrac = Math.Clamp(float.CreateSaturating(frameMixStart_db % 1), 0, 1);
+			long frameMixPlayed = long.CreateSaturating(frameMixPlayed_db);
+			float frameMixPlayedFrac = Math.Clamp((float)(frameMixPlayed_db % 1), 0, 1);
+			long frameMixN = frameMixPlayed + ((frameMixPlayedFrac > 0) ? 1 : 0);
+			for (long frameMixI = 0; frameMixI < frameMixN; ++frameMixI) {
+				long frameFxOffset = (speed == 1.0) ? frameMixI : long.CreateSaturating(frameMixI * speed);
+				long frameFxPos = frameFxSeek + frameFxOffset;
+				if (frameFxPos >= frameFxLength)
 					break;
+				float volLI = volL, volRI = volR;
+				if (frameMixI == 0) {
+					float scale = Lanczos1(frameMixStartFrac);
+					volLI *= scale; volRI *= scale;
+				}
+				if (frameMixI >= frameMixPlayed) {
+					float scale = Lanczos1(1 - frameMixPlayedFrac);
+					volLI *= scale; volRI *= scale;
+				}
 				long sampleMixI = (frameMixStart + frameMixI) * 2;
-				mixL[sampleMixI] += pcm[frameFxI * 2] * volL;
-				mixL[sampleMixI + 1] += pcm[frameFxI * 2 + 1] * volR;
+				mixL[sampleMixI] += pcm[frameFxPos * 2] * volLI;
+				mixL[sampleMixI + 1] += pcm[frameFxPos * 2 + 1] * volRI;
 			}
 		}
 
