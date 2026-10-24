@@ -133,6 +133,7 @@ Le handle de liste de chansons, SONGMOUNT:ChosenSongNode() et DANBUILDER:GetSong
 | `node.ForeColor  (color)` | La couleur de premier plan du nœud, ou nil. |
 | `node.BackColor  (color)` | La couleur d'arrière-plan du nœud, ou nil. |
 | `node.BoxColor  (color)` | La couleur de boîte du nœud, ou nil. |
+| `node.BoxText  (string)` | La description box.def du dossier (`#BOXEXPLANATION1`-`3`) dans la langue du jeu, une ligne par entrée ; "" s'il n'en a pas. |
 | `node.Title  (string)` | Le titre affiché. Les boîtes de retour et aléatoires renvoient le texte localisé "Return" / "Random" construit à partir du titre du dossier parent. |
 | `node.Subtitle  (string)` | Le sous-titre de la chanson, ou nil. |
 | `node.Genre  (string)` | La chaîne de genre, ou nil. |

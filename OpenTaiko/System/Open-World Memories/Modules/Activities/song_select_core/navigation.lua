@@ -193,15 +193,70 @@ local function buildSlot(node, isSelected)
     return slot
 end
 
+-- a folder's songs, down its whole tree: the unlocked ones, and all of them but the locked mythical ones
+-- (those stay a secret); kept per folder node until the next activate
+local function folderCounts(node)
+    G.folderCountCache = G.folderCountCache or {}
+    local c = G.folderCountCache[node]
+    if c ~= nil then return c[1], c[2] end
+    local open, total = 0, 0
+    local function walk(n)
+        local children = n.Children
+        for i = 0, children.Count - 1 do
+            local ch = children[i]
+            if ch.IsSong then
+                local locked = ch.IsLocked == true
+                if not locked then open = open + 1 end
+                if not (locked and ch.Rarity == "Mythical") then total = total + 1 end
+            elseif ch.IsFolder then
+                walk(ch)
+            end
+        end
+    end
+    walk(node)
+    G.folderCountCache[node] = { open, total }
+    return open, total
+end
+
+-- the selected row's band inside a folder: the folder's colour, darkened for a light folder and lightened for
+-- a dark one so it stands apart from the folder's bars; nil at the top level (the band stays green)
+local function bandColorFor(folder)
+    if folder == nil or folder.IsRoot then return nil end
+    G.bandColorCache = G.bandColorCache or {}
+    local cached = G.bandColorCache[folder]
+    if cached ~= nil then return cached end
+    local c = folder.BoxColor
+    if c == nil then return nil end
+    local r, g, b = c.R, c.G, c.B
+    if 0.299 * r + 0.587 * g + 0.114 * b > 140 then
+        r, g, b = r * 0.6, g * 0.6, b * 0.6
+    else
+        r, g, b = r + (255 - r) * 0.5, g + (255 - g) * 0.5, b + (255 - b) * 0.5
+    end
+    cached = COLOR:CreateColorFromARGB(255, math.floor(r + 0.5), math.floor(g + 0.5), math.floor(b + 0.5))
+    G.bandColorCache[folder] = cached
+    return cached
+end
+
 -- selected-node info for the right panel / breadcrumb / preimage / selected-bar visuals
 local function buildSelInfo(node)
     local sel = {}
     sel.isSong, sel.isRandom = node.IsSong == true, node.IsRandom == true
+    sel.isFolder = node.IsFolder == true
     sel.crumbs = {}
     local cur = node.Parent
     while cur ~= nil do
         sel.crumbs[#sel.crumbs + 1] = cur.Title ~= nil and cur.Title or "/"
         cur = cur.Parent
+    end
+    if sel.isFolder then
+        sel.vaultFolder = G.unlocks.isVaultFolder(node)
+        sel.folderName = node.Title
+        sel.folderColor = brightenedFill(node.BoxColor)
+        sel.folderLines = {}
+        for line in (node.BoxText or ""):gmatch("[^\n]+") do sel.folderLines[#sel.folderLines + 1] = line end
+        local open, total = folderCounts(node)
+        sel.folderCount = string.format("%d / %d", open, total)
     end
     if not sel.isSong then return sel end
     sel.hi = G.unlocks.effectiveHiddenIndex(node)
@@ -233,7 +288,10 @@ function M.refreshPage(skipMedia)
             G.pageTexts[i] = nil
         else
             G.pageTexts[i] = buildSlot(node, i == 0)
-            if i == 0 then G.selInfo = buildSelInfo(node) end
+            if i == 0 then
+                G.selInfo = buildSelInfo(node)
+                G.selectBandColor = bandColorFor(node.Parent)
+            end
             -- the selected node's genre picks the background; the rest of the page warms its sets up
             if i == 0 then G.backgrounds.select(node.Genre) else G.backgrounds.prefetch(node.Genre) end
             if G.genre_overlays[node.Genre] == nil then

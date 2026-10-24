@@ -133,6 +133,7 @@ De nummerlijst-handle, SONGMOUNT:ChosenSongNode() en DANBUILDER:GetSong() geven 
 | `node.ForeColor  (color)` | De voorgrondkleur van de knoop, of nil. |
 | `node.BackColor  (color)` | De achtergrondkleur van de knoop, of nil. |
 | `node.BoxColor  (color)` | De boxkleur van de knoop, of nil. |
+| `node.BoxText  (string)` | De box.def-beschrijving van de map (`#BOXEXPLANATION1`-`3`) in de taal van het spel, één regel per item; "" als die er niet is. |
 | `node.Title  (string)` | De weergavetitel. Terug- en randomboxen geven de gelokaliseerde tekst "Return" / "Random" terug, opgebouwd uit de titel van de bovenliggende map. |
 | `node.Subtitle  (string)` | De ondertitel van het nummer, of nil. |
 | `node.Genre  (string)` | De genrestring, of nil. |

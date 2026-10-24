@@ -28,6 +28,25 @@ local SONGLIST_TEXT_OFFSET_Y      = CFG.num("song_list.text_offset_y", 15)
 local SONGLIST_SELECTED_X_DIFF    = CFG.num("song_list.selected_x_diff", 50)
 local SONGLIST_SELECTED_ARROW_GAP = CFG.num("song_list.selected_arrow_gap", 925)
 local SONGBAR_LABEL_X_OFFSET      = CFG.num("song_list.label_x_offset", 288)
+-- the back bar's colour, and the random bar's rainbow: RAINBOW_STEPS hues made once, pastel enough for the
+-- title to stay readable; the rainbow runs along the bar, one full pass every RAINBOW_MS
+local BACK_BAR_COLOR = CFG.color("colors.back_bar", COLOR:CreateColorFromARGB(255, 131, 113, 96))
+local RAINBOW_MS     = CFG.num("song_list.random_rainbow_ms", 4000)
+local RAINBOW_STEPS  = 120
+local RAINBOW_SLICE  = CFG.num("song_list.random_rainbow_slice", 8)   -- px per tinted slice of the bar
+local RAINBOW_SPAN   = CFG.num("song_list.random_rainbow_span", 1)     -- hue turns across the bar
+local RAINBOW = {}
+for i = 0, RAINBOW_STEPS - 1 do
+    local h, s, v = i / RAINBOW_STEPS * 6, 0.5, 1
+    local c = v * s
+    local x = c * (1 - math.abs(h % 2 - 1))
+    local r, g, b = 0, 0, 0
+    if h < 1 then r, g = c, x elseif h < 2 then r, g = x, c elseif h < 3 then g, b = c, x
+    elseif h < 4 then g, b = x, c elseif h < 5 then r, b = x, c else r, b = c, x end
+    local m = v - c
+    RAINBOW[i] = COLOR:CreateColorFromARGB(255, math.floor((r + m) * 255 + 0.5), math.floor((g + m) * 255 + 0.5),
+        math.floor((b + m) * 255 + 0.5))
+end
 -- The "+" of a plus level rides the last digit's top-right corner: its centre, from the digits' right cell
 -- edge and their centre line (BarLevel/plus.png)
 local SONGBAR_PLUS_DX             = CFG.num("song_list.plus_dx", -19)
@@ -63,6 +82,17 @@ local SONGBAR_CHECKER_LEVEL       = {
     [1] = CFG.num("song_list.checker_level_normal", 8),
     [2] = CFG.num("song_list.checker_level_hard", 9),
 }
+
+-- the folder info placeholder: a folder (bg_folderinfo.png) tinted with the folder's colour, its top
+-- centred on the info column; the rows of its name, description lines and song count
+local FOLDERINFO_CENTER_X  = CFG.num("folder_info.center_x", 1548)
+local FOLDERINFO_PANEL_Y   = CFG.num("folder_info.panel_y", 270)
+local FOLDERINFO_WIDTH     = CFG.num("folder_info.width", 600)
+local FOLDERINFO_NAME_Y    = CFG.num("folder_info.name_y", 382)
+local FOLDERINFO_TEXT_Y    = CFG.num("folder_info.text_y", 478)
+local FOLDERINFO_LINE_GAP  = CFG.num("folder_info.line_gap", 48)
+local FOLDERINFO_COUNT_Y   = CFG.num("folder_info.count_y", 668)
+local FOLDERINFO_COUNT_GAP = CFG.num("folder_info.count_gap", 54)
 
 local SONGINFO_DIFFICULTIES_ORIGIN_X = CFG.num("song_info.difficulties_origin_x", 1790)
 local SONGINFO_DIFFICULTIES_ORIGIN_Y = CFG.num("song_info.difficulties_origin_y", 154)
@@ -289,6 +319,28 @@ local function drawBarTitle(pt, x, y)
     G.text:Draw(pt.text, x, y, pt.gold and SONGLIST_GOLD or nil, nil, 1, 1, 525, "center")
 end
 
+-- the random bar: bar.png drawn in narrow vertical slices, each tinted the hue its place and the time give,
+-- so the rainbow runs along the bar (whole pixels, so the slices meet without seams)
+local function drawRainbowBar(xpos, ypos)
+    local tex = G.bars["bar"]
+    local w, h = tex.Width, tex.Height
+    local x0, y0 = math.floor(xpos - w / 2 + 0.5), math.floor(ypos - h / 2 + 0.5)
+    local shift = (G.nowMs or 0) % RAINBOW_MS / RAINBOW_MS
+    for sx = 0, w - 1, RAINBOW_SLICE do
+        local hue = (sx / w * RAINBOW_SPAN - shift) % 1
+        tex:SetColor(RAINBOW[math.floor(hue * RAINBOW_STEPS) % RAINBOW_STEPS])
+        tex:DrawRectAtAnchor(x0 + sx, y0, sx, 0, math.min(RAINBOW_SLICE, w - sx), h, "topleft")
+    end
+    tex:SetColor(COL_WHITE)
+end
+
+-- the black sticker in the level tag's place, with the icon of a random, back or folder bar
+local function drawSticker(kind, xpos, ypos)
+    local x = xpos + SONGBAR_LABEL_X_OFFSET
+    G.bars["sticker"]:DrawAtAnchor(x, ypos, "center")
+    G.bars["sticker_" .. kind]:DrawAtAnchor(x, ypos, "center")
+end
+
 -- Draw one song-list bar's full visuals (bar art + overlays + title + level tag) at (xpos, ypos).
 local function drawBar(tx, xpos, ypos)
     if tx == nil then return end
@@ -328,14 +380,18 @@ local function drawBar(tx, xpos, ypos)
             G.genre_overlays[tx.genre]:DrawAtAnchor(xpos, ypos, "center")
             if tx.fav then drawFavIcon(xpos, ypos) end
             if tx.isSong then drawBarleft(tx.barleft, xpos, ypos) end
+            if tx.isFolder then drawSticker("folder", xpos, ypos) end
             drawLevelTag(tx.level, xpos + SONGBAR_LABEL_X_OFFSET, ypos)
             drawBarTitle(tx, xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y)
         end
-    elseif tx.isRandom then
-        G.bars["random"]:DrawAtAnchor(xpos, ypos, "center")
-        drawBarTitle(tx, xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y)
-    elseif tx.isReturn then
-        G.bars["back"]:DrawAtAnchor(xpos, ypos, "center")
+    elseif tx.isRandom or tx.isReturn then
+        if tx.isRandom then
+            drawRainbowBar(xpos, ypos)
+        else
+            G.bars["bar"]:SetColor(BACK_BAR_COLOR)
+            G.bars["bar"]:DrawAtAnchor(xpos, ypos, "center")
+        end
+        drawSticker(tx.isRandom and "random" or "back", xpos, ypos)
         drawBarTitle(tx, xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y)
     end
 end
@@ -460,11 +516,15 @@ function M.hitTest(mx, my)
     return nil
 end
 
--- ── The selected row: a segment of the band at the centre bar's height, its green bouncing in and out ──
+-- ── The selected row: a segment of the band at the centre bar's height, its colour bouncing in and out ──
 -- Baked once like the backdrop (same width, slope and edges), as high as the bar plate plus half the gap to
 -- the next bar above and below (one row of the list); G.selectBandPulse
 -- (0..1, the "selectband_animation" counter) scales its alpha.
 local SELECT_BAND_COLOR = CFG.numList("song_list.select_band_color", { 72, 210, 104 })
+-- green at the top level; inside a folder, G.selectBandColor (navigation.lua: the folder's colour, moved
+-- away from its bars')
+local SELECT_BAND_TOP = COLOR:CreateColorFromARGB(255, SELECT_BAND_COLOR[1] or 0, SELECT_BAND_COLOR[2] or 0,
+    SELECT_BAND_COLOR[3] or 0)
 local SELECT_BAND_ALPHA = CFG.num("song_list.select_band_alpha", 170)
 local selectBand = nil         -- { canvas, dx, y }: dx = its offset from the band's canvas x, y = its screen row
 local function drawSelectBand(opacity)
@@ -482,8 +542,7 @@ local function drawSelectBand(opacity)
         cv:ClearTransparent()
         local fade = math.max(0, math.min(math.floor(BACKDROP_FADE), math.floor(W / 4)))
         local step = 4
-        local cr, cg, cb = SELECT_BAND_COLOR[1] or 0, SELECT_BAND_COLOR[2] or 0, SELECT_BAND_COLOR[3] or 0
-        local function fill(x, y, w, al) cv:FillRect(x, y, w, 1, cr, cg, cb, al) end
+        local function fill(x, y, w, al) cv:FillRect(x, y, w, 1, 255, 255, 255, al) end
         for r = 0, H - 1 do
             -- the band's own row top + r, so both edges line up with the backdrop's
             local xf = (top + r) * slope - dx
@@ -509,9 +568,11 @@ local function drawSelectBand(opacity)
     end
     local x0 = SONGLIST_ORIGIN_X + BACKDROP_DX - SONGLIST_ORIGIN_Y * slope - W / 2
     local cv = selectBand.canvas
+    cv:SetColor(G.selectBandColor or SELECT_BAND_TOP)
     cv:SetOpacity(a)
     cv:Draw(math.floor(x0 - G.songSelectShift + 0.5) + selectBand.dx, selectBand.y)
     cv:SetOpacity(1)
+    cv:SetColor(COL_WHITE)
 end
 
 -- ── Folder open/close animation ─────────────────────────────────────────────────
@@ -624,6 +685,25 @@ function M.drawPanel()
     -- Random / song info panels (all node-derived data comes from the selection cache — see navigation.lua)
     if sel ~= nil and sel.isRandom then
         G.bgtx["randominfo"]:DrawAtAnchor(1920 - G.songSelectShift, 0, "topright")
+    end
+
+    -- folder info (placeholder): its name, its box.def description, and its unlocked / total songs
+    if sel ~= nil and sel.isFolder and not sel.vaultFolder then
+        local cx = FOLDERINFO_CENTER_X - G.songSelectShift
+        local panel = G.bgtx["folderinfo"]
+        panel:SetColor(sel.folderColor or COL_WHITE)
+        panel:DrawAtAnchor(cx, FOLDERINFO_PANEL_Y, "top")
+        panel:SetColor(COL_WHITE)
+        G.textLarge:Draw(sel.folderName or "", cx, FOLDERINFO_NAME_Y, nil, nil, 1, 1, FOLDERINFO_WIDTH, "top")
+        for i, line in ipairs(sel.folderLines) do
+            G.text:Draw(line, cx, FOLDERINFO_TEXT_Y + (i - 1) * FOLDERINFO_LINE_GAP, nil, nil, 1, 1, FOLDERINFO_WIDTH, "top")
+        end
+        if G.folderSongsLabel == nil then
+            local ok, s = pcall(function() return THEME:GetSkinString("SONGSELECT_FOLDER_SONGS") end)
+            G.folderSongsLabel = (ok and type(s) == "string" and s ~= "" and s:sub(1, 1) ~= "[") and s or "Songs"
+        end
+        G.textStats:Draw(G.folderSongsLabel, cx, FOLDERINFO_COUNT_Y, nil, nil, 1, 1, FOLDERINFO_WIDTH, "top")
+        G.textLarge:Draw(sel.folderCount, cx, FOLDERINFO_COUNT_Y + FOLDERINFO_COUNT_GAP, nil, nil, 1, 1, FOLDERINFO_WIDTH, "top")
     end
 
     if sel ~= nil and sel.isSong then

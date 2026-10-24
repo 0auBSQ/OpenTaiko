@@ -133,6 +133,7 @@ El handle de lista de canciones, SONGMOUNT:ChosenSongNode() y DANBUILDER:GetSong
 | `node.ForeColor  (color)` | El color de primer plano del nodo, o nil. |
 | `node.BackColor  (color)` | El color de fondo del nodo, o nil. |
 | `node.BoxColor  (color)` | El color de casilla del nodo, o nil. |
+| `node.BoxText  (string)` | La descripción del box.def de la carpeta (`#BOXEXPLANATION1`-`3`) en el idioma del juego, una línea por entrada; "" si no tiene. |
 | `node.Title  (string)` | El título mostrado. Las casillas de retorno y aleatorias devuelven el texto localizado "Return" / "Random" construido a partir del título de la carpeta padre. |
 | `node.Subtitle  (string)` | El subtítulo de la canción, o nil. |
 | `node.Genre  (string)` | La cadena de género, o nil. |

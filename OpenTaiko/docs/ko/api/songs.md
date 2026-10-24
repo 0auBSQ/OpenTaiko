@@ -133,6 +133,7 @@ end
 | `node.ForeColor  (color)` | 노드의 전경색. 없으면 nil. |
 | `node.BackColor  (color)` | 노드의 배경색. 없으면 nil. |
 | `node.BoxColor  (color)` | 노드의 박스 색. 없으면 nil. |
+| `node.BoxText  (string)` | 폴더의 box.def 설명(`#BOXEXPLANATION1`-`3`)으로, 게임 언어로 한 줄씩. 없으면 "". |
 | `node.Title  (string)` | 표시 제목. 뒤로 가기 박스와 랜덤 박스는 부모 폴더의 제목으로 만든 지역화된 "Return" / "Random" 텍스트를 반환합니다. |
 | `node.Subtitle  (string)` | 곡의 부제. 없으면 nil. |
 | `node.Genre  (string)` | 장르 문자열. 없으면 nil. |

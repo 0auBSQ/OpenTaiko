@@ -133,6 +133,7 @@ end
 | `node.ForeColor  (color)` | Цвет переднего плана узла или nil. |
 | `node.BackColor  (color)` | Цвет фона узла или nil. |
 | `node.BoxColor  (color)` | Цвет бокса узла или nil. |
+| `node.BoxText  (string)` | Описание папки из box.def (`#BOXEXPLANATION1`-`3`) на языке игры, по строке на запись; "", если его нет. |
 | `node.Title  (string)` | Отображаемое название. Боксы возврата и случайные боксы возвращают локализованный текст «Return» / «Random», построенный из названия родительской папки. |
 | `node.Subtitle  (string)` | Подзаголовок песни или nil. |
 | `node.Genre  (string)` | Строка жанра или nil. |

@@ -273,6 +273,7 @@ function onStart()
     G.bgtx["preimage_load"]             = TEXTURE:CreateTexture("Textures/preimage_load.png")
     G.bgtx["songinfo"]                  = TEXTURE:CreateTexture("Textures/bg_songinfo.png")
     G.bgtx["randominfo"]                = TEXTURE:CreateTexture("Textures/bg_randominfo.png")
+    G.bgtx["folderinfo"]                = TEXTURE:CreateTexture("Textures/bg_folderinfo.png")
     G.bgtx["difficultyselect"]          = TEXTURE:CreateTexture("Textures/bg_difficultyselect.png")
     G.bgtx["header"]                    = TEXTURE:CreateTexture("Textures/bg_header.png")
     G.bgtx["header-box"]                = TEXTURE:CreateTexture("Textures/bg_header-box.png")
@@ -315,8 +316,11 @@ function onStart()
     G.bgtx["placeholder_portrait"] = TEXTURE:CreateTexture("Textures/placeholder_portrait.png")
 
     G.bars["bar"]              = TEXTURE:CreateTexture("Textures/bar.png")
-    G.bars["random"]           = TEXTURE:CreateTexture("Textures/random.png")
-    G.bars["back"]             = TEXTURE:CreateTexture("Textures/back.png")
+    -- the black sticker of the random, back and folder bars, and its icons
+    G.bars["sticker"]          = TEXTURE:CreateTexture("Textures/bar_sticker.png")
+    G.bars["sticker_random"]   = TEXTURE:CreateTexture("Textures/bar_sticker_random.png")
+    G.bars["sticker_back"]     = TEXTURE:CreateTexture("Textures/bar_sticker_back.png")
+    G.bars["sticker_folder"]   = TEXTURE:CreateTexture("Textures/bar_sticker_folder.png")
     G.bars["locked"]           = TEXTURE:CreateTexture("Textures/locked.png")
     G.bars["selected-arrow-l"] = TEXTURE:CreateTexture("Textures/selected-arrow-l.png")
     G.bars["selected-arrow-r"] = TEXTURE:CreateTexture("Textures/selected-arrow-r.png")
@@ -365,6 +369,7 @@ end
 -- backgroundMode: nil = the per-genre sets (backgrounds.lua); "shared" = the host draws its own via the
 -- SHARED "background" texture (set after this call), scrolled as before
 function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly, backgroundMode)
+    G.folderCountCache = nil   -- unlocks may have changed since the last visit
     G.activeConfig = {
         allowPlayerCount  = allowPlayerCount,
         lockedPlayerCount = lockedPlayerCount,

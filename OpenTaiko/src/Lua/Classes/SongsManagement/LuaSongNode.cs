@@ -174,6 +174,15 @@
 			}
 		}
 
+		// a folder's box.def description (#BOXEXPLANATION1-3) in the current language, one line each,
+		// empty lines left out; "" when it has none
+		public string BoxText {
+			get {
+				if (_node == null) return "";
+				return string.Join("\n", _node.strBoxText.Select(t => t.GetString("")).Where(s => !string.IsNullOrWhiteSpace(s)));
+			}
+		}
+
 
 		#endregion
 

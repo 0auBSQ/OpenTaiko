@@ -133,6 +133,7 @@ end
 | `node.ForeColor  (color)` | ノードの前景色。なければ nil。 |
 | `node.BackColor  (color)` | ノードの背景色。なければ nil。 |
 | `node.BoxColor  (color)` | ノードのボックス色。なければ nil。 |
+| `node.BoxText  (string)` | フォルダーの box.def の説明 (`#BOXEXPLANATION1`-`3`)。ゲームの言語で、1 行ずつ。なければ ""。 |
 | `node.Title  (string)` | 表示タイトル。戻るボックスとランダムボックスは、親フォルダのタイトルから作られたローカライズ済みの「戻る」/「ランダム」テキストを返します。 |
 | `node.Subtitle  (string)` | 楽曲のサブタイトル。なければ nil。 |
 | `node.Genre  (string)` | ジャンル文字列。なければ nil。 |

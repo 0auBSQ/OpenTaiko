@@ -133,6 +133,7 @@ The song list handle, SONGMOUNT:ChosenSongNode() and DANBUILDER:GetSong() return
 | `node.ForeColor  (color)` | The node's foreground color, or nil. |
 | `node.BackColor  (color)` | The node's background color, or nil. |
 | `node.BoxColor  (color)` | The node's box color, or nil. |
+| `node.BoxText  (string)` | The folder's box.def description (`#BOXEXPLANATION1`-`3`) in the game's language, one line each; "" when it has none. |
 | `node.Title  (string)` | The display title. Back and random boxes return the localized "Return" / "Random" text built from the parent folder's title. |
 | `node.Subtitle  (string)` | The song's subtitle, or nil. |
 | `node.Genre  (string)` | The genre string, or nil. |

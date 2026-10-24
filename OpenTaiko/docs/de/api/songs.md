@@ -133,6 +133,7 @@ Das Songlisten-Handle, SONGMOUNT:ChosenSongNode() und DANBUILDER:GetSong() geben
 | `node.ForeColor  (color)` | Die Vordergrundfarbe des Knotens, oder nil. |
 | `node.BackColor  (color)` | Die Hintergrundfarbe des Knotens, oder nil. |
 | `node.BoxColor  (color)` | Die Box-Farbe des Knotens, oder nil. |
+| `node.BoxText  (string)` | Die box.def-Beschreibung des Ordners (`#BOXEXPLANATION1`-`3`) in der Spielsprache, eine Zeile pro Eintrag; "", wenn es keine gibt. |
 | `node.Title  (string)` | Der Anzeigetitel. Zurück- und Zufalls-Boxen geben den lokalisierten Text "Return" / "Random" zurück, der aus dem Titel des übergeordneten Ordners gebildet wird. |
 | `node.Subtitle  (string)` | Der Untertitel des Songs, oder nil. |
 | `node.Genre  (string)` | Der Genre-String, oder nil. |

@@ -133,6 +133,7 @@ end
 | `node.ForeColor  (color)` | 节点的前景色，或 nil。 |
 | `node.BackColor  (color)` | 节点的背景色，或 nil。 |
 | `node.BoxColor  (color)` | 节点的框颜色，或 nil。 |
+| `node.BoxText  (string)` | 文件夹 box.def 中的说明（`#BOXEXPLANATION1`-`3`），使用游戏语言，每项一行；没有时为 ""。 |
 | `node.Title  (string)` | 显示标题。返回项和随机选曲项返回由父文件夹标题构成的本地化“返回”/“随机”文本。 |
 | `node.Subtitle  (string)` | 歌曲的副标题，或 nil。 |
 | `node.Genre  (string)` | 分类字符串，或 nil。 |
