@@ -31,6 +31,8 @@ local SONGBAR_LABEL_X_OFFSET      = CFG.num("song_list.label_x_offset", 288)
 -- the back bar's colour, and the random bar's rainbow: RAINBOW_STEPS hues made once, pastel enough for the
 -- title to stay readable; the rainbow runs along the bar, one full pass every RAINBOW_MS
 local BACK_BAR_COLOR = CFG.color("colors.back_bar", COLOR:CreateColorFromARGB(255, 131, 113, 96))
+-- the song info under a BLURRED song, leaning purple
+local BLURRED_INFO_TINT = CFG.color("colors.blurred_info", COLOR:CreateColorFromARGB(255, 222, 196, 255))
 local RAINBOW_MS     = CFG.num("song_list.random_rainbow_ms", 4000)
 local RAINBOW_STEPS  = 120
 local RAINBOW_SLICE  = CFG.num("song_list.random_rainbow_slice", 8)   -- px per tinted slice of the bar
@@ -294,7 +296,16 @@ end
 
 local function drawPreimage()
     local sel = G.selInfo
-    if sel == nil or not sel.isSong or sel.hi >= 2 then return end
+    if sel == nil or not sel.isSong then return end
+    -- BLURRED: static in the jacket's place, never the jacket
+    if sel.blurredInfo then
+        local st = G.bgtx["preimage_load"]
+        st:SetUseNoiseEffect(true)
+        st:Draw(PREIMAGE_ORIGIN_X - G.songSelectShift, PREIMAGE_ORIGIN_Y)
+        st:SetUseNoiseEffect(false)
+        return
+    end
+    if sel.hi >= 2 then return end
     G.bgtx["preimage_load"]:Draw(PREIMAGE_ORIGIN_X - G.songSelectShift, PREIMAGE_ORIGIN_Y)
     G.bgtx["load"]:DrawAtAnchor(
         PREIMAGE_ORIGIN_X - G.songSelectShift + PREIMAGE_SIZE_X / 2,
@@ -707,15 +718,23 @@ function M.drawPanel()
     end
 
     if sel ~= nil and sel.isSong then
-        -- BLURED / vault locked: skip the song info panel entirely
-        if sel.hi < 2 then
+        -- vault locked: no song info; BLURRED: drawn darker, its texts as ???
+        local hide = sel.blurredInfo
+        if sel.hi < 2 or hide then
+            local tint = hide and BLURRED_INFO_TINT or COL_WHITE
+            G.bgtx["songinfo"]:SetColor(tint)
             G.bgtx["songinfo"]:DrawAtAnchor(1920 - G.songSelectShift, 0, "topright")
+            G.bgtx["songinfo"]:SetColor(COL_WHITE)
             if sel.hasVideo then
+                G.bgtx["sinfo_video"]:SetColor(tint)
                 G.bgtx["sinfo_video"]:Draw(SONGINFO_HASVIDEO_ORIGIN_X - G.songSelectShift, SONGINFO_HASVIDEO_ORIGIN_Y)
+                G.bgtx["sinfo_video"]:SetColor(COL_WHITE)
             end
             if sel.explicit then
+                G.bgtx["sinfo_explicit"]:SetColor(tint)
                 G.bgtx["sinfo_explicit"]:DrawAtAnchor(
                     SONGINFO_EXPLICIT_ORIGIN_X - G.songSelectShift, SONGINFO_EXPLICIT_ORIGIN_Y, "topright")
+                G.bgtx["sinfo_explicit"]:SetColor(COL_WHITE)
             end
 
             -- Difficulty icons: hidden for GRAYED and above
@@ -747,19 +766,22 @@ function M.drawPanel()
                 end
             end
 
-            G.textSmall:Draw(sel.subtitle, SONGINFO_SUBTITLE_ORIGIN_X - G.songSelectShift, SONGINFO_SUBTITLE_ORIGIN_Y,
+            G.textSmall:Draw(hide and "???" or sel.subtitle, SONGINFO_SUBTITLE_ORIGIN_X - G.songSelectShift, SONGINFO_SUBTITLE_ORIGIN_Y,
                 nil, nil, 1, 1, SONGINFO_SUBTITLE_MWIDTH, "center")
-            G.textSmall:Draw(sel.charter, SONGINFO_CHARTER_ORIGIN_X - G.songSelectShift, SONGINFO_CHARTER_ORIGIN_Y,
+            G.textSmall:Draw(hide and "???" or sel.charter, SONGINFO_CHARTER_ORIGIN_X - G.songSelectShift, SONGINFO_CHARTER_ORIGIN_Y,
                 nil, nil, 1, 1, SONGINFO_CHARTER_MWIDTH)
             -- rebuild the length string only when the async preview load lands a new duration
             if sel.lenMs ~= G.previewDurationMs then
                 sel.lenMs   = G.previewDurationMs
                 sel.lenText = "Length - " .. formatDuration(sel.lenMs)
             end
-            G.textSmall:Draw(sel.lenText, SONGINFO_LENGTH_ORIGIN_X - G.songSelectShift, SONGINFO_LENGTH_ORIGIN_Y,
+            G.textSmall:Draw(hide and "???" or sel.lenText, SONGINFO_LENGTH_ORIGIN_X - G.songSelectShift, SONGINFO_LENGTH_ORIGIN_Y,
                 nil, nil, 1, 1, SONGINFO_LENGTH_MWIDTH)
 
-            if sel.bpmBase ~= nil then
+            if hide then
+                G.text:Draw("???", SONGINFO_BPM_ORIGIN_X - G.songSelectShift, SONGINFO_BPM_ORIGIN_Y,
+                    COL_WHITE, nil, 1, 1, SONGINFO_BPM_MWIDTH, "center", 0, SONGINFO_BPM_ROTATION)
+            elseif sel.bpmBase ~= nil then
                 -- rebuild the BPM string/color only when the song-speed multiplier changes
                 local mult = CONFIG.SONGSPEED:ToActual(CONFIG.SongSpeed)
                 if sel.bpmMult ~= mult then

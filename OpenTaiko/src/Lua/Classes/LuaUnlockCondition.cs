@@ -12,7 +12,7 @@ namespace OpenTaiko {
 		public bool HasCondition => _cUC != null;
 
 		/// <summary>The condition's type id (e.g. "ch","cs","gt","gc","ig",…) or "" if none.</summary>
-		public string GetConditionType() => _cUC?.Type ?? "";
+		public string GetConditionType() => _cUC?.Id ?? "";
 
 		/// <summary>Returns the coin price of this unlock condition (0 if no coin cost).</summary>
 		public int GetCoinPrice() => _cUC?.CoinStack ?? 0;

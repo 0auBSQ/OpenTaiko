@@ -18,6 +18,38 @@ local HI_DISPLAYED = 0
 local HI_GRAYED    = 1
 local HI_BLURED    = 2
 
+-- A locked song's condition sits on the jacket (centred at x 1526, 500 px wide, its bottom at y 646). A
+-- coin-only condition: the price strip along the jacket's bottom. Any other: the same strip reading "How to
+-- unlock" with [Decide], which opens into the details card, wider than the jacket and centred on it. Decide
+-- on the open card closes it, or unlocks the song when its condition is met. The card stays open or closed
+-- while browsing.
+local JACKET_CX, JACKET_W   = 1526, 500
+local STRIP_Y, STRIP_H      = 554, 92
+local CARD_Y, CARD_W, CARD_H = 146, 600, 500
+local CARD_PAD_X       = 30     -- the text's inset from the card's sides
+local CARD_TITLE_Y     = 22     -- the title's top, from the card's top
+local CARD_TEXT_Y      = 94     -- the condition text's top, from the card's top
+local CARD_TEXT_H      = 380    -- a taller condition text is shrunk vertically to this height
+local TITLE_SCALE_SHUT = 0.75   -- the title's size on the closed strip
+local DETAILS_MS       = 220    -- the card opening or closing
+local TEXT_FADE_FROM   = 0.6    -- the condition text fades in over the last part of the opening
+local PRICE_COIN_X     = 52     -- the coin's centre, from the strip's left edge
+local PRICE_COIN_SIZE  = 58
+local PRICE_TEXT_X     = 96     -- the price's left edge
+local STRIP_MSG_RIGHT  = 22     -- the right-hand text's margin
+local PRICE_MSG_W      = 300    -- the message's widest box (longer ones are squished)
+local COIN_CONDS = { ch = true, cs = true, cm = true }
+local COL_PRICE       = COLOR:CreateColorFromARGB(255, 255, 226, 92)
+local COL_PRICE_SHORT = COLOR:CreateColorFromARGB(255, 255, 110, 100)
+local COL_KEY         = COLOR:CreateColorFromARGB(255, 190, 198, 216)
+
+-- a missing key comes back as "[LOCALE NOT FOUND: KEY]": the fallback then; texts may start with "["
+local function tr(key, fallback)
+    local ok, s = pcall(function() return THEME:GetSkinString(key) end)
+    if ok and type(s) == "string" and s ~= "" and s:sub(1, 18) ~= "[LOCALE NOT FOUND:" then return s end
+    return fallback
+end
+
 -- Flash animation: nil = white; non-nil = animated color (red → white)
 -- Shared by both standard locked songs and vault locked songs (mutually exclusive).
 local flashColor = nil
@@ -26,7 +58,15 @@ local lastFlashVal = nil
 -- Per-selection cache of the unlock-condition text. UnlockText/GetConditionMessage BUILD a new string on
 -- every call (and each cross-boundary string marshal allocates), so querying them per frame steadily stacks
 -- garbage while a locked song is selected. Fetch once per selected node instead.
-local condCache = nil   -- { node, has, text, scale }
+local condCache = nil   -- { mode, text, scale } or { mode = "coin", player, price, short, text }
+local cardTitle = nil
+local decideLabel = nil
+
+-- the details card: open or closed (the toggle), and its animation (0 = the strip, 1 = the card)
+local detailsOpen = false
+local detailsT = 0
+local lastMs = nil
+local panelRect = nil   -- { x, y, w, h } of the strip or card drawn this frame, for the mouse
 
 -- ── Init ──────────────────────────────────────────────────────────────────────
 
@@ -34,6 +74,7 @@ function M.init(g)
     G = g
     flashColor = nil
     condCache = nil
+    detailsOpen, detailsT, lastMs, panelRect = false, 0, nil, nil
 end
 
 -- drop the cached condition text (call on activity re-activation: unlock progress may have changed)
@@ -48,6 +89,8 @@ function M.loadTextures()
     G.bars["lock_1"]      = TEXTURE:CreateTexture("Textures/Unlockables/1/lock.png")
     G.bars["static_2"]    = TEXTURE:CreateTexture("Textures/Unlockables/2/static.png")
     G.bars["condsbox"]    = TEXTURE:CreateTexture("Textures/Unlockables/condsbox.png")
+    G.bars["unlock_card"] = TEXTURE:CreateTexture("Textures/Unlockables/card.png")
+    pcall(function() G.unlockCoin = SHARED:GetSharedTexture("Coin") end)
     -- Secret Vault textures
     G.bars["vault_bar"]   = TEXTURE:CreateTexture("Textures/Unlockables/Vault/bar.png")
     G.bars["vault_lock0"] = TEXTURE:CreateTexture("Textures/Unlockables/Vault/lock0.png")
@@ -179,11 +222,20 @@ local function refreshCondCache()
     if ssn.IsSong and ssn.IsLocked then
         local cond = ssn.UnlockCondition
         if not cond.HasCondition then return end
+        -- a coin price is shown for the highlighted player: affordable or not
+        local player = G.highlightedPlayer or 0
+        local price = cond:GetCoinPrice()
+        if COIN_CONDS[cond:GetConditionType()] and price > 0 then
+            local ok = cond:IsUnlockable(player)
+            condCache = { mode = "coin", player = player, price = tostring(price), short = not ok,
+                text = ok and tr("SONGSELECT_UNLOCK_BUY", "[Decide] to buy") or cond:GetBlockedMessage(player) }
+            return
+        end
         local text = ssn.UnlockText
         if type(text) ~= "string" or text == "" then text = cond:GetConditionMessage() end
         if text == nil or text == "" then return end
         local h = G.text:MeasureWrapped(text, 0)
-        condCache = { mode = "locked", text = text, scale = (h > 380) and (380 / h) or 1 }
+        condCache = { mode = "locked", text = text, scale = (h > CARD_TEXT_H) and (CARD_TEXT_H / h) or 1 }
         return
     end
     if M.isVaultLocked(ssn) then
@@ -193,13 +245,88 @@ local function refreshCondCache()
     end
 end
 
--- Draw condsbox.png and the unlock condition text for the currently selected locked
--- song. Also applies the flash-red animation when the player just failed to unlock.
+local function smooth(t) return t * t * (3 - 2 * t) end
+local function lerp(a, b, t) return a + (b - a) * t end
+
+-- the strip or the card: the card texture (a flat fill) cut to the size
+local function drawFill(x, y, w, h)
+    G.bars["unlock_card"]:DrawRectAtAnchor(x, y, 0, 0, w, h, "topleft")
+    panelRect = { x = x, y = y, w = w, h = h }
+end
+
+-- The selected locked song's condition: the price strip for a coin-only condition, else the strip that opens
+-- into the details card. Its texts take the flash-red animation when the player just failed to unlock.
 function M.drawCondsPanel()
-    if condCache == nil then refreshCondCache() end
-    if condCache.mode ~= "locked" then return end
-    G.bars["condsbox"]:DrawAtAnchor(317, 572, "topleft")
-    drawCondText(condCache.text, condCache.scale)
+    if condCache == nil or (condCache.player ~= nil and condCache.player ~= G.highlightedPlayer) then
+        refreshCondCache()
+    end
+    local now = G.nowMs or 0
+    local dt = (lastMs ~= nil) and math.max(0, math.min(100, now - lastMs)) or 0
+    lastMs = now
+    panelRect = nil
+    local shift = G.songSelectShift or 0
+    if condCache.mode == "coin" then
+        local x, cy = JACKET_CX - JACKET_W / 2 - shift, STRIP_Y + STRIP_H / 2
+        drawFill(x, STRIP_Y, JACKET_W, STRIP_H)
+        local coin = G.unlockCoin
+        if coin ~= nil and coin.Width > 0 then
+            local k = PRICE_COIN_SIZE / coin.Width
+            coin:SetScale(k, k)
+            coin:DrawAtAnchor(x + PRICE_COIN_X, cy, "center")
+            coin:SetScale(1, 1)
+        end
+        local big, small = G.textLarge, G.text
+        local bigPad = big.BoxHeight - math.ceil(big.LineHeight)
+        local smallPad = small.BoxHeight - math.ceil(small.LineHeight)
+        big:Draw(condCache.price, x + PRICE_TEXT_X - bigPad, cy - big.LineHeight / 2,
+            flashColor or (condCache.short and COL_PRICE_SHORT or COL_PRICE), nil, 1, 1, 0, "topleft")
+        small:Draw(condCache.text, x + JACKET_W - STRIP_MSG_RIGHT + smallPad, cy - small.LineHeight / 2,
+            flashColor, nil, 1, 1, PRICE_MSG_W, "topright")
+    elseif condCache.mode == "locked" then
+        local target = detailsOpen and 1 or 0
+        if detailsT < target then detailsT = math.min(target, detailsT + dt / DETAILS_MS)
+        elseif detailsT > target then detailsT = math.max(target, detailsT - dt / DETAILS_MS) end
+        local e = smooth(detailsT)
+        -- the strip on the jacket's bottom grows into the card, its bottom edge rising to the card's
+        local w = lerp(JACKET_W, CARD_W, e)
+        local y = lerp(STRIP_Y, CARD_Y, e)
+        local h = lerp(STRIP_H, CARD_H, e)
+        local x = JACKET_CX - w / 2 - shift
+        drawFill(math.floor(x + 0.5), math.floor(y + 0.5), math.floor(w + 0.5), math.floor(h + 0.5))
+        local big, small = G.textLarge, G.text
+        local smallPad = small.BoxHeight - math.ceil(small.LineHeight)
+        -- the title: centred on the strip, then at the card's top, growing to its full size
+        cardTitle = cardTitle or tr("SONGSELECT_UNLOCK_TITLE", "How to unlock")
+        local ts = lerp(TITLE_SCALE_SHUT, 1, e)
+        local ty = lerp(STRIP_Y + STRIP_H / 2 - big.LineHeight * ts / 2, CARD_Y + CARD_TITLE_Y, e)
+        big:Draw(cardTitle, x + w / 2, ty, nil, nil, 1, ts, w - 160, "top")
+        -- [Decide]: the strip's right end, then the card's bottom-right corner
+        decideLabel = decideLabel or tr("SONGSELECT_DECIDE_KEY", "[Decide]")
+        small:Draw(decideLabel, x + w - STRIP_MSG_RIGHT + smallPad, y + h - STRIP_H / 2 - small.LineHeight / 2,
+            COL_KEY, nil, 1, 1, 0, "topright")
+        local fade = (e - TEXT_FADE_FROM) / (1 - TEXT_FADE_FROM)
+        if fade > 0 then
+            small:Draw(condCache.text, x + CARD_PAD_X - smallPad, y + CARD_TEXT_Y, flashColor, nil, math.min(1, fade), 1,
+                w - 2 * CARD_PAD_X + 2 * smallPad, "topleft", condCache.scale)
+        end
+    end
+end
+
+-- opens or closes the details card (a locked song with a condition other than a coin price only)
+local function toggleDetails()
+    detailsOpen = not detailsOpen
+    G.sounds.Skip:Play()
+end
+
+-- a click on the strip or the card does what Decide does; true when the click was on it
+function M.clickDetails(mx, my)
+    local r = panelRect
+    if r == nil or condCache == nil or condCache.mode ~= "locked" then return false end
+    if mx < r.x or mx > r.x + r.w or my < r.y or my > r.y + r.h then return false end
+    local node = G.songList:GetSelectedSongNode()
+    if node == nil then return false end
+    M.onDecideLocked(G.highlightedPlayer or 0, node)
+    return true
 end
 
 -- Draw condsbox.png and the vault message for the currently selected vault-locked song or vault folder.
@@ -235,10 +362,24 @@ local function startFlash()
 end
 
 -- Called when the player presses Decide on a standard locked song.
--- Opens confirm_dialog if the condition is met; otherwise flashes the condition text.
+-- A details card: Decide opens it; on the open card it unlocks a met condition right away (confirm_dialog
+-- plays the modal, the card is closed at once), else it closes the card.
+-- A coin price: confirm_dialog's purchase panel when the player can pay, else the flash.
 function M.onDecideLocked(player, node)
-    condCache = nil
     local cond = node.UnlockCondition
+    if condCache == nil then refreshCondCache() end
+    if condCache.mode == "locked" then
+        if detailsOpen and cond:IsUnlockable(player) then
+            local cd = G.act_inner["confirm_dialog"]
+            if cd ~= nil and not cd.IsActive then cd:Activate(player, node, "direct") end
+            detailsOpen, detailsT = false, 0
+            condCache = nil
+            return "confirmed"
+        end
+        toggleDetails()
+        return "details"
+    end
+    condCache = nil
     if cond:IsUnlockable(player) then
         local cd = G.act_inner["confirm_dialog"]
         if cd ~= nil and not cd.IsActive then

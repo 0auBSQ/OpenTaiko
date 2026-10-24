@@ -271,7 +271,10 @@ local function buildSelInfo(node)
     end
     local fc = focusChart(node)
     if fc ~= nil then sel.bpmBase, sel.bpmMin, sel.bpmMax = fc.BaseBPM, fc.MinBPM, fc.MaxBPM end
-    sel.isUnlockedSong = node.IsLocked ~= true and not G.unlocks.isVaultLocked(node)
+    local vaultLocked = G.unlocks.isVaultLocked(node)
+    sel.isUnlockedSong = node.IsLocked ~= true and not vaultLocked
+    -- BLURRED (a vault song excepted): the song info drawn darker, its texts as ???, static for the jacket
+    sel.blurredInfo = sel.hi == 2 and node.IsLocked == true and not vaultLocked
     return sel
 end
 
@@ -574,11 +577,15 @@ function M.handleSongSelectInput(Sort, Diff)
         for _ = 1, math.min(5, math.floor(math.abs(wheel) + 0.5)) do doMove(wheel < 0 and 1 or -1) end
     end
 
-    -- a click on a bar: the selected bar decides, another bar becomes the selection
+    -- a click on a bar: the selected bar decides, another bar becomes the selection; a click on a locked
+    -- song's strip or card decides too
     local clickDecide = false
     if mouse and INPUT:MousePressed("Left") and INPUT:IsMouseInside() and G.songList ~= nil then
-        local slot = G.songListHit(INPUT:GetMouseXY())
-        if slot == 0 then
+        local mx, my = INPUT:GetMouseXY()
+        local slot = G.songListHit(mx, my)
+        if G.unlocks ~= nil and G.unlocks.clickDetails(mx, my) then
+            slot = nil
+        elseif slot == 0 then
             clickDecide = true
         elseif slot ~= nil then
             stopHold()
