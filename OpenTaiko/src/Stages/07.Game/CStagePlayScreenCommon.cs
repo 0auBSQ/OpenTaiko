@@ -1310,12 +1310,12 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 
 		long msLastHit = long.MinValue;
 		for (int i = 0; i < nHits; ++i) {
-			long msHit = Math.Min((long)(msFirstHit + i * msPerRollTja), pChip.end.nSoundTimems - 1);
-			bool didHit = (msHit == msLastHit) ? !pChip.bHit && this.AutoplayDoHit(pChip, Math.Min(msHit, pChip.end.nSoundTimems - 1), iPlayer, gt)
+			var msHit = Math.Min((msFirstHit + i * msPerRollTja), pChip.end.nSoundTimems - 1);
+			bool didHit = (long.CreateSaturating(msHit) == msLastHit) ? !pChip.bHit && this.AutoplayDoHit(pChip, Math.Min(msHit, pChip.end.nSoundTimems - 1), iPlayer, gt)
 				: this.AutoplayTryHit(pChip, Math.Min(msHit, pChip.end.nSoundTimems - 1), iPlayer, gt);
 			if (!(didHit && this.WithinInputFrame(uncappedSpeed)))
 				break;
-			msLastHit = msHit;
+			msLastHit = long.CreateSaturating(msHit);
 		}
 		pChip.msAutoLastHit = msFirstHit + (nHits - 1) * msPerRollTja;
 	}
@@ -1367,12 +1367,12 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 				pChip.msAutoLastHit = double.PositiveInfinity; // prevent clearing fuze
 				return;
 			}
-			long msHit = Math.Min((long)(msFirstHit + i * msPerRollTja), pChip.end.nSoundTimems - 1);
-			bool didHit = (msHit == msLastHit) ? !pChip.bHit && this.AutoplayDoHit(pChip, Math.Min(msHit, pChip.end.nSoundTimems - 1), iPlayer, gt)
+			var msHit = Math.Min(msFirstHit + i * msPerRollTja, pChip.end.nSoundTimems - 1);
+			bool didHit = (long.CreateSaturating(msHit) == msLastHit) ? !pChip.bHit && this.AutoplayDoHit(pChip, Math.Min(msHit, pChip.end.nSoundTimems - 1), iPlayer, gt)
 				: this.AutoplayTryHit(pChip, Math.Min(msHit, pChip.end.nSoundTimems - 1), iPlayer, gt);
 			if (!(didHit && this.WithinInputFrame()))
 				break;
-			msLastHit = msHit;
+			msLastHit = long.CreateSaturating(msHit);
 		}
 		pChip.msAutoLastHit = msFirstHit + (nHits - 1) * msPerRollTja;
 	}
