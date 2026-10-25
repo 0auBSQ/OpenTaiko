@@ -1,6 +1,6 @@
 {
     "stage_title": "커스텀 스테이지 만들기",
-    "stage_desc": "커스텀 스테이지를 만들고 공유하기 위해 알아야 할 네 가지.",
+    "stage_desc": "커스텀 스테이지를 만들고 공유하기 위해 알아야 할 다섯 가지.",
     "topics": "주제",
     "back": "뒤로",
     "prev": "이전",
@@ -13,6 +13,9 @@
     "namespace_title": "네임스페이스 설정",
     "namespace_1_head": "STAGES:SetNamespace(\"CStage\", ...)",
     "namespace_1_text": "Script.lua 맨 위, 함수 밖에서 호출하고, 커스텀 스테이지 메뉴에 보일 제목과 설명을 넘기세요. 문자열이나 언어 코드별 테이블입니다. 이 호출이 없으면 스테이지는 커스텀 스테이지에 나타나지 않습니다.",
+    "resolution_title": "해상도 설정",
+    "resolution_1_head": "STAGES:SetResolution(1920, 1080)",
+    "resolution_1_text": "이것도 Script.lua 맨 위에서, 스테이지를 그린 해상도로 호출하세요. 그러면 해상도가 다른 스킨에서 스테이지 전체가 마우스까지 포함해 크기가 조정되어, 잘리거나 한쪽 구석에 남지 않습니다. 호출하지 않으면 스테이지는 그것을 여는 스킨의 해상도로 그려집니다.",
     "inside_title": "모두 안에 두기",
     "inside_1_head": "모든 것을 스테이지 폴더에",
     "inside_1_text": "텍스처, 소리, 글꼴, 텍스트는 스테이지 자신의 폴더에 두고 그 폴더 기준의 상대 경로로 불러옵니다. 그 밖에는 Global/Modules/Lib의 모듈(UI.Pick, Input.NavInput, Locale.i18n 등)과 엔진의 액티비티만 쓰세요. 스킨의 Lib나 다른 스테이지의 파일은 다른 플레이어에게 없을 수 있으니 쓰지 마세요.",

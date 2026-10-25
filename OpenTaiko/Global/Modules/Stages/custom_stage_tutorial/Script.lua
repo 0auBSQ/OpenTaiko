@@ -26,6 +26,7 @@ CS.declare{
 local TOPICS = {
     { id = "place",     pages = { "place.png" } },
     { id = "namespace", pages = { "namespace.png" } },
+    { id = "resolution", pages = { false } },
     { id = "inside",    pages = { "inside.png" } },
     { id = "docs",      pages = { false } },
 }

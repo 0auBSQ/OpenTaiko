@@ -1,6 +1,6 @@
 {
     "stage_title": "制作自定义舞台",
-    "stage_desc": "制作并分享自定义舞台需要知道的四件事。",
+    "stage_desc": "制作并分享自定义舞台需要知道的五件事。",
     "topics": "主题",
     "back": "返回",
     "prev": "上一页",
@@ -13,6 +13,9 @@
     "namespace_title": "设置命名空间",
     "namespace_1_head": "STAGES:SetNamespace(\"CStage\", ...)",
     "namespace_1_text": "在 Script.lua 顶部、任何函数之外调用它，并传入自定义舞台菜单显示的标题和说明：字符串，或按语言代码组织的表。没有这个调用，舞台永远不会出现在自定义舞台中。",
+    "resolution_title": "设置分辨率",
+    "resolution_1_head": "STAGES:SetResolution(1920, 1080)",
+    "resolution_1_text": "同样在 Script.lua 顶部调用它，传入舞台绘制所用的分辨率。这样，不同分辨率的皮肤会缩放整个舞台（包括鼠标），而不会把它裁掉或留在一角。不调用时，舞台会按打开它的皮肤的分辨率绘制。",
     "inside_title": "一切都放在里面",
     "inside_1_head": "一切都在舞台文件夹中",
     "inside_1_text": "它的纹理、声音、字体和文本都放在它自己的文件夹中，并以相对于该文件夹的路径加载。除此之外，只使用 Global/Modules/Lib 中的模块（UI.Pick、Input.NavInput、Locale.i18n 等）和引擎的 activity：绝不要用皮肤的 Lib 或其他舞台的文件，其他玩家可能没有它们。",

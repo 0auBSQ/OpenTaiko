@@ -1,6 +1,6 @@
 {
     "stage_title": "Crear stages personalizados",
-    "stage_desc": "Las cuatro cosas que saber para crear un stage personalizado y compartirlo.",
+    "stage_desc": "Las cinco cosas que saber para crear un stage personalizado y compartirlo.",
     "topics": "Temas",
     "back": "Volver",
     "prev": "Anterior",
@@ -13,6 +13,9 @@
     "namespace_title": "Fijar el espacio de nombres",
     "namespace_1_head": "STAGES:SetNamespace(\"CStage\", ...)",
     "namespace_1_text": "Llámalo arriba en Script.lua, fuera de toda función, con el título y la descripción que muestra el menú Stages personalizados: cadenas, o tablas por código de idioma. Sin esto, el stage nunca aparece en Stages personalizados.",
+    "resolution_title": "Fijar la resolución",
+    "resolution_1_head": "STAGES:SetResolution(1920, 1080)",
+    "resolution_1_text": "Llámalo también al principio de Script.lua, con la resolución en la que está dibujado el stage. Un skin de otra resolución reescala entonces todo el stage, ratón incluido, en vez de recortarlo o dejarlo en una esquina. Sin él, el stage se dibuja en la resolución del skin que lo abra.",
     "inside_title": "Todo dentro",
     "inside_1_head": "Todo en la carpeta del stage",
     "inside_1_text": "Sus texturas, sonidos, fuentes y textos están en su propia carpeta y se cargan con rutas relativas a ella. Fuera de eso, usa solo los módulos de Global/Modules/Lib (UI.Pick, Input.NavInput, Locale.i18n...) y las activities del motor: nunca la Lib de una skin ni archivos de otro stage, que otros jugadores quizá no tengan.",

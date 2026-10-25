@@ -1,6 +1,6 @@
 {
     "stage_title": "Eigen stages maken",
-    "stage_desc": "De vier dingen die je moet weten om een eigen stage te maken en te delen.",
+    "stage_desc": "De vijf dingen die je moet weten om een eigen stage te maken en te delen.",
     "topics": "Onderwerpen",
     "back": "Terug",
     "prev": "Vorige",
@@ -13,6 +13,9 @@
     "namespace_title": "De naamruimte instellen",
     "namespace_1_head": "STAGES:SetNamespace(\"CStage\", ...)",
     "namespace_1_text": "Roep het bovenaan Script.lua aan, buiten elke functie, met de titel en de beschrijving die het menu Eigen stages toont: strings, of tabellen per taalcode. Zonder deze aanroep verschijnt de stage nooit in Eigen stages.",
+    "resolution_title": "De resolutie instellen",
+    "resolution_1_head": "STAGES:SetResolution(1920, 1080)",
+    "resolution_1_text": "Roep het ook bovenaan Script.lua aan, met de resolutie waarin de stage getekend is. Een skin met een andere resolutie schaalt dan de hele stage, de muis inbegrepen, in plaats van hem af te snijden of in een hoek te laten. Zonder de aanroep wordt de stage getekend in de resolutie van de skin die hem opent.",
     "inside_title": "Alles erin houden",
     "inside_1_head": "Alles in de map van de stage",
     "inside_1_text": "Zijn texturen, geluiden, lettertypen en teksten staan in zijn eigen map en laden via paden relatief daaraan. Gebruik verder alleen de modules van Global/Modules/Lib (UI.Pick, Input.NavInput, Locale.i18n...) en de activities van de engine: nooit de Lib van een skin of bestanden van een andere stage, die andere spelers misschien niet hebben.",

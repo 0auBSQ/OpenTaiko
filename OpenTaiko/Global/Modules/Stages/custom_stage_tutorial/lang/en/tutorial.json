@@ -1,6 +1,6 @@
 {
     "stage_title": "Making custom stages",
-    "stage_desc": "The four things to know to make a custom stage and share it.",
+    "stage_desc": "The five things to know to make a custom stage and share it.",
     "topics": "Topics",
     "back": "Back",
     "prev": "Previous",
@@ -13,6 +13,9 @@
     "namespace_title": "Set the namespace",
     "namespace_1_head": "STAGES:SetNamespace(\"CStage\", ...)",
     "namespace_1_text": "Call it at the top of Script.lua, outside any function, with the title and the description the Custom Stages menu shows: strings, or tables by language code. Without it, the stage never appears in Custom Stages.",
+    "resolution_title": "Set the resolution",
+    "resolution_1_head": "STAGES:SetResolution(1920, 1080)",
+    "resolution_1_text": "Call it at the top of Script.lua too, with the resolution the stage is drawn in. A skin of another resolution then rescales the whole stage, the mouse included, instead of cutting it off or leaving it in a corner. Without it, the stage is drawn in the resolution of whichever skin opens it.",
     "inside_title": "Keep everything inside",
     "inside_1_head": "Everything in the stage's folder",
     "inside_1_text": "Its textures, sounds, fonts and strings live in its own folder and load by paths relative to it. Beyond that, use only the modules of Global/Modules/Lib (UI.Pick, Input.NavInput, Locale.i18n...) and the engine's activities: never a skin's Lib or another stage's files, which other players may not have.",

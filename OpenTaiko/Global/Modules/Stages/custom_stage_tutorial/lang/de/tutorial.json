@@ -1,6 +1,6 @@
 {
     "stage_title": "Eigene Stages erstellen",
-    "stage_desc": "Die vier Dinge, die du wissen musst, um eine eigene Stage zu bauen und zu teilen.",
+    "stage_desc": "Die fünf Dinge, die du wissen musst, um eine eigene Stage zu bauen und zu teilen.",
     "topics": "Themen",
     "back": "Zurück",
     "prev": "Vorherige",
@@ -13,6 +13,9 @@
     "namespace_title": "Den Namespace setzen",
     "namespace_1_head": "STAGES:SetNamespace(\"CStage\", ...)",
     "namespace_1_text": "Rufe es oben in Script.lua auf, außerhalb jeder Funktion, mit dem Titel und der Beschreibung, die das Menü Eigene Stages zeigt: Strings oder Tabellen nach Sprachcode. Ohne diesen Aufruf erscheint die Stage nie in Eigene Stages.",
+    "resolution_title": "Die Auflösung setzen",
+    "resolution_1_head": "STAGES:SetResolution(1920, 1080)",
+    "resolution_1_text": "Ruf es ebenfalls oben in Script.lua auf, mit der Auflösung, in der die Stage gezeichnet ist. Ein Skin mit einer anderen Auflösung skaliert dann die ganze Stage, die Maus eingeschlossen, statt sie abzuschneiden oder in einer Ecke zu lassen. Ohne den Aufruf wird die Stage in der Auflösung des Skins gezeichnet, der sie öffnet.",
     "inside_title": "Alles drinnen behalten",
     "inside_1_head": "Alles im Ordner der Stage",
     "inside_1_text": "Ihre Texturen, Sounds, Schriften und Texte liegen in ihrem eigenen Ordner und werden relativ dazu geladen. Darüber hinaus nutze nur die Module aus Global/Modules/Lib (UI.Pick, Input.NavInput, Locale.i18n...) und die Activities der Engine: nie die Lib eines Skins oder Dateien einer anderen Stage, die andere Spieler vielleicht nicht haben.",
