@@ -13,6 +13,9 @@
 -- shadows, subtle diorama grade), the floor is a raised platform the physics character actually stands
 -- on (camera boom collides too), and the day/night sky stays visible through the window (drawSky).
 
+-- drawn in 1920x1080: a skin of another resolution rescales it
+STAGES:SetResolution(1920, 1080)
+
 local OWM      = require("World.OWM3d")
 local A        = require("assets")
 local Room     = require("room")

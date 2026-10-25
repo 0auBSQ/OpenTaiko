@@ -16,7 +16,10 @@ CS.declare{
     title       = CS.allLanguages("menu", "title"),       -- lang/<code>/menu.json, every language
     description = { en = "A calm walk down a street of paper lanterns." },
 }
+STAGES:SetResolution(1920, 1080)
 ```
+
+`STAGES:SetResolution(1920, 1080)` ernaast vertelt de engine in welke resolutie de stage tekent, zodat een skin met een andere resolutie hem schaalt in plaats van hem af te snijden.
 
 `CS.declare(info)` is `STAGES:SetNamespace("CStage", info)`. De menu's lezen twee velden van info:
 

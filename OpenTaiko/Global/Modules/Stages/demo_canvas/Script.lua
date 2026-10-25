@@ -12,6 +12,9 @@
 -- (brush strokes, stamps, clears). Undo drops the last action and replays the rest onto
 -- a blank sheet — so there are no big pixel snapshots to allocate.
 
+-- drawn in 1920x1080: a skin of another resolution rescales it
+STAGES:SetResolution(1920, 1080)
+
 local SURF_W, SURF_H = 1920, 1080
 
 local paper       = nil   -- the drawing sheet (full-surface LuaCanvas)

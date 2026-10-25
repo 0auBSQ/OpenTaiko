@@ -90,11 +90,13 @@ end
 | メソッド | 説明 |
 | --- | --- |
 | `STAGES:SetNamespace(namespace, info?)  -> boolean` | 呼び出し元のステージの名前空間を宣言します。任意の info テーブルは、それを一覧にするステージに返されます。ステージのスクリプト以外では false を返します。 |
+| `STAGES:SetResolution(width, height)  -> boolean` | 呼び出し元のステージが描画する解像度を宣言します。スキンの解像度と異なる場合、ステージが描くものはすべて、その解像度のスキン全体と同じように、比率を保ったまま中央に合わせてスキンの解像度へ拡大縮小されます。マウス座標、`INPUT:GetSurfaceWidth/Height`、クリップもそれに従い、ステージが開くスキンの ROActivity はスキンの解像度のままです。0 で解除します。Stage スクリプトの外では false です。 |
 | `STAGES:ListNamespace(namespace)  -> table` | 名前空間のステージを `{ name, isGlobal, info }` テーブルの配列 (1 始まり) で返します。フォルダー名、Global/Modules/Stages にあるステージなら true、宣言された info (指定がなければ空のテーブル) です。 |
 
 ```lua
 -- Modules/Stages/color_tool/Script.lua, at the top
 STAGES:SetNamespace("MyTools", { title = { en = "Colour picker", fr = "Pipette" } })
+STAGES:SetResolution(1920, 1080)
 
 -- another stage lists them
 function activate()

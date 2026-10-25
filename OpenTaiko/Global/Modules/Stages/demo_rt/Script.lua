@@ -17,6 +17,9 @@
 -- Config / state
 -- ════════════════════════════════════════════════════════════════════════════════
 
+-- drawn in 1920x1080: a skin of another resolution rescales it
+STAGES:SetResolution(1920, 1080)
+
 local SCREEN_W, SCREEN_H = 1920, 1080
 local RW, RH      = 1920, 1080        -- internal path-trace resolution (full screen: the CPU path tracer is slow at this size)
 local FOV         = 65.0

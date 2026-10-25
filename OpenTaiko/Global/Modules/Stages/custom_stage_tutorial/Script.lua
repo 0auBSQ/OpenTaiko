@@ -6,6 +6,9 @@
 -- Keys: Up/Down a topic, Left/Right a page, Decide the next page, Cancel back. The mouse clicks topics
 -- and the Previous, Next and Back buttons.
 
+-- drawn in 1920x1080: a skin of another resolution rescales it
+STAGES:SetResolution(1920, 1080)
+
 local I18N     = require("Locale.i18n")
 local NavInput = require("Input.NavInput")
 local CS       = require("Stages.CustomStages")

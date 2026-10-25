@@ -16,7 +16,10 @@ CS.declare{
     title       = CS.allLanguages("menu", "title"),       -- lang/<code>/menu.json, every language
     description = { en = "A calm walk down a street of paper lanterns." },
 }
+STAGES:SetResolution(1920, 1080)
 ```
+
+旁边的 `STAGES:SetResolution(1920, 1080)` 告诉引擎舞台绘制所用的分辨率，这样不同分辨率的皮肤会缩放它，而不会把它裁掉。
 
 `CS.declare(info)` 即 `STAGES:SetNamespace("CStage", info)`。菜单读取 info 的两个字段：
 

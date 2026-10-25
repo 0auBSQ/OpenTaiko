@@ -3,6 +3,9 @@
 -- them; only the current one is active, with its own activate/update/draw/deactivate. Each lives in
 -- its own folder (<name>/demo.lua and its assets). Leaving any of them goes back to My Room.
 
+-- drawn in 1920x1080: a skin of another resolution rescales it
+STAGES:SetResolution(1920, 1080)
+
 local I18N = require("Locale.i18n")
 local T = I18N.texts("demo_overall")   -- lang/<code>/demo_overall.json
 

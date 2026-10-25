@@ -5,6 +5,9 @@
 -- projects, Decide plays one, closing the player comes back to the list and Esc on the list brings My
 -- Room back.
 
+-- drawn in 1920x1080: a skin of another resolution rescales it
+STAGES:SetResolution(1920, 1080)
+
 local PopUI = require("UI.Pick")()
 
 local PROJECTS = {

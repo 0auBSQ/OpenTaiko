@@ -3,6 +3,9 @@
 -- sprites (soft circles, ice crystals, glows) instead of flat squares. Free-fly camera
 -- (WASD + mouse, Space/LShift up/down), number keys 1-7 switch scenes.
 
+-- drawn in 1920x1080: a skin of another resolution rescales it
+STAGES:SetResolution(1920, 1080)
+
 local floor, sin, cos, sqrt, pi, random = math.floor, math.sin, math.cos, math.sqrt, math.pi, math.random
 local max = math.max
 local exp = math.exp

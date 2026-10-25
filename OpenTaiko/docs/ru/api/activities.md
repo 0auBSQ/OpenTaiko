@@ -90,11 +90,13 @@ end
 | Метод | Описание |
 | --- | --- |
 | `STAGES:SetNamespace(namespace, info?)  -> boolean` | Объявляет пространство имён вызывающей сцены с необязательной таблицей info, которая возвращается сценам, получающим список; false вне скрипта сцены. |
+| `STAGES:SetResolution(width, height)  -> boolean` | Объявляет разрешение, в котором рисует вызывающий stage. Если разрешение скина другое, всё, что рисует stage, масштабируется к разрешению скина по центру с сохранением пропорций, как целый скин этого разрешения; координаты мыши, `INPUT:GetSurfaceWidth/Height` и обрезка следуют за ним, а открытая им ROActivity скина сохраняет разрешение скина. 0 сбрасывает его; false вне скрипта Stage. |
 | `STAGES:ListNamespace(namespace)  -> table` | Сцены пространства имён в виде массива таблиц `{ name, isGlobal, info }` с индексами от 1: имя папки, true для сцены в Global/Modules/Stages и объявленный info (пустая таблица, если он не задан). |
 
 ```lua
 -- Modules/Stages/color_tool/Script.lua, at the top
 STAGES:SetNamespace("MyTools", { title = { en = "Colour picker", fr = "Pipette" } })
+STAGES:SetResolution(1920, 1080)
 
 -- another stage lists them
 function activate()

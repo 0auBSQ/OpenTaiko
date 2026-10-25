@@ -962,6 +962,69 @@ public abstract partial class Game : IDisposable {
 		ImGuiController?.Update((float)deltaTime);
 	}
 
+	// ── Logical resolution of a module ────────────────────────────────────────────────────────────
+	// A module made for another resolution than the skin's (a global stage) draws in its own: while pushed,
+	// GameWindowSize is that size and the viewport its largest centred fit inside the current one, so what it
+	// draws, its clips and the mouse are rescaled the way a whole skin of that resolution is. Push and Pop pair
+	// up; PushBaseResolution gives a module drawn inside one (a skin ROActivity) the frame's own space back.
+	private struct LogicalFrame {
+		public int W, H, VpX, VpY, VpW, VpH;
+		public Vector2D<int> PortOffset, PortSize;
+	}
+	private static readonly Stack<LogicalFrame> _logicalFrames = new();
+	private static LogicalFrame _baseFrame;
+
+	public static bool InLogicalResolution => _logicalFrames.Count > 0;
+
+	private static LogicalFrame CaptureFrame() {
+		Span<int> vp = stackalloc int[4];
+		Gl?.GetInteger(GLEnum.Viewport, vp);
+		return new LogicalFrame {
+			W = GameWindowSize.Width, H = GameWindowSize.Height, VpX = vp[0], VpY = vp[1], VpW = vp[2], VpH = vp[3],
+			PortOffset = ViewPortOffset, PortSize = ViewPortSize,
+		};
+	}
+
+	private static void ApplyFrame(in LogicalFrame f) {
+		GameWindowSize.Width = f.W;
+		GameWindowSize.Height = f.H;
+		ViewPortOffset = f.PortOffset;
+		ViewPortSize = f.PortSize;
+		Gl?.Viewport(f.VpX, f.VpY, (uint)Math.Max(0, f.VpW), (uint)Math.Max(0, f.VpH));
+	}
+
+	// w x h fitted inside f, centred (bars on the sides or on top and bottom when the shapes differ)
+	private static LogicalFrame FitFrame(in LogicalFrame f, int w, int h) {
+		double s = Math.Min((double)f.W / w, (double)f.H / h);
+		double fw = w * s / f.W, fh = h * s / f.H, fx = (1 - fw) / 2, fy = (1 - fh) / 2;
+		static int R(double v) => (int)Math.Round(v);
+		return new LogicalFrame {
+			W = w, H = h,
+			VpX = f.VpX + R(fx * f.VpW), VpY = f.VpY + R(fy * f.VpH), VpW = R(fw * f.VpW), VpH = R(fh * f.VpH),
+			PortOffset = new Vector2D<int>(f.PortOffset.X + R(fx * f.PortSize.X), f.PortOffset.Y + R(fy * f.PortSize.Y)),
+			PortSize = new Vector2D<int>(R(fw * f.PortSize.X), R(fh * f.PortSize.Y)),
+		};
+	}
+
+	public static void PushLogicalResolution(int w, int h) {
+		var cur = CaptureFrame();
+		if (_logicalFrames.Count == 0) _baseFrame = cur;
+		_logicalFrames.Push(cur);
+		if (w <= 0 || h <= 0 || cur.W <= 0 || cur.H <= 0 || (w == cur.W && h == cur.H)) return;
+		ApplyFrame(FitFrame(cur, w, h));
+	}
+
+	public static void PushBaseResolution() {
+		var cur = CaptureFrame();
+		if (_logicalFrames.Count == 0) _baseFrame = cur;
+		_logicalFrames.Push(cur);
+		ApplyFrame(_baseFrame);
+	}
+
+	public static void PopLogicalResolution() {
+		if (_logicalFrames.Count > 0) ApplyFrame(_logicalFrames.Pop());
+	}
+
 	// ── Render-scale (global resolution downscale) ────────────────────────────────────────────────
 	// When RenderScale < 1, the whole frame (all 2D + composited 3D) is rendered into an offscreen FBO sized
 	// (GameWindowSize × RenderScale) and then upscale-blitted to the window's letterboxed region on present. Content

@@ -90,11 +90,13 @@ In elke module geregistreerd als de globale STAGES, maar alleen een Stage-script
 | Methode | Beschrijving |
 | --- | --- |
 | `STAGES:SetNamespace(namespace, info?)  -> boolean` | Declareert de naamruimte van de aanroepende stage, met een optionele info-tabel die teruggaat naar de stages die hem opsommen; false buiten een Stage-script. |
+| `STAGES:SetResolution(width, height)  -> boolean` | Legt de resolutie vast waarin de aanroepende stage tekent. Wijkt die van de skin af, dan wordt alles wat de stage tekent naar die van de skin geschaald, gecentreerd en met dezelfde verhoudingen, zoals een hele skin van die resolutie; muiscoördinaten, `INPUT:GetSurfaceWidth/Height` en clips volgen, en een ROActivity van de skin die hij opent houdt de resolutie van de skin. 0 wist hem; false buiten een Stage-script. |
 | `STAGES:ListNamespace(namespace)  -> table` | De stages van de naamruimte als een array van `{ name, isGlobal, info }`-tabellen, vanaf 1 geïndexeerd: de mapnaam, true voor een stage in Global/Modules/Stages, en de gedeclareerde info (een lege tabel als er geen gegeven is). |
 
 ```lua
 -- Modules/Stages/color_tool/Script.lua, at the top
 STAGES:SetNamespace("MyTools", { title = { en = "Colour picker", fr = "Pipette" } })
+STAGES:SetResolution(1920, 1080)
 
 -- another stage lists them
 function activate()

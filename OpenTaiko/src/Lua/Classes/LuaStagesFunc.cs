@@ -26,6 +26,17 @@ namespace OpenTaiko {
 			return true;
 		}
 
+		// The resolution the calling stage is made for: when the skin's differs, everything the stage draws is
+		// rescaled to it (centred, keeping its shape), its mouse coordinates and clips included. 0 or less clears
+		// it (the skin's resolution). Only a stage has one: in another module it does nothing and returns false.
+		public bool SetResolution(double width, double height) {
+			if (_stage == null) return false;
+			bool set = width > 0 && height > 0;
+			_stage.ResolutionWidth = set ? (int)Math.Round(width) : 0;
+			_stage.ResolutionHeight = set ? (int)Math.Round(height) : 0;
+			return true;
+		}
+
 		// The stages of a namespace, one per name: the stage Exit("stage", name) from this module would open,
 		// listed when that stage declared the namespace. An array of { name, isGlobal, info }, ordered by name.
 		public LuaTable ListNamespace(string ns) {

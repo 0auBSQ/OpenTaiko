@@ -101,6 +101,19 @@
 		public string Namespace => lcStageScript?.StageNamespace ?? "";
 		internal Dictionary<object, object>? NamespaceInfo => lcStageScript?.StageNamespaceInfo;
 
+		// everything the stage runs is pushed in the resolution it declared (STAGES:SetResolution); false when it
+		// declared none
+		private bool PushResolution() {
+			int w = lcStageScript?.ResolutionWidth ?? 0, h = lcStageScript?.ResolutionHeight ?? 0;
+			if (w <= 0 || h <= 0) return false;
+			FDK.Game.PushLogicalResolution(w, h);
+			return true;
+		}
+
+		private static void PopResolution(bool pushed) {
+			if (pushed) FDK.Game.PopLogicalResolution();
+		}
+
 		public void DisposeStage() {
 			lcStageScript?.Dispose();
 		}
@@ -193,13 +206,16 @@
 			base.ePhaseID = CStage.EPhase.Common_NORMAL;
 			this.eFadeOutReturnValue = EReturnValue.Continuation;
 			_exitImmediate = false;
-			lcStageScript?.BeginActivate();
+			bool pushed = PushResolution();
+			try { lcStageScript?.BeginActivate(); } finally { PopResolution(pushed); }
 			_activating = true;
 		}
 		internal bool StepActivate(out float progress) {
 			progress = 1f;
 			if (!_activating || lcStageScript == null) { _activating = false; return false; }
-			bool more = lcStageScript.StepActivate(out progress);
+			bool more;
+			bool pushed = PushResolution();
+			try { more = lcStageScript.StepActivate(out progress); } finally { PopResolution(pushed); }
 			if (!more) _activating = false;
 			return more;
 		}
@@ -209,14 +225,18 @@
 		private bool _activating = false;
 
 		public override void DeActivate() {
-			lcStageScript?.Deactivate();
+			bool pushed = PushResolution();
+			try { lcStageScript?.Deactivate(); } finally { PopResolution(pushed); }
 
 			base.DeActivate();
 		}
 
 		public override int Draw() {
-			if (this.eFadeOutReturnValue == EReturnValue.Continuation) lcStageScript?.Update(FDK.Game.TimeMs);
-			lcStageScript?.Draw();
+			bool pushed = PushResolution();
+			try {
+				if (this.eFadeOutReturnValue == EReturnValue.Continuation) lcStageScript?.Update(FDK.Game.TimeMs);
+				lcStageScript?.Draw();
+			} finally { PopResolution(pushed); }
 
 			// A transition was requested: hand off this frame (CStageTransition then drives the fade/loading).
 			if (_exitImmediate) {
@@ -243,12 +263,14 @@
 		// Incremental onStart (run just after the skin loads + on every reload): the engine calls BeginOnStart()
 		// then StepOnStart() each frame until it returns false, so a heavy onStart spreads across frames.
 		internal void BeginOnStart() {
-			lcStageScript?.BeginOnStart();
+			bool pushed = PushResolution();
+			try { lcStageScript?.BeginOnStart(); } finally { PopResolution(pushed); }
 		}
 
 		internal bool StepOnStart(out float progress) {
 			if (lcStageScript == null) { progress = 0f; return false; }
-			return lcStageScript.StepOnStart(out progress);
+			bool pushed = PushResolution();
+			try { return lcStageScript.StepOnStart(out progress); } finally { PopResolution(pushed); }
 		}
 
 

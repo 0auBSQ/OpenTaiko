@@ -90,11 +90,13 @@ end
 | 메서드 | 설명 |
 | --- | --- |
 | `STAGES:SetNamespace(namespace, info?)  -> boolean` | 호출한 스테이지의 네임스페이스를 선언하며, 선택적인 info 테이블은 목록을 얻는 스테이지에 돌려줍니다. 스테이지 스크립트 밖에서는 false입니다. |
+| `STAGES:SetResolution(width, height)  -> boolean` | 호출한 스테이지가 그리는 해상도를 선언합니다. 스킨의 해상도가 다르면 스테이지가 그리는 모든 것이 그 해상도의 스킨 전체처럼 비율을 유지한 채 가운데에 맞춰 스킨의 해상도로 크기가 조정됩니다. 마우스 좌표, `INPUT:GetSurfaceWidth/Height`, 클립도 따르며, 스테이지가 여는 스킨의 ROActivity는 스킨의 해상도를 유지합니다. 0이면 해제하며, Stage 스크립트 밖에서는 false입니다. |
 | `STAGES:ListNamespace(namespace)  -> table` | 네임스페이스의 스테이지를 1부터 시작하는 `{ name, isGlobal, info }` 테이블 배열로 반환합니다. 폴더 이름, Global/Modules/Stages의 스테이지이면 true, 그리고 선언된 info(주어지지 않았으면 빈 테이블)입니다. |
 
 ```lua
 -- Modules/Stages/color_tool/Script.lua, at the top
 STAGES:SetNamespace("MyTools", { title = { en = "Colour picker", fr = "Pipette" } })
+STAGES:SetResolution(1920, 1080)
 
 -- another stage lists them
 function activate()

@@ -90,11 +90,13 @@ Registered as the STAGES global in every module, but only a Stage script has a n
 | Method | Description |
 | --- | --- |
 | `STAGES:SetNamespace(namespace, info?)  -> boolean` | Declares the calling stage's namespace, with an optional info table given back to the stages that list it; false outside a Stage script. |
+| `STAGES:SetResolution(width, height)  -> boolean` | Declares the resolution the calling stage is drawn in. When the skin's differs, everything the stage draws is rescaled to the skin's, centred and keeping its shape, like a whole skin of that resolution; mouse coordinates, `INPUT:GetSurfaceWidth/Height` and clips follow, and a skin ROActivity it opens keeps the skin's resolution. 0 clears it; false outside a Stage script. |
 | `STAGES:ListNamespace(namespace)  -> table` | The stages of the namespace as an array of `{ name, isGlobal, info }` tables, indexed from 1: the folder name, true for a stage in Global/Modules/Stages, and the declared info (an empty table when none was given). |
 
 ```lua
 -- Modules/Stages/color_tool/Script.lua, at the top
 STAGES:SetNamespace("MyTools", { title = { en = "Colour picker", fr = "Pipette" } })
+STAGES:SetResolution(1920, 1080)
 
 -- another stage lists them
 function activate()

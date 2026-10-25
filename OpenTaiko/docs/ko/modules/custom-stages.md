@@ -16,7 +16,10 @@ CS.declare{
     title       = CS.allLanguages("menu", "title"),       -- lang/<code>/menu.json, every language
     description = { en = "A calm walk down a street of paper lanterns." },
 }
+STAGES:SetResolution(1920, 1080)
 ```
+
+그 옆의 `STAGES:SetResolution(1920, 1080)`은 스테이지가 그리는 해상도를 엔진에 알려, 해상도가 다른 스킨에서 잘리지 않고 크기가 조정되게 합니다.
 
 `CS.declare(info)`는 `STAGES:SetNamespace("CStage", info)`입니다. 메뉴는 info의 두 필드를 읽습니다.
 

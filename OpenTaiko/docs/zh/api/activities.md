@@ -90,11 +90,13 @@ end
 | 方法 | 说明 |
 | --- | --- |
 | `STAGES:SetNamespace(namespace, info?)  -> boolean` | 声明调用舞台的命名空间，可选的 info 表会返回给列出它的舞台；在舞台脚本之外返回 false。 |
+| `STAGES:SetResolution(width, height)  -> boolean` | 声明调用舞台绘制所用的分辨率。若皮肤的分辨率不同，舞台绘制的一切都会像该分辨率的整个皮肤一样，保持比例居中缩放到皮肤的分辨率；鼠标坐标、`INPUT:GetSurfaceWidth/Height` 和裁剪随之变化，舞台打开的皮肤 ROActivity 保持皮肤的分辨率。0 表示清除；在舞台脚本之外返回 false。 |
 | `STAGES:ListNamespace(namespace)  -> table` | 以从 1 开始索引的 `{ name, isGlobal, info }` 表数组返回该命名空间的舞台：文件夹名、位于 Global/Modules/Stages 的舞台为 true，以及声明的 info（未提供时为空表）。 |
 
 ```lua
 -- Modules/Stages/color_tool/Script.lua, at the top
 STAGES:SetNamespace("MyTools", { title = { en = "Colour picker", fr = "Pipette" } })
+STAGES:SetResolution(1920, 1080)
 
 -- another stage lists them
 function activate()

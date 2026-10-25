@@ -10,6 +10,10 @@ namespace OpenTaiko {
 		internal string StageNamespace = "";
 		internal Dictionary<object, object>? StageNamespaceInfo = null;
 
+		// set by STAGES:SetResolution: the resolution the stage is made for, 0 x 0 for the skin's
+		internal int ResolutionWidth = 0;
+		internal int ResolutionHeight = 0;
+
 		// Activation / Deactivation (when met/unmet)
 		private NamedLuaFunction lfActivate = new("activate");
 		private NamedLuaFunction lfDeactivate = new("deactivate");

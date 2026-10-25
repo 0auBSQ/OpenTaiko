@@ -81,10 +81,22 @@ namespace OpenTaiko {
 
 		public bool IsActive => lcActScript?.IsActive() ?? false;
 
-		public object[]? Activate(params object[] args) => lcActScript?.Activate(args);
-		public object[]? Deactivate(params object[] args) => lcActScript?.Deactivate(args);
-		public object[]? Draw(params object[] args) => lcActScript?.Draw(args);
-		public object[]? Update(params object[] args) => lcActScript?.Update(FDK.Game.TimeMs, args);
+		public object[]? Activate(params object[] args) { bool s = EnterSkinResolution(); try { return lcActScript?.Activate(args); } finally { ExitSkinResolution(s); } }
+		public object[]? Deactivate(params object[] args) { bool s = EnterSkinResolution(); try { return lcActScript?.Deactivate(args); } finally { ExitSkinResolution(s); } }
+		public object[]? Draw(params object[] args) { bool s = EnterSkinResolution(); try { return lcActScript?.Draw(args); } finally { ExitSkinResolution(s); } }
+		public object[]? Update(params object[] args) { bool s = EnterSkinResolution(); try { return lcActScript?.Update(FDK.Game.TimeMs, args); } finally { ExitSkinResolution(s); } }
+
+		// called from a stage drawn in a resolution of its own (STAGES:SetResolution), a skin module runs in the
+		// skin's, the one it is made for; a global module stays in its caller's
+		private bool EnterSkinResolution() {
+			if (IsGlobal || !FDK.Game.InLogicalResolution) return false;
+			FDK.Game.PushBaseResolution();
+			return true;
+		}
+
+		private static void ExitSkinResolution(bool pushed) {
+			if (pushed) FDK.Game.PopLogicalResolution();
+		}
 
 		#endregion
 

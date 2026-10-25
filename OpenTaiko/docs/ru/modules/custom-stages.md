@@ -16,7 +16,10 @@ CS.declare{
     title       = CS.allLanguages("menu", "title"),       -- lang/<code>/menu.json, every language
     description = { en = "A calm walk down a street of paper lanterns." },
 }
+STAGES:SetResolution(1920, 1080)
 ```
+
+`STAGES:SetResolution(1920, 1080)` рядом сообщает движку разрешение, в котором рисует stage, чтобы скин другого разрешения масштабировал его, а не обрезал.
 
 `CS.declare(info)` — это `STAGES:SetNamespace("CStage", info)`. Меню читают два поля info:
 

@@ -6,6 +6,9 @@
 -- the modal so the chest and colours always follow the button; nothing is written to the save
 -- file. Esc returns to My Room.
 
+-- drawn in 1920x1080: a skin of another resolution rescales it
+STAGES:SetResolution(1920, 1080)
+
 local PopUI = require("UI.Pick")()
 
 local RARITY_NAMES = { "Poor", "Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythical" }

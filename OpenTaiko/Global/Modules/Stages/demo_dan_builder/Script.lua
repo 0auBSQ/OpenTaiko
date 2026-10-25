@@ -13,6 +13,9 @@
 
 -- ── Constants ────────────────────────────────────────────────────────────────
 
+-- drawn in 1920x1080: a skin of another resolution rescales it
+STAGES:SetResolution(1920, 1080)
+
 local MIN_SONGS = 1
 local MAX_SONGS = 9
 

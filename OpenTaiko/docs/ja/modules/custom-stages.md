@@ -16,7 +16,10 @@ CS.declare{
     title       = CS.allLanguages("menu", "title"),       -- lang/<code>/menu.json, every language
     description = { en = "A calm walk down a street of paper lanterns." },
 }
+STAGES:SetResolution(1920, 1080)
 ```
+
+その隣の `STAGES:SetResolution(1920, 1080)` で、ステージが描画する解像度をエンジンに伝えます。解像度の違うスキンでは、切れずに拡大縮小されます。
 
 `CS.declare(info)` は `STAGES:SetNamespace("CStage", info)` と同じです。メニューは info の2つのフィールドを読みます。
 

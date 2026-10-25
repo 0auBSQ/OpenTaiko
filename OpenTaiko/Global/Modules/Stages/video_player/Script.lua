@@ -6,6 +6,9 @@
 -- dropdown and a volume slider. Esc closes the player, which brings My Room back. With no cutscene in the
 -- library, My Room comes back at once.
 
+-- drawn in 1920x1080: a skin of another resolution rescales it
+STAGES:SetResolution(1920, 1080)
+
 local NavInput = require("Input.NavInput")
 
 local player
