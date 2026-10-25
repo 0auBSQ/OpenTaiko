@@ -92,11 +92,28 @@ function M.reload()
     end
 end
 
+-- A shortcut on a modifier key fires when the key is let go after a short tap, so a desktop combination
+-- (Ctrl+Q closing the game, Alt+Tab...) never triggers it: the game closes or the key is held longer first.
+local MODIFIERS = {
+    LeftControl = true, RightControl = true, LeftShift = true, RightShift = true,
+    LeftAlt = true, RightAlt = true, LeftWindowsKey = true, RightWindowsKey = true,
+}
+local TAP_MS = 500
+local tapStart = {}   -- id -> the time its modifier went down
+
 function M.pressed(id)
     if disabled(id) then return false end
     local k = M.keys[id]
     if k == nil or k == "" then return false end
-    return INPUT:KeyboardPressed(k)
+    if not MODIFIERS[k] then return INPUT:KeyboardPressed(k) end
+    local now = (G and G.nowMs) or 0
+    if INPUT:KeyboardPressed(k) then tapStart[id] = now end
+    if INPUT:KeyboardReleased(k) then
+        local start = tapStart[id]
+        tapStart[id] = nil
+        return start ~= nil and now - start <= TAP_MS
+    end
+    return false
 end
 
 -- "[Space]" for a bound shortcut, the unbound text otherwise
