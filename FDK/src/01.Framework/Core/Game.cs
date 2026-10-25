@@ -65,7 +65,8 @@ public abstract partial class Game : IDisposable {
 	public static void InitImGuiController(IView window, IInputContext context) {
 		if (ImGuiController != null) return;
 
-		ImGuiController = new ImGuiController(Gl, window, context);
+		// the controller reads key states on the game thread: it gets a keyboard of its own (see ImGuiInputContext)
+		ImGuiController = new ImGuiController(Gl, window, new ImGuiInputContext(context));
 		BridgeImGuiChars(context);
 		ImGuiIO = ImGui.GetIO();
 		ImGui.StyleColorsDark();
