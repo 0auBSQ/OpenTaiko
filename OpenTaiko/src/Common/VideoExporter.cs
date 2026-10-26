@@ -229,13 +229,15 @@ internal static class VideoExporter {
 	// ── sound capture ────────────────────────────────────────────────────────────────────────────
 
 	private static readonly Dictionary<CSound, int> _sndToEventIdx = [];
+	private static readonly double _volZero = CSound.LufsToLinear(CSound.MinimumLufs);
 
 	private static void OnSoundPlay(CSound snd, double msFrameworkTime) {
+		const float volErr = 1e-9f;
 		if (_phase != Phase.Capturing && _phase != Phase.Loading) return;
 		string? f = snd.FileName;
 		if (string.IsNullOrEmpty(f) || !File.Exists(f)) return;
 		var (vol, pan) = snd.tGetChannelLevels();
-		if (vol <= 0.0001f) return;
+		if (vol <= _volZero + volErr) return;
 		snd.tGetPlayPosition(out var bytesSeek, out var msSeek);
 		lock (_eventsLock) {
 			_sndToEventIdx[snd] = _events.Count;
