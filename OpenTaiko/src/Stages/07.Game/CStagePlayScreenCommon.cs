@@ -2038,7 +2038,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 
 			//CDTXMania.act文字コンソール.tPrint(620, 80, C文字コンソール.Eフォント種別.白, "BPM: " + dbUnit.ToString());
 
-			if (this.actCombo.nCurrentCombo[nPlayer] is 50 or 300) {
+			if (CNotesSkins.IsEntryCombo(this.actCombo.nCurrentCombo[nPlayer])) {
 				ctChipAnimeLag[nPlayer] = new CCounter(0, 664, 1, OpenTaiko.Timer);
 			}
 

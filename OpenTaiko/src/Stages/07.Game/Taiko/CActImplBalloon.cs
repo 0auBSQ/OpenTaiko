@@ -24,7 +24,7 @@ internal class CActImplBalloon : CActivity {
 
 		_state.RefreshConst();
 		if (tChartHasKusudama()) {
-			KusudamaScript = new LuaBackgroundWrapper(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.BALLOON}{TextureLoader.KUSUDAMA}"));
+			KusudamaScript = new LuaBackgroundWrapper(CSkin.Path(TextureLoader.BASE + TextureLoader.KusudamaFolder()));
 			KusudamaScript.Activate(_state);
 		}
 
@@ -155,8 +155,12 @@ internal class CActImplBalloon : CActivity {
 			for (int j = 0; j < 5; j++) {
 
 				if (nRemainingHitCount[j] < nConsecutiveHitCount && NotesManager.GetNoteType(chip) is NotesManager.ENoteType.Balloon) {
-					if (OpenTaiko.Tx.Balloon_Breaking[j] != null)
-						OpenTaiko.Tx.Balloon_Breaking[j].t2DDraw(x + (this.ctBalloonBubbleAnime.CurrentValue == 1 ? 3 : 0), y);
+					int bx = x + (this.ctBalloonBubbleAnime.CurrentValue == 1 ? 3 : 0);
+					if (OpenTaiko.Tx.Balloon_Breaking_Sheet is CTexture sheet) {
+						int h = sheet.szTextureSize.Height / 6;
+						sheet.t2DDraw(bx, y, new Rectangle(0, j * h, sheet.szTextureSize.Width, h));
+					} else if (OpenTaiko.Tx.Balloon_Breaking[j] != null)
+						OpenTaiko.Tx.Balloon_Breaking[j].t2DDraw(bx, y);
 					break;
 				}
 			}

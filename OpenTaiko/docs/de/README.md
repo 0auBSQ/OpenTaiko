@@ -13,7 +13,7 @@ OpenTaiko zeichnet fast jeden Bildschirm außerhalb des eigentlichen Spielgesche
 - Falls Sie noch kein Modul geschrieben haben, lesen Sie [So funktionieren Module](getting-started.md): die Ordnerstruktur eines Skins, die Modularten und die Lebenszyklus-Callbacks, die ein Skript erhält.
 - Um eine Funktion nachzuschlagen, öffnen Sie die [API-Referenz](api/) und wählen Sie in der Seitenleiste eine Kategorie.
 - Um auf dem aufzubauen, was das Spiel mitliefert (eine UI-Bibliothek, ein Dialogfenster, die Regeln von Pagode, Tresor und Laden, Mein Zimmer), lesen Sie [Bereitgestellte Module](modules/).
-- Für ein konkretes Ziel führen die Anleitungen Schritt für Schritt durch [Charaktere](guides/characters.md), [Puchicharas](guides/puchicharas.md), [Namensschilder](guides/nameplates.md), [Skins und Themes](guides/skins.md) sowie [Chart-Freischaltungen](guides/unlockables.md).
+- Für ein konkretes Ziel führen die Anleitungen Schritt für Schritt durch [Charaktere](guides/characters.md), [Puchicharas](guides/puchicharas.md), [Namensschilder](guides/nameplates.md), [Skins und Themes](guides/skins.md), [Noten- und Bewertungspakete](guides/notes-skins.md) sowie [Chart-Freischaltungen](guides/unlockables.md).
 
 ## Was Sie bauen können
 

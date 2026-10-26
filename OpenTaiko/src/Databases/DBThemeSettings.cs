@@ -139,6 +139,25 @@ internal class DBThemeSettings : IDisposable {
 		cmd.ExecuteNonQuery();
 	}
 
+	/// <summary>A stored global value that no definition declares (the engine's own theme settings), or null.</summary>
+	public string? GetRaw(string settingId) {
+		if (_conn == null) return null;
+		var cmd = _conn.CreateCommand();
+		cmd.CommandText = "SELECT Value FROM global_settings WHERE SettingId = $id;";
+		cmd.Parameters.AddWithValue("$id", settingId);
+		return cmd.ExecuteScalar() as string;
+	}
+
+	public void SetRaw(string settingId, string value) {
+		if (_conn == null) return;
+		var cmd = _conn.CreateCommand();
+		cmd.CommandText = @"INSERT INTO global_settings(SettingId, Value) VALUES($id, $val)
+			ON CONFLICT(SettingId) DO UPDATE SET Value = EXCLUDED.Value;";
+		cmd.Parameters.AddWithValue("$id", settingId);
+		cmd.Parameters.AddWithValue("$val", value);
+		cmd.ExecuteNonQuery();
+	}
+
 	// ── Private helpers ───────────────────────────────────────────────────
 
 	// the file is either a plain array of definitions, or { "sections": { id: localized header }, "settings": [...] }

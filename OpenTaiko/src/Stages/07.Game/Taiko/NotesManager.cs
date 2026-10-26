@@ -249,6 +249,12 @@ class NotesManager {
 	public static bool IsBigKaTaiko(ENoteType nt, EGameType gt) => IsBigNoteTaiko(nt, gt, PlayerLane.FlashType.Blue);
 	public static bool IsBigDonTaiko(ENoteType nt, EGameType gt) => IsBigNoteTaiko(nt, gt, PlayerLane.FlashType.Red);
 	public static bool IsJointedNote(ENoteType nt) => nt is ENoteType.DonHand or ENoteType.KaHand;
+	// the notes drawn at the small size: in Taiko the small Don and Ka, small roll, balloon, fuse roll, bomb and
+	// ADLib; every Konga note
+	public static bool IsSmallLookingNote(ENoteType nt, EGameType gt)
+		=> gt is EGameType.Konga
+			|| nt is ENoteType.Don or ENoteType.Ka or ENoteType.Balloon or ENoteType.BalloonFuze or ENoteType.Bomb or ENoteType.Adlib
+			|| IsSmallRollTaiko(nt, gt);
 	public static bool IsClapKonga(ENoteType nt, EGameType gt)
 		=> (nt, gt) is (ENoteType.Clap or ENoteType.ClapHand, EGameType.Konga);
 	public static bool IsSwapNote(ENoteType nt, EGameType gt)
@@ -303,18 +309,54 @@ class NotesManager {
 		_ => nt,
 	};
 
+	// a flying note (or the note shown where it lands), drawn centred with the pack's flying-notes row
 	public static void DisplayNote(int player, int x, int y, ENoteType Lane, EGameType gt) {
-		switch (Lane) {
-			case ENoteType.Don:
-			case ENoteType.Ka:
-			case ENoteType.DonBig:
-			case ENoteType.KaBig:
-				OpenTaiko.Tx.Notes[(int)gt]?.t2DCenterBasedDraw(x, y, new Rectangle(NoteTextureColumnFast(Lane) * OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1] * 3, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
-				break;
-			case ENoteType.Kadon:
-				OpenTaiko.Tx.Note_Swap?.t2DCenterBasedDraw(x, y, new Rectangle(0, OpenTaiko.Skin.Game_Notes_Size[1] * 3, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
-				break;
+		if (Lane is not (ENoteType.Don or ENoteType.Ka or ENoteType.DonBig or ENoteType.KaBig or ENoteType.Kadon)) return;
+		if (FlyingCell(Lane, gt) is not Cell cell) return;
+		int w = OpenTaiko.Skin.Game_Notes_Size[0], h = OpenTaiko.Skin.Game_Notes_Size[1];
+		int row = Math.Clamp(CNotesSkins.Def(gt).FlyingNotesFrame, 0, Math.Max(0, cell.Sheet.Frames - 1));
+		cell.Tex.t2DCenterBasedDraw(x, y, new Rectangle(cell.Col * w, row * h, w, h));
+	}
+
+	private static Cell? FlyingCell(ENoteType Lane, EGameType gt)
+		=> Lane is ENoteType.Kadon ? NoteCell(Lane, EGameType.Taiko) : KindCell(NoteTextureColumnFast(Lane) - 1, gt);
+
+	// The flash over a note that has landed: the pack's ChipEffect.png cell (the same columns as Notes.png), else the
+	// note itself drawn additively
+	public static void DisplayChipEffect(int x, int y, ENoteType Lane, EGameType gt, Color4 color, int opacity) {
+		if (Lane is not (ENoteType.Don or ENoteType.Ka or ENoteType.DonBig or ENoteType.KaBig or ENoteType.Kadon)) return;
+		int w = OpenTaiko.Skin.Game_Notes_Size[0], h = OpenTaiko.Skin.Game_Notes_Size[1];
+		var def = CNotesSkins.Def(gt);
+		CTexture? fx = OpenTaiko.Tx.ChipEffect[(int)gt];
+		int col;
+		if (def.Legacy) {
+			fx = OpenTaiko.Tx.ChipEffect[0];   // the former layout has one chip effect sheet, with the Taiko columns
+			col = IsPurpleNoteTaiko(Lane, gt) ? NoteTextureColumnFast(ENoteType.DonBig)
+				: (gt is EGameType.Konga || Lane > ENoteType.KaBig) ? NoteTextureColumnFast(ENoteType.Don)
+				: NoteTextureColumnFast(Lane);
+		} else {
+			col = Lane is ENoteType.Kadon ? 4 : NoteTextureColumnFast(Lane) - 1;
 		}
+		if (fx != null) {
+			fx.color4 = color;
+			fx.Opacity = opacity;
+			fx.t2DCenterBasedDraw(x, y, new Rectangle(col * w, 0, w, h));
+			fx.color4 = new Color4(1f, 1f, 1f, 1f);
+			fx.Opacity = 255;
+			return;
+		}
+		if (FlyingCell(Lane, gt) is not Cell cell) return;
+		var tex = cell.Tex;
+		int savedOpacity = tex.Opacity;
+		bool savedAdd = tex.bAddBlend;
+		var savedColor = tex.color4;
+		tex.bAddBlend = true;
+		tex.Opacity = opacity;
+		tex.color4 = color;
+		tex.t2DCenterBasedDraw(x, y, new Rectangle(cell.Col * w, 0, w, h));
+		tex.bAddBlend = savedAdd;
+		tex.Opacity = savedOpacity;
+		tex.color4 = savedColor;
 	}
 
 	// Draws with a texture faded to `opacity` (0..1) and restores its opacity afterwards: the Hidden mod's
@@ -329,12 +371,17 @@ class NotesManager {
 		tex.Opacity = saved;
 	}
 
-	// How a note is drawn beyond its texture, until skins ship textures of their own for these:
-	// - a partner small note (Don, Ka, KaDon, bomb, ADLib) is drawn big: the square root of 2 on each axis
-	// - a giant note is twice a big note's size, all kinds alike, wobbling slightly
-	// - a #NOTEIF note that has just appeared scales in from bigger with a white flash; a glowing one then pulses
-	private const float PartnerBigScale = 1.41421356f;
-	private const float GiantScale = 2f;          // of a big note
+	// The cells of the notes packs (CNotesSkins), all Game_Notes_Size big:
+	// - Notes.png: Don, Ka, big Don, big Ka, KaDon, ADLib (Bongo: red, yellow, pink, clap, ADLib), one row per frame
+	// - Rolls.png: head, body and tail of the small roll, then of the big roll (Bongo: red, pink, yellow, clap rolls)
+	// - Balloons.png (the Taiko set's, for every game type): balloon (2 cells), kusudama (2 cells), fuse roll (3 cells)
+	// - Notes_Partner.png: the columns of Notes.png, as many rows, note-sized cells
+	// - Notes_Giant.png: as many rows, cells whatever the sheet's size gives (see GiantColumns)
+	//   Without them a partner or giant note is the note scaled.
+	// The former layout (a skin without packs): Notes.png with the hit circle, the 4 notes, the rolls and the balloon,
+	// then Swap.png, Adlib.png, Kusu.png and FuseRoll.png.
+	// A giant note wobbles slightly; a #NOTEIF note that has just appeared scales in from bigger with a white flash,
+	// and a glowing one then pulses.
 	private const float GiantWobbleRad = 0.1f;    // about 6 degrees either way
 	private const double GiantWobbleMs = 1600;
 	private const double AppearMs = 300;
@@ -342,22 +389,59 @@ class NotesManager {
 	private const float GlowPulse = 0.3f;         // the pulse's brightest flash
 	private const double GlowPulseMs = 900;
 
-	private static bool IsSmallNote(ENoteType nt)
-		=> nt is ENoteType.Don or ENoteType.Ka or ENoteType.Kadon or ENoteType.Bomb or ENoteType.Adlib;
+	// a column (Span cells wide) of a sheet, whose rows follow Sheet's animation
+	private readonly record struct Cell(CTexture Tex, int Col, int Span, CSheetDef Sheet, bool MainSheet);
+
+	// a note's cell by kind: 0 Don, 1 Ka, 2 big Don, 3 big Ka, 4 KaDon, 5 ADLib (the Bongo pink and clap are 2 and 3)
+	private static Cell? KindCell(int kind, EGameType gt) {
+		var tx = OpenTaiko.Tx;
+		var def = CNotesSkins.Def(gt);
+		if (def.Legacy) {
+			if (kind == 4) return tx.Note_Swap is CTexture swap ? new Cell(swap, 0, 1, def.Notes, false) : null;
+			if (kind == 5) return tx.Note_Adlib is CTexture adlib ? new Cell(adlib, 0, 1, def.Notes, false) : null;
+			return tx.Notes[(int)gt] is CTexture old ? new Cell(old, kind + 1, 1, def.Notes, true) : null;
+		}
+		if (gt is EGameType.Konga) {
+			if (kind == 4) return null;
+			if (kind == 5) kind = 4;
+		}
+		return tx.Notes[(int)gt] is CTexture notes ? new Cell(notes, kind, 1, def.Notes, true) : null;
+	}
+
+	private static int NoteKind(ENoteType nt, EGameType gt)
+		=> IsPurpleNoteTaiko(nt, gt) ? 4 : IsADLIB(nt) ? 5 : NoteTextureColumn(nt, gt) - 1;
+
+	// the cell of a note drawn by DisplayNote (a hit note, a balloon or a kusudama), or null
+	private static Cell? NoteCell(ENoteType nt, EGameType gt) {
+		if (IsBalloon(nt) || IsKusudama(nt)) {
+			var tx = OpenTaiko.Tx;
+			var taiko = CNotesSkins.Def(EGameType.Taiko);
+			if (!taiko.Legacy)
+				return tx.Balloons is CTexture b ? new Cell(b, IsKusudama(nt) ? 2 : 0, 2, taiko.Balloons, false) : null;
+			var def = CNotesSkins.Def(gt);
+			if (IsKusudama(nt)) return tx.Note_Kusu is CTexture k ? new Cell(k, 0, 2, def.Notes, false) : null;
+			return tx.Notes[(int)gt] is CTexture n ? new Cell(n, 11, 2, def.Notes, false) : null;
+		}
+		return KindCell(NoteKind(nt, gt), gt);
+	}
+
+	// the column count of a pack's Notes.png
+	private static int NotesColumns(EGameType gt) => gt is EGameType.Konga ? 5 : 6;
+
+	// a Taiko pack's Notes_Giant.png has no small Don and Ka (a giant note looks big whatever its size):
+	// Don, Ka, KaDon, ADLib; a Bongo one has the columns of its Notes.png
+	private static int GiantColumns(EGameType gt) => gt is EGameType.Konga ? 5 : 4;
+	private static int GiantColumn(int notesCol, EGameType gt)
+		=> gt is EGameType.Konga ? notesCol : notesCol switch { 0 or 2 => 0, 1 or 3 => 1, 4 => 2, _ => 3 };
 
 	private readonly record struct NoteLook(float Scale, float Rotation, float Flash) {
 		public bool IsPlain => this.Scale == 1f && this.Rotation == 0f && this.Flash <= 0f;
 	}
 
-	private static NoteLook GetNoteLook(CChip chip, ENoteType nt) {
+	private static NoteLook GetNoteLook(CChip chip) {
 		float scale = 1f, rot = 0f, flash = 0f;
-		bool small = IsSmallNote(nt);
-		if (chip.IsGiantNote) {
-			scale = GiantScale * (small ? PartnerBigScale : 1f);
+		if (chip.IsGiantNote)
 			rot = GiantWobbleRad * (float)Math.Sin(2 * Math.PI * (Game.TimeMs % GiantWobbleMs) / GiantWobbleMs);
-		} else if (chip.IsPartnerNote && small) {
-			scale = PartnerBigScale;
-		}
 		if (chip.msNoteIfShown >= 0) {
 			double since = Game.TimeMs - chip.msNoteIfShown;
 			if (since < AppearMs) {
@@ -403,44 +487,63 @@ class NotesManager {
 	}
 
 	// Regular display
-	public static void DisplayNote(int player, int x, int y, CChip chip, int frame, int length = -1, EStealthMode hiddenMode = EStealthMode.Off, float opacity = 1f) {
+	public static void DisplayNote(int player, int x, int y, CChip chip, CNoteAnim anim, EStealthMode hiddenMode = EStealthMode.Off, float opacity = 1f) {
 		if (hiddenMode.HidesNotes())
 			return;
 
-		if (length == -1) {
-			length = OpenTaiko.Skin.Game_Notes_Size[0];
-		}
-
 		ENoteType nt = GetNoteType(chip);
 		EGameType _gt = GetChipGameType(chip, player);
-		NoteLook look = GetNoteLook(chip, nt);
+		if (IsADLIB(nt)) {
+			if (!PuchiChara.tGetEffect(player).ShowAdlib) return;
+			opacity *= 50f / 255f;
+		}
+		var def = CNotesSkins.Def(_gt);
+		NoteLook look = GetNoteLook(chip);
+		int wNote = OpenTaiko.Skin.Game_Notes_Size[0], hNote = OpenTaiko.Skin.Game_Notes_Size[1];
+		bool giant = chip.IsGiantNote;
+		bool partner = !giant && chip.IsPartnerNote && IsSmallLookingNote(nt, _gt);
 
 		if (IsMine(nt)) {
-			DrawFaded(OpenTaiko.Tx.Note_Mine, opacity, t => DrawWithLook(t, x, y, null, look));
-			return;
-		} else if (IsPurpleNoteTaiko(nt, _gt)) {
-			DrawFaded(OpenTaiko.Tx.Note_Swap, opacity,
-				t => DrawWithLook(t, x, y, new RectangleF(0, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]), look));
-			return;
-		} else if (IsKusudama(nt)) {
-			DrawFaded(OpenTaiko.Tx.Note_Kusu, opacity, t => t.t2DDraw(x, y, new Rectangle(0, frame, length, OpenTaiko.Skin.Game_Notes_Size[1])));
-			return;
-		} else if (IsADLIB(nt)) {
-			if (PuchiChara.tGetEffect(player).ShowAdlib) {
-				OpenTaiko.Tx.Note_Adlib?.tUpdateOpacity(50);
-				DrawFaded(OpenTaiko.Tx.Note_Adlib, opacity,
-					t => DrawWithLook(t, x, y, new RectangleF(0, frame, length, OpenTaiko.Skin.Game_Notes_Size[1]), look));
-			}
+			float scale = giant ? def.GiantNotesScale * def.PartnerNotesScale : partner ? def.PartnerNotesScale : 1f;
+			DrawFaded(OpenTaiko.Tx.Note_Mine, opacity, t => DrawWithLook(t, x, y, null, look with { Scale = look.Scale * scale }));
 			return;
 		}
 
-		int noteType = NoteTextureColumn(chip, _gt);
-		DrawFaded(OpenTaiko.Tx.Notes[(int)_gt], opacity,
-			t => DrawWithLook(t, x, y, new RectangleF(noteType * OpenTaiko.Skin.Game_Notes_Size[0], frame, length, OpenTaiko.Skin.Game_Notes_Size[1]), look));
+		if (NoteCell(nt, _gt) is not Cell cell) return;
+		int row = cell.Sheet.Row(anim);
+
+		// a giant or partner note: its cell of the giant or partner sheet, centred on the note's place
+		if ((giant || partner) && cell.MainSheet && !def.Legacy) {
+			var sheet = giant ? OpenTaiko.Tx.Notes_Giant[(int)_gt] : OpenTaiko.Tx.Notes_Partner[(int)_gt];
+			if (sheet != null) {
+				float cw = sheet.szTextureSize.Width / (float)(giant ? GiantColumns(_gt) : NotesColumns(_gt));
+				float ch = sheet.szTextureSize.Height / (float)Math.Max(1, def.Notes.Frames);
+				int col = giant ? GiantColumn(cell.Col, _gt) : cell.Col;
+				DrawFaded(sheet, opacity,
+					t => DrawWithLook(t, x + (wNote - cw) / 2, y + (hNote - ch) / 2, new RectangleF(col * cw, row * ch, cw, ch), look));
+				return;
+			}
+		}
+		// without one: a partner note takes its big look (a Taiko Don or Ka its big version, any other small-looking note
+		// scaled by PartnerNotesScale); a giant note takes that look scaled by GiantNotesScale
+		if (giant || partner) {
+			float scale = giant ? def.GiantNotesScale : 1f;
+			if (IsSmallLookingNote(nt, _gt)) {
+				if (_gt is EGameType.Taiko && nt is ENoteType.Don or ENoteType.Ka && KindCell(nt is ENoteType.Don ? 2 : 3, _gt) is Cell big)
+					cell = big;
+				else
+					scale *= def.PartnerNotesScale;
+			}
+			look = look with { Scale = look.Scale * scale };
+		}
+
+		var c = cell;
+		DrawFaded(c.Tex, opacity,
+			t => DrawWithLook(t, x, y, new RectangleF(c.Col * wNote, row * hNote, c.Span * wNote, hNote), look));
 	}
 
 	// Roll display
-	public static void DisplayRoll(int player, int x, int y, CChip chip, int frame,
+	public static void DisplayRoll(int player, int x, int y, CChip chip, CNoteAnim anim,
 		Color4 normalColor, Color4 effectedColor, int xEnd, int yEnd, EStealthMode hiddenMode = EStealthMode.Off, float opacity = 1f
 		) {
 		if (hiddenMode.HidesNotes() || opacity <= 0f)
@@ -448,31 +551,42 @@ class NotesManager {
 
 		ENoteType nt = GetNoteType(chip);
 		EGameType _gt = GetChipGameType(chip, player);
+		var def = CNotesSkins.Def(_gt);
 
-		int _offset = 0;
-		var _texarr = OpenTaiko.Tx.Notes[(int)_gt];
-		int rollOrigin = (OpenTaiko.Skin.Game_Notes_Size[0] * 5);
+		// the roll's sheet and the column of its head (the body and tail follow)
+		CTexture? _texarr;
+		int originCol;
+		CSheetDef sheetDef;
+		if (IsFuzeRoll(nt)) {
+			var taiko = CNotesSkins.Def(EGameType.Taiko);
+			_texarr = taiko.Legacy ? OpenTaiko.Tx.Note_FuseRoll : OpenTaiko.Tx.Balloons;
+			originCol = taiko.Legacy ? 0 : 4;
+			sheetDef = taiko.Legacy ? def.Notes : taiko.Balloons;
+		} else {
+			int part = (IsBigRollTaiko(nt, _gt) || IsPinkRollKonga(nt, _gt)) ? 1
+				: IsYellowRollKonga(nt, _gt) ? 2
+				: IsClapRollKonga(nt, _gt) ? 3
+				: 0;
+			if (def.Legacy) {
+				_texarr = OpenTaiko.Tx.Notes[(int)_gt];
+				originCol = 5 + part switch { 1 => 3, 2 => 8, 3 => 11, _ => 0 };
+				sheetDef = def.Notes;
+			} else {
+				_texarr = OpenTaiko.Tx.Rolls[(int)_gt];
+				originCol = part * 3;
+				sheetDef = def.Rolls;
+			}
+		}
+
+		if (_texarr == null) return;
+		int rollOrigin = OpenTaiko.Skin.Game_Notes_Size[0] * originCol;
+		int frame = sheetDef.Row(anim) * OpenTaiko.Skin.Game_Notes_Size[1];
 		float wImage = OpenTaiko.Skin.Game_Notes_Size[0];
 		float hImage = OpenTaiko.Skin.Game_Notes_Size[1];
 
 		// Hit-type notes are drawn anchoring to the top-left and are off center, but roll-type notes are not
 		float xHitNoteOffset = wImage / 2.0f;
 		float yHitNoteOffset = hImage / 2.0f;
-
-		if (IsSmallRollTaiko(nt, _gt)) {
-			_offset = 0;
-		} else if (IsBigRollTaiko(nt, _gt) || IsPinkRollKonga(nt, _gt)) {
-			_offset = OpenTaiko.Skin.Game_Notes_Size[0] * 3;
-		} else if (IsClapRollKonga(nt, _gt)) {
-			_offset = OpenTaiko.Skin.Game_Notes_Size[0] * 11;
-		} else if (IsYellowRollKonga(nt, _gt)) {
-			_offset = OpenTaiko.Skin.Game_Notes_Size[0] * 8;
-		} else if (IsFuzeRoll(nt)) {
-			_texarr = OpenTaiko.Tx.Note_FuseRoll;
-			_offset = -rollOrigin;
-		}
-
-		if (_texarr == null) return;
 
 		// the fade applies to the head, body and tail alike, restored once the roll is drawn
 		int savedOpacity = _texarr.Opacity;
@@ -496,8 +610,8 @@ class NotesManager {
 			var _center_x = (x + xEnd) / 2 + xHitNoteOffset;
 			var _center_y = (y + yEnd) / 2 + yHitNoteOffset;
 			_texarr.t2D_DisplayImage_RollNote((int)_center_x, (int)_center_y, new Rectangle(
-				rollOrigin + OpenTaiko.Skin.Game_Notes_Size[0] + _offset,
-				0,
+				rollOrigin + OpenTaiko.Skin.Game_Notes_Size[0],
+				frame,
 				OpenTaiko.Skin.Game_Notes_Size[0],
 				OpenTaiko.Skin.Game_Notes_Size[1]));
 
@@ -510,7 +624,7 @@ class NotesManager {
 			var xTailOrig = (Math.Cos(theta) * -wImage / 2) + wImage / 2;
 			var yTailOrig = (-Math.Sin(theta) * -wImage / 2) + hImage / 2;
 			_texarr.t2DDraw((int)(_xc - xTailOrig), (int)(_yc - yTailOrig), 0, new Rectangle(
-				rollOrigin + (OpenTaiko.Skin.Game_Notes_Size[0] * 2) + _offset,
+				rollOrigin + (OpenTaiko.Skin.Game_Notes_Size[0] * 2),
 				frame,
 				OpenTaiko.Skin.Game_Notes_Size[0],
 				OpenTaiko.Skin.Game_Notes_Size[1]));
@@ -524,7 +638,7 @@ class NotesManager {
 			_texarr.color4 = normalColor;
 
 		// Head
-		_texarr.t2DDraw(x, y, 0, new Rectangle(rollOrigin + _offset, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+		_texarr.t2DDraw(x, y, 0, new Rectangle(rollOrigin, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 		_texarr.color4 = normalColor;
 		_texarr.Opacity = savedOpacity;
 	}

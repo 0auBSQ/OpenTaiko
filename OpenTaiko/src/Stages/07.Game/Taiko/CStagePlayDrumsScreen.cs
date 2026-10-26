@@ -1209,12 +1209,12 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 				if (x > 0 - OpenTaiko.Skin.Game_Notes_Size[0] && x < OpenTaiko.Skin.Resolution[0]) {
 					if (OpenTaiko.Tx.Notes[(int)_gt] != null) {
-						int pxFaceTxOffset = this.GetPxFaceTextureOffset(nPlayer);
+						var noteAnim = this.GetNoteAnim(nPlayer);
 						var (nSenotesX, nSenotesY) = NotesManager.GetSENotesPos(nPlayer);
 						float opacity = this.tNoteOpacity(nPlayer, x, y);
 						if (NotesManager.IsHittableNote(nt) && opacity > 0f && this.IsNoteIfVisible(pChip, nPlayer)) {
 							NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ctHandHold.CurrentValue, hiddenMode: hiddenMode, opacity: opacity);
-							NotesManager.DisplayNote(nPlayer, x, y, pChip, pxFaceTxOffset, hiddenMode: hiddenMode, opacity: opacity);
+							NotesManager.DisplayNote(nPlayer, x, y, pChip, noteAnim, hiddenMode: hiddenMode, opacity: opacity);
 							if (!NotesManager.IsADLIB(nt))
 								NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode, opacity);
 						}
@@ -1281,7 +1281,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 			if (isBodyXInScreen) {
 				if (OpenTaiko.Tx.Notes[(int)_gt] != null) {
-					int pxFaceTxOffset = this.GetPxFaceTextureOffset(nPlayer);
+					var noteAnim = this.GetNoteAnim(nPlayer);
 					float opacity = this.tRollOpacity(nPlayer, x, y, xEnd, yEnd);
 					if (opacity <= 0f) return;
 
@@ -1324,7 +1324,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 					var normalColor = new Color4(1.0f, 1.0f, 1.0f, 1f);
 
 						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ctHandHold.CurrentValue, hiddenMode: hiddenMode, opacity: opacity);
-						NotesManager.DisplayRoll(nPlayer, x, y, pChip, pxFaceTxOffset, normalColor, effectedColor, xEnd, yEnd, hiddenMode, opacity);
+						NotesManager.DisplayRoll(nPlayer, x, y, pChip, noteAnim, normalColor, effectedColor, xEnd, yEnd, hiddenMode, opacity);
 
 						if (!hiddenMode.HidesSENotes() && OpenTaiko.Tx.SENotes[(int)_gt] != null) {
 							int savedSeOpacity = OpenTaiko.Tx.SENotes[(int)_gt].Opacity;
@@ -1350,7 +1350,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 					} else if (NotesManager.IsBalloon(nt) || NotesManager.IsKusudama(nt)) {
 						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ctHandHold.CurrentValue, hiddenMode: hiddenMode, opacity: opacity);
-						NotesManager.DisplayNote(nPlayer, x, y, pChip, pxFaceTxOffset, OpenTaiko.Skin.Game_Notes_Size[0] * 2, hiddenMode, opacity);
+						NotesManager.DisplayNote(nPlayer, x, y, pChip, noteAnim, hiddenMode, opacity);
 						NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode, opacity);
 					}
 				}
@@ -1359,33 +1359,11 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		#endregion
 	}
 
-	public int GetPxFaceTextureOffset(int nPlayer) {
-		int pxFaceTxOffset = 0;
-		if (OpenTaiko.Skin.Game_Notes_Anime && !OpenTaiko.ConfigIni.SimpleMode) {
-			if (this.actCombo.nCurrentCombo[nPlayer] >= 300) {
-				if ((int)ctChipAnime[nPlayer].CurrentValue % 2 == 1) {
-					pxFaceTxOffset = ctChipAnimeLag[nPlayer].IsEnded ? (OpenTaiko.Skin.Game_Notes_Size[1] * 2) : OpenTaiko.Skin.Game_Notes_Size[1];
-				} else {
-					pxFaceTxOffset = 0;
-				}
-			} else if (this.actCombo.nCurrentCombo[nPlayer] >= 150) {
-				if ((int)ctChipAnime[nPlayer].CurrentValue % 2 == 1) {
-					pxFaceTxOffset = OpenTaiko.Skin.Game_Notes_Size[1];
-				} else {
-					pxFaceTxOffset = 0;
-				}
-			} else if (this.actCombo.nCurrentCombo[nPlayer] >= 50) {
-				if ((int)ctChipAnime[nPlayer].CurrentValue <= 1) {
-					pxFaceTxOffset = ctChipAnimeLag[nPlayer].IsEnded ? OpenTaiko.Skin.Game_Notes_Size[1] : 0;
-				} else {
-					pxFaceTxOffset = 0;
-				}
-			} else {
-				pxFaceTxOffset = 0;
-			}
-		}
-
-		return pxFaceTxOffset;
+	// the animation state of a player's notes: the rows shown come from the notes pack's definition
+	public CNoteAnim GetNoteAnim(int nPlayer) {
+		if (OpenTaiko.ConfigIni.SimpleMode) return CNoteAnim.Still;
+		return new CNoteAnim(this.actCombo.nCurrentCombo[nPlayer], (int)ctChipAnime[nPlayer].CurrentValue % 4,
+			!ctChipAnimeLag[nPlayer].IsEnded);
 	}
 
 	// Judge whether rolls are intended to obscure the screen, then detect and hide unintended obscuring rolls when any of its tips are out of screen

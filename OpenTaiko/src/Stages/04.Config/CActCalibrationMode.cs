@@ -114,7 +114,10 @@ internal class CActCalibrationMode : CActivity {
 		OpenTaiko.Tx.Lane_Background_Sub?.t2DDraw(OpenTaiko.Skin.Game_Lane_Sub_X[0], OpenTaiko.Skin.Game_Lane_Sub_Y[0]);
 		OpenTaiko.Tx.Taiko_Frame[2]?.t2DDraw(OpenTaiko.Skin.Game_Taiko_Frame_X[0], OpenTaiko.Skin.Game_Taiko_Frame_Y[0]);
 
-		OpenTaiko.Tx.Notes[0]?.t2DDraw(OpenTaiko.Skin.nScrollFieldX[0], OpenTaiko.Skin.nScrollFieldY[0], new RectangleF(0, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+		OpenTaiko.Tx.HitCircle[0]?.t2DDraw(OpenTaiko.Skin.nScrollFieldX[0], OpenTaiko.Skin.nScrollFieldY[0], new RectangleF(0, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+		// a Don: the second cell of the former layout's second row, the first cell of a notes pack's sheet
+		bool legacyNotes = CNotesSkins.Def(EGameType.Taiko).Legacy;
+		int donX = legacyNotes ? OpenTaiko.Skin.Game_Notes_Size[0] : 0, donY = legacyNotes ? OpenTaiko.Skin.Game_Notes_Size[1] : 0;
 
 		for (int x = OpenTaiko.Skin.nScrollFieldX[0]; x < GameWindowSize.Width + 500; x += 500) {
 			OpenTaiko.Tx.Bar?.t2DDraw(
@@ -125,7 +128,7 @@ internal class CActCalibrationMode : CActivity {
 			OpenTaiko.Tx.Notes[0]?.t2DDraw(
 				(x - CalibrateTick.CurrentValue),
 				OpenTaiko.Skin.nScrollFieldY[0],
-				new Rectangle(OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1], OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1])
+				new Rectangle(donX, donY, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1])
 			);
 		}
 

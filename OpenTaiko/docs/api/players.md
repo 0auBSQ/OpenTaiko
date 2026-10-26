@@ -472,6 +472,7 @@ The skin declares theme settings in ThemeSettings.json and stores their values i
 | `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | Value of a save-scope setting for the 1-based player, or its default if the save has no value. |
 | `THEME:SetThemeSetting(settingId, value)  -> bool` | Writes a global-scope setting declared in ThemeSettings.json (a session setting is only kept for this run); false for an unknown id. |
 | `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | Writes a save-scope setting for the 1-based player; false for an unknown id. |
+| `THEME:GetNotesSkinFile(kind, file)  -> string` | Path of a file of the selected pack of `kind` (`"taiko"`, `"bongo"` or `"judges"`), relative to the skin's Graphics folder, taken from pack 1 when the selected pack lacks it; an empty string when the skin has no such pack or file. See [Adding notes and judges packs](../guides/notes-skins.md). |
 | `THEME:GetSkinString(key)  -> string` | Localized string from the skin's Locales folder: current language first, then the skin's default locale, then `[LOCALE NOT FOUND: key]`. |
 | `THEME:GetDefinitionCount()  -> integer` | Number of setting definitions in ThemeSettings.json. |
 | `THEME:GetDefinitionId(index)  -> string` | Id of the definition at a 0-based index, or an empty string. |

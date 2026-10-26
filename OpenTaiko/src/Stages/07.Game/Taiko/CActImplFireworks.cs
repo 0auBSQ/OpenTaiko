@@ -133,10 +133,14 @@ internal class CActImplFireworks : CActivity {
 	}
 	public override int Draw() {
 		if (!base.IsDeActivated) {
+			bool packs = CNotesSkins.HasPacks(CNotesSkins.EKind.Taiko);
 			int nWidth = ((OpenTaiko.Tx.Effects_Hit_Explosion?.szTextureSize.Width ?? 0) / 7);
-			int nHeight = ((OpenTaiko.Tx.Effects_Hit_Explosion?.szTextureSize.Height ?? 0) / 4);
+			// rows: Good, OK, then the big notes' Good and OK; a notes pack's sheet of 2 rows (square frames) uses them for both
+			int explosionRows = (packs && nWidth > 0 && Math.Round((OpenTaiko.Tx.Effects_Hit_Explosion.szTextureSize.Height) / (double)nWidth) <= 2) ? 2 : 4;
+			int nHeight = ((OpenTaiko.Tx.Effects_Hit_Explosion?.szTextureSize.Height ?? 0) / explosionRows);
 			int nBombWidth = ((OpenTaiko.Tx.Effects_Hit_Bomb?.szTextureSize.Width ?? 0) / 7);
-			int nBombHeight = ((OpenTaiko.Tx.Effects_Hit_Bomb?.szTextureSize.Height ?? 0) / 4);
+			// a notes pack's Bomb.png is one row; the former one has 4, of which only the first is drawn
+			int nBombHeight = ((OpenTaiko.Tx.Effects_Hit_Bomb?.szTextureSize.Height ?? 0) / (packs ? 1 : 4));
 			for (int i = 0; i < 3 * 4; i++) {
 				ref STSTATUS state = ref this.stState[i];
 				if (state.bUse) {
@@ -150,7 +154,7 @@ internal class CActImplFireworks : CActivity {
 						// (When performing calibration, reduce visual distraction
 						// and current judgment feedback near the judgment position.)
 						if (OpenTaiko.Tx.Effects_Hit_Explosion != null) {
-							int n = state.IsBig ? (nHeight * 2) : 0;
+							int n = (state.IsBig && explosionRows == 4) ? (nHeight * 2) : 0;
 
 							int nX = 0;
 							int nY = 0;

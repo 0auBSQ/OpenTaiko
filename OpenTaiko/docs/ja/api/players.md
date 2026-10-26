@@ -472,6 +472,7 @@ PUCHICHARALIST と sf:GetPuchichara がこのハンドルを返します。テ�
 | `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | 1 始まりのプレイヤーに対するセーブスコープの設定の値。セーブに値がなければその既定値。 |
 | `THEME:SetThemeSetting(settingId, value)  -> bool` | ThemeSettings.json で宣言されたグローバル設定を書き込みます (セッション設定は今回の起動中だけ保持されます)。未知の id では false。 |
 | `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | 1 始まりのプレイヤーのセーブ単位の設定を書き込みます。未知の id では false。 |
+| `THEME:GetNotesSkinFile(kind, file)  -> string` | `kind` (`"taiko"`、`"bongo"`、`"judges"`) の選択中のパックにあるファイルのパス。スキンの Graphics フォルダからの相対パスで、選択中のパックにそのファイルがなければパック 1 から取ります。スキンにそのようなパックやファイルがなければ空文字列。[音符と判定のパックの追加](../guides/notes-skins.md)を参照してください。 |
 | `THEME:GetSkinString(key)  -> string` | スキンの Locales フォルダのローカライズ文字列。現在の言語、次にスキンの既定ロケール、最後に `[LOCALE NOT FOUND: key]` の順です。 |
 | `THEME:GetDefinitionCount()  -> integer` | ThemeSettings.json の設定定義の数。 |
 | `THEME:GetDefinitionId(index)  -> string` | 0 始まりのインデックスの定義の id。なければ空文字列。 |

@@ -13,7 +13,7 @@ OpenTaiko は、コアのゲームプレイ以外のほぼすべての画面を�
 - モジュールをまだ書いたことがなければ、[モジュールの仕組み](getting-started.md)をお読みください。スキンのフォルダ構成、モジュールの種類、スクリプトが受け取るライフサイクルコールバックを説明しています。
 - 関数を調べるには、[API リファレンス](api/)を開き、サイドバーからカテゴリを選んでください。
 - ゲームが同梱しているもの (UI ライブラリ、ダイアログボックス、未知の塔・金庫・ショップのルール、マイルーム) を土台に作るなら、[提供モジュール](modules/)を読んでください。
-- 具体的な目的があるなら、ガイドが[キャラクター](guides/characters.md)、[ぷちキャラ](guides/puchicharas.md)、[ネームプレート](guides/nameplates.md)、[スキンとテーマ](guides/skins.md)、[譜面のアンロック要素](guides/unlockables.md)を手順ごとに解説しています。
+- 具体的な目的があるなら、ガイドが[キャラクター](guides/characters.md)、[ぷちキャラ](guides/puchicharas.md)、[ネームプレート](guides/nameplates.md)、[スキンとテーマ](guides/skins.md)、[音符と判定のパック](guides/notes-skins.md)、[譜面のアンロック要素](guides/unlockables.md)を手順ごとに解説しています。
 
 ## 作成できるもの
 

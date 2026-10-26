@@ -13,7 +13,7 @@ OpenTaiko 中除核心演奏之外的几乎每一个界面都由随皮肤一起�
 - 如果你还没有写过模块，请阅读[模块的工作原理](getting-started.md)：皮肤的文件夹布局、模块类型，以及脚本会收到的生命周期回调。
 - 要查找某个函数，请打开 [API 参考](api/)，从侧边栏中选择一个分类。
 - 要在游戏自带的内容（UI 库、对话框、未知之塔、金库和商店的规则、我的房间）之上构建，请阅读[内置模块](modules/)。
-- 对于明确的目标，各篇指南会一步一步地讲解[角色](guides/characters.md)、[小角色](guides/puchicharas.md)、[名牌](guides/nameplates.md)、[皮肤与主题](guides/skins.md)以及[谱面解锁条件](guides/unlockables.md)。
+- 对于明确的目标，各篇指南会一步一步地讲解[角色](guides/characters.md)、[小角色](guides/puchicharas.md)、[名牌](guides/nameplates.md)、[皮肤与主题](guides/skins.md)、[音符包与判定包](guides/notes-skins.md)以及[谱面解锁条件](guides/unlockables.md)。
 
 ## 你可以构建的内容
 

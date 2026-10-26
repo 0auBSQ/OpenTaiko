@@ -9,6 +9,7 @@
   - [添加小角色](guides/puchicharas.md)
   - [添加名牌](guides/nameplates.md)
   - [添加皮肤与主题](guides/skins.md)
+  - [添加音符包与判定包](guides/notes-skins.md)
   - [谱面解锁条件](guides/unlockables.md)
   - [解锁条件参考](guides/unlockables-reference.md)
 

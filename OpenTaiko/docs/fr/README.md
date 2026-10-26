@@ -13,7 +13,7 @@ OpenTaiko dessine presque tous les écrans situés en dehors du cœur du gamepla
 - Si vous n'avez pas encore écrit de module, lisez [Fonctionnement des modules](getting-started.md) : l'organisation des dossiers d'un skin, les types de modules et les fonctions de rappel du cycle de vie qu'un script reçoit.
 - Pour retrouver une fonction, ouvrez la [référence de l'API](api/) et choisissez une catégorie dans la barre latérale.
 - Pour vous appuyer sur ce que livre le jeu (une bibliothèque d'interface, une boîte de dialogue, les règles de la pagode, de la chambre forte et de la boutique, Ma Chambre), lisez [Modules fournis](modules/).
-- Pour un objectif précis, les guides parcourent pas à pas les [personnages](guides/characters.md), les [puchicharas](guides/puchicharas.md), les [plaques de nom](guides/nameplates.md), les [skins et thèmes](guides/skins.md) et le [déblocage de partitions](guides/unlockables.md).
+- Pour un objectif précis, les guides parcourent pas à pas les [personnages](guides/characters.md), les [puchicharas](guides/puchicharas.md), les [plaques de nom](guides/nameplates.md), les [skins et thèmes](guides/skins.md), les [packs de notes et de jugements](guides/notes-skins.md) et le [déblocage de partitions](guides/unlockables.md).
 
 ## Ce que vous pouvez construire
 

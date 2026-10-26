@@ -9,6 +9,7 @@
   - [Añadir puchicharas](guides/puchicharas.md)
   - [Añadir placas de nombre](guides/nameplates.md)
   - [Añadir skins y temas](guides/skins.md)
+  - [Añadir paquetes de notas y juicios](guides/notes-skins.md)
   - [Desbloqueables de charts](guides/unlockables.md)
   - [Referencia de desbloqueables](guides/unlockables-reference.md)
 

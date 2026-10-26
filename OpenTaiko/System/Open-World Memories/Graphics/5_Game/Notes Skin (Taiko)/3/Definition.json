@@ -1,0 +1,133 @@
+{
+	"Name": {
+		"strings": {
+			"default": "Sky Spirits"
+		}
+	},
+	"Notes": {
+		"Frames": 3,
+		"Animation": [
+			{
+				"FromCombo": 0,
+				"Rows": [
+					0
+				]
+			},
+			{
+				"FromCombo": 50,
+				"Rows": [
+					1,
+					1,
+					0,
+					0
+				],
+				"RowsOnEntry": [
+					0
+				]
+			},
+			{
+				"FromCombo": 150,
+				"Rows": [
+					0,
+					1
+				]
+			},
+			{
+				"FromCombo": 300,
+				"Rows": [
+					0,
+					2
+				],
+				"RowsOnEntry": [
+					0,
+					1
+				]
+			}
+		]
+	},
+	"Rolls": {
+		"Frames": 3,
+		"Animation": [
+			{
+				"FromCombo": 0,
+				"Rows": [
+					0
+				]
+			},
+			{
+				"FromCombo": 50,
+				"Rows": [
+					1,
+					1,
+					0,
+					0
+				],
+				"RowsOnEntry": [
+					0
+				]
+			},
+			{
+				"FromCombo": 150,
+				"Rows": [
+					0,
+					1
+				]
+			},
+			{
+				"FromCombo": 300,
+				"Rows": [
+					0,
+					2
+				],
+				"RowsOnEntry": [
+					0,
+					1
+				]
+			}
+		]
+	},
+	"Balloons": {
+		"Frames": 3,
+		"Animation": [
+			{
+				"FromCombo": 0,
+				"Rows": [
+					0
+				]
+			},
+			{
+				"FromCombo": 50,
+				"Rows": [
+					1,
+					1,
+					0,
+					0
+				],
+				"RowsOnEntry": [
+					0
+				]
+			},
+			{
+				"FromCombo": 150,
+				"Rows": [
+					0,
+					1
+				]
+			},
+			{
+				"FromCombo": 300,
+				"Rows": [
+					0,
+					2
+				],
+				"RowsOnEntry": [
+					0,
+					1
+				]
+			}
+		]
+	},
+	"FlyingNotesFrame": 1,
+	"PartnerNotesScale": 1.4142,
+	"GiantNotesScale": 2.0
+}

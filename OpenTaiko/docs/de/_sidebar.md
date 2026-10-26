@@ -9,6 +9,7 @@
   - [Puchicharas hinzufügen](guides/puchicharas.md)
   - [Namensschilder hinzufügen](guides/nameplates.md)
   - [Skins und Themes hinzufügen](guides/skins.md)
+  - [Noten- und Bewertungspakete hinzufügen](guides/notes-skins.md)
   - [Chart-Freischaltungen](guides/unlockables.md)
   - [Referenz der Freischaltbedingungen](guides/unlockables-reference.md)
 

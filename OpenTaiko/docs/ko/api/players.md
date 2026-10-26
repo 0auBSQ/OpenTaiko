@@ -472,6 +472,7 @@ PUCHICHARALIST와 sf:GetPuchichara가 이 핸들을 반환합니다. 텍스처�
 | `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | 1부터 시작하는 플레이어의 세이브 범위 설정 값. 세이브에 값이 없으면 기본값. |
 | `THEME:SetThemeSetting(settingId, value)  -> bool` | ThemeSettings.json에 선언된 전역 설정을 씁니다 (세션 설정은 이번 실행 동안만 유지). 알 수 없는 id면 false. |
 | `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | 1부터 시작하는 플레이어의 세이브 단위 설정을 씁니다. 알 수 없는 id면 false. |
+| `THEME:GetNotesSkinFile(kind, file)  -> string` | `kind`(`"taiko"`, `"bongo"`, `"judges"`)의 선택된 팩에 있는 파일의 경로로, 스킨의 Graphics 폴더 기준 상대 경로입니다. 선택된 팩에 그 파일이 없으면 팩 1에서 가져옵니다. 스킨에 그런 팩이나 파일이 없으면 빈 문자열. [노트와 판정 팩 추가하기](../guides/notes-skins.md)를 참고하십시오. |
 | `THEME:GetSkinString(key)  -> string` | 스킨의 Locales 폴더에서 온 지역화 문자열: 현재 언어 먼저, 그다음 스킨의 기본 로케일, 그다음 `[LOCALE NOT FOUND: key]`. |
 | `THEME:GetDefinitionCount()  -> integer` | ThemeSettings.json의 설정 정의 수. |
 | `THEME:GetDefinitionId(index)  -> string` | 0부터 시작하는 인덱스의 정의 id. 없으면 빈 문자열. |

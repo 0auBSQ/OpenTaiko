@@ -9,6 +9,7 @@
   - [Добавление пучичар](guides/puchicharas.md)
   - [Добавление табличек имени](guides/nameplates.md)
   - [Добавление скинов и тем](guides/skins.md)
+  - [Добавление наборов нот и оценок](guides/notes-skins.md)
   - [Разблокировка чартов](guides/unlockables.md)
   - [Справочник по разблокировке](guides/unlockables-reference.md)
 

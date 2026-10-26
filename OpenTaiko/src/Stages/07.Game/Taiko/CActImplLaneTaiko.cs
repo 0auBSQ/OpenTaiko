@@ -431,14 +431,13 @@ internal class CActImplLaneTaiko : CActivity {
 	// each player drawn on the layer CActImplFlashlight.DrawsOverLight puts it on
 	public void GoGoFlame(bool overLight) {
 		//判定枠
-		if (OpenTaiko.Tx.Judge_Frame != null) {
-			OpenTaiko.Tx.Judge_Frame.bAddBlend = OpenTaiko.Skin.Game_JudgeFrame_AddBlend;
-			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-				if (OpenTaiko.stageGameScreen.actFlashlight.DrawsOverLight(i) != overLight) continue;
-				OpenTaiko.Tx.Judge_Frame.t2DDraw(
-					OpenTaiko.stageGameScreen.GetNoteOriginX(i),
-					OpenTaiko.stageGameScreen.GetNoteOriginY(i), new Rectangle(0, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
-			}
+		// a Konga player takes the Bongo pack's hit circle when it has one
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			if (OpenTaiko.stageGameScreen.actFlashlight.DrawsOverLight(i) != overLight) continue;
+			var circle = (OpenTaiko.ConfigIni.nGameType[i] is EGameType.Konga ? OpenTaiko.Tx.HitCircle[1] : null) ?? OpenTaiko.Tx.HitCircle[0];
+			circle?.t2DDraw(
+				OpenTaiko.stageGameScreen.GetNoteOriginX(i),
+				OpenTaiko.stageGameScreen.GetNoteOriginY(i), new Rectangle(0, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 		}
 
 

@@ -9,6 +9,7 @@
   - [ぷちキャラの追加](guides/puchicharas.md)
   - [ネームプレートの追加](guides/nameplates.md)
   - [スキンとテーマの追加](guides/skins.md)
+  - [音符と判定のパックの追加](guides/notes-skins.md)
   - [譜面のアンロック要素](guides/unlockables.md)
   - [アンロック要素リファレンス](guides/unlockables-reference.md)
 

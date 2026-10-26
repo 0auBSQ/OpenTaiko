@@ -45,6 +45,19 @@ namespace OpenTaiko {
 			return true;
 		}
 
+		/// <summary>
+		/// A file of the selected notes or judges pack ("taiko", "bongo" or "judges"), relative to the skin's Graphics
+		/// folder (the first pack's when the selected one lacks it). Returns "" when the skin has no such pack or file.
+		/// </summary>
+		public string GetNotesSkinFile(string kind, string file) {
+			var k = kind?.ToLowerInvariant() switch {
+				"bongo" => CNotesSkins.EKind.Bongo,
+				"judges" => CNotesSkins.EKind.Judges,
+				_ => CNotesSkins.EKind.Taiko,
+			};
+			return CNotesSkins.File_(k, file ?? "")?.Replace('\\', '/') ?? "";
+		}
+
 		// ── Skin-scoped localization ──────────────────────────────────────────────
 
 		/// <summary>

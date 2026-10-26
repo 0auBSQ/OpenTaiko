@@ -80,6 +80,8 @@ class TextureLoader {
 		Mine = 1 << 5,        // a mine or fuse-roll note in the chart (a failed fuse roll draws the bomb effect)
 		TwoPlus = 1 << 6,     // a second player (or the AI)
 		ThreePlus = 1 << 7,   // three players or more
+		Partner = 1 << 8,     // a partner note in the chart
+		Giant = 1 << 9,       // a giant note in the chart
 	}
 	private readonly Dictionary<CTexture, WarmNeed> _warmNeeds = new();
 	private WarmNeed _playNeeds;
@@ -116,6 +118,8 @@ class TextureLoader {
 			foreach (var chip in tja.listChip) {
 				if (chip.eGameType == EGameType.Konga) needs |= WarmNeed.Konga;
 				if (NotesManager.IsMine(chip) || NotesManager.IsFuzeRoll(chip)) needs |= WarmNeed.Mine;
+				if (chip.IsPartnerNote) needs |= WarmNeed.Partner;
+				if (chip.IsGiantNote) needs |= WarmNeed.Giant;
 			}
 		}
 		return needs;
@@ -291,17 +295,8 @@ class TextureLoader {
 
 		#region General
 
-		Notes = new CTexture[2];
-		Notes[0] = TxC(GAME + @$"Notes.png");
-		Notes[1] = TxCFor(WarmNeed.Konga, GAME + @$"Notes_Konga.png");
-
+		// the notes, rolls, balloons, hit effects and judges come from the selected packs: LoadNotesSkinTextures
 		Note_Mine = TxCFor(WarmNeed.Mine, GAME + @$"Mine.png");
-		Note_Swap = TxC(GAME + @$"Swap.png");
-		Note_Kusu = TxC(GAME + @$"Kusu.png");
-		Note_FuseRoll = TxC(GAME + @$"FuseRoll.png");
-		Note_Adlib = TxC(GAME + @$"Adlib.png");
-
-		Judge_Frame = TxC(GAME + @$"Notes.png");
 
 		SENotes = new CTexture[2];
 		SENotes[0] = TxC(GAME + @$"SENotes.png");
@@ -310,8 +305,6 @@ class TextureLoader {
 		SENotesExtension = TxC(GAME + @$"SENotes_Extension.png");
 
 		Notes_Arm = TxC(GAME + @$"Notes_Arm.png");
-		Judge = TxC(GAME + @$"Judge.png");
-		ChipEffect = TxC(GAME + @$"ChipEffect.png");
 		ScoreRank = TxC(GAME + @$"ScoreRank.png");
 
 		Judge_Meter = TxC(GAME + @$"Judge_Meter.png");
@@ -507,34 +500,12 @@ class TextureLoader {
 		Balloon_Combo = new CTexture[2];
 		Balloon_Combo[0] = TxC(GAME + BALLOON + @$"Combo_1P.png");
 		Balloon_Combo[1] = TxC(GAME + BALLOON + @$"Combo_2P.png");
-		Balloon_Roll = TxC(GAME + BALLOON + @$"Roll.png");
-		Balloon_Balloon = TxC(GAME + BALLOON + @$"Balloon.png");
 		Balloon_Number_Roll = TxC(GAME + BALLOON + @$"Number_Roll.png");
 		Balloon_Number_Combo = TxC(GAME + BALLOON + @$"Number_Combo.png");
-
-		Balloon_Breaking = new CTexture[6];
-		for (int i = 0; i < 6; i++) {
-			Balloon_Breaking[i] = TxC(GAME + BALLOON + @$"Breaking_" + i.ToString() + ".png");
-		}
-
-		Kusudama_Number = TxC(GAME + BALLOON + KUSUDAMA + @$"Kusudama_Number.png");
-
-		Fuse_Number = TxC(GAME + BALLOON + FUSE + @$"Number_Fuse.png");
-		Fuse_Balloon = TxC(GAME + BALLOON + FUSE + @$"Fuse.png");
 
 		#endregion
 
 		#region Effects
-
-		Effects_Hit_Explosion = TxCAf(GAME + EFFECTS + @$"Hit{Path.DirectorySeparatorChar}Explosion.png");
-		if (Effects_Hit_Explosion != null) Effects_Hit_Explosion.bAddBlend = OpenTaiko.Skin.Game_Effect_HitExplosion_AddBlend;
-		Effects_Hit_Explosion_Big = TxC(GAME + EFFECTS + @$"Hit{Path.DirectorySeparatorChar}Explosion_Big.png");
-		if (Effects_Hit_Explosion_Big != null) Effects_Hit_Explosion_Big.bAddBlend = OpenTaiko.Skin.Game_Effect_HitExplosionBig_AddBlend;
-		Effects_Hit_FireWorks = TxC(GAME + EFFECTS + @$"Hit{Path.DirectorySeparatorChar}FireWorks.png");
-		if (Effects_Hit_FireWorks != null) Effects_Hit_FireWorks.bAddBlend = OpenTaiko.Skin.Game_Effect_FireWorks_AddBlend;
-
-		Effects_Hit_Bomb = TxCAfFor(WarmNeed.Mine, GAME + EFFECTS + @$"Hit{Path.DirectorySeparatorChar}Bomb.png");
-
 
 		Effects_Fire = TxC(GAME + EFFECTS + @$"Fire.png");
 		if (Effects_Fire != null) Effects_Fire.bAddBlend = OpenTaiko.Skin.Game_Effect_Fire_AddBlend;
@@ -543,16 +514,6 @@ class TextureLoader {
 
 		Effects_GoGoSplash = TxC(GAME + EFFECTS + @$"GoGoSplash.png");
 		if (Effects_GoGoSplash != null) Effects_GoGoSplash.bAddBlend = OpenTaiko.Skin.Game_Effect_GoGoSplash_AddBlend;
-		Effects_Hit_Great = new CTexture[15];
-		Effects_Hit_Great_Big = new CTexture[15];
-		Effects_Hit_Good = new CTexture[15];
-		Effects_Hit_Good_Big = new CTexture[15];
-		for (int i = 0; i < 15; i++) {
-			Effects_Hit_Great[i] = TxC(GAME + EFFECTS + @$"Hit{Path.DirectorySeparatorChar}" + @$"Great{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
-			Effects_Hit_Great_Big[i] = TxC(GAME + EFFECTS + @$"Hit{Path.DirectorySeparatorChar}" + @$"Great_Big{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
-			Effects_Hit_Good[i] = TxC(GAME + EFFECTS + @$"Hit{Path.DirectorySeparatorChar}" + @$"Good{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
-			Effects_Hit_Good_Big[i] = TxC(GAME + EFFECTS + @$"Hit{Path.DirectorySeparatorChar}" + @$"Good_Big{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
-		}
 		OpenTaiko.Skin.Game_Effect_Roll_Ptn = OpenTaiko.tSequenceImageSheetCountCount(CSkin.Path(BASE + GAME + EFFECTS + @$"Roll{Path.DirectorySeparatorChar}"));
 		Effects_Roll = new CTexture[OpenTaiko.Skin.Game_Effect_Roll_Ptn];
 		for (int i = 0; i < OpenTaiko.Skin.Game_Effect_Roll_Ptn; i++) {
@@ -819,6 +780,8 @@ class TextureLoader {
 		LuaCharacterDb = new LuaCharacterDatabase(Characters);
 
 		OpenTaiko.Databases?.LoadThemeSettings();
+		CNotesSkins.Scan();
+		LoadNotesSkinTextures();
 		CVirtualSlotManager.Initialize();
 		BootLabel = "";
 
@@ -852,6 +815,118 @@ class TextureLoader {
 		} catch { /* non-fatal: just means next boot reuses the previous estimate */ }
 		#endregion
 	}
+
+	// the textures of the selected notes and judges packs, replaced when another pack is selected
+	private readonly List<CTexture> _notesSkinTextures = new();
+
+	/// <summary>(Re)loads the textures of the selected notes and judges packs (<see cref="CNotesSkins"/>); a skin
+	/// without packs loads its former files.</summary>
+	public void LoadNotesSkinTextures() {
+		foreach (var tex in _notesSkinTextures) {
+			if (tex == null) continue;
+			listTexture.Remove(tex);
+			gameplayTextures.Remove(tex);
+			_warmNeeds.Remove(tex);
+			tex.Dispose();
+		}
+		_notesSkinTextures.Clear();
+		bool collect = _collectGameplay;
+		_collectGameplay = true;
+		try {
+			LoadNotesSkinTexturesCore();
+		} finally {
+			_collectGameplay = collect;
+		}
+	}
+
+	private T? Pack<T>(T? tex) where T : CTexture {
+		if (tex != null) _notesSkinTextures.Add(tex);
+		return tex;
+	}
+
+	private CTexture? PackTx(WarmNeed need, string? rel) => rel == null ? null : Pack(TxCFor(need, rel));
+	private CTexture? PackTxAf(WarmNeed need, string? rel) => rel == null ? null : Pack<CTexture>(TxCAfFor(need, rel));
+
+	private void LoadNotesSkinTexturesCore() {
+		const CNotesSkins.EKind TAIKO = CNotesSkins.EKind.Taiko, BONGO = CNotesSkins.EKind.Bongo, JUDGES = CNotesSkins.EKind.Judges;
+		char sep = Path.DirectorySeparatorChar;
+		bool taikoPacks = CNotesSkins.HasPacks(TAIKO), bongoPacks = CNotesSkins.HasPacks(BONGO);
+		// a Taiko pack's file, or the former file when the skin has no Taiko packs
+		string? T(string rel, string legacy, bool selectedOnly = false)
+			=> taikoPacks ? CNotesSkins.File_(TAIKO, rel, selectedOnly) : legacy;
+		string? B(string rel, string legacy, bool selectedOnly = false)
+			=> bongoPacks ? CNotesSkins.File_(BONGO, rel, selectedOnly) : legacy;
+
+		Notes = new CTexture[2];
+		Rolls = new CTexture[2];
+		HitCircle = new CTexture[2];
+		ChipEffect = new CTexture[2];
+		Notes_Partner = new CTexture[2];
+		Notes_Giant = new CTexture[2];
+
+		Notes[0] = PackTx(WarmNeed.Always, T("Notes.png", GAME + "Notes.png"));
+		Notes[1] = PackTx(WarmNeed.Konga, B("Notes.png", GAME + "Notes_Konga.png"));
+		Rolls[0] = taikoPacks ? PackTx(WarmNeed.Always, T("Rolls.png", "")) : null;
+		Rolls[1] = bongoPacks ? PackTx(WarmNeed.Konga, B("Rolls.png", "")) : null;
+		HitCircle[0] = PackTx(WarmNeed.Always, T("HitCircle.png", GAME + "Notes.png"));
+		HitCircle[1] = bongoPacks ? PackTx(WarmNeed.Konga, CNotesSkins.File_(BONGO, "HitCircle.png", true)) : null;
+		ChipEffect[0] = PackTx(WarmNeed.Always, T("ChipEffect.png", GAME + "ChipEffect.png", true));
+		ChipEffect[1] = bongoPacks ? PackTx(WarmNeed.Konga, CNotesSkins.File_(BONGO, "ChipEffect.png", true)) : null;
+		Notes_Partner[0] = taikoPacks ? PackTx(WarmNeed.Partner, CNotesSkins.File_(TAIKO, "Notes_Partner.png", true)) : null;
+		Notes_Partner[1] = bongoPacks ? PackTx(WarmNeed.Partner, CNotesSkins.File_(BONGO, "Notes_Partner.png", true)) : null;
+		Notes_Giant[0] = taikoPacks ? PackTx(WarmNeed.Giant, CNotesSkins.File_(TAIKO, "Notes_Giant.png", true)) : null;
+		Notes_Giant[1] = bongoPacks ? PackTx(WarmNeed.Giant, CNotesSkins.File_(BONGO, "Notes_Giant.png", true)) : null;
+		if (HitCircle[0] != null) HitCircle[0].bAddBlend = OpenTaiko.Skin.Game_JudgeFrame_AddBlend;
+		if (HitCircle[1] != null) HitCircle[1].bAddBlend = OpenTaiko.Skin.Game_JudgeFrame_AddBlend;
+
+		// the balloons are the Taiko set's whatever the game type
+		Balloons = taikoPacks ? PackTx(WarmNeed.Always, T("Balloons.png", "")) : null;
+		Note_Swap = taikoPacks ? null : PackTx(WarmNeed.Always, GAME + "Swap.png");
+		Note_Kusu = taikoPacks ? null : PackTx(WarmNeed.Always, GAME + "Kusu.png");
+		Note_FuseRoll = taikoPacks ? null : PackTx(WarmNeed.Always, GAME + "FuseRoll.png");
+		Note_Adlib = taikoPacks ? null : PackTx(WarmNeed.Always, GAME + "Adlib.png");
+
+		Balloon_Roll = PackTx(WarmNeed.Always, T("Roll.png", GAME + BALLOON + "Roll.png"));
+		Balloon_Balloon = PackTx(WarmNeed.Always, T("Balloon.png", GAME + BALLOON + "Balloon.png"));
+		Balloon_Breaking = new CTexture[6];
+		Balloon_Breaking_Sheet = null;
+		if (taikoPacks) {
+			Balloon_Breaking_Sheet = PackTx(WarmNeed.Always, T("Breaking.png", ""));
+		} else {
+			for (int i = 0; i < 6; i++)
+				Balloon_Breaking[i] = PackTx(WarmNeed.Always, GAME + BALLOON + "Breaking_" + i + ".png");
+		}
+		Kusudama_Number = PackTx(WarmNeed.Always, T(KUSUDAMA + "Kusudama_Number.png", GAME + BALLOON + KUSUDAMA + "Kusudama_Number.png"));
+		Fuse_Number = PackTx(WarmNeed.Mine, T(FUSE + "Number_Fuse.png", GAME + BALLOON + FUSE + "Number_Fuse.png"));
+		Fuse_Balloon = PackTx(WarmNeed.Mine, T(FUSE + "Fuse.png", GAME + BALLOON + FUSE + "Fuse.png"));
+
+		string hit = GAME + EFFECTS + HIT;
+		Effects_Hit_Explosion = PackTxAf(WarmNeed.Always, T(HIT + "Explosion.png", hit + "Explosion.png"));
+		if (Effects_Hit_Explosion != null) Effects_Hit_Explosion.bAddBlend = OpenTaiko.Skin.Game_Effect_HitExplosion_AddBlend;
+		Effects_Hit_Explosion_Big = PackTx(WarmNeed.Always, T(HIT + "Explosion_Big.png", hit + "Explosion_Big.png"));
+		if (Effects_Hit_Explosion_Big != null) Effects_Hit_Explosion_Big.bAddBlend = OpenTaiko.Skin.Game_Effect_HitExplosionBig_AddBlend;
+		Effects_Hit_FireWorks = PackTx(WarmNeed.Always, T(HIT + "FireWorks.png", hit + "FireWorks.png"));
+		if (Effects_Hit_FireWorks != null) Effects_Hit_FireWorks.bAddBlend = OpenTaiko.Skin.Game_Effect_FireWorks_AddBlend;
+		Effects_Hit_Bomb = PackTxAf(WarmNeed.Mine, T(HIT + "Bomb.png", hit + "Bomb.png"));
+
+		Effects_Hit_Great = new CTexture[15];
+		Effects_Hit_Great_Big = new CTexture[15];
+		Effects_Hit_Good = new CTexture[15];
+		Effects_Hit_Good_Big = new CTexture[15];
+		for (int i = 0; i < 15; i++) {
+			Effects_Hit_Great[i] = PackTx(WarmNeed.Always, T($"{HIT}Great{sep}{i}.png", $"{hit}Great{sep}{i}.png"));
+			Effects_Hit_Great_Big[i] = PackTx(WarmNeed.Always, T($"{HIT}Great_Big{sep}{i}.png", $"{hit}Great_Big{sep}{i}.png"));
+			Effects_Hit_Good[i] = PackTx(WarmNeed.Always, T($"{HIT}Good{sep}{i}.png", $"{hit}Good{sep}{i}.png"));
+			Effects_Hit_Good_Big[i] = PackTx(WarmNeed.Always, T($"{HIT}Good_Big{sep}{i}.png", $"{hit}Good_Big{sep}{i}.png"));
+		}
+
+		Judge = PackTx(WarmNeed.Always, CNotesSkins.HasPacks(JUDGES) ? CNotesSkins.File_(JUDGES, "Judge.png") : GAME + "Judge.png");
+	}
+
+	/// <summary>The kusudama script's folder, relative to Graphics/.</summary>
+	public static string KusudamaFolder()
+		=> CNotesSkins.Dir(CNotesSkins.EKind.Taiko, "Kusudama") is string dir ? dir + Path.DirectorySeparatorChar
+			: GAME + BALLOON + KUSUDAMA;
 
 	public int[] CreateNumberedArrayFromInt(int total) {
 		int[] array = new int[total];
@@ -909,6 +984,7 @@ class TextureLoader {
 		listTexture.Clear();
 		gameplayTextures.Clear();
 		_warmNeeds.Clear();
+		_notesSkinTextures.Clear();
 
 		foreach (var character in Characters) {
 			character.Dispose();
@@ -958,21 +1034,26 @@ class TextureLoader {
 
 	#region 5_演奏画面
 	#region 共通
-	public CTexture Judge_Frame,
-		Note_Mine,
-		Note_Swap,
+	public CTexture Note_Mine,
+		Note_Swap,       // the former layout's purple, ADLib, kusudama and fuse roll sheets (null with a notes pack)
 		Note_Kusu,
 		Note_FuseRoll,
 		Note_Adlib,
+		Balloons,        // a Taiko notes pack's Balloons.png
 		SENotesExtension,
 		Notes_Arm,
-		ChipEffect,
 		ScoreRank,
 		Judge;
 	public CTexture Judge_Meter,
 		Bar,
 		Bar_Branch;
+	// per game type (Taiko, Konga)
 	public CTexture[] Notes,
+		Rolls,           // a notes pack's Rolls.png (null in the former layout, where Notes.png holds the rolls)
+		HitCircle,
+		ChipEffect,
+		Notes_Partner,
+		Notes_Giant,
 		SENotes;
 	#endregion
 
@@ -1031,6 +1112,7 @@ class TextureLoader {
 		Fuse_Balloon;
 
 	public CTexture[] Balloon_Breaking;
+	public CTexture Balloon_Breaking_Sheet;   // a notes pack's Breaking.png: the 6 pictures one above the other
 	#endregion
 	#region エフェクト
 	public CTexture Effects_Hit_Explosion,

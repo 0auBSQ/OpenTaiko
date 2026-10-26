@@ -318,6 +318,24 @@ public static class CConfigOptionBuilder {
 			} else db.SetSetting(def.Id, valueStr);
 		}
 
+		// the notes and judges packs come first, each choice listed when the skin has two packs of its kind or more
+		string secPacks = L("SETTINGS_SECTION_NOTESSKINS", "Notes Skins");
+		foreach (var (kind, key, fallback) in new[] {
+			(CNotesSkins.EKind.Taiko, "SETTINGS_NOTESSKIN_TAIKO", "Notes (Taiko)"),
+			(CNotesSkins.EKind.Bongo, "SETTINGS_NOTESSKIN_BONGO", "Notes (Bongo)"),
+			(CNotesSkins.EKind.Judges, "SETTINGS_JUDGESSKIN", "Judges"),
+		}) {
+			var packs = CNotesSkins.Packs(kind);
+			if (packs.Count < 2) continue;
+			O.Add(CLuaConfigOption.Choice_("Theme", secPacks, L(key, fallback), L(key + "_DESC", ""),
+				packs.Select(p => p.Name).ToArray(), CNotesSkins.SelectedIndex(kind),
+				idx => {
+					CNotesSkins.Select(kind, idx);
+					OpenTaiko.Tx.LoadNotesSkinTextures();
+				},
+				packs.Select(p => CNotesSkins.PreviewPath(kind, p)).ToArray()));
+		}
+
 		// the page lists each section's settings together, sections in the order they first appear
 		var sections = new List<string>();
 		var bySection = new Dictionary<string, List<CThemeSettingDef>>();

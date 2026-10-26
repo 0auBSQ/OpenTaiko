@@ -472,6 +472,7 @@ end
 | `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | Значение настройки области сохранения для игрока с номером от 1 или её значение по умолчанию, если в сохранении значения нет. |
 | `THEME:SetThemeSetting(settingId, value)  -> bool` | Записывает глобальную настройку, объявленную в ThemeSettings.json (настройка сессии хранится только до выхода); false для неизвестного id. |
 | `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | Записывает настройку уровня сохранения для игрока (нумерация с 1); false для неизвестного id. |
+| `THEME:GetNotesSkinFile(kind, file)  -> string` | Путь к файлу выбранного набора вида `kind` (`"taiko"`, `"bongo"` или `"judges"`) относительно папки Graphics скина; если в выбранном наборе файла нет, он берётся из набора 1; пустая строка, если у скина нет такого набора или файла. См. [Добавление наборов нот и оценок](../guides/notes-skins.md). |
 | `THEME:GetSkinString(key)  -> string` | Локализованная строка из папки Locales скина: сначала текущий язык, затем локаль скина по умолчанию, затем `[LOCALE NOT FOUND: key]`. |
 | `THEME:GetDefinitionCount()  -> integer` | Число определений настроек в ThemeSettings.json. |
 | `THEME:GetDefinitionId(index)  -> string` | Идентификатор определения по индексу от 0 или пустая строка. |

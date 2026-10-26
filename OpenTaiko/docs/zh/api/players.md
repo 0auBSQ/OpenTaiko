@@ -472,6 +472,7 @@ PUCHICHARALIST 和 sf:GetPuchichara 返回这些句柄。列表拥有这些纹�
 | `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | 1 起玩家的一个存档范围设置的值；存档没有值时为其默认值。 |
 | `THEME:SetThemeSetting(settingId, value)  -> bool` | 写入 ThemeSettings.json 中声明的全局设置（会话设置只在本次运行中保留）；id 未知时返回 false。 |
 | `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | 为从 1 起的玩家写入存档级设置；id 未知时返回 false。 |
+| `THEME:GetNotesSkinFile(kind, file)  -> string` | `kind`（`"taiko"`、`"bongo"` 或 `"judges"`）所选包中某个文件的路径，相对于皮肤的 Graphics 文件夹；所选包缺少该文件时取自包 1；皮肤没有这种包或文件时为空字符串。见[添加音符包与判定包](../guides/notes-skins.md)。 |
 | `THEME:GetSkinString(key)  -> string` | 来自皮肤 Locales 文件夹的本地化字符串：先查当前语言，再查皮肤的默认区域设置，然后是 `[LOCALE NOT FOUND: key]`。 |
 | `THEME:GetDefinitionCount()  -> integer` | ThemeSettings.json 中设置定义的数量。 |
 | `THEME:GetDefinitionId(index)  -> string` | 0 起索引处定义的 id，或空字符串。 |

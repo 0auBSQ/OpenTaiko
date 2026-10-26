@@ -9,6 +9,7 @@
   - [Ajouter des puchicharas](guides/puchicharas.md)
   - [Ajouter des plaques de nom](guides/nameplates.md)
   - [Ajouter des skins et des thèmes](guides/skins.md)
+  - [Ajouter des packs de notes et de jugements](guides/notes-skins.md)
   - [Déblocage de partitions](guides/unlockables.md)
   - [Référence des déblocages](guides/unlockables-reference.md)
 

@@ -9,6 +9,7 @@
   - [Puchichara's toevoegen](guides/puchicharas.md)
   - [Naamplaatjes toevoegen](guides/nameplates.md)
   - [Skins en thema's toevoegen](guides/skins.md)
+  - [Noten- en beoordelingspakketten toevoegen](guides/notes-skins.md)
   - [Ontgrendelvoorwaarden voor charts](guides/unlockables.md)
   - [Referentie voor ontgrendelvoorwaarden](guides/unlockables-reference.md)
 

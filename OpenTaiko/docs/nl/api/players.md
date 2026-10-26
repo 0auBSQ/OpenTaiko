@@ -472,6 +472,7 @@ De skin declareert thema-instellingen in ThemeSettings.json en slaat hun waarden
 | `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | Waarde van een instelling met save-scope voor de 1-gebaseerde speler, of haar standaardwaarde als het opslagbestand geen waarde heeft. |
 | `THEME:SetThemeSetting(settingId, value)  -> bool` | Schrijft een in ThemeSettings.json gedeclareerde globale instelling (een sessie-instelling blijft alleen voor deze run bewaard); false bij een onbekend id. |
 | `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | Schrijft een save-gebonden instelling voor de 1-gebaseerde speler; false bij een onbekend id. |
+| `THEME:GetNotesSkinFile(kind, file)  -> string` | Pad van een bestand van het geselecteerde pakket van `kind` (`"taiko"`, `"bongo"` of `"judges"`), relatief ten opzichte van de map Graphics van de skin, genomen uit pakket 1 wanneer het geselecteerde pakket het mist; een lege string wanneer de skin zo'n pakket of bestand niet heeft. Zie [Noten- en beoordelingspakketten toevoegen](../guides/notes-skins.md). |
 | `THEME:GetSkinString(key)  -> string` | Gelokaliseerde string uit de map Locales van de skin: eerst de huidige taal, dan de standaardlocale van de skin, dan `[LOCALE NOT FOUND: key]`. |
 | `THEME:GetDefinitionCount()  -> integer` | Aantal instellingsdefinities in ThemeSettings.json. |
 | `THEME:GetDefinitionId(index)  -> string` | Id van de definitie op een 0-gebaseerde index, of een lege string. |

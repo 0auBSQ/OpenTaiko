@@ -9,6 +9,7 @@
   - [Adding puchicharas](guides/puchicharas.md)
   - [Adding nameplates](guides/nameplates.md)
   - [Adding skins and themes](guides/skins.md)
+  - [Adding notes and judges packs](guides/notes-skins.md)
   - [Chart unlockables](guides/unlockables.md)
   - [Unlockables reference](guides/unlockables-reference.md)
 

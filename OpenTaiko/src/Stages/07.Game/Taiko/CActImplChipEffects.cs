@@ -93,22 +93,14 @@ internal class CActImplChipEffects : CActivity {
 						break;
 				}
 
-				if (OpenTaiko.Tx.ChipEffect != null) {
-					// TODO: Generate chip effect from note image?
-					int laneXOffset = NotesManager.IsPurpleNoteTaiko(st.Lane, st.GameType) ? NotesManager.NoteTextureColumnFast(NotesManager.ENoteType.DonBig)
-						: (st.GameType is EGameType.Konga || st.Lane > NotesManager.ENoteType.KaBig) ? NotesManager.NoteTextureColumnFast(NotesManager.ENoteType.Don)
-						: NotesManager.NoteTextureColumnFast(st.Lane);
-
-					if (st.ctChipEffect.CurrentValue < 12) {
-						OpenTaiko.Tx.ChipEffect.color4 = new Color4(1.0f, 1.0f, 0.0f, 1.0f);
-						OpenTaiko.Tx.ChipEffect.Opacity = (int)(st.ctChipEffect.CurrentValue * (float)(225 / 11));
-						OpenTaiko.Tx.ChipEffect.t2DCenterBasedDraw(OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[st.nPlayer], OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[st.nPlayer], new Rectangle(laneXOffset * OpenTaiko.Skin.Game_Notes_Size[0], 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
-					}
-					if (st.ctChipEffect.CurrentValue > 12 && st.ctChipEffect.CurrentValue < 24) {
-						OpenTaiko.Tx.ChipEffect.color4 = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
-						OpenTaiko.Tx.ChipEffect.Opacity = 255 - (int)((st.ctChipEffect.CurrentValue - 10) * (float)(255 / 14));
-						OpenTaiko.Tx.ChipEffect.t2DCenterBasedDraw(OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[st.nPlayer], OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[st.nPlayer], new Rectangle(laneXOffset * OpenTaiko.Skin.Game_Notes_Size[0], 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
-					}
+				{
+					int fx = OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[st.nPlayer], fy = OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[st.nPlayer];
+					if (st.ctChipEffect.CurrentValue < 12)
+						NotesManager.DisplayChipEffect(fx, fy, st.Lane, st.GameType, new Color4(1.0f, 1.0f, 0.0f, 1.0f),
+							(int)(st.ctChipEffect.CurrentValue * (float)(225 / 11)));
+					if (st.ctChipEffect.CurrentValue > 12 && st.ctChipEffect.CurrentValue < 24)
+						NotesManager.DisplayChipEffect(fx, fy, st.Lane, st.GameType, new Color4(1.0f, 1.0f, 1.0f, 1.0f),
+							255 - (int)((st.ctChipEffect.CurrentValue - 10) * (float)(255 / 14)));
 				}
 
 			}
