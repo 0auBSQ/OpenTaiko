@@ -1,0 +1,23 @@
+{
+    "_note": "Intro Nokon timings, in seconds unless the key says otherwise; angles in degrees.",
+    "curtain_s": 0.9,
+    "opening": {
+        "_note": "The closed curtain waits wait_s, splits open over curtain_s, then the menu waits post_open_s. The chosen button flashes (one way over flash_half_s); the light turns once every light_turn_s; every jiggle_delay_s plus up to jiggle_delay_spread_s (random) the logo rocks by jiggle_deg over jiggle_s.",
+        "wait_s": 1.5,
+        "post_open_s": 2,
+        "flash_half_s": 0.6,
+        "light_turn_s": 6,
+        "jiggle_delay_s": 6,
+        "jiggle_delay_spread_s": 1,
+        "jiggle_s": 0.5,
+        "jiggle_deg": 4
+    },
+    "setup": {
+        "_note": "A roll's item zooms over zoom_s; Go flashes (one way over go_flash_half_s); an error shows for error_s.",
+        "zoom_s": 0.12,
+        "go_flash_half_s": 0.5,
+        "error_s": 5
+    },
+    "game": { "_note": "The genre shows this long before its song starts.", "genre_reveal_s": 1 },
+    "dialogue": { "_note": "Nokon slides in and out over slide_s; the text types chars_per_s letters a second.", "slide_s": 0.4, "chars_per_s": 28 }
+}

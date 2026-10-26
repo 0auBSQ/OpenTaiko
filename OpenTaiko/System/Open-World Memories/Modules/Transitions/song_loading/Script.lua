@@ -6,10 +6,16 @@
 --   fadeIn(t)             reveal the loaded game screen (t 0→1), or song select after ESC
 -- The C# loader (CStageSongLoading) runs the actual load + reports `progress` (0..1); everything drawn here.
 
+-- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local BAR = Layout.bar
+
 -- Fade durations (seconds) for this transition; the engine reads these globals (default is 0.5s elsewhere).
 -- The song-select → gameplay flow reads better with a slightly slower 1s curtain in + reveal out.
-FADE_OUT_SECONDS = 1.0
-FADE_IN_SECONDS  = 1.0
+FADE_OUT_SECONDS = Animation.fade_out_s
+FADE_IN_SECONDS  = Animation.fade_in_s
 
 local TA = require("TransitionArt")
 local PlayStrings = require("PlayStrings")
@@ -42,15 +48,15 @@ local luaPhase     = nil                      -- "out" | "load" | "in" — used 
 local wait         = TA.new()
 
 -- Tuning (mirrors the old ROActivity)
-local SLIDE_DURATION, SLIDE_STAGGER = 0.35, 0.28
-local TOWER_SCROLL_SPEED, TOWER_SCROLL_MAX = 20, 120
-local DAN_SCROLL_SPEED, DAN_SCROLL_MAX = 20, 60
+local SLIDE_DURATION, SLIDE_STAGGER = Animation.slide.duration_s, Animation.slide.stagger_s
+local TOWER_SCROLL_SPEED, TOWER_SCROLL_MAX = Animation.tower_scroll.speed_px_per_s, Animation.tower_scroll.max
+local DAN_SCROLL_SPEED, DAN_SCROLL_MAX = Animation.dan_scroll.speed_px_per_s, Animation.dan_scroll.max
 
--- Skin layout (1920x1080, centered) — from SongLoadingConfig.ini
-local PLATE_X, PLATE_Y      = 960, 540
-local TITLE_X, TITLE_Y      = 960, 420
-local SUBTITLE_X, SUBTITLE_Y = 960, 487
-local DANPLATE_X, DANPLATE_Y = 1682, 320
+-- Skin layout (1920x1080, centered)
+local PLATE_X, PLATE_Y      = Layout.plate.x, Layout.plate.y
+local TITLE_X, TITLE_Y      = Layout.title.x, Layout.title.y
+local SUBTITLE_X, SUBTITLE_Y = Layout.subtitle.x, Layout.subtitle.y
+local DANPLATE_X, DANPLATE_Y = Layout.danplate.x, Layout.danplate.y
 
 -- ── helpers ──────────────────────────────────────────────────────────────────
 local function rect(x, y, w, h, r, g, b, a)
@@ -122,14 +128,15 @@ local function setup_characters()
 	slot_w = res_w / math.max(1, player_count)
 	if mode ~= "normal" then return end
 
-	local stagger = (player_count > 1) and math.min(SLIDE_STAGGER, 0.7 / (player_count - 1)) or 0.0
+	local stagger = (player_count > 1) and math.min(SLIDE_STAGGER, Animation.slide.stagger_total_s / (player_count - 1)) or 0.0
+	local easing = Animation.slide.easing
 	for i = 1, player_count do
 		local chara = CHARACTER:GetPlayerCharacter(i - 1)
 		chara:LoadAnimation(CHARACTER.ANIM_RENDER)
-		chara:SetOpacity(0.3)
+		chara:SetOpacity(Layout.characters.opacity)
 		characters[i] = chara
 		local cnt = COUNTER:CreateCounterDuration(0.0, 1.0, SLIDE_DURATION)
-		cnt:SetEasing("OUT", "QUAD")
+		cnt:SetEasing(easing[1], easing[2])
 		slide_infos[i] = {
 			counter  = cnt,
 			delay    = (i - 1) * stagger,
@@ -221,7 +228,8 @@ local function draw_characters(opacity)
 			chara:Update(CHARACTER.ANIM_RENDER, true)
 			local rs = chara:GetAnimationSize(CHARACTER.ANIM_RENDER)
 			local render_w, render_h = rs.X, rs.Y
-			local scale = (render_h > 1450) and (1450.0 / render_h) or 1.0
+			local maxH = Layout.characters.max_height
+			local scale = (render_h > maxH) and (maxH / render_h) or 1.0
 			local scaled_w, scaled_h = render_w * scale, render_h * scale
 			local crop_w = math.min(slot_w, scaled_w)
 			local crop_h = math.min(res_h, scaled_h)
@@ -229,9 +237,9 @@ local function draw_characters(opacity)
 			local off_y = math.max(0.0, (scaled_h - crop_h) / 2.0)
 			chara:SetScale(scale, scale)
 			chara:DrawRectAtAnchor(slot_x, 0, crop_w, crop_h, CHARACTER.ANIM_RENDER, opacity, off_x, off_y)
-			local np_w = 384
+			local np_w = Layout.nameplate.width
 			local np_x = math.floor(slot_x + (slot_w - np_w) / 2)
-			NAMEPLATE:DrawPlayerNameplate(np_x, res_h - 200, opacity, i - 1)
+			NAMEPLATE:DrawPlayerNameplate(np_x, res_h - Layout.nameplate.bottom_offset, opacity, i - 1)
 		end
 	end
 end
@@ -256,12 +264,14 @@ local function draw_screen(progress, alpha, showBar)
 	end
 
 	if showBar then   -- progress bar (bottom centre)
-		local barW, barH = 640, 14
-		local bx, by = res_w / 2 - barW / 2, res_h - 70
+		local barW, barH = BAR.width, BAR.height
+		local bx, by = res_w / 2 - barW / 2, res_h - BAR.bottom_offset
 		local p = math.max(0, math.min(1, progress or 0))
-		rect(bx - 2, by - 2, barW + 4, barH + 4, 1, 1, 1, 0.25)
-		rect(bx, by, barW, barH, 0.12, 0.12, 0.12, 1.0)
-		rect(bx, by, barW * p, barH, 0.95, 0.62, 0.10, 1.0)
+		local b = BAR.border
+		local bc, tc, fc = BAR.border_color, BAR.track_color, BAR.fill_color
+		rect(bx - b, by - b, barW + 2 * b, barH + 2 * b, bc[1], bc[2], bc[3], BAR.border_opacity)
+		rect(bx, by, barW, barH, tc[1], tc[2], tc[3], BAR.track_opacity)
+		rect(bx, by, barW * p, barH, fc[1], fc[2], fc[3], BAR.fill_opacity)
 	end
 end
 
@@ -287,8 +297,8 @@ function fadeIn(t)
 end
 
 function onStart()
-	titleFont    = TEXT:Create(46)
-	subtitleFont = TEXT:Create(30)
+	titleFont    = TEXT:Create(Layout.title.font_size)
+	subtitleFont = TEXT:Create(Layout.subtitle.font_size)
 end
 
 function onDestroy()

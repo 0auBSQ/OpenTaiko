@@ -1,0 +1,22 @@
+{
+    "_note": "Default transition layout, in 1920x1080 pixels. Colours are [r, g, b] from 0 to 1, opacities 0 to 1.",
+    "cover_scale": 8000,
+    "loading_text": {
+        "font_size": 28,
+        "x": 960,
+        "y": 500
+    },
+    "bar": {
+        "center_x": 960,
+        "y": 560,
+        "width": 640,
+        "height": 16,
+        "border": 2,
+        "border_color": [1, 1, 1],
+        "border_opacity": 0.25,
+        "track_color": [0.15, 0.15, 0.15],
+        "track_opacity": 1.0,
+        "fill_color": [0.95, 0.62, 0.10],
+        "fill_opacity": 1.0
+    }
+}

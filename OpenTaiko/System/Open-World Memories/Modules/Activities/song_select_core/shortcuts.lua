@@ -10,6 +10,9 @@
 --   SC.open()    SC.isOpen()   SC.update(ts)    SC.draw(opacity)   SC.dispose()
 
 local PopUI = require("PopUI")
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local P      = Layout.shortcuts
 
 local M = {}
 local G
@@ -133,22 +136,12 @@ end
 -- ── the help panel ───────────────────────────────────────────────────────────
 
 local SW, SH = 1920, 1080
-local PANEL_W, ROW_H, HEAD_H, FOOT_H = 1040, 46, 96, 70
-local KEY_COL_W = 190
-local THEME_UI = {
-    colors = {
-        surface  = { 250, 252, 255, 255 }, surface2 = { 230, 236, 244, 255 },
-        primary  = { 96, 132, 180, 255 },  primary2 = { 72, 108, 156, 255 },
-        accent   = { 126, 196, 200, 255 }, accent2  = { 96, 168, 176, 255 },
-        outline  = { 70, 84, 104, 255 },   text = { 44, 56, 74, 255 }, textOnAccent = { 255, 255, 255, 255 },
-    },
-    font = { small = 18, label = 22, button = 22, title = 30 },
-}
-local CLOSE_STYLE = {
-    radius = 40,
-    colors = { primary = { 208, 62, 56, 255 }, primary2 = { 158, 34, 30, 255 },
-               outline = { 96, 24, 20, 255 }, textOnAccent = { 255, 255, 255, 255 } },
-}
+local PANEL_W, ROW_H, HEAD_H, FOOT_H = P.panel_w, P.row_h, P.head_h, P.foot_h
+local KEY_COL_W = P.key_col_w
+local THEME_UI = Config.plain(P.theme)
+local CLOSE_STYLE = Config.plain(P.close_style)
+local CloseX, CloseButton = P.close_x, P.close_button
+local DIM = P.dim_color
 
 local ui = nil
 local open = false
@@ -171,10 +164,10 @@ local function buildPanel()
         sfx = { click = function() G.sounds.Decide:Play() end, hover = function() G.sounds.Skip:Play() end },
     }
     ui:panel{ x = panel.x, y = panel.y, w = panel.w, h = panel.h, title = tr("SONGSELECT_SHORTCUTS_TITLE", "Shortcuts") }
-    ui:button{ text = "×", x = panel.x + panel.w - 62, y = panel.y - 14, w = 60, h = 60, accent = true,
+    ui:button{ text = "×", x = panel.x + panel.w - CloseX.right, y = panel.y + CloseX.y, w = CloseX.size, h = CloseX.size, accent = true,
                style = CLOSE_STYLE, onClick = function() wantClose = true end, sfx = { click = "" } }
-    local btn = ui:button{ text = tr("SONGSELECT_SHORTCUTS_CLOSE", "Close"), w = 260, h = 56, accent = true,
-                           x = panel.x + math.floor((panel.w - 260) / 2), y = panel.y + panel.h - FOOT_H + 6,
+    local btn = ui:button{ text = tr("SONGSELECT_SHORTCUTS_CLOSE", "Close"), w = CloseButton.w, h = CloseButton.h, accent = true,
+                           x = panel.x + math.floor((panel.w - CloseButton.w) / 2), y = panel.y + panel.h - FOOT_H + CloseButton.y,
                            onClick = function() wantClose = true end }
     btn.onDecide = function(self) self:keyActivate() end
 end
@@ -206,13 +199,13 @@ end
 
 function M.draw(opacity)
     if not open or ui == nil then return end
-    ui:rect(0, 0, SW, SH, 8, 10, 18, 150)
+    ui:rect(0, 0, SW, SH, DIM[1], DIM[2], DIM[3], DIM[4])
     ui:draw()
     local y = panel.y + HEAD_H
-    local kx = panel.x + 40 + KEY_COL_W
+    local kx = panel.x + P.key_x + KEY_COL_W
     for _, l in ipairs(lines) do
-        ui:drawTextEx(22, l.key, kx, y, { 72, 108, 156 }, { 255, 255, 255, 160 }, 1, 1, KEY_COL_W, "topright")
-        ui:drawTextEx(22, l.text, kx + 28, y, { 44, 56, 74 }, { 255, 255, 255, 160 }, 1, 1, panel.w - KEY_COL_W - 110)
+        ui:drawTextEx(P.font_size, l.key, kx, y, P.key_color, P.text_outline_color, 1, 1, KEY_COL_W, "topright")
+        ui:drawTextEx(P.font_size, l.text, kx + P.text_gap, y, P.text_color, P.text_outline_color, 1, 1, panel.w - KEY_COL_W - P.text_right_margin)
         y = y + ROW_H
     end
 end

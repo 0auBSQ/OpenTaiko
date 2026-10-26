@@ -1,0 +1,17 @@
+{
+    "_note": "Secret Vault wooden gate timings, in seconds. shut_s: the fade-out, the halves swinging shut; the fade-in is a last rattle for hold_s, then the halves swing open over open_s. The stage counts as in view cover_at (part of the opening) into it, the halves nearly edge-on at the sides.",
+    "shut_s": 0.75,
+    "hold_s": 0.25,
+    "open_s": 0.8,
+    "cover_at": 0.8,
+    "rattle": {
+        "_note": "after the thud, for length_s: the halves bounce back by bounce (part of shut), decaying at bounce_decay per second, at bounce_freq radians per second; the seam rattles sideways by wobble, decaying at wobble_decay, at wobble_freq",
+        "length_s": 0.7,
+        "bounce": 0.035,
+        "bounce_decay": 6,
+        "bounce_freq": 13,
+        "wobble": 0.003,
+        "wobble_decay": 8,
+        "wobble_freq": 55
+    }
+}

@@ -3,7 +3,8 @@
 --
 -- local water = VaultWater.new{ w = 1920, h = 1080 }   -- water.ok is false when the shader cannot run (CPU
 --                                                       -- renderer, compile failure): the caller draws its own picture
---                                                       -- (scale = render size against the drawn size, 2/3 if left out)
+--                                                       -- (scale = render size against the drawn size, the
+--                                                       -- layout's render_scale if left out)
 -- water:update(dt)                     -- dt = real seconds since the last frame (frames slower than 0.5 s count 0.5)
 -- water:drawUnderwater(opacity)        -- full screen, seen from inside the water
 -- water:drawSurface(y, opacity)        -- water below a wavy surface line at screen y; above it nothing is drawn
@@ -17,22 +18,25 @@
 -- The draw calls return false when nothing was drawn. Above a surface line and below a lower edge the frame is
 -- transparent, so what was drawn before shows through.
 
+-- sizes and colours: Config/VaultWater/layout.json; motion: Config/VaultWater/animation.json
+local HERE = require("Core.Here")(...)
+local Config = require("Core.Config")
+local Layout = Config.load(HERE .. "Config/VaultWater/layout.json")
+local Animation = Config.load(HERE .. "Config/VaultWater/animation.json")
+
 local VaultWater = {}
 VaultWater.__index = VaultWater
 
-local SCALE = 2 / 3                   -- render size against the drawn size
-local EDGE = 4                        -- the frame reaches this far past the drawn area: its texture wraps, so its
+local SCALE = Layout.render_scale     -- render size against the drawn size
+local EDGE = Layout.edge_px           -- the frame reaches this far past the drawn area: its texture wraps, so its
                                       -- outermost rows blend with the opposite side when scaled up
+local CULL = Layout.cull_margin_px
 local NONE = 100000                   -- a surface or an edge this far off the screen is not drawn
+local MAX_DT = Animation.max_frame_s
 
-local LOOK = {
-    deep    = { 0.010, 0.060, 0.150 },
-    mid     = { 0.030, 0.270, 0.420 },
-    shallow = { 0.160, 0.600, 0.700 },
-    sky     = { 0.820, 0.960, 1.000 },
-    foam    = { 0.930, 0.990, 1.000 },
-    caustics = 0.42, shafts = 0.34, specks = 0.85, waves = 15,
-}
+local Look = Layout.look
+local DEEP, MID, SHALLOW, SKY, FOAM = Look.deep_color, Look.mid_color, Look.shallow_color, Look.sky_color, Look.foam_color
+local WAVES = Animation.waves_px
 
 local SHADER = [==[
 // psrdnoise (c) Stefan Gustavson and Ian McEwan, ver. 2021-12-02, published under the MIT license:
@@ -264,21 +268,21 @@ void main() {
 local function clampDt(dt)
     dt = tonumber(dt) or 0
     if dt < 0 then return 0 end
-    if dt > 0.5 then return 0.5 end
+    if dt > MAX_DT then return MAX_DT end
     return dt
 end
 
 local function setLook(s)
-    s:SetSkyUniform(2, LOOK.deep[1], LOOK.deep[2], LOOK.deep[3], LOOK.caustics)
-    s:SetSkyUniform(3, LOOK.mid[1], LOOK.mid[2], LOOK.mid[3], LOOK.shafts)
-    s:SetSkyUniform(4, LOOK.shallow[1], LOOK.shallow[2], LOOK.shallow[3], LOOK.specks)
+    s:SetSkyUniform(2, DEEP[1], DEEP[2], DEEP[3], Look.caustics)
+    s:SetSkyUniform(3, MID[1], MID[2], MID[3], Look.shafts)
+    s:SetSkyUniform(4, SHALLOW[1], SHALLOW[2], SHALLOW[3], Look.specks)
 end
 
 function VaultWater.new(opts)
     opts = opts or {}
     local t0 = 100 * math.random()
     local self = setmetatable({ ok = false, w = opts.w or 1920, h = opts.h or 1080, t = t0, ti = t0,
-        seed = math.floor(1000 * math.random()), dx = 0, dy = 0, waves = LOOK.waves, froth = 1, churn = 1,
+        seed = math.floor(1000 * math.random()), dx = 0, dy = 0, waves = WAVES, froth = 1, churn = 1,
         last = nil }, VaultWater)
     if SCENE3D == nil then return self end
     local scale = math.max(0.25, math.min(1, tonumber(opts.scale) or SCALE))
@@ -318,7 +322,7 @@ function VaultWater:setDrift(x, y)
 end
 
 function VaultWater:setSwell(waves, froth, churn)
-    self.waves, self.froth = tonumber(waves) or LOOK.waves, tonumber(froth) or 1
+    self.waves, self.froth = tonumber(waves) or WAVES, tonumber(froth) or 1
     self.churn = math.max(0, tonumber(churn) or 1)
 end
 
@@ -332,8 +336,8 @@ function VaultWater:render(top, bottom)
     local ok = pcall(function()
         s:SetSkyUniform(0, 1, top, bottom, self.seed)
         s:SetSkyUniform(1, 0, self.dx, self.dy, self.ti)
-        s:SetSkyUniform(5, LOOK.foam[1], LOOK.foam[2], LOOK.foam[3], self.waves)
-        s:SetSkyUniform(6, LOOK.sky[1], LOOK.sky[2], LOOK.sky[3], self.froth)
+        s:SetSkyUniform(5, FOAM[1], FOAM[2], FOAM[3], self.waves)
+        s:SetSkyUniform(6, SKY[1], SKY[2], SKY[3], self.froth)
         s:SetTime(self.t)
         s:Render()
         s:Upload()
@@ -348,7 +352,7 @@ function VaultWater:drawBody(top, bottom, opacity)
     if opacity <= 0 then return false end
     top = top or -NONE
     bottom = bottom or NONE
-    if bottom <= top or top >= self.h + 60 or bottom <= -60 then return false end
+    if bottom <= top or top >= self.h + CULL or bottom <= -CULL then return false end
     if not self:render(top, bottom) then return false end
     local s = self.scene
     s:SetColor(1, 1, 1)

@@ -1,5 +1,10 @@
 local NavInput = require("NavInput")
 
+-- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+
 -- Reactive once the enter animation is done
 local reactive = false
 local player = 0
@@ -34,35 +39,43 @@ local sounds = {}
 -- Animations and counters
 local ctx = {}
 
-local bgpos = 1080
+local SLIDE = Animation.slide
+local SLIDE_DIST = SLIDE.distance_px
+local SLIDE_STEP = SLIDE.duration_s / SLIDE_DIST   -- the counter's seconds per pixel of the slide
+
+local bgpos = SLIDE_DIST
 local bgtlop = 0
 
 -- ============================================================
 -- UI Layout Constants
 -- ============================================================
-local MENU_TITLE_X          = 80    -- X of the "Mod Select" title
-local MENU_TITLE_Y          = 60     -- Y of the title
-local MENU_ORIGIN_Y         = 150    -- Y of the first option row
-local MENU_OPTION_SPACING_Y = 82     -- Vertical gap between option rows
-local MENU_LABEL_X          = 80    -- X of the option name label
-local MENU_CHOICES_ORIGIN_X = 440    -- X where choices/values start
-local MENU_CHOICE_SPACING_X = 155    -- Horizontal gap between individual choices
-local MENU_FOOTER_Y         = 835    -- Y of the OK / Cancel row
-local MENU_OK_X             = 580    -- X of the OK button
-local MENU_CANCEL_X         = 780    -- X of the Cancel button
-local MENU_DESC_Y           = 950    -- Y of the description line at the bottom
-local MENU_DESC_X           = 80    -- X of the description line
+local OPTIONS = Layout.options
+local FOOTER = Layout.footer
+local TILE = Layout.background_tile
+local MENU_TITLE_X          = Layout.title.x
+local MENU_TITLE_Y          = Layout.title.y
+local MENU_ORIGIN_Y         = OPTIONS.y            -- Y of the first option row
+local MENU_OPTION_SPACING_Y = OPTIONS.spacing_y    -- Vertical gap between option rows
+local MENU_LABEL_X          = OPTIONS.label_x      -- X of the option name label
+local MENU_CHOICES_ORIGIN_X = OPTIONS.choices_x    -- X where choices/values start
+local MENU_CHOICE_SPACING_X = OPTIONS.choice_spacing_x    -- Horizontal gap between individual choices
+local MENU_FOOTER_Y         = FOOTER.y             -- Y of the OK / Cancel row
+local MENU_OK_X             = FOOTER.ok_x          -- X of the OK button
+local MENU_CANCEL_X         = FOOTER.cancel_x      -- X of the Cancel button
+local MENU_DESC_Y           = Layout.description.y -- Y of the description line at the bottom
+local MENU_DESC_X           = Layout.description.x -- X of the description line
 
 -- ============================================================
 -- Color palette (hex strings for COLOR:CreateColorFromHex)
 -- ============================================================
-local COL_WHITE      = "FFFFFFFF"
-local COL_GRAY       = "FF777777"
-local COL_HIGHLIGHT  = "FFF2CF01"   -- selected option label
-local COL_GREEN      = "FF00DD00"
-local COL_LIGHTGREEN = "FF88EE88"
-local COL_ORANGE     = "FFFFAA00"
-local COL_RED        = "FFFF5555"
+local COLORS = Layout.colors
+local COL_WHITE      = COLORS.white_color
+local COL_GRAY       = COLORS.gray_color
+local COL_HIGHLIGHT  = COLORS.highlight_color   -- selected option label
+local COL_GREEN      = COLORS.green_color
+local COL_LIGHTGREEN = COLORS.light_green_color
+local COL_ORANGE     = COLORS.orange_color
+local COL_RED        = COLORS.red_color
 
 -- ============================================================
 -- Static option definitions (choices, colors, per-choice desc)
@@ -190,7 +203,7 @@ end
 
 local function updateTransitionVisuals(val)
     bgpos = val
-    local bgOpacity = 255 - (val * (255 / 540))
+    local bgOpacity = 255 - (val * (255 / SLIDE.fade_distance_px))
     bgtlop = math.max(0, math.min(255, bgOpacity))
 end
 
@@ -199,9 +212,9 @@ end
 -- ============================================================
 local function drawBg(opacity)
     tx["bgtile"]:SetOpacity((opacity * bgtlop) / 255)
-    for i = 0, 10, 1 do
-        for j = 0, 10, 1 do
-            tx["bgtile"]:Draw(i * 192, j * 108)
+    for i = 0, TILE.columns - 1, 1 do
+        for j = 0, TILE.rows - 1, 1 do
+            tx["bgtile"]:Draw(i * TILE.step_x, j * TILE.step_y)
         end
     end
 end
@@ -302,18 +315,18 @@ end
 -- Draw
 -- ============================================================
 function draw()
-    drawBg(0.5)
+    drawBg(TILE.opacity)
     tx["bg"]:SetOpacity(bgtlop / 255)
     tx["bg"]:Draw(0, bgpos)
 
     tx["player"..player]:SetOpacity(bgtlop / 255)
-    tx["player"..player]:DrawAtAnchor(1920,1080+bgpos,"bottomright")
+    tx["player"..player]:DrawAtAnchor(Layout.player_art.x,Layout.player_art.y+bgpos,"bottomright")
 
     if bgtlop == 0 then return end
     local alpha = bgtlop / 255
 
     -- Title
-    local titleTx = textLarge:GetText("Mod Select", false, 800)
+    local titleTx = textLarge:GetText("Mod Select", false, Layout.title.max_w)
     titleTx:SetOpacity(alpha)
     titleTx:Draw(MENU_TITLE_X, MENU_TITLE_Y)
 
@@ -329,7 +342,7 @@ function draw()
         -- Label (highlighted when row is selected in step 1 or being edited in step 2)
         local labelCol = isSel and COLOR:CreateColorFromHex(COL_HIGHLIGHT)
                                 or COLOR:CreateColorFromHex(COL_WHITE)
-        local labelTx = text:GetText(opt.text, false, 340, labelCol)
+        local labelTx = text:GetText(opt.text, false, OPTIONS.label_max_w, labelCol)
         labelTx:SetOpacity(alpha)
         labelTx:Draw(MENU_LABEL_X, ypos)
 
@@ -338,7 +351,7 @@ function draw()
             -- Single value display; highlighted when being edited
             local valCol = isEdit and COLOR:CreateColorFromHex(COL_HIGHLIGHT)
                                    or COLOR:CreateColorFromHex(COL_WHITE)
-            local valTx = text:GetText(scrollSpeedDisplay(opt.value), false, 200, valCol)
+            local valTx = text:GetText(scrollSpeedDisplay(opt.value), false, OPTIONS.value_max_w, valCol)
             valTx:SetOpacity(alpha)
             valTx:Draw(MENU_CHOICES_ORIGIN_X, ypos)
         else
@@ -360,7 +373,7 @@ function draw()
                     choiceCol = COLOR:CreateColorFromHex(COL_GRAY)
                 end
 
-                local choiceTx = text:GetText(choice.label, false, opt.spacing - 10, choiceCol)
+                local choiceTx = text:GetText(choice.label, false, opt.spacing - OPTIONS.choice_padding, choiceCol)
                 choiceTx:SetOpacity(alpha)
                 choiceTx:Draw(xpos, ypos)
                 xpos = xpos + opt.spacing
@@ -376,8 +389,8 @@ function draw()
     local canCol = (selectedIndex == CANCEL_INDEX) and COLOR:CreateColorFromHex(COL_HIGHLIGHT)
                                                    or  COLOR:CreateColorFromHex(COL_WHITE)
 
-    local okTx  = text:GetText("OK",     false, 200, okCol)
-    local canTx = text:GetText("Cancel", false, 200, canCol)
+    local okTx  = text:GetText("OK",     false, FOOTER.button_max_w, okCol)
+    local canTx = text:GetText("Cancel", false, FOOTER.button_max_w, canCol)
     okTx:SetOpacity(alpha)
     canTx:SetOpacity(alpha)
     okTx:Draw(MENU_OK_X,     MENU_FOOTER_Y)
@@ -388,7 +401,7 @@ function draw()
     -- --------------------------------------------------------
     local descStr = getCurrentDesc()
     if descStr and descStr ~= "" then
-        local descTx = textSmall:GetText(descStr, false, 1550)
+        local descTx = textSmall:GetText(descStr, false, Layout.description.max_w)
         descTx:SetOpacity(alpha)
         descTx:Draw(MENU_DESC_X, MENU_DESC_Y)
     end
@@ -422,7 +435,7 @@ function update()
             if selectedIndex == OK_INDEX then
                 sounds.Decide:Play()
                 reactive = false
-                startCounter("screen_transition", 0, 1080, 0.5/1080, "none", updateTransitionVisuals, function()
+                startCounter("screen_transition", 0, SLIDE_DIST, SLIDE_STEP, "none", updateTransitionVisuals, function()
                     saveOptions()
                     DEACTIVATE()
                 end)
@@ -430,7 +443,7 @@ function update()
             elseif selectedIndex == CANCEL_INDEX then
                 sounds.Cancel:Play()
                 reactive = false
-                startCounter("screen_transition", 0, 1080, 0.5/1080, "none", updateTransitionVisuals, function()
+                startCounter("screen_transition", 0, SLIDE_DIST, SLIDE_STEP, "none", updateTransitionVisuals, function()
                     DEACTIVATE()
                 end)
 
@@ -444,7 +457,7 @@ function update()
             -- Escape from menu without saving
             sounds.Cancel:Play()
             reactive = false
-            startCounter("screen_transition", 0, 1080, 0.5/1080, "none", updateTransitionVisuals, function()
+            startCounter("screen_transition", 0, SLIDE_DIST, SLIDE_STEP, "none", updateTransitionVisuals, function()
                 DEACTIVATE()
             end)
         end
@@ -516,7 +529,7 @@ function activate(pl, restrict)
     sounds.Decide    = SHARED:GetSharedSound("Decide")
     sounds.SongDecide = SHARED:GetSharedSound("SongDecide")
 
-    startCounter("screen_transition", 1080, 0, -0.5/1080, "none", updateTransitionVisuals, function()
+    startCounter("screen_transition", SLIDE_DIST, 0, -SLIDE_STEP, "none", updateTransitionVisuals, function()
         reactive = true
     end)
 end
@@ -529,9 +542,9 @@ function deactivate()
 end
 
 function onStart()
-    textSmall = TEXT:Create(18)
-    text      = TEXT:Create(28)
-    textLarge = TEXT:Create(40)
+    textSmall = TEXT:Create(Layout.fonts.small_size)
+    text      = TEXT:Create(Layout.fonts.text_size)
+    textLarge = TEXT:Create(Layout.fonts.large_size)
 
     tx["bg"]     = TEXTURE:CreateTexture("Textures/Background.png")
     tx["bgtile"] = TEXTURE:CreateTexture("Textures/BgTile.png")

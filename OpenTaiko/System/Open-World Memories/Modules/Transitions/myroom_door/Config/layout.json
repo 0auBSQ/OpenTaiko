@@ -1,0 +1,8 @@
+{
+    "_note": "My Room door layout, in 1920x1080 pixels.",
+    "screen_height": 1080,
+    "door": {
+        "_note": "overscan: the art is this much bigger than the screen on each side, for the shake",
+        "overscan": 30
+    }
+}

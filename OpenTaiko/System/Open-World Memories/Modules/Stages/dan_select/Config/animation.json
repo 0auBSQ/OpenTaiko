@@ -1,0 +1,43 @@
+{
+    "_note": "Dan select timings, in seconds unless the key says otherwise; distances in 1920x1080 pixels. Easing names are the engine counter's (mode, curve).",
+    "menu": {
+        "_note": "The boards fly in (outBack with overshoot over slide_in_s, the right one card_stagger_s after the left) and out (slide_out_s), off_x_px off screen on their side: the left board (centre 600, half width 300 plus the ring and the hover scale) ends 100 px past the edge, the right one likewise. The exit pill fades over exit_fade_s, starting exit_fade_start of slide_in_s into the flight in. Entering through the doors, the boards wait entry_delay_s for them to open (they open over 0.7 s; update() runs from the fade-in's start). out_hold_s is a beat with the dojo empty before what was chosen happens. The selection glow follows the cursor at hover_rate_per_s; the ring pulses between base - amp and base + amp.",
+        "hover_rate_per_s": 12,
+        "slide_in_s": 0.55,
+        "slide_out_s": 0.38,
+        "card_stagger_s": 0.09,
+        "overshoot": 1.15,
+        "exit_fade_s": 0.3,
+        "exit_fade_start": 0.6,
+        "entry_delay_s": 0.5,
+        "off_x_px": 1000,
+        "out_hold_s": 0.1,
+        "ring_pulse": { "base": 0.78, "amp": 0.22, "rad_per_s": 5 }
+    },
+    "bgm_fade_s": 0.7,
+    "puchi": {
+        "_note": "The puchichara floats float_px up and down every float_period_s; its sprite has frames frames side by side, played through every frame_cycle_s.",
+        "float_px": 6.0,
+        "float_period_s": 3,
+        "frames": 2,
+        "frame_cycle_s": 4.8
+    },
+    "list": {
+        "_note": "The dan list. Holding a direction scrolls again after hold_delay_s, then every hold_repeat_s. On entry the bars appear bar_stagger_s apart. A scroll slides the content panel in from content_slide_px away over content_slide_s, and the bars over bar_slide_s. The chosen bar's highlight pulses between select_pulse from and to opacity every dur_s.",
+        "hold_delay_s": 0.25,
+        "hold_repeat_s": 0.08,
+        "bar_stagger_s": 0.05,
+        "content_slide_s": 0.25,
+        "content_slide_px": 1080,
+        "bar_slide_s": 0.15,
+        "ease_mode": "OUT",
+        "ease_curve": "QUAD",
+        "select_pulse": { "from": 0.3, "to": 1.0, "dur_s": 0.6 }
+    },
+    "confirm": { "_note": "The confirm scroll unrolls over open_s and rolls back up over close_s.", "open_s": 0.45, "close_s": 0.22 },
+    "contents": {
+        "_note": "From 4 songs on the song bars scroll up, and an individual exam's blocks scroll left.",
+        "scroll_px_per_s": 35.0,
+        "exam_scroll_px_per_s": 40.0
+    }
+}

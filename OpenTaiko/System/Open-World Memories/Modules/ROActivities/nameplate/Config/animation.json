@@ -1,0 +1,73 @@
+{
+    "_note": "Nameplate animation. Opacities 0 to 1 unless named otherwise.",
+    "title_cycles_per_s": 3.3,
+    "flash": {
+        "_note": "The star flash over \"flash\" title plates, a loop of loop_frames frames at 60 per second. stars: each draws the title's Small.png from frame `from` to frame `to` at (x, y) in 1280x720 units (drawn 1.5 times larger, for 1920x1080) or at y_px, a y in 1920x1080 pixels; its scale is `scale`, or with fade_frames it shrinks from `scale` by scale / fade_frames per frame from `from`. Entries draw in this order.",
+        "loop_frames": 120,
+        "stars": [
+            { "from": 0, "to": 10, "x": 63, "y": 25, "scale": 1.0, "fade_frames": 10 },
+            { "from": 3, "to": 10, "x": 38, "y": 7, "scale": 1.0, "fade_frames": 7 },
+            { "from": 6, "to": 10, "x": 51, "y": 5, "scale": 1.0, "fade_frames": 4 },
+            { "from": 8, "to": 10, "x": 110, "y": 25, "scale": 0.3, "fade_frames": 2 },
+            { "from": 11, "to": 13, "x": 38, "y": 7, "scale": 1.0, "fade_frames": 2 },
+            { "from": 11, "to": 15, "x": 51, "y_px": 5, "scale": 1.0 },
+            { "from": 11, "to": 17, "x": 110, "y": 25, "scale": 1.0, "fade_frames": 7 },
+            { "from": 16, "to": 20, "x": 63, "y": 25, "scale": 0.2, "fade_frames": 4 },
+            { "from": 17, "to": 20, "x": 99, "y": 1, "scale": 1.0, "fade_frames": 3 },
+            { "from": 20, "to": 24, "x": 63, "y_px": 25, "scale": 0.4 },
+            { "from": 20, "to": 25, "x": 99, "y_px": 1, "scale": 1.0 },
+            { "from": 20, "to": 30, "x": 152, "y": 7, "scale": 0.5, "fade_frames": 10 },
+            { "from": 31, "to": 37, "x": 176, "y": 8, "scale": 0.5, "fade_frames": 6 },
+            { "from": 31, "to": 37, "x": 175, "y": 25, "scale": 1.0, "fade_frames": 6 },
+            { "from": 31, "to": 40, "x": 136, "y": 24, "scale": 0.9, "fade_frames": 9 },
+            { "from": 34, "to": 40, "x": 159, "y": 25, "scale": 0.7, "fade_frames": 6 },
+            { "from": 41, "to": 42, "x": 159, "y": 25, "scale": 0.7 },
+            { "from": 43, "to": 50, "x": 196, "y": 23, "scale": 0.8, "fade_frames": 7 },
+            { "from": 51, "to": 57, "x": 51, "y": 5, "scale": 0.8, "fade_frames": 6 },
+            { "from": 51, "to": 52, "x": 166, "y": 22, "scale": 0.2 },
+            { "from": 51, "to": 53, "x": 136, "y": 24, "scale": 0.8 },
+            { "from": 51, "to": 55, "x": 176, "y": 8, "scale": 1.0 },
+            { "from": 61, "to": 70, "x": 196, "y": 23, "scale": 1.0, "fade_frames": 9 },
+            { "from": 61, "to": 67, "x": 214, "y": 14, "scale": 0.7, "fade_frames": 6 },
+            { "from": 63, "to": 70, "x": 129, "y": 24, "scale": 0.5, "fade_frames": 7 },
+            { "from": 65, "to": 70, "x": 117, "y": 7, "scale": 0.8, "fade_frames": 5 },
+            { "from": 71, "to": 72, "x": 151, "y": 25, "scale": 0.8 },
+            { "from": 71, "to": 74, "x": 117, "y": 7, "scale": 0.8 }
+        ],
+        "slash": {
+            "_note": "Shines/Slash.png sweeps right by travel_x (1280x720 units) every travel_frames frames, from frame `from` to `to`, at y; its opacity, in 0-255 units, starts at start_opacity (shown capped at full) and drops by opacity_drop_per_frame.",
+            "from": 85,
+            "to": 112,
+            "y": 7,
+            "travel_x": 150,
+            "travel_frames": 27,
+            "start_opacity": 1400,
+            "opacity_drop_per_frame": 50
+        },
+        "big_star": {
+            "_note": "The title's Big.png at (x, y) in 1280x720 units, from frame `from` to `to`: it grows from nothing by 1 / grow_frames per frame until frame grow_until, then fades by fade_per_frame (0-255 units) per frame.",
+            "from": 105,
+            "to": 120,
+            "grow_until": 112,
+            "grow_frames": 8,
+            "fade_per_frame": 31.875,
+            "x": 193,
+            "y": 6
+        }
+    },
+    "rarity_stars": {
+        "_note": "The rarity stars' glitter. Each star's patch pulses additively, peaking at shine_opacity once per shine_period_ms, each star shine_phase_step radians after the previous one. Each star's two glints blink in turn once per glint_period_ms (each star glint_phase_step of a period after the previous one, the second glint glint_pair_phase of a period after the first), turning glint_turn_deg over a blink and growing from glint_min_scale by up to glint_scale_grow; a blink weaker than glint_min_blink is not drawn. The clock wraps at time_wrap_ms, a multiple of both periods.",
+        "shine_period_ms": 900,
+        "shine_opacity": 0.45,
+        "shine_phase_step": 1.3,
+        "glint_period_ms": 1500,
+        "glint_opacity": 0.95,
+        "glint_phase_step": 0.37,
+        "glint_pair_phase": 0.5,
+        "glint_turn_deg": 90,
+        "glint_min_scale": 0.6,
+        "glint_scale_grow": 0.6,
+        "glint_min_blink": 0.02,
+        "time_wrap_ms": 45000
+    }
+}

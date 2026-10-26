@@ -1,0 +1,21 @@
+{
+    "_note": "Survival Mode gate way back timings. Times in seconds; distances in 1920x1080 pixels; frequencies in radians per unit of their span.",
+    "close": {
+        "_note": "fade_out_s: the gate closing; the halves meet at shut_at (part of the fade-out), then shake by shake_px, wobbling shake_freq_x / shake_freq_y",
+        "fade_out_s": 1.1,
+        "shut_at": 0.68,
+        "shake_px": 20,
+        "shake_freq_x": 70,
+        "shake_freq_y": 53
+    },
+    "open_s": 1.2,
+    "dust": {
+        "_note": "over its life a puff grows from start_scale by grow, drifts travel px off the seam and turns turn_deg; when the gate opens it lives the first open_life of the opening at open_strength",
+        "start_scale": 0.6,
+        "grow": 1.2,
+        "travel": 110,
+        "turn_deg": 40,
+        "open_life": 0.45,
+        "open_strength": 0.6
+    }
+}

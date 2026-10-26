@@ -1,14 +1,20 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
 local TA = require("TransitionArt")
 
-local SHUT = 0.75                        -- fade-out: the halves swing shut
-local HOLD, OPEN = 0.25, 0.8             -- fade-in: a last rattle, then the halves swing open
-local COVER = HOLD + OPEN * 0.8          -- the stage is in view (the halves nearly edge-on at the sides)
+-- sizes and shading: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local RATTLE = Animation.rattle
+
+local SHUT = Animation.shut_s            -- fade-out: the halves swing shut
+local HOLD, OPEN = Animation.hold_s, Animation.open_s   -- fade-in: a last rattle, then the halves swing open
+local COVER = HOLD + OPEN * Animation.cover_at   -- the stage is in view (the halves nearly edge-on at the sides)
 
 FADE_OUT_SECONDS = SHUT
 FADE_IN_SECONDS  = HOLD + OPEN
 
-local SCREEN_W = 1920
+local SCREEN_W = Layout.screen_width
 
 local tx_left, tx_right = nil, nil
 local snd_creak, snd_thud = nil, nil
@@ -56,7 +62,8 @@ end
 local function half(tx, x, anchor, k)
 	if tx == nil or not tx.Loaded or k <= 0.001 then return end
 	if tx.Width <= 0 then return end
-	local shade = 0.5 + 0.5 * k
+	local edge = Layout.half.edge_shade
+	local shade = edge + (1 - edge) * k
 	tx:SetScale(k, 1)
 	tx:SetColor(shade, shade, shade)
 	tx:DrawAtAnchor(x, 0, anchor)
@@ -70,9 +77,9 @@ local function drawGate(k)
 	local rattle, wob = 0, 0
 	if thudAt ~= nil then
 		local a = clock - thudAt
-		if a >= 0 and a < 0.7 then
-			rattle = 0.035 * math.exp(-6 * a) * math.abs(math.sin(13 * a))
-			wob = 0.003 * math.exp(-8 * a) * math.sin(55 * a)
+		if a >= 0 and a < RATTLE.length_s then
+			rattle = RATTLE.bounce * math.exp(-RATTLE.bounce_decay * a) * math.abs(math.sin(RATTLE.bounce_freq * a))
+			wob = RATTLE.wobble * math.exp(-RATTLE.wobble_decay * a) * math.sin(RATTLE.wobble_freq * a)
 		end
 	end
 	local s = k * (1 - rattle)

@@ -5,38 +5,42 @@
 
 local TA = require("TransitionArt")
 
--- the show, in seconds from the start of the fade-in (fixed: the fade-in length is read once)
-local DIM_IN = 0.3                       -- the lights go down
-local SPOT_AT, SPOT_END = 0.10, 1.70     -- the spotlights circle in; they merge at SPOT_END (the drum roll's crash)
-local FLASH = 0.35
-local FALL_AT, FALL_LAST = 1.85, 2.55    -- first and last letter start falling
-local FALL = 0.42                        -- one letter's fall
-local HOP_AT, HOP_LAST = 3.05, 3.85      -- first and last letter start their hop; confetti and applause start
-local HOP = 0.40
-local SHOW_SECONDS = 4.45
-local OPEN_SECONDS = 0.9
+-- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local TITLE, LIGHTS, CONF = Layout.title, Layout.lights, Layout.confetti
+local CURTAIN, LIGHTS_ANIM, LETTERS, CONF_ANIM = Animation.curtain, Animation.lights, Animation.letters, Animation.confetti
 
-FADE_OUT_SECONDS = 0.9                   -- curtain closing
+-- the show, in seconds from the start of the fade-in (fixed: the fade-in length is read once)
+local DIM_IN = LIGHTS_ANIM.dim_s
+local SPOT_AT, SPOT_END = LIGHTS_ANIM.spot_at_s, LIGHTS_ANIM.spot_end_s
+local FLASH = LIGHTS_ANIM.flash_s
+local FALL_AT, FALL_LAST = LETTERS.fall_at_s, LETTERS.fall_last_s
+local FALL = LETTERS.fall_s
+local HOP_AT, HOP_LAST = LETTERS.hop_at_s, LETTERS.hop_last_s
+local HOP = LETTERS.hop_s
+local SHOW_SECONDS = CURTAIN.show_s
+local OPEN_SECONDS = CURTAIN.open_s
+
+FADE_OUT_SECONDS = CURTAIN.close_s
 FADE_IN_SECONDS  = SHOW_SECONDS + OPEN_SECONDS
 
-local SCREEN_W, SCREEN_H = 1920, 1080
+local SCREEN_W, SCREEN_H = Layout.screen.width, Layout.screen.height
 local CX, CY = SCREEN_W / 2, SCREEN_H / 2
-local CURTAIN_W = 960
+local CURTAIN_W = Layout.curtain_half_width
 local TITLE_KEY, TITLE_DEFAULT = "TRANSITION_NOKON_TITLE", "INTRO NOKON"
-local FONT_SIZE = 150
-local LINE_GAP = 180
-local TRACKING = 0.06                    -- em between letters
-local SPACE = 0.35                       -- em for a space
-local MAX_W = 1700
-local LETTER_Y = 520
-local INK = "<g.#FFF3A8.#F2A024>%s</g>"
-local SPOT_SIZE = 256                    -- Spot.png
-local ORBIT_X, ORBIT_Y = 620, 330
-local CONFETTI_N = 150
-local CONFETTI_COLORS = {
-	{ 0.95, 0.26, 0.26 }, { 1.00, 0.78, 0.18 }, { 0.26, 0.62, 0.95 },
-	{ 0.30, 0.82, 0.42 }, { 0.95, 0.45, 0.80 }, { 1.00, 0.55, 0.15 },
-}
+local FONT_SIZE = TITLE.font_size
+local LINE_GAP = TITLE.line_gap
+local TRACKING = TITLE.tracking_em
+local SPACE = TITLE.space_em
+local MAX_W = TITLE.max_width
+local LETTER_Y = TITLE.y
+local INK = "<g." .. TITLE.ink_top_color .. "." .. TITLE.ink_bottom_color .. ">%s</g>"
+local SPOT_SIZE = LIGHTS.spot_texture_size
+local ORBIT_X, ORBIT_Y = LIGHTS.orbit_x, LIGHTS.orbit_y
+local CONFETTI_N = CONF.count
+local CONFETTI_COLORS = CONF.colors
 
 local tx_closed, tx_open, tx_spot, tx_confetti, tx_px = nil, nil, nil, nil, nil
 local snd_curtain, snd_drum, snd_applause = nil, nil, nil
@@ -96,7 +100,8 @@ end
 local function spot(x, y, size, a)
 	if tx_spot == nil or a <= 0 then return end
 	local s = size / SPOT_SIZE
-	tx_spot:SetColor(1, 0.95, 0.78); tx_spot:SetOpacity(a); tx_spot:SetScale(s, s)
+	local c = LIGHTS.spot_color
+	tx_spot:SetColor(c[1], c[2], c[3]); tx_spot:SetOpacity(a); tx_spot:SetScale(s, s)
 	tx_spot:SetBlendMode("add")
 	tx_spot:DrawAtAnchor(x, y, "center")
 	tx_spot:SetBlendMode("normal")
@@ -156,22 +161,23 @@ local function drawLetters(now, alpha)
 			if f < 1 then
 				y = -FONT_SIZE + (L.y + FONT_SIZE) * f * f                    -- falls faster and faster
 			else
-				local land = clamp01((f - 1) * FALL / 0.18)                  -- a short squash as it lands
+				local land = clamp01((f - 1) * FALL / LETTERS.land_s)        -- a short squash as it lands
 				local sq = math.sin(math.pi * land) * (1 - land)
-				sx, sy = 1 + 0.18 * sq, 1 - 0.18 * sq
+				sx, sy = 1 + LETTERS.squash * sq, 1 - LETTERS.squash * sq
 			end
 			local h = (now - startOf(i, HOP_AT, HOP_LAST)) / HOP
 			if h >= 0 and h <= 1 then
 				bump = math.sin(math.pi * h)
-				sx, sy = sx * (1 + 0.45 * bump), sy * (1 + 0.45 * bump)
-				rot = (i % 2 == 0 and -9 or 9) * bump
+				sx, sy = sx * (1 + LETTERS.hop_grow * bump), sy * (1 + LETTERS.hop_grow * bump)
+				rot = (i % 2 == 0 and -LETTERS.hop_tilt_deg or LETTERS.hop_tilt_deg) * bump
 			end
 			shown[#shown + 1] = { L = L, y = y, sx = sx * L.k, sy = sy * L.k, rot = rot, bump = bump, i = i }
 		end
 	end
 	-- all shadows first, then the letters, the biggest hop last so it stands in front of its neighbours
 	for _, d in ipairs(shown) do
-		font:Draw(d.L.ch, d.L.x + 6, d.y + nudge * d.sy + 8, col_shadow, col_shadow, 0.45 * alpha, d.sx, 0, "center", d.sy, d.rot)
+		font:Draw(d.L.ch, d.L.x + TITLE.shadow_offset.x, d.y + nudge * d.sy + TITLE.shadow_offset.y, col_shadow, col_shadow,
+			TITLE.shadow_opacity * alpha, d.sx, 0, "center", d.sy, d.rot)
 	end
 	table.sort(shown, function(a, b)
 		if a.bump ~= b.bump then return a.bump < b.bump end
@@ -196,10 +202,12 @@ local function makeConfetti()
 	local r = rng(20260927)
 	for i = 1, CONFETTI_N do
 		confetti[i] = {
-			x = r() * SCREEN_W, y = -20 - r() * 700, v = 260 + 220 * r(),
-			sway = 20 + 45 * r(), swayF = 1.5 + 2.0 * r(), phase = r() * 6.283,
-			spin = (r() < 0.5 and -1 or 1) * (90 + 270 * r()), flipF = 2 + 4 * r(),
-			scale = 0.8 + 0.6 * r(), c = CONFETTI_COLORS[1 + math.floor(r() * #CONFETTI_COLORS)],
+			x = r() * SCREEN_W, y = CONF.start_y - r() * CONF.spread_y, v = CONF_ANIM.speed_min + CONF_ANIM.speed_extra * r(),
+			sway = CONF_ANIM.sway_min + CONF_ANIM.sway_extra * r(),
+			swayF = CONF_ANIM.sway_rate_min + CONF_ANIM.sway_rate_extra * r(), phase = r() * 6.283,
+			spin = (r() < 0.5 and -1 or 1) * (CONF_ANIM.spin_deg_per_s_min + CONF_ANIM.spin_deg_per_s_extra * r()),
+			flipF = CONF_ANIM.flip_rate_min + CONF_ANIM.flip_rate_extra * r(),
+			scale = CONF.scale_min + CONF.scale_extra * r(), c = CONFETTI_COLORS[1 + math.floor(r() * #CONFETTI_COLORS)],
 		}
 	end
 end
@@ -209,9 +217,9 @@ local function drawConfetti(t, alpha)
 	tx_confetti:SetOpacity(alpha)
 	for _, p in ipairs(confetti) do
 		local y = p.y + p.v * t
-		if y > -30 and y < SCREEN_H + 30 then
+		if y > -CONF.cull_margin and y < SCREEN_H + CONF.cull_margin then
 			local x = p.x + p.sway * math.sin(p.swayF * t + p.phase)
-			local flip = math.max(0.15, math.abs(math.cos(p.flipF * t + p.phase)))
+			local flip = math.max(CONF.min_flip, math.abs(math.cos(p.flipF * t + p.phase)))
 			tx_confetti:SetColor(p.c[1], p.c[2], p.c[3])
 			tx_confetti:SetScale(p.scale * flip, p.scale)
 			tx_confetti:SetRotation(p.spin * t)
@@ -223,22 +231,23 @@ end
 
 -- the stage lights: dim, two spots circling in, then one spot where they met
 local function drawLights(now, alpha)
-	rect(0, 0, SCREEN_W, SCREEN_H, 0, 0, 0, 0.62 * clamp01(now / DIM_IN) * alpha)
+	local dim, flash = LIGHTS.dim_color, LIGHTS.flash_color
+	rect(0, 0, SCREEN_W, SCREEN_H, dim[1], dim[2], dim[3], LIGHTS.dim_opacity * clamp01(now / DIM_IN) * alpha)
 	local p = clamp01((now - SPOT_AT) / (SPOT_END - SPOT_AT))
 	if now >= SPOT_AT and p < 1 then
 		local e = easeInOut(p)
-		local ang = 6.283 * 2.2 * p ^ 1.15
-		local shrink = (1 - e) ^ 1.1
+		local ang = 6.283 * LIGHTS_ANIM.turns * p ^ LIGHTS_ANIM.turn_ease
+		local shrink = (1 - e) ^ LIGHTS_ANIM.shrink_ease
 		for k = 0, 1 do
 			local a = ang + k * math.pi
-			spot(CX + math.cos(a) * ORBIT_X * shrink, CY + math.sin(a) * ORBIT_Y * shrink, 380, 0.85 * alpha)
+			spot(CX + math.cos(a) * ORBIT_X * shrink, CY + math.sin(a) * ORBIT_Y * shrink, LIGHTS.spot_size, LIGHTS.spot_opacity * alpha)
 		end
 	elseif p >= 1 then
-		spot(CX, LETTER_Y, 900, 0.75 * alpha)                             -- the merged spot the name stands in
+		spot(CX, LETTER_Y, LIGHTS.merged_size, LIGHTS.merged_opacity * alpha)   -- the merged spot the name stands in
 		local fl = (now - SPOT_END) / FLASH
 		if fl < 1 then
-			spot(CX, CY, 380 + 1400 * easeOut(fl), (1 - fl) * alpha)
-			rect(0, 0, SCREEN_W, SCREEN_H, 1, 0.97, 0.88, 0.45 * (1 - fl) ^ 2 * alpha)
+			spot(CX, CY, LIGHTS_ANIM.flash_start_size + LIGHTS_ANIM.flash_grow_px * easeOut(fl), (1 - fl) * alpha)
+			rect(0, 0, SCREEN_W, SCREEN_H, flash[1], flash[2], flash[3], LIGHTS.flash_opacity * (1 - fl) ^ 2 * alpha)
 		end
 	end
 end
@@ -271,11 +280,12 @@ function fadeIn(t)
 	if now >= HOP_AT then once("applause", snd_applause) end
 	local open = clamp01((now - SHOW_SECONDS) / OPEN_SECONDS)
 	if open > 0 then once("open", snd_curtain) end
-	local fade = 1 - clamp01(open / 0.3)     -- the lights and the name go as the curtain parts
+	local fade = 1 - clamp01(open / CURTAIN.lights_fade)   -- the lights and the name go as the curtain parts
 	draw_curtain(easeInOut(open))
 	drawLights(now, fade)
 	drawLetters(now, fade)
-	drawConfetti(now - HOP_AT, 1 - clamp01((now - (FADE_IN_SECONDS - 0.4)) / 0.4))   -- gone before the stage takes over
+	local cf = CURTAIN.confetti_fade_s
+	drawConfetti(now - HOP_AT, 1 - clamp01((now - (FADE_IN_SECONDS - cf)) / cf))   -- gone before the stage takes over
 	if t >= 1 then freeTextures() end   -- the trip is over
 end
 
@@ -284,10 +294,10 @@ function onStart()
 	snd_drum = SOUND:CreateSFX("Sounds/DrumRoll.ogg")
 	snd_applause = SOUND:CreateSFX("Sounds/Applause.ogg")
 	font = TEXT:CreateGlyphCached(FONT_SIZE)
-	nudge = math.floor((font.BoxHeight - math.ceil(font.LineHeight)) / 2) - 1
-	col_ink = COLOR:CreateColorFromRGBA(255, 255, 255, 255)
-	col_edge = COLOR:CreateColorFromRGBA(138, 26, 16, 255)
-	col_shadow = COLOR:CreateColorFromRGBA(30, 8, 4, 255)
+	nudge = math.floor((font.BoxHeight - math.ceil(font.LineHeight)) / 2) + TITLE.text_nudge
+	col_ink = Config.color(TITLE.ink_color)
+	col_edge = Config.color(TITLE.edge_color)
+	col_shadow = Config.color(TITLE.shadow_color)
 end
 
 function onDestroy()

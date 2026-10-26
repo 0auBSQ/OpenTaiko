@@ -1,0 +1,68 @@
+{
+    "_note": "Tower select animation. Times in seconds, angles in degrees, frequencies in radians per second, distances in pixels.",
+    "move": {
+        "_note": "The slide to the next tower: the counter's interval, seconds per unit over its 1 to 0 run.",
+        "slide_interval_s": 0.2
+    },
+    "badge": {
+        "_note": "The badges bob by bob_px, each one bob_phase_step radians after its left neighbour.",
+        "bob_px": 8,
+        "bob_rad_per_s": 2,
+        "bob_phase_step": 0.8
+    },
+    "rainbow_deg_per_s": 45,
+    "glow": {
+        "_note": "The halo under the random badge breathes: its scale goes from scale_base to scale_base + scale_range, its opacity likewise.",
+        "pulse_rad_per_s": 3,
+        "scale_base": 0.92,
+        "scale_range": 0.12,
+        "opacity_base": 0.45,
+        "opacity_range": 0.35
+    },
+    "sparkles": {
+        "_note": "count sparkles twinkle over the random badge, each rate_per_s times a second, at radius_min to radius_min + radius_range from it. A sparkle grows from glow_scale_base with its glow (glow_scale_range more at its brightest), times size_base to size_base + size_range picked per twinkle. It turns turn_per_cycle_deg between twinkles and spin_deg during one.",
+        "count": 6,
+        "rate_per_s": 0.9,
+        "radius_min": 18,
+        "radius_range": 50,
+        "glow_scale_base": 0.4,
+        "glow_scale_range": 0.6,
+        "size_base": 0.6,
+        "size_range": 0.6,
+        "turn_per_cycle_deg": 37,
+        "spin_deg": 60
+    },
+    "signs": {
+        "_note": "The title sign falls from drop_px over its place, the options from the title sign's place, in fall_s; the first option starts first_option_delay_s after the title sign lands, each next one stagger_s later. A landed sign bounces on its ropes, swings, and the swing settles into the idle sway over settle_s; phase offsets the sway of each sign (title_phase, then option_phase_step times its rank). The signs leave in close_s.",
+        "drop_px": 520,
+        "fall_s": 0.36,
+        "first_option_delay_s": 0.05,
+        "stagger_s": 0.09,
+        "settle_s": 1.5,
+        "close_s": 0.22,
+        "title_phase": 0.9,
+        "option_phase_step": 1.7,
+        "bounce": { "amplitude_px": 12, "rad_per_s": 14, "decay_per_s": 5 },
+        "swing": { "amplitude_deg": 3, "rad_per_s": 5, "decay_per_s": 1.2, "x_px_per_deg": 2 },
+        "sway": {
+            "_note": "Sums of sine waves; each wave's phase is the sign's phase times phase_scale. angle amplitudes in degrees, x and y in pixels.",
+            "angle": [
+                { "amplitude": 1.4, "rad_per_s": 0.9, "phase_scale": 1 },
+                { "amplitude": 0.5, "rad_per_s": 2.3, "phase_scale": 0.7 }
+            ],
+            "x": [
+                { "amplitude": 4, "rad_per_s": 0.7, "phase_scale": 1 },
+                { "amplitude": 1.5, "rad_per_s": 1.9, "phase_scale": 1 }
+            ],
+            "y": [
+                { "amplitude": 3, "rad_per_s": 1.1, "phase_scale": 1.3 }
+            ]
+        }
+    },
+    "frame_pulse": {
+        "_note": "The chosen option's frame: opacity opacity_base + opacity_range * sin(time * rad_per_s).",
+        "opacity_base": 0.75,
+        "opacity_range": 0.25,
+        "rad_per_s": 6
+    }
+}

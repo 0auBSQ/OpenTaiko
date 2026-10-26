@@ -14,10 +14,16 @@
 local PopUI = require("PopUI")
 local NavInput = require("NavInput")
 
+-- positions, sizes and colours: Config/layout.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local POPUP = Layout.popup
+
 local INPUT_GRACE_S = 0.15  -- after the popup opens, so the press that opened it does not act on it
-local DIM = 0.5             -- how dark the picture goes behind the popup
+local DIM = Layout.dim_opacity
 local FILL = 16
-local PANEL_W, PANEL_H, ROW_H = 560, 300, 72
+local PANEL_W, PANEL_H, ROW_H = POPUP.width, POPUP.height, POPUP.row_height
+local SCREEN_W, SCREEN_H = Layout.screen.width, Layout.screen.height
 
 local ui, menu
 local paths, index
@@ -71,10 +77,11 @@ end
 
 local function fillScreen(alpha)
     if fill == nil or alpha <= 0 then return end
-    fill:SetScale(1920 / FILL, 1080 / FILL)
+    local c = Layout.backdrop_color
+    fill:SetScale(SCREEN_W / FILL, SCREEN_H / FILL)
     fill:SetOpacity(math.min(1, alpha))
-    fill:SetColor(0, 0, 0)
-    fill:DrawAtAnchor(960, 540, "center")
+    fill:SetColor(c[1], c[2], c[3])
+    fill:DrawAtAnchor(SCREEN_W / 2, SCREEN_H / 2, "center")
     fill:SetScale(1, 1) ; fill:SetOpacity(1) ; fill:SetColor(1, 1, 1)
 end
 
@@ -82,10 +89,10 @@ end
 local function buildPopup()
     ui:disposeWidgets()
     ui:clear()
-    local x, y = (1920 - PANEL_W) / 2, (1080 - PANEL_H) / 2
-    local panel = ui:panel{ x = x, y = y, w = PANEL_W, h = PANEL_H, pad = 30, title = LANG:GetString("PAUSE_TITLE") }
+    local x, y = (SCREEN_W - PANEL_W) / 2, (SCREEN_H - PANEL_H) / 2
+    local panel = ui:panel{ x = x, y = y, w = PANEL_W, h = PANEL_H, pad = POPUP.padding, title = LANG:GetString("PAUSE_TITLE") }
     local cx, cy, cw = panel:content()
-    menu = ui:menu{ x = cx, y = cy + 10, w = cw, h = ROW_H * 2, rowHeight = ROW_H, selected = 1,
+    menu = ui:menu{ x = cx, y = cy + POPUP.menu_y, w = cw, h = ROW_H * 2, rowHeight = ROW_H, selected = 1,
         items = { LANG:GetString("PAUSE_RESUME"), LANG:GetString("PAUSE_SKIP") },
         onSelect = function(i) if i == 1 then resume() else skip() end end }
 end
@@ -157,10 +164,10 @@ function draw()
     if video ~= nil and video.Width > 0 then
         -- the picture fits the screen and keeps its shape
         local tex = video.Texture
-        local s = math.min(1920 / video.Width, 1080 / video.Height)
+        local s = math.min(SCREEN_W / video.Width, SCREEN_H / video.Height)
         local w, h = video.Width * s, video.Height * s
         tex:SetScale(s, s)
-        tex:Draw(math.floor((1920 - w) / 2), math.floor((1080 - h) / 2))
+        tex:Draw(math.floor((SCREEN_W - w) / 2), math.floor((SCREEN_H - h) / 2))
         tex:SetScale(1, 1)
     end
     if paused then

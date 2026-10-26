@@ -8,38 +8,43 @@ local NavInput     = require("NavInput")
 local Easing       = require("Easing")
 local EM           = require("EventMode")
 local PagodaAvatar = require("PagodaAvatar")
+-- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+local Config       = require("Core.Config")
+local Layout       = Config.load("Config/layout.json")
+local Animation    = Config.load("Config/animation.json")
 
 local TX  = "Textures/"
 local SND = "Sounds/"
 
 -- ── Constants ────────────────────────────────────────────────────────────────
 
-local NP_X = 20
-local NP_Y = 980
+local Player = Layout.player
+local NP_X = Player.x
+local NP_Y = Player.y
 
-local PUCHI_FLOAT_AMP = 6.0
-local PUCHI_N_FRAMES = 2
+local Puchi = Animation.puchi
+local PUCHI_FLOAT_AMP = Puchi.float_px
+local PUCHI_N_FRAMES = Puchi.frames
 
--- the two boards side by side, the exit pill under them (the art's sizes: 600x540, 320x84)
-local CARD_CX   = { 600, 1320 }
-local CARD_CY   = 560
-local CARD_W, CARD_H = 600, 540
-local BAND_TOP, BAND_BOTTOM = 352, 506   -- the text band inside card_*.png (title, then the description)
-local DESC_W    = 520
-local TITLE_GAP = 6                      -- between the title's line and the description's first line
-local EXIT_CX, EXIT_CY = 960, 930
-local EXIT_W, EXIT_H = 320, 84
-local HOVER_RATE = 12           -- how fast the selection glow follows the cursor
-local SLIDE_IN_SEC  = 0.55      -- a board's flight in from its side of the screen
-local SLIDE_OUT_SEC = 0.38      -- and back out
-local CARD_STAGGER  = 0.09      -- the right board follows the left one by this much
-local EXIT_FADE_SEC = 0.3       -- the exit pill fades after the boards
-local ENTRY_DELAY_SEC = 0.5     -- entering through the doors: the boards wait for them to open
-                                -- (the doors open over 0.7 s; update() runs from the fade-in's start)
-local OFF_X = 1000              -- a board's resting offset off screen: the left one (centre 600, half
-                                -- width 300 plus the ring and the hover scale) ends 100 px past the
-                                -- edge, the right one likewise
-local OUT_HOLD_SEC = 0.1        -- a beat with the dojo empty before what was chosen happens
+-- the two boards side by side, the exit pill under them
+local Menu = Layout.menu
+local MenuAnim = Animation.menu
+local CARD_CX   = Menu.card_cx
+local CARD_CY   = Menu.card_cy
+local CARD_W, CARD_H = Menu.card_w, Menu.card_h
+local BAND_TOP, BAND_BOTTOM = Menu.band_top, Menu.band_bottom   -- the text band inside card_*.png (title, then the description)
+local DESC_W    = Menu.desc_w
+local TITLE_GAP = Menu.title_gap                      -- between the title's line and the description's first line
+local EXIT_CX, EXIT_CY = Menu.exit_cx, Menu.exit_cy
+local EXIT_W, EXIT_H = Menu.exit_w, Menu.exit_h
+local HOVER_RATE = MenuAnim.hover_rate_per_s           -- how fast the selection glow follows the cursor
+local SLIDE_IN_SEC  = MenuAnim.slide_in_s      -- a board's flight in from its side of the screen
+local SLIDE_OUT_SEC = MenuAnim.slide_out_s      -- and back out
+local CARD_STAGGER  = MenuAnim.card_stagger_s      -- the right board follows the left one by this much
+local EXIT_FADE_SEC = MenuAnim.exit_fade_s       -- the exit pill fades after the boards
+local ENTRY_DELAY_SEC = MenuAnim.entry_delay_s     -- entering through the doors: the boards wait for them to open
+local OFF_X = MenuAnim.off_x_px              -- a board's resting offset off screen
+local OUT_HOLD_SEC = MenuAnim.out_hold_s        -- a beat with the dojo empty before what was chosen happens
 
 -- ── Locale ────────────────────────────────────────────────────────────────────
 -- the skin's Locales/<code>/ through THEME; the English text stays in the code as the fallback
@@ -211,9 +216,9 @@ end
 local function flight()
     if anim_dir == "in" then
         local t = anim_t - anim_delay
-        local left  = 1 - Easing.outBack(Easing.span(t, 0, SLIDE_IN_SEC), 1.15)
-        local right = 1 - Easing.outBack(Easing.span(t, CARD_STAGGER, SLIDE_IN_SEC), 1.15)
-        local exitA = Easing.outQuad(Easing.span(t, SLIDE_IN_SEC * 0.6, EXIT_FADE_SEC))
+        local left  = 1 - Easing.outBack(Easing.span(t, 0, SLIDE_IN_SEC), MenuAnim.overshoot)
+        local right = 1 - Easing.outBack(Easing.span(t, CARD_STAGGER, SLIDE_IN_SEC), MenuAnim.overshoot)
+        local exitA = Easing.outQuad(Easing.span(t, SLIDE_IN_SEC * MenuAnim.exit_fade_start, EXIT_FADE_SEC))
         return left, right, exitA, t >= SLIDE_IN_SEC + CARD_STAGGER
     else
         local t = anim_t
@@ -239,12 +244,13 @@ end
 -- ── Lifecycle ────────────────────────────────────────────────────────────────
 
 function onStart()
-    font_loading = TEXT:Create(30, "regular")
-    gfont_title  = TEXT:CreateGlyphCached(40)
-    gfont_desc   = TEXT:CreateGlyphCached(24)
-    gfont_exit   = TEXT:CreateGlyphCached(30)
-    col_ink  = COLOR:CreateColorFromRGBA(76, 40, 32, 255)
-    col_none = COLOR:CreateColorFromRGBA(0, 0, 0, 0)
+    local Fonts = Layout.fonts
+    font_loading = TEXT:Create(Fonts.loading, "regular")
+    gfont_title  = TEXT:CreateGlyphCached(Fonts.menu_title)
+    gfont_desc   = TEXT:CreateGlyphCached(Fonts.menu_desc)
+    gfont_exit   = TEXT:CreateGlyphCached(Fonts.menu_exit)
+    col_ink  = Config.color(Layout.colors.ink_color)
+    col_none = Config.color(Layout.colors.clear_color)
 
     -- the background, the menu art and the music stay loaded with the skin, like the title's: the
     -- stage then has everything on its very first frame behind the opening doors
@@ -289,10 +295,10 @@ function activate()
 
     _load_menu_chara()
 
-    CB.startCounter("puchi_sine", 0, 360, 1/120, "loop", function(val)  -- 1/3 cycles/s
+    CB.startCounter("puchi_sine", 0, 360, Puchi.float_period_s / 360, "loop", function(val)
         CB.puchiSineY = math.sin(val * math.pi / 180) * PUCHI_FLOAT_AMP
     end)
-    CB.startCounter("puchi_frame", 0, 1, 4.8, "loop", function(val)  -- 1/4.8 cycles/s
+    CB.startCounter("puchi_frame", 0, 1, Puchi.frame_cycle_s, "loop", function(val)
         CB.puchiIdxFrame = math.floor(val * PUCHI_N_FRAMES)
     end)
 
@@ -535,7 +541,8 @@ local function textNudge(gf)
 end
 
 local function drawMenu()
-    local pulse = 0.78 + 0.22 * math.sin(menu_t * 5)
+    local Ring = MenuAnim.ring_pulse
+    local pulse = Ring.base + Ring.amp * math.sin(menu_t * Ring.rad_per_s)
     local left, right, exitA = flight()
     for i, e in ipairs(entries) do
         local hi = menu_hi[i]
@@ -543,16 +550,16 @@ local function drawMenu()
             -- the chosen board grows a little and lights up, its text with it; the other waits in the shade
             local k = (e.side < 0) and left or right
             local cx = e.cx + e.side * OFF_X * k
-            local s = 1 + 0.04 * hi
+            local s = 1 + Menu.card_grow * hi
             drawTex("card_hover", cx, e.cy, s, hi * pulse)
-            drawTex(e.tex, cx, e.cy, s, 1, 0.78 + 0.22 * hi)
+            drawTex(e.tex, cx, e.cy, s, 1, Menu.card_shade + (1 - Menu.card_shade) * hi)
             drawBandText(e, cx, e.cy, s, 1)
         else
-            local s = 1 + 0.06 * hi
+            local s = 1 + Menu.exit_grow * hi
             drawTex("exit_hover", e.cx, e.cy, s, hi * pulse * exitA)
-            drawTex("exit", e.cx, e.cy, s, exitA, 0.84 + 0.16 * hi)
+            drawTex("exit", e.cx, e.cy, s, exitA, Menu.exit_shade + (1 - Menu.exit_shade) * hi)
             if exitA > 0.001 then
-                gfont_exit:Draw(e.title, e.cx, e.cy + textNudge(gfont_exit) * s, col_ink, col_none, exitA, s, (EXIT_W - 40) * s, "center")
+                gfont_exit:Draw(e.title, e.cx, e.cy + textNudge(gfont_exit) * s, col_ink, col_none, exitA, s, (EXIT_W - Menu.exit_text_inset) * s, "center")
             end
         end
     end
@@ -565,16 +572,16 @@ function draw()
 
     -- Fade the dojo BGM out while the doors close on the way out. update() stops the frame
     -- Exit() is called; draw() keeps running through the transition's fade-out phase, so the
-    -- ramp lives here (0.7s = dan_doors close).
+    -- ramp lives here (bgm_fade_s = dan_doors close).
     if exiting and snd_bgm ~= nil then
-        dan_bgm_vol = math.max(0, dan_bgm_vol - fps.deltaTime / 0.7 * 100)
+        dan_bgm_vol = math.max(0, dan_bgm_vol - fps.deltaTime / Animation.bgm_fade_s * 100)
         snd_bgm:SetVolumePercent(dan_bgm_vol)
     end
 
     -- ── LOADING ───────────────────────────────────────────────────────────────
     if state == "loading" then
         if font_loading ~= nil then
-            font_loading:GetText("Please wait for song enumeration to complete...", false, 900)
+            font_loading:GetText("Please wait for song enumeration to complete...", false, Layout.loading.max_width)
                 :DrawAtAnchor(res_w / 2, res_h / 2, "center")
         end
         return
@@ -598,8 +605,8 @@ function draw()
         drawMenu()
 
         NAMEPLATE:DrawPlayerNameplate(NP_X, NP_Y, 255, 0)
-        CB.drawPlayerChara(NP_X + 140, NP_Y - 6,            1.0)
-        CB.drawPlayerPuchi(NP_X + 220, NP_Y + CB.puchiSineY, 1.0, CB.puchiIdxFrame)
+        CB.drawPlayerChara(NP_X + Player.chara_dx, NP_Y + Player.chara_dy, 1.0)
+        CB.drawPlayerPuchi(NP_X + Player.puchi_dx, NP_Y + CB.puchiSineY, 1.0, CB.puchiIdxFrame)
     end
     if event_timer ~= nil and event_timer.IsActive and state ~= "leaving" then event_timer:Draw() end
 end

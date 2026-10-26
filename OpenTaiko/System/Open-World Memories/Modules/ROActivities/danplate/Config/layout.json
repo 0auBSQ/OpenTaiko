@@ -1,0 +1,22 @@
+{
+    "_note": "Dan plate layout, in pixels of the plate's textures. frame_count: how many back_{i} / plates_{i} textures there are (a dan tick beyond it wraps). The title is drawn vertically, at most title_max_height tall, offset from the plate's centre.",
+    "frame_count": 6,
+    "title_font_size": 67,
+    "title_max_height": 300,
+    "title_offset_x": 6,
+    "title_offset_y": 0,
+    "rainbow": {
+        "_note": "the rainbow plate: cycles hue cycles along the plate's diagonal, stops colour stops per gradient map, saturation 0 to 1 (a little pastel)",
+        "cycles": 1.5,
+        "stops": 18,
+        "saturation": 0.7
+    },
+    "glitter": {
+        "_note": "the sparkles over a rainbow plate's frame: size is their scale, max how many at once per box, blend the blend mode, opacity 0 to 1. boxes are the plate's frame (shared by frames 0-4) as [x, y, w, h] from its top-left: top roller, bottom roller, left post, right post.",
+        "size": 0.8,
+        "max": 7,
+        "blend": "Add",
+        "opacity": 1,
+        "boxes": [[50, 46, 190, 42], [50, 482, 190, 44], [63, 92, 20, 382], [212, 92, 20, 382]]
+    }
+}

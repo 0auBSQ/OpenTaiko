@@ -1,0 +1,80 @@
+{
+    "_note": "Song select and difficulty select timings. Times in milliseconds (_ms) or seconds (_s), speeds per second, distances in 1920x1080 pixels, opacities from 0 to 1. Easings are a counter's SetEasing mode and curve. Staggers are phase offsets in radians (or in cycles for the glints) per item.",
+
+    "preview": { "_note": "the song preview's volume fades, and the wait after a selection before its jacket and preview load", "fade_in_ms": 280, "fade_out_ms": 140, "throttle_ms": 200 },
+
+    "screen_transition": { "_note": "song select <-> difficulty select: the panels scroll a screen width in duration_s; song select fades out over the first fade_px, difficulty select fades in over the last fade_px", "duration_s": 0.5, "fade_px": 960 },
+
+    "song_list": {
+        "scroll_s": 0.06,
+        "hold_delay_s": 0.16,
+        "hold_repeat_s": 0.06,
+        "select_band_ms": 900,
+        "select_band_min": 0.5,
+        "shortcuts_helper_pulse_ms": 2400,
+        "shortcuts_helper_opacity_min": 0.45,
+        "random_rainbow_ms": 4000
+    },
+
+    "selected_arrows": { "_note": "the arrows around the selected bar (and the AI level arrows) bounce distance_px along angle_deg", "distance_px": 10, "speed_px_per_s": 10, "angle_deg": 105 },
+
+    "level_tag": { "_note": "the animated level tags (vault, fire, storm, checker): frame_count rows, one loop every loop_s", "frame_count": 20, "loop_s": 2 },
+
+    "ura_fade": { "_note": "the Ura/Edit difficulty icon of the song info blinks: a counter runs from cycle down to 0 at speed_per_s, the icon's opacity (0-255) is min(value - fade_in_from, cycle - value)", "cycle": 2000, "speed_per_s": 400, "fade_in_from": 745 },
+
+    "loading_spinner": { "speed_deg_per_s": 150 },
+
+    "puchi": { "_note": "frame_count frames side by side in the puchi texture, one loop every frame_loop_s; the bob's amplitude and speed", "frame_count": 2, "frame_loop_s": 4.8, "float_amp_px": 8, "float_speed_deg_per_s": 120 },
+
+    "folder_anim": {
+        "_note": "opening a folder: the parent siblings slide out to offscreen_left_x, then the contents fan out; closing: the contents group at the focus, then the siblings slide back in",
+        "offscreen_left_x": -1000,
+        "open_out_s": 0.13,
+        "open_out_easing": ["IN", "CUBIC"],
+        "open_fan_s": 0.30,
+        "open_fan_easing": ["OUT", "BACK"],
+        "close_group_s": 0.20,
+        "close_group_easing": ["IN", "CUBIC"],
+        "close_in_s": 0.22,
+        "close_in_easing": ["OUT", "CUBIC"]
+    },
+
+    "preimage": { "_note": "the jacket pops in from pop_start_scale to 1", "pop_start_scale": 0.7, "pop_duration_ms": 180, "pop_easing": ["OUT", "BACK"] },
+
+    "song_info": { "_note": "the song speed arrows pulse once per beat of the sped-up song, clamped to speed_beat_min_ms..speed_beat_max_ms", "speed_arrow_opacity_min": 0.25, "speed_beat_min_ms": 150, "speed_beat_max_ms": 2000, "speed_beat_default_ms": 600 },
+
+    "background": {
+        "_note": "the crossfade between background sets, the sets blended at once while scrolling fast, the scroll speeds of the shared background and of bg1.png, and the particle twinkle / ray flicker: base + amount * sin(...)",
+        "fade_ms": 450,
+        "stack_max": 4,
+        "shared_scroll_px_per_s": 48,
+        "default_scroll_px_per_s": 40,
+        "particle_twinkle_base": 0.55, "particle_twinkle_amount": 0.45,
+        "ray_flicker_base": 0.8, "ray_flicker_amount": 0.2, "ray_flicker_ms": 700
+    },
+
+    "difficulty_select": {
+        "note": { "_note": "the Note frame floats and sways: phase speed, drift / bob amplitudes in px (the drift at float_freq_x times the bob's frequency), sway amplitude in degrees and its phase", "phase_speed_deg_per_s": 45, "float_amp_x": 6, "float_amp_y": 12, "float_freq_x": 2, "rot_amp": 1.5, "rot_phase": 0.9 },
+        "level": {
+            "_note": "the high-level gauge pulse and space overlay frames, and the level stars' shine and glints",
+            "gauge_fx_pulse_ms": 1100, "gauge_fx_pulse_opacity": 0.6, "gauge_fx_stagger": 0.6, "gauge_fx_frame_ms": 70,
+            "star_shine_ms": 900, "star_shine_opacity": 0.45, "star_shine_stagger": 1.3,
+            "star_glint_ms": 1500, "star_glint_opacity": 0.95, "star_glint_stagger": 0.37, "star_glint_min": 0.02,
+            "star_glint_spin_deg": 90, "star_glint_scale_min": 0.6, "star_glint_scale_grow": 0.6
+        }
+    },
+
+    "replays": {
+        "rank_shine": {
+            "_note": "the medal ranks shine like the level stars, three times slower",
+            "shine_ms": 2700, "shine_opacity": 0.45, "shine_stagger": 1.3,
+            "glint_ms": 1500, "glint_opacity": 0.95, "glint_stagger": 0.37, "glint_min": 0.02,
+            "glint_spin_deg": 90, "glint_scale_min": 1.0, "glint_scale_grow": 1.0
+        },
+        "scroll_ease_per_s": 14,
+        "loading_dots_per_s": 3,
+        "loading_dot_count": 3
+    },
+
+    "unlock": { "_note": "the details card opening or closing, the point of the opening from which the condition text fades in, and the red flash of a failed unlock", "details_ms": 220, "text_fade_from": 0.6, "flash_s": 0.5 }
+}

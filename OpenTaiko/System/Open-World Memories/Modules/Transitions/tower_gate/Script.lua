@@ -4,27 +4,34 @@
 
 local TA = require("TransitionArt")
 
-local SHUT_AT = 0.68             -- part of the fade-out when the halves meet
-local ARRIVE = 2.0               -- the letters start falling within this time
-local FALL = 0.26                -- one letter's fall, in seconds
-local SHOW_AFTER, TITLE_FADE = 0.6, 0.45
-local TITLE_SECONDS = ARRIVE + FALL + SHOW_AFTER + TITLE_FADE   -- the first part of the fade-in
-local OPEN_SECONDS = 1.2
+-- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local TITLE, DUST = Layout.title, Layout.dust
+local CLOSE, TITLE_ANIM, JOLT, DUST_ANIM = Animation.close, Animation.title, Animation.jolt, Animation.dust
 
-FADE_OUT_SECONDS = 1.1
+local SHUT_AT = CLOSE.shut_at
+local ARRIVE = TITLE_ANIM.arrive_s
+local FALL = TITLE_ANIM.fall_s
+local SHOW_AFTER, TITLE_FADE = TITLE_ANIM.show_after_s, TITLE_ANIM.fade_s
+local TITLE_SECONDS = ARRIVE + FALL + SHOW_AFTER + TITLE_FADE   -- the first part of the fade-in
+local OPEN_SECONDS = TITLE_ANIM.open_s
+
+FADE_OUT_SECONDS = CLOSE.fade_out_s
 FADE_IN_SECONDS  = TITLE_SECONDS + OPEN_SECONDS
 
-local SCREEN_W, SCREEN_H = 1920, 1080
-local TOP = -60                  -- 60 px of extra art above and below, for the shake
-local TRAVEL_PAD = 40            -- how far past the screen edge an open half rests
+local SCREEN_W, SCREEN_H = Layout.screen.width, Layout.screen.height
+local TOP = Layout.gate.top
+local TRAVEL_PAD = Layout.gate.travel_pad
 
 local TITLE_KEY, TITLE_DEFAULT = "TRANSITION_TOWERS_TITLE", "SURVIVAL\nMODE"
-local FONT_SIZE = 116
-local TRACK = 0.2                -- space between two letters, in ems
-local MAX_W = 1760               -- a longer line shrinks to this width
-local STEP_MAX = 0.17            -- seconds between letters, less for long titles
-local BIG = 2.4                  -- a letter's starting scale
-local STONE = "<g.#F4ECD9.#8C7A5D>%s</g>"
+local FONT_SIZE = TITLE.font_size
+local TRACK = TITLE.tracking_em
+local MAX_W = TITLE.max_width
+local STEP_MAX = TITLE_ANIM.step_max_s
+local BIG = TITLE_ANIM.start_scale
+local STONE = "<g." .. TITLE.stone_top_color .. "." .. TITLE.stone_bottom_color .. ">%s</g>"
 
 local tx_left, tx_right, tx_dust = nil, nil, nil
 local snd_slide, snd_slam, snd_open = nil, nil, nil
@@ -58,7 +65,7 @@ local function easeInOut(x) return x < 0.5 and 4 * x * x * x or 1 - (-2 * x + 2)
 -- openness: 0 = shut, 1 = off screen
 local function drawGate(openness, dx, dy)
 	if tx_left == nil or tx_right == nil then return end
-	local w = tx_left.Width > 0 and tx_left.Width or 1010
+	local w = tx_left.Width > 0 and tx_left.Width or Layout.gate.half_width
 	local travel = openness * (SCREEN_W / 2 + TRAVEL_PAD)
 	tx_left:Draw(SCREEN_W / 2 - w - travel + dx, TOP + dy)
 	tx_right:Draw(SCREEN_W / 2 + travel + dx, TOP + dy)
@@ -67,14 +74,14 @@ end
 -- dust from the seam, k goes 0..1 over its life
 local function drawDust(k, strength)
 	if tx_dust == nil or k >= 1 then return end
-	tx_dust:SetOpacity(0.85 * (1 - k) * strength)
-	for i = 1, 7 do
+	tx_dust:SetOpacity(DUST.opacity * (1 - k) * strength)
+	for i = 1, DUST.count do
 		local side = (i % 2 == 0) and 1 or -1
-		local y = 100 + (i - 1) * 150
-		local s = (0.6 + 1.2 * k) * (0.8 + 0.25 * ((i * 37) % 5) / 4) * strength
+		local y = DUST.first_y + (i - 1) * DUST.spacing_y
+		local s = (DUST_ANIM.start_scale + DUST_ANIM.grow * k) * (DUST.base_scale + DUST.scale_spread * ((i * 37) % 5) / 4) * strength
 		tx_dust:SetScale(s, s)
-		tx_dust:SetRotation(i * 47 + k * 40 * side)
-		tx_dust:DrawAtAnchor(SCREEN_W / 2 + side * (20 + 110 * k), y, "center")
+		tx_dust:SetRotation(i * DUST.angle_step_deg + k * DUST_ANIM.turn_deg * side)
+		tx_dust:DrawAtAnchor(SCREEN_W / 2 + side * (DUST.seam_offset + DUST_ANIM.travel * k), y, "center")
 	end
 	tx_dust:SetScale(1, 1); tx_dust:SetRotation(0); tx_dust:SetOpacity(1)
 end
@@ -84,10 +91,10 @@ local function shakeAt(now)
 	local dx, dy = 0, 0
 	for i, L in ipairs(letters) do
 		local d = now - (L.t0 + FALL)
-		if d >= 0 and d < 0.4 then
-			local a = 13 * math.exp(-d / 0.08)
-			dx = dx + a * math.sin(d * 97 + i)
-			dy = dy + a * math.cos(d * 83 + i * 1.7)
+		if d >= 0 and d < JOLT.length_s then
+			local a = JOLT.amp_px * math.exp(-d / JOLT.decay_s)
+			dx = dx + a * math.sin(d * JOLT.freq_x + i)
+			dy = dy + a * math.cos(d * JOLT.freq_y + i * JOLT.phase_y)
 		end
 	end
 	return dx, dy
@@ -105,8 +112,8 @@ local function layout()
 	if font == nil then return end
 	local lines = {}
 	for line in (title() .. "\n"):gmatch("(.-)\n") do lines[#lines + 1] = line end
-	local lineH = font.LineHeight * 0.92
-	local track = FONT_SIZE * 1.3 * TRACK
+	local lineH = font.LineHeight * TITLE.line_pitch
+	local track = FONT_SIZE * TITLE.em_size * TRACK
 	local rows, widest = {}, 0
 	for _, line in ipairs(lines) do
 		local chars, w = {}, 0
@@ -135,7 +142,8 @@ local function drawLetter(L, dx, dy, scale, alpha)
 	if alpha <= 0 then return end
 	scale = scale * L.k
 	local x, y = L.x + dx, L.y + dy + nudge * scale
-	font:Draw(L.ch, x + 7 * scale, y + 9 * scale, shadow, shadow, alpha * 0.45, scale, 0, "center")
+	font:Draw(L.ch, x + TITLE.shadow_offset.x * scale, y + TITLE.shadow_offset.y * scale, shadow, shadow,
+		alpha * TITLE.shadow_opacity, scale, 0, "center")
 	font:Draw(string.format(STONE, L.ch), x, y, fore, outline, alpha, scale, 0, "center")
 end
 
@@ -152,7 +160,7 @@ local function drawTitle(now)
 	for _, L in ipairs(letters) do
 		local p = clamp01((now - L.t0) / FALL)
 		if p > 0 then
-			local e = 1 - (1 - p) ^ 3
+			local e = 1 - (1 - p) ^ TITLE_ANIM.fall_ease
 			drawLetter(L, dx, dy, BIG + (1 - BIG) * e, e * titleAlpha)
 		end
 	end
@@ -180,8 +188,8 @@ function fadeOut(t)
 		if snd_slam then snd_slam:Play() end
 	end
 	local k = (t - SHUT_AT) / (1 - SHUT_AT)
-	local amp = 20 * (1 - k) ^ 2
-	drawGate(0, amp * math.sin(k * 70), amp * math.cos(k * 53))
+	local amp = CLOSE.shake_px * (1 - k) ^ 2
+	drawGate(0, amp * math.sin(k * CLOSE.shake_freq_x), amp * math.cos(k * CLOSE.shake_freq_y))
 	drawDust(k, 1)
 end
 
@@ -203,7 +211,7 @@ function fadeIn(t)
 	end
 	local k = clamp01((now - TITLE_SECONDS) / OPEN_SECONDS)
 	drawGate(easeInOut(k), 0, 0)
-	drawDust(clamp01(k / 0.45), 0.6)
+	drawDust(clamp01(k / DUST_ANIM.open_life), DUST_ANIM.open_strength)
 	if t >= 1 then freeTextures() end   -- the trip is over
 end
 
@@ -213,10 +221,10 @@ function onStart()
 	snd_open = SOUND:CreateSFX("Sounds/GateOpen.ogg")
 	for i = 1, 3 do snd_letters[i] = SOUND:CreateSFX("Sounds/LetterSlam.ogg") end
 	font = TEXT:CreateGlyphCached(FONT_SIZE)
-	nudge = math.floor((font.BoxHeight - math.ceil(font.LineHeight)) / 2) - 1
-	fore = COLOR:CreateColorFromRGBA(244, 236, 217, 255)
-	outline = COLOR:CreateColorFromRGBA(40, 32, 24, 255)
-	shadow = COLOR:CreateColorFromRGBA(0, 0, 0, 255)
+	nudge = math.floor((font.BoxHeight - math.ceil(font.LineHeight)) / 2) + TITLE.text_nudge
+	fore = Config.color(TITLE.fore_color)
+	outline = Config.color(TITLE.outline_color)
+	shadow = Config.color(TITLE.shadow_color)
 end
 
 function onDestroy()

@@ -9,73 +9,84 @@
 
 local Replay = require("replaylist")
 local Color  = require("Color")            -- Lib: colour space conversions / adjustments
-local CFG    = require("sscore_config")   -- Config/layout.json (skinner-editable); values fall back to the defaults below
+local Config    = require("Core.Config")
+local Layout    = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local DS        = Layout.difficulty_select
+local Level     = DS.level
+local LevelAnim = Animation.difficulty_select.level
+local NoteAnim  = Animation.difficulty_select.note
+local Colors    = Layout.colors
 
 local M = {}
 local G   -- shared state injected by Script.lua
 
--- ── Layout constants (defaults; overridable via Config/layout.json) ─────────────
+-- ── Layout constants ────────────────────────────────────────────────────────────
 
-local DIFFSELECT_CHARA_ORIG_X_35P = CFG.num("difficulty_select.chara_35p.origin_x", 1250)
-local DIFFSELECT_CHARA_ORIG_Y_35P = CFG.num("difficulty_select.chara_35p.origin_y", 470)
-local DIFFSELECT_CHARA_GAP_X_35P  = CFG.num("difficulty_select.chara_35p.gap_x", 332)
-local DIFFSELECT_CHARA_GAP_Y_35P  = CFG.num("difficulty_select.chara_35p.gap_y", 457)
-local DIFFSELECT_CHARA_SCALE_35P  = CFG.num("difficulty_select.chara_35p.scale", 0.5)
-local DIFFSELECT_CHARA_ORIG_X_12P = CFG.num("difficulty_select.chara_12p.origin_x", 1300)
-local DIFFSELECT_CHARA_ORIG_Y_12P = CFG.num("difficulty_select.chara_12p.origin_y", 760)
-local DIFFSELECT_CHARA_GAP_X_12P  = CFG.num("difficulty_select.chara_12p.gap_x", 468)
-local DIFFSELECT_CHARA_SCALE_12P  = CFG.num("difficulty_select.chara_12p.scale", 0.8)
+local Chara35 = DS.chara_35p
+local Chara12 = DS.chara_12p
+local DIFFSELECT_CHARA_ORIG_X_35P = Chara35.origin_x
+local DIFFSELECT_CHARA_ORIG_Y_35P = Chara35.origin_y
+local DIFFSELECT_CHARA_GAP_X_35P  = Chara35.gap_x
+local DIFFSELECT_CHARA_GAP_Y_35P  = Chara35.gap_y
+local DIFFSELECT_CHARA_SCALE_35P  = Chara35.scale
+local DIFFSELECT_CHARA_ROW1_35P   = Chara35.first_row_count   -- index = player count - 2
+local DIFFSELECT_CHARA_ORIG_X_12P = Chara12.origin_x
+local DIFFSELECT_CHARA_ORIG_Y_12P = Chara12.origin_y
+local DIFFSELECT_CHARA_GAP_X_12P  = Chara12.gap_x
+local DIFFSELECT_CHARA_SCALE_12P  = Chara12.scale
+
+local function hexList(list)
+    local out = {}
+    for i, hex in ipairs(list) do out[i] = COLOR:CreateColorFromHex(hex) end
+    return out
+end
 
 -- Per-difficulty LevelCol tint (index = difficulty + 1); vault overrides to LVL_VAULT_COLOR.
-local DIFFSELECT_LEVEL_COLORS = CFG.colorList("colors.level", {
-    COLOR:CreateColorFromHex("FF65A9F7"),
-    COLOR:CreateColorFromHex("FF8FF5A9"),
-    COLOR:CreateColorFromHex("FFE6DA76"),
-    COLOR:CreateColorFromHex("FFF39898"),
-    COLOR:CreateColorFromHex("FFCD7EE6"),
-})
+local DIFFSELECT_LEVEL_COLORS = hexList(Colors.level)
 local COL_WHITE       = COLOR:CreateColorFromHex("FFFFFFFF")
-local LVL_VAULT_COLOR = CFG.color("colors.level_vault", COLOR:CreateColorFromHex("FF1F5050"))
+local LVL_VAULT_COLOR = COLOR:CreateColorFromHex(Colors.level_vault)
 
 -- The "+" of a plus level (LevelCol/plus.png) takes the level colour like the digits; LevelCol/plus_border.png
 -- is drawn under it in a colour of its own: white, black for Ura/Edit (whose colour is light on a dark bar)
 -- and vault.
-local COL_BLACK = COLOR:CreateColorFromHex("FF000000")
-local DIFFSELECT_PLUS_BORDER_COLORS = CFG.colorList("colors.level_plus_border", { COL_WHITE, COL_WHITE, COL_WHITE, COL_WHITE, COL_BLACK })
-local LVL_VAULT_PLUS_BORDER_COLOR   = CFG.color("colors.level_plus_border_vault", COL_BLACK)
-local VAULT_BLACK     = CFG.color("colors.vault_text", COLOR:CreateColorFromARGB(255, 0, 0, 0))
-local VAULT_NOOUTLINE = CFG.color("colors.vault_text_outline", COLOR:CreateColorFromARGB(0, 0, 0, 0))
+local DIFFSELECT_PLUS_BORDER_COLORS = hexList(Colors.level_plus_border)
+local LVL_VAULT_PLUS_BORDER_COLOR   = COLOR:CreateColorFromHex(Colors.level_plus_border_vault)
+local VAULT_BLACK     = COLOR:CreateColorFromHex(Colors.vault_text)
+local VAULT_NOOUTLINE = COLOR:CreateColorFromHex(Colors.vault_text_outline)
 
 -- Note frame: base position relative to the difficulty-select scroll, plus the float/rotate idle.
-local NOTE_BASE_X      = CFG.num("difficulty_select.note.base_x", -115)
-local NOTE_BASE_Y      = CFG.num("difficulty_select.note.base_y", -78)
-local NOTE_FLOAT_AMP_X = CFG.num("difficulty_select.note.float_amp_x", 6)     -- px, gentle horizontal drift
-local NOTE_FLOAT_AMP_Y = CFG.num("difficulty_select.note.float_amp_y", 12)    -- px, gentle vertical bob
-local NOTE_ROT_AMP     = CFG.num("difficulty_select.note.rot_amp", 1.5)       -- degrees; sine amplitude of the gentle sway (not a turn count)
-local NOTE_FIXED_TILT  = CFG.num("difficulty_select.note.fixed_tilt", 5)      -- degrees; constant tilt of the whole note (positive = tilt right/clockwise)
+local NOTE_BASE_X      = DS.note.base_x
+local NOTE_BASE_Y      = DS.note.base_y
+local NOTE_FLOAT_AMP_X = NoteAnim.float_amp_x     -- px, gentle horizontal drift
+local NOTE_FLOAT_AMP_Y = NoteAnim.float_amp_y     -- px, gentle vertical bob
+local NOTE_FLOAT_FREQ_X = NoteAnim.float_freq_x   -- the drift's frequency, in bobs
+local NOTE_ROT_AMP     = NoteAnim.rot_amp         -- degrees; sine amplitude of the gentle sway (not a turn count)
+local NOTE_ROT_PHASE   = NoteAnim.rot_phase       -- radians; the sway's lead on the bob
+local NOTE_FIXED_TILT  = DS.note.fixed_tilt       -- degrees; constant tilt of the whole note (positive = tilt right/clockwise)
 
 -- Option bars (0 / 1 / Customize), top-left anchor relative to Note; first position, step to each next.
-local OPT_ORIG_X = CFG.num("difficulty_select.option_bars.origin_x", 595)
-local OPT_ORIG_Y = CFG.num("difficulty_select.option_bars.origin_y", 139)
-local OPT_STEP_X = CFG.num("difficulty_select.option_bars.step_x", -245)
-local OPT_STEP_Y = CFG.num("difficulty_select.option_bars.step_y", 57)
+local OPT_ORIG_X = DS.option_bars.origin_x
+local OPT_ORIG_Y = DS.option_bars.origin_y
+local OPT_STEP_X = DS.option_bars.step_x
+local OPT_STEP_Y = DS.option_bars.step_y
 
 -- Difficulty bars (compact list, one slot each along the diagonal); first position, step to each next.
-local DBAR_ORIG_X = CFG.num("difficulty_select.difficulty_bars.origin_x", 173)
-local DBAR_ORIG_Y = CFG.num("difficulty_select.difficulty_bars.origin_y", 332)
-local DBAR_STEP_X = CFG.num("difficulty_select.difficulty_bars.step_x", 39)
-local DBAR_STEP_Y = CFG.num("difficulty_select.difficulty_bars.step_y", 140)
+local DBAR_ORIG_X = DS.difficulty_bars.origin_x
+local DBAR_ORIG_Y = DS.difficulty_bars.origin_y
+local DBAR_STEP_X = DS.difficulty_bars.step_x
+local DBAR_STEP_Y = DS.difficulty_bars.step_y
 
 -- LevelCol number, relative to a difficulty bar's top-left. The whole digit set is centred at (LVL_CX,LVL_CY);
 -- multiple digits step by (LVL_DIGIT_DX, LVL_DIGIT_DY) (a slight up-right slant matching the layout).
-local LVL_CX       = CFG.num("difficulty_select.level.center_x", 399)
-local LVL_CY       = CFG.num("difficulty_select.level.center_y", 108)
-local LVL_DIGIT_DX = CFG.num("difficulty_select.level.digit_step_x", 34)
-local LVL_DIGIT_DY = CFG.num("difficulty_select.level.digit_step_y", -9)
+local LVL_CX       = Level.center_x
+local LVL_CY       = Level.center_y
+local LVL_DIGIT_DX = Level.digit_step_x
+local LVL_DIGIT_DY = Level.digit_step_y
 -- A plus level's "+" (LevelCol/plus.png) rides the last digit's top-right corner: its centre from that
 -- digit's slot centre
-local LVL_PLUS_DX  = CFG.num("difficulty_select.level.plus_dx", 7)
-local LVL_PLUS_DY  = CFG.num("difficulty_select.level.plus_dy", -25)
+local LVL_PLUS_DX  = Level.plus_dx
+local LVL_PLUS_DY  = Level.plus_dy
 
 -- Level gauge: the dark band under the number, cut into slices baked upright in Textures/DifficultyBars/
 -- LevelGauge (seg8 for Easy/Normal, seg10 for the rest; three cells each: first / middle / last). Every
@@ -83,64 +94,66 @@ local LVL_PLUS_DY  = CFG.num("difficulty_select.level.plus_dy", -25)
 -- then last) and rotated by the band's angle plus the Note's sway. Lit slices = min(level, slices). Each
 -- slice takes its own shade, two styles: light bars run from a pale tint of the level colour to its vivid
 -- variant; dark bars (Ura/Edit, vault) run from the vivid variant to a lighter one. Unlit slices show faintly.
-local GAUGE_ROT       = CFG.num("difficulty_select.level.gauge_rotation", 13.2)       -- degrees; the band's rise (CCW)
+local GAUGE_ROT       = Level.gauge_rotation       -- degrees; the band's rise (CCW)
 -- 1 = the dark-bar style (vivid first, lighter last), per difficulty (index = difficulty + 1) and for the vault
-local GAUGE_VIVID_FIRST       = CFG.numList("difficulty_select.level.gauge_vivid_first", { 0, 0, 0, 0, 1 })
-local GAUGE_VIVID_FIRST_VAULT = CFG.num("difficulty_select.level.gauge_vivid_first_vault", 1)
+local GAUGE_VIVID_FIRST       = Level.gauge_vivid_first
+local GAUGE_VIVID_FIRST_VAULT = Level.gauge_vivid_first_vault
 local GAUGE_SETS = {
-    [8]  = { first = { CFG.num("difficulty_select.level.gauge8_first_x", 350.6), CFG.num("difficulty_select.level.gauge8_first_y", 177.2) },
-             mid   = { CFG.num("difficulty_select.level.gauge8_mid_x", 388.1),   CFG.num("difficulty_select.level.gauge8_mid_y", 168.4) },
-             step  = { CFG.num("difficulty_select.level.gauge8_step_x", 36.45),  CFG.num("difficulty_select.level.gauge8_step_y", -8.55) },
-             last  = { CFG.num("difficulty_select.level.gauge8_last_x", 607.7),  CFG.num("difficulty_select.level.gauge8_last_y", 116.9) } },
-    [10] = { first = { CFG.num("difficulty_select.level.gauge10_first_x", 346.5), CFG.num("difficulty_select.level.gauge10_first_y", 176.1) },
-             mid   = { CFG.num("difficulty_select.level.gauge10_mid_x", 376.7),   CFG.num("difficulty_select.level.gauge10_mid_y", 169.0) },
-             step  = { CFG.num("difficulty_select.level.gauge10_step_x", 29.18),  CFG.num("difficulty_select.level.gauge10_step_y", -6.84) },
-             last  = { CFG.num("difficulty_select.level.gauge10_last_x", 611.1),  CFG.num("difficulty_select.level.gauge10_last_y", 114.0) } },
+    [8]  = { first = { Level.gauge8_first_x, Level.gauge8_first_y },
+             mid   = { Level.gauge8_mid_x,   Level.gauge8_mid_y },
+             step  = { Level.gauge8_step_x,  Level.gauge8_step_y },
+             last  = { Level.gauge8_last_x,  Level.gauge8_last_y } },
+    [10] = { first = { Level.gauge10_first_x, Level.gauge10_first_y },
+             mid   = { Level.gauge10_mid_x,   Level.gauge10_mid_y },
+             step  = { Level.gauge10_step_x,  Level.gauge10_step_y },
+             last  = { Level.gauge10_last_x,  Level.gauge10_last_y } },
 }
-local GAUGE_EMPTY     = CFG.num("difficulty_select.level.gauge_empty_opacity", 0.15)   -- unlit slices; 0 hides them
+local GAUGE_EMPTY     = Level.gauge_empty_opacity   -- unlit slices; 0 hides them
 -- High-level slices (Easy / Normal / Hard from the song list's checker levels, slice index >= level) pulse
 -- brighter and carry the space overlay (LevelGauge/seg<n>_space.png: same cells, one frame per row)
 local GAUGE_FX_LEVEL = {
-    [0] = CFG.num("song_list.checker_level_easy", 6),
-    [1] = CFG.num("song_list.checker_level_normal", 8),
-    [2] = CFG.num("song_list.checker_level_hard", 9),
+    [0] = Layout.song_list.checker_level_easy,
+    [1] = Layout.song_list.checker_level_normal,
+    [2] = Layout.song_list.checker_level_hard,
 }
-local GAUGE_FX_PULSE_MS  = CFG.num("difficulty_select.level.gauge_fx_pulse_ms", 1100)      -- one brightness pulse
-local GAUGE_FX_PULSE_OP  = CFG.num("difficulty_select.level.gauge_fx_pulse_opacity", 0.6)  -- pulse peak, over the slice
-local GAUGE_FX_LIGHTEN   = CFG.num("difficulty_select.level.gauge_fx_lighten", 0.55)       -- the pulse shade: how far toward white
-local GAUGE_FX_FRAME_MS  = CFG.num("difficulty_select.level.gauge_fx_frame_ms", 70)        -- space overlay frame time
-local GAUGE_FX_SPACE_OP  = CFG.num("difficulty_select.level.gauge_fx_space_opacity", 0.9)  -- space overlay opacity
+local GAUGE_FX_PULSE_MS  = LevelAnim.gauge_fx_pulse_ms        -- one brightness pulse
+local GAUGE_FX_PULSE_OP  = LevelAnim.gauge_fx_pulse_opacity   -- pulse peak, over the slice
+local GAUGE_FX_STAGGER   = LevelAnim.gauge_fx_stagger         -- the pulse's phase step from one slice to the next
+local GAUGE_FX_LIGHTEN   = Level.gauge_fx_lighten             -- the pulse shade: how far toward white
+local GAUGE_FX_FRAME_MS  = LevelAnim.gauge_fx_frame_ms        -- space overlay frame time
+local GAUGE_FX_SPACE_OP  = Level.gauge_fx_space_opacity       -- space overlay opacity
 -- Level stars: one per level past the gauge's last slice, on three slots along the band (bar-relative
 -- centres, from Textures/DifficultyBars/stars.xcf). 13+ fills the three slots; 12 puts two stars pulled
 -- toward the middle by STAR_PAIR_PULL of their half-distance; 11 puts one in the middle of slots 1 and 3.
-local STAR_FROM_LEVEL = CFG.num("difficulty_select.level.star_from_level", 11)
+local STAR_FROM_LEVEL = Level.star_from_level
 local STAR_SLOTS = {
-    { CFG.num("difficulty_select.level.star1_x", 447.5), CFG.num("difficulty_select.level.star1_y", 168) },
-    { CFG.num("difficulty_select.level.star2_x", 481.5), CFG.num("difficulty_select.level.star2_y", 163) },
-    { CFG.num("difficulty_select.level.star3_x", 513.5), CFG.num("difficulty_select.level.star3_y", 152) },
+    { Level.star1_x, Level.star1_y },
+    { Level.star2_x, Level.star2_y },
+    { Level.star3_x, Level.star3_y },
 }
-local STAR_PAIR_PULL      = CFG.num("difficulty_select.level.star_pair_pull", 0.25)
+local STAR_PAIR_PULL      = Level.star_pair_pull
 -- the glitter: an additive shine pulse on the star and two glints blinking in turn
-local STAR_SHINE_MS       = CFG.num("difficulty_select.level.star_shine_ms", 900)
-local STAR_SHINE_OP       = CFG.num("difficulty_select.level.star_shine_opacity", 0.45)
-local STAR_GLINT_MS       = CFG.num("difficulty_select.level.star_glint_ms", 1500)
-local STAR_GLINT_OP       = CFG.num("difficulty_select.level.star_glint_opacity", 0.95)
+local STAR_SHINE_MS       = LevelAnim.star_shine_ms
+local STAR_SHINE_OP       = LevelAnim.star_shine_opacity
+local STAR_GLINT_MS       = LevelAnim.star_glint_ms
+local STAR_GLINT_OP       = LevelAnim.star_glint_opacity
 local STAR_GLINT_OFFSETS  = {   -- star-relative (bar coordinates), rotating with the Note
-    { CFG.num("difficulty_select.level.star_glint1_dx", 9),  CFG.num("difficulty_select.level.star_glint1_dy", -11) },
-    { CFG.num("difficulty_select.level.star_glint2_dx", -9), CFG.num("difficulty_select.level.star_glint2_dy", 6) },
+    { Level.star_glint1_dx, Level.star_glint1_dy },
+    { Level.star_glint2_dx, Level.star_glint2_dy },
 }
-local GAUGE_START_MIX = CFG.num("difficulty_select.level.gauge_start_mix", 0.45)      -- light bars, first slice: how far toward white
-local GAUGE_END_SAT   = CFG.num("difficulty_select.level.gauge_end_saturation", 1.45) -- vivid end: saturation multiplier
-local GAUGE_END_LIGHT = CFG.num("difficulty_select.level.gauge_end_lighten", 0.4)     -- dark bars, last slice: how far toward white (HSL lightness)
+local GAUGE_START_MIX = Level.gauge_start_mix          -- light bars, first slice: how far toward white
+local GAUGE_END_SAT   = Level.gauge_end_saturation     -- vivid end: saturation multiplier
+local GAUGE_END_SAT_ADD = Level.gauge_end_saturation_add   -- vivid end: flat saturation added
+local GAUGE_END_LIGHT = Level.gauge_end_lighten        -- dark bars, last slice: how far toward white (HSL lightness)
 -- the vault's level colour is the vault band's own colour, so its gauge starts from a lighter teal
-local LVL_VAULT_GAUGE_COLOR = CFG.color("colors.level_gauge_vault", COLOR:CreateColorFromHex("FF5FC8C8"))
+local LVL_VAULT_GAUGE_COLOR = COLOR:CreateColorFromHex(Colors.level_gauge_vault)
 
 -- n shades of the level colour: pale tint -> vivid (light bars), or vivid -> lighter (dark bars); plus the
 -- lighter shade of each, for the high-level pulse
 local function gaugeShades(levelCol, n, vividFirst)
     local ok, shades, bright = pcall(function()
         local r, g, b = Color.fromEngine(levelCol)
-        local vr, vg, vb = Color.saturate(r, g, b, GAUGE_END_SAT, 0.05)
+        local vr, vg, vb = Color.saturate(r, g, b, GAUGE_END_SAT, GAUGE_END_SAT_ADD)
         local from, to
         if vividFirst then
             from, to = { vr, vg, vb }, { Color.lighten(r, g, b, GAUGE_END_LIGHT) }
@@ -164,26 +177,28 @@ local gaugeShadeCache = {}   -- difficulty (or "vault") -> { shades, bright }, b
 -- Charter names (up to CHARTER_MAX), relative to a difficulty bar's top-left. First centred at
 -- (CHARTER_CX,CHARTER_CY), each next offset by (CHARTER_DX,CHARTER_DY); squished to CHARTER_MAXW, tilted CHARTER_ROT.
 -- White, outlined in the level colour darkened by CHARTER_BORDER_DARKEN.
-local CHARTER_CX   = CFG.num("difficulty_select.charter.center_x", 553)
-local CHARTER_CY   = CFG.num("difficulty_select.charter.center_y", 58)
-local CHARTER_DX   = CFG.num("difficulty_select.charter.step_x", 7)
-local CHARTER_DY   = CFG.num("difficulty_select.charter.step_y", 26)
-local CHARTER_MAXW = CFG.num("difficulty_select.charter.max_width", 132)
-local CHARTER_ROT  = CFG.num("difficulty_select.charter.rotation", 13.76)   -- degrees; up-right tilt (CCW). Flip if it tilts down.
-local CHARTER_MAX  = CFG.num("difficulty_select.charter.max_count", 3)
-local CHARTER_BORDER_DARKEN = CFG.num("difficulty_select.charter.border_darken", 0.55)
+local Charter = DS.charter
+local CHARTER_CX   = Charter.center_x
+local CHARTER_CY   = Charter.center_y
+local CHARTER_DX   = Charter.step_x
+local CHARTER_DY   = Charter.step_y
+local CHARTER_MAXW = Charter.max_width
+local CHARTER_ROT  = Charter.rotation   -- degrees; up-right tilt (CCW). Flip if it tilts down.
+local CHARTER_MAX  = Charter.max_count
+local CHARTER_BORDER_DARKEN = Charter.border_darken
 
 -- Vault chart name, relative to a difficulty bar's top-left (centred), squished + tilted like the charters.
-local VAULT_CX   = CFG.num("difficulty_select.vault.center_x", 178)
-local VAULT_CY   = CFG.num("difficulty_select.vault.center_y", 215)
-local VAULT_MAXW = CFG.num("difficulty_select.vault.max_width", 222)
+local Vault = DS.vault
+local VAULT_CX   = Vault.center_x
+local VAULT_CY   = Vault.center_y
+local VAULT_MAXW = Vault.max_width
 
 -- Charter/vault labels render to a single cached texture each (TEXT:GetText) rather than per-glyph, so
 -- rotating them stays smooth (a rotated composite of many small glyph quads jitters). Bounded strings.
 local charterFont, vaultFont
 local function ensureLabelFonts()
-    if charterFont == nil then charterFont = TEXT:Create(18) end
-    if vaultFont   == nil then vaultFont   = TEXT:Create(24) end
+    if charterFont == nil then charterFont = TEXT:Create(Charter.font_size) end
+    if vaultFont   == nil then vaultFont   = TEXT:Create(Vault.font_size) end
 end
 
 -- the charter outline: the level colour darkened, one COLOR object per level colour
@@ -205,20 +220,27 @@ end
 -- difficulty bar (drawn at (PSEL_DIFF_DX,PSEL_DIFF_DY) from the bar's top-left), the small BOTTOM half
 -- frames an option bar. The bottom half's art sits in the texture's left ~PSEL_OPT_W px, so it is centred
 -- on the option bar (centring on the full 674px width put it far to the right), then nudged by (PSEL_OPT_DX,DY).
-local PSEL_SPLIT_Y = CFG.num("difficulty_select.player_selector.split_y", 292)
-local PSEL_DIFF_DX = CFG.num("difficulty_select.player_selector.diff_offset_x", 8)
-local PSEL_DIFF_DY = CFG.num("difficulty_select.player_selector.diff_offset_y", -7)
-local PSEL_OPT_W   = CFG.num("difficulty_select.player_selector.opt_width", 290)
-local PSEL_OPT_DX  = CFG.num("difficulty_select.player_selector.opt_offset_x", 22)
-local PSEL_OPT_DY  = CFG.num("difficulty_select.player_selector.opt_offset_y", -6)
+local PSel = DS.player_selector
+local PSEL_SPLIT_Y = PSel.split_y
+local PSEL_DIFF_DX = PSel.diff_offset_x
+local PSEL_DIFF_DY = PSel.diff_offset_y
+local PSEL_OPT_W   = PSel.opt_width
+local PSEL_OPT_DX  = PSel.opt_offset_x
+local PSEL_OPT_DY  = PSel.opt_offset_y
 
 -- Header alpha eases 100% (song select) → HEADER_DIFF_ALPHA (difficulty select) across the transition.
-local HEADER_DIFF_ALPHA  = CFG.num("header.diffselect_alpha", 0.4)
+local HEADER_DIFF_ALPHA  = Layout.header.diffselect_alpha
 
-local NAMEPLATE_HEIGHT   = CFG.num("difficulty_select.nameplate.height", 81)
-local NAMEPLATE_OFFSET_X = CFG.num("difficulty_select.nameplate.offset_x", 27)
-local NAMEPLATE_OFFSET_Y = CFG.num("difficulty_select.nameplate.offset_y", 37)
-local PUCHI_OFFSET_X     = CFG.num("difficulty_select.nameplate.puchi_offset_x", 60)
+local DSNameplate = DS.nameplate
+local NAMEPLATE_HEIGHT   = DSNameplate.height
+local NAMEPLATE_OFFSET_X = DSNameplate.offset_x
+local NAMEPLATE_OFFSET_Y = DSNameplate.offset_y
+local PUCHI_OFFSET_X     = DSNameplate.puchi_offset_x
+local MODICONS_GAP       = DSNameplate.modicons_gap
+
+local Title   = DS.title
+local AILevel = DS.ai_level
+local Transition = Animation.screen_transition
 
 -- ── Init ──────────────────────────────────────────────────────────────────────
 
@@ -267,9 +289,10 @@ end
 
 function M.updateTransitionVisuals(val)
     G.songSelectShift = val
-    local opacity    = 255 - (val * (255 / 960))
+    local fadePx     = Transition.fade_px
+    local opacity    = 255 - (val * (255 / fadePx))
     G.songSelectElemOpacity      = math.max(0, math.min(255, opacity))
-    local diffOpacity = (val - 960) * (255 / 960)
+    local diffOpacity = (val - (1920 - fadePx)) * (255 / fadePx)
     G.difficultySelectElemOpacity = math.max(0, math.min(255, diffOpacity))
 end
 
@@ -290,10 +313,10 @@ local nAngleDeg, nCosA, nSinA, nNoteX, nNoteY, nPivX, nPivY
 
 local function computeNoteXform()
     local ph  = (G.noteFloatPhase or 0) * math.pi / 180
-    local fx  = math.sin(ph * 2) * NOTE_FLOAT_AMP_X
+    local fx  = math.sin(ph * NOTE_FLOAT_FREQ_X) * NOTE_FLOAT_AMP_X
     local fy  = math.sin(ph) * NOTE_FLOAT_AMP_Y
     -- constant right tilt (subtract: SetRotation is CCW, so negative = clockwise/right) plus the gentle sway
-    nAngleDeg = math.sin(ph + 0.9) * NOTE_ROT_AMP - NOTE_FIXED_TILT
+    nAngleDeg = math.sin(ph + NOTE_ROT_PHASE) * NOTE_ROT_AMP - NOTE_FIXED_TILT
     local rad = nAngleDeg * math.pi / 180
     nCosA, nSinA = math.cos(rad), math.sin(rad)
 
@@ -324,8 +347,8 @@ end
 
 -- The bars' plates are slanted rectangles inside their textures (measured on the art): centre, rise angle and
 -- half extents along / across the plate. A point is on a bar when it is inside that rectangle.
-local PLATE_DIFF = { cx = 342, cy = 135, angle = 13.2, along = 318, across = 62 }
-local PLATE_OPT  = { cx = 132, cy = 101, angle = 10.9, along = 104, across = 68 }
+local PLATE_DIFF = DS.plate_diff
+local PLATE_OPT  = DS.plate_opt
 local function onPlate(plate, bx, by, lx, ly)
     local a = math.rad(plate.angle)
     local dx, dy = lx - (bx + plate.cx), ly - (by + plate.cy)
@@ -482,7 +505,7 @@ local function drawLevelGauge(level, difficulty, isVault, bx, by, opacity)
             tex:DrawRectAtAnchor(sx, sy, cell * cw, 0, cw, ch, "center")
             if fxFrom ~= nil and i >= fxFrom and i <= lit then
                 -- brightness pulse: the lighter shade over the slice, staggered along the gauge
-                local pulse = 0.5 + 0.5 * math.sin(2 * math.pi * t / GAUGE_FX_PULSE_MS + i * 0.6)
+                local pulse = 0.5 + 0.5 * math.sin(2 * math.pi * t / GAUGE_FX_PULSE_MS + i * GAUGE_FX_STAGGER)
                 tex:SetColor(bright[i])
                 tex:SetOpacity(a * GAUGE_FX_PULSE_OP * pulse)
                 tex:DrawRectAtAnchor(sx, sy, cell * cw, 0, cw, ch, "center")
@@ -507,19 +530,19 @@ local function drawLevelStars(level, bar, bx, by, opacity)
     if lv < STAR_FROM_LEVEL then return end
     local tex = G.bgtx["diffsel_star" .. bar]
     if tex == nil then return end
-    local count = math.min(3, lv - STAR_FROM_LEVEL + 1)
+    local count = math.min(#STAR_SLOTS, lv - STAR_FROM_LEVEL + 1)
     local s1, s3 = STAR_SLOTS[1], STAR_SLOTS[3]
     local mx, my = (s1[1] + s3[1]) / 2, (s1[2] + s3[2]) / 2
     local t = G.nowMs or 0
     local glint = G.bgtx["diffsel_star_glint"]
     for i = 1, count do
         local px, py
-        if count == 3 then px, py = STAR_SLOTS[i][1], STAR_SLOTS[i][2]
+        if count == #STAR_SLOTS then px, py = STAR_SLOTS[i][1], STAR_SLOTS[i][2]
         elseif count == 2 then
             local s = (i == 1) and s1 or s3
             px, py = s[1] + (mx - s[1]) * STAR_PAIR_PULL, s[2] + (my - s[2]) * STAR_PAIR_PULL
         else px, py = mx, my end
-        local shine = 0.5 + 0.5 * math.sin(2 * math.pi * t / STAR_SHINE_MS + i * 1.3)
+        local shine = 0.5 + 0.5 * math.sin(2 * math.pi * t / STAR_SHINE_MS + i * LevelAnim.star_shine_stagger)
         local sx, sy = nmap(bx + px, by + py)
         tex:SetRotation(nAngleDeg)
         tex:SetOpacity(opacity)
@@ -534,13 +557,14 @@ local function drawLevelStars(level, bar, bx, by, opacity)
             glint:SetBlendMode("add")
             for k, off in ipairs(STAR_GLINT_OFFSETS) do
                 -- each glint blinks once per STAR_GLINT_MS, offset per star and per glint so they take turns
-                local gp = (t / STAR_GLINT_MS + i * 0.37 + k * 0.5) % 1
+                local gp = (t / STAR_GLINT_MS + i * LevelAnim.star_glint_stagger + k * 0.5) % 1
                 local blink = math.sin(gp * math.pi)
                 blink = blink * blink * blink
-                if blink > 0.02 then
+                if blink > LevelAnim.star_glint_min then
                     local gx, gy = nmap(bx + px + off[1], by + py + off[2])
-                    glint:SetRotation(nAngleDeg + gp * 90)
-                    glint:SetScale(0.6 + 0.6 * blink, 0.6 + 0.6 * blink)
+                    local gs = LevelAnim.star_glint_scale_min + LevelAnim.star_glint_scale_grow * blink
+                    glint:SetRotation(nAngleDeg + gp * LevelAnim.star_glint_spin_deg)
+                    glint:SetScale(gs, gs)
                     glint:SetOpacity(opacity * STAR_GLINT_OP * blink)
                     glint:DrawAtAnchor(gx, gy, "center")
                 end
@@ -644,8 +668,8 @@ function M.drawPanel()
     G.bgtx["overlay_difficulty"]:SetOpacity(opacityNorm)
     G.bgtx["overlay_difficulty"]:DrawAtAnchor(1920, 0, "TopRight")
     if G.selectedSongNode ~= nil then
-        G.textLarge:Draw(G.selectedSongNode.Title, 1926 - G.songSelectShift, 0, nil, nil, opacityNorm, 1, 1280)
-        G.text:Draw(G.selectedSongNode.Subtitle, 1926 - G.songSelectShift, 67, nil, nil, opacityNorm, 1, 1280)
+        G.textLarge:Draw(G.selectedSongNode.Title, Title.x - G.songSelectShift, Title.y, nil, nil, opacityNorm, 1, Title.max_width)
+        G.text:Draw(G.selectedSongNode.Subtitle, Title.x - G.songSelectShift, Title.subtitle_y, nil, nil, opacityNorm, 1, Title.max_width)
     end
 
     -- Characters and nameplates
@@ -657,12 +681,12 @@ function M.drawPanel()
         local gx    = is35 and DIFFSELECT_CHARA_GAP_X_35P  or DIFFSELECT_CHARA_GAP_X_12P
         local gy    = is35 and DIFFSELECT_CHARA_GAP_Y_35P  or 0
         local s     = is35 and DIFFSELECT_CHARA_SCALE_35P  or DIFFSELECT_CHARA_SCALE_12P
-        local r1Count = (p == 5 and 3) or (p > 2 and 2) or p
+        local r1Count = is35 and DIFFSELECT_CHARA_ROW1_35P[p - 2] or p
 
         -- single-player performance mode shows the best-plays cards down the right edge;
         -- nudge the character/nameplate/mod-icons left so the two don't overlap. Any mode without the
         -- strip (training, AI battle, lobby, multiplayer) keeps the base layout.
-        if Replay.isActive() then ox = ox - 200 end
+        if Replay.isActive() then ox = ox - DS.replay_shift_x end
 
         for i = 0, p - 1 do
             local isRow2 = i >= r1Count
@@ -675,22 +699,22 @@ function M.drawPanel()
             local charaX = x + G.bgtx["nameplate_info"].Width / 2 - NAMEPLATE_OFFSET_X
             G.drawPlayerPuchi(i, charaX - PUCHI_OFFSET_X * s, y + G.puchiSineY * s, s, s, opacityNorm, false, G.puchiIdxFrame)
             if G.modicons_ro ~= nil then
-                G.modicons_ro:Draw(x, y + NAMEPLATE_HEIGHT + 4, i, nil, G.difficultySelectElemOpacity)
+                G.modicons_ro:Draw(x, y + NAMEPLATE_HEIGHT + MODICONS_GAP, i, nil, G.difficultySelectElemOpacity)
             end
         end
     end
 
     -- AI level slider (AI battle only)
     if G.activeConfig.mountAISlotToP2 then
-        local cx      = 1490 + xshift
-        G.textSmall:Draw("Starting AI Level", cx, 940, nil, nil, opacityNorm, 1, 400, "center")
-        G.text:Draw(tostring(CONFIG.AILevel), cx, 980, nil, nil, opacityNorm, 1, 200, "center")
+        local cx      = AILevel.x + xshift
+        G.textSmall:Draw("Starting AI Level", cx, AILevel.label_y, nil, nil, opacityNorm, 1, AILevel.label_max_width, "center")
+        G.text:Draw(tostring(CONFIG.AILevel), cx, AILevel.value_y, nil, nil, opacityNorm, 1, AILevel.value_max_width, "center")
         local ax = G.arrowsDistance
         if CONFIG.AILevel > 1 then
-            G.textSmall:Draw("◀", cx - 55 - ax, 980, nil, nil, opacityNorm, 1, 60, "right")
+            G.textSmall:Draw("◀", cx - AILevel.arrow_gap - ax, AILevel.value_y, nil, nil, opacityNorm, 1, AILevel.arrow_max_width, "right")
         end
         if CONFIG.AILevel < 10 then
-            G.textSmall:Draw("▶", cx + 55 + ax, 980, nil, nil, opacityNorm, 1, 60, "left")
+            G.textSmall:Draw("▶", cx + AILevel.arrow_gap + ax, AILevel.value_y, nil, nil, opacityNorm, 1, AILevel.arrow_max_width, "left")
         end
     end
 
@@ -784,7 +808,7 @@ function M.handleUpdate(ts)
     if canceled or (G.NavInput.cancel() and optionShown(0)) then
         G.sounds.Cancel:Play()
         G.activeScreen = "transition"
-        G.startCounter("screen_transition", 1920, 0, -0.5/1920, "none", M.updateTransitionVisuals, function()
+        G.startCounter("screen_transition", 1920, 0, -Transition.duration_s / 1920, "none", M.updateTransitionVisuals, function()
             M.resetToSongSelect()
         end)
     elseif allDiffsSelected then

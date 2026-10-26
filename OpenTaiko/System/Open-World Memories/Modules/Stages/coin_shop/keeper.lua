@@ -7,20 +7,24 @@
 -- bubble types the line in letter by letter.
 
 local Easing = require("Easing")
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
 
 local K = {}
 
+local Bubble, Talk, Hop, BubbleAnim = Layout.bubble, Animation.keeper, Animation.hop, Animation.bubble
 -- the stand-in's feet (bottom centre, behind the desk's front)
-local FOOT_X, FOOT_Y = 1556, 845
+local FOOT_X, FOOT_Y = Layout.keeper.foot.x, Layout.keeper.foot.y
 -- the bubble's tail tip; the image centre sits at TIP + (BUB_DX, BUB_DY), its body centre BODY_DY above that
-local TIP_X, TIP_Y = 1600, 354
-local BUB_DX, BUB_DY = -108, -133
-local BODY_DY = -32
-local TEXT_W = 548
-local CPS = 36
-local HOLD, HOLD_PER_CHAR = 2.6, 0.045
-local POP, CLOSE = 0.24, 0.18
-local LOW_GAP = 1.0           -- a low-priority line waits this long after the last line finished typing
+local TIP_X, TIP_Y = Bubble.tip_x, Bubble.tip_y
+local BUB_DX, BUB_DY = Bubble.dx, Bubble.dy
+local BODY_DY = Bubble.body_dy
+local TEXT_W = Bubble.text_w
+local CPS = Talk.chars_per_s
+local HOLD, HOLD_PER_CHAR = Talk.hold_s, Talk.hold_per_char_s
+local POP, CLOSE = BubbleAnim.pop_s, BubbleAnim.close_s
+local LOW_GAP = Talk.low_gap_s           -- a low-priority line waits this long after the last line finished typing
 
 -- part-timer 0, Calla: event -> expression, then her English lines; quiet and tired, says as little as she
 -- can (keys SHOP_TALK_CALLA_<EVENT>_<n>)
@@ -43,7 +47,7 @@ local CALLA = {
 }
 -- folder number -> the key prefix of its lines, how much it hops, its lines; a folder missing here uses 0's
 local PART_TIMERS = {
-	[0] = { prefix = "SHOP_TALK_CALLA_", hop = 0.4, lines = CALLA },
+	[0] = { prefix = "SHOP_TALK_CALLA_", hop = Hop.calla, lines = CALLA },
 }
 local KEEPERS = "Textures/Keepers/"
 local FRAMES = { neutral = "Neutral", happy = "Happy", surprised = "Surprised", sad = "Sad" }
@@ -140,7 +144,7 @@ function K.say(event, now, low)
 		K.expr = expr
 		hopT, hopAmp = now, who.hop
 	else
-		hopT, hopAmp = now, 0.4 * who.hop
+		hopT, hopAmp = now, Hop.nod_factor * who.hop
 	end
 
 	local lines = {}
@@ -167,26 +171,27 @@ function K.current()
 end
 
 local function hopShape(b, amp)
-	if b == nil or b < 0 or b >= 0.62 then return 1, 1, 0 end
-	if b < 0.08 then
-		local k = Easing.outQuad(b / 0.08) * amp
-		return 1 + 0.08 * k, 1 - 0.10 * k, 0
+	local riseEnd = Hop.squash_s + Hop.rise_s
+	if b == nil or b < 0 or b >= riseEnd + Hop.settle_s then return 1, 1, 0 end
+	if b < Hop.squash_s then
+		local k = Easing.outQuad(b / Hop.squash_s) * amp
+		return 1 + Hop.squash_x * k, 1 - Hop.squash_y * k, 0
 	end
-	if b < 0.38 then
-		local u = (b - 0.08) / 0.30
+	if b < riseEnd then
+		local u = (b - Hop.squash_s) / Hop.rise_s
 		local v = math.abs(math.cos(u * math.pi)) * amp
-		return 1 - 0.06 * v, 1 + 0.09 * v, 32 * amp * math.sin(u * math.pi)
+		return 1 - Hop.stretch_x * v, 1 + Hop.stretch_y * v, Hop.height_px * amp * math.sin(u * math.pi)
 	end
-	local d = (b - 0.38) / 0.24
-	local e = (1 - d) * (1 - d) * math.cos(d * 3 * math.pi) * amp
-	return 1 + 0.08 * e, 1 - 0.10 * e, 0
+	local d = (b - riseEnd) / Hop.settle_s
+	local e = (1 - d) * (1 - d) * math.cos(d * Hop.settle_wobbles * math.pi) * amp
+	return 1 + Hop.settle_x * e, 1 - Hop.settle_y * e, 0
 end
 
 function K.drawBody(now)
 	local tex = frames[K.expr] or frames.neutral
 	if tex == nil then return end
 	local sx, sy, lift = hopShape(hopT and (now - hopT) or nil, hopAmp)
-	local breath = 1 + 0.008 * math.sin(now * 2 * math.pi / 3.4)
+	local breath = 1 + Talk.breath.amp * math.sin(now * 2 * math.pi / Talk.breath.period_s)
 	tex:SetScale(sx, sy * breath)
 	tex:DrawAtAnchor(FOOT_X, FOOT_Y - lift, "bottom")
 	tex:SetScale(1, 1)
@@ -199,12 +204,12 @@ function K.drawBubble(now)
 	local s, op = 1, 1
 	local a = now - bubble.openT
 	if a < POP then
-		s = 0.55 + 0.45 * Easing.outBack(a / POP, 2.2)
-		op = math.min(1, a / 0.08)
+		s = BubbleAnim.start_scale + (1 - BubbleAnim.start_scale) * Easing.outBack(a / POP, BubbleAnim.overshoot)
+		op = math.min(1, a / BubbleAnim.fade_s)
 	end
 	if bubble.boingT ~= nil then
 		local b = now - bubble.boingT
-		if b < 0.22 then s = s * (1 + 0.06 * Easing.hump(b / 0.22)) end
+		if b < BubbleAnim.boing_s then s = s * (1 + BubbleAnim.boing_grow * Easing.hump(b / BubbleAnim.boing_s)) end
 	end
 	if bubble.closeT ~= nil then
 		local c = now - bubble.closeT
@@ -212,10 +217,10 @@ function K.drawBubble(now)
 			talk, bubble.openT, bubble.closeT, bubble.boingT = nil, nil, nil, nil
 			return
 		end
-		s = s * (1 - 0.12 * Easing.outQuad(c / CLOSE))
+		s = s * (1 - BubbleAnim.close_shrink * Easing.outQuad(c / CLOSE))
 		op = op * (1 - c / CLOSE)
 	end
-	local fy = 2 * math.sin(now * 2 * math.pi / 2.7)
+	local fy = BubbleAnim.float_px * math.sin(now * 2 * math.pi / BubbleAnim.float_period_s)
 	local cx, cy = TIP_X + BUB_DX * s, TIP_Y + fy + BUB_DY * s
 	tex:SetScale(s, s)
 	tex:SetOpacity(op)
@@ -233,7 +238,7 @@ function K.drawBubble(now)
 		local k = math.min(#chars, shown)
 		shown = shown - k
 		if chars.w == nil then chars.w = f:Measure(table.concat(chars)) end
-		local left = cx - chars.w * s / 2 - 25 * s
+		local left = cx - chars.w * s / 2 - Bubble.text_pad * s
 		f:Draw(table.concat(chars, "", 1, k), left, top + (i - 1) * lh, ctx.col.ink, ctx.col.clear, op, s, 0, "topleft")
 	end
 end

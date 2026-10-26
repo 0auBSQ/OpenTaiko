@@ -1,0 +1,40 @@
+{
+    "_note": "Survival Mode gate timings. Times in seconds; distances in 1920x1080 pixels; frequencies in radians per unit of their span.",
+    "close": {
+        "_note": "fade_out_s: the gate closing; the halves meet at shut_at (part of the fade-out), then shake by shake_px, wobbling shake_freq_x / shake_freq_y",
+        "fade_out_s": 1.1,
+        "shut_at": 0.68,
+        "shake_px": 20,
+        "shake_freq_x": 70,
+        "shake_freq_y": 53
+    },
+    "title": {
+        "_note": "the letters start falling within arrive_s, at most step_max_s apart (less for long titles); one letter falls for fall_s from start_scale, fall_ease the power of its slow-down. The title shows show_after_s more, then fades over fade_s; the gate then opens over open_s.",
+        "arrive_s": 2.0,
+        "step_max_s": 0.17,
+        "fall_s": 0.26,
+        "start_scale": 2.4,
+        "fall_ease": 3,
+        "show_after_s": 0.6,
+        "fade_s": 0.45,
+        "open_s": 1.2
+    },
+    "jolt": {
+        "_note": "each landed letter shakes the gate for length_s: amplitude amp_px decaying by e every decay_s, at freq_x / freq_y radians per second; phase_y is the extra y phase per letter",
+        "length_s": 0.4,
+        "amp_px": 13,
+        "decay_s": 0.08,
+        "freq_x": 97,
+        "freq_y": 83,
+        "phase_y": 1.7
+    },
+    "dust": {
+        "_note": "over its life a puff grows from start_scale by grow, drifts travel px off the seam and turns turn_deg; when the gate opens it lives the first open_life of the opening at open_strength",
+        "start_scale": 0.6,
+        "grow": 1.2,
+        "travel": 110,
+        "turn_deg": 40,
+        "open_life": 0.45,
+        "open_strength": 0.6
+    }
+}

@@ -4,46 +4,37 @@
 
 local M = {}
 
+-- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+
 local TEX = "Textures/Players/"
 local SND = "Sounds/"
 
 -- ── Layout ────────────────────────────────────────────────────────────────────
 -- screen px on 1920x1080; the art sizes are fixed, so nothing is read back from a texture size
 
-local L = {
-    BAND_TOP_Y = 24,  BAND_BOT_Y = 984, TILE_W = 960, TIP_W = 56,
-    PROMPT_CY  = 262, TEXT_NUDGE = 11,
-    BOX_CX     = 960, BOX_CY     = 590,
-    BOX_W      = 400, BOX_H      = 468,
-    LABEL_DX   = -2.5, LABEL_TOP = 10,      -- the label's top in box px, as the title menu draws its titles
-    ART_DX     = -2.5, ART_DY    = 26.5,    -- the art section's centre from the box centre
-    STEP_1     = 392, STEP_2     = 344,     -- centre distance to the first neighbour, then to each further one
-    SIDE_SHRINK = 0.24, SIDE_DARKEN = 0.3,  -- scale and grey lost one step away from the centre
-}
+local L = Layout.player_select
+local A = Animation.player_select
 
 local ITEMS = 6   -- item 0 is the back box, items 1 to 5 the player counts
 
 -- box colours, 0..1: brown for back, as the other menus style it, then the player colours
-local PC = {
-    [0] = { 140 / 255,  90 / 255,  50 / 255 },
-    { 238 / 255,  51 / 255,  51 / 255 },
-    {  51 / 255,  85 / 255, 238 / 255 },
-    { 187 / 255, 187 / 255,         0 },
-    {  51 / 255, 187 / 255,  68 / 255 },
-    { 187 / 255,  51 / 255, 187 / 255 },
-}
+local PC = {}
+for i, c in ipairs(L.box_colors) do PC[i - 1] = { c[1] / 255, c[2] / 255, c[3] / 255 } end
 
 -- open timeline (ms)
-local T_UPPER_LAND = 460
-local T_LOWER_IN   = 70
-local T_LOWER_LAND = 530
-local POP_AT       = 180    -- the selected box starts popping in
-local POP_STEP     = 60     -- delay per box further out
-local POP_MS       = 320
-local DECIDE_LOCK  = 200
-local DECIDE_MS    = 300
-local CLOSE_MS     = 260
-local DIM_MAX      = 0.6
+local T_UPPER_LAND = A.upper_land_ms
+local T_LOWER_IN   = A.lower_in_ms
+local T_LOWER_LAND = A.lower_land_ms
+local POP_AT       = A.pop_at_ms     -- the selected box starts popping in
+local POP_STEP     = A.pop_step_ms   -- delay per box further out
+local POP_MS       = A.pop_ms
+local DECIDE_LOCK  = A.decide_lock_ms
+local DECIDE_MS    = A.decide_ms
+local CLOSE_MS     = A.close_ms
+local DIM_MAX      = L.dim_opacity
 
 -- ── Resources ─────────────────────────────────────────────────────────────────
 
@@ -105,7 +96,7 @@ end
 local function tClose() return nowTs - closeTs end
 
 local function outroFade()
-    if state == "closing" then return math.max(0, 1 - tClose() / 160) end
+    if state == "closing" then return math.max(0, 1 - tClose() / A.outro_fade_ms) end
     return 1
 end
 
@@ -148,17 +139,18 @@ end
 
 -- while entering, the left edge of the upper strip and the right edge of the lower one; each starts with its
 -- ribbon tip just off screen
-local function headU(t) return (1920 + L.TIP_W) * (1 - outQuart(t / T_UPPER_LAND)) end
-local function headL(t) return (1920 + L.TIP_W) * outQuart((t - T_LOWER_IN) / (T_LOWER_LAND - T_LOWER_IN)) - L.TIP_W end
+local function headU(t) return (1920 + L.tip_width) * (1 - outQuart(t / T_UPPER_LAND)) end
+local function headL(t) return (1920 + L.tip_width) * outQuart((t - T_LOWER_IN) / (T_LOWER_LAND - T_LOWER_IN)) - L.tip_width end
 
 -- scroll speed in px/s: it builds up once both ribbons have landed, and rushes while deciding
 local function speed()
+    local B = A.band
     if state == "deciding" then
         local u = clamp01((nowTs - decideTs) / DECIDE_MS)
-        return 60 + 900 * u * u
+        return B.scroll_px_per_s + B.rush_px_per_s * u * u
     end
-    if state == "closing" then return closeFrom and closeFrom.v or 60 end
-    return 60 * clamp01((tOpen() - T_LOWER_LAND) / 300)
+    if state == "closing" then return closeFrom and closeFrom.v or B.scroll_px_per_s end
+    return B.scroll_px_per_s * clamp01((tOpen() - T_LOWER_LAND) / B.build_up_ms)
 end
 
 -- on-screen tile x positions of both bands, plus the tip x while a band slides in: the tiles wrap by the scroll
@@ -167,17 +159,17 @@ local function bandLayout()
     local t = tOpen()
     local nU, nL, tipU, tipL = 0, 0, nil, nil
     local left = (t >= T_UPPER_LAND) and round(-bands[1].phase) or round(headU(t))
-    for m = 0, 3 do
-        local x = left + L.TILE_W * m
-        if x < 1920 and x + L.TILE_W > 0 then nU = nU + 1; xsU[nU] = x end
+    for m = 0, L.tile_count - 1 do
+        local x = left + L.tile_width * m
+        if x < 1920 and x + L.tile_width > 0 then nU = nU + 1; xsU[nU] = x end
     end
-    if t < T_UPPER_LAND and left > 0 and left - L.TIP_W < 1920 then tipU = left end
+    if t < T_UPPER_LAND and left > 0 and left - L.tip_width < 1920 then tipU = left end
     local right = (t >= T_LOWER_LAND) and 1920 + round(bands[2].phase) or round(headL(t))
-    for m = 0, 3 do
-        local x = right - L.TILE_W * (m + 1)
-        if x < 1920 and x + L.TILE_W > 0 then nL = nL + 1; xsL[nL] = x end
+    for m = 0, L.tile_count - 1 do
+        local x = right - L.tile_width * (m + 1)
+        if x < 1920 and x + L.tile_width > 0 then nL = nL + 1; xsL[nL] = x end
     end
-    if t < T_LOWER_LAND and right < 1920 and right + L.TIP_W > 0 then tipL = right end
+    if t < T_LOWER_LAND and right < 1920 and right + L.tip_width > 0 then tipL = right end
     return nU, nL, tipU, tipL
 end
 
@@ -190,12 +182,13 @@ local function drawTiles(t, xs, n, y, rot, op)
     t:SetRotation(0)
 end
 
--- the ribbons of the shown count, the previous count fading out over them for 120 ms after a change
+-- the ribbons of the shown count, the previous count fading out over them for a moment after a change
 local function drawBand(b, xs, n, y, tipX)
-    local rot  = (b == 2) and 180 or 0
+    local rot  = (b == 2) and L.lower_rotation_deg or 0
     local band = bands[b]
     local su   = band.swapTs and (nowTs - band.swapTs) or 1e9
-    local fade = (su < 120) and 1 - su / 120 or 0
+    local swap = A.band.swap_fade_ms
+    local fade = (su < swap) and 1 - su / swap or 0
     local oldN = band.swapOld
     drawTiles(tex.band[shown], xs, n, y, rot, 1)
     if fade > 0 and oldN ~= shown then drawTiles(tex.band[oldN], xs, n, y, rot, fade) end
@@ -211,9 +204,9 @@ end
 
 local function drawBands()
     local nU, nL, tipU, tipL = bandLayout()
-    local yU, yL = L.BAND_TOP_Y, L.BAND_BOT_Y
+    local yU, yL = L.band_top_y, L.band_bottom_y
     if state == "closing" then
-        local s = 136 * inCubic(tClose() / 240)
+        local s = A.band.close_travel_px * inCubic(tClose() / A.band.close_ms)
         yU, yL = round(yU - s), round(yL + s)
     end
     drawBand(1, xsU, nU, yU, tipU)
@@ -222,23 +215,24 @@ end
 
 -- ── Prompt ────────────────────────────────────────────────────────────────────
 
-local function white() return COLOR:CreateColorFromRGBA(255, 255, 255, 255) end
+local function textColor() return Config.color(L.text_color) end
 
 local function getPromptTex()
     if promptTex == nil and promptFont ~= nil then
-        promptTex = promptFont:GetText(tr("TITLE_PLAYERS_PROMPT", "How many drummers take the stage?"), false, 1600,
-            white(), COLOR:CreateColorFromRGBA(0, 0, 0, 255))
+        promptTex = promptFont:GetText(tr("TITLE_PLAYERS_PROMPT", "How many drummers take the stage?"), false, L.prompt_max_width,
+            textColor(), Config.color(L.prompt_outline_color))
     end
     return promptTex
 end
 
 local function drawPrompt()
-    local u    = outCubic((tOpen() - 140) / 260)
+    local P    = A.prompt
+    local u    = outCubic((tOpen() - P.delay_ms) / P.fade_ms)
     local op   = u * outroFade()
     local text = getPromptTex()
     if op <= 0 or text == nil then return end
     text:SetOpacity(op)
-    text:DrawAtAnchor(960, L.PROMPT_CY + L.TEXT_NUDGE + round(-24 * (1 - u)), "center")
+    text:DrawAtAnchor(L.prompt_x, L.prompt_cy + L.text_nudge + round(P.start_offset_px * (1 - u)), "center")
     text:SetOpacity(1)
 end
 
@@ -247,8 +241,8 @@ end
 -- screen x of a box at offset o from the carousel position
 local function carouselX(o)
     local a = math.abs(o)
-    local d = (a <= 1) and a * L.STEP_1 or L.STEP_1 + (a - 1) * L.STEP_2
-    return L.BOX_CX + ((o < 0) and -d or d)
+    local d = (a <= 1) and a * L.step_1 or L.step_1 + (a - 1) * L.step_2
+    return L.box_cx + ((o < 0) and -d or d)
 end
 
 -- centre, scale, opacity and grey factor of box i this frame
@@ -256,20 +250,21 @@ local function boxLook(i)
     local a = math.min(1, math.abs(i - scroll))
     local u = (tOpen() - popStart(i)) / POP_MS
     local extra, op = outBack(u), outCubic(u)
-    local y = L.BOX_CY
-    if i == sel then y = y - 4 * (0.5 - 0.5 * cos(2 * pi * tLive() / 1800)) end
+    local B = A.box
+    local y = L.box_cy
+    if i == sel then y = y - B.bob_px * (0.5 - 0.5 * cos(2 * pi * tLive() / B.bob_period_ms)) end
     if state == "deciding" then
         local t = nowTs - decideTs
         if i == sel then
-            extra = extra * (1 + 0.08 * sin(pi * clamp01(t / DECIDE_MS)))
+            extra = extra * (1 + B.decide_pulse * sin(pi * clamp01(t / DECIDE_MS)))
         else
-            op = op * (1 - 0.65 * clamp01(t / 200))
+            op = op * (1 - B.decide_others_fade * clamp01(t / B.decide_others_fade_ms))
         end
     elseif state == "closing" then
-        local v = inCubic(tClose() / 200)
-        extra, op = extra * (1 - 0.15 * v), op * (1 - v)
+        local v = inCubic(tClose() / B.close_ms)
+        extra, op = extra * (1 - B.close_shrink * v), op * (1 - v)
     end
-    return carouselX(i - scroll), y, (1 - L.SIDE_SHRINK * a) * extra, op, 1 - L.SIDE_DARKEN * a
+    return carouselX(i - scroll), y, (1 - L.side_shrink * a) * extra, op, 1 - L.side_darken * a
 end
 
 -- draws t centred at (x, y) with a scale, tint, opacity and blend, then resets its state
@@ -292,8 +287,9 @@ local function getLabelTex(i)
         local text = (i == 0) and tr("TITLE_PLAYERS_BACK", "Back")
             or tr("TITLE_PLAYERS_" .. i, (i == 1) and "1 Player" or (i .. " Players"))
         local c = PC[i]
-        labelTex[i] = labelFont:GetText(text, false, 360, white(),
-            COLOR:CreateColorFromRGBA(math.floor(c[1] * 89), math.floor(c[2] * 89), math.floor(c[3] * 89), 255))
+        local k = L.label_outline_scale
+        labelTex[i] = labelFont:GetText(text, false, L.label_max_width, textColor(),
+            COLOR:CreateColorFromRGBA(math.floor(c[1] * k), math.floor(c[2] * k), math.floor(c[3] * k), 255))
     end
     return labelTex[i]
 end
@@ -310,26 +306,28 @@ local function drawBox(i)
         label:SetScale(sc, sc)
         label:SetColor(f, f, f)
         label:SetOpacity(op)
-        label:DrawAtAnchor(x + L.LABEL_DX * sc, y + (L.LABEL_TOP - L.BOX_H / 2) * sc, "top")
+        label:DrawAtAnchor(x + L.label_dx * sc, y + (L.label_top - L.box_h / 2) * sc, "top")
         label:SetOpacity(1)
         label:SetColor(1, 1, 1)
         label:SetScale(1, 1)
     end
 
     local art = sc
-    if i == sel and bounceTs ~= nil and nowTs - bounceTs < 240 then
-        art = sc * (1 + bounceAmp * sin(pi * (nowTs - bounceTs) / 240))
+    local bounce = A.bounce.ms
+    if i == sel and bounceTs ~= nil and nowTs - bounceTs < bounce then
+        art = sc * (1 + bounceAmp * sin(pi * (nowTs - bounceTs) / bounce))
     end
-    drawCentered(tex.art[i], x + L.ART_DX * sc, y + L.ART_DY * sc, art, f, f, f, op)
+    drawCentered(tex.art[i], x + L.art_dx * sc, y + L.art_dy * sc, art, f, f, f, op)
     return x, y, sc, op
 end
 
 -- the selection ring, plus its additive flash while deciding
 local function drawRing(x, y, sc, op)
-    local fade = clamp01((tOpen() - popStart(sel) - POP_MS) / 150)
-    drawCentered(tex.hover, x, y, sc, 1, 1, 1, op * fade * (0.8 + 0.2 * sin(2 * pi * tLive() / 900)))
+    local R = A.ring
+    local fade = clamp01((tOpen() - popStart(sel) - POP_MS) / R.fade_in_ms)
+    drawCentered(tex.hover, x, y, sc, 1, 1, 1, op * fade * (R.pulse_base + R.pulse_range * sin(2 * pi * tLive() / R.pulse_period_ms)))
     if state == "deciding" then
-        drawCentered(tex.hover, x, y, sc, 1, 1, 1, 1 - (nowTs - decideTs) / 240, "add")
+        drawCentered(tex.hover, x, y, sc, 1, 1, 1, 1 - (nowTs - decideTs) / R.flash_ms, "add")
     end
 end
 
@@ -340,7 +338,7 @@ local function farther(p, q)
 end
 
 local function onScreen(i)
-    local half = L.BOX_W / 2 * (1 - L.SIDE_SHRINK * math.min(1, math.abs(i - scroll)))
+    local half = L.box_w / 2 * (1 - L.side_shrink * math.min(1, math.abs(i - scroll)))
     local x = carouselX(i - scroll)
     return x + half > 0 and x - half < 1920
 end
@@ -375,8 +373,8 @@ function M.load(trFn)
     tex.box   = loadTex("PlayerBox", true)
     tex.hover = loadTex("PlayerHover", true)
 
-    promptFont = TEXT:Create(36)
-    labelFont  = TEXT:Create(28)
+    promptFont = TEXT:Create(L.prompt_font_size)
+    labelFont  = TEXT:Create(L.label_font_size)
 
     -- one instance per setting: pan, volume and speed also retune a voice that is playing
     local function sound(name, pan, vol, spd)
@@ -420,13 +418,13 @@ function M.deciding()  return state == "deciding" end
 function M.count()     return sel end   -- 0 while the back box is selected
 function M.canDecide() return state == "open" and not armed and tOpen() >= DECIDE_LOCK end
 
--- dim opacity behind the prompt; the title menu fades by 1 - dim / 0.6
+-- dim opacity behind the prompt; the title menu fades by 1 - dim / dim_opacity
 function M.dim()
     if state == "closed" then return 0 end
     if state == "closing" then
         return (closeFrom and closeFrom.dim or 0) * math.max(0, 1 - tClose() / CLOSE_MS)
     end
-    return math.max(dimCarry, DIM_MAX * outQuad(tOpen() / 220))
+    return math.max(dimCarry, DIM_MAX * outQuad(tOpen() / A.dim_in_ms))
 end
 
 -- ── Input ─────────────────────────────────────────────────────────────────────
@@ -446,7 +444,7 @@ end
 function M.move(d, edge)
     if state ~= "open" then return end
     sel = (sel + d) % ITEMS
-    bounceTs, bounceAmp = nowTs, edge and 0.06 or 0.03
+    bounceTs, bounceAmp = nowTs, edge and A.bounce.press_amount or A.bounce.hold_amount
     if sel ~= 0 and sel ~= shown then
         for b = 1, 2 do bands[b].swapTs, bands[b].swapOld = nowTs, shown end
         shown = sel
@@ -491,12 +489,12 @@ function M.update(ts, dt)
     end
     if state == "deciding" and ts - decideTs >= DECIDE_MS then return true end
 
-    scroll = scroll + (sel - scroll) * (1 - exp(-dt / 55))
-    if math.abs(sel - scroll) < 0.001 then scroll = sel end
+    scroll = scroll + (sel - scroll) * (1 - exp(-dt / A.carousel.time_constant_ms))
+    if math.abs(sel - scroll) < A.carousel.snap_distance then scroll = sel end
 
     local t, v = tOpen(), speed()
-    if t >= T_UPPER_LAND then bands[1].phase = (bands[1].phase + v * dt / 1000) % L.TILE_W end
-    if t >= T_LOWER_LAND then bands[2].phase = (bands[2].phase + v * dt / 1000) % L.TILE_W end
+    if t >= T_UPPER_LAND then bands[1].phase = (bands[1].phase + v * dt / 1000) % L.tile_width end
+    if t >= T_LOWER_LAND then bands[2].phase = (bands[2].phase + v * dt / 1000) % L.tile_width end
     return false
 end
 

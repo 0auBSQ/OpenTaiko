@@ -1,0 +1,62 @@
+{
+    "_note": "Tower select layout, in 1920x1080 pixels. Colours are [r, g, b] or [r, g, b, a] from 0 to 255, except the tower info's two colours, AARRGGBB hex strings. Opacities and shades 0 to 1.",
+    "fonts": { "title": 20, "small": 12, "path": 15, "confirm": 40 },
+    "notice": { "_note": "The text shown while the song list is not ready.", "x": 960, "y": 540 },
+    "towers": {
+        "_note": "visible_each_side towers on each side of the chosen one. Tower i (0 = chosen) stands at center_x + spacing_x * i, its foot at base_y + |arc_drop * (i + floor(i * arc_factor))|, scaled by 1 - |i / scale_divisor|, its brightness 255 / ((|i| + 1) * fade_factor). art_scale scales the TowerArt pieces; floors_max is the most floors a tower shows. A name sits title_rise pixels over the foot (times the scale); the folder path of a back or random entry under it.",
+        "visible_each_side": 3,
+        "center_x": 960,
+        "spacing_x": 500,
+        "base_y": 1080,
+        "arc_factor": 0.75,
+        "arc_drop": 20,
+        "scale_divisor": 10,
+        "fade_factor": 0.75,
+        "art_scale": 0.72,
+        "floors_max": 3,
+        "title_rise": 540,
+        "title_max_width": 480,
+        "path_max_width": 480,
+        "path_color": [190, 190, 190, 255]
+    },
+    "badge": {
+        "_note": "The back, random and folder entries: a badge floating lift pixels over its pedestal, on a disc (cream for back, the folder's colour for folders).",
+        "lift": 60,
+        "disc_color": [244, 232, 204]
+    },
+    "info": {
+        "_note": "The chosen tower's info box, centred top_offset - y pixels over the tower's foot; the other positions are from the box's top left. digit_spacing is the step between two digits of a number.",
+        "top_offset": 1080,
+        "y": 175,
+        "title": { "x": 270, "y": 60 },
+        "subtitle": { "x": 270, "y": 93, "max_width": 420 },
+        "charter": { "x": 395, "y": 160, "max_width": 230 },
+        "level": { "x": 202, "y": 150 },
+        "life": { "x": 202, "y": 233 },
+        "floor": { "x": 434, "y": 233 },
+        "digit_spacing": 32,
+        "ex_color": "FFFF9781",
+        "normal_color": "FFC8FF96"
+    },
+    "confirm": {
+        "_note": "The wooden signs of the confirm menu. The title sign's centre lands at (center_x, title_y); each option hangs rope_length under it, option_gap apart, in one of option_slots slots (option_slot names each option's). hole_x / hole_y place a rope's hole from a sign's corner; button_pad keeps wood clear around an option's button. The ropes of the title sign start at rope_top_y. The veil (scaled by veil_scale) dims the screen to veil_opacity; an option not chosen is shaded to unchosen_shade. The question's width is the title sign's minus title_text_inset.",
+        "center_x": 960,
+        "title_y": 250,
+        "rope_length": 70,
+        "option_gap": 16,
+        "option_slots": 4,
+        "option_slot": { "back": 1, "settings": 2, "customize": 3, "challenge": 4 },
+        "hole_x": 24,
+        "hole_y": 11,
+        "button_pad_x": 14,
+        "button_pad_top": 20,
+        "button_pad_bottom": 14,
+        "rope_top_y": -10,
+        "veil_scale": { "x": 240, "y": 135 },
+        "veil_opacity": 0.7,
+        "unchosen_shade": 0.72,
+        "title_text_inset": 100,
+        "sign_color": [250, 238, 210, 255],
+        "sign_outline_color": [54, 32, 16, 255]
+    }
+}

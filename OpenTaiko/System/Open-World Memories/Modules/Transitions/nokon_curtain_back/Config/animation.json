@@ -1,0 +1,4 @@
+{
+    "_note": "Intro Nokon curtain way back timings, in seconds.",
+    "curtain": { "close_s": 0.9, "open_s": 0.9 }
+}

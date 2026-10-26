@@ -1,0 +1,51 @@
+{
+    "_note": "AI Battle transition art (ai_link, ai_link_back), in 1920x1080 pixels; the chip and the status box are centred on the screen's middle x. SetColor colours are [r, g, b] from 0 to 1, COLOR colours [r, g, b, a] from 0 to 255; opacities 0 to 1; texture scales are factors of the texture's own size.",
+    "textures": {
+        "_note": "the size of Textures/Pixel.png and the length of Textures/Line.png, in their own pixels",
+        "pixel_size": 8,
+        "line_length": 64
+    },
+    "bg_color": [0.03, 0.06, 0.10],
+    "line_color": [0.25, 0.90, 1.00],
+    "tip_color": [0.80, 1.00, 1.00],
+    "frame_width": 3,
+    "chip": {
+        "_note": "half: half the chip's side; die: the inner square sits this far inside it, drawn with a die_frame px frame; the pin 1 mark is a Dot.png at mark_scale",
+        "y": 430,
+        "half": 125,
+        "fill_color": [0.05, 0.12, 0.18],
+        "die": 40,
+        "die_frame": 2,
+        "die_opacity": 0.35,
+        "mark_scale": 0.8
+    },
+    "pins": { "_note": "per side", "count": 8, "gap": 26, "length": 14, "width": 6 },
+    "traces": {
+        "_note": "from each pin: a straight run (run_side for the left and right pins, run_end for the top and bottom ones), a 45 degree bend, then straight on to edge_overshoot px past the screen edge or to a via. Left and right traces end in rows around side_mid, spread side_spread times the pin's offset; top and bottom ones in columns spread end_spread times. A trace with more than via_min_room px left ends at a via with chance via_chance, at least via_min_run px further. glow_width is the glow's height scale under each line",
+        "side_mid": 540,
+        "side_spread": 5.6,
+        "end_spread": 3.2,
+        "run_side": 30,
+        "run_end": 20,
+        "edge_overshoot": 20,
+        "via_min_room": 240,
+        "via_chance": 0.3,
+        "via_min_run": 100,
+        "glow_width": 3,
+        "glow_opacity": 0.28,
+        "bend_dot_scale": 0.45,
+        "tip_dot_scale": 0.9,
+        "pulse_dot_scale": 0.7
+    },
+    "box": {
+        "_note": "the status box at y (its middle): at least min_width wide, pad px either side of the text; corner squares of corner px; text_pad is the glyph box's side padding",
+        "y": 930,
+        "min_width": 560,
+        "pad": 90,
+        "height": 104,
+        "corner": 12,
+        "font_size": 40,
+        "text_pad": 25,
+        "text_color": [90, 232, 255, 255]
+    }
+}

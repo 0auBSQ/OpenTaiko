@@ -2,22 +2,28 @@
 local TA = require("TransitionArt")
 local VaultWater = require("VaultWater")
 
-local RISE = 1.6                         -- fade-out: the water rises over the screen
-local DRAIN = 1.7                        -- fade-in: the water drains down (its first moments out of sight)
-local SURFACE_SND = 0.3                  -- the drain's sound, in seconds into the fade-in
+-- positions, sizes and colours: Config/layout.json; timings and motion: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local BUBBLES, WATER, BUBBLES_ANIM = Layout.bubbles, Animation.water, Animation.bubbles
+
+local RISE = WATER.rise_s                -- fade-out: the water rises over the screen
+local DRAIN = WATER.drain_s              -- fade-in: the water drains down (its first moments out of sight)
+local SURFACE_SND = WATER.surface_sound_at_s   -- the drain's sound, in seconds into the fade-in
 local COVER = DRAIN
 
 FADE_OUT_SECONDS = RISE
 FADE_IN_SECONDS  = DRAIN
 
-local SCREEN_W, SCREEN_H = 1920, 1080
-local SURFACE_LOW, SURFACE_HIGH = SCREEN_H + 60, -160  -- the surface line out of sight below / above the screen
-local FLAT, FLAT_LINE = { 0.04, 0.24, 0.40 }, { 0.86, 0.97, 1.0 }   -- the stand-in: the water, the line along its surface
-local LINE_W = 8
-local CALM, SWELL = 13, 26               -- wave height (px) with the water at rest / at its fastest
-local FROTH_CALM, FROTH_SWELL = 0.55, 1.3
-local CHURN_CALM, CHURN_SWELL = 1, 3.4   -- how fast the pattern inside moves, at rest / at its fastest
-local CARRY = 0.35                       -- the pattern moves this share of the surface's way, so the water flows as it moves
+local SCREEN_W, SCREEN_H = Layout.screen.width, Layout.screen.height
+local SURFACE_LOW, SURFACE_HIGH = SCREEN_H + Layout.surface.below_screen, Layout.surface.high_y
+local FLAT, FLAT_LINE = Layout.flat.water_color, Layout.flat.line_color
+local LINE_W = Layout.flat.line_width
+local CALM, SWELL = WATER.wave_calm_px, WATER.wave_swell_px
+local FROTH_CALM, FROTH_SWELL = WATER.froth_calm, WATER.froth_swell
+local CHURN_CALM, CHURN_SWELL = WATER.churn_calm, WATER.churn_swell
+local CARRY = WATER.carry
 
 local water = nil
 local fill = nil                         -- the stand-in's paint: a white 2x2 canvas, tinted and stretched
@@ -123,19 +129,21 @@ end
 
 local function drawBubbles(dt, top, rate)
 	if math.random() < rate * dt then
-		bubbles[#bubbles + 1] = { x = rnd(40, SCREEN_W - 40), y = SCREEN_H + 30, vy = rnd(120, 260),
-			k = rnd(0.3, 1.0), wob = rnd(4, 12), wobF = rnd(0.6, 1.5), ph = rnd(0, 6.283) }
+		local B, A = BUBBLES, BUBBLES_ANIM
+		bubbles[#bubbles + 1] = { x = rnd(B.margin_x, SCREEN_W - B.margin_x), y = SCREEN_H + B.start_below,
+			vy = rnd(A.speed_min, A.speed_max), k = rnd(B.scale_min, B.scale_max), wob = rnd(A.wobble_min, A.wobble_max),
+			wobF = rnd(A.wobble_hz_min, A.wobble_hz_max), ph = rnd(0, 6.283) }
 	end
 	local i = 1
 	while i <= #bubbles do
 		local b = bubbles[i]
 		b.y = b.y - b.vy * dt
-		if b.y < -40 or b.y > SCREEN_H + 60 then
+		if b.y < BUBBLES.remove_y or b.y > SCREEN_H + BUBBLES.remove_below then
 			table.remove(bubbles, i)
 		else
-			if b.y > top + 40 and tx_bubble ~= nil and tx_bubble.Loaded then
+			if b.y > top + BUBBLES.surface_margin and tx_bubble ~= nil and tx_bubble.Loaded then
 				tx_bubble:SetScale(b.k, b.k)
-				tx_bubble:SetOpacity(0.75)
+				tx_bubble:SetOpacity(BUBBLES.opacity)
 				tx_bubble:DrawAtAnchor(b.x + b.wob * math.sin(clock * b.wobF * 6.283 + b.ph), b.y, "center")
 			end
 			i = i + 1
@@ -157,7 +165,7 @@ function fadeOut(t)
 	local top = SURFACE_LOW + (SURFACE_HIGH - SURFACE_LOW) * glide(t)
 	carry(top, pace(t))
 	drawWater(top)
-	drawBubbles(dt, top, 22)
+	drawBubbles(dt, top, BUBBLES_ANIM.spawn_rising)
 end
 
 function loading(progress, elapsed)
@@ -165,7 +173,7 @@ function loading(progress, elapsed)
 	local dt = tick()
 	carry(SURFACE_HIGH, 0)
 	drawWater(SURFACE_HIGH)
-	drawBubbles(dt, SURFACE_HIGH, 9)
+	drawBubbles(dt, SURFACE_HIGH, BUBBLES_ANIM.spawn_covered)
 end
 
 function fadeIn(t)
@@ -176,7 +184,7 @@ function fadeIn(t)
 	local top = SURFACE_HIGH + (SURFACE_LOW - SURFACE_HIGH) * glide(t)
 	carry(top, pace(t))
 	drawWater(top)
-	drawBubbles(dt, top, 6)
+	drawBubbles(dt, top, BUBBLES_ANIM.spawn_draining)
 	if t >= 1 then endTrip() end   -- the trip is over
 end
 

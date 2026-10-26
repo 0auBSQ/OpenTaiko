@@ -4,21 +4,27 @@
 
 local TA = require("TransitionArt")
 
-local PASS = 2.4             -- one line's crossing, in seconds
-local STAGGER = 0.15         -- the lower line follows the upper one by this much
-local TITLE_SECONDS = PASS + STAGGER + 0.1
-local OPEN_SECONDS = 0.7
+-- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local TITLE = Layout.title
+local TRAIL = Animation.trail
 
-FADE_OUT_SECONDS = 0.7       -- doors closing
+local PASS = Animation.title.pass_s
+local STAGGER = Animation.title.stagger_s
+local TITLE_SECONDS = PASS + STAGGER + Animation.title.tail_s
+local OPEN_SECONDS = Animation.doors.open_s
+
+FADE_OUT_SECONDS = Animation.doors.close_s
 FADE_IN_SECONDS  = TITLE_SECONDS + OPEN_SECONDS
 
-local SCREEN_W, SCREEN_H = 1920, 1080
+local SCREEN_W, SCREEN_H = Layout.screen.width, Layout.screen.height
 local TITLE_KEY, TITLE_DEFAULT = "TRANSITION_DOJO_TITLE", "THE FOX\nDOJO"
-local FONT_SIZE = 118
-local LINE_GAP = 170         -- between the two lines' centres
-local DRIFT = 70             -- how far a line creeps either side of the middle
-local OUT_AT = 0.78          -- part of a crossing when the line speeds off
-local INK = "<g.#DC4630.#8A1A10>%s</g>"
+local LINE_GAP = TITLE.line_gap
+local DRIFT = Animation.title.drift
+local OUT_AT = Animation.title.out_at
+local INK = "<g." .. TITLE.ink_top_color .. "." .. TITLE.ink_bottom_color .. ">%s</g>"
 
 local tx_door = nil
 local snd_close, snd_open = nil, nil
@@ -80,8 +86,8 @@ end
 -- p goes 0..1: fast in, slow in the middle, fast out, starting and ending off screen
 local function offset(L, p)
 	local u = 2 * p - 1
-	local far = SCREEN_W / 2 + L.w / 2 + 80 - DRIFT
-	return L.dir * (far * (0.35 * u ^ 3 + 0.65 * u ^ 5) + DRIFT * u)
+	local far = SCREEN_W / 2 + L.w / 2 + TITLE.offscreen_margin - DRIFT
+	return L.dir * (far * (Animation.title.curve_cubic * u ^ 3 + Animation.title.curve_quintic * u ^ 5) + DRIFT * u)
 end
 
 local function swish()
@@ -93,14 +99,15 @@ end
 local function drawLine(L, p)
 	local x = SCREEN_W / 2 + offset(L, p)
 	local speed = math.abs(offset(L, math.min(1, p + 0.01)) - offset(L, p)) / (0.01 * PASS)   -- px/s
-	local trail = clamp01((speed - 900) / 3000)
-	for k = 3, 1, -1 do                                          -- a short streak behind a fast line
+	local trail = clamp01((speed - TRAIL.min_speed_px_per_s) / TRAIL.speed_range_px_per_s)
+	for k = TRAIL.copies, 1, -1 do                               -- a short streak behind a fast line
 		if trail > 0 then
-			font:Draw(string.format(INK, L.text), x - L.dir * speed * 0.012 * k, L.y + nudge, col_ink, col_edge,
-				trail * 0.22 / k, 1, 0, "center")
+			font:Draw(string.format(INK, L.text), x - L.dir * speed * TRAIL.spacing_s * k, L.y + nudge, col_ink, col_edge,
+				trail * TRAIL.opacity / k, 1, 0, "center")
 		end
 	end
-	font:Draw(L.text, x + 5, L.y + nudge + 7, col_shadow, col_shadow, 0.35, 1, 0, "center")
+	font:Draw(L.text, x + TITLE.shadow_offset.x, L.y + nudge + TITLE.shadow_offset.y, col_shadow, col_shadow,
+		TITLE.shadow_opacity, 1, 0, "center")
 	font:Draw(string.format(INK, L.text), x, L.y + nudge, col_ink, col_edge, 1, 1, 0, "center")
 end
 
@@ -160,11 +167,11 @@ function onStart()
 	snd_close = SOUND:CreateSFX("Sounds/DoorsClose.ogg")
 	snd_open = SOUND:CreateSFX("Sounds/DoorsOpen.ogg")
 	for i = 1, 2 do snd_swish[i] = SOUND:CreateSFX("Sounds/Swish.ogg") end
-	font = TEXT:CreateGlyphCached(FONT_SIZE)
-	nudge = math.floor((font.BoxHeight - math.ceil(font.LineHeight)) / 2) - 1
-	col_ink = COLOR:CreateColorFromRGBA(255, 255, 255, 255)
-	col_edge = COLOR:CreateColorFromRGBA(250, 238, 206, 255)
-	col_shadow = COLOR:CreateColorFromRGBA(40, 16, 8, 255)
+	font = TEXT:CreateGlyphCached(TITLE.font_size)
+	nudge = math.floor((font.BoxHeight - math.ceil(font.LineHeight)) / 2) + TITLE.text_nudge
+	col_ink = Config.color(TITLE.ink_color)
+	col_edge = Config.color(TITLE.edge_color)
+	col_shadow = Config.color(TITLE.shadow_color)
 end
 
 function onDestroy()

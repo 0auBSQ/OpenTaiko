@@ -1,35 +1,56 @@
 {
-    "_note": "Song-select-core layout. Edit to reposition/retune the song-select and difficulty-select screens without touching Lua. Any missing key falls back to the in-code default, so partial edits are safe. Colours are 'AARRGGBB' hex strings.",
+    "_note": "Song select and difficulty select layout, in 1920x1080 pixels. Colours under \"colors\" are \"AARRGGBB\" hex strings; the other colours are [r, g, b] or [r, g, b, a] from 0 to 255. Keys ending in _alpha go from 0 to 255, opacities and mixes from 0 to 1. Timings are in animation.json.",
+
+    "fonts": { "text": 28, "small": 18, "large": 40, "stats": 24 },
+
+    "wait_screen": { "_note": "the loading / no-songs message", "x": 960, "y": 540, "max_width": 1600, "text_color": [255, 255, 255] },
 
     "song_list": {
+        "_note": "the diagonal list: bar i sits at origin + i * offset (the selected bar selected_x_diff further right); rows_each_side bars above and below the selected one",
         "origin_x": 660,
         "origin_y": 500,
         "offset_x": 45,
         "offset_y": 120,
+        "rows_each_side": 5,
         "text_offset_x": -65,
         "text_offset_y": 15,
+        "title_max_width": 525,
         "selected_x_diff": 50,
         "selected_arrow_gap": 925,
         "label_x_offset": 288,
         "plus_dx": -19,
         "plus_dy": -27,
         "plus_shift": -5,
-        "shortcuts_helper_x": 44, "shortcuts_helper_y": 178, "shortcuts_helper_pulse_ms": 2400, "shortcuts_helper_opacity_min": 0.45,
+        "fav_icon_x": 39, "fav_icon_y": 80,
+        "level_fill_lighten": 0.5,
+        "random_rainbow_steps": 120, "random_rainbow_slice": 8, "random_rainbow_span": 1,
+        "random_rainbow_saturation": 0.5, "random_rainbow_value": 1,
+        "shortcuts_helper_x": 44, "shortcuts_helper_y": 178,
         "shortcuts_helper_pad_x": 16, "shortcuts_helper_pad_y": 8, "shortcuts_helper_box_alpha": 150, "shortcuts_helper_box_radius": 10,
-        "backdrop_width": 980, "backdrop_offset_x": 0, "backdrop_color": [255, 255, 255], "backdrop_alpha": 90, "backdrop_fade": 0, "backdrop_blend": "normal",
-        "select_band_color": [72, 210, 104], "select_band_alpha": 170, "select_band_min": 0.5, "select_band_ms": 900,
+        "shortcuts_helper_box_color": [0, 0, 0], "shortcuts_helper_text_color": [255, 255, 255], "shortcuts_helper_outline_color": [0, 0, 0],
+        "backdrop_width": 980, "backdrop_offset_x": 0, "backdrop_color": [255, 255, 255], "backdrop_alpha": 90, "backdrop_fade": 0, "backdrop_fade_step": 4, "backdrop_blend": "normal",
+        "select_band_color": [72, 210, 104], "select_band_alpha": 170,
+        "select_band_folder_light_threshold": 140, "select_band_folder_darken": 0.6, "select_band_folder_lighten": 0.5,
         "checker_level_easy": 6,
         "checker_level_normal": 8,
         "checker_level_hard": 9,
-        "barleft_x_offset": -67
+        "barleft_x_offset": -67,
+        "bar_plate": {
+            "_note": "the slanted plate inside bar.png the mouse hits: opaque rows top..bottom, its left edge sliding skew px right per row",
+            "top": 17, "bottom": 116, "left": 20, "width": 690, "skew": 0.34
+        }
     },
 
-    "folder_anim": {
-        "offscreen_left_x": -1000,
-        "open_out_seconds": 0.13,
-        "open_fan_seconds": 0.30,
-        "close_group_seconds": 0.20,
-        "close_in_seconds": 0.22
+    "folder_info": {
+        "_note": "the folder info panel (bg_folderinfo.png), its top centred on center_x",
+        "center_x": 1548,
+        "panel_y": 270,
+        "width": 600,
+        "name_y": 382,
+        "text_y": 478,
+        "line_gap": 48,
+        "count_y": 668,
+        "count_gap": 54
     },
 
     "song_info": {
@@ -62,23 +83,19 @@
     },
 
     "preimage": {
+        "_note": "the jacket frame; jackets are decoded at most decode_max_size px wide",
         "origin_x": 1276,
         "origin_y": 146,
         "size_x": 500,
         "size_y": 500,
-        "pop_start_scale": 0.7,
-        "pop_duration_ms": 180
-    },
-
-    "preview": {
-        "fade_in_ms": 280,
-        "fade_out_ms": 140
+        "decode_max_size": 500
     },
 
     "header": {
         "offset_x": 1780,
         "box_text_offset_x": 250,
         "box_text_offset_y": 12,
+        "box_text_max_width": 270,
         "diffselect_alpha": 0.4
     },
 
@@ -90,24 +107,26 @@
         "offset_x": 27,
         "offset_y": 37,
         "height": 81,
-        "puchi_offset_x": 60
+        "puchi_offset_x": 60,
+        "stats_y": 1058,
+        "stats_x": [95, 212, 329]
     },
 
     "difficulty_select": {
         "chara_12p": { "origin_x": 1300, "origin_y": 760, "gap_x": 468, "scale": 0.8 },
-        "chara_35p": { "origin_x": 1250, "origin_y": 470, "gap_x": 332, "gap_y": 457, "scale": 0.5 },
-        "note": { "base_x": -115, "base_y": -78, "float_amp_x": 6, "float_amp_y": 12, "rot_amp": 1.5, "fixed_tilt": 5 },
+        "chara_35p": { "_note": "first_row_count: the characters on the first row for 3, 4 and 5 players", "origin_x": 1250, "origin_y": 470, "gap_x": 332, "gap_y": 457, "scale": 0.5, "first_row_count": [2, 2, 3] },
+        "replay_shift_x": 200,
+        "note": { "base_x": -115, "base_y": -78, "fixed_tilt": 5 },
         "option_bars": { "origin_x": 595, "origin_y": 139, "step_x": -245, "step_y": 57 },
         "difficulty_bars": { "origin_x": 173, "origin_y": 332, "step_x": 39, "step_y": 140 },
+        "plate_diff": { "_note": "the difficulty bars' slanted plates the mouse hits: centre, rise angle in degrees, half extents along / across", "cx": 342, "cy": 135, "angle": 13.2, "along": 318, "across": 62 },
+        "plate_opt": { "cx": 132, "cy": 101, "angle": 10.9, "along": 104, "across": 68 },
         "level": { "center_x": 399, "center_y": 108, "digit_step_x": 34, "digit_step_y": -9, "plus_dx": 7, "plus_dy": -25,
-                   "gauge_rotation": 13.2, "gauge_empty_opacity": 0.15, "gauge_start_mix": 0.45, "gauge_end_saturation": 1.45,
+                   "gauge_rotation": 13.2, "gauge_empty_opacity": 0.15, "gauge_start_mix": 0.45, "gauge_end_saturation": 1.45, "gauge_end_saturation_add": 0.05,
                    "gauge_end_lighten": 0.4, "gauge_vivid_first": [0, 0, 0, 0, 1], "gauge_vivid_first_vault": 1,
-                   "gauge_fx_pulse_ms": 1100, "gauge_fx_pulse_opacity": 0.6, "gauge_fx_lighten": 0.55,
-                   "gauge_fx_frame_ms": 70, "gauge_fx_space_opacity": 0.9,
+                   "gauge_fx_lighten": 0.55, "gauge_fx_space_opacity": 0.9,
                    "star_from_level": 11, "star_pair_pull": 0.25,
                    "star1_x": 447.5, "star1_y": 168, "star2_x": 481.5, "star2_y": 163, "star3_x": 513.5, "star3_y": 152,
-                   "star_shine_ms": 900, "star_shine_opacity": 0.45,
-                   "star_glint_ms": 1500, "star_glint_opacity": 0.95,
                    "star_glint1_dx": 9, "star_glint1_dy": -11, "star_glint2_dx": -9, "star_glint2_dy": 6,
                    "gauge8_first_x": 350.6, "gauge8_first_y": 177.2,
                    "gauge8_mid_x": 388.1, "gauge8_mid_y": 168.4, "gauge8_step_x": 36.45, "gauge8_step_y": -8.55,
@@ -115,13 +134,126 @@
                    "gauge10_first_x": 346.5, "gauge10_first_y": 176.1,
                    "gauge10_mid_x": 376.7, "gauge10_mid_y": 169.0, "gauge10_step_x": 29.18, "gauge10_step_y": -6.84,
                    "gauge10_last_x": 611.1, "gauge10_last_y": 114.0 },
-        "charter": { "center_x": 553, "center_y": 58, "step_x": 7, "step_y": 26, "max_width": 132, "rotation": 13.76, "max_count": 3, "border_darken": 0.55 },
-        "vault": { "center_x": 178, "center_y": 215, "max_width": 222 },
+        "charter": { "center_x": 553, "center_y": 58, "step_x": 7, "step_y": 26, "max_width": 132, "rotation": 13.76, "max_count": 3, "border_darken": 0.55, "font_size": 18 },
+        "vault": { "center_x": 178, "center_y": 215, "max_width": 222, "font_size": 24 },
         "player_selector": { "split_y": 292, "diff_offset_x": 8, "diff_offset_y": -7, "opt_width": 290, "opt_offset_x": 22, "opt_offset_y": -6 },
-        "nameplate": { "height": 81, "offset_x": 27, "offset_y": 37, "puchi_offset_x": 60 }
+        "nameplate": { "height": 81, "offset_x": 27, "offset_y": 37, "puchi_offset_x": 60, "modicons_gap": 4 },
+        "title": { "_note": "the song title and subtitle; x is before the transition's scroll", "x": 1926, "y": 0, "subtitle_y": 67, "max_width": 1280 },
+        "ai_level": { "_note": "the AI level slider of the AI battle; x is from the panel's left edge", "x": 1490, "label_y": 940, "label_max_width": 400, "value_y": 980, "value_max_width": 200, "arrow_gap": 55, "arrow_max_width": 60 }
     },
 
-    "background": { "fade_ms": 450, "cache_sets": 6 },
+    "replays": {
+        "_note": "the best-plays strip down the right edge of the difficulty select. Block-local values are from a block's top-left; the *_sheet groups are the cells of the textures they cut",
+        "strip": { "x": 1456, "w": 464 },
+        "header_x": 6, "header_y": 206,
+        "list_top": 262,
+        "visible": 3,
+        "card": { "x": 4, "w": 440, "h": 236, "gap": 14, "margin": 10, "radius": 20, "outline_w": 4, "checker_cell": 12, "hover_alpha": 52, "unwatchable_opacity": 0.45 },
+        "shadow": { "col": [60, 20, 40, 48], "layers": 2, "grow": 2, "dx": 0, "dy": 3 },
+        "column": { "w": 108, "bottom": 196, "rank_cy": 40, "badge_cy": 108, "crown_cy": 170, "badge_scale": 0.38, "crown_scale": 0.33 },
+        "foot_y": 196,
+        "right": { "x": 124, "right": 428 },
+        "score": { "y": 8, "scale": 0.48, "advance": 48 },
+        "caption_y": 16,
+        "name": { "y": 50, "max_width": 176 },
+        "date_y": 54,
+        "fonts": { "header": 28, "status": 18, "caption": 14, "name": 18, "date": 14, "stats": 17, "tooltip": 16 },
+        "stats": { "y": 78, "h": 114, "row_h": 27, "pad": 8, "row_top": 4, "rule_w": 2, "radius": 8, "outline_w": 2,
+                   "split_left": 136, "split_right": 152, "count_dy": -12, "word_half_h": 13 },
+        "mods": { "x": 16, "y": 195, "h": 37 },
+        "flag": { "x": 418, "y": 214, "half_h": 14, "icon_scale": 0.5 },
+        "scrollbar": { "inset": 12, "w": 6, "grab": 6, "clear": 8, "thumb_min": 28, "track_alpha": 70, "thumb_alpha": 220, "thumb_drag_alpha": 255 },
+        "colors": {
+            "ink": [60, 44, 56], "sub": [150, 118, 134], "face": [255, 255, 255, 255],
+            "pink": [255, 97, 137], "pinkMid": [255, 109, 142], "pinkDeep": [212, 0, 111],
+            "checkA": [255, 231, 231], "checkB": [255, 211, 210], "rule": [255, 211, 210],
+            "hover": [255, 131, 160], "tipText": [255, 244, 246], "tipFace": [60, 28, 44],
+            "warn": [232, 172, 40], "err": [214, 72, 72], "sbTrack": [120, 70, 90], "sbThumb": [255, 131, 160]
+        },
+        "rank_tier_scales": [0.70, 0.62, 0.55, 0.42],
+        "rank_sheet": { "_note": "Textures/Replay/rank_<tier>.png: cells, the digits' advance, the ink's centre in a cell and its extent above / below it", "cell_w": 96, "cell_h": 120, "advance": 70, "ink_cx": 48, "ink_cy": 69, "ink_up": 44, "ink_down": 45 },
+        "rank_glint_spots": [[30, -34], [-28, 24]],
+        "rank_glint_scale_ref": 0.7,
+        "score_sheet": { "cell_w": 70, "cell_h": 84 },
+        "badge_sheet": { "cell_w": 210, "cell_h": 180 },
+        "crown_sheet": { "cell_w": 170, "cell_h": 168 },
+        "judge_sheet": { "cell_h": 100 },
+        "judges": [
+            { "_note": "Judge.png frames cropped to their ink, in the stats list's order: Good, OK, Bad, Ad-Lib, BOOM", "sx": 1, "sy": 43, "sw": 149, "sh": 50, "scale": 0.30 },
+            { "sx": 39, "sy": 41, "sw": 66, "sh": 49, "scale": 0.30 },
+            { "sx": 25, "sy": 42, "sw": 94, "sh": 43, "scale": 0.30 },
+            { "sx": 7, "sy": 31, "sw": 126, "sh": 42, "scale": 0.30 },
+            { "sx": 16, "sy": 2, "sw": 109, "sh": 87, "scale": 0.26 }
+        ],
+        "warn_icon": {
+            "_note": "the warning triangle, baked at twice its drawn size: the outer triangle, the inner one inset by inner_top / inner_bottom / inner_side, and the mark's bars (dx from the centre)",
+            "w": 64, "h": 56, "inner_top": 6, "inner_bottom": 4, "inner_side": 5,
+            "outline_color": [146, 96, 10], "fill_color": [246, 189, 55], "mark_color": [84, 54, 4],
+            "mark": [ { "dx": -3, "y": 20, "w": 6, "h": 18 }, { "dx": -2, "y": 18, "w": 4, "h": 2 }, { "dx": -3, "y": 43, "w": 6, "h": 6 } ]
+        },
+        "err_icon": {
+            "_note": "the error circle, baked at twice its drawn size: the ring's width, the cross's half length and stroke",
+            "size": 56, "ring": 3, "cross_half": 13, "cross_stroke": 5,
+            "ring_color": [152, 36, 36], "fill_color": [206, 58, 58], "cross_color": [255, 255, 255]
+        },
+        "tooltip": { "pad": 14, "line_h": 24, "extra_w": 14, "trim_h": 6, "text_dy": -2, "mouse_dx": 18, "above": 12, "screen_margin": 8, "face_alpha": 235, "accent_h": 4 },
+        "confirm": {
+            "w": 720, "h": 440, "dim_opacity": 0.55,
+            "button_w": 230, "button_h": 62, "button_bottom": 92, "watch_dx": -250, "cancel_dx": 20,
+            "row_y": 130, "rank_dx": -230, "badge_dx": -120, "crown_dx": -30, "score_right_dx": 300, "score_scale": 0.5,
+            "name_y": 200, "name_font": 22, "name_margin": 120, "name_outline_color": [255, 255, 255, 160],
+            "date_y": 236, "date_font": 18, "date_color": [150, 118, 134], "date_outline_color": [255, 255, 255, 140]
+        },
+        "theme": {
+            "colors": {
+                "surface": [255, 255, 255, 255], "surface2": [255, 231, 231, 255],
+                "primary": [255, 109, 142, 255], "primary2": [232, 86, 122, 255],
+                "accent": [212, 0, 111, 255], "accent2": [180, 0, 94, 255],
+                "outline": [255, 97, 137, 255], "text": [60, 44, 56, 255], "textOnAccent": [255, 255, 255, 255]
+            },
+            "font": { "small": 18, "label": 22, "button": 24, "title": 30 }
+        }
+    },
+
+    "unlock": {
+        "_note": "a locked song's condition on the jacket: the strip along its bottom, opening into the card centred on it",
+        "jacket_cx": 1526, "jacket_w": 500,
+        "strip_y": 554, "strip_h": 92,
+        "card_y": 146, "card_w": 600, "card_h": 500,
+        "card_pad_x": 30, "card_title_y": 22, "card_text_y": 94, "card_text_h": 380, "card_title_margin": 160,
+        "title_scale_shut": 0.75,
+        "price_coin_x": 52, "price_coin_size": 58, "price_text_x": 96, "price_msg_w": 300,
+        "strip_msg_right": 22,
+        "price_color": [255, 226, 92], "price_short_color": [255, 110, 100], "key_color": [190, 198, 216],
+        "vault_box": { "x": 317, "y": 572 },
+        "vault_text": { "x": 350, "y": 605, "max_width": 806 }
+    },
+
+    "shortcuts": {
+        "_note": "the shortcuts help panel, centred on the screen",
+        "panel_w": 1040, "row_h": 46, "head_h": 96, "foot_h": 70,
+        "key_x": 40, "key_col_w": 190, "text_gap": 28, "text_right_margin": 110, "font_size": 22,
+        "key_color": [72, 108, 156], "text_color": [44, 56, 74], "text_outline_color": [255, 255, 255, 160],
+        "dim_color": [8, 10, 18, 150],
+        "close_x": { "right": 62, "y": -14, "size": 60 },
+        "close_button": { "w": 260, "h": 56, "y": 6 },
+        "theme": {
+            "colors": {
+                "surface": [250, 252, 255, 255], "surface2": [230, 236, 244, 255],
+                "primary": [96, 132, 180, 255], "primary2": [72, 108, 156, 255],
+                "accent": [126, 196, 200, 255], "accent2": [96, 168, 176, 255],
+                "outline": [70, 84, 104, 255], "text": [44, 56, 74, 255], "textOnAccent": [255, 255, 255, 255]
+            },
+            "font": { "small": 18, "label": 22, "button": 22, "title": 30 }
+        },
+        "close_style": {
+            "radius": 40,
+            "colors": { "primary": [208, 62, 56, 255], "primary2": [158, 34, 30, 255],
+                        "outline": [96, 24, 20, 255], "textOnAccent": [255, 255, 255, 255] }
+        }
+    },
+
+    "background": { "_note": "decoded background sets kept (the least recently used go)", "cache_sets": 6 },
 
     "colors": {
         "level": ["FF65A9F7", "FF8FF5A9", "FFE6DA76", "FFF39898", "FFCD7EE6"],
@@ -132,9 +264,8 @@
         "vault_text": "FF000000",
         "vault_text_outline": "00000000",
         "songlist_gold": "FFF2CF01",
-        "vault_gray": "FF808080",
-        "tag_fire": "FFAC0C0C",
-        "tag_storm": "FF83159E",
+        "back_bar": "FF837160",
+        "blurred_info": "FFDEC4FF",
         "bpm_slow": "FF95CCFF",
         "bpm_fast": "FFFF9EC3"
     }

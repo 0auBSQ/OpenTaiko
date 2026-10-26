@@ -1,0 +1,7 @@
+{
+    "_note": "Song enumeration overlay animation. phase_step is added to the phase each frame; the message pulses between pulse_min and pulse_min + pulse_range opacity (0 to 1) with it; the waiting marquee moves marquee_speed px per unit of phase.",
+    "phase_step": 0.05,
+    "pulse_min": 0.75,
+    "pulse_range": 0.25,
+    "marquee_speed": 90
+}

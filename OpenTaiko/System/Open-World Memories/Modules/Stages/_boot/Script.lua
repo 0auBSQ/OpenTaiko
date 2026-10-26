@@ -1,6 +1,11 @@
 ---@diagnostic disable: undefined-global, undefined-field
 
 local NavInput = require("NavInput")
+-- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local MENU = Layout.first_time_menu
 
 local sounds = {}
 
@@ -26,9 +31,9 @@ local header_langs = TEXTURE:CreateTexture()
 local menu_langs = {}
 local menu_vols = {}
 
-local color_white = COLOR:CreateColorFromRGBA(255, 255, 255)
-local color_red = COLOR:CreateColorFromRGBA(255, 50, 50)
-local color_yellow = COLOR:CreateColorFromRGBA(255, 255, 50)
+local color_white = Config.color(MENU.text_color)
+local color_red = Config.color(MENU.selected_color)
+local color_yellow = Config.color(MENU.editing_color)
 -- First Time Menu --
 
 local function movedUp()
@@ -99,21 +104,21 @@ function draw()
 
 		if firsttimepage == 1 then
 			local offset = (#menu_langs + 1) / 2
-			header_langs:DrawAtAnchor(960, 540 + (60 * -offset), "Center")
+			header_langs:DrawAtAnchor(MENU.center_x, MENU.center_y + (MENU.row_height * -offset), "Center")
 			for i = 1, #menu_langs do
-				menu_langs[i].Text:DrawAtAnchor(960, 540 + (60 * (i - offset)), "Center")
+				menu_langs[i].Text:DrawAtAnchor(MENU.center_x, MENU.center_y + (MENU.row_height * (i - offset)), "Center")
 			end
 		elseif firsttimepage == 2 then
 			local offset = #menu_vols / 2
 			for i = 1, #menu_vols do
-				local y = 540 + (60 * (i - offset - 1))
+				local y = MENU.center_y + (MENU.row_height * (i - offset - 1))
 				if volselected and i == volindex then
-					menu_vols[i].Text:SetOpacity(0.25)
-					menu_vols[i].Text:DrawAtAnchor(960, y, "Center")
+					menu_vols[i].Text:SetOpacity(MENU.editing_opacity)
+					menu_vols[i].Text:DrawAtAnchor(MENU.center_x, y, "Center")
 					menu_vols[i].Text:SetOpacity(1.0)
-					text:GetText(tostring(volcurrent)):DrawAtAnchor(960, y, "Center")
+					text:GetText(tostring(volcurrent)):DrawAtAnchor(MENU.center_x, y, "Center")
 				else
-					menu_vols[i].Text:DrawAtAnchor(960, y, "Center")
+					menu_vols[i].Text:DrawAtAnchor(MENU.center_x, y, "Center")
 				end
 			end
 		end
@@ -123,7 +128,7 @@ function draw()
 		end
 
 		if text_enter ~= nil then
-			text_enter:DrawAtAnchor(960, 960, "Center")
+			text_enter:DrawAtAnchor(Layout.press_enter.x, Layout.press_enter.y, "Center")
 		end
 	end
 end
@@ -224,7 +229,7 @@ function update()
 end
 
 function activate()
-	text = TEXT:Create(32)
+	text = TEXT:Create(Layout.font_size)
 	text_enter = text:GetText("Press Enter to Start!")
 	-- the intro plays its own audio track, clocked together with the picture
 	local intro = "Videos/intro.mp4"
@@ -236,7 +241,7 @@ function activate()
 	sounds.Move = SHARED:GetSharedSound("Move")
 	sounds.Cancel = SHARED:GetSharedSound("Cancel")
 
-	counter = COUNTER:CreateCounter(0.0, 1.0, 1.0)
+	counter = COUNTER:CreateCounter(0.0, 1.0, Animation.press_enter.fade_s)
 	counter:SetBounce(true)
 
 	if not firsttime then

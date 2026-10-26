@@ -22,6 +22,10 @@
 --   Stage.showFail(on)
 
 local I18N = require("i18n")
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local Stands, Board, Clock, List = Layout.stands, Layout.blackboard, Layout.clock, Layout.list
 
 local M = {}
 
@@ -33,32 +37,33 @@ local txts = {}
 
 local SCREEN_W  = 1920
 local SCREEN_H  = 1080
-local CURTAIN_W = 960
+local CURTAIN_W = Layout.curtain.half_w
 
-local STAND_Y   = 790
-local STAND_RANGE_LO = 425
-local STAND_RANGE_HI = 1515
-local STAND_PADDING  = 80   -- inset from borders when numPlayers < 5
+local STAND_Y   = Stands.y
+local STAND_RANGE_LO = Stands.range_lo
+local STAND_RANGE_HI = Stands.range_hi
+local STAND_PADDING  = Stands.padding   -- inset from borders when numPlayers < 5
 
-local BODY_DY   = -210
-local HEAD_DY   = -230
-local HANDS_DY  = -210
-local SCORE_DY  = 10
+local BODY_DY   = Stands.body_dy
+local HEAD_DY   = Stands.head_dy
+local HANDS_DY  = Stands.hands_dy
+local SCORE_DY  = Stands.score_dy
 
-local BB_X     = 930
-local BB_Y     = 280
-local BB_MWIDTH = 780
+local BB_X     = Board.x
+local BB_Y     = Board.y
+local BB_MWIDTH = Board.max_width
 
-local CLOCK_X  = 1980
-local CLOCK_Y  = 0
-local CLOCK_NUM_X = 1800
-local CLOCK_NUM_Y = 66
+local CLOCK_X  = Clock.x
+local CLOCK_Y  = Clock.y
+local CLOCK_NUM_X = Clock.num_x
+local CLOCK_NUM_Y = Clock.num_y
 
-local LIST_BG_X  = 960
-local LIST_BG_Y  = 0
-local LIST_HEADER_Y = 55
-local LIST_START_Y  = 130
-local LIST_SPACING  = 78
+local LIST_BG_X  = List.bg_x
+local LIST_BG_Y  = List.bg_y
+local LIST_HEADER_Y = List.header_y
+local LIST_START_Y  = List.start_y
+local LIST_SPACING  = List.spacing
+local LIST_ROWS     = List.rows_each_side
 
 local PLAYER_COLORS = nil  -- lazy-initialized
 
@@ -99,19 +104,14 @@ local function col(hex) return COLOR:CreateColorFromHex(hex) end
 
 local function lazyColors()
     if PLAYER_COLORS then return end
-    PLAYER_COLORS = {
-        col("ffee3333"),  -- P1 Red
-        col("ff3355ee"),  -- P2 Blue
-        col("ffbbbb00"),  -- P3 Yellow
-        col("ff33bb44"),  -- P4 Green
-        col("ffbb33bb"),  -- P5 Magenta
-    }
+    PLAYER_COLORS = {}
+    for i, hex in ipairs(Stands.player_colors) do PLAYER_COLORS[i] = col(hex) end
 end
 
 local function computeStandPositions(n)
     local pos = {}
     if n == 1 then
-        pos[1] = 930
+        pos[1] = Stands.solo_x
     else
         local lo = n >= 5 and STAND_RANGE_LO or (STAND_RANGE_LO + STAND_PADDING)
         local hi = n >= 5 and STAND_RANGE_HI or (STAND_RANGE_HI - STAND_PADDING)
@@ -182,7 +182,7 @@ end
 function M.closeCurtain(onDone)
     curtainState = "closing"
     curtainDone  = onDone
-    curtainCtr   = COUNTER:CreateCounterDuration(0, CURTAIN_W, 0.9)
+    curtainCtr   = COUNTER:CreateCounterDuration(0, CURTAIN_W, Animation.curtain_s)
     curtainCtr:Listen(function(v) curtainX = CURTAIN_W - math.floor(v) end)
     curtainCtr:Start()
     if snd["CurtainOpen"] then snd["CurtainOpen"]:Play() end
@@ -191,7 +191,7 @@ end
 function M.openCurtain(onDone)
     curtainState = "opening"
     curtainDone  = onDone
-    curtainCtr   = COUNTER:CreateCounterDuration(0, CURTAIN_W, 0.9)
+    curtainCtr   = COUNTER:CreateCounterDuration(0, CURTAIN_W, Animation.curtain_s)
     curtainCtr:Listen(function(v) curtainX = math.floor(v) end)
     curtainCtr:Start()
     if snd["CurtainOpen"] then snd["CurtainOpen"]:Play() end
@@ -225,7 +225,7 @@ local function drawStands()
         local isDenied   = denied[p]
         local isPressing = pressing[p]
         local pcol = PLAYER_COLORS[p] or col("ffffffff")
-        local gray = isDenied and col("ff555555") or col("ffffffff")
+        local gray = isDenied and col(Stands.denied_color) or col("ffffffff")
 
         -- Spotlight (behind everything on the stand); always on when pressing
         if (spotlights[p] or pressing[p]) and tx["Spotlight"] then
@@ -234,7 +234,7 @@ local function drawStands()
 
         -- Body (under Stand, under Head/Hands)
         if tx["player_body"] then
-            tx["player_body"]:SetColor(isDenied and darkenColor("ffee3333", 0.35) or pcol)
+            tx["player_body"]:SetColor(isDenied and darkenColor(Stands.denied_body_color, Stands.denied_body_shade) or pcol)
             tx["player_body"]:DrawAtAnchor(sx, sy + BODY_DY, "center")
             tx["player_body"]:SetColor(col("ffffffff"))
         end
@@ -256,7 +256,7 @@ local function drawStands()
 
         -- Stand itself
         if tx["Stand"] then
-            tx["Stand"]:SetColor(isDenied and col("ff666666") or col("ffffffff"))
+            tx["Stand"]:SetColor(isDenied and col(Stands.denied_stand_color) or col("ffffffff"))
             tx["Stand"]:DrawAtAnchor(sx, sy, "center")
             tx["Stand"]:SetColor(col("ffffffff"))
         end
@@ -270,7 +270,7 @@ local function drawStands()
 
         -- Score text (over Stand) — title renderer for bigger digits
         if txts.title then
-            local st = txts.title:GetText(tostring(scores[p] or 0), false, 200)
+            local st = txts.title:GetText(tostring(scores[p] or 0), false, Stands.score_max_width)
             st:DrawAtAnchor(sx, sy + SCORE_DY, "center")
         end
 
@@ -284,7 +284,7 @@ end
 local function drawBlackboard()
     if blackboard == nil or blackboard == "" then return end
     if txts.title then
-        local t = txts.title:GetText(blackboard, false, BB_MWIDTH, col("ffffffff"))
+        local t = txts.title:GetText(blackboard, false, BB_MWIDTH, col(Board.color))
         t:DrawAtAnchor(BB_X, BB_Y, "center")
     end
 end
@@ -296,9 +296,9 @@ local function drawClock()
     end
     if txts.title then
         local secs = math.max(0, math.ceil(clockMs / 1000))
-        local tcol      = secs <= 3 and col("ffee2222") or col("ff111111")
-        local noOutline = COLOR:CreateColorFromARGB(0, 0, 0, 0)  -- transparent edge
-        local ct = txts.title:GetText(tostring(secs), false, 200, tcol, noOutline)
+        local tcol      = secs <= Clock.warn_at_s and col(Clock.warn_color) or col(Clock.color)
+        local noOutline = Config.color(Clock.outline_color)  -- transparent edge
+        local ct = txts.title:GetText(tostring(secs), false, Clock.max_width, tcol, noOutline)
         ct:DrawAtAnchor(CLOCK_NUM_X, CLOCK_NUM_Y, "center")
     end
 end
@@ -315,21 +315,21 @@ local function drawList(listData, headerText)
 
     -- Background panel (semi-transparent)
     if tx["SongList"] then
-        tx["SongList"]:SetOpacity(0.7)
+        tx["SongList"]:SetOpacity(List.bg_opacity)
         tx["SongList"]:DrawAtAnchor(LIST_BG_X, LIST_BG_Y, "top")
         tx["SongList"]:SetOpacity(1)
     end
 
     -- Header text
     if txts.label and headerText then
-        local ht = txts.label:GetText(headerText, false, 1200)
+        local ht = txts.label:GetText(headerText, false, List.header_max_width)
         ht:DrawAtAnchor(LIST_BG_X, LIST_HEADER_Y, "center")
     end
 
     -- Entries
     local entries = {}
     if type(cache) == "table" then
-        for i = -5, 5 do
+        for i = -LIST_ROWS, LIST_ROWS do
             local entry = cache[i]
             if entry ~= nil then
                 entries[#entries + 1] = {offset = i, entry = entry}
@@ -340,14 +340,14 @@ local function drawList(listData, headerText)
     for _, e in ipairs(entries) do
         local offset = e.offset
         local entry  = e.entry
-        local y = LIST_START_Y + (offset + 5) * LIST_SPACING
+        local y = LIST_START_Y + (offset + LIST_ROWS) * LIST_SPACING
         local isSel = (offset == 0)
 
         -- Song block — tinted with the node's genre color (BoxColor)
         if tx["SongBlock"] then
             local nodeColor = (entry.node and entry.node.BoxColor) or col("ffffffff")
             tx["SongBlock"]:SetColor(nodeColor)
-            tx["SongBlock"]:SetOpacity(isSel and 1.0 or 0.5)
+            tx["SongBlock"]:SetOpacity(isSel and 1.0 or List.other_opacity)
             tx["SongBlock"]:DrawAtAnchor(LIST_BG_X, y, "center")
             tx["SongBlock"]:SetColor(col("ffffffff"))
             tx["SongBlock"]:SetOpacity(1)
@@ -355,7 +355,7 @@ local function drawList(listData, headerText)
 
         -- Song/genre name
         if txts.label and entry.text then
-            entry.text:SetColor(isSel and col("ffffffff") or col("ff888888"))
+            entry.text:SetColor(isSel and col(List.text_color) or col(List.other_text_color))
             entry.text:DrawAtAnchor(LIST_BG_X, y, "center")
             entry.text:SetColor(col("ffffffff"))
         end
@@ -391,7 +391,7 @@ function M.draw()
     end
 
     -- Darkening overlay for evaluation phases
-    if darkenOn then tileOverlay(0.5) end
+    if darkenOn then tileOverlay(Layout.darken_opacity) end
 
     -- Curtain on top of everything
     drawCurtain()

@@ -1,0 +1,28 @@
+{
+    "_note": "pill_clouds transition art (Lib/PillClouds), in 1920x1080 pixels. Places are measured from the screen's centre along the travel axis (leaning tilt_deg to the right, up positive) and across it; reach is the farthest screen corner along that axis. Texture sizes and rows are in the textures' own pixels.",
+    "tilt_deg": 15,
+    "reach": 770,
+    "pills": {
+        "_note": "four pills w x l, step px apart across the travel axis (neighbours overlap by w - step); the capsule in Pill.png is px_w x px_l, inside its clear border; they start start_gap px below the screen",
+        "w": 600,
+        "l": 2160,
+        "px_w": 300,
+        "px_l": 1080,
+        "step": 560,
+        "start_gap": 40
+    },
+    "clouds": {
+        "_note": "CloudEdge.png is edge_w x edge_h and repeats across; its rows: tips the first puff, solid the first all body colour, base the clear border. The edge is one strip_w long quad, its ends off screen. The body (CloudBody.png, body_px square) is body_w wide and ends bury px under the edge's solid rows, never more than body_overdraw px past the screen. The bank starts and ends margin px past the screen",
+        "edge_w": 1024,
+        "edge_h": 384,
+        "tips": 47,
+        "solid": 183,
+        "base": 382,
+        "strip_w": 2400,
+        "bury": 8,
+        "body_px": 8,
+        "body_w": 2800,
+        "body_overdraw": 60,
+        "margin": 10
+    }
+}

@@ -5,6 +5,11 @@ local EM             = require("EventMode")
 
 local M = {}
 local ContentsDrawer = require("standard_dan_contents_draw")
+local Config         = require("Core.Config")
+local Layout         = Config.load("Config/layout.json")
+local Animation      = Config.load("Config/animation.json")
+local Bars, Header, ConfirmLayout = Layout.bars, Layout.header, Layout.confirm
+local List, Player = Animation.list, Layout.player
 
 -- ── Constants ────────────────────────────────────────────────────────────────
 
@@ -14,44 +19,44 @@ local DIFF_DAN = 6
 
 -- one bar more than the screen holds at each end: the bar that slides in on a scroll is already
 -- there, just past the edge, instead of appearing at it
-local PAGE_BEFORE = 7
-local PAGE_AFTER  = 8
-local PAGE_SIZE   = PAGE_BEFORE + 1 + PAGE_AFTER  -- 16
+local PAGE_BEFORE = Bars.visible_before
+local PAGE_AFTER  = Bars.visible_after
+local PAGE_SIZE   = PAGE_BEFORE + 1 + PAGE_AFTER
 
-local BAR_SEL_X   = 1636
-local BAR_SEL_Y   = 458
-local BAR_OTH_X   = 1695
-local BAR_GAP_Y   = 77
-local HOVER_SRC_Y = 156
+local BAR_SEL_X   = Bars.sel_x
+local BAR_SEL_Y   = Bars.sel_y
+local BAR_OTH_X   = Bars.other_x
+local BAR_GAP_Y   = Bars.gap_y
+local HOVER_SRC_Y = ConfirmLayout.hover_src_y
 
-local TITLE_SEL_X     = 1720
-local TITLE_SEL_Y     = 508
-local TITLE_OTH_X     = 1779
-local TITLE_FONT_SIZE = 36
-local TITLE_MAX_W     = 150
+local TITLE_SEL_X     = Bars.title_sel_x
+local TITLE_SEL_Y     = Bars.title_y
+local TITLE_OTH_X     = Bars.title_other_x
+local TITLE_FONT_SIZE = Layout.fonts.bar_title
+local TITLE_MAX_W     = Bars.title_max_width
 
-local HEADER_X        = 373
-local HEADER_Y        = 84
-local HDR_TITLE_X     = 978
-local HDR_TITLE_Y     = 138
-local HDR_TITLE_FONT  = 56
-local HDR_TITLE_MAX_W = 1170
-local HDR_SUB_Y       = 208
-local HDR_SUB_FONT    = 34
+local HEADER_X        = Header.x
+local HEADER_Y        = Header.y
+local HDR_TITLE_X     = Header.title_x
+local HDR_TITLE_Y     = Header.title_y
+local HDR_TITLE_FONT  = Layout.fonts.header_title
+local HDR_TITLE_MAX_W = Header.title_max_width
+local HDR_SUB_Y       = Header.sub_y
+local HDR_SUB_FONT    = Layout.fonts.header_sub
 
-local CONTENT_X = 373
-local CONTENT_Y = 287
-local DANPLATE_X = 195
-local DANPLATE_Y = 280
+local CONTENT_X = Layout.content.x
+local CONTENT_Y = Layout.content.y
+local DANPLATE_X = Layout.danplate.x
+local DANPLATE_Y = Layout.danplate.y
 
-local NP_X = 20
-local NP_Y = 980
+local NP_X = Player.x
+local NP_Y = Player.y
 
-local HOLD_DELAY_SEC    = 0.25
-local HOLD_REPEAT_SEC   = 0.08
-local BAR_STAGGER_SEC   = 0.05
-local CONTENT_SLIDE_SEC = 0.25
-local BAR_SLIDE_SEC     = 0.15
+local HOLD_DELAY_SEC    = List.hold_delay_s
+local HOLD_REPEAT_SEC   = List.hold_repeat_s
+local BAR_STAGGER_SEC   = List.bar_stagger_s
+local CONTENT_SLIDE_SEC = List.content_slide_s
+local BAR_SLIDE_SEC     = List.bar_slide_s
 
 -- ── State persistent across activate/deactivate ───────────────────────────────
 
@@ -106,12 +111,12 @@ local confirm_items         = { 0, 1, 2, 3 }   -- the options on the scroll: 0 b
 local confirm_pos           = 1                -- the selected option's place in confirm_items
 local confirm_anim          = 0.0              -- the scroll: 0 rolled up, 1 open
 local confirm_dir           = 1                -- 1 unrolling, -1 rolling back up (the list returns once shut)
-local CONFIRM_OPEN_SEC      = 0.45
-local CONFIRM_CLOSE_SEC     = 0.22
-local CONFIRM_BTN_SCALE     = 0.85
-local CONFIRM_BTN_GAP       = 16
-local CONFIRM_TITLE_DY      = 70               -- the title's line below the paper's top
-local CONFIRM_BTN_DY        = 36               -- the buttons' centre below the paper's centre
+local CONFIRM_OPEN_SEC      = Animation.confirm.open_s
+local CONFIRM_CLOSE_SEC     = Animation.confirm.close_s
+local CONFIRM_BTN_SCALE     = ConfirmLayout.button_scale
+local CONFIRM_BTN_GAP       = ConfirmLayout.button_gap
+local CONFIRM_TITLE_DY      = ConfirmLayout.title_dy               -- the title's line below the paper's top
+local CONFIRM_BTN_DY        = ConfirmLayout.button_dy               -- the buttons' centre below the paper's centre
 
 -- ── Internals ─────────────────────────────────────────────────────────────────
 
@@ -175,20 +180,20 @@ local function _do_scroll(dir)
     if snd_move ~= nil then snd_move:Play() end
 
     content_slide_dir  = dir
-    content_slide_from = -dir * 1080
+    content_slide_from = -dir * List.content_slide_px
     content_slide_y    = content_slide_from
     content_slide_counter = COUNTER:CreateCounterDuration(content_slide_from, 0.0, CONTENT_SLIDE_SEC)
-    content_slide_counter:SetEasing("OUT", "QUAD")
+    content_slide_counter:SetEasing(List.ease_mode, List.ease_curve)
     content_slide_counter:Start()
 
     bar_sel_x_anim    = BAR_OTH_X
     bar_sel_x_counter = COUNTER:CreateCounterDuration(BAR_OTH_X, BAR_SEL_X, BAR_SLIDE_SEC)
-    bar_sel_x_counter:SetEasing("OUT", "QUAD")
+    bar_sel_x_counter:SetEasing(List.ease_mode, List.ease_curve)
     bar_sel_x_counter:Start()
 
     bar_y_offset          = dir * BAR_GAP_Y
     bar_y_offset_counter  = COUNTER:CreateCounterDuration(dir * BAR_GAP_Y, 0.0, BAR_SLIDE_SEC)
-    bar_y_offset_counter:SetEasing("OUT", "QUAD")
+    bar_y_offset_counter:SetEasing(List.ease_mode, List.ease_curve)
     bar_y_offset_counter:Start()
 end
 
@@ -261,9 +266,9 @@ function M.init()
     tx_bars["Select"] = TEXTURE:CreateTexture(TX .. "SideBars/Select.png")
     tx_scroll_paper   = TEXTURE:CreateTexture(TX .. "Confirm/scroll_paper.png")
     tx_scroll_roller  = TEXTURE:CreateTexture(TX .. "Confirm/scroll_roller.png")
-    gfont_confirm     = TEXT:CreateGlyphCached(40)
-    col_confirm         = COLOR:CreateColorFromRGBA(104, 70, 46, 255)
-    col_confirm_outline = COLOR:CreateColorFromRGBA(255, 250, 236, 200)
+    gfont_confirm     = TEXT:CreateGlyphCached(Layout.fonts.confirm)
+    col_confirm         = Config.color(Layout.colors.confirm_color)
+    col_confirm_outline = Config.color(Layout.colors.confirm_outline_color)
 
     local ok, s = pcall(function() return SOUND:CreateSFX("Sounds/tick.ogg") end)
     if ok then snd_tick = s end
@@ -302,7 +307,8 @@ local function _setup_entry()
         chara:LoadAnimation(CHARACTER.ANIM_MENU_NORMAL)
     end
 
-    bar_select_pulse = COUNTER:CreateCounterDuration(0.3, 1.0, 0.6)
+    local Pulse = List.select_pulse
+    bar_select_pulse = COUNTER:CreateCounterDuration(Pulse.from, Pulse.to, Pulse.dur_s)
     bar_select_pulse:SetBounce(true)
     bar_select_pulse:Start()
 end
@@ -717,10 +723,10 @@ function M.draw()
     -- Nameplate + character
     NAMEPLATE:DrawPlayerNameplate(NP_X, NP_Y, 255, 0)
     if _CB then
-        _CB.drawPlayerChara(NP_X + 140, NP_Y - 6,            1.0)
-        _CB.drawPlayerPuchi(NP_X + 220, NP_Y + _CB.puchiSineY, 1.0, _CB.puchiIdxFrame)
+        _CB.drawPlayerChara(NP_X + Player.chara_dx, NP_Y + Player.chara_dy, 1.0)
+        _CB.drawPlayerPuchi(NP_X + Player.puchi_dx, NP_Y + _CB.puchiSineY, 1.0, _CB.puchiIdxFrame)
     end
-    if modicons_ro ~= nil then modicons_ro:Draw(NP_X, NP_Y - 50, 0, "menu", 255) end
+    if modicons_ro ~= nil then modicons_ro:Draw(NP_X, NP_Y + Player.modicons_dy, 0, "menu", 255) end
 
     -- Confirm scroll: the parchment unrolls from its middle, the options come into view as it does (each
     -- cut at the rollers' edge), the question fades in once its line is uncovered
@@ -729,7 +735,7 @@ function M.draw()
         if tx_confirm_bg ~= nil and tx_confirm_bg.Loaded then
             local bw = tx_confirm_bg.Width
             local bh = tx_confirm_bg.Height
-            tx_confirm_bg:SetOpacity(0.6 * ease)
+            tx_confirm_bg:SetOpacity(ConfirmLayout.veil_opacity * ease)
             for rx = 0, math.ceil(res_w / bw) - 1 do
                 for ry = 0, math.ceil(res_h / bh) - 1 do
                     tx_confirm_bg:Draw(rx * bw, ry * bh)
@@ -740,8 +746,8 @@ function M.draw()
 
         local cx, cy = res_w / 2, res_h / 2
         local paper = tx_scroll_paper
-        local pw = (paper ~= nil and paper.Loaded) and paper.Width or 1500
-        local ph = (paper ~= nil and paper.Loaded) and paper.Height or 380
+        local pw = (paper ~= nil and paper.Loaded) and paper.Width or ConfirmLayout.paper_w
+        local ph = (paper ~= nil and paper.Loaded) and paper.Height or ConfirmLayout.paper_h
         local half = math.floor(pw / 2 * ease)
         local open_x0, open_x1 = cx - half, cx + half
         if half > 0 and paper ~= nil and paper.Loaded then
@@ -751,7 +757,7 @@ function M.draw()
         -- the options, scaled to fit the paper, each cut to the part the scroll has uncovered; the
         -- player's highlight frame goes under its option once the scroll is open
         local s = CONFIRM_BTN_SCALE
-        local bw, bh = 358 * s, 202 * s
+        local bw, bh = ConfirmLayout.button_w * s, ConfirmLayout.button_h * s
         local n = #confirm_items
         local total_w = n * bw + (n - 1) * CONFIRM_BTN_GAP
         local btn_y = cy + CONFIRM_BTN_DY
@@ -777,11 +783,11 @@ function M.draw()
         -- the question once the scroll is open enough for it
         if gfont_confirm ~= nil then
             local title = _sk("DANSELECT_CONFIRM", "Take the challenge?")
-            local tw = gfont_confirm:Measure(title) + 40
-            local fade = math.max(0, math.min(1, (half * 2 - tw) / 80))
+            local tw = gfont_confirm:Measure(title) + ConfirmLayout.title_pad
+            local fade = math.max(0, math.min(1, (half * 2 - tw) / ConfirmLayout.title_fade_px))
             if fade > 0 then
                 local nudge = math.floor((gfont_confirm.BoxHeight - math.ceil(gfont_confirm.LineHeight)) / 2) - 1
-                gfont_confirm:Draw(title, cx, cy - ph / 2 + CONFIRM_TITLE_DY + nudge, col_confirm, col_confirm_outline, fade, 1, pw - 200, "center")
+                gfont_confirm:Draw(title, cx, cy - ph / 2 + CONFIRM_TITLE_DY + nudge, col_confirm, col_confirm_outline, fade, 1, pw - ConfirmLayout.title_inset, "center")
             end
         end
 

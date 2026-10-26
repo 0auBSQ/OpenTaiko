@@ -27,6 +27,11 @@
 -- default "../../../" of a Stages/, Transitions/ or ROActivities/ module. Textures load asynchronously, so a
 -- look drawn right after preload pops in a frame or two later, unless the caller waits for art:ready(look).
 
+-- a look's default floor sizes: Config/TowerArt/layout.json
+local HERE = require("Core.Here")(...)
+local Config = require("Core.Config")
+local Layout = Config.load(HERE .. "Config/TowerArt/layout.json")
+
 local TowerArt = {}
 TowerArt.__index = TowerArt
 
@@ -64,8 +69,10 @@ local function loadSequence(dir, prefix)
     return list
 end
 
+local LookDefaults = Layout.look_defaults
+
 local function readLayout(dir)
-    local layout = { floor_height = 216, deco_dx = -135, deco_dy = -27 }
+    local layout = { floor_height = LookDefaults.floor_height, deco_dx = LookDefaults.deco_dx, deco_dy = LookDefaults.deco_dy }
     if STORAGE:FileExists(dir .. "Config.json") then
         pcall(function()
             local cfg = JSONLOADER:JsonParseFileAny(dir .. "Config.json")

@@ -3,36 +3,56 @@
 -- A chip lights up on a dark screen, traces run from its pins to the screen edges,
 -- then the status box at the bottom types its line.
 
+-- positions, sizes and colours: Config/AILink/layout.json; timings: Config/AILink/animation.json
+local HERE = require("Core.Here")(...)
+local Config = require("Core.Config")
+local Layout = Config.load(HERE .. "Config/AILink/layout.json")
+local Animation = Config.load(HERE .. "Config/AILink/animation.json")
+
 local TA = require("TransitionArt")
 
 local AI = {}
 AI.__index = AI
 
-AI.OUT_SECONDS = 1.5
-AI.IN_SECONDS = 0.7
+AI.OUT_SECONDS = Animation.out_s
+AI.IN_SECONDS = Animation.in_s
 
 local SCREEN_W, SCREEN_H = 1920, 1080
-local BG = { 0.03, 0.06, 0.10 }
-local CHIP_FILL = { 0.05, 0.12, 0.18 }
-local CYAN = { 0.25, 0.90, 1.00 }
-local TIP = { 0.80, 1.00, 1.00 }
-local BG_IN = 0.3                        -- fade-out part for the dark screen
-local CHIP_AT, CHIP_IN = 0.08, 0.14      -- the chip lights up here...
-local GROW_AT = 0.2                      -- ...then the traces grow until the box opens
-local BOX_AT, BOX_OPEN = 0.7, 0.12
-local TYPE_AT, TYPE_END = 0.8, 0.98      -- the box's line types in
-local BOX_MIN_W, BOX_PAD, BOX_H, BOX_Y = 560, 90, 104, 930
-local FRAME = 3
-local FONT_SIZE = 40
-local TEXT_PAD = 25                      -- glyph box side padding
-local PULSE_SPEED = 700                  -- px/s
+local BG = Layout.bg_color
+local CHIP_FILL = Layout.chip.fill_color
+local CYAN = Layout.line_color
+local TIP = Layout.tip_color
+local Out = Animation.fade_out
+local BG_IN = Out.bg_in                  -- fade-out part for the dark screen
+local CHIP_AT, CHIP_IN = Out.chip_at, Out.chip_in      -- the chip lights up here...
+local GROW_AT = Out.grow_at              -- ...then the traces grow until the box opens
+local BOX_AT, BOX_OPEN = Out.box_at, Out.box_open
+local TYPE_AT, TYPE_END = Out.type_at, Out.type_end    -- the box's line types in
+local Box = Layout.box
+local BOX_MIN_W, BOX_PAD, BOX_H, BOX_Y = Box.min_width, Box.pad, Box.height, Box.y
+local BOX_CORNER = Box.corner
+local FRAME = Layout.frame_width
+local FONT_SIZE = Box.font_size
+local TEXT_PAD = Box.text_pad            -- glyph box side padding
+local Pulses = Animation.pulses
+local PULSE_SPEED = Pulses.speed_px_per_s
+local PULSE_GAP, PULSE_LEAD = Pulses.gap_px, Pulses.lead_px
+local CURSOR_TOGGLES = Animation.cursor_toggles_per_s
+local MAX_DT = Animation.max_frame_s
+local PIXEL_SIZE, LINE_LENGTH = Layout.textures.pixel_size, Layout.textures.line_length
 
-local CHIP_X, CHIP_Y, CHIP_HALF = SCREEN_W / 2, 430, 125
-local PINS, PIN_GAP, PIN_LEN, PIN_W = 8, 26, 14, 6       -- per side
-local DIE = 40                           -- inner square, this far inside the chip
-local SIDE_MID, SIDE_SPREAD = 540, 5.6   -- left and right traces end in rows spread over the screen height
-local END_SPREAD = 3.2                   -- top and bottom traces spread less
-local RUN_SIDE, RUN_END = 30, 20         -- straight part before the 45° bend
+local Chip = Layout.chip
+local CHIP_X, CHIP_Y, CHIP_HALF = SCREEN_W / 2, Chip.y, Chip.half
+local Pins = Layout.pins
+local PINS, PIN_GAP, PIN_LEN, PIN_W = Pins.count, Pins.gap, Pins.length, Pins.width       -- per side
+local DIE = Chip.die                     -- inner square, this far inside the chip
+local Traces = Layout.traces
+local SIDE_MID, SIDE_SPREAD = Traces.side_mid, Traces.side_spread   -- left and right traces end in rows spread over the screen height
+local END_SPREAD = Traces.end_spread     -- top and bottom traces spread less
+local RUN_SIDE, RUN_END = Traces.run_side, Traces.run_end           -- straight part before the 45° bend
+local EDGE_OVERSHOOT = Traces.edge_overshoot
+local ChipGrow = Animation.chip
+local ViaRing = Animation.via_ring
 
 local function clamp01(x) return x < 0 and 0 or (x > 1 and 1 or x) end
 local function easeOut(x) return 1 - (1 - x) ^ 3 end
@@ -42,7 +62,7 @@ local function rnd(i, k) local x = math.sin(i * 12.9898 + k * 78.233) * 43758.54
 local function frameDt()
 	local ok, d = pcall(function() return fps.deltaTime end)
 	d = ok and tonumber(d) or 0
-	return d < 0 and 0 or (d > 0.1 and 0.1 or d)
+	return d < 0 and 0 or (d > MAX_DT and MAX_DT or d)
 end
 
 -- offset of pin i from the middle of its side
@@ -65,8 +85,8 @@ local function buildTraces()
 	-- the last part: `room` px to past the edge, in direction (dx, dy)
 	local function finish(pts, dx, dy, room, viaOk)
 		local id = #traces + 1
-		local via = viaOk and room > 240 and rnd(id, 5) < 0.3
-		local run = via and 100 + (room - 240) * rnd(id, 6) or room
+		local via = viaOk and room > Traces.via_min_room and rnd(id, 5) < Traces.via_chance
+		local run = via and Traces.via_min_run + (room - Traces.via_min_room) * rnd(id, 6) or room
 		local p = pts[#pts]
 		pts[#pts + 1] = { p[1] + dx * run, p[2] + dy * run }
 		add(pts, via)
@@ -80,13 +100,13 @@ local function buildTraces()
 			local row = SIDE_MID + o * SIDE_SPREAD
 			local bx = x + dir * RUN_SIDE
 			local ex = bx + dir * math.abs(row - y)
-			finish({ { x, y }, { bx, y }, { ex, row } }, dir, 0, dir > 0 and SCREEN_W + 20 - ex or ex + 20, true)
+			finish({ { x, y }, { bx, y }, { ex, row } }, dir, 0, dir > 0 and SCREEN_W + EDGE_OVERSHOOT - ex or ex + EDGE_OVERSHOOT, true)
 
 			x, y = CHIP_X + o, CHIP_Y + dir * tip                       -- top and bottom
 			local col = CHIP_X + o * END_SPREAD
 			local by = y + dir * RUN_END
 			local ey = by + dir * math.abs(col - x)
-			finish({ { x, y }, { x, by }, { col, ey } }, 0, dir, dir > 0 and SCREEN_H + 20 - ey or ey + 20, dir < 0)
+			finish({ { x, y }, { x, by }, { col, ey } }, 0, dir, dir > 0 and SCREEN_H + EDGE_OVERSHOOT - ey or ey + EDGE_OVERSHOOT, dir < 0)
 		end
 	end
 
@@ -119,7 +139,7 @@ function AI:load()
 	self.sndTyping = SOUND:CreateSFX("Sounds/Typing.ogg")
 	self.font = TEXT:CreateGlyphCached(FONT_SIZE)
 	self.nudge = math.floor((self.font.BoxHeight - math.ceil(self.font.LineHeight)) / 2) - 1
-	self.colText = COLOR:CreateColorFromRGBA(90, 232, 255, 255)
+	self.colText = Config.color(Box.text_color)
 	self.colClear = COLOR:CreateColorFromRGBA(0, 0, 0, 0)
 end
 
@@ -160,7 +180,7 @@ end
 function AI:rect(x, y, w, h, c, a)
 	if self.px == nil or a <= 0 or w <= 0 or h <= 0 then return end
 	self.px:SetColor(c[1], c[2], c[3]); self.px:SetOpacity(a)
-	self.px:SetScale(w / 8, h / 8); self.px:Draw(x, y)
+	self.px:SetScale(w / PIXEL_SIZE, h / PIXEL_SIZE); self.px:Draw(x, y)
 end
 
 function AI:frame(x, y, w, h, t, c, a)
@@ -178,10 +198,10 @@ function AI:segment(x1, y1, x2, y2, a)
 	local line = self.line
 	line:SetRotation(-math.deg(math.atan(dy, dx)))
 	line:SetBlendMode("add")
-	line:SetScale(len / 64, 3); line:SetOpacity(0.28 * a)
+	line:SetScale(len / LINE_LENGTH, Traces.glow_width); line:SetOpacity(Traces.glow_opacity * a)
 	line:DrawAtAnchor((x1 + x2) / 2, (y1 + y2) / 2, "center")
 	line:SetBlendMode("normal")
-	line:SetScale(len / 64, 1); line:SetOpacity(a)
+	line:SetScale(len / LINE_LENGTH, 1); line:SetOpacity(a)
 	line:DrawAtAnchor((x1 + x2) / 2, (y1 + y2) / 2, "center")
 end
 
@@ -204,21 +224,21 @@ function AI:drawTraces(g, a, pulses)
 			if reach <= s.from then break end
 			local k = math.min(1, (reach - s.from) / s.len)
 			self:segment(s.a[1], s.a[2], s.a[1] + (s.b[1] - s.a[1]) * k, s.a[2] + (s.b[2] - s.a[2]) * k, a)
-			if k >= 1 and s.from + s.len < w.len then self:spot(self.dot, s.b[1], s.b[2], 0.45, CYAN, a) end
+			if k >= 1 and s.from + s.len < w.len then self:spot(self.dot, s.b[1], s.b[2], Traces.bend_dot_scale, CYAN, a) end
 		end
 		if reach < w.len then
 			local x, y = pointAt(w, reach)
-			self:spot(self.dot, x, y, 0.9, TIP, a, true)
+			self:spot(self.dot, x, y, Traces.tip_dot_scale, TIP, a, true)
 		else
 			if w.via then
 				local e = w.pts[#w.pts]
-				self:spot(self.ring, e[1], e[2], 0.6 + 0.4 * easeOut(clamp01((grown - w.len) / 60)), CYAN, a)
+				self:spot(self.ring, e[1], e[2], ViaRing.scale_from + ViaRing.scale_grow_by * easeOut(clamp01((grown - w.len) / ViaRing.grow_px)), CYAN, a)
 			end
 			if pulses then                                              -- signals leaving the chip
-				local d = (self.clock * PULSE_SPEED + w.pulse * (w.len + 300)) % (w.len + 300) - 150
+				local d = (self.clock * PULSE_SPEED + w.pulse * (w.len + PULSE_GAP)) % (w.len + PULSE_GAP) - PULSE_LEAD
 				if d > 0 and d < w.len then
 					local x, y = pointAt(w, d)
-					self:spot(self.dot, x, y, 0.7, TIP, a, true)
+					self:spot(self.dot, x, y, Traces.pulse_dot_scale, TIP, a, true)
 				end
 			end
 		end
@@ -231,7 +251,7 @@ end
 function AI:drawChip(k, a)
 	if k <= 0 then return end
 	a = a * k
-	local grow = 0.8 + 0.2 * easeOut(k)
+	local grow = ChipGrow.grow_from + ChipGrow.grow_by * easeOut(k)
 	local h = CHIP_HALF * grow
 	local x, y, s = CHIP_X - h, CHIP_Y - h, 2 * h
 	for i = 1, PINS do
@@ -244,8 +264,8 @@ function AI:drawChip(k, a)
 	self:rect(x, y, s, s, CHIP_FILL, a)
 	self:frame(x, y, s, s, FRAME, CYAN, a)
 	local d = DIE * grow
-	self:frame(x + d, y + d, s - 2 * d, s - 2 * d, 2, CYAN, 0.35 * a)
-	self:spot(self.dot, x + d / 2, y + d / 2, 0.8, CYAN, a)          -- pin 1 mark
+	self:frame(x + d, y + d, s - 2 * d, s - 2 * d, Chip.die_frame, CYAN, Chip.die_opacity * a)
+	self:spot(self.dot, x + d / 2, y + d / 2, Chip.mark_scale, CYAN, a)          -- pin 1 mark
 	if self.dot then self.dot:SetScale(1, 1); self.dot:SetOpacity(1); self.dot:SetColor(1, 1, 1) end
 end
 
@@ -256,12 +276,13 @@ function AI:drawBox(k, typed, a)
 	local x, y = CHIP_X - w / 2, BOX_Y - BOX_H / 2
 	self:rect(x, y, w, BOX_H, BG, a)
 	self:frame(x, y, w, BOX_H, FRAME, CYAN, a)
-	for _, c in ipairs({ { x, y }, { x + w - 12, y }, { x, y + BOX_H - 12 }, { x + w - 12, y + BOX_H - 12 } }) do
-		self:rect(c[1], c[2], 12, 12, CYAN, a)
+	local cs = BOX_CORNER
+	for _, c in ipairs({ { x, y }, { x + w - cs, y }, { x, y + BOX_H - cs }, { x + w - cs, y + BOX_H - cs } }) do
+		self:rect(c[1], c[2], cs, cs, CYAN, a)
 	end
 	if k < 1 or self.font == nil or self.chars == nil then return end
 	local s = table.concat(self.chars, "", 1, math.min(typed, #self.chars))
-	if math.floor(self.clock * 2.5) % 2 == 0 then s = s .. "_" end
+	if math.floor(self.clock * CURSOR_TOGGLES) % 2 == 0 then s = s .. "_" end
 	self.font:Draw(s, CHIP_X - self.textW / 2 - TEXT_PAD, BOX_Y + self.nudge, self.colText, self.colClear, a, 1, 0, "left")
 end
 

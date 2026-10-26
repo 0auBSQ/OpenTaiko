@@ -7,37 +7,26 @@
 
 local TA = require("TransitionArt")
 
-local SCATTER_AT, SCATTER = 0.1, 1.35    -- the papers fly off to the left, in seconds into the fade-in
-local REVEAL_AT = SCATTER_AT + 0.7       -- the next stage starts to show between the leaving papers
+-- positions and sizes: Config/layout.json; timings and flights: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local ARRIVE, LEAVING, DRIFT = Animation.arrive, Animation.leave, Animation.drift
+local SHADOW = Layout.shadow
 
-FADE_OUT_SECONDS = 1.3                   -- the papers fly in
+local SCATTER_AT, SCATTER = Animation.scatter_at_s, Animation.scatter_s   -- the papers fly off to the left
+local REVEAL_AT = SCATTER_AT + Animation.reveal_after_s   -- the next stage starts to show between the leaving papers
+
+FADE_OUT_SECONDS = Animation.fade_out_s  -- the papers fly in
 FADE_IN_SECONDS  = SCATTER_AT + SCATTER
 
-local SCREEN_W = 1920
+local SCREEN_W = Layout.screen_width
 local PAGES = 6                          -- Textures/Page1..6.png
-local OFF = 820                          -- a page (and its shadow) this far past a screen edge is out of sight
-local SHADOW_OPACITY = 0.34
-local SHADOW_X, SHADOW_Y = 10, 14        -- a resting page's shadow offset; a lifted page's shadow falls further
+local OFF = Layout.offscreen
 
--- where each page comes to rest, in the order they arrive (a later page lies on top): bx, by the centre and
--- s the scale; every trip moves each a little, turns it to a random angle and picks its page picture
-local SHEETS = {
-	{ bx = 1685, by = 830, s = 0.90 },
-	{ bx = 1180, by = 260, s = 0.92 },
-	{ bx = 700,  by = 830, s = 0.88 },
-	{ bx = 1685, by = 245, s = 0.90 },
-	{ bx = 240,  by = 290, s = 0.92 },
-	{ bx = 1200, by = 800, s = 0.90 },
-	{ bx = 700,  by = 280, s = 0.88 },
-	{ bx = 230,  by = 820, s = 0.90 },
-	{ bx = 1420, by = 560, s = 0.84 },
-	{ bx = 460,  by = 520, s = 0.84 },
-	{ bx = 960,  by = 600, s = 0.86 },
-	{ bx = 1830, by = 500, s = 0.82 },
-	{ bx = 90,   by = 600, s = 0.82 },
-	{ bx = 1000, by = 150, s = 0.80 },
-	{ bx = 760,  by = 980, s = 0.84 },
-}
+-- every trip moves each page a little, turns it to a random angle and picks its page picture
+local SHEETS = {}
+for i, R in ipairs(Layout.sheets.rest) do SHEETS[i] = { bx = R.bx, by = R.by, s = R.s } end
 
 local tx_pages, tx_shadow = {}, nil
 local snd_rush, snd_scatter = nil, nil
@@ -54,24 +43,25 @@ local function clamp01(x) return x < 0 and 0 or (x > 1 and 1 or x) end
 local function plan()
 	local r = math.random
 	local n = #SHEETS
+	local J = Layout.sheets
 	for i, S in ipairs(SHEETS) do
 		local k = (i - 1) / (n - 1)
-		S.x = S.bx + (r() - 0.5) * 60
-		S.y = S.by + (r() - 0.5) * 50
-		S.r = (r() - 0.5) * 30 + ((r() < 0.12) and 180 or 0)
+		S.x = S.bx + (r() - 0.5) * J.jitter_x
+		S.y = S.by + (r() - 0.5) * J.jitter_y
+		S.r = (r() - 0.5) * J.jitter_deg + ((r() < J.upside_down_chance) and 180 or 0)
 		S.p = math.random(PAGES)
-		S.inAt = math.max(0, 0.46 * k + 0.05 * (r() - 0.5))
-		S.inDur = math.min(1 - S.inAt, 0.36 + 0.22 * r())
-		S.fromY = S.y + (r() - 0.5) * 440
-		S.arc = 20 + 60 * r()
-		S.spinIn = (r() < 0.5 and -1 or 1) * (25 + 50 * r())
-		S.flapIn = 1.2 + 1.4 * r()
+		S.inAt = math.max(0, ARRIVE.spread * k + ARRIVE.jitter * (r() - 0.5))
+		S.inDur = math.min(1 - S.inAt, ARRIVE.duration_min + ARRIVE.duration_extra * r())
+		S.fromY = S.y + (r() - 0.5) * ARRIVE.from_y
+		S.arc = ARRIVE.arc_min + ARRIVE.arc_extra * r()
+		S.spinIn = (r() < 0.5 and -1 or 1) * (ARRIVE.spin_deg_min + ARRIVE.spin_deg_extra * r())
+		S.flapIn = ARRIVE.flap_min + ARRIVE.flap_extra * r()
 		S.ph1, S.ph2, S.ph3 = r() * 6.283, r() * 6.283, r() * 6.283
-		S.outAt = 0.5 * (1 - k) + 0.06 * r()
-		S.outDur = math.min(SCATTER - 0.02 - S.outAt, 0.55 + 0.3 * r())
-		S.toY = S.y + (r() - 0.5) * 320
-		S.spinOut = (r() < 0.5 and -1 or 1) * (15 + 30 * r())
-		S.flapOut = 1.0 + 1.2 * r()
+		S.outAt = LEAVING.spread * (1 - k) + LEAVING.jitter * r()
+		S.outDur = math.min(SCATTER - LEAVING.end_margin_s - S.outAt, LEAVING.duration_min + LEAVING.duration_extra * r())
+		S.toY = S.y + (r() - 0.5) * LEAVING.to_y
+		S.spinOut = (r() < 0.5 and -1 or 1) * (LEAVING.spin_deg_min + LEAVING.spin_deg_extra * r())
+		S.flapOut = LEAVING.flap_min + LEAVING.flap_extra * r()
 	end
 end
 
@@ -102,11 +92,11 @@ end
 -- lift 0..1: how far the page is off the pile (bigger, its shadow further and lighter)
 local function drawSheet(tx, x, y, sx, sy, rot, lift)
 	if tx == nil or tx_shadow == nil then return end
-	local grow = 1 + 0.05 * lift
-	tx_shadow:SetOpacity(SHADOW_OPACITY * (1 - 0.35 * lift))
+	local grow = 1 + SHADOW.lift_grow * lift
+	tx_shadow:SetOpacity(SHADOW.opacity * (1 - SHADOW.lift_fade * lift))
 	tx_shadow:SetScale(sx * grow, sy * grow)
 	tx_shadow:SetRotation(rot)
-	tx_shadow:DrawAtAnchor(x + SHADOW_X + 36 * lift, y + SHADOW_Y + 46 * lift, "center")
+	tx_shadow:DrawAtAnchor(x + SHADOW.x + SHADOW.lift_x * lift, y + SHADOW.y + SHADOW.lift_y * lift, "center")
 	tx:SetScale(sx, sy)
 	tx:SetRotation(rot)
 	tx:DrawAtAnchor(x, y, "center")
@@ -119,26 +109,26 @@ local function drawPile(arrive, away)
 		local l = clamp01((away - S.outAt) / S.outDur)
 		local x, y, rot, sx, lift = S.x, S.y, S.r, 1, 0
 		if a < 1 then
-			local e = 1 - (1 - a) ^ 2.5
+			local e = 1 - (1 - a) ^ ARRIVE.ease
 			local f = 1 - e
 			x = SCREEN_W + OFF + (S.x - SCREEN_W - OFF) * e
 			y = S.fromY + (S.y - S.fromY) * e - S.arc * math.sin(math.pi * e)
-			rot = S.r + S.spinIn * f ^ 1.5
-			sx = 1 - 0.3 * math.abs(math.sin(math.pi * S.flapIn * a)) * f
+			rot = S.r + S.spinIn * f ^ ARRIVE.spin_ease
+			sx = 1 - Animation.flap_squash * math.abs(math.sin(math.pi * S.flapIn * a)) * f
 			lift = f
 		elseif l > 0 then
-			local e = l ^ 2.2
+			local e = l ^ LEAVING.ease
 			x = S.x + (-OFF - S.x) * e
 			y = S.y + (S.toY - S.y) * e
 			rot = S.r + S.spinOut * e
-			sx = 1 - 0.3 * math.abs(math.sin(math.pi * S.flapOut * l)) * e
-			lift = math.min(1, l * 2.5)
+			sx = 1 - Animation.flap_squash * math.abs(math.sin(math.pi * S.flapOut * l)) * e
+			lift = math.min(1, l * LEAVING.lift_rate)
 		end
-		x = x + 6 * math.sin(0.8 * clock + S.ph1)
-		y = y + 5 * math.sin(0.6 * clock + S.ph2)
-		rot = rot + 0.7 * math.sin(0.5 * clock + S.ph3)
+		x = x + DRIFT.x_px * math.sin(DRIFT.x_rate * clock + S.ph1)
+		y = y + DRIFT.y_px * math.sin(DRIFT.y_rate * clock + S.ph2)
+		rot = rot + DRIFT.turn_deg * math.sin(DRIFT.turn_rate * clock + S.ph3)
 		if x > -OFF and x < SCREEN_W + OFF then
-			local k = S.s * (1 + 0.1 * lift)
+			local k = S.s * (1 + Layout.sheets.lift_grow * lift)
 			drawSheet(tx_pages[S.p], x, y, k * sx, k, rot, lift)
 		end
 	end

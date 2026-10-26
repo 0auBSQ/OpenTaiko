@@ -1,0 +1,148 @@
+{
+    "_note": "Dan select layout, in 1920x1080 pixels. Colours are [r, g, b] or [r, g, b, a] from 0 to 255. Opacities and shades 0 to 1; a grow is added to a scale of 1.",
+    "fonts": {
+        "loading": 30,
+        "menu_title": 40,
+        "menu_desc": 24,
+        "menu_exit": 30,
+        "confirm": 40,
+        "bar_title": 36,
+        "header_title": 56,
+        "header_sub": 34
+    },
+    "colors": {
+        "ink_color": [76, 40, 32, 255],
+        "clear_color": [0, 0, 0, 0],
+        "confirm_color": [104, 70, 46, 255],
+        "confirm_outline_color": [255, 250, 236, 200]
+    },
+    "loading": { "_note": "The text shown while the songs are enumerated, centred.", "max_width": 900 },
+    "player": {
+        "_note": "The nameplate's top-left (x, y); the character's feet at chara_dx / chara_dy from it, the puchichara's at puchi_dx; the mod icons modicons_dy over it (the list only).",
+        "x": 20, "y": 980,
+        "chara_dx": 140, "chara_dy": -6,
+        "puchi_dx": 220,
+        "modicons_dy": -50
+    },
+    "menu": {
+        "_note": "The two boards side by side (card_*.png, card_w x card_h) centred at (card_cx[i], card_cy), the exit pill (exit_w x exit_h) under them at (exit_cx, exit_cy). The title and the description are one block centred in the board's text band (band_top to band_bottom of card_*.png), the description wrapping at desc_w, title_gap under the title. The chosen board grows by card_grow and lights from card_shade to full; the exit pill grows by exit_grow and lights from exit_shade; its label is exit_text_inset narrower than it.",
+        "card_cx": [600, 1320],
+        "card_cy": 560,
+        "card_w": 600, "card_h": 540,
+        "band_top": 352, "band_bottom": 506,
+        "desc_w": 520,
+        "title_gap": 6,
+        "exit_cx": 960, "exit_cy": 930,
+        "exit_w": 320, "exit_h": 84,
+        "card_grow": 0.04,
+        "card_shade": 0.78,
+        "exit_grow": 0.06,
+        "exit_shade": 0.84,
+        "exit_text_inset": 40
+    },
+    "bars": {
+        "_note": "The dan list's side bars: visible_before / visible_after bars around the chosen one, one more than the screen holds at each end, so the bar that slides in on a scroll is already there past the edge. The chosen bar's top-left at (sel_x, sel_y), the others at other_x, gap_y apart; a song's title centred at title_sel_x / title_other_x and title_y (the chosen bar's line, the others' moved with them).",
+        "visible_before": 7,
+        "visible_after": 8,
+        "sel_x": 1636, "sel_y": 458,
+        "other_x": 1695,
+        "gap_y": 77,
+        "title_sel_x": 1720, "title_y": 508,
+        "title_other_x": 1779,
+        "title_max_width": 150
+    },
+    "header": {
+        "_note": "Header.png's top-left (x, y); the chosen entry's title centred at (title_x, title_y), its subtitle at sub_y.",
+        "x": 373, "y": 84,
+        "title_x": 978, "title_y": 138,
+        "title_max_width": 1170,
+        "sub_y": 208
+    },
+    "content": { "_note": "Contents.png's top-left.", "x": 373, "y": 287 },
+    "danplate": { "x": 195, "y": 280 },
+    "confirm": {
+        "_note": "The confirm scroll, centred on the screen. The veil tiles dim to veil_opacity. paper_w x paper_h stand in for scroll_paper.png's size before it loads. The options (button_w x button_h art, drawn at button_scale) stand button_gap apart, their centre button_dy under the paper's; the highlight frame is Hover.png from hover_src_y down. The question sits title_dy under the paper's top, fades in over title_fade_px once the open part is title_pad wider than it, and is title_inset narrower than the paper.",
+        "veil_opacity": 0.6,
+        "paper_w": 1500, "paper_h": 380,
+        "button_w": 358, "button_h": 202,
+        "button_scale": 0.85,
+        "button_gap": 16,
+        "button_dy": 36,
+        "hover_src_y": 156,
+        "title_dy": 70,
+        "title_pad": 40,
+        "title_fade_px": 80,
+        "title_inset": 200
+    },
+    "contents": {
+        "_note": "The chosen dan's songs and exams inside Contents.png, from its top-left. Song bars are clipped to clip_top..clip_bottom. The _fallback sizes stand in for an art's size while it is not loaded.",
+        "fonts": {
+            "title": 28, "sub": 20, "ordinal": 22, "level": 22,
+            "exam_name": 20, "exam_range": 18, "number_big": 28, "number_small": 20
+        },
+        "clip_top": 33,
+        "clip_bottom": 334,
+        "songs": {
+            "_note": "The song bars, gap_y apart from first_y; from scroll_from songs on, they scroll.",
+            "x": 49, "first_y": 38, "gap_y": 100,
+            "scroll_from": 4,
+            "bar_h_fallback": 100
+        },
+        "song_bar": {
+            "_note": "Within DanSong.png, from its top-left: the ordinal stamp (nb) and its text, the difficulty stamp, the level, the title and the genre (sub).",
+            "nb": { "x": 0, "y": 0 },
+            "nb_text": { "x": 46, "y": 49, "max_width": 120 },
+            "diff": { "x": 94, "y": 0 },
+            "level": { "x": 156, "y": 74, "max_width": 80 },
+            "title": { "x": 250, "y": 32, "max_width": 840 },
+            "sub": { "x": 250, "y": 72, "max_width": 840 }
+        },
+        "text_color": [255, 255, 255, 255],
+        "number_color": [0, 0, 0, 255],
+        "clear_color": [0, 0, 0, 0],
+        "stamp_colors": {
+            "_note": "The ordinal stamp's colour of song 1, 2, ...; the last one for every song after; its outline is the colour times outline_shade.",
+            "list": [
+                [255, 0, 0], [0, 128, 0], [0, 0, 255], [255, 0, 255], [255, 255, 0],
+                [0, 255, 255], [165, 42, 42], [128, 128, 128], [0, 100, 0], [0, 0, 0]
+            ],
+            "outline_shade": 0.45
+        },
+        "diff_outline_colors": {
+            "_note": "The level's outline by difficulty: Easy, Normal, Hard, Extreme, Edit.",
+            "list": [[0, 0, 100], [0, 100, 0], [150, 110, 0], [139, 0, 0], [75, 0, 130]]
+        },
+        "gauge": { "_note": "The gauge exam's bar, filled in fill_color up to its value.", "x": 421, "y": 335, "color": [255, 220, 0, 255], "fill_color": [200, 0, 0, 255] },
+        "exam_grid": {
+            "_note": "The exam bars, two columns of three rows from (x, y), gap apart; a row with one exam uses the long bar.",
+            "x": 36, "y": 369,
+            "gap": 1,
+            "bar_w_fallback": 230,
+            "bar_h_fallback": 80
+        },
+        "exam_bar": {
+            "_note": "Within an exam bar, from its top-left: ExamName.png, ExamRange.png, the name and range texts' centres, a global exam's value and best score (left edge, vertical centre).",
+            "name": { "x": 0, "y": 0 },
+            "range": { "x": 0, "y": 63 },
+            "name_text": { "x": 110, "y": 35 },
+            "range_text": { "x": 110, "y": 98 },
+            "text_max_width": 220,
+            "global_value": { "x": 250, "y": 35 },
+            "global_best": { "x": 250, "y": 98 },
+            "name_outline_color": [101, 67, 33],
+            "range_more_color": [139, 0, 0],
+            "range_less_color": [0, 0, 100]
+        },
+        "exam_values": {
+            "_note": "An individual exam's per-song blocks (ExamValue.png), from start_x of the bar, clipped clip_pad_right before its right end: the ordinal, the value and the best score centred in each block. They scroll from scroll_from_short songs on (scroll_from_long on a long bar).",
+            "start_x": 220,
+            "clip_pad_right": 7,
+            "ordinal": { "x": 57, "y": 22 },
+            "value": { "x": 57, "y": 71 },
+            "best": { "x": 57, "y": 110 },
+            "scroll_from_short": 4,
+            "scroll_from_long": 9,
+            "block_w_fallback": 60
+        }
+    }
+}

@@ -13,48 +13,39 @@
 local PopUI = require("PopUI")
 local NavInput = require("NavInput")
 
+-- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+
 local SW, SH = 1920, 1080
 
 -- ── layout ──────────────────────────────────────────────────────────────────────────
-local TAB_Y, TAB_H = 44, 64
-local VX, VY       = 70, 150            -- left pane viewport top-left
-local VW, VH       = 1020, SH - 150 - 50 -- left pane size
-local PX, PW       = 1120, 730          -- right preview pane
-local NAME_X       = VX + 34            -- setting-name column x
-local HEADER_X     = VX + 16            -- section header x
-local CTRL_RIGHT   = VX + VW - 30       -- every control right-aligns to this edge
-local ROW_H, HEADER_H, ROW_GAP = 64, 50, 8
-local W_SLIDER, VALUE_W, W_CHOOSER = 240, 96, 300   -- value_w reserves room so slider numbers stay clear of the scrollbar
-local SB_X, SB_W = VX + VW - 9, 7                    -- scrollbar gutter
-local NAME_MAXW    = 600
-local descFont     = 22                 -- preview description font size
-local nameFont     = 30                 -- preview heading font size
-local TRANSP       = { 255, 255, 255, 0 }   -- transparent text backcolor
-local DESC_COLOR   = { 64, 76, 96, 255 }
+local PANE = Layout.pane
+local CONTROLS = Layout.controls
+local SCROLLBAR = Layout.scrollbar
+local PREVIEW = Layout.preview
+local BACKGROUND = Layout.background
+local TAB_Y, TAB_H = Layout.tabs.y, Layout.tabs.h
+local VX, VY       = PANE.x, PANE.y     -- left pane viewport top-left
+local VW, VH       = PANE.w, SH - PANE.y - PANE.bottom_margin -- left pane size
+local PX, PW       = PREVIEW.x, PREVIEW.w   -- right preview pane
+local NAME_X       = VX + PANE.name_x   -- setting-name column x
+local HEADER_X     = VX + PANE.header_x -- section header x
+local CTRL_RIGHT   = VX + VW - PANE.control_right_inset   -- every control right-aligns to this edge
+local ROW_H, HEADER_H, ROW_GAP = PANE.row_h, PANE.header_h, PANE.row_gap
+local W_SLIDER, VALUE_W, W_CHOOSER = CONTROLS.slider_w, CONTROLS.value_w, CONTROLS.chooser_w   -- value_w reserves room so slider numbers stay clear of the scrollbar
+local SB_X, SB_W = VX + VW - SCROLLBAR.x_inset, SCROLLBAR.w   -- scrollbar gutter
+local NAME_MAXW    = PANE.name_max_w
+local descFont     = PREVIEW.desc_font_size   -- preview description font size
+local nameFont     = PREVIEW.name_font_size   -- preview heading font size
+local TRANSP       = PREVIEW.prompt_back_color   -- transparent text backcolor
+local DESC_COLOR   = PREVIEW.desc_color
+local BUTTON_H     = CONTROLS.button_h
+local BG_TOP, BG_BOTTOM = BACKGROUND.top_color, BACKGROUND.bottom_color
 
 -- ── settings theme (cool slate / steel-blue) ─────────────────────────────────────────
-local THEME = {
-    name = "ConfigCalm",
-    colors = {
-        bg           = { 232, 238, 245, 255 },
-        surface      = { 250, 252, 255, 255 },
-        surface2     = { 230, 236, 244, 255 },
-        primary      = { 96, 132, 180, 255 },
-        primary2     = { 72, 108, 156, 255 },
-        accent       = { 126, 196, 200, 255 },
-        accent2      = { 96, 168, 176, 255 },
-        outline      = { 70, 84, 104, 255 },
-        text         = { 44, 56, 74, 255 },
-        textOnAccent = { 255, 255, 255, 255 },
-        textDisabled = { 150, 162, 178, 255 },
-        shadow       = { 40, 52, 72, 70 },
-        gloss        = { 255, 255, 255, 90 },
-        focusRing    = { 120, 184, 232, 255 },
-        track        = { 214, 222, 232, 255 },
-    },
-    radius = 22, radiusSmall = 12, outlineWidth = 4, gloss = true,
-    shadow = { dx = 0, dy = 5, layers = 4, grow = 3 },
-}
+local THEME = Config.plain(Layout.theme)
 
 -- ── module state ──────────────────────────────────────────────────────────────────
 ui   = nil   -- PopUI manager
@@ -139,13 +130,13 @@ end
 local function makeControl(opt)
     local kind = opt.Kind
     if kind == "Toggle" then
-        local w = ui:toggle{ value = opt.On, text = "", gap = 0, w = 92,
+        local w = ui:toggle{ value = opt.On, text = "", gap = CONTROLS.toggle_gap, w = CONTROLS.toggle_w,
             onChange = function(v) opt:SetOn(v) end }
         return w, false
     elseif kind == "Int" and opt.TextInput then
         -- number-only text box (type the value), e.g. a port
         local maxLen = #tostring(opt.Max)
-        local w = ui:textbox{ w = 200, h = 56, value = tostring(opt.Value), maxLen = maxLen,
+        local w = ui:textbox{ w = CONTROLS.text_input_w, h = BUTTON_H, value = tostring(opt.Value), maxLen = maxLen,
             onChange = function(t, box)
                 local digits = t:gsub("%D", "")            -- strip non-digits as you type
                 if digits ~= t and box._ti then box._ti.Text = digits end
@@ -156,24 +147,24 @@ local function makeControl(opt)
         return w, false
     elseif kind == "Int" then
         local custom = (opt:Display() ~= tostring(opt.Value))
-        local w = ui:slider{ w = W_SLIDER, h = 40, min = opt.Min, max = opt.Max, step = opt.Step,
+        local w = ui:slider{ w = W_SLIDER, h = CONTROLS.slider_h, min = opt.Min, max = opt.Max, step = opt.Step,
             value = opt.Value, showValue = not custom or function () return opt:Display() end,
             onChange = function(v) opt:SetValue(floor(v + 0.5)) end }
         return w, custom
     elseif kind == "Choice" then
-        local w = ui:chooser{ w = W_CHOOSER, h = 56, options = copyChoices(opt), index = opt.Index + 1,
+        local w = ui:chooser{ w = W_CHOOSER, h = BUTTON_H, options = copyChoices(opt), index = opt.Index + 1,
             wrap = true, onChange = function(i) opt:SetIndex(i - 1) end }
         return w, false
     elseif kind == "Action" then
-        local w = ui:button{ text = tr("SETTINGS_UI_RUN", "Run"), h = 56, onClick = function() opt:Activate() end }
+        local w = ui:button{ text = tr("SETTINGS_UI_RUN", "Run"), h = BUTTON_H, onClick = function() opt:Activate() end }
         return w, false
     elseif kind == "KeyConfig" then
-        local w = ui:button{ text = tr("SETTINGS_UI_CONFIGURE", "Configure"), h = 56,
+        local w = ui:button{ text = tr("SETTINGS_UI_CONFIGURE", "Configure"), h = BUTTON_H,
             onClick = function() enterKeys(opt.KeyGroup ~= "" and opt.KeyGroup or "system") end }
         return w, false
     elseif kind == "Key" then
         -- a theme "key" setting: the button shows the key; decide/click captures one (Esc keeps the old one)
-        local w = ui:button{ text = opt:Display(), h = 56, w = 300,
+        local w = ui:button{ text = opt:Display(), h = BUTTON_H, w = CONTROLS.key_button_w,
             onClick = function(self)
                 captureBtn = self
                 M.Keys:StartKeyNameCapture(function(name)
@@ -184,7 +175,7 @@ local function makeControl(opt)
         w._keyOpt = opt
         return w, false
     end
-    return ui:button{ text = "?", h = 56 }, false
+    return ui:button{ text = "?", h = BUTTON_H }, false
 end
 
 -- right-align the control and tag it for focus/preview/scroll
@@ -215,7 +206,7 @@ local function layoutPage(page)
         if e.kind == "header" then e.h = HEADER_H; e.baseY = y; y = y + HEADER_H
         else e.h = ROW_H; e.baseY = y; y = y + ROW_H + ROW_GAP end
     end
-    page.contentH = y + 16   -- breathing room so the last row clears the pane edge
+    page.contentH = y + PANE.bottom_padding   -- breathing room so the last row clears the pane edge
 end
 
 local function addHeader(page, text)
@@ -277,7 +268,7 @@ local function addBindRow(page, act)
     nameLbl:setVisible(false)
     -- an action can hold several bindings: the button shows them all; decide adds one into the next free slot,
     -- delete (handled in update) removes the most recent
-    local btn = ui:button{ text = M.Keys:GetAllBindings(act), h = 56, w = 420,
+    local btn = ui:button{ text = M.Keys:GetAllBindings(act), h = BUTTON_H, w = CONTROLS.bind_button_w,
         onClick = function(self)
             captureBtn = self
             local slot = M.Keys:FirstFreeSlot(act); if slot < 0 then slot = 0 end   -- full -> overwrite slot 0
@@ -393,7 +384,7 @@ local function reposition(dt)
     if not pages.current then return end
     local maxS = max(0, pages.current.contentH - VH)
     scrollTarget = clamp(scrollTarget, 0, maxS)
-    scrollCur = scrollCur + (scrollTarget - scrollCur) * min(1, dt * 16)
+    scrollCur = scrollCur + (scrollTarget - scrollCur) * min(1, dt * Animation.scroll_follow_per_s)
     for _, e in ipairs(pages.current.entries) do
         local sy = VY + e.baseY - scrollCur
         -- let rows scroll past the pane top/bottom (they get masked in draw for a clean cut); cull only when fully off
@@ -416,7 +407,7 @@ end
 local function scrollMetrics()
     if not pages.current or not pages.current.contentH or pages.current.contentH <= VH then return nil end
     local maxS = max(0, pages.current.contentH - VH)
-    local thumbH = max(40, VH * VH / pages.current.contentH)
+    local thumbH = max(SCROLLBAR.min_thumb_h, VH * VH / pages.current.contentH)
     local t = (maxS > 0) and clamp(scrollCur / maxS, 0, 1) or 0
     local thumbY = VY + (VH - thumbH) * t
     return maxS, thumbY, thumbH
@@ -428,7 +419,8 @@ local function handleScrollbar()
     local maxS, _, thumbH = scrollMetrics()
     if not maxS then sbDrag = false; return end
     local mx, my = INPUT:GetMouseXY()
-    local overTrack = mx >= SB_X - 6 and mx <= SB_X + SB_W + 6 and my >= VY and my <= VY + VH
+    local grab = SCROLLBAR.grab_margin
+    local overTrack = mx >= SB_X - grab and mx <= SB_X + SB_W + grab and my >= VY and my <= VY + VH
     if INPUT:MousePressed("Left") and overTrack then sbDrag = true end
     if not INPUT:MousePressing("Left") then sbDrag = false end
     if sbDrag then
@@ -466,7 +458,7 @@ local function bakeGradient()
     bgCanvas = CANVAS:CreateCanvas(2, H)
     for iy = 0, H - 1 do
         local t = iy / (H - 1)
-        bgCanvas:FillRect(0, iy, 2, 1, floor(lerp(226, 202, t)), floor(lerp(233, 213, t)), floor(lerp(243, 228, t)), 255)
+        bgCanvas:FillRect(0, iy, 2, 1, floor(lerp(BG_TOP[1], BG_BOTTOM[1], t)), floor(lerp(BG_TOP[2], BG_BOTTOM[2], t)), floor(lerp(BG_TOP[3], BG_BOTTOM[3], t)), 255)
     end
     bgCanvas:Upload()
 end
@@ -508,7 +500,8 @@ local function drawThumb(opt, x, y, w, h)
 end
 
 local function drawPreview()
-    local innerX, innerY, innerW = PX + 34, VY + 34, PW - 68
+    local pad = PREVIEW.padding
+    local innerX, innerY, innerW = PX + pad, VY + pad, PW - 2 * pad
     local title, desc, opt = currentTitleDesc()
     -- glyph-composed: no per-string textures. The title squishes per-letter into the pane width; the
     -- description WORD-WRAPS to it (translations no longer need hand-placed line feeds) and its drawn
@@ -516,17 +509,17 @@ local function drawPreview()
     local y = innerY
     if title and title ~= "" then
         ui:drawText(nameFont, title, innerX, y, THEME.colors.primary2, 1, 1, innerW)
-        y = y + ui:textHeight(nameFont) + 22
+        y = y + ui:textHeight(nameFont) + PREVIEW.name_gap
     end
     if desc and desc ~= "" then
-        -- wrap the ink to innerW-50: the glyph box pads 25px per side, so this keeps the visual right
-        -- margin equal to the left one
-        y = y + ui:drawWrapped(descFont, desc, innerX, y, innerW - 50, DESC_COLOR) + 28
+        -- wrap the ink narrower than the pane (desc_wrap_inset: the glyph box pads each side), so the
+        -- visual right margin equals the left one
+        y = y + ui:drawWrapped(descFont, desc, innerX, y, innerW - PREVIEW.desc_wrap_inset, DESC_COLOR) + PREVIEW.desc_gap
     end
-    if opt and opt.Thumbnails ~= nil then drawThumb(opt, innerX, y, innerW, 380) end
+    if opt and opt.Thumbnails ~= nil then drawThumb(opt, innerX, y, innerW, PREVIEW.thumb_h) end
     -- multi-bind hint while configuring keys
     if mode == "bind" then
-        ui:drawText(18, tr("SETTINGS_UI_KEYS_MULTIBIND_HINT", "Enter: add a key    Delete: remove the last"), innerX, VY + VH - 56, { 150, 162, 178 })
+        ui:drawText(PREVIEW.hint_font_size, tr("SETTINGS_UI_KEYS_MULTIBIND_HINT", "Enter: add a key    Delete: remove the last"), innerX, VY + VH - PREVIEW.hint_y, PREVIEW.hint_color)
     end
 end
 
@@ -565,7 +558,7 @@ function activate(model)
         t.onNavDown = tabNavDown
         t.onNavUp = tabNavUp   -- up from a tab wraps to the last row
         setupHandleTabKeys(t)
-        t.x = floor(tx); tx = tx + t.w + 16
+        t.x = floor(tx); tx = tx + t.w + Layout.tabs.gap
         tabs[i] = t
     end
     tabs.idxKeysTab = #tabs   -- the keys tab is the last category-strip entry (exit is appended after)
@@ -577,7 +570,7 @@ function activate(model)
         t.onNavDown = tabNavDown
         t.onNavUp = tabNavUp
         setupHandleTabKeys(t)
-        t.x = floor(tx); tx = tx + t.w + 16
+        t.x = floor(tx); tx = tx + t.w + Layout.tabs.gap
         tabs[i] = t
     end
     tabs.n = #tabs
@@ -585,7 +578,7 @@ function activate(model)
     -- keys-mode chrome, shown only while binding keys
     keysBack = ui:button{ text = tr("SETTINGS_UI_BACK", "< Back"), x = VX, y = TAB_Y, h = TAB_H, onClick = backToKeysTab, sfx = { click = "" } }
     keysBack:setVisible(false)
-    keysTitle = ui:label{ text = "", x = floor(keysBack.x + keysBack.w + 40), y = TAB_Y + 18, size = "title", color = THEME.colors.text }
+    keysTitle = ui:label{ text = "", x = floor(keysBack.x + keysBack.w + Layout.keys_title.gap), y = TAB_Y + Layout.keys_title.y, size = "title", color = THEME.colors.text }
     keysTitle:setVisible(false)
 
     -- right preview pane
@@ -647,7 +640,7 @@ function update(ts)
         if sdy and sdy ~= 0 then
             local mx, my = INPUT:GetMouseXY()
             if INPUT:IsMouseInside() and mx >= VX and mx <= VX + VW and my >= VY and my <= VY + VH then
-                scrollTarget = scrollTarget - sdy * 60
+                scrollTarget = scrollTarget - sdy * PANE.wheel_step
             end
         end
         handleScrollbar()  -- before ui:update: may set ui._suppressMouse so a drag doesn't hover/click rows
@@ -705,10 +698,10 @@ function draw()
     -- header mask: cover the area above the pane top so rows that scrolled up are cut cleanly (no abrupt pop, no
     -- overlap with the tab strip). the colour matches the gradient at y=VY for a seamless seam.
     local mt = VY / SH
-    ui:rect(0, 0, SW, VY, lerp(226, 202, mt), lerp(233, 213, mt), lerp(243, 228, mt), 255)
+    ui:rect(0, 0, SW, VY, lerp(BG_TOP[1], BG_BOTTOM[1], mt), lerp(BG_TOP[2], BG_BOTTOM[2], mt), lerp(BG_TOP[3], BG_BOTTOM[3], mt), 255)
     -- footer mask: same at the bottom edge. limited to the left pane's x-range so it never clips the preview shadow.
     local mb = (VY + VH) / SH
-    ui:rect(0, VY + VH, VX + VW, SH - (VY + VH), lerp(226, 202, mb), lerp(233, 213, mb), lerp(243, 228, mb), 255)
+    ui:rect(0, VY + VH, VX + VW, SH - (VY + VH), lerp(BG_TOP[1], BG_BOTTOM[1], mb), lerp(BG_TOP[2], BG_BOTTOM[2], mb), lerp(BG_TOP[3], BG_BOTTOM[3], mb), 255)
     -- redraw the chrome on top of the mask
     for _, t in ipairs(tabs) do if t.visible then t:draw() end end
     if keysBack.visible then keysBack:draw() end
@@ -717,14 +710,17 @@ function draw()
     -- scrollbar (track + thumb) in the right gutter
     local maxS, thumbY, thumbH = scrollMetrics()
     if maxS then
-        ui:rect(SB_X, VY, SB_W, VH, 70, 84, 104, 70)
-        ui:rect(SB_X, thumbY, SB_W, thumbH, sbDrag and 200 or 150, 200, 232, sbDrag and 255 or 220)
+        local tc = SCROLLBAR.track_color
+        local hc = sbDrag and SCROLLBAR.thumb_drag_color or SCROLLBAR.thumb_color
+        ui:rect(SB_X, VY, SB_W, VH, tc[1], tc[2], tc[3], tc[4])
+        ui:rect(SB_X, thumbY, SB_W, thumbH, hc[1], hc[2], hc[3], hc[4])
     end
 
     drawPreview()
     if M.Keys ~= nil and M.Keys.IsCapturing then
-        local tex = ui:renderText(28, tr("SETTINGS_UI_KEYS_CAPTURE_PROMPT", "Press a key...  (Esc to cancel)"), { 230, 150, 70, 255 }, TRANSP, false, PW - 68)
-        tex:Draw(PX + 34, VY + VH - 110)
+        local pad = PREVIEW.padding
+        local tex = ui:renderText(PREVIEW.prompt_font_size, tr("SETTINGS_UI_KEYS_CAPTURE_PROMPT", "Press a key...  (Esc to cancel)"), PREVIEW.prompt_color, TRANSP, false, PW - 2 * pad)
+        tex:Draw(PX + pad, VY + VH - PREVIEW.prompt_y)
     end
 end
 

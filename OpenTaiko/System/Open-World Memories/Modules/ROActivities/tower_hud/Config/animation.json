@@ -1,0 +1,22 @@
+{
+    "_note": "Tower climb hud animation. Times in seconds; rates in radians per second; distances in 1920x1080 pixels.",
+    "flip": {
+        "_note": "the floor number's flip takes flip_s; a folding flap darkens to shade_min, its brightness shade_min + shade_range * its height",
+        "flip_s": 0.45,
+        "shade_min": 0.55,
+        "shade_range": 0.45
+    },
+    "sway": {
+        "_note": "each plank sways on its own, plank i at a phase of i * phase_step; its tilt is the sum of the tilt waves, its x offset of the x waves, its y offset the y wave. A wave is size (degrees for the tilt, px otherwise) * sin(rate * time + phase_scale * the plank's phase).",
+        "phase_step": 1.9,
+        "tilt": [
+            { "deg": 1.4, "rate": 0.9, "phase_scale": 1 },
+            { "deg": 0.5, "rate": 2.3, "phase_scale": 0.7 }
+        ],
+        "x": [
+            { "px": 4, "rate": 0.7, "phase_scale": 1 },
+            { "px": 1.5, "rate": 1.9, "phase_scale": 1 }
+        ],
+        "y": { "px": 3, "rate": 1.1, "phase_scale": 1.3 }
+    }
+}

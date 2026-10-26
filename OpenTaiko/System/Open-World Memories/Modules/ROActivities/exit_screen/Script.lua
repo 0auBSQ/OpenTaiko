@@ -9,18 +9,15 @@
 --   draw()        every frame
 --   deactivate()  frees the pictures: nothing is held while the screen is not shown
 
-local CENTER_X, CENTER_Y = 540, 540
--- where each character stands (its picture's top left)
-local CHARACTERS = {
-    { x = 1058, y = 131 },
-    { x = 925, y = 25 },
-    { x = 1092, y = 65 },
-    { x = 951, y = 288 },
-    { x = 1142, y = 17 },
-    { x = 1108, y = 35 },
-    { x = 915, y = 189 },
-    { x = 1168, y = 21 },
-}
+-- positions: Config/layout.json; the circles' turning speeds: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+
+local CENTER_X, CENTER_Y = Layout.center.x, Layout.center.y
+-- where each character stands (its picture's top left), one entry per Textures/Character/<n>.png
+local CHARACTERS = Layout.characters
+local CIRCLE_SPEEDS = Animation.circle_speeds_deg_per_s
 -- the languages that have a bubble; the others get the English one
 local SPEECH = { en = true, ja = true, fr = true, es = true, ru = true, zh = true }
 
@@ -71,9 +68,7 @@ function draw()
     if background == nil then return end
     background:Draw(0, 0)
     effect:Draw(0, 0)
-    circles[1]:SetRotation(timer * 30)
-    circles[2]:SetRotation(timer * -20)
-    circles[3]:SetRotation(timer * 10)
+    for i = 1, 3 do circles[i]:SetRotation(timer * CIRCLE_SPEEDS[i]) end
     for i = 3, 1, -1 do circles[i]:DrawAtAnchor(CENTER_X, CENTER_Y, "center") end
     logo:DrawAtAnchor(CENTER_X, CENTER_Y, "center")
     if speech ~= nil then speech:DrawAtAnchor(CENTER_X, CENTER_Y, "center") end

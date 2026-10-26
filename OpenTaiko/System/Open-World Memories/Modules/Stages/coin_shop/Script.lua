@@ -7,6 +7,11 @@ local NavInput = require("NavInput")
 local Magazine = require("magazine")   -- the catalog page
 local Keeper = require("keeper")       -- the shopkeeper and its speech bubble
 local Easing = require("Easing")
+-- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local Talk = Animation.talk
 
 local save = nil
 local shop = nil               -- Shop.Daily for the chosen save
@@ -35,7 +40,7 @@ local lastDt = 0
 local coinFrom, coinT = nil, nil      -- the coin counter rolling down after a purchase
 local browseT, browseSaid = 0, true   -- when the focus last moved, and whether the keeper commented on it
 local lastBrowseLine = -100
-local idleT, idleNext = 0, 15
+local idleT, idleNext = 0, Talk.first_idle_s
 local revealAt = 0                    -- when the way-in transition stops hiding the page (on this clock)
 local pendingLine = nil               -- a keeper line held until then
 
@@ -108,10 +113,14 @@ end
 
 -- ── Draw ──────────────────────────────────────────────────────────────────────
 
-local DESK_X, DESK_Y = 1180, 786          -- Desk.png's top-left (its wood starts 4 px in)
-local PLATE_X, PLATE_Y = 1232, 903        -- the player's nameplate on the desk's front
-local TILL_X, TILL_Y = 1738, 944          -- the coin counter on the desk's front
-local CONFIRM_CX, BTN_W = 614, 340        -- the modals sit over the page, leaving the keeper in view
+local DESK_X, DESK_Y = Layout.desk.x, Layout.desk.y
+local PLATE_X, PLATE_Y = Layout.nameplate.x, Layout.nameplate.y
+local Till = Layout.till
+local TILL_X, TILL_Y = Till.x, Till.y
+local Confirm = Layout.confirm
+local Buy, Reroll = Confirm.buy, Confirm.reroll
+local CONFIRM_CX, BTN_W, BTN_H = Confirm.center_x, Confirm.button_w, Confirm.button_h
+local PlateOffset = Layout.title_plate_offset
 
 local function rerollPrice()
 	return shop and shop:rerollPrice() or Daily.rerollPrice(0)
@@ -130,7 +139,7 @@ end
 local function frameDelta()
 	local ok, d = pcall(function() return fps.deltaTime end)
 	d = (ok and type(d) == "number") and d or (1 / 60)
-	if d < 0 then d = 0 elseif d > 0.1 then d = 0.1 end
+	if d < 0 then d = 0 elseif d > Animation.frame_step_max_s then d = Animation.frame_step_max_s end
 	return d
 end
 
@@ -138,7 +147,7 @@ end
 local function shownCoins()
 	local coins = save.Coins
 	if coinFrom == nil then return coins end
-	local k = Easing.outCubic((now - coinT) / 0.7)
+	local k = Easing.outCubic((now - coinT) / Animation.coins.roll_s)
 	if k >= 1 then coinFrom = nil; return coins end
 	return math.floor(coinFrom + (coins - coinFrom) * k + 0.5)
 end
@@ -148,9 +157,9 @@ local function drawDesk()
 	if save == nil then return end
 	NAMEPLATE:DrawPlayerNameplate(PLATE_X, PLATE_Y, 255, playerIndex)
 	textures["Till"]:DrawAtAnchor(TILL_X, TILL_Y, "center")
-	if coinTex then drawSharedIcon(coinTex, TILL_X - 112, TILL_Y, 42) end
+	if coinTex then drawSharedIcon(coinTex, TILL_X + Till.coin_dx, TILL_Y, Till.coin_size) end
 	local f = fonts.mid
-	f:Draw(tostring(shownCoins()), TILL_X + 150, TILL_Y + Magazine.nudge(f), cols.ink, cols.clear, 1, 1, 260, "right")
+	f:Draw(tostring(shownCoins()), TILL_X + Till.amount_dx, TILL_Y + Magazine.nudge(f), cols.ink, cols.clear, 1, 1, Till.amount_max_width, "right")
 end
 
 local view = { ready = false }
@@ -172,16 +181,17 @@ function draw()
 	Magazine.draw(now, lastDt, view)
 
 	if currentScreen ~= "shop" and confirmUI then
-		confirmUI:rect(0, 0, 1920, 1080, 6, 8, 16, 150)   -- dim the shop behind the modal
+		local dim = Layout.dim_color
+		confirmUI:rect(0, 0, 1920, 1080, dim[1], dim[2], dim[3], dim[4])   -- dim the shop behind the modal
 		confirmUI:draw()
 		-- the item preview sits on top of the panel body (in the gap above the price line), scaled to a
 		-- fixed box so large icons (vault-key PNGs) don't spill over the panel text
 		if currentScreen == "confirm" and toBuyItem then
-			local px, py = CONFIRM_CX, 322
+			local px, py = CONFIRM_CX, Buy.preview_y
 			if toBuyItem.Type == "nameplate" then
-				NAMEPLATE:DrawNameplateTitleById(toBuyItem.RefInt, px + 15, py - 45, 255, text)
+				NAMEPLATE:DrawNameplateTitleById(toBuyItem.RefInt, px + PlateOffset.x, py + PlateOffset.y, 255, text)
 			elseif toBuyItemIcon ~= nil then
-				drawSharedIcon(toBuyItemIcon, px, py, 168)   -- scales any texture down to the box
+				drawSharedIcon(toBuyItemIcon, px, py, Buy.preview_size)   -- scales any texture down to the box
 			end
 		end
 	end
@@ -261,17 +271,7 @@ end
 local SHOP_SFX  -- set in activate() once sounds exist
 
 -- the modals in the magazine's paper and ink
-local MAG_THEME = {
-	colors = {
-		bg = { 251, 246, 232, 255 }, surface = { 255, 252, 243, 255 }, surface2 = { 243, 233, 210, 255 },
-		primary = { 226, 72, 61, 255 }, primary2 = { 192, 50, 43, 255 },
-		accent = { 255, 214, 77, 255 }, accent2 = { 236, 180, 40, 255 },
-		outline = { 58, 46, 52, 255 }, text = { 58, 46, 52, 255 }, textOnAccent = { 255, 255, 255, 255 },
-		textDisabled = { 170, 158, 150, 255 }, shadow = { 60, 40, 30, 90 }, gloss = { 255, 255, 255, 120 },
-		focusRing = { 47, 160, 154, 255 }, track = { 236, 226, 206, 255 },
-	},
-	radius = 18,
-}
+local MAG_THEME = Config.plain(Confirm.theme)
 
 -- confirm dialog: centred panel with the item name (title), a scaled preview (drawn in draw()), price,
 -- an optional quantity stepper, total, and VERTICALLY-stacked Buy/Cancel (matches the up/down nav). Buy
@@ -281,22 +281,22 @@ local function buildConfirmUI(item, slot)
 	confirmUI = PopUI.new{ theme = MAG_THEME, sfx = SHOP_SFX, navPlayer = playerIndex + 1 }
 	local cx, bx = CONFIRM_CX, CONFIRM_CX - BTN_W / 2
 	local hasQty = (item.Stock or 1) > 1
-	local panelH = hasQty and 720 or 640
-	confirmUI:panel{ x = CONFIRM_CX - 300, y = 180, w = 600, h = panelH, title = item.LocalizedName or "" }
-	confirmUI:label{ text = trf("SHOP_UI_PRICE", "Price: %d", item.Price), x = cx, y = 452, size = "label", align = "center" }
+	local panelH = hasQty and Buy.panel_h_quantity or Buy.panel_h
+	confirmUI:panel{ x = CONFIRM_CX - Confirm.panel_w / 2, y = Buy.panel_y, w = Confirm.panel_w, h = panelH, title = item.LocalizedName or "" }
+	confirmUI:label{ text = trf("SHOP_UI_PRICE", "Price: %d", item.Price), x = cx, y = Buy.price_y, size = "label", align = "center" }
 	local qtyChooser, totalY, buyY
 	if hasQty then
-		confirmUI:label{ text = tr("SHOP_UI_QUANTITY", "Quantity"), x = cx, y = 508, size = "small", align = "center" }
+		confirmUI:label{ text = tr("SHOP_UI_QUANTITY", "Quantity"), x = cx, y = Buy.quantity_y, size = "small", align = "center" }
 		local opts = {}
 		for i = 1, item.Stock do opts[i] = tostring(i) end
-		qtyChooser = confirmUI:chooser{ x = cx - 170, y = 546, w = BTN_W, h = 62, options = opts, index = 1,
+		qtyChooser = confirmUI:chooser{ x = cx - BTN_W / 2, y = Buy.chooser_y, w = BTN_W, h = Buy.chooser_h, options = opts, index = 1,
 			wrap = false, onChange = function() updateConfirmTotals() end }
-		totalY, buyY = 634, 706
+		totalY, buyY = Buy.total_y_quantity, Buy.buy_y_quantity
 	else
-		totalY, buyY = 520, 596
+		totalY, buyY = Buy.total_y, Buy.buy_y
 	end
 	local totalLabel = confirmUI:label{ text = trf("SHOP_UI_TOTAL", "Total: %d", item.Price), x = cx, y = totalY, size = "label", align = "center" }
-	local buyBtn = confirmUI:button{ text = tr("SHOP_UI_BUY", "Buy"), x = bx, y = buyY, w = BTN_W, h = 76, accent = true,
+	local buyBtn = confirmUI:button{ text = tr("SHOP_UI_BUY", "Buy"), x = bx, y = buyY, w = BTN_W, h = BTN_H, accent = true,
 		onClick = function()
 			local qty = (qtyChooser and tonumber(qtyChooser:value())) or 1
 			local before = save.Coins
@@ -310,7 +310,7 @@ local function buildConfirmUI(item, slot)
 			closeConfirm()
 		end,
 		sfx = { click = "" } }
-	confirmUI:button{ text = tr("SHOP_UI_CANCEL", "Cancel"), x = bx, y = buyY + 92, w = BTN_W, h = 76,
+	confirmUI:button{ text = tr("SHOP_UI_CANCEL", "Cancel"), x = bx, y = buyY + Buy.button_gap, w = BTN_W, h = BTN_H,
 		onClick = function() closeConfirm(); Keeper.say("cancel", now) end,
 		sfx = { click = "cancel" } }
 	confirmUI._item, confirmUI._qty = item, qtyChooser
@@ -324,10 +324,10 @@ local function buildRefreshUI()
 	confirmUI = PopUI.new{ theme = MAG_THEME, sfx = SHOP_SFX, navPlayer = playerIndex + 1 }
 	local cx, bx = CONFIRM_CX, CONFIRM_CX - BTN_W / 2
 	local price = rerollPrice()
-	confirmUI:panel{ x = CONFIRM_CX - 300, y = 280, w = 600, h = 480, title = tr("SHOP_UI_REROLL", "New picks") }
-	confirmUI:label{ text = tr("SHOP_UI_REROLL_ASK", "Reshuffle the shop?"), x = cx, y = 384, size = "label", align = "center" }
-	confirmUI:label{ text = trf("SHOP_UI_REROLL_COST", "Cost: %d", price), x = cx, y = 448, size = "label", align = "center" }
-	local rb = confirmUI:button{ text = tr("SHOP_UI_REROLL_GO", "Reroll"), x = bx, y = 528, w = BTN_W, h = 76, accent = true,
+	confirmUI:panel{ x = CONFIRM_CX - Confirm.panel_w / 2, y = Reroll.panel_y, w = Confirm.panel_w, h = Reroll.panel_h, title = tr("SHOP_UI_REROLL", "New picks") }
+	confirmUI:label{ text = tr("SHOP_UI_REROLL_ASK", "Reshuffle the shop?"), x = cx, y = Reroll.ask_y, size = "label", align = "center" }
+	confirmUI:label{ text = trf("SHOP_UI_REROLL_COST", "Cost: %d", price), x = cx, y = Reroll.cost_y, size = "label", align = "center" }
+	local rb = confirmUI:button{ text = tr("SHOP_UI_REROLL_GO", "Reroll"), x = bx, y = Reroll.go_y, w = BTN_W, h = BTN_H, accent = true,
 		onClick = function()
 			if price > save.Coins then sounds.SoldOut:Play(); Keeper.say("poor", now); return end
 			local before = save.Coins
@@ -341,7 +341,7 @@ local function buildRefreshUI()
 			return true
 		end }
 	rb.enabled = (price <= save.Coins)
-	confirmUI:button{ text = tr("SHOP_UI_CANCEL", "Cancel"), x = bx, y = 620, w = BTN_W, h = 76,
+	confirmUI:button{ text = tr("SHOP_UI_CANCEL", "Cancel"), x = bx, y = Reroll.cancel_y, w = BTN_W, h = BTN_H,
 		onClick = function() closeConfirm(); Keeper.say("cancel", now) end,
 		sfx = { click = "cancel" } }
 	confirmUI:_setFocusIndex(1)   -- default focus/highlight on Reroll
@@ -444,10 +444,10 @@ function update(ts)
 		end
 
 		-- the keeper comments on the listing in focus, and fills a long silence
-		if not browseSaid and now - browseT > 0.7 then
+		if not browseSaid and now - browseT > Talk.browse_after_s then
 			browseSaid = true
 			local ev = browseEvent(selected)
-			if ev ~= nil and now - lastBrowseLine > 3.5 and Keeper.say(ev, now, true) then lastBrowseLine = now end
+			if ev ~= nil and now - lastBrowseLine > Talk.browse_gap_s and Keeper.say(ev, now, true) then lastBrowseLine = now end
 		end
 		if acted then
 			idleT = 0
@@ -455,7 +455,7 @@ function update(ts)
 			idleT = idleT + lastDt
 			if idleT >= idleNext then
 				idleT = 0
-				if Keeper.say("idle", now, true) then idleNext = 22 end
+				if Keeper.say("idle", now, true) then idleNext = Talk.idle_repeat_s end
 			end
 		end
 	end
@@ -473,10 +473,10 @@ local function enterShopFor(index)
 	currentScreen = "shop"
 	relayout(true)
 	local start = math.max(now, revealAt)
-	Magazine.popAll(start + 0.1)
+	Magazine.popAll(start + Animation.entrance.pop_delay_s)
 	sayOnReveal("greet")
 	browseT, browseSaid = start, true
-	idleT, idleNext = 0, 15
+	idleT, idleNext = 0, Talk.first_idle_s
 end
 
 -- the save chosen on the title; opened without one, the first save
@@ -510,7 +510,7 @@ function activate()
 	now, lastDt = 0, 0
 	coinFrom, coinT = nil, nil
 	browseT, browseSaid, lastBrowseLine = 0, true, -100
-	idleT, idleNext = 0, 15
+	idleT, idleNext = 0, Talk.first_idle_s
 	-- the newspaper way in keeps the page hidden this long into its fade-in; the entrance waits for it
 	revealAt = tonumber(SHARED:GetSharedString("newspaper_cover")) or 0
 	SHARED:SetSharedString("newspaper_cover", "")
@@ -552,19 +552,20 @@ end
 
 
 function onStart()
-	text = TEXT:Create(16)
-	fonts.mast = TEXT:CreateGlyphCached(56)
-	fonts.big = TEXT:CreateGlyphCached(40)
-	fonts.talk = TEXT:CreateGlyphCached(32)
-	fonts.mid = TEXT:CreateGlyphCached(30)
-	fonts.small = TEXT:CreateGlyphCached(24)
-	cols.ink = COLOR:CreateColorFromRGBA(52, 44, 52, 255)
-	cols.red = COLOR:CreateColorFromRGBA(214, 52, 44, 255)
-	cols.stamp = COLOR:CreateColorFromRGBA(214, 52, 44, 255)
-	cols.white = COLOR:CreateColorFromRGBA(255, 255, 255, 255)
-	cols.cream = COLOR:CreateColorFromRGBA(255, 248, 236, 255)
-	cols.gold = COLOR:CreateColorFromRGBA(255, 226, 150, 255)
-	cols.clear = COLOR:CreateColorFromRGBA(0, 0, 0, 0)
+	local Fonts, Colors = Layout.fonts, Layout.colors
+	text = TEXT:Create(Fonts.plate_title)
+	fonts.mast = TEXT:CreateGlyphCached(Fonts.mast)
+	fonts.big = TEXT:CreateGlyphCached(Fonts.big)
+	fonts.talk = TEXT:CreateGlyphCached(Fonts.talk)
+	fonts.mid = TEXT:CreateGlyphCached(Fonts.mid)
+	fonts.small = TEXT:CreateGlyphCached(Fonts.small)
+	cols.ink = Config.color(Colors.ink_color)
+	cols.red = Config.color(Colors.red_color)
+	cols.stamp = Config.color(Colors.stamp_color)
+	cols.white = Config.color(Colors.white_color)
+	cols.cream = Config.color(Colors.cream_color)
+	cols.gold = Config.color(Colors.gold_color)
+	cols.clear = Config.color(Colors.clear_color)
 
 	sounds.Skip = SOUND:CreateSFX("Sounds/Skip.ogg")
 	sounds.Cancel = SOUND:CreateSFX("Sounds/Cancel.ogg")

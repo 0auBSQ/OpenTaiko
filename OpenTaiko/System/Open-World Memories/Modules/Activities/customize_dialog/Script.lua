@@ -10,6 +10,11 @@
 
 local NavInput = require("NavInput")
 
+-- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+
 -- ─── State ────────────────────────────────────────────────────────────────────
 
 local reactive = false
@@ -76,7 +81,10 @@ local palFlashColor        = nil   -- nil = white; non-nil = animated red→whit
 local currentPaletteFolder = ""   -- folder name the palette list was built for
 
 -- Slide-in transition
-local bgpos  = 1080
+local SLIDE      = Animation.slide
+local SLIDE_DIST = SLIDE.distance_px
+local SLIDE_STEP = SLIDE.duration_s / SLIDE_DIST   -- the counter's seconds per pixel of the slide
+local bgpos  = SLIDE_DIST
 local bgtlop = 0
 
 -- ─── Fonts / textures / sounds / counters ────────────────────────────────────
@@ -89,33 +97,42 @@ local sounds    = {}
 local ctx       = {}
 
 -- ─── Layout constants ─────────────────────────────────────────────────────────
--- Left panel  (menu / lists):  x 0–1060,  centre at 530
--- Right panel (preview):       x 1100–1920
 
 -- Left panel
-local MENU_CX        = 530
-local MENU_TITLE_X   = 80
-local MENU_TITLE_Y   = 60
-local MENU_ORIGIN_Y  = 200
-local MENU_SPACING_Y = 90
+local MENU           = Layout.menu
+local MENU_CX        = MENU.cx
+local MENU_TITLE_X   = Layout.title.x
+local MENU_TITLE_Y   = Layout.title.y
+local MENU_ORIGIN_Y  = MENU.y
+local MENU_SPACING_Y = MENU.spacing_y
+local SCREEN_TITLE   = Layout.screen_title
+local SCREEN_TITLE_Y = MENU_TITLE_Y + SCREEN_TITLE.below_title
+local EMPTY_MAX_W    = Layout.empty_message_max_w
+local DESC           = Layout.description
+local NAME_SCREEN    = Layout.player_name
+local TILE           = Layout.background_tile
 
 -- Footer OK / Cancel (matches mod_select_dialog layout)
-local MENU_FOOTER_Y  = 835
-local MENU_OK_X      = 510
-local MENU_CANCEL_X  = 710
+local FOOTER         = Layout.footer
+local MENU_FOOTER_Y  = FOOTER.y
+local MENU_OK_X      = FOOTER.ok_x
+local MENU_CANCEL_X  = FOOTER.cancel_x
 
--- Horizontal list (character / puchichara): 3 visible slots (-1, 0, +1)
-local ITEM_SLOT_W   = 220
-local VISIBLE_COUNT = 3
-local LIST_CX       = 530
-local LIST_CY       = 840   -- moved down 320 px so items sit lower in the panel
+-- Horizontal list (character / puchichara): VISIBLE_COUNT slots around the selected one
+local HLIST         = Layout.horizontal_list
+local ITEM_SLOT_W   = HLIST.slot_w
+local VISIBLE_COUNT = HLIST.visible_count
+local LIST_CX       = HLIST.cx
+local LIST_CY       = HLIST.cy
 
 -- Vertical nameplate / hitsound list (shared layout)
-local NP_LIST_CX  = 530
-local NP_LIST_CY  = 520
-local NP_ROW_H    = 84
-local NP_HALF_VIS = 3
-local NP_PLATE_W  = 480
+local VLIST       = Layout.vertical_list
+local NP_LIST_CX  = VLIST.cx
+local NP_LIST_CY  = VLIST.cy
+local NP_ROW_H    = VLIST.row_h
+local NP_HALF_VIS = VLIST.half_visible
+local NP_PLATE_W  = VLIST.plate_w
+local DIM_ROW     = VLIST.unselected_opacity
 
 local HS_LIST_CX  = NP_LIST_CX
 local HS_LIST_CY  = NP_LIST_CY
@@ -124,16 +141,19 @@ local HS_HALF_VIS = NP_HALF_VIS
 
 -- Preview positions — character bottom and nameplate share PREVIEW_BASE_Y so the
 -- nameplate appears directly under the character, matching the in-game layout.
-local PREVIEW_BASE_Y  = 720    -- character "bottom" / nameplate top-left y
-local PREVIEW_NP_X    = 1120   -- nameplate left-edge x
-local PREVIEW_CHARA_X = 1258   -- character centre-x
-local PREVIEW_PUCHI_X = 1198   -- puchichara centre-x (60 px left of character)
-local PREVIEW_PUCHI_BASE = 500  -- puchichara centre-y (140 px lower than before)
+local PREVIEW            = Layout.preview
+local PREVIEW_BASE_Y     = PREVIEW.base_y         -- character "bottom" / nameplate top-left y
+local PREVIEW_NP_X       = PREVIEW.nameplate_x    -- nameplate left-edge x
+local PREVIEW_CHARA_X    = PREVIEW.character_x    -- character centre-x
+local PREVIEW_PUCHI_X    = PREVIEW.puchichara_x   -- puchichara centre-x
+local PREVIEW_PUCHI_BASE = PREVIEW.puchichara_y   -- puchichara centre-y
+
+local FLOAT = Animation.puchichara_float
 
 -- ─── Color helpers ────────────────────────────────────────────────────────────
 
-local COL_WHITE  = "FFFFFFFF"
-local COL_YELLOW = "FFF2CF01"
+local COL_WHITE  = Layout.colors.white_color
+local COL_YELLOW = Layout.colors.yellow_color
 
 -- ─── Misc helpers ─────────────────────────────────────────────────────────────
 
@@ -394,9 +414,9 @@ end
 
 local function drawBg(opacity)
     tx["bgtile"]:SetOpacity((opacity * bgtlop) / 255)
-    for i = 0, 10 do
-        for j = 0, 10 do
-            tx["bgtile"]:Draw(i * 192, j * 108)
+    for i = 0, TILE.columns - 1 do
+        for j = 0, TILE.rows - 1 do
+            tx["bgtile"]:Draw(i * TILE.step_x, j * TILE.step_y)
         end
     end
 end
@@ -479,7 +499,7 @@ local function drawCharItem(entry, cx, cy, isSelected, alpha)
         and loadedCharaInst.IsValid
     then
         -- Animation was already updated this frame in drawPreview; just draw again at list pos.
-        loadedCharaInst:SetScale(1.1, 1.1)
+        loadedCharaInst:SetScale(HLIST.character_selected_scale, HLIST.character_selected_scale)
         loadedCharaInst:DrawAtAnchor(
             cx, cy, CHARACTER.ANIM_MENU_NORMAL, "bottom",
             1, 1, math.floor(alpha * 255)
@@ -487,9 +507,9 @@ local function drawCharItem(entry, cx, cy, isSelected, alpha)
         loadedCharaInst:SetScale(1, 1)
     end
     local col   = isSelected and COLOR:CreateColorFromHex(COL_YELLOW) or COLOR:CreateColorFromHex(COL_WHITE)
-    local namTx = textSmall:GetText(entry.DisplayName, false, ITEM_SLOT_W - 10, col)
+    local namTx = textSmall:GetText(entry.DisplayName, false, ITEM_SLOT_W - HLIST.name_padding, col)
     namTx:SetOpacity(alpha)
-    namTx:DrawAtAnchor(cx, cy + 8, "top")
+    namTx:DrawAtAnchor(cx, cy + HLIST.name_y, "top")
 end
 
 -- Puchichara: show first sprite-sheet frame.
@@ -498,7 +518,7 @@ local function drawPuchiItem(entry, cx, cy, isSelected, alpha)
     if entry.tx ~= nil and entry.tx.Loaded then
         local frameW = math.floor(entry.tx.Width / 2)
         local frameH = entry.tx.Height
-        local scale  = isSelected and 1.4 or 1.0
+        local scale  = isSelected and HLIST.puchichara_selected_scale or 1.0
         entry.tx:SetScale(scale, scale)
         entry.tx:SetOpacity(alpha)
         entry.tx:DrawRectAtAnchor(cx, cy, 0, 0, frameW, frameH, "bottom")
@@ -506,9 +526,9 @@ local function drawPuchiItem(entry, cx, cy, isSelected, alpha)
         entry.tx:SetScale(1, 1)
     end
     local col   = isSelected and COLOR:CreateColorFromHex(COL_YELLOW) or COLOR:CreateColorFromHex(COL_WHITE)
-    local namTx = textSmall:GetText(entry.Name, false, ITEM_SLOT_W - 10, col)
+    local namTx = textSmall:GetText(entry.Name, false, ITEM_SLOT_W - HLIST.name_padding, col)
     namTx:SetOpacity(alpha)
-    namTx:DrawAtAnchor(cx, cy + 8, "top")
+    namTx:DrawAtAnchor(cx, cy + HLIST.name_y, "top")
 end
 
 -- ─── Hitsound preview ────────────────────────────────────────────────────────
@@ -546,9 +566,9 @@ local function drawHitsoundList(alpha)
         if entry ~= nil then
             local rowY       = HS_LIST_CY + slot * HS_ROW_H
             local isSelected = (slot == 0)
-            local opacity    = isSelected and alpha or alpha * 0.5
+            local opacity    = isSelected and alpha or alpha * DIM_ROW
             local col        = isSelected and COLOR:CreateColorFromHex(COL_YELLOW) or COLOR:CreateColorFromHex(COL_WHITE)
-            local namTx      = text:GetText(entry.DisplayName, false, 500, col)
+            local namTx      = text:GetText(entry.DisplayName, false, VLIST.text_max_w, col)
             namTx:SetOpacity(opacity)
             namTx:DrawAtAnchor(HS_LIST_CX, rowY, "center")
         end
@@ -565,14 +585,14 @@ local function drawDanTitleList(alpha)
         local entry      = danList[dataIdx + 1]
         if entry ~= nil then
             local rowY    = NP_LIST_CY + slot * NP_ROW_H
-            local opacity = math.floor(((slot == 0) and alpha or alpha * 0.5) * 255)
+            local opacity = math.floor(((slot == 0) and alpha or alpha * DIM_ROW) * 255)
             local nx      = NP_LIST_CX - math.floor(NP_PLATE_W / 2)
             if npEntry ~= nil then
-                np:Draw(6, nx, rowY - 30, opacity, player, 0,
+                np:Draw(6, nx, rowY + VLIST.plate_y, opacity, player, 0,
                     npEntry.Title, npEntry.Type, npEntry.RarityInt, npEntry.Id,
                     entry.Title, entry.ClearStatus, stagedPlayerName)
             else
-                np:Draw(4, nx, rowY - 30, opacity, player, 0,
+                np:Draw(4, nx, rowY + VLIST.plate_y, opacity, player, 0,
                     entry.Title, entry.ClearStatus, stagedPlayerName)
             end
         end
@@ -589,9 +609,9 @@ local function drawNameplateList(alpha)
         local entry      = nameplateList[dataIdx + 1]
         if entry ~= nil then
             local rowY    = NP_LIST_CY + slot * NP_ROW_H
-            local opacity = math.floor(((slot == 0) and alpha or alpha * 0.5) * 255)
+            local opacity = math.floor(((slot == 0) and alpha or alpha * DIM_ROW) * 255)
             local nx      = NP_LIST_CX - math.floor(NP_PLATE_W / 2)
-            np:Draw(6, nx, rowY - 30, opacity, player, 0,
+            np:Draw(6, nx, rowY + VLIST.plate_y, opacity, player, 0,
                 entry.Title, entry.Type, entry.RarityInt, entry.Id,
                 danEntry ~= nil and danEntry.Title       or nil,
                 danEntry ~= nil and danEntry.ClearStatus or nil,
@@ -614,18 +634,18 @@ end
 
 local function updateTransitionVisuals(val)
     bgpos  = val
-    local op = 255 - (val * (255 / 540))
+    local op = 255 - (val * (255 / SLIDE.fade_distance_px))
     bgtlop = math.max(0, math.min(255, op))
 end
 
 -- ─── draw() ───────────────────────────────────────────────────────────────────
 
 function draw()
-    drawBg(0.5)
+    drawBg(TILE.opacity)
     tx["bg"]:SetOpacity(bgtlop / 255)
     tx["bg"]:Draw(0, bgpos)
     tx["player" .. player]:SetOpacity(bgtlop / 255)
-    tx["player" .. player]:DrawAtAnchor(1920, 1080 + bgpos, "bottomright")
+    tx["player" .. player]:DrawAtAnchor(Layout.player_art.x, Layout.player_art.y + bgpos, "bottomright")
 
     if bgtlop == 0 then return end
     local alpha = bgtlop / 255
@@ -634,7 +654,7 @@ function draw()
     drawPreview(alpha)
 
     -- Title
-    local titleTx = textLarge:GetText("Customize", false, 700)
+    local titleTx = textLarge:GetText("Customize", false, Layout.title.max_w)
     titleTx:SetOpacity(alpha)
     titleTx:Draw(MENU_TITLE_X, MENU_TITLE_Y)
 
@@ -643,7 +663,7 @@ function draw()
         for i = 1, #MAIN_LABELS do
             local isSel = (i == mainIdx)
             local col   = isSel and COLOR:CreateColorFromHex(COL_YELLOW) or COLOR:CreateColorFromHex(COL_WHITE)
-            local item  = text:GetText(MAIN_LABELS[i], false, 500, col)
+            local item  = text:GetText(MAIN_LABELS[i], false, MENU.item_max_w, col)
             item:SetOpacity(alpha)
             item:DrawAtAnchor(MENU_CX, MENU_ORIGIN_Y + (i - 1) * MENU_SPACING_Y, "top")
         end
@@ -651,18 +671,18 @@ function draw()
         -- ── OK / Cancel footer (matches mod_select_dialog layout) ──
         local okCol  = (mainIdx == OK_IDX)     and COLOR:CreateColorFromHex(COL_YELLOW) or COLOR:CreateColorFromHex(COL_WHITE)
         local canCol = (mainIdx == CANCEL_IDX) and COLOR:CreateColorFromHex(COL_YELLOW) or COLOR:CreateColorFromHex(COL_WHITE)
-        local okTx  = text:GetText("OK",     false, 200, okCol)
-        local canTx = text:GetText("Cancel", false, 200, canCol)
+        local okTx  = text:GetText("OK",     false, FOOTER.button_max_w, okCol)
+        local canTx = text:GetText("Cancel", false, FOOTER.button_max_w, canCol)
         okTx:SetOpacity(alpha)  ; okTx:Draw(MENU_OK_X,     MENU_FOOTER_Y)
         canTx:SetOpacity(alpha) ; canTx:Draw(MENU_CANCEL_X, MENU_FOOTER_Y)
 
-        local desc = textSmall:GetText("Choose your character, puchichara, nameplate and hitsounds.", false, 900)
+        local desc = textSmall:GetText("Choose your character, puchichara, nameplate and hitsounds.", false, DESC.max_w)
         desc:SetOpacity(alpha)
-        desc:DrawAtAnchor(MENU_CX, 950, "top")
+        desc:DrawAtAnchor(MENU_CX, DESC.y, "top")
 
     elseif currentScreen == "palette" then
-        local ttl = text:GetText("Palette", false, 400, COLOR:CreateColorFromHex(COL_YELLOW))
-        ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, MENU_TITLE_Y + 40, "top")
+        local ttl = text:GetText("Palette", false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
+        ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, SCREEN_TITLE_Y, "top")
 
         local playCount          = getCharPlayCount()
         local selUnlocked        = true
@@ -678,9 +698,9 @@ function draw()
                     selUnlocked  = unlocked
                     selRemaining = unlocked and 0 or ((p.plays or 0) - playCount)
                 end
-                local rowAlpha = isSel and alpha or alpha * 0.5
+                local rowAlpha = isSel and alpha or alpha * DIM_ROW
                 local col      = isSel and COLOR:CreateColorFromHex(COL_YELLOW) or COLOR:CreateColorFromHex(COL_WHITE)
-                local namTx    = text:GetText(p.name, false, 500, col)
+                local namTx    = text:GetText(p.name, false, VLIST.text_max_w, col)
                 namTx:SetOpacity(rowAlpha)
                 namTx:DrawAtAnchor(MENU_CX, rowY, "center")
             end
@@ -688,71 +708,72 @@ function draw()
 
         -- Lock message at the bottom, below the last visible row
         if not selUnlocked then
-            local msgCol = palFlashColor or COLOR:CreateColorFromHex("FFAAAAAA")
+            local lock = Layout.palette_lock
+            local msgCol = palFlashColor or COLOR:CreateColorFromHex(lock.color)
             local s = selRemaining == 1 and "" or "s"
             local msg = textSmall:GetText(
                 "Play " .. selRemaining .. " more time" .. s .. " with this character to unlock",
-                false, 700, msgCol)
+                false, lock.max_w, msgCol)
             msg:SetOpacity(alpha)
-            msg:DrawAtAnchor(MENU_CX, NP_LIST_CY + NP_HALF_VIS * NP_ROW_H + 20, "top")
+            msg:DrawAtAnchor(MENU_CX, NP_LIST_CY + NP_HALF_VIS * NP_ROW_H + lock.y, "top")
         end
 
     elseif currentScreen == "character" then
-        local ttl = text:GetText("Character", false, 400, COLOR:CreateColorFromHex(COL_YELLOW))
-        ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, MENU_TITLE_Y + 40, "top")
+        local ttl = text:GetText("Character", false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
+        ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, SCREEN_TITLE_Y, "top")
 
         if #characterList == 0 then
-            local e = textSmall:GetText("No characters available.", false, 600)
+            local e = textSmall:GetText("No characters available.", false, EMPTY_MAX_W)
             e:SetOpacity(alpha) ; e:DrawAtAnchor(MENU_CX, LIST_CY, "center")
         else
             drawHorizList(characterList, charSubIdx, alpha, drawCharItem)
         end
 
     elseif currentScreen == "puchichara" then
-        local ttl = text:GetText("Puchichara", false, 400, COLOR:CreateColorFromHex(COL_YELLOW))
-        ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, MENU_TITLE_Y + 40, "top")
+        local ttl = text:GetText("Puchichara", false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
+        ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, SCREEN_TITLE_Y, "top")
 
         if #puchiList == 0 then
-            local e = textSmall:GetText("No puchichara available.", false, 600)
+            local e = textSmall:GetText("No puchichara available.", false, EMPTY_MAX_W)
             e:SetOpacity(alpha) ; e:DrawAtAnchor(MENU_CX, LIST_CY, "center")
         else
             drawHorizList(puchiList, puchiSubIdx, alpha, drawPuchiItem)
         end
 
     elseif currentScreen == "nameplate_title" then
-        local ttl = text:GetText("Nameplate title", false, 400, COLOR:CreateColorFromHex(COL_YELLOW))
-        ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, MENU_TITLE_Y + 40, "top")
+        local ttl = text:GetText("Nameplate title", false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
+        ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, SCREEN_TITLE_Y, "top")
 
         drawNameplateList(alpha)
 
     elseif currentScreen == "dan_title" then
-        local ttl = text:GetText("Dan title", false, 400, COLOR:CreateColorFromHex(COL_YELLOW))
-        ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, MENU_TITLE_Y + 40, "top")
+        local ttl = text:GetText("Dan title", false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
+        ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, SCREEN_TITLE_Y, "top")
 
         if #danList == 0 then
-            local e = textSmall:GetText("No dan titles available.", false, 600)
+            local e = textSmall:GetText("No dan titles available.", false, EMPTY_MAX_W)
             e:SetOpacity(alpha) ; e:DrawAtAnchor(MENU_CX, NP_LIST_CY, "center")
         else
             drawDanTitleList(alpha)
         end
 
     elseif currentScreen == "player_name" then
-        local ttl = text:GetText("Player name", false, 400, COLOR:CreateColorFromHex(COL_YELLOW))
-        ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, MENU_TITLE_Y + 40, "top")
+        local ttl = text:GetText("Player name", false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
+        ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, SCREEN_TITLE_Y, "top")
 
         local displayText = playerNameInput ~= nil and playerNameInput.DisplayText or stagedPlayerName
-        local nameTx = text:GetText(displayText, false, 700)
-        nameTx:SetOpacity(alpha) ; nameTx:DrawAtAnchor(MENU_CX, 500, "center")
+        local nameTx = text:GetText(displayText, false, NAME_SCREEN.max_w)
+        nameTx:SetOpacity(alpha) ; nameTx:DrawAtAnchor(MENU_CX, NAME_SCREEN.y, "center")
 
-        local hint = textSmall:GetText("Enter: confirm   Esc: cancel", false, 700)
-        hint:SetOpacity(alpha) ; hint:DrawAtAnchor(MENU_CX, 950, "top")
+        local hint = textSmall:GetText("Enter: confirm   Esc: cancel", false, NAME_SCREEN.hint_max_w)
+        hint:SetOpacity(alpha) ; hint:DrawAtAnchor(MENU_CX, NAME_SCREEN.hint_y, "top")
 
     elseif currentScreen == "hitsounds" then
-        local ttl = text:GetText("Hitsounds", false, 400, COLOR:CreateColorFromHex(COL_YELLOW))
-        ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, MENU_TITLE_Y + 40, "top")
+        local ttl = text:GetText("Hitsounds", false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
+        ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, SCREEN_TITLE_Y, "top")
 
         if #hitsoundList == 0 then
-            local e = textSmall:GetText("No hitsound sets available.", false, 600)
+            local e = textSmall:GetText("No hitsound sets available.", false, EMPTY_MAX_W)
             e:SetOpacity(alpha) ; e:DrawAtAnchor(MENU_CX, HS_LIST_CY, "center")
         else
             drawHitsoundList(alpha)
@@ -772,7 +793,7 @@ function update()
     local function exitDialog(save_changes)
         reactive = false
         if save_changes then applyChanges() end
-        startCounter("exit", 0, 1080, 0.5 / 1080, "none", updateTransitionVisuals, function()
+        startCounter("exit", 0, SLIDE_DIST, SLIDE_STEP, "none", updateTransitionVisuals, function()
             DEACTIVATE()
         end)
     end
@@ -839,7 +860,7 @@ function update()
         elseif navPn.decide() then
             local p = paletteList[paletteSubIdx + 1]
             if p ~= nil and not isPaletteUnlocked(p) then
-                startCounter("palFlash", 0, 255, 1/510, "none", function(val)
+                startCounter("palFlash", 0, 255, Animation.palette_lock_flash.duration_s / 255, "none", function(val)
                     palFlashColor = COLOR:CreateColorFromARGB(255, 255, math.floor(val), math.floor(val))
                 end, function()
                     palFlashColor = nil
@@ -976,13 +997,13 @@ function activate(pl)
     sounds.Cancel = SHARED:GetSharedSound("Cancel")
 
     -- Slide-in
-    startCounter("enter", 1080, 0, -0.5 / 1080, "none", updateTransitionVisuals, function()
+    startCounter("enter", SLIDE_DIST, 0, -SLIDE_STEP, "none", updateTransitionVisuals, function()
         reactive = true
     end)
 
-    -- Puchichara floating animation (±15 px sine)
-    startCounter("sine", 0, 360, 1 / 120, "loop", function(val)
-        sineY = math.sin(val * math.pi / 180) * 15
+    -- Puchichara floating animation (sine)
+    startCounter("sine", 0, 360, 1 / FLOAT.speed_deg_per_s, "loop", function(val)
+        sineY = math.sin(val * math.pi / 180) * FLOAT.amplitude_px
     end)
 end
 
@@ -1022,9 +1043,9 @@ end
 -- ─── onStart() / onDestroy() ──────────────────────────────────────────────────
 
 function onStart()
-    textSmall = TEXT:Create(18)
-    text      = TEXT:Create(26)
-    textLarge = TEXT:Create(40)
+    textSmall = TEXT:Create(Layout.fonts.small_size)
+    text      = TEXT:Create(Layout.fonts.text_size)
+    textLarge = TEXT:Create(Layout.fonts.large_size)
 
     tx["bg"]     = TEXTURE:CreateTexture("Textures/Background.png")
     tx["bgtile"] = TEXTURE:CreateTexture("Textures/BgTile.png")

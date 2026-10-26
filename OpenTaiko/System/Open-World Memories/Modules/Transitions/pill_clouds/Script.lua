@@ -2,7 +2,10 @@
 -- pill_clouds: from the title into the regular song select (Lib/PillClouds).
 
 local PC = require("PillClouds")
-local anim = PC.new({ { 1.00, 0.80, 0.60 }, { 0.60, 0.90, 1.00 }, { 1.00, 0.80, 0.60 }, { 0.60, 0.90, 1.00 }, })
+-- the pill colours: Config/layout.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local anim = PC.new(Config.plain(Layout.pill_colors))
 
 FADE_OUT_SECONDS = PC.PILLS_OUT_SECONDS
 FADE_IN_SECONDS  = PC.IN_SECONDS

@@ -12,6 +12,7 @@
 --   "play"   — a song was successfully mounted, parent stage should Exit("play")
 --   "cancel" — user backed out entirely, parent stage should decide where to go
 --   nil      — still running, no action needed
+-- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
 
 local Sort    = require("sort")
 local Nav     = require("navigation")
@@ -19,7 +20,9 @@ local Diff    = require("diffselect")
 local Replay  = require("replaylist")
 local EM      = require("EventMode")
 local DrawSS  = require("draw_songselect")
-local CFG     = require("sscore_config")
+local Config  = require("Core.Config")
+local Layout  = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
 local NavInput = require("NavInput")
 local I18N    = require("i18n")
 
@@ -27,9 +30,12 @@ local I18N    = require("i18n")
 -- deactivate() (G.bgtx key -> default file; the "<name>_<code>.png" variant is used when it exists)
 local OVERLAY_FILES = { overlay = "Textures/bg_overlay.png", overlay_difficulty = "Textures/bg_overlay_difficulty.png" }
 
--- Song-preview volume fades (skinner-tunable in Config/layout.json).
-local PREVIEW_FADE_IN_MS  = CFG.num("preview.fade_in_ms", 280)
-local PREVIEW_FADE_OUT_MS = CFG.num("preview.fade_out_ms", 140)
+-- Song-preview volume fades
+local PREVIEW_FADE_IN_MS  = Animation.preview.fade_in_ms
+local PREVIEW_FADE_OUT_MS = Animation.preview.fade_out_ms
+local Fonts = Layout.fonts
+local WaitScreen = Layout.wait_screen
+local WAIT_TEXT_COLOR = Config.color(WaitScreen.text_color)
 local MusicDuck = require("MusicDuck")
 local previewDuck = MusicDuck.new()   -- dims the preview while the unlock reward modal plays
 local Search  = require("search")
@@ -185,7 +191,8 @@ G.drawPlayerChara = function(player, x, y, scaleX, scaleY, opacity, flipX)
     end
 end
 
-local PUCHI_N_FRAMES = 2  -- TODO: Read from PuchiConfig.txt
+local Puchi = Animation.puchi
+local PUCHI_N_FRAMES = Puchi.frame_count  -- TODO: Read from PuchiConfig.txt
 G.drawPlayerPuchi = function(player, x, y, scaleX, scaleY, opacity, flipX, idxFrame)
     local puchi = GetSaveFile(player):GetPuchichara()
     if puchi == nil or puchi.tx == nil or not puchi.tx.Loaded then return end
@@ -199,8 +206,8 @@ G.drawPlayerPuchi = function(player, x, y, scaleX, scaleY, opacity, flipX, idxFr
     puchi.tx:SetOpacity(1); puchi.tx:SetScale(1, 1)
 end
 
+local NAMEPLATE_OFFSET_X = Layout.difficulty_select.nameplate.offset_x
 G.drawCharaWithNameplate = function(player, x, y, scaleX, scaleY, opacity, flipX)
-    local NAMEPLATE_OFFSET_X = 27
     G.drawPlayerChara(player, x + G.bgtx["nameplate_info"].Width / 2 - NAMEPLATE_OFFSET_X,
         y, scaleX, scaleY, opacity, flipX)
     NAMEPLATE:DrawPlayerNameplate(x, y, opacity * 255, player)
@@ -262,10 +269,10 @@ G.unlocks = Unlocks
 
 function onStart()
     -- glyph-composed fonts: one texture per unique character (bounded), no per-string texture cache
-    G.text      = TEXT:CreateGlyphCached(28)
-    G.textSmall = TEXT:CreateGlyphCached(18)
-    G.textLarge = TEXT:CreateGlyphCached(40)
-    G.textStats = TEXT:CreateGlyphCached(24)
+    G.text      = TEXT:CreateGlyphCached(Fonts.text)
+    G.textSmall = TEXT:CreateGlyphCached(Fonts.small)
+    G.textLarge = TEXT:CreateGlyphCached(Fonts.large)
+    G.textStats = TEXT:CreateGlyphCached(Fonts.stats)
 
     BG.loadDefault()   -- bg1.png, the set every genre without its own falls back to
 
@@ -446,41 +453,45 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly
     end
 
     -- Animation counters
-    local PUCHI_FLOAT_AMP                  = 8
-    local SONGBAR_LEVEL_EX_ANIMATION_FRAMECOUNT = 20
+    local PUCHI_FLOAT_AMP                  = Puchi.float_amp_px
+    local LevelTag = Animation.level_tag
+    local SONGBAR_LEVEL_EX_ANIMATION_FRAMECOUNT = LevelTag.frame_count
+    local UraFade = Animation.ura_fade
+    local Arrows = Animation.selected_arrows
 
-    G.startCounter("background", 1920, 0, 1/48, "loop", function(val)
+    G.startCounter("background", 1920, 0, 1 / Animation.background.shared_scroll_px_per_s, "loop", function(val)
         G.backgroundScrollX = val
     end)
-    G.startCounter("extreme_fade", 2000, 0, 1/400, "loop", function(val)
-        local fadeIn = val - 745; local fadeOut = 2000 - val
+    G.startCounter("extreme_fade", UraFade.cycle, 0, 1 / UraFade.speed_per_s, "loop", function(val)
+        local fadeIn = val - UraFade.fade_in_from; local fadeOut = UraFade.cycle - val
         G.difficultyFade4 = math.max(0, math.min(255, fadeIn, fadeOut))
     end)
-    -- the selected row's green: from select_band_min to full and back, eased at both ends
-    local bandMin = CFG.num("song_list.select_band_min", 0.5)
-    G.startCounter("selectband_animation", 0, 1000, CFG.num("song_list.select_band_ms", 900) / 1000000, "bounce", function(val)
+    -- the selected row's green: from select_band_min to full and back, eased at both ends (the counter runs
+    -- 0..1000 over select_band_ms)
+    local bandMin = Animation.song_list.select_band_min
+    G.startCounter("selectband_animation", 0, 1000, Animation.song_list.select_band_ms / 1000000, "bounce", function(val)
         G.selectBandPulse = bandMin + (1 - bandMin) * (0.5 - 0.5 * math.cos(math.pi * val / 1000))
     end)
-    G.startCounter("arrows_animation", 10, 0, 1/10, "bounce", function(val)
+    G.startCounter("arrows_animation", Arrows.distance_px, 0, 1 / Arrows.speed_px_per_s, "bounce", function(val)
         G.arrowsDistance = val
     end)
     G.startCounter("leveltag_animation",
         SONGBAR_LEVEL_EX_ANIMATION_FRAMECOUNT, 0,
-        1 / SONGBAR_LEVEL_EX_ANIMATION_FRAMECOUNT * 2, "loop", function(val)
+        LevelTag.loop_s / SONGBAR_LEVEL_EX_ANIMATION_FRAMECOUNT, "loop", function(val)
         G.levelLabelFrame = math.floor(val)
     end)
-    G.startCounter("load_animation", 0, 360, 2/300, "loop", function(val)
+    G.startCounter("load_animation", 0, 360, 1 / Animation.loading_spinner.speed_deg_per_s, "loop", function(val)
         if G.bgtx["load"] ~= nil then G.bgtx["load"]:SetRotation(val) end
     end)
-    G.startCounter("puchi_sine", 0, 360, 1/120, "loop", function(val)  -- 1/3 cycles/s
+    G.startCounter("puchi_sine", 0, 360, 1 / Puchi.float_speed_deg_per_s, "loop", function(val)
         G.puchiSineY = math.sin(val * math.pi / 180) * PUCHI_FLOAT_AMP
     end)
-    G.startCounter("puchi_frame", 0, 1, 4.8, "loop", function(val)  -- 1/4.8 cycles/s
+    G.startCounter("puchi_frame", 0, 1, Puchi.frame_loop_s, "loop", function(val)
         G.puchiIdxFrame = math.floor(val * PUCHI_N_FRAMES)
     end)
-    -- Difficulty-select Note float/rotation phase (0..360, ~8s loop). Ticks in G.ctx every frame regardless of
+    -- Difficulty-select Note float/rotation phase (0..360). Ticks in G.ctx every frame regardless of
     -- activeScreen, so the Note animates during the songselect→diffselect transition too. diffselect reads it.
-    G.startCounter("diffnote_float", 0, 360, 1/45, "loop", function(val)
+    G.startCounter("diffnote_float", 0, 360, 1 / Animation.difficulty_select.note.phase_speed_deg_per_s, "loop", function(val)
         G.noteFloatPhase = val
     end)
 
@@ -567,8 +578,7 @@ end
 local function drawWaitScreen(msg)
     -- Black fill
     local black = COLOR:CreateColorFromHex("ff000000")
-    local white = COLOR:CreateColorFromHex("ffffffff")
-    G.textLarge:Draw(msg, 960, 540, white, nil, 1, 1, 1600, "center")
+    G.textLarge:Draw(msg, WaitScreen.x, WaitScreen.y, WAIT_TEXT_COLOR, nil, 1, 1, WaitScreen.max_width, "center")
 end
 
 function draw(mode)

@@ -16,27 +16,23 @@
 local PopUI = require("PopUI")
 local SongSearch = require("SongSearch")
 
+-- positions, sizes and colours: Config/layout.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+
 local SW, SH = 1920, 1080
 local SORT_METHODS = { "SONGSELECT_SORT_FILEPATH", "SONGSELECT_SORT_SONG_TITLE", "SONGSELECT_SORT_SUBTITLE",
                        "SONGSELECT_SORT_LEVEL", "SONGSELECT_SORT_BPM", "SONGSELECT_SORT_BEST_SCORE", "SONGSELECT_SORT_CLEAR_STATUS" }
 local METHOD_KEY, DIR_KEY = "ss_sort_method", "ss_sort_dir"
 local DEFAULT_METHOD, DEFAULT_DIR = 0, 1
 
-local UI_THEME = {
-    colors = {
-        surface  = { 250, 252, 255, 255 }, surface2 = { 230, 236, 244, 255 },
-        primary  = { 96, 132, 180, 255 },  primary2 = { 72, 108, 156, 255 },
-        accent   = { 126, 196, 200, 255 }, accent2  = { 96, 168, 176, 255 },
-        outline  = { 70, 84, 104, 255 },   text = { 44, 56, 74, 255 }, textOnAccent = { 255, 255, 255, 255 },
-    },
-    font = { small = 18, label = 22, button = 22, title = 30 },
-}
-local CLOSE_STYLE = {
-    radius = 40,
-    colors = { primary = { 208, 62, 56, 255 }, primary2 = { 158, 34, 30, 255 },
-               outline = { 96, 24, 20, 255 }, textOnAccent = { 255, 255, 255, 255 } },
-}
-local COL_MUTED = { 108, 114, 146 }
+local UI_THEME = Config.plain(Layout.theme)
+local CLOSE = Layout.close_button
+local CLOSE_STYLE = Config.plain(CLOSE.style)
+local COL_MUTED = Layout.muted_color
+local DIM = Layout.dim_color
+local SORT = Layout.sort
+local SEARCH = Layout.search
 
 local function tr(key, fallback)
     local ok, s = pcall(function() return THEME:GetSkinString(key) end)
@@ -81,27 +77,28 @@ local function refreshSortButtons()
     end
 end
 
-local SORT_ROW_H = 66
+local SORT_ROW_H = SORT.row_h
 local function buildSort()
-    panel.w, panel.h = 900, 96 + #SORT_METHODS * SORT_ROW_H + 120
+    panel.w, panel.h = SORT.panel_w, SORT.header_h + #SORT_METHODS * SORT_ROW_H + SORT.footer_h
     panel.x, panel.y = math.floor((SW - panel.w) / 2), math.floor((SH - panel.h) / 2)
     ui:panel{ x = panel.x, y = panel.y, w = panel.w, h = panel.h, title = tr("SONGSELECT_SORT_TITLE", "Sort songs") }
     -- the choice is saved as it is made; OK just closes the dialog
-    ui:button{ text = tr("SONGSELECT_SORT_OK", "OK"), x = panel.x + panel.w / 2 - 140, y = panel.y + panel.h - 90, w = 280, h = 60, accent = true,
+    local ok = SORT.ok_button
+    ui:button{ text = tr("SONGSELECT_SORT_OK", "OK"), x = panel.x + panel.w / 2 - ok.w / 2, y = panel.y + panel.h - ok.bottom, w = ok.w, h = ok.h, accent = true,
                onClick = function() sounds.Decide:Play(); wantClose = true end }
-    local bw, bh, gap = 124, 50, 8
-    local bx0 = panel.x + panel.w - 40 - 3 * bw - 2 * gap
+    local bw, bh, gap = SORT.dir_button.w, SORT.dir_button.h, SORT.dir_button.gap
+    local bx0 = panel.x + panel.w - SORT.margin_x - 3 * bw - 2 * gap
     sortButtons = {}
     for i, key in ipairs(SORT_METHODS) do
-        local y = panel.y + 84 + (i - 1) * SORT_ROW_H
+        local y = panel.y + SORT.rows_y + (i - 1) * SORT_ROW_H
         local method = i - 1
-        ui:label{ text = tr(key, key), x = panel.x + 40, y = y + math.floor((bh - 22) / 2), size = "label", color = UI_THEME.colors.text, maxWidth = bx0 - panel.x - 60 }
+        ui:label{ text = tr(key, key), x = panel.x + SORT.margin_x, y = y + math.floor((bh - UI_THEME.font.label) / 2), size = "label", color = UI_THEME.colors.text, maxWidth = bx0 - panel.x - SORT.label_gap }
         sortButtons[method] = {}
         for k, dir in ipairs({ 1, 2, 0 }) do
             local labelKey = (dir == 1) and "SONGSELECT_SORT_ASC" or ((dir == 2) and "SONGSELECT_SORT_DESC" or "SONGSELECT_SORT_OFF")
             local fallback = (dir == 1) and "ascending" or ((dir == 2) and "descending" or "off")
             sortButtons[method][dir] = ui:button{
-                text = tr(labelKey, fallback), x = bx0 + (k - 1) * (bw + gap), y = y, w = bw, h = bh, style = { font = { button = 18 } },
+                text = tr(labelKey, fallback), x = bx0 + (k - 1) * (bw + gap), y = y, w = bw, h = bh, style = { font = { button = SORT.dir_button.font_size } },
                 onClick = function() writeSort(method, dir); refreshSortButtons() end,
             }
         end
@@ -137,13 +134,15 @@ local function recount()
 end
 
 local function buildSearch()
-    panel.w, panel.h = 940, 96 + 6 * 74 + 170
+    local rowH = SEARCH.row_h
+    panel.w, panel.h = SEARCH.panel_w, SEARCH.header_h + 6 * rowH + SEARCH.footer_h
     panel.x, panel.y = math.floor((SW - panel.w) / 2), math.floor((SH - panel.h) / 2)
     ui:panel{ x = panel.x, y = panel.y, w = panel.w, h = panel.h, title = tr("SONGSELECT_SEARCH_TITLE", "Search songs") }
-    local labelX, fieldX, fieldW = panel.x + 40, panel.x + 330, panel.w - 370
-    local y = panel.y + 90
+    local labelX, fieldX, fieldW = panel.x + SEARCH.margin_x, panel.x + SEARCH.field_x, panel.w - SEARCH.field_x - SEARCH.margin_x
+    local slider, textbox = SEARCH.slider, SEARCH.textbox
+    local y = panel.y + SEARCH.rows_y
     local function row(labelKey, fallback)
-        ui:label{ text = tr(labelKey, fallback), x = labelX, y = y + 20, size = "label", color = UI_THEME.colors.text, maxWidth = 270 }
+        ui:label{ text = tr(labelKey, fallback), x = labelX, y = y + SEARCH.label_y, size = "label", color = UI_THEME.colors.text, maxWidth = SEARCH.label_max_w }
     end
     local function labels(opts)
         local out = {}
@@ -151,32 +150,33 @@ local function buildSearch()
         return out
     end
     row("SONGSELECT_SEARCH_DIFFICULTY", "Difficulty")
-    ui:chooser{ x = fieldX, y = y, w = fieldW, h = 60, options = labels(SongSearch.DIFF_OPTIONS), index = search.diffIdx, wrap = true,
+    ui:chooser{ x = fieldX, y = y, w = fieldW, h = SEARCH.chooser_h, options = labels(SongSearch.DIFF_OPTIONS), index = search.diffIdx, wrap = true,
                 onChange = function(i) search.diffIdx = i; recount() end }
-    y = y + 74
+    y = y + rowH
     row("SONGSELECT_SEARCH_LEVEL_FROM", "Level from")
-    ui:slider{ x = fieldX, y = y + 10, w = fieldW - 90, h = 40, min = 0, max = LEVEL_MAX, step = 1, value = search.from,
+    ui:slider{ x = fieldX, y = y + slider.y, w = fieldW - slider.shorter_by, h = slider.h, min = 0, max = LEVEL_MAX, step = 1, value = search.from,
                onChange = function(v) search.from = math.floor(v + 0.5); recount() end }
-    y = y + 74
+    y = y + rowH
     row("SONGSELECT_SEARCH_LEVEL_TO", "Level to")
-    ui:slider{ x = fieldX, y = y + 10, w = fieldW - 90, h = 40, min = 0, max = LEVEL_MAX, step = 1, value = search.to,
+    ui:slider{ x = fieldX, y = y + slider.y, w = fieldW - slider.shorter_by, h = slider.h, min = 0, max = LEVEL_MAX, step = 1, value = search.to,
                showValue = function(self) local v = math.floor(self.value + 0.5); return (v >= LEVEL_MAX) and (LEVEL_MAX .. "~") or tostring(v) end,
                onChange = function(v) search.to = math.floor(v + 0.5); recount() end }
-    y = y + 74
+    y = y + rowH
     local any = tr("SONGSELECT_SEARCH_ANY", "Any")
     for _, f in ipairs({ { "SONGSELECT_SEARCH_SONG_TITLE", "Song title", "title" }, { "SONGSELECT_SEARCH_SUBTITLE", "Song subtitle", "subtitle" },
                          { "SONGSELECT_SEARCH_CHARTER", "Charter", "charter" } }) do
         row(f[1], f[2])
-        ui:textbox{ x = fieldX, y = y - 4, w = fieldW, h = 64, value = search[f[3]], placeholder = any, maxLen = 64,
+        ui:textbox{ x = fieldX, y = y + textbox.y, w = fieldW, h = textbox.h, value = search[f[3]], placeholder = any, maxLen = 64,
                     onChange = function(t) search[f[3]] = t; recount() end }
-        y = y + 74
+        y = y + rowH
     end
-    counter.label = ui:label{ text = "", x = labelX, y = y + 8, size = "small", color = COL_MUTED, maxWidth = panel.w - 80 }
+    counter.label = ui:label{ text = "", x = labelX, y = y + SEARCH.counter_y, size = "small", color = COL_MUTED, maxWidth = panel.w - 2 * SEARCH.margin_x }
     recount()
-    local by = panel.y + panel.h - 90
-    ui:button{ text = tr("SONGSELECT_SEARCH_OK", "Search"), x = panel.x + panel.w / 2 - 300, y = by, w = 280, h = 60, accent = true,
+    local bt = SEARCH.buttons
+    local by = panel.y + panel.h - bt.bottom
+    ui:button{ text = tr("SONGSELECT_SEARCH_OK", "Search"), x = panel.x + panel.w / 2 - bt.gap / 2 - bt.w, y = by, w = bt.w, h = bt.h, accent = true,
                onClick = function() SongSearch.write(GetSaveFile(activePlayer), searchParams()); sounds.Decide:Play(); wantClose = true end }
-    ui:button{ text = tr("SONGSELECT_SEARCH_CANCEL", "Cancel"), x = panel.x + panel.w / 2 + 20, y = by, w = 280, h = 60,
+    ui:button{ text = tr("SONGSELECT_SEARCH_CANCEL", "Cancel"), x = panel.x + panel.w / 2 + bt.gap / 2, y = by, w = bt.w, h = bt.h,
                onClick = function() sounds.Cancel:Play(); wantClose = true end }
 end
 
@@ -196,11 +196,11 @@ function activate(player, mode, baseFolder)
         theme = UI_THEME, bg = false, navPlayer = activePlayer + 1,
         sfx = { click = function() sounds.Decide:Play() end, hover = function() sounds.Skip:Play() end },
     }
-    ui:button{ text = "×", w = 60, h = 60, accent = true, style = CLOSE_STYLE, sfx = { click = "" },
+    ui:button{ text = "×", w = CLOSE.w, h = CLOSE.h, accent = true, style = CLOSE_STYLE, sfx = { click = "" },
                onClick = function() sounds.Cancel:Play(); wantClose = true end }
     if activeMode == "sort" then buildSort() else buildSearch() end
     -- the close button sits on the panel's corner once the panel size is known
-    ui.widgets[1].x, ui.widgets[1].y = panel.x + panel.w - 62, panel.y - 14
+    ui.widgets[1].x, ui.widgets[1].y = panel.x + panel.w - CLOSE.inset_right, panel.y - CLOSE.above
 end
 
 function deactivate()
@@ -218,7 +218,7 @@ end
 
 function draw()
     if ui == nil then return end
-    ui:rect(0, 0, SW, SH, 8, 10, 18, 150)
+    ui:rect(0, 0, SW, SH, DIM[1], DIM[2], DIM[3], DIM[4])
     ui:draw()
 end
 

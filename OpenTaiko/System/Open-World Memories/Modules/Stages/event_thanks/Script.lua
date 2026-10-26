@@ -8,18 +8,23 @@
 local Easing = require("Easing")
 local NavInput = require("NavInput")
 local EM = require("EventMode")
+-- the fade colour: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
 
 local FAREWELL = "Sounds/Thanks.ogg" -- a soft "win" fanfare on a grand piano (CC0, tools/build_event_sfx.py), 3.8 s
-local HOLD_SEC = 4.5          -- on screen before it leaves by itself
-local SKIP_AFTER_SEC = 1.0    -- Decide leaves after this
-local FADE_SEC = 0.6
+local HOLD_SEC = Animation.hold_s              -- on screen before it leaves by itself
+local SKIP_AFTER_SEC = Animation.skip_after_s  -- Decide leaves after this
+local FADE_SEC = Animation.fade_s
 
 local fill, snd, screen
 local t, fading, fadeT = 0, false, 0
 
 function onStart()
     fill = CANVAS:CreateCanvas(16, 16)
-    fill:Clear(0, 0, 0, 255)
+    local c = Layout.fade_color
+    fill:Clear(c[1], c[2], c[3], c[4])
     fill:Upload()
     pcall(function() snd = SOUND:CreateSFX(FAREWELL) end)
 end

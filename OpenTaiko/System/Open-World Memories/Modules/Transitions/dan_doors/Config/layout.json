@@ -1,0 +1,18 @@
+{
+    "_note": "Fox Dojo doors layout, in 1920x1080 pixels. COLOR colours are [r, g, b, a] from 0 to 255; the ink gradient colours are #RRGGBB text markup; opacities 0 to 1.",
+    "screen": { "width": 1920, "height": 1080 },
+    "title": {
+        "_note": "line_gap is between the two lines' centres; offscreen_margin is how far past the screen edge a line starts and ends; text_nudge moves the text inside its glyph box",
+        "font_size": 118,
+        "line_gap": 170,
+        "offscreen_margin": 80,
+        "text_nudge": -1,
+        "ink_top_color": "#DC4630",
+        "ink_bottom_color": "#8A1A10",
+        "ink_color": [255, 255, 255, 255],
+        "edge_color": [250, 238, 206, 255],
+        "shadow_color": [40, 16, 8, 255],
+        "shadow_offset": { "x": 5, "y": 7 },
+        "shadow_opacity": 0.35
+    }
+}

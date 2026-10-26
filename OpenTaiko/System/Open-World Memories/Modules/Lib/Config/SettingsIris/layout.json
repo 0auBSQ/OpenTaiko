@@ -1,0 +1,16 @@
+{
+    "_note": "settings_iris transition art (Lib/SettingsIris), in 1920x1080 pixels, around the screen's centre. Texture sizes are in the textures' own pixels.",
+    "full_radius_pad": 14,
+    "tools_half": 288,
+    "ring": {
+        "_note": "radius: the radius of Ring.png's line (1024 px image); a circle smaller than fade_from + fade_range fades its ring out, gone at fade_from (the thin line would break into dots)",
+        "radius": 502,
+        "fade_from": 16,
+        "fade_range": 48
+    },
+    "edge": {
+        "_note": "the circle is drawn as clipped rows, thin where its edge is steep: max_step is the largest step of its edge in px, max_row the tallest row",
+        "max_step": 1.5,
+        "max_row": 8
+    }
+}

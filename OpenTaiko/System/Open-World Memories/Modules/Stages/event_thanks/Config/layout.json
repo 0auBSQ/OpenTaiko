@@ -1,0 +1,4 @@
+{
+    "_note": "Event thanks screen layout. Colours are [r, g, b, a] from 0 to 255.",
+    "fade_color": [0, 0, 0, 255]
+}

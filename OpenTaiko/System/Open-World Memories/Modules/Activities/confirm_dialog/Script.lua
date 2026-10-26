@@ -15,27 +15,20 @@
 
 local PopUI = require("PopUI")
 
-local SW, SH = 1920, 1080
-local PANEL_W = 760
-local PANEL_H = { notP1 = 220, purchase = 440 }
-local TITLE_Y = 96            -- the song title's centre, from the panel's top
-local PURSE_Y = 210           -- the purse's top, from the panel's top (its price sits 26 px above it)
-local PURSE_W, PURSE_H = 300, 66
-local BUTTON_W, BUTTON_H, BUTTON_GAP = 280, 60, 40
-local BUTTON_BOTTOM = 96      -- the buttons' top, from the panel's bottom
-local PAY_WAIT = 1.2          -- seconds the purse's payment plays before the unlock modal
-local INK = { 44, 56, 74 }
-local INK_EDGE = { 255, 255, 255, 160 }
+-- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
 
-local UI_THEME = {
-    colors = {
-        surface  = { 250, 252, 255, 255 }, surface2 = { 230, 236, 244, 255 },
-        primary  = { 96, 132, 180, 255 },  primary2 = { 72, 108, 156, 255 },
-        accent   = { 126, 196, 200, 255 }, accent2  = { 96, 168, 176, 255 },
-        outline  = { 70, 84, 104, 255 },   text = { 44, 56, 74, 255 }, textOnAccent = { 255, 255, 255, 255 },
-    },
-    font = { small = 18, label = 22, button = 22, title = 30 },
-}
+local SW, SH = 1920, 1080
+local PANEL = Layout.panel
+local TITLE = Layout.title
+local PURSE = Layout.purse
+local BUTTONS = Layout.buttons
+local BUTTON_W, BUTTON_H, BUTTON_GAP = BUTTONS.w, BUTTONS.h, BUTTONS.gap
+local PAY_WAIT = Animation.pay_wait_s          -- seconds the purse's payment plays before the unlock modal
+local DIM = Layout.dim_color
+local UI_THEME = Config.plain(Layout.theme)
 
 -- Rarity string → modal integer (matches HRarity.RarityToModalInt in C#)
 local rarityToInt = { Poor=0, Common=0, Uncommon=1, Rare=2, Epic=3, Legendary=4, Mythical=4 }
@@ -48,7 +41,7 @@ end
 
 local ui = nil
 local sounds = {}
-local panel = { x = 0, y = 0, w = PANEL_W, h = 0 }
+local panel = { x = 0, y = 0, w = PANEL.w, h = 0 }
 local buttons = {}
 local purse = nil
 
@@ -133,7 +126,7 @@ local function rowNav()
 end
 
 local function build()
-    panel.h = PANEL_H[_mode]
+    panel.h = (_mode == "notP1") and PANEL.not_p1_h or PANEL.purchase_h
     panel.x, panel.y = math.floor((SW - panel.w) / 2), math.floor((SH - panel.h) / 2)
     ui = PopUI.new{
         theme = UI_THEME, bg = false, navPlayer = _player + 1,
@@ -142,7 +135,7 @@ local function build()
     local title = (_mode == "notP1") and tr("SONGSELECT_UNLOCK_P1_ONLY", "Only Player 1 can unlock songs")
         or tr("SONGSELECT_BUY_TITLE", "Buy this song?")
     ui:panel{ x = panel.x, y = panel.y, w = panel.w, h = panel.h, title = title }
-    local cx, by = panel.x + panel.w / 2, panel.y + panel.h - BUTTON_BOTTOM
+    local cx, by = panel.x + panel.w / 2, panel.y + panel.h - BUTTONS.bottom
     -- the main button first, so it holds the focus
     if _mode == "notP1" then
         buttons[1] = ui:button{ text = tr("SONGSELECT_CONFIRM_OK", "OK"), x = cx - BUTTON_W / 2, y = by, w = BUTTON_W, h = BUTTON_H,
@@ -152,7 +145,7 @@ local function build()
                                 accent = true, onClick = buy, sfx = { click = "" } }
         buttons[2] = ui:button{ text = tr("SONGSELECT_CONFIRM_CANCEL", "Cancel"), x = cx + BUTTON_GAP / 2, y = by, w = BUTTON_W, h = BUTTON_H,
                                 onClick = function() sounds.Cancel:Play(); wantClose = true end, sfx = { click = "" } }
-        purse = ui:coins{ x = cx - PURSE_W / 2, y = panel.y + PURSE_Y, w = PURSE_W, h = PURSE_H, amount = GetSaveFile(0).Coins }
+        purse = ui:coins{ x = cx - PURSE.w / 2, y = panel.y + PURSE.y, w = PURSE.w, h = PURSE.h, amount = GetSaveFile(0).Coins }
         purse:setPrice(_coinPrice)
     end
     rowNav()
@@ -194,11 +187,11 @@ function draw()
         return
     end
     if ui == nil then return end
-    ui:rect(0, 0, SW, SH, 8, 10, 18, 150)
+    ui:rect(0, 0, SW, SH, DIM[1], DIM[2], DIM[3], DIM[4])
     ui:draw()
     if _mode == "purchase" then
-        ui:drawTextEx(30, _title, panel.x + panel.w / 2, panel.y + TITLE_Y + ui:textNudge(30), INK, INK_EDGE, 1, 1,
-            panel.w - 80, "center")
+        ui:drawTextEx(TITLE.font_size, _title, panel.x + panel.w / 2, panel.y + TITLE.y + ui:textNudge(TITLE.font_size), TITLE.color, TITLE.edge_color, 1, 1,
+            panel.w - 2 * TITLE.margin_x, "center")
     end
 end
 

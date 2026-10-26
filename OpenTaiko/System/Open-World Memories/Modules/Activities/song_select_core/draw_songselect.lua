@@ -1,45 +1,50 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
 -- draw_songselect.lua  —  Song-select panel drawing for song_select_core.
 
-local CFG = require("sscore_config")   -- Config/layout.json (skinner-editable); values fall back to the defaults below
+local Config    = require("Core.Config")
+local Layout    = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local List      = Layout.song_list
+local ListAnim  = Animation.song_list
+local Info      = Layout.song_info
+local Colors    = Layout.colors
 
 local M = {}
--- hoisted colors (per-frame COLOR:Create* calls allocate userdata every frame); overridable via config
-local SONGLIST_GOLD  = CFG.color("colors.songlist_gold", COLOR:CreateColorFromARGB(255, 242, 207, 1))   -- selected-bar title tint
+-- hoisted colors (per-frame COLOR:Create* calls allocate userdata every frame)
+local SONGLIST_GOLD  = COLOR:CreateColorFromHex(Colors.songlist_gold)   -- selected-bar title tint
 local COL_WHITE      = COLOR:CreateColorFromHex("ffffffff")
-local COL_BLACK      = COLOR:CreateColorFromHex("ff000000")
-local COL_VAULT_GRAY = CFG.color("colors.vault_gray", COLOR:CreateColorFromHex("ff808080"))
-local COL_TAG_FIRE   = CFG.color("colors.tag_fire", COLOR:CreateColorFromHex("ffac0c0c"))
-local COL_TAG_STORM  = CFG.color("colors.tag_storm", COLOR:CreateColorFromHex("ff83159e"))
-local COL_BPM_SLOW   = CFG.color("colors.bpm_slow", COLOR:CreateColorFromHex("ff95ccff"))
-local COL_BPM_FAST   = CFG.color("colors.bpm_fast", COLOR:CreateColorFromHex("ffff9ec3"))
+local COL_BPM_SLOW   = COLOR:CreateColorFromHex(Colors.bpm_slow)
+local COL_BPM_FAST   = COLOR:CreateColorFromHex(Colors.bpm_fast)
 
 local statsCache = { player = -1, diff = -1 }   -- clear-count queries are save-file scans; key on (player, course)
 local G   -- shared state injected by Script.lua
 
--- ── Layout constants (defaults; overridable via Config/layout.json) ─────────────
+-- ── Layout constants ────────────────────────────────────────────────────────────
 
-local SONGLIST_ORIGIN_X           = CFG.num("song_list.origin_x", 660)
-local SONGLIST_ORIGIN_Y           = CFG.num("song_list.origin_y", 500)
-local SONGLIST_OFFSET_X           = CFG.num("song_list.offset_x", 45)
-local SONGLIST_OFFSET_Y           = CFG.num("song_list.offset_y", 120)
-local SONGLIST_TEXT_OFFSET_X      = CFG.num("song_list.text_offset_x", -65)
-local SONGLIST_TEXT_OFFSET_Y      = CFG.num("song_list.text_offset_y", 15)
-local SONGLIST_SELECTED_X_DIFF    = CFG.num("song_list.selected_x_diff", 50)
-local SONGLIST_SELECTED_ARROW_GAP = CFG.num("song_list.selected_arrow_gap", 925)
-local SONGBAR_LABEL_X_OFFSET      = CFG.num("song_list.label_x_offset", 288)
+local SONGLIST_ORIGIN_X           = List.origin_x
+local SONGLIST_ORIGIN_Y           = List.origin_y
+local SONGLIST_OFFSET_X           = List.offset_x
+local SONGLIST_OFFSET_Y           = List.offset_y
+local SONGLIST_ROWS               = List.rows_each_side
+local SONGLIST_TEXT_OFFSET_X      = List.text_offset_x
+local SONGLIST_TEXT_OFFSET_Y      = List.text_offset_y
+local SONGLIST_TITLE_MWIDTH       = List.title_max_width
+local SONGLIST_SELECTED_X_DIFF    = List.selected_x_diff
+local SONGLIST_SELECTED_ARROW_GAP = List.selected_arrow_gap
+local SONGBAR_LABEL_X_OFFSET      = List.label_x_offset
+local FAV_ICON_X, FAV_ICON_Y      = List.fav_icon_x, List.fav_icon_y
 -- the back bar's colour, and the random bar's rainbow: RAINBOW_STEPS hues made once, pastel enough for the
 -- title to stay readable; the rainbow runs along the bar, one full pass every RAINBOW_MS
-local BACK_BAR_COLOR = CFG.color("colors.back_bar", COLOR:CreateColorFromARGB(255, 131, 113, 96))
+local BACK_BAR_COLOR = COLOR:CreateColorFromHex(Colors.back_bar)
 -- the song info under a BLURRED song, leaning purple
-local BLURRED_INFO_TINT = CFG.color("colors.blurred_info", COLOR:CreateColorFromARGB(255, 222, 196, 255))
-local RAINBOW_MS     = CFG.num("song_list.random_rainbow_ms", 4000)
-local RAINBOW_STEPS  = 120
-local RAINBOW_SLICE  = CFG.num("song_list.random_rainbow_slice", 8)   -- px per tinted slice of the bar
-local RAINBOW_SPAN   = CFG.num("song_list.random_rainbow_span", 1)     -- hue turns across the bar
+local BLURRED_INFO_TINT = COLOR:CreateColorFromHex(Colors.blurred_info)
+local RAINBOW_MS     = ListAnim.random_rainbow_ms
+local RAINBOW_STEPS  = List.random_rainbow_steps
+local RAINBOW_SLICE  = List.random_rainbow_slice   -- px per tinted slice of the bar
+local RAINBOW_SPAN   = List.random_rainbow_span    -- hue turns across the bar
 local RAINBOW = {}
 for i = 0, RAINBOW_STEPS - 1 do
-    local h, s, v = i / RAINBOW_STEPS * 6, 0.5, 1
+    local h, s, v = i / RAINBOW_STEPS * 6, List.random_rainbow_saturation, List.random_rainbow_value
     local c = v * s
     local x = c * (1 - math.abs(h % 2 - 1))
     local r, g, b = 0, 0, 0
@@ -51,102 +56,115 @@ for i = 0, RAINBOW_STEPS - 1 do
 end
 -- The "+" of a plus level rides the last digit's top-right corner: its centre, from the digits' right cell
 -- edge and their centre line (BarLevel/plus.png)
-local SONGBAR_PLUS_DX             = CFG.num("song_list.plus_dx", -19)
-local SONGBAR_PLUS_DY             = CFG.num("song_list.plus_dy", -27)
+local SONGBAR_PLUS_DX             = List.plus_dx
+local SONGBAR_PLUS_DY             = List.plus_dy
 -- the plus overhangs the digits' ink by ~9px, so the whole number moves left by half of that to stay centred
-local SONGBAR_PLUS_SHIFT          = CFG.num("song_list.plus_shift", -5)
+local SONGBAR_PLUS_SHIFT          = List.plus_shift
 -- the "[key] - Show shortcuts" line under the Select-a-Song overlay: position and its slow opacity pulse
-local HELPER_X           = CFG.num("song_list.shortcuts_helper_x", 44)
-local HELPER_Y           = CFG.num("song_list.shortcuts_helper_y", 178)
-local HELPER_PULSE_MS    = CFG.num("song_list.shortcuts_helper_pulse_ms", 2400)
-local HELPER_OPACITY_MIN = CFG.num("song_list.shortcuts_helper_opacity_min", 0.45)
-local HELPER_PAD_X       = CFG.num("song_list.shortcuts_helper_pad_x", 16)       -- the dark box around the line
-local HELPER_PAD_Y       = CFG.num("song_list.shortcuts_helper_pad_y", 8)
-local HELPER_BOX_ALPHA   = CFG.num("song_list.shortcuts_helper_box_alpha", 150)
-local HELPER_BOX_RADIUS  = CFG.num("song_list.shortcuts_helper_box_radius", 10)
+local HELPER_X           = List.shortcuts_helper_x
+local HELPER_Y           = List.shortcuts_helper_y
+local HELPER_PULSE_MS    = ListAnim.shortcuts_helper_pulse_ms
+local HELPER_OPACITY_MIN = ListAnim.shortcuts_helper_opacity_min
+local HELPER_PAD_X       = List.shortcuts_helper_pad_x       -- the dark box around the line
+local HELPER_PAD_Y       = List.shortcuts_helper_pad_y
+local HELPER_BOX_ALPHA   = List.shortcuts_helper_box_alpha
+local HELPER_BOX_RADIUS  = List.shortcuts_helper_box_radius
+local HELPER_BOX_COLOR   = List.shortcuts_helper_box_color
+local HELPER_TEXT_COLOR    = Config.color(List.shortcuts_helper_text_color)
+local HELPER_OUTLINE_COLOR = Config.color(List.shortcuts_helper_outline_color)
 -- the translucent band under the song list, sheared to the bars' diagonal (origin/offset above): its
 -- horizontal width, its centre's horizontal offset from the bar centre line, its alpha and edge fade
-local BACKDROP_W         = CFG.num("song_list.backdrop_width", 980)
-local BACKDROP_DX        = CFG.num("song_list.backdrop_offset_x", 0)
+local BACKDROP_W         = List.backdrop_width
+local BACKDROP_DX        = List.backdrop_offset_x
 -- the band's colour and alpha: blending toward a dark grey drains the saturation of what is under the
 -- band (chroma scales by 1 - alpha) while pulling its brightness toward the grey, a mild darkening on
 -- most backgrounds; black would only darken
-local BACKDROP_COLOR     = CFG.numList("song_list.backdrop_color", { 88, 88, 96 })
-local BACKDROP_ALPHA     = CFG.num("song_list.backdrop_alpha", 150)
-local BACKDROP_FADE      = CFG.num("song_list.backdrop_fade", 36)
+local BACKDROP_COLOR     = List.backdrop_color
+local BACKDROP_ALPHA     = List.backdrop_alpha
+local BACKDROP_FADE      = List.backdrop_fade
+local BACKDROP_FADE_STEP = List.backdrop_fade_step
 -- "normal" lays the colour over the background at that alpha; "screen" lightens the background by the
 -- colour times the alpha, and never darkens it; "multi" multiplies the background by the colour, the
 -- alpha saying how far (255 = the colour itself), and never lightens it
-local BACKDROP_BLEND     = CFG.str("song_list.backdrop_blend", "normal")
+local BACKDROP_BLEND     = List.backdrop_blend
 -- Easy / Normal / Hard levels from which the tag plays its checker animation (bar_levelbgchecker<diff>.png)
 local SONGBAR_CHECKER_LEVEL       = {
-    [0] = CFG.num("song_list.checker_level_easy", 6),
-    [1] = CFG.num("song_list.checker_level_normal", 8),
-    [2] = CFG.num("song_list.checker_level_hard", 9),
+    [0] = List.checker_level_easy,
+    [1] = List.checker_level_normal,
+    [2] = List.checker_level_hard,
 }
 
 -- the folder info placeholder: a folder (bg_folderinfo.png) tinted with the folder's colour, its top
 -- centred on the info column; the rows of its name, description lines and song count
-local FOLDERINFO_CENTER_X  = CFG.num("folder_info.center_x", 1548)
-local FOLDERINFO_PANEL_Y   = CFG.num("folder_info.panel_y", 270)
-local FOLDERINFO_WIDTH     = CFG.num("folder_info.width", 600)
-local FOLDERINFO_NAME_Y    = CFG.num("folder_info.name_y", 382)
-local FOLDERINFO_TEXT_Y    = CFG.num("folder_info.text_y", 478)
-local FOLDERINFO_LINE_GAP  = CFG.num("folder_info.line_gap", 48)
-local FOLDERINFO_COUNT_Y   = CFG.num("folder_info.count_y", 668)
-local FOLDERINFO_COUNT_GAP = CFG.num("folder_info.count_gap", 54)
+local FolderInfo = Layout.folder_info
+local FOLDERINFO_CENTER_X  = FolderInfo.center_x
+local FOLDERINFO_PANEL_Y   = FolderInfo.panel_y
+local FOLDERINFO_WIDTH     = FolderInfo.width
+local FOLDERINFO_NAME_Y    = FolderInfo.name_y
+local FOLDERINFO_TEXT_Y    = FolderInfo.text_y
+local FOLDERINFO_LINE_GAP  = FolderInfo.line_gap
+local FOLDERINFO_COUNT_Y   = FolderInfo.count_y
+local FOLDERINFO_COUNT_GAP = FolderInfo.count_gap
 
-local SONGINFO_DIFFICULTIES_ORIGIN_X = CFG.num("song_info.difficulties_origin_x", 1790)
-local SONGINFO_DIFFICULTIES_ORIGIN_Y = CFG.num("song_info.difficulties_origin_y", 154)
-local SONGINFO_DIFFICULTIES_GAP_Y    = CFG.num("song_info.difficulties_gap_y", 130)
-local SONGINFO_PLUS_DX               = CFG.num("song_info.plus_dx", -8)
-local SONGINFO_PLUS_DY               = CFG.num("song_info.plus_dy", -14)
-local SONGINFO_HASVIDEO_ORIGIN_X     = CFG.num("song_info.has_video_origin_x", 1064)
-local SONGINFO_HASVIDEO_ORIGIN_Y     = CFG.num("song_info.has_video_origin_y", 257)
-local SONGINFO_EXPLICIT_ORIGIN_X     = CFG.num("song_info.explicit_origin_x", 1266)
-local SONGINFO_EXPLICIT_ORIGIN_Y     = CFG.num("song_info.explicit_origin_y", 151)
-local SONGINFO_SUBTITLE_ORIGIN_X     = CFG.num("song_info.subtitle_origin_x", 1536)
-local SONGINFO_SUBTITLE_ORIGIN_Y     = CFG.num("song_info.subtitle_origin_y", 689)
-local SONGINFO_SUBTITLE_MWIDTH       = CFG.num("song_info.subtitle_max_width", 530)
-local SONGINFO_BPM_ORIGIN_X          = CFG.num("song_info.bpm_origin_x", 1780)
-local SONGINFO_BPM_ORIGIN_Y          = CFG.num("song_info.bpm_origin_y", 877)
-local SONGINFO_BPM_MWIDTH            = CFG.num("song_info.bpm_max_width", 240)
-local SONGINFO_BPM_ROTATION          = CFG.num("song_info.bpm_rotation", 355.55)   -- tilt to match the BPM plate image
+local SONGINFO_DIFFICULTIES_ORIGIN_X = Info.difficulties_origin_x
+local SONGINFO_DIFFICULTIES_ORIGIN_Y = Info.difficulties_origin_y
+local SONGINFO_DIFFICULTIES_GAP_Y    = Info.difficulties_gap_y
+local SONGINFO_PLUS_DX               = Info.plus_dx
+local SONGINFO_PLUS_DY               = Info.plus_dy
+local SONGINFO_HASVIDEO_ORIGIN_X     = Info.has_video_origin_x
+local SONGINFO_HASVIDEO_ORIGIN_Y     = Info.has_video_origin_y
+local SONGINFO_EXPLICIT_ORIGIN_X     = Info.explicit_origin_x
+local SONGINFO_EXPLICIT_ORIGIN_Y     = Info.explicit_origin_y
+local SONGINFO_SUBTITLE_ORIGIN_X     = Info.subtitle_origin_x
+local SONGINFO_SUBTITLE_ORIGIN_Y     = Info.subtitle_origin_y
+local SONGINFO_SUBTITLE_MWIDTH       = Info.subtitle_max_width
+local SONGINFO_BPM_ORIGIN_X          = Info.bpm_origin_x
+local SONGINFO_BPM_ORIGIN_Y          = Info.bpm_origin_y
+local SONGINFO_BPM_MWIDTH            = Info.bpm_max_width
+local SONGINFO_BPM_ROTATION          = Info.bpm_rotation   -- tilt to match the BPM plate image
 -- Song speed notice over the metronome (only when the multiplier is not 1): a label and the multiplier,
 -- with two large ▶ behind them, centred on the text block, pulsing in turn once per beat of the sped-up
 -- BPM. Everything is tinted with the BPM text colour.
-local SONGINFO_SPEED_ORIGIN_X        = CFG.num("song_info.speed_origin_x", 1804)
-local SONGINFO_SPEED_LABEL_Y         = CFG.num("song_info.speed_label_y", 729)
-local SONGINFO_SPEED_VALUE_Y         = CFG.num("song_info.speed_value_y", 753)
-local SONGINFO_SPEED_ARROW_GAP       = CFG.num("song_info.speed_arrow_gap", 40)   -- between the two ▶ centres
-local SONGINFO_SPEED_LABEL           = CFG.str("song_info.speed_label", nil)   -- a skin's own text; else the localized one
-local SONGINFO_CHARTER_ORIGIN_X      = CFG.num("song_info.charter_origin_x", 1216)
-local SONGINFO_CHARTER_ORIGIN_Y      = CFG.num("song_info.charter_origin_y", 750)
-local SONGINFO_CHARTER_MWIDTH        = CFG.num("song_info.charter_max_width", 512)
-local SONGINFO_LENGTH_ORIGIN_X       = CFG.num("song_info.length_origin_x", 1216)
-local SONGINFO_LENGTH_ORIGIN_Y       = CFG.num("song_info.length_origin_y", 806)
-local SONGINFO_LENGTH_MWIDTH         = CFG.num("song_info.length_max_width", 420)
+local SONGINFO_SPEED_ORIGIN_X        = Info.speed_origin_x
+local SONGINFO_SPEED_LABEL_Y         = Info.speed_label_y
+local SONGINFO_SPEED_VALUE_Y         = Info.speed_value_y
+local SONGINFO_SPEED_ARROW_GAP       = Info.speed_arrow_gap   -- between the two ▶ centres
+local SONGINFO_SPEED_LABEL           = Config.optional(Info, "speed_label")   -- a skin's own text; else the localized one
+local InfoAnim = Animation.song_info
+local SPEED_ARROW_OPACITY_MIN        = InfoAnim.speed_arrow_opacity_min
+local SONGINFO_CHARTER_ORIGIN_X      = Info.charter_origin_x
+local SONGINFO_CHARTER_ORIGIN_Y      = Info.charter_origin_y
+local SONGINFO_CHARTER_MWIDTH        = Info.charter_max_width
+local SONGINFO_LENGTH_ORIGIN_X       = Info.length_origin_x
+local SONGINFO_LENGTH_ORIGIN_Y       = Info.length_origin_y
+local SONGINFO_LENGTH_MWIDTH         = Info.length_max_width
 
-local PREIMAGE_ORIGIN_X = CFG.num("preimage.origin_x", 1276)
-local PREIMAGE_ORIGIN_Y = CFG.num("preimage.origin_y", 146)
-local PREIMAGE_SIZE_X   = CFG.num("preimage.size_x", 500)
-local PREIMAGE_SIZE_Y   = CFG.num("preimage.size_y", 500)
+local Preimage = Layout.preimage
+local PREIMAGE_ORIGIN_X = Preimage.origin_x
+local PREIMAGE_ORIGIN_Y = Preimage.origin_y
+local PREIMAGE_SIZE_X   = Preimage.size_x
+local PREIMAGE_SIZE_Y   = Preimage.size_y
 
-local HEADER_OFFSET_X          = CFG.num("header.offset_x", 1780)
-local HEADER_BOX_TEXT_OFFSET_X = CFG.num("header.box_text_offset_x", 250)
-local HEADER_BOX_TEXT_OFFSET_Y = CFG.num("header.box_text_offset_y", 12)
-local HEADER_DIFF_ALPHA        = CFG.num("header.diffselect_alpha", 0.4)
+local Header = Layout.header
+local HEADER_OFFSET_X          = Header.offset_x
+local HEADER_BOX_TEXT_OFFSET_X = Header.box_text_offset_x
+local HEADER_BOX_TEXT_OFFSET_Y = Header.box_text_offset_y
+local HEADER_BOX_TEXT_MWIDTH   = Header.box_text_max_width
+local HEADER_DIFF_ALPHA        = Header.diffselect_alpha
 
-local BARLEFT_X_OFFSET             = CFG.num("song_list.barleft_x_offset", -67)   -- pixels left of bar.png topleft
+local BARLEFT_X_OFFSET             = List.barleft_x_offset   -- pixels left of bar.png topleft
+local ARROW_ANGLE                  = math.rad(Animation.selected_arrows.angle_deg)   -- the arrows' bounce direction
 
-local NAMEPLATE_BOX_FOLDED_SIZE_Y  = CFG.num("nameplate.box_folded_size_y", 182)
-local NAMEPLATE_SECONDARY_OFFSET_Y = CFG.num("nameplate.secondary_offset_y", 81)
-local NAMEPLATE_BOX_START_X        = CFG.num("nameplate.box_start_x", 0)
-local NAMEPLATE_BOX_SPACING_X      = CFG.num("nameplate.box_spacing_x", 384)
-local NAMEPLATE_OFFSET_X           = CFG.num("nameplate.offset_x", 27)
-local NAMEPLATE_OFFSET_Y           = CFG.num("nameplate.offset_y", 37)
-local NAMEPLATE_HEIGHT             = CFG.num("nameplate.height", 81)
-local PUCHI_OFFSET_X               = CFG.num("nameplate.puchi_offset_x", 60)
+local Nameplate = Layout.nameplate
+local NAMEPLATE_BOX_FOLDED_SIZE_Y  = Nameplate.box_folded_size_y
+local NAMEPLATE_SECONDARY_OFFSET_Y = Nameplate.secondary_offset_y
+local NAMEPLATE_BOX_START_X        = Nameplate.box_start_x
+local NAMEPLATE_BOX_SPACING_X      = Nameplate.box_spacing_x
+local NAMEPLATE_OFFSET_X           = Nameplate.offset_x
+local NAMEPLATE_OFFSET_Y           = Nameplate.offset_y
+local NAMEPLATE_HEIGHT             = Nameplate.height
+local PUCHI_OFFSET_X               = Nameplate.puchi_offset_x
+local STATS_Y, STATS_X             = Nameplate.stats_y, Nameplate.stats_x
 
 -- ── Init ──────────────────────────────────────────────────────────────────────
 
@@ -230,7 +248,7 @@ local function drawSpeedNotice(sel)
         tex:SetColor(sel.bpmColor)
         for i = 0, 1 do
             local p = (phase - i * 0.5) % 1
-            tex:SetOpacity(0.25 + 0.75 * (0.5 + 0.5 * math.cos(2 * math.pi * p)))
+            tex:SetOpacity(SPEED_ARROW_OPACITY_MIN + (1 - SPEED_ARROW_OPACITY_MIN) * (0.5 + 0.5 * math.cos(2 * math.pi * p)))
             tex:DrawAtAnchor(x + (i - 0.5) * SONGINFO_SPEED_ARROW_GAP, cy, "center")
         end
         tex:SetOpacity(1)
@@ -245,12 +263,12 @@ local function drawSpeedNotice(sel)
     G.text:Draw(sel.speedText, x, SONGINFO_SPEED_VALUE_Y, sel.bpmColor, nil, 1, 1, 0, "top")
 end
 
--- Draw fav.png at x=39 y=80 relative to bar.png top-left (the favorite flag is cached in the page slot).
+-- Draw fav.png at (fav_icon_x, fav_icon_y) relative to bar.png top-left (the favorite flag is cached in the page slot).
 local function drawFavIcon(xpos, ypos)
     if G.favoriteicon == nil then return end
     local bar_tl_x = xpos - G.bars["bar"].Width  / 2
     local bar_tl_y = ypos - G.bars["bar"].Height / 2
-    G.favoriteicon:Draw(bar_tl_x + 39, bar_tl_y + 80)
+    G.favoriteicon:Draw(bar_tl_x + FAV_ICON_X, bar_tl_y + FAV_ICON_Y)
 end
 
 -- bl = the slot's cached { played, cs, sr } best-score info (nil when the node has no chart)
@@ -327,7 +345,7 @@ end
 -- ── Song-list bar drawing (shared by the normal list + the folder open/close animation) ─────
 
 local function drawBarTitle(pt, x, y)
-    G.text:Draw(pt.text, x, y, pt.gold and SONGLIST_GOLD or nil, nil, 1, 1, 525, "center")
+    G.text:Draw(pt.text, x, y, pt.gold and SONGLIST_GOLD or nil, nil, 1, 1, SONGLIST_TITLE_MWIDTH, "center")
 end
 
 -- the random bar: bar.png drawn in narrow vertical slices, each tinted the hue its place and the time give,
@@ -430,10 +448,11 @@ local function drawHelperLine(text, opacity)
         local cv = CANVAS:CreateCanvas(w, h)
         cv:ClearTransparent()
         local r = math.max(0, math.min(HELPER_BOX_RADIUS, math.floor(h / 2)))
-        cv:FillRect(r, 0, w - 2 * r, h, 0, 0, 0, HELPER_BOX_ALPHA)
-        cv:FillRect(0, r, w, h - 2 * r, 0, 0, 0, HELPER_BOX_ALPHA)
+        local br, bg, bb = HELPER_BOX_COLOR[1], HELPER_BOX_COLOR[2], HELPER_BOX_COLOR[3]
+        cv:FillRect(r, 0, w - 2 * r, h, br, bg, bb, HELPER_BOX_ALPHA)
+        cv:FillRect(0, r, w, h - 2 * r, br, bg, bb, HELPER_BOX_ALPHA)
         for _, c in ipairs({ { r, r }, { w - r - 1, r }, { r, h - r - 1 }, { w - r - 1, h - r - 1 } }) do
-            cv:FillCircle(c[1], c[2], r, 0, 0, 0, HELPER_BOX_ALPHA)
+            cv:FillCircle(c[1], c[2], r, br, bg, bb, HELPER_BOX_ALPHA)
         end
         cv:Upload()
         helperBox = { canvas = cv, w = w, h = h, text = text }
@@ -441,13 +460,13 @@ local function drawHelperLine(text, opacity)
     helperBox.canvas:SetOpacity(opacity)
     helperBox.canvas:Draw(HELPER_X, HELPER_Y)
     helperBox.canvas:SetOpacity(1)
-    gf:Draw(text, HELPER_X + HELPER_PAD_X - pad, HELPER_Y + HELPER_PAD_Y, COL_WHITE, COL_BLACK, opacity, 1, 0, "topleft")
+    gf:Draw(text, HELPER_X + HELPER_PAD_X - pad, HELPER_Y + HELPER_PAD_Y, HELPER_TEXT_COLOR, HELPER_OUTLINE_COLOR, opacity, 1, 0, "topleft")
 end
 
 -- ── The song list backdrop: a translucent grey band behind the bars, along their diagonal ──
 -- Baked once as a screen-high canvas: every row is the band shifted by the bars' slope (offset_x per
--- offset_y), so its edges are the list's own diagonal; the edges fade over BACKDROP_FADE px in 4 px steps
--- (0 = a clean hard edge).
+-- offset_y), so its edges are the list's own diagonal; the edges fade over BACKDROP_FADE px in
+-- BACKDROP_FADE_STEP px steps (0 = a clean hard edge), never more than a quarter of the band.
 local backdrop = nil           -- { canvas, x0 }: x0 = the canvas' screen x before the panel shift
 local function drawListBackdrop(opacity)
     if backdrop == nil then
@@ -457,7 +476,7 @@ local function drawListBackdrop(opacity)
         local cv = CANVAS:CreateCanvas(W + span + 2, H)
         cv:ClearTransparent()
         local fade = math.max(0, math.min(math.floor(BACKDROP_FADE), math.floor(W / 4)))
-        local step = 4
+        local step = BACKDROP_FADE_STEP
         local cr, cg, cb = BACKDROP_COLOR[1] or 0, BACKDROP_COLOR[2] or 0, BACKDROP_COLOR[3] or 0
         -- a screen blend reads the colour alone: the alpha goes into the colour, on solid pixels
         local screen = BACKDROP_BLEND == "screen"
@@ -510,13 +529,13 @@ local function drawListBackdrop(opacity)
     cv:SetOpacity(1)
 end
 
--- the list slot (-5..5) whose bar plate is under (mx, my), or nil. The plate is the slanted strip inside
--- the bar texture (765x130: opaque rows 17..116, its left edge sliding 0.34 px right per row).
-local BAR_PLATE = { top = 17, bottom = 116, left = 20, width = 690, skew = 0.34 }
+-- the list slot (-rows..rows) whose bar plate is under (mx, my), or nil. The plate is the slanted strip
+-- inside the bar texture (song_list.bar_plate).
+local BAR_PLATE = List.bar_plate
 function M.hitTest(mx, my)
     local tex = G.bars["bar"]
     local hw, hh = tex.Width / 2, tex.Height / 2
-    for i = -5, 5 do
+    for i = -SONGLIST_ROWS, SONGLIST_ROWS do
         local cx, cy = M.barPos(i, G.selectBoxDist)
         local row = my - (cy - hh)
         if row >= BAR_PLATE.top and row <= BAR_PLATE.bottom then
@@ -531,12 +550,12 @@ end
 -- Baked once like the backdrop (same width, slope and edges), as high as the bar plate plus half the gap to
 -- the next bar above and below (one row of the list); G.selectBandPulse
 -- (0..1, the "selectband_animation" counter) scales its alpha.
-local SELECT_BAND_COLOR = CFG.numList("song_list.select_band_color", { 72, 210, 104 })
+local SELECT_BAND_COLOR = List.select_band_color
 -- green at the top level; inside a folder, G.selectBandColor (navigation.lua: the folder's colour, moved
 -- away from its bars')
 local SELECT_BAND_TOP = COLOR:CreateColorFromARGB(255, SELECT_BAND_COLOR[1] or 0, SELECT_BAND_COLOR[2] or 0,
     SELECT_BAND_COLOR[3] or 0)
-local SELECT_BAND_ALPHA = CFG.num("song_list.select_band_alpha", 170)
+local SELECT_BAND_ALPHA = List.select_band_alpha
 local selectBand = nil         -- { canvas, dx, y }: dx = its offset from the band's canvas x, y = its screen row
 local function drawSelectBand(opacity)
     local a = opacity * (G.selectBandPulse or 0) * SELECT_BAND_ALPHA / 255
@@ -552,7 +571,7 @@ local function drawSelectBand(opacity)
         local cv = CANVAS:CreateCanvas(W + math.ceil(H * slope) + 2, H)
         cv:ClearTransparent()
         local fade = math.max(0, math.min(math.floor(BACKDROP_FADE), math.floor(W / 4)))
-        local step = 4
+        local step = BACKDROP_FADE_STEP
         local function fill(x, y, w, al) cv:FillRect(x, y, w, 1, 255, 255, 255, al) end
         for r = 0, H - 1 do
             -- the band's own row top + r, so both edges line up with the backdrop's
@@ -591,7 +610,7 @@ end
 -- oldBars/newBars = { {i, pt}, ... } sorted outer-first, folderPt = the folder's own bar }.
 -- t is the phase counter's value, already EASED by the counter (navigation sets SetEasing per phase),
 -- so drawing is a plain lerp between the bars' rest slots (M.barPos) and the off-screen / centre point.
-local ANIM_OFFLEFT_X = CFG.num("folder_anim.offscreen_left_x", -1000)  -- where bars slide out to / in from
+local ANIM_OFFLEFT_X = Animation.folder_anim.offscreen_left_x  -- where bars slide out to / in from
 local function lerp(a, b, t) return a + (b - a) * t end
 
 local function drawFolderAnim()
@@ -640,7 +659,7 @@ local function drawCrumb(title, xRight, alpha, drawArrow)
     G.bgtx["header-box"]:SetOpacity(alpha)
     G.bgtx["header-box"]:DrawAtAnchor(xRight, 0, "topright")
     G.text:Draw(title, xRight - boxW + HEADER_BOX_TEXT_OFFSET_X,
-        HEADER_BOX_TEXT_OFFSET_Y + boxH / 2, nil, nil, alpha, 1, 270, "center")
+        HEADER_BOX_TEXT_OFFSET_Y + boxH / 2, nil, nil, alpha, 1, HEADER_BOX_TEXT_MWIDTH, "center")
     if drawArrow then
         G.bgtx["header-arrow"]:SetOpacity(alpha)
         G.bgtx["header-arrow"]:DrawAtAnchor(xRight - boxW, 0, "topright")
@@ -796,7 +815,8 @@ function M.drawPanel()
                     sel.speedText = (mult ~= 1) and string.format("x%.2f", mult) or nil
                     -- one beat of the sped-up song, in ms (clamped so extreme BPMs still read as a pulse)
                     local bpm = (sel.bpmBase or 0) * mult
-                    sel.speedBeatMs = (bpm > 0) and math.max(150, math.min(2000, 60000 / bpm)) or 600
+                    sel.speedBeatMs = (bpm > 0) and math.max(InfoAnim.speed_beat_min_ms, math.min(InfoAnim.speed_beat_max_ms, 60000 / bpm))
+                        or InfoAnim.speed_beat_default_ms
                 end
                 G.text:Draw(sel.bpmText, SONGINFO_BPM_ORIGIN_X - G.songSelectShift, SONGINFO_BPM_ORIGIN_Y,
                     sel.bpmColor, nil, 1, 1, SONGINFO_BPM_MWIDTH, "center", 0, SONGINFO_BPM_ROTATION)
@@ -821,8 +841,8 @@ function M.drawPanel()
         local x0     = SONGLIST_ORIGIN_X + SONGLIST_SELECTED_X_DIFF - G.songSelectShift
         local y0     = SONGLIST_ORIGIN_Y
         local ax     = G.arrowsDistance
-        local xlshift = ax * math.cos(7 * math.pi / 12)
-        local ylshift = ax * math.sin(7 * math.pi / 12)
+        local xlshift = ax * math.cos(ARROW_ANGLE)
+        local ylshift = ax * math.sin(ARROW_ANGLE)
         local isUnlockedSong = sel ~= nil and sel.isSong and sel.isUnlockedSong
         -- Left arrow shifts 67px further left when an unlocked song is selected to clear barleft
         local arrowLOffset = isUnlockedSong and BARLEFT_X_OFFSET or 0
@@ -887,11 +907,11 @@ function M.drawPanel()
                 sc.clear   = tostring(sav:GetClearStatusCount(diff, 2))
             end
             local function drawStat(n, x)
-                G.textStats:Draw(n, x, 1058, COL_WHITE, nil, opacityNorm, 1, 0, "center")
+                G.textStats:Draw(n, x, STATS_Y, COL_WHITE, nil, opacityNorm, 1, 0, "center")
             end
-            drawStat(sc.perfect, 95)
-            drawStat(sc.fc,     212)
-            drawStat(sc.clear,  329)
+            drawStat(sc.perfect, STATS_X[1])
+            drawStat(sc.fc,      STATS_X[2])
+            drawStat(sc.clear,   STATS_X[3])
         end
     end
 

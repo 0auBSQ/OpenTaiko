@@ -23,94 +23,98 @@
 
 local PopUI = require("PopUI")
 local Shape = require("PopUI.shape")
+local Config    = require("Core.Config")
+local Layout    = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local R         = Layout.replays
+local Card      = R.card
+local Column    = R.column
+local Stats     = R.stats
+local Scrollbar = R.scrollbar
+local Fonts     = R.fonts
+local Tooltip   = R.tooltip
+local Confirm   = R.confirm
+local Shine     = Animation.replays.rank_shine
 
 local M = {}
 local G            -- shared state injected by Script.lua
 
 -- ── Layout ──────────────────────────────────────────────────────────────────────
-local STRIP_X   = 1456
-local STRIP_W   = 464                            -- to the screen's right edge
-local CARD_W    = 440
-local CARD_H    = 236
-local MARGIN    = 10                             -- room around the block for its shadow
+local STRIP_X   = R.strip.x
+local STRIP_W   = R.strip.w                      -- to the screen's right edge
+local CARD_W    = Card.w
+local CARD_H    = Card.h
+local MARGIN    = Card.margin                    -- room around the block for its shadow
 local CANVAS_W, CANVAS_H = CARD_W + 2 * MARGIN, CARD_H + 2 * MARGIN
-local CARD_GAP  = 14
+local CARD_GAP  = Card.gap
 local STEP      = CARD_H + CARD_GAP
-local CARD_X    = STRIP_X + 4
-local LIST_TOP  = 262
-local HEADER_Y  = 206
-local VISIBLE   = 3
+local CARD_X    = STRIP_X + Card.x
+local LIST_TOP  = R.list_top
+local HEADER_Y  = R.header_y
+local VISIBLE   = R.visible
 local VIEW_H    = VISIBLE * STEP - CARD_GAP
 local VIEW_BOT  = LIST_TOP + VIEW_H
-local SB_X, SB_W = STRIP_X + STRIP_W - 12, 6     -- 8 px clear of the blocks' right edge
-local RADIUS    = 20
-local OUTLINE_W = 4
-local CELL      = 12                             -- the checker's square
+local SB_X, SB_W = STRIP_X + STRIP_W - Scrollbar.inset, Scrollbar.w   -- clear of the blocks' right edge
+local RADIUS    = Card.radius
+local OUTLINE_W = Card.outline_w
+local CELL      = Card.checker_cell              -- the checker's square
 -- the checker column and the bottom band (block-local)
-local COL_X, COL_W, COL_BOT = OUTLINE_W, 108, 196
-local FOOT_Y = 196
+local COL_X, COL_W, COL_BOT = OUTLINE_W, Column.w, Column.bottom
+local FOOT_Y = R.foot_y
 -- the right side
-local RX, RR = 124, 428
-local SCORE_SCALE = 0.48                         -- Score_Number.png digits (70x84 cells)
-local SCORE_ADV   = 48                           -- the result screen's digit interval (Result_Score_Number_Interval)
-local STATS = { x = RX, y = 78, w = RR - RX, h = 114, rowH = 27, pad = 8 }
+local RX, RR = R.right.x, R.right.right
+local SCORE_SCALE = R.score.scale                -- Score_Number.png digits
+local SCORE_ADV   = R.score.advance              -- the result screen's digit interval (Result_Score_Number_Interval)
+local STATS = { x = RX, y = Stats.y, w = RR - RX, h = Stats.h, rowH = Stats.row_h, pad = Stats.pad }
 local STATS_LEFT  = STATS.x + STATS.pad
 local STATS_RIGHT = STATS.x + STATS.w - STATS.pad
-local HALF_L_R, HALF_R_L = STATS_LEFT + 136, STATS_LEFT + 152   -- the split of the last row
-local MODS_X, MODS_Y = 16, 195
-local FLAG_X, FLAG_Y = 418, 214
+local HALF_L_R, HALF_R_L = STATS_LEFT + Stats.split_left, STATS_LEFT + Stats.split_right   -- the split of the last row
+local STATS_ROW_TOP, STATS_RULE = Stats.row_top, Stats.rule_w
+local MODS_X, MODS_Y = R.mods.x, R.mods.y
+local FLAG_X, FLAG_Y = R.flag.x, R.flag.y
 -- the column: the rank's ink centre, then the badges' centres
-local RANK_CX, RANK_CY = COL_X + COL_W / 2, 40
-local BADGE_CY, CROWN_CY = 108, 170
-local BADGE_SCALE = 0.38                         -- ScoreRank.png frames (210x180)
-local CROWN_SCALE = 0.33                         -- CrownEffect.png frames (170x168)
+local RANK_CX, RANK_CY = COL_X + COL_W / 2, Column.rank_cy
+local BADGE_CY, CROWN_CY = Column.badge_cy, Column.crown_cy
+local BADGE_SCALE = Column.badge_scale           -- ScoreRank.png frames
+local CROWN_SCALE = Column.crown_scale           -- CrownEffect.png frames
+-- the sheets' cells
+local SCORE_SHEET, BADGE_SHEET, CROWN_SHEET = R.score_sheet, R.badge_sheet, R.crown_sheet
+local JUDGE_CELL_H = R.judge_sheet.cell_h
 
 -- ── Palette (the result screen's panel) ─────────────────────────────────────────
-local RGB = {
-    ink = { 60, 44, 56 }, sub = { 150, 118, 134 }, white = { 255, 255, 255 },
-    pink = { 255, 97, 137 }, pinkMid = { 255, 109, 142 }, pinkDeep = { 212, 0, 111 },
-    checkA = { 255, 231, 231 }, checkB = { 255, 211, 210 }, rule = { 255, 211, 210 },
-    hover = { 255, 131, 160 }, tipText = { 255, 244, 246 }, tipFace = { 60, 28, 44 },
-    warn = { 232, 172, 40 }, err = { 214, 72, 72 }, sbTrack = { 120, 70, 90 }, sbThumb = { 255, 131, 160 },
-}
+local RGB = R.colors
 -- the medal shine, the level stars' recipe: an additive pulse of the digit itself and two glints that blink
 -- in turn (star_glint.png, shared with the difficulty bars) at fixed spots around the digit
-local SHINE_MS, SHINE_OP = 2700, 0.45           -- the digit's flash, three times slower than the stars'
-local GLINT_MS, GLINT_OP = 1500, 0.95           -- the glints at the stars' pace
-local GLINT_SPOTS = { { 30, -34 }, { -28, 24 } }   -- ink-centre relative, in the sheet's pixels (scaled with the tier)
+local SHINE_MS, SHINE_OP = Shine.shine_ms, Shine.shine_opacity   -- the digit's flash
+local GLINT_MS, GLINT_OP = Shine.glint_ms, Shine.glint_opacity   -- the glints
+local GLINT_SPOTS = R.rank_glint_spots   -- ink-centre relative, in the sheet's pixels (scaled with the tier)
 -- what C# reports for an unwatchable replay (ReplayHeader.UnwatchableReason) -> the skin's wording
 local REASONS = {
     rng_mods             = { "SONGSELECT_REPLAY_REASON_RNG",          "Uses random mods that cannot be replayed" },
     dynamic_beat_version = { "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT", "Dynamic Beat replay from a different game version" },
     unseeded_shuffle     = { "SONGSELECT_REPLAY_REASON_UNSEEDED",     "Recorded before the note shuffle was seeded" },
 }
--- the rank digit sheets (Textures/Replay/rank_<tier>.png, 96x120 cells, ink centred on (48, 69), advance
--- 70): gold, silver and bronze hold their one digit only; white holds 0-9, drawn smaller
+-- the rank digit sheets (Textures/Replay/rank_<tier>.png, cells and ink in replays.rank_sheet): gold, silver
+-- and bronze hold their one digit only; white holds 0-9, drawn smaller
+local TIER_SCALES = R.rank_tier_scales
 local RANK_TIERS = {
-    { sheet = "gold",   scale = 0.70, medal = true },
-    { sheet = "silver", scale = 0.62, medal = true },
-    { sheet = "bronze", scale = 0.55, medal = true },
-    { sheet = "white",  scale = 0.42, medal = false },
+    { sheet = "gold",   scale = TIER_SCALES[1], medal = true },
+    { sheet = "silver", scale = TIER_SCALES[2], medal = true },
+    { sheet = "bronze", scale = TIER_SCALES[3], medal = true },
+    { sheet = "white",  scale = TIER_SCALES[4], medal = false },
 }
-local RANK_CELL_W, RANK_CELL_H, RANK_ADV, RANK_INK_CX, RANK_INK_CY = 96, 120, 70, 48, 69
-local RANK_INK_UP, RANK_INK_DOWN = 44, 45          -- the ink's extent above and below its centre
--- Judge.png frames (150x100 each) cropped to their ink, in the order the stats list shows them
-local JUDGES = {
-    { frame = 0, field = "Good",  sx = 1,  sy = 43, sw = 149, sh = 50, scale = 0.30 },
-    { frame = 1, field = "Ok",    sx = 39, sy = 41, sw = 66,  sh = 49, scale = 0.30 },
-    { frame = 2, field = "Bad",   sx = 25, sy = 42, sw = 94,  sh = 43, scale = 0.30 },
-    { frame = 3, field = "ADLib", sx = 7,  sy = 31, sw = 126, sh = 42, scale = 0.30 },
-    { frame = 4, field = "Boom",  sx = 16, sy = 2,  sw = 109, sh = 87, scale = 0.26 },
-}
-local UI_THEME = {
-    colors = {
-        surface  = { 255, 255, 255, 255 }, surface2 = { 255, 231, 231, 255 },
-        primary  = { 255, 109, 142, 255 }, primary2 = { 232, 86, 122, 255 },
-        accent   = { 212, 0, 111, 255 },   accent2  = { 180, 0, 94, 255 },
-        outline  = { 255, 97, 137, 255 },  text = { 60, 44, 56, 255 }, textOnAccent = { 255, 255, 255, 255 },
-    },
-    font = { small = 18, label = 22, button = 24, title = 30 },
-}
+local RankSheet = R.rank_sheet
+local RANK_CELL_W, RANK_CELL_H, RANK_ADV = RankSheet.cell_w, RankSheet.cell_h, RankSheet.advance
+local RANK_INK_CX, RANK_INK_CY = RankSheet.ink_cx, RankSheet.ink_cy
+local RANK_INK_UP, RANK_INK_DOWN = RankSheet.ink_up, RankSheet.ink_down   -- the ink's extent above and below its centre
+-- Judge.png frames cropped to their ink, in the order the stats list shows them
+local JUDGE_CROPS = R.judges
+local JUDGES = {}
+for i, field in ipairs({ "Good", "Ok", "Bad", "ADLib", "Boom" }) do
+    local c = JUDGE_CROPS[i]
+    JUDGES[i] = { frame = i - 1, field = field, sx = c.sx, sy = c.sy, sw = c.sw, sh = c.sh, scale = c.scale }
+end
+local UI_THEME = Config.plain(R.theme)
 
 local function clamp(v, lo, hi) if v < lo then return lo elseif v > hi then return hi else return v end end
 local function tierOf(rank) return RANK_TIERS[rank] or RANK_TIERS[4] end
@@ -147,7 +151,7 @@ local function text(size, str, x, y, rgb, opacity, anchor, maxWidth, outline)
     f:Draw(tostring(str), x, y, color(rgb), outline or NO_OUTLINE, opacity or 1, 1, maxWidth or 0, a)
 end
 local function textWidth(size, str) return font(size):Measure(tostring(str)) end
-local TEXT_SIZES = { 14, 17, 18 }
+local TEXT_SIZES = { Fonts.caption, Fonts.stats, Fonts.name, Fonts.date }   -- the sizes clipped to the viewport
 local function clipText(on)
     for _, size in ipairs(TEXT_SIZES) do
         if on then font(size):SetClipY(LIST_TOP, VIEW_BOT) else font(size):SetClipY(0, 0) end
@@ -195,9 +199,9 @@ local function bakeFace()
     local cv = CANVAS:CreateCanvas(CANVAS_W, CANVAS_H)
     cv:ClearTransparent()
     local x, y = MARGIN, MARGIN
-    Shape.dropShadow(cv, x, y, CARD_W, CARD_H, RADIUS, { col = { 60, 20, 40, 48 }, layers = 2, grow = 2, dx = 0, dy = 3 })
+    Shape.dropShadow(cv, x, y, CARD_W, CARD_H, RADIUS, Config.plain(R.shadow))
     Shape.panel(cv, x, y, CARD_W, CARD_H, { radius = RADIUS, outline = { col = { RGB.pink[1], RGB.pink[2], RGB.pink[3], 255 }, width = OUTLINE_W },
-                                            top = { 255, 255, 255, 255 } })
+                                            top = Config.plain(RGB.face) })
     local cols = math.floor((CARD_W - 2 * OUTLINE_W) / CELL)
     local colCells, colRows = math.floor(COL_W / CELL), math.floor((COL_BOT - OUTLINE_W) / CELL)
     local footRow0 = math.floor((FOOT_Y - OUTLINE_W) / CELL)
@@ -212,15 +216,15 @@ local function bakeFace()
         if (i + footRow0 - 1) % 2 == 0 then checkerCell(cv, i, footRow0 - 1) end
     end
     -- the stats sub-panel
-    Shape.panel(cv, x + STATS.x, y + STATS.y, STATS.w, STATS.h, { radius = 8, outline = { col = { RGB.pinkDeep[1], RGB.pinkDeep[2], RGB.pinkDeep[3], 255 }, width = 2 },
-                                                                  top = { 255, 255, 255, 255 } })
+    Shape.panel(cv, x + STATS.x, y + STATS.y, STATS.w, STATS.h, { radius = Stats.radius, outline = { col = { RGB.pinkDeep[1], RGB.pinkDeep[2], RGB.pinkDeep[3], 255 }, width = Stats.outline_w },
+                                                                  top = Config.plain(RGB.face) })
     for row = 0, 3 do
-        local ry = y + STATS.y + 4 + row * STATS.rowH + STATS.rowH - 2
+        local ry = y + STATS.y + STATS_ROW_TOP + row * STATS.rowH + STATS.rowH - STATS_RULE
         if row < 3 then
-            cv:FillRect(x + STATS_LEFT, ry, STATS_RIGHT - STATS_LEFT, 2, RGB.rule[1], RGB.rule[2], RGB.rule[3], 255)
+            cv:FillRect(x + STATS_LEFT, ry, STATS_RIGHT - STATS_LEFT, STATS_RULE, RGB.rule[1], RGB.rule[2], RGB.rule[3], 255)
         else
-            cv:FillRect(x + STATS_LEFT, ry, HALF_L_R - STATS_LEFT, 2, RGB.rule[1], RGB.rule[2], RGB.rule[3], 255)
-            cv:FillRect(x + HALF_R_L, ry, STATS_RIGHT - HALF_R_L, 2, RGB.rule[1], RGB.rule[2], RGB.rule[3], 255)
+            cv:FillRect(x + STATS_LEFT, ry, HALF_L_R - STATS_LEFT, STATS_RULE, RGB.rule[1], RGB.rule[2], RGB.rule[3], 255)
+            cv:FillRect(x + HALF_R_L, ry, STATS_RIGHT - HALF_R_L, STATS_RULE, RGB.rule[1], RGB.rule[2], RGB.rule[3], 255)
         end
     end
     cv:Upload()
@@ -231,52 +235,58 @@ end
 local function bakeHover()
     local cv = CANVAS:CreateCanvas(CANVAS_W, CANVAS_H)
     cv:ClearTransparent()
-    Shape.panel(cv, MARGIN, MARGIN, CARD_W, CARD_H, { radius = RADIUS, top = { RGB.hover[1], RGB.hover[2], RGB.hover[3], 52 } })
+    Shape.panel(cv, MARGIN, MARGIN, CARD_W, CARD_H, { radius = RADIUS, top = { RGB.hover[1], RGB.hover[2], RGB.hover[3], Card.hover_alpha } })
     cv:Upload()
     return cv
 end
 
 -- warning triangle (amber, dark outline, "!") at 2x, drawn at half scale so the edges smooth out
 local function bakeWarnTriangle()
-    local W, H = 64, 56
+    local I = R.warn_icon
+    local W, H = I.w, I.h
+    local top, bottom, side = I.inner_top, I.inner_bottom, I.inner_side
+    local oc, fc, mc = I.outline_color, I.fill_color, I.mark_color
     local c = CANVAS:CreateCanvas(W, H)
     c:Clear(0, 0, 0, 0)
     local cx = W / 2
     for y = 0, H - 1 do
         local half = ((y + 1) / H) * (W / 2 - 1)
-        c:FillRect(math.floor(cx - half), y, math.max(1, math.floor(half * 2 + 0.5)), 1, 146, 96, 10, 255)
+        c:FillRect(math.floor(cx - half), y, math.max(1, math.floor(half * 2 + 0.5)), 1, oc[1], oc[2], oc[3], 255)
     end
-    for y = 6, H - 4 do
-        local half = ((y - 5) / (H - 9)) * (W / 2 - 5)
-        c:FillRect(math.floor(cx - half), y, math.max(1, math.floor(half * 2 + 0.5)), 1, 246, 189, 55, 255)
+    for y = top, H - bottom do
+        local half = ((y - (top - 1)) / (H - top - bottom + 1)) * (W / 2 - side)
+        c:FillRect(math.floor(cx - half), y, math.max(1, math.floor(half * 2 + 0.5)), 1, fc[1], fc[2], fc[3], 255)
     end
-    c:FillRect(math.floor(cx - 3), 20, 6, 18, 84, 54, 4, 255)
-    c:FillRect(math.floor(cx - 2), 18, 4, 2, 84, 54, 4, 255)
-    c:FillRect(math.floor(cx - 3), 43, 6, 6, 84, 54, 4, 255)
+    for _, b in ipairs(I.mark) do
+        c:FillRect(math.floor(cx + b.dx), b.y, b.w, b.h, mc[1], mc[2], mc[3], 255)
+    end
     c:Upload()
     return c
 end
 
 -- red error circle with a white X (2x, drawn at half scale) for unwatchable replays
 local function bakeErrCircle()
-    local D = 56
+    local I = R.err_icon
+    local D, ring, arm, stroke = I.size, I.ring, I.cross_half, I.cross_stroke
+    local rc, fc, xc = I.ring_color, I.fill_color, I.cross_color
     local c = CANVAS:CreateCanvas(D, D)
     c:Clear(0, 0, 0, 0)
     local r, cx = D / 2, D / 2
     for y = 0, D - 1 do
         local dy = y + 0.5 - cx
         local half = math.sqrt(math.max(0, r * r - dy * dy))
-        if half >= 1 then c:FillRect(math.floor(cx - half), y, math.max(1, math.floor(half * 2 + 0.5)), 1, 152, 36, 36, 255) end
+        if half >= 1 then c:FillRect(math.floor(cx - half), y, math.max(1, math.floor(half * 2 + 0.5)), 1, rc[1], rc[2], rc[3], 255) end
     end
-    for y = 3, D - 4 do
+    for y = ring, D - ring - 1 do
         local dy = y + 0.5 - cx
-        local ri = r - 3
+        local ri = r - ring
         local half = math.sqrt(math.max(0, ri * ri - dy * dy))
-        if half >= 1 then c:FillRect(math.floor(cx - half), y, math.max(1, math.floor(half * 2 + 0.5)), 1, 206, 58, 58, 255) end
+        if half >= 1 then c:FillRect(math.floor(cx - half), y, math.max(1, math.floor(half * 2 + 0.5)), 1, fc[1], fc[2], fc[3], 255) end
     end
-    for t = -13, 13 do
-        c:FillRect(math.floor(cx + t - 2), math.floor(cx + t), 5, 1, 255, 255, 255, 255)
-        c:FillRect(math.floor(cx - t - 2), math.floor(cx + t), 5, 1, 255, 255, 255, 255)
+    local sh = math.floor(stroke / 2)
+    for t = -arm, arm do
+        c:FillRect(math.floor(cx + t - sh), math.floor(cx + t), stroke, 1, xc[1], xc[2], xc[3], 255)
+        c:FillRect(math.floor(cx - t - sh), math.floor(cx + t), stroke, 1, xc[1], xc[2], xc[3], 255)
     end
     c:Upload()
     return c
@@ -402,18 +412,19 @@ end
 local function rowVisible(y0, y1) return y0 >= LIST_TOP and y1 <= VIEW_BOT end
 local function ready(tex) return tex ~= nil and tex.Width > 0 end
 
--- a number in the result screen's digits (Score_Number.png, 70x84 cells set SCORE_ADV apart, as the result
+-- a number in the result screen's digits (Score_Number.png cells set SCORE_ADV apart, as the result
 -- screen spaces them) with the last cell's right edge at right and the top at y
 local function drawScore(n, right, y, scale, op)
     local tex = sheets.digits
     if not ready(tex) then return end
     local s = tostring(math.tointeger(n) or n)
     local adv = SCORE_ADV * scale
-    local x0 = right - 70 * scale - (#s - 1) * adv
+    local cw, ch = SCORE_SHEET.cell_w, SCORE_SHEET.cell_h
+    local x0 = right - cw * scale - (#s - 1) * adv
     tex:SetScale(scale, scale); tex:SetOpacity(op)
     for i = 1, #s do
         local d = tonumber(s:sub(i, i))
-        if d ~= nil then tex:DrawRectAtAnchor(math.floor(x0 + (i - 1) * adv), math.floor(y), d * 70, 0, 70, 84, "topleft") end
+        if d ~= nil then tex:DrawRectAtAnchor(math.floor(x0 + (i - 1) * adv), math.floor(y), d * cw, 0, cw, ch, "topleft") end
     end
     tex:SetScale(1, 1); tex:SetOpacity(1)
 end
@@ -444,7 +455,7 @@ local function drawRank(rank, cx, cy, op)
     drawRankCells(tex, s, sc, cx, cy, tier.medal)
     if tier.medal then
         local t = M._now
-        local pulse = 0.5 + 0.5 * math.sin(2 * math.pi * t / SHINE_MS + rank * 1.3)
+        local pulse = 0.5 + 0.5 * math.sin(2 * math.pi * t / SHINE_MS + rank * Shine.shine_stagger)
         tex:SetBlendMode("add"); tex:SetOpacity(op * SHINE_OP * pulse)
         drawRankCells(tex, s, sc, cx, cy, true)
         tex:SetBlendMode("normal")
@@ -452,12 +463,12 @@ local function drawRank(rank, cx, cy, op)
         if glint ~= nil then
             glint:SetBlendMode("add")
             for k, spot in ipairs(GLINT_SPOTS) do
-                local gp = (t / GLINT_MS + rank * 0.37 + k * 0.5) % 1
+                local gp = (t / GLINT_MS + rank * Shine.glint_stagger + k * 0.5) % 1
                 local blink = math.sin(gp * math.pi)
                 blink = blink * blink * blink
-                if blink > 0.02 then
-                    local gs = (1.0 + 1.0 * blink) * (sc / 0.7)
-                    glint:SetRotation(gp * 90); glint:SetScale(gs, gs); glint:SetOpacity(op * GLINT_OP * blink)
+                if blink > Shine.glint_min then
+                    local gs = (Shine.glint_scale_min + Shine.glint_scale_grow * blink) * (sc / R.rank_glint_scale_ref)
+                    glint:SetRotation(gp * Shine.glint_spin_deg); glint:SetScale(gs, gs); glint:SetOpacity(op * GLINT_OP * blink)
                     glint:DrawAtAnchor(math.floor(cx + spot[1] * sc + 0.5), math.floor(cy + spot[2] * sc + 0.5), "center")
                 end
             end
@@ -477,7 +488,7 @@ end
 -- the score-rank badge (sr: 0 = none, else the E..Ω frame sr-1) centred on (cx, cy)
 local function drawRankBadge(r, cx, cy, op)
     if r.ScoreRank and r.ScoreRank > 0 then
-        drawSheetFrame(sheets.rank, cx, cy, 0, (r.ScoreRank - 1) * 180, 210, 180, BADGE_SCALE, op)
+        drawSheetFrame(sheets.rank, cx, cy, 0, (r.ScoreRank - 1) * BADGE_SHEET.cell_h, BADGE_SHEET.cell_w, BADGE_SHEET.cell_h, BADGE_SCALE, op)
     end
 end
 
@@ -485,7 +496,7 @@ end
 -- a failed play shows none
 local function drawCrown(r, cx, cy, op)
     if r.ClearStatus and r.ClearStatus > 0 then
-        drawSheetFrame(sheets.crown, cx, cy, (r.ClearStatus - 1) * 170, 0, 170, 168, CROWN_SCALE, op)
+        drawSheetFrame(sheets.crown, cx, cy, (r.ClearStatus - 1) * CROWN_SHEET.cell_w, 0, CROWN_SHEET.cell_w, CROWN_SHEET.cell_h, CROWN_SCALE, op)
     end
 end
 
@@ -494,7 +505,7 @@ local function drawJudgeWord(j, x, cy, op)
     local tex = sheets.judge
     if not ready(tex) then return end
     tex:SetScale(j.scale, j.scale); tex:SetOpacity(op)
-    tex:DrawRectAtAnchor(math.floor(x), math.floor(cy), j.sx, j.frame * 100 + j.sy, j.sw, j.sh, "left")
+    tex:DrawRectAtAnchor(math.floor(x), math.floor(cy), j.sx, j.frame * JUDGE_CELL_H + j.sy, j.sw, j.sh, "left")
     tex:SetScale(1, 1); tex:SetOpacity(1)
 end
 
@@ -509,7 +520,7 @@ end
 -- draw one block whose face top-left is (x, y); the canvas has MARGIN around it. state: "plain",
 -- "hover" or "press".
 local function drawCard(r, rank, x, y, state)
-    local op = r.Watchable and 1.0 or 0.45
+    local op = r.Watchable and 1.0 or Card.unwatchable_opacity
     local cx0, cy0 = x - MARGIN, y - MARGIN                     -- the canvas' top-left
     local top, bot = math.max(cy0, LIST_TOP), math.min(cy0 + CANVAS_H, VIEW_BOT)
     if bot <= top then return end
@@ -531,46 +542,49 @@ local function drawCard(r, rank, x, y, state)
     if rowVisible(rcy - RANK_INK_UP * tier.scale, rcy + RANK_INK_DOWN * tier.scale) then
         drawRank(rank, rcx, rcy, op)
     end
-    local badgeH, crownH = 180 * BADGE_SCALE, 168 * CROWN_SCALE
+    local badgeH, crownH = BADGE_SHEET.cell_h * BADGE_SCALE, CROWN_SHEET.cell_h * CROWN_SCALE
     if rowVisible(y + BADGE_CY - badgeH / 2, y + BADGE_CY + badgeH / 2) then drawRankBadge(r, rcx, y + BADGE_CY, op) end
     if rowVisible(y + CROWN_CY - crownH / 2, y + CROWN_CY + crownH / 2) then drawCrown(r, rcx, y + CROWN_CY, op) end
 
     -- the score row: the caption and the digits, right-aligned so seven fit
-    if rowVisible(y + 8, y + 8 + 84 * SCORE_SCALE) then drawScore(r.Score, x + RR, y + 8, SCORE_SCALE, op) end
+    local scoreY = R.score.y
+    if rowVisible(y + scoreY, y + scoreY + SCORE_SHEET.cell_h * SCORE_SCALE) then drawScore(r.Score, x + RR, y + scoreY, SCORE_SCALE, op) end
     clipText(true)
-    text(14, tr("SONGSELECT_REPLAY_SCORE", "score"), x + RX, y + 16, RGB.pinkMid, op)
-    text(18, r.PlayerName, x + RX, y + 50, RGB.ink, op, "left", 176)
-    text(14, r.Date, x + RR, y + 54, RGB.sub, op, "right")
+    text(Fonts.caption, tr("SONGSELECT_REPLAY_SCORE", "score"), x + RX, y + R.caption_y, RGB.pinkMid, op)
+    text(Fonts.name, r.PlayerName, x + RX, y + R.name.y, RGB.ink, op, "left", R.name.max_width)
+    text(Fonts.date, r.Date, x + RR, y + R.date_y, RGB.sub, op, "right")
     -- the stats: three full rows then the Ad-Lib / BOOM!! row
-    local function rowCy(i) return y + STATS.y + 4 + i * STATS.rowH + STATS.rowH / 2 - 1 end
+    local function rowCy(i) return y + STATS.y + STATS_ROW_TOP + i * STATS.rowH + STATS.rowH / 2 - STATS_RULE / 2 end
+    local countDy, wordHalf = Stats.count_dy, Stats.word_half_h
     for i = 1, 3 do
-        text(17, tostring(r[JUDGES[i].field] or 0), x + STATS_RIGHT, rowCy(i - 1) - 12, RGB.ink, op, "right")
+        text(Fonts.stats, tostring(r[JUDGES[i].field] or 0), x + STATS_RIGHT, rowCy(i - 1) + countDy, RGB.ink, op, "right")
     end
-    text(17, tostring(r.ADLib or 0), x + HALF_L_R, rowCy(3) - 12, RGB.ink, op, "right")
-    text(17, tostring(r.Boom or 0), x + STATS_RIGHT, rowCy(3) - 12, RGB.ink, op, "right")
+    text(Fonts.stats, tostring(r.ADLib or 0), x + HALF_L_R, rowCy(3) + countDy, RGB.ink, op, "right")
+    text(Fonts.stats, tostring(r.Boom or 0), x + STATS_RIGHT, rowCy(3) + countDy, RGB.ink, op, "right")
     clipText(false)
     for i = 1, 3 do
         local cy = rowCy(i - 1)
-        if rowVisible(cy - 13, cy + 13) then drawJudgeWord(JUDGES[i], x + STATS_LEFT, cy, op) end
+        if rowVisible(cy - wordHalf, cy + wordHalf) then drawJudgeWord(JUDGES[i], x + STATS_LEFT, cy, op) end
     end
     do
         local cy = rowCy(3)
-        if rowVisible(cy - 13, cy + 13) then
+        if rowVisible(cy - wordHalf, cy + wordHalf) then
             drawJudgeWord(JUDGES[4], x + STATS_LEFT, cy, op)
             drawJudgeWord(JUDGES[5], x + HALF_R_L, cy, op)
         end
     end
     -- the bottom band: the play's mod icons, and the flag badge on the right
-    if rowVisible(y + MODS_Y, y + MODS_Y + 37) and G.modicons_ro ~= nil then
+    if rowVisible(y + MODS_Y, y + MODS_Y + R.mods.h) and G.modicons_ro ~= nil then
         G.modicons_ro:Call("drawFlags", math.floor(x + MODS_X), math.floor(y + MODS_Y),
             r.ModFlags, r.ScrollSpeed, r.SongSpeed, r.JudgeStrictness, "menu", op * 255)
     end
     local bx, by = x + FLAG_X, y + FLAG_Y
-    if rowVisible(by - 14, by + 14) then
+    local flagHalf, iconScale = R.flag.half_h, R.flag.icon_scale
+    if rowVisible(by - flagHalf, by + flagHalf) then
         if not r.Watchable then
-            art.err:SetScale(0.5, 0.5); art.err:DrawAtAnchor(math.floor(bx), math.floor(by), "center"); art.err:SetScale(1, 1)
+            art.err:SetScale(iconScale, iconScale); art.err:DrawAtAnchor(math.floor(bx), math.floor(by), "center"); art.err:SetScale(1, 1)
         elseif r.OldVersion or r.ChecksumMismatch then
-            art.warn:SetScale(0.5, 0.5); art.warn:SetOpacity(op)
+            art.warn:SetScale(iconScale, iconScale); art.warn:SetOpacity(op)
             art.warn:DrawAtAnchor(math.floor(bx), math.floor(by), "center")
             art.warn:SetScale(1, 1); art.warn:SetOpacity(1)
         end
@@ -578,7 +592,7 @@ local function drawCard(r, rank, x, y, state)
 end
 
 -- ── The confirm popup (PopUI) ────────────────────────────────────────────────────
-local CONFIRM_W, CONFIRM_H = 720, 440
+local CONFIRM_W, CONFIRM_H = Confirm.w, Confirm.h
 local function openConfirm(row, rank, diff)
     G.replayConfirm = { filepath = row.FilePath, diff = diff, header = row, rank = rank, chartPath = G.replayChartPath }
     M._confirmChoice = nil
@@ -587,10 +601,11 @@ local function openConfirm(row, rank, diff)
         sfx = { click = function() G.sounds.Decide:Play() end, hover = function() G.sounds.Skip:Play() end },
     }
     local px, py = math.floor((1920 - CONFIRM_W) / 2), math.floor((1080 - CONFIRM_H) / 2)
+    local bw, bh, by = Confirm.button_w, Confirm.button_h, py + CONFIRM_H - Confirm.button_bottom
     ui:panel{ x = px, y = py, w = CONFIRM_W, h = CONFIRM_H, title = tr("SONGSELECT_REPLAY_CONFIRM", "Watch this replay?") }
-    local watch = ui:button{ text = tr("SONGSELECT_REPLAY_WATCH", "Watch"), x = px + CONFIRM_W / 2 - 250, y = py + CONFIRM_H - 92, w = 230, h = 62, accent = true,
+    local watch = ui:button{ text = tr("SONGSELECT_REPLAY_WATCH", "Watch"), x = px + CONFIRM_W / 2 + Confirm.watch_dx, y = by, w = bw, h = bh, accent = true,
                              onClick = function() M._confirmChoice = "watch" end }
-    ui:button{ text = tr("SONGSELECT_SEARCH_CANCEL", "Cancel"), x = px + CONFIRM_W / 2 + 20, y = py + CONFIRM_H - 92, w = 230, h = 62,
+    ui:button{ text = tr("SONGSELECT_SEARCH_CANCEL", "Cancel"), x = px + CONFIRM_W / 2 + Confirm.cancel_dx, y = by, w = bw, h = bh,
                onClick = function() M._confirmChoice = "cancel" end }
     for i, w in ipairs(ui.focusables) do if w == watch then ui.focusIdx = i end end
     M._confirmUI = ui
@@ -653,12 +668,12 @@ function M.handleUpdate(ts)
 
     -- scrollbar drag: press anywhere on the gutter jumps/drags the thumb
     if maxScroll > 0 and inside then
-        local onGutter = mx >= SB_X - 6 and mx <= SB_X + SB_W + 6 and my >= LIST_TOP and my <= VIEW_BOT
+        local onGutter = mx >= SB_X - Scrollbar.grab and mx <= SB_X + SB_W + Scrollbar.grab and my >= LIST_TOP and my <= VIEW_BOT
         if INPUT:MousePressed("Left") and onGutter then M._sbDrag = true end
     end
     if M._sbDrag then
         if INPUT:MousePressing("Left") then
-            local thumbH = math.max(28, VIEW_H * VIEW_H / math.max(1, contentH))
+            local thumbH = math.max(Scrollbar.thumb_min, VIEW_H * VIEW_H / math.max(1, contentH))
             local t = clamp((my - LIST_TOP - thumbH / 2) / math.max(1, VIEW_H - thumbH), 0, 1)
             M._scrollTarget = t * maxScroll
             G.replayScroll  = M._scrollTarget          -- track the pointer directly while dragging
@@ -669,12 +684,12 @@ function M.handleUpdate(ts)
 
     -- ease the scroll toward the target
     M._scrollTarget = clamp(M._scrollTarget, 0, maxScroll)
-    G.replayScroll = G.replayScroll + (M._scrollTarget - G.replayScroll) * math.min(1, dt * 14)
+    G.replayScroll = G.replayScroll + (M._scrollTarget - G.replayScroll) * math.min(1, dt * Animation.replays.scroll_ease_per_s)
     if math.abs(M._scrollTarget - G.replayScroll) < 0.5 then G.replayScroll = M._scrollTarget end
 
     -- hover: the block under the mouse inside the viewport (gaps are dead space)
     local hover = nil
-    if inside and not M._sbDrag and overStrip and mx >= CARD_X and mx <= CARD_X + CARD_W and mx < SB_X - 8 then
+    if inside and not M._sbDrag and overStrip and mx >= CARD_X and mx <= CARD_X + CARD_W and mx < SB_X - Scrollbar.clear then
         local ly = my - LIST_TOP + G.replayScroll
         local idx = math.floor(ly / STEP)
         if idx >= 0 and idx < n and ly - idx * STEP <= CARD_H then hover = idx end
@@ -717,12 +732,14 @@ function M.draw()
     -- loading lines in the secondary grey
     local title = tr("SONGSELECT_REPLAY_TITLE", "Best Plays")
     if n > 0 then title = title .. " (" .. n .. ")" end
-    text(28, title, CARD_X + 6, HEADER_Y, RGB.pinkDeep)
+    local hx = CARD_X + R.header_x
+    text(Fonts.header, title, hx, HEADER_Y, RGB.pinkDeep)
     if G.replayLoading then
-        local dots = string.rep(".", 1 + math.floor((M._loadAnim or 0) * 3) % 3)
-        text(18, tr("SONGSELECT_REPLAY_LOADING", "Loading replays") .. dots, CARD_X + 6, LIST_TOP, RGB.sub)
+        local dotAnim = Animation.replays
+        local dots = string.rep(".", 1 + math.floor((M._loadAnim or 0) * dotAnim.loading_dots_per_s) % dotAnim.loading_dot_count)
+        text(Fonts.status, tr("SONGSELECT_REPLAY_LOADING", "Loading replays") .. dots, hx, LIST_TOP, RGB.sub)
     elseif n == 0 then
-        text(18, tr("SONGSELECT_REPLAY_NONE", "No replays yet"), CARD_X + 6, LIST_TOP, RGB.sub)
+        text(Fonts.status, tr("SONGSELECT_REPLAY_NONE", "No replays yet"), hx, LIST_TOP, RGB.sub)
     else
         local first = math.max(0, math.floor(G.replayScroll / STEP))
         for idx = first, math.min(n - 1, first + VISIBLE + 1) do
@@ -737,10 +754,10 @@ function M.draw()
     -- scrollbar (track + thumb) when the list overflows the viewport
     local contentH, maxScroll = contentMetrics(n)
     if maxScroll > 0 then
-        local thumbH = math.max(28, VIEW_H * VIEW_H / contentH)
+        local thumbH = math.max(Scrollbar.thumb_min, VIEW_H * VIEW_H / contentH)
         local t = clamp(G.replayScroll / maxScroll, 0, 1)
-        rect(SB_X, LIST_TOP, SB_W, VIEW_H, RGB.sbTrack, 70)
-        rect(SB_X, LIST_TOP + t * (VIEW_H - thumbH), SB_W, thumbH, RGB.sbThumb, M._sbDrag and 255 or 220)
+        rect(SB_X, LIST_TOP, SB_W, VIEW_H, RGB.sbTrack, Scrollbar.track_alpha)
+        rect(SB_X, LIST_TOP + t * (VIEW_H - thumbH), SB_W, thumbH, RGB.sbThumb, M._sbDrag and Scrollbar.thumb_drag_alpha or Scrollbar.thumb_alpha)
     end
 
     -- tooltip while hovering a flagged block: red accent + the reason for an unwatchable replay (its code
@@ -762,33 +779,36 @@ function M.draw()
         end
         if #lines > 0 then
             local w = 0
-            for _, l in ipairs(lines) do w = math.max(w, textWidth(16, l)) end
-            local pad, lineH = 14, 24
-            local bw, bh = w + pad * 2 + 14, #lines * lineH + pad * 2 - 6
+            for _, l in ipairs(lines) do w = math.max(w, textWidth(Fonts.tooltip, l)) end
+            local pad, lineH = Tooltip.pad, Tooltip.line_h
+            local bw, bh = w + pad * 2 + Tooltip.extra_w, #lines * lineH + pad * 2 - Tooltip.trim_h
             local mx, my = INPUT:GetMouseXY()
-            local bx = math.max(8, math.min(mx + 18, 1920 - bw - 8))
-            local by = math.max(8, my - bh - 12)
-            rect(bx, by, bw, bh, RGB.tipFace, 235)
-            rect(bx, by, bw, 4, accent, 255)
-            for i, l in ipairs(lines) do text(16, l, bx + pad, by + pad - 2 + (i - 1) * lineH, RGB.tipText) end
+            local edge = Tooltip.screen_margin
+            local bx = math.max(edge, math.min(mx + Tooltip.mouse_dx, 1920 - bw - edge))
+            local by = math.max(edge, my - bh - Tooltip.above)
+            rect(bx, by, bw, bh, RGB.tipFace, Tooltip.face_alpha)
+            rect(bx, by, bw, Tooltip.accent_h, accent, 255)
+            for i, l in ipairs(lines) do text(Fonts.tooltip, l, bx + pad, by + pad + Tooltip.text_dy + (i - 1) * lineH, RGB.tipText) end
         end
     end
 
     -- the confirm popup: dim, the PopUI panel and buttons, then the play's rank, badges, score and lines
     if G.replayConfirm ~= nil and M._confirmUI ~= nil then
         local c, h = G.replayConfirm, G.replayConfirm.header
-        drawDim(0.55)
+        drawDim(Confirm.dim_opacity)
         M._confirmUI:draw()
-        local cx, py = 960, math.floor((1080 - CONFIRM_H) / 2)
+        local cx, py = math.floor((1920 - CONFIRM_W) / 2) + CONFIRM_W / 2, math.floor((1080 - CONFIRM_H) / 2)
         if h ~= nil then
             -- one row: rank, score-rank badge, crown, then the score right-aligned; the name and date under it
-            local ry = py + 130
-            drawRank(c.rank or 0, cx - 230, ry, 1)
-            drawRankBadge(h, cx - 120, ry, 1)
-            drawCrown(h, cx - 30, ry, 1)
-            drawScore(h.Score, cx + 300, ry - 42 * 0.5, 0.5, 1)
-            M._confirmUI:drawTextEx(22, h.PlayerName, cx, py + 200, UI_THEME.colors.text, { 255, 255, 255, 160 }, 1, 1, CONFIRM_W - 120, "top")
-            M._confirmUI:drawTextEx(18, h.Date, cx, py + 236, { 150, 118, 134 }, { 255, 255, 255, 140 }, 1, 1, 0, "top")
+            local ry = py + Confirm.row_y
+            local sc = Confirm.score_scale
+            drawRank(c.rank or 0, cx + Confirm.rank_dx, ry, 1)
+            drawRankBadge(h, cx + Confirm.badge_dx, ry, 1)
+            drawCrown(h, cx + Confirm.crown_dx, ry, 1)
+            drawScore(h.Score, cx + Confirm.score_right_dx, ry - SCORE_SHEET.cell_h / 2 * sc, sc, 1)
+            M._confirmUI:drawTextEx(Confirm.name_font, h.PlayerName, cx, py + Confirm.name_y, UI_THEME.colors.text, Confirm.name_outline_color,
+                1, 1, CONFIRM_W - Confirm.name_margin, "top")
+            M._confirmUI:drawTextEx(Confirm.date_font, h.Date, cx, py + Confirm.date_y, Confirm.date_color, Confirm.date_outline_color, 1, 1, 0, "top")
         end
     end
 end

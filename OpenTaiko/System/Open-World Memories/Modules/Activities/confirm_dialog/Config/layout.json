@@ -1,0 +1,39 @@
+{
+    "_note": "Song unlock dialog layout, in 1920x1080 pixels. Colours are [r, g, b] or [r, g, b, a] from 0 to 255. theme is handed to PopUI as is, so its keys keep PopUI's names.",
+    "theme": {
+        "colors": {
+            "surface": [250, 252, 255, 255], "surface2": [230, 236, 244, 255],
+            "primary": [96, 132, 180, 255], "primary2": [72, 108, 156, 255],
+            "accent": [126, 196, 200, 255], "accent2": [96, 168, 176, 255],
+            "outline": [70, 84, 104, 255], "text": [44, 56, 74, 255], "textOnAccent": [255, 255, 255, 255]
+        },
+        "font": { "small": 18, "label": 22, "button": 22, "title": 30 }
+    },
+    "dim_color": [8, 10, 18, 150],
+    "panel": {
+        "w": 760,
+        "not_p1_h": 220,
+        "purchase_h": 440
+    },
+    "title": {
+        "_note": "The song title: y is its centre from the panel's top; it fits the panel's width less margin_x on each side.",
+        "y": 96,
+        "font_size": 30,
+        "margin_x": 40,
+        "color": [44, 56, 74],
+        "edge_color": [255, 255, 255, 160]
+    },
+    "purse": {
+        "_note": "y is the purse's top from the panel's top (its price sits 26 px above it).",
+        "y": 210,
+        "w": 300,
+        "h": 66
+    },
+    "buttons": {
+        "_note": "bottom is the buttons' top, from the panel's bottom; gap is between Buy and Cancel.",
+        "w": 280,
+        "h": 60,
+        "gap": 40,
+        "bottom": 96
+    }
+}

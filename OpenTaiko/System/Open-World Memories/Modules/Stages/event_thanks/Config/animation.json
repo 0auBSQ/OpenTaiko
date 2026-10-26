@@ -1,0 +1,6 @@
+{
+    "_note": "Event thanks screen timings, in seconds.",
+    "hold_s": 4.5,
+    "skip_after_s": 1.0,
+    "fade_s": 0.6
+}

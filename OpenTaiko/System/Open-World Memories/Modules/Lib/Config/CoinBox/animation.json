@@ -1,0 +1,38 @@
+{
+    "_note": "Coin purse timings (Lib/CoinBox). Times in seconds, rates per second, distances in pixels (1920x1080).",
+    "fade_rate_per_s": 10,
+    "roll": { "_note": "the number on the pill eases to the balance at rate_per_s, and snaps to it once within snap", "rate_per_s": 7, "snap": 0.6 },
+    "pay": {
+        "_note": "the price label drops into the purse over drop_s, fading by drop_fade. count coins start start_from_right px left of the pill's right edge, step_x px apart leftwards, start_dy px over its top plus (i % row_cycle) * row_dy; coin i flies for dur_s + (i % dur_cycle) * dur_step_s, after i * delay_step_s. The balance starts rolling after roll_delay_s",
+        "drop_s": 0.55,
+        "drop_fade": 0.4,
+        "count": 8,
+        "start_from_right": 60,
+        "step_x": 26,
+        "start_dy": 26,
+        "row_cycle": 3,
+        "row_dy": 10,
+        "dur_s": 0.45,
+        "dur_cycle": 4,
+        "dur_step_s": 0.05,
+        "delay_step_s": 0.05,
+        "roll_delay_s": 0.45
+    },
+    "gain": {
+        "_note": "the green +n rises rise_px out of the purse over rise_s. count coins start start_from_left px right of the pill's left edge, step_x px apart, start_dy px over its top plus (i % row_cycle) * row_dy; coin i flies for dur_s + (i % dur_cycle) * dur_step_s, after i * delay_step_s. The balance starts rolling after roll_delay_s",
+        "rise_s": 0.9,
+        "rise_px": 70,
+        "count": 8,
+        "start_from_left": 40,
+        "step_x": 30,
+        "start_dy": 90,
+        "row_cycle": 3,
+        "row_dy": 14,
+        "dur_s": 0.4,
+        "dur_cycle": 3,
+        "dur_step_s": 0.06,
+        "delay_step_s": 0.04,
+        "roll_delay_s": 0.3
+    },
+    "coin_flight": { "_note": "a flying coin arcs arc_px over its straight path; its wobble turns wobble_freq radians per flight", "arc_px": 34, "wobble_freq": 12 }
+}

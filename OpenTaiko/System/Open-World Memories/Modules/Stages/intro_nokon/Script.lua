@@ -7,6 +7,9 @@ local Dialogue  = require("nokon_dialogue")   -- stage chrome over the shared Li
 local Stage     = require("stage")
 local Game      = require("game")
 local NavInput  = require("NavInput")
+-- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+local Config    = require("Core.Config")
+local Layout    = Config.load("Config/layout.json")
 
 local text  = nil
 local texts = {}
@@ -114,13 +117,14 @@ end
 local function refreshQuizSongListCache()
     currentPageCache = {}
     if quizSongList == nil then return end
-    for i = -5, 5 do
+    local rows = Layout.list.rows_each_side
+    for i = -rows, rows do
         local node = quizSongList:GetSongNodeAtOffset(i)
         if node ~= nil and node.IsSong then
             currentPageCache[i] = {
                 node = node,
                 text = text:GetText(node.Title, false, 99999,
-                    i == 0 and COLOR:CreateColorFromARGB(255, 242, 207, 1) or nil),
+                    i == 0 and Config.color(Layout.list.highlight_color) or nil),
             }
         else
             currentPageCache[i] = nil
@@ -309,7 +313,7 @@ end
 function draw()
     if state == "waiting_enum" then
         if text ~= nil then
-            text:GetText(I18N.tr("Loading songs...")):DrawAtAnchor(960, 540, "center")
+            text:GetText(I18N.tr("Loading songs...")):DrawAtAnchor(Layout.loading.x, Layout.loading.y, "center")
         end
     elseif state == "opening" then
         Opening.draw()
@@ -453,11 +457,11 @@ end
 
 function onStart()
     I18N.detect()
-    text = TEXT:Create(16)
+    text = TEXT:Create(Layout.fonts.list)
 
     -- Text renderers
-    texts.title    = TEXT:Create(36)
-    texts.label    = TEXT:Create(22)
+    texts.title    = TEXT:Create(Layout.fonts.title)
+    texts.label    = TEXT:Create(Layout.fonts.label)
 
     -- Utils table injected into Game module
     local utils = {

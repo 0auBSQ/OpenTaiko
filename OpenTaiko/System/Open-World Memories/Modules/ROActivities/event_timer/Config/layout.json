@@ -1,0 +1,27 @@
+{
+    "_note": "Event Mode countdown hud, in 1920x1080 pixels. Colours are [r, g, b, a] from 0 to 255. Both lines use countdown.color; edge_color is their outline; text_nudge moves the text inside its glyph box.",
+    "pill": {
+        "_note": "the cream pill at the top-left, its top-left at x, y; each line after the first adds line_height; its corners are half its one-line height round",
+        "x": 24,
+        "y": 16,
+        "width": 236,
+        "height": 64,
+        "line_height": 30,
+        "color": [250, 242, 222, 235]
+    },
+    "countdown": {
+        "_note": "the seconds turn red (and tick each second) from red_from_s down; the text is at most the pill's width less text_margin wide; the plays line sits line_gap below the line height",
+        "font_size": 40,
+        "red_from_s": 10,
+        "text_margin": 40,
+        "line_gap": 4,
+        "color": [20, 18, 24, 255],
+        "red_color": [214, 40, 40, 255]
+    },
+    "plays": {
+        "font_size": 22,
+        "text_margin": 30
+    },
+    "text_nudge": -1,
+    "edge_color": [0, 0, 0, 0]
+}

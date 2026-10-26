@@ -14,33 +14,45 @@
 -- pop); any extra frames in between are shown during the wind-up.
 
 local Fx = require("modal_fx")
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
 
 local M = {}
 M.__index = M
 
-local CHEST_X = 960
-local FRAME = 512
-local BASE_ROW, MOUTH_ROW = 482, 270           -- the chest's base and where its light pours out, inside a frame
-local CUSHION_BOTTOM = 900                     -- where the cushion's bottom row lands
-local CUSHION_SEAT = 0.5                       -- the chest's base sits this far down the cushion (its top face)
-local GROUND_SEAT = 838                        -- where the chest's base rests without a cushion
-local DROP_FROM = -600
-local SMOKE_N = 30
-local WHEEL_SPEED = 24                         -- degrees per second
+local L = Layout.chest
+local T = Animation.chest
+local CHEST_X = L.x
+local FRAME = L.frame
+local BASE_ROW, MOUTH_ROW = L.base_row, L.mouth_row   -- the chest's base and where its light pours out, inside a frame
+local CUSHION_BOTTOM = L.cushion_bottom        -- where the cushion's bottom row lands
+local CUSHION_SEAT = L.cushion_seat            -- the chest's base sits this far down the cushion (its top face)
+local GROUND_SEAT = L.ground_seat              -- where the chest's base rests without a cushion
+local DROP_FROM = T.drop_from_y
+local SMOKE_N = L.smoke.count
+local WHEEL_SPEED = T.wheel_speed_deg_per_s    -- degrees per second
 
 -- timeline (seconds)
-local T_CUSHION, CUSHION_DROP = 0.8, 0.45
-local T_CHEST, CHEST_DROP = 1.45, 0.5
-local T_LATCH = 2.45
-local T_OPEN = 2.85
+local T_CUSHION, CUSHION_DROP = T.cushion_at_s, T.cushion_drop_s
+local T_CHEST, CHEST_DROP = T.chest_at_s, T.chest_drop_s
+local T_LATCH = T.latch_at_s
+local T_OPEN = T.open_at_s
 -- per rarity: how long the rattle builds before the lid pops, and how long the light is admired
-local PACE = {
-    poor = { windup = 0.25, admire = 0.70 }, common = { windup = 0.32, admire = 0.95 }, uncommon = { windup = 0.36, admire = 0.95 },
-    rare = { windup = 0.40, admire = 1.00 }, epic = { windup = 0.45, admire = 1.10 }, legendary = { windup = 1.00, admire = 1.40 },
-    mythical = { windup = 0.60, admire = 1.50 },
-}
-local FLASH_IN, FLASH_HOLD, FLASH_TO_BLACK, BLACK_HOLD = 0.22, 0.12, 0.45, 0.25
-local ATTIC_DUST = { 168, 154, 132 }
+local PACE = {}
+for _, r in ipairs(Fx.RARITIES) do PACE[r] = { windup = T.pace[r].windup_s, admire = T.pace[r].admire_s } end
+local FLASH_IN, FLASH_HOLD, FLASH_TO_BLACK, BLACK_HOLD = T.flash_in_s, T.flash_hold_s, T.flash_to_black_s, T.black_hold_s
+local ATTIC_DUST = L.attic_dust_color
+local SMOKE = Layout.chest.smoke
+local SMOKE_T = Animation.chest.smoke
+local SHADOW = Layout.chest.shadow
+local WHEEL = Layout.chest.wheel
+local DRIFT = Layout.chest.drift_motes
+local DRIFT_T = Animation.chest.drift_motes
+local RING_T = Animation.chest.dust_ring
+local POP_DUST = Animation.chest.pop_dust
+local POP_MOTES = Animation.chest.pop_motes
+local POP_SPARKS = Animation.chest.pop_sparks
 
 local sin, cos, pi, random, min, max, floor = math.sin, math.cos, math.pi, math.random, math.min, math.max, math.floor
 
@@ -81,16 +93,17 @@ function M:start(key)
 
     -- a screen of slow puffs, the outer ones rolling in first and the centre filling last; the
     -- attic gets a thinner, dustier haze
+    local farthest = SMOKE.min_dist + SMOKE.dist_range
     for i = 1, SMOKE_N do
-        local a = (i / SMOKE_N) * 2 * pi + random() * 0.4
-        local d = 180 + random() * 720
-        local x, y = 960 + cos(a) * d, 540 + sin(a) * d * 0.62
+        local a = (i / SMOKE_N) * 2 * pi + random() * SMOKE_T.angle_jitter
+        local d = SMOKE.min_dist + random() * SMOKE.dist_range
+        local x, y = SMOKE.cx + cos(a) * d, SMOKE.cy + sin(a) * d * SMOKE.squash_y
         local pool = (i % 2 == 0) and self.smoke or self.smoke2
-        local col = self.rainbow and Fx.rainbow(i / SMOKE_N, 0.2) or (self.attic and ATTIC_DUST or Fx.rarityColor(key))
-        pool:emit{ x = x, y = y, vx = -cos(a) * (18 + random() * 22), vy = -sin(a) * 10 - (8 + random() * 14),
-                   life = 60, s0 = 2.4 + random() * 2.2, s1 = 3.6 + random() * 2.6, rot = random() * 360,
-                   spin = (random() - 0.5) * 14, color = col, fade = "rise", rise = 0.35 + (1 - d / 900) * 0.9 + random() * 0.3,
-                   alpha = (self.attic and 0.22 or 0.5) + random() * (self.attic and 0.14 or 0.3) }
+        local col = self.rainbow and Fx.rainbow(i / SMOKE_N, SMOKE.rainbow_pastel) or (self.attic and ATTIC_DUST or Fx.rarityColor(key))
+        pool:emit{ x = x, y = y, vx = -cos(a) * (SMOKE_T.speed_min + random() * SMOKE_T.speed_range), vy = -sin(a) * SMOKE_T.vy_out - (SMOKE_T.rise_vy_min + random() * SMOKE_T.rise_vy_range),
+                   life = SMOKE_T.life_s, s0 = SMOKE_T.size_min + random() * SMOKE_T.size_range, s1 = SMOKE_T.size1_min + random() * SMOKE_T.size1_range, rot = random() * 360,
+                   spin = (random() - 0.5) * SMOKE_T.spin_range, color = col, fade = SMOKE_T.fade, rise = SMOKE_T.rise_min + (1 - d / farthest) * SMOKE_T.rise_by_dist + random() * SMOKE_T.rise_range,
+                   alpha = (self.attic and SMOKE_T.attic_alpha_min or SMOKE_T.alpha_min) + random() * (self.attic and SMOKE_T.attic_alpha_range or SMOKE_T.alpha_range) }
     end
 
     local tl = self.tl
@@ -101,13 +114,13 @@ function M:start(key)
         tl:at(T_CUSHION + CUSHION_DROP, function()
             self.cushionLandT = 0
             self.A:play("cushion")
-            self:dustRing(CHEST_X, CUSHION_BOTTOM - 30, 12, 260)
+            self:dustRing(CHEST_X, CUSHION_BOTTOM - L.cushion_dust_above, T.cushion_dust.count, T.cushion_dust.speed)
         end)
     end
     tl:at(T_CHEST + CHEST_DROP, function()
         self.landT, self.shakeT, self.cushionLandT = 0, 0, 0
         self.A:play(self.cue.land)
-        self:dustRing(CHEST_X, self:seatY(), 14, 320)
+        self:dustRing(CHEST_X, self:seatY(), T.land_dust.count, T.land_dust.speed)
     end)
     tl:at(T_LATCH, function() self.A:play(self.cue.latch) end)
     tl:at(T_OPEN, function() self.A:play(self.cue.open) end)
@@ -116,29 +129,30 @@ function M:start(key)
         local mouth = self:seatY() - (BASE_ROW - MOUTH_ROW)
         if self.attic then
             -- a cloud of dust and drifting motes instead of light
-            for _ = 1, 18 do
-                self.dust:emit{ x = CHEST_X + (random() - 0.5) * 200, y = mouth + random() * 40, vx = (random() - 0.5) * 220, vy = -(60 + random() * 160), drag = 1.8,
-                                life = 1.2 + random() * 0.8, s0 = 0.4, s1 = 1.6, rot = random() * 360, spin = (random() - 0.5) * 90, color = ATTIC_DUST, alpha = 0.55 }
+            for _ = 1, POP_DUST.count do
+                self.dust:emit{ x = CHEST_X + (random() - 0.5) * L.pop_dust_spread_x, y = mouth + random() * L.pop_dust_spread_y, vx = (random() - 0.5) * POP_DUST.vx_range, vy = -(POP_DUST.vy_min + random() * POP_DUST.vy_range), drag = POP_DUST.drag,
+                                life = POP_DUST.life_min + random() * POP_DUST.life_range, s0 = POP_DUST.size, s1 = POP_DUST.size1, rot = random() * 360, spin = (random() - 0.5) * POP_DUST.spin_range, color = ATTIC_DUST, alpha = POP_DUST.alpha }
             end
-            self.motes:burst(CHEST_X, mouth, 30, { angle = -pi / 2, spread = 2.4, speed = 160, size = 0.12, size1 = 0.05, life = 2.4, color = { 230, 214, 180 }, gravity = 20, fade = "hump" })
+            self.motes:burst(CHEST_X, mouth, POP_MOTES.count, { angle = -pi / 2, spread = POP_MOTES.spread, speed = POP_MOTES.speed, size = POP_MOTES.size, size1 = POP_MOTES.size1, life = POP_MOTES.life_s, color = L.motes_color, gravity = POP_MOTES.gravity, fade = POP_MOTES.fade })
         else
             self.A:play("sparkle")
+            local ps = POP_SPARKS
             if self.rainbow then
-                for i = 0, 5 do
-                    self.sparks:burst(CHEST_X, mouth, 8, { angle = -pi / 2, spread = 1.8, speed = 560, size = 0.4, life = 1.1, color = Fx.rainbow(i / 6, 0.1), gravity = 380 })
+                for i = 0, ps.rainbow_hues - 1 do
+                    self.sparks:burst(CHEST_X, mouth, ps.rainbow_count, { angle = -pi / 2, spread = ps.spread, speed = ps.speed, size = ps.size, life = ps.life_s, color = Fx.rainbow(i / ps.rainbow_hues, L.sparks_rainbow_pastel), gravity = ps.gravity })
                 end
             else
-                self.sparks:burst(CHEST_X, mouth, 44, { angle = -pi / 2, spread = 1.8, speed = 560, size = 0.4, life = 1.1, color = Fx.rarityColor(key), gravity = 380 })
+                self.sparks:burst(CHEST_X, mouth, ps.count, { angle = -pi / 2, spread = ps.spread, speed = ps.speed, size = ps.size, life = ps.life_s, color = Fx.rarityColor(key), gravity = ps.gravity })
             end
         end
-        self:dustRing(CHEST_X, self:seatY(), 10, 240)
+        self:dustRing(CHEST_X, self:seatY(), T.pop_ring_dust.count, T.pop_ring_dust.speed)
     end)
     tl:at(self.tFlash, function() self:flash() end)
 end
 
 local function cushionHeight(A)
     local h = A.tex.cushion and A.tex.cushion.Height or 0
-    if h <= 0 then h = 300 end          -- no cushion art: the shipped cushion's height
+    if h <= 0 then h = L.cushion_fallback_h end   -- no cushion art: the shipped cushion's height
     return h
 end
 
@@ -156,21 +170,21 @@ end
 
 -- the attic's dust motes: a slow, steady drift up through the haze
 function M:driftMotes(dt)
-    self.moteAcc = self.moteAcc + dt * 14
+    self.moteAcc = self.moteAcc + dt * DRIFT_T.per_s
     while self.moteAcc >= 1 do
         self.moteAcc = self.moteAcc - 1
-        self.motes:emit{ x = random() * 1920, y = 200 + random() * 900, vx = (random() - 0.5) * 24, vy = -(8 + random() * 22),
-                         life = 3 + random() * 3, s0 = 0.05 + random() * 0.09, s1 = 0.04, rot = random() * 360, spin = 40,
-                         color = { 232, 218, 186 }, fade = "hump", alpha = 0.6 }
+        self.motes:emit{ x = random() * DRIFT.w, y = DRIFT.y + random() * DRIFT.h, vx = (random() - 0.5) * DRIFT_T.vx_range, vy = -(DRIFT_T.vy_min + random() * DRIFT_T.vy_range),
+                         life = DRIFT_T.life_min + random() * DRIFT_T.life_range, s0 = DRIFT_T.size_min + random() * DRIFT_T.size_range, s1 = DRIFT_T.size1, rot = random() * 360, spin = DRIFT_T.spin,
+                         color = DRIFT.color, fade = DRIFT_T.fade, alpha = DRIFT_T.alpha }
     end
 end
 
 function M:dustRing(x, y, n, speed)
     for i = 1, n do
         local a = (i / n) * 2 * pi
-        self.dust:emit{ x = x, y = y, vx = cos(a) * speed, vy = sin(a) * speed * 0.25 - 40, drag = 2.5,
-                        life = 0.6 + random() * 0.3, s0 = 0.5, s1 = 1.4, rot = random() * 360, spin = (random() - 0.5) * 120,
-                        color = { 235, 225, 215 }, alpha = 0.7 }
+        self.dust:emit{ x = x, y = y, vx = cos(a) * speed, vy = sin(a) * speed * RING_T.squash_y - RING_T.lift, drag = RING_T.drag,
+                        life = RING_T.life_min + random() * RING_T.life_range, s0 = RING_T.size, s1 = RING_T.size1, rot = random() * 360, spin = (random() - 0.5) * RING_T.spin_range,
+                        color = L.dust_ring_color, alpha = RING_T.alpha }
     end
 end
 
@@ -206,8 +220,8 @@ end
 
 -- the shadow on the ground, gathering under whatever is coming down
 function M:drawShadow(fade, sx, sy, groundY, height, width)
-    local k = min(1, height / 500)
-    Fx.draw(self.A.tex.glow, CHEST_X + sx, groundY + sy, { sx = width - 0.4 * k, sy = 0.36, opacity = fade * (0.6 - 0.35 * k), color = { 0, 0, 0 } })
+    local k = min(1, height / SHADOW.fade_height)
+    Fx.draw(self.A.tex.glow, CHEST_X + sx, groundY + sy, { sx = width - SHADOW.shrink * k, sy = SHADOW.height_scale, opacity = fade * (SHADOW.opacity - SHADOW.opacity_drop * k), color = SHADOW.color })
 end
 
 -- the cushion: its drop and the squash whenever something lands on it
@@ -218,9 +232,9 @@ function M:drawCushion(fade, sx, sy)
     local cush = A.tex.cushion
     local h = cushionHeight(A)
     local bottom = Fx.lerp(DROP_FROM, CUSHION_BOTTOM, Fx.inQuad(ck))
-    local sq = Fx.hump(Fx.span(self.cushionLandT, 0, 0.3)) * 0.16
-    self:drawShadow(fade, sx, sy, CUSHION_BOTTOM - 40, CUSHION_BOTTOM - bottom, 1.7)
-    Fx.draw(cush, CHEST_X + sx, bottom + sy, { anchor = "bottom", sx = 1 + sq * 0.7, sy = 1 - sq, opacity = fade })
+    local sq = Fx.hump(Fx.span(self.cushionLandT, 0, T.cushion_squash_s)) * T.cushion_squash
+    self:drawShadow(fade, sx, sy, CUSHION_BOTTOM - SHADOW.cushion_above, CUSHION_BOTTOM - bottom, SHADOW.cushion_w)
+    Fx.draw(cush, CHEST_X + sx, bottom + sy, { anchor = "bottom", sx = 1 + sq * T.cushion_squash_x, sy = 1 - sq, opacity = fade })
     return h * sq * (1 - CUSHION_SEAT)      -- how much lower the seat sits while the cushion is squashed
 end
 
@@ -233,15 +247,15 @@ function M:drawChest(fade, sx, sy, sink)
     local bottom = Fx.lerp(DROP_FROM, seat + (FRAME - BASE_ROW), Fx.inQuad(dk))
     local scx, scy, rot, dx, dy = 1, 1, 0, 0, 0
     if not self.withCushion then
-        self:drawShadow(fade, sx, sy, seat, seat + (FRAME - BASE_ROW) - bottom, 1.35)
+        self:drawShadow(fade, sx, sy, seat, seat + (FRAME - BASE_ROW) - bottom, SHADOW.ground_w)
     end
 
-    local land = Fx.hump(Fx.span(self.landT, 0, 0.28)) * 0.10
-    scx, scy = scx * (1 + land * 0.5), scy * (1 - land)
+    local land = Fx.hump(Fx.span(self.landT, 0, T.land_squash_s)) * T.land_squash
+    scx, scy = scx * (1 + land * T.land_squash_x), scy * (1 - land)
 
     if t >= T_LATCH and t < T_OPEN then
         local k = 1 - Fx.span(t, T_LATCH, T_OPEN - T_LATCH)
-        dx = sin((t - T_LATCH) * 60) * 2.5 * k
+        dx = sin((t - T_LATCH) * T.latch_jiggle_freq) * T.latch_jiggle_px * k
     end
 
     local frames = max(1, floor((self.chestTex.Width or 0) / FRAME))
@@ -249,29 +263,29 @@ function M:drawChest(fade, sx, sy, sink)
     if t >= T_OPEN and t < self.tPop then
         -- the wind-up: the rattle builds, the chest squats down ready to spring
         local k = Fx.span(t, T_OPEN, self.windup)
-        dx = dx + sin(t * 95) * 8 * k
-        rot = sin(t * 71) * 3.5 * k
-        scx, scy = scx * (1 + 0.10 * k * k), scy * (1 - 0.12 * k * k)
+        dx = dx + sin(t * T.rattle_freq) * T.rattle_px * k
+        rot = sin(t * T.rattle_rot_freq) * T.rattle_rot_deg * k
+        scx, scy = scx * (1 + T.squat_x * k * k), scy * (1 - T.squat_y * k * k)
         if frames > 2 then frame = min(frames - 2, floor(k * (frames - 1))) end
     elseif t >= self.tPop then
         -- the pop: open frame, a stretch that overshoots and settles, a hop and a bounce
         frame = frames - 1
-        local p = Fx.span(self.popT, 0, 0.45)
-        local stretch = 1 + 0.48 * (1 - Fx.outBack(p, 2.4)) * (p < 1 and 1 or 0)
-        local settle = Fx.outBack(p, 2.0)
-        scy = scy * (0.88 + 0.12 * settle) * stretch
-        scx = scx * (1.12 - 0.12 * settle) / (stretch > 1 and (0.5 + stretch * 0.5) or 1)
-        dy = -Fx.hump(Fx.span(self.popT, 0, 0.34)) * 58
-        rot = sin(self.popT * 30) * 2 * (1 - Fx.span(self.popT, 0, 0.5))
+        local p = Fx.span(self.popT, 0, T.pop_s)
+        local stretch = 1 + T.pop_stretch * (1 - Fx.outBack(p, T.pop_stretch_overshoot)) * (p < 1 and 1 or 0)
+        local settle = Fx.outBack(p, T.pop_settle_overshoot)
+        scy = scy * (T.pop_squash_y + T.pop_settle_y * settle) * stretch
+        scx = scx * (T.pop_squash_x - T.pop_settle_x * settle) / (stretch > 1 and (0.5 + stretch * 0.5) or 1)
+        dy = -Fx.hump(Fx.span(self.popT, 0, T.pop_hop_s)) * T.pop_hop_px
+        rot = sin(self.popT * T.pop_wobble_freq) * T.pop_wobble_deg * (1 - Fx.span(self.popT, 0, T.pop_wobble_s))
     end
 
     -- the light inside, before the chest so it spills out of the mouth as the lid lifts (the
     -- attic only stirs up a dim haze)
     if t >= self.tPop then
-        local g = Fx.outQuad(Fx.span(self.popT, 0, 0.6))
-        local flare = 1 + 1.2 * Fx.hump(Fx.span(self.popT, 0, 0.25))
-        local strength = self.attic and 0.35 or 1
-        Fx.draw(A.tex.glow, CHEST_X + sx, seat - (BASE_ROW - MOUTH_ROW) + sy + dy - 110 * g, { s = (0.9 + 3.0 * g) * flare, opacity = fade * min(1, g * 1.5) * strength, color = self:color(), blend = "add" })
+        local g = Fx.outQuad(Fx.span(self.popT, 0, T.light_s))
+        local flare = 1 + T.light_flare * Fx.hump(Fx.span(self.popT, 0, T.light_flare_s))
+        local strength = self.attic and L.light_attic_opacity or 1
+        Fx.draw(A.tex.glow, CHEST_X + sx, seat - (BASE_ROW - MOUTH_ROW) + sy + dy - L.light_rise_px * g, { s = (T.light_scale_start + T.light_scale_grow * g) * flare, opacity = fade * min(1, g * T.light_fade_in) * strength, color = self:color(), blend = "add" })
     end
     Fx.draw(self.chestTex, CHEST_X + sx + dx, bottom + sy + dy, { rx = frame * FRAME, ry = 0, rw = FRAME, rh = FRAME, anchor = "bottom",
                                                                  sx = scx, sy = scy, rot = rot, opacity = fade })
@@ -279,18 +293,18 @@ end
 
 function M:draw()
     local A = self.A
-    local fade = Fx.span(self.t, 0, 0.45)
-    Fx.fill(A.fillCv, { 0, 0, 0 }, 0.82 * fade)
+    local fade = Fx.span(self.t, 0, T.fade_in_s)
+    Fx.fill(A.fillCv, L.overlay_color, L.overlay_opacity * fade)
     self.smoke:draw(fade) ; self.smoke2:draw(fade)
     if self.attic then
         self.motes:draw(fade)
     else
         -- the wheel of light turns through the smoke
         local wheelCol = self.rainbow and self:color() or nil
-        Fx.draw(A.tex.wheel, 960, 540, { s = 1.7, rot = self.wheelRot, opacity = 0.18 * fade, blend = "add", color = wheelCol })
-        Fx.draw(A.tex.wheel, 960, 540, { s = 1.2, rot = -self.wheelRot * 0.6, opacity = 0.10 * fade, blend = "add", color = wheelCol })
+        Fx.draw(A.tex.wheel, WHEEL.cx, WHEEL.cy, { s = WHEEL.scale, rot = self.wheelRot, opacity = WHEEL.opacity * fade, blend = "add", color = wheelCol })
+        Fx.draw(A.tex.wheel, WHEEL.cx, WHEEL.cy, { s = WHEEL.inner_scale, rot = -self.wheelRot * T.wheel_inner_speed_ratio, opacity = WHEEL.inner_opacity * fade, blend = "add", color = wheelCol })
     end
-    local sx, sy = Fx.shake(9, self.shakeT, 0.35)
+    local sx, sy = Fx.shake(T.shake_px, self.shakeT, T.shake_s)
     local sink = self.withCushion and self:drawCushion(fade, sx, sy) or 0
     self:drawChest(fade, sx, sy, sink)
     self.dust:draw(fade)
@@ -299,9 +313,9 @@ function M:draw()
     if self.flashT ~= nil then
         local ft = self.flashT
         local white = Fx.outQuad(Fx.span(ft, 0, FLASH_IN))
-        Fx.fill(A.fillCv, { 255, 255, 255 }, white)
+        Fx.fill(A.fillCv, L.flash_color, white)
         local dark = Fx.inQuad(Fx.span(ft, FLASH_IN + FLASH_HOLD, FLASH_TO_BLACK))
-        Fx.fill(A.fillCv, { 0, 0, 0 }, dark)
+        Fx.fill(A.fillCv, L.settle_color, dark)
     end
 end
 

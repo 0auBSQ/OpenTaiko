@@ -3,22 +3,32 @@
 -- The settings screen: gray, with connected L lines scrolling left and the crossed tools in the middle.
 -- It opens and closes as a circle at the screen centre.
 
+-- positions and sizes: Config/SettingsIris/layout.json; timings: Config/SettingsIris/animation.json
+local HERE = require("Core.Here")(...)
+local Config = require("Core.Config")
+local Layout = Config.load(HERE .. "Config/SettingsIris/layout.json")
+local Animation = Config.load(HERE .. "Config/SettingsIris/animation.json")
+
 local TA = require("TransitionArt")
 
 local SI = {}
 SI.__index = SI
 
-SI.OUT_SECONDS = 0.6
-SI.IN_SECONDS = 0.6
+SI.OUT_SECONDS = Animation.out_s
+SI.IN_SECONDS = Animation.in_s
 
 local SCREEN_W, SCREEN_H = 1920, 1080
 local CX, CY = SCREEN_W / 2, SCREEN_H / 2
-local R_FULL = math.sqrt(CX * CX + CY * CY) + 14   -- past the corners, ring included
-local SCROLL = 60                  -- px/s the lines move left
-local TOOLS_HALF = 288             -- half of Tools.png
-local RING_R = 502                 -- Ring.png: radius of its line (1024 px image)
-local EDGE_ERR = 1.5               -- px: largest step of the circle's edge (it is built from clipped rows)
-local MAX_ROW = 8
+local R_FULL = math.sqrt(CX * CX + CY * CY) + Layout.full_radius_pad   -- past the corners, ring included
+local SCROLL = Animation.scroll_px_per_s   -- px/s the lines move left
+local TOOLS_HALF = Layout.tools_half       -- half of Tools.png
+local Ring = Layout.ring
+local RING_R = Ring.radius                 -- Ring.png: radius of its line (1024 px image)
+local EDGE_ERR = Layout.edge.max_step      -- px: largest step of the circle's edge (it is built from clipped rows)
+local MAX_ROW = Layout.edge.max_row
+local Tools = Animation.tools
+local TOOLS_START, TOOLS_CHANGE = Tools.start_scale, Tools.scale_change
+local MAX_DT = Animation.max_frame_s
 
 local function clamp01(x) return x < 0 and 0 or (x > 1 and 1 or x) end
 local function ease(x) return x < 0.5 and 4 * x * x * x or 1 - (-2 * x + 2) ^ 3 / 2 end
@@ -26,7 +36,7 @@ local function ease(x) return x < 0.5 and 4 * x * x * x or 1 - (-2 * x + 2) ^ 3 
 local function frameDt()
 	local ok, d = pcall(function() return fps.deltaTime end)
 	d = ok and tonumber(d) or 0
-	return d < 0 and 0 or (d > 0.1 and 0.1 or d)
+	return d < 0 and 0 or (d > MAX_DT and MAX_DT or d)
 end
 
 -- way: "in" (title -> settings) or "back"
@@ -91,7 +101,7 @@ end
 
 function SI:drawRing(r)
 	local ring = self.ring
-	local a = clamp01((r - 16) / 48)   -- shrunk this far the thin line would break into dots, so it fades
+	local a = clamp01((r - Ring.fade_from) / Ring.fade_range)   -- shrunk this far the thin line would break into dots, so it fades
 	if ring == nil or not ring.Loaded or a <= 0 then return end
 	local s = r / RING_R
 	ring:SetScale(s, s); ring:SetOpacity(a)
@@ -161,7 +171,7 @@ function SI:fadeOut(t)
 	self:enter("out")
 	t = self.wait:progress(t, self.pattern, self.tools, self.ring)
 	local e = ease(clamp01(t))
-	if self.way == "in" then self:drawDisc(R_FULL * e, 0.6 + 0.4 * e)
+	if self.way == "in" then self:drawDisc(R_FULL * e, TOOLS_START + TOOLS_CHANGE * e)
 	else self:drawHole(R_FULL * (1 - e), 1) end
 end
 
@@ -178,7 +188,7 @@ function SI:fadeIn(t)
 	self:enter("in")
 	local e = ease(clamp01(t))
 	if self.way == "in" then self:drawHole(R_FULL * e, 1)
-	else self:drawDisc(R_FULL * (1 - e), 1 - 0.4 * e) end
+	else self:drawDisc(R_FULL * (1 - e), 1 - TOOLS_CHANGE * e) end
 	if t >= 1 then self:freeTextures() end   -- the trip is over
 end
 

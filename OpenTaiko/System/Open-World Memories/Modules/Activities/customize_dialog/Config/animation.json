@@ -1,0 +1,18 @@
+{
+    "_note": "Customize dialog animation.",
+    "slide": {
+        "_note": "The screen slides up from below on open and back down on close: distance_px in duration_s; it fades in over the last fade_distance_px of the slide.",
+        "distance_px": 1080,
+        "duration_s": 0.5,
+        "fade_distance_px": 540
+    },
+    "puchichara_float": {
+        "_note": "The preview puchichara bobs on a sine: its phase turns speed_deg_per_s, its height swings amplitude_px up and down.",
+        "speed_deg_per_s": 120,
+        "amplitude_px": 15
+    },
+    "palette_lock_flash": {
+        "_note": "Choosing a locked palette flashes the lock message red, back to white in duration_s.",
+        "duration_s": 0.5
+    }
+}

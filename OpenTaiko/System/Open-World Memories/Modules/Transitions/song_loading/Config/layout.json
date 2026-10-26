@@ -1,0 +1,30 @@
+{
+    "_note": "Song loading screen layout, in 1920x1080 pixels, centred. SetColor colours are [r, g, b] from 0 to 1; opacities 0 to 1.",
+    "plate": { "x": 960, "y": 540 },
+    "title": { "x": 960, "y": 420, "font_size": 46 },
+    "subtitle": { "x": 960, "y": 487, "font_size": 30 },
+    "danplate": { "x": 1682, "y": 320 },
+    "characters": {
+        "_note": "a render taller than max_height is shrunk to it",
+        "opacity": 0.3,
+        "max_height": 1450
+    },
+    "nameplate": {
+        "_note": "centred under each player's slot, bottom_offset above the bottom of the screen",
+        "width": 384,
+        "bottom_offset": 200
+    },
+    "bar": {
+        "_note": "the progress bar, bottom centre: bottom_offset above the bottom of the screen",
+        "width": 640,
+        "height": 14,
+        "bottom_offset": 70,
+        "border": 2,
+        "border_color": [1, 1, 1],
+        "border_opacity": 0.25,
+        "track_color": [0.12, 0.12, 0.12],
+        "track_opacity": 1.0,
+        "fill_color": [0.95, 0.62, 0.10],
+        "fill_opacity": 1.0
+    }
+}

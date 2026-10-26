@@ -11,54 +11,60 @@
 --   M.draw(abs_x, abs_y, dan_songs, dan_exams) — draw all bars + exam panel
 
 local M = {}
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local Contents = Layout.contents
+local Songs, SongBar, ExamBar, ExamValues = Contents.songs, Contents.song_bar, Contents.exam_bar, Contents.exam_values
 
 -- ── Constants ─────────────────────────────────────────────────────────────────
 
 local TX = "Textures/Contents/"
 
 -- Clip window, relative to Contents.png top-left (y only)
-local CLIP_Y1 = 33
-local CLIP_Y2 = 334
+local CLIP_Y1 = Contents.clip_top
+local CLIP_Y2 = Contents.clip_bottom
 
 -- Bar layout within Contents.png
-local BAR_X       = 49
-local BAR_Y_FIRST = 38
-local BAR_GAP_Y   = 100
+local BAR_X       = Songs.x
+local BAR_Y_FIRST = Songs.first_y
+local BAR_GAP_Y   = Songs.gap_y
 
 -- Positions within DanSong.png (relative to its own top-left)
-local NB_REL_X      = 0    ; local NB_REL_Y      = 0
-local NB_TXT_REL_X  = 46   ; local NB_TXT_REL_Y  = 49
-local DIFF_REL_X    = 94   ; local DIFF_REL_Y     = 0
-local LVL_REL_X     = 156  ; local LVL_REL_Y      = 74
-local TITLE_REL_X   = 250  ; local TITLE_REL_Y    = 32  ; local TITLE_MAX_W    = 840
-local SUB_REL_X     = 250  ; local SUB_REL_Y      = 72  ; local SUB_MAX_W      = 840
+local NB_REL_X      = SongBar.nb.x        ; local NB_REL_Y      = SongBar.nb.y
+local NB_TXT_REL_X  = SongBar.nb_text.x   ; local NB_TXT_REL_Y  = SongBar.nb_text.y
+local DIFF_REL_X    = SongBar.diff.x      ; local DIFF_REL_Y     = SongBar.diff.y
+local LVL_REL_X     = SongBar.level.x     ; local LVL_REL_Y      = SongBar.level.y
+local TITLE_REL_X   = SongBar.title.x     ; local TITLE_REL_Y    = SongBar.title.y  ; local TITLE_MAX_W    = SongBar.title.max_width
+local SUB_REL_X     = SongBar.sub.x       ; local SUB_REL_Y      = SongBar.sub.y    ; local SUB_MAX_W      = SongBar.sub.max_width
 
 -- Scroll speed (pixels per second, bars move up)
-local SCROLL_SPEED = 35.0
+local SCROLL_SPEED = Animation.contents.scroll_px_per_s
 
 -- Gauge drawing (EXAM1), position relative to Contents.png, without anchor
-local GAUGE_X = 421
-local GAUGE_Y = 335
+local GAUGE_X = Contents.gauge.x
+local GAUGE_Y = Contents.gauge.y
 
 -- Exam grid top-left, relative to Contents.png, without anchor
-local EXAM_GRID_X = 36
-local EXAM_GRID_Y = 369
+local EXAM_GRID_X = Contents.exam_grid.x
+local EXAM_GRID_Y = Contents.exam_grid.y
+local EXAM_GRID_GAP = Contents.exam_grid.gap
 
 -- Positions within each DanExam bar (relative to its own top-left)
-local EXAM_NAME_REL_X    = 0   -- ExamName.png
-local EXAM_NAME_REL_Y    = 0
-local EXAM_RANGE_REL_X   = 0   -- ExamRange.png
-local EXAM_RANGE_REL_Y   = 63
-local EXAM_TXT_NAME_CX   = 110 -- exam name text, center-x
-local EXAM_TXT_NAME_CY   = 35  -- exam name text, center-y
-local EXAM_TXT_RANGE_CX  = 110 -- exam range text, center-x
-local EXAM_TXT_RANGE_CY  = 98  -- exam range text, center-y
-local EXAM_TXT_MAX_W     = 220
+local EXAM_NAME_REL_X    = ExamBar.name.x   -- ExamName.png
+local EXAM_NAME_REL_Y    = ExamBar.name.y
+local EXAM_RANGE_REL_X   = ExamBar.range.x   -- ExamRange.png
+local EXAM_RANGE_REL_Y   = ExamBar.range.y
+local EXAM_TXT_NAME_CX   = ExamBar.name_text.x -- exam name text, center-x
+local EXAM_TXT_NAME_CY   = ExamBar.name_text.y  -- exam name text, center-y
+local EXAM_TXT_RANGE_CX  = ExamBar.range_text.x -- exam range text, center-x
+local EXAM_TXT_RANGE_CY  = ExamBar.range_text.y  -- exam range text, center-y
+local EXAM_TXT_MAX_W     = ExamBar.text_max_width
 
 -- Outline colours for exam elements (dark brown for name; red/blue for range)
-local EXAM_NAME_OUTLINE   = {101,  67,  33}  -- dark brown (SaddleBrown-ish)
-local EXAM_RANGE_MORE_COL = {139,   0,   0}  -- dark red
-local EXAM_RANGE_LESS_COL = {  0,   0, 100}  -- dark blue
+local EXAM_NAME_OUTLINE   = ExamBar.name_outline_color
+local EXAM_RANGE_MORE_COL = ExamBar.range_more_color
+local EXAM_RANGE_LESS_COL = ExamBar.range_less_color
 
 -- Range display strings (RangeAsInt: 0=More, 1=Less)
 local EXAM_RANGE_STRINGS  = {"or More", "Less than"}
@@ -69,42 +75,26 @@ local NUM_CHAR_IDX = {}
 for i = 1, #NUM_CHARS do NUM_CHAR_IDX[NUM_CHARS:sub(i,i)] = i end
 
 -- Exam value display — global exam (relative to exam bar TL)
-local EXAM_GVAL_X  = 250  ; local EXAM_GVAL_Y  = 35   -- left-center anchor
-local EXAM_GBEST_X = 250  ; local EXAM_GBEST_Y = 98
+local EXAM_GVAL_X  = ExamBar.global_value.x  ; local EXAM_GVAL_Y  = ExamBar.global_value.y   -- left-center anchor
+local EXAM_GBEST_X = ExamBar.global_best.x   ; local EXAM_GBEST_Y = ExamBar.global_best.y
 
 -- ExamValue block layout — individual exams
-local EV_START_X    = 220   -- first block left edge, relative to bar
-local EV_CLIP_PAD_R = 7     -- right clip inset: clip_x2 = bar_x + bar_w - 7
-local EV_ORD_CX     = 57   ; local EV_ORD_CY  = 22    -- ordinal, centered in block
-local EV_VAL_CX     = 57   ; local EV_VAL_CY  = 71    -- value, centered in block
-local EV_BEST_CX    = 57   ; local EV_BEST_CY = 110   -- best score, centered
+local EV_START_X    = ExamValues.start_x   -- first block left edge, relative to bar
+local EV_CLIP_PAD_R = ExamValues.clip_pad_right     -- right clip inset: clip_x2 = bar_x + bar_w - EV_CLIP_PAD_R
+local EV_ORD_CX     = ExamValues.ordinal.x   ; local EV_ORD_CY  = ExamValues.ordinal.y    -- ordinal, centered in block
+local EV_VAL_CX     = ExamValues.value.x     ; local EV_VAL_CY  = ExamValues.value.y    -- value, centered in block
+local EV_BEST_CX    = ExamValues.best.x      ; local EV_BEST_CY = ExamValues.best.y   -- best score, centered
 
-local EV_SCROLL_THRES_SHORT = 4    -- DanExam scrolls at ≥4 songs
-local EV_SCROLL_THRES_LONG  = 9    -- DanExamLong scrolls at ≥9 songs
-local EV_SCROLL_SPEED       = 40.0
+local EV_SCROLL_THRES_SHORT = ExamValues.scroll_from_short    -- DanExam scrolls from this many songs
+local EV_SCROLL_THRES_LONG  = ExamValues.scroll_from_long    -- DanExamLong scrolls from this many songs
+local EV_SCROLL_SPEED       = Animation.contents.exam_scroll_px_per_s
 
--- Ordinal stamp colours (1 = 1st … ≥10 all use Black)
-local STAMP_COLORS = {
-    {255,   0,   0},   -- 1st  Red
-    {  0, 128,   0},   -- 2nd  Green
-    {  0,   0, 255},   -- 3rd  Blue
-    {255,   0, 255},   -- 4th  Magenta
-    {255, 255,   0},   -- 5th  Yellow
-    {  0, 255, 255},   -- 6th  Cyan
-    {165,  42,  42},   -- 7th  Brown
-    {128, 128, 128},   -- 8th  Gray
-    {  0, 100,   0},   -- 9th  DarkGreen
-    {  0,   0,   0},   -- 10th+ Black
-}
+-- Ordinal stamp colours (song 1, 2, …; the last one for every song after)
+local STAMP_COLORS = Contents.stamp_colors.list
+local STAMP_OUTLINE_SHADE = Contents.stamp_colors.outline_shade
 
--- Difficulty outline colours indexed by DifficultyAsInt (0–4)
-local DIFF_OUTLINE = {
-    [0] = {  0,   0, 100},   -- Easy    dark blue
-    [1] = {  0, 100,   0},   -- Normal  dark green
-    [2] = {150, 110,   0},   -- Hard    dark yellow
-    [3] = {139,   0,   0},   -- Extreme dark red
-    [4] = { 75,   0, 130},   -- Edit    dark purple
-}
+-- Difficulty outline colours, DifficultyAsInt (0–4) + 1
+local DIFF_OUTLINE = Contents.diff_outline_colors.list
 
 -- ── Module state ──────────────────────────────────────────────────────────────
 
@@ -157,7 +147,7 @@ local function stampColors(idx)
     local c = STAMP_COLORS[math.min(idx, #STAMP_COLORS)]
     local r, g, b = c[1], c[2], c[3]
     return r, g, b,
-           math.floor(r * 0.45), math.floor(g * 0.45), math.floor(b * 0.45)
+           math.floor(r * STAMP_OUTLINE_SHADE), math.floor(g * STAMP_OUTLINE_SHADE), math.floor(b * STAMP_OUTLINE_SHADE)
 end
 
 -- Clip-draw a texture whose top-left is at (rel_x, rel_y) relative to Contents.png.
@@ -232,18 +222,19 @@ function M.load()
     tx_exam_long  = TEXTURE:CreateTexture(TX .. "DanExamLong.png")
     tx_exam_value = TEXTURE:CreateTexture(TX .. "ExamValue.png")
     if font_title == nil then
-        font_title      = TEXT:Create(28, "regular")
-        font_sub        = TEXT:Create(20, "regular")
-        font_nb         = TEXT:Create(22, "regular")
-        font_level      = TEXT:Create(22, "regular")
-        font_exam_name  = TEXT:Create(20, "regular")
-        font_exam_range = TEXT:Create(18, "regular")
-        font_num_big    = TEXT:Create(28, "regular")
-        font_num_sml    = TEXT:Create(20, "regular")
+        local Fonts = Contents.fonts
+        font_title      = TEXT:Create(Fonts.title, "regular")
+        font_sub        = TEXT:Create(Fonts.sub, "regular")
+        font_nb         = TEXT:Create(Fonts.ordinal, "regular")
+        font_level      = TEXT:Create(Fonts.level, "regular")
+        font_exam_name  = TEXT:Create(Fonts.exam_name, "regular")
+        font_exam_range = TEXT:Create(Fonts.exam_range, "regular")
+        font_num_big    = TEXT:Create(Fonts.number_big, "regular")
+        font_num_sml    = TEXT:Create(Fonts.number_small, "regular")
     end
     -- Pre-bake number char textures (black, no outline)
-    local black      = COLOR:CreateColorFromARGB(255, 0, 0, 0)
-    local no_outline = COLOR:CreateColorFromARGB(0, 0, 0, 0)
+    local black      = Config.color(Contents.number_color)
+    local no_outline = Config.color(Contents.clear_color)
     num_big = {}  ; num_sml = {}
     for i = 1, #NUM_CHARS do
         local c = NUM_CHARS:sub(i, i)
@@ -283,7 +274,7 @@ end
 -- ── Update ─────────────────────────────────────────────────────────────────────
 
 function M.update(dt, song_count)
-    if song_count < 4 then
+    if song_count < Songs.scroll_from then
         scroll_y = 0.0
     else
         local total_h = song_count * BAR_GAP_Y
@@ -292,7 +283,7 @@ function M.update(dt, song_count)
 
     -- ExamValue horizontal scroll (individual exam blocks)
     if song_count >= EV_SCROLL_THRES_SHORT then
-        local ev_w    = (tx_exam_value ~= nil and tx_exam_value.Width > 0) and tx_exam_value.Width or 60
+        local ev_w    = (tx_exam_value ~= nil and tx_exam_value.Width > 0) and tx_exam_value.Width or ExamValues.block_w_fallback
         local total_x = song_count * ev_w
         exam_val_scroll_x = (exam_val_scroll_x + EV_SCROLL_SPEED * dt) % total_x
     else
@@ -304,9 +295,9 @@ end
 
 -- Draw a single DanSong bar (all elements) at Contents-relative position (bar_rel_x, bar_rel_y).
 local function drawBar(song_idx, ds, bar_rel_x, bar_rel_y, abs_x, abs_y)
-    local white     = COLOR:CreateColorFromARGB(255, 255, 255, 255)
-    local black     = COLOR:CreateColorFromARGB(255,   0,   0,   0)
-    local no_outline = COLOR:CreateColorFromARGB(  0,   0,   0,   0)
+    local white     = Config.color(Contents.text_color)
+    local black     = Config.color(Contents.number_color)
+    local no_outline = Config.color(Contents.clear_color)
 
     -- ── DanSong container ────────────────────────────────────────────────────
     drawTexClipped(tx_dan_song, bar_rel_x, bar_rel_y, abs_x, abs_y)
@@ -325,7 +316,7 @@ local function drawBar(song_idx, ds, bar_rel_x, bar_rel_y, abs_x, abs_y)
 
     -- Ordinal text
     local outline_dark = COLOR:CreateColorFromARGB(255, dr, dg, db)
-    drawTextCenter(font_nb, ordinal(song_idx), 120, white, outline_dark,
+    drawTextCenter(font_nb, ordinal(song_idx), SongBar.nb_text.max_width, white, outline_dark,
         bar_rel_x + NB_TXT_REL_X,
         bar_rel_y + NB_TXT_REL_Y,
         abs_x, abs_y)
@@ -341,9 +332,9 @@ local function drawBar(song_idx, ds, bar_rel_x, bar_rel_y, abs_x, abs_y)
         abs_x, abs_y)
 
     -- Level number
-    local dc = DIFF_OUTLINE[diff] or DIFF_OUTLINE[0]
+    local dc = DIFF_OUTLINE[diff + 1] or DIFF_OUTLINE[1]
     local lvl_outline = COLOR:CreateColorFromARGB(255, dc[1], dc[2], dc[3])
-    drawTextCenter(font_level, tostring(ds.Level), 80, white, lvl_outline,
+    drawTextCenter(font_level, tostring(ds.Level), SongBar.level.max_width, white, lvl_outline,
         bar_rel_x + LVL_REL_X,
         bar_rel_y + LVL_REL_Y,
         abs_x, abs_y)
@@ -431,7 +422,7 @@ local function drawOneEV(scr_x, scr_y, si, se, best_score, clip_x1, clip_x2)
     if vis_l >= vis_r then return end
 
     local r, g, b, dr, dg, db = stampColors(si)
-    local white = COLOR:CreateColorFromARGB(255, 255, 255, 255)
+    local white = Config.color(Contents.text_color)
 
     -- ExamValue background (tinted with ordinal colour)
     tx_exam_value:SetColor(COLOR:CreateColorFromARGB(255, r, g, b))
@@ -441,7 +432,7 @@ local function drawOneEV(scr_x, scr_y, si, se, best_score, clip_x1, clip_x2)
     -- Ordinal text (white with dark ordinal outline, horizontally clipped)
     -- Uses the same 25px left-pad / visual_w = Width-50 math as drawNumStr.
     local dark_col = COLOR:CreateColorFromARGB(255, dr, dg, db)
-    local ot = font_nb ~= nil and font_nb:GetText(ordinal(si), false, 120, white, dark_col) or nil
+    local ot = font_nb ~= nil and font_nb:GetText(ordinal(si), false, SongBar.nb_text.max_width, white, dark_col) or nil
     if ot ~= nil then
         local vw    = math.max(1, ot.Width  - 50)
         local vh    = math.max(1, ot.Height - 25)
@@ -472,7 +463,7 @@ end
 -- is_long       = true when bar is DanExamLong (higher scroll threshold)
 local function drawIndivExamValues(bar_x, bar_y, bar_w, song_count, song_exams, best_scores, is_long)
     if tx_exam_value == nil then return end
-    local ev_w      = (tx_exam_value.Width  > 0) and tx_exam_value.Width  or 60
+    local ev_w      = (tx_exam_value.Width  > 0) and tx_exam_value.Width  or ExamValues.block_w_fallback
     local clip_x1   = bar_x + EV_START_X
     local clip_x2   = bar_x + bar_w - EV_CLIP_PAD_R
     local threshold = is_long and EV_SCROLL_THRES_LONG or EV_SCROLL_THRES_SHORT
@@ -512,7 +503,7 @@ end
 -- is_long     = true when bar is DanExamLong
 local function drawExamBar(exam_ref, bar_x, bar_y, bar_w,
                            is_indiv, song_count, song_exams, best_scores, is_long)
-    local white     = COLOR:CreateColorFromARGB(255, 255, 255, 255)
+    local white     = Config.color(Contents.text_color)
     local is_more   = (exam_ref.RangeAsInt == 0)
     local rc        = is_more and EXAM_RANGE_MORE_COL or EXAM_RANGE_LESS_COL
     local rng_color = COLOR:CreateColorFromARGB(255, rc[1], rc[2], rc[3])
@@ -571,9 +562,9 @@ end
 local function drawExams(dan_exams, dan_songs, dan_song_exams, dan_best_play, abs_x, abs_y)
     if dan_exams == nil then return end
 
-    local white    = COLOR:CreateColorFromARGB(255, 255, 255, 255)
-    local yellow   = COLOR:CreateColorFromARGB(255, 255, 220,   0)
-    local red_fill = COLOR:CreateColorFromARGB(255, 200,   0,   0)
+    local white    = Config.color(Contents.text_color)
+    local yellow   = Config.color(Contents.gauge.color)
+    local red_fill = Config.color(Contents.gauge.fill_color)
     local song_count = dan_songs ~= nil and #dan_songs or 0
 
     -- ── Gauge (EXAM1) ─────────────────────────────────────────────────────────
@@ -599,9 +590,9 @@ local function drawExams(dan_exams, dan_songs, dan_song_exams, dan_best_play, ab
     --   Row 0: col0=EXAM2[2], col1=EXAM5[5]
     --   Row 1: col0=EXAM3[3], col1=EXAM6[6]
     --   Row 2: col0=EXAM4[4], col1=EXAM7[7]
-    local exam_h = (tx_exam ~= nil and tx_exam.Height > 0) and tx_exam.Height or 80
-    local exam_w = (tx_exam ~= nil and tx_exam.Width  > 0) and tx_exam.Width  or 230
-    local long_w = (tx_exam_long ~= nil and tx_exam_long.Width > 0) and tx_exam_long.Width or exam_w * 2 + 1
+    local exam_h = (tx_exam ~= nil and tx_exam.Height > 0) and tx_exam.Height or Contents.exam_grid.bar_h_fallback
+    local exam_w = (tx_exam ~= nil and tx_exam.Width  > 0) and tx_exam.Width  or Contents.exam_grid.bar_w_fallback
+    local long_w = (tx_exam_long ~= nil and tx_exam_long.Width > 0) and tx_exam_long.Width or exam_w * 2 + EXAM_GRID_GAP
 
     local function getSlotInfo(slot)
         -- Returns: exam_ref (LuaSongDanExam), is_indiv, song_exams_for_slot
@@ -651,14 +642,14 @@ local function drawExams(dan_exams, dan_songs, dan_song_exams, dan_best_play, ab
         if not c0any and not c1any then
             -- empty row, skip
         elseif c0any and c1any then
-            local row_y = abs_y + EXAM_GRID_Y + row * (exam_h + 1)
+            local row_y = abs_y + EXAM_GRID_Y + row * (exam_h + EXAM_GRID_GAP)
             local bx0   = abs_x + EXAM_GRID_X
-            local bx1   = bx0 + exam_w + 1
+            local bx1   = bx0 + exam_w + EXAM_GRID_GAP
             if tx_exam ~= nil then tx_exam:Draw(bx0, row_y) ; tx_exam:Draw(bx1, row_y) end
             drawSlot(s0, bx0, row_y, exam_w, false)
             drawSlot(s1, bx1, row_y, exam_w, false)
         else
-            local row_y = abs_y + EXAM_GRID_Y + row * (exam_h + 1)
+            local row_y = abs_y + EXAM_GRID_Y + row * (exam_h + EXAM_GRID_GAP)
             local bx0   = abs_x + EXAM_GRID_X
             if tx_exam_long ~= nil then tx_exam_long:Draw(bx0, row_y) end
             drawSlot(s0, bx0, row_y, long_w, true)
@@ -677,7 +668,7 @@ function M.draw(abs_x, abs_y, dan_songs, dan_exams, dan_song_exams, dan_best_pla
     local song_count = #dan_songs
     if song_count == 0 then return end
 
-    if song_count <= 3 then
+    if song_count < Songs.scroll_from then
         -- ── Static layout ────────────────────────────────────────────────────
         for i = 1, song_count do
             local rel_y = BAR_Y_FIRST + (i - 1) * BAR_GAP_Y
@@ -690,7 +681,7 @@ function M.draw(abs_x, abs_y, dan_songs, dan_exams, dan_song_exams, dan_best_pla
         local total_h = song_count * BAR_GAP_Y
 
         local bar_h = (tx_dan_song ~= nil and tx_dan_song.Height > 0)
-                      and tx_dan_song.Height or 100
+                      and tx_dan_song.Height or Songs.bar_h_fallback
 
         for i = 1, song_count do
             local virtual_y = BAR_Y_FIRST + (i - 1) * BAR_GAP_Y

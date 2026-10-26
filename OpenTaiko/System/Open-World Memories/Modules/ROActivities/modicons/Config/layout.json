@@ -1,0 +1,18 @@
+{
+    "_note": "Mod icon layouts, in pixels from the top-left anchor of slot 1. Each list has 8 entries, one per slot: 1 HS, 2 Stealth, 3 Random, 4 Fun, 5 Just, 6 Timing, 7 SongSpeed, 8 Auto / special mod. Colours are [r, g, b, a] from 0 to 255.",
+    "menu": {
+        "_note": "a single horizontal row, 45 px between slots",
+        "offset_x": [0, 45, 90, 135, 180, 225, 270, 315],
+        "offset_y": [0, 0, 0, 0, 0, 0, 0, 0]
+    },
+    "game": {
+        "_note": "a 4+4 grid: top row slots 1-4, bottom row slots 5-8",
+        "offset_x": [0, 45, 90, 135, 0, 45, 90, 135],
+        "offset_y": [0, 0, 0, 0, 45, 45, 45, 45]
+    },
+    "value": {
+        "_note": "the scroll and song speed numbers over their icons; the icons are about 37 px, so keep the font small",
+        "font_size": 16,
+        "color": [255, 255, 255, 255]
+    }
+}

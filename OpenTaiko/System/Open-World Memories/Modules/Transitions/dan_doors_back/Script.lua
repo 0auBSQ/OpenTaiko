@@ -3,10 +3,15 @@
 
 local TA = require("TransitionArt")
 
-FADE_OUT_SECONDS = 0.7   -- doors closing
-FADE_IN_SECONDS  = 0.7   -- doors opening
+-- sizes: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
 
-local SCREEN_W, SCREEN_H = 1920, 1080
+FADE_OUT_SECONDS = Animation.doors.close_s
+FADE_IN_SECONDS  = Animation.doors.open_s
+
+local SCREEN_W, SCREEN_H = Layout.screen.width, Layout.screen.height
 local tx_door = nil
 local snd_close, snd_open = nil, nil
 local closed, opened = false, false

@@ -6,6 +6,10 @@
 
 local Easing = require("Easing")
 local Color = require("Color")
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local FX = Animation.fx
 
 local Fx = {}
 
@@ -19,15 +23,9 @@ Fx.outBack, Fx.outBounce = Easing.outBack, Easing.outBounce
 -- 4 legendary); an item's own Rarity string is preferred whenever it is known, so poor and mythical
 -- keep their own chest and colour.
 Fx.RARITIES = { "poor", "common", "uncommon", "rare", "epic", "legendary", "mythical" }
-Fx.RARITY_COLOR = {
-    poor = { 150, 150, 162 },
-    common = { 236, 236, 244 },
-    uncommon = { 96, 226, 118 },
-    rare = { 72, 156, 255 },
-    epic = { 200, 84, 255 },
-    legendary = { 255, 172, 64 },
-    mythical = { 255, 132, 204 },
-}
+-- a plain table: looking up a name that is not a rarity gives nil
+Fx.RARITY_COLOR = {}
+for _, r in ipairs(Fx.RARITIES) do Fx.RARITY_COLOR[r] = Layout.rarity_colors[r .. "_color"] end
 Fx.RARITY_LANG_INT = { poor = 0, common = 1, uncommon = 2, rare = 3, epic = 4, legendary = 5, mythical = 6 }
 Fx.RARITY_RANK = Fx.RARITY_LANG_INT
 local MODAL_INT_KEY = { [0] = "common", "uncommon", "rare", "epic", "legendary" }
@@ -50,7 +48,7 @@ end
 
 -- the colour a rarity draws in; the mythical one cycles with time t
 function Fx.rarityColor(key, t)
-    if key == "mythical" then return Fx.rainbow((t or 0) * 0.22, 0.12) end
+    if key == "mythical" then return Fx.rainbow((t or 0) * FX.mythical_hue_per_s, Layout.mythical_pastel) end
     return Fx.RARITY_COLOR[key] or Fx.RARITY_COLOR.common
 end
 
@@ -148,7 +146,7 @@ function Pool:clear() self.list = {} end
 function Pool:count() return #self.list end
 function Pool:emit(p)
     p.age = 0
-    p.life = p.life or 0.8
+    p.life = p.life or FX.particle_life_s
     p.s0, p.s1 = p.s0 or 1, p.s1 or (p.s0 or 1)
     p.vx, p.vy = p.vx or 0, p.vy or 0
     p.rot, p.spin = p.rot or 0, p.spin or 0
@@ -162,11 +160,11 @@ function Pool:burst(x, y, n, o)
     o = o or {}
     for _ = 1, n do
         local a = (o.angle or 0) + (random() - 0.5) * (o.spread or (2 * pi))
-        local v = (o.speed or 300) * (0.5 + random())
+        local v = (o.speed or FX.burst_speed) * (0.5 + random())
         self:emit{ x = x + (random() - 0.5) * (o.jitter or 0), y = y + (random() - 0.5) * (o.jitter or 0),
-                   vx = cos(a) * v, vy = sin(a) * v, life = (o.life or 0.7) * (0.7 + 0.6 * random()),
-                   s0 = (o.size or 0.4) * (0.6 + 0.8 * random()), s1 = o.size1 or 0,
-                   rot = random() * 360, spin = (random() - 0.5) * 400, color = o.color, fade = o.fade,
+                   vx = cos(a) * v, vy = sin(a) * v, life = (o.life or FX.burst_life_s) * (FX.burst_life_min + FX.burst_life_range * random()),
+                   s0 = (o.size or FX.burst_size) * (FX.burst_size_min + FX.burst_size_range * random()), s1 = o.size1 or 0,
+                   rot = random() * 360, spin = (random() - 0.5) * FX.burst_spin_range, color = o.color, fade = o.fade,
                    gravity = o.gravity or 0, alpha = o.alpha }
     end
 end
@@ -192,7 +190,7 @@ function Pool:draw(opacity)
         local k = p.age / p.life
         local a
         if p.fade == "hump" then a = Fx.hump(k)
-        elseif p.fade == "rise" then a = min(1, p.age / (p.rise or 0.5))
+        elseif p.fade == "rise" then a = min(1, p.age / (p.rise or FX.particle_rise_s))
         elseif p.fade == "in" then a = k
         else a = 1 - k end
         local s = Fx.lerp(p.s0, p.s1, k)
@@ -206,7 +204,7 @@ end
 function Fx.shake(amount, t, dur)
     if t < 0 or t >= dur then return 0, 0 end
     local k = 1 - t / dur
-    return sin(t * 70) * amount * k, cos(t * 53) * amount * k
+    return sin(t * FX.shake_freq_x) * amount * k, cos(t * FX.shake_freq_y) * amount * k
 end
 
 return Fx

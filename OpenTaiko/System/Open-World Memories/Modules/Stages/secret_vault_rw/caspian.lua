@@ -3,15 +3,20 @@ local Dialogue = require("dialogue")
 local Easing = require("Easing")
 local NavInput = require("NavInput")
 local Tex = require("tex")
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local Look, Motion = Layout.caspian, Animation.caspian
+local Hop = Motion.hop
 
 local C = {}
 
-local FOOT_X, FOOT_Y = 1555, 855
+local FOOT_X, FOOT_Y = Look.foot.x, Look.foot.y
 local FRAMES = { neutral = "Neutral", happy = "Happy", laugh = "Laugh", grumpy = "Grumpy" }
-local BOX = { x = 300, y = 822, w = 1320, h = 210 }
-local CPS = 38
-local LAUGH = 1.4
-local BLIP_EVERY = 3
+local BOX = Config.plain(Look.box)
+local CPS = Motion.chars_per_s
+local LAUGH = Motion.laugh_s
+local BLIP_EVERY = Motion.blip_every
 local VOICES = 4
 -- marks that make no sound: wide (CJK) punctuation and spaces
 local SILENT = {}
@@ -19,11 +24,7 @@ for _, ch in ipairs({ "、", "。", "，", "．", "！", "？", "：", "；", "�
     "～", "—", "–", "　", "¡", "¿", "«", "»", "“", "”", "‘", "’" }) do SILENT[ch] = true end
 
 -- the box in the cabin's dark marble and bronze
-local THEME = {
-    face = { 46, 54, 66, 255 }, face2 = { 28, 34, 44, 255 }, outline = { 196, 152, 86, 255 },
-    namePill = { 210, 166, 96, 255 }, namePill2 = { 152, 108, 54, 255 }, nameText = { 255, 250, 236 },
-    text = { 244, 238, 226 }, caret = { 232, 192, 112 }, shadow = { 0, 10, 20, 110 },
-}
+local THEME = Config.plain(Look.theme)
 
 -- event -> lines { expression, English }; keys VAULT_TALK_<EVENT>_<n>
 local LINES = {
@@ -131,13 +132,13 @@ function C.setExpr(e)
     if FRAMES[e] == nil then return end
     if e ~= C.expr then
         C.expr = e
-        exprT, hopT, hopAmp = clock, clock, 1
+        exprT, hopT, hopAmp = clock, clock, Motion.change_hop
     else
-        hopT, hopAmp = clock, 0.4
+        hopT, hopAmp = clock, Motion.nod_hop
     end
 end
 
-function C.hop() hopT, hopAmp = clock, 1.4 end
+function C.hop() hopT, hopAmp = clock, Motion.kick_hop end
 
 -- the n-th letter shown of the line being typed
 local function shownChar(n)
@@ -163,7 +164,7 @@ function C.init(c)
     ctx = c
     dlg = Dialogue.new{
         gfont = c.fonts.talk, gfontName = c.fonts.name,
-        ui = "popui", theme = THEME, box = BOX, portraitSize = 0, cps = CPS,
+        ui = "popui", theme = THEME, box = BOX, portraitSize = Look.portrait_size, cps = CPS,
         sfx = { click = function() if c.snd.Decide then c.snd.Decide:Play() end end },
         onExpr = function(e) C.setExpr(e) end,
         onBlip = blip, blipEvery = BLIP_EVERY,
@@ -264,19 +265,20 @@ function C.update(dt, now)
 end
 
 local function hopShape(b, amp)
-    if b == nil or b < 0 or b >= 0.62 then return 1, 1, 0 end
-    if b < 0.08 then
-        local k = Easing.outQuad(b / 0.08) * amp
-        return 1 + 0.06 * k, 1 - 0.07 * k, 0
+    local riseEnd = Hop.squash_s + Hop.rise_s
+    if b == nil or b < 0 or b >= riseEnd + Hop.settle_s then return 1, 1, 0 end
+    if b < Hop.squash_s then
+        local k = Easing.outQuad(b / Hop.squash_s) * amp
+        return 1 + Hop.squash_x * k, 1 - Hop.squash_y * k, 0
     end
-    if b < 0.38 then
-        local u = (b - 0.08) / 0.30
+    if b < riseEnd then
+        local u = (b - Hop.squash_s) / Hop.rise_s
         local v = math.abs(math.cos(u * math.pi)) * amp
-        return 1 - 0.04 * v, 1 + 0.06 * v, 16 * amp * math.sin(u * math.pi)
+        return 1 - Hop.stretch_x * v, 1 + Hop.stretch_y * v, Hop.height_px * amp * math.sin(u * math.pi)
     end
-    local d = (b - 0.38) / 0.24
-    local e = (1 - d) * (1 - d) * math.cos(d * 3 * math.pi) * amp
-    return 1 + 0.06 * e, 1 - 0.07 * e, 0
+    local d = (b - riseEnd) / Hop.settle_s
+    local e = (1 - d) * (1 - d) * math.cos(d * Hop.settle_wobbles * math.pi) * amp
+    return 1 + Hop.settle_x * e, 1 - Hop.settle_y * e, 0
 end
 
 function C.drawBody(now)
@@ -285,10 +287,10 @@ function C.drawBody(now)
     if not Tex.ok(tex) then tex = ctx.tex["Cabin/Caspian/Neutral"] end
     if not Tex.ok(tex) then return end
     local sx, sy, lift = hopShape(hopT and (now - hopT) or nil, hopAmp)
-    local breath = 1 + 0.009 * math.sin(now * 2 * math.pi / 3.6)
+    local breath = 1 + Motion.breath.amp * math.sin(now * 2 * math.pi / Motion.breath.period_s)
     if C.expr == "laugh" then
         local a = now - exprT
-        if a >= 0 and a < LAUGH then lift = lift + 7 * math.abs(math.sin(a * 2 * math.pi * 2.6)) * (1 - a / LAUGH) end
+        if a >= 0 and a < LAUGH then lift = lift + Motion.laugh.bounce_px * math.abs(math.sin(a * 2 * math.pi * Motion.laugh.hz)) * (1 - a / LAUGH) end
     end
     Tex.place(tex, FOOT_X, FOOT_Y - lift, "bottom", sx, sy * breath)
 end

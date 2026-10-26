@@ -1,0 +1,4 @@
+{
+    "_note": "Tower view layout, in pixels of Textures/Panorama.png. The tower's centre x and its ground line y; scale is the TowerArt pieces' (half the gameplay size).",
+    "tower": { "x": 960, "ground_y": 1580, "scale": 0.8 }
+}

@@ -1,0 +1,18 @@
+{
+    "_note": "Online lobby timings, in seconds.",
+    "toast_fade_s": 0.4,
+    "message_s": {
+        "_note": "How long each message bar stays.",
+        "default": 4,
+        "back_to_menu": 5,
+        "network_notice": 8,
+        "open_failed": 6,
+        "join_failed": 8,
+        "no_code": 5,
+        "disconnected": 12,
+        "cant_start": 5,
+        "start_problem": 3,
+        "starting": 2,
+        "mods_unavailable": 3
+    }
+}

@@ -2,19 +2,28 @@
 -- navigation.lua  —  Page management, media loading, hold-scroll and song-select
 --                    input handling for song_select_core.
 
-local CFG = require("sscore_config")
+local Config    = require("Core.Config")
+local Layout    = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local List      = Layout.song_list
+local ListAnim  = Animation.song_list
+local PopAnim   = Animation.preimage
+local FolderAnim = Animation.folder_anim
 
 local M = {}
 local G   -- shared state injected by Script.lua
 
-local PREVIEW_THROTTLE_MS  = 200
-local BOX_SCROLL_SECONDS   = 0.06
-local HOLD_DELAY_SECONDS   = 0.16
-local HOLD_REPEAT_SECONDS  = 0.06
+local PREVIEW_THROTTLE_MS  = Animation.preview.throttle_ms
+local BOX_SCROLL_SECONDS   = ListAnim.scroll_s
+local HOLD_DELAY_SECONDS   = ListAnim.hold_delay_s
+local HOLD_REPEAT_SECONDS  = ListAnim.hold_repeat_s
+local ROWS                 = List.rows_each_side   -- the page: the selected node and ROWS on each side
+local TRANSITION_S         = Animation.screen_transition.duration_s
+local JACKET_MAX_SIZE      = Layout.preimage.decode_max_size
 
 -- Preimage/jacket "pop" on appear: scale from PREIMAGE_POP_START up to 1.0 with a short overshoot.
-local PREIMAGE_POP_START = CFG.num("preimage.pop_start_scale", 0.7)
-local PREIMAGE_POP_MS    = CFG.num("preimage.pop_duration_ms", 180)
+local PREIMAGE_POP_START = PopAnim.pop_start_scale
+local PREIMAGE_POP_MS    = PopAnim.pop_duration_ms
 
 -- Kick the pop animation (called from the shared-texture onCreate, i.e. the moment the jacket appears).
 -- The counter's built-in OUT/BACK easing does the 0→1-with-overshoot "bounce"; the listener already
@@ -24,7 +33,7 @@ local function startPreimagePop()
     local c = G.startCounter("preimage_pop", 0, 1, PREIMAGE_POP_MS / 1000, "none",
         function(t) G.preimagePopScale = PREIMAGE_POP_START + (1 - PREIMAGE_POP_START) * t end,
         function() G.preimagePopScale = 1 end)
-    c:SetEasing("OUT", "BACK")
+    c:SetEasing(PopAnim.pop_easing[1], PopAnim.pop_easing[2])
 end
 
 -- ── Media loaders ─────────────────────────────────────────────────────────────
@@ -32,7 +41,7 @@ end
 local function reloadPreimage(songNode)
     SHARED:ClearSharedTexture("preimage")
     if songNode.IsSong == true then
-        G.startCounter("throttle_preimage", 0, PREVIEW_THROTTLE_MS, 0.2/PREVIEW_THROTTLE_MS, "none", nil, function()
+        G.startCounter("throttle_preimage", 0, PREVIEW_THROTTLE_MS, PREVIEW_THROTTLE_MS / 1000 / PREVIEW_THROTTLE_MS, "none", nil, function()
             -- Selection may have changed during the throttle window — only load this node's jacket if it is
             -- still selected (so a stale jacket / pop-in never lands on the next box).
             if G.songList == nil or G.songList:GetSelectedSongNode() ~= songNode then return end
@@ -44,9 +53,9 @@ local function reloadPreimage(songNode)
                 startPreimagePop()
             end
             if songNode.HasPreimage then
-                SHARED:SetSharedTextureUsingAbsolutePath("preimage", songNode.PreimagePath, { maxSize = 500 }, onCreate)
+                SHARED:SetSharedTextureUsingAbsolutePath("preimage", songNode.PreimagePath, { maxSize = JACKET_MAX_SIZE }, onCreate)
             else
-                SHARED:SetSharedTexture("preimage", "Textures/preimage.png", { maxSize = 500 }, onCreate)
+                SHARED:SetSharedTexture("preimage", "Textures/preimage.png", { maxSize = JACKET_MAX_SIZE }, onCreate)
             end
         end)
     else
@@ -85,7 +94,7 @@ local function playPreview(songNode)
             G.ctx["throttle_presound"] = COUNTER:EmptyCounter()
             return
         end
-        G.startCounter("throttle_presound", 0, PREVIEW_THROTTLE_MS, 0.2/PREVIEW_THROTTLE_MS, "none", nil, function()
+        G.startCounter("throttle_presound", 0, PREVIEW_THROTTLE_MS, PREVIEW_THROTTLE_MS / 1000 / PREVIEW_THROTTLE_MS, "none", nil, function()
             -- Selection may have changed during the throttle window (moved to another song / a back box /
             -- a folder). Only load the preview if this node is still the selected one.
             if G.songList == nil or G.songList:GetSelectedSongNode() ~= songNode then return end
@@ -133,8 +142,9 @@ end
 -- The genre (song bar) colour brightened by 50% toward white — used to tint the BarLevelFill numbers so
 -- they read as a lighter shade of the bar regardless of the chart's star rating. Precomputed per selection
 -- (never per frame) since COLOR:Create allocates. Falls back to white when the node has no box colour.
+local FILL_LIGHTEN = List.level_fill_lighten
 local function brightenedFill(boxColor)
-    local function up(c) return math.min(255, math.floor(c + (255 - c) * 0.5)) end
+    local function up(c) return math.min(255, math.floor(c + (255 - c) * FILL_LIGHTEN)) end
     if boxColor == nil then return COLOR:CreateColorFromRGBA(255, 255, 255, 255) end
     return COLOR:CreateColorFromRGBA(up(boxColor.R), up(boxColor.G), up(boxColor.B), 255)
 end
@@ -220,6 +230,9 @@ end
 
 -- the selected row's band inside a folder: the folder's colour, darkened for a light folder and lightened for
 -- a dark one so it stands apart from the folder's bars; nil at the top level (the band stays green)
+local BAND_LIGHT_THRESHOLD = List.select_band_folder_light_threshold
+local BAND_DARKEN          = List.select_band_folder_darken
+local BAND_LIGHTEN         = List.select_band_folder_lighten
 local function bandColorFor(folder)
     if folder == nil or folder.IsRoot then return nil end
     G.bandColorCache = G.bandColorCache or {}
@@ -228,10 +241,11 @@ local function bandColorFor(folder)
     local c = folder.BoxColor
     if c == nil then return nil end
     local r, g, b = c.R, c.G, c.B
-    if 0.299 * r + 0.587 * g + 0.114 * b > 140 then
-        r, g, b = r * 0.6, g * 0.6, b * 0.6
+    -- Rec. 601 luma
+    if 0.299 * r + 0.587 * g + 0.114 * b > BAND_LIGHT_THRESHOLD then
+        r, g, b = r * BAND_DARKEN, g * BAND_DARKEN, b * BAND_DARKEN
     else
-        r, g, b = r + (255 - r) * 0.5, g + (255 - g) * 0.5, b + (255 - b) * 0.5
+        r, g, b = r + (255 - r) * BAND_LIGHTEN, g + (255 - g) * BAND_LIGHTEN, b + (255 - b) * BAND_LIGHTEN
     end
     cached = COLOR:CreateColorFromARGB(255, math.floor(r + 0.5), math.floor(g + 0.5), math.floor(b + 0.5))
     G.bandColorCache[folder] = cached
@@ -284,7 +298,7 @@ function M.refreshPage(skipMedia)
     G.selInfo     = nil
     G.unlocks.invalidateCondCache()   -- selection changed: recompute the unlock-condition panel cache
 
-    for i = -5, 5 do
+    for i = -ROWS, ROWS do
         local node = G.songList:GetSongNodeAtOffset(i)
         G.currentPage[i] = node
         if node == nil then
@@ -330,7 +344,7 @@ end
 -- Snapshot the current page's bars as { {i, pt}, ... }, sorted outer-first so the centre bar draws on top.
 local function snapshotBars(excludeZero)
     local arr = {}
-    for i = -5, 5 do
+    for i = -ROWS, ROWS do
         local pt = G.pageTexts[i]
         if pt ~= nil and (not excludeZero or i ~= 0) then
             arr[#arr + 1] = { i = i, pt = pt }
@@ -352,16 +366,16 @@ local function copyCrumbs()
     return c
 end
 
--- Phase durations (seconds) — skinner-tunable via Config/layout.json.
-local ANIM_OPEN_OUT_S  = CFG.num("folder_anim.open_out_seconds",    0.13)  -- phase 1: parent siblings slide out left
-local ANIM_OPEN_FAN_S  = CFG.num("folder_anim.open_fan_seconds",    0.30)  -- phase 2: folder contents fan out
-local ANIM_CLOSE_GRP_S = CFG.num("folder_anim.close_group_seconds", 0.20)  -- phase 1: folder contents group at the focus
-local ANIM_CLOSE_IN_S  = CFG.num("folder_anim.close_in_seconds",    0.22)  -- phase 2: parent siblings slide back in
+-- Phase durations (seconds) and easings
+local ANIM_OPEN_OUT_S  = FolderAnim.open_out_s     -- phase 1: parent siblings slide out left
+local ANIM_OPEN_FAN_S  = FolderAnim.open_fan_s     -- phase 2: folder contents fan out
+local ANIM_CLOSE_GRP_S = FolderAnim.close_group_s  -- phase 1: folder contents group at the focus
+local ANIM_CLOSE_IN_S  = FolderAnim.close_in_s     -- phase 2: parent siblings slide back in
 
 -- Start a phase: a 0→1 counter whose value is eased by the engine (SetEasing), so the draw side just lerps.
-local function startPhase(dur, easeType, easeFn, onFinish)
+local function startPhase(dur, easing, onFinish)
     local c = G.startCounter("folder_anim", 0, 1, dur, "none", animTick, onFinish)
-    c:SetEasing(easeType, easeFn)   -- listener receives the eased value
+    c:SetEasing(easing[1], easing[2])   -- listener receives the eased value
 end
 
 -- After OpenFolder (cursor at the first child), jump back to the child node that was focused when this
@@ -395,10 +409,10 @@ local function startOpenAnim(Sort)
     G.folderAnim = { mode = "open", phase = 1, t = 0, oldCrumbs = oldCrumbs,
                      oldBars = oldBars, newBars = snapshotBars(false), folderPt = folderPt }
     G.sounds.Decide:Play()
-    startPhase(ANIM_OPEN_OUT_S, "IN", "CUBIC", function()
+    startPhase(ANIM_OPEN_OUT_S, FolderAnim.open_out_easing, function()
         if G.folderAnim == nil then return end
         G.folderAnim.phase = 2; G.folderAnim.t = 0
-        startPhase(ANIM_OPEN_FAN_S, "OUT", "BACK", finishFolderAnim)   -- overshoot = the "book" pop
+        startPhase(ANIM_OPEN_FAN_S, FolderAnim.open_fan_easing, finishFolderAnim)   -- overshoot = the "book" pop
     end)
     return true
 end
@@ -424,10 +438,10 @@ local function startCloseAnim(Sort)
     end
     G.folderAnim = { mode = "close", phase = 1, t = 0, oldCrumbs = oldCrumbs,
                      oldBars = oldBars, newBars = snapshotBars(true), folderPt = G.pageTexts[0] }
-    startPhase(ANIM_CLOSE_GRP_S, "IN", "CUBIC", function()
+    startPhase(ANIM_CLOSE_GRP_S, FolderAnim.close_group_easing, function()
         if G.folderAnim == nil then return end
         G.folderAnim.phase = 2; G.folderAnim.t = 0
-        startPhase(ANIM_CLOSE_IN_S, "OUT", "CUBIC", finishFolderAnim)
+        startPhase(ANIM_CLOSE_IN_S, FolderAnim.close_in_easing, finishFolderAnim)
     end)
     return true
 end
@@ -696,7 +710,7 @@ function M.handleSongSelectInput(Sort, Diff)
         if G.event.on() then
             for i = 1, 5 do G.diffIndex[i] = 3 end
         end
-        G.startCounter("screen_transition", 0, 1920, 0.5/1920, "none", Diff.updateTransitionVisuals, function()
+        G.startCounter("screen_transition", 0, 1920, TRANSITION_S / 1920, "none", Diff.updateTransitionVisuals, function()
             G.activeScreen = "difficultyselect"
         end)
     end

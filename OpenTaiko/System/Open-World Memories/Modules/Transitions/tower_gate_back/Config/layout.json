@@ -1,0 +1,21 @@
+{
+    "_note": "Survival Mode gate way back layout, in 1920x1080 pixels. Opacities 0 to 1.",
+    "screen_width": 1920,
+    "gate": {
+        "_note": "top: the art has this much extra above and below, for the shake; travel_pad: how far past the screen edge an open half rests; half_width: a half's width when the texture reports none",
+        "top": -60,
+        "travel_pad": 40,
+        "half_width": 1010
+    },
+    "dust": {
+        "_note": "count puffs from the seam, alternating sides, the first at first_y and each spacing_y below; each is seam_offset off the seam, turned angle_step_deg more than the previous one, and scaled by base_scale plus up to scale_spread",
+        "count": 7,
+        "first_y": 100,
+        "spacing_y": 150,
+        "seam_offset": 20,
+        "angle_step_deg": 47,
+        "base_scale": 0.8,
+        "scale_spread": 0.25,
+        "opacity": 0.85
+    }
+}

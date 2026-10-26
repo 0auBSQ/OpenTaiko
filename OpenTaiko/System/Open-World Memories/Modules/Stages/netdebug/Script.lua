@@ -9,6 +9,11 @@
 -- The panel shows your role / ids / peer roster and a live event log, so you can confirm joins, messages,
 -- host-role hand-off and disconnects all flow correctly before the real stages are built on top.
 
+-- positions, sizes and colours: Config/layout.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local LOG = Layout.log
+
 local fontBig, fontMid, fontSmall
 local log = {}            -- recent event lines (newest last)
 local code = nil          -- the room code when hosting
@@ -17,25 +22,25 @@ local SW, SH = 1920, 1080
 
 local function add(line)
     log[#log + 1] = line
-    while #log > 18 do table.remove(log, 1) end
+    while #log > LOG.rows do table.remove(log, 1) end
 end
 
 function onStart()
     SW = INPUT:GetSurfaceWidth();  if SW <= 0 then SW = 1920 end
     SH = INPUT:GetSurfaceHeight(); if SH <= 0 then SH = 1080 end
-    fontBig   = TEXT:Create(40)
-    fontMid   = TEXT:Create(24)
-    fontSmall = TEXT:Create(18)
+    fontBig   = TEXT:Create(Layout.fonts.big)
+    fontMid   = TEXT:Create(Layout.fonts.mid)
+    fontSmall = TEXT:Create(Layout.fonts.small)
 end
 function activate() log = {}; code = nil; pingN = 0; add("Ready. H = host, J = join.") end
 function deactivate() end
 function afterSongEnum() end
 function onDestroy() if NET then NET:Leave() end end
 
-local function txt(font, str, r, g, b)
-    return font:GetText(str, false, 1860,
-        COLOR:CreateColorFromRGBA(r or 235, g or 235, b or 245, 255),
-        COLOR:CreateColorFromRGBA(0, 0, 0, 255))
+local function txt(font, str, c)
+    return font:GetText(str, false, Layout.text.max_width,
+        Config.color(c or Layout.text.default_color),
+        Config.color(Layout.text.outline_color))
 end
 
 local function host()
@@ -52,7 +57,7 @@ local function join()
     local c = d and JSONLOADER:JsonGet(d, "code") or nil
     if not c then add("No netroom.json yet — host first (press H in the other copy)."); return end
     NET:SetLocalPlayer('{"name":"GuestTester-' .. math.random(100, 999) .. '","char":"Bot","plate":0}')
-    if NET:JoinRoom(c) then add("Joining " .. string.sub(c, 1, 14) .. "...") else add("JoinRoom: bad code.") end
+    if NET:JoinRoom(c) then add("Joining " .. string.sub(c, 1, LOG.join_code_chars) .. "...") else add("JoinRoom: bad code.") end
 end
 
 function update(ts)
@@ -85,22 +90,26 @@ function update(ts)
 end
 
 function draw()
-    txt(fontBig, "Net Debug  —  OpenTaiko Online smoke test", 255, 230, 140):Draw(40, 24)
-    txt(fontSmall, "H host   J join   B broadcast ping   R rotate host (server)   L leave   Esc back", 200, 210, 230):Draw(40, 78)
+    local T, K = Layout.title, Layout.keys
+    txt(fontBig, "Net Debug  —  OpenTaiko Online smoke test", T.color):Draw(T.x, T.y)
+    txt(fontSmall, "H host   J join   B broadcast ping   R rotate host (server)   L leave   Esc back", K.color):Draw(K.x, K.y)
 
     local role = NET:IsHost() and "HOST/SERVER" or (NET:Connected() and "CLIENT" or "(not connected)")
     local line = string.format("Role: %s    self id: %d    host-role id: %d    connected: %s    peers: %d",
         role, NET:SelfId(), NET:HostRoleId(), tostring(NET:Connected()), NET:PeerCount())
-    txt(fontMid, line, 150, 230, 160):Draw(40, 116)
+    local S = Layout.status
+    txt(fontMid, line, S.color):Draw(S.x, S.y)
 
     if code ~= nil then
-        txt(fontSmall, "Room code (also in netroom.txt): " .. string.sub(code, 1, 70) .. (#code > 70 and "..." or ""), 235, 200, 120):Draw(40, 152)
+        local RC = Layout.room_code
+        txt(fontSmall, "Room code (also in netroom.txt): " .. string.sub(code, 1, RC.max_chars) .. (#code > RC.max_chars and "..." or ""), RC.color):Draw(RC.x, RC.y)
     end
-    txt(fontSmall, "Roster: " .. NET:PeersJson(), 180, 200, 235):Draw(40, 178)
+    local R = Layout.roster
+    txt(fontSmall, "Roster: " .. NET:PeersJson(), R.color):Draw(R.x, R.y)
 
-    txt(fontMid, "Event log", 255, 255, 255):Draw(40, 214)
-    local y = 246
+    txt(fontMid, "Event log", LOG.title_color):Draw(LOG.title_x, LOG.title_y)
+    local y = LOG.y
     for i = 1, #log do
-        txt(fontSmall, log[i], 220, 220, 230):Draw(48, y); y = y + 26
+        txt(fontSmall, log[i], LOG.color):Draw(LOG.x, y); y = y + LOG.row_height
     end
 end

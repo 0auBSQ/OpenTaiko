@@ -3,6 +3,10 @@
 -- switcher that re-skins everything, driven by mouse OR keyboard/gamepad. Esc returns to the title.
 
 local PopUI = require("PopUI")
+-- positions, sizes and colours: Config/layout.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local TOP, P1L, P2L, LAB = Layout.top_bar, Layout.page1, Layout.page2, Layout.bubble_lab
 
 local ui
 local page = 1
@@ -10,21 +14,19 @@ local page1, page2 = {}, {}
 local clickCount = 0
 local lastTs = 0
 
+-- the library copies a theme with its metatable, so it gets plain tables, not the config's
+local function plain(t)
+    local o = {}
+    for k, v in pairs(t) do o[k] = v end
+    return o
+end
+
 -- a few original colour palettes to prove customization (no real product is referenced)
 local THEMES = {
     { name = "Bubblegum", theme = {} },
-    { name = "Aqua", theme = { colors = {
-        primary = { 86, 196, 222 }, primary2 = { 44, 160, 196 }, accent = { 255, 200, 120 }, accent2 = { 240, 170, 80 },
-        bg = { 232, 248, 252 }, surface = { 255, 255, 255 }, surface2 = { 214, 240, 246 },
-        outline = { 32, 70, 86 }, text = { 32, 70, 86 }, focusRing = { 255, 210, 90 } } } },
-    { name = "Sunset", theme = { colors = {
-        primary = { 255, 150, 90 }, primary2 = { 240, 96, 120 }, accent = { 150, 120, 230 }, accent2 = { 110, 90, 210 },
-        bg = { 255, 242, 234 }, surface = { 255, 255, 255 }, surface2 = { 255, 224, 210 },
-        outline = { 92, 44, 52 }, text = { 92, 44, 52 }, focusRing = { 120, 220, 200 } } } },
-    { name = "Mint", theme = { colors = {
-        primary = { 120, 210, 150 }, primary2 = { 80, 182, 130 }, accent = { 255, 160, 190 }, accent2 = { 240, 120, 160 },
-        bg = { 238, 250, 240 }, surface = { 255, 255, 255 }, surface2 = { 220, 244, 228 },
-        outline = { 40, 84, 60 }, text = { 40, 84, 60 }, focusRing = { 255, 198, 90 } } } },
+    { name = "Aqua", theme = { colors = plain(Layout.themes.aqua) } },
+    { name = "Sunset", theme = { colors = plain(Layout.themes.sunset) } },
+    { name = "Mint", theme = { colors = plain(Layout.themes.mint) } },
 }
 local themeIdx = 1
 
@@ -61,7 +63,7 @@ local function tailFromHandle(b, mx, my)   -- which side/pos/size the handle pos
     elseif mv == rr then side, pos, size = "right", (my - b.y) / b.h, rr
     elseif mv == t then side, pos, size = "top", (mx - b.x) / b.w, t
     else side, pos, size = "bottom", (mx - b.x) / b.w, bo end
-    return side, clampn(pos, 0.18, 0.82), clampn(size, 14, 90)
+    return side, clampn(pos, LAB.tail_pos_min, LAB.tail_pos_max), clampn(size, LAB.tail_size_min, LAB.tail_size_max)
 end
 
 local function setPage(p)
@@ -91,33 +93,44 @@ function onStart()
     }
 
     -- ── top bar (always visible) ─────────────────────────────────────────────────
-    ui:label{ text = "PopUI Showcase", x = 60, y = 36, size = "title" }
-    ui:button{ text = "Widgets", x = 470, y = 28, w = 220, h = 64, accent = true, onClick = function() setPage(1) end }
-    ui:button{ text = "Chat & Menu", x = 700, y = 28, w = 260, h = 64, onClick = function() setPage(2) end }
-    local cx = 1060
+    local B, CHIP = TOP.widgets_button, TOP.theme_chips
+    ui:label{ text = "PopUI Showcase", x = TOP.title.x, y = TOP.title.y, size = TOP.title.size }
+    ui:button{ text = "Widgets", x = B.x, y = B.y, w = B.w, h = B.h, accent = true, onClick = function() setPage(1) end }
+    B = TOP.chat_button
+    ui:button{ text = "Chat & Menu", x = B.x, y = B.y, w = B.w, h = B.h, onClick = function() setPage(2) end }
+    local cx = CHIP.x
     for i, t in ipairs(THEMES) do
-        ui:button{ text = t.name, x = cx, y = 32, w = 180, h = 56,
+        ui:button{ text = t.name, x = cx, y = CHIP.y, w = CHIP.w, h = CHIP.h,
             style = (i == 1) and nil or t.theme,            -- chip previews its own palette
             onClick = function() applyTheme(i) end }
-        cx = cx + 196
+        cx = cx + CHIP.step
     end
 
     -- ── page 1: widgets ─────────────────────────────────────────────────────────
     local function P1(w) page1[#page1 + 1] = w; return w end
-    P1(ui:panel{ x = 60, y = 130, w = 820, h = 820, title = "Widgets" })
-    local greet = P1(ui:label{ text = "Hi there!", x = 110, y = 210, size = "label" })
-    local clicks = P1(ui:label{ text = "Clicked 0 times", x = 110, y = 260, size = "small" })
-    P1(ui:button{ text = "Press me!", x = 110, y = 320, w = 320, h = 96, accent = true, onClick = function(b)
+    local W = P1L.panel
+    P1(ui:panel{ x = W.x, y = W.y, w = W.w, h = W.h, title = "Widgets" })
+    W = P1L.greeting
+    local greet = P1(ui:label{ text = "Hi there!", x = W.x, y = W.y, size = W.size })
+    W = P1L.clicks
+    local clicks = P1(ui:label{ text = "Clicked 0 times", x = W.x, y = W.y, size = W.size })
+    W = P1L.press_button
+    P1(ui:button{ text = "Press me!", x = W.x, y = W.y, w = W.w, h = W.h, accent = true, onClick = function(b)
         clickCount = clickCount + 1
         clicks:setText("Clicked " .. clickCount .. " times")
     end })
-    P1(ui:button{ text = "Disabled", x = 470, y = 320, w = 280, h = 96, onClick = function() end }).enabled = false
-    P1(ui:toggle{ text = "Fullscreen", x = 110, y = 450, value = true, onChange = function(v) end })
-    P1(ui:checkbox{ text = "Mute audio", x = 110, y = 520, value = false, onChange = function(v) end })
-    P1(ui:label{ text = "Volume", x = 110, y = 600, size = "small" })
-    P1(ui:slider{ x = 110, y = 636, w = 560, min = 0, max = 100, step = 1, value = 70, onChange = function(v) end })
-    P1(ui:label{ text = "Your name", x = 110, y = 720, size = "small" })
-    P1(ui:textbox{ x = 110, y = 756, w = 560, placeholder = "type here + Enter...", maxLen = 18,
+    W = P1L.disabled_button
+    P1(ui:button{ text = "Disabled", x = W.x, y = W.y, w = W.w, h = W.h, onClick = function() end }).enabled = false
+    P1(ui:toggle{ text = "Fullscreen", x = P1L.toggle.x, y = P1L.toggle.y, value = true, onChange = function(v) end })
+    P1(ui:checkbox{ text = "Mute audio", x = P1L.checkbox.x, y = P1L.checkbox.y, value = false, onChange = function(v) end })
+    W = P1L.volume_label
+    P1(ui:label{ text = "Volume", x = W.x, y = W.y, size = W.size })
+    W = P1L.slider
+    P1(ui:slider{ x = W.x, y = W.y, w = W.w, min = 0, max = 100, step = 1, value = 70, onChange = function(v) end })
+    W = P1L.name_label
+    P1(ui:label{ text = "Your name", x = W.x, y = W.y, size = W.size })
+    W = P1L.textbox
+    P1(ui:textbox{ x = W.x, y = W.y, w = W.w, placeholder = "type here + Enter...", maxLen = 18,
         onSubmit = function(t) greet:setText(t ~= "" and ("Hi, " .. t .. "!") or "Hi there!") end })
 
     -- ── page 2: chat & menu ─────────────────────────────────────────────────────
@@ -130,37 +143,49 @@ function onStart()
         "Boss territory. You've got this!",
         "Hidden gem — give it a try.",
     }
-    local bubble = P2(ui:bubble{ x = 700, y = 200, w = 700, h = 220, tail = "left", tailPos = 0.4,
+    W = P2L.bubble
+    local bubble = P2(ui:bubble{ x = W.x, y = W.y, w = W.w, h = W.h, tail = W.tail, tailPos = W.tail_pos,
         typewriter = true, text = COMMENTS[1] })
     labBubble = bubble
     local items = { "Sunrise Stroll", "Triplet Trouble", "Hyper Drive", "Marshmallow Hop", "Final Fury", "Secret Track" }
-    P2(ui:menu{ x = 120, y = 200, w = 520, h = 700, items = items, selected = 1,
+    W = P2L.menu
+    P2(ui:menu{ x = W.x, y = W.y, w = W.w, h = W.h, items = items, selected = 1,
         onChange = function(i) bubble:setText(COMMENTS[i] or "...", true) end,
         onSelect = function(i, it) bubble:setText("Now playing: " .. it.text .. "!", true) end })
-    P2(ui:panel{ x = 700, y = 470, w = 700, h = 430, title = "How to use" })
+    W = P2L.help_panel
+    P2(ui:panel{ x = W.x, y = W.y, w = W.w, h = W.h, title = "How to use" })
+    W = P2L.help_text
     P2(ui:label{ text = "Mouse: hover + click. Keyboard/Pad: arrows move,\nDecide selects, Cancel/Esc backs out.",
-        x = 740, y = 560, size = "label", maxWidth = 640 })
+        x = W.x, y = W.y, size = W.size, maxWidth = W.max_width })
+    W = P2L.drag_text
     P2(ui:label{ text = "Drag the bubble, its gold tail pin, or the blue corner grip (resize).",
-        x = 740, y = 690, size = "small", maxWidth = 640 })
+        x = W.x, y = W.y, size = W.size, maxWidth = W.max_width })
     -- show off the different bubble shapes
     local SHAPES = { "round", "oval", "cloud" }
     local shapeIdx = 1
-    P2(ui:button{ text = "Bubble shape: round", x = 740, y = 790, w = 420, h = 72, accent = true, onClick = function(b)
+    W = P2L.shape_button
+    P2(ui:button{ text = "Bubble shape: round", x = W.x, y = W.y, w = W.w, h = W.h, accent = true, onClick = function(b)
         shapeIdx = shapeIdx % #SHAPES + 1
         bubble:setShape(SHAPES[shapeIdx])
         b:setText("Bubble shape: " .. SHAPES[shapeIdx])
     end })
 
     -- tail-drag handle (a gold pin drawn at the tail apex)
-    handleCv = CANVAS:CreateCanvas(40, 40)
-    handleCv:FillCircle(20, 20, 16, 60, 40, 70, 255)
-    handleCv:FillCircle(20, 20, 12, 255, 206, 84, 255)
-    handleCv:FillCircle(20, 20, 5, 90, 60, 40, 255)
+    local pin = LAB.tail_pin
+    handleCv = CANVAS:CreateCanvas(pin.canvas_size, pin.canvas_size)
+    local mid = pin.canvas_size / 2
+    for _, ring in ipairs(pin.rings) do
+        local c = ring.color
+        handleCv:FillCircle(mid, mid, ring.radius, c[1], c[2], c[3], c[4])
+    end
     handleCv:Upload()
     -- resize grip (a blue rounded square drawn at the bottom-right corner)
-    sizeCv = CANVAS:CreateCanvas(36, 36)
-    sizeCv:FillRect(2, 2, 32, 32, 60, 40, 70, 255)
-    sizeCv:FillRect(5, 5, 26, 26, 90, 200, 230, 255)
+    local grip = LAB.size_grip
+    sizeCv = CANVAS:CreateCanvas(grip.canvas_size, grip.canvas_size)
+    for _, sq in ipairs(grip.squares) do
+        local c = sq.color
+        sizeCv:FillRect(sq.inset, sq.inset, sq.size, sq.size, c[1], c[2], c[3], c[4])
+    end
     sizeCv:Upload()
     updateHandle(); updateSizeHandle()
 
@@ -186,8 +211,9 @@ function update(ts)
     if page == 2 and labBubble and not ui:isCapturing() then
         local mx, my = INPUT:GetMouseXY()
         if INPUT:MousePressed("Left") then
-            if (mx - sizeHandle.x) ^ 2 + (my - sizeHandle.y) ^ 2 < 28 * 28 then dragMode = "resize"
-            elseif (mx - tailHandle.x) ^ 2 + (my - tailHandle.y) ^ 2 < 26 * 26 then dragMode = "tail"
+            local gr, tr = LAB.size_grip.grab_radius, LAB.tail_pin.grab_radius
+            if (mx - sizeHandle.x) ^ 2 + (my - sizeHandle.y) ^ 2 < gr * gr then dragMode = "resize"
+            elseif (mx - tailHandle.x) ^ 2 + (my - tailHandle.y) ^ 2 < tr * tr then dragMode = "tail"
             elseif mx >= labBubble.x and mx <= labBubble.x + labBubble.w and my >= labBubble.y and my <= labBubble.y + labBubble.h then
                 dragMode, grabDX, grabDY = "body", mx - labBubble.x, my - labBubble.y
             else dragMode = nil end
@@ -200,13 +226,13 @@ function update(ts)
             labBubble.x, labBubble.y = mx - grabDX, my - grabDY; updateHandle(); updateSizeHandle()
         elseif dragMode == "tail" then
             local side, pos, size = tailFromHandle(labBubble, mx, my)
-            if side ~= labBubble.tail or math.abs(pos - labBubble.tailPos) > 0.02 or math.abs(size - labBubble.tailSize) > 2 then
+            if side ~= labBubble.tail or math.abs(pos - labBubble.tailPos) > LAB.rebake_pos_step or math.abs(size - labBubble.tailSize) > LAB.rebake_px_step then
                 labBubble:setTail(side, pos, size, true)   -- draft (responsive)
             end
             updateHandle()
         elseif dragMode == "resize" then
             local nw, nh = mx - labBubble.x, my - labBubble.y
-            if math.abs(nw - labBubble.w) > 2 or math.abs(nh - labBubble.h) > 2 then
+            if math.abs(nw - labBubble.w) > LAB.rebake_px_step or math.abs(nh - labBubble.h) > LAB.rebake_px_step then
                 labBubble:setSize(nw, nh, true)   -- draft (responsive)
             end
             updateHandle(); updateSizeHandle()
@@ -222,6 +248,7 @@ function draw()
         if handleCv then handleCv:DrawAtAnchor(math.floor(tailHandle.x), math.floor(tailHandle.y), "center") end
     end
     -- footer hint (glyph-atlas draw, theme text colour, correct spacing, bounded glyph cache)
-    ui:drawText(22, "Esc: back    Q/E: pages    T: cycle theme    (page 2: drag bubble / tail pin / corner grip)",
-        60, 1006, ui.theme.colors.text)
+    local F = Layout.footer
+    ui:drawText(F.size, "Esc: back    Q/E: pages    T: cycle theme    (page 2: drag bubble / tail pin / corner grip)",
+        F.x, F.y, ui.theme.colors.text)
 end

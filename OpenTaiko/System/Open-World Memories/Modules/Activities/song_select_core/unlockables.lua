@@ -11,6 +11,12 @@
 -- They use their own bar/lock textures from Textures/Unlockables/Vault/.
 -- Detection: genre == "Secret Vault" AND save trigger ".vault_song_unlocked_<id>" is false.
 
+local Config    = require("Core.Config")
+local Layout    = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local U         = Layout.unlock
+local UAnim     = Animation.unlock
+
 local M = {}
 local G
 
@@ -18,30 +24,32 @@ local HI_DISPLAYED = 0
 local HI_GRAYED    = 1
 local HI_BLURED    = 2
 
--- A locked song's condition sits on the jacket (centred at x 1526, 500 px wide, its bottom at y 646). A
--- coin-only condition: the price strip along the jacket's bottom. Any other: the same strip reading "How to
+-- A locked song's condition sits on the jacket (centred at jacket_cx, jacket_w wide, its bottom at the strip's).
+-- A coin-only condition: the price strip along the jacket's bottom. Any other: the same strip reading "How to
 -- unlock" with [Decide], which opens into the details card, wider than the jacket and centred on it. Decide
 -- on the open card closes it, or unlocks the song when its condition is met. The card stays open or closed
 -- while browsing.
-local JACKET_CX, JACKET_W   = 1526, 500
-local STRIP_Y, STRIP_H      = 554, 92
-local CARD_Y, CARD_W, CARD_H = 146, 600, 500
-local CARD_PAD_X       = 30     -- the text's inset from the card's sides
-local CARD_TITLE_Y     = 22     -- the title's top, from the card's top
-local CARD_TEXT_Y      = 94     -- the condition text's top, from the card's top
-local CARD_TEXT_H      = 380    -- a taller condition text is shrunk vertically to this height
-local TITLE_SCALE_SHUT = 0.75   -- the title's size on the closed strip
-local DETAILS_MS       = 220    -- the card opening or closing
-local TEXT_FADE_FROM   = 0.6    -- the condition text fades in over the last part of the opening
-local PRICE_COIN_X     = 52     -- the coin's centre, from the strip's left edge
-local PRICE_COIN_SIZE  = 58
-local PRICE_TEXT_X     = 96     -- the price's left edge
-local STRIP_MSG_RIGHT  = 22     -- the right-hand text's margin
-local PRICE_MSG_W      = 300    -- the message's widest box (longer ones are squished)
+local JACKET_CX, JACKET_W   = U.jacket_cx, U.jacket_w
+local STRIP_Y, STRIP_H      = U.strip_y, U.strip_h
+local CARD_Y, CARD_W, CARD_H = U.card_y, U.card_w, U.card_h
+local CARD_PAD_X       = U.card_pad_x       -- the text's inset from the card's sides
+local CARD_TITLE_Y     = U.card_title_y     -- the title's top, from the card's top
+local CARD_TEXT_Y      = U.card_text_y      -- the condition text's top, from the card's top
+local CARD_TEXT_H      = U.card_text_h      -- a taller condition text is shrunk vertically to this height
+local CARD_TITLE_MARGIN = U.card_title_margin   -- the title's box is the strip or card's width less this
+local TITLE_SCALE_SHUT = U.title_scale_shut -- the title's size on the closed strip
+local DETAILS_MS       = UAnim.details_ms       -- the card opening or closing
+local TEXT_FADE_FROM   = UAnim.text_fade_from   -- the condition text fades in over the last part of the opening
+local PRICE_COIN_X     = U.price_coin_x     -- the coin's centre, from the strip's left edge
+local PRICE_COIN_SIZE  = U.price_coin_size
+local PRICE_TEXT_X     = U.price_text_x     -- the price's left edge
+local STRIP_MSG_RIGHT  = U.strip_msg_right  -- the right-hand text's margin
+local PRICE_MSG_W      = U.price_msg_w      -- the message's widest box (longer ones are squished)
+local VAULT_BOX, VAULT_TEXT = U.vault_box, U.vault_text
 local COIN_CONDS = { ch = true, cs = true, cm = true }
-local COL_PRICE       = COLOR:CreateColorFromARGB(255, 255, 226, 92)
-local COL_PRICE_SHORT = COLOR:CreateColorFromARGB(255, 255, 110, 100)
-local COL_KEY         = COLOR:CreateColorFromARGB(255, 190, 198, 216)
+local COL_PRICE       = Config.color(U.price_color)
+local COL_PRICE_SHORT = Config.color(U.price_short_color)
+local COL_KEY         = Config.color(U.key_color)
 
 -- a missing key comes back as "[LOCALE NOT FOUND: KEY]": the fallback then; texts may start with "["
 local function tr(key, fallback)
@@ -205,11 +213,11 @@ end
 
 -- ── Conditions panels ─────────────────────────────────────────────────────────
 
--- unlock text keeps the original behavior: no horizontal wrap — the width squishes to the box (806) while
--- the HEIGHT shrinks independently (scaleY) when the newline-stacked block exceeds the 380px text area
+-- unlock text keeps the original behavior: no horizontal wrap — the width squishes to the box (vault_text.max_width)
+-- while the HEIGHT shrinks independently (scaleY) when the newline-stacked block exceeds the text area
 local function drawCondText(condText, scale)
     if condText == nil or condText == "" then return end
-    G.text:Draw(condText, 350, 605, flashColor, nil, 1, 1, 806, "topleft", scale or 1)
+    G.text:Draw(condText, VAULT_TEXT.x, VAULT_TEXT.y, flashColor, nil, 1, 1, VAULT_TEXT.max_width, "topleft", scale or 1)
 end
 
 -- Rebuilt only when the cache is invalid (selection moved / activity re-activated / unlock attempted):
@@ -299,7 +307,7 @@ function M.drawCondsPanel()
         cardTitle = cardTitle or tr("SONGSELECT_UNLOCK_TITLE", "How to unlock")
         local ts = lerp(TITLE_SCALE_SHUT, 1, e)
         local ty = lerp(STRIP_Y + STRIP_H / 2 - big.LineHeight * ts / 2, CARD_Y + CARD_TITLE_Y, e)
-        big:Draw(cardTitle, x + w / 2, ty, nil, nil, 1, ts, w - 160, "top")
+        big:Draw(cardTitle, x + w / 2, ty, nil, nil, 1, ts, w - CARD_TITLE_MARGIN, "top")
         -- [Decide]: the strip's right end, then the card's bottom-right corner
         decideLabel = decideLabel or tr("SONGSELECT_DECIDE_KEY", "[Decide]")
         small:Draw(decideLabel, x + w - STRIP_MSG_RIGHT + smallPad, y + h - STRIP_H / 2 - small.LineHeight / 2,
@@ -333,10 +341,10 @@ end
 function M.drawVaultCondsPanel()
     if condCache == nil then refreshCondCache() end
     if condCache.mode == "vault" then
-        G.bars["condsbox"]:DrawAtAnchor(317, 572, "topleft")
+        G.bars["condsbox"]:DrawAtAnchor(VAULT_BOX.x, VAULT_BOX.y, "topleft")
         drawCondText("Get this song in the Secret Vault menu", 1)
     elseif condCache.mode == "vaultFolder" then
-        G.bars["condsbox"]:DrawAtAnchor(317, 572, "topleft")
+        G.bars["condsbox"]:DrawAtAnchor(VAULT_BOX.x, VAULT_BOX.y, "topleft")
         drawCondText("4 keys is what you need...", 1)
     end
 end
@@ -350,7 +358,8 @@ end
 
 local function startFlash()
     lastFlashVal = nil
-    G.startCounter("unlock_flash", 0, 255, 1/510, "none", function(val)
+    -- the green and blue channels climb 0..255 over flash_s: red to white
+    G.startCounter("unlock_flash", 0, 255, UAnim.flash_s / 255, "none", function(val)
         val = math.floor(val)
         if val ~= lastFlashVal then
             lastFlashVal = val

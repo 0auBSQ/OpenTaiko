@@ -1,0 +1,49 @@
+{
+    "_note": "Intro Nokon curtain timings. Times in seconds, 'at' times from the start of the fade-in; distances in 1920x1080 pixels; rates in radians per second. A '_min' / '_extra' pair is a random value from min to min + extra.",
+    "curtain": {
+        "_note": "close_s: the curtain closing (the fade-out); show_s: the show on the shut curtain; open_s: the curtain opening after it. The lights and the name go during the first lights_fade (part, 0 to 1) of the opening; the confetti fades out over the last confetti_fade_s of the fade-in.",
+        "close_s": 0.9,
+        "show_s": 4.45,
+        "open_s": 0.9,
+        "lights_fade": 0.3,
+        "confetti_fade_s": 0.4
+    },
+    "lights": {
+        "_note": "the lights go down over dim_s; the spotlights circle in from spot_at_s and merge at spot_end_s (the drum roll's crash), turning turns times around, turn_ease and shrink_ease the powers of their turn and of their orbit's shrink; the flash then grows by flash_grow_px from flash_start_size over flash_s",
+        "dim_s": 0.3,
+        "spot_at_s": 0.10,
+        "spot_end_s": 1.70,
+        "turns": 2.2,
+        "turn_ease": 1.15,
+        "shrink_ease": 1.1,
+        "flash_s": 0.35,
+        "flash_start_size": 380,
+        "flash_grow_px": 1400
+    },
+    "letters": {
+        "_note": "the first and the last letter start falling at fall_at_s and fall_last_s, one letter's fall taking fall_s; it lands with a squash of squash over land_s. The first and the last letter start their hop at hop_at_s and hop_last_s (confetti and applause start), one hop taking hop_s, growing by hop_grow and tilting hop_tilt_deg.",
+        "fall_at_s": 1.85,
+        "fall_last_s": 2.55,
+        "fall_s": 0.42,
+        "land_s": 0.18,
+        "squash": 0.18,
+        "hop_at_s": 3.05,
+        "hop_last_s": 3.85,
+        "hop_s": 0.40,
+        "hop_grow": 0.45,
+        "hop_tilt_deg": 9
+    },
+    "confetti": {
+        "_note": "speed in px per second; sway in px at sway_rate; spin in degrees per second; flip_rate in radians per second",
+        "speed_min": 260,
+        "speed_extra": 220,
+        "sway_min": 20,
+        "sway_extra": 45,
+        "sway_rate_min": 1.5,
+        "sway_rate_extra": 2.0,
+        "spin_deg_per_s_min": 90,
+        "spin_deg_per_s_extra": 270,
+        "flip_rate_min": 2,
+        "flip_rate_extra": 4
+    }
+}

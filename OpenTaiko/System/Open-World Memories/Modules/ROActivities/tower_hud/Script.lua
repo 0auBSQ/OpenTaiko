@@ -12,14 +12,24 @@
 -- Driven by the gameplay screen: activate(maxFloor), update() and draw() every frame, deactivate(). The
 -- floor and the lives are read from PLAYSTATE.
 
-local TITLE_SIZE, LABEL_SIZE, NUMBER_SIZE, LIVES_SIZE = 26, 30, 42, 24
-local CENTER_X = 960
-local CHAIN_TOP = -6           -- where the top ropes start, just above the screen
-local ROPE_GAP = 18            -- rope length between two planks
-local HOLE_INSET_X, HOLE_INSET_Y = 24, 11   -- the rope holes, from the plank's ends and edges
-local FLIP_SECONDS = 0.45
-local BAR_W, BAR_H = 220, 22
-local PLAIN_BAR_FROM = 100     -- lives from which the bar has no segments
+-- positions, sizes and colours: Config/layout.json; the flip and the sway: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local CHAIN, LIVES, FLIP, SWAY = Layout.chain, Layout.lives, Animation.flip, Animation.sway
+local TILT1, TILT2 = SWAY.tilt[1], SWAY.tilt[2]
+local SWAY_X1, SWAY_X2 = SWAY.x[1], SWAY.x[2]
+local SWAY_Y = SWAY.y
+
+local FONT_SIZES = Layout.font_sizes
+local TITLE_SIZE, LABEL_SIZE, NUMBER_SIZE, LIVES_SIZE = FONT_SIZES.title, FONT_SIZES.label, FONT_SIZES.number, FONT_SIZES.lives
+local CENTER_X = CHAIN.center_x
+local CHAIN_TOP = CHAIN.top    -- where the top ropes start, just above the screen
+local ROPE_GAP = CHAIN.rope_gap   -- rope length between two planks
+local HOLE_INSET_X, HOLE_INSET_Y = CHAIN.hole_inset.x, CHAIN.hole_inset.y   -- the rope holes, from the plank's ends and edges
+local FLIP_SECONDS = FLIP.flip_s
+local BAR_W, BAR_H = LIVES.bar_width, LIVES.bar_height
+local PLAIN_BAR_FROM = LIVES.plain_from   -- lives from which the bar has no segments
 
 local fontTitle, fontLabel, fontNumber, fontLives
 local colText, colOutline
@@ -44,7 +54,7 @@ local function tr(key, fallback)
 end
 
 -- a glyph line anchored at its middle sits its ink high by half the box's bottom padding
-local function nudge(gf) return math.floor((gf.BoxHeight - math.ceil(gf.LineHeight)) / 2) - 1 end
+local function nudge(gf) return math.floor((gf.BoxHeight - math.ceil(gf.LineHeight)) / 2) + Layout.text_nudge end
 
 -- ── layout ───────────────────────────────────────────────────────────────────────────────────────────
 
@@ -59,21 +69,22 @@ local function buildLayout()
     local prefixW = fontLabel:Measure(strings.prefix)
     local flapW = tex.flap.Width
     local restW = fontLabel:Measure(strings.rest)
-    local left = -(prefixW + flapW + 6 + restW) / 2
+    local floorGap = Layout.floor.gap
+    local left = -(prefixW + flapW + floorGap + restW) / 2
     layout.prefixX = left + prefixW / 2
     layout.flapX = left + prefixW + flapW / 2
-    layout.restX = left + prefixW + flapW + 6 + restW / 2
+    layout.restX = left + prefixW + flapW + floorGap + restW / 2
 
     -- plank 3 holds the label then the bar
     local livesW = fontLives:Measure(strings.lives)
-    local contentW = livesW + 16 + BAR_W
+    local contentW = livesW + LIVES.gap + BAR_W
     layout.livesX = -contentW / 2 + livesW / 2
-    layout.barX = -contentW / 2 + livesW + 16 + BAR_W / 2
+    layout.barX = -contentW / 2 + livesW + LIVES.gap + BAR_W / 2
 
-    local y = CHAIN_TOP + ROPE_GAP + 10
+    local y = CHAIN_TOP + ROPE_GAP + CHAIN.first_extra
     for i, t in ipairs({ tex.plank_title, tex.plank_floor, tex.plank_lives }) do
         local w, h = t.Width, t.Height
-        planks[i] = { tex = t, w = w, h = h, cx = CENTER_X, cy = y + h / 2, phase = i * 1.9,
+        planks[i] = { tex = t, w = w, h = h, cx = CENTER_X, cy = y + h / 2, phase = i * SWAY.phase_step,
                       hx = w / 2 - HOLE_INSET_X, hy = h / 2 - HOLE_INSET_Y,
                       pose = { x = CENTER_X, y = y + h / 2, angle = 0, s = 0, c = 1 } }
         y = y + h + ROPE_GAP
@@ -90,12 +101,12 @@ function onStart()
     fontLabel = TEXT:CreateGlyphCached(LABEL_SIZE)
     fontNumber = TEXT:CreateGlyphCached(NUMBER_SIZE)
     fontLives = TEXT:CreateGlyphCached(LIVES_SIZE)
-    colText = COLOR:CreateColorFromRGBA(250, 236, 200, 255)
-    colOutline = COLOR:CreateColorFromRGBA(58, 34, 18, 255)
-    colLives.blue = COLOR:CreateColorFromRGBA(72, 144, 255, 255)
-    colLives.yellow = COLOR:CreateColorFromRGBA(255, 208, 64, 255)
-    colLives.red = COLOR:CreateColorFromRGBA(236, 64, 56, 255)
-    colLives.empty = COLOR:CreateColorFromRGBA(66, 46, 30, 255)
+    colText = Config.color(Layout.text_color)
+    colOutline = Config.color(Layout.outline_color)
+    colLives.blue = Config.color(LIVES.blue_color)
+    colLives.yellow = Config.color(LIVES.yellow_color)
+    colLives.red = Config.color(LIVES.red_color)
+    colLives.empty = Config.color(LIVES.empty_color)
 end
 
 local function readState()
@@ -147,9 +158,11 @@ local function pose(p)
     local t = clock
     local ph = p.phase
     local q = p.pose
-    q.angle = 1.4 * math.sin(t * 0.9 + ph) + 0.5 * math.sin(t * 2.3 + ph * 0.7)
-    q.x = p.cx + 4 * math.sin(t * 0.7 + ph) + 1.5 * math.sin(t * 1.9 + ph)
-    q.y = p.cy + 3 * math.sin(t * 1.1 + ph * 1.3)
+    q.angle = TILT1.deg * math.sin(t * TILT1.rate + ph * TILT1.phase_scale)
+        + TILT2.deg * math.sin(t * TILT2.rate + ph * TILT2.phase_scale)
+    q.x = p.cx + SWAY_X1.px * math.sin(t * SWAY_X1.rate + ph * SWAY_X1.phase_scale)
+        + SWAY_X2.px * math.sin(t * SWAY_X2.rate + ph * SWAY_X2.phase_scale)
+    q.y = p.cy + SWAY_Y.px * math.sin(t * SWAY_Y.rate + ph * SWAY_Y.phase_scale)
     local rad = math.rad(q.angle)
     q.s, q.c = math.sin(rad), math.cos(rad)
     return q
@@ -174,8 +187,8 @@ end
 local function livesColor()
     local ratio = maxLives > 0 and lives / maxLives or 0
     local lastLife = lives == 1 and maxLives ~= 1
-    if ratio > 0.5 and not lastLife then return colLives.blue end
-    if ratio >= 0.2 and not lastLife then return colLives.yellow end
+    if ratio > LIVES.blue_above and not lastLife then return colLives.blue end
+    if ratio >= LIVES.yellow_from and not lastLife then return colLives.yellow end
     return colLives.red
 end
 
@@ -187,7 +200,10 @@ local function drawBar(cx, q)
     local col = livesColor()
     local n = math.max(1, maxLives)
     local segments = (n >= PLAIN_BAR_FROM) and 1 or n
-    local gap = (n <= 12 and 3) or (n <= 30 and 2) or (n <= 60 and 1) or 0
+    local gap = 0
+    for _, g in ipairs(LIVES.segment_gaps) do
+        if n <= g.up_to then gap = g.gap; break end
+    end
     if segments == 1 then gap = 0 end
     local segW = (BAR_W - gap * (segments - 1)) / segments
     local seg = tex.bar_segment
@@ -222,7 +238,7 @@ local function drawFloorFlap(q)
             sy = -math.cos(k * math.pi)
         end
         sy = math.max(0.02, sy)
-        shade = 0.55 + 0.45 * sy
+        shade = FLIP.shade_min + FLIP.shade_range * sy
     end
     local flap = tex.flap
     flap:SetScale(1, sy)
@@ -231,8 +247,11 @@ local function drawFloorFlap(q)
     flap:DrawAtAnchor(px, py, "center")
     flap:SetColor(1.0, 1.0, 1.0)
     local col = colText
-    if shade < 1 then col = COLOR:CreateColorFromRGBA(math.floor(250 * shade), math.floor(236 * shade), math.floor(200 * shade), 255) end
-    fontNumber:Draw(tostring(value), px, py + nudge(fontNumber) * sy, col, colOutline, 1, 1, flap.Width - 10, "center", sy, q.angle)
+    if shade < 1 then
+        local c = Layout.text_color
+        col = COLOR:CreateColorFromRGBA(math.floor(c[1] * shade), math.floor(c[2] * shade), math.floor(c[3] * shade), c[4])
+    end
+    fontNumber:Draw(tostring(value), px, py + nudge(fontNumber) * sy, col, colOutline, 1, 1, flap.Width - Layout.floor.text_margin, "center", sy, q.angle)
 end
 
 local poses = {}
@@ -280,7 +299,7 @@ function draw()
     -- plank 1: the title
     do
         local p, q = planks[1], poses[1]
-        fontTitle:Draw(strings.title, q.x, q.y + nudge(fontTitle), colText, colOutline, 1, 1, p.w - 40, "center", 0, q.angle)
+        fontTitle:Draw(strings.title, q.x, q.y + nudge(fontTitle), colText, colOutline, 1, 1, p.w - Layout.title.text_margin, "center", 0, q.angle)
     end
     -- plank 2: prefix, the flap, "/k" and the suffix
     do

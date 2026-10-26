@@ -24,18 +24,23 @@
 --   glow      color, opacity [min,max], pulse_ms, blend — a full-screen tint
 -- Files resolve in the set's folder first, then in Textures/Backgrounds/_common/.
 
-local CFG = require("sscore_config")
+local Config    = require("Core.Config")
+local Layout    = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local BgAnim    = Animation.background
 
 local M = {}
 local G
 local COL_WHITE = COLOR:CreateColorFromHex("FFFFFFFF")
 
-local FADE_MS   = CFG.num("background.fade_ms", 450)         -- crossfade between sets
-local CACHE_MAX = CFG.num("background.cache_sets", 6)        -- decoded sets kept (least recently used go)
-local STACK_MAX = CFG.num("background.stack_max", 4)         -- sets blended at once while scrolling fast
+local FADE_MS   = BgAnim.fade_ms                   -- crossfade between sets
+local CACHE_MAX = Layout.background.cache_sets     -- decoded sets kept (least recently used go)
+local STACK_MAX = BgAnim.stack_max                 -- sets blended at once while scrolling fast
 local SCREEN_W, SCREEN_H = 1920, 1080
+local TWINKLE_BASE, TWINKLE_AMOUNT = BgAnim.particle_twinkle_base, BgAnim.particle_twinkle_amount
+local FLICKER_BASE, FLICKER_AMOUNT, FLICKER_MS = BgAnim.ray_flicker_base, BgAnim.ray_flicker_amount, BgAnim.ray_flicker_ms
 
-local DEFAULT_DEF = { layers = { { type = "image", file = "Textures/bg1.png", scroll = 40, y = 0, opacity = { 1, 1 }, blend = "normal" } } }
+local DEFAULT_DEF = { layers = { { type = "image", file = "Textures/bg1.png", scroll = BgAnim.default_scroll_px_per_s, y = 0, opacity = { 1, 1 }, blend = "normal" } } }
 
 local BASE   = "Textures/Backgrounds/"
 local COMMON = BASE .. "_common/"
@@ -405,7 +410,7 @@ local function drawParticles(S, L, alpha)
     local tw = tex.Width
     for _, p in ipairs(S.items) do
         local op = p.op
-        if L.twinkleMs > 0 then op = op * (0.55 + 0.45 * math.sin(2 * math.pi * S.t / L.twinkleMs + p.phase)) end
+        if L.twinkleMs > 0 then op = op * (TWINKLE_BASE + TWINKLE_AMOUNT * math.sin(2 * math.pi * S.t / L.twinkleMs + p.phase)) end
         local x = p.x
         if L.sway > 0 then x = x + L.sway * math.sin(2 * math.pi * S.t / L.swayMs + p.phase) end
         local sc = p.size / tw
@@ -450,7 +455,7 @@ local function drawRays(S, L, alpha)
         local cx = L.x + math.sin(rad) * h / 2 * -1
         local cy = L.y + math.cos(rad) * h / 2
         tex:SetRotation(-a)   -- SetRotation is counter-clockwise
-        tex:SetOpacity(alpha * op * (0.8 + 0.2 * math.sin(S.t / 700 + i)))
+        tex:SetOpacity(alpha * op * (FLICKER_BASE + FLICKER_AMOUNT * math.sin(S.t / FLICKER_MS + i)))
         tex:DrawAtAnchor(cx, cy, "center")
     end
     tex:SetRotation(0)

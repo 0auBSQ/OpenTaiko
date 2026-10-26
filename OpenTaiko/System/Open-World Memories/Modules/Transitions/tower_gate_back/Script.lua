@@ -3,13 +3,19 @@
 
 local TA = require("TransitionArt")
 
-FADE_OUT_SECONDS = 1.1
-FADE_IN_SECONDS  = 1.2
+-- positions and sizes: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local DUST, CLOSE, DUST_ANIM = Layout.dust, Animation.close, Animation.dust
 
-local SCREEN_W = 1920
-local TOP = -60                  -- 60 px of extra art above and below, for the shake
-local SHUT_AT = 0.68             -- part of the fade-out when the halves meet
-local TRAVEL_PAD = 40            -- how far past the screen edge an open half rests
+FADE_OUT_SECONDS = CLOSE.fade_out_s
+FADE_IN_SECONDS  = Animation.open_s
+
+local SCREEN_W = Layout.screen_width
+local TOP = Layout.gate.top
+local SHUT_AT = CLOSE.shut_at
+local TRAVEL_PAD = Layout.gate.travel_pad
 
 local tx_left, tx_right, tx_dust = nil, nil, nil
 local snd_slide, snd_slam, snd_open = nil, nil, nil
@@ -38,7 +44,7 @@ local function easeInOut(x) return x < 0.5 and 4 * x * x * x or 1 - (-2 * x + 2)
 -- openness: 0 = shut, 1 = off screen
 local function drawGate(openness, dx, dy)
 	if tx_left == nil or tx_right == nil then return end
-	local w = tx_left.Width > 0 and tx_left.Width or 1010
+	local w = tx_left.Width > 0 and tx_left.Width or Layout.gate.half_width
 	local travel = openness * (SCREEN_W / 2 + TRAVEL_PAD)
 	tx_left:Draw(SCREEN_W / 2 - w - travel + dx, TOP + dy)
 	tx_right:Draw(SCREEN_W / 2 + travel + dx, TOP + dy)
@@ -47,14 +53,14 @@ end
 -- dust from the seam, k goes 0..1 over its life
 local function drawDust(k, strength)
 	if tx_dust == nil or k >= 1 then return end
-	tx_dust:SetOpacity(0.85 * (1 - k) * strength)
-	for i = 1, 7 do
+	tx_dust:SetOpacity(DUST.opacity * (1 - k) * strength)
+	for i = 1, DUST.count do
 		local side = (i % 2 == 0) and 1 or -1
-		local y = 100 + (i - 1) * 150
-		local s = (0.6 + 1.2 * k) * (0.8 + 0.25 * ((i * 37) % 5) / 4) * strength
+		local y = DUST.first_y + (i - 1) * DUST.spacing_y
+		local s = (DUST_ANIM.start_scale + DUST_ANIM.grow * k) * (DUST.base_scale + DUST.scale_spread * ((i * 37) % 5) / 4) * strength
 		tx_dust:SetScale(s, s)
-		tx_dust:SetRotation(i * 47 + k * 40 * side)
-		tx_dust:DrawAtAnchor(SCREEN_W / 2 + side * (20 + 110 * k), y, "center")
+		tx_dust:SetRotation(i * DUST.angle_step_deg + k * DUST_ANIM.turn_deg * side)
+		tx_dust:DrawAtAnchor(SCREEN_W / 2 + side * (DUST.seam_offset + DUST_ANIM.travel * k), y, "center")
 	end
 	tx_dust:SetScale(1, 1); tx_dust:SetRotation(0); tx_dust:SetOpacity(1)
 end
@@ -80,8 +86,8 @@ function fadeOut(t)
 		if snd_slam then snd_slam:Play() end
 	end
 	local k = (t - SHUT_AT) / (1 - SHUT_AT)
-	local amp = 20 * (1 - k) ^ 2
-	drawGate(0, amp * math.sin(k * 70), amp * math.cos(k * 53))
+	local amp = CLOSE.shake_px * (1 - k) ^ 2
+	drawGate(0, amp * math.sin(k * CLOSE.shake_freq_x), amp * math.cos(k * CLOSE.shake_freq_y))
 	drawDust(k, 1)
 end
 
@@ -97,7 +103,7 @@ function fadeIn(t)
 		if snd_open then snd_open:Play() end
 	end
 	drawGate(easeInOut(t), 0, 0)
-	drawDust(clamp01(t / 0.45), 0.6)
+	drawDust(clamp01(t / DUST_ANIM.open_life), DUST_ANIM.open_strength)
 	if t >= 1 then freeTextures() end   -- the trip is over
 end
 

@@ -14,10 +14,15 @@
 
 local EM = require("EventMode")
 
-local RED_FROM = 10          -- seconds: red digits and a tick each second from here down
-local HUD_X, HUD_Y = 24, 16
-local PILL_W, PILL_H = 236, 64
-local LINE_H = 30
+-- positions, sizes and colours: Config/layout.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local PILL, COUNTDOWN, PLAYS = Layout.pill, Layout.countdown, Layout.plays
+
+local RED_FROM = COUNTDOWN.red_from_s   -- seconds: red digits and a tick each second from here down
+local HUD_X, HUD_Y = PILL.x, PILL.y
+local PILL_W, PILL_H = PILL.width, PILL.height
+local LINE_H = PILL.line_height
 
 local pills = {}             -- height -> a cream pill canvas of that height (one line, two lines)
 local gfontBig, gfontSmall
@@ -38,19 +43,21 @@ local function pillFor(h)
     if cv ~= nil then return cv end
     cv = CANVAS:CreateCanvas(PILL_W, h)
     local r = math.floor(PILL_H / 2)
-    cv:FillRect(r, 0, PILL_W - 2 * r, h, 250, 242, 222, 235)
-    cv:FillRect(0, r, PILL_W, h - 2 * r, 250, 242, 222, 235)
-    cv:FillCircle(r, r, r, 250, 242, 222, 235)
-    cv:FillCircle(PILL_W - r - 1, r, r, 250, 242, 222, 235)
-    cv:FillCircle(r, h - r - 1, r, 250, 242, 222, 235)
-    cv:FillCircle(PILL_W - r - 1, h - r - 1, r, 250, 242, 222, 235)
+    local c = PILL.color
+    local cr, cg, cb, ca = c[1], c[2], c[3], c[4]
+    cv:FillRect(r, 0, PILL_W - 2 * r, h, cr, cg, cb, ca)
+    cv:FillRect(0, r, PILL_W, h - 2 * r, cr, cg, cb, ca)
+    cv:FillCircle(r, r, r, cr, cg, cb, ca)
+    cv:FillCircle(PILL_W - r - 1, r, r, cr, cg, cb, ca)
+    cv:FillCircle(r, h - r - 1, r, cr, cg, cb, ca)
+    cv:FillCircle(PILL_W - r - 1, h - r - 1, r, cr, cg, cb, ca)
     cv:Upload()
     pills[h] = cv
     return cv
 end
 
 -- a glyph line anchored at its middle sits its ink high by half the box's bottom padding
-local function nudge(gf) return math.floor((gf.BoxHeight - math.ceil(gf.LineHeight)) / 2) - 1 end
+local function nudge(gf) return math.floor((gf.BoxHeight - math.ceil(gf.LineHeight)) / 2) + Layout.text_nudge end
 
 -- the seconds left, whole, or nil without a countdown
 local function seconds()
@@ -59,11 +66,11 @@ local function seconds()
 end
 
 function onStart()
-    gfontBig = TEXT:CreateGlyphCached(40)
-    gfontSmall = TEXT:CreateGlyphCached(22)
-    colBlack = COLOR:CreateColorFromRGBA(20, 18, 24, 255)
-    colRed = COLOR:CreateColorFromRGBA(214, 40, 40, 255)
-    colNone = COLOR:CreateColorFromRGBA(0, 0, 0, 0)
+    gfontBig = TEXT:CreateGlyphCached(COUNTDOWN.font_size)
+    gfontSmall = TEXT:CreateGlyphCached(PLAYS.font_size)
+    colBlack = Config.color(COUNTDOWN.color)
+    colRed = Config.color(COUNTDOWN.red_color)
+    colNone = Config.color(Layout.edge_color)
 end
 
 function restart(secs)
@@ -113,12 +120,12 @@ function draw()
     pillFor(h):DrawAtAnchor(HUD_X, HUD_Y, "topleft")
     local cx, y = HUD_X + PILL_W / 2, HUD_Y + PILL_H / 2
     if secs ~= nil then
-        gfontBig:Draw(tostring(secs), cx, y + nudge(gfontBig), secs <= RED_FROM and colRed or colBlack, colNone, 1, 1, PILL_W - 40, "center")
-        y = y + LINE_H + 4
+        gfontBig:Draw(tostring(secs), cx, y + nudge(gfontBig), secs <= RED_FROM and colRed or colBlack, colNone, 1, 1, PILL_W - COUNTDOWN.text_margin, "center")
+        y = y + LINE_H + COUNTDOWN.line_gap
     end
     if plays ~= nil then
         local text = string.format(tr("EVENT_PLAYS_LEFT", "Plays left: %d"), plays)
-        gfontSmall:Draw(text, cx, y + nudge(gfontSmall), colBlack, colNone, 1, 1, PILL_W - 30, "center")
+        gfontSmall:Draw(text, cx, y + nudge(gfontSmall), colBlack, colNone, 1, 1, PILL_W - PLAYS.text_margin, "center")
     end
 end
 

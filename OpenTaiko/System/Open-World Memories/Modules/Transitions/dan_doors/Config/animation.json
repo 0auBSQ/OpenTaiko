@@ -1,0 +1,22 @@
+{
+    "_note": "Fox Dojo doors timings, in seconds; distances in 1920x1080 pixels.",
+    "doors": { "close_s": 0.7, "open_s": 0.7 },
+    "title": {
+        "_note": "pass_s is one line's crossing; the lower line follows the upper one by stagger_s; the doors open tail_s after the lower line's crossing. drift is how far a line creeps either side of the middle; out_at is the part of a crossing when the line speeds off. The path is curve_cubic * u^3 + curve_quintic * u^5 of the crossing.",
+        "pass_s": 2.4,
+        "stagger_s": 0.15,
+        "tail_s": 0.1,
+        "drift": 70,
+        "out_at": 0.78,
+        "curve_cubic": 0.35,
+        "curve_quintic": 0.65
+    },
+    "trail": {
+        "_note": "the streak behind a fast line: it shows above min_speed_px_per_s and is full speed_range_px_per_s above that; each copy sits spacing_s of travel behind the previous one",
+        "copies": 3,
+        "min_speed_px_per_s": 900,
+        "speed_range_px_per_s": 3000,
+        "spacing_s": 0.012,
+        "opacity": 0.22
+    }
+}

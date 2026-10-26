@@ -1,0 +1,4 @@
+{
+    "_note": "Dojo doors timings, in seconds.",
+    "doors": { "close_s": 0.7, "open_s": 0.7 }
+}

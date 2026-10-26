@@ -20,13 +20,32 @@
 -- for them. The coin is the "Coin" shared texture (_boot registers Textures/Coin.png, so an artist
 -- can redraw it); a drawn fallback covers a skin without one.
 
+-- positions, sizes and colours: Config/CoinBox/layout.json; timings: Config/CoinBox/animation.json
+local HERE = require("Core.Here")(...)
+local Config = require("Core.Config")
+local Layout = Config.load(HERE .. "Config/CoinBox/layout.json")
+local Animation = Config.load(HERE .. "Config/CoinBox/animation.json")
+
 local CoinBox = {}
 CoinBox.__index = CoinBox
 
+local Pill = Layout.pill
+local Icon = Layout.icon
+local Fallback = Layout.fallback_coin
+local Text = Layout.text
+local Flying = Layout.flying_coin
+local Roll = Animation.roll
+local Pay = Animation.pay
+local Gain = Animation.gain
+local Flight = Animation.coin_flight
+
 local SCREEN_W = 1920
-local ICON = 44
-local INK = { 52, 58, 92 }
-local RED, GREEN = { 214, 64, 56 }, { 62, 168, 92 }
+local ICON = Icon.size
+local ICON_LEFT = Icon.left
+local INK = Text.ink_color
+local RED, GREEN = Text.red_color, Text.green_color
+local OUTLINE, OUTLINE_ALPHA = Text.outline_color, Text.outline_alpha
+local RIGHT_INSET, ABOVE_DY = Text.right_inset, Text.above_dy
 local COIN_SFX = "../../ROActivities/modal/Sounds/Coin.ogg"   -- from any Modules/<kind>/<name>/ folder
 local PAY_SFX = "../coin_shop/Sounds/Buy.ogg"                 -- from any Modules/Stages/<name>/ folder
 
@@ -50,15 +69,17 @@ end
 local function coinIcon(s)
     local cv = CANVAS:CreateCanvas(s, s)
     local c, r = floor(s / 2), floor(s / 2) - 1
-    cv:FillCircle(c, c, r, 24, 24, 30, 255)
-    local ri = r - 3
-    cv:FillCircle(c, c, ri, 232, 52, 44, 255)
+    local rim, top, bottom, glint = Fallback.rim_color, Fallback.top_color, Fallback.bottom_color, Fallback.glint_color
+    cv:FillCircle(c, c, r, rim[1], rim[2], rim[3], 255)
+    local ri = r - Fallback.rim
+    cv:FillCircle(c, c, ri, top[1], top[2], top[3], 255)
     for dy = 0, ri do
         local half = floor(sqrt(ri * ri - dy * dy))
-        cv:FillRect(c - half, c + dy, 2 * half + 1, 1, 52, 120, 236, 255)
+        cv:FillRect(c - half, c + dy, 2 * half + 1, 1, bottom[1], bottom[2], bottom[3], 255)
     end
-    cv:FillRect(c - ri, c, 2 * ri + 1, 1, 24, 24, 30, 255)
-    cv:FillCircle(c - floor(ri * 0.4), c - floor(ri * 0.45), max(2, floor(ri * 0.18)), 255, 200, 200, 255)
+    cv:FillRect(c - ri, c, 2 * ri + 1, 1, rim[1], rim[2], rim[3], 255)
+    cv:FillCircle(c - floor(ri * Fallback.glint_dx), c - floor(ri * Fallback.glint_dy),
+        max(Fallback.glint_min, floor(ri * Fallback.glint_size)), glint[1], glint[2], glint[3], 255)
     cv:Upload()
     return cv
 end
@@ -67,10 +88,10 @@ end
 function CoinBox.new(o)
     o = o or {}
     local self = setmetatable({}, CoinBox)
-    self.w, self.h = o.w or 300, o.h or 66
-    self.x = o.x or (SCREEN_W - 60 - self.w)
-    self.y = o.y or 60
-    self.face = o.face or { 255, 250, 226 }
+    self.w, self.h = o.w or Pill.w, o.h or Pill.h
+    self.x = o.x or (SCREEN_W - Pill.right_margin - self.w)
+    self.y = o.y or Pill.y
+    self.face = o.face or Pill.face_color
     self.textColor = o.text or INK
     self.sfx, self.paySfx = o.sfx, o.paySfx
     self.ownSfx, self.ownPaySfx = false, false
@@ -100,7 +121,8 @@ end
 function CoinBox:_ensureArt()
     if self.pillCv then return end
     self.pillCv = pill(self.w, self.h, self.face[1], self.face[2], self.face[3])
-    self.shadowCv = pill(self.w, self.h, 40, 34, 60)
+    local shadow = Pill.shadow_color
+    self.shadowCv = pill(self.w, self.h, shadow[1], shadow[2], shadow[3])
     if self.coinTex == nil then
         pcall(function() self.coinTex = SHARED:GetSharedTexture("Coin") end)
     end
@@ -115,11 +137,11 @@ function CoinBox:_ensureArt()
 end
 
 -- every label here is anchored by its middle, where the glyph box draws its ink high: move it down
-local function nudge(size) return floor(size * 0.36) end
+local function nudge(size) return floor(size * Text.nudge) end
 
 function CoinBox:_text(size, str, x, y, color, opacity, anchor)
     local gf = self:_font(size)
-    gf:Draw(tostring(str), x, y + nudge(size), self:_color(color), self:_color({ 255, 255, 255 }, 220), opacity, 1, 0, anchor)
+    gf:Draw(tostring(str), x, y + nudge(size), self:_color(color), self:_color(OUTLINE, OUTLINE_ALPHA), opacity, 1, 0, anchor)
 end
 
 function CoinBox:_chime()
@@ -170,12 +192,13 @@ function CoinBox:pay(n)
     local x, y, w, h = self.x, self.y, self.w, self.h
     self.balance = self.balance - n
     self.price = nil
-    self.drops[#self.drops + 1] = { text = "-" .. tostring(n), x = x + w - 24, y = y - 26, ty = y + h / 2, t = 0, dur = 0.55, color = RED }
-    for i = 1, 8 do
-        self.coins[#self.coins + 1] = { x = x + w - 60 - (i - 1) * 26, y = y - 26 - (i % 3) * 10, tx = x + ICON / 2 + 11, ty = y + h / 2,
-                                        t = 0, dur = 0.45 + (i % 4) * 0.05, delay = 0.05 * i, spin = (i % 2 == 0) and 1 or -1 }
+    self.drops[#self.drops + 1] = { text = "-" .. tostring(n), x = x + w - RIGHT_INSET, y = y - ABOVE_DY, ty = y + h / 2, t = 0, dur = Pay.drop_s, color = RED }
+    for i = 1, Pay.count do
+        self.coins[#self.coins + 1] = { x = x + w - Pay.start_from_right - (i - 1) * Pay.step_x, y = y - Pay.start_dy - (i % Pay.row_cycle) * Pay.row_dy,
+                                        tx = x + ICON / 2 + ICON_LEFT, ty = y + h / 2,
+                                        t = 0, dur = Pay.dur_s + (i % Pay.dur_cycle) * Pay.dur_step_s, delay = Pay.delay_step_s * i, spin = (i % 2 == 0) and 1 or -1 }
     end
-    self.rollDelay = 0.45
+    self.rollDelay = Pay.roll_delay_s
 end
 
 -- coins pour into the purse from above and a green "+n" rises out of it; the balance rolls up
@@ -183,17 +206,18 @@ function CoinBox:gain(n)
     self:_ensureArt()
     local x, y, w, h = self.x, self.y, self.w, self.h
     self.balance = self.balance + n
-    self.rises[#self.rises + 1] = { text = "+" .. tostring(n), x = x + w / 2, y = y + h / 2, t = 0, dur = 0.9, color = GREEN }
-    for i = 1, 8 do
-        self.coins[#self.coins + 1] = { x = x + 40 + (i - 1) * 30, y = y - 90 - (i % 3) * 14, tx = x + ICON / 2 + 11, ty = y + h / 2,
-                                        t = 0, dur = 0.4 + (i % 3) * 0.06, delay = 0.04 * i, spin = (i % 2 == 0) and 1 or -1 }
+    self.rises[#self.rises + 1] = { text = "+" .. tostring(n), x = x + w / 2, y = y + h / 2, t = 0, dur = Gain.rise_s, color = GREEN }
+    for i = 1, Gain.count do
+        self.coins[#self.coins + 1] = { x = x + Gain.start_from_left + (i - 1) * Gain.step_x, y = y - Gain.start_dy - (i % Gain.row_cycle) * Gain.row_dy,
+                                        tx = x + ICON / 2 + ICON_LEFT, ty = y + h / 2,
+                                        t = 0, dur = Gain.dur_s + (i % Gain.dur_cycle) * Gain.dur_step_s, delay = Gain.delay_step_s * i, spin = (i % 2 == 0) and 1 or -1 }
     end
-    self.rollDelay = 0.3
+    self.rollDelay = Gain.roll_delay_s
     self:_chime()
 end
 
 function CoinBox:update(dt)
-    self.alpha = self.alpha + ((self.shown and 1 or 0) - self.alpha) * min(1, dt * 10)
+    self.alpha = self.alpha + ((self.shown and 1 or 0) - self.alpha) * min(1, dt * Animation.fade_rate_per_s)
     if not self.shown and self.alpha < 0.01 then self.alpha = 0 end
     for i = #self.drops, 1, -1 do
         local d = self.drops[i]
@@ -217,8 +241,8 @@ function CoinBox:update(dt)
     if self.rollDelay > 0 then
         self.rollDelay = self.rollDelay - dt
     elseif self.rolling ~= self.balance then
-        self.rolling = self.rolling + (self.balance - self.rolling) * min(1, dt * 7)
-        if math.abs(self.balance - self.rolling) < 0.6 then self.rolling = self.balance end
+        self.rolling = self.rolling + (self.balance - self.rolling) * min(1, dt * Roll.rate_per_s)
+        if math.abs(self.balance - self.rolling) < Roll.snap then self.rolling = self.balance end
     end
 end
 
@@ -226,32 +250,32 @@ function CoinBox:draw()
     local a = self.alpha
     if a <= 0 or self.pillCv == nil then return end
     local x, y, w, h = self.x, self.y, self.w, self.h
-    self.shadowCv:SetOpacity(0.35 * a) ; self.shadowCv:Draw(x + 4, y + 6) ; self.shadowCv:SetOpacity(1)
+    self.shadowCv:SetOpacity(Pill.shadow_opacity * a) ; self.shadowCv:Draw(x + Pill.shadow_dx, y + Pill.shadow_dy) ; self.shadowCv:SetOpacity(1)
     self.pillCv:SetOpacity(a) ; self.pillCv:Draw(x, y) ; self.pillCv:SetOpacity(1)
-    self:drawCoin(x + 11 + ICON / 2, y + h / 2, 1, 1, a)
-    self:_text(30, floor(self.rolling + 0.5), x + w - 24, y + h / 2, self.textColor, a, "right")
+    self:drawCoin(x + ICON_LEFT + ICON / 2, y + h / 2, 1, 1, a)
+    self:_text(Text.balance_size, floor(self.rolling + 0.5), x + w - RIGHT_INSET, y + h / 2, self.textColor, a, "right")
     if self.price ~= nil then
-        self:_text(24, self.price, x + w - 24, y - 26, self.textColor, a, "right")
+        self:_text(Text.price_size, self.price, x + w - RIGHT_INSET, y - ABOVE_DY, self.textColor, a, "right")
     elseif self.bonus ~= nil then
         local up = self.bonus > 0
-        self:_text(26, (up and "+" or "-") .. tostring(math.abs(self.bonus)), x + w - 24, y - 26, up and GREEN or RED, a, "right")
+        self:_text(Text.bonus_size, (up and "+" or "-") .. tostring(math.abs(self.bonus)), x + w - RIGHT_INSET, y - ABOVE_DY, up and GREEN or RED, a, "right")
     end
     for _, d in ipairs(self.drops) do
         local k = easeIn(min(1, d.t / d.dur))
-        self:_text(24, d.text, d.x, d.y + (d.ty - d.y) * k, d.color, a * (1 - k * 0.4), "right")
+        self:_text(Text.drop_size, d.text, d.x, d.y + (d.ty - d.y) * k, d.color, a * (1 - k * Pay.drop_fade), "right")
     end
     for _, r in ipairs(self.rises) do
         local k = min(1, r.t / r.dur)
-        self:_text(26, r.text, r.x, r.y - 70 * ease(k), r.color, a * (1 - k), "center")
+        self:_text(Text.rise_size, r.text, r.x, r.y - Gain.rise_px * ease(k), r.color, a * (1 - k), "center")
     end
     for _, c in ipairs(self.coins) do
         local k = (c.t - c.delay) / c.dur
         if k >= 0 and k < 1 then
             local e = easeIn(k)
             local cx = c.x + (c.tx - c.x) * e
-            local cy = c.y + (c.ty - c.y) * e - sin(k * 3.14159) * 34
-            local s = 0.5 + 0.2 * sin(k * 12 * c.spin)             -- a little wobble reads as a spin
-            self:drawCoin(cx, cy, s, 0.5, a)
+            local cy = c.y + (c.ty - c.y) * e - sin(k * 3.14159) * Flight.arc_px
+            local s = Flying.scale_x + Flying.wobble * sin(k * Flight.wobble_freq * c.spin)             -- a little wobble reads as a spin
+            self:drawCoin(cx, cy, s, Flying.scale_y, a)
         end
     end
 end

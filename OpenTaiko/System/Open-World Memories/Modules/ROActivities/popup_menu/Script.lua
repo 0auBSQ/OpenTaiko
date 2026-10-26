@@ -5,6 +5,11 @@
 -- (customize the popup look by editing those). Driven via:
 --   activate(title, items("\n"-joined), fontSize, <PopupMenu_* positions...>)
 --   draw(selectedIndex)   -- per frame; cursor highlights the selected line
+-- the cursor's tile count: Config/layout.json
+
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local CURSOR_TILES = Layout.cursor.middle_tiles
 
 local _active = false
 
@@ -81,7 +86,7 @@ function draw(selected)
         local h = cursor.Height
         cursor:DrawRect(curX, curY, 0, 0, w, h)
         curX = curX + w
-        for _ = 0, 15 do
+        for _ = 1, CURSOR_TILES do
             cursor:DrawRect(curX, curY, math.floor(w / 2), 0, w, h)
             curX = curX + w
         end

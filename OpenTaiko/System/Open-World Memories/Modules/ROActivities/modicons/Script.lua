@@ -9,6 +9,10 @@
 --   modicons:Draw(x, y, player)            -- uses "menu" layout (single row)
 --   modicons:Draw(x, y, player, "game")    -- uses "game" layout (2×4 grid)
 
+-- slot offsets, the value font and its colour: Config/layout.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+
 local _isActive = false
 
 -- Loaded in onStart(), disposed in onDestroy()
@@ -21,13 +25,13 @@ local colWhite        -- white text colour
 --   Slot 1: HS   2: Stealth   3: Random   4: Fun
 --   Slot 5: Just  6: Timing   7: SongSpeed  8: Auto / special mod
 --
--- "menu" : single horizontal row, 45 px between slots
-local OFFSET_X_MENU = {  0, 45, 90, 135, 180, 225, 270, 315 }
-local OFFSET_Y_MENU = {  0,  0,  0,   0,   0,   0,   0,   0 }
+-- "menu" : single horizontal row
+local OFFSET_X_MENU = Layout.menu.offset_x
+local OFFSET_Y_MENU = Layout.menu.offset_y
 
 -- "game" : 4+4 grid (top row = slots 1-4, bottom row = slots 5-8)
-local OFFSET_X_GAME = {  0, 45, 90, 135,   0,  45,  90, 135 }
-local OFFSET_Y_GAME = {  0,  0,  0,   0,  45,  45,  45,  45 }
+local OFFSET_X_GAME = Layout.game.offset_x
+local OFFSET_Y_GAME = Layout.game.offset_y
 
 -- ─── Speed values ────────────────────────────────────────────────────────────
 -- Scroll speed: nScrollSpeed 9 = x1 (multiplier = (value+1)/10). Any other value shows a single HS icon plus
@@ -35,7 +39,7 @@ local OFFSET_Y_GAME = {  0,  0,  0,   0,  45,  45,  45,  45 }
 -- Icons are ~37px, so keep the value font small.
 local SCROLL_SPEED_NORMAL = CONFIG.SCROLLSPEED.Normal
 local SONG_SPEED_NORMAL = CONFIG.SONGSPEED.Normal
-local VALUE_FONT_SIZE = 16
+local VALUE_FONT_SIZE = Layout.value.font_size
 
 -- Icon of each CONFIG:GetSpecialMod value shown in the Auto slot (Auto itself follows CONFIG:GetAutoStatus)
 local SPECIAL_ICONS = { [2] = "Flawless", [3] = "Timed", [4] = "TimedHard" }
@@ -252,7 +256,7 @@ function onStart()
     tx["HS"] = TEXTURE:CreateTexture("Textures/Mods/HS.png")
 
     valueFont = TEXT:CreateGlyphCached(VALUE_FONT_SIZE)
-    colWhite  = COLOR:CreateColorFromARGB(255, 255, 255, 255)
+    colWhite  = Config.color(Layout.value.color)
 
     -- Fun: 1=Avalanche, 2=Minesweeper, 3=DynamicBeat
     for i = 1, 3 do

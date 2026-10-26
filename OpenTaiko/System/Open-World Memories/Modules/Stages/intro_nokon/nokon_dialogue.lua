@@ -8,38 +8,29 @@
 
 local DialogueLib = require("dialogue")   -- resolves to Modules/Lib/dialogue.lua
 local I18N        = require("i18n")
+local Config      = require("Core.Config")
+local Layout      = Config.load("Config/layout.json")
+local Animation   = Config.load("Config/animation.json")
+local Dlg         = Layout.dialogue
 
 local M = {}
 
 local tx = {}
 
 -- ── Layout constants ──────────────────────────────────────────────────────────
-local NOKON_Y     = 507
-local NOKON_X_IN  = 1480
-local NOKON_X_OUT = 1980
-local SLIDE_DUR   = 0.4
+local NOKON_Y     = Dlg.nokon_y
+local NOKON_X_IN  = Dlg.nokon_x_in
+local NOKON_X_OUT = Dlg.nokon_x_out
+local SLIDE_DUR   = Animation.dialogue.slide_s
 
-local BOX = { x = 74, y = 740, w = 1448, h = 270 }
+local BOX = Config.plain(Dlg.box)
 
-local CHARS_PER_SEC = 28
+local CHARS_PER_SEC = Animation.dialogue.chars_per_s
 
 local SCREEN_W, SCREEN_H = 1920, 1080
 
 -- showbiz theme: red velvet face, gold trim, warm text
-local THEME = {
-    face      = { 64, 24, 32, 255 },
-    face2     = { 44, 14, 22, 255 },
-    outline   = { 212, 171, 66, 255 },
-    namePill  = { 158, 32, 44, 255 },
-    namePill2 = { 118, 18, 32, 255 },
-    nameText  = { 255, 230, 170 },
-    text      = { 255, 244, 232 },
-    choiceRow = { 84, 34, 42, 235 },
-    choiceSel = { 132, 52, 60, 255 },
-    choiceText = { 255, 236, 214 },
-    caret     = { 255, 215, 120 },
-    shadow    = { 12, 6, 8, 110 },
-}
+local THEME = Config.plain(Dlg.theme)
 
 -- ── State ─────────────────────────────────────────────────────────────────────
 local active   = false
@@ -82,14 +73,14 @@ end
 function M.init(t)
     tx = t
     -- single-arg CreateGlyphCached only (NLua params-cache pitfall — see nlua-params-cache-nre)
-    gfont     = TEXT:CreateGlyphCached(26)
-    gfontName = TEXT:CreateGlyphCached(24)
+    gfont     = TEXT:CreateGlyphCached(Dlg.fonts.text)
+    gfontName = TEXT:CreateGlyphCached(Dlg.fonts.name)
     dlg = DialogueLib.new({
         gfont = gfont, gfontName = gfontName,
         ui = "popui",
         theme = THEME,
         box = BOX,
-        portraitSize = 0,
+        portraitSize = Dlg.portrait_size,
         cps = CHARS_PER_SEC,
         advanceInput = function() return INPUT:Pressed("Decide") end,
     })

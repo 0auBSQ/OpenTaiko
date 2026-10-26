@@ -1,0 +1,12 @@
+{
+    "_note": "Rainbow spectrum and glitter motion (Lib/Rainbow), used when the caller's opts leave a value out. Times in seconds.",
+    "spectrum": { "_note": "hue turns per second the spectrum scrolls", "speed_turns_per_s": 0.35 },
+    "glitter": {
+        "_note": "rate_per_s sparkles a second, at most burst_max spawned in one frame; a sparkle lives life_s plus up to life_range_s more and spins up to spin_deg_per_s either way",
+        "rate_per_s": 6,
+        "burst_max": 3,
+        "life_s": 0.45,
+        "life_range_s": 0.4,
+        "spin_deg_per_s": 120
+    }
+}

@@ -5,11 +5,16 @@
 
 local TA = require("TransitionArt")
 
-FADE_OUT_SECONDS = 0.9   -- curtain closing
-FADE_IN_SECONDS  = 0.9   -- curtain opening
+-- sizes: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
 
-local SCREEN_W, SCREEN_H = 1920, 1080
-local CURTAIN_W = 960                    -- each half
+FADE_OUT_SECONDS = Animation.curtain.close_s
+FADE_IN_SECONDS  = Animation.curtain.open_s
+
+local SCREEN_W, SCREEN_H = Layout.screen.width, Layout.screen.height
+local CURTAIN_W = Layout.curtain_half_width   -- each half
 
 local tx_closed, tx_open = nil, nil
 local snd_curtain = nil

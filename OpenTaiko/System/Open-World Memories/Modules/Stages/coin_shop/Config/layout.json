@@ -1,0 +1,137 @@
+{
+    "_note": "Coin shop layout, in 1920x1080 pixels. Colours are [r, g, b, a] from 0 to 255, except splash_colors, [r, g, b] from 0 to 1 (SetColor). Opacities and shades 0 to 1, angles in degrees (counter-clockwise). The page's own positions (page, hero, grid, coupon, note) are in page pixels, 0..page.w and 0..page.h of the Page.png content; a listing's pieces are offsets from its centre, in its own turned frame.",
+    "fonts": { "plate_title": 16, "mast": 56, "big": 40, "talk": 32, "mid": 30, "small": 24 },
+    "colors": {
+        "ink_color": [52, 44, 52, 255],
+        "red_color": [214, 52, 44, 255],
+        "stamp_color": [214, 52, 44, 255],
+        "white_color": [255, 255, 255, 255],
+        "cream_color": [255, 248, 236, 255],
+        "gold_color": [255, 226, 150, 255],
+        "clear_color": [0, 0, 0, 0]
+    },
+    "desk": { "_note": "Desk.png's top-left (its wood starts 4 px in).", "x": 1180, "y": 786 },
+    "nameplate": { "_note": "The player's nameplate on the desk's front.", "x": 1232, "y": 903 },
+    "till": {
+        "_note": "The coin counter on the desk's front, centred at (x, y): the coin coin_dx from it, fitted to a coin_size square; the amount right-aligned at amount_dx.",
+        "x": 1738, "y": 944,
+        "coin_dx": -112, "coin_size": 42,
+        "amount_dx": 150, "amount_max_width": 260
+    },
+    "title_plate_offset": { "_note": "A nameplate title is drawn this far from the point it is shown at.", "x": 15, "y": -45 },
+    "dim_color": [6, 8, 16, 150],
+    "confirm": {
+        "_note": "The modals sit over the page, leaving the keeper in view: centred on center_x, panel_w wide, the buttons button_w x button_h under each other.",
+        "center_x": 614,
+        "panel_w": 600,
+        "button_w": 340,
+        "button_h": 76,
+        "buy": {
+            "_note": "The buy dialog; the _quantity values are used when the item has a quantity chooser. Cancel sits button_gap under Buy. The item's picture is fitted to a preview_size square centred at preview_y.",
+            "panel_y": 180, "panel_h": 640, "panel_h_quantity": 720,
+            "price_y": 452,
+            "quantity_y": 508,
+            "chooser_y": 546, "chooser_h": 62,
+            "total_y": 520, "buy_y": 596,
+            "total_y_quantity": 634, "buy_y_quantity": 706,
+            "button_gap": 92,
+            "preview_y": 322, "preview_size": 168
+        },
+        "reroll": { "panel_y": 280, "panel_h": 480, "ask_y": 384, "cost_y": 448, "go_y": 528, "cancel_y": 620 },
+        "theme": {
+            "_note": "The PopUI theme of the modals, in the magazine's paper and ink (PopUI's own key names).",
+            "colors": {
+                "bg": [251, 246, 232, 255], "surface": [255, 252, 243, 255], "surface2": [243, 233, 210, 255],
+                "primary": [226, 72, 61, 255], "primary2": [192, 50, 43, 255],
+                "accent": [255, 214, 77, 255], "accent2": [236, 180, 40, 255],
+                "outline": [58, 46, 52, 255], "text": [58, 46, 52, 255], "textOnAccent": [255, 255, 255, 255],
+                "textDisabled": [170, 158, 150, 255], "shadow": [60, 40, 30, 90], "gloss": [255, 255, 255, 120],
+                "focusRing": [47, 160, 154, 255], "track": [236, 226, 206, 255]
+            },
+            "radius": 18
+        }
+    },
+    "page": {
+        "_note": "The catalog page (Page.png, w x h) centred at (x, y); its shadow shadow_dx / shadow_dy further. The masthead is left-aligned at (masthead.x, masthead.y), the issue line right-aligned at issue.x on the same line.",
+        "w": 1160, "h": 990,
+        "x": 614, "y": 541,
+        "shadow_dx": 12, "shadow_dy": 16,
+        "masthead": { "x": 34, "y": 69, "max_width": 640 },
+        "issue": { "x": 1133, "max_width": 380 }
+    },
+    "text": { "_note": "A text longer than its max width first shrinks, down to fit_min of its size, then squeezes; box_pad (times the scale) is added to the squeeze width.", "fit_min": 0.72, "box_pad": 50 },
+    "coin_px": 42,
+    "amount": { "_note": "A coin and an amount next to it: the coin coin_w wide (drawn at coin_scale), then gap.", "coin_w": 34, "gap": 6, "coin_scale": 0.85 },
+    "sold": { "_note": "A sold-out item's picture or plate: drawn at opacity, its picture shaded to shade.", "opacity": 0.45, "shade": 0.7 },
+    "lift_shadow": { "_note": "The soft shadow under a lifted piece, offset by (x, y); EntryShadow.png is tex_w x tex_h and is stretched to the piece; opacity at full selection.", "x": 7, "y": 11, "tex_w": 340, "tex_h": 330, "opacity": 0.5 },
+    "tilt": {
+        "_note": "Each listing's rest pose, picked at random in [min, max] when the page is laid out: its tilt by kind, its offset (offset_px each way), the tilt of its tape, price tag and splash.",
+        "big_deg": [-0.6, 0.6],
+        "normal_deg": [-1.3, 1.3],
+        "reroll_deg": [-2.4, -1.2],
+        "back_deg": [3, 5],
+        "offset_px": [-3, 3],
+        "tape_deg": [-7, 7],
+        "tag_deg": [-4, 4],
+        "splash_deg": [-8, 8]
+    },
+    "hero": {
+        "_note": "The featured listing.",
+        "x": 221, "y": 493, "w": 390, "h": 670,
+        "photo_y": -100,
+        "picture_w": 300, "picture_h": 300,
+        "tapes": [{ "x": -168, "y": -170, "rot_deg": 42 }, { "x": 168, "y": -170, "rot_deg": -42 }],
+        "name_y": 185, "name_max_width": 350,
+        "sticker": { "_note": "The price sticker: the coin at coin_y, the price at price_y, fitted to price_max_width.", "x": 118, "y": 50, "rot_deg": 8, "coin_y": -34, "price_y": 14, "price_max_width": 116 },
+        "badge": { "x": 162, "y": -262 },
+        "stamp_rot_deg": 14
+    },
+    "burst": { "_note": "The 'Featured!' burst on the featured listing.", "x": -96, "y": -296, "rot_deg": -9, "max_width": 170 },
+    "grid": {
+        "_note": "The catalog entries' centres (cols x rows, row by row) and size: with_featured beside the featured listing, full without it.",
+        "with_featured": { "cols": [607.5, 966.5], "rows": [319.5, 663.5], "w": 335, "h": 323 },
+        "full": { "cols": [202.7, 580, 957.3], "rows": [319.5, 663.5], "w": 353, "h": 323 }
+    },
+    "cell": {
+        "_note": "A catalog entry. A nameplate title sits at plate_y as a cut-out, its shadow plate_shadow, its tape at plate_tape_y; another item's photo at photo_y, its shadow photo_shadow, its picture fitted to picture, its tape at tape_y. The name is name_inset narrower than the entry.",
+        "splash": { "x": -24, "y": -26, "scale": 1.08 },
+        "photo_y": -50,
+        "plate_y": -18,
+        "plate_shadow": { "w": 330, "h": 81 },
+        "plate_tape_y": -40,
+        "photo_shadow": { "w": 290, "h": 190 },
+        "picture": { "w": 250, "h": 150 },
+        "tape_y": -98,
+        "name_y": 69, "name_inset": 30,
+        "tag_y": 120, "price_dx": 14,
+        "badge": { "x": 130, "y": -134 },
+        "stamp_rot_deg": 12, "stamp_scale": 0.82
+    },
+    "splash_colors": [[0.82, 0.94, 0.88], [1, 0.88, 0.80], [0.90, 0.86, 0.98], [0.84, 0.92, 1], [1, 0.95, 0.78], [1, 0.86, 0.90]],
+    "coupon": {
+        "_note": "The reroll coupon.",
+        "x": 930, "y": 928, "w": 390, "h": 128,
+        "title": { "x": 52, "y": -24, "max_width": 260 },
+        "price": { "x": 52, "y": 26 }
+    },
+    "note": {
+        "_note": "The back note.",
+        "x": 112, "y": 936, "w": 170, "h": 150,
+        "label": { "x": -4, "y": 36, "max_width": 140 }
+    },
+    "stamp": { "text_max_width": 250 },
+    "stock_badge": { "text_max_width": 60 },
+    "marker": { "rot_deg": -2 },
+    "keeper": {
+        "_note": "The keeper's feet (bottom centre, behind the desk's front).",
+        "foot": { "x": 1556, "y": 845 }
+    },
+    "bubble": {
+        "_note": "The speech bubble's tail tip at (tip_x, tip_y); the image centre sits at tip + (dx, dy), its body centre body_dy above that (all times the bubble's scale). The text wraps at text_w; text_pad moves each line left.",
+        "tip_x": 1600, "tip_y": 354,
+        "dx": -108, "dy": -133,
+        "body_dy": -32,
+        "text_w": 548,
+        "text_pad": 25
+    }
+}

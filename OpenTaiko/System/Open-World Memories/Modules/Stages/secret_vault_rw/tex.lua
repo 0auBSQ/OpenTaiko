@@ -1,4 +1,9 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local Fit = Layout.text_fit
+
 local A = {}
 
 A.SW, A.SH = 1920, 1080
@@ -12,11 +17,12 @@ function A.approach(v, target, step)
     return math.max(target, v - step)
 end
 
--- seconds since the last frame, kept between 0 and 0.1
+-- seconds since the last frame, kept between 0 and frame_step_max_s
 function A.dt()
     local ok, d = pcall(function() return fps.deltaTime end)
     d = (ok and type(d) == "number") and d or (1 / 60)
-    if d < 0 then d = 0 elseif d > 0.1 then d = 0.1 end
+    local cap = Animation.frame_step_max_s
+    if d < 0 then d = 0 elseif d > cap then d = cap end
     return d
 end
 
@@ -125,7 +131,7 @@ end
 
 -- text centred (or "left"/"right") on the frame's point, its ink vertically centred there; maxInk = the widest
 -- the ink may get at this scale (0 = no limit): a longer text shrinks down to FIT_MIN, then squeezes
-local FIT_MIN = 0.72
+local FIT_MIN = Fit.fit_min
 function A.text(font, str, f, fore, back, scale, maxInk, anchor, op)
     if font == nil or str == nil or str == "" then return end
     local s = f.k * (scale or 1)
@@ -135,7 +141,7 @@ function A.text(font, str, f, fore, back, scale, maxInk, anchor, op)
     end
     local n = A.nudge(font) * s
     local x, y = f.x + n * f.s, f.y + n * f.c
-    local maxW = (maxInk and maxInk > 0) and (maxInk * f.k + 50 * s) or 0
+    local maxW = (maxInk and maxInk > 0) and (maxInk * f.k + Fit.box_pad * s) or 0
     font:Draw(str, x, y, fore, back or A.clear(), op or 1, s, maxW, anchor or "center", 0, f.rot)
 end
 
@@ -186,7 +192,7 @@ end
 -- scale and the line pitch at that scale. Below kmin the lines are squeezed by A.text's maxInk.
 local boxes = setmetatable({}, { __mode = "k" })
 function A.fitBox(font, str, w, h, kmax, kmin)
-    kmax, kmin = kmax or 1, kmin or 0.6
+    kmax, kmin = kmax or 1, kmin or Fit.box_min_scale
     local byFont = boxes[font]
     if byFont == nil then byFont = {}; boxes[font] = byFont end
     local key = str .. "\0" .. w .. "\0" .. h .. "\0" .. kmax .. "\0" .. kmin
@@ -204,16 +210,16 @@ function A.fitBox(font, str, w, h, kmax, kmin)
     while k >= kmin - 1e-6 do
         best, fits = try(k)
         if fits then break end
-        k = k - 0.04
+        k = k - Fit.box_step
     end
     -- a last line of a word or two: a little smaller, if that saves the line
     local n = #best.lines
-    if fits and n > 1 and A.measure(font, best.lines[n]) * best.k < w * 0.25 then
-        local k2 = best.k - 0.04
-        while k2 >= math.max(kmin, best.k - 0.16) - 1e-6 do
+    if fits and n > 1 and A.measure(font, best.lines[n]) * best.k < w * Fit.short_last_line then
+        local k2 = best.k - Fit.box_step
+        while k2 >= math.max(kmin, best.k - Fit.short_line_shrink) - 1e-6 do
             local b2, f2 = try(k2)
             if f2 and #b2.lines < n then best = b2; break end
-            k2 = k2 - 0.04
+            k2 = k2 - Fit.box_step
         end
     end
     byFont[key] = best

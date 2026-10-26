@@ -1,0 +1,16 @@
+{
+    "_note": "Secret Vault water (Lib/VaultWater), in 1920x1080 pixels. render_scale: the render size against the drawn size (2/3) when the caller gives none; edge_px: the frame reaches this far past the drawn area (its texture wraps, so its outermost rows blend with the opposite side when scaled up); cull_margin_px: a surface this far below the drawn area, or a lower edge this far above it, draws nothing. Colours are [r, g, b] from 0 to 1, handed to the shader; caustics, shafts and specks are strengths (1 = full).",
+    "render_scale": 0.6666666666666666,
+    "edge_px": 4,
+    "cull_margin_px": 60,
+    "look": {
+        "deep_color": [0.010, 0.060, 0.150],
+        "mid_color": [0.030, 0.270, 0.420],
+        "shallow_color": [0.160, 0.600, 0.700],
+        "sky_color": [0.820, 0.960, 1.000],
+        "foam_color": [0.930, 0.990, 1.000],
+        "caustics": 0.42,
+        "shafts": 0.34,
+        "specks": 0.85
+    }
+}

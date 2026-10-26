@@ -1,0 +1,109 @@
+{
+    "_note": "Coin shop timings, in seconds unless the key says otherwise; distances in 1920x1080 pixels, angles in degrees. A wave is amp * sin(2 pi * hz * t + phase_rad). A wobble is amp * e^(-decay * a) * sin(rad_per_s * a), for dur_s after its event (a = time since it).",
+    "frame_step_max_s": 0.1,
+    "coins": { "_note": "The till rolling down to the new amount after a purchase.", "roll_s": 0.7 },
+    "talk": {
+        "_note": "When the keeper speaks up: about the listing in focus once it stayed there browse_after_s (at most every browse_gap_s), and after a silence of first_idle_s, then idle_repeat_s.",
+        "first_idle_s": 15,
+        "idle_repeat_s": 22,
+        "browse_after_s": 0.7,
+        "browse_gap_s": 3.5
+    },
+    "entrance": { "_note": "The listings pop in this long after the page shows.", "pop_delay_s": 0.1 },
+    "page": {
+        "_note": "The page floats (the sum of the waves of each axis, rot in degrees) and its shadow follows shadow_follow of it. A reroll turns it (shuffle); a sold-out slam shakes it, delay_s after the purchase.",
+        "float_x": [{ "amp": 3.0, "hz": 0.071, "phase_rad": 0.3 }, { "amp": 1.5, "hz": 0.173, "phase_rad": 1.9 }],
+        "float_y": [{ "amp": 3.6, "hz": 0.089, "phase_rad": 2.2 }, { "amp": 1.6, "hz": 0.211, "phase_rad": 0.7 }],
+        "float_rot": [{ "amp": 0.30, "hz": 0.061, "phase_rad": 1.1 }, { "amp": 0.15, "hz": 0.149, "phase_rad": 2.6 }],
+        "shadow_follow": 0.6,
+        "shuffle": { "dur_s": 1.6, "amp": 1.0, "decay": 4.5, "rad_per_s": 13 },
+        "shake": {
+            "delay_s": 0.14,
+            "dur_s": 0.6,
+            "x": { "amp": 5, "decay": 12, "rad_per_s": 70 },
+            "y": { "amp": 3, "decay": 12, "rad_per_s": 55, "phase_rad": 1 }
+        }
+    },
+    "listing": {
+        "_note": "Each listing sways (its tilt by sway_rot_deg, its place by sway_x_px / sway_y_px) at a rate picked in sway_hz's [min, max]; selected, it eases in at select_rate_per_s, rises select_lift_px and grows by select_grow.",
+        "select_rate_per_s": 12,
+        "sway_rot_deg": 0.22,
+        "sway_x_px": 1.2,
+        "sway_y_px": 1.4,
+        "sway_hz": { "rot": [0.11, 0.2], "x": [0.09, 0.17], "y": [0.12, 0.22] },
+        "select_lift_px": 8,
+        "select_grow": 0.045,
+        "pop": {
+            "_note": "The listings pop onto the page stagger_s apart, each turned by up to spin_deg (random), growing from start_scale with an outBack(overshoot) over ease_s, fading in over fade_s; dur_s ends the pop.",
+            "stagger_s": 0.05,
+            "spin_deg": 7,
+            "dur_s": 0.4,
+            "start_scale": 0.6,
+            "ease_s": 0.32,
+            "overshoot": 2.0,
+            "fade_s": 0.12
+        },
+        "select_wobble": { "_note": "Degrees, when it gets the focus.", "dur_s": 1, "amp": 2.6, "decay": 6, "rad_per_s": 26 },
+        "bought": { "_note": "Scale, when bought.", "dur_s": 1.2, "amp": 0.13, "decay": 7, "rad_per_s": 16 },
+        "poor": { "_note": "Pixels sideways, when out of reach.", "dur_s": 1, "amp": 9, "decay": 9, "rad_per_s": 48 },
+        "sold_out": { "_note": "Pixels sideways, when tried while sold out.", "dur_s": 1, "amp": 5, "decay": 9, "rad_per_s": 44 }
+    },
+    "plate": { "_note": "A title plate shows delay_s after its listing popped in, fading in over fade_s.", "delay_s": 0.3, "fade_s": 0.12 },
+    "stamp": {
+        "_note": "The sold-out stamp slams down over slam_s from 1 + slam_grow times its size (fading in over fade_s), then wobbles in scale until settle_end_s; tried again, it shakes (degrees).",
+        "slam_s": 0.14,
+        "slam_grow": 1.4,
+        "fade_s": 0.06,
+        "settle_end_s": 0.8,
+        "settle": { "amp": 0.05, "decay": 10, "rad_per_s": 40 },
+        "shake": { "dur_s": 1, "amp": 6, "decay": 8, "rad_per_s": 40 }
+    },
+    "burst": { "_note": "The featured burst rocks by sway_deg every period_s.", "sway_deg": 3, "period_s": 1.7 },
+    "sticker": { "_note": "The featured price sticker rocks by sway_deg every period_s.", "sway_deg": 2, "period_s": 2.3, "phase_rad": 1 },
+    "marker": {
+        "_note": "The selection marker grows from start_scale with an outBack(overshoot) over grow_s, fades in over fade_s and rocks by sway_deg every period_s.",
+        "start_scale": 0.86,
+        "grow_s": 0.2,
+        "overshoot": 2.2,
+        "fade_s": 0.06,
+        "sway_deg": 0.8,
+        "period_s": 2.3
+    },
+    "keeper": {
+        "_note": "The keeper breathes (scale amp every period_s). Its bubble types chars_per_s letters a second and stays hold_s plus hold_per_char_s a letter; a low-priority line waits low_gap_s after the last one finished typing.",
+        "chars_per_s": 36,
+        "hold_s": 2.6,
+        "hold_per_char_s": 0.045,
+        "low_gap_s": 1.0,
+        "breath": { "amp": 0.008, "period_s": 3.4 }
+    },
+    "hop": {
+        "_note": "The keeper hops when its expression changes (calla: Calla's hop amount), and nods (nod_factor of it) when it keeps it. Squash over squash_s (scale 1 + squash_x, 1 - squash_y), rise over rise_s (scale 1 - stretch_x, 1 + stretch_y, height_px up), settle over settle_s (settle_wobbles half-turns, scale 1 + settle_x, 1 - settle_y); all times the amount.",
+        "calla": 0.4,
+        "nod_factor": 0.4,
+        "squash_s": 0.08,
+        "rise_s": 0.30,
+        "settle_s": 0.24,
+        "squash_x": 0.08,
+        "squash_y": 0.10,
+        "stretch_x": 0.06,
+        "stretch_y": 0.09,
+        "height_px": 32,
+        "settle_x": 0.08,
+        "settle_y": 0.10,
+        "settle_wobbles": 3
+    },
+    "bubble": {
+        "_note": "The speech bubble pops over pop_s from start_scale (outBack(overshoot)), fading in over fade_s; a new line while open boings it (boing_grow over boing_s); it closes over close_s, shrinking by close_shrink. It floats float_px every float_period_s.",
+        "pop_s": 0.24,
+        "start_scale": 0.55,
+        "overshoot": 2.2,
+        "fade_s": 0.08,
+        "boing_s": 0.22,
+        "boing_grow": 0.06,
+        "close_s": 0.18,
+        "close_shrink": 0.12,
+        "float_px": 2,
+        "float_period_s": 2.7
+    }
+}

@@ -1,0 +1,50 @@
+{
+    "_note": "Nameplate layout, in 1920x1080 pixels; offsets are from the nameplate's top left. Font sizes are point sizes; max_size is the width a text is squeezed into. Colours are [r, g, b, a] from 0 to 255.",
+    "font_name_normal": { "size": 22, "max_size": 240 },
+    "font_name_withtitle": { "size": 18, "max_size": 240 },
+    "font_name_full": { "size": 18, "max_size": 180 },
+    "font_title": { "size": 16, "max_size": 240 },
+    "font_dan": { "size": 18, "max_size": 100 },
+    "text_name_normal": { "offset_x": 195, "offset_y": 53 },
+    "text_name_withtitle": { "offset_x": 199, "offset_y": 68 },
+    "text_name_full": { "offset_x": 226, "offset_y": 68 },
+    "text_title": { "offset_x": 186, "offset_y": 35 },
+    "text_dan": { "offset_x": 103, "offset_y": 68 },
+    "title_plate": { "offset_x": -3, "offset_y": -3 },
+    "title_text_color": [0, 0, 0, 255],
+    "title_text_back_color": [0, 0, 0, 0],
+    "titles": {
+        "_note": "Per title plate folder (Textures/Title/<n>/): frame_count is the last frame file's number (0 = a single 0.png); effect is \"flash\" (the star flash, needs Small.png and Big.png) or \"none\". A folder not listed has one frame and no effect.",
+        "0": { "frame_count": 0, "effect": "none" },
+        "1": { "frame_count": 0, "effect": "flash" },
+        "2": { "frame_count": 0, "effect": "flash" },
+        "3": { "frame_count": 0, "effect": "flash" },
+        "4": { "frame_count": 0, "effect": "flash" },
+        "5": { "frame_count": 0, "effect": "flash" },
+        "6": { "frame_count": 0, "effect": "flash" },
+        "7": { "frame_count": 5, "effect": "none" }
+    },
+    "stars": {
+        "_note": "Per rarity star folder (Textures/Stars/<n>/): frame_count is the last frame file's number. A folder not listed has one frame.",
+        "1": { "frame_count": 0 },
+        "2": { "frame_count": 0 },
+        "3": { "frame_count": 0 }
+    },
+    "plate_only": {
+        "_note": "Draw modes 1 and 2 (a dan or title plate alone) place the nameplate at the given point plus this offset.",
+        "offset_x": -180,
+        "offset_y": 5
+    },
+    "rarity_stars": {
+        "_note": "The rarity star overlay is drawn offset_y above the title plate. spots: per overlay (1, 2 or 3 stars; the 4-star overlay uses the 3-star spots), each star's [centre x, centre y, sprite width, clockwise rotation in degrees] in the overlay. Each star's glitter patch is half its width plus spot_padding around its centre. glint_offsets are the two glints' [x, y] beside a star of glint_base_w width, turned and scaled with each star.",
+        "offset_y": -20,
+        "spots": [
+            [[186, 23, 31, 16]],
+            [[160, 23, 31, 0], [202, 23, 31, 32]],
+            [[153, 28, 31, 0], [186, 23, 31, 16], [219, 28, 31, 32]]
+        ],
+        "spot_padding": 5,
+        "glint_base_w": 31,
+        "glint_offsets": [[9, -11], [-9, 6]]
+    }
+}

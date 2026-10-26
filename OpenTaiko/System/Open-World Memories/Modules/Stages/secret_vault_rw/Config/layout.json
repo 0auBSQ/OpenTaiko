@@ -1,0 +1,186 @@
+{
+    "_note": "Secret vault layout, in 1920x1080 pixels. Colours are [r, g, b] or [r, g, b, a] from 0 to 255; text markup strings (<g.#top.#bottom>%s</g>) are glyph gradients. Opacities, shades and scales 0 to 1; angles in degrees.",
+    "fonts": { "big": 46, "title": 34, "talk": 30, "text": 28, "small": 23 },
+    "loading": { "_note": "The text shown while the songs load.", "x": 960, "y": 540, "color": [244, 234, 214], "outline_color": [20, 16, 12], "max_width": 1200 },
+    "name_tag": { "_note": "The dialogue's name tag holds ink_w px of ink at size font: a longer name gets a smaller font, down to min_font.", "font": 30, "ink_w": 240, "min_font": 18 },
+    "text_fit": {
+        "_note": "A text longer than its max width shrinks down to fit_min of its size, then squeezes; box_pad (times the scale) is added to the squeeze width. Text fitted to a box tries scales box_step apart down to box_min_scale; a last line shorter than short_last_line of the box may shrink the text up to short_line_shrink more to save the line.",
+        "fit_min": 0.72,
+        "box_pad": 50,
+        "box_min_scale": 0.6,
+        "box_step": 0.04,
+        "short_last_line": 0.25,
+        "short_line_shrink": 0.16
+    },
+    "gate": {
+        "_note": "The vault door, centred in the doorway at center (door_r is its radius; the doorway shows it within 304 px). Its bolts' centres are bolt_out from the door's centre when locked, bolt_in when drawn back, count of them from first_deg step_deg apart; each slides through a clamp guide_r out. The wall is centred at wall. The wheel's and the keys' shadows sit (x, y) off them at opacity. The keyholes, left to right, with each key's colour; an unowned key's name is shaded to dim_shade.",
+        "center": { "x": 960, "y": 610 },
+        "door_r": 330,
+        "bolt_out": 297,
+        "bolt_in": 197,
+        "guide_r": 260,
+        "bolts": { "count": 8, "first_deg": 22.5, "step_deg": 45 },
+        "wall": { "x": 960, "y": 540 },
+        "wheel_shadow": { "x": 8, "y": 10, "opacity": 0.35 },
+        "key_shadow": { "x": 7, "y": 9, "opacity": 0.3 },
+        "keys": [
+            { "x": 200, "y": 400, "color": [96, 222, 255] },
+            { "x": 420, "y": 760, "color": [104, 232, 120] },
+            { "x": 1500, "y": 760, "color": [255, 218, 72] },
+            { "x": 1720, "y": 400, "color": [255, 96, 84] }
+        ],
+        "panel": {
+            "_note": "The hint panel, top at top, centred on center_x, sized to its text between min_w and max_w: pad_x / pad_y inside, a name_row for the key's name, a hint_row per hint line (wrapping at hint_max_w), a status_row.",
+            "top": 18,
+            "center_x": 960,
+            "pad_x": 60, "pad_y": 24,
+            "name_row": 64, "hint_row": 36, "status_row": 40,
+            "hint_max_w": 1480,
+            "min_w": 760, "max_w": 1800,
+            "dim_shade": 0.55,
+            "name_outline_color": [24, 18, 14],
+            "hint_color": [62, 38, 20],
+            "status_colors": { "missing": [170, 44, 28], "ready": [150, 94, 10], "owned": [40, 108, 50], "not_owned": [112, 100, 88] }
+        }
+    },
+    "sea": {
+        "_note": "The cabin and the sea behind its glass. Things in the sea are laid out in the room's space: x across, y down from the vanishing point (vanish_x, vanish_y), at depth z (1 = the glass; depth_px is the depth of z = 1 in px, so speeds along the walls are px / depth_px), half_w out to either side wall. floor_y is the cabin floor's screen row, desk_y the desk's (the chest stands on it), ceil_y the top bubbles rise to, kick_y the height the sea's things are laid out from, foot_y the row seaweed stands on behind the counter. The table's bottom centre at table. Fog turns things murky with depth (z_range) and distance behind the glass (d_range).",
+        "desk_y": 778,
+        "vanish_x": 960, "vanish_y": 430,
+        "half_w": 1200,
+        "floor_y": 779,
+        "ceil_y": -840,
+        "kick_y": 520,
+        "foot_y": 800,
+        "depth_px": 1663,
+        "table": { "x": 960, "y": 1080 },
+        "fog": { "z_range": 3.6, "d_range": 2600 },
+        "weeds": {
+            "_note": "Seaweed out on the sea floor: side, distance behind the glass, depth, kind (Seaweed<kind>.png), height (px at z = 1). The sea floor falls away from the glass, so a weed's foot always stays hidden behind the counter.",
+            "list": [
+                { "side": -1, "d": 60, "z": 1.30, "kind": 2, "h": 470 },
+                { "side": -1, "d": 260, "z": 1.75, "kind": 1, "h": 520 },
+                { "side": -1, "d": 120, "z": 2.30, "kind": 3, "h": 430 },
+                { "side": -1, "d": 520, "z": 2.80, "kind": 2, "h": 600 },
+                { "side": 1, "d": 90, "z": 1.45, "kind": 1, "h": 480 },
+                { "side": 1, "d": 340, "z": 2.00, "kind": 3, "h": 520 },
+                { "side": 1, "d": 160, "z": 2.55, "kind": 2, "h": 460 },
+                { "side": 1, "d": 600, "z": 3.10, "kind": 1, "h": 620 }
+            ]
+        },
+        "weed_squeeze": 0.7,
+        "weed": { "_note": "Seaweed is shaded by fog_shade of the fog, tinted (red, green, 1) and faded by fog_fade of it.", "fog_shade": 0.55, "red": 0.82, "green": 0.94, "fog_fade": 0.4 },
+        "max_fish": 9,
+        "max_bubbles": 40,
+        "start_fish": 5,
+        "start_bubbles": 22,
+        "fish": {
+            "_note": "A fish swims along a side wall, d behind the glass (picked in d, times one picked in d_spread), len long, at a height picked in y; from just off the screen's edge (near_half_w) to hidden behind the back wall's corner (far_half_w). Its art has art_pad px of margin; it tilts at most max_tilt_deg. Fog shades it (fog_shade), takes red and green out of it (fog_red, fog_green) and fades it (fog_fade).",
+            "d": [40, 900],
+            "d_spread": [0.4, 1],
+            "len": [200, 300],
+            "near_half_w": 960,
+            "far_half_w": 400,
+            "y": [-620, 400],
+            "art_pad": 12,
+            "max_tilt_deg": 24,
+            "fog_shade": 0.35,
+            "fog_red": 0.3,
+            "fog_green": 0.1,
+            "fog_fade": 0.4
+        },
+        "bubble": {
+            "_note": "A bubble rises d behind the glass at depth z, from rise_from_dy under kick_y, radius r; it goes once gone_margin above ceil_y. Fog fades it by fog_fade; it is drawn at opacity.",
+            "d": [20, 700],
+            "z": [1.15, 3.4],
+            "rise_from_dy": 80,
+            "r": [14, 30],
+            "gone_margin": 40,
+            "fog_fade": 0.5,
+            "opacity": 0.85
+        }
+    },
+    "caspian": {
+        "_note": "Mr.Caspian's feet (bottom centre) and his dialogue box (box and theme are handed to the shared dialogue library, its own key names, 0-255).",
+        "foot": { "x": 1555, "y": 855 },
+        "box": { "x": 300, "y": 822, "w": 1320, "h": 210 },
+        "portrait_size": 0,
+        "theme": {
+            "face": [46, 54, 66, 255], "face2": [28, 34, 44, 255], "outline": [196, 152, 86, 255],
+            "namePill": [210, 166, 96, 255], "namePill2": [152, 108, 54, 255], "nameText": [255, 250, 236],
+            "text": [244, 238, 226], "caret": [232, 192, 112], "shadow": [0, 10, 20, 110]
+        }
+    },
+    "cards": {
+        "_note": "The chest cards (Leave plus one per chest) around center_x: the front one at y, the next spread1 to its side, the ones after spread2 further. A card one place off is near_shrink smaller per place; further ones far_scale less far_shrink per place. Side cards are shaded by side_shade, drop side_drop px, turn rot_deg per place, and fade out from fade_from places over fade_over. On a card: the title at title_y (confirm_squeeze narrower when asking to confirm), the chest at chest_y scaled chest_scale, the stock message, the key chip at chip_y; on Leave, its label at leave_label_y. face_w is the card face's text width.",
+        "center_x": 960,
+        "y": 452,
+        "spread1": 440,
+        "spread2": 330,
+        "near_shrink": 0.26,
+        "far_scale": 0.74,
+        "far_shrink": 0.2,
+        "side_shade": 0.45,
+        "side_drop": 22,
+        "rot_deg": -4,
+        "fade_from": 1.5,
+        "fade_over": 0.5,
+        "face_w": 316,
+        "title_y": -212,
+        "confirm_squeeze": 1.14,
+        "chest_y": -70,
+        "chest_scale": 0.8,
+        "chip_y": 206,
+        "leave_label_y": 90,
+        "ink_color": [62, 38, 20],
+        "red_ink_color": [166, 40, 26],
+        "stock": {
+            "_note": "The stock message, centred at y in a face_w x h box, shrinking down to min_scale to fit. On a side card it fades down to dim_opacity. kinds: its look by how much is left (fore and back are the text and outline colours, a shadow under it, its scale; light colours with a dark outline and a soft shadow on the parchment; nothing left is plain grey and smaller).",
+            "y": 100,
+            "h": 116,
+            "min_scale": 0.6,
+            "dim_opacity": 0.45,
+            "shadow": { "x": 1, "y": 3, "color": [40, 26, 14], "opacity": 0.3 },
+            "kinds": {
+                "plenty": { "grad": "<g.#A8DCFF.#3482E2>%s</g>", "fore": [255, 255, 255], "back": [10, 32, 78], "shadow": true, "scale": 1 },
+                "various": { "grad": "<g.#C4F2AA.#3A9E45>%s</g>", "fore": [255, 255, 255], "back": [10, 46, 18], "shadow": true, "scale": 1 },
+                "few": { "fore": [255, 255, 255], "back": [44, 32, 24], "shadow": true, "scale": 1 },
+                "none": { "fore": [124, 116, 108], "scale": 0.86 }
+            }
+        },
+        "chip": {
+            "_note": "A key chip: UI/Chip.png with cap px end caps (its middle stretches between them); inside, pad_l, the icon (icon_px wide; its art has icon_art_pad px of margin), gap, the count, pad_r.",
+            "cap": 42,
+            "icon_px": 50,
+            "icon_art_pad": 12,
+            "pad_l": 16, "gap": 8, "pad_r": 24
+        },
+        "top_chips": { "_note": "The top right chips, right-aligned at right, gap apart.", "y": 60, "right": 1890, "gap": 14 }
+    },
+    "chest": {
+        "_note": "A chest being opened, centred on x: drawn at scale, its art h px tall with the keyhole hole_y from its top. The key is drawn at key_scale once home; its shadow sits (x, y) off it, lift more per unit of extra scale, at opacity. A won key comes to rest at won_y. hit and kick_flash centre the punch's and the kick's impact flashes.",
+        "x": 960,
+        "scale": 0.75,
+        "h": 300,
+        "hole_y": 171,
+        "key_scale": 0.42,
+        "key_shadow": { "x": 4, "y": 6, "lift": 14, "opacity": 0.3 },
+        "won_y": 300,
+        "hit": { "x": 960, "y": 640 },
+        "kick_flash": { "x": 960, "y": 1000 },
+        "banner": {
+            "_note": "The 'new key' banner over the won key: the title at y (fitted to title_fit, at most title_max_width), its shadow (dx, dy) off it, the key's name name_dy under it.",
+            "x": 960,
+            "y": 104,
+            "title_fit": 860,
+            "title_max_width": 900,
+            "title_markup": "<g.#FFF4C8.#E0A030>%s</g>",
+            "title_color": [255, 255, 255],
+            "ink_color": [40, 22, 8],
+            "shadow": { "dx": 3, "dy": 4, "color": [0, 0, 0], "opacity": 0.4 },
+            "name_dy": 58,
+            "name_color": [255, 246, 226],
+            "name_max_width": 700
+        }
+    }
+}

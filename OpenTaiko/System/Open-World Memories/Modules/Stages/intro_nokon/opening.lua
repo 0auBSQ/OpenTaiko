@@ -8,13 +8,17 @@
 -- update() returns "start", "back", or nil.
 
 local NavInput = require("NavInput")
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local Open, Anim = Layout.opening, Animation.opening
 
 local M = {}
 
 local tx     = {}   -- shared with Script.lua (allocated/freed there)
 local sounds = {}   -- shared with Script.lua (BGM, shared SFX)
 
-local CURTAIN_W = 960  -- each curtain half is 960px wide (1920px total)
+local CURTAIN_W = Layout.curtain.half_w  -- each curtain half's width
 
 -- Sub-state
 local subState = "closed"
@@ -45,22 +49,22 @@ local lightRotCounter    = nil
 local function empty() return COUNTER:EmptyCounter() end
 
 local function startJiggleDelay()
-    local delay = 6 + math.random()  -- 6.0–7.0 seconds
+    local delay = Anim.jiggle_delay_s + math.random() * Anim.jiggle_delay_spread_s
     jiggleDelayCounter = COUNTER:CreateCounterDuration(0, 1, delay)
     jiggleDelayCounter:Start()
 end
 
 local function startFlash()
-    -- 0→255 bounce: each half-cycle (~0.6 s)
-    flashCounter = COUNTER:CreateCounter(0, 255, 0.6 / 255)
+    -- 0→255 bounce: each half-cycle flash_half_s
+    flashCounter = COUNTER:CreateCounter(0, 255, Anim.flash_half_s / 255)
     flashCounter:SetBounce(true)
     flashCounter:Listen(function(v) flashOpacity = math.floor(v) end)
     flashCounter:Start()
 end
 
 local function startLightRot()
-    -- One full rotation every 6 seconds, looping forever
-    lightRotCounter = COUNTER:CreateCounter(0, 360, 6 / 360)
+    -- One full rotation every light_turn_s, looping forever
+    lightRotCounter = COUNTER:CreateCounter(0, 360, Anim.light_turn_s / 360)
     lightRotCounter:SetLoop(true)
     lightRotCounter:Listen(function(v) lightAngle = v end)
     lightRotCounter:Start()
@@ -84,7 +88,7 @@ function M.reset()
     lightAngle   = 0
     jiggling     = false
 
-    waitOpenCounter    = COUNTER:CreateCounterDuration(0, 1, 1.5)
+    waitOpenCounter    = COUNTER:CreateCounterDuration(0, 1, Anim.wait_s)
     curtainCounter     = empty()
     postOpenCounter    = empty()
     flashCounter       = empty()
@@ -131,8 +135,8 @@ function M.draw()
 
     -- Light.png (behind Logo, perpetually rotating, centered on Logo center)
     if tx["Light"] and tx["Logo"] then
-        local cx = 89 + tx["Logo"].Width  / 2
-        local cy = 143 + tx["Logo"].Height / 2
+        local cx = Open.logo.x + tx["Logo"].Width  / 2
+        local cy = Open.logo.y + tx["Logo"].Height / 2
         tx["Light"]:SetRotation(lightAngle)
         tx["Light"]:DrawAtAnchor(cx, cy, "center")
         tx["Light"]:SetRotation(0)
@@ -141,12 +145,12 @@ function M.draw()
     -- Logo (with occasional jiggle rotation)
     if tx["Logo"] then
         tx["Logo"]:SetRotation(logoAngle)
-        tx["Logo"]:Draw(89, 143)
+        tx["Logo"]:Draw(Open.logo.x, Open.logo.y)
         tx["Logo"]:SetRotation(0)
     end
 
     -- Nokon2
-    if tx["Nokon2"] then tx["Nokon2"]:Draw(1428, 504) end
+    if tx["Nokon2"] then tx["Nokon2"]:Draw(Open.nokon.x, Open.nokon.y) end
 
     -- Menu buttons (only once curtain is fully open)
     if subState == "menu" then
@@ -155,12 +159,12 @@ function M.draw()
 
         if tx["Start"] then
             tx["Start"]:SetOpacity(startOp)
-            tx["Start"]:DrawAtAnchor(960, 920, "center")
+            tx["Start"]:DrawAtAnchor(Open.start.x, Open.start.y, "center")
             tx["Start"]:SetOpacity(1)
         end
         if tx["Back"] then
             tx["Back"]:SetOpacity(backOp)
-            tx["Back"]:Draw(33, 905)
+            tx["Back"]:Draw(Open.back.x, Open.back.y)
             tx["Back"]:SetOpacity(1)
         end
     end
@@ -190,7 +194,7 @@ function M.update()
             waitOpenCounter = empty()
             subState = "opening"
             sounds["CurtainOpen"]:Play()
-            curtainCounter = COUNTER:CreateCounterDuration(0, CURTAIN_W, 0.9)
+            curtainCounter = COUNTER:CreateCounterDuration(0, CURTAIN_W, Animation.curtain_s)
             curtainCounter:Listen(function(v) curtainX = math.floor(v) end)
             curtainCounter:Start()
             startLightRot()
@@ -201,7 +205,7 @@ function M.update()
             curtainCounter = empty()
             curtainX = CURTAIN_W
             subState = "post_open"
-            postOpenCounter = COUNTER:CreateCounterDuration(0, 1, 2)
+            postOpenCounter = COUNTER:CreateCounterDuration(0, 1, Anim.post_open_s)
             postOpenCounter:Start()
         end
 
@@ -221,9 +225,9 @@ function M.update()
             if jiggleDelayCounter.Value >= 1 then
                 jiggling = true
                 jiggleDelayCounter = empty()
-                jiggleCounter = COUNTER:CreateCounter(0, 360, 0.5 / 360)
+                jiggleCounter = COUNTER:CreateCounter(0, 360, Anim.jiggle_s / 360)
                 jiggleCounter:Listen(function(v)
-                    logoAngle = math.sin(v * math.pi / 180) * 4
+                    logoAngle = math.sin(v * math.pi / 180) * Anim.jiggle_deg
                 end)
                 jiggleCounter:Start()
             end

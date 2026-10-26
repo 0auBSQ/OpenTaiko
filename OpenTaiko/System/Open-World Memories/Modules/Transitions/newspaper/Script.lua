@@ -8,50 +8,39 @@
 
 local TA = require("TransitionArt")
 
--- the fade-in, in seconds
-local SPIN = 0.45                        -- the title slams in
-local LAND = 0.22                        -- it lands: a short press, and the pile under it jolts
-local LEAVE_AT, LEAVE = 2.3, 0.5         -- the title is flicked off to the left
-local SCATTER_AT, SCATTER = 2.45, 1.35   -- the papers fly off to the left
-local REVEAL_AT = SCATTER_AT + 0.7       -- the shop starts to show between the leaving papers
+-- positions, sizes and colours: Config/layout.json; timings and flights: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local ARRIVE, LEAVING, DRIFT = Animation.arrive, Animation.leave, Animation.drift
+local TITLE_ANIM = Animation.title
+local SHADOW = Layout.shadow
+local TITLE = Layout.title
 
-FADE_OUT_SECONDS = 1.3                   -- the papers fly in
+-- the fade-in, in seconds
+local SPIN = TITLE_ANIM.spin_s             -- the title slams in
+local LAND = TITLE_ANIM.land_s             -- it lands: a short press, and the pile under it jolts
+local LEAVE_AT, LEAVE = TITLE_ANIM.leave_at_s, TITLE_ANIM.leave_s   -- the title is flicked off to the left
+local SCATTER_AT, SCATTER = Animation.scatter_at_s, Animation.scatter_s   -- the papers fly off to the left
+local REVEAL_AT = SCATTER_AT + Animation.reveal_after_s   -- the shop starts to show between the leaving papers
+
+FADE_OUT_SECONDS = Animation.fade_out_s  -- the papers fly in
 FADE_IN_SECONDS  = SCATTER_AT + SCATTER
 
-local SCREEN_W, SCREEN_H = 1920, 1080
+local SCREEN_W, SCREEN_H = Layout.screen.width, Layout.screen.height
 local CX, CY = SCREEN_W / 2, SCREEN_H / 2
 local PAGES = 6                          -- Textures/Page1..6.png
-local OFF = 820                          -- a page (and its shadow) this far past a screen edge is out of sight
-local TITLE_ROT = -2.5
-local TITLE_OFF = 1400
-local SHADOW_OPACITY = 0.34
-local SHADOW_X, SHADOW_Y = 10, 14        -- a resting page's shadow offset; a lifted page's shadow falls further
+local OFF = Layout.offscreen
+local TITLE_ROT = TITLE.rotation_deg
+local TITLE_OFF = TITLE_ANIM.leave_to_x
 
 local TITLE_KEY, TITLE_DEFAULT = "TITLE_STORE", "OpenTaiko's General Store"
-local FONT_SIZE = 96
-local HEAD_W, HEAD_H = 1500, 420         -- the title's room on the screen
-local BOLD = { -1.8, 0, 1.8 }            -- the title's fills, px apart along the line
-local SHADOW_DX, SHADOW_DY, SHADOW_A = 10, 12, 0.45
+local HEAD_W, HEAD_H = TITLE.room.width, TITLE.room.height
+local BOLD = TITLE.bold
 
--- where each page comes to rest, in the order they arrive (a later page lies on top): bx, by the centre and
--- s the scale; every trip moves each a little, turns it to a random angle and picks its page picture
-local SHEETS = {
-	{ bx = 1685, by = 830, s = 0.90 },
-	{ bx = 1180, by = 260, s = 0.92 },
-	{ bx = 700,  by = 830, s = 0.88 },
-	{ bx = 1685, by = 245, s = 0.90 },
-	{ bx = 240,  by = 290, s = 0.92 },
-	{ bx = 1200, by = 800, s = 0.90 },
-	{ bx = 700,  by = 280, s = 0.88 },
-	{ bx = 230,  by = 820, s = 0.90 },
-	{ bx = 1420, by = 560, s = 0.84 },
-	{ bx = 460,  by = 520, s = 0.84 },
-	{ bx = 960,  by = 600, s = 0.86 },
-	{ bx = 1830, by = 500, s = 0.82 },
-	{ bx = 90,   by = 600, s = 0.82 },
-	{ bx = 1000, by = 150, s = 0.80 },
-	{ bx = 760,  by = 980, s = 0.84 },
-}
+-- every trip moves each page a little, turns it to a random angle and picks its page picture
+local SHEETS = {}
+for i, R in ipairs(Layout.sheets.rest) do SHEETS[i] = { bx = R.bx, by = R.by, s = R.s } end
 
 local tx_pages, tx_shadow = {}, nil
 local snd_rush, snd_slap, snd_swish, snd_scatter = nil, nil, nil, nil
@@ -71,24 +60,25 @@ local function clamp01(x) return x < 0 and 0 or (x > 1 and 1 or x) end
 local function plan()
 	local r = math.random
 	local n = #SHEETS
+	local J = Layout.sheets
 	for i, S in ipairs(SHEETS) do
 		local k = (i - 1) / (n - 1)
-		S.x = S.bx + (r() - 0.5) * 60
-		S.y = S.by + (r() - 0.5) * 50
-		S.r = (r() - 0.5) * 30 + ((r() < 0.12) and 180 or 0)
+		S.x = S.bx + (r() - 0.5) * J.jitter_x
+		S.y = S.by + (r() - 0.5) * J.jitter_y
+		S.r = (r() - 0.5) * J.jitter_deg + ((r() < J.upside_down_chance) and 180 or 0)
 		S.p = math.random(PAGES)
-		S.inAt = math.max(0, 0.46 * k + 0.05 * (r() - 0.5))
-		S.inDur = math.min(1 - S.inAt, 0.36 + 0.22 * r())
-		S.fromY = S.y + (r() - 0.5) * 440
-		S.arc = 20 + 60 * r()
-		S.spinIn = (r() < 0.5 and -1 or 1) * (25 + 50 * r())
-		S.flapIn = 1.2 + 1.4 * r()
+		S.inAt = math.max(0, ARRIVE.spread * k + ARRIVE.jitter * (r() - 0.5))
+		S.inDur = math.min(1 - S.inAt, ARRIVE.duration_min + ARRIVE.duration_extra * r())
+		S.fromY = S.y + (r() - 0.5) * ARRIVE.from_y
+		S.arc = ARRIVE.arc_min + ARRIVE.arc_extra * r()
+		S.spinIn = (r() < 0.5 and -1 or 1) * (ARRIVE.spin_deg_min + ARRIVE.spin_deg_extra * r())
+		S.flapIn = ARRIVE.flap_min + ARRIVE.flap_extra * r()
 		S.ph1, S.ph2, S.ph3 = r() * 6.283, r() * 6.283, r() * 6.283
-		S.outAt = 0.5 * (1 - k) + 0.06 * r()
-		S.outDur = math.min(SCATTER - 0.02 - S.outAt, 0.55 + 0.3 * r())
-		S.toY = S.y + (r() - 0.5) * 320
-		S.spinOut = (r() < 0.5 and -1 or 1) * (15 + 30 * r())
-		S.flapOut = 1.0 + 1.2 * r()
+		S.outAt = LEAVING.spread * (1 - k) + LEAVING.jitter * r()
+		S.outDur = math.min(SCATTER - LEAVING.end_margin_s - S.outAt, LEAVING.duration_min + LEAVING.duration_extra * r())
+		S.toY = S.y + (r() - 0.5) * LEAVING.to_y
+		S.spinOut = (r() < 0.5 and -1 or 1) * (LEAVING.spin_deg_min + LEAVING.spin_deg_extra * r())
+		S.flapOut = LEAVING.flap_min + LEAVING.flap_extra * r()
 	end
 end
 
@@ -119,11 +109,11 @@ end
 -- lift 0..1: how far the page is off the pile (bigger, its shadow further and lighter)
 local function drawSheet(tx, x, y, sx, sy, rot, lift)
 	if tx == nil or tx_shadow == nil then return end
-	local grow = 1 + 0.05 * lift
-	tx_shadow:SetOpacity(SHADOW_OPACITY * (1 - 0.35 * lift))
+	local grow = 1 + SHADOW.lift_grow * lift
+	tx_shadow:SetOpacity(SHADOW.opacity * (1 - SHADOW.lift_fade * lift))
 	tx_shadow:SetScale(sx * grow, sy * grow)
 	tx_shadow:SetRotation(rot)
-	tx_shadow:DrawAtAnchor(x + SHADOW_X + 36 * lift, y + SHADOW_Y + 46 * lift, "center")
+	tx_shadow:DrawAtAnchor(x + SHADOW.x + SHADOW.lift_x * lift, y + SHADOW.y + SHADOW.lift_y * lift, "center")
 	tx:SetScale(sx, sy)
 	tx:SetRotation(rot)
 	tx:DrawAtAnchor(x, y, "center")
@@ -136,31 +126,31 @@ local function drawPile(arrive, away, jolt)
 		local l = clamp01((away - S.outAt) / S.outDur)
 		local x, y, rot, sx, lift = S.x, S.y, S.r, 1, 0
 		if a < 1 then
-			local e = 1 - (1 - a) ^ 2.5
+			local e = 1 - (1 - a) ^ ARRIVE.ease
 			local f = 1 - e
 			x = SCREEN_W + OFF + (S.x - SCREEN_W - OFF) * e
 			y = S.fromY + (S.y - S.fromY) * e - S.arc * math.sin(math.pi * e)
-			rot = S.r + S.spinIn * f ^ 1.5
-			sx = 1 - 0.3 * math.abs(math.sin(math.pi * S.flapIn * a)) * f
+			rot = S.r + S.spinIn * f ^ ARRIVE.spin_ease
+			sx = 1 - Animation.flap_squash * math.abs(math.sin(math.pi * S.flapIn * a)) * f
 			lift = f
 		elseif l > 0 then
-			local e = l ^ 2.2
+			local e = l ^ LEAVING.ease
 			x = S.x + (-OFF - S.x) * e
 			y = S.y + (S.toY - S.y) * e
 			rot = S.r + S.spinOut * e
-			sx = 1 - 0.3 * math.abs(math.sin(math.pi * S.flapOut * l)) * e
-			lift = math.min(1, l * 2.5)
+			sx = 1 - Animation.flap_squash * math.abs(math.sin(math.pi * S.flapOut * l)) * e
+			lift = math.min(1, l * LEAVING.lift_rate)
 		end
-		x = x + 6 * math.sin(0.8 * clock + S.ph1)
-		y = y + 5 * math.sin(0.6 * clock + S.ph2)
-		rot = rot + 0.7 * math.sin(0.5 * clock + S.ph3)
+		x = x + DRIFT.x_px * math.sin(DRIFT.x_rate * clock + S.ph1)
+		y = y + DRIFT.y_px * math.sin(DRIFT.y_rate * clock + S.ph2)
+		rot = rot + DRIFT.turn_deg * math.sin(DRIFT.turn_rate * clock + S.ph3)
 		if jolt ~= 0 then
 			local dx, dy = S.x - CX, S.y - CY
 			local d = math.max(1, math.sqrt(dx * dx + dy * dy))
 			x, y = x + dx / d * jolt, y + dy / d * jolt
 		end
 		if x > -OFF and x < SCREEN_W + OFF then
-			local k = S.s * (1 + 0.1 * lift)
+			local k = S.s * (1 + Layout.sheets.lift_grow * lift)
 			drawSheet(tx_pages[S.p], x, y, k * sx, k, rot, lift)
 		end
 	end
@@ -188,7 +178,7 @@ local function layout()
 	end
 	local widest = 0
 	for _, p in ipairs(parts) do widest = math.max(widest, font:Measure(p)) end
-	local pitch = font.LineHeight * 0.92
+	local pitch = font.LineHeight * TITLE.line_pitch
 	local k = math.min(1, HEAD_W / math.max(1, widest), HEAD_H / (#parts * pitch))
 	for i, p in ipairs(parts) do
 		lines[#lines + 1] = { text = p, k = k, y = (i - (#parts + 1) / 2) * pitch * k }
@@ -206,7 +196,8 @@ local function drawTitle(x, y, scale, rot, a)
 			local oy = (L.y + nudge * L.k) * scale
 			local lx, ly = x + oy * s, y + oy * c
 			if pass == 1 then
-				font:Draw(L.text, lx + SHADOW_DX * scale, ly + SHADOW_DY * scale, col_shade, col_shade, SHADOW_A * a, L.k * scale, 0, "center", 0, rot)
+				font:Draw(L.text, lx + TITLE.shadow_offset.x * scale, ly + TITLE.shadow_offset.y * scale, col_shade, col_shade,
+					TITLE.shadow_opacity * a, L.k * scale, 0, "center", 0, rot)
 			elseif pass == 2 then
 				font:Draw(L.text, lx, ly, col_paper, col_paper, a, L.k * scale, 0, "center", 0, rot)
 			else
@@ -225,22 +216,22 @@ local function drawTitleAt(now)
 	local x, y, k, rot, a = CX, CY, 1, TITLE_ROT, 1
 	if now < SPIN then
 		local u = now / SPIN
-		local e = 1 - (1 - u) ^ 3
-		k = 1.7 - 0.7 * e
-		a = math.min(1, u * 2.5)
-		rot = TITLE_ROT - 9 * (1 - e)
+		local e = 1 - (1 - u) ^ TITLE_ANIM.ease
+		k = TITLE_ANIM.start_scale - (TITLE_ANIM.start_scale - 1) * e
+		a = math.min(1, u * TITLE_ANIM.fade_in_rate)
+		rot = TITLE_ROT - TITLE_ANIM.start_turn_deg * (1 - e)
 	elseif now < SPIN + LAND then
-		k = 1 - 0.04 * math.sin(math.pi * (now - SPIN) / LAND)
+		k = 1 - TITLE_ANIM.land_press * math.sin(math.pi * (now - SPIN) / LAND)
 	elseif now > LEAVE_AT then
 		local u = (now - LEAVE_AT) / LEAVE
 		local e = u * u
 		x = CX + (-TITLE_OFF - CX) * e
-		y = CY - 50 * e
-		rot = TITLE_ROT + 14 * e
-		k = 1 + 0.05 * math.min(1, u * 3)
+		y = CY - TITLE_ANIM.rise_px * e
+		rot = TITLE_ROT + TITLE_ANIM.turn_deg * e
+		k = 1 + TITLE_ANIM.grow * math.min(1, u * TITLE_ANIM.grow_rate)
 	end
-	x = x + 3 * math.sin(0.7 * clock)
-	rot = rot + 0.35 * math.sin(0.45 * clock + 1)
+	x = x + TITLE_ANIM.sway_px * math.sin(TITLE_ANIM.sway_rate * clock)
+	rot = rot + TITLE_ANIM.sway_deg * math.sin(TITLE_ANIM.sway_turn_rate * clock + TITLE_ANIM.sway_turn_phase)
 	drawTitle(x, y, k, rot, a)
 end
 
@@ -273,7 +264,7 @@ function fadeIn(t)
 	if now >= LEAVE_AT then once("swish", snd_swish) end
 	if now >= SCATTER_AT then once("scatter", snd_scatter) end
 	local v = (now - SPIN) / LAND
-	drawPile(1, now - SCATTER_AT, (v > 0 and v < 1) and 14 * math.sin(math.pi * v) * (1 - v) or 0)
+	drawPile(1, now - SCATTER_AT, (v > 0 and v < 1) and TITLE_ANIM.jolt_px * math.sin(math.pi * v) * (1 - v) or 0)
 	drawTitleAt(now)
 	if t >= 1 then freeTextures() end   -- the trip is over
 end
@@ -283,12 +274,12 @@ function onStart()
 	snd_slap = SOUND:CreateSFX("Sounds/Slap.ogg")
 	snd_swish = SOUND:CreateSFX("Sounds/Swish.ogg")
 	snd_scatter = SOUND:CreateSFX("Sounds/Scatter.ogg")
-	font = TEXT:CreateGlyphCached(FONT_SIZE)
-	nudge = math.floor((font.BoxHeight - math.ceil(font.LineHeight)) / 2) - 1
-	col_ink = COLOR:CreateColorFromRGBA(30, 25, 21, 255)
-	col_paper = COLOR:CreateColorFromRGBA(242, 234, 214, 255)
-	col_shade = COLOR:CreateColorFromRGBA(0, 0, 0, 255)
-	col_clear = COLOR:CreateColorFromRGBA(0, 0, 0, 0)
+	font = TEXT:CreateGlyphCached(TITLE.font_size)
+	nudge = math.floor((font.BoxHeight - math.ceil(font.LineHeight)) / 2) + TITLE.text_nudge
+	col_ink = Config.color(TITLE.ink_color)
+	col_paper = Config.color(TITLE.paper_color)
+	col_shade = Config.color(TITLE.shadow_color)
+	col_clear = Config.color(TITLE.clear_color)
 end
 
 function onDestroy()

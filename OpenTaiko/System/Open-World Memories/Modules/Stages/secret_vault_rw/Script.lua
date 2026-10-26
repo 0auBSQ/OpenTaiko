@@ -8,15 +8,20 @@ local Opening = require("opening")
 local Vault = require("vault")
 local NavInput = require("NavInput")
 local MusicDuck = require("MusicDuck")
+-- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
 
 local EXIT_OPEN, EXIT_LOCKED = "vault_water_back", "vault_wood"
 local COVER_KEY = "vault_cover"
-local FADE = 0.3                 -- the dialogue box and the menu fade in and out this fast
+local FADE = Animation.ui_fade_s          -- the dialogue box and the menu fade in and out this fast
 local AMBIENCE_VOLUME = 35
 local KICK_SNAPS = 3             -- snapped keys in one visit before Mr.Caspian kicks the player out
 local KICKED = ".vault_kicked_out"
-local KICK_SHUT_AT = 0.12        -- s after the kick, the door starts to shut
-local KICK_PACE = 1.5            -- behind a kicked-out player the door shuts this much faster
+local KICK_SHUT_AT = Animation.kick_door.shut_after_s        -- s after the kick, the door starts to shut
+local KICK_PACE = Animation.kick_door.pace            -- behind a kicked-out player the door shuts this much faster
+local EXIT_HOLD = Animation.exit_hold_s   -- the shut door stays this long before the stage leaves
 
 -- Cabin/Water.png (the sea when the water shader cannot run) is loaded by cabin.lua only when it is needed
 local TEXTURES = {
@@ -262,8 +267,10 @@ function draw()
     if state == "gate_locked" or state == "gate_unlocking" then Gate.drawPanel(now, dt) end
 
     if state == "waiting_enum" and fonts.text then
-        Tex.text(fonts.text, Tex.tr("VAULT_LOADING", "Loading songs..."), Tex.frame(960, 540),
-            Tex.col(244, 234, 214), Tex.col(20, 16, 12), 1, 1200, "center")
+        local L = Layout.loading
+        local fore, back = L.color, L.outline_color
+        Tex.text(fonts.text, Tex.tr("VAULT_LOADING", "Loading songs..."), Tex.frame(L.x, L.y),
+            Tex.col(fore[1], fore[2], fore[3]), Tex.col(back[1], back[2], back[3]), 1, L.max_width, "center")
     end
 
     Cards.draw(now, menuA, info)
@@ -378,7 +385,7 @@ function update()
     elseif state == "closing" then
         if Gate.isClosed(now) then
             closedAt = closedAt or now
-            if now - closedAt >= 0.35 then return exitTo(EXIT_OPEN) end
+            if now - closedAt >= EXIT_HOLD then return exitTo(EXIT_OPEN) end
         end
     elseif state == "kicked" then
         if shutT == nil and now - kickT >= KICK_SHUT_AT then
@@ -387,13 +394,13 @@ function update()
         end
         if shutT ~= nil and Gate.isClosed(gateNow()) then
             closedAt = closedAt or now
-            if now - closedAt >= 0.35 then return exitTo(EXIT_OPEN) end
+            if now - closedAt >= EXIT_HOLD then return exitTo(EXIT_OPEN) end
         end
     end
 end
 
--- the dialogue's name tag holds NAME_INK px of ink at size 30: a longer name gets a smaller font
-local NAME_SIZE, NAME_INK = 30, 240
+-- the dialogue's name tag holds NAME_INK px of ink at size NAME_SIZE: a longer name gets a smaller font
+local NAME_SIZE, NAME_INK = Layout.name_tag.font, Layout.name_tag.ink_w
 local nameFor = nil
 local function fitNameFont()
     local nm = Tex.tr("VAULT_CASPIAN", "Mr.Caspian")
@@ -404,7 +411,7 @@ local function fitNameFont()
     local ink = fonts.name:Measure(nm)
     if ink > NAME_INK then
         fonts.name:Dispose()
-        fonts.name = TEXT:CreateGlyphCached(math.max(18, math.floor(NAME_SIZE * NAME_INK / ink)))
+        fonts.name = TEXT:CreateGlyphCached(math.max(Layout.name_tag.min_font, math.floor(NAME_SIZE * NAME_INK / ink)))
     end
     Caspian.setNameFont(fonts.name)
 end
@@ -469,11 +476,12 @@ function afterSongEnum()
 end
 
 function onStart()
-    fonts.big   = TEXT:CreateGlyphCached(46)
-    fonts.title = TEXT:CreateGlyphCached(34)
-    fonts.talk  = TEXT:CreateGlyphCached(30)
-    fonts.text  = TEXT:CreateGlyphCached(28)
-    fonts.small = TEXT:CreateGlyphCached(23)
+    local Fonts = Layout.fonts
+    fonts.big   = TEXT:CreateGlyphCached(Fonts.big)
+    fonts.title = TEXT:CreateGlyphCached(Fonts.title)
+    fonts.talk  = TEXT:CreateGlyphCached(Fonts.talk)
+    fonts.text  = TEXT:CreateGlyphCached(Fonts.text)
+    fonts.small = TEXT:CreateGlyphCached(Fonts.small)
 
     if STORAGE:FileExists("Sounds/BGM.ogg") then sounds.BGM = SOUND:CreateBGM("Sounds/BGM.ogg") end
     if STORAGE:FileExists("Sounds/Underwater.ogg") then sounds.Underwater = SOUND:CreateSFX("Sounds/Underwater.ogg") end

@@ -1,0 +1,26 @@
+{
+    "_note": "Secret Vault water way back layout, in 1920x1080 pixels. SetColor colours are [r, g, b] from 0 to 1; opacities 0 to 1.",
+    "screen": { "width": 1920, "height": 1080 },
+    "surface": {
+        "_note": "the surface line, out of sight below_screen under the screen's bottom when low and at high_y when high",
+        "below_screen": 60,
+        "high_y": -160
+    },
+    "flat": {
+        "_note": "the stand-in when the water effect cannot run: the water, and the line along its surface",
+        "water_color": [0.04, 0.24, 0.40],
+        "line_color": [0.86, 0.97, 1.0],
+        "line_width": 8
+    },
+    "bubbles": {
+        "_note": "a bubble rises from start_below under the screen, margin_x or more from the sides, at a scale from scale_min to scale_max; it is dropped above remove_y or more than remove_below under the screen, and shows only surface_margin below the surface",
+        "margin_x": 40,
+        "start_below": 30,
+        "scale_min": 0.3,
+        "scale_max": 1.0,
+        "opacity": 0.75,
+        "remove_y": -40,
+        "remove_below": 60,
+        "surface_margin": 40
+    }
+}

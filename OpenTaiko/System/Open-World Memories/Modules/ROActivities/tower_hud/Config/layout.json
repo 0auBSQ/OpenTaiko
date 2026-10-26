@@ -1,0 +1,42 @@
+{
+    "_note": "Tower climb hud layout, in 1920x1080 pixels. Colours are [r, g, b, a] from 0 to 255. text_nudge moves the texts inside their glyph boxes.",
+    "font_sizes": { "title": 26, "label": 30, "number": 42, "lives": 24 },
+    "text_color": [250, 236, 200, 255],
+    "outline_color": [58, 34, 18, 255],
+    "text_nudge": -1,
+    "chain": {
+        "_note": "center_x: the chain's middle; top: where the top ropes start, just above the screen; rope_gap: the rope length between two planks (the first plank hangs first_extra lower); hole_inset: the rope holes, from the plank's ends and edges",
+        "center_x": 960,
+        "top": -6,
+        "rope_gap": 18,
+        "first_extra": 10,
+        "hole_inset": { "x": 24, "y": 11 }
+    },
+    "title": {
+        "_note": "the title is at most its plank's width less text_margin wide",
+        "text_margin": 40
+    },
+    "floor": {
+        "_note": "gap: between the flap and the '/k' text; the number is at most the flap's width less text_margin wide",
+        "gap": 6,
+        "text_margin": 10
+    },
+    "lives": {
+        "_note": "gap: between the label and the bar. The bar has one segment per life, a plain bar from plain_from lives up; segments are gap px apart for up to up_to lives (the first entry that fits), touching beyond. It is blue while the lives are above blue_above of the most, yellow from yellow_from, red below (and on the last life).",
+        "gap": 16,
+        "bar_width": 220,
+        "bar_height": 22,
+        "plain_from": 100,
+        "segment_gaps": [
+            { "up_to": 12, "gap": 3 },
+            { "up_to": 30, "gap": 2 },
+            { "up_to": 60, "gap": 1 }
+        ],
+        "blue_above": 0.5,
+        "yellow_from": 0.2,
+        "blue_color": [72, 144, 255, 255],
+        "yellow_color": [255, 208, 64, 255],
+        "red_color": [236, 64, 56, 255],
+        "empty_color": [66, 46, 30, 255]
+    }
+}

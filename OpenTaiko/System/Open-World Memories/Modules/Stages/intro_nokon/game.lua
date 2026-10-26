@@ -7,6 +7,10 @@
 
 local I18N = require("i18n")
 local NavInput = require("NavInput")
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local Results, DialogueLayout = Layout.results, Layout.dialogue
 
 local M = {}
 
@@ -232,7 +236,7 @@ eStartTurn = function()
     utils.playSound("Question")  -- play when the genre name appears on the blackboard
     setState("e_genre")
 
-    startWait(1, function()
+    startWait(Animation.game.genre_reveal_s, function()
         utils.startPreview()
         startClock(10000)
         setState("e_listen")
@@ -313,7 +317,7 @@ local function eEvalFail()
             highScores = utils.getHighScores()
             setState("e_gameover")
         end)
-    end, 0.6)
+    end, DialogueLayout.fail_dim_opacity)
 end
 
 -- ── VS ────────────────────────────────────────────────────────────────────────
@@ -365,7 +369,7 @@ local function vsEvalFail()
         Stage.setDarken(false)
         Stage.setShowFail(false)
         vsNextRound()
-    end, 0.4)
+    end, DialogueLayout.vs_fail_dim_opacity)
 end
 
 local function vsEvalWin(winner, score)
@@ -422,7 +426,8 @@ vsStartTurn = function()
     -- Build genre page cache centered on vsGenreIdx
     local function rebuildGenreCache()
         local cache = {}
-        for off = -5, 5 do
+        local rows = Layout.list.rows_each_side
+        for off = -rows, rows do
             local idx = vsGenreIdx + off
             if idx >= 1 and idx <= #vsGenres then
                 local g = vsGenres[idx]
@@ -430,8 +435,8 @@ vsStartTurn = function()
                 local label = (g.Title or "?") .. " (" .. maxSc .. ")"
                 cache[off] = {
                     node = g,
-                    text = txts.label and txts.label:GetText(label, false, 750,
-                        off == 0 and COLOR:CreateColorFromARGB(255, 242, 207, 1) or nil) or nil,
+                    text = txts.label and txts.label:GetText(label, false, Layout.list.genre_max_width,
+                        off == 0 and Config.color(Layout.list.highlight_color) or nil) or nil,
                 }
             end
         end
@@ -493,8 +498,9 @@ function M.draw()
     -- VS round counter (always visible during play)
     if gameMode == "VS" and state ~= "vs_results" and state ~= "idle" and state ~= "ceremony" then
         if txts.label then
-            txts.label:GetText(I18N.trf("Round %d / %d", currentRound, totalRounds), false, 500)
-                :DrawAtAnchor(960, 28, "center")
+            local Counter = Layout.round_counter
+            txts.label:GetText(I18N.trf("Round %d / %d", currentRound, totalRounds), false, Counter.max_width)
+                :DrawAtAnchor(Counter.x, Counter.y, "center")
         end
     end
 
@@ -502,22 +508,22 @@ function M.draw()
     if state == "e_gameover" or state == "vs_results" then
         if txts.title then
             local header = I18N.tr(state == "e_gameover" and "Game Over!" or "Final Results!")
-            txts.title:GetText(header, false, 1000):DrawAtAnchor(960, 200, "center")
+            txts.title:GetText(header, false, Results.title_max_width):DrawAtAnchor(Results.x, Results.title_y, "center")
         end
         if txts.label then
             if state == "e_gameover" then
-                local s = txts.label:GetText(I18N.trf("Score: %d", scores[1] or 0), false, 800)
-                s:DrawAtAnchor(960, 320, "center")
+                local s = txts.label:GetText(I18N.trf("Score: %d", scores[1] or 0), false, Results.score_max_width)
+                s:DrawAtAnchor(Results.x, Results.score_y, "center")
                 -- High scores
-                local hs = txts.label:GetText(I18N.tr("High Scores"), false, 600)
-                hs:DrawAtAnchor(960, 410, "center")
+                local hs = txts.label:GetText(I18N.tr("High Scores"), false, Results.high_scores_max_width)
+                hs:DrawAtAnchor(Results.x, Results.high_scores_y, "center")
                 local playerScore = scores[1] or 0
                 for i, entry in ipairs(highScores) do
-                    if i > 8 then break end
+                    if i > Results.high_score_rows then break end
                     local isPlayer = (entry.score == playerScore and entry.name == (playerNames[1] or ""))
-                    local ecol = isPlayer and COLOR:CreateColorFromARGB(255, 242, 207, 1) or nil
-                    local et = txts.label:GetText(i .. ". " .. entry.name .. "  " .. entry.score, false, 700, ecol)
-                    et:DrawAtAnchor(960, 450 + (i - 1) * 40, "center")
+                    local ecol = isPlayer and Config.color(Layout.list.highlight_color) or nil
+                    local et = txts.label:GetText(i .. ". " .. entry.name .. "  " .. entry.score, false, Results.high_score_max_width, ecol)
+                    et:DrawAtAnchor(Results.x, Results.high_score_y + (i - 1) * Results.high_score_gap, "center")
                 end
             else
                 -- VS: sort and show scores
@@ -526,12 +532,12 @@ function M.draw()
                 table.sort(sorted, function(a, b) return a.s > b.s end)
                 for rank, entry in ipairs(sorted) do
                     local nm = playerNames[entry.p] or ("P" .. entry.p)
-                    local t = txts.label:GetText(rank .. ". " .. nm .. "  " .. entry.s, false, 800)
-                    t:DrawAtAnchor(960, 280 + rank * 60, "center")
+                    local t = txts.label:GetText(rank .. ". " .. nm .. "  " .. entry.s, false, Results.vs_max_width)
+                    t:DrawAtAnchor(Results.x, Results.vs_y + rank * Results.vs_gap, "center")
                 end
             end
-            txts.label:GetText(I18N.tr("Decide: Play again   Cancel: Exit"), false, 1000)
-                :DrawAtAnchor(960, 900, "center")
+            txts.label:GetText(I18N.tr("Decide: Play again   Cancel: Exit"), false, Results.footer_max_width)
+                :DrawAtAnchor(Results.x, Results.footer_y, "center")
         end
     end
 end
@@ -614,7 +620,7 @@ function M.update()
 
             Stage.setBlackboard(genre.Title or "???")
             setState("vs_pregame")
-            startWait(1, function()
+            startWait(Animation.game.genre_reveal_s, function()
                 utils.startPreview()
                 Stage.setBlackboard(tostring(vsRoundScore))
                 vsScoreDropCtr = COUNTER:CreateCounterDuration(0, 1, 2)

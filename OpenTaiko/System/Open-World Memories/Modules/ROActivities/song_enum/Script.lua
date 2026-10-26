@@ -7,24 +7,20 @@
 
 local PopUI = require("PopUI")
 
+-- positions, sizes and colours: Config/layout.json; the pulse and the marquee: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local PANEL, MESSAGE, BAR, COUNT = Layout.panel, Layout.message, Layout.bar, Layout.count
+
 -- same palette as the settings menu (config_ui "ConfigCalm") so the box matches; opaque faces (alpha 255)
 local THEME = {
     name = "ConfigCalm",
-    colors = {
-        surface  = { 250, 252, 255, 255 }, -- panel face (top)
-        surface2 = { 230, 236, 244, 255 }, -- panel face (bottom)
-        primary  = { 96, 132, 180, 255 },  -- progress fill
-        primary2 = { 72, 108, 156, 255 },
-        outline  = { 70, 84, 104, 255 },
-        text     = { 44, 56, 74, 255 },
-        shadow   = { 40, 52, 72, 70 },
-        gloss    = { 255, 255, 255, 90 },
-        track    = { 214, 222, 232, 255 }, -- progress track
-    },
-    radius = 22,
-    outlineWidth = 4,
-    gloss = true,
-    shadow = { dx = 0, dy = 5, layers = 4, grow = 3 },
+    colors = Config.plain(Layout.theme.colors),
+    radius = Layout.theme.radius,
+    outlineWidth = Layout.theme.outline_width,
+    gloss = Layout.theme.gloss,
+    shadow = Config.plain(Layout.theme.shadow),
 }
 
 local ui, panel
@@ -35,15 +31,15 @@ local msgBlockH = 0     -- total height of the message block
 local msgMaxW = 0       -- glyph maxWidth to pass (= content width + glyph box padding; squish only past the cap)
 
 -- layout (skin 1920x1080 space)
-local POP_X, POP_Y = 32, 28
-local PAD = 26                    -- inner margin between the panel edge and its content
-local MSG_SIZE, CNT_SIZE = 24, 18
-local LINE_H = MSG_SIZE + 10      -- airy line spacing for the message
-local BAR_H = 18
-local ROW_GAP = 20               -- space between the message block and the bar row
-local COL_GAP = 16               -- space between the bar and the count
-local BAR_ROW_H = math.max(BAR_H, CNT_SIZE + 4)
-local MIN_CONTENT_W, MAX_CONTENT_W = 320, 700
+local POP_X, POP_Y = PANEL.x, PANEL.y
+local PAD = PANEL.padding         -- inner margin between the panel edge and its content
+local MSG_SIZE, CNT_SIZE = MESSAGE.font_size, COUNT.font_size
+local LINE_H = MSG_SIZE + MESSAGE.line_extra   -- airy line spacing for the message
+local BAR_H = BAR.height
+local ROW_GAP = BAR.row_gap      -- space between the message block and the bar row
+local COL_GAP = BAR.column_gap   -- space between the bar and the count
+local BAR_ROW_H = math.max(BAR_H, CNT_SIZE + COUNT.row_extra)
+local MIN_CONTENT_W, MAX_CONTENT_W = PANEL.min_content_width, PANEL.max_content_width
 local GLYPH_BOX_PAD = 50   -- the ink+pad the glyph box carries (25px per side): factored into the squish cap
 
 -- split a raw LANG string into trimmed, non-empty lines (the translations embed \n + leading-space indent
@@ -67,7 +63,7 @@ local function rebuild(raw)
     local widest = 0
     for _, l in ipairs(msgLines) do widest = math.max(widest, ui:measureText(MSG_SIZE, l)) end
 
-    local contentW = math.min(MAX_CONTENT_W, math.max(MIN_CONTENT_W, math.ceil(widest) + 8))
+    local contentW = math.min(MAX_CONTENT_W, math.max(MIN_CONTENT_W, math.ceil(widest) + PANEL.text_margin))
     msgMaxW = contentW + GLYPH_BOX_PAD           -- lines squish only if their ink exceeds contentW (the cap)
     msgBlockH = #msgLines * LINE_H
 
@@ -95,8 +91,8 @@ function draw(bCommand, done, total)
 
     done  = math.floor(done or 0)
     total = math.floor(total or 0)
-    phase = phase + 0.05
-    local pulse = 0.75 + 0.25 * math.abs(math.sin(phase))
+    phase = phase + Animation.phase_step
+    local pulse = Animation.pulse_min + Animation.pulse_range * math.abs(math.sin(phase))
 
     ui:draw()   -- the PopUI panel (rounded/shadowed box)
 
@@ -105,7 +101,7 @@ function draw(bCommand, done, total)
 
     -- status message, one centred line per row (no squish for normal-length text)
     for i, line in ipairs(msgLines) do
-        ui:drawTextEx(MSG_SIZE, line, cx + cw / 2, cy + (i - 0.5) * LINE_H + 2,
+        ui:drawTextEx(MSG_SIZE, line, cx + cw / 2, cy + (i - 0.5) * LINE_H + MESSAGE.text_y,
             C.text, nil, pulse, 1, msgMaxW, "center")
     end
 
@@ -117,21 +113,22 @@ function draw(bCommand, done, total)
     local reserveStr = (total > 0) and (total .. " / " .. total) or "0000000"
     local reserveW = ui:measureText(CNT_SIZE, reserveStr)
     local liveW = ui:measureText(CNT_SIZE, countStr)
-    local barW = math.max(40, cw - reserveW - COL_GAP)
+    local barW = math.max(BAR.min_width, cw - reserveW - COL_GAP)
+    local inset = BAR.inset
 
     ui:rect(cx, barY, barW, BAR_H, C.track[1], C.track[2], C.track[3], 255)
     if total > 0 then
-        ui:rect(cx + 2, barY + 2, (barW - 4) * math.max(0, math.min(1, done / total)), BAR_H - 4,
+        ui:rect(cx + inset, barY + inset, (barW - 2 * inset) * math.max(0, math.min(1, done / total)), BAR_H - 2 * inset,
             C.primary[1], C.primary[2], C.primary[3], 255)
     else
         -- total not known yet (pre-count still running): indeterminate marquee
-        local seg, fw = 90, barW - 4
-        local mx = (phase * 90) % (fw + seg) - seg
-        local x0 = (cx + 2) + math.max(0, mx)
-        local x1 = (cx + 2) + math.min(fw, mx + seg)
-        ui:rect(x0, barY + 2, x1 - x0, BAR_H - 4, C.primary[1], C.primary[2], C.primary[3], 255)
+        local seg, fw = BAR.marquee_width, barW - 2 * inset
+        local mx = (phase * Animation.marquee_speed) % (fw + seg) - seg
+        local x0 = (cx + inset) + math.max(0, mx)
+        local x1 = (cx + inset) + math.min(fw, mx + seg)
+        ui:rect(x0, barY + inset, x1 - x0, BAR_H - 2 * inset, C.primary[1], C.primary[2], C.primary[3], 255)
     end
 
     -- count, flush-right of the row, vertically centred on the bar (never overlaps it)
-    ui:drawTextEx(CNT_SIZE, countStr, cx + cw - liveW / 2, barRowCy + 2, C.text, nil, 1, 1, 0, "center")
+    ui:drawTextEx(CNT_SIZE, countStr, cx + cw - liveW / 2, barRowCy + COUNT.text_y, C.text, nil, 1, 1, 0, "center")
 end

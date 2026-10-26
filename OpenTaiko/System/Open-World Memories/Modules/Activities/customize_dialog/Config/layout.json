@@ -1,0 +1,73 @@
+{
+    "_note": "Customize dialog layout, in 1920x1080 pixels. Left panel (menu / lists): x 0 to 1060, centre at 530; right panel (preview): x 1100 to 1920. Colours are AARRGGBB hex strings (COLOR:CreateColorFromHex); opacities and scales are factors (1 = as is). max_w values are the widths a text is fitted into.",
+    "fonts": { "small_size": 18, "text_size": 26, "large_size": 40 },
+    "colors": {
+        "white_color": "FFFFFFFF",
+        "yellow_color": "FFF2CF01"
+    },
+    "background_tile": {
+        "_note": "BgTile.png repeated over the screen: columns x rows copies, step_x / step_y apart.",
+        "opacity": 0.5,
+        "step_x": 192,
+        "step_y": 108,
+        "columns": 11,
+        "rows": 11
+    },
+    "player_art": {
+        "_note": "The bottom right corner of the player's picture, before the slide offset.",
+        "x": 1920,
+        "y": 1080
+    },
+    "title": { "x": 80, "y": 60, "max_w": 700 },
+    "screen_title": {
+        "_note": "A sub-screen's name, centred on menu.cx, below_title px under the title's y.",
+        "below_title": 40,
+        "max_w": 400
+    },
+    "menu": {
+        "cx": 530,
+        "y": 200,
+        "spacing_y": 90,
+        "item_max_w": 500
+    },
+    "footer": { "y": 835, "ok_x": 510, "cancel_x": 710, "button_max_w": 200 },
+    "description": { "y": 950, "max_w": 900 },
+    "player_name": { "y": 500, "max_w": 700, "hint_y": 950, "hint_max_w": 700 },
+    "empty_message_max_w": 600,
+    "horizontal_list": {
+        "_note": "Character and puchichara lists: visible_count slots slot_w apart around (cx, cy); the item's name sits name_y below its slot, fitted into slot_w less name_padding.",
+        "slot_w": 220,
+        "visible_count": 3,
+        "cx": 530,
+        "cy": 840,
+        "name_y": 8,
+        "name_padding": 10,
+        "character_selected_scale": 1.1,
+        "puchichara_selected_scale": 1.4
+    },
+    "vertical_list": {
+        "_note": "Nameplate, dan title, palette and hitsound lists: half_visible rows above and below the selected one, around (cx, cy). Nameplates are plate_w wide and drawn plate_y from their row. Rows other than the selected one are drawn at unselected_opacity.",
+        "cx": 530,
+        "cy": 520,
+        "row_h": 84,
+        "half_visible": 3,
+        "plate_w": 480,
+        "plate_y": -30,
+        "unselected_opacity": 0.5,
+        "text_max_w": 500
+    },
+    "palette_lock": {
+        "_note": "The message under the palette list when the selected palette is locked; y is below the last visible row.",
+        "color": "FFAAAAAA",
+        "y": 20,
+        "max_w": 700
+    },
+    "preview": {
+        "_note": "The character's bottom and the nameplate's top share base_y, so the nameplate appears right under the character as in game.",
+        "base_y": 720,
+        "nameplate_x": 1120,
+        "character_x": 1258,
+        "puchichara_x": 1198,
+        "puchichara_y": 500
+    }
+}

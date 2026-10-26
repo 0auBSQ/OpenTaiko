@@ -1,33 +1,33 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
 local Tex = require("tex")
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local Sea, SeaAnim = Layout.sea, Animation.sea
+local Fish, Bubble, Weed = Sea.fish, Sea.bubble, Sea.weed
+local FishAnim, BubbleAnim = SeaAnim.fish, SeaAnim.bubble
 
 local C = {}
 
-C.DESK_Y = 778
-local VPX, VPY = 960, 430
-local HALF_W, FLOOR_Y, CEIL_Y = 1200, 779, -840
+C.DESK_Y = Sea.desk_y
+local VPX, VPY = Sea.vanish_x, Sea.vanish_y
+local HALF_W, FLOOR_Y, CEIL_Y = Sea.half_w, Sea.floor_y, Sea.ceil_y
 C.FLOOR_Y = FLOOR_Y
-local KICK_Y = 520                             -- the height the sea's things are laid out from
-local FOOT_Y = 800                             -- seaweed stands on this screen row, behind the counter
-local F = 1663                                 -- depth of z = 1 in px: world speeds along the walls are px / F
-local TABLE_X, TABLE_Y = 960, 1080
+local KICK_Y = Sea.kick_y                      -- the height the sea's things are laid out from
+local FOOT_Y = Sea.foot_y                      -- seaweed stands on this screen row, behind the counter
+local F = Sea.depth_px                         -- depth of z = 1 in px: world speeds along the walls are px / F
+local TABLE_X, TABLE_Y = Sea.table.x, Sea.table.y
 local FISH_KINDS = 6
 
--- seaweed out on the sea floor: side, distance behind the glass, depth, kind, height (px at z = 1), sway, period;
--- the sea floor falls away from the glass, so a weed's foot always stays hidden behind the counter
-local WEEDS = {
-    { side = -1, d = 60,  z = 1.30, kind = 2, h = 470, sway = 5, period = 4.6 },
-    { side = -1, d = 260, z = 1.75, kind = 1, h = 520, sway = 7, period = 3.8 },
-    { side = -1, d = 120, z = 2.30, kind = 3, h = 430, sway = 6, period = 4.2 },
-    { side = -1, d = 520, z = 2.80, kind = 2, h = 600, sway = 5, period = 5.1 },
-    { side = 1,  d = 90,  z = 1.45, kind = 1, h = 480, sway = 6, period = 4.0 },
-    { side = 1,  d = 340, z = 2.00, kind = 3, h = 520, sway = 7, period = 3.6 },
-    { side = 1,  d = 160, z = 2.55, kind = 2, h = 460, sway = 5, period = 4.8 },
-    { side = 1,  d = 600, z = 3.10, kind = 1, h = 620, sway = 6, period = 4.4 },
-}
-local WEED_SQUEEZE = 0.7                       -- seaweed drawn narrower than tall
+-- seaweed out on the sea floor (Layout.sea.weeds), swaying as Animation.sea.weeds says
+local WEEDS = {}
+for i, w in ipairs(Sea.weeds.list) do
+    local s = SeaAnim.weeds.list[i]
+    WEEDS[i] = { side = w.side, d = w.d, z = w.z, kind = w.kind, h = w.h, sway = s.sway_deg, period = s.period_s }
+end
+local WEED_SQUEEZE = Sea.weed_squeeze          -- seaweed drawn narrower than tall
 
-local MAX_FISH, MAX_BUBBLES = 9, 40
+local MAX_FISH, MAX_BUBBLES = Sea.max_fish, Sea.max_bubbles
 
 local ctx = nil
 local VaultWater = nil
@@ -49,7 +49,7 @@ C.project = project
 function C.unproject(x, y, z) return (x - VPX) * z, (y - VPY) * z end
 
 -- 0 near the glass .. 1 far out in the murk
-local function fog(z, d) return Tex.clamp01((z - 1) / 3.6 + d / 2600) end
+local function fog(z, d) return Tex.clamp01((z - 1) / Sea.fog.z_range + d / Sea.fog.d_range) end
 
 local function kinds(prefix, n)
     local out = {}
@@ -64,30 +64,32 @@ local function spawnFish(at)
     local have = kinds("Cabin/Fish", FISH_KINDS)
     if #have == 0 then return end
     local side = (math.random() < 0.5) and -1 or 1
-    local d = rnd(40, 900) * rnd(0.4, 1)
-    local len = rnd(200, 300)
+    local d = rnd(Fish.d[1], Fish.d[2]) * rnd(Fish.d_spread[1], Fish.d_spread[2])
+    local len = rnd(Fish.len[1], Fish.len[2])
     local X = side * (HALF_W + d)
     -- from just off the screen's edge to hidden behind the back wall's corner
-    local zNear = (HALF_W + d - len) / 960
-    local zFar = (HALF_W + d + len) / 400
+    local zNear = (HALF_W + d - len) / Fish.near_half_w
+    local zFar = (HALF_W + d + len) / Fish.far_half_w
     local dir = (math.random() < 0.5) and 1 or -1
     local z0, z1 = zNear, zFar
     if dir < 0 then z0, z1 = zFar, zNear end
     local f = {
         kind = have[math.random(#have)], side = side, d = d, X = X, len = len, dir = dir,
-        Y = rnd(-620, 400), z = Tex.lerp(z0, z1, at or 0), zEnd = z1,
-        speed = rnd(170, 420) / F,
-        bob = rnd(10, 26), bobF = rnd(0.3, 0.6), ph = rnd(0, 6.283),
+        Y = rnd(Fish.y[1], Fish.y[2]), z = Tex.lerp(z0, z1, at or 0), zEnd = z1,
+        speed = rnd(FishAnim.speed_px_per_s[1], FishAnim.speed_px_per_s[2]) / F,
+        bob = rnd(FishAnim.bob_px[1], FishAnim.bob_px[2]), bobF = rnd(FishAnim.bob_hz[1], FishAnim.bob_hz[2]), ph = rnd(0, 6.283),
     }
     fish[#fish + 1] = f
 end
 
 local function spawnBubble(Y)
     local side = (math.random() < 0.5) and -1 or 1
-    local d = rnd(20, 700)
+    local d = rnd(Bubble.d[1], Bubble.d[2])
     bubbles[#bubbles + 1] = {
-        X = side * (HALF_W + d), d = d, z = rnd(1.15, 3.4), Y = Y or (KICK_Y + 80) * (HALF_W + d) / HALF_W,
-        vy = rnd(140, 260), r = rnd(14, 30), wob = rnd(8, 20), wobF = rnd(0.6, 1.4), ph = rnd(0, 6.283), age = 0,
+        X = side * (HALF_W + d), d = d, z = rnd(Bubble.z[1], Bubble.z[2]), Y = Y or (KICK_Y + Bubble.rise_from_dy) * (HALF_W + d) / HALF_W,
+        vy = rnd(BubbleAnim.rise_px_per_s[1], BubbleAnim.rise_px_per_s[2]), r = rnd(Bubble.r[1], Bubble.r[2]),
+        wob = rnd(BubbleAnim.wobble_px[1], BubbleAnim.wobble_px[2]), wobF = rnd(BubbleAnim.wobble_hz[1], BubbleAnim.wobble_hz[2]),
+        ph = rnd(0, 6.283), age = 0,
     }
 end
 
@@ -114,9 +116,9 @@ function C.reset()
     fish, bubbles = {}, {}
     clock = 0
     triedWater = false
-    for i = 1, 5 do spawnFish(rnd(0.1, 0.85)) end
-    for i = 1, 22 do spawnBubble(rnd(CEIL_Y, KICK_Y)) end
-    nextFish = rnd(1.5, 3)
+    for i = 1, Sea.start_fish do spawnFish(rnd(FishAnim.start_along[1], FishAnim.start_along[2])) end
+    for i = 1, Sea.start_bubbles do spawnBubble(rnd(CEIL_Y, KICK_Y)) end
+    nextFish = rnd(FishAnim.first_s[1], FishAnim.first_s[2])
     bubbleAcc = 0
     for i = 1, #WEEDS do weedPhase[i] = rnd(0, 6.283) end
 end
@@ -128,7 +130,7 @@ local function step(dt)
     nextFish = nextFish - dt
     if nextFish <= 0 then
         if #fish < MAX_FISH then spawnFish(0) end
-        nextFish = rnd(1.8, 4.2)
+        nextFish = rnd(FishAnim.every_s[1], FishAnim.every_s[2])
     end
     local i = 1
     while i <= #fish do
@@ -141,7 +143,7 @@ local function step(dt)
         end
     end
 
-    bubbleAcc = bubbleAcc + dt * 3
+    bubbleAcc = bubbleAcc + dt * BubbleAnim.per_s
     while bubbleAcc >= 1 do
         bubbleAcc = bubbleAcc - 1
         if #bubbles < MAX_BUBBLES then spawnBubble() end
@@ -151,7 +153,7 @@ local function step(dt)
         local b = bubbles[i]
         b.age = b.age + dt
         b.Y = b.Y - b.vy * dt
-        if b.Y < CEIL_Y - 40 then table.remove(bubbles, i) else i = i + 1 end
+        if b.Y < CEIL_Y - Bubble.gone_margin then table.remove(bubbles, i) else i = i + 1 end
     end
 end
 
@@ -166,14 +168,14 @@ local function drawFish(f)
     local vx, vy = x2 - x, y2 - y
     local right = vx >= 0
     local tilt = math.deg(math.atan(vy, math.abs(vx) + 1e-6))
-    tilt = math.max(-24, math.min(24, tilt)) + 5 * math.cos(wave)
-    local k = (f.len / f.z) / math.max(1, tex.Width - 12)
+    tilt = math.max(-Fish.max_tilt_deg, math.min(Fish.max_tilt_deg, tilt)) + FishAnim.tilt_wobble_deg * math.cos(wave)
+    local k = (f.len / f.z) / math.max(1, tex.Width - Fish.art_pad)
     local g = fog(f.z, f.d)
-    local shade = 1 - 0.35 * g
+    local shade = 1 - Fish.fog_shade * g
     tex:SetScale(right and k or -k, k)
     tex:SetRotation(right and -tilt or tilt)
-    tex:SetColor(shade * (1 - 0.3 * g), shade * (1 - 0.1 * g), shade)
-    tex:SetOpacity(1 - 0.4 * g)
+    tex:SetColor(shade * (1 - Fish.fog_red * g), shade * (1 - Fish.fog_green * g), shade)
+    tex:SetOpacity(1 - Fish.fog_fade * g)
     tex:DrawAtAnchor(x, y, "center")
     tex:SetScale(1, 1)
     tex:SetRotation(0)
@@ -191,11 +193,11 @@ local function drawWeed(i, w)
     local deg = w.sway * math.sin(2 * math.pi * clock / w.period + weedPhase[i])
     local dx, dy = Tex.turn(0, -tex.Height * k / 2, deg)
     local g = fog(w.z, w.d)
-    local shade = 1 - 0.55 * g
+    local shade = 1 - Weed.fog_shade * g
     tex:SetScale((w.side < 0 and k or -k) * WEED_SQUEEZE, k)
     tex:SetRotation(deg)
-    tex:SetColor(shade * 0.82, shade * 0.94, shade)
-    tex:SetOpacity(1 - 0.4 * g)
+    tex:SetColor(shade * Weed.red, shade * Weed.green, shade)
+    tex:SetOpacity(1 - Weed.fog_fade * g)
     tex:DrawAtAnchor(x + dx, y + dy, "center")
     tex:SetScale(1, 1)
     tex:SetRotation(0)
@@ -209,7 +211,7 @@ local function drawBubble(b)
     local X = b.X + b.wob * math.sin(2 * math.pi * b.wobF * clock + b.ph)
     local x, y = project(X, b.Y, b.z)
     local k = (2 * b.r / b.z) / tex.Width
-    local op = math.min(1, b.age / 0.4) * (1 - 0.5 * fog(b.z, b.d)) * 0.85
+    local op = math.min(1, b.age / BubbleAnim.fade_in_s) * (1 - Bubble.fog_fade * fog(b.z, b.d)) * Bubble.opacity
     Tex.place(tex, x, y, "center", k, k, op)
 end
 

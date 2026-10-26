@@ -2,30 +2,37 @@
 local TA = require("TransitionArt")
 local VaultWater = require("VaultWater")
 
-local RISE = 1.8                         -- fade-out: the water rises over the screen
-local NAME_IN = 0.6                      -- the name fades in once the water covers the screen
-local LIFT_AT, LIFT = 0.9, 1.8           -- the water lifts away, in seconds into the fade-in
+-- positions, sizes and colours: Config/layout.json; timings and motion: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local NAME, BUBBLES = Layout.name, Layout.bubbles
+local WATER, BUBBLES_ANIM, NAME_ANIM = Animation.water, Animation.bubbles, Animation.name
+
+local RISE = WATER.rise_s                -- fade-out: the water rises over the screen
+local NAME_IN = WATER.name_in_s          -- the name fades in once the water covers the screen
+local LIFT_AT, LIFT = WATER.lift_at_s, WATER.lift_s   -- the water lifts away, in seconds into the fade-in
 local COVER = LIFT_AT + LIFT
 
 FADE_OUT_SECONDS = RISE
 FADE_IN_SECONDS  = LIFT_AT + LIFT
 
-local SCREEN_W, SCREEN_H = 1920, 1080
+local SCREEN_W, SCREEN_H = Layout.screen.width, Layout.screen.height
 local CX, CY = SCREEN_W / 2, SCREEN_H / 2
-local SURFACE_FROM, SURFACE_TO = SCREEN_H + 60, -160   -- the surface line out of sight below / above the screen
-local EDGE_FROM, EDGE_TO = SCREEN_H + 130, -50         -- the lower edge of the lifting water, out of sight
-local CALM, SWELL = 13, 26               -- wave height (px) with the water at rest / at its fastest
-local FROTH_CALM, FROTH_SWELL = 0.55, 1.3
-local CHURN_CALM, CHURN_SWELL = 1, 3.4   -- how fast the pattern inside moves, at rest / at its fastest
-local CARRY = 0.35                       -- the pattern moves this share of the surface's way, so the water flows as it moves
-local FLAT, FLAT_LINE = { 0.04, 0.24, 0.40 }, { 0.86, 0.97, 1.0 }   -- the stand-in: the water, the line along its edge
-local LINE_W = 8
+local SURFACE_FROM, SURFACE_TO = SCREEN_H + Layout.surface.below_screen, Layout.surface.to_y
+local EDGE_FROM, EDGE_TO = SCREEN_H + Layout.edge.below_screen, Layout.edge.to_y
+local CALM, SWELL = WATER.wave_calm_px, WATER.wave_swell_px
+local FROTH_CALM, FROTH_SWELL = WATER.froth_calm, WATER.froth_swell
+local CHURN_CALM, CHURN_SWELL = WATER.churn_calm, WATER.churn_swell
+local CARRY = WATER.carry
+local FLAT, FLAT_LINE = Layout.flat.water_color, Layout.flat.line_color
+local LINE_W = Layout.flat.line_width
 
 local TITLE_KEY, TITLE_DEFAULT = "TITLE_VAULT", "Secret Vault"
-local FONT_SIZE = 104
-local MAX_W = 1640
-local GRAD = "<g.#EFFCFF.#58B9DA>%s</g>"
-local SHADOW_DY = 8
+local FONT_SIZE = NAME.font_size
+local MAX_W = NAME.max_width
+local GRAD = "<g." .. NAME.gradient_top_color .. "." .. NAME.gradient_bottom_color .. ">%s</g>"
+local SHADOW_DY = NAME.shadow_y
 
 local water = nil
 local fill = nil                         -- the stand-in's paint: a white 2x2 canvas, tinted and stretched
@@ -125,7 +132,7 @@ local function layout()
 	local chars, w = {}, 0
 	for ch in title():gsub("\n", " "):gmatch("[%z\1-\127\194-\244][\128-\191]*") do
 		local adv = font:Measure(ch)
-		if ch == " " then adv = FONT_SIZE * 0.32 end
+		if ch == " " then adv = FONT_SIZE * NAME.space_em end
 		chars[#chars + 1] = { ch = ch, adv = adv }
 		w = w + adv
 	end
@@ -133,7 +140,7 @@ local function layout()
 	local pen = CX - w * k / 2
 	for i, c in ipairs(chars) do
 		if c.ch ~= " " then
-			letters[#letters + 1] = { ch = c.ch, x = pen + c.adv * k / 2, k = k, ph = i * 0.55 }
+			letters[#letters + 1] = { ch = c.ch, x = pen + c.adv * k / 2, k = k, ph = i * NAME_ANIM.letter_phase }
 		end
 		pen = pen + c.adv * k
 	end
@@ -161,8 +168,10 @@ local function drawWater(top, bottom)
 end
 
 local function spawnBubble()
-	bubbles[#bubbles + 1] = { x = rnd(40, SCREEN_W - 40), y = SCREEN_H + 30, vy = rnd(120, 260),
-		k = rnd(0.3, 1.0), wob = rnd(4, 12), wobF = rnd(0.6, 1.5), ph = rnd(0, 6.283) }
+	local B, A = BUBBLES, BUBBLES_ANIM
+	bubbles[#bubbles + 1] = { x = rnd(B.margin_x, SCREEN_W - B.margin_x), y = SCREEN_H + B.start_below,
+		vy = rnd(A.speed_min, A.speed_max), k = rnd(B.scale_min, B.scale_max), wob = rnd(A.wobble_min, A.wobble_max),
+		wobF = rnd(A.wobble_hz_min, A.wobble_hz_max), ph = rnd(0, 6.283) }
 end
 
 -- bubbles inside the water: below the surface line (top) and above the lower edge (bottom)
@@ -172,13 +181,13 @@ local function drawBubbles(dt, top, bottom, rate)
 	while i <= #bubbles do
 		local b = bubbles[i]
 		b.y = b.y - b.vy * dt
-		if b.y < -40 then
+		if b.y < BUBBLES.remove_y then
 			table.remove(bubbles, i)
 		else
-			local inside = (top == nil or b.y > top + 40) and (bottom == nil or b.y < bottom - 30)
+			local inside = (top == nil or b.y > top + BUBBLES.surface_margin) and (bottom == nil or b.y < bottom - BUBBLES.edge_margin)
 			if inside and tx_bubble ~= nil and tx_bubble.Loaded then
 				tx_bubble:SetScale(b.k, b.k)
-				tx_bubble:SetOpacity(0.75)
+				tx_bubble:SetOpacity(BUBBLES.opacity)
 				tx_bubble:DrawAtAnchor(b.x + b.wob * math.sin(clock * b.wobF * 6.283 + b.ph), b.y, "center")
 			end
 			i = i + 1
@@ -190,11 +199,12 @@ end
 -- the name, each letter bobbing on its own; lift = px the water has carried it up, a = opacity
 local function drawName(lift, a)
 	if font == nil or a <= 0 then return end
-	local y0 = CY + 10 * math.sin(clock * 1.1) - lift
+	local N = NAME_ANIM
+	local y0 = CY + N.name_bob_px * math.sin(clock * N.name_bob_rate) - lift
 	for _, L in ipairs(letters) do
-		local y = y0 + 9 * math.sin(clock * 2.6 + L.ph) + nudge * L.k
-		local rot = 3 * math.sin(clock * 1.9 + L.ph * 1.3)
-		font:Draw(L.ch, L.x, y + SHADOW_DY * L.k, col_shadow, col_clear, 0.45 * a, L.k, 0, "center", 0, rot)
+		local y = y0 + N.letter_bob_px * math.sin(clock * N.letter_bob_rate + L.ph) + nudge * L.k
+		local rot = N.letter_tilt_deg * math.sin(clock * N.letter_tilt_rate + L.ph * N.tilt_phase_scale)
+		font:Draw(L.ch, L.x, y + SHADOW_DY * L.k, col_shadow, col_clear, NAME.shadow_opacity * a, L.k, 0, "center", 0, rot)
 		font:Draw(string.format(GRAD, L.ch), L.x, y, col_white, col_outline, a, L.k, 0, "center", 0, rot)
 	end
 end
@@ -221,7 +231,7 @@ function fadeOut(t)
 	local top = SURFACE_FROM + (SURFACE_TO - SURFACE_FROM) * e
 	carry(RISEN * e, pace(t))
 	drawWater(top, nil)
-	drawBubbles(dt, top, nil, 22)
+	drawBubbles(dt, top, nil, BUBBLES_ANIM.spawn_rising)
 end
 
 function loading(progress, elapsed)
@@ -231,7 +241,7 @@ function loading(progress, elapsed)
 	once("bubbles", snd_bubbles)
 	carry(RISEN, 0)
 	drawWater(nil, nil)
-	drawBubbles(dt, nil, nil, 9)
+	drawBubbles(dt, nil, nil, BUBBLES_ANIM.spawn_covered)
 	drawName(0, nameOpacity())
 end
 
@@ -248,8 +258,8 @@ function fadeIn(t)
 	carry(RISEN + lift, pace(u))
 	if now >= LIFT_AT then once("surface", snd_surface) end
 	drawWater(nil, e > 0 and bottom or nil)
-	drawBubbles(dt, nil, e > 0 and bottom or nil, e > 0 and 4 or 9)
-	drawName(lift, nameOpacity() * (1 - smooth((lift - 300) / 320)))
+	drawBubbles(dt, nil, e > 0 and bottom or nil, e > 0 and BUBBLES_ANIM.spawn_lifting or BUBBLES_ANIM.spawn_covered)
+	drawName(lift, nameOpacity() * (1 - smooth((lift - NAME_ANIM.fade_from_px) / NAME_ANIM.fade_over_px)))
 	if t >= 1 then endTrip() end   -- the trip is over
 end
 
@@ -258,11 +268,11 @@ function onStart()
 	snd_surface = sfx("Sounds/Surface.ogg")
 	snd_bubbles = sfx("Sounds/Bubbles.ogg")
 	font = TEXT:CreateGlyphCached(FONT_SIZE)
-	nudge = math.floor((font.BoxHeight - math.ceil(font.LineHeight)) / 2) - 1
-	col_white = COLOR:CreateColorFromRGBA(255, 255, 255, 255)
-	col_outline = COLOR:CreateColorFromRGBA(8, 38, 70, 255)
-	col_shadow = COLOR:CreateColorFromRGBA(0, 12, 30, 255)
-	col_clear = COLOR:CreateColorFromRGBA(0, 0, 0, 0)
+	nudge = math.floor((font.BoxHeight - math.ceil(font.LineHeight)) / 2) + NAME.text_nudge
+	col_white = Config.color(NAME.fore_color)
+	col_outline = Config.color(NAME.outline_color)
+	col_shadow = Config.color(NAME.shadow_color)
+	col_clear = Config.color(NAME.clear_color)
 end
 
 function onDestroy()

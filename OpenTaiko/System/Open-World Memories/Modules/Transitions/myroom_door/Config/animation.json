@@ -1,0 +1,23 @@
+{
+    "_note": "My Room door timings. Times in seconds; 'at' and 'span' values are parts (0 to 1) of a fade.",
+    "fade_out_s": 0.8,
+    "fade_in_s": 0.9,
+    "close": {
+        "_note": "slam_at: part of the fade-out when the door hits the frame. After it the door rebounds once by rebound (part of fully open) and shakes by shake_px, wobbling shake_freq_x / shake_freq_y radians per unit of the remaining fade.",
+        "slam_at": 0.72,
+        "rebound": 0.035,
+        "shake_px": 12,
+        "shake_freq_x": 61,
+        "shake_freq_y": 47
+    },
+    "open": {
+        "_note": "span: part of the fade-in the swing takes",
+        "span": 0.92
+    },
+    "swing": {
+        "_note": "while the door swings by an angle a (0 shut, 90 degrees open): brightness = shade_base + shade_by_angle * cos(a), height scale = 1 + grow_by_angle * sin(a), the free edge swinging toward the viewer",
+        "shade_base": 0.42,
+        "shade_by_angle": 0.58,
+        "grow_by_angle": 0.12
+    }
+}

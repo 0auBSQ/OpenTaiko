@@ -12,6 +12,13 @@ local PopUI = require("PopUI")
 local I18N = require("Locale.i18n")
 local T = I18N.texts("lobby")     -- lang/<code>/lobby.json
 local net = LO.net
+-- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local COL = Layout.colors
+local MSG = Animation.message_s
+local CX = Layout.center_x
 
 -- the lobby's texts, looked up once per visit (resetTexts on activate); the engine's own words for the
 -- difficulty names
@@ -110,20 +117,23 @@ local builtHost = false                      -- and whether they were built for 
 local click = {}                             -- what the menus and buttons were asked this frame
 local nextBtn = nil                          -- the results' way back to the lobby, for the mouse
 
-local INK, DIM, WHITE = { 74, 38, 72 }, { 150, 132, 150 }, { 255, 255, 255 }
-local ACCENT, ACCENT_SOFT = { 244, 78, 150 }, { 255, 226, 242 }
-local GREEN, RED, AMBER = { 34, 150, 84 }, { 214, 60, 60 }, { 196, 124, 16 }
-local BG = { 255, 240, 248 }
-local ROW_FACE, ROW_EMPTY = { 250, 244, 250 }, { 244, 236, 244 }
-local NONE = { 0, 0, 0, 0 }
-local TEXT_PAD = 25                          -- a glyph box's side padding
+local INK, DIM, WHITE = COL.ink, COL.dim, COL.white
+local ACCENT, ACCENT_SOFT = COL.accent, COL.accent_soft
+local GREEN, RED, AMBER = COL.green, COL.red, COL.amber
+local BG = COL.background
+local ROW_FACE, ROW_EMPTY = COL.row_face, COL.row_empty
+local NONE = COL.text_outline
+local TEXT_PAD = 25                          -- a glyph box's side padding (PopUI's)
 -- each difficulty's text colour: its emblem's hue, darkened for the light panels
-local DIFF_COL = { [0] = { 40, 110, 210 }, [1] = { 20, 150, 110 }, [2] = { 196, 124, 16 }, [3] = { 214, 60, 60 }, [4] = { 130, 70, 210 } }
+local DIFF_COL = {}
+for i, c in ipairs(Layout.difficulty_colors.list) do DIFF_COL[i - 1] = c end
 
-local SONG = { x = 80, y = 100, w = 560, h = 690 }
-local ROSTER = { x = 680, y = 100, w = 1160, h = 690 }
-local ROW_X, ROW_TOP, ROW_PITCH, ROW_W, ROW_H = 704, 186, 118, 1112, 106
-local DECK_X, DECK_Y, DECK_W, DECK_H, DECK_SPLIT = 80, 809, 1760, 150, 440
+local SONG = Layout.song_panel
+local ROSTER = Layout.roster_panel
+local ROWS = Layout.rows
+local ROW_X, ROW_TOP, ROW_PITCH, ROW_W, ROW_H = ROWS.x, ROWS.top, ROWS.pitch, ROWS.w, ROWS.h
+local DECK = Layout.deck
+local DECK_X, DECK_Y, DECK_W, DECK_H, DECK_SPLIT = DECK.x, DECK.y, DECK.w, DECK.h, DECK.split
 
 local function loadArt()
     for _, n in ipairs(TEX_NAMES) do tex[n] = TEXTURE:CreateTexture("Textures/" .. n .. ".png") end
@@ -151,7 +161,8 @@ end
 -- a difficulty emblem centred on (cx, cy) at scale k with its level inside, the digits set like the song
 -- select's song info (a plus level's "+" off the last digit's top-right corner); d nil = the empty emblem,
 -- level nil = the emblem alone
-local PLUS_DX, PLUS_DY = -8, -14
+local EMBLEM = Layout.emblem
+local PLUS_DX, PLUS_DY = EMBLEM.plus_dx, EMBLEM.plus_dy
 local function drawEmblem(d, level, isPlus, cx, cy, k, op)
     sprite(d ~= nil and ("Difficulty/" .. d) or "Difficulty/Missing", cx, cy, k, op)
     if level == nil then return end
@@ -161,7 +172,7 @@ local function drawEmblem(d, level, isPlus, cx, cy, k, op)
         local t = tex["Difficulty/Level/" .. s:sub(i, i)]
         if t then
             local w = (t.Width or 0) * k
-            if i > 1 then total = total + prev * 0.5 end
+            if i > 1 then total = total + prev * EMBLEM.digit_advance end
             prev, last = w, w
         end
     end
@@ -173,7 +184,7 @@ local function drawEmblem(d, level, isPlus, cx, cy, k, op)
         local t = tex[name]
         if t then
             local w = (t.Width or 0) * k
-            if i > 1 then cursor = cursor + prev * 0.5 end
+            if i > 1 then cursor = cursor + prev * EMBLEM.digit_advance end
             sprite(name, cursor + w / 2, cy, k, op)
             prev = w
         end
@@ -196,14 +207,15 @@ end
 
 -- a message on one line, or wrapped onto as many as it needs when it is too long; the lines are kept
 -- until the message changes
-local TOAST_W = 1120
-local toastOf, toastRows, toastSize = nil, nil, 22
+local TOAST = Layout.toast
+local TOAST_W = TOAST.max_width
+local toastOf, toastRows, toastSize = nil, nil, TOAST.font_size
 local function toastLines(s)
     if toastOf ~= s then
         toastOf = s
-        if ui:gfont(22):Measure(s) <= TOAST_W then toastRows, toastSize = { s }, 22
+        if ui:gfont(TOAST.font_size):Measure(s) <= TOAST_W then toastRows, toastSize = { s }, TOAST.font_size
         else
-            toastRows, toastSize = ui:wrapLines(20, s, TOAST_W), 20
+            toastRows, toastSize = ui:wrapLines(TOAST.wrap_font_size, s, TOAST_W), TOAST.wrap_font_size
             if #toastRows == 0 then toastRows = { s } end
         end
     end
@@ -213,26 +225,28 @@ end
 -- the bar keeps its bottom edge and grows upwards with the lines
 local function drawToast()
     if not (msgT and msgT > 0 and msg) then return end
-    local op = math.min(1, msgT / 0.4)
+    local op = math.min(1, msgT / Animation.toast_fade_s)
     local lines, size = toastLines(msg)
-    local h = math.max(88, 24 + #lines * 32)
-    local top = 1032 - h
-    rect(960 - 616, top, 1232, h, INK, 235 * op)
-    if #lines == 1 then text(size, lines[1], 960, 988, WHITE, "center", op, TOAST_W)
+    local h = math.max(TOAST.min_height, TOAST.pad_height + #lines * TOAST.line_height)
+    local top = TOAST.bottom - h
+    rect(CX - TOAST.width / 2, top, TOAST.width, h, INK, TOAST.opacity * op)
+    if #lines == 1 then text(size, lines[1], CX, TOAST.single_line_y, WHITE, "center", op, TOAST_W)
     else
-        for i, line in ipairs(lines) do text(size, line, 960, top + 28 + (i - 1) * 32, WHITE, "center", op, TOAST_W) end
+        for i, line in ipairs(lines) do text(size, line, CX, top + TOAST.first_line_dy + (i - 1) * TOAST.line_height, WHITE, "center", op, TOAST_W) end
     end
 end
 
-local function drawHint(s) text(20, s, 960, 1052, DIM, "center", 1, 1800) end
+local HINT = Layout.hint
+local function drawHint(s) text(HINT.font_size, s, CX, HINT.y, DIM, "center", 1, HINT.max_width) end
 
 -- ── menu / code ─────────────────────────────────────────────────────────────────────────────────────
-local MENU = { x = 560, y = 250, w = 800, h = 500 }
-local MENU_ROW = 100
+local MENU = Layout.menu
+local MENU_ROW = MENU.row_height
 
 -- the way back at the top left of every screen, for the mouse; the keys use the cancel button
 local function backButton()
-    ui:button{ icon = "back", x = 80, y = 20, w = 76, h = 64, mouseOnly = true, onClick = function() click.back = true end }
+    local B = Layout.back_button
+    ui:button{ icon = "back", x = B.x, y = B.y, w = B.w, h = B.h, mouseOnly = true, onClick = function() click.back = true end }
 end
 
 -- a menu whose cursor goes round from one end to the other
@@ -243,8 +257,8 @@ local function wrapping(o)
 end
 
 PANELS.menu = function()
-    ui:panel{ x = MENU.x, y = MENU.y, w = MENU.w, h = MENU.h, pad = 30, title = L("logo_title") }
-    ui:menu(wrapping{ x = 960 - 320, y = MENU.y + 190, w = 640, h = 2 * MENU_ROW, rowHeight = MENU_ROW,
+    ui:panel{ x = MENU.x, y = MENU.y, w = MENU.w, h = MENU.h, pad = MENU.pad, title = L("logo_title") }
+    ui:menu(wrapping{ x = CX - MENU.list.w / 2, y = MENU.y + MENU.list.y_offset, w = MENU.list.w, h = 2 * MENU_ROW, rowHeight = MENU_ROW,
         items = { L("menu_create"), L("menu_join") }, selected = 1, onSelect = function(i) click.pick = i end })
     backButton()
     ui:focusStay()
@@ -253,44 +267,47 @@ end
 local function drawMenu()
     if builtFor ~= "menu" then return end
     ui:draw()
-    text(22, L("menu_subtitle"), 960, MENU.y + 130, DIM, "center", 1, MENU.w - 80)
+    text(MENU.subtitle.font_size, L("menu_subtitle"), CX, MENU.y + MENU.subtitle.y_offset, DIM, "center", 1, MENU.w - MENU.subtitle.inset)
     drawHint(LF("hint_menu", bindLabel("DECIDE"), bindLabel("CANCEL")))
 end
 
-local CODE = { x = 320, y = 300, w = 1280, h = 420 }
+local CODE = Layout.code
 
 PANELS.code = function()
-    ui:panel{ x = CODE.x, y = CODE.y, w = CODE.w, h = CODE.h, pad = 30, title = L("code_title") }
+    ui:panel{ x = CODE.x, y = CODE.y, w = CODE.w, h = CODE.h, pad = CODE.pad, title = L("code_title") }
     backButton()
 end
 
 local function drawCode()
     if builtFor ~= "code" then return end
     ui:draw()
-    text(24, L("code_prompt"), 960, CODE.y + 140, DIM, "center", 1, CODE.w - 100)
-    rect(960 - 566, CODE.y + 220, 1132, 96, INK)
-    rect(960 - 562, CODE.y + 224, 1124, 88, WHITE)
+    local P, FB, F, TX = CODE.prompt, CODE.field_border, CODE.field, CODE.text
+    text(P.font_size, L("code_prompt"), CX, CODE.y + P.y_offset, DIM, "center", 1, CODE.w - P.inset)
+    rect(CX - FB.w / 2, CODE.y + FB.y_offset, FB.w, FB.h, INK)
+    rect(CX - F.w / 2, CODE.y + F.y_offset, F.w, F.h, WHITE)
     local shown = (ti and ti.DisplayText) or ""
-    if #shown > 64 then shown = "..." .. string.sub(shown, #shown - 63) end
-    text(28, shown .. " ", 960, CODE.y + 268, INK, "center", 1, 1040)
+    if #shown > CODE.max_chars then shown = "..." .. string.sub(shown, #shown - (CODE.max_chars - 1)) end
+    text(TX.font_size, shown .. " ", CX, CODE.y + TX.y_offset, INK, "center", 1, TX.max_width)
     drawHint(LF("hint_code", bindLabel("CANCEL")))
 end
 
 -- ── lobby ───────────────────────────────────────────────────────────────────────────────────────────
-local JK_X, JK_Y, JK_S = 210, 190, 300        -- the jacket
+local JK = Layout.jacket
+local JK_X, JK_Y, JK_S = JK.x, JK.y, JK.size        -- the jacket
+local SI = Layout.song_info
 
 -- the song speed: its multiplier, pink when faster and blue when slower
-local SPEED_FAST, SPEED_SLOW = { 220, 70, 130 }, { 40, 110, 210 }
+local SPEED_FAST, SPEED_SLOW = COL.speed_fast, COL.speed_slow
 local function drawSpeed(x, labelY, valueY)
     local mult = net.song.speed and CONFIG.SONGSPEED:ToActual(net.song.speed) or 1
     local changed = math.abs(mult - 1) > 1e-4
     local col = not changed and INK or (mult > 1 and SPEED_FAST or SPEED_SLOW)
-    text(16, L("song_speed_label"), x, labelY, col, "center")
-    text(26, string.format("x%.2f", mult), x, valueY, col, "center")
+    text(SI.speed.label_font_size, L("song_speed_label"), x, labelY, col, "center")
+    text(SI.speed.value_font_size, string.format("x%.2f", mult), x, valueY, col, "center")
 end
 
 local function drawSong()
-    rect(JK_X - 4, JK_Y - 4, JK_S + 8, JK_S + 8, INK)
+    rect(JK_X - JK.border, JK_Y - JK.border, JK_S + 2 * JK.border, JK_S + 2 * JK.border, INK)
     rect(JK_X, JK_Y, JK_S, JK_S, ROW_EMPTY)
     if net.song and not net.iLackSong then
         local jk = SHARED:GetSharedTexture("preimage")     -- same path as regular song select
@@ -302,19 +319,20 @@ local function drawSong()
             end
         end) end
     elseif net.song and net.iLackSong then
-        text(26, L("song_not_found"), JK_X + JK_S / 2, JK_Y + JK_S / 2, RED, "center", 1, JK_S - 20)
+        text(JK.missing_font_size, L("song_not_found"), JK_X + JK_S / 2, JK_Y + JK_S / 2, RED, "center", 1, JK_S - JK.missing_inset)
     end
     if net.song then
-        text(28, net.song.title or "?", 360, 534, INK, "center", 1, 500)
-        if net.songSubtitle and net.songSubtitle ~= "" then text(20, net.songSubtitle, 360, 569, DIM, "center", 1, 500) end
-        drawSpeed(360, 606, 636)
+        text(SI.title.font_size, net.song.title or "?", SI.center_x, SI.title.y, INK, "center", 1, SI.max_width)
+        if net.songSubtitle and net.songSubtitle ~= "" then text(SI.subtitle.font_size, net.songSubtitle, SI.center_x, SI.subtitle.y, DIM, "center", 1, SI.max_width) end
+        drawSpeed(SI.center_x, SI.speed.label_y, SI.speed.value_y)
         -- every difficulty's emblem with its level; the ones this chart lacks show the empty emblem
+        local E = SI.emblems
         for d = 0, 4 do
             local lv = net.songLevels[d]
-            drawEmblem(lv ~= nil and d or nil, lv, net.songPlus[d], 160 + d * 100, 716, 0.8, lv ~= nil and 1 or 0.5)
+            drawEmblem(lv ~= nil and d or nil, lv, net.songPlus[d], E.x + d * E.step, E.y, E.scale, lv ~= nil and 1 or E.missing_opacity)
         end
     else
-        text(22, LO.amController() and LF("song_pick", keyLabel("song")) or L("song_wait"), 360, 590, AMBER, "center", 1, 500)
+        text(SI.wait.font_size, LO.amController() and LF("song_pick", keyLabel("song")) or L("song_wait"), SI.center_x, SI.wait.y, AMBER, "center", 1, SI.max_width)
     end
 end
 
@@ -334,39 +352,40 @@ local function drawRoster(ids, me)
         local cy = top + ROW_H / 2
         if id == nil then
             rect(ROW_X, top, ROW_W, ROW_H, ROW_EMPTY)
-            text(20, L("seat_waiting"), cx, cy, DIM, "center", 1, 600)
+            text(ROWS.waiting.font_size, L("seat_waiting"), cx, cy, DIM, "center", 1, ROWS.waiting.max_width)
         else
             local mine, host = (id == me), (NET:HostRoleId() == id)
             rect(ROW_X, top, ROW_W, ROW_H, mine and ACCENT_SOFT or ROW_FACE)
-            if mine then rect(ROW_X, top, 8, ROW_H, ACCENT) end
+            if mine then rect(ROW_X, top, ROWS.marker_width, ROW_H, ACCENT) end
             local spot = LO.spotOf[id]
             local drawn = false
             if spot ~= nil then
-                drawn = pcall(function() NAMEPLATE:DrawPlayerNameplate(ROW_X + 28, math.floor(cy - 40), 255, spot) end)
+                drawn = pcall(function() NAMEPLATE:DrawPlayerNameplate(ROW_X + ROWS.nameplate_dx, math.floor(cy + ROWS.nameplate_dy), 255, spot) end)
             end
-            if not drawn then text(24, net.nameByPeer[id] or ("P" .. id), ROW_X + 40, cy, INK, "left", 1, 310) end
+            if not drawn then text(ROWS.name.font_size, net.nameByPeer[id] or ("P" .. id), ROW_X + ROWS.name.dx, cy, INK, "left", 1, ROWS.name.max_width) end
             local d = net.diffByPeer[id] or 1
             local lv = (net.song ~= nil and not net.iLackSong) and net.songLevels[d] or nil
-            drawEmblem(d, lv, net.songPlus[d], ROW_X + 430, cy, 0.68, 1)
+            drawEmblem(d, lv, net.songPlus[d], ROW_X + ROWS.emblem.dx, cy, ROWS.emblem.scale, 1)
             -- mod icons (real icons): self uses CONFIG[0], others use a scratch slot
             if modicons then
                 pcall(function()
-                    if mine then modicons:Draw(ROW_X + 496, cy - 18, 0, "menu", 255)
+                    if mine then modicons:Draw(ROW_X + ROWS.mods.dx, cy + ROWS.mods.dy, 0, "menu", 255)
                     else
                         -- the scratch slot is the local 5th player's: their special mod is put back after the draw
                         local keep = CONFIG:GetSpecialMod(4)
-                        LO.applyModsToSlot(4, net.modByPeer[id]); modicons:Draw(ROW_X + 496, cy - 18, 4, "menu", 255)
+                        LO.applyModsToSlot(4, net.modByPeer[id]); modicons:Draw(ROW_X + ROWS.mods.dx, cy + ROWS.mods.dy, 4, "menu", 255)
                         CONFIG:SetSpecialMod(4, (keep ~= 1) and keep or 0)
                     end
                 end)
             end
             local st, sc = seatStatus(id)
-            local right = ROW_X + ROW_W - 26
+            local S = ROWS.status
+            local right = ROW_X + ROW_W - S.right_inset
             if host then
-                text(20, st, right, cy - 14, sc, "right", 1, 250)
-                text(16, L("tag_host"), right, cy + 16, ACCENT, "right", 1, 250)
+                text(S.font_size, st, right, cy + S.host_dy, sc, "right", 1, S.max_width)
+                text(ROWS.host_tag.font_size, L("tag_host"), right, cy + ROWS.host_tag.dy, ACCENT, "right", 1, S.max_width)
             else
-                text(20, st, right, cy, sc, "right", 1, 250)
+                text(S.font_size, st, right, cy, sc, "right", 1, S.max_width)
             end
         end
     end
@@ -374,36 +393,37 @@ end
 
 -- the difficulty row of the deck: all five emblems, the chosen one full size on a marker, the others
 -- scaled down; the ones the song lacks stay greyed (the cursor never stops on them)
-local DIFF_STEP = 128
-local DIFF_X0, DIFF_CY = DECK_X + DECK_SPLIT + 110, DECK_Y + DECK_H / 2
-local DECK_ROW = 44
-local SPEED_Y = 596                           -- the host's song speed buttons
+local DR = Layout.difficulty_row
+local DIFF_STEP = DR.step
+local DIFF_X0, DIFF_CY = DECK_X + DECK_SPLIT + DR.x_offset, DECK_Y + DECK_H / 2
+local DECK_ROW = DECK.row_height
+local SPEED_Y = Layout.speed_buttons.y        -- the host's song speed buttons
 local function drawDiffRow(x0, cy)
     local d = LO.myDiff()
-    rect(x0 + d * DIFF_STEP - 58, cy - 56, 116, 112, ACCENT_SOFT)
+    rect(x0 + d * DIFF_STEP - DR.marker.w / 2, cy - DR.marker.h / 2, DR.marker.w, DR.marker.h, ACCENT_SOFT)
     local known = net.song ~= nil and not net.iLackSong
     for i = 0, 4 do
         local has = LO.diffAvailable(i)
-        local s = (i == d) and 1.0 or (has and 0.72 or 0.6)
+        local s = (i == d) and DR.chosen_scale or (has and DR.other_scale or DR.missing_scale)
         local x = x0 + i * DIFF_STEP
-        if has then drawEmblem(i, known and net.songLevels[i] or nil, net.songPlus[i], x, cy, s, (i == d) and 1 or 0.75)
-        else drawEmblem(nil, nil, false, x, cy, s, 0.45) end
+        if has then drawEmblem(i, known and net.songLevels[i] or nil, net.songPlus[i], x, cy, s, (i == d) and DR.chosen_opacity or DR.other_opacity)
+        else drawEmblem(nil, nil, false, x, cy, s, DR.missing_opacity) end
     end
 end
 
 local function drawDeck()
-    rect(DECK_X + DECK_SPLIT, DECK_Y + 24, 3, DECK_H - 48, ROW_EMPTY)
+    rect(DECK_X + DECK_SPLIT, DECK_Y + DECK.divider_inset, DECK.divider_width, DECK_H - 2 * DECK.divider_inset, ROW_EMPTY)
     local cx = DECK_X + DECK_SPLIT + (DECK_W - DECK_SPLIT) / 2
     local cy = DECK_Y + DECK_H / 2
-    local roomW = DECK_W - DECK_SPLIT - 80
+    local roomW = DECK_W - DECK_SPLIT - DECK.content_inset
     if tab == 2 then
         local d = LO.myDiff()
         local x0 = DIFF_X0
         drawDiffRow(x0, cy)
-        local tx = x0 + 4 * DIFF_STEP + 96
-        local w = DECK_X + DECK_W - 40 - tx
-        text(34, diffName(d), tx, cy - 18, DIFF_COL[d] or INK, "left", 1, w)
-        text(20, L("deck_diff_help"), tx, cy + 26, DIM, "left", 1, w)
+        local tx = x0 + 4 * DIFF_STEP + DR.name_gap
+        local w = DECK_X + DECK_W - DR.right_inset - tx
+        text(DR.name.font_size, diffName(d), tx, cy + DR.name.dy, DIFF_COL[d] or INK, "left", 1, w)
+        text(DR.help.font_size, L("deck_diff_help"), tx, cy + DR.help.dy, DIM, "left", 1, w)
         return
     end
     local main, sub, mc = nil, nil, INK
@@ -424,19 +444,19 @@ local function drawDeck()
         sub = L("deck_mods_help")
     end
     if sub then
-        text(30, main, cx, cy - 18, mc, "center", 1, roomW)
-        text(20, sub, cx, cy + 24, DIM, "center", 1, roomW)
+        text(DECK.main_font_size, main, cx, cy + DECK.main_dy, mc, "center", 1, roomW)
+        text(DECK.sub_font_size, sub, cx, cy + DECK.sub_dy, DIM, "center", 1, roomW)
     else
-        text(30, main, cx, cy, mc, "center", 1, roomW)
+        text(DECK.main_font_size, main, cx, cy, mc, "center", 1, roomW)
     end
 end
 
 PANELS.lobby = function()
-    ui:panel{ x = SONG.x, y = SONG.y, w = SONG.w, h = SONG.h, pad = 24, title = L("song_label") }
-    ui:panel{ x = ROSTER.x, y = ROSTER.y, w = ROSTER.w, h = ROSTER.h, pad = 24 }
-    ui:panel{ x = DECK_X, y = DECK_Y, w = DECK_W, h = DECK_H, pad = 20 }
+    ui:panel{ x = SONG.x, y = SONG.y, w = SONG.w, h = SONG.h, pad = SONG.pad, title = L("song_label") }
+    ui:panel{ x = ROSTER.x, y = ROSTER.y, w = ROSTER.w, h = ROSTER.h, pad = ROSTER.pad }
+    ui:panel{ x = DECK_X, y = DECK_Y, w = DECK_W, h = DECK_H, pad = DECK.pad }
     -- the deck's menu: choosing a row confirms it, Left / Right change the difficulty on its row
-    ui:menu(wrapping{ x = DECK_X + 24, y = DECK_Y + (DECK_H - 3 * DECK_ROW) / 2, w = DECK_SPLIT - 60, h = 3 * DECK_ROW,
+    ui:menu(wrapping{ x = DECK_X + DECK.menu_dx, y = DECK_Y + (DECK_H - 3 * DECK_ROW) / 2, w = DECK_SPLIT - DECK.menu_w_inset, h = 3 * DECK_ROW,
         rowHeight = DECK_ROW, selected = tab,
         items = { builtHost and L("tab_start") or L("tab_ready"), L("tab_difficulty"), L("tab_mods") },
         onChange = function(i) tab = i end, onSelect = function() click.confirm = true end,
@@ -444,8 +464,9 @@ PANELS.lobby = function()
         onNavRight = function() click.diff = 1; return true end })
     backButton()
     if builtHost then
-        ui:button{ icon = "rewind", x = 360 - 158, y = SPEED_Y, w = 56, h = 52, mouseOnly = true, onClick = function() click.speed = -1 end }
-        ui:button{ icon = "forward", x = 360 + 102, y = SPEED_Y, w = 56, h = 52, mouseOnly = true, onClick = function() click.speed = 1 end }
+        local SB = Layout.speed_buttons
+        ui:button{ icon = "rewind", x = SI.center_x + SB.rewind_dx, y = SPEED_Y, w = SB.w, h = SB.h, mouseOnly = true, onClick = function() click.speed = -1 end }
+        ui:button{ icon = "forward", x = SI.center_x + SB.forward_dx, y = SPEED_Y, w = SB.w, h = SB.h, mouseOnly = true, onClick = function() click.speed = 1 end }
     end
     ui:focusStay()
 end
@@ -454,27 +475,30 @@ local function drawLobby()
     local ids, me = LO.peerIds(), NET:SelfId()
     if builtFor ~= "lobby" then return end
     ui:draw()
-    text(30, L("logo_title"), 176, 52, INK, "left", 1, 700)
-    text(20, LO.amController() and L("role_host") or L("role_guest"), 1700, 52, DIM, "right", 1, 600)
-    text(24, LO.count() .. " / " .. LO.MAXP, 1836, 52, INK, "right")
+    local H = Layout.header
+    text(H.title.font_size, L("logo_title"), H.title.x, H.title.y, INK, "left", 1, H.title.max_width)
+    text(H.role.font_size, LO.amController() and L("role_host") or L("role_guest"), H.role.x, H.role.y, DIM, "right", 1, H.role.max_width)
+    text(H.count.font_size, LO.count() .. " / " .. LO.MAXP, H.count.x, H.count.y, INK, "right")
     drawSong()
     drawRoster(ids, me)
     drawDeck()
     if LO.amController() then drawHint(LF("hint_host", keyLabel("song"), speedLabel(), bindLabel("CANCEL")))
     else drawHint(LF("hint_guest", bindLabel("CANCEL"))) end
     if net.connecting then
-        rect(0, 0, SCREEN_W, SCREEN_H, BG, 225)
-        text(44, L("connecting"), 960, 540, INK, "center")
-        text(22, LF("hint_connecting", bindLabel("CANCEL")), 960, 620, DIM, "center", 1, 1200)
+        local C = Layout.connecting
+        rect(0, 0, SCREEN_W, SCREEN_H, BG, C.overlay_opacity)
+        text(C.title.font_size, L("connecting"), CX, C.title.y, INK, "center")
+        text(C.hint.font_size, LF("hint_connecting", bindLabel("CANCEL")), CX, C.hint.y, DIM, "center", 1, C.hint.max_width)
     end
 end
 
 -- ── results ─────────────────────────────────────────────────────────────────────────────────────────
-local RESULTS = { x = 220, y = 90, w = 1480, h = 600 }
+local RESULTS = Layout.results
 
 PANELS.results = function()
-    ui:panel{ x = RESULTS.x, y = RESULTS.y, w = RESULTS.w, h = RESULTS.h, pad = 24, title = L("results_title") }
-    nextBtn = ui:button{ icon = "play", accent = true, x = 960 - 90, y = RESULTS.y + RESULTS.h + 30, w = 180, h = 88,
+    ui:panel{ x = RESULTS.x, y = RESULTS.y, w = RESULTS.w, h = RESULTS.h, pad = RESULTS.pad, title = L("results_title") }
+    local NB = RESULTS.next_button
+    nextBtn = ui:button{ icon = "play", accent = true, x = CX - NB.w / 2, y = RESULTS.y + RESULTS.h + NB.gap, w = NB.w, h = NB.h,
         mouseOnly = true, visible = false, onClick = function() click.next = true end }
     backButton()
 end
@@ -482,24 +506,26 @@ end
 local function drawResults()
     if builtFor ~= "results" then return end
     ui:draw()
-    if net.song then text(24, net.song.title or "", 960, RESULTS.y + 104, DIM, "center", 1, 1200) end
+    local R = RESULTS
+    if net.song then text(R.title.font_size, net.song.title or "", CX, R.y + R.title.y_offset, DIM, "center", 1, R.title.max_width) end
     local rows = LO.standings()
+    local RR = R.rows
     for i, row in ipairs(rows) do
         local r = row.r
-        local y = RESULTS.y + 180 + (i - 1) * 80
+        local y = R.y + RR.top + (i - 1) * RR.pitch
         local first = (i == 1 and r and not r.ab)
-        rect(RESULTS.x + 30, y - 36, RESULTS.w - 60, 72, first and ACCENT_SOFT or ROW_FACE)
-        if first then rect(RESULTS.x + 30, y - 36, 8, 72, ACCENT) end
-        text(26, i, RESULTS.x + 86, y, first and ACCENT or INK, "center")
-        text(26, row.name or "?", RESULTS.x + 140, y, INK, "left", 1, 440)
+        rect(R.x + RR.inset, y - RR.h / 2, R.w - 2 * RR.inset, RR.h, first and ACCENT_SOFT or ROW_FACE)
+        if first then rect(R.x + RR.inset, y - RR.h / 2, RR.marker_width, RR.h, ACCENT) end
+        text(R.rank.font_size, i, R.x + R.rank.dx, y, first and ACCENT or INK, "center")
+        text(R.name.font_size, row.name or "?", R.x + R.name.dx, y, INK, "left", 1, R.name.max_width)
         if r and not r.ab then
-            text(28, string.format("%d", r.sc), RESULTS.x + 830, y, INK, "right")
-            text(20, LF("results_combo", r.ac, r.co), RESULTS.x + 880, y, DIM, "left", 1, 330)
+            text(R.score.font_size, string.format("%d", r.sc), R.x + R.score.dx, y, INK, "right")
+            text(R.combo.font_size, LF("results_combo", r.ac, r.co), R.x + R.combo.dx, y, DIM, "left", 1, R.combo.max_width)
             local badge = r.pf and L("badge_perfect") or r.fc and L("badge_fc") or r.cl and L("badge_clear") or L("badge_failed")
-            local bc = r.pf and AMBER or r.fc and { 20, 140, 160 } or r.cl and GREEN or RED
-            text(20, badge, RESULTS.x + RESULTS.w - 60, y, bc, "right", 1, 180)
+            local bc = r.pf and AMBER or r.fc and COL.badge_full_combo or r.cl and GREEN or RED
+            text(R.badge.font_size, badge, R.x + R.w - R.badge.right_inset, y, bc, "right", 1, R.badge.max_width)
         else
-            text(20, r and L("results_aborted") or L("results_playing"), RESULTS.x + 880, y, AMBER, "left", 1, 500)
+            text(R.status.font_size, r and L("results_aborted") or L("results_playing"), R.x + R.status.dx, y, AMBER, "left", 1, R.status.max_width)
         end
     end
     if net.resultsReadyT == nil then drawHint(L("hint_results_wait"))
@@ -539,14 +565,14 @@ function afterSongEnum() end
 function onDestroy() if modicons then pcall(function() modicons:Deactivate() end) end LO.leave() end
 
 -- ── helpers ────────────────────────────────────────────────────────────────────────────────────────
-local function setMsg(m, t) msg = m; msgT = t or 4 end
+local function setMsg(m, t) msg = m; msgT = t or MSG.default end
 local function getSignal(result)
     if type(result) == "string" then return result end
     if result == nil then return nil end
     local ok, val = pcall(function() return result[0] end)
     return ok and val or nil
 end
-local function backToMenu(m, t) LO.leave(); mode = "menu"; if m then setMsg(m, t or 5) end end
+local function backToMenu(m, t) LO.leave(); mode = "menu"; if m then setMsg(m, t or MSG.back_to_menu) end end
 local function playSfx(name) pcall(function() SHARED:GetSharedSound(name):Play() end) end
 local function playError() playSfx("Error") end
 
@@ -601,7 +627,7 @@ local function step(ts)
             if mode == "songselect" and act then act:Deactivate() end
             backToMenu(L("msg_room_closed")); return nil
         end
-        if net.notice then setMsg(net.notice, 8); net.notice = nil end
+        if net.notice then setMsg(net.notice, MSG.network_notice); net.notice = nil end
     end
     if mode == "lobby" or mode == "results" then LO.tickPreview(dt) end   -- loop the jacket preview (song select owns its own)
 
@@ -610,7 +636,7 @@ local function step(ts)
     if mode == "menu" then
         widgets(ts)
         if click.pick == 1 then
-            if LO.host() then mode = "lobby"; tab = 1 else playError(); setMsg(net.msg or L("msg_open_failed"), 6) end
+            if LO.host() then mode = "lobby"; tab = 1 else playError(); setMsg(net.msg or L("msg_open_failed"), MSG.open_failed) end
         elseif click.pick == 2 then mode = "code"; ti = INPUT:CreateTextInput("", 4096) end
         if navPn.cancel() or click.back then return Exit("stage", "_title") end
 
@@ -619,7 +645,7 @@ local function step(ts)
         if ti:Update() then
             local code = (ti.Text ~= "" and ti.Text) or nil
             if code and LO.join(code) then mode = "lobby"; tab = 1
-            else playError(); setMsg(code and (net.msg or L("msg_join_failed")) or L("msg_no_code"), code and 8 or 5); mode = "menu" end
+            else playError(); setMsg(code and (net.msg or L("msg_join_failed")) or L("msg_no_code"), code and MSG.join_failed or MSG.no_code); mode = "menu" end
         end
         if navPn.cancel() or click.back then mode = "menu" end
 
@@ -629,7 +655,7 @@ local function step(ts)
     elseif mode == "lobby" then
         if not net.online then
             -- a failed join comes back with its reason, shown long enough to read; Cancel gives up the wait
-            if not net.connecting then backToMenu(net.msg or L("msg_disconnected"), 12)
+            if not net.connecting then backToMenu(net.msg or L("msg_disconnected"), MSG.disconnected)
             elseif navPn.cancel() then backToMenu() end
             return nil
         end
@@ -639,7 +665,7 @@ local function step(ts)
             local r = LO.launchPlay()
             if r == true then pendingReturn = true; return Exit("play", nil)
             elseif r == "eject" then backToMenu(L("msg_no_song_eject")); return nil
-            else setMsg(net.msg or L("msg_cant_start"), 5) end
+            else setMsg(net.msg or L("msg_cant_start"), MSG.cant_start) end
         end
         -- mod_select_dialog modal: while open it owns all input (Esc = its Cancel)
         if modDlg and modDlg.IsActive then modDlg:Update(); modWasActive = true; return nil end
@@ -652,8 +678,8 @@ local function step(ts)
             if LO.amController() then
                 if confirm then
                     local why = LO.startProblem()
-                    if why then playError(); setMsg(L("msg_" .. why), 3)
-                    elseif LO.hostStart() then setMsg(L("msg_starting"), 2) end
+                    if why then playError(); setMsg(L("msg_" .. why), MSG.start_problem)
+                    elseif LO.hostStart() then setMsg(L("msg_starting"), MSG.starting) end
                 end
             else
                 if confirm then LO.setReady(not LO.myReady()) end
@@ -663,14 +689,14 @@ local function step(ts)
             if click.diff and LO.stepDiff(click.diff) then playSfx("Move") end
             -- the mouse picks an emblem directly
             for d = 0, 4 do
-                if clickedIn(DIFF_X0 + d * DIFF_STEP - 58, DIFF_CY - 56, 116, 112) and LO.diffAvailable(d) and d ~= LO.myDiff() then
+                if clickedIn(DIFF_X0 + d * DIFF_STEP - DR.marker.w / 2, DIFF_CY - DR.marker.h / 2, DR.marker.w, DR.marker.h) and LO.diffAvailable(d) and d ~= LO.myDiff() then
                     LO.setDiff(d); playSfx("Move")
                 end
             end
         elseif tab == 3 then
             if confirm then
                 if not modDlg then modDlg = ACTIVITY:GetActivity("mod_select_dialog") end   -- lazily (re)fetch if onStart missed it
-                if modDlg then modDlg:Activate(0, true) else playError(); setMsg(L("msg_mods_unavailable"), 3) end   -- restrict: no Auto (Dynamic Beat IS allowed, per-player)
+                if modDlg then modDlg:Activate(0, true) else playError(); setMsg(L("msg_mods_unavailable"), MSG.mods_unavailable) end   -- restrict: no Auto (Dynamic Beat IS allowed, per-player)
             end
         end
         -- controller-only song controls

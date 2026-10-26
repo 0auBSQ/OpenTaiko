@@ -1,0 +1,42 @@
+{
+    "_note": "Secret Vault water timings. Times in seconds; distances in 1920x1080 pixels; rates in radians per second unless named.",
+    "water": {
+        "_note": "rise_s: the fade-out, the water rising over the screen; the name fades in over name_in_s once the water covers the screen; the water lifts away from lift_at_s into the fade-in, over lift_s. Wave height (px), froth and churn (how fast the pattern inside moves) go from their calm value at rest to their swell value at the water's fastest; the pattern moves carry of the surface's way, so the water flows as it moves.",
+        "rise_s": 1.8,
+        "name_in_s": 0.6,
+        "lift_at_s": 0.9,
+        "lift_s": 1.8,
+        "wave_calm_px": 13,
+        "wave_swell_px": 26,
+        "froth_calm": 0.55,
+        "froth_swell": 1.3,
+        "churn_calm": 1,
+        "churn_swell": 3.4,
+        "carry": 0.35
+    },
+    "bubbles": {
+        "_note": "bubbles spawn at about spawn_rising / spawn_covered / spawn_lifting per second while the water rises, covers the screen and lifts away; each rises at speed_min to speed_max px per second and wobbles wobble_min to wobble_max px at wobble_hz_min to wobble_hz_max times per second",
+        "spawn_rising": 22,
+        "spawn_covered": 9,
+        "spawn_lifting": 4,
+        "speed_min": 120,
+        "speed_max": 260,
+        "wobble_min": 4,
+        "wobble_max": 12,
+        "wobble_hz_min": 0.6,
+        "wobble_hz_max": 1.5
+    },
+    "name": {
+        "_note": "the name bobs name_bob_px at name_bob_rate; each letter bobs letter_bob_px at letter_bob_rate and tilts letter_tilt_deg at letter_tilt_rate, letter i at a phase of i * letter_phase (times tilt_phase_scale for the tilt). It fades out as the water lifts it from fade_from_px over fade_over_px.",
+        "name_bob_px": 10,
+        "name_bob_rate": 1.1,
+        "letter_bob_px": 9,
+        "letter_bob_rate": 2.6,
+        "letter_tilt_deg": 3,
+        "letter_tilt_rate": 1.9,
+        "letter_phase": 0.55,
+        "tilt_phase_scale": 1.3,
+        "fade_from_px": 300,
+        "fade_over_px": 320
+    }
+}

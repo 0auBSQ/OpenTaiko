@@ -8,6 +8,11 @@ local PopUI    = require("PopUI")
 local PagodaAvatar = require("PagodaAvatar")
 local SavePicker = require("SavePicker")
 local CustomStages = require("Stages.CustomStages")
+-- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local MENU = Layout.menu
 
 -- ── Resources ─────────────────────────────────────────────────────────────────
 
@@ -25,10 +30,11 @@ local textVersion = nil   -- version watermark
 
 local function col(r, g, b)     return { r = r, g = g, b = b } end
 local function mkCol(c, a)      a = a or 255; return COLOR:CreateColorFromRGBA(c.r, c.g, c.b, a) end
-local function darken(c, f)     f = f or 0.35
+local function darken(c, f)     f = f or MENU.outline_darken
     return col(math.floor(c.r * f), math.floor(c.g * f), math.floor(c.b * f)) end
-local white = col(255, 255, 255)
-local black = col(0, 0, 0)
+local function rgb(a)           return col(a[1], a[2], a[3]) end
+local white = col(255, 255, 255)   -- the neutral tint a box is reset to
+local EC = MENU.entry_colors
 
 -- ── Locale ────────────────────────────────────────────────────────────────────
 -- the skin's Locales/<code>.json through THEME; the English text stays in the code as the fallback
@@ -55,51 +61,51 @@ local function buildMenus()
         {
             title = tr("TITLE_PERFORMANCE", "Performance Mode"),
             desc  = tr("TITLE_PERFORMANCE_DESC", "Play Taiko charts with your preferred settings!\nPlayable between 1 and 5 players."),
-            c     = col(255, 140, 0),
+            c     = rgb(EC.performance),
             via   = "stage", stage = "regular_song_select", trans = "pill_clouds",
             playerPrompt = true,
         },
         {
             title = tr("TITLE_DOJO", "The Fox Dojo"),
             desc  = tr("TITLE_DOJO_DESC", "Challenge various dan exams tailored by the Fox Band!\nSingle player only."),
-            c     = col(0, 50, 150),
+            c     = rgb(EC.dojo),
             via   = "stage", stage = "dan_select", trans = "dan_doors", fastTrans = "dan_doors_back",
         },
         {
             title = tr("TITLE_TOWERS", "Survival Mode"),
             desc  = tr("TITLE_TOWERS_DESC", "Climb the towers through survival challenges and try getting to the top!\nSingle player only."),
-            c     = col(100, 210, 50),
+            c     = rgb(EC.towers),
             via   = "stage", stage = "tower_select", trans = "tower_gate", fastTrans = "tower_gate_back",
         },
         {
             title = tr("TITLE_AI_BATTLE", "AI Battle Mode"),
             desc  = tr("TITLE_AI_BATTLE_DESC", "Fight AItritus on your favorite charts and try to get the W!\nSingle player only."),
-            c     = col(0, 200, 220),
+            c     = rgb(EC.ai_battle),
             via   = "stage", stage = "ai_battle_song_select", trans = "ai_link",
         },
         {
             title = tr("TITLE_TRAINING", "Training Mode"),
             desc  = tr("TITLE_TRAINING_DESC", "Practice your favorite charts to get the hang of them!\nSingle player only."),
-            c     = col(210, 185, 130),
+            c     = rgb(EC.training),
             via   = "stage", stage = "training_song_select", trans = "pill_clouds_training",
         },
         {
             title = tr("TITLE_INTRO_NOKON", "Intro Nokon"),
             desc  = tr("TITLE_INTRO_NOKON_DESC", "It's show time! Show your musical knowledge through Nokon's best show!\nPlayable between 1 and 5 players."),
-            c     = col(140, 80, 30),
+            c     = rgb(EC.intro_nokon),
             via   = "stage", stage = "intro_nokon", trans = "nokon_curtain", fastTrans = "nokon_curtain_back",
         },
         {
             title = tr("TITLE_MYROOM", "My Room"),
             desc  = tr("TITLE_MYROOM_DESC", "Decorate your personal room, place furniture, and visit other players' rooms!"),
-            c     = col(30, 150, 60),
+            c     = rgb(EC.my_room),
             via   = "stage", stage = "my_room", trans = "myroom_door", pickSave = "room",
             back  = "_title|myroom_door",   -- My Room's way back (the shared string my_room_return)
         },
         {
             title = tr("TITLE_STORE", "OpenTaiko's General Store"),
             desc  = tr("TITLE_STORE_DESC", "Spend your OpenTaiko coins for very nice goods! *wink*"),
-            c     = col(0, 160, 170),
+            c     = rgb(EC.store),
             via   = "stage", stage = "coin_shop", trans = "newspaper", fastTrans = "newspaper_back", pickSave = "shop",
         },
     }
@@ -109,14 +115,14 @@ local function buildMenus()
         m[#m + 1] = {
             title = tr("TITLE_VAULT", "Secret Vault"),
             desc  = tr("TITLE_VAULT_DESC", "A place full of mysteries where keys seems to have a particular value..."),
-            c     = col(80, 80, 90),
+            c     = rgb(EC.vault),
             via   = "stage", stage = "secret_vault_rw", trans = "vault_water", fastTrans = "vault_water_back",
         }
     else
         m[#m + 1] = {
             title  = "???",
             desc   = tr("TITLE_VAULT_LOCKED_DESC", "Can you hear me...?"),
-            c      = col(80, 80, 90),
+            c      = rgb(EC.vault_locked),
             via    = "stage", stage = "secret_vault_rw", trans = "vault_wood",
             static = true,
         }
@@ -125,26 +131,26 @@ local function buildMenus()
     m[#m + 1] = {
         title = tr("TITLE_CUSTOM_STAGES", "Custom Stages"),
         desc  = tr("TITLE_CUSTOM_STAGES_DESC", "Play stages made by the community, or learn how to make your own!"),
-        c     = col(210, 90, 160),
+        c     = rgb(EC.custom_stages),
         via   = "custom",
     }
     m[#m + 1] = {
         title = tr("TITLE_SETTINGS", "Settings"),
         desc  = tr("TITLE_SETTINGS_DESC", "Adjust your settings to fit with your play experience!"),
-        c     = col(170, 170, 175),
+        c     = rgb(EC.settings),
         via   = "config", trans = "settings_iris",
     }
     m[#m + 1] = {
         title = tr("TITLE_EXIT", "Exit"),
         desc  = tr("TITLE_EXIT_DESC", "See you next time!"),
-        c     = col(100, 100, 105),
+        c     = rgb(EC.exit),
         via   = "exit",
     }
     m[#m + 1] = {
         title = tr("TITLE_ONLINE_LOBBY", "Online Lobby"),
         desc  = tr("TITLE_ONLINE_LOBBY_DESC", "(Beta, Share your room code only with people you trust)"),
         requiresOnline = true,
-        c     = col(72, 36, 112),
+        c     = rgb(EC.online_lobby),
         via   = "stage", stage = "onlinelobby",
     }
 
@@ -170,8 +176,8 @@ local inPrompt   = false
 local holdDir    = 0
 local holdStart  = 0
 local holdLast   = 0
-local HOLD_DELAY  = 180   -- ms before auto-repeat starts
-local HOLD_REPEAT = 70    -- ms between auto-repeat fires
+local HOLD_DELAY  = Animation.hold_scroll.delay_ms    -- ms before auto-repeat starts
+local HOLD_REPEAT = Animation.hold_scroll.repeat_ms   -- ms between auto-repeat fires
 
 -- Scroll animation
 local scrollPos  = 1.0   -- float index, lerps toward curIdx each frame
@@ -188,7 +194,7 @@ local function getTitleTex(i)
     if textCache[i] and textCache[i].title then return textCache[i].title end
     if not textCache[i] then textCache[i] = {} end
     local m = menus[i]
-    textCache[i].title = textBig:GetText(m.title, false, 750, mkCol(white), mkCol(darken(m.c)))
+    textCache[i].title = textBig:GetText(m.title, false, MENU.text_max_width, Config.color(MENU.text_color), mkCol(darken(m.c)))
     return textCache[i].title
 end
 
@@ -196,13 +202,13 @@ local function getDescTex(i)
     if textCache[i] and textCache[i].desc then return textCache[i].desc end
     if not textCache[i] then textCache[i] = {} end
     local m = menus[i]
-    textCache[i].desc = textSmall:GetText(m.desc, false, 750, mkCol(white), mkCol(darken(m.c)))
+    textCache[i].desc = textSmall:GetText(m.desc, false, MENU.text_max_width, Config.color(MENU.text_color), mkCol(darken(m.c)))
     return textCache[i].desc
 end
 
 -- ── Draw helpers ──────────────────────────────────────────────────────────────
 
-local BGTILE_W, BGTILE_H = 192, 108   -- BgTile.png
+local BGTILE_W, BGTILE_H = Layout.background.tile_width, Layout.background.tile_height   -- BgTile.png
 
 local function drawBgTile(opacity)
     if bgtile == nil or bgtile.Width <= 0 then return end
@@ -220,13 +226,13 @@ end
 local function drawBoxes(alpha)
     if boxTex == nil or #menus == 0 or alpha <= 0 then return end
     local bh      = boxTex.Height
-    local spacing = bh + 20
+    local spacing = bh + MENU.box_gap
 
     for i = 1, #menus do
         local offset = i - scrollPos
-        local boxY   = 540 + offset * spacing
+        local boxY   = MENU.center_y + offset * spacing
 
-        if boxY < -(bh / 2 + 60) or boxY > 1080 + (bh / 2 + 60) then goto skip end
+        if boxY < -(bh / 2 + MENU.cull_margin) or boxY > 1080 + (bh / 2 + MENU.cull_margin) then goto skip end
 
         local m = menus[i]
 
@@ -236,7 +242,7 @@ local function drawBoxes(alpha)
         if isStatic then boxTex:SetUseNoiseEffect(true) end
         boxTex:SetColor(mkCol(m.c))
         boxTex:SetOpacity(alpha)
-        boxTex:DrawAtAnchor(960, boxY, "center")
+        boxTex:DrawAtAnchor(MENU.center_x, boxY, "center")
         boxTex:SetOpacity(1)
         boxTex:SetColor(mkCol(white))
         if isStatic then boxTex:SetUseNoiseEffect(false) end
@@ -245,27 +251,27 @@ local function drawBoxes(alpha)
         if i == curIdx and hoverTex ~= nil then
             if isStatic then hoverTex:SetUseNoiseEffect(true) end
             hoverTex:SetOpacity(alpha)
-            hoverTex:DrawAtAnchor(960, boxY, "center")
+            hoverTex:DrawAtAnchor(MENU.center_x, boxY, "center")
             hoverTex:SetOpacity(1)
             if isStatic then hoverTex:SetUseNoiseEffect(false) end
         end
 
-        -- Title text (top = boxTop + 10)
+        -- Title text (top = boxTop + title_top)
         local titleTex = getTitleTex(i)
         if titleTex ~= nil then
             if isStatic then titleTex:SetUseNoiseEffect(true) end
             titleTex:SetOpacity(alpha)
-            titleTex:DrawAtAnchor(960, boxY - bh / 2 + 10, "top")
+            titleTex:DrawAtAnchor(MENU.center_x, boxY - bh / 2 + MENU.title_top, "top")
             titleTex:SetOpacity(1)
             if isStatic then titleTex:SetUseNoiseEffect(false) end
         end
 
-        -- Description text (top = boxTop + 100)
+        -- Description text (top = boxTop + desc_top)
         local descTex = getDescTex(i)
         if descTex ~= nil then
             if isStatic then descTex:SetUseNoiseEffect(true) end
             descTex:SetOpacity(alpha)
-            descTex:DrawAtAnchor(960, boxY - bh / 2 + 100, "top")
+            descTex:DrawAtAnchor(MENU.center_x, boxY - bh / 2 + MENU.desc_top, "top")
             descTex:SetOpacity(1)
             if isStatic then descTex:SetUseNoiseEffect(false) end
         end
@@ -306,17 +312,19 @@ local function openNotice()
     local setting = engineString("SETTINGS_SYSTEM_LUANETWORKING", "Allow LuaNetworking connections")
     local section = engineString("SETTINGS_SYSTEM", "System")
     msg = msg:gsub("{setting}", function() return setting end):gsub("{section}", function() return section end)
-    local PW, SIZE, LINE = 1000, 26, 40
-    local lines = notice:wrapLines(SIZE, msg, PW - 120)
-    local PH = 230 + #lines * LINE
-    local panel = notice:panel{ x = (1920 - PW) / 2, y = (1080 - PH) / 2, w = PW, h = PH, pad = 34,
+    local N = Layout.notice
+    local PW, SIZE, LINE = N.width, N.font_size, N.line_height
+    local lines = notice:wrapLines(SIZE, msg, PW - N.text_inset)
+    local PH = N.base_height + #lines * LINE
+    local panel = notice:panel{ x = (1920 - PW) / 2, y = (1080 - PH) / 2, w = PW, h = PH, pad = N.pad,
                                 title = tr("TITLE_ONLINE_OFF_TITLE", "Online play is off") }
     local cx, cy, cw = panel:content()
     for i, line in ipairs(lines) do
-        notice:label{ x = cx + cw / 2, y = cy + 14 + (i - 1) * LINE, text = line, size = SIZE, align = "center", maxWidth = cw }
+        notice:label{ x = cx + cw / 2, y = cy + N.text_top + (i - 1) * LINE, text = line, size = SIZE, align = "center", maxWidth = cw }
     end
-    local ok = notice:button{ text = tr("TITLE_ONLINE_OFF_OK", "OK"), x = cx + cw / 2 - 120, y = cy + 34 + #lines * LINE,
-                              w = 240, h = 76, accent = true, onClick = function() noticeDone = true end }
+    local B = N.button
+    local ok = notice:button{ text = tr("TITLE_ONLINE_OFF_OK", "OK"), x = cx + cw / 2 - B.width / 2, y = cy + B.top + #lines * LINE,
+                              w = B.width, h = B.height, accent = true, onClick = function() noticeDone = true end }
     for i, f in ipairs(notice.focusables) do if f == ok then notice:_setFocusIndex(i) end end
     noticeDone, noticeFresh = false, true
 end
@@ -375,9 +383,9 @@ function onStart()
     bgtile     = TEXTURE:CreateTexture("Textures/BgTile.png")
     background = TEXTURE:CreateTexture("Textures/Background.png")
 
-    textBig     = TEXT:Create(28)
-    textSmall   = TEXT:Create(17)
-    textVersion = TEXT:Create(15)
+    textBig     = TEXT:Create(MENU.title_font_size)
+    textSmall   = TEXT:Create(MENU.desc_font_size)
+    textVersion = TEXT:Create(Layout.version.font_size)
 
     sounds.BGM    = SOUND:CreateBGM("Sounds/BGM.ogg")
     sounds.BGM:SetLoop(true)
@@ -425,13 +433,14 @@ end
 
 function draw()
     if background ~= nil then background:Draw(0, 0) end
-    drawBgTile(0.65)
-    drawBoxes(1 - PS.dim() / 0.6)
+    drawBgTile(Layout.background.tile_opacity)
+    drawBoxes(1 - PS.dim() / Layout.player_select.dim_opacity)
 
     -- Version watermark (top-left, no anchor)
     if textVersion ~= nil then
-        local vTex = textVersion:GetText("OpenTaiko 0.6.1 Pre-release 1 (Demo)", false, 1920, mkCol(white), mkCol(black))
-        if vTex ~= nil then vTex:Draw(0, 0) end
+        local V = Layout.version
+        local vTex = textVersion:GetText("OpenTaiko 0.6.1 Pre-release 1 (Demo)", false, V.max_width, Config.color(V.text_color), Config.color(V.outline_color))
+        if vTex ~= nil then vTex:Draw(V.x, V.y) end
     end
 
     -- Player-count prompt overlay (also while its cancel outro plays)
@@ -440,18 +449,19 @@ function draw()
         PS.draw()
     end
 
+    local dim = Layout.background.overlay_dim_opacity
     if notice then
-        drawBgTile(0.6)
+        drawBgTile(dim)
         notice:draw()
     end
 
     if SavePicker.isOpen() then
-        drawBgTile(0.6)
+        drawBgTile(dim)
         SavePicker.draw()
     end
 
     if CustomStages.isOpen() then
-        drawBgTile(0.6)
+        drawBgTile(dim)
         CustomStages.draw()
     end
 end
@@ -464,16 +474,17 @@ function update(ts)
     currentTs = ts
 
     -- Scroll animation: exponential smoothing, FPS-independent
-    local alpha = 1.0 - math.exp(-dt / 45.0)  -- half-life ~31 ms → ~120 ms to reach target
+    local SCROLL = Animation.menu_scroll
+    local alpha = 1.0 - math.exp(-dt / SCROLL.time_constant_ms)
     scrollPos = scrollPos + (curIdx - scrollPos) * alpha
-    if math.abs(scrollPos - curIdx) < 0.005 then scrollPos = curIdx end
+    if math.abs(scrollPos - curIdx) < SCROLL.snap_distance then scrollPos = curIdx end
 
     -- Update static burst for locked vault (time-based, FPS-independent)
+    local ST = Animation.locked_static
     if ts >= staticNextMs then
-        staticNextMs = ts + 100  -- re-check every 100 ms
-        if currentTs >= staticUntilMs and math.random(1, 10) <= 2 then
-            -- 20% chance every 100 ms → bursts roughly 2×/sec on average
-            staticUntilMs = ts + math.random(150, 500)
+        staticNextMs = ts + ST.check_interval_ms
+        if currentTs >= staticUntilMs and math.random(1, ST.chance_out_of) <= ST.chance then
+            staticUntilMs = ts + math.random(ST.burst_min_ms, ST.burst_max_ms)
         end
     end
 

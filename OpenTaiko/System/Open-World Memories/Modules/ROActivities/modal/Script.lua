@@ -23,6 +23,13 @@ local Coins = require("modal_coins")
 local Chest = require("modal_chest")
 local Card = require("modal_card")
 
+-- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local FONTS = Layout.fonts
+local COLORS = Layout.colors
+
 local TEX, SND = "Textures/", "Sounds/"
 local ANIM_SOUNDS = { "slide", "coin", "coin_alt", "jingle", "pay", "puff", "cushion", "chest", "latch", "sparkle", "flash", "reveal", "close",
                       "box_land", "box_rustle", "box_open" }
@@ -49,7 +56,7 @@ local player = 1
 local pending = nil          -- the item waiting behind the chest reveal
 local nav = NavInput.p[""]
 local age = 0                -- seconds since activate: the press that opened the modal must not also skip it
-local INPUT_GRACE = 0.25
+local INPUT_GRACE = Animation.input_grace_s
 
 function onStart()
     for i = 1, 5 do A.icons[i] = TEXTURE:CreateTexture(TEX .. i .. "P.png") end
@@ -66,16 +73,16 @@ function onStart()
 
     -- glyph fonts, all without a style token: CoinBox creates its own the same way and one script
     -- must not mix the two forms (the NLua params cache)
-    A.fontHeader = TEXT:CreateGlyphCached(84)
-    A.fontName = TEXT:CreateGlyphCached(56)
-    A.fontSmall = TEXT:CreateGlyphCached(32)
-    A.fontPlate = TEXT:Create(16, "regular")
-    A.colPlateFg = COLOR:CreateColorFromRGBA(0, 0, 0, 255)
-    A.colPlateBg = COLOR:CreateColorFromRGBA(0, 0, 0, 0)
-    A.colInk = COLOR:CreateColorFromRGBA(52, 58, 92, 255)
-    A.colInkOutline = COLOR:CreateColorFromRGBA(255, 255, 255, 230)
-    A.colPillText = COLOR:CreateColorFromRGBA(255, 255, 255, 255)
-    A.colPillOutline = COLOR:CreateColorFromRGBA(30, 30, 44, 255)
+    A.fontHeader = TEXT:CreateGlyphCached(FONTS.header_size)
+    A.fontName = TEXT:CreateGlyphCached(FONTS.name_size)
+    A.fontSmall = TEXT:CreateGlyphCached(FONTS.small_size)
+    A.fontPlate = TEXT:Create(FONTS.plate_size, "regular")
+    A.colPlateFg = Config.color(COLORS.plate_text_color)
+    A.colPlateBg = Config.color(COLORS.plate_back_color)
+    A.colInk = Config.color(COLORS.ink_color)
+    A.colInkOutline = Config.color(COLORS.ink_outline_color)
+    A.colPillText = Config.color(COLORS.pill_text_color)
+    A.colPillOutline = Config.color(COLORS.pill_outline_color)
 
     coins, chest, card = Coins.new(A), Chest.new(A), Card.new(A)
 end

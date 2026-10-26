@@ -21,26 +21,31 @@
 local Rainbow = require("Rainbow")
 local PlayStrings = require("PlayStrings")
 
+-- sizes, offsets and colours: Config/layout.json; the rainbow's and the glitter's pace: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+
 local TEXTURES_DIR = "Textures/"
 
 local STYLE_KEY = "danplate_style"
-local RAINBOW_CYCLES = 1.5       -- hue cycles along the plate's diagonal
-local RAINBOW_SPEED  = 0.35      -- cycles per second
-local RAINBOW_STEPS  = 48        -- gradient maps per cycle (the animation's phase steps)
-local RAINBOW_STOPS  = 18        -- colour stops per gradient map
-local RAINBOW_SAT    = 0.7       -- a little pastel
-local GLITTER   = { rate = 4, size = 0.8, max = 7, blend = "Add" }
-local GLITTER_OPACITY = 1
+local RAINBOW_CYCLES = Layout.rainbow.cycles         -- hue cycles along the plate's diagonal
+local RAINBOW_SPEED  = Animation.rainbow.speed       -- cycles per second
+local RAINBOW_STEPS  = Animation.rainbow.steps       -- gradient maps per cycle (the animation's phase steps)
+local RAINBOW_STOPS  = Layout.rainbow.stops          -- colour stops per gradient map
+local RAINBOW_SAT    = Layout.rainbow.saturation     -- a little pastel
+local GLITTER   = { rate = Animation.glitter.rate, size = Layout.glitter.size, max = Layout.glitter.max,
+    blend = Layout.glitter.blend }
+local GLITTER_OPACITY = Layout.glitter.opacity
 -- the plate's frame (shared by frames 0-4), x, y, w, h from its top-left: top roller, bottom roller,
 -- left post, right post
-local GLITTER_BOXES = { { 50, 46, 190, 42 }, { 50, 482, 190, 44 }, { 63, 92, 20, 382 }, { 212, 92, 20, 382 } }
+local GLITTER_BOXES = Layout.glitter.boxes
 
--- Config values (loaded in onStart)
-local cfg_frame_count     = 6
-local cfg_title_font_size = 48
-local cfg_title_max_h     = 160
-local cfg_title_offset_x  = 0
-local cfg_title_offset_y  = 0
+local cfg_frame_count     = Layout.frame_count
+local cfg_title_font_size = Layout.title_font_size
+local cfg_title_max_h     = Layout.title_max_height
+local cfg_title_offset_x  = Layout.title_offset_x
+local cfg_title_offset_y  = Layout.title_offset_y
 
 -- Per-tick texture arrays (1-indexed)
 local back_frames  = {}   -- back_frames[i]  → LuaTexture for background tick i-1
@@ -136,13 +141,6 @@ end
 -- ─────────────────────────────────────────────────────────────────────────────
 
 function onStart()
-    local config = JSONLOADER:LoadJson("Config.json")
-    cfg_frame_count     = JSONLOADER:ExtractNumber(config["frame_count"])      or 6
-    cfg_title_font_size = JSONLOADER:ExtractNumber(config["title_font_size"])  or 48
-    cfg_title_max_h     = JSONLOADER:ExtractNumber(config["title_max_height"]) or 160
-    cfg_title_offset_x  = JSONLOADER:ExtractNumber(config["title_offset_x"])   or 0
-    cfg_title_offset_y  = JSONLOADER:ExtractNumber(config["title_offset_y"])   or 0
-
     -- Load one texture per tick for both layers
     for i = 0, cfg_frame_count - 1 do
         back_frames[i + 1]  = TEXTURE:CreateTexture(TEXTURES_DIR .. "back_"   .. i .. ".png")

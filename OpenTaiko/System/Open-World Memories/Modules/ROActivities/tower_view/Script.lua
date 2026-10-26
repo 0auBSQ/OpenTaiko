@@ -13,9 +13,13 @@
 
 local TowerArt = require("TowerArt")
 
-local TOWER_X = 960          -- the tower's centre and the ground line, in panorama pixels
-local TOWER_GROUND_Y = 1580
-local TOWER_SCALE = 0.8          -- of the TowerArt pieces (half the gameplay size)
+-- the tower's place in the panorama: Config/layout.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+
+local TOWER_X = Layout.tower.x               -- the tower's centre and the ground line, in panorama pixels
+local TOWER_GROUND_Y = Layout.tower.ground_y
+local TOWER_SCALE = Layout.tower.scale       -- of the TowerArt pieces (half the gameplay size)
 
 local panorama = nil
 local art = nil

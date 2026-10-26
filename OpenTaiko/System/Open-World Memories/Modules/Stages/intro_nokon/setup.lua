@@ -4,6 +4,11 @@
 
 local I18N = require("i18n")
 local NavInput = require("NavInput")
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local SetupLayout, SetupAnim = Layout.setup, Animation.setup
+local Rolls, Rounds = Layout.setup.rolls, Layout.setup.rounds
 
 local M = {}
 
@@ -17,18 +22,15 @@ local errorTimer = nil
 
 -- ── Constants ─────────────────────────────────────────────────────────────────
 
-local SCALE_SEL   = 1.2
-local SCALE_UNSEL = 0.8
-local ANIM_DUR    = 0.12   -- seconds for zoom transition
-local MAX_GAP     = 100    -- pixel cap on inter-item gap
+local SCALE_SEL   = Rolls.selected_scale
+local SCALE_UNSEL = Rolls.other_scale
+local ANIM_DUR    = SetupAnim.zoom_s   -- seconds for zoom transition
+local MAX_GAP     = Rolls.max_gap    -- pixel cap on inter-item gap
 
 -- Roll vertical centers (screen is 1080px; title uses top ~110px)
-local ROLL_Y = { 285, 570, 855 }
+local ROLL_Y = Rolls.y
 
 local WHITE = "ffffffff"
-local GRAY  = "ff888888"
-local DARK  = "ff444444"
-local GOLD  = "ffffd700"
 
 -- ── Roll definitions ─────────────────────────────────────────────────────────
 
@@ -99,12 +101,12 @@ local function itemPositions(r)
         local t = tx[item.key]
         if t and t.Width > maxW then maxW = t.Width end
     end
-    if maxW == 0 then maxW = 200 end
+    if maxW == 0 then maxW = Rolls.item_fallback end
 
-    -- Choose gap so items fit without script overflowing (target total ≤ 900px)
-    local gap = math.max(20, math.min(MAX_GAP, math.floor((900 - n * maxW) / math.max(1, n - 1))))
+    -- Choose gap so items fit without script overflowing (target total ≤ max_total_w)
+    local gap = math.max(Rolls.min_gap, math.min(MAX_GAP, math.floor((Rolls.max_total_w - n * maxW) / math.max(1, n - 1))))
     local totalW = n * maxW + (n - 1) * gap
-    local x0     = 960 - totalW / 2
+    local x0     = Rolls.center_x - totalW / 2
 
     local pos = {}
     for i = 1, n do
@@ -166,7 +168,7 @@ end
 local function startGo()
     showGo    = true
     goOpacity = 255
-    goCounter = COUNTER:CreateCounter(0, 255, 0.5 / 255)
+    goCounter = COUNTER:CreateCounter(0, 255, SetupAnim.go_flash_half_s / 255)
     goCounter:SetBounce(true)
     goCounter:Listen(function(v) goOpacity = math.floor(v) end)
     goCounter:Start()
@@ -202,7 +204,7 @@ end
 
 local function showError(msg)
     errorMsg   = msg
-    errorTimer = COUNTER:CreateCounterDuration(0, 1, 5)
+    errorTimer = COUNTER:CreateCounterDuration(0, 1, SetupAnim.error_s)
     errorTimer:Start()
 end
 
@@ -260,19 +262,19 @@ local function drawRoll(r, isActive)
 
     -- Label (gold for active, gray for others)
     if txts.label then
-        local lc = isActive and col(GOLD) or col(GRAY)
-        local lt = txts.label:GetText(I18N.tr(roll.label), false, 500, lc)
+        local lc = isActive and col(Rolls.active_label_color) or col(Rolls.label_color)
+        local lt = txts.label:GetText(I18N.tr(roll.label), false, Rolls.label_max_width, lc)
         -- Position label just above the tallest image
         local maxH = 0
         for _, item in ipairs(items) do
             local t = tx[item.key]
             if t and t.Height > maxH then maxH = t.Height end
         end
-        if maxH == 0 then maxH = 200 end
-        lt:DrawAtAnchor(960, rollY - maxH * SCALE_SEL / 2 - 20, "center")
+        if maxH == 0 then maxH = Rolls.item_fallback end
+        lt:DrawAtAnchor(Rolls.center_x, rollY - maxH * SCALE_SEL / 2 - Rolls.label_gap, "center")
     end
 
-    local baseOp = isActive and 1.0 or 0.6
+    local baseOp = isActive and 1.0 or Rolls.inactive_opacity
 
     for i, item in ipairs(items) do
         local t = tx[item.key]
@@ -282,11 +284,11 @@ local function drawRoll(r, isActive)
             local sel   = (i == roll.selectedIdx)
 
             if not avail then
-                t:SetColor(col(DARK))
+                t:SetColor(col(Rolls.unavailable_color))
             elseif sel then
-                t:SetColor(col(WHITE))
+                t:SetColor(col(Rolls.selected_color))
             else
-                t:SetColor(col(GRAY))
+                t:SetColor(col(Rolls.other_color))
             end
 
             t:SetOpacity(baseOp)
@@ -305,8 +307,9 @@ function M.draw()
 
     -- Title
     if txts.title then
-        local tt = txts.title:GetText(I18N.tr("Let's set up the game show!"), false, 1400, col(WHITE))
-        tt:Draw(30, 45)
+        local Title = SetupLayout.title
+        local tt = txts.title:GetText(I18N.tr("Let's set up the game show!"), false, Title.max_width, col(Title.color))
+        tt:Draw(Title.x, Title.y)
     end
 
     -- All 3 rolls (active highlighting suppressed during rounds step)
@@ -320,7 +323,7 @@ function M.draw()
         local bgt = tx["bgtile"]
         if bgt ~= nil and bgt.Loaded then
             local res = THEME:GetResolution()
-            bgt:SetOpacity(0.75)
+            bgt:SetOpacity(Rounds.veil_opacity)
             for rx = 0, math.ceil(res.X / bgt.Width) - 1 do
                 for ry = 0, math.ceil(res.Y / bgt.Height) - 1 do
                     bgt:Draw(rx * bgt.Width, ry * bgt.Height)
@@ -329,27 +332,28 @@ function M.draw()
             bgt:SetOpacity(1)
         end
         if txts.title then
-            txts.title:GetText(I18N.tr("Round Count"), false, 800, col(GOLD)):DrawAtAnchor(960, 430, "center")
+            txts.title:GetText(I18N.tr("Round Count"), false, Rounds.title_max_width, col(Rounds.title_color)):DrawAtAnchor(Rounds.x, Rounds.title_y, "center")
         end
         if txts.label then
             local canDec = roundCount > roundStep
             local arrow_l = canDec and "◀   " or "      "
-            txts.label:GetText(arrow_l .. tostring(roundCount) .. "   ▶", false, 600, col(WHITE))
-                :DrawAtAnchor(960, 560, "center")
+            txts.label:GetText(arrow_l .. tostring(roundCount) .. "   ▶", false, Rounds.count_max_width, col(Rounds.count_color))
+                :DrawAtAnchor(Rounds.x, Rounds.count_y, "center")
         end
     end
 
     -- Go.png with bounce opacity (confirms everything is set)
     if showGo and tx["go"] then
         tx["go"]:SetOpacity(goOpacity / 255)
-        tx["go"]:Draw(1428, 504)
+        tx["go"]:Draw(SetupLayout.go.x, SetupLayout.go.y)
         tx["go"]:SetOpacity(1)
     end
 
     -- Error message (bottom of screen, red)
     if errorMsg ~= nil and txts.label then
-        local ec = COLOR:CreateColorFromARGB(255, 255, 80, 80)
-        txts.label:GetText(errorMsg, false, 1600, ec):DrawAtAnchor(960, 1000, "center")
+        local Err = SetupLayout.error
+        local ec = Config.color(Err.color)
+        txts.label:GetText(errorMsg, false, Err.max_width, ec):DrawAtAnchor(Err.x, Err.y, "center")
     end
 end
 

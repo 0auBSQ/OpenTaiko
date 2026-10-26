@@ -1,0 +1,145 @@
+{
+    "_note": "Online lobby layout, in 1920x1080 pixels. Colours are [r, g, b] or [r, g, b, a] from 0 to 255; opacities given as 0 to 255 say so, the others are 0 to 1, like the scales. Offsets named *_dx / *_dy / *_y_offset are from their panel's or row's left, top or centre; insets are taken off a width.",
+    "center_x": 960,
+    "colors": {
+        "ink": [74, 38, 72],
+        "dim": [150, 132, 150],
+        "white": [255, 255, 255],
+        "accent": [244, 78, 150],
+        "accent_soft": [255, 226, 242],
+        "green": [34, 150, 84],
+        "red": [214, 60, 60],
+        "amber": [196, 124, 16],
+        "background": [255, 240, 248],
+        "row_face": [250, 244, 250],
+        "row_empty": [244, 236, 244],
+        "text_outline": [0, 0, 0, 0],
+        "speed_fast": [220, 70, 130],
+        "speed_slow": [40, 110, 210],
+        "badge_full_combo": [20, 140, 160]
+    },
+    "difficulty_colors": {
+        "_note": "Each difficulty's text colour (Easy to Extra): its emblem's hue, darkened for the light panels.",
+        "list": [[40, 110, 210], [20, 150, 110], [196, 124, 16], [214, 60, 60], [130, 70, 210]]
+    },
+    "emblem": {
+        "_note": "A level's digits: each next digit starts digit_advance of the previous digit's width further; a plus level's + sits off the last digit's top-right corner by (plus_dx, plus_dy), times the emblem's scale.",
+        "digit_advance": 0.5,
+        "plus_dx": -8,
+        "plus_dy": -14
+    },
+    "toast": {
+        "_note": "The message bar: one line at font_size when it fits max_width, else wrapped at wrap_font_size. It keeps its bottom edge at bottom and grows upwards: pad_height + line_height per line, at least min_height. opacity is 0 to 255.",
+        "max_width": 1120,
+        "font_size": 22,
+        "wrap_font_size": 20,
+        "width": 1232,
+        "bottom": 1032,
+        "min_height": 88,
+        "pad_height": 24,
+        "line_height": 32,
+        "first_line_dy": 28,
+        "single_line_y": 988,
+        "opacity": 235
+    },
+    "hint": { "font_size": 20, "y": 1052, "max_width": 1800 },
+    "back_button": { "x": 80, "y": 20, "w": 76, "h": 64 },
+    "menu": {
+        "x": 560, "y": 250, "w": 800, "h": 500, "pad": 30,
+        "row_height": 100,
+        "list": { "y_offset": 190, "w": 640 },
+        "subtitle": { "font_size": 22, "y_offset": 130, "inset": 80 }
+    },
+    "code": {
+        "_note": "The room-code entry. The field shows at most max_chars characters (the end of a longer code, after an ellipsis).",
+        "x": 320, "y": 300, "w": 1280, "h": 420, "pad": 30,
+        "prompt": { "font_size": 24, "y_offset": 140, "inset": 100 },
+        "field_border": { "y_offset": 220, "w": 1132, "h": 96 },
+        "field": { "y_offset": 224, "w": 1124, "h": 88 },
+        "text": { "font_size": 28, "y_offset": 268, "max_width": 1040 },
+        "max_chars": 64
+    },
+    "header": {
+        "title": { "font_size": 30, "x": 176, "y": 52, "max_width": 700 },
+        "role": { "font_size": 20, "x": 1700, "y": 52, "max_width": 600 },
+        "count": { "font_size": 24, "x": 1836, "y": 52 }
+    },
+    "song_panel": { "x": 80, "y": 100, "w": 560, "h": 690, "pad": 24 },
+    "jacket": {
+        "_note": "The jacket's top left and size, inside a border; missing_inset is taken off the width of the song-not-found text.",
+        "x": 210, "y": 190, "size": 300, "border": 4,
+        "missing_font_size": 26, "missing_inset": 20
+    },
+    "song_info": {
+        "_note": "Under the jacket, centred on center_x. The five emblems start at emblems.x, step apart; a difficulty the chart lacks shows the empty emblem at missing_opacity.",
+        "center_x": 360,
+        "max_width": 500,
+        "title": { "font_size": 28, "y": 534 },
+        "subtitle": { "font_size": 20, "y": 569 },
+        "speed": { "label_font_size": 16, "label_y": 606, "value_font_size": 26, "value_y": 636 },
+        "emblems": { "x": 160, "step": 100, "y": 716, "scale": 0.8, "missing_opacity": 0.5 },
+        "wait": { "font_size": 22, "y": 590 }
+    },
+    "speed_buttons": {
+        "_note": "The host's song speed buttons, placed from song_info.center_x.",
+        "y": 596, "w": 56, "h": 52, "rewind_dx": -158, "forward_dx": 102
+    },
+    "roster_panel": { "x": 680, "y": 100, "w": 1160, "h": 690, "pad": 24 },
+    "rows": {
+        "_note": "One row per seat: the first at (x, top), one every pitch. The player's own row has a marker_width strip. A host's status sits host_status_dy over the row's centre, the host tag host_tag_dy under it.",
+        "x": 704, "top": 186, "pitch": 118, "w": 1112, "h": 106,
+        "marker_width": 8,
+        "waiting": { "font_size": 20, "max_width": 600 },
+        "nameplate_dx": 28, "nameplate_dy": -40,
+        "name": { "dx": 40, "font_size": 24, "max_width": 310 },
+        "emblem": { "dx": 430, "scale": 0.68 },
+        "mods": { "dx": 496, "dy": -18 },
+        "status": { "right_inset": 26, "font_size": 20, "max_width": 250, "host_dy": -14 },
+        "host_tag": { "font_size": 16, "dy": 16 }
+    },
+    "deck": {
+        "_note": "The bottom panel: the menu on the left of split, the chosen tab's content right of it. The divider is divider_width wide, divider_inset off the panel's top and bottom.",
+        "x": 80, "y": 809, "w": 1760, "h": 150, "split": 440, "pad": 20,
+        "row_height": 44,
+        "menu_dx": 24, "menu_w_inset": 60,
+        "divider_inset": 24, "divider_width": 3,
+        "content_inset": 80,
+        "main_font_size": 30, "main_dy": -18,
+        "sub_font_size": 20, "sub_dy": 24
+    },
+    "difficulty_row": {
+        "_note": "The deck's difficulty tab: five emblems from x_offset right of the split, step apart; the chosen one at full size on a marker, the others at other_scale / other_opacity, the ones the song lacks at missing_scale / missing_opacity. The difficulty's name sits name_gap right of the last emblem, right_inset off the panel's right edge.",
+        "step": 128,
+        "x_offset": 110,
+        "marker": { "w": 116, "h": 112 },
+        "chosen_scale": 1.0,
+        "chosen_opacity": 1,
+        "other_scale": 0.72,
+        "other_opacity": 0.75,
+        "missing_scale": 0.6,
+        "missing_opacity": 0.45,
+        "name_gap": 96,
+        "right_inset": 40,
+        "name": { "font_size": 34, "dy": -18 },
+        "help": { "font_size": 20, "dy": 26 }
+    },
+    "connecting": {
+        "_note": "The cover while a join connects; overlay_opacity is 0 to 255.",
+        "overlay_opacity": 225,
+        "title": { "font_size": 44, "y": 540 },
+        "hint": { "font_size": 22, "y": 620, "max_width": 1200 }
+    },
+    "results": {
+        "_note": "Rows from top, one every pitch, inset off the panel's sides; the next button sits button_gap under the panel.",
+        "x": 220, "y": 90, "w": 1480, "h": 600, "pad": 24,
+        "next_button": { "w": 180, "h": 88, "gap": 30 },
+        "title": { "font_size": 24, "y_offset": 104, "max_width": 1200 },
+        "rows": { "top": 180, "pitch": 80, "inset": 30, "h": 72, "marker_width": 8 },
+        "rank": { "dx": 86, "font_size": 26 },
+        "name": { "dx": 140, "font_size": 26, "max_width": 440 },
+        "score": { "dx": 830, "font_size": 28 },
+        "combo": { "dx": 880, "font_size": 20, "max_width": 330 },
+        "badge": { "right_inset": 60, "font_size": 20, "max_width": 180 },
+        "status": { "dx": 880, "font_size": 20, "max_width": 500 }
+    }
+}
