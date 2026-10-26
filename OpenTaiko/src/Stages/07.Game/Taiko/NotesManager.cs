@@ -329,6 +329,79 @@ class NotesManager {
 		tex.Opacity = saved;
 	}
 
+	// How a note is drawn beyond its texture, until skins ship textures of their own for these:
+	// - a partner small note (Don, Ka, KaDon, bomb, ADLib) is drawn big: the square root of 2 on each axis
+	// - a giant note is twice a big note's size, all kinds alike, wobbling slightly
+	// - a #NOTEIF note that has just appeared scales in from bigger with a white flash; a glowing one then pulses
+	private const float PartnerBigScale = 1.41421356f;
+	private const float GiantScale = 2f;          // of a big note
+	private const float GiantWobbleRad = 0.1f;    // about 6 degrees either way
+	private const double GiantWobbleMs = 1600;
+	private const double AppearMs = 300;
+	private const float AppearExtraScale = 0.4f;  // the size it appears with, above its own
+	private const float GlowPulse = 0.3f;         // the pulse's brightest flash
+	private const double GlowPulseMs = 900;
+
+	private static bool IsSmallNote(ENoteType nt)
+		=> nt is ENoteType.Don or ENoteType.Ka or ENoteType.Kadon or ENoteType.Bomb or ENoteType.Adlib;
+
+	private readonly record struct NoteLook(float Scale, float Rotation, float Flash) {
+		public bool IsPlain => this.Scale == 1f && this.Rotation == 0f && this.Flash <= 0f;
+	}
+
+	private static NoteLook GetNoteLook(CChip chip, ENoteType nt) {
+		float scale = 1f, rot = 0f, flash = 0f;
+		bool small = IsSmallNote(nt);
+		if (chip.IsGiantNote) {
+			scale = GiantScale * (small ? PartnerBigScale : 1f);
+			rot = GiantWobbleRad * (float)Math.Sin(2 * Math.PI * (Game.TimeMs % GiantWobbleMs) / GiantWobbleMs);
+		} else if (chip.IsPartnerNote && small) {
+			scale = PartnerBigScale;
+		}
+		if (chip.msNoteIfShown >= 0) {
+			double since = Game.TimeMs - chip.msNoteIfShown;
+			if (since < AppearMs) {
+				float left = (float)(1 - since / AppearMs);
+				scale *= 1f + AppearExtraScale * left * left;
+				flash = left;
+			} else if (chip.NoteIfGlow) {
+				flash = GlowPulse * (float)(0.5 - 0.5 * Math.Cos(2 * Math.PI * ((since - AppearMs) % GlowPulseMs) / GlowPulseMs));
+			}
+		}
+		return new NoteLook(scale, rot, flash);
+	}
+
+	// t2DDraw at (x, y), scaled and turned around the drawn rectangle's centre, then drawn again additively for the flash
+	private static void DrawWithLook(CTexture t, float x, float y, RectangleF? rect, NoteLook look) {
+		if (look.IsPlain) {
+			if (rect is RectangleF r0) t.t2DDraw(x, y, r0); else t.t2DDraw(x, y);
+			return;
+		}
+		float w = rect?.Width ?? t.szTextureSize.Width, h = rect?.Height ?? t.szTextureSize.Height;
+		float dx = w * (look.Scale - 1) / 2, dy = h * (look.Scale - 1) / 2;
+		var savedScale = t.vcScaleRatio;
+		float savedRot = t.fZAxisCenterRotate;
+		t.vcScaleRatio = new Silk.NET.Maths.Vector3D<float>(savedScale.X * look.Scale, savedScale.Y * look.Scale, savedScale.Z);
+		t.fZAxisCenterRotate = look.Rotation;
+		try {
+			Draw();
+			if (look.Flash > 0f) {
+				int savedOpacity = t.Opacity;
+				bool savedAdd = t.bAddBlend;
+				t.bAddBlend = true;
+				t.Opacity = (int)(savedOpacity * Math.Min(1f, look.Flash));
+				try { Draw(); } finally { t.bAddBlend = savedAdd; t.Opacity = savedOpacity; }
+			}
+		} finally {
+			t.vcScaleRatio = savedScale;
+			t.fZAxisCenterRotate = savedRot;
+		}
+
+		void Draw() {
+			if (rect is RectangleF r) t.t2DDraw(x - dx, y - dy, r); else t.t2DDraw(x - dx, y - dy);
+		}
+	}
+
 	// Regular display
 	public static void DisplayNote(int player, int x, int y, CChip chip, int frame, int length = -1, EStealthMode hiddenMode = EStealthMode.Off, float opacity = 1f) {
 		if (hiddenMode.HidesNotes())
@@ -340,12 +413,14 @@ class NotesManager {
 
 		ENoteType nt = GetNoteType(chip);
 		EGameType _gt = GetChipGameType(chip, player);
+		NoteLook look = GetNoteLook(chip, nt);
 
 		if (IsMine(nt)) {
-			DrawFaded(OpenTaiko.Tx.Note_Mine, opacity, t => t.t2DDraw(x, y));
+			DrawFaded(OpenTaiko.Tx.Note_Mine, opacity, t => DrawWithLook(t, x, y, null, look));
 			return;
 		} else if (IsPurpleNoteTaiko(nt, _gt)) {
-			DrawFaded(OpenTaiko.Tx.Note_Swap, opacity, t => t.t2DDraw(x, y, new Rectangle(0, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1])));
+			DrawFaded(OpenTaiko.Tx.Note_Swap, opacity,
+				t => DrawWithLook(t, x, y, new RectangleF(0, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]), look));
 			return;
 		} else if (IsKusudama(nt)) {
 			DrawFaded(OpenTaiko.Tx.Note_Kusu, opacity, t => t.t2DDraw(x, y, new Rectangle(0, frame, length, OpenTaiko.Skin.Game_Notes_Size[1])));
@@ -353,13 +428,15 @@ class NotesManager {
 		} else if (IsADLIB(nt)) {
 			if (PuchiChara.tGetEffect(player).ShowAdlib) {
 				OpenTaiko.Tx.Note_Adlib?.tUpdateOpacity(50);
-				DrawFaded(OpenTaiko.Tx.Note_Adlib, opacity, t => t.t2DDraw(x, y, new Rectangle(0, frame, length, OpenTaiko.Skin.Game_Notes_Size[1])));
+				DrawFaded(OpenTaiko.Tx.Note_Adlib, opacity,
+					t => DrawWithLook(t, x, y, new RectangleF(0, frame, length, OpenTaiko.Skin.Game_Notes_Size[1]), look));
 			}
 			return;
 		}
 
 		int noteType = NoteTextureColumn(chip, _gt);
-		DrawFaded(OpenTaiko.Tx.Notes[(int)_gt], opacity, t => t.t2DDraw(x, y, new Rectangle(noteType * OpenTaiko.Skin.Game_Notes_Size[0], frame, length, OpenTaiko.Skin.Game_Notes_Size[1])));
+		DrawFaded(OpenTaiko.Tx.Notes[(int)_gt], opacity,
+			t => DrawWithLook(t, x, y, new RectangleF(noteType * OpenTaiko.Skin.Game_Notes_Size[0], frame, length, OpenTaiko.Skin.Game_Notes_Size[1]), look));
 	}
 
 	// Roll display
@@ -482,7 +559,7 @@ class NotesManager {
 	}
 
 	public static void DisplayNoteArm(int player, int x, int y, CChip chip, float moveCounterValue, EStealthMode hiddenMode = EStealthMode.Off, float opacity = 1f) {
-		if (!chip.IsPartnerNote || hiddenMode.HidesNotes() || opacity <= 0f)
+		if (!chip.IsPartnerNote || chip.IsGiantNote || hiddenMode.HidesNotes() || opacity <= 0f)
 			return;
 
 		var arm = OpenTaiko.Tx.Notes_Arm;
@@ -501,13 +578,16 @@ class NotesManager {
 		int moveX = (int)(moveAmount * OpenTaiko.Skin.Game_Notes_Arm_Move[0]);
 		int moveY = (int)(moveAmount * OpenTaiko.Skin.Game_Notes_Arm_Move[1]);
 
-		if (IsADLIB(chip)) {
+		bool isAdlib = IsADLIB(chip);
+		if (isAdlib) {
 			if (!PuchiChara.tGetEffect(player).ShowAdlib)
 				return;
 			OpenTaiko.Tx.Notes_Arm?.tUpdateOpacity(50);
 		}
+		// an ADLib links only to a player whose puchichara shows ADLibs too
+		bool Linked(int other) => chip.multiLink?[other, 0] != null && (!isAdlib || PuchiChara.tGetEffect(other).ShowAdlib);
 
-		if (player != OpenTaiko.ConfigIni.nPlayerCount - 1 && chip.multiLink?[player + 1, 0] != null) {
+		if (player != OpenTaiko.ConfigIni.nPlayerCount - 1 && Linked(player + 1)) {
 			//downward link
 			OpenTaiko.Tx.Notes_Arm?.t2DFlipVDraw(
 				x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_X[0] + moveX,
@@ -516,7 +596,7 @@ class NotesManager {
 				x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_X[0] - moveX,
 				y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_Y[0] - moveY);
 		}
-		if (player != 0 && chip.multiLink?[player - 1, 0] != null) {
+		if (player != 0 && Linked(player - 1)) {
 			//upward link
 			OpenTaiko.Tx.Notes_Arm?.t2DDraw(
 				x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_X[1] + moveX,

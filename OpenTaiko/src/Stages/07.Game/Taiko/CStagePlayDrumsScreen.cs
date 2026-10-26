@@ -1212,7 +1212,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 						int pxFaceTxOffset = this.GetPxFaceTextureOffset(nPlayer);
 						var (nSenotesX, nSenotesY) = NotesManager.GetSENotesPos(nPlayer);
 						float opacity = this.tNoteOpacity(nPlayer, x, y);
-						if (NotesManager.IsHittableNote(nt) && opacity > 0f) {
+						if (NotesManager.IsHittableNote(nt) && opacity > 0f && this.IsNoteIfVisible(pChip, nPlayer)) {
 							NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ctHandHold.CurrentValue, hiddenMode: hiddenMode, opacity: opacity);
 							NotesManager.DisplayNote(nPlayer, x, y, pChip, pxFaceTxOffset, hiddenMode: hiddenMode, opacity: opacity);
 							if (!NotesManager.IsADLIB(nt))

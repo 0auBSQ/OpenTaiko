@@ -4189,6 +4189,14 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		return tja == null || tja.LocalTriggers.Get(chip.NoteIfTrigger);
 	}
 
+	// a #NOTEIF note is drawn only while its trigger is on; the first frame it shows starts its appear animation
+	protected bool IsNoteIfVisible(CChip chip, int nPlayer) {
+		if (string.IsNullOrEmpty(chip.NoteIfTrigger)) return true;
+		if (!this.IsNoteIfMet(chip, nPlayer)) return false;
+		if (chip.msNoteIfShown < 0) chip.msNoteIfShown = FDK.Game.TimeMs;
+		return true;
+	}
+
 	public double GetBranchConditionScore(int nPlayer, (Exam.Type, CTja.EBranchCondBig) cond) {
 		CBRANCHSCORE branchScore = this.CBranchScore[OpenTaiko.ConfigIni.bAIBattleMode ? 0 : nPlayer];
 		return branchScore.GetScore(cond);
@@ -4403,6 +4411,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 					chip.bVisible = true;
 					chip.IsHitted = false;
 					chip.IsMissed = false;
+					chip.msNoteIfShown = -1;
 					chip.eNoteState = ENoteState.None;
 					chip.msAutoLastHit = double.NegativeInfinity;
 					chip.padStoredHit = EPad.Unknown;

@@ -129,6 +129,9 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	// #NOTEIF — a note (not a roll) takes no hit while its trigger is false, and is skipped (not missed) if the trigger is
 	// still false when its time arrives
 	public string? NoteIfTrigger;
+	// #NOTEIF ...,true: the note glows while it is visible; msNoteIfShown: the game time it first showed (-1 before)
+	public bool NoteIfGlow;
+	public double msNoteIfShown = -1;
 
 	// #GIANTNOTE — triggers activated on note hit result
 	public string? GiantNoteOkTrigger;

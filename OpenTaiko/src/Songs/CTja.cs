@@ -537,6 +537,7 @@ internal class CTja : CActivity {
 	public bool IsEnabledPartnerNote;
 	public bool IsEnabledNoteIf;
 	public string? PendingNoteIfTrigger;
+	public bool PendingNoteIfGlow;
 	public bool IsEnabledGiantNote;
 	public string? PendingGiantNoteOkTrigger;
 	public string? PendingGiantNoteGoodTrigger;
@@ -2446,8 +2447,11 @@ internal class CTja : CActivity {
 		} else if (command == "#COMMANDIF") {
 			PendingCommandIfTrigger = argument.Trim();
 		} else if (command == "#NOTEIF") {
+			// #NOTEIF <local trigger>,<glows>
+			var parts = argument.Split(',', 2, StringSplitOptions.TrimEntries);
 			IsEnabledNoteIf = true;
-			PendingNoteIfTrigger = argument.Trim();
+			PendingNoteIfTrigger = parts[0];
+			PendingNoteIfGlow = parts.Length > 1 && parts[1].ToLower() == "true";
 		} else if (command == "#GIANTNOTE") {
 			var parts = argument.Split(',', 3, StringSplitOptions.TrimEntries);
 			IsEnabledGiantNote = true;
@@ -3272,6 +3276,7 @@ internal class CTja : CActivity {
 		this.IsEnabledFixSENote = this.IsEnabledPartnerNote = this.IsEnabledNoteIf = this.IsEnabledGiantNote = false;
 		this.PendingNoteIfTrigger = this.PendingGiantNoteOkTrigger = this.PendingGiantNoteGoodTrigger = null;
 		this.PendingGiantNoteLink = false;
+		this.PendingNoteIfGlow = false;
 	}
 
 	private void SetChipSudden(CChip chip) {
@@ -3328,12 +3333,16 @@ internal class CTja : CActivity {
 		chip.nScrollDirection = this.nScrollDirection;
 		this.SetChipSudden(chip);
 		chip.bGOGOTIME = this.bGOGOTIME;
-		chip.IsPartnerNote = (NotesManager.IsJointedNote(chip) || this.IsEnabledPartnerNote);
-		chip.IsGiantNote = this.IsEnabledGiantNote;
+		// #PARTNERNOTE marks any note but the roll family (rolls, balloons, kusudamas, roll ends), which only use it up
+		chip.IsPartnerNote = NotesManager.IsJointedNote(chip)
+			|| (this.IsEnabledPartnerNote && !NotesManager.IsGenericRoll(noteType));
+		// #GIANTNOTE, like #PARTNERNOTE, takes any note but the roll family
+		chip.IsGiantNote = this.IsEnabledGiantNote && !NotesManager.IsGenericRoll(noteType);
 		chip.NoteIfTrigger = this.IsEnabledNoteIf ? this.PendingNoteIfTrigger : null;
-		chip.GiantNoteOkTrigger = this.IsEnabledGiantNote ? this.PendingGiantNoteOkTrigger : null;
-		chip.GiantNoteGoodTrigger = this.IsEnabledGiantNote ? this.PendingGiantNoteGoodTrigger : null;
-		chip.GiantNoteLink = this.IsEnabledGiantNote && this.PendingGiantNoteLink;
+		chip.NoteIfGlow = this.IsEnabledNoteIf && this.PendingNoteIfGlow;
+		chip.GiantNoteOkTrigger = chip.IsGiantNote ? this.PendingGiantNoteOkTrigger : null;
+		chip.GiantNoteGoodTrigger = chip.IsGiantNote ? this.PendingGiantNoteGoodTrigger : null;
+		chip.GiantNoteLink = chip.IsGiantNote && this.PendingGiantNoteLink;
 
 		if (NotesManager.IsGenericBalloon(chip)) {
 			//this.n現在のコースをswitchで分岐していたため風船の値がうまく割り当てられていない 2020.04.21 akasoko26
