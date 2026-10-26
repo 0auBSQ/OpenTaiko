@@ -207,18 +207,22 @@ function draw(state)
       tx["Slam.png"]:DrawRect(760 - (dan_in_slam * 400), 0, 0, 0, 200, dan_in_height)
       tx["Slam.png"]:DrawRect(960 + (dan_in_slam * 400), 0, 200, 0, 200, dan_in_height)
 
-      tx["Foxes.png"]:SetOpacity(math.max(math.min((math.min(dan_in_slam - 0.7, 0.25) - math.max(0, dan_in_slam - 0.95)) * 1020, 255), 0) / 255)
-      tx["Foxes.png"]:DrawRectAtAnchor(light_pos[1], light_pos[2], light_blue_rect[1], light_blue_rect[2], light_blue_rect[3], light_blue_rect[4], "center")
-      tx["Foxes.png"]:DrawRectAtAnchor(light_pos[3], light_pos[4], light_red_rect[1], light_red_rect[2], light_red_rect[3], light_red_rect[4], "center")
-      tx["Foxes.png"]:SetRotation(dan_in_slam * 720)
-      tx["Foxes.png"]:DrawRectAtAnchor(star_pos[1], star_pos[2], star_blue_rect[1], star_blue_rect[2], star_blue_rect[3], star_blue_rect[4], "center")
-      tx["Foxes.png"]:SetRotation(dan_in_slam * -720)
-      tx["Foxes.png"]:DrawRectAtAnchor(star_pos[3], star_pos[4], star_red_rect[1], star_red_rect[2], star_red_rect[3], star_red_rect[4], "center")
-      tx["Foxes.png"]:SetRotation(0)
+      -- the foxes' eye shine and their shadow behind the bars go with them
+      if foxes_shown then
+        tx["Foxes.png"]:SetOpacity(math.max(math.min((math.min(dan_in_slam - 0.7, 0.25) - math.max(0, dan_in_slam - 0.95)) * 1020, 255), 0) / 255)
+        tx["Foxes.png"]:DrawRectAtAnchor(light_pos[1], light_pos[2], light_blue_rect[1], light_blue_rect[2], light_blue_rect[3], light_blue_rect[4], "center")
+        tx["Foxes.png"]:DrawRectAtAnchor(light_pos[3], light_pos[4], light_red_rect[1], light_red_rect[2], light_red_rect[3], light_red_rect[4], "center")
+        tx["Foxes.png"]:SetRotation(dan_in_slam * 720)
+        tx["Foxes.png"]:DrawRectAtAnchor(star_pos[1], star_pos[2], star_blue_rect[1], star_blue_rect[2], star_blue_rect[3], star_blue_rect[4], "center")
+        tx["Foxes.png"]:SetRotation(dan_in_slam * -720)
+        tx["Foxes.png"]:DrawRectAtAnchor(star_pos[3], star_pos[4], star_red_rect[1], star_red_rect[2], star_red_rect[3], star_red_rect[4], "center")
+        tx["Foxes.png"]:SetRotation(0)
+        tx["Foxes.png"]:SetOpacity(1)
 
-      tx["Dan_In_Shadow.png"]:SetOpacity(math.max(math.min((dan_in_slam - 1.2) * 510, 255), 0) / 255)
+        tx["Dan_In_Shadow.png"]:SetOpacity(math.max(math.min((dan_in_slam - 1.2) * 510, 255), 0) / 255)
+        tx["Dan_In_Shadow.png"]:Draw(0, 0)
+      end
       tx["Message.png"]:SetOpacity(math.max(math.min((dan_in_slam - 0.2) * 1020, 255), 0) / 255)
-      tx["Dan_In_Shadow.png"]:Draw(0, 0)
       tx["Message.png"]:Draw(0, 0)
     end
 
