@@ -166,7 +166,7 @@ end
 
 - `Effects.json`: `gauge` (`Normal`、`Hard`、`Extreme`。既定 `Normal`) は魂ゲージの種類を選びます。ゲームが通常のゲージを強制しない限り、`Hard` はコイン獲得を 1.5 倍、`Extreme` は 1.8 倍にします。Minesweeper の Fun Mod が有効なとき、`bombFactor` (1-100、既定 20) は Mod が爆弾に変える音符の割合、`fuseRollFactor` (0-100、既定 0) は Mod がヒューズ連打に変える風船の割合です。
 - `Unlock.json`: 存在するとき、プレイヤーが条件を満たすまでキャラクターはロックされたままです。形式と条件 id は楽曲のものと同じです。[アンロック要素リファレンス](unlockables-reference.md)を参照してください。コイン条件はプレイヤーが部屋画面で購入し、他の条件はゲームがリザルト画面で自動的に確認します。同梱の例: Kuro は `{ "condition": "dp", "type": "me", "values": [3, 3, 10] }` (Extreme 譜面をフルコンボ以上で 10 回クリア)、Aoi は `{ "condition": "ch", "type": "me", "values": [200] }` (200 コイン) を使っています。
-- `Palettes.json`: プレイヤーがキャラクターに適用できるカラーパレットの配列。各エントリは `name`、`blend` (0-1)、`stops` (`[position, R, G, B]` または `[position, R, G, B, A]` のグラデーションストップの配列。2 つ以上与えてください)、そして `plays` (パレットをアンロックする、このキャラクターでのプレイ回数。0 または省略で直ちに利用可能) を持ちます。`"stops": null` のエントリは着色なしの既定です。
+- `Palettes.json`: プレイヤーがキャラクターに適用できるカラーパレットの配列。各エントリは `name`、`blend` (0-1)、`stops` (`[position, R, G, B]` または `[position, R, G, B, A]` のグラデーションストップの配列。2 つ以上与えてください)、そして `plays` (パレットをアンロックする、このキャラクターでのプレイ回数。0 または省略で直ちに利用可能) を持ちます。最初のエントリはプレイヤーが最初に使うパレットで、ほかと同じく `stops` を持てます。`"stops": null` のエントリは、リストのどこにあってもキャラクターを着色なしで表示します。
 - ボイス: 組み込みのスクリプトはキャラクターフォルダ内の決まったパスから `.ogg` ファイルを読み込みます。例: `Sounds/Clear/Clear.ogg`、`Sounds/Clear/Failed.ogg`、`Sounds/Clear/FullCombo.ogg`、`Sounds/Clear/AllPerfect.ogg`、`Sounds/Menu/SongSelect.ogg`、`Sounds/Menu/SongDecide.ogg`、`Sounds/Menu/DiffSelect.ogg`、`Sounds/Title/Sanka.ogg`、`Sounds/Result/BestScore.ogg`、`Sounds/Result/ClearSuccess.ogg`、`Sounds/Result/ClearFailed.ogg`。完全な一覧は、組み込みの `CharaScript.lua` の先頭にある `voice_files` テーブルです。存在しないファイルはスクリプトがスキップします。
 
 ```json

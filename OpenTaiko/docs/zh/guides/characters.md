@@ -166,7 +166,7 @@ end
 
 - `Effects.json`：`gauge`（`Normal`、`Hard` 或 `Extreme`；默认 `Normal`）选择魂槽类型。除非游戏强制使用普通魂槽，`Hard` 把金币收益乘以 1.5，`Extreme` 乘以 1.8。Minesweeper（扫雷）趣味 Mod 启用时，`bombFactor`（1-100，默认 20）是该 Mod 变成地雷的音符百分比，`fuseRollFactor`（0-100，默认 0）是它变成导火线连打的气球百分比。
 - `Unlock.json`：存在时，角色会保持锁定直到玩家满足条件。格式和条件 id 与歌曲的一致；见[解锁条件参考](unlockables-reference.md)。玩家在房间界面购买金币条件；游戏在结算界面自动检查其他条件。自带示例：Kuro 使用 `{ "condition": "dp", "type": "me", "values": [3, 3, 10] }`（十首 Extreme 谱面达到全连击或更好），Aoi 使用 `{ "condition": "ch", "type": "me", "values": [200] }`（200 金币）。
-- `Palettes.json`：玩家可以应用到角色上的调色板数组。每个条目有 `name`、`blend`（0-1）、`stops`（`[position, R, G, B]` 或 `[position, R, G, B, A]` 渐变色标的数组；请至少给出两个）和 `plays`，即解锁该调色板所需的使用此角色的演奏次数（0 或缺失表示立即可用）。`"stops": null` 的条目是不着色的默认项。
+- `Palettes.json`：玩家可以应用到角色上的调色板数组。每个条目有 `name`、`blend`（0-1）、`stops`（`[position, R, G, B]` 或 `[position, R, G, B, A]` 渐变色标的数组；请至少给出两个）和 `plays`，即解锁该调色板所需的使用此角色的演奏次数（0 或缺失表示立即可用）。第一个条目是玩家开始时使用的调色板，它可以像其他条目一样带有 `stops`。`"stops": null` 的条目无论位于列表何处，都会让角色不着色地显示。
 - 语音：内置脚本从角色文件夹内的固定路径加载 `.ogg` 文件，例如 `Sounds/Clear/Clear.ogg`、`Sounds/Clear/Failed.ogg`、`Sounds/Clear/FullCombo.ogg`、`Sounds/Clear/AllPerfect.ogg`、`Sounds/Menu/SongSelect.ogg`、`Sounds/Menu/SongDecide.ogg`、`Sounds/Menu/DiffSelect.ogg`、`Sounds/Title/Sanka.ogg`、`Sounds/Result/BestScore.ogg`、`Sounds/Result/ClearSuccess.ogg`、`Sounds/Result/ClearFailed.ogg`。完整列表是内置 `CharaScript.lua` 顶部的 `voice_files` 表。脚本会跳过缺失的文件。
 
 ```json

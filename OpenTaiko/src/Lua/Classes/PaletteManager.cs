@@ -114,8 +114,9 @@ public static class PaletteManager {
 		var chara = chars[charaIdx];
 		if (chara == null || string.IsNullOrEmpty(chara.dirName)) return;
 
+		// an unset counter reads 0: the first palette, which is drawn plain only when it has no stops
 		long savedIdx = (long)sf.tGetGlobalCounter(".character_palette_" + chara.dirName);
-		if (savedIdx <= 0) return;
+		if (savedIdx < 0) return;
 
 		string palettesPath = Path.Combine(chara._path, "Palettes.json");
 		if (!File.Exists(palettesPath)) return;
