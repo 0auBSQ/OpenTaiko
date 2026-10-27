@@ -480,11 +480,11 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 			if (NotesManager.IsGenericBalloon(_chip)) {
 				var msDuration = (_chip.end.nSoundTimems - _chip.nSoundTimems);
 				var expectedHits = (int)(16.6 * msDuration / 1000);
-				nBalloonHits += Math.Min(_chip.nBalloon, expectedHits);
+				nBalloonHits += Math.Max(0, Math.Min(_chip.nBalloon, expectedHits));
 			}
 
 			if (NotesManager.IsRoll(_chip))
-				msRollTime += (_chip.end.nSoundTimems - _chip.nSoundTimems);
+				msRollTime += Math.Max(0, (_chip.end.nSoundTimems - _chip.nSoundTimems));
 		}
 	}
 
@@ -4248,7 +4248,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 				if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 					this.DanSongScore[actDan.NowShowingNumber].nBarRollPass++;
 
-				double msRollLength = chip.end.nSoundTimems - chip.nSoundTimems;
+				double msRollLength = Math.Max(0, chip.end.nSoundTimems - chip.nSoundTimems);
 				this.CChartScore[iPlayer].msBarRollPass += msRollLength;
 				this.CSectionScore[iPlayer].msBarRollPass += msRollLength;
 				this.CBranchScore[iPlayer].msBarRollPass += msRollLength;
