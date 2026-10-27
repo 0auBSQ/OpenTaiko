@@ -10,6 +10,7 @@
         "PAGODA_PRACTICE":  "Übung",
         "PAGODA_START_AT":   "Starten bei…",
         "PAGODA_LEVEL":      "Stufe",
+        "PAGODA_ESTIMATED_DIFFICULTY": "Geschätzte Schwierigkeit:",
         "PAGODA_ACCEPT":     "Herausforderung annehmen?",
         "PAGODA_YES":        "Ja",
         "PAGODA_NO":         "Nein",
@@ -20,6 +21,7 @@
         "PAGODA_OK":            "OK",
         "PAGODA_ITEM_NEW":      "Neuer Gegenstand",
         "PAGODA_EXIT":      "Beenden",
+        "PAGODA_BESTIARY":  "Bestiarium",
 
         // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
         "PAGODA_BAND_TEST":      "Pfad",

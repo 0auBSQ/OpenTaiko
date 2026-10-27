@@ -10,6 +10,7 @@
         "PAGODA_PRACTICE":  "Тренировка",
         "PAGODA_START_AT":   "Начать с...",
         "PAGODA_LEVEL":      "Уровень",
+        "PAGODA_ESTIMATED_DIFFICULTY": "Примерная сложность:",
         "PAGODA_ACCEPT":     "Принять испытание?",
         "PAGODA_YES":        "Да",
         "PAGODA_NO":         "Нет",
@@ -20,6 +21,7 @@
         "PAGODA_OK":            "ОК",
         "PAGODA_ITEM_NEW":      "Новый предмет",
         "PAGODA_EXIT":      "Выход",
+        "PAGODA_BESTIARY":  "Бестиарий",
 
         // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
         "PAGODA_BAND_TEST":      "Тропа",

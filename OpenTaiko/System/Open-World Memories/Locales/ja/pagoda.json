@@ -10,6 +10,7 @@
         "PAGODA_PRACTICE":  "練習",
         "PAGODA_START_AT":   "開始地点…",
         "PAGODA_LEVEL":      "レベル",
+        "PAGODA_ESTIMATED_DIFFICULTY": "推定難易度：",
         "PAGODA_ACCEPT":     "挑戦を受けますか？",
         "PAGODA_YES":        "はい",
         "PAGODA_NO":         "いいえ",
@@ -20,6 +21,7 @@
         "PAGODA_OK":            "OK",
         "PAGODA_ITEM_NEW":      "新しいアイテム",
         "PAGODA_EXIT":      "退出",
+        "PAGODA_BESTIARY":  "魔物図鑑",
 
         // Pagoda encounter: the floor's tier, the song bars and level 10's destiny
         "PAGODA_BAND_TEST":      "道",
