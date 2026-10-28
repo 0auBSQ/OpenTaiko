@@ -19,9 +19,15 @@ public class AngleContext : IGLContext {
 	[DllImport("libwayland-egl.so.1")] private static extern void wl_egl_window_resize(nint eglWindow, int width, int height, int dx, int dy);
 	[DllImport("libwayland-egl.so.1")] private static extern void wl_egl_window_destroy(nint eglWindow);
 
+	// which window system the handles below belong to: without it, ANGLE takes Linux handles as X11 ones
+	private const int EGL_PLATFORM_ANGLE_NATIVE_PLATFORM_TYPE_ANGLE = 0x348F;
+	private const int EGL_PLATFORM_X11_EXT = 0x31D5;
+	private const int EGL_PLATFORM_WAYLAND_EXT = 0x31D8;
+
 	public AngleContext(AnglePlatformType anglePlatformType, IWindow window, string flag_override = "") {
 		nint windowHandle;
 		nint display;
+		int nativePlatform = 0;
 		NativeWindowFlags selectedflag; // For logging
 
 		bool flag_has_override = !string.IsNullOrWhiteSpace(flag_override);
@@ -36,6 +42,7 @@ public class AngleContext : IGLContext {
 			// Temporary fix for the segfaults
 			// Note than X11 Display number is NOT always 0, it can be 1, 2 and so on for example in cases of user switching
 			display = 0;// Egl.GetDisplay(window.Native.X11.Value.Display);
+			nativePlatform = EGL_PLATFORM_X11_EXT;
 			Console.WriteLine("Handle set to X11");
 		} else if ((window.Native.Kind.HasFlag(NativeWindowFlags.Cocoa) && !flag_has_override) || flag_override == "cocoa") {
 			selectedflag = NativeWindowFlags.Cocoa;
@@ -45,6 +52,7 @@ public class AngleContext : IGLContext {
 		} else if ((window.Native.Kind.HasFlag(NativeWindowFlags.Wayland) && !flag_has_override) || flag_override == "wayland") {
 			selectedflag = NativeWindowFlags.Wayland;
 			display = window.Native.Wayland.Value.Display;
+			nativePlatform = EGL_PLATFORM_WAYLAND_EXT;
 			nint wlSurface = window.Native.Wayland.Value.Surface;
 			// Wrap the wl_surface in a wl_egl_window; eglCreateWindowSurface needs THIS, not the raw
 			// surface. Size it to the window (matching the viewport math, which is driven by Size, not
@@ -89,11 +97,9 @@ public class AngleContext : IGLContext {
 				platform = Egl.PLATFORM_ANGLE_TYPE_METAL_ANGLE;
 				break;
 		}
-		int[] platformAttributes = new int[]
-		{
-			Egl.PLATFORM_ANGLE_TYPE_ANGLE, platform,
-			Egl.NONE
-		};
+		int[] platformAttributes = nativePlatform != 0
+			? new int[] { Egl.PLATFORM_ANGLE_TYPE_ANGLE, platform, EGL_PLATFORM_ANGLE_NATIVE_PLATFORM_TYPE_ANGLE, nativePlatform, Egl.NONE }
+			: new int[] { Egl.PLATFORM_ANGLE_TYPE_ANGLE, platform, Egl.NONE };
 
 		//getEGLNativeDisplay
 		Display = Egl.GetPlatformDisplayEXT(Egl.PLATFORM_ANGLE_ANGLE, display, platformAttributes);

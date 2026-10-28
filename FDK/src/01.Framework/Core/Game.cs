@@ -244,9 +244,11 @@ public abstract partial class Game : IDisposable {
 		switch (_windowMode) {
 			case 1:   // exclusive fullscreen
 				Window_.WindowBorder = WindowBorder.Resizable;
+				if (!_usingGlfw) this.SetSdlFullscreen(true);
 				Window_.WindowState = WindowState.Fullscreen;
 				break;
 			case 2:   // borderless fullscreen
+				if (!_usingGlfw) this.SetSdlFullscreen(false);
 				Window_.WindowState = WindowState.Normal;
 				Window_.WindowBorder = WindowBorder.Hidden;
 				var mon = Window_.Monitor;
@@ -256,6 +258,7 @@ public abstract partial class Game : IDisposable {
 				}
 				break;
 			default:  // windowed
+				if (!_usingGlfw) this.SetSdlFullscreen(false);
 				Window_.WindowState = WindowState.Normal;
 				Window_.WindowBorder = WindowBorder.Resizable;
 				// Restore the configured windowed size/position — borderless (and exclusive fullscreen) resized the
@@ -263,6 +266,21 @@ public abstract partial class Game : IDisposable {
 				Window_.Size = WindowSize;
 				Window_.Position = WindowPosition;
 				break;
+		}
+	}
+
+	// SDL's fullscreen takes the display mode nearest the window size, so the screen would switch to the windowed
+	// resolution: it is given the desktop's mode, as GLFW's takes. Restoring an SDL window does not leave fullscreen.
+	private unsafe void SetSdlFullscreen(bool fullscreen) {
+		if (Window_.Native?.Sdl is not nint handle || handle == 0) return;
+		var sdl = Silk.NET.SDL.SdlProvider.SDL.Value;
+		var window = (Silk.NET.SDL.Window*)handle;
+		if (fullscreen) {
+			Silk.NET.SDL.DisplayMode mode;
+			if (sdl.GetDesktopDisplayMode(sdl.GetWindowDisplayIndex(window), &mode) == 0)
+				sdl.SetWindowDisplayMode(window, &mode);
+		} else {
+			sdl.SetWindowFullscreen(window, 0);
 		}
 	}
 
@@ -513,6 +531,10 @@ public abstract partial class Game : IDisposable {
 		// Use SDL on Linux with Wayland, otherwise use GLFW for everything else
 		if ((OperatingSystem.IsLinux() && Environment.GetEnvironmentVariable("XDG_SESSION_TYPE") == "wayland" && windowing_override != "glfw")
 		|| windowing_override == "sdl") {
+			// X11 (XWayland) whenever an X server is there: the SDL found on the system may otherwise open a
+			// native Wayland window, which the game does not render to reliably yet
+			if (OperatingSystem.IsLinux() && !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DISPLAY")))
+				Silk.NET.SDL.SdlProvider.UninitializedSDL.Value.SetHintWithPriority(Silk.NET.SDL.Sdl.HintVideodriver, "x11", Silk.NET.SDL.HintPriority.Override);
 			Silk.NET.Windowing.Sdl.SdlWindowing.Use();
 			Trace.TraceInformation("SDL selected for Windowing");
 		} else {
@@ -520,6 +542,10 @@ public abstract partial class Game : IDisposable {
 			_usingGlfw = true;
 			Trace.TraceInformation("GLFW selected for Windowing");
 		}
+		// SDL would create it fullscreen in the display mode nearest the window size: it goes fullscreen once
+		// it exists instead (ApplyWindowMode), in the desktop's mode
+		if (!_usingGlfw && options.WindowState == WindowState.Fullscreen)
+			options.WindowState = WindowState.Normal;
 
 		try {
 			Window_ = Window.Create(options);

@@ -41,6 +41,38 @@ internal class Program {
 	//-----------------------------
 	#endregion
 
+	// On Linux the soname files (libavformat.so.59, ...) ship empty, as symlinks do not survive a zip made on
+	// Windows, and the libraries carry no rpath. So each one loads from its full-version file, after the ones it
+	// needs, which it then finds by soname among the loaded libraries. Without the files, a system FFmpeg of the
+	// same version is used.
+	private static readonly Dictionary<string, IntPtr> ffmpegLibraries = new();
+
+	private static IntPtr LoadFFmpegLibrary(string name) {
+		IntPtr handle = TryLoadFFmpegLibrary(name);
+		if (handle == IntPtr.Zero)
+			throw new DllNotFoundException($"Unable to load lib{name}.so.{FFmpeg.AutoGen.ffmpeg.LibraryVersionMap[name]} from {FFmpeg.AutoGen.ffmpeg.RootPath} or the system.");
+		return handle;
+	}
+
+	private static IntPtr TryLoadFFmpegLibrary(string name) {
+		lock (ffmpegLibraries) {
+			if (ffmpegLibraries.TryGetValue(name, out IntPtr handle))
+				return handle;
+			if (FFmpeg.AutoGen.ffmpeg.LibraryDependenciesMap.TryGetValue(name, out string[]? dependencies))
+				foreach (string dependency in dependencies)
+					TryLoadFFmpegLibrary(dependency);
+			string soname = $"lib{name}.so.{FFmpeg.AutoGen.ffmpeg.LibraryVersionMap[name]}";
+			string? file = Directory.Exists(FFmpeg.AutoGen.ffmpeg.RootPath)
+				? new DirectoryInfo(FFmpeg.AutoGen.ffmpeg.RootPath).GetFiles(soname + "*")
+					.Where(f => f.Length > 0).OrderByDescending(f => f.Name.Length).FirstOrDefault()?.FullName
+				: null;
+			if (file == null || !NativeLibrary.TryLoad(file, out handle))
+				NativeLibrary.TryLoad(soname, out handle);
+			ffmpegLibraries[name] = handle;
+			return handle;
+		}
+	}
+
 	[STAThread]
 	static void Main(params string[] args) {
 		Console.WriteLine("Args: " + (args.Length > 0 ? string.Join(" ", args) : "(None)"));
@@ -104,6 +136,8 @@ internal class Program {
 					if (!OperatingSystem.IsIOS()) {
 						// iOS bundles native libraries in the app framework; no runtime copy needed.
 						FFmpeg.AutoGen.ffmpeg.RootPath = AppContext.BaseDirectory + @"FFmpeg/" + osplatform + "-" + platform + "/";
+						if (OperatingSystem.IsLinux())
+							FFmpeg.AutoGen.ffmpeg.GetOrLoadLibrary = LoadFFmpegLibrary;
 						DirectoryInfo info = new DirectoryInfo(AppContext.BaseDirectory + @"Libs/" + osplatform + "-" + platform + "/");
 
 						//実行ファイルの階層にライブラリをコピー
