@@ -1155,10 +1155,9 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 
 	private NoteJudgeWithOffset eGetChipJudgeAtTimeImpl(long msTjaTime, CChip pChip, int player = 0) {
 		if (pChip == null) return new NoteJudgeWithOffset(ENoteJudge.Miss, null);
-		var msDelta = msTjaTime - pChip.dbSoundTimems;
 		return new NoteJudgeWithOffset(
 			evaluateNodeJudge(msTjaTime, JudgeWindows.AbsDeltaMs(msTjaTime, pChip.dbSoundTimems), pChip, player),
-			(int)msDelta
+			JudgeWindows.DeltaMs(msTjaTime, pChip.dbSoundTimems)
 		);
 	}
 

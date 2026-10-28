@@ -160,7 +160,8 @@ namespace OpenTaikoTests {
 		[InlineData((int)CSongReplay.EModFlag.SuperRandom, -1, CSongReplay.STORED_GAME_VERSION, false)]
 		[InlineData((int)CSongReplay.EModFlag.Avalanche, 123, CSongReplay.STORED_GAME_VERSION, false)]  // unseeded RNG mod
 		[InlineData((int)CSongReplay.EModFlag.DynamicBeat, -1, CSongReplay.STORED_GAME_VERSION, true)]  // deterministic from inputs on the same version
-		[InlineData((int)CSongReplay.EModFlag.DynamicBeat, -1, CSongReplay.STORED_GAME_VERSION - 1, false)]  // evaluation logic may differ
+		[InlineData((int)CSongReplay.EModFlag.DynamicBeat, -1, CSongReplay.DYNAMIC_BEAT_RULE_VERSION, true)]  // same evaluation logic
+		[InlineData((int)CSongReplay.EModFlag.DynamicBeat, -1, CSongReplay.DYNAMIC_BEAT_RULE_VERSION - 1, false)]  // evaluation logic may differ
 		public void IsReplayWatchable_FollowsRngRules(int mods, int seed, int gameVersion, bool expected) {
 			Assert.Equal(expected, CSongReplay.tIsReplayWatchable(mods, seed, gameVersion));
 		}
