@@ -281,7 +281,7 @@ namespace OpenTaikoTests {
 			+ "256,192,7000,8,0,8000\n";
 
 		// the multiset of a chart's chips other than the mixer events
-		private static List<(int, double, int)> Shape(CTja tja) => tja.listChip.Where(c => c.nChannelNo is not (0xDA or 0xDB))
+		private static List<(long, double, int)> Shape(CTja tja) => tja.listChip.Where(c => c.nChannelNo is not (0xDA or 0xDB))
 			.Select(c => (c.nSoundTimems, c.dbSoundTimems, c.nChannelNo)).OrderBy(x => x).ToList();
 
 		// a TCI course defines no chip indexes; two builds of it still get the same mines and fuses
