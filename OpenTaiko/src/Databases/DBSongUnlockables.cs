@@ -84,6 +84,8 @@ internal class DBSongUnlockables : CSavableT<Dictionary<string, SongUnlockable>>
 		foreach (KeyValuePair<string, SongUnlockable> item in data) {
 			string _npvKey = item.Key;
 			CSongListNode? _node = CSongDict.tGetNodeFromID(_npvKey);
+			// a song missing from the song list stays locked: it unlocks, with its modal, at a check where it is there
+			if (_node == null) continue;
 
 			if (!_sf.Contains(_npvKey)) {
 				var _fulfilled = item.Value.unlockConditions.tConditionMet(player, CUnlockCondition.EScreen.Internal).Item1;
@@ -97,7 +99,7 @@ internal class DBSongUnlockables : CSavableT<Dictionary<string, SongUnlockable>>
 						new Modal(
 							Modal.EModalType.Song,
 							HRarity.tRarityToModalInt(item.Value.rarity),
-							new LuaSongNode(_node!)
+							new LuaSongNode(_node)
 						),
 						_player);
 
