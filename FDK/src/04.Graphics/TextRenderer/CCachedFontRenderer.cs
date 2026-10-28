@@ -81,7 +81,7 @@ public class CCachedFontRenderer : CFontRenderer {
 	protected new SKBitmap DrawText(string drawstr, DrawMode drawmode, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradationBottomColor, int edge_Ratio, bool keepCenter = false) {
 		this.DropCacheOnShapingChange();
 		#region [ 以前レンダリングしたことのある文字列/フォントか? (キャッシュにヒットするか?) ]
-		int index = listFontCache.FindIndex(
+		int index = listFontCache!.FindIndex(
 			delegate (FontCache fontcache) {
 				return (
 					drawstr == fontcache.drawstr &&
@@ -135,7 +135,7 @@ public class CCachedFontRenderer : CFontRenderer {
 	protected new SKBitmap DrawText_V(string drawstr, DrawMode drawmode, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradationBottomColor, int edge_Ratio, bool keepCenter = false) {
 		this.DropCacheOnShapingChange();
 		#region [ 以前レンダリングしたことのある文字列/フォントか? (キャッシュにヒットするか?) ]
-		int index = listFontCache.FindIndex(
+		int index = listFontCache!.FindIndex(
 			delegate (FontCache fontcache) {
 				return (
 					drawstr == fontcache.drawstr &&
@@ -191,9 +191,9 @@ public class CCachedFontRenderer : CFontRenderer {
 		if (generation == this.shapingGeneration)
 			return;
 		this.shapingGeneration = generation;
-		foreach (FontCache bc in listFontCache)
+		foreach (FontCache bc in listFontCache!)
 			bc.bmp?.Dispose();
-		listFontCache.Clear();
+		listFontCache!.Clear();
 	}
 	private int shapingGeneration = ShapingGeneration;
 
@@ -240,7 +240,7 @@ public class CCachedFontRenderer : CFontRenderer {
 		public bool Vertical;
 		public bool KeepCenter;
 	}
-	private List<FontCache> listFontCache;
+	private List<FontCache>? listFontCache;
 
 	protected bool bDisposed_CCachedFontRenderer;
 	//-----------------

@@ -94,9 +94,9 @@ internal class CActImplDancer : CActivity {
 		this.arDancerMotionNumber = CConversion.StringToIntArray(OpenTaiko.Skin.Game_Dancer_Motion);
 		if (this.arDancerMotionNumber == null) arDancerMotionNumber = CConversion.StringToIntArray("0,0");
 
-		ClampMotion(arMotionArray_In, nDancerInPtn);
-		ClampMotion(arMotionArray_Out, nDancerOutPtn);
-		ClampMotion(arDancerMotionNumber, nDancerPtn);
+		ClampMotion(arMotionArray_In!, nDancerInPtn);
+		ClampMotion(arMotionArray_Out!, nDancerOutPtn);
+		ClampMotion(arDancerMotionNumber!, nDancerPtn);
 
 		nNowDancerCounter = 0;
 		nNowDancerFrame = 0;
@@ -170,9 +170,9 @@ internal class CActImplDancer : CActivity {
 										}
 									}
 
-									int frame = (int)(nNowDancerInCounter[i] * (this.arMotionArray_In.Length - 1));
+									int frame = (int)(nNowDancerInCounter[i] * (this.arMotionArray_In!.Length - 1));
 									if (this.Dancer_In[i] != null && this.Dancer_In[i].Length > 0 && this.Dancer_In[i][this.arMotionArray_In[frame]] != null) {
-										this.Dancer_In[i][this.arMotionArray_In[frame]].t2DCenterBasedDraw(OpenTaiko.Skin.Game_Dancer_X[i], OpenTaiko.Skin.Game_Dancer_Y[i]);
+										this.Dancer_In[i][this.arMotionArray_In[frame]]!.t2DCenterBasedDraw(OpenTaiko.Skin.Game_Dancer_X[i], OpenTaiko.Skin.Game_Dancer_Y[i]);
 									}
 								}
 
@@ -190,16 +190,16 @@ internal class CActImplDancer : CActivity {
 											DancerStates[i] = 0;
 									}
 
-									int frame = (int)(nNowDancerOutCounter[i] * (this.arMotionArray_Out.Length - 1));
+									int frame = (int)(nNowDancerOutCounter[i] * (this.arMotionArray_Out!.Length - 1));
 									if (this.Dancer_Out[i] != null && this.Dancer_Out[i].Length > 0 && this.Dancer_Out[i][this.arMotionArray_Out[frame]] != null) {
-										this.Dancer_Out[i][this.arMotionArray_Out[frame]].t2DCenterBasedDraw(OpenTaiko.Skin.Game_Dancer_X[i], OpenTaiko.Skin.Game_Dancer_Y[i]);
+										this.Dancer_Out[i][this.arMotionArray_Out[frame]]!.t2DCenterBasedDraw(OpenTaiko.Skin.Game_Dancer_X[i], OpenTaiko.Skin.Game_Dancer_Y[i]);
 									}
 								}
 							}
 							break;
 						case 3:
 							if (this.Dancer[i] != null && this.Dancer[i].Length > 0 && this.Dancer[i][this.arDancerMotionNumber[nNowDancerFrame]] != null) {
-								this.Dancer[i][this.arDancerMotionNumber[nNowDancerFrame]].t2DCenterBasedDraw(OpenTaiko.Skin.Game_Dancer_X[i], OpenTaiko.Skin.Game_Dancer_Y[i]);
+								this.Dancer[i][this.arDancerMotionNumber[nNowDancerFrame]]!.t2DCenterBasedDraw(OpenTaiko.Skin.Game_Dancer_X[i], OpenTaiko.Skin.Game_Dancer_Y[i]);
 							}
 							break;
 					}
@@ -213,8 +213,8 @@ internal class CActImplDancer : CActivity {
 	#region[ private ]
 	//-----------------
 	private int nDancerCount;
-	private float[] nNowDancerInCounter;
-	private float[] nNowDancerOutCounter;
+	private float[] nNowDancerInCounter = null!;
+	private float[] nNowDancerOutCounter = null!;
 	private float nNowDancerCounter;
 	private int nNowDancerFrame;
 	private int nDancerInPtn;
@@ -223,16 +223,16 @@ internal class CActImplDancer : CActivity {
 	private float nDancerBeat;
 	private float nDancerInInterval;
 	private float nDancerOutInterval;
-	private int[] arMotionArray_In;
-	private int[] arMotionArray_Out;
-	private int[] arDancerMotionNumber;
+	private int[]? arMotionArray_In;
+	private int[]? arMotionArray_Out;
+	private int[]? arDancerMotionNumber;
 	//public CCounter ct踊り子モーション;
-	private CTexture[][] Dancer_In;
-	private CTexture[][] Dancer_Out;
-	private CTexture[][] Dancer;
-	private int[] DancerStates;
-	private string Game_Dancer_In_Motion;
-	private string Game_Dancer_Out_Motion;
+	private CTexture?[][] Dancer_In = null!;
+	private CTexture?[][] Dancer_Out = null!;
+	private CTexture?[][] Dancer = null!;
+	private int[] DancerStates = null!;
+	private string Game_Dancer_In_Motion = null!;
+	private string Game_Dancer_Out_Motion = null!;
 
 	// keeps every motion entry inside the frames the set has
 	internal static void ClampMotion(int[] motion, int frameCount) {

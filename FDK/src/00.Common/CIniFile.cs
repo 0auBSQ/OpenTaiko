@@ -39,12 +39,12 @@ public class CIniFile {
 	public void tRead(string fileName) {
 		this.FileName = fileName;
 
-		StreamReader sr = null;
-		CSection section = null;
+		StreamReader? sr = null;
+		CSection? section = null;
 		try {
 			sr = new StreamReader(this.FileName, Encoding.GetEncoding("Shift_JIS"));    // ファイルが存在しない場合は例外発生。
 
-			string line;
+			string? line;
 			while ((line = sr.ReadLine()) != null) {
 				line = line.Replace('\t', ' ').TrimStart(new char[] { '\t', ' ' });
 				if (string.IsNullOrEmpty(line) || line[0] == ';')   // ';'以降はコメントとして無視
@@ -93,7 +93,7 @@ public class CIniFile {
 		this.tWrite();
 	}
 	public void tWrite() {
-		StreamWriter sw = null;
+		StreamWriter? sw = null;
 		try {
 			sw = new StreamWriter(this.FileName, false, Encoding.GetEncoding("Shift_JIS")); // オープン失敗の場合は例外発生。
 

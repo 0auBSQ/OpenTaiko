@@ -20,9 +20,9 @@ class Databases {
 		SkinLocaleManager = new CSkinLocaleManager(skinFolder, OpenTaiko.Skin.Skin_DefaultLocale);
 	}
 
-	public DBCDN DBCDN;
-	public DBNameplateUnlockables DBNameplateUnlockables;
-	public DBSongUnlockables DBSongUnlockables;
+	public DBCDN DBCDN = null!;
+	public DBNameplateUnlockables DBNameplateUnlockables = null!;
+	public DBSongUnlockables DBSongUnlockables = null!;
 	public DBThemeSettings? DBThemeSettings;
 	public CSkinLocaleManager? SkinLocaleManager;
 }

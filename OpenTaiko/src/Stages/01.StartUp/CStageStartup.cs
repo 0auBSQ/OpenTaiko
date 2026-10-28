@@ -11,7 +11,7 @@ internal class CStageStartup : CStage {
 		base.IsDeActivated = true;
 	}
 
-	public List<string> listProgressString;
+	public List<string>? listProgressString;
 
 	// CStage 実装
 
@@ -44,8 +44,7 @@ internal class CStageStartup : CStage {
 			if (es != null) {
 				if ((es.thDTXFileEnumerate != null) && es.thDTXFileEnumerate.IsAlive) {
 					Trace.TraceWarning("リスト構築スレッドを強制停止します。");
-					es.thDTXFileEnumerate.Abort();
-					es.thDTXFileEnumerate.Join();
+					es.Abort();   // Thread.Abort is not supported on .NET: the enumeration is cancelled and waited for
 				}
 			}
 			base.DeActivate();
@@ -64,9 +63,9 @@ internal class CStageStartup : CStage {
 	public override int Draw() {
 		if (!base.IsDeActivated) {
 			if (base.IsFirstDraw) {
-				this.listProgressString.Add("DTXManiaXG Ver.K powered by YAMAHA Silent Session Drums");
+				this.listProgressString!.Add("DTXManiaXG Ver.K powered by YAMAHA Silent Session Drums");
 				this.listProgressString.Add("Product by.kairera0467");
-				this.listProgressString.Add("Release: " + OpenTaiko.VERSION + " [" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + "]");
+				this.listProgressString.Add("Release: " + OpenTaiko.VERSION + " [" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version!.ToString() + "]");
 
 				this.listProgressString.Add("");
 				this.listProgressString.Add("TJAPlayer3-Develop-ReWrite forked TJAPlayer3(@aioilight)");
@@ -89,7 +88,7 @@ internal class CStageStartup : CStage {
 
 			// CSongs管理 s管理 = CDTXMania.Songs管理;
 
-			Background.Update(_state);
+			Background!.Update(_state);
 			Background.Draw(_state);
 			CLoadingScreen.Draw();   // engine loading bar overlay
 
@@ -110,7 +109,7 @@ internal class CStageStartup : CStage {
 					System.Diagnostics.Trace.Flush();
 					OpenTaiko.NamePlate.RefreshSkin();
 					OpenTaiko.ModalManager.RefreshSkin();
-					lock (this.listProgressString) this.listProgressString.Add($"MODULES ... OK ({CSkin.LoadingModuleTotal / 2} loaded)");
+					lock (this.listProgressString!) this.listProgressString!.Add($"MODULES ... OK ({CSkin.LoadingModuleTotal / 2} loaded)");
 					this.strCurrentProgress = "SYSTEM SOUNDS ...";
 					es = new CEnumSongs();
 					es.StartLoadSystemSound();
@@ -130,15 +129,15 @@ internal class CStageStartup : CStage {
 					break;
 
 				case CStage.EPhase.Startup_2_EnumerateSongs:
-					this.strCurrentProgress = string.Format("SONG LIST ... enumerating ({0} charts)", es.SongManager.nSearchScoreCount);
+					this.strCurrentProgress = string.Format("SONG LIST ... enumerating ({0} charts)", es!.SongManager!.nSearchScoreCount);
 					break;
 
 				case CStage.EPhase.Startup_3_ApplyScoreCache:
-					this.strCurrentProgress = string.Format("SONG LIST ... scores from songs.db ({0}/{1})", es.SongManager.nScoresAppliedFromScoreCache, es.SongManager.nSearchScoreCount);
+					this.strCurrentProgress = string.Format("SONG LIST ... scores from songs.db ({0}/{1})", es!.SongManager!.nScoresAppliedFromScoreCache, es.SongManager.nSearchScoreCount);
 					break;
 
 				case CStage.EPhase.Startup_4_LoadSongsNotSeenInScoreCacheAndApplyThem:
-					this.strCurrentProgress = string.Format("SONG LIST ... scores from files ({0}/{1})", es.SongManager.nScoresAppliedFromFile, es.SongManager.nSearchScoreCount - es.SongManager.nScoresAppliedFromScoreCache);
+					this.strCurrentProgress = string.Format("SONG LIST ... scores from files ({0}/{1})", es!.SongManager!.nScoresAppliedFromFile, es.SongManager.nSearchScoreCount - es.SongManager.nScoresAppliedFromScoreCache);
 					break;
 
 				case CStage.EPhase.Startup_5_PostProcessSonglist:
@@ -157,15 +156,15 @@ internal class CStageStartup : CStage {
 								OpenTaiko.Tx.LoadTexture();
 								CLoadingProgress.End();   // textures done → snap the boot bar to 100%
 
-								lock (this.listProgressString) {
-									this.listProgressString.Add($"CHARACTERS ... OK ({OpenTaiko.Tx.Characters.Length})");
+								lock (this.listProgressString!) {
+									this.listProgressString!.Add($"CHARACTERS ... OK ({OpenTaiko.Tx.Characters.Length})");
 									this.listProgressString.Add($"TEXTURES ... OK ({OpenTaiko.Tx.BootTexturesLoaded})");
 								}
 								this.strCurrentProgress = "Setup done.";
 							} catch (Exception exception) {
 								Trace.TraceError(exception.ToString());
-								lock (this.listProgressString) {
-									this.listProgressString.Add("TEXTURES ... NG");
+								lock (this.listProgressString!) {
+									this.listProgressString!.Add("TEXTURES ... NG");
 									foreach (var text in exception.ToString().Split('\n')) {
 										this.listProgressString.Add(text);
 									}
@@ -193,8 +192,8 @@ internal class CStageStartup : CStage {
 				int x = (int)(320 * OpenTaiko.Skin.Resolution[0] / 1280.0);
 				int y = (int)(20 * OpenTaiko.Skin.Resolution[1] / 720.0);
 				int dy = (int)((OpenTaiko.actTextConsole.fontHeight + 8) * OpenTaiko.Skin.Resolution[1] / 720.0);
-				lock (this.listProgressString) {
-					for (int i = 0; i < this.listProgressString.Count; i++) {
+				lock (this.listProgressString!) {
+					for (int i = 0; i < this.listProgressString!.Count; i++) {
 						y = OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, this.listProgressString[i]).y;
 						y += dy;
 					}
@@ -220,11 +219,11 @@ internal class CStageStartup : CStage {
 	#region [ private ]
 	//-----------------
 	private string strCurrentProgress = "";
-	private LuaBackgroundWrapper Background;
+	private LuaBackgroundWrapper? Background;
 	private readonly LuaBackgroundState _state = new();
-	private CEnumSongs es;
+	private CEnumSongs? es;
 	private bool bIsLoadingTextures;
-	private CLoadSession _session;       // drives the incremental skin-module load + onStart-texture stream
+	private CLoadSession? _session;       // drives the incremental skin-module load + onStart-texture stream
 	private bool _savedAutoFlush;        // Trace.AutoFlush state to restore after the batched module-load phase
 
 #if false

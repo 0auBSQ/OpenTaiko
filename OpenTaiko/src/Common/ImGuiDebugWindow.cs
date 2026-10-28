@@ -22,7 +22,6 @@ public static class ImGuiDebugWindow {
 
 	private static long memoryReadTimer = 0;
 	private static long pagedmemory = 0;
-	private static long textureMemoryUsage = 0;
 	private static long currentStageMemoryUsage = 0;
 	private static long lastAllocatedBytes = 0;
 	private static long lastAllocatedAtMs = 0;
@@ -75,7 +74,7 @@ public static class ImGuiDebugWindow {
 			ImGui.Text($"GC collections — Gen0: {GC.CollectionCount(0)}  Gen1: {GC.CollectionCount(1)}  Gen2: {GC.CollectionCount(2)}");
 			ImGui.Text($"Allocated Memory: {pagedmemory} bytes ({String.Format("{0:0.###}", (float)pagedmemory / (1024 * 1024 * 1024))}GB)");
 			ImGui.Text($"Draw FPS: {(OpenTaiko.FPS != null ? OpenTaiko.FPS?.NowFPS : "???")}, Input FPS: {(OpenTaiko.FPSInput != null ? OpenTaiko.FPSInput?.NowFPS : "???")}");
-			ImGui.Text("Current Stage: " + OpenTaiko.rCurrentStage.eStageID.ToString() + " (StageID " + ((int)OpenTaiko.rCurrentStage.eStageID).ToString() + ")");
+			ImGui.Text("Current Stage: " + OpenTaiko.rCurrentStage!.eStageID.ToString() + " (StageID " + ((int)OpenTaiko.rCurrentStage.eStageID).ToString() + ")");
 			#endregion
 
 			ImGui.BeginTabBar("Tabs");
@@ -207,7 +206,7 @@ public static class ImGuiDebugWindow {
 	private static void Profile() {
 		if (ImGui.BeginTabItem("Profile")) {
 
-			ImGui.BeginDisabled(OpenTaiko.rCurrentStage.eStageID == CStage.EStage.Game);
+			ImGui.BeginDisabled(OpenTaiko.rCurrentStage!.eStageID == CStage.EStage.Game);
 			int count = OpenTaiko.ConfigIni.nPlayerCount;
 			if (ImGui.InputInt("Player Count", ref count))
 				OpenTaiko.ConfigIni.nPlayerCount = Math.Clamp(count, 1, 5); // funny things can happen when the player count is set to 0
@@ -360,7 +359,7 @@ public static class ImGuiDebugWindow {
 	private static void Stage() {
 		if (ImGui.BeginTabItem("Stage")) {
 
-			switch (OpenTaiko.rCurrentStage.eStageID) {
+			switch (OpenTaiko.rCurrentStage!.eStageID) {
 				case CStage.EStage.SongSelect:
 				case CStage.EStage.DanDojoSelect:
 					System.Numerics.Vector4 normal = new System.Numerics.Vector4(1, 1, 1, 1);
@@ -381,7 +380,7 @@ public static class ImGuiDebugWindow {
 									}
 									if (song.nLevel[(int)Difficulty.Dan] != -1) {
 										if (ImGui.TreeNodeEx("Dan Songs")) {
-											for (int j = 0; j < song.DanSongs.Count; j++) {
+											for (int j = 0; j < song.DanSongs!.Count; j++) {
 												var dan_song = song.DanSongs[j];
 												Vector4 is_hidden = dan_song.bTitleShow ? new(1, 0.5f, 1, 1) : new(1);
 												ImGui.TextColored(is_hidden, $"Song {j + 1}: {dan_song.Title}{(dan_song.bTitleShow ? " (Hidden)" : "")}");
@@ -393,7 +392,7 @@ public static class ImGuiDebugWindow {
 												if (ImGui.TreeNodeEx($"Dan_C###DAN_C{j}")) {
 													for (int i = 0; i < dan_song.Dan_C.Length; i++) {
 														if (dan_song.Dan_C[i] != null) {
-															var dan_c = dan_song.Dan_C[i];
+															var dan_c = dan_song.Dan_C[i]!;
 															ImGui.Text($"Exam {i + 1}: {dan_c.ExamType} ({dan_c.ExamRange} - {dan_c.GetValue()[0]} - {dan_c.GetValue()[1]})");
 														} else
 															ImGui.TextDisabled($"Exam {i + 1}: null");
@@ -507,7 +506,7 @@ public static class ImGuiDebugWindow {
 									ImGui.SeparatorText("Tower Mode");
 									ImGui.Text("Side: " + dtx.SIDE);
 									ImGui.Text("Life: " + dtx.LIFE);
-									ImGui.Text("Floor Count: " + OpenTaiko.SongMount.rCurrentlySelectedSong.score[5].ChartInfo.nTotalFloor);
+									ImGui.Text("Floor Count: " + OpenTaiko.SongMount.rCurrentlySelectedSong!.score[5]!.ChartInfo.nTotalFloor);
 									break;
 								default:
 									ImGui.SeparatorText(OpenTaiko.ConfigIni.nGameType[i] == EGameType.Konga ? "Konga Mode" : "Taiko Mode");
@@ -587,7 +586,7 @@ public static class ImGuiDebugWindow {
 			ImGui.EndTabItem();
 		}
 	}
-	private static void Resources<T>(string resourceType, List<T> listTotal, string listTotalName) where T : IDisposable {
+	private static void Resources<T>(string resourceType, List<T> listTotal, string listTotalName) where T : IDisposable? {
 		if (ImGui.BeginTabItem(resourceType)) {
 			if (ImGui.BeginCombo($"Change {listTotalName} Sort###RESC_TOTAL_SORT", sortType != -1 ? sortNames[sortType] : "(Default)")) {
 				if (ImGui.Selectable(sortNames[0], sortType == 0)) {
@@ -622,7 +621,7 @@ public static class ImGuiDebugWindow {
 			// already counted in the CLuaScript.listScripts loop above, so these per-element popups no-op (return 0).
 			long popup(LuaBackgroundWrapper? script, string label, string id) => 0;
 
-			switch (OpenTaiko.rCurrentStage.eStageID) {
+			switch (OpenTaiko.rCurrentStage!.eStageID) {
 				#region Game
 				case CStage.EStage.Game:
 
@@ -744,7 +743,7 @@ public static class ImGuiDebugWindow {
 			ImGui.BeginDisabled(sound == null);
 			ImGui.InputText("Path", ref reloadResourcePath, 2048);
 			if (ImGui.Button($"Update via. Path###SOUND_UPDATE_{label}")) {
-				CSkin.CSystemSound new_snd = new(reloadResourcePath, sound.bLoop, sound.bExclusive, sound.bCompactTarget, sound.SoundGroup);
+				CSkin.CSystemSound new_snd = new(reloadResourcePath, sound!.bLoop, sound.bExclusive, sound.bCompactTarget, sound.SoundGroup);
 				sound.UpdateSound(new_snd);
 			}
 			ImGui.EndDisabled();
@@ -773,9 +772,9 @@ public static class ImGuiDebugWindow {
 	private static long CResourceListPopup<T>(string resourceType, IEnumerable<T> resourceList, string label, string id) where T : IDisposable? {
 		if (resourceList == null) return 0;
 
-		Action<IDisposable, string> popup =
-			(typeof(T) == typeof(CTexture)) ? (resc, label) => CResourcePopup((CTexture)resc, label)
-			: (typeof(T) == typeof(CSkin.CSystemSound)) ? (resc, label) => CResourcePopup((CSkin.CSystemSound)resc, label)
+		Action<IDisposable?, string> popup =
+			(typeof(T) == typeof(CTexture)) ? (resc, label) => CResourcePopup((CTexture?)resc, label)
+			: (typeof(T) == typeof(CSkin.CSystemSound)) ? (resc, label) => CResourcePopup((CSkin.CSystemSound?)resc, label)
 			: (resc, label) => { };
 
 		try {
@@ -788,13 +787,13 @@ public static class ImGuiDebugWindow {
 						var mbMemTex = GetMemAllocationInMegabytes(GetResourceMemAllocation(resc));
 						popup(resc, $"{resourceType} #{index} (Pointer: {(resc != null ? GetResourceID(resc) : "null")}) {mbMemTex:0.###}MB###{id}_{index++}");
 					}
-				} catch (InvalidOperationException ex) {
+				} catch (InvalidOperationException) {
 					ImGui.Text("(updating...)");
 				}
 				ImGui.TreePop();
 			}
 			return memoryCount;
-		} catch (InvalidOperationException ex) {
+		} catch (InvalidOperationException) {
 			ImGui.Text($"{label} {resourceType}: (updating...)");
 			return 0;
 		}

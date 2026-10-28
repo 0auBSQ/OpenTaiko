@@ -19,7 +19,7 @@ internal class CSongListNode {
 	}
 	[JsonIgnore]  // runtime counter, reassigned by the constructor on load
 	public int nID { get; private set; }
-	public CScore[] score = new CScore[(int)Difficulty.Total];
+	public CScore?[] score = new CScore?[(int)Difficulty.Total];
 
 	public string[] difficultyLabel = new string[(int)Difficulty.Total];
 
@@ -32,23 +32,23 @@ internal class CSongListNode {
 	public bool isChangedBgColor;
 	public bool isChangedBgType;
 	public bool isChangedBoxType;
-	public string BoxType;
-	public string BgType;
-	public string BoxChara;
+	public string? BoxType;
+	public string? BgType;
+	public string? BoxChara;
 	public bool isChangedBoxChara;
 
 	public bool IsChangedForeColor;
 	public bool IsChangedBackColor;
 	public bool isChangedBoxColor;
-	[JsonIgnore] public List<CSongListNode> randomList;     // tree links: rebuilt by enumeration, not cached
-	[JsonIgnore] public List<CSongListNode> childrenList;
+	[JsonIgnore] public List<CSongListNode>? randomList;     // tree links: rebuilt by enumeration, not cached
+	[JsonIgnore] public List<CSongListNode>? childrenList;
 
 	public CTja.ETjaCompat Compat;
 	public bool isChangedCompat;
 
 	public int difficultiesCount; // 4~5 if AD
 
-	[JsonIgnore] public CSongListNode rParentNode;     // re-established from the enumeration context on load
+	[JsonIgnore] public CSongListNode? rParentNode;     // re-established from the enumeration context on load
 
 	// Internal
 	public int Openindex;
@@ -80,16 +80,16 @@ internal class CSongListNode {
 	public bool bBranch = false;
 
 	// Dan
-	public List<CTja.DanSongs> DanSongs;
-	public Dan_C[] Dan_C;
+	public List<CTja.DanSongs>? DanSongs;
+	public Dan_C?[]? Dan_C;
 
 	// Tower Lives
 	public int nLife = 5;
 	public int nTotalFloor = 140;
-	public string nTowerType;
+	public string? nTowerType;
 
 	// Unique id
-	public CSongUniqueID uniqueId;
+	public CSongUniqueID? uniqueId;
 	public List<string> shortcutIds = [];
 	public bool shortcutIsParsed;
 
@@ -98,11 +98,11 @@ internal class CSongListNode {
 
 	public CLocalizationData[] strBoxText = new CLocalizationData[3] { new CLocalizationData(), new CLocalizationData(), new CLocalizationData() };
 
-	public string strSelectBGPath;
+	public string? strSelectBGPath;
 
 	// In-game visuals
 
-	public string strScenePresets; // includes commas
+	public string? strScenePresets; // includes commas
 
 	#region [ OpenTaiko-Exclusive TJA Extension Data ]
 
@@ -126,8 +126,8 @@ internal class CSongListNode {
 		return (CSongListNode)MemberwiseClone();
 	}
 
-	public override bool Equals(object other) {
-		if (other.GetType() == typeof(CSongListNode)) {
+	public override bool Equals(object? other) {
+		if (other!.GetType() == typeof(CSongListNode)) {
 			CSongListNode obj = (CSongListNode)other;
 			return this.nID == obj.nID;
 		}

@@ -31,14 +31,14 @@ public class AngleContext : IGLContext {
 		NativeWindowFlags selectedflag; // For logging
 
 		bool flag_has_override = !string.IsNullOrWhiteSpace(flag_override);
-		if ((window.Native.Kind.HasFlag(NativeWindowFlags.Win32) && !flag_has_override) || flag_override == "win32") {
+		if ((window.Native!.Kind.HasFlag(NativeWindowFlags.Win32) && !flag_has_override) || flag_override == "win32") {
 			selectedflag = NativeWindowFlags.Win32;
-			windowHandle = window.Native.Win32.Value.Hwnd;
-			display = window.Native.Win32.Value.HDC;
+			windowHandle = window.Native.Win32!.Value.Hwnd;
+			display = window.Native.Win32!.Value.HDC;
 			Console.WriteLine("Handle set to Win32");
 		} else if ((window.Native.Kind.HasFlag(NativeWindowFlags.X11) && !flag_has_override) || flag_override == "x11") {
 			selectedflag = NativeWindowFlags.X11;
-			windowHandle = (nint)window.Native.X11.Value.Window;
+			windowHandle = (nint)window.Native.X11!.Value.Window;
 			// Temporary fix for the segfaults
 			// Note than X11 Display number is NOT always 0, it can be 1, 2 and so on for example in cases of user switching
 			display = 0;// Egl.GetDisplay(window.Native.X11.Value.Display);
@@ -46,14 +46,14 @@ public class AngleContext : IGLContext {
 			Console.WriteLine("Handle set to X11");
 		} else if ((window.Native.Kind.HasFlag(NativeWindowFlags.Cocoa) && !flag_has_override) || flag_override == "cocoa") {
 			selectedflag = NativeWindowFlags.Cocoa;
-			windowHandle = window.Native.Cocoa.Value;
+			windowHandle = window.Native.Cocoa!.Value;
 			display = 0;
 			Console.WriteLine("Handle set to Cocoa");
 		} else if ((window.Native.Kind.HasFlag(NativeWindowFlags.Wayland) && !flag_has_override) || flag_override == "wayland") {
 			selectedflag = NativeWindowFlags.Wayland;
-			display = window.Native.Wayland.Value.Display;
+			display = window.Native.Wayland!.Value.Display;
 			nativePlatform = EGL_PLATFORM_WAYLAND_EXT;
-			nint wlSurface = window.Native.Wayland.Value.Surface;
+			nint wlSurface = window.Native.Wayland!.Value.Surface;
 			// Wrap the wl_surface in a wl_egl_window; eglCreateWindowSurface needs THIS, not the raw
 			// surface. Size it to the window (matching the viewport math, which is driven by Size, not
 			// the framebuffer), keep it in sync on resize, and free it on dispose.

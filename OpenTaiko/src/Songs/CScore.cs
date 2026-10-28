@@ -66,7 +66,7 @@ internal class CScore {
 		public double MinBpm;
 		public double MaxBpm;
 		public int Duration;
-		public string strBGMFileName;
+		public string? strBGMFileName;
 		public int SongVol;
 		public LoudnessMetadata? SongLoudnessMetadata;
 		public int nDemoBGMOffset;
@@ -82,7 +82,7 @@ internal class CScore {
 		// Tower lifes
 		public int nLife;
 		public int nTotalFloor;
-		public string nTowerType;
+		public string? nTowerType;
 
 		public int nDanTick;
 		[JsonIgnore]  // keeps System.Drawing.Color out of the source generation graph

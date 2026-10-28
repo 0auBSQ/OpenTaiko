@@ -42,7 +42,7 @@ class HScenePreset {
 		Random? rand = null;
 		foreach (var list in new string[][]{
 			OpenTaiko.TJA?.scenePresets ?? [], // song tja
-			CTja.SplitComma(OpenTaiko.SongMount.rChoosenSong.strScenePresets ?? ""), // box.def
+			CTja.SplitComma(OpenTaiko.SongMount.rChoosenSong!.strScenePresets ?? ""), // box.def
 			[""], // fallback
 			}) {
 			var options = list.Select(k => _ps.GetValueOrDefault(k)).Where(k => k != null).ToArray();

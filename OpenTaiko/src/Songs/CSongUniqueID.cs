@@ -48,7 +48,7 @@ internal class CSongUniqueID {
 
 	public Data data = new Data();
 
-	public string filePath;
+	public string filePath = null!;
 
 	#region [private]
 

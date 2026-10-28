@@ -8,7 +8,7 @@ namespace OpenTaiko {
 		// so Lua can use the proven array pattern: list.Length + list[i] (0-based). Each row exposes (read in Lua):
 		// .Score .PlayerName .ClearStatus .ScoreRank .ModFlags .Date .FilePath .Watchable .ChartDifficulty
 		// .OldVersion .ChecksumMismatch (card warnings; the mismatch is computed against chartPath's current md5)
-		public CSongReplay.ReplayHeader[] ListReplays(string songFolder, string uniqueId, int difficulty, int topN, string chartPath) {
+		public CSongReplay.ReplayHeader[] ListReplays(string songFolder, string uniqueId, int difficulty, int topN, string? chartPath) {
 			return CSongReplay.tListReplays(songFolder ?? "", uniqueId ?? "", difficulty, topN, chartPath).ToArray();
 		}
 		public CSongReplay.ReplayHeader[] ListReplays(string songFolder, string uniqueId, int difficulty, int topN)
@@ -34,7 +34,7 @@ namespace OpenTaiko {
 		// Load a replay and arm replay-playback for the next play. Returns false if it can't be watched (load
 		// failure or unreproducible RNG mods). Applies the replay's mods in memory only (restored after the play).
 		// chartPath (when given) sets the in-game "(Invalid replay file)" warnings (old version / edited chart).
-		public bool Watch(string filepath, string chartPath) {
+		public bool Watch(string filepath, string? chartPath) {
 			if (string.IsNullOrEmpty(filepath)) return false;
 			var rep = new CSongReplay();
 			rep.tLoadReplayFile(filepath);

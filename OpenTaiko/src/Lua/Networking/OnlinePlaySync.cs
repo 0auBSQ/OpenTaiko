@@ -21,9 +21,9 @@ namespace OpenTaiko {
 		private static long _lastSend;
 		private static int _epoch = -1;
 		private static LuaNetworking? _net;
-		private static CCachedFontRenderer _waitFont;
-		private static CTexture _waitTex;
-		private static string _waitText;
+		private static CCachedFontRenderer? _waitFont;
+		private static CTexture? _waitTex;
+		private static string? _waitText;
 		// per remote spot: the last "ps" string seen and what it held
 		private static readonly string[] _frameJson = new string[OpenTaiko.MAX_PLAYERS];
 		private static readonly PlayFrame?[] _frames = new PlayFrame?[OpenTaiko.MAX_PLAYERS];
@@ -134,7 +134,7 @@ namespace OpenTaiko {
 					var cs = screen.CChartScore[0];
 					if (cs != null) { gr = cs.nGreat; gd = cs.nGood; ms = cs.nMiss; acc = cs.GetScore(Exam.Type.Accuracy); }
 					if (screen.actCombo != null) combo = screen.actCombo.nCurrentCombo[0];
-					gauge = screen.actGauge.dbCurrentGaugeValue[0];
+					gauge = screen.actGauge!.dbCurrentGaugeValue![0];
 				} catch { }
 				var p = new JObject { ["n"] = net.SelfPlayName, ["s"] = score, ["g"] = gauge, ["a"] = Math.Round(acc, 2), ["gr"] = gr, ["gd"] = gd, ["ms"] = ms, ["co"] = combo };
 				WriteTimer(p, screen.actGame.OwnTimer());

@@ -98,7 +98,7 @@ internal class CStageShutdown : CStage {
 	//-----------------
 	// the picture is the skin's exit_screen ROActivity; this stage plays the closing sound and times the stay
 	private static LuaROActivityWrapper? Screen => LuaROActivityWrapper.GetROActivity("exit_screen");
-	private CCounter ctTimeStall;
+	private CCounter ctTimeStall = null!;
 	//private CTexture tx背景;
 	//      private CTexture tx文字;
 	//      private CTexture tx文字2;

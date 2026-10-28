@@ -151,11 +151,11 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public CChip?[,]? multiLink; // [iPlayer, iBranch]
 
 	//EXTENDED COMMANDS
-	public Color4 borderColor;
+	public Color4 borderColor = null!;
 
 	public double fObjTimeMs;
-	public string strObjName;
-	public string strObjEaseType;
+	public string strObjName = null!;
+	public string strObjEaseType = null!;
 	public Easing.CalcType objCalcType;
 
 	public float fObjX;
@@ -166,10 +166,10 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 	public CSongObject? obj;
 
-	public string strTargetTxName;
-	public string strNewPath;
+	public string strTargetTxName = null!;
+	public string strNewPath = null!;
 
-	public string strConfigValue;
+	public string strConfigValue = null!;
 
 	public double dbAnimInterval;
 
@@ -346,17 +346,17 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 		if (this.nChannelNo == 0x01)       // WAV
 		{
-			CTja.CWAV wc;
-			OpenTaiko.TJA.listWAV.TryGetValue(this.nIntValue_InternalNumber, out wc);
+			CTja.CWAV? wc;
+			OpenTaiko.TJA!.listWAV.TryGetValue(this.nIntValue_InternalNumber, out wc);
 			if (wc == null) {
 				nDuration = 0;
 			} else {
-				nDuration = (wc.rSound[0] == null) ? 0 : wc.rSound[0].TotalPlayTime;
+				nDuration = (wc.rSound[0] == null) ? 0 : wc.rSound[0]!.TotalPlayTime;
 			}
 		} else if (this.nChannelNo == 0x54) // AVI
 		{
-			CVideoDecoder wc;
-			OpenTaiko.TJA.listVD.TryGetValue(this.nIntValue_InternalNumber, out wc);
+			CVideoDecoder? wc;
+			OpenTaiko.TJA!.listVD!.TryGetValue(this.nIntValue_InternalNumber, out wc);
 			if (wc == null) {
 				nDuration = 0;
 			} else {
@@ -388,11 +388,11 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public static CChip GetSearchChipAtOrAfter(long msTjaTimeInt) => GetSearchChipAtOrAfter(msTjaTimeInt, allowAt: true);
 	public static CChip GetSearchChipAfter(long msTjaTimeInt) => GetSearchChipAtOrAfter(msTjaTimeInt, allowAt: false);
 
-	public int CompareTo(CChip other) {
+	public int CompareTo(CChip? other) {
 		//譜面解析メソッドV4では発声時刻msで比較する。
 		// 位置が同じなら優先度で比較。
 		return (this.nSoundTimems, this.dbSoundTimems, nPriority(this.nChannelNo), this.idxDefine)
-			.CompareTo((other.nSoundTimems, other.dbSoundTimems, nPriority(other.nChannelNo), other.idxDefine));
+			.CompareTo((other!.nSoundTimems,other.dbSoundTimems, nPriority(other.nChannelNo), other.idxDefine));
 	}
 	//-----------------
 	#endregion

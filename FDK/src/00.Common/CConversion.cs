@@ -153,7 +153,7 @@ public class CConversion {
 		) ? (ch2.ToString() + ch1.ToString())
 		: "00";
 
-	public static int[] StringToIntArray(string str) {
+	public static int[]? StringToIntArray(string? str) {
 		//0,1,2 ...の形式で書かれたstringをint配列に変換する。
 		//一応実装はしたものの、例外処理などはまだ完成していない。
 		//str = "0,1,2";

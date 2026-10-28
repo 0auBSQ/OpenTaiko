@@ -148,7 +148,7 @@ namespace OpenTaiko {
 				buf[o] = br; buf[o + 1] = bg; buf[o + 2] = bb; buf[o + 3] = (byte)(a2 * 255.0);
 			}
 		}
-		private int[] _outlineDist;
+		private int[]? _outlineDist;
 
 		public void Draw(int x, int y) { if (!_disposedValue) _canvas.Draw(x, y); }
 		public void DrawAtAnchor(int x, int y, string anchor) { if (!_disposedValue) _canvas.DrawAtAnchor(x, y, anchor); }

@@ -76,7 +76,7 @@ namespace OpenTaiko {
 		internal double _wetness;
 		internal double _shaderTime;
 		internal double _gradeExp = 1.0, _gradeR = 1.0, _gradeG = 1.0, _gradeB = 1.0;
-		internal string _postSrc; internal int _postSrcRev;
+		internal string? _postSrc; internal int _postSrcRev;
 		internal readonly float[] _postUser = new float[16];
 
 		/// <summary>Global surface wetness 0..1 (rain look): darkens lit diffuse and adds a sun
@@ -111,7 +111,7 @@ namespace OpenTaiko {
 		}
 
 		// ── procedural SKY pass (GPU rasterizer) ─────────────────────────────────────────────────
-		internal string _skySrc; internal int _skySrcRev;
+		internal string? _skySrc; internal int _skySrcRev;
 		internal readonly float[] _skyUser = new float[32];
 		/// <summary>Attach a full-screen SKY fragment shader, drawn into the canvas before the 3D pass
 		/// (same source rules as <see cref="SetPostShader"/>: full GLSL ES 3.00 source, or a main() body

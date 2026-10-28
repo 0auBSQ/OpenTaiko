@@ -148,7 +148,7 @@ class HGaugeMethods {
 
 	#region [Displayables]
 
-	public static void tDrawGaugeBase(CTexture baseTexture, int x, int y, float scale_x, float scale_y) {
+	public static void tDrawGaugeBase(CTexture? baseTexture, int x, int y, float scale_x, float scale_y) {
 		if (baseTexture != null) {
 			baseTexture.vcScaleRatio.X = scale_x;
 			baseTexture.vcScaleRatio.Y = scale_y;
@@ -163,7 +163,7 @@ class HGaugeMethods {
 		}
 	}
 
-	public static void tDrawGaugeBaseClear(CTexture baseTexture, int x, int y, Difficulty diff, int level, EGaugeType gaugeType, float scale_x, float scale_y) {
+	public static void tDrawGaugeBaseClear(CTexture? baseTexture, int x, int y, Difficulty diff, int level, EGaugeType gaugeType, float scale_x, float scale_y) {
 		if (gaugeType != EGaugeType.NORMAL || diff > Difficulty.Edit) return;
 		float norma = tGetCurrentGaugeNorma(diff, level) - 2f; // A segment flashes earlier
 		float revnorma = 100f - norma;
@@ -188,9 +188,9 @@ class HGaugeMethods {
 	}
 
 	public static void tDrawGaugeFill(
-		CTexture fillTexture,
-		CTexture yellowTexture,
-		CTexture rainbowTexture,
+		CTexture? fillTexture,
+		CTexture? yellowTexture,
+		CTexture? rainbowTexture,
 		int x,
 		int y,
 		int rainbow_x,
@@ -266,7 +266,7 @@ class HGaugeMethods {
 
 	}
 
-	public static void tDrawGaugeFlash(CTexture flashTexture, int x, int y, int Opacity, Difficulty diff, int level, float currentPercent, EGaugeType gaugeType, float scale_x, float scale_y) {
+	public static void tDrawGaugeFlash(CTexture? flashTexture,int x, int y, int Opacity, Difficulty diff, int level, float currentPercent, EGaugeType gaugeType, float scale_x, float scale_y) {
 		if (gaugeType != EGaugeType.NORMAL || diff > Difficulty.Edit) return;
 		float norma = tGetCurrentGaugeNorma(diff, level) - 2f; // A segment flashes earlier
 		float percent = Math.Min(100f, Math.Max(0f, currentPercent));
@@ -288,7 +288,7 @@ class HGaugeMethods {
 		}
 	}
 
-	public static void tDrawKillZone(CTexture killzoneTexture, int x, int y, Difficulty diff, int level, EGaugeType gaugeType, float scale_x, float scale_y, int perfectHits, int totalNotes) {
+	public static void tDrawKillZone(CTexture? killzoneTexture, int x, int y, Difficulty diff, int level, EGaugeType gaugeType, float scale_x, float scale_y, int perfectHits, int totalNotes) {
 		if (gaugeType != EGaugeType.EXTREME || diff > Difficulty.Edit) return;
 		float currentFill = tHardGaugeGetKillscreenRatio(diff, level, gaugeType, perfectHits, totalNotes);
 		if (killzoneTexture != null) {
@@ -305,7 +305,7 @@ class HGaugeMethods {
 		}
 	}
 
-	public static void tDrawClearIcon(CTexture clearIcon, Difficulty diff, int level, float currentPercent, int text_x, int text_y, float scale_x, float scale_y, EGaugeType gaugeType, int perfectHits, int totalNotes, Rectangle clearRect, Rectangle clearRectHighlight) {
+	public static void tDrawClearIcon(CTexture? clearIcon,Difficulty diff, int level, float currentPercent, int text_x, int text_y, float scale_x, float scale_y, EGaugeType gaugeType, int perfectHits, int totalNotes, Rectangle clearRect, Rectangle clearRectHighlight) {
 		if (clearIcon == null) return;
 		if (diff > Difficulty.Edit) return;
 
@@ -325,7 +325,7 @@ class HGaugeMethods {
 		}
 	}
 
-	public static void tDrawSoulFire(CTexture soulFire, Difficulty diff, int level, float currentPercent, EGaugeType gaugeType, float scale_x, float scale_y, int fire_x, int fire_y, int fireFrame) {
+	public static void tDrawSoulFire(CTexture? soulFire,Difficulty diff, int level, float currentPercent, EGaugeType gaugeType, float scale_x, float scale_y, int fire_x, int fire_y, int fireFrame) {
 		if (soulFire == null) return;
 		if (gaugeType != EGaugeType.NORMAL || diff > Difficulty.Edit) return;
 		float percent = Math.Min(100f, Math.Max(0f, currentPercent));
@@ -341,7 +341,7 @@ class HGaugeMethods {
 		}
 	}
 
-	public static void tDrawSoulLetter(CTexture soulLetter, Difficulty diff, int level, float currentPercent, EGaugeType gaugeType, float scale_x, float scale_y, int soul_x, int soul_y) {
+	public static void tDrawSoulLetter(CTexture? soulLetter,Difficulty diff, int level, float currentPercent, EGaugeType gaugeType, float scale_x, float scale_y, int soul_x, int soul_y) {
 		if (soulLetter == null) return;
 		if (gaugeType != EGaugeType.NORMAL || diff > Difficulty.Edit) return;
 		float norma = tGetCurrentGaugeNorma(diff, level);
@@ -359,16 +359,16 @@ class HGaugeMethods {
 	}
 
 	public static void tDrawCompleteGauge(
-		CTexture baseTexture,
-		CTexture baseNormaTexture,
-		CTexture flashTexture,
-		CTexture fillTexture,
-		CTexture yellowTexture,
-		CTexture[] rainbowTextureArr,
-		CTexture killzoneTexture,
-		CTexture clearIcon,
-		CTexture soulLetter,
-		CTexture soulFire,
+		CTexture? baseTexture,
+		CTexture? baseNormaTexture,
+		CTexture? flashTexture,
+		CTexture? fillTexture,
+		CTexture? yellowTexture,
+		CTexture?[]? rainbowTextureArr,
+		CTexture? killzoneTexture,
+		CTexture? clearIcon,
+		CTexture? soulLetter,
+		CTexture? soulFire,
 		int x,
 		int y,
 		int rainbow_x,
@@ -416,8 +416,8 @@ class HGaugeMethods {
 		// after the play, its exams are the ones saved for the results
 		if (_dif == (int)Difficulty.Dan && gaugeType == EGaugeType.NORMAL) {
 			var actDan = OpenTaiko.stageGameScreen.actDan;
-			ReadOnlySpan<Dan_C> exams = actDan.IsDeActivated ? OpenTaiko.stageResults.stPlayRecord.Dan_C : actDan.GetExam();
-			return !OpenTaiko.stageGameScreen.IsStageFailed(player) && !Dan_Cert.GetFailedAllChallenges(exams, OpenTaiko.SongMount.rChoosenSong!.DanSongs);
+			ReadOnlySpan<Dan_C?> exams = actDan.IsDeActivated ? OpenTaiko.stageResults.stPlayRecord.Dan_C : actDan.GetExam();
+			return !OpenTaiko.stageGameScreen.IsStageFailed(player) && !Dan_Cert.GetFailedAllChallenges(exams, OpenTaiko.SongMount.rChoosenSong!.DanSongs!);
 		}
 		return tNormaCheck(
 			(Difficulty)_dif,
@@ -563,22 +563,22 @@ class HGaugeMethods {
 			: (player == 1) ? 1
 			: 0;
 
-		CTexture baseTexture = OpenTaiko.Tx.Gauge_Base[_usedGauge];
-		CTexture fillTexture = OpenTaiko.Tx.Gauge[_usedGauge];
+		CTexture? baseTexture = OpenTaiko.Tx.Gauge_Base[_usedGauge];
+		CTexture? fillTexture = OpenTaiko.Tx.Gauge[_usedGauge];
 
-		CTexture[] rainbowTextureArr = (new CTexture[][] { OpenTaiko.Tx.Gauge_Rainbow, OpenTaiko.Tx.Gauge_Rainbow_2PGauge, OpenTaiko.Tx.Gauge_Rainbow_Flat })[_4pGaugeIDX];
-		CTexture yellowTexture = OpenTaiko.Tx.Gauge_Clear[_4pGaugeIDX];
-		CTexture baseNormaTexture = OpenTaiko.Tx.Gauge_Base_Norma[_4pGaugeIDX];
-		CTexture killzoneTexture = OpenTaiko.Tx.Gauge_Killzone[_4pGaugeIDX];
+		CTexture?[] rainbowTextureArr = (new CTexture?[][] { OpenTaiko.Tx.Gauge_Rainbow, OpenTaiko.Tx.Gauge_Rainbow_2PGauge, OpenTaiko.Tx.Gauge_Rainbow_Flat })[_4pGaugeIDX];
+		CTexture? yellowTexture = OpenTaiko.Tx.Gauge_Clear[_4pGaugeIDX];
+		CTexture? baseNormaTexture = OpenTaiko.Tx.Gauge_Base_Norma[_4pGaugeIDX];
+		CTexture? killzoneTexture = OpenTaiko.Tx.Gauge_Killzone[_4pGaugeIDX];
 
-		CTexture flashTexture = yellowTexture;
-		CTexture clearIcon = (_4pGaugeIDX == 2)
+		CTexture? flashTexture = yellowTexture;
+		CTexture? clearIcon = (_4pGaugeIDX == 2)
 			? null
 			: (gaugeType != EGaugeType.NORMAL)
 				? OpenTaiko.Tx.Gauge_Killzone[0]
 				: OpenTaiko.Tx.Gauge[0];
-		CTexture soulLetter = OpenTaiko.Tx.Gauge_Soul;
-		CTexture soulFlame = OpenTaiko.Tx.Gauge_Soul_Fire;
+		CTexture? soulLetter = OpenTaiko.Tx.Gauge_Soul;
+		CTexture? soulFlame = OpenTaiko.Tx.Gauge_Soul_Fire;
 
 		// Rectangles
 		Rectangle clearRectHighlight = new Rectangle(
@@ -689,21 +689,21 @@ class HGaugeMethods {
 
 		// Textures
 		int _usedGauge = shiftPos;
-		CTexture baseTexture = OpenTaiko.Tx.Result_Gauge_Base[_usedGauge];
-		CTexture fillTexture = OpenTaiko.Tx.Result_Gauge[_usedGauge];
+		CTexture? baseTexture = OpenTaiko.Tx.Result_Gauge_Base[_usedGauge];
+		CTexture? fillTexture = OpenTaiko.Tx.Result_Gauge[_usedGauge];
 
-		CTexture[] rainbowTextureArr = OpenTaiko.Tx.Result_Rainbow;
-		CTexture yellowTexture = OpenTaiko.Tx.Result_Gauge_Clear;
-		CTexture baseNormaTexture = OpenTaiko.Tx.Result_Gauge_Clear_Base;
-		CTexture killzoneTexture = OpenTaiko.Tx.Result_Gauge_Killzone;
+		CTexture?[] rainbowTextureArr = OpenTaiko.Tx.Result_Rainbow;
+		CTexture? yellowTexture = OpenTaiko.Tx.Result_Gauge_Clear;
+		CTexture? baseNormaTexture = OpenTaiko.Tx.Result_Gauge_Clear_Base;
+		CTexture? killzoneTexture = OpenTaiko.Tx.Result_Gauge_Killzone;
 
-		CTexture flashTexture = null;
-		CTexture clearIcon = (gaugeType != EGaugeType.NORMAL)
+		CTexture? flashTexture = null;
+		CTexture? clearIcon = (gaugeType != EGaugeType.NORMAL)
 			? OpenTaiko.Tx.Result_Gauge_Killzone
 			: OpenTaiko.Tx.Result_Gauge[0];
 
-		CTexture soulLetter = OpenTaiko.Tx.Result_Soul_Text;
-		CTexture soulFlame = OpenTaiko.Tx.Result_Soul_Fire;
+		CTexture? soulLetter = OpenTaiko.Tx.Result_Soul_Text;
+		CTexture? soulFlame = OpenTaiko.Tx.Result_Soul_Fire;
 
 		// Rectangles
 		Rectangle clearRectHighlight = new Rectangle(

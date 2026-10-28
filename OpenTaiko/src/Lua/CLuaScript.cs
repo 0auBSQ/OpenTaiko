@@ -77,10 +77,10 @@ public abstract class CLuaScript : IDisposable {
 	private NamedLuaFunction lfLoadAssets = new("loadAssets");
 	private NamedLuaFunction lfReloadLanguage = new("reloadLanguage");
 
-	private CLuaInfo luaInfo;
+	private CLuaInfo? luaInfo;
 	private CLuaFps luaFPS = new CLuaFps();
 
-	public List<IDisposable> listDisposables { get; private set; } = new List<IDisposable>();
+	public List<IDisposable?> listDisposables { get; private set; } = new List<IDisposable?>();
 
 	protected bool Available {
 		get {
@@ -92,38 +92,32 @@ public abstract class CLuaScript : IDisposable {
 		return (double)x;
 	}
 
-	private string getText(JsonValue x) {
-		return (string)x;
+	private string? getText(JsonValue x) {
+		return (string?)x;
 	}
 
 	private List<double> getNumArray(JsonArray x) {
 		List<double> array = new List<double>();
 
-		foreach (double value in x) {
+		foreach (JsonNode? value in x) {
+			array.Add((double)value!);
+		}
+		return array;
+	}
+
+	private List<string?> getTextArray(JsonArray x) {
+		List<string?> array = new List<string?>();
+
+		foreach (string? value in x) {
 			array.Add(value);
 		}
 		return array;
 	}
 
-	private List<string> getTextArray(JsonArray x) {
-		List<string> array = new List<string>();
-
-		foreach (string value in x) {
-			array.Add(value);
-		}
-		return array;
-	}
-
-	protected object[]? RunLuaCode(NamedLuaFunction luaFunction, params object[] args) {
+	protected object[]? RunLuaCode(NamedLuaFunction luaFunction, params object?[] args) {
 		try {
 			if (luaFunction.Func == null) {
 				// To prevent lag
-				return null;
-
-				Trace.TraceWarning($"{this.GetType().Name} Warning: [{this.strScriptShort}] Function [{luaFunction.Name}] is called but undefined");
-				Trace.TraceWarning($"Full script path: {this.strScriptPath}");
-				Trace.TraceWarning(new StackTrace(new StackFrame(1, true)).ToString());
-				luaFunction.LoadNoop(LuaScript); // silence further warnings
 				return null;
 			}
 			// Lua's own incremental collector runs as the script allocates and keeps the heap within about twice
@@ -303,9 +297,9 @@ end
 		_hookCo = null;
 	}
 
-	private JsonNode LoadConfig(string name) {
+	private JsonNode? LoadConfig(string name) {
 		using Stream stream = File.OpenRead($"{strDir}/{name}");
-		JsonNode jsonNode = JsonNode.Parse(stream);
+		JsonNode? jsonNode = JsonNode.Parse(stream);
 		return jsonNode;
 	}
 
@@ -320,7 +314,7 @@ end
 		Trace.TraceInformation("<Lua Log>: " + message);
 	}
 
-	private CSound LoadSound(string name, string soundGroupName) {
+	private CSound? LoadSound(string name, string soundGroupName) {
 		ESoundGroup soundGroup;
 		switch (soundGroupName) {
 			case "soundeffect":
@@ -339,7 +333,7 @@ end
 				soundGroup = ESoundGroup.Unknown;
 				break;
 		}
-		CSound sound = OpenTaiko.SoundManager?.tCreateSound($"{strSounsdDir}/{name}", soundGroup);
+		CSound? sound = OpenTaiko.SoundManager?.tCreateSound($"{strSounsdDir}/{name}", soundGroup);
 
 		listDisposables.Add(sound);
 		return sound;
@@ -410,18 +404,18 @@ end
 			LuaScript["info"] = luaInfo = new CLuaInfo(strDir);
 			LuaScript["fps"] = luaFPS;
 
-			LuaScript["loadConfig"] = LoadConfig;
-			LuaScript["loadTexture"] = LoadTexture;
-			LuaScript["loadSound"] = LoadSound;
-			LuaScript["loadFontRenderer"] = LoadFontRenderer;
-			LuaScript["createTitleTextureKey"] = CreateTitleTextureKey;
-			LuaScript["getTextTex"] = GetTextTex;
-			LuaScript["getNum"] = getNum;
-			LuaScript["getText"] = getText;
-			LuaScript["getNumArray"] = getNumArray;
-			LuaScript["getTextArray"] = getTextArray;
-			LuaScript["getLocalizedString"] = GetLocalizedString;
-			LuaScript["debugLog"] = DebugLog;
+			LuaScript["loadConfig"] = (Delegate)LoadConfig;
+			LuaScript["loadTexture"] = (Delegate)LoadTexture;
+			LuaScript["loadSound"] = (Delegate)LoadSound;
+			LuaScript["loadFontRenderer"] = (Delegate)LoadFontRenderer;
+			LuaScript["createTitleTextureKey"] = (Delegate)CreateTitleTextureKey;
+			LuaScript["getTextTex"] = (Delegate)GetTextTex;
+			LuaScript["getNum"] = (Delegate)getNum;
+			LuaScript["getText"] = (Delegate)getText;
+			LuaScript["getNumArray"] = (Delegate)getNumArray;
+			LuaScript["getTextArray"] = (Delegate)getTextArray;
+			LuaScript["getLocalizedString"] = (Delegate)GetLocalizedString;
+			LuaScript["debugLog"] = (Delegate)DebugLog;
 
 			// New Lua Module API
 			var ltf = new LuaTextureFunc(TextureList, dir);
@@ -492,8 +486,8 @@ end
 				LuaScript["GetSaveFile"] = (Func<int, LuaSaveFile?>)GetLuaSaveFile;
 			else
 				LuaScript["GetSaveFile"] = (Func<int, LuaROSaveFile?>)GetLuaROSaveFile;
-			LuaScript["RequestSongList"] = RequestSongList;
-			LuaScript["GenerateSongListSettings"] = LuaSongListSettings.Generate;
+			LuaScript["RequestSongList"] = (Delegate)RequestSongList;
+			LuaScript["GenerateSongListSettings"] = (Delegate)LuaSongListSettings.Generate;
 			LuaScript["IsSongsEnumerating"] = (Func<bool>)(() => OpenTaiko.EnumSongs?.IsEnumerating ?? false);
 			// positive "enumeration fully done" flag (IsSongsEnumerating is also false BEFORE the scan starts)
 			LuaScript["IsSongsEnumDone"] = (Func<bool>)(() => OpenTaiko.EnumSongs?.IsSongListEnumCompletelyDone ?? false);

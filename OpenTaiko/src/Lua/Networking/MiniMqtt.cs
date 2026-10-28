@@ -14,10 +14,10 @@ namespace OpenTaiko {
 		// well-known free public brokers; the first that answers wins (signaling only, tiny payloads)
 		public static readonly string[] PublicBrokers = { "test.mosquitto.org:1883", "broker.hivemq.com:1883", "broker.emqx.io:1883" };
 
-		private TcpClient _tcp;
-		private NetworkStream _ns;
+		private TcpClient? _tcp;
+		private NetworkStream? _ns;
 		private readonly object _writeLock = new();
-		private Thread _rx;
+		private Thread? _rx;
 		private volatile bool _running;
 		private ushort _packetId = 1;
 		public string ConnectedBroker { get; private set; } = "";
@@ -63,7 +63,7 @@ namespace OpenTaiko {
 
 					// CONNACK
 					var (type, body) = ReadPacket(ns);
-					if (type != 0x20 || body.Length < 2 || body[1] != 0) { tcp.Close(); continue; }
+					if (type != 0x20 || body!.Length < 2 || body[1] != 0) { tcp.Close(); continue; }
 
 					_tcp = tcp; _ns = ns; _running = true; ConnectedBroker = b;
 					ns.ReadTimeout = 90000;
@@ -81,14 +81,14 @@ namespace OpenTaiko {
 			ushort id = _packetId++;
 			vh.Add((byte)(id >> 8)); vh.Add((byte)id);
 			AddString(vh, topic); vh.Add(0);                 // QoS 0
-			Send(_ns, 0x82, vh.ToArray());                   // SUBACK is consumed by RxLoop
+			Send(_ns!, 0x82, vh.ToArray());                   // SUBACK is consumed by RxLoop
 		}
 
 		public void Publish(string topic, byte[] payload) {
 			var vh = new List<byte>();
 			AddString(vh, topic);
 			vh.AddRange(payload);
-			Send(_ns, 0x30, vh.ToArray());
+			Send(_ns!, 0x30, vh.ToArray());
 		}
 
 		private void RxLoop() {
@@ -99,26 +99,26 @@ namespace OpenTaiko {
 					long sent = Interlocked.Read(ref _pingSentAt);
 					if (sent != 0 && now - sent > PongTimeoutMs) break;
 					if (now - lastPing > PingIntervalMs) {
-						Send(_ns, 0xC0, Array.Empty<byte>());
+						Send(_ns!, 0xC0, Array.Empty<byte>());
 						lastPing = now;
 						if (sent == 0) Interlocked.Exchange(ref _pingSentAt, now);
 					}
-					if (!_ns.DataAvailable) {
+					if (!_ns!.DataAvailable) {
 						// readable with nothing to read: the broker closed the connection
-						if (_tcp.Client.Poll(0, SelectMode.SelectRead) && _tcp.Client.Available == 0) break;
+						if (_tcp!.Client.Poll(0, SelectMode.SelectRead) && _tcp.Client.Available == 0) break;
 						Thread.Sleep(50); continue;
 					}
 					var (type, body) = ReadPacket(_ns);
 					if (type < 0) break;
 					Interlocked.Exchange(ref _pingSentAt, 0);     // any packet proves the link
 					if (type == 0x30) {                       // PUBLISH (QoS 0: no packet id)
-						if (body.Length < 2) continue;
+						if (body!.Length < 2) continue;
 						int tl = (body[0] << 8) | body[1];
 						if (body.Length < 2 + tl) continue;
 						string topic = Encoding.UTF8.GetString(body, 2, tl);
 						byte[] payload = new byte[body.Length - 2 - tl];
 						Buffer.BlockCopy(body, 2 + tl, payload, 0, payload.Length);
-						Action<byte[]> cb = null;
+						Action<byte[]>? cb = null;
 						lock (_subs) _subs.TryGetValue(topic, out cb);
 						try { cb?.Invoke(payload); } catch { }
 					}
@@ -144,7 +144,7 @@ namespace OpenTaiko {
 			lock (_writeLock) ns.Write(raw, 0, raw.Length);
 		}
 
-		private static (int type, byte[] body) ReadPacket(NetworkStream ns) {
+		private static (int type, byte[]? body) ReadPacket(NetworkStream ns) {
 			int h = ns.ReadByte();
 			if (h < 0) return (-1, null);
 			int len = 0, mult = 1;

@@ -41,7 +41,7 @@ internal class CStageSongLoading : CStage {
 				OpenTaiko.ConfigIni.bTokkunMode = false;
 			}
 
-			string strDTXFilePath = OpenTaiko.SongMount.rChosenScore.FileInfo.FileAbsolutePath;
+			string strDTXFilePath = OpenTaiko.SongMount.rChosenScore!.FileInfo.FileAbsolutePath;
 
 			var strFolderName = Path.GetDirectoryName(strDTXFilePath) + Path.DirectorySeparatorChar;
 
@@ -74,12 +74,12 @@ internal class CStageSongLoading : CStage {
 					//this.txタイトル.vc拡大縮小倍率 = new Vector3( 0.5f, 0.5f, 1f );
 
 
-					using (var bmpSongTitle = this.pfTITLE.DrawText(Title, OpenTaiko.Skin.SongLoading_Title_ForeColor, OpenTaiko.Skin.SongLoading_Title_BackColor, null, 30)) {
+					using (var bmpSongTitle = this.pfTITLE!.DrawText(Title, OpenTaiko.Skin.SongLoading_Title_ForeColor, OpenTaiko.Skin.SongLoading_Title_BackColor, null, 30)) {
 						this.txTitle = new CTexture(bmpSongTitle);
 						txTitle.vcScaleRatio.X = OpenTaiko.GetSongNameXScaling(ref txTitle, OpenTaiko.Skin.SongLoading_Title_MaxSize);
 					}
 
-					using (var bmpSongSubTitle = this.pfSUBTITLE.DrawText(Subtitle, OpenTaiko.Skin.SongLoading_SubTitle_ForeColor, OpenTaiko.Skin.SongLoading_SubTitle_BackColor, null, 30)) {
+					using (var bmpSongSubTitle = this.pfSUBTITLE!.DrawText(Subtitle, OpenTaiko.Skin.SongLoading_SubTitle_ForeColor, OpenTaiko.Skin.SongLoading_SubTitle_BackColor, null, 30)) {
 						this.txSubtitle = new CTexture(bmpSongSubTitle);
 						txSubtitle.vcScaleRatio.X = OpenTaiko.GetSongNameXScaling(ref txSubtitle, OpenTaiko.Skin.SongLoading_SubTitle_MaxSize);
 					}
@@ -181,7 +181,7 @@ internal class CStageSongLoading : CStage {
 		#region [ 初めての進行描画 ]
 		//-----------------------------
 		if (base.IsFirstDraw) {
-			CScore cScore1 = OpenTaiko.SongMount.rChosenScore;
+			CScore? cScore1 = OpenTaiko.SongMount.rChosenScore;
 			if (this.sdLoadSound != null) {
 				if (OpenTaiko.Skin.soundSongLoadStartSound.bExclusive && (CSkin.CSystemSound.rLastPlaybackExclusiveSystemSound != null)) {
 					CSkin.CSystemSound.rLastPlaybackExclusiveSystemSound.tStop();
@@ -218,7 +218,7 @@ internal class CStageSongLoading : CStage {
 
 		void drawPlate() {
 			if (this.txTitle != null) {
-				int nSubtitleCorrection = string.IsNullOrEmpty(OpenTaiko.SongMount.rChosenScore.ChartInfo.strSubtitle) ? 15 : 0;
+				int nSubtitleCorrection = string.IsNullOrEmpty(OpenTaiko.SongMount.rChosenScore!.ChartInfo.strSubtitle) ? 15 : 0;
 				this.txTitle.Opacity = 255;
 				if (OpenTaiko.Skin.SongLoading_Title_ReferencePoint == CSkin.ReferencePoint.Left) {
 					this.txTitle.t2DDraw(OpenTaiko.Skin.SongLoading_Title_X, OpenTaiko.Skin.SongLoading_Title_Y - (this.txTitle.szImageSize.Height / 2) + nSubtitleCorrection);
@@ -233,7 +233,7 @@ internal class CStageSongLoading : CStage {
 				if (OpenTaiko.Skin.SongLoading_SubTitle_ReferencePoint == CSkin.ReferencePoint.Left) {
 					this.txSubtitle.t2DDraw(OpenTaiko.Skin.SongLoading_SubTitle_X, OpenTaiko.Skin.SongLoading_SubTitle_Y - (this.txSubtitle.szImageSize.Height / 2));
 				} else if (OpenTaiko.Skin.SongLoading_Title_ReferencePoint == CSkin.ReferencePoint.Right) {
-					this.txSubtitle.t2DDraw(OpenTaiko.Skin.SongLoading_SubTitle_X - (this.txSubtitle.szImageSize.Width * txTitle.vcScaleRatio.X), OpenTaiko.Skin.SongLoading_SubTitle_Y - (this.txSubtitle.szImageSize.Height / 2));
+					this.txSubtitle.t2DDraw(OpenTaiko.Skin.SongLoading_SubTitle_X - (this.txSubtitle.szImageSize.Width * txTitle!.vcScaleRatio.X), OpenTaiko.Skin.SongLoading_SubTitle_Y - (this.txSubtitle.szImageSize.Height / 2));
 				} else {
 					this.txSubtitle.t2DDraw((OpenTaiko.Skin.SongLoading_SubTitle_X - ((this.txSubtitle.szImageSize.Width * txSubtitle.vcScaleRatio.X) / 2)), OpenTaiko.Skin.SongLoading_SubTitle_Y - (this.txSubtitle.szImageSize.Height / 2));
 				}
@@ -242,7 +242,7 @@ internal class CStageSongLoading : CStage {
 
 		void drawPlate_AI() {
 			if (this.txTitle != null) {
-				int nSubtitleCorrection = string.IsNullOrEmpty(OpenTaiko.SongMount.rChosenScore.ChartInfo.strSubtitle) ? 15 : 0;
+				int nSubtitleCorrection = string.IsNullOrEmpty(OpenTaiko.SongMount.rChosenScore!.ChartInfo.strSubtitle) ? 15 : 0;
 				this.txTitle.Opacity = 255;
 				if (OpenTaiko.Skin.SongLoading_Title_ReferencePoint == CSkin.ReferencePoint.Left) {
 					this.txTitle.t2DDraw(OpenTaiko.Skin.SongLoading_Title_X_AI, OpenTaiko.Skin.SongLoading_Title_Y_AI - (this.txTitle.szImageSize.Height / 2) + nSubtitleCorrection);
@@ -257,7 +257,7 @@ internal class CStageSongLoading : CStage {
 				if (OpenTaiko.Skin.SongLoading_SubTitle_ReferencePoint == CSkin.ReferencePoint.Left) {
 					this.txSubtitle.t2DDraw(OpenTaiko.Skin.SongLoading_SubTitle_X_AI, OpenTaiko.Skin.SongLoading_SubTitle_Y_AI - (this.txSubtitle.szImageSize.Height / 2));
 				} else if (OpenTaiko.Skin.SongLoading_Title_ReferencePoint == CSkin.ReferencePoint.Right) {
-					this.txSubtitle.t2DDraw(OpenTaiko.Skin.SongLoading_SubTitle_X_AI - (this.txSubtitle.szImageSize.Width * txTitle.vcScaleRatio.X), OpenTaiko.Skin.SongLoading_SubTitle_Y_AI - (this.txSubtitle.szImageSize.Height / 2));
+					this.txSubtitle.t2DDraw(OpenTaiko.Skin.SongLoading_SubTitle_X_AI - (this.txSubtitle.szImageSize.Width * txTitle!.vcScaleRatio.X), OpenTaiko.Skin.SongLoading_SubTitle_Y_AI - (this.txSubtitle.szImageSize.Height / 2));
 				} else {
 					this.txSubtitle.t2DDraw((OpenTaiko.Skin.SongLoading_SubTitle_X_AI - ((this.txSubtitle.szImageSize.Width * txSubtitle.vcScaleRatio.X) / 2)), OpenTaiko.Skin.SongLoading_SubTitle_Y_AI - (this.txSubtitle.szImageSize.Height / 2));
 				}
@@ -301,7 +301,7 @@ internal class CStageSongLoading : CStage {
 
 			case CStage.EPhase.SongLoading_LoadDTXFile: {
 					timeBeginLoad = DateTime.Now;
-					str = OpenTaiko.SongMount.rChosenScore.FileInfo.FileAbsolutePath;
+					str = OpenTaiko.SongMount.rChosenScore!.FileInfo.FileAbsolutePath;
 
 					if ((OpenTaiko.TJA != null) && OpenTaiko.TJA.IsActivated)
 						OpenTaiko.TJA.DeActivate();
@@ -381,7 +381,7 @@ internal class CStageSongLoading : CStage {
 
 					TimeSpan span = (TimeSpan)(DateTime.Now - timeBeginLoad);
 					Trace.TraceInformation("---- Song information -----------------");
-					Trace.TraceInformation("TITLE: {0}", OpenTaiko.TJA.TITLE.GetString(""));
+					Trace.TraceInformation("TITLE: {0}", OpenTaiko.TJA!.TITLE.GetString(""));
 					Trace.TraceInformation("FILE: {0}", OpenTaiko.TJA.strFullPath);
 					Trace.TraceInformation("---------------------------");
 					Trace.TraceInformation("Chart loading time:           {0}", span.ToString());
@@ -396,16 +396,16 @@ internal class CStageSongLoading : CStage {
 
 						for (int i = 0; i < OpenTaiko.TJA.List_DanSongs.Count; i++) {
 							if (!string.IsNullOrEmpty(OpenTaiko.TJA.List_DanSongs[i].Title)) {
-								using (var bmpSongTitle = pfDanTitle.DrawText(OpenTaiko.TJA.List_DanSongs[i].Title, titleForeColor, titleBackColor, null, 30)) {
+								using (var bmpSongTitle = pfDanTitle!.DrawText(OpenTaiko.TJA.List_DanSongs[i].Title, titleForeColor, titleBackColor, null, 30)) {
 									OpenTaiko.TJA.List_DanSongs[i].TitleTex = OpenTaiko.tTextureCreate(bmpSongTitle, false);
-									OpenTaiko.TJA.List_DanSongs[i].TitleTex.vcScaleRatio.X = OpenTaiko.GetSongNameXScaling(ref OpenTaiko.TJA.List_DanSongs[i].TitleTex, OpenTaiko.Skin.Game_DanC_Title_MaxWidth);
+									OpenTaiko.TJA.List_DanSongs[i].TitleTex!.vcScaleRatio.X = OpenTaiko.GetSongNameXScaling(ref OpenTaiko.TJA.List_DanSongs[i].TitleTex!, OpenTaiko.Skin.Game_DanC_Title_MaxWidth);
 								}
 							}
 
 							if (!string.IsNullOrEmpty(OpenTaiko.TJA.List_DanSongs[i].SubTitle)) {
-								using (var bmpSongSubTitle = pfDanSubTitle.DrawText(OpenTaiko.TJA.List_DanSongs[i].SubTitle, subtitleForeColor, subtitleBackColor, null, 30)) {
+								using (var bmpSongSubTitle = pfDanSubTitle!.DrawText(OpenTaiko.TJA.List_DanSongs[i].SubTitle, subtitleForeColor, subtitleBackColor, null, 30)) {
 									OpenTaiko.TJA.List_DanSongs[i].SubTitleTex = OpenTaiko.tTextureCreate(bmpSongSubTitle, false);
-									OpenTaiko.TJA.List_DanSongs[i].SubTitleTex.vcScaleRatio.X = OpenTaiko.GetSongNameXScaling(ref OpenTaiko.TJA.List_DanSongs[i].SubTitleTex, OpenTaiko.Skin.Game_DanC_SubTitle_MaxWidth);
+									OpenTaiko.TJA.List_DanSongs[i].SubTitleTex!.vcScaleRatio.X = OpenTaiko.GetSongNameXScaling(ref OpenTaiko.TJA.List_DanSongs[i].SubTitleTex!, OpenTaiko.Skin.Game_DanC_SubTitle_MaxWidth);
 								}
 							}
 						}
@@ -423,7 +423,7 @@ internal class CStageSongLoading : CStage {
 						var tja  = OpenTaiko.TJA;
 						var wcts = _loadCts!;
 						_wavLoadTask = Task.Run(() => {
-							foreach (var cwav in tja.listWAV.Values) {
+							foreach (var cwav in tja!.listWAV.Values) {
 								if (wcts.Token.IsCancellationRequested) break;
 								if (cwav.listThisWAVUseChannelNumberSet.Count > 0)
 									tja.tWAVLoad(cwav);
@@ -448,7 +448,7 @@ internal class CStageSongLoading : CStage {
 					_wavLoadTask = null;
 
 					TimeSpan span = (TimeSpan)(DateTime.Now - timeBeginLoadWAV);
-					Trace.TraceInformation("Song loading time({0,4}):     {1}", OpenTaiko.TJA.listWAV.Count, span.ToString());
+					Trace.TraceInformation("Song loading time({0,4}):     {1}", OpenTaiko.TJA!.listWAV.Count, span.ToString());
 					timeBeginLoadWAV = DateTime.Now;
 
 					if (OpenTaiko.ConfigIni.bDynamicBassMixerManagement) {
@@ -492,7 +492,7 @@ internal class CStageSongLoading : CStage {
 							_dtx.tApplyFunMods(OpenTaiko.ConfigIni.nFunMods[i], draws.FunMods,
 								CTja.FunModEffectOf(AIBattleModMirror.ModSourceOf(OpenTaiko.ConfigIni, i)));
 						}
-						OpenTaiko.ReplayInstances[i] = new CSongReplay(_dtx.strFullPath, i);
+						OpenTaiko.ReplayInstances[i] = new CSongReplay(_dtx!.strFullPath, i);
 					}
 
 					// Chart + WAV are loaded; the game-screen activation (streamed) runs in the next phase.
@@ -553,7 +553,7 @@ internal class CStageSongLoading : CStage {
 					// finalize queue so they don't freeze the load frame. They complete during the BGM lead-in wait
 					// below, so they're ready by the time gameplay starts (the BGA/render just pops in when ready).
 					if (OpenTaiko.ConfigIni.bEnableAVI)
-						Game.AsyncActions.Enqueue(() => OpenTaiko.TJA.tAVILoad());
+						Game.AsyncActions.Enqueue(() => OpenTaiko.TJA!.tAVILoad());
 
 					TimeSpan span = (TimeSpan)(DateTime.Now - timeBeginLoad);
 					Trace.TraceInformation("総読込時間:                {0}", span.ToString());
@@ -623,12 +623,12 @@ internal class CStageSongLoading : CStage {
 	//private CActFIFOBlack actFO;
 	private long nBGMTotalPlaybackTimems;
 	private long nBGMPlaybackStartTime;
-	private CSound sdLoadSound;
-	private string strSTAGEFILE;
-	private string strSongTitle;
-	private string strSubtitle;
-	private CTexture txTitle;
-	private CTexture txSubtitle;
+	private CSound? sdLoadSound;
+	private string strSTAGEFILE = null!;
+	private string strSongTitle = null!;
+	private string strSubtitle = null!;
+	private CTexture? txTitle;
+	private CTexture? txSubtitle;
 	//private CTexture txSongnamePlate;
 	private DateTime timeBeginLoad;
 	private DateTime timeBeginLoadWAV;
@@ -642,14 +642,14 @@ internal class CStageSongLoading : CStage {
 	private bool _handedOver;                  // this load reached gameplay
 	private System.Collections.Generic.IEnumerator<float>? _gsActivate;   // in-flight stepped game-screen build
 	private bool _gsPrevAutoFlush;             // Trace.AutoFlush to restore after the batched stepped build
-	private CCounter ctWait;
-	private CCounter ctSongNameDisplay;
+	private CCounter ctWait = null!;
+	private CCounter ctSongNameDisplay = null!;
 
-	private CCachedFontRenderer pfTITLE;
-	private CCachedFontRenderer pfSUBTITLE;
+	private CCachedFontRenderer? pfTITLE;
+	private CCachedFontRenderer? pfSUBTITLE;
 
-	private CCachedFontRenderer pfDanTitle = null;
-	private CCachedFontRenderer pfDanSubTitle = null;
+	private CCachedFontRenderer? pfDanTitle = null;
+	private CCachedFontRenderer? pfDanSubTitle = null;
 	//-----------------
 	#endregion
 }

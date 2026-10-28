@@ -17,7 +17,7 @@ public class CInputManager : IDisposable {
 	public List<IInputDevice> InputDevices {
 		get;
 		private set;
-	}
+	} = null!;
 	// Define a null device for platforms without a physical keyboard/mouse (such as iOS).
 	private static readonly IInputDevice _nullDevice = new CInputNull();
 	public float Deadzone = 0.5f;
@@ -49,8 +49,8 @@ public class CInputManager : IDisposable {
 
 		this.InputDevices = new List<IInputDevice>(10);
 		#region [ Enumerate keyboard/mouse: exception is masked if keyboard/mouse is not connected ]
-		CInputKeyboard cinputkeyboard = null;
-		CInputMouse cinputmouse = null;
+		CInputKeyboard? cinputkeyboard = null;
+		CInputMouse? cinputmouse = null;
 		try {
 			cinputkeyboard = new CInputKeyboard(Context.Keyboards[0]);
 			cinputmouse = new CInputMouse(Context.Mice[0]);

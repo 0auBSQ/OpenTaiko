@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using ManagedBass;
 using Silk.NET.Windowing;
 
@@ -37,13 +38,13 @@ public class SoundManager   // : CSound
 		return list;
 	}
 
-	private static ISoundDevice SoundDevice {
+	private static ISoundDevice? SoundDevice {
 		get; set;
 	}
 	private static ESoundDeviceType SoundDeviceType {
 		get; set;
 	}
-	public static CSoundTimer PlayTimer = null;
+	[AllowNull] public static CSoundTimer PlayTimer = null!;   // set when the sound device opens; null again after tEnd
 	public static bool bUseOSTimer = false;     // OSのタイマーを使うか、CSoundTimerを使うか。DTXCではfalse, DTXManiaではtrue。
 												// DTXC(DirectSound)でCSoundTimerを使うと、内部で無音のループサウンドを再生するため
 												// サウンドデバイスを占有してしまい、Viewerとして呼び出されるDTXManiaで、ASIOが使えなくなる。
@@ -59,7 +60,7 @@ public class SoundManager   // : CSound
 		try { if (SoundDevice != null) SoundDevice.nMasterVolume = 0; } catch { /* best effort */ }
 	}
 
-	private static IWindow Window_;
+	private static IWindow Window_ = null!;
 
 	private static int _nMasterVolume;
 	public int nMasterVolume {
@@ -111,7 +112,7 @@ public class SoundManager   // : CSound
 		//    }
 		//}
 		set {
-			SoundDevice.nMasterVolume = value;
+			SoundDevice!.nMasterVolume = value;
 			_nMasterVolume = value;
 		}
 	}
@@ -200,7 +201,7 @@ public class SoundManager   // : CSound
 		}
 	}
 
-	public static long nBytesPerSec => SoundDevice.nBytesPerSec;
+	public static long nBytesPerSec => SoundDevice!.nBytesPerSec;
 	#endregion
 
 
@@ -290,7 +291,7 @@ public class SoundManager   // : CSound
 
 
 	public static void tEnd() {
-		SoundDevice.Dispose();
+		SoundDevice!.Dispose();
 		PlayTimer.Dispose();    // Global.Bass を解放した後に解放すること。（Global.Bass で参照されているため）
 		PlayTimer = null;       // a later tInitialize starts a new one
 	}
@@ -512,10 +513,10 @@ public class SoundManager   // : CSound
 		if (SoundDeviceType == ESoundDeviceType.Unknown) {
 			throw new Exception(string.Format("未対応の SoundDeviceType です。[{0}]", SoundDeviceType.ToString()));
 		}
-		return SoundDevice.tCreateUserSound(frequency, channels, durationSeconds, proc, soundGroup);
+		return SoundDevice!.tCreateUserSound(frequency, channels, durationSeconds, proc, soundGroup);
 	}
 
-	public CSound tCreateSound(string filename, ESoundGroup soundGroup) {
+	public CSound? tCreateSound(string filename, ESoundGroup soundGroup) {
 		if (!File.Exists(filename)) {
 			Trace.TraceWarning($"[i18n] File does not exist: {filename}");
 			return null;
@@ -525,7 +526,7 @@ public class SoundManager   // : CSound
 			throw new Exception(string.Format("未対応の SoundDeviceType です。[{0}]", SoundDeviceType.ToString()));
 		}
 		try {
-			return SoundDevice.tCreateSound(filename, soundGroup);
+			return SoundDevice!.tCreateSound(filename, soundGroup);
 		} catch (Exception ex) {
 			Trace.TraceWarning($"Failed to create sound: {System.IO.Path.GetFileName(filename)}: {ex.Message}");
 			return null;
@@ -534,7 +535,7 @@ public class SoundManager   // : CSound
 
 	private static DateTime lastUpdateTime = DateTime.MinValue;
 
-	public void tDisposeSound(CSound csound) {
+	public void tDisposeSound(CSound? csound) {
 		csound?.tDispose(true);         // インスタンスは存続→破棄にする。
 	}
 

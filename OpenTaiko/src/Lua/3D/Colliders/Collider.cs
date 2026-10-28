@@ -31,11 +31,11 @@ namespace OpenTaiko {
 
 	public abstract class Collider {
 		public double Cx, Cy, Cz;     // centre / reference point (SetCenter moves the shape rigidly)
-		public object Tag;            // optional payload so a hit can be mapped back (e.g. the Lua fighter table)
+		public object? Tag;            // optional payload so a hit can be mapped back (e.g. the Lua fighter table)
 
 		public void SetCenter(double x, double y, double z) { Cx = x; Cy = y; Cz = z; }
 		public void SetTag(object tag) { Tag = tag; }
-		public object GetTag() => Tag;
+		public object? GetTag() => Tag;
 
 		// rough bounding-sphere radius (broad-phase reject)
 		public abstract double BoundRadius();

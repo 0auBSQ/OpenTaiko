@@ -43,7 +43,7 @@ internal class CSkin : IDisposable {
 	public class CSystemSound : IDisposable {
 		// static フィールド
 
-		public static CSkin.CSystemSound rLastPlaybackExclusiveSystemSound;
+		public static CSkin.CSystemSound? rLastPlaybackExclusiveSystemSound;
 
 		public ESoundGroup SoundGroup { get; private init; }
 
@@ -102,8 +102,8 @@ internal class CSkin : IDisposable {
 			_heldSounds.Clear();
 		}
 
-		private CSound nowSound => this.rSound[1 - this.nNextPlayingSoundNumber];
-		private CSound nextSound => this.rSound[this.nNextPlayingSoundNumber];
+		private CSound? nowSound => this.rSound[1 - this.nNextPlayingSoundNumber];
+		private CSound? nextSound => this.rSound[this.nNextPlayingSoundNumber];
 		public bool bIsPlaying {
 			get => _held || (this.nowSound?.IsPlaying ?? false);
 		}
@@ -122,7 +122,7 @@ internal class CSkin : IDisposable {
 		public int nAutomationLevel_CurrentSound {
 			get => this.nowSound?.AutomationLevel ?? 0;
 			set {
-				CSound sound = this.nowSound;
+				CSound? sound = this.nowSound;
 				if (sound != null) {
 					sound.AutomationLevel = value;
 				}
@@ -265,8 +265,8 @@ internal class CSkin : IDisposable {
 		}
 
 		public void SetSpeed(double speed) {
-			if (this.rSound[0] != null) this.rSound[0].SetSpeedWhilePlaying(speed);
-			if (this.rSound[1] != null) this.rSound[1].SetSpeedWhilePlaying(speed);
+			if (this.rSound[0] != null) this.rSound[0]!.SetSpeedWhilePlaying(speed);
+			if (this.rSound[1] != null) this.rSound[1]!.SetSpeedWhilePlaying(speed);
 		}
 
 		public void SetTimestamp(long ms) {
@@ -291,7 +291,7 @@ internal class CSkin : IDisposable {
 			if (OpenTaiko.SoundManager.GetCurrentSoundDeviceType() != "DirectShow") {
 				for (int i = 0; i < 2; i++) {
 					if (this.rSound[i] != null) {
-						OpenTaiko.SoundManager.RemoveMixer(this.rSound[i]);
+						OpenTaiko.SoundManager.RemoveMixer(this.rSound[i]!);
 					}
 				}
 			}
@@ -304,7 +304,7 @@ internal class CSkin : IDisposable {
 			if (!this.bDisposed) {
 				for (int i = 0; i < 2; i++) {
 					if (this.rSound[i] != null) {
-						OpenTaiko.SoundManager.tDisposeSound(this.rSound[i]);
+						OpenTaiko.SoundManager.tDisposeSound(this.rSound[i]!);
 						this.rSound[i] = null;
 					}
 				}
@@ -319,7 +319,7 @@ internal class CSkin : IDisposable {
 		//-----------------
 		private bool bDisposed;
 		private int nNextPlayingSoundNumber;
-		private CSound[] rSound = new CSound[2];
+		private CSound?[] rSound = new CSound?[2];
 		//-----------------
 		#endregion
 	}
@@ -329,7 +329,7 @@ internal class CSkin : IDisposable {
 
 	// Hitsounds
 
-	public CHitSounds hsHitSoundsInformations = null;
+	public CHitSounds hsHitSoundsInformations = null!;
 
 	// Character specific voice samples
 
@@ -371,86 +371,86 @@ internal class CSkin : IDisposable {
 
 	// General sound effects (Skin specific)
 
-	public CSystemSound bgmOptionScreen = null;
-	public CSystemSound bgmConfigScreen = null;
-	public CSystemSound bgmStartupScreen = null;
-	public CSystemSound soundSTAGEFAILEDSound = null;
-	public CSystemSound soundCursorMoveSound = null;
-	public CSystemSound soundGameStartSound = null;
-	public CSystemSound soundGameEndSound = null;
-	public CSystemSound soundStageClearSound = null;
-	public CSystemSound soundFullComboSound = null;
-	public CSystemSound soundCheerSound = null;
-	public CSystemSound soundSongLoadStartSound = null;
-	public CSystemSound soundDecideSFX = null;
-	public CSystemSound soundCancelSFX = null;
-	public CSystemSound soundChangeSFX = null;
-	public CSystemSound soundSongSelectChara = null;
-	public CSystemSound soundSkip = null;
-	public CSystemSound soundEntry = null;
-	public CSystemSound soundError = null;
-	public CSystemSound soundsanka = null;
-	public CSystemSound soundBomb = null;
+	public CSystemSound bgmOptionScreen = null!;
+	public CSystemSound bgmConfigScreen = null!;
+	public CSystemSound bgmStartupScreen = null!;
+	public CSystemSound soundSTAGEFAILEDSound = null!;
+	public CSystemSound soundCursorMoveSound = null!;
+	public CSystemSound soundGameStartSound = null!;
+	public CSystemSound soundGameEndSound = null!;
+	public CSystemSound soundStageClearSound = null!;
+	public CSystemSound soundFullComboSound = null!;
+	public CSystemSound soundCheerSound = null!;
+	public CSystemSound soundSongLoadStartSound = null!;
+	public CSystemSound soundDecideSFX = null!;
+	public CSystemSound soundCancelSFX = null!;
+	public CSystemSound soundChangeSFX = null!;
+	public CSystemSound? soundSongSelectChara = null;
+	public CSystemSound soundSkip = null!;
+	public CSystemSound soundEntry = null!;
+	public CSystemSound soundError = null!;
+	public CSystemSound? soundsanka = null;
+	public CSystemSound soundBomb = null!;
 	//add
-	public CSystemSound soundSongDecideSound = null;
-	public CSystemSound soundSongDecide_AI = null;
-	public CSystemSound bgmResultInSound = null;
-	public CSystemSound bgmResultSound = null;
-	public CSystemSound bgmResultIn_AI = null;
-	public CSystemSound bgmResult_AI = null;
+	public CSystemSound soundSongDecideSound = null!;
+	public CSystemSound soundSongDecide_AI = null!;
+	public CSystemSound bgmResultInSound = null!;
+	public CSystemSound bgmResultSound = null!;
+	public CSystemSound bgmResultIn_AI = null!;
+	public CSystemSound bgmResult_AI = null!;
 
-	public CSystemSound bgmDanResult = null;
+	public CSystemSound bgmDanResult = null!;
 
-	public CSystemSound bgmTitle = null;
-	public CSystemSound bgmTitleIn = null;
-	public CSystemSound bgmSelSongScreen = null;
-	public CSystemSound bgmSelSongScreenIn = null;
-	public CSystemSound bgmSongSelect_AI = null;
-	public CSystemSound bgmSongSelect_AI_In = null;
-	public CSystemSound bgmResult = null;
-	public CSystemSound bgmResultIn = null;
+	public CSystemSound bgmTitle = null!;
+	public CSystemSound bgmTitleIn = null!;
+	public CSystemSound bgmSelSongScreen = null!;
+	public CSystemSound bgmSelSongScreenIn = null!;
+	public CSystemSound bgmSongSelect_AI = null!;
+	public CSystemSound bgmSongSelect_AI_In = null!;
+	public CSystemSound? bgmResult = null;
+	public CSystemSound? bgmResultIn = null;
 
-	public CSystemSound soundTrainingPlaybackSound = null;
-	public CSystemSound soundTrainingStopSound = null;
-	public CSystemSound soundTrainingToggleBookmarkSFX = null;
-	public CSystemSound soundTrainingSkipSound = null;
-	public CSystemSound soundTrainingModeScrollSFX = null;
-	public CSystemSound soundPon = null;
-	public CSystemSound soundGauge = null;
-	public CSystemSound soundScoreDon = null;
-	public CSystemSound soundChallengeVoice = null;
-	public CSystemSound soundDanSelectStart = null;
-	public CSystemSound soundDanSongSelectCheck = null;
+	public CSystemSound soundTrainingPlaybackSound = null!;
+	public CSystemSound soundTrainingStopSound = null!;
+	public CSystemSound soundTrainingToggleBookmarkSFX = null!;
+	public CSystemSound soundTrainingSkipSound = null!;
+	public CSystemSound soundTrainingModeScrollSFX = null!;
+	public CSystemSound soundPon = null!;
+	public CSystemSound soundGauge = null!;
+	public CSystemSound soundScoreDon = null!;
+	public CSystemSound? soundChallengeVoice = null;
+	public CSystemSound? soundDanSelectStart = null;
+	public CSystemSound? soundDanSongSelectCheck = null;
 
-	public CSystemSound soundDanSongSelectIn = null;
+	public CSystemSound soundDanSongSelectIn = null!;
 
-	public CSystemSound soundDanSelectBGM = null;
-	public CSystemSound soundDanSongSelect = null;
+	public CSystemSound soundDanSelectBGM = null!;
+	public CSystemSound soundDanSongSelect = null!;
 
-	public CSystemSound soundOnlineLoungeBGM = null;
-	public CSystemSound soundTowerSelectBGM = null;
+	public CSystemSound soundOnlineLoungeBGM = null!;
+	public CSystemSound soundTowerSelectBGM = null!;
 
-	public CSystemSound[] soundExToExtra = null;
-	public CSystemSound[] soundExtraToEx = null;
+	public CSystemSound[] soundExToExtra = null!;
+	public CSystemSound[] soundExtraToEx = null!;
 
-	public CSystemSound calibrationTick = null;
+	public CSystemSound calibrationTick = null!;
 
-	public CSystemSound[] soundModal = null;
+	public CSystemSound[] soundModal = null!;
 
-	public CSystemSound soundCrownIn = null;
-	public CSystemSound soundRankIn = null;
+	public CSystemSound soundCrownIn = null!;
+	public CSystemSound soundRankIn = null!;
 
-	public CSystemSound soundSelectAnnounce = null;
+	public CSystemSound? soundSelectAnnounce = null;
 
 	// Tower Sfx
-	public CSystemSound soundTowerMiss = null;
-	public CSystemSound bgmTowerResult = null;
+	public CSystemSound? soundTowerMiss = null;
+	public CSystemSound bgmTowerResult = null!;
 
 	//public Cシステムサウンド soundRed = null;
 	//public Cシステムサウンド soundBlue = null;
-	public CSystemSound soundBalloon = null;
-	public CSystemSound soundKusudama = null;
-	public CSystemSound soundKusudamaMiss = null;
+	public CSystemSound soundBalloon = null!;
+	public CSystemSound soundKusudama = null!;
+	public CSystemSound soundKusudamaMiss = null!;
 
 	#region [ For disposing ]
 	public List<CSystemSound> listSystemSound = new();
@@ -484,10 +484,10 @@ internal class CSkin : IDisposable {
 	private object lockBoxDefSkin;
 	public static bool bUseBoxDefSkin = true;                       // box.defからのスキン変更を許容するか否か
 
-	public string strSystemSkinRoot = null;
-	public string[] strSystemSkinSubfolders = null;     // List<string>だとignoreCaseな検索が面倒なので、配列に逃げる :-)
-	private string[] _strBoxDefSkinSubfolders = null;
-	public string[] strBoxDefSkinSubfolders {
+	public string strSystemSkinRoot = null!;
+	public string[] strSystemSkinSubfolders = null!;     // List<string>だとignoreCaseな検索が面倒なので、配列に逃げる :-)
+	private string[]? _strBoxDefSkinSubfolders = null;
+	public string[]? strBoxDefSkinSubfolders {
 		get {
 			lock (lockBoxDefSkin) {
 				return _strBoxDefSkinSubfolders;
@@ -500,7 +500,7 @@ internal class CSkin : IDisposable {
 		}
 	}           // 別スレッドからも書き込みアクセスされるため、スレッドセーフなアクセス法を提供
 
-	private static string strSystemSkinSubfolderFullName;           // Config画面で設定されたスキン
+	private static string strSystemSkinSubfolderFullName = null!;           // Config画面で設定されたスキン
 	private static string strBoxDefSkinSubfolderFullName = "";      // box.defで指定されているスキン
 
 	/// <summary>
@@ -530,7 +530,7 @@ internal class CSkin : IDisposable {
 
 	#region [ Lua Stages and Custom Menus ]
 
-	public CMainMenuSettings MainMenuSettings;
+	public CMainMenuSettings MainMenuSettings = null!;
 
 	public void CleanupModules() {
 		LuaStageWrapper.PropagateOnDestroy();
@@ -988,7 +988,8 @@ internal class CSkin : IDisposable {
 	/// </summary>
 	/// <param name="skinPathFullName">スキンが格納されたパス名(フルパス)</param>
 	/// <returns>スキン名</returns>
-	public static string GetSkinName(string skinPathFullName) {
+	[return: System.Diagnostics.CodeAnalysis.NotNullIfNotNull(nameof(skinPathFullName))]
+	public static string? GetSkinName(string skinPathFullName) {
 		if (skinPathFullName != null) {
 			if (skinPathFullName == "")     // 「box.defで未定義」用
 				skinPathFullName = strSystemSkinSubfolderFullName;
@@ -1006,12 +1007,12 @@ internal class CSkin : IDisposable {
 	}
 
 
-	public string GetSkinSubfolderFullNameFromSkinName(string skinName) {
+	public string? GetSkinSubfolderFullNameFromSkinName(string skinName) {
 		foreach (string s in strSystemSkinSubfolders) {
 			if (GetSkinName(s) == skinName)
 				return s;
 		}
-		foreach (string b in strBoxDefSkinSubfolders) {
+		foreach (string b in strBoxDefSkinSubfolders!) {
 			if (GetSkinName(b) == skinName)
 				return b;
 		}
@@ -1060,7 +1061,7 @@ internal class CSkin : IDisposable {
 		using (var streamReader = new StreamReader(Path(path), Encoding.GetEncoding(OpenTaiko.sEncType))) {
 			while (streamReader.Peek() > -1) // 一行ずつ読み込む。
 			{
-				var nowLine = streamReader.ReadLine();
+				var nowLine = streamReader.ReadLine()!;
 				if (nowLine.StartsWith("#include")) {
 					// #include hogehoge.iniにぶち当たった
 					var includePath = nowLine.Substring("#include ".Length).Trim();
@@ -7469,9 +7470,9 @@ internal class CSkin : IDisposable {
 		public string AIBattleCharacter = "10v2 - AItritus";
 		/// <summary>Id of the nameplate the AI battle opponent wears; set via <c>AIBattleNameplate=</c> in SkinConfig.ini.</summary>
 		public string AIBattleNameplate = "66";
-	public string FontName { get { return _fontNameLocalized.TryGetValue(CLangManager.fetchLang(), out string value) ? value : ""; } }
+	public string FontName { get { return _fontNameLocalized.TryGetValue(CLangManager.fetchLang(), out string? value) ? value : ""; } }
 	private Dictionary<string, string> _fontNameLocalized = new Dictionary<string, string>();
-	public string BoxFontName { get { return _boxFontNameLocalized.TryGetValue(CLangManager.fetchLang(), out string value) ? value : ""; } }
+	public string BoxFontName { get { return _boxFontNameLocalized.TryGetValue(CLangManager.fetchLang(), out string? value) ? value : ""; } }
 	private Dictionary<string, string> _boxFontNameLocalized = new Dictionary<string, string>();
 	// FontFallbacksMain / FontFallbacksSub (null: the Main list)
 	private List<string> _fontFallbacksMain = new List<string>();
@@ -7537,134 +7538,134 @@ internal class CSkin : IDisposable {
 	#region Characters
 
 	public int Characters_Ptn;
-	public string[] Characters_DirName;
-	public int[] Characters_Normal_Ptn,
-		Characters_Normal_Missed_Ptn,
-		Characters_Normal_MissedDown_Ptn,
-		Characters_Normal_Cleared_Ptn,
-		Characters_Normal_Maxed_Ptn,
-		Characters_MissIn_Ptn,
-		Characters_MissDownIn_Ptn,
-		Characters_GoGoTime_Ptn,
-		Characters_GoGoTime_Maxed_Ptn,
-		Characters_10Combo_Ptn,
-		Characters_10Combo_Clear_Ptn,
-		Characters_10Combo_Maxed_Ptn,
-		Characters_GoGoStart_Ptn,
-		Characters_GoGoStart_Clear_Ptn,
-		Characters_GoGoStart_Maxed_Ptn,
-		Characters_Become_Cleared_Ptn,
-		Characters_Become_Maxed_Ptn,
-		Characters_SoulOut_Ptn,
-		Characters_ClearOut_Ptn,
-		Characters_Return_Ptn,
-		Characters_Balloon_Breaking_Ptn,
-		Characters_Balloon_Broke_Ptn,
-		Characters_Balloon_Miss_Ptn,
-		Characters_Kusudama_Idle_Ptn,
-		Characters_Kusudama_Breaking_Ptn,
-		Characters_Kusudama_Broke_Ptn,
-		Characters_Kusudama_Miss_Ptn,
-		Characters_Title_Entry_Ptn,
-		Characters_Title_Normal_Ptn,
-		Characters_Menu_Loop_Ptn,
-		Characters_Menu_Select_Ptn,
-		Characters_Menu_Start_Ptn,
-		Characters_Menu_Wait_Ptn,
-		Characters_Result_Clear_Ptn,
-		Characters_Result_Failed_Ptn,
-		Characters_Result_Failed_In_Ptn,
-		Characters_Result_Normal_Ptn,
-		Characters_Tower_Standing_Ptn,
-		Characters_Tower_Climbing_Ptn,
-		Characters_Tower_Running_Ptn,
-		Characters_Tower_Clear_Ptn,
-		Characters_Tower_Fail_Ptn,
-		Characters_Tower_Standing_Tired_Ptn,
-		Characters_Tower_Climbing_Tired_Ptn,
-		Characters_Tower_Running_Tired_Ptn,
-		Characters_Tower_Clear_Tired_Ptn;
+	public string[] Characters_DirName = null!;
+	public int[] Characters_Normal_Ptn = null!,
+		Characters_Normal_Missed_Ptn = null!,
+		Characters_Normal_MissedDown_Ptn = null!,
+		Characters_Normal_Cleared_Ptn = null!,
+		Characters_Normal_Maxed_Ptn = null!,
+		Characters_MissIn_Ptn = null!,
+		Characters_MissDownIn_Ptn = null!,
+		Characters_GoGoTime_Ptn = null!,
+		Characters_GoGoTime_Maxed_Ptn = null!,
+		Characters_10Combo_Ptn = null!,
+		Characters_10Combo_Clear_Ptn = null!,
+		Characters_10Combo_Maxed_Ptn = null!,
+		Characters_GoGoStart_Ptn = null!,
+		Characters_GoGoStart_Clear_Ptn = null!,
+		Characters_GoGoStart_Maxed_Ptn = null!,
+		Characters_Become_Cleared_Ptn = null!,
+		Characters_Become_Maxed_Ptn = null!,
+		Characters_SoulOut_Ptn = null!,
+		Characters_ClearOut_Ptn = null!,
+		Characters_Return_Ptn = null!,
+		Characters_Balloon_Breaking_Ptn = null!,
+		Characters_Balloon_Broke_Ptn = null!,
+		Characters_Balloon_Miss_Ptn = null!,
+		Characters_Kusudama_Idle_Ptn = null!,
+		Characters_Kusudama_Breaking_Ptn = null!,
+		Characters_Kusudama_Broke_Ptn = null!,
+		Characters_Kusudama_Miss_Ptn = null!,
+		Characters_Title_Entry_Ptn = null!,
+		Characters_Title_Normal_Ptn = null!,
+		Characters_Menu_Loop_Ptn = null!,
+		Characters_Menu_Select_Ptn = null!,
+		Characters_Menu_Start_Ptn = null!,
+		Characters_Menu_Wait_Ptn = null!,
+		Characters_Result_Clear_Ptn = null!,
+		Characters_Result_Failed_Ptn = null!,
+		Characters_Result_Failed_In_Ptn = null!,
+		Characters_Result_Normal_Ptn = null!,
+		Characters_Tower_Standing_Ptn = null!,
+		Characters_Tower_Climbing_Ptn = null!,
+		Characters_Tower_Running_Ptn = null!,
+		Characters_Tower_Clear_Ptn = null!,
+		Characters_Tower_Fail_Ptn = null!,
+		Characters_Tower_Standing_Tired_Ptn = null!,
+		Characters_Tower_Climbing_Tired_Ptn = null!,
+		Characters_Tower_Running_Tired_Ptn = null!,
+		Characters_Tower_Clear_Tired_Ptn = null!;
 
 	// Config
 
-	public int[][] Characters_Resolution;
-	public bool[] Characters_UseResult1P;
-	public int[][] Characters_Menu_Offset;
-	public int[][] Characters_Result_Offset;
-	public int[][] Characters_X;
-	public int[][] Characters_Y;
-	public int[][] Characters_4P;
-	public int[][] Characters_5P;
-	public int[][] Characters_X_AI;
-	public int[][] Characters_Y_AI;
-	public int[][] Characters_Balloon_X;
-	public int[][] Characters_Balloon_Y;
-	public int[][] Characters_Balloon_4P;
-	public int[][] Characters_Balloon_5P;
-	public int[][] Characters_Kusudama_X;
-	public int[][] Characters_Kusudama_Y;
-	public int[][] Characters_Motion_Normal,
-		Characters_Motion_10Combo,
-		Characters_Motion_10Combo_Clear,
-		Characters_Motion_10ComboMax,
-		Characters_Motion_Miss,
-		Characters_Motion_MissDown,
-		Characters_Motion_ClearIn,
-		Characters_Motion_Clear,
-		Characters_Motion_ClearMax,
-		Characters_Motion_MissIn,
-		Characters_Motion_MissDownIn,
-		Characters_Motion_GoGoStart,
-		Characters_Motion_GoGoStart_Clear,
-		Characters_Motion_GoGoStartMax,
-		Characters_Motion_GoGo,
-		Characters_Motion_GoGoMax,
-		Characters_Motion_SoulIn,
-		Characters_Motion_SoulOut,
-		Characters_Motion_ClearOut,
-		Characters_Motion_Return;
-	public float[] Characters_Beat_Normal,
-		Characters_Beat_10Combo,
-		Characters_Beat_10Combo_Clear,
-		Characters_Beat_10ComboMax,
-		Characters_Beat_Miss,
-		Characters_Beat_MissDown,
-		Characters_Beat_ClearIn,
-		Characters_Beat_Clear,
-		Characters_Beat_ClearMax,
-		Characters_Beat_MissIn,
-		Characters_Beat_MissDownIn,
-		Characters_Beat_GoGoStart,
-		Characters_Beat_GoGoStart_Clear,
-		Characters_Beat_GoGoStartMax,
-		Characters_Beat_GoGo,
-		Characters_Beat_GoGoMax,
-		Characters_Beat_SoulIn,
-		Characters_Beat_SoulOut,
-		Characters_Beat_ClearOut,
-		Characters_Beat_Return,
-		Characters_Beat_Tower_Standing,
-		Characters_Beat_Tower_Standing_Tired,
-		Characters_Beat_Tower_Fail,
-		Characters_Beat_Tower_Clear,
-		Characters_Beat_Tower_Clear_Tired;
-	public bool[] Characters_Tower_Clear_IsLooping,
-		Characters_Tower_Clear_Tired_IsLooping,
-		Characters_Tower_Fail_IsLooping;
-	public int[] Characters_Balloon_Timer;
-	public int[] Characters_Balloon_Delay;
-	public int[] Characters_Balloon_FadeOut;
+	public int[][] Characters_Resolution = null!;
+	public bool[] Characters_UseResult1P = null!;
+	public int[][] Characters_Menu_Offset = null!;
+	public int[][] Characters_Result_Offset = null!;
+	public int[][] Characters_X = null!;
+	public int[][] Characters_Y = null!;
+	public int[][] Characters_4P = null!;
+	public int[][] Characters_5P = null!;
+	public int[][] Characters_X_AI = null!;
+	public int[][] Characters_Y_AI = null!;
+	public int[][] Characters_Balloon_X = null!;
+	public int[][] Characters_Balloon_Y = null!;
+	public int[][] Characters_Balloon_4P = null!;
+	public int[][] Characters_Balloon_5P = null!;
+	public int[][] Characters_Kusudama_X = null!;
+	public int[][] Characters_Kusudama_Y = null!;
+	public int[][] Characters_Motion_Normal = null!,
+		Characters_Motion_10Combo = null!,
+		Characters_Motion_10Combo_Clear = null!,
+		Characters_Motion_10ComboMax = null!,
+		Characters_Motion_Miss = null!,
+		Characters_Motion_MissDown = null!,
+		Characters_Motion_ClearIn = null!,
+		Characters_Motion_Clear = null!,
+		Characters_Motion_ClearMax = null!,
+		Characters_Motion_MissIn = null!,
+		Characters_Motion_MissDownIn = null!,
+		Characters_Motion_GoGoStart = null!,
+		Characters_Motion_GoGoStart_Clear = null!,
+		Characters_Motion_GoGoStartMax = null!,
+		Characters_Motion_GoGo = null!,
+		Characters_Motion_GoGoMax = null!,
+		Characters_Motion_SoulIn = null!,
+		Characters_Motion_SoulOut = null!,
+		Characters_Motion_ClearOut = null!,
+		Characters_Motion_Return = null!;
+	public float[] Characters_Beat_Normal = null!,
+		Characters_Beat_10Combo = null!,
+		Characters_Beat_10Combo_Clear = null!,
+		Characters_Beat_10ComboMax = null!,
+		Characters_Beat_Miss = null!,
+		Characters_Beat_MissDown = null!,
+		Characters_Beat_ClearIn = null!,
+		Characters_Beat_Clear = null!,
+		Characters_Beat_ClearMax = null!,
+		Characters_Beat_MissIn = null!,
+		Characters_Beat_MissDownIn = null!,
+		Characters_Beat_GoGoStart = null!,
+		Characters_Beat_GoGoStart_Clear = null!,
+		Characters_Beat_GoGoStartMax = null!,
+		Characters_Beat_GoGo = null!,
+		Characters_Beat_GoGoMax = null!,
+		Characters_Beat_SoulIn = null!,
+		Characters_Beat_SoulOut = null!,
+		Characters_Beat_ClearOut = null!,
+		Characters_Beat_Return = null!,
+		Characters_Beat_Tower_Standing = null!,
+		Characters_Beat_Tower_Standing_Tired = null!,
+		Characters_Beat_Tower_Fail = null!,
+		Characters_Beat_Tower_Clear = null!,
+		Characters_Beat_Tower_Clear_Tired = null!;
+	public bool[] Characters_Tower_Clear_IsLooping = null!,
+		Characters_Tower_Clear_Tired_IsLooping = null!,
+		Characters_Tower_Fail_IsLooping = null!;
+	public int[] Characters_Balloon_Timer = null!;
+	public int[] Characters_Balloon_Delay = null!;
+	public int[] Characters_Balloon_FadeOut = null!;
 
-	public int[] Characters_Title_Entry_AnimationDuration;
-	public int[] Characters_Title_Normal_AnimationDuration;
-	public int[] Characters_Menu_Loop_AnimationDuration;
-	public int[] Characters_Menu_Select_AnimationDuration;
-	public int[] Characters_Menu_Start_AnimationDuration;
-	public int[] Characters_Menu_Wait_AnimationDuration;
-	public int[] Characters_Result_Normal_AnimationDuration;
-	public int[] Characters_Result_Clear_AnimationDuration;
-	public int[] Characters_Result_Failed_In_AnimationDuration;
-	public int[] Characters_Result_Failed_AnimationDuration;
+	public int[] Characters_Title_Entry_AnimationDuration = null!;
+	public int[] Characters_Title_Normal_AnimationDuration = null!;
+	public int[] Characters_Menu_Loop_AnimationDuration = null!;
+	public int[] Characters_Menu_Select_AnimationDuration = null!;
+	public int[] Characters_Menu_Start_AnimationDuration = null!;
+	public int[] Characters_Menu_Wait_AnimationDuration = null!;
+	public int[] Characters_Result_Normal_AnimationDuration = null!;
+	public int[] Characters_Result_Clear_AnimationDuration = null!;
+	public int[] Characters_Result_Failed_In_AnimationDuration = null!;
+	public int[] Characters_Result_Failed_AnimationDuration = null!;
 
 	#endregion
 
@@ -8213,7 +8214,7 @@ internal class CSkin : IDisposable {
 	public int[] Game_ScoreRank_4P = new int[] { 87, 88 };
 	public int[] Game_ScoreRank_5P = new int[] { 87, 80 };
 
-	public DBSkinPreset.SkinPreset Game_SkinScenes = null;
+	public DBSkinPreset.SkinPreset Game_SkinScenes = null!;
 
 	#region Chara
 

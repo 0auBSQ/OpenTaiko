@@ -8,7 +8,7 @@ namespace OpenTaiko;
 internal class Program {
 	#region [ 二重起動チェック、DLL存在チェック ]
 	//-----------------------------
-	private static Mutex mutexDoubleStartupPrevent;
+	private static Mutex? mutexDoubleStartupPrevent;
 
 	private static bool tDLLExistsCheck(string strDllName, string strNotFoundErrorTextJp, string strNotFoundErrorTextEn, bool bLoadDllCheck) {
 		string strNotFoundErrorText = (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ja") ?
@@ -89,7 +89,6 @@ internal class Program {
 
 		if (mutexDoubleStartupPrevent.WaitOne(0, false)) {
 			string newLine = Environment.NewLine;
-			bool bDLLnotfound = false;
 
 			Trace.WriteLine("Current Directory: " + Environment.CurrentDirectory);
 			Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
@@ -191,11 +190,11 @@ internal class Program {
 
 				Process current = Process.GetCurrentProcess();
 				Process[] running = Process.GetProcessesByName(current.ProcessName);
-				Process target = null;
+				Process? target = null;
 				foreach (Process p in running) {
 					if (p.Id != current.Id) // プロセス名は同じでかつ、プロセスIDが自分自身とは異なるものを探す
 					{
-						if (p.MainModule.FileName == current.MainModule.FileName && p.MainWindowHandle != IntPtr.Zero) {
+						if (p.MainModule!.FileName == current.MainModule!.FileName && p.MainWindowHandle != IntPtr.Zero) {
 							target = p;
 							break;
 						}
@@ -207,7 +206,7 @@ internal class Program {
 				if (target != null) {
 					string[] commandLineArgs = Environment.GetCommandLineArgs();
 					if (commandLineArgs != null && commandLineArgs.Length > 1) {
-						string arg = null;
+						string? arg = null;
 						for (int j = 1; j < commandLineArgs.Length; j++) {
 							if (j == 1) {
 								arg += commandLineArgs[j];

@@ -454,7 +454,7 @@ internal class DBSaves {
 		List<int>[] danResults = new List<int>[7] { new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>() };
 
 		// Do not register plays for DanBuilder charts (no persistent unique ID)
-		if (choosenSong.uniqueId == null) return false;
+		if (choosenSong!.uniqueId == null) return false;
 
 		// Do not register the play if Dan/Tower and any mod is ON
 		if ((choosenDifficulty == (int)Difficulty.Tower || choosenDifficulty == (int)Difficulty.Dan) && !ModIcons.tPlayIsStock(player)) return false;
@@ -468,16 +468,16 @@ internal class DBSaves {
 			currentPlay.Artist = choosenSong.ldSubtitle.GetString(""); // There is no direct Artist tag on the .tja format, so we directly use the subtitle as a guess
 			currentPlay.PlayMods = ModIcons.tModsToPlayModsFlags(player);
 			currentPlay.ChartDifficulty = choosenDifficulty;
-			currentPlay.ChartLevel = choosenSong.score[choosenDifficulty].ChartInfo.nLevel[choosenDifficulty];
+			currentPlay.ChartLevel = choosenSong.score[choosenDifficulty]!.ChartInfo.nLevel[choosenDifficulty];
 			currentPlay.ClearStatus = clearStatus;
 			currentPlay.ScoreRank = scoreRank;
 			currentPlay.HighScore = chartScore.nScore;
 			if (choosenDifficulty == (int)Difficulty.Tower) currentPlay.TowerBestFloor = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor;
 			if (choosenDifficulty == (int)Difficulty.Dan) {
-				for (int i = 0; i < OpenTaiko.SongMount.rChoosenSong.DanSongs.Count; i++) {
+				for (int i = 0; i < OpenTaiko.SongMount.rChoosenSong!.DanSongs!.Count; i++) {
 					for (int j = 0; j < OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Dan_C.Length; j++) {
 						if (OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Dan_C[j] != null) {
-							int amount = OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Dan_C[j].Amount;
+							int amount = OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Dan_C[j]!.Amount;
 							danResults[j].Add(amount);
 						}
 					}
@@ -528,7 +528,7 @@ internal class DBSaves {
 						JsonConvert.DeserializeObject<List<int>>((string)reader["DanExam6"]) ?? new List<int> { -1 },
 						JsonConvert.DeserializeObject<List<int>>((string)reader["DanExam7"]) ?? new List<int> { -1 }
 					};
-					for (int i = 0; i < OpenTaiko.SongMount.rChoosenSong.DanSongs.Count; i++) {
+					for (int i = 0; i < OpenTaiko.SongMount.rChoosenSong!.DanSongs!.Count; i++) {
 						for (int j = 0; j < OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Dan_C.Length; j++) {
 							if (OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Dan_C[j] != null) {
 								int amount = danResults[j][i];
@@ -537,9 +537,9 @@ internal class DBSaves {
 									int current = oldDanResults[j][i];
 									if (current == -1) {
 										danResults[j][i] = amount;
-									} else if (OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Dan_C[j].ExamRange == Exam.Range.More) {
+									} else if (OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Dan_C[j]!.ExamRange == Exam.Range.More) {
 										danResults[j][i] = Math.Max(amount, current);
-									} else if (OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Dan_C[j].ExamRange == Exam.Range.Less) {
+									} else if (OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Dan_C[j]!.ExamRange == Exam.Range.Less) {
 										danResults[j][i] = Math.Min(amount, current);
 									}
 								}

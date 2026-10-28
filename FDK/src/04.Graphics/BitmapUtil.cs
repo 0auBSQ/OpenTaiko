@@ -40,7 +40,7 @@ public static class BitmapUtil {
 
 	// メソッド
 
-	public static unsafe SKBitmap ToBitmap(IntPtr pBITMAPINFOHEADER) {
+	public static unsafe SKBitmap? ToBitmap(IntPtr pBITMAPINFOHEADER) {
 		BITMAPFILEHEADER bitmapfileheader;
 		BITMAPINFOHEADER* bitmapinfoheaderPtr = (BITMAPINFOHEADER*)pBITMAPINFOHEADER;
 		bitmapfileheader.bfType = 0x4d42;

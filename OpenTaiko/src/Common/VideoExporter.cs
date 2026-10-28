@@ -413,7 +413,7 @@ internal static class VideoExporter {
 		if (src != 0) {
 			int mix = BassMix.CreateMixerStream(sampleRate, 2, BassFlags.Decode | BassFlags.Float | BassFlags.MixerEnd);
 			if (mix != 0) {
-				BassMix.MixerAddChannel(mix, src, BassFlags.MixerDownMix);
+				BassMix.MixerAddChannel(mix, src, BassFlags.MixerChanDownMix);
 				var chunks = new List<float[]>();
 				var buf = new float[sampleRate * 2];
 				long total = 0;
@@ -551,7 +551,7 @@ internal unsafe sealed class FFVideoWriter {
 	public FFVideoWriter(string path, int w, int h, int fps) {
 		Width = w; Height = h; _fps = fps; _path = path;
 		_worker = new Thread(WorkerMain) { Name = "ExportVideoEncoder", IsBackground = true };
-		_worker.SetApartmentState(ApartmentState.MTA);
+		if (OperatingSystem.IsWindows()) _worker.SetApartmentState(ApartmentState.MTA);
 		_worker.Start();
 		_ready.Wait();                                       // surface init failures synchronously
 		if (_error != null)

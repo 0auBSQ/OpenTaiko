@@ -31,7 +31,7 @@ public static class ConfigManager {
 		using (var stream = new System.IO.StreamReader(filePath, Encoding.UTF8)) {
 			json = stream.ReadToEnd();
 		}
-		return JsonConvert.DeserializeObject<T>(json, Settings);
+		return JsonConvert.DeserializeObject<T>(json, Settings)!;
 	}
 
 	public static T? JsonParse<T>(string json) where T : new() {
@@ -44,7 +44,7 @@ public static class ConfigManager {
 	/// <param name="obj">Object to serialize.</param>
 	/// <param name="filePath">File name.</param>
 	public static void SaveConfig(object obj, string filePath) {
-		(new FileInfo(filePath)).Directory.Create();
+		(new FileInfo(filePath)).Directory!.Create();
 		using (var stream = new System.IO.StreamWriter(filePath, false, Encoding.UTF8)) {
 			stream.Write(JsonConvert.SerializeObject(obj, Formatting.None, Settings));
 		}

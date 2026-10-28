@@ -73,7 +73,7 @@ class CSongReplay {
 	}
 
 	public CSongReplay(string ChartPath, int player) {
-		string _chartFolder = Path.GetDirectoryName(ChartPath);
+		string _chartFolder = Path.GetDirectoryName(ChartPath)!;
 		replayFolder = Path.Combine(_chartFolder, REPLAY_FOLDER_NAME);
 
 		storedPlayer = player;
@@ -130,16 +130,16 @@ class CSongReplay {
 	public void tDanInputSongResults(int songNo) {
 		if (songNo >= DanSongCount) return;
 		if (songNo < 0) return;
-		IndividualGoodCount[songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nGreat;
-		IndividualOkCount[songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nGood;
-		IndividualBadCount[songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nMiss;
-		IndividualRollCount[songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nRoll;
-		IndividualMaxCombo[songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nHighestCombo;
-		IndividualBoomCount[songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nMine;
-		IndividualADLibCount[songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nADLIB;
+		IndividualGoodCount![songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nGreat;
+		IndividualOkCount![songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nGood;
+		IndividualBadCount![songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nMiss;
+		IndividualRollCount![songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nRoll;
+		IndividualMaxCombo![songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nHighestCombo;
+		IndividualBoomCount![songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nMine;
+		IndividualADLibCount![songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nADLIB;
 		danAccumulatedScore = 0;
-		for (int acc = 0; acc < songNo; acc++) danAccumulatedScore += IndividualScore[acc];
-		IndividualScore[songNo] = (int)OpenTaiko.stageGameScreen.actScore.Get(0) - danAccumulatedScore;
+		for (int acc = 0; acc < songNo; acc++) danAccumulatedScore += IndividualScore![acc];
+		IndividualScore![songNo] = (int)OpenTaiko.stageGameScreen.actScore.Get(0) - danAccumulatedScore;
 	}
 
 	#endregion
@@ -184,14 +184,14 @@ class CSongReplay {
 						tDanRegisterSongCount(DanSongCount);
 					}
 					for (int i = 0; i < DanSongCount; i++) {
-						IndividualGoodCount[i] = reader.ReadInt32();
-						IndividualOkCount[i] = reader.ReadInt32();
-						IndividualBadCount[i] = reader.ReadInt32();
-						IndividualRollCount[i] = reader.ReadInt32();
-						IndividualMaxCombo[i] = reader.ReadInt32();
-						IndividualBoomCount[i] = reader.ReadInt32();
-						IndividualADLibCount[i] = reader.ReadInt32();
-						IndividualScore[i] = reader.ReadInt32();
+						IndividualGoodCount![i] = reader.ReadInt32();
+						IndividualOkCount![i] = reader.ReadInt32();
+						IndividualBadCount![i] = reader.ReadInt32();
+						IndividualRollCount![i] = reader.ReadInt32();
+						IndividualMaxCombo![i] = reader.ReadInt32();
+						IndividualBoomCount![i] = reader.ReadInt32();
+						IndividualADLibCount![i] = reader.ReadInt32();
+						IndividualScore![i] = reader.ReadInt32();
 					}
 					ClearStatus = reader.ReadByte();
 					ScoreRank = reader.ReadByte();
@@ -214,7 +214,7 @@ class CSongReplay {
 					RandomSeed = (GameVersion >= 601) ? reader.ReadInt32() : -1;
 				}
 			}
-		} catch (Exception ex) {
+		} catch (Exception) {
 
 		}
 	}
@@ -271,7 +271,7 @@ class CSongReplay {
 	}
 
 	// Reads a replay's metadata without decompressing the input log (seeks past it). Returns null on failure.
-	public static ReplayHeader tParseHeader(string optkrFilePath) {
+	public static ReplayHeader? tParseHeader(string optkrFilePath) {
 		try {
 			using var fs = new FileStream(optkrFilePath, FileMode.Open, FileAccess.Read);
 			using var r = new BinaryReader(fs);
@@ -313,7 +313,7 @@ class CSongReplay {
 	// Regular (GameMode 0) replays for a chart+difficulty, ranked by score (highest first), capped to topN.
 	// When chartPath is given, each header's ChecksumMismatch is set by comparing its stored chart md5 against
 	// the chart file's current md5 (a mismatch means the chart was edited after the play was recorded).
-	public static List<ReplayHeader> tListReplays(string songFolder, string uniqueId, int difficulty, int topN, string chartPath = null) {
+	public static List<ReplayHeader> tListReplays(string songFolder, string uniqueId, int difficulty, int topN, string? chartPath = null) {
 		var result = new List<ReplayHeader>();
 		try {
 			string dir = Path.Combine(songFolder, "Replay");
@@ -372,14 +372,14 @@ class CSongReplay {
 					writer.Write(RemainingLives);
 					writer.Write(DanSongCount);
 					for (int i = 0; i < DanSongCount; i++) {
-						writer.Write(IndividualGoodCount[i]);
-						writer.Write(IndividualOkCount[i]);
-						writer.Write(IndividualBadCount[i]);
-						writer.Write(IndividualRollCount[i]);
-						writer.Write(IndividualMaxCombo[i]);
-						writer.Write(IndividualBoomCount[i]);
-						writer.Write(IndividualADLibCount[i]);
-						writer.Write(IndividualScore[i]);
+						writer.Write(IndividualGoodCount![i]);
+						writer.Write(IndividualOkCount![i]);
+						writer.Write(IndividualBadCount![i]);
+						writer.Write(IndividualRollCount![i]);
+						writer.Write(IndividualMaxCombo![i]);
+						writer.Write(IndividualBoomCount![i]);
+						writer.Write(IndividualADLibCount![i]);
+						writer.Write(IndividualScore![i]);
 					}
 					writer.Write(ClearStatus);
 					writer.Write(ScoreRank);
@@ -501,13 +501,13 @@ class CSongReplay {
 		// Generation timestamp (in ticks)
 		Timestamp = DateTime.Now.Ticks;
 		// Compressed inputs and size
-		byte[] barr = ConvertTupleListToByteArray(allInputs);
+		byte[] barr = ConvertTupleListToByteArray(allInputs!);
 		CompressedInputs = SevenZip.Compression.LZMA.SevenZipHelper.Compress(barr);
 		CompressedInputsSize = CompressedInputs.Length;
 		// Chart metadata
 		ChartUniqueID = OpenTaiko.SongMount.rChoosenSong.uniqueId.data.id;
 		ChartDifficulty = (byte)OpenTaiko.SongMount.nChoosenSongDifficulty[storedPlayer];
-		ChartLevel = (byte)Math.Min(255, OpenTaiko.SongMount.rChoosenSong.score[ChartDifficulty].ChartInfo.nLevel[ChartDifficulty]);
+		ChartLevel = (byte)Math.Min(255, OpenTaiko.SongMount.rChoosenSong.score[ChartDifficulty]!.ChartInfo.nLevel[ChartDifficulty]);
 		// Online score ID used for online leaderboards linking, given by the server (Defaulted to 0 for now)
 		OnlineScoreID = 0;
 		// Note-shuffle seed used this play (so Random/Super-Random replays can be reproduced)
@@ -526,7 +526,7 @@ class CSongReplay {
 	public bool WarnChecksumMismatch;
 
 	// set the playback warnings by comparing this loaded replay against the chart it is about to be played on
-	public void tEvaluateWarnings(string currentChartPath) {
+	public void tEvaluateWarnings(string? currentChartPath) {
 		WarnOldVersion = GameVersion < STORED_GAME_VERSION;
 		string currentMd5 = string.IsNullOrEmpty(currentChartPath) ? "" : tComputeChartMd5(currentChartPath);
 		WarnChecksumMismatch = currentMd5 != "" && ChartChecksum != "" && !string.Equals(ChartChecksum, currentMd5, StringComparison.OrdinalIgnoreCase);
@@ -540,7 +540,7 @@ class CSongReplay {
 	private static EFunMods _snapFunMods;
 	private static ESpecialMod _snapSpecialMod;
 	private static int _snapJust, _snapScroll, _snapTimingZones, _snapSongSpeed, _snapSeed;
-	private static string _snapName;
+	private static string? _snapName;
 
 	// apply this replay's recorded mods to player 0 IN MEMORY (never exported to Config.ini), snapshotting first
 	public void tApplyVirtualMods() {
@@ -608,7 +608,7 @@ class CSongReplay {
 
 	#region [Helper variables]
 
-	private string chartPath;
+	private string? chartPath;
 	private string replayFolder;
 	private int storedPlayer;
 	private int danAccumulatedScore = 0;
@@ -628,11 +628,11 @@ class CSongReplay {
 	// Game version used for the replay
 	public int GameVersion;
 	// MD5 checksum of the chart
-	public string ChartChecksum;
+	public string ChartChecksum = null!;
 	// Player name
-	public string PlayerName;
+	public string PlayerName = null!;
 	// Replay hash
-	public string ReplayChecksum;
+	public string ReplayChecksum = null!;
 	/* Performance informations
 	 * - Good count (Int)
 	 * - Ok count (Int)
@@ -661,14 +661,14 @@ class CSongReplay {
 	public int RemainingLives = 0;
 	// Individual performance informations (Dan only)
 	public int DanSongCount = 0;
-	public int[] IndividualGoodCount;
-	public int[] IndividualOkCount;
-	public int[] IndividualBadCount;
-	public int[] IndividualRollCount;
-	public int[] IndividualMaxCombo;
-	public int[] IndividualBoomCount;
-	public int[] IndividualADLibCount;
-	public int[] IndividualScore;
+	public int[]? IndividualGoodCount;
+	public int[]? IndividualOkCount;
+	public int[]? IndividualBadCount;
+	public int[]? IndividualRollCount;
+	public int[]? IndividualMaxCombo;
+	public int[]? IndividualBoomCount;
+	public int[]? IndividualADLibCount;
+	public int[]? IndividualScore;
 	/* Clear status
 	 * - Regular :
 	 *  > 0 : Failed (None)
@@ -747,13 +747,13 @@ class CSongReplay {
 	// Size in bytes of the compressed inputs (replay data) array
 	public int CompressedInputsSize;
 	// Compressed inputs (replay data)
-	public byte[] CompressedInputs;
+	public byte[] CompressedInputs = null!;
 	/* Chart metadata
 	 * - Chart unique ID : String
 	 * - Chart difficulty : Byte (Between 0 and 6)
 	 * - Chart level : Byte (Rounded to 255, usually between 0 and 13)
 	 */
-	public string ChartUniqueID;
+	public string ChartUniqueID = null!;
 	public byte ChartDifficulty;
 	public byte ChartLevel;
 	// Online score ID used for online leaderboards linking, given by the server

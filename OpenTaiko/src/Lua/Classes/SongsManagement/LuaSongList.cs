@@ -22,7 +22,7 @@ namespace OpenTaiko {
 
 				#region [If a specific root genre folder is given, process a DFS to get the first potential root node found]
 
-				T? FindNode<T>(IEnumerable<T> roots, Func<T, bool> predicate, Func<T, IEnumerable<T>> childrenSelector) {
+				T? FindNode<T>(IEnumerable<T> roots, Func<T, bool> predicate, Func<T, IEnumerable<T>?> childrenSelector) {
 					foreach (var node in roots) {
 						if (predicate(node))
 							return node;
@@ -43,7 +43,7 @@ namespace OpenTaiko {
 					node => node.childrenList
 				);
 
-				if (_found != null) _scanningList = _found.childrenList;
+				if (_found != null) _scanningList = _found.childrenList!;
 
 				#endregion
 
@@ -249,7 +249,7 @@ namespace OpenTaiko {
 		public bool CloseFolder() {
 			if (_currentNode == null) return false;
 
-			if (!_currentNode.IsRoot && _currentNode.Parent.IsFolder && _currentNode.Parent.Opened) {
+			if (!_currentNode.IsRoot && _currentNode.Parent!.IsFolder && _currentNode.Parent.Opened) {
 				_currentNode = _currentNode.Parent;
 				_currentNode.Opened = false;
 				_currentPage = GetCurrentPage();
@@ -307,7 +307,7 @@ namespace OpenTaiko {
 			virtualFolder.AppendChildInternal(MakeBack());
 			int songCount = 0;
 			foreach (var song in songs) {
-				virtualFolder.AppendChildInternal(new LuaSongNode(song.InternalNode, virtualFolder, false, _settings));
+				virtualFolder.AppendChildInternal(new LuaSongNode(song.InternalNode!, virtualFolder, false, _settings));
 				songCount++;
 				if (backBoxFrequency > 0 && songCount % backBoxFrequency == 0)
 					virtualFolder.AppendChildInternal(MakeBack());
@@ -359,7 +359,7 @@ namespace OpenTaiko {
 			int songCount = 0;
 			foreach (var song in songs) {
 				// Re-wrap so _parent = virtualFolder → Siblings returns the virtual page
-				var rewrapped = new LuaSongNode(song.InternalNode, virtualFolder, false, _settings);
+				var rewrapped = new LuaSongNode(song.InternalNode!, virtualFolder, false, _settings);
 				virtualFolder.AppendChildInternal(rewrapped);
 				songCount++;
 				if (backBoxFrequency > 0 && songCount % backBoxFrequency == 0)
@@ -376,7 +376,7 @@ namespace OpenTaiko {
 			// Navigate into the virtual folder
 			virtualFolder.Opened = true;
 			_currentNode = virtualFolder.Child(0);
-			_currentPage = _currentNode.Siblings;   // = virtualFolder.Children directly
+			_currentPage = _currentNode!.Siblings;   // = virtualFolder.Children directly
 			return true;
 		}
 

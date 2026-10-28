@@ -284,8 +284,8 @@ public static class CConfigOptionBuilder {
 		int ns = OpenTaiko.Skin.strSystemSkinSubfolders?.Length ?? 0;
 		int nb = OpenTaiko.Skin.strBoxDefSkinSubfolders?.Length ?? 0;
 		var folders = new string[ns + nb];
-		for (int i = 0; i < ns; i++) folders[i] = OpenTaiko.Skin.strSystemSkinSubfolders[i];
-		for (int i = 0; i < nb; i++) folders[ns + i] = OpenTaiko.Skin.strBoxDefSkinSubfolders[i];
+		for (int i = 0; i < ns; i++) folders[i] = OpenTaiko.Skin.strSystemSkinSubfolders![i];
+		for (int i = 0; i < nb; i++) folders[ns + i] = OpenTaiko.Skin.strBoxDefSkinSubfolders![i];
 		Array.Sort(folders);
 		_skinSubFolders = folders;
 		string[] names = CSkin.GetSkinName(folders);

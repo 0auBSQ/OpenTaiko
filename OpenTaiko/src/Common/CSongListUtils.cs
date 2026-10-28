@@ -25,7 +25,7 @@ internal class CActSelectSongList {
 				++nowIndex;
 			}
 			if (e.nodeType == CSongListNode.ENodeType.BOX && (!useOpenFlag || e.bIsOpenFolder)) {
-				var (n, idx) = GetFromFlattenList(e.childrenList, useOpenFlag, index - nowIndex, wrap: false, node: node);
+				var (n, idx) = GetFromFlattenList(e.childrenList!, useOpenFlag, index - nowIndex, wrap: false, node: node);
 				if (n != null)
 					return (n, nowIndex + idx);
 				nowIndex += idx;

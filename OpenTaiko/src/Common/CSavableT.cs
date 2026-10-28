@@ -1,10 +1,10 @@
 ﻿namespace OpenTaiko;
 
-class CSavableT<T> where T : new() {
+class CSavableT<T> where T : notnull, new() {
 	public virtual string _fn {
 		get;
 		protected set;
-	}
+	} = null!;
 	public void tDBInitSavable() {
 		// iOS: the app bundle is read-only, so writes go to the Documents copy (ResolveWritePath). Seed
 		// it once from any existing/bundled file (ResolveAssetPath) so a shipped default isn't lost.

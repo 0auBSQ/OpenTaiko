@@ -49,7 +49,7 @@ internal abstract class CActFIFOBase : CActivity {
 
 	#region [ private ]
 	//-----------------
-	protected CCounter counter;
+	protected CCounter counter = null!;
 	protected EFIFOMode mode;
 	//-----------------
 	#endregion

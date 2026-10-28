@@ -67,7 +67,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	public virtual System.Collections.Generic.IEnumerator<float> ActivateSteps() {
 		ScenePreset = HScenePreset.GetBGPreset();
 
-		OpenTaiko.HttpEventReporter.ReportGameplayStart();
+		OpenTaiko.HttpEventReporter!.ReportGameplayStart();
 
 		// a #SONGJUMP left pending by a play that ended another way must not reach this one
 		OpenTaiko.SongMount.bSongJumpPending = false;
@@ -94,7 +94,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		}
 
 
-		for (int index = OpenTaiko.TJA.listChip.Count - 1; index >= 0; index--) {
+		for (int index = OpenTaiko.TJA!.listChip.Count - 1; index >= 0; index--) {
 			if (OpenTaiko.TJA.listChip[index].nChannelNo == 0x01) {
 				this.bgmlength = OpenTaiko.TJA.listChip[index].GetDuration() + OpenTaiko.TJA.listChip[index].nSoundTimems;
 				break;
@@ -103,7 +103,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 
 		this.AIBattleSections = new List<AIBattleSection>();
 
-		CChip endChip = null;
+		CChip? endChip = null;
 		for (int i = 0; i < listChip[0].Count; i++) {
 			CChip chip = listChip[0][i];
 			if (endChip == null || (chip.dbSoundTimems > endChip.dbSoundTimems && chip.nChannelNo is 0x50 or 0xFF)) {
@@ -113,7 +113,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 				break;
 		}
 
-		int battleSectionCount = 3 + (int)((endChip.dbSoundTimems * 2) / 100000);
+		int battleSectionCount = 3 + (int)((endChip!.dbSoundTimems * 2) / 100000);
 		// Avoid single section
 		if (battleSectionCount <= 1)
 			battleSectionCount = 3;
@@ -248,10 +248,10 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 				if (pChip.nChannelNo == 0xDA) {
 					pChip.bHit = true;
 					//						Trace.TraceInformation( "first [DA] BAR=" + pChip.n発声位置 / 384 + " ch=" + pChip.nチャンネル番号.ToString( "x2" ) + ", wav=" + pChip.n整数値 + ", time=" + pChip.n発声時刻ms );
-					if (listWAV.TryGetValue(pChip.nIntValue_InternalNumber, out CTja.CWAV wc)) {
+					if (listWAV.TryGetValue(pChip.nIntValue_InternalNumber, out CTja.CWAV? wc)) {
 						for (int i = 0; i < nPolyphonicSounds; i++) {
 							if (wc.rSound[i] != null) {
-								OpenTaiko.SoundManager.AddMixer(wc.rSound[i], OpenTaiko.ConfigIni.SongPlaybackSpeed, pChip.bPlayEndAfterPlaybackContinuesChip);
+								OpenTaiko.SoundManager.AddMixer(wc.rSound[i]!, OpenTaiko.ConfigIni.SongPlaybackSpeed, pChip.bPlayEndAfterPlaybackContinuesChip);
 								//AddMixer( wc.rSound[ i ] );		// 最初はqueueを介さず直接ミキサー登録する
 							}
 						}
@@ -265,7 +265,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 
 		// Note
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-			this.DanSongScore = new CBRANCHSCORE[OpenTaiko.SongMount.rChoosenSong.DanSongs.Count];
+			this.DanSongScore = new CBRANCHSCORE[OpenTaiko.SongMount.rChoosenSong!.DanSongs!.Count];
 			for (int i = 0; i < this.DanSongScore.Length; ++i)
 				this.DanSongScore[i] = new();
 		} else {
@@ -435,7 +435,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	}
 
 	private void CalculateGen4ShinUchiScoreParameters_Dan() {
-		this.nNoteCount_Dan = new int[OpenTaiko.SongMount.rChoosenSong.DanSongs.Count];
+		this.nNoteCount_Dan = new int[OpenTaiko.SongMount.rChoosenSong!.DanSongs!.Count];
 		this.nBalloonHitCount_Dan = new int[OpenTaiko.SongMount.rChoosenSong.DanSongs.Count];
 		this.nRollTimeMs_Dan = new double[OpenTaiko.SongMount.rChoosenSong.DanSongs.Count];
 		this.nAddScoreGen4ShinUchi_Dan = new double[OpenTaiko.SongMount.rChoosenSong.DanSongs.Count];
@@ -620,7 +620,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 
 
 
-	protected struct stmixer {
+	protected struct STMixer {
 		internal bool bIsAdd;
 		internal CSound csound;
 		internal bool bPlayEndAfterPlaybackContinuesChip;
@@ -732,37 +732,36 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		}
 	}
 
-	public CActPlayAVI actAVI;
-	public Rainbow Rainbow;
-	public CActPlayComboCommon actCombo;
+	public CActPlayAVI actAVI = null!;
+	public Rainbow Rainbow = null!;
+	public CActPlayComboCommon actCombo = null!;
 	//protected CActFIFOBlack actFI;
-	public CActFIFOStart actFI;
-	protected CActFIFOBase actFO;
-	protected CActFIFOBlack actFOBlack;
-	protected CActFIFOResult actFOClear;
-	public CActPlayGaugeCommon actGauge;
+	public CActFIFOStart actFI = null!;
+	protected CActFIFOBase actFO = null!;
+	protected CActFIFOBlack actFOBlack = null!;
+	protected CActFIFOResult actFOClear = null!;
+	public CActPlayGaugeCommon actGauge = null!;
 
-	public CActImplDancer actDancer;
-	protected CActImplJudgeText actJudgeString;
-	public TaikoLaneFlash actTaikoLaneFlash;
-	public CActPlayPanelString actPanel;
-	public CActPlayPlayInfo actPlayInfo;
-	public CActPlayScoreCommon actScore;
-	protected CActTaikoScrollSpeed actScrollSpeed;
-	protected CActImplRoll actRoll;
-	public CActImplBalloon actBalloon;
-	public CActImplCharacter actChara;
-	protected CActImplRollEffect actRollChara;
-	protected CActImplComboBalloon actComboBalloon;
-	protected CActPlayComboSound actComboVoice;
-	protected CActPlayPauseMenu actPauseMenu;
-	public CActImplChipEffects actChipEffects;
-	public CActImplFooter actFooter;
-	public CActImplRunner actRunner;
-	public CActImplMob actMob;
-	public Dan_Cert actDan;
-	public AIBattle actAIBattle;
-	public CActImplTrainingMode actTokkun;
+	public CActImplDancer actDancer = null!;
+	protected CActImplJudgeText actJudgeString = null!;
+	public TaikoLaneFlash actTaikoLaneFlash = null!;
+	public CActPlayPanelString actPanel = null!;
+	public CActPlayPlayInfo actPlayInfo = null!;
+	public CActPlayScoreCommon actScore = null!;
+	protected CActTaikoScrollSpeed actScrollSpeed = null!;
+	protected CActImplRoll actRoll = null!;
+	public CActImplBalloon actBalloon = null!;
+	public CActImplCharacter actChara = null!;
+	protected CActImplRollEffect actRollChara = null!;
+	protected CActImplComboBalloon actComboBalloon = null!;
+	protected CActPlayComboSound actComboVoice = null!;
+	protected CActPlayPauseMenu actPauseMenu = null!;
+	public CActImplChipEffects actChipEffects = null!;
+	public CActImplFooter actFooter = null!;
+	public CActImplRunner actRunner = null!;
+	public CActImplMob actMob = null!;
+	public Dan_Cert actDan = null!;
+	public AIBattle actAIBattle = null!;
 	public bool bPAUSE;
 	// Tracks time since last Resume() to enforce a 1-second anti-buffering cooldown on pause re-open.
 	// Initialized with a high elapsed value so the first pause is never blocked.
@@ -805,7 +804,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	public bool hasChipBeenPlayed(int chipListIndex, int iPlayer)
 		=> hasChipBeenPlayedAt(chipListIndex, nCurrentTopChip[iPlayer]);
 
-	protected volatile Queue<stmixer> queueMixerSound = new(64); // #24820 2013.1.21 yyagi まずは単純にAdd/Removeを1個のキューでまとめて管理するやり方で設計する
+	protected volatile Queue<STMixer> queueMixerSound = new(64); // #24820 2013.1.21 yyagi まずは単純にAdd/Removeを1個のキューでまとめて管理するやり方で設計する
 	protected DateTime dtLastQueueOperation;                //
 	protected bool bIsDirectSound;                          //
 	protected bool bValidScore;
@@ -899,10 +898,10 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	public int nLoopCount_Clear;
 	protected int[,] nScore = new int[5, 11]; // [iPlayer, comboLevel]
 	protected int[] nHand = new int[5];
-	protected CSound[] soundRed = new CSound[5];
-	protected CSound[] soundBlue = new CSound[5];
-	protected CSound[] soundAdlib = new CSound[5];
-	protected CSound[] soundClap = new CSound[5];
+	protected CSound?[] soundRed = new CSound?[5];
+	protected CSound?[] soundBlue = new CSound?[5];
+	protected CSound?[] soundAdlib = new CSound?[5];
+	protected CSound?[] soundClap = new CSound?[5];
 	public bool isMultiPlay; // 2016.08.21 kairera0467 表示だけ。
 	protected Stopwatch sw = new();     // 2011.6.13 最適化検討用のストップウォッチ
 	protected System.Runtime.GCLatencyMode gclatencymode;   // saved GC latency mode, restored on DeActivate
@@ -937,7 +936,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		public bool IsAnimated;
 	}
 
-	public List<AIBattleSection> AIBattleSections;
+	public List<AIBattleSection> AIBattleSections = null!;
 
 	public int NowAIBattleSectionCount;
 	public int NowAIBattleSectionTime;
@@ -983,7 +982,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	}
 
 	public void AddMixer(CSound cs, bool _bPlayEndAfterPlaybackContinuesChip) {
-		stmixer stm = new stmixer() {
+		STMixer stm = new STMixer() {
 			bIsAdd = true,
 			csound = cs,
 			bPlayEndAfterPlaybackContinuesChip = _bPlayEndAfterPlaybackContinuesChip
@@ -992,7 +991,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		//		Debug.WriteLine( "★Queue: add " + Path.GetFileName( stm.csound.strファイル名 ));
 	}
 	public void RemoveMixer(CSound cs) {
-		stmixer stm = new stmixer() {
+		STMixer stm = new STMixer() {
 			bIsAdd = false,
 			csound = cs,
 			bPlayEndAfterPlaybackContinuesChip = false
@@ -1009,7 +1008,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 			if (ts.TotalMilliseconds > 7) {
 				for (int i = 0; i < 2 && queueMixerSound.Count > 0; i++) {
 					dtLastQueueOperation = dtnow;
-					stmixer stm = queueMixerSound.Dequeue();
+					STMixer stm = queueMixerSound.Dequeue();
 					if (stm.bIsAdd) {
 						OpenTaiko.SoundManager.AddMixer(stm.csound, OpenTaiko.ConfigIni.SongPlaybackSpeed, stm.bPlayEndAfterPlaybackContinuesChip);
 					} else {
@@ -1046,7 +1045,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		// Diff = Dan and current song is Normal or Easy
 		if (diff == (int)Difficulty.Dan) {
 			int _nb = OpenTaiko.stageGameScreen.actDan.NowShowingNumber;
-			var _danSongs = OpenTaiko.SongMount.rChoosenSong.DanSongs;
+			var _danSongs = OpenTaiko.SongMount.rChoosenSong!.DanSongs!;
 
 			if (_nb < _danSongs.Count) {
 				var _currentDiff = _danSongs[_nb].Difficulty;
@@ -1410,7 +1409,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	protected bool bDrumSoundPlayedOnArrival;
 
 	protected void StartHitNoteLaneFlash(int iPlayer, NotesManager.EInputType input, EGameType gt) {
-		this.actTaikoLaneFlash.PlayerLane[iPlayer].Start(NotesManager.InputToLane(input), gt);
+		this.actTaikoLaneFlash.PlayerLane[iPlayer]!.Start(NotesManager.InputToLane(input), gt);
 	}
 
 	private void AutoplaySwitchHand(int iPlayer) {
@@ -1427,9 +1426,9 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 				this.actRoll.tFrameDisplayTimeExtend(nPlayer, true);
 			else
 				this.actRoll.tFrameDisplayTimeExtend(nPlayer, false);
-			if (this.actRoll.ctRollAnime[nPlayer].IsUnEnded) {
+			if (this.actRoll.ctRollAnime[nPlayer]!.IsUnEnded) {
 				this.actRoll.ctRollAnime[nPlayer] = new CCounter(0, 9, 14, OpenTaiko.Timer);
-				this.actRoll.ctRollAnime[nPlayer].CurrentValue = 1;
+				this.actRoll.ctRollAnime[nPlayer]!.CurrentValue = 1;
 			} else {
 				this.actRoll.ctRollAnime[nPlayer] = new CCounter(0, 9, 14, OpenTaiko.Timer);
 			}
@@ -1671,7 +1670,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 					OpenTaiko.stageGameScreen.actChipFireD.Start(pChip, gt, eJudgeResult, false, nPlayer);
 					this.soundAdlib[nPlayer]?.PlayStart(TjaTimeToFrameworkTime(tja, msHitTjaTime));
 					this.StartHitNoteLaneFlash(nPlayer, nNowInput, gt);
-					this.actTaikoLaneFlash.PlayerLane[nPlayer].Start(PlayerLane.FlashType.Hit, gt);
+					this.actTaikoLaneFlash.PlayerLane[nPlayer]!.Start(PlayerLane.FlashType.Hit, gt);
 					if (!isDeniedJudgeCount) {
 					this.CChartScore[nPlayer].nADLIB++;
 					this.CSectionScore[nPlayer].nADLIB++;
@@ -1723,7 +1722,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 					OpenTaiko.stageGameScreen.actLaneTaiko.Start(pChip, gt, eJudgeResult, isBigInput, nPlayer);
 					OpenTaiko.stageGameScreen.actChipFireD.Start(pChip, gt, eJudgeResult, isBigInput, nPlayer);
 					if (eJudgeResult is not ENoteJudge.Poor) {
-						this.actTaikoLaneFlash.PlayerLane[nPlayer].Start(PlayerLane.FlashType.Hit, gt);
+						this.actTaikoLaneFlash.PlayerLane[nPlayer]!.Start(PlayerLane.FlashType.Hit, gt);
 						OpenTaiko.stageGameScreen.FlyingNotes.Start(NotesManager.GetFlyNoteType(pChip, gt, isBigInput), gt, nPlayer);
 					}
 					OpenTaiko.stageGameScreen.actBackground.AddHit(nPlayer, NotesManager.GetFlyNoteType(pChip, gt, isBigInput), LuaBackgroundState.JudgeName(eJudgeResult));
@@ -1871,7 +1870,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	}
 
 	private void UpdateJudgeCount(CChip? pChip, int nPlayer, bool bAutoPlay, bool bBombHit, ENoteJudge eJudgeResult, bool leftMax, int? msDelta = null) {
-		OpenTaiko.HttpEventReporter.ReportNoteJudgement(eJudgeResult, nPlayer, pChip, msDelta);
+		OpenTaiko.HttpEventReporter!.ReportNoteJudgement(eJudgeResult, nPlayer, pChip, msDelta);
 
 		void returnChara() {
 			CCharacter character = CCharacter.GetCharacter(nPlayer);
@@ -2074,7 +2073,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	private void AddScore(CChip pChip, int nPlayer, ENoteJudge eJudgeResult) {
 		if ((eJudgeResult != ENoteJudge.Miss) && (eJudgeResult != ENoteJudge.Bad) && (eJudgeResult != ENoteJudge.Poor) && (NotesManager.IsMissableNote(pChip))) {
 			int nCombos = this.actCombo.nCurrentCombo[nPlayer];
-			long nInit = OpenTaiko.TJA.PlayerSideMetadata.nScoreInit[0];
+			long nInit = OpenTaiko.TJA!.PlayerSideMetadata.nScoreInit[0];
 			long nDiff = OpenTaiko.TJA.PlayerSideMetadata.nScoreDiff;
 			long nAddScore = 0;
 
@@ -2398,14 +2397,14 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		if (!this.bPAUSE) {
 			this.tInputProcess_Drums();
 
-			CTja tja = OpenTaiko.TJA;
+			CTja? tja = OpenTaiko.TJA;
 
 			// Individual offset
 			if (keyboard.KeyPressed((int)SlimDXKeys.Key.UpArrow) && (keyboard.KeyPressing((int)SlimDXKeys.Key.RightShift) || keyboard.KeyPressing((int)SlimDXKeys.Key.LeftShift))) {    // shift (+ctrl) + UpArrow (BGMAdjust)
-				OpenTaiko.TJA.tEachAutoPlaySoundChipPlaybackTimeChange((keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl) || keyboard.KeyPressing((int)SlimDXKeys.Key.RightControl)) ? 1 : 10);
+				OpenTaiko.TJA!.tEachAutoPlaySoundChipPlaybackTimeChange((keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl) || keyboard.KeyPressing((int)SlimDXKeys.Key.RightControl)) ? 1 : 10);
 				OpenTaiko.TJA.tWavePlaybackPositionAutoCorrection();
 			} else if (keyboard.KeyPressed((int)SlimDXKeys.Key.DownArrow) && (keyboard.KeyPressing((int)SlimDXKeys.Key.RightShift) || keyboard.KeyPressing((int)SlimDXKeys.Key.LeftShift))) {   // shift + DownArrow (BGMAdjust)
-				OpenTaiko.TJA.tEachAutoPlaySoundChipPlaybackTimeChange((keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl) || keyboard.KeyPressing((int)SlimDXKeys.Key.RightControl)) ? -1 : -10);
+				OpenTaiko.TJA!.tEachAutoPlaySoundChipPlaybackTimeChange((keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl) || keyboard.KeyPressing((int)SlimDXKeys.Key.RightControl)) ? -1 : -10);
 				OpenTaiko.TJA.tWavePlaybackPositionAutoCorrection();
 			}
 			// Tokkun only
@@ -2504,7 +2503,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 
 		#region [ Minus & Equals Sound Group Level ]
 		KeyboardSoundGroupLevelControlHandler.Handle(
-			keyboard, OpenTaiko.SoundGroupLevelController, OpenTaiko.Skin, false);
+			keyboard, OpenTaiko.SoundGroupLevelController!, OpenTaiko.Skin, false);
 		#endregion
 		this.PublishLiveDrums(); // a pause or quit started this frame stops the drum sounds of later presses
 	}
@@ -2537,15 +2536,15 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		if (now - this.msLastBgmDriftCheck < msBgmDriftCheckInterval) return;
 		this.msLastBgmDriftCheck = now;
 
-		CTja tja = OpenTaiko.TJA;
+		CTja? tja = OpenTaiko.TJA;
 		if (tja?.listWAV == null) return;
 
 		long worst = 0;
 		foreach (CTja.CWAV wc in tja.listWAV.Values) {
 			// same "long sound" gate as tWavePlaybackPositionAutoCorrection
-			if (wc.rSound[0] == null || wc.rSound[0].TotalPlayTime < 5000) continue;
+			if (wc.rSound[0] == null || wc.rSound[0]!.TotalPlayTime < 5000) continue;
 			for (int i = 0; i < wc.rSound.Length; i++) {
-				CSound snd = wc.rSound[i];
+				CSound? snd = wc.rSound[i];
 				if (snd == null || !snd.IsPlaying) continue;
 				long expected = now - wc.nPlaybackStartTime[i] + wc.nInitialSeekMs;
 				long timelineLength = (long)(snd.TotalPlayTime / Math.Max(0.01, snd.Frequency * snd.PlaySpeed));
@@ -2572,16 +2571,16 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		this.bPAUSE = true;
 		SoundManager.PlayTimer.Pause();
 		OpenTaiko.Timer.Pause();
-		OpenTaiko.TJA.tAllChipPlaybackPause();
+		OpenTaiko.TJA!.tAllChipPlaybackPause();
 		// every running video of the drawn chart, so that one hidden under another does not run ahead
-		foreach (var vd in OpenTaiko.TJA.listVD.Values) {
+		foreach (var vd in OpenTaiko.TJA.listVD!.Values) {
 			if (vd.bPlaying)
 				vd.Pause();
 		}
 	}
 
 	public void Resume(long? msStartGameTime = null) {
-		OpenTaiko.TJA.tAllChipPlaybackReOpen();
+		OpenTaiko.TJA!.tAllChipPlaybackReOpen();
 		OpenTaiko.Timer.Resume();
 		msStartGameTime ??= OpenTaiko.Timer.NowTimeMs; // target time defaults to pre-pause time
 		OpenTaiko.Timer.Reset(); // reset internal pause timer
@@ -2590,7 +2589,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		SoundManager.PlayTimer.Reset();
 		SoundManager.PlayTimer.NowTimeMs = OpenTaiko.Timer.NowTimeMs; // sync with game time
 
-		foreach (var vd in OpenTaiko.TJA.listVD.Values) {
+		foreach (var vd in OpenTaiko.TJA.listVD!.Values) {
 			if (vd.bDrawing && !vd.bPlaying)
 				vd.Resume();
 		}
@@ -2685,10 +2684,10 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 			this.actPanel.Draw();
 		}
 	protected void tPanelStringSettings() {
-		var panelString = string.IsNullOrEmpty(OpenTaiko.TJA.PANEL) ? OpenTaiko.TJA.TITLE.GetString("") : OpenTaiko.TJA.PANEL;
+		var panelString = string.IsNullOrEmpty(OpenTaiko.TJA!.PANEL) ? OpenTaiko.TJA.TITLE.GetString("") : OpenTaiko.TJA.PANEL;
 
 		this.actPanel.SetPanelString(panelString,
-			OpenTaiko.SongMount.rChoosenSong.songGenrePanel,
+			OpenTaiko.SongMount.rChoosenSong!.songGenrePanel,
 			OpenTaiko.Skin.Game_StageText,
 			songNode: OpenTaiko.SongMount.rChoosenSong);
 	}
@@ -2933,7 +2932,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 						pChip.bHit = true;
 						// the videos are the drawn chart's: the other players' charts only mark the chip
 						if (configIni.bEnableAVI && ReferenceEquals(dTX, OpenTaiko.TJA)) {
-							if ((dTX.listVD.TryGetValue(pChip.nIntValue_InternalNumber, out CVideoDecoder vd))) {
+							if ((dTX.listVD!.TryGetValue(pChip.nIntValue_InternalNumber, out CVideoDecoder? vd))) {
 								ShowVideo = true;
 								if (vd != null) {
 									this.actAVI.Start(vd);
@@ -2948,7 +2947,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 					if (!this.bPAUSE && !pChip.bHit) { // can't play while paused
 						pChip.bHit = true;
 						if (configIni.bEnableAVI && ReferenceEquals(dTX, OpenTaiko.TJA)) {
-							dTX.listVD.TryGetValue(1, out CVideoDecoder? vdMain);
+							dTX.listVD!.TryGetValue(1, out CVideoDecoder? vdMain);
 							if (dTX.listVD.ContainsKey(pChip.nIntValue_InternalNumber)) {
 								ShowVideo = false;
 								// stops the video on screen, unless it is the main one
@@ -3040,7 +3039,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 						if (this.IsChartEnded())
 							this.UpdateClearAnimation(nPlayer);
 						if (ListDan_Number != 0 && actDan.FirstSectionAnime) {
-							if (this.actDan.GetFailedAllChallenges(OpenTaiko.SongMount.rChoosenSong.DanSongs)) {
+							if (this.actDan.GetFailedAllChallenges(OpenTaiko.SongMount.rChoosenSong!.DanSongs!)) {
 								this.nCurrentTopChip[nPlayer] = tja.listChip.Count - 1;   // 終端にシーク
 								IsDanFailed = true;
 								finishedPlaying = true;
@@ -3248,10 +3247,10 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 						pChip.bHit = true;
 
 						if (OpenTaiko.Tx.trackedTextures.ContainsKey(pChip.strTargetTxName)) {
-							OpenTaiko.Tx.trackedTextures.TryGetValue(pChip.strTargetTxName, out CTexture oldTx);
-							dTX.listTextures.TryGetValue(pChip.strNewPath, out CTexture newTx);
+							OpenTaiko.Tx.trackedTextures.TryGetValue(pChip.strTargetTxName, out CTexture? oldTx);
+							dTX.listTextures.TryGetValue(pChip.strNewPath, out CTexture? newTx);
 
-							newTx.Opacity = oldTx.Opacity;
+							newTx!.Opacity = oldTx!.Opacity;
 							newTx.fZAxisCenterRotate = oldTx.fZAxisCenterRotate;
 							newTx.vcScaleRatio = oldTx.vcScaleRatio;
 
@@ -3264,10 +3263,10 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 						pChip.bHit = true;
 
 						if (OpenTaiko.Tx.trackedTextures.ContainsKey(pChip.strTargetTxName)) {
-							OpenTaiko.Tx.trackedTextures.TryGetValue(pChip.strTargetTxName, out CTexture oldTx);
-							dTX.listOriginalTextures.TryGetValue(pChip.strTargetTxName, out CTexture originalTx);
+							OpenTaiko.Tx.trackedTextures.TryGetValue(pChip.strTargetTxName, out CTexture? oldTx);
+							dTX.listOriginalTextures.TryGetValue(pChip.strTargetTxName, out CTexture? originalTx);
 
-							originalTx.Opacity = oldTx.Opacity;
+							originalTx!.Opacity = oldTx!.Opacity;
 							originalTx.fZAxisCenterRotate = oldTx.fZAxisCenterRotate;
 							originalTx.vcScaleRatio = oldTx.vcScaleRatio;
 
@@ -3281,7 +3280,6 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 						string[] split = pChip.strConfigValue.Split('=');
 
 						//TJAPlayer3.Skin.t文字列から読み込み(pChip.strConfigValue, split[0]);
-						bConfigUpdated = true;
 					}
 					break;
 				case 0xd4: //start object animation
@@ -3339,12 +3337,12 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 					if (!pChip.bHit) {
 						//Debug.WriteLine( "[DA(AddMixer)] BAR=" + pChip.n発声位置 / 384 + " ch=" + pChip.nチャンネル番号.ToString( "x2" ) + ", wav=" + pChip.n整数値.ToString( "x2" ) + ", time=" + pChip.n発声時刻ms );
 						pChip.bHit = true;
-						if (listWAV.TryGetValue(pChip.nIntValue_InternalNumber, out CTja.CWAV wc)) // 参照が遠いので後日最適化する
+						if (listWAV.TryGetValue(pChip.nIntValue_InternalNumber, out CTja.CWAV? wc)) // 参照が遠いので後日最適化する
 						{
 							for (int i = 0; i < nPolyphonicSounds; i++) {
 								if (wc.rSound[i] != null) {
 									//CDTXMania.Sound管理.AddMixer( wc.rSound[ i ] );
-									AddMixer(wc.rSound[i], pChip.bPlayEndAfterPlaybackContinuesChip);
+									AddMixer(wc.rSound[i]!, pChip.bPlayEndAfterPlaybackContinuesChip);
 								}
 							}
 						}
@@ -3356,14 +3354,14 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 					if (!pChip.bHit) {
 						//Debug.WriteLine( "[DB(RemoveMixer)] BAR=" + pChip.n発声位置 / 384 + " ch=" + pChip.nチャンネル番号.ToString( "x2" ) + ", wav=" + pChip.n整数値.ToString( "x2" ) + ", time=" + pChip.n発声時刻ms );
 						pChip.bHit = true;
-						if (listWAV.TryGetValue(pChip.nIntValue_InternalNumber, out CTja.CWAV wc)) // 参照が遠いので後日最適化する
+						if (listWAV.TryGetValue(pChip.nIntValue_InternalNumber, out CTja.CWAV? wc)) // 参照が遠いので後日最適化する
 						{
 							for (int i = 0; i < nPolyphonicSounds; i++) {
 								if (wc.rSound[i] != null) {
 									//CDTXMania.Sound管理.RemoveMixer( wc.rSound[ i ] );
-									if (!wc.rSound[i].bPlayEndAfterPlaybackContinuesChip)   // #32248 2013.10.16 yyagi
+									if (!wc.rSound[i]!.bPlayEndAfterPlaybackContinuesChip)   // #32248 2013.10.16 yyagi
 									{                                                           // DTX終了後も再生が続くチップの0xDB登録をなくすことはできず。
-										RemoveMixer(wc.rSound[i]);                          // (ミキサー解除のタイミングが遅延する場合の対応が面倒なので。)
+										RemoveMixer(wc.rSound[i]!);                          // (ミキサー解除のタイミングが遅延する場合の対応が面倒なので。)
 									}                                                           // そこで、代わりにフラグをチェックしてミキサー削除ロジックへの遷移をカットする。
 								}
 							}
@@ -3508,9 +3506,9 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 						if (pChip.nIntValue_InternalNumber != 0) { // 0: last note past, 0xFF: song end
 							finishedPlaying = true;
 							if (OpenTaiko.ConfigIni.bTokkunMode) {
-								foreach (CTja.CWAV cwav in OpenTaiko.TJA.listWAV.Values) {
+								foreach (CTja.CWAV cwav in OpenTaiko.TJA!.listWAV.Values) {
 									for (int i = 0; i < nPolyphonicSounds; i++) {
-										if ((cwav.rSound[i] != null) && cwav.rSound[i].IsPlaying) {
+										if ((cwav.rSound[i] != null) && cwav.rSound[i]!.IsPlaying) {
 											finishedPlaying = false;
 											break;
 										}
@@ -4311,17 +4309,17 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	}
 
 	public void tReload() {
-		OpenTaiko.TJA.tStopAllChipsAndRemoveFromMixer();
+		OpenTaiko.TJA!.tStopAllChipsAndRemoveFromMixer();
 		this.eFadeOutCompleteWhenReturnValue = EGameplayScreenReturnValue.ReloadAndReplay;
 		base.ePhaseID = CStage.EPhase.Game_Reload;
 		this.bPAUSE = false;
 	}
 
 	public void tPlayRetry() {
-		OpenTaiko.HttpEventReporter.ReportGameplayStart();
-		OpenTaiko.TJA.tStopAllChipsAndRemoveFromMixer();
+		OpenTaiko.HttpEventReporter!.ReportGameplayStart();
+		OpenTaiko.TJA!.tStopAllChipsAndRemoveFromMixer();
 		//this.actAVI.Stop();
-		foreach (var vd in OpenTaiko.TJA.listVD) {
+		foreach (var vd in OpenTaiko.TJA.listVD!) {
 			vd.Value.Stop();
 			vd.Value.dbPlaySpeed = OpenTaiko.ConfigIni.SongPlaybackSpeed;   // Dynamic Beat may have changed it
 		}
@@ -4339,8 +4337,8 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	}
 
 	public void tStop() {
-		OpenTaiko.TJA.tStopAllChipsAndRemoveFromMixer();
-		foreach (var vd in OpenTaiko.TJA.listVD) {
+		OpenTaiko.TJA!.tStopAllChipsAndRemoveFromMixer();
+		foreach (var vd in OpenTaiko.TJA.listVD!) {
 			vd.Value.Stop();
 		}
 		this.actAVI.Stop();
@@ -4548,7 +4546,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		this.objHandlers.Clear();
 
 		this.actAVI.rVD = null;
-		if ((OpenTaiko.TJA.listVD.TryGetValue(1, out CVideoDecoder vd2))) {
+		if ((OpenTaiko.TJA!.listVD!.TryGetValue(1, out CVideoDecoder? vd2))) {
 			ShowVideo = true;
 		} else {
 			ShowVideo = false;
@@ -4562,7 +4560,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	// returns the chip index at the target measure of the first player
 	public (int idxChip, long msStartGameTime) tPlayPositionChange(int nStartBar) {
 		// まず全サウンドオフにする
-		OpenTaiko.TJA.tStopAllChips();
+		OpenTaiko.TJA!.tStopAllChips();
 		this.actAVI.Stop();
 		if (OpenTaiko.TJA == null) return (0, 0); //CDTXがnullの場合はプレイヤーが居ないのでその場で処理終了
 
@@ -4630,18 +4628,18 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 						if (!((nDuration > 0) && (nStartTime <= nSoundTimems + nDuration)))
 							continue;
 
-						CTja.CWAV wc;
+						CTja.CWAV? wc;
 						bool b = tjai.listWAV.TryGetValue(pChip.nIntValue_InternalNumber, out wc);
 						if (!b) continue;
 
-						if ((wc.bIsBGMSound && OpenTaiko.ConfigIni.bBGMPlayVoiceSound) || (!wc.bIsBGMSound)) {
+						if ((wc!.bIsBGMSound && OpenTaiko.ConfigIni.bBGMPlayVoiceSound) || (!wc.bIsBGMSound)) {
 							tjai.tChipPlayback(pChip, SoundManager.PlayTimer.GameTimeToSystemTime(nSoundTimems));
 							#region [ PAUSEする ]
 							int j = wc.nCurrentPlaybackSoundNumber;
 							if (wc.rSound[j] != null) {
-								wc.rSound[j].Pause();
-								wc.rSound[j].tSetPosition(nStartTime - nSoundTimems);
-								pausedCSound.Add(wc.rSound[j]);
+								wc.rSound[j]!.Pause();
+								wc.rSound[j]!.tSetPosition(nStartTime - nSoundTimems);
+								pausedCSound.Add(wc.rSound[j]!);
 							}
 							#endregion
 						}
@@ -4696,8 +4694,8 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	protected abstract void tProgressDraw_Chip_MeasureLine(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer, double nowTime, bool bBranch);
 	protected void tProgressDraw_ChipAnime() {
 		for (int i = 0; i < 5; i++) {
-			ctChipAnime[i].TickLoopDB();
-			ctChipAnimeLag[i].Tick();
+			ctChipAnime[i]!.TickLoopDB();
+			ctChipAnimeLag[i]!.Tick();
 		}
 	}
 
@@ -4749,7 +4747,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	protected void tBackgroundTextureCreate(string DefaultBgFilename, Rectangle bgrect, string bgfilename) {
 		try {
 			if (!String.IsNullOrEmpty(bgfilename))
-				this.txBgImage = OpenTaiko.tTextureCreate(OpenTaiko.SongMount.rChosenScore.FileInfo.FolderAbsolutePath + bgfilename);
+				this.txBgImage = OpenTaiko.tTextureCreate(OpenTaiko.SongMount.rChosenScore!.FileInfo.FolderAbsolutePath + bgfilename);
 			else
 				this.txBgImage = OpenTaiko.tTextureCreate(CSkin.Path(DefaultBgFilename));
 		} catch (Exception e) {
@@ -4811,7 +4809,6 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		// -1だった場合、その前を引き継ぐ。
 		int nInit = scoreInit != -1 ? scoreInit : this.nScore[iPlayer, 0];
 		int nDiff = scoreDiff != -1 ? scoreDiff : this.nScore[iPlayer, 1] - this.nScore[iPlayer, 0];
-		int nAddScore = 0;
 		int[] nScale = { 0, 1, 2, 4, 8 };
 
 		if (this.scoreMode[iPlayer] == 1) {
@@ -4834,6 +4831,5 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	private Dictionary<string, (CChip chip, int player, Action<float> setter)> objHandlers = new();
 
 	public bool[] bCustomDoron = new bool[OpenTaiko.MAX_PLAYERS];
-	private bool bConfigUpdated = false;
 	#endregion
 }

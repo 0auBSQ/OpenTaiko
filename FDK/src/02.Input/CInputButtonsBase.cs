@@ -22,11 +22,11 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 	//-----------------
 	public Silk.NET.Input.IInputDevice? Device { get; protected set; }
 	public InputDeviceType CurrentType { get; protected set; }
-	public string GUID { get; protected set; }
+	public string GUID { get; protected set; } = null!;
 	public int ID { get; set; }
-	public string Name { get; protected set; }
+	public string Name { get; protected set; } = null!;
 	public List<STInputEvent> InputEvents { get; protected set; }
-	public string strDeviceName { get; set; }
+	public string? strDeviceName { get; set; }
 
 	public void Polling(bool accumulate = false) {
 		// clear previous input buffer

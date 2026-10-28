@@ -81,7 +81,7 @@ internal class CActImplMob : CActivity {
 	}
 	#region[ private ]
 	//-----------------
-	public LuaBackgroundWrapper MobScript { get; private set; }
+	public LuaBackgroundWrapper? MobScript { get; private set; }
 	private readonly LuaBackgroundState _state = new();
 	//-----------------
 	#endregion

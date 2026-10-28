@@ -103,13 +103,13 @@ internal class CItemBase {
 		this.ePanelType = ePanelType;
 		this.strDescriptionText = (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ja") ? strDescriptionjp : strDescriptionen;
 	}
-	public virtual object objCurrentValue() {
+	public virtual object? objCurrentValue() {
 		return null;
 	}
 
 	public string tGetValueText() {
-		object value = objCurrentValue();
-		return value == null ? "" : value.ToString();
+		object? value = objCurrentValue();
+		return value == null ? "" : value.ToString()!;
 	}
 	public virtual int GetIndex() {
 		return 0;

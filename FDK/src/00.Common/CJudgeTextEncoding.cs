@@ -7,7 +7,7 @@ public class CJudgeTextEncoding {
 	/// <summary>
 	/// Hnc8様のReadJEncを使用して文字コードの判別をする。
 	/// </summary>
-	public static Encoding JudgeFileEncoding(string path) {
+	public static Encoding? JudgeFileEncoding(string path) {
 		if (!File.Exists(path)) return null;
 		Encoding enc;
 		FileInfo file = new FileInfo(path);
@@ -34,7 +34,7 @@ public class CJudgeTextEncoding {
 	/// </summary>
 	/// <param name="path"></param>
 	/// <returns></returns>
-	public static string ReadTextFile(string path) {
+	public static string? ReadTextFile(string path) {
 		if (!File.Exists(path)) return null;
 		string? str = null;
 		FileInfo file = new FileInfo(path);

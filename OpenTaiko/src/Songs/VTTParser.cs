@@ -42,7 +42,6 @@ public class VTTParser {
 
 	private bool isUsingLang = false;
 
-	private bool _isDisposed;
 
 	public VTTParser() { }
 
@@ -287,7 +286,7 @@ public class VTTParser {
 								break;
 						}
 					}
-					string betterDecode(string sourceText) {
+					string betterDecode(string? sourceText) {
 						if (sourceText == null) return "";
 						string decodeResult = "";
 						for (int i = 0; i < sourceText.Length; i++) {

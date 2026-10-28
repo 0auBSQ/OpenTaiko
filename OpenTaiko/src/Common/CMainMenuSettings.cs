@@ -11,12 +11,12 @@
 		}
 
 		public class MenuSettings {
-			public CLocalizationData StageName;
-			public CLocalizationData StageDescription;
-			public string StageType;
-			public string LuaStageName;
+			public CLocalizationData? StageName;
+			public CLocalizationData? StageDescription;
+			public string? StageType;
+			public string? LuaStageName;
 			public bool Restricted1P;
-			public string LEGACY_MenuBoxColor;
+			public string? LEGACY_MenuBoxColor;
 		}
 	}
 }

@@ -15,7 +15,7 @@ public class CTraceLogListener : TraceListener {
 			}
 		}
 	}
-	public override void TraceEvent(TraceEventCache eventCache, string source, TraceEventType eventType, int id, string message) {
+	public override void TraceEvent(TraceEventCache? eventCache, string source, TraceEventType eventType, int id, string? message) {
 		if (this.LogStreamWriter != null) {
 			try {
 				this.LogEventType(eventType);
@@ -25,17 +25,17 @@ public class CTraceLogListener : TraceListener {
 			}
 		}
 	}
-	public override void TraceEvent(TraceEventCache eventCache, string source, TraceEventType eventType, int id, string format, params object[] args) {
+	public override void TraceEvent(TraceEventCache? eventCache, string source, TraceEventType eventType, int id, string? format, params object?[]? args) {
 		if (this.LogStreamWriter != null) {
 			try {
 				this.LogEventType(eventType);
 				this.LogIndent();
-				this.LogStreamWriter.WriteLine(string.Format(format, args));
+				this.LogStreamWriter.WriteLine(string.Format(format!, args!));
 			} catch (ObjectDisposedException) {
 			}
 		}
 	}
-	public override void Write(string message) {
+	public override void Write(string? message) {
 		if (this.LogStreamWriter != null) {
 			try {
 				this.LogStreamWriter.Write(message);
@@ -43,7 +43,7 @@ public class CTraceLogListener : TraceListener {
 			}
 		}
 	}
-	public override void WriteLine(string message) {
+	public override void WriteLine(string? message) {
 		if (this.LogStreamWriter != null) {
 			try {
 				this.LogStreamWriter.WriteLine(message);
@@ -65,7 +65,7 @@ public class CTraceLogListener : TraceListener {
 
 	#region [ private ]
 	//-----------------
-	private StreamWriter LogStreamWriter;
+	private StreamWriter? LogStreamWriter;
 
 	private void LogEventType(TraceEventType eventType) {
 		if (this.LogStreamWriter != null) {

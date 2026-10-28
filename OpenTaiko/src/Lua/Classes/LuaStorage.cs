@@ -36,7 +36,7 @@ namespace OpenTaiko {
 			string root = Path.GetFullPath(DirPath);
 			if (!fullPath.StartsWith(root, StringComparison.OrdinalIgnoreCase)) return false;
 			try {
-				string dir = Path.GetDirectoryName(fullPath);
+				string? dir = Path.GetDirectoryName(fullPath);
 				if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
 				File.WriteAllText(fullPath, contents);
 				return true;
@@ -44,7 +44,7 @@ namespace OpenTaiko {
 		}
 
 		/// <summary>Read a file's raw text (under the stage dir, or an absolute path), or null if missing.</summary>
-		public string ReadText(string name) {
+		public string? ReadText(string name) {
 			try {
 				string full = Path.IsPathRooted(name) ? name : Path.Combine(DirPath, name);
 				return File.Exists(full) ? File.ReadAllText(full) : null;
@@ -52,7 +52,7 @@ namespace OpenTaiko {
 		}
 
 		/// <summary>Absolute path of a file under the stage directory (for display), or null.</summary>
-		public string GetFullPath(string name) {
+		public string? GetFullPath(string name) {
 			if (string.IsNullOrEmpty(name) || Path.IsPathRooted(name)) return null;
 			return Path.GetFullPath(Path.Combine(DirPath, name));
 		}
@@ -86,9 +86,9 @@ namespace OpenTaiko {
 		/// code .txt). Falls back to opening the containing folder. Windows/macOS/Linux. Returns true on success.</summary>
 		public bool RevealInExplorer(string name) {
 			try {
-				string full = GetFullPath(name);
+				string? full = GetFullPath(name);
 				if (full == null) return false;
-				string dir = Path.GetDirectoryName(full);
+				string? dir = Path.GetDirectoryName(full);
 				if (File.Exists(full) && OperatingSystem.IsWindows())
 					System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo { FileName = "explorer.exe", Arguments = "/select,\"" + full + "\"", UseShellExecute = true });
 				else if (File.Exists(full) && OperatingSystem.IsMacOS())

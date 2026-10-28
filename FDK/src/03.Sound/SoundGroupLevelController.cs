@@ -84,11 +84,11 @@ public sealed class SoundGroupLevelController {
 		sound.GroupLevel = (int)(_levelBySoundGroup[sound.SoundGroup] * (_levelBySoundGroup[ESoundGroup.Master] / 100.0));
 	}
 
-	private void SoundsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+	private void SoundsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) {
 		switch (e.Action) {
 			case NotifyCollectionChangedAction.Add:
 			case NotifyCollectionChangedAction.Replace:
-				foreach (CSound sound in e.NewItems) {
+				foreach (CSound sound in e.NewItems!) {
 					SetLevel(sound);
 				}
 				break;
@@ -109,5 +109,5 @@ public sealed class SoundGroupLevelController {
 		public int Level { get; private set; }
 	}
 
-	public event EventHandler<LevelChangedEventArgs> LevelChanged;
+	public event EventHandler<LevelChangedEventArgs>? LevelChanged;
 }

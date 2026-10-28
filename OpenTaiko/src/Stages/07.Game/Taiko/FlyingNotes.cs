@@ -99,7 +99,7 @@ internal class FlyingNotes : CActivity {
 				} else {
 					// the shown gameplay background can make the notes land on its own art
 					bool toBackground = OpenTaiko.stageGameScreen.actBackground.FlyTarget(state.Player, out double bgX, out double bgY);
-					state.OldValue = state.Counter.CurrentValue;
+					state.OldValue = state.Counter!.CurrentValue;
 					state.Counter.Tick();
 					if (state.Counter.IsEnded) {
 						state.Counter.Stop();
@@ -194,7 +194,7 @@ internal class FlyingNotes : CActivity {
 		public EGameType GameType;
 		public int Player;
 		public bool IsUsing;
-		public CCounter Counter;
+		public CCounter? Counter;
 		public int OldValue;
 		public double X;
 		public double Y;

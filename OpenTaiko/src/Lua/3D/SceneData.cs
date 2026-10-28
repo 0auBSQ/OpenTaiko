@@ -18,7 +18,7 @@ namespace OpenTaiko {
 		public double MinX, MinY, MinZ, MaxX, MaxY, MaxZ;   // in the object's own space: Transform moves them
 		public double CenX, CenY, CenZ, Radius;   // bounding sphere, precomputed whenever the bounds change (cull hot path)
 		public bool HasNormal; public double Nx, Ny, Nz; // axis-aligned planar back-face cull
-		public double[] Transform;    // null = identity (row-major 4x4 for models)
+		public double[]? Transform;    // null = identity (row-major 4x4 for models)
 		public int Material = -1;     // raytracer material id (-1 = use a default); rasterizer ignores
 		public bool Lit = true;       // rasterizer forward lighting applies (false = render at shade only)
 		public bool CastShadow = true; // the object casts into the sun shadow map (false = UI markers/bubbles)
@@ -32,7 +32,7 @@ namespace OpenTaiko {
 		public double XrayAlpha;      // >0: sprites re-draw where occluded (depth-greater silhouette at this alpha)
 		public double FresnelF0 = -1; // screen-tex mirrors: per-pixel Schlick reflectivity (F0; <0 = legacy per-vertex shade)
 		public double DeepR = -1, DeepG, DeepB;   // screen-tex water: deep colour (vShade lerps base→deep; DeepR<0 = off)
-		public string SurfaceSrc;     // screen-tex surfaces: optional CUSTOM fragment shader source
+		public string? SurfaceSrc;     // screen-tex surfaces: optional CUSTOM fragment shader source
 		                              // (replaces the built-in ripple/fresnel path; null = built-in)
 		// TERRAIN SPLAT shading (GPU): blend 4 layer textures per pixel by a weight sprite instead
 		// of the per-quad dominant texture (smooth painted paths). SplatSprite < 0 = off.

@@ -22,10 +22,10 @@ namespace OpenTaiko {
 		// Node/Skinned: which scene node placed this primitive (glTF node TRS applies to non-skinned
 		// meshes; skinned meshes are posed purely by their joints per the glTF spec). Node -1 = raw
 		// (legacy models whose meshes are not referenced by any node).
-		private sealed class Prim { public float[] Pos, Uv, Wt; public int[] Jt, Idx; public int Mat; public int Node = -1; public bool Skinned; }
+		private sealed class Prim { public float[] Pos = null!, Uv = null!, Wt = null!; public int[] Jt = null!, Idx = null!; public int Mat; public int Node = -1; public bool Skinned; }
 		private sealed class Node { public double[] T = {0,0,0}; public double[] R = {0,0,0,1}; public double[] S = {1,1,1}; public int[] Children = Array.Empty<int>(); }
 		// Path 0=T,1=R,2=S; Interp 0=LINEAR,1=STEP,2=CUBICSPLINE (3 values per key: in-tangent, value, out-tangent)
-		private sealed class Channel { public int Path, Stride, Interp; public double[] Times; public float[] Vals; }
+		private sealed class Channel { public int Path, Stride, Interp; public double[] Times = null!; public float[] Vals = null!; }
 		// ByNode[node]: the channels that animate that node, in file order (null when none)
 		private sealed class Anim { public string Name = ""; public double Dur; public Channel[][] ByNode = Array.Empty<Channel[]>(); }
 
@@ -56,7 +56,7 @@ namespace OpenTaiko {
 
 		// per-material decoded base-colour TEXTURE (null = flat colour). Transparent texels are encoded
 		// as NEGATIVE ints — the engine's cutout convention across both renderers.
-		private int[][] _matPix; private int[] _matTexW, _matTexH;
+		private int[][]? _matPix; private int[]? _matTexW, _matTexH;
 
 		// material m is texture TexBase(scene) + m, in the scene's block for this model file
 		private int TexBase(Lua3DScene scene) => scene.ModelTextureBase(_key, Math.Max(1, _matRgb.Length));
@@ -66,7 +66,7 @@ namespace OpenTaiko {
 			int tb = TexBase(scene);
 			for (int m = 0; m < _matRgb.Length; m++) {
 				if (_matPix != null && _matPix[m] != null) {     // real base-colour texture (VRM etc.)
-					scene.RegisterTexturePixels(tb + m, _matPix[m], _matTexW[m], _matTexH[m]);
+					scene.RegisterTexturePixels(tb + m, _matPix[m], _matTexW![m], _matTexH![m]);
 					continue;
 				}
 				int rgb = _matRgb[m];
@@ -105,7 +105,7 @@ namespace OpenTaiko {
 			int nv = pr.Pos.Length / 3;
 			EnsureSkin(nv);
 			bool skin = pr.Skinned && _bone.Length > 0;
-			double[] g = (!skin && pr.Node >= 0 && pr.Node < _global.Length) ? _global[pr.Node] : null;
+			double[]? g = (!skin && pr.Node >= 0 && pr.Node < _global.Length) ? _global[pr.Node] : null;
 			for (int v = 0; v < nv; v++) {
 				double px = pr.Pos[v*3], py = pr.Pos[v*3+1], pz = pr.Pos[v*3+2];
 				double ax, ay, az;
@@ -576,9 +576,9 @@ namespace OpenTaiko {
 						if (!prim.TryGetProperty("indices", out var idxA)) continue;   // non-indexed: skip (rare)
 						var pr = new Prim {
 							Pos = ReadF(posA.GetInt32(), 3),
-							Uv  = att.TryGetProperty("TEXCOORD_0", out var uvA) ? ReadF(uvA.GetInt32(), 2) : null,
-							Wt  = att.TryGetProperty("WEIGHTS_0", out var wA) ? ReadF(wA.GetInt32(), 4) : null,
-							Jt  = att.TryGetProperty("JOINTS_0", out var jA) ? ReadI(jA.GetInt32()) : null,
+							Uv  = att.TryGetProperty("TEXCOORD_0", out var uvA) ? ReadF(uvA.GetInt32(), 2) : null!,
+							Wt  = att.TryGetProperty("WEIGHTS_0", out var wA) ? ReadF(wA.GetInt32(), 4) : null!,
+							Jt  = att.TryGetProperty("JOINTS_0", out var jA) ? ReadI(jA.GetInt32()) : null!,
 							Idx = ReadI(idxA.GetInt32()),
 							Mat = prim.TryGetProperty("material", out var mi) ? mi.GetInt32() : 0,
 						};
@@ -663,7 +663,7 @@ namespace OpenTaiko {
 			if (root.TryGetProperty("animations", out var animsEl)) {
 				int nodeCount = g._nodes.Length;
 				foreach (var an in animsEl.EnumerateArray()) {
-					var a = new Anim { Name = an.TryGetProperty("name", out var nm) ? nm.GetString() : "anim" };
+					var a = new Anim { Name = an.TryGetProperty("name", out var nm) ? nm.GetString()! : "anim" };
 					var byNode = new List<Channel>[nodeCount];
 					var samplers = an.GetProperty("samplers");
 					foreach (var chEl in an.GetProperty("channels").EnumerateArray()) {
@@ -673,7 +673,7 @@ namespace OpenTaiko {
 						var samp = samplers[si];
 						var inF = ReadF(samp.GetProperty("input").GetInt32(), 1);
 						for (int k = 0; k < inF.Length; k++) if (inF[k] > a.Dur) a.Dur = inF[k];
-						string pathS = tgt.GetProperty("path").GetString();
+						string? pathS = tgt.GetProperty("path").GetString();
 						int pth = pathS == "translation" ? 0 : pathS == "rotation" ? 1 : pathS == "scale" ? 2 : -1;
 						int node = nodeEl.GetInt32();
 						if (pth < 0 || node < 0 || node >= nodeCount || inF.Length == 0) continue;

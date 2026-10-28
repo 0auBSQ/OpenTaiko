@@ -8,8 +8,8 @@ internal class CSystemError : CStage {
 	public bool GameCrashed = false;
 	public string ErrorMessage = "";
 
-	private CCachedFontRenderer _pfText = null;
-	private TitleTextureKey _ttkText = null;
+	private CCachedFontRenderer? _pfText = null;
+	private TitleTextureKey? _ttkText = null;
 
 	public enum Errno {
 		ENO_UNKNOWN = 0,

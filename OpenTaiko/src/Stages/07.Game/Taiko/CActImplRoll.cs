@@ -48,30 +48,30 @@ internal class CActImplRoll : CActivity {
 	public int OnProgressDraw(int nConsecutiveHitCount, int player) {
 		if (OpenTaiko.ConfigIni.nPlayerCount > 2) return base.Draw();
 
-		this.ctRollFrameCounter[player].Tick();
-		this.ctRollAnime[player].Tick();
-		FadeOut[player].Tick();
+		this.ctRollFrameCounter[player]!.Tick();
+		this.ctRollAnime[player]!.Tick();
+		FadeOut[player]!.Tick();
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			//CDTXMania.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, this.ct連打枠カウンター[player].n現在の値.ToString());
-			if (this.ctRollFrameCounter[player].IsUnEnded) {
-				if (ctRollFrameCounter[player].CurrentValue > 66 && !FadeOut[player].Counter.IsTicked) {
-					FadeOut[player].Start();
+			if (this.ctRollFrameCounter[player]!.IsUnEnded) {
+				if (ctRollFrameCounter[player]!.CurrentValue > 66 && !FadeOut[player]!.Counter.IsTicked) {
+					FadeOut[player]!.Start();
 				}
-				var opacity = (int)FadeOut[player].GetAnimation();
+				var opacity = (int)FadeOut[player]!.GetAnimation();
 
 				int numberOpacity = 255;
-				if (ctRollFrameCounter[player].CurrentValue == 0 || ctRollFrameCounter[player].CurrentValue == 60) {
+				if (ctRollFrameCounter[player]!.CurrentValue == 0 || ctRollFrameCounter[player]!.CurrentValue == 60) {
 					bNowRollAnime = 0;
 					numberOpacity = 64;
-				} else if (ctRollFrameCounter[player].CurrentValue == 1 || ctRollFrameCounter[player].CurrentValue == 59) {
+				} else if (ctRollFrameCounter[player]!.CurrentValue == 1 || ctRollFrameCounter[player]!.CurrentValue == 59) {
 					bNowRollAnime = 1;
 					numberOpacity = 128;
-				} else if (ctRollFrameCounter[player].CurrentValue == 2 || ctRollFrameCounter[player].CurrentValue == 58) {
+				} else if (ctRollFrameCounter[player]!.CurrentValue == 2 || ctRollFrameCounter[player]!.CurrentValue == 58) {
 					bNowRollAnime = 2;
 					numberOpacity = 192;
-				} else if (ctRollFrameCounter[player].CurrentValue == 3 || ctRollFrameCounter[player].CurrentValue == 57) {
+				} else if (ctRollFrameCounter[player]!.CurrentValue == 3 || ctRollFrameCounter[player]!.CurrentValue == 57) {
 					bNowRollAnime = 3;
-				} else if (ctRollFrameCounter[player].CurrentValue >= 4 || ctRollFrameCounter[player].CurrentValue <= 56) {
+				} else if (ctRollFrameCounter[player]!.CurrentValue >= 4 || ctRollFrameCounter[player]!.CurrentValue <= 56) {
 					bNowRollAnime = 4;
 				}
 				if (OpenTaiko.Tx.Balloon_Number_Roll != null) OpenTaiko.Tx.Balloon_Number_Roll.Opacity = numberOpacity;
@@ -93,21 +93,21 @@ internal class CActImplRoll : CActivity {
 	}
 
 	public void tFrameDisplayTimeExtend(int player, bool first) {
-		if ((this.ctRollFrameCounter[player].CurrentValue >= 6 && !first) || first)
+		if ((this.ctRollFrameCounter[player]!.CurrentValue >= 6 && !first) || first)
 			this.ctRollFrameCounter[player] = new CCounter(0, 60, 40, OpenTaiko.Timer);
 
 		if (!first)
-			this.ctRollFrameCounter[player].CurrentValue = 5;
+			this.ctRollFrameCounter[player]!.CurrentValue = 5;
 		else
-			this.ctRollFrameCounter[player].CurrentValue = 0;
+			this.ctRollFrameCounter[player]!.CurrentValue = 0;
 	}
 
 	public int bNowRollAnime;
-	public bool[] bDisplay;
-	public int[] nConsecutiveHitCount;
-	public CCounter[] ctRollFrameCounter = new CCounter[OpenTaiko.MAX_PLAYERS];
+	public bool[] bDisplay = null!;
+	public int[] nConsecutiveHitCount = null!;
+	public CCounter?[] ctRollFrameCounter = new CCounter[OpenTaiko.MAX_PLAYERS];
 
-	public CCounter[] ctRollAnime = new CCounter[OpenTaiko.MAX_PLAYERS];
+	public CCounter?[] ctRollAnime = new CCounter[OpenTaiko.MAX_PLAYERS];
 	private float[] RollScale = new float[]
 	{
 		0.000f,
@@ -121,7 +121,7 @@ internal class CActImplRoll : CActivity {
 		0.055f,
 		0.000f
 	};
-	private Animations.FadeOut[] FadeOut = new Animations.FadeOut[OpenTaiko.MAX_PLAYERS];
+	private Animations.FadeOut?[] FadeOut = new Animations.FadeOut[OpenTaiko.MAX_PLAYERS];
 
 	[StructLayout(LayoutKind.Sequential)]
 	private struct STTextPosition {
@@ -133,7 +133,7 @@ internal class CActImplRoll : CActivity {
 		if (OpenTaiko.Tx.Balloon_Number_Roll == null) return;
 
 		OpenTaiko.Tx.Balloon_Number_Roll.vcScaleRatio.X = OpenTaiko.Skin.Game_Balloon_Roll_Number_Scale;
-		OpenTaiko.Tx.Balloon_Number_Roll.vcScaleRatio.Y = OpenTaiko.Skin.Game_Balloon_Roll_Number_Scale + RollScale[this.ctRollAnime[nPlayer].CurrentValue];
+		OpenTaiko.Tx.Balloon_Number_Roll.vcScaleRatio.Y = OpenTaiko.Skin.Game_Balloon_Roll_Number_Scale + RollScale[this.ctRollAnime[nPlayer]!.CurrentValue];
 
 		int[] nums = CConversion.SeparateDigits(num);
 		for (int j = 0; j < nums.Length; j++) {

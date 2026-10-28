@@ -6,7 +6,7 @@ public class CStage : CActivity {
 	internal EStage eStageID;
 
 	// Only used if eStageID is EStage.CUSTOM
-	internal string customStageName;
+	internal string? customStageName;
 
 	public enum EStage {
 		None,

@@ -13,7 +13,6 @@ internal class CActImplBackground : CActivity {
 
 	public void tFadeIn(int player) {
 		//this.ct上背景クリアインタイマー[player] = new CCounter(0, 100, 2, TJAPlayer3.Timer);
-		this.eFadeMode = EFIFOMode.FadeIn;
 	}
 
 	//public void tFadeOut(int player)
@@ -516,31 +515,30 @@ internal class CActImplBackground : CActivity {
 	//private CTexture tx下背景クリアメイン;
 	//private CTexture tx下背景クリアサブ1;
 
-	public LuaBackgroundWrapper UpScript;
-	public LuaBackgroundWrapper DownScript;
+	public LuaBackgroundWrapper? UpScript;
+	public LuaBackgroundWrapper? DownScript;
 	private readonly LuaBackgroundState _state = new();
 
 	private static LuaROActivityWrapper? TowerHud => LuaROActivityWrapper.GetROActivity("tower_hud");
 
 	private int lastSeenFloor = 1;
 	private int currentCharacter;
-	private CCounter ctStandingAnimation;
-	private CCounter ctClimbingAnimation;
-	private CCounter ctRunningAnimation;
-	private CCounter ctClearAnimation;
-	private CCounter ctFailAnimation;
-	private CCounter ctStandTiredAnimation;
-	private CCounter ctClimbTiredAnimation;
-	private CCounter ctRunTiredAnimation;
-	private CCounter ctClearTiredAnimation;
-	private CCounter ctClimbDuration;
+	private CCounter ctStandingAnimation = null!;
+	private CCounter ctClimbingAnimation = null!;
+	private CCounter ctRunningAnimation = null!;
+	private CCounter ctClearAnimation = null!;
+	private CCounter ctFailAnimation = null!;
+	private CCounter ctStandTiredAnimation = null!;
+	private CCounter ctClimbTiredAnimation = null!;
+	private CCounter ctRunTiredAnimation = null!;
+	private CCounter ctClearTiredAnimation = null!;
+	private CCounter ctClimbDuration = null!;
 	private bool TowerFinished;
 
 
 	private bool IsUpNotFound;
 	private bool IsDownNotFound;
 
-	private EFIFOMode eFadeMode;
 	//-----------------
 	#endregion
 }

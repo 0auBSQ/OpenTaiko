@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace OpenTaiko {
 	public class LuaDiscordFunc {
-		private DateTime _lastUsage;
 		public void UpdateState(string state) {
 			OpenTaiko.DiscordClient?.UpdateState(state);
 		}

@@ -7,15 +7,15 @@ namespace OpenTaiko;
 internal class CActPlayScoreCommon : CActivity {
 	// Properties
 
-	protected double[] nCurrentRealScore;
-	protected long[] nCurrentlyDisplayedScore;
+	protected double[] nCurrentRealScore = null!;
+	protected long[] nCurrentlyDisplayedScore = null!;
 	//protected CTexture txScore;
 
 	//      protected CTexture txScore_1P;
-	protected CCounter ctTimer;
-	public CCounter[] ctPointsAnimeTimer;
+	protected CCounter ctTimer = null!;
+	public CCounter[] ctPointsAnimeTimer = null!;
 
-	public CCounter[] ctBonusAddTimer;
+	public CCounter[] ctBonusAddTimer = null!;
 	public int[] nBonusDanSong = new int[5]; // the dan song of the note whose 100-combo bonus is pending
 
 	protected STScore[] stScore;
@@ -289,13 +289,13 @@ internal class CActPlayScoreCommon : CActivity {
 						case 0:
 							if (OpenTaiko.Tx.Taiko_Score[0] != null) {
 								//this.txScore.color4 = new SlimDX.Color4( 1.0f, 1.0f, 1.0f );
-								OpenTaiko.Tx.Taiko_Score[0].Opacity = alpha;
+								OpenTaiko.Tx.Taiko_Score[0]!.Opacity = alpha;
 								if (OpenTaiko.ConfigIni.SimpleMode) {
-									OpenTaiko.Tx.Taiko_Score[0].vcScaleRatio.Y = 1;
+									OpenTaiko.Tx.Taiko_Score[0]!.vcScaleRatio.Y = 1;
 								} else {
-									OpenTaiko.Tx.Taiko_Score[0].vcScaleRatio.Y = ScoreScale[this.ctPointsAnimeTimer[player].CurrentValue];
+									OpenTaiko.Tx.Taiko_Score[0]!.vcScaleRatio.Y = ScoreScale[this.ctPointsAnimeTimer[player].CurrentValue];
 								}
-								OpenTaiko.Tx.Taiko_Score[0].t2DScaledBottomBasedDraw(x, y, rectangle);
+								OpenTaiko.Tx.Taiko_Score[0]!.t2DScaledBottomBasedDraw(x, y, rectangle);
 
 							}
 							break;
@@ -303,45 +303,45 @@ internal class CActPlayScoreCommon : CActivity {
 							if (OpenTaiko.Tx.Taiko_Score[1] != null) {
 								//this.txScore.color4 = new SlimDX.Color4( 1.0f, 0.5f, 0.4f );
 								//this.txScore.color4 = CDTXMania.Skin.cScoreColor1P;
-								OpenTaiko.Tx.Taiko_Score[1].Opacity = alpha;
-								OpenTaiko.Tx.Taiko_Score[1].vcScaleRatio.Y = 1;
-								OpenTaiko.Tx.Taiko_Score[1].t2DScaledBottomBasedDraw(x, y, rectangle);
+								OpenTaiko.Tx.Taiko_Score[1]!.Opacity = alpha;
+								OpenTaiko.Tx.Taiko_Score[1]!.vcScaleRatio.Y = 1;
+								OpenTaiko.Tx.Taiko_Score[1]!.t2DScaledBottomBasedDraw(x, y, rectangle);
 							}
 							break;
 						case 2:
 							if (OpenTaiko.Tx.Taiko_Score[2] != null) {
 								//this.txScore.color4 = new SlimDX.Color4( 0.4f, 0.5f, 1.0f );
 								//this.txScore.color4 = CDTXMania.Skin.cScoreColor2P;
-								OpenTaiko.Tx.Taiko_Score[2].Opacity = alpha;
-								OpenTaiko.Tx.Taiko_Score[2].vcScaleRatio.Y = 1;
-								OpenTaiko.Tx.Taiko_Score[2].t2DScaledBottomBasedDraw(x, y, rectangle);
+								OpenTaiko.Tx.Taiko_Score[2]!.Opacity = alpha;
+								OpenTaiko.Tx.Taiko_Score[2]!.vcScaleRatio.Y = 1;
+								OpenTaiko.Tx.Taiko_Score[2]!.t2DScaledBottomBasedDraw(x, y, rectangle);
 							}
 							break;
 						case 3:
 							if (OpenTaiko.Tx.Taiko_Score[3] != null) {
 								//this.txScore.color4 = new SlimDX.Color4( 0.4f, 0.5f, 1.0f );
 								//this.txScore.color4 = CDTXMania.Skin.cScoreColor2P;
-								OpenTaiko.Tx.Taiko_Score[3].Opacity = alpha;
-								OpenTaiko.Tx.Taiko_Score[3].vcScaleRatio.Y = 1;
-								OpenTaiko.Tx.Taiko_Score[3].t2DScaledBottomBasedDraw(x, y, rectangle);
+								OpenTaiko.Tx.Taiko_Score[3]!.Opacity = alpha;
+								OpenTaiko.Tx.Taiko_Score[3]!.vcScaleRatio.Y = 1;
+								OpenTaiko.Tx.Taiko_Score[3]!.t2DScaledBottomBasedDraw(x, y, rectangle);
 							}
 							break;
 						case 4:
 							if (OpenTaiko.Tx.Taiko_Score[4] != null) {
 								//this.txScore.color4 = new SlimDX.Color4( 0.4f, 0.5f, 1.0f );
 								//this.txScore.color4 = CDTXMania.Skin.cScoreColor2P;
-								OpenTaiko.Tx.Taiko_Score[4].Opacity = alpha;
-								OpenTaiko.Tx.Taiko_Score[4].vcScaleRatio.Y = 1;
-								OpenTaiko.Tx.Taiko_Score[4].t2DScaledBottomBasedDraw(x, y, rectangle);
+								OpenTaiko.Tx.Taiko_Score[4]!.Opacity = alpha;
+								OpenTaiko.Tx.Taiko_Score[4]!.vcScaleRatio.Y = 1;
+								OpenTaiko.Tx.Taiko_Score[4]!.t2DScaledBottomBasedDraw(x, y, rectangle);
 							}
 							break;
 						case 5:
 							if (OpenTaiko.Tx.Taiko_Score[5] != null) {
 								//this.txScore.color4 = new SlimDX.Color4( 0.4f, 0.5f, 1.0f );
 								//this.txScore.color4 = CDTXMania.Skin.cScoreColor2P;
-								OpenTaiko.Tx.Taiko_Score[5].Opacity = alpha;
-								OpenTaiko.Tx.Taiko_Score[5].vcScaleRatio.Y = 1;
-								OpenTaiko.Tx.Taiko_Score[5].t2DScaledBottomBasedDraw(x, y, rectangle);
+								OpenTaiko.Tx.Taiko_Score[5]!.Opacity = alpha;
+								OpenTaiko.Tx.Taiko_Score[5]!.vcScaleRatio.Y = 1;
+								OpenTaiko.Tx.Taiko_Score[5]!.t2DScaledBottomBasedDraw(x, y, rectangle);
 							}
 							break;
 					}

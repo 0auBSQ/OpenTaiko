@@ -97,7 +97,7 @@ internal class CActImplBalloon : CActivity {
 	}
 
 	public int OnProgressDraw(int nRollNorma, int nConsecutiveHitCount, int player, CChip chip, bool isTrainingPaused) {
-		this.ctBalloonBubbleAnime.TickLoop();
+		this.ctBalloonBubbleAnime!.TickLoop();
 		this.ctBalloonAnime[player].Tick();
 
 		//CDTXMania.act文字コンソール.tPrint( 0, 16, C文字コンソール.Eフォント種別.赤, this.ct風船終了.n現在の値.ToString() );
@@ -160,7 +160,7 @@ internal class CActImplBalloon : CActivity {
 						int h = sheet.szTextureSize.Height / 6;
 						sheet.t2DDraw(bx, y, new Rectangle(0, j * h, sheet.szTextureSize.Width, h));
 					} else if (OpenTaiko.Tx.Balloon_Breaking[j] != null)
-						OpenTaiko.Tx.Balloon_Breaking[j].t2DDraw(bx, y);
+						OpenTaiko.Tx.Balloon_Breaking[j]!.t2DDraw(bx, y);
 					break;
 				}
 			}
@@ -195,10 +195,10 @@ internal class CActImplBalloon : CActivity {
 	private readonly LuaBackgroundState _state = new();
 
 
-	private CCounter ctBalloonEnd;
-	private CCounter ctBalloonBubbleAnime;
+	private CCounter? ctBalloonEnd;
+	private CCounter? ctBalloonBubbleAnime;
 
-	public CCounter[] ctBalloonAnime;
+	public CCounter[] ctBalloonAnime = null!;
 	private float[] RollScale = new float[]
 	{
 		0.000f,

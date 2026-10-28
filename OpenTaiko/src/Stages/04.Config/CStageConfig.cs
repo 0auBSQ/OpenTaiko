@@ -43,7 +43,7 @@ internal class CStageConfig : CStage {
 			_osTimerOrg = OpenTaiko.ConfigIni.bUseOSTimer;
 
 			RebuildModel();
-			UI?.Activate(_model);   // hand the schema to the Lua config_ui ROActivity (it draws its own calm gradient bg)
+			UI?.Activate(_model!);   // hand the schema to the Lua config_ui ROActivity (it draws its own calm gradient bg)
 		} finally {
 			Trace.TraceInformation("コンフィグステージの活性化を完了しました。");
 			Trace.Unindent();
@@ -52,9 +52,9 @@ internal class CStageConfig : CStage {
 	}
 
 	private static LuaROActivityWrapper? UI => LuaROActivityWrapper.GetROActivity("config_ui");
-	private CLuaConfigModel _model;
-	private CConfigOptionBuilder.Hooks _hooks;
-	private string _skinOrg;
+	private CLuaConfigModel? _model;
+	private CConfigOptionBuilder.Hooks? _hooks;
+	private string _skinOrg = null!;
 	private float _renderOrg;
 	private int _soundTypeOrg, _bassBufOrg, _wasapiBufOrg, _asioOrg;
 	private bool _osTimerOrg;
@@ -63,7 +63,7 @@ internal class CStageConfig : CStage {
 		if (_hooks == null) {
 			_hooks = new CConfigOptionBuilder.Hooks {
 				// any other settings or texts changed → rebuild model + push reload to Lua
-				Refresh = () => { _model = CConfigOptionBuilder.Build(_hooks); UI?.Call("reload", _model); },
+				Refresh = () => { _model = CConfigOptionBuilder.Build(_hooks!); UI?.Call("reload", _model); },
 				Calibration = (onDone) => actCalibrationMode.Start(onDone),
 				ReloadSongs = () => tReloadSongs(false),
 				HardReloadSongs = () => tReloadSongs(true),
@@ -76,11 +76,11 @@ internal class CStageConfig : CStage {
 	private void tReloadSongs(bool hard) {
 		if (OpenTaiko.EnumSongs.IsEnumerating) {
 			OpenTaiko.EnumSongs.Abort();
-			OpenTaiko.actEnumSongs.DeActivate();
+			OpenTaiko.actEnumSongs!.DeActivate();
 		}
 		OpenTaiko.EnumSongs.StartEnumFromDisk(hard);
 		OpenTaiko.EnumSongs.ChangeEnumeratePriority(System.Threading.ThreadPriority.Normal);
-		OpenTaiko.actEnumSongs.bCommandSongDataGet = true;
+		OpenTaiko.actEnumSongs!.bCommandSongDataGet = true;
 		OpenTaiko.actEnumSongs.Activate();
 	}
 
@@ -180,7 +180,7 @@ internal class CStageConfig : CStage {
 					// C# owns input this frame: poll the device sweep for the key being bound
 					var (done, needRefresh) = _model.Keys.PollCaptureFrame();
 					if (needRefresh)
-						_hooks.Refresh();
+						_hooks!.Refresh();
 				} else {
 					// Lua handles nav/edit/cancel; returns "exit" at the top level, optionally with a transition name
 					// (like a Lua stage's Exit). A pending skin/sound reload keeps the plain fade.

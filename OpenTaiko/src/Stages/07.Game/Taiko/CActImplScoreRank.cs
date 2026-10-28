@@ -4,8 +4,6 @@ namespace OpenTaiko;
 
 class CActImplScoreRank : CActivity {
 	public override void Activate() {
-		double RollTimems = 0;
-
 		/*
         foreach (var chip in TJAPlayer3.DTX.listChip)
         {
@@ -45,7 +43,7 @@ class CActImplScoreRank : CActivity {
 	private void displayScoreRank(int i, int player, float x, float y, int mode = 0) {
 		CCounter cct = this.counter[player][i];
 
-		CTexture tex = OpenTaiko.Tx.ScoreRank;
+		CTexture? tex = OpenTaiko.Tx.ScoreRank;
 		if (mode == 1) // tower
 			tex = TowerResult_ScoreRankEffect;
 
@@ -176,7 +174,7 @@ class CActImplScoreRank : CActivity {
 				} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 					#region [Tower score ranks]
 
-					double progress = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor / ((double)OpenTaiko.SongMount.rChoosenSong.score[5].ChartInfo.nTotalFloor);
+					double progress = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor / ((double)OpenTaiko.SongMount.rChoosenSong!.score[5]!.ChartInfo.nTotalFloor);
 
 					bool[] conditions =
 					{
@@ -216,7 +214,7 @@ class CActImplScoreRank : CActivity {
 		return base.Draw();
 	}
 
-	private CTexture TowerResult_ScoreRankEffect;
+	private CTexture? TowerResult_ScoreRankEffect;
 
 	public int[][] ScoreRank = new int[5][];
 	private CCounter[][] counter = new CCounter[5][] {

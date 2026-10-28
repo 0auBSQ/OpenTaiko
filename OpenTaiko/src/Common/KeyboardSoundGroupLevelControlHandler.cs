@@ -31,7 +31,7 @@ internal static class KeyboardSoundGroupLevelControlHandler {
 		if (!(isAdjustmentPositive || isAdjustmentNegative)) return;
 
 		ESoundGroup soundGroup;
-		CSkin.CSystemSound SystemSound = null;
+		CSkin.CSystemSound? SystemSound = null;
 
 		if (keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl) ||
 			keyboard.KeyPressing((int)SlimDXKeys.Key.RightControl)) {

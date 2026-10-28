@@ -63,13 +63,13 @@ internal class DBSongUnlockables : CSavableT<Dictionary<string, SongUnlockable>>
 		public EHiddenIndex hiddenIndex;
 
 		[JsonProperty("Rarity")]
-		public string rarity;
+		public string rarity = null!;
 
 		[JsonProperty("UnlockCondition")]
-		public CUnlockCondition unlockConditions;
+		public CUnlockCondition unlockConditions = null!;
 
 		[JsonProperty("CustomUnlockText")]
-		public CLocalizationData customUnlockText;
+		public CLocalizationData customUnlockText = null!;
 
 		public string GetUnlockMessage() {
 			return customUnlockText.GetString(unlockConditions.tConditionMessage(CUnlockCondition.EScreen.SongSelect));
@@ -97,7 +97,7 @@ internal class DBSongUnlockables : CSavableT<Dictionary<string, SongUnlockable>>
 						new Modal(
 							Modal.EModalType.Song,
 							HRarity.tRarityToModalInt(item.Value.rarity),
-							new LuaSongNode(_node)
+							new LuaSongNode(_node!)
 						),
 						_player);
 

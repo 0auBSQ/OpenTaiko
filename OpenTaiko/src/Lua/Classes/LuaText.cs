@@ -149,7 +149,7 @@ namespace OpenTaiko {
 		}
 
 		internal LuaText Create(int size, string[] style, bool autoDispose) {
-			LuaText text = new();
+			LuaText? text = new();
 
 			try {
 				text = new(true, size, style);
@@ -171,7 +171,7 @@ namespace OpenTaiko {
 
 		// glyph-composed text (bounded per-character cache); see LuaGlyphText
 		public LuaGlyphText CreateGlyphCached(int size, params string[] style) {
-			LuaGlyphText text = new();
+			LuaGlyphText? text = new();
 			try {
 				text = new(size, style);
 				GlyphTexts.Add(text);

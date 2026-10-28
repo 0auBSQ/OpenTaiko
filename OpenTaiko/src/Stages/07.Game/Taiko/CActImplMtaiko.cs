@@ -84,7 +84,7 @@ internal class CActImplMtaiko : CActivity {
 				bg_y = OpenTaiko.Skin.Game_Taiko_Background_Y[i];
 			}
 
-			CTexture tex = null;
+			CTexture? tex = null;
 
 			switch (i) {
 				case 0: {
@@ -247,7 +247,7 @@ internal class CActImplMtaiko : CActivity {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			if (OpenTaiko.ConfigIni.nPlayerCount > 2 || OpenTaiko.ConfigIni.SimpleMode) break;
 
-			if (!this.ctLevelUpDown[i].IsStopped) {
+			if (!this.ctLevelUpDown![i].IsStopped) {
 				this.ctLevelUpDown[i].Tick();
 				if (this.ctLevelUpDown[i].IsEnded) {
 					this.ctLevelUpDown[i].Stop();
@@ -339,7 +339,7 @@ internal class CActImplMtaiko : CActivity {
 			_ro?.Draw(modIcons_x, modIcons_y, i, "game");
 
 			if (OpenTaiko.Tx.Couse_Symbol[OpenTaiko.SongMount.nChoosenSongDifficulty[i]] != null) {
-				OpenTaiko.Tx.Couse_Symbol[OpenTaiko.SongMount.nChoosenSongDifficulty[i]].t2DDraw(
+				OpenTaiko.Tx.Couse_Symbol[OpenTaiko.SongMount.nChoosenSongDifficulty[i]]!.t2DDraw(
 					couse_symbol_x,
 					couse_symbol_y
 				);
@@ -348,7 +348,7 @@ internal class CActImplMtaiko : CActivity {
 
 			if (OpenTaiko.ConfigIni.ShinuchiMode) {
 				if (OpenTaiko.Tx.Couse_Symbol[(int)Difficulty.Total] != null) {
-					OpenTaiko.Tx.Couse_Symbol[(int)Difficulty.Total].t2DDraw(
+					OpenTaiko.Tx.Couse_Symbol[(int)Difficulty.Total]!.t2DDraw(
 						couse_symbol_x,
 						couse_symbol_y
 					);
@@ -385,7 +385,7 @@ internal class CActImplMtaiko : CActivity {
 			OpenTaiko.NamePlate.tNamePlateDraw(namePlate_x, namePlate_y, i);
 
 			if (OpenTaiko.Tx.Taiko_PlayerNumber[i] != null) {
-				OpenTaiko.Tx.Taiko_PlayerNumber[i].t2DDraw(playerNumber_x, playerNumber_y);
+				OpenTaiko.Tx.Taiko_PlayerNumber[i]!.t2DDraw(playerNumber_x, playerNumber_y);
 			}
 		}
 		return base.Draw();
@@ -415,12 +415,12 @@ internal class CActImplMtaiko : CActivity {
 
 	public void tBranchEvent(CTja.ECourse After, int player, bool stopAnime = false) {
 		if (stopAnime) {
-			this.ctLevelUpDown[player].Stop();
+			this.ctLevelUpDown![player].Stop();
 			this.Before[player] = this.After[player] = After;
 			return;
 		}
 		if (After != this.After[player])
-			this.ctLevelUpDown[player] = new CCounter(0, 1000, 1, OpenTaiko.Timer);
+			this.ctLevelUpDown![player] = new CCounter(0, 1000, 1, OpenTaiko.Timer);
 
 		this.Before[player] = this.After[player];
 		this.After[player] = After;
@@ -452,8 +452,8 @@ internal class CActImplMtaiko : CActivity {
 			if (OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.SongMount.nChoosenSongDifficulty[i]] != null) {
 				int originX = 0;
 				int originY = 0;
-				int width = OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.SongMount.nChoosenSongDifficulty[i]].szTextureSize.Width;
-				int height = OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.SongMount.nChoosenSongDifficulty[i]].szTextureSize.Height;
+				int width = OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.SongMount.nChoosenSongDifficulty[i]]!.szTextureSize.Width;
+				int height = OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.SongMount.nChoosenSongDifficulty[i]]!.szTextureSize.Height;
 
 				if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
 					originX = OpenTaiko.Skin.Game_CourseSymbol_Back_Rect_5P[0];
@@ -467,7 +467,7 @@ internal class CActImplMtaiko : CActivity {
 					height = OpenTaiko.Skin.Game_CourseSymbol_Back_Rect_4P[3];
 				}
 
-				OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.SongMount.nChoosenSongDifficulty[i]].t2DDraw(
+				OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.SongMount.nChoosenSongDifficulty[i]]!.t2DDraw(
 					couse_symbol_x,
 					couse_symbol_y,
 					new System.Drawing.RectangleF(originX, originY, width, height));
@@ -476,8 +476,8 @@ internal class CActImplMtaiko : CActivity {
 			if (OpenTaiko.Tx.Couse_Symbol_Back_Flash[OpenTaiko.SongMount.nChoosenSongDifficulty[i]] != null && !OpenTaiko.ConfigIni.SimpleMode) {
 				int originX = 0;
 				int originY = 0;
-				int width = OpenTaiko.Tx.Couse_Symbol_Back_Flash[OpenTaiko.SongMount.nChoosenSongDifficulty[i]].szTextureSize.Width;
-				int height = OpenTaiko.Tx.Couse_Symbol_Back_Flash[OpenTaiko.SongMount.nChoosenSongDifficulty[i]].szTextureSize.Height;
+				int width = OpenTaiko.Tx.Couse_Symbol_Back_Flash[OpenTaiko.SongMount.nChoosenSongDifficulty[i]]!.szTextureSize.Width;
+				int height = OpenTaiko.Tx.Couse_Symbol_Back_Flash[OpenTaiko.SongMount.nChoosenSongDifficulty[i]]!.szTextureSize.Height;
 
 				if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
 					originX = OpenTaiko.Skin.Game_CourseSymbol_Back_Rect_5P[0];
@@ -491,8 +491,8 @@ internal class CActImplMtaiko : CActivity {
 					height = OpenTaiko.Skin.Game_CourseSymbol_Back_Rect_4P[3];
 				}
 
-				OpenTaiko.Tx.Couse_Symbol_Back_Flash[OpenTaiko.SongMount.nChoosenSongDifficulty[i]].Opacity = 255 - (int)((ctSymbolFlash[i].CurrentValue / 1000.0) * 255);
-				OpenTaiko.Tx.Couse_Symbol_Back_Flash[OpenTaiko.SongMount.nChoosenSongDifficulty[i]].t2DDraw(
+				OpenTaiko.Tx.Couse_Symbol_Back_Flash[OpenTaiko.SongMount.nChoosenSongDifficulty[i]]!.Opacity = 255 - (int)((ctSymbolFlash[i].CurrentValue / 1000.0) * 255);
+				OpenTaiko.Tx.Couse_Symbol_Back_Flash[OpenTaiko.SongMount.nChoosenSongDifficulty[i]]!.t2DDraw(
 					couse_symbol_x,
 					couse_symbol_y,
 					new System.Drawing.RectangleF(originX, originY, width, height));
@@ -514,18 +514,13 @@ internal class CActImplMtaiko : CActivity {
 	private long nFlashControlTimer;
 
 	//private CTexture[] txコースシンボル = new CTexture[ 6 ];
-	private string[] strCourseSymbolFileName;
 
 	//オプション
-	private CTexture txOptionPanel_HS;
-	private CTexture txOptionPanel_RANMIR;
-	private CTexture txOptionPanel_Special;
-	private int nHS;
 
 	//譜面分岐
-	private CCounter[] ctLevelUpDown;
-	public CTja.ECourse[] After;
-	public CTja.ECourse[] Before;
+	private CCounter[]? ctLevelUpDown;
+	public CTja.ECourse[] After = null!;
+	public CTja.ECourse[] Before = null!;
 	private CCounter[] ctSymbolFlash = new CCounter[5];
 	//-----------------
 	#endregion

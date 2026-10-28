@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using FDK;
 using ManagedBass;
 using Xunit;
@@ -121,7 +122,7 @@ namespace OpenTaikoTests {
 		// the game's exact shape: a decoding mixer pulled by a stream procedure, the decoder opened on a
 		// worker thread (as LuaVideo does), Start on the main thread
 		[Fact]
-		public void AudioTrack_PlaysThroughADecodeMixerFromAWorkerThread() {
+		public async Task AudioTrack_PlaysThroughADecodeMixerFromAWorkerThread() {
 			string? clip = MakeClip();
 			if (clip == null) return;
 			int mixer = 0, main = 0;
@@ -145,7 +146,7 @@ namespace OpenTaikoTests {
 					v.InitRead();
 					video = v;
 				});
-				Assert.True(opened.Wait(10000), "open did not finish");
+				await opened.WaitAsync(TimeSpan.FromSeconds(10));   // a TimeoutException when the open does not finish
 				Assert.True(video!.HasAudio);
 				var sw = Stopwatch.StartNew();
 				while (video.AudioQueuedMs <= 0 && sw.ElapsedMilliseconds < 3000) Thread.Sleep(10);
@@ -166,7 +167,7 @@ namespace OpenTaikoTests {
 		// the boot intro muxes a run of video packets ahead of its first audio packet: the reader must keep
 		// reading past a full frame queue so the sound gets data, or picture and sound wait on each other
 		[Fact]
-		public void VideoPacketsMuxedAheadOfAudio_StillStart() {
+		public async Task VideoPacketsMuxedAheadOfAudio_StillStart() {
 			if (!OperatingSystem.IsWindows()) return;
 			string intro = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "OpenTaiko", "System", "Open-World Memories", "Modules", "Stages", "_boot", "Videos", "intro.mp4"));
 			if (!File.Exists(intro)) return;
@@ -189,7 +190,7 @@ namespace OpenTaikoTests {
 					v.InitRead();
 					video = v;
 				});
-				Assert.True(opened.Wait(15000), "open did not finish");
+				await opened.WaitAsync(TimeSpan.FromSeconds(15));   // a TimeoutException when the open does not finish
 				var sw = Stopwatch.StartNew();
 				while (video!.AudioQueuedMs < 100 && sw.ElapsedMilliseconds < 5000) Thread.Sleep(10);
 				Assert.True(video.AudioQueuedMs >= 100, $"only {video.AudioQueuedMs:F0} ms of audio queued before playback");

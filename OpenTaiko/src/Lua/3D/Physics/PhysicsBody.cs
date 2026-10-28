@@ -17,7 +17,7 @@ namespace OpenTaiko {
 	public enum PhysShape { Sphere, Capsule, Box }
 
 	public sealed class PhysicsBody {
-		internal PhysicsWorld World;
+		internal PhysicsWorld World = null!;
 		public double X, Y, Z;                     // body CENTRE
 		public double Vx, Vy, Vz;
 		public double Radius = 0.5;

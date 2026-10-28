@@ -38,8 +38,8 @@ class PuchiChara : CActivity {
 	}
 
 	public void ChangeBPM(double secPerBeat) {
-		Counter.ChangeInterval(OpenTaiko.Skin.Game_PuchiChara_Timer * secPerBeat / OpenTaiko.Skin.Game_PuchiChara[2]); // 1 / (Timer/1000 = 4.8) = 25/120, cycles/beat
-		SineCounter.ChangeInterval(1000 * OpenTaiko.Skin.Game_PuchiChara_SineTimer * secPerBeat / 180); // (1/2) / (SineTimer = 2), cycles/beat
+		Counter!.ChangeInterval(OpenTaiko.Skin.Game_PuchiChara_Timer * secPerBeat / OpenTaiko.Skin.Game_PuchiChara[2]); // 1 / (Timer/1000 = 4.8) = 25/120, cycles/beat
+		SineCounter!.ChangeInterval(1000 * OpenTaiko.Skin.Game_PuchiChara_SineTimer * secPerBeat / 180); // (1/2) / (SineTimer = 2), cycles/beat
 		if (!this.inGame) { // initialize value
 			Counter.CurrentValue = 0;
 			SineCounter.CurrentValue = 1;
@@ -63,7 +63,7 @@ class PuchiChara : CActivity {
 		if (Counter == null || SineCounter == null || OpenTaiko.Tx.Puchichara == null) return base.Draw();
 		Counter.TickLoop();
 		SineCounter.TickLoopDB();
-		SineCounterIdle.TickLoop();
+		SineCounterIdle!.TickLoop();
 
 		int p = player;
 
@@ -101,8 +101,8 @@ class PuchiChara : CActivity {
 
 	public double sineY;
 
-	public CCounter Counter;
-	private CCounter SineCounter;
-	private CCounter SineCounterIdle;
+	public CCounter? Counter;
+	private CCounter? SineCounter;
+	private CCounter? SineCounterIdle;
 	private bool inGame;
 }

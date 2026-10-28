@@ -57,7 +57,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 		// font file into native memory, SKPaint does not own/free its Typeface, and renderers
 		// are created per stage/HUD element. Resolve into a local rather than reading
 		// paint.Typeface back, so paint disposal can never dispose a cached typeface.
-		SKTypeface typeface = null;
+		SKTypeface? typeface = null;
 
 		if (SKFontManager.Default.FontFamilies.Contains(fontpath))
 			typeface = GetCachedTypeface($"family:{fontpath}:{weight}:{width}:{slant}",
@@ -278,7 +278,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 				}
 
 				if (!drawMode.HasFlag(CFontRenderer.DrawMode.NoFill)) {
-					SKShader shader = null;
+					SKShader? shader = null;
 					SKColor color;
 					if (tok.UseGradiant) {
 						//https://docs.microsoft.com/ja-jp/xamarin/xamarin-forms/user-interface/graphics/skiasharp/effects/shaders/linear-gradient
@@ -423,12 +423,12 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 	// game from its skin, CFontRenderer.SetFallbackFonts), then with the font the system offers for that character.
 
 	private static readonly SKTypeface[][] _fallbacks = [[], []];   // indexed by CFontRenderer.FallbackList
-	private static readonly System.Collections.Concurrent.ConcurrentDictionary<(int codepoint, int weight, int width, SKFontStyleSlant slant), SKTypeface> _systemFallbacks = new();
+	private static readonly System.Collections.Concurrent.ConcurrentDictionary<(int codepoint, int weight, int width, SKFontStyleSlant slant), SKTypeface?> _systemFallbacks = new();
 
 	internal static void SetFallbackFonts(CFontRenderer.FallbackList list, IEnumerable<string> fonts) {
 		var typefaces = new List<SKTypeface>();
 		foreach (string font in fonts) {
-			SKTypeface typeface = null;
+			SKTypeface? typeface = null;
 			if (File.Exists(font))
 				typeface = FileTypeface(font);
 			else if (SKFontManager.Default.FontFamilies.Contains(font))
@@ -454,7 +454,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 
 	// the system's font for this character in the style of `typeface` (null when it has none), one shared instance
 	// per family and style
-	private static SKTypeface SystemTypefaceFor(SKTypeface typeface, int codepoint)
+	private static SKTypeface? SystemTypefaceFor(SKTypeface typeface, int codepoint)
 		=> _systemFallbacks.GetOrAdd((codepoint, typeface.FontWeight, typeface.FontWidth, typeface.FontSlant), key => {
 			SKTypeface found = SKFontManager.Default.MatchCharacter(null, (SKFontStyleWeight)key.weight, (SKFontStyleWidth)key.width, key.slant, null, key.codepoint);
 			if (found == null)
@@ -481,7 +481,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 			runs.Add(new(0, s.Length, paint.Typeface));
 			return runs;
 		}
-		SKTypeface current = null;
+		SKTypeface? current = null;
 		int start = 0;
 		for (int i = 0; i < s.Length;) {
 			int length = char.IsSurrogatePair(s, i) ? 2 : 1;
@@ -495,7 +495,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 			current = typeface;
 			i += length;
 		}
-		runs.Add(new(start, s.Length - start, current));
+		runs.Add(new(start, s.Length - start, current!));
 		return runs;
 	}
 
@@ -537,7 +537,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 	private readonly Dictionary<SKTypeface, SKFont> fonts = new();
 
 	private SKFont FontFor(SKTypeface typeface) {
-		if (!fonts.TryGetValue(typeface, out SKFont font)) {
+		if (!fonts.TryGetValue(typeface, out SKFont? font)) {
 			font = this.PaintFor(typeface).ToFont();
 			fonts[typeface] = font;
 		}
@@ -552,7 +552,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 	private SKPaint PaintFor(SKTypeface typeface) {
 		if (ReferenceEquals(typeface, paint.Typeface))
 			return paint;
-		if (!fallbackPaints.TryGetValue(typeface, out SKPaint fallbackPaint)) {
+		if (!fallbackPaints.TryGetValue(typeface, out SKPaint? fallbackPaint)) {
 			fallbackPaint = paint.Clone();
 			fallbackPaint.Typeface = typeface;
 			fallbackPaint.Shader = null;
@@ -567,7 +567,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 	// copy. Cached for the application's lifetime (a small, bounded set of font/style combos).
 	private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, SKTypeface> _typefaceCache = new();
 
-	private static SKTypeface FileTypeface(string fontpath)
+	private static SKTypeface? FileTypeface(string fontpath)
 		=> GetCachedTypeface($"file:{fontpath}", () => {
 			SKTypeface typeface;
 			if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) {
@@ -583,7 +583,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 			return typeface;
 		});
 
-	private static SKTypeface GetCachedTypeface(string key, Func<SKTypeface> factory) {
+	private static SKTypeface? GetCachedTypeface(string key, Func<SKTypeface?> factory) {
 		if (_typefaceCache.TryGetValue(key, out var cached))
 			return cached;
 		var created = factory();
@@ -592,7 +592,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 		return created;
 	}
 
-	private SKPaint paint = null;
+	private SKPaint paint = null!;
 
-	private SKPaint strokePaint;   // the edge stroke's paint, built on first use from `paint`
+	private SKPaint? strokePaint;   // the edge stroke's paint, built on first use from `paint`
 }

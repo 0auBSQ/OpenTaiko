@@ -138,7 +138,7 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 		//(デバッグ用)
 		Trace.TraceInformation("サウンドデバイス一覧:");
 		int a;
-		string strDefaultSoundDeviceName = null;
+		string? strDefaultSoundDeviceName = null;
 		DeviceInfo[] bassDevInfos = new DeviceInfo[Bass.DeviceCount];
 		for (int j = 0; j < bassDevInfos.Length; j++) {
 			bassDevInfos[j] = Bass.GetDeviceInfo(j);
@@ -400,7 +400,7 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 		}
 		if (bManagedDispose) {
 			SystemTimer.Dispose();
-			SystemTimer = null;
+			SystemTimer = null!;
 		}
 	}
 	~CSoundDeviceWASAPI() {
@@ -411,7 +411,7 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 
 	protected int hMixer = -1;
 	protected int hMixer_DeviceOut = -1;
-	protected WasapiProcedure tWasapiProc = null;
+	protected WasapiProcedure? tWasapiProc = null;
 
 	protected int tWASAPIProcess(IntPtr buffer, int length, IntPtr user) {
 		// BASSミキサからの出力データをそのまま WASAPI buffer へ丸投げ。

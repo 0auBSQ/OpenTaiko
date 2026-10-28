@@ -62,7 +62,7 @@ class CHitSounds {
 		return 0;
 	}
 
-	public CLocalizationData[] names;
+	public CLocalizationData[] names = null!;
 
 	public string[] don = new string[5];
 	public string[] ka = new string[5];
@@ -86,7 +86,7 @@ class CHitSounds {
 		}
 	}
 
-	private HitSoundsData[] data;
+	private HitSoundsData[] data = null!;
 
 	private void tLoadFile(string path) {
 		string[] directories = OpenTaiko.GetMergedDirectories(path);

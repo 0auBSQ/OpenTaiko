@@ -22,7 +22,7 @@ namespace OpenTaiko {
 		public LuaTexture() {
 			_texture = null;
 		}
-		public LuaTexture(CTexture texture) {
+		public LuaTexture(CTexture? texture) {
 			_texture = texture;
 			SetWrapMode("Repeat");
 		}
@@ -61,6 +61,7 @@ namespace OpenTaiko {
 		#endregion
 		#region Gets
 		// a loaded texture always has its real size, even before its pixels arrive; a disposed one reads as missing
+		[System.Diagnostics.CodeAnalysis.MemberNotNullWhen(true, nameof(_texture))]
 		public bool Loaded => _texture != null && !_texture.IsDisposed;
 		public bool Ready => Loaded && !_texture.UploadPending;   // drawing it now shows the image
 		public virtual int Height => Loaded ? _texture.szTextureSize.Height : -1;
@@ -185,7 +186,7 @@ namespace OpenTaiko {
 		// Options table shared by the texture-creating APIs: { maxSize = N } downscales the image at decode
 		// time so its long side is at most N px (for big art drawn small, e.g. song jackets).
 		internal static int tParseMaxSize(NLua.LuaTable options) {
-			object v = options?["maxSize"];
+			object? v = options?["maxSize"];
 			if (v == null) return 0;
 			try { return Math.Max(0, (int)Convert.ToDouble(v)); } catch { return 0; }
 		}

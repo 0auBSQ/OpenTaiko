@@ -15,7 +15,7 @@ internal class CActPlayComboSound : CActivity {
 	}
 
 	public void tPlayFloorSound() {
-		tPlayReached(ListFloor[0], ref FloorIndex[0], OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor);
+		tPlayReached(ListFloor[0], ref FloorIndex![0], OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor);
 	}
 
 	// plays the voices numbered value and steps past every number already reached, so a duplicate number or a skipped
@@ -23,7 +23,7 @@ internal class CActPlayComboSound : CActivity {
 	private static void tPlayReached(List<CComboVoice> voices, ref int index, int value) {
 		for (; index < voices.Count && voices[index].nCombo <= value; index++) {
 			if (voices[index].nCombo == value)
-				voices[index].soundComboVoice.PlayStart();
+				voices[index].soundComboVoice!.PlayStart();
 		}
 	}
 
@@ -115,12 +115,12 @@ internal class CActPlayComboSound : CActivity {
 		if (!base.IsDeActivated) {
 			for (int i = 0; i < 5; i++) {
 				foreach (var item in ListCombo[i]) {
-					OpenTaiko.SoundManager.tDisposeSound(item.soundComboVoice);
+					OpenTaiko.SoundManager.tDisposeSound(item.soundComboVoice!);
 				}
 				ListCombo[i].Clear();
 
 				foreach (var item in ListFloor[i]) {
-					OpenTaiko.SoundManager.tDisposeSound(item.soundComboVoice);
+					OpenTaiko.SoundManager.tDisposeSound(item.soundComboVoice!);
 				}
 				ListFloor[i].Clear();
 			}
@@ -137,8 +137,8 @@ internal class CActPlayComboSound : CActivity {
 
 	#region [ private ]
 	//-----------------
-	int[] VoiceIndex;
-	int[] FloorIndex;
+	int[] VoiceIndex = null!;
+	int[]? FloorIndex;
 
 	readonly List<CComboVoice>[] ListCombo = new List<CComboVoice>[5];
 	readonly List<CComboVoice>[] ListFloor = new List<CComboVoice>[5];
@@ -151,7 +151,7 @@ public class CComboVoice : IComparable<CComboVoice> {
 	public int nCombo;
 	public int nPlayer;
 	public string strFilePath;
-	public CSound soundComboVoice;
+	public CSound? soundComboVoice;
 
 	public CComboVoice() {
 		bFileFound = false;
@@ -161,8 +161,8 @@ public class CComboVoice : IComparable<CComboVoice> {
 		soundComboVoice = null;
 	}
 
-	public int CompareTo(CComboVoice other) {
-		if (this.nCombo > other.nCombo) return 1;
+	public int CompareTo(CComboVoice? other) {
+		if (this.nCombo > other!.nCombo) return 1;
 		else if (this.nCombo < other.nCombo) return -1;
 
 		return 0;

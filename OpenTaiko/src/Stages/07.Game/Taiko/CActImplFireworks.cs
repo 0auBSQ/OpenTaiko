@@ -136,7 +136,7 @@ internal class CActImplFireworks : CActivity {
 			bool packs = CNotesSkins.HasPacks(CNotesSkins.EKind.Taiko);
 			int nWidth = ((OpenTaiko.Tx.Effects_Hit_Explosion?.szTextureSize.Width ?? 0) / 7);
 			// rows: Good, OK, then the big notes' Good and OK; a notes pack's sheet of 2 rows (square frames) uses them for both
-			int explosionRows = (packs && nWidth > 0 && Math.Round((OpenTaiko.Tx.Effects_Hit_Explosion.szTextureSize.Height) / (double)nWidth) <= 2) ? 2 : 4;
+			int explosionRows = (packs && nWidth > 0 && Math.Round((OpenTaiko.Tx.Effects_Hit_Explosion!.szTextureSize.Height) / (double)nWidth) <= 2) ? 2 : 4;
 			int nHeight = ((OpenTaiko.Tx.Effects_Hit_Explosion?.szTextureSize.Height ?? 0) / explosionRows);
 			int nBombWidth = ((OpenTaiko.Tx.Effects_Hit_Bomb?.szTextureSize.Width ?? 0) / 7);
 			// a notes pack's Bomb.png is one row; the former one has 4, of which only the first is drawn
@@ -144,7 +144,7 @@ internal class CActImplFireworks : CActivity {
 			for (int i = 0; i < 3 * 4; i++) {
 				ref STSTATUS state = ref this.stState[i];
 				if (state.bUse) {
-					if (!state.ctProgress.IsStopped) {
+					if (!state.ctProgress!.IsStopped) {
 						state.ctProgress.Tick();
 						if (state.ctProgress.IsEnded) {
 							state.ctProgress.Stop();
@@ -195,7 +195,7 @@ internal class CActImplFireworks : CActivity {
 
 			for (int i = 0; i < 3 * 4; i++) {
 				ref STSTATUS_B state = ref this.stState_Big[i];
-				if (!state.ctProgress.IsStopped) {
+				if (!state.ctProgress!.IsStopped) {
 					state.ctProgress.Tick();
 					if (state.ctProgress.IsEnded) {
 						state.ctProgress.Stop();
@@ -299,16 +299,16 @@ internal class CActImplFireworks : CActivity {
 
 			for (int i = 0; i < 256; i++) {
 				if (this.stConfetti[i].bUse) {
-					this.stConfetti[i].nPreviousValue = this.stConfetti[i].ctProgress.CurrentValue;
-					this.stConfetti[i].ctProgress.Tick();
-					if (this.stConfetti[i].ctProgress.IsEnded) {
-						this.stConfetti[i].ctProgress.Stop();
+					this.stConfetti[i].nPreviousValue = this.stConfetti[i].ctProgress!.CurrentValue;
+					this.stConfetti[i].ctProgress!.Tick();
+					if (this.stConfetti[i].ctProgress!.IsEnded) {
+						this.stConfetti[i].ctProgress!.Stop();
 						this.stConfetti[i].bUse = false;
 					} else if (this.stConfetti[i].fX > 1300 || this.stConfetti[i].fX < -20) {
-						this.stConfetti[i].ctProgress.Stop();
+						this.stConfetti[i].ctProgress!.Stop();
 						this.stConfetti[i].bUse = false;
 					}
-					for (int n = this.stConfetti[i].nPreviousValue; n < this.stConfetti[i].ctProgress.CurrentValue; n++) {
+					for (int n = this.stConfetti[i].nPreviousValue; n < this.stConfetti[i].ctProgress!.CurrentValue; n++) {
 						this.stConfetti[i].fX -= this.stConfetti[i].fAccelerationX;
 						this.stConfetti[i].fY -= this.stConfetti[i].fAccelerationY;
 						this.stConfetti[i].fAccelerationX *= this.stConfetti[i].fAccelerationAccelerationX;
@@ -356,7 +356,7 @@ internal class CActImplFireworks : CActivity {
 	[StructLayout(LayoutKind.Sequential)]
 	protected struct STSTATUS {
 		public bool bUse;
-		public CCounter ctProgress;
+		public CCounter? ctProgress;
 		public ENoteJudge judge;
 		public bool IsBig;
 		public int nOpacity;
@@ -364,7 +364,7 @@ internal class CActImplFireworks : CActivity {
 	}
 	[StructLayout(LayoutKind.Sequential)]
 	protected struct STSTATUS_B {
-		public CCounter ctProgress;
+		public CCounter? ctProgress;
 		public ENoteJudge judge;
 		public bool IsBig;
 		public int nOpacity;
@@ -388,7 +388,7 @@ internal class CActImplFireworks : CActivity {
 		public int nGraphic;
 		public int nColor;
 		public bool bUse;
-		public CCounter ctProgress;
+		public CCounter? ctProgress;
 		public int nPreviousValue;
 		public float fX;
 		public float fY;

@@ -36,7 +36,7 @@ class CVisualLogManager {
 			return timeSinceCreation.IsEnded;
 		}
 
-		private CCounter timeSinceCreation;
+		private CCounter timeSinceCreation = null!;
 		private TraceEventType lct;
 		private string msg;
 	}

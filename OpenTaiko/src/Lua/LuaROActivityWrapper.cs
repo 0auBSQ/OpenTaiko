@@ -59,7 +59,7 @@ namespace OpenTaiko {
 
 		#endregion
 
-		protected CLuaActivityScriptBase lcActScript;
+		protected CLuaActivityScriptBase? lcActScript;
 
 		// loaded from the game's Global/Modules folder
 		internal bool IsGlobal { get; private protected set; }
@@ -81,7 +81,7 @@ namespace OpenTaiko {
 
 		public bool IsActive => lcActScript?.IsActive() ?? false;
 
-		public object[]? Activate(params object[] args) { bool s = EnterSkinResolution(); try { return lcActScript?.Activate(args); } finally { ExitSkinResolution(s); } }
+		public object[]? Activate(params object?[] args) { bool s = EnterSkinResolution(); try { return lcActScript?.Activate(args); } finally { ExitSkinResolution(s); } }
 		public object[]? Deactivate(params object[] args) { bool s = EnterSkinResolution(); try { return lcActScript?.Deactivate(args); } finally { ExitSkinResolution(s); } }
 		public object[]? Draw(params object[] args) { bool s = EnterSkinResolution(); try { return lcActScript?.Draw(args); } finally { ExitSkinResolution(s); } }
 		public object[]? Update(params object[] args) { bool s = EnterSkinResolution(); try { return lcActScript?.Update(FDK.Game.TimeMs, args); } finally { ExitSkinResolution(s); } }

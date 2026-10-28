@@ -131,7 +131,7 @@ public class CSound : IDisposable {
 	public bool bSpeedRaiseTooProblem = false;
 	public bool bPlayEndAfterPlaybackContinuesChip = false; // これがtrueなら、本サウンドの再生終了のコールバック時に自動でミキサーから削除する
 
-	private SyncProcedure _cbEndofStream;
+	private SyncProcedure _cbEndofStream = null!;
 
 	/// <summary>
 	/// Gain is applied "first" to the audio data, much as in a physical or
@@ -621,7 +621,7 @@ public class CSound : IDisposable {
 				switch (sounds[i].CurrnetCreateType) {
 					#region [ ファイルから ]
 					case CreateType.FromFile:
-						string strFileName = sounds[i].FileName;
+						string strFileName = sounds[i].FileName!;
 						sounds[i].Dispose(true, false);
 						device.tCreateSound(strFileName, sounds[i]);
 						break;
@@ -767,7 +767,7 @@ public class CSound : IDisposable {
 	protected enum CreateType { FromFile, UserStream, Unknown }
 	protected CreateType CurrnetCreateType = CreateType.Unknown;
 	protected ESoundDeviceType CurrentSoundDeviceType = ESoundDeviceType.Unknown;
-	public string FileName = null;
+	public string? FileName = null;
 	protected GCHandle hGC;
 	protected int _hTempoStream = 0;
 	protected int _hBassStream = -1;                    // ASIO, WASAPI 用
@@ -800,8 +800,6 @@ public class CSound : IDisposable {
 	#region [ private ]
 	//-----------------
 	private bool IsBassSound => SoundManager.IsDeviceTypeSupported(this.CurrentSoundDeviceType);
-	private int _nPosition = 0;
-	private int _nPositiondb;
 	private Lufs _gain = DefaultGain;
 	private Lufs? _truePeak = null;
 	private int _automationLevel = DefaultAutomationLevel;

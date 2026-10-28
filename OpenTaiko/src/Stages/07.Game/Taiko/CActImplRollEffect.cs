@@ -96,7 +96,7 @@ internal class CActImplRollEffect : CActivity {
 					if (iRollChara == RollCharaTail)
 						break;
 				} else {
-					rollChara.OldValue = rollChara.Counter.CurrentValue;
+					rollChara.OldValue = rollChara.Counter!.CurrentValue;
 					rollChara.Counter.Tick();
 					if (rollChara.Counter.IsEnded) {
 						rollChara.Counter.Stop();
@@ -113,12 +113,12 @@ internal class CActImplRollEffect : CActivity {
 						OpenTaiko.Tx.Effects_Roll[rollChara.Type]?.t2DDraw(rollChara.X, rollChara.Y);
 
 						// 画面外にいたら描画をやめさせる
-						if (rollChara.X < 0 - OpenTaiko.Tx.Effects_Roll[rollChara.Type].szTextureSize.Width || rollChara.X > OpenTaiko.Skin.Resolution[0]) {
+						if (rollChara.X < 0 - OpenTaiko.Tx.Effects_Roll[rollChara.Type]!.szTextureSize.Width || rollChara.X > OpenTaiko.Skin.Resolution[0]) {
 							rollChara.Counter.Stop();
 							rollChara.IsUsing = false;
 						}
 
-						if (rollChara.Y < 0 - OpenTaiko.Tx.Effects_Roll[rollChara.Type].szTextureSize.Height || rollChara.Y > OpenTaiko.Skin.Resolution[1]) {
+						if (rollChara.Y < 0 - OpenTaiko.Tx.Effects_Roll[rollChara.Type]!.szTextureSize.Height || rollChara.Y > OpenTaiko.Skin.Resolution[1]) {
 							rollChara.Counter.Stop();
 							rollChara.IsUsing = false;
 						}
@@ -137,7 +137,6 @@ internal class CActImplRollEffect : CActivity {
 	#region [ private ]
 	//-----------------
 	//private CTexture[] txChara;
-	private int nTexSheetCount;
 
 	[StructLayout(LayoutKind.Sequential)]
 	private struct STRollChar {
@@ -157,7 +156,7 @@ internal class CActImplRollEffect : CActivity {
 
 	[StructLayout(LayoutKind.Sequential)]
 	private struct RollChara {
-		public CCounter Counter;
+		public CCounter? Counter;
 		public int Type;
 		public bool IsUsing;
 		public float X;
@@ -174,13 +173,6 @@ internal class CActImplRollEffect : CActivity {
 
 	private Random random = new Random();
 
-	private int[,] StartPoint;
-	private int[,] StartPoint_1P;
-	private int[,] StartPoint_2P;
-	private float[,] Speed;
-	private float[,] Speed_1P;
-	private float[,] Speed_2P;
-	private int CharaPtn;
 	//-----------------
 	#endregion
 }

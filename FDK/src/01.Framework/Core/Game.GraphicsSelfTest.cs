@@ -15,7 +15,7 @@ public abstract partial class Game {
 	private bool _selfTestDone;
 
 	private void RunGraphicsSelfTest() {
-		if (_selfTestDone) { try { Window_.Close(); } catch { } return; }
+		if (_selfTestDone) { try { Window_!.Close(); } catch { } return; }
 		_selfTestDone = true;
 		try {
 			Gl.ClearColor(0.10f, 0.20f, 0.35f, 1f);

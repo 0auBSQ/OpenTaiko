@@ -119,7 +119,7 @@ public class CFontRenderer : IDisposable {
 				this.textRenderer = new CSkiaSharpTextRenderer(fontpath, pt, style);
 			}
 			else {
-				this.textRenderer = new CSkiaSharpTextRenderer(Assembly.GetExecutingAssembly().GetManifestResourceStream(@"FDK.mplus-1p-medium.ttf"), "FDK.mplus-1p-medium.ttf", pt, style);
+				this.textRenderer = new CSkiaSharpTextRenderer(Assembly.GetExecutingAssembly().GetManifestResourceStream(@"FDK.mplus-1p-medium.ttf")!, "FDK.mplus-1p-medium.ttf", pt, style);
 			}
 			return;
 		} catch (Exception e) {
@@ -315,5 +315,5 @@ public class CFontRenderer : IDisposable {
 		this.textRenderer.Dispose();
 	}
 
-	private ITextRenderer textRenderer;
+	private ITextRenderer textRenderer = null!;
 }

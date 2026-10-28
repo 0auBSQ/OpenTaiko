@@ -57,5 +57,5 @@ class GoGoSplash : CActivity {
 		Splash = new CCounter(0, OpenTaiko.Skin.Game_Effect_GoGoSplash[2] - 1, OpenTaiko.Skin.Game_Effect_GoGoSplash_Timer, OpenTaiko.Timer);
 	}
 
-	private CCounter Splash;
+	private CCounter? Splash;
 }

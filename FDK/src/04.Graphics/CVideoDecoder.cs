@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using FFmpeg.AutoGen;
 using ManagedBass;
@@ -384,7 +385,7 @@ public unsafe class CVideoDecoder : IDisposable {
 	// set by a seek: the next decoded frame is shown at once, even while paused, the way a player scrubs
 	private bool presentAfterSeek;
 
-	public void GetNowFrame(ref CTexture Texture) {
+	public void GetNowFrame([NotNull] ref CTexture? Texture) {
 		if ((this.bPlaying || this.presentAfterSeek) && framelist[framelistHead].Using) {
 			if (this.bPlaying) CTimer.Update();
 			(int idx, CDecodedFrame frame)? nowFrame = null;
@@ -419,11 +420,11 @@ public unsafe class CVideoDecoder : IDisposable {
 			this.EnsureEnqueuingFrames();
 		}
 
-		if (Texture == lastTexture)
+		if (Texture == lastTexture!)
 			return;
 
 		// a frame texture from another decoder stays that decoder's to free
-		Texture = lastTexture;
+		Texture = lastTexture!;
 
 	}
 
@@ -790,7 +791,7 @@ public unsafe class CVideoDecoder : IDisposable {
 	private StreamProcedure? audioProc;   // referenced for as long as BASS may call it
 	private const double AudioRingSeconds = 12;   // more than the reader ever runs ahead
 	private double audioBaseMs;   // media time the ring was last started from (a seek target)
-	private CTexture lastTexture;
+	private CTexture? lastTexture;
 	private bool bqueueinitialized = false;
 
 	//for convert

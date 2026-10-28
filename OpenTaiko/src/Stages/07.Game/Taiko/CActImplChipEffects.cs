@@ -59,8 +59,8 @@ internal class CActImplChipEffects : CActivity {
 				if (iState == StateTail)
 					break;
 			} else {
-				st.ctProgress.Tick();
-				st.ctChipEffect.Tick();
+				st.ctProgress!.Tick();
+				st.ctChipEffect!.Tick();
 				if (st.ctProgress.IsEnded) {
 					st.ctProgress.Stop();
 					st.bUse = false;
@@ -118,8 +118,8 @@ internal class CActImplChipEffects : CActivity {
 	[StructLayout(LayoutKind.Sequential)]
 	private struct STChipEffect {
 		public bool bUse;
-		public CCounter ctProgress;
-		public CCounter ctChipEffect;
+		public CCounter? ctProgress;
+		public CCounter? ctChipEffect;
 		public int nPlayer;
 		public NotesManager.ENoteType Lane;
 		public EGameType GameType;

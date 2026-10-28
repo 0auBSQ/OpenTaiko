@@ -46,7 +46,7 @@ class AIBattle : CStage {
 		OpenTaiko.Tx.AIBattle_SectionTime_Bar_Base?.t2DDraw(OpenTaiko.Skin.Game_AIBattle_SectionTime_Bar[0], OpenTaiko.Skin.Game_AIBattle_SectionTime_Bar[1],
 			new System.Drawing.RectangleF(0, 0, OpenTaiko.Tx.AIBattle_SectionTime_Bar_Base.szTextureSize.Width, OpenTaiko.Tx.AIBattle_SectionTime_Bar_Base.szTextureSize.Height));
 
-		void drawBar(CTexture barTex, float length) {
+		void drawBar(CTexture? barTex, float length) {
 			barTex?.t2DDraw(OpenTaiko.Skin.Game_AIBattle_SectionTime_Bar[0], OpenTaiko.Skin.Game_AIBattle_SectionTime_Bar[1],
 				new System.Drawing.RectangleF(0, 0, barTex.szTextureSize.Width * length, barTex.szTextureSize.Height));
 		}
@@ -186,8 +186,8 @@ class AIBattle : CStage {
 
 	#region [Private]
 
-	private CCounter BarFlashCounter;
-	public CCounter BatchAnimeCounter;
+	private CCounter BarFlashCounter = null!;
+	public CCounter BatchAnimeCounter = null!;
 
 	private void DrawJudgeNumber(int x, int y, int num) {
 		if (OpenTaiko.Tx.AIBattle_Judge_Number == null) return;

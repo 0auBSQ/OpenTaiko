@@ -104,7 +104,7 @@ internal class CActOptionPanel : CActivity {
 	private readonly Rectangle[] rcReverse = new Rectangle[] { new Rectangle(0x18, 0x18, 0x18, 12), new Rectangle(0x18, 0x24, 0x18, 12) };
 	private readonly Rectangle[] rcTight = new Rectangle[] { new Rectangle(0x60, 0x30, 0x18, 12), new Rectangle(0x60, 60, 0x18, 12) };
 	private readonly Rectangle[] rcChartSpeed = new Rectangle[] { new Rectangle(0x30, 0, 0x18, 12), new Rectangle(0x30, 12, 0x18, 12), new Rectangle(0x30, 0x18, 0x18, 12), new Rectangle(0x30, 0x24, 0x18, 12), new Rectangle(0x48, 0, 0x18, 12), new Rectangle(0x48, 12, 0x18, 12), new Rectangle(0x48, 0x18, 0x18, 12), new Rectangle(0x48, 0x24, 0x18, 12), new Rectangle(0x60, 0, 0x18, 12), new Rectangle(0x60, 12, 0x18, 12), new Rectangle(0x60, 0x18, 0x18, 12), new Rectangle(0x60, 0x24, 0x18, 12), new Rectangle(120, 0, 0x18, 12), new Rectangle(120, 12, 0x18, 12), new Rectangle(120, 0x18, 0x18, 12), new Rectangle(120, 0x24, 0x18, 12) };
-	private CTexture txOptionPanel;
+	private CTexture? txOptionPanel;
 	//-----------------
 	#endregion
 }

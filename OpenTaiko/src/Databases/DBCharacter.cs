@@ -80,7 +80,7 @@ class DBCharacter {
 		// String or CLocalizationData
 		[JsonProperty("description")]
 		[JsonConverter(typeof(LocalizedStringConverter<CLocalizationData>))]
-		public object Description;
+		public object? Description;
 
 		[JsonProperty("speechtext")]
 		public CLocalizationData[] SpeechText;

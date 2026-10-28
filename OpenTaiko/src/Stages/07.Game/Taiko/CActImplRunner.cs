@@ -107,7 +107,7 @@ internal class CActImplRunner : CActivity {
 				if (iRunner == RunnerTail)
 					break;
 			} else {
-				runner.nOldValue = runner.ctProgress.CurrentValue;
+				runner.nOldValue = runner.ctProgress!.CurrentValue;
 				runner.ctProgress.Tick();
 				if (runner.ctProgress.IsEnded || runner.fX > OpenTaiko.Skin.Resolution[0]) {
 					runner.ctProgress.Stop();
@@ -143,7 +143,7 @@ internal class CActImplRunner : CActivity {
 		public int nOldValue;
 		public int nNowPtn;
 		public float fX;
-		public CCounter ctProgress;
+		public CCounter? ctProgress;
 	}
 	private const int RUNNER_COUNT = 128; // circular queue
 	private readonly STRunner[] stRunners = new STRunner[RUNNER_COUNT];
@@ -151,7 +151,7 @@ internal class CActImplRunner : CActivity {
 	int RunnerHead = 0;
 	int RunnerTail = 0;
 
-	private CTexture Runner;
+	private CTexture? Runner;
 
 	private void LoadRunnerConifg(string dancerPath) {
 		var _str = "";
@@ -215,16 +215,16 @@ internal class CActImplRunner : CActivity {
 	}
 
 	// ランナー画像のサイズ。 X, Y
-	private int[] Size;
+	private int[] Size = null!;
 	// ランナーのコマ数
 	private int Ptn;
 	// ランナーのキャラクターのバリエーション(ミス時を含まない)。
 	private int Type;
 	private int Timer;
 	// スタート地点のX座標 1P, 2P
-	private int[] StartPoint_X;
+	private int[] StartPoint_X = null!;
 	// スタート地点のY座標 1P, 2P
-	private int[] StartPoint_Y;
+	private int[] StartPoint_Y = null!;
 
 	//-----------------
 	#endregion

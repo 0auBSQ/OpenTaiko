@@ -192,8 +192,8 @@ internal class CActCalibrationMode : CActivity {
 	private CCounter CalibrateTick = new CCounter();
 	private List<int> Offsets = new List<int>();
 	private int LastOffset = 0;
-	private CCachedFontRenderer font;
-	private CTexture offsettext;
+	private CCachedFontRenderer font = null!;
+	private CTexture? offsettext;
 	private Action? onDone;
 
 	//private CSound hitSound;

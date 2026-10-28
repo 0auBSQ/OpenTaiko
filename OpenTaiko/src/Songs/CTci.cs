@@ -12,26 +12,26 @@ internal class CTci {
 	// ── JSON model ────────────────────────────────────────────────────────────
 
 	private class TciJson {
-		[JsonProperty("title")]    public JToken?  Title;       // string or {lang: string}
-		[JsonProperty("subtitle")] public JToken?  Subtitle;
-		[JsonProperty("artist")]   public JToken?  Artist;      // string or array
-		[JsonProperty("creator")]  public JToken?  Creator;     // MAKER — string or array
-		[JsonProperty("audio")]    public string?  Audio;
-		[JsonProperty("songpreview")] public double Songpreview; // seconds
-		[JsonProperty("albumart")] public string?  Albumart;
-		[JsonProperty("background")] public string? Background;
-		[JsonProperty("bpm")]      public double?  Bpm;
-		[JsonProperty("offset")]   public double?  Offset;
-		[JsonProperty("courses")]  public List<TciCourseJson>? Courses;
+		[JsonProperty("title")]    public JToken?  Title { get; set; }       // string or {lang: string}
+		[JsonProperty("subtitle")] public JToken?  Subtitle { get; set; }
+		[JsonProperty("artist")]   public JToken?  Artist { get; set; }      // string or array
+		[JsonProperty("creator")]  public JToken?  Creator { get; set; }     // MAKER — string or array
+		[JsonProperty("audio")]    public string?  Audio { get; set; }
+		[JsonProperty("songpreview")] public double Songpreview { get; set; } // seconds
+		[JsonProperty("albumart")] public string?  Albumart { get; set; }
+		[JsonProperty("background")] public string? Background { get; set; }
+		[JsonProperty("bpm")]      public double?  Bpm { get; set; }
+		[JsonProperty("offset")]   public double?  Offset { get; set; }
+		[JsonProperty("courses")]  public List<TciCourseJson>? Courses { get; set; }
 	}
 
 	private class TciCourseJson {
-		[JsonProperty("difficulty")] public string? Difficulty;
-		[JsonProperty("level")]      public double  Level;
-		[JsonProperty("single")]     public string? Single;     // .osu file
+		[JsonProperty("difficulty")] public string? Difficulty { get; set; }
+		[JsonProperty("level")]      public double  Level { get; set; }
+		[JsonProperty("single")]     public string? Single { get; set; }     // .osu file
 		// OpenTaiko extensions (not in spec)
-		[JsonProperty("life")]  public int  Life = 5;
-		[JsonProperty("side")]  public string? Side;
+		[JsonProperty("life")]  public int  Life { get; set; } = 5;
+		[JsonProperty("side")]  public string? Side { get; set; }
 	}
 
 	// ── Parsed data ───────────────────────────────────────────────────────────
@@ -143,8 +143,8 @@ internal class CTci {
 		foreach (var course in Courses) {
 			int i = course.DifficultyIndex;
 			for (int k = 0; k < (int)Difficulty.Total; k++) {
-				node.score[i].ChartInfo.nLevel[k]    = levels[k];
-				node.score[i].ChartInfo.nLevelIcon[k] = levelIcons[k];
+				node.score[i]!.ChartInfo.nLevel[k]    = levels[k];
+				node.score[i]!.ChartInfo.nLevelIcon[k] = levelIcons[k];
 			}
 		}
 

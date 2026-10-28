@@ -11,7 +11,7 @@ namespace OpenTaiko;
 internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲リストを取得するクラス
 {                                                   // ファイルキャッシュ(songslist.db)からの取得と、ディスクからの取得を、この一つのクラスに集約。
 
-	public CSongManager SongManager                     // 曲の探索結果はこのSongs管理に読み込まれる
+	public CSongManager? SongManager                     // 曲の探索結果はこのSongs管理に読み込まれる
 	{
 		get;
 		private set;
@@ -50,10 +50,10 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 	public bool IsSlowdown                          // #PREMOVIE再生中は検索負荷を落とす
 	{
 		get {
-			return this.SongManager.bIsSlowdown;
+			return this.SongManager!.bIsSlowdown;
 		}
 		set {
-			this.SongManager.bIsSlowdown = value;
+			this.SongManager!.bIsSlowdown = value;
 		}
 	}
 
@@ -65,7 +65,7 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 	private readonly string strPathSongsDB = OpenTaiko.strEXEFolder + "songs.db";
 	private readonly string strPathSongList = OpenTaiko.strEXEFolder + "songlist.db";
 
-	public Thread thDTXFileEnumerate {
+	public Thread? thDTXFileEnumerate {
 		get;
 		private set;
 	}
@@ -143,7 +143,7 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 		if (this.state != DTXEnumState.CompletelyDone &&
 			((thDTXFileEnumerate?.ThreadState & (System.Threading.ThreadState.Background)) != 0)) {
 			// this.thDTXFileEnumerate.Suspend();		// obsoleteにつき使用中止
-			this.SongManager.bIsSuspending = true;
+			this.SongManager!.bIsSuspending = true;
 			this.state = DTXEnumState.Suspended;
 			Trace.TraceInformation("★曲データ検索スレッドを中断しました。");
 		}
@@ -154,10 +154,10 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 	/// </summary>
 	public void Resume() {
 		if (this.state == DTXEnumState.Suspended) {
-			if ((this.thDTXFileEnumerate.ThreadState & (System.Threading.ThreadState.WaitSleepJoin | System.Threading.ThreadState.StopRequested)) != 0) //
+			if ((this.thDTXFileEnumerate!.ThreadState & (System.Threading.ThreadState.WaitSleepJoin | System.Threading.ThreadState.StopRequested)) != 0) //
 			{
 				// this.thDTXFileEnumerate.Resume();	// obsoleteにつき使用中止
-				this.SongManager.bIsSuspending = false;
+				this.SongManager!.bIsSuspending = false;
 				this.SongManager.AutoReset.Set();
 				this.state = DTXEnumState.Ongoing;
 				Trace.TraceInformation("★曲データ検索スレッドを再開しました。");
@@ -187,7 +187,7 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 	/// </summary>
 	public void Abort() {
 		if (thDTXFileEnumerate != null) {
-			this.SongManager.bIsCanceled = true;
+			this.SongManager!.bIsCanceled = true;
 			this.state = DTXEnumState.Canceled;
 			try {
 				thDTXFileEnumerate.Join();
@@ -224,7 +224,7 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 			try {
 				OpenTaiko.Skin.bgmStartupScreen.tPlay();
 				OpenTaiko.Skin.PreloadSystemSounds();
-				lock (OpenTaiko.stageStartup.listProgressString) {
+				lock (OpenTaiko.stageStartup.listProgressString!) {
 					OpenTaiko.stageStartup.listProgressString.Add("SYSTEM SOUNDS ... OK");
 				}
 			} finally {
@@ -286,7 +286,7 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 					// One folder walk sets the "loaded / total" progress total and parses every .tja
 					// across CPU cores up front, so the tree build below reuses the results and the
 					// progress bar advances through the parse instead of sitting at 0%.
-					this.SongManager.PreparseTjaCharts(resolvedRoots);
+					this.SongManager!.PreparseTjaCharts(resolvedRoots);
 
 					if (strArray.Length > 0) {
 						// 全パスについて…
@@ -317,7 +317,7 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 					Trace.TraceWarning("曲データの検索パス(TJAPath)の指定がありません。");
 				}
 			} finally {
-				this.SongManager.ClearPreparse();   // no longer required once the tree is built
+				this.SongManager!.ClearPreparse();   // no longer required once the tree is built
 				Trace.TraceInformation("曲データの検索を完了しました。[{0}曲{1}スコア]", this.SongManager.nSearchSongNodeCount, this.SongManager.nSearchScoreCount);
 				Trace.Unindent();
 			}
@@ -427,9 +427,9 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 		try {
 			using Stream songlistdb = File.Create($"{OpenTaiko.strEXEFolder}songlist.db");
 			if (UseJsonCache)
-				WriteSongListCacheJson(songlistdb, SongManager.listSongsDB);
+				WriteSongListCacheJson(songlistdb, SongManager!.listSongsDB);
 			else
-				WriteSongListCache(songlistdb, SongManager.listSongsDB);
+				WriteSongListCache(songlistdb, SongManager!.listSongsDB);
 		} catch (Exception e) {
 			Trace.TraceWarning($"songlist.db write failed, continuing without cache: {e.Message}");
 			try { File.Delete($"{OpenTaiko.strEXEFolder}songlist.db"); } catch { }
@@ -445,12 +445,12 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 		try {
 			if (File.Exists($"{OpenTaiko.strEXEFolder}songlist.db")) {
 				using Stream songlistdb = File.OpenRead($"{OpenTaiko.strEXEFolder}songlist.db");
-				this.SongManager.listSongsDB = (UseJsonCache
+				this.SongManager!.listSongsDB = (UseJsonCache
 					? ReadSongListCacheJson(songlistdb)
 					: ReadSongListCache(songlistdb)) ?? new();
 			}
-		} catch (Exception exception) {
-			this.SongManager.listSongsDB = new();
+		} catch (Exception) {
+			this.SongManager!.listSongsDB = new();
 		}
 	}
 
@@ -462,7 +462,7 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 	// Bump this when a serialization change is not visible in the type graph signature.
 	// Old caches then rebuild once.
 	private const string CacheFormatVersion = "3";
-	private static string _cacheSchemaSignature;
+	private static string? _cacheSchemaSignature;
 	internal static string SongListCacheSchemaSignature
 		=> _cacheSchemaSignature ??= CacheFormatVersion + "-" + ComputeSchemaSignature(typeof(Dictionary<string, CSongListNode>));
 
@@ -472,7 +472,7 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 		songlistdb_.Serialize(stream, listSongsDB);
 	}
 
-	internal static Dictionary<string, CSongListNode> ReadSongListCache(Stream stream) {
+	internal static Dictionary<string, CSongListNode>? ReadSongListCache(Stream stream) {
 		BinaryFormatter songlistdb_ = new BinaryFormatter();
 		// A cache written before this header (or with a different schema) fails this check → rebuild.
 		if (songlistdb_.Deserialize(stream) is not string signature || signature != SongListCacheSchemaSignature)
@@ -483,8 +483,8 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 	// JSON song cache serialized by System.Text.Json source generation. Runtime state is marked
 	// [JsonIgnore] and rebuilt on load. The schema signature guards layout changes.
 	private sealed class SongListCacheFile {
-		public string Signature { get; set; }
-		public Dictionary<string, CSongListNode> Songs { get; set; }
+		public string Signature { get; set; } = null!;
+		public Dictionary<string, CSongListNode> Songs { get; set; } = null!;
 	}
 
 	// Source generation only, with no runtime options, reflection, or converters. Nothing runs
@@ -498,7 +498,7 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 		JsonSerializer.Serialize(stream, file, SongCacheJsonContext.Default.SongListCacheFile);
 	}
 
-	internal static Dictionary<string, CSongListNode> ReadSongListCacheJson(Stream stream) {
+	internal static Dictionary<string, CSongListNode>? ReadSongListCacheJson(Stream stream) {
 		var file = JsonSerializer.Deserialize(stream, SongCacheJsonContext.Default.SongListCacheFile);
 		// A cache with a different schema (renamed, added, or removed field) is discarded so the caller rebuilds.
 		if (file == null || file.Signature != SongListCacheSchemaSignature)
@@ -514,7 +514,7 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 	private static string ComputeSchemaSignature(Type root) {
 		var sb = new StringBuilder();
 		var seen = new HashSet<Type>();
-		void Consider(Type t) {
+		void Consider(Type? t) {
 			if (t == null) return;
 			if (t.IsArray) { Consider(t.GetElementType()); return; }
 			if (t.IsGenericType) { foreach (var a in t.GetGenericArguments()) Consider(a); return; }
@@ -524,7 +524,7 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 			if (!seen.Add(t)) return;
 			sb.Append(t.FullName).Append('{');
 			foreach (var f in t.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-								.Where(f => !f.IsNotSerialized)
+								.Where(f => !f.IsDefined(typeof(NonSerializedAttribute), false))
 								.OrderBy(f => f.Name, StringComparer.Ordinal)) {
 				sb.Append(f.Name).Append(':').Append(f.FieldType.FullName).Append(';');
 				Consider(f.FieldType);

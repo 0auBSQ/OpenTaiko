@@ -67,7 +67,7 @@ internal class FireWorks : CActivity {
 					if (iFireWork == FireWorkTail)
 						break;
 				} else {
-					fireWork.Counter.Tick();
+					fireWork.Counter!.Tick();
 					OpenTaiko.Tx.Effects_Hit_FireWorks?.t2DCenterBasedDraw((float)fireWork.X, (float)fireWork.Y, 1, new Rectangle(fireWork.Counter.CurrentValue * OpenTaiko.Skin.Game_Effect_FireWorks[0], 0, OpenTaiko.Skin.Game_Effect_FireWorks[0], OpenTaiko.Skin.Game_Effect_FireWorks[1]));
 					if (fireWork.Counter.IsEnded) {
 						fireWork.Counter.Stop();
@@ -92,7 +92,7 @@ internal class FireWorks : CActivity {
 		public EGameType GameType;
 		public int Player;
 		public bool IsUsing;
-		public CCounter Counter;
+		public CCounter? Counter;
 		public double X;
 		public double Y;
 	}

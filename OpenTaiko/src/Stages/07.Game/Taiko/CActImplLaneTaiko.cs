@@ -28,7 +28,7 @@ internal class CActImplLaneTaiko : CActivity {
 			this.ResetPlayStates();
 		}
 		if (OpenTaiko.Tx.Lane_Base[0] != null)
-			OpenTaiko.Tx.Lane_Base[0].Opacity = 255;
+			OpenTaiko.Tx.Lane_Base[0]!.Opacity = 255;
 		this.ctGoGo = new CCounter();
 
 
@@ -117,10 +117,10 @@ internal class CActImplLaneTaiko : CActivity {
 				this.stBranch[i].nFlashControlTimer += 8;
 			}
 
-			if (!this.stBranch[i].ctBranchAnimeProgress.IsStopped) {
-				this.stBranch[i].ctBranchAnimeProgress.Tick();
-				if (this.stBranch[i].ctBranchAnimeProgress.IsEnded) {
-					this.stBranch[i].ctBranchAnimeProgress.Stop();
+			if (!this.stBranch[i].ctBranchAnimeProgress!.IsStopped) {
+				this.stBranch[i].ctBranchAnimeProgress!.Tick();
+				if (this.stBranch[i].ctBranchAnimeProgress!.IsEnded) {
+					this.stBranch[i].ctBranchAnimeProgress!.Stop();
 					this.stBranch[i].nBefore = this.stBranch[i].nAfter;
 				}
 			}
@@ -142,7 +142,7 @@ internal class CActImplLaneTaiko : CActivity {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			#region[ ゴーゴータイムレーン背景レイヤー ]
 			if (OpenTaiko.Tx.Lane_Background_GoGo != null && OpenTaiko.stageGameScreen.bIsGOGOTIME[i]) {
-				if (!this.ctGoGo.IsStopped) {
+				if (!this.ctGoGo!.IsStopped) {
 					this.ctGoGo.Tick();
 				}
 
@@ -198,7 +198,7 @@ internal class CActImplLaneTaiko : CActivity {
 					frame_y = OpenTaiko.Skin.Game_Taiko_Frame_Y[i];
 				}
 
-				CTexture tex = null;
+				CTexture? tex = null;
 
 				switch (i) {
 					case 0: {
@@ -280,7 +280,7 @@ internal class CActImplLaneTaiko : CActivity {
 
 
 
-		if (OpenTaiko.ConfigIni.bEnableAVI && OpenTaiko.TJA.listVD.Count > 0 && OpenTaiko.stageGameScreen.ShowVideo && !OpenTaiko.ConfigIni.bTokkunMode) {
+		if (OpenTaiko.ConfigIni.bEnableAVI && OpenTaiko.TJA!.listVD!.Count > 0 && OpenTaiko.stageGameScreen.ShowVideo && !OpenTaiko.ConfigIni.bTokkunMode) {
 			if (OpenTaiko.Tx.Lane_Background_Main != null) OpenTaiko.Tx.Lane_Background_Main.Opacity = OpenTaiko.ConfigIni.nBGAlpha;
 			if (OpenTaiko.Tx.Lane_Background_AI != null) OpenTaiko.Tx.Lane_Background_AI.Opacity = OpenTaiko.ConfigIni.nBGAlpha;
 			if (OpenTaiko.Tx.Lane_Background_Sub != null) OpenTaiko.Tx.Lane_Background_Sub.Opacity = OpenTaiko.ConfigIni.nBGAlpha;
@@ -304,9 +304,9 @@ internal class CActImplLaneTaiko : CActivity {
 			if (OpenTaiko.ConfigIni.nBranchAnime == 1 && this.stBranch[i].nYCoord == 21) {
 				this.stBranch[i].nYCoord = 0;
 			}
-			if (OpenTaiko.ConfigIni.SimpleMode || !this.stBranch[i].ctBranchAnimeProgress.IsTicked || (OpenTaiko.ConfigIni.nBranchAnime == 1 && this.stBranch[i].nYCoord == 0)) {
-				OpenTaiko.Tx.Lane_Text[(int)OpenTaiko.stageGameScreen.nTargetBranch[i]].Opacity = 255;
-				OpenTaiko.Tx.Lane_Text[(int)OpenTaiko.stageGameScreen.nTargetBranch[i]].t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i]);
+			if (OpenTaiko.ConfigIni.SimpleMode || !this.stBranch[i].ctBranchAnimeProgress!.IsTicked || (OpenTaiko.ConfigIni.nBranchAnime == 1 && this.stBranch[i].nYCoord == 0)) {
+				OpenTaiko.Tx.Lane_Text[(int)OpenTaiko.stageGameScreen.nTargetBranch[i]]!.Opacity = 255;
+				OpenTaiko.Tx.Lane_Text[(int)OpenTaiko.stageGameScreen.nTargetBranch[i]]!.t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i]);
 				continue;
 			}
 
@@ -314,7 +314,7 @@ internal class CActImplLaneTaiko : CActivity {
 			int nAfter = (int)this.stBranch[i].nAfter;
 
 			if (OpenTaiko.ConfigIni.nBranchAnime == 0) {
-				int progress = this.stBranch[i].ctBranchAnimeProgress.CurrentValue;
+				int progress = this.stBranch[i].ctBranchAnimeProgress!.CurrentValue;
 				if (Math.Abs(nAfter - nBefore) >= 2) {
 					// 2-level change
 					if (progress < 150) {
@@ -326,37 +326,37 @@ internal class CActImplLaneTaiko : CActivity {
 				}
 				var opacity = (Math.Min(100, progress) * 0xff) / 100;
 				if (progress < 60) {
-					OpenTaiko.Tx.Lane_Text[nBefore].Opacity = 255 - opacity;
-					OpenTaiko.Tx.Lane_Text[nAfter].Opacity = opacity;
+					OpenTaiko.Tx.Lane_Text[nBefore]!.Opacity = 255 - opacity;
+					OpenTaiko.Tx.Lane_Text[nAfter]!.Opacity = opacity;
 					double ratio = progress / 60.0;
 					float max = (float)(OpenTaiko.Skin.ScaleY * 30);
 					if (nAfter > nBefore) {
 						// AC7~14 level up: fly down
-						OpenTaiko.Tx.Lane_Text[nBefore].t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] + Easing.EaseIn(ratio, 0, max, Easing.CalcType.Back));
-						OpenTaiko.Tx.Lane_Text[nAfter].t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] + Easing.EaseIn(ratio, -max, 0, Easing.CalcType.Back));
+						OpenTaiko.Tx.Lane_Text[nBefore]!.t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] + Easing.EaseIn(ratio, 0, max, Easing.CalcType.Back));
+						OpenTaiko.Tx.Lane_Text[nAfter]!.t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] + Easing.EaseIn(ratio, -max, 0, Easing.CalcType.Back));
 					} else {
 						// AC7~14 level down: fly up
-						OpenTaiko.Tx.Lane_Text[nBefore].t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] - Easing.EaseIn(ratio, 0, max, Easing.CalcType.Back));
-						OpenTaiko.Tx.Lane_Text[nAfter].t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] - Easing.EaseIn(ratio, -max, 0, Easing.CalcType.Back));
+						OpenTaiko.Tx.Lane_Text[nBefore]!.t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] - Easing.EaseIn(ratio, 0, max, Easing.CalcType.Back));
+						OpenTaiko.Tx.Lane_Text[nAfter]!.t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] - Easing.EaseIn(ratio, -max, 0, Easing.CalcType.Back));
 					}
 				} else {
-					OpenTaiko.Tx.Lane_Text[nAfter].Opacity = opacity;
-					OpenTaiko.Tx.Lane_Text[nAfter].t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i]);
+					OpenTaiko.Tx.Lane_Text[nAfter]!.Opacity = opacity;
+					OpenTaiko.Tx.Lane_Text[nAfter]!.t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i]);
 				}
 			} else {
 				var opacity = Math.Min(255, this.stBranch[i].nBranchLayerOpacity);
-				OpenTaiko.Tx.Lane_Text[nBefore].Opacity = 255 - opacity;
-				OpenTaiko.Tx.Lane_Text[nAfter].Opacity = opacity;
+				OpenTaiko.Tx.Lane_Text[nBefore]!.Opacity = 255 - opacity;
+				OpenTaiko.Tx.Lane_Text[nAfter]!.Opacity = opacity;
 				double ratio = this.stBranch[i].nYCoord / 20.0;
 				float max = (float)(OpenTaiko.Skin.ScaleY * 20);
 				if (nAfter > nBefore) {
 					// AC15~ level up: fly up
-					OpenTaiko.Tx.Lane_Text[nBefore].t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] - Easing.EaseIn(ratio, 0, max, Easing.CalcType.Back));
-					OpenTaiko.Tx.Lane_Text[nAfter].t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] - Easing.EaseIn(ratio, -max, 0, Easing.CalcType.Back));
+					OpenTaiko.Tx.Lane_Text[nBefore]!.t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] - Easing.EaseIn(ratio, 0, max, Easing.CalcType.Back));
+					OpenTaiko.Tx.Lane_Text[nAfter]!.t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] - Easing.EaseIn(ratio, -max, 0, Easing.CalcType.Back));
 				} else {
 					// AC15~ level down: fly down
-					OpenTaiko.Tx.Lane_Text[nBefore].t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] + Easing.EaseIn(ratio, 0, max, Easing.CalcType.Back));
-					OpenTaiko.Tx.Lane_Text[nAfter].t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] + Easing.EaseIn(ratio, -max, 0, Easing.CalcType.Back));
+					OpenTaiko.Tx.Lane_Text[nBefore]!.t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] + Easing.EaseIn(ratio, 0, max, Easing.CalcType.Back));
+					OpenTaiko.Tx.Lane_Text[nAfter]!.t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] + Easing.EaseIn(ratio, -max, 0, Easing.CalcType.Back));
 				}
 			}
 		}
@@ -370,10 +370,10 @@ internal class CActImplLaneTaiko : CActivity {
 			}
 
 			#region[ 動いていない ]
-			if (OpenTaiko.ConfigIni.SimpleMode || !this.stBranch[i].ctBranchAnimeProgress.IsTicked) {
+			if (OpenTaiko.ConfigIni.SimpleMode || !this.stBranch[i].ctBranchAnimeProgress!.IsTicked) {
 				int nBranch = (int)OpenTaiko.stageGameScreen.nTargetBranch[i];
-				OpenTaiko.Tx.Lane_Base[nBranch].Opacity = 255;
-				OpenTaiko.Tx.Lane_Base[nBranch].t2DDraw(x[i], y[i]);
+				OpenTaiko.Tx.Lane_Base[nBranch]!.Opacity = 255;
+				OpenTaiko.Tx.Lane_Base[nBranch]!.t2DDraw(x[i], y[i]);
 				continue;
 			}
 			#endregion
@@ -384,16 +384,16 @@ internal class CActImplLaneTaiko : CActivity {
 
 			if (OpenTaiko.ConfigIni.nBranchAnime == 1) {
 				#region[ AC15～風の背後レイヤー ]
-				OpenTaiko.Tx.Lane_Base[nBranchLower].Opacity = 255;
-				OpenTaiko.Tx.Lane_Base[nBranchLower].t2DDraw(x[i], y[i]);
-				OpenTaiko.Tx.Lane_Base[nBranchHigher].Opacity = this.stBranch[i].nBranchLayerOpacity;
+				OpenTaiko.Tx.Lane_Base[nBranchLower]!.Opacity = 255;
+				OpenTaiko.Tx.Lane_Base[nBranchLower]!.t2DDraw(x[i], y[i]);
+				OpenTaiko.Tx.Lane_Base[nBranchHigher]!.Opacity = this.stBranch[i].nBranchLayerOpacity;
 				if (isLevelDown) // level down
-					OpenTaiko.Tx.Lane_Base[nBranchHigher].Opacity = 255 - OpenTaiko.Tx.Lane_Base[nBranchHigher].Opacity;
-				OpenTaiko.Tx.Lane_Base[nBranchHigher].t2DDraw(x[i], y[i]);
+					OpenTaiko.Tx.Lane_Base[nBranchHigher]!.Opacity = 255 - OpenTaiko.Tx.Lane_Base[nBranchHigher]!.Opacity;
+				OpenTaiko.Tx.Lane_Base[nBranchHigher]!.t2DDraw(x[i], y[i]);
 				#endregion
 			} else if (OpenTaiko.ConfigIni.nBranchAnime == 0) {
 				#region[ AC7～14風の背後レイヤー ]
-				var progress = this.stBranch[i].ctBranchAnimeProgress.CurrentValue;
+				var progress = this.stBranch[i].ctBranchAnimeProgress!.CurrentValue;
 				if (Math.Abs(nBranchHigher - nBranchLower) < 2) {
 					// 1-level change
 					if (isLevelDown)
@@ -408,13 +408,13 @@ internal class CActImplLaneTaiko : CActivity {
 					}
 				}
 				if (progress < 100) {
-					OpenTaiko.Tx.Lane_Base[nBranchLower].Opacity = 255;
-					OpenTaiko.Tx.Lane_Base[nBranchLower].t2DDraw(x[i], y[i]);
-					OpenTaiko.Tx.Lane_Base[nBranchLower + 1].Opacity = (Math.Min(100, progress) * 0xff) / 100;
-					OpenTaiko.Tx.Lane_Base[nBranchLower + 1].t2DDraw(x[i], y[i]);
+					OpenTaiko.Tx.Lane_Base[nBranchLower]!.Opacity = 255;
+					OpenTaiko.Tx.Lane_Base[nBranchLower]!.t2DDraw(x[i], y[i]);
+					OpenTaiko.Tx.Lane_Base[nBranchLower + 1]!.Opacity = (Math.Min(100, progress) * 0xff) / 100;
+					OpenTaiko.Tx.Lane_Base[nBranchLower + 1]!.t2DDraw(x[i], y[i]);
 				} else {
-					OpenTaiko.Tx.Lane_Base[nBranchLower + 1].Opacity = 255;
-					OpenTaiko.Tx.Lane_Base[nBranchLower + 1].t2DDraw(x[i], y[i]);
+					OpenTaiko.Tx.Lane_Base[nBranchLower + 1]!.Opacity = 255;
+					OpenTaiko.Tx.Lane_Base[nBranchLower + 1]!.t2DDraw(x[i], y[i]);
 				}
 				#endregion
 			}
@@ -452,7 +452,7 @@ internal class CActImplLaneTaiko : CActivity {
 
 					float[] arScale = new float[] { 0.8f, 1.2f, 1.7f, 2.5f, 2.3f, 2.2f, 2.0f, 1.8f, 1.7f, 1.6f, 1.6f, 1.5f, 1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1.0f };
 
-					fScale = arScale[this.ctGoGo.CurrentValue];
+					fScale = arScale[this.ctGoGo!.CurrentValue];
 
 					/*
                     Matrix mat = Matrix.Identity;
@@ -494,10 +494,10 @@ internal class CActImplLaneTaiko : CActivity {
 		#endregion
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			if (OpenTaiko.stageGameScreen.actFlashlight.DrawsOverLight(i) != overLight) continue;
-			if (!this.stState[i].ctProgress.IsStopped) {
-				this.stState[i].ctProgress.Tick();
-				if (this.stState[i].ctProgress.IsEnded) {
-					this.stState[i].ctProgress.Stop();
+			if (!this.stState[i].ctProgress!.IsStopped) {
+				this.stState[i].ctProgress!.Tick();
+				if (this.stState[i].ctProgress!.IsEnded) {
+					this.stState[i].ctProgress!.Stop();
 				}
 				//if( this.txアタックエフェクトLower != null )
 				{
@@ -526,19 +526,19 @@ internal class CActImplLaneTaiko : CActivity {
 						case ENoteJudge.Auto:
 							if (!OpenTaiko.ConfigIni.SimpleMode) {
 								//this.txアタックエフェクトLower.t2D描画( CDTXMania.app.Device, 285, 127, new Rectangle( this.st状態[ i ].ct進行.n現在の値 * 260, n, 260, 260 ) );
-								if (this.stState[i].IsBig && OpenTaiko.Tx.Effects_Hit_Great_Big[this.stState[i].ctProgress.CurrentValue] != null)
-									OpenTaiko.Tx.Effects_Hit_Great_Big[this.stState[i].ctProgress.CurrentValue].t2DDraw(x, y);
-								else if (OpenTaiko.Tx.Effects_Hit_Great[this.stState[i].ctProgress.CurrentValue] != null)
-									OpenTaiko.Tx.Effects_Hit_Great[this.stState[i].ctProgress.CurrentValue].t2DDraw(x, y);
+								if (this.stState[i].IsBig && OpenTaiko.Tx.Effects_Hit_Great_Big[this.stState[i].ctProgress!.CurrentValue] != null)
+									OpenTaiko.Tx.Effects_Hit_Great_Big[this.stState[i].ctProgress!.CurrentValue]!.t2DDraw(x, y);
+								else if (OpenTaiko.Tx.Effects_Hit_Great[this.stState[i].ctProgress!.CurrentValue] != null)
+									OpenTaiko.Tx.Effects_Hit_Great[this.stState[i].ctProgress!.CurrentValue]!.t2DDraw(x, y);
 							}
 							break;
 
 						case ENoteJudge.Good:
 							//this.txアタックエフェクトLower.t2D描画( CDTXMania.app.Device, 285, 127, new Rectangle( this.st状態[ i ].ct進行.n現在の値 * 260, n + 260, 260, 260 ) );
-							if (this.stState[i].IsBig && OpenTaiko.Tx.Effects_Hit_Good_Big[this.stState[i].ctProgress.CurrentValue] != null)
-								OpenTaiko.Tx.Effects_Hit_Good_Big[this.stState[i].ctProgress.CurrentValue].t2DDraw(x, y);
-							else if (OpenTaiko.Tx.Effects_Hit_Good[this.stState[i].ctProgress.CurrentValue] != null)
-								OpenTaiko.Tx.Effects_Hit_Good[this.stState[i].ctProgress.CurrentValue].t2DDraw(x, y);
+							if (this.stState[i].IsBig && OpenTaiko.Tx.Effects_Hit_Good_Big[this.stState[i].ctProgress!.CurrentValue] != null)
+								OpenTaiko.Tx.Effects_Hit_Good_Big[this.stState[i].ctProgress!.CurrentValue]!.t2DDraw(x, y);
+							else if (OpenTaiko.Tx.Effects_Hit_Good[this.stState[i].ctProgress!.CurrentValue] != null)
+								OpenTaiko.Tx.Effects_Hit_Good[this.stState[i].ctProgress!.CurrentValue]!.t2DDraw(x, y);
 							break;
 
 						case ENoteJudge.Miss:
@@ -573,7 +573,7 @@ internal class CActImplLaneTaiko : CActivity {
 
 	public void ChangeBranch(CTja.ECourse nAfter, int nPlayer, bool stopAnime = false) {
 		if (stopAnime) {
-			this.stBranch[nPlayer].ctBranchAnimeProgress.Stop();
+			this.stBranch[nPlayer].ctBranchAnimeProgress!.Stop();
 			this.stBranch[nPlayer].nBefore = this.stBranch[nPlayer].nAfter = nAfter;
 			return;
 		}
@@ -636,21 +636,21 @@ internal class CActImplLaneTaiko : CActivity {
 	[StructLayout(LayoutKind.Sequential)]
 	protected struct STSTATUS {
 		public bool bUse;
-		public CCounter ctProgress;
+		public CCounter? ctProgress;
 		public ENoteJudge judge;
 		public bool IsBig;
 		public int nOpacity;
 		public int nPlayer;
 	}
-	private CCounter ctGoGo;
-	private CCounter ctGoGoFlame;
+	private CCounter? ctGoGo;
+	private CCounter ctGoGoFlame = null!;
 
 
 
 	public STBRANCH[] stBranch = new STBRANCH[5];
 	[StructLayout(LayoutKind.Sequential)]
 	public struct STBRANCH {
-		public CCounter ctBranchAnimeProgress;
+		public CCounter? ctBranchAnimeProgress;
 		public CTja.ECourse nBefore;
 		public CTja.ECourse nAfter;
 

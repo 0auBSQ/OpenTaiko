@@ -1,8 +1,8 @@
 ﻿namespace OpenTaiko.CSongListNodeComparers;
 
 internal sealed class CSongListNodeComparerNodeType : IComparer<CSongListNode> {
-	public int Compare(CSongListNode x, CSongListNode y) {
-		return ToComparable(x.nodeType).CompareTo(ToComparable(y.nodeType));
+	public int Compare(CSongListNode? x, CSongListNode? y) {
+		return ToComparable(x!.nodeType).CompareTo(ToComparable(y!.nodeType));
 	}
 
 	private static int ToComparable(CSongListNode.ENodeType nodeType) {

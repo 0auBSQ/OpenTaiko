@@ -152,7 +152,7 @@ public sealed class LuaBackgroundState {
 		towerFloor = gs.actPlayInfo.NowMeasure[0];
 		towerMaxFloor = 0;
 		if (OpenTaiko.SongMount.rChoosenSong != null && OpenTaiko.SongMount.rChoosenSong.score[5] != null) {
-			int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5].ChartInfo.nTotalFloor;
+			int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5]!.ChartInfo.nTotalFloor;
 			int nightTime = Math.Max(140, maxFloor / 2);
 			towerNight = Math.Min(gs.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
 			towerMaxFloor = maxFloor;

@@ -425,7 +425,7 @@
 				// so that the per-song file integrates transparently with the unlock system.
 				string? folderPath = null;
 				for (int i = 0; i < node.score.Length; i++) {
-					if (node.score[i] != null) { folderPath = node.score[i].FileInfo.FolderAbsolutePath; break; }
+					if (node.score[i] != null) { folderPath = node.score[i]!.FileInfo.FolderAbsolutePath; break; }
 				}
 				if (folderPath != null)
 					OpenTaiko.Databases.DBSongUnlockables.tTryRegisterLocalUnlock(node.tGetUniqueId(), folderPath);

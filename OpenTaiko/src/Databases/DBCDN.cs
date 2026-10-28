@@ -37,7 +37,7 @@ class DBCDN : CSavableT<Dictionary<string, DBCDN.CDNData>> {
 	public class CDNData {
 
 		[JsonProperty("baseUrl")]
-		public string BaseUrl;
+		public string BaseUrl = null!;
 
 		[JsonProperty("download")]
 		public Dictionary<string, string> Download = new Dictionary<string, string>() {
@@ -45,10 +45,10 @@ class DBCDN : CSavableT<Dictionary<string, DBCDN.CDNData>> {
 		};
 
 		[JsonProperty("songList")]
-		public string SongList;
+		public string SongList = null!;
 
 		[JsonProperty("hooks")]
-		public CDNHooks Hooks;
+		public CDNHooks Hooks = null!;
 	}
 
 	#endregion

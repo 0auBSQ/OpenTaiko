@@ -60,7 +60,7 @@ public partial class CTexture {
 	public static bool FileExistsCached(string path) {
 		if (string.IsNullOrEmpty(path)) return false;
 		try {
-			string dir = Path.GetDirectoryName(path);
+			string? dir = Path.GetDirectoryName(path);
 			if (string.IsNullOrEmpty(dir)) return File.Exists(path);
 			var names = _dirListCache.GetOrAdd(dir, d => {
 				var set = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase);

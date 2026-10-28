@@ -9,10 +9,10 @@ public class CScoreIni {
 		public int nOkCount;
 		public int nBadCount;
 		public int nGoodCount;
-		public Dan_C[] Dan_C;
+		public Dan_C?[] Dan_C;
 
 		public CPlayRecord() {
-			Dan_C = new Dan_C[CExamInfo.cMaxExam];
+			Dan_C = new Dan_C?[CExamInfo.cMaxExam];
 		}
 
 	}

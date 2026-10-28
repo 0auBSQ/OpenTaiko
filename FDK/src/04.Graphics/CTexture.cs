@@ -508,7 +508,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		}
 	}
 
-	private byte[] _regionBuf = null;
+	private byte[]? _regionBuf = null;
 
 	/// <summary>
 	/// Updates only a sub-rectangle of the texture from the full RGBA buffer
@@ -731,14 +731,14 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		// Decode straight into the zero-copy upload format (BGRA8888 unpremul) — a plain SKBitmap.Decode
 		// yields premul, forcing a full-size conversion pass per image at upload time. A failed decode
 		// falls through to MakeTexture's null-guard (blank 10x10), as before.
-		SKBitmap bitmap = tClampToMaxDimension(tDecodeForUpload(strFileName), maxDimension);
+		SKBitmap? bitmap = tClampToMaxDimension(tDecodeForUpload(strFileName), maxDimension);
 		MakeTexture(bitmap, bBlackTransparent);
 		bitmap?.Dispose();
 	}
 
 	// Downscale so the long side is at most maxDimension px (0 = no clamp). Keeps the zero-copy upload
 	// format; disposes the original when a resize happens.
-	internal static SKBitmap tClampToMaxDimension(SKBitmap bmp, int maxDimension) {
+	internal static SKBitmap? tClampToMaxDimension(SKBitmap? bmp, int maxDimension) {
 		if (bmp == null || maxDimension <= 0) return bmp;
 		int longSide = Math.Max(bmp.Width, bmp.Height);
 		if (longSide <= maxDimension) return bmp;
@@ -753,7 +753,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 
 	// The render-scale shrink MakeTexture(SKBitmap) does, done ahead by a decode worker so the render thread only
 	// uploads. Keeps the bitmap's own pixel format (straight alpha stays straight: no conversion at upload).
-	internal static SKBitmap tApplyRenderScale(SKBitmap bmp) {
+	internal static SKBitmap? tApplyRenderScale(SKBitmap? bmp) {
 		float rs = Game.RenderScale;
 		if (bmp == null || rs >= 0.999f) return bmp;
 		int dw = Math.Max(1, (int)Math.Round(bmp.Width * rs));
@@ -901,7 +901,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 	private void tRealizeDeferred() {
 		if (Pointer == 0 && _deferred && _sourcePath != null && !bDisposeCompleteDone) {
 			_deferred = false;
-			try { using SKBitmap bmp = tClampToMaxDimension(tDecodeForUpload(_sourcePath), _sourceMaxDimension); if (bmp != null) MakeTexture(bmp, _sourceBlackTransparent); }
+			try { using SKBitmap? bmp = tClampToMaxDimension(tDecodeForUpload(_sourcePath), _sourceMaxDimension); if (bmp != null) MakeTexture(bmp, _sourceBlackTransparent); }
 			catch { }
 		}
 	}
@@ -1030,11 +1030,11 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 	public static long LiveBytes;
 	private long _countedBytes;
 
-	public void MakeTexture(SKBitmap bitmap, bool bBlackTransparent) => MakeTexture(bitmap, bBlackTransparent, 0, 0);
+	public void MakeTexture(SKBitmap? bitmap, bool bBlackTransparent) => MakeTexture(bitmap, bBlackTransparent, 0, 0);
 
 	// scaledFromW/H > 0: the bitmap was already shrunk for the render scale (tApplyRenderScale) from an image of
 	// that size, which stays the texture's size
-	internal void MakeTexture(SKBitmap bitmap, bool bBlackTransparent, int scaledFromW, int scaledFromH) {
+	internal void MakeTexture(SKBitmap? bitmap, bool bBlackTransparent, int scaledFromW, int scaledFromH) {
 		try {
 			if (bitmap == null)
 				bitmap = new SKBitmap(10, 10);
@@ -1048,7 +1048,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 			// stores fewer pixels, so its size (and every source rect in image pixels) stays the image's own
 			bool preScaled = scaledFromW > 0 && scaledFromH > 0;
 			int logicalW = preScaled ? scaledFromW : bitmap.Width, logicalH = preScaled ? scaledFromH : bitmap.Height;
-			SKBitmap scaledBitmap = null;
+			SKBitmap? scaledBitmap = null;
 			if (bitmap.Width > _maxTextureSize || bitmap.Height > _maxTextureSize) {
 				float scale = Math.Min((float)_maxTextureSize / bitmap.Width, (float)_maxTextureSize / bitmap.Height);
 				int newW = Math.Max(1, (int)(bitmap.Width * scale));
@@ -1422,7 +1422,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 	// any asset file. Used for the programmatic loading bars (see CLoadingProgress / the Lua loading
 	// screens). Only ever called from the render thread during draw, so lazy GL creation is safe; the
 	// single instance lives for the app lifetime (1 texel — negligible) and is never disposed.
-	private static CTexture _solidWhite;
+	private static CTexture? _solidWhite;
 	public static void FillBox(int x, int y, int w, int h, int r, int g, int b, int a) {
 		if (w <= 0 || h <= 0 || a <= 0)
 			return;

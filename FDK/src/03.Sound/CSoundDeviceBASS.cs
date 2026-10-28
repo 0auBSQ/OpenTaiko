@@ -246,7 +246,7 @@ public partial class CSoundDeviceBASS : ISoundDevice {
 
 		if (bManagedDispose) {
 			SystemTimer.Dispose();
-			this.SystemTimer = null;
+			this.SystemTimer = null!;
 		}
 	}
 	~CSoundDeviceBASS() {
@@ -282,7 +282,7 @@ public partial class CSoundDeviceBASS : ISoundDevice {
 	protected int MainStreamHandle = -1;
 	protected int MixerHandle = -1;
 	protected int Mixer_DeviceOut = -1;
-	protected StreamProcedure STREAMPROC = null;
+	protected StreamProcedure? STREAMPROC = null;
 	private bool IsBASSSoundFree = true;
 
 	//WASAPIとASIOはLinuxでは使えないので、ここだけで良し

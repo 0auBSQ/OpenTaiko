@@ -15,7 +15,7 @@ class CSongObject {
 		if ((attr & FileAttributes.Directory) == FileAttributes.Directory) {
 			textures = OpenTaiko.Tx.TxCSongFolder(path);
 		} else {
-			textures = new CTexture[1];
+			textures = new CTexture?[1];
 			textures[0] = OpenTaiko.Tx.TxCSong(path);
 		}
 	}
@@ -32,7 +32,7 @@ class CSongObject {
 	}
 
 	public void tStartAnimation(double animInterval, bool loop) {
-		counter.Start(0, textures.Length - 1, animInterval, OpenTaiko.Timer);
+		counter.Start(0, textures!.Length - 1, animInterval, OpenTaiko.Timer);
 		counter.CurrentValue = this.frame;
 
 		this.isLooping = loop;
@@ -55,7 +55,7 @@ class CSongObject {
 			frame = counter.CurrentValue;
 		}
 
-		CTexture tx = this.textures[frame];
+		CTexture? tx = this.textures![frame];
 		if (frame + 1 > textures.Length) return;
 		if (tx == null) return;
 
@@ -70,7 +70,7 @@ class CSongObject {
 
 	public void tDispose() {
 		this.isVisible = false;
-		foreach (CTexture tx in textures) {
+		foreach (CTexture? tx in textures!) {
 			if (tx != null) tx.Dispose();
 		}
 	}
@@ -79,7 +79,7 @@ class CSongObject {
 	private bool isAnimating;
 	private bool isLooping;
 
-	public CTexture[] textures;
+	public CTexture?[]? textures;
 
 	public string name;
 	public bool isVisible;
@@ -90,7 +90,7 @@ class CSongObject {
 	public int opacity;
 	public float xScale;
 	public float yScale;
-	public Color4 color;
+	public Color4 color = null!;
 
 	public int frame;
 }

@@ -93,7 +93,7 @@ internal class CActPlayAVI : CActivity {
 
 	private float ratio1;
 
-	private CTexture txDraw;
+	private CTexture? txDraw;
 
 	public CVideoDecoder? rVD;
 

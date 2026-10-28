@@ -114,7 +114,6 @@ class CNamePlate {
 
 	public void tNamePlateDraw(int x, int y, int player, bool bTitle = false, int Opacity = 255) {
 		int basePlayer = player;
-		player = player;
 
 		bool isAI = OpenTaiko.ConfigIni.bAIBattleMode && basePlayer == 1;
 		if (bIsPrevAI[basePlayer] != isAI) {

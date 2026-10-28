@@ -54,7 +54,7 @@ internal class CActImplFooter : CActivity {
 
 	#region[ private ]
 	//-----------------
-	public CTexture Mob_Footer;
+	public CTexture? Mob_Footer;
 	//-----------------
 	#endregion
 }

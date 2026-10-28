@@ -9,7 +9,7 @@ internal class CBoxDef {
 	// Properties
 
 	public Color Color;
-	public string SelectBG;
+	public string? SelectBG;
 	public string Genre;
 	public CLocalizationData Title = new CLocalizationData();
 	public CLocalizationData[] strBoxText = new CLocalizationData[3] { new CLocalizationData(), new CLocalizationData(), new CLocalizationData() };
@@ -27,8 +27,8 @@ internal class CBoxDef {
 	public bool IsChangedBgType;
 	public string BoxChara;
 	public bool IsChangedBoxChara;
-	public string DefaultPreimage;
-	public string ScenePreset;
+	public string? DefaultPreimage;
+	public string? ScenePreset;
 	public bool IsChangedCompat;
 	public CTja.ETjaCompat Compat;
 
@@ -58,7 +58,7 @@ internal class CBoxDef {
 
 	public void tLoad(string boxdefFileName) {
 		StreamReader reader = new StreamReader(boxdefFileName, Encoding.GetEncoding(OpenTaiko.sEncType));
-		string str = null;
+		string? str = null;
 		while ((str = reader.ReadLine()) != null) {
 			if (str.Length != 0) {
 				try {
@@ -115,7 +115,7 @@ internal class CBoxDef {
 							} else if (key == "#SCENEPRESET") {
 								this.ScenePreset = value;
 							} else if (key == "#DEFAULTPREIMAGE") {
-								this.DefaultPreimage = Path.Combine(Directory.GetParent(boxdefFileName).FullName, value);
+								this.DefaultPreimage = Path.Combine(Directory.GetParent(boxdefFileName)!.FullName, value);
 							} else if (key == "#COMPAT") {
 								this.Compat = CTja.strConvertTjaCompat(value);
 								IsChangedCompat = true;

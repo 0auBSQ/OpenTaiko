@@ -126,10 +126,10 @@ public class CSoundTimer : CTimerBase {
 		this.ctDInputTimer?.Dispose();
 	}
 
-	internal ISoundDevice Device = null;    // debugのため、一時的にprotectedをpublicにする。後で元に戻しておくこと。
+	internal ISoundDevice Device = null!;    // debugのため、一時的にprotectedをpublicにする。後で元に戻しておくこと。
 											//protected Thread thSendInput = null;
 											//protected Thread thSnapTimers = null;
-	private CTimer ctDInputTimer = null;
+	private CTimer ctDInputTimer = null!;
 	private long msDInputTimerOffset = 0;
 	private long msSoundTimerOffset = 0;
 }

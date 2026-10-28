@@ -31,7 +31,7 @@ internal class CTextConsole : CActivity {
 				int index = printableCharacters.IndexOf(ch);
 				if (index >= 0) {
 					if (this.fontTextures[(int)((int)font / (int)EFontType.WhiteSlim)] != null) {
-						this.fontTextures[(int)((int)font / (int)EFontType.WhiteSlim)].t2DDraw(x, y, this.characterRectangles[(int)((int)font % (int)EFontType.WhiteSlim), index]);
+						this.fontTextures[(int)((int)font / (int)EFontType.WhiteSlim)]!.t2DDraw(x, y, this.characterRectangles![(int)((int)font % (int)EFontType.WhiteSlim), index]);
 					}
 				}
 
@@ -53,8 +53,8 @@ internal class CTextConsole : CActivity {
 		this.fontTextures[0] = OpenTaiko.Tx.TxC(@"Console_Font.png");
 		this.fontTextures[1] = OpenTaiko.Tx.TxC(@"Console_Font_Small.png");
 
-		this.fontWidth = this.fontTextures[0].szTextureSize.Width / 32;
-		this.fontHeight = this.fontTextures[0].szTextureSize.Height / 16;
+		this.fontWidth = this.fontTextures[0]!.szTextureSize.Width / 32;
+		this.fontHeight = this.fontTextures[0]!.szTextureSize.Height / 16;
 
 		this.characterRectangles = new Rectangle[3, printableCharacters.Length];
 		for (int i = 0; i < 3; i++) {
@@ -83,7 +83,7 @@ internal class CTextConsole : CActivity {
 				continue;
 			}
 
-			this.fontTextures[i].Dispose();
+			this.fontTextures[i]!.Dispose();
 			this.fontTextures[i] = null;
 		}
 		base.ReleaseManagedResource();
@@ -91,10 +91,10 @@ internal class CTextConsole : CActivity {
 
 	#region [ private ]
 	//-----------------
-	private Rectangle[,] characterRectangles;
+	private Rectangle[,]? characterRectangles;
 	private const string printableCharacters = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ ";
 	public int fontWidth = 8, fontHeight = 16;
-	private CTexture[] fontTextures = new CTexture[2];
+	private CTexture?[] fontTextures = new CTexture?[2];
 	//-----------------
 	#endregion
 }

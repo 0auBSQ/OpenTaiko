@@ -24,7 +24,7 @@ namespace OpenTaiko {
 	/// across CPU cores.
 	/// </summary>
 	internal sealed class Builder {
-		private Lua3DScene s;
+		private Lua3DScene s = null!;
 		private bool _lit, _gour, _screenT;
 		private byte _baseR, _baseG, _baseB;
 		// the object's surface colour, as on the GPU: albedo (the texel times the tint, or the ObjSetColor colour) times
@@ -476,7 +476,7 @@ namespace OpenTaiko {
 		// dedicated point-sprite pass, which is far cheaper for the many-small-billboard case.)
 
 		// model->world (row-major 4x4 . point), or identity when t is null.
-		private static void Xform(double[] t, double x, double y, double z, out double ox, out double oy, out double oz) {
+		private static void Xform(double[]? t, double x, double y, double z, out double ox, out double oy, out double oz) {
 			if (t == null) { ox = x; oy = y; oz = z; return; }
 			ox = t[0]*x + t[1]*y + t[2]*z + t[3];
 			oy = t[4]*x + t[5]*y + t[6]*z + t[7];
@@ -496,11 +496,11 @@ namespace OpenTaiko {
 	/// shaders, the diorama and colour grade, and texture filtering (always nearest).
 	/// </summary>
 	internal sealed class Rasterizer : IRenderer {
-		private Lua3DScene _s;
+		private Lua3DScene _s = null!;
 		private bool _lit;
 		private Builder[] _builders = Array.Empty<Builder>();
-		private Builder _transBuilder;
-		private Builder _overlayBuilder;
+		private Builder? _transBuilder;
+		private Builder? _overlayBuilder;
 		private int _nb;
 		private readonly List<SceneObject> _opaque = new();
 		private readonly List<SceneObject> _transp = new();
@@ -826,7 +826,7 @@ namespace OpenTaiko {
 
 		private void RasterizeBand(int band, int by0, int by1) {
 			for (int bi = 0; bi < _nb; bi++) RasterTris(_builders[bi], band, by0, by1);
-			RasterTris(_transBuilder, band, by0, by1);
+			RasterTris(_transBuilder!, band, by0, by1);
 		}
 
 		// (cx, cy, cz, radius): the object's world bounding sphere, when it has bounds

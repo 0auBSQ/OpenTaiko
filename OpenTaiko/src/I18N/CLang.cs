@@ -34,14 +34,14 @@ internal class CLang {
 
 			JsonNodeOptions options = new JsonNodeOptions() { PropertyNameCaseInsensitive = false };
 			JsonDocumentOptions doc = new JsonDocumentOptions() { CommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true };
-			JsonNode node = JsonNode.Parse(data, options, doc);
+			JsonNode node = JsonNode.Parse(data, options, doc)!;
 
 			clang.Id = id;
-			clang.Language = node["Language"].Deserialize<string>();
-			clang.Entries = node["Entries"].Deserialize<Dictionary<string, string>>();
-			clang.InvalidKey = node["InvalidKey"].Deserialize<string>();
-			clang.FontName = node["FontName"].Deserialize<string>().FixPath();
-			clang.BoxFontName = node["BoxFontName"].Deserialize<string>().FixPath();
+			clang.Language = node["Language"].Deserialize<string>()!;
+			clang.Entries = node["Entries"].Deserialize<Dictionary<string, string>>()!;
+			clang.InvalidKey = node["InvalidKey"].Deserialize<string>()!;
+			clang.FontName = node["FontName"].Deserialize<string>()!.FixPath();
+			clang.BoxFontName = node["BoxFontName"].Deserialize<string>()!.FixPath();
 
 			return clang;
 		} else {

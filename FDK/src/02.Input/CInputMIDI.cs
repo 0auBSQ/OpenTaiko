@@ -7,7 +7,7 @@ namespace FDK;
 public class CInputMIDI : CInputButtonsBase, IInputDevice, IDisposable {
 	// Properties
 
-	public List<STInputEvent> EventBuffers;
+	public List<STInputEvent>? EventBuffers;
 	protected int[] velocities;
 
 	// update thread and input thread

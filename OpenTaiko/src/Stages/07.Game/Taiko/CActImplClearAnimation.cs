@@ -41,14 +41,14 @@ internal class CActImplClearAnimation : CActivity {
 		} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 			// 段位認定モード。
 			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageFailed_Fast())
-				&& !OpenTaiko.stageGameScreen.actDan.GetFailedAllChallenges(OpenTaiko.SongMount.rChoosenSong.DanSongs)
+				&& !OpenTaiko.stageGameScreen.actDan.GetFailedAllChallenges(OpenTaiko.SongMount.rChoosenSong!.DanSongs!)
 				) {
 				// 段位認定モード、クリア成功
 				// this.Mode[0] = EndMode.StageCleared;
 				if (!endOfPlay) {
 					this.Mode[0] = EndMode.Total; // cancel mis-judged failed
 				} else {
-					bool bgold = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(OpenTaiko.stageGameScreen.actDan.GetExam(), OpenTaiko.SongMount.rChoosenSong.DanSongs) == Exam.Status.Better_Success;
+					bool bgold = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(OpenTaiko.stageGameScreen.actDan.GetExam(), OpenTaiko.SongMount.rChoosenSong!.DanSongs!) == Exam.Status.Better_Success;
 
 					if (OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0) {
 						if (OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0)
@@ -307,7 +307,7 @@ internal class CActImplClearAnimation : CActivity {
 			if (!((playerStageFailed && !OpenTaiko.ConfigIni.bAIBattleMode) || OpenTaiko.stageGameScreen.IsStageFailed_Fast() || OpenTaiko.stageGameScreen.IsStageCompleted()))
 				return 0;
 
-			this.ctProgressMain[iPlayer].Tick();
+			this.ctProgressMain[iPlayer]!.Tick();
 
 			var (script, sound, voices) = this.Mode[iPlayer] switch {
 				EndMode.StageFailed => (FailedScript, this.soundFailed[iPlayer], OpenTaiko.Skin.voiceClearFailed),
@@ -353,7 +353,7 @@ internal class CActImplClearAnimation : CActivity {
 				script?.Update(_state);
 			script?.Draw(_state);
 
-			if (this.ctProgressMain[iPlayer].IsEnded) {
+			if (this.ctProgressMain[iPlayer]!.IsEnded) {
 				return 1;
 			}
 		}
@@ -364,32 +364,32 @@ internal class CActImplClearAnimation : CActivity {
 	#region[ private ]
 	//-----------------
 
-	public LuaBackgroundWrapper FailedScript { get; private set; }
-	public LuaBackgroundWrapper ClearScript { get; private set; }
-	public LuaBackgroundWrapper FullComboScript { get; private set; }
-	public LuaBackgroundWrapper PerfectComboScript { get; private set; }
+	public LuaBackgroundWrapper? FailedScript { get; private set; }
+	public LuaBackgroundWrapper? ClearScript { get; private set; }
+	public LuaBackgroundWrapper? FullComboScript { get; private set; }
+	public LuaBackgroundWrapper? PerfectComboScript { get; private set; }
 
-	public LuaBackgroundWrapper AILoseScript { get; private set; }
-	public LuaBackgroundWrapper AIWinScript { get; private set; }
-	public LuaBackgroundWrapper AIWin_FullComboScript { get; private set; }
-	public LuaBackgroundWrapper AIWin_PerfectScript { get; private set; }
+	public LuaBackgroundWrapper? AILoseScript { get; private set; }
+	public LuaBackgroundWrapper? AIWinScript { get; private set; }
+	public LuaBackgroundWrapper? AIWin_FullComboScript { get; private set; }
+	public LuaBackgroundWrapper? AIWin_PerfectScript { get; private set; }
 
-	public LuaBackgroundWrapper Tower_DropoutScript { get; private set; }
-	public LuaBackgroundWrapper Tower_TopReached_PassScript { get; private set; }
-	public LuaBackgroundWrapper Tower_TopReached_FullComboScript { get; private set; }
-	public LuaBackgroundWrapper Tower_TopReached_PerfectScript { get; private set; }
+	public LuaBackgroundWrapper? Tower_DropoutScript { get; private set; }
+	public LuaBackgroundWrapper? Tower_TopReached_PassScript { get; private set; }
+	public LuaBackgroundWrapper? Tower_TopReached_FullComboScript { get; private set; }
+	public LuaBackgroundWrapper? Tower_TopReached_PerfectScript { get; private set; }
 
-	public LuaBackgroundWrapper Dan_FailScript { get; private set; }
-	public LuaBackgroundWrapper Dan_Red_PassScript { get; private set; }
-	public LuaBackgroundWrapper Dan_Red_FullComboScript { get; private set; }
-	public LuaBackgroundWrapper Dan_Red_PerfectScript { get; private set; }
+	public LuaBackgroundWrapper? Dan_FailScript { get; private set; }
+	public LuaBackgroundWrapper? Dan_Red_PassScript { get; private set; }
+	public LuaBackgroundWrapper? Dan_Red_FullComboScript { get; private set; }
+	public LuaBackgroundWrapper? Dan_Red_PerfectScript { get; private set; }
 
-	public LuaBackgroundWrapper Dan_Gold_PassScript { get; private set; }
-	public LuaBackgroundWrapper Dan_Gold_FullComboScript { get; private set; }
-	public LuaBackgroundWrapper Dan_Gold_PerfectScript { get; private set; }
+	public LuaBackgroundWrapper? Dan_Gold_PassScript { get; private set; }
+	public LuaBackgroundWrapper? Dan_Gold_FullComboScript { get; private set; }
+	public LuaBackgroundWrapper? Dan_Gold_PerfectScript { get; private set; }
 
 	bool[] bSoundPlayed = new bool[OpenTaiko.MAX_PLAYERS];
-	CCounter[] ctProgressMain = new CCounter[OpenTaiko.MAX_PLAYERS];
+	CCounter?[] ctProgressMain = new CCounter?[OpenTaiko.MAX_PLAYERS];
 	private readonly LuaBackgroundState _state = new();
 
 	/*
@@ -400,30 +400,29 @@ internal class CActImplClearAnimation : CActivity {
     CCounter ctEnd_DondaFullComboLoop;
     */
 
-	CCounter ctProgressLoop;
-	CSound[] soundClear = new CSound[5];
-	CSound[] soundFailed = new CSound[5];
-	CSound[] soundFullCombo = new CSound[5];
-	CSound[] soundPerfectCombo = new CSound[5];
+	CSound?[] soundClear = new CSound?[5];
+	CSound?[] soundFailed = new CSound?[5];
+	CSound?[] soundFullCombo = new CSound?[5];
+	CSound?[] soundPerfectCombo = new CSound?[5];
 
-	CSound soundDanFailed;
-	CSound soundDanRedClear;
-	CSound soundDanRedFC;
-	CSound soundDanRedPerfect;
-	CSound soundDanGoldClear;
-	CSound soundDanGoldFC;
-	CSound soundDanGoldPerfect;
-	CSound soundTowerDropout;
-	CSound soundTowerTopPass;
-	CSound soundTowerTopFC;
-	CSound soundTowerTopPerfect;
+	CSound? soundDanFailed;
+	CSound? soundDanRedClear;
+	CSound? soundDanRedFC;
+	CSound? soundDanRedPerfect;
+	CSound? soundDanGoldClear;
+	CSound? soundDanGoldFC;
+	CSound? soundDanGoldPerfect;
+	CSound? soundTowerDropout;
+	CSound? soundTowerTopPass;
+	CSound? soundTowerTopFC;
+	CSound? soundTowerTopPerfect;
 
-	CSound soundAILose;
-	CSound soundAIWin;
-	CSound soundAIWinFullCombo;
-	CSound soundAIWinPerfectCombo;
+	CSound? soundAILose;
+	CSound? soundAIWin;
+	CSound? soundAIWinFullCombo;
+	CSound? soundAIWinPerfectCombo;
 
-	public EndMode[] Mode { get; private set; }
+	public EndMode[] Mode { get; private set; } = null!;
 	public enum EndMode {
 		StageFailed,
 		StageCleared,

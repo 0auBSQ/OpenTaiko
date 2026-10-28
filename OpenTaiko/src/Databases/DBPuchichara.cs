@@ -77,7 +77,7 @@ class DBPuchichara {
 		// String or CLocalizationData
 		[JsonProperty("description")]
 		[JsonConverter(typeof(LocalizedStringConverter<CLocalizationData>))]
-		public object Description;
+		public object? Description;
 	}
 
 }

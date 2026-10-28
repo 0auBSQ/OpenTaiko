@@ -7,7 +7,7 @@ namespace OpenTaiko;
 /// </summary>
 public class LaneFlash : CActivity {
 
-	public LaneFlash(ref CTexture texture, int player) {
+	public LaneFlash(ref CTexture? texture, int player) {
 		Texture = texture;
 		Player = player;
 		base.IsDeActivated = true;
@@ -53,7 +53,7 @@ public class LaneFlash : CActivity {
 		return base.Draw();
 	}
 
-	private CTexture Texture;
-	private CCounter Counter;
+	private CTexture? Texture;
+	private CCounter? Counter;
 	private int Player;
 }

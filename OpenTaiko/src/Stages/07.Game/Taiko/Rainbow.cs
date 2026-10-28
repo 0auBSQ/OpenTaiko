@@ -58,9 +58,9 @@ internal class Rainbow : CActivity {
 			if (OpenTaiko.ConfigIni.nPlayerCount > 2) return base.Draw();
 			for (int f = 0; f < 2; f++) {
 				if (this.Rainbow1P[f].IsUsing) {
-					this.Rainbow1P[f].Counter.Tick();
-					if (this.Rainbow1P[f].Counter.IsEnded) {
-						this.Rainbow1P[f].Counter.Stop();
+					this.Rainbow1P[f].Counter!.Tick();
+					if (this.Rainbow1P[f].Counter!.IsEnded) {
+						this.Rainbow1P[f].Counter!.Stop();
 						this.Rainbow1P[f].IsUsing = false;
 					}
 
@@ -68,12 +68,12 @@ internal class Rainbow : CActivity {
 					{
 						//this.st虹[f].ct進行.n現在の値 = 164;
 
-						if (this.Rainbow1P[f].Counter.CurrentValue < 82) {
-							int nRectX = ((this.Rainbow1P[f].Counter.CurrentValue * OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Width) / 85);
+						if (this.Rainbow1P[f].Counter!.CurrentValue < 82) {
+							int nRectX = ((this.Rainbow1P[f].Counter!.CurrentValue * OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Width) / 85);
 							OpenTaiko.Tx.Effects_Rainbow.t2DDraw(OpenTaiko.Skin.Game_Effect_Rainbow_X[0], OpenTaiko.Skin.Game_Effect_Rainbow_Y[0],
 								new Rectangle(0, 0, nRectX, OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Height));
-						} else if (this.Rainbow1P[f].Counter.CurrentValue >= 82) {
-							int nRectX = (((this.Rainbow1P[f].Counter.CurrentValue - 82) * OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Width) / 85);
+						} else if (this.Rainbow1P[f].Counter!.CurrentValue >= 82) {
+							int nRectX = (((this.Rainbow1P[f].Counter!.CurrentValue - 82) * OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Width) / 85);
 							OpenTaiko.Tx.Effects_Rainbow.t2DDraw(OpenTaiko.Skin.Game_Effect_Rainbow_X[0] + nRectX, OpenTaiko.Skin.Game_Effect_Rainbow_Y[0],
 								new Rectangle(nRectX, 0, OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Width - nRectX, OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Height));
 						}
@@ -84,9 +84,9 @@ internal class Rainbow : CActivity {
 			}
 			for (int f = 0; f < 2; f++) {
 				if (this.Rainbow2P[f].IsUsing) {
-					this.Rainbow2P[f].Counter.Tick();
-					if (this.Rainbow2P[f].Counter.IsEnded) {
-						this.Rainbow2P[f].Counter.Stop();
+					this.Rainbow2P[f].Counter!.Tick();
+					if (this.Rainbow2P[f].Counter!.IsEnded) {
+						this.Rainbow2P[f].Counter!.Stop();
 						this.Rainbow2P[f].IsUsing = false;
 					}
 
@@ -94,12 +94,12 @@ internal class Rainbow : CActivity {
 					{
 						//this.st虹[f].ct進行.n現在の値 = 164;
 
-						if (this.Rainbow2P[f].Counter.CurrentValue < 82) {
-							int nRectX = ((this.Rainbow2P[f].Counter.CurrentValue * OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Width) / 85);
+						if (this.Rainbow2P[f].Counter!.CurrentValue < 82) {
+							int nRectX = ((this.Rainbow2P[f].Counter!.CurrentValue * OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Width) / 85);
 							OpenTaiko.Tx.Effects_Rainbow.t2DFlipVDraw(OpenTaiko.Skin.Game_Effect_Rainbow_X[0], OpenTaiko.Skin.Game_Effect_Rainbow_Y[1],
 								new Rectangle(0, 0, nRectX, OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Height));
-						} else if (this.Rainbow2P[f].Counter.CurrentValue >= 82) {
-							int nRectX = (((this.Rainbow2P[f].Counter.CurrentValue - 82) * OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Width) / 85);
+						} else if (this.Rainbow2P[f].Counter!.CurrentValue >= 82) {
+							int nRectX = (((this.Rainbow2P[f].Counter!.CurrentValue - 82) * OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Width) / 85);
 							OpenTaiko.Tx.Effects_Rainbow.t2DFlipVDraw(OpenTaiko.Skin.Game_Effect_Rainbow_X[0] + nRectX, OpenTaiko.Skin.Game_Effect_Rainbow_Y[1],
 								new Rectangle(nRectX, 0, OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Width - nRectX, OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Height));
 						}
@@ -122,7 +122,7 @@ internal class Rainbow : CActivity {
 	private struct StructRainbow {
 		public bool IsUsing;
 		public int Player;
-		public CCounter Counter;
+		public CCounter? Counter;
 		public float X;
 	}
 

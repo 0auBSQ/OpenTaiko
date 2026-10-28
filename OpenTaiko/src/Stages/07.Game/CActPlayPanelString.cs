@@ -25,7 +25,7 @@ internal class CActPlayPanelString : CActivity {
 	/// <param name="songName">曲名</param>
 	/// <param name="genreName">ジャンル名</param>
 	/// <param name="stageText">曲数</param>
-	public void SetPanelString(string songName, string genreName, string stageText = null, CSongListNode songNode = null) {
+	public void SetPanelString(string songName, string genreName, string? stageText = null, CSongListNode? songNode = null) {
 		if (base.IsActivated) {
 			OpenTaiko.tDisposeSafely(ref this.txMusicName);
 			OpenTaiko.tDisposeSafely(ref this.txStage);
@@ -33,7 +33,7 @@ internal class CActPlayPanelString : CActivity {
 			this.tReleaseGenre();
 			if ((songName != null) && (songName.Length > 0)) {
 				try {
-					using (var bmpSongTitle = pfMusicName.DrawText(songName, OpenTaiko.Skin.Game_MusicName_ForeColor, OpenTaiko.Skin.Game_MusicName_BackColor, null, 30)) {
+					using (var bmpSongTitle = pfMusicName!.DrawText(songName, OpenTaiko.Skin.Game_MusicName_ForeColor, OpenTaiko.Skin.Game_MusicName_BackColor, null, 30)) {
 						this.txMusicName = OpenTaiko.tTextureCreate(bmpSongTitle, false);
 					}
 					if (txMusicName != null) {
@@ -112,7 +112,6 @@ internal class CActPlayPanelString : CActivity {
 		this.pfMusicName = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Game_MusicName_FontSize);
 		this.ctForProgress = new CCounter();
 		this.Start();
-		this.bFirst = true;
 		base.Activate();
 	}
 	public override void DeActivate() {
@@ -135,11 +134,11 @@ internal class CActPlayPanelString : CActivity {
 	public override int Draw() {
 		if (OpenTaiko.stageGameScreen.actDan.IsAnimating || OpenTaiko.ConfigIni.nPlayerCount > 2) return 0;
 		if (!base.IsDeActivated && !this.bMute) {
-			this.ctForProgress.TickLoop();
+			this.ctForProgress!.TickLoop();
 
 			if (this.txGENRE != null) {
 				this.txGENRE.t2DDraw(OpenTaiko.Skin.Game_Genre_X, OpenTaiko.Skin.Game_Genre_Y);
-				TitleTextureKey.ResolveTitleTexture(this.ttkGENRE).t2DScaledCenterBasedDraw(OpenTaiko.Skin.Game_Genre_X + OpenTaiko.Skin.Game_GenreText_Offset[0], OpenTaiko.Skin.Game_Genre_Y + OpenTaiko.Skin.Game_GenreText_Offset[1]);
+				TitleTextureKey.ResolveTitleTexture(this.ttkGENRE!).t2DScaledCenterBasedDraw(OpenTaiko.Skin.Game_Genre_X + OpenTaiko.Skin.Game_GenreText_Offset[0], OpenTaiko.Skin.Game_Genre_Y + OpenTaiko.Skin.Game_GenreText_Offset[1]);
 			}
 			if (this.txStage != null)
 				this.txStage.t2DDraw(OpenTaiko.Skin.Game_Genre_X, OpenTaiko.Skin.Game_Genre_Y);
@@ -208,19 +207,18 @@ internal class CActPlayPanelString : CActivity {
 
 	#region [ private ]
 	//-----------------
-	private CCounter ctForProgress;
+	private CCounter? ctForProgress;
 
 	private bool bMute;
-	private bool bFirst;
 
 	private CTexture? txMusicName;
 	private CTexture? txStage;
 	private CTexture? txGENRE;
 	private CCachedFontRenderer? pfGENRE;
-	private TitleTextureKey ttkGENRE;
-	private CTexture txLyricsTexture;
-	private CCachedFontRenderer pfMusicName;
-	private CCachedFontRenderer pfLyricsFont;
+	private TitleTextureKey? ttkGENRE;
+	private CTexture? txLyricsTexture;
+	private CCachedFontRenderer? pfMusicName;
+	private CCachedFontRenderer? pfLyricsFont;
 	//-----------------
 	#endregion
 }

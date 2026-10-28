@@ -25,7 +25,7 @@ namespace OpenTaiko {
 		private NamedLuaFunction lfAfterSongEnum = new("afterSongEnum");
 		private NamedLuaFunction lfOnDestroy = new("onDestroy");
 
-		private Func<string, string?, string?, int> StageExitCallBack;
+		private Func<string, string?, string?, int>? StageExitCallBack;
 
 		#region [CStage/CActivity events]
 

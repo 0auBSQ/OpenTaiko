@@ -42,14 +42,14 @@ namespace FDK;
 /// Presents an easy to use wrapper for making games and samples.
 /// </summary>
 public abstract partial class Game : IDisposable {
-	public static GL Gl { get; private set; }
-	public static Silk.NET.Core.Contexts.IGLContext Context { get; private set; }
+	public static GL Gl { get; private set; } = null!;
+	public static Silk.NET.Core.Contexts.IGLContext Context { get; private set; } = null!;
 
 	/// <summary>True when the GL context is GLES 3.1+, i.e. compute shaders (the GPU renderer path)
 	/// are usable. False on the GLES 2.0 fallback, where the CPU renderers are used instead.</summary>
 	public static bool ComputeShadersAvailable { get; private set; }
 	
-	private static string[] parameters;
+	private static string[] parameters = null!;
 	private static string GetParameterValue(string parameter = "", string parameter_full = "") {
 		if (parameters.Length == 0) return "";
 		int index = parameters.Contains(parameter) || parameters.Contains(parameter_full)
@@ -58,9 +58,9 @@ public abstract partial class Game : IDisposable {
 		return index > -1 && parameters.Length > index ? parameters[index + 1] : "";
 	}
 
-	public static ImGuiController ImGuiController { get; private set; }
+	public static ImGuiController? ImGuiController { get; private set; }
 	public static ImGuiIOPtr ImGuiIO { get; private set; }
-	private static CTexture ImGuiFontAtlas;
+	private static CTexture? ImGuiFontAtlas;
 
 	public static void InitImGuiController(IView window, IInputContext context) {
 		if (ImGuiController != null) return;
@@ -74,7 +74,7 @@ public abstract partial class Game : IDisposable {
 		try {
 			ImGuiIO.Fonts.Clear();
 			unsafe {
-				Stream data = Assembly.GetExecutingAssembly().GetManifestResourceStream(@"FDK.mplus-1p-medium.ttf");
+				Stream data = Assembly.GetExecutingAssembly().GetManifestResourceStream(@"FDK.mplus-1p-medium.ttf")!;
 				byte[] stream_data = new byte[data.Length];
 				data.Read(stream_data);
 				fixed (byte* stream = stream_data) {
@@ -96,7 +96,7 @@ public abstract partial class Game : IDisposable {
 					ImGuiIO.Fonts.SetTexID((nint)ImGuiFontAtlas.Pointer);
 				}
 			}
-		} catch (Exception ex) {
+		} catch (Exception) {
 			ImGuiIO.Fonts.Clear();
 			ImGuiIO.Fonts.AddFontDefault();
 		}
@@ -173,7 +173,7 @@ public abstract partial class Game : IDisposable {
 
 	public static AnglePlatformType GraphicsDeviceType_ = AnglePlatformType.OpenGL;
 
-	public IWindow Window_;
+	public IWindow? Window_;
 
 	private Vector2D<int> _WindowSize;
 	public Vector2D<int> WindowSize {
@@ -243,13 +243,13 @@ public abstract partial class Game : IDisposable {
 	private void ApplyWindowModeOnWindowThread() {
 		switch (_windowMode) {
 			case 1:   // exclusive fullscreen
-				Window_.WindowBorder = WindowBorder.Resizable;
+				Window_!.WindowBorder = WindowBorder.Resizable;
 				if (!_usingGlfw) this.SetSdlFullscreen(true);
 				Window_.WindowState = WindowState.Fullscreen;
 				break;
 			case 2:   // borderless fullscreen
 				if (!_usingGlfw) this.SetSdlFullscreen(false);
-				Window_.WindowState = WindowState.Normal;
+				Window_!.WindowState = WindowState.Normal;
 				Window_.WindowBorder = WindowBorder.Hidden;
 				var mon = Window_.Monitor;
 				if (mon != null) {
@@ -259,7 +259,7 @@ public abstract partial class Game : IDisposable {
 				break;
 			default:  // windowed
 				if (!_usingGlfw) this.SetSdlFullscreen(false);
-				Window_.WindowState = WindowState.Normal;
+				Window_!.WindowState = WindowState.Normal;
 				Window_.WindowBorder = WindowBorder.Resizable;
 				// Restore the configured windowed size/position — borderless (and exclusive fullscreen) resized the
 				// window to the monitor, so without this the window stays monitor-sized and looks still-borderless.
@@ -272,7 +272,7 @@ public abstract partial class Game : IDisposable {
 	// SDL's fullscreen takes the display mode nearest the window size, so the screen would switch to the windowed
 	// resolution: it is given the desktop's mode, as GLFW's takes. Restoring an SDL window does not leave fullscreen.
 	private unsafe void SetSdlFullscreen(bool fullscreen) {
-		if (Window_.Native?.Sdl is not nint handle || handle == 0) return;
+		if (Window_!.Native?.Sdl is not nint handle || handle == 0) return;
 		var sdl = Silk.NET.SDL.SdlProvider.SDL.Value;
 		var window = (Silk.NET.SDL.Window*)handle;
 		if (fullscreen) {
@@ -574,11 +574,11 @@ public abstract partial class Game : IDisposable {
 
 	private void UpdateWindowFramerate(bool vsync, int value) {
 		if (vsync) {
-			Window_.UpdatesPerSecond = 0;
+			Window_!.UpdatesPerSecond = 0;
 			Window_.FramesPerSecond = 0;
 			Context.SwapInterval(1);
 		} else {
-			Window_.UpdatesPerSecond = value;
+			Window_!.UpdatesPerSecond = value;
 			Window_.FramesPerSecond = value;
 			Context.SwapInterval(0);
 		}
@@ -590,7 +590,7 @@ public abstract partial class Game : IDisposable {
 	public void Dispose() {
 		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid())
 			return;
-		Window_.Dispose();
+		Window_!.Dispose();
 	}
 
 	// Hosted (mobile) builds have no window to close: the host installs a callback here and
@@ -745,7 +745,7 @@ public abstract partial class Game : IDisposable {
 		}
 		// This thread keeps the window: it waits for window events (waking on input, or after 1 ms to poll the pads),
 		// and the device callbacks stamp each press as it arrives. The game runs on its own thread (GameThreadMain).
-		Window_.Initialize();
+		Window_!.Initialize();
 		if (OperatingSystem.IsMacOS())
 			Window_.GLContext?.Clear(); // made current on the game thread
 		WindowInput = Window_.CreateInput();
@@ -867,7 +867,7 @@ public abstract partial class Game : IDisposable {
 		// the windowing backend, not our state — swallow it and re-pump next frame instead of
 		// letting it crash the whole game.
 		try {
-			Window_.DoEvents();
+			Window_!.DoEvents();
 		} catch (Exception e) {
 			System.Diagnostics.Trace.TraceWarning($"Window event pump threw (ignored): {e}");
 		}
@@ -893,15 +893,15 @@ public abstract partial class Game : IDisposable {
 	// window thread, inside Window_.Initialize
 	public void Window_Load() {
 		// a hidden run stays hidden whatever the windowing backend applied after creating the window
-		if (StartHidden && Window_.IsVisible) Window_.IsVisible = false;
+		if (StartHidden && Window_!.IsVisible) Window_.IsVisible = false;
 		var icons = GetIconData(strIconFileName);
 		if (icons.Length > 0) {
-			Window_.SetWindowIcon(new ReadOnlySpan<RawImage>(icons));
+			Window_!.SetWindowIcon(new ReadOnlySpan<RawImage>(icons));
 			if (OperatingSystem.IsWindows() && Window_.Native?.Win32 is { } w && w.Hwnd != 0)
 				SyncTaskbarIcon(w.Hwnd);
 		}
 
-		if (OperatingSystem.IsMacOS() && Window_.GLContext == null) {
+		if (OperatingSystem.IsMacOS() && Window_!.GLContext == null) {
 			throw new Exception("No native OpenGL context available");
 		}
 
@@ -913,7 +913,7 @@ public abstract partial class Game : IDisposable {
 	// game thread: the GL context and the state that needs it
 	private void InitializeGraphics() {
 		if (OperatingSystem.IsMacOS()) {
-			Context = Window_.GLContext!;
+			Context = Window_!.GLContext!;
 			Context.MakeCurrent();
 		} else {
 			#region Override Platform
@@ -929,7 +929,7 @@ public abstract partial class Game : IDisposable {
 			Console.WriteLine("Platform set to " + GraphicsDeviceType_);
 			#endregion
 
-			Context = new AngleContext(GraphicsDeviceType_, Window_, GetParameterValue("-f", "--flag"));
+			Context = new AngleContext(GraphicsDeviceType_, Window_!, GetParameterValue("-f", "--flag"));
 
 			Context.MakeCurrent();
 		}

@@ -93,7 +93,7 @@ public class CActLVLNFont : CActivity {
 		Right
 	}
 	private STNumber[,] stNumber;
-	private CTexture txValue;
+	private CTexture? txValue;
 	//-----------------
 	#endregion
 }

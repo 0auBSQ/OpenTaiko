@@ -59,45 +59,45 @@ internal class CActImplComboBalloon : CActivity {
 				if (OpenTaiko.PlayerSide == 1 && OpenTaiko.ConfigIni.nPlayerCount == 1)
 					j = 1;
 
-				if (!this.ctProgress[i].IsStopped) {
-					this.ctProgress[i].Tick();
-					if (this.ctProgress[i].IsEnded) {
-						this.ctProgress[i].Stop();
+				if (!this.ctProgress[i]!.IsStopped) {
+					this.ctProgress[i]!.Tick();
+					if (this.ctProgress[i]!.IsEnded) {
+						this.ctProgress[i]!.Stop();
 					}
 				}
 
 				if (OpenTaiko.Tx.Balloon_Combo[j] != null && OpenTaiko.Tx.Balloon_Number_Combo != null) {
 					//半透明4f
-					if (this.ctProgress[i].CurrentValue == 1 || this.ctProgress[i].CurrentValue == 42) {
+					if (this.ctProgress[i]!.CurrentValue == 1 || this.ctProgress[i]!.CurrentValue == 42) {
 						OpenTaiko.Tx.Balloon_Number_Combo.Opacity = 0;
-						OpenTaiko.Tx.Balloon_Combo[j].Opacity = 64;
+						OpenTaiko.Tx.Balloon_Combo[j]!.Opacity = 64;
 						NowDrawBalloon = 0;
-					} else if (this.ctProgress[i].CurrentValue == 2 || this.ctProgress[i].CurrentValue == 41) {
+					} else if (this.ctProgress[i]!.CurrentValue == 2 || this.ctProgress[i]!.CurrentValue == 41) {
 						OpenTaiko.Tx.Balloon_Number_Combo.Opacity = 0;
-						OpenTaiko.Tx.Balloon_Combo[j].Opacity = 128;
+						OpenTaiko.Tx.Balloon_Combo[j]!.Opacity = 128;
 						NowDrawBalloon = 0;
-					} else if (this.ctProgress[i].CurrentValue == 3 || this.ctProgress[i].CurrentValue == 40) {
+					} else if (this.ctProgress[i]!.CurrentValue == 3 || this.ctProgress[i]!.CurrentValue == 40) {
 						NowDrawBalloon = 1;
-						OpenTaiko.Tx.Balloon_Combo[j].Opacity = 255;
+						OpenTaiko.Tx.Balloon_Combo[j]!.Opacity = 255;
 						OpenTaiko.Tx.Balloon_Number_Combo.Opacity = 128;
-					} else if (this.ctProgress[i].CurrentValue == 4 || this.ctProgress[i].CurrentValue == 39) {
+					} else if (this.ctProgress[i]!.CurrentValue == 4 || this.ctProgress[i]!.CurrentValue == 39) {
 						NowDrawBalloon = 2;
-						OpenTaiko.Tx.Balloon_Combo[j].Opacity = 255;
+						OpenTaiko.Tx.Balloon_Combo[j]!.Opacity = 255;
 						OpenTaiko.Tx.Balloon_Number_Combo.Opacity = 255;
-					} else if (this.ctProgress[i].CurrentValue == 5 || this.ctProgress[i].CurrentValue == 38) {
+					} else if (this.ctProgress[i]!.CurrentValue == 5 || this.ctProgress[i]!.CurrentValue == 38) {
 						NowDrawBalloon = 2;
-						OpenTaiko.Tx.Balloon_Combo[j].Opacity = 255;
+						OpenTaiko.Tx.Balloon_Combo[j]!.Opacity = 255;
 						OpenTaiko.Tx.Balloon_Number_Combo.Opacity = 255;
-					} else if (this.ctProgress[i].CurrentValue >= 6 || this.ctProgress[i].CurrentValue <= 37) {
+					} else if (this.ctProgress[i]!.CurrentValue >= 6 || this.ctProgress[i]!.CurrentValue <= 37) {
 						NowDrawBalloon = 2;
-						OpenTaiko.Tx.Balloon_Combo[j].Opacity = 255;
+						OpenTaiko.Tx.Balloon_Combo[j]!.Opacity = 255;
 						OpenTaiko.Tx.Balloon_Number_Combo.Opacity = 255;
 					}
 
-					if (this.ctProgress[i].IsTicked) {
-						int plate_width = OpenTaiko.Tx.Balloon_Combo[j].szTextureSize.Width / 3;
-						int plate_height = OpenTaiko.Tx.Balloon_Combo[j].szTextureSize.Height;
-						OpenTaiko.Tx.Balloon_Combo[j].t2DDraw(OpenTaiko.Skin.Game_Balloon_Combo_X[i], OpenTaiko.Skin.Game_Balloon_Combo_Y[i], new RectangleF(NowDrawBalloon * plate_width, 0, plate_width, plate_height));
+					if (this.ctProgress[i]!.IsTicked) {
+						int plate_width = OpenTaiko.Tx.Balloon_Combo[j]!.szTextureSize.Width / 3;
+						int plate_height = OpenTaiko.Tx.Balloon_Combo[j]!.szTextureSize.Height;
+						OpenTaiko.Tx.Balloon_Combo[j]!.t2DDraw(OpenTaiko.Skin.Game_Balloon_Combo_X[i], OpenTaiko.Skin.Game_Balloon_Combo_Y[i], new RectangleF(NowDrawBalloon * plate_width, 0, plate_width, plate_height));
 						if (this.nCombo_Watari[i] < 1000) //2016.08.23 kairera0467 仮実装。
 						{
 							this.tSmallDisplay(OpenTaiko.Skin.Game_Balloon_Combo_Number_X[i], OpenTaiko.Skin.Game_Balloon_Combo_Number_Y[i], this.nCombo_Watari[i], j);
@@ -121,7 +121,7 @@ internal class CActImplComboBalloon : CActivity {
 
 	#region [ private ]
 	//-----------------
-	private CCounter[] ctProgress = new CCounter[5];
+	private CCounter?[] ctProgress = new CCounter?[5];
 	//private CTexture[] tx吹き出し本体 = new CTexture[ 2 ];
 	//private CTexture tx数字;
 	private int[] nCombo_Watari = new int[5];
@@ -148,7 +148,7 @@ internal class CActImplComboBalloon : CActivity {
 			float width = OpenTaiko.Skin.Game_Balloon_Combo_Number_Size[0];
 			float height = OpenTaiko.Skin.Game_Balloon_Combo_Number_Size[1];
 
-			OpenTaiko.Tx.Balloon_Number_Combo.t2DDraw(_x, _y, new RectangleF(width * nums[j], height * player, width, height));
+			OpenTaiko.Tx.Balloon_Number_Combo!.t2DDraw(_x, _y, new RectangleF(width * nums[j], height * player, width, height));
 		}
 	}
 	//-----------------

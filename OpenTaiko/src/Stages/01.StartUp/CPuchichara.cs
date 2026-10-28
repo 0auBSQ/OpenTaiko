@@ -5,7 +5,7 @@ using Silk.NET.Maths;
 namespace OpenTaiko;
 
 class CPuchichara {
-	public CTexture tx;
+	public CTexture? tx;
 	public CSkin.CSystemSound welcome;
 	public DBPuchichara.PuchicharaData metadata;
 	public DBPuchichara.PuchicharaEffect effect;

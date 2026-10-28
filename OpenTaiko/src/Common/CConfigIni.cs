@@ -272,7 +272,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 	/// <summary>
 	/// Notice: Call OpenTaiko.Pad.InvalidateInputToPadCache() after any value is changed.
 	/// </summary>
-	public CKeyAssign KeyAssign;
+	public CKeyAssign KeyAssign = null!;
 
 	public int nMsSleepUnfocused; // #23568 2010.11.04 ikanick add
 	public int nMsSleepPerFrame; // #xxxxx 2011.11.27 yyagi add
@@ -839,8 +839,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 		this.nWindowHeight = GameWindowSize.Height; //
 		this.nMsSleepPerFrame = -1; // #xxxxx 2011.11.27 yyagi add
 		this.nMsSleepUnfocused = 1; // #23568 2010.11.04 ikanick add
-		this._bGuitarEnabled = true;
-		this._bDrumsEnabled = true;
 		this.nBGAlpha = 100;
 		this.bEnableAVI = false;
 		this.eClipDispType = EClipDispType.BackgroundOnly;
@@ -1146,7 +1144,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 				System.IO.Path.DirectorySeparatorChar));
 		}
 
-		Uri uriPath = new Uri(System.IO.Path.Combine(this.strSystemSkinSubfolderFullName,
+		Uri uriPath = new Uri(System.IO.Path.Combine(this.strSystemSkinSubfolderFullName!,
 			"." + System.IO.Path.DirectorySeparatorChar));
 		string relPath = uriRoot.MakeRelativeUri(uriPath).ToString(); // 相対パスを取得
 		relPath = System.Web.HttpUtility.UrlDecode(relPath); // デコードする
@@ -2984,8 +2982,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 	private Dictionary<ESectionType, Action<string, string>> sectionProcess = new Dictionary<ESectionType, Action<string, string>>();
 
-	private bool _bDrumsEnabled;
-	private bool _bGuitarEnabled;
 	private bool bConfigIniFileExists;
 	private string ConfigIniFileName;
 
@@ -3182,9 +3178,9 @@ TrainingJumpToLastMeasure=K051
 	#endregion
 
 
-	public event PropertyChangedEventHandler PropertyChanged;
+	public event PropertyChangedEventHandler? PropertyChanged;
 
-	private bool SetProperty<T>(ref T storage, T value, string propertyName = null) {
+	private bool SetProperty<T>(ref T storage, T value, string? propertyName = null) {
 		if (Equals(storage, value)) {
 			return false;
 		}
@@ -3194,7 +3190,7 @@ TrainingJumpToLastMeasure=K051
 		return true;
 	}
 
-	private void OnPropertyChanged(string propertyName) {
+	private void OnPropertyChanged(string? propertyName) {
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 }

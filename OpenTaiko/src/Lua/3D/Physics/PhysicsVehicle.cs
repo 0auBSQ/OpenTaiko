@@ -52,7 +52,7 @@ namespace OpenTaiko {
 			Wheels.Add(wh);
 			return wh;
 		}
-		public WheelCollider GetWheel(int i) => (i >= 0 && i < Wheels.Count) ? Wheels[i] : null;
+		public WheelCollider? GetWheel(int i) => (i >= 0 && i < Wheels.Count) ? Wheels[i] : null;
 		public int WheelCount() => Wheels.Count;
 
 		// ── proxies so the VehicleBody drops in where a Character body was ──────────────────────────

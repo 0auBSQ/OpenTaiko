@@ -67,7 +67,7 @@ namespace OpenTaiko {
 
 		// A* from node `start` to node `goal`; the returned path is the transit points crossed, then (goalX,goalY,goalZ).
 		// Returns null if unreachable / bad indices. start==goal -> just the goal point.
-		public NavPath FindPath(int start, int goal, double goalX, double goalY, double goalZ) {
+		public NavPath? FindPath(int start, int goal, double goalX, double goalY, double goalZ) {
 			int n = _nx.Count;
 			if (start < 1 || start > n || goal < 1 || goal > n) return null;
 			start--; goal--;

@@ -187,7 +187,6 @@ public class Dan_C {
 	/// この変数が一度trueになれば、基本的にfalseに戻ることはない。
 	/// (スコア加算については、この限りではない。)
 	/// </summary>
-	[Obsolete("use `ReachStatus == Exam.ReachStatus.Failure`")] private bool NotReached = false;
 	#endregion
 
 	[NonSerialized]

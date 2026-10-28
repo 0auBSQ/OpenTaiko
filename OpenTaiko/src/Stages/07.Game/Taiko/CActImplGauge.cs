@@ -88,7 +88,7 @@ internal class CActImplGauge : CActPlayGaugeCommon {
 			int nWidth = (OpenTaiko.Skin.Game_Gauge_Rect[2] / 50);
 			for (int g = 0; g < 5; g++)
 				nRectX[g] = (int)(this.dbCurrentGaugeValue[g] / 2) * nWidth;
-			int RainbowBase = ctRainbowAnime.CurrentValue + 1;
+			int RainbowBase = ctRainbowAnime!.CurrentValue + 1;
 			if (RainbowBase == ctRainbowAnime.EndValue + 1) RainbowBase = 0;
 			/*
 
@@ -123,7 +123,7 @@ internal class CActImplGauge : CActPlayGaugeCommon {
 				int rainbowFrame = this.ctRainbowAnime.CurrentValue;
 
 				// Soul fire frame
-				this.ctFlame.TickLoop();
+				this.ctFlame!.TickLoop();
 				int soulFireFrame = this.ctFlame.CurrentValue;
 
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
@@ -164,14 +164,14 @@ internal class CActImplGauge : CActPlayGaugeCommon {
 
 
 					if (OpenTaiko.Tx.Gauge_Dan[2] != null) {
-						for (int i = 0; i < OpenTaiko.TJA.Dan_C.Length; i++) {
+						for (int i = 0; i < OpenTaiko.TJA!.Dan_C.Length; i++) {
 							if (OpenTaiko.TJA.Dan_C[i] != null) {
 								Dan_C dan_c = OpenTaiko.TJA.List_DanSongs[OpenTaiko.stageGameScreen.actDan.NowCymbolShowingNumber].Dan_C[i] != null ?
-									OpenTaiko.TJA.List_DanSongs[OpenTaiko.stageGameScreen.actDan.NowCymbolShowingNumber].Dan_C[i] :
-									OpenTaiko.TJA.Dan_C[i];
+									OpenTaiko.TJA.List_DanSongs[OpenTaiko.stageGameScreen.actDan.NowCymbolShowingNumber].Dan_C[i]! :
+									OpenTaiko.TJA.Dan_C[i]!;
 
 								if (dan_c.ExamType == Exam.Type.Gauge) {
-									OpenTaiko.Tx.Gauge_Dan[2].t2DDraw(gauge_x[0] + (dan_c.GetValue()[0] / 2 * nWidth), gauge_y[0],
+									OpenTaiko.Tx.Gauge_Dan[2]!.t2DDraw(gauge_x[0] + (dan_c.GetValue()[0] / 2 * nWidth), gauge_y[0],
 										new Rectangle((dan_c.GetValue()[0] / 2 * nWidth), 0, OpenTaiko.Skin.Game_Gauge_Rect[2] - (dan_c.GetValue()[0] / 2 * nWidth), OpenTaiko.Skin.Game_Gauge_Rect[3]));
 								}
 							}
@@ -200,22 +200,22 @@ internal class CActImplGauge : CActPlayGaugeCommon {
 						else
 							OpenTaiko.Tx.Gauge_Dan[1]?.t2DDraw(x, y, new Rectangle(0, 0, nRectX[0], OpenTaiko.Skin.Game_Gauge_Rect[3]));
 
-						for (int i = 0; i < OpenTaiko.TJA.Dan_C.Length; i++) {
-							Dan_C dan_c = OpenTaiko.TJA.List_DanSongs[OpenTaiko.stageGameScreen.actDan.NowCymbolShowingNumber].Dan_C[i] != null ?
+						for (int i = 0; i < OpenTaiko.TJA!.Dan_C.Length; i++) {
+							Dan_C? dan_c = OpenTaiko.TJA.List_DanSongs[OpenTaiko.stageGameScreen.actDan.NowCymbolShowingNumber].Dan_C[i] != null ?
 								OpenTaiko.TJA.List_DanSongs[OpenTaiko.stageGameScreen.actDan.NowCymbolShowingNumber].Dan_C[i] :
 								OpenTaiko.TJA.Dan_C[i];
 
 							if (dan_c != null && dan_c.ExamType == Exam.Type.Gauge && dbCurrentGaugeValue[0] >= dan_c.GetValue()[0]) {
 								if (OpenTaiko.Tx.Gauge_Dan[3] == null) break;
 
-								OpenTaiko.Tx.Gauge_Dan[3].Opacity = 255;
+								OpenTaiko.Tx.Gauge_Dan[3]!.Opacity = 255;
 								OpenTaiko.Tx.Gauge_Dan[3]?.t2DDraw(x + (dan_c.GetValue()[0] / 2 * nWidth), y, new Rectangle(dan_c.GetValue()[0] / 2 * nWidth, 0, nRectX[0] - (dan_c.GetValue()[0] / 2 * nWidth), OpenTaiko.Skin.Game_Gauge_Rect[3]));
 
 								int Opacity = 0;
 								if (this.ctGaugeFlash.CurrentValue <= 365) Opacity = 0;
 								else if (this.ctGaugeFlash.CurrentValue <= 448) Opacity = (int)((this.ctGaugeFlash.CurrentValue - 365) / 83f * 255f);
 								else if (this.ctGaugeFlash.CurrentValue <= 531) Opacity = 255 - (int)((this.ctGaugeFlash.CurrentValue - 448) / 83f * 255f);
-								OpenTaiko.Tx.Gauge_Dan[3].Opacity = Opacity;
+								OpenTaiko.Tx.Gauge_Dan[3]!.Opacity = Opacity;
 								OpenTaiko.Tx.Gauge_Dan[3]?.t2DDraw(x, y, new Rectangle(0, 0, dan_c.GetValue()[0] / 2 * nWidth, OpenTaiko.Skin.Game_Gauge_Rect[3]));
 
 								break;
@@ -230,29 +230,29 @@ internal class CActImplGauge : CActPlayGaugeCommon {
 						this.ctRainbowAnime.TickLoop();
 						this.ctRainbowOpacity.TickLoop();
 						if (OpenTaiko.Tx.Gauge_Rainbow != null && OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue] != null && OpenTaiko.Tx.Gauge_Rainbow[RainbowBase] != null) {
-							OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue].vcScaleRatio.X = scale;
-							OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue].vcScaleRatio.Y = scale;
+							OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue]!.vcScaleRatio.X = scale;
+							OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue]!.vcScaleRatio.Y = scale;
 
-							OpenTaiko.Tx.Gauge_Rainbow[RainbowBase].vcScaleRatio.X = scale;
-							OpenTaiko.Tx.Gauge_Rainbow[RainbowBase].vcScaleRatio.Y = scale;
+							OpenTaiko.Tx.Gauge_Rainbow[RainbowBase]!.vcScaleRatio.X = scale;
+							OpenTaiko.Tx.Gauge_Rainbow[RainbowBase]!.vcScaleRatio.Y = scale;
 
 							bool smart = OpenTaiko.ConfigIni.nPlayerCount > 2 || OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan;
 
 
-							OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue].Opacity = 255;
-							OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue].t2DDraw(x, y + (smart ? (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : 0),
+							OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue]!.Opacity = 255;
+							OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue]!.t2DDraw(x, y + (smart ? (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : 0),
 								new RectangleF(0,
 									smart ? (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : 0,
-									OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue].szTextureSize.Width,
-									smart ? OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue].szTextureSize.Height - (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue].szTextureSize.Height));
+									OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue]!.szTextureSize.Width,
+									smart ? OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue]!.szTextureSize.Height - (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue]!.szTextureSize.Height));
 
 
-							OpenTaiko.Tx.Gauge_Rainbow[RainbowBase].Opacity = (ctRainbowOpacity.CurrentValue * 255 / (int)ctRainbowOpacity.EndValue) / 1;
-							OpenTaiko.Tx.Gauge_Rainbow[RainbowBase].t2DDraw(x, y + (smart ? (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : 0),
+							OpenTaiko.Tx.Gauge_Rainbow[RainbowBase]!.Opacity = (ctRainbowOpacity.CurrentValue * 255 / (int)ctRainbowOpacity.EndValue) / 1;
+							OpenTaiko.Tx.Gauge_Rainbow[RainbowBase]!.t2DDraw(x, y + (smart ? (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : 0),
 								new RectangleF(0,
 									smart ? (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : 0,
-									OpenTaiko.Tx.Gauge_Rainbow[RainbowBase].szTextureSize.Width,
-									smart ? OpenTaiko.Tx.Gauge_Rainbow[RainbowBase].szTextureSize.Height - (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : OpenTaiko.Tx.Gauge_Rainbow[RainbowBase].szTextureSize.Height));
+									OpenTaiko.Tx.Gauge_Rainbow[RainbowBase]!.szTextureSize.Width,
+									smart ? OpenTaiko.Tx.Gauge_Rainbow[RainbowBase]!.szTextureSize.Height - (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : OpenTaiko.Tx.Gauge_Rainbow[RainbowBase]!.szTextureSize.Height));
 						}
 					}
 
@@ -260,10 +260,10 @@ internal class CActImplGauge : CActPlayGaugeCommon {
 
 					if (OpenTaiko.Tx.Gauge_Line[0] != null) {
 
-						OpenTaiko.Tx.Gauge_Line[0].vcScaleRatio.X = scale;
-						OpenTaiko.Tx.Gauge_Line[0].vcScaleRatio.Y = scale;
+						OpenTaiko.Tx.Gauge_Line[0]!.vcScaleRatio.X = scale;
+						OpenTaiko.Tx.Gauge_Line[0]!.vcScaleRatio.Y = scale;
 
-						OpenTaiko.Tx.Gauge_Line[0].t2DDraw(x, y);
+						OpenTaiko.Tx.Gauge_Line[0]!.t2DDraw(x, y);
 					}
 
 				}
@@ -297,7 +297,7 @@ internal class CActImplGauge : CActPlayGaugeCommon {
 						}
 
 						if (this.dbCurrentGaugeValue[i] >= 100.0) {
-							this.ctFlame.TickLoop();
+							this.ctFlame!.TickLoop();
 
 							OpenTaiko.Tx.Gauge_Soul_Fire.vcScaleRatio.X = scale;
 							OpenTaiko.Tx.Gauge_Soul_Fire.vcScaleRatio.Y = scale;
@@ -350,9 +350,9 @@ internal class CActImplGauge : CActPlayGaugeCommon {
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				for (int d = 0; d < 32; d++) {
 					if (this.stFireworkState[i][d].bUse) {
-						this.stFireworkState[i][d].ctProgress.Tick();
-						if (this.stFireworkState[i][d].ctProgress.IsEnded) {
-							this.stFireworkState[i][d].ctProgress.Stop();
+						this.stFireworkState[i][d].ctProgress!.Tick();
+						if (this.stFireworkState[i][d].ctProgress!.IsEnded) {
+							this.stFireworkState[i][d].ctProgress!.Stop();
 							this.stFireworkState[i][d].bUse = false;
 						}
 
@@ -370,7 +370,7 @@ internal class CActImplGauge : CActPlayGaugeCommon {
 
 	#region [ private ]
 	//-----------------
-	private CCounter ctGaugeFlash;
+	private CCounter ctGaugeFlash = null!;
 
 	// Reused per-frame scratch buffers (filled fresh every Draw) so the draw loop allocates no arrays.
 	private readonly int[] nRectX = new int[5];
@@ -386,7 +386,7 @@ internal class CActImplGauge : CActPlayGaugeCommon {
 	};
 	[StructLayout(LayoutKind.Sequential)]
 	protected struct STSTATUS {
-		public CCounter ctProgress;
+		public CCounter? ctProgress;
 		public bool isBig;
 		public bool bUse;
 		public int nPlayer;

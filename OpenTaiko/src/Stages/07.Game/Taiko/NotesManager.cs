@@ -361,7 +361,7 @@ class NotesManager {
 
 	// Draws with a texture faded to `opacity` (0..1) and restores its opacity afterwards: the Hidden mod's
 	// fade-out, applied to every note-related texture without leaving state behind.
-	private static void DrawFaded(CTexture tex, float opacity, Action<CTexture> draw) {
+	private static void DrawFaded(CTexture? tex, float opacity, Action<CTexture> draw) {
 		if (tex == null) return;
 		if (opacity >= 1f) { draw(tex); return; }
 		if (opacity <= 0f) return;

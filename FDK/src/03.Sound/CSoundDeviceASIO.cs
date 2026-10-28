@@ -362,7 +362,7 @@ internal class CSoundDeviceASIO : ISoundDevice {
 
 		if (bManagedDispose) {
 			SystemTimer.Dispose();
-			SystemTimer = null;
+			SystemTimer = null!;
 		}
 	}
 	~CSoundDeviceASIO() {
@@ -380,7 +380,7 @@ internal class CSoundDeviceASIO : ISoundDevice {
 	protected AsioSampleFormat fmtASIODeviceFormat = AsioSampleFormat.Unknown;
 	protected AsioSampleFormat fmtASIOChannelFormat = AsioSampleFormat.Bit16;     // 16bit 固定
 																				//protected BASSASIOFormat fmtASIOチャンネルフォーマット = BASSASIOFormat.BASS_ASIO_FORMAT_32BIT;// 16bit 固定
-	protected AsioProcedure tAsioProc = null;
+	protected AsioProcedure? tAsioProc = null;
 
 	protected int tAsioProcess(bool input, int channel, IntPtr buffer, int length, IntPtr user) {
 		if (input) return 0;

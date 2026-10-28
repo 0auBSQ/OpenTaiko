@@ -11,29 +11,29 @@ internal class CTcm {
 	// ── JSON model ────────────────────────────────────────────────────────────
 
 	private class TcmJson {
-		[JsonProperty("title")]    public JToken? Title;
-		[JsonProperty("subtitle")] public JToken? Subtitle;
-		[JsonProperty("albumart")] public string? Albumart;
+		[JsonProperty("title")]    public JToken? Title { get; set; }
+		[JsonProperty("subtitle")] public JToken? Subtitle { get; set; }
+		[JsonProperty("albumart")] public string? Albumart { get; set; }
 		// OpenTaiko extensions
-		[JsonProperty("dan_tick")]       public int   DanTick;
-		[JsonProperty("dan_tick_color")] public int[]? DanTickColor;
-		[JsonProperty("exams")]  public List<TcmExamJson?>? Exams;
-		[JsonProperty("charts")] public List<TcmChartJson?>? Charts;
+		[JsonProperty("dan_tick")]       public int   DanTick { get; set; }
+		[JsonProperty("dan_tick_color")] public int[]? DanTickColor { get; set; }
+		[JsonProperty("exams")]  public List<TcmExamJson?>? Exams { get; set; }
+		[JsonProperty("charts")] public List<TcmChartJson?>? Charts { get; set; }
 	}
 
 	private class TcmExamJson {
-		[JsonProperty("type")]  public string? Type;
-		[JsonProperty("range")] public string? Range;
+		[JsonProperty("type")]  public string? Type { get; set; }
+		[JsonProperty("range")] public string? Range { get; set; }
 		// value: [int, int]  OR  [[int,int], [int,int], null, ...]
-		[JsonProperty("value")] public JToken? Value;
+		[JsonProperty("value")] public JToken? Value { get; set; }
 	}
 
 	private class TcmChartJson {
 		// "id" replaces spec's "file" — references a song by its OpenTaiko unique ID
-		[JsonProperty("id")]         public string? Id;
-		[JsonProperty("difficulty")] public string? Difficulty;
+		[JsonProperty("id")]         public string? Id { get; set; }
+		[JsonProperty("difficulty")] public string? Difficulty { get; set; }
 		// OpenTaiko extension
-		[JsonProperty("title_show")] public bool TitleShow;
+		[JsonProperty("title_show")] public bool TitleShow { get; set; }
 	}
 
 	// ── Parsed data ───────────────────────────────────────────────────────────
@@ -97,7 +97,7 @@ internal class CTcm {
 				Title    = refNode.ldTitle.GetString(""),
 				SubTitle = refNode.ldSubtitle.GetString(""),
 				Genre    = refNode.songGenre,
-				FileName = refNode.score[diff].FileInfo.FileAbsolutePath ?? "",
+				FileName = refNode.score[diff]!.FileInfo.FileAbsolutePath ?? "",
 				Level      = refNode.nLevel[diff],
 				Difficulty = diff,
 				ScoreInit  = 300,

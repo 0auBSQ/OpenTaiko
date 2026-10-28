@@ -102,8 +102,8 @@ namespace OpenTaiko {
 		private readonly Dictionary<int, PeerConn> _peers = new();   // host: all clients; client: just {hostId:hostConn}
 		private readonly Dictionary<int, string> _roster = new();    // id -> player info json (incl. self)
 		private readonly List<int> _order = new();                   // join order (for host-role rotation), self included
-		private TcpListener _listener;
-		private Thread _acceptThread;
+		private TcpListener? _listener;
+		private Thread _acceptThread = null!;
 		private volatile bool _running;
 		private bool _isHost;
 		private int _selfId;
@@ -127,7 +127,7 @@ namespace OpenTaiko {
 		// player's running score on a side channel ("ps") that BYPASSES the Poll() event queue and lands in
 		// _liveScores instead - so it never pollutes the lobby's event stream. Bracketed by BeginPlaySync/
 		// EndPlaySync around the play round; the gameplay overlay reaches the connected instance via Active.
-		public static LuaNetworking Active;
+		public static LuaNetworking? Active;
 		private volatile bool _playSync;
 		private int _playEpoch;
 		private volatile string _selfPlayScore = "";
@@ -136,7 +136,7 @@ namespace OpenTaiko {
 		// online play SPOT mapping: _spotPeers[i] = the peerId rendered in player spot i (index 0 = self). The
 		// gameplay screen renders spots 1.. as REMOTE players (auto-played lanes in the normal N-player layout,
 		// score/gauge fed from the wire).
-		private int[] _spotPeers;
+		private int[]? _spotPeers;
 		private readonly ConcurrentDictionary<int, string> _spotLive = new();   // spotIndex -> last "ps" json
 		// per-spot judge odds (per mille) derived from each remote spot's broadcast good/ok/bad counts - fed to
 		// the gameplay AlterJudgement so remote lanes auto-hit with a realistic judge mix (AI-battle-style).
@@ -155,11 +155,11 @@ namespace OpenTaiko {
 		// ── a single peer connection (host has many; client has one to the host) ─────────────────────────
 		private sealed class PeerConn {
 			public int Id;
-			public TcpClient Tcp;
-			public NetworkStream Stream;
-			public AesGcm Rx, Tx;          // separate instances: Rx used only by the reader thread, Tx under SendLock
+			public TcpClient Tcp = null!;
+			public NetworkStream Stream = null!;
+			public AesGcm Rx = null!, Tx = null!;          // separate instances: Rx used only by the reader thread, Tx under SendLock
 			public readonly object SendLock = new();
-			public Thread Reader;
+			public Thread? Reader;
 			public volatile bool Alive = true;
 		}
 
@@ -169,7 +169,7 @@ namespace OpenTaiko {
 		/// <summary>Host a room: start the (dual-stack) TCP server, register the P2P rendezvous topic, become
 		/// host (id 1) + initial host-role holder, and return the encrypted room code carrying the connection
 		/// candidates + secrets {ip/ips/pub, stageid, payload, k, tok}. maxPlayers caps joiners (default 8).</summary>
-		public string CreateRoom(string stageId, string payload, int maxPlayers) {
+		public string? CreateRoom(string stageId, string payload, int maxPlayers) {
 			// gated off by default; ConfigIni is always set in-game (null only in headless tests → allow)
 			if (OpenTaiko.ConfigIni != null && !OpenTaiko.ConfigIni.bAllowLuaNetworkingConnections) {
 				Enqueue("error", 0, "", "Networking is disabled. Enable 'Allow LuaNetworking connections' in Settings (only with people you trust).");
@@ -209,16 +209,16 @@ namespace OpenTaiko {
 				["k"] = Convert.ToBase64String(_psk), ["tok"] = _roomToken,
 			};
 			if (_signalBroker.Length > 0) obj["sb"] = _signalBroker;             // rendezvous broker pin
-			foreach (string ip6 in LocalIPv6s()) ((JArray)obj["ips"]).Add(ip6);  // IPv6 = direct internet, no NAT at all
-			string pub = _publicIp;
+			foreach (string ip6 in LocalIPv6s()) ((JArray)obj["ips"]!).Add(ip6);  // IPv6 = direct internet, no NAT at all
+			string? pub = _publicIp;
 			if (!string.IsNullOrEmpty(pub) && !hostIps.Contains(pub)) obj["pub"] = pub;   // direct internet candidate
 			return EncodeRoom(obj.ToString(Newtonsoft.Json.Formatting.None));
 		}
-		public string CreateRoom(string stageId, string payload) => CreateRoom(stageId, payload, 8);
+		public string? CreateRoom(string stageId, string payload) => CreateRoom(stageId, payload, 8);
 
 		/// <summary>Decode a room code's stage id WITHOUT connecting (so the join UI can route to the right stage),
 		/// or null if the code is invalid.</summary>
-		public string PeekStageId(string roomCode) {
+		public string? PeekStageId(string roomCode) {
 			var o = DecodeRoom(roomCode); return o?["stageid"]?.ToString();
 		}
 
@@ -235,10 +235,10 @@ namespace OpenTaiko {
 			string stage = o["stageid"]?.ToString() ?? ""; string pay = o["payload"]?.ToString() ?? "";
 			// newer codes carry every host address ("ips" + public "pub"); older ones just the primary ("ip")
 			var ips = new List<string>();
-			if (o["ips"] is JArray arr) foreach (var v in arr) { string s = v?.ToString(); if (!string.IsNullOrEmpty(s) && !ips.Contains(s)) ips.Add(s); }
-			string one = o["ip"]?.ToString();
+			if (o["ips"] is JArray arr) foreach (var v in arr) { string? s = v?.ToString(); if (!string.IsNullOrEmpty(s) && !ips.Contains(s)) ips.Add(s); }
+			string? one = o["ip"]?.ToString();
 			if (!string.IsNullOrEmpty(one) && !ips.Contains(one)) ips.Insert(0, one);
-			string pub = o["pub"]?.ToString();
+			string? pub = o["pub"]?.ToString();
 			if (!string.IsNullOrEmpty(pub) && !ips.Contains(pub)) ips.Add(pub);   // internet candidate last: LAN/VPN joins stay instant
 			string roomTok = o["tok"]?.ToString() ?? "";
 			if (ips.Count == 0 && roomTok.Length == 0) return false;
@@ -431,7 +431,7 @@ namespace OpenTaiko {
 		}
 
 		// ── Lua: queries / host role ─────────────────────────────────────────────────────────────────────
-		public NetEvent Poll() => _events.TryDequeue(out var e) ? e : null;
+		public NetEvent? Poll() => _events.TryDequeue(out var e) ? e : null;
 		public bool IsHost() => _isHost;
 		public bool HasHostRole() => _selfId != 0 && _selfId == _hostRoleId;
 		public int HostRoleId() => _hostRoleId;
@@ -487,7 +487,7 @@ namespace OpenTaiko {
 			try {
 				var ns = cli.GetStream(); ns.ReadTimeout = 8000; ns.WriteTimeout = SEND_TIMEOUT_MS;
 				// validate the OpenTaiko Online magic + version (rejects any non-OT / wrong-version client)
-				byte[] hdr = ReadExact(ns, 6);
+				byte[]? hdr = ReadExact(ns, 6);
 				if (hdr == null || hdr[0] != MAGIC[0] || hdr[1] != MAGIC[1] || hdr[2] != MAGIC[2] || hdr[3] != MAGIC[3]) { try { cli.Close(); } catch { } return; }
 				if ((ushort)((hdr[4] << 8) | hdr[5]) != PROTO_VER) {
 					// another version of the game: our header lets it tell its player so (what it already sent is
@@ -502,7 +502,7 @@ namespace OpenTaiko {
 					try { cli.Close(); } catch { }
 					return;
 				}
-				byte[] cliPub = ReadBlock(ns); if (cliPub == null) { cli.Close(); return; }
+				byte[]? cliPub = ReadBlock(ns); if (cliPub == null) { cli.Close(); return; }
 				using var dh = ECDiffieHellman.Create(ECCurve.NamedCurves.nistP256);
 				byte[] myPub = dh.ExportSubjectPublicKeyInfo();
 				WriteHeader(ns); WriteBlock(ns, myPub);
@@ -510,7 +510,7 @@ namespace OpenTaiko {
 				var conn = new PeerConn { Tcp = cli, Stream = ns, Rx = new AesGcm(key, 16), Tx = new AesGcm(key, 16) };
 				ns.ReadTimeout = Timeout.Infinite;
 				// first frame must be HELLO with the joiner's player info
-				if (!ReadFrame(conn, out byte op, out JObject hello) || op != OP_HELLO) { CloseConn(conn, 0); return; }
+				if (!ReadFrame(conn, out byte op, out JObject? hello) || op != OP_HELLO) { CloseConn(conn, 0); return; }
 				if (!Live(session) || (admit != null && !admit())) { CloseConn(conn, 0); return; }
 				// REJOIN: a dropped peer (or a migration survivor) presents its old id + the room secret
 				int rid = (int?)hello["rid"] ?? 0;
@@ -526,7 +526,7 @@ namespace OpenTaiko {
 				if (full) { SendFrame(conn, OP_REJECT, new JObject { ["why"] = "Room is full" }); CloseConn(conn, 0); return; }
 				bool wasKnown = false;
 				if (isRejoin) {
-					PeerConn zombie = null;
+					PeerConn? zombie = null;
 					lock (_lock) {
 						if (_peers.TryGetValue(rid, out zombie)) _peers.Remove(rid);   // replace a half-dead conn
 						wasKnown = _roster.ContainsKey(rid);
@@ -538,7 +538,7 @@ namespace OpenTaiko {
 				string info = hello["i"]?.ToString() ?? "{}";
 				if (info.Length > 16384) info = "{}";   // relayed to the whole room: cap the amplification
 				string addr = "";
-				try { addr = ((IPEndPoint)cli.Client.RemoteEndPoint).Address.ToString(); } catch { }
+				try { addr = ((IPEndPoint)cli.Client.RemoteEndPoint!).Address.ToString(); } catch { }
 				JArray roster = new JArray();
 				bool stale;
 				lock (_lock) {
@@ -600,7 +600,7 @@ namespace OpenTaiko {
 			private volatile bool _open;
 			/// <param name="pinned">when set, ONLY this broker is used — host and joiner must meet on the
 			/// SAME broker, so the host pins the one it registered on into the room code.</param>
-			public MqttSignal(string pinned = null) { _brokers = string.IsNullOrEmpty(pinned) ? MiniMqtt.PublicBrokers : new[] { pinned }; }
+			public MqttSignal(string? pinned = null) { _brokers = string.IsNullOrEmpty(pinned) ? MiniMqtt.PublicBrokers : new[] { pinned }; }
 			public string Broker => _m.ConnectedBroker;
 			public bool Open() => _open = _m.Connect(_brokers);
 			public bool Alive => _open && _m.Alive;
@@ -705,7 +705,7 @@ namespace OpenTaiko {
 			Buffer.BlockCopy(nonce, 0, outb, 0, 12); Buffer.BlockCopy(ct, 0, outb, 12, ct.Length); Buffer.BlockCopy(tag, 0, outb, 12 + ct.Length, 16);
 			return outb;
 		}
-		private JObject OpenPsk(byte[] inb) {
+		private JObject? OpenPsk(byte[] inb) {
 			if (inb == null || inb.Length < 12 + 16 || _psk.Length == 0) return null;
 			byte[] nonce = new byte[12]; Buffer.BlockCopy(inb, 0, nonce, 0, 12);
 			int ctLen = inb.Length - 12 - 16;
@@ -765,7 +765,7 @@ namespace OpenTaiko {
 			string nonce = o["n"]?.ToString() ?? "";
 			if (nonce.Length == 0) return;
 			var cands = new List<string>();
-			if (o["c"] is JArray ca) foreach (var v in ca) { string s = v?.ToString(); if (!string.IsNullOrEmpty(s)) cands.Add(s); }
+			if (o["c"] is JArray ca) foreach (var v in ca) { string? s = v?.ToString(); if (!string.IsNullOrEmpty(s)) cands.Add(s); }
 			if (cands.Count == 0 || cands.Count > 12) return;
 			string joinerPunch = o["pp"]?.ToString() ?? "";   // joiner's public endpoint for hole punching
 
@@ -797,7 +797,7 @@ namespace OpenTaiko {
 			foreach (string cand in cands) {
 				string c = cand;
 				new Thread(() => {
-					TcpClient cli = null;
+					TcpClient? cli = null;
 					try {
 						int i = c.LastIndexOf(':');
 						if (i <= 0 || !int.TryParse(c.Substring(i + 1), out int cport)) return;
@@ -824,12 +824,12 @@ namespace OpenTaiko {
 		/// <summary>TCP hole punch: repeatedly dial the peer's public endpoint from a FIXED source port.
 		/// Our outbound SYNs open our NAT mapping while the peer does the same toward us — when the SYNs
 		/// cross, the connection establishes (works on the common port-preserving home NATs).</summary>
-		private static TcpClient PunchLoop(string target, int srcPort, Func<bool> keepGoing) {
+		private static TcpClient? PunchLoop(string target, int srcPort, Func<bool> keepGoing) {
 			int i = target.LastIndexOf(':');
 			if (i <= 0 || !int.TryParse(target.Substring(i + 1), out int tport)) return null;
 			string thost = target.Substring(0, i).Trim('[', ']');
 			for (int a = 0; a < 12 && keepGoing(); a++) {
-				Socket s = null;
+				Socket? s = null;
 				try {
 					s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 					s.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
@@ -853,7 +853,7 @@ namespace OpenTaiko {
 		private string? P2PJoin(string stage, string payload, int rejoinId, JoinRace race) {
 			var sigs = new List<IOtonSignal>();            // the broker links that opened (locked on itself)
 			bool closed = false;
-			TcpListener lst = null;
+			TcpListener? lst = null;
 			int session = race.Session;
 			try {
 				lst = BindListener(0);
@@ -862,7 +862,7 @@ namespace OpenTaiko {
 
 				var cands = new List<string>();
 				foreach (string ip in LocalIPv4s()) cands.Add($"{ip}:{lport}");
-				string pub = _publicIp;
+				string? pub = _publicIp;
 				if (!string.IsNullOrEmpty(pub) && !cands.Contains($"{pub}:{lport}")) cands.Add($"{pub}:{lport}");
 				foreach (string ip6 in LocalIPv6s()) cands.Add($"[{ip6}]:{lport}");
 				cands.Add($"127.0.0.1:{lport}");               // same-machine sessions; strangers die on the magic check
@@ -872,7 +872,7 @@ namespace OpenTaiko {
 				try {
 					using var tmp = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 					tmp.Bind(new IPEndPoint(IPAddress.Any, 0));
-					punchPort = ((IPEndPoint)tmp.LocalEndPoint).Port;
+					punchPort = ((IPEndPoint)tmp.LocalEndPoint!).Port;
 				} catch { }
 				string myPunch = (punchPort > 0 && !string.IsNullOrEmpty(pub)) ? $"{pub}:{punchPort}" : "";
 
@@ -1020,11 +1020,11 @@ namespace OpenTaiko {
 				WriteHeader(ns);
 				using var dh = ECDiffieHellman.Create(ECCurve.NamedCurves.nistP256);
 				WriteBlock(ns, dh.ExportSubjectPublicKeyInfo());
-				byte[] hdr = ReadExact(ns, 6);
+				byte[]? hdr = ReadExact(ns, 6);
 				if (hdr == null || hdr[0] != MAGIC[0] || hdr[1] != MAGIC[1] || hdr[2] != MAGIC[2] || hdr[3] != MAGIC[3])
 					throw new Exception("Not an OpenTaiko host (or version mismatch)");
 				if ((ushort)((hdr[4] << 8) | hdr[5]) != PROTO_VER) { kind = JoinFail.VersionMismatch; throw new Exception("Version mismatch"); }
-				byte[] hostPub = ReadBlock(ns); if (hostPub == null) throw new Exception("Bad handshake");
+				byte[]? hostPub = ReadBlock(ns); if (hostPub == null) throw new Exception("Bad handshake");
 				byte[] key = DeriveSession(dh, hostPub);
 				var conn = new PeerConn { Id = 1, Tcp = cli, Stream = ns, Rx = new AesGcm(key, 16), Tx = new AesGcm(key, 16) };
 				var helloMsg = new JObject { ["i"] = _localInfo };
@@ -1034,7 +1034,7 @@ namespace OpenTaiko {
 				if (!SendFrame(conn, OP_HELLO, helloMsg)) throw new Exception("Connection lost during the handshake");
 				ns.ReadTimeout = 12000;
 				long asked = Environment.TickCount64;
-				if (!ReadFrame(conn, out byte op, out JObject msg)) {
+				if (!ReadFrame(conn, out byte op, out JObject? msg)) {
 					// the host closes on a HELLO it cannot decrypt: a quick end means the key of our code is not this room's
 					if (Environment.TickCount64 - asked < 11000) kind = JoinFail.StaleCode;
 					throw new Exception("No reply from host");
@@ -1045,13 +1045,13 @@ namespace OpenTaiko {
 				ns.ReadTimeout = Timeout.Infinite;
 				lock (_lock) {
 					if (race.Session != _session) throw new Exception("superseded");   // left while the host answered
-					_selfId = (int)msg["id"]; _hostRoleId = (int)msg["h"];
+					_selfId = (int)msg["id"]!; _hostRoleId = (int)msg["h"]!;
 					_roomSecret = msg["sec"]?.ToString() ?? "";
-					_serverPeerId = msg["sid"] != null ? (int)msg["sid"] : 1;
+					_serverPeerId = msg["sid"] != null ? (int)msg["sid"]! : 1;
 					_serverIp = ip; _migrateTo = -1;
 					_peers[1] = conn; _roster.Clear(); _order.Clear(); _peerAddr.Clear();
-					foreach (var r in (JArray)msg["r"]) {
-						int rid2 = (int)r["id"]; _roster[rid2] = r["i"]?.ToString() ?? "{}"; _order.Add(rid2);
+					foreach (var r in (JArray)msg["r"]!) {
+						int rid2 = (int)r["id"]!; _roster[rid2] = r["i"]?.ToString() ?? "{}"; _order.Add(rid2);
 						_peerAddr[rid2] = r["a"]?.ToString() ?? "";
 					}
 					if (!_order.Contains(_selfId)) { _order.Add(_selfId); _roster[_selfId] = _localInfo; }
@@ -1073,7 +1073,7 @@ namespace OpenTaiko {
 		// ── shared reader loop ───────────────────────────────────────────────────────────────────────────
 		private void ReaderLoop(PeerConn conn) {
 			while (_running && conn.Alive) {
-				if (!ReadFrame(conn, out byte op, out JObject body)) break;
+				if (!ReadFrame(conn, out byte op, out JObject? body)) break;
 				HandleFrame(conn, op, body);
 			}
 			OnConnDropped(conn);
@@ -1082,11 +1082,11 @@ namespace OpenTaiko {
 		private void HandleFrame(PeerConn conn, byte op, JObject body) {
 			switch (op) {
 				case OP_DATA:
-					if (_isHost) RelayFromHost(conn.Id, body["t"] != null ? (int)body["t"] : -1, body);
-					else DeliverMessage(body["f"] != null ? (int)body["f"] : 0, body["c"]?.ToString() ?? "", body["d"]?.ToString() ?? "");
+					if (_isHost) RelayFromHost(conn.Id, body["t"] != null ? (int)body["t"]! : -1, body);
+					else DeliverMessage(body["f"] != null ? (int)body["f"]! : 0, body["c"]?.ToString() ?? "", body["d"]?.ToString() ?? "");
 					break;
 				case OP_PEERJOIN: {   // client side
-					int id = (int)body["id"]; string info = body["i"]?.ToString() ?? "{}";
+					int id = (int)body["id"]!; string info = body["i"]?.ToString() ?? "{}";
 					bool isNew;
 					lock (_lock) {
 						isNew = !_roster.ContainsKey(id); if (isNew) _order.Add(id); _roster[id] = info;
@@ -1096,16 +1096,16 @@ namespace OpenTaiko {
 					break;
 				}
 				case OP_PEERLEFT: {   // client side
-					int id = (int)body["id"];
+					int id = (int)body["id"]!;
 					lock (_lock) { _roster.Remove(id); _order.Remove(id); }
 					Enqueue("left", id, "", "");
 					break;
 				}
 				case OP_HOSTROLE:
-					_hostRoleId = (int)body["id"]; Enqueue("hostrole", _hostRoleId, "", "");
+					_hostRoleId = (int)body["id"]!; Enqueue("hostrole", _hostRoleId, "", "");
 					break;
 				case OP_MIGRATE:
-					_migrateTo = body["id"] != null ? (int)body["id"] : -1;   // graceful handover: skip the
+					_migrateTo = body["id"] != null ? (int)body["id"]! : -1;   // graceful handover: skip the
 					conn.Alive = false;                                       // retry phase, go straight to it
 					Recover(conn);
 					break;
@@ -1166,7 +1166,7 @@ namespace OpenTaiko {
 				if (!Live(session)) { _recovering = false; return; }   // left meanwhile: this room is not ours to recover
 				if (succ <= 0) { GiveUp(session); return; }
 				if (succ == myId) { BecomeServer(deadServer); _recovering = false; return; }
-				string succIp; lock (_lock) _peerAddr.TryGetValue(succ, out succIp);
+				string? succIp; lock (_lock) _peerAddr.TryGetValue(succ, out succIp);
 				if (string.IsNullOrEmpty(succIp)) { GiveUp(session); return; }
 				for (int a = 0; a < 8 && Live(session); a++) {   // the successor needs a moment to re-bind
 					Thread.Sleep(2500);
@@ -1253,13 +1253,13 @@ namespace OpenTaiko {
 			}
 		}
 
-		private bool ReadFrame(PeerConn conn, out byte op, out JObject body) {
+		private bool ReadFrame(PeerConn conn, out byte op, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out JObject body) {
 			op = 0; body = null;
 			try {
-				byte[] lenb = ReadExact(conn.Stream, 4); if (lenb == null) return false;
+				byte[]? lenb = ReadExact(conn.Stream, 4); if (lenb == null) return false;
 				int n = (lenb[0] << 24) | (lenb[1] << 16) | (lenb[2] << 8) | lenb[3];
 				if (n < 12 + 16 || n > 8 * 1024 * 1024) return false;   // sanity cap (8 MB/frame)
-				byte[] buf = ReadExact(conn.Stream, n); if (buf == null) return false;
+				byte[]? buf = ReadExact(conn.Stream, n); if (buf == null) return false;
 				byte[] nonce = new byte[12]; Buffer.BlockCopy(buf, 0, nonce, 0, 12);
 				int ctLen = n - 12 - 16;
 				byte[] ct = new byte[ctLen]; Buffer.BlockCopy(buf, 12, ct, 0, ctLen);
@@ -1296,7 +1296,7 @@ namespace OpenTaiko {
 							_spotLive[sp] = data ?? "";
 							if (sp < _spotBadOdds.Length) {
 								try {
-									var o = JObject.Parse(data);
+									var o = JObject.Parse(data!);
 									int gr = (int?)o["gr"] ?? 0, gd = (int?)o["gd"] ?? 0, ms = (int?)o["ms"] ?? 0;
 									int tot = gr + gd + ms;
 									if (tot > 0) { _spotBadOdds[sp] = (int)Math.Round(1000.0 * ms / tot); _spotGoodOdds[sp] = (int)Math.Round(1000.0 * gd / tot); }
@@ -1328,12 +1328,12 @@ namespace OpenTaiko {
 			byte[] len = { (byte)(data.Length >> 8), (byte)data.Length };
 			ns.Write(len, 0, 2); ns.Write(data, 0, data.Length);
 		}
-		private static byte[] ReadBlock(NetworkStream ns) {
-			byte[] len = ReadExact(ns, 2); if (len == null) return null;
+		private static byte[]? ReadBlock(NetworkStream ns) {
+			byte[]? len = ReadExact(ns, 2); if (len == null) return null;
 			int n = (len[0] << 8) | len[1]; if (n <= 0 || n > 4096) return null;
 			return ReadExact(ns, n);
 		}
-		private static byte[] ReadExact(NetworkStream ns, int n) {
+		private static byte[]? ReadExact(NetworkStream ns, int n) {
 			byte[] b = new byte[n]; int got = 0;
 			while (got < n) { int r; try { r = ns.Read(b, got, n - got); } catch { return null; } if (r <= 0) return null; got += r; }
 			return b;
@@ -1360,7 +1360,7 @@ namespace OpenTaiko {
 			Buffer.BlockCopy(nonce, 0, outb, 0, 12); Buffer.BlockCopy(ct, 0, outb, 12, ct.Length); Buffer.BlockCopy(tag, 0, outb, 12 + ct.Length, 16);
 			return "OTON1." + Convert.ToBase64String(outb);
 		}
-		private static JObject DecodeRoom(string code) {
+		private static JObject? DecodeRoom(string code) {
 			if (string.IsNullOrWhiteSpace(code)) return null;
 			code = code.Trim();
 			if (code.StartsWith("OTON1.")) code = code.Substring(6);
@@ -1380,7 +1380,7 @@ namespace OpenTaiko {
 			try {
 				using var s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 				s.Connect("8.8.8.8", 65530);   // no packet is sent; this just selects the primary outbound interface
-				return ((IPEndPoint)s.LocalEndPoint).Address.ToString();
+				return ((IPEndPoint)s.LocalEndPoint!).Address.ToString();
 			} catch { return "127.0.0.1"; }
 		}
 
@@ -1391,7 +1391,7 @@ namespace OpenTaiko {
 		// and UPnP asks the router to forward the port — together they make DIRECT internet connections work
 		// on cooperative routers (and feed both sides' candidates for the P2P rendezvous path). When neither
 		// side is reachable at all (e.g. strict CGNAT on both ends), the join fails with a plain-language error.
-		private static volatile string _publicIp;             // null until discovered (or undiscoverable)
+		private static volatile string? _publicIp;             // null until discovered (or undiscoverable)
 		private static volatile string? _upnpControlUrl;
 		private static string? _upnpServiceType;
 		private static int _discoveryRunning;
@@ -1436,7 +1436,7 @@ namespace OpenTaiko {
 				"ST: urn:schemas-upnp-org:device:InternetGatewayDevice:1\r\n\r\n");
 			udp.Send(req, req.Length, new IPEndPoint(IPAddress.Parse("239.255.255.250"), 1900));
 			var from = new IPEndPoint(IPAddress.Any, 0);
-			string location = null;
+			string? location = null;
 			long until = Environment.TickCount64 + 2500;
 			while (Environment.TickCount64 < until && location == null) {
 				try {
@@ -1453,7 +1453,7 @@ namespace OpenTaiko {
 				if (!svc.Name.LocalName.Equals("service")) continue;
 				string st = svc.Elements().FirstOrDefault(e => e.Name.LocalName == "serviceType")?.Value ?? "";
 				if (!st.Contains("WANIPConnection") && !st.Contains("WANPPPConnection")) continue;
-				string ctl = svc.Elements().FirstOrDefault(e => e.Name.LocalName == "controlURL")?.Value;
+				string? ctl = svc.Elements().FirstOrDefault(e => e.Name.LocalName == "controlURL")?.Value;
 				if (string.IsNullOrEmpty(ctl)) continue;
 				var baseUri = new Uri(location);
 				_upnpServiceType = st;

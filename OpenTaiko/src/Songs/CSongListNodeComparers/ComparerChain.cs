@@ -7,7 +7,7 @@ internal sealed class ComparerChain<T> : IComparer<T> where T : class {
 		_comparers = comparers;
 	}
 
-	public int Compare(T x, T y) {
+	public int Compare(T? x, T? y) {
 		if (ReferenceEquals(x, y)) {
 			return 0;
 		}

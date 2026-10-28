@@ -193,10 +193,10 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				this.soundClap[actual] = OpenTaiko.SoundManager.tCreateSound(hs.clap[actual], ESoundGroup.SoundEffect);
 
 				int _panning = OpenTaiko.ConfigIni.nPanning[OpenTaiko.ConfigIni.nPlayerCount - 1][actual];
-				if (this.soundRed[actual] != null) this.soundRed[actual].SoundPosition = _panning;
-				if (this.soundBlue[actual] != null) this.soundBlue[actual].SoundPosition = _panning;
-				if (this.soundAdlib[actual] != null) this.soundAdlib[actual].SoundPosition = _panning;
-				if (this.soundClap[actual] != null) this.soundClap[actual].SoundPosition = _panning;
+				if (this.soundRed[actual] != null) this.soundRed[actual]!.SoundPosition = _panning;
+				if (this.soundBlue[actual] != null) this.soundBlue[actual]!.SoundPosition = _panning;
+				if (this.soundAdlib[actual] != null) this.soundAdlib[actual]!.SoundPosition = _panning;
+				if (this.soundClap[actual] != null) this.soundClap[actual]!.SoundPosition = _panning;
 			});
 		}
 
@@ -249,14 +249,14 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 					"+"
 				};
 
-				int level = OpenTaiko.SongMount.rChoosenSong.nLevel[diff];
+				int level = OpenTaiko.SongMount.rChoosenSong!.nLevel[diff];
 				CTja.ELevelIcon levelIcon = OpenTaiko.SongMount.rChoosenSong.nLevelIcon[diff];
 
 				return (diffArr[Math.Min(diff, 6)] + "Lv." + level + diffArrIcon[(int)levelIcon]);
 			}
 
 			// Discord Presence の更新
-			string details = OpenTaiko.ConfigIni.SendDiscordPlayingInformation ? OpenTaiko.SongMount.rChoosenSong.ldTitle.GetString("")
+			string details = OpenTaiko.ConfigIni.SendDiscordPlayingInformation ? OpenTaiko.SongMount.rChoosenSong!.ldTitle.GetString("")
 																				 + diffToString(OpenTaiko.SongMount.nChoosenSongDifficulty[0]) : "";
 
 			// Discord takes at most 128 UTF-8 bytes; cutting inside a character would make it throw
@@ -267,7 +267,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			OpenTaiko.DiscordClient?.SetPresence(new RichPresence() {
 				Details = details,
 				State = "Playing" + (OpenTaiko.ConfigIni.bAutoPlay[0] == true ? " (Auto)" : ""),
-				Timestamps = new Timestamps(DateTime.UtcNow, DateTime.UtcNow.AddMilliseconds(OpenTaiko.TJA.TjaTimeToGameTime(OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1].nSoundTimems))),
+				Timestamps = new Timestamps(DateTime.UtcNow, DateTime.UtcNow.AddMilliseconds(OpenTaiko.TJA!.TjaTimeToGameTime(OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1].nSoundTimems))),
 				Assets = new Assets() {
 					SmallImageKey = OpenTaiko.ConfigIni.SendDiscordPlayingInformation ? difficultyName.ToLower() : "",
 					SmallImageText = OpenTaiko.ConfigIni.SendDiscordPlayingInformation ? String.Format("COURSE:{0} ({1})", difficultyName, OpenTaiko.SongMount.nChoosenSongDifficulty[0]) : "",
@@ -281,8 +281,6 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			return; // no needs to reset
 
 		#region [reset accumulated chip state]
-		this.bFillIn = false;
-		this.nWaitBigNoteCoord = 0;
 
 		this.actLaneTaiko.ResetPlayStates();
 		this.actFlashlight.Reset();
@@ -333,13 +331,13 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			if (this.soundRed[i] != null)
-				this.soundRed[i].tDispose();
+				this.soundRed[i]!.tDispose();
 			if (this.soundBlue[i] != null)
-				this.soundBlue[i].tDispose();
+				this.soundBlue[i]!.tDispose();
 			if (this.soundAdlib[i] != null)
-				this.soundAdlib[i].tDispose();
+				this.soundAdlib[i]!.tDispose();
 			if (this.soundClap[i] != null)
-				this.soundClap[i].tDispose();
+				this.soundClap[i]!.tDispose();
 		}
 
 		base.DeActivate();
@@ -412,7 +410,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			if (isTower) {
 				this.FloorManagement.loopFrames();
 				if (this.FloorManagement.CurrentNumberOfLives > 0) {
-					int maxFloor = OpenTaiko.SongMount.rChoosenSong!.score[(int)Difficulty.Tower].ChartInfo.nTotalFloor;
+					int maxFloor = OpenTaiko.SongMount.rChoosenSong!.score[(int)Difficulty.Tower]!.ChartInfo.nTotalFloor;
 					this.FloorManagement.LastRegisteredFloor = this.actPlayInfo.NowMeasure[0] + 1;
 					if (!(this.IsChartEnded(0) || this.IsFinishedPlaying(0)) && this.FloorManagement.LastRegisteredFloor >= maxFloor)
 						this.FloorManagement.LastRegisteredFloor = maxFloor - 1;
@@ -436,7 +434,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			}
 			this.EndDanClearIfExamFailed(0);
 
-			bool BGA_Shown = OpenTaiko.ConfigIni.bEnableAVI && OpenTaiko.TJA.listVD.Count > 0 && ShowVideo;
+			bool BGA_Shown = OpenTaiko.ConfigIni.bEnableAVI && OpenTaiko.TJA!.listVD!.Count > 0 && ShowVideo;
 
 			// Layer: background
 
@@ -517,7 +515,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 			// Layer: notes & bar lines. Players under the Flashlight canvas draw first, then the canvas,
 			// then the players it must not darken (their judge frames included).
-			this.ctHandHold.TickLoop();
+			this.ctHandHold!.TickLoop();
 
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				if (!this.actFlashlight.DrawsOverLight(i))
@@ -584,7 +582,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 			// object rendering
 			if (!OpenTaiko.ConfigIni.bTokkunMode) {
-				foreach (var (key, obj) in OpenTaiko.TJA.listObj)
+				foreach (var (key, obj) in OpenTaiko.TJA!.listObj)
 					obj.tDraw();
 			}
 
@@ -737,7 +735,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		int onl = (LuaNetworking.Active?.IsRemoteSpot(i) == true) ? LuaNetworking.Active.GetSpotClearLevel(i) : -2;
 		// a dan ends in the pose of its result, like its end animation
 		bool danFailed = OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan
-			&& (this.IsStageFailed(i) || this.IsStageFailed_Fast() || Dan_Cert.GetFailedAllChallenges(this.actDan.GetExam(), OpenTaiko.SongMount.rChoosenSong!.DanSongs));
+			&& (this.IsStageFailed(i) || this.IsStageFailed_Fast() || Dan_Cert.GetFailedAllChallenges(this.actDan.GetExam(), OpenTaiko.SongMount.rChoosenSong!.DanSongs!));
 		string anim;
 		if (onl >= 0)
 			anim = onl == 2 ? CCharacter.ANIM_GAME_10COMBO_MAX : onl == 1 ? CCharacter.ANIM_GAME_CLEARED : CCharacter.ANIM_GAME_FAILED;
@@ -791,7 +789,6 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	public FireWorks FireWorks;
 	public PuchiChara PuchiChara;
 	public CActImplScoreRank ScoreRank;
-	private bool bFillIn;
 	private readonly EPad[] eChanneltoPad = new EPad[]
 	{
 		EPad.HH, EPad.SD, EPad.BD, EPad.HT,
@@ -800,30 +797,22 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		EPad.LP, EPad.LBD
 	};
 	private int[] nChanneltoXCoord = new int[] { 370, 470, 582, 527, 645, 748, 694, 373, 815, 298, 419, 419 };
-	private CCounter ctHandHold;
-	private CTexture txHitBarGB;
-	private CTexture txLaneFrameGB;
+	private CCounter? ctHandHold;
 	//private CTexture tx太鼓ノーツ;
 	//private CTexture txHand;
 	//private CTexture txSenotes;
 	//private CTexture tx小節線;
 	//private CTexture tx小節線_branch;
 
-	private CTexture txJudgeCountDisplayPanel;
-	private CTexture txJudgeCountSmall;
 	//private CTexture txNamePlate; //ちょっと描画順で都合が悪くなるので移動。
 	//private CTexture txNamePlate2P; //ちょっと描画順で都合が悪くなるので移動。
 	//private CTexture txPlayerNumber;
-	private CTexture txMovie; //2016.08.30 kairera0467 ウィンドウ表示
 
 	public float nGauge = 0.0f;
 	private int ShownLyric2 = 0;
 
-	private StreamWriter stream;
 
-	private int nWaitBigNoteCoord;
 	private readonly STTextPosition[] stSmallPosition;
-	private readonly STTextPosition[] stLargePosition;
 	//-----------------
 
 	private ENoteJudge tDrumsHitProcess(double nHitTime, EPad type, CChip pChip, bool bBothHandsInput, int nPlayer) {
@@ -866,10 +855,10 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	private int[] replayCursor = new int[5];
 
 	// "> Replay Mode <" indicator under the 1P lane while watching a replay (fonts disposed in DeActivate)
-	private CCachedFontRenderer pfReplayModeText;
-	private CCachedFontRenderer pfReplayModeTextSmall;
-	private TitleTextureKey ttkReplayMode;
-	private TitleTextureKey ttkReplayInvalid;
+	private CCachedFontRenderer? pfReplayModeText;
+	private CCachedFontRenderer? pfReplayModeTextSmall;
+	private TitleTextureKey? ttkReplayMode;
+	private TitleTextureKey? ttkReplayInvalid;
 
 	#region [Hidden / Flashlight]
 
@@ -1000,13 +989,13 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		}
 
 		for (int songNo = 0; songNo < Math.Min(this.DanSongScore.Length, rep.DanSongCount); ++songNo) {
-			bool judgeCountValidI = rep.IndividualGoodCount[songNo] >= this.DanSongScore[songNo].nGreat
-				&& rep.IndividualOkCount[songNo] >= this.DanSongScore[songNo].nGood
-				&& rep.IndividualBadCount[songNo] >= this.DanSongScore[songNo].nMiss
-				&& rep.IndividualRollCount[songNo] >= this.DanSongScore[songNo].nRoll
-				&& rep.IndividualMaxCombo[songNo] >= this.DanSongScore[songNo].nHighestCombo
-				&& rep.IndividualBoomCount[songNo] >= this.DanSongScore[songNo].nMine
-				&& rep.IndividualADLibCount[songNo] >= this.DanSongScore[songNo].nADLIB;
+			bool judgeCountValidI = rep.IndividualGoodCount![songNo] >= this.DanSongScore[songNo].nGreat
+				&& rep.IndividualOkCount![songNo] >= this.DanSongScore[songNo].nGood
+				&& rep.IndividualBadCount![songNo] >= this.DanSongScore[songNo].nMiss
+				&& rep.IndividualRollCount![songNo] >= this.DanSongScore[songNo].nRoll
+				&& rep.IndividualMaxCombo![songNo] >= this.DanSongScore[songNo].nHighestCombo
+				&& rep.IndividualBoomCount![songNo] >= this.DanSongScore[songNo].nMine
+				&& rep.IndividualADLibCount![songNo] >= this.DanSongScore[songNo].nADLIB;
 			if (!judgeCountValidI)
 				return false;
 		}
@@ -1019,7 +1008,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
 			if (!OpenTaiko.bReplayMode[p]) continue;
 			var rep = OpenTaiko.ReplayPlayback[p];
-			CTja tja = OpenTaiko.GetTJA(p);
+			CTja? tja = OpenTaiko.GetTJA(p);
 			if (rep == null || tja == null) continue;
 			var inputs = rep.Value.replay.Inputs;
 			var pumpTimes = rep.Value.msInputPumpTjaTimes;
@@ -1154,7 +1143,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		Rectangle bgrect = new Rectangle(0, 0, 1280, 720);
 		string DefaultBgFilename = @$"Graphics{Path.DirectorySeparatorChar}5_Game{Path.DirectorySeparatorChar}5_Background{Path.DirectorySeparatorChar}0{Path.DirectorySeparatorChar}Background.png";
 		string BgFilename = "";
-		if (!String.IsNullOrEmpty(OpenTaiko.TJA.strBGIMAGE_PATH))
+		if (!String.IsNullOrEmpty(OpenTaiko.TJA!.strBGIMAGE_PATH))
 			BgFilename = OpenTaiko.TJA.strBGIMAGE_PATH;
 		base.tBackgroundTextureCreate(DefaultBgFilename, bgrect, BgFilename);
 	}
@@ -1213,7 +1202,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 						var (nSenotesX, nSenotesY) = NotesManager.GetSENotesPos(nPlayer);
 						float opacity = this.tNoteOpacity(nPlayer, x, y);
 						if (NotesManager.IsHittableNote(nt) && opacity > 0f && this.IsNoteIfVisible(pChip, nPlayer)) {
-							NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ctHandHold.CurrentValue, hiddenMode: hiddenMode, opacity: opacity);
+							NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ctHandHold!.CurrentValue, hiddenMode: hiddenMode, opacity: opacity);
 							NotesManager.DisplayNote(nPlayer, x, y, pChip, noteAnim, hiddenMode: hiddenMode, opacity: opacity);
 							if (!NotesManager.IsADLIB(nt))
 								NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode, opacity);
@@ -1297,12 +1286,12 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 						if (!hiddenMode.HidesSENotes()) {
 							//大きい連打か小さい連打かの区別方法を考えてなかったよちくしょう
 							if (OpenTaiko.Tx.Notes[(int)_gt] != null)
-								OpenTaiko.Tx.Notes[(int)_gt].vcScaleRatio.X = 1.0f;
+								OpenTaiko.Tx.Notes[(int)_gt]!.vcScaleRatio.X = 1.0f;
 							if (!NotesManager.IsGenericBalloon(pChip.start) && OpenTaiko.Tx.SENotes[(int)_gt] != null) {
-								int savedSeOpacity = OpenTaiko.Tx.SENotes[(int)_gt].Opacity;
-								if (opacity < 1f) OpenTaiko.Tx.SENotes[(int)_gt].Opacity = (int)(savedSeOpacity * opacity);
-								OpenTaiko.Tx.SENotes[(int)_gt].t2DDraw(xEnd + 56, yEnd + nSenotesY, new Rectangle(_58_cut, 9 * _size[1], _78_cut, _size[1]));
-								OpenTaiko.Tx.SENotes[(int)_gt].Opacity = savedSeOpacity;
+								int savedSeOpacity = OpenTaiko.Tx.SENotes[(int)_gt]!.Opacity;
+								if (opacity < 1f) OpenTaiko.Tx.SENotes[(int)_gt]!.Opacity = (int)(savedSeOpacity * opacity);
+								OpenTaiko.Tx.SENotes[(int)_gt]!.t2DDraw(xEnd + 56, yEnd + nSenotesY, new Rectangle(_58_cut, 9 * _size[1], _78_cut, _size[1]));
+								OpenTaiko.Tx.SENotes[(int)_gt]!.Opacity = savedSeOpacity;
 							}
 						}
 					} else if (NotesManager.IsRoll(nt) || NotesManager.IsFuzeRoll(nt)) {
@@ -1323,12 +1312,12 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 					var effectedColor = new Color4(1.0f, fDecreaseColor, fDecreaseColor, 1f);
 					var normalColor = new Color4(1.0f, 1.0f, 1.0f, 1f);
 
-						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ctHandHold.CurrentValue, hiddenMode: hiddenMode, opacity: opacity);
+						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ctHandHold!.CurrentValue, hiddenMode: hiddenMode, opacity: opacity);
 						NotesManager.DisplayRoll(nPlayer, x, y, pChip, noteAnim, normalColor, effectedColor, xEnd, yEnd, hiddenMode, opacity);
 
 						if (!hiddenMode.HidesSENotes() && OpenTaiko.Tx.SENotes[(int)_gt] != null) {
-							int savedSeOpacity = OpenTaiko.Tx.SENotes[(int)_gt].Opacity;
-							if (opacity < 1f) OpenTaiko.Tx.SENotes[(int)_gt].Opacity = (int)(savedSeOpacity * opacity);
+							int savedSeOpacity = OpenTaiko.Tx.SENotes[(int)_gt]!.Opacity;
+							if (opacity < 1f) OpenTaiko.Tx.SENotes[(int)_gt]!.Opacity = (int)(savedSeOpacity * opacity);
 							if (!NotesManager.IsFuzeRoll(nt)) {
 								int _shift = NotesManager.IsBigRollTaiko(nt, _gt) ? 26 : 0;
 								int senote = pChip.nSenote;
@@ -1336,20 +1325,20 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 									senote = 7; // drumroll
 
 								if (pChip.canShowBody) {
-									OpenTaiko.Tx.SENotes[(int)_gt].vcScaleRatio.X = xEnd - x - 44 - _shift;
-									OpenTaiko.Tx.SENotes[(int)_gt].t2DDraw(x + 90 + _shift, y + nSenotesY, new Rectangle(_60_cut, 8 * _size[1], 1, _size[1]));
-									OpenTaiko.Tx.SENotes[(int)_gt].vcScaleRatio.X = 1.0f;
-									OpenTaiko.Tx.SENotes[(int)_gt].t2DDraw(x + 30 + _shift, y + nSenotesY, new Rectangle(0, 8 * _size[1], _60_cut, _size[1]));
+									OpenTaiko.Tx.SENotes[(int)_gt]!.vcScaleRatio.X = xEnd - x - 44 - _shift;
+									OpenTaiko.Tx.SENotes[(int)_gt]!.t2DDraw(x + 90 + _shift, y + nSenotesY, new Rectangle(_60_cut, 8 * _size[1], 1, _size[1]));
+									OpenTaiko.Tx.SENotes[(int)_gt]!.vcScaleRatio.X = 1.0f;
+									OpenTaiko.Tx.SENotes[(int)_gt]!.t2DDraw(x + 30 + _shift, y + nSenotesY, new Rectangle(0, 8 * _size[1], _60_cut, _size[1]));
 								}
-								OpenTaiko.Tx.SENotes[(int)_gt].t2DDraw(x - (_shift / 13), y + nSenotesY, new Rectangle(0, _size[1] * senote, _size[0], _size[1]));
+								OpenTaiko.Tx.SENotes[(int)_gt]!.t2DDraw(x - (_shift / 13), y + nSenotesY, new Rectangle(0, _size[1] * senote, _size[0], _size[1]));
 							} else {
 								NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, opacity: opacity);
 							}
-							OpenTaiko.Tx.SENotes[(int)_gt].Opacity = savedSeOpacity;
+							OpenTaiko.Tx.SENotes[(int)_gt]!.Opacity = savedSeOpacity;
 						}
 
 					} else if (NotesManager.IsBalloon(nt) || NotesManager.IsKusudama(nt)) {
-						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ctHandHold.CurrentValue, hiddenMode: hiddenMode, opacity: opacity);
+						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ctHandHold!.CurrentValue, hiddenMode: hiddenMode, opacity: opacity);
 						NotesManager.DisplayNote(nPlayer, x, y, pChip, noteAnim, hiddenMode, opacity);
 						NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode, opacity);
 					}
@@ -1362,8 +1351,8 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	// the animation state of a player's notes: the rows shown come from the notes pack's definition
 	public CNoteAnim GetNoteAnim(int nPlayer) {
 		if (OpenTaiko.ConfigIni.SimpleMode) return CNoteAnim.Still;
-		return new CNoteAnim(this.actCombo.nCurrentCombo[nPlayer], (int)ctChipAnime[nPlayer].CurrentValue % 4,
-			!ctChipAnimeLag[nPlayer].IsEnded, this.NotesAnimDifficulty(nPlayer));
+		return new CNoteAnim(this.actCombo.nCurrentCombo[nPlayer], (int)ctChipAnime[nPlayer]!.CurrentValue % 4,
+			!ctChipAnimeLag[nPlayer]!.IsEnded, this.NotesAnimDifficulty(nPlayer));
 	}
 
 	// Judge whether rolls are intended to obscure the screen, then detect and hide unintended obscuring rolls when any of its tips are out of screen
@@ -1676,7 +1665,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	}
 
 	private void tSmallDisplay(int x, int y, int num, bool bOrange, bool drawPercent) {
-		float width = OpenTaiko.Tx.Result_Number.szImageSize.Width / 11.0f;
+		float width = OpenTaiko.Tx.Result_Number!.szImageSize.Width / 11.0f;
 		float height = OpenTaiko.Tx.Result_Number.szImageSize.Height / 2.0f;
 
 		int[] nums = CConversion.SeparateDigits(num);
@@ -1704,7 +1693,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			float _x = x - ((OpenTaiko.Skin.Result_Number_Interval[0] * 1.27f) * offset);
 			float _y = y - ((OpenTaiko.Skin.Result_Number_Interval[1] * 1.27f) * offset);
 
-			float width = OpenTaiko.Tx.Result_Number.szImageSize.Width / 11.0f;
+			float width = OpenTaiko.Tx.Result_Number!.szImageSize.Width / 11.0f;
 			float height = OpenTaiko.Tx.Result_Number.szImageSize.Height / 2.0f;
 
 			OpenTaiko.Tx.Result_Number.t2DScaledCenterBasedDraw(_x + (width / 2), _y + (height / 2),

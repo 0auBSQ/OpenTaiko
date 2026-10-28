@@ -26,11 +26,11 @@ internal class CActPlayPlayInfo : CActivity {
 	public override void Activate() {
 		for (int i = 0; i < 5; i++) {
 			NowMeasure[i] = 0;
-			this.dbBPM[i] = OpenTaiko.TJA.BASEBPM;
+			this.dbBPM[i] = OpenTaiko.TJA!.BASEBPM;
 		}
 		this.dbSCROLL = 1.0;
 
-		_chipCounts[0] = OpenTaiko.TJA.listChip.Where(num => NotesManager.IsMissableNote(num)).Count();
+		_chipCounts[0] = OpenTaiko.TJA!.listChip.Where(num => NotesManager.IsMissableNote(num)).Count();
 		_chipCounts[1] = OpenTaiko.TJA.listChip_Branch[2].Where(num => NotesManager.IsMissableNote(num)).Count();
 
 		NotesTextN = string.Format("NoteN:         {0:####0}", OpenTaiko.TJA.nNotesCount_Branch[0]);
@@ -50,7 +50,7 @@ internal class CActPlayPlayInfo : CActivity {
 		int y = 404 * OpenTaiko.Skin.Resolution[1] / 720;
 		if (!base.IsDeActivated) {
 			y += (13 - 1) * dy;
-			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, string.Format("Song/G. Offset:{0:####0}/{1:####0} ms", OpenTaiko.TJA.nBGMAdjust, OpenTaiko.ConfigIni.nGlobalOffsetMs));
+			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, string.Format("Song/G. Offset:{0:####0}/{1:####0} ms", OpenTaiko.TJA!.nBGMAdjust, OpenTaiko.ConfigIni.nGlobalOffsetMs));
 			y -= dy;
 			int num = (OpenTaiko.TJA.listChip.Count > 0) ? OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1].nSoundTimems : 0;
 			string str = "Time:          " + (OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) / 1000.0).ToString("####0.00") + " / " + ((((double)num) / 1000.0)).ToString("####0.00");
@@ -88,11 +88,11 @@ internal class CActPlayPlayInfo : CActivity {
 		return 0;
 	}
 
-	private string NotesTextN;
-	private string NotesTextE;
-	private string NotesTextM;
-	private string NotesTextC;
-	private string ScoreModeText;
-	private string ListChipText;
-	private string ListChipMText;
+	private string NotesTextN = null!;
+	private string NotesTextE = null!;
+	private string NotesTextM = null!;
+	private string NotesTextC = null!;
+	private string ScoreModeText = null!;
+	private string ListChipText = null!;
+	private string ListChipMText = null!;
 }

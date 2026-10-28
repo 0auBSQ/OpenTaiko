@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <Nullable>disable</Nullable>
+    <Nullable>annotations</Nullable>
     <IsPackable>false</IsPackable>
     <AssemblyName>OpenTaiko.Tests</AssemblyName>
     <!-- the game project is a WinExe; tests load it as a library -->

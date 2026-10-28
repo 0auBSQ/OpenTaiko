@@ -9,9 +9,9 @@ namespace OpenTaiko {
 			DirPath = dirPath;
 		}
 
-		public JsonNode LoadJson(string name) {
+		public JsonNode? LoadJson(string name) {
 			using Stream stream = File.OpenRead($"{DirPath}{Path.DirectorySeparatorChar}{name}");
-			JsonNode jsonNode = JsonNode.Parse(stream);
+			JsonNode? jsonNode = JsonNode.Parse(stream);
 			return jsonNode;
 		}
 
@@ -21,19 +21,19 @@ namespace OpenTaiko {
 		public double ExtractNumber(JsonValue x) {
 			if (x == null) return 0;
 			try { return (double)x; } catch { }
-			try { return (string)x is string s && double.TryParse(s, out double v) ? v : 0; } catch { return 0; }
+			try { return (string?)x is string s && double.TryParse(s, out double v) ? v : 0; } catch { return 0; }
 		}
 
-		public string ExtractText(JsonValue x) {
+		public string? ExtractText(JsonValue x) {
 			if (x == null) return null;
-			try { return (string)x; } catch { }
+			try { return (string?)x; } catch { }
 			try { return x.ToString(); } catch { return null; }
 		}
 
-		public Dictionary<string, object> JsonParseFile(string name) {
+		public Dictionary<string, object?> JsonParseFile(string name) {
 			string json = File.ReadAllText($"{DirPath}{Path.DirectorySeparatorChar}{name}");
 			if (string.IsNullOrWhiteSpace(json))
-				return new Dictionary<string, object>();
+				return new Dictionary<string, object?>();
 
 			var token = JToken.Parse(json);
 			return ToDictionary(token);
@@ -78,9 +78,9 @@ namespace OpenTaiko {
 			return ConvertToken(token);
 		}
 
-		public Dictionary<string, object> JsonParseString(string json) {
+		public Dictionary<string, object?> JsonParseString(string json) {
 			if (string.IsNullOrWhiteSpace(json))
-				return new Dictionary<string, object>();
+				return new Dictionary<string, object?>();
 
 			var token = JToken.Parse(json);
 			return ToDictionary(token);
@@ -101,9 +101,9 @@ namespace OpenTaiko {
 			return 0;
 		}
 
-		private Dictionary<string, object> ToDictionary(JToken token) {
+		private Dictionary<string, object?> ToDictionary(JToken token) {
 			if (token is JObject obj) {
-				var dict = new Dictionary<string, object>();
+				var dict = new Dictionary<string, object?>();
 				foreach (var property in obj.Properties()) {
 					dict[property.Name] = ConvertToken(property.Value);
 				}
@@ -112,12 +112,12 @@ namespace OpenTaiko {
 			throw new ArgumentException("JSON root is not an object");
 		}
 
-		private object ConvertToken(JToken token) {
+		private object? ConvertToken(JToken token) {
 			switch (token.Type) {
 				case JTokenType.Object:
 					return ToDictionary(token);
 				case JTokenType.Array:
-					var dict = new Dictionary<int, object>();
+					var dict = new Dictionary<int, object?>();
 					int index = 1; // 1-indexed
 					foreach (var item in token) {
 						dict[index++] = ConvertToken(item);

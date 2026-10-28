@@ -11,7 +11,7 @@ namespace OpenTaikoTests {
 	[Collection("texture streaming")]
 	public class PaletteOffThreadTests {
 		[Fact]
-		public void PaletteMadeOnALoaderThreadQueuesItsUpload() {
+		public async Task PaletteMadeOnALoaderThreadQueuesItsUpload() {
 			var stops = new List<(float Pos, float R, float G, float B, float A)> {
 				(0f, 0.1f, 0.2f, 0.3f, 1f),
 				(1f, 0.9f, 0.8f, 0.7f, 1f),
@@ -19,7 +19,7 @@ namespace OpenTaikoTests {
 			string key = PaletteManager.BuildCacheKey(stops, 0.5f) + "|" + System.Guid.NewGuid().ToString("N");
 			int before = Game.AsyncActions.Count;
 
-			var entry = Task.Run(() => PaletteManager.GetOrCreate(key, stops, 0.5f)).GetAwaiter().GetResult();
+			var entry = await Task.Run(() => PaletteManager.GetOrCreate(key, stops, 0.5f));
 
 			Assert.NotNull(entry);
 			Assert.Equal(0.5f, entry.Blend);

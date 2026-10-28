@@ -1,4 +1,5 @@
-﻿using FDK;
+﻿using System.Diagnostics.CodeAnalysis;
+using FDK;
 using Color = System.Drawing.Color;
 
 namespace OpenTaiko;
@@ -9,7 +10,8 @@ public sealed class TitleTextureKey {
 	internal static readonly Dictionary<TitleTextureKey, CTexture> _titledictionary
 		= new Dictionary<TitleTextureKey, CTexture>();
 
-	public static CTexture ResolveTitleTexture(TitleTextureKey titleTextureKey) {
+	[return: NotNullIfNotNull(nameof(titleTextureKey))]
+	public static CTexture? ResolveTitleTexture(TitleTextureKey? titleTextureKey) {
 		if (titleTextureKey == null) return null;
 		if (!_titledictionary.TryGetValue(titleTextureKey, out var texture)) {
 			texture = GenerateTitleTexture(titleTextureKey);
@@ -19,7 +21,8 @@ public sealed class TitleTextureKey {
 		return texture;
 	}
 
-	public static CTexture ResolveTitleTexture(TitleTextureKey titleTextureKey, bool bVertical, bool keepCenter = false) {
+	[return: NotNullIfNotNull(nameof(titleTextureKey))]
+	public static CTexture? ResolveTitleTexture(TitleTextureKey? titleTextureKey, bool bVertical, bool keepCenter = false) {
 		if (titleTextureKey == null) return null;
 		if (!_titledictionary.TryGetValue(titleTextureKey, out var texture)) {
 			if (bVertical)
@@ -32,7 +35,8 @@ public sealed class TitleTextureKey {
 		return texture;
 	}
 
-	public static CTexture ResolveTitleTextureTate(TitleTextureKey titleTextureKey) {
+	[return: NotNullIfNotNull(nameof(titleTextureKey))]
+	public static CTexture? ResolveTitleTextureTate(TitleTextureKey? titleTextureKey) {
 		if (titleTextureKey == null) return null;
 		if (!_titledictionary.TryGetValue(titleTextureKey, out var texture)) {
 			texture = GenerateTitleTextureTate(titleTextureKey);
@@ -49,12 +53,13 @@ public sealed class TitleTextureKey {
 		_titledictionary.Remove(key);
 	}
 
-	private static CTexture GenerateTitleTextureTate(TitleTextureKey titleTextureKey, bool keepCenter = false) {
+	[return: NotNullIfNotNull(nameof(titleTextureKey))]
+	private static CTexture? GenerateTitleTextureTate(TitleTextureKey? titleTextureKey, bool keepCenter = false) {
 		if (titleTextureKey == null) return null;
 		using (var bmp = titleTextureKey.cPrivateFastFont.DrawText_V(
 				   titleTextureKey.str, titleTextureKey.forecolor, titleTextureKey.backcolor, titleTextureKey.secondEdge, 30, keepCenter)) {
-			CTexture txTextTexture = OpenTaiko.tTextureCreate(bmp, false);
-			txTextTexture.CacheKeys[_titledictionary] = titleTextureKey;
+			CTexture? txTextTexture = OpenTaiko.tTextureCreate(bmp, false);
+			txTextTexture!.CacheKeys[_titledictionary] = titleTextureKey;
 			if (txTextTexture.szTextureSize.Height > titleTextureKey.maxWidth) {
 				//tx文字テクスチャ.vc拡大縮小倍率.X = (float)(((double)titleTextureKey.maxWidth) / tx文字テクスチャ.szテクスチャサイズ.Height);
 				txTextTexture.vcScaleRatio.X = 1.0f;
@@ -65,12 +70,13 @@ public sealed class TitleTextureKey {
 		}
 	}
 
-	private static CTexture GenerateTitleTexture(TitleTextureKey titleTextureKey, bool keepCenter = false) {
+	[return: NotNullIfNotNull(nameof(titleTextureKey))]
+	private static CTexture? GenerateTitleTexture(TitleTextureKey? titleTextureKey, bool keepCenter = false) {
 		if (titleTextureKey == null) return null;
 		using (var bmp = titleTextureKey.cPrivateFastFont.DrawText(
 				   titleTextureKey.str, titleTextureKey.forecolor, titleTextureKey.backcolor, titleTextureKey.secondEdge, 30, keepCenter)) {
-			CTexture txTextTexture = OpenTaiko.tTextureCreate(bmp, false);
-			txTextTexture.CacheKeys[_titledictionary] = titleTextureKey;
+			CTexture? txTextTexture = OpenTaiko.tTextureCreate(bmp, false);
+			txTextTexture!.CacheKeys[_titledictionary] = titleTextureKey;
 			if (txTextTexture.szTextureSize.Width > titleTextureKey.maxWidth) {
 				txTextTexture.vcScaleRatio.X = (float)(((double)titleTextureKey.maxWidth) / txTextTexture.szTextureSize.Width);
 				txTextTexture.vcScaleRatio.Y = 1.0f;// (float) (((double) titleTextureKey.maxWidth) / tx文字テクスチャ.szテクスチャサイズ.Width);
@@ -116,7 +122,7 @@ public sealed class TitleTextureKey {
 			   maxWidth == other.maxWidth;
 	}
 
-	public override bool Equals(object obj) {
+	public override bool Equals(object? obj) {
 		if (ReferenceEquals(null, obj)) return false;
 		if (ReferenceEquals(this, obj)) return true;
 		return obj is TitleTextureKey other && Equals(other);
@@ -135,11 +141,11 @@ public sealed class TitleTextureKey {
 		}
 	}
 
-	public static bool operator ==(TitleTextureKey left, TitleTextureKey right) {
+	public static bool operator ==(TitleTextureKey? left, TitleTextureKey? right) {
 		return Equals(left, right);
 	}
 
-	public static bool operator !=(TitleTextureKey left, TitleTextureKey right) {
+	public static bool operator !=(TitleTextureKey? left, TitleTextureKey? right) {
 		return !Equals(left, right);
 	}
 }

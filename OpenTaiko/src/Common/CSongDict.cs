@@ -25,13 +25,13 @@ internal class CSongDict {
 
 	#region [General song dict methods]
 
-	public static CSongListNode tGetNodeFromID(string id) {
+	public static CSongListNode? tGetNodeFromID(string id) {
 		if (nodes.ContainsKey(id))
 			return nodes[id].Clone();
 		return null;
 	}
 
-	public static void tAddSongNode(CSongUniqueID sid, CSongListNode node) {
+	public static void tAddSongNode(CSongUniqueID? sid, CSongListNode node) {
 		var id = sid?.data?.id ?? "";
 
 		if (!string.IsNullOrEmpty(id) && !nodes.ContainsKey(id))
@@ -74,7 +74,7 @@ internal class CSongDict {
 	#region [Extra methods]
 
 	// Generate a back button
-	public static CSongListNode tGenerateBackButton(CSongListNode parent, string? path = "/", List<string> listStrBoxDef = null) {
+	public static CSongListNode tGenerateBackButton(CSongListNode parent, string? path = "/", List<string>? listStrBoxDef = null) {
 		CSongListNode itemBack = new CSongListNode();
 		itemBack.nodeType = CSongListNode.ENodeType.BACKBOX;
 
@@ -106,9 +106,9 @@ internal class CSongDict {
 			itemBack.ldTitle.GetString("BACKBOX") : itemBack.rParentNode.strBreadcrumbs + " > " + itemBack.ldTitle.GetString("BACKBOX");
 
 		itemBack.score[0] = new CScore();
-		itemBack.score[0].FileInfo.FolderAbsolutePath = "";
-		itemBack.score[0].ChartInfo.Title = itemBack.ldTitle.GetString("");
-		itemBack.score[0].ChartInfo.Comment = "";
+		itemBack.score[0]!.FileInfo.FolderAbsolutePath = "";
+		itemBack.score[0]!.ChartInfo.Title = itemBack.ldTitle.GetString("");
+		itemBack.score[0]!.ChartInfo.Comment = "";
 
 		return (itemBack);
 	}
@@ -131,7 +131,7 @@ internal class CSongDict {
 	}
 
 	// Reset the position of all back buttons, also adds a random button at the end
-	public static List<CSongListNode> tReinsertBackButtons(CSongListNode parent, List<CSongListNode> songList, string path = "/", List<string> listStrBoxDef = null) {
+	public static List<CSongListNode> tReinsertBackButtons(CSongListNode parent, List<CSongListNode> songList, string path = "/", List<string>? listStrBoxDef = null) {
 		// Remove all the existing back boxes currently existing
 		songList.RemoveAll(e => e.nodeType == CSongListNode.ENodeType.BACKBOX || e.nodeType == CSongListNode.ENodeType.RANDOM);
 
@@ -150,7 +150,7 @@ internal class CSongDict {
 	}
 
 
-	private static CSongListNode tReadaptChildNote(CSongListNode parent, CSongListNode node) {
+	private static CSongListNode? tReadaptChildNote(CSongListNode parent, CSongListNode? node) {
 		if (node != null) {
 			node.rParentNode = parent;
 			node.isChangedBgType = parent.isChangedBgType;

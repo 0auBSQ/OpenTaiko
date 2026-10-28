@@ -23,7 +23,7 @@ internal class CLuaNamePlateScript : CLuaScript {
 
 	public int GetCharaOffset() {
 		if (!Available) return 0;
-		double result = (double)RunLuaCode(lfGetCharaOffset)[0];
+		double result = (double)RunLuaCode(lfGetCharaOffset)![0];
 		return (int)result;
 	}
 

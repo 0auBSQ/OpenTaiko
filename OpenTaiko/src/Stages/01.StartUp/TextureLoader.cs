@@ -63,7 +63,7 @@ class TextureLoader {
 	// Gameplay-screen textures (the "5_演奏画面" region below), collected so they can be warmed
 	// (decoded + uploaded) during the song-load screen instead of lazily on first draw during play,
 	// which otherwise causes an in-frame decode hitch the first time each effect appears.
-	public readonly List<CTexture> gameplayTextures = new();
+	public readonly List<CTexture?> gameplayTextures = new();
 	private bool _collectGameplay;
 	private int _warmIndex;
 
@@ -86,16 +86,16 @@ class TextureLoader {
 	private readonly Dictionary<CTexture, WarmNeed> _warmNeeds = new();
 	private WarmNeed _playNeeds;
 
-	private CTexture TxCFor(WarmNeed need, string FileName) {
+	private CTexture? TxCFor(WarmNeed need, string FileName) {
 		var tex = TxC(FileName);
 		if (tex != null && need != WarmNeed.Always) _warmNeeds[tex] = need;
-		return tex!;
+		return tex;
 	}
 
-	private CTextureAf TxCAfFor(WarmNeed need, string FileName) {
+	private CTextureAf? TxCAfFor(WarmNeed need, string FileName) {
 		var tex = TxCAf(FileName);
 		if (tex != null && need != WarmNeed.Always) _warmNeeds[tex] = need;
-		return tex!;
+		return tex;
 	}
 
 	// what the coming play can draw: its mode, its players and its charts (loaded by now)
@@ -129,7 +129,7 @@ class TextureLoader {
 		// Constructor
 	}
 
-	internal CTexture TxC(string FileName, bool localize = true) {
+	internal CTexture? TxC(string FileName, bool localize = true) {
 		tTickTextureProgress();
 		var texpath = (localize) ? HLocalizedPath.GetAvailableLocalizedPath(CSkin.Path(BASE + FileName)) : CSkin.Path(BASE + FileName);
 		var tex = OpenTaiko.tTextureCreate(texpath, false);
@@ -139,21 +139,21 @@ class TextureLoader {
 		return tex;
 	}
 
-	internal CTexture TxCGlobal(string FileName) {
+	internal CTexture? TxCGlobal(string FileName) {
 		tTickTextureProgress();
 		var tex = OpenTaiko.tTextureCreate(OpenTaiko.strEXEFolder + GLOBAL + FileName, false);
 		listTexture.Add(tex);
 		return tex;
 	}
 
-	internal CTexture TxCAbsolute(string FileName) {
+	internal CTexture? TxCAbsolute(string FileName) {
 		tTickTextureProgress();
 		var tex = OpenTaiko.tTextureCreate(FileName, false);
 		listTexture.Add(tex);
 		return tex;
 	}
 
-	internal CTextureAf TxCAf(string FileName) {
+	internal CTextureAf? TxCAf(string FileName) {
 		tTickTextureProgress();
 		var tex = OpenTaiko.tTextureCreateAf(CSkin.Path(BASE + FileName));
 		listTexture.Add(tex);
@@ -182,24 +182,24 @@ class TextureLoader {
 		}
 		return _warmIndex >= gameplayTextures.Count;
 	}
-	internal CTexture TxCGen(string FileName) {
+	internal CTexture? TxCGen(string FileName) {
 		tTickTextureProgress();
 		return OpenTaiko.tTextureCreate(CSkin.Path(BASE + GAME + GENRE + FileName + ".png"), false);
 	}
 
-	internal CTexture TxCSong(string path) {
+	internal CTexture? TxCSong(string path) {
 		return TxCUntrackedSong(path);
 	}
 
-	private CTexture[] TxCSong(int count, string format, int start = 0) {
+	private CTexture?[] TxCSong(int count, string format, int start = 0) {
 		return TxCSong(format, Enumerable.Range(start, count).Select(o => o.ToString()).ToArray());
 	}
 
-	private CTexture[] TxCSong(string format, params string[] parts) {
+	private CTexture?[] TxCSong(string format, params string[] parts) {
 		return parts.Select(o => TxCSong(string.Format(format, o))).ToArray();
 	}
 
-	public CTexture[] TxCSongFolder(string folder) {
+	public CTexture?[]? TxCSongFolder(string folder) {
 		// Match .png case-insensitively so mixed-case frame names work on case-sensitive filesystems (iOS).
 		if (!Directory.Exists(folder)) return null;
 		var byIndex = new Dictionary<int, string>();
@@ -207,13 +207,13 @@ class TextureLoader {
 			if (int.TryParse(Path.GetFileNameWithoutExtension(file), out int n))
 				byIndex[n] = file;
 		}
-		var textures = new List<CTexture>();
-		for (int i = 0; byIndex.TryGetValue(i, out string path); i++)
+		var textures = new List<CTexture?>();
+		for (int i = 0; byIndex.TryGetValue(i, out string? path); i++)
 			textures.Add(TxCSong(path));
 		return textures.Count == 0 ? null : textures.ToArray();
 	}
 
-	internal CTexture TxCUntrackedSong(string path) {
+	internal CTexture? TxCUntrackedSong(string path) {
 		tTickTextureProgress();
 		// Chart-object textures (#ADDOBJECT / #CHANGETEXTURE) are created during the OFF-thread chart parse. Load
 		// them async so the GL upload lands on the render thread (Game.AsyncActions) — doing GL on the parse thread
@@ -312,7 +312,7 @@ class TextureLoader {
 		Bar_Branch = TxC(GAME + @$"Bar_Branch.png");
 
 		Vector2 judgeDiff = new(OpenTaiko.Skin.Game_Judge_X[1] - OpenTaiko.Skin.Game_Judge_X[0], OpenTaiko.Skin.Game_Judge_Y[1] - OpenTaiko.Skin.Game_Judge_Y[0]);
-		OpenTaiko.Skin.Init_Game_Notes_Arm_Configs(CSkin.ToVector2(Notes_Arm.szTextureSize), CSkin.ToVector2(OpenTaiko.Skin.Game_Notes_Size), judgeDiff,
+		OpenTaiko.Skin.Init_Game_Notes_Arm_Configs(CSkin.ToVector2(Notes_Arm!.szTextureSize), CSkin.ToVector2(OpenTaiko.Skin.Game_Notes_Size), judgeDiff,
 			(float)OpenTaiko.Skin.ScaleY * new Vector2(35, 0), (float)OpenTaiko.Skin.ScaleY * 8);
 
 		var _presetsDefs = CSkin.Path(BASE + GAME + BACKGROUND + @$"Presets.json");
@@ -876,8 +876,8 @@ class TextureLoader {
 		Notes_Partner[1] = bongoPacks ? PackTx(WarmNeed.Partner, CNotesSkins.File_(BONGO, "Notes_Partner.png", true)) : null;
 		Notes_Giant[0] = taikoPacks ? PackTx(WarmNeed.Giant, CNotesSkins.File_(TAIKO, "Notes_Giant.png", true)) : null;
 		Notes_Giant[1] = bongoPacks ? PackTx(WarmNeed.Giant, CNotesSkins.File_(BONGO, "Notes_Giant.png", true)) : null;
-		if (HitCircle[0] != null) HitCircle[0].bAddBlend = OpenTaiko.Skin.Game_JudgeFrame_AddBlend;
-		if (HitCircle[1] != null) HitCircle[1].bAddBlend = OpenTaiko.Skin.Game_JudgeFrame_AddBlend;
+		if (HitCircle[0] != null) HitCircle[0]!.bAddBlend = OpenTaiko.Skin.Game_JudgeFrame_AddBlend;
+		if (HitCircle[1] != null) HitCircle[1]!.bAddBlend = OpenTaiko.Skin.Game_JudgeFrame_AddBlend;
 
 		// the balloons are the Taiko set's whatever the game type
 		Balloons = taikoPacks ? PackTx(WarmNeed.Always, T("Balloons.png", "")) : null;
@@ -1006,13 +1006,13 @@ class TextureLoader {
 	}
 	#region Calibration
 
-	public CTexture CalibrateFG,
+	public CTexture? CalibrateFG,
 		CalibrateBG;
 
 	#endregion
 
 	#region 共通
-	public CTexture Tile_Black,
+	public CTexture? Tile_Black,
 		Menu_Title,
 		Menu_Highlight,
 		Loading,
@@ -1025,46 +1025,46 @@ class TextureLoader {
 
 	#region 3_段位選択画面 (textures still used by result/gameplay stages)
 
-	public CTexture Dani_Difficulty_Cymbol;
-	public CTexture Dani_Level_Number;
-	public CTexture Dani_DanIcon;
-	public CTexture Dani_DanIcon_Fade;
+	public CTexture? Dani_Difficulty_Cymbol;
+	public CTexture? Dani_Level_Number;
+	public CTexture? Dani_DanIcon;
+	public CTexture? Dani_DanIcon_Fade;
 
 	#endregion
 
 	#region 5_演奏画面
 	#region 共通
-	public CTexture Note_Mine,
-		Note_Swap,       // the former layout's purple, ADLib, kusudama and fuse roll sheets (null with a notes pack)
+	public CTexture? Note_Mine;
+	public CTexture? Note_Swap,       // the former layout's purple, ADLib, kusudama and fuse roll sheets (null with a notes pack)
 		Note_Kusu,
 		Note_FuseRoll,
 		Note_Adlib,
-		Balloons,        // a Taiko notes pack's Balloons.png
-		SENotesExtension,
+		Balloons;        // a Taiko notes pack's Balloons.png
+	public CTexture? SENotesExtension,
 		Notes_Arm,
-		ScoreRank,
-		Judge;
-	public CTexture Judge_Meter,
+		ScoreRank;
+	public CTexture? Judge;
+	public CTexture? Judge_Meter,
 		Bar,
 		Bar_Branch;
 	// per game type (Taiko, Konga)
-	public CTexture[] Notes,
-		Rolls,           // a notes pack's Rolls.png (null in the former layout, where Notes.png holds the rolls)
-		HitCircle,
-		ChipEffect,
-		Notes_Partner,
-		Notes_Giant,
-		SENotes;
+	public CTexture?[] Notes = null!,
+		Rolls = null!,           // a notes pack's Rolls.png (null in the former layout, where Notes.png holds the rolls)
+		HitCircle = null!,
+		ChipEffect = null!,
+		Notes_Partner = null!,
+		Notes_Giant = null!;
+	public CTexture?[] SENotes = null!;
 	#endregion
 
 
 	#region モブ
 	#endregion
 	#region 太鼓
-	public CTexture[] Taiko_Base,
-		Taiko_Frame, // MTaiko下敷き
-		Taiko_Background;
-	public CTexture Taiko_Don_Left,
+	public CTexture?[] Taiko_Base = null!,
+		Taiko_Frame = null!, // MTaiko下敷き
+		Taiko_Background = null!;
+	public CTexture? Taiko_Don_Left,
 		Taiko_Don_Right,
 		Taiko_Ka_Left,
 		Taiko_Ka_Right,
@@ -1075,87 +1075,87 @@ class TextureLoader {
 		Taiko_LevelDown,
 		Taiko_Combo_Effect,
 		Taiko_Combo_Text;
-	public CTexture[] Couse_Symbol, // コースシンボル
-		Couse_Symbol_Back,
-		Couse_Symbol_Back_Flash,
-		Taiko_PlayerNumber;
-	public CTexture[] Taiko_Score,
-		Taiko_Combo,
-		Taiko_Combo_Guide;
+	public CTexture?[] Couse_Symbol = null!, // コースシンボル
+		Couse_Symbol_Back = null!,
+		Couse_Symbol_Back_Flash = null!,
+		Taiko_PlayerNumber = null!;
+	public CTexture?[] Taiko_Score = null!,
+		Taiko_Combo = null!,
+		Taiko_Combo_Guide = null!;
 	#endregion
 	#region ゲージ
-	public CTexture[] Gauge,
-		Gauge_Base,
-		Gauge_Base_Norma,
-		Gauge_Line,
-		Gauge_Rainbow,
-		Gauge_Rainbow_2PGauge,
-		Gauge_Rainbow_Flat,
-		Gauge_Clear,
-		Gauge_Killzone,
-		Gauge_Soul_Explosion;
-	public CTexture Gauge_Soul,
+	public CTexture?[] Gauge = null!,
+		Gauge_Base = null!,
+		Gauge_Base_Norma = null!,
+		Gauge_Line = null!,
+		Gauge_Rainbow = null!,
+		Gauge_Rainbow_2PGauge = null!,
+		Gauge_Rainbow_Flat = null!,
+		Gauge_Clear = null!,
+		Gauge_Killzone = null!,
+		Gauge_Soul_Explosion = null!;
+	public CTexture? Gauge_Soul,
 		Gauge_Soul_Fire;
-	public CTexture[] Gauge_Dan;
-	public CTexture[] Gauge_Dan_Rainbow;
+	public CTexture?[] Gauge_Dan = null!;
+	public CTexture?[] Gauge_Dan_Rainbow = null!;
 	#endregion
 	#region 吹き出し
-	public CTexture[] Balloon_Combo;
-	public CTexture Balloon_Roll,
-		Balloon_Balloon,
-		Balloon_Number_Roll,
+	public CTexture?[] Balloon_Combo = null!;
+	public CTexture? Balloon_Roll,
+		Balloon_Balloon;
+	public CTexture? Balloon_Number_Roll,
 		Balloon_Number_Combo/*,*/
 		/*Balloon_Broken*/;
-	public CTexture Kusudama_Number;
+	public CTexture? Kusudama_Number;
 
-	public CTexture Fuse_Number,
+	public CTexture? Fuse_Number,
 		Fuse_Balloon;
 
-	public CTexture[] Balloon_Breaking;
-	public CTexture Balloon_Breaking_Sheet;   // a notes pack's Breaking.png: the 6 pictures one above the other
+	public CTexture?[] Balloon_Breaking = null!;
+	public CTexture? Balloon_Breaking_Sheet;   // a notes pack's Breaking.png: the 6 pictures one above the other
 	#endregion
 	#region エフェクト
-	public CTexture Effects_Hit_Explosion,
+	public CTexture? Effects_Hit_Explosion,
 		Effects_Hit_Bomb,
-		Effects_Hit_Explosion_Big,
-		Effects_Fire,
+		Effects_Hit_Explosion_Big;
+	public CTexture? Effects_Fire,
 		Effects_Rainbow,
-		Effects_GoGoSplash,
-		Effects_Hit_FireWorks;
-	public CTexture[] Effects_Hit_Great,
-		Effects_Hit_Good,
-		Effects_Hit_Great_Big,
-		Effects_Hit_Good_Big;
-	public CTexture[] Effects_Roll;
+		Effects_GoGoSplash;
+	public CTexture? Effects_Hit_FireWorks;
+	public CTexture?[] Effects_Hit_Great = null!,
+		Effects_Hit_Good = null!,
+		Effects_Hit_Great_Big = null!,
+		Effects_Hit_Good_Big = null!;
+	public CTexture?[] Effects_Roll = null!;
 	#endregion
 	#region レーン
-	public CTexture[] Lane_Red,
-		Lane_Blue,
-		Lane_Clap,
-		Lane_Base,
-		Lane_Text;
-	public CTexture Lane_Yellow;
-	public CTexture Lane_Background_Main,
+	public CTexture?[] Lane_Red = null!,
+		Lane_Blue = null!,
+		Lane_Clap = null!,
+		Lane_Base = null!,
+		Lane_Text = null!;
+	public CTexture? Lane_Yellow;
+	public CTexture? Lane_Background_Main,
 		Lane_Background_AI,
 		Lane_Background_Sub,
 		Lane_Background_GoGo;
 	#endregion
 	#region ゲームモード
-	public CTexture GameMode_Timer_Frame;
+	public CTexture? GameMode_Timer_Frame;
 	#endregion
 	#region ランナー
 	//public CTexture Runner;
 	#endregion
 	#region DanC
-	public CTexture DanC_Background;
-	public CTexture[] DanC_Gauge;
-	public CTexture DanC_Base;
-	public CTexture DanC_Base_Small;
+	public CTexture? DanC_Background;
+	public CTexture?[] DanC_Gauge = null!;
+	public CTexture? DanC_Base;
+	public CTexture? DanC_Base_Small;
 
 
-	public CTexture DanC_Gauge_Base;
-	public CTexture DanC_Failed;
-	public CTexture DanC_Number,
+	public CTexture? DanC_Gauge_Base;
+	public CTexture? DanC_Failed;
+	public CTexture? DanC_Number,
 		DanC_Small_Number,
 		DanC_SmallBase,
 		DanC_ExamType,
@@ -1163,16 +1163,16 @@ class TextureLoader {
 		DanC_Small_ExamCymbol,
 		DanC_ExamCymbol,
 		DanC_MiniNumber;
-	public CTexture DanC_Screen;
+	public CTexture? DanC_Screen;
 	#endregion
 	#region PuchiChara
 
-	public CPuchichara[] Puchichara;
+	public CPuchichara[] Puchichara = null!;
 	public LuaPuchicharaDatabase? LuaPuchicharaDb;
 
 	#endregion
 	#region Training
-	public CTexture Tokkun_DownBG,
+	public CTexture? Tokkun_DownBG,
 		Tokkun_BigTaiko,
 		Tokkun_ProgressBar,
 		Tokkun_ProgressBarWhite,
@@ -1186,13 +1186,13 @@ class TextureLoader {
 
 	#region [20_Tower]
 
-	public CTexture Tower_Miss;
+	public CTexture? Tower_Miss;
 
 	#endregion
 
 	#region [22_AIBattle]
 
-	public CTexture AIBattle_SectionTime_Panel,
+	public CTexture? AIBattle_SectionTime_Panel,
 		AIBattle_SectionTime_Bar_Base,
 		AIBattle_SectionTime_Bar_Normal,
 		AIBattle_SectionTime_Bar_Finish,
@@ -1200,7 +1200,7 @@ class TextureLoader {
 		AIBattle_Batch,
 		AIBattle_Judge_Number;
 
-	public CTexture[] AIBattle_Judge_Meter = new CTexture[2];
+	public CTexture?[] AIBattle_Judge_Meter = new CTexture?[2];
 
 	#endregion
 
@@ -1208,7 +1208,7 @@ class TextureLoader {
 	#endregion
 
 	#region 6_結果発表
-	public CTexture Result_Header,
+	public CTexture? Result_Header,
 		Result_Number,
 		Result_Panel,
 		Result_Panel_2P,
@@ -1228,24 +1228,24 @@ class TextureLoader {
 		Result_Gauge_Clear_Base,
 		Result_Gauge_Killzone;
 
-	public CTexture[]
-		Result_Panel_5P = new CTexture[5],
-		Result_Panel_4P = new CTexture[4],
-		Result_Rainbow = new CTexture[41],
+	public CTexture?[]
+		Result_Panel_5P = new CTexture?[5],
+		Result_Panel_4P = new CTexture?[4],
+		Result_Rainbow = new CTexture?[41],
 		//Result_Background = new CTexture[6],
-		Result_Flower_Rotate = new CTexture[5],
+		Result_Flower_Rotate = new CTexture?[5],
 		//Result_Work = new CTexture[3],
 
-		Result_Gauge = new CTexture[5],
-		Result_Gauge_Base = new CTexture[5],
-		Result_Speech_Bubble = new CTexture[2],
-		Result_Speech_Bubble_V2 = new CTexture[3]
+		Result_Gauge = new CTexture?[5],
+		Result_Gauge_Base = new CTexture?[5],
+		Result_Speech_Bubble = new CTexture?[2],
+		Result_Speech_Bubble_V2 = new CTexture?[3]
 /*,
-Result_Mountain = new CTexture[4]*/;
+Result_Mountain = new CTexture?[4]*/;
 	#endregion
 
 	#region 7_AIResults
-	public CTexture Result_AIBattle_Panel_AI,
+	public CTexture? Result_AIBattle_Panel_AI,
 		Result_AIBattle_Batch,
 		Result_AIBattle_SectionPlate,
 		Result_AIBattle_WinFlag_Clear,
@@ -1259,7 +1259,7 @@ Result_Mountain = new CTexture[4]*/;
 
 	#region [7_DanResults]
 
-	public CTexture
+	public CTexture?
 		//DanResult_Background,
 		DanResult_Rank,
 		DanResult_SongPanel_Base,
@@ -1271,7 +1271,7 @@ Result_Mountain = new CTexture[4]*/;
 
 	#region [8_TowerResults]
 
-	public CTexture TowerResult_ScoreRankEffect,
+	public CTexture? TowerResult_ScoreRankEffect,
 		TowerResult_Panel;
 
 	#endregion
@@ -1279,7 +1279,7 @@ Result_Mountain = new CTexture[4]*/;
 	#region [11_Characters]
 
 	/*
-	public CTexture[][] Characters_Normal,
+	public CTexture?[][] Characters_Normal,
 		Characters_Normal_Missed,
 		Characters_Normal_MissedDown,
 		Characters_Normal_Cleared,
@@ -1325,7 +1325,7 @@ Result_Mountain = new CTexture[4]*/;
 		Characters_Tower_Climbing_Tired,
 		Characters_Tower_Running_Tired,
 		Characters_Tower_Clear_Tired;
-	public CTexture[] Characters_Result_Clear_1P,
+	public CTexture?[] Characters_Result_Clear_1P,
 		Characters_Result_Failed_1P,
 		Characters_Result_Clear_2P,
 		Characters_Result_Failed_2P;
@@ -1365,7 +1365,7 @@ Result_Mountain = new CTexture[4]*/;
 
 	#region [12_OnlineLounge]
 
-	public CTexture
+	public CTexture?
 		//OnlineLounge_Background,
 		OnlineLounge_Box,
 		OnlineLounge_Side_Menu,
@@ -1376,7 +1376,7 @@ Result_Mountain = new CTexture[4]*/;
 	#endregion
 
 	#region [ 解放用 ]
-	public List<CTexture> listTexture = new List<CTexture>();
+	public List<CTexture?> listTexture = new List<CTexture?>();
 	#endregion
 
 }

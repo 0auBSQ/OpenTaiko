@@ -50,10 +50,10 @@ internal class DBNameplateUnlockables : CSavableT<Dictionary<string, NameplateUn
 
 	public class NameplateUnlockable {
 		[JsonProperty("NameplateInfo")]
-		public SaveFile.CNamePlateTitle nameplateInfo;
+		public SaveFile.CNamePlateTitle nameplateInfo = null!;
 
 		[JsonProperty("Rarity")]
-		public string rarity;
+		public string rarity = null!;
 
 		// null = no unlock condition, the nameplate is owned by everyone
 		[JsonProperty("UnlockCondition")]

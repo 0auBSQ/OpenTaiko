@@ -801,7 +801,7 @@ internal class CActImplCharacter : CActivity {
 		GenericBalloon_BrokeMiss,
 	}
 
-	public CCounter ctKusuIn;
+	public CCounter ctKusuIn = null!;
 	public CCounter? ctKusuMiss;
 	public CCounter? ctKusuSuccess;
 	public CCharacterController[] CharacterControllers = new CCharacterController[5];
@@ -922,7 +922,7 @@ internal class CActImplCharacter : CActivity {
 
 	//public CCounter[] CharaAction_Balloon_Delay = new CCounter[5];
 
-	public Animations.FadeOut[] CharaAction_Balloon_FadeOut = new Animations.FadeOut[5];
+	public Animations.FadeOut?[] CharaAction_Balloon_FadeOut = new Animations.FadeOut[5];
 
 	//public bool[] bキャラクターアクション中 = new bool[5];
 

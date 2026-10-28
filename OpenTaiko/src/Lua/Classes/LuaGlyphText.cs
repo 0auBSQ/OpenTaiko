@@ -225,13 +225,13 @@ namespace OpenTaiko {
 
 		private Slot? GetFill(int cp, Color? gradTop, Color? gradBottom) {
 			bool grad = gradTop.HasValue && gradBottom.HasValue;
-			var key = new FillKey(cp, grad ? gradTop.Value.ToArgb() : 0, grad ? gradBottom.Value.ToArgb() : 0);
+			var key = new FillKey(cp, grad ? gradTop!.Value.ToArgb() : 0, grad ? gradBottom!.Value.ToArgb() : 0);
 			if (_fills.TryGetValue(key, out var slot)) return slot;
 			string s = char.ConvertFromUtf32(cp);
 			// The text renderer only paints a vertical gradient for a token wrapped in a <g.#top.#bottom> tag
 			// (the DrawMode.Gradation flag alone is ignored), so a gradient glyph bakes as that tagged token.
 			string bake = grad
-				? $"<g.#{gradTop.Value.R:X2}{gradTop.Value.G:X2}{gradTop.Value.B:X2}.#{gradBottom.Value.R:X2}{gradBottom.Value.G:X2}{gradBottom.Value.B:X2}>{s}</g>"
+				? $"<g.#{gradTop!.Value.R:X2}{gradTop.Value.G:X2}{gradTop.Value.B:X2}.#{gradBottom!.Value.R:X2}{gradBottom.Value.G:X2}{gradBottom.Value.B:X2}>{s}</g>"
 				: s;
 			slot = Bake(bake, false, grad);
 			_fills[key] = slot;

@@ -5,7 +5,7 @@
 		private double _levelDecimal;
 		private CTja.ELevelIcon _levelIcon;
 		private string _notesDesigner = "";
-		private CScore _score;
+		private CScore? _score;
 		private CScore.STChartInfo? _chartInfo;
 		private LuaSongNode? _parent;
 		private CSongListNode? _parentListNode;
@@ -183,7 +183,7 @@
 		public LuaSongDanExam[] DanExams {
 			get {
 				List<LuaSongDanExam> _de = new List<LuaSongDanExam>();
-				foreach (Dan_C _danC in _parentListNode?.Dan_C.ToList() ?? new List<Dan_C>()) {
+				foreach (Dan_C? _danC in _parentListNode?.Dan_C?.ToList() ?? new List<Dan_C?>()) {
 					_de.Add(new LuaSongDanExam(_danC));
 				}
 				return _de.ToArray();
@@ -234,7 +234,7 @@
 			// never receives a null rChoosenSong regardless of whether Mount() was called.
 			if (player == 0) {
 				OpenTaiko.SongMount.rChoosenSong = _parentListNode;
-				OpenTaiko.SongMount.strChosenSongGenre = _parent.Genre ?? "???";
+				OpenTaiko.SongMount.strChosenSongGenre = _parent!.Genre ?? "???";
 			}
 			OpenTaiko.SongMount.rChosenScore = _score;
 			OpenTaiko.SongMount.nChoosenSongDifficulty[player] = (int)Difficulty;

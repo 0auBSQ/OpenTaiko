@@ -35,7 +35,7 @@ namespace OpenTaiko {
 			return RunLuaCode(lfDraw, args);
 		}
 
-		public object[]? Activate(params object[] args) {
+		public object[]? Activate(params object?[] args) {
 			_active = true;
 			// Refresh globals populated by TextureLoader after script construction (mirrors CLuaStageScript).
 			LuaScript["CHARACTERLIST"] = OpenTaiko.Tx?.LuaCharacterDb;
@@ -81,7 +81,7 @@ namespace OpenTaiko {
 				lfAfterSongEnum.Load(LuaScript);
 				lfOnDestroy.Load(LuaScript);
 
-				LuaScript["DEACTIVATE"] = Deactivate;
+				LuaScript["DEACTIVATE"] = (Delegate)Deactivate;
 
 			} catch (Exception e) {
 				Crash(e, $"initializing {nameof(CLuaActivityScript)}");

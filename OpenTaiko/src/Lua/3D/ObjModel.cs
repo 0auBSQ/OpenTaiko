@@ -98,7 +98,7 @@ namespace OpenTaiko {
 			var uv = new List<float>();    // vt  (u v)
 			var matIndex = new Dictionary<string, int>();
 			var matColor = new List<int>();
-			Group cur = null;
+			Group? cur = null;
 			var groupByMat = new Dictionary<int, Group>();
 
 			Group GroupFor(int mat) {
@@ -110,11 +110,11 @@ namespace OpenTaiko {
 			// .mtl: newmtl name / Kd r g b  →  packed colour per material name
 			void LoadMtl(string mtlPath) {
 				if (!File.Exists(mtlPath)) return;
-				string name = null;
+				string? name = null;
 				foreach (var raw in File.ReadLines(mtlPath)) {
 					var line = raw.Trim();
 					if (line.Length == 0 || line[0] == '#') continue;
-					var tok = line.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+					var tok = line.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
 					if (tok[0] == "newmtl" && tok.Length > 1) {
 						name = tok[1];
 						if (!matIndex.ContainsKey(name)) { matIndex[name] = matColor.Count; matColor.Add(0xC0C0C0); }
@@ -128,7 +128,7 @@ namespace OpenTaiko {
 			foreach (var raw in File.ReadLines(path)) {
 				var line = raw.Trim();
 				if (line.Length == 0 || line[0] == '#') continue;
-				var tok = line.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+				var tok = line.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
 				switch (tok[0]) {
 					case "v":
 						if (tok.Length >= 4) { pos.Add(F(tok[1])); pos.Add(F(tok[2])); pos.Add(F(tok[3])); }

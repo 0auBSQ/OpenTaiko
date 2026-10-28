@@ -101,7 +101,7 @@ internal class CSongManager {
 			downloadBox.childrenList.Clear();
 
 
-			var path = downloadBox.score[0].FileInfo.FolderAbsolutePath;
+			var path = downloadBox.score[0]!.FileInfo.FolderAbsolutePath;
 
 			if (count > 0) {
 				tSongSearchListCreate(path, true, downloadBox.childrenList, downloadBox);
@@ -222,10 +222,10 @@ internal class CSongManager {
 			node.CutSceneOutros = dtx.CutSceneOutros;
 
 			node.score[n] = new CScore();
-			node.score[n].FileInfo.FileAbsolutePath = strBaseFolder + fileinfo.Name;
-			node.score[n].FileInfo.FolderAbsolutePath = strBaseFolder;
-			node.score[n].FileInfo.FileSize = fileinfo.Length;
-			node.score[n].FileInfo.LastUpdateDateTime = fileinfo.LastWriteTime;
+			node.score[n]!.FileInfo.FileAbsolutePath = strBaseFolder + fileinfo.Name;
+			node.score[n]!.FileInfo.FolderAbsolutePath = strBaseFolder;
+			node.score[n]!.FileInfo.FileSize = fileinfo.Length;
+			node.score[n]!.FileInfo.LastUpdateDateTime = fileinfo.LastWriteTime;
 
 			LoadChartInfo(node, dtx, n);
 
@@ -253,8 +253,8 @@ internal class CSongManager {
 		// The parent's preimage fills in every course that has none.
 		if (parent?.score[0] != null) {
 			for (int n = 0; n < (int)Difficulty.Total; n++) {
-				if (node.score[n] != null && string.IsNullOrEmpty(node.score[n].ChartInfo.Preimage))
-					node.score[n].ChartInfo.Preimage = parent.score[0].ChartInfo.Preimage;
+				if (node.score[n] != null && string.IsNullOrEmpty(node.score[n]!.ChartInfo.Preimage))
+					node.score[n]!.ChartInfo.Preimage = parent.score[0]!.ChartInfo.Preimage;
 			}
 		}
 	}
@@ -278,7 +278,7 @@ internal class CSongManager {
 		return nonTja;
 	}
 
-	private void tSongSearchListCreate(string strBaseFolder, bool bChildBOXRecurse, List<CSongListNode> listNodeList, CSongListNode nodeParent, List<(string filePath, List<CSongListNode> nodeList, CSongListNode? parent)>? deferredTcm = null) {
+	private void tSongSearchListCreate(string strBaseFolder, bool bChildBOXRecurse, List<CSongListNode> listNodeList, CSongListNode? nodeParent,List<(string filePath, List<CSongListNode> nodeList, CSongListNode? parent)>? deferredTcm = null) {
 		if (!strBaseFolder.EndsWith(Path.DirectorySeparatorChar))
 			strBaseFolder = strBaseFolder + Path.DirectorySeparatorChar;
 
@@ -319,7 +319,7 @@ internal class CSongManager {
 						hash = TjaHash(filePath); preNode = null;
 					}
 
-					if (listSongsDB.TryGetValue(filePath + hash, out CSongListNode value)) {
+					if (listSongsDB.TryGetValue(filePath + hash, out CSongListNode? value)) {
 						this.nSearchScoreCount++;
 						listNodeList.Add(value);
 						CSongDict.tAddSongNode(value.uniqueId, value);
@@ -385,7 +385,7 @@ internal class CSongManager {
 					byte[] tciRawHash = tciHash.ComputeHash(tciFs);
 					string tciHashStr = string.Concat(tciRawHash.Select(b => b.ToString("X2")));
 
-					if (listSongsDB.TryGetValue(filePath + tciHashStr, out CSongListNode tciCached)) {
+					if (listSongsDB.TryGetValue(filePath + tciHashStr, out CSongListNode? tciCached)) {
 						this.nSearchScoreCount++;
 						listNodeList.Add(tciCached);
 						CSongDict.tAddSongNode(tciCached.uniqueId, tciCached);
@@ -484,11 +484,11 @@ internal class CSongManager {
 
 				cSongListNode.difficultiesCount = 1;
 				cSongListNode.score[0] = new CScore();
-				cSongListNode.score[0].FileInfo.FolderAbsolutePath = infoDir.FullName + Path.DirectorySeparatorChar;
-				cSongListNode.score[0].ChartInfo.Title = boxdef.Title.GetString("");
-				cSongListNode.score[0].ChartInfo.Genre = boxdef.Genre;
+				cSongListNode.score[0]!.FileInfo.FolderAbsolutePath = infoDir.FullName + Path.DirectorySeparatorChar;
+				cSongListNode.score[0]!.ChartInfo.Title = boxdef.Title.GetString("");
+				cSongListNode.score[0]!.ChartInfo.Genre = boxdef.Genre;
 				if (!String.IsNullOrEmpty(boxdef.DefaultPreimage))
-					cSongListNode.score[0].ChartInfo.Preimage = boxdef.DefaultPreimage;
+					cSongListNode.score[0]!.ChartInfo.Preimage = boxdef.DefaultPreimage;
 				cSongListNode.rParentNode = nodeParent;
 
 
@@ -531,13 +531,13 @@ internal class CSongManager {
 							sb.Append(", BgColor=" + cSongListNode.BgColor.ToString());
 						}
 						if (cSongListNode.isChangedBoxType) {
-							sb.Append(", BoxType=" + cSongListNode.BoxType.ToString());
+							sb.Append(", BoxType=" + cSongListNode.BoxType!.ToString());
 						}
 						if (cSongListNode.isChangedBgType) {
-							sb.Append(", BgType=" + cSongListNode.BgType.ToString());
+							sb.Append(", BgType=" + cSongListNode.BgType!.ToString());
 						}
 						if (cSongListNode.isChangedBoxChara) {
-							sb.Append(", BoxChara=" + cSongListNode.BoxChara.ToString());
+							sb.Append(", BoxChara=" + cSongListNode.BoxChara!.ToString());
 						}
 						if (cSongListNode.isChangedCompat) {
 							sb.Append(", Compat=" + cSongListNode.Compat.ToString());
@@ -567,57 +567,57 @@ internal class CSongManager {
 	#endregion
 
 	private void LoadChartInfo(CSongListNode cSongListNode, CTja cdtx, int i) {
-		if ((cSongListNode.score[i] != null) && !cSongListNode.score[i].bHadCacheInSongDB) {
+		if ((cSongListNode.score[i] != null) && !cSongListNode.score[i]!.bHadCacheInSongDB) {
 			#region [ DTX ファイルのヘッダだけ読み込み、Cスコア.譜面情報 を設定する ]
 			//-----------------
-			string path = cSongListNode.score[i].FileInfo.FileAbsolutePath;
+			string path = cSongListNode.score[i]!.FileInfo.FileAbsolutePath;
 			if (File.Exists(path)) {
 				try {
-					cSongListNode.score[i].ChartInfo.Title = cdtx.TITLE.GetString("");
+					cSongListNode.score[i]!.ChartInfo.Title = cdtx.TITLE.GetString("");
 
 
-					cSongListNode.score[i].ChartInfo.ArtistName = cdtx.ARTIST;
-					cSongListNode.score[i].ChartInfo.Comment = cdtx.COMMENT;
-					cSongListNode.score[i].ChartInfo.Genre = cdtx.GENRE;
+					cSongListNode.score[i]!.ChartInfo.ArtistName = cdtx.ARTIST;
+					cSongListNode.score[i]!.ChartInfo.Comment = cdtx.COMMENT;
+					cSongListNode.score[i]!.ChartInfo.Genre = cdtx.GENRE;
 					if (!String.IsNullOrEmpty(cdtx.PREIMAGE))
-						cSongListNode.score[i].ChartInfo.Preimage = cdtx.PREIMAGE;
-					cSongListNode.score[i].ChartInfo.Presound = cdtx.PREVIEW;
-					cSongListNode.score[i].ChartInfo.Backgound = cdtx.BACKGROUND;
-					cSongListNode.score[i].ChartInfo.Level = cdtx.LEVEL;
-					cSongListNode.score[i].ChartInfo.LevelHide = cdtx.HIDDENLEVEL;
-					cSongListNode.score[i].ChartInfo.Bpm = cdtx.BPM;
-					cSongListNode.score[i].ChartInfo.BaseBpm = cdtx.BASEBPM;
-					cSongListNode.score[i].ChartInfo.MinBpm = cdtx.MinBPM;
-					cSongListNode.score[i].ChartInfo.MaxBpm = cdtx.MaxBPM;
-					cSongListNode.score[i].ChartInfo.Duration = 0;    //  (cdtx.listChip == null)? 0 : cdtx.listChip[ cdtx.listChip.Count - 1 ].n発声時刻ms;
-					cSongListNode.score[i].ChartInfo.strBGMFileName = cdtx.strBGM_PATH;
-					cSongListNode.score[i].ChartInfo.SongVol = cdtx.SongVol;
-					cSongListNode.score[i].ChartInfo.SongLoudnessMetadata = cdtx.SongLoudnessMetadata;
-					cSongListNode.score[i].ChartInfo.nDemoBGMOffset = cdtx.nDemoBGMOffset;
-					cSongListNode.score[i].ChartInfo.strSubtitle = cdtx.SUBTITLE.GetString("");
+						cSongListNode.score[i]!.ChartInfo.Preimage = cdtx.PREIMAGE;
+					cSongListNode.score[i]!.ChartInfo.Presound = cdtx.PREVIEW;
+					cSongListNode.score[i]!.ChartInfo.Backgound = cdtx.BACKGROUND;
+					cSongListNode.score[i]!.ChartInfo.Level = cdtx.LEVEL;
+					cSongListNode.score[i]!.ChartInfo.LevelHide = cdtx.HIDDENLEVEL;
+					cSongListNode.score[i]!.ChartInfo.Bpm = cdtx.BPM;
+					cSongListNode.score[i]!.ChartInfo.BaseBpm = cdtx.BASEBPM;
+					cSongListNode.score[i]!.ChartInfo.MinBpm = cdtx.MinBPM;
+					cSongListNode.score[i]!.ChartInfo.MaxBpm = cdtx.MaxBPM;
+					cSongListNode.score[i]!.ChartInfo.Duration = 0;    //  (cdtx.listChip == null)? 0 : cdtx.listChip[ cdtx.listChip.Count - 1 ].n発声時刻ms;
+					cSongListNode.score[i]!.ChartInfo.strBGMFileName = cdtx.strBGM_PATH;
+					cSongListNode.score[i]!.ChartInfo.SongVol = cdtx.SongVol;
+					cSongListNode.score[i]!.ChartInfo.SongLoudnessMetadata = cdtx.SongLoudnessMetadata;
+					cSongListNode.score[i]!.ChartInfo.nDemoBGMOffset = cdtx.nDemoBGMOffset;
+					cSongListNode.score[i]!.ChartInfo.strSubtitle = cdtx.SUBTITLE.GetString("");
 					for (int k = 0; k < (int)Difficulty.Total; k++) {
-						cSongListNode.score[i].ChartInfo.bChartBranch[k] = cdtx.SongListCourseMetadata[k].bHIDDENBRANCH ? false : cdtx.SongListCourseMetadata[k].bHasBranch;
-						cSongListNode.score[i].ChartInfo.nLevel[k] = cdtx.SongListCourseMetadata[k].LEVELtaiko;
-						cSongListNode.score[i].ChartInfo.nLevelIcon[k] = cdtx.SongListCourseMetadata[k].LEVELtaikoIcon;
+						cSongListNode.score[i]!.ChartInfo.bChartBranch[k] = cdtx.SongListCourseMetadata[k].bHIDDENBRANCH ? false : cdtx.SongListCourseMetadata[k].bHasBranch;
+						cSongListNode.score[i]!.ChartInfo.nLevel[k] = cdtx.SongListCourseMetadata[k].LEVELtaiko;
+						cSongListNode.score[i]!.ChartInfo.nLevelIcon[k] = cdtx.SongListCourseMetadata[k].LEVELtaikoIcon;
 					}
 
 					// Tower Lives
-					cSongListNode.score[i].ChartInfo.nLife = cdtx.LIFE;
+					cSongListNode.score[i]!.ChartInfo.nLife = cdtx.LIFE;
 
-					cSongListNode.score[i].ChartInfo.nTowerType = cdtx.TOWERTYPE;
+					cSongListNode.score[i]!.ChartInfo.nTowerType = cdtx.TOWERTYPE;
 
-					cSongListNode.score[i].ChartInfo.nDanTick = cdtx.DANTICK;
-					cSongListNode.score[i].ChartInfo.cDanTickColor = cdtx.DANTICKCOLOR;
+					cSongListNode.score[i]!.ChartInfo.nDanTick = cdtx.DANTICK;
+					cSongListNode.score[i]!.ChartInfo.cDanTickColor = cdtx.DANTICKCOLOR;
 
-					cSongListNode.score[i].ChartInfo.nTotalFloor = 0;
+					cSongListNode.score[i]!.ChartInfo.nTotalFloor = 0;
 					if ((Difficulty)i is Difficulty.Tower) {
 						for (int k = 0; k < cdtx.listChip.Count; k++) {
 							CChip pChip = cdtx.listChip[k];
 
-							if (pChip.nIntValue_InternalNumber > cSongListNode.score[i].ChartInfo.nTotalFloor && pChip.nChannelNo == 0x50)
-								cSongListNode.score[i].ChartInfo.nTotalFloor = pChip.nIntValue_InternalNumber;
+							if (pChip.nIntValue_InternalNumber > cSongListNode.score[i]!.ChartInfo.nTotalFloor && pChip.nChannelNo == 0x50)
+								cSongListNode.score[i]!.ChartInfo.nTotalFloor = pChip.nIntValue_InternalNumber;
 						}
-						cSongListNode.score[i].ChartInfo.nTotalFloor++;
+						cSongListNode.score[i]!.ChartInfo.nTotalFloor++;
 					}
 
 
@@ -629,20 +629,20 @@ internal class CSongManager {
 					if (OpenTaiko.ConfigIni.bOutputSongSearchLog) {
 						StringBuilder sb = new StringBuilder(0x400);
 						sb.Append(string.Format("曲データファイルから譜面情報を転記しました。({0})", path));
-						sb.Append("(title=" + cSongListNode.score[i].ChartInfo.Title);
-						sb.Append(", artist=" + cSongListNode.score[i].ChartInfo.ArtistName);
-						sb.Append(", comment=" + cSongListNode.score[i].ChartInfo.Comment);
-						sb.Append(", genre=" + cSongListNode.score[i].ChartInfo.Genre);
-						sb.Append(", preimage=" + cSongListNode.score[i].ChartInfo.Preimage);
-						sb.Append(", premovie=" + cSongListNode.score[i].ChartInfo.Premovie);
-						sb.Append(", presound=" + cSongListNode.score[i].ChartInfo.Presound);
-						sb.Append(", background=" + cSongListNode.score[i].ChartInfo.Backgound);
-						sb.Append(", lvDr=" + cSongListNode.score[i].ChartInfo.Level);
-						sb.Append(", lvHide=" + cSongListNode.score[i].ChartInfo.LevelHide);
-						sb.Append(", bpm=" + cSongListNode.score[i].ChartInfo.Bpm);
-						sb.Append(", basebpm=" + cSongListNode.score[i].ChartInfo.BaseBpm);
-						sb.Append(", minbpm=" + cSongListNode.score[i].ChartInfo.MinBpm);
-						sb.Append(", maxbpm=" + cSongListNode.score[i].ChartInfo.MaxBpm);
+						sb.Append("(title=" + cSongListNode.score[i]!.ChartInfo.Title);
+						sb.Append(", artist=" + cSongListNode.score[i]!.ChartInfo.ArtistName);
+						sb.Append(", comment=" + cSongListNode.score[i]!.ChartInfo.Comment);
+						sb.Append(", genre=" + cSongListNode.score[i]!.ChartInfo.Genre);
+						sb.Append(", preimage=" + cSongListNode.score[i]!.ChartInfo.Preimage);
+						sb.Append(", premovie=" + cSongListNode.score[i]!.ChartInfo.Premovie);
+						sb.Append(", presound=" + cSongListNode.score[i]!.ChartInfo.Presound);
+						sb.Append(", background=" + cSongListNode.score[i]!.ChartInfo.Backgound);
+						sb.Append(", lvDr=" + cSongListNode.score[i]!.ChartInfo.Level);
+						sb.Append(", lvHide=" + cSongListNode.score[i]!.ChartInfo.LevelHide);
+						sb.Append(", bpm=" + cSongListNode.score[i]!.ChartInfo.Bpm);
+						sb.Append(", basebpm=" + cSongListNode.score[i]!.ChartInfo.BaseBpm);
+						sb.Append(", minbpm=" + cSongListNode.score[i]!.ChartInfo.MinBpm);
+						sb.Append(", maxbpm=" + cSongListNode.score[i]!.ChartInfo.MaxBpm);
 						//	sb.Append( ", duration=" + c曲リストノード.arスコア[ i ].譜面情報.Duration );
 						Trace.TraceInformation(sb.ToString());
 					}
@@ -705,7 +705,7 @@ internal class CSongManager {
 					// Add to dojo
 					if (DistanceFromRoots(cSongListNode, this.SongRootsDan) < 0) {
 						this.SongRootsDan.Add(cSongListNode);
-						listSongRoot_Dan.AddRange(cSongListNode.childrenList);
+						listSongRoot_Dan.AddRange(cSongListNode.childrenList!);
 					}
 				} else if (cSongListNode.songGenre == "太鼓タワー") {
 					if (OpenTaiko.ConfigIni.bDanTowerHide) {
@@ -715,14 +715,14 @@ internal class CSongManager {
 
 					if (DistanceFromRoots(cSongListNode, this.SongRootsTower) < 0) {
 						this.SongRootsTower.Add(cSongListNode);
-						listSongRoot_Tower.AddRange(cSongListNode.childrenList);
+						listSongRoot_Tower.AddRange(cSongListNode.childrenList!);
 					}
 				} else if (cSongListNode.songGenre == "Download") {
 					// use the closest from the root song folder
 					if (this.SongRootDownload == null || DistanceFromRoots(cSongListNode) < DistanceFromRoots(this.SongRootDownload))
 						this.SongRootDownload = cSongListNode;
 				} else {
-					for (int i = 0; i < cSongListNode.childrenList.Count; i++) {
+					for (int i = 0; i < cSongListNode.childrenList!.Count; i++) {
 						if (cSongListNode.childrenList[i].score[6] != null) {
 							listSongRoot_Dan.Add(cSongListNode.childrenList[i]);
 
@@ -782,14 +782,14 @@ internal class CSongManager {
 			//-----------------------------
 			if (songNode.nodeType == CSongListNode.ENodeType.BOX) {
 
-				tSongListSortByPath(songNode.childrenList);
+				tSongListSortByPath(songNode.childrenList!);
 
 				string newPath = parentName + songNode.ldTitle.GetString("") + "/";
 
-				CSongDict.tReinsertBackButtons(songNode, songNode.childrenList, newPath, listStrBoxDefSkinSubfolderFullName);
+				CSongDict.tReinsertBackButtons(songNode, songNode.childrenList!, newPath, listStrBoxDefSkinSubfolderFullName);
 
 				// Process subfolders recussively
-				tSongListPostprocessing(songNode.childrenList, newPath, false);
+				tSongListPostprocessing(songNode.childrenList!, newPath, false);
 
 				continue;
 			}
@@ -801,7 +801,7 @@ internal class CSongManager {
 			//-----------------------------
 			if (string.IsNullOrEmpty(songNode.ldTitle.GetString(""))) {
 				for (int j = 0; j < (int)Difficulty.Total; j++) {
-					if ((songNode.score[j] != null) && !string.IsNullOrEmpty(songNode.score[j].ChartInfo.Title)) {
+					if ((songNode.score[j] != null) && !string.IsNullOrEmpty(songNode.score[j]!.ChartInfo.Title)) {
 						songNode.ldTitle = new CLocalizationData();
 
 						if (OpenTaiko.ConfigIni.bOutputSongSearchLog)
@@ -942,7 +942,7 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 
 	#region [ private ]
 	//-----------------
-	public List<string> listStrBoxDefSkinSubfolderFullName {
+	public List<string>? listStrBoxDefSkinSubfolderFullName {
 		get;
 		private set;
 	}
@@ -977,7 +977,7 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 				byte[] tcmRawHash = tcmHash.ComputeHash(tcmFs);
 				string tcmHashStr = string.Concat(tcmRawHash.Select(b => b.ToString("X2")));
 
-				if (listSongsDB.TryGetValue(filePath + tcmHashStr, out CSongListNode tcmCached)) {
+				if (listSongsDB.TryGetValue(filePath + tcmHashStr, out CSongListNode? tcmCached)) {
 					this.nSearchScoreCount++;
 					nodeList.Add(tcmCached);
 					CSongDict.tAddSongNode(tcmCached.uniqueId, tcmCached);
@@ -1018,8 +1018,8 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 		if (parent.isChangedBoxType) { node.BoxType = parent.BoxType; node.isChangedBoxType = true; }
 		if (parent.isChangedBoxChara) { node.BoxChara = parent.BoxChara; node.isChangedBoxChara = true; }
 		if (parent.isChangedCompat) { node.Compat = parent.Compat; node.isChangedCompat = true; }
-		if (node.score[0] != null && parent.score[0] != null && string.IsNullOrEmpty(node.score[0].ChartInfo.Preimage))
-			node.score[0].ChartInfo.Preimage = parent.score[0].ChartInfo.Preimage;
+		if (node.score[0] != null && parent.score[0] != null && string.IsNullOrEmpty(node.score[0]!.ChartInfo.Preimage))
+			node.score[0]!.ChartInfo.Preimage = parent.score[0]!.ChartInfo.Preimage;
 	}
 
 }

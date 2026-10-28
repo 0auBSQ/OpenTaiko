@@ -155,12 +155,12 @@ internal class CActResultParameterPanel : CActivity {
 	// メソッド
 
 	public void tAnimeComplete() {
-		this.ctDisplay.CurrentValue = (int)this.ctDisplay.EndValue;
+		this.ctDisplay!.CurrentValue = (int)this.ctDisplay.EndValue;
 	}
 
 
 	public void tSkipResultAnimations() {
-		OpenTaiko.stageResults.Background.Call("skipAnime");
+		OpenTaiko.stageResults.Background!.Call("skipAnime");
 		ctMainCounter.CurrentValue = (int)MountainAppearValue;
 
 		for (int i = 0; i < bAudioPlayback.Length; i++) {
@@ -186,7 +186,7 @@ internal class CActResultParameterPanel : CActivity {
 
 		ttkAISection = new TitleTextureKey[OpenTaiko.stageGameScreen.AIBattleSections.Count];
 		for (int i = 0; i < ttkAISection.Length; i++) {
-			ttkAISection[i] = new TitleTextureKey(CLangManager.LangInstance.GetString("AI_SECTION", i + 1), pfAISectionText, Color.White, Color.Black, 1280);
+			ttkAISection[i] = new TitleTextureKey(CLangManager.LangInstance.GetString("AI_SECTION", i + 1), pfAISectionText!, Color.White, Color.Black, 1280);
 
 		}
 
@@ -203,7 +203,7 @@ internal class CActResultParameterPanel : CActivity {
 					? speech[Math.Min(j, speech.Length - 1)].GetString("")
 					: "";
 				ttkSpeechText[i][j] = new TitleTextureKey(
-					line, pfSpeechText, Color.White, Color.Black, OpenTaiko.Skin.Result_Speech_Text_MaxWidth);
+					line, pfSpeechText!, Color.White, Color.Black, OpenTaiko.Skin.Result_Speech_Text_MaxWidth);
 			}
 
 			CCharacter.AddEssentialVoice(i, CCharacter.VOICE_RESULT_CLEARSUCCESS);
@@ -310,7 +310,7 @@ internal class CActResultParameterPanel : CActivity {
 			this.ctDisplay = new CCounter(0, 0x3e7, 2, OpenTaiko.Timer);
 			base.IsFirstDraw = false;
 		}
-		this.ctDisplay.Tick();
+		this.ctDisplay!.Tick();
 
 		ctMainCounter.Tick();
 
@@ -361,7 +361,6 @@ internal class CActResultParameterPanel : CActivity {
 			bool is1P = (nLayoutPlayers == 1);
 			bool is2PSide = OpenTaiko.P1IsBlue();
 
-			int shift = 635;
 
 			int uioffset_x = 0;
 			double uioffset_value = Math.Sin((ctUIMove.CurrentValue / 1000.0) * Math.PI / 2.0);
@@ -382,14 +381,14 @@ internal class CActResultParameterPanel : CActivity {
 
 				if (nLayoutPlayers <= 2) {
 					if (shiftPos == 0)
-						OpenTaiko.Tx.Result_Panel.t2DDraw(0 + uioffset_x, 0);
+						OpenTaiko.Tx.Result_Panel!.t2DDraw(0 + uioffset_x, 0);
 					else
-						OpenTaiko.Tx.Result_Panel_2P.t2DDraw(0 + uioffset_x, 0);
+						OpenTaiko.Tx.Result_Panel_2P!.t2DDraw(0 + uioffset_x, 0);
 				} else {
 					if (nLayoutPlayers == 5) {
-						OpenTaiko.Tx.Result_Panel_5P[i].t2DDraw(OpenTaiko.Skin.Result_UIMove_5P_X[i], OpenTaiko.Skin.Result_UIMove_5P_Y[i]);
+						OpenTaiko.Tx.Result_Panel_5P[i]!.t2DDraw(OpenTaiko.Skin.Result_UIMove_5P_X[i], OpenTaiko.Skin.Result_UIMove_5P_Y[i]);
 					} else {
-						OpenTaiko.Tx.Result_Panel_4P[i].t2DDraw(OpenTaiko.Skin.Result_UIMove_4P_X[i], OpenTaiko.Skin.Result_UIMove_4P_Y[i]);
+						OpenTaiko.Tx.Result_Panel_4P[i]!.t2DDraw(OpenTaiko.Skin.Result_UIMove_4P_X[i], OpenTaiko.Skin.Result_UIMove_4P_Y[i]);
 					}
 				}
 
@@ -422,7 +421,7 @@ internal class CActResultParameterPanel : CActivity {
 						gauge_base_y = OpenTaiko.Skin.Result_Gauge_Base_Y[pos];
 					}
 
-					OpenTaiko.Tx.Result_Diff_Bar.t2DDraw(bar_x, bar_y,
+					OpenTaiko.Tx.Result_Diff_Bar!.t2DDraw(bar_x, bar_y,
 						new RectangleF(0, OpenTaiko.SongMount.nChoosenSongDifficulty[i] * OpenTaiko.Skin.Result_DifficultyBar_Size[1], OpenTaiko.Skin.Result_DifficultyBar_Size[0], OpenTaiko.Skin.Result_DifficultyBar_Size[1]));
 
 					_frame.t2DDraw(gauge_base_x, gauge_base_y);
@@ -575,7 +574,7 @@ internal class CActResultParameterPanel : CActivity {
 								} else if (nLayoutPlayers == 3 || nLayoutPlayers == 4) {
 									numScale = OpenTaiko.Skin.Result_Number_Scale_4P;
 								}
-								OpenTaiko.Tx.Result_Number.vcScaleRatio.X = ctMainCounter.CurrentValue <= AnimeCount + (Interval * k) + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - (AnimeCount + (Interval * k))) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f;
+								OpenTaiko.Tx.Result_Number!.vcScaleRatio.X = ctMainCounter.CurrentValue <= AnimeCount + (Interval * k) + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - (AnimeCount + (Interval * k))) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f;
 								OpenTaiko.Tx.Result_Number.vcScaleRatio.Y = ctMainCounter.CurrentValue <= AnimeCount + (Interval * k) + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - (AnimeCount + (Interval * k))) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f;
 
 								if ((k != 5 || OpenTaiko.Skin.Result_ADLib_Show) && (k != 6 || OpenTaiko.Skin.Result_Bomb_Show)) {
@@ -618,7 +617,7 @@ internal class CActResultParameterPanel : CActivity {
 
 							int AnimeCount1 = AnimeCount + Interval * 4 + 840;
 
-							OpenTaiko.Tx.Result_Score_Number.vcScaleRatio.X = ctMainCounter.CurrentValue <= AnimeCount1 + 270 ? 1.0f + (float)Math.Sin((ctMainCounter.CurrentValue - AnimeCount1) / 1.5f * (Math.PI / 180)) * 0.65f :
+							OpenTaiko.Tx.Result_Score_Number!.vcScaleRatio.X = ctMainCounter.CurrentValue <= AnimeCount1 + 270 ? 1.0f + (float)Math.Sin((ctMainCounter.CurrentValue - AnimeCount1) / 1.5f * (Math.PI / 180)) * 0.65f :
 								ctMainCounter.CurrentValue <= AnimeCount1 + 360 ? 1.0f - (float)Math.Sin((ctMainCounter.CurrentValue - AnimeCount1 - 270) * (Math.PI / 180)) * 0.1f : 1.0f;
 							OpenTaiko.Tx.Result_Score_Number.vcScaleRatio.Y = ctMainCounter.CurrentValue <= AnimeCount1 + 270 ? 1.0f + (float)Math.Sin((ctMainCounter.CurrentValue - AnimeCount1) / 1.5f * (Math.PI / 180)) * 0.65f :
 								ctMainCounter.CurrentValue <= AnimeCount1 + 360 ? 1.0f - (float)Math.Sin((ctMainCounter.CurrentValue - AnimeCount1 - 270) * (Math.PI / 180)) * 0.1f : 1.0f;
@@ -647,9 +646,9 @@ internal class CActResultParameterPanel : CActivity {
 			}
 
 			if (OpenTaiko.ConfigIni.bAIBattleMode) {
-				OpenTaiko.Tx.Result_AIBattle_Panel_AI.t2DDraw(0, 0);
+				OpenTaiko.Tx.Result_AIBattle_Panel_AI!.t2DDraw(0, 0);
 
-				int batch_width = OpenTaiko.Tx.Result_AIBattle_Batch.szTextureSize.Width / 3;
+				int batch_width = OpenTaiko.Tx.Result_AIBattle_Batch!.szTextureSize.Width / 3;
 				int batch_height = OpenTaiko.Tx.Result_AIBattle_Batch.szTextureSize.Height;
 
 
@@ -670,12 +669,12 @@ internal class CActResultParameterPanel : CActivity {
 
 					if (nowIndex == nNowAISection) {
 						OpenTaiko.Tx.Result_AIBattle_Batch.Opacity = opacityCounter;
-						OpenTaiko.Tx.Result_AIBattle_SectionPlate.Opacity = opacityCounter;
+						OpenTaiko.Tx.Result_AIBattle_SectionPlate!.Opacity = opacityCounter;
 						if (TitleTextureKey.ResolveTitleTexture(ttkAISection[i]) != null)
 							TitleTextureKey.ResolveTitleTexture(ttkAISection[i]).Opacity = opacityCounter;
 					} else {
 						OpenTaiko.Tx.Result_AIBattle_Batch.Opacity = 255 - opacityCounter;
-						OpenTaiko.Tx.Result_AIBattle_SectionPlate.Opacity = 255 - opacityCounter;
+						OpenTaiko.Tx.Result_AIBattle_SectionPlate!.Opacity = 255 - opacityCounter;
 						if (TitleTextureKey.ResolveTitleTexture(ttkAISection[i]) != null)
 							TitleTextureKey.ResolveTitleTexture(ttkAISection[i]).Opacity = 255 - opacityCounter;
 					}
@@ -701,9 +700,9 @@ internal class CActResultParameterPanel : CActivity {
 				if (ctMainCounter.CurrentValue >= MountainAppearValue) {
 					float flagScale = 2.0f - (Math.Min(Math.Max(ctMainCounter.CurrentValue - MountainAppearValue, 0), 200) / 200.0f);
 
-					CTexture tex = OpenTaiko.stageResults.bClear[0] ? OpenTaiko.Tx.Result_AIBattle_WinFlag_Clear : OpenTaiko.Tx.Result_AIBattle_WinFlag_Lose;
+					CTexture? tex = OpenTaiko.stageResults.bClear[0] ? OpenTaiko.Tx.Result_AIBattle_WinFlag_Clear : OpenTaiko.Tx.Result_AIBattle_WinFlag_Lose;
 
-					tex.vcScaleRatio.X = flagScale;
+					tex!.vcScaleRatio.X = flagScale;
 					tex.vcScaleRatio.Y = flagScale;
 
 					tex.t2DScaledCenterBasedDraw(OpenTaiko.Skin.Result_AIBattle_WinFlag[0], OpenTaiko.Skin.Result_AIBattle_WinFlag[1]);
@@ -761,7 +760,7 @@ internal class CActResultParameterPanel : CActivity {
 				//int chara_y = TJAPlayer3.Skin.Characters_Result_Y[_charaId][pos];
 
 				//int chara_x = namePlate_x[pos] - (OpenTaiko.Skin.Characters_UseResult1P[_charaId] ? uioffset_x : 0) + OpenTaiko.Tx.NamePlateBase.szTextureSize.Width / 2;
-				int chara_x = namePlate_x[pos] + OpenTaiko.Tx.NamePlateBase.szTextureSize.Width / 2;
+				int chara_x = namePlate_x[pos] + OpenTaiko.Tx.NamePlateBase!.szTextureSize.Width / 2;
 				int chara_y = namePlate_y[pos];
 
 				int p1chara_x = is2PSide ? OpenTaiko.Skin.Resolution[0] / 2 : 0;
@@ -834,12 +833,11 @@ internal class CActResultParameterPanel : CActivity {
 					float AddCount = 135;
 
 					int baseX = (pos == 1) ? 1280 - 182 : 182;
-					int baseY = 602;
 
 					#region [Cherry blossom animation]
 
 					if (OpenTaiko.stageResults.nClear[p] >= 1 && nLayoutPlayers <= 2) {
-						OpenTaiko.Tx.Result_Flower.vcScaleRatio.X = 0.6f * (ctMainCounter.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
+						OpenTaiko.Tx.Result_Flower!.vcScaleRatio.X = 0.6f * (ctMainCounter.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
 						OpenTaiko.Tx.Result_Flower.vcScaleRatio.Y = 0.6f * (ctMainCounter.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
 
 						int flower_width = OpenTaiko.Tx.Result_Flower.szTextureSize.Width;
@@ -859,9 +857,9 @@ internal class CActResultParameterPanel : CActivity {
 						for (int i = 0; i < 5; i++) {
 
 							if ((int)FlowerTime < ApparitionTimeStamps[i] || (int)FlowerTime > ApparitionTimeStamps[i] + 2 * ApparitionFade + ApparitionDuration)
-								OpenTaiko.Tx.Result_Flower_Rotate[i].Opacity = 0;
+								OpenTaiko.Tx.Result_Flower_Rotate[i]!.Opacity = 0;
 							else if ((int)FlowerTime <= ApparitionTimeStamps[i] + ApparitionDuration + ApparitionFade && (int)FlowerTime >= ApparitionTimeStamps[i] + ApparitionFade)
-								OpenTaiko.Tx.Result_Flower_Rotate[i].Opacity = 255;
+								OpenTaiko.Tx.Result_Flower_Rotate[i]!.Opacity = 255;
 							else {
 								int CurrentGradiant = 0;
 								if ((int)FlowerTime >= ApparitionTimeStamps[i] + ApparitionFade + ApparitionDuration)
@@ -870,14 +868,14 @@ internal class CActResultParameterPanel : CActivity {
 									CurrentGradiant = (int)FlowerTime - ApparitionTimeStamps[i];
 
 
-								OpenTaiko.Tx.Result_Flower_Rotate[i].Opacity = (255 * CurrentGradiant) / ApparitionFade;
+								OpenTaiko.Tx.Result_Flower_Rotate[i]!.Opacity = (255 * CurrentGradiant) / ApparitionFade;
 							}
 
-							OpenTaiko.Tx.Result_Flower_Rotate[i].vcScaleRatio.X = 0.6f;
-							OpenTaiko.Tx.Result_Flower_Rotate[i].vcScaleRatio.Y = 0.6f;
-							OpenTaiko.Tx.Result_Flower_Rotate[i].fZAxisCenterRotate = (float)(FlowerTime - ApparitionTimeStamps[i]) / (FlowerRotationSpeeds[i] * 360f);
+							OpenTaiko.Tx.Result_Flower_Rotate[i]!.vcScaleRatio.X = 0.6f;
+							OpenTaiko.Tx.Result_Flower_Rotate[i]!.vcScaleRatio.Y = 0.6f;
+							OpenTaiko.Tx.Result_Flower_Rotate[i]!.fZAxisCenterRotate = (float)(FlowerTime - ApparitionTimeStamps[i]) / (FlowerRotationSpeeds[i] * 360f);
 
-							OpenTaiko.Tx.Result_Flower_Rotate[i].t2DCenterBasedDraw(OpenTaiko.Skin.Result_Flower_Rotate_X[pos][i], OpenTaiko.Skin.Result_Flower_Rotate_Y[pos][i]);
+							OpenTaiko.Tx.Result_Flower_Rotate[i]!.t2DCenterBasedDraw(OpenTaiko.Skin.Result_Flower_Rotate_X[pos][i], OpenTaiko.Skin.Result_Flower_Rotate_Y[pos][i]);
 						}
 
 					}
@@ -892,11 +890,11 @@ internal class CActResultParameterPanel : CActivity {
 
 						for (int i = 0; i < OpenTaiko.Skin.Result_PlateShine_Count; i++) {
 							if (i < 3 && ShineTime >= 500 || i >= 3 && ShineTime < 500)
-								OpenTaiko.Tx.Result_Shine.Opacity = 0;
+								OpenTaiko.Tx.Result_Shine!.Opacity = 0;
 							else if (Quadrant500 >= ShinePFade && Quadrant500 <= 500 - ShinePFade)
-								OpenTaiko.Tx.Result_Shine.Opacity = 255;
+								OpenTaiko.Tx.Result_Shine!.Opacity = 255;
 							else
-								OpenTaiko.Tx.Result_Shine.Opacity = (255 * Math.Min(Quadrant500, 500 - Quadrant500)) / ShinePFade;
+								OpenTaiko.Tx.Result_Shine!.Opacity = (255 * Math.Min(Quadrant500, 500 - Quadrant500)) / ShinePFade;
 
 							OpenTaiko.Tx.Result_Shine.vcScaleRatio.X = 0.15f;
 							OpenTaiko.Tx.Result_Shine.vcScaleRatio.Y = 0.15f;
@@ -936,18 +934,18 @@ internal class CActResultParameterPanel : CActivity {
 					}
 
 					if (nLayoutPlayers <= 2) {
-						int speechBuddle_width = OpenTaiko.Tx.Result_Speech_Bubble[pos].szTextureSize.Width / 4;
-						int speechBuddle_height = OpenTaiko.Tx.Result_Speech_Bubble[pos].szTextureSize.Height / 3;
+						int speechBuddle_width = OpenTaiko.Tx.Result_Speech_Bubble[pos]!.szTextureSize.Width / 4;
+						int speechBuddle_height = OpenTaiko.Tx.Result_Speech_Bubble[pos]!.szTextureSize.Height / 3;
 
-						OpenTaiko.Tx.Result_Speech_Bubble[pos].vcScaleRatio.X = 0.9f * (ctMainCounter.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
-						OpenTaiko.Tx.Result_Speech_Bubble[pos].vcScaleRatio.Y = 0.9f * (ctMainCounter.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
-						OpenTaiko.Tx.Result_Speech_Bubble[pos].t2DScaledCenterBasedDraw(OpenTaiko.Skin.Result_Speech_Bubble_X[pos], OpenTaiko.Skin.Result_Speech_Bubble_Y[pos],
+						OpenTaiko.Tx.Result_Speech_Bubble[pos]!.vcScaleRatio.X = 0.9f * (ctMainCounter.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
+						OpenTaiko.Tx.Result_Speech_Bubble[pos]!.vcScaleRatio.Y = 0.9f * (ctMainCounter.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
+						OpenTaiko.Tx.Result_Speech_Bubble[pos]!.t2DScaledCenterBasedDraw(OpenTaiko.Skin.Result_Speech_Bubble_X[pos], OpenTaiko.Skin.Result_Speech_Bubble_Y[pos],
 							new Rectangle(Mood * speechBuddle_width, RandomText * speechBuddle_height, speechBuddle_width, speechBuddle_height));
 					}
 					int speech_vubble_index = nLayoutPlayers <= 2 ? pos : 2;
 					if (OpenTaiko.Tx.Result_Speech_Bubble_V2[speech_vubble_index] != null) {
-						int speechBuddle_width = OpenTaiko.Tx.Result_Speech_Bubble_V2[speech_vubble_index].szTextureSize.Width;
-						int speechBuddle_height = OpenTaiko.Tx.Result_Speech_Bubble_V2[speech_vubble_index].szTextureSize.Height / 6;
+						int speechBuddle_width = OpenTaiko.Tx.Result_Speech_Bubble_V2[speech_vubble_index]!.szTextureSize.Width;
+						int speechBuddle_height = OpenTaiko.Tx.Result_Speech_Bubble_V2[speech_vubble_index]!.szTextureSize.Height / 6;
 
 						int speech_bubble_x;
 						int speech_bubble_y;
@@ -970,9 +968,9 @@ internal class CActResultParameterPanel : CActivity {
 							scale = 1.0f;
 						}
 
-						OpenTaiko.Tx.Result_Speech_Bubble_V2[speech_vubble_index].vcScaleRatio.X = 0.9f * scale * (ctMainCounter.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
-						OpenTaiko.Tx.Result_Speech_Bubble_V2[speech_vubble_index].vcScaleRatio.Y = 0.9f * scale * (ctMainCounter.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
-						OpenTaiko.Tx.Result_Speech_Bubble_V2[speech_vubble_index].t2DScaledCenterBasedDraw(speech_bubble_x, speech_bubble_y,
+						OpenTaiko.Tx.Result_Speech_Bubble_V2[speech_vubble_index]!.vcScaleRatio.X = 0.9f * scale * (ctMainCounter.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
+						OpenTaiko.Tx.Result_Speech_Bubble_V2[speech_vubble_index]!.vcScaleRatio.Y = 0.9f * scale * (ctMainCounter.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
+						OpenTaiko.Tx.Result_Speech_Bubble_V2[speech_vubble_index]!.t2DScaledCenterBasedDraw(speech_bubble_x, speech_bubble_y,
 							new Rectangle(0, MoodV2 * speechBuddle_height, speechBuddle_width, speechBuddle_height));
 
 						TitleTextureKey.ResolveTitleTexture(ttkSpeechText[p][MoodV2]).vcScaleRatio.X = scale;
@@ -1001,7 +999,7 @@ internal class CActResultParameterPanel : CActivity {
 					{
 						#region [Score rank apparition]
 
-						int scoreRank_width = OpenTaiko.Tx.Result_ScoreRankEffect.szTextureSize.Width / 7;
+						int scoreRank_width = OpenTaiko.Tx.Result_ScoreRankEffect!.szTextureSize.Width / 7;
 						int scoreRank_height = OpenTaiko.Tx.Result_ScoreRankEffect.szTextureSize.Height / 4;
 
 						if (ctMainCounter.CurrentValue <= ScoreApparitionTimeStamp + 1180) {
@@ -1061,7 +1059,7 @@ internal class CActResultParameterPanel : CActivity {
 					{
 						#region [Crown apparition]
 
-						int crownEffect_width = OpenTaiko.Tx.Result_CrownEffect.szTextureSize.Width / 4;
+						int crownEffect_width = OpenTaiko.Tx.Result_CrownEffect!.szTextureSize.Width / 4;
 						int crownEffect_height = OpenTaiko.Tx.Result_CrownEffect.szTextureSize.Height / 4;
 
 						if (ctMainCounter.CurrentValue <= ScoreApparitionTimeStamp + 2680) {
@@ -1143,21 +1141,21 @@ internal class CActResultParameterPanel : CActivity {
 		public Point pt;
 	}
 
-	public CCounter ctMainCounter;
-	public CCounter[] ctGaugeAnime;
-	private CCounter ctRainbowGaugeAnime;
-	private CCounter ctSoul;
+	public CCounter ctMainCounter = null!;
+	public CCounter[] ctGaugeAnime = null!;
+	private CCounter ctRainbowGaugeAnime = null!;
+	private CCounter ctSoul = null!;
 
-	public CCounter ctEndAnime;
-	public CCounter ctMountain_ClearIn;
-	public CCounter ctBackgroundAnime;
-	public CCounter ctBackgroundAnime_Clear;
+	public CCounter ctEndAnime = null!;
+	public CCounter ctMountain_ClearIn = null!;
+	public CCounter ctBackgroundAnime = null!;
+	public CCounter ctBackgroundAnime_Clear = null!;
 
 	private int RandomText;
 
-	private CCounter ctFlash_Icon;
-	private CCounter ctRotate_Flowers;
-	private CCounter ctShine_Plate;
+	private CCounter ctFlash_Icon = null!;
+	private CCounter ctRotate_Flowers = null!;
+	private CCounter ctShine_Plate = null!;
 
 	public PuchiChara PuchiChara;
 
@@ -1186,26 +1184,26 @@ internal class CActResultParameterPanel : CActivity {
 	public int[] ShinePYPos = { -36 + 52, -36 + 2, 3 - 7, 3 + 30, -73 - 23, -81 - 31 };
 	public int ShinePFade = 100;
 
-	public int[] gaugeValues;
+	public int[] gaugeValues = null!;
 
-	private CCounter ctDisplay;
+	private CCounter? ctDisplay;
 	private readonly Point[] ptFullComboPosition;
-	private CSound sdDTXSpecifiedFullComboSound;
+	private CSound? sdDTXSpecifiedFullComboSound;
 	private readonly STTextPosition[] stSmallPosition;
 	private readonly STTextPosition[] stLargePosition;
 	private STTextPosition[] stScoreFont;
 	private CCharacterController[] characterController = new CCharacterController[5];
 
-	private TitleTextureKey[] ttkAISection;
+	private TitleTextureKey[] ttkAISection = null!;
 
 	private TitleTextureKey[][] ttkSpeechText = new TitleTextureKey[5][];
 
-	private CCachedFontRenderer pfSpeechText;
-	private CCachedFontRenderer pfAISectionText;
+	private CCachedFontRenderer? pfSpeechText;
+	private CCachedFontRenderer? pfAISectionText;
 
-	private CCounter ctAISectionChange;
+	private CCounter ctAISectionChange = null!;
 
-	private CCounter ctUIMove;
+	private CCounter ctUIMove = null!;
 
 	private int nNowAISection;
 
@@ -1238,7 +1236,7 @@ internal class CActResultParameterPanel : CActivity {
 	}
 
 	public void tSmallDisplay(int x, int y, int num, float scale) {
-		OpenTaiko.Tx.Result_Number.vcScaleRatio.X *= scale;
+		OpenTaiko.Tx.Result_Number!.vcScaleRatio.X *= scale;
 		OpenTaiko.Tx.Result_Number.vcScaleRatio.Y *= scale;
 		int[] nums = CConversion.SeparateDigits(num);
 		for (int j = 0; j < nums.Length; j++) {
@@ -1277,7 +1275,7 @@ internal class CActResultParameterPanel : CActivity {
 	}
 
 	public void tScoreTextDisplay(int x, int y, int num, float scale) {
-		OpenTaiko.Tx.Result_Score_Number.vcScaleRatio.X *= scale;
+		OpenTaiko.Tx.Result_Score_Number!.vcScaleRatio.X *= scale;
 		OpenTaiko.Tx.Result_Score_Number.vcScaleRatio.Y *= scale;
 		int[] nums = CConversion.SeparateDigits(num);
 		for (int j = 0; j < nums.Length; j++) {

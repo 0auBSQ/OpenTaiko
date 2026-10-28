@@ -64,7 +64,7 @@ internal class CActPlayComboCommon : CActivity {
 				if (this.p1 > this.MaxValue[0]) {
 					this.MaxValue[0] = this.p1;
 				}
-				this.act.status.P1.nCOMBOValue = this.p1;
+				this.act.status!.P1.nCOMBOValue = this.p1;
 				this.act.status.P1.nMaxCOMBOValue = this.MaxValue[0];
 			}
 		}
@@ -77,7 +77,7 @@ internal class CActPlayComboCommon : CActivity {
 				if (this.p2 > this.MaxValue[1]) {
 					this.MaxValue[1] = this.p2;
 				}
-				this.act.status.P2.nCOMBOValue = this.p2;
+				this.act.status!.P2.nCOMBOValue = this.p2;
 				this.act.status.P2.nMaxCOMBOValue = this.MaxValue[1];
 			}
 		}
@@ -90,7 +90,7 @@ internal class CActPlayComboCommon : CActivity {
 				if (this.p3 > this.MaxValue[2]) {
 					this.MaxValue[2] = this.p3;
 				}
-				this.act.status.P3.nCOMBOValue = this.p3;
+				this.act.status!.P3.nCOMBOValue = this.p3;
 				this.act.status.P3.nMaxCOMBOValue = this.MaxValue[2];
 			}
 		}
@@ -103,7 +103,7 @@ internal class CActPlayComboCommon : CActivity {
 				if (this.p4 > this.MaxValue[3]) {
 					this.MaxValue[3] = this.p4;
 				}
-				this.act.status.P4.nCOMBOValue = this.p4;
+				this.act.status!.P4.nCOMBOValue = this.p4;
 				this.act.status.P4.nMaxCOMBOValue = this.MaxValue[3];
 			}
 		}
@@ -116,7 +116,7 @@ internal class CActPlayComboCommon : CActivity {
 				if (this.p5 > this.MaxValue[4]) {
 					this.MaxValue[4] = this.p5;
 				}
-				this.act.status.P5.nCOMBOValue = this.p5;
+				this.act.status!.P5.nCOMBOValue = this.p5;
 				this.act.status.P5.nMaxCOMBOValue = this.MaxValue[4];
 			}
 		}
@@ -137,12 +137,12 @@ internal class CActPlayComboCommon : CActivity {
 	protected const int nDrumsComboWidth = 90;
 	protected const int nDrumsComboTextInterval = -6;
 	protected int[] nJumpDiffPartValue = new int[180];
-	protected CSTATUS status;
+	protected CSTATUS? status;
 	//protected CTexture txCOMBO太鼓;
 	//protected CTexture txCOMBO太鼓_でかいやつ;
 	//protected CTexture txコンボラメ;
-	public CCounter[] ctComboAddCounter;
-	public CCounter ctComboGlitter;
+	public CCounter[] ctComboAddCounter = null!;
+	public CCounter ctComboGlitter = null!;
 
 	protected float[,] nComboScale_Coord = new float[,]{
 		{1.11f,-7},
@@ -339,7 +339,6 @@ internal class CActPlayComboCommon : CActivity {
 
 		#region [ n位の数[] を、"COMBO" → 1の位 → 10の位 … の順に、右から左へ向かって順番に表示する。]
 		//-----------------
-		const int n1DigitPerJumpDelay = 30;   // 1桁につき 50 インデックス遅れる
 
 
 		//X右座標を元にして、右座標 - ( コンボの幅 * 桁数 ) でX座標を求めていく?
@@ -449,31 +448,31 @@ internal class CActPlayComboCommon : CActivity {
 
 		for (int i = 0; i < nDigitCount; i++) {
 
-			if (OpenTaiko.Tx.Taiko_Combo[0] != null) OpenTaiko.Tx.Taiko_Combo[0].Opacity = 255;
-			if (OpenTaiko.Tx.Taiko_Combo[1] != null) OpenTaiko.Tx.Taiko_Combo[1].Opacity = 255;
+			if (OpenTaiko.Tx.Taiko_Combo[0] != null) OpenTaiko.Tx.Taiko_Combo[0]!.Opacity = 255;
+			if (OpenTaiko.Tx.Taiko_Combo[1] != null) OpenTaiko.Tx.Taiko_Combo[1]!.Opacity = 255;
 
 			if (nDigitCount <= 1) {
 				if (OpenTaiko.Tx.Taiko_Combo[0] != null) {
 					var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale[this.ctComboAddCounter[nPlayer].CurrentValue];
-					OpenTaiko.Tx.Taiko_Combo[0].vcScaleRatio.Y = OpenTaiko.Skin.Game_Taiko_Combo_Scale[0] + yScalling;
-					OpenTaiko.Tx.Taiko_Combo[0].vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[0];
-					OpenTaiko.Tx.Taiko_Combo[0].t2DScaledBottomCenterBasedDraw(rightX, combo_y, new Rectangle(nPlaceCount[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size[0], OpenTaiko.Skin.Game_Taiko_Combo_Size[1]));
+					OpenTaiko.Tx.Taiko_Combo[0]!.vcScaleRatio.Y = OpenTaiko.Skin.Game_Taiko_Combo_Scale[0] + yScalling;
+					OpenTaiko.Tx.Taiko_Combo[0]!.vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[0];
+					OpenTaiko.Tx.Taiko_Combo[0]!.t2DScaledBottomCenterBasedDraw(rightX, combo_y, new Rectangle(nPlaceCount[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size[0], OpenTaiko.Skin.Game_Taiko_Combo_Size[1]));
 				}
 			} else if (nDigitCount <= 2) {
 				//int[] arComboX = { CDTXMania.Skin.Game_Taiko_Combo_X[nPlayer] + CDTXMania.Skin.Game_Taiko_Combo_Padding[0], CDTXMania.Skin.Game_Taiko_Combo_X[nPlayer] - CDTXMania.Skin.Game_Taiko_Combo_Padding[0] };
 				if (nComboValue < 50) {
 					if (OpenTaiko.Tx.Taiko_Combo[0] != null) {
 						var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale[this.ctComboAddCounter[nPlayer].CurrentValue];
-						OpenTaiko.Tx.Taiko_Combo[0].vcScaleRatio.Y = OpenTaiko.Skin.Game_Taiko_Combo_Scale[0] + yScalling;
-						OpenTaiko.Tx.Taiko_Combo[0].vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[0];
-						OpenTaiko.Tx.Taiko_Combo[0].t2DScaledBottomCenterBasedDraw(rightX - OpenTaiko.Skin.Game_Taiko_Combo_Padding[0] * i, combo_y, new Rectangle(nPlaceCount[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size[0], OpenTaiko.Skin.Game_Taiko_Combo_Size[1]));
+						OpenTaiko.Tx.Taiko_Combo[0]!.vcScaleRatio.Y = OpenTaiko.Skin.Game_Taiko_Combo_Scale[0] + yScalling;
+						OpenTaiko.Tx.Taiko_Combo[0]!.vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[0];
+						OpenTaiko.Tx.Taiko_Combo[0]!.t2DScaledBottomCenterBasedDraw(rightX - OpenTaiko.Skin.Game_Taiko_Combo_Padding[0] * i, combo_y, new Rectangle(nPlaceCount[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size[0], OpenTaiko.Skin.Game_Taiko_Combo_Size[1]));
 					}
 				} else {
 					if (OpenTaiko.Tx.Taiko_Combo[2] != null) {
 						var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale[this.ctComboAddCounter[nPlayer].CurrentValue];
-						OpenTaiko.Tx.Taiko_Combo[2].vcScaleRatio.Y = OpenTaiko.Skin.Game_Taiko_Combo_Scale[0] + yScalling;
-						OpenTaiko.Tx.Taiko_Combo[2].vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[0];
-						OpenTaiko.Tx.Taiko_Combo[2].t2DScaledBottomCenterBasedDraw(rightX - OpenTaiko.Skin.Game_Taiko_Combo_Padding[0] * i, combo_y, new Rectangle(nPlaceCount[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size[0], OpenTaiko.Skin.Game_Taiko_Combo_Size[1]));
+						OpenTaiko.Tx.Taiko_Combo[2]!.vcScaleRatio.Y = OpenTaiko.Skin.Game_Taiko_Combo_Scale[0] + yScalling;
+						OpenTaiko.Tx.Taiko_Combo[2]!.vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[0];
+						OpenTaiko.Tx.Taiko_Combo[2]!.t2DScaledBottomCenterBasedDraw(rightX - OpenTaiko.Skin.Game_Taiko_Combo_Padding[0] * i, combo_y, new Rectangle(nPlaceCount[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size[0], OpenTaiko.Skin.Game_Taiko_Combo_Size[1]));
 					}
 
 					if (!OpenTaiko.ConfigIni.SimpleMode) showComboEffect(0, i, rightX, combo_ex_y, nPlayer);
@@ -481,32 +480,32 @@ internal class CActPlayComboCommon : CActivity {
 			} else if (nDigitCount == 3) {
 				if (nComboValue >= 300 && OpenTaiko.Tx.Taiko_Combo[3] != null) {
 					var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale_Ex[this.ctComboAddCounter[nPlayer].CurrentValue, 0];
-					OpenTaiko.Tx.Taiko_Combo[3].vcScaleRatio.Y = OpenTaiko.Skin.Game_Taiko_Combo_Scale[1] + yScalling;
-					OpenTaiko.Tx.Taiko_Combo[3].vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[1];
+					OpenTaiko.Tx.Taiko_Combo[3]!.vcScaleRatio.Y = OpenTaiko.Skin.Game_Taiko_Combo_Scale[1] + yScalling;
+					OpenTaiko.Tx.Taiko_Combo[3]!.vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[1];
 					var yJumping = OpenTaiko.Skin.Game_Taiko_Combo_Ex_IsJumping ? (int)ComboScale_Ex[this.ctComboAddCounter[nPlayer].CurrentValue, 1] : 0;
-					OpenTaiko.Tx.Taiko_Combo[3].t2DScaledBottomCenterBasedDraw(rightX - OpenTaiko.Skin.Game_Taiko_Combo_Padding[1] * i, combo_ex_y + yJumping, new Rectangle(nPlaceCount[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[1]));
+					OpenTaiko.Tx.Taiko_Combo[3]!.t2DScaledBottomCenterBasedDraw(rightX - OpenTaiko.Skin.Game_Taiko_Combo_Padding[1] * i, combo_ex_y + yJumping, new Rectangle(nPlaceCount[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[1]));
 				} else if (OpenTaiko.Tx.Taiko_Combo[1] != null) {
 					var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale_Ex[this.ctComboAddCounter[nPlayer].CurrentValue, 0];
-					OpenTaiko.Tx.Taiko_Combo[1].vcScaleRatio.Y = OpenTaiko.Skin.Game_Taiko_Combo_Scale[1] + yScalling;
-					OpenTaiko.Tx.Taiko_Combo[1].vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[1];
+					OpenTaiko.Tx.Taiko_Combo[1]!.vcScaleRatio.Y = OpenTaiko.Skin.Game_Taiko_Combo_Scale[1] + yScalling;
+					OpenTaiko.Tx.Taiko_Combo[1]!.vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[1];
 					var yJumping = OpenTaiko.Skin.Game_Taiko_Combo_Ex_IsJumping ? (int)ComboScale_Ex[this.ctComboAddCounter[nPlayer].CurrentValue, 1] : 0;
-					OpenTaiko.Tx.Taiko_Combo[1].t2DScaledBottomCenterBasedDraw(rightX - OpenTaiko.Skin.Game_Taiko_Combo_Padding[1] * i, combo_ex_y + yJumping, new Rectangle(nPlaceCount[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[1]));
+					OpenTaiko.Tx.Taiko_Combo[1]!.t2DScaledBottomCenterBasedDraw(rightX - OpenTaiko.Skin.Game_Taiko_Combo_Padding[1] * i, combo_ex_y + yJumping, new Rectangle(nPlaceCount[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[1]));
 				}
 
 				if (!OpenTaiko.ConfigIni.SimpleMode) showComboEffect(1, i, rightX, combo_ex_y, nPlayer);
 			} else {
 				if (nComboValue >= 300 && OpenTaiko.Tx.Taiko_Combo[3] != null) {
 					var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale_Ex[this.ctComboAddCounter[nPlayer].CurrentValue, 0];
-					OpenTaiko.Tx.Taiko_Combo[3].vcScaleRatio.Y = 1.0f + yScalling;
-					OpenTaiko.Tx.Taiko_Combo[3].vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[2];
+					OpenTaiko.Tx.Taiko_Combo[3]!.vcScaleRatio.Y = 1.0f + yScalling;
+					OpenTaiko.Tx.Taiko_Combo[3]!.vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[2];
 					var yJumping = OpenTaiko.Skin.Game_Taiko_Combo_Ex_IsJumping ? (int)ComboScale_Ex[this.ctComboAddCounter[nPlayer].CurrentValue, 1] : 0;
-					OpenTaiko.Tx.Taiko_Combo[3].t2DScaledBottomCenterBasedDraw(rightX - OpenTaiko.Skin.Game_Taiko_Combo_Padding[2] * i, combo_ex_y + yJumping, new Rectangle(nPlaceCount[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[1]));
+					OpenTaiko.Tx.Taiko_Combo[3]!.t2DScaledBottomCenterBasedDraw(rightX - OpenTaiko.Skin.Game_Taiko_Combo_Padding[2] * i, combo_ex_y + yJumping, new Rectangle(nPlaceCount[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[1]));
 				} else if (OpenTaiko.Tx.Taiko_Combo[1] != null) {
 					var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale_Ex[this.ctComboAddCounter[nPlayer].CurrentValue, 0];
-					OpenTaiko.Tx.Taiko_Combo[1].vcScaleRatio.Y = 1.0f + yScalling;
-					OpenTaiko.Tx.Taiko_Combo[1].vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[2];
+					OpenTaiko.Tx.Taiko_Combo[1]!.vcScaleRatio.Y = 1.0f + yScalling;
+					OpenTaiko.Tx.Taiko_Combo[1]!.vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[2];
 					var yJumping = OpenTaiko.Skin.Game_Taiko_Combo_Ex_IsJumping ? (int)ComboScale_Ex[this.ctComboAddCounter[nPlayer].CurrentValue, 1] : 0;
-					OpenTaiko.Tx.Taiko_Combo[1].t2DScaledBottomCenterBasedDraw(rightX - OpenTaiko.Skin.Game_Taiko_Combo_Padding[2] * i, combo_ex_y + yJumping, new Rectangle(nPlaceCount[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[1]));
+					OpenTaiko.Tx.Taiko_Combo[1]!.t2DScaledBottomCenterBasedDraw(rightX - OpenTaiko.Skin.Game_Taiko_Combo_Padding[2] * i, combo_ex_y + yJumping, new Rectangle(nPlaceCount[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[1]));
 				}
 
 				if (!OpenTaiko.ConfigIni.SimpleMode) showComboEffect(2, i, rightX, combo_ex_y, nPlayer);
@@ -560,7 +559,7 @@ internal class CActPlayComboCommon : CActivity {
 
 			#region [ 前回と今回の COMBO 値から、e今回の状態遷移イベントを決定する。]
 			//-----------------
-			if (this.status[i].nCurrentDisplayingCOMBOValue == this.status[i].nCOMBOValue) {
+			if (this.status![i].nCurrentDisplayingCOMBOValue == this.status[i].nCOMBOValue) {
 				eThisTimeStateTransitionEvent = EEvent.SameValue;
 			} else if (this.status[i].nCurrentDisplayingCOMBOValue > this.status[i].nCOMBOValue) {
 				eThisTimeStateTransitionEvent = EEvent.MissNotify;

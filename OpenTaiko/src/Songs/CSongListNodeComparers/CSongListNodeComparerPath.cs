@@ -7,13 +7,13 @@ internal sealed class CSongListNodeComparerPath : IComparer<CSongListNode> {
 		this._order = order;
 	}
 
-	public int Compare(CSongListNode n1, CSongListNode n2) {
-		if ((n1.nodeType == CSongListNode.ENodeType.BOX) && (n2.nodeType == CSongListNode.ENodeType.BOX)) {
-			return _order * n1.score[0].FileInfo.FolderAbsolutePath.CompareTo(n2.score[0].FileInfo.FolderAbsolutePath);
+	public int Compare(CSongListNode? n1, CSongListNode? n2) {
+		if ((n1!.nodeType == CSongListNode.ENodeType.BOX) && (n2!.nodeType == CSongListNode.ENodeType.BOX)) {
+			return _order * n1.score[0]!.FileInfo.FolderAbsolutePath.CompareTo(n2.score[0]!.FileInfo.FolderAbsolutePath);
 		}
 
 		var str = filePath(n1);
-		var strB = filePath(n2);
+		var strB = filePath(n2!);
 
 		return _order * str.CompareTo(strB);
 	}
@@ -21,7 +21,7 @@ internal sealed class CSongListNodeComparerPath : IComparer<CSongListNode> {
 	private static string filePath(CSongListNode songNode) {
 		for (int i = 0; i < (int)Difficulty.Total; i++) {
 			if (songNode.score[i] != null) {
-				return songNode.score[i].FileInfo.FileAbsolutePath ?? "";
+				return songNode.score[i]!.FileInfo.FileAbsolutePath ?? "";
 			}
 		}
 

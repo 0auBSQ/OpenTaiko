@@ -65,7 +65,7 @@
 				var max = ac.nCurrentCombo.MaxValue;
 				if (max != null && player >= 0 && player < max.Length) return max[player];
 			}
-			return OpenTaiko.stageGameScreen.CChartScore[player].nHighestCombo;
+			return OpenTaiko.stageGameScreen!.CChartScore[player].nHighestCombo;
 		}
 
 		// Normal play
@@ -95,7 +95,7 @@
 
 		// Dan
 		private Exam.Status ExamStatus() {
-			return OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(OpenTaiko.stageResults.stPlayRecord.Dan_C, OpenTaiko.SongMount.rChoosenSong.DanSongs);
+			return OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(OpenTaiko.stageResults.stPlayRecord.Dan_C, OpenTaiko.SongMount.rChoosenSong!.DanSongs!);
 		}
 
 		public bool IsPass() {

@@ -49,10 +49,10 @@ class CStageCutScene : CStage {
 		var selectedSong = OpenTaiko.SongMount.rChoosenSong;
 		if (isLuaStageIntro) {
 			this.mode = ECutSceneMode.Intro;
-			this.cutScenes = (selectedSong.CutSceneIntro != null) ? [selectedSong.CutSceneIntro] : [];
+			this.cutScenes = (selectedSong!.CutSceneIntro != null) ? [selectedSong.CutSceneIntro] : [];
 		} else {
 			this.mode = ECutSceneMode.Outro;
-			this.cutScenes = (selectedSong.CutSceneOutros != null) ? [.. selectedSong.CutSceneOutros] : [];
+			this.cutScenes = (selectedSong!.CutSceneOutros != null) ? [.. selectedSong.CutSceneOutros] : [];
 		}
 		this.cutScenes.RemoveAll(x => !this.JudgeRequirement(x, selectedSong, true));
 		return this.cutScenes.Count > 0;
@@ -62,7 +62,7 @@ class CStageCutScene : CStage {
 		var selectedSong = OpenTaiko.SongMount.rChoosenSong;
 		var oldMode = this.mode;
 		this.mode = ECutSceneMode.Outro;
-		if (selectedSong.CutSceneOutros != null) {
+		if (selectedSong!.CutSceneOutros != null) {
 			foreach (var cutscene in selectedSong.CutSceneOutros) {
 				string fileName = Path.GetFileName(cutscene.FullPath);
 				string _gTriggerName = $".regcutscene_{selectedSong?.tGetUniqueId() ?? ""}_{this.mode.ToString()}_{fileName}".EscapeSingleQuotes();

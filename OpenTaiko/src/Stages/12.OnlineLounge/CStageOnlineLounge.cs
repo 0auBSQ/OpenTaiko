@@ -52,7 +52,6 @@ class CStageOnlineLounge : CStage {
 		OpenTaiko.Skin.soundOnlineLoungeBGM?.tPlay();
 
 		this.currentMenu = ECurrentMenu.MAIN;
-		this.menuPointer = ECurrentMenu.CDN_SELECT;
 		this.menus = new CMenuInfo[(int)ECurrentMenu.TOTAL];
 
 		for (int i = 0; i < (int)ECurrentMenu.TOTAL; i++)
@@ -144,7 +143,7 @@ class CStageOnlineLounge : CStage {
 	}
 
 	public override int Draw() {
-		Background.Update(_state);
+		Background!.Update(_state);
 		Background.Draw(_state);
 
 		//OnlineLounge_Background.t2D描画(0, 0);
@@ -240,7 +239,7 @@ class CStageOnlineLounge : CStage {
 				tmpSubtitle.t2DScaledTopCenterBasedDraw(x + OpenTaiko.Skin.OnlineLounge_Song_SubTitle_Offset[0], y + OpenTaiko.Skin.OnlineLounge_Song_SubTitle_Offset[1]);
 
 				if (pos != 0 && i == 0) {
-					OpenTaiko.Tx.OnlineLounge_Context.t2DDraw(0, 0);
+					OpenTaiko.Tx.OnlineLounge_Context!.t2DDraw(0, 0);
 
 					var song_ = apiMethods.FetchedSongsList[pos - 1];
 
@@ -306,7 +305,7 @@ class CStageOnlineLounge : CStage {
 		#endregion
 
 		if (IsDownloading) {
-			OpenTaiko.Tx.OnlineLounge_Box.t2DDraw(0, 0);
+			OpenTaiko.Tx.OnlineLounge_Box!.t2DDraw(0, 0);
 
 			var text = TitleTextureKey.ResolveTitleTexture(
 				new TitleTextureKey("Downloading...", this.pfOLFontLarge, Color.White, Color.Black, 1000));
@@ -403,7 +402,7 @@ class CStageOnlineLounge : CStage {
 						OpenTaiko.Skin.soundCancelSFX.tPlay();
 					else {
 						if (currentMenu == ECurrentMenu.CDN_SONGS) {
-							apiMethods = new API(dbCDNData);
+							apiMethods = new API(dbCDNData!);
 							apiMethods.tLoadSongsFromInternalCDN();
 
 							#region [Generate song list values]
@@ -517,7 +516,7 @@ class CStageOnlineLounge : CStage {
 	}
 
 	private string GetDownloadLink(API.APISongData song) {
-		return $"{dbCDNData.BaseUrl}{GetAssignedLanguageValue(dbCDNData.Download)}{song.Id}";
+		return $"{dbCDNData!.BaseUrl}{GetAssignedLanguageValue(dbCDNData.Download)}{song.Id}";
 	}
 
 	private void DownloadSong() {
@@ -537,10 +536,15 @@ class CStageOnlineLounge : CStage {
 			// Download zip from cdn
 
 			if (!File.Exists(zipPath)) {
-				System.Net.WebClient wc = new System.Net.WebClient();
-
-				wc.DownloadFile(downloadLink, zipPath);
-				wc.Dispose();
+				try {
+					using var http = new System.Net.Http.HttpClient();
+					using var download = http.GetStreamAsync(downloadLink).GetAwaiter().GetResult();
+					using var file = File.Create(zipPath);
+					download.CopyTo(file);
+				} catch {
+					File.Delete(zipPath);   // a partial zip would be taken for the song next time
+					throw;
+				}
 			}
 
 			// Get the download folder root
@@ -548,15 +552,15 @@ class CStageOnlineLounge : CStage {
 
 			// If the download folder exists, transfer the zip contents in it
 			if (downloadBox != null) {
-				var path = downloadBox.score[0].FileInfo.FolderAbsolutePath;
-				var genredPath = $@"{path}{Path.DirectorySeparatorChar}{song.Genre.genre}{Path.DirectorySeparatorChar}";
+				var path = downloadBox.score[0]!.FileInfo.FolderAbsolutePath;
+				var genredPath = $@"{path}{Path.DirectorySeparatorChar}{song.Genre!.genre}{Path.DirectorySeparatorChar}";
 
 				if (!Directory.Exists(genredPath)) {
 					// Create Genre sub-folder if does not exist
 					Directory.CreateDirectory(genredPath);
 
 					// Search a corresponding box-def if exists
-					CSongListNode correspondingBox = null;
+					CSongListNode? correspondingBox = null;
 					for (int i = 0; i < OpenTaiko.SongManager.listSongRoot.Count; i++) {
 						if (OpenTaiko.SongManager.listSongRoot[i].songGenre == song.Genre.genre
 							&& OpenTaiko.SongManager.listSongRoot[i].nodeType == CSongListNode.ENodeType.BOX)
@@ -585,7 +589,7 @@ class CStageOnlineLounge : CStage {
 						sw.Close();
 					} else {
 						// Copy the existing box.def if available
-						var corPath = correspondingBox.score[0].FileInfo.FolderAbsolutePath;
+						var corPath = correspondingBox.score[0]!.FileInfo.FolderAbsolutePath;
 
 						File.Copy($@"{corPath}{Path.DirectorySeparatorChar}box.def", newBoxDef);
 					}
@@ -645,40 +649,39 @@ class CStageOnlineLounge : CStage {
 
 	#region [Private]
 
-	private LuaBackgroundWrapper Background;
+	private LuaBackgroundWrapper? Background;
 	private readonly LuaBackgroundState _state = new();
 
 	private ECurrentMenu currentMenu;
-	private ECurrentMenu menuPointer;
-	private CMenuInfo[] menus;
+	private CMenuInfo[] menus = null!;
 	public EReturnValue eFadeOutCompleteWhenReturnValue;
 	public CActFIFOBlack actFOtoTitle;
 
 
-	private CCachedFontRenderer pfOLFont;
-	private CCachedFontRenderer pfOLFontLarge;
+	private CCachedFontRenderer pfOLFont = null!;
+	private CCachedFontRenderer pfOLFontLarge = null!;
 
-	private DBCDN dbCDN;
-	private DBCDN.CDNData dbCDNData;
-	private API apiMethods;
+	private DBCDN dbCDN = null!;
+	private DBCDN.CDNData? dbCDNData;
+	private API apiMethods = null!;
 
 	// Main Menu
-	private TitleTextureKey[] ttkMainMenuOpt;
-	private ECurrentMenu[] mainMenu;
+	private TitleTextureKey[] ttkMainMenuOpt = null!;
+	private ECurrentMenu[] mainMenu = null!;
 	private int mainMenuIndex;
 
 	// CDN Select
-	private TitleTextureKey[] ttkCDNSelectOpt;
+	private TitleTextureKey[] ttkCDNSelectOpt = null!;
 	private int CDNSelectIndex;
 
 	// CDN Option
-	private TitleTextureKey[] ttkCDNOptionOpt;
-	private ECurrentMenu[] cdnOptMenu;
+	private TitleTextureKey[] ttkCDNOptionOpt = null!;
+	private ECurrentMenu[] cdnOptMenu = null!;
 	private int cdnOptMenuIndex;
 
 	// CDN List songs option
-	private TitleTextureKey[] ttkCDNSongList;
-	private TitleTextureKey[] ttkCDNSongSubtitles;
+	private TitleTextureKey[] ttkCDNSongList = null!;
+	private TitleTextureKey[] ttkCDNSongSubtitles = null!;
 	private int cdnSongListIndex;
 
 	private bool IsDownloading;

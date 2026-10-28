@@ -138,7 +138,7 @@ internal class CTja : CActivity {
 		public long[] nPlaybackStartTime = new long[OpenTaiko.ConfigIni.nPoliphonicSounds];    // 4
 		public int nInternalNumber;
 		public int nNotationTopNumber;
-		public CSound[] rSound = new CSound[OpenTaiko.ConfigIni.nPoliphonicSounds];     // 4
+		public CSound?[] rSound = new CSound[OpenTaiko.ConfigIni.nPoliphonicSounds];     // 4
 		public string strCommentText = "";
 		public string strFileName = "";
 		public bool bDoNotUseAsBGM {
@@ -217,25 +217,25 @@ internal class CTja : CActivity {
 	public class DanSongs {
 		[NonSerialized]
 		[JsonIgnore]  // Runtime GL texture, rebuilt on demand. Not part of the mobile JSON cache.
-		public CTexture TitleTex;
+		public CTexture? TitleTex;
 		[NonSerialized]
 		[JsonIgnore]
-		public CTexture SubTitleTex;
-		public string Title;
-		public string SubTitle;
-		public string FileName;
-		public string Genre;
+		public CTexture? SubTitleTex;
+		public string Title = null!;
+		public string SubTitle = null!;
+		public string FileName = null!;
+		public string Genre = null!;
 		public int ScoreInit;
 		public int ScoreDiff;
 		public int Level;
 		public int Difficulty;
 		[Obsolete("use List_DanSongs.Count")] public static int Number = 0;
 		public bool bTitleShow;
-		public Dan_C[] Dan_C = new Dan_C[CExamInfo.cMaxExam];
+		public Dan_C?[] Dan_C = new Dan_C?[CExamInfo.cMaxExam];
 
 		[NonSerialized]
 		[JsonIgnore]  // Runtime audio handle, reloaded on demand. Not part of the mobile JSON cache.
-		public CWAV Wave;
+		public CWAV? Wave;
 
 		[NonSerialized]
 		[JsonIgnore]  // Runtime: the song a dan built at runtime took this section from
@@ -341,7 +341,7 @@ internal class CTja : CActivity {
 	public bool bLyrics;
 	public ESide SIDE = ESide.eBoth;
 	public ETjaCompat COMPAT = ETjaCompat.OOS;
-	public CSongUniqueID uniqueID;
+	public CSongUniqueID uniqueID = null!;
 
 	public class QueryableCourseMetadata {
 		public string NOTESDESIGNER = "";
@@ -373,21 +373,21 @@ internal class CTja : CActivity {
 	// Tower lifes
 	public int LIFE;
 
-	public string TOWERTYPE;
+	public string? TOWERTYPE;
 
 	public int DANTICK = 0;
 	public Color DANTICKCOLOR = Color.White;
 
-	public Dictionary<int, CVideoDecoder> listVD;
-	public List<CBPM> listBPM; // Initial 3 for each branch
-	public List<CChip> listChip; // increasing time > chip priority > definition order
-	public List<CChip> listBarLineChip; // increasing definition order
-	public List<CChip> listNoteChip; // increasing definition order
-	public List<CChip>[] listChip_Branch;
-	public List<CChip> listBRANCH; // increasing time > definition order (consistent with listChip)
-	public Dictionary<int, CWAV> listWAV;
-	public List<CJPOSSCROLL> listJPOSSCROLL;
-	public List<DanSongs> List_DanSongs;
+	public Dictionary<int, CVideoDecoder>? listVD;
+	public List<CBPM> listBPM = null!; // Initial 3 for each branch
+	public List<CChip> listChip = null!; // increasing time > chip priority > definition order
+	public List<CChip> listBarLineChip = null!; // increasing definition order
+	public List<CChip> listNoteChip = null!; // increasing definition order
+	public List<CChip>[] listChip_Branch = null!;
+	public List<CChip> listBRANCH = null!; // increasing time > definition order (consistent with listChip)
+	public Dictionary<int, CWAV> listWAV = null!;
+	public List<CJPOSSCROLL> listJPOSSCROLL = null!;
+	public List<DanSongs> List_DanSongs = null!;
 	private EScrollMode eScrollMode;
 
 	public const int nMaxSoundCount = 4;
@@ -404,7 +404,7 @@ internal class CTja : CActivity {
 	public string PATH_WAV;
 	public string PREIMAGE;
 	public string PREVIEW;
-	public string strHashofDTXFile;
+	public string? strHashofDTXFile;
 	public string strFileName;
 	public string strFullPath;
 	public string strFolderPath;
@@ -424,7 +424,6 @@ internal class CTja : CActivity {
 	private int msMOVIEOFFSET_Abs = 0; // from music begin to video begin
 	private bool isMOVIEOFFSET_Negative = false;
 	private double dbNowBPM = 120.0;
-	private int nDELAY = 0;
 
 	public bool[] bHasBranchDan = new bool[1] { false };
 
@@ -444,7 +443,7 @@ internal class CTja : CActivity {
 	public int nTotalMine;
 	public CChip[] pDan_LastChip;
 
-	private List<int> divsPerMeasureAllBranches; // [iMeasureAllBranches]
+	private List<int> divsPerMeasureAllBranches = null!; // [iMeasureAllBranches]
 
 	// Difficulty.Total for the pre-COURSE: default scope
 	public int nowCourseScope = (int)Difficulty.Total;
@@ -482,12 +481,12 @@ internal class CTja : CActivity {
 	public bool bMeasureLineInsert = false;
 
 	//Normal Regular Masterにしたいけどここは我慢。
-	private List<int>[] listBalloon_Branch; // [3] for common
+	private List<int>[] listBalloon_Branch = null!; // [3] for common
 	private byte[] listBalloon_Branch_defined; // [3] for common; 0 = not defined, 1 = defined for previous player sides, 2 = defined for current player sides
 
-	public List<SKBitmap> listLyric; //歌詞を格納していくリスト。スペル忘れた(ぉい
-	public List<STLYRIC> listLyric2;
-	public List<int> IdxLyric2AtSongEnds;
+	public List<SKBitmap> listLyric = null!; //歌詞を格納していくリスト。スペル忘れた(ぉい
+	public List<STLYRIC> listLyric2 = null!;
+	public List<int> IdxLyric2AtSongEnds = null!;
 
 	//public Dictionary<double, CChip> kusudaMAP = new Dictionary<double, CChip>();
 
@@ -515,14 +514,14 @@ internal class CTja : CActivity {
 	//6:左上
 	//7:左下
 
-	public string strBGIMAGE_PATH;
-	public string strBGVIDEO_PATH;
+	public string? strBGIMAGE_PATH;
+	public string? strBGVIDEO_PATH;
 
 	// In TJA notation but scaled to ms
 	public double msSuddenShowOffset = 0;
 	public double msSuddenMoveOffset = 0;
 
-	public string strBGM_PATH;
+	public string? strBGM_PATH;
 	public int SongVol;
 	public LoudnessMetadata? SongLoudnessMetadata;
 
@@ -530,7 +529,7 @@ internal class CTja : CActivity {
 
 	public bool[] IsBranchBarDraw = new bool[4]; // 仕様変更により、黄色lineの表示法を変更.2020.04.21.akasoko26
 	public bool IsEndedBranching = true; // BRANCHENDが呼び出されたかどうか
-	public Dan_C[] Dan_C;
+	public Dan_C?[] Dan_C;
 
 	public bool IsEnabledFixSENote;
 	public int FixSENote;
@@ -546,9 +545,9 @@ internal class CTja : CActivity {
 	public GaugeIncreaseMode GaugeIncreaseMode;
 
 	#region [ EXTENDED VARiABLES ]
-	public Dictionary<string, CSongObject> listObj;
-	public Dictionary<string, CTexture> listTextures;
-	public Dictionary<string, CTexture> listOriginalTextures;
+	public Dictionary<string, CSongObject> listObj = null!;
+	public Dictionary<string, CTexture?> listTextures = null!;
+	public Dictionary<string, CTexture> listOriginalTextures = null!;
 	#endregion
 
 	#region [ OpenTaiko-Exclusive TJA Extension Data ]
@@ -654,7 +653,7 @@ internal class CTja : CActivity {
 		GaugeIncreaseMode = GaugeIncreaseMode.Normal;
 
 		Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture; // Change default culture to invariant, fixes (Purota)
-		Dan_C = new Dan_C[CExamInfo.cMaxExam];
+		Dan_C = new Dan_C?[CExamInfo.cMaxExam];
 		pDan_LastChip = new CChip[1];
 
 		LocalCounters = new CLocalCounters();
@@ -690,9 +689,9 @@ internal class CTja : CActivity {
 		}
 	}
 	public void tWavePlaybackPositionAutoCorrection(CWAV wc) {
-		if (wc.rSound[0] != null && wc.rSound[0].TotalPlayTime >= 5000) {
+		if (wc.rSound[0] != null && wc.rSound[0]!.TotalPlayTime >= 5000) {
 			for (int i = 0; i < nPolyphonicSounds; i++) {
-				if ((wc.rSound[i] != null) && (wc.rSound[i].IsPlaying)) {
+				if ((wc.rSound[i] != null) && (wc.rSound[i]!.IsPlaying)) {
 					long nCurrentTime = SoundManager.PlayTimer.SystemTimeMsReal;
 					if (nCurrentTime > wc.nPlaybackStartTime[i]) {
 						long nAbsTimeFromStartPlaying = nCurrentTime - wc.nPlaybackStartTime[i];
@@ -702,10 +701,10 @@ internal class CTja : CActivity {
 						long nSeekMs = nAbsTimeFromStartPlaying + wc.nInitialSeekMs;
 						// WASAPI/ASIO用↓
 						if (!OpenTaiko.stageGameScreen.bPAUSE) {
-							if (wc.rSound[i].IsPaused) wc.rSound[i].Resume(nSeekMs);
-							else wc.rSound[i].tSetPosition(nSeekMs);
+							if (wc.rSound[i]!.IsPaused) wc.rSound[i]!.Resume(nSeekMs);
+							else wc.rSound[i]!.tSetPosition(nSeekMs);
 						} else {
-							wc.rSound[i].Pause();
+							wc.rSound[i]!.Pause();
 						}
 					}
 				}
@@ -716,13 +715,13 @@ internal class CTja : CActivity {
 		tWavPlaybackStop(nWaveInternalNumber, false);
 	}
 	public void tWavPlaybackStop(int nWaveInternalNumber, bool bAlsoRemoveFromMixer) {
-		if (this.listWAV.TryGetValue(nWaveInternalNumber, out CWAV cwav)) {
+		if (this.listWAV.TryGetValue(nWaveInternalNumber, out CWAV? cwav)) {
 			for (int i = 0; i < nPolyphonicSounds; i++) {
-				if (cwav.rSound[i] != null && cwav.rSound[i].IsPlaying) {
+				if (cwav.rSound[i] != null && cwav.rSound[i]!.IsPlaying) {
 					if (bAlsoRemoveFromMixer) {
-						cwav.rSound[i].tStopAndRemoveFromMixer();
+						cwav.rSound[i]!.tStopAndRemoveFromMixer();
 					} else {
-						cwav.rSound[i].StopReset();
+						cwav.rSound[i]!.StopReset();
 					}
 				}
 				cwav.nPauseTime[i] = long.MinValue; // prevent unpause
@@ -753,24 +752,24 @@ internal class CTja : CActivity {
 					cwav.rSound[i] = OpenTaiko.SoundManager.tCreateSound(str, ESoundGroup.SongPlayback);
 
 					if (!OpenTaiko.ConfigIni.bDynamicBassMixerManagement) {
-						cwav.rSound[i].AddBassSoundFromMixer();
+						cwav.rSound[i]!.AddBassSoundFromMixer();
 					}
 
 					// force chart end for all players when the WAVE of last song ends
 					if (i == 0 && cwav.rSound[i] != null) {
 						var chipBgm = cwav.PlayChip;
 						bool isLastSongWave = (nReferenceDifficulty == (int)Difficulty.Dan) ?
-							(this.List_DanSongs.Count > 0) && (cwav.nInternalNumber == this.List_DanSongs.Last().Wave.nInternalNumber)
+							(this.List_DanSongs.Count > 0) && (cwav.nInternalNumber == this.List_DanSongs.Last().Wave!.nInternalNumber)
 							: (cwav.nInternalNumber == 1);
 						if (chipBgm != null && isLastSongWave) {
 							for (int iPlayer = 0; iPlayer < OpenTaiko.ConfigIni.nPlayerCount; ++iPlayer)
-								OpenTaiko.GetTJA(iPlayer)!.InsertEndOfChartChips(chipBgm.dbSoundTimems + cwav.rSound[i].TotalPlayTime, this.nCurrentMeasureCount, msFadeOutDelay: 0, sortListChip: true);
+								OpenTaiko.GetTJA(iPlayer)!.InsertEndOfChartChips(chipBgm.dbSoundTimems + cwav.rSound[i]!.TotalPlayTime, this.nCurrentMeasureCount, msFadeOutDelay: 0, sortListChip: true);
 						}
 					}
 
 					if (OpenTaiko.ConfigIni.bOutputCreationReleaseLog) {
 						Trace.TraceInformation("サウンドを作成しました。({3})({0})({1})({2}bytes)", cwav.strCommentText, str,
-							cwav.rSound[0].SoundBufferSize, cwav.rSound[0].IsStreamPlay ? "Stream" : "OnMemory");
+							cwav.rSound[0]!.SoundBufferSize, cwav.rSound[0]!.IsStreamPlay ? "Stream" : "OnMemory");
 					}
 				} catch (Exception e) {
 					cwav.rSound[i] = null;
@@ -958,8 +957,6 @@ internal class CTja : CActivity {
 			//ひとまずチップだけのリストを作成しておく。
 			List<CChip> listNoteOnlyList;
 			listNoteOnlyList = new List<CChip>();
-			int nCount = 0;
-			int dkdkCount = 0;
 
 			foreach (CChip chip in this.listChip) {
 				if (chip.nChannelNo >= 0x11 && chip.nChannelNo < 0x18) {
@@ -978,13 +975,13 @@ internal class CTja : CActivity {
 			return;
 
 		if (pChip.nIntValue_InternalNumber >= 0) {
-			if (this.listWAV.TryGetValue(pChip.nIntValue_InternalNumber, out CWAV wc)) {
+			if (this.listWAV.TryGetValue(pChip.nIntValue_InternalNumber, out CWAV? wc)) {
 				int index = wc.nCurrentPlaybackSoundNumber = (wc.nCurrentPlaybackSoundNumber + 1) % nPolyphonicSounds;
 				if ((wc.rSound[0] != null) &&
-					(wc.rSound[0].IsStreamPlay || wc.rSound[index] == null)) {
+					(wc.rSound[0]!.IsStreamPlay || wc.rSound[index] == null)) {
 					index = wc.nCurrentPlaybackSoundNumber = 0;
 				}
-				CSound sound = wc.rSound[index];
+				CSound? sound = wc.rSound[index];
 				if (sound != null) {
 					sound.PlaySpeed = OpenTaiko.ConfigIni.SongPlaybackSpeed;
 					// 再生速度によって、WASAPI/ASIOで使う使用mixerが決まるため、付随情報の設定(音量/PAN)は、再生速度の設定後に行う
@@ -992,7 +989,7 @@ internal class CTja : CActivity {
 					// 2018-08-27 twopointzero - DON'T attempt to load (or queue scanning) loudness metadata here.
 					//                           This code is called right after loading the .tja, and that code
 					//                           will have just made such an attempt.
-					OpenTaiko.SongGainController.Set(wc.SongVol, wc.SongLoudnessMetadata, sound);
+					OpenTaiko.SongGainController!.Set(wc.SongVol, wc.SongLoudnessMetadata, sound);
 
 					sound.SoundPosition = wc.nPosition;
 					sound.PlayStart(SoundManager.PlayTimer.SystemTimeToFrameworkTime(nPlaybackStartSystemTimems));
@@ -1009,7 +1006,7 @@ internal class CTja : CActivity {
 		long now = SoundManager.PlayTimer.SystemTimeMs;
 		foreach (CWAV cwav in this.listWAV.Values) {
 			for (int i = 0; i < nPolyphonicSounds; i++) {
-				CSound sound = cwav.rSound[i];
+				CSound? sound = cwav.rSound[i];
 				if (sound == null || !sound.IsPlaying) continue;
 				cwav.nPlaybackStartTime[i] = tRebasedPlaybackStartTime(cwav.nPlaybackStartTime[i], now, sound.PlaySpeed, newSpeed);
 				sound.SetSpeedWhilePlaying(newSpeed);
@@ -1043,7 +1040,7 @@ internal class CTja : CActivity {
 		}
 		foreach (CWAV cwav in this.listWAV.Values) {
 			for (int j = 0; j < nPolyphonicSounds; j++) {
-				if ((cwav.rSound[j] != null) && cwav.rSound[j].IsPlaying) {
+				if ((cwav.rSound[j] != null) && cwav.rSound[j]!.IsPlaying) {
 					cwav.nPlaybackStartTime[j] += nBGMAdjustIncDecValue;
 				}
 			}
@@ -1052,8 +1049,8 @@ internal class CTja : CActivity {
 	public void tAllChipPlaybackPause() {
 		foreach (CWAV cwav in this.listWAV.Values) {
 			for (int i = 0; i < nPolyphonicSounds; i++) {
-				if ((cwav.rSound[i] != null) && cwav.rSound[i].IsPlaying) {
-					cwav.rSound[i].Pause();
+				if ((cwav.rSound[i] != null) && cwav.rSound[i]!.IsPlaying) {
+					cwav.rSound[i]!.Pause();
 					cwav.nPauseTime[i] = SoundManager.PlayTimer.SystemTimeMs;
 				}
 			}
@@ -1064,8 +1061,8 @@ internal class CTja : CActivity {
 			for (int i = 0; i < nPolyphonicSounds; i++) {
 				// paused: pause >= play time (do resume)
 				// stopped: pause < play time (do not resume)
-				if ((cwav.rSound[i] != null) && cwav.rSound[i].IsPaused && cwav.nPauseTime[i] >= cwav.nPlaybackStartTime[i]) {
-					cwav.rSound[i].Resume(cwav.nPauseTime[i] - cwav.nPlaybackStartTime[i]);
+				if ((cwav.rSound[i] != null) && cwav.rSound[i]!.IsPaused && cwav.nPauseTime[i] >= cwav.nPlaybackStartTime[i]) {
+					cwav.rSound[i]!.Resume(cwav.nPauseTime[i] - cwav.nPlaybackStartTime[i]);
 					cwav.nPlaybackStartTime[i] += SoundManager.PlayTimer.SystemTimeMs - cwav.nPauseTime[i];
 				}
 			}
@@ -1106,19 +1103,18 @@ internal class CTja : CActivity {
 			Trace.TraceError("An exception occurred, but processing will continue. (79ff8639-9b3c-477f-bc4a-f2eea9784860)");
 		}
 	}
-	public void tProcessAllText(string strAllInputString, Difficulty Difficulty, int nBGMAdjust) {
+	public void tProcessAllText(string? strAllInputString, Difficulty Difficulty, int nBGMAdjust) {
 		if (!string.IsNullOrEmpty(strAllInputString)) {
 			#region [ 初期化 ]
 			for (int j = 0; j < 36 * 36; j++) {
-				this.nInfiniteWAV[j] = -j;
-				this.nInfiniteBPM[j] = -j;
-				this.nInfinitePAN[j] = -10000 - j;
-				this.nInfiniteSIZE[j] = -j;
+				this.nInfiniteWAV![j] = -j;
+				this.nInfiniteBPM![j] = -j;
+				this.nInfinitePAN![j] = -10000 - j;
+				this.nInfiniteSIZE![j] = -j;
 			}
 			this.nInternalNumberWAV1to = 1;
 			this.bStackSkipIfToEndif = new Stack<bool>();
 			this.bStackSkipIfToEndif.Push(false);
-			this.nCurrentRandCount = 0;
 			for (int k = 0; k < 7; k++) {
 				this.nRESULTIMAGEPriority[k] = 0;
 				this.nRESULTMOVIEPriority[k] = 0;
@@ -1150,7 +1146,7 @@ internal class CTja : CActivity {
 				#endregion
 				#region [ チップ倍率設定 ]						// #28145 2012.4.22 yyagi 二重ループを1重ループに変更して高速化)
 				foreach (CChip chip in this.listChip) {
-					if (this.listWAV.TryGetValue(chip.nIntValue_InternalNumber, out CWAV cwav)) {
+					if (this.listWAV.TryGetValue(chip.nIntValue_InternalNumber, out CWAV? cwav)) {
 						chip.dbChipSizeRatio = ((double)cwav.nChipSize) / 100.0;
 					}
 				}
@@ -1420,7 +1416,7 @@ internal class CTja : CActivity {
 
 				#region [ チップの種類を分類し、対応するフラグを立てる ]
 				foreach (CChip chip in this.listChip) {
-					if ((chip.nChannelNo == 0x01 && this.listWAV.TryGetValue(chip.nIntValue_InternalNumber, out CWAV cwav)) && !cwav.listThisWAVUseChannelNumberSet.Contains(chip.nChannelNo)) {
+					if ((chip.nChannelNo == 0x01 && this.listWAV.TryGetValue(chip.nIntValue_InternalNumber, out CWAV? cwav)) && !cwav.listThisWAVUseChannelNumberSet.Contains(chip.nChannelNo)) {
 						cwav.listThisWAVUseChannelNumberSet.Add(chip.nChannelNo);
 
 						int c = chip.nChannelNo >> 4;
@@ -2143,11 +2139,11 @@ internal class CTja : CActivity {
 
 			if (this.bLoadChart) {
 				if (!this.listOriginalTextures.ContainsKey(chip.strTargetTxName)) {
-					OpenTaiko.Tx.trackedTextures.TryGetValue(chip.strTargetTxName, out CTexture oldTx);
-					this.listOriginalTextures.Add(chip.strTargetTxName, new CTexture(oldTx));
+					OpenTaiko.Tx.trackedTextures.TryGetValue(chip.strTargetTxName, out CTexture? oldTx);
+					this.listOriginalTextures.Add(chip.strTargetTxName, new CTexture(oldTx!));
 				}
 				if (!this.listTextures.ContainsKey(chip.strNewPath)) {
-					CTexture tx = OpenTaiko.Tx.TxCSong(chip.strNewPath);
+					CTexture? tx = OpenTaiko.Tx.TxCSong(chip.strNewPath);
 					this.listTextures.Add(chip.strNewPath, tx);
 				}
 			}
@@ -2371,7 +2367,7 @@ internal class CTja : CActivity {
 		} else if (command == "#LYRIC" && !usingLyricsFile && OpenTaiko.ConfigIni.nPlayerCount < 4) // Do not parse LYRIC tags if a lyric file is already loaded
 		{
 			if (this.bLoadChart)//起動時に重たくなってしまう問題の修正用
-				this.listLyric.Add(this.pfLyricsFont.DrawText(argumentFull, OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30));
+				this.listLyric.Add(this.pfLyricsFont!.DrawText(argumentFull, OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30));
 
 			var chip = this.NewEventChipAtDefCursor(0xF1, this.listLyric.Count - 1);
 			this.listChip.Add(chip);
@@ -2546,8 +2542,8 @@ internal class CTja : CActivity {
 			dansongs.Wave = new CWAV {
 				nInternalNumber = this.nInternalNumberWAV1to,
 				nNotationTopNumber = this.nInternalNumberWAV1to,
-				nChipSize = this.nInfiniteSIZE[this.nInternalNumberWAV1to],
-				nPosition = this.nInfinitePAN[this.nInternalNumberWAV1to],
+				nChipSize = this.nInfiniteSIZE![this.nInternalNumberWAV1to],
+				nPosition = this.nInfinitePAN![this.nInternalNumberWAV1to],
 				SongVol = this.SongVol,
 				SongLoudnessMetadata = this.SongLoudnessMetadata,
 				strFileName = CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, dansongs.FileName),
@@ -2786,10 +2782,10 @@ internal class CTja : CActivity {
 			var chip = this.NewEventChipAtDefCursor(channelNo, 1);
 			chip.strObjName = argument;
 
-			currentObjAnimations.TryGetValue($"{animationKey}_{name}", out CChip startChip);
+			currentObjAnimations.TryGetValue($"{animationKey}_{name}", out CChip? startChip);
 
-			var index = this.listChip.IndexOf(startChip);
-			var msDiff = chip.dbSoundTimems - startChip.dbSoundTimems;
+			var index = this.listChip.IndexOf(startChip!);
+			var msDiff = chip.dbSoundTimems - startChip!.dbSoundTimems;
 
 			startChip.fObjTimeMs = msDiff;
 			this.listChip[index] = startChip;
@@ -3513,10 +3509,6 @@ internal class CTja : CActivity {
 	/// </summary>
 	/// <param name="InputText"></param>
 	private void ParsePerPlayerSideHeader(string strCommandName, string strCommandParam, bool forCurrentPlaySide) {
-		void ParseOptionalInt16(Action<short> setValue) {
-			this.ParseOptionalInt16(strCommandName, strCommandParam, setValue);
-		}
-
 		// note: at this stage, this.nowCourseScope != Difficulty.Total
 
 		// Add current player-side custom headers to dictionary, including those having a set behaviour
@@ -3771,10 +3763,6 @@ internal class CTja : CActivity {
 	private static readonly Regex DecimalPlaceRegex = new Regex(@"[+-]?\d*(?:\.(\d+))?(?:e([+-]?\d+))?", RegexOptions.IgnoreCase);
 
 	private void ParseGlobalHeader(string strCommandName, string strCommandParam) {
-		void ParseOptionalInt16(Action<short> setValue) {
-			this.ParseOptionalInt16(strCommandName, strCommandParam, setValue);
-		}
-
 		// Add file-/course-global scope custom headers to dictionary, including those having a set behaviour
 		if (strCommandName.StartsWith(".")) {
 			if (this.nowCourseScope == (int)Difficulty.Total) {
@@ -3829,8 +3817,8 @@ internal class CTja : CActivity {
 					var wav = new CWAV() {
 						nInternalNumber = this.nInternalNumberWAV1to,
 						nNotationTopNumber = 1,
-						nChipSize = this.nInfiniteSIZE[this.nInternalNumberWAV1to],
-						nPosition = this.nInfinitePAN[this.nInternalNumberWAV1to],
+						nChipSize = this.nInfiniteSIZE![this.nInternalNumberWAV1to],
+						nPosition = this.nInfinitePAN![this.nInternalNumberWAV1to],
 						SongVol = this.SongVol,
 						SongLoudnessMetadata = this.SongLoudnessMetadata,
 						strFileName = this.strBGM_PATH,
@@ -3945,14 +3933,14 @@ internal class CTja : CActivity {
 				if (this.bLoadChart && this.nPlayerSide == 0) {
 					CVideoDecoder vd = new CVideoDecoder(strVideoFilename);
 
-					if (this.listVD.ContainsKey(1))
+					if (this.listVD!.ContainsKey(1))
 						this.listVD.Remove(1);
 
 					this.listVD.Add(1, vd);
 				}
 			} catch (Exception e) {
 				this.AddWarn($"{strCommandName}: Exception when generating decoder for video {strVideoFilename}: {e.Message}; continued", e);
-				if (this.listVD.ContainsKey(1))
+				if (this.listVD!.ContainsKey(1))
 					this.listVD.Remove(1);
 			}
 		} else if (strCommandName.Contains("BGA")) {
@@ -3978,11 +3966,11 @@ internal class CTja : CActivity {
 
 					var indexText = strCommandName.Remove(0, 3);
 
-					this.listVD.Add((10 * int.Parse(indexText[0].ToString())) + int.Parse(indexText[1].ToString()) + 2, vd);
+					this.listVD!.Add((10 * int.Parse(indexText[0].ToString())) + int.Parse(indexText[1].ToString()) + 2, vd);
 				}
 			} catch (Exception e) {
 				this.AddWarn($"{strCommandName}: Exception when generating decoder for video {strVideoFilename}: {e.Message}; continued.", e);
-				if (this.listVD.ContainsKey(1))
+				if (this.listVD!.ContainsKey(1))
 					this.listVD.Remove(1);
 			}
 		} else if (strCommandName.Equals("BGIMAGE")) {
@@ -4144,7 +4132,7 @@ internal class CTja : CActivity {
 	/// <param name="strFilePath">lrcファイルのパス</param>
 	private void LyricFileParser(List<STLYRIC> lrclist, string strFilePath)//lrcファイルのパース用
 	{
-		string str = CJudgeTextEncoding.ReadTextFile(strFilePath);
+		string str = CJudgeTextEncoding.ReadTextFile(strFilePath)!;
 		Regex timeRegex = new Regex(@"^(\[)(\d{2})(:)(\d{2})([:.])(\d{2})(\])", RegexOptions.Multiline | RegexOptions.Compiled);
 		Regex timeRegexO = new Regex(@"^(\[)(\d{2})(:)(\d{2})(\])", RegexOptions.Multiline | RegexOptions.Compiled);
 		List<long> list;
@@ -4172,7 +4160,7 @@ internal class CTja : CActivity {
 					for (int listindex = 0; listindex < list.Count; listindex++) {
 						STLYRIC stlrc;
 						stlrc.Text = line;
-						stlrc.TextTex = this.pfLyricsFont.DrawText(line, OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30);
+						stlrc.TextTex = this.pfLyricsFont!.DrawText(line, OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30);
 						stlrc.Time = list[listindex];
 						stlrc.index = lrclist.Count;
 						lrclist.Add(stlrc);
@@ -4197,8 +4185,6 @@ internal class CTja : CActivity {
 		//ひとまずチップだけのリストを作成しておく。
 		List<CChip> listNoteOnlyList;
 		listNoteOnlyList = new List<CChip>();
-		int nCount = 0;
-		int dkdkCount = 0;
 
 		foreach (CChip chip in this.listChip) {
 			if (NotesManager.IsHittableNote(chip) && !NotesManager.IsRollEnd(chip)) {
@@ -4226,8 +4212,6 @@ internal class CTja : CActivity {
 		#region[ list作成 ]
 		//ひとまずチップだけのリストを作成しておく。
 		List<CChip>[] listNoteOnlyList_Branch = new[] { new List<CChip>(), new List<CChip>(), new List<CChip>() };
-		int nCount = 0;
-		int dkdkCount = 0;
 
 		foreach (CChip chip in this.listChip) {
 			if (NotesManager.IsHittableNote(chip) && !NotesManager.IsRollEnd(chip)) {
@@ -4465,7 +4449,7 @@ internal class CTja : CActivity {
 					#endregion
 
 					int duration = 0;
-					if (listWAV.TryGetValue(pChip.nIntValue_InternalNumber, out CTja.CWAV wc)) {
+					if (listWAV.TryGetValue(pChip.nIntValue_InternalNumber, out CTja.CWAV? wc)) {
 						duration = wc.rSound[0]?.TotalPlayTime ?? 0;
 					}
 					double msNewRemoveMixerTime;
@@ -4577,7 +4561,7 @@ internal class CTja : CActivity {
 	}
 
 	// CActivity 実装
-	private CCachedFontRenderer pfLyricsFont;
+	private CCachedFontRenderer? pfLyricsFont;
 	public override void Activate() => Activate(loadChart: false);
 	public void Activate(bool loadChart) {
 		this.bLoadChart |= loadChart;
@@ -4615,7 +4599,7 @@ internal class CTja : CActivity {
 		this.IdxLyric2AtSongEnds = new();
 		this.List_DanSongs = new List<DanSongs>();
 		this.listObj = new Dictionary<string, CSongObject>();
-		this.listTextures = new Dictionary<string, CTexture>();
+		this.listTextures = new Dictionary<string, CTexture?>();
 		this.listOriginalTextures = new Dictionary<string, CTexture>();
 		this.currentObjAnimations = new Dictionary<string, CChip>();
 
@@ -4663,18 +4647,18 @@ internal class CTja : CActivity {
 			foreach (KeyValuePair<string, CTexture> pair in this.listOriginalTextures) {
 				string txPath = pair.Key;
 				CTexture originalTx = pair.Value;
-				OpenTaiko.Tx.trackedTextures.TryGetValue(txPath, out CTexture oldTx);
+				OpenTaiko.Tx.trackedTextures.TryGetValue(txPath, out CTexture? oldTx);
 
 				if (oldTx != originalTx) {
-					oldTx.UpdateTexture(originalTx, originalTx.szImageSize.Width, originalTx.szImageSize.Height);
+					oldTx!.UpdateTexture(originalTx, originalTx.szImageSize.Width, originalTx.szImageSize.Height);
 				}
 			}
 			this.listOriginalTextures.Clear();
 		}
 
 		if (this.listTextures != null) {
-			foreach (KeyValuePair<string, CTexture> pair in this.listTextures) {
-				pair.Value.Dispose();
+			foreach (KeyValuePair<string, CTexture?> pair in this.listTextures) {
+				pair.Value!.Dispose();
 			}
 			this.listTextures.Clear();
 		}
@@ -4703,30 +4687,28 @@ internal class CTja : CActivity {
 	// その他
 
 	#region [ private ]
-	private Stack<bool> bStackSkipIfToEndif;
+	private Stack<bool> bStackSkipIfToEndif = null!;
 
-	private int nCurrentLineCount;
-	private int nCurrentRandCount;
 
 	private int nPolyphonicSounds = 4;                          // #28228 2012.5.1 yyagi
 
 	private int nInternalNumberWAV1to;
-	private int[] nInfiniteBPM;
-	private int[] nInfinitePAN;
-	private int[] nInfiniteSIZE;
-	private int[] nInfiniteWAV;
+	private int[]? nInfiniteBPM;
+	private int[]? nInfinitePAN;
+	private int[]? nInfiniteSIZE;
+	private int[]? nInfiniteWAV;
 	private int[] nRESULTIMAGEPriority;
 	private int[] nRESULTMOVIEPriority;
 	private int[] nRESULTSOUNDPriority;
 
-	private CChip currentCamVMoveChip;
-	private CChip currentCamHMoveChip;
-	private CChip currentCamRotateChip;
-	private CChip currentCamZoomChip;
-	private CChip currentCamVScaleChip;
-	private CChip currentCamHScaleChip;
+	private CChip? currentCamVMoveChip;
+	private CChip? currentCamHMoveChip;
+	private CChip? currentCamRotateChip;
+	private CChip? currentCamZoomChip;
+	private CChip? currentCamVScaleChip;
+	private CChip? currentCamHScaleChip;
 
-	private Dictionary<string, CChip> currentObjAnimations;
+	private Dictionary<string, CChip> currentObjAnimations = null!;
 
 	/// <summary>
 	/// 音源再生前の空白を追加するメソッド。

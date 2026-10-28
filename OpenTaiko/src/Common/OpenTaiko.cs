@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net.NetworkInformation;
 using System.Reflection;
@@ -16,7 +17,7 @@ namespace OpenTaiko;
 internal class OpenTaiko : Game {
 	// Properties
 	#region [ properties ]
-	public static readonly string VERSION = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+	public static readonly string VERSION = Assembly.GetExecutingAssembly().GetName().Version!.ToString();
 	public static readonly string AppDisplayThreePartVersion = GetAppDisplayThreePartVersion();
 	public static readonly string AppNumericThreePartVersion = GetAppNumericThreePartVersion();
 
@@ -27,7 +28,7 @@ internal class OpenTaiko : Game {
 	}
 
 	private static string GetAppNumericThreePartVersion() {
-		var version = Assembly.GetExecutingAssembly().GetName().Version;
+		var version = Assembly.GetExecutingAssembly().GetName().Version!;
 
 		return $"{version.Major}.{version.Minor}.{version.Build}";
 	}
@@ -41,7 +42,7 @@ internal class OpenTaiko : Game {
 			?.InformationalVersion
 		?? $"{GetAppDisplayThreePartVersion()} (unknown informational version)";
 
-	public static CStage latestSongSelect {
+	public static CStage? latestSongSelect {
 		get;
 		private set;
 	}
@@ -49,20 +50,20 @@ internal class OpenTaiko : Game {
 	public static OpenTaiko app {
 		get;
 		private set;
-	}
-	public static CTextConsole actTextConsole {
+	} = null!;
+	[AllowNull] public static CTextConsole actTextConsole {
 		get;
 		private set;
-	}
-	public static CConfigIni ConfigIni {
+	} = null!;
+	[AllowNull] public static CConfigIni ConfigIni {
 		get;
 		private set;
-	}
+	} = null!;
 
 	public static CVisualLogManager VisualLogManager {
 		get;
 		private set;
-	}
+	} = null!;
 
 	/// <summary>
 	/// When non-null, the song-loading stage will use this pre-built <see cref="CTja"/> instead of
@@ -87,14 +88,14 @@ internal class OpenTaiko : Game {
 			return;
 		}
 		if ((tja[player] != null) && (app != null)) {
-			tja[player].DeActivate();
-			tja[player].ReleaseManagedResource();
-			tja[player].ReleaseUnmanagedResource();
-			app.listTopLevelActivities.Remove(tja[player]);
+			tja[player]!.DeActivate();
+			tja[player]!.ReleaseManagedResource();
+			tja[player]!.ReleaseUnmanagedResource();
+			app.listTopLevelActivities.Remove(tja[player]!);
 		}
 		tja[player] = value;
 		if ((tja[player] != null) && (app != null)) {
-			app.listTopLevelActivities.Add(tja[player]);
+			app.listTopLevelActivities.Add(tja[player]!);
 		}
 	}
 
@@ -113,63 +114,63 @@ internal class OpenTaiko : Game {
 	public static bool ReplayWatchArmed = false;
 	public static CSongReplay.ReplayWithPumpTimes? PendingReplay = null;
 
-	public static CFPS FPS {
+	[AllowNull] public static CFPS FPS {
 		get;
 		private set;
-	}
-	public static CFPS FPSInput {
+	} = null!;
+	[AllowNull] public static CFPS FPSInput {
 		get;
 		private set;
-	}
-	public static CInputManager InputManager {
+	} = null!;
+	[AllowNull] public static CInputManager InputManager {
 		get;
 		private set;
-	}
+	} = null!;
 	/// <summary>
 	/// iOS: set external input devices (e.g. the iOS keyboard) before calling InitWithExternalContext().
 	/// </summary>
-	internal static List<IInputDevice> ExternalInputDevices { get; set; }
+	internal static List<IInputDevice>? ExternalInputDevices { get; set; }
 
-	public static CPad Pad {
+	[AllowNull] public static CPad Pad {
 		get;
 		private set;
-	}
+	} = null!;
 	public static Random Random {
 		get;
 		private set;
-	}
-	public static CSkin Skin {
+	} = null!;
+	[AllowNull] public static CSkin Skin {
 		get;
 		private set;
-	}
-	public static CSongManager SongManager {
+	} = null!;
+	[AllowNull] public static CSongManager SongManager {
 		get;
 		set;    // 2012.1.26 yyagi private解除 CStage起動でのdesirialize読み込みのため
-	}
+	} = null!;
 	public static CEnumSongs EnumSongs {
 		get;
 		private set;
-	}
-	public static CActEnumSongs actEnumSongs {
+	} = null!;
+	public static CActEnumSongs? actEnumSongs {
 		get;
 		private set;
 	}
-	public static CActScanningLoudness actScanningLoudness {
-		get;
-		private set;
-	}
-
-	public static SoundManager SoundManager {
+	public static CActScanningLoudness? actScanningLoudness {
 		get;
 		private set;
 	}
 
-	public static SongGainController SongGainController {
+	[AllowNull] public static SoundManager SoundManager {
+		get;
+		private set;
+	} = null!;
+
+	public static SongGainController? SongGainController {
 		get;
 		private set;
 	}
 
-	public static SoundGroupLevelController SoundGroupLevelController {
+	public static SoundGroupLevelController? SoundGroupLevelController {
 		get;
 		private set;
 	}
@@ -177,81 +178,81 @@ internal class OpenTaiko : Game {
 	public static CNamePlate NamePlate {
 		get;
 		private set;
-	}
+	} = null!;
 
 	public static NamePlateConfig NamePlateConfig {
 		get;
 		private set;
-	}
+	} = null!;
 
 	public static Favorites Favorites {
 		get;
 		private set;
-	}
+	} = null!;
 
 	public static RecentlyPlayedSongs RecentlyPlayedSongs {
 		get;
 		private set;
-	}
+	} = null!;
 
 	public static Databases Databases {
 		get;
 		private set;
-	}
+	} = null!;
 
 	public static CSystemError SystemError {
 		get;
 		private set;
-	}
+	} = null!;
 	public static CStageStartup stageStartup {
 		get;
 		private set;
-	}
+	} = null!;
 	public static CStageConfig stageConfig {
 		get;
 		private set;
-	}
+	} = null!;
 	public static CSongMount SongMount {
 		get;
 		private set;
-	}
+	} = null!;
 
 	public static CStageOnlineLounge stageOnlineLounge {
 		get;
 		private set;
-	}
+	} = null!;
 
 	public static CStageCutScene stageCutScene {
 		get;
 		private set;
-	}
+	} = null!;
 
 	public static CStageSongLoading stageSongLoading {
 		get;
 		private set;
-	}
+	} = null!;
 	public static CStagePlayDrumsScreen stageGameScreen {
 		get;
 		private set;
-	}
+	} = null!;
 	public static CStageResult stageResults {
 		get;
 		private set;
-	}
+	} = null!;
 	public static CStageChangeSkin stageChangeSkin {
 		get;
 		private set;
-	}
+	} = null!;
 	public static CStageTransition stageTransition {
 		get;
 		private set;
-	}
+	} = null!;
 	public static CStageShutdown stageExit {
 		get;
 		private set;
-	}
-	public static CStage rCurrentStage = null;
-	public static CStage rPreviousStage = null;
+	} = null!;
+	public static CStage? rCurrentStage = null;
+	public static CStage? rPreviousStage = null;
 	public static string strEXEFolder {
 		get;
 		private set;
@@ -262,7 +263,7 @@ internal class OpenTaiko : Game {
 	/// iOS only: read-only app bundle path. Null on other platforms.
 	/// Used as a fallback for assets not copied to Documents (Global/, Lang/, etc.).
 	/// </summary>
-	public static string strBundleFolder {
+	public static string? strBundleFolder {
 		get;
 		set;
 	}
@@ -344,10 +345,10 @@ internal class OpenTaiko : Game {
 		return dirs.Values.ToArray();
 	}
 
-	public static CTimer Timer {
+	[AllowNull] public static CTimer Timer {
 		get;
 		private set;
-	}
+	} = null!;
 	public bool bSwitchVSyncAtTheNextFrame {
 		get;
 		set;
@@ -356,7 +357,7 @@ internal class OpenTaiko : Game {
 		get;
 		set;
 	}
-	public static DiscordRpcClient DiscordClient;
+	public static DiscordRpcClient? DiscordClient;
 
 	public static SaveFile[] SaveFileInstances = new SaveFile[5];
 
@@ -369,24 +370,24 @@ internal class OpenTaiko : Game {
 	public static CModalManager ModalManager {
 		get;
 		private set;
-	}
+	} = null!;
 
 	// Pause-menu popup manager (drives the popup_menu ROActivity; replaces the old CActSelectPopupMenu rendering)
 	public static CPopupMenuManager PopupMenuManager {
 		get;
 		private set;
-	}
+	} = null!;
 
 	// Unlockables factory
 	public static CUnlockConditionFactory UnlockConditionFactory {
 		get;
 		private set;
-	}
+	} = null!;
 
 	public static LuaGlobalStores GlobalStores {
 		get;
 		private set;
-	}
+	} = null!;
 
 	public static bool P1IsBlue() {
 		return (OpenTaiko.PlayerSide == 1 && OpenTaiko.ConfigIni.nPlayerCount == 1);
@@ -415,11 +416,11 @@ internal class OpenTaiko : Game {
 
 	public static string LargeImageText {
 		get {
-			return "Ver." + Assembly.GetExecutingAssembly().GetName().Version.ToString() + "(" + RuntimeInformation.RuntimeIdentifier + ")";
+			return "Ver." + Assembly.GetExecutingAssembly().GetName().Version!.ToString() + "("+ RuntimeInformation.RuntimeIdentifier + ")";
 		}
 	}
 
-	public static CCounter BeatScaling;
+	public static CCounter? BeatScaling;
 
 	/// <summary>
 	/// Returns true for this session if the game fails to locate Config.ini.<br/>
@@ -468,14 +469,14 @@ internal class OpenTaiko : Game {
 		// mounted outgoing stage during fade-out, activates the target behind a loading screen, then fades in).
 		var pending = CStageTransition.ConsumePendingScript();
 		if (rCurrentStage == pending?.stage && Stage != null) {
-			stageTransition.Begin(rCurrentStage, Stage, CStageTransition.ActivateStep(Stage), default, pending.Value.script, traceMessage);
+			stageTransition.Begin(rCurrentStage, Stage, CStageTransition.ActivateStep(Stage), default, pending!.Value.script, traceMessage);
 			rPreviousStage = rCurrentStage;
 			rCurrentStage = stageTransition;   // outgoing stays mounted; the transition unmounts it after fade-out
 			return;
 		}
 
 		UnmountActivity(rCurrentStage);
-		this.ChangeStage(Stage, traceMessage);
+		this.ChangeStage(Stage!, traceMessage);
 	}
 
 	// Stops, deactivates and releases the charts of every player; a chart that several slots share (.tcm and built
@@ -556,7 +557,7 @@ internal class OpenTaiko : Game {
 		bool success = true;
 
 		void save(SKBitmap sKBitmap) {
-			string strSavePath = Path.GetDirectoryName(strFullPath);
+			string strSavePath = Path.GetDirectoryName(strFullPath)!;
 			if (!Directory.Exists(strSavePath)) {
 				try {
 					Directory.CreateDirectory(strSavePath);
@@ -727,7 +728,7 @@ internal class OpenTaiko : Game {
 				}
 
 				if (OperatingSystem.IsIOS() && _iosStageDebugCounter++ % 300 == 0) {
-					Console.WriteLine($"[OpenTaiko] Stage: {rCurrentStage.eStageID}{(string.IsNullOrEmpty(rCurrentStage.customStageName) ? "" : $" ({rCurrentStage.customStageName})")}, Phase: {rCurrentStage.ePhaseID}");
+					Console.WriteLine($"[OpenTaiko] Stage: {rCurrentStage!.eStageID}{(string.IsNullOrEmpty(rCurrentStage.customStageName) ? "" : $" ({rCurrentStage.customStageName})")}, Phase: {rCurrentStage.ePhaseID}");
 				}
 				OpenTaiko.NamePlate?.Update();
 				this.nDrawLoopReturnValue = (rCurrentStage != null) ? rCurrentStage.Draw() : 0;
@@ -754,14 +755,12 @@ internal class OpenTaiko : Game {
 				// draw the remaining elements normally
 				Camera = Matrix4X4<float>.Identity;
 
-				CScoreIni scoreIni = null;
-
 				#region [ Enumerate Songs thread ]
 
 				actEnumSongs?.Draw();                            // "Enumerating Songs..." icon
 
 
-				switch (rCurrentStage.eStageID) {
+				switch (rCurrentStage!.eStageID) {
 					case CStage.EStage.StartUp:
 					case CStage.EStage.Config:
 					case CStage.EStage.SongSelect:
@@ -809,7 +808,7 @@ internal class OpenTaiko : Game {
 								UnmountActivity(actEnumSongs);
 
 								if (EnumSongs.IsSongListEnumerated) {
-								OpenTaiko.SongManager = EnumSongs.SongManager;
+								OpenTaiko.SongManager = EnumSongs.SongManager!;
 								EnumSongs.SongListEnumCompletelyDone();
 
 								// Propagate AfterSongEnum events to all lua stages
@@ -846,7 +845,7 @@ internal class OpenTaiko : Game {
 							if (stageTransition.Canceled) {
 								CStage? cancelTo = stageTransition.CancelTarget;
 								stageTransition.Finish();
-								UnmountAndChangeStage(cancelTo ?? latestSongSelect, "Return to song select menu");
+								UnmountAndChangeStage(cancelTo ?? latestSongSelect!, "Return to song select menu");
 								this.tExecuteGarbageCollection();
 							} else {
 								CStage? _target = stageTransition.Target;
@@ -914,7 +913,7 @@ internal class OpenTaiko : Game {
 								tReleaseAllCharts();
 
 								SongMount.bIsAfterSongJump = false;
-								UnmountAndChangeStage(OpenTaiko.latestSongSelect, "Return to song select menu");
+								UnmountAndChangeStage(OpenTaiko.latestSongSelect!, "Return to song select menu");
 								break;
 							}
 							#endregion
@@ -964,7 +963,7 @@ internal class OpenTaiko : Game {
 
 								tReleaseAllCharts(chart => chart.tStopAllChips());
 								SongMount.bIsAfterSongJump = false;
-								UnmountAndChangeStage(OpenTaiko.latestSongSelect, "Return to song select menu");
+								UnmountAndChangeStage(OpenTaiko.latestSongSelect!, "Return to song select menu");
 
 								this.tExecuteGarbageCollection();
 								break;
@@ -977,7 +976,7 @@ internal class OpenTaiko : Game {
 
 								tReleaseAllCharts(chart => chart.tStopAllChips());
 								SongMount.bIsAfterSongJump = false;
-								UnmountAndChangeStage(OpenTaiko.latestSongSelect, "Return to song select menu");
+								UnmountAndChangeStage(OpenTaiko.latestSongSelect!, "Return to song select menu");
 								this.tExecuteGarbageCollection();
 								break;
 							//-----------------------------
@@ -1157,7 +1156,7 @@ internal class OpenTaiko : Game {
 			if (OpenTaiko.ConfigIni.KeyAssign.System.Capture.IsPressed()) {
 #if DEBUG
 				if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl)) {
-					if (rCurrentStage.eStageID is not (CStage.EStage.StartUp or CStage.EStage.Game or CStage.EStage.ChangeSkin)) {
+					if (rCurrentStage!.eStageID is not (CStage.EStage.StartUp or CStage.EStage.Game or CStage.EStage.ChangeSkin)) {
 						this.EnterRefreshSkinStage();
 						this.UnmountAndChangeStage(stageChangeSkin);
 					}
@@ -1209,7 +1208,7 @@ internal class OpenTaiko : Game {
 	}
 
 	private void NextSongSelectStage(CStage fromStage) {
-		ChangeStage(OpenTaiko.latestSongSelect, "Return to song select menu");
+		ChangeStage(OpenTaiko.latestSongSelect!, "Return to song select menu");
 		rPreviousStage = fromStage;
 		this.tExecuteGarbageCollection();
 	}
@@ -1218,11 +1217,11 @@ internal class OpenTaiko : Game {
 
 	#region [ 汎用ヘルパー ]
 	//-----------------
-	public static CTexture tTextureCreate(string fileName) {
+	public static CTexture? tTextureCreate(string fileName) {
 		return tTextureCreate(fileName, false);
 	}
-	public static CTexture tTextureCreate(string fileName, bool bBlackTransparent) => tTextureCreate(fileName, bBlackTransparent, 0);
-	public static CTexture tTextureCreate(string fileName, bool bBlackTransparent, int maxDimension) {
+	public static CTexture? tTextureCreate(string fileName, bool bBlackTransparent) => tTextureCreate(fileName, bBlackTransparent, 0);
+	public static CTexture? tTextureCreate(string fileName, bool bBlackTransparent, int maxDimension) {
 		if (app == null) {
 			return null;
 		}
@@ -1252,10 +1251,10 @@ internal class OpenTaiko : Game {
 	public static void tTextureRelease(ref CTextureAf? tx) {
 		OpenTaiko.tDisposeSafely(ref tx);
 	}
-	public static CTexture tTextureCreate(SKBitmap bitmap) {
+	public static CTexture? tTextureCreate(SKBitmap bitmap) {
 		return tTextureCreate(bitmap, false);
 	}
-	public static CTexture tTextureCreate(SKBitmap bitmap, bool bBlackTransparent) {
+	public static CTexture? tTextureCreate(SKBitmap bitmap, bool bBlackTransparent) {
 		if (app == null) {
 			return null;
 		}
@@ -1272,10 +1271,10 @@ internal class OpenTaiko : Game {
 		}
 	}
 
-	public static CTextureAf tTextureCreateAf(string fileName) {
+	public static CTextureAf? tTextureCreateAf(string fileName) {
 		return tTextureCreateAf(fileName, false);
 	}
-	public static CTextureAf tTextureCreateAf(string fileName, bool bBlackTransparent) {
+	public static CTextureAf? tTextureCreateAf(string fileName, bool bBlackTransparent) {
 		if (app == null) {
 			return null;
 		}
@@ -1372,11 +1371,11 @@ internal class OpenTaiko : Game {
 	//-----------------
 	private bool bMouseCursorDisplaying = true;
 	private bool bEndProcessCompleteDone;
-	private static CTja[] tja = new CTja[MAX_PLAYERS];
+	private static CTja?[] tja = new CTja[MAX_PLAYERS];
 
 	public static TextureLoader Tx = new TextureLoader();
 
-	public List<CActivity> listTopLevelActivities;
+	public List<CActivity> listTopLevelActivities = null!;
 	private int nDrawLoopReturnValue;
 	private int _iosStageDebugCounter;
 	private string strWindowTitle
@@ -1386,7 +1385,6 @@ internal class OpenTaiko : Game {
 			return "OpenTaiko";
 		}
 	}
-	private CSound previewSound;
 	public static DateTime StartupTime {
 		get;
 		private set;
@@ -1583,7 +1581,7 @@ internal class OpenTaiko : Game {
 				// Mobile: use externally-provided input devices (touch) instead of Silk.NET
 				InputManager = new CInputManager(ExternalInputDevices);
 			} else {
-				InputManager = new CInputManager(Window_, WindowInput!, OpenTaiko.ConfigIni.bBufferedInputs, true, OpenTaiko.ConfigIni.nControllerDeadzone / 100.0f);
+				InputManager = new CInputManager(Window_!, WindowInput!, OpenTaiko.ConfigIni.bBufferedInputs, true, OpenTaiko.ConfigIni.nControllerDeadzone / 100.0f);
 			}
 			InputManager.SetID(ConfigIni.StableIdToGuid);
 			CInputButtonsBase.PressArrived = HitSoundOnArrival.OnPress;
@@ -1622,7 +1620,7 @@ internal class OpenTaiko : Game {
 		//---------------------
 		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) {
 			Trace.TraceInformation("Mobile: initializing BASS sound device.");
-			SoundManager = new SoundManager(Window_,
+			SoundManager = new SoundManager(Window_!,
 				ESoundDeviceType.Bass,
 				OpenTaiko.ConfigIni.nBassBufferSizeMs,
 				OpenTaiko.ConfigIni.nWASAPIBufferSizeMs,
@@ -1657,7 +1655,7 @@ internal class OpenTaiko : Game {
 						soundDeviceType = ESoundDeviceType.Unknown;
 						break;
 				}
-				SoundManager = new SoundManager(Window_,
+				SoundManager = new SoundManager(Window_!,
 					soundDeviceType,
 					OpenTaiko.ConfigIni.nBassBufferSizeMs,
 					OpenTaiko.ConfigIni.nWASAPIBufferSizeMs,
@@ -1676,7 +1674,7 @@ internal class OpenTaiko : Game {
 					actScanningLoudness = new CActScanningLoudness();
 					MountActivity(actScanningLoudness);
 					LoudnessMetadataScanner.ScanningStateChanged +=
-						(_, args) => actScanningLoudness.bIsActivelyScanning = args.IsActivelyScanning;
+						(_, args) => actScanningLoudness!.bIsActivelyScanning = args.IsActivelyScanning;
 					LoudnessMetadataScanner.StartBackgroundScanning();
 
 					SongGainController = new SongGainController();
@@ -2192,7 +2190,7 @@ internal class OpenTaiko : Game {
 		}
 		EnumSongs.Resume();
 
-		actEnumSongs.RefreshSkin(EnumSongs.IsEnumerating);
+		actEnumSongs!.RefreshSkin(EnumSongs.IsEnumerating);
 		OpenTaiko.NamePlate.RefreshSkin();
 		OpenTaiko.ModalManager.RefreshSkin();
 		OpenTaiko.PopupMenuManager.RefreshSkin();

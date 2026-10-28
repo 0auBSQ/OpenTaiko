@@ -51,7 +51,7 @@ namespace OpenTaiko {
 		private static readonly float[] _ident3 = { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
 		private readonly float[] _mtx = new float[16], _nmtx = new float[9];
 
-		private float[] ModelMatrix(double[] t) {
+		private float[] ModelMatrix(double[]? t) {
 			if (t == null) return _ident;
 			var m = _mtx;
 			m[0] = (float)t[0]; m[1] = (float)t[4]; m[2] = (float)t[8]; m[3] = 0;
@@ -213,7 +213,7 @@ namespace OpenTaiko {
 			return c;
 		}
 
-		private static void XfPt(double[] t, double px, double py, double pz, out double x, out double y, out double z) {
+		private static void XfPt(double[]? t, double px, double py, double pz, out double x, out double y, out double z) {
 			if (t == null) { x = px; y = py; z = pz; return; }
 			x = t[0] * px + t[1] * py + t[2] * pz + t[3];
 			y = t[4] * px + t[5] * py + t[6] * pz + t[7];
@@ -381,7 +381,7 @@ namespace OpenTaiko {
 		private void Prune(Lua3DScene s) {
 			if (_cache.Count <= s._objects.Count) return;
 			_live.Clear(); foreach (var v in s._objects.Values) _live.Add(v);
-			List<SceneObject> dead = null;
+			List<SceneObject>? dead = null;
 			foreach (var kv in _cache) if (!_live.Contains(kv.Key)) { (dead ??= new()).Add(kv.Key); FreeBuffers(kv.Value); }
 			if (dead != null) foreach (var o in dead) _cache.Remove(o);
 		}

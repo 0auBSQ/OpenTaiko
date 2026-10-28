@@ -11,7 +11,7 @@ namespace OpenTaiko;
 /// </summary>
 internal class CActPlayGaugeCommon : CActivity {
 	// Properties
-	public CActLVLNFont actLVLNFont { get; protected set; }
+	public CActLVLNFont? actLVLNFont { get; protected set; }
 
 	// コンストラクタ
 	public CActPlayGaugeCommon() {
@@ -34,7 +34,7 @@ internal class CActPlayGaugeCommon : CActivity {
 		base.Activate();
 	}
 	public override void DeActivate() {
-		actLVLNFont.DeActivate();
+		actLVLNFont!.DeActivate();
 		actLVLNFont = null;
 		base.DeActivate();
 	}
@@ -309,9 +309,9 @@ internal class CActPlayGaugeCommon : CActivity {
 
 	private CTja[] DTX = new CTja[OpenTaiko.MAX_PLAYERS];
 	public double[] dbCurrentGaugeValue = new double[5];
-	protected CCounter ctFlame;
-	protected CCounter ctRainbowAnime;
-	protected CCounter ctRainbowOpacity;
+	protected CCounter? ctFlame;
+	protected CCounter? ctRainbowAnime;
+	protected CCounter ctRainbowOpacity = null!;
 	protected CTexture[] txGaugeRainbow = new CTexture[12];
 	protected CTexture[] txGaugeRainbow2P = new CTexture[12];
 }

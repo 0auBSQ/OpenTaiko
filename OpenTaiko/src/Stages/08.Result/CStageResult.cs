@@ -47,7 +47,7 @@ internal class CStageResult : CStage {
 
 	public int GetTowerScoreRank() {
 		int tmpClear = 0;
-		double progress = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor / ((double)OpenTaiko.SongMount.rChoosenSong.score[5].ChartInfo.nTotalFloor);
+		double progress = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor / ((double)OpenTaiko.SongMount.rChoosenSong!.score[5]!.ChartInfo.nTotalFloor);
 
 		// Clear badges : 10% (E), 25% (D), 50% (C), 75% (B), Clear (A), FC (S), DFC (X)
 		bool[] conditions =
@@ -242,7 +242,7 @@ internal class CStageResult : CStage {
 
 					// Unlock dan grade
 					if (clearValue > 0 && !OpenTaiko.ConfigIni.bAutoPlay[0]) {
-						string dan_title = OpenTaiko.SongMount.rChoosenSong.ldTitle.GetString("").RemoveTags();
+						string dan_title = OpenTaiko.SongMount.rChoosenSong!.ldTitle.GetString("").RemoveTags();
 						if (dan_title.Length > 2) dan_title = dan_title.Substring(0, 2);
 
 						this.newGradeGranted = OpenTaiko.SaveFileInstances[0].tUpdateDanTitle(dan_title, clearValue % 2 == 0, (clearValue - 1) / 2);
@@ -291,13 +291,13 @@ internal class CStageResult : CStage {
 					"+"
 				};
 
-				int level = OpenTaiko.SongMount.rChoosenSong.nLevel[diff];
+				int level = OpenTaiko.SongMount.rChoosenSong!.nLevel[diff];
 				CTja.ELevelIcon levelIcon = OpenTaiko.SongMount.rChoosenSong.nLevelIcon[diff];
 
 				return (diffArr[Math.Min(diff, 6)] + "Lv." + level + diffArrIcon[(int)levelIcon]);
 			}
 
-			string details = OpenTaiko.ConfigIni.SendDiscordPlayingInformation ? OpenTaiko.SongMount.rChoosenSong.ldTitle.GetString("")
+			string details = OpenTaiko.ConfigIni.SendDiscordPlayingInformation ? OpenTaiko.SongMount.rChoosenSong!.ldTitle.GetString("")
 				+ diffToString(OpenTaiko.SongMount.nChoosenSongDifficulty[0]) : "";
 
 			// Discord takes at most 128 UTF-8 bytes; cutting inside a character would make it throw
@@ -357,12 +357,12 @@ internal class CStageResult : CStage {
 			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 				diffModifier = 3;
 
-				int stars = Math.Min(13, OpenTaiko.SongMount.rChoosenSong.score[(int)Difficulty.Tower].ChartInfo.nLevel[(int)Difficulty.Tower]);
+				int stars = Math.Min(13, OpenTaiko.SongMount.rChoosenSong!.score[(int)Difficulty.Tower]!.ChartInfo.nLevel[(int)Difficulty.Tower]);
 
 				starRate = Math.Min(10, stars) / 2;
 				redStarRate = Math.Max(0, stars - 10) * 4;
 
-				int maxFloors = OpenTaiko.SongMount.rChoosenSong.score[(int)Difficulty.Tower].ChartInfo.nTotalFloor;
+				int maxFloors = OpenTaiko.SongMount.rChoosenSong.score[(int)Difficulty.Tower]!.ChartInfo.nTotalFloor;
 
 				double floorRate = Math.Pow(OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor / (double)maxFloors, 2);
 				double lengthBonus = Math.Max(1, maxFloors / 140.0);
@@ -409,7 +409,7 @@ internal class CStageResult : CStage {
 
 				#region [Partial scores]
 
-				for (int i = 0; i < OpenTaiko.SongMount.rChoosenSong.DanSongs.Count; i++) {
+				for (int i = 0; i < OpenTaiko.SongMount.rChoosenSong!.DanSongs!.Count; i++) {
 					if (OpenTaiko.SongMount.rChoosenSong.DanSongs[i] != null) {
 						int diff = OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Difficulty;
 						int stars = Math.Min(13, OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Level);
@@ -436,7 +436,7 @@ internal class CStageResult : CStage {
 			} else {
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 					int diff = OpenTaiko.SongMount.nChoosenSongDifficulty[i];
-					int stars = Math.Min(13, OpenTaiko.SongMount.rChoosenSong.score[diff]?.ChartInfo.nLevel[diff] ?? -1);
+					int stars = Math.Min(13, OpenTaiko.SongMount.rChoosenSong!.score[diff]?.ChartInfo.nLevel[diff] ?? -1);
 
 					//diffModifier = Math.Max(1, Math.Min(3, diff));
 					diffModifier = Math.Max(2.0, Math.Min(2.0 + (diff * 0.25), 3.0));
@@ -511,16 +511,6 @@ internal class CStageResult : CStage {
 				if (!OpenTaiko.ConfigIni.bAutoPlay[i]
 					&& !OpenTaiko.bReplayMode[i]   // watching a replay must not write score/coins/playcount
 					&& !(OpenTaiko.ConfigIni.bAIBattleMode && i == 1)) {
-					int _cs = -1;
-					if (!OpenTaiko.stageGameScreen.IsStageFailed(i) && HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
-						_cs = 0;
-						if (OpenTaiko.stageGameScreen.CChartScore[i].nMiss == 0) {
-							_cs = 1;
-							if (OpenTaiko.stageGameScreen.CChartScore[i].nGood == 0)
-								_cs = 2;
-						}
-					}
-
 					// Unsafe function, it is the only appropriate place to call it
 					if (DBSaves.RegisterPlay(i, clearStatuses[i], scoreRanks[i])) {
 						this.IsScoreValid[i] = true;
@@ -596,7 +586,6 @@ internal class CStageResult : CStage {
 
 			this.ctPhase1 = null;
 			this.ctPhase2 = null;
-			this.ctPhase3 = null;
 			examsShift = 0;
 
 			base.Activate();
@@ -620,13 +609,13 @@ internal class CStageResult : CStage {
 			this.EndAnime = false;
 
 			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-				this.ttkMaxFloors = new TitleTextureKey("/" + OpenTaiko.SongMount.rChoosenSong.score[5].ChartInfo.nTotalFloor.ToString() + CLangManager.LangInstance.GetString("TOWER_FLOOR_INITIAL"), pfTowerText48, Color.Black, Color.Transparent, 700);
-				this.ttkToutatsu = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_FLOOR_REACHED"), pfTowerText48, Color.White, Color.Black, 700);
-				this.ttkTen = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_SCORE_INITIAL"), pfTowerText, Color.Black, Color.Transparent, 700);
-				this.ttkReachedFloor = new TitleTextureKey(OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor.ToString(), pfTowerText72, Color.Orange, Color.Black, 700);
-				this.ttkScore = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_SCORE"), pfTowerText, Color.Black, Color.Transparent, 700);
-				this.ttkRemaningLifes = new TitleTextureKey(OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives.ToString() + " / " + OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
-				this.ttkScoreCount = new TitleTextureKey(OpenTaiko.stageGameScreen.actScore.Get(0).ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
+				this.ttkMaxFloors = new TitleTextureKey("/" + OpenTaiko.SongMount.rChoosenSong!.score[5]!.ChartInfo.nTotalFloor.ToString() + CLangManager.LangInstance.GetString("TOWER_FLOOR_INITIAL"), pfTowerText48!, Color.Black, Color.Transparent, 700);
+				this.ttkToutatsu = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_FLOOR_REACHED"), pfTowerText48!, Color.White, Color.Black, 700);
+				this.ttkTen = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_SCORE_INITIAL"), pfTowerText!, Color.Black, Color.Transparent, 700);
+				this.ttkReachedFloor = new TitleTextureKey(OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor.ToString(), pfTowerText72!, Color.Orange, Color.Black, 700);
+				this.ttkScore = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_SCORE"), pfTowerText!, Color.Black, Color.Transparent, 700);
+				this.ttkRemaningLifes = new TitleTextureKey(OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives.ToString() + " / " + OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives.ToString(), pfTowerText!, Color.Black, Color.Transparent, 700);
+				this.ttkScoreCount = new TitleTextureKey(OpenTaiko.stageGameScreen.actScore.Get(0).ToString(), pfTowerText!, Color.Black, Color.Transparent, 700);
 			} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 				Background = new LuaBackgroundWrapper(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.DANRESULT}"));
 				Background.Activate(_state.Refreshed());
@@ -639,13 +628,13 @@ internal class CStageResult : CStage {
 				Background.Activate(_state.Refreshed());
 			}
 
-			this.ttkDanTitles = new TitleTextureKey[OpenTaiko.SongMount.rChoosenSong.DanSongs.Count];
+			this.ttkDanTitles = new TitleTextureKey[OpenTaiko.SongMount.rChoosenSong!.DanSongs!.Count];
 
 			for (int i = 0; i < OpenTaiko.SongMount.rChoosenSong.DanSongs.Count; i++) {
 				this.ttkDanTitles[i] = new TitleTextureKey(OpenTaiko.SongMount.rChoosenSong.DanSongs[i].bTitleShow
 						? "???"
 						: OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Title,
-					pfDanTitles,
+					pfDanTitles!,
 					Color.White,
 					Color.Black,
 					700);
@@ -724,7 +713,7 @@ internal class CStageResult : CStage {
 				base.IsFirstDraw = false;
 			}
 			this.bAnimeComplete = true;
-			if (this.ctAppear.IsTicked) {
+			if (this.ctAppear!.IsTicked) {
 				this.ctAppear.Tick();
 				if (this.ctAppear.IsEnded) {
 					this.ctAppear.Stop();
@@ -1026,7 +1015,7 @@ internal class CStageResult : CStage {
 
 					#region [Counter processings]
 
-					int songCount = OpenTaiko.SongMount.rChoosenSong.DanSongs.Count;
+					int songCount = OpenTaiko.SongMount.rChoosenSong!.DanSongs!.Count;
 
 					/*
 					 **	1600 => Dan plate
@@ -1056,7 +1045,7 @@ internal class CStageResult : CStage {
 					}
 
 					//DanResult_Background.t2D描画(0, 0);
-					OpenTaiko.Tx.DanResult_SongPanel_Base.t2DDraw(0, 0);
+					OpenTaiko.Tx.DanResult_SongPanel_Base!.t2DDraw(0, 0);
 
 					#region [DanPlate]
 
@@ -1118,7 +1107,7 @@ internal class CStageResult : CStage {
 					int unitsBeforeAppearance = Math.Max(0, 8200 + 300 * songCount - ctPhase1.CurrentValue);
 
 					if (unitsBeforeAppearance <= 270) {
-						OpenTaiko.Tx.DanResult_Rank.Opacity = 255;
+						OpenTaiko.Tx.DanResult_Rank!.Opacity = 255;
 
 						int rank_width = OpenTaiko.Tx.DanResult_Rank.szTextureSize.Width / 7;
 						int rank_height = OpenTaiko.Tx.DanResult_Rank.szTextureSize.Height;
@@ -1133,7 +1122,7 @@ internal class CStageResult : CStage {
 								OpenTaiko.Tx.DanResult_Rank.vcScaleRatio.X = 1.0f + (float)Math.Sin((360 - unitsBeforeAppearance) / 1.5f * (Math.PI / 180)) * 1.4f;
 								OpenTaiko.Tx.DanResult_Rank.vcScaleRatio.Y = 1.0f + (float)Math.Sin((360 - unitsBeforeAppearance) / 1.5f * (Math.PI / 180)) * 1.4f;
 							} else if (unitsBeforeAppearance > 0) {
-								OpenTaiko.Tx.Result_ScoreRankEffect.vcScaleRatio.X = 0.5f + (float)Math.Sin((float)(90 - unitsBeforeAppearance) * (Math.PI / 180)) * 0.5f;
+								OpenTaiko.Tx.Result_ScoreRankEffect!.vcScaleRatio.X = 0.5f + (float)Math.Sin((float)(90 - unitsBeforeAppearance) * (Math.PI / 180)) * 0.5f;
 								OpenTaiko.Tx.Result_ScoreRankEffect.vcScaleRatio.Y = 0.5f + (float)Math.Sin((float)(90 - unitsBeforeAppearance) * (Math.PI / 180)) * 0.5f;
 							} else {
 								OpenTaiko.Tx.DanResult_Rank.vcScaleRatio.X = 1f;
@@ -1254,7 +1243,7 @@ internal class CStageResult : CStage {
 					tmpScoreCount?.t2DDraw(OpenTaiko.Skin.TowerResult_ScoreCount[0] - tmpScoreCount.szTextureSize.Width, OpenTaiko.Skin.TowerResult_ScoreCount[1]);
 					tmpRemainingLifes?.t2DDraw(OpenTaiko.Skin.TowerResult_RemainingLifes[0] - tmpRemainingLifes.szTextureSize.Width, OpenTaiko.Skin.TowerResult_RemainingLifes[1]);
 
-					int soul_width = OpenTaiko.Tx.Gauge_Soul.szTextureSize.Width;
+					int soul_width = OpenTaiko.Tx.Gauge_Soul!.szTextureSize.Width;
 					int soul_height = OpenTaiko.Tx.Gauge_Soul.szTextureSize.Height / 2;
 
 					OpenTaiko.Tx.Gauge_Soul?.t2DDraw(OpenTaiko.Skin.TowerResult_Gauge_Soul[0], OpenTaiko.Skin.TowerResult_Gauge_Soul[1], new Rectangle(0, 0, soul_width, soul_height));
@@ -1463,8 +1452,8 @@ internal class CStageResult : CStage {
 		int baseX = OpenTaiko.Skin.DanResult_StatePanel[0] + offset;
 		int baseY = OpenTaiko.Skin.DanResult_StatePanel[1];
 
-		OpenTaiko.Tx.DanResult_StatePanel_Base.t2DDraw(baseX, baseY);
-		OpenTaiko.Tx.DanResult_StatePanel_Main.t2DDraw(baseX, baseY);
+		OpenTaiko.Tx.DanResult_StatePanel_Base!.t2DDraw(baseX, baseY);
+		OpenTaiko.Tx.DanResult_StatePanel_Main!.t2DDraw(baseX, baseY);
 
 		#region [ Global scores ]
 
@@ -1498,7 +1487,7 @@ internal class CStageResult : CStage {
 
 		#region [ Display exams ]
 
-		OpenTaiko.stageGameScreen.actDan.DrawExam(this.stPlayRecord.Dan_C, OpenTaiko.SongMount.rChoosenSong.DanSongs, true, offset);
+		OpenTaiko.stageGameScreen.actDan.DrawExam(this.stPlayRecord.Dan_C, OpenTaiko.SongMount.rChoosenSong!.DanSongs!, true, offset);
 
 		#endregion
 	}
@@ -1510,7 +1499,7 @@ internal class CStageResult : CStage {
 
 	private static void DrawDanLevelNumber(float x, float y, int num) {
 		var tx = OpenTaiko.Tx.Dani_Level_Number;
-		float width = tx.szImageSize.Width / 10.0f;
+		float width = tx!.szImageSize.Width / 10.0f;
 		float height = tx.szImageSize.Height;
 		int[] nums = CConversion.SeparateDigits(num);
 		for (int j = 0; j < nums.Length; j++) {
@@ -1538,24 +1527,24 @@ internal class CStageResult : CStage {
 		int baseY = 100 + 183 * i;
 		*/
 
-		var song = OpenTaiko.SongMount.rChoosenSong.DanSongs[i];
+		var song = OpenTaiko.SongMount.rChoosenSong!.DanSongs![i];
 
 		// TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(scroll + 377, 180 + i * 73, new Rectangle(song.Difficulty * 53, 0, 53, 53));
 
-		int songPanel_main_width = OpenTaiko.Tx.DanResult_SongPanel_Main.szTextureSize.Width;
+		int songPanel_main_width = OpenTaiko.Tx.DanResult_SongPanel_Main!.szTextureSize.Width;
 		int songPanel_main_height = OpenTaiko.Tx.DanResult_SongPanel_Main.szTextureSize.Height / 3;
 
 		OpenTaiko.Tx.DanResult_SongPanel_Main.Opacity = opacity;
 		OpenTaiko.Tx.DanResult_SongPanel_Main.t2DDraw(OpenTaiko.Skin.DanResult_SongPanel_Main_X[drawPos] + offset, OpenTaiko.Skin.DanResult_SongPanel_Main_Y[drawPos], new Rectangle(0, songPanel_main_height * Math.Min(i, 2), songPanel_main_width, songPanel_main_height));
 
-		int difficulty_cymbol_width = OpenTaiko.Tx.Dani_Difficulty_Cymbol.szTextureSize.Width / 5;
+		int difficulty_cymbol_width = OpenTaiko.Tx.Dani_Difficulty_Cymbol!.szTextureSize.Width / 5;
 		int difficulty_cymbol_height = OpenTaiko.Tx.Dani_Difficulty_Cymbol.szTextureSize.Height;
 
 		OpenTaiko.Tx.Dani_Difficulty_Cymbol.Opacity = opacity;
 		OpenTaiko.Tx.Dani_Difficulty_Cymbol.t2DCenterBasedDraw(OpenTaiko.Skin.DanResult_Difficulty_Cymbol_X[drawPos] + offset, OpenTaiko.Skin.DanResult_Difficulty_Cymbol_Y[drawPos], new Rectangle(song.Difficulty * difficulty_cymbol_width, 0, difficulty_cymbol_width, difficulty_cymbol_height));
 		OpenTaiko.Tx.Dani_Difficulty_Cymbol.Opacity = 255;
 
-		OpenTaiko.Tx.Dani_Level_Number.Opacity = opacity;
+		OpenTaiko.Tx.Dani_Level_Number!.Opacity = opacity;
 		DrawDanLevelNumber(OpenTaiko.Skin.DanResult_Level_Number_X[drawPos] + offset, OpenTaiko.Skin.DanResult_Level_Number_Y[drawPos], song.Level);
 		OpenTaiko.Tx.Dani_Level_Number.Opacity = 255;
 
@@ -1581,7 +1570,7 @@ internal class CStageResult : CStage {
 			OpenTaiko.Skin.DanResult_Sections_Roll_Y[drawPos],
 		};
 
-		OpenTaiko.Tx.Result_Number.Opacity = opacity;
+		OpenTaiko.Tx.Result_Number!.Opacity = opacity;
 		for (int j = 0; j < 4; j++)
 			this.actParameterPanel.tSmallDisplay(num_x[j] + offset, num_y[j], scoresArr[j], 1.0f);
 		OpenTaiko.Tx.Result_Number.Opacity = 255;
@@ -1600,7 +1589,7 @@ internal class CStageResult : CStage {
 
 		if (!bAddedToRecentlyPlayedSongs) {
 			// DanBuilder charts have no persistent uniqueId; skip recently-played tracking.
-			if (OpenTaiko.SongMount.rChoosenSong.uniqueId == null) {
+			if (OpenTaiko.SongMount.rChoosenSong!.uniqueId == null) {
 				bAddedToRecentlyPlayedSongs = true;
 				return;
 			}
@@ -1626,7 +1615,7 @@ internal class CStageResult : CStage {
 	public bool bAudioPlayback;
 	public bool EndAnime;
 
-	private CCounter ctAppear;
+	private CCounter? ctAppear;
 	private EReturnValue eFadeOutCompleteWhenReturnValue;
 	private CActFIFOResult actFIFromGameplay;
 	private CActFIFOBlack actFO;
@@ -1636,8 +1625,8 @@ internal class CStageResult : CStage {
 	private CActResultSongBar actSongBar;
 	private bool bAnimeComplete;
 	private bool bIsCheckedWhetherResultScreenShouldSaveOrNot;              // #24509 2011.3.14 yyagi
-	private CSound rResultSound;
-	public LuaBackgroundWrapper Background;
+	private CSound? rResultSound;
+	public LuaBackgroundWrapper? Background;
 	private readonly LuaBackgroundState _state = new();
 
 	public bool[] bClear {
@@ -1657,13 +1646,13 @@ internal class CStageResult : CStage {
 	}
 
 	public Exam.Status GetResultExamStatus() {
-		Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.stPlayRecord.Dan_C, OpenTaiko.SongMount.rChoosenSong.DanSongs, forceFinalJudge: true);
+		Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.stPlayRecord.Dan_C, OpenTaiko.SongMount.rChoosenSong!.DanSongs!, forceFinalJudge: true);
 		if (OpenTaiko.stageGameScreen.IsStageFailed(0))
 			examStatus = Exam.Status.Failure;
 		return examStatus;
 	}
 
-	private CCounter ctDanSongInfoChange;
+	private CCounter ctDanSongInfoChange = null!;
 
 	private int nNowDanSongInfo;
 
@@ -1672,7 +1661,7 @@ internal class CStageResult : CStage {
 		ctDanSongInfoChange.CurrentValue = 0;
 
 		nNowDanSongInfo++;
-		if (nNowDanSongInfo >= Math.Ceiling(OpenTaiko.SongMount.rChoosenSong.DanSongs.Count / 3.0)) {
+		if (nNowDanSongInfo >= Math.Ceiling(OpenTaiko.SongMount.rChoosenSong!.DanSongs!.Count / 3.0)) {
 			nNowDanSongInfo = 0;
 		}
 	}
@@ -1685,7 +1674,7 @@ internal class CStageResult : CStage {
 	*/
 
 	// Shines informations
-	private CCounter ctShine_Plate;
+	private CCounter ctShine_Plate = null!;
 
 	/*
 	private int[] ShinePXPos = { 805, 1175, 645, 810, 1078, 1060 };
@@ -1694,10 +1683,9 @@ internal class CStageResult : CStage {
 	private float[] ShinePSize = { 0.44f, 0.6f, 0.4f, 0.15f, 0.35f, 0.6f };
 	*/
 
-	private int ShinePFade = 100;
 
 	// Fireworks informations
-	private CCounter ctWork_Plate;
+	private CCounter ctWork_Plate = null!;
 
 	/*
 	private int[] WorksPosX = { 800, 900, 1160 };
@@ -1707,27 +1695,26 @@ internal class CStageResult : CStage {
 	private int[] WorksTimeStamp = { 1000, 2000, 3000 };
 
 	// Dan informations
-	private TitleTextureKey[] ttkDanTitles;
-	private CCachedFontRenderer pfDanTitles;
-	private CCounter ctPhase1; // Info display
-	private CCounter ctPhase2; // Free swipe
-	private CCounter ctPhase3; // Background & grade granted if changes
+	private TitleTextureKey[] ttkDanTitles = null!;
+	private CCachedFontRenderer? pfDanTitles;
+	private CCounter? ctPhase1; // Info display
+	private CCounter? ctPhase2; // Free swipe
 	private int examsShift = 0;
 	private bool newGradeGranted = false;
 
 	// Tower informations
-	private CCounter ctTower_Animation;
+	private CCounter ctTower_Animation = null!;
 	private static LuaROActivityWrapper? TowerView => LuaROActivityWrapper.GetROActivity("tower_view");
-	private TitleTextureKey ttkMaxFloors;
-	private TitleTextureKey ttkToutatsu;
-	private TitleTextureKey ttkTen;
-	private TitleTextureKey ttkReachedFloor;
-	private TitleTextureKey ttkScore;
-	private TitleTextureKey ttkRemaningLifes;
-	private TitleTextureKey ttkScoreCount;
-	private CCachedFontRenderer pfTowerText;
-	private CCachedFontRenderer pfTowerText48;
-	private CCachedFontRenderer pfTowerText72;
+	private TitleTextureKey ttkMaxFloors = null!;
+	private TitleTextureKey ttkToutatsu = null!;
+	private TitleTextureKey ttkTen = null!;
+	private TitleTextureKey ttkReachedFloor = null!;
+	private TitleTextureKey ttkScore = null!;
+	private TitleTextureKey ttkRemaningLifes = null!;
+	private TitleTextureKey ttkScoreCount = null!;
+	private CCachedFontRenderer? pfTowerText;
+	private CCachedFontRenderer? pfTowerText48;
+	private CCachedFontRenderer? pfTowerText72;
 
 	private CSkin.CSystemSound bgmResultIn {
 		get {
