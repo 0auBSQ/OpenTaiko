@@ -168,6 +168,8 @@ internal class CSoundDeviceASIO : ISoundDevice {
 				this.fmtASIODeviceFormat.ToString()
 			);
 			this.bIsBASSFree = false;
+			// the driver asks to be reset when its device goes away or changes: the game then reopens it
+			BassAsio.SetNotify(SoundManager.AsioNotify, IntPtr.Zero);
 			#region [ debug: channel format ]
 			//BASS_ASIO_CHANNELINFO chinfo = new BASS_ASIO_CHANNELINFO();
 			//int chan = 0;
@@ -303,6 +305,8 @@ internal class CSoundDeviceASIO : ISoundDevice {
 			this.bIsBASSFree = true;
 			throw new Exception("ASIO デバイス出力開始に失敗しました。" + err.ToString());
 		} else {
+			this.OpenedTick = Environment.TickCount64;
+			Volatile.Write(ref this.lastCallbackTick, this.OpenedTick);
 			int nDelaysample = BassAsio.GetLatency(false); // この関数は BASS_ASIO_Start() 後にしか呼び出せない。
 			int nDesiredDelaysample = (int)(bufferSize * this.dbFrequency / 1000.0);
 			this.BufferSize = this.OutputDelay = (long)(nDelaysample * 1000.0f / this.dbFrequency);
@@ -341,12 +345,19 @@ internal class CSoundDeviceASIO : ISoundDevice {
 	}
 	protected void Dispose(bool bManagedDispose) {
 		SoundDeviceType = ESoundDeviceType.Unknown;     // まず出力停止する(Dispose中にクラス内にアクセスされることを防ぐ)
+		// the driver stops calling tAsioProcess first: it reads both mixers
+		if (!bIsBASSFree) {
+			BassAsio.Free();    // システムタイマより先に呼び出すこと。（tAsio処理() の中でシステムタイマを参照してるため）
+		}
+		if (hMixer_DeviceOut != -1) {
+			Bass.StreamFree(hMixer_DeviceOut);
+		}
 		if (hMixer != -1) {
 			Bass.StreamFree(hMixer);
 		}
 		if (!bIsBASSFree) {
-			BassAsio.Free();    // システムタイマより先に呼び出すこと。（tAsio処理() の中でシステムタイマを参照してるため）
 			Bass.Free();
+			bIsBASSFree = true;
 		}
 
 		if (bManagedDispose) {
@@ -394,8 +405,15 @@ internal class CSoundDeviceASIO : ISoundDevice {
 		// 経過時間を更新後に、今回分の累積転送バイト数を反映。
 
 		this.nCumulativeTransferByteCount += num;
+		Volatile.Write(ref this.lastCallbackTick, Environment.TickCount64);
 		return num;
 	}
+
+	/// <summary>Environment.TickCount64 of the driver's last request for sound (or of the start).</summary>
+	public long LastCallbackTick => Volatile.Read(ref this.lastCallbackTick);
+	private long lastCallbackTick;
+	/// <summary>Environment.TickCount64 of the start.</summary>
+	public long OpenedTick { get; private set; }
 
 	private long nCumulativeTransferByteCount = 0;
 	private bool bIsBASSFree = true;

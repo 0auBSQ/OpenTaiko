@@ -409,18 +409,20 @@ public class SoundManager   // : CSound
 		}
 	}
 
-	/// <summary>Rebuilds the sound device on the current default output when Windows reported a change.
-	/// Call from the thread that plays the sounds, with nothing else playing them meanwhile. ASIO, which
-	/// names its device, is left alone.</summary>
+	/// <summary>Rebuilds the sound device on the current default output when Windows reported a change, or the
+	/// ASIO device when its driver asked for a reset or stopped. Call from the thread that plays the sounds, with
+	/// nothing else playing them meanwhile.</summary>
 	public static void tCheckDeviceChange() {
 		if (!IsDeviceChangeDue) return;
 		Interlocked.Exchange(ref deviceChangeTick, -1);
-		if (requestedDeviceType is ESoundDeviceType.ASIO or ESoundDeviceType.Unknown) return;
-		if (!OutputChanged()) return;   // a microphone, or an output not in use
+		if (requestedDeviceType is ESoundDeviceType.Unknown) return;
+		if (requestedDeviceType is ESoundDeviceType.ASIO ? !AsioNeedsReopening() : !OutputChanged())
+			return;   // a microphone, or an output not in use
 
 		Trace.TraceInformation($"The output device changed; reopening the sound device ({requestedDeviceType}).");
 		foreach (var deviceType in DeviceTryOrder(requestedDeviceType, OperatingSystem.IsWindows())) {
-			if (deviceType is ESoundDeviceType.Unknown or ESoundDeviceType.ASIO) continue;
+			if (deviceType is ESoundDeviceType.Unknown) continue;
+			if (deviceType is ESoundDeviceType.ASIO && requestedDeviceType is not ESoundDeviceType.ASIO) continue;
 			SoundDeviceType = deviceType;
 			try {
 				tReloadSoundDeviceAndSound();
@@ -445,6 +447,26 @@ public class SoundManager   // : CSound
 		}
 	}
 	private static bool onSilentDevice;
+
+	// BASSASIO calls this on the driver's thread when the driver asks to be reset (its device went away or
+	// changed) or changes its sample rate: the game thread reopens it at its next frame
+	internal static readonly ManagedBass.Asio.AsioNotifyProcedure AsioNotify = (notify, user) => {
+		Interlocked.Exchange(ref asioResetRequested, 1);
+		Interlocked.Exchange(ref deviceChangeTick, Environment.TickCount64 - (long)DeviceChangeSettleMs);
+	};
+	private static int asioResetRequested;
+	private const long AsioStallMs = 250;
+
+	// ASIO names its device, so a change of the default output does not concern it: it is reopened when its
+	// driver asked for a reset, when it no longer asks for sound, or when it could not be opened before
+	private static bool AsioNeedsReopening() {
+		bool reset = Interlocked.Exchange(ref asioResetRequested, 0) != 0;
+		if (SoundDevice is not CSoundDeviceASIO asio || asio.SoundDeviceType != ESoundDeviceType.ASIO) return true;
+		long now = Environment.TickCount64;
+		// some drivers ask for a reset as they open: that one is not followed, or the device would reopen in a loop
+		return now - asio.LastCallbackTick > AsioStallMs || (reset && now - asio.OpenedTick > AsioOpeningMs);
+	}
+	private const long AsioOpeningMs = 1000;
 
 	// the output in use is gone, the default output is another one, or there is one again after none
 	private static bool OutputChanged() {
