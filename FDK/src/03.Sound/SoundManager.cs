@@ -301,6 +301,9 @@ public class SoundManager   // : CSound
 		#region [ すでにサウンドデバイスと演奏タイマが構築されていれば解放する。]
 		//-----------------
 		if (SoundDevice != null) {
+			// an ASIO driver stops asking for sound before anything it reads is released
+			(SoundDevice as CSoundDeviceASIO)?.StopOutput();
+
 			// what goes on across the new device, read while the old one is still there: the play timer's time,
 			// what each sound was doing, and how long the old output has been silent (so the sounds go on from
 			// where they would be)
@@ -417,10 +420,14 @@ public class SoundManager   // : CSound
 		if (!IsDeviceChangeDue) return;
 		Interlocked.Exchange(ref deviceChangeTick, -1);
 		if (requestedDeviceType is ESoundDeviceType.Unknown) return;
-		if (requestedDeviceType is ESoundDeviceType.ASIO ? !AsioNeedsReopening() : !OutputChanged())
-			return;   // a microphone, or an output not in use
-
-		Trace.TraceInformation($"The output device changed; reopening the sound device ({requestedDeviceType}).");
+		if (requestedDeviceType is ESoundDeviceType.ASIO) {
+			string? reason = AsioReopenReason();
+			if (reason == null) return;
+			Trace.TraceInformation($"Reopening the sound device (ASIO): {reason}.");
+		} else {
+			if (!OutputChanged()) return;   // a microphone, or an output not in use
+			Trace.TraceInformation($"The output device changed; reopening the sound device ({requestedDeviceType}).");
+		}
 		foreach (var deviceType in DeviceTryOrder(requestedDeviceType, OperatingSystem.IsWindows())) {
 			if (deviceType is ESoundDeviceType.Unknown) continue;
 			if (deviceType is ESoundDeviceType.ASIO && requestedDeviceType is not ESoundDeviceType.ASIO) continue;
@@ -450,22 +457,32 @@ public class SoundManager   // : CSound
 	private static bool onSilentDevice;
 
 	// BASSASIO calls this on the driver's thread when the driver asks to be reset (its device went away or
-	// changed) or changes its sample rate: the game thread reopens it at its next frame
+	// changed) or changes its sample rate: the game thread looks at the driver once the notifications settled
 	internal static readonly ManagedBass.Asio.AsioNotifyProcedure AsioNotify = (notify, user) => {
-		Interlocked.Exchange(ref asioResetRequested, 1);
-		Interlocked.Exchange(ref deviceChangeTick, Environment.TickCount64 - (long)DeviceChangeSettleMs);
+		Interlocked.Or(ref asioNotifications, 1 << (int)notify);
+		Interlocked.Exchange(ref deviceChangeTick, Environment.TickCount64);
 	};
-	private static int asioResetRequested;
+	private static int asioNotifications;   // one bit per kind of notification received since the last look
 	private const long AsioStallMs = 250;
 
-	// ASIO names its device, so a change of the default output does not concern it: it is reopened when its
-	// driver asked for a reset, when it no longer asks for sound, or when it could not be opened before
-	private static bool AsioNeedsReopening() {
-		bool reset = Interlocked.Exchange(ref asioResetRequested, 0) != 0;
-		if (SoundDevice is not CSoundDeviceASIO asio || asio.SoundDeviceType != ESoundDeviceType.ASIO) return true;
+	// ASIO names its device, so a change of the default output does not concern it. It is reopened when it no
+	// longer asks for sound, when its sample rate changed, or when it could not be opened before. A reset request
+	// alone is not followed while the driver still asks for sound: some drivers crash when they are closed while
+	// they change their device. Returns why it is reopened, or null.
+	private static string? AsioReopenReason() {
+		int notified = Interlocked.Exchange(ref asioNotifications, 0);
+		if (SoundDevice is not CSoundDeviceASIO asio || asio.SoundDeviceType != ESoundDeviceType.ASIO) return "it is not open";
 		long now = Environment.TickCount64;
+		bool opening = now - asio.OpenedTick <= AsioOpeningMs;
+		long silentMs = now - asio.LastCallbackTick;
+		// a driver that has not begun asking for sound yet is not stalled during its first second
+		if (silentMs > AsioStallMs && (asio.HasCalledBack || !opening)) return $"the driver stopped asking for sound {silentMs} ms ago";
 		// some drivers ask for a reset as they open: that one is not followed, or the device would reopen in a loop
-		return now - asio.LastCallbackTick > AsioStallMs || (reset && now - asio.OpenedTick > AsioOpeningMs);
+		if (opening) return null;
+		if ((notified & (1 << (int)ManagedBass.Asio.AsioNotify.Rate)) != 0) return "the driver changed its sample rate";
+		if ((notified & (1 << (int)ManagedBass.Asio.AsioNotify.Reset)) != 0)
+			Trace.TraceInformation($"The ASIO driver asked for a reset; it still asks for sound ({silentMs} ms ago), so it is left open.");
+		return null;
 	}
 	private const long AsioOpeningMs = 1000;
 

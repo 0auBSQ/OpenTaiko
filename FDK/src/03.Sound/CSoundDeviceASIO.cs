@@ -337,6 +337,14 @@ internal class CSoundDeviceASIO : ISoundDevice {
 	#endregion
 
 
+	/// <summary>The driver stops asking for sound (tAsioProcess is no longer called); Dispose closes it.</summary>
+	public void StopOutput() {
+		if (bIsBASSFree) return;
+		Trace.TraceInformation("Stopping the ASIO output.");
+		BassAsio.Stop();
+		Trace.TraceInformation("ASIO output stopped.");
+	}
+
 	#region [ Dispose-Finallizeパターン実装 ]
 	//-----------------
 	public void Dispose() {
@@ -347,7 +355,9 @@ internal class CSoundDeviceASIO : ISoundDevice {
 		SoundDeviceType = ESoundDeviceType.Unknown;     // まず出力停止する(Dispose中にクラス内にアクセスされることを防ぐ)
 		// the driver stops calling tAsioProcess first: it reads both mixers
 		if (!bIsBASSFree) {
+			Trace.TraceInformation("Closing the ASIO driver.");
 			BassAsio.Free();    // システムタイマより先に呼び出すこと。（tAsio処理() の中でシステムタイマを参照してるため）
+			Trace.TraceInformation("ASIO driver closed.");
 		}
 		if (hMixer_DeviceOut != -1) {
 			Bass.StreamFree(hMixer_DeviceOut);
@@ -406,12 +416,16 @@ internal class CSoundDeviceASIO : ISoundDevice {
 
 		this.nCumulativeTransferByteCount += num;
 		Volatile.Write(ref this.lastCallbackTick, Environment.TickCount64);
+		this.calledBack = true;
 		return num;
 	}
 
 	/// <summary>Environment.TickCount64 of the driver's last request for sound (or of the start).</summary>
 	public long LastCallbackTick => Volatile.Read(ref this.lastCallbackTick);
 	private long lastCallbackTick;
+	/// <summary>Whether the driver asked for sound since the start: some take half a second to begin.</summary>
+	public bool HasCalledBack => this.calledBack;
+	private volatile bool calledBack;
 	/// <summary>Environment.TickCount64 of the start.</summary>
 	public long OpenedTick { get; private set; }
 
