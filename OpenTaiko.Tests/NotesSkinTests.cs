@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using OpenTaiko;
 using SkiaSharp;
@@ -39,14 +40,65 @@ namespace OpenTaikoTests {
 			foreach (int combo in new[] { 0, 49, 50, 149, 150, 299, 300, 1000 })
 				for (int step = 0; step < 4; step++)
 					foreach (bool entry in new[] { false, true })
-						Assert.Equal(FormerRow(combo, step, !entry), sheet.Row(new CNoteAnim(combo, step, entry)));
+						foreach (var diff in new[] { Difficulty.Easy, Difficulty.Oni })
+							Assert.Equal(FormerRow(combo, step, !entry), sheet.Row(new CNoteAnim(combo, step, entry, diff), "Don"));
 		}
 
 		[Fact]
 		public void RowsStayInTheSheet() {
 			var single = DefaultTable(1);
-			Assert.Equal(0, single.Row(new CNoteAnim(500, 1, false)));
-			Assert.Equal(0, new CSheetDef().Row(new CNoteAnim(500, 1, false)));
+			Assert.Equal(0, single.Row(new CNoteAnim(500, 1, false, Difficulty.Oni), "Don"));
+			Assert.Equal(0, new CSheetDef().Row(new CNoteAnim(500, 1, false, Difficulty.Oni), "Don"));
+		}
+
+		[Fact]
+		public void TiersStartAtTheirDifficultysCombo() {
+			var sheet = JsonConvert.DeserializeObject<CSheetDef>(@"{ ""Frames"": 3, ""Animation"": [
+				{ ""FromCombo"": 0, ""Rows"": [0] },
+				{ ""FromCombo"": 100, ""FromComboByDifficulty"": { ""Easy"": 5, ""hard"": 50 }, ""Rows"": [2] }
+			] }")!;
+			int Row(int combo, Difficulty diff) => sheet.Row(new CNoteAnim(combo, 0, false, diff), "Don");
+			Assert.Equal(0, Row(4, Difficulty.Easy));
+			Assert.Equal(2, Row(5, Difficulty.Easy));
+			Assert.Equal(0, Row(49, Difficulty.Hard));
+			Assert.Equal(2, Row(50, Difficulty.Hard));
+			// unlisted difficulties use FromCombo
+			Assert.Equal(0, Row(50, Difficulty.Normal));
+			Assert.Equal(2, Row(100, Difficulty.Normal));
+			Assert.Equal(2, Row(100, Difficulty.Edit));
+		}
+
+		[Fact]
+		public void NotesCanHaveTheirOwnRows() {
+			var sheet = JsonConvert.DeserializeObject<CSheetDef>(@"{ ""Frames"": 3, ""Animation"": [
+				{ ""FromCombo"": 0, ""Rows"": [0, 2], ""RowsByNote"": { ""BigDon"": [1, 2] }, ""RowsOnEntry"": [0] }
+			] }")!;
+			int Row(string note, int step, bool entry = false) => sheet.Row(new CNoteAnim(10, step, entry, Difficulty.Oni), note);
+			Assert.Equal(new[] { 0, 2 }, new[] { Row("Don", 0), Row("Don", 1) });
+			Assert.Equal(new[] { 1, 2 }, new[] { Row("BigDon", 0), Row("BigDon", 1) });
+			Assert.Equal(new[] { 1, 2 }, new[] { Row("bigdon", 0), Row("bigdon", 1) });
+			Assert.Equal(new[] { 0, 0 }, new[] { Row("BigDon", 0, true), Row("BigDon", 1, true) });
+		}
+
+		// Sky Spirits: the tiers start at 5/10/30 combo in Easy and Normal, 10/30/50 in Hard and 10/50/100 in Extreme and
+		// Extra Extreme; from the last tier on, the big notes (big Don, big Ka, KaDon) alternate their rows 1 and 2
+		[Theory]
+		[InlineData("Notes Skin (Taiko)/3")]
+		[InlineData("Notes Skin (Taiko)/4")]
+		public void SkySpiritsTiersFollowTheDifficulty(string pack) {
+			var def = JsonConvert.DeserializeObject<CNotesSkinDef>(File.ReadAllText(Path.Combine(Packs, pack, "Definition.json")))!;
+			var expected = new (Difficulty Diff, int[] From)[] {
+				(Difficulty.Easy, [0, 5, 10, 30]), (Difficulty.Normal, [0, 5, 10, 30]), (Difficulty.Hard, [0, 10, 30, 50]),
+				(Difficulty.Oni, [0, 10, 50, 100]), (Difficulty.Edit, [0, 10, 50, 100]),
+			};
+			foreach (var sheet in new[] { def.Notes, def.Rolls, def.Balloons })
+				foreach (var (diff, from) in expected)
+					Assert.Equal(from, sheet.Animation.Select(t => t.FromComboAt(diff)).ToArray());
+			var top = new CNoteAnim(100, 0, false, Difficulty.Oni);
+			foreach (string note in new[] { "Don", "Ka", "BigDon", "BigKa", "KaDon", "ADLib" }) {
+				int[] rows = { def.Notes.Row(top, note), def.Notes.Row(top with { Step = 1 }, note) };
+				Assert.Equal(note is "BigDon" or "BigKa" or "KaDon" ? new[] { 1, 2 } : new[] { 0, 2 }, rows);
+			}
 		}
 
 		[Theory]

@@ -121,6 +121,18 @@ Un pack de jugements contient `Judge.png`, 5 lignes de même hauteur : Bon, Ok,
 
 `Animation` est une liste de paliers. Le jeu utilise le palier au `FromCombo` le plus élevé que le combo du joueur a atteint. Un temps compte 4 subdivisions, et `Rows` donne la ligne dessinée à chaque subdivision ; une liste plus courte se répète, donc `[0, 1]` alterne à chaque subdivision et `[0]` reste fixe. `RowsOnEntry` remplace `Rows` pendant environ deux tiers de seconde après que le combo a atteint ce palier. Sans paliers, la planche affiche sa première ligne. Le tableau de l'exemple est l'animation que le jeu a toujours utilisée, et le Mode simple des paramètres garde chaque planche sur sa première ligne.
 
+Deux champs facultatifs ajustent un palier. `FromComboByDifficulty` fixe le combo du palier pour certaines difficultés, avec les clés `Easy`, `Normal`, `Hard`, `Extreme` et `ExtraExtreme` ; les autres difficultés utilisent `FromCombo`, donc `"FromCombo": 100, "FromComboByDifficulty": { "Easy": 30 }` fait commencer le palier à 30 de combo en Easy et à 100 dans les autres. Une partition Tour compte comme Normal sur son côté Normal et comme Extreme sur ses autres côtés, et un Dan utilise la difficulté de la chanson en cours.
+
+`RowsByNote` donne à certaines notes leurs propres `Rows`, avec pour clés les noms ci-dessous ; les autres notes gardent `Rows`. Dans `Notes.png`, `"Rows": [0, 2], "RowsByNote": { "BigDon": [1, 2] }` alterne les lignes 0 et 2 sur toutes les notes sauf le grand Don, qui alterne les lignes 1 et 2. Le corps et la queue d'un roulement suivent sa tête, et `RowsOnEntry` s'applique toujours à toutes les notes.
+
+| Planche | Noms des notes |
+| --- | --- |
+| `Notes.png`, Taiko | `Don`, `Ka`, `BigDon`, `BigKa`, `KaDon`, `ADLib` |
+| `Notes.png`, Bongo | `Red`, `Yellow`, `Pink`, `Clap`, `ADLib` |
+| `Rolls.png`, Taiko | `Roll`, `BigRoll` |
+| `Rolls.png`, Bongo | `RedRoll`, `PinkRoll`, `YellowRoll`, `ClapRoll` |
+| `Balloons.png` | `Balloon`, `Kusudama`, `FuseRoll` |
+
 ## Étape 6 : Notes partenaires et notes géantes
 
 Une note partenaire garde sa taille dans la plupart des cas, mais les petites (un petit Don ou Ka, un ADLib, une bombe, toutes les notes Bongo) prennent un look de grande note. Une note géante est bien plus grande et oscille lentement. Chacune a sa propre planche facultative :

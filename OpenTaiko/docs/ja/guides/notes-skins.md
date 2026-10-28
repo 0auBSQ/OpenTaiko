@@ -121,6 +121,18 @@ Graphics/5_Game/
 
 `Animation` は段階のリストです。ゲームは、プレイヤーのコンボが到達した段階のうち `FromCombo` が最も大きいものを使います。1 拍は 4 つの区間に分かれ、`Rows` は各区間で描く行を指定します。短いリストは繰り返されるため、`[0, 1]` は区間ごとに交互になり、`[0]` は止まったままです。`RowsOnEntry` は、コンボがその段階に到達してから約 3 分の 2 秒の間、`Rows` の代わりに使われます。段階がなければ、シートは最初の行を表示します。例の表はゲームが従来から使ってきたアニメーションで、設定のシンプルモードではすべてのシートが最初の行のままになります。
 
+段階は 2 つの任意フィールドで調整できます。`FromComboByDifficulty` は一部の難易度について段階のコンボを決めます。キーは `Easy`、`Normal`、`Hard`、`Extreme`、`ExtraExtreme` で、ほかの難易度は `FromCombo` を使います。たとえば `"FromCombo": 100, "FromComboByDifficulty": { "Easy": 30 }` では、段階は Easy で 30 コンボ、ほかの難易度で 100 コンボから始まります。Tower の譜面は Normal 側なら Normal、ほかの側なら Extreme として扱われ、Dan では演奏中の曲の難易度が使われます。
+
+`RowsByNote` は一部の音符に専用の `Rows` を与えます。キーは下の表の名前で、ほかの音符は `Rows` のままです。`Notes.png` で `"Rows": [0, 2], "RowsByNote": { "BigDon": [1, 2] }` とすると、大ドン以外の音符は行 0 と 2 を交互に、大ドンは行 1 と 2 を交互に表示します。連打の胴と尾は頭に従い、`RowsOnEntry` は引き続きすべての音符に適用されます。
+
+| シート | 音符の名前 |
+| --- | --- |
+| `Notes.png`, 太鼓 | `Don`, `Ka`, `BigDon`, `BigKa`, `KaDon`, `ADLib` |
+| `Notes.png`, ボンゴ | `Red`, `Yellow`, `Pink`, `Clap`, `ADLib` |
+| `Rolls.png`, 太鼓 | `Roll`, `BigRoll` |
+| `Rolls.png`, ボンゴ | `RedRoll`, `PinkRoll`, `YellowRoll`, `ClapRoll` |
+| `Balloons.png` | `Balloon`, `Kusudama`, `FuseRoll` |
+
 ## ステップ 6: パートナー音符と巨大音符
 
 パートナー音符はほとんどの場合そのままのサイズですが、小さい音符 (小さいドンやカッ、ADLib、爆弾、すべてのボンゴの音符) は大きい見た目になります。巨大音符はずっと大きく、ゆっくり揺れます。それぞれに任意のシートがあります。

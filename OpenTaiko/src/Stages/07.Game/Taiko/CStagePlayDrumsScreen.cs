@@ -1363,7 +1363,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	public CNoteAnim GetNoteAnim(int nPlayer) {
 		if (OpenTaiko.ConfigIni.SimpleMode) return CNoteAnim.Still;
 		return new CNoteAnim(this.actCombo.nCurrentCombo[nPlayer], (int)ctChipAnime[nPlayer].CurrentValue % 4,
-			!ctChipAnimeLag[nPlayer].IsEnded);
+			!ctChipAnimeLag[nPlayer].IsEnded, this.NotesAnimDifficulty(nPlayer));
 	}
 
 	// Judge whether rolls are intended to obscure the screen, then detect and hide unintended obscuring rolls when any of its tips are out of screen

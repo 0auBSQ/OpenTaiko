@@ -389,23 +389,28 @@ class NotesManager {
 	private const float GlowPulse = 0.3f;         // the pulse's brightest flash
 	private const double GlowPulseMs = 900;
 
-	// a column (Span cells wide) of a sheet, whose rows follow Sheet's animation
-	private readonly record struct Cell(CTexture Tex, int Col, int Span, CSheetDef Sheet, bool MainSheet);
+	// a column (Span cells wide) of a sheet, whose rows follow Sheet's animation for the note Name (see CAnimTier.RowsByNote)
+	private readonly record struct Cell(CTexture Tex, int Col, int Span, CSheetDef Sheet, bool MainSheet, string Name);
+
+	private static readonly string[] TaikoNoteNames = { "Don", "Ka", "BigDon", "BigKa", "KaDon", "ADLib" };
+	private static readonly string[] KongaNoteNames = { "Red", "Yellow", "Pink", "Clap", "", "ADLib" };
 
 	// a note's cell by kind: 0 Don, 1 Ka, 2 big Don, 3 big Ka, 4 KaDon, 5 ADLib (the Bongo pink and clap are 2 and 3)
 	private static Cell? KindCell(int kind, EGameType gt) {
 		var tx = OpenTaiko.Tx;
 		var def = CNotesSkins.Def(gt);
+		var names = gt is EGameType.Konga ? KongaNoteNames : TaikoNoteNames;
+		string name = kind >= 0 && kind < names.Length ? names[kind] : "";
 		if (def.Legacy) {
-			if (kind == 4) return tx.Note_Swap is CTexture swap ? new Cell(swap, 0, 1, def.Notes, false) : null;
-			if (kind == 5) return tx.Note_Adlib is CTexture adlib ? new Cell(adlib, 0, 1, def.Notes, false) : null;
-			return tx.Notes[(int)gt] is CTexture old ? new Cell(old, kind + 1, 1, def.Notes, true) : null;
+			if (kind == 4) return tx.Note_Swap is CTexture swap ? new Cell(swap, 0, 1, def.Notes, false, name) : null;
+			if (kind == 5) return tx.Note_Adlib is CTexture adlib ? new Cell(adlib, 0, 1, def.Notes, false, name) : null;
+			return tx.Notes[(int)gt] is CTexture old ? new Cell(old, kind + 1, 1, def.Notes, true, name) : null;
 		}
 		if (gt is EGameType.Konga) {
 			if (kind == 4) return null;
 			if (kind == 5) kind = 4;
 		}
-		return tx.Notes[(int)gt] is CTexture notes ? new Cell(notes, kind, 1, def.Notes, true) : null;
+		return tx.Notes[(int)gt] is CTexture notes ? new Cell(notes, kind, 1, def.Notes, true, name) : null;
 	}
 
 	private static int NoteKind(ENoteType nt, EGameType gt)
@@ -416,11 +421,12 @@ class NotesManager {
 		if (IsBalloon(nt) || IsKusudama(nt)) {
 			var tx = OpenTaiko.Tx;
 			var taiko = CNotesSkins.Def(EGameType.Taiko);
+			string name = IsKusudama(nt) ? "Kusudama" : "Balloon";
 			if (!taiko.Legacy)
-				return tx.Balloons is CTexture b ? new Cell(b, IsKusudama(nt) ? 2 : 0, 2, taiko.Balloons, false) : null;
+				return tx.Balloons is CTexture b ? new Cell(b, IsKusudama(nt) ? 2 : 0, 2, taiko.Balloons, false, name) : null;
 			var def = CNotesSkins.Def(gt);
-			if (IsKusudama(nt)) return tx.Note_Kusu is CTexture k ? new Cell(k, 0, 2, def.Notes, false) : null;
-			return tx.Notes[(int)gt] is CTexture n ? new Cell(n, 11, 2, def.Notes, false) : null;
+			if (IsKusudama(nt)) return tx.Note_Kusu is CTexture k ? new Cell(k, 0, 2, def.Notes, false, name) : null;
+			return tx.Notes[(int)gt] is CTexture n ? new Cell(n, 11, 2, def.Notes, false, name) : null;
 		}
 		return KindCell(NoteKind(nt, gt), gt);
 	}
@@ -510,7 +516,7 @@ class NotesManager {
 		}
 
 		if (NoteCell(nt, _gt) is not Cell cell) return;
-		int row = cell.Sheet.Row(anim);
+		int row = cell.Sheet.Row(anim, cell.Name);
 
 		// a giant or partner note: its cell of the giant or partner sheet, centred on the note's place
 		if ((giant || partner) && cell.MainSheet && !def.Legacy) {
@@ -529,9 +535,10 @@ class NotesManager {
 		if (giant || partner) {
 			float scale = giant ? def.GiantNotesScale : 1f;
 			if (IsSmallLookingNote(nt, _gt)) {
-				if (_gt is EGameType.Taiko && nt is ENoteType.Don or ENoteType.Ka && KindCell(nt is ENoteType.Don ? 2 : 3, _gt) is Cell big)
+				if (_gt is EGameType.Taiko && nt is ENoteType.Don or ENoteType.Ka && KindCell(nt is ENoteType.Don ? 2 : 3, _gt) is Cell big) {
 					cell = big;
-				else
+					row = cell.Sheet.Row(anim, cell.Name);
+				} else
 					scale *= def.PartnerNotesScale;
 			}
 			look = look with { Scale = look.Scale * scale };
@@ -553,20 +560,25 @@ class NotesManager {
 		EGameType _gt = GetChipGameType(chip, player);
 		var def = CNotesSkins.Def(_gt);
 
-		// the roll's sheet and the column of its head (the body and tail follow)
+		// the roll's sheet, the column of its head (the body and tail follow) and its name (see CAnimTier.RowsByNote)
 		CTexture? _texarr;
 		int originCol;
 		CSheetDef sheetDef;
+		string name;
 		if (IsFuzeRoll(nt)) {
 			var taiko = CNotesSkins.Def(EGameType.Taiko);
 			_texarr = taiko.Legacy ? OpenTaiko.Tx.Note_FuseRoll : OpenTaiko.Tx.Balloons;
 			originCol = taiko.Legacy ? 0 : 4;
 			sheetDef = taiko.Legacy ? def.Notes : taiko.Balloons;
+			name = "FuseRoll";
 		} else {
 			int part = (IsBigRollTaiko(nt, _gt) || IsPinkRollKonga(nt, _gt)) ? 1
 				: IsYellowRollKonga(nt, _gt) ? 2
 				: IsClapRollKonga(nt, _gt) ? 3
 				: 0;
+			name = _gt is EGameType.Konga
+				? part switch { 1 => "PinkRoll", 2 => "YellowRoll", 3 => "ClapRoll", _ => "RedRoll" }
+				: part == 1 ? "BigRoll" : "Roll";
 			if (def.Legacy) {
 				_texarr = OpenTaiko.Tx.Notes[(int)_gt];
 				originCol = 5 + part switch { 1 => 3, 2 => 8, 3 => 11, _ => 0 };
@@ -580,7 +592,7 @@ class NotesManager {
 
 		if (_texarr == null) return;
 		int rollOrigin = OpenTaiko.Skin.Game_Notes_Size[0] * originCol;
-		int frame = sheetDef.Row(anim) * OpenTaiko.Skin.Game_Notes_Size[1];
+		int frame = sheetDef.Row(anim, name) * OpenTaiko.Skin.Game_Notes_Size[1];
 		float wImage = OpenTaiko.Skin.Game_Notes_Size[0];
 		float hImage = OpenTaiko.Skin.Game_Notes_Size[1];
 

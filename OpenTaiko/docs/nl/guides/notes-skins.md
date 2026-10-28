@@ -121,6 +121,18 @@ Een beoordelingspakket bevat `Judge.png`, 5 rijen van dezelfde hoogte: Good, OK,
 
 `Animation` is een lijst van niveaus. Het spel gebruikt het niveau met de hoogste `FromCombo` die de combo van de speler heeft bereikt. Een tel heeft 4 stappen, en `Rows` geeft de rij die bij elke stap getekend wordt; een kortere lijst herhaalt zich, dus `[0, 1]` wisselt bij elke stap en `[0]` staat stil. `RowsOnEntry` vervangt `Rows` gedurende ongeveer twee derde seconde nadat de combo dat niveau bereikt. Zonder niveaus toont de sheet zijn eerste rij. De tabel van het voorbeeld is de animatie die het spel altijd heeft gebruikt, en de Simpele Modus van de instellingen houdt elke sheet op zijn eerste rij.
 
+Twee optionele velden passen een niveau aan. `FromComboByDifficulty` stelt de combo van het niveau in voor sommige moeilijkheidsgraden, met de sleutels `Easy`, `Normal`, `Hard`, `Extreme` en `ExtraExtreme`; de andere moeilijkheidsgraden gebruiken `FromCombo`, dus `"FromCombo": 100, "FromComboByDifficulty": { "Easy": 30 }` laat het niveau in Easy beginnen bij 30 combo en in de andere bij 100. Een Tower-chart telt als Normal aan zijn Normal-kant en als Extreme aan zijn andere kanten, en een Dan gebruikt de moeilijkheidsgraad van het nummer dat gespeeld wordt.
+
+`RowsByNote` geeft sommige noten hun eigen `Rows`, met de namen hieronder als sleutels; de andere noten houden `Rows`. In `Notes.png` wisselt `"Rows": [0, 2], "RowsByNote": { "BigDon": [1, 2] }` de rijen 0 en 2 af op elke noot behalve de grote Don, die de rijen 1 en 2 afwisselt. Het lijf en de staart van een roffel volgen zijn kop, en `RowsOnEntry` geldt nog steeds voor elke noot.
+
+| Sheet | Nootnamen |
+| --- | --- |
+| `Notes.png`, Taiko | `Don`, `Ka`, `BigDon`, `BigKa`, `KaDon`, `ADLib` |
+| `Notes.png`, Bongo | `Red`, `Yellow`, `Pink`, `Clap`, `ADLib` |
+| `Rolls.png`, Taiko | `Roll`, `BigRoll` |
+| `Rolls.png`, Bongo | `RedRoll`, `PinkRoll`, `YellowRoll`, `ClapRoll` |
+| `Balloons.png` | `Balloon`, `Kusudama`, `FuseRoll` |
+
 ## Stap 6: Partner- en reuzennoten
 
 Een partnernoot houdt in de meeste gevallen zijn grootte, maar de kleine (een kleine Don of Ka, een ADLib, een bom, elke Bongo-noot) krijgen een grote look. Een reuzennoot is veel groter en wiebelt langzaam. Elk heeft een eigen optionele sheet:

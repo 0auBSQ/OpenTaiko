@@ -1076,6 +1076,20 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 		return (_timingzonesAreEasy == true) ? OpenTaiko.ConfigIni.tzLevels[timingShift] : OpenTaiko.ConfigIni.tzLevels[2 + timingShift];
 	}
 
+	// the difficulty whose combo tiers animate a player's notes: a tower chart takes Normal or Extreme by its side,
+	// a dan the difficulty of the song on screen
+	internal Difficulty NotesAnimDifficulty(int nPlayer) {
+		var diff = (Difficulty)OpenTaiko.SongMount.nChoosenSongDifficulty[nPlayer];
+		if (diff == Difficulty.Tower)
+			return OpenTaiko.GetTJA(nPlayer)?.SIDE == CTja.ESide.eNormal ? Difficulty.Normal : Difficulty.Oni;
+		if (diff == Difficulty.Dan) {
+			var danSongs = OpenTaiko.SongMount.rChoosenSong?.DanSongs;
+			int nb = this.DanSongOf(null);
+			return danSongs != null && nb < danSongs.Count ? (Difficulty)Math.Clamp(danSongs[nb].Difficulty, 0, (int)Difficulty.Edit) : Difficulty.Oni;
+		}
+		return diff;
+	}
+
 	// the dan song a chip belongs to (the song on screen when there is no chip)
 	private int DanSongOf(CChip? chip)
 		=> (chip == null) ? this.actDan.NowShowingNumber : DanSongAt(this.msDanSongStart, chip.dbSoundTimems);
@@ -2040,7 +2054,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 
 			//CDTXMania.act文字コンソール.tPrint(620, 80, C文字コンソール.Eフォント種別.白, "BPM: " + dbUnit.ToString());
 
-			if (CNotesSkins.IsEntryCombo(this.actCombo.nCurrentCombo[nPlayer])) {
+			if (CNotesSkins.IsEntryCombo(this.actCombo.nCurrentCombo[nPlayer], this.NotesAnimDifficulty(nPlayer))) {
 				ctChipAnimeLag[nPlayer] = new CCounter(0, 664, 1, OpenTaiko.Timer);
 			}
 

@@ -121,6 +121,18 @@ Ein Bewertungspaket enthält `Judge.png`, 5 gleich hohe Zeilen: Gut, Ok, Übel, 
 
 `Animation` ist eine Liste von Stufen. Das Spiel verwendet die Stufe mit dem höchsten `FromCombo`, das die Combo des Spielers erreicht hat. Ein Beat hat 4 Teilschritte, und `Rows` gibt die Zeile an, die bei jedem Teilschritt gezeichnet wird; eine kürzere Liste wiederholt sich, sodass `[0, 1]` bei jedem Teilschritt wechselt und `[0]` stillsteht. `RowsOnEntry` ersetzt `Rows` für etwa zwei Drittel einer Sekunde, nachdem die Combo diese Stufe erreicht hat. Ohne Stufen zeigt das Sheet seine erste Zeile. Die Tabelle des Beispiels ist die Animation, die das Spiel schon immer verwendet hat, und der Einfachmodus der Einstellungen hält jedes Sheet auf seiner ersten Zeile.
 
+Zwei optionale Felder passen eine Stufe an. `FromComboByDifficulty` legt die Combo der Stufe für einzelne Schwierigkeitsgrade fest, mit den Schlüsseln `Easy`, `Normal`, `Hard`, `Extreme` und `ExtraExtreme`; die anderen Schwierigkeitsgrade verwenden `FromCombo`, sodass `"FromCombo": 100, "FromComboByDifficulty": { "Easy": 30 }` die Stufe in Easy ab 30 Combo und in den anderen ab 100 beginnen lässt. Ein Tower-Chart zählt auf seiner Normal-Seite als Normal und auf seinen anderen Seiten als Extreme, und ein Dan verwendet den Schwierigkeitsgrad des gerade gespielten Songs.
+
+`RowsByNote` gibt einzelnen Noten eigene `Rows`, mit den Namen unten als Schlüssel; die anderen Noten behalten `Rows`. In `Notes.png` lässt `"Rows": [0, 2], "RowsByNote": { "BigDon": [1, 2] }` jede Note zwischen den Zeilen 0 und 2 wechseln, außer dem großen Don, der zwischen den Zeilen 1 und 2 wechselt. Körper und Ende eines Trommelwirbels folgen seinem Kopf, und `RowsOnEntry` gilt weiterhin für jede Note.
+
+| Sheet | Notennamen |
+| --- | --- |
+| `Notes.png`, Taiko | `Don`, `Ka`, `BigDon`, `BigKa`, `KaDon`, `ADLib` |
+| `Notes.png`, Bongo | `Red`, `Yellow`, `Pink`, `Clap`, `ADLib` |
+| `Rolls.png`, Taiko | `Roll`, `BigRoll` |
+| `Rolls.png`, Bongo | `RedRoll`, `PinkRoll`, `YellowRoll`, `ClapRoll` |
+| `Balloons.png` | `Balloon`, `Kusudama`, `FuseRoll` |
+
 ## Schritt 6: Partner- und Riesennoten
 
 Eine Partnernote behält in den meisten Fällen ihre Größe, aber die kleinen (ein kleines Don oder Ka, ein ADLib, eine Bombe, jede Bongo-Note) nehmen einen großen Look an. Eine Riesennote ist viel größer und wackelt langsam. Jede hat ihr eigenes optionales Sheet:

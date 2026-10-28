@@ -121,6 +121,18 @@ Un paquete de juicios contiene `Judge.png`, 5 filas de la misma altura: Bien, Va
 
 `Animation` es una lista de niveles. El juego usa el nivel con el `FromCombo` más alto que haya alcanzado el combo del jugador. Un pulso tiene 4 subdivisiones, y `Rows` da la fila dibujada en cada subdivisión; una lista más corta se repite, así que `[0, 1]` alterna en cada subdivisión y `[0]` se queda quieta. `RowsOnEntry` sustituye a `Rows` durante unos dos tercios de segundo después de que el combo alcance ese nivel. Sin niveles, la hoja muestra su primera fila. La tabla del ejemplo es la animación que el juego siempre ha usado, y el Modo Simple de los ajustes mantiene cada hoja en su primera fila.
 
+Dos campos opcionales ajustan un nivel. `FromComboByDifficulty` fija el combo del nivel para algunas dificultades, con las claves `Easy`, `Normal`, `Hard`, `Extreme` y `ExtraExtreme`; las demás dificultades usan `FromCombo`, así que `"FromCombo": 100, "FromComboByDifficulty": { "Easy": 30 }` empieza el nivel a 30 de combo en Easy y a 100 en las demás. Un chart Torre cuenta como Normal en su lado Normal y como Extreme en sus otros lados, y un Dan usa la dificultad de la canción que se está jugando.
+
+`RowsByNote` da a algunas notas sus propias `Rows`, con los nombres de abajo como claves; las demás notas conservan `Rows`. En `Notes.png`, `"Rows": [0, 2], "RowsByNote": { "BigDon": [1, 2] }` alterna las filas 0 y 2 en todas las notas salvo el Don grande, que alterna las filas 1 y 2. El cuerpo y la cola de un redoble siguen a su cabeza, y `RowsOnEntry` sigue aplicándose a todas las notas.
+
+| Hoja | Nombres de notas |
+| --- | --- |
+| `Notes.png`, Taiko | `Don`, `Ka`, `BigDon`, `BigKa`, `KaDon`, `ADLib` |
+| `Notes.png`, Bongo | `Red`, `Yellow`, `Pink`, `Clap`, `ADLib` |
+| `Rolls.png`, Taiko | `Roll`, `BigRoll` |
+| `Rolls.png`, Bongo | `RedRoll`, `PinkRoll`, `YellowRoll`, `ClapRoll` |
+| `Balloons.png` | `Balloon`, `Kusudama`, `FuseRoll` |
+
 ## Paso 6: Notas compañeras y gigantes
 
 Una nota compañera conserva su tamaño en la mayoría de los casos, pero las pequeñas (un Don o Ka pequeño, un ADLib, una bomba, todas las notas Bongo) toman un aspecto grande. Una nota gigante es mucho más grande y se tambalea despacio. Cada una tiene su propia hoja opcional:

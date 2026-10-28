@@ -121,6 +121,18 @@ Graphics/5_Game/
 
 `Animation`은 티어의 목록입니다. 게임은 플레이어의 콤보가 도달한 티어 중 `FromCombo`가 가장 큰 티어를 사용합니다. 한 박자는 4스텝이며, `Rows`는 각 스텝에서 그릴 행을 정합니다. 목록이 짧으면 반복되므로 `[0, 1]`은 스텝마다 번갈아 바뀌고 `[0]`은 멈춰 있습니다. `RowsOnEntry`는 콤보가 그 티어에 도달한 뒤 약 3분의 2초 동안 `Rows`를 대신합니다. 티어가 없으면 시트는 첫 행을 표시합니다. 예시의 표는 게임이 예전부터 써 온 애니메이션이며, 설정의 간단모드에서는 모든 시트가 첫 행에 머뭅니다.
 
+두 개의 선택 필드로 티어를 조정할 수 있습니다. `FromComboByDifficulty`는 일부 난이도에 대해 티어의 콤보를 정하며, 키는 `Easy`, `Normal`, `Hard`, `Extreme`, `ExtraExtreme`입니다. 다른 난이도는 `FromCombo`를 사용하므로, `"FromCombo": 100, "FromComboByDifficulty": { "Easy": 30 }`은 Easy에서 30 콤보, 다른 난이도에서 100 콤보부터 티어를 시작합니다. 타워 채보는 Normal 쪽이면 Normal로, 다른 쪽이면 Extreme으로 취급되고, 단위에서는 플레이 중인 곡의 난이도를 사용합니다.
+
+`RowsByNote`는 일부 노트에 고유한 `Rows`를 주며, 키는 아래 표의 이름입니다. 다른 노트는 `Rows`를 유지합니다. `Notes.png`에서 `"Rows": [0, 2], "RowsByNote": { "BigDon": [1, 2] }`는 큰 동을 제외한 모든 노트에서 행 0과 2를 번갈아 보여 주고, 큰 동은 행 1과 2를 번갈아 보여 줍니다. 연타의 몸통과 꼬리는 머리를 따르고, `RowsOnEntry`는 여전히 모든 노트에 적용됩니다.
+
+| 시트 | 노트 이름 |
+| --- | --- |
+| `Notes.png`, 태고 | `Don`, `Ka`, `BigDon`, `BigKa`, `KaDon`, `ADLib` |
+| `Notes.png`, 봉고 | `Red`, `Yellow`, `Pink`, `Clap`, `ADLib` |
+| `Rolls.png`, 태고 | `Roll`, `BigRoll` |
+| `Rolls.png`, 봉고 | `RedRoll`, `PinkRoll`, `YellowRoll`, `ClapRoll` |
+| `Balloons.png` | `Balloon`, `Kusudama`, `FuseRoll` |
+
 ## 6단계: 파트너 노트와 거대 노트
 
 파트너 노트는 대부분 크기가 그대로지만, 작은 노트(작은 동이나 캇, 애드립, 폭탄, 모든 봉고 노트)는 큰 모습이 됩니다. 거대 노트는 훨씬 크고 천천히 흔들립니다. 각각 선택적인 시트가 있습니다.

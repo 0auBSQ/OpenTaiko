@@ -121,6 +121,18 @@ Graphics/5_Game/
 
 `Animation` 是一个档位列表。游戏使用玩家连击已达到的档位中 `FromCombo` 最高的那一个。一拍分为 4 段，`Rows` 给出每一段绘制的行；较短的列表会重复，因此 `[0, 1]` 每段交替，`[0]` 保持静止。连击达到某个档位后的约三分之二秒内，`RowsOnEntry` 代替 `Rows`。没有档位时，图集显示第一行。示例中的表就是游戏一直使用的动画，而设置中的简化模式会让每个图集都停在第一行。
 
+两个可选字段可以调整档位。`FromComboByDifficulty` 为部分难度设定档位的连击数，键为 `Easy`、`Normal`、`Hard`、`Extreme` 和 `ExtraExtreme`；其他难度使用 `FromCombo`，因此 `"FromCombo": 100, "FromComboByDifficulty": { "Easy": 30 }` 让档位在 Easy 中从 30 连击开始，在其他难度中从 100 开始。塔的谱面在 Normal 侧算作 Normal，在其他侧算作 Extreme；段位使用正在演奏的歌曲的难度。
+
+`RowsByNote` 为部分音符提供各自的 `Rows`，键为下表中的名称；其他音符保持 `Rows`。在 `Notes.png` 中，`"Rows": [0, 2], "RowsByNote": { "BigDon": [1, 2] }` 让除大咚以外的音符交替显示第 0 行和第 2 行，大咚则交替显示第 1 行和第 2 行。连打的身体和尾部跟随其头部，`RowsOnEntry` 仍然适用于所有音符。
+
+| 图集 | 音符名称 |
+| --- | --- |
+| `Notes.png`, 太鼓 | `Don`, `Ka`, `BigDon`, `BigKa`, `KaDon`, `ADLib` |
+| `Notes.png`, 邦戈 | `Red`, `Yellow`, `Pink`, `Clap`, `ADLib` |
+| `Rolls.png`, 太鼓 | `Roll`, `BigRoll` |
+| `Rolls.png`, 邦戈 | `RedRoll`, `PinkRoll`, `YellowRoll`, `ClapRoll` |
+| `Balloons.png` | `Balloon`, `Kusudama`, `FuseRoll` |
+
 ## 第 6 步：搭档音符与巨型音符
 
 搭档音符大多保持原有尺寸，但小音符（小咚或小咔、ADLib、炸弹、所有邦戈音符）会采用大的外观。巨型音符要大得多，并缓慢摇晃。两者各有一个可选图集：

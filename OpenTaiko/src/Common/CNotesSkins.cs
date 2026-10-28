@@ -105,19 +105,19 @@ internal static class CNotesSkins {
 		return File.Exists(preview) ? preview : Path.Combine(dir, kind is EKind.Judges ? "Judge.png" : "Notes.png");
 	}
 
-	// whether reaching this combo starts a sheet's entry rows somewhere
-	public static bool IsEntryCombo(int combo) {
+	// whether reaching this combo starts a sheet's entry rows somewhere, at this difficulty
+	public static bool IsEntryCombo(int combo, Difficulty difficulty) {
 		foreach (var def in new[] { Def(EGameType.Taiko), Def(EGameType.Konga) })
 			foreach (var sheet in new[] { def.Notes, def.Rolls, def.Balloons })
-				if (sheet.Animation.Any(t => t.FromCombo == combo && t.RowsOnEntry != null)) return true;
+				if (sheet.Animation.Any(t => t.FromComboAt(difficulty) == combo && t.RowsOnEntry != null)) return true;
 		return false;
 	}
 }
 
-/// <summary>The animation state of a player's notes: the combo, the step of the beat (0-3, 4 per beat) and whether
-/// the combo has just reached a tier with entry rows.</summary>
-internal readonly record struct CNoteAnim(int Combo, int Step, bool Entry) {
-	public static readonly CNoteAnim Still = new(0, 0, false);
+/// <summary>The animation state of a player's notes: the combo, the step of the beat (0-3, 4 per beat), whether
+/// the combo has just reached a tier with entry rows, and the difficulty whose tiers apply (Easy to Edit).</summary>
+internal readonly record struct CNoteAnim(int Combo, int Step, bool Entry, Difficulty Difficulty) {
+	public static readonly CNoteAnim Still = new(0, 0, false, Difficulty.Easy);
 }
 
 /// <summary>Definition.json of a notes pack.</summary>
@@ -178,26 +178,65 @@ internal class CSheetDef {
 	[JsonProperty("Animation")]
 	public List<CAnimTier> Animation { get; set; } = [];
 
-	/// <summary>The row to draw for an animation state.</summary>
-	public int Row(CNoteAnim anim) {
+	/// <summary>The row to draw for an animation state, for a note named as in <see cref="CAnimTier.RowsByNote"/>.</summary>
+	public int Row(CNoteAnim anim, string note) {
 		CAnimTier? tier = null;
-		foreach (var t in this.Animation)
-			if (anim.Combo >= t.FromCombo && (tier == null || t.FromCombo >= tier.FromCombo)) tier = t;
+		int tierFrom = 0;
+		foreach (var t in this.Animation) {
+			int from = t.FromComboAt(anim.Difficulty);
+			if (anim.Combo >= from && (tier == null || from >= tierFrom)) {
+				tier = t;
+				tierFrom = from;
+			}
+		}
 		if (tier == null) return 0;
-		int[] rows = (anim.Entry && tier.RowsOnEntry is { Length: > 0 } entry) ? entry : tier.Rows;
+		int[] rows = (anim.Entry && tier.RowsOnEntry is { Length: > 0 } entry) ? entry
+			: tier.RowsFor(note);
 		if (rows.Length == 0) return 0;
 		return Math.Clamp(rows[anim.Step % rows.Length], 0, Math.Max(0, this.Frames - 1));
 	}
 }
 
 /// <summary>From a combo on: the row of each step of the beat (4 steps per beat, the list repeats when shorter),
-/// and optionally the rows used just after the combo reaches it.</summary>
+/// optionally other rows for some notes, and the rows used just after the combo reaches it.</summary>
 internal class CAnimTier {
 	[JsonProperty("FromCombo")]
 	public int FromCombo { get; set; }
 
+	/// <summary>FromCombo for some difficulties, keyed Easy, Normal, Hard, Extreme or ExtraExtreme; the others use FromCombo.</summary>
+	[JsonProperty("FromComboByDifficulty")]
+	public Dictionary<string, int>? FromComboByDifficulty { get; set; }
+
+	public int FromComboAt(Difficulty difficulty) {
+		string key = difficulty switch {
+			Difficulty.Easy => "Easy",
+			Difficulty.Normal => "Normal",
+			Difficulty.Hard => "Hard",
+			Difficulty.Oni => "Extreme",
+			Difficulty.Edit => "ExtraExtreme",
+			_ => "",
+		};
+		if (this.FromComboByDifficulty != null)
+			foreach (var (name, combo) in this.FromComboByDifficulty)
+				if (string.Equals(name, key, StringComparison.OrdinalIgnoreCase)) return combo;
+		return this.FromCombo;
+	}
+
 	[JsonProperty("Rows")]
 	public int[] Rows { get; set; } = [0];
+
+	/// <summary>Rows for some notes, keyed by name. Notes.png: Don, Ka, BigDon, BigKa, KaDon, ADLib (Bongo: Red, Yellow,
+	/// Pink, Clap, ADLib). Rolls.png: Roll, BigRoll (Bongo: RedRoll, PinkRoll, YellowRoll, ClapRoll).
+	/// Balloons.png: Balloon, Kusudama, FuseRoll.</summary>
+	[JsonProperty("RowsByNote")]
+	public Dictionary<string, int[]>? RowsByNote { get; set; }
+
+	public int[] RowsFor(string note) {
+		if (this.RowsByNote != null)
+			foreach (var (name, rows) in this.RowsByNote)
+				if (string.Equals(name, note, StringComparison.OrdinalIgnoreCase)) return rows;
+		return this.Rows;
+	}
 
 	[JsonProperty("RowsOnEntry")]
 	public int[]? RowsOnEntry { get; set; }

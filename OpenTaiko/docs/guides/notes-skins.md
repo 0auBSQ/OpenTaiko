@@ -121,6 +121,18 @@ A judges pack holds `Judge.png`, 5 rows of the same height: Good, OK, Bad, ADLib
 
 `Animation` is a list of tiers. The game uses the tier with the highest `FromCombo` that the player's combo has reached. A beat has 4 steps, and `Rows` gives the row drawn at each step; a shorter list repeats, so `[0, 1]` alternates on every step and `[0]` stays still. `RowsOnEntry` replaces `Rows` for about two thirds of a second after the combo reaches that tier. Without tiers, the sheet shows its first row. The example's table is the animation the game has always used, and the simple mode of the settings keeps every sheet on its first row.
 
+Two optional fields adjust a tier. `FromComboByDifficulty` sets the tier's combo for some difficulties, keyed `Easy`, `Normal`, `Hard`, `Extreme` and `ExtraExtreme`; the other difficulties use `FromCombo`, so `"FromCombo": 100, "FromComboByDifficulty": { "Easy": 30 }` starts the tier at 30 combo in Easy and at 100 in the others. A Tower chart counts as Normal on its Normal side and as Extreme on its other sides, and a Dan uses the difficulty of the song being played.
+
+`RowsByNote` gives some notes their own `Rows`, keyed by the names below; the other notes keep `Rows`. In `Notes.png`, `"Rows": [0, 2], "RowsByNote": { "BigDon": [1, 2] }` alternates rows 0 and 2 on every note except the big Don, which alternates rows 1 and 2. A roll's body and tail follow its head, and `RowsOnEntry` still applies to every note.
+
+| Sheet | Note names |
+| --- | --- |
+| `Notes.png`, Taiko | `Don`, `Ka`, `BigDon`, `BigKa`, `KaDon`, `ADLib` |
+| `Notes.png`, Bongo | `Red`, `Yellow`, `Pink`, `Clap`, `ADLib` |
+| `Rolls.png`, Taiko | `Roll`, `BigRoll` |
+| `Rolls.png`, Bongo | `RedRoll`, `PinkRoll`, `YellowRoll`, `ClapRoll` |
+| `Balloons.png` | `Balloon`, `Kusudama`, `FuseRoll` |
+
 ## Step 6: Partner and giant notes
 
 A partner note keeps its size in most cases, but the small ones (a small Don or Ka, an ADLib, a bomb, every Bongo note) take a big look. A giant note is much larger and slowly wobbles. Each has its own optional sheet:
