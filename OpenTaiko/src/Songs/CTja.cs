@@ -235,7 +235,7 @@ internal class CTja : CActivity {
 		public double LevelDecimal = -1;   // the level as written, decimals kept; -1 when only Level is known
 		public int Difficulty;
 		[Obsolete("use List_DanSongs.Count")] public static int Number = 0;
-		public bool bTitleShow;
+		public bool bTitleShow; // true if hidden, false if shown
 		public Dan_C?[] Dan_C = new Dan_C?[CExamInfo.cMaxExam];
 
 		[NonSerialized]
@@ -275,12 +275,12 @@ internal class CTja : CActivity {
 		eBoth,
 	}
 
-	public static ESide strConvertSide(string str)
-		=> (int.TryParse(str, out int res) && Enum.IsDefined(typeof(ESide), res)) ? (ESide)res : str.ToLower() switch {
+	public static ESide strConvertSide(string strSide)
+		=> (int.TryParse(strSide, out int res) && Enum.IsDefined(typeof(ESide), res)) ? (ESide)res : strSide.ToLower() switch {
 			"normal" => ESide.eNormal,
 			"ex" or "extra" => ESide.eEx,
 			"both" => ESide.eBoth,
-			_ => throw new ArgumentOutOfRangeException(),
+			_ => throw new ArgumentOutOfRangeException(nameof(strSide), strSide, "Out of recognized values (Normal (0), Extra/Ex (1), Both (2))"),
 		};
 
 	public enum ETjaCompat {
@@ -418,8 +418,10 @@ internal class CTja : CActivity {
 	public double dbDTXVPlaySpeed;
 	public int nDemoBGMOffset;
 
-	private int nCurrentMeasureCount = 0; // 0: pre-#START, 1: post-#START
+	private int nCurrentMeasureCount = 0; // 0: pre-#START, >= 1: post-#START (reset and updated when parsing either player-side headers or notechart definition)
 	private int iNowMeasureAllBranches = 0;
+	private int iDivNowMeasure = 0; // only used for parsing warnings
+	private int? nDivsNowMeasure => divsPerMeasureAllBranches?[iNowMeasureAllBranches]; // unaccessible during parsing player-side headers
 
 	private int[] nNowRollCountBranch = new int[3] { -1, -1, -1 };
 
@@ -449,22 +451,14 @@ internal class CTja : CActivity {
 	public int nTotalMine;
 	public CChip[] pDan_LastChip;
 
-	private List<int> divsPerMeasureAllBranches = null!; // [iMeasureAllBranches]
+	private List<int>? divsPerMeasureAllBranches = null; // [iMeasureAllBranches] // null when parsing headers
 
 	// Difficulty.Total for the pre-COURSE: default scope
-	public int nowCourseScope = (int)Difficulty.Total;
+	// -1 for the inaccessible difficulty due to unrecognized argument to COURSE:
+	private int nowCourseScope = (int)Difficulty.Total;
 	public int nReferenceDifficulty {
-		get => (nowCourseScope >= (int)Difficulty.Total) ? 3 : nowCourseScope;
+		get => (nowCourseScope >= 0 && nowCourseScope < (int)Difficulty.Total) ? nowCourseScope : (int)Difficulty.Oni;
 		set => nowCourseScope = value;
-	}
-
-	public void ForEachCurrentCourseScope(Action<int> action) {
-		if (this.nowCourseScope != (int)Difficulty.Total) {
-			action(this.nowCourseScope);
-		} else {
-			for (int i = 0; i < (int)Difficulty.Total; ++i)
-				action(i);
-		}
 	}
 
 	public float fNow_Measure_s = 4.0f;
@@ -496,7 +490,7 @@ internal class CTja : CActivity {
 
 	//public Dictionary<double, CChip> kusudaMAP = new Dictionary<double, CChip>();
 
-	public bool usingLyricsFile; //If lyric file is used (VTT/LRC), ignore #LYRIC tags & do not parse other lyric file tags
+	public bool usingLyricsFile; //If lyric file is used (VTT/LRC), ignore #LYRIC commands & ignore other LYRICS:/LYRICFILE: headers
 
 	private int[] listBalloon_Branch_iLast; // [3] for common
 
@@ -575,12 +569,12 @@ internal class CTja : CActivity {
 	public CutSceneDef? CutSceneIntro;
 	public List<CutSceneDef> CutSceneOutros = [];
 
-	public static HGaugeMethods.EGaugeType? strConvertForceGauge(string str) => str.ToLower() switch {
+	public static HGaugeMethods.EGaugeType? strConvertForceGauge(string strGaugeType) => strGaugeType.ToLower() switch {
 		"none" => null,
 		"normal" => HGaugeMethods.EGaugeType.NORMAL,
 		"hard" => HGaugeMethods.EGaugeType.HARD,
 		"extreme" => HGaugeMethods.EGaugeType.EXTREME,
-		_ => throw new ArgumentOutOfRangeException(),
+		_ => throw new ArgumentOutOfRangeException(nameof(strGaugeType), strGaugeType, "Out of recognized values (None, Normal, Hard, Extreme)"),
 	};
 
 	public HGaugeMethods.EGaugeType? forceGauge = null;
@@ -591,11 +585,11 @@ internal class CTja : CActivity {
 		Fatal,
 	}
 
-	public static EBoomRule strConvertBoomRule(string str) => str.ToLower() switch {
+	public static EBoomRule strConvertBoomRule(string strBoomRule) => strBoomRule.ToLower() switch {
 		"scal" => EBoomRule.Scal,
 		"ratio" => EBoomRule.Ratio,
 		"fatal" => EBoomRule.Fatal,
-		_ => throw new ArgumentOutOfRangeException(),
+		_ => throw new ArgumentOutOfRangeException(nameof(strBoomRule), strBoomRule, "Out of recognized values (Scal, Ratio, Fatal)"),
 	};
 
 	public EBoomRule boomRule = EBoomRule.Scal;
@@ -1255,15 +1249,17 @@ internal class CTja : CActivity {
 									chip.dbSoundTimems += this.msOFFSET_Abs;
 
 								#region[listlyric2の時間合わせ]
-								// has #NEXTSONG -> skip WAVE: (if exist)
-								bool skipWave = (this.strBGM_PATH != null) && (List_DanSongs.Count > 0);
-								int lyricFileIndex = chip.nIntValue_InternalNumber - (skipWave ? 2 : 1);
-								int idxStart = this.IdxLyric2AtSongEnds.ElementAtOrDefault(lyricFileIndex - 1);
-								int idxEnd = this.IdxLyric2AtSongEnds.ElementAtOrDefault(lyricFileIndex);
-								for (int ind = idxStart; ind < idxEnd; ind++) {
-									STLYRIC lyrictmp = this.listLyric2[ind];
-									lyrictmp.Time = origListLyricTime[ind].SaturatingAdd(chip.nSoundTimems);
-									this.listLyric2[ind] = lyrictmp;
+								if (this.IdxLyric2AtSongEnds.Count > 0) {
+									// has #NEXTSONG -> skip WAVE: (if exist)
+									bool skipWave = (this.strBGM_PATH != null) && (List_DanSongs.Count > 0);
+									int lyricFileIndex = Math.Clamp(chip.nIntValue_InternalNumber - (skipWave ? 2 : 1), 0, this.IdxLyric2AtSongEnds.Count - 1);
+									int idxStart = this.IdxLyric2AtSongEnds[Math.Max(0, lyricFileIndex - 1)];
+									int idxEnd = this.IdxLyric2AtSongEnds[lyricFileIndex];
+									for (int ind = idxStart; ind < idxEnd; ind++) {
+										STLYRIC lyrictmp = this.listLyric2[ind];
+										lyrictmp.Time = origListLyricTime[ind].SaturatingAdd(chip.nSoundTimems);
+										this.listLyric2[ind] = lyrictmp;
+									}
 								}
 								#endregion
 								continue;
@@ -1594,19 +1590,20 @@ internal class CTja : CActivity {
 					eol = courseSections[n].Length;
 
 				string strCourse = courseSections[n].Substring(valueStart, eol - valueStart);
-				int nCourseConverted = this.strConvertCourse(strCourse);
-				if (nCourseConverted >= 0)
-					nCourse = nCourseConverted;
+				try {
+					nCourse = strConvertCourse(strCourse);
+				} catch (ArgumentOutOfRangeException) {
+					nCourse = -1; // TaikoJiro 1 compatibility: unknown difficulties becomes inaccessible
+					// already warned at TryParseGlobalHeader()
+				}
 			}
-			strCourseTJA[nCourse] ??= "";
-			strCourseTJA[nCourse] += courseSections[n];
+			if (nCourse >= 0) {
+				strCourseTJA[nCourse] ??= "";
+				strCourseTJA[nCourse] += courseSections[n];
+			}
 		}
 
 		return strCourseTJA;
-	}
-
-	public int nInstanceDifficulty {
-		get => this.nReferenceDifficulty;
 	}
 
 	/// <summary>
@@ -1667,7 +1664,7 @@ internal class CTja : CActivity {
 			//ここで1行の文字数をカウント。配列にして返す。
 			int divPerMeasure = 0;
 			try {
-				foreach ((string part, bool forCurrentPlayerSide) in new []{ (strUpperHeaders, false), (strCourse, true) }) {
+				foreach ((string part, bool forCurrentPlayerSide) in new[] { (strUpperHeaders, false), (strCourse, true) }) {
 					using StringReader reader = new(part);
 					for (string? line; (line = reader.ReadLine()) != null;) {
 						if (!String.IsNullOrEmpty(line)) {
@@ -1676,13 +1673,14 @@ internal class CTja : CActivity {
 					}
 				}
 
+				this.divsPerMeasureAllBranches = new List<int>();
 				{
 					using StringReader reader = new(strCourse);
 					for (string? line; (line = reader.ReadLine()) != null;) {
 						line = RemoveCommandFromTJALine(line, 0);
 						if (String.IsNullOrEmpty(line))
 							continue;
-						if (line.IndexOf(',', 0) == -1 && !String.IsNullOrEmpty(line)) {
+						if (!line.Contains(',') && !String.IsNullOrEmpty(line)) {
 							divPerMeasure += line.Count(char.IsAsciiLetterOrDigit);
 						} else {
 							this.divsPerMeasureAllBranches.Add(divPerMeasure + line.Count(char.IsAsciiLetterOrDigit));
@@ -1734,12 +1732,34 @@ internal class CTja : CActivity {
 		new Regex(@"^(#[A-Z]+)(?:\s?)(.+?)?$", RegexOptions.Compiled);
 
 	private static readonly Regex FormatExceptionMessageRegex =
-		new Regex(@"^The input string '(.*)' was not in a correct format.$", RegexOptions.Compiled);
+		new Regex(@"^The input string '(.*?)' was not in a correct format\.", RegexOptions.Compiled);
 
-	private static string GetTjaErrorReason(Exception ex) {
+	private static readonly Regex ArgumentOutOfRangeExceptionRegex =
+		new Regex(@"^(.*?)(?: \(Parameter '(.*?)'\))?\r?\nActual value was (.*?)\.(?!\S)", RegexOptions.Compiled); // allow the value to have inner dots (.) not before inner-spaces
+
+	private static string GetTjaErrorReason(Exception? ex, bool noArgName = false, bool noArgValue = false) {
 		switch (ex) {
+			case null:
+				return "";
+			case NthArgError:
+				return GetTjaErrorReason(ex.InnerException, noArgName, noArgValue);
 			case IndexOutOfRangeException:
 				return "Too few arguments";
+			case ArgumentOutOfRangeException: {
+					if (noArgName || noArgValue) {
+						var match = ArgumentOutOfRangeExceptionRegex.Match(ex.Message);
+						if (match.Success) {
+							StringBuilder sb = new();
+							sb.Append(match.Groups[1].ToString());
+							if (!noArgName)
+								sb.Append($" (Parameter '{match.Groups[2].ToString()}')");
+							if (!noArgValue)
+								sb.Append($": [{match.Groups[3]}]");
+							return sb.ToString();
+						}
+					}
+					return ex.Message;
+				}
 			case FormatException: {
 					string? expectedType = null;
 					if (ex.TargetSite?.Name == "ParseComplex") {
@@ -1755,7 +1775,7 @@ internal class CTja : CActivity {
 					} else {
 						sb.Append("Bad format");
 					}
-					if (match.Success) {
+					if (!noArgValue && match.Success) {
 						sb.Append($": [{match.Groups[1]}]");
 					}
 					return sb.ToString();
@@ -1766,17 +1786,88 @@ internal class CTja : CActivity {
 		}
 	}
 
-	private void AddWarn(string msg, Exception? ex = null) {
-		LogNotification.PopWarning($"[{strFileName}]: {msg}");
-		if (ex != null)
-			Trace.TraceWarning($"TJA file: '{strFullPath}', at {(Difficulty)this.nReferenceDifficulty}, line {nNowReadLine}, Error: {ex.ToString()}");
+	private void AddWarn(string msg, Exception? ex = null, string? input = null) {
+		StringBuilder sb = new($"[{strFileName}]: {msg}");
+		if (this.nCurrentMeasureCount > 0) { // post-#START
+			sb.Append(" | ");
+			if (!this.IsEndedBranching)
+				sb.Append($"Branch {this.nCurrentCourse}, ");
+			sb.Append($"Measure {this.nCurrentMeasureCount}");
+			var nDivs = nDivsNowMeasure;
+			if (nDivs != null) // parsing notechart definition
+				sb.Append($", Division {this.iDivNowMeasure + 1}/{nDivs}");
+		}
+		if (!string.IsNullOrEmpty(input))
+			sb.Append($" | Input: [{input}]");
+		LogNotification.PopWarning(sb.ToString());
+		Trace.TraceWarning($"TJA file: '{strFullPath}', at {(Difficulty)this.nReferenceDifficulty}, line {nNowReadLine}" + ((ex == null) ? "" : $", Error: {ex.ToString()}"));
 	}
-	private void AddCommandError(string command, string argument, string reason, Exception? ex = null) {
-		this.AddWarn($"Bad {command} arguments: [{argument}]: {reason}", ex);
+
+	private static string FormatArgumentName(int? argIdx, string? argName)
+		=> (argIdx == null ? "" : $" {argIdx + 1}")
+			+  (string.IsNullOrEmpty(argName) ? "" : $" ({argName})");
+	private static string FormatReasons(Exception? ex, string? reason, string? argumentFull, bool noArgName = false, bool noArgValue = false)
+		=> string.Join(" | ", new[] {
+			GetTjaErrorReason(ex, noArgName, noArgValue),
+			reason,
+			(argumentFull == null) ? null : $"Full arguments: [{argumentFull}]",
+		}.Where(x => !string.IsNullOrEmpty(x)));
+	private void AddCommandError(string command, string? arg, string? reason = null, Exception? ex = null, int? idxArg = null, string? argName = null, string? argsFull = null)
+		=> AddWarn($"Bad {command} argument{FormatArgumentName(idxArg, argName)}: [{arg}]: {FormatReasons(ex, reason, argsFull, argName != null, arg != null)}", ex);
+
+	private void AddArgError(string command, string argName, string argValue, string? reason = null, Exception? ex = null)
+		=> AddCommandError(command, argValue, reason, ex, argName: argName);
+	private void AddArgError(string command, string? argsFull, int idxArg, string? argName, string argValue, string? reason = null, Exception? ex = null)
+		=> AddCommandError(command, argValue, reason, ex, idxArg: idxArg, argName: argName, argsFull: argsFull);
+	private void AddArgError(NthArgError ex)
+		=> AddCommandError(ex.Command, ex.ArgValue, ex.Reason, ex.InnerException, idxArg: ex.idxArgument, argName: ex.ArgName, argsFull: ex.ArgsFull);
+
+	[Serializable]
+	public class NthArgError : Exception {
+		public string Command;
+		public string? ArgsFull = null;
+		public int? idxArgument = null;
+		public string? ArgName = null, ArgValue = null;
+		public string Reason;
+
+		public NthArgError(string command, string? argValue, string? argName, string reason = "", Exception? innerException = null) : base("", innerException) {
+			this.Command = command;
+			this.ArgName = argName;
+			this.ArgValue = argValue;
+			this.Reason = reason;
+		}
+		public NthArgError(string command, string? argsFull, int? idxArg, string? argName, string? argValue, string reasonExtra = "", Exception? innerException = null) : base("", innerException) {
+			this.Command = command;
+			this.ArgsFull = argsFull;
+			this.idxArgument = idxArg;
+			this.ArgName = argName;
+			this.ArgValue = argValue;
+			this.Reason = reasonExtra;
+		}
 	}
-	private void AddCommandError(string command, string argument, Exception ex) {
-		this.AddWarn($"Bad {command} arguments: [{argument}]: {GetTjaErrorReason(ex)}", ex);
+
+	private static void ParseArg(string command, string? argsFull, int? idxArg, ReadOnlySpan<string> argValues, string argName, Action<string> parseAndSet, string reasonFail = "") {
+		string? argValue = null;
+		try {
+			argValue = argValues[idxArg ?? 0];
+			parseAndSet(argValue);
+		} catch (Exception ex) {
+			throw new NthArgError(command, argsFull, idxArg, argName, argValue, reasonFail, ex);
+		}
 	}
+	private static void ParseArg(string command, string argValue, string argName, Action<string> parseAndSet, string reasonFail = "")
+		=> ParseArg(command, null, null, [argValue], argName, parseAndSet, reasonFail);
+	private static void ParseArg(string command, string argsFull, ReadOnlySpan<string> argValues, int idxArg, string argName, Action<string> parseAndSet, string reasonFail = "")
+		=> ParseArg(command, argsFull, idxArg, argValues, argName, parseAndSet, reasonFail);
+
+	private void TryArg(Action action) {
+		try {
+			action();
+		} catch (NthArgError ex) {
+			this.AddArgError(ex);
+		}
+	}
+
 
 	public static string[] SplitComma(string input) {
 		var result = new List<string>();
@@ -1816,7 +1907,7 @@ internal class CTja : CActivity {
 
 		// For handling arguments ending in a ` `-or-`,`-containing string, use argumentFull
 
-		//命令の最後に,が残ってしまっているときの対応
+		// remove trailing whitespaces and commas
 		argument = argumentFull.TrimEnd([',', ' ']);
 		return true;
 		#endregion
@@ -1828,8 +1919,10 @@ internal class CTja : CActivity {
 
 		try {
 			this.ParseCommand(command, argument, argumentFull);
+		} catch (NthArgError ex) {
+			this.AddArgError(ex);
 		} catch (Exception ex) {
-			this.AddCommandError(command, argumentFull, ex);
+			this.AddCommandError(command, argumentFull, ex: ex);
 		}
 	}
 
@@ -1843,7 +1936,8 @@ internal class CTja : CActivity {
 		} else if (command == "#END") {
 			// handled at end of input
 		} else if (command == "#BPMCHANGE") {
-			double dbBPM = argument.ParseReal();
+			double dbBPM = 0;
+			ParseArg(command, argument, "bpm_real", arg => dbBPM = arg.ParseReal());
 			this.dbNowBPM = dbBPM;
 
 			if (dbBPM > MaxBPM) {
@@ -1869,10 +1963,12 @@ internal class CTja : CActivity {
 			double[] dbComplexNum = new double[2];
 			//2016.08.13 kairera0467 複素数スクロールもどきのテスト
 			//iが入っていた場合、複素数スクロールとみなす。
-			if (argument.IndexOf('i') != -1)
-				this.tParsedComplexNumber(argument, ref dbComplexNum);
-			else
-				dbComplexNum[0] = argument.ParseReal();
+			ParseArg(command, argument, "rate_complex", arg => {
+				if (arg.Contains('i'))
+					this.tParsedComplexNumber(arg, ref dbComplexNum);
+				else
+					dbComplexNum[0] = arg.ParseReal();
+			});
 
 			this.dbNowScroll = new(dbComplexNum[0], dbComplexNum[1]);
 
@@ -1891,20 +1987,22 @@ internal class CTja : CActivity {
 			// with #MEASURE x×measure would, without their 0 or infinite BPM; a complex x turns the direction of
 			// every note, on top of each note's own #SCROLL
 			double[] dbHiSpeed = new double[2];
-			if (argument.IndexOf('i') != -1)
-				this.tParsedComplexNumber(argument, ref dbHiSpeed);
-			else
-				dbHiSpeed[0] = argument.ParseReal();
+			ParseArg(command, argument, "rate_complex", arg => {
+				if (argument.Contains('i'))
+					this.tParsedComplexNumber(arg, ref dbHiSpeed);
+				else
+					dbHiSpeed[0] = arg.ParseReal();
+			});
 			this.dbNowHiSpeed = new(dbHiSpeed[0], dbHiSpeed[1]);
 
 			this.SetBPMPointAtDefCursor(EBPMPointType.HiSpeed);
 		} else if (command == "#MEASURE") {
-			var strArray = argument.Split(new char[] { '/' });
-			WarnSplitLength("#MEASURE subsplit", strArray, 2);
-
 			double[] dbLength = new double[2];
-			dbLength[0] = strArray[0].ParseReal();
-			dbLength[1] = strArray[1].ParseReal();
+			ParseArg(command, argument, "timeSignature_fractionReal", arg => {
+				var strArray = arg.Split(new char[] { '/' }, 2);
+				dbLength[0] = strArray[0].ParseReal();
+				dbLength[1] = strArray[1].ParseReal();
+			});
 
 			double dbMeasureLengthScale = dbLength[0] / dbLength[1];
 			this.fNow_Measure_m = (float)dbLength[1];
@@ -1914,7 +2012,8 @@ internal class CTja : CActivity {
 
 			this.listChip.Add(this.NewEventChipAtDefCursor(0x02, 1, argDb: dbMeasureLengthScale));
 		} else if (command == "#DELAY") {
-			double nDELAY = argument.ParseReal();
+			double nDELAY = 0;
+			ParseArg(command, argument, "secDelay_real", arg => nDELAY = arg.ParseReal());
 			nDELAY *= 1000;
 			if (this.COMPAT is ETjaCompat.Jiro1 or ETjaCompat.Jiro2) {
 				nDELAY = Math.Truncate(nDELAY);
@@ -1979,55 +2078,49 @@ internal class CTja : CActivity {
 			this.listChip.Add(this.NewEventChipAtDefCursor(0x9F, 1));
 		} else if (command == "#BGAON") {
 			var commandData = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-			string listvdIndex = commandData[0];
-			var bgaStartTime = commandData[1];
-			int index = (10 * int.Parse(listvdIndex[0].ToString())) + int.Parse(listvdIndex[1].ToString()) + 2;
+			int index = 2;
+			ParseArg(command, argument, commandData, 0, "indexBGA_2digits", arg => index = strConvertBGAIndex(arg) + 2);
 
 			var chip = this.NewEventChipAtDefCursor(0x54, index, index);
-			chip.VideoStartTimeMs = (int)(bgaStartTime.ParseRealF() * 1000);
+			ParseArg(command, argument, commandData, 1, "msSeek_real", arg => chip.VideoStartTimeMs = (int)(arg.ParseRealF() * 1000));
 			this.listChip.Add(chip);
 		} else if (command == "#BGAOFF") {
-			int index = (10 * int.Parse(argument[0].ToString())) + int.Parse(argument[1].ToString()) + 2;
+			int index = 2;
+			ParseArg(command, argument, "indexBGA_2digits", arg => index = strConvertBGAIndex(arg.Trim()) + 2);
 			this.listChip.Add(this.NewEventChipAtDefCursor(0x55, index, index));
 		} else if (command == "#CAMVMOVESTART") {
 			//starts vertical camera moving: <start x> to <end y>
-			this.ParseArgCamStartCommand(command, argument, 0xA0, ref this.currentCamVMoveChip,
-				"#CAMVMOVEEND");
+			this.ParseArgCamStartCommand(command, argument, 0xA0, ref this.currentCamVMoveChip, "#CAMVMOVEEND");
 		} else if (command == "#CAMVMOVEEND") {
 			//ends vertical camera moving
 			this.ParseArgCamEndCommand(command, argument, 0xA1, ref this.currentCamVMoveChip, "#CAMVMOVESTART");
 		} else if (command == "#CAMHMOVESTART") {
 			//starts horizontal camera moving: <start x> to <end x>
-			this.ParseArgCamStartCommand(command, argument, 0xA2, ref this.currentCamHMoveChip,
-				"#CAMHMOVEEND");
+			this.ParseArgCamStartCommand(command, argument, 0xA2, ref this.currentCamHMoveChip, "#CAMHMOVEEND");
 		} else if (command == "#CAMHMOVEEND") {
 			//ends horizontal camera moving
 			this.ParseArgCamEndCommand(command, argument, 0xA3, ref this.currentCamHMoveChip, "#CAMHMOVESTART");
 		} else if (command == "#CAMZOOMSTART") {
 			//starts zooming in/out the screen: <start value> to <end value>
-			this.ParseArgCamStartCommand(command, argument, 0xA4, ref this.currentCamZoomChip,
-				"#CAMZOOMEND");
+			this.ParseArgCamStartCommand(command, argument, 0xA4, ref this.currentCamZoomChip, "#CAMZOOMEND");
 		} else if (command == "#CAMZOOMEND") {
 			//stops zooming
 			this.ParseArgCamEndCommand(command, argument, 0xA5, ref this.currentCamZoomChip, "#CAMZOOMSTART");
 		} else if (command == "#CAMROTATIONSTART") {
 			//starts rotating the screen: <start degrees> to <end degrees>
-			this.ParseArgCamStartCommand(command, argument, 0xA6, ref this.currentCamRotateChip,
-				"#CAMROTATIONEND");
+			this.ParseArgCamStartCommand(command, argument, 0xA6, ref this.currentCamRotateChip, "#CAMROTATIONEND");
 		} else if (command == "#CAMROTATIONEND") {
 			//stops screen rotation
 			this.ParseArgCamEndCommand(command, argument, 0xA7, ref this.currentCamRotateChip, "#CAMROTATIONSTART");
 		} else if (command == "#CAMVSCALESTART") {
 			//starts rotating the screen: <start degrees> to <end degrees>
-			this.ParseArgCamStartCommand(command, argument, 0xA8, ref this.currentCamVScaleChip,
-				"#CAMVSCALEEND");
+			this.ParseArgCamStartCommand(command, argument, 0xA8, ref this.currentCamVScaleChip, "#CAMVSCALEEND");
 		} else if (command == "#CAMVSCALEEND") {
 			//ends vertical camera scaling
 			this.ParseArgCamEndCommand(command, argument, 0xA9, ref this.currentCamVScaleChip, "#CAMVSCALESTART");
 		} else if (command == "#CAMHSCALESTART") {
 			//starts horizontal camera scale changing: <start scale> to <end scale>
-			this.ParseArgCamStartCommand(command, argument, 0xB0, ref this.currentCamHScaleChip,
-				"#CAMHSCALEEND");
+			this.ParseArgCamStartCommand(command, argument, 0xB0, ref this.currentCamHScaleChip, "#CAMHSCALEEND");
 		} else if (command == "#CAMHSCALEEND") {
 			//ends horizontal camera scaling
 			this.ParseArgCamEndCommand(command, argument, 0xB1, ref this.currentCamHScaleChip, "#CAMHSCALESTART");
@@ -2037,7 +2130,11 @@ internal class CTja : CActivity {
 			var chip = this.NewEventChipAtDefCursor(0xB2, 1);
 
 			string[] args = argument.Split(',');
-			chip.borderColor = new Color4(args[0].ParseRealF() / 255, args[1].ParseRealF() / 255, args[2].ParseRealF() / 255, 1f);
+			float r = 0, g = 0, b = 0;
+			ParseArg(command, argument, args, 0, "red255_real", arg => r = arg.ParseRealF());
+			ParseArg(command, argument, args, 1, "green255_real", arg => g = arg.ParseRealF());
+			ParseArg(command, argument, args, 2, "blue255_real", arg => b = arg.ParseRealF());
+			chip.borderColor = new Color4(r / 255, g / 255, b / 255, 1f);
 
 			// チップを配置。
 			this.listChip.Add(chip);
@@ -2062,7 +2159,7 @@ internal class CTja : CActivity {
 		} else if (command == "#CAMRESET") {
 			//resets camera properties
 			var chip = this.NewEventChipAtDefCursor(0xB9, 1);
-			chip.strObjEaseType = "IN_OUT";
+			chip.objEaseType = Easing.PointType.InOut;
 			this.listChip.Add(chip);
 		} else if (command == "#ENABLEDORON") {
 			this.listChip.Add(this.NewEventChipAtDefCursor(0xBA, 1));
@@ -2072,11 +2169,11 @@ internal class CTja : CActivity {
 			//adds object
 			var chip = this.NewEventChipAtDefCursor(0xBC, 1);
 
-			string[] args = argumentFull.Split(',');
+			string[] args = argumentFull.Split(',', StringSplitOptions.TrimEntries);
 
-			chip.strObjName = args[0];
-			chip.fObjX = args[1].ParseRealF();
-			chip.fObjY = args[2].ParseRealF();
+			ParseArg(command, argument, args, 0, "strObjName", arg => ArgumentException.ThrowIfNullOrEmpty(chip.strObjName = arg));
+			ParseArg(command, argument, args, 1, "pxX_real", arg => chip.fObjX = arg.ParseRealF());
+			ParseArg(command, argument, args, 2, "pxY_real", arg => chip.fObjY = arg.ParseRealF());
 			var txPath = this.strFolderPath + args[3];
 			Trace.TraceInformation("" + this.bLoadChart);
 			if (this.bLoadChart) {
@@ -2089,7 +2186,7 @@ internal class CTja : CActivity {
 		} else if (command == "#REMOVEOBJECT") {
 			//removes object
 			var chip = this.NewEventChipAtDefCursor(0xBD, 1);
-			chip.strObjName = argument;
+			ParseArg(command, argument, "strObjName", arg => ArgumentException.ThrowIfNullOrEmpty(chip.strObjName = arg.Trim()));
 			this.listChip.Add(chip);
 		} else if (command == "#OBJVMOVESTART") {
 			//starts vertical object movement: <start y> to <end y>
@@ -2123,8 +2220,12 @@ internal class CTja : CActivity {
 			var chip = this.NewEventChipAtDefCursor(0xCA, 1);
 
 			string[] args = argument.Split(',');
-			chip.strObjName = args[0];
-			chip.borderColor = new Color4(args[1].ParseRealF() / 255, args[2].ParseRealF() / 255, args[3].ParseRealF() / 255, 1f);
+			ParseArg(command, argument, args, 0, "strObjName", arg => ArgumentException.ThrowIfNullOrEmpty(chip.strObjName = arg));
+			float r = 0, g = 0, b = 0;
+			ParseArg(command, argument, args, 1, "red255_real", arg => r = arg.ParseRealF());
+			ParseArg(command, argument, args, 2, "green255_real", arg => g = arg.ParseRealF());
+			ParseArg(command, argument, args, 3, "blue255_real", arg => b = arg.ParseRealF());
+			chip.borderColor = new Color4(r / 255, g / 255, b / 255, 1f);
 
 			// チップを配置。
 			this.listChip.Add(chip);
@@ -2144,10 +2245,11 @@ internal class CTja : CActivity {
 			var chip = this.NewEventChipAtDefCursor(0xD1, 1);
 
 			string[] args = argumentFull.Split(',');
-			chip.strTargetTxName = args[0]
-				.Replace('/', Path.DirectorySeparatorChar)
-				.Replace('\\', Path.DirectorySeparatorChar);
-			chip.strNewPath = this.strFolderPath + args[1];
+			ParseArg(command, argument, args, 0, "pathTextureDefault",
+				arg => ArgumentException.ThrowIfNullOrEmpty(chip.strTargetTxName = arg
+					.Replace('/', Path.DirectorySeparatorChar)
+					.Replace('\\', Path.DirectorySeparatorChar)));
+			ParseArg(command, argument, args, 1, "pathTextureOverride", arg => chip.strNewPath = string.IsNullOrEmpty(arg) ? arg : this.strFolderPath + arg);
 
 			if (this.bLoadChart) {
 				if (!this.listOriginalTextures.ContainsKey(chip.strTargetTxName)) {
@@ -2164,47 +2266,53 @@ internal class CTja : CActivity {
 			this.listChip.Add(chip);
 		} else if (command == "#RESETTEXTURE") {
 			var chip = this.NewEventChipAtDefCursor(0xD2, 1);
-			chip.strTargetTxName = argument
-				.Replace('/', Path.DirectorySeparatorChar)
-				.Replace('\\', Path.DirectorySeparatorChar);
+			ParseArg(command, argument, "pathTextureDefault",
+				arg => ArgumentException.ThrowIfNullOrEmpty(chip.strTargetTxName = arg
+					.Replace('/', Path.DirectorySeparatorChar)
+					.Replace('\\', Path.DirectorySeparatorChar)));
 			this.listChip.Add(chip);
 		} else if (command == "#SETCONFIG") {
 			var chip = this.NewEventChipAtDefCursor(0xD3, 1);
-			chip.strConfigValue = argument;
+			ParseArg(command, argument, "keyEqualValue_str", arg => {
+				string[] split = arg.Split('=', 2, StringSplitOptions.TrimEntries);
+				if (split.Length < 2 || string.IsNullOrEmpty(split[0]))
+					throw new FormatException($"The input string '{arg}' was not in a correct format. Expected 'key=value'");
+				chip.strConfigValue = arg;
+			});
 			this.listChip.Add(chip);
 		} else if (command == "#OBJANIMSTART") {
 			var chip = this.NewEventChipAtDefCursor(0xD4, 1);
 
-			string[] args = argument.Split(',');
-			chip.strObjName = args[0];
-			chip.dbAnimInterval = args[1].ParseReal();
+			string[] args = argument.Split(',', StringSplitOptions.TrimEntries);
+			ParseArg(command, argument, args, 0, "strObjName", arg => ArgumentException.ThrowIfNullOrEmpty(chip.strObjName = arg));
+			ParseArg(command, argument, args, 1, "msFrameDuration_real", arg => chip.dbAnimInterval = arg.ParseReal());
 
 			// チップを配置。
 			this.listChip.Add(chip);
 		} else if (command == "#OBJANIMSTARTLOOP") {
 			var chip = this.NewEventChipAtDefCursor(0xD5, 1);
 
-			string[] args = argument.Split(',');
-			chip.strObjName = args[0];
-			chip.dbAnimInterval = args[1].ParseReal();
+			string[] args = argument.Split(',', StringSplitOptions.TrimEntries);
+			ParseArg(command, argument, args, 0, "strObjName", arg => ArgumentException.ThrowIfNullOrEmpty(chip.strObjName = arg));
+			ParseArg(command, argument, args, 1, "msFrameDuration_real", arg => chip.dbAnimInterval = arg.ParseReal());
 
 			// チップを配置。
 			this.listChip.Add(chip);
 		} else if (command == "#OBJANIMEND") {
 			var chip = this.NewEventChipAtDefCursor(0xD6, 1);
-			chip.strObjName = argument;
+			ParseArg(command, argument, "strObjName", arg => ArgumentException.ThrowIfNullOrEmpty(chip.strObjName = arg.Trim()));
 			this.listChip.Add(chip);
 		} else if (command == "#OBJFRAME") {
 			var chip = this.NewEventChipAtDefCursor(0xD7, 1);
 
-			string[] args = argument.Split(',');
-			chip.strObjName = args[0];
-			chip.intFrame = int.Parse(args[1]);
+			string[] args = argument.Split(',', StringSplitOptions.TrimEntries);
+			ParseArg(command, argument, args, 0, "strObjName", arg => ArgumentException.ThrowIfNullOrEmpty(chip.strObjName = arg));
+			ParseArg(command, argument, args, 1, "idxFrame_int", arg => chip.intFrame = int.Parse(arg));
 
 			// チップを配置。
 			this.listChip.Add(chip);
 		} else if (command == "#GAMETYPE") {
-			this.nowGameType = strConvertGameType(argument);
+			ParseArg(command, argument, "enumGameType_str", arg => this.nowGameType = strConvertGameType(arg));
 			this.listChip.Add(this.NewEventChipAtDefCursor(0xD8, 1));
 		} else if (command == "#SPLITLANE") {
 			this.listChip.Add(this.NewEventChipAtDefCursor(0xD9, 1));
@@ -2223,10 +2331,6 @@ internal class CTja : CActivity {
 			this.PlayerSideMetadata.bHasBranch = true;
 			this.GotoBranchEnd();
 
-			//条件数値。
-			string strCond = "";
-			double[] nNum = new double[2];
-
 			//名前と条件Aの間に,が無いと正常に動作しなくなる.2020.04.23.akasoko26
 			// insert comma (,) between condition type and value if not exists
 			argument = Regex.Replace(argument, @"(?<=^\s*[a-zA-Z]+)\s*(?=\d)", ",");
@@ -2235,64 +2339,84 @@ internal class CTja : CActivity {
 			var (eType, eBig) = (Exam.Type.None, EBranchCondBig.Both);
 			var eRange = CTExprRange.MoreOrEqual;
 
+			double[] nNum = new double[2];
 			string? pendingLcKey = null, pendingLt1Key = null, pendingLt2Key = null;
 			if (!string.IsNullOrWhiteSpace(argument)) {
 				var arguments = argument.Split(',', StringSplitOptions.TrimEntries);
 				try {
-					strCond = arguments[0];
+					string strCond = "";
+					string strCondArg = "";
+					ParseArg(command, argument, arguments, 0, "enumCondition_str", arg => {
+						var parts = arg.Split(':', 2, StringSplitOptions.TrimEntries);
+						strCond = parts[0];
+						if (parts.Length > 1)
+							strCondArg = parts[1];
+					});
 
-					if (strCond.StartsWith("lc:", StringComparison.OrdinalIgnoreCase) && arguments.Length >= 3) {
+					if (strCond.Equals("lc", StringComparison.OrdinalIgnoreCase)) {
 						// Local counter branch: #BRANCHSTART lc:key,v1,v2[,op]
-						pendingLcKey = strCond[3..].Trim();
-						nNum[0] = arguments[1].ParseReal();
-						nNum[1] = arguments[2].ParseReal();
+						ParseArg(command, argument, arguments, 0, "keyLocalCounter_str", arg => {
+							if (string.IsNullOrEmpty(strCondArg))
+								throw new FormatException($"The input string '{arg}' was not in a correct format. Expected 'lc:key'");
+							pendingLcKey = strCondArg;
+						});
+						ParseArg(command, argument, arguments, 1, "valueExpert_real", arg => nNum[0] = arg.ParseReal());
+						ParseArg(command, argument, arguments, 2, "valueMaster_real", arg => nNum[1] = arg.ParseReal());
 						(eType, eBig) = (Exam.Type.LocalCounter, EBranchCondBig.Both);
-						eRange = arguments.Length > 3 ? arguments[3] switch {
-							"<"  or "l"  => CTExprRange.Less,
-							">"          => CTExprRange.More,
-							"==" or "eq" => CTExprRange.Equal,
-							"!=" or "ne" => CTExprRange.NotEqual,
-							"<=" or "le" => CTExprRange.LessOrEqual,
-							">=" or "m" or "me" or "" => CTExprRange.MoreOrEqual,
-							_ => CTExprRange.MoreOrEqual,
-						} : CTExprRange.MoreOrEqual;
+						eRange = CTExprRange.MoreOrEqual;
+						if (arguments.Length > 3) {
+							ParseArg(command, argument, arguments, 3, "enumRequireRange_str", arg => eRange = arg switch {
+								"<" or "l" => CTExprRange.Less,
+								">" => CTExprRange.More,
+								"==" or "eq" => CTExprRange.Equal,
+								"!=" or "ne" => CTExprRange.NotEqual,
+								"<=" or "le" => CTExprRange.LessOrEqual,
+								">=" or "m" or "me" => CTExprRange.MoreOrEqual,
+								_ => throw new ArgumentOutOfRangeException("strRange", arg, "Specified an out-of-recognized value (l/<, le/<=, eq/==, m/me/>=, >, ne/!=)"),
+							});
+						}
 					} else if (strCond.Equals("lt", StringComparison.OrdinalIgnoreCase)) {
 						// Local trigger branch: #BRANCHSTART lt,expertTrigger,masterTrigger
-						pendingLt1Key = arguments.Length > 1 ? arguments[1] : "";
-						pendingLt2Key = arguments.Length > 2 ? arguments[2] : "";
+						ParseArg(command, argument, arguments, 1, "keyLocalTriggerExpertMet_str", arg => ArgumentException.ThrowIfNullOrEmpty(pendingLt1Key = arg));
+						ParseArg(command, argument, arguments, 2, "keyLocalTriggerMasterMet_str", arg => ArgumentException.ThrowIfNullOrEmpty(pendingLt2Key = arg));
 						(eType, eBig) = (Exam.Type.LocalTrigger, EBranchCondBig.Both);
 					} else {
-						nNum[0] = arguments[1].ParseReal();
-						nNum[1] = arguments[2].ParseReal();
+						ParseArg(command, argument, arguments, 1, "valueExpert_real", arg => nNum[0] = arg.ParseReal());
+						ParseArg(command, argument, arguments, 2, "valueMaster_real", arg => nNum[1] = arg.ParseReal());
 
 						// only check first character for case
-						bool isUpper = char.IsUpper(strCond[0]);
-						var bigOnlyIfUpper = isUpper ? EBranchCondBig.BigOnly : EBranchCondBig.Both;
+						ParseArg(command, argument, arguments, 0, "enumCondition_str", arg => {
+							var bigOnlyIfUpper = char.IsUpper(arg.FirstOrDefault()) ? EBranchCondBig.BigOnly : EBranchCondBig.Both;
+							(eType, eBig) = arg.ToLower() switch {
+								"p" => (Exam.Type.Accuracy, bigOnlyIfUpper), // lower p: traditional condition
+								"pp" => (Exam.Type.PercentPerfect, bigOnlyIfUpper),
+								"jb" => (Exam.Type.JudgeBad, bigOnlyIfUpper),
+								"r" => (Exam.Type.Roll, bigOnlyIfUpper), // lower r: traditional condition
+								"rb" => (Exam.Type.BalloonHits, bigOnlyIfUpper),
+								"s" => (Exam.Type.Score, EBranchCondBig.Both), // traditional condition (case-insensive)
+																			   // TJAP2fPC extensions, Akasoko modification
+								"d" => (Exam.Type.JudgePerfect, EBranchCondBig.BigOnly),
+								// uniqsub extensions, renamed to dan-i type
+								"jp" => (Exam.Type.JudgePerfect, bigOnlyIfUpper),
+								"jg" => (Exam.Type.JudgeGood, bigOnlyIfUpper),
+								// unrecognized condition
+								_ => throw new ArgumentOutOfRangeException("strCond", arg, "Out of recognized values (p, pp, jp, jg, jb, r, rb, s, d; or upper-case variants)"),
+							};
+						});
 
-						(eType, eBig) = strCond.ToLower() switch {
-							"p" => (Exam.Type.Accuracy, bigOnlyIfUpper), // lower p: traditional condition
-							"pp" => (Exam.Type.PercentPerfect, bigOnlyIfUpper),
-							"jb" => (Exam.Type.JudgeBad, bigOnlyIfUpper),
-							"r" => (Exam.Type.Roll, bigOnlyIfUpper), // lower r: traditional condition
-							"rb" => (Exam.Type.BalloonHits, bigOnlyIfUpper),
-							"s" => (Exam.Type.Score, EBranchCondBig.Both), // traditional condition (case-insensive)
-																		   // TJAP2fPC extensions, Akasoko modification
-							"d" => (Exam.Type.JudgePerfect, EBranchCondBig.BigOnly),
-							// uniqsub extensions, renamed to dan-i type
-							"jp" => (Exam.Type.JudgePerfect, bigOnlyIfUpper),
-							"jg" => (Exam.Type.JudgeGood, bigOnlyIfUpper),
-							// unrecognized condition
-							_ => throw new ArgumentOutOfRangeException("strCond"),
-						};
-
-						eRange = ((arguments.Length > 3) ? arguments[3] : "") switch {
-							"l" => CTExprRange.Less,
-							"m" or "" => CTExprRange.MoreOrEqual,
-							_ => throw new ArgumentOutOfRangeException("strRange"),
-						};
+						eRange = CTExprRange.MoreOrEqual;
+						if (arguments.Length > 3) {
+							ParseArg(command, argument, arguments, 3, "enumRange_str", arg => eRange = arg switch {
+								"l" => CTExprRange.Less,
+								"m" => CTExprRange.MoreOrEqual,
+								_ => throw new ArgumentOutOfRangeException("strRange", arg, "Specified an out-of-recognized value (l, m)"),
+							});
+						}
 					}
-				} catch (FormatException ex) {
-					this.AddCommandError(command, argument, $"{GetTjaErrorReason(ex)}; treated as \"keep current branch\" condition", ex);
+				} catch (Exception ex) {
+					eType = Exam.Type.None;
+					pendingLcKey = pendingLt1Key = pendingLt2Key = null;
+					this.AddCommandError(command, argument, $"Treated as \"keep current branch\" condition", ex);
 				}
 			}
 
@@ -2376,7 +2500,7 @@ internal class CTja : CActivity {
 			this.bBARLINECUE[0] = 0;
 
 			this.listChip.Add(chip);
-		} else if (command == "#LYRIC" && !usingLyricsFile && OpenTaiko.ConfigIni.nPlayerCount < 4) // Do not parse LYRIC tags if a lyric file is already loaded
+		} else if (command == "#LYRIC" && !usingLyricsFile && OpenTaiko.ConfigIni.nPlayerCount < 4) // Ignore #LYRIC if a lyric file is already loaded
 		{
 			if (this.bLoadChart)//起動時に重たくなってしまう問題の修正用
 				this.listLyric.Add(this.pfLyricsFont!.DrawText(argumentFull, OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30));
@@ -2385,7 +2509,8 @@ internal class CTja : CActivity {
 			this.listChip.Add(chip);
 			this.bLyrics = true;
 		} else if (command == "#DIRECTION") {
-			double dbSCROLL = argument.ParseReal();
+			double dbSCROLL = 0;
+			ParseArg(command, argument, "enumScrollDirection_real", arg => dbSCROLL = arg.ParseReal());
 			this.nScrollDirection = (int)dbSCROLL;
 
 			//チップ追加して割り込んでみる。
@@ -2398,9 +2523,10 @@ internal class CTja : CActivity {
 			this.listChip.Add(chip);
 		} else if (command == "#SUDDEN") {
 			var strArray = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-			WarnSplitLength("#SUDDEN", strArray, 2);
-			double dbAppearTime = strArray[0].ParseReal();
-			double dbMoveWaitTime = strArray[1].ParseReal();
+			double dbAppearTime = 0;
+			ParseArg(command, argument, strArray, 0, "msShowOffset_real", arg => dbAppearTime = arg.ParseReal());
+			double dbMoveWaitTime = 0;
+			ParseArg(command, argument, strArray, 1, "msMoveOffset_real", arg => dbMoveWaitTime = arg.ParseReal());
 			this.msSuddenShowOffset = 1000 * dbAppearTime;
 			this.msSuddenMoveOffset = 1000 * dbMoveWaitTime;
 
@@ -2414,20 +2540,24 @@ internal class CTja : CActivity {
 			this.listChip.Add(chip);
 		} else if (command == "#JPOSSCROLL") {
 			var strArray = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-			WarnSplitLength("#JPOSSCROLL", strArray, 2);
-			double msMoveDt = double.Max(0, 1000 * strArray[0].ParseReal());
+			double msMoveDt = 0;
+			ParseArg(command, argument, strArray, 0, "secDuration_real", arg => msMoveDt = double.Max(0, 1000 * arg.ParseReal()));
 			double pxMoveDx = 0;
 			double pxMoveDy = 0;
-			if (strArray[1].IndexOf('i') != -1) {
-				double[] dbComplexNum = new double[2];
-				this.tParsedComplexNumber(strArray[1], ref dbComplexNum);
-				pxMoveDx = dbComplexNum[0];
-				pxMoveDy = dbComplexNum[1];
-			} else
-				pxMoveDx = strArray[1].ParseReal();
+			ParseArg(command, argument, strArray, 1, "pxDistance_complex", arg => {
+				if (arg.Contains('i')) {
+					double[] dbComplexNum = new double[2];
+					this.tParsedComplexNumber(arg, ref dbComplexNum);
+					pxMoveDx = dbComplexNum[0];
+					pxMoveDy = dbComplexNum[1];
+				} else
+					pxMoveDx = arg.ParseReal();
+			});
 
 
-			int nMoveDirection = (strArray.Length >= 3) ? Convert.ToInt32(strArray[2]) : 0;
+			int nMoveDirection = 0;
+			if (strArray.Length >= 3)
+				ParseArg(command, argument, strArray, 2, "boolReverse_int", arg => nMoveDirection = int.Parse(arg));
 			if (nMoveDirection == 0) { // same move direction as notes in `#SCROLL x+yi`
 				pxMoveDx = -pxMoveDx;
 				pxMoveDy = -pxMoveDy;
@@ -2448,7 +2578,7 @@ internal class CTja : CActivity {
 			});
 			this.listChip.Add(chip);
 		} else if (command == "#SENOTECHANGE") {
-			FixSENote = int.Parse(argument);
+			ParseArg(command, argument, "enumSENote_int", arg => FixSENote = int.Parse(arg));
 			IsEnabledFixSENote = true;
 		} else if (command == "#PARTNERNOTE") {
 			IsEnabledPartnerNote = true;
@@ -2457,52 +2587,56 @@ internal class CTja : CActivity {
 		} else if (command == "#NOTEIF") {
 			// #NOTEIF <local trigger>,<glows>
 			var parts = argument.Split(',', 2, StringSplitOptions.TrimEntries);
+			ParseArg(command, argument, parts, 0, "keyLocalTrigger_str", arg => PendingNoteIfTrigger = arg);
 			IsEnabledNoteIf = true;
-			PendingNoteIfTrigger = parts[0];
-			PendingNoteIfGlow = parts.Length > 1 && parts[1].ToLower() == "true";
+			PendingNoteIfGlow = false;
+			if (parts.Length > 1)
+				this.TryArg(() => ParseArg(command, argument, parts, 1, "boolGrow", arg => PendingNoteIfGlow = bool.Parse(arg), "Defaulted it to false"));
 		} else if (command == "#GIANTNOTE") {
 			var parts = argument.Split(',', 3, StringSplitOptions.TrimEntries);
 			IsEnabledGiantNote = true;
 			PendingGiantNoteOkTrigger = parts.Length > 0 && !string.IsNullOrEmpty(parts[0]) ? parts[0] : null;
 			PendingGiantNoteGoodTrigger = parts.Length > 1 && !string.IsNullOrEmpty(parts[1]) ? parts[1] : null;
-			PendingGiantNoteLink = parts.Length > 2 && parts[2].ToLower() == "true";
+			PendingGiantNoteLink = false;
+			if (parts.Length > 2)
+				this.TryArg(() => ParseArg(command, argument, parts, 2, "boolGoodTriggerOk", arg => PendingGiantNoteLink = bool.Parse(arg), "Defaulted it to false"));
 		} else if (command == "#STOREC") {
-			var commaIdx = argument.IndexOf(',');
-			if (commaIdx >= 0) {
-				var chip = this.NewEventChipAtDefCursor(0xEA);
-				chip.StoreCKey = argument[..commaIdx].Trim();
-				chip.StoreCExpression = argument[(commaIdx + 1)..].Trim();
-				chip.CommandIfTrigger = PendingCommandIfTrigger;
-				PendingCommandIfTrigger = null;
-				this.listChip.Add(chip);
-			}
+			var parts = argument.Split(',', 2, StringSplitOptions.TrimEntries);
+			var chip = this.NewEventChipAtDefCursor(0xEA);
+			ParseArg(command, argument, parts, 0, "keyLocalCounterWritten_str", arg => ArgumentException.ThrowIfNullOrEmpty(chip.StoreCKey = arg));
+			ParseArg(command, argument, parts, 1, "storeExpression_str", arg => chip.StoreCExpression = arg);
+			chip.CommandIfTrigger = PendingCommandIfTrigger;
+			PendingCommandIfTrigger = null;
+			this.listChip.Add(chip);
 		} else if (command == "#STORET") {
-			var commaIdx = argument.IndexOf(',');
-			if (commaIdx >= 0) {
-				var chip = this.NewEventChipAtDefCursor(0xEB);
-				chip.StoreTKey = argument[..commaIdx].Trim();
-				chip.StoreTExpression = argument[(commaIdx + 1)..].Trim();
-				chip.CommandIfTrigger = PendingCommandIfTrigger;
-				PendingCommandIfTrigger = null;
-				this.listChip.Add(chip);
-			}
+			var parts = argument.Split(',', 2, StringSplitOptions.TrimEntries);
+			var chip = this.NewEventChipAtDefCursor(0xEB);
+			ParseArg(command, argument, parts, 0, "keyLocalTriggerWritten_str", arg => ArgumentException.ThrowIfNullOrEmpty(chip.StoreTKey = arg));
+			ParseArg(command, argument, parts, 1, "storeExpression_str", arg => chip.StoreTExpression = arg);
+			chip.CommandIfTrigger = PendingCommandIfTrigger;
+			PendingCommandIfTrigger = null;
+			this.listChip.Add(chip);
 		} else if (command == "#ELEVATEC") {
 			var chip = this.NewEventChipAtDefCursor(0xEC);
-			chip.ElevateCKey = argument.Trim();
+			ParseArg(command, argument, "keyLocalCounterToGlobal_str", arg => ArgumentException.ThrowIfNullOrEmpty(chip.ElevateCKey = arg.Trim()));
 			chip.CommandIfTrigger = PendingCommandIfTrigger;
 			PendingCommandIfTrigger = null;
 			this.listChip.Add(chip);
 		} else if (command == "#ELEVATET") {
 			var chip = this.NewEventChipAtDefCursor(0xED);
-			chip.ElevateTKey = argument.Trim();
+			ParseArg(command, argument, "keyLocalTriggerToGlobal_str", arg => ArgumentException.ThrowIfNullOrEmpty(chip.ElevateTKey = arg.Trim()));
 			chip.CommandIfTrigger = PendingCommandIfTrigger;
 			PendingCommandIfTrigger = null;
 			this.listChip.Add(chip);
 		} else if (command == "#SONGJUMP") {
 			var parts = argument.Split(',', 2, StringSplitOptions.TrimEntries);
 			var chip = this.NewEventChipAtDefCursor(0xEE);
-			chip.SongJumpUniqueId = parts.Length > 0 ? parts[0] : "";
-			chip.SongJumpDifficulty = parts.Length > 1 ? strConvertCourse(parts[1]) : 3;
+			ParseArg(command, argument, parts, 0, "uniqueIdSongTarget_str", arg => ArgumentException.ThrowIfNullOrEmpty(chip.SongJumpUniqueId = arg));
+			chip.SongJumpDifficulty = 3;
+			if (parts.Length > 1) {
+				this.TryArg(() => ParseArg(command, argument, parts, 1, "enumDifficultyType", arg => chip.SongJumpDifficulty = strConvertCourse(arg),
+					$"Defaulted it to {chip.SongJumpDifficulty}"));
+			}
 			chip.CommandIfTrigger = PendingCommandIfTrigger;
 			PendingCommandIfTrigger = null;
 			this.listChip.Add(chip);
@@ -2531,7 +2665,6 @@ internal class CTja : CActivity {
 			}
 
 			var strArray = SplitComma(argumentFull); // \,をエスケープ処理するメソッドだぞっ
-			WarnSplitLength("#NEXTSONG", strArray, 4);
 			var dansongs = new DanSongs();
 
 			// basic fields
@@ -2541,19 +2674,28 @@ internal class CTja : CActivity {
 			dansongs.FileName = (strArray.Length > 3) ? strArray[3] : "";
 
 			// required by TJAP3
-			dansongs.ScoreInit = (strArray.Length > 4 && !string.IsNullOrWhiteSpace(strArray[4])) ? int.Parse(strArray[4]) : -1;
-			dansongs.ScoreDiff = (strArray.Length > 5 && !string.IsNullOrWhiteSpace(strArray[5])) ? int.Parse(strArray[5]) : -1;
+			dansongs.ScoreInit = -1;
+			if (strArray.Length > 4 && !string.IsNullOrWhiteSpace(strArray[4]))
+				this.TryArg(() => ParseArg(command, argumentFull, strArray, 4, "scoreInit_int", arg => dansongs.ScoreInit = int.Parse(arg), $"Defaulted it to {dansongs.ScoreInit}"));
+			dansongs.ScoreDiff = -1;
+			if (strArray.Length > 5 && !string.IsNullOrWhiteSpace(strArray[5]))
+				this.TryArg(() => ParseArg(command, argumentFull, strArray, 5, "scoreDiff_int", arg => dansongs.ScoreDiff = int.Parse(arg), $"Defaulted it to {dansongs.ScoreDiff}"));
 
 			// optional in TJAP3-Dev-ReW and OpTk; the level may have decimals, like a chart's LEVEL
+			dansongs.LevelDecimal = dansongs.Level = 10;
 			if (strArray.Length > 6 && !string.IsNullOrWhiteSpace(strArray[6])) {
-				double level = strArray[6].ParseReal();
-				dansongs.Level = Math.Max(0, (int)level);
-				dansongs.LevelDecimal = Math.Max(0, level);
-			} else {
-				dansongs.Level = 10;
+				this.TryArg(() => ParseArg(command, argumentFull, strArray, 6, "level_real", arg => {
+					double level = arg.ParseReal();
+					dansongs.Level = Math.Max(0, (int)level);
+					dansongs.LevelDecimal = Math.Max(0, level);
+				}, $"Defaulted it to {dansongs.LevelDecimal}"));
 			}
-			dansongs.Difficulty = (strArray.Length > 7 && !string.IsNullOrWhiteSpace(strArray[7])) ? strConvertCourse(strArray[7]) : 3;
-			dansongs.bTitleShow = (strArray.Length > 8 && !string.IsNullOrWhiteSpace(strArray[8])) ? bool.Parse(strArray[8]) : false;
+			dansongs.Difficulty = 3;
+			if (strArray.Length > 7 && !string.IsNullOrWhiteSpace(strArray[7]))
+				this.TryArg(() => ParseArg(command, argumentFull, strArray, 7, "enumDifficultyType", arg => dansongs.Difficulty = strConvertCourse(arg), $"Defaulted it to {(Difficulty)dansongs.Difficulty} ({dansongs.Difficulty})"));
+			dansongs.bTitleShow = false;
+			if (strArray.Length > 8 && !string.IsNullOrWhiteSpace(strArray[8]))
+				this.TryArg(() => ParseArg(command, argumentFull, strArray, 8, "boolHideTitle", arg => dansongs.bTitleShow = bool.Parse(arg), $"Defaulted it to {dansongs.bTitleShow}"));
 
 			var chipBgm = this.NewEventChipAtDefCursor(0x01, this.nInternalNumberWAV1to, 0x01);
 
@@ -2606,6 +2748,14 @@ internal class CTja : CActivity {
 			var chip = this.NewEventChipAtDefCursor(0x0B);
 			chip.nSoundPos -= 1;
 			this.listChip.Add(chip);
+		}
+	}
+
+	private static int strConvertBGAIndex(string strIndex) {
+		try {
+			return (10 * int.Parse(strIndex[0].ToString())) + int.Parse(strIndex[1].ToString());
+		} catch (IndexOutOfRangeException) {
+			throw new ArgumentOutOfRangeException(nameof(strIndex), strIndex, $"The input string '{strIndex}' was not in a correct format. Expected 2 digits");
 		}
 	}
 
@@ -2699,8 +2849,8 @@ internal class CTja : CActivity {
 	private void ParseArgCamSetCommand(string command, string argument, int channelNo, CChip? camChip, string commandEnd) {
 		if (camChip == null) {
 			var chip = this.NewEventChipAtDefCursor(channelNo, 1);
-			chip.fObjStart = chip.fObjEnd = argument.ParseRealF();
-			chip.strObjEaseType = "IN_OUT";
+			ParseArg(command, argument, "valueEnd_real", arg => chip.fObjStart = chip.fObjEnd = arg.ParseRealF());
+			chip.objEaseType = Easing.PointType.InOut;
 			// チップを配置。
 			this.listChip.Add(chip);
 		} else {
@@ -2716,11 +2866,11 @@ internal class CTja : CActivity {
 			//arguments: <start value>,<end value>,<easing type>,<calc type>
 			var chip = this.NewEventChipAtDefCursor(channelNo, 0);
 
-			string[] args = argument.Split(',');
-			chip.fObjStart = args[0].ParseRealF();
-			chip.fObjEnd = args[1].ParseRealF();
-			chip.strObjEaseType = args[2];
-			chip.objCalcType = TjaArgToEasingCalcType(args[3]);
+			string[] args = argument.Split(',', StringSplitOptions.TrimEntries);
+			ParseArg(command, argument, args, 0, "valueStart_real", arg => chip.fObjStart = arg.ParseRealF());
+			ParseArg(command, argument, args, 1, "valueEnd_real", arg => chip.fObjEnd = arg.ParseRealF());
+			ParseArg(command, argument, args, 2, "enumEasePointType_str", arg => chip.objEaseType = TjaArgToEasingPointType(arg));
+			ParseArg(command, argument, args, 3, "enumEaseCalcType_str", arg => chip.objCalcType = TjaArgToEasingCalcType(arg));
 
 			camChip = chip;
 
@@ -2752,48 +2902,50 @@ internal class CTja : CActivity {
 	}
 
 	private void ParseArgObjSetCommand(string command, string argument, int channelNo, string animationKey, string commandEnd) {
-		string[] args = argument.Split(',');
-		string name = args[0];
+		string[] args = argument.Split(',', StringSplitOptions.TrimEntries);
+		string name = "";
+		ParseArg(command, argument, args, 0, "strObjName", arg => ArgumentException.ThrowIfNullOrEmpty(name = arg));
 
 		if (!currentObjAnimations.ContainsKey($"{animationKey}_{name}")) {
 			var chip = this.NewEventChipAtDefCursor(channelNo, 0);
 			chip.strObjName = args[0];
-			chip.fObjStart = args[1].ParseRealF();
-			chip.fObjEnd = args[1].ParseRealF();
-			chip.strObjEaseType = "IN_OUT";
+			ParseArg(command, argument, args, 1, $"{animationKey}End_real", arg => chip.fObjStart = chip.fObjEnd = arg.ParseRealF());
+			chip.objEaseType = Easing.PointType.InOut;
 
 			// チップを配置。
 			this.listChip.Add(chip);
 		} else {
-			this.AddCommandError(command, argument, $"Missing {commandEnd}");
+			this.AddCommandError(command, argument, $"Missing {commandEnd} {name}");
 		}
 	}
 
 	private void ParseArgObjStartCommand(string command, string argument, int channelNo, string animationKey, string commandEnd) {
-		string[] args = argument.Split(',');
-		string name = args[0];
+		string[] args = argument.Split(',', StringSplitOptions.TrimEntries);
+		string name = "";
+		ParseArg(command, argument, args, 0, "strObjName", arg => ArgumentException.ThrowIfNullOrEmpty(name = arg));
 
 		if (!currentObjAnimations.ContainsKey($"{animationKey}_{name}")) {
 			//starts attribute changing
 			//arguments: <start value>,<end value>,<easing type>,<calc type>
 			var chip = this.NewEventChipAtDefCursor(channelNo, 0);
 			chip.strObjName = args[0];
-			chip.fObjStart = args[1].ParseRealF();
-			chip.fObjEnd = args[2].ParseRealF();
-			chip.strObjEaseType = args[3];
-			chip.objCalcType = TjaArgToEasingCalcType(args[4]);
+			ParseArg(command, argument, args, 1, $"{animationKey}Start_real", arg => chip.fObjStart = arg.ParseRealF());
+			ParseArg(command, argument, args, 2, $"{animationKey}End_real", arg => chip.fObjEnd = arg.ParseRealF());
+			ParseArg(command, argument, args, 3, "enumEasePointType_str", arg => chip.objEaseType = TjaArgToEasingPointType(arg));
+			ParseArg(command, argument, args, 4, "enumEaseCalcType_str", arg => chip.objCalcType = TjaArgToEasingCalcType(arg));
 
 			currentObjAnimations.Add($"{animationKey}_{name}", chip);
 
 			// チップを配置。
 			this.listChip.Add(chip);
 		} else {
-			this.AddCommandError(command, argument, $"Missing {commandEnd}");
+			this.AddCommandError(command, argument, $"Missing {commandEnd} {name}");
 		}
 	}
 
 	private void ParseArgObjEndCommand(string command, string argument, int channelNo, string animationKey, string commandStart) {
-		string name = argument;
+		string name = "";
+		ParseArg(command, argument, "strObjName", arg => ArgumentException.ThrowIfNullOrEmpty(name = arg.Trim()));
 
 		if (currentObjAnimations.ContainsKey($"{animationKey}_{name}")) {
 			//ends attribute changing
@@ -2813,12 +2965,21 @@ internal class CTja : CActivity {
 			// チップを配置。
 			this.listChip.Add(chip);
 		} else {
-			this.AddCommandError(command, argument, $"Missing {commandStart}");
+			this.AddCommandError(command, argument, $"Missing {commandStart} {name}");
 		}
 	}
 
-	private static Easing.CalcType TjaArgToEasingCalcType(string type)
-		=> type switch {
+	public static Easing.PointType TjaArgToEasingPointType(string strEasePointType)
+		=> strEasePointType.ToUpper() switch {
+			"IN" => Easing.PointType.In,
+			"OUT" => Easing.PointType.Out,
+			"IN_OUT" => Easing.PointType.InOut,
+			_ => throw new ArgumentOutOfRangeException(nameof(strEasePointType), strEasePointType, "Out of recognized values (IN, OUT, IN_OUT)"),
+		};
+
+
+	public static Easing.CalcType TjaArgToEasingCalcType(string strEaseCalcType)
+		=> strEaseCalcType.ToUpper() switch {
 			"CUBIC" => Easing.CalcType.Cubic,
 			"QUARTIC" => Easing.CalcType.Quartic,
 			"QUINTIC" => Easing.CalcType.Quintic,
@@ -2826,7 +2987,8 @@ internal class CTja : CActivity {
 			"EXPONENTIAL" => Easing.CalcType.Exponential,
 			"CIRCULAR" => Easing.CalcType.Circular,
 			"LINEAR" => Easing.CalcType.Linear,
-			"QUADRATIC" or _ => Easing.CalcType.Quadratic,
+			"QUADRATIC" => Easing.CalcType.Quadratic,
+			_ => throw new ArgumentOutOfRangeException(nameof(strEaseCalcType), strEaseCalcType, "Out of recognized values (CUBIC, QUARTIC, QUINTIC, SINUSOIDAL, EXPONENTIAL, CIRCULAR, LINEAR, QUADRATIC)"),
 		};
 
 	private void InitializeChartDefinitionBody() {
@@ -3136,16 +3298,8 @@ internal class CTja : CActivity {
 		);
 	}
 
-	private void WarnSplitLength(string name, string[] strArray, int minimumLength) {
-		if (strArray.Length < minimumLength) {
-			this.AddWarn($"Insufficient arguments to command {name}. Needs at least {minimumLength} but got {strArray.Length}.");
-		}
-	}
-
 	private void tInput_LineParseChart_V4(string InputText) {
 		if (!String.IsNullOrEmpty(InputText)) {
-			int nTextCount = this.divsPerMeasureAllBranches[this.iNowMeasureAllBranches];
-
 			if (InputText.StartsWith("#")) {
 				// Call orders here
 				this.TryParseCommand(InputText);
@@ -3154,6 +3308,7 @@ internal class CTja : CActivity {
 				this.TryDanExamLoad(InputText);
 				return;
 			} else {
+				int nTextCount = this.nDivsNowMeasure!.Value;
 				if (this.bMeasureLineInsert == false) {
 					// 小節線にもやってあげないと
 					if (this.nCurrentMeasureCount <= 0) // missing #START
@@ -3187,6 +3342,7 @@ internal class CTja : CActivity {
 							this.GotoNextDiv(1);
 						++this.iNowMeasureAllBranches;
 						this.nCurrentMeasureCount++;
+						this.iDivNowMeasure = 0;
 						this.bMeasureLineInsert = false;
 						if (this.COMPAT is ETjaCompat.Jiro1 && this.isBpmChangedMeasure) {
 							// TaikoJiro 1 behavior: A BPM change truncates time duration of containing measure to ms. Ref: https://note.com/lime_5137/n/n672c0a41495d
@@ -3201,7 +3357,8 @@ internal class CTja : CActivity {
 						continue; // skip whitespaces
 					}
 					if (!char.IsAsciiLetterOrDigit(inputChar[0])) {
-						this.AddWarn($"Invalid note symbol {inputChar} ignored at measure {this.nCurrentMeasureCount}. Input: {InputText}");
+						if (nTextCount > 0 || n == 0) // skip further warnings if no valid note symbols in this measure
+							this.AddWarn($"Invalid note symbol [{inputChar}] ignored, at symbol {n + 1}/{InputText.Length}", input: InputText);
 						continue;
 					}
 
@@ -3223,13 +3380,9 @@ internal class CTja : CActivity {
 								}
 								if (noteType != NotesManager.ENoteType.EndRoll) {
 									// TaikoJiro compatibility: A non-roll ends an unended roll
-									if (branch == ECourse.eNormal || this.PlayerSideMetadata.bHasBranch) {
-										this.AddWarn(this.PlayerSideMetadata.bHasBranch ?
-											$"An unended roll is ended by a non-roll of type {noteType} in branch {branch} at measure {this.nCurrentMeasureCount}. Input: {InputText}"
-											: $"An unended roll is ended by a non-roll of type {noteType} at measure {this.nCurrentMeasureCount}. Input: {InputText}"
-										);
-									}
-									InsertNoteAtDefCursor(NotesManager.ENoteType.EndRoll, n, nTextCount, branch);
+									if (beforeInsertNote || !this.IsEndedBranching)
+										this.AddWarn($"An unended roll is ended by a non-roll of type {noteType} ({inputChar})", input: InputText);
+									InsertNoteAtDefCursor(NotesManager.ENoteType.EndRoll, this.iDivNowMeasure, nTextCount, branch);
 
 								}
 							}
@@ -3240,19 +3393,19 @@ internal class CTja : CActivity {
 							}
 
 							if (noteType is NotesManager.ENoteType.Unknown) {
-								this.AddWarn(this.PlayerSideMetadata.bHasBranch ?
-									$"Unknown note symbol {inputChar} treated as a non-roll blank in branch {branch} at measure {this.nCurrentMeasureCount}. Input: {InputText}"
-									: $"Unknown note symbol {inputChar} treated as a non-roll blank at measure {this.nCurrentMeasureCount}. Input: {InputText}");
+								if (beforeInsertNote)
+									this.AddWarn($"Unknown note symbol [{inputChar}] treated as a non-roll blank", input: InputText);
 							} else {
-								InsertNoteAtDefCursor(noteType, n, nTextCount, branch, beforeInsertNote);
-								beforeInsertNote = false;
+								InsertNoteAtDefCursor(noteType, this.iDivNowMeasure, nTextCount, branch, beforeInsertNote);
 							}
+							beforeInsertNote = false;
 						});
 					}
 
 					this.ResetNoteSymbolOneShotCommands();
 
 					this.GotoNextDiv(nTextCount);
+					++this.iDivNowMeasure;
 				}
 			}
 		}
@@ -3388,13 +3541,9 @@ internal class CTja : CActivity {
 				chip.nBalloon = listBalloon[iBalloon];
 			} else {
 				if (firstInsertedForDiv || !useCommon) {
-					StringBuilder msg = new($"Undefined pop count defaulted to 5 hits for note {noteType}");
-					if (!this.IsEndedBranching)
-						msg.Append($" in branch {branch}");
-					msg.Append($", at division {iDiv + 1}/{divsPerMeasure}, measure {this.nCurrentMeasureCount}. Pop count used {iBalloon + 1} / defined {listBalloon.Count}");
+					StringBuilder msg = new($"Undefined pop count defaulted to 5 hits for note {noteType} ({NotesManager.ToNoteChar(noteType)}) | Pop count used {iBalloon + 1} / defined {listBalloon.Count}");
 					if (!useCommon)
 						msg.Append($"(for {branch})");
-					msg.Append('.');
 					this.AddWarn(msg.ToString());
 				}
 				chip.nBalloon = 5;
@@ -3521,8 +3670,10 @@ internal class CTja : CActivity {
 		}
 		try {
 			this.ParsePerPlayerSideHeader(strCommandName, strCommandParam, forCurrentPlaySide);
+		} catch (NthArgError ex) {
+			this.AddArgError(ex);
 		} catch (Exception ex) {
-			this.AddCommandError(strCommandName, strCommandParam, ex);
+			this.AddCommandError(strCommandName, strCommandParam, ex: ex);
 		}
 	}
 
@@ -3540,18 +3691,15 @@ internal class CTja : CActivity {
 		}
 
 		if (strCommandName.Equals("SIDE")) {
-			this.SIDE = strConvertSide(strCommandParam);
+			ParseArg(strCommandName, strCommandParam, "enumSide_str", arg => this.SIDE = strConvertSide(arg));
 		} else if (strCommandName.Equals("LIFE")) {
-			var life = (int)strCommandParam.ParseReal();
-			this.LIFE = life;
+			ParseArg(strCommandName, strCommandParam, "nLifes_real", arg => this.LIFE = (int)arg.ParseReal());
 		} else if (strCommandName.Equals("TOWERTYPE")) {
-			this.TOWERTYPE = strCommandParam;
+			this.TOWERTYPE = string.IsNullOrEmpty(strCommandParam) ? null : strCommandParam;
 		} else if (strCommandName.Equals("DANTICK")) {
-			var tick = (int)strCommandParam.ParseReal();
-			this.DANTICK = tick;
+			ParseArg(strCommandName, strCommandParam, "idxTick_real", arg => this.DANTICK = (int)arg.ParseReal());
 		} else if (strCommandName.Equals("DANTICKCOLOR")) {
-			var tickcolor = ColorTranslator.FromHtml(strCommandParam);
-			this.DANTICKCOLOR = tickcolor;
+			ParseArg(strCommandName, strCommandParam, "htmlTickColorLiteral_str", arg => this.DANTICKCOLOR = ColorTranslator.FromHtml(arg));
 		} else if (strCommandName.Equals("BALLOON")) {
 			ParseBalloon(strCommandName, strCommandParam, forCurrentPlaySide, 3);
 		} else if (strCommandName.Equals("BALLOONNOR")) {
@@ -3561,16 +3709,17 @@ internal class CTja : CActivity {
 		} else if (strCommandName.Equals("BALLOONMAS")) {
 			ParseBalloon(strCommandName, strCommandParam, forCurrentPlaySide, (int)ECourse.eMaster);
 		} else if (strCommandName.Equals(".FORCEGAUGE")) {
-			this.forceGauge = strConvertForceGauge(strCommandParam);
+			ParseArg(strCommandName, strCommandParam, "enumHardGaugeType_str", arg => this.forceGauge = strConvertForceGauge(arg));
 		} else if (strCommandName.Equals(".BOOMRULE")) {
-			string[] args = strCommandParam.Split(',');
-			this.boomRule = strConvertBoomRule(args[0]);
-			this.boomRuleValue = (args.Length > 1) ? args[1].ParseRealF() : (this.boomRule switch {
+			string[] args = strCommandParam.Split(',', StringSplitOptions.TrimEntries);
+			ParseArg(strCommandName, strCommandParam, args, 0, "enumBoomRule_str", arg => this.boomRule = strConvertBoomRule(arg));
+			this.boomRuleValue = this.boomRule switch {
 				EBoomRule.Scal => 4f,
 				EBoomRule.Ratio => 1f,
-				EBoomRule.Fatal => 1,
-				_ => throw new ArgumentOutOfRangeException(),
-			});
+				EBoomRule.Fatal or _ => 1,
+			};
+			if (args.Length > 1)
+				ParseArg(strCommandName, strCommandParam, args, 1, "valueBoomRule_real", arg => this.boomRuleValue = arg.ParseRealF());
 		} else {
 			this.ParseQueryableCourseMetadata([this.PlayerSideMetadata], strCommandName, strCommandParam);
 		}
@@ -3578,20 +3727,17 @@ internal class CTja : CActivity {
 
 	// The score headers contains all difficulties and needed to be parsed for global header as well
 	private void ParseQueryableCourseMetadata(IEnumerable<QueryableCourseMetadata> metadatas, string strCommandName, string strCommandParam) {
-		void ParseOptionalInt16(Action<short> setValue) {
-			this.ParseOptionalInt16(strCommandName, strCommandParam, setValue);
-		}
-
 		if (strCommandName.Equals("GAME")) {
-			if (!string.IsNullOrEmpty(strCommandParam)) {
-				foreach (var metadata in metadatas) {
-					metadata.GameType = strConvertGameType(strCommandParam);
-					if (metadatas.FirstOrDefault() == this.PlayerSideMetadata)
-						this.nowGameType = metadata.GameType;
-			}
+			EGameType gameType = 0;
+			ParseArg(strCommandName, strCommandParam, "enumGameType_str", arg => gameType = strConvertGameType(arg));
+			foreach (var metadata in metadatas) {
+				metadata.GameType = gameType;
+				if (metadatas.FirstOrDefault() == this.PlayerSideMetadata)
+					this.nowGameType = metadata.GameType;
 			}
 		} else if (strCommandName.Equals("LEVEL")) {
-			var level_dec = strCommandParam.ParseReal();
+			double level_dec = 0;
+			ParseArg(strCommandName, strCommandParam, "level_real", arg => level_dec = arg.ParseReal());
 			var level = Math.Max(0, (int)level_dec);
 			// detect decimal places small than 1
 			var matchFrac = DecimalPlaceRegex.Match(strCommandParam);
@@ -3611,47 +3757,64 @@ internal class CTja : CActivity {
 				metadata.LEVELtaikoDecimal = Math.Max(0, level_dec);
 			}
 		} else if (strCommandName.Equals("SCOREMODE")) {
-			ParseOptionalInt16(value => {
-				foreach (var metadata in metadatas)
-					metadata.nScoreMode = value;
-			});
+			int value = 0;
+			ParseArg(strCommandName, strCommandParam, "enumScoreMode_int", arg => value = int.Parse(arg));
+			foreach (var metadata in metadatas)
+				metadata.nScoreMode = value;
 		} else if (strCommandName.Equals("SCOREINIT")) {
-			if (!string.IsNullOrEmpty(strCommandParam)) {
-				string[] scoreinit = strCommandParam.Split(',');
+			string[] scoreinit = strCommandParam.Split(',');
 
-				this.ParseOptionalInt16("SCOREINIT first value", scoreinit[0], value => {
+			ParseArg(strCommandName, strCommandParam, scoreinit, 0, "scoreNonShinUchi_int", arg => {
+				if (string.IsNullOrWhiteSpace(arg))
+					return; // TODO: Insert a placeholder value to Calculate the proper score automatically
+
+				var value = int.Parse(arg);
+				foreach (var metadata in metadatas) {
+					metadata.nScoreInit[0] = value;
+					metadata.bScorePointAssigned[0] = true;
+				}
+			});
+
+			if (scoreinit.Length < 2) {
+				// TODO: Insert a placeholder value to Calculate the proper score automatically
+			} else {
+				ParseArg(strCommandName, strCommandParam, scoreinit, 1, "scoreShinUchi_int", arg => {
+					if (string.IsNullOrWhiteSpace(arg))
+						return; // TODO: Insert a placeholder value to Calculate the proper score automatically
+
+					var value = int.Parse(arg);
 					foreach (var metadata in metadatas) {
-						metadata.nScoreInit[0] = value;
-						metadata.bScorePointAssigned[0] = true;
+						metadata.nScoreInit[1] = value;
+						metadata.bScorePointAssigned[2] = true;
 					}
 				});
-
-				if (scoreinit.Length == 2) {
-					this.ParseOptionalInt16("SCOREINIT second value", scoreinit[1], value => {
-						foreach (var metadata in metadatas) {
-							metadata.nScoreInit[1] = value;
-							metadata.bScorePointAssigned[2] = true;
-						}
-					});
-				}
 			}
 		} else if (strCommandName.Equals("SCOREDIFF")) {
-			ParseOptionalInt16(value => {
+			if (string.IsNullOrWhiteSpace(strCommandParam)) {
+				// TODO: Insert a placeholder value to Calculate the proper score automatically
+			} else {
+				int value = 0;
+				ParseArg(strCommandName, strCommandParam, "scoreNonShinUchi_int", arg => value = int.Parse(arg));
 				foreach (var metadata in metadatas) {
 					metadata.nScoreDiff = value;
 					metadata.bScorePointAssigned[1] = true;
 				}
-			});
+			}
 		} else if (strCommandName.Equals("HIDDENBRANCH")) {
 			//2016.04.01 kairera0467 パラメーターは
-			if (!string.IsNullOrEmpty(strCommandParam)) {
-				foreach (var metadata in metadatas)
-					metadata.bHIDDENBRANCH = true;
-			}
+			bool value = false;
+			ParseArg(strCommandName, strCommandParam, "boolHideBranch_int", arg => value = int.Parse(arg) != 0);
+			foreach (var metadata in metadatas)
+				metadata.bHIDDENBRANCH = value;
 		} else if (strCommandName.StartsWith("NOTESDESIGNER")) {
 			string strDiff = strCommandName.Substring("NOTESDESIGNER".Length);
 			if (this.nowCourseScope == (int)Difficulty.Total && strDiff != "") { // before COURSE:, with diff, set target difficulty's default
-				this.SongListCourseMetadata[int.Parse(strDiff)].NOTESDESIGNER = strCommandParam;
+				ParseArg(strCommandName, strCommandParam, null, [strDiff], "enumDifficultyTypeSuffix_int", arg => {
+					int diff = int.Parse(arg);
+					if ((Difficulty)diff is not (>= 0 and < Difficulty.Total))
+						throw new ArgumentOutOfRangeException(nameof(diff), diff, $"Value must be between 0 ({(Difficulty)0}) and {(int)(Difficulty.Total - 1)} ({Difficulty.Total - 1})");
+					this.SongListCourseMetadata[diff].NOTESDESIGNER = strCommandParam;
+				}) ;
 			} else { // after COURSE:, ignore diff and apply to current difficulty
 				foreach (var metadata in metadatas)
 					metadata.NOTESDESIGNER = strCommandParam;
@@ -3672,7 +3835,7 @@ internal class CTja : CActivity {
 		try {
 			this.tDanExamLoad(strCommandName, strCommandParam);
 		} catch (Exception ex) {
-			this.AddCommandError(strCommandName, strCommandParam, ex);
+			this.AddCommandError(strCommandName, strCommandParam, ex: ex);
 		}
 	}
 
@@ -3680,86 +3843,90 @@ internal class CTja : CActivity {
 		// Adapt to EXAM until 7, optimise condition
 
 		if (strCommandName.StartsWith("EXAM")) {
-			if (!string.IsNullOrEmpty(strCommandParam)) {
-				int[] examValue;
-				var splitExam = strCommandParam.Split(',');
-				int examNumber = int.Parse(strCommandName.Substring(4)) - 1;
+			int examNumber = 0;
+			ParseArg(strCommandName, strCommandParam, null, [strCommandName.Substring(4)], "idxExamSuffix_int", arg => examNumber = int.Parse(arg) - 1);
 
-				if (examNumber > CExamInfo.cMaxExam)
-					return;
-				var examType = splitExam[0] switch {
-					"jp" => Exam.Type.JudgePerfect,
-					"jg" => Exam.Type.JudgeGood,
-					"jb" => Exam.Type.JudgeBad,
-					"s" => Exam.Type.Score,
-					"r" => Exam.Type.Roll,
-					"h" => Exam.Type.Hit,
-					"c" => Exam.Type.Combo,
-					"a" => Exam.Type.Accuracy,
-					"ja" => Exam.Type.JudgeADLIB,
-					"jm" => Exam.Type.JudgeMine,
-					"g" or _ => Exam.Type.Gauge,
-				};
-				examValue = new int[] { int.Parse(splitExam[1]), int.Parse(splitExam[2]) };
+			var splitExam = strCommandParam.Split(',');
+			Exam.Type examType = 0;
+			ParseArg(strCommandName, strCommandParam, splitExam, 0, "enumExamType_str", arg => examType = arg switch {
+				"jp" => Exam.Type.JudgePerfect,
+				"jg" => Exam.Type.JudgeGood,
+				"jb" => Exam.Type.JudgeBad,
+				"s" => Exam.Type.Score,
+				"r" => Exam.Type.Roll,
+				"h" => Exam.Type.Hit,
+				"c" => Exam.Type.Combo,
+				"a" => Exam.Type.Accuracy,
+				"ja" => Exam.Type.JudgeADLIB,
+				"jm" => Exam.Type.JudgeMine,
+				"g" => Exam.Type.Gauge,
+				_ => throw new ArgumentOutOfRangeException("strExamType", arg, "Out of recognized values (jp, jg, jb, s, r, h, c, a, ja, jm, g)"),
+			});
+			// check arguments regardless of whether the result is used
+			int[] examValue = new int[2];
+			ParseArg(strCommandName, strCommandParam, splitExam, 1, "valueRedPass_int", arg => examValue[0] = int.Parse(arg));
+			ParseArg(strCommandName, strCommandParam, splitExam, 2, "valueGoldPass_int", arg => examValue[1] = int.Parse(arg));
 
-				var examRange = splitExam[3] switch {
-					"l" => Exam.Range.Less,
-					"m" or _ => Exam.Range.More,
-				};
-				if (Dan_C[examNumber] == null)
-					Dan_C[examNumber] = new Dan_C(examType, examValue, examRange);
+			Exam.Range examRange = 0;
+			ParseArg(strCommandName, strCommandParam, splitExam, 3, "enumRangeExam_str", arg => examRange = arg switch {
+				"l" => Exam.Range.Less,
+				"m" => Exam.Range.More,
+				_ => throw new ArgumentOutOfRangeException("strExamRange", arg, "Out of recognized values (l, m)"),
+			});
 
-				if (List_DanSongs.Count > 0)
-					List_DanSongs[List_DanSongs.Count - 1].Dan_C[examNumber] = new Dan_C(examType, examValue, examRange);
+			if (!(examNumber >= 0 && examNumber < CExamInfo.cMaxExam)) {
+				this.AddWarn($"[{strCommandName}] is ignored. Only EXAM{0 + 1} to EXAM{CExamInfo.cMaxExam} are used by the game.");
+				return;
 			}
+
+			if (Dan_C[examNumber] == null)
+				Dan_C[examNumber] = new Dan_C(examType, examValue, examRange);
+
+			if (List_DanSongs.Count > 0)
+				List_DanSongs[List_DanSongs.Count - 1].Dan_C[examNumber] = new Dan_C(examType, examValue, examRange);
 		}
 	}
-
-	private void ParseOptionalInt16(string name, string unparsedValue, Action<short> setValue) {
-		if (string.IsNullOrEmpty(unparsedValue)) {
-			return;
-		}
-
-		if (short.TryParse(unparsedValue, out var value)) {
-			setValue(value);
-		} else {
-			this.AddWarn($"Command {name} has invalid argument: {unparsedValue}");
-		}
-	}
-
 
 	private void ParseBalloon(string strCommandName, string strCommandParam, bool isForCurrentPlaySide, int iBranch) {
-		string[] strParam = strCommandParam.Split(',');
-		var listTmp = new List<int>(strParam.Length);
-		for (int n = 0; n < strParam.Length; n++) {
+		string[] strParams = strCommandParam.Split(',');
+		if (strParams.Length > 0 && string.IsNullOrWhiteSpace(strParams[^1])) // empty list, or trailing comma (,) (not trimmed for headers)
+			Array.Resize(ref strParams, strParams.Length - 1);
+
+		var listTmp = new List<int>(strParams.Length);
+		int nSuccesses = 0;
+		int nFailures = 0;
+		for (int n = 0; n < strParams.Length; n++) {
 			int nHitCount;
 			try {
-				if (strParam[n] == null || strParam[n] == "")
-					break;
-
-				nHitCount = Convert.ToInt32(strParam[n]);
+				nHitCount = int.Parse(strParams[n]);
+				++nSuccesses;
 			} catch (Exception ex) {
-				this.AddCommandError(strCommandName, strCommandParam, ex);
-				return;
+				nHitCount = 5;
+				this.AddArgError(strCommandName, (nFailures > 0) ? null : strCommandParam, n, "nHits_int", strParams[n], $"Defaulted it to {nHitCount} hits", ex);
+				++nFailures;
 			}
 
 			listTmp.Add(nHitCount);
 		}
-		// Arguments are valid, update balloon list
-		this.listBalloon_Branch[iBranch] = listTmp;
-		this.listBalloon_Branch_defined[iBranch] = (byte)(isForCurrentPlaySide ? 2 : 1);
+		if (nFailures == 0 || nSuccesses > 0) {
+			// Arguments are valid, update balloon list
+			this.listBalloon_Branch[iBranch] = listTmp;
+			this.listBalloon_Branch_defined[iBranch] = (byte)(isForCurrentPlaySide ? 2 : 1);
+		}
 	}
 
 	// Parsing (file-)global and COURSE-global headers
 	private void TryParseGlobalHeader(string InputText) {
 		if (TokenizeCommand(InputText, out string command, out string commandArgumentFull, out string commandArgument)) {
 			if (command == "#START") {
-				this.bChartExists[this.nReferenceDifficulty] = true;
+				if (this.nowCourseScope >= 0)
+					this.bChartExists[this.nReferenceDifficulty] = true;
 			} else if (command == "#BRANCHSTART") {
 				//2015.08.18 kairera0467
 				//本来はヘッダ命令ではありませんが、難易度ごとに違う項目なのでここで読み込ませます。
 				//Lengthのチェックをされる前ににif文を入れています。
-				this.SongListCourseMetadata[this.nReferenceDifficulty].bHasBranch = true;
+				if (this.nowCourseScope >= 0)
+					this.SongListCourseMetadata[this.nReferenceDifficulty].bHasBranch = true;
 			}
 			return;
 		}
@@ -3777,8 +3944,10 @@ internal class CTja : CActivity {
 
 		try {
 			this.ParseGlobalHeader(strCommandName, strCommandParam);
+		} catch (NthArgError ex) {
+			this.AddArgError(ex);
 		} catch (Exception ex) {
-			this.AddCommandError(strCommandName, strCommandParam, ex);
+			this.AddCommandError(strCommandName, strCommandParam, ex: ex);
 		}
 	}
 
@@ -3793,7 +3962,8 @@ internal class CTja : CActivity {
 				this.GlobalCustomMetadata[strCommandName] = strCommandParam;
 			} else {
 				// NOTE: Doesn't include (file-)global scope headers, to access them use the appropriate Lua API accessor
-				this.SongListCourseMetadata[this.nowCourseScope].CustomMetadata[strCommandName] = strCommandParam;
+				if (this.nowCourseScope >= 0)
+					this.SongListCourseMetadata[this.nReferenceDifficulty].CustomMetadata[strCommandName] = strCommandParam;
 			}
 		}
 
@@ -3814,10 +3984,11 @@ internal class CTja : CActivity {
 		} else if (strCommandName.Equals("PREIMAGE")) {
 			this.PREIMAGE = strCommandParam;
 		} else if (strCommandName.Equals("BPM")) {
-			if (strCommandParam.IndexOf(",") != -1)
+			if (strCommandParam.Contains(","))
 				strCommandParam = strCommandParam.Replace(',', '.');
 
-			double dbBPM = strCommandParam.ParseReal();
+			double dbBPM = 0;
+			ParseArg(strCommandName, strCommandParam, "bpm_real", arg => dbBPM = arg.ParseReal());
 			this.BPM = dbBPM;
 			this.BASEBPM = dbBPM;
 			this.MinBPM = dbBPM;
@@ -3852,94 +4023,69 @@ internal class CTja : CActivity {
 					this.nInternalNumberWAV1to++;
 				}
 			}
-		} else if (strCommandName.Equals("OFFSET") && !string.IsNullOrEmpty(strCommandParam)) {
-			this.msOFFSET_Abs = (int)(strCommandParam.ParseReal() * 1000);
+		} else if (strCommandName.Equals("OFFSET")) {
+			ParseArg(strCommandName, strCommandParam, "secOffsetToMusic_real", arg => this.msOFFSET_Abs = (int)(arg.ParseReal() * 1000));
 			this.isOFFSET_Negative = this.msOFFSET_Abs < 0 ? true : false;
 
 			if (this.isOFFSET_Negative == true)
 				this.msOFFSET_Abs = this.msOFFSET_Abs * -1; //OFFSETは秒を加算するので、必ず正の数にすること。
 															//tbOFFSET.Text = strCommandParam;
 		} else if (strCommandName.Equals("MOVIEOFFSET")) {
-			this.msMOVIEOFFSET_Abs = (int)(strCommandParam.ParseReal() * 1000);
+			ParseArg(strCommandName, strCommandParam, "secOffsetFromMusic_real", arg => this.msMOVIEOFFSET_Abs = (int)(arg.ParseReal() * 1000));
 			this.isMOVIEOFFSET_Negative = this.msMOVIEOFFSET_Abs < 0 ? true : false;
 
 			if (this.isMOVIEOFFSET_Negative == true)
 				this.msMOVIEOFFSET_Abs = this.msMOVIEOFFSET_Abs * -1; //OFFSETは秒を加算するので、必ず正の数にすること。
 																	  //tbOFFSET.Text = strCommandParam;
 		} else if (strCommandName.Equals("GAUGEINCR")) {
-			if (!string.IsNullOrEmpty(strCommandParam)) {
-				GaugeIncreaseMode = strCommandParam.ToLower() switch {
-					"floor" => GaugeIncreaseMode.Floor,
-					"round" => GaugeIncreaseMode.Round,
-					"ceiling" => GaugeIncreaseMode.Ceiling,
-					"notfix" => GaugeIncreaseMode.NotFix,
-					"normal" or _ => GaugeIncreaseMode.Normal,
-				};
-			}
-		} else if (strCommandName.Equals("SONGVOL") && !string.IsNullOrEmpty(strCommandParam)) {
-			this.SongVol = Convert.ToInt32(strCommandParam).Clamp(CSound.MinimumSongVol, CSound.MaximumSongVol);
+			ParseArg(strCommandName, strCommandParam, "enumGaugeIncreaseMode_str", arg => GaugeIncreaseMode = arg.ToLower() switch {
+				"floor" => GaugeIncreaseMode.Floor,
+				"round" => GaugeIncreaseMode.Round,
+				"ceiling" => GaugeIncreaseMode.Ceiling,
+				"notfix" => GaugeIncreaseMode.NotFix,
+				"normal" => GaugeIncreaseMode.Normal,
+				_ => throw new ArgumentOutOfRangeException("strGaugeIncreaseMode", arg, "Out of recognized values (Floor, Round, Ceiling, Notfix, Normal)"),
+			});
+		} else if (strCommandName.Equals("SONGVOL")) {
+			ParseArg(strCommandName, strCommandParam, "percentVol_int", arg => this.SongVol = int.Parse(arg).Clamp(CSound.MinimumSongVol, CSound.MaximumSongVol));
 
 			foreach (var kvp in this.listWAV) {
 				kvp.Value.SongVol = this.SongVol;
 			}
 		} else if (strCommandName.Equals("SEVOL")) {
 			//tbSeVol.Text = strCommandParam;
+			ParseArg(strCommandName, strCommandParam, "percentVol_int", arg => _ = int.Parse(arg));
 		} else if (strCommandName.Equals("COURSE")) {
-			if (!string.IsNullOrEmpty(strCommandParam)) {
-				//this.n参照中の難易度 = Convert.ToInt16( strCommandParam );
-				this.nReferenceDifficulty = this.strConvertCourse(strCommandParam);
-			}
+			//this.n参照中の難易度 = Convert.ToInt16( strCommandParam );
+			this.nowCourseScope = -1;
+			ParseArg(strCommandName, strCommandParam, "enumDifficultyType", arg => this.nowCourseScope = strConvertCourse(arg), $"Defaulted it to the inaccessible difficulty ({this.nowCourseScope})");
 		} else if (strCommandName.Equals("HEADSCROLL")) {
 			//新定義:初期スクロール速度設定(というよりこのシステムに合わせるには必須。)
 			//どうしても一番最初に1小節挿入されるから、こうするしかなかったんだ___
 
-			this.dbNowScroll = strCommandParam.ParseReal();
+			ParseArg(strCommandName, strCommandParam, "rate_real", arg => this.dbNowScroll = arg.ParseReal());
 		} else if (strCommandName.Equals("GENRE")) {
 			//2015.03.28 kairera0467
 			//ジャンルの定義。DTXから入力もできるが、tjaからも入力できるようにする。
 			//日本語名だと選曲画面でバグが出るので、そこもどうにかしていく予定。
-
-			if (!string.IsNullOrEmpty(strCommandParam)) {
-				this.GENRE = strCommandParam;
-			}
+			this.GENRE = strCommandParam;
 		} else if (strCommandName.Equals("MAKER")) {
-			if (!string.IsNullOrEmpty(strCommandParam)) {
-				this.MAKER = strCommandParam;
-			}
+			this.MAKER = strCommandParam;
 		} else if (strCommandName.Equals("EXPLICIT")) {
-			if (!string.IsNullOrEmpty(strCommandParam)) {
-				this.EXPLICIT = CConversion.bONorOFF(strCommandParam[0]);
-			}
+			ParseArg(strCommandName, strCommandParam, "boolExplicit_int", arg => this.EXPLICIT = int.Parse(arg) != 0);
 		} else if (strCommandName.Equals("SELECTBG")) {
-			if (!string.IsNullOrEmpty(strCommandParam)) {
-				this.SELECTBG = strCommandParam;
-			}
+			this.SELECTBG = strCommandParam;
 		} else if (strCommandName.Equals("SCENEPRESET")) {
-			if (!string.IsNullOrEmpty(strCommandParam)) {
-				this.scenePresets = SplitComma(strCommandParam);
-			}
+			this.scenePresets = SplitComma(strCommandParam);
 		} else if (strCommandName.Equals("DEMOSTART")) {
 			//2015.04.10 kairera0467
-
-			if (!string.IsNullOrEmpty(strCommandParam)) {
-				int nOFFSETms;
-				try {
-					nOFFSETms = (int)(strCommandParam.ParseReal() * 1000.0);
-				} catch {
-					nOFFSETms = 0;
-				}
-
-
-				this.nDemoBGMOffset = nOFFSETms;
-			}
+			ParseArg(strCommandName, strCommandParam, "secSongSeek_real", arg => this.nDemoBGMOffset = (int)(arg.ParseReal() * 1000.0));
 		} else if (strCommandName.Equals("BGMOVIE")) {
 			//2016.02.02 kairera0467
 			//背景動画の定義。DTXから入力もできるが、tjaからも入力できるようにする。
 
-			if (!string.IsNullOrEmpty(strCommandParam)) {
-				this.strBGVIDEO_PATH =
-					CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, strCommandParam);
-			}
+			this.strBGVIDEO_PATH = string.IsNullOrEmpty(strCommandParam) ? strCommandParam
+				: CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, strCommandParam);
 
 			string strVideoFilename;
 			if (!string.IsNullOrEmpty(this.PATH_WAV))
@@ -3953,28 +4099,21 @@ internal class CTja : CActivity {
 				// (tAVILoad is itself gated on bLoadChart) and would leak native memory, since the parsed
 				// CTja is discarded without Dispose. Enumeration still records strBGVIDEO_PATH above.
 				// Only the first player's chart shows videos, so the other players' charts open none.
-				if (this.bLoadChart && this.nPlayerSide == 0) {
-					CVideoDecoder vd = new CVideoDecoder(strVideoFilename);
-
-					if (this.listVD!.ContainsKey(1))
-						this.listVD.Remove(1);
-
-					this.listVD.Add(1, vd);
-				}
+				if (this.bLoadChart && this.nPlayerSide == 0)
+					this.listVD![1] = new CVideoDecoder(strVideoFilename);
 			} catch (Exception e) {
 				this.AddWarn($"{strCommandName}: Exception when generating decoder for video {strVideoFilename}: {e.Message}; continued", e);
-				if (this.listVD!.ContainsKey(1))
-					this.listVD.Remove(1);
+				this.listVD!.Remove(1);
 			}
-		} else if (strCommandName.Contains("BGA")) {
+		} else if (strCommandName.StartsWith("BGA")) {
 			//2016.02.02 kairera0467
 			//背景動画の定義。DTXから入力もできるが、tjaからも入力できるようにする。
+			var indexText = strCommandName.Remove(0, 3);
+			var index = 2;
+			ParseArg(strCommandName, strCommandParam, null, [indexText], "indexBGASuffix_2digits", arg => index = strConvertBGAIndex(arg) + 2);
 
-			string videoPath = "";
-			if (!string.IsNullOrEmpty(strCommandParam)) {
-				videoPath =
-					CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, strCommandParam);
-			}
+			string videoPath = string.IsNullOrEmpty(strCommandParam) ? strCommandParam
+					: CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, strCommandParam);
 
 			string strVideoFilename;
 			if (!string.IsNullOrEmpty(this.PATH_WAV))
@@ -3984,23 +4123,15 @@ internal class CTja : CActivity {
 
 			try {
 				// As with BGMOVIE: only open the native decoder for actual play, not metadata enumeration.
-				if (this.bLoadChart && this.nPlayerSide == 0) {
-					CVideoDecoder vd = new CVideoDecoder(strVideoFilename);
-
-					var indexText = strCommandName.Remove(0, 3);
-
-					this.listVD!.Add((10 * int.Parse(indexText[0].ToString())) + int.Parse(indexText[1].ToString()) + 2, vd);
-				}
+				if (this.bLoadChart && this.nPlayerSide == 0)
+					this.listVD![index] = new CVideoDecoder(strVideoFilename);
 			} catch (Exception e) {
 				this.AddWarn($"{strCommandName}: Exception when generating decoder for video {strVideoFilename}: {e.Message}; continued.", e);
-				if (this.listVD!.ContainsKey(1))
-					this.listVD.Remove(1);
+				this.listVD!.Remove(index);
 			}
 		} else if (strCommandName.Equals("BGIMAGE")) {
 			//2016.02.02 kairera0467
-			if (!string.IsNullOrEmpty(strCommandParam)) {
-				this.strBGIMAGE_PATH = strCommandParam;
-			}
+			this.strBGIMAGE_PATH = strCommandParam;
 		} else if (strCommandName.Equals(".CUTSCENE_INTRO")) { // .CUTSCENE_INTRO:<path>,<repeat?>
 			string[] args = SplitComma(strCommandParam);
 			string path = !(0 < args.Length) ? "" : CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, args[0]);
@@ -4016,11 +4147,9 @@ internal class CTja : CActivity {
 
 				ECutSceneRepeatMode repeatMode = ECutSceneRepeatMode.FirstMet;
 				if (1 < args.Length && !string.IsNullOrEmpty(args[1])) {
-					repeatMode = int.Parse(args[1]) switch {
-						< 0 => ECutSceneRepeatMode.UntilFirstUnmet,
-						> 0 => ECutSceneRepeatMode.EverytimeMet,
-						0 or _ => ECutSceneRepeatMode.FirstMet,
-					};
+					this.TryArg(() => ParseArg(strCommandName, strCommandParam, args, 1, "enumRepeatMode_int",
+						arg => repeatMode = strConvertCutSceneRepeatMode(arg),
+						$"Defaulted it to {repeatMode} ({(int)repeatMode})"));
 				}
 
 				this.CutSceneIntro = new() {
@@ -4032,83 +4161,126 @@ internal class CTja : CActivity {
 			List<CutSceneDef> outros = new();
 			string[] args = SplitComma(strCommandParam);
 			for (int iArg = 0; iArg < args.Length; iArg += 4) {
-				string path = !(iArg + 0 < args.Length) ? "" : CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, args[iArg + 0]);
+				this.TryArg(() => {
+					string path = !(iArg + 0 < args.Length) ? "" : CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, args[iArg + 0]);
 
-				if (!string.IsNullOrEmpty(path)) {
-					string fullPath;
-					if (!string.IsNullOrEmpty(this.PATH_WAV))
-						fullPath = this.PATH_WAV + path;
-					else
-						fullPath = this.strFolderPath + path;
+					if (!string.IsNullOrEmpty(path)) {
+						string fullPath;
+						if (!string.IsNullOrEmpty(this.PATH_WAV))
+							fullPath = this.PATH_WAV + path;
+						else
+							fullPath = this.strFolderPath + path;
 
-					BestPlayRecords.EClearStatus clearRequirement = BestPlayRecords.EClearStatus.NONE;
-					if (iArg + 1 < args.Length && !string.IsNullOrEmpty(args[iArg + 1])) {
-						clearRequirement = (BestPlayRecords.EClearStatus)int.Parse(args[iArg + 1]);
+						BestPlayRecords.EClearStatus clearRequirement = BestPlayRecords.EClearStatus.NONE;
+						if (iArg + 1 < args.Length && !string.IsNullOrEmpty(args[iArg + 1])) {
+							this.TryArg(() => ParseArg(strCommandName, strCommandParam, args, iArg + 1, $"enumClearStatus_int_{iArg / 4}",
+								arg => clearRequirement = (BestPlayRecords.EClearStatus)int.Parse(arg),
+								$"Defaulted it to {clearRequirement} ({(int)clearRequirement})"));
+						}
+
+						string requirementRange = "me";
+						if (iArg + 2 < args.Length) {
+							this.TryArg(() => ParseArg(strCommandName, strCommandParam, args, iArg + 2, $"enumRangeClearStatus_str_{iArg / 4}",
+								arg => requirementRange = arg.Trim() switch {
+									"l" or "le" or "e" or "m" or "d" or "me" => arg.Trim(),
+									_ => throw new ArgumentOutOfRangeException("strRange", arg, "Out of recognized values (l, le, e, m, d, me)"),
+								},
+								$"Defaulted it to {requirementRange}"));
+						}
+
+						ECutSceneRepeatMode repeatMode = ECutSceneRepeatMode.FirstMet;
+						if (iArg + 3 < args.Length && !string.IsNullOrEmpty(args[iArg + 3])) {
+							this.TryArg(() => ParseArg(strCommandName, strCommandParam, args, iArg + 3, $"enumRepeatMode_int_{iArg / 4}",
+								arg => repeatMode = strConvertCutSceneRepeatMode(arg),
+								$"Defaulted it to {repeatMode} ({(int)repeatMode})"));
+						}
+
+						outros.Add(new() {
+							FullPath = fullPath,
+							ClearRequirement = clearRequirement,
+							RequirementRange = requirementRange,
+							RepeatMode = repeatMode,
+						});
 					}
-
-					string requirementRange = !(iArg + 2 < args.Length) ? "me" : args[iArg + 2].Trim();
-
-					ECutSceneRepeatMode repeatMode = ECutSceneRepeatMode.FirstMet;
-					if (iArg + 3 < args.Length && !string.IsNullOrEmpty(args[iArg + 3])) {
-						repeatMode = int.Parse(args[iArg + 3]) switch {
-							< 0 => ECutSceneRepeatMode.UntilFirstUnmet,
-							> 0 => ECutSceneRepeatMode.EverytimeMet,
-							0 or _ => ECutSceneRepeatMode.FirstMet,
-						};
-					}
-
-					outros.Add(new() {
-						FullPath = fullPath,
-						ClearRequirement = clearRequirement,
-						RequirementRange = requirementRange,
-						RepeatMode = repeatMode,
-					});
-				}
+				});
 			}
 			this.CutSceneOutros = outros;
 		} else if (strCommandName.Equals("LYRICS") || strCommandName.Equals("LYRICFILE")) {
-			if (!usingLyricsFile && OpenTaiko.ConfigIni.nPlayerCount < 4 && !string.IsNullOrEmpty(strCommandParam)) {
-				string[] files = SplitComma(strCommandParam);
-				string[] filePaths = new string[files.Length];
-				for (int i = 0; i < files.Length; i++) {
-					filePaths[i] = this.strFolderPath + files[i];
+			if (usingLyricsFile) {
+				this.AddWarn($"ignoring an extra LYRICS / LYRICFILE header, argument: {strCommandParam}");
+			} else {
+				bool isLoadingLyrics = this.bLoadChart && OpenTaiko.ConfigIni.nPlayerCount < 4;
+				List<STLYRIC> listLyrics = [];
+				List<int> idxLyric2AtSongEnds = [];
 
-					if (File.Exists(filePaths[i])) {
-						try {
-							if (this.bLoadChart) {
-								if (filePaths[i].EndsWith(".vtt")) {
-									new VTTParser().ParseVTTFile(this.listLyric2, filePaths[i], 0);
-								} else if (filePaths[i].EndsWith(".lrc")) {
-									this.LyricFileParser(this.listLyric2, filePaths[i]);
-								} else {
-									continue;
-								}
-								this.IdxLyric2AtSongEnds.Add(this.listLyric2.Count);
-								this.bLyrics = true;
-								this.usingLyricsFile = true;
-							}
-						} catch (Exception e) {
-							this.AddWarn($"{strCommandName}: Something went wrong while parsing a lyric file at {filePaths[i]}: {e.Message}", e);
-						}
+				int nEntries = 0;
+				string[] files = SplitComma(strCommandParam);
+				if (files.Length > 0 && string.IsNullOrWhiteSpace(files[^1])) // empty list, or trailing comma (,) (not trimmed for headers)
+					Array.Resize(ref files, files.Length - 1);
+				for (int i = 0; i < files.Length; i++) {
+					if (string.IsNullOrEmpty(files[i])) {
+						idxLyric2AtSongEnds.Add(listLyrics.Count);
+						continue;
 					}
+
+					++nEntries;
+					this.TryArg(() => ParseArg(strCommandName, strCommandParam, files, i, "pathLyricFile",
+						arg => {
+							try {
+								string filePath = this.strFolderPath + arg;
+								void checkFileExist(string path) {
+									if (!File.Exists(path))
+										throw new FileNotFoundException("Lyric file not found", path);
+								}
+
+								if (filePath.ToLower().EndsWith(".vtt")) {
+									if (!isLoadingLyrics)
+										return;
+									checkFileExist(filePath);
+									new VTTParser().ParseVTTFile(listLyrics, filePath, 0);
+								} else if (filePath.ToLower().EndsWith(".lrc")) {
+									if (!isLoadingLyrics)
+										return;
+									checkFileExist(filePath);
+									this.LyricFileParser(listLyrics, filePath);
+								} else {
+									this.AddArgError(strCommandName, strCommandParam, i, null, arg, $"Unknown lyric file extension");
+									return;
+								}
+							} finally {
+								idxLyric2AtSongEnds.Add(listLyrics.Count);
+							}
+						},
+						"Disabled the lyrics for its corresponding song"));
 				}
+
+				this.listLyric2 = listLyrics;
+				this.IdxLyric2AtSongEnds = idxLyric2AtSongEnds;
+				this.bLyrics = this.usingLyricsFile = (nEntries > 0);
 			}
 		} else if (strCommandName.Equals("COMPAT")) {
-			this.COMPAT = strConvertTjaCompat(strCommandParam);
+			ParseArg(strCommandName, strCommandParam, "enumCompat_str", arg => this.COMPAT = strConvertTjaCompat(arg));
 		} else {
 			var metadatas = (this.nowCourseScope == (int)Difficulty.Total) ? this.SongListCourseMetadata
-				: [this.SongListCourseMetadata[this.nowCourseScope]];
+				: (this.nowCourseScope >= 0) ? [this.SongListCourseMetadata[this.nReferenceDifficulty]]
+				: [];
 			this.ParseQueryableCourseMetadata(metadatas, strCommandName, strCommandParam);
 		}
 	}
 
-	public static ETjaCompat strConvertTjaCompat(string strCommandParam) => strCommandParam.ToLower() switch {
+	public static ECutSceneRepeatMode strConvertCutSceneRepeatMode(string arg) => int.Parse(arg) switch {
+		< 0 => ECutSceneRepeatMode.UntilFirstUnmet,
+		> 0 => ECutSceneRepeatMode.EverytimeMet,
+		0 or _ => ECutSceneRepeatMode.FirstMet,
+	};
+
+	public static ETjaCompat strConvertTjaCompat(string strCompatMode) => strCompatMode.ToLower() switch {
 		"jiro1" => ETjaCompat.Jiro1,
 		"jiro2" => ETjaCompat.Jiro2,
 		"tmg" => ETjaCompat.TMG,
 		"tjap3" => ETjaCompat.TJAP3,
 		"oos" => ETjaCompat.OOS,
-		_ => throw new ArgumentOutOfRangeException("strCompatMode"), // argument shown in AddCommandError()
+		_ => throw new ArgumentOutOfRangeException(nameof(strCompatMode), strCompatMode, "Out of recognized values (Jiro1, Jiro2, Tmg, Tjap3, Oos)"),
 	};
 
 	/// <summary>
@@ -4123,29 +4295,30 @@ internal class CTja : CActivity {
 			return false;
 	}
 
-	private int strConvertCourse(string str) {
+	public static int strConvertCourse(string strDiff) {
 		//2016.08.24 kairera0467
 		//正規表現を使っているため、easyでもEASYでもOK。
 
 		// 小文字大文字区別しない正規表現で仮対応。 (AioiLight)
 		// 相変わらず原始的なやり方だが、正常に動作した。
-		str = str.Trim();
+		strDiff = strDiff.Trim();
 		string[] Matchptn = new string[7] { "easy", "normal", "hard", "oni", "edit", "tower", "dan" };
 		for (int i = 0; i < Matchptn.Length; i++) {
-			if (string.Equals(str, Matchptn[i], StringComparison.InvariantCultureIgnoreCase)) {
+			if (string.Equals(strDiff, Matchptn[i], StringComparison.InvariantCultureIgnoreCase)) {
 				return i;
 			}
 		}
 
-		if (int.TryParse(str, out int iDiff) && (iDiff >= 0 && iDiff <= 6)) {
+		if (int.TryParse(strDiff, out int iDiff) && (iDiff >= 0 && iDiff <= 6)) {
 			return iDiff;
 		}
-		return 3;
+		throw new ArgumentOutOfRangeException(nameof(strDiff), strDiff, "Out of recognized values (Easy (0), Normal (1), Hard (2), Oni (3), Edit (4), Tower (5), Dan (6))");
 	}
 
-	private static EGameType strConvertGameType(string argument) => argument.ToLower() switch {
+	public static EGameType strConvertGameType(string strGameType) => strGameType.ToLower() switch {
 		"bongo" or "konga" => EGameType.Konga,
-		"taiko" or _ => EGameType.Taiko,
+		"taiko" => EGameType.Taiko,
+		_ => throw new ArgumentOutOfRangeException(nameof(strGameType), strGameType, "Out of recognized values (Taiko, Bongo/Konga)"),
 	};
 
 	/// <summary>
@@ -4616,7 +4789,6 @@ internal class CTja : CActivity {
 		this.listNoteChip = new List<CChip>();
 		this.listBalloon_Branch = Enumerable.Range(0, 4).Select(x => new List<int>()).ToArray();
 		this.listBRANCH = new List<CChip>();
-		this.divsPerMeasureAllBranches = new List<int>();
 		this.listLyric = new List<SKBitmap>();
 		this.listLyric2 = new List<STLYRIC>();
 		this.IdxLyric2AtSongEnds = new();
