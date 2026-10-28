@@ -257,6 +257,7 @@ public class SoundManager   // : CSound
 		if (!OperatingSystem.IsWindows() && soundDeviceType is ESoundDeviceType.ExclusiveWASAPI or ESoundDeviceType.SharedWASAPI or ESoundDeviceType.ASIO)
 			Trace.TraceInformation($"{soundDeviceType} is only available on Windows; using BASS.");
 		foreach (var deviceType in DeviceTryOrder(soundDeviceType, OperatingSystem.IsWindows())) {
+			if (deviceType is ESoundDeviceType.ASIO && CSoundDeviceASIO.DriverAbandoned) continue;   // until a restart
 			SoundDeviceType = deviceType;
 			try {
 				tReloadSoundDeviceAndSound();
@@ -409,7 +410,7 @@ public class SoundManager   // : CSound
 	public static bool IsDeviceChangeDue {
 		get {
 			long tick = Interlocked.Read(ref deviceChangeTick);
-			return tick >= 0 && Environment.TickCount64 - tick >= DeviceChangeSettleMs;
+			return (tick >= 0 && Environment.TickCount64 - tick >= DeviceChangeSettleMs) || AsioCrashGuard.CrashPending;
 		}
 	}
 
@@ -420,7 +421,12 @@ public class SoundManager   // : CSound
 		if (!IsDeviceChangeDue) return;
 		Interlocked.Exchange(ref deviceChangeTick, -1);
 		if (requestedDeviceType is ESoundDeviceType.Unknown) return;
-		if (requestedDeviceType is ESoundDeviceType.ASIO) {
+		if (AsioCrashGuard.TakeCrash()) {
+			// the driver's crashing thread was ended: the sound moves to another output, the driver is not called again
+			Trace.TraceWarning("The ASIO driver crashed; its thread was stopped instead of the game.");
+			if (SoundDevice is not CSoundDeviceASIO crashed) return;   // already off that driver
+			crashed.Abandon();
+		} else if (requestedDeviceType is ESoundDeviceType.ASIO && !CSoundDeviceASIO.DriverAbandoned) {
 			string? reason = AsioReopenReason();
 			if (reason == null) return;
 			Trace.TraceInformation($"Reopening the sound device (ASIO): {reason}.");
@@ -430,7 +436,7 @@ public class SoundManager   // : CSound
 		}
 		foreach (var deviceType in DeviceTryOrder(requestedDeviceType, OperatingSystem.IsWindows())) {
 			if (deviceType is ESoundDeviceType.Unknown) continue;
-			if (deviceType is ESoundDeviceType.ASIO && requestedDeviceType is not ESoundDeviceType.ASIO) continue;
+			if (deviceType is ESoundDeviceType.ASIO && (requestedDeviceType is not ESoundDeviceType.ASIO || CSoundDeviceASIO.DriverAbandoned)) continue;
 			SoundDeviceType = deviceType;
 			try {
 				tReloadSoundDeviceAndSound();

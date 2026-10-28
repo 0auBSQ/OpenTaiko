@@ -104,6 +104,8 @@ internal class CSoundDeviceASIO : ISoundDevice {
 		// 初期化。
 
 		Trace.TraceInformation("BASS (ASIO) の初期化を開始します。");
+		if (DriverAbandoned)
+			throw new Exception("The ASIO driver crashed or stopped answering earlier; ASIO opens again after a restart.");
 		this.SoundDeviceType = ESoundDeviceType.Unknown;
 		this.OutputDelay = 0;
 		this.ElapsedTimeMs = 0;
@@ -170,6 +172,9 @@ internal class CSoundDeviceASIO : ISoundDevice {
 			this.bIsBASSFree = false;
 			// the driver asks to be reset when its device goes away or changes: the game then reopens it
 			BassAsio.SetNotify(SoundManager.AsioNotify, IntPtr.Zero);
+			// a crash on one of the driver's own threads ends that thread, not the game
+			if (BassAsio.GetDeviceInfo(ASIODevice, out AsioDeviceInfo driverInfo))
+				AsioCrashGuard.Watch(driverInfo.Driver);
 			#region [ debug: channel format ]
 			//BASS_ASIO_CHANNELINFO chinfo = new BASS_ASIO_CHANNELINFO();
 			//int chan = 0;
@@ -337,13 +342,51 @@ internal class CSoundDeviceASIO : ISoundDevice {
 	#endregion
 
 
-	/// <summary>The driver stops asking for sound (tAsioProcess is no longer called); Dispose closes it.</summary>
+	/// <summary>The driver stops asking for sound (tAsioProcess is no longer called); Dispose closes it. A driver
+	/// that does not answer in time or crashes meanwhile is left alone (<see cref="Abandon"/>).</summary>
 	public void StopOutput() {
-		if (bIsBASSFree) return;
+		if (bIsBASSFree || abandoned) return;
 		Trace.TraceInformation("Stopping the ASIO output.");
-		BassAsio.Stop();
-		Trace.TraceInformation("ASIO output stopped.");
+		if (CallDriver(BassAsio.Stop))
+			Trace.TraceInformation("ASIO output stopped.");
+		else
+			Abandon();
 	}
+
+	/// <summary>True once an ASIO driver crashed or stopped answering in this run: it is never called again, and
+	/// no ASIO device opens until the game restarts.</summary>
+	public static bool DriverAbandoned { get; private set; }
+	private static readonly List<CSoundDeviceASIO> abandonedDevices = new();   // their procedures stay callable
+	private bool abandoned;
+
+	/// <summary>Leaves the driver alone from now on: it is neither stopped nor closed (it may hold its own locks).</summary>
+	public void Abandon() {
+		if (abandoned) return;
+		abandoned = true;
+		DriverAbandoned = true;
+		lock (abandonedDevices) abandonedDevices.Add(this);
+		Trace.TraceWarning("The ASIO driver is left alone until the game restarts: it crashed or stopped answering.");
+	}
+
+	// a call into a driver that may have crashed, on a thread of its own: a driver that hangs, or whose thread
+	// AsioCrashGuard ended, cannot stop the game. False when it did not return in time or the driver crashed.
+	private bool CallDriver(Func<bool> call) {
+		int device = ASIODevice;
+		var returned = new ManualResetEventSlim();
+		var thread = new Thread(() => {
+			try {
+				BassAsio.CurrentDevice = device;   // the current device is per thread
+				call();
+			} catch (Exception e) {
+				Trace.TraceWarning("ASIO driver call failed: " + e.Message);
+			} finally {
+				returned.Set();
+			}
+		}) { IsBackground = true, Name = "ASIO driver call" };
+		thread.Start();
+		return returned.Wait(DriverAnswerMs) && !AsioCrashGuard.CrashPending;
+	}
+	private const int DriverAnswerMs = 2000;
 
 	#region [ Dispose-Finallizeパターン実装 ]
 	//-----------------
@@ -355,9 +398,14 @@ internal class CSoundDeviceASIO : ISoundDevice {
 		SoundDeviceType = ESoundDeviceType.Unknown;     // まず出力停止する(Dispose中にクラス内にアクセスされることを防ぐ)
 		// the driver stops calling tAsioProcess first: it reads both mixers
 		if (!bIsBASSFree) {
-			Trace.TraceInformation("Closing the ASIO driver.");
-			BassAsio.Free();    // システムタイマより先に呼び出すこと。（tAsio処理() の中でシステムタイマを参照してるため）
-			Trace.TraceInformation("ASIO driver closed.");
+			if (!abandoned) {
+				Trace.TraceInformation("Closing the ASIO driver.");
+				// システムタイマより先に呼び出すこと。（tAsio処理() の中でシステムタイマを参照してるため）
+				if (CallDriver(BassAsio.Free))
+					Trace.TraceInformation("ASIO driver closed.");
+				else
+					Abandon();
+			}
 		}
 		if (hMixer_DeviceOut != -1) {
 			Bass.StreamFree(hMixer_DeviceOut);
@@ -393,7 +441,8 @@ internal class CSoundDeviceASIO : ISoundDevice {
 	protected AsioProcedure? tAsioProc = null;
 
 	protected int tAsioProcess(bool input, int channel, IntPtr buffer, int length, IntPtr user) {
-		if (input) return 0;
+		// nothing once closed: a driver left alone may still call (its mixers and timer are gone)
+		if (input || this.SoundDeviceType != ESoundDeviceType.ASIO) return 0;
 
 
 		// BASSミキサからの出力データをそのまま ASIO buffer へ丸投げ。
