@@ -7,6 +7,10 @@ public class CSoundTimer : CTimerBase {
 
 	private long SystemTimeMsBase(Func<long> getOSTime) {
 		if (this.IsDeviceTypeSupported()) {
+			// a device that has just replaced another: the double path carries the time over until it plays
+			if (this.rebasePending)
+				return (long)this.SystemTimsMsBase_Double(() => getOSTime());
+
 			// BASS 系の ISoundDevice.n経過時間ms はオーディオバッファの更新間隔ずつでしか更新されないため、単にこれを返すだけではとびとびの値になる。
 			// そこで、更新間隔の最中に呼ばれた場合は、システムタイマを使って補間する。
 			// この場合の経過時間との誤差は更新間隔以内に収まるので問題ないと判断する。
@@ -27,13 +31,14 @@ public class CSoundTimer : CTimerBase {
 				// そこで、演奏タイマが動作を始める前(this.Device.n経過時間を更新したシステム時刻ms == CTimer.n未使用)は、
 				// 補正部分をゼロにして、n経過時間msだけを返すようにする。
 				// こうすることで、演奏タイマが動作を始めても、破綻しなくなる。
-				return this.Device.ElapsedTimeMs;
+				return this.Device.ElapsedTimeMs + (long)this.msDeviceOffset;
 			} else {
 				if (FDK.SoundManager.bUseOSTimer) {
 					return getOSTime(); // match TimerType.GameTimeAtDraw behavior
 				} else {
 					return this.Device.ElapsedTimeMs
-						   + (this.Device.SystemTimer.SystemTimeMs - this.Device.UpdateSystemTimeMs);
+						   + (this.Device.SystemTimer.SystemTimeMs - this.Device.UpdateSystemTimeMs)
+						   + (long)this.msDeviceOffset;
 				}
 			}
 		}
@@ -45,18 +50,47 @@ public class CSoundTimer : CTimerBase {
 
 	private double SystemTimsMsBase_Double(Func<double> getOSTime) {
 		if (this.IsDeviceTypeSupported()) {
+			if (this.rebasePending) {
+				double now = this.Device.SystemTimer.SystemTimeMs_Double;
+				double sinceSwitch = now - this.msSwitchSystemTime;
+				if (double.IsNaN(this.msFirstPendingRead)) this.msFirstPendingRead = now;
+				// on with the clock until the new device has played, in an update stamped after the clock moved
+				// on: the ones stamped while the game thread was rebuilding the device carry its stale time
+				if (this.Device.UpdateSystemTimeMs == CTimer.UnusedNum || this.Device.dbUpdateSystemTimeMs <= this.msFirstPendingRead)
+					return this.msCarried + sinceSwitch;
+				// from here its own count goes on from the time reached, whatever it starts at (its first value
+				// is less its latency or unplayed buffer)
+				this.rebasePending = false;
+				this.msDeviceOffset = this.msCarried + sinceSwitch
+					- (this.Device.dbElapsedTimeMs + (this.Device.SystemTimer.SystemTimeMs_Double - this.Device.dbUpdateSystemTimeMs));
+			}
 			if (this.Device.UpdateSystemTimeMs == CTimer.UnusedNum) {
-				return this.Device.dbElapsedTimeMs;
+				return this.Device.dbElapsedTimeMs + this.msDeviceOffset;
 			} else {
 				if (FDK.SoundManager.bUseOSTimer) {
 					return getOSTime();
 				} else {
 					return this.Device.dbElapsedTimeMs
-						   + (this.Device.SystemTimer.SystemTimeMs_Double - this.Device.dbUpdateSystemTimeMs);
+						   + (this.Device.SystemTimer.SystemTimeMs_Double - this.Device.dbUpdateSystemTimeMs)
+						   + this.msDeviceOffset;
 				}
 			}
 		}
 		return CTimerBase.UnusedNum;
+	}
+
+	// The output device was rebuilt: the new one counts its time from zero, so the timer goes on from the
+	// time it had (msCarried, read before the old device closed) instead of jumping back with it.
+	private double msDeviceOffset;
+	private bool rebasePending;
+	private double msCarried, msSwitchSystemTime, msFirstPendingRead;
+	internal void SwitchDevice(ISoundDevice device, double msCarried) {
+		this.Device = device;
+		this.msDeviceOffset = 0;
+		this.msCarried = msCarried;
+		this.msSwitchSystemTime = device.SystemTimer.SystemTimeMs_Double;
+		this.msFirstPendingRead = double.NaN;
+		this.rebasePending = true;
 	}
 
 	public override double SystemTimeMs_Double => SystemTimsMsBase_Double(() => Game.dbTimeMs);

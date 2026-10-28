@@ -236,6 +236,62 @@ namespace OpenTaikoTests {
 			}
 		}
 
+		// the output stops taking samples (headphones unplugged): the picture runs on, the waiting sound is
+		// dropped at the same pace, and the sound clocks the video again once the output takes samples again
+		[Fact]
+		public void AudioOutputStalls_TheVideoRunsOnAndTheSoundTakesOverAgain() {
+			string? clip = MakeClip();
+			if (clip == null) return;
+			int mixer = 0, main = 0;
+			StreamProcedure? proc = null;
+			var clock = Stopwatch.StartNew();
+			double t0 = Game.dbTimeMs;
+			void Tick() { Game.dbTimeMs = t0 + clock.Elapsed.TotalMilliseconds; Game.TimeMs = (long)Game.dbTimeMs; }
+			try {
+				mixer = ManagedBass.Mix.BassMix.CreateMixerStream(48000, 2, BassFlags.MixerNonStop | BassFlags.Decode);
+				Assert.True(mixer != 0, Bass.LastError.ToString());
+				int mixerHandle = mixer;
+				proc = (handle, buffer, length, user) => { int n = Bass.ChannelGetData(mixerHandle, buffer, length); return n < 0 ? 0 : n; };
+				main = Bass.CreateStream(48000, 2, BassFlags.Default, proc, IntPtr.Zero);
+				Assert.True(Bass.ChannelPlay(main, false), Bass.LastError.ToString());
+				Tick();
+				var video = new CVideoDecoder(clip, (rate, channels, seconds, proc) => {
+					var snd = new CSound(ESoundGroup.SongPlayback);
+					snd.CreateBassUserSound(rate, channels, seconds, mixerHandle, proc);
+					return snd;
+				});
+				video.InitRead();
+				var sw = Stopwatch.StartNew();
+				while (video.AudioQueuedMs < 500 && sw.ElapsedMilliseconds < 3000) Thread.Sleep(10);
+
+				// the clock read about once a frame while the game time moves
+				double Run(int ms) {
+					var run = Stopwatch.StartNew();
+					while (run.ElapsedMilliseconds < ms) { Tick(); _ = video.msPlayPosition; Thread.Sleep(15); }
+					Tick();
+					return video.msPlayPosition;
+				}
+				video.Start();
+				double playing = Run(500);
+				Assert.InRange(playing, 250.0, 800.0);
+
+				Bass.ChannelPause(main);   // the output stops taking samples
+				double stalled = Run(1500);
+				Assert.InRange(stalled, playing + 1050.0, playing + 1800.0);   // ran on through the stall
+
+				Assert.True(Bass.ChannelPlay(main, false), Bass.LastError.ToString());   // and takes them again
+				double resumed = Run(600);
+				Assert.InRange(resumed, stalled + 250.0, stalled + 1000.0);   // on from there, clocked by the sound
+				video.Stop();
+				DisposeWithoutGl(video);
+			} finally {
+				if (main != 0) Bass.StreamFree(main);
+				if (mixer != 0) Bass.StreamFree(mixer);
+				GC.KeepAlive(proc);
+				try { File.Delete(clip); } catch (IOException) { }
+			}
+		}
+
 		[Fact]
 		public void SilentClip_SeekLandsWhereAsked_AndASpeedChangeKeepsThePosition() {
 			string? clip = MakeClip();

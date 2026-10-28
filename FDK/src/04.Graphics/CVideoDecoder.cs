@@ -29,7 +29,8 @@ public unsafe class CVideoDecoder : IDisposable {
 		private readonly object gate = new();
 		private readonly ManualResetEventSlim spaceFreed = new(true);
 		public readonly int Rate;
-		public long DeliveredFrames { get; private set; }   // handed to BASS since the last flush
+		public long DeliveredFrames { get; private set; }   // handed to BASS (or discarded) since the last flush
+		public long PulledFrames { get; private set; }      // taken by the stream procedure, ever
 		public bool Ended;
 
 		public AudioRing(int rate, int channels, double seconds) {
@@ -52,8 +53,22 @@ public unsafe class CVideoDecoder : IDisposable {
 				this.head = (this.head + floats) % this.buf.Length;
 				this.count -= floats;
 				this.DeliveredFrames += floats / this.channels;
+				this.PulledFrames += floats / this.channels;
 				this.spaceFreed.Set();
 				return floats * sizeof(float);
+			}
+		}
+
+		// drops up to `frames` frames as if they had been played (the output is gone; the time goes on)
+		public void Discard(long frames) {
+			lock (this.gate) {
+				long floats = Math.Min(frames * this.channels, this.count);
+				floats -= floats % this.channels;
+				if (floats <= 0) return;
+				this.head = (int)((this.head + floats) % this.buf.Length);
+				this.count -= (int)floats;
+				this.DeliveredFrames += floats / this.channels;
+				this.spaceFreed.Set();
 			}
 		}
 
@@ -287,6 +302,7 @@ public unsafe class CVideoDecoder : IDisposable {
 
 	public void Start() {
 		if (this.bStreamEnded) this.Seek(0);   // after Stop or the end: from the top again
+		this.ResetStallWatch();
 		CTimer.Reset();
 		CTimer.Resume();
 		this.audio?.PlayStart();
@@ -351,6 +367,7 @@ public unsafe class CVideoDecoder : IDisposable {
 			this.audioRing!.Flush();
 			this.audio.UserStreamFlush();
 			audioBaseMs = timestampms;
+			this.ResetStallWatch();
 		}
 		foreach (var frame in framelist) {
 			frame.RemoveFrame();
@@ -624,13 +641,60 @@ public unsafe class CVideoDecoder : IDisposable {
 	}
 
 	// with an audio track the clock is what has actually been heard: the frames the stream procedure handed
-	// out, less what the mixer still holds, from the last seek target
+	// out, less what the mixer still holds, from the last seek target.
+	// The output can stop taking samples (the device was unplugged or failed), and that clock stops with it.
+	// When the sound has not moved for StallMs while playing with samples waiting, the clock runs on the
+	// timer from there, and the waiting samples are dropped at the same pace so the reader goes on and the
+	// sound is in the right place when the output takes samples again; the sound is the clock again from then.
 	public double msPlayPosition {
 		get {
 			if (this.audio == null || this.audioRing == null) return CTimer.NowTimeMs_Double * _dbPlaySpeed;
-			long bytesPerFrame = audioChannels * sizeof(float);
-			double heardFrames = this.audioRing.DeliveredFrames - this.audio.UserStreamBufferedBytes / (double)bytesPerFrame;
-			return audioBaseMs + Math.Max(0.0, heardFrames) * 1000.0 / audioRate;
+			lock (this.clockGate) {
+				var ring = this.audioRing;
+				long bytesPerFrame = audioChannels * sizeof(float);
+				double bufferedFrames = this.audio.UserStreamBufferedBytes / (double)bytesPerFrame;
+				double heard = audioBaseMs + Math.Max(0.0, ring.DeliveredFrames - bufferedFrames) * 1000.0 / audioRate;
+				if (!this.bPlaying)
+					return this.freeRun ? this.freeRunBaseMs + (CTimer.NowTimeMs_Double - this.freeRunTimerMs) * _dbPlaySpeed : heard;
+				CTimer.Update();
+				double now = CTimer.NowTimeMs_Double;
+				if (this.freeRun) {
+					if (ring.PulledFrames == this.freeRunPulled) {
+						double pos = this.freeRunBaseMs + (now - this.freeRunTimerMs) * _dbPlaySpeed;
+						long due = (long)((pos - audioBaseMs) * audioRate / 1000.0 + bufferedFrames) - ring.DeliveredFrames;
+						if (due > 0) ring.Discard(due);
+						return pos;
+					}
+					this.freeRun = false;   // the output takes samples again
+					Trace.TraceInformation("Video audio output resumed; the sound clocks the video again.");
+				}
+				if (heard != this.lastHeardMs) {
+					this.lastHeardMs = heard;
+					this.lastHeardTimerMs = now;
+				} else if (now - this.lastHeardTimerMs >= StallMs && ring.QueuedMs >= StallMs) {
+					this.freeRun = true;
+					this.freeRunBaseMs = heard;
+					this.freeRunTimerMs = now;
+					this.freeRunPulled = ring.PulledFrames;
+					Trace.TraceWarning("Video audio output stalled; the video runs on its own clock until the sound plays again.");
+				}
+				return heard;
+			}
+		}
+	}
+
+	private const double StallMs = 300;
+	private readonly object clockGate = new();
+	private double lastHeardMs = double.NaN, lastHeardTimerMs;
+	private bool freeRun;
+	private double freeRunBaseMs, freeRunTimerMs;
+	private long freeRunPulled;
+
+	// the clock starts over (start, seek): the stall watch with it
+	private void ResetStallWatch() {
+		lock (this.clockGate) {
+			this.freeRun = false;
+			this.lastHeardMs = double.NaN;
 		}
 	}
 
@@ -657,6 +721,15 @@ public unsafe class CVideoDecoder : IDisposable {
 				if (this.audio == null || this.audioRing == null) {
 					if (this.bPlaying) CTimer.Update();
 					CTimer.NowTimeMs_Double = CTimer.NowTimeMs_Double * this._dbPlaySpeed / value;
+				} else {
+					// a clock running on the timer while the output is gone goes on from where it is
+					double pos = this.msPlayPosition;
+					lock (this.clockGate) {
+						if (this.freeRun) {
+							this.freeRunBaseMs = pos;
+							this.freeRunTimerMs = CTimer.NowTimeMs_Double;
+						}
+					}
 				}
 				this._dbPlaySpeed = value;
 				this.audio?.SetSpeedLive(value);   // on the stream already in the mixer; the clock is in media time either way

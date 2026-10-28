@@ -75,7 +75,8 @@ public partial class CSoundDeviceBASS : ISoundDevice {
 		}
 	}
 
-	public CSoundDeviceBASS(int updatePeriod, int bufferSize) {
+	// device: -1 the system's default output; 0 BASS's silent device (the mixer runs, nothing is heard)
+	public CSoundDeviceBASS(int updatePeriod, int bufferSize, int device = -1) {
 		Trace.TraceInformation("Start initialization of BASS");
 		this.SoundDeviceType = ESoundDeviceType.Unknown;
 		this.OutputDelay = 0;
@@ -114,7 +115,7 @@ public partial class CSoundDeviceBASS : ISoundDevice {
 			Bass.Configure(Configuration.LogarithmicVolumeCurve, true);
 		}
 
-		if (!Bass.Init(-1, freq, DeviceInitFlags.Latency)) {
+		if (!Bass.Init(device, freq, DeviceInitFlags.Latency)) {
 			// The tuned Android config can be rejected by some devices/HALs — fall back to safe
 			// defaults before giving up (audio at default latency beats no audio).
 			if (!(OperatingSystem.IsAndroid() && RetryAndroidDefaultInit(out freq)))
@@ -216,6 +217,10 @@ public partial class CSoundDeviceBASS : ISoundDevice {
 		var sound = new CSound(soundGroup);
 		sound.CreateBassUserSound(frequency, channels, durationSeconds, this.MixerHandle, proc, ESoundDeviceType.Bass, SoundManager.bIsTimeStretch);
 		return sound;
+	}
+
+	public void tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, CSound sound) {
+		sound.CreateBassUserSound(frequency, channels, durationSeconds, this.MixerHandle, proc, ESoundDeviceType.Bass, SoundManager.bIsTimeStretch);
 	}
 	#endregion
 

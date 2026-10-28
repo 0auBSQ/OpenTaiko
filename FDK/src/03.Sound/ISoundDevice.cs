@@ -18,4 +18,6 @@ internal interface ISoundDevice : IDisposable {
 	void tCreateSound(string strFileName, CSound sound);
 	// a stream fed from code through a stream procedure (a video's audio track)
 	CSound tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, ESoundGroup soundGroup);
+	// the same, made again on an existing sound (the device was rebuilt)
+	void tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, CSound sound);
 }

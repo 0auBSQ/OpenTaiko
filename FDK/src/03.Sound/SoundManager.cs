@@ -251,6 +251,7 @@ public class SoundManager   // : CSound
 		ASIODevice = _nASIODevice;
 		bUseOSTimer = _bUseOSTimer;
 
+		requestedDeviceType = soundDeviceType;
 		if (!OperatingSystem.IsWindows() && soundDeviceType is ESoundDeviceType.ExclusiveWASAPI or ESoundDeviceType.SharedWASAPI or ESoundDeviceType.ASIO)
 			Trace.TraceInformation($"{soundDeviceType} is only available on Windows; using BASS.");
 		foreach (var deviceType in DeviceTryOrder(soundDeviceType, OperatingSystem.IsWindows())) {
@@ -267,6 +268,8 @@ public class SoundManager   // : CSound
 				}
 			}
 		}
+		onSilentDevice = false;
+		WatchOutputDevices();
 		if (IsDeviceTypeSupported(soundDeviceType)) {
 			//Bass.BASS_SetConfig( BASSConfig.BASS_CONFIG_UPDATETHREADS, 4 );
 			//Bass.BASS_SetConfig( BASSConfig.BASS_CONFIG_UPDATEPERIOD, 0 );
@@ -295,15 +298,26 @@ public class SoundManager   // : CSound
 		#region [ すでにサウンドデバイスと演奏タイマが構築されていれば解放する。]
 		//-----------------
 		if (SoundDevice != null) {
+			// what goes on across the new device, read while the old one is still there: the play timer's time,
+			// what each sound was doing, and how long the old output has been silent (so the sounds go on from
+			// where they would be)
+			if (IsDeviceTypeSupported(SoundDevice.SoundDeviceType)) {
+				carriedTimerMs = PlayTimer?.SystemTimeMs_Double;
+				carriedOutageMs = SoundDevice.UpdateSystemTimeMs == CTimer.UnusedNum ? 0.0
+					: Math.Max(0.0, SoundDevice.SystemTimer.SystemTimeMs_Double - SoundDevice.dbUpdateSystemTimeMs);
+				carriedStates = CSound.tCaptureStates();
+				carriedAtTimestamp = Stopwatch.GetTimestamp();
+			}
+
 			// すでに生成済みのサウンドがあれば初期状態に戻す。
 
 			CSound.tResetAllSound();        // リソースは解放するが、CSoundのインスタンスは残す。
 
 
-			// サウンドデバイスと演奏タイマを解放する。
+			// サウンドデバイスを解放する。演奏タイマは残し、新しいデバイスに付け替える。
 
 			SoundDevice.Dispose();
-			PlayTimer?.Dispose();   // Global.SoundDevice を解放した後に解放すること。（Global.SoundDevice で参照されているため）
+			SoundDevice = null;   // a failed rebuild below must not close it twice
 		}
 		//-----------------
 		#endregion
@@ -312,7 +326,7 @@ public class SoundManager   // : CSound
 		//-----------------
 		switch (SoundDeviceType) {
 			case ESoundDeviceType.Bass:
-				SoundDevice = new CSoundDeviceBASS(updatePeriod: SoundUpdatePeriodBASS, bufferSize: SoundDelayBASS);
+				SoundDevice = new CSoundDeviceBASS(updatePeriod: SoundUpdatePeriodBASS, bufferSize: SoundDelayBASS, device: silentFallback ? 0 : -1);
 				break;
 
 			case ESoundDeviceType.ExclusiveWASAPI:
@@ -334,14 +348,141 @@ public class SoundManager   // : CSound
 		#endregion
 		#region [ 新しい演奏タイマを構築する。]
 		//-----------------
-		PlayTimer = new CSoundTimer(SoundDevice);
+		if (PlayTimer == null)
+			PlayTimer = new CSoundTimer(SoundDevice);
+		else
+			PlayTimer.SwitchDevice(SoundDevice, carriedTimerMs ?? 0.0);
 		//-----------------
 		#endregion
 
 		SoundDevice.nMasterVolume = _nMasterVolume;                 // サウンドデバイスに対して、マスターボリュームを再設定する
 
 		CSound.tReloadSound(SoundDevice);       // すでに生成済みのサウンドがあれば作り直す。
+		// the sounds go on where they would be: the old output's silence plus the rebuild itself (real time:
+		// the game's clock stands still meanwhile)
+		if (carriedStates != null)
+			CSound.tRestoreStates(carriedStates, carriedOutageMs + Stopwatch.GetElapsedTime(carriedAtTimestamp).TotalMilliseconds);
+		carriedTimerMs = null;
+		carriedStates = null;
+		carriedOutageMs = 0.0;
 	}
+	private static double? carriedTimerMs;
+	private static List<CSound.PlayState>? carriedStates;
+	private static double carriedOutageMs;
+	private static long carriedAtTimestamp;
+	private static bool silentFallback;
+
+	#region [ Output device changes ]
+	// Windows tells which output is the default and when an output goes away (unplugged headphones). The
+	// sound device is then rebuilt on the current default, on the game's thread (tCheckDeviceChange), once
+	// the notifications have settled. When no output can be opened, a silent device keeps the timer and the
+	// sounds going until Windows reports an output again.
+	private const double DeviceChangeSettleMs = 400;
+	private static ManagedBass.Wasapi.WasapiNotifyProcedure? notifyProc;   // referenced for as long as BASSWASAPI may call it
+	private static long deviceChangeTick = -1;   // Environment.TickCount64 of the last change; -1: none pending
+	private static ESoundDeviceType requestedDeviceType = ESoundDeviceType.Unknown;
+
+	private static void WatchOutputDevices() {
+		if (!OperatingSystem.IsWindows() || notifyProc != null) return;
+		notifyProc = (notify, device, user) => {
+			if (notify is ManagedBass.Wasapi.WasapiNotificationType.DefaultOutput
+				or ManagedBass.Wasapi.WasapiNotificationType.Disabled
+				or ManagedBass.Wasapi.WasapiNotificationType.Enabled
+				or ManagedBass.Wasapi.WasapiNotificationType.Fail)
+				Interlocked.Exchange(ref deviceChangeTick, Environment.TickCount64);
+		};
+		try {
+			if (!ManagedBass.Wasapi.BassWasapi.SetNotify(notifyProc, IntPtr.Zero))
+				Trace.TraceWarning($"Output device changes are not followed (BASS_WASAPI_SetNotify: {Bass.LastError}).");
+		} catch (Exception e) {
+			Trace.TraceWarning("Output device changes are not followed: " + e.Message);
+		}
+	}
+
+	/// <summary>True when an output device change is waiting to be applied by <see cref="tCheckDeviceChange"/>.</summary>
+	public static bool IsDeviceChangeDue {
+		get {
+			long tick = Interlocked.Read(ref deviceChangeTick);
+			return tick >= 0 && Environment.TickCount64 - tick >= DeviceChangeSettleMs;
+		}
+	}
+
+	/// <summary>Rebuilds the sound device on the current default output when Windows reported a change.
+	/// Call from the thread that plays the sounds, with nothing else playing them meanwhile. ASIO, which
+	/// names its device, is left alone.</summary>
+	public static void tCheckDeviceChange() {
+		if (!IsDeviceChangeDue) return;
+		Interlocked.Exchange(ref deviceChangeTick, -1);
+		if (requestedDeviceType is ESoundDeviceType.ASIO or ESoundDeviceType.Unknown) return;
+		if (!OutputChanged()) return;   // a microphone, or an output not in use
+
+		Trace.TraceInformation($"The output device changed; reopening the sound device ({requestedDeviceType}).");
+		foreach (var deviceType in DeviceTryOrder(requestedDeviceType, OperatingSystem.IsWindows())) {
+			if (deviceType is ESoundDeviceType.Unknown or ESoundDeviceType.ASIO) continue;
+			SoundDeviceType = deviceType;
+			try {
+				tReloadSoundDeviceAndSound();
+				onSilentDevice = false;
+				Trace.TraceInformation($"Sound device reopened ({deviceType}).");
+				return;
+			} catch (Exception e) {
+				Trace.TraceWarning($"Reopening the sound device as {deviceType} failed: {e.Message}");
+			}
+		}
+		// no output opens (none is plugged in): a silent device until Windows reports one again
+		SoundDeviceType = ESoundDeviceType.Bass;
+		silentFallback = true;
+		try {
+			tReloadSoundDeviceAndSound();
+			onSilentDevice = true;
+			Trace.TraceWarning("No output device can be opened; sounds play silently until one is available.");
+		} catch (Exception e) {
+			Trace.TraceError("Even the silent sound device could not be opened: " + e);
+		} finally {
+			silentFallback = false;
+		}
+	}
+	private static bool onSilentDevice;
+
+	// the output in use is gone, the default output is another one, or there is one again after none
+	private static bool OutputChanged() {
+		string? defaultOutput = DefaultOutputName();
+		if (onSilentDevice) return defaultOutput != null;
+		var (name, usable) = CurrentOutput();
+		if (name == null) return false;   // not a device that can be followed
+		return !usable || (defaultOutput != null && name != defaultOutput);
+	}
+
+	// the system's default output, by name (the names BASS and BASSWASAPI give the same device are equal);
+	// BASS's own "Default" and "No sound" entries, which have no driver, are not outputs of their own
+	private static string? DefaultOutputName() {
+		for (int i = 1; Bass.GetDeviceInfo(i, out var info); i++) {
+			if (info.IsDefault && info.IsEnabled && !string.IsNullOrEmpty(info.Driver)) return info.Name;
+		}
+		return null;
+	}
+
+	private static (string? name, bool usable) CurrentOutput() {
+		try {
+			if (SoundDevice is CSoundDeviceWASAPI) {
+				int dev = ManagedBass.Wasapi.BassWasapi.CurrentDevice;
+				if (!ManagedBass.Wasapi.BassWasapi.GetDeviceInfo(dev, out var info)) return ("", false);
+				return (info.Name, info.IsEnabled && !info.IsUnplugged && !info.IsDisabled && ManagedBass.Wasapi.BassWasapi.IsStarted);
+			}
+			if (SoundDevice is CSoundDeviceBASS) {
+				int dev = Bass.CurrentDevice;
+				if (dev < 1 || !Bass.GetDeviceInfo(dev, out var info)) return ("", false);
+				// BASS's "Default" device (what BASS opens) moves to the default output by itself
+				if (string.IsNullOrEmpty(info.Driver)) return (null, true);
+				return (info.Name, info.IsEnabled);
+			}
+		} catch (Exception e) {
+			Trace.TraceWarning("Could not read the output device's state: " + e.Message);
+		}
+		return (null, true);
+	}
+	#endregion
+
 	// a sound fed from code through a stream procedure (a video's audio track)
 	public CSound tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, ESoundGroup soundGroup) {
 		if (SoundDeviceType == ESoundDeviceType.Unknown) {

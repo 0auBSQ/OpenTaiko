@@ -617,15 +617,86 @@ public class CSound : IDisposable {
 		// 配列に基づいて個々のサウンドを作成する。
 
 		for (int i = 0; i < sounds.Length; i++) {
-			switch (sounds[i].CurrnetCreateType) {
-				#region [ ファイルから ]
-				case CreateType.FromFile:
-					string strFileName = sounds[i].FileName;
-					sounds[i].Dispose(true, false);
-					device.tCreateSound(strFileName, sounds[i]);
-					break;
+			try {
+				switch (sounds[i].CurrnetCreateType) {
+					#region [ ファイルから ]
+					case CreateType.FromFile:
+						string strFileName = sounds[i].FileName;
+						sounds[i].Dispose(true, false);
+						device.tCreateSound(strFileName, sounds[i]);
+						break;
 					#endregion
+					case CreateType.UserStream:
+						// rebuilt in place: its owner keeps this instance and the procedure feeding it
+						var s = sounds[i];
+						s.Dispose(true, false);
+						device.tCreateUserSound(s._userFrequency, s._userChannels, s._userSeconds, s._userProc!, s);
+						break;
+				}
+				sounds[i].ReapplyAttributes();
+			} catch (Exception e) {
+				// one sound that cannot be rebuilt (its file gone) leaves the others to rebuild
+				Trace.TraceWarning($"Could not rebuild a sound on the new device ({Path.GetFileName(sounds[i].FileName)}): {e.Message}");
 			}
+		}
+	}
+
+	// a new stream starts at full volume, normal speed and centred: the sound's settings go on it again
+	private void ReapplyAttributes() {
+		if (!this.IsBassSound) return;
+		this.SetVolume();
+		if (this.IsUserStream) {
+			this.SetSpeedLive(this._PlaySpeed);
+			return;
+		}
+		double speed = this._PlaySpeed;
+		this._PlaySpeed = double.NaN;   // so the setter applies it
+		this.PlaySpeed = speed;
+	}
+
+	/// <summary>What a sound was doing when the sound device is about to be rebuilt.</summary>
+	internal readonly record struct PlayState(CSound Sound, int Pan, bool Playing, bool Paused, bool Looped, long WallMs);
+
+	internal static List<PlayState> tCaptureStates() {
+		CSound[] snapshot;
+		lock (_soundInstancesLock) { snapshot = CSound.SoundInstances.ToArray(); }
+		var states = new List<PlayState>();
+		foreach (var s in snapshot) {
+			if (!s.IsBassSound) continue;
+			bool playing = s.IsPlaying, paused = !playing && s.IsPaused;
+			bool looped = Bass.ChannelHasFlag(s.hBassStream, BassFlags.Loop);
+			long wallMs = (playing || paused) && !s.IsUserStream ? Math.Max(0, s.tGetPositionWallTimeMs()) : 0;
+			states.Add(new PlayState(s, s.SoundPosition, playing, paused, looped, wallMs));
+		}
+		return states;
+	}
+
+	/// <summary>Puts the captured states back on the rebuilt sounds. A sound that was playing goes on from
+	/// where it would be by now (the output was silent for <paramref name="msOutage"/>); one that was paused
+	/// waits at its place for its Resume.</summary>
+	internal static void tRestoreStates(List<PlayState> states, double msOutage) {
+		foreach (var st in states) {
+			var s = st.Sound;
+			if (!s.IsBassSound) continue;   // not rebuilt (disposed meanwhile, or its file is gone)
+			if (st.Pan != 0) s.SoundPosition = st.Pan;
+			if (!st.Playing && !st.Paused) continue;
+			if (s.IsUserStream) {
+				// its owner holds the samples and the clock: it only has to be playing again
+				if (st.Playing) {
+					s.AddBassSoundFromMixer();
+					s.tPlay(st.Looped);
+				}
+				continue;
+			}
+			long wallMs = st.WallMs + (st.Playing ? (long)msOutage : 0);
+			double msLength = s.dbTotalPlayTime / Math.Max(1e-6, s.Frequency * s.PlaySpeed);
+			if (wallMs >= msLength) {
+				if (!st.Looped || msLength < 1) continue;   // it would have ended by now
+				wallMs %= (long)msLength;
+			}
+			s.AddBassSoundFromMixer();   // in the mixer, paused, at the start
+			s.tSetPosition(wallMs);
+			if (st.Playing) s.tPlay(st.Looped);
 		}
 	}
 
@@ -693,7 +764,7 @@ public class CSound : IDisposable {
 
 	#region [ protected ]
 	//-----------------
-	protected enum CreateType { FromFile, Unknown }
+	protected enum CreateType { FromFile, UserStream, Unknown }
 	protected CreateType CurrnetCreateType = CreateType.Unknown;
 	protected ESoundDeviceType CurrentSoundDeviceType = ESoundDeviceType.Unknown;
 	public string FileName = null;
@@ -744,16 +815,21 @@ public class CSound : IDisposable {
 
 	// A stream fed from code through a BASS stream procedure (a video's audio track). The owner holds the
 	// samples and the position, so the BASS position calls are no-ops here; pause, resume and volume work as
-	// on any other sound, and the speed is applied live on the stream in the mixer (SetSpeedLive). It is
-	// not rebuilt when the sound device changes; the owner recreates it.
+	// on any other sound, and the speed is applied live on the stream in the mixer (SetSpeedLive). When the
+	// sound device is rebuilt it is rebuilt in place around the same procedure.
 	public bool IsUserStream { get; private set; }
 	private StreamProcedure? _userProc;   // referenced for as long as BASS may call it
+	private int _userFrequency, _userChannels;
+	private double _userSeconds;
 
 	public void CreateBassUserSound(int frequency, int channels, double durationSeconds, int hMixer, StreamProcedure proc, ESoundDeviceType deviceType = ESoundDeviceType.Bass, bool timeStretch = false) {
-		this.CurrnetCreateType = CreateType.Unknown;
+		this.CurrnetCreateType = CreateType.UserStream;
 		this.FileName = "";
 		this.IsUserStream = true;
 		this._userProc = proc;
+		this._userFrequency = frequency;
+		this._userChannels = channels;
+		this._userSeconds = durationSeconds;
 
 		// a decoding stream for a mixer; a playable one when there is no mixer (direct output)
 		var flags = hMixer == NoMixerHandle ? BassFlags.Float : BassFlags.Decode | BassFlags.Float;

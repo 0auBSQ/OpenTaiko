@@ -688,6 +688,13 @@ internal class OpenTaiko : Game {
 		try
 #endif
 		{
+			// an output device came or went (headphones unplugged): the sound device follows the default one.
+			// Instant hit sounds start from the input threads, so they wait for it; an export mutes the device
+			// itself and keeps it.
+			if (SoundManager.IsDeviceChangeDue && !VideoExporter.Active) {
+				lock (HitSoundOnArrival.Gate)
+					SoundManager.tCheckDeviceChange();
+			}
 			Timer?.Update();
 			SoundManager.PlayTimer?.Update();
 			FPS?.Update();

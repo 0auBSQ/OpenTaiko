@@ -326,6 +326,10 @@ internal class CSoundDeviceASIO : ISoundDevice {
 		sound.CreateBassUserSound(frequency, channels, durationSeconds, this.hMixer, proc, ESoundDeviceType.ASIO, SoundManager.bIsTimeStretch);
 		return sound;
 	}
+
+	public void tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, CSound sound) {
+		sound.CreateBassUserSound(frequency, channels, durationSeconds, this.hMixer, proc, ESoundDeviceType.ASIO, SoundManager.bIsTimeStretch);
+	}
 	#endregion
 
 
