@@ -20,10 +20,11 @@ internal static class JudgeWindows {
 		};
 	}
 
-	// whole-ms distance of a hit from a note, truncated; out of int range it is negative on x64 and int.MaxValue on
-	// ARM64, both judged Miss
+	// whole-ms-timestamp distance of a hit from a note (0.6.0 judgement behavior), out of int range it is saturated to int.MinValue or int.MaxValue, both judged Miss
+	internal static int DeltaMs(long msHitTjaTime, double msNoteTjaTime)
+		=> int.CreateSaturating(msHitTjaTime - Math.Floor(msNoteTjaTime));
 	internal static int AbsDeltaMs(long msHitTjaTime, double msNoteTjaTime)
-		=> (int)Math.Abs(msHitTjaTime - msNoteTjaTime);
+		=> int.CreateSaturating(Math.Abs(msHitTjaTime - Math.Floor(msNoteTjaTime)));
 
 	// the zone of a whole-ms distance, Miss past the Bad zone; the bounds are inclusive
 	internal static ENoteJudge ZoneOf(int msAbsDelta, CConfigIni.CTimingZones zones)
