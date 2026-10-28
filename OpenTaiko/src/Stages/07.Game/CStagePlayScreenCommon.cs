@@ -3826,7 +3826,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 			// a tween follows the chart time of the player whose chart started it
 			if (player != nPlayer)
 				continue;
-			if (Easing.EvaluateTween(nCurrentTimems - chip.dbSoundTimems, chip.fObjTimeMs, chip.strObjEaseType, chip.fObjStart, chip.fObjEnd, chip.objCalcType, out float value))
+			if (Easing.EvaluateTween(nCurrentTimems - chip.dbSoundTimems, chip.fObjTimeMs, chip.objEaseType, chip.fObjStart, chip.fObjEnd, chip.objCalcType, out float value))
 				keysToRemove.Add(key);
 
 			setter(value);
