@@ -156,7 +156,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 	public double fObjTimeMs;
 	public string strObjName = null!;
-	public string strObjEaseType = null!;
+	public Easing.PointType objEaseType;
 	public Easing.CalcType objCalcType;
 
 	public float fObjX;
