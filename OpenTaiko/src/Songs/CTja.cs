@@ -3383,14 +3383,16 @@ internal class CTja : CActivity {
 			if (iBalloon < listBalloon.Count) {
 				chip.nBalloon = listBalloon[iBalloon];
 			} else {
-				StringBuilder msg = new($"Undefined pop count defaulted to 5 hits for note {noteType}");
-				if (!this.IsEndedBranching)
-					msg.Append($" in branch {branch}");
-				msg.Append($", at division {iDiv + 1}/{divsPerMeasure}, measure {this.nCurrentMeasureCount}. Pop count used {iBalloon + 1} / defined {listBalloon.Count}");
-				if (!useCommon)
-					msg.Append($"(for {branch})");
-				msg.Append('.');
-				this.AddWarn(msg.ToString());
+				if (firstInsertedForDiv || !useCommon) {
+					StringBuilder msg = new($"Undefined pop count defaulted to 5 hits for note {noteType}");
+					if (!this.IsEndedBranching)
+						msg.Append($" in branch {branch}");
+					msg.Append($", at division {iDiv + 1}/{divsPerMeasure}, measure {this.nCurrentMeasureCount}. Pop count used {iBalloon + 1} / defined {listBalloon.Count}");
+					if (!useCommon)
+						msg.Append($"(for {branch})");
+					msg.Append('.');
+					this.AddWarn(msg.ToString());
+				}
 				chip.nBalloon = 5;
 			}
 		}
