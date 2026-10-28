@@ -19,7 +19,7 @@ internal class CModalManager {
 	public void RefreshSkin() { }
 
 	public void RegisterNewModal(int player, int rarity, Modal.EModalType modalType, params object?[] args) {
-		object[] newParams = new object[] { player, rarity, (int)modalType };
+		object?[] newParams = new object?[] { player, rarity, (int)modalType };
 		if (args != null) {
 			var wrappedArgs = new object?[args.Length];
 			for (int i = 0; i < args.Length; i++) {

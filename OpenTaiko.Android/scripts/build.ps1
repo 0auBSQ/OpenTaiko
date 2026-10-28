@@ -99,7 +99,7 @@ if ($Clean) {
 
 $buildArgs = @(
     "build", $csproj,
-    "-f", "net8.0-android",
+    "-f", "net10.0-android",
     "-c", $config,
     "-p:UseVendoredFFmpeg=true",
     "-p:AndroidSdkDirectory=$AndroidSdk",
@@ -137,7 +137,7 @@ if ($Install) { $buildArgs += "-t:Install" }
 & dotnet @buildArgs
 if ($LASTEXITCODE -ne 0) { throw "dotnet build failed (exit $LASTEXITCODE)" }
 
-$apk = Get-ChildItem (Join-Path $root "bin\$config\net8.0-android") -Filter "*-Signed.apk" -ErrorAction SilentlyContinue |
+$apk = Get-ChildItem (Join-Path $root "bin\$config\net10.0-android") -Filter "*-Signed.apk" -ErrorAction SilentlyContinue |
     Sort-Object LastWriteTime -Descending | Select-Object -First 1
 if ($apk) {
     Write-Host ("APK: {0} ({1:N0} MB)" -f $apk.FullName, ($apk.Length / 1MB))

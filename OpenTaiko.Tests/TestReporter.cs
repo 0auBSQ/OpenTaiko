@@ -60,7 +60,7 @@ namespace OpenTaikoTests {
 			lock (_lock) _recs.Add(new Rec { Cls = cls, Name = name, Outcome = outcome, Msg = msg ?? "", Stack = stack ?? "", Ms = (double)m.ExecutionTime * 1000.0 });
 		}
 
-		// <proj>/bin/<cfg>/net8.0/OpenTaiko.Tests.dll → <proj>/TestResults
+		// <proj>/bin/<cfg>/net10.0/OpenTaiko.Tests.dll → <proj>/TestResults
 		private static string OutputDir() {
 			try { return Path.Combine(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..")), "TestResults"); }
 			catch { return AppContext.BaseDirectory; }

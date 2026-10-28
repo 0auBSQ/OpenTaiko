@@ -2,7 +2,7 @@
 
 The Android host for OpenTaiko — the counterpart of `OpenTaiko.iOS`, built on the same FDK
 hosted-mode contract (`InitWithExternalContext` / `RenderHostedFrame`): the shared `OpenTaiko` and
-`FDK` projects compile unchanged as net8.0 libraries, and this thin app owns the window, EGL
+`FDK` projects compile unchanged as net10.0 libraries, and this thin app owns the window, EGL
 context, game loop, input, storage, and audio session.
 
 ## Building
@@ -45,7 +45,7 @@ build.ps1 -Release -Install -PushSongs                # full library over adb af
 - The songs zip is rebuilt only when missing from `obj/` — use `-Clean` after changing songs.
 
 Other options: `-Clean` (wipe obj/bin first), `-AndroidSdk PATH` / `-JavaSdk PATH` when
-auto-detection fails. Only hard prerequisites: .NET 8 SDK with the Android workload
+auto-detection fails. Only hard prerequisites: .NET 10 SDK with the Android workload
 (`dotnet workload install android`), an Android SDK, and a JDK 17 (Android Studio's default
 install provides both).
 
@@ -74,15 +74,15 @@ The launcher icons under `Resources/mipmap-*` are generated from `OpenTaiko/Open
 Then (`-p:UseVendoredFFmpeg=true` is required; the build errors without it):
 
 ```
-dotnet build OpenTaiko.Android/OpenTaiko.Android.csproj -f net8.0-android -p:UseVendoredFFmpeg=true
-dotnet build OpenTaiko.Android/OpenTaiko.Android.csproj -f net8.0-android -p:UseVendoredFFmpeg=true -t:Install   # deploy to a connected device
+dotnet build OpenTaiko.Android/OpenTaiko.Android.csproj -f net10.0-android -p:UseVendoredFFmpeg=true
+dotnet build OpenTaiko.Android/OpenTaiko.Android.csproj -f net10.0-android -p:UseVendoredFFmpeg=true -t:Install   # deploy to a connected device
 ```
 
 If the build can't find the Android SDK or complains about the JDK version (it wants JDK 17 —
 Android Studio's bundled JBR works), pass the paths explicitly:
 
 ```
-dotnet build OpenTaiko.Android/OpenTaiko.Android.csproj -f net8.0-android -p:UseVendoredFFmpeg=true ^
+dotnet build OpenTaiko.Android/OpenTaiko.Android.csproj -f net10.0-android -p:UseVendoredFFmpeg=true ^
   -p:AndroidSdkDirectory="%LOCALAPPDATA%\Android\Sdk" ^
   -p:JavaSdkDirectory="C:\Program Files\Android\Android Studio\jbr"
 ```

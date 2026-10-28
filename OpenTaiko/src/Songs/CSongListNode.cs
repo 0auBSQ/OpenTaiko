@@ -1,5 +1,4 @@
 ﻿using System.Drawing;
-using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
 namespace OpenTaiko;
@@ -140,16 +139,6 @@ internal class CSongListNode {
 
 
 	// その他
-
-	/// <summary>
-	/// Restores fields that have default initializers after BinaryFormatter deserialization,
-	/// which bypasses constructors and field initializers for fields added in newer versions.
-	/// </summary>
-	[OnDeserialized]
-	private void OnDeserialized(StreamingContext context) {
-		customMetadataGScope ??= new Dictionary<string, string>();
-		customMetadataCScope ??= Enumerable.Range(0, (int)Difficulty.Total).Select(_ => new Dictionary<string, string>()).ToArray();
-	}
 
 	#region [ private ]
 	//-----------------

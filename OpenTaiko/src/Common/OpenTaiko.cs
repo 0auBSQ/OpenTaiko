@@ -1886,13 +1886,10 @@ internal class OpenTaiko : Game {
 				Trace.TraceInformation("Ending song list...");
 				Trace.Indent();
 				try {
-#pragma warning disable SYSLIB0011
-					if (EnumSongs.IsSongListEnumCompletelyDone
-						&& !OperatingSystem.IsIOS() && !OperatingSystem.IsAndroid()) {   // BinaryFormatter is unsupported on mobile
+					if (EnumSongs.IsSongListEnumCompletelyDone) {
 						using Stream songlistdb = File.Create($"{OpenTaiko.strEXEFolder}songlist.db");
 						CEnumSongs.WriteSongListCache(songlistdb, SongManager.listSongsDB);
 					}
-#pragma warning restore SYSLIB0011
 
 					SongManager = null;
 					Trace.TraceInformation("Song list terminated.");

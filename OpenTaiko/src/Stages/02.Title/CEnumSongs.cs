@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -414,11 +413,6 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 #endif
 
 
-#pragma warning disable SYSLIB0011
-	// BinaryFormatter is unsupported under mobile AOT, so mobile uses a System.Text.Json cache
-	// (source-generated, so it survives Release trimming) instead.
-	private static bool UseJsonCache => OperatingSystem.IsIOS() || OperatingSystem.IsAndroid();
-
 	/// <summary>
 	/// 曲リストのserialize
 	/// </summary>
@@ -426,10 +420,7 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 		// The cache is an optimization. A serialization failure must never crash enumeration.
 		try {
 			using Stream songlistdb = File.Create($"{OpenTaiko.strEXEFolder}songlist.db");
-			if (UseJsonCache)
-				WriteSongListCacheJson(songlistdb, SongManager!.listSongsDB);
-			else
-				WriteSongListCache(songlistdb, SongManager!.listSongsDB);
+			WriteSongListCache(songlistdb, SongManager!.listSongsDB);
 		} catch (Exception e) {
 			Trace.TraceWarning($"songlist.db write failed, continuing without cache: {e.Message}");
 			try { File.Delete($"{OpenTaiko.strEXEFolder}songlist.db"); } catch { }
@@ -440,14 +431,13 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 	/// Deserialize the song-list cache. If the cache predates or no longer matches the current
 	/// serialized schema (e.g. a serialized field was renamed/added/removed), it is silently discarded
 	/// so the caller rebuilds the list from disk. Users never have to delete songlist.db by hand.
+	/// A cache in an older format (the BinaryFormatter one, before .NET 10) is not JSON: it is discarded too.
 	/// </summary>
 	public void Deserialize() {
 		try {
 			if (File.Exists($"{OpenTaiko.strEXEFolder}songlist.db")) {
 				using Stream songlistdb = File.OpenRead($"{OpenTaiko.strEXEFolder}songlist.db");
-				this.SongManager!.listSongsDB = (UseJsonCache
-					? ReadSongListCacheJson(songlistdb)
-					: ReadSongListCache(songlistdb)) ?? new();
+				this.SongManager!.listSongsDB = ReadSongListCache(songlistdb) ?? new();
 			}
 		} catch (Exception) {
 			this.SongManager!.listSongsDB = new();
@@ -457,8 +447,8 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 	// ── songlist.db format: a schema signature, then the song dictionary ───────────────────────────────
 	// The signature is a fingerprint of the serialized type graph (every serialized field's name + type),
 	// so ANY change to the CSongListNode/CScore/… layout — including a rename — changes it and makes old
-	// caches load as empty and rebuild automatically. This prevents BinaryFormatter from silently loading
-	// a stale cache with mismatched field names (which leaves the renamed fields null).
+	// caches load as empty and rebuild automatically. This prevents a stale cache with mismatched field
+	// names from loading with the renamed fields left at their defaults.
 	// Bump this when a serialization change is not visible in the type graph signature.
 	// Old caches then rebuild once.
 	private const string CacheFormatVersion = "3";
@@ -466,22 +456,9 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 	internal static string SongListCacheSchemaSignature
 		=> _cacheSchemaSignature ??= CacheFormatVersion + "-" + ComputeSchemaSignature(typeof(Dictionary<string, CSongListNode>));
 
-	internal static void WriteSongListCache(Stream stream, Dictionary<string, CSongListNode> listSongsDB) {
-		BinaryFormatter songlistdb_ = new BinaryFormatter();
-		songlistdb_.Serialize(stream, SongListCacheSchemaSignature);
-		songlistdb_.Serialize(stream, listSongsDB);
-	}
-
-	internal static Dictionary<string, CSongListNode>? ReadSongListCache(Stream stream) {
-		BinaryFormatter songlistdb_ = new BinaryFormatter();
-		// A cache written before this header (or with a different schema) fails this check → rebuild.
-		if (songlistdb_.Deserialize(stream) is not string signature || signature != SongListCacheSchemaSignature)
-			return null;
-		return (Dictionary<string, CSongListNode>)songlistdb_.Deserialize(stream);
-	}
-
-	// JSON song cache serialized by System.Text.Json source generation. Runtime state is marked
-	// [JsonIgnore] and rebuilt on load. The schema signature guards layout changes.
+	// JSON song cache serialized by System.Text.Json source generation (it survives Release trimming and
+	// mobile AOT). Runtime state is marked [JsonIgnore] and rebuilt on load. The schema signature guards
+	// layout changes.
 	private sealed class SongListCacheFile {
 		public string Signature { get; set; } = null!;
 		public Dictionary<string, CSongListNode> Songs { get; set; } = null!;
@@ -493,12 +470,12 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 	[JsonSerializable(typeof(SongListCacheFile))]
 	private partial class SongCacheJsonContext : JsonSerializerContext { }
 
-	internal static void WriteSongListCacheJson(Stream stream, Dictionary<string, CSongListNode> listSongsDB) {
+	internal static void WriteSongListCache(Stream stream, Dictionary<string, CSongListNode> listSongsDB) {
 		var file = new SongListCacheFile { Signature = SongListCacheSchemaSignature, Songs = listSongsDB };
 		JsonSerializer.Serialize(stream, file, SongCacheJsonContext.Default.SongListCacheFile);
 	}
 
-	internal static Dictionary<string, CSongListNode>? ReadSongListCacheJson(Stream stream) {
+	internal static Dictionary<string, CSongListNode>? ReadSongListCache(Stream stream) {
 		var file = JsonSerializer.Deserialize(stream, SongCacheJsonContext.Default.SongListCacheFile);
 		// A cache with a different schema (renamed, added, or removed field) is discarded so the caller rebuilds.
 		if (file == null || file.Signature != SongListCacheSchemaSignature)
@@ -534,5 +511,4 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 		Consider(root);
 		return Convert.ToHexString(MD5.HashData(Encoding.UTF8.GetBytes(sb.ToString())));
 	}
-#pragma warning restore SYSLIB0011
 }

@@ -27,7 +27,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
 
       - name: Observe the Directory
         shell: cmd
@@ -183,7 +183,7 @@ jobs:
       - name: Create Archive (Win x64)
         shell: cmd
         run: |
-          cd OpenTaiko\bin\Release\net8.0\win-x64\
+          cd OpenTaiko\bin\Release\net10.0\win-x64\
           7z a ../../../../../OpenTaiko.Win.x64.zip publish/ -xr!publish/Songs/ -xr!publish/FFmpeg/ -xr!publish/System/ -xr!publish/Libs/
           7z u ../../../../../OpenTaiko.Win.x64.zip "publish/Libs/win-x64/*" "publish/FFmpeg/win-x64/*" "publish/Songs/L2 Custom Charts/*" "publish/Songs/L3 Downloaded Songs/*" "publish/Songs/S1 Dan-i Dojo/box.def" "publish/Songs/S2 Taiko Towers/box.def" "publish/Songs/X1 Favorite/*" "publish/Songs/X2 Recent/*" "publish/Songs/X3 Search By Difficulty/*" "publish/Songs/X4 Search By Text/*"
           cd ..\..\..\..\..\
@@ -196,7 +196,7 @@ jobs:
       - name: Create Archive (Linux x64)
         shell: cmd
         run: |
-          cd OpenTaiko\bin\Release\net8.0\linux-x64\
+          cd OpenTaiko\bin\Release\net10.0\linux-x64\
           7z a ../../../../../OpenTaiko.Linux.x64.zip publish/ -xr!publish/Songs/ -xr!publish/FFmpeg/ -xr!publish/System/ -xr!publish/Libs/
           7z u ../../../../../OpenTaiko.Linux.x64.zip "publish/Libs/linux-x64/*" "publish/FFmpeg/linux-x64/*" "publish/Songs/L2 Custom Charts/*" "publish/Songs/L3 Downloaded Songs/*" "publish/Songs/S1 Dan-i Dojo/box.def" "publish/Songs/S2 Taiko Towers/box.def" "publish/Songs/X1 Favorite/*" "publish/Songs/X2 Recent/*" "publish/Songs/X3 Search By Difficulty/*" "publish/Songs/X4 Search By Text/*"
           cd ..\..\..\..\..\

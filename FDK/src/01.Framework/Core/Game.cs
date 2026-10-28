@@ -76,7 +76,7 @@ public abstract partial class Game : IDisposable {
 			unsafe {
 				Stream data = Assembly.GetExecutingAssembly().GetManifestResourceStream(@"FDK.mplus-1p-medium.ttf")!;
 				byte[] stream_data = new byte[data.Length];
-				data.Read(stream_data);
+				data.ReadExactly(stream_data);
 				fixed (byte* stream = stream_data) {
 					ImFontConfigPtr config = new ImFontConfigPtr(ImGuiNative.ImFontConfig_ImFontConfig());
 					ImGuiIO.Fonts.AddFontFromMemoryTTF((IntPtr)stream, 64, 16.0f, config, ImGuiIO.Fonts.GetGlyphRangesDefault());

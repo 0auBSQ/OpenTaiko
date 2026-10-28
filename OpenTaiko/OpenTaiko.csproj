@@ -10,13 +10,12 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="LightningDB" Version="0.18.1" />
-    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="8.0.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.10" />
+    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="10.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.14" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="SevenZip" Version="19.0.0" />
     <PackageReference Include="NLua" Version="1.7.3" />
     <PackageReference Include="DiscordRichPresence" Version="1.2.1.24" />
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Databases/**" CopyToOutputDirectory="PreserveNewest" />
@@ -37,8 +36,10 @@
     <Version>0.6.1.0</Version>
     <OutputType Condition="'$(BuildingAsLibrary)' != 'true'">WinExe</OutputType>
     <OutputType Condition="'$(BuildingAsLibrary)' == 'true'">Library</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-        <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- .NET 9+ marks the exe compatible with hardware-enforced stack protection (Intel CET); a native library
+         (the sound stack) is not, and Windows stops the game as the sound device opens (0xc0000409, fast fail 57) -->
+    <CETCompat>false</CETCompat>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
