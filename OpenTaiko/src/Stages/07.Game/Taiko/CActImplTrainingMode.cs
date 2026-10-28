@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using FDK;
+using FDK.ExtensionMethods;
 
 namespace OpenTaiko;
 
@@ -20,8 +21,8 @@ class CActImplTrainingMode : CActivity {
 		var measureCount = 1;
 		var bIsInGoGo = false;
 
-		int endtime = 1;
-		int bgmlength = 1;
+		long endtime = 1;
+		long bgmlength = 1;
 
 		for (int index = 0; index < OpenTaiko.TJA!.listChip.Count; index++) {
 			if (OpenTaiko.TJA.listChip[index].nChannelNo == 0xff) {
@@ -31,7 +32,7 @@ class CActImplTrainingMode : CActivity {
 		}
 		for (int index = 0; index < OpenTaiko.TJA.listChip.Count; index++) {
 			if (OpenTaiko.TJA.listChip[index].nChannelNo == 0x01) {
-				bgmlength = OpenTaiko.TJA.listChip[index].GetDuration() + OpenTaiko.TJA.listChip[index].nSoundTimems;
+				bgmlength = OpenTaiko.TJA.listChip[index].GetDuration().SaturatingAdd(OpenTaiko.TJA.listChip[index].nSoundTimems);
 				break;
 			}
 		}
@@ -53,7 +54,7 @@ class CActImplTrainingMode : CActivity {
 				var width = 0;
 				if (OpenTaiko.Tx.Tokkun_ProgressBar != null) width = OpenTaiko.Tx.Tokkun_ProgressBar.szTextureSize.Width;
 
-				this.gogoXList.Add((int)(width * (current / length)));
+				this.gogoXList.Add(int.CreateSaturating(width * (current / length)));
 			}
 			if (pChip.nChannelNo == 0x9F && bIsInGoGo) {
 				bIsInGoGo = false;
@@ -416,12 +417,14 @@ class CActImplTrainingMode : CActivity {
 	}
 
 	private bool tIsArrayValueBelowInterval(ref long[] array, long num, int interval) {
+		if (interval < 0)
+			return false;
 		long[] arraytmp = array;
 		for (int index = 0; index < (array.Length - 1); index++) {
 			array[index] = array[index + 1];
 		}
 		array[array.Length - 1] = num;
-		return Math.Abs(num - arraytmp[0]) <= interval;
+		return num.AbsDiffTo(arraytmp[0]) <= (uint)interval;
 	}
 
 	public int nCurrentMeasure;

@@ -133,7 +133,7 @@ namespace OpenTaikoTests {
 		}
 
 		// listChip order (the engine's play order) — monotonicity is checked against it, not re-sorted
-		private static List<int> NoteTimes(CTja tja)
+		private static List<long> NoteTimes(CTja tja)
 			=> tja.listChip.Where(c => c.nChannelNo >= 0x11 && c.nChannelNo <= 0x14)
 				.Select(c => c.nSoundTimems).ToList();
 
