@@ -144,19 +144,22 @@ public class CSound : IDisposable {
 	/// DTXViewer preview mode.
 	/// </summary>
 	public void SetGain(int songVol) {
-		SetGain(LinearIntegerPercentToLufs(songVol), null);
+		SetGain(LinearPercentToLufs(songVol), null);
 	}
 
-	public double GetGainPercent() => LufsToLinearIntergerPercent(_gain);
+	public double GetGainPercent() => LufsToLinearPercent(_gain);
 	public Lufs GetGainLufs() => _gain;
 
-	private static Lufs LinearIntegerPercentToLufs(int percent) {
-		// 2018-08-27 twopointzero: We'll use the standard conversion until an appropriate curve can be selected
-		return new Lufs(20.0 * Math.Log10(percent / 100.0));
-	}
+	// 2018-08-27 twopointzero: We'll use the standard conversion until an appropriate curve can be selected
+	public static Lufs LinearToLufs(double vol) => new(20.0 * Math.Log10(vol));
+	public static double LufsToLinear(Lufs lufs) => Math.Pow(10, lufs.ToDouble() / 20.0);
 
-	private static double LufsToLinearIntergerPercent(Lufs lufs)
-		=> 100.0 * Math.Pow(10, lufs.ToDouble() / 20.0);
+	public static Lufs LinearPercentToLufs(double percent) => LinearToLufs(percent / 100.0);
+	public static double LufsToLinearPercent(Lufs lufs) => 100.0 * LufsToLinear(lufs);
+
+	// the value is linear to Lufs (0: -100 dB, 1: 0dB), as specified using Bass.Configure(Configuration.LogarithmicVolumeCurve, true);
+	public static double LufsToLogarithmicVolume(Lufs lufs) => (lufs.ToDouble() / 100.0) + 1.0;
+	public static Lufs LogarithmicVolumeToLufs(double vol) => new((vol - 1.0) * 100.0);
 
 	/// <summary>
 	/// Gain is applied "first" to the audio data, much as in a physical or
@@ -233,8 +236,8 @@ public class CSound : IDisposable {
 	}
 
 	private void SetVolume() {
-		var automationLevel = LinearIntegerPercentToLufs(AutomationLevel);
-		var groupLevel = LinearIntegerPercentToLufs(GroupLevel);
+		var automationLevel = LinearPercentToLufs(AutomationLevel);
+		var groupLevel = LinearPercentToLufs(GroupLevel);
 
 		var gain =
 			_gain +
@@ -250,7 +253,7 @@ public class CSound : IDisposable {
 	private Lufs lufsVolume {
 		set {
 			if (this.IsBassSound) {
-				var dbVolume = ((value.ToDouble() / 100.0) + 1.0).Clamp(0, 1);
+				var dbVolume = LufsToLogarithmicVolume(value).Clamp(0, 1);
 				Bass.ChannelSetAttribute(this._hBassStream, ChannelAttribute.Volume, (float)dbVolume);
 				Bass.ChannelSetAttribute(this._hTempoStream, ChannelAttribute.Volume, (float)dbVolume);
 			}
@@ -449,11 +452,14 @@ public class CSound : IDisposable {
 	public static Action<CSound, double>? SoundPlayCapture = null;
 	public static Action<CSound, double>? SoundStopCapture = null;
 
-	/// <summary>Current effective BASS channel volume/pan of this sound (1.0/0.0 when unavailable).</summary>
+	/// <summary>Current effective BASS channel volume/pan of this sound (linear, 1.0/0.0 when unavailable).</summary>
 	public (float volume, float pan) tGetChannelLevels() {
 		float vol = 1f, pan = 0f;
 		if (this.IsBassSound && this.hBassStream != 0) {
-			if (!Bass.ChannelGetAttribute(this.hBassStream, ChannelAttribute.Volume, out vol)) vol = 1f;
+			if (Bass.ChannelGetAttribute(this.hBassStream, ChannelAttribute.Volume, out vol))
+				vol = (float)LufsToLinear(LogarithmicVolumeToLufs(vol));
+			else
+				vol = 1f;
 			if (!Bass.ChannelGetAttribute(this.hBassStream, ChannelAttribute.Pan, out pan)) pan = 0f;
 		}
 		return (vol, pan);
