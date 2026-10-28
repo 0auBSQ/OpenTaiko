@@ -106,7 +106,7 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 				this.pressedSincePoll[idxBtn] = true;
 		}
 		if (isPressed == 0) {
-			long msTimestamp = SoundManager.PlayTimer.msGetPreciseNowSoundTimerTime();
+			long msTimestamp = NowTimestamp();
 			this.AddPressedEvent(idxBtn, msTimestamp, velocity, this.HandleOnArrival(idxBtn));
 		}
 		this.SetVelocity(idxBtn, velocity);
@@ -128,8 +128,11 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 	protected void ButtonUp(int idxBtn) {
 		var isPressed = Interlocked.Exchange(ref this.ButtonStates[idxBtn].isPressed, 0U);
 		if (isPressed != 0)
-			this.AddReleasedEvent(idxBtn, SoundManager.PlayTimer.msGetPreciseNowSoundTimerTime());
+			this.AddReleasedEvent(idxBtn, NowTimestamp());
 	}
+
+	// the play timer's time; 0 before the sound device exists (input arrives from the start)
+	private static long NowTimestamp() => SoundManager.PlayTimer?.msGetPreciseNowSoundTimerTime() ?? 0;
 
 	public bool KeyAvailable(int nButton) {
 		return Volatile.Read(ref ButtonStates[nButton].state) is not 0;

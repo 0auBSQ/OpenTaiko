@@ -241,7 +241,8 @@ public class SoundManager   // : CSound
 
 	public void tInitialize(ESoundDeviceType soundDeviceType, int _nSoundDelayBASS, int _nSoundDelayExclusiveWASAPI, int _nSoundDelayASIO, int _nASIODevice, bool _bUseOSTimer) {
 		//SoundDevice = null;						// 後で再初期化することがあるので、null初期化はコンストラクタに回す
-		PlayTimer = null;                       // Global.Bass 依存（つまりユーザ依存）
+		// a running play timer stays: tReloadSoundDeviceAndSound moves it to the new device, and the input thread
+		// reads it at every key press and release while the device is being rebuilt
 		nMixing = 0;
 
 		SoundDelayBASS = _nSoundDelayBASS;
@@ -291,6 +292,7 @@ public class SoundManager   // : CSound
 	public static void tEnd() {
 		SoundDevice.Dispose();
 		PlayTimer.Dispose();    // Global.Bass を解放した後に解放すること。（Global.Bass で参照されているため）
+		PlayTimer = null;       // a later tInitialize starts a new one
 	}
 
 
