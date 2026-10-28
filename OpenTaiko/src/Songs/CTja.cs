@@ -1258,7 +1258,7 @@ internal class CTja : CActivity {
 								int idxEnd = this.IdxLyric2AtSongEnds.ElementAtOrDefault(lyricFileIndex);
 								for (int ind = idxStart; ind < idxEnd; ind++) {
 									STLYRIC lyrictmp = this.listLyric2[ind];
-									lyrictmp.Time = origListLyricTime[ind] + (long)Math.Floor(chip.dbSoundTimems);
+									lyrictmp.Time = origListLyricTime[ind].SaturatingAdd(chip.nSoundTimems);
 									this.listLyric2[ind] = lyrictmp;
 								}
 								#endregion
