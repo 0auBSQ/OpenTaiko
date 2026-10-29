@@ -225,7 +225,7 @@ end
 | `modal` | キューに入ったアンロックモーダルごとに `activate(player, rarity, modalType, ...)`、その後毎フレーム `update()` と `draw()`。スクリプトは DEACTIVATE() を呼んでモーダルを閉じ、エンジンは次のものをアクティブにします。 |
 | `modicons` | 一度だけ `activate()`、その後 layout が "menu" または "game" の `draw(x, y, player, layout, alpha)`。MODICONS グローバルがこれをラップします。 |
 | `danplate` | リザルト画面と段位コースで `draw(x, y, opacity, danTick, r, g, b, titleText)`。 |
-| `tower_view` | 塔のリザルトで、譜面の塔のルックと階数を渡して `activate(look, floors)`。毎フレーム `draw(scroll, opacity)` (scroll 0 が地面、1 が空)。`deactivate()`。song_loading トランジションも同じように駆動します。 |
+| `results_tower` | 塔のリザルトを開くとき、プレイ内容を LuaResultInfo (`ReachedFloor`、`TotalFloors`、`Lives`、`TowerRank`、`IsNewBestFloor`、`GetScore(player)` などの読み取り専用ゲッター) として渡して `activate(info)`。毎フレーム `update()` と `draw()`。決定時に Call で `skip()` (アニメーション中は true を返し、その決定はスキップだけになります)。`deactivate()`。 |
 | `tower_hud` | 塔のプレイ開始時に `activate(maxFloor)`。毎フレーム上側背景の上に `update()` と `draw()`。`deactivate()`。階とライフは PLAYSTATE から読みます。 |
 | `popup_menu` | `activate(title, items, fontSize, ...)`。items は改行で連結したラベルで、その後に PopupMenu のスキン位置が続きます。毎フレーム `draw(selected)`。閉じるときに `deactivate()`。 |
 | `config_ui` | 設定モデルとともに `activate(model)`。毎フレーム `update()` を呼び、"exit" を返すと設定画面を離れます。続けて Modules/Transitions のモジュール名を返すと、戻りにそのトランジションを使います (スキン・解像度・サウンドデバイスの変更が適用待ちのときは通常のフェードになります)。`draw()`。エンジンがモデルを再構築したときに Call を通じて `reload(model)`。`deactivate()`。 |

@@ -641,18 +641,6 @@ internal class CStageResult : CStage {
 			ctShine_Plate = new CCounter(0, 1000, 1, OpenTaiko.Timer);
 			ctWork_Plate = new CCounter(0, 4000, 1, OpenTaiko.Timer);
 
-			// results_tower draws the whole tower result; a skin without it gets the tower view coming down from the
-			// sky to the ground behind the former panel
-			ctTower_Animation = new CCounter(0, 1000, 13.5, OpenTaiko.Timer);
-			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-				if (ResultsTower != null) {
-					ResultsTower.Activate(tTowerResultInfo(bestBefore));
-				} else {
-					var towerChart = OpenTaiko.SongMount.rChoosenSong?.score[(int)Difficulty.Tower]?.ChartInfo;
-					TowerView?.Activate(towerChart?.nTowerType, towerChart?.nTotalFloor ?? 0);
-				}
-			}
-
 
 			ctDanSongInfoChange = new CCounter(0, 3000, 1, OpenTaiko.Timer);
 			ctDanSongInfoChange.CurrentValue = 255;
@@ -661,13 +649,8 @@ internal class CStageResult : CStage {
 			this.EndAnime = false;
 
 			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-				this.ttkMaxFloors = new TitleTextureKey("/" + OpenTaiko.SongMount.rChoosenSong!.score[5]!.ChartInfo.nTotalFloor.ToString() + CLangManager.LangInstance.GetString("TOWER_FLOOR_INITIAL"), pfTowerText48!, Color.Black, Color.Transparent, 700);
-				this.ttkToutatsu = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_FLOOR_REACHED"), pfTowerText48!, Color.White, Color.Black, 700);
-				this.ttkTen = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_SCORE_INITIAL"), pfTowerText!, Color.Black, Color.Transparent, 700);
-				this.ttkReachedFloor = new TitleTextureKey(OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor.ToString(), pfTowerText72!, Color.Orange, Color.Black, 700);
-				this.ttkScore = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_SCORE"), pfTowerText!, Color.Black, Color.Transparent, 700);
-				this.ttkRemaningLifes = new TitleTextureKey(OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives.ToString() + " / " + OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives.ToString(), pfTowerText!, Color.Black, Color.Transparent, 700);
-				this.ttkScoreCount = new TitleTextureKey(OpenTaiko.stageGameScreen.actScore.Get(0).ToString(), pfTowerText!, Color.Black, Color.Transparent, 700);
+				// the skin's results_tower draws the whole tower result
+				ResultsTower?.Activate(tTowerResultInfo(bestBefore));
 			} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 				Background = new LuaBackgroundWrapper(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.DANRESULT}"));
 				Background.Activate(_state.Refreshed());
@@ -713,7 +696,6 @@ internal class CStageResult : CStage {
 		}
 
 		OpenTaiko.tDisposeSafely(ref Background);
-		if (TowerView != null && TowerView.IsActive) TowerView.Deactivate();
 		if (ResultsTower != null && ResultsTower.IsActive) ResultsTower.Deactivate();
 
 		if (this.rResultSound != null) {
@@ -727,21 +709,13 @@ internal class CStageResult : CStage {
 		base.DeActivate();
 	}
 	public override void CreateManagedResource() {
-		this.pfTowerText = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.TowerResult_Font_TowerText);
-		this.pfTowerText48 = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.TowerResult_Font_TowerText48);
-		this.pfTowerText72 = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.TowerResult_Font_TowerText72);
-
 		this.pfDanTitles = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.DanResult_Font_DanTitles_Size);
 
 		base.CreateManagedResource();
 	}
 	public override void ReleaseManagedResource() {
 
-		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-			OpenTaiko.tDisposeSafely(ref pfTowerText);
-			OpenTaiko.tDisposeSafely(ref pfTowerText48);
-			OpenTaiko.tDisposeSafely(ref pfTowerText72);
-		} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 			OpenTaiko.tDisposeSafely(ref pfDanTitles);
 		}
 
@@ -1244,71 +1218,8 @@ internal class CStageResult : CStage {
 					}
 
 					if (ResultsTower is { IsActive: true } towerUI) {
-						// results_tower draws the whole screen: the sky, the tower, the boards and the badge
 						towerUI.Update();
 						towerUI.Draw();
-					} else {
-						// Pictures here
-
-						this.ctTower_Animation.Tick();
-
-						#region [Tower background]
-
-						// the panorama and the chart's tower (tower_view ROActivity): scroll 1 = the sky, 0 = the ground
-						if (TowerView != null && TowerView.IsActive)
-							TowerView.Draw(1.0 - this.ctTower_Animation.CurrentValue / 1000.0, 1.0);
-
-						#endregion
-
-						OpenTaiko.Tx.TowerResult_Panel?.t2DDraw(0, 0);
-
-						#region [Score Rank]
-
-						int sc = GetTowerScoreRank() - 1;
-
-						if (sc >= 0 && OpenTaiko.Tx.TowerResult_ScoreRankEffect != null) {
-							int scoreRankEffect_width = OpenTaiko.Tx.TowerResult_ScoreRankEffect.szTextureSize.Width / 7;
-							int scoreRankEffect_height = OpenTaiko.Tx.TowerResult_ScoreRankEffect.szTextureSize.Height;
-
-							OpenTaiko.Tx.TowerResult_ScoreRankEffect.Opacity = 255;
-							OpenTaiko.Tx.TowerResult_ScoreRankEffect.vcScaleRatio.X = 1f;
-							OpenTaiko.Tx.TowerResult_ScoreRankEffect.vcScaleRatio.Y = 1f;
-							OpenTaiko.Tx.TowerResult_ScoreRankEffect.t2DScaledCenterBasedDraw(
-								OpenTaiko.Skin.TowerResult_ScoreRankEffect[0],
-								OpenTaiko.Skin.TowerResult_ScoreRankEffect[1],
-								new Rectangle(sc * scoreRankEffect_width, 0, scoreRankEffect_width, scoreRankEffect_height));
-						}
-
-
-						#endregion
-
-
-						#region [Text elements]
-
-						TitleTextureKey.ResolveTitleTexture(this.ttkToutatsu)?.t2DDraw(OpenTaiko.Skin.TowerResult_Toutatsu[0], OpenTaiko.Skin.TowerResult_Toutatsu[1]);
-						TitleTextureKey.ResolveTitleTexture(this.ttkMaxFloors)?.t2DDraw(OpenTaiko.Skin.TowerResult_MaxFloors[0], OpenTaiko.Skin.TowerResult_MaxFloors[1]);
-						TitleTextureKey.ResolveTitleTexture(this.ttkTen)?.t2DDraw(OpenTaiko.Skin.TowerResult_Ten[0], OpenTaiko.Skin.TowerResult_Ten[1]);
-						TitleTextureKey.ResolveTitleTexture(this.ttkScore)?.t2DDraw(OpenTaiko.Skin.TowerResult_Score[0], OpenTaiko.Skin.TowerResult_Score[1]);
-
-						CTexture tmpScoreCount = TitleTextureKey.ResolveTitleTexture(this.ttkScoreCount);
-						CTexture tmpCurrentFloor = TitleTextureKey.ResolveTitleTexture(this.ttkReachedFloor);
-						CTexture tmpRemainingLifes = TitleTextureKey.ResolveTitleTexture(this.ttkRemaningLifes);
-
-						tmpCurrentFloor?.t2DDraw(OpenTaiko.Skin.TowerResult_CurrentFloor[0] - tmpCurrentFloor.szTextureSize.Width, OpenTaiko.Skin.TowerResult_CurrentFloor[1]);
-						tmpScoreCount?.t2DDraw(OpenTaiko.Skin.TowerResult_ScoreCount[0] - tmpScoreCount.szTextureSize.Width, OpenTaiko.Skin.TowerResult_ScoreCount[1]);
-						tmpRemainingLifes?.t2DDraw(OpenTaiko.Skin.TowerResult_RemainingLifes[0] - tmpRemainingLifes.szTextureSize.Width, OpenTaiko.Skin.TowerResult_RemainingLifes[1]);
-
-						int soul_width = OpenTaiko.Tx.Gauge_Soul!.szTextureSize.Width;
-						int soul_height = OpenTaiko.Tx.Gauge_Soul.szTextureSize.Height / 2;
-
-						OpenTaiko.Tx.Gauge_Soul?.t2DDraw(OpenTaiko.Skin.TowerResult_Gauge_Soul[0], OpenTaiko.Skin.TowerResult_Gauge_Soul[1], new Rectangle(0, 0, soul_width, soul_height));
-
-						#endregion
-					}
-
-					if (!bAudioPlayback && !OpenTaiko.Skin.bgmTowerResult.bIsPlaying) {
-						OpenTaiko.Skin.bgmTowerResult.tPlay();
-						bAudioPlayback = true;
 					}
 
 
@@ -1765,20 +1676,7 @@ internal class CStageResult : CStage {
 	private int examsShift = 0;
 	private bool newGradeGranted = false;
 
-	// Tower informations
-	private CCounter ctTower_Animation = null!;
-	private static LuaROActivityWrapper? TowerView => LuaROActivityWrapper.GetROActivity("tower_view");
 	private static LuaROActivityWrapper? ResultsTower => LuaROActivityWrapper.GetROActivity("results_tower");
-	private TitleTextureKey ttkMaxFloors = null!;
-	private TitleTextureKey ttkToutatsu = null!;
-	private TitleTextureKey ttkTen = null!;
-	private TitleTextureKey ttkReachedFloor = null!;
-	private TitleTextureKey ttkScore = null!;
-	private TitleTextureKey ttkRemaningLifes = null!;
-	private TitleTextureKey ttkScoreCount = null!;
-	private CCachedFontRenderer? pfTowerText;
-	private CCachedFontRenderer? pfTowerText48;
-	private CCachedFontRenderer? pfTowerText72;
 
 	private CSkin.CSystemSound bgmResultIn {
 		get {

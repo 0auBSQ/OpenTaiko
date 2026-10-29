@@ -6790,84 +6790,6 @@ internal class CSkin : IDisposable {
 								}
 							#endregion
 
-							#region TowerResult
-							case "TowerResult_ScoreRankEffect": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerResult_ScoreRankEffect[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerResult_Toutatsu": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerResult_Toutatsu[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerResult_MaxFloors": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerResult_MaxFloors[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerResult_Ten": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerResult_Ten[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerResult_Score": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerResult_Score[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerResult_CurrentFloor": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerResult_CurrentFloor[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerResult_ScoreCount": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerResult_ScoreCount[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerResult_RemainingLifes": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerResult_RemainingLifes[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerResult_Gauge_Soul": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerResult_Gauge_Soul[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerResult_Font_TowerText": {
-									TowerResult_Font_TowerText = int.Parse(strParam);
-									break;
-								}
-							case "TowerResult_Font_TowerText48": {
-									TowerResult_Font_TowerText48 = int.Parse(strParam);
-									break;
-								}
-							case "TowerResult_Font_TowerText72": {
-									TowerResult_Font_TowerText72 = int.Parse(strParam);
-									break;
-								}
-							#endregion
-
 							#region OnlineLounge
 							case "OnlineLounge_Side_Menu": {
 									string[] strSplit = strParam.Split(',');
@@ -8938,27 +8860,6 @@ internal class CSkin : IDisposable {
 	public int[] DanResult_Rank = new int[] { 130, 380 };
 
 	public int DanResult_Font_DanTitles_Size = 24;
-
-	#endregion
-
-	#region TowerResult
-
-	public int[] TowerResult_ScoreRankEffect = new int[] { 1000, 220 };
-
-	public int[] TowerResult_Toutatsu = new int[] { 196, 160 };
-	public int[] TowerResult_MaxFloors = new int[] { 616, 296 };
-	public int[] TowerResult_Ten = new int[] { 982, 394 };
-	public int[] TowerResult_Score = new int[] { 248, 394 };
-
-	public int[] TowerResult_CurrentFloor = new int[] { 688, 258 };
-	public int[] TowerResult_ScoreCount = new int[] { 1026, 394 };
-	public int[] TowerResult_RemainingLifes = new int[] { 1068, 490 };
-
-	public int[] TowerResult_Gauge_Soul = new int[] { 248, 474 };
-
-	public int TowerResult_Font_TowerText = 28;
-	public int TowerResult_Font_TowerText48 = 48;
-	public int TowerResult_Font_TowerText72 = 72;
 
 	#endregion
 

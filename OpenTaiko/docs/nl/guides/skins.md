@@ -114,7 +114,6 @@ Wanneer de parser een regel van de vorm `#include SomeFile.ini` tegenkomt, leest
 #include ResultConfig.ini
 #include DaniSelectConfig.ini
 #include DanResultConfig.ini
-#include TowerResultConfig.ini
 #include OnlineLoungeConfig.ini
 #include ModalConfig.ini
 #include Game4PConfig.ini
@@ -172,7 +171,7 @@ Binnen elke categorie maakt het spel eerst elke module aan en draait daarna `onS
 Het spel zoekt deze modules op naam op, en de meegeleverde skin levert ze allemaal:
 
 - Stages `_boot` en `_title`. Het spel stopt met een fout als een van beide ontbreekt.
-- ROActivities `modal`, `config_ui`, `nameplate`, `popup_menu`, `modicons`, `song_enum`, `cutscene`, `tower_view`, `tower_hud` en `danplate`.
+- ROActivities `modal`, `config_ui`, `nameplate`, `popup_menu`, `modicons`, `song_enum`, `cutscene`, `results_tower`, `tower_hud` en `danplate`.
 - Transitions `default` en `song_loading`. `song_loading` speelt terwijl het spel een nummer laadt; het spel gebruikt `default` wanneer `Exit` geen transitie noemt of een noemt die niet bestaat. Een skin zonder enige transitiemodule valt terug op een gewone zwarte fade.
 
 Houd al deze modules op hun plaats bij het bouwen van een skin; voeg je eigen modules ernaast toe.

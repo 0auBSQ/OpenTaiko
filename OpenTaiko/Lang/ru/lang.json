@@ -396,12 +396,6 @@
 		"ONLINE_DOWNLOAD_PUCHI": "Скачать пти-персонажей (Не доступен)",
 		"ONLINE_MULTIPLAYER": "Сетевые многопользовательский (Не доступен)",
 
-		// Taiko Towers
-		"TOWER_FLOOR_REACHED": "Достигнутый этаж",
-		"TOWER_FLOOR_INITIAL": "",
-		"TOWER_SCORE": "Очки",
-		"TOWER_SCORE_INITIAL": "",
-
 		// Dan Dojo
 		"DAN_CONDITION_NAME_SOUL": "Датчик души",
 		"DAN_CONDITION_NAME_GOOD": "Количество Хорошо",

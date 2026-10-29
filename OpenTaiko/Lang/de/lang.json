@@ -396,12 +396,6 @@
 		"ONLINE_DOWNLOAD_PUCHI": "Puchicharas herunterladen (Nicht verfügbar)",
 		"ONLINE_MULTIPLAYER": "Online Multiplayer (Nicht verfügbar)",
 
-		// Taiko Towers
-		"TOWER_FLOOR_REACHED": "Erreichte Etage",
-		"TOWER_FLOOR_INITIAL": "E",
-		"TOWER_SCORE": "Punkte",
-		"TOWER_SCORE_INITIAL": "P",
-
 		// Dan Dojo
 		"DAN_CONDITION_NAME_SOUL": "Seelenleiste",
 		"DAN_CONDITION_NAME_GOOD": "Gut-Anzahl",

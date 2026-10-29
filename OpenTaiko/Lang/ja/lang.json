@@ -398,12 +398,6 @@
 		"ONLINE_DOWNLOAD_PUCHI": "プチキャラダウンロード (準備中)",
 		"ONLINE_MULTIPLAYER": "オンラインマルチプレイ (準備中)",
 
-		// Taiko Towers
-		"TOWER_FLOOR_REACHED": "到達階数",
-		"TOWER_FLOOR_INITIAL": "階",
-		"TOWER_SCORE": "スコア",
-		"TOWER_SCORE_INITIAL": "点",
-
 		// Dan Dojo
 		"DAN_CONDITION_NAME_SOUL": "魂ゲージ",
 		"DAN_CONDITION_NAME_GOOD": "良の数",

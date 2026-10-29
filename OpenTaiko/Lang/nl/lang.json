@@ -396,12 +396,6 @@
 		"ONLINE_DOWNLOAD_PUCHI": "Download Puchicharas (Niet beschikbaar)",
 		"ONLINE_MULTIPLAYER": "Online Multiplayer (Niet beschikbaar)",
 
-		// Taiko Towers
-		"TOWER_FLOOR_REACHED": "Niveau bereikt:",
-		"TOWER_FLOOR_INITIAL": "V",
-		"TOWER_SCORE": "Score",
-		"TOWER_SCORE_INITIAL": "P",
-
 		// Dan Dojo
 		"DAN_CONDITION_NAME_SOUL": "Zielmeter",
 		"DAN_CONDITION_NAME_GOOD": "Aantal Good",

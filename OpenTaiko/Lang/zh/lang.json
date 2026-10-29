@@ -396,12 +396,6 @@
 		"ONLINE_DOWNLOAD_PUCHI": "下载迷你角色（不可用）",
 		"ONLINE_MULTIPLAYER": "在线多人（不可用）",
 
-		// Taiko Towers
-		"TOWER_FLOOR_REACHED": "到达楼层",
-		"TOWER_FLOOR_INITIAL": "层",
-		"TOWER_SCORE": "得分",
-		"TOWER_SCORE_INITIAL": "点",
-
 		// Dan Dojo
 		"DAN_CONDITION_NAME_SOUL": "魂条",
 		"DAN_CONDITION_NAME_GOOD": "“良”数",

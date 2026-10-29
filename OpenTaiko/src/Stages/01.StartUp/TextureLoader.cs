@@ -741,15 +741,6 @@ class TextureLoader {
 
 		#endregion
 
-		#region [8_TowerResults]
-
-		// the panorama and the tower behind the panel are the tower_view ROActivity
-		TowerResult_Panel = TxC(TOWERRESULT + @$"Panel.png");
-
-		TowerResult_ScoreRankEffect = TxC(TOWERRESULT + @$"ScoreRankEffect.png");
-
-		#endregion
-
 		#region [11_Characters]
 
 		string[] charaDirs = OpenTaiko.GetMergedDirectories(OpenTaiko.strEXEFolder + GLOBAL + CHARACTERS);
@@ -1266,13 +1257,6 @@ Result_Mountain = new CTexture?[4]*/;
 		DanResult_StatePanel_Base,
 		DanResult_SongPanel_Main,
 		DanResult_StatePanel_Main;
-
-	#endregion
-
-	#region [8_TowerResults]
-
-	public CTexture? TowerResult_ScoreRankEffect,
-		TowerResult_Panel;
 
 	#endregion
 

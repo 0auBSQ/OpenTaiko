@@ -398,12 +398,6 @@
 		"ONLINE_DOWNLOAD_PUCHI": "푸치 캐릭터 다운로드 (사용 불가)",
 		"ONLINE_MULTIPLAYER": "온라인 멀티플레이 (사용 불가)",
 
-		// Taiko Towers
-		"TOWER_FLOOR_REACHED": "도달한 층",
-		"TOWER_FLOOR_INITIAL": "층",
-		"TOWER_SCORE": "스코어",
-		"TOWER_SCORE_INITIAL": "점",
-
 		// Dan Dojo
 		"DAN_CONDITION_NAME_SOUL": "게이지",
 		"DAN_CONDITION_NAME_GOOD": "얼쑤 개수",
