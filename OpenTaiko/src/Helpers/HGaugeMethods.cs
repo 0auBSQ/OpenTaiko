@@ -431,6 +431,9 @@ class HGaugeMethods {
 	// the level the gauge rate and damage use: the chart's player-side LEVEL
 	private static int UNSAFE_PlayLevel(int player) => OpenTaiko.GetTJA(player)?.PlayerSideMetadata.LEVELtaiko ?? -1;
 
+	public static float UNSAFE_Norma(int player)
+		=> tGetCurrentGaugeNorma((Difficulty)OpenTaiko.SongMount.nChoosenSongDifficulty[player], UNSAFE_PlayLevel(player));
+
 	// the notes of the route the player is on, common notes included
 	private static int UNSAFE_RouteNotesCount(CTja dtx, int player) => dtx.nNotesCount_Branch[(int)OpenTaiko.stageGameScreen.nCurrentBranch[player]];
 
@@ -596,143 +599,6 @@ class HGaugeMethods {
 		);
 
 		tDrawCompleteGauge(baseTexture, baseNormaTexture, flashTexture, fillTexture, yellowTexture, rainbowTextureArr, killzoneTexture, clearIcon, soulLetter, soulFlame, gauge_x, gauge_y, gauge_x, gauge_y, opacity, rainbowTextureIndex, soulFlameIndex, difficulty, level, currentPercent, gaugeType, scale, scale, text_x, text_y, perfectHits, totalHits, soul_x, soul_y, fire_x, fire_y, clearRect, clearRectHighlight);
-	}
-
-	public static void UNSAFE_DrawResultGaugeFast(int player, int shiftPos, int pos, int segmentsDisplayed, int rainbowTextureIndex, int soulFlameIndex, int uioffset_x) {
-		CTja dtx = OpenTaiko.GetTJA(player)!;
-
-		// Set box
-		GaugeBox = new int[] { OpenTaiko.Skin.Result_Gauge_Rect[0], OpenTaiko.Skin.Result_Gauge_Rect[1], OpenTaiko.Skin.Result_Gauge_Rect[2], OpenTaiko.Skin.Result_Gauge_Rect[3] };
-
-		// Total hits and perfect hits
-		int perfectHits = OpenTaiko.stageGameScreen.CChartScore[player].nGreat;
-		int totalHits = UNSAFE_RouteNotesCount(dtx, player);
-
-		// Gauge type
-		EGaugeType gaugeType = tGetGaugeTypeEnum(player);
-
-		// Current percent
-		float currentPercent = segmentsDisplayed * 2f;
-
-		// Scale x
-		float scale_x = 1.0f;
-		if (OpenTaiko.ConfigIni.nPlayerCount >= 3) {
-			scale_x = 0.5f;
-		}
-
-		// Difficulty
-		int _dif = OpenTaiko.SongMount.nChoosenSongDifficulty[player];
-		Difficulty difficulty = (Difficulty)_dif;
-		int level = UNSAFE_PlayLevel(player);
-
-		int gauge_x;
-		int gauge_y;
-		if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
-			gauge_x = OpenTaiko.Skin.Result_Gauge_5P[0] + OpenTaiko.Skin.Result_UIMove_5P_X[pos];
-			gauge_y = OpenTaiko.Skin.Result_Gauge_5P[1] + OpenTaiko.Skin.Result_UIMove_5P_Y[pos];
-		} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
-			gauge_x = OpenTaiko.Skin.Result_Gauge_4P[0] + OpenTaiko.Skin.Result_UIMove_4P_X[pos];
-			gauge_y = OpenTaiko.Skin.Result_Gauge_4P[1] + OpenTaiko.Skin.Result_UIMove_4P_Y[pos];
-		} else {
-			gauge_x = OpenTaiko.Skin.Result_Gauge_X[pos] + uioffset_x;
-			gauge_y = OpenTaiko.Skin.Result_Gauge_Y[pos];
-		}
-
-		int gauge_rainbow_x;
-		int gauge_rainbow_y;
-		if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
-			gauge_rainbow_x = OpenTaiko.Skin.Result_Gauge_Rainbow_5P[0] + OpenTaiko.Skin.Result_UIMove_5P_X[pos];
-			gauge_rainbow_y = OpenTaiko.Skin.Result_Gauge_Rainbow_5P[1] + OpenTaiko.Skin.Result_UIMove_5P_Y[pos];
-		} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
-			gauge_rainbow_x = OpenTaiko.Skin.Result_Gauge_Rainbow_4P[0] + OpenTaiko.Skin.Result_UIMove_4P_X[pos];
-			gauge_rainbow_y = OpenTaiko.Skin.Result_Gauge_Rainbow_4P[1] + OpenTaiko.Skin.Result_UIMove_4P_Y[pos];
-		} else {
-			gauge_rainbow_x = OpenTaiko.Skin.Result_Gauge_Rainbow_X[pos] + uioffset_x;
-			gauge_rainbow_y = OpenTaiko.Skin.Result_Gauge_Rainbow_Y[pos];
-		}
-
-		// Flame and soul
-		int soulText_x;
-		int soulText_y;
-		int soulFire_x;
-		int soulFire_y;
-		if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
-			soulText_x = OpenTaiko.Skin.Result_Soul_Text_5P[0] + OpenTaiko.Skin.Result_UIMove_5P_X[pos];
-			soulText_y = OpenTaiko.Skin.Result_Soul_Text_5P[1] + OpenTaiko.Skin.Result_UIMove_5P_Y[pos];
-			soulFire_x = OpenTaiko.Skin.Result_Soul_Fire_5P[0] + OpenTaiko.Skin.Result_UIMove_5P_X[pos];
-			soulFire_y = OpenTaiko.Skin.Result_Soul_Fire_5P[1] + OpenTaiko.Skin.Result_UIMove_5P_Y[pos];
-		} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
-			soulText_x = OpenTaiko.Skin.Result_Soul_Text_4P[0] + OpenTaiko.Skin.Result_UIMove_4P_X[0];
-			soulText_y = OpenTaiko.Skin.Result_Soul_Text_4P[1] + OpenTaiko.Skin.Result_UIMove_4P_Y[1];
-			soulFire_x = OpenTaiko.Skin.Result_Soul_Fire_4P[0] + OpenTaiko.Skin.Result_UIMove_4P_X[0];
-			soulFire_y = OpenTaiko.Skin.Result_Soul_Fire_4P[1] + OpenTaiko.Skin.Result_UIMove_4P_Y[1];
-		} else {
-			soulText_x = OpenTaiko.Skin.Result_Soul_Text_X[pos] + uioffset_x;
-			soulText_y = OpenTaiko.Skin.Result_Soul_Text_Y[pos];
-			soulFire_x = OpenTaiko.Skin.Result_Soul_Fire_X[pos] + uioffset_x;
-			soulFire_y = OpenTaiko.Skin.Result_Soul_Fire_Y[pos];
-		}
-
-		// Clear text
-		int clearText_x;
-		int clearText_y;
-		if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
-			clearText_x = OpenTaiko.Skin.Result_Gauge_ClearText_5P[0] + OpenTaiko.Skin.Result_UIMove_5P_X[pos];
-			clearText_y = OpenTaiko.Skin.Result_Gauge_ClearText_5P[1] + OpenTaiko.Skin.Result_UIMove_5P_Y[pos];
-		} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
-			clearText_x = OpenTaiko.Skin.Result_Gauge_ClearText_4P[0] + OpenTaiko.Skin.Result_UIMove_4P_X[pos];
-			clearText_y = OpenTaiko.Skin.Result_Gauge_ClearText_4P[1] + OpenTaiko.Skin.Result_UIMove_4P_Y[pos];
-		} else {
-			clearText_x = OpenTaiko.Skin.Result_Gauge_ClearText_X[pos] + uioffset_x;
-			clearText_y = OpenTaiko.Skin.Result_Gauge_ClearText_Y[pos];
-		}
-
-		// Textures
-		int _usedGauge = shiftPos;
-		CTexture? baseTexture = OpenTaiko.Tx.Result_Gauge_Base[_usedGauge];
-		CTexture? fillTexture = OpenTaiko.Tx.Result_Gauge[_usedGauge];
-
-		CTexture?[] rainbowTextureArr = OpenTaiko.Tx.Result_Rainbow;
-		CTexture? yellowTexture = OpenTaiko.Tx.Result_Gauge_Clear;
-		CTexture? baseNormaTexture = OpenTaiko.Tx.Result_Gauge_Clear_Base;
-		CTexture? killzoneTexture = OpenTaiko.Tx.Result_Gauge_Killzone;
-
-		CTexture? flashTexture = null;
-		CTexture? clearIcon = (gaugeType != EGaugeType.NORMAL)
-			? OpenTaiko.Tx.Result_Gauge_Killzone
-			: OpenTaiko.Tx.Result_Gauge[0];
-
-		CTexture? soulLetter = OpenTaiko.Tx.Result_Soul_Text;
-		CTexture? soulFlame = OpenTaiko.Tx.Result_Soul_Fire;
-
-		// Rectangles
-		Rectangle clearRectHighlight = new Rectangle(
-			OpenTaiko.Skin.Result_Gauge_ClearText_Clear_Rect[0],
-			OpenTaiko.Skin.Result_Gauge_ClearText_Clear_Rect[1],
-			OpenTaiko.Skin.Result_Gauge_ClearText_Clear_Rect[2],
-			OpenTaiko.Skin.Result_Gauge_ClearText_Clear_Rect[3]
-		);
-
-		Rectangle clearRect = new Rectangle(
-			OpenTaiko.Skin.Result_Gauge_ClearText_Rect[0],
-			OpenTaiko.Skin.Result_Gauge_ClearText_Rect[1],
-			OpenTaiko.Skin.Result_Gauge_ClearText_Rect[2],
-			OpenTaiko.Skin.Result_Gauge_ClearText_Rect[3]
-		);
-
-		// Positionnings
-		if (soulLetter != null) {
-			soulText_x -= (int)((soulLetter.szTextureSize.Width / 2));
-			soulText_y -= (soulLetter.szTextureSize.Height / 4);
-		}
-		if (soulFlame != null) {
-			soulFire_y -= (soulFlame.szTextureSize.Height / 2);
-			soulFire_x -= (int)((soulFlame.szTextureSize.Width / 16));
-		}
-
-		tDrawCompleteGauge(baseTexture, baseNormaTexture, flashTexture, fillTexture, yellowTexture, rainbowTextureArr, killzoneTexture, clearIcon, null, null, gauge_x, gauge_y, gauge_rainbow_x, gauge_rainbow_y, 0, rainbowTextureIndex, soulFlameIndex, difficulty, level, currentPercent, gaugeType, scale_x, 1f, clearText_x, clearText_y, perfectHits, totalHits, soulText_x, soulText_y, soulFire_x, soulFire_y, clearRect, clearRectHighlight);
-		tDrawSoulFire(soulFlame, difficulty, level, currentPercent, gaugeType, 1f, 1f, soulFire_x, soulFire_y, soulFlameIndex);
-		tDrawSoulLetter(soulLetter, difficulty, level, currentPercent, gaugeType, 1f, 1f, soulText_x, soulText_y);
 	}
 
 	#endregion

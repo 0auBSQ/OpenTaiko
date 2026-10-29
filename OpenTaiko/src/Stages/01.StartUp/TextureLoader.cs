@@ -653,91 +653,8 @@ class TextureLoader {
 
 		#region 6_結果発表
 
-		Result_Gauge[0] = TxC(RESULT + @$"Gauge.png");
-		Result_Gauge_Base[0] = TxC(RESULT + @$"Gauge_Base.png");
-		Result_Gauge[1] = TxC(RESULT + @$"Gauge_2.png");
-		Result_Gauge_Base[1] = TxC(RESULT + @$"Gauge_Base_2.png");
-		Result_Gauge[2] = TxC(RESULT + @$"Gauge_3.png");
-		Result_Gauge_Base[2] = TxC(RESULT + @$"Gauge_Base_3.png");
-		Result_Gauge[3] = TxC(RESULT + @$"Gauge_4.png");
-		Result_Gauge_Base[3] = TxC(RESULT + @$"Gauge_Base_4.png");
-		Result_Gauge[4] = TxC(RESULT + @$"Gauge_5.png");
-		Result_Gauge_Base[4] = TxC(RESULT + @$"Gauge_Base_5.png");
-
-		Result_Gauge_Frame = TxC(RESULT + @$"Gauge_Frame.png");
-		Result_Gauge_Clear = TxC(RESULT + @$"Gauge_Clear.png");
-		Result_Gauge_Clear_Base = TxC(RESULT + @$"Gauge_Clear_Base.png");
-		Result_Gauge_Killzone = TxC(RESULT + @$"Gauge_Killzone.png");
-
-		Result_Header = TxC(RESULT + @$"Header.png");
+		// the result screens are the skin's results_* ROActivities; the play's judge meter draws with these digits
 		Result_Number = TxC(RESULT + @$"Number.png");
-		Result_Panel = TxC(RESULT + @$"Panel.png");
-		Result_Panel_2P = TxC(RESULT + @$"Panel_2.png");
-		Result_Soul_Text = TxC(RESULT + @$"Soul_Text.png");
-		Result_Soul_Fire = TxC(RESULT + @$"Result_Soul_Fire.png");
-		Result_Diff_Bar = TxC(RESULT + @$"DifficultyBar.png");
-		Result_Score_Number = TxC(RESULT + @$"Score_Number.png");
-
-		Result_CrownEffect = TxC(RESULT + @$"CrownEffect.png");
-		Result_ScoreRankEffect = TxC(RESULT + @$"ScoreRankEffect.png");
-		//Result_Cloud = TxC(RESULT + @$"Cloud.png");
-		Result_Shine = TxC(RESULT + @$"Shine.png");
-
-		Result_Speech_Bubble[0] = TxC(RESULT + @$"Speech_Bubble.png");
-		Result_Speech_Bubble[1] = TxC(RESULT + @$"Speech_Bubble_2.png");
-
-		Result_Speech_Bubble_V2[0] = TxC(RESULT + @$"Speech_Bubble_V2_Left.png");
-		Result_Speech_Bubble_V2[1] = TxC(RESULT + @$"Speech_Bubble_V2_Right.png");
-		Result_Speech_Bubble_V2[2] = TxC(RESULT + @$"Speech_Bubble_V2_4P_5P.png");
-
-		Result_Flower = TxC(RESULT + @$"Flower{Path.DirectorySeparatorChar}Flower.png");
-
-		for (int i = 0; i < 4; i++)
-			Result_Panel_4P[i] = TxC(RESULT + @$"Panel_4P_" + (i + 1).ToString() + ".png");
-
-		for (int i = 0; i < 5; i++)
-			Result_Panel_5P[i] = TxC(RESULT + @$"Panel_5P_" + (i + 1).ToString() + ".png");
-
-		for (int i = 1; i <= 5; i++)
-			Result_Flower_Rotate[i - 1] = TxC(RESULT + @$"Flower{Path.DirectorySeparatorChar}Rotate_" + i.ToString() + ".png");
-
-		//for (int i = 0; i < 3; i++)
-		//Result_Work[i] = TxC(RESULT + @$"Work{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
-
-		OpenTaiko.Skin.Result_Gauge_Rainbow_Ptn = OpenTaiko.tSequenceImageSheetCountCount(CSkin.Path(BASE + RESULT + @$"Rainbow{Path.DirectorySeparatorChar}"));
-		if (OpenTaiko.Skin.Result_Gauge_Rainbow_Ptn != 0) {
-			Result_Rainbow = new CTexture[OpenTaiko.Skin.Result_Gauge_Rainbow_Ptn];
-			for (int i = 0; i < OpenTaiko.Skin.Result_Gauge_Rainbow_Ptn; i++) {
-				Result_Rainbow[i] = TxC(RESULT + @$"Rainbow{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
-			}
-		}
-
-		//for (int i = 0; i < 6; i++)
-		//Result_Background[i] = TxC(RESULT + @$"Background_" + i.ToString() + ".png");
-
-		//for (int i = 0; i < 4; i++)
-		//Result_Mountain[i] = TxC(RESULT + @$"Background_Mountain_" + i.ToString() + ".png");
-
-		#endregion
-
-		#region 7_AIResults
-
-		Result_AIBattle_Panel_AI = TxC(RESULT + @$"AIBattle{Path.DirectorySeparatorChar}Panel_AI.png");
-		Result_AIBattle_Batch = TxC(RESULT + @$"AIBattle{Path.DirectorySeparatorChar}Batch.png");
-		Result_AIBattle_SectionPlate = TxC(RESULT + @$"AIBattle{Path.DirectorySeparatorChar}SectionPlate.png");
-		Result_AIBattle_WinFlag_Clear = TxC(RESULT + @$"AIBattle{Path.DirectorySeparatorChar}WinFlag_Win.png");
-		Result_AIBattle_WinFlag_Lose = TxC(RESULT + @$"AIBattle{Path.DirectorySeparatorChar}WinFlag_Lose.png");
-
-		#endregion
-
-		#region [7_DanResults]
-
-		//DanResult_Background = TxC(DANRESULT + @$"Background.png");
-		DanResult_Rank = TxC(DANRESULT + @$"Rank.png");
-		DanResult_SongPanel_Base = TxC(DANRESULT + @$"SongPanel_Base.png");
-		DanResult_StatePanel_Base = TxC(DANRESULT + @$"StatePanel_Base.png");
-		DanResult_SongPanel_Main = TxC(DANRESULT + @$"SongPanel_Main.png");
-		DanResult_StatePanel_Main = TxC(DANRESULT + @$"StatePanel_Main.png");
 
 		#endregion
 
@@ -1199,65 +1116,12 @@ class TextureLoader {
 	#endregion
 
 	#region 6_結果発表
-	public CTexture? Result_Header,
-		Result_Number,
-		Result_Panel,
-		Result_Panel_2P,
-		Result_Soul_Text,
-		Result_Soul_Fire,
-		Result_Diff_Bar,
-		Result_Score_Number,
-
-		Result_CrownEffect,
-		Result_ScoreRankEffect,
-
-		//Result_Cloud,
-		Result_Flower,
-		Result_Shine,
-		Result_Gauge_Frame,
-		Result_Gauge_Clear,
-		Result_Gauge_Clear_Base,
-		Result_Gauge_Killzone;
-
-	public CTexture?[]
-		Result_Panel_5P = new CTexture?[5],
-		Result_Panel_4P = new CTexture?[4],
-		Result_Rainbow = new CTexture?[41],
-		//Result_Background = new CTexture[6],
-		Result_Flower_Rotate = new CTexture?[5],
-		//Result_Work = new CTexture[3],
-
-		Result_Gauge = new CTexture?[5],
-		Result_Gauge_Base = new CTexture?[5],
-		Result_Speech_Bubble = new CTexture?[2],
-		Result_Speech_Bubble_V2 = new CTexture?[3]
-/*,
-Result_Mountain = new CTexture?[4]*/;
-	#endregion
-
-	#region 7_AIResults
-	public CTexture? Result_AIBattle_Panel_AI,
-		Result_AIBattle_Batch,
-		Result_AIBattle_SectionPlate,
-		Result_AIBattle_WinFlag_Clear,
-		Result_AIBattle_WinFlag_Lose;
+	public CTexture? Result_Number;
 	#endregion
 
 	#region 7_終了画面
 	//public CTexture Exit_Background/* , */
 	/*Exit_Text; */
-	#endregion
-
-	#region [7_DanResults]
-
-	public CTexture?
-		//DanResult_Background,
-		DanResult_Rank,
-		DanResult_SongPanel_Base,
-		DanResult_StatePanel_Base,
-		DanResult_SongPanel_Main,
-		DanResult_StatePanel_Main;
-
 	#endregion
 
 	#region [11_Characters]

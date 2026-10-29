@@ -100,7 +100,7 @@
         "slide": { "file": "Sounds/slide.ogg", "volume": 35 },
         "step": { "file": "Sounds/step_%02d.ogg", "count": 16, "volume": 45 },
         "mark": { "file": "Sounds/mark_%d.ogg", "count": 5, "volume": 70 },
-        "stamp": { "file": "../../../Sounds/ResultScreen/RankIn.ogg", "volume": 90 },
+        "stamp": { "file": "Sounds/RankIn.ogg", "volume": 90 },
         "flash": { "file": "Sounds/flash.ogg", "volume": 25 },
         "jingle": { "file": "Sounds/jingle.ogg", "volume": 80 },
         "jingle_high": { "file": "Sounds/jingle_high.ogg", "volume": 75 },

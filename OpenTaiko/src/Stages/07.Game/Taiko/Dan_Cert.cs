@@ -788,7 +788,7 @@ internal class Dan_Cert : CActivity {
 	}
 
 	// Regular ingame exams draw
-	public void DrawExam(ReadOnlySpan<Dan_C?> dan_C, List<CTja.DanSongs> danSongs, bool isResult = false, int offX = 0) {
+	public void DrawExam(ReadOnlySpan<Dan_C?> dan_C, List<CTja.DanSongs> danSongs) {
 		int count = 0;
 		int countNoGauge = 0;
 
@@ -809,10 +809,8 @@ internal class Dan_Cert : CActivity {
 			if (dan_C[i] == null || dan_C[i]!.ExamIsEnable != true)
 				continue;
 
-			if (dan_C[i]!.ExamType != Exam.Type.Gauge
-				|| isResult) {
-				if (dan_C[i]!.ExamType != Exam.Type.Gauge)
-					currentPosition++;
+			if (dan_C[i]!.ExamType != Exam.Type.Gauge) {
+				currentPosition++;
 
 				// Determines if a small bar will be used to optimise the display layout
 				bool isSmallGauge = currentPosition >= 3 || (countNoGauge > 3 && countNoGauge % 3 > currentPosition) || countNoGauge == 6;
@@ -820,16 +818,9 @@ internal class Dan_Cert : CActivity {
 				// Y index of the gauge
 				int yIndex = (currentPosition % 3) + 1;
 
-				// Specific case for gauge
-				if (dan_C[i]!.ExamType == Exam.Type.Gauge) {
-					yIndex = 0;
-					isSmallGauge = false;
-				}
-
-
 				// Panel origin
-				int xOrigin = (isResult) ? OpenTaiko.Skin.DanResult_Exam[0] + offX : OpenTaiko.Skin.Game_DanC_X[1];
-				int yOrigin = (isResult) ? OpenTaiko.Skin.DanResult_Exam[1] : OpenTaiko.Skin.Game_DanC_Y[1];
+				int xOrigin = OpenTaiko.Skin.Game_DanC_X[1];
+				int yOrigin = OpenTaiko.Skin.Game_DanC_Y[1];
 
 				// Origin position which will be used as a reference for bar elements
 				int barXOffset = xOrigin + (currentPosition >= 3 ? OpenTaiko.Skin.Game_DanC_Base_Offset_X[1] : OpenTaiko.Skin.Game_DanC_Base_Offset_X[0]);
@@ -1000,12 +991,10 @@ internal class Dan_Cert : CActivity {
 					if (rainbowBase == ctRainbowAnime.EndValue) rainbowBase = 0;
 				}
 				this.Status[i].ctGaugeFlashLoop.TickLoop();
-				if (!isResult) {
-					this.Status[i].Timer_Gauge!.Tick();
-					if (this.Status[i].Timer_Gauge!.IsTicked && this.Status[i].Timer_Gauge!.IsEnded) {
-						this.Status[i].Timer_Gauge!.Stop();
-						this.Status[i].Timer_Gauge!.CurrentValue = (int)this.Status[i].Timer_Gauge!.EndValue;
-					}
+				this.Status[i].Timer_Gauge!.Tick();
+				if (this.Status[i].Timer_Gauge!.IsTicked && this.Status[i].Timer_Gauge!.IsEnded) {
+					this.Status[i].Timer_Gauge!.Stop();
+					this.Status[i].Timer_Gauge!.CurrentValue = (int)this.Status[i].Timer_Gauge!.EndValue;
 				}
 
 				#endregion
@@ -1022,7 +1011,7 @@ internal class Dan_Cert : CActivity {
 				}
 
 				// Flash value
-				float whiteFlashValue = (isResult || !this.Status[i].Timer_Gauge!.IsTicked) ? 0
+				float whiteFlashValue = !this.Status[i].Timer_Gauge!.IsTicked ? 0
 					: Math.Min(1, ((int)this.Status[i].Timer_Gauge!.EndValue - this.Status[i].Timer_Gauge!.CurrentValue) / 315f);
 				int gaugeOpacity = opacity;
 				if (dan_C[i]!.ReachStatus == Exam.ReachStatus.Failure) {
@@ -1186,7 +1175,7 @@ internal class Dan_Cert : CActivity {
 				if (OpenTaiko.Tx.DanC_Failed != null) OpenTaiko.Tx.DanC_Failed.vcScaleRatio.X = isSmallGauge ? 0.33f : 1f;
 
 				if (dan_C[i]!.ReachStatus == Exam.ReachStatus.Failure && OpenTaiko.Tx.DanC_Failed != null) {
-					OpenTaiko.Tx.DanC_Failed.Opacity = (isResult ? 255 : Math.Min(255, 255 * this.Status[i].Timer_Gauge!.CurrentValue / 85));
+					OpenTaiko.Tx.DanC_Failed.Opacity = Math.Min(255, 255 * this.Status[i].Timer_Gauge!.CurrentValue / 85);
 					OpenTaiko.Tx.DanC_Failed.t2DScaledBottomBasedDraw(
 						barXOffset + OpenTaiko.Skin.Game_DanC_Offset[0],
 						lowerBarYOffset - OpenTaiko.Skin.Game_DanC_Offset[1]);
@@ -1363,6 +1352,9 @@ internal class Dan_Cert : CActivity {
 	}
 
 	public ReadOnlySpan<Dan_C?> GetExam() => this.Challenge;
+
+	// exam i is judged song by song (the dan has more than one song and its last song names it)
+	public bool IsPerSongExam(int exam) => ExamChange[exam];
 
 	private readonly float[] ScoreScale = new float[]
 	{

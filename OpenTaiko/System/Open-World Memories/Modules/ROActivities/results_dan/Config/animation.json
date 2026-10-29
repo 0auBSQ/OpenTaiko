@@ -1,0 +1,10 @@
+{
+    "_note": "milliseconds from the start; step is per song",
+    "plate": { "at": 800, "px_per_ms": 4 },
+    "songs": { "at": 1600, "step": 150, "px_per_ms": 3 },
+    "exams": { "at": 2750, "step": 150, "px_per_ms": 6 },
+    "rank": { "at": 4100, "step": 150, "appear": 135, "fade": 90, "grow_by": 1.4, "drop_px_per_ms": 0.2 },
+    "swap": 640,
+    "pages": { "_note": "pages of three songs", "first": 2745, "each": 2000, "fade": 255 },
+    "rainbow_frame": 30
+}

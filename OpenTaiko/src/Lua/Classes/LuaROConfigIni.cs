@@ -92,6 +92,11 @@ namespace OpenTaiko {
 		public bool AreLuaNetworkingConnectionsAllowed {
 			get => OpenTaiko.ConfigIni.bAllowLuaNetworkingConnections;
 		}
+
+		// the settings' "display puchichara"
+		public bool ShowPuchiChara {
+			get => OpenTaiko.ConfigIni.ShowPuchiChara;
+		}
 		#endregion
 
 		#region [Gameplay mods]

@@ -300,9 +300,9 @@ local function ensureArt()
     local judgeFile = THEME:GetNotesSkinFile("judges", "Judge.png")
     if judgeFile == "" then judgeFile = "5_Game/Judge.png" end
     sheets = {
-        digits = TEXTURE:CreateTexture(gfx .. "6_Result/Score_Number.png"),   -- 10 digits, 70x84
+        digits = TEXTURE:CreateTexture("Textures/Replay/Score_Number.png"),   -- 10 digits, 70x84
         rank   = TEXTURE:CreateTexture(gfx .. "5_Game/ScoreRank.png"),         -- 7 frames E..Ω, 210x180
-        crown  = TEXTURE:CreateTexture(gfx .. "6_Result/CrownEffect.png"),     -- 4 columns x 4 rows, 170x168
+        crown  = TEXTURE:CreateTexture("Textures/Replay/CrownEffect.png"),     -- 4 columns x 4 rows, 170x168
         judge  = TEXTURE:CreateTexture(gfx .. judgeFile),                      -- 5 frames, 150x100
         ranks  = {},
     }

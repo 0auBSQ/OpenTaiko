@@ -13,7 +13,7 @@ local TOP, BOTTOM, ROPES, LIVES, TOWER, TAG = Layout.top_board, Layout.bottom_bo
 local BOARDS, SWAY, GLITTER, SHINE = Animation.boards, Animation.boards.sway, Animation.glitter, Animation.shine
 
 local GRAPHICS = "../../../Graphics/"
-local RANK_SHEET = GRAPHICS .. "8_TowerResult/ScoreRankEffect.png"   -- 7 cells side by side: 10 25 50 75 %, clear, full combo, perfect
+local RANK_SHEET = "Textures/ScoreRankEffect.png"   -- 7 cells side by side: 10 25 50 75 %, clear, full combo, perfect
 local RANK_CELLS = 7
 local SKY_DIR = GRAPHICS .. "5_Game/5_Background/Tower/Down/"       -- <look>/Sky_Gradient.png: the gameplay tower sky, day at its bottom
 local MARKS = { 10, 25, 50, 75 }

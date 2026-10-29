@@ -226,6 +226,8 @@ end
 | `modicons` | 한 번 `activate()`, 그다음 layout이 "menu" 또는 "game"인 `draw(x, y, player, layout, alpha)`. MODICONS 전역이 이를 감쌉니다. |
 | `danplate` | 결과 화면과 단위 코스에서 `draw(x, y, opacity, danTick, r, g, b, titleText)`. |
 | `results_tower` | 타워 결과 화면이 열릴 때 플레이를 LuaResultInfo(`ReachedFloor`, `TotalFloors`, `Lives`, `TowerRank`, `IsNewBestFloor`, `GetScore(player)` 같은 읽기 전용 getter)로 넘겨 `activate(info)`; 매 프레임 `update()`와 `draw()`; 결정 시 Call로 `skip()`, 아직 애니메이션 중이면 true를 반환(그 결정은 건너뛰기만 함); `deactivate()`. |
+| `results_regular` | 플레이 결과(AI 배틀 포함)가 열릴 때 플레이를 LuaResultInfo(0부터 시작하는 플레이어별 getter `GetGauge(p)`, `GetClearType(p)`, `GetScoreRank(p)`, `GetScore(p)`, 그리고 `IsAIBattle`, `GetAISectionEnd(i)`)로 넘겨 `activate(info)`; 매 프레임 결과 배경 위에 `update()`와 `draw()`; 결정 시 Call로 `skip()`, 아직 애니메이션 중이면 true를 반환(배경에는 `skipAnime`이 전달됨); `deactivate()`. |
+| `results_dan` | 단위 플레이 결과가 열릴 때 플레이를 LuaResultInfo(`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`)로 넘겨 `activate(info)`; 매 프레임 단위 결과 배경 위에 `update()`와 `draw()`; 결정 시 Call로 `skip()`, 아직 애니메이션 중이면 true를 반환; 왼쪽 또는 오른쪽에서 Call로 `swap()`, 시험과 곡 사이를 전환하면 true를 반환; `deactivate()`. |
 | `tower_hud` | 타워 플레이 시작 시 `activate(maxFloor)`; 매 프레임 상단 배경 위에 `update()`와 `draw()`; `deactivate()`. 층과 라이프는 PLAYSTATE에서 읽습니다. |
 | `popup_menu` | `activate(title, items, fontSize, ...)`. items는 줄바꿈으로 이어진 라벨이고, 그 뒤에 PopupMenu 스킨 위치가 옵니다. 매 프레임 `draw(selected)`; 닫힐 때 `deactivate()`. |
 | `config_ui` | 설정 모델과 함께 `activate(model)`; 매 프레임 `update()`를 호출하며 "exit"를 반환하면 설정 화면을 떠남, 그 뒤에 Modules/Transitions 모듈 이름을 반환하면 돌아갈 때 그 트랜지션을 사용(스킨·해상도·사운드 장치 변경이 적용 대기 중이면 기본 페이드); `draw()`; 엔진이 모델을 다시 만들 때 Call을 통한 `reload(model)`; `deactivate()`. |

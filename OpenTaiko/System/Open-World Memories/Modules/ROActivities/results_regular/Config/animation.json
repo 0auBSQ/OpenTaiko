@@ -1,0 +1,74 @@
+{
+    "_note": "times in milliseconds from the screen's start; gauge_ms values are added per gauge segment (2 % of the gauge) of the fullest gauge",
+    "gauge": {
+        "start": 2000,
+        "segment": 59,
+        "rainbow_frame": 50,
+        "soul_frame": 33,
+        "soul_frames": 8
+    },
+    "numbers": {
+        "start": 3000,
+        "gauge_ms": 59,
+        "row": 420,
+        "pop": 135,
+        "pop_from": 1.3
+    },
+    "score": {
+        "after_rows": 4,
+        "delay": 840,
+        "grow": 270,
+        "grow_by": 0.65,
+        "settle": 90,
+        "settle_by": 0.1
+    },
+    "badges": {
+        "_note": "the score rank and the crown, after the score: fade in over fade, shrink from big, dip, then settle",
+        "rank_delay": 1000,
+        "crown_delay": 2500,
+        "fade": 180,
+        "dip": 90,
+        "grow_by": 1.4,
+        "sound_after": 180
+    },
+    "flash": {
+        "_note": "the rank and crown sheets' lit rows, each step long, in a loop",
+        "loop": 3000,
+        "step": 40,
+        "rank_at": [1500, 1660],
+        "crown_at": [2000, 2160]
+    },
+    "clear": {
+        "_note": "the clear: the characters react, the flowers and bubbles pop in, a lone player's panel slides aside",
+        "start": 10275,
+        "gauge_ms": 66,
+        "pop": 135,
+        "ui_move": 500,
+        "win_flag": 200
+    },
+    "flowers": {
+        "loop": 1500,
+        "at": [10, 30, 50, 100, 190],
+        "fade": 100,
+        "hold": 300,
+        "turns": [5, 3, -6, 4, -2]
+    },
+    "plate_shine": {
+        "loop": 1000,
+        "fade": 100
+    },
+    "ai_page": 2000,
+    "character_ms": 500,
+    "puchichara": {
+        "frame": 2400,
+        "bob": 4000
+    },
+    "sounds": {
+        "_note": "gauge while the gauges fill, pon for each count, score_don for the score, rank_in and crown_in for the badges; a missing file plays nothing",
+        "gauge": "Sounds/Gauge.ogg",
+        "pon": "Sounds/Pon.ogg",
+        "score_don": "Sounds/ScoreDon.ogg",
+        "rank_in": "Sounds/RankIn.ogg",
+        "crown_in": "Sounds/CrownIn.ogg"
+    }
+}

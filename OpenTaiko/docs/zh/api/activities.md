@@ -226,6 +226,8 @@ end
 | `modicons` | 调用一次 `activate()`，然后调用 `draw(x, y, player, layout, alpha)`，layout 为 "menu" 或 "game"。MODICONS 全局对象封装了它。 |
 | `danplate` | 在结算界面和段位课程中调用 `draw(x, y, opacity, danTick, r, g, b, titleText)`。 |
 | `results_tower` | 打开塔结算画面时以 LuaResultInfo 传入本次游玩并调用 `activate(info)`（只读的 getter，如 `ReachedFloor`、`TotalFloors`、`Lives`、`TowerRank`、`IsNewBestFloor`、`GetScore(player)`）；每帧 `update()` 和 `draw()`；确认时通过 Call 调用 `skip()`，仍在播放动画时返回 true（这次确认只会跳过动画）；`deactivate()`。 |
+| `results_regular` | 打开一局（包括 AI 对战）的结算画面时以 LuaResultInfo 传入本局并调用 `activate(info)`（从 0 开始的按玩家 getter，如 `GetGauge(p)`、`GetClearType(p)`、`GetScoreRank(p)`、`GetScore(p)`，以及 `IsAIBattle`、`GetAISectionEnd(i)`）；每帧在结算背景之上 `update()` 和 `draw()`；确认时通过 Call 调用 `skip()`，仍在播放动画时返回 true（背景随后收到 `skipAnime`）；`deactivate()`。 |
+| `results_dan` | 打开段位结算画面时以 LuaResultInfo 传入本局并调用 `activate(info)`（`DanResult`、`DanCombo`、`GetDanSong(i)`、`GetExam(i)`、`exam:GetSong(i)`）；每帧在段位结算背景之上 `update()` 和 `draw()`；确认时通过 Call 调用 `skip()`，仍在播放动画时返回 true；按左或右时通过 Call 调用 `swap()`，在考试与歌曲之间切换时返回 true；`deactivate()`。 |
 | `tower_hud` | 塔模式开始时 `activate(maxFloor)`；每帧在上方背景之上 `update()` 和 `draw()`；`deactivate()`。楼层和生命从 PLAYSTATE 读取。 |
 | `popup_menu` | 调用 `activate(title, items, fontSize, ...)`，其中 items 是用换行符连接的标签，其后是 PopupMenu 的皮肤位置；每帧调用 `draw(selected)`；关闭时调用 `deactivate()`。 |
 | `config_ui` | 以设置模型调用 `activate(model)`；每帧调用 `update()`，返回 "exit" 即离开设置界面，其后可再返回一个 Modules/Transitions 模块名作为返回时的过渡（若有待应用的皮肤、分辨率或声音设备更改，则改为普通淡出）；调用 `draw()`；引擎重建模型时通过 Call 调用 `reload(model)`；调用 `deactivate()`。 |
