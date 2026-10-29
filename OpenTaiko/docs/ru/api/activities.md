@@ -227,12 +227,104 @@ end
 | `danplate` | `draw(x, y, opacity, danTick, r, g, b, titleText)` на экране результатов и в дан-курсах. |
 | `results_tower` | `activate(info)` при открытии результата башни, с игрой в виде LuaResultInfo (геттеры только для чтения, например `ReachedFloor`, `TotalFloors`, `Lives`, `TowerRank`, `IsNewBestFloor`, `GetScore(player)`); `update()` и `draw()` каждый кадр; `skip()` через Call при подтверждении, возвращает true, пока идёт анимация (такое подтверждение только пропускает её); `deactivate()`. |
 | `results_regular` | `activate(info)` при открытии результата игры, в том числе битвы с ИИ, с игрой в виде LuaResultInfo (геттеры по игрокам с 0, например `GetGauge(p)`, `GetClearType(p)`, `GetScoreRank(p)`, `GetScore(p)`, а также `IsAIBattle`, `GetAISectionEnd(i)`); `update()` и `draw()` каждый кадр поверх фона результата; `skip()` через Call при подтверждении, возвращает true, пока идёт анимация (фон тогда получает `skipAnime`); `deactivate()`. |
-| `results_dan` | `activate(info)` при открытии результата дан-игры, с игрой в виде LuaResultInfo (`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`); `update()` и `draw()` каждый кадр поверх фона результата дана; `skip()` через Call при подтверждении, возвращает true, пока идёт анимация; `swap()` через Call по нажатию влево или вправо, возвращает true, когда экран переключается между экзаменами и песнями; `deactivate()`. |
+| `results_dan` | `activate(info)` при открытии результата дан-игры, с игрой в виде LuaResultInfo (`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`, `exam.PreviousBestAmount`); `update()` и `draw()` каждый кадр поверх фона результата дана; `skip()` через Call при подтверждении, возвращает true, пока идёт анимация; `swap()` через Call по нажатию влево или вправо, возвращает true, когда экран переключается между экзаменами и песнями; `deactivate()`. |
 | `tower_hud` | `activate(maxFloor)` при старте игры в башне; `update()` и `draw()` каждый кадр поверх верхнего фона; `deactivate()`. Этаж и жизни он читает из PLAYSTATE. |
 | `popup_menu` | `activate(title, items, fontSize, ...)`, где items — метки, соединённые переносами строк, за которыми следуют позиции PopupMenu из скина; `draw(selected)` каждый кадр; `deactivate()` при закрытии. |
 | `config_ui` | `activate(model)` с моделью настроек; `update()` каждый кадр, возвращающий "exit" для выхода с экрана настроек, по желанию затем имя модуля Modules/Transitions для обратного пути (вместо него играет простое затемнение, если ещё ждёт применения смена скина, разрешения или звукового устройства); `draw()`; `reload(model)` через Call, когда движок перестраивает модель; `deactivate()`. |
 | `song_enum` | `activate()`, затем `draw(isCommandSongDataGet, done, total)` каждый кадр, пока идёт сканирование песен; `deactivate()`. |
 | `cutscene` | `activate(paths, fadeOutSeconds)`: видеофайлы по порядку и затемнение после последнего (0 — без него); `update()` каждый кадр, возвращает "finished", когда все видео проиграны и затемнение завершено; `draw()`; `deactivate()`. Проигрывает каждый файл с его звуковой дорожкой и владеет всплывающим окном паузы; для чего нужна катсцена, решает вызывающая сторона. |
+
+Три ROActivity results сами воспроизводят музыку экрана результатов. Пока показывается всплывающее окно награды, движок приглушает её через Call с `setMusicLevel(percent)`, от 0 до 100. Когда экран полностью затемнён, движок деактивирует модуль, и его музыка останавливается вместе с ним.
+
+### Сведения о результате
+
+Объект LuaResultInfo, который этап результатов передаёт в callback activate модулей results_tower, results_regular и results_dan.
+
+<div class="callout warn">
+Этап результатов заполняет его после сохранения игры, и после этого он не меняется. Все члены доступны только для чтения: свойства используют точечный синтаксис (`info.Title`), методы — синтаксис с двоеточием. Аргументы игрока начинаются с 0; вне диапазона метод возвращает 0, false или пустую строку. Член, помеченный именем модуля, заполняется только для этого экрана; на остальных он сохраняет это значение по умолчанию.
+</div>
+
+| Метод | Описание |
+| --- | --- |
+| `info.Title  -> string` | Название чарта. |
+| `info.Subtitle  -> string` | Подзаголовок чарта. |
+| `info.PlayerCount  -> number` | Число игроков (1 на результатах башни и дана). |
+| `info.PlayerSide  -> number` | Сторона таблички игрока 1: 1, если он играет на синей стороне, иначе 0. |
+| `info:GetGoodCount(player)  -> number` | Попадания Good. |
+| `info:GetOkCount(player)  -> number` | Попадания Ok. |
+| `info:GetBadCount(player)  -> number` | Попадания Bad. |
+| `info:GetRollCount(player)  -> number` | Удары по дроби. |
+| `info:GetMaxCombo(player)  -> number` | Максимальное комбо. |
+| `info:GetADLibCount(player)  -> number` | Попадания по нотам AD-LIB. |
+| `info:GetBoomCount(player)  -> number` | Попадания по бомбам. |
+| `info:GetScore(player)  -> number` | Итоговый счёт. |
+| `info:GetPreviousBestScore(player)  -> number` | Лучший счёт игрока на этом чарте и сложности до сохранения этой игры, 0, если его нет. |
+| `info:IsSaved(player)  -> boolean` | Истина, если игра попала в сохранение игрока (никогда на автоигре или при просмотре повтора). |
+| `info:GetDifficulty(player)  -> number` | results_regular: сыгранная сложность, от 0 Easy до 4 Extra. |
+| `info:GetGauge(player)  -> number` | results_regular: шкала души в конце игры, от 0 до 100. |
+| `info:GetGaugeType(player)  -> number` | results_regular: 0 обычная, 1 сложная, 2 экстремальная. |
+| `info:GetNorma(player)  -> number` | results_regular: значение шкалы, с которого обычная шкала засчитывает прохождение. |
+| `info:GetKillZone(player)  -> number` | results_regular: зона поражения экстремальной шкалы, от 0 до 100 (0 у остальных шкал). |
+| `info:GetClearType(player)  -> number` | results_regular: 0 не пройдено, 1 пройдено с помощью, 2 пройдено, 3 фулл-комбо, 4 идеально. |
+| `info:GetScoreRank(player)  -> number` | results_regular: 0 нет, затем ранги счёта от 1 до 7. |
+| `info:IsCleared(player)  -> boolean` | results_regular: истина, если игра пройдена; в битве с ИИ — если победил игрок 1. |
+| `info:GetSpeechText(player, mood)  -> string` | results_regular: реплика персонажа игрока на экране результатов для настроения, от 0 (худшее) до 5 (идеально). |
+| `info.IsAIBattle  -> boolean` | results_regular: истина для битвы с ИИ. |
+| `info.AISectionCount  -> number` | results_regular: число секций битвы с ИИ. |
+| `info:GetAISectionEnd(section)  -> number` | results_regular: чем закончилась секция (с 0): 0 не доиграна, 1 победа, 2 поражение. |
+| `info.TowerType  -> string` | results_tower: TOWERTYPE чарта, "", если он не указан. |
+| `info.TowerSide  -> number` | results_tower: 0 Sweet, 1 Spicy. |
+| `info.ReachedFloor  -> number` | results_tower: достигнутый этаж. |
+| `info.TotalFloors  -> number` | results_tower: число этажей башни. |
+| `info.Lives  -> number` | results_tower: оставшиеся жизни. |
+| `info.MaxLives  -> number` | results_tower: жизни в начале. |
+| `info.TowerRank  -> number` | results_tower: 0 нет, затем от 1 до 7: 10, 25, 50 и 75 %, пройдено, фулл-комбо, идеально. |
+| `info.PreviousBestFloor  -> number` | results_tower: лучший этаж до сохранения этой игры. |
+| `info.IsNewBestFloor  -> boolean` | results_tower: истина, если сохранённая игра побила лучший этаж. |
+| `info.IsNewBestScore  -> boolean` | results_tower: истина, если сохранённая игра побила лучший счёт. |
+| `info.IsTired  -> boolean` | results_tower: истина, если игра закончилась с уставшим персонажем башни (осталось мало жизней). |
+| `info.Bpm  -> number` | results_tower: BPM, на котором закончилась игра. |
+| `info.DanTick  -> number` | results_dan: отметки таблички дана (DANTICK). |
+| `info.DanTickColor  -> color` | results_dan: цвет отметок (DANTICKCOLOR). |
+| `info.DanResult  -> number` | results_dan: 0 не сдан, 1 сдан (красный), 2 сдан (золотой). |
+| `info.DanCombo  -> number` | results_dan: 0, 1 без Bad (фулл-комбо), 2 без Bad и Ok (идеально). |
+| `info.TotalHits  -> number` | results_dan: попадания Good, Ok и по дроби вместе. |
+| `info.DanSongCount  -> number` | results_dan: число песен дана. |
+| `info.DanSongReached  -> number` | results_dan: песня, на которой закончилась игра, с 0. |
+| `info.DanExamSong  -> number` | results_dan: песня, чьи экзамены по песням показывались последними, с 0. |
+| `info:GetDanSong(song)  -> dan song` | results_dan: песня i дана (с 0) или nil. |
+| `info.ExamCount  -> number` | results_dan: число экзаменов дана. |
+| `info:GetExam(exam)  -> dan exam` | results_dan: экзамен i (с 0, в порядке чарта) или nil. |
+
+### Песня дана
+
+Объект, который возвращает info:GetDanSong, только для чтения.
+
+| Метод | Описание |
+| --- | --- |
+| `song.Title  -> string` | Название песни; "???" для песни, которую чарт скрывает. |
+| `song.Difficulty  -> number` | От 0 Easy до 4 Extra. |
+| `song.Level  -> number` | Уровень песни. |
+| `song.Good  -> number` | Попадания Good в песне. |
+| `song.Ok  -> number` | Попадания Ok в песне. |
+| `song.Bad  -> number` | Попадания Bad в песне. |
+| `song.Roll  -> number` | Удары по дроби в песне. |
+
+### Экзамен дана
+
+Объект, который возвращают info:GetExam и exam:GetSong, только для чтения: экзамен на момент окончания игры.
+
+| Метод | Описание |
+| --- | --- |
+| `exam.Type  -> number` | 0 шкала, 1 Good, 2 Ok, 3 Bad, 4 счёт, 5 дроби, 6 попадания, 7 комбо, 8 точность, 9 AD-LIB, 10 BOOM; название даёт LANG:GetExamName(type). |
+| `exam.Range  -> number` | 0 не меньше Value, 1 меньше Value. |
+| `exam.Value  -> number` | Значение для сдачи (красный). |
+| `exam.Amount  -> number` | Показываемое значение; для экзамена «меньше» — сколько оставалось до провала. |
+| `exam.PreviousBestAmount  -> number` | Лучшее значение Amount игрока в этом экзамене до сохранения этой игры, в тех же единицах (больше — лучше); -1, если его нет. У экзамена по песням своё значение у каждой песни (exam:GetSong). |
+| `exam.Percent  -> number` | Amount относительно Value, от 0 до 100. |
+| `exam.Status  -> number` | 0 не сдан, 1 сдан, 2 сдан на золото. |
+| `exam.IsPerSong  -> boolean` | Истина для экзамена, оцениваемого по каждой песне; тогда сам экзамен относится к последней песне. |
+| `exam:GetSong(song)  -> dan exam` | Экзамен по песням на песне i (с 0) или nil. |
 
 ## Фоны
 

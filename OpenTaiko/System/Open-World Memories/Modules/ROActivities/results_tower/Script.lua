@@ -629,14 +629,14 @@ local function drawBottom(b, q)
         drawTag(b, q, cx, SB.tag_y, timeline.scoreBest)
         if clock >= timeline.scoreBest then
             cue("jingle_high", "scoreBest")
-            if info.PreviousBestScore > 0 then
+            if info:GetPreviousBestScore(0) > 0 then
                 local k = progress(timeline.scoreBest, Animation.new_best.pop_s)
-                text(fonts.best, "+" .. thousands(info:GetScore(0) - info.PreviousBestScore), b, q, cx, SB.line_y, "center", { color = col.gain, opacity = k })
+                text(fonts.best, "+" .. thousands(info:GetScore(0) - info:GetPreviousBestScore(0)), b, q, cx, SB.line_y, "center", { color = col.gain, opacity = k })
             end
         end
-    elseif info.PreviousBestScore > 0 and clock >= timeline.scoreEnd then
+    elseif info:GetPreviousBestScore(0) > 0 and clock >= timeline.scoreEnd then
         local k = progress(timeline.scoreEnd, Animation.new_best.pop_s)
-        text(fonts.best, fill(strings.best, thousands(info.PreviousBestScore)), b, q, x0, S.y, "left", { color = col.dim, opacity = k })
+        text(fonts.best, fill(strings.best, thousands(info:GetPreviousBestScore(0))), b, q, x0, S.y, "left", { color = col.dim, opacity = k })
     end
 
     drawLives(b, q)
@@ -724,6 +724,43 @@ local function updateChara()
     chara:Update(a)
 end
 
+local music = {}
+
+-- an optional intro, then the loop; a missing file stays silent
+local function startMusic(intro, loop)
+    music = {}
+    if loop ~= nil and STORAGE:FileExists(loop) then
+        music.loop = SOUND:CreateBGM(loop)
+        music.loop:SetLoop(true)
+    end
+    if intro ~= nil and STORAGE:FileExists(intro) then
+        music.intro = SOUND:CreateBGM(intro)
+        music.intro:Play()
+    elseif music.loop ~= nil then
+        music.loop:Play()
+    end
+end
+
+-- the loop takes over once the intro has played
+local function updateMusic()
+    local intro = music.intro
+    if intro ~= nil and intro.Loaded and not intro.IsPlaying then
+        music.intro = nil
+        pcall(function() intro:Dispose() end)
+        if music.loop ~= nil then music.loop:Play() end
+    end
+end
+
+local function stopMusic()
+    for _, s in pairs(music) do pcall(function() s:Stop(); s:Dispose() end) end
+    music = {}
+end
+
+-- the result stage dims the music while a reward pop-up shows, percent from 0 to 100
+function setMusicLevel(percent)
+    for _, s in pairs(music) do s:SetVolumePercent(percent) end
+end
+
 local function loadSounds()
     for name, s in pairs(Animation.sounds) do
         if name ~= "_note" then
@@ -759,6 +796,7 @@ function activate(result)
     if STORAGE:FileExists(skyFile) then tex.sky = TEXTURE:CreateTexture(skyFile) end
     loadChara()
     loadSounds()
+    startMusic(Config.optional(Animation.music, "intro"), Config.optional(Animation.music, "loop"))
     strings.reached = tr("TOWER_HUD_REACHED", "Reached floor")
     strings.lives = tr("TOWER_HUD_LIVES", "Lives")
     strings.score = tr("TOWER_RESULTS_SCORE", "Score")
@@ -793,6 +831,7 @@ end
 
 function deactivate()
     active = false
+    stopMusic()
     for _, set in pairs(sounds) do
         for _, s in ipairs(set) do pcall(function() s:Stop(); s:Dispose() end) end
     end
@@ -812,6 +851,7 @@ function update()
     if not active then return end
     clock = clock + fps.deltaTime
     idle = idle + fps.deltaTime
+    updateMusic()
     local tl = timeline
     if clock >= tl.topLanded then cue("plank", "topLanded") end
     if clock >= BOARDS.bottom_start_s then cue("slide", "bottomDrop") end

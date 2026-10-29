@@ -123,7 +123,7 @@ AIBattleNameplate=66
 기본 제공 스킨을 기준으로, 스킨 루트에는 다음이 있습니다.
 
 - `Graphics/`: 번호가 매겨진 화면별 폴더(`0_Startup`, `1_Title`, `2_Config`, `3_DaniSelect`, `5_Game`, `6_Result`, `7_DanResult`, `8_TowerResult`, `12_OnlineLounge`)로 묶인 이미지와 상단의 몇몇 공용 이미지. 애니메이션 배경은 속한 폴더의 이미지 옆에 놓인 `Script.lua` 파일입니다(예: `Graphics/0_Startup/Script.lua`와 `Graphics/5_Game/5_Background/` 아래 폴더). 타워 룩은 `Graphics/5_Game/5_Background/Tower/Down/` 아래의 폴더 하나로, 하늘, 층(`Base/`), 지붕(`Top.png`), 선택적인 장식(`Deco/`), 그리고 `Config.json`의 배치를 담습니다. 채보는 `TOWERTYPE:`으로 룩을 고르고, 타워 선택, 로딩 화면, 결과 화면은 `Modules/Lib/TowerArt/` 아래 같은 이름의 폴더에 있는 전용 사본(조각을 절반 크기로 줄인 것과 자체 `Config.json`: `floor_height`, 그리고 층의 아래쪽 가운데에서 장식까지의 오프셋 `deco_dx`/`deco_dy`, 모두 그 조각의 픽셀 단위)으로 같은 타워를 그립니다. 따라서 새 룩에는 두 폴더가 모두 필요합니다. 노트, 연타, 풍선, 히트 이펙트, 판정 문자는 `Graphics/5_Game/` 아래의 팩에 들어 있으며, 플레이어가 그중에서 고릅니다([노트와 판정 팩 추가하기](notes-skins.md) 참고).
-- `Sounds/`: 게임이 고정 파일 이름으로 로드하는 시스템 소리와 BGM. 예: `Sounds/Move.ogg`, `Sounds/Decide.ogg`, `Sounds/Cancel.ogg`, `Sounds/BGM/Title.ogg`, `Sounds/BGM/SongSelect.ogg`, `Sounds/BGM/Result.ogg`. 파일이 없으면 그 소리는 재생되지 않습니다.
+- `Sounds/`: 게임이 고정 파일 이름으로 로드하는 시스템 소리와 BGM. 예: `Sounds/Move.ogg`, `Sounds/Decide.ogg`, `Sounds/Cancel.ogg`, `Sounds/BGM/Title.ogg`, `Sounds/BGM/SongSelect.ogg`. 파일이 없으면 그 소리는 재생되지 않습니다.
 - `Fonts/`: `FontName` 키가 참조하는 `.ttf` 파일.
 - `Locales/`: 언어별 폴더 하나(`en/`, `ja/`, ...)에 화면이나 기능마다 JSON 파일(`coin_shop.json`, `items.json`, ...)을 원하는 만큼 두며, 형태는 모두 `{ "Entries": { "KEY": "text" } }`입니다. 게임은 폴더의 모든 파일을 읽습니다(단일 `Locales/<lang>.json` 파일도 읽습니다). 이 문자열은 스킨 자체 화면과 설정의 라벨이며 Lua는 `THEME:GetSkinString(key)`로 이를 읽습니다. 활성 언어에 키가 없으면 게임은 `DefaultLocale` 언어에서 찾습니다.
 - `Modules/`: Lua 모듈 트리(8단계).

@@ -68,18 +68,17 @@ internal class CStageResult : CStage {
 		return tmpClear;
 	}
 
-	// the player's best floor and score on the chosen chart and difficulty in their save, (0, 0) when none
-	private static (int floor, long score) tBestBefore(int player) {
+	// the player's best play on the chosen chart and difficulty in their save, null when none. Saving the play puts new
+	// records in the save, so one read before keeps the bests as they were.
+	private static BestPlayRecords.CBestPlayRecord? tBestBefore(int player) {
 		var song = OpenTaiko.SongMount.rChoosenSong;
-		if (song?.uniqueId == null) return (0, 0);
+		if (song?.uniqueId == null) return null;
 		string key = song.uniqueId.data.id + OpenTaiko.SongMount.nChoosenSongDifficulty[player].ToString();
-		return OpenTaiko.SaveFileInstances[player].data.bestPlaysDistinctCharts.TryGetValue(key, out var best)
-			? ((int)best.TowerBestFloor, best.HighScore)
-			: (0, 0);
+		return OpenTaiko.SaveFileInstances[player].data.bestPlaysDistinctCharts.TryGetValue(key, out var best) ? best : null;
 	}
 
 	// the tower play for results_tower; the new bests count only for a play that went into the save
-	private LuaResultInfo tTowerResultInfo((int floor, long score) bestBefore) {
+	private LuaResultInfo tTowerResultInfo(BestPlayRecords.CBestPlayRecord?[] bestBefore) {
 		var song = OpenTaiko.SongMount.rChoosenSong!;
 		var game = OpenTaiko.stageGameScreen;
 		var chart = game.CChartScore[0];
@@ -94,8 +93,7 @@ internal class CStageResult : CStage {
 			lives = game.FloorManagement.CurrentNumberOfLives,
 			maxLives = game.FloorManagement.MaxNumberOfLives,
 			towerRank = GetTowerScoreRank(),
-			previousBestFloor = bestBefore.floor,
-			previousBestScore = bestBefore.score,
+			previousBestFloor = (int)(bestBefore[0]?.TowerBestFloor ?? 0),
 			tired = game.FloorManagement.IsTired,
 			bpm = game.actPlayInfo.dbBPM[0],
 		};
@@ -108,13 +106,14 @@ internal class CStageResult : CStage {
 		info.boom[0] = chart.nMine;
 		info.score[0] = (long)game.actScore.Get(0);
 		info.saved[0] = this.IsScoreValid[0];
-		info.newBestFloor = info.saved[0] && info.floor > bestBefore.floor;
-		info.newBestScore = info.saved[0] && chart.nScore > bestBefore.score;
+		info.previousBestScore[0] = bestBefore[0]?.HighScore ?? 0;
+		info.newBestFloor = info.saved[0] && info.floor > info.previousBestFloor;
+		info.newBestScore = info.saved[0] && chart.nScore > info.previousBestScore[0];
 		return info;
 	}
 
 	// the play for results_regular, an AI battle's included
-	private LuaResultInfo tRegularResultInfo() {
+	private LuaResultInfo tRegularResultInfo(BestPlayRecords.CBestPlayRecord?[] bestBefore) {
 		var song = OpenTaiko.SongMount.rChoosenSong!;
 		var game = OpenTaiko.stageGameScreen;
 		int players = OpenTaiko.ConfigIni.nPlayerCount;
@@ -137,6 +136,7 @@ internal class CStageResult : CStage {
 			info.adlib[p] = chart.nADLIB;
 			info.boom[p] = chart.nMine;
 			info.score[p] = (long)game.actScore.Get(p);
+			info.previousBestScore[p] = bestBefore[p]?.HighScore ?? 0;
 			info.saved[p] = this.IsScoreValid[p];
 			info.difficulty[p] = OpenTaiko.SongMount.nChoosenSongDifficulty[p];
 			info.gauge[p] = game.actGauge.dbCurrentGaugeValue[p];
@@ -152,8 +152,8 @@ internal class CStageResult : CStage {
 		return info;
 	}
 
-	// the dan play for results_dan, with its exams as they ended
-	private LuaResultInfo tDanResultInfo() {
+	// the dan play for results_dan, with its exams as they ended and their bests before this play
+	private LuaResultInfo tDanResultInfo(BestPlayRecords.CBestPlayRecord?[] bestBefore) {
 		var song = OpenTaiko.SongMount.rChoosenSong!;
 		var game = OpenTaiko.stageGameScreen;
 		var chart = game.CChartScore[0];
@@ -164,7 +164,7 @@ internal class CStageResult : CStage {
 			subtitle = song.ldSubtitle.GetString(""),
 			playerSide = OpenTaiko.P1IsBlue() ? 1 : 0,
 			danTick = chartInfo?.nDanTick ?? 0,
-			danTickColor = chartInfo is { } ci ? [ci.cDanTickColor.R, ci.cDanTickColor.G, ci.cDanTickColor.B] : [255, 255, 255],
+			danTickColor = chartInfo is { } ci ? new LuaColor(ci.cDanTickColor) : new LuaColor(255, 255, 255),
 			danResult = (int)GetResultExamStatus(),
 			danCombo = this.stPlayRecord.nBadCount != 0 ? 0 : this.stPlayRecord.nOkCount != 0 ? 1 : 2,
 			totalHits = chart.nGreat + chart.nGood + game.GetRoll(0),
@@ -191,25 +191,44 @@ internal class CStageResult : CStage {
 		info.adlib[0] = chart.nADLIB;
 		info.boom[0] = chart.nMine;
 		info.score[0] = (long)game.actScore.Get(0);
+		info.previousBestScore[0] = bestBefore[0]?.HighScore ?? 0;
 		info.saved[0] = this.IsScoreValid[0];
+
+		// the save keeps, per exam, one best amount for each song that has the exam, in the songs' order
+		var best = bestBefore[0];
+		var savedExams = best == null ? null
+			: new[] { best.DanExam1, best.DanExam2, best.DanExam3, best.DanExam4, best.DanExam5, best.DanExam6, best.DanExam7 };
+		int tSaved(int exam, int danSong) {
+			if (savedExams == null) return -1;
+			int at = 0;
+			for (int s = 0; s < danSong; s++) {
+				if (danSongs[s].Dan_C[exam] != null) at++;
+			}
+			return at < savedExams[exam].Count ? savedExams[exam][at] : -1;
+		}
 
 		var exams = new List<LuaResultExam>();
 		for (int i = 0; i < CExamInfo.cMaxExam; i++) {
 			if (this.stPlayRecord.Dan_C[i] is not Dan_C exam || !exam.ExamIsEnable) continue;
-			var shown = tExamInfo(exam);
+			// the exam shown is one of the songs' exams: the first song's for an exam on the whole dan
+			int ownSong = Math.Max(0, danSongs.FindIndex(s => ReferenceEquals(s.Dan_C[i], exam)));
+			var shown = tExamInfo(exam, tSaved(i, ownSong));
 			if (game.actDan.IsPerSongExam(i))
-				shown.songs = danSongs.Select(s => s.Dan_C[i] is Dan_C e ? tExamInfo(e) : null).ToArray();
+				shown.songs = danSongs.Select((s, j) => s.Dan_C[i] is Dan_C e ? tExamInfo(e, tSaved(i, j)) : null).ToArray();
 			exams.Add(shown);
 		}
 		info.exams = [.. exams];
 		return info;
 	}
 
-	private static LuaResultExam tExamInfo(Dan_C exam) => new() {
+	// an exam as the play ended; saved is the save's best raw amount (-1 for none), shown in the terms of Amount
+	private static LuaResultExam tExamInfo(Dan_C exam, int saved) => new() {
 		type = (int)exam.ExamType,
 		range = (int)exam.ExamRange,
 		value = exam.GetValue()[0],
 		amount = exam.GetDisplayedAmount(),
+		previousBestAmount = saved < 0 ? -1
+			: exam.ExamRange == Exam.Range.Less ? Math.Max(0, exam.GetValue()[0] - saved) : saved,
 		percent = exam.GetAmountToPercent(),
 		status = (int)exam.GetExamStatus(),
 	};
@@ -263,8 +282,8 @@ internal class CStageResult : CStage {
 			this.IsScoreValid = [false, false, false, false, false];
 			this.ClearStatusesSaved = [0, 0, 0, 0, 0];
 			this.ScoreRanksSaved = [0, 0, 0, 0, 0];
-			// the bests before this play is saved, for the result's "new best"
-			var bestBefore = tBestBefore(0);
+			// each player's bests before this play is saved, for the result's previous bests
+			var bestBefore = Enumerable.Range(0, 5).Select(p => p < OpenTaiko.ConfigIni.nPlayerCount ? tBestBefore(p) : null).ToArray();
 
 			{
 				#region [ 初期化 ]
@@ -731,7 +750,6 @@ internal class CStageResult : CStage {
 
 			base.Activate();
 
-			bAudioPlayback = false;
 			this.EndAnime = false;
 
 			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
@@ -741,25 +759,21 @@ internal class CStageResult : CStage {
 				Background = new LuaBackgroundWrapper(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.DANRESULT}"));
 				Background.Activate(_state.Refreshed());
 				// the skin's results_dan draws the rest of the dan result
-				ResultsDan?.Activate(tDanResultInfo());
+				ResultsDan?.Activate(tDanResultInfo(bestBefore));
 			} else {
 				Background = new LuaBackgroundWrapper(CSkin.Path(OpenTaiko.ConfigIni.bAIBattleMode
 					? $@"{TextureLoader.BASE}{TextureLoader.RESULT}AIBattle"
 					: $@"{TextureLoader.BASE}{TextureLoader.RESULT}"));
 				Background.Activate(_state.Refreshed());
 				// the skin's results_regular draws the rest of the result, an AI battle's too
-				ResultsRegular?.Activate(tRegularResultInfo());
+				ResultsRegular?.Activate(tRegularResultInfo(bestBefore));
 			}
 		} finally {
 			Trace.TraceInformation("結果ステージの活性化を完了しました。");
 			Trace.Unindent();
 		}
-
-		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Tower)
-			bgmResultIn.tPlay();
 	}
 	public override void DeActivate() {
-		this.tSetMusicLevel(100);
 		// the fun mods forced for Dynamic Beat, then player 2's own modes in AI battle, go back after the replay was saved,
 		// before a watched replay's mods
 		CStagePlayScreenCommon.RestoreSharedDynamicBeat(OpenTaiko.ConfigIni);
@@ -772,9 +786,7 @@ internal class CStageResult : CStage {
 		}
 
 		OpenTaiko.tDisposeSafely(ref Background);
-		if (ResultsTower != null && ResultsTower.IsActive) ResultsTower.Deactivate();
-		if (ResultsRegular != null && ResultsRegular.IsActive) ResultsRegular.Deactivate();
-		if (ResultsDan != null && ResultsDan.IsActive) ResultsDan.Deactivate();
+		tDeactivateResults();
 
 		if (this.rResultSound != null) {
 			OpenTaiko.SoundManager.tDisposeSound(this.rResultSound);
@@ -819,55 +831,10 @@ internal class CStageResult : CStage {
 			Background?.Update(_state);
 			Background?.Draw(_state);
 
-			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Tower) {
-				#region [Ensou game result screen]
-
-				if (!bAudioPlayback && !bgmResultIn.bIsPlaying) {
-					bgmResultLoop.tPlay();
-					bAudioPlayback = true;
-				}
-
-				if (ResultsRegular is { IsActive: true } regularUI) {
-					regularUI.Update();
-					regularUI.Draw();
-				}
-
-				#endregion
-
-			} else {
-				if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-					#region [DaniDoujou result screen]
-
-					if (!bAudioPlayback && !OpenTaiko.Skin.bgmDanResult.bIsPlaying) {
-						OpenTaiko.Skin.bgmDanResult.tPlay();
-						bAudioPlayback = true;
-					}
-
-					if (ResultsDan is { IsActive: true } danUI) {
-						danUI.Update();
-						danUI.Draw();
-					}
-
-					#endregion
-
-				} else {
-					#region [Tower result screen]
-
-					if (!bAudioPlayback && !OpenTaiko.Skin.bgmTowerResult.bIsPlaying) {
-						OpenTaiko.Skin.bgmTowerResult.tPlay();
-						bAudioPlayback = true;
-					}
-
-					if (ResultsTower is { IsActive: true } towerUI) {
-						towerUI.Update();
-						towerUI.Draw();
-					}
-
-
-					#endregion
-				}
-
-
+			// the skin's results ROActivity draws the result and plays its music
+			if (ActiveResults is { IsActive: true } resultsUI) {
+				resultsUI.Update();
+				resultsUI.Draw();
 			}
 
 			// Display medals debug
@@ -895,9 +862,8 @@ internal class CStageResult : CStage {
 			} else if ((base.ePhaseID == CStage.EPhase.Common_FADEOUT))         //&& ( this.actFO.On進行描画() != 0 ) )
 			{
 				if (this.actFO.Draw() != 0) {
-					bgmResultLoop.tStop();
-					OpenTaiko.Skin.bgmDanResult.tStop();
-					OpenTaiko.Skin.bgmTowerResult.tStop();
+					// the screen is black: the results module goes, its music with it
+					tDeactivateResults();
 					return (int)this.eFadeOutCompleteWhenReturnValue;
 				}
 			}
@@ -1023,7 +989,6 @@ internal class CStageResult : CStage {
 	//-----------------
 
 	public bool bAddedToRecentlyPlayedSongs;
-	public bool bAudioPlayback;
 	public bool EndAnime;
 
 	private CCounter? ctAppear;
@@ -1067,31 +1032,24 @@ internal class CStageResult : CStage {
 	private static LuaROActivityWrapper? ResultsRegular => LuaROActivityWrapper.GetROActivity("results_regular");
 	private static LuaROActivityWrapper? ResultsDan => LuaROActivityWrapper.GetROActivity("results_dan");
 
-	private CSkin.CSystemSound bgmResultIn {
-		get {
-			if (OpenTaiko.ConfigIni.bAIBattleMode) {
-				return OpenTaiko.Skin.bgmResultIn_AI;
-			} else {
-				return OpenTaiko.Skin.bgmResultInSound;
-			}
-		}
-	}
+	// the results ROActivity of the play: results_tower, results_dan or results_regular
+	private static LuaROActivityWrapper? ActiveResults => OpenTaiko.SongMount.nChoosenSongDifficulty[0] switch {
+		(int)Difficulty.Tower => ResultsTower,
+		(int)Difficulty.Dan => ResultsDan,
+		_ => ResultsRegular,
+	};
 
-	private CSkin.CSystemSound bgmResultLoop {
-		get {
-			if (OpenTaiko.ConfigIni.bAIBattleMode) {
-				return OpenTaiko.Skin.bgmResult_AI;
-			} else {
-				return OpenTaiko.Skin.bgmResultSound;
-			}
+	private static void tDeactivateResults() {
+		foreach (var results in new[] { ResultsTower, ResultsRegular, ResultsDan }) {
+			if (results is { IsActive: true }) results.Deactivate();
 		}
 	}
 
 	// Coins information
 	private int[] nEarnedMedalsCount = { 0, 0, 0, 0, 0 };
 
-	// The result music dims while a reward modal plays so the modal's own sounds are heard: its automation
-	// level (percent) eases with a smoothstep down to MODAL_DUCK_LEVEL and back up, so neither edge is rough.
+	// The result music dims while a reward modal plays so the modal's own sounds are heard: its level (percent)
+	// eases with a smoothstep down to MODAL_DUCK_LEVEL and back up, so neither edge is rough.
 	private const int MODAL_DUCK_LEVEL = 30;
 	private const double MODAL_DUCK_IN_MS = 350;
 	private const double MODAL_DUCK_OUT_MS = 800;
@@ -1113,11 +1071,9 @@ internal class CStageResult : CStage {
 		this.tSetMusicLevel((int)Math.Round(this.modalDuck));
 	}
 
-	// the skin's result sounds outlive the stage, so the level is put back on the way out
+	// the results module plays the music, at this level
 	private void tSetMusicLevel(int level) {
-		if (this.bgmResultLoop != null) this.bgmResultLoop.nAutomationLevel_CurrentSound = level;
-		if (OpenTaiko.Skin.bgmDanResult != null) OpenTaiko.Skin.bgmDanResult.nAutomationLevel_CurrentSound = level;
-		if (OpenTaiko.Skin.bgmTowerResult != null) OpenTaiko.Skin.bgmTowerResult.nAutomationLevel_CurrentSound = level;
+		if (ActiveResults is { IsActive: true } results) results.Call("setMusicLevel", level);
 	}
 
 

@@ -354,6 +354,45 @@ local function drawPlayer()
     end
 end
 
+-- ── the music ────────────────────────────────────────────────────────────────────────────────────────
+
+local music = {}
+
+-- an optional intro, then the loop; a missing file stays silent
+local function startMusic(intro, loop)
+    music = {}
+    if loop ~= nil and STORAGE:FileExists(loop) then
+        music.loop = SOUND:CreateBGM(loop)
+        music.loop:SetLoop(true)
+    end
+    if intro ~= nil and STORAGE:FileExists(intro) then
+        music.intro = SOUND:CreateBGM(intro)
+        music.intro:Play()
+    elseif music.loop ~= nil then
+        music.loop:Play()
+    end
+end
+
+-- the loop takes over once the intro has played
+local function updateMusic()
+    local intro = music.intro
+    if intro ~= nil and intro.Loaded and not intro.IsPlaying then
+        music.intro = nil
+        pcall(function() intro:Dispose() end)
+        if music.loop ~= nil then music.loop:Play() end
+    end
+end
+
+local function stopMusic()
+    for _, s in pairs(music) do pcall(function() s:Stop(); s:Dispose() end) end
+    music = {}
+end
+
+-- the result stage dims the music while a reward pop-up shows, percent from 0 to 100
+function setMusicLevel(percent)
+    for _, s in pairs(music) do s:SetVolumePercent(percent) end
+end
+
 -- ── lifecycle ────────────────────────────────────────────────────────────────────────────────────────
 
 function onStart()
@@ -419,6 +458,7 @@ function activate(result)
     phaseEnd = Animation.rank.at + Animation.rank.step * songCount
     swapShift, swapAt = 0, nil
     loadTextures()
+    startMusic(Config.optional(Animation.music, "intro"), Config.optional(Animation.music, "loop"))
     -- the glyphs shown later are made now, not on their first draw
     fonts.title:Draw(info.Title, -10000, -10000, col.title, col.titleOutline)
     for i = 0, songCount - 1 do fonts.song:Draw(info:GetDanSong(i).Title, -10000, -10000, col.song, col.songOutline) end
@@ -427,6 +467,7 @@ end
 
 function deactivate()
     active = false
+    stopMusic()
     disposeTextures(tex)
     tex = {}
     info = nil
@@ -437,6 +478,7 @@ function update()
     local dt = fps.deltaTime * 1000
     clock = clock + dt
     phase = math.min(phaseEnd, phase + dt)
+    updateMusic()
 end
 
 -- true while still animating: everything jumps to its place
@@ -462,7 +504,8 @@ function draw()
     if plate ~= nil then
         local A = Animation.plate
         local y = Layout.dan_plate[2] - math.max(0, A.at - phase) * A.px_per_ms
-        plate:Draw(Layout.dan_plate[1], y, 255, info.DanTick, info.DanTickRed, info.DanTickGreen, info.DanTickBlue, info.Title)
+        local c = info.DanTickColor
+        plate:Draw(Layout.dan_plate[1], y, 255, info.DanTick, c.R, c.G, c.B, info.Title)
     end
     local page, fade = songPage()
     local S = Animation.songs

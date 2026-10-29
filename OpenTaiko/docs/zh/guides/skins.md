@@ -123,7 +123,7 @@ AIBattleNameplate=66
 以自带皮肤为参考，皮肤根目录包含：
 
 - `Graphics/`：按编号的界面文件夹分组的图像（`0_Startup`、`1_Title`、`2_Config`、`3_DaniSelect`、`5_Game`、`6_Result`、`7_DanResult`、`8_TowerResult`、`12_OnlineLounge`），加上顶层的几张共享图像。动画背景是位于其所属文件夹图像旁边的 `Script.lua` 文件（例如 `Graphics/0_Startup/Script.lua` 和 `Graphics/5_Game/5_Background/` 下的文件夹）。 塔外观是 `Graphics/5_Game/5_Background/Tower/Down/` 下的一个文件夹，包含天空、楼层（`Base/`）、屋顶（`Top.png`）、可选的装饰（`Deco/`）以及 `Config.json` 中的布局；谱面用 `TOWERTYPE:` 选择外观，塔选择、加载画面和结算画面则用 `Modules/Lib/TowerArt/` 下同名文件夹中的专用副本画出同一座塔（部件为一半尺寸，另有自己的 `Config.json`：`floor_height`，以及装饰相对其楼层底部中心的偏移 `deco_dx`/`deco_dy`，均以这些部件的像素为单位），因此新外观需要这两个文件夹。音符、连打、气球、击打特效和判定文字位于 `Graphics/5_Game/` 下的包中，由玩家从中选择（见[添加音符包与判定包](notes-skins.md)）。
-- `Sounds/`：游戏按固定文件名加载的系统声音和 BGM，例如 `Sounds/Move.ogg`、`Sounds/Decide.ogg`、`Sounds/Cancel.ogg`、`Sounds/BGM/Title.ogg`、`Sounds/BGM/SongSelect.ogg`、`Sounds/BGM/Result.ogg`。如果某个文件缺失，该声音就不播放。
+- `Sounds/`：游戏按固定文件名加载的系统声音和 BGM，例如 `Sounds/Move.ogg`、`Sounds/Decide.ogg`、`Sounds/Cancel.ogg`、`Sounds/BGM/Title.ogg`、`Sounds/BGM/SongSelect.ogg`。如果某个文件缺失，该声音就不播放。
 - `Fonts/`：`FontName` 键引用的 `.ttf` 文件。
 - `Locales/`：每种语言一个文件夹（`en/`、`ja/`、...），其中可放任意数量的 JSON 文件，每个界面或功能一个（`coin_shop.json`、`items.json`、...），形如 `{ "Entries": { "KEY": "text" } }`；游戏会读取文件夹中的所有文件（也会读取单个 `Locales/<lang>.json` 文件）。这些字符串为皮肤自己的界面和设置提供标签，Lua 通过 `THEME:GetSkinString(key)` 读取它们。当前语言中缺失某个键时，游戏会在 `DefaultLocale` 语言中查找它。
 - `Modules/`：Lua 模块树（第 8 步）。

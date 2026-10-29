@@ -243,6 +243,7 @@ Properties use dot syntax (`CONFIG.PlayerCount`), methods use colon syntax. Play
 | `CONFIG.UsedLegacyScoringMethod  -> int` | Legacy scoring generation (see `CONFIG.LEGACY_SCORING`), clamped to 0..3 on write. |
 | `CONFIG.AreSongUnlockablesDisabled  -> bool (read-only)` | Whether the game ignores song unlock conditions. |
 | `CONFIG.AreLuaNetworkingConnectionsAllowed  -> bool (read-only)` | Whether the player allowed online connections in the settings ("Allow LuaNetworking connections", off by default). Scripts cannot change it. |
+| `CONFIG.ShowPuchiChara  -> bool (read-only)` | Whether the puchicharas are shown (the puchichara setting). |
 | `CONFIG.SongSpeed  -> int` | Song speed in twentieths of the multiplier: 20 is 1.0x. Clamped to 2..200 (0.1x to 10x) on write. |
 | `CONFIG.MasterVolume  -> int` | Master volume, clamped to 0..100 on write. |
 | `CONFIG.SoundEffectVolume  -> int` | Sound-effect volume, clamped to 0..100 on write. |

@@ -106,5 +106,9 @@
         "jingle_high": { "file": "Sounds/jingle_high.ogg", "volume": 75 },
         "judge": { "file": "Sounds/judge_%02d.ogg", "count": 7, "volume": 30 },
         "count": { "file": "Sounds/count_%02d.ogg", "count": 12, "volume": 35 }
+    },
+    "music": {
+        "_note": "an optional intro, then the loop",
+        "loop": "Sounds/BGM.ogg"
     }
 }

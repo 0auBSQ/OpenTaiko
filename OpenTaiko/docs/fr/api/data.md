@@ -243,6 +243,7 @@ Les propriétés utilisent la syntaxe à point (`CONFIG.PlayerCount`), les méth
 | `CONFIG.UsedLegacyScoringMethod  -> int` | Génération de calcul du score historique (voir `CONFIG.LEGACY_SCORING`), bornée à 0..3 à l'écriture. |
 | `CONFIG.AreSongUnlockablesDisabled  -> bool (read-only)` | Si le jeu ignore les conditions de déblocage des chansons. |
 | `CONFIG.AreLuaNetworkingConnectionsAllowed  -> bool (read-only)` | Si le joueur a autorisé les connexions en ligne dans les paramètres (« Autoriser les connexions LuaNetworking », désactivé par défaut). Les scripts ne peuvent pas le modifier. |
+| `CONFIG.ShowPuchiChara  -> bool (read-only)` | Si les puchicharas sont affichés (le réglage des puchicharas). |
 | `CONFIG.SongSpeed  -> int` | Vitesse de la chanson en vingtièmes du multiplicateur : 20 vaut 1,0x. Bornée à 2..200 (0,1x à 10x) à l'écriture. |
 | `CONFIG.MasterVolume  -> int` | Volume principal, borné à 0..100 à l'écriture. |
 | `CONFIG.SoundEffectVolume  -> int` | Volume des effets sonores, borné à 0..100 à l'écriture. |

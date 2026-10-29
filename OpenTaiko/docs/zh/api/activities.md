@@ -227,12 +227,104 @@ end
 | `danplate` | 在结算界面和段位课程中调用 `draw(x, y, opacity, danTick, r, g, b, titleText)`。 |
 | `results_tower` | 打开塔结算画面时以 LuaResultInfo 传入本次游玩并调用 `activate(info)`（只读的 getter，如 `ReachedFloor`、`TotalFloors`、`Lives`、`TowerRank`、`IsNewBestFloor`、`GetScore(player)`）；每帧 `update()` 和 `draw()`；确认时通过 Call 调用 `skip()`，仍在播放动画时返回 true（这次确认只会跳过动画）；`deactivate()`。 |
 | `results_regular` | 打开一局（包括 AI 对战）的结算画面时以 LuaResultInfo 传入本局并调用 `activate(info)`（从 0 开始的按玩家 getter，如 `GetGauge(p)`、`GetClearType(p)`、`GetScoreRank(p)`、`GetScore(p)`，以及 `IsAIBattle`、`GetAISectionEnd(i)`）；每帧在结算背景之上 `update()` 和 `draw()`；确认时通过 Call 调用 `skip()`，仍在播放动画时返回 true（背景随后收到 `skipAnime`）；`deactivate()`。 |
-| `results_dan` | 打开段位结算画面时以 LuaResultInfo 传入本局并调用 `activate(info)`（`DanResult`、`DanCombo`、`GetDanSong(i)`、`GetExam(i)`、`exam:GetSong(i)`）；每帧在段位结算背景之上 `update()` 和 `draw()`；确认时通过 Call 调用 `skip()`，仍在播放动画时返回 true；按左或右时通过 Call 调用 `swap()`，在考试与歌曲之间切换时返回 true；`deactivate()`。 |
+| `results_dan` | 打开段位结算画面时以 LuaResultInfo 传入本局并调用 `activate(info)`（`DanResult`、`DanCombo`、`GetDanSong(i)`、`GetExam(i)`、`exam:GetSong(i)`、`exam.PreviousBestAmount`）；每帧在段位结算背景之上 `update()` 和 `draw()`；确认时通过 Call 调用 `skip()`，仍在播放动画时返回 true；按左或右时通过 Call 调用 `swap()`，在考试与歌曲之间切换时返回 true；`deactivate()`。 |
 | `tower_hud` | 塔模式开始时 `activate(maxFloor)`；每帧在上方背景之上 `update()` 和 `draw()`；`deactivate()`。楼层和生命从 PLAYSTATE 读取。 |
 | `popup_menu` | 调用 `activate(title, items, fontSize, ...)`，其中 items 是用换行符连接的标签，其后是 PopupMenu 的皮肤位置；每帧调用 `draw(selected)`；关闭时调用 `deactivate()`。 |
 | `config_ui` | 以设置模型调用 `activate(model)`；每帧调用 `update()`，返回 "exit" 即离开设置界面，其后可再返回一个 Modules/Transitions 模块名作为返回时的过渡（若有待应用的皮肤、分辨率或声音设备更改，则改为普通淡出）；调用 `draw()`；引擎重建模型时通过 Call 调用 `reload(model)`；调用 `deactivate()`。 |
 | `song_enum` | 调用 `activate()`，然后在歌曲扫描进行期间每帧调用 `draw(isCommandSongDataGet, done, total)`；调用 `deactivate()`。 |
 | `cutscene` | `activate(paths, fadeOutSeconds)`，依次给出视频文件和最后一个视频之后的淡黑秒数（0 表示不淡出）；每帧调用 `update()`，所有视频播完且淡出结束后返回 "finished"；`draw()`；`deactivate()`。每个文件都带着自身音轨播放，并自带暂停弹窗；过场动画的用途由调用方决定。 |
+
+三个 results 只读活动自行播放结算画面的音乐。奖励弹窗显示期间，引擎通过 Call 调用 `setMusicLevel(percent)`（0 到 100）降低音量。画面淡出为黑色后，引擎停用该模块，其音乐随之停止。
+
+### 结算信息
+
+结算阶段传给 results_tower、results_regular 和 results_dan 的 activate 回调的 LuaResultInfo 对象。
+
+<div class="callout warn">
+结算阶段在本局保存后填写它，之后不再改变。所有成员都是只读的：属性使用点语法（`info.Title`），方法使用冒号语法。玩家参数从 0 开始；超出范围时，方法返回 0、false 或空字符串。标有模块名的成员只在该画面中填写；在其他画面中保持该默认值。
+</div>
+
+| 方法 | 说明 |
+| --- | --- |
+| `info.Title  -> string` | 谱面的标题。 |
+| `info.Subtitle  -> string` | 谱面的副标题。 |
+| `info.PlayerCount  -> number` | 玩家数量（塔和段位的结算中为 1）。 |
+| `info.PlayerSide  -> number` | 玩家 1 的名牌一侧：在蓝色侧游玩时为 1，否则为 0。 |
+| `info:GetGoodCount(player)  -> number` | 良的数量。 |
+| `info:GetOkCount(player)  -> number` | 可的数量。 |
+| `info:GetBadCount(player)  -> number` | 不可的数量。 |
+| `info:GetRollCount(player)  -> number` | 连打数。 |
+| `info:GetMaxCombo(player)  -> number` | 最大连击数。 |
+| `info:GetADLibCount(player)  -> number` | 击中的 AD-LIB 音符数。 |
+| `info:GetBoomCount(player)  -> number` | 击中的炸弹数。 |
+| `info:GetScore(player)  -> number` | 最终分数。 |
+| `info:GetPreviousBestScore(player)  -> number` | 保存本局之前，玩家在该谱面和难度上的最高分，没有时为 0。 |
+| `info:IsSaved(player)  -> boolean` | 本局记入玩家存档时为 true（自动演奏或观看回放时从不记入）。 |
+| `info:GetDifficulty(player)  -> number` | results_regular: 游玩的难度，0 简单 到 4 里魔王。 |
+| `info:GetGauge(player)  -> number` | results_regular: 本局结束时的魂槽，0 到 100。 |
+| `info:GetGaugeType(player)  -> number` | results_regular: 0 普通，1 困难，2 极限。 |
+| `info:GetNorma(player)  -> number` | results_regular: 普通魂槽达成通关的数值。 |
+| `info:GetKillZone(player)  -> number` | results_regular: 极限魂槽的危险区，0 到 100（其他魂槽为 0）。 |
+| `info:GetClearType(player)  -> number` | results_regular: 0 未通关，1 辅助通关，2 通关，3 全连，4 全良。 |
+| `info:GetScoreRank(player)  -> number` | results_regular: 0 无，之后为 1 到 7 的分数等级。 |
+| `info:IsCleared(player)  -> boolean` | results_regular: 本局通关时为 true；AI 对战中为玩家 1 获胜时。 |
+| `info:GetSpeechText(player, mood)  -> string` | results_regular: 玩家角色按心情的结算台词，0（最差）到 5（全良）。 |
+| `info.IsAIBattle  -> boolean` | results_regular: AI 对战时为 true。 |
+| `info.AISectionCount  -> number` | results_regular: AI 对战的段落数。 |
+| `info:GetAISectionEnd(section)  -> number` | results_regular: 段落（从 0 开始）的结果：0 未打到结尾，1 胜利，2 失败。 |
+| `info.TowerType  -> string` | results_tower: 谱面的 TOWERTYPE，未指定时为 ""。 |
+| `info.TowerSide  -> number` | results_tower: 0 甜口，1 辣口。 |
+| `info.ReachedFloor  -> number` | results_tower: 到达的楼层。 |
+| `info.TotalFloors  -> number` | results_tower: 塔的楼层数。 |
+| `info.Lives  -> number` | results_tower: 剩余的生命。 |
+| `info.MaxLives  -> number` | results_tower: 开始时的生命。 |
+| `info.TowerRank  -> number` | results_tower: 0 无，之后为 1 到 7：10、25、50、75 %，通关，全连，全良。 |
+| `info.PreviousBestFloor  -> number` | results_tower: 保存本局之前的最佳楼层。 |
+| `info.IsNewBestFloor  -> boolean` | results_tower: 已保存的本局超过最佳楼层时为 true。 |
+| `info.IsNewBestScore  -> boolean` | results_tower: 已保存的本局超过最高分时为 true。 |
+| `info.IsTired  -> boolean` | results_tower: 本局结束时塔角色处于疲惫状态（剩余生命很少）时为 true。 |
+| `info.Bpm  -> number` | results_tower: 本局结束时的 BPM。 |
+| `info.DanTick  -> number` | results_dan: 段位牌的刻度（DANTICK）。 |
+| `info.DanTickColor  -> color` | results_dan: 刻度的颜色（DANTICKCOLOR）。 |
+| `info.DanResult  -> number` | results_dan: 0 不合格，1 合格（红），2 合格（金）。 |
+| `info.DanCombo  -> number` | results_dan: 0，1 无不可（全连），2 无不可也无可（全良）。 |
+| `info.TotalHits  -> number` | results_dan: 良、可和连打的合计。 |
+| `info.DanSongCount  -> number` | results_dan: 段位的歌曲数。 |
+| `info.DanSongReached  -> number` | results_dan: 本局结束时的歌曲，从 0 开始。 |
+| `info.DanExamSong  -> number` | results_dan: 最后显示其单曲考试的歌曲，从 0 开始。 |
+| `info:GetDanSong(song)  -> dan song` | results_dan: 段位的第 i 首歌曲（从 0 开始），或 nil。 |
+| `info.ExamCount  -> number` | results_dan: 段位的考试数。 |
+| `info:GetExam(exam)  -> dan exam` | results_dan: 第 i 项考试（从 0 开始，按谱面顺序），或 nil。 |
+
+### 段位歌曲
+
+info:GetDanSong 返回的只读对象。
+
+| 方法 | 说明 |
+| --- | --- |
+| `song.Title  -> string` | 歌曲的标题；谱面隐藏的歌曲为 "???"。 |
+| `song.Difficulty  -> number` | 0 简单 到 4 里魔王。 |
+| `song.Level  -> number` | 歌曲的等级。 |
+| `song.Good  -> number` | 该曲的良的数量。 |
+| `song.Ok  -> number` | 该曲的可的数量。 |
+| `song.Bad  -> number` | 该曲的不可的数量。 |
+| `song.Roll  -> number` | 该曲的连打数。 |
+
+### 段位考试
+
+info:GetExam 和 exam:GetSong 返回的只读对象：本局结束时的一项考试。
+
+| 方法 | 说明 |
+| --- | --- |
+| `exam.Type  -> number` | 0 魂槽，1 良，2 可，3 不可，4 分数，5 连打，6 击打数，7 连击，8 精度，9 AD-LIB，10 BOOM；名称由 LANG:GetExamName(type) 给出。 |
+| `exam.Range  -> number` | 0 至少 Value，1 少于 Value。 |
+| `exam.Value  -> number` | 合格（红）的数值。 |
+| `exam.Amount  -> number` | 显示的数值；对于“少于”考试，为失败前剩余的数量。 |
+| `exam.PreviousBestAmount  -> number` | 保存本局之前玩家在该考试上的最佳 Amount，口径与 Amount 相同（越大越好）；没有时为 -1。单曲考试的每首歌曲（exam:GetSong）各有其值。 |
+| `exam.Percent  -> number` | Amount 相对 Value 的比例，0 到 100。 |
+| `exam.Status  -> number` | 0 不合格，1 合格，2 金合格。 |
+| `exam.IsPerSong  -> boolean` | 逐曲判定的考试时为 true；此时该考试本身是最后一首歌曲的。 |
+| `exam:GetSong(song)  -> dan exam` | 单曲考试在第 i 首歌曲（从 0 开始）上的考试，或 nil。 |
 
 ## 背景
 

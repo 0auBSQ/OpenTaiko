@@ -394,12 +394,6 @@ internal class CSkin : IDisposable {
 	//add
 	public CSystemSound soundSongDecideSound = null!;
 	public CSystemSound soundSongDecide_AI = null!;
-	public CSystemSound bgmResultInSound = null!;
-	public CSystemSound bgmResultSound = null!;
-	public CSystemSound bgmResultIn_AI = null!;
-	public CSystemSound bgmResult_AI = null!;
-
-	public CSystemSound bgmDanResult = null!;
 
 	public CSystemSound bgmTitle = null!;
 	public CSystemSound bgmTitleIn = null!;
@@ -407,8 +401,6 @@ internal class CSkin : IDisposable {
 	public CSystemSound bgmSelSongScreenIn = null!;
 	public CSystemSound bgmSongSelect_AI = null!;
 	public CSystemSound bgmSongSelect_AI_In = null!;
-	public CSystemSound? bgmResult = null;
-	public CSystemSound? bgmResultIn = null;
 
 	public CSystemSound soundTrainingPlaybackSound = null!;
 	public CSystemSound soundTrainingStopSound = null!;
@@ -439,7 +431,6 @@ internal class CSkin : IDisposable {
 
 	// Tower Sfx
 	public CSystemSound? soundTowerMiss = null;
-	public CSystemSound bgmTowerResult = null!;
 
 	//public Cシステムサウンド soundRed = null;
 	//public Cシステムサウンド soundBlue = null;
@@ -801,15 +792,6 @@ internal class CSkin : IDisposable {
 		this.bgmSelSongScreen = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect.ogg", true, false, true, ESoundGroup.SongPlayback);
 		this.bgmSongSelect_AI_In = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect_AI_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
 		this.bgmSongSelect_AI = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect_AI.ogg", true, false, true, ESoundGroup.SongPlayback);
-		this.bgmResultInSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result_In.ogg", false, false, true, ESoundGroup.SongPlayback);
-		this.bgmResultSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result.ogg", true, false, true, ESoundGroup.SongPlayback);
-		this.bgmResultIn_AI = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result_In_AI.ogg", false, false, true, ESoundGroup.SongPlayback);
-		this.bgmResult_AI = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result_AI.ogg", true, false, true, ESoundGroup.SongPlayback);
-
-		this.bgmDanResult = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Dan{System.IO.Path.DirectorySeparatorChar}Dan_Result.ogg", true, false, false, ESoundGroup.SongPlayback);
-
-		this.bgmTowerResult = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Tower{System.IO.Path.DirectorySeparatorChar}Tower_Result.ogg", true, false, false, ESoundGroup.SongPlayback);
-
 
 		this.soundTrainingPlaybackSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Resume.ogg", false, false, false, ESoundGroup.SoundEffect);
 		this.soundTrainingStopSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Pause.ogg", false, false, false, ESoundGroup.SoundEffect);

@@ -227,12 +227,104 @@ The engine looks up some ROActivities by fixed folder name and drives them itsel
 | `danplate` | `draw(x, y, opacity, danTick, r, g, b, titleText)` on the result screen and in dan courses. |
 | `results_tower` | `activate(info)` when the tower result opens, with the play as a LuaResultInfo (read-only getters such as `ReachedFloor`, `TotalFloors`, `Lives`, `TowerRank`, `IsNewBestFloor`, `GetScore(player)`); `update()` and `draw()` every frame; `skip()` through Call on decide, returning true while it is still animating (that decide then only skips); `deactivate()`. |
 | `results_regular` | `activate(info)` when a play's result opens, an AI battle's too, with the play as a LuaResultInfo (per-player getters from 0 such as `GetGauge(p)`, `GetClearType(p)`, `GetScoreRank(p)`, `GetScore(p)`, and `IsAIBattle`, `GetAISectionEnd(i)`); `update()` and `draw()` every frame over the result background; `skip()` through Call on decide, returning true while it is still animating (the background then gets `skipAnime`); `deactivate()`. |
-| `results_dan` | `activate(info)` when a dan play's result opens, with the play as a LuaResultInfo (`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`); `update()` and `draw()` every frame over the dan result background; `skip()` through Call on decide, returning true while it is still animating; `swap()` through Call on left or right, returning true when it turns between the exams and the songs; `deactivate()`. |
+| `results_dan` | `activate(info)` when a dan play's result opens, with the play as a LuaResultInfo (`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`, `exam.PreviousBestAmount`); `update()` and `draw()` every frame over the dan result background; `skip()` through Call on decide, returning true while it is still animating; `swap()` through Call on left or right, returning true when it turns between the exams and the songs; `deactivate()`. |
 | `tower_hud` | `activate(maxFloor)` when a tower play starts; `update()` and `draw()` every frame over the upper background; `deactivate()`. It reads the floor and the lives from PLAYSTATE. |
 | `popup_menu` | `activate(title, items, fontSize, ...)` where items are the labels joined by newlines, followed by the PopupMenu skin positions; `draw(selected)` every frame; `deactivate()` on close. |
 | `config_ui` | `activate(model)` with the settings model; `update()` every frame, returning "exit" to leave the settings screen, optionally followed by the name of the Modules/Transitions module for the way back (the plain fade plays instead when a skin, resolution or sound-device change is waiting to apply); `draw()`; `reload(model)` through Call when the engine rebuilds the model; `deactivate()`. |
 | `song_enum` | `activate()`, then `draw(isCommandSongDataGet, done, total)` every frame while the song scan runs; `deactivate()`. |
 | `cutscene` | `activate(paths, fadeOutSeconds)` with the video files in order and a fade to black after the last one (0 for none); `update()` every frame, returning "finished" once every video has played and the fade is over; `draw()`; `deactivate()`. It plays each file with its own audio track and owns the pause popup; what the cutscene is for is the caller's business. |
+
+The three results ROActivities play the result screen's music themselves. While a reward pop-up shows, the engine dims it through Call with `setMusicLevel(percent)`, from 0 to 100. Once the screen has faded to black, the engine deactivates the module, and its music stops with it.
+
+### Result info
+
+The LuaResultInfo object the result stage passes to the activate callback of results_tower, results_regular and results_dan.
+
+<div class="callout warn">
+The result stage fills it after the play is saved, and it does not change afterwards. Every member is read-only: properties use dot syntax (`info.Title`), methods use colon syntax. Player arguments start at 0; out of range, a method returns 0, false or an empty string. A member marked with a module name is filled only for that screen; on the others it keeps that default.
+</div>
+
+| Method | Description |
+| --- | --- |
+| `info.Title  -> string` | The chart's title. |
+| `info.Subtitle  -> string` | The chart's subtitle. |
+| `info.PlayerCount  -> number` | Number of players (1 on the tower and dan results). |
+| `info.PlayerSide  -> number` | Player 1's nameplate side: 1 when they play on the blue side, else 0. |
+| `info:GetGoodCount(player)  -> number` | Good hits. |
+| `info:GetOkCount(player)  -> number` | Ok hits. |
+| `info:GetBadCount(player)  -> number` | Bad hits. |
+| `info:GetRollCount(player)  -> number` | Roll hits. |
+| `info:GetMaxCombo(player)  -> number` | Highest combo. |
+| `info:GetADLibCount(player)  -> number` | AD-LIB notes hit. |
+| `info:GetBoomCount(player)  -> number` | Bombs hit. |
+| `info:GetScore(player)  -> number` | Final score. |
+| `info:GetPreviousBestScore(player)  -> number` | The player's best score on this chart and difficulty before this play was saved, 0 when none. |
+| `info:IsSaved(player)  -> boolean` | True when the play went into the player's save (never on auto or for a watched replay). |
+| `info:GetDifficulty(player)  -> number` | results_regular: the difficulty played, 0 Easy to 4 Extra. |
+| `info:GetGauge(player)  -> number` | results_regular: the soul gauge at the end of the play, 0 to 100. |
+| `info:GetGaugeType(player)  -> number` | results_regular: 0 normal, 1 hard, 2 extreme. |
+| `info:GetNorma(player)  -> number` | results_regular: the gauge value a normal gauge clears from. |
+| `info:GetKillZone(player)  -> number` | results_regular: the extreme gauge's kill zone, 0 to 100 (0 on the other gauges). |
+| `info:GetClearType(player)  -> number` | results_regular: 0 not cleared, 1 assisted clear, 2 clear, 3 full combo, 4 perfect. |
+| `info:GetScoreRank(player)  -> number` | results_regular: 0 none, then the score ranks from 1 to 7. |
+| `info:IsCleared(player)  -> boolean` | results_regular: true when the play cleared; in an AI battle, when player 1 won. |
+| `info:GetSpeechText(player, mood)  -> string` | results_regular: the player's character's result line for a mood, 0 (worst) to 5 (perfect). |
+| `info.IsAIBattle  -> boolean` | results_regular: true for an AI battle. |
+| `info.AISectionCount  -> number` | results_regular: the AI battle's sections. |
+| `info:GetAISectionEnd(section)  -> number` | results_regular: how a section (from 0) ended: 0 not played to its end, 1 won, 2 lost. |
+| `info.TowerType  -> string` | results_tower: the chart's TOWERTYPE, "" when it names none. |
+| `info.TowerSide  -> number` | results_tower: 0 Sweet, 1 Spicy. |
+| `info.ReachedFloor  -> number` | results_tower: the floor reached. |
+| `info.TotalFloors  -> number` | results_tower: the tower's floors. |
+| `info.Lives  -> number` | results_tower: the lives left. |
+| `info.MaxLives  -> number` | results_tower: the lives at the start. |
+| `info.TowerRank  -> number` | results_tower: 0 none, then 1 to 7: 10, 25, 50 and 75 %, clear, full combo, perfect. |
+| `info.PreviousBestFloor  -> number` | results_tower: the best floor before this play was saved. |
+| `info.IsNewBestFloor  -> boolean` | results_tower: true when a saved play beat the best floor. |
+| `info.IsNewBestScore  -> boolean` | results_tower: true when a saved play beat the best score. |
+| `info.IsTired  -> boolean` | results_tower: true when the play ended with the tower character tired (few lives left). |
+| `info.Bpm  -> number` | results_tower: the BPM the play ended on. |
+| `info.DanTick  -> number` | results_dan: the dan plate's ticks (DANTICK). |
+| `info.DanTickColor  -> color` | results_dan: the ticks' colour (DANTICKCOLOR). |
+| `info.DanResult  -> number` | results_dan: 0 failed, 1 passed (red), 2 passed (gold). |
+| `info.DanCombo  -> number` | results_dan: 0, 1 no bad (full combo), 2 no bad and no ok (perfect). |
+| `info.TotalHits  -> number` | results_dan: good, ok and roll hits together. |
+| `info.DanSongCount  -> number` | results_dan: the dan's songs. |
+| `info.DanSongReached  -> number` | results_dan: the song the play ended on, from 0. |
+| `info.DanExamSong  -> number` | results_dan: the song whose per-song exams were shown last, from 0. |
+| `info:GetDanSong(song)  -> dan song` | results_dan: song i of the dan (from 0), or nil. |
+| `info.ExamCount  -> number` | results_dan: the dan's exams. |
+| `info:GetExam(exam)  -> dan exam` | results_dan: exam i (from 0, in the chart's order), or nil. |
+
+### Dan song
+
+The object info:GetDanSong returns, read-only.
+
+| Method | Description |
+| --- | --- |
+| `song.Title  -> string` | The song's title; "???" for a song the chart keeps hidden. |
+| `song.Difficulty  -> number` | 0 Easy to 4 Extra. |
+| `song.Level  -> number` | The song's level. |
+| `song.Good  -> number` | Good hits on the song. |
+| `song.Ok  -> number` | Ok hits on the song. |
+| `song.Bad  -> number` | Bad hits on the song. |
+| `song.Roll  -> number` | Roll hits on the song. |
+
+### Dan exam
+
+The object info:GetExam and exam:GetSong return, read-only: an exam as the play ended.
+
+| Method | Description |
+| --- | --- |
+| `exam.Type  -> number` | 0 gauge, 1 good, 2 ok, 3 bad, 4 score, 5 rolls, 6 hits, 7 combo, 8 accuracy, 9 AD-LIB, 10 BOOM; LANG:GetExamName(type) gives its name. |
+| `exam.Range  -> number` | 0 at least Value, 1 less than Value. |
+| `exam.Value  -> number` | The value to pass (red). |
+| `exam.Amount  -> number` | The count shown; for a "less than" exam, what was left before failing it. |
+| `exam.PreviousBestAmount  -> number` | The player's best Amount on this exam before this play was saved, in the same terms (larger is better); -1 when none. Each song of a per-song exam (exam:GetSong) has its own. |
+| `exam.Percent  -> number` | Amount against Value, 0 to 100. |
+| `exam.Status  -> number` | 0 failed, 1 passed, 2 passed gold. |
+| `exam.IsPerSong  -> boolean` | True for an exam judged song by song; the exam itself then is the last song's. |
+| `exam:GetSong(song)  -> dan exam` | A per-song exam on song i (from 0), or nil. |
 
 ## Backgrounds
 

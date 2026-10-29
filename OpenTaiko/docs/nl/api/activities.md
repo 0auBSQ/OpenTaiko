@@ -227,12 +227,104 @@ De engine zoekt sommige ROActivities op vaste mapnaam op en stuurt ze zelf aan. 
 | `danplate` | `draw(x, y, opacity, danTick, r, g, b, titleText)` op het resultatenscherm en in dan-cursussen. |
 | `results_tower` | `activate(info)` bij het openen van het torenresultaat, met de play als LuaResultInfo (alleen-lezen getters zoals `ReachedFloor`, `TotalFloors`, `Lives`, `TowerRank`, `IsNewBestFloor`, `GetScore(player)`); `update()` en `draw()` elk frame; `skip()` via Call bij bevestigen, geeft true terug zolang het nog animeert (die bevestiging slaat dan alleen over); `deactivate()`. |
 | `results_regular` | `activate(info)` bij het openen van het resultaat van een play, ook van een AI-gevecht, met de play als LuaResultInfo (getters per speler vanaf 0 zoals `GetGauge(p)`, `GetClearType(p)`, `GetScoreRank(p)`, `GetScore(p)`, en `IsAIBattle`, `GetAISectionEnd(i)`); `update()` en `draw()` elk frame over de resultaatachtergrond; `skip()` via Call bij bevestigen, geeft true terug zolang het nog animeert (de achtergrond krijgt dan `skipAnime`); `deactivate()`. |
-| `results_dan` | `activate(info)` bij het openen van het resultaat van een dan-play, met de play als LuaResultInfo (`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`); `update()` en `draw()` elk frame over de dan-resultaatachtergrond; `skip()` via Call bij bevestigen, geeft true terug zolang het nog animeert; `swap()` via Call bij links of rechts, geeft true terug wanneer het wisselt tussen de examens en de nummers; `deactivate()`. |
+| `results_dan` | `activate(info)` bij het openen van het resultaat van een dan-play, met de play als LuaResultInfo (`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`, `exam.PreviousBestAmount`); `update()` en `draw()` elk frame over de dan-resultaatachtergrond; `skip()` via Call bij bevestigen, geeft true terug zolang het nog animeert; `swap()` via Call bij links of rechts, geeft true terug wanneer het wisselt tussen de examens en de nummers; `deactivate()`. |
 | `tower_hud` | `activate(maxFloor)` bij de start van een torenspel; `update()` en `draw()` elk frame boven de bovenste achtergrond; `deactivate()`. Het leest de verdieping en de levens uit PLAYSTATE. |
 | `popup_menu` | `activate(title, items, fontSize, ...)` waarbij items de labels zijn, samengevoegd met regeleinden, gevolgd door de PopupMenu-skinposities; `draw(selected)` elk frame; `deactivate()` bij sluiten. |
 | `config_ui` | `activate(model)` met het instellingenmodel; `update()` elk frame, dat "exit" teruggeeft om het instellingenscherm te verlaten, eventueel gevolgd door de naam van de Modules/Transitions-module voor de terugweg (de gewone fade speelt in plaats daarvan wanneer een wijziging van skin, resolutie of geluidsapparaat nog moet worden toegepast); `draw()`; `reload(model)` via Call wanneer de engine het model opnieuw opbouwt; `deactivate()`. |
 | `song_enum` | `activate()`, daarna `draw(isCommandSongDataGet, done, total)` elk frame terwijl de nummerscan draait; `deactivate()`. |
 | `cutscene` | `activate(paths, fadeOutSeconds)` met de videobestanden op volgorde en een fade naar zwart na de laatste (0 voor geen); `update()` elk frame, geeft "finished" terug zodra elke video is afgespeeld en de fade voorbij is; `draw()`; `deactivate()`. Speelt elk bestand met zijn eigen audiospoor en beheert de pauzepopup; waar de cutscene voor dient bepaalt de aanroeper. |
+
+De drie results-ROActivities spelen de muziek van het resultatenscherm zelf af. Zolang een beloningspop-up wordt getoond, dempt de engine die via Call met `setMusicLevel(percent)`, van 0 tot 100. Zodra het scherm naar zwart is vervaagd, deactiveert de engine de module en stopt de muziek mee.
+
+### Resultaatinfo
+
+Het LuaResultInfo-object dat de resultaatstage doorgeeft aan de activate-callback van results_tower, results_regular en results_dan.
+
+<div class="callout warn">
+De resultaatstage vult het nadat de play is opgeslagen, en daarna verandert het niet meer. Elk lid is alleen-lezen: eigenschappen gebruiken de puntsyntaxis (`info.Title`), methoden de dubbelepuntsyntaxis. Spelerargumenten beginnen bij 0; buiten bereik geeft een methode 0, false of een lege string terug. Een lid met een modulenaam wordt alleen voor dat scherm gevuld; op de andere houdt het die standaardwaarde.
+</div>
+
+| Methode | Beschrijving |
+| --- | --- |
+| `info.Title  -> string` | De titel van de chart. |
+| `info.Subtitle  -> string` | De ondertitel van de chart. |
+| `info.PlayerCount  -> number` | Aantal spelers (1 bij de toren- en dan-resultaten). |
+| `info.PlayerSide  -> number` | De naamplaatkant van speler 1: 1 als die aan de blauwe kant speelt, anders 0. |
+| `info:GetGoodCount(player)  -> number` | Good-slagen. |
+| `info:GetOkCount(player)  -> number` | Ok-slagen. |
+| `info:GetBadCount(player)  -> number` | Bad-slagen. |
+| `info:GetRollCount(player)  -> number` | Roffelslagen. |
+| `info:GetMaxCombo(player)  -> number` | Hoogste combo. |
+| `info:GetADLibCount(player)  -> number` | Geraakte AD-LIB-noten. |
+| `info:GetBoomCount(player)  -> number` | Geraakte bommen. |
+| `info:GetScore(player)  -> number` | Eindscore. |
+| `info:GetPreviousBestScore(player)  -> number` | De beste score van de speler op deze chart en moeilijkheid voordat deze play werd opgeslagen, 0 als er geen is. |
+| `info:IsSaved(player)  -> boolean` | True wanneer de play in de save van de speler is opgenomen (nooit op auto of bij een bekeken replay). |
+| `info:GetDifficulty(player)  -> number` | results_regular: de gespeelde moeilijkheid, 0 Easy tot 4 Extra. |
+| `info:GetGauge(player)  -> number` | results_regular: de zielmeter aan het einde van de play, 0 tot 100. |
+| `info:GetGaugeType(player)  -> number` | results_regular: 0 normaal, 1 moeilijk, 2 extreem. |
+| `info:GetNorma(player)  -> number` | results_regular: de meterwaarde vanaf waar een normale meter slaagt. |
+| `info:GetKillZone(player)  -> number` | results_regular: de killzone van de extreme meter, 0 tot 100 (0 bij de andere meters). |
+| `info:GetClearType(player)  -> number` | results_regular: 0 niet gehaald, 1 gehaald met hulp, 2 gehaald, 3 full combo, 4 perfect. |
+| `info:GetScoreRank(player)  -> number` | results_regular: 0 geen, dan de scorerangen van 1 tot 7. |
+| `info:IsCleared(player)  -> boolean` | results_regular: true wanneer de play gehaald is; in een AI-gevecht, wanneer speler 1 won. |
+| `info:GetSpeechText(player, mood)  -> string` | results_regular: de resultaatzin van het personage van de speler voor een stemming, 0 (slechtst) tot 5 (perfect). |
+| `info.IsAIBattle  -> boolean` | results_regular: true bij een AI-gevecht. |
+| `info.AISectionCount  -> number` | results_regular: de secties van het AI-gevecht. |
+| `info:GetAISectionEnd(section)  -> number` | results_regular: hoe een sectie (vanaf 0) eindigde: 0 niet tot het einde gespeeld, 1 gewonnen, 2 verloren. |
+| `info.TowerType  -> string` | results_tower: de TOWERTYPE van de chart, "" als die er geen noemt. |
+| `info.TowerSide  -> number` | results_tower: 0 Sweet, 1 Spicy. |
+| `info.ReachedFloor  -> number` | results_tower: de bereikte verdieping. |
+| `info.TotalFloors  -> number` | results_tower: de verdiepingen van de toren. |
+| `info.Lives  -> number` | results_tower: de resterende levens. |
+| `info.MaxLives  -> number` | results_tower: de levens bij de start. |
+| `info.TowerRank  -> number` | results_tower: 0 geen, dan 1 tot 7: 10, 25, 50 en 75 %, gehaald, full combo, perfect. |
+| `info.PreviousBestFloor  -> number` | results_tower: de beste verdieping voordat deze play werd opgeslagen. |
+| `info.IsNewBestFloor  -> boolean` | results_tower: true wanneer een opgeslagen play de beste verdieping verbeterde. |
+| `info.IsNewBestScore  -> boolean` | results_tower: true wanneer een opgeslagen play de beste score verbeterde. |
+| `info.IsTired  -> boolean` | results_tower: true wanneer de play eindigde met een vermoeid torenpersonage (weinig levens over). |
+| `info.Bpm  -> number` | results_tower: de BPM waarop de play eindigde. |
+| `info.DanTick  -> number` | results_dan: de streepjes van het dan-plaatje (DANTICK). |
+| `info.DanTickColor  -> color` | results_dan: de kleur van de streepjes (DANTICKCOLOR). |
+| `info.DanResult  -> number` | results_dan: 0 gezakt, 1 geslaagd (rood), 2 geslaagd (goud). |
+| `info.DanCombo  -> number` | results_dan: 0, 1 geen Bad (full combo), 2 geen Bad en geen Ok (perfect). |
+| `info.TotalHits  -> number` | results_dan: Good-, Ok- en roffelslagen samen. |
+| `info.DanSongCount  -> number` | results_dan: de nummers van de dan. |
+| `info.DanSongReached  -> number` | results_dan: het nummer waarop de play eindigde, vanaf 0. |
+| `info.DanExamSong  -> number` | results_dan: het nummer waarvan de examens per nummer het laatst getoond werden, vanaf 0. |
+| `info:GetDanSong(song)  -> dan song` | results_dan: nummer i van de dan (vanaf 0), of nil. |
+| `info.ExamCount  -> number` | results_dan: de examens van de dan. |
+| `info:GetExam(exam)  -> dan exam` | results_dan: examen i (vanaf 0, in de volgorde van de chart), of nil. |
+
+### Dan-nummer
+
+Het object dat info:GetDanSong teruggeeft, alleen-lezen.
+
+| Methode | Beschrijving |
+| --- | --- |
+| `song.Title  -> string` | De titel van het nummer; "???" voor een nummer dat de chart verborgen houdt. |
+| `song.Difficulty  -> number` | 0 Easy tot 4 Extra. |
+| `song.Level  -> number` | Het niveau van het nummer. |
+| `song.Good  -> number` | Good-slagen in het nummer. |
+| `song.Ok  -> number` | Ok-slagen in het nummer. |
+| `song.Bad  -> number` | Bad-slagen in het nummer. |
+| `song.Roll  -> number` | Roffelslagen in het nummer. |
+
+### Dan-examen
+
+Het object dat info:GetExam en exam:GetSong teruggeven, alleen-lezen: een examen zoals de play eindigde.
+
+| Methode | Beschrijving |
+| --- | --- |
+| `exam.Type  -> number` | 0 meter, 1 Good, 2 Ok, 3 Bad, 4 score, 5 roffels, 6 slagen, 7 combo, 8 nauwkeurigheid, 9 AD-LIB, 10 BOOM; LANG:GetExamName(type) geeft de naam. |
+| `exam.Range  -> number` | 0 minstens Value, 1 minder dan Value. |
+| `exam.Value  -> number` | De waarde om te slagen (rood). |
+| `exam.Amount  -> number` | De getoonde waarde; bij een "minder dan"-examen wat er over was voordat je zakte. |
+| `exam.PreviousBestAmount  -> number` | De beste Amount van de speler op dit examen voordat deze play werd opgeslagen, in dezelfde termen (groter is beter); -1 als er geen is. Bij een examen per nummer heeft elk nummer (exam:GetSong) zijn eigen. |
+| `exam.Percent  -> number` | Amount ten opzichte van Value, 0 tot 100. |
+| `exam.Status  -> number` | 0 gezakt, 1 geslaagd, 2 geslaagd met goud. |
+| `exam.IsPerSong  -> boolean` | True bij een examen dat per nummer wordt beoordeeld; het examen zelf is dan dat van het laatste nummer. |
+| `exam:GetSong(song)  -> dan exam` | Het examen per nummer op nummer i (vanaf 0), of nil. |
 
 ## Achtergronden
 

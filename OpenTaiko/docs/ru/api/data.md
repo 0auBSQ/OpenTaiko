@@ -243,6 +243,7 @@ SHARED:GetSharedSound("Decide"):Play()
 | `CONFIG.UsedLegacyScoringMethod  -> int` | Поколение устаревшего подсчёта очков (см. `CONFIG.LEGACY_SCORING`), при записи ограничивается диапазоном 0..3. |
 | `CONFIG.AreSongUnlockablesDisabled  -> bool (read-only)` | Игнорирует ли игра условия разблокировки песен. |
 | `CONFIG.AreLuaNetworkingConnectionsAllowed  -> bool (read-only)` | Разрешил ли игрок сетевые подключения в настройках («Разрешить подключения LuaNetworking», по умолчанию выключено). Скрипты не могут это изменить. |
+| `CONFIG.ShowPuchiChara  -> bool (read-only)` | Показываются ли пучичары (настройка пучичар). |
 | `CONFIG.SongSpeed  -> int` | Скорость песни в двадцатых долях множителя: 20 — это 1.0x. При записи ограничивается диапазоном 2..200 (от 0.1x до 10x). |
 | `CONFIG.MasterVolume  -> int` | Общая громкость, при записи ограничивается диапазоном 0..100. |
 | `CONFIG.SoundEffectVolume  -> int` | Громкость звуковых эффектов, при записи ограничивается диапазоном 0..100. |

@@ -20,6 +20,7 @@ public sealed class LuaResultInfo {
 	internal readonly int[] adlib = new int[5];
 	internal readonly int[] boom = new int[5];
 	internal readonly long[] score = new long[5];
+	internal readonly long[] previousBestScore = new long[5];
 	// the play went into the player's save (not on auto, a watched replay, or a tower or dan played with mods)
 	internal readonly bool[] saved = new bool[5];
 	internal readonly int[] difficulty = new int[5];
@@ -45,7 +46,6 @@ public sealed class LuaResultInfo {
 	internal int maxLives;
 	internal int towerRank;
 	internal int previousBestFloor;
-	internal long previousBestScore;
 	internal bool newBestFloor;
 	internal bool newBestScore;
 	internal bool tired;
@@ -53,7 +53,7 @@ public sealed class LuaResultInfo {
 
 	// dan
 	internal int danTick;
-	internal int[] danTickColor = [255, 255, 255];
+	internal LuaColor danTickColor = new(255, 255, 255);
 	internal int danResult;
 	internal int danCombo;
 	internal int totalHits;
@@ -76,6 +76,8 @@ public sealed class LuaResultInfo {
 	public int GetADLibCount(int player) => At(adlib, player);
 	public int GetBoomCount(int player) => At(boom, player);
 	public long GetScore(int player) => At(score, player);
+	/// <summary>The player's best score on this chart and difficulty before this play was saved, 0 when none.</summary>
+	public long GetPreviousBestScore(int player) => At(previousBestScore, player);
 	public bool IsSaved(int player) => At(saved, player);
 	/// <summary>The difficulty played, 0 Easy to 4 Extra.</summary>
 	public int GetDifficulty(int player) => At(difficulty, player);
@@ -115,9 +117,8 @@ public sealed class LuaResultInfo {
 	/// <summary>0 none, then the cells of 8_TowerResult/ScoreRankEffect.png from 1: 10, 25, 50 and 75 %, clear, full
 	/// combo, perfect.</summary>
 	public int TowerRank => towerRank;
-	/// <summary>The bests before this play was saved.</summary>
+	/// <summary>The best floor before this play was saved.</summary>
 	public int PreviousBestFloor => previousBestFloor;
-	public long PreviousBestScore => previousBestScore;
 	public bool IsNewBestFloor => newBestFloor;
 	public bool IsNewBestScore => newBestScore;
 	/// <summary>The play ended with the tower character on its tired animations (few lives left).</summary>
@@ -127,9 +128,7 @@ public sealed class LuaResultInfo {
 
 	/// <summary>The dan plate's ticks and their colour (the chart's DANTICK and DANTICKCOLOR).</summary>
 	public int DanTick => danTick;
-	public int DanTickRed => danTickColor[0];
-	public int DanTickGreen => danTickColor[1];
-	public int DanTickBlue => danTickColor[2];
+	public LuaColor DanTickColor => danTickColor;
 	/// <summary>0 failed, 1 passed (red), 2 passed (gold).</summary>
 	public int DanResult => danResult;
 	/// <summary>0, 1 no bad (full combo), 2 no bad and no ok (perfect).</summary>
@@ -169,6 +168,7 @@ public sealed class LuaResultDanSong {
 /// <summary>An exam of a dan play, as it ended.</summary>
 public sealed class LuaResultExam {
 	internal int type, range, value, amount, percent, status;
+	internal int previousBestAmount = -1;
 	internal LuaResultExam?[] songs = [];
 
 	/// <summary>0 gauge, 1 good, 2 ok, 3 bad, 4 score, 5 rolls, 6 hits, 7 combo, 8 accuracy, 9 AD-LIB, 10 BOOM.</summary>
@@ -179,6 +179,9 @@ public sealed class LuaResultExam {
 	public int Value => value;
 	/// <summary>The count shown; for a "less than" exam, what was left before failing it.</summary>
 	public int Amount => amount;
+	/// <summary>The player's best Amount on this exam before this play was saved, in the same terms (larger is better);
+	/// -1 when none. A per-song exam's songs (GetSong) each have their own.</summary>
+	public int PreviousBestAmount => previousBestAmount;
 	/// <summary>Amount against Value, 0 to 100.</summary>
 	public int Percent => percent;
 	/// <summary>0 failed, 1 passed, 2 passed gold.</summary>

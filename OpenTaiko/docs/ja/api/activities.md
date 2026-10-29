@@ -227,12 +227,104 @@ end
 | `danplate` | リザルト画面と段位コースで `draw(x, y, opacity, danTick, r, g, b, titleText)`。 |
 | `results_tower` | 塔のリザルトを開くとき、プレイ内容を LuaResultInfo (`ReachedFloor`、`TotalFloors`、`Lives`、`TowerRank`、`IsNewBestFloor`、`GetScore(player)` などの読み取り専用ゲッター) として渡して `activate(info)`。毎フレーム `update()` と `draw()`。決定時に Call で `skip()` (アニメーション中は true を返し、その決定はスキップだけになります)。`deactivate()`。 |
 | `results_regular` | プレイのリザルト (AI バトルも含む) を開くとき、プレイ内容を LuaResultInfo (0 から始まるプレイヤーごとのゲッター `GetGauge(p)`、`GetClearType(p)`、`GetScoreRank(p)`、`GetScore(p)`、および `IsAIBattle`、`GetAISectionEnd(i)`) として渡して `activate(info)`。毎フレーム、リザルト背景の上で `update()` と `draw()`。決定時に Call で `skip()` (アニメーション中は true を返し、背景には `skipAnime` が送られます)。`deactivate()`。 |
-| `results_dan` | 段位のリザルトを開くとき、プレイ内容を LuaResultInfo (`DanResult`、`DanCombo`、`GetDanSong(i)`、`GetExam(i)`、`exam:GetSong(i)`) として渡して `activate(info)`。毎フレーム、段位リザルト背景の上で `update()` と `draw()`。決定時に Call で `skip()` (アニメーション中は true を返します)。左右で Call により `swap()` (試験と曲の表示を切り替えたときに true を返します)。`deactivate()`。 |
+| `results_dan` | 段位のリザルトを開くとき、プレイ内容を LuaResultInfo (`DanResult`、`DanCombo`、`GetDanSong(i)`、`GetExam(i)`、`exam:GetSong(i)`、`exam.PreviousBestAmount`) として渡して `activate(info)`。毎フレーム、段位リザルト背景の上で `update()` と `draw()`。決定時に Call で `skip()` (アニメーション中は true を返します)。左右で Call により `swap()` (試験と曲の表示を切り替えたときに true を返します)。`deactivate()`。 |
 | `tower_hud` | 塔のプレイ開始時に `activate(maxFloor)`。毎フレーム上側背景の上に `update()` と `draw()`。`deactivate()`。階とライフは PLAYSTATE から読みます。 |
 | `popup_menu` | `activate(title, items, fontSize, ...)`。items は改行で連結したラベルで、その後に PopupMenu のスキン位置が続きます。毎フレーム `draw(selected)`。閉じるときに `deactivate()`。 |
 | `config_ui` | 設定モデルとともに `activate(model)`。毎フレーム `update()` を呼び、"exit" を返すと設定画面を離れます。続けて Modules/Transitions のモジュール名を返すと、戻りにそのトランジションを使います (スキン・解像度・サウンドデバイスの変更が適用待ちのときは通常のフェードになります)。`draw()`。エンジンがモデルを再構築したときに Call を通じて `reload(model)`。`deactivate()`。 |
 | `song_enum` | `activate()`、その後楽曲のスキャン中は毎フレーム `draw(isCommandSongDataGet, done, total)`。`deactivate()`。 |
 | `cutscene` | `activate(paths, fadeOutSeconds)`。動画ファイルを順に、続けて最後の動画の後の黒へのフェード秒数（0 でなし）。毎フレーム `update()` を呼び、すべての動画が再生し終わりフェードも終わると "finished" を返します。`draw()`、`deactivate()`。各ファイルを自身の音声トラックと共に再生し、ポーズポップアップも持ちます。カットシーンの用途は呼び出し側が決めます。 |
+
+3 つの results ROActivity はリザルト画面の音楽を自分で再生します。報酬ポップアップの表示中、エンジンは Call で `setMusicLevel(percent)` (0 から 100) を呼んで音量を下げます。画面が暗転し終わるとエンジンはモジュールを非アクティブにし、その音楽も止まります。
+
+### リザルト情報
+
+リザルトステージが results_tower、results_regular、results_dan の activate コールバックに渡す LuaResultInfo オブジェクトです。
+
+<div class="callout warn">
+リザルトステージはプレイの保存後にこれを埋め、以後は変化しません。すべてのメンバーは読み取り専用です。プロパティはドット構文 (`info.Title`)、メソッドはコロン構文を使います。プレイヤー引数は 0 から始まり、範囲外ではメソッドは 0、false、または空文字列を返します。モジュール名が付いたメンバーはその画面でのみ埋められ、ほかの画面ではその既定値のままです。
+</div>
+
+| メソッド | 説明 |
+| --- | --- |
+| `info.Title  -> string` | 譜面のタイトル。 |
+| `info.Subtitle  -> string` | 譜面のサブタイトル。 |
+| `info.PlayerCount  -> number` | プレイヤー数 (タワーと段位のリザルトでは 1)。 |
+| `info.PlayerSide  -> number` | プレイヤー 1 のネームプレートの側。青側でプレイするとき 1、それ以外は 0。 |
+| `info:GetGoodCount(player)  -> number` | 良の数。 |
+| `info:GetOkCount(player)  -> number` | 可の数。 |
+| `info:GetBadCount(player)  -> number` | 不可の数。 |
+| `info:GetRollCount(player)  -> number` | 連打数。 |
+| `info:GetMaxCombo(player)  -> number` | 最大コンボ数。 |
+| `info:GetADLibCount(player)  -> number` | 叩いた AD-LIB 音符の数。 |
+| `info:GetBoomCount(player)  -> number` | 叩いた爆弾の数。 |
+| `info:GetScore(player)  -> number` | 最終スコア。 |
+| `info:GetPreviousBestScore(player)  -> number` | このプレイが保存される前の、この譜面と難易度でのプレイヤーのハイスコア。なければ 0。 |
+| `info:IsSaved(player)  -> boolean` | プレイがプレイヤーのセーブに記録されたとき true (オートや再生中のリプレイでは記録されません)。 |
+| `info:GetDifficulty(player)  -> number` | results_regular: プレイした難易度。0 かんたん から 4 裏鬼。 |
+| `info:GetGauge(player)  -> number` | results_regular: プレイ終了時の魂ゲージ。0 から 100。 |
+| `info:GetGaugeType(player)  -> number` | results_regular: 0 ノーマル、1 ハード、2 エクストリーム。 |
+| `info:GetNorma(player)  -> number` | results_regular: ノーマルゲージがクリアとなるゲージ値。 |
+| `info:GetKillZone(player)  -> number` | results_regular: エクストリームゲージのキルゾーン。0 から 100 (ほかのゲージでは 0)。 |
+| `info:GetClearType(player)  -> number` | results_regular: 0 未クリア、1 アシストクリア、2 クリア、3 フルコンボ、4 全良。 |
+| `info:GetScoreRank(player)  -> number` | results_regular: 0 なし、その後 1 から 7 のスコアランク。 |
+| `info:IsCleared(player)  -> boolean` | results_regular: クリアしたとき true。AI バトルではプレイヤー 1 が勝ったとき。 |
+| `info:GetSpeechText(player, mood)  -> string` | results_regular: プレイヤーのキャラクターの、気分ごとのリザルトのセリフ。0 (最低) から 5 (全良)。 |
+| `info.IsAIBattle  -> boolean` | results_regular: AI バトルのとき true。 |
+| `info.AISectionCount  -> number` | results_regular: AI バトルの区間数。 |
+| `info:GetAISectionEnd(section)  -> number` | results_regular: 区間 (0 から) の結果。0 最後までプレイしていない、1 勝ち、2 負け。 |
+| `info.TowerType  -> string` | results_tower: 譜面の TOWERTYPE。指定がなければ ""。 |
+| `info.TowerSide  -> number` | results_tower: 0 甘口、1 辛口。 |
+| `info.ReachedFloor  -> number` | results_tower: 到達した階。 |
+| `info.TotalFloors  -> number` | results_tower: タワーの階数。 |
+| `info.Lives  -> number` | results_tower: 残りライフ。 |
+| `info.MaxLives  -> number` | results_tower: 開始時のライフ。 |
+| `info.TowerRank  -> number` | results_tower: 0 なし、その後 1 から 7。10、25、50、75 %、クリア、フルコンボ、全良。 |
+| `info.PreviousBestFloor  -> number` | results_tower: このプレイが保存される前の最高到達階。 |
+| `info.IsNewBestFloor  -> boolean` | results_tower: 保存されたプレイが最高到達階を更新したとき true。 |
+| `info.IsNewBestScore  -> boolean` | results_tower: 保存されたプレイがハイスコアを更新したとき true。 |
+| `info.IsTired  -> boolean` | results_tower: タワーキャラクターが疲れた状態 (残りライフが少ない) でプレイが終わったとき true。 |
+| `info.Bpm  -> number` | results_tower: プレイ終了時の BPM。 |
+| `info.DanTick  -> number` | results_dan: 段位プレートの目盛り (DANTICK)。 |
+| `info.DanTickColor  -> color` | results_dan: 目盛りの色 (DANTICKCOLOR)。 |
+| `info.DanResult  -> number` | results_dan: 0 不合格、1 合格 (赤)、2 合格 (金)。 |
+| `info.DanCombo  -> number` | results_dan: 0、1 不可なし (フルコンボ)、2 不可も可もなし (全良)。 |
+| `info.TotalHits  -> number` | results_dan: 良、可、連打を合わせた数。 |
+| `info.DanSongCount  -> number` | results_dan: 段位の曲数。 |
+| `info.DanSongReached  -> number` | results_dan: プレイが終わった曲 (0 から)。 |
+| `info.DanExamSong  -> number` | results_dan: 曲ごとの試験が最後に表示された曲 (0 から)。 |
+| `info:GetDanSong(song)  -> dan song` | results_dan: 段位の i 曲目 (0 から)。なければ nil。 |
+| `info.ExamCount  -> number` | results_dan: 段位の試験数。 |
+| `info:GetExam(exam)  -> dan exam` | results_dan: i 番目の試験 (0 から、譜面の順)。なければ nil。 |
+
+### 段位の曲
+
+info:GetDanSong が返す読み取り専用のオブジェクトです。
+
+| メソッド | 説明 |
+| --- | --- |
+| `song.Title  -> string` | 曲のタイトル。譜面が隠している曲では "???"。 |
+| `song.Difficulty  -> number` | 0 かんたん から 4 裏鬼。 |
+| `song.Level  -> number` | 曲のレベル。 |
+| `song.Good  -> number` | その曲の良の数。 |
+| `song.Ok  -> number` | その曲の可の数。 |
+| `song.Bad  -> number` | その曲の不可の数。 |
+| `song.Roll  -> number` | その曲の連打数。 |
+
+### 段位の試験
+
+info:GetExam と exam:GetSong が返す読み取り専用のオブジェクトで、プレイ終了時点の試験を表します。
+
+| メソッド | 説明 |
+| --- | --- |
+| `exam.Type  -> number` | 0 魂ゲージ、1 良、2 可、3 不可、4 スコア、5 連打、6 叩けた数、7 コンボ、8 精度、9 AD-LIB、10 BOOM。名前は LANG:GetExamName(type) で得られます。 |
+| `exam.Range  -> number` | 0 Value 以上、1 Value 未満。 |
+| `exam.Value  -> number` | 合格 (赤) の値。 |
+| `exam.Amount  -> number` | 表示される値。「未満」の試験では、不合格になるまでの残り。 |
+| `exam.PreviousBestAmount  -> number` | このプレイが保存される前の、この試験でのプレイヤーの最高の Amount。Amount と同じ基準 (大きいほど良い)。なければ -1。曲ごとの試験では、各曲 (exam:GetSong) がそれぞれ持ちます。 |
+| `exam.Percent  -> number` | Value に対する Amount の割合。0 から 100。 |
+| `exam.Status  -> number` | 0 不合格、1 合格、2 金合格。 |
+| `exam.IsPerSong  -> boolean` | 曲ごとに判定される試験のとき true。その場合、この試験自体は最後の曲のものです。 |
+| `exam:GetSong(song)  -> dan exam` | 曲ごとの試験の、i 曲目 (0 から) のもの。なければ nil。 |
 
 ## バックグラウンド
 

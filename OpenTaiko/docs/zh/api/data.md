@@ -243,6 +243,7 @@ SHARED:GetSharedSound("Decide"):Play()
 | `CONFIG.UsedLegacyScoringMethod  -> int` | 旧版计分世代（见 `CONFIG.LEGACY_SCORING`），写入时限制在 0..3。 |
 | `CONFIG.AreSongUnlockablesDisabled  -> bool (read-only)` | 游戏是否忽略歌曲解锁条件。 |
 | `CONFIG.AreLuaNetworkingConnectionsAllowed  -> bool (read-only)` | 玩家是否在设置中允许了在线连接（「允许 LuaNetworking 连接」，默认关闭）。脚本无法更改此项。 |
+| `CONFIG.ShowPuchiChara  -> bool (read-only)` | 是否显示小角色（小角色设置）。 |
 | `CONFIG.SongSpeed  -> int` | 以倍率的二十分之一为单位的歌曲速度：20 为 1.0x。写入时限制在 2..200（0.1x 到 10x）。 |
 | `CONFIG.MasterVolume  -> int` | 主音量，写入时限制在 0..100。 |
 | `CONFIG.SoundEffectVolume  -> int` | 音效音量，写入时限制在 0..100。 |

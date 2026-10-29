@@ -6,5 +6,9 @@
     "rank": { "at": 4100, "step": 150, "appear": 135, "fade": 90, "grow_by": 1.4, "drop_px_per_ms": 0.2 },
     "swap": 640,
     "pages": { "_note": "pages of three songs", "first": 2745, "each": 2000, "fade": 255 },
-    "rainbow_frame": 30
+    "rainbow_frame": 30,
+    "music": {
+        "_note": "an optional intro, then the loop",
+        "loop": "Sounds/BGM.ogg"
+    }
 }

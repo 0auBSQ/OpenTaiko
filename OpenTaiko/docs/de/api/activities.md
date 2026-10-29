@@ -227,12 +227,104 @@ Die Engine schlägt einige ROActivities unter festem Ordnernamen nach und steuer
 | `danplate` | `draw(x, y, opacity, danTick, r, g, b, titleText)` auf dem Ergebnisbildschirm und in Dan-Kursen. |
 | `results_tower` | `activate(info)` beim Öffnen des Tower-Ergebnisses, mit dem Spiel als LuaResultInfo (schreibgeschützte Getter wie `ReachedFloor`, `TotalFloors`, `Lives`, `TowerRank`, `IsNewBestFloor`, `GetScore(player)`); `update()` und `draw()` in jedem Frame; `skip()` über Call beim Bestätigen, gibt true zurück, solange es noch animiert (diese Bestätigung überspringt dann nur); `deactivate()`. |
 | `results_regular` | `activate(info)` beim Öffnen eines Ergebnisses, auch eines KI-Kampfs, mit dem Spiel als LuaResultInfo (Getter je Spieler ab 0 wie `GetGauge(p)`, `GetClearType(p)`, `GetScoreRank(p)`, `GetScore(p)`, sowie `IsAIBattle`, `GetAISectionEnd(i)`); `update()` und `draw()` in jedem Frame über dem Ergebnis-Hintergrund; `skip()` über Call beim Bestätigen, gibt true zurück, solange es noch animiert (der Hintergrund erhält dann `skipAnime`); `deactivate()`. |
-| `results_dan` | `activate(info)` beim Öffnen des Ergebnisses eines Dan-Spiels, mit dem Spiel als LuaResultInfo (`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`); `update()` und `draw()` in jedem Frame über dem Dan-Ergebnis-Hintergrund; `skip()` über Call beim Bestätigen, gibt true zurück, solange es noch animiert; `swap()` über Call bei links oder rechts, gibt true zurück, wenn es zwischen den Prüfungen und den Songs wechselt; `deactivate()`. |
+| `results_dan` | `activate(info)` beim Öffnen des Ergebnisses eines Dan-Spiels, mit dem Spiel als LuaResultInfo (`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`, `exam.PreviousBestAmount`); `update()` und `draw()` in jedem Frame über dem Dan-Ergebnis-Hintergrund; `skip()` über Call beim Bestätigen, gibt true zurück, solange es noch animiert; `swap()` über Call bei links oder rechts, gibt true zurück, wenn es zwischen den Prüfungen und den Songs wechselt; `deactivate()`. |
 | `tower_hud` | `activate(maxFloor)` beim Start eines Tower-Spiels; `update()` und `draw()` in jedem Frame über dem oberen Hintergrund; `deactivate()`. Es liest das Stockwerk und die Leben aus PLAYSTATE. |
 | `popup_menu` | `activate(title, items, fontSize, ...)`, wobei items die durch Zeilenumbrüche verbundenen Beschriftungen sind, gefolgt von den PopupMenu-Positionen des Skins; `draw(selected)` jeden Frame; `deactivate()` beim Schließen. |
 | `config_ui` | `activate(model)` mit dem Einstellungsmodell; `update()` jeden Frame, gibt "exit" zurück, um den Einstellungsbildschirm zu verlassen, optional gefolgt vom Namen des Modules/Transitions-Moduls für den Rückweg (stattdessen spielt die einfache Blende, wenn ein Wechsel von Skin, Auflösung oder Audiogerät noch angewendet werden muss); `draw()`; `reload(model)` über Call, wenn die Engine das Modell neu aufbaut; `deactivate()`. |
 | `song_enum` | `activate()`, dann `draw(isCommandSongDataGet, done, total)` jeden Frame, während der Song-Scan läuft; `deactivate()`. |
 | `cutscene` | `activate(paths, fadeOutSeconds)` mit den Videodateien in Reihenfolge und einem Ausblenden nach Schwarz nach der letzten (0 für keines); `update()` jeden Frame, gibt "finished" zurück, sobald jedes Video gespielt hat und das Ausblenden vorbei ist; `draw()`; `deactivate()`. Spielt jede Datei mit ihrer eigenen Tonspur und besitzt das Pause-Popup; wofür die Cutscene dient, ist Sache des Aufrufers. |
+
+Die drei results-ROActivities spielen die Musik des Ergebnisbildschirms selbst. Während ein Belohnungs-Pop-up angezeigt wird, dämpft die Engine sie über Call mit `setMusicLevel(percent)`, von 0 bis 100. Sobald der Bildschirm zu Schwarz ausgeblendet ist, deaktiviert die Engine das Modul, und seine Musik endet damit.
+
+### Ergebnisinfo
+
+Das LuaResultInfo-Objekt, das die Ergebnisstufe an den activate-Callback von results_tower, results_regular und results_dan übergibt.
+
+<div class="callout warn">
+Die Ergebnisstufe füllt es, nachdem das Spiel gespeichert wurde, und danach ändert es sich nicht mehr. Jedes Mitglied ist schreibgeschützt: Eigenschaften verwenden die Punkt-Syntax (`info.Title`), Methoden die Doppelpunkt-Syntax. Spielerargumente beginnen bei 0; außerhalb des Bereichs gibt eine Methode 0, false oder einen leeren String zurück. Ein mit einem Modulnamen markiertes Mitglied wird nur für diesen Bildschirm gefüllt; auf den anderen behält es diesen Standardwert.
+</div>
+
+| Methode | Beschreibung |
+| --- | --- |
+| `info.Title  -> string` | Der Titel des Charts. |
+| `info.Subtitle  -> string` | Der Untertitel des Charts. |
+| `info.PlayerCount  -> number` | Anzahl der Spieler (1 bei den Turm- und Dan-Ergebnissen). |
+| `info.PlayerSide  -> number` | Die Namensschild-Seite von Spieler 1: 1, wenn er auf der blauen Seite spielt, sonst 0. |
+| `info:GetGoodCount(player)  -> number` | Good-Treffer. |
+| `info:GetOkCount(player)  -> number` | Ok-Treffer. |
+| `info:GetBadCount(player)  -> number` | Bad-Treffer. |
+| `info:GetRollCount(player)  -> number` | Wirbel-Treffer. |
+| `info:GetMaxCombo(player)  -> number` | Höchste Combo. |
+| `info:GetADLibCount(player)  -> number` | Getroffene AD-LIB-Noten. |
+| `info:GetBoomCount(player)  -> number` | Getroffene Bomben. |
+| `info:GetScore(player)  -> number` | Endpunktzahl. |
+| `info:GetPreviousBestScore(player)  -> number` | Die beste Punktzahl des Spielers auf diesem Chart und Schwierigkeitsgrad, bevor dieses Spiel gespeichert wurde, 0 wenn keine. |
+| `info:IsSaved(player)  -> boolean` | True, wenn das Spiel in den Spielstand des Spielers eingegangen ist (nie mit Auto oder bei einer angesehenen Wiederholung). |
+| `info:GetDifficulty(player)  -> number` | results_regular: der gespielte Schwierigkeitsgrad, 0 Easy bis 4 Extra. |
+| `info:GetGauge(player)  -> number` | results_regular: die Seelenanzeige am Ende des Spiels, 0 bis 100. |
+| `info:GetGaugeType(player)  -> number` | results_regular: 0 normal, 1 hart, 2 extrem. |
+| `info:GetNorma(player)  -> number` | results_regular: der Anzeigewert, ab dem eine normale Anzeige als geschafft gilt. |
+| `info:GetKillZone(player)  -> number` | results_regular: die Todeszone der extremen Anzeige, 0 bis 100 (0 bei den anderen Anzeigen). |
+| `info:GetClearType(player)  -> number` | results_regular: 0 nicht geschafft, 1 geschafft mit Hilfe, 2 geschafft, 3 Full Combo, 4 perfekt. |
+| `info:GetScoreRank(player)  -> number` | results_regular: 0 keiner, dann die Punkteränge von 1 bis 7. |
+| `info:IsCleared(player)  -> boolean` | results_regular: true, wenn das Spiel geschafft wurde; in einem KI-Kampf, wenn Spieler 1 gewonnen hat. |
+| `info:GetSpeechText(player, mood)  -> string` | results_regular: der Ergebnissatz der Figur des Spielers für eine Stimmung, 0 (schlechteste) bis 5 (perfekt). |
+| `info.IsAIBattle  -> boolean` | results_regular: true bei einem KI-Kampf. |
+| `info.AISectionCount  -> number` | results_regular: die Abschnitte des KI-Kampfs. |
+| `info:GetAISectionEnd(section)  -> number` | results_regular: wie ein Abschnitt (ab 0) endete: 0 nicht zu Ende gespielt, 1 gewonnen, 2 verloren. |
+| `info.TowerType  -> string` | results_tower: der TOWERTYPE des Charts, "" wenn er keinen nennt. |
+| `info.TowerSide  -> number` | results_tower: 0 Sweet, 1 Spicy. |
+| `info.ReachedFloor  -> number` | results_tower: das erreichte Stockwerk. |
+| `info.TotalFloors  -> number` | results_tower: die Stockwerke des Turms. |
+| `info.Lives  -> number` | results_tower: die verbleibenden Leben. |
+| `info.MaxLives  -> number` | results_tower: die Leben zu Beginn. |
+| `info.TowerRank  -> number` | results_tower: 0 keiner, dann 1 bis 7: 10, 25, 50 und 75 %, geschafft, Full Combo, perfekt. |
+| `info.PreviousBestFloor  -> number` | results_tower: das beste Stockwerk, bevor dieses Spiel gespeichert wurde. |
+| `info.IsNewBestFloor  -> boolean` | results_tower: true, wenn ein gespeichertes Spiel das beste Stockwerk übertroffen hat. |
+| `info.IsNewBestScore  -> boolean` | results_tower: true, wenn ein gespeichertes Spiel die beste Punktzahl übertroffen hat. |
+| `info.IsTired  -> boolean` | results_tower: true, wenn das Spiel mit erschöpfter Turmfigur endete (wenige Leben übrig). |
+| `info.Bpm  -> number` | results_tower: die BPM, mit der das Spiel endete. |
+| `info.DanTick  -> number` | results_dan: die Striche des Dan-Schilds (DANTICK). |
+| `info.DanTickColor  -> color` | results_dan: die Farbe der Striche (DANTICKCOLOR). |
+| `info.DanResult  -> number` | results_dan: 0 nicht bestanden, 1 bestanden (rot), 2 bestanden (gold). |
+| `info.DanCombo  -> number` | results_dan: 0, 1 kein Bad (Full Combo), 2 kein Bad und kein Ok (perfekt). |
+| `info.TotalHits  -> number` | results_dan: Good-, Ok- und Wirbel-Treffer zusammen. |
+| `info.DanSongCount  -> number` | results_dan: die Songs des Dans. |
+| `info.DanSongReached  -> number` | results_dan: der Song, mit dem das Spiel endete, ab 0. |
+| `info.DanExamSong  -> number` | results_dan: der Song, dessen Prüfungen pro Song zuletzt angezeigt wurden, ab 0. |
+| `info:GetDanSong(song)  -> dan song` | results_dan: Song i des Dans (ab 0) oder nil. |
+| `info.ExamCount  -> number` | results_dan: die Prüfungen des Dans. |
+| `info:GetExam(exam)  -> dan exam` | results_dan: Prüfung i (ab 0, in der Reihenfolge des Charts) oder nil. |
+
+### Dan-Song
+
+Das Objekt, das info:GetDanSong zurückgibt, schreibgeschützt.
+
+| Methode | Beschreibung |
+| --- | --- |
+| `song.Title  -> string` | Der Titel des Songs; "???" für einen Song, den der Chart verborgen hält. |
+| `song.Difficulty  -> number` | 0 Easy bis 4 Extra. |
+| `song.Level  -> number` | Das Level des Songs. |
+| `song.Good  -> number` | Good-Treffer im Song. |
+| `song.Ok  -> number` | Ok-Treffer im Song. |
+| `song.Bad  -> number` | Bad-Treffer im Song. |
+| `song.Roll  -> number` | Wirbel-Treffer im Song. |
+
+### Dan-Prüfung
+
+Das Objekt, das info:GetExam und exam:GetSong zurückgeben, schreibgeschützt: eine Prüfung, wie das Spiel endete.
+
+| Methode | Beschreibung |
+| --- | --- |
+| `exam.Type  -> number` | 0 Anzeige, 1 Good, 2 Ok, 3 Bad, 4 Punktzahl, 5 Wirbel, 6 Treffer, 7 Combo, 8 Genauigkeit, 9 AD-LIB, 10 BOOM; LANG:GetExamName(type) liefert den Namen. |
+| `exam.Range  -> number` | 0 mindestens Value, 1 weniger als Value. |
+| `exam.Value  -> number` | Der Wert zum Bestehen (rot). |
+| `exam.Amount  -> number` | Der angezeigte Wert; bei einer "weniger als"-Prüfung, was bis zum Nichtbestehen übrig war. |
+| `exam.PreviousBestAmount  -> number` | Der beste Amount des Spielers bei dieser Prüfung, bevor dieses Spiel gespeichert wurde, im selben Maß (größer ist besser); -1, wenn keiner. Bei einer Prüfung pro Song hat jeder Song (exam:GetSong) seinen eigenen. |
+| `exam.Percent  -> number` | Amount im Verhältnis zu Value, 0 bis 100. |
+| `exam.Status  -> number` | 0 nicht bestanden, 1 bestanden, 2 in Gold bestanden. |
+| `exam.IsPerSong  -> boolean` | True bei einer Prüfung, die Song für Song bewertet wird; die Prüfung selbst ist dann die des letzten Songs. |
+| `exam:GetSong(song)  -> dan exam` | Die Prüfung pro Song in Song i (ab 0) oder nil. |
 
 ## Hintergründe
 

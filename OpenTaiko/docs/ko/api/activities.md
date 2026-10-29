@@ -227,12 +227,104 @@ end
 | `danplate` | 결과 화면과 단위 코스에서 `draw(x, y, opacity, danTick, r, g, b, titleText)`. |
 | `results_tower` | 타워 결과 화면이 열릴 때 플레이를 LuaResultInfo(`ReachedFloor`, `TotalFloors`, `Lives`, `TowerRank`, `IsNewBestFloor`, `GetScore(player)` 같은 읽기 전용 getter)로 넘겨 `activate(info)`; 매 프레임 `update()`와 `draw()`; 결정 시 Call로 `skip()`, 아직 애니메이션 중이면 true를 반환(그 결정은 건너뛰기만 함); `deactivate()`. |
 | `results_regular` | 플레이 결과(AI 배틀 포함)가 열릴 때 플레이를 LuaResultInfo(0부터 시작하는 플레이어별 getter `GetGauge(p)`, `GetClearType(p)`, `GetScoreRank(p)`, `GetScore(p)`, 그리고 `IsAIBattle`, `GetAISectionEnd(i)`)로 넘겨 `activate(info)`; 매 프레임 결과 배경 위에 `update()`와 `draw()`; 결정 시 Call로 `skip()`, 아직 애니메이션 중이면 true를 반환(배경에는 `skipAnime`이 전달됨); `deactivate()`. |
-| `results_dan` | 단위 플레이 결과가 열릴 때 플레이를 LuaResultInfo(`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`)로 넘겨 `activate(info)`; 매 프레임 단위 결과 배경 위에 `update()`와 `draw()`; 결정 시 Call로 `skip()`, 아직 애니메이션 중이면 true를 반환; 왼쪽 또는 오른쪽에서 Call로 `swap()`, 시험과 곡 사이를 전환하면 true를 반환; `deactivate()`. |
+| `results_dan` | 단위 플레이 결과가 열릴 때 플레이를 LuaResultInfo(`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`, `exam.PreviousBestAmount`)로 넘겨 `activate(info)`; 매 프레임 단위 결과 배경 위에 `update()`와 `draw()`; 결정 시 Call로 `skip()`, 아직 애니메이션 중이면 true를 반환; 왼쪽 또는 오른쪽에서 Call로 `swap()`, 시험과 곡 사이를 전환하면 true를 반환; `deactivate()`. |
 | `tower_hud` | 타워 플레이 시작 시 `activate(maxFloor)`; 매 프레임 상단 배경 위에 `update()`와 `draw()`; `deactivate()`. 층과 라이프는 PLAYSTATE에서 읽습니다. |
 | `popup_menu` | `activate(title, items, fontSize, ...)`. items는 줄바꿈으로 이어진 라벨이고, 그 뒤에 PopupMenu 스킨 위치가 옵니다. 매 프레임 `draw(selected)`; 닫힐 때 `deactivate()`. |
 | `config_ui` | 설정 모델과 함께 `activate(model)`; 매 프레임 `update()`를 호출하며 "exit"를 반환하면 설정 화면을 떠남, 그 뒤에 Modules/Transitions 모듈 이름을 반환하면 돌아갈 때 그 트랜지션을 사용(스킨·해상도·사운드 장치 변경이 적용 대기 중이면 기본 페이드); `draw()`; 엔진이 모델을 다시 만들 때 Call을 통한 `reload(model)`; `deactivate()`. |
 | `song_enum` | `activate()`, 그다음 곡 스캔이 실행되는 동안 매 프레임 `draw(isCommandSongDataGet, done, total)`; `deactivate()`. |
 | `cutscene` | `activate(paths, fadeOutSeconds)`: 동영상 파일을 순서대로, 이어서 마지막 동영상 뒤의 검은 페이드 초(0이면 없음); 매 프레임 `update()`를 호출하며 모든 동영상이 재생되고 페이드가 끝나면 "finished"를 반환; `draw()`; `deactivate()`. 각 파일을 자체 오디오 트랙과 함께 재생하고 일시정지 팝업도 담당합니다. 컷신의 용도는 호출하는 쪽이 정합니다. |
+
+세 results ROActivity는 결과 화면의 음악을 직접 재생합니다. 보상 팝업이 표시되는 동안 엔진은 Call로 `setMusicLevel(percent)`(0에서 100)를 호출해 음악을 줄입니다. 화면이 검게 페이드아웃되면 엔진이 모듈을 비활성화하고, 음악도 함께 멈춥니다.
+
+### 결과 정보
+
+결과 스테이지가 results_tower, results_regular, results_dan의 activate 콜백에 넘기는 LuaResultInfo 객체입니다.
+
+<div class="callout warn">
+결과 스테이지는 플레이가 저장된 뒤 이를 채우며, 그 후에는 바뀌지 않습니다. 모든 멤버는 읽기 전용입니다. 속성은 점 구문(`info.Title`), 메서드는 콜론 구문을 사용합니다. 플레이어 인수는 0부터 시작하며, 범위를 벗어나면 메서드는 0, false 또는 빈 문자열을 반환합니다. 모듈 이름이 붙은 멤버는 그 화면에서만 채워지고, 다른 화면에서는 그 기본값을 유지합니다.
+</div>
+
+| 메서드 | 설명 |
+| --- | --- |
+| `info.Title  -> string` | 채보의 제목. |
+| `info.Subtitle  -> string` | 채보의 부제. |
+| `info.PlayerCount  -> number` | 플레이어 수(타워와 단위 결과에서는 1). |
+| `info.PlayerSide  -> number` | 플레이어 1의 네임플레이트 쪽: 파란 쪽에서 플레이하면 1, 아니면 0. |
+| `info:GetGoodCount(player)  -> number` | Good 판정 수. |
+| `info:GetOkCount(player)  -> number` | Ok 판정 수. |
+| `info:GetBadCount(player)  -> number` | Bad 판정 수. |
+| `info:GetRollCount(player)  -> number` | 연타 수. |
+| `info:GetMaxCombo(player)  -> number` | 최대 콤보. |
+| `info:GetADLibCount(player)  -> number` | 친 AD-LIB 노트 수. |
+| `info:GetBoomCount(player)  -> number` | 친 폭탄 수. |
+| `info:GetScore(player)  -> number` | 최종 점수. |
+| `info:GetPreviousBestScore(player)  -> number` | 이 플레이가 저장되기 전, 이 채보와 난이도에서의 플레이어 최고 점수. 없으면 0. |
+| `info:IsSaved(player)  -> boolean` | 플레이가 플레이어의 세이브에 기록되면 true(오토나 시청한 리플레이는 기록되지 않음). |
+| `info:GetDifficulty(player)  -> number` | results_regular: 플레이한 난이도, 0 쉬움부터 4 뒷귀신. |
+| `info:GetGauge(player)  -> number` | results_regular: 플레이가 끝날 때의 혼 게이지, 0에서 100. |
+| `info:GetGaugeType(player)  -> number` | results_regular: 0 노멀, 1 하드, 2 익스트림. |
+| `info:GetNorma(player)  -> number` | results_regular: 노멀 게이지가 클리어되는 게이지 값. |
+| `info:GetKillZone(player)  -> number` | results_regular: 익스트림 게이지의 킬 존, 0에서 100(다른 게이지에서는 0). |
+| `info:GetClearType(player)  -> number` | results_regular: 0 미클리어, 1 어시스트 클리어, 2 클리어, 3 풀 콤보, 4 퍼펙트. |
+| `info:GetScoreRank(player)  -> number` | results_regular: 0 없음, 그다음 1부터 7까지의 점수 랭크. |
+| `info:IsCleared(player)  -> boolean` | results_regular: 클리어하면 true. AI 배틀에서는 플레이어 1이 이겼을 때. |
+| `info:GetSpeechText(player, mood)  -> string` | results_regular: 플레이어 캐릭터의 기분별 결과 대사, 0(최악)에서 5(퍼펙트). |
+| `info.IsAIBattle  -> boolean` | results_regular: AI 배틀이면 true. |
+| `info.AISectionCount  -> number` | results_regular: AI 배틀의 구간 수. |
+| `info:GetAISectionEnd(section)  -> number` | results_regular: 구간(0부터)이 끝난 방식: 0 끝까지 플레이하지 않음, 1 승리, 2 패배. |
+| `info.TowerType  -> string` | results_tower: 채보의 TOWERTYPE, 지정이 없으면 "". |
+| `info.TowerSide  -> number` | results_tower: 0 Sweet, 1 Spicy. |
+| `info.ReachedFloor  -> number` | results_tower: 도달한 층. |
+| `info.TotalFloors  -> number` | results_tower: 타워의 층수. |
+| `info.Lives  -> number` | results_tower: 남은 라이프. |
+| `info.MaxLives  -> number` | results_tower: 시작할 때의 라이프. |
+| `info.TowerRank  -> number` | results_tower: 0 없음, 그다음 1부터 7: 10, 25, 50, 75 %, 클리어, 풀 콤보, 퍼펙트. |
+| `info.PreviousBestFloor  -> number` | results_tower: 이 플레이가 저장되기 전의 최고 층. |
+| `info.IsNewBestFloor  -> boolean` | results_tower: 저장된 플레이가 최고 층을 넘으면 true. |
+| `info.IsNewBestScore  -> boolean` | results_tower: 저장된 플레이가 최고 점수를 넘으면 true. |
+| `info.IsTired  -> boolean` | results_tower: 타워 캐릭터가 지친 상태(라이프가 얼마 남지 않음)로 플레이가 끝나면 true. |
+| `info.Bpm  -> number` | results_tower: 플레이가 끝날 때의 BPM. |
+| `info.DanTick  -> number` | results_dan: 단위 플레이트의 눈금(DANTICK). |
+| `info.DanTickColor  -> color` | results_dan: 눈금 색(DANTICKCOLOR). |
+| `info.DanResult  -> number` | results_dan: 0 불합격, 1 합격(빨강), 2 합격(금). |
+| `info.DanCombo  -> number` | results_dan: 0, 1 Bad 없음(풀 콤보), 2 Bad와 Ok 없음(퍼펙트). |
+| `info.TotalHits  -> number` | results_dan: Good, Ok, 연타를 합친 수. |
+| `info.DanSongCount  -> number` | results_dan: 단위의 곡 수. |
+| `info.DanSongReached  -> number` | results_dan: 플레이가 끝난 곡, 0부터. |
+| `info.DanExamSong  -> number` | results_dan: 곡별 시험이 마지막으로 표시된 곡, 0부터. |
+| `info:GetDanSong(song)  -> dan song` | results_dan: 단위의 i번째 곡(0부터), 없으면 nil. |
+| `info.ExamCount  -> number` | results_dan: 단위의 시험 수. |
+| `info:GetExam(exam)  -> dan exam` | results_dan: i번째 시험(0부터, 채보 순서), 없으면 nil. |
+
+### 단위 곡
+
+info:GetDanSong이 반환하는 읽기 전용 객체입니다.
+
+| 메서드 | 설명 |
+| --- | --- |
+| `song.Title  -> string` | 곡의 제목. 채보가 숨긴 곡은 "???". |
+| `song.Difficulty  -> number` | 0 쉬움부터 4 뒷귀신. |
+| `song.Level  -> number` | 곡의 레벨. |
+| `song.Good  -> number` | 그 곡의 Good 판정 수. |
+| `song.Ok  -> number` | 그 곡의 Ok 판정 수. |
+| `song.Bad  -> number` | 그 곡의 Bad 판정 수. |
+| `song.Roll  -> number` | 그 곡의 연타 수. |
+
+### 단위 시험
+
+info:GetExam과 exam:GetSong이 반환하는 읽기 전용 객체로, 플레이가 끝난 시점의 시험입니다.
+
+| 메서드 | 설명 |
+| --- | --- |
+| `exam.Type  -> number` | 0 게이지, 1 Good, 2 Ok, 3 Bad, 4 점수, 5 연타, 6 타격 수, 7 콤보, 8 정확도, 9 AD-LIB, 10 BOOM. 이름은 LANG:GetExamName(type)으로 얻습니다. |
+| `exam.Range  -> number` | 0 Value 이상, 1 Value 미만. |
+| `exam.Value  -> number` | 합격(빨강) 값. |
+| `exam.Amount  -> number` | 표시되는 값. "미만" 시험에서는 불합격까지 남은 양. |
+| `exam.PreviousBestAmount  -> number` | 이 플레이가 저장되기 전, 이 시험에서의 플레이어 최고 Amount, 같은 기준(클수록 좋음). 없으면 -1. 곡별 시험에서는 각 곡(exam:GetSong)이 각자의 값을 가집니다. |
+| `exam.Percent  -> number` | Value 대비 Amount, 0에서 100. |
+| `exam.Status  -> number` | 0 불합격, 1 합격, 2 금합격. |
+| `exam.IsPerSong  -> boolean` | 곡마다 판정되는 시험이면 true. 이때 이 시험 자체는 마지막 곡의 것입니다. |
+| `exam:GetSong(song)  -> dan exam` | 곡별 시험의 i번째 곡(0부터) 것, 없으면 nil. |
 
 ## 배경
 

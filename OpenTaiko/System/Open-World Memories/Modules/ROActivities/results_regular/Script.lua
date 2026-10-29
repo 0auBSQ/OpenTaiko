@@ -572,6 +572,45 @@ local function drawPlayers()
     end
 end
 
+-- ── the music ────────────────────────────────────────────────────────────────────────────────────────
+
+local music = {}
+
+-- an optional intro, then the loop; a missing file stays silent
+local function startMusic(intro, loop)
+    music = {}
+    if loop ~= nil and STORAGE:FileExists(loop) then
+        music.loop = SOUND:CreateBGM(loop)
+        music.loop:SetLoop(true)
+    end
+    if intro ~= nil and STORAGE:FileExists(intro) then
+        music.intro = SOUND:CreateBGM(intro)
+        music.intro:Play()
+    elseif music.loop ~= nil then
+        music.loop:Play()
+    end
+end
+
+-- the loop takes over once the intro has played
+local function updateMusic()
+    local intro = music.intro
+    if intro ~= nil and intro.Loaded and not intro.IsPlaying then
+        music.intro = nil
+        pcall(function() intro:Dispose() end)
+        if music.loop ~= nil then music.loop:Play() end
+    end
+end
+
+local function stopMusic()
+    for _, s in pairs(music) do pcall(function() s:Stop(); s:Dispose() end) end
+    music = {}
+end
+
+-- the result stage dims the music while a reward pop-up shows, percent from 0 to 100
+function setMusicLevel(percent)
+    for _, s in pairs(music) do s:SetVolumePercent(percent) end
+end
+
 -- ── lifecycle ────────────────────────────────────────────────────────────────────────────────────────
 
 function onStart()
@@ -657,6 +696,9 @@ function activate(result)
         if name ~= "_note" and STORAGE:FileExists(path) then sounds[name] = SOUND:CreateSFX(path) end
     end
     loadCharas()
+    local M = Animation.music
+    local ai = info.IsAIBattle and "ai_" or ""
+    startMusic(Config.optional(M, ai .. "intro"), Config.optional(M, ai .. "loop"))
     -- the glyphs shown later are made now, not on their first draw
     fonts.title:Draw(info.Title, -10000, -10000, col.title, col.titleOutline)
     for p = 0, drawn - 1 do
@@ -668,6 +710,7 @@ end
 
 function deactivate()
     active = false
+    stopMusic()
     for _, s in pairs(sounds) do pcall(function() s:Stop(); s:Dispose() end) end
     sounds = {}
     disposeTextures(tex)
@@ -679,6 +722,7 @@ end
 function update()
     if not active then return end
     clock = clock + fps.deltaTime * 1000
+    updateMusic()
     -- the gauge's sound stops once every gauge has filled, unless they all went rainbow (it plays out then)
     if played.gauge and not played.gaugeStop then
         local allEnded, allRainbow = true, true

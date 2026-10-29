@@ -64,11 +64,18 @@
         "bob": 4000
     },
     "sounds": {
-        "_note": "gauge while the gauges fill, pon for each count, score_don for the score, rank_in and crown_in for the badges; a missing file plays nothing",
+        "_note": "a missing file plays nothing",
         "gauge": "Sounds/Gauge.ogg",
         "pon": "Sounds/Pon.ogg",
         "score_don": "Sounds/ScoreDon.ogg",
         "rank_in": "Sounds/RankIn.ogg",
         "crown_in": "Sounds/CrownIn.ogg"
+    },
+    "music": {
+        "_note": "an intro, then the loop",
+        "intro": "Sounds/BGM_In.ogg",
+        "loop": "Sounds/BGM.ogg",
+        "ai_intro": "Sounds/BGM_AI_In.ogg",
+        "ai_loop": "Sounds/BGM_AI.ogg"
     }
 }
