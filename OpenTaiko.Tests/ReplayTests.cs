@@ -91,6 +91,25 @@ namespace OpenTaikoTests {
 			} finally { Directory.Delete(dir, true); }
 		}
 
+		[Theory]
+		[InlineData("A?B")]
+		[InlineData("Dj:K")]
+		[InlineData("x/y")]
+		[InlineData("<3 \"star*\" |\\")]
+		public void Save_PlayerNameWithFileNameCharacters_IsListed(string name) {
+			var (dir, tja) = NewSong();
+			try {
+				var r = new CSongReplay(tja, 0) {
+					GameMode = 0, GameVersion = CSongReplay.STORED_GAME_VERSION, PlayerName = name, Score = 100, Timestamp = 1,
+					ChartUniqueID = "uid-A", ChartDifficulty = 3, CompressedInputs = new byte[] { 1 }, CompressedInputsSize = 1,
+				};
+				r.tSaveReplayFile();
+				var list = CSongReplay.tListReplays(dir, "uid-A", 3, 50);
+				Assert.Single(list);
+				Assert.Equal(name, list[0].PlayerName);   // the name in the file stays whole
+			} finally { Directory.Delete(dir, true); }
+		}
+
 		[Fact]
 		public void ListReplays_FiltersByChartAndDifficulty_AndRanksByScore() {
 			var (dir, tja) = NewSong();

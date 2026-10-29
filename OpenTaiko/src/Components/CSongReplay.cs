@@ -348,8 +348,19 @@ class CSongReplay {
 		return byteArray.ToArray();
 	}
 
+	// the player name as part of a file name: characters a file system refuses become '_' (Windows' set on every
+	// system, so a replay folder can move between them); the name itself is stored whole inside the file
+	private static readonly char[] _fileNameRefused = Path.GetInvalidFileNameChars().Union(['<', '>', ':', '"', '/', '\\', '|', '?', '*']).ToArray();
+	internal static string tFileNamePart(string? s) {
+		if (string.IsNullOrEmpty(s)) return "";
+		var chars = s.ToCharArray();
+		for (int i = 0; i < chars.Length; i++)
+			if (Array.IndexOf(_fileNameRefused, chars[i]) >= 0) chars[i] = '_';
+		return new string(chars);
+	}
+
 	public void tSaveReplayFile() {
-		string _path = replayFolder + @"/Replay_" + ChartUniqueID + @"_" + PlayerName + @"_" + Timestamp.ToString() + @".optkr";
+		string _path = replayFolder + @"/Replay_" + ChartUniqueID + @"_" + tFileNamePart(PlayerName) + @"_" + Timestamp.ToString() + @".optkr";
 
 		try {
 			Directory.CreateDirectory(replayFolder);
