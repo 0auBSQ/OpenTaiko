@@ -3,5 +3,6 @@
 		"strings": {
 			"default": "Default (Without Good)"
 		}
-	}
+	},
+	"JudgeFrames": 7
 }

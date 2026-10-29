@@ -58,6 +58,10 @@ namespace OpenTaiko {
 			return CNotesSkins.File_(k, file ?? "")?.Replace('\\', '/') ?? "";
 		}
 
+		/// <summary>The frames of the Judge.png in use, one under the other: Good, OK, Bad, Ad-Lib, BOOM, then Rolls and
+		/// Combo when 7.</summary>
+		public int GetJudgeFrames() => CNotesSkins.JudgeFrames;
+
 		// ── Skin-scoped localization ──────────────────────────────────────────────
 
 		/// <summary>

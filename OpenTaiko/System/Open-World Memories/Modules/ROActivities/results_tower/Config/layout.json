@@ -1,0 +1,110 @@
+{
+    "_note": "1920x1080 pixels; colours [r, g, b, a]; positions on a board from its top left corner",
+    "tower": {
+        "_note": "the chart's tower, centred at x",
+        "x": 330,
+        "scale": 0.8,
+        "chara": {
+            "_note": "the player's character, off the bottom centre of the floor it stands on",
+            "dx": -30,
+            "dy": -17,
+            "scale": 1.0
+        }
+    },
+    "font_sizes": { "title": 32, "subtitle": 18, "caption": 18, "floor": 80, "floor_total": 26, "best": 18, "gain": 22, "tag": 19, "mark": 13, "judge": 32, "score": 40 },
+    "text_color": [250, 236, 200, 255],
+    "dim_color": [232, 212, 172, 255],
+    "gain_color": [255, 220, 110, 255],
+    "shadow_color": [40, 22, 10, 255],
+    "shadow_opacity": 0.55,
+    "shadow_px": 2,
+    "big_shadow_px": 4,
+    "mark_off_color": [168, 128, 88, 255],
+    "mark_off_tint": [90, 62, 40, 255],
+    "side_colors": {
+        "_note": "the floor bar's fill",
+        "sweet": [176, 236, 120, 255],
+        "spicy": [255, 140, 112, 255]
+    },
+    "text_nudge": -1,
+    "ropes": {
+        "_note": "under_top: where the bottom board's ropes start, above the top board's bottom edge",
+        "top": -8,
+        "under_top": 30,
+        "hole_inset": { "x": 26, "y": 13 }
+    },
+    "top_board": {
+        "_note": "groove_y is baked into the board texture",
+        "center_x": 1300,
+        "top": 26,
+        "groove_y": 126,
+        "pill": { "x": 104, "y": 64, "scale": 1.05 },
+        "title": { "x": 610, "y": 52, "max_width": 760 },
+        "subtitle": { "x": 610, "y": 94, "max_width": 760 },
+        "caption": { "x": 58, "y": 160 },
+        "floor": { "x": 54, "y": 232 },
+        "floor_total": { "gap": 8, "dy": 22 },
+        "best": { "gap": 34, "min_x": 380, "tag_y": 196, "line1_y": 240, "line2_y": 270, "width": 220 },
+        "bar": { "x": 52, "y": 352, "width": 620, "height": 26, "label_dy": 30, "notch_dy": -21, "shine_dy": -6, "shine_height": 7, "shine_inset": 6, "shine_opacity": 0.35 },
+        "badge": { "x": 984, "y": 236, "scale": 0.95 }
+    },
+    "bottom_board": {
+        "_note": "judge words are frames of the selected judges pack; line_dy and groove_y are baked into the board texture",
+        "center_x": 1300,
+        "top": 492,
+        "columns": [56, 424, 786],
+        "rows": [54, 114, 174],
+        "row_width": 236,
+        "line_dy": 28,
+        "judge_scale": 0.62,
+        "judge_dy": -8,
+        "judge_padding": 4,
+        "judges": [
+            { "name": "good", "frame": 0, "column": 1, "row": 1 },
+            { "name": "ok", "frame": 1, "column": 1, "row": 2 },
+            { "name": "bad", "frame": 2, "column": 1, "row": 3 },
+            { "name": "rolls", "frame": 5, "column": 2, "row": 1 },
+            { "name": "combo", "frame": 6, "column": 2, "row": 2 },
+            { "name": "adlib", "frame": 3, "column": 3, "row": 1 },
+            { "name": "boom", "frame": 4, "column": 3, "row": 2 }
+        ],
+        "groove_y": 222,
+        "score": { "x": 58, "caption_y": 254, "y": 298 },
+        "score_best": { "gap": 40, "tag_y": 282, "line_y": 318 },
+        "lives": { "right": 1072, "caption_y": 254, "y": 298, "scale": 1.0 }
+    },
+    "tag": {
+        "_note": "the New best! tag",
+        "height": 34,
+        "pad_x": 16,
+        "rim": 3,
+        "fill_color": [244, 178, 40, 255],
+        "rim_color": [168, 96, 16, 255],
+        "text_color": [255, 255, 255, 255],
+        "shadow_color": [120, 62, 0, 255],
+        "sparkle_dx": 6,
+        "sparkle_dy": 12
+    },
+    "player": {
+        "_note": "top left corners",
+        "nameplate": { "x": 760, "y": 930 },
+        "modicons": { "x": 1110, "y": 948 }
+    },
+    "lives_bar": {
+        "_note": "as the climb HUD's",
+        "bar_width": 220,
+        "bar_height": 22,
+        "plain_from": 100,
+        "segment_gaps": [
+            { "up_to": 12, "gap": 3 },
+            { "up_to": 30, "gap": 2 },
+            { "up_to": 60, "gap": 1 }
+        ],
+        "blue_above": 0.5,
+        "yellow_from": 0.2,
+        "blue_color": [72, 144, 255, 255],
+        "yellow_color": [255, 208, 64, 255],
+        "red_color": [236, 64, 56, 255],
+        "empty_color": [66, 46, 30, 255]
+    }
+}

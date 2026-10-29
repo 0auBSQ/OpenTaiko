@@ -118,5 +118,24 @@ namespace OpenTaikoTests {
 				Assert.Equal(def.Balloons.Frames, Size(Path.Combine(dir, "Balloons.png")).Height / cell);
 			Assert.InRange(def.FlyingNotesFrame, 0, def.Notes.Frames - 1);
 		}
+
+		// OWM's judges packs carry Rolls and Combo under the five judge words: seven frames, as tall as the five were
+		[Theory]
+		[InlineData("Judges Skin/1")]
+		[InlineData("Judges Skin/2")]
+		[InlineData("Judges Skin/3")]
+		[InlineData("Judges Skin/4")]
+		public void OwmJudgesPacksHaveSevenEqualFrames(string pack) {
+			string dir = Path.Combine(Packs, pack);
+			var def = JsonConvert.DeserializeObject<CNotesSkinDef>(File.ReadAllText(Path.Combine(dir, "Definition.json")))!;
+			Assert.Equal(7, def.JudgeFrames);
+			var sheet = Size(Path.Combine(dir, "Judge.png"));
+			Assert.Equal(0, sheet.Height % def.JudgeFrames);
+			Assert.Equal(100, sheet.Height / def.JudgeFrames);
+		}
+
+		[Fact]
+		public void JudgeFramesDefaultToFive() =>
+			Assert.Equal(5, JsonConvert.DeserializeObject<CNotesSkinDef>(@"{ ""Name"": { ""strings"": { ""default"": ""x"" } } }")!.JudgeFrames);
 	}
 }

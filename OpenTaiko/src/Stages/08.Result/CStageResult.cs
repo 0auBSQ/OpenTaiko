@@ -71,6 +71,51 @@ internal class CStageResult : CStage {
 		return tmpClear;
 	}
 
+	// the player's best floor and score on the chosen chart and difficulty in their save, (0, 0) when none
+	private static (int floor, long score) tBestBefore(int player) {
+		var song = OpenTaiko.SongMount.rChoosenSong;
+		if (song?.uniqueId == null) return (0, 0);
+		string key = song.uniqueId.data.id + OpenTaiko.SongMount.nChoosenSongDifficulty[player].ToString();
+		return OpenTaiko.SaveFileInstances[player].data.bestPlaysDistinctCharts.TryGetValue(key, out var best)
+			? ((int)best.TowerBestFloor, best.HighScore)
+			: (0, 0);
+	}
+
+	// the tower play for results_tower; the new bests count only for a play that went into the save
+	private LuaResultInfo tTowerResultInfo((int floor, long score) bestBefore) {
+		var song = OpenTaiko.SongMount.rChoosenSong!;
+		var game = OpenTaiko.stageGameScreen;
+		var chart = game.CChartScore[0];
+		var info = new LuaResultInfo {
+			title = song.ldTitle.GetString(""),
+			subtitle = song.ldSubtitle.GetString(""),
+			playerSide = OpenTaiko.P1IsBlue() ? 1 : 0,
+			towerType = song.score[(int)Difficulty.Tower]?.ChartInfo.nTowerType ?? "",
+			towerSide = (int)song.nSide,
+			floor = game.FloorManagement.LastRegisteredFloor,
+			totalFloors = song.score[(int)Difficulty.Tower]?.ChartInfo.nTotalFloor ?? 0,
+			lives = game.FloorManagement.CurrentNumberOfLives,
+			maxLives = game.FloorManagement.MaxNumberOfLives,
+			towerRank = GetTowerScoreRank(),
+			previousBestFloor = bestBefore.floor,
+			previousBestScore = bestBefore.score,
+			tired = game.FloorManagement.IsTired,
+			bpm = game.actPlayInfo.dbBPM[0],
+		};
+		info.good[0] = chart.nGreat;
+		info.ok[0] = chart.nGood;
+		info.bad[0] = chart.nMiss;
+		info.roll[0] = chart.nRoll;
+		info.maxCombo[0] = game.actCombo.nCurrentCombo.MaxValue[0];
+		info.adlib[0] = chart.nADLIB;
+		info.boom[0] = chart.nMine;
+		info.score[0] = (long)game.actScore.Get(0);
+		info.saved[0] = this.IsScoreValid[0];
+		info.newBestFloor = info.saved[0] && info.floor > bestBefore.floor;
+		info.newBestScore = info.saved[0] && chart.nScore > bestBefore.score;
+		return info;
+	}
+
 	// CStage 実装
 
 	public override void Activate() {
@@ -120,6 +165,8 @@ internal class CStageResult : CStage {
 			this.IsScoreValid = [false, false, false, false, false];
 			this.ClearStatusesSaved = [0, 0, 0, 0, 0];
 			this.ScoreRanksSaved = [0, 0, 0, 0, 0];
+			// the bests before this play is saved, for the result's "new best"
+			var bestBefore = tBestBefore(0);
 
 			{
 				#region [ 初期化 ]
@@ -594,11 +641,16 @@ internal class CStageResult : CStage {
 			ctShine_Plate = new CCounter(0, 1000, 1, OpenTaiko.Timer);
 			ctWork_Plate = new CCounter(0, 4000, 1, OpenTaiko.Timer);
 
-			// the tower view comes down from the sky to the ground over the result
+			// results_tower draws the whole tower result; a skin without it gets the tower view coming down from the
+			// sky to the ground behind the former panel
 			ctTower_Animation = new CCounter(0, 1000, 13.5, OpenTaiko.Timer);
 			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-				var towerChart = OpenTaiko.SongMount.rChoosenSong?.score[(int)Difficulty.Tower]?.ChartInfo;
-				TowerView?.Activate(towerChart?.nTowerType, towerChart?.nTotalFloor ?? 0);
+				if (ResultsTower != null) {
+					ResultsTower.Activate(tTowerResultInfo(bestBefore));
+				} else {
+					var towerChart = OpenTaiko.SongMount.rChoosenSong?.score[(int)Difficulty.Tower]?.ChartInfo;
+					TowerView?.Activate(towerChart?.nTowerType, towerChart?.nTotalFloor ?? 0);
+				}
 			}
 
 
@@ -662,6 +714,7 @@ internal class CStageResult : CStage {
 
 		OpenTaiko.tDisposeSafely(ref Background);
 		if (TowerView != null && TowerView.IsActive) TowerView.Deactivate();
+		if (ResultsTower != null && ResultsTower.IsActive) ResultsTower.Deactivate();
 
 		if (this.rResultSound != null) {
 			OpenTaiko.SoundManager.tDisposeSound(this.rResultSound);
@@ -1190,65 +1243,68 @@ internal class CStageResult : CStage {
 						bAudioPlayback = true;
 					}
 
-					// Pictures here
+					if (ResultsTower is { IsActive: true } towerUI) {
+						// results_tower draws the whole screen: the sky, the tower, the boards and the badge
+						towerUI.Update();
+						towerUI.Draw();
+					} else {
+						// Pictures here
 
-					this.ctTower_Animation.Tick();
+						this.ctTower_Animation.Tick();
 
-					#region [Tower background]
+						#region [Tower background]
 
-					// the panorama and the chart's tower (tower_view ROActivity): scroll 1 = the sky, 0 = the ground
-					if (TowerView != null && TowerView.IsActive)
-						TowerView.Draw(1.0 - this.ctTower_Animation.CurrentValue / 1000.0, 1.0);
+						// the panorama and the chart's tower (tower_view ROActivity): scroll 1 = the sky, 0 = the ground
+						if (TowerView != null && TowerView.IsActive)
+							TowerView.Draw(1.0 - this.ctTower_Animation.CurrentValue / 1000.0, 1.0);
 
-					#endregion
+						#endregion
 
-					OpenTaiko.Tx.TowerResult_Panel?.t2DDraw(0, 0);
+						OpenTaiko.Tx.TowerResult_Panel?.t2DDraw(0, 0);
 
-					#region [Score Rank]
+						#region [Score Rank]
 
-					int sc = GetTowerScoreRank() - 1;
+						int sc = GetTowerScoreRank() - 1;
 
-					int y = 2 * OpenTaiko.actTextConsole.fontHeight + 8;
-					OpenTaiko.actTextConsole.Print(0, y, CTextConsole.EFontType.White, sc.ToString());
+						if (sc >= 0 && OpenTaiko.Tx.TowerResult_ScoreRankEffect != null) {
+							int scoreRankEffect_width = OpenTaiko.Tx.TowerResult_ScoreRankEffect.szTextureSize.Width / 7;
+							int scoreRankEffect_height = OpenTaiko.Tx.TowerResult_ScoreRankEffect.szTextureSize.Height;
 
-					if (sc >= 0 && OpenTaiko.Tx.TowerResult_ScoreRankEffect != null) {
-						int scoreRankEffect_width = OpenTaiko.Tx.TowerResult_ScoreRankEffect.szTextureSize.Width / 7;
-						int scoreRankEffect_height = OpenTaiko.Tx.TowerResult_ScoreRankEffect.szTextureSize.Height;
+							OpenTaiko.Tx.TowerResult_ScoreRankEffect.Opacity = 255;
+							OpenTaiko.Tx.TowerResult_ScoreRankEffect.vcScaleRatio.X = 1f;
+							OpenTaiko.Tx.TowerResult_ScoreRankEffect.vcScaleRatio.Y = 1f;
+							OpenTaiko.Tx.TowerResult_ScoreRankEffect.t2DScaledCenterBasedDraw(
+								OpenTaiko.Skin.TowerResult_ScoreRankEffect[0],
+								OpenTaiko.Skin.TowerResult_ScoreRankEffect[1],
+								new Rectangle(sc * scoreRankEffect_width, 0, scoreRankEffect_width, scoreRankEffect_height));
+						}
 
-						OpenTaiko.Tx.TowerResult_ScoreRankEffect.Opacity = 255;
-						OpenTaiko.Tx.TowerResult_ScoreRankEffect.vcScaleRatio.X = 1f;
-						OpenTaiko.Tx.TowerResult_ScoreRankEffect.vcScaleRatio.Y = 1f;
-						OpenTaiko.Tx.TowerResult_ScoreRankEffect.t2DScaledCenterBasedDraw(
-							OpenTaiko.Skin.TowerResult_ScoreRankEffect[0],
-							OpenTaiko.Skin.TowerResult_ScoreRankEffect[1],
-							new Rectangle(sc * scoreRankEffect_width, 0, scoreRankEffect_width, scoreRankEffect_height));
+
+						#endregion
+
+
+						#region [Text elements]
+
+						TitleTextureKey.ResolveTitleTexture(this.ttkToutatsu)?.t2DDraw(OpenTaiko.Skin.TowerResult_Toutatsu[0], OpenTaiko.Skin.TowerResult_Toutatsu[1]);
+						TitleTextureKey.ResolveTitleTexture(this.ttkMaxFloors)?.t2DDraw(OpenTaiko.Skin.TowerResult_MaxFloors[0], OpenTaiko.Skin.TowerResult_MaxFloors[1]);
+						TitleTextureKey.ResolveTitleTexture(this.ttkTen)?.t2DDraw(OpenTaiko.Skin.TowerResult_Ten[0], OpenTaiko.Skin.TowerResult_Ten[1]);
+						TitleTextureKey.ResolveTitleTexture(this.ttkScore)?.t2DDraw(OpenTaiko.Skin.TowerResult_Score[0], OpenTaiko.Skin.TowerResult_Score[1]);
+
+						CTexture tmpScoreCount = TitleTextureKey.ResolveTitleTexture(this.ttkScoreCount);
+						CTexture tmpCurrentFloor = TitleTextureKey.ResolveTitleTexture(this.ttkReachedFloor);
+						CTexture tmpRemainingLifes = TitleTextureKey.ResolveTitleTexture(this.ttkRemaningLifes);
+
+						tmpCurrentFloor?.t2DDraw(OpenTaiko.Skin.TowerResult_CurrentFloor[0] - tmpCurrentFloor.szTextureSize.Width, OpenTaiko.Skin.TowerResult_CurrentFloor[1]);
+						tmpScoreCount?.t2DDraw(OpenTaiko.Skin.TowerResult_ScoreCount[0] - tmpScoreCount.szTextureSize.Width, OpenTaiko.Skin.TowerResult_ScoreCount[1]);
+						tmpRemainingLifes?.t2DDraw(OpenTaiko.Skin.TowerResult_RemainingLifes[0] - tmpRemainingLifes.szTextureSize.Width, OpenTaiko.Skin.TowerResult_RemainingLifes[1]);
+
+						int soul_width = OpenTaiko.Tx.Gauge_Soul!.szTextureSize.Width;
+						int soul_height = OpenTaiko.Tx.Gauge_Soul.szTextureSize.Height / 2;
+
+						OpenTaiko.Tx.Gauge_Soul?.t2DDraw(OpenTaiko.Skin.TowerResult_Gauge_Soul[0], OpenTaiko.Skin.TowerResult_Gauge_Soul[1], new Rectangle(0, 0, soul_width, soul_height));
+
+						#endregion
 					}
-
-
-					#endregion
-
-
-					#region [Text elements]
-
-					TitleTextureKey.ResolveTitleTexture(this.ttkToutatsu)?.t2DDraw(OpenTaiko.Skin.TowerResult_Toutatsu[0], OpenTaiko.Skin.TowerResult_Toutatsu[1]);
-					TitleTextureKey.ResolveTitleTexture(this.ttkMaxFloors)?.t2DDraw(OpenTaiko.Skin.TowerResult_MaxFloors[0], OpenTaiko.Skin.TowerResult_MaxFloors[1]);
-					TitleTextureKey.ResolveTitleTexture(this.ttkTen)?.t2DDraw(OpenTaiko.Skin.TowerResult_Ten[0], OpenTaiko.Skin.TowerResult_Ten[1]);
-					TitleTextureKey.ResolveTitleTexture(this.ttkScore)?.t2DDraw(OpenTaiko.Skin.TowerResult_Score[0], OpenTaiko.Skin.TowerResult_Score[1]);
-
-					CTexture tmpScoreCount = TitleTextureKey.ResolveTitleTexture(this.ttkScoreCount);
-					CTexture tmpCurrentFloor = TitleTextureKey.ResolveTitleTexture(this.ttkReachedFloor);
-					CTexture tmpRemainingLifes = TitleTextureKey.ResolveTitleTexture(this.ttkRemaningLifes);
-
-					tmpCurrentFloor?.t2DDraw(OpenTaiko.Skin.TowerResult_CurrentFloor[0] - tmpCurrentFloor.szTextureSize.Width, OpenTaiko.Skin.TowerResult_CurrentFloor[1]);
-					tmpScoreCount?.t2DDraw(OpenTaiko.Skin.TowerResult_ScoreCount[0] - tmpScoreCount.szTextureSize.Width, OpenTaiko.Skin.TowerResult_ScoreCount[1]);
-					tmpRemainingLifes?.t2DDraw(OpenTaiko.Skin.TowerResult_RemainingLifes[0] - tmpRemainingLifes.szTextureSize.Width, OpenTaiko.Skin.TowerResult_RemainingLifes[1]);
-
-					int soul_width = OpenTaiko.Tx.Gauge_Soul!.szTextureSize.Width;
-					int soul_height = OpenTaiko.Tx.Gauge_Soul.szTextureSize.Height / 2;
-
-					OpenTaiko.Tx.Gauge_Soul?.t2DDraw(OpenTaiko.Skin.TowerResult_Gauge_Soul[0], OpenTaiko.Skin.TowerResult_Gauge_Soul[1], new Rectangle(0, 0, soul_width, soul_height));
-
-					#endregion
 
 					if (!bAudioPlayback && !OpenTaiko.Skin.bgmTowerResult.bIsPlaying) {
 						OpenTaiko.Skin.bgmTowerResult.tPlay();
@@ -1273,13 +1329,16 @@ internal class CStageResult : CStage {
 				this.bAnimeComplete = false;
 			}
 
-			if (this.actSongBar.Draw() == 0) {
+			// results_tower shows the title on its board
+			if (ResultsTower is not { IsActive: true } && this.actSongBar.Draw() == 0) {
 				this.bAnimeComplete = false;
 			}
 
 			#region Nameplate
 
-			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			// results_tower places the nameplate and the mod icons itself
+			bool ownNameplate = OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower && ResultsTower is { IsActive: true };
+			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount && !ownNameplate; i++) {
 				if (OpenTaiko.ConfigIni.bAIBattleMode && i == 1) break;
 
 				int pos = i;
@@ -1398,6 +1457,10 @@ internal class CStageResult : CStage {
 							   && (ctPhase1 != null && ctPhase1.IsUnEnded)) {
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
 						ctPhase1.CurrentValue = (int)ctPhase1.EndValue;
+					} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower
+							   && ResultsTower is { IsActive: true } towerUI && towerUI.Call("skip") is [true, ..]) {
+						// results_tower was still animating: it jumped to its end
+						OpenTaiko.Skin.soundDecideSFX.tPlay();
 					}
 
 					#endregion
@@ -1705,6 +1768,7 @@ internal class CStageResult : CStage {
 	// Tower informations
 	private CCounter ctTower_Animation = null!;
 	private static LuaROActivityWrapper? TowerView => LuaROActivityWrapper.GetROActivity("tower_view");
+	private static LuaROActivityWrapper? ResultsTower => LuaROActivityWrapper.GetROActivity("results_tower");
 	private TitleTextureKey ttkMaxFloors = null!;
 	private TitleTextureKey ttkToutatsu = null!;
 	private TitleTextureKey ttkTen = null!;

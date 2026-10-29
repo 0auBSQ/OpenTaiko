@@ -9,6 +9,17 @@
         "TOWER_HUD_FLOOR_SUFFIX": "",
         "TOWER_HUD_LIVES": "Vidas",
 
+        // Tower results (results_tower ROActivity); {0} is a number
+        "TOWER_RESULTS_SCORE": "Puntos",
+        "TOWER_RESULTS_OF_FLOORS": "/ {0} P",
+        "TOWER_RESULTS_NEW_BEST": "¡Nuevo récord!",
+        "TOWER_RESULTS_PREVIOUS_BEST": "récord anterior {0}",
+        "TOWER_RESULTS_FLOORS_GAINED": "+{0} pisos",
+        "TOWER_RESULTS_FLOORS_GAINED_ONE": "+{0} piso",
+        "TOWER_RESULTS_BEST": "récord {0}",
+        "TOWER_RESULTS_FLOORS_TO_GO": "faltan {0} pisos",
+        "TOWER_RESULTS_FLOORS_TO_GO_ONE": "falta {0} piso",
+
         // Tower select
         "TOWERSELECT_CONFIRM": "¿Desafiar la torre?",
         "TOWERSELECT_RANDOM": "Torre aleatoria",

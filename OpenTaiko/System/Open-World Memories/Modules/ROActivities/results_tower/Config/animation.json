@@ -1,0 +1,110 @@
+{
+    "_note": "times in seconds, rates in radians per second, distances in pixels",
+    "boards": {
+        "_note": "the boards' drop, bounce and sway",
+        "top_start_s": 0.15,
+        "bottom_start_s": 0.6,
+        "drop_px": 560,
+        "hidden_px": 40,
+        "fall_s": 0.36,
+        "settle_s": 1.4,
+        "top_phase": 0.9,
+        "bottom_phase": 2.6,
+        "bounce": { "amplitude_px": 10, "rad_per_s": 14, "decay_per_s": 6 },
+        "swing": { "amplitude_deg": 1.8, "rad_per_s": 5, "decay_per_s": 1.6, "x_px_per_deg": 2 },
+        "sway": {
+            "_note": "sums of sine waves; angles in degrees",
+            "angle": [
+                { "amplitude": 0.35, "rad_per_s": 0.9, "phase_scale": 1 },
+                { "amplitude": 0.12, "rad_per_s": 2.3, "phase_scale": 0.7 }
+            ],
+            "x": [
+                { "amplitude": 2, "rad_per_s": 0.7, "phase_scale": 1 },
+                { "amplitude": 0.6, "rad_per_s": 1.9, "phase_scale": 1 }
+            ],
+            "y": [
+                { "amplitude": 1.5, "rad_per_s": 1.1, "phase_scale": 1.3 }
+            ]
+        }
+    },
+    "floor": {
+        "_note": "the floor count; the sky's night as in play",
+        "start_s": 0.9,
+        "count_s": 2.2,
+        "steps_per_s": 14,
+        "night_floors": 140,
+        "night_share": 0.5
+    },
+    "badge": {
+        "_note": "the rank badge's stamp after the count",
+        "delay_s": 0.12,
+        "stamp_s": 0.28,
+        "from_scale": 1.6
+    },
+    "glitter": {
+        "_note": "the sparkle burst when the badge lands, then the twinkles round it",
+        "burst_count": 10,
+        "burst_s": 0.75,
+        "burst_from_px": 40,
+        "burst_to_px": 150,
+        "burst_scale": 1.1,
+        "spin_deg": 200,
+        "twinkle_count": 4,
+        "twinkle_rate_per_s": 0.7,
+        "radius_min": 70,
+        "radius_range": 45,
+        "twinkle_scale": 0.85,
+        "gold": [255, 222, 120, 255]
+    },
+    "shine": {
+        "_note": "the light band sweeping over the badge; more passes, whiter",
+        "passes": 2,
+        "first_delay_s": 0.35,
+        "period_s": 3.5,
+        "sweep_s": 0.6,
+        "band_px": 30,
+        "soft_px": 12,
+        "angle_deg": 32,
+        "opacity": 0.9
+    },
+    "new_best": {
+        "_note": "the New best! tags' pop",
+        "delay_s": 0.35,
+        "pop_s": 0.32,
+        "overshoot": 1.15,
+        "twinkle_rad_per_s": 4,
+        "twinkle_scale": 0.15
+    },
+    "judges": {
+        "_note": "the judge rows, one every step_s",
+        "delay_s": 0.25,
+        "step_s": 0.08,
+        "pop_s": 0.13,
+        "pop_scale": 1.25
+    },
+    "score": {
+        "_note": "the score count; a note every tick_s",
+        "delay_s": 0.12,
+        "count_s": 0.9,
+        "tick_s": 0.075
+    },
+    "lives": {
+        "_note": "the lives bar, one segment every step_s",
+        "delay_s": 0.15,
+        "step_s": 0.08
+    },
+    "sounds": {
+        "_note": "file, volume in percent, and count for a set of notes",
+        "plank": { "file": "Sounds/plank.ogg", "volume": 80 },
+        "plank_light": { "file": "Sounds/plank_light.ogg", "volume": 60 },
+        "slide": { "file": "Sounds/slide.ogg", "volume": 35 },
+        "step": { "file": "Sounds/step_%02d.ogg", "count": 16, "volume": 45 },
+        "mark": { "file": "Sounds/mark_%d.ogg", "count": 5, "volume": 70 },
+        "stamp": { "file": "../../../Sounds/ResultScreen/RankIn.ogg", "volume": 90 },
+        "flash": { "file": "Sounds/flash.ogg", "volume": 25 },
+        "jingle": { "file": "Sounds/jingle.ogg", "volume": 80 },
+        "jingle_high": { "file": "Sounds/jingle_high.ogg", "volume": 75 },
+        "judge": { "file": "Sounds/judge_%02d.ogg", "count": 7, "volume": 30 },
+        "count": { "file": "Sounds/count_%02d.ogg", "count": 12, "volume": 35 }
+    }
+}

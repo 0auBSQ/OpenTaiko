@@ -58,6 +58,9 @@ internal class CFloorManagement {
 	public int MaxNumberOfLives = 5;
 	public int CurrentNumberOfLives = 5;
 
+	// the tower character's tired animations: under a fifth of the lives, or on the last of several
+	public bool IsTired => !(CurrentNumberOfLives / (float)MaxNumberOfLives >= 0.2f && !(CurrentNumberOfLives == 1 && MaxNumberOfLives != 1));
+
 	// Divides by song speed so the wall-clock window shrinks at high speeds,
 	// preventing cheese by skipping fewer notes when using speed mods.
 	public double InvincibilityDurationSpeedDependent {

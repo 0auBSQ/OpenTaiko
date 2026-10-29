@@ -9,6 +9,17 @@
         "TOWER_HUD_FLOOR_SUFFIX": "階",
         "TOWER_HUD_LIVES": "ライフ",
 
+        // Tower results (results_tower ROActivity); {0} is a number
+        "TOWER_RESULTS_SCORE": "スコア",
+        "TOWER_RESULTS_OF_FLOORS": "/ {0}階",
+        "TOWER_RESULTS_NEW_BEST": "自己ベスト更新！",
+        "TOWER_RESULTS_PREVIOUS_BEST": "前回のベスト {0}",
+        "TOWER_RESULTS_FLOORS_GAINED": "+{0}階",
+        "TOWER_RESULTS_FLOORS_GAINED_ONE": "+{0}階",
+        "TOWER_RESULTS_BEST": "ベスト {0}",
+        "TOWER_RESULTS_FLOORS_TO_GO": "あと{0}階",
+        "TOWER_RESULTS_FLOORS_TO_GO_ONE": "あと{0}階",
+
         // Tower select
         "TOWERSELECT_CONFIRM": "タワーに挑戦しますか？",
         "TOWERSELECT_RANDOM": "おまかせ",

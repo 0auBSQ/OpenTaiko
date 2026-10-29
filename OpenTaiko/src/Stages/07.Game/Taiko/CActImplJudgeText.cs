@@ -83,7 +83,7 @@ internal class CActImplJudgeText : CActivity {
 
 		if (OpenTaiko.Tx.Judge == null) return;
 
-		int height = OpenTaiko.Tx.Judge.szTextureSize.Height / 5;
+		int height = OpenTaiko.Tx.Judge.szTextureSize.Height / CNotesSkins.JudgeFrames;
 		judgeAnime.rc = new Rectangle(0, (int)njudge * height, OpenTaiko.Tx.Judge.szTextureSize.Width, height);
 
 		JudgeAnimes[player].Enqueue(judgeAnime);

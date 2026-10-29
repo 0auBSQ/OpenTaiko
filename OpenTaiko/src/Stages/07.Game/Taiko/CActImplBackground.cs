@@ -297,8 +297,7 @@ internal class CActImplBackground : CActivity {
 			#region [Climbing don]
 
 			CCharacter character = CCharacter.GetCharacter(0);
-			float liveState = (OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives / (float)OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives);
-			bool ctIsTired = !(liveState >= 0.2f && !(OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives == 1 && OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives != 1));
+			bool ctIsTired = OpenTaiko.stageGameScreen.FloorManagement.IsTired;
 
 			bool stageEnded = OpenTaiko.stageGameScreen.IsStageCompleted() || OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives == 0;
 
@@ -366,7 +365,7 @@ internal class CActImplBackground : CActivity {
 			if (!OpenTaiko.stageGameScreen.bPAUSE) {
 				character.Update(animation);
 			}
-			character.Draw(animation, x, y);
+			character.Draw(animation, x, y, gradientMap: PaletteManager.GetEffectivePalette(0)?.LuaMap);
 
 			if (isClimbing) {
 				// Tired Climb

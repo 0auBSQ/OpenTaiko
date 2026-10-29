@@ -3,5 +3,6 @@
 		"strings": {
 			"default": "Default"
 		}
-	}
+	},
+	"JudgeFrames": 7
 }

@@ -29,6 +29,9 @@ internal static class CNotesSkins {
 	public static bool HasPacks(EKind kind) => _packs[(int)kind].Length > 0;
 	public static Pack? Selected(EKind kind) => HasPacks(kind) ? _packs[(int)kind][_selected[(int)kind]] : null;
 
+	/// <summary>The frames of the Judge.png in use: the selected judges pack's, 5 for a skin without judges packs.</summary>
+	public static int JudgeFrames => Math.Max(1, Selected(EKind.Judges)?.Def.JudgeFrames ?? 5);
+
 	/// <summary>The definition drawing uses for a game type: the selected pack's, or the former layout's.</summary>
 	public static CNotesSkinDef Def(EGameType gt) {
 		var kind = gt is EGameType.Konga ? EKind.Bongo : EKind.Taiko;
@@ -145,6 +148,11 @@ internal class CNotesSkinDef {
 	/// <summary>The scale of a giant note when the pack has no Notes_Giant.png.</summary>
 	[JsonProperty("GiantNotesScale")]
 	public float GiantNotesScale { get; set; } = 2f;
+
+	/// <summary>A judges pack's Judge.png frames, one under the other, all as tall: Good, OK, Bad, Ad-Lib, BOOM, then
+	/// Rolls and Combo when 7.</summary>
+	[JsonProperty("JudgeFrames")]
+	public int JudgeFrames { get; set; } = 5;
 
 	/// <summary>True for the former layout (a skin without packs): Notes.png with the hit circle, rolls and balloon,
 	/// Swap.png, Adlib.png, Kusu.png and FuseRoll.png.</summary>
