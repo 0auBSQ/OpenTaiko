@@ -4,13 +4,13 @@
     "text_color": [250, 236, 200, 255],
     "outline_color": [58, 34, 18, 255],
     "text_nudge": -1,
-    "chain": {
-        "_note": "center_x: the chain's middle; top: where the top ropes start, just above the screen; rope_gap: the rope length between two planks (the first plank hangs first_extra lower); hole_inset: the rope holes, from the plank's ends and edges",
+    "plank": {
+        "_note": "center_x: the plank's middle; top: where its two ropes start, just above the screen; rope_length: from there down to the plank's top edge; hole_inset: the rope holes, from the plank's ends and top edge; rows: the centre heights of the title, the floor line and the lives line, from the plank's top edge",
         "center_x": 960,
         "top": -6,
-        "rope_gap": 18,
-        "first_extra": 10,
-        "hole_inset": { "x": 24, "y": 11 }
+        "rope_length": 28,
+        "hole_inset": { "x": 24, "y": 11 },
+        "rows": { "title": 42, "floor": 104, "lives": 163 }
     },
     "title": {
         "_note": "the title is at most its plank's width less text_margin wide",

@@ -1,14 +1,14 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
 -- tower_hud ROActivity
 -- ------------------------------------------------------------------------------------------------------
--- The tower climb's head-up display, in the band between the top of the screen and the lane: three wooden
--- planks hanging from one another on ropes, the whole chain swaying a little.
---   plank 1   the "Reached floor" title
---   plank 2   Floor n/k, the current floor on a small split-flap panel that flips when a floor is reached
---   plank 3   Lives, a bar of one segment per life (a plain bar from a hundred lives up), blue while the
---             lives are above half, yellow above a fifth, red below (and on the last life)
--- The art is in Textures/ (the three planks, the flap, a rope tile stretched to length, the knots, the bar
--- back and a white segment tinted per life); the texts come from the skin locale and centre on their plank.
+-- The tower climb's head-up display, in the band between the top of the screen and the lane: one wooden
+-- plank hanging from the top of the screen on two ropes, swaying a little. It holds three rows:
+--   the "Reached floor" title
+--   Floor n/k, the current floor on a small split-flap panel that flips when a floor is reached
+--   Lives, a bar of one segment per life (a plain bar from a hundred lives up), blue while the lives are
+--   above half, yellow above a fifth, red below (and on the last life)
+-- The art is in Textures/ (the plank, the flap, a rope tile stretched to length, the knots, the bar back
+-- and a white segment tinted per life); the texts come from the skin locale and centre on the plank.
 -- Driven by the gameplay screen: activate(maxFloor), update() and draw() every frame, deactivate(). The
 -- floor and the lives are read from PLAYSTATE.
 
@@ -16,17 +16,18 @@
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
-local CHAIN, LIVES, FLIP, SWAY = Layout.chain, Layout.lives, Animation.flip, Animation.sway
+local PLANK, LIVES, FLIP, SWAY = Layout.plank, Layout.lives, Animation.flip, Animation.sway
 local TILT1, TILT2 = SWAY.tilt[1], SWAY.tilt[2]
 local SWAY_X1, SWAY_X2 = SWAY.x[1], SWAY.x[2]
 local SWAY_Y = SWAY.y
 
 local FONT_SIZES = Layout.font_sizes
 local TITLE_SIZE, LABEL_SIZE, NUMBER_SIZE, LIVES_SIZE = FONT_SIZES.title, FONT_SIZES.label, FONT_SIZES.number, FONT_SIZES.lives
-local CENTER_X = CHAIN.center_x
-local CHAIN_TOP = CHAIN.top    -- where the top ropes start, just above the screen
-local ROPE_GAP = CHAIN.rope_gap   -- rope length between two planks
-local HOLE_INSET_X, HOLE_INSET_Y = CHAIN.hole_inset.x, CHAIN.hole_inset.y   -- the rope holes, from the plank's ends and edges
+local CENTER_X = PLANK.center_x
+local ROPE_TOP = PLANK.top    -- where the two ropes start, just above the screen
+local ROPE_LENGTH = PLANK.rope_length   -- from there down to the plank's top edge
+local HOLE_INSET_X, HOLE_INSET_Y = PLANK.hole_inset.x, PLANK.hole_inset.y   -- the rope holes, from the plank's ends and top edge
+local ROWS = PLANK.rows   -- the rows' centre heights, from the plank's top edge
 local FLIP_SECONDS = FLIP.flip_s
 local BAR_W, BAR_H = LIVES.bar_width, LIVES.bar_height
 local PLAIN_BAR_FROM = LIVES.plain_from   -- lives from which the bar has no segments
@@ -36,9 +37,9 @@ local colText, colOutline
 local colLives = {}
 
 local tex = {}                 -- the textures by file name
-local planks = {}              -- per plank: texture, w, h, cx, cy (rest position), phase, holes, pose
+local plank = nil              -- texture, w, h, cx, cy (rest position), phase, holes, the rows' heights, pose
 local strings = {}             -- the localized texts
-local layout = {}              -- the centres of plank 2's and plank 3's pieces, as offsets from the plank's centre
+local layout = {}              -- the centres of the floor and lives rows' pieces, as x offsets from the plank's centre
 local maxFloor = 0
 
 local floor, lives, maxLives = 1, 5, 5
@@ -65,7 +66,7 @@ local function buildLayout()
     strings.lives = tr("TOWER_HUD_LIVES", "Lives")
     strings.rest = "/" .. tostring(maxFloor) .. strings.suffix
 
-    -- plank 2 holds "<prefix>[ n ]/k<suffix>", centred as a group
+    -- the floor row holds "<prefix>[ n ]/k<suffix>", centred as a group
     local prefixW = fontLabel:Measure(strings.prefix)
     local flapW = tex.flap.Width
     local restW = fontLabel:Measure(strings.rest)
@@ -75,26 +76,25 @@ local function buildLayout()
     layout.flapX = left + prefixW + flapW / 2
     layout.restX = left + prefixW + flapW + floorGap + restW / 2
 
-    -- plank 3 holds the label then the bar
+    -- the lives row holds the label then the bar
     local livesW = fontLives:Measure(strings.lives)
     local contentW = livesW + LIVES.gap + BAR_W
     layout.livesX = -contentW / 2 + livesW / 2
     layout.barX = -contentW / 2 + livesW + LIVES.gap + BAR_W / 2
 
-    local y = CHAIN_TOP + ROPE_GAP + CHAIN.first_extra
-    for i, t in ipairs({ tex.plank_title, tex.plank_floor, tex.plank_lives }) do
-        local w, h = t.Width, t.Height
-        planks[i] = { tex = t, w = w, h = h, cx = CENTER_X, cy = y + h / 2, phase = i * SWAY.phase_step,
-                      hx = w / 2 - HOLE_INSET_X, hy = h / 2 - HOLE_INSET_Y,
-                      pose = { x = CENTER_X, y = y + h / 2, angle = 0, s = 0, c = 1 } }
-        y = y + h + ROPE_GAP
-    end
+    local t = tex.plank
+    local w, h = t.Width, t.Height
+    local cy = ROPE_TOP + ROPE_LENGTH + h / 2
+    plank = { tex = t, w = w, h = h, cx = CENTER_X, cy = cy, phase = SWAY.phase,
+              hx = w / 2 - HOLE_INSET_X, hy = h / 2 - HOLE_INSET_Y,
+              titleY = ROWS.title - h / 2, floorY = ROWS.floor - h / 2, livesY = ROWS.lives - h / 2,
+              pose = { x = CENTER_X, y = cy, angle = 0, s = 0, c = 1 } }
 end
 
 -- ── lifecycle ────────────────────────────────────────────────────────────────────────────────────────
 
 function onStart()
-    for _, name in ipairs({ "plank_title", "plank_floor", "plank_lives", "flap", "rope", "knot", "bar_back", "bar_segment" }) do
+    for _, name in ipairs({ "plank", "flap", "rope", "knot", "bar_back", "bar_segment" }) do
         tex[name] = TEXTURE:CreateTexture("Textures/" .. name .. ".png")
     end
     fontTitle = TEXT:CreateGlyphCached(TITLE_SIZE)
@@ -133,7 +133,7 @@ end
 function deactivate()
     active = false
     flip = nil
-    planks = {}
+    plank = nil
 end
 
 function update()
@@ -193,8 +193,8 @@ local function livesColor()
 end
 
 local function drawBar(cx, q)
-    local p = planks[3]
-    local bx, by = at(p, q, cx, 0)
+    local p = plank
+    local bx, by = at(p, q, cx, p.livesY)
     tex.bar_back:SetRotation(q.angle)
     tex.bar_back:DrawAtAnchor(bx, by, "center")
     local col = livesColor()
@@ -214,7 +214,7 @@ local function drawBar(cx, q)
         if segments == 1 then w = BAR_W * math.max(0, math.min(1, lives / n)) end
         if w > 0.2 then
             local left = cx - BAR_W / 2 + (i - 1) * (segW + gap)
-            local sx, sy = at(p, q, left + w / 2, 0)
+            local sx, sy = at(p, q, left + w / 2, p.livesY)
             seg:SetScale(w / seg.Width, BAR_H / seg.Height)
             seg:SetColor(filled and col or colLives.empty)
             seg:DrawAtAnchor(sx, sy, "center")
@@ -225,8 +225,8 @@ end
 
 -- the current floor on its flap: the old number folds away along the seam, the new one unfolds
 local function drawFloorFlap(q)
-    local p = planks[2]
-    local px, py = at(p, q, layout.flapX, 0)
+    local p = plank
+    local px, py = at(p, q, layout.flapX, p.floorY)
     local value, sy, shade = floor, 1, 1
     if flip ~= nil then
         local k = flip.t / FLIP_SECONDS
@@ -254,69 +254,35 @@ local function drawFloorFlap(q)
     fontNumber:Draw(tostring(value), px, py + nudge(fontNumber) * sy, col, colOutline, 1, 1, flap.Width - Layout.floor.text_margin, "center", sy, q.angle)
 end
 
-local poses = {}
-
 function draw()
-    if not active or #planks < 3 then return end
-    for i = 1, 3 do poses[i] = pose(planks[i]) end
+    if not active or plank == nil then return end
+    local p = plank
+    local q = pose(p)
 
-    -- ropes first: from the top of the screen to plank 1, then from each plank's bottom holes to the next
-    local elx, ely, erx, ery = 0, 0, 0, 0
-    for i = 1, 3 do
-        local p, q = planks[i], poses[i]
-        local hx, hy = p.hx, p.hy
-        local lx, ly = at(p, q, -hx, -hy)
-        local rx, ry = at(p, q, hx, -hy)
-        if i == 1 then
-            drawRope(p.cx - hx, CHAIN_TOP, lx, ly)
-            drawRope(p.cx + hx, CHAIN_TOP, rx, ry)
-        else
-            drawRope(elx, ely, lx, ly)
-            drawRope(erx, ery, rx, ry)
-        end
-        elx, ely = at(p, q, -hx, hy)
-        erx, ery = at(p, q, hx, hy)
-    end
+    -- the two ropes, from the top of the screen to the holes at the plank's top corners, then the plank
+    local hx, hy = p.hx, p.hy
+    local lx, ly = at(p, q, -hx, -hy)
+    local rx, ry = at(p, q, hx, -hy)
+    drawRope(p.cx - hx, ROPE_TOP, lx, ly)
+    drawRope(p.cx + hx, ROPE_TOP, rx, ry)
+    p.tex:SetRotation(q.angle)
+    p.tex:DrawAtAnchor(q.x, q.y, "center")
+    tex.knot:DrawAtAnchor(lx, ly, "center")
+    tex.knot:DrawAtAnchor(rx, ry, "center")
 
-    local knot = tex.knot
-    for i = 1, 3 do
-        local p, q = planks[i], poses[i]
-        p.tex:SetRotation(q.angle)
-        p.tex:DrawAtAnchor(q.x, q.y, "center")
-        local hx, hy = p.hx, p.hy
-        local kx, ky = at(p, q, -hx, -hy)
-        knot:DrawAtAnchor(kx, ky, "center")
-        kx, ky = at(p, q, hx, -hy)
-        knot:DrawAtAnchor(kx, ky, "center")
-        if i < 3 then
-            kx, ky = at(p, q, -hx, hy)
-            knot:DrawAtAnchor(kx, ky, "center")
-            kx, ky = at(p, q, hx, hy)
-            knot:DrawAtAnchor(kx, ky, "center")
-        end
-    end
-
-    -- plank 1: the title
-    do
-        local p, q = planks[1], poses[1]
-        fontTitle:Draw(strings.title, q.x, q.y + nudge(fontTitle), colText, colOutline, 1, 1, p.w - Layout.title.text_margin, "center", 0, q.angle)
-    end
-    -- plank 2: prefix, the flap, "/k" and the suffix
-    do
-        local p, q = planks[2], poses[2]
-        local lx, ly = at(p, q, layout.prefixX, 0)
-        fontLabel:Draw(strings.prefix, lx, ly + nudge(fontLabel), colText, colOutline, 1, 1, 0, "center", 0, q.angle)
-        drawFloorFlap(q)
-        local rx, ry = at(p, q, layout.restX, 0)
-        fontLabel:Draw(strings.rest, rx, ry + nudge(fontLabel), colText, colOutline, 1, 1, 0, "center", 0, q.angle)
-    end
-    -- plank 3: the label and the bar
-    do
-        local p, q = planks[3], poses[3]
-        local lx, ly = at(p, q, layout.livesX, 0)
-        fontLives:Draw(strings.lives, lx, ly + nudge(fontLives), colText, colOutline, 1, 1, 0, "center", 0, q.angle)
-        drawBar(layout.barX, q)
-    end
+    -- the title
+    local tx, ty = at(p, q, 0, p.titleY)
+    fontTitle:Draw(strings.title, tx, ty + nudge(fontTitle), colText, colOutline, 1, 1, p.w - Layout.title.text_margin, "center", 0, q.angle)
+    -- prefix, the flap, "/k" and the suffix
+    local fx, fy = at(p, q, layout.prefixX, p.floorY)
+    fontLabel:Draw(strings.prefix, fx, fy + nudge(fontLabel), colText, colOutline, 1, 1, 0, "center", 0, q.angle)
+    drawFloorFlap(q)
+    fx, fy = at(p, q, layout.restX, p.floorY)
+    fontLabel:Draw(strings.rest, fx, fy + nudge(fontLabel), colText, colOutline, 1, 1, 0, "center", 0, q.angle)
+    -- the label and the bar
+    local bx, by = at(p, q, layout.livesX, p.livesY)
+    fontLives:Draw(strings.lives, bx, by + nudge(fontLives), colText, colOutline, 1, 1, 0, "center", 0, q.angle)
+    drawBar(layout.barX, q)
 end
 
 function afterSongEnum() end

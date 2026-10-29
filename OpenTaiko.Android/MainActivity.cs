@@ -91,8 +91,9 @@ public class MainActivity : Activity, ISurfaceHolderCallback {
 	}
 
 	private void ApplyImmersiveMode() {
-		if (Build.VERSION.SdkInt >= BuildVersionCodes.R) {
-			Window?.SetDecorFitsSystemWindows(false);
+		if (OperatingSystem.IsAndroidVersionAtLeast(30)) {
+			// from API 35 an app targeting it is drawn edge to edge anyway (and the call is deprecated)
+			if (!OperatingSystem.IsAndroidVersionAtLeast(35)) Window?.SetDecorFitsSystemWindows(false);
 			var controller = Window?.InsetsController;
 			if (controller != null) {
 				controller.Hide(WindowInsets.Type.SystemBars());
@@ -324,7 +325,7 @@ public class MainActivity : Activity, ISurfaceHolderCallback {
 	}
 
 	private void RequestAudioFocus(AudioManager audioManager) {
-		if (Build.VERSION.SdkInt < BuildVersionCodes.O) return;   // AudioFocusRequest is API 26+
+		if (!OperatingSystem.IsAndroidVersionAtLeast(26)) return;   // AudioFocusRequest is API 26+
 		try {
 			var attrs = new AudioAttributes.Builder()
 				.SetUsage(AudioUsageKind.Game)!

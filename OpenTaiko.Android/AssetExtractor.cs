@@ -17,7 +17,7 @@ public static class AssetExtractor {
 	/// Reports progress as (copied, total) through <paramref name="progress"/>.</summary>
 	public static void EnsureExtracted(Context context, string targetRoot, Action<int, int>? progress = null) {
 		var assets = context.Assets!;
-		long versionCode = global::Android.OS.Build.VERSION.SdkInt >= global::Android.OS.BuildVersionCodes.P
+		long versionCode = OperatingSystem.IsAndroidVersionAtLeast(28)
 			? context.PackageManager!.GetPackageInfo(context.PackageName!, 0)!.LongVersionCode
 			: 0;
 
