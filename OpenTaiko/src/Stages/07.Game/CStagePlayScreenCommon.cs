@@ -369,10 +369,11 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 					double msErrorMin = msMatchErrorLimit;
 					for (int ic = idxNotes[i, b]; ic < targetNotes[i, b].Count; ++ic) {
 						var now = targetNotes[i, b][ic];
-						if (now.dbSoundTimems >= min!.dbSoundTimems + msMatchErrorLimit)
+						bool isMinSelf = ReferenceEquals(now, min); // min must be taken to ensure advance
+						if (!isMinSelf && now.dbSoundTimems >= min!.dbSoundTimems + msMatchErrorLimit)
 							break; // would not match further
 						double msError = Math.Max(Math.Abs(now.dbSoundTimems - min.dbSoundTimems), Math.Abs(now.end.dbSoundTimems - min.end.dbSoundTimems));
-						if (ReferenceEquals(now, min) || msError < msErrorMin) {
+						if (isMinSelf || msError < msErrorMin) {
 							// downgrade unmatched notes
 							for (int id = idxNotes[i, b]; id < ic; ++id) {
 								var note = targetNotes[i, b][id];
