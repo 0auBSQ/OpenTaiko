@@ -1,12 +1,49 @@
 {
-    "_note": "milliseconds from the start; step is per song",
-    "plate": { "at": 800, "px_per_ms": 4 },
-    "songs": { "at": 1600, "step": 150, "px_per_ms": 3 },
-    "exams": { "at": 2750, "step": 150, "px_per_ms": 6 },
-    "rank": { "at": 4100, "step": 150, "appear": 135, "fade": 90, "grow_by": 1.4, "drop_px_per_ms": 0.2 },
-    "swap": 640,
-    "pages": { "_note": "pages of three songs", "first": 2745, "each": 2000, "fade": 255 },
-    "rainbow_frame": 30,
+    "_note": "milliseconds",
+    "verdict": {
+        "plate_ms": 450, "plate_from_px": -700,
+        "ticket_at": 200, "ticket_ms": 450, "ticket_from_px": 1100,
+        "best_at": 750, "pop_ms": 300, "overshoot": 1.15,
+        "tiles_at": 950, "tile_step": 110, "tile_ms": 280,
+        "stamp_delay": 250, "stamp_ms": 260, "stamp_from_scale": 1.9,
+        "end_delay": 300,
+        "marquee_px_per_ms": 0.06
+    },
+    "swap_ms": 640,
+    "songs_scroll": { "_note": "past three songs: a row every hold + move", "hold_ms": 1600, "move_ms": 400 },
+    "blocks_px_per_ms": 0.05,
+    "twinkle_rad_per_ms": 0.004,
+    "grade": {
+        "_note": "the screens before it fade over fade_out_ms while the background floods in from a flash",
+        "fade_out_ms": 350,
+        "glow_at": 100, "glow_ms": 550, "flash_ms": 700,
+        "back_deg_per_ms": 0.004,
+        "kanji_at": 900, "kanji_step": 700, "slam_ms": 200, "slam_from": 2.4,
+        "shake_ms": 380, "shake_px": 22,
+        "flare_ms": 420, "flare_scale": 2.6,
+        "burst_ms": 560, "burst_count": 10, "burst_from_px": 70, "burst_to_px": 250,
+        "twinkle_count": 6, "twinkle_rate_per_ms": 0.0016,
+        "scroll_delay": 450, "rise_ms": 500, "unroll_ms": 450,
+        "hold_ms": 2200, "fade_ms": 450,
+        "jump_delay": 100, "jump_ms": 650, "overshoot": 1.6, "plate_delay": 90,
+        "title_delay": 650, "title_ms": 900,
+        "music_level": 25,
+        "character_ms": 1000
+    },
+    "sounds": {
+        "_note": "volume in percent",
+        "rank": { "file": "Sounds/RankIn.ogg", "volume": 100 },
+        "best": { "file": "Sounds/jingle_high.ogg", "volume": 75 },
+        "flash": { "file": "Sounds/Grade/flash.ogg", "volume": 90 },
+        "dong": { "file": "Sounds/Grade/dong.ogg", "volume": 100 },
+        "title": { "file": "Sounds/Grade/jingle.ogg", "volume": 80 }
+    },
+    "fanfares": {
+        "_note": "the grade screen's fanfare (Sounds/Grade/fanfare_<name>.ogg, the reward pop-ups' rarities) for a clear, a full combo, a perfect",
+        "red": ["common", "uncommon", "epic"],
+        "gold": ["uncommon", "rare", "legendary"],
+        "volume": 100
+    },
     "music": {
         "_note": "an optional intro, then the loop",
         "loop": "Sounds/BGM.ogg"

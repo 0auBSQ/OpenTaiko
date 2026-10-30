@@ -1,0 +1,11 @@
+{
+    // Skin locale file, Spanish: dan results (results_dan ROActivity); {0} is a number
+    "Entries": {
+        "DAN_RESULTS_NEW_BEST": "¡Nuevo récord!",
+        "DAN_RESULTS_BEST": "récord {0}",
+        "DAN_RESULTS_EXAM_MORE": "{0} o más",
+        "DAN_RESULTS_EXAM_LESS": "menos de {0}",
+        "DAN_RESULTS_DETAILS": "Izquierda / Derecha: detalles",
+        "DAN_RESULTS_SUMMARY": "Izquierda / Derecha: resumen"
+    }
+}

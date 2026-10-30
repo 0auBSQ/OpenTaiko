@@ -227,7 +227,7 @@ Die Engine schlägt einige ROActivities unter festem Ordnernamen nach und steuer
 | `danplate` | `draw(x, y, opacity, danTick, r, g, b, titleText)` auf dem Ergebnisbildschirm und in Dan-Kursen. |
 | `results_tower` | `activate(info)` beim Öffnen des Tower-Ergebnisses, mit dem Spiel als LuaResultInfo (schreibgeschützte Getter wie `ReachedFloor`, `TotalFloors`, `Lives`, `TowerRank`, `IsNewBestFloor`, `GetScore(player)`); `update()` und `draw()` in jedem Frame; `skip()` über Call beim Bestätigen, gibt true zurück, solange es noch animiert (diese Bestätigung überspringt dann nur); `deactivate()`. |
 | `results_regular` | `activate(info)` beim Öffnen eines Ergebnisses, auch eines KI-Kampfs, mit dem Spiel als LuaResultInfo (Getter je Spieler ab 0 wie `GetGauge(p)`, `GetClearType(p)`, `GetScoreRank(p)`, `GetScore(p)`, sowie `IsAIBattle`, `GetAISectionEnd(i)`); `update()` und `draw()` in jedem Frame über dem Ergebnis-Hintergrund; `skip()` über Call beim Bestätigen, gibt true zurück, solange es noch animiert (der Hintergrund erhält dann `skipAnime`); `deactivate()`. |
-| `results_dan` | `activate(info)` beim Öffnen des Ergebnisses eines Dan-Spiels, mit dem Spiel als LuaResultInfo (`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`, `exam.PreviousBestAmount`); `update()` und `draw()` in jedem Frame über dem Dan-Ergebnis-Hintergrund; `skip()` über Call beim Bestätigen, gibt true zurück, solange es noch animiert; `swap()` über Call bei links oder rechts, gibt true zurück, wenn es zwischen den Prüfungen und den Songs wechselt; `deactivate()`. |
+| `results_dan` | `activate(info)` beim Öffnen des Ergebnisses eines Dan-Spiels, mit dem Spiel als LuaResultInfo (`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`, `exam.PreviousBestAmount`, `DanGradeChange`, `DanGrade`); `update()` und `draw()` in jedem Frame über dem Dan-Ergebnis-Hintergrund; `skip()` über Call beim Bestätigen, gibt true zurück, solange es noch animiert; danach `advance()` über Call beim Bestätigen, gibt true zurück, wenn es vor den Belohnungs-Pop-ups noch einen Bildschirm zeigt (die Engine hat einen neuen oder besseren Dan-Rang schon auf das Namensschild gesetzt, also zeichnet das Modul `PreviousNameplateDan`, bis es ihn enthüllt); `swap()` über Call bei links oder rechts, gibt true zurück, wenn es zwischen seinen Bildschirmen wechselt; `deactivate()`. |
 | `tower_hud` | `activate(maxFloor)` beim Start eines Tower-Spiels; `update()` und `draw()` in jedem Frame über dem oberen Hintergrund; `deactivate()`. Es liest das Stockwerk und die Leben aus PLAYSTATE. |
 | `popup_menu` | `activate(title, items, fontSize, ...)`, wobei items die durch Zeilenumbrüche verbundenen Beschriftungen sind, gefolgt von den PopupMenu-Positionen des Skins; `draw(selected)` jeden Frame; `deactivate()` beim Schließen. |
 | `config_ui` | `activate(model)` mit dem Einstellungsmodell; `update()` jeden Frame, gibt "exit" zurück, um den Einstellungsbildschirm zu verlassen, optional gefolgt vom Namen des Modules/Transitions-Moduls für den Rückweg (stattdessen spielt die einfache Blende, wenn ein Wechsel von Skin, Auflösung oder Audiogerät noch angewendet werden muss); `draw()`; `reload(model)` über Call, wenn die Engine das Modell neu aufbaut; `deactivate()`. |
@@ -295,6 +295,9 @@ Die Ergebnisstufe füllt es, nachdem das Spiel gespeichert wurde, und danach än
 | `info:GetDanSong(song)  -> dan song` | results_dan: Song i des Dans (ab 0) oder nil. |
 | `info.ExamCount  -> number` | results_dan: die Prüfungen des Dans. |
 | `info:GetExam(exam)  -> dan exam` | results_dan: Prüfung i (ab 0, in der Reihenfolge des Charts) oder nil. |
+| `info.DanGradeChange  -> number` | results_dan: 0 keine, 1 ein neuer Dan-Rang, 2 ein besserer Rang in einem schon bestandenen Dan (Gold oder ein besseres Clear). Die Engine setzt einen neuen oder besseren Rang auf das Namensschild des Spielers. |
+| `info.DanGrade  -> dan grade` | results_dan: der Rang des Dans im Spielstand nach diesem Spiel; sein Title ist "", wenn der Dan nie bestanden wurde. |
+| `info.PreviousNameplateDan  -> dan grade` | results_dan: der Dan-Rang, den das Namensschild vor diesem Spiel zeigte (Title "" für keinen). |
 
 ### Dan-Song
 
@@ -303,6 +306,7 @@ Das Objekt, das info:GetDanSong zurückgibt, schreibgeschützt.
 | Methode | Beschreibung |
 | --- | --- |
 | `song.Title  -> string` | Der Titel des Songs; "???" für einen Song, den der Chart verborgen hält. |
+| `song.Subtitle  -> string` | Der Untertitel des Songs; "" für einen Song, den der Chart verborgen hält. |
 | `song.Difficulty  -> number` | 0 Easy bis 4 Extra. |
 | `song.Level  -> number` | Das Level des Songs. |
 | `song.Good  -> number` | Good-Treffer im Song. |
@@ -325,6 +329,16 @@ Das Objekt, das info:GetExam und exam:GetSong zurückgeben, schreibgeschützt: e
 | `exam.Status  -> number` | 0 nicht bestanden, 1 bestanden, 2 in Gold bestanden. |
 | `exam.IsPerSong  -> boolean` | True bei einer Prüfung, die Song für Song bewertet wird; die Prüfung selbst ist dann die des letzten Songs. |
 | `exam:GetSong(song)  -> dan exam` | Die Prüfung pro Song in Song i (ab 0) oder nil. |
+
+### Dan-Rang
+
+Das Objekt, das info.DanGrade und info.PreviousNameplateDan zurückgeben, schreibgeschützt.
+
+| Methode | Beschreibung |
+| --- | --- |
+| `grade.Title  -> string` | Der Titel des Dans, wie ihn das Namensschild zeigt (die ersten zwei Zeichen des Chart-Titels); "" für keinen. |
+| `grade.Gold  -> boolean` | True bei einem goldenen Bestehen. |
+| `grade.Tier  -> number` | 0 Clear, 1 Full Combo, 2 Perfect. |
 
 ## Hintergründe
 

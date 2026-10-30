@@ -227,7 +227,7 @@ Le moteur recherche certaines ROActivities par un nom de dossier fixe et les pil
 | `danplate` | `draw(x, y, opacity, danTick, r, g, b, titleText)` sur l'écran de résultats et dans les parcours dan. |
 | `results_tower` | `activate(info)` à l'ouverture du résultat de la tour, avec la partie sous forme de LuaResultInfo (des accesseurs en lecture seule comme `ReachedFloor`, `TotalFloors`, `Lives`, `TowerRank`, `IsNewBestFloor`, `GetScore(player)`) ; `update()` et `draw()` à chaque image ; `skip()` via Call à la validation, qui renvoie true tant que l'écran s'anime (cette validation ne fait alors que passer l'animation) ; `deactivate()`. |
 | `results_regular` | `activate(info)` à l'ouverture du résultat d'une partie, d'un combat contre l'IA aussi, avec la partie sous forme de LuaResultInfo (des accesseurs par joueur à partir de 0 comme `GetGauge(p)`, `GetClearType(p)`, `GetScoreRank(p)`, `GetScore(p)`, et `IsAIBattle`, `GetAISectionEnd(i)`) ; `update()` et `draw()` à chaque image par-dessus le fond du résultat ; `skip()` via Call à la validation, qui renvoie true tant que l'écran s'anime (le fond reçoit alors `skipAnime`) ; `deactivate()`. |
-| `results_dan` | `activate(info)` à l'ouverture du résultat d'une partie dan, avec la partie sous forme de LuaResultInfo (`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`, `exam.PreviousBestAmount`) ; `update()` et `draw()` à chaque image par-dessus le fond du résultat dan ; `skip()` via Call à la validation, qui renvoie true tant que l'écran s'anime ; `swap()` via Call sur gauche ou droite, qui renvoie true quand l'écran passe des examens aux chansons ou l'inverse ; `deactivate()`. |
+| `results_dan` | `activate(info)` à l'ouverture du résultat d'une partie dan, avec la partie sous forme de LuaResultInfo (`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`, `exam.PreviousBestAmount`, `DanGradeChange`, `DanGrade`) ; `update()` et `draw()` à chaque image par-dessus le fond du résultat dan ; `skip()` via Call à la validation, qui renvoie true tant que l'écran s'anime ; puis `advance()` via Call à la validation, qui renvoie true quand le module montre un écran de plus avant les fenêtres de récompense (le moteur a déjà mis un grade dan nouveau ou meilleur sur la plaque du joueur, le module dessine donc `PreviousNameplateDan` jusqu'à le révéler) ; `swap()` via Call sur gauche ou droite, qui renvoie true quand le module passe d'un de ses écrans à l'autre ; `deactivate()`. |
 | `tower_hud` | `activate(maxFloor)` au début d'une partie de tour ; `update()` et `draw()` à chaque image au-dessus de l'arrière-plan supérieur ; `deactivate()`. Il lit l'étage et les vies dans PLAYSTATE. |
 | `popup_menu` | `activate(title, items, fontSize, ...)` où items sont les libellés joints par des sauts de ligne, suivis des positions PopupMenu du skin ; `draw(selected)` à chaque frame ; `deactivate()` à la fermeture. |
 | `config_ui` | `activate(model)` avec le modèle des paramètres ; `update()` à chaque frame, renvoyant "exit" pour quitter l'écran des paramètres, suivi en option du nom du module Modules/Transitions pour le retour (le fondu simple joue à la place quand un changement de skin, de résolution ou de périphérique audio reste à appliquer) ; `draw()` ; `reload(model)` via Call quand le moteur reconstruit le modèle ; `deactivate()`. |
@@ -295,6 +295,9 @@ L'étape de résultats le remplit une fois la partie enregistrée, et il ne chan
 | `info:GetDanSong(song)  -> dan song` | results_dan: la chanson i du dan (à partir de 0), ou nil. |
 | `info.ExamCount  -> number` | results_dan: les examens du dan. |
 | `info:GetExam(exam)  -> dan exam` | results_dan: l'examen i (à partir de 0, dans l'ordre du chart), ou nil. |
+| `info.DanGradeChange  -> number` | results_dan: 0 aucun, 1 un nouveau grade dan, 2 un meilleur grade sur un dan déjà réussi (or, ou un meilleur clear). Le moteur met un grade nouveau ou meilleur sur la plaque du joueur. |
+| `info.DanGrade  -> dan grade` | results_dan: le grade du dan dans la sauvegarde après cette partie ; son Title vaut "" si le dan n'a jamais été réussi. |
+| `info.PreviousNameplateDan  -> dan grade` | results_dan: le grade dan que la plaque affichait avant cette partie (Title "" s'il n'y en avait pas). |
 
 ### Chanson de dan
 
@@ -303,6 +306,7 @@ L'objet que renvoie info:GetDanSong, en lecture seule.
 | Méthode | Description |
 | --- | --- |
 | `song.Title  -> string` | Le titre de la chanson ; "???" pour une chanson que le chart garde cachée. |
+| `song.Subtitle  -> string` | Le sous-titre de la chanson ; "" pour une chanson que le chart garde cachée. |
 | `song.Difficulty  -> number` | De 0 Easy à 4 Extra. |
 | `song.Level  -> number` | Le niveau de la chanson. |
 | `song.Good  -> number` | Coups Good sur la chanson. |
@@ -325,6 +329,16 @@ L'objet que renvoient info:GetExam et exam:GetSong, en lecture seule : un examen
 | `exam.Status  -> number` | 0 échoué, 1 réussi, 2 réussi en or. |
 | `exam.IsPerSong  -> boolean` | Vrai pour un examen jugé chanson par chanson ; l'examen lui-même est alors celui de la dernière chanson. |
 | `exam:GetSong(song)  -> dan exam` | L'examen par chanson sur la chanson i (à partir de 0), ou nil. |
+
+### Grade de dan
+
+L'objet que renvoient info.DanGrade et info.PreviousNameplateDan, en lecture seule.
+
+| Méthode | Description |
+| --- | --- |
+| `grade.Title  -> string` | Le titre du dan tel que la plaque l'affiche (les deux premiers caractères du titre du chart) ; "" s'il n'y en a pas. |
+| `grade.Gold  -> boolean` | true pour une réussite en or. |
+| `grade.Tier  -> number` | 0 clear, 1 full combo, 2 perfect. |
 
 ## Arrière-plans
 

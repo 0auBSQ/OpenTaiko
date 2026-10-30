@@ -227,7 +227,7 @@ end
 | `danplate` | リザルト画面と段位コースで `draw(x, y, opacity, danTick, r, g, b, titleText)`。 |
 | `results_tower` | 塔のリザルトを開くとき、プレイ内容を LuaResultInfo (`ReachedFloor`、`TotalFloors`、`Lives`、`TowerRank`、`IsNewBestFloor`、`GetScore(player)` などの読み取り専用ゲッター) として渡して `activate(info)`。毎フレーム `update()` と `draw()`。決定時に Call で `skip()` (アニメーション中は true を返し、その決定はスキップだけになります)。`deactivate()`。 |
 | `results_regular` | プレイのリザルト (AI バトルも含む) を開くとき、プレイ内容を LuaResultInfo (0 から始まるプレイヤーごとのゲッター `GetGauge(p)`、`GetClearType(p)`、`GetScoreRank(p)`、`GetScore(p)`、および `IsAIBattle`、`GetAISectionEnd(i)`) として渡して `activate(info)`。毎フレーム、リザルト背景の上で `update()` と `draw()`。決定時に Call で `skip()` (アニメーション中は true を返し、背景には `skipAnime` が送られます)。`deactivate()`。 |
-| `results_dan` | 段位のリザルトを開くとき、プレイ内容を LuaResultInfo (`DanResult`、`DanCombo`、`GetDanSong(i)`、`GetExam(i)`、`exam:GetSong(i)`、`exam.PreviousBestAmount`) として渡して `activate(info)`。毎フレーム、段位リザルト背景の上で `update()` と `draw()`。決定時に Call で `skip()` (アニメーション中は true を返します)。左右で Call により `swap()` (試験と曲の表示を切り替えたときに true を返します)。`deactivate()`。 |
+| `results_dan` | 段位のリザルトを開くとき、プレイ内容を LuaResultInfo (`DanResult`、`DanCombo`、`GetDanSong(i)`、`GetExam(i)`、`exam:GetSong(i)`、`exam.PreviousBestAmount`、`DanGradeChange`、`DanGrade`) として渡して `activate(info)`。毎フレーム、段位リザルト背景の上で `update()` と `draw()`。決定時に Call で `skip()` (アニメーション中は true を返します)。続いて決定時に Call で `advance()` (報酬のポップアップの前にもう一つ画面を見せるときに true を返します。新しい段位や上がった段位はエンジンがすでにネームプレートに反映しているので、モジュールはそれを明かすまで `PreviousNameplateDan` を描きます)。左右で Call により `swap()` (画面を切り替えたときに true を返します)。`deactivate()`。 |
 | `tower_hud` | 塔のプレイ開始時に `activate(maxFloor)`。毎フレーム上側背景の上に `update()` と `draw()`。`deactivate()`。階とライフは PLAYSTATE から読みます。 |
 | `popup_menu` | `activate(title, items, fontSize, ...)`。items は改行で連結したラベルで、その後に PopupMenu のスキン位置が続きます。毎フレーム `draw(selected)`。閉じるときに `deactivate()`。 |
 | `config_ui` | 設定モデルとともに `activate(model)`。毎フレーム `update()` を呼び、"exit" を返すと設定画面を離れます。続けて Modules/Transitions のモジュール名を返すと、戻りにそのトランジションを使います (スキン・解像度・サウンドデバイスの変更が適用待ちのときは通常のフェードになります)。`draw()`。エンジンがモデルを再構築したときに Call を通じて `reload(model)`。`deactivate()`。 |
@@ -295,6 +295,9 @@ end
 | `info:GetDanSong(song)  -> dan song` | results_dan: 段位の i 曲目 (0 から)。なければ nil。 |
 | `info.ExamCount  -> number` | results_dan: 段位の試験数。 |
 | `info:GetExam(exam)  -> dan exam` | results_dan: i 番目の試験 (0 から、譜面の順)。なければ nil。 |
+| `info.DanGradeChange  -> number` | results_dan: 0 変化なし、1 新しい段位、2 合格済みの段位がより良くなった (金、またはより良いクリア)。新しい段位や上がった段位はエンジンがプレイヤーのネームプレートに反映します。 |
+| `info.DanGrade  -> dan grade` | results_dan: このプレイ後のセーブにおけるこの段位の評価。一度も合格していなければ Title は ""。 |
+| `info.PreviousNameplateDan  -> dan grade` | results_dan: このプレイの前にネームプレートが表示していた段位 (なければ Title は "")。 |
 
 ### 段位の曲
 
@@ -303,6 +306,7 @@ info:GetDanSong が返す読み取り専用のオブジェクトです。
 | メソッド | 説明 |
 | --- | --- |
 | `song.Title  -> string` | 曲のタイトル。譜面が隠している曲では "???"。 |
+| `song.Subtitle  -> string` | 曲のサブタイトル。譜面が隠している曲では ""。 |
 | `song.Difficulty  -> number` | 0 かんたん から 4 裏鬼。 |
 | `song.Level  -> number` | 曲のレベル。 |
 | `song.Good  -> number` | その曲の良の数。 |
@@ -325,6 +329,16 @@ info:GetExam と exam:GetSong が返す読み取り専用のオブジェクト�
 | `exam.Status  -> number` | 0 不合格、1 合格、2 金合格。 |
 | `exam.IsPerSong  -> boolean` | 曲ごとに判定される試験のとき true。その場合、この試験自体は最後の曲のものです。 |
 | `exam:GetSong(song)  -> dan exam` | 曲ごとの試験の、i 曲目 (0 から) のもの。なければ nil。 |
+
+### 段位の評価
+
+info.DanGrade と info.PreviousNameplateDan が返すオブジェクト (読み取り専用)。
+
+| メソッド | 説明 |
+| --- | --- |
+| `grade.Title  -> string` | ネームプレートに表示される段位の名前 (譜面タイトルの最初の 2 文字)。なければ ""。 |
+| `grade.Gold  -> boolean` | 金合格なら true。 |
+| `grade.Tier  -> number` | 0 クリア、1 フルコンボ、2 全良。 |
 
 ## バックグラウンド
 

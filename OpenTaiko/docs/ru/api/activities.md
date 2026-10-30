@@ -227,7 +227,7 @@ end
 | `danplate` | `draw(x, y, opacity, danTick, r, g, b, titleText)` на экране результатов и в дан-курсах. |
 | `results_tower` | `activate(info)` при открытии результата башни, с игрой в виде LuaResultInfo (геттеры только для чтения, например `ReachedFloor`, `TotalFloors`, `Lives`, `TowerRank`, `IsNewBestFloor`, `GetScore(player)`); `update()` и `draw()` каждый кадр; `skip()` через Call при подтверждении, возвращает true, пока идёт анимация (такое подтверждение только пропускает её); `deactivate()`. |
 | `results_regular` | `activate(info)` при открытии результата игры, в том числе битвы с ИИ, с игрой в виде LuaResultInfo (геттеры по игрокам с 0, например `GetGauge(p)`, `GetClearType(p)`, `GetScoreRank(p)`, `GetScore(p)`, а также `IsAIBattle`, `GetAISectionEnd(i)`); `update()` и `draw()` каждый кадр поверх фона результата; `skip()` через Call при подтверждении, возвращает true, пока идёт анимация (фон тогда получает `skipAnime`); `deactivate()`. |
-| `results_dan` | `activate(info)` при открытии результата дан-игры, с игрой в виде LuaResultInfo (`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`, `exam.PreviousBestAmount`); `update()` и `draw()` каждый кадр поверх фона результата дана; `skip()` через Call при подтверждении, возвращает true, пока идёт анимация; `swap()` через Call по нажатию влево или вправо, возвращает true, когда экран переключается между экзаменами и песнями; `deactivate()`. |
+| `results_dan` | `activate(info)` при открытии результата дан-игры, с игрой в виде LuaResultInfo (`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`, `exam.PreviousBestAmount`, `DanGradeChange`, `DanGrade`); `update()` и `draw()` каждый кадр поверх фона результата дана; `skip()` через Call при подтверждении, возвращает true, пока идёт анимация; затем `advance()` через Call при подтверждении, возвращает true, когда перед окнами наград показывается ещё один экран (движок уже записал новый или лучший дан-ранг на табличку игрока, поэтому модуль рисует `PreviousNameplateDan`, пока не раскроет его); `swap()` через Call по нажатию влево или вправо, возвращает true, когда экраны переключаются; `deactivate()`. |
 | `tower_hud` | `activate(maxFloor)` при старте игры в башне; `update()` и `draw()` каждый кадр поверх верхнего фона; `deactivate()`. Этаж и жизни он читает из PLAYSTATE. |
 | `popup_menu` | `activate(title, items, fontSize, ...)`, где items — метки, соединённые переносами строк, за которыми следуют позиции PopupMenu из скина; `draw(selected)` каждый кадр; `deactivate()` при закрытии. |
 | `config_ui` | `activate(model)` с моделью настроек; `update()` каждый кадр, возвращающий "exit" для выхода с экрана настроек, по желанию затем имя модуля Modules/Transitions для обратного пути (вместо него играет простое затемнение, если ещё ждёт применения смена скина, разрешения или звукового устройства); `draw()`; `reload(model)` через Call, когда движок перестраивает модель; `deactivate()`. |
@@ -295,6 +295,9 @@ end
 | `info:GetDanSong(song)  -> dan song` | results_dan: песня i дана (с 0) или nil. |
 | `info.ExamCount  -> number` | results_dan: число экзаменов дана. |
 | `info:GetExam(exam)  -> dan exam` | results_dan: экзамен i (с 0, в порядке чарта) или nil. |
+| `info.DanGradeChange  -> number` | results_dan: 0 нет изменений, 1 новый дан-ранг, 2 лучший ранг на уже сданном дане (золото или лучший клир). Движок записывает новый или лучший ранг на табличку игрока. |
+| `info.DanGrade  -> dan grade` | results_dan: ранг дана в сохранении после этой игры; его Title равен "", если дан ни разу не был сдан. |
+| `info.PreviousNameplateDan  -> dan grade` | results_dan: дан-ранг, который табличка показывала до этой игры (Title "", если его не было). |
 
 ### Песня дана
 
@@ -303,6 +306,7 @@ end
 | Метод | Описание |
 | --- | --- |
 | `song.Title  -> string` | Название песни; "???" для песни, которую чарт скрывает. |
+| `song.Subtitle  -> string` | Подзаголовок песни; "" для песни, которую чарт скрывает. |
 | `song.Difficulty  -> number` | От 0 Easy до 4 Extra. |
 | `song.Level  -> number` | Уровень песни. |
 | `song.Good  -> number` | Попадания Good в песне. |
@@ -325,6 +329,16 @@ end
 | `exam.Status  -> number` | 0 не сдан, 1 сдан, 2 сдан на золото. |
 | `exam.IsPerSong  -> boolean` | Истина для экзамена, оцениваемого по каждой песне; тогда сам экзамен относится к последней песне. |
 | `exam:GetSong(song)  -> dan exam` | Экзамен по песням на песне i (с 0) или nil. |
+
+### Дан-ранг
+
+Объект, который возвращают info.DanGrade и info.PreviousNameplateDan, только для чтения.
+
+| Метод | Описание |
+| --- | --- |
+| `grade.Title  -> string` | Название дана, как его показывает табличка (первые два символа названия чарта); "", если его нет. |
+| `grade.Gold  -> boolean` | true для золотой сдачи. |
+| `grade.Tier  -> number` | 0 клир, 1 фулл комбо, 2 перфект. |
 
 ## Фоны
 

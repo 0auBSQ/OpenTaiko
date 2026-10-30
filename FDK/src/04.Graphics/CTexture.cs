@@ -146,8 +146,9 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 						// texColor.a = 1.0;
 					}
 
-					// the output colour is multiplied by its alpha: the blend modes expect it
-					texColor.rgb *= texColor.a;
+					// the output colour is multiplied by its alpha: the blend modes expect it. A tint above 1 saturates
+					// first, so a texture tinted far above 1 still draws white at its opacity
+					texColor.rgb = min(texColor.rgb, vec3(1.0)) * texColor.a;
                     gl_FragColor = texColor;
                 }"
 		);

@@ -1,0 +1,11 @@
+{
+    // Skin locale file, Chinese: dan results (results_dan ROActivity); {0} is a number
+    "Entries": {
+        "DAN_RESULTS_NEW_BEST": "新纪录！",
+        "DAN_RESULTS_BEST": "最佳 {0}",
+        "DAN_RESULTS_EXAM_MORE": "{0}以上",
+        "DAN_RESULTS_EXAM_LESS": "少于{0}",
+        "DAN_RESULTS_DETAILS": "左右：详情",
+        "DAN_RESULTS_SUMMARY": "左右：总览"
+    }
+}

@@ -52,12 +52,8 @@ end
 
 local function fill(s, value) return (s:gsub("{0}", tostring(value))) end
 
--- "812,450"
-local function thousands(n)
-    local s = tostring(math.floor(n))
-    local out = s:reverse():gsub("(%d%d%d)", "%1,"):reverse()
-    return (out:gsub("^,", ""))
-end
+-- "812450", no separators
+local function whole(n) return tostring(math.floor(n)) end
 
 local function clamp01(x) return math.max(0, math.min(1, x)) end
 local function easeOut(x) x = clamp01(x); return 1 - (1 - x) ^ 3 end
@@ -610,17 +606,17 @@ local function drawBottom(b, q)
                 local cw = word.Width - 2 * BOTTOM.judge_padding
                 put(word, b, q, x + cw * BOTTOM.judge_scale / 2, y + BOTTOM.judge_dy, BOTTOM.judge_scale * s, 0, k)
             end
-            text(fonts.judge, thousands(JUDGE_VALUE[j.name]()), b, q, x + BOTTOM.row_width, y, "right", { scale = s, opacity = k })
+            text(fonts.judge, whole(JUDGE_VALUE[j.name]()), b, q, x + BOTTOM.row_width, y, "right", { scale = s, opacity = k })
         end
     end
 
     -- the score counts up; its New best! tag after it, or its best
     local S = BOTTOM.score
     text(fonts.caption, strings.score, b, q, S.x, S.caption_y, "left", { color = col.dim })
-    local final = thousands(info:GetScore(0))
+    local final = whole(info:GetScore(0))
     if clock >= timeline.scoreStart then
         local shown = info:GetScore(0) * easeOut(progress(timeline.scoreStart, Animation.score.count_s))
-        text(fonts.score, thousands(shown), b, q, S.x, S.y, "left", { shadow = Layout.big_shadow_px })
+        text(fonts.score, whole(shown), b, q, S.x, S.y, "left", { shadow = Layout.big_shadow_px })
     end
     local SB = BOTTOM.score_best
     local x0 = S.x + width(fonts.score, final) + SB.gap
@@ -631,12 +627,12 @@ local function drawBottom(b, q)
             cue("jingle_high", "scoreBest")
             if info:GetPreviousBestScore(0) > 0 then
                 local k = progress(timeline.scoreBest, Animation.new_best.pop_s)
-                text(fonts.best, "+" .. thousands(info:GetScore(0) - info:GetPreviousBestScore(0)), b, q, cx, SB.line_y, "center", { color = col.gain, opacity = k })
+                text(fonts.best, "+" .. whole(info:GetScore(0) - info:GetPreviousBestScore(0)), b, q, cx, SB.line_y, "center", { color = col.gain, opacity = k })
             end
         end
     elseif info:GetPreviousBestScore(0) > 0 and clock >= timeline.scoreEnd then
         local k = progress(timeline.scoreEnd, Animation.new_best.pop_s)
-        text(fonts.best, fill(strings.best, thousands(info:GetPreviousBestScore(0))), b, q, x0, S.y, "left", { color = col.dim, opacity = k })
+        text(fonts.best, fill(strings.best, whole(info:GetPreviousBestScore(0))), b, q, x0, S.y, "left", { color = col.dim, opacity = k })
     end
 
     drawLives(b, q)
@@ -818,7 +814,7 @@ function activate(result)
     played, notes, clock, idle = {}, { step = { t = -1, floor = 0 }, count = -1, lives = 0 }, 0, 0
     -- the glyphs the screen shows are baked here, not on their first draw while it animates
     local off = -10000
-    for _, f in pairs(fonts) do f:Draw("0123456789,%+/", off, off, col.text, col.clear) end
+    for _, f in pairs(fonts) do f:Draw("0123456789%+/", off, off, col.text, col.clear) end
     fonts.title:Draw(info.Title, off, off, col.text, col.clear)
     fonts.subtitle:Draw(info.Subtitle, off, off, col.text, col.clear)
     fonts.tag:Draw(strings.newBest, off, off, col.text, col.clear)

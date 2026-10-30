@@ -174,6 +174,7 @@ internal class CStageResult : CStage {
 				var counts = i < game.DanSongScore.Length ? game.DanSongScore[i] : null;
 				return new LuaResultDanSong {
 					title = s.bTitleShow ? "???" : s.Title,
+					subtitle = s.bTitleShow ? "" : s.SubTitle ?? "",
 					difficulty = s.Difficulty,
 					level = s.Level,
 					good = counts?.nGreat ?? 0,
@@ -193,6 +194,13 @@ internal class CStageResult : CStage {
 		info.score[0] = (long)game.actScore.Get(0);
 		info.previousBestScore[0] = bestBefore[0]?.HighScore ?? 0;
 		info.saved[0] = this.IsScoreValid[0];
+		info.danGradeChange = this.danGradeChange;
+		var dans = OpenTaiko.SaveFileInstances[0].data.DanTitles;
+		if (this.danGradeTitle != "" && dans != null && dans.TryGetValue(this.danGradeTitle, out var grade))
+			info.danGrade = new LuaResultDanGrade { title = this.danGradeTitle, gold = grade.isGold, tier = grade.clearStatus };
+		info.previousNameplateDan = new LuaResultDanGrade {
+			title = this.nameplateDanBefore.dan ?? "", gold = this.nameplateDanBefore.gold, tier = this.nameplateDanBefore.type,
+		};
 
 		// the save keeps, per exam, one best amount for each song that has the exam, in the songs' order
 		var best = bestBefore[0];
@@ -404,12 +412,23 @@ internal class CStageResult : CStage {
 
 					// this.st演奏記録[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], clearValue);
 
-					// Unlock dan grade
-					if (clearValue > 0 && !OpenTaiko.ConfigIni.bAutoPlay[0]) {
+					// Unlock dan grade (a watched replay earns nothing); a new or better grade goes onto the nameplate,
+					// which results_dan shows going on
+					var danSave = OpenTaiko.SaveFileInstances[0];
+					this.nameplateDanBefore = (danSave.data.Dan, danSave.data.DanGold, danSave.data.DanType);
+					this.danGradeTitle = "";
+					this.danGradeChange = 0;
+					if (clearValue > 0 && !OpenTaiko.ConfigIni.bAutoPlay[0] && !OpenTaiko.bReplayMode[0]) {
 						string dan_title = OpenTaiko.SongMount.rChoosenSong!.ldTitle.GetString("").RemoveTags();
 						if (dan_title.Length > 2) dan_title = dan_title.Substring(0, 2);
 
-						this.newGradeGranted = OpenTaiko.SaveFileInstances[0].tUpdateDanTitle(dan_title, clearValue % 2 == 0, (clearValue - 1) / 2);
+						bool known = danSave.data.DanTitles?.ContainsKey(dan_title) ?? false;
+						this.danGradeTitle = dan_title;
+						if (danSave.tUpdateDanTitle(dan_title, clearValue % 2 == 0, (clearValue - 1) / 2)) {
+							this.danGradeChange = known ? 2 : 1;
+							danSave.tSetNameplateDan(dan_title);
+							OpenTaiko.NamePlate?.tNamePlateRefreshTitles(0);
+						}
 					}
 
 					#endregion
@@ -922,6 +941,10 @@ internal class CStageResult : CStage {
 							   && ResultsDan is { IsActive: true } danUI && danUI.Call("skip") is [true, ..]) {
 						// results_dan was still animating: it jumped to its end
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
+					} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan
+							   && ResultsDan is { IsActive: true } danNext && danNext.Call("advance") is [true, ..]) {
+						// results_dan went on to another of its screens before the reward pop-ups
+						OpenTaiko.Skin.soundDecideSFX.tPlay();
 					} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower
 							   && ResultsTower is { IsActive: true } towerUI && towerUI.Call("skip") is [true, ..]) {
 						// results_tower was still animating: it jumped to its end
@@ -1026,7 +1049,10 @@ internal class CStageResult : CStage {
 		return examStatus;
 	}
 
-	private bool newGradeGranted = false;
+	// the dan grade this play earned (its title "" when none), 0 / 1 new / 2 better, and the nameplate's before
+	private string danGradeTitle = "";
+	private int danGradeChange;
+	private (string dan, bool gold, int type) nameplateDanBefore = ("", false, 0);
 
 	private static LuaROActivityWrapper? ResultsTower => LuaROActivityWrapper.GetROActivity("results_tower");
 	private static LuaROActivityWrapper? ResultsRegular => LuaROActivityWrapper.GetROActivity("results_regular");

@@ -85,8 +85,13 @@ internal class CScore {
 		public string? nTowerType;
 
 		public int nDanTick;
-		[JsonIgnore]  // keeps System.Drawing.Color out of the source generation graph
-		public Color cDanTickColor;
+		// the song list cache keeps the tick colour as ARGB: System.Drawing.Color stays out of the source generation graph
+		public int nDanTickColorArgb;
+		[JsonIgnore]
+		public Color cDanTickColor {
+			get => Color.FromArgb(nDanTickColorArgb);
+			set => nDanTickColorArgb = value.ToArgb();
+		}
 
 		public List<int[]> nExamResult;
 

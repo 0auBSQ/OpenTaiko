@@ -227,7 +227,7 @@ The engine looks up some ROActivities by fixed folder name and drives them itsel
 | `danplate` | `draw(x, y, opacity, danTick, r, g, b, titleText)` on the result screen and in dan courses. |
 | `results_tower` | `activate(info)` when the tower result opens, with the play as a LuaResultInfo (read-only getters such as `ReachedFloor`, `TotalFloors`, `Lives`, `TowerRank`, `IsNewBestFloor`, `GetScore(player)`); `update()` and `draw()` every frame; `skip()` through Call on decide, returning true while it is still animating (that decide then only skips); `deactivate()`. |
 | `results_regular` | `activate(info)` when a play's result opens, an AI battle's too, with the play as a LuaResultInfo (per-player getters from 0 such as `GetGauge(p)`, `GetClearType(p)`, `GetScoreRank(p)`, `GetScore(p)`, and `IsAIBattle`, `GetAISectionEnd(i)`); `update()` and `draw()` every frame over the result background; `skip()` through Call on decide, returning true while it is still animating (the background then gets `skipAnime`); `deactivate()`. |
-| `results_dan` | `activate(info)` when a dan play's result opens, with the play as a LuaResultInfo (`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`, `exam.PreviousBestAmount`); `update()` and `draw()` every frame over the dan result background; `skip()` through Call on decide, returning true while it is still animating; `swap()` through Call on left or right, returning true when it turns between the exams and the songs; `deactivate()`. |
+| `results_dan` | `activate(info)` when a dan play's result opens, with the play as a LuaResultInfo (`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`, `exam.PreviousBestAmount`, `DanGradeChange`, `DanGrade`); `update()` and `draw()` every frame over the dan result background; `skip()` through Call on decide, returning true while it is still animating; then `advance()` through Call on decide, returning true when it shows one more screen before the reward pop-ups (the engine has already put a new or better dan grade on the nameplate, so the module draws `PreviousNameplateDan` until it reveals it); `swap()` through Call on left or right, returning true when it turns between its screens; `deactivate()`. |
 | `tower_hud` | `activate(maxFloor)` when a tower play starts; `update()` and `draw()` every frame over the upper background; `deactivate()`. It reads the floor and the lives from PLAYSTATE. |
 | `popup_menu` | `activate(title, items, fontSize, ...)` where items are the labels joined by newlines, followed by the PopupMenu skin positions; `draw(selected)` every frame; `deactivate()` on close. |
 | `config_ui` | `activate(model)` with the settings model; `update()` every frame, returning "exit" to leave the settings screen, optionally followed by the name of the Modules/Transitions module for the way back (the plain fade plays instead when a skin, resolution or sound-device change is waiting to apply); `draw()`; `reload(model)` through Call when the engine rebuilds the model; `deactivate()`. |
@@ -295,6 +295,9 @@ The result stage fills it after the play is saved, and it does not change afterw
 | `info:GetDanSong(song)  -> dan song` | results_dan: song i of the dan (from 0), or nil. |
 | `info.ExamCount  -> number` | results_dan: the dan's exams. |
 | `info:GetExam(exam)  -> dan exam` | results_dan: exam i (from 0, in the chart's order), or nil. |
+| `info.DanGradeChange  -> number` | results_dan: 0 none, 1 a new dan grade, 2 a better grade on a dan passed before (gold, or a better clear). The engine puts a new or better grade on the player's nameplate. |
+| `info.DanGrade  -> dan grade` | results_dan: the dan's grade in the save after this play; its Title is "" when the dan was never passed. |
+| `info.PreviousNameplateDan  -> dan grade` | results_dan: the dan grade the nameplate showed before this play (Title "" for none). |
 
 ### Dan song
 
@@ -303,6 +306,7 @@ The object info:GetDanSong returns, read-only.
 | Method | Description |
 | --- | --- |
 | `song.Title  -> string` | The song's title; "???" for a song the chart keeps hidden. |
+| `song.Subtitle  -> string` | The song's subtitle; "" for a song the chart keeps hidden. |
 | `song.Difficulty  -> number` | 0 Easy to 4 Extra. |
 | `song.Level  -> number` | The song's level. |
 | `song.Good  -> number` | Good hits on the song. |
@@ -325,6 +329,16 @@ The object info:GetExam and exam:GetSong return, read-only: an exam as the play 
 | `exam.Status  -> number` | 0 failed, 1 passed, 2 passed gold. |
 | `exam.IsPerSong  -> boolean` | True for an exam judged song by song; the exam itself then is the last song's. |
 | `exam:GetSong(song)  -> dan exam` | A per-song exam on song i (from 0), or nil. |
+
+### Dan grade
+
+The object info.DanGrade and info.PreviousNameplateDan return, read-only.
+
+| Method | Description |
+| --- | --- |
+| `grade.Title  -> string` | The dan's title as the nameplate shows it (the first two characters of the chart's title); "" for none. |
+| `grade.Gold  -> boolean` | True for a gold pass. |
+| `grade.Tier  -> number` | 0 clear, 1 full combo, 2 perfect. |
 
 ## Backgrounds
 

@@ -227,7 +227,7 @@ end
 | `danplate` | 在结算界面和段位课程中调用 `draw(x, y, opacity, danTick, r, g, b, titleText)`。 |
 | `results_tower` | 打开塔结算画面时以 LuaResultInfo 传入本次游玩并调用 `activate(info)`（只读的 getter，如 `ReachedFloor`、`TotalFloors`、`Lives`、`TowerRank`、`IsNewBestFloor`、`GetScore(player)`）；每帧 `update()` 和 `draw()`；确认时通过 Call 调用 `skip()`，仍在播放动画时返回 true（这次确认只会跳过动画）；`deactivate()`。 |
 | `results_regular` | 打开一局（包括 AI 对战）的结算画面时以 LuaResultInfo 传入本局并调用 `activate(info)`（从 0 开始的按玩家 getter，如 `GetGauge(p)`、`GetClearType(p)`、`GetScoreRank(p)`、`GetScore(p)`，以及 `IsAIBattle`、`GetAISectionEnd(i)`）；每帧在结算背景之上 `update()` 和 `draw()`；确认时通过 Call 调用 `skip()`，仍在播放动画时返回 true（背景随后收到 `skipAnime`）；`deactivate()`。 |
-| `results_dan` | 打开段位结算画面时以 LuaResultInfo 传入本局并调用 `activate(info)`（`DanResult`、`DanCombo`、`GetDanSong(i)`、`GetExam(i)`、`exam:GetSong(i)`、`exam.PreviousBestAmount`）；每帧在段位结算背景之上 `update()` 和 `draw()`；确认时通过 Call 调用 `skip()`，仍在播放动画时返回 true；按左或右时通过 Call 调用 `swap()`，在考试与歌曲之间切换时返回 true；`deactivate()`。 |
+| `results_dan` | 打开段位结算画面时以 LuaResultInfo 传入本局并调用 `activate(info)`（`DanResult`、`DanCombo`、`GetDanSong(i)`、`GetExam(i)`、`exam:GetSong(i)`、`exam.PreviousBestAmount`、`DanGradeChange`、`DanGrade`）；每帧在段位结算背景之上 `update()` 和 `draw()`；确认时通过 Call 调用 `skip()`，仍在播放动画时返回 true；随后确认时通过 Call 调用 `advance()`，在奖励弹窗之前还要显示一个画面时返回 true（引擎已把新的或更好的段位写到名牌上，因此模块在揭晓之前绘制 `PreviousNameplateDan`）；按左或右时通过 Call 调用 `swap()`，切换画面时返回 true；`deactivate()`。 |
 | `tower_hud` | 塔模式开始时 `activate(maxFloor)`；每帧在上方背景之上 `update()` 和 `draw()`；`deactivate()`。楼层和生命从 PLAYSTATE 读取。 |
 | `popup_menu` | 调用 `activate(title, items, fontSize, ...)`，其中 items 是用换行符连接的标签，其后是 PopupMenu 的皮肤位置；每帧调用 `draw(selected)`；关闭时调用 `deactivate()`。 |
 | `config_ui` | 以设置模型调用 `activate(model)`；每帧调用 `update()`，返回 "exit" 即离开设置界面，其后可再返回一个 Modules/Transitions 模块名作为返回时的过渡（若有待应用的皮肤、分辨率或声音设备更改，则改为普通淡出）；调用 `draw()`；引擎重建模型时通过 Call 调用 `reload(model)`；调用 `deactivate()`。 |
@@ -295,6 +295,9 @@ end
 | `info:GetDanSong(song)  -> dan song` | results_dan: 段位的第 i 首歌曲（从 0 开始），或 nil。 |
 | `info.ExamCount  -> number` | results_dan: 段位的考试数。 |
 | `info:GetExam(exam)  -> dan exam` | results_dan: 第 i 项考试（从 0 开始，按谱面顺序），或 nil。 |
+| `info.DanGradeChange  -> number` | results_dan: 0 无变化，1 新的段位，2 已合格段位的更好等级（金色或更好的通关）。引擎会把新的或更好的等级写到玩家的名牌上。 |
+| `info.DanGrade  -> dan grade` | results_dan: 本局之后存档中该段位的等级；从未合格时其 Title 为 ""。 |
+| `info.PreviousNameplateDan  -> dan grade` | results_dan: 本局之前名牌显示的段位（没有时 Title 为 ""）。 |
 
 ### 段位歌曲
 
@@ -303,6 +306,7 @@ info:GetDanSong 返回的只读对象。
 | 方法 | 说明 |
 | --- | --- |
 | `song.Title  -> string` | 歌曲的标题；谱面隐藏的歌曲为 "???"。 |
+| `song.Subtitle  -> string` | 歌曲的副标题；谱面隐藏的歌曲为 ""。 |
 | `song.Difficulty  -> number` | 0 简单 到 4 里魔王。 |
 | `song.Level  -> number` | 歌曲的等级。 |
 | `song.Good  -> number` | 该曲的良的数量。 |
@@ -325,6 +329,16 @@ info:GetExam 和 exam:GetSong 返回的只读对象：本局结束时的一项�
 | `exam.Status  -> number` | 0 不合格，1 合格，2 金合格。 |
 | `exam.IsPerSong  -> boolean` | 逐曲判定的考试时为 true；此时该考试本身是最后一首歌曲的。 |
 | `exam:GetSong(song)  -> dan exam` | 单曲考试在第 i 首歌曲（从 0 开始）上的考试，或 nil。 |
+
+### 段位等级
+
+info.DanGrade 和 info.PreviousNameplateDan 返回的对象，只读。
+
+| 方法 | 说明 |
+| --- | --- |
+| `grade.Title  -> string` | 名牌上显示的段位名称（谱面标题的前两个字符）；没有时为 ""。 |
+| `grade.Gold  -> boolean` | 金色合格时为 true。 |
+| `grade.Tier  -> number` | 0 通关，1 全连，2 全良。 |
 
 ## 背景
 

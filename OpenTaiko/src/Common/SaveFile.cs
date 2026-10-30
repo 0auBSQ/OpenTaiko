@@ -103,32 +103,29 @@ internal class SaveFile {
 
 	#region [Dan titles]
 
+	// returns true when the grade is new, or better than the one saved (gold, or a better clear)
 	public bool tUpdateDanTitle(string title, bool isGold, int clearStatus) {
-		bool changed = false;
-
-		bool iG = isGold;
-		int cs = clearStatus;
-
 		if (this.data.DanTitles == null)
 			this.data.DanTitles = new Dictionary<string, CDanTitle>();
 
-		if (this.data.DanTitles.ContainsKey(title)) {
-			if (this.data.DanTitles[title].clearStatus > cs)
-				cs = this.data.DanTitles[title].clearStatus;
-			if (this.data.DanTitles[title].isGold)
-				iG = true;
-		}
+		bool known = this.data.DanTitles.TryGetValue(title, out var old);
+		bool iG = isGold || (known && old!.isGold);
+		int cs = known ? Math.Max(old!.clearStatus, clearStatus) : clearStatus;
+		bool changed = !known || iG != old!.isGold || cs != old.clearStatus;
 
-		// Automatically set the dan to nameplate if new
-		// Add a function within the NamePlate.cs file to update the title texture
-
-		if (!this.data.DanTitles.ContainsKey(title) || cs != clearStatus || iG != isGold) {
+		if (changed)
 			DBSaves.RegisterDanTitle(data.SaveId, title, clearStatus, isGold);
-			changed = true;
-		}
-		CDanTitle danTitle = new CDanTitle(iG, cs);
-		this.data.DanTitles[title] = danTitle;
+		this.data.DanTitles[title] = new CDanTitle(iG, cs);
 		return changed;
+	}
+
+	// shows the dan grade saved under title on the player's nameplate, as the nameplate menu does
+	public void tSetNameplateDan(string title) {
+		if (this.data.DanTitles == null || !this.data.DanTitles.TryGetValue(title, out var grade)) return;
+		this.data.Dan = title;
+		this.data.DanGold = grade.isGold;
+		this.data.DanType = grade.clearStatus;
+		this.tApplyHeyaChanges();
 	}
 
 	#endregion

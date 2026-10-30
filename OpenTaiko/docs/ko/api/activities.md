@@ -227,7 +227,7 @@ end
 | `danplate` | 결과 화면과 단위 코스에서 `draw(x, y, opacity, danTick, r, g, b, titleText)`. |
 | `results_tower` | 타워 결과 화면이 열릴 때 플레이를 LuaResultInfo(`ReachedFloor`, `TotalFloors`, `Lives`, `TowerRank`, `IsNewBestFloor`, `GetScore(player)` 같은 읽기 전용 getter)로 넘겨 `activate(info)`; 매 프레임 `update()`와 `draw()`; 결정 시 Call로 `skip()`, 아직 애니메이션 중이면 true를 반환(그 결정은 건너뛰기만 함); `deactivate()`. |
 | `results_regular` | 플레이 결과(AI 배틀 포함)가 열릴 때 플레이를 LuaResultInfo(0부터 시작하는 플레이어별 getter `GetGauge(p)`, `GetClearType(p)`, `GetScoreRank(p)`, `GetScore(p)`, 그리고 `IsAIBattle`, `GetAISectionEnd(i)`)로 넘겨 `activate(info)`; 매 프레임 결과 배경 위에 `update()`와 `draw()`; 결정 시 Call로 `skip()`, 아직 애니메이션 중이면 true를 반환(배경에는 `skipAnime`이 전달됨); `deactivate()`. |
-| `results_dan` | 단위 플레이 결과가 열릴 때 플레이를 LuaResultInfo(`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`, `exam.PreviousBestAmount`)로 넘겨 `activate(info)`; 매 프레임 단위 결과 배경 위에 `update()`와 `draw()`; 결정 시 Call로 `skip()`, 아직 애니메이션 중이면 true를 반환; 왼쪽 또는 오른쪽에서 Call로 `swap()`, 시험과 곡 사이를 전환하면 true를 반환; `deactivate()`. |
+| `results_dan` | 단위 플레이 결과가 열릴 때 플레이를 LuaResultInfo(`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`, `exam.PreviousBestAmount`, `DanGradeChange`, `DanGrade`)로 넘겨 `activate(info)`; 매 프레임 단위 결과 배경 위에 `update()`와 `draw()`; 결정 시 Call로 `skip()`, 아직 애니메이션 중이면 true를 반환; 이어서 결정 시 Call로 `advance()`, 보상 팝업 전에 화면을 하나 더 보여 줄 때 true를 반환(새 단위나 오른 단위는 엔진이 이미 네임플레이트에 반영했으므로, 모듈은 공개할 때까지 `PreviousNameplateDan`을 그림); 왼쪽 또는 오른쪽에서 Call로 `swap()`, 화면을 전환하면 true를 반환; `deactivate()`. |
 | `tower_hud` | 타워 플레이 시작 시 `activate(maxFloor)`; 매 프레임 상단 배경 위에 `update()`와 `draw()`; `deactivate()`. 층과 라이프는 PLAYSTATE에서 읽습니다. |
 | `popup_menu` | `activate(title, items, fontSize, ...)`. items는 줄바꿈으로 이어진 라벨이고, 그 뒤에 PopupMenu 스킨 위치가 옵니다. 매 프레임 `draw(selected)`; 닫힐 때 `deactivate()`. |
 | `config_ui` | 설정 모델과 함께 `activate(model)`; 매 프레임 `update()`를 호출하며 "exit"를 반환하면 설정 화면을 떠남, 그 뒤에 Modules/Transitions 모듈 이름을 반환하면 돌아갈 때 그 트랜지션을 사용(스킨·해상도·사운드 장치 변경이 적용 대기 중이면 기본 페이드); `draw()`; 엔진이 모델을 다시 만들 때 Call을 통한 `reload(model)`; `deactivate()`. |
@@ -295,6 +295,9 @@ end
 | `info:GetDanSong(song)  -> dan song` | results_dan: 단위의 i번째 곡(0부터), 없으면 nil. |
 | `info.ExamCount  -> number` | results_dan: 단위의 시험 수. |
 | `info:GetExam(exam)  -> dan exam` | results_dan: i번째 시험(0부터, 채보 순서), 없으면 nil. |
+| `info.DanGradeChange  -> number` | results_dan: 0 변화 없음, 1 새 단위, 2 이미 합격한 단위의 더 나은 등급(금, 또는 더 나은 클리어). 엔진이 새 등급이나 더 나은 등급을 플레이어의 네임플레이트에 반영합니다. |
+| `info.DanGrade  -> dan grade` | results_dan: 이 플레이 후 세이브에 기록된 이 단위의 등급. 합격한 적이 없으면 Title은 "". |
+| `info.PreviousNameplateDan  -> dan grade` | results_dan: 이 플레이 전에 네임플레이트에 표시되던 단위 등급(없으면 Title은 ""). |
 
 ### 단위 곡
 
@@ -303,6 +306,7 @@ info:GetDanSong이 반환하는 읽기 전용 객체입니다.
 | 메서드 | 설명 |
 | --- | --- |
 | `song.Title  -> string` | 곡의 제목. 채보가 숨긴 곡은 "???". |
+| `song.Subtitle  -> string` | 곡의 부제. 채보가 숨긴 곡은 "". |
 | `song.Difficulty  -> number` | 0 쉬움부터 4 뒷귀신. |
 | `song.Level  -> number` | 곡의 레벨. |
 | `song.Good  -> number` | 그 곡의 Good 판정 수. |
@@ -325,6 +329,16 @@ info:GetExam과 exam:GetSong이 반환하는 읽기 전용 객체로, 플레이�
 | `exam.Status  -> number` | 0 불합격, 1 합격, 2 금합격. |
 | `exam.IsPerSong  -> boolean` | 곡마다 판정되는 시험이면 true. 이때 이 시험 자체는 마지막 곡의 것입니다. |
 | `exam:GetSong(song)  -> dan exam` | 곡별 시험의 i번째 곡(0부터) 것, 없으면 nil. |
+
+### 단위 등급
+
+info.DanGrade와 info.PreviousNameplateDan이 반환하는 객체(읽기 전용).
+
+| 메서드 | 설명 |
+| --- | --- |
+| `grade.Title  -> string` | 네임플레이트에 표시되는 단위 이름(채보 제목의 처음 두 글자). 없으면 "". |
+| `grade.Gold  -> boolean` | 금 합격이면 true. |
+| `grade.Tier  -> number` | 0 클리어, 1 풀 콤보, 2 퍼펙트. |
 
 ## 배경
 

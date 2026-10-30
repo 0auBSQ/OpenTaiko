@@ -61,6 +61,9 @@ public sealed class LuaResultInfo {
 	internal int examSong;
 	internal LuaResultDanSong[] danSongs = [];
 	internal LuaResultExam[] exams = [];
+	internal int danGradeChange;
+	internal LuaResultDanGrade danGrade = new();
+	internal LuaResultDanGrade previousNameplateDan = new();
 
 	public string Title => title;
 	public string Subtitle => subtitle;
@@ -145,6 +148,13 @@ public sealed class LuaResultInfo {
 	public int ExamCount => exams.Length;
 	/// <summary>Exam i (from 0, the chart's order), or nil.</summary>
 	public LuaResultExam? GetExam(int exam) => At(exams, exam);
+	/// <summary>0 no change, 1 a new dan grade, 2 a better grade on a dan passed before (gold, or a better clear).
+	/// A new or better grade goes onto the player's nameplate.</summary>
+	public int DanGradeChange => danGradeChange;
+	/// <summary>The dan's grade in the save after this play; its Title is "" when the dan was not passed.</summary>
+	public LuaResultDanGrade DanGrade => danGrade;
+	/// <summary>The dan grade the nameplate showed before this play.</summary>
+	public LuaResultDanGrade PreviousNameplateDan => previousNameplateDan;
 
 	private static T At<T>(T[] values, int player) => player >= 0 && player < values.Length ? values[player] : default!;
 }
@@ -152,10 +162,13 @@ public sealed class LuaResultInfo {
 /// <summary>A song of a dan play.</summary>
 public sealed class LuaResultDanSong {
 	internal string title = "";
+	internal string subtitle = "";
 	internal int difficulty, level, good, ok, bad, roll;
 
 	/// <summary>"???" for a song the chart keeps hidden.</summary>
 	public string Title => title;
+	/// <summary>"" for a song the chart keeps hidden.</summary>
+	public string Subtitle => subtitle;
 	/// <summary>0 Easy to 4 Extra.</summary>
 	public int Difficulty => difficulty;
 	public int Level => level;
@@ -163,6 +176,18 @@ public sealed class LuaResultDanSong {
 	public int Ok => ok;
 	public int Bad => bad;
 	public int Roll => roll;
+}
+
+/// <summary>A dan grade: the dan's title (as the nameplate shows it), gold or red, and its clear.</summary>
+public sealed class LuaResultDanGrade {
+	internal string title = "";
+	internal bool gold;
+	internal int tier;
+
+	public string Title => title;
+	public bool Gold => gold;
+	/// <summary>0 clear, 1 full combo, 2 perfect.</summary>
+	public int Tier => tier;
 }
 
 /// <summary>An exam of a dan play, as it ended.</summary>

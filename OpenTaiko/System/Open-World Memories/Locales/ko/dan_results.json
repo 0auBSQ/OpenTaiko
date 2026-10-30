@@ -1,0 +1,11 @@
+{
+    // Skin locale file, Korean: dan results (results_dan ROActivity); {0} is a number
+    "Entries": {
+        "DAN_RESULTS_NEW_BEST": "최고 기록 갱신!",
+        "DAN_RESULTS_BEST": "최고 기록 {0}",
+        "DAN_RESULTS_EXAM_MORE": "{0} 이상",
+        "DAN_RESULTS_EXAM_LESS": "{0} 미만",
+        "DAN_RESULTS_DETAILS": "좌우: 상세",
+        "DAN_RESULTS_SUMMARY": "좌우: 요약"
+    }
+}
