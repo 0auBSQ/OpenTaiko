@@ -1230,7 +1230,7 @@ internal class OpenTaiko : Game {
 					&& rCurrentStage.eStageID != CStage.EStage.StartUp
 					&& rCurrentStage.eStageID != CStage.EStage.CRASH
 					&& OpenTaiko.Tx.Network_Connection != null) {
-					if (Math.Abs(SoundManager.PlayTimer.SystemTimeMs - this.PreviousSystemTimeMs) > 10000) {
+					if (SoundManager.PlayTimer.SystemTimeMs > this.PreviousSystemTimeMs + 10000) {
 						this.PreviousSystemTimeMs = SoundManager.PlayTimer.SystemTimeMs;
 						Task.Factory.StartNew(() => {
 							//IPv4 8.8.8.8にPingを送信する(timeout 5000ms)
