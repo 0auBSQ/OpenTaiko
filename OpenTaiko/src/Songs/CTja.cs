@@ -20,22 +20,26 @@ internal class CTja : CActivity {
 
 	[Flags]
 	public enum EBPMPointType {
-		// parsing-time timing + information
-		InitBpm = 0,
+		// lower bits: passive (parsing-time timing + information)
+		InitBpm = 0, // deny merging with all
+
+		// timing is realigned after merging
 		BranchEnd = 1 << 0,
 		DelayStart = 1 << 1,
 		DelayEnd = 1 << 2,
 		Scroll = 1 << 3,
 		ScrollMode = 1 << 4,
 		Measure = 1 << 5,
+		HiSpeed = 1 << 6, // #HISPEED: the visual beat advances at a new rate from here
+
+		// higher bits: merging control
 
 		// timing is rounded in Jiro1 mode
-		BpmMeasEnd = 1 << 7,
-		Bpm = 1 << 6,
+		Bpm = 1 << 10, // merging (last) + Bpm => realign (last) to Bpm
+		BpmMeasEnd = 1 << 11, // merging BpmMeasEnd + (next) => realign (next) to BpmMeasEnd, priority over Bpm
 
-		BpmAtDiv = 1 << 8, // controls forced NMScroll
-		DelayStop = 1 << 9,
-		HiSpeed = 1 << 10, // #HISPEED: the visual beat advances at a new rate from here
+		BpmAtDiv = 1 << 12, // controls forced NMScroll, deny merging with itself
+		DelayStop = 1 << 13, // deny merging with all
 	}
 	public class CBPM {
 		public required double dbBPMValue;
