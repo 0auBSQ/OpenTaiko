@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.112] - 2026-10-30 (Beta)
+
+- [Fix] Network pinging can crash due to Math.Abs() negated long.MinValue when checking the timestamp
+
 ## [0.6.0.111] - 2026-09-12 (Beta)
 
 - [Fix] Graphics Device and inputs not being properly initialized when used with OpenTaiko Hub 0.2 or newer
