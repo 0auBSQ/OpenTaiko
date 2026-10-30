@@ -259,7 +259,7 @@ end
 | `info:GetBoomCount(player)  -> number` | 叩いた爆弾の数。 |
 | `info:GetScore(player)  -> number` | 最終スコア。 |
 | `info:GetPreviousBestScore(player)  -> number` | このプレイが保存される前の、この譜面と難易度でのプレイヤーのハイスコア。なければ 0。 |
-| `info:IsSaved(player)  -> boolean` | プレイがプレイヤーのセーブに記録されたとき true (オートや再生中のリプレイでは記録されません)。 |
+| `info:IsSaved(player)  -> boolean` | プレイがプレイヤーのセーブに記録されたとき true (オート、再生中のリプレイ、未知の塔のように実行時に組み立てた段位では記録されません)。 |
 | `info:GetDifficulty(player)  -> number` | results_regular: プレイした難易度。0 かんたん から 4 裏鬼。 |
 | `info:GetGauge(player)  -> number` | results_regular: プレイ終了時の魂ゲージ。0 から 100。 |
 | `info:GetGaugeType(player)  -> number` | results_regular: 0 ノーマル、1 ハード、2 エクストリーム。 |

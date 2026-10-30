@@ -259,7 +259,7 @@ L'étape de résultats le remplit une fois la partie enregistrée, et il ne chan
 | `info:GetBoomCount(player)  -> number` | Bombes touchées. |
 | `info:GetScore(player)  -> number` | Score final. |
 | `info:GetPreviousBestScore(player)  -> number` | Le meilleur score du joueur sur ce chart et cette difficulté avant l'enregistrement de cette partie, 0 s'il n'y en a pas. |
-| `info:IsSaved(player)  -> boolean` | Vrai quand la partie a été enregistrée dans la sauvegarde du joueur (jamais en auto ni pour un replay regardé). |
+| `info:IsSaved(player)  -> boolean` | Vrai quand la partie a été enregistrée dans la sauvegarde du joueur (jamais en auto, pour un replay regardé ni pour un dan construit à l'exécution comme ceux de la pagode). |
 | `info:GetDifficulty(player)  -> number` | results_regular: la difficulté jouée, de 0 Easy à 4 Extra. |
 | `info:GetGauge(player)  -> number` | results_regular: la jauge d'âme en fin de partie, de 0 à 100. |
 | `info:GetGaugeType(player)  -> number` | results_regular: 0 normale, 1 difficile, 2 extrême. |

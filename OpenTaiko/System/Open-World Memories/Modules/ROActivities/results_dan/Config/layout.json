@@ -129,6 +129,10 @@
         "list": [[0, 0, 100], [0, 100, 0], [150, 110, 0], [139, 0, 0], [75, 0, 130]]
     },
     "player": { "nameplate": [50, 932], "modicons": [48, 1017] },
+    "stage_background": {
+        "_note": "a stage's own dan background (the pagoda's loading one), its brightness mapped onto these blues",
+        "stops": [[0.0, 40, 56, 110], [0.35, 110, 138, 205], [0.6, 150, 182, 230], [0.85, 196, 218, 247], [1.0, 222, 236, 255]]
+    },
     "grade": {
         "_note": "the third screen, a new or better dan grade: the background by its clear (silver, full combo gold, perfect rainbow), the kanji red or gold as the pass",
         "background": { "scale": 2.2, "glow": [960, 270], "glow_scale": 2.6, "glow_opacity": 0.35, "flash_from": 1.0, "flash_to": 9.0 },

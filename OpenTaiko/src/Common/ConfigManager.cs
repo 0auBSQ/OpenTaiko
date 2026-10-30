@@ -39,6 +39,20 @@ public static class ConfigManager {
 	}
 
 	/// <summary>
+	/// Reads a file with <paramref name="read"/>, or returns <paramref name="fallback"/> when the file is missing or
+	/// broken (the error goes to the log), so one bad file does not stop everything loaded after it.
+	/// </summary>
+	public static T ReadOr<T>(string filePath, Func<string, T?> read, T fallback) {
+		if (!File.Exists(filePath)) return fallback;
+		try {
+			return read(filePath) ?? fallback;
+		} catch (Exception e) {
+			System.Diagnostics.Trace.TraceWarning($"Could not read {filePath}, using defaults: {e.Message}");
+			return fallback;
+		}
+	}
+
+	/// <summary>
 	/// Writes the object to a file.
 	/// </summary>
 	/// <param name="obj">Object to serialize.</param>

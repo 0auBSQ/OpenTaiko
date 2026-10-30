@@ -56,22 +56,8 @@ class CPuchichara {
 		// Puchichara welcome sfx
 		welcome = new CSkin.CSystemSound($@"{path}{Path.DirectorySeparatorChar}Welcome.ogg", false, false, true, ESoundGroup.Voice);
 
-		// Puchichara metadata
-		if (File.Exists($@"{path}{Path.DirectorySeparatorChar}Metadata.json"))
-			metadata = ConfigManager.GetConfig<DBPuchichara.PuchicharaData>($@"{path}{Path.DirectorySeparatorChar}Metadata.json");
-		else
-			metadata = new DBPuchichara.PuchicharaData();
-
-		// Puchichara metadata
-		if (File.Exists($@"{path}{Path.DirectorySeparatorChar}Effects.json"))
-			effect = ConfigManager.GetConfig<DBPuchichara.PuchicharaEffect>($@"{path}{Path.DirectorySeparatorChar}Effects.json");
-		else
-			effect = new DBPuchichara.PuchicharaEffect();
-
-		// Puchichara unlockables
-		if (File.Exists($@"{path}{Path.DirectorySeparatorChar}Unlock.json"))
-			unlock = OpenTaiko.UnlockConditionFactory.GenerateUnlockObjectFromJsonPath($@"{path}{Path.DirectorySeparatorChar}Unlock.json");
-		else
-			unlock = null;
+		metadata = ConfigManager.ReadOr(Path.Combine(path, "Metadata.json"), ConfigManager.GetConfig<DBPuchichara.PuchicharaData>, new DBPuchichara.PuchicharaData());
+		effect = ConfigManager.ReadOr(Path.Combine(path, "Effects.json"), ConfigManager.GetConfig<DBPuchichara.PuchicharaEffect>, new DBPuchichara.PuchicharaEffect());
+		unlock = ConfigManager.ReadOr<CUnlockCondition?>(Path.Combine(path, "Unlock.json"), p => OpenTaiko.UnlockConditionFactory.GenerateUnlockObjectFromJsonPath(p), null);
 	}
 }

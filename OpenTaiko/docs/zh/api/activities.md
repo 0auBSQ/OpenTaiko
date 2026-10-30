@@ -259,7 +259,7 @@ end
 | `info:GetBoomCount(player)  -> number` | 击中的炸弹数。 |
 | `info:GetScore(player)  -> number` | 最终分数。 |
 | `info:GetPreviousBestScore(player)  -> number` | 保存本局之前，玩家在该谱面和难度上的最高分，没有时为 0。 |
-| `info:IsSaved(player)  -> boolean` | 本局记入玩家存档时为 true（自动演奏或观看回放时从不记入）。 |
+| `info:IsSaved(player)  -> boolean` | 本局记入玩家存档时为 true（自动演奏、观看回放或像未知之塔那样在运行时组建的段位从不记入）。 |
 | `info:GetDifficulty(player)  -> number` | results_regular: 游玩的难度，0 简单 到 4 里魔王。 |
 | `info:GetGauge(player)  -> number` | results_regular: 本局结束时的魂槽，0 到 100。 |
 | `info:GetGaugeType(player)  -> number` | results_regular: 0 普通，1 困难，2 极限。 |

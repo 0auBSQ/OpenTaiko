@@ -4,6 +4,8 @@
 -- (true while still animating), then advance() (true when a new or better dan grade gets its own screen before the
 -- reward pop-ups), swap() on left or right (true when the verdict and the details trade places) and deactivate().
 
+local PlayStrings = require("PlayStrings")
+
 -- positions, sizes and colours: Config/layout.json; the timeline, the motion and the sounds: Config/animation.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
@@ -12,6 +14,9 @@ local V, D, T, TAG, G = Layout.verdict, Layout.details, Layout.ticket, Layout.ta
 local A1, A3 = Animation.verdict, Animation.grade
 
 local GRAPHICS_DIR = "../../../Graphics/"   -- the selected judges pack
+-- a stage can give the dan it mounts its own background (the song_loading transition shows it too): this shared
+-- string holds its path from the Modules folder, read only for the chart the stage stamped
+local STAGE_BACKGROUND_KEY = "song_loading_dan_bg"
 local RANK_CELLS = 7                        -- Rank.png: failed, then red and gold passes, full combos, perfects
 local SCROLLS = { "Pass", "FullCombo", "Perfect" }
 local BACKS = { "Silver", "Gold", "Rainbow" }   -- the grade screen's background by the clear: pass, full combo, perfect
@@ -36,6 +41,7 @@ local view, swapAt = 1, nil -- 1 the verdict, 2 the details; when the last swap 
 local grade = nil           -- the grade screen's timeline, once advance() started it
 local chara = nil
 local judgeWords, judgeFrames, judgeCellH = nil, 5, 100
+local stageTint = nil       -- the gradient map of a stage's own background
 local duckMusic             -- with the music, below
 
 -- ── helpers ──────────────────────────────────────────────────────────────────────────────────────────
@@ -494,7 +500,7 @@ local function drawSongRow(i, x, y, op)
     else
         text(fonts.songTitle, s.Title, x + B.title[1], y + B.count_y, "left", o)
     end
-    local played = i <= info.DanSongReached
+    local reached = i <= info.DanSongReached
     local counts = { s.Good, s.Ok, s.Bad, s.Roll }
     local sep, body = B.separator, tex.fillBody
     for k, v in ipairs(counts) do
@@ -504,8 +510,8 @@ local function drawSongRow(i, x, y, op)
         body:SetScale(sep.width / body.Width, sep.height / (body.Height - 4))
         body:DrawAtAnchor(cx - B.column_width / 2, y + B.count_y, "center")
         body:SetColor(1.0, 1.0, 1.0)
-        text(fonts.count, played and whole(v) or "--", cx, y + B.count_y, "center",
-            { color = played and col.ink or col.dimInk, shadow = 0, opacity = op, maxW = B.column_width - 12 })
+        text(fonts.count, reached and whole(v) or "--", cx, y + B.count_y, "center",
+            { color = reached and col.ink or col.dimInk, shadow = 0, opacity = op, maxW = B.column_width - 12 })
     end
 end
 
@@ -1035,6 +1041,22 @@ local function loadTextures()
     if judgeFile == "" then judgeFile = "5_Game/Judge.png" end
     tex.judge = TEXTURE:CreateTexture(GRAPHICS_DIR .. judgeFile)
     judgeFrames = THEME:GetJudgeFrames()
+    -- a stage's own background for its dan (the pagoda's), in the dan result's blues
+    local own = PlayStrings.get(STAGE_BACKGROUND_KEY)
+    if own ~= "" then
+        tex.stageBack = TEXTURE:CreateTexture("../../" .. own)
+        stageTint = GRADIENT:Create(Layout.stage_background.stops, 1)
+        tex.stageBack:SetGradientMap(stageTint)
+    end
+end
+
+-- a stage's own background over the result background, covering the screen's width
+local function drawStageBackground()
+    local b = tex.stageBack
+    if b == nil then return end
+    local s = W / b.Width
+    b:SetScale(s, s)
+    b:DrawAtAnchor(W / 2, H / 2, "center")
 end
 
 local function loadSounds()
@@ -1116,6 +1138,8 @@ function deactivate()
     sounds = {}
     disposeAll(tex)
     tex = {}
+    if stageTint ~= nil then pcall(function() stageTint:Dispose() end) end
+    stageTint = nil
     for _, c in pairs(judgeWords or {}) do pcall(function() c:Dispose() end) end
     judgeWords = nil
     if chara ~= nil then
@@ -1192,6 +1216,7 @@ function draw()
     if not active then return end
     buildJudgeWords()
     local op = grade ~= nil and 1 - easeOut(progress(grade.t0, A3.fade_out_ms)) or 1
+    drawStageBackground()
     if op > 0 then
         local k = swapK()
         drawPlate(k, op)

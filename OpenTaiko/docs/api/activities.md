@@ -259,7 +259,7 @@ The result stage fills it after the play is saved, and it does not change afterw
 | `info:GetBoomCount(player)  -> number` | Bombs hit. |
 | `info:GetScore(player)  -> number` | Final score. |
 | `info:GetPreviousBestScore(player)  -> number` | The player's best score on this chart and difficulty before this play was saved, 0 when none. |
-| `info:IsSaved(player)  -> boolean` | True when the play went into the player's save (never on auto or for a watched replay). |
+| `info:IsSaved(player)  -> boolean` | True when the play went into the player's save (never on auto, for a watched replay or for a dan built at runtime such as the pagoda's). |
 | `info:GetDifficulty(player)  -> number` | results_regular: the difficulty played, 0 Easy to 4 Extra. |
 | `info:GetGauge(player)  -> number` | results_regular: the soul gauge at the end of the play, 0 to 100. |
 | `info:GetGaugeType(player)  -> number` | results_regular: 0 normal, 1 hard, 2 extreme. |

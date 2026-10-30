@@ -302,23 +302,9 @@ abstract class CCharacter : IDisposable {
 			dirName = Path.GetFileName(path);
 			_idx = i;
 
-			// Character metadata
-			if (File.Exists($@"{path}{Path.DirectorySeparatorChar}Metadata.json"))
-				metadata = ConfigManager.GetConfig<DBCharacter.CharacterData>($@"{path}{Path.DirectorySeparatorChar}Metadata.json");
-			else
-				metadata = new DBCharacter.CharacterData();
-
-			// Character metadata
-			if (File.Exists($@"{path}{Path.DirectorySeparatorChar}Effects.json"))
-				effect = ConfigManager.GetConfig<DBCharacter.CharacterEffect>($@"{path}{Path.DirectorySeparatorChar}Effects.json");
-			else
-				effect = new DBCharacter.CharacterEffect();
-
-			// Character unlockables
-			if (File.Exists($@"{path}{Path.DirectorySeparatorChar}Unlock.json"))
-				unlock = OpenTaiko.UnlockConditionFactory.GenerateUnlockObjectFromJsonPath($@"{path}{Path.DirectorySeparatorChar}Unlock.json");
-			else
-				unlock = null;
+			metadata = ConfigManager.ReadOr(Path.Combine(path, "Metadata.json"), ConfigManager.GetConfig<DBCharacter.CharacterData>, new DBCharacter.CharacterData());
+			effect = ConfigManager.ReadOr(Path.Combine(path, "Effects.json"), ConfigManager.GetConfig<DBCharacter.CharacterEffect>, new DBCharacter.CharacterEffect());
+			unlock = ConfigManager.ReadOr<CUnlockCondition?>(Path.Combine(path, "Unlock.json"), p => OpenTaiko.UnlockConditionFactory.GenerateUnlockObjectFromJsonPath(p), null);
 		}
 	}
 

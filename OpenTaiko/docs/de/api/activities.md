@@ -259,7 +259,7 @@ Die Ergebnisstufe füllt es, nachdem das Spiel gespeichert wurde, und danach än
 | `info:GetBoomCount(player)  -> number` | Getroffene Bomben. |
 | `info:GetScore(player)  -> number` | Endpunktzahl. |
 | `info:GetPreviousBestScore(player)  -> number` | Die beste Punktzahl des Spielers auf diesem Chart und Schwierigkeitsgrad, bevor dieses Spiel gespeichert wurde, 0 wenn keine. |
-| `info:IsSaved(player)  -> boolean` | True, wenn das Spiel in den Spielstand des Spielers eingegangen ist (nie mit Auto oder bei einer angesehenen Wiederholung). |
+| `info:IsSaved(player)  -> boolean` | True, wenn das Spiel in den Spielstand des Spielers eingegangen ist (nie mit Auto, bei einer angesehenen Wiederholung oder bei einem zur Laufzeit gebauten Dan wie denen der Pagode). |
 | `info:GetDifficulty(player)  -> number` | results_regular: der gespielte Schwierigkeitsgrad, 0 Easy bis 4 Extra. |
 | `info:GetGauge(player)  -> number` | results_regular: die Seelenanzeige am Ende des Spiels, 0 bis 100. |
 | `info:GetGaugeType(player)  -> number` | results_regular: 0 normal, 1 hart, 2 extrem. |

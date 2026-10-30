@@ -259,7 +259,7 @@ La etapa de resultados lo rellena después de guardar la partida y ya no cambia.
 | `info:GetBoomCount(player)  -> number` | Bombas golpeadas. |
 | `info:GetScore(player)  -> number` | Puntuación final. |
 | `info:GetPreviousBestScore(player)  -> number` | La mejor puntuación del jugador en este chart y dificultad antes de guardar esta partida, 0 si no hay ninguna. |
-| `info:IsSaved(player)  -> boolean` | Verdadero cuando la partida quedó en el guardado del jugador (nunca en auto ni al ver una repetición). |
+| `info:IsSaved(player)  -> boolean` | Verdadero cuando la partida quedó en el guardado del jugador (nunca en auto, al ver una repetición ni en un dan creado en tiempo de ejecución como los de la pagoda). |
 | `info:GetDifficulty(player)  -> number` | results_regular: la dificultad jugada, de 0 Easy a 4 Extra. |
 | `info:GetGauge(player)  -> number` | results_regular: el medidor de alma al final de la partida, de 0 a 100. |
 | `info:GetGaugeType(player)  -> number` | results_regular: 0 normal, 1 difícil, 2 extremo. |

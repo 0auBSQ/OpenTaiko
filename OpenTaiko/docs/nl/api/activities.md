@@ -259,7 +259,7 @@ De resultaatstage vult het nadat de play is opgeslagen, en daarna verandert het 
 | `info:GetBoomCount(player)  -> number` | Geraakte bommen. |
 | `info:GetScore(player)  -> number` | Eindscore. |
 | `info:GetPreviousBestScore(player)  -> number` | De beste score van de speler op deze chart en moeilijkheid voordat deze play werd opgeslagen, 0 als er geen is. |
-| `info:IsSaved(player)  -> boolean` | True wanneer de play in de save van de speler is opgenomen (nooit op auto of bij een bekeken replay). |
+| `info:IsSaved(player)  -> boolean` | True wanneer de play in de save van de speler is opgenomen (nooit op auto, bij een bekeken replay of bij een dan die tijdens het spel is gebouwd, zoals die van de pagode). |
 | `info:GetDifficulty(player)  -> number` | results_regular: de gespeelde moeilijkheid, 0 Easy tot 4 Extra. |
 | `info:GetGauge(player)  -> number` | results_regular: de zielmeter aan het einde van de play, 0 tot 100. |
 | `info:GetGaugeType(player)  -> number` | results_regular: 0 normaal, 1 moeilijk, 2 extreem. |

@@ -259,7 +259,7 @@ end
 | `info:GetBoomCount(player)  -> number` | 친 폭탄 수. |
 | `info:GetScore(player)  -> number` | 최종 점수. |
 | `info:GetPreviousBestScore(player)  -> number` | 이 플레이가 저장되기 전, 이 채보와 난이도에서의 플레이어 최고 점수. 없으면 0. |
-| `info:IsSaved(player)  -> boolean` | 플레이가 플레이어의 세이브에 기록되면 true(오토나 시청한 리플레이는 기록되지 않음). |
+| `info:IsSaved(player)  -> boolean` | 플레이가 플레이어의 세이브에 기록되면 true(오토, 시청한 리플레이, 미지의 탑처럼 실행 중에 만든 단위는 기록되지 않음). |
 | `info:GetDifficulty(player)  -> number` | results_regular: 플레이한 난이도, 0 쉬움부터 4 뒷귀신. |
 | `info:GetGauge(player)  -> number` | results_regular: 플레이가 끝날 때의 혼 게이지, 0에서 100. |
 | `info:GetGaugeType(player)  -> number` | results_regular: 0 노멀, 1 하드, 2 익스트림. |

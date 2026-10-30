@@ -259,7 +259,7 @@ end
 | `info:GetBoomCount(player)  -> number` | Попадания по бомбам. |
 | `info:GetScore(player)  -> number` | Итоговый счёт. |
 | `info:GetPreviousBestScore(player)  -> number` | Лучший счёт игрока на этом чарте и сложности до сохранения этой игры, 0, если его нет. |
-| `info:IsSaved(player)  -> boolean` | Истина, если игра попала в сохранение игрока (никогда на автоигре или при просмотре повтора). |
+| `info:IsSaved(player)  -> boolean` | Истина, если игра попала в сохранение игрока (никогда на автоигре, при просмотре повтора или в дане, собранном во время игры, как в пагоде). |
 | `info:GetDifficulty(player)  -> number` | results_regular: сыгранная сложность, от 0 Easy до 4 Extra. |
 | `info:GetGauge(player)  -> number` | results_regular: шкала души в конце игры, от 0 до 100. |
 | `info:GetGaugeType(player)  -> number` | results_regular: 0 обычная, 1 сложная, 2 экстремальная. |

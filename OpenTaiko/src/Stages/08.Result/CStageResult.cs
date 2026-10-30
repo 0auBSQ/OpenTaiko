@@ -412,13 +412,15 @@ internal class CStageResult : CStage {
 
 					// this.st演奏記録[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], clearValue);
 
-					// Unlock dan grade (a watched replay earns nothing); a new or better grade goes onto the nameplate,
-					// which results_dan shows going on
+					// Unlock dan grade (a watched replay earns nothing, nor a dan built at runtime like the pagoda's,
+					// which keeps no score either); a new or better grade goes onto the nameplate, which results_dan
+					// shows going on
 					var danSave = OpenTaiko.SaveFileInstances[0];
 					this.nameplateDanBefore = (danSave.data.Dan, danSave.data.DanGold, danSave.data.DanType);
 					this.danGradeTitle = "";
 					this.danGradeChange = 0;
-					if (clearValue > 0 && !OpenTaiko.ConfigIni.bAutoPlay[0] && !OpenTaiko.bReplayMode[0]) {
+					if (clearValue > 0 && !OpenTaiko.ConfigIni.bAutoPlay[0] && !OpenTaiko.bReplayMode[0]
+						&& OpenTaiko.SongMount.rChoosenSong!.uniqueId != null) {
 						string dan_title = OpenTaiko.SongMount.rChoosenSong!.ldTitle.GetString("").RemoveTags();
 						if (dan_title.Length > 2) dan_title = dan_title.Substring(0, 2);
 

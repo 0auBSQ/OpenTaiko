@@ -671,10 +671,15 @@ class TextureLoader {
 			charaDirNames[i] = Characters[i].dirName;
 		}
 
+		// before the player loads below, so CHARACTERLIST exists even if one of them fails
+		LuaCharacterDb?.Dispose();
+		LuaCharacterDb = new LuaCharacterDatabase(Characters);
+
 		for (int i = 0; i < 5; i++) {
 			BootLabel = $"CHARACTERS ... player {i + 1} ({OpenTaiko.SaveFileInstances[i].data.Character})";
 			OpenTaiko.SaveFileInstances[i].tReindexCharacter(charaDirNames);
-			this.ReloadCharacter(-1, OpenTaiko.SaveFileInstances[i].data.Character, i, true);
+			if (Characters.Length > 0)
+				this.ReloadCharacter(-1, OpenTaiko.SaveFileInstances[i].data.Character, i, true);
 			PaletteManager.RestoreFromSave(i);
 			PlayerCharacters[i] = new LuaCharacter(i);
 
@@ -683,9 +688,6 @@ class TextureLoader {
 			if (OpenTaiko.Skin.Puchicharas_Name.Length > 0 && !OpenTaiko.Skin.Puchicharas_NameToIndex.ContainsKey(puchi))
 				OpenTaiko.SaveFileInstances[i].data.PuchiChara = OpenTaiko.Skin.Puchicharas_Name[0];
 		}
-
-		LuaCharacterDb?.Dispose();
-		LuaCharacterDb = new LuaCharacterDatabase(Characters);
 
 		OpenTaiko.Databases?.LoadThemeSettings();
 		CNotesSkins.Scan();
