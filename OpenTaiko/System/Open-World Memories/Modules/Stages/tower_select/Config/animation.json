@@ -1,39 +1,36 @@
 {
-    "_note": "Tower select animation. Times in seconds, angles in degrees, frequencies in radians per second, distances in pixels.",
-    "move": {
-        "_note": "The slide to the next tower: the counter's interval, seconds per unit over its 1 to 0 run.",
-        "slide_interval_s": 0.2
+    "_note": "Tower select timings, in seconds unless named otherwise.",
+    "enter": {
+        "_note": "from picking Standard Tower: [start, end] of each part",
+        "monoliths": [0.0, 0.9],
+        "camera": [0.5, 1.6],
+        "road": [0.9, 1.9],
+        "fall_start": 1.6,
+        "fall_stagger": 0.15,
+        "fall_s": 0.45,
+        "fall_height": 28.0,
+        "box": [2.35, 2.7],
+        "end": 2.75,
+        "leave_speed": 1.7
     },
-    "badge": {
-        "_note": "The badges bob by bob_px, each one bob_phase_step radians after its left neighbour.",
-        "bob_px": 8,
-        "bob_rad_per_s": 2,
-        "bob_phase_step": 0.8
+    "land_shake": { "metres": 0.12, "decay_per_s": 9.0, "rad_per_s": 70 },
+    "refuse_shake": { "seconds": 0.35, "metres": 0.18, "rad_per_s": 45 },
+    "scroll_rad_per_s": 19,
+    "rainbow_deg_per_s": 40,
+    "preview": { "fade_in_ms": 280, "fade_out_ms": 140, "throttle_ms": 200 },
+    "modes_back": { "pulse": 0.025, "pulse_rad_per_s": 5 },
+    "sounds": {
+        "lift": "Sounds/monolith_lift.ogg",
+        "fall": "Sounds/tower_fall.ogg",
+        "land": "Sounds/tower_land.ogg",
+        "box": "Sounds/box_slide.ogg",
+        "slide": "Sounds/tower_slide.ogg"
     },
-    "rainbow_deg_per_s": 45,
-    "glow": {
-        "_note": "The halo under the random badge breathes: its scale goes from scale_base to scale_base + scale_range, its opacity likewise.",
-        "pulse_rad_per_s": 3,
-        "scale_base": 0.92,
-        "scale_range": 0.12,
-        "opacity_base": 0.45,
-        "opacity_range": 0.35
-    },
-    "sparkles": {
-        "_note": "count sparkles twinkle over the random badge, each rate_per_s times a second, at radius_min to radius_min + radius_range from it. A sparkle grows from glow_scale_base with its glow (glow_scale_range more at its brightest), times size_base to size_base + size_range picked per twinkle. It turns turn_per_cycle_deg between twinkles and spin_deg during one.",
-        "count": 6,
-        "rate_per_s": 0.9,
-        "radius_min": 18,
-        "radius_range": 50,
-        "glow_scale_base": 0.4,
-        "glow_scale_range": 0.6,
-        "size_base": 0.6,
-        "size_range": 0.6,
-        "turn_per_cycle_deg": 37,
-        "spin_deg": 60
-    },
+    "land_speeds": [0.92, 1.0, 1.08],
+    "slide_volume": 60,
     "signs": {
         "_note": "The title sign falls from drop_px over its place, the options from the title sign's place, in fall_s; the first option starts first_option_delay_s after the title sign lands, each next one stagger_s later. A landed sign bounces on its ropes, swings, and the swing settles into the idle sway over settle_s; phase offsets the sway of each sign (title_phase, then option_phase_step times its rank). The signs leave in close_s.",
+        "sound": "Sounds/plank.ogg",
         "drop_px": 520,
         "fall_s": 0.36,
         "first_option_delay_s": 0.05,

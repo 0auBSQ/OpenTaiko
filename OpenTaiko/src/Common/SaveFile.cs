@@ -374,10 +374,13 @@ internal class SaveFile {
 					songSelectTableEntries[key].ClearStatusDifficulty = (int)bestPlay.ChartDifficulty;
 					songSelectTableEntries[key].ClearStatus = (int)bestPlay.ClearStatus;
 				}
-				if ((int)bestPlay.ChartDifficulty == (int)Difficulty.Tower) songSelectTableEntries[key].TowerReachedFloor = (int)bestPlay.TowerBestFloor;
-				songSelectTableEntries[key].HighScore[(int)bestPlay.ChartDifficulty] = (int)bestPlay.HighScore;
-				songSelectTableEntries[key].ScoreRanks[(int)bestPlay.ChartDifficulty] = (int)bestPlay.ScoreRank + 1; // 0 start
-				songSelectTableEntries[key].ClearStatuses[(int)bestPlay.ChartDifficulty] = (int)bestPlay.ClearStatus + 1; // 0 start
+				// one record per chart and mod set: the table keeps the best of them
+				var entry = songSelectTableEntries[key];
+				int diff = (int)bestPlay.ChartDifficulty;
+				if (diff == (int)Difficulty.Tower) entry.TowerReachedFloor = Math.Max(entry.TowerReachedFloor, (int)bestPlay.TowerBestFloor);
+				entry.HighScore[diff] = Math.Max(entry.HighScore[diff], (int)bestPlay.HighScore);
+				entry.ScoreRanks[diff] = Math.Max(entry.ScoreRanks[diff], (int)bestPlay.ScoreRank + 1); // 0 start
+				entry.ClearStatuses[diff] = Math.Max(entry.ClearStatuses[diff], (int)bestPlay.ClearStatus + 1); // 0 start
 				songSelectTableEntries[key].PlayedDifficulties[(int)bestPlay.ChartDifficulty] = true;
 			}
 

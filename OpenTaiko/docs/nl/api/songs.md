@@ -215,6 +215,7 @@ chart:GetPlayerBestScore(save) geeft dit object terug. Alle leden zijn alleen-le
 | `info.ScoreRank  (int)` | De beste bereikte scorerang. |
 | `info.ClearStatus  (int)` | De beste bereikte clearstatus. |
 | `info.HighScore  (int)` | De hoogste score. |
+| `info.TowerReachedFloor  (int)` | De hoogste verdieping die op de torenchart van het nummer is bereikt; 0 als die nooit is gespeeld. |
 | `info.HasBeenPlayed  (bool)` | True wanneer de chart minstens één geregistreerde spelbeurt heeft, ongeacht het resultaat. |
 | `info.PlayCount  (int)` | Totaal aantal spelbeurten op deze chart, alle modvarianten samen. |
 

@@ -23,6 +23,13 @@
         // Tower select
         "TOWERSELECT_CONFIRM": "Den Turm herausfordern?",
         "TOWERSELECT_RANDOM": "Zufälliger Turm",
-        "TOWERSELECT_RETURN": "Zurück"
+        "TOWERSELECT_RETURN": "Zurück",
+        "TOWERSELECT_STANDARD": "Standardturm",
+        "TOWERSELECT_STANDARD_DESC": "Erklimme den Turm Etage für Etage und erreiche die Spitze, bevor dir die Leben ausgehen!",
+        "TOWERSELECT_SOON": "Demnächst...",
+        "TOWERSELECT_SOON_DESC": "Dieser Spielmodus kommt später, bleib dran!",
+        "TOWERSELECT_HIGH_SCORE": "Highscore",
+        "TOWERSELECT_BEST_FLOOR": "Beste Etage",
+        "TOWERSELECT_TO_MODES": "Modusauswahl"
     }
 }

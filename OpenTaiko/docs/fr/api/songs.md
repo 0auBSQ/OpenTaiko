@@ -215,6 +215,7 @@ chart:GetPlayerBestScore(save) renvoie cet objet. Tous les membres sont en lectu
 | `info.ScoreRank  (int)` | Le meilleur rang de score atteint. |
 | `info.ClearStatus  (int)` | Le meilleur statut de réussite atteint. |
 | `info.HighScore  (int)` | Le meilleur score. |
+| `info.TowerReachedFloor  (int)` | L'étage le plus haut atteint sur la partition tour de la chanson ; 0 si elle n'a jamais été jouée. |
 | `info.HasBeenPlayed  (bool)` | Vrai quand la partition a au moins une partie enregistrée, quel que soit le résultat. |
 | `info.PlayCount  (int)` | Nombre total de parties sur cette partition, toutes variantes de mods confondues. |
 

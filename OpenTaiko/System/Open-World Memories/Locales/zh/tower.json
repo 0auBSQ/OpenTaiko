@@ -23,6 +23,13 @@
         // Tower select
         "TOWERSELECT_CONFIRM": "挑战高塔？",
         "TOWERSELECT_RANDOM": "随机高塔",
-        "TOWERSELECT_RETURN": "返回"
+        "TOWERSELECT_RETURN": "返回",
+        "TOWERSELECT_STANDARD": "标准高塔",
+        "TOWERSELECT_STANDARD_DESC": "一层一层向上攀登，在生命耗尽之前登顶吧！",
+        "TOWERSELECT_SOON": "敬请期待...",
+        "TOWERSELECT_SOON_DESC": "该游戏模式将在之后推出，敬请期待！",
+        "TOWERSELECT_HIGH_SCORE": "最高分",
+        "TOWERSELECT_BEST_FLOOR": "最高楼层",
+        "TOWERSELECT_TO_MODES": "模式选择"
     }
 }

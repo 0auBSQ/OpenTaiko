@@ -23,6 +23,13 @@
         // Tower select
         "TOWERSELECT_CONFIRM": "Challenge the Tower?",
         "TOWERSELECT_RANDOM": "Random Tower",
-        "TOWERSELECT_RETURN": "Return"
+        "TOWERSELECT_RETURN": "Return",
+        "TOWERSELECT_STANDARD": "Standard Tower",
+        "TOWERSELECT_STANDARD_DESC": "Climb the tower floor by floor and reach the top before your lives run out!",
+        "TOWERSELECT_SOON": "Coming Soon...",
+        "TOWERSELECT_SOON_DESC": "This game mode will come later, stay tuned!",
+        "TOWERSELECT_HIGH_SCORE": "High score",
+        "TOWERSELECT_BEST_FLOOR": "Best floor",
+        "TOWERSELECT_TO_MODES": "Mode select"
     }
 }

@@ -26,6 +26,9 @@
 			}
 		}
 
+		/// <summary>The highest floor reached on this song's tower chart, 0 when none was played.</summary>
+		public int TowerReachedFloor => _scoreInfo.TowerReachedFloor;
+
 		/// <summary>True if this chart has at least one registered play for this player,
 		/// regardless of clear status or score rank.</summary>
 		public bool HasBeenPlayed => _hasBeenPlayed;

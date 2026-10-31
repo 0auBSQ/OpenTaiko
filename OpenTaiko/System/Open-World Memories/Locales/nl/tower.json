@@ -23,6 +23,13 @@
         // Tower select
         "TOWERSELECT_CONFIRM": "De toren uitdagen?",
         "TOWERSELECT_RANDOM": "Willekeurige toren",
-        "TOWERSELECT_RETURN": "Terug"
+        "TOWERSELECT_RETURN": "Terug",
+        "TOWERSELECT_STANDARD": "Standaardtoren",
+        "TOWERSELECT_STANDARD_DESC": "Beklim de toren verdieping voor verdieping en bereik de top voordat je levens op zijn!",
+        "TOWERSELECT_SOON": "Binnenkort...",
+        "TOWERSELECT_SOON_DESC": "Deze spelmodus komt later, blijf op de hoogte!",
+        "TOWERSELECT_HIGH_SCORE": "Hoogste score",
+        "TOWERSELECT_BEST_FLOOR": "Beste verdieping",
+        "TOWERSELECT_TO_MODES": "Moduskeuze"
     }
 }

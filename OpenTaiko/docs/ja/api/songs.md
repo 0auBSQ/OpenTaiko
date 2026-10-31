@@ -215,6 +215,7 @@ chart:GetPlayerBestScore(save) がこのオブジェクトを返します。す�
 | `info.ScoreRank  (int)` | 到達した最高のスコアランク。 |
 | `info.ClearStatus  (int)` | 到達した最高のクリア状態。 |
 | `info.HighScore  (int)` | ハイスコア。 |
+| `info.TowerReachedFloor  (int)` | その曲のタワー譜面で到達した最高階。一度もプレイしていなければ 0。 |
 | `info.HasBeenPlayed  (bool)` | 結果にかかわらず、譜面に少なくとも 1 回の記録されたプレイがあるとき true。 |
 | `info.PlayCount  (int)` | すべての Mod の組み合わせを合わせた、この譜面のプレイ回数の合計。 |
 

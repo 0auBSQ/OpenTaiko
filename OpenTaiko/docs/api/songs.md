@@ -215,6 +215,7 @@ chart:GetPlayerBestScore(save) returns this object. All members are read-only. A
 | `info.ScoreRank  (int)` | The best score rank reached. |
 | `info.ClearStatus  (int)` | The best clear status reached. |
 | `info.HighScore  (int)` | The high score. |
+| `info.TowerReachedFloor  (int)` | The highest floor reached on the song's tower chart; 0 when it was never played. |
 | `info.HasBeenPlayed  (bool)` | True when the chart has at least one recorded play, whatever the result. |
 | `info.PlayCount  (int)` | Total number of plays on this chart, all mod variants combined. |
 

@@ -23,6 +23,13 @@
         // Tower select
         "TOWERSELECT_CONFIRM": "タワーに挑戦しますか？",
         "TOWERSELECT_RANDOM": "おまかせ",
-        "TOWERSELECT_RETURN": "とじる"
+        "TOWERSELECT_RETURN": "とじる",
+        "TOWERSELECT_STANDARD": "スタンダードタワー",
+        "TOWERSELECT_STANDARD_DESC": "ライフがなくなる前に、一階ずつ登って頂上を目指そう！",
+        "TOWERSELECT_SOON": "近日公開...",
+        "TOWERSELECT_SOON_DESC": "このゲームモードは後日追加予定です。お楽しみに！",
+        "TOWERSELECT_HIGH_SCORE": "ハイスコア",
+        "TOWERSELECT_BEST_FLOOR": "最高到達階",
+        "TOWERSELECT_TO_MODES": "モード選択"
     }
 }

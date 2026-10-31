@@ -215,6 +215,7 @@ chart:GetPlayerBestScore(save) 返回此对象。所有成员均为只读。无�
 | `info.ScoreRank  (int)` | 达到过的最佳分数评级。 |
 | `info.ClearStatus  (int)` | 达到过的最佳过关状态。 |
 | `info.HighScore  (int)` | 最高分。 |
+| `info.TowerReachedFloor  (int)` | 该歌曲高塔谱面达到的最高楼层；从未演奏过时为 0。 |
 | `info.HasBeenPlayed  (bool)` | 谱面至少有一次记录在案的演奏（无论结果如何）时为 true。 |
 | `info.PlayCount  (int)` | 本谱面的总演奏次数，所有 Mod 变体合计。 |
 

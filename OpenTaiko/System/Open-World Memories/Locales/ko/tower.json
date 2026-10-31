@@ -23,6 +23,13 @@
         // Tower select
         "TOWERSELECT_CONFIRM": "타워에 도전하시겠습니까?",
         "TOWERSELECT_RANDOM": "랜덤 타워",
-        "TOWERSELECT_RETURN": "뒤로가기"
+        "TOWERSELECT_RETURN": "뒤로가기",
+        "TOWERSELECT_STANDARD": "스탠다드 타워",
+        "TOWERSELECT_STANDARD_DESC": "목숨이 다하기 전에 한 층씩 올라 정상에 도달하세요!",
+        "TOWERSELECT_SOON": "출시 예정...",
+        "TOWERSELECT_SOON_DESC": "이 게임 모드는 나중에 추가됩니다. 기대해 주세요!",
+        "TOWERSELECT_HIGH_SCORE": "최고 점수",
+        "TOWERSELECT_BEST_FLOOR": "최고 층",
+        "TOWERSELECT_TO_MODES": "모드 선택"
     }
 }

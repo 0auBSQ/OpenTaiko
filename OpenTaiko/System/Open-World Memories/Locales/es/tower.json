@@ -23,6 +23,13 @@
         // Tower select
         "TOWERSELECT_CONFIRM": "¿Desafiar la torre?",
         "TOWERSELECT_RANDOM": "Torre aleatoria",
-        "TOWERSELECT_RETURN": "Regresar"
+        "TOWERSELECT_RETURN": "Regresar",
+        "TOWERSELECT_STANDARD": "Torre estándar",
+        "TOWERSELECT_STANDARD_DESC": "¡Sube la torre piso a piso y llega a la cima antes de quedarte sin vidas!",
+        "TOWERSELECT_SOON": "Próximamente...",
+        "TOWERSELECT_SOON_DESC": "Este modo de juego llegará más adelante, ¡estate atento!",
+        "TOWERSELECT_HIGH_SCORE": "Puntuación máxima",
+        "TOWERSELECT_BEST_FLOOR": "Mejor piso",
+        "TOWERSELECT_TO_MODES": "Selección de modo"
     }
 }

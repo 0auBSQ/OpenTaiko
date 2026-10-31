@@ -23,6 +23,13 @@
         // Tower select
         "TOWERSELECT_CONFIRM": "Бросить вызов башне?",
         "TOWERSELECT_RANDOM": "Случайная башня",
-        "TOWERSELECT_RETURN": "Назад"
+        "TOWERSELECT_RETURN": "Назад",
+        "TOWERSELECT_STANDARD": "Стандартная башня",
+        "TOWERSELECT_STANDARD_DESC": "Поднимайтесь по башне этаж за этажом и доберитесь до вершины, пока не закончились жизни!",
+        "TOWERSELECT_SOON": "Скоро...",
+        "TOWERSELECT_SOON_DESC": "Этот режим появится позже, следите за новостями!",
+        "TOWERSELECT_HIGH_SCORE": "Рекорд",
+        "TOWERSELECT_BEST_FLOOR": "Лучший этаж",
+        "TOWERSELECT_TO_MODES": "Выбор режима"
     }
 }

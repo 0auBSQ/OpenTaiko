@@ -215,6 +215,7 @@ chart:GetPlayerBestScore(save) gibt dieses Objekt zurück. Alle Member sind schr
 | `info.ScoreRank  (int)` | Der beste erreichte Score-Rang. |
 | `info.ClearStatus  (int)` | Der beste erreichte Clear-Status. |
 | `info.HighScore  (int)` | Der Highscore. |
+| `info.TowerReachedFloor  (int)` | Die höchste erreichte Etage im Turm-Chart des Songs; 0, wenn er nie gespielt wurde. |
 | `info.HasBeenPlayed  (bool)` | True, wenn das Chart mindestens ein aufgezeichnetes Spiel hat, unabhängig vom Ergebnis. |
 | `info.PlayCount  (int)` | Gesamtzahl der Spiele auf diesem Chart, alle Mod-Varianten zusammen. |
 

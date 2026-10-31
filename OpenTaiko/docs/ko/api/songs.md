@@ -215,6 +215,7 @@ chart:GetPlayerBestScore(save)가 이 객체를 반환합니다. 모든 멤버�
 | `info.ScoreRank  (int)` | 도달한 최고 스코어 랭크. |
 | `info.ClearStatus  (int)` | 도달한 최고 클리어 상태. |
 | `info.HighScore  (int)` | 최고 스코어. |
+| `info.TowerReachedFloor  (int)` | 곡의 타워 채보에서 도달한 최고 층. 한 번도 플레이하지 않았으면 0. |
 | `info.HasBeenPlayed  (bool)` | 결과와 관계없이 채보에 기록된 플레이가 하나 이상 있으면 true. |
 | `info.PlayCount  (int)` | 모든 모드 변형을 합친 이 채보의 총 플레이 수. |
 

@@ -23,6 +23,13 @@
         // Tower select
         "TOWERSELECT_CONFIRM": "Défier la tour ?",
         "TOWERSELECT_RANDOM": "Tour aléatoire",
-        "TOWERSELECT_RETURN": "Retour"
+        "TOWERSELECT_RETURN": "Retour",
+        "TOWERSELECT_STANDARD": "Tour standard",
+        "TOWERSELECT_STANDARD_DESC": "Gravir la tour étage par étage et atteindre le sommet avant d'épuiser ses vies !",
+        "TOWERSELECT_SOON": "Bientôt disponible...",
+        "TOWERSELECT_SOON_DESC": "Ce mode de jeu arrivera plus tard, restez à l'écoute !",
+        "TOWERSELECT_HIGH_SCORE": "Meilleur score",
+        "TOWERSELECT_BEST_FLOOR": "Meilleur étage",
+        "TOWERSELECT_TO_MODES": "Choix du mode"
     }
 }

@@ -215,6 +215,7 @@ chart:GetPlayerBestScore(save) devuelve este objeto. Todos los miembros son de s
 | `info.ScoreRank  (int)` | El mejor rango de puntuación alcanzado. |
 | `info.ClearStatus  (int)` | El mejor estado de clear alcanzado. |
 | `info.HighScore  (int)` | La puntuación máxima. |
+| `info.TowerReachedFloor  (int)` | El piso más alto alcanzado en el chart de torre de la canción; 0 si nunca se jugó. |
 | `info.HasBeenPlayed  (bool)` | Verdadero cuando el chart tiene al menos una partida registrada, sea cual sea el resultado. |
 | `info.PlayCount  (int)` | Número total de partidas en este chart, todas las variantes de mods combinadas. |
 
