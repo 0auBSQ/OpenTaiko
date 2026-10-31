@@ -1,11 +1,12 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
 -- event_timer ROActivity
 -- ------------------------------------------------------------------------------------------------------
--- Event Mode's countdown and its hud: a cream pill at the top-left with the seconds left (black, red from
--- ten down, a tick on each of those last seconds) and, under it, the plays still allowed. The countdown is
--- an engine counter running from the seconds given to zero. Driven by the song select and the dojo:
---   activate(seconds, kind)  seconds = the countdown, 0 or nil for none (the pill then shows the plays
---                            only); kind = "song" or "dan", what the plays-left line counts
+-- Event Mode's countdown and its hud: a floating stopwatch at the top-left, its hand on the seconds left and
+-- the number in the box below (black, red from ten down, a tick on each of those last seconds), and the plays
+-- still allowed in a cream pill beside it. The countdown is an engine counter running from the seconds given
+-- to zero. Driven by the song select and the dojo:
+--   activate(seconds, kind)  seconds = the countdown, 0 or nil for none (only the plays pill shows, in the
+--                            stopwatch's corner); kind = "song" or "dan", what the plays-left line counts
 --   update()                 every frame; returns "expired" once, on the frame the countdown reaches zero
 --   draw()                   every frame, over everything
 --   restart(seconds)         a new countdown (the difficulty choice), reached through Call
@@ -14,23 +15,24 @@
 
 local EM = require("EventMode")
 
--- positions, sizes and colours: Config/layout.json
+-- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
-local PILL, COUNTDOWN, PLAYS = Layout.pill, Layout.countdown, Layout.plays
+local Animation = Config.load("Config/animation.json")
+local WATCH, COUNTDOWN, PLAYS = Layout.stopwatch, Layout.countdown, Layout.plays
+local BOB = Animation.stopwatch
 
 local RED_FROM = COUNTDOWN.red_from_s   -- seconds: red digits and a tick each second from here down
-local HUD_X, HUD_Y = PILL.x, PILL.y
-local PILL_W, PILL_H = PILL.width, PILL.height
-local LINE_H = PILL.line_height
 
-local pills = {}             -- height -> a cream pill canvas of that height (one line, two lines)
+local tex = {}
+local pill = nil             -- the plays pill canvas
 local gfontBig, gfontSmall
 local colBlack, colRed, colNone
 local counter = nil          -- the countdown: Value runs from the seconds to 0
 local kind = "song"
 local expiredSent = false
 local lastSeconds = nil      -- for the tick on each new second of the last ten
+local bobT = 0
 
 local function tr(key, fallback)
     local ok, s = pcall(function() return THEME:GetSkinString(key) end)
@@ -38,21 +40,18 @@ local function tr(key, fallback)
     return fallback
 end
 
-local function pillFor(h)
-    local cv = pills[h]
-    if cv ~= nil then return cv end
-    cv = CANVAS:CreateCanvas(PILL_W, h)
-    local r = math.floor(PILL_H / 2)
-    local c = PILL.color
+local function pillCanvas()
+    if pill ~= nil then return pill end
+    local w, h = PLAYS.width, PLAYS.height
+    local cv = CANVAS:CreateCanvas(w, h)
+    local r = math.floor(h / 2)
+    local c = PLAYS.color
     local cr, cg, cb, ca = c[1], c[2], c[3], c[4]
-    cv:FillRect(r, 0, PILL_W - 2 * r, h, cr, cg, cb, ca)
-    cv:FillRect(0, r, PILL_W, h - 2 * r, cr, cg, cb, ca)
+    cv:FillRect(r, 0, w - 2 * r, h, cr, cg, cb, ca)
     cv:FillCircle(r, r, r, cr, cg, cb, ca)
-    cv:FillCircle(PILL_W - r - 1, r, r, cr, cg, cb, ca)
-    cv:FillCircle(r, h - r - 1, r, cr, cg, cb, ca)
-    cv:FillCircle(PILL_W - r - 1, h - r - 1, r, cr, cg, cb, ca)
+    cv:FillCircle(w - r - 1, r, r, cr, cg, cb, ca)
     cv:Upload()
-    pills[h] = cv
+    pill = cv
     return cv
 end
 
@@ -71,6 +70,9 @@ function onStart()
     colBlack = Config.color(COUNTDOWN.color)
     colRed = Config.color(COUNTDOWN.red_color)
     colNone = Config.color(Layout.edge_color)
+    tex.clock = TEXTURE:CreateTexture("Textures/Clock.png")
+    tex.hand = TEXTURE:CreateTexture("Textures/Hand.png")
+    tex.box = TEXTURE:CreateTexture("Textures/Plate.png")
 end
 
 function restart(secs)
@@ -97,6 +99,7 @@ function deactivate()
 end
 
 function update()
+    bobT = bobT + fps.deltaTime
     if counter == nil then return nil end
     counter:Tick()
     local now = seconds()
@@ -111,28 +114,37 @@ function update()
     return nil
 end
 
+-- the stopwatch floats; its hand ticks clockwise from 12 to the seconds left, the number in the box below
+local function drawStopwatch(secs)
+    local cx = WATCH.x
+    local cy = WATCH.y + BOB.bob_px * math.sin(2 * math.pi * bobT / BOB.bob_s)
+    tex.clock:DrawAtAnchor(cx, cy, "center")
+    tex.hand:SetRotation(-secs * 6)   -- SetRotation turns anticlockwise
+    tex.hand:DrawAtAnchor(cx, cy, "center")
+    tex.hand:SetRotation(0)
+    local by = cy + WATCH.box_dy
+    tex.box:DrawAtAnchor(cx, by, "center")
+    gfontBig:Draw(tostring(secs), cx, by + nudge(gfontBig), secs <= RED_FROM and colRed or colBlack, colNone, 1, 1, WATCH.text_width, "center")
+end
+
 function draw()
     local secs = seconds()
     local plays = EM.playsLeft(kind)
-    if secs == nil and plays == nil then return end
-    local lines = (secs ~= nil and 1 or 0) + (plays ~= nil and 1 or 0)
-    local h = PILL_H + (lines - 1) * LINE_H
-    pillFor(h):DrawAtAnchor(HUD_X, HUD_Y, "topleft")
-    local cx, y = HUD_X + PILL_W / 2, HUD_Y + PILL_H / 2
-    if secs ~= nil then
-        gfontBig:Draw(tostring(secs), cx, y + nudge(gfontBig), secs <= RED_FROM and colRed or colBlack, colNone, 1, 1, PILL_W - COUNTDOWN.text_margin, "center")
-        y = y + LINE_H + COUNTDOWN.line_gap
-    end
+    if secs ~= nil then drawStopwatch(secs) end
     if plays ~= nil then
+        local x, y = PLAYS.x, PLAYS.y
+        if secs == nil then x, y = PLAYS.solo_x, PLAYS.solo_y end
+        pillCanvas():DrawAtAnchor(x, y, "topleft")
         local text = string.format(tr("EVENT_PLAYS_LEFT", "Plays left: %d"), plays)
-        gfontSmall:Draw(text, cx, y + nudge(gfontSmall), colBlack, colNone, 1, 1, PILL_W - PLAYS.text_margin, "center")
+        gfontSmall:Draw(text, x + PLAYS.width / 2, y + PLAYS.height / 2 + nudge(gfontSmall), colBlack, colNone, 1, 1, PLAYS.width - PLAYS.text_margin, "center")
     end
 end
 
 function afterSongEnum() end
 
 function onDestroy()
-    for h, cv in pairs(pills) do pcall(function() cv:Dispose() end) ; pills[h] = nil end
+    if pill ~= nil then pcall(function() pill:Dispose() end) ; pill = nil end
+    for k, t in pairs(tex) do pcall(function() t:Dispose() end) ; tex[k] = nil end
     for _, f in ipairs({ gfontBig, gfontSmall }) do if f ~= nil then pcall(function() f:Dispose() end) end end
     gfontBig, gfontSmall, counter = nil, nil, nil
 end

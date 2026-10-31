@@ -1,0 +1,4 @@
+{
+    "_note": "Event Mode countdown hud timings, in seconds.",
+    "stopwatch": { "_note": "the stopwatch floats bob_px up and down, once every bob_s", "bob_px": 4, "bob_s": 2.6 }
+}
