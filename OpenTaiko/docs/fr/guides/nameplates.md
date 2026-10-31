@@ -35,7 +35,7 @@ Un skin fournit son pack de la même façon, sous la forme d'un dossier `Namepla
 - `nameplates` (array, requis) : un objet par plaque de nom, avec ces champs :
   - `key` (string, requis) : un nom pour la plaque de nom, unique dans le pack. L'identifiant complet de la plaque de nom est `<pack>:<key>`, par exemple `example_pack:night_sky`. Les fichiers de sauvegarde stockent cet identifiant ; gardez donc une clé dès que des joueurs peuvent posséder la plaque de nom, et ne la donnez jamais à une autre plaque de nom.
   - `title` (string, requis) : le texte du titre. Toute langue sans traduction l'affiche.
-  - `type` (int, par défaut 0) : le graphisme de la plaque, un numéro de dossier dans les textures de plaques de nom du skin. Dans le skin fourni, les dossiers vont de `Modules/ROActivities/nameplate/Textures/Title/0` à `45`, et le skin ne dessine aucune plaque pour un numéro sans dossier. Le tableau ci-dessous liste les plaques du skin fourni.
+  - `type` (int, par défaut 0) : le graphisme de la plaque, un numéro de dossier dans les textures de plaques de nom du skin. Dans le skin fourni, les dossiers vont de `Modules/ROActivities/nameplate/Textures/Title/0` à `61`, et le skin ne dessine aucune plaque pour un numéro sans dossier. Le tableau ci-dessous liste les plaques du skin fourni.
   - `rarity` (string, par défaut `Common`) : le nom de la rareté (voir le tableau ci-dessous). Un nom inconnu devient `Common`.
   - `unlock` (object, facultatif) : la condition de déblocage, avec les mêmes champs que dans un `Unlock.json` : `condition`, `values`, `type` et `references` (la [Référence des déblocages](unlockables-reference.md) liste les identifiants de condition). Sans `unlock`, chaque joueur possède la plaque de nom dès le départ.
 
@@ -101,6 +101,24 @@ Types de plaque (`type`) du skin fourni, Open-World Memories. Le PC de My Room r
 | 43 | Lever de soleil |  |
 | 44 | Chapitre VI |  |
 | 45 | Un nouveau monde |  |
+| 46 | Fort Boyaux |  |
+| 47 | Pagode (Sentier) |  |
+| 48 | Pagode (Escaliers) |  |
+| 49 | Pagode (Niveau 11) |  |
+| 50 | Pagode (Niveau 12) |  |
+| 51 | Pagode (Niveau 13) |  |
+| 52 | Pagode (Niveau 14) |  |
+| 53 | Pagode (Niveau 15) |  |
+| 54 | Pagode (Niveau 16) |  |
+| 55 | Pagode (Niveau 17) |  |
+| 56 | Pagode (Niveau 18) |  |
+| 57 | Pagode (Niveau 19) |  |
+| 58 | Pagode (Niveau 20) |  |
+| 59 | Pagode (Haricot magique, jour) |  |
+| 60 | Pagode (Haricot magique, coucher de soleil) |  |
+| 61 | Pagode (Haricot magique, nuit) |  |
+
+Un titre s'affiche en noir sur sa plaque. Sur une plaque sombre, colorez-le avec une balise, comme les plaques de nom fournies du coffre et de la pagode : `<c.#FFFFFF.#000000>Titre</c>` dessine des lettres blanches avec une bordure noire.
 
 Le jeu vérifie les conditions de déblocage sur l'écran de résultats après chaque partie. Quand le joueur en remplit une, le jeu débloque la plaque de nom et affiche une notification. Les conditions de pièces (`ch`, `cs`, `cm`) ne se débloquent que par un achat : dans le skin fourni, le joueur achète la plaque de nom depuis le PC de My Room. Le PC de My Room garde aussi les plaques de nom Mythical verrouillées hors de sa liste jusqu'à ce que le joueur les possède.
 

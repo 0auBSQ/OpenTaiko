@@ -53,7 +53,7 @@ local FLASH_BIG = FLASH.big_star
 local config_titletypes = { "0", "1" }
 local config_titleplate_effects = { }
 
-local nameplate_count = 46
+local nameplate_count = 62
 
 local base = nil
 local dan_gradation = { }

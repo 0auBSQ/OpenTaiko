@@ -35,7 +35,7 @@ Ein Skin liefert sein Paket auf dieselbe Weise mit, als Ordner `Nameplates/` in 
 - `nameplates` (array, erforderlich): ein Objekt pro Namensschild, mit diesen Feldern:
   - `key` (string, erforderlich): ein Name für das Namensschild, eindeutig innerhalb des Pakets. Die vollständige ID des Namensschilds ist `<pack>:<key>`, zum Beispiel `example_pack:night_sky`. Spielstände speichern diese ID; behalten Sie einen Schlüssel also bei, sobald Spieler das Namensschild besitzen können, und geben Sie ihn nie einem anderen Namensschild.
   - `title` (string, erforderlich): der Titeltext. Jede Sprache ohne Übersetzung zeigt ihn an.
-  - `type` (int, Standard 0): die Grafik des Schilds, eine Ordnernummer in den Namensschild-Texturen des Skins. Im mitgelieferten Skin sind die Ordner `Modules/ROActivities/nameplate/Textures/Title/0` bis `45`, und für eine Nummer ohne Ordner zeichnet der Skin kein Schild. Die Tabelle unten listet die Schilder des mitgelieferten Skins auf.
+  - `type` (int, Standard 0): die Grafik des Schilds, eine Ordnernummer in den Namensschild-Texturen des Skins. Im mitgelieferten Skin sind die Ordner `Modules/ROActivities/nameplate/Textures/Title/0` bis `61`, und für eine Nummer ohne Ordner zeichnet der Skin kein Schild. Die Tabelle unten listet die Schilder des mitgelieferten Skins auf.
   - `rarity` (string, Standard `Common`): der Name der Seltenheit (siehe Tabelle unten). Ein unbekannter Name wird zu `Common`.
   - `unlock` (object, optional): die Freischaltbedingung, mit denselben Feldern wie in einer `Unlock.json`: `condition`, `values`, `type` und `references` (die Bedingungs-IDs stehen in der [Referenz der Freischaltbedingungen](unlockables-reference.md)). Ohne `unlock` besitzt jeder Spieler das Namensschild von Anfang an.
 
@@ -101,6 +101,24 @@ Schildtypen (`type`) des mitgelieferten Skins, Open-World Memories. Der PC in My
 | 43 | Sonnenaufgang |  |
 | 44 | Kapitel VI |  |
 | 45 | Eine neue Welt |  |
+| 46 | Geheimtresor |  |
+| 47 | Pagode (Pfad) |  |
+| 48 | Pagode (Treppe) |  |
+| 49 | Pagode (Stufe 11) |  |
+| 50 | Pagode (Stufe 12) |  |
+| 51 | Pagode (Stufe 13) |  |
+| 52 | Pagode (Stufe 14) |  |
+| 53 | Pagode (Stufe 15) |  |
+| 54 | Pagode (Stufe 16) |  |
+| 55 | Pagode (Stufe 17) |  |
+| 56 | Pagode (Stufe 18) |  |
+| 57 | Pagode (Stufe 19) |  |
+| 58 | Pagode (Stufe 20) |  |
+| 59 | Pagode (Bohnenranke, Tag) |  |
+| 60 | Pagode (Bohnenranke, Sonnenuntergang) |  |
+| 61 | Pagode (Bohnenranke, Nacht) |  |
+
+Ein Titel erscheint schwarz auf seinem Schild. Auf einem dunklen Schild färbt man ihn mit einem Tag, wie die mitgelieferten Namensschilder des Tresors und der Pagode: `<c.#FFFFFF.#000000>Titel</c>` zeichnet weiße Buchstaben mit schwarzem Rand.
 
 Das Spiel prüft die Freischaltbedingungen nach jedem Spiel auf dem Ergebnisbildschirm. Erfüllt der Spieler eine, schaltet das Spiel das Namensschild frei und zeigt eine Benachrichtigung an. Münzbedingungen (`ch`, `cs`, `cm`) schalten nur durch einen Kauf frei: Im mitgelieferten Skin kauft der Spieler das Namensschild am PC in My Room. Der PC in My Room lässt außerdem gesperrte Mythical-Namensschilder aus seiner Liste, bis der Spieler sie besitzt.
 

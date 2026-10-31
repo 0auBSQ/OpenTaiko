@@ -35,7 +35,7 @@ Een skin levert zijn pakket op dezelfde manier mee, als map `Nameplates/` in de 
 - `nameplates` (array, vereist): één object per naamplaatje, met deze velden:
   - `key` (string, vereist): een naam voor het naamplaatje, uniek binnen het pakket. Het volledige id van het naamplaatje is `<pack>:<key>`, bijvoorbeeld `example_pack:night_sky`. Opslagbestanden bewaren dit id, dus houd een sleutel ongewijzigd zodra spelers het naamplaatje kunnen hebben, en geef hem nooit aan een ander naamplaatje.
   - `title` (string, vereist): de titeltekst. Elke taal zonder vertaling toont die.
-  - `type` (int, standaard 0): de afbeelding van het plaatje, een mapnummer in de naamplaatjestexturen van de skin. In de meegeleverde skin zijn de mappen `Modules/ROActivities/nameplate/Textures/Title/0` tot `45`, en voor een nummer zonder map tekent de skin geen plaatje. De tabel hieronder toont de plaatjes van de meegeleverde skin.
+  - `type` (int, standaard 0): de afbeelding van het plaatje, een mapnummer in de naamplaatjestexturen van de skin. In de meegeleverde skin zijn de mappen `Modules/ROActivities/nameplate/Textures/Title/0` tot `61`, en voor een nummer zonder map tekent de skin geen plaatje. De tabel hieronder toont de plaatjes van de meegeleverde skin.
   - `rarity` (string, standaard `Common`): de naam van de zeldzaamheid (zie de tabel hieronder). Een onbekende naam wordt `Common`.
   - `unlock` (object, optioneel): de ontgrendelvoorwaarde, met dezelfde velden als in een `Unlock.json`: `condition`, `values`, `type` en `references` (de [Referentie voor ontgrendelvoorwaarden](unlockables-reference.md) geeft de voorwaarde-id's). Zonder `unlock` bezit elke speler het naamplaatje vanaf het begin.
 
@@ -101,6 +101,24 @@ Plaattypen (`type`) van de meegeleverde skin, Open-World Memories. De pc in My R
 | 43 | Zonsopgang |  |
 | 44 | Hoofdstuk VI |  |
 | 45 | Een nieuwe wereld |  |
+| 46 | Geheime kluis |  |
+| 47 | Pagode (Pad) |  |
+| 48 | Pagode (Trappen) |  |
+| 49 | Pagode (Niveau 11) |  |
+| 50 | Pagode (Niveau 12) |  |
+| 51 | Pagode (Niveau 13) |  |
+| 52 | Pagode (Niveau 14) |  |
+| 53 | Pagode (Niveau 15) |  |
+| 54 | Pagode (Niveau 16) |  |
+| 55 | Pagode (Niveau 17) |  |
+| 56 | Pagode (Niveau 18) |  |
+| 57 | Pagode (Niveau 19) |  |
+| 58 | Pagode (Niveau 20) |  |
+| 59 | Pagode (Bonenstaak, dag) |  |
+| 60 | Pagode (Bonenstaak, zonsondergang) |  |
+| 61 | Pagode (Bonenstaak, nacht) |  |
+
+Een titel staat zwart op zijn plaatje. Kleur hem op een donker plaatje met een tag, zoals de meegeleverde naamplaatjes van de kluis en de pagode: `<c.#FFFFFF.#000000>Titel</c>` tekent witte letters met een zwarte rand.
 
 Het spel controleert de ontgrendelvoorwaarden na elke spelbeurt op het resultatenscherm. Wanneer de speler aan een ervan voldoet, ontgrendelt het spel het naamplaatje en toont het een melding. Muntvoorwaarden (`ch`, `cs`, `cm`) ontgrendelen alleen via een aankoop: in de meegeleverde skin koopt de speler het naamplaatje via de pc in My Room. De pc in My Room houdt vergrendelde Mythical-naamplaatjes ook uit zijn lijst tot de speler ze bezit.
 

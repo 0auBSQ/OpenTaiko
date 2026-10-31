@@ -35,7 +35,7 @@ A skin ships its pack the same way, as a `Nameplates/` folder at the root of the
 - `nameplates` (array, required): one object per nameplate, with these fields:
   - `key` (string, required): a name for the nameplate, unique inside the pack. The nameplate's full id is `<pack>:<key>`, for example `example_pack:night_sky`. Save files store this id, so do not change a key once players can have the nameplate, and never give it to another nameplate.
   - `title` (string, required): the title text. Every language without a translation shows it.
-  - `type` (int, default 0): the plate art, a folder number in the skin's nameplate textures. In the shipped skin the folders are `Modules/ROActivities/nameplate/Textures/Title/0` to `45`, and a number without a folder draws no plate. The table below lists the shipped skin's plates.
+  - `type` (int, default 0): the plate art, a folder number in the skin's nameplate textures. In the shipped skin the folders are `Modules/ROActivities/nameplate/Textures/Title/0` to `61`, and a number without a folder draws no plate. The table below lists the shipped skin's plates.
   - `rarity` (string, default `Common`): the rarity name (see the table below). An unknown name becomes `Common`.
   - `unlock` (object, optional): the unlock condition, with the same fields as in an `Unlock.json`: `condition`, `values`, `type` and `references` (see the [Unlockables reference](unlockables-reference.md) for the condition ids). Without `unlock`, every player owns the nameplate from the start.
 
@@ -101,6 +101,24 @@ Plate types (`type`) of the shipped skin, Open-World Memories. The PC in My Room
 | 43 | Sunrise |  |
 | 44 | Chapter VI |  |
 | 45 | A new world |  |
+| 46 | Secret Vault |  |
+| 47 | Pagoda (Trail) |  |
+| 48 | Pagoda (Stairs) |  |
+| 49 | Pagoda (Level 11) |  |
+| 50 | Pagoda (Level 12) |  |
+| 51 | Pagoda (Level 13) |  |
+| 52 | Pagoda (Level 14) |  |
+| 53 | Pagoda (Level 15) |  |
+| 54 | Pagoda (Level 16) |  |
+| 55 | Pagoda (Level 17) |  |
+| 56 | Pagoda (Level 18) |  |
+| 57 | Pagoda (Level 19) |  |
+| 58 | Pagoda (Level 20) |  |
+| 59 | Pagoda (Beanstalk Day) |  |
+| 60 | Pagoda (Beanstalk Sunset) |  |
+| 61 | Pagoda (Beanstalk Night) |  |
+
+A title shows black on its plate. On a dark plate, colour it with a tag, as the shipped vault and pagoda nameplates do: `<c.#FFFFFF.#000000>Title</c>` draws white letters with a black border.
 
 The game checks the unlock conditions on the results screen after each play. When the player meets one, the game unlocks the nameplate and shows a notification. Coin conditions (`ch`, `cs`, `cm`) only unlock through a purchase: in the shipped skin, the player buys the nameplate from the PC in My Room. The PC in My Room also keeps locked Mythical nameplates out of its list until the player owns them.
 

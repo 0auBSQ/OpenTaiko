@@ -44,3 +44,19 @@
 43 - OpTk Secret 1
 44 - OpTk Chapter VI
 45 - OpTk Chapter VI (Alternative)
+46 - Vault
+47 - Pagoda (Trail)
+48 - Pagoda (Stairs)
+49 - Pagoda (Level 11)
+50 - Pagoda (Level 12)
+51 - Pagoda (Level 13)
+52 - Pagoda (Level 14)
+53 - Pagoda (Level 15)
+54 - Pagoda (Level 16)
+55 - Pagoda (Level 17)
+56 - Pagoda (Level 18)
+57 - Pagoda (Level 19)
+58 - Pagoda (Level 20)
+59 - Pagoda (Beanstalk Day)
+60 - Pagoda (Beanstalk Sunset)
+61 - Pagoda (Beanstalk Night)

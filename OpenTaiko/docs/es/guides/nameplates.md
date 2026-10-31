@@ -35,7 +35,7 @@ Un skin incluye su paquete de la misma forma, como una carpeta `Nameplates/` en 
 - `nameplates` (array, obligatorio): un objeto por placa de nombre, con estos campos:
   - `key` (string, obligatorio): un nombre para la placa de nombre, único dentro del paquete. El id completo de la placa es `<pack>:<key>`, por ejemplo `example_pack:night_sky`. Los archivos de guardado almacenan este id, así que no cambies una clave una vez que los jugadores puedan tener la placa, y nunca se la des a otra placa.
   - `title` (string, obligatorio): el texto del título. Todos los idiomas sin traducción lo muestran.
-  - `type` (int, por defecto 0): el arte de la placa, un número de carpeta en las texturas de placas de nombre del skin. En el skin incluido las carpetas van de `Modules/ROActivities/nameplate/Textures/Title/0` a `45`, y un número sin carpeta no dibuja ninguna placa. La tabla siguiente enumera las placas del skin incluido.
+  - `type` (int, por defecto 0): el arte de la placa, un número de carpeta en las texturas de placas de nombre del skin. En el skin incluido las carpetas van de `Modules/ROActivities/nameplate/Textures/Title/0` a `61`, y un número sin carpeta no dibuja ninguna placa. La tabla siguiente enumera las placas del skin incluido.
   - `rarity` (string, por defecto `Common`): el nombre de la rareza (véase la tabla siguiente). Un nombre desconocido se convierte en `Common`.
   - `unlock` (object, opcional): la condición de desbloqueo, con los mismos campos que un `Unlock.json`: `condition`, `values`, `type` y `references` (consulta la [Referencia de desbloqueables](unlockables-reference.md) para los ids de condición). Sin `unlock`, todos los jugadores poseen la placa de nombre desde el principio.
 
@@ -101,6 +101,24 @@ Tipos de placa (`type`) del skin incluido, Open-World Memories. El ordenador de 
 | 43 | Amanecer |  |
 | 44 | Capítulo VI |  |
 | 45 | Un nuevo mundo |  |
+| 46 | Bóveda Secreta |  |
+| 47 | Pagoda (Sendero) |  |
+| 48 | Pagoda (Escaleras) |  |
+| 49 | Pagoda (Nivel 11) |  |
+| 50 | Pagoda (Nivel 12) |  |
+| 51 | Pagoda (Nivel 13) |  |
+| 52 | Pagoda (Nivel 14) |  |
+| 53 | Pagoda (Nivel 15) |  |
+| 54 | Pagoda (Nivel 16) |  |
+| 55 | Pagoda (Nivel 17) |  |
+| 56 | Pagoda (Nivel 18) |  |
+| 57 | Pagoda (Nivel 19) |  |
+| 58 | Pagoda (Nivel 20) |  |
+| 59 | Pagoda (Tallo de habichuela, día) |  |
+| 60 | Pagoda (Tallo de habichuela, atardecer) |  |
+| 61 | Pagoda (Tallo de habichuela, noche) |  |
+
+Un título se ve negro sobre su placa. En una placa oscura, coloréalo con una etiqueta, como hacen las placas de nombre incluidas de la bóveda y la pagoda: `<c.#FFFFFF.#000000>Título</c>` dibuja letras blancas con borde negro.
 
 El juego comprueba las condiciones de desbloqueo en la pantalla de resultados tras cada partida. Cuando el jugador cumple una, el juego desbloquea la placa de nombre y muestra una notificación. Las condiciones de monedas (`ch`, `cs`, `cm`) solo se desbloquean mediante una compra: en el skin incluido, el jugador compra la placa de nombre en el ordenador de Mi Habitación. El ordenador de Mi Habitación también deja fuera de su lista las placas Mythical bloqueadas hasta que el jugador las posee.
 
