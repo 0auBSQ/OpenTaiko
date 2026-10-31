@@ -59,6 +59,8 @@ All members below are public fields that Lua reads and writes directly (settings
 | `settings.ExcludedGenreFolders  (string array)` | Genre folder names the list leaves out. Set it with SetExcludedGenreFolders. |
 | `settings.RootGenreFolder  (string, default nil)` | When set, the list root becomes the first folder (depth-first) whose genre matches this name; when nil, the root is the top level. |
 | `settings.RootGenreFolderNode  (song node, default nil)` | Node form of RootGenreFolder. When set, it takes precedence over the string, which disambiguates folders that share a genre name. |
+| `settings.TreeSongPredicate  (function, default nil)` | When set, the list holds every song for which fn(song node) returns true, wherever it is in the song tree, instead of one folder: a folder shows when it holds such a song itself or several folders holding some, and any other folder gives way to what it holds, in path order. Each song shows once. The dan list uses `function(node) return node:GetChart(6) ~= nil end`. Set it with SetTreeSongPredicate. |
+| `settings.TreeFolderPredicate  (function, default nil)` | With TreeSongPredicate, every folder follows the rule above; this only names exceptions: the folders for which fn(folder node, depth) returns true give way even when they hold songs themselves (depth 0 is the top level), and a song found twice keeps its copy inside them. The dan list opens its own folder this way, so the shipped dans fill the list root: `function(folder, depth) return depth == 0 and folder.Genre == "段位道場" end`. Set it with SetTreeFolderPredicate. |
 | `settings.MandatoryDifficultyList  (Difficulty array, default nil)` | Difficulties a song must have to appear in the list; nil means no requirement. Set it with SetMandatoryDifficultyList. |
 | `settings.MandatoryDifficultyMatchAll  (bool, default true)` | true requires every listed difficulty (AND); false requires at least one (OR). |
 | `settings.HideEmptyFolders  (bool, default true)` | Hides folders that contain no visible song, recursively. |
@@ -70,6 +72,8 @@ All members below are public fields that Lua reads and writes directly (settings
 | `settings.IgnoreUnlockables  (bool, default false)` | When true, the list ignores ExcludeLockedSongs and GetRandomNodeInFolder may return locked songs. Node properties such as IsLocked keep reporting the real state. |
 | `settings:SetExcludedGenreFolders(table)  -> void` | Sets ExcludedGenreFolders from a Lua table of genre-name strings. |
 | `settings:SetMandatoryDifficultyList(table)  -> void` | Sets MandatoryDifficultyList from a Lua table of difficulty indices. |
+| `settings:SetTreeSongPredicate(fn)  -> void` | Sets TreeSongPredicate; nil turns the tree off. |
+| `settings:SetTreeFolderPredicate(fn)  -> void` | Sets TreeFolderPredicate; nil opens no folder. |
 
 ### Song list handle
 

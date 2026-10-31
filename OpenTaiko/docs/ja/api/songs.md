@@ -59,6 +59,8 @@ local node = list:GetSelectedSongNode()
 | `settings.ExcludedGenreFolders  (string array)` | リストが除外するジャンルフォルダ名。SetExcludedGenreFolders で設定します。 |
 | `settings.RootGenreFolder  (string, default nil)` | 設定すると、ジャンルがこの名前に一致する最初のフォルダ (深さ優先) がリストのルートになります。nil のとき、ルートは最上位です。 |
 | `settings.RootGenreFolderNode  (song node, default nil)` | RootGenreFolder のノード形式。設定されていれば文字列より優先され、同じジャンル名を持つフォルダを区別できます。 |
+| `settings.TreeSongPredicate  (function, default nil)` | 設定すると、リストは 1 つのフォルダの代わりに、fn(楽曲ノード) が true を返すすべての楽曲を、楽曲ツリーのどこにあっても含みます。フォルダはそのような楽曲を直接持つとき、またはそれを持つフォルダを複数持つときに表示され、それ以外のフォルダはパス順で中身に場所を譲ります。各楽曲は 1 回だけ表示されます。段位リストは `function(node) return node:GetChart(6) ~= nil end` を使います。SetTreeSongPredicate で設定します。 |
+| `settings.TreeFolderPredicate  (function, default nil)` | TreeSongPredicate と併用すると、すべてのフォルダは上の規則に従います。これは例外だけを指定します。fn(フォルダノード, 深さ) が true を返すフォルダは、自身が楽曲を持っていても中身に場所を譲り (深さ 0 が最上位)、2 回見つかった楽曲はそのフォルダ内のものが残ります。段位リストはこうして自身のフォルダを開き、同梱の段位がリストのルートに並びます: `function(folder, depth) return depth == 0 and folder.Genre == "段位道場" end`。SetTreeFolderPredicate で設定します。 |
 | `settings.MandatoryDifficultyList  (Difficulty array, default nil)` | 楽曲がリストに現れるために持っていなければならない難易度。nil は要件なし。SetMandatoryDifficultyList で設定します。 |
 | `settings.MandatoryDifficultyMatchAll  (bool, default true)` | true は列挙したすべての難易度を要求し (AND)、false は少なくとも 1 つを要求します (OR)。 |
 | `settings.HideEmptyFolders  (bool, default true)` | 表示される楽曲を含まないフォルダを再帰的に隠します。 |
@@ -70,6 +72,8 @@ local node = list:GetSelectedSongNode()
 | `settings.IgnoreUnlockables  (bool, default false)` | true のとき、リストは ExcludeLockedSongs を無視し、GetRandomNodeInFolder はロックされた楽曲を返すことがあります。IsLocked などのノードのプロパティは実際の状態を報告し続けます。 |
 | `settings:SetExcludedGenreFolders(table)  -> void` | ジャンル名文字列の Lua テーブルから ExcludedGenreFolders を設定します。 |
 | `settings:SetMandatoryDifficultyList(table)  -> void` | 難易度インデックスの Lua テーブルから MandatoryDifficultyList を設定します。 |
+| `settings:SetTreeSongPredicate(fn)  -> void` | TreeSongPredicate を設定します。nil でツリーを無効にします。 |
+| `settings:SetTreeFolderPredicate(fn)  -> void` | TreeFolderPredicate を設定します。nil ではどのフォルダも開きません。 |
 
 ### 楽曲リストハンドル
 

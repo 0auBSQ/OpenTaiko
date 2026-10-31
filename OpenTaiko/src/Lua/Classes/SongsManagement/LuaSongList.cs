@@ -49,12 +49,24 @@ namespace OpenTaiko {
 
 			}
 
-			_scanningList.ForEach((song) => {
-				if (_settings.IsNodeExcludedAtGeneration(song) == false) {
-					LuaSongNode _node = new LuaSongNode(song, _root, true, _settings);
-					_root.AppendChild(_node);
-				}
-			});
+			if (_settings.TreeSongPredicate != null) {
+				var _song = _settings.TreeSongPredicate.AsPredicate<LuaSongNode>()!;
+				var _folder = _settings.TreeFolderPredicate.AsPredicate<LuaSongNode, int>();
+				var _entries = GatherTree(OpenTaiko.SongManager.listSongRoot,
+					node => _song(new LuaSongNode(node, null, false, _settings)),
+					_folder == null ? null : (node, depth) => _folder(new LuaSongNode(node, null, false, _settings), depth),
+					_settings.IsNodeExcludedAtGeneration);
+				var _gathered = new List<LuaSongNode>();
+				MountTree(_entries, _root, _gathered);
+				_gathered.ForEach(_root.AppendChild);
+			} else {
+				_scanningList.ForEach((song) => {
+					if (_settings.IsNodeExcludedAtGeneration(song) == false) {
+						LuaSongNode _node = new LuaSongNode(song, _root, true, _settings);
+						_root.AppendChild(_node);
+					}
+				});
+			}
 			_settings.AlterRootNodeWithRequestedNodes(_root);
 
 			_currentNode = null;
@@ -71,6 +83,103 @@ namespace OpenTaiko {
 			_settings = settings;
 			ReloadSongList();
 		}
+
+		#region [(Private) Tree lists]
+
+		// A song, or a folder with the entries it shows
+		internal sealed class TreeEntry {
+			public CSongListNode Node = null!;
+			public List<TreeEntry> Children = [];
+		}
+
+		// The entries of a tree list (LuaSongListSettings.TreeSongPredicate) in path order: the songs accepts takes, the folders
+		// that hold one themselves or several folders holding some, and in place of any other folder what it holds; the
+		// folders opens takes (with their depth, 0 = the top level) always give way. Each song shows once: a copy inside such
+		// a folder first, then the first in path order.
+		internal static List<TreeEntry> GatherTree(List<CSongListNode> roots, Func<CSongListNode, bool> accepts,
+			Func<CSongListNode, int, bool>? opens, Func<CSongListNode, bool> excluded) {
+			var accepted = new Dictionary<CSongListNode, bool>(System.Collections.Generic.ReferenceEqualityComparer.Instance);
+			bool IsSong(CSongListNode node) {
+				if (node.nodeType != CSongListNode.ENodeType.SCORE || excluded(node)) return false;
+				if (!accepted.TryGetValue(node, out bool result)) accepted[node] = result = accepts(node);
+				return result;
+			}
+
+			var opened = new Dictionary<CSongListNode, bool>(System.Collections.Generic.ReferenceEqualityComparer.Instance);
+			bool Opens(CSongListNode box, int depth) {
+				if (opens == null) return false;
+				if (!opened.TryGetValue(box, out bool result)) opened[box] = result = opens(box, depth);
+				return result;
+			}
+
+			var kept = new Dictionary<string, CSongListNode>();
+			var keptInOpened = new HashSet<string>();
+			void Keep(List<CSongListNode> nodes, bool inOpened, int depth) {
+				foreach (var node in nodes) {
+					if (excluded(node)) continue;
+					if (node.nodeType == CSongListNode.ENodeType.BOX) {
+						if (node.childrenList != null) Keep(node.childrenList, inOpened || Opens(node, depth), depth + 1);
+					} else if (IsSong(node)) {
+						string id = node.tGetUniqueId();
+						if (id == "") continue;
+						if (!kept.ContainsKey(id) || (inOpened && !keptInOpened.Contains(id))) {
+							kept[id] = node;
+							if (inOpened) keptInOpened.Add(id);
+						}
+					}
+				}
+			}
+			Keep(roots, false, 0);
+
+			bool Shown(CSongListNode node) {
+				if (!IsSong(node)) return false;
+				string id = node.tGetUniqueId();
+				return id == "" || !kept.TryGetValue(id, out var copy) || ReferenceEquals(copy, node);
+			}
+
+			var holds = new Dictionary<CSongListNode, bool>(System.Collections.Generic.ReferenceEqualityComparer.Instance);
+			bool Holds(CSongListNode box) {
+				if (box.nodeType != CSongListNode.ENodeType.BOX || box.childrenList == null || excluded(box)) return false;
+				if (!holds.TryGetValue(box, out bool result)) holds[box] = result = box.childrenList.Any(child => Shown(child) || Holds(child));
+				return result;
+			}
+
+			void Gather(List<CSongListNode> nodes, List<TreeEntry> into, int depth) {
+				foreach (var node in nodes) {
+					if (excluded(node)) continue;
+					if (node.nodeType == CSongListNode.ENodeType.SCORE) {
+						if (Shown(node)) into.Add(new TreeEntry { Node = node });
+					} else if (node.nodeType == CSongListNode.ENodeType.BOX && node.childrenList != null) {
+						if (Opens(node, depth) || (!node.childrenList.Any(Shown) && node.childrenList.Count(Holds) < 2)) {
+							Gather(node.childrenList, into, depth + 1);
+						} else {
+							var folder = new TreeEntry { Node = node };
+							Gather(node.childrenList, folder.Children, depth + 1);
+							into.Add(folder);
+						}
+					}
+				}
+			}
+
+			var entries = new List<TreeEntry>();
+			Gather(roots, entries, 0);
+			return entries;
+		}
+
+		private void MountTree(List<TreeEntry> entries, LuaSongNode parent, List<LuaSongNode> into) {
+			foreach (var entry in entries) {
+				var node = new LuaSongNode(entry.Node, parent, false, _settings);
+				if (entry.Node.nodeType == CSongListNode.ENodeType.BOX) {
+					var children = new List<LuaSongNode>();
+					MountTree(entry.Children, node, children);
+					_settings.AlterNodeListWithRequestedNodes(entry.Node, children, node);
+					children.ForEach(node.AppendChildInternal);
+				}
+				into.Add(node);
+			}
+		}
+
+		#endregion
 
 		private List<LuaSongNode> GetLeaves() {
 			if (_root == null) return new List<LuaSongNode>();

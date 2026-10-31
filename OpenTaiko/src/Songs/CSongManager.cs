@@ -797,6 +797,8 @@ internal class CSongManager {
 			//-----------------------------
 			#endregion
 
+			tClearLevelsWithoutChart(songNode);
+
 			#region [ If no node title found, try to fetch it within the score objects ]
 			//-----------------------------
 			if (string.IsNullOrEmpty(songNode.ldTitle.GetString(""))) {
@@ -821,6 +823,18 @@ internal class CSongManager {
 	}
 	//-----------------
 	#endregion
+
+	// A song's courses without a chart have no level (-1): a .tcm dan only sets its Dan level and leaves the others at
+	// 0, so it read as having every course (its songlist.db copy too, until the file changes)
+	internal static void tClearLevelsWithoutChart(CSongListNode node) {
+		if (node.nodeType != CSongListNode.ENodeType.SCORE || node.score.All(s => s == null)) return;
+		for (int i = 0; i < (int)Difficulty.Total; i++) {
+			if (node.score[i] == null) {
+				node.nLevel[i] = -1;
+				node.dLevel[i] = -1;
+			}
+		}
+	}
 
 	#region [ Sort Song List ]
 	//-----------------

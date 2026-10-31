@@ -59,6 +59,8 @@ local node = list:GetSelectedSongNode()
 | `settings.ExcludedGenreFolders  (string array)` | Имена папок жанров, которые список не включает. Задавайте его через SetExcludedGenreFolders. |
 | `settings.RootGenreFolder  (string, default nil)` | Если задано, корнем списка становится первая папка (в глубину), жанр которой совпадает с этим именем; если nil, корень — верхний уровень. |
 | `settings.RootGenreFolderNode  (song node, default nil)` | Форма RootGenreFolder в виде узла. Если задана, имеет приоритет над строкой, что позволяет различать папки с одинаковым именем жанра. |
+| `settings.TreeSongPredicate  (function, default nil)` | Если задано, список содержит вместо одной папки каждую песню, для которой fn(узел песни) возвращает true, где бы она ни находилась в дереве песен: папка показывается, если сама содержит такую песню или несколько папок с такими песнями, а любая другая папка уступает место своему содержимому, в порядке путей. Каждая песня показывается один раз. Список данов использует `function(node) return node:GetChart(6) ~= nil end`. Задавайте его через SetTreeSongPredicate. |
+| `settings.TreeFolderPredicate  (function, default nil)` | Вместе с TreeSongPredicate каждая папка следует правилу выше; это задаёт лишь исключения: папки, для которых fn(узел папки, глубина) возвращает true, уступают место своему содержимому, даже если сами содержат песни (глубина 0 — верхний уровень), а у песни, найденной дважды, остаётся копия внутри них. Список данов так открывает свою папку, чтобы поставляемые даны заполнили корень списка: `function(folder, depth) return depth == 0 and folder.Genre == "段位道場" end`. Задавайте его через SetTreeFolderPredicate. |
 | `settings.MandatoryDifficultyList  (Difficulty array, default nil)` | Сложности, которые песня должна иметь, чтобы попасть в список; nil означает отсутствие требования. Задавайте его через SetMandatoryDifficultyList. |
 | `settings.MandatoryDifficultyMatchAll  (bool, default true)` | true требует все перечисленные сложности (И); false — хотя бы одну (ИЛИ). |
 | `settings.HideEmptyFolders  (bool, default true)` | Скрывает папки, не содержащие ни одной видимой песни, рекурсивно. |
@@ -70,6 +72,8 @@ local node = list:GetSelectedSongNode()
 | `settings.IgnoreUnlockables  (bool, default false)` | Если true, список игнорирует ExcludeLockedSongs, а GetRandomNodeInFolder может возвращать заблокированные песни. Свойства узлов, такие как IsLocked, продолжают сообщать реальное состояние. |
 | `settings:SetExcludedGenreFolders(table)  -> void` | Задаёт ExcludedGenreFolders из таблицы Lua со строками имён жанров. |
 | `settings:SetMandatoryDifficultyList(table)  -> void` | Задаёт MandatoryDifficultyList из таблицы Lua с индексами сложностей. |
+| `settings:SetTreeSongPredicate(fn)  -> void` | Задаёт TreeSongPredicate; nil отключает дерево. |
+| `settings:SetTreeFolderPredicate(fn)  -> void` | Задаёт TreeFolderPredicate; nil не открывает ни одной папки. |
 
 ### Дескриптор списка песен
 

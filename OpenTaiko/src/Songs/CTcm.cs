@@ -152,6 +152,7 @@ internal class CTcm {
 		score.ChartInfo.nDanTick    = DAN_TICK;
 		score.ChartInfo.cDanTickColor = DAN_TICK_COLOR;
 		node.score[(int)Difficulty.Dan] = score;
+		node.nLevel = Enumerable.Repeat(-1, (int)Difficulty.Total).ToArray();
 		node.nLevel[(int)Difficulty.Dan] = 10;
 		node.dLevel[(int)Difficulty.Dan] = 10;
 

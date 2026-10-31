@@ -1606,8 +1606,10 @@ end
 
 function afterSongEnum()
     local settings = GenerateSongListSettings()
-    settings.RootGenreFolder = "太鼓タワー"
-    settings.MandatoryDifficultyList = { 5 }
+    settings:SetTreeSongPredicate(function(node) return node:GetChart(5) ~= nil end)
+    settings:SetTreeFolderPredicate(function(folder, depth) return depth == 0 and folder.Genre == "太鼓タワー" end)
+    settings:SetMandatoryDifficultyList({ 5 })
+    settings:SetExcludedGenreFolders({ "Favorite", "最近遊んだ曲", "SearchD", "SearchT" })
     settings.FlattenOpenedFolders = false
     settings.AppendMainRandomBox = true
     songlist = RequestSongList(settings)

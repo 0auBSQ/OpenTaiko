@@ -59,6 +59,8 @@ local node = list:GetSelectedSongNode()
 | `settings.ExcludedGenreFolders  (string array)` | 목록에서 제외하는 장르 폴더 이름. SetExcludedGenreFolders로 설정하십시오. |
 | `settings.RootGenreFolder  (string, default nil)` | 설정되면 목록 루트가 장르가 이 이름과 일치하는 첫 폴더(깊이 우선)가 됩니다. nil이면 루트는 최상위입니다. |
 | `settings.RootGenreFolderNode  (song node, default nil)` | RootGenreFolder의 노드 형태. 설정되면 문자열보다 우선하며, 장르 이름을 공유하는 폴더를 구분할 수 있습니다. |
+| `settings.TreeSongPredicate  (function, default nil)` | 설정되면 목록은 폴더 하나 대신 fn(곡 노드)이 true를 반환하는 모든 곡을 곡 트리의 어디에 있든 담습니다. 폴더는 그런 곡을 직접 담거나 그런 곡을 담은 폴더를 여러 개 담을 때 나타나고, 다른 폴더는 경로 순서대로 그 안의 내용에 자리를 내줍니다. 각 곡은 한 번만 나타납니다. 단위 목록은 `function(node) return node:GetChart(6) ~= nil end`를 사용합니다. SetTreeSongPredicate로 설정하십시오. |
+| `settings.TreeFolderPredicate  (function, default nil)` | TreeSongPredicate와 함께 쓰면 모든 폴더는 위 규칙을 따르며, 이것은 예외만 지정합니다. fn(폴더 노드, 깊이)이 true를 반환하는 폴더는 자신이 곡을 담고 있어도 내용에 자리를 내주고(깊이 0이 최상위), 두 번 발견된 곡은 그 폴더 안의 사본이 남습니다. 단위 목록은 이렇게 자신의 폴더를 열어 기본 제공 단위가 목록 루트를 채웁니다: `function(folder, depth) return depth == 0 and folder.Genre == "段位道場" end`. SetTreeFolderPredicate로 설정하십시오. |
 | `settings.MandatoryDifficultyList  (Difficulty array, default nil)` | 곡이 목록에 나타나기 위해 가져야 하는 난이도. nil은 요구 사항 없음을 뜻합니다. SetMandatoryDifficultyList로 설정하십시오. |
 | `settings.MandatoryDifficultyMatchAll  (bool, default true)` | true는 나열된 모든 난이도를 요구하고(AND), false는 하나 이상을 요구합니다(OR). |
 | `settings.HideEmptyFolders  (bool, default true)` | 보이는 곡이 없는 폴더를 재귀적으로 숨깁니다. |
@@ -70,6 +72,8 @@ local node = list:GetSelectedSongNode()
 | `settings.IgnoreUnlockables  (bool, default false)` | true이면 목록이 ExcludeLockedSongs를 무시하고 GetRandomNodeInFolder가 잠긴 곡을 반환할 수 있습니다. IsLocked 같은 노드 프로퍼티는 계속 실제 상태를 보고합니다. |
 | `settings:SetExcludedGenreFolders(table)  -> void` | 장르 이름 문자열의 Lua 테이블로 ExcludedGenreFolders를 설정합니다. |
 | `settings:SetMandatoryDifficultyList(table)  -> void` | 난이도 인덱스의 Lua 테이블로 MandatoryDifficultyList를 설정합니다. |
+| `settings:SetTreeSongPredicate(fn)  -> void` | TreeSongPredicate를 설정합니다. nil이면 트리를 끕니다. |
+| `settings:SetTreeFolderPredicate(fn)  -> void` | TreeFolderPredicate를 설정합니다. nil이면 어떤 폴더도 열지 않습니다. |
 
 ### 곡 목록 핸들
 

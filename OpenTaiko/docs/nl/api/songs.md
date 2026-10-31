@@ -59,6 +59,8 @@ Alle onderstaande leden zijn publieke velden die Lua rechtstreeks leest en schri
 | `settings.ExcludedGenreFolders  (string array)` | Namen van genremappen die de lijst weglaat. Stel het in met SetExcludedGenreFolders. |
 | `settings.RootGenreFolder  (string, default nil)` | Indien gezet wordt de root van de lijst de eerste map (diepte-eerst) waarvan het genre met deze naam overeenkomt; indien nil is de root het hoogste niveau. |
 | `settings.RootGenreFolderNode  (song node, default nil)` | Knoopvorm van RootGenreFolder. Indien gezet heeft hij voorrang op de string, wat mappen met dezelfde genrenaam onderscheidt. |
+| `settings.TreeSongPredicate  (function, default nil)` | Indien gezet bevat de lijst in plaats van één map elk nummer waarvoor fn(nummerknoop) true teruggeeft, waar het ook in de nummerboom staat: een map verschijnt als hij zelf zo'n nummer bevat of meerdere mappen met zulke nummers, en elke andere map maakt plaats voor wat hij bevat, in padvolgorde. Elk nummer verschijnt één keer. De danlijst gebruikt `function(node) return node:GetChart(6) ~= nil end`. Stel het in met SetTreeSongPredicate. |
+| `settings.TreeFolderPredicate  (function, default nil)` | Met TreeSongPredicate volgt elke map de regel hierboven; dit noemt alleen uitzonderingen: de mappen waarvoor fn(mapknoop, diepte) true teruggeeft maken plaats voor hun inhoud, ook als ze zelf nummers bevatten (diepte 0 is het hoogste niveau), en van een twee keer gevonden nummer blijft de kopie in die mappen. De danlijst opent zo zijn eigen map, zodat de meegeleverde dans de root van de lijst vullen: `function(folder, depth) return depth == 0 and folder.Genre == "段位道場" end`. Stel het in met SetTreeFolderPredicate. |
 | `settings.MandatoryDifficultyList  (Difficulty array, default nil)` | Moeilijkheden die een nummer moet hebben om in de lijst te verschijnen; nil betekent geen vereiste. Stel het in met SetMandatoryDifficultyList. |
 | `settings.MandatoryDifficultyMatchAll  (bool, default true)` | true vereist elke vermelde moeilijkheid (AND); false vereist er minstens één (OR). |
 | `settings.HideEmptyFolders  (bool, default true)` | Verbergt mappen die geen zichtbaar nummer bevatten, recursief. |
@@ -70,6 +72,8 @@ Alle onderstaande leden zijn publieke velden die Lua rechtstreeks leest en schri
 | `settings.IgnoreUnlockables  (bool, default false)` | Indien true negeert de lijst ExcludeLockedSongs en kan GetRandomNodeInFolder vergrendelde nummers teruggeven. Knoopeigenschappen zoals IsLocked blijven de werkelijke status rapporteren. |
 | `settings:SetExcludedGenreFolders(table)  -> void` | Stelt ExcludedGenreFolders in vanuit een Lua-tabel van genrenaamstrings. |
 | `settings:SetMandatoryDifficultyList(table)  -> void` | Stelt MandatoryDifficultyList in vanuit een Lua-tabel van moeilijkheidsindices. |
+| `settings:SetTreeSongPredicate(fn)  -> void` | Stelt TreeSongPredicate in; nil schakelt de boom uit. |
+| `settings:SetTreeFolderPredicate(fn)  -> void` | Stelt TreeFolderPredicate in; nil opent geen enkele map. |
 
 ### Nummerlijst-handle
 

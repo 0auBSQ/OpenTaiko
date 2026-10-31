@@ -59,6 +59,8 @@ local node = list:GetSelectedSongNode()
 | `settings.ExcludedGenreFolders  (string array)` | 列表排除的分类文件夹名称。通过 SetExcludedGenreFolders 设置它。 |
 | `settings.RootGenreFolder  (string, default nil)` | 设置后，列表的根变为分类与此名称匹配的第一个文件夹（深度优先）；为 nil 时，根是顶层。 |
 | `settings.RootGenreFolderNode  (song node, default nil)` | RootGenreFolder 的节点形式。设置后，它优先于字符串，可用于区分同名分类的文件夹。 |
+| `settings.TreeSongPredicate  (function, default nil)` | 设置后，列表不再取自一个文件夹，而是包含 fn(歌曲节点) 返回 true 的每首歌曲，无论它在歌曲树的哪里：文件夹在自身直接包含这样的歌曲，或包含多个含有这类歌曲的文件夹时显示，其他文件夹按路径顺序让位给其内容。每首歌曲只显示一次。段位列表使用 `function(node) return node:GetChart(6) ~= nil end`。通过 SetTreeSongPredicate 设置它。 |
+| `settings.TreeFolderPredicate  (function, default nil)` | 配合 TreeSongPredicate 时，每个文件夹都遵循上面的规则；此项只指定例外：fn(文件夹节点, 深度) 返回 true 的文件夹即使自身包含歌曲也会让位给其内容（深度 0 为顶层），出现两次的歌曲保留其中的副本。段位列表以此打开自己的文件夹，让自带的段位填满列表根部：`function(folder, depth) return depth == 0 and folder.Genre == "段位道場" end`。通过 SetTreeFolderPredicate 设置它。 |
 | `settings.MandatoryDifficultyList  (Difficulty array, default nil)` | 歌曲必须拥有才会出现在列表中的难度；nil 表示无要求。通过 SetMandatoryDifficultyList 设置它。 |
 | `settings.MandatoryDifficultyMatchAll  (bool, default true)` | true 要求列出的每个难度都存在（AND）；false 要求至少存在一个（OR）。 |
 | `settings.HideEmptyFolders  (bool, default true)` | 递归隐藏不包含任何可见歌曲的文件夹。 |
@@ -70,6 +72,8 @@ local node = list:GetSelectedSongNode()
 | `settings.IgnoreUnlockables  (bool, default false)` | 为 true 时，列表忽略 ExcludeLockedSongs，且 GetRandomNodeInFolder 可能返回锁定的歌曲。IsLocked 等节点属性仍报告真实状态。 |
 | `settings:SetExcludedGenreFolders(table)  -> void` | 从一张分类名称字符串的 Lua 表设置 ExcludedGenreFolders。 |
 | `settings:SetMandatoryDifficultyList(table)  -> void` | 从一张难度索引的 Lua 表设置 MandatoryDifficultyList。 |
+| `settings:SetTreeSongPredicate(fn)  -> void` | 设置 TreeSongPredicate；nil 关闭树。 |
+| `settings:SetTreeFolderPredicate(fn)  -> void` | 设置 TreeFolderPredicate；nil 不打开任何文件夹。 |
 
 ### 歌曲列表句柄
 

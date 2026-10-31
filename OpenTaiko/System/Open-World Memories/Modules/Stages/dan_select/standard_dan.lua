@@ -282,7 +282,8 @@ function M.init()
     ContentsDrawer.load()
 end
 
--- the dan folder's song list, built when enumeration finishes so the first entry has it ready
+-- every dan's song list (folders holding dans, wherever they are), built when enumeration finishes so the first
+-- entry has it ready
 local function _build_song_list()
     local lsls = GenerateSongListSettings()
     lsls.SubBackBoxFrequency  = 5
@@ -290,7 +291,9 @@ local function _build_song_list()
     lsls.AppendMainRandomBox  = false
     lsls.AppendSubRandomBoxes = false
     lsls.FlattenOpenedFolders = false
-    lsls.RootGenreFolder      = "段位道場"
+    lsls:SetTreeSongPredicate(function(node) return node:GetChart(DIFF_DAN) ~= nil end)
+    lsls:SetTreeFolderPredicate(function(folder, depth) return depth == 0 and folder.Genre == "段位道場" end)
+    lsls:SetExcludedGenreFolders({ "Favorite", "最近遊んだ曲", "SearchD", "SearchT" })
     lsls:SetMandatoryDifficultyList({DIFF_DAN})
     return RequestSongList(lsls)
 end

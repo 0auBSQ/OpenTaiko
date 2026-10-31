@@ -59,6 +59,8 @@ Tous les membres ci-dessous sont des champs publics que Lua lit et écrit direct
 | `settings.ExcludedGenreFolders  (string array)` | Noms de dossiers de genre que la liste laisse de côté. Définissez-le avec SetExcludedGenreFolders. |
 | `settings.RootGenreFolder  (string, default nil)` | Quand défini, la racine de la liste devient le premier dossier (en profondeur d'abord) dont le genre correspond à ce nom ; quand nil, la racine est le niveau supérieur. |
 | `settings.RootGenreFolderNode  (song node, default nil)` | Forme nœud de RootGenreFolder. Quand défini, il prend le pas sur la chaîne, ce qui lève l'ambiguïté entre dossiers qui partagent un nom de genre. |
+| `settings.TreeSongPredicate  (function, default nil)` | Quand défini, la liste contient, au lieu d'un seul dossier, chaque chanson pour laquelle fn(nœud de chanson) renvoie true, où qu'elle soit dans l'arbre des chansons : un dossier apparaît s'il contient lui-même une telle chanson ou plusieurs dossiers qui en contiennent, et tout autre dossier laisse place à ce qu'il contient, dans l'ordre des chemins. Chaque chanson apparaît une fois. La liste des dans utilise `function(node) return node:GetChart(6) ~= nil end`. Définissez-le avec SetTreeSongPredicate. |
+| `settings.TreeFolderPredicate  (function, default nil)` | Avec TreeSongPredicate, chaque dossier suit la règle ci-dessus ; ceci ne nomme que des exceptions : les dossiers pour lesquels fn(nœud de dossier, profondeur) renvoie true laissent place à leur contenu même s'ils contiennent eux-mêmes des chansons (la profondeur 0 est le premier niveau), et une chanson trouvée deux fois garde sa copie qui s'y trouve. La liste des dans ouvre ainsi son propre dossier, pour que les dans fournis remplissent la racine de la liste : `function(folder, depth) return depth == 0 and folder.Genre == "段位道場" end`. Définissez-le avec SetTreeFolderPredicate. |
 | `settings.MandatoryDifficultyList  (Difficulty array, default nil)` | Difficultés qu'une chanson doit avoir pour apparaître dans la liste ; nil signifie aucune exigence. Définissez-le avec SetMandatoryDifficultyList. |
 | `settings.MandatoryDifficultyMatchAll  (bool, default true)` | true exige chaque difficulté listée (ET) ; false en exige au moins une (OU). |
 | `settings.HideEmptyFolders  (bool, default true)` | Masque les dossiers qui ne contiennent aucune chanson visible, récursivement. |
@@ -70,6 +72,8 @@ Tous les membres ci-dessous sont des champs publics que Lua lit et écrit direct
 | `settings.IgnoreUnlockables  (bool, default false)` | Quand true, la liste ignore ExcludeLockedSongs et GetRandomNodeInFolder peut renvoyer des chansons verrouillées. Les propriétés de nœud telles qu'IsLocked continuent de rapporter l'état réel. |
 | `settings:SetExcludedGenreFolders(table)  -> void` | Définit ExcludedGenreFolders à partir d'une table Lua de chaînes de noms de genre. |
 | `settings:SetMandatoryDifficultyList(table)  -> void` | Définit MandatoryDifficultyList à partir d'une table Lua d'indices de difficulté. |
+| `settings:SetTreeSongPredicate(fn)  -> void` | Définit TreeSongPredicate ; nil désactive l'arbre. |
+| `settings:SetTreeFolderPredicate(fn)  -> void` | Définit TreeFolderPredicate ; nil n'ouvre aucun dossier. |
 
 ### Handle de liste de chansons
 

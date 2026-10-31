@@ -17,5 +17,12 @@ namespace OpenTaiko {
 				var r = fn.Call(arg);
 				return r is { Length: > 0 } && r[0] is not (null or false);
 			};
+
+		// The same with two arguments.
+		public static Func<T1, T2, bool>? AsPredicate<T1, T2>(this LuaFunction? fn)
+			=> fn == null ? null : (arg1, arg2) => {
+				var r = fn.Call(arg1, arg2);
+				return r is { Length: > 0 } && r[0] is not (null or false);
+			};
 	}
 }

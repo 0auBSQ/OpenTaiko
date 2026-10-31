@@ -28,6 +28,19 @@ namespace OpenTaiko {
 		// The node version of RootGenreFolder, to use if there is a risk of having multiple folders with the same genre as a string, takes precedence over RootGenreFolder
 		public LuaSongNode? RootGenreFolderNode = null;
 
+		// Build the list from every song this accepts (fn(song node) -> true) wherever it is in the song tree, instead of from
+		// one folder: a folder shows when it holds such a song itself or several folders holding some, any other folder gives
+		// way to what it holds. nil = off. Set it with SetTreeSongPredicate
+		public LuaFunction? TreeSongPredicate = null;
+
+		// With TreeSongPredicate: the folders this accepts (fn(folder node, depth) -> true, depth 0 = the top level) always give
+		// way, fe. a mode's own folder; a song found twice keeps its copy inside them. Set it with SetTreeFolderPredicate
+		public LuaFunction? TreeFolderPredicate = null;
+
+		public void SetTreeSongPredicate(LuaFunction? fn) => TreeSongPredicate = fn;
+
+		public void SetTreeFolderPredicate(LuaFunction? fn) => TreeFolderPredicate = fn;
+
 		// Difficulty requirement for a SCORE node to be included. null = no requirement. How the list is
 		// matched is controlled by MandatoryDifficultyMatchAll below.
 		public Difficulty[]? MandatoryDifficultyList = null;

@@ -59,6 +59,8 @@ Todos los miembros de abajo son campos públicos que Lua lee y escribe directame
 | `settings.ExcludedGenreFolders  (string array)` | Nombres de carpetas de género que la lista deja fuera. Establécelo con SetExcludedGenreFolders. |
 | `settings.RootGenreFolder  (string, default nil)` | Cuando está establecido, la raíz de la lista pasa a ser la primera carpeta (en profundidad) cuyo género coincide con este nombre; cuando es nil, la raíz es el nivel superior. |
 | `settings.RootGenreFolderNode  (song node, default nil)` | Forma de nodo de RootGenreFolder. Cuando está establecido, tiene prioridad sobre la cadena, lo que desambigua carpetas que comparten nombre de género. |
+| `settings.TreeSongPredicate  (function, default nil)` | Cuando está establecido, la lista contiene, en lugar de una carpeta, cada canción para la que fn(nodo de canción) devuelve true, esté donde esté en el árbol de canciones: una carpeta aparece si contiene ella misma una de esas canciones o varias carpetas que las contienen, y cualquier otra carpeta cede su lugar a lo que contiene, en orden de ruta. Cada canción aparece una vez. La lista de danes usa `function(node) return node:GetChart(6) ~= nil end`. Establécelo con SetTreeSongPredicate. |
+| `settings.TreeFolderPredicate  (function, default nil)` | Con TreeSongPredicate, cada carpeta sigue la regla anterior; esto solo nombra excepciones: las carpetas para las que fn(nodo de carpeta, profundidad) devuelve true ceden su lugar aunque contengan canciones ellas mismas (la profundidad 0 es el nivel superior), y una canción encontrada dos veces conserva su copia dentro de ellas. La lista de danes abre así su propia carpeta, para que los danes incluidos llenen la raíz de la lista: `function(folder, depth) return depth == 0 and folder.Genre == "段位道場" end`. Establécelo con SetTreeFolderPredicate. |
 | `settings.MandatoryDifficultyList  (Difficulty array, default nil)` | Dificultades que una canción debe tener para aparecer en la lista; nil significa sin requisito. Establécelo con SetMandatoryDifficultyList. |
 | `settings.MandatoryDifficultyMatchAll  (bool, default true)` | true exige todas las dificultades listadas (AND); false exige al menos una (OR). |
 | `settings.HideEmptyFolders  (bool, default true)` | Oculta las carpetas que no contienen ninguna canción visible, de forma recursiva. |
@@ -70,6 +72,8 @@ Todos los miembros de abajo son campos públicos que Lua lee y escribe directame
 | `settings.IgnoreUnlockables  (bool, default false)` | Cuando es true, la lista ignora ExcludeLockedSongs y GetRandomNodeInFolder puede devolver canciones bloqueadas. Las propiedades de nodo como IsLocked siguen reportando el estado real. |
 | `settings:SetExcludedGenreFolders(table)  -> void` | Establece ExcludedGenreFolders a partir de una tabla Lua de cadenas de nombres de género. |
 | `settings:SetMandatoryDifficultyList(table)  -> void` | Establece MandatoryDifficultyList a partir de una tabla Lua de índices de dificultad. |
+| `settings:SetTreeSongPredicate(fn)  -> void` | Establece TreeSongPredicate; nil desactiva el árbol. |
+| `settings:SetTreeFolderPredicate(fn)  -> void` | Establece TreeFolderPredicate; nil no abre ninguna carpeta. |
 
 ### Handle de lista de canciones
 

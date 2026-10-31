@@ -59,6 +59,8 @@ Alle Member unten sind öffentliche Felder, die Lua direkt liest und schreibt (s
 | `settings.ExcludedGenreFolders  (string array)` | Namen von Genre-Ordnern, die die Liste weglässt. Setzen Sie es mit SetExcludedGenreFolders. |
 | `settings.RootGenreFolder  (string, default nil)` | Wenn gesetzt, wird der erste Ordner (Tiefensuche), dessen Genre diesem Namen entspricht, zur Wurzel der Liste; bei nil ist die Wurzel die oberste Ebene. |
 | `settings.RootGenreFolderNode  (song node, default nil)` | Knotenform von RootGenreFolder. Wenn gesetzt, hat er Vorrang vor dem String, was Ordner mit gleichem Genrenamen eindeutig macht. |
+| `settings.TreeSongPredicate  (function, default nil)` | Wenn gesetzt, enthält die Liste statt eines Ordners jeden Song, für den fn(Song-Knoten) true liefert, wo auch immer er im Songbaum liegt: Ein Ordner erscheint, wenn er selbst einen solchen Song oder mehrere Ordner mit solchen Songs enthält, und jeder andere Ordner weicht seinem Inhalt, in Pfadreihenfolge. Jeder Song erscheint einmal. Die Dan-Liste nutzt `function(node) return node:GetChart(6) ~= nil end`. Setzen Sie es mit SetTreeSongPredicate. |
+| `settings.TreeFolderPredicate  (function, default nil)` | Mit TreeSongPredicate folgt jeder Ordner der Regel oben; dies benennt nur Ausnahmen: Die Ordner, für die fn(Ordner-Knoten, Tiefe) true liefert, weichen ihrem Inhalt auch dann, wenn sie selbst Songs enthalten (Tiefe 0 ist die oberste Ebene), und bei einem doppelt gefundenen Song bleibt die Kopie in ihnen. Die Dan-Liste öffnet so ihren eigenen Ordner, damit die mitgelieferten Dans die Wurzel der Liste füllen: `function(folder, depth) return depth == 0 and folder.Genre == "段位道場" end`. Setzen Sie es mit SetTreeFolderPredicate. |
 | `settings.MandatoryDifficultyList  (Difficulty array, default nil)` | Schwierigkeitsgrade, die ein Song haben muss, um in der Liste zu erscheinen; nil bedeutet keine Anforderung. Setzen Sie es mit SetMandatoryDifficultyList. |
 | `settings.MandatoryDifficultyMatchAll  (bool, default true)` | true verlangt jeden aufgeführten Schwierigkeitsgrad (UND); false verlangt mindestens einen (ODER). |
 | `settings.HideEmptyFolders  (bool, default true)` | Blendet Ordner ohne sichtbaren Song aus, rekursiv. |
@@ -70,6 +72,8 @@ Alle Member unten sind öffentliche Felder, die Lua direkt liest und schreibt (s
 | `settings.IgnoreUnlockables  (bool, default false)` | Wenn true, ignoriert die Liste ExcludeLockedSongs, und GetRandomNodeInFolder kann gesperrte Songs zurückgeben. Knoteneigenschaften wie IsLocked melden weiterhin den tatsächlichen Zustand. |
 | `settings:SetExcludedGenreFolders(table)  -> void` | Setzt ExcludedGenreFolders aus einer Lua-Tabelle von Genrenamen-Strings. |
 | `settings:SetMandatoryDifficultyList(table)  -> void` | Setzt MandatoryDifficultyList aus einer Lua-Tabelle von Schwierigkeitsindizes. |
+| `settings:SetTreeSongPredicate(fn)  -> void` | Setzt TreeSongPredicate; nil schaltet den Baum aus. |
+| `settings:SetTreeFolderPredicate(fn)  -> void` | Setzt TreeFolderPredicate; nil öffnet keinen Ordner. |
 
 ### Songlisten-Handle
 
