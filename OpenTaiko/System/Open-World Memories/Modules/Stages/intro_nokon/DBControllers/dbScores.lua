@@ -1,112 +1,94 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- High-score persistence for the Intro Nokon minigame.
---
--- Scores live in a GLOBAL LMDB store under Global/ApplicationData/LMDB, OUTSIDE the skin, so a skin
--- update never wipes them. The old store (Databases/Scores.db3) sat inside the skin and was replaced
--- on every update, losing the player's high scores. On first run -- or if the store is empty/corrupt --
--- it is seeded from the shipped Databases/DefaultScores.json.
+-- High scores of the Intro Nokon minigame: each profile's best Endurance score is its save's global counter
+-- SCORE_KEY; the table shows the profiles of the player slots among the rivals of Databases/DefaultScores.json.
 
-local M = {
-	db    = nil,   -- cached LMDB handle (each op opens/closes its own env internally)
-	cache = nil,   -- array of { player = string, score = int }, unsorted
-}
+local M = {}
 
-local STORE         = "IntroNokon/HighScores"   -- Global/ApplicationData/LMDB/IntroNokon/HighScores
-local KEY           = "scores"
+local SCORE_KEY     = ".intro_nokon_high_score"
 local LIMIT         = 8
+local SLOTS         = 5
 local DEFAULTS_JSON = "Databases/DefaultScores.json"
+local OLD_STORE     = "IntroNokon/HighScores"   -- the global LMDB table the scores were kept in before
 
-local function openDB()
-	if M.db == nil then
-		M.db = DATABASE:OpenGlobalDatabase(STORE)
-	end
-	return M.db
-end
+local rivals = nil
+local oldScores = nil
 
--- Persist as a Lua-table literal (same convention as iso_demo2/saveData.lua). Player names go through
--- %q so quotes/specials round-trip safely -- which also removes the old SQL-injection risk.
-local function serialize(list)
-	local parts = { "{" }
-	for _, row in ipairs(list) do
-		parts[#parts + 1] = string.format("{player=%q,score=%d},",
-			tostring(row.player or ""), math.floor(tonumber(row.score) or 0))
-	end
-	parts[#parts + 1] = "}"
-	return table.concat(parts)
-end
-
-local function deserialize(str)
-	local f = load("return " .. str)
-	if not f then return nil end
-	local ok, res = pcall(f)
-	if ok and type(res) == "table" then return res end
-	return nil
-end
-
--- Read the shipped defaults (JSON array of { player, score }) into the internal { player, score } shape.
-local function loadDefaults()
-	local out = {}
+-- the rivals, { name, score } each
+local function loadRivals()
+	if rivals ~= nil then return rivals end
+	rivals = {}
 	local arr = JSONLOADER:JsonParseFileAny(DEFAULTS_JSON)
-	if arr == nil then return out end
+	if arr == nil then return rivals end
 	for i = 1, JSONLOADER:JsonCount(arr) do
 		local row = JSONLOADER:JsonGet(arr, i)
 		if row ~= nil then
-			out[#out + 1] = {
-				player = tostring(JSONLOADER:JsonGet(row, "player") or ""),
-				score  = math.floor(tonumber(tostring(JSONLOADER:JsonGet(row, "score") or 0)) or 0),
+			rivals[#rivals + 1] = {
+				name  = tostring(JSONLOADER:JsonGet(row, "player") or ""),
+				score = math.floor(tonumber(tostring(JSONLOADER:JsonGet(row, "score") or 0)) or 0),
 			}
 		end
 	end
-	return out
+	return rivals
 end
 
--- Load the score list into M.cache, seeding + persisting the defaults on first run.
-local function ensureLoaded()
-	if M.cache ~= nil then return M.cache end
-	openDB()
-	local raw    = M.db:Read(KEY)
-	local scores = raw ~= nil and deserialize(raw) or nil
-	if scores == nil then
-		scores = loadDefaults()
-		M.db:Write(KEY, serialize(scores))
+-- the old table's scores by player name, the rivals' own rows left out; read once
+local function loadOldScores()
+	if oldScores ~= nil then return oldScores end
+	oldScores = {}
+	local isRival = {}
+	for _, r in ipairs(loadRivals()) do isRival[r.name .. "\0" .. r.score] = true end
+	pcall(function()
+		local raw = DATABASE:OpenGlobalDatabase(OLD_STORE):Read("scores")
+		local f = raw ~= nil and load("return " .. raw) or nil
+		local list = f ~= nil and f() or nil
+		for _, row in ipairs(type(list) == "table" and list or {}) do
+			local name, score = tostring(row.player or ""), math.floor(tonumber(row.score) or 0)
+			if not isRival[name .. "\0" .. score] then oldScores[name] = math.max(oldScores[name] or 0, score) end
+		end
+	end)
+	return oldScores
+end
+
+-- a profile's best score, taking over its score from the old table the first time
+local function best(sf)
+	local score = math.floor(sf:GetGlobalCounter(SCORE_KEY))
+	local old = loadOldScores()[sf.Name] or 0
+	if old > score then
+		sf:SetGlobalCounter(SCORE_KEY, old)
+		score = old
 	end
-	M.cache = scores
-	return scores
+	return score
 end
 
--- Top-LIMIT scores as an array of { name = string, score = int }, highest first
--- (ties keep insertion order, matching the old "ORDER BY score DESC, id ASC").
+-- the top LIMIT of the rivals and the slots' profiles (each once, if they have a score), { name, score }, highest
+-- first; a profile ties above a rival
 function M:GetScores()
-	local list = ensureLoaded() or {}
-	local sorted = {}
-	for i, row in ipairs(list) do
-		sorted[#sorted + 1] = { name = row.player, score = row.score, order = i }
+	local rows = {}
+	local seen = {}
+	for slot = 0, SLOTS - 1 do
+		local ok, sf = pcall(GetSaveFile, slot)
+		if ok and sf ~= nil and not seen[sf.SaveId] then
+			seen[sf.SaveId] = true
+			local score = best(sf)
+			if score > 0 then rows[#rows + 1] = { name = sf.Name, score = score, order = #rows } end
+		end
 	end
-	table.sort(sorted, function(a, b)
+	for _, r in ipairs(loadRivals()) do rows[#rows + 1] = { name = r.name, score = r.score, order = #rows } end
+	table.sort(rows, function(a, b)
 		if a.score ~= b.score then return a.score > b.score end
 		return a.order < b.order
 	end)
 	local out = {}
-	for i = 1, math.min(LIMIT, #sorted) do
-		out[i] = { name = sorted[i].name, score = sorted[i].score }
-	end
+	for i = 1, math.min(LIMIT, #rows) do out[i] = { name = rows[i].name, score = rows[i].score } end
 	return out
 end
 
--- Upsert the player's best score, then persist. Keeps the higher of the old/new score per player.
-function M:RegisterScore(playerName, score)
-	local list = ensureLoaded() or {}
-	playerName = tostring(playerName or "")
-	score      = math.floor(tonumber(score) or 0)
-	for _, row in ipairs(list) do
-		if row.player == playerName then
-			if score > row.score then row.score = score end
-			M.db:Write(KEY, serialize(list))
-			return
-		end
-	end
-	list[#list + 1] = { player = playerName, score = score }
-	M.db:Write(KEY, serialize(list))
+-- keeps score as player 1's best when it beats it
+function M:RegisterScore(score)
+	local sf = GetSaveFile(0)
+	if sf == nil then return end
+	score = math.floor(tonumber(score) or 0)
+	if score > best(sf) then sf:SetGlobalCounter(SCORE_KEY, score) end
 end
 
 return M

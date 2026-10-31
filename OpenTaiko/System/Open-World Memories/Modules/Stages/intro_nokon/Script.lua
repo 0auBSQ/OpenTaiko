@@ -95,8 +95,8 @@ local function loadHighScores()
     return DBScores:GetScores() or {}
 end
 
-local function saveHighScore(score, name)
-    DBScores:RegisterScore(name, score)
+local function saveHighScore(score)
+    DBScores:RegisterScore(score)
 end
 
 ---------------------------------------
