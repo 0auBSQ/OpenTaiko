@@ -1,6 +1,6 @@
 {
     "_note": "Intro Nokon layout, in 1920x1080 pixels. Colours are [r, g, b, a] from 0 to 255, or AARRGGBB hex strings where the key's value is a string. Opacities, shades and scales 0 to 1 (a scale may exceed 1).",
-    "fonts": { "list": 16, "title": 36, "label": 22 },
+    "fonts": { "list": 16, "title": 36, "label": 22, "board_line2": 26 },
     "loading": { "_note": "The text shown while the songs load.", "x": 960, "y": 540 },
     "curtain": { "_note": "Each curtain half is half_w wide (it slides that far).", "half_w": 960 },
     "opening": {
@@ -60,13 +60,15 @@
         "denied_color": "ff555555",
         "denied_stand_color": "ff666666"
     },
-    "blackboard": { "_note": "The text on the stage panel, centred.", "x": 930, "y": 280, "max_width": 780, "color": "ffffffff" },
+    "blackboard": { "_note": "The text on the stage panel, centred; two lines sit line_gap apart, the second in fonts.board_line2.", "x": 960, "y": 280, "line_gap": 58, "max_width": 780, "color": "ffffffff" },
+    "board_lights": { "_note": "The bulbs round the stage panel: their centres run around rect (x0, y0, x1, y1), about spacing apart.", "rect": [498, 178, 1422, 372], "spacing": 52 },
     "clock": {
-        "_note": "Clock.png's top-right (x, y) and the seconds left centred at (num_x, num_y), in warn_color from warn_at_s seconds down.",
-        "x": 1980, "y": 0,
-        "num_x": 1800, "num_y": 66,
+        "_note": "The stopwatch's face centred at (x, y); the seconds left in Plate.png, box_dy below it (the number num_dy lower). A clock that started above warn_at_s rings there and shows warn_color.",
+        "x": 1790, "y": 200,
+        "box_dy": 124,
+        "num_dy": 12,
         "max_width": 200,
-        "warn_at_s": 3,
+        "warn_at_s": 10,
         "color": "ff111111",
         "warn_color": "ffee2222",
         "outline_color": [0, 0, 0, 0]

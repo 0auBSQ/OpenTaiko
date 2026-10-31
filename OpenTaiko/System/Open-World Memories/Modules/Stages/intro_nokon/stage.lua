@@ -13,7 +13,8 @@
 --   Stage.setPlayerDenied(p, on)
 --   Stage.clearRoundState()   — reset pressing/denied for a new round
 --   Stage.setScore(p, score)
---   Stage.setBlackboard(text) — nil to clear
+--   Stage.setBlackboard(text, line2) — nil to clear; line2 an optional second line
+--   Stage.setBoardLights(mode) — the board's lights: "off", "right" (blue, flashing) or "wrong" (red)
 --   Stage.setDarken(on)       — darkening overlay for evaluation
 --   Stage.setChip(chipIdx)    — player chip to display, nil = none
 --   Stage.setSongList(cache, selIdx)  — song list data, nil to hide
@@ -26,6 +27,7 @@ local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
 local Stands, Board, Clock, List = Layout.stands, Layout.blackboard, Layout.clock, Layout.list
+local Lights, LightAnim = Layout.board_lights, Animation.board_lights
 
 local M = {}
 
@@ -55,8 +57,7 @@ local BB_MWIDTH = Board.max_width
 
 local CLOCK_X  = Clock.x
 local CLOCK_Y  = Clock.y
-local CLOCK_NUM_X = Clock.num_x
-local CLOCK_NUM_Y = Clock.num_y
+local ClockAnim = Animation.clock
 
 local LIST_BG_X  = List.bg_x
 local LIST_BG_Y  = List.bg_y
@@ -86,21 +87,35 @@ local scores      = {}   -- [p] int
 
 -- UI
 local blackboard  = nil   -- string or nil
+local blackboard2 = nil   -- the board's second line, or nil
 local darkenOn    = false
 local chipIdx     = nil   -- 1-5 or nil
 local showFail    = false
 
 local clockMs     = nil   -- remaining ms, nil=hidden
 local clockShow   = false
+local clockT      = 0     -- the float's clock
+local clockStartS = 0     -- the running clock's first second
+local clockLastS  = nil   -- the last second shown; each new one ticks
+local clockTense  = false -- reached warn_at_s on a clock that started above it
+local clockPulseT = nil   -- time since the warning, while the clock zooms in and out
 
 local songList    = nil   -- {cache, selIdx} or nil
 local genreList   = nil   -- {genres, selIdx} or nil
+
+-- the board's lights; while a song list is up (a player choosing), the pattern turns around them instead
+local lightsMode  = "off"  -- "off"|"right"|"wrong"
+local lightsT     = 0
+local bulbs       = nil    -- the bulbs' centres, clockwise from the ring's top-left corner
 
 -- ── Helpers ───────────────────────────────────────────────────────────────────
 
 local function empty() return COUNTER:EmptyCounter() end
 
 local function col(hex) return COLOR:CreateColorFromHex(hex) end
+
+local function play(name) if snd[name] then snd[name]:Play() end end
+local function stop(name) if snd[name] then snd[name]:Stop() end end
 
 local function lazyColors()
     if PLAYER_COLORS then return end
@@ -132,6 +147,18 @@ local function tileOverlay(opacity)
         for r = 0, rows do t:Draw(c * t.Width, r * t.Height) end
     end
     t:SetOpacity(1)
+end
+
+-- evenly spaced around the ring's rectangle, each side its own count
+local function bulbCentres()
+    local x0, y0, x1, y1 = Lights.rect[1], Lights.rect[2], Lights.rect[3], Lights.rect[4]
+    local pts = {}
+    local function side(ax, ay, bx, by)
+        local n = math.max(1, math.floor(math.sqrt((bx - ax) ^ 2 + (by - ay) ^ 2) / Lights.spacing + 0.5))
+        for i = 0, n - 1 do pts[#pts + 1] = { ax + (bx - ax) * i / n, ay + (by - ay) * i / n } end
+    end
+    side(x0, y0, x1, y0); side(x1, y0, x1, y1); side(x1, y1, x0, y1); side(x0, y1, x0, y0)
+    return pts
 end
 
 -- Darken a color to a given factor (0=black, 1=original).
@@ -167,14 +194,20 @@ function M.reset(n)
         denied[i]     = false
         scores[i]     = 0
     end
-    blackboard = nil
+    blackboard  = nil
+    blackboard2 = nil
     darkenOn   = false
     chipIdx    = nil
     showFail   = false
     clockMs    = nil
     clockShow  = false
+    clockLastS = nil
+    clockTense = false
+    clockPulseT = nil
     songList   = nil
     genreList  = nil
+    lightsMode = "off"
+    lightsT    = 0
 end
 
 -- ── Curtain transitions ───────────────────────────────────────────────────────
@@ -203,16 +236,45 @@ function M.setSpotlight(p, on)      spotlights[p] = on      end
 function M.setPlayerPressing(p, on) pressing[p]   = on      end
 function M.setPlayerDenied(p, on)   denied[p]     = on      end
 function M.setScore(p, v)           scores[p]     = v       end
-function M.setBlackboard(text)      blackboard     = text    end
+function M.setBlackboard(text, l2) blackboard = text; blackboard2 = l2 end
 function M.setDarken(on)            darkenOn       = on      end
 function M.setChip(idx)             chipIdx        = idx     end
 function M.setShowFail(on)          showFail       = on      end
-function M.setClock(ms, show)       clockMs = ms; clockShow = (show == true) end
+
+-- a tick each second; on a clock that started above warn_at_s, reaching it rings and zooms the clock once,
+-- then the ticks turn heavy
+local function clockSecond(s)
+    if not clockTense and clockStartS > Clock.warn_at_s and s <= Clock.warn_at_s then
+        clockTense  = true
+        clockPulseT = 0
+        play("ClockRing")
+    else
+        play(clockTense and "ClockTickTense" or "ClockTick")
+    end
+end
+
+function M.setClock(ms, show)
+    if ms == nil then
+        if clockTense then stop("ClockRing"); stop("ClockTickTense") end
+        clockLastS, clockTense, clockPulseT = nil, false, nil
+    else
+        local s = math.max(0, math.ceil(ms / 1000))
+        if clockLastS == nil then
+            clockStartS, clockLastS = s, s
+        elseif s < clockLastS then
+            clockLastS = s
+            if s > 0 then clockSecond(s) end
+        end
+    end
+    clockMs = ms; clockShow = (show == true)
+end
 function M.setSongList(cache, sel)  songList = cache and {cache=cache, sel=sel} or nil  end
 function M.setGenreList(gen, sel)   genreList = gen and {cache=gen, sel=sel} or nil     end
+function M.setBoardLights(mode)     lightsMode = mode or "off"; lightsT = 0              end
 
 function M.clearRoundState()
     for i = 1, 5 do pressing[i] = false; denied[i] = false end
+    lightsMode = "off"
 end
 
 -- ── Draw ──────────────────────────────────────────────────────────────────────
@@ -281,25 +343,67 @@ local function drawStands()
     end
 end
 
-local function drawBlackboard()
-    if blackboard == nil or blackboard == "" then return end
-    if txts.title then
-        local t = txts.title:GetText(blackboard, false, BB_MWIDTH, col(Board.color))
-        t:DrawAtAnchor(BB_X, BB_Y, "center")
+local function drawBoardLights()
+    bulbs = bulbs or bulbCentres()
+    local pattern = LightAnim.chase_pattern
+    local step    = math.floor(lightsT / LightAnim.chase_step_s)
+    local flashOn = math.floor(lightsT / LightAnim.flash_half_s) % 2 == 0
+    for i, p in ipairs(bulbs) do
+        local key = "off"
+        if songList ~= nil then
+            key = pattern[(i - 1 - step) % #pattern + 1]
+        elseif lightsMode == "right" then
+            key = flashOn and "blue" or "off"
+        elseif lightsMode == "wrong" then
+            key = "red"
+        end
+        local t = tx["bulb_" .. key]
+        if t then t:DrawAtAnchor(p[1], p[2], "center") end
     end
 end
 
+-- one line centred on the board, or two line_gap apart, the second in the smaller font
+local function drawBlackboard()
+    local lines = {}
+    if blackboard ~= nil and blackboard ~= "" then lines[#lines + 1] = { blackboard, txts.title } end
+    if blackboard2 ~= nil and blackboard2 ~= "" then lines[#lines + 1] = { blackboard2, txts.board2 } end
+    for i, l in ipairs(lines) do
+        if l[2] then
+            local t = l[2]:GetText(l[1], false, BB_MWIDTH, col(Board.color))
+            t:DrawAtAnchor(BB_X, BB_Y + (i - (#lines + 1) / 2) * Board.line_gap, "center")
+        end
+    end
+end
+
+local function clockScale()
+    if clockPulseT == nil or clockPulseT >= ClockAnim.pulse_s then return 1 end
+    return 1 + (ClockAnim.pulse_scale - 1) * math.sin(math.pi * clockPulseT / ClockAnim.pulse_s)
+end
+
+local function drawScaled(t, x, y, sc, rot)
+    if not t then return end
+    t:SetScale(sc, sc)
+    t:SetRotation(rot or 0)
+    t:DrawAtAnchor(x, y, "center")
+    t:SetRotation(0)
+    t:SetScale(1, 1)
+end
+
+-- the stopwatch floats; its hand ticks clockwise from 12 to the seconds left, the number in the box below
 local function drawClock()
     if not clockShow or clockMs == nil then return end
-    if tx["Clock"] then
-        tx["Clock"]:DrawAtAnchor(CLOCK_X, CLOCK_Y, "topright")
-    end
+    local sc = clockScale()
+    local cx = CLOCK_X
+    local cy = CLOCK_Y + ClockAnim.bob_px * math.sin(2 * math.pi * clockT / ClockAnim.bob_s)
+    local secs = math.max(0, math.ceil(clockMs / 1000))
+    drawScaled(tx["Clock"], cx, cy, sc)
+    drawScaled(tx["ClockHand"], cx, cy, sc, -secs * 6)   -- SetRotation turns anticlockwise
+    local by = cy + Clock.box_dy * sc
+    drawScaled(tx["ClockPlate"], cx, by, sc)
     if txts.title then
-        local secs = math.max(0, math.ceil(clockMs / 1000))
-        local tcol      = secs <= Clock.warn_at_s and col(Clock.warn_color) or col(Clock.color)
+        local tcol      = clockTense and col(Clock.warn_color) or col(Clock.color)
         local noOutline = Config.color(Clock.outline_color)  -- transparent edge
-        local ct = txts.title:GetText(tostring(secs), false, Clock.max_width, tcol, noOutline)
-        ct:DrawAtAnchor(CLOCK_NUM_X, CLOCK_NUM_Y, "center")
+        drawScaled(txts.title:GetText(tostring(secs), false, Clock.max_width, tcol, noOutline), cx, by + Clock.num_dy * sc, sc)
     end
 end
 
@@ -377,6 +481,7 @@ end
 function M.draw()
     -- Stage background
     if tx["Stage"] then tx["Stage"]:Draw(0, 0) end
+    drawBoardLights()
 
     -- Stands (behind curtain)
     drawStands()
@@ -407,6 +512,9 @@ end
 -- ── Update ────────────────────────────────────────────────────────────────────
 
 function M.update()
+    lightsT = lightsT + fps.deltaTime
+    clockT  = clockT + fps.deltaTime
+    if clockPulseT then clockPulseT = clockPulseT + fps.deltaTime end
     if curtainCtr then
         curtainCtr:Tick()
         local done = false

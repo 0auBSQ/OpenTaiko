@@ -400,6 +400,9 @@ function loadAssets()
     sounds.ResultsSolo  = SOUND:CreateSFX("Sounds/ResultsSolo.ogg")
     sounds.Right        = SOUND:CreateSFX("Sounds/Right.ogg")
     sounds.Wrong        = SOUND:CreateSFX("Sounds/Wrong.ogg")
+    sounds.ClockTick      = SOUND:CreateSFX("Sounds/ClockTick.ogg")
+    sounds.ClockTickTense = SOUND:CreateSFX("Sounds/ClockTickTense.ogg")
+    sounds.ClockRing      = SOUND:CreateSFX("Sounds/ClockRing.ogg")
 
     -- Opening textures
     textures["Curtain"]     = TEXTURE:CreateTexture("Textures/Curtain.png")
@@ -435,8 +438,13 @@ function loadAssets()
     textures["Fail"]       = TEXTURE:CreateTexture("Textures/Fail.png")
     textures["bgtile"]     = TEXTURE:CreateTexture("Textures/BgTile.png")
     textures["Clock"]      = TEXTURE:CreateTexture("Textures/Clock/Clock.png")
+    textures["ClockHand"]  = TEXTURE:CreateTexture("Textures/Clock/Hand.png")
+    textures["ClockPlate"] = TEXTURE:CreateTexture("Textures/Clock/Plate.png")
     textures["SongList"]   = TEXTURE:CreateTexture("Textures/SongList.png")
     textures["SongBlock"]  = TEXTURE:CreateTexture("Textures/SongBlock.png")
+    textures["bulb_off"]   = TEXTURE:CreateTexture("Textures/Lights/Off.png")
+    textures["bulb_red"]   = TEXTURE:CreateTexture("Textures/Lights/Red.png")
+    textures["bulb_blue"]  = TEXTURE:CreateTexture("Textures/Lights/Blue.png")
     for i = 1, 5 do
         textures["chip_" .. i] = TEXTURE:CreateTexture("Textures/Icons/" .. i .. "P.png")
     end
@@ -462,6 +470,7 @@ function onStart()
     -- Text renderers
     texts.title    = TEXT:Create(Layout.fonts.title)
     texts.label    = TEXT:Create(Layout.fonts.label)
+    texts.board2   = TEXT:Create(Layout.fonts.board_line2)
 
     -- Utils table injected into Game module
     local utils = {

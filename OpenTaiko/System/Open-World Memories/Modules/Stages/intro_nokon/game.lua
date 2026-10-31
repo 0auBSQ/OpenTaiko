@@ -151,6 +151,11 @@ local function sub(text)
     return text
 end
 
+-- the board's second line after a right answer
+local function winsLine(p, n)
+    return I18N.trf(n == 1 and "%s wins %d point!" or "%s wins %d points!", playerNames[p] or ("Player " .. p), n)
+end
+
 local function showDialogue(blocks, onDone, opacity)
     local processed = {}
     for _, b in ipairs(blocks) do
@@ -261,12 +266,14 @@ local function eEvalCorrect()
     utils.playSound("Right")
     Stage.setPlayerPressing(1, false)
     Stage.setSongList(nil, nil)
+    Stage.setBoardLights("right")
     Stage.setSpotlight(1, true)
     scores[1] = (scores[1] or 0) + 1
     Stage.setScore(1, scores[1])
     setState("e_correct")
     local sel = utils.getSelectedSong()
     local songTitle = (sel and sel.Title) or "?"
+    Stage.setBlackboard(songTitle, winsLine(1, 1))
     local line
     if singleSongMode and scores[1] >= 100 then
         line = pick({
@@ -296,7 +303,8 @@ local function eEvalFail()
     Stage.setSongList(nil, nil)
     -- reveal the correct answer on the stage panel
     local sel = utils.getSelectedSong()
-    Stage.setBlackboard(sel and sel.Title or nil)
+    Stage.setBlackboard(sel and sel.Title or nil, I18N.tr("It's a wrap!"))
+    Stage.setBoardLights("wrong")
     Stage.setDarken(true)
     Stage.setShowFail(true)
     setState("e_fail")
@@ -353,8 +361,9 @@ local function vsEvalFail()
     Stage.setSongList(nil, nil)
     -- nobody found it in time — reveal the correct answer on the stage panel
     local sel = utils.getSelectedSong()
-    Stage.setBlackboard(sel and sel.Title or nil)
+    Stage.setBlackboard(sel and sel.Title or nil, I18N.tr("It's a wrap!"))
     Stage.clearRoundState()
+    Stage.setBoardLights("wrong")
     Stage.setDarken(true)
     Stage.setShowFail(true)
     setState("vs_fail")
@@ -378,8 +387,8 @@ local function vsEvalWin(winner, score)
     utils.stopPreview()
     utils.playSound("Right")
     Stage.setSongList(nil, nil)
-    Stage.setBlackboard(nil)
     Stage.clearRoundState()
+    Stage.setBoardLights("right")
     Stage.setSpotlight(winner, true)
     scores[winner] = (scores[winner] or 0) + score
     Stage.setScore(winner, scores[winner])
@@ -387,6 +396,7 @@ local function vsEvalWin(winner, score)
     local wname = playerNames[winner] or ("Player " .. winner)
     local wsel = utils.getSelectedSong()
     local wtitle = (wsel and wsel.Title) or "?"
+    Stage.setBlackboard(wtitle, winsLine(winner, score))
     showDialogue({
         { text = I18N.trf(pick({
             "And that's another W for %s! The song was \"%s\"!",
@@ -678,6 +688,7 @@ function M.update()
                 -- Wrong: deny player, fixed 10-point penalty; also reduce prize pool
                 vsDenied[ap] = true
                 Stage.setPlayerDenied(ap, true)
+                Stage.setBoardLights("wrong")
                 scores[ap] = math.max(0, (scores[ap] or 0) - 10)
                 Stage.setScore(ap, scores[ap])
                 utils.playSound("Wrong")
