@@ -112,6 +112,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 			if (chip.nChannelNo == 0xFF)
 				break;
 		}
+		this.msChartLength = endChip?.dbSoundTimems ?? 0;
 
 		int battleSectionCount = 3 + (int)((endChip!.dbSoundTimems * 2) / 100000);
 		// Avoid single section
@@ -778,6 +779,8 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	public CCounter?[] ctChipAnime = new CCounter[OpenTaiko.MAX_PLAYERS];
 	public CCounter?[] ctChipAnimeLag = new CCounter[OpenTaiko.MAX_PLAYERS];
 	private int bgmlength = 1;
+	// the chart's length to its end chip, in chart time (1x): the tower's coin length bonus
+	public double msChartLength = 0;
 
 	protected EGameplayScreenReturnValue eFadeOutCompleteWhenReturnValue;
 	protected readonly int[] nChannel0AtoPad08 = new int[] { 1, 2, 3, 4, 5, 7, 6, 1, 8, 0, 9, 9 };
