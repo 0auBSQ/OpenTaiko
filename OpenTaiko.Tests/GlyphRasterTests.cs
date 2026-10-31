@@ -51,5 +51,28 @@ namespace OpenTaikoTests {
 			var px = glyph.GetPixel((b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2);
 			if (px.Alpha > 200) { Assert.Equal(255, px.Red); Assert.Equal(255, px.Green); Assert.Equal(255, px.Blue); }
 		}
+
+		// an outline width from a tag (<c.#fore.#outline[4]>) reaches that many px past the letter, in the glyph
+		// raster and in the string renderer alike
+		[Fact]
+		public void OutlineWidth_ReachesThatFarPastTheInk() {
+			if (!File.Exists(FontPath())) return;
+			var fr = new CFontRenderer(FontPath(), 30);
+			const int reach = 4;
+			int margin = reach + 3;
+			using var fill = fr.DrawGlyph("W", false, 30, margin);
+			using var edge = fr.DrawGlyph("W", true, 30, margin, reach * 2);
+			var f = InkBox(fill);
+			var e = InkBox(edge);
+			Assert.InRange(f.x0 - e.x0, reach - 1, reach + 1);
+			Assert.InRange(e.x1 - f.x1, reach - 1, reach + 1);
+
+			using var plain = fr.DrawText("W", Color.White, false);
+			using var tagged = fr.DrawText("<c.#ffffff.#000000[4]>W</c>", Color.White, false);
+			var p = InkBox(plain);
+			var t = InkBox(tagged);
+			Assert.InRange(p.x0 - t.x0, reach - 1, reach + 1);
+			Assert.InRange(t.x1 - p.x1, reach - 1, reach + 1);
+		}
 	}
 }

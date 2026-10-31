@@ -113,7 +113,7 @@ namespace System {
 	public static class StringExtensions {
 		// TagRegex and RemoveTags are copies of TagRegex and Purify from the CSkiaSharpTextRenderer class (Have two instances because of both being in 2 different projects)
 
-		private const string TagRegex = @"<(/?)([gc](?:\.#[0-9a-fA-F]{6})*?)>";
+		private const string TagRegex = @"<(/?)([gc](?:\.#[0-9a-fA-F]{6})*?)(?:\[(\d+(?:\.\d+)?)\])?>";
 
 		public static string TrimStringWithTags(this string input, int maxLength) {
 			// This will store the result
@@ -175,7 +175,7 @@ namespace System {
 			while (openTags.Count > 0) {
 				string openTag = openTags.Pop();
 				// Convert the opening tag to its closing counterpart
-				string tagName = new Regex(@"<([gc](?:\.#[0-9a-fA-F]{6})*?)>").Match(openTag).Groups[1].Value;
+				string tagName = new Regex(TagRegex).Match(openTag).Groups[2].Value;
 				result += $"</{tagName[0]}>";
 			}
 

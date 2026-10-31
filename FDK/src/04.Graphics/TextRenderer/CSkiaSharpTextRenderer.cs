@@ -91,11 +91,13 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 		public Color GradiantBottom;
 		public bool UseOutline;
 		public Color OutlineColor;
+		public float OutlineWidth;   // how far the outline reaches past the letters, in px; 0 = the ratio's width
 	}
 
 	// Purify is equivalent to RemoveTags on ObjectExtensions.cs, update both if changing TagRegex
+	// <c.#fore>, <c.#fore.#outline>, either with an outline width: <c.#fore.#outline[3]>; <g.#top.#bottom>
 
-	private const string TagRegex = @"<(/?)([gc](?:\.#[0-9a-fA-F]{6})*?)>";
+	private const string TagRegex = @"<(/?)([gc](?:\.#[0-9a-fA-F]{6})*?)(?:\[(\d+(?:\.\d+)?)\])?>";
 
 	public string Purify(string input) {
 		return Regex.Replace(input, TagRegex, "");
@@ -140,6 +142,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 					TextColor = (tokenStack.Count == 0) ? fontColor : tokenStack.Peek().TextColor,
 					UseOutline = tokenStack.Count > 0 && tokenStack.Peek().UseOutline,
 					OutlineColor = (tokenStack.Count == 0) ? edgeColor : tokenStack.Peek().OutlineColor,
+					OutlineWidth = (tokenStack.Count == 0) ? 0 : tokenStack.Peek().OutlineWidth,
 				};
 				tokens.Add(token);
 			}
@@ -158,6 +161,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 					TextColor = (tokenStack.Count == 0) ? fontColor : tokenStack.Peek().TextColor,
 					UseOutline = tokenStack.Count > 0 ? tokenStack.Peek().UseOutline : false,
 					OutlineColor = (tokenStack.Count == 0) ? edgeColor : tokenStack.Peek().OutlineColor,
+					OutlineWidth = (tokenStack.Count == 0) ? 0 : tokenStack.Peek().OutlineWidth,
 				};
 
 				string[] _varSplit = match.Groups[2].Value.Split(".");
@@ -180,6 +184,10 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 									newToken.UseOutline = true;
 									newToken.OutlineColor = ColorTranslator.FromHtml(_varSplit[2]);
 								}
+								if (match.Groups[3].Success) {
+									newToken.UseOutline = true;
+									newToken.OutlineWidth = float.Parse(match.Groups[3].Value, System.Globalization.CultureInfo.InvariantCulture);
+								}
 								break;
 							}
 
@@ -200,6 +208,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 				TextColor = (tokenStack.Count == 0) ? fontColor : tokenStack.Peek().TextColor,
 				UseOutline = tokenStack.Count > 0 && tokenStack.Peek().UseOutline,
 				OutlineColor = (tokenStack.Count == 0) ? edgeColor : tokenStack.Peek().OutlineColor,
+				OutlineWidth = (tokenStack.Count == 0) ? 0 : tokenStack.Peek().OutlineWidth,
 			};
 			tokens.Add(token);
 		}
@@ -260,7 +269,8 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 					}
 
 					using SKPaint edgePaint = new SKPaint();
-					edgePaint.StrokeWidth = paint.TextSize * (secondEdgeColor == null ? 8 : 4) / edge_Ratio;
+					// the stroke is centred on the glyph path: it reaches half its width past the letters
+					edgePaint.StrokeWidth = tok.OutlineWidth > 0 ? tok.OutlineWidth * 2 : paint.TextSize * (secondEdgeColor == null ? 8 : 4) / edge_Ratio;
 					edgePaint.StrokeJoin = SKStrokeJoin.Round;
 					edgePaint.Color = new SKColor(tok.OutlineColor.R, tok.OutlineColor.G, tok.OutlineColor.B, tok.OutlineColor.A);
 					edgePaint.Style = SKPaintStyle.Stroke;
@@ -358,7 +368,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 		return SKBitmap.FromImage(image);
 	}
 
-	public SKBitmap DrawGlyph(string glyph, bool edgeOnly, int edge_Ratio, int margin) {
+	public SKBitmap DrawGlyph(string glyph, bool edgeOnly, int edge_Ratio, int margin, float strokeWidth = 0) {
 		// the glyph's own typeface when the font lacks it; the line metrics stay the font's, so every glyph shares a baseline
 		var segments = this.Shape(glyph, CTextShaper.Options.Current);
 		var fm = paint.FontMetrics;
@@ -380,7 +390,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 					strokePaint.Style = SKPaintStyle.Stroke;
 					strokePaint.Color = SKColors.White;
 				}
-				strokePaint.StrokeWidth = paint.TextSize * 8 / edge_Ratio;
+				strokePaint.StrokeWidth = strokeWidth > 0 ? strokeWidth : paint.TextSize * 8 / edge_Ratio;
 				float x = margin;
 				foreach (var segment in segments) {
 					this.DrawSegment(canvas, segment, x, baseline, strokePaint);

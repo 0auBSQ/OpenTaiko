@@ -199,6 +199,7 @@ Ambos renderizadores respetan estas etiquetas dentro de la cadena. Las etiquetas
 | --- | --- |
 | `<c.#rrggbb>` ... `</c>` | Color de relleno. |
 | `<c.#rrggbb.#rrggbb>` ... `</c>` | Color de relleno y color de contorno. |
+| `<c.#rrggbb.#rrggbb[n]>` ... `</c>` | Color de relleno, color de contorno y grosor del contorno: el contorno sobresale n px de las letras (se admiten decimales). `<c.#rrggbb[n]>` conserva el color de contorno predeterminado. |
 | `<g.#rrggbb.#rrggbb>` ... `</g>` | Relleno con gradiente vertical (color superior, color inferior). |
 
 ### Handle de texto

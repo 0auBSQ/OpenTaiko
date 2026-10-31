@@ -150,6 +150,38 @@ namespace OpenTaikoTests {
 		}
 
 		[Fact]
+		public void Tokenize_OutlineWidth_InBrackets() {
+			var (runes, styles) = Tok("a<c.#ffffff.#221612[3]>bc</c>d");
+			Assert.Equal(4, runes.Count);   // the bracket is part of the tag, not text
+			var st = styles[runes[1].StyleId];
+			Assert.Equal(Color.FromArgb(0x22, 0x16, 0x12).ToArgb(), st.Outline!.Value.ToArgb());
+			Assert.Equal(3f, st.OutlineWidth);
+			Assert.Equal(-1, runes[3].StyleId);
+		}
+
+		[Fact]
+		public void Tokenize_OutlineWidth_WithoutOutlineColour_AndDecimal() {
+			var (runes, styles) = Tok("<c.#ffffff[2.5]>x</c>");
+			var st = styles[runes[0].StyleId];
+			Assert.Null(st.Outline);
+			Assert.Equal(2.5f, st.OutlineWidth);
+			Assert.Null(Tok("<c.#ffffff>x</c>").styles[0].OutlineWidth);   // no bracket: the font's own width
+		}
+
+		[Fact]
+		public void Tokenize_OutlineWidth_InheritsIntoNestedTag() {
+			var (runes, styles) = Tok("<c.#ffffff.#000000[4]>a<c.#ff0000>b</c></c>");
+			Assert.Equal(4f, styles[runes[1].StyleId].OutlineWidth);
+			Assert.Equal(Color.FromArgb(255, 0, 0).ToArgb(), styles[runes[1].StyleId].Fore.ToArgb());
+		}
+
+		[Fact]
+		public void StringTags_WithOutlineWidth_RemoveAndTrim() {
+			Assert.Equal("Title", "<c.#ffffff.#000000[3]>Title</c>".RemoveTags());
+			Assert.Equal("<c.#ffffff.#000000[3]>Ti</c>", "<c.#ffffff.#000000[3]>Title".TrimStringWithTags(2));
+		}
+
+		[Fact]
 		public void Tokenize_NestedTags_RestoreOuter() {
 			var (runes, styles) = Tok("<c.#ff0000>a<c.#00ff00>b</c>c</c>");
 			Assert.Equal(Color.FromArgb(255, 0, 0).ToArgb(), styles[runes[0].StyleId].Fore.ToArgb());

@@ -14,7 +14,8 @@ namespace OpenTaiko {
 	// keep the font's kerning, measured once per pair by the string renderer, so the pen moves as it does there.
 	//
 	// Each character bakes a white fill (tinted with the fore colour at draw) and, on first use with a visible
-	// outline, a white edge stroke (tinted with the outline colour). Gradient fills bake their colours in.
+	// outline, a white edge stroke (tinted with the outline colour), one per outline width a tag asks for
+	// (<c.#fore.#outline[3]>). Gradient fills bake their colours in.
 	// A draw call places every glyph, then draws all the edges and all the fills on top, like the string
 	// renderer does for a token: a letter's outline never bites into its neighbour's ink.
 	//
@@ -33,11 +34,12 @@ namespace OpenTaiko {
 		private const int EDGE_RATIO = 30;
 		private const int GUTTER = 2;             // transparent pixels between slots so linear sampling never bleeds
 
-		// one packed glyph: its page texture and the rectangle holding it (tight box, GLYPH_MARGIN around the ink)
+		// one packed glyph: its page texture and the rectangle holding it (tight box, Margin around the ink)
 		private sealed class Slot {
 			public CTexture Page = null!;
 			public RectangleF Rect;
 			public int W, H;
+			public int Margin;
 		}
 		private sealed class Page {
 			public CTexture Tex = null!;
@@ -49,7 +51,7 @@ namespace OpenTaiko {
 
 		private readonly record struct FillKey(int CodePoint, int GradTopArgb, int GradBottomArgb);
 		private readonly Dictionary<FillKey, Slot?> _fills = [];   // null = whitespace or a failed bake
-		private readonly Dictionary<int, Slot?> _edges = [];
+		private readonly Dictionary<(int CodePoint, int Width), Slot?> _edges = [];   // Width: quarter px, -1 = the font's own
 		private readonly Dictionary<int, double> _advances = [];
 		private readonly Dictionary<(int, int), double> _kerns = [];
 		private readonly Func<int, double> _advanceOf;
@@ -190,7 +192,8 @@ namespace OpenTaiko {
 			return new Slot { Page = page.Tex, Rect = new RectangleF(x, y, w, h), W = w, H = h };
 		}
 
-		private Slot? Bake(string s, bool edgeOnly, bool tagged) {
+		// reach > 0: an edge reaching that many px past the ink instead of the font's own width
+		private Slot? Bake(string s, bool edgeOnly, bool tagged, float reach = 0) {
 			if (_font == null || string.IsNullOrWhiteSpace(s)) return null;
 			// base cast: render directly, skipping CCachedFontRenderer's FIFO (it would hold a duplicate copy).
 			// A failed bake (e.g. the font resource was swapped by a language change) degrades to an
@@ -198,6 +201,7 @@ namespace OpenTaiko {
 			try {
 				var fr = (CFontRenderer)_font;
 				SKBitmap bmp;
+				int margin = reach > 0 ? Math.Max(_margin, (int)Math.Ceiling(reach) + 3) : _margin;
 				if (tagged) {
 					// a gradient glyph goes through the string renderer (the only path that paints <g> tags):
 					// its bitmap carries the 25 px paddings, trimmed here to the atlas margin
@@ -210,11 +214,14 @@ namespace OpenTaiko {
 						if (sub == null || !sub.ReadPixels(bmp.Info, bmp.GetPixels(), bmp.RowBytes)) { bmp.Dispose(); return null; }
 					}
 				} else {
-					bmp = fr.DrawGlyph(s, edgeOnly, EDGE_RATIO, _margin);
+					bmp = fr.DrawGlyph(s, edgeOnly, EDGE_RATIO, margin, reach * 2);
 				}
 				using (bmp) {
 					var slot = Insert(bmp);
-					if (slot != null) Interlocked.Increment(ref LiveGlyphs);
+					if (slot != null) {
+						slot.Margin = tagged ? _margin : margin;
+						Interlocked.Increment(ref LiveGlyphs);
+					}
 					return slot;
 				}
 			} catch (Exception e) {
@@ -238,16 +245,18 @@ namespace OpenTaiko {
 			return slot;
 		}
 
-		private Slot? GetEdge(int cp) {
-			if (_edges.TryGetValue(cp, out var slot)) return slot;
-			slot = Bake(char.ConvertFromUtf32(cp), true, false);
-			_edges[cp] = slot;
+		// reach: the tag's outline width, null for the font's own
+		private Slot? GetEdge(int cp, float? reach) {
+			var key = (cp, reach.HasValue ? (int)Math.Round(reach.Value * 4) : -1);
+			if (_edges.TryGetValue(key, out var slot)) return slot;
+			slot = Bake(char.ConvertFromUtf32(cp), true, false, reach ?? 0);
+			_edges[key] = slot;
 			return slot;
 		}
 
-		private void Place(int cp, double gx, double gy, Color fore, Color outline, Color? gradTop, Color? gradBottom) {
+		private void Place(int cp, double gx, double gy, Color fore, Color outline, Color? gradTop, Color? gradBottom, float? reach) {
 			var fill = GetFill(cp, gradTop, gradBottom);
-			var edge = outline.A > 0 ? GetEdge(cp) : null;
+			var edge = outline.A > 0 && !(reach <= 0) ? GetEdge(cp, reach) : null;
 			if (fill == null && edge == null) return;
 			_placements.Add(new Placement { Fill = fill, Edge = edge, X = gx, Y = gy, Fore = fore, Outline = outline });
 		}
@@ -325,13 +334,15 @@ namespace OpenTaiko {
 					int styleId = runes[i].StyleId;
 					Color gFore = fore, gOutline = outline;
 					Color? gGradTop = null, gGradBottom = null;
+					float? gReach = null;
 					if (styleId >= 0) {
 						var st = styles[styleId];
 						if (!st.Fore.IsEmpty) gFore = st.Fore;
 						if (st.Outline != null) gOutline = st.Outline.Value;
 						gGradTop = st.GradTop; gGradBottom = st.GradBottom;
+						gReach = st.OutlineWidth;
 					}
-					Place(cp, startX + padShift + pen * f * scale, lineY, gFore, gOutline, gGradTop, gGradBottom);
+					Place(cp, startX + padShift + pen * f * scale, lineY, gFore, gOutline, gGradTop, gGradBottom, gReach);
 					pen += Step(runes, i, line.Start + line.Count);
 				}
 			}
@@ -351,13 +362,13 @@ namespace OpenTaiko {
 			foreach (var p in _placements) if (p.Edge != null) { anyEdge = true; break; }
 			bool batch = !rot && GlyphQuadBatch.Usable;
 
-			// the slots hold tight boxes (margin around the ink); the layout positions the string renderer's
+			// the slots hold tight boxes (their margin around the ink); the layout positions the string renderer's
 			// 25 px box, so every slot draws shifted right by the padding it no longer carries
-			double padShift = (CFontRenderer.TextPadding - _margin);
 			for (int pass = anyEdge ? 0 : 1; pass < 2; pass++) {
 				foreach (var p in _placements) {
 					var slot = pass == 0 ? p.Edge : p.Fill;
 					if (slot == null) continue;
+					double padShift = CFontRenderer.TextPadding - slot.Margin;
 					var page = slot.Page;
 					Color tint = pass == 0 ? p.Outline : p.Fore;
 					int opacity255 = (int)((pass == 0 ? opacity * tint.A / 255.0 : opacity) * 255);
@@ -472,13 +483,15 @@ namespace OpenTaiko {
 					int styleId = runes[i].StyleId;
 					Color gFore = fore, gOutline = outline;
 					Color? gGradTop = null, gGradBottom = null;
+					float? gReach = null;
 					if (styleId >= 0) {
 						var st = styles[styleId];
 						if (!st.Fore.IsEmpty) gFore = st.Fore;
 						if (st.Outline != null) gOutline = st.Outline.Value;
 						gGradTop = st.GradTop; gGradBottom = st.GradBottom;
+						gReach = st.OutlineWidth;
 					}
-					Place(cp, x + pen * scale, lineY, gFore, gOutline, gGradTop, gGradBottom);
+					Place(cp, x + pen * scale, lineY, gFore, gOutline, gGradTop, gGradBottom, gReach);
 					pen += Step(runes, i, line.Start + line.Count);
 				}
 			}

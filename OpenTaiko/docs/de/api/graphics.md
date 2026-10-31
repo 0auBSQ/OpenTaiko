@@ -199,6 +199,7 @@ Beide Renderer beachten diese Tags innerhalb des Strings. Tags können verschach
 | --- | --- |
 | `<c.#rrggbb>` ... `</c>` | Füllfarbe. |
 | `<c.#rrggbb.#rrggbb>` ... `</c>` | Füllfarbe und Umrissfarbe. |
+| `<c.#rrggbb.#rrggbb[n]>` ... `</c>` | Füllfarbe, Umrissfarbe und Umrissbreite: Der Umriss reicht n px über die Buchstaben hinaus (Dezimalzahlen erlaubt). `<c.#rrggbb[n]>` behält die Standard-Umrissfarbe. |
 | `<g.#rrggbb.#rrggbb>` ... `</g>` | Vertikaler Verlauf als Füllung (obere Farbe, untere Farbe). |
 
 ### Text-Handle

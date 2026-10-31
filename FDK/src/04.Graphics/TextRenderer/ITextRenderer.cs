@@ -11,7 +11,8 @@ internal interface ITextRenderer : IDisposable {
 	// one glyph, white, on a tight bitmap: the ink (or its edge stroke alone) with `margin` px of room on the
 	// left, right and bottom and the ascender line at y = 0 — the geometry DrawText gives a single character
 	// once its 25 px paddings shrink to `margin`. Straight (unpremultiplied) RGBA, ready to upload as is.
-	SKBitmap DrawGlyph(string glyph, bool edgeOnly, int edge_Ratio, int margin);
+	// strokeWidth > 0 sets the edge stroke's width in px instead of the ratio's.
+	SKBitmap DrawGlyph(string glyph, bool edgeOnly, int edge_Ratio, int margin, float strokeWidth = 0);
 
 	string Purify(string input);
 

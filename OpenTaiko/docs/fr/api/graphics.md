@@ -199,6 +199,7 @@ Les deux moteurs de rendu reconnaissent ces balises dans la chaîne. Les balises
 | --- | --- |
 | `<c.#rrggbb>` ... `</c>` | Couleur de remplissage. |
 | `<c.#rrggbb.#rrggbb>` ... `</c>` | Couleur de remplissage et couleur de contour. |
+| `<c.#rrggbb.#rrggbb[n]>` ... `</c>` | Couleur de remplissage, couleur de contour et largeur du contour : le contour dépasse les lettres de n px (décimales acceptées). `<c.#rrggbb[n]>` garde la couleur de contour par défaut. |
 | `<g.#rrggbb.#rrggbb>` ... `</g>` | Remplissage en dégradé vertical (couleur du haut, couleur du bas). |
 
 ### Handle de texte

@@ -11,11 +11,12 @@ namespace OpenTaiko;
 // is unit-testable headless.
 public static class GlyphTextLayout {
 	// keep in sync with CSkiaSharpTextRenderer.TagRegex and StringExtensions.TagRegex
-	private static readonly Regex TagRegex = new(@"<(/?)([gc](?:\.#[0-9a-fA-F]{6})*?)>", RegexOptions.Compiled);
+	private static readonly Regex TagRegex = new(@"<(/?)([gc](?:\.#[0-9a-fA-F]{6})*?)(?:\[(\d+(?:\.\d+)?)\])?>", RegexOptions.Compiled);
 
 	// a color override introduced by a <c.#rrggbb>/<c.#rrggbb.#rrggbb> (fore / fore+outline) or a
-	// <g.#top.#bottom> vertical-gradient tag (GradTop/GradBottom set, applied per glyph at bake time)
-	public readonly record struct Style(Color Fore, Color? Outline, Color? GradTop = null, Color? GradBottom = null);
+	// <g.#top.#bottom> vertical-gradient tag (GradTop/GradBottom set, applied per glyph at bake time).
+	// A c tag may end with an outline width, <c.#rrggbb.#rrggbb[3]>: how far the outline reaches past the letters, in px
+	public readonly record struct Style(Color Fore, Color? Outline, Color? GradTop = null, Color? GradBottom = null, float? OutlineWidth = null);
 
 	// one Unicode code point with the style active at its position; StyleId -1 = the caller's default colors
 	public readonly record struct StyledRune(int CodePoint, int StyleId);
@@ -45,6 +46,8 @@ public static class GlyphTextLayout {
 			if (parts[0] == "c") {
 				if (parts.Length > 1) current = current with { Fore = ColorTranslator.FromHtml(parts[1]) };
 				if (parts.Length > 2) current = current with { Outline = ColorTranslator.FromHtml(parts[2]) };
+				if (match.Groups[3].Success)
+					current = current with { OutlineWidth = float.Parse(match.Groups[3].Value, System.Globalization.CultureInfo.InvariantCulture) };
 			} else if (parts[0] == "g") {
 				if (parts.Length > 2) current = current with { GradTop = ColorTranslator.FromHtml(parts[1]), GradBottom = ColorTranslator.FromHtml(parts[2]) };
 			}

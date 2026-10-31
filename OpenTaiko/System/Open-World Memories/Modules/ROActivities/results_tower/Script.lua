@@ -24,6 +24,7 @@ local judgeFrames = 5   -- the selected judges pack's Judge.png frames (Good, OK
 local tex = {}
 local fonts = {}
 local col = {}
+local hex = {}               -- the text colours as tag hex ("rrggbb"), by name
 local sounds = {}            -- each a list of notes (one for a single sound)
 local strings = {}
 
@@ -54,6 +55,9 @@ local function fill(s, value) return (s:gsub("{0}", tostring(value))) end
 
 -- "812450", no separators
 local function whole(n) return tostring(math.floor(n)) end
+
+-- "812,450"
+local function grouped(n) return (whole(n):reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", "")) end
 
 local function clamp01(x) return math.max(0, math.min(1, x)) end
 local function easeOut(x) x = clamp01(x); return 1 - (1 - x) ^ 3 end
@@ -203,8 +207,17 @@ local function nudge(font) return math.floor(pad(font) / 2) + Layout.text_nudge 
 -- the ink width of s
 local function width(font, s, scale) return font:Measure(s) * (scale or 1) end
 
+-- s in a colour tag: its fill and, unless o.edge is false, a thin dark edge at the tag's width (the engine's own
+-- edge is too thick here). o.color and o.edgeColor are names in `hex`
+local function styled(font, s, o)
+    local fore = hex[o.color or "text"]
+    if o.edge == false then return "<c.#" .. fore .. ">" .. s .. "</c>" end
+    local e = math.max(1, math.floor(font.LineHeight * Layout.edge_ratio + 0.5))
+    return "<c.#" .. fore .. ".#" .. hex[o.edgeColor or "edge"] .. "[" .. e .. "]>" .. s .. "</c>"
+end
+
 -- a text at a board point, its ink's left edge, centre or right edge at x ("left", "center" or "right") and
--- its line's middle at y; no outline, a soft shadow under it. o: scale, opacity, maxW, angle, color, shadow (px)
+-- its line's middle at y. o: scale, opacity, maxW, angle, color, edgeColor, edge (see styled)
 local function text(font, s, b, q, x, y, anchor, o)
     if s == nil or s == "" then return end
     o = o or {}
@@ -215,11 +228,7 @@ local function text(font, s, b, q, x, y, anchor, o)
     local angle = q.angle + (o.angle or 0)
     local sx, sy = at(b, q, x, y)
     sy = sy + nudge(font) * scale
-    local sh = o.shadow or Layout.shadow_px
-    if sh > 0 then
-        font:Draw(s, sx, sy + sh, o.shadowColor or col.shadow, col.clear, opacity * Layout.shadow_opacity, scale, o.maxW or 0, anchor, 0, angle)
-    end
-    font:Draw(s, sx, sy, o.color or col.text, col.clear, opacity, scale, o.maxW or 0, anchor, 0, angle)
+    font:Draw(styled(font, s, o), sx, sy, nil, col.clear, opacity, scale, o.maxW or 0, anchor, 0, angle)
 end
 
 -- ── timeline ─────────────────────────────────────────────────────────────────────────────────────────
@@ -431,7 +440,7 @@ local function drawTag(b, q, cx, cy, t0)
     local w, h, r = tagWidth() * s, TAG.height * s, TAG.rim * s
     pill(b, q, cx - w / 2 - r, cx + w / 2 + r, cy, h + 2 * r, col.tagRim)
     pill(b, q, cx - w / 2, cx + w / 2, cy, h, col.tagFill)
-    text(fonts.tag, strings.newBest, b, q, cx, cy, "center", { scale = s, color = col.tagText, shadowColor = col.tagShadow })
+    text(fonts.tag, strings.newBest, b, q, cx, cy, "center", { scale = s, color = "tagText", edgeColor = "tagEdge" })
     local tw = 1 + Animation.new_best.twinkle_scale * math.sin(idle * Animation.new_best.twinkle_rad_per_s)
     put(tex.sparkle, b, q, cx - w / 2 - TAG.sparkle_dx * s, cy - TAG.sparkle_dy * s, s * tw, 0)
     put(tex.sparkle, b, q, cx + w / 2 + TAG.sparkle_dx * s, cy + TAG.sparkle_dy * s, s * (2 - tw) * 0.8, 20)
@@ -456,11 +465,11 @@ local function drawFloorBar(b, q, climb, shown)
     for i, m in ipairs(MARKS) do
         local reached = shown * 100 >= total * m
         local mx = left + barW * m / 100
-        tex.floor_mark:SetColor(reached and col.shadow or col.markOffTint)
+        tex.floor_mark:SetColor(reached and col.edge or col.markOffTint)
         put(tex.floor_mark, b, q, mx, B.y)
         tex.floor_mark:SetColor(1.0, 1.0, 1.0)
         text(fonts.mark, tostring(m) .. "%", b, q, mx, B.y + B.label_dy, "center",
-            { color = reached and col.text or col.markOff, shadow = reached and Layout.shadow_px or 0 })
+            { color = reached and "text" or "markOff", edge = reached })
         if reached and clock < timeline.floorEnd + 0.05 then cue("mark", "mark" .. m, i) end
     end
     -- the top: one note over the last mark's
@@ -494,15 +503,15 @@ local function drawTop(b, q, climb)
     local pillTex = info.TowerSide == 1 and tex.pill_spicy or tex.pill_sweet
     put(pillTex, b, q, TOP.pill.x, TOP.pill.y, TOP.pill.scale)
     text(fonts.title, info.Title, b, q, TOP.title.x, TOP.title.y, "center", { maxW = TOP.title.max_width })
-    text(fonts.subtitle, info.Subtitle, b, q, TOP.subtitle.x, TOP.subtitle.y, "center", { maxW = TOP.subtitle.max_width, color = col.dim })
-    text(fonts.caption, strings.reached, b, q, TOP.caption.x, TOP.caption.y, "left", { color = col.dim })
+    text(fonts.subtitle, info.Subtitle, b, q, TOP.subtitle.x, TOP.subtitle.y, "center", { maxW = TOP.subtitle.max_width, color = "dim" })
+    text(fonts.caption, strings.reached, b, q, TOP.caption.x, TOP.caption.y, "left", { color = "dim" })
 
     -- the floor, right-aligned where its final count ends, the total after it
     local shown = math.floor(climb + 0.5)
-    local right = TOP.floor.x + width(fonts.floor, tostring(info.ReachedFloor))
-    text(fonts.floor, tostring(shown), b, q, right, TOP.floor.y, "right", { shadow = Layout.big_shadow_px })
+    local right = TOP.floor.x + width(fonts.floor, whole(info.ReachedFloor))
+    text(fonts.floor, whole(shown), b, q, right, TOP.floor.y, "right", { color = "number" })
     local totalX = right + TOP.floor_total.gap
-    text(fonts.floorTotal, strings.ofFloors, b, q, totalX, TOP.floor.y + TOP.floor_total.dy, "left", { color = col.dim })
+    text(fonts.floorTotal, strings.ofFloors, b, q, totalX, TOP.floor.y + TOP.floor_total.dy, "left", { color = "dim" })
 
     drawFloorBar(b, q, climb, shown)
 
@@ -517,17 +526,17 @@ local function drawTop(b, q, climb)
             cue("jingle", "floorBest")
             if prev > 0 then
                 local k = progress(timeline.floorBest, Animation.new_best.pop_s)
-                text(fonts.best, fill(strings.previousBest, prev), b, q, cx, B.line1_y, "center", { color = col.dim, opacity = k })
+                text(fonts.best, fill(strings.previousBest, prev), b, q, cx, B.line1_y, "center", { color = "dim", opacity = k })
                 local gained = info.ReachedFloor - prev
-                text(fonts.gain, fill(gained == 1 and strings.gainedOne or strings.gained, gained), b, q, cx, B.line2_y, "center", { color = col.gain, opacity = k })
+                text(fonts.gain, fill(gained == 1 and strings.gainedOne or strings.gained, gained), b, q, cx, B.line2_y, "center", { color = "gain", opacity = k })
             end
         end
     elseif prev > 0 and clock >= timeline.floorEnd then
         local k = progress(timeline.floorEnd, Animation.new_best.pop_s)
-        text(fonts.best, fill(strings.best, prev), b, q, cx, B.tag_y, "center", { color = col.dim, opacity = k })
+        text(fonts.best, fill(strings.best, prev), b, q, cx, B.tag_y, "center", { color = "dim", opacity = k })
         local left = prev - info.ReachedFloor
         if left > 0 then
-            text(fonts.best, fill(left == 1 and strings.toGoOne or strings.toGo, left), b, q, cx, B.line1_y, "center", { color = col.dim, opacity = k })
+            text(fonts.best, fill(left == 1 and strings.toGoOne or strings.toGo, left), b, q, cx, B.line1_y, "center", { color = "dim", opacity = k })
         end
     end
 
@@ -555,7 +564,7 @@ local function drawLives(b, q)
     local back = tex.bar_back
     local cx = L.right - back.Width * s / 2
     put(back, b, q, cx, L.y, s)
-    text(fonts.caption, strings.lives, b, q, L.right - back.Width * s + 2, L.caption_y, "left", { color = col.dim })
+    text(fonts.caption, strings.lives, b, q, L.right - back.Width * s + 2, L.caption_y, "left", { color = "dim" })
     local n = math.max(1, info.MaxLives)
     local segments = (n >= LIVES.plain_from) and 1 or n
     local gap = 0
@@ -606,20 +615,19 @@ local function drawBottom(b, q)
                 local cw = word.Width - 2 * BOTTOM.judge_padding
                 put(word, b, q, x + cw * BOTTOM.judge_scale / 2, y + BOTTOM.judge_dy, BOTTOM.judge_scale * s, 0, k)
             end
-            text(fonts.judge, whole(JUDGE_VALUE[j.name]()), b, q, x + BOTTOM.row_width, y, "right", { scale = s, opacity = k })
+            text(fonts.judge, whole(JUDGE_VALUE[j.name]()), b, q, x + BOTTOM.row_width, y, "right", { scale = s, opacity = k, color = "number" })
         end
     end
 
     -- the score counts up; its New best! tag after it, or its best
     local S = BOTTOM.score
-    text(fonts.caption, strings.score, b, q, S.x, S.caption_y, "left", { color = col.dim })
-    local final = whole(info:GetScore(0))
+    text(fonts.caption, strings.score, b, q, S.x, S.caption_y, "left", { color = "dim" })
     if clock >= timeline.scoreStart then
         local shown = info:GetScore(0) * easeOut(progress(timeline.scoreStart, Animation.score.count_s))
-        text(fonts.score, whole(shown), b, q, S.x, S.y, "left", { shadow = Layout.big_shadow_px })
+        text(fonts.score, grouped(shown), b, q, S.x, S.y, "left", { color = "number" })
     end
     local SB = BOTTOM.score_best
-    local x0 = S.x + width(fonts.score, final) + SB.gap
+    local x0 = S.x + width(fonts.score, grouped(info:GetScore(0))) + SB.gap
     if info.IsNewBestScore then
         local cx = x0 + tagWidth() / 2
         drawTag(b, q, cx, SB.tag_y, timeline.scoreBest)
@@ -627,12 +635,12 @@ local function drawBottom(b, q)
             cue("jingle_high", "scoreBest")
             if info:GetPreviousBestScore(0) > 0 then
                 local k = progress(timeline.scoreBest, Animation.new_best.pop_s)
-                text(fonts.best, "+" .. whole(info:GetScore(0) - info:GetPreviousBestScore(0)), b, q, cx, SB.line_y, "center", { color = col.gain, opacity = k })
+                text(fonts.best, "+" .. grouped(info:GetScore(0) - info:GetPreviousBestScore(0)), b, q, cx, SB.line_y, "center", { color = "gain", opacity = k })
             end
         end
     elseif info:GetPreviousBestScore(0) > 0 and clock >= timeline.scoreEnd then
         local k = progress(timeline.scoreEnd, Animation.new_best.pop_s)
-        text(fonts.best, fill(strings.best, whole(info:GetPreviousBestScore(0))), b, q, x0, S.y, "left", { color = col.dim, opacity = k })
+        text(fonts.best, fill(strings.best, grouped(info:GetPreviousBestScore(0))), b, q, x0, S.y, "left", { color = "dim", opacity = k })
     end
 
     drawLives(b, q)
@@ -663,7 +671,7 @@ function onStart()
     col.text = Config.color(Layout.text_color)
     col.dim = Config.color(Layout.dim_color)
     col.gain = Config.color(Layout.gain_color)
-    col.shadow = Config.color(Layout.shadow_color)
+    col.edge = Config.color(Layout.edge_color)
     col.markOff = Config.color(Layout.mark_off_color)
     col.markOffTint = Config.color(Layout.mark_off_tint)
     col.sweet = Config.color(Layout.side_colors.sweet)
@@ -671,7 +679,7 @@ function onStart()
     col.tagFill = Config.color(TAG.fill_color)
     col.tagRim = Config.color(TAG.rim_color)
     col.tagText = Config.color(TAG.text_color)
-    col.tagShadow = Config.color(TAG.shadow_color)
+    col.tagEdge = Config.color(TAG.edge_color)
     col.blue = Config.color(LIVES.blue_color)
     col.yellow = Config.color(LIVES.yellow_color)
     col.red = Config.color(LIVES.red_color)
@@ -679,6 +687,10 @@ function onStart()
     col.gold = Config.color(GLITTER.gold)
     col.white = COLOR:CreateColorFromRGBA(255, 255, 255, 255)
     col.clear = COLOR:CreateColorFromRGBA(0, 0, 0, 0)
+    for name, c in pairs({ text = Layout.text_color, dim = Layout.dim_color, gain = Layout.gain_color, markOff = Layout.mark_off_color, number = Layout.number_color,
+                           edge = Layout.edge_color, tagText = TAG.text_color, tagEdge = TAG.edge_color }) do
+        hex[name] = string.format("%02x%02x%02x", c[1], c[2], c[3])
+    end
 end
 
 local TEXTURES = { "board_top", "board_bottom", "rope", "knot", "floor_track", "fill_end", "fill_body", "floor_mark",
@@ -812,16 +824,17 @@ function activate(result)
     }
     timeline = buildTimeline()
     played, notes, clock, idle = {}, { step = { t = -1, floor = 0 }, count = -1, lives = 0 }, 0, 0
-    -- the glyphs the screen shows are baked here, not on their first draw while it animates
+    -- the glyphs the screen shows, fills and edges, are baked here, not on their first draw while it animates
     local off = -10000
-    for _, f in pairs(fonts) do f:Draw("0123456789%+/", off, off, col.text, col.clear) end
-    fonts.title:Draw(info.Title, off, off, col.text, col.clear)
-    fonts.subtitle:Draw(info.Subtitle, off, off, col.text, col.clear)
-    fonts.tag:Draw(strings.newBest, off, off, col.text, col.clear)
-    for _, s in ipairs({ strings.reached, strings.lives, strings.score }) do fonts.caption:Draw(s, off, off, col.text, col.clear) end
-    fonts.floorTotal:Draw(strings.ofFloors, off, off, col.text, col.clear)
-    for _, s in ipairs({ strings.previousBest, strings.best, strings.toGo, strings.toGoOne }) do fonts.best:Draw(s, off, off, col.text, col.clear) end
-    for _, s in ipairs({ strings.gained, strings.gainedOne }) do fonts.gain:Draw(s, off, off, col.text, col.clear) end
+    local function warm(f, s) f:Draw(styled(f, s, {}), off, off, nil, col.clear) end
+    for _, f in pairs(fonts) do warm(f, "0123456789%+/,") end
+    warm(fonts.title, info.Title)
+    warm(fonts.subtitle, info.Subtitle)
+    warm(fonts.tag, strings.newBest)
+    for _, s in ipairs({ strings.reached, strings.lives, strings.score }) do warm(fonts.caption, s) end
+    warm(fonts.floorTotal, strings.ofFloors)
+    for _, s in ipairs({ strings.previousBest, strings.best, strings.toGo, strings.toGoOne }) do warm(fonts.best, s) end
+    for _, s in ipairs({ strings.gained, strings.gainedOne }) do warm(fonts.gain, s) end
     active = true
 end
 

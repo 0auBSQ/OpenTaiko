@@ -199,6 +199,7 @@ Beide renderers honoreren deze tags binnen de string. Tags kunnen nesten; een ni
 | --- | --- |
 | `<c.#rrggbb>` ... `</c>` | Vulkleur. |
 | `<c.#rrggbb.#rrggbb>` ... `</c>` | Vulkleur en contourkleur. |
+| `<c.#rrggbb.#rrggbb[n]>` ... `</c>` | Vulkleur, contourkleur en contourdikte: de contour steekt n px buiten de letters uit (decimalen toegestaan). `<c.#rrggbb[n]>` houdt de standaard contourkleur. |
 | `<g.#rrggbb.#rrggbb>` ... `</g>` | Verticale gradiëntvulling (bovenkleur, onderkleur). |
 
 ### Tekst-handle

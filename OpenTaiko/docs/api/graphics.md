@@ -199,6 +199,7 @@ Both renderers honour these tags inside the string. Tags nest; an unclosed tag r
 | --- | --- |
 | `<c.#rrggbb>` ... `</c>` | Fill colour. |
 | `<c.#rrggbb.#rrggbb>` ... `</c>` | Fill colour and outline colour. |
+| `<c.#rrggbb.#rrggbb[n]>` ... `</c>` | Fill colour, outline colour and outline width: the outline reaches n px past the letters (decimals allowed). `<c.#rrggbb[n]>` keeps the default outline colour. |
 | `<g.#rrggbb.#rrggbb>` ... `</g>` | Vertical gradient fill (top colour, bottom colour). |
 
 ### Text handle

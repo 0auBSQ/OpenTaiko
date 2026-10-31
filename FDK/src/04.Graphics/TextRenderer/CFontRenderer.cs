@@ -152,8 +152,9 @@ public class CFontRenderer : IDisposable {
 
 	// a single white glyph (or its edge stroke) on a tight straight-alpha bitmap: `margin` px left/right/bottom,
 	// ascender line at y = 0. The fast path for glyph caches: no tokenizing, no compositing pass, one raster.
-	public SKBitmap DrawGlyph(string glyph, bool edgeOnly, int edge_Ratio, int margin) {
-		return this.textRenderer.DrawGlyph(glyph, edgeOnly, edge_Ratio, margin);
+	// strokeWidth > 0 sets the edge stroke's width in px instead of the ratio's.
+	public SKBitmap DrawGlyph(string glyph, bool edgeOnly, int edge_Ratio, int margin, float strokeWidth = 0) {
+		return this.textRenderer.DrawGlyph(glyph, edgeOnly, edge_Ratio, margin, strokeWidth);
 	}
 	protected SKBitmap DrawText(string drawstr, CFontRenderer.DrawMode drawmode, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradationBottomColor, int edge_Ratio, bool keepCenter = false) {
 		//横書きに対してのCorrectionは廃止
