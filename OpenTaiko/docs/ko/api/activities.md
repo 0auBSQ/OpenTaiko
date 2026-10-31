@@ -336,7 +336,7 @@ info.DanGrade와 info.PreviousNameplateDan이 반환하는 객체(읽기 전용)
 
 | 메서드 | 설명 |
 | --- | --- |
-| `grade.Title  -> string` | 네임플레이트에 표시되는 단위 이름(채보 제목의 처음 두 글자). 없으면 "". |
+| `grade.Title  -> string` | 네임플레이트에 표시되는 단위 이름(채보 제목의 처음 최대 네 글자). 없으면 "". |
 | `grade.Gold  -> boolean` | 금 합격이면 true. |
 | `grade.Tier  -> number` | 0 클리어, 1 풀 콤보, 2 퍼펙트. |
 

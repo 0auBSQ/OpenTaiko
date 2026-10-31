@@ -336,7 +336,7 @@ L'objet que renvoient info.DanGrade et info.PreviousNameplateDan, en lecture seu
 
 | Méthode | Description |
 | --- | --- |
-| `grade.Title  -> string` | Le titre du dan tel que la plaque l'affiche (les deux premiers caractères du titre du chart) ; "" s'il n'y en a pas. |
+| `grade.Title  -> string` | Le titre du dan tel que la plaque l'affiche (jusqu'aux quatre premiers caractères du titre du chart) ; "" s'il n'y en a pas. |
 | `grade.Gold  -> boolean` | true pour une réussite en or. |
 | `grade.Tier  -> number` | 0 clear, 1 full combo, 2 perfect. |
 

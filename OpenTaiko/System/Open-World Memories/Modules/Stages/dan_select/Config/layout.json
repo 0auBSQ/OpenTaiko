@@ -59,6 +59,7 @@
         "sub_y": 208
     },
     "content": { "_note": "Contents.png's top-left.", "x": 373, "y": 287 },
+    "shortcuts": { "_note": "the shortcuts line's top-left; the song speed notice's top centre", "helper": [24, 24], "speed": [165, 84] },
     "danplate": { "x": 195, "y": 280 },
     "confirm": {
         "_note": "The confirm scroll, centred on the screen. The veil tiles dim to veil_opacity. paper_w x paper_h stand in for scroll_paper.png's size before it loads. The options (button_w x button_h art, drawn at button_scale) stand button_gap apart, their centre button_dy under the paper's; the highlight frame is Hover.png from hover_src_y down. The question sits title_dy under the paper's top, fades in over title_fade_px once the open part is title_pad wider than it, and is title_inset narrower than the paper.",

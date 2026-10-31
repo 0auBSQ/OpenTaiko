@@ -27,6 +27,7 @@
         "slide": "Sounds/tower_slide.ogg"
     },
     "land_speeds": [0.92, 1.0, 1.08],
+    "puchi": { "_note": "the puchichara's bob and its frames", "float_px": 6.0, "float_period_s": 3, "frames": 2, "frame_cycle_s": 4.8 },
     "slide_volume": 60,
     "signs": {
         "_note": "The title sign falls from drop_px over its place, the options from the title sign's place, in fall_s; the first option starts first_option_delay_s after the title sign lands, each next one stagger_s later. A landed sign bounces on its ropes, swings, and the swing settles into the idle sway over settle_s; phase offsets the sway of each sign (title_phase, then option_phase_step times its rank). The signs leave in close_s.",

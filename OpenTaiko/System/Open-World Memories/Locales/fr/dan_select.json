@@ -8,6 +8,8 @@
         "DANSELECT_STANDARD_DESC": "Prouve ton niveau avec la sélection du dojo !",
         "DANSELECT_PAGODA_DESC": "Enchaîne plusieurs dans aléatoires à la suite !",
         "DANSELECT_EXIT": "Quitter",
-        "DANSELECT_CONFIRM": "Relever le défi ?"
+        "DANSELECT_CONFIRM": "Relever le défi ?",
+        "DANSELECT_NOT_RECORDED": "Non enregistré",
+        "DANSELECT_NO_GRADE": "Non enregistré, sans grade de dan"
     }
 }

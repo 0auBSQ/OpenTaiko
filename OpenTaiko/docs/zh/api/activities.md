@@ -336,7 +336,7 @@ info.DanGrade 和 info.PreviousNameplateDan 返回的对象，只读。
 
 | 方法 | 说明 |
 | --- | --- |
-| `grade.Title  -> string` | 名牌上显示的段位名称（谱面标题的前两个字符）；没有时为 ""。 |
+| `grade.Title  -> string` | 名牌上显示的段位名称（谱面标题的最多前四个字符）；没有时为 ""。 |
 | `grade.Gold  -> boolean` | 金色合格时为 true。 |
 | `grade.Tier  -> number` | 0 通关，1 全连，2 全良。 |
 

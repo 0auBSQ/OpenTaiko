@@ -8,6 +8,8 @@
         "DANSELECT_STANDARD_DESC": "Prove your skills through the dojo's selection!",
         "DANSELECT_PAGODA_DESC": "Go through multiple randomized dans in a row!",
         "DANSELECT_EXIT": "Exit",
-        "DANSELECT_CONFIRM": "Take the challenge?"
+        "DANSELECT_CONFIRM": "Take the challenge?",
+        "DANSELECT_NOT_RECORDED": "Not recorded",
+        "DANSELECT_NO_GRADE": "Not recorded, no dan grade"
     }
 }

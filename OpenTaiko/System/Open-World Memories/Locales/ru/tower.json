@@ -30,6 +30,7 @@
         "TOWERSELECT_SOON_DESC": "Этот режим появится позже, следите за новостями!",
         "TOWERSELECT_HIGH_SCORE": "Рекорд",
         "TOWERSELECT_BEST_FLOOR": "Лучший этаж",
-        "TOWERSELECT_TO_MODES": "Выбор режима"
+        "TOWERSELECT_TO_MODES": "Выбор режима",
+        "TOWERSELECT_NOT_RECORDED": "Не сохраняется"
     }
 }

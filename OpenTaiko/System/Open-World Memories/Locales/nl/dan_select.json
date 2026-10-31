@@ -8,6 +8,8 @@
         "DANSELECT_STANDARD_DESC": "Bewijs je kunnen met de selectie van de dojo!",
         "DANSELECT_PAGODA_DESC": "Doorloop meerdere willekeurige dans achter elkaar!",
         "DANSELECT_EXIT": "Afsluiten",
-        "DANSELECT_CONFIRM": "De uitdaging aangaan?"
+        "DANSELECT_CONFIRM": "De uitdaging aangaan?",
+        "DANSELECT_NOT_RECORDED": "Wordt niet opgeslagen",
+        "DANSELECT_NO_GRADE": "Niet opgeslagen, geen dan-rang"
     }
 }

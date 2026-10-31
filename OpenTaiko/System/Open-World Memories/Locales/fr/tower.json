@@ -30,6 +30,7 @@
         "TOWERSELECT_SOON_DESC": "Ce mode de jeu arrivera plus tard, restez à l'écoute !",
         "TOWERSELECT_HIGH_SCORE": "Meilleur score",
         "TOWERSELECT_BEST_FLOOR": "Meilleur étage",
-        "TOWERSELECT_TO_MODES": "Choix du mode"
+        "TOWERSELECT_TO_MODES": "Choix du mode",
+        "TOWERSELECT_NOT_RECORDED": "Non enregistré"
     }
 }

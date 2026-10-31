@@ -8,6 +8,8 @@
         "DANSELECT_STANDARD_DESC": "通过道场精选的课题证明你的实力！",
         "DANSELECT_PAGODA_DESC": "连续挑战多个随机段位！",
         "DANSELECT_EXIT": "退出",
-        "DANSELECT_CONFIRM": "接受挑战？"
+        "DANSELECT_CONFIRM": "接受挑战？",
+        "DANSELECT_NOT_RECORDED": "不会记录成绩",
+        "DANSELECT_NO_GRADE": "不会记录成绩，也无法获得段位"
     }
 }

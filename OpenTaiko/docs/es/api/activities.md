@@ -336,7 +336,7 @@ El objeto que devuelven info.DanGrade e info.PreviousNameplateDan, de solo lectu
 
 | Método | Descripción |
 | --- | --- |
-| `grade.Title  -> string` | El título del dan tal como lo muestra la placa de nombre (los dos primeros caracteres del título del chart); "" si ninguno. |
+| `grade.Title  -> string` | El título del dan tal como lo muestra la placa de nombre (hasta los cuatro primeros caracteres del título del chart); "" si ninguno. |
 | `grade.Gold  -> boolean` | true para un aprobado de oro. |
 | `grade.Tier  -> number` | 0 clear, 1 full combo, 2 perfect. |
 

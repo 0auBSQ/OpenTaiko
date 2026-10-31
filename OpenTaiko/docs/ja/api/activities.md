@@ -336,7 +336,7 @@ info.DanGrade と info.PreviousNameplateDan が返すオブジェクト (読み�
 
 | メソッド | 説明 |
 | --- | --- |
-| `grade.Title  -> string` | ネームプレートに表示される段位の名前 (譜面タイトルの最初の 2 文字)。なければ ""。 |
+| `grade.Title  -> string` | ネームプレートに表示される段位の名前 (譜面タイトルの最初の最大 4 文字)。なければ ""。 |
 | `grade.Gold  -> boolean` | 金合格なら true。 |
 | `grade.Tier  -> number` | 0 クリア、1 フルコンボ、2 全良。 |
 

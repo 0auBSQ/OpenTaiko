@@ -30,6 +30,7 @@
         "TOWERSELECT_SOON_DESC": "This game mode will come later, stay tuned!",
         "TOWERSELECT_HIGH_SCORE": "High score",
         "TOWERSELECT_BEST_FLOOR": "Best floor",
-        "TOWERSELECT_TO_MODES": "Mode select"
+        "TOWERSELECT_TO_MODES": "Mode select",
+        "TOWERSELECT_NOT_RECORDED": "Not recorded"
     }
 }

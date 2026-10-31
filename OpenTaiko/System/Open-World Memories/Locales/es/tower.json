@@ -30,6 +30,7 @@
         "TOWERSELECT_SOON_DESC": "Este modo de juego llegará más adelante, ¡estate atento!",
         "TOWERSELECT_HIGH_SCORE": "Puntuación máxima",
         "TOWERSELECT_BEST_FLOOR": "Mejor piso",
-        "TOWERSELECT_TO_MODES": "Selección de modo"
+        "TOWERSELECT_TO_MODES": "Selección de modo",
+        "TOWERSELECT_NOT_RECORDED": "No se guarda"
     }
 }

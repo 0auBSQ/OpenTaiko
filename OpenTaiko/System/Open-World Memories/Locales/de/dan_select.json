@@ -8,6 +8,8 @@
         "DANSELECT_STANDARD_DESC": "Beweise dein Können in der Auswahl des Dojos!",
         "DANSELECT_PAGODA_DESC": "Bestehe mehrere zufällige Dans hintereinander!",
         "DANSELECT_EXIT": "Beenden",
-        "DANSELECT_CONFIRM": "Die Herausforderung annehmen?"
+        "DANSELECT_CONFIRM": "Die Herausforderung annehmen?",
+        "DANSELECT_NOT_RECORDED": "Wird nicht gespeichert",
+        "DANSELECT_NO_GRADE": "Nicht gespeichert, kein Dan-Rang"
     }
 }

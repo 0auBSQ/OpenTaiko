@@ -2,6 +2,7 @@
 
 local NavInput       = require("NavInput")
 local EM             = require("EventMode")
+local Shortcuts      = require("Shortcuts")
 
 local M = {}
 local ContentsDrawer = require("standard_dan_contents_draw")
@@ -78,6 +79,7 @@ local col_confirm, col_confirm_outline = nil, nil
 local tx_bars          = {}
 
 local danplate_ro      = nil
+local sc               = nil       -- the song select's shortcuts: help panel, auto, song speed
 local modicons_ro      = nil
 local act              = {}
 local act_was_active   = {}
@@ -301,6 +303,8 @@ local function _setup_entry()
     act["customize_dialog"]  = ACTIVITY:GetActivity("customize_dialog")
     act["mod_select_dialog"] = ACTIVITY:GetActivity("mod_select_dialog")
     snd_move = SHARED:GetSharedSound("Move")
+    sc = Shortcuts.new{ ids = { "help", "auto_p1", "speed_down", "speed_up" }, nav = NavInput.p[1],
+        disabled = function(id) return id == "auto_p1" and EM.on() end }
 
     local chara = GetSaveFile(0):GetCharacter()
     if chara ~= nil and chara.IsValid then
@@ -317,6 +321,7 @@ local function _teardown_entry()
     if modicons_ro ~= nil then modicons_ro:Deactivate() end
 
     snd_move = nil
+    if sc ~= nil then sc:dispose(); sc = nil end
 
     local chara = GetSaveFile(0):GetCharacter()
     if chara ~= nil and chara.IsValid then
@@ -437,6 +442,7 @@ function M.update(dt)
     if _CB then
         for _, c in pairs(_CB.ctx) do c:Tick() end
     end
+    if sc ~= nil then sc:tick() end
 
     -- Activities take full control while active
     local any_active = false
@@ -471,6 +477,7 @@ function M.update(dt)
     end
 
     if any_active then return nil end
+    if sc ~= nil and sc:update() then return nil end
 
     -- Tick animations
     if content_slide_counter ~= nil then
@@ -493,9 +500,14 @@ function M.update(dt)
         if bar_y_offset == 0.0 then bar_y_offset_counter = nil end
     end
 
-    if INPUT:Pressed("ToggleAutoP1") and not EM.on() then
-        CONFIG:SetAutoStatus(0, not CONFIG:GetAutoStatus(0))
-        SHARED:GetSharedSound("Move"):Play()
+    -- the song select's shortcuts: auto play and the song speed anywhere in the list
+    if sc ~= nil then
+        if sc:pressed("auto_p1") then
+            CONFIG:SetAutoStatus(0, not CONFIG:GetAutoStatus(0))
+            SHARED:GetSharedSound("Move"):Play()
+        end
+        if sc:pressed("speed_down") then Shortcuts.stepSpeed(-1) end
+        if sc:pressed("speed_up") then Shortcuts.stepSpeed(1) end
     end
 
     -- ── SONG SELECT SETUP ─────────────────────────────────────────────────────
@@ -520,6 +532,7 @@ function M.update(dt)
     -- ── SONG SELECT ───────────────────────────────────────────────────────────
 	local navPn = NavInput.p[1]
     if _state == "song_select" then
+        if sc ~= nil and sc:pressed("help") then sc:open(); return nil end
         if hold_dir ~= 0 then
             local still =
                 (hold_dir ==  1 and navPn.right()) or
@@ -728,6 +741,17 @@ function M.draw()
     end
     if modicons_ro ~= nil then modicons_ro:Draw(NP_X, NP_Y + Player.modicons_dy, 0, "menu", 255) end
 
+    -- the shortcuts line on the list, the song speed notice whenever the speed is not 1x
+    if sc ~= nil then
+        local SC = Layout.shortcuts
+        if _state == "song_select" or _state == "song_select_setup" then sc:drawHelper(SC.helper[1], SC.helper[2], 1) end
+        local chart = (sel_node ~= nil and sel_node.IsSong) and sel_node:GetChart(DIFF_DAN) or nil
+        -- another speed than 1x keeps no record; a slower one earns no grade either
+        local note = Shortcuts.speed() < 1 and _sk("DANSELECT_NO_GRADE", "Not recorded, no dan grade")
+            or _sk("DANSELECT_NOT_RECORDED", "Not recorded")
+        sc:drawSpeed(SC.speed[1], SC.speed[2], chart ~= nil and chart.BPM or nil, 1, note)
+    end
+
     -- Confirm scroll: the parchment unrolls from its middle, the options come into view as it does (each
     -- cut at the rollers' edge), the question fades in once its line is uncovered
     if _state == "confirm" then
@@ -801,6 +825,7 @@ function M.draw()
     for _, a in pairs(act) do
         if a ~= nil and a.IsActive then a:Draw() end
     end
+    if sc ~= nil then sc:draw() end
 end
 
 return M

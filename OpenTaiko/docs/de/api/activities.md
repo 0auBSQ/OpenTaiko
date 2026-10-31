@@ -336,7 +336,7 @@ Das Objekt, das info.DanGrade und info.PreviousNameplateDan zurückgeben, schrei
 
 | Methode | Beschreibung |
 | --- | --- |
-| `grade.Title  -> string` | Der Titel des Dans, wie ihn das Namensschild zeigt (die ersten zwei Zeichen des Chart-Titels); "" für keinen. |
+| `grade.Title  -> string` | Der Titel des Dans, wie ihn das Namensschild zeigt (bis zu den ersten vier Zeichen des Chart-Titels); "" für keinen. |
 | `grade.Gold  -> boolean` | True bei einem goldenen Bestehen. |
 | `grade.Tier  -> number` | 0 Clear, 1 Full Combo, 2 Perfect. |
 

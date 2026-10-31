@@ -279,7 +279,8 @@ end
 
 function activate()
     CONFIG.PlayerCount = 1
-    CONFIG.SongSpeed   = 20   -- reset speed (pagoda may have changed it)
+    -- reset speed (pagoda may have changed it); a dan play keeps the one chosen in the list
+    if not standard_dan.is_returning_from_play() then CONFIG.SongSpeed = 20 end
     PagodaAvatar.leave()      -- player 1's own character and puchichara, if the pagoda still held them
 
     active      = true
@@ -432,9 +433,9 @@ function update()
         end
     end
 
-    -- F3 auto toggle (not in Event Mode)
+    -- F3 auto toggle (not in Event Mode); the dan list has its own
 	local navPn = NavInput.p[1]
-    if INPUT:Pressed("ToggleAutoP1") and not EM.on() then
+    if INPUT:Pressed("ToggleAutoP1") and not EM.on() and state ~= "standard_dan" then
         CONFIG:SetAutoStatus(0, not CONFIG:GetAutoStatus(0))
         SHARED:GetSharedSound("Move"):Play()
     end

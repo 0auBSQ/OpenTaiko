@@ -1,6 +1,7 @@
 ﻿local NavInput = require("NavInput")
 local TowerArt = require("TowerArt")
 local EM = require("EventMode")
+local Shortcuts = require("Shortcuts")
 local OWM = require("World.OWM3d")
 local Sky3D = require("World.OWM3d.sky")
 local Terrain = require("World.OWM3d.terrain")
@@ -45,6 +46,8 @@ local chosen = nil          -- the chosen tower's info, nil for anything but a s
 local confirm = nil
 local chara = nil
 local grey = nil
+local modicons = nil         -- the mod icons under the nameplate (the modicons ROActivity)
+local sc = nil              -- the song select's shortcuts: help panel, auto, song speed
 
 local arcPhi, arcLen, perimeter, step = {}, {}, 0, ROAD.slot
 
@@ -413,6 +416,7 @@ local function towerInfo(node)
         level = chart ~= nil and chart.Level or 0,
         plus = chart ~= nil and chart.IsPlus == true,
         look = chart ~= nil and chart.TowerType or nil,
+        bpm = chart ~= nil and chart.BPM or nil,
     }
 end
 
@@ -1297,6 +1301,26 @@ local function closeFolder()
     return success
 end
 
+-- ── the player, bottom left as in the other selects: the nameplate, the character and puchichara standing on it,
+-- the mod icons under it ───────────────────────────────────────────────────────────────────────────────────────
+local function drawPlayer()
+    local L, A = Layout.player, Animation.puchi
+    NAMEPLATE:DrawPlayerNameplate(L.x, L.y, 255, 0)
+    if chara ~= nil then
+        chara:Update(CHARACTER.ANIM_MENU_NORMAL, true)
+        chara:DrawAtAnchor(L.x + L.chara_dx, L.y + L.chara_dy, CHARACTER.ANIM_MENU_NORMAL, "bottom", 1, 1, 255)
+    end
+    local puchi = GetSaveFile(0):GetPuchichara()
+    if puchi ~= nil and puchi.tx ~= nil and puchi.tx.Loaded then
+        local frameW = math.floor(puchi.tx.Width / A.frames)
+        local frame = math.floor(clock / A.frame_cycle_s * A.frames) % A.frames
+        local bob = math.sin(2 * math.pi * clock / A.float_period_s) * A.float_px
+        puchi.tx:SetScale(1, 1)
+        puchi.tx:DrawRectAtAnchor(L.x + L.puchi_dx, L.y + bob, frame * frameW, 0, frameW, puchi.tx.Height, "bottom")
+    end
+    if modicons ~= nil then modicons:Draw(L.x, L.y + L.modicons_dy, 0, "menu", 255) end
+end
+
 -- ── stage callbacks ───────────────────────────────────────────────────────────────────────────────────────────
 function draw()
     if world == nil then return end
@@ -1314,11 +1338,19 @@ function draw()
     end
     local a = boxAt(T)
     drawTags(a)
+    drawPlayer()
     if confirm ~= nil then drawConfirm() end
     drawInfo(a)
+    if sc ~= nil and state == "select" then
+        local SC = Layout.shortcuts
+        if confirm == nil then sc:drawHelper(SC.helper[1], SC.helper[2], a) end
+        -- a tower played at another speed than 1x keeps no record
+        sc:drawSpeed(SC.speed[1], SC.speed[2], chosen ~= nil and chosen.bpm or nil, a, skinString("TOWERSELECT_NOT_RECORDED", "Not recorded"))
+    end
     for _, d in pairs(act) do
         if d ~= nil and d.IsActive then d:Draw() end
     end
+    if sc ~= nil then sc:draw() end
 end
 
 local function updateModes(nav)
@@ -1351,7 +1383,24 @@ local function updateModes(nav)
     end
 end
 
+-- the song select's shortcuts: the help panel, auto play, the song speed (the preview follows it)
+local function shortcuts()
+    if sc:pressed("help") then sc:open(); return true end
+    if sc:pressed("auto_p1") then
+        CONFIG:SetAutoStatus(0, not CONFIG:GetAutoStatus(0))
+        shared("Decide")
+    end
+    for _, s in ipairs({ { "speed_down", -1 }, { "speed_up", 1 } }) do
+        if sc:pressed(s[1]) then
+            preview.speed = Shortcuts.stepSpeed(s[2])
+            if preview.node ~= nil then preview.demo = math.floor(preview.node.DemoStart / preview.speed) end
+        end
+    end
+    return false
+end
+
 local function updateSelect(nav)
+    if shortcuts() then return end
     if songlist == nil then
         if nav.cancel() then shared("Cancel"); startLeave() end
         return
@@ -1383,6 +1432,7 @@ end
 function update()
     local dt = fps.deltaTime
     clock = clock + dt
+    if sc ~= nil then sc:tick() end
     if world ~= nil then
         cameraUpdate()
         world:update(dt)
@@ -1396,6 +1446,7 @@ function update()
         if d ~= nil and d.IsActive then d:Update(); busy = true end
     end
     if busy then return end
+    if sc ~= nil and sc:update() then return end
 
     local nav = NavInput.p[1]
     if state == "enter" then
@@ -1486,7 +1537,7 @@ end
 
 function activate()
     CONFIG.PlayerCount = 1
-    CONFIG.SongSpeed = 20   -- reset speed (other modes may have changed it)
+    if not backFromPlay then CONFIG.SongSpeed = 20 end   -- other modes may have changed it; a tower play keeps it
 
     clock, T, focus, state, refused, landShake = 0, 0, 1, "modes", -100, -100
     if backFromPlay then state, T, backFromPlay = "select", ENTER["end"], false end
@@ -1507,18 +1558,28 @@ function activate()
         chara:SetAnimationCyclesFromBPM(CHARACTER.ANIM_GAME_TOWER_CLIMBING, 120)
         chara:ResetAnimationCounter(CHARACTER.ANIM_GAME_TOWER_CLIMBING)
         chara:Update(CHARACTER.ANIM_GAME_TOWER_CLIMBING)
+        chara:LoadAnimation(CHARACTER.ANIM_MENU_NORMAL)
     end
     act.customize_dialog = ACTIVITY:GetActivity("customize_dialog")
     act.mod_select_dialog = ACTIVITY:GetActivity("mod_select_dialog")
+    modicons = ROACTIVITY:GetROActivity("modicons")
+    if modicons ~= nil then modicons:Activate() end
+    sc = Shortcuts.new{ ids = { "help", "auto_p1", "speed_down", "speed_up" }, nav = NavInput.p[1],
+        disabled = function(id) return id == "auto_p1" and EM.on() end }
     refresh()
 end
 
 function deactivate()
+    if sc ~= nil then sc:dispose(); sc = nil end
     previewStop()
     local ps = SHARED:GetSharedSound("presound")
     if ps ~= nil then ps:Stop() end
     SHARED:SetSharedString("presound_path", "")
-    if chara ~= nil then pcall(function() chara:DisposeAnimation(CHARACTER.ANIM_GAME_TOWER_CLIMBING) end) end
+    if chara ~= nil then
+        pcall(function() chara:DisposeAnimation(CHARACTER.ANIM_GAME_TOWER_CLIMBING) end)
+        pcall(function() chara:DisposeAnimation(CHARACTER.ANIM_MENU_NORMAL) end)
+    end
+    if modicons ~= nil then modicons:Deactivate(); modicons = nil end
     chara = nil
     if grey ~= nil then grey:Dispose(); grey = nil end
     if art ~= nil then art:dispose(); art = nil end

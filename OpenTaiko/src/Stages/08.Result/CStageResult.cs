@@ -413,16 +413,18 @@ internal class CStageResult : CStage {
 					// this.st演奏記録[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], clearValue);
 
 					// Unlock dan grade (a watched replay earns nothing, nor a dan built at runtime like the pagoda's,
-					// which keeps no score either); a new or better grade goes onto the nameplate, which results_dan
-					// shows going on
+					// which keeps no score either, nor a play whose mods lower the score, a slowed song among them);
+					// a new or better grade goes onto the nameplate, which results_dan shows going on
 					var danSave = OpenTaiko.SaveFileInstances[0];
 					this.nameplateDanBefore = (danSave.data.Dan, danSave.data.DanGold, danSave.data.DanType);
 					this.danGradeTitle = "";
 					this.danGradeChange = 0;
-					if (clearValue > 0 && !OpenTaiko.ConfigIni.bAutoPlay[0] && !OpenTaiko.bReplayMode[0]
+					if (clearValue > 0 && !assistedClear[0] && !OpenTaiko.ConfigIni.bAutoPlay[0] && !OpenTaiko.bReplayMode[0]
 						&& OpenTaiko.SongMount.rChoosenSong!.uniqueId != null) {
 						string dan_title = OpenTaiko.SongMount.rChoosenSong!.ldTitle.GetString("").RemoveTags();
-						if (dan_title.Length > 2) dan_title = dan_title.Substring(0, 2);
+						// the grade is the title's first four characters (whole ones: a surrogate pair is never cut)
+						var titleInfo = new System.Globalization.StringInfo(dan_title);
+						if (titleInfo.LengthInTextElements > 4) dan_title = titleInfo.SubstringByTextElements(0, 4);
 
 						bool known = danSave.data.DanTitles?.ContainsKey(dan_title) ?? false;
 						this.danGradeTitle = dan_title;

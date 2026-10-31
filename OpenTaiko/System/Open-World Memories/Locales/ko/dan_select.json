@@ -8,6 +8,8 @@
         "DANSELECT_STANDARD_DESC": "도장이 고른 과제로 실력을 증명하세요!",
         "DANSELECT_PAGODA_DESC": "무작위 단위를 연속으로 돌파하세요!",
         "DANSELECT_EXIT": "나가기",
-        "DANSELECT_CONFIRM": "도전하시겠습니까?"
+        "DANSELECT_CONFIRM": "도전하시겠습니까?",
+        "DANSELECT_NOT_RECORDED": "기록되지 않음",
+        "DANSELECT_NO_GRADE": "기록되지 않으며 단위도 얻을 수 없음"
     }
 }

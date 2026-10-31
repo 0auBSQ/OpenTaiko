@@ -145,5 +145,7 @@
         "sign_color": [250, 238, 210, 255],
         "sign_outline_color": [54, 32, 16, 255]
     },
+    "shortcuts": { "_note": "the shortcuts line's top-left; the song speed notice's top centre", "helper": [24, 24], "speed": [165, 84] },
+    "player": { "_note": "the nameplate's top-left; the character's feet, the puchichara's and the mod icons from it", "x": 27, "y": 935, "chara_dx": 140, "chara_dy": -6, "puchi_dx": 220, "modicons_dy": 85 },
     "notice": [960, 540]
 }

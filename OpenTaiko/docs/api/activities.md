@@ -336,7 +336,7 @@ The object info.DanGrade and info.PreviousNameplateDan return, read-only.
 
 | Method | Description |
 | --- | --- |
-| `grade.Title  -> string` | The dan's title as the nameplate shows it (the first two characters of the chart's title); "" for none. |
+| `grade.Title  -> string` | The dan's title as the nameplate shows it (up to the first four characters of the chart's title); "" for none. |
 | `grade.Gold  -> boolean` | True for a gold pass. |
 | `grade.Tier  -> number` | 0 clear, 1 full combo, 2 perfect. |
 

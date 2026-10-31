@@ -8,6 +8,8 @@
         "DANSELECT_STANDARD_DESC": "道場が選んだ課題で腕前を証明しよう！",
         "DANSELECT_PAGODA_DESC": "ランダムな段位を連続で駆け上がろう！",
         "DANSELECT_EXIT": "退出",
-        "DANSELECT_CONFIRM": "挑戦しますか？"
+        "DANSELECT_CONFIRM": "挑戦しますか？",
+        "DANSELECT_NOT_RECORDED": "記録されません",
+        "DANSELECT_NO_GRADE": "記録されず、段位も獲得できません"
     }
 }

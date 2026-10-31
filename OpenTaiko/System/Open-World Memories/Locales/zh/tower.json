@@ -30,6 +30,7 @@
         "TOWERSELECT_SOON_DESC": "该游戏模式将在之后推出，敬请期待！",
         "TOWERSELECT_HIGH_SCORE": "最高分",
         "TOWERSELECT_BEST_FLOOR": "最高楼层",
-        "TOWERSELECT_TO_MODES": "模式选择"
+        "TOWERSELECT_TO_MODES": "模式选择",
+        "TOWERSELECT_NOT_RECORDED": "不会记录成绩"
     }
 }

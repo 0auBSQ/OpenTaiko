@@ -30,6 +30,7 @@
         "TOWERSELECT_SOON_DESC": "이 게임 모드는 나중에 추가됩니다. 기대해 주세요!",
         "TOWERSELECT_HIGH_SCORE": "최고 점수",
         "TOWERSELECT_BEST_FLOOR": "최고 층",
-        "TOWERSELECT_TO_MODES": "모드 선택"
+        "TOWERSELECT_TO_MODES": "모드 선택",
+        "TOWERSELECT_NOT_RECORDED": "기록되지 않음"
     }
 }

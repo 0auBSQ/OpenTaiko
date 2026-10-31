@@ -136,7 +136,7 @@
     "grade": {
         "_note": "the third screen, a new or better dan grade: the background by its clear (silver, full combo gold, perfect rainbow), the kanji red or gold as the pass",
         "background": { "scale": 2.2, "glow": [960, 270], "glow_scale": 2.6, "glow_opacity": 0.35, "flash_from": 1.0, "flash_to": 9.0 },
-        "kanji": { "_note": "the dan plate's characters, up to max_count (past it, the grade's two)", "max_count": 4, "y": 270, "pitch": 360, "outline_px": 16, "ring_px": 10, "rim_px": 4, "bob_px": 5, "shadow": [7, 10], "glow_scale": 2.4 },
+        "kanji": { "_note": "the dan plate's characters, up to max_count (past it, the grade's)", "max_count": 4, "y": 270, "pitch": 360, "outline_px": 16, "ring_px": 10, "rim_px": 4, "bob_px": 5, "shadow": [7, 10], "glow_scale": 2.4 },
         "kanji_colors": {
             "_note": "fill: the gradient's top and bottom; outline, ring and rim: the copies round it from the outside in; accent: their sparkles",
             "red": { "fill": ["FF6E5A", "C8141E"], "outline": [66, 6, 10, 255], "ring": [255, 251, 244, 255], "rim": [140, 16, 24, 255], "accent": [232, 52, 48] },

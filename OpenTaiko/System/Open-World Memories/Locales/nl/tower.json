@@ -30,6 +30,7 @@
         "TOWERSELECT_SOON_DESC": "Deze spelmodus komt later, blijf op de hoogte!",
         "TOWERSELECT_HIGH_SCORE": "Hoogste score",
         "TOWERSELECT_BEST_FLOOR": "Beste verdieping",
-        "TOWERSELECT_TO_MODES": "Moduskeuze"
+        "TOWERSELECT_TO_MODES": "Moduskeuze",
+        "TOWERSELECT_NOT_RECORDED": "Wordt niet opgeslagen"
     }
 }

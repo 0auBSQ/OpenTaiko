@@ -8,6 +8,8 @@
         "DANSELECT_STANDARD_DESC": "¡Demuestra tu nivel con la selección del dojo!",
         "DANSELECT_PAGODA_DESC": "¡Supera varios danes aleatorios seguidos!",
         "DANSELECT_EXIT": "Salir",
-        "DANSELECT_CONFIRM": "¿Aceptas el desafío?"
+        "DANSELECT_CONFIRM": "¿Aceptas el desafío?",
+        "DANSELECT_NOT_RECORDED": "No se guarda",
+        "DANSELECT_NO_GRADE": "No se guarda, sin rango de dan"
     }
 }

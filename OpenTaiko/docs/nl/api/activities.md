@@ -336,7 +336,7 @@ Het object dat info.DanGrade en info.PreviousNameplateDan teruggeven, alleen-lez
 
 | Methode | Beschrijving |
 | --- | --- |
-| `grade.Title  -> string` | De titel van de dan zoals het naambord die toont (de eerste twee tekens van de charttitel); "" voor geen. |
+| `grade.Title  -> string` | De titel van de dan zoals het naambord die toont (tot de eerste vier tekens van de charttitel); "" voor geen. |
 | `grade.Gold  -> boolean` | true bij een gouden pass. |
 | `grade.Tier  -> number` | 0 clear, 1 full combo, 2 perfect. |
 

@@ -8,6 +8,8 @@
         "DANSELECT_STANDARD_DESC": "Докажите своё мастерство на испытаниях додзё!",
         "DANSELECT_PAGODA_DESC": "Пройдите несколько случайных данов подряд!",
         "DANSELECT_EXIT": "Выход",
-        "DANSELECT_CONFIRM": "Принять вызов?"
+        "DANSELECT_CONFIRM": "Принять вызов?",
+        "DANSELECT_NOT_RECORDED": "Не сохраняется",
+        "DANSELECT_NO_GRADE": "Не сохраняется, ранг дана не присваивается"
     }
 }
