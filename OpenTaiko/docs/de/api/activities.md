@@ -559,6 +559,8 @@ Als globales Objekt info registriert und pro Modul erzeugt. Jedes Feld berechnet
 | `info.playerCount  -> number` | Die konfigurierte Spieleranzahl. |
 | `info.lang  -> string` | Der aktuelle Sprachcode. |
 | `info.gameVersion  -> string` | Die Spielversion, vier Zahlen in der Form main.major.minor.patch (zum Beispiel `"0.7.0.0"`). |
+| `info.skinName  -> string` | Der `Name=` des aktuellen Skins aus seiner SkinConfig.ini (`"Unknown"`, wenn er fehlt). |
+| `info.skinVersion  -> string` | Die `Version=` des aktuellen Skins aus seiner SkinConfig.ini, zum Beispiel `"0.7.0.0"` (`"Unknown"`, wenn sie fehlt). |
 | `info.simplemode  -> boolean` | True, wenn Simple Mode aktiv ist. |
 | `info.p1IsBlue  -> boolean` | True, wenn Spieler 1 die blaue Seite verwendet. |
 | `info.online  -> boolean` | True, wenn eine nutzbare Netzwerkschnittstelle verfügbar ist. |

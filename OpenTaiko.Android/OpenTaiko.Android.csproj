@@ -10,7 +10,7 @@
     <SupportedOSPlatformVersion>24</SupportedOSPlatformVersion>
     <ApplicationId>com.opentaiko.OpenTaiko</ApplicationId>
     <ApplicationVersion>1</ApplicationVersion>
-    <ApplicationDisplayVersion>0.6.1</ApplicationDisplayVersion>
+    <ApplicationDisplayVersion>0.7.0</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
     <!-- arm64 first-class; add the rest for emulators/exotics. -->
     <RuntimeIdentifiers>android-arm64;android-x64</RuntimeIdentifiers>

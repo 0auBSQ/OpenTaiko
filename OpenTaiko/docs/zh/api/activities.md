@@ -559,6 +559,8 @@ end
 | `info.playerCount  -> number` | 配置的玩家数量。 |
 | `info.lang  -> string` | 当前语言代码。 |
 | `info.gameVersion  -> string` | 游戏版本，main.major.minor.patch 形式的四个数字（例如 `"0.7.0.0"`）。 |
+| `info.skinName  -> string` | 当前皮肤 SkinConfig.ini 中的 `Name=`（缺失时为 `"Unknown"`）。 |
+| `info.skinVersion  -> string` | 当前皮肤 SkinConfig.ini 中的 `Version=`，例如 `"0.7.0.0"`（缺失时为 `"Unknown"`）。 |
 | `info.simplemode  -> boolean` | 简易模式开启时为 true。 |
 | `info.p1IsBlue  -> boolean` | 玩家 1 使用蓝色侧时为 true。 |
 | `info.online  -> boolean` | 存在可用的网络接口时为 true。 |

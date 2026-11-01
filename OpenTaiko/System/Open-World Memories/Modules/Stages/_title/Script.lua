@@ -436,11 +436,14 @@ function draw()
     drawBgTile(Layout.background.tile_opacity)
     drawBoxes(1 - PS.dim() / Layout.player_select.dim_opacity)
 
-    -- Version watermark (top-left, no anchor)
+    -- Version watermark (top-left, no anchor): the game, then the skin
     if textVersion ~= nil then
         local V = Layout.version
-        local vTex = textVersion:GetText("OpenTaiko " .. info.gameVersion, false, V.max_width, Config.color(V.text_color), Config.color(V.outline_color))
+        local textColor, outlineColor = Config.color(V.text_color), Config.color(V.outline_color)
+        local vTex = textVersion:GetText("OpenTaiko " .. info.gameVersion, false, V.max_width, textColor, outlineColor)
         if vTex ~= nil then vTex:Draw(V.x, V.y) end
+        local sTex = textVersion:GetText(info.skinName .. " " .. info.skinVersion, false, V.max_width, textColor, outlineColor)
+        if sTex ~= nil then sTex:Draw(V.x, V.y + V.line_height) end
     end
 
     -- Player-count prompt overlay (also while its cancel outro plays)

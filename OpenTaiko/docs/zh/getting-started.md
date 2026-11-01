@@ -177,4 +177,5 @@ end
 - 游戏在释放模块时会释放该模块创建的纹理、声音、视频和文本对象，因此重新加载皮肤不会泄漏它们。每次访问时打开的资源（例如数据库）请像 demo_overall 的数据库演示那样在 deactivate 中释放；你创建的对象请像它的第一个演示那样在 onDestroy 中释放。
 - GetText 会在其文本对象上为每个不同的字符串缓存一张纹理。每帧都在变化的字符串会每帧新增一张纹理，游戏会逐渐变慢。请用字形渲染器（TEXT:CreateGlyphCached）绘制变化的数值，或者在数值变化之前一直保留同一张纹理。
 - LOADING 只在以协程方式运行的回调中可用：任意模块的 onStart，以及舞台的 activate。在活动的 activate 中，或者在 update 或 draw 中调用 LOADING:Tick 会抛出 Lua 错误。
+- 回调引发 Lua 错误时，游戏只显示该函数的第一个错误一次，并继续调用该模块。出错的 stage 会回到标题画面（_boot 和 _title 除外），config_ui 出错时设置界面会关闭，modal 出错时结果画面会跳过奖励卡片。
 - onStart 和 afterSongEnum 会在模块不在屏幕上时运行。编写时要保证它们在舞台不可见的情况下也能正常工作。

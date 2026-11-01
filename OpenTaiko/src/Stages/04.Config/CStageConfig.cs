@@ -176,7 +176,12 @@ internal class CStageConfig : CStage {
 				OpenTaiko.Skin.bgmConfigScreen.tPlay();
 
 			if (base.ePhaseID == CStage.EPhase.Common_NORMAL && !_leaving) {
-				if (_model != null && _model.Keys.IsCapturing) {
+				if (UI == null || UI.IsCrashed) {
+					// no settings screen to drive: leave instead of waiting for an exit that never comes
+					if (UI == null) LogNotification.PopError("The skin has no config_ui ROActivity, so Settings cannot open.");
+					this.actFIFO.tFadeOutStart();
+					base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+				} else if (_model != null && _model.Keys.IsCapturing) {
 					// C# owns input this frame: poll the device sweep for the key being bound
 					var (done, needRefresh) = _model.Keys.PollCaptureFrame();
 					if (needRefresh)

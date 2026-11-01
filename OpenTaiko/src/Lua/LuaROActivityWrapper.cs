@@ -81,6 +81,9 @@ namespace OpenTaiko {
 
 		public bool IsActive => lcActScript?.IsActive() ?? false;
 
+		// the script failed to load or one of its functions raised an error
+		public bool IsCrashed => lcActScript?.bCrashed ?? true;
+
 		public object[]? Activate(params object?[] args) { bool s = EnterSkinResolution(); try { return lcActScript?.Activate(args); } finally { ExitSkinResolution(s); } }
 		public object[]? Deactivate(params object[] args) { bool s = EnterSkinResolution(); try { return lcActScript?.Deactivate(args); } finally { ExitSkinResolution(s); } }
 		public object[]? Draw(params object[] args) { bool s = EnterSkinResolution(); try { return lcActScript?.Draw(args); } finally { ExitSkinResolution(s); } }

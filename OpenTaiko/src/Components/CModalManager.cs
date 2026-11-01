@@ -39,7 +39,11 @@ internal class CModalManager {
 	/// queued modal or sets <see cref="AllModalsDone"/> when the queue is exhausted.
 	/// </summary>
 	public void Draw() {
-		if (displayedModals == null || Script == null) return;
+		if (displayedModals == null) return;
+		if (Script == null || Script.IsCrashed) {
+			SkipModals();
+			return;
+		}
 
 		Script.Update();
 		Script.Draw();
@@ -68,10 +72,23 @@ internal class CModalManager {
 
 		if (rModalQueue.tAreBothQueuesEmpty()) return true; // Nothing queued — exit results
 
+		if (Script == null || Script.IsCrashed) {
+			SkipModals();
+			return true;
+		}
+
 		// First modal: triggered by the result screen's existing input gate
 		OpenTaiko.Skin.soundDecideSFX.tPlay();
 		displayedModals = rModalQueue.tPopModalInOrder();
 		return false;
+	}
+
+	// no modal script to show them (missing, or stopped after an error): the rewards are already granted, only their
+	// cards are skipped so the result screen can move on
+	private void SkipModals() {
+		rModalQueue.tClear();
+		displayedModals = null;
+		AllModalsDone = true;
 	}
 
 	public CModalManager() {

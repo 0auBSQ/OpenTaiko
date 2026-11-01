@@ -7,7 +7,7 @@
 	// "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
 	// i.e. "日本語 (Japanese)"
 	"Language": "English",
-	"Version": "0.6.1.0",
+	"Version": "0.7.0.0",
 	"Entries": {
         "SETTINGS_SYSTEM_LUANETWORKING": "Allow LuaNetworking connections",
         "SETTINGS_SYSTEM_LUANETWORKING_DESC": "Allow Lua stages to host or join online rooms.\nOff by default: only enable with people you trust - sharing a room code shares your IP address. While off, hosting and joining are disabled.",

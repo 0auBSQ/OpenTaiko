@@ -559,6 +559,8 @@ Geregistreerd als de info-global en per module aangemaakt. Elk veld berekent zij
 | `info.playerCount  -> number` | Het ingestelde aantal spelers. |
 | `info.lang  -> string` | De huidige taalcode. |
 | `info.gameVersion  -> string` | De spelversie, vier getallen in de vorm main.major.minor.patch (bijvoorbeeld `"0.7.0.0"`). |
+| `info.skinName  -> string` | De `Name=` van de huidige skin uit zijn SkinConfig.ini (`"Unknown"` als die ontbreekt). |
+| `info.skinVersion  -> string` | De `Version=` van de huidige skin uit zijn SkinConfig.ini, bijvoorbeeld `"0.7.0.0"` (`"Unknown"` als die ontbreekt). |
 | `info.simplemode  -> boolean` | True wanneer Simple Mode aan staat. |
 | `info.p1IsBlue  -> boolean` | True wanneer speler 1 de blauwe kant gebruikt. |
 | `info.online  -> boolean` | True wanneer een bruikbare netwerkinterface beschikbaar is. |

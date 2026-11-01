@@ -7,7 +7,7 @@
 	// "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
 	// i.e. "日本語 (Japanese)"
 	"Language": "Español (Spanish)",
-	"Version": "0.6.1.0",
+	"Version": "0.7.0.0",
 	"Entries": {
         "SETTINGS_SYSTEM_LUANETWORKING": "Permitir conexiones de LuaNetworking",
         "SETTINGS_SYSTEM_LUANETWORKING_DESC": "Permite que las fases Lua creen salas en línea o se unan a ellas. Desactivado por defecto: actívalo solo con gente de confianza: compartir un código de sala comparte tu dirección IP. Mientras esté desactivado, crear y unirse están deshabilitados.",

@@ -7,7 +7,7 @@
   // "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
   // i.e. "日本語 (Japanese)"
     "Language": "한국어 (Korean)",
-	"Version":  "0.6.1.0",
+	"Version":  "0.7.0.0",
 	"Entries": {
         "SETTINGS_SYSTEM_LUANETWORKING": "LuaNetworking 연결 허용",
         "SETTINGS_SYSTEM_LUANETWORKING_DESC": "Lua 스테이지가 온라인 방을 열거나 참가할 수 있도록 허용합니다. 기본값은 꺼짐: 신뢰하는 사람과만 켜세요 - 방 코드를 공유하면 IP 주소가 공유됩니다. 꺼져 있는 동안에는 호스트와 참가가 비활성화됩니다.",

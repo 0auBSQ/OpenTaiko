@@ -103,6 +103,8 @@ public abstract class CLuaScript : IDisposable {
 		}
 	}
 
+	private readonly HashSet<string> _reportedFunctions = new();
+
 	protected object[]? RunLuaCode(NamedLuaFunction luaFunction, params object?[] args) {
 		var outer = _running;
 		try {
@@ -115,8 +117,13 @@ public abstract class CLuaScript : IDisposable {
 			// its live data (Lua's default pause of 200)
 			return luaFunction.Func.Call(args);
 		} catch (Exception exception) {
-			var argsAsReprStrings = args.Select(v => JsonConvert.SerializeObject(v));
-			Crash(exception, $"RunLuaCode - {luaFunction.Name}({string.Join(", ", argsAsReprStrings)})");
+			// only a function's first error is shown: a failing update or draw would add an error card and a log entry every frame
+			if (_reportedFunctions.Add(luaFunction.Name)) {
+				var argsAsReprStrings = args.Select(v => JsonConvert.SerializeObject(v));
+				Crash(exception, $"RunLuaCode - {luaFunction.Name}({string.Join(", ", argsAsReprStrings)})");
+			} else {
+				bCrashed = true;
+			}
 		} finally {
 			_running = outer;
 		}

@@ -238,6 +238,13 @@
 				lcStageScript?.Draw();
 			} finally { PopResolution(pushed); }
 
+			// a crashed stage goes back to the title; the core stages have nowhere to go back to
+			if (lcStageScript?.bCrashed == true && !_exitImmediate && this.eFadeOutReturnValue == EReturnValue.Continuation
+				&& !CoreStages.Contains(customStageName)) {
+				LogNotification.PopError($"The Lua stage {customStageName} stopped after an error, back to the title.");
+				RequestExitStage("title", null, null);
+			}
+
 			// A transition was requested: hand off this frame (CStageTransition then drives the fade/loading).
 			if (_exitImmediate) {
 				_exitImmediate = false;

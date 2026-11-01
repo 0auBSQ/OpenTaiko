@@ -559,6 +559,8 @@ info 전역으로 등록되며 모듈마다 생성됩니다. 각 필드는 접�
 | `info.playerCount  -> number` | 설정된 플레이어 수. |
 | `info.lang  -> string` | 현재 언어 코드. |
 | `info.gameVersion  -> string` | 게임 버전. main.major.minor.patch 형식의 네 숫자(예: `"0.7.0.0"`). |
+| `info.skinName  -> string` | 현재 스킨의 SkinConfig.ini에 있는 `Name=` (없으면 `"Unknown"`). |
+| `info.skinVersion  -> string` | 현재 스킨의 SkinConfig.ini에 있는 `Version=`. 예: `"0.7.0.0"` (없으면 `"Unknown"`). |
 | `info.simplemode  -> boolean` | 심플 모드가 켜져 있으면 true. |
 | `info.p1IsBlue  -> boolean` | 플레이어 1이 파란 쪽을 사용하면 true. |
 | `info.online  -> boolean` | 사용 가능한 네트워크 인터페이스가 있으면 true. |

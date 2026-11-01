@@ -38,10 +38,11 @@
         }
     },
     "version": {
-        "_note": "The version watermark, its top left at (x, y).",
+        "_note": "The version watermark, its top left at (x, y): the game version, then the skin version line_height below.",
         "font_size": 15,
         "x": 0,
         "y": 0,
+        "line_height": 20,
         "max_width": 1920,
         "text_color": [255, 255, 255],
         "outline_color": [0, 0, 0]

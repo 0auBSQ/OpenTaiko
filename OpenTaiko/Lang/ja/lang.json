@@ -7,7 +7,7 @@
 	// "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
 	// i.e. "日本語 (Japanese)"
 	"Language": "日本語 (Japanese)",
-	"Version": "0.6.1.0",
+	"Version": "0.7.0.0",
 	"Entries": {
         "SETTINGS_SYSTEM_LUANETWORKING": "LuaNetworking接続を許可",
         "SETTINGS_SYSTEM_LUANETWORKING_DESC": "Luaステージがオンラインルームを開く/参加するのを許可します。既定はオフ：信頼できる相手とのみ有効にしてください。ルームコードの共有はIPアドレスの共有を意味します。オフの間は接続できません。",

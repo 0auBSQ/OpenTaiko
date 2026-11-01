@@ -7,7 +7,7 @@
 	// "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
 	// i.e. "日本語 (Japanese)"
 	"Language": "Deutsch (German)",
-	"Version": "0.6.1.0",
+	"Version": "0.7.0.0",
 	"Entries": {
         "SETTINGS_SYSTEM_LUANETWORKING": "LuaNetworking-Verbindungen zulassen",
         "SETTINGS_SYSTEM_LUANETWORKING_DESC": "Erlaubt Lua-Stages, Online-Räume zu hosten oder ihnen beizutreten. Standardmäßig aus: nur mit vertrauenswürdigen Personen aktivieren – das Teilen eines Raumcodes teilt deine IP-Adresse. Wenn aus, sind Hosten und Beitreten deaktiviert.",

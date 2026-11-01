@@ -7,7 +7,7 @@
 	// "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
 	// i.e. "日本語 (Japanese)"
 	"Language": "Français (French)",
-	"Version": "0.6.1.0",
+	"Version": "0.7.0.0",
 	"Entries": {
         "SETTINGS_SYSTEM_LUANETWORKING": "Autoriser les connexions LuaNetworking",
         "SETTINGS_SYSTEM_LUANETWORKING_DESC": "Permet aux niveaux Lua d'héberger des salons en ligne ou d'y entrer. Désactivé par défaut : à n'activer qu'avec des personnes de confiance ; partager un code de salon partage votre adresse IP. Désactivé, l'hébergement et la connexion sont impossibles.",
