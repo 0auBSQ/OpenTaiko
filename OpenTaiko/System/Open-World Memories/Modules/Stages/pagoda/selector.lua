@@ -1,54 +1,42 @@
--- pagoda / selector.lua
--- Floor-selection screen shared by Practice (pick any beaten level) and Challenge (pick a
--- checkpoint): selection input + camera, the fixed-centre selection UI (frame, details plaque,
--- tier glyph, level number, carets), and sky control (day-night across roofs + pitch parallax).
--- It also renders the title-screen pose (the same scene resting at the base floor).
--- Scene rendering lives in selector_scene.lua, the practice confirm in selector_confirm.lua.
--- UI offsets are measured from the selected floor's normal.png top-left (source: plan1.xcf).
+-- Floor-selection screen for Practice (any beaten level) and Challenge (a checkpoint).
+-- UI offsets are px from the selected floor's normal.png top-left (source: plan1.xcf).
 
 local scene   = require("selector_scene")
 local confirm = require("selector_confirm")
+local skybox  = require("skybox")
+local plaque  = require("selectui/plaque")
+local numbers = require("selectui/numbers")
+local hover   = require("selectui/hover")
+local carets  = require("selectui/carets")
+local difficulty = require("selectui/difficulty")
+local Config  = require("Core.Config")
+local Layout  = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
 
 local M = {}
 
--- ── Tunables ──────────────────────────────────────────────────────────────────
+-- tunables
 local NORMAL_W, NORMAL_H = scene.NORMAL_W, scene.NORMAL_H
 
--- offsets from the selected floor's reference top-left  {dx, dy, w, h}
-local OFF_DETAILS  = { -736,  -67, 729, 499 }
-local OFF_GATE     = { -631,   45, 305, 209 }
-local OFF_NUMBER   = { -332,   -5, 230, 280 }
-local OFF_FRAME    = {  -30,  -52,1105, 458 }
-local OFF_CARET_UP = { -537, -279, 305, 209 }
-local OFF_CARET_DN = { -535,  433, 305, 209 }
+local SCROLL_SPEED  = Animation.stage.selector.scroll_rate     -- exp-smoothing rate of the tower scroll
 
-local SCROLL_SPEED  = 9.0      -- exp-smoothing rate of the tower scroll
-local DIGIT_ADVANCE = 170      -- horizontal step between number digits
-local CARET_BOB_AMP = 14
-local CARET_BOB_SPD = 3.2
+-- sky pitch follows the camera; rest pose: the base floor at its title height
+local BASE_PITCH     = Layout.stage.sky.pitch_deg
+local BASE_BOTTOM_WY = Layout.stage.selector.base_bottom_wy         -- world-Y of the pagoda base bottom (pitch rest point)
+local SKY_PITCH_RATE = Layout.stage.selector.sky_pitch_deg_per_px
 
--- sky: pitch follows the camera; the rest pose is the base floor at its title height
-local BASE_PITCH     = -6      -- matches the stage's world pitch
-local BASE_BOTTOM_WY = 517     -- world-Y of the pagoda base bottom (pitch rest point)
-local SKY_PITCH_RATE = 0.0006  -- degrees of pitch per scrolled pixel
-
--- day-night across roofs: each roof tier past the first adds ROOF_HOUR_STEP hours until
--- midnight (24), then holds midnight
-local ROOF_START_HOUR = 12.0
-local ROOF_HOUR_STEP  = 2.0
-
--- ── State ─────────────────────────────────────────────────────────────────────
+-- state
 local _world, _tex, _fonts = nil, nil, nil
 local _color_fn = nil           -- level -> {r,g,b} dan-plate colour (from pagoda.lua)
-local _highest  = 0             -- highest reached level
+local _highest  = 0
 
-local _items   = {}             -- ordered top→bottom: { {kind="level", level=N} ..., {kind="exit"} }
+local _items   = {}             -- top to bottom: { {kind="level", level=N} ..., {kind="exit"} }
 local _sel     = 1              -- index into _items
 local _mode    = "practice"
 local _lowest  = 1              -- lowest selectable level (the Exit entry shares its position)
 local _cam     = 0              -- animated world-Y at the focus
 local _bob_t   = 0
-local _last_hour = nil
+local _plaque_level = nil       -- last level drawn through drawPlaque
 
 M.active = false
 
@@ -58,29 +46,12 @@ local function _sk(key, fallback)
     return s
 end
 
--- ── Level helpers ─────────────────────────────────────────────────────────────
--- tier bands: base/training 1-10 (題), gates 11-20 (扉), roofs 21+ (穹天)
-local function band(level)
-    if     level <= 10 then return "base"
-    elseif level <= 20 then return "gate"
-    else                    return "roof"
-    end
-end
-
--- the number shown on the plaque: within-tier (gate 1 for level 11, roof 1 for level 21)
-local function tier_number(L)
-    if L <= 10 then return L
-    elseif L <= 20 then return L - 10
-    else return L - 20 end
-end
-
--- time-of-day for a roof tier; reusable by other pagoda menus
+-- sky hour for a roof tier
 function M.roofSkyHour(level)
-    local roof_index = level - 20
-    return math.min(24.0, ROOF_START_HOUR + (roof_index - 1) * ROOF_HOUR_STEP)
+    return skybox.hourFor(level)
 end
 
--- ── Camera ────────────────────────────────────────────────────────────────────
+-- camera
 local function focus_y() return THEME:GetResolution().Y * 0.5 end
 
 -- Exit shares the lowest level's spot so selecting it never scrolls the tower
@@ -93,23 +64,51 @@ local function cam_target(item)
     return scene.floor_center(item_level(item)) - focus_y()
 end
 
--- pitch parallax; `hour` is only pushed to the sky when it changes (light recompute)
-local function apply_sky(hour)
+-- pitch parallax; skybox only pushes hour and pitch when they change; a nil hour keeps the current one
+local function apply_sky(hour, cam)
     if _world == nil then return end
-    if hour ~= nil and hour ~= _last_hour then
-        _world.daynight:setHour(hour)
-        _last_hour = hour
-    end
     local rest = BASE_BOTTOM_WY - THEME:GetResolution().Y
-    _world.cam:setPitch(BASE_PITCH + (rest - _cam) * SKY_PITCH_RATE)
+    skybox.setView(hour, BASE_PITCH + (rest - (cam or _cam)) * SKY_PITCH_RATE)
 end
 
--- ── Session control ───────────────────────────────────────────────────────────
+-- for other screens drawing the tower scene (floor transition)
+function M.applySky(hour, cam) apply_sky(hour, cam) end
+
+-- session control
 function M.setup(world, tex, fonts)
     _world, _tex, _fonts = world, tex, fonts
     scene.setup(tex)
     confirm.setup(tex, fonts)
+    plaque.setup(fonts)
+    numbers.setup()
+    hover.setup()
+    carets.setup()
+    difficulty.setup(fonts.name)
     _cam = scene.floor_center(10) - focus_y()   -- start at the title pose
+end
+
+function M.dispose()
+    scene.dispose()
+    plaque.dispose()
+    numbers.dispose()
+    hover.dispose()
+    carets.dispose()
+    difficulty.dispose()
+    confirm.dispose()
+end
+
+local function selected_level()
+    local it = _items[_sel]
+    return (it and it.kind == "level") and it.level or nil
+end
+
+-- current cursor level (nil on Exit); used to reopen practice on the same floor
+function M.hovered_level() return selected_level() end
+
+-- called on every selection change
+local function on_select()
+    hover.select(selected_level())
+    plaque.pop()
 end
 
 -- mode: "practice" | "checkpoint";  levels: ascending;  initial: level to select.
@@ -130,34 +129,26 @@ function M.open(mode, levels, initial, info)
     end
     -- _cam is not snapped: it eases from the title pose / previous selection
     _bob_t     = 0
-    _last_hour = nil
     M.active   = true
+    on_select()
 end
 
-function M.close()
+-- toTitle: the sky keeps its hour; the title moves it home as the tower scrolls down
+function M.close(toTitle)
     M.active   = false
-    _last_hour = nil
     confirm.reset()
-    if _world ~= nil then
-        _world.daynight:setHour(12)
-        _world.cam:setPitch(BASE_PITCH)
-    end
+    if _world ~= nil then skybox.reset(toTitle) end
 end
 
-local function selected_level()
-    local it = _items[_sel]
-    return (it and it.kind == "level") and it.level or nil
-end
-
--- current cursor level (nil on Exit); used to reopen practice on the same floor
-function M.hovered_level() return selected_level() end
-
--- ── Update ────────────────────────────────────────────────────────────────────
+-- update
 -- Returns nil | { sel = level } | "exit"
 function M.update(dt, nav)
     _bob_t = _bob_t + dt
+    plaque.update(dt)
+    hover.update(dt)
 
     local result = nil
+    local prev = _sel
     if confirm.active() then
         result = confirm.update(dt, nav)
     else
@@ -175,38 +166,39 @@ function M.update(dt, nav)
             if it.kind == "exit" then
                 SHARED:GetSharedSound("Cancel"):Play()
                 result = "exit"
-            elseif _mode == "practice" then
-                confirm.enter(it.level)
-                SHARED:GetSharedSound("Decide"):Play()
             else
+                -- both modes confirm with the dialog, which returns the selection; a challenge then goes to
+                -- the story, practice to song_loading
+                confirm.enter(it.level, _mode == "checkpoint")
                 SHARED:GetSharedSound("Decide"):Play()
-                result = { sel = it.level }
             end
         end
     end
+    if _sel ~= prev then on_select() end
 
-    -- the tower keeps easing toward the selection, including behind the confirm overlay
+    -- the tower keeps easing toward the selection, also behind the confirm overlay
     local target = cam_target(_items[_sel])
     _cam = _cam + (target - _cam) * (1 - math.exp(-SCROLL_SPEED * dt))
 
-    local L = selected_level()
-    apply_sky((L ~= nil and L >= 21) and M.roofSkyHour(L) or 12.0)
+    -- roofs at their own hour, everything else (and Exit) at noon
+    apply_sky(skybox.glideHour(skybox.hourFor(selected_level()), dt))
     return result
 end
 
--- ── Selection UI ──────────────────────────────────────────────────────────────
-local function draw_tex(tx, x, y)
-    if tx ~= nil and tx.Loaded then tx:Draw(x, y) end
-end
-
--- the selected item always scrolls to the centre, so the UI reference point is fixed there;
--- drawing against it keeps the frame/details readable while the tower slides behind
+-- selection UI
+-- the selected item always scrolls to the centre, so the UI reference point is fixed there
 local function ref_topleft()
     local res = THEME:GetResolution()
     return res.X - NORMAL_W, res.Y * 0.5 - NORMAL_H * 0.5
 end
 
--- big number tint = the level's dan-plate colour; roofs stay white
+-- the level's estimated difficulty
+local function draw_difficulty(level, rx, ry)
+    local off = Layout.selectui.difficulty.offset
+    difficulty.draw(level, rx + off[1], ry + off[2])
+end
+
+-- number tint: the level's dan-plate colour; roofs stay white
 local function num_tint(level)
     if level >= 21 then return 1, 1, 1 end
     if _color_fn ~= nil then
@@ -216,41 +208,31 @@ local function num_tint(level)
     return 1, 1, 1
 end
 
-local function draw_number(level, nx, ny)
-    local s = tostring(tier_number(level))
-    local n = #s
-    local tr, tg, tb = num_tint(level)
-    local cell_cx = nx + OFF_NUMBER[1] + OFF_NUMBER[3] * 0.5
-    local total   = (n - 1) * DIGIT_ADVANCE
-    local x0      = cell_cx - total * 0.5 - OFF_NUMBER[3] * 0.5
-    local y       = ny + OFF_NUMBER[2]
-    for i = 1, n do
-        local g = _tex.num[tonumber(s:sub(i, i))]
-        if g ~= nil and g.Loaded then
-            g:SetColor(tr, tg, tb)
-            g:Draw(x0 + (i - 1) * DIGIT_ADVANCE, y)
-            g:SetColor(1, 1, 1)
-        end
+-- draw
+
+-- floor plaque at the fixed screen-centre reference; the floor transition also draws it, with its own header
+function M.drawPlaque(level, header)
+    if level ~= _plaque_level then
+        _plaque_level = level
+        plaque.pop()
+        hover.select(level)
     end
+    plaque.update(fps.deltaTime)
+    hover.update(fps.deltaTime)
+    local rx, ry = ref_topleft()
+    local r, g, b = num_tint(level)
+    hover.draw(level, r, g, b, rx, ry)
+    plaque.draw(level, header, rx, ry, num_tint)
+    draw_difficulty(level, rx, ry)
 end
 
-local function gate_tex(level)
-    local b = band(level)
-    if b == "base" then return _tex.gateT
-    elseif b == "roof" then return _tex.gateR
-    else return _tex.gate end
-end
-
--- ── Draw ──────────────────────────────────────────────────────────────────────
-
--- Title screen: the scene easing back to the base floor pose. Called by Script.lua every
--- title frame; `highest` keeps the door darkening in sync with the save.
+-- title screen scene, called by Script.lua every title frame; `highest` syncs the door darkening with the save
 function M.drawTitle(highest)
     if highest ~= nil then _highest = highest end
     local dt = fps.deltaTime
     local target = scene.floor_center(10) - focus_y()
     _cam = _cam + (target - _cam) * (1 - math.exp(-SCROLL_SPEED * dt))
-    apply_sky(nil)
+    apply_sky(skybox.glideHour(skybox.hourFor(nil), dt))      -- back to noon
     scene.draw(_cam, _highest)
 end
 
@@ -261,43 +243,18 @@ function M.draw()
     local rx, ry = ref_topleft()
 
     if item.kind == "exit" then
-        draw_tex(_tex.details, rx + OFF_DETAILS[1], ry + OFF_DETAILS[2])
-        local cx = rx + OFF_DETAILS[1] + OFF_DETAILS[3] * 0.5
-        local cy = ry + OFF_DETAILS[2] + OFF_DETAILS[4] * 0.5
-        local t = _fonts.header:GetText(_sk("PAGODA_EXIT", "Exit"), false, 600)
-        if t ~= nil then t:DrawAtAnchor(cx, cy, "center") end
+        plaque.drawExit(rx, ry)
     else
-        local L = item.level
-        if _tex.frame ~= nil and _tex.frame.Loaded then
-            _tex.frame:SetOpacity(0.75 + 0.25 * math.sin(_bob_t * 3.2))
-            _tex.frame:Draw(rx + OFF_FRAME[1], ry + OFF_FRAME[2])
-            _tex.frame:SetOpacity(1)
-        end
-        draw_tex(_tex.details, rx + OFF_DETAILS[1], ry + OFF_DETAILS[2])
-        draw_tex(gate_tex(L), rx + OFF_GATE[1], ry + OFF_GATE[2])
-        draw_number(L, rx, ry)
-
-        local hdr = (_mode == "checkpoint") and _sk("PAGODA_START_AT", "Start at...")
-                                             or  _sk("PAGODA_PRACTICE", "Practice")
-        local h = _fonts.header:GetText(hdr, false, 500)
-        if h ~= nil then h:DrawAtAnchor(rx + OFF_DETAILS[1] + 34, ry + OFF_DETAILS[2] + 30, "topleft") end
-
-        -- "Level N" strip: the raw pagoda level, black text with a transparent outline
-        local lvl = _fonts.name:GetText(_sk("PAGODA_LEVEL", "Level") .. " " .. tostring(L),
-            false, 500, COLOR:CreateColorFromRGBA(0, 0, 0, 255), COLOR:CreateColorFromRGBA(0, 0, 0, 0))
-        local sx = rx + OFF_DETAILS[1] + OFF_DETAILS[3] * 0.5
-        local sy = ry + OFF_DETAILS[2] + OFF_DETAILS[4] - 62
-        if lvl ~= nil then lvl:DrawAtAnchor(sx, sy, "center") end
+        local r, g, b = num_tint(item.level)
+        hover.draw(item.level, r, g, b, rx, ry)
+        plaque.draw(item.level, (_mode == "checkpoint") and _sk("PAGODA_START_AT", "Start at...")
+                                                         or  _sk("PAGODA_PRACTICE", "Practice"),
+                    rx, ry, num_tint)
+        draw_difficulty(item.level, rx, ry)
     end
 
-    -- carets only toward an available neighbour, bobbing
-    local bob = (math.sin(_bob_t * CARET_BOB_SPD) * 0.5 + 0.5) * CARET_BOB_AMP
-    if _sel > 1 and _tex.caret_up ~= nil and _tex.caret_up.Loaded then
-        _tex.caret_up:Draw(rx + OFF_CARET_UP[1], ry + OFF_CARET_UP[2] - bob)
-    end
-    if _sel < #_items and _tex.caret ~= nil and _tex.caret.Loaded then
-        _tex.caret:Draw(rx + OFF_CARET_DN[1], ry + OFF_CARET_DN[2] + bob)
-    end
+    -- carets only toward an available neighbour
+    carets.draw(_sel > 1, _sel < #_items, _bob_t, rx, ry)
 
     confirm.draw()
 end

@@ -1,101 +1,158 @@
--- pagoda / selector_scene.lua
--- Renders the landscape + tower scene shared by the floor selector and the title screen:
--- parallax background (forest canopy + three mountain layers), per-level tower art, overlay
--- objects (guardian gate, lanterns), and the corruption clouds/particles covering doors above
--- the highest reached level. Stateless toward the caller: draw(cam, highest) each frame.
+-- Landscape and tower scene of the floor selector and the title screen.
+
+local tiles    = require("tower_tiles")
+local Darkness = require("fx/darkness")
+local levels   = require("levels")
+local skybox   = require("skybox")
+local towerfx  = require("tower_fx")
+local Config   = require("Core.Config")
+local Layout   = Config.load("Config/layout.json")
 
 local M = {}
 
--- ── Layout ────────────────────────────────────────────────────────────────────
-M.NORMAL_W, M.NORMAL_H = 1063, 403      -- normal.png; every level occupies one NORMAL_H slot
+-- layout
+local Scene = Layout.stage.scene
+M.NORMAL_W, M.NORMAL_H = Scene.normal.w, Scene.normal.h      -- normal.png; every level occupies one NORMAL_H slot
 local NORMAL_W, NORMAL_H = M.NORMAL_W, M.NORMAL_H
-local FLOOR_W = 1198                    -- floor_top.png / road tile width (right-aligned)
-local DOOR_X  = 812                     -- path/door column inside the road tiles
-local ROOF_W, ROOF_H = 996, 403         -- roof.png (gate 10 = level 20)
+local ROOF_W, ROOF_H = Scene.roof.w, Scene.roof.h            -- roof.png (gate 10 = level 20)
 
 -- world-space vertical centre of a level's slot (y grows downward; higher level = higher up)
 function M.floor_center(level)
     return -NORMAL_H * (level - 10) + NORMAL_H * 0.5
 end
 
--- ── Background layers ─────────────────────────────────────────────────────────
--- Layers draw at native pixel size; `rate` only scales scroll speed. The forest is a 2D-tiled
--- fill capped by a treeline fringe (its bottom rows tuck under the fill). The mountains are
--- three depth layers drawn far → near; each is opaque from its ridge base down, so the layer
--- in front always covers the bottom edge of the one behind it.
-local BG_FOREST = { key = "bg_near", rate = 0.60, wyTop = 700, rows = 5, tile = 512 }
-local BG_FRINGE = { key = "bg_near_top", overlap = 40 }
-local BG_MTNS = {
-    { key = "bg_far1", rate = 0.20, wyBottom = 1260, hTotal = 640 },
-    { key = "bg_far2", rate = 0.26, wyBottom = 1440, hTotal = 560 },
-    { key = "bg_far3", rate = 0.32, wyBottom = 1740, hTotal = 714 },
-}
+-- background layers
+-- Layers draw at native pixel size; `rate` only scales scroll speed. Forest rows go `tile` apart and
+-- draw bottom-up, so each row hides the top band of the row below. Mountains draw far to near;
+-- hTotal = strip height, wyBottom = its bottom edge, kept behind the next nearer layer's solid rows.
+local BG_FOREST = { key = "bg_near", rate = Scene.forest.rate, wyTop = Scene.forest.wy_top, rows = Scene.forest.rows,
+                    tile = Scene.forest.tile }
+-- forest lift (px up) per camera level around the summit (level 9), sampled every `step` levels from
+-- `from`, interpolated, zero outside; it keeps the treeline over summit.png's open bottom-left corner
+-- (else the sky shows there between levels ~7.2 and ~8.2)
+local SUMMIT_LIFT = Scene.summit_lift
+local BG_FRINGE = { key = "bg_near_top", overlap = Scene.fringe.overlap }
+local BG_MTNS = {}
+for i, key in ipairs({ "bg_far1", "bg_far2", "bg_far3" }) do
+    local m = Scene.mountains[i]
+    BG_MTNS[i] = { key = key, rate = m.rate, wyBottom = m.wy_bottom, hTotal = m.h_total }
+end
 
--- ── Overlays ──────────────────────────────────────────────────────────────────
-local GATE_ROW   = 230                  -- L5 tile row of the guardian gate's base line
-local LANTERN_DX = 186                  -- lantern pairs at DOOR_X ± this
-local LANTERNS = {
-    { L = 2, row = 300 }, { L = 3, row = 140 }, { L = 4, row = 300 },
-    { L = 6, row = 250 }, { L = 7, row = 120 }, { L = 8, row = 280 },
-}
+-- corruption effects (doors above the highest reached level)
+local Dark = Scene.darkness
+local FLOOR_DARKEN   = Dark.floor_tint           -- tint on an undiscovered floor's art
+-- tint from two floors above the highest cleared one (the next floor up keeps FLOOR_DARKEN)
+local FLOOR_DARKEN_DEEP = Dark.floor_tint_deep
+local CHECKPOINT_DEEP   = Dark.checkpoint_deep   -- extra dim of the checkpoint art when deep
+local DARK_CROP_LEFT = Dark.crop_left            -- skip the eave; effects cover the trunk only
+local DARK_SPLIT_X   = Dark.split_x              -- dispersing motes blow left or right of this x
 
--- ── Corruption effects (doors above the highest reached level) ────────────────
-local FLOOR_DARKEN   = { 0.10, 0.04, 0.14 }  -- tint on an undiscovered floor's art
-local DARK_CROP_LEFT = 300                   -- skip the eave; effects cover the trunk only
+-- a door floor's normal.png takes its dan colour moved this far toward white
+local FLOOR_TINT_LIGHTEN = Scene.floor_tint_lighten
 
-local SHADOW_MAX   = 260                     -- particle pool cap (motes + spirals)
-local SHADOW_RATE  = 72                      -- motes per second per visible floor
-local SHADOW_LIFE  = { 0.9, 2.3 }
-local SHADOW_RISE  = { 12, 95 }              -- upward drift (world px/s)
-local SHADOW_SIZE  = { 0.5, 3.8 }
-local SHADOW_SWIRL = 55                      -- horizontal swirl (px/s)
-local SPIRAL_RATE  = 7
-local SPIRAL_LIFE  = { 1.3, 2.6 }
-local SPIRAL_SIZE  = { 1.1, 3.2 }
-local SPIRAL_SPIN  = { 70, 250 }             -- deg/s, random direction
-local SHADOW_COLS  = {
-    { 0.02, 0.00, 0.04 },
-    { 0.16, 0.02, 0.24 },
-    { 0.09, 0.01, 0.15 },
-    { 0.22, 0.03, 0.30 },
-}
-
-local CLOUD_COLS, CLOUD_ROWS = 7, 5
-local CLOUD_SCALE   = { 0.75, 1.4 }
-local CLOUD_SWAY    = 10
-local CLOUD_DRIFT   = 24
-local CLOUD_OPACITY = 0.9
-local CLOUD_COL_A   = { 0.02, 0.00, 0.04 }
-local CLOUD_COL_B   = { 0.20, 0.03, 0.28 }
-
--- ── State ─────────────────────────────────────────────────────────────────────
+-- state
 local _tex = nil
+local _dark = nil                       -- fx/darkness instance for the door banks
+local _boxes = {}                       -- darkness boxes, rebuilt every draw
 local _cam, _highest = 0, 0             -- refreshed on every draw() call
-local _t = 0                            -- scene clock (cloud sway)
-local _particles  = {}
-local _emit_acc   = 0
-local _spiral_acc = 0
+local _scLevel, _scT = nil, 0           -- floor whose darkness is dispersing, and its 0..1 progress
+local _tints = {}                       -- level -> { r, g, b } of its normal.png, built on first use
+local _clock = 0                        -- seconds of scene drawn, for the section effects
+local _fr, _fg, _fb = 1, 1, 1           -- the sky's time-of-day filter this frame
 
 function M.setup(tex)
+    if _dark == nil or _tex ~= tex then _dark = Darkness.new(tex, { splitX = DARK_SPLIT_X }) end
     _tex = tex
+    towerfx.setup()
+end
+
+function M.dispose()
+    towerfx.dispose()
 end
 
 function M.reset()
-    _particles, _emit_acc, _spiral_acc = {}, 0, 0
+    if _dark ~= nil then _dark:reset() end
+    _scLevel, _scT = nil, 0
 end
 
--- ── Draw helpers ──────────────────────────────────────────────────────────────
+-- disperses a floor's darkness as t goes 0 -> 1; level = nil clears
+function M.setScatter(level, t)
+    _scLevel, _scT = level, t or 0
+end
+
+-- draw helpers
 local function screen_y(world_y) return world_y - _cam end
 
--- right-aligned floor image at a world-Y top; `dark` tints undiscovered floors
-local function draw_floor_img(tx, w, h, world_top, dark)
-    if tx == nil or not tx.Loaded then return end
+-- right-aligned floor image at a world-Y top, on a whole pixel so abutting slots never seam;
+-- dark: 0..1 or a boolean (a fraction lets the tint lift with the scatter); r, g, b: optional art colour;
+-- deep: 0..1, optional, toward FLOOR_DARKEN_DEEP
+local function draw_floor_img(tx, w, h, world_top, dark, r, g, b, deep)
+    if tx == nil or not tx.Ready then return end
     local res = THEME:GetResolution()
-    local y = screen_y(world_top)
+    local y = math.floor(screen_y(world_top) + 0.5)
     if y > res.Y or y + h < 0 then return end
-    if dark then tx:SetColor(FLOOR_DARKEN[1], FLOOR_DARKEN[2], FLOOR_DARKEN[3]) end
+    local da = (dark == true) and 1 or (type(dark) == "number" and dark or 0)
+    r, g, b = r or 1, g or 1, b or 1
+    local tinted = da > 0 or r ~= 1 or g ~= 1 or b ~= 1
+    if tinted then
+        local k = deep or 0
+        local d1 = FLOOR_DARKEN[1] + (FLOOR_DARKEN_DEEP[1] - FLOOR_DARKEN[1]) * k
+        local d2 = FLOOR_DARKEN[2] + (FLOOR_DARKEN_DEEP[2] - FLOOR_DARKEN[2]) * k
+        local d3 = FLOOR_DARKEN[3] + (FLOOR_DARKEN_DEEP[3] - FLOOR_DARKEN[3]) * k
+        tx:SetColor(r * (1 + (d1 - 1) * da), g * (1 + (d2 - 1) * da), b * (1 + (d3 - 1) * da))
+    end
     tx:Draw(res.X - w, y)
-    if dark then tx:SetColor(1, 1, 1) end
+    if tinted then tx:SetColor(1, 1, 1) end
+end
+
+-- 0..1; the dispersing floor brightens with _scT
+local function floor_darkness(L)
+    if L == _scLevel then return math.max(0, 1 - _scT) end
+    return (L > _highest) and 1 or 0
+end
+
+-- 0..1: full from two floors above the highest cleared one; eases with a dispersal below it
+local function floor_deep(L)
+    if _scLevel ~= nil and L == _scLevel + 1 then return math.max(0, 1 - _scT) end
+    return (L >= _highest + 2) and 1 or 0
+end
+
+-- the multiplier a door floor's normal.png is drawn with (its dan colour toward white)
+local function floor_tint(L)
+    local t = _tints[L]
+    if t == nil then
+        local c = levels.level_tick_color(L)
+        t = {}
+        for i = 1, 3 do
+            local v = c[i] / 255
+            t[i] = v + (1 - v) * FLOOR_TINT_LIGHTEN
+        end
+        _tints[L] = t
+    end
+    return t[1], t[2], t[3]
+end
+
+-- level 15 always draws the checkpoint art
+local function shows_checkpoint(L)
+    return L == 15 and _tex.checkpoint_cleared ~= nil
+end
+
+-- what the section effects read each frame (see tower_fx.lua)
+local _ctx = { t = 0, resX = 1920, resY = 1080, hour = 12, fr = 1, fg = 1, fb = 1, roofLit = 0 }
+function _ctx.top(L) return -NORMAL_H * (L - 10) - _cam end
+function _ctx.lit(L) return 1 - floor_darkness(L) end
+_ctx.tint = floor_tint
+_ctx.checkpoint = shows_checkpoint
+
+local function summit_lift(focus)
+    local s, px = SUMMIT_LIFT, SUMMIT_LIFT.px
+    local u = (10 - (_cam + focus - NORMAL_H * 0.5) / NORMAL_H - s.from) / s.step
+    if u <= 0 or u >= #px - 1 then return 0 end
+    local i = math.floor(u)
+    local t = u - i
+    local p0, p1, p2, p3 = px[math.max(i, 1)], px[i + 1], px[i + 2], px[math.min(i + 3, #px)]
+    return 0.5 * (2 * p1 + (p2 - p0) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t
+        + (3 * p1 - p0 - 3 * p2 + p3) * t * t * t)                -- Catmull-Rom through the samples
 end
 
 local function draw_parallax()
@@ -115,7 +172,7 @@ local function draw_parallax()
     local f = _tex[BG_FOREST.key]
     if f ~= nil and f.Loaded then
         -- convert the origin once and round once; tiles go at exact integer offsets from it
-        local base = (BG_FOREST.wyTop - _cam - focus) * BG_FOREST.rate + focus
+        local base = (BG_FOREST.wyTop - _cam - focus) * BG_FOREST.rate + focus - summit_lift(focus)
         base = math.floor(base + 0.5)
         local fr = _tex[BG_FRINGE.key]
         if fr ~= nil and fr.Loaded then
@@ -125,9 +182,9 @@ local function draw_parallax()
                 while x < res.X do fr:DrawAtAnchor(x, fy, "topleft") ; x = x + fr.Width end
             end
         end
-        for row = 0, BG_FOREST.rows - 1 do
+        for row = BG_FOREST.rows - 1, 0, -1 do
             local y = base + row * BG_FOREST.tile
-            if y < res.Y and y + BG_FOREST.tile > 0 then
+            if y < res.Y and y + f.Height > 0 then
                 local x = 0
                 while x < res.X do f:DrawAtAnchor(x, y, "topleft") ; x = x + f.Width end
             end
@@ -135,59 +192,52 @@ local function draw_parallax()
     end
 end
 
--- ── Tower art ─────────────────────────────────────────────────────────────────
-local function road_tex(L)
-    if     L == 5 then return _tex.road_forest_stairs   -- forest → stairs transition
-    elseif L == 9 then return _tex.road_stairs_base     -- stairs → pagoda-base transition
-    elseif L >= 6 then return _tex.road_stairs
-    else               return _tex.road_forest end
-end
-
--- slot 0 = dojo (departure point), 1-9 = road column, 10 = pagoda base, 11-19 = doors,
--- 20 = gate 10 wearing the crown, 21+ = beanstalk once gate 10 is beaten
+-- tower art
+-- slot 0 = dojo, 1-9 = forest path and stairs, 10 = pagoda base, 11-19 = doors,
+-- 20 = gate 10 with the crown, 21+ = beanstalk once gate 10 is beaten
 local function draw_level_art(L)
     local wtop = -NORMAL_H * (L - 10)
     if L == 0 then
         local dj = _tex.dojo
         if dj ~= nil and dj.Loaded then draw_floor_img(dj, dj.Width, dj.Height, wtop, false) end
-    elseif L >= 1 and L <= 9 then
-        draw_floor_img(road_tex(L), FLOOR_W, NORMAL_H, wtop, false)
-    elseif L == 10 then
-        draw_floor_img(_tex.floor_top, FLOOR_W, NORMAL_H, wtop, false)
+    elseif L >= 1 and L <= 10 then
+        local tx = tiles.forLevel(L)
+        if tx ~= nil then draw_floor_img(tx, tx.Width, tx.Height, wtop, false) end
     elseif L >= 11 and L <= 20 then
         if L == 20 then
-            local rtex = (_highest >= 20 and _tex.roof_beanstalk ~= nil and _tex.roof_beanstalk.Loaded)
-                         and _tex.roof_beanstalk or _tex.roof
-            draw_floor_img(rtex, ROOF_W, ROOF_H, wtop, L > _highest)
-        else
-            local ftex = _tex.normal
-            if L == 15 and _highest >= 15 and _tex.checkpoint_cleared ~= nil then
-                ftex = _tex.checkpoint_cleared
+            -- the roof stalk takes the sky's filter like the beanstalk
+            local stalk = _highest >= 20 and _tex.roof_beanstalk ~= nil and _tex.roof_beanstalk.Loaded
+            if stalk then
+                draw_floor_img(_tex.roof_beanstalk, ROOF_W, ROOF_H, wtop, floor_darkness(L), _fr, _fg, _fb, floor_deep(L))
+            else
+                draw_floor_img(_tex.roof, ROOF_W, ROOF_H, wtop, floor_darkness(L), nil, nil, nil, floor_deep(L))
             end
-            draw_floor_img(ftex, NORMAL_W, NORMAL_H, wtop, L > _highest)
+            -- gate 10 beaten: the roof stalk follows the dispersal
+            if _scLevel == 20 and _tex.roof_beanstalk ~= nil and _tex.roof_beanstalk.Loaded then
+                _tex.roof_beanstalk:SetOpacity(_scT)
+                draw_floor_img(_tex.roof_beanstalk, ROOF_W, ROOF_H, wtop, floor_darkness(L), _fr, _fg, _fb)
+                _tex.roof_beanstalk:SetOpacity(1)
+            end
+        elseif shows_checkpoint(L) then
+            local c = 1 - floor_darkness(L)
+            c = c * (1 - (1 - CHECKPOINT_DEEP) * floor_deep(L))
+            draw_floor_img(_tex.checkpoint_cleared, NORMAL_W, NORMAL_H, wtop, false, c, c, c)
+        else
+            local r, g, b = floor_tint(L)
+            draw_floor_img(_tex.normal, NORMAL_W, NORMAL_H, wtop, floor_darkness(L), r, g, b, floor_deep(L))
         end
     else
-        if _highest >= 20 then draw_floor_img(_tex.beanstalk, ROOF_W, NORMAL_H, wtop, false) end
-    end
-end
-
--- overlays overhang the slot above, so they draw in a second pass after every tile
-local function draw_overlays(Lmin, Lmax)
-    local res   = THEME:GetResolution()
-    local col_x = res.X - FLOOR_W + DOOR_X
-    for _, lt in ipairs(LANTERNS) do
-        if lt.L >= Lmin and lt.L <= Lmax and _tex.lantern ~= nil and _tex.lantern.Loaded then
-            local y = screen_y(-NORMAL_H * (lt.L - 10) + lt.row)
-            _tex.lantern:DrawAtAnchor(col_x - LANTERN_DX, y, "bottom")
-            _tex.lantern:DrawAtAnchor(col_x + LANTERN_DX, y, "bottom")
+        if _highest >= 20 then
+            draw_floor_img(_tex.beanstalk, ROOF_W, NORMAL_H, wtop, false, _fr, _fg, _fb)
+        elseif _scLevel == 20 and _tex.beanstalk ~= nil and _tex.beanstalk.Loaded then
+            _tex.beanstalk:SetOpacity(_scT)
+            draw_floor_img(_tex.beanstalk, ROOF_W, NORMAL_H, wtop, false, _fr, _fg, _fb)
+            _tex.beanstalk:SetOpacity(1)
         end
     end
-    if Lmin <= 5 and 5 <= Lmax and _tex.niomon ~= nil and _tex.niomon.Loaded then
-        _tex.niomon:DrawAtAnchor(col_x, screen_y(-NORMAL_H * (5 - 10) + GATE_ROW), "bottom")
-    end
 end
 
--- ── Corruption clouds + particles ─────────────────────────────────────────────
+-- corruption clouds and particles
 -- effect box for an undiscovered door, in world space (x is screen space: no horizontal scroll)
 local function floor_world_box(L)
     local res = THEME:GetResolution()
@@ -198,147 +248,48 @@ local function floor_world_box(L)
     return nil
 end
 
-local function spawn_particle(kind, b)
-    local lr = (kind == "spiral") and SPIRAL_LIFE or SHADOW_LIFE
-    local sr = (kind == "spiral") and SPIRAL_SIZE or SHADOW_SIZE
-    local life = lr[1] + math.random() * (lr[2] - lr[1])
-    _particles[#_particles + 1] = {
-        kind = kind,
-        x  = b[1] + math.random() * b[3],
-        wy = b[2] + math.random() * b[4],
-        vy = -(SHADOW_RISE[1] + math.random() * (SHADOW_RISE[2] - SHADOW_RISE[1])),
-        phase = math.random() * 6.28,
-        life = life, max = life,
-        size = sr[1] + math.random() * (sr[2] - sr[1]),
-        col  = SHADOW_COLS[math.random(#SHADOW_COLS)],
-        rot  = math.random() * 360,
-        spin = (SPIRAL_SPIN[1] + math.random() * (SPIRAL_SPIN[2] - SPIRAL_SPIN[1]))
-               * (math.random() < 0.5 and 1 or -1),
-    }
-end
-
-local function emit_particles(dt)
+-- doors above the highest reached level within a slot of the screen, plus the dispersing floor;
+-- box tables are reused
+local function dark_boxes()
     local res = THEME:GetResolution()
-    local mg = NORMAL_H                     -- seed one slot beyond the screen to avoid pop-in
-    local boxes = {}
+    local mg = NORMAL_H                     -- one slot beyond the screen to avoid pop-in
+    local n = 0
     for L = 11, 20 do
-        if L > _highest then
-            local x, wy, w, h = floor_world_box(L)
-            if x ~= nil then
-                local sy = screen_y(wy)
-                if sy < res.Y + mg and sy + h > -mg then boxes[#boxes + 1] = { x, wy, w, h } end
-            end
+        local x, wy, w, h = floor_world_box(L)
+        local scatter = (L == _scLevel)
+        local sy = screen_y(wy)
+        if scatter or (L > _highest and sy < res.Y + mg and sy + h > -mg) then
+            n = n + 1
+            local b = _boxes[n]
+            if b == nil then b = {} ; _boxes[n] = b end
+            b[1], b[2], b[3], b[4] = x, wy, w, h
+            b.scatter = scatter and _scT or nil
+            b.deep = floor_deep(L)
         end
     end
-    if #boxes == 0 then return end
-    _emit_acc = math.min(8, _emit_acc + SHADOW_RATE * #boxes * dt)
-    while _emit_acc >= 1 and #_particles < SHADOW_MAX do
-        _emit_acc = _emit_acc - 1
-        spawn_particle("mote", boxes[math.random(#boxes)])
-    end
-    _spiral_acc = math.min(4, _spiral_acc + SPIRAL_RATE * #boxes * dt)
-    while _spiral_acc >= 1 and #_particles < SHADOW_MAX do
-        _spiral_acc = _spiral_acc - 1
-        spawn_particle("spiral", boxes[math.random(#boxes)])
-    end
+    for i = #_boxes, n + 1, -1 do _boxes[i] = nil end
+    return _boxes
 end
 
-local function update_particles(dt)
-    local i = 1
-    while i <= #_particles do
-        local p = _particles[i]
-        p.life = p.life - dt
-        if p.life <= 0 then
-            _particles[i] = _particles[#_particles]
-            _particles[#_particles] = nil
-        else
-            p.phase = p.phase + dt * 3
-            p.wy = p.wy + p.vy * dt
-            p.x  = p.x + math.cos(p.phase) * SHADOW_SWIRL * dt
-            if p.kind == "spiral" then p.rot = p.rot + p.spin * dt end
-            i = i + 1
-        end
-    end
-end
-
-local function draw_particles()
-    for _, p in ipairs(_particles) do
-        local tx = (p.kind == "spiral") and _tex.spiral or _tex.shadow
-        if tx ~= nil and tx.Loaded then
-            local a = math.sin((1 - p.life / p.max) * math.pi)
-            tx:SetScale(p.size, p.size)
-            tx:SetColor(p.col[1], p.col[2], p.col[3])
-            tx:SetOpacity(a * (p.kind == "spiral" and 0.75 or 0.9))
-            if p.kind == "spiral" then tx:SetRotation(p.rot) end
-            tx:DrawAtAnchor(p.x, screen_y(p.wy), "center")
-            if p.kind == "spiral" then tx:SetRotation(0) end
-        end
-    end
-    if _tex.shadow ~= nil then _tex.shadow:SetColor(1, 1, 1) ; _tex.shadow:SetOpacity(1) ; _tex.shadow:SetScale(1, 1) end
-    if _tex.spiral ~= nil then _tex.spiral:SetColor(1, 1, 1) ; _tex.spiral:SetOpacity(1) ; _tex.spiral:SetScale(1, 1) end
-end
-
-local function clamp_center(v, lo, hi)
-    if lo >= hi then return (lo + hi) * 0.5 end
-    return math.max(lo, math.min(hi, v))
-end
-
--- dark puffs in an oval per undiscovered door, each clamped fully inside the floor image
-local function draw_clouds()
-    local cl = _tex.cloud
-    if cl == nil or not cl.Loaded then return end
-    local res = THEME:GetResolution()
-    local mg = NORMAL_H
-    local drift = math.sin(_t * 0.5) * CLOUD_DRIFT
-    for L = 11, 20 do
-        if L > _highest then
-            local x, wy, w, h = floor_world_box(L)
-            if x ~= nil then
-                local sy = screen_y(wy)
-                if sy < res.Y + mg and sy + h > -mg then
-                    for cxi = 0, CLOUD_COLS - 1 do
-                        for cyi = 0, CLOUD_ROWS - 1 do
-                            local u = (cxi + 0.5) / CLOUD_COLS * 2 - 1
-                            local v = (cyi + 0.5) / CLOUD_ROWS * 2 - 1
-                            if u * u + v * v <= 1.0 then
-                                local idx = cxi * CLOUD_ROWS + cyi
-                                local sc = CLOUD_SCALE[1] + (idx % 4) / 4 * (CLOUD_SCALE[2] - CLOUD_SCALE[1])
-                                local hw, hh = sc * cl.Width * 0.5, sc * cl.Height * 0.5
-                                local px = x  + (cxi + 0.5) / CLOUD_COLS * w + drift + math.sin(_t * 0.9 + idx) * CLOUD_SWAY
-                                local py = sy + (cyi + 0.5) / CLOUD_ROWS * h + math.cos(_t * 0.6 + idx * 1.7) * (CLOUD_SWAY * 0.5)
-                                px = clamp_center(px, x + hw,  x + w - hw)
-                                py = clamp_center(py, sy + hh, sy + h - hh)
-                                local t = (idx * 0.618034) % 1
-                                cl:SetScale(sc, sc)
-                                cl:SetColor(CLOUD_COL_A[1] + (CLOUD_COL_B[1] - CLOUD_COL_A[1]) * t,
-                                            CLOUD_COL_A[2] + (CLOUD_COL_B[2] - CLOUD_COL_A[2]) * t,
-                                            CLOUD_COL_A[3] + (CLOUD_COL_B[3] - CLOUD_COL_A[3]) * t)
-                                cl:SetOpacity(CLOUD_OPACITY)
-                                cl:DrawAtAnchor(px, py, "center")
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-    cl:SetColor(1, 1, 1) ; cl:SetOpacity(1) ; cl:SetScale(1, 1)
-end
-
--- ── Frame entry point ─────────────────────────────────────────────────────────
+-- entry point, called each frame
 function M.draw(cam, highest)
     _cam = cam
     if highest ~= nil then _highest = highest end
-    local dt = fps.deltaTime
-    _t = _t + dt
     local res = THEME:GetResolution()
+    _clock = _clock + fps.deltaTime
+    local hour = skybox.hour()
+    _fr, _fg, _fb = skybox.filterFor(hour)
+    _ctx.t, _ctx.resX, _ctx.resY, _ctx.hour = _clock, res.X, res.Y, hour
+    _ctx.fr, _ctx.fg, _ctx.fb = _fr, _fg, _fb
+    _ctx.roofLit = (_highest >= 20) and 1 or ((_scLevel == 20) and _scT or 0)
+
     draw_parallax()
     local Lmin = math.max(0, math.floor(10 - (_cam + res.Y + NORMAL_H) / NORMAL_H) - 1)
     local Lmax =             math.floor(10 - (_cam - NORMAL_H) / NORMAL_H) + 1
+    towerfx.draw("back", Lmin, Lmax, _ctx)
     for L = Lmin, Lmax do draw_level_art(L) end
-    draw_overlays(Lmin, Lmax)
-    draw_clouds()
-    update_particles(dt) ; emit_particles(dt) ; draw_particles()
+    towerfx.draw("front", Lmin, Lmax, _ctx)
+    if _dark ~= nil then _dark:frame(fps.deltaTime, dark_boxes(), _cam) end
 end
 
 return M

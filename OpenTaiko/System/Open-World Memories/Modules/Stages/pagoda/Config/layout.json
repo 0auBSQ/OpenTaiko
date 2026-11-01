@@ -1,0 +1,1732 @@
+{
+    "_note": "Pagoda layout, in 1920x1080 pixels, one group per part of the stage (stage = the files at the pagoda root). Each group's _note gives its colour and opacity ranges.",
+    "encounter": {
+        "_note": "The encounter screens, their minigames, cutscenes, credits and item popups, in 1920x1080 pixels. Each sub-group is one encounter file (folders nest: cutscenes, credits, bands, items); its _note says its colour range (0-1 for SetColor, 0-255 for COLOR) when it has colours. Opacities are 0 to 1.",
+        "cutscenes": {
+            "corruption": {
+                "_note": "The noise over the whole screen. Ranges are [min, max], picked at random per bit. Colours 0-1 (SetColor), opacities 0-1.",
+                "shard_scale": [0.3, 1.0],
+                "shard_opacity": [0.35, 0.8],
+                "sliver_left_px": -200,
+                "sliver_right_inset_px": 100,
+                "sliver_w_px": [200, 1920],
+                "sliver_h_px": [2, 14],
+                "sliver_opacity": [0.15, 0.4],
+                "tint_colors": [
+                    [0.35, 1, 1],
+                    [1, 0.3, 0.8],
+                    [1, 1, 1],
+                    [0.55, 0.45, 1]
+                ]
+            },
+            "glitch": {
+                "_note": "Ranges are [min, max], picked at random. Slice and split pushes are texture px times the glitch's size. The ambient area is x, y, w, h from the figure's eye (1920 space at scale 1). Colours 0-1 (SetColor), opacities 0-1.",
+                "slices": [5, 9],
+                "slice_shift_share": 0.45,
+                "slice_dx_px": [6, 30],
+                "split_dx_px": [5, 12],
+                "split_opacity": 0.35,
+                "split_red_color": [1, 0.2, 0.25],
+                "split_cyan_color": [0.2, 0.9, 1],
+                "ambient": {
+                    "count": 4,
+                    "area": [-560, -330, 1120, 640],
+                    "scale": [0.3, 0.7],
+                    "opacity": 0.8
+                },
+                "tears": {
+                    "_note": "count bars or tiles, then extra_count more; tile_share of them are atlas tiles at tile_opacity_scale times the opacity.",
+                    "count": [1, 3],
+                    "extra_count": [0, 2],
+                    "left_px": -100,
+                    "right_inset_px": 200,
+                    "w_px": [220, 1100],
+                    "h_px": [2, 12],
+                    "opacity": [0.12, 0.32],
+                    "tile_share": 0.5,
+                    "tile_scale": [0.3, 0.8],
+                    "tile_opacity_scale": 2
+                },
+                "tint_colors": [
+                    [0.35, 1, 1],
+                    [1, 0.35, 0.8],
+                    [1, 1, 1]
+                ]
+            },
+            "level10": {
+                "_note": "Colours 0-1 (SetColor), opacities 0-1. The swirl and the trail's two inner control points are in 1920 space; the trail ends door_depth down the doorway (door_fallback when the manifest has no cut10_door).",
+                "overscan_px": 24,
+                "scrim_opacity": 0.5,
+                "dark_color": [0.05, 0.03, 0.07],
+                "bg_dim": 0.22,
+                "swirl": { "x": 1420, "y": 470 },
+                "trail": [
+                    { "x": 1300, "y": 960 },
+                    { "x": 960, "y": 980 }
+                ],
+                "door_depth": 0.62,
+                "door_fallback": { "x": 880, "y": 398, "w": 241, "h": 292 }
+            },
+            "level20": {
+                "_note": "Colours 0-1 (SetColor), opacities 0-1. overscan_px: how far the backdrop reaches past each screen edge for the shakes; sink_px: how far the layers resting on the screen bottom reach below it. bolt_x: the x ranges a bolt strikes in (past Tobiraph's wing tips). shafts: dx from the gleam's x.",
+                "overscan_px": 24,
+                "sink_px": 20,
+                "sky_hour": 12,
+                "sky_pitch_deg": -6,
+                "scrim_opacity": 0.5,
+                "glitch_size": 1.8,
+                "bolt_x": [
+                    [40, 190],
+                    [1740, 1880]
+                ],
+                "ume_off_px": 80,
+                "away_scale": 0.24,
+                "away_to": { "x": 1090, "y": 150 },
+                "gleam_scale": 10,
+                "gleam_dx_px": 170,
+                "shafts": [
+                    {
+                        "dx": -380,
+                        "y": -40,
+                        "rot_deg": 14,
+                        "sx": 1.4,
+                        "sy": 1.3
+                    },
+                    {
+                        "dx": -100,
+                        "y": -40,
+                        "rot_deg": 6,
+                        "sx": 1.1,
+                        "sy": 1.2
+                    },
+                    {
+                        "dx": 160,
+                        "y": -40,
+                        "rot_deg": -6,
+                        "sx": 1.3,
+                        "sy": 1.4
+                    }
+                ],
+                "shaft_opacity": 0.16,
+                "warm_color": [1, 0.97, 0.88],
+                "finial_scale": 5,
+                "finial_opacity": 0.55,
+                "finial_color": [1, 0.82, 0.5]
+            },
+            "stair_air": {
+                "_note": "Colours 0-1 (SetColor), opacities 0-1. Each ray breathes between ray_opacity min and max.",
+                "ray_color": [1, 0.95, 0.78],
+                "rays": [
+                    { "x": 300, "y": 120, "rot_deg": 28 },
+                    { "x": 700, "y": 120, "rot_deg": 28 }
+                ],
+                "ray_scale": { "x": 1.4, "y": 1.2 },
+                "ray_opacity": { "min": 0.1, "max": 0.2 },
+                "sun": { "x": 260, "y": -40 },
+                "sun_scale": 9,
+                "sun_color": [1, 0.95, 0.75],
+                "sun_opacity": 0.22,
+                "vignette_opacity": 0.45,
+                "mist_glow_opacity": 0.09
+            },
+            "star": {
+                "_note": "Colours 0-1, opacities 0-1. The glow grows from glow_scale[1] to glow_scale[2] until the star pops.",
+                "star_scale": 1.0,
+                "inner_star_scale": 0.55,
+                "inner_star_opacity": 0.9,
+                "glow_scale": [1.5, 6.5],
+                "glow_opacity": 0.85,
+                "trail_scale": [0.35, 0.8],
+                "tint_color": [1, 0.96, 0.84]
+            },
+            "storm": {
+                "_note": "In 1920x1080 space. Colours 0-1 (SetColor), opacities 0-1. Rain drops spawn between spawn_left_px and the screen width plus spawn_right_over_px, spawn_above_min_px plus up to spawn_above_range_px above the top, and wrap wrap_margin_px left of spawn_left_px; the fall span is the rain height plus fill_extra_px (drops start up to fill_top_px above the top) and a drop respawns fall_past_px below it.",
+                "bolt_x": [260, 1100],
+                "bolt_y": -20,
+                "bolt_scale": [0.85, 1.15],
+                "bolt_opacity_scale": 1.4,
+                "rain_layers": [
+                    {
+                        "count": 80,
+                        "scale": [0.45, 0.7],
+                        "opacity": [0.22, 0.36]
+                    },
+                    {
+                        "count": 36,
+                        "scale": [0.85, 1.25],
+                        "opacity": [0.3, 0.5]
+                    }
+                ],
+                "rain_width_scale": 0.8,
+                "spawn_left_px": -200,
+                "spawn_right_over_px": 520,
+                "spawn_above_min_px": 80,
+                "spawn_above_range_px": 200,
+                "fill_extra_px": 160,
+                "fill_top_px": 120,
+                "fall_past_px": 80,
+                "wrap_margin_px": 300,
+                "cloud_brightness": 0.28,
+                "cloud_opacity": 0.96,
+                "flash_color": [0.85, 0.9, 1]
+            }
+        },
+        "bands": {
+            "checkpoint": {
+                "_note": "Colours 0-1 (SetColor), opacities 0-1 except shadow_cast_alpha_255 (0-255): the cast's opacity in the shadow room. dust_area: x, y, w, h.",
+                "shadow_cast_alpha_255": 60,
+                "sky_hour": 12,
+                "sky_pitch_deg": -6,
+                "shaft_color": [1, 0.95, 0.82],
+                "shafts": [
+                    {
+                        "x": 500,
+                        "y": 640,
+                        "rot_deg": 25,
+                        "sx": 1.1,
+                        "sy": 0.45
+                    },
+                    {
+                        "x": 1000,
+                        "y": 620,
+                        "rot_deg": 25,
+                        "sx": 1.1,
+                        "sy": 0.45
+                    }
+                ],
+                "shaft_opacity": 0.12,
+                "dust_max_count": 40,
+                "dust_area": [80, 380, 1500, 560],
+                "lantern_scale": 1.4,
+                "lantern_opacity": 0.25,
+                "lantern_color": [1, 0.75, 0.4],
+                "vignette_opacity": 0.45,
+                "ground_dust_color": [0.7, 0.66, 0.62]
+            },
+            "forest": {
+                "_note": "Colours 0-1 (SetColor), opacities 0-1. Per variant: trail (levels 1-5), stair (6-10). Each ray breathes between ray_opacity min and max.",
+                "ray_color": [1, 0.95, 0.78],
+                "rays": {
+                    "trail": [
+                        { "x": 420, "y": 330, "rot_deg": -18 },
+                        { "x": 860, "y": 330, "rot_deg": -21 },
+                        { "x": 1350, "y": 330, "rot_deg": -24 }
+                    ],
+                    "stair": [
+                        { "x": 300, "y": 120, "rot_deg": 28 },
+                        { "x": 700, "y": 120, "rot_deg": 28 }
+                    ]
+                },
+                "ray_scale": { "x": 1.4, "y": 1.2 },
+                "ray_opacity": { "min": 0.1, "max": 0.2 },
+                "sun": {
+                    "trail": { "x": 1880, "y": -60 },
+                    "stair": { "x": 260, "y": -40 }
+                },
+                "sun_scale": 9,
+                "sun_color": [1, 0.95, 0.75],
+                "sun_opacity": 0.22,
+                "vignette_opacity": { "trail": 0.55, "stair": 0.45 },
+                "ground_dust_color": [0.86, 0.8, 0.7],
+                "mist_glow_opacity": 0.09,
+                "stair_sky_hour": 12,
+                "stair_sky_pitch_deg": -6
+            },
+            "pagoda": {
+                "_note": "Colours 0-1 (SetColor), opacities 0-1. tint_lift: how far the plate colour is lifted towards white.",
+                "tint_lift": 0.6,
+                "shaft_color": [0.95, 0.9, 1.0],
+                "shafts": [
+                    {
+                        "x": 1220,
+                        "y": 420,
+                        "rot_deg": 12,
+                        "sx": 1.2,
+                        "sy": 0.85
+                    },
+                    {
+                        "x": 1220,
+                        "y": 420,
+                        "rot_deg": 20,
+                        "sx": 0.9,
+                        "sy": 0.8
+                    }
+                ],
+                "shaft_opacity": 0.12,
+                "grain_opacity": 0.05,
+                "vignette_opacity": 0.7,
+                "ground_dust_color": [0.72, 0.66, 0.58]
+            },
+            "sky": {
+                "_note": "Colours 0-1 (SetColor), opacities 0-1. wisps: the stair mist preset, thinner and higher up (area x, y, w, h). clouds: two rows of the cloud art repeated across the screen, the far row first, their foot at cloud_foot_y. A sun shows up to its last_hour; spores from spore_from_hour; the vignette goes from day to night over vignette_span_hours from vignette_from_hour.",
+                "sky_pitch_deg": -6,
+                "wisps": {
+                    "max_count": 3,
+                    "opacity": 0.12,
+                    "area": [-400, 120, 2200, 600]
+                },
+                "clouds": [
+                    { "scale": 2.4, "offset_px": 300, "opacity": 0.5 },
+                    { "scale": 1.5, "offset_px": 700, "opacity": 0.85 }
+                ],
+                "cloud_foot_y": 1110,
+                "sun": {
+                    "day": {
+                        "last_hour": 16,
+                        "x": 1650,
+                        "y": 120,
+                        "scale": 9,
+                        "color": [1, 0.97, 0.9],
+                        "opacity": 0.25
+                    },
+                    "sunset": {
+                        "last_hour": 19,
+                        "x": 1700,
+                        "y": 600,
+                        "scale": 10,
+                        "color": [1, 0.6, 0.3],
+                        "opacity": 0.35
+                    }
+                },
+                "spore_from_hour": 20,
+                "vignette_day_opacity": 0.35,
+                "vignette_night_opacity": 0.65,
+                "vignette_from_hour": 12,
+                "vignette_span_hours": 12,
+                "ground_dust_color": [0.8, 0.84, 0.78]
+            }
+        },
+        "band_label": {
+            "_note": "The tier name and floor number, top right. face_color 0-1 (made into a COLOR); opacities 0-1. number_left_x / number_y: the number's left ink edge and ink centre; label_gap_px / label_dy: the name's right end from the number's left edge and centre. rainbow: Rainbow.draw options for the roof floors.",
+            "digit_gap_px": 8,
+            "number_scale": 0.43,
+            "number_left_x": 1716,
+            "number_y": 116,
+            "number_rot_deg": -6,
+            "label_gap_px": 22,
+            "label_dy": -58,
+            "label_rot_deg": 17,
+            "label_opacity": 0.5,
+            "label_jitter": 0.5,
+            "label_width_px": 900,
+            "face_color": [1, 0.97, 0.9],
+            "rainbow": {
+                "cycles": 1,
+                "sat": 0.6,
+                "val": 1,
+                "anchor": "center",
+                "strip": 6
+            }
+        },
+        "banner": {
+            "_note": "The CLEAR! and FAILED... words: their centre y (1920x1080, inside the scrim's black) and the glitter area's margin around the word.",
+            "center_y": 150,
+            "glitter_margin_px": 40
+        },
+        "items": {
+            "_note": "Ume's items on the encounter screen. Colours ending in _color are 0-1 (SetColor) unless their group's _note says 0-255 (COLOR).",
+            "charm": {
+                "_note": "Asagao's Gift: the drop falls on impact, its rings spread out from there. Colours 0-1.",
+                "impact": { "x": 960, "y": 520 },
+                "dim_opacity": 0.34,
+                "water_color": [0.64, 0.86, 1.0],
+                "drop": {
+                    "_note": "The falling drop (scale of drop.png) and its two glows: the trail above it and the glow on it.",
+                    "scale": 2.0,
+                    "trail_scale_x": 0.3,
+                    "trail_scale_y": 0.3,
+                    "trail_opacity": 0.35,
+                    "glow_scale_x": 0.42,
+                    "glow_scale_y": 0.52,
+                    "glow_opacity": 0.6
+                },
+                "ring_squash": 0.94,
+                "flash_scale": 2.4,
+                "flash_opacity": 0.8,
+                "bar_flash": {
+                    "_note": "The light over a bar that gives its secret up: a glow bar_w x bar_h (local px of the bar) and glints along it.",
+                    "w": 900,
+                    "h": 150,
+                    "glow_w_fallback": 256,
+                    "glow_opacity": 0.75,
+                    "glints": 5,
+                    "glint_step_px": 150,
+                    "glint_scale": 0.9,
+                    "glint_scale_min": 0.2
+                }
+            },
+            "icons": {
+                "_note": "The item icons at the bottom left. Colours 0-1.",
+                "slot_x0": 80,
+                "slot_dx": 122,
+                "icon_y": 958,
+                "icon_scale": 0.85,
+                "icon_h_fallback": 120,
+                "shadow_scale": 0.62,
+                "shadow_opacity": 0.42,
+                "shadow_grey_opacity": 0.72,
+                "shadow_color": [0, 0, 0],
+                "rim_px": 3,
+                "rim_opacity": 0.3,
+                "rim_color": [0, 0, 0],
+                "glow_scale": 0.82,
+                "focus_grey_dim": 0.55,
+                "halo_r_px": 66,
+                "halo_opacity": 0.85,
+                "gold_color": [1, 0.86, 0.45],
+                "grey_color": [0.62, 0.62, 0.64],
+                "grey_opacity": 0.5,
+                "flash_opacity": 0.85,
+                "flash_color": [1, 1, 1],
+                "burst_glints": 7,
+                "burst_ring_opacity": 0.9
+            },
+            "popup": {
+                "_note": "The popup explaining a new item; the panel is 1280 x 800 around center. Text colours 0-255 (COLOR), halo_color 0-1.",
+                "center": { "x": 960, "y": 540 },
+                "new_y": 200,
+                "icon_y": 310,
+                "title_y": 437,
+                "sub_y": 509,
+                "body_y": 570,
+                "body_w": 1040,
+                "para_gap_px": 12,
+                "ok_y": 862,
+                "icon_scale": 1.15,
+                "title_font_size": 46,
+                "body_font_size": 24,
+                "text_nudge_px": 12,
+                "gold_color": [255, 226, 140, 255],
+                "soft_color": [206, 196, 228, 255],
+                "white_color": [240, 236, 246, 255],
+                "outline_color": [0, 0, 0, 255],
+                "halo_color": [1, 0.86, 0.5],
+                "halo_scale": 1.25,
+                "halo_opacity": 0.55,
+                "glints": 6,
+                "glint_orbit_x_px": 120,
+                "glint_orbit_y_px": 78,
+                "glint_scale": 0.7
+            },
+            "tambourine": {
+                "_note": "Ume's Tambourine in the middle of the screen. Colours 0-1.",
+                "center": { "x": 960, "y": 500 },
+                "size": 1.5,
+                "wave_opacity": 0.9,
+                "glints": 8,
+                "halo_scale": 1.6,
+                "halo_opacity": 0.55,
+                "gold_color": [1, 0.84, 0.42]
+            },
+            "tooltip": {
+                "_note": "The focused item's description panel over the icons: its left edge and bottom, the text's left inset and the name's and first line's centres from the panel's top. Colours 0-255 (COLOR).",
+                "x": 16,
+                "bottom": 836,
+                "pad_x": 40,
+                "name_y": 56,
+                "desc_y": 112,
+                "desc_w": 530,
+                "text_nudge_px": 12,
+                "text_color": [238, 234, 244, 255],
+                "outline_color": [0, 0, 0, 255]
+            }
+        },
+        "songbars": {
+            "_note": "The song bars at the top left: the first bar's centre, each next one's step, turn (degrees) and shrink.",
+            "name_font_size": 38,
+            "label_font_size": 90,
+            "flavor_font_size": 12,
+            "slot_x": 458,
+            "slot_y": 78,
+            "slot_dx": -16,
+            "slot_dy": 110,
+            "slot_rot_deg": 0.8,
+            "slot_drot_deg": 1.1,
+            "slot_ds": 0.025
+        },
+        "songbars_data": {
+            "_note": "A song bar's local px (x to the right, y down, about its centre): its size, the name box's ends, the emblem's centre and scale; the level digits' advances (digit 0 to 9); the destiny crack's impact and the shards' centres (shard01 to shard22, in order).",
+            "bar": {
+                "w": 840,
+                "h": 100,
+                "text_x0": -380,
+                "text_x1": 292,
+                "text_h": 70,
+                "emblem_x": 354,
+                "emblem_scale": 0.74
+            },
+            "digit_w": [36, 27, 34, 34, 35, 35, 36, 35, 36, 36],
+            "impact": { "x": -120, "y": 4 },
+            "shards": [
+                { "x": -53.5, "y": -8.5 },
+                { "x": -97.5, "y": 19 },
+                { "x": -154, "y": 25.5 },
+                { "x": -167.5, "y": -5 },
+                { "x": -164.5, "y": -21.5 },
+                { "x": -88, "y": -21.5 },
+                { "x": 59.5, "y": 19.5 },
+                { "x": -42, "y": 29 },
+                { "x": -229.5, "y": 20 },
+                { "x": -289, "y": 1 },
+                { "x": -254, "y": -12.5 },
+                { "x": -130.5, "y": -30 },
+                { "x": 39, "y": -6.5 },
+                { "x": -395, "y": 6 },
+                { "x": -377.5, "y": -24 },
+                { "x": -360, "y": 0.5 },
+                { "x": 132.5, "y": 1 },
+                { "x": 189, "y": 1 },
+                { "x": 242.5, "y": 1 },
+                { "x": 294, "y": 1 },
+                { "x": 353.5, "y": -1 },
+                { "x": 371, "y": 1.5 }
+            ]
+        },
+        "song_bar": {
+            "_note": "One song bar's lettering, in the bar's local px. Sizes are shares of the bars' font. hues and dark colours are 0-1; question_color and question_outline_color are 0-255 (COLOR). check_k: the checker's colour as a share of the extrusion's (the flavour's too: no darker, so the checker leaves it alone).",
+            "name_size": 1,
+            "chance_size": 0.72,
+            "chance_jitter": 0.45,
+            "flavor_size": 0.66,
+            "flavor_y": 31,
+            "flavor_x0": -398,
+            "flavor_x1": 300,
+            "flavor_fade_px": 70,
+            "flavor_gap_px": 34,
+            "flavor_opacity": 0.9,
+            "ext_dx": 3,
+            "ext_dy": 4,
+            "check_k": 0.72,
+            "question_size": 0.9,
+            "question_color": [255, 255, 255, 255],
+            "question_outline_color": [20, 12, 28, 255],
+            "plus_dx": -8,
+            "plus_dy": -14,
+            "text_nudge_px": 12.5,
+            "emblem_gap_px": 6,
+            "rim_color": [1, 0.98, 0.93],
+            "hues": {
+                "_note": "Letter colours per song pull: the extrusion and the dark face.",
+                "blue": {
+                    "ext": [0.36, 0.5, 0.86],
+                    "face": [0.06, 0.09, 0.2]
+                },
+                "green": {
+                    "ext": [0.32, 0.68, 0.42],
+                    "face": [0.05, 0.15, 0.08]
+                },
+                "red": {
+                    "ext": [0.88, 0.38, 0.36],
+                    "face": [0.2, 0.05, 0.05]
+                },
+                "purple": {
+                    "ext": [0.64, 0.4, 0.88],
+                    "face": [0.13, 0.06, 0.2]
+                },
+                "black": {
+                    "ext": [0.5, 0.49, 0.53],
+                    "face": [0.06, 0.06, 0.07]
+                }
+            },
+            "dark": {
+                "_note": "The darkness per look: the shell's and cracks' tints, the flames, the light lettering on it.",
+                "purple": {
+                    "shell": [0.8, 0.5, 1.0],
+                    "crack": [0.88, 0.74, 1.0],
+                    "flame": [0.15, 0.04, 0.24],
+                    "glow": [0.62, 0.26, 0.95],
+                    "face": [0.94, 0.88, 1.0],
+                    "rim": [0.2, 0.07, 0.3],
+                    "ext": [0.45, 0.2, 0.66]
+                },
+                "black": {
+                    "shell": [0.5, 0.5, 0.55],
+                    "crack": [0.85, 0.85, 0.9],
+                    "flame": [0.03, 0.03, 0.04],
+                    "glow": [0.3, 0.3, 0.36],
+                    "face": [0.92, 0.92, 0.94],
+                    "rim": [0.05, 0.05, 0.06],
+                    "ext": [0.36, 0.36, 0.4]
+                }
+            }
+        },
+        "speed_badge": {
+            "_note": "The song speed at the bottom right: centre x, each line's centre, the two arrows' spacing. Colours 0-255 (COLOR; the arrows take them as a tint).",
+            "x": 1790,
+            "label_y": 952,
+            "value_y": 994,
+            "arrow_gap_px": 40,
+            "fast_color": [255, 158, 195],
+            "slow_color": [149, 204, 255],
+            "outline_color": [20, 12, 28, 255],
+            "text_nudge_px": 12.5
+        },
+        "bar_flames": {
+            "_note": "The dark flames' peak opacity for the dark tongues and for the glow over some of them.",
+            "dark_opacity": 0.72,
+            "glow_opacity": 0.55
+        },
+        "bar_text": {
+            "_note": "The song bars' lettering: each character's turn (degrees), size range, the first character's size, its lift (px up or down at most), the narrowest squish, and the chance a character turns the same way as the one before.",
+            "text_nudge_px": 12.5,
+            "rot_min_deg": 3,
+            "rot_max_deg": 10,
+            "same_turn_chance": 0.3,
+            "size_min": 0.88,
+            "size_max": 1.14,
+            "first_size": 1.18,
+            "lift_px": 3.5,
+            "squish_min": 0.4
+        },
+        "ui_pill": {
+            "_note": "The menu's answer pill: base_w is the encounter button's width (and its label's). Tints 0-1; label colours 0-255. The glow's scale is per base_w of pill width.",
+            "base_w": 300,
+            "selected_tint": [1, 0.86, 0.45],
+            "dim_tint": [0.62, 0.62, 0.66],
+            "dim_opacity": 0.75,
+            "glow_scale_x": 1.6,
+            "glow_scale_y": 0.6,
+            "glow_opacity": 0.35,
+            "marker_gap_px": 6,
+            "marker_above_rot_deg": -90,
+            "label_gold_color": [255, 226, 140],
+            "label_grey_color": [205, 205, 205]
+        },
+        "menu": {
+            "_note": "The Leave / Start pills (1 = Leave, 2 = Start) and the leave confirmation's text. Colours 0-255 (COLOR).",
+            "pill_y": 946,
+            "pill_x": [770, 1150],
+            "text_nudge_px": 11,
+            "line_gap_px": 2,
+            "question_pad_px": 25,
+            "text_color": [255, 255, 255, 255],
+            "outline_color": [0, 0, 0, 255]
+        },
+        "confirm": {
+            "_note": "The Yes / No confirm panel, shared by the encounter's leave confirmation and the floor select's dialog. button_x: 1 = Yes, 2 = No. dim_opacity: the black over the screen behind the panel (0-1).",
+            "panel": { "x": 960, "y": 470 },
+            "question_y": 420,
+            "question_w": 880,
+            "button_y": 560,
+            "button_x": [810, 1110],
+            "button_scale": 0.8,
+            "dim_opacity": 0.62
+        },
+        "cast": {
+            "_note": "Ume and the Student on the encounter screen; positions are their feet. They run in from start_x, overshoot to over_x, skid back to x, and walk out to exit_x. Colours are 0-1 for SetColor; opacities 0 to 1.",
+            "start_x": -150,
+            "exit_x": -180,
+            "ume": { "x": 334, "over_x": 352, "y": 939 },
+            "student": { "x": 438, "over_x": 456, "y": 1003, "shadow_px": 61 },
+            "art_scale": {
+                "_note": "Frames whose art is drawn bigger than the rest of the cast's, by manifest key: the scale that brings them to its size.",
+                "ume_fail": 0.5625
+            },
+            "dust_color": [0.86, 0.8, 0.7],
+            "shadow": {
+                "_note": "The contact shadow: width_share of the shadow key's sprite width (fallback_w when it has none); lifted lift_full_px off the ground it is lift_shrink smaller and lift_fade fainter.",
+                "opacity": 0.34,
+                "width_share": 0.6,
+                "fallback_w": 150,
+                "lift_full_px": 52,
+                "lift_shrink": 0.4,
+                "lift_fade": 0.5
+            },
+            "hit_fallback": { "dx": 76, "dy": -102 },
+            "offscreen_fallback": { "margin_x": 200, "margin_top": 40 }
+        },
+        "destiny": {
+            "_note": "Level 20's destiny bar: the middle it zooms to, its scale there, the dimming behind it, and the shatter's flash (its size as shares of the bar's). Colours are 0-1 for SetColor; opacities 0 to 1.",
+            "centre_x": 960,
+            "centre_y": 500,
+            "zoom": 1.6,
+            "dim_opacity": 0.55,
+            "flash_color": [0.86, 0.72, 1.0],
+            "flash_opacity": 0.85,
+            "flash_w_share": 1.15,
+            "flash_h_share": 3.2
+        },
+        "exclaim": {
+            "_note": "The tail's tip of the \"!\" bubble from the top of Ume's head.",
+            "tail_dx": 34,
+            "tail_dy": -6
+        },
+        "monsters": {
+            "_note": "Where the floor's monsters stand: the lead's feet at home_x, moved left until every member's right half is left of right_x. door_glow_opacity is the pulse of the doors' monsters (floors 11+); soft_flash_share the share of the play screen's white flash a landing gives the filled bodies. pair: floor 6's critter, from norm4b's feet.",
+            "foot_y": 970,
+            "home_x": 1574,
+            "right_x": 1880,
+            "door_glow_opacity": 0.22,
+            "soft_flash_share": 0.3,
+            "pair": { "critter_dx": 120, "critter_dy": -14 }
+        },
+        "monster_body": {
+            "_note": "One monster's aura, eye glints and shadow. aura: the spawn box above the feet (the divine aura); the dark aura spawns inside the sprite grown by dark_spread on each side. Colours are 0-1 for SetColor; opacities 0 to 1.",
+            "aura": { "w": 340, "h": 400, "foot": 30, "dark_spread": -0.1 },
+            "glint_scale": 0.9,
+            "glint_color": [1, 0.62, 0.2],
+            "shadow": {
+                "_note": "width_share of the sprite width, held between min_scale and max_scale of the shadow art; lifted lift_full_px it is lift_shrink smaller and lift_fade fainter. Floaters get float_scale and float_opacity.",
+                "width_share": 0.6,
+                "min_scale": 0.5,
+                "max_scale": 2.6,
+                "opacity": 0.34,
+                "lift_full_px": 52,
+                "lift_shrink": 0.4,
+                "lift_fade": 0.5,
+                "float_scale": 0.8,
+                "float_opacity": 0.22
+            }
+        },
+        "scene": {
+            "_note": "The scrim over the top of the screen: its x scale and drawn height (scrim.png is 147 px tall), and its opacity outside the pagoda's rooms 11-14 and 16-19 (full there). Opacities 0 to 1.",
+            "scrim_scale_x": 4,
+            "scrim_h": 587,
+            "scrim_opacity": 0.9
+        },
+        "script": {
+            "_note": "The dialog in the top-left corner of the scrim (the box only places the text) and the name tag over it. text_nudge: centre-anchored text sits this far below the box centre. tag.cap_px: nametag.png's caps around a stretched middle; tag.pad: the tag's margin on each side of the name. Colours are 0-255 (COLOR).",
+            "dialog_box": { "x": 16, "y": 14, "w": 1240, "h": 260 },
+            "choice_y": 300,
+            "text_nudge": 11,
+            "tag": { "y": 8, "h": 64, "cap_px": 24, "pad": 30 },
+            "name_color": [255, 226, 140, 255],
+            "name_outline_color": [0, 0, 0, 255]
+        },
+        "credits": {
+            "_note": "The end credits' backgrounds (encounter/credits/). Colours are [r, g, b] from 0 to 1 (SetColor); opacities 0 to 1.",
+            "actor": {
+                "_note": "A credits figure, as the encounter's cast (encounter/cast.lua). Its contact shadow is shadow_width of its art's width (shadow_fallback_w px without one); lifted lift_full px off the ground it shrinks by lift_shrink and fades by lift_fade. art_scale scales a manifest key's art.",
+                "shadow_opacity": 0.34,
+                "shadow_width": 0.6,
+                "shadow_fallback_w": 150,
+                "lift_full": 52,
+                "lift_shrink": 0.4,
+                "lift_fade": 0.5,
+                "art_scale": { "ume_fail": 0.5625 }
+            },
+            "beanstalk": {
+                "_note": "As the level-20 clear leaves them (encounter/cutscenes/level20.lua and storm.lua). The cloud strip sits cloud_sink px below its manifest y; gleam_x is where the star left the screen. Each shaft is [dx from gleam_x, y, rotation deg, scale x, scale y]. The finial glows finial_rest * finial_opacity at rest.",
+                "cloud_sink": 20,
+                "gleam_x": 1176,
+                "gleam_scale": 10,
+                "gleam_opacity": 0.2,
+                "shafts": [
+                    [-380, -40, 14, 1.4, 1.3],
+                    [-100, -40, 6, 1.1, 1.2],
+                    [160, -40, -6, 1.3, 1.4]
+                ],
+                "shaft_opacity": 0.16,
+                "warm_color": [1, 0.97, 0.88],
+                "finial_scale": 5,
+                "finial_opacity": 0.55,
+                "finial_rest": 0.45,
+                "finial_color": [1, 0.82, 0.5]
+            },
+            "chase": {
+                "_note": "The level-11 room. door_x, floor_y: the open door's middle (floor_result.lua climbs through it) and Ume's mark; mid_x where he stands; an actor left of gone_x is hidden. chasers: where each norm3 lands from the stairs.",
+                "door_x": 1622,
+                "floor_y": 939,
+                "mid_x": 900,
+                "gone_x": -400,
+                "chasers": [
+                    { "x": 1560, "y": 945 },
+                    { "x": 1720, "y": 925 }
+                ],
+                "shaft_color": [0.95, 0.9, 1.0],
+                "shafts": [
+                    {
+                        "x": 1220,
+                        "y": 420,
+                        "rot": 12,
+                        "sx": 1.2,
+                        "sy": 0.85
+                    },
+                    {
+                        "x": 1220,
+                        "y": 420,
+                        "rot": 20,
+                        "sx": 0.9,
+                        "sy": 0.8
+                    }
+                ],
+                "shaft_opacity": 0.12,
+                "grain_opacity": 0.05,
+                "vignette_opacity": 0.7
+            },
+            "fall": {
+                "_note": "The line down the treads: y = y0 - slope * x, from x0 off the right to x1 off the left.",
+                "x0": 2150,
+                "x1": -350,
+                "y0": 1200,
+                "slope": 0.417
+            },
+            "forest": {
+                "_note": "The forest trail. walkers: each monster's starting feet (in the order of the Lua list of keys); a walker goes wrap_pad px past an edge before it comes back round. Rays and the sun as the trail's band (encounter/bands/forest.lua); rays are scaled by ray_scale [x, y].",
+                "walkers": [
+                    { "x": 1460, "y": 925 },
+                    { "x": 380, "y": 945 },
+                    { "x": 860, "y": 960 },
+                    { "x": 1180, "y": 980 },
+                    { "x": 2150, "y": 995 },
+                    { "x": 1680, "y": 1010 }
+                ],
+                "wrap_pad": 300,
+                "ray_color": [1, 0.95, 0.78],
+                "rays": [
+                    { "x": 420, "y": 330, "rot": -18 },
+                    { "x": 860, "y": 330, "rot": -21 },
+                    { "x": 1350, "y": 330, "rot": -24 }
+                ],
+                "ray_scale": [1.4, 1.2],
+                "sun_x": 1880,
+                "sun_y": -60,
+                "sun_scale": 9,
+                "sun_color": [1, 0.95, 0.75],
+                "sun_opacity": 0.22,
+                "vignette_opacity": 0.55
+            },
+            "watch": {
+                "_note": "The cleared level-15 room. door_x: the room's doorway (floor_result.lua climbs through it). spirits: each one's lane (feet y) and where it stops by the doorway (px from door_x), in the order of the Lua list of keys; drawn at spirit_scale so the six read as a swarm. Ume startles once the first spirit is closer than startle_dist px.",
+                "ume_x": 1120,
+                "ume_y": 939,
+                "student_y": 1003,
+                "student_shadow_w": 61,
+                "start_x": -150,
+                "door_x": 1575,
+                "startle_dist": 220,
+                "spirits": [
+                    { "y": 990, "door": -30 },
+                    { "y": 1018, "door": 40 },
+                    { "y": 972, "door": 10 },
+                    { "y": 1006, "door": -55 },
+                    { "y": 984, "door": 60 },
+                    { "y": 1012, "door": -10 }
+                ],
+                "spirit_scale": 0.62
+            }
+        }
+    },
+    "fx": {
+        "_note": "The shared effects (fx/*), in 1920x1080 pixels. Colours are 0-1 (SetColor), opacities 0-1, scales are multiples of the texture's own size. Each sub-group is one fx file.",
+        "emitter": {
+            "_note": "What a preset without area, size or alpha gets: the spawn rect x, y, w, h, the particle scale and the peak opacity.",
+            "default_area": [0, 0, 1920, 1080],
+            "default_size": 1,
+            "default_opacity": 1
+        },
+        "darkness": {
+            "_note": "split_x_px: a scatter blows the motes left of it left, the others right (D.new's default). Boxes up to cull_margin_px off screen still simulate. A box's deep share (0..1) moves its colours and bank opacity toward the deep_ ones.",
+            "split_x_px": 960,
+            "cull_margin_px": 403,
+            "shadow_colors": [
+                [0.02, 0.0, 0.04],
+                [0.16, 0.02, 0.24],
+                [0.09, 0.01, 0.15],
+                [0.22, 0.03, 0.3]
+            ],
+            "deep_shadow_colors": [
+                [0.015, 0.015, 0.02],
+                [0.09, 0.085, 0.1],
+                [0.05, 0.05, 0.06],
+                [0.12, 0.115, 0.13]
+            ],
+            "mote": {
+                "size": [0.5, 3.8],
+                "opacity": 0.9
+            },
+            "spiral": {
+                "size": [1.1, 3.2],
+                "opacity": 0.75
+            },
+            "cloud": {
+                "_note": "The bank is a cols x rows grid of puffs kept inside an oval; the puffs cycle through scale_steps scales across the scale range and mix between a_color and b_color.",
+                "cols": 7,
+                "rows": 5,
+                "scale": [0.75, 1.4],
+                "scale_steps": 4,
+                "opacity": 0.9,
+                "deep_opacity": 0.97,
+                "a_color": [0.02, 0.0, 0.04],
+                "b_color": [0.2, 0.03, 0.28],
+                "deep_a_color": [0.015, 0.015, 0.02],
+                "deep_b_color": [0.11, 0.105, 0.12]
+            }
+        },
+        "dissolve": {
+            "_note": "The sprite is cut into columns strips (each at least column_min_px wide on average); the ragged front reaches rag_share of the sprite height (at least rag_min_px) and the edge_px under it draw at edge_opacity. dark_color is the silhouette's filter, dust_color the dust's. Dust spawns up to spawn_jitter_px from its point.",
+            "dark_color": [0.05, 0.03, 0.07],
+            "dust_color": [0.04, 0.03, 0.05],
+            "columns": 96,
+            "column_min_px": 5,
+            "rag_share": 0.09,
+            "rag_min_px": 16,
+            "edge_px": 6,
+            "edge_opacity": 0.45,
+            "spawn_jitter_px": 2
+        },
+        "dust_trail": {
+            "_note": "The swirl is an ellipse flat times as high as wide; each piece settles on a radius in radius_px. The trail starts spout_r_px left of the swirl's middle and is spread_px half-wide there, tapering to 0. A flying speck has a ghost copy at ghost.opacity and ghost.scale. Dust spawns up to spawn_jitter_px from its point.",
+            "dust_color": [0.04, 0.03, 0.05],
+            "flat": 0.5,
+            "radius_px": [40, 140],
+            "spout_r_px": 90,
+            "spread_px": 26,
+            "spawn_jitter_px": 3,
+            "ghost": { "opacity": 0.35, "scale": 0.85 }
+        },
+        "fire": {
+            "_note": "The core is core_h_px tall on a marker_h_px marker (the marker height defaults to marker_h_px); without a core meta the base sits base_above_bottom_px above the core's bottom centre. The glows centre glow_y_share of the core height above the base; the core draws once more Add at add_copy_opacity. Emitters spawn y_share of the core height above the base, spread_px x, y around it.",
+            "core_h_px": 70,
+            "marker_h_px": 64,
+            "base_above_bottom_px": 8,
+            "glow_y_share": 0.45,
+            "add_copy_opacity": 0.35,
+            "halo": {
+                "scale": 2.4,
+                "color": [1, 0.62, 0.25],
+                "opacity": 0.55
+            },
+            "room": {
+                "scale": 7,
+                "color": [1, 0.7, 0.4],
+                "opacity": 0.14
+            },
+            "puffs": {
+                "y_share": 0.3,
+                "spread_px": [6, 3]
+            },
+            "tongues": {
+                "y_share": 0.35,
+                "spread_px": [0, 0]
+            },
+            "embers": {
+                "y_share": 0.5,
+                "spread_px": [12, 6]
+            }
+        }
+    },
+    "play_bg": {
+        "_note": "The play screen's upper background (its own VM, play_bg/), in 1920x1080 skin space, player 1. Colours 0-1 (SetColor) unless a group says 0-255; opacities 0-1; angles in degrees. Emitter groups (named after their fx/presets preset) replace those fields of the preset: area [x, y, w, h], max particles, size scales [min, max] or one scale, opacity (the preset's alpha).",
+        "view": {
+            "_note": "Where things sit on the play screen: the upper band the background fills (w x h) and the rows of it left in view at the monster, above the soul gauge (x 719-1769, y 208-284) and its frame (from y 204 at the right). The lane covers everything from y 287. The monster is as big as on the encounter screen, so most of it runs on under them. view_bottom: the band's rows in view at the monster, 0 to this; foe_x: the encounter's home x; foe_y: the monster's aim point (its face), the middle of the rows in view; top: a group short enough for that keeps its highest point this far down.",
+            "w": 1920,
+            "h": 276,
+            "view_bottom": 206,
+            "foe_x": 1574,
+            "foe_y": 103,
+            "top": 10
+        },
+        "flash": {
+            "_note": "The white gradient map the monster's flash copy is drawn under (stops: position 0-1, then r, g, b 0-255); the copy is skipped at or below min_opacity.",
+            "white_gradient": [
+                [0, 255, 255, 255],
+                [1, 255, 255, 255]
+            ],
+            "min_opacity": 0.002
+        },
+        "sky": {
+            "_note": "top_zenith_share: the band's top colour, this share of the way from the horizon colour to the zenith's.",
+            "top_zenith_share": 0.4
+        },
+        "checkpoint": {
+            "_note": "Floor 15. sky_hour: the floor select's hour the clear room's sky shows; dark_filter_color: the monster in the dark room; dark_sky_color: behind the darkness (no sky shows in the dark room); darkness_density: a share of the floor select's darkness motes. dust.inset_x: the dust's area inset from both sides of the arches.",
+            "sky_hour": 12,
+            "dark_filter_color": [0.34, 0.31, 0.42],
+            "dark_sky_color": [0.04, 0.01, 0.07],
+            "darkness_density": 0.35,
+            "lantern": {
+                "scale": 1.4,
+                "opacity": 0.25,
+                "glow_color": [1, 0.75, 0.4]
+            },
+            "shaft_color": [1, 0.95, 0.82],
+            "shafts": [
+                {
+                    "x": 520,
+                    "y": -20,
+                    "rot_deg": 25,
+                    "sx": 1.1,
+                    "sy": 0.32
+                },
+                {
+                    "x": 1010,
+                    "y": -20,
+                    "rot_deg": 25,
+                    "sx": 1.1,
+                    "sy": 0.32
+                }
+            ],
+            "shaft_opacity": 0.12,
+            "vignette_opacity": 0.45,
+            "interior_dust": { "inset_x": 40, "max": 14 }
+        },
+        "forest": {
+            "_note": "Floors 1-10. mist_glow_opacity: the mist again additively at this share (brighter, not thicker). fireflies: the area's y and h; it spans the band's width.",
+            "ray_color": [1, 0.95, 0.78],
+            "rays": [
+                { "x": 420, "y": -30, "rot_deg": -18 },
+                { "x": 860, "y": -30, "rot_deg": -21 },
+                { "x": 1350, "y": -30, "rot_deg": -24 }
+            ],
+            "ray_sx": 1.1,
+            "ray_sy": 0.36,
+            "sun": { "x": 1880, "y": -60, "scale": 6, "opacity": 0.22 },
+            "sun_color": [1, 0.95, 0.75],
+            "vignette_opacity": 0.45,
+            "mist_glow_opacity": 0.09,
+            "pollen": { "max": 16 },
+            "fireflies": { "area_y": 150, "area_h": 120, "max": 4 },
+            "forest_leaves": {
+                "area": [200, -40, 1700, 0],
+                "max": 8
+            },
+            "mist": {
+                "area": [-400, 130, 2100, 110],
+                "max": 2,
+                "size": [1.2, 1.6]
+            },
+            "near_leaves": {
+                "area": [-150, 90, 2070, 150],
+                "max": 2,
+                "size": 2.0
+            }
+        },
+        "pagoda": {
+            "_note": "Floors 11-19 but 15. The band shows the encounter room from its row 502 down, so its effects sit as there. Shaft colours are multiplied by the floor's plate tint. interior_dust.zones: x, y, w, h and the share of spawns there (no h: the band's height).",
+            "shaft_color": [0.95, 0.9, 1.0],
+            "shafts": [
+                {
+                    "x": 1220,
+                    "y": -82,
+                    "rot_deg": 12,
+                    "sx": 1.2,
+                    "sy": 0.85
+                },
+                {
+                    "x": 1220,
+                    "y": -82,
+                    "rot_deg": 20,
+                    "sx": 0.9,
+                    "sy": 0.8
+                }
+            ],
+            "shaft_opacity": 0.12,
+            "grain_opacity": 0.05,
+            "vignette_opacity": 0.55,
+            "interior_dust": {
+                "zones": [
+                    {
+                        "x": 1000,
+                        "y": 0,
+                        "w": 450,
+                        "h": 60,
+                        "share": 0.35
+                    },
+                    { "x": 1640, "y": 0, "w": 160, "share": 0.35 }
+                ],
+                "max": 24
+            },
+            "ceiling_specks": {
+                "area": [260, 0, 1440, 0]
+            }
+        },
+        "roof": {
+            "_note": "Floors 21+. sun: the glow up to last_hour (day, then sunset; none after). spore_from_hour: the glowing spores from this hour; star_min_opacity: the stars (and their glints) only above this. moon: sky luminance where the moonlight starts (day_luminance) and where it is full (night_luminance); the white copy lifts the line art lift over the sky, at most max_opacity. vignette: light, squeezed into the band it darkens the horizon; it goes from day_opacity to night_opacity over ramp_hours from ramp_from_hour. clouds: two rows of the cloud art repeated across the band behind the bean, their foot on its bottom edge, the far row first: scale, starting offset (px) and opacity.",
+            "sun": {
+                "day": {
+                    "last_hour": 16,
+                    "x": 1650,
+                    "y": 30,
+                    "scale": 6,
+                    "glow_color": [1, 0.97, 0.9],
+                    "opacity": 0.25
+                },
+                "sunset": {
+                    "last_hour": 19,
+                    "x": 1700,
+                    "y": 320,
+                    "scale": 8,
+                    "glow_color": [1, 0.6, 0.3],
+                    "opacity": 0.35
+                }
+            },
+            "spore_from_hour": 20,
+            "star_min_opacity": 0.05,
+            "moon": {
+                "day_luminance": 0.45,
+                "night_luminance": 0.3,
+                "lift": 0.32,
+                "max_opacity": 0.6
+            },
+            "vignette": {
+                "day_opacity": 0.15,
+                "night_opacity": 0.35,
+                "ramp_from_hour": 12,
+                "ramp_hours": 12
+            },
+            "clouds": [
+                { "scale": 1.1, "offset_px": 300, "opacity": 0.5 },
+                { "scale": 0.7, "offset_px": 700, "opacity": 0.85 }
+            ],
+            "mist": {
+                "max": 2,
+                "opacity": 0.1,
+                "area": [-400, 0, 2200, 200],
+                "size": [1.2, 1.6]
+            },
+            "sky_glints": { "max": 14 },
+            "spores": { "max": 8 }
+        },
+        "storm": {
+            "_note": "Floor 20. bolt_x: [left, right] x ranges the far bolts strike in, left of Tobiraph's wing, where the sky shows.",
+            "bolt_x": [
+                [60, 380]
+            ]
+        },
+        "tobiraph": {
+            "_note": "glitch_tile_scale: the glitch tiles' spread and size, kept inside the band; flash_share: a landing only lightens the big figure this much.",
+            "glitch_tile_scale": 0.5,
+            "flash_share": 0.3
+        }
+    },
+    "stage": {
+        "_note": "The stage's own screens (the root .lua files): title, floor selector and its tower scene, confirm dialog, floor result, fail flight, credits, in 1920x1080 pixels. Colours ending in _color are [r, g, b] or [r, g, b, a] 0-255 (COLOR) unless a group's _note says 0-1 (SetColor). Opacities are 0 to 1.",
+        "script": {
+            "_note": "Script.lua: the fonts it makes, and the day-sky scene's render size and camera",
+            "fonts": {
+                "header": 40,
+                "name": 30,
+                "story": 30,
+                "story_name": 34,
+                "story_small": 24
+            },
+            "world": { "render_w": 1280, "render_h": 720, "fov_deg": 30, "yaw_deg": 40 }
+        },
+        "sky": {
+            "_note": "skybox.lua: the sky every pagoda screen draws. pitch_deg and hour are the rest view (the day-sky scene starts there, the selector's pitch parallax rests there); a roof floor shows hour + hour_step per roof floor above the first, at most max_hour. grey_stops are { position 0-1, r, g, b } 0-255 for the grey gradient until level 20 is beaten, grey_blend its strength (0 none, 1 full). filter_keys are { hour, r, g, b } 0-1 (SetColor), the time-of-day colour on the roofs, linear between keys.",
+            "pitch_deg": -6,
+            "hour": 12,
+            "hour_step": 2,
+            "max_hour": 24,
+            "grey_stops": [
+                [0, 128, 131, 137],
+                [0.45, 198, 201, 206],
+                [1, 244, 245, 247]
+            ],
+            "grey_blend": 1,
+            "filter_keys": [
+                [12, 1.0, 1.0, 1.0],
+                [14, 1.0, 0.98, 0.94],
+                [16, 1.0, 0.9, 0.78],
+                [18, 0.98, 0.74, 0.62],
+                [20, 0.62, 0.62, 0.85],
+                [22, 0.45, 0.48, 0.72],
+                [24, 0.36, 0.4, 0.64]
+            ]
+        },
+        "pagoda": {
+            "_note": "pagoda.lua: the missing-songs screen, the status line and the nameplate. *_dy are offsets from the screen's vertical centre.",
+            "fonts": { "hero": 72, "body": 32, "hint": 22 },
+            "missing_songs": {
+                "body_max_w": 1500,
+                "hint_max_w": 900,
+                "message_dy": -40,
+                "update_dy": 20,
+                "count_dy": 80,
+                "back_dy": 130,
+                "fail_color": [255, 80, 80, 255],
+                "text_color": [255, 255, 255, 255],
+                "dim_color": [180, 180, 180, 220]
+            },
+            "status": {
+                "_note": "a short message above the bottom edge; its opacity follows the time it has left",
+                "max_w": 900,
+                "bottom_offset": 90,
+                "color": [255, 220, 80]
+            },
+            "nameplate": { "x": 20, "y": 980 }
+        },
+        "title_screen": {
+            "_note": "title_screen.lua: centres given as shares of the screen height. menu_y_shares are by menu index (Challenge, Practice, Exit); menu_y_shares_with_bestiary by index too (Challenge, Practice, Exit, Bestiary) when the Bestiary button shows, Bestiary above Exit.",
+            "title_y_share": 0.235,
+            "best_y_share": 0.385,
+            "menu_y_shares": [0.58, 0.68, 0.78],
+            "text_color": [255, 255, 255, 255],
+            "text_edge_color": [0, 0, 0, 255],
+            "title": {
+                "_note": "fill_tag is the title's gold gradient (a GetText colour tag); a title wider than max_ink_w is squeezed to it; the plaque is never narrower than min_w",
+                "fill_tag": "<g.#FFEDB4.#DC9A36>",
+                "edge_color": [52, 26, 10],
+                "max_ink_w": 1500,
+                "min_w": 640,
+                "shadow": { "dx": 3, "dy": 5, "opacity": 0.55 }
+            },
+            "best": {
+                "_note": "lift: the level's colour mixed this far toward white to read on the lacquer; the rainbow is the roof floors' look",
+                "lift": 0.4,
+                "rainbow": { "cycles": 1, "sat": 0.7, "val": 1 }
+            },
+            "menu_y_shares_with_bestiary": [0.55, 0.64, 0.82, 0.73]
+        },
+        "selector": {
+            "_note": "selector.lua: the sky's pitch follows the camera, resting at sky.pitch_deg with the pagoda base bottom (world y base_bottom_wy) at the screen bottom",
+            "base_bottom_wy": 517,
+            "sky_pitch_deg_per_px": 0.0006
+        },
+        "confirm": {
+            "_note": "selector_confirm.lua: the question and answer text colours (the panel's layout is the encounter's confirm_layout)",
+            "text_color": [255, 255, 255, 255],
+            "text_edge_color": [0, 0, 0, 255]
+        },
+        "scene": {
+            "_note": "selector_scene.lua: the landscape and tower scene. normal is normal.png (every level occupies one normal.h slot), roof roof.png. Layers draw at native pixel size; rate only scales their scroll speed. The forest is a 2D-tiled fill (rows rows, tile px apart, its top at world y wy_top) capped by a treeline fringe whose bottom overlap px tuck under the fill. The mountains are drawn far to near (bg_far1, bg_far2, bg_far3): h_total is the strip height and wy_bottom places its bottom edge.",
+            "normal": { "w": 1063, "h": 403 },
+            "roof": { "w": 996, "h": 403 },
+            "forest": { "rate": 0.6, "wy_top": 700, "rows": 5, "tile": 512 },
+            "summit_lift": {
+                "_note": "around the summit (level 9) the forest gets an extra lift (px up) per camera level, sampled every step levels from level from and smoothly interpolated, zero outside: it keeps the forest's treeline over summit.png's open bottom-left corner, its blurred top band behind the tower art, and its scroll rate between 0.4 and 0.8",
+                "from": 4,
+                "step": 0.25,
+                "px": [0, 0, 3, 8, 16, 28, 43, 61, 80, 100, 120, 140, 159, 177, 191, 200, 201, 194, 182, 165, 146, 126, 106, 86, 66, 47, 30, 15, 4, -3, -5, -6, -4, -3, -1, 0, 0]
+            },
+            "fringe": { "overlap": 40 },
+            "mountains": [
+                { "rate": 0.2, "wy_bottom": 1107, "h_total": 573 },
+                { "rate": 0.26, "wy_bottom": 1444, "h_total": 372 },
+                { "rate": 0.34, "wy_bottom": 1404, "h_total": 315 }
+            ],
+            "darkness": {
+                "_note": "the doors above the highest reached level. floor_tint is the 0-1 (SetColor) tint on an undiscovered floor's art, floor_tint_deep the deeper one from two floors above the highest cleared; checkpoint_deep dims the dark checkpoint floor's art further when deep. The effects skip crop_left px of the eave; dispersing motes blow left or right of split_x.",
+                "floor_tint": [0.1, 0.04, 0.14],
+                "floor_tint_deep": [0.045, 0.045, 0.05],
+                "checkpoint_deep": 0.5,
+                "crop_left": 300,
+                "split_x": 960
+            },
+            "floor_tint_lighten": 0.62
+        },
+        "tower_fx": {
+            "_note": "tower_fx.lua: how far a slot's effects stray past its edges (falling leaves, wide mist); the slot is scene.normal.h tall",
+            "reach": 280
+        },
+        "credits": {
+            "_note": "credits.lua: bg_dim / scene_dim are the first picture's and the following backgrounds' brightness under the text (0-1). The pads are the space below each kind of line, gap_px an empty line; the composers sit in columns of column_w, each name at most column_w - column_margin wide; any other line at most the screen width - line_margin. The text fades over edge_fade px at the top and bottom edges.",
+            "bg_dim": 0.3,
+            "scene_dim": 0.5,
+            "header_pad": 8,
+            "line_pad": 4,
+            "name_pad": 8,
+            "gap_px": 64,
+            "columns": 3,
+            "column_w": 560,
+            "column_margin": 20,
+            "line_margin": 80,
+            "edge_fade": 140,
+            "header_color": [255, 232, 176, 255],
+            "line_color": [228, 226, 232, 255],
+            "name_color": [214, 208, 216, 255],
+            "last_color": [255, 255, 255, 255],
+            "edge_color": [24, 8, 16, 150]
+        },
+        "fail_flight": {
+            "_note": "fail_flight.lua. Clouds streaking past: count, centre y range, scale range, opacity, horizontal stretch and the gap range before a cloud comes back (px off the left edge). Actors: home point as an offset from the screen centre and scale; fallback_actor is the size used when an actor's art has no size.",
+            "clouds_back": {
+                "n": 4,
+                "y": [120, 640],
+                "scale": [0.45, 0.85],
+                "opacity": 0.75,
+                "stretch": 1.5,
+                "gap": [0, 600]
+            },
+            "clouds_front": {
+                "n": 1,
+                "y": [520, 760],
+                "scale": [1.2, 1.5],
+                "opacity": 0.55,
+                "stretch": 1.7,
+                "gap": [4000, 9000]
+            },
+            "ume": { "dx": -170, "dy": 30, "scale": 0.9 },
+            "student": { "dx": 90, "dy": 155, "scale": 1.6 },
+            "solo": { "dx": 0, "dy": 110, "scale": 1.6 },
+            "fallback_actor": { "w": 150, "h": 200 }
+        },
+        "floor_result": {
+            "_note": "floor_result.lua: after a clear on 11-19 the cast climbs the stairs behind the doorway: its centre x in the band art, the pagoda's open door and the cleared level-15 room's doorway",
+            "climb_door_x": { "pagoda": 1622, "checkpoint": 1575 }
+        },
+        "bestiary": {
+            "_note": "bestiary.lua, in 1920x1080 pixels. Text and title colours are 0-255; card colours are SetColor tints 0-1. The grid holds a card per monster, row by row, then the Back button; back.text_nudge_px: how far the label's glyph box centre sits above its letters' (at scale 1). The panel shows the selected monster in the art box with its name, levels, counts and description under it; a monster not seen yet is a question mark question_h pixels tall.",
+            "dim_opacity": 0.62,
+            "title": { "y": 110 },
+            "grid": {
+                "x": 80,
+                "y": 200,
+                "columns": 6,
+                "card_w": 150,
+                "card_h": 150,
+                "gap": 18,
+                "thumb_pad": 16
+            },
+            "card": {
+                "corner_px": 14,
+                "idle_color": [0.85, 0.85, 0.9],
+                "selected_color": [1, 0.93, 0.65],
+                "unmet_opacity": 0.8,
+                "question_h": 84,
+                "glow_scale": 1.6,
+                "glow_opacity": 0.55
+            },
+            "back": { "x": 575, "y": 945, "w": 300, "h": 84, "text_nudge_px": 12.5 },
+            "panel": {
+                "x": 1120,
+                "y": 190,
+                "w": 720,
+                "h": 820,
+                "corner_px": 40
+            },
+            "art": { "x": 1160, "y": 230, "w": 640, "h": 370, "question_h": 260 },
+            "text": {
+                "left_pad": 50,
+                "name_y": 650,
+                "levels_y": 708,
+                "counts_y": 758,
+                "counts_gap": 300,
+                "description_y": 820,
+                "title_scale": 1.6,
+                "name_scale": 1.3,
+                "button_scale": 1.0,
+                "color": [255, 255, 255, 255],
+                "dim_color": [212, 208, 222, 255],
+                "title_color": [255, 214, 120, 255],
+                "edge_color": [0, 0, 0, 255]
+            },
+            "description": {
+                "_note": "The description under the counts, from text.description_y: h is its visible height, a longer one scrolls (Decide on its card, then Up/Down, Decide or Cancel to leave). lines_per_step: lines one press scrolls; wheel_lines: lines one wheel notch scrolls, with the mouse over the panel. The bar stands bar_dx right of the text, bar_w wide; frame_pad: the reading frame's margin around the text. Colours 0-255.",
+                "h": 160,
+                "lines_per_step": 2,
+                "wheel_lines": 1,
+                "clip_margin_px": 6,
+                "bar_dx": 14,
+                "bar_w": 6,
+                "track_opacity": 0.35,
+                "thumb_color": [212, 208, 222, 255],
+                "thumb_reading_color": [255, 214, 120, 255],
+                "frame_pad": 14,
+                "frame_color": [1, 0.93, 0.65],
+                "frame_opacity": 0.25
+            }
+        }
+    },
+    "selectui": {
+        "_note": "The floor select's UI pieces, in 1920x1080 pixels; offsets are from the selected slot's reference top-left unless a group says otherwise. Colours 0-255 (COLOR); opacities 0-1; angles in degrees.",
+        "metrics": {
+            "_note": "Measurements of the floor-select UI art, in its png's px. digits: digit d at index d + 1 (ink and face boxes, base_y the baseline); border: slice_px its nine-slice corner size, pad_px its fringe outside the rect; chevron, chevron_up: cx, cy the face centre; seal: ink_l, ink_r its ink box; label.nudge: a text line's capitals' centre below its texture centre.",
+            "digits": [
+                {
+                    "w": 232,
+                    "h": 301,
+                    "ink_l": 5,
+                    "ink_r": 220.7,
+                    "ink_t": 4,
+                    "ink_b": 285,
+                    "base_y": 250,
+                    "face_l": 15,
+                    "face_r": 194.7,
+                    "face_t": 14
+                },
+                {
+                    "w": 160,
+                    "h": 295,
+                    "ink_l": 4.3,
+                    "ink_r": 148.3,
+                    "ink_t": 4.3,
+                    "ink_b": 279,
+                    "base_y": 247,
+                    "face_l": 14.3,
+                    "face_r": 122.3,
+                    "face_t": 14.3
+                },
+                {
+                    "w": 207,
+                    "h": 298,
+                    "ink_l": 4.3,
+                    "ink_r": 195.3,
+                    "ink_t": 4,
+                    "ink_b": 282,
+                    "base_y": 250,
+                    "face_l": 14.3,
+                    "face_r": 169.3,
+                    "face_t": 14
+                },
+                {
+                    "w": 207,
+                    "h": 298,
+                    "ink_l": 4.3,
+                    "ink_r": 195.3,
+                    "ink_t": 4.3,
+                    "ink_b": 282,
+                    "base_y": 247,
+                    "face_l": 14.3,
+                    "face_r": 169.3,
+                    "face_t": 14.3
+                },
+                {
+                    "w": 238,
+                    "h": 295,
+                    "ink_l": 4.7,
+                    "ink_r": 226.7,
+                    "ink_t": 4.3,
+                    "ink_b": 279,
+                    "base_y": 247,
+                    "face_l": 14.7,
+                    "face_r": 200.7,
+                    "face_t": 14.3
+                },
+                {
+                    "w": 207,
+                    "h": 298,
+                    "ink_l": 4.7,
+                    "ink_r": 195.3,
+                    "ink_t": 4.3,
+                    "ink_b": 282,
+                    "base_y": 247,
+                    "face_l": 14.7,
+                    "face_r": 169.3,
+                    "face_t": 14.3
+                },
+                {
+                    "w": 229,
+                    "h": 301,
+                    "ink_l": 5,
+                    "ink_r": 217.7,
+                    "ink_t": 4,
+                    "ink_b": 285,
+                    "base_y": 250,
+                    "face_l": 15,
+                    "face_r": 191.7,
+                    "face_t": 14
+                },
+                {
+                    "w": 214,
+                    "h": 295,
+                    "ink_l": 5,
+                    "ink_r": 202,
+                    "ink_t": 4.3,
+                    "ink_b": 279,
+                    "base_y": 247,
+                    "face_l": 15,
+                    "face_r": 176,
+                    "face_t": 14.3
+                },
+                {
+                    "w": 232,
+                    "h": 301,
+                    "ink_l": 5,
+                    "ink_r": 220.7,
+                    "ink_t": 4,
+                    "ink_b": 285,
+                    "base_y": 250,
+                    "face_l": 15,
+                    "face_r": 194.7,
+                    "face_t": 14
+                },
+                {
+                    "w": 229,
+                    "h": 301,
+                    "ink_l": 5,
+                    "ink_r": 217.7,
+                    "ink_t": 4,
+                    "ink_b": 285,
+                    "base_y": 250,
+                    "face_l": 15,
+                    "face_r": 191.7,
+                    "face_t": 14
+                }
+            ],
+            "border": { "slice_px": 16, "pad_px": 1 },
+            "chevron": { "w": 140, "h": 96, "cx": 70.12, "cy": 42.62 },
+            "chevron_up": { "w": 140, "h": 96, "cx": 70.12, "cy": 45.75 },
+            "seal": { "h": 209, "ink_l": 20, "ink_r": 286 },
+            "label": { "nudge": 12.5 },
+            "plaque": { "w": 729 }
+        },
+        "carets": {
+            "_note": "The chevron face centres from the reference top-left.",
+            "up_offset": [-384.5, -168.5],
+            "down_offset": [-382.5, 566.5]
+        },
+        "difficulty": {
+            "_note": "The estimated difficulty line under the plaque (selectui/difficulty.lua): offset is its centre from the reference top-left; emblem_scale the song bars' emblem's scale (its level digits follow); Extreme is the Extra Extreme emblem with the Extreme one over it, stack_dx left and stack_dy down of it (unscaled px, the level on the front one); label_gap_px after \"Estimated difficulty:\"; dash_gap_px on each side of the range's dash. Colours 0-255.",
+            "offset": [-371.5, 474],
+            "emblem_scale": 0.6,
+            "stack_dx": 18,
+            "stack_dy": 10,
+            "label_gap_px": 14,
+            "dash_gap_px": 12,
+            "text_color": [255, 255, 255, 255],
+            "text_edge_color": [24, 18, 30, 255]
+        },
+        "hover": {
+            "_note": "The selected floor's border box (the reference is the floor's slot top). rect_dx0, rect_dy0: its top-left from the reference; rect_right_inset: its right edge is the screen width minus this; rect_dy1: its bottom from the reference. sheen_lighten: the sheen's colour, this share of the way from the floor's plate colour to white.",
+            "rect_dx0": 318,
+            "rect_dy0": 12,
+            "rect_right_inset": 16,
+            "rect_dy1": 405,
+            "sheen_rot_deg": 16,
+            "sheen_opacity": 0.16,
+            "sheen_lighten": 0.6
+        },
+        "numbers": { "_note": "gap: px between the inks of neighbouring digits.", "gap": 8 },
+        "plaque": {
+            "_note": "plaque_offset: plaque.png's top-left; seal_dy: the seal's top; num_dy: the baseline of a full-size number; num_gap: the least gap from the number ink to the seal and the margin; num_right: the right margin, from the plaque's right; header, strip (the \"Level N\" band's centre) and exit (the \"Exit\" centre): from the plaque's top-left. *_max_w: the text's max width. glitter_inset: the share of the number's ink box kept clear at its edges. rainbow, glitter: the roof number's Rainbow.draw and Rainbow.glitter options (speed and rate are in the animation file).",
+            "plaque_offset": [-736, -67],
+            "seal_dy": 45,
+            "num_dy": 250,
+            "num_gap": 40,
+            "num_right": 34,
+            "header": { "dx": 34, "dy": 30 },
+            "strip": { "dx": 364.5, "dy": 437 },
+            "exit": { "dx": 364.5, "dy": 249.5 },
+            "tier_font_size": 104,
+            "tier_color": [150, 148, 158],
+            "level_text_color": [0, 0, 0, 255],
+            "header_max_w": 500,
+            "level_max_w": 500,
+            "exit_max_w": 600,
+            "rainbow": { "cycles": 1, "sat": 0.6, "val": 1 },
+            "glitter": { "size": 1, "opacity": 0.95, "max": 12 },
+            "glitter_inset": 0.12
+        }
+    },
+    "story": {
+        "_note": "The story layer: the VN player (story/vn.lua), its backgrounds (story/backgrounds.lua) and its music (story/vn_music.lua), in 1920x1080 pixels. Sub-groups by file. Colours are [r, g, b] or [r, g, b, a], 0-255, as the VN box theme takes them.",
+        "vn": {
+            "box": {
+                "_note": "The dialogue panel, sized for three lines of body text.",
+                "x": 110,
+                "y": 720,
+                "w": 1700,
+                "h": 300
+            },
+            "theme": {
+                "_note": "A dark VN panel: the text is white, so the box has to be dark (the library's default is a light panel with near-black text). 0-255.",
+                "face_color": [22, 24, 34, 232],
+                "face2_color": [14, 15, 24, 240],
+                "outline_color": [214, 206, 190, 255],
+                "name_pill_color": [176, 67, 47, 255],
+                "name_pill2_color": [138, 46, 32, 255],
+                "name_text_color": [255, 245, 232],
+                "text_color": [255, 255, 255],
+                "choice_row_color": [30, 32, 44, 235],
+                "choice_sel_color": [92, 62, 46, 245],
+                "choice_text_color": [255, 245, 232]
+            },
+            "ume": {
+                "_note": "Ume's VN sprite: main.png is drawn anchored top-centre (side, y = its top edge), and the face overlay sits at face_x, face_y inside it (body pixels, measured from ume.xcf); both scale together.",
+                "side": "center",
+                "y": 0,
+                "scale": 0.75,
+                "face_x": 478,
+                "face_y": 421
+            }
+        },
+        "backgrounds": {
+            "_note": "Placed layers of the VN backgrounds: x, y = top-left on the screen, scale = draw scale (a layer without x, y is stretched over the screen). sky_grey = grey (0 blue .. 1 grey) of the stage sky shown through the background's transparent parts.",
+            "stairs": { "sky_grey": 0 },
+            "sky": { "x": 0, "y": 0, "sky_grey": 0 },
+            "beanstalk": {
+                "bean": { "x": 349, "y": 0 },
+                "cloud": { "x": 0, "y": 258, "scale": 2 }
+            }
+        },
+        "music": {
+            "_note": "Each story loop's volume, in percent.",
+            "volume_percent": { "forest": 45, "dojo": 70 }
+        }
+    },
+    "title_ui": {
+        "_note": "The title screen's UI pieces, in 1920x1080 pixels. Opacities 0-1.",
+        "metrics": {
+            "_note": "Measurements of the title-screen art. plaque, best, button: the three-slice boxes' height, cap width and inset (the inner span's margin on each side). hero, body: the middle of the letters in a label texture, from its top, per font (main, or the ko / zh font).",
+            "plaque": { "h": 148, "cap": 92, "inset": 74 },
+            "best": { "h": 76, "cap": 52, "inset": 44 },
+            "button": { "h": 84, "cap": 50, "inset": 52 },
+            "hero": { "main": 66.5, "ko": 73.5, "zh": 73 },
+            "body": { "main": 29.5, "ko": 33, "zh": 32.5 }
+        },
+        "shine": {
+            "_note": "slant: the bars' lean, px to the right per px up; strip_px: the strip width in texture px; core_width_share, core_opacity_share: the core's share of a bar's half width and opacity; bars: offset behind the lead (px), half width and peak opacity; glitter_w, glitter_h_share: the glitter box around the lead bar, its width and its share of the rows.",
+            "slant": 0.6,
+            "strip_px": 3,
+            "core_width_share": 0.6,
+            "core_opacity_share": 0.65,
+            "bars": [
+                { "off_px": 0, "half_w": 12, "opacity": 1 },
+                { "off_px": -34, "half_w": 5, "opacity": 0.9 }
+            ],
+            "glitter_w": 90,
+            "glitter_h_share": 0.6,
+            "glitter_size": 0.65,
+            "glitter_opacity": 1
+        }
+    },
+    "towerfx": {
+        "_note": "The floor-select ambience (towerfx/*), in 1920x1080 pixels. Rects are x, y, w, h and points x, y in the floor's own art (from its left edge, resX - tile_w_px, and the slot's top); slot_h_px is one level's slot height. Colours are 0-1 (SetColor), opacities 0-1 (peaks, before fades), scales are multiples of the sprite's size, ranges [min, max] picked per particle. Each sub-group is one towerfx file.",
+        "base": {
+            "tile_w_px": 1125,
+            "facade": [330, 150, 770, 230],
+            "vines": [230, 150, 480, 220],
+            "dust": {
+                "count": 10,
+                "size": [0.18, 0.32],
+                "color": [1.0, 0.94, 0.82],
+                "opacity": 0.6
+            },
+            "flies": {
+                "count": 3,
+                "size": 0.45,
+                "color": [0.8, 1.0, 0.5],
+                "opacity": 0.85
+            }
+        },
+        "checkpoint": {
+            "_note": "lanterns: x, y, size. Sparks start at a lantern, jitter_x_px sideways and start_dy_px below it, in the halo colour.",
+            "tile_w_px": 1063,
+            "lanterns": [
+                [508, 190, 1.0],
+                [542, 205, 0.75],
+                [823, 205, 0.75],
+                [852, 190, 1.0]
+            ],
+            "halo": {
+                "color": [1.0, 0.68, 0.35],
+                "scale": 1.25,
+                "opacity": 0.34
+            },
+            "core": {
+                "color": [1.0, 0.8, 0.45],
+                "scale_x": 0.28,
+                "scale_y": 0.32,
+                "opacity": 0.32
+            },
+            "sparks": {
+                "count": 6,
+                "jitter_x_px": [-8, 8],
+                "start_dy_px": 10,
+                "size": [0.5, 0.8],
+                "opacity": 0.8
+            }
+        },
+        "doors": {
+            "_note": "door: the arched door, room: the open floor space, windows: x, y, slant (deg) of the light from the high windows, in normal.png. The lights and dust take the floor's tint moved toward white by whiten.",
+            "tile_w_px": 1063,
+            "door": [681, 215],
+            "room": [395, 45, 580, 255],
+            "windows": [
+                [540, 30, 8],
+                [822, 30, -8]
+            ],
+            "door_glow": { "scale": 2.6, "inner_scale_x": 1.1, "inner_scale_y": 1.4, "inner_dy_px": 10 },
+            "shaft": { "scale_x": 0.8, "scale_y": 0.55, "whiten": 0.5 },
+            "dust": {
+                "count": 12,
+                "size": [0.16, 0.32],
+                "whiten": 0.6,
+                "opacity": 0.75
+            }
+        },
+        "forest": {
+            "_note": "Shafts (per slot) hang above_px above the slot, x between x_left_px and the right edge minus x_right_inset_px, all at the sun's slant rot_deg. Flies stay y_margin_px inside the slot; leaves start between -x_margin_px and the width plus x_margin_px, y_px from the slot's top.",
+            "slot_h_px": 403,
+            "shafts": {
+                "count": 2,
+                "x_left_px": 220,
+                "x_right_inset_px": 160,
+                "above_px": 60,
+                "rot_deg": -24,
+                "scale_x": [0.9, 1.4],
+                "scale_y": [1.0, 1.3],
+                "color": [1.0, 0.95, 0.8]
+            },
+            "flies": {
+                "count": 6,
+                "size": [0.45, 0.75],
+                "color": [0.8, 1.0, 0.5],
+                "opacity": 0.9,
+                "y_margin_px": 30
+            },
+            "leaves": {
+                "count": 3,
+                "x_margin_px": 40,
+                "y_px": [-30, 120],
+                "size": [0.8, 1.15],
+                "opacity": 0.92
+            }
+        },
+        "roofs": {
+            "_note": "Cloud layers: count per slot and scale range, drawn squash_y as tall; they run edge_px off screen on both sides (over half the widest cloud) and stay y_margin_px inside the slot. At full night they dim to night_dim of the sky filter at night_opacity times their opacity. Winds stay y_margin_px inside the slot.",
+            "slot_h_px": 403,
+            "back_clouds": {
+                "count": 2,
+                "size": [1.2, 2.2]
+            },
+            "front_clouds": {
+                "count": 2,
+                "size": [1.6, 2.4]
+            },
+            "clouds": {
+                "edge_px": 420,
+                "y_margin_px": 30,
+                "squash_y": 0.8,
+                "night_dim": 0.38,
+                "night_opacity": 0.7
+            },
+            "winds": {
+                "count": 4,
+                "y_margin_px": 20,
+                "scale_x": [0.7, 1.3],
+                "opacity": 0.35
+            },
+            "stars": {
+                "count": 12,
+                "size": [0.4, 0.8],
+                "color": [0.85, 0.9, 1.0],
+                "opacity": 0.9
+            }
+        },
+        "stairs": {
+            "_note": "Mist banks (per slot) run edge_px off screen on both sides (over half the widest bank), drawn squash_y as tall, y between y_top_px and the slot height minus y_bottom_inset_px. Petals start between x_left_px and x_right_share of the width, y_px from the slot's top. One flock per slot: flock birds of one frame_w_px x frame_h_px frame of bird.png (frames side by side), y_px from the slot's top, starting run_out_px off screen; the followers trail back_px behind and side_px (2nd, then the others) above/below the leader.",
+            "slot_h_px": 403,
+            "mists": {
+                "count": 2,
+                "size": [1.6, 2.4],
+                "squash_y": 0.9,
+                "edge_px": 700,
+                "y_top_px": 70,
+                "y_bottom_inset_px": 50,
+                "color": [0.96, 0.97, 1.0]
+            },
+            "petals": {
+                "count": 4,
+                "x_left_px": -60,
+                "x_right_share": 0.8,
+                "y_px": [-20, 200],
+                "size": [0.8, 1.2],
+                "opacity": 0.9
+            },
+            "birds": {
+                "flock": 3,
+                "frame_w_px": 32,
+                "frame_h_px": 24,
+                "color": [0.2, 0.22, 0.27],
+                "opacity": 0.85,
+                "y_px": [60, 260],
+                "run_out_px": 150,
+                "back_px": [30, 46],
+                "side_px": [-16, 18]
+            }
+        }
+    }
+}

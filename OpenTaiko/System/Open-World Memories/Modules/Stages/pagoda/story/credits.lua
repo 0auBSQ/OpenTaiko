@@ -1,0 +1,52 @@
+-- End credits rows, top to bottom:
+--   { header = "..." }     a section title
+--   { line = "..." }       a line of the section
+--   { gap = true }         an empty line
+--   { composers = true }   the composers (story/credits_composers.lua) in rows of three
+--   { last = "..." }       the line the roll stops on, in the middle of the screen
+
+return {
+    { header = "Character Concepts and planning" },
+    { line = "Dashy, IID, Komi" },
+    { gap = true },
+    { header = "Development" },
+    { line = "Komi" },
+    { gap = true },
+    { header = "User Interface" },
+    { line = "Komi, Dashy" },
+    { gap = true },
+    { header = "Story Concepts and Drafting" },
+    { line = "Dashy, Komi, DiamondN1nja, Crab" },
+    { gap = true },
+    { header = "Story, Final Revisions" },
+    { line = "Dashy, Komi" },
+    { gap = true },
+    { header = "Illustration, Character Designs" },
+    { line = "Dashy, Crab, Tatsuoto" },
+    { gap = true },
+    { header = "Background Illustration" },
+    { line = "Dashy" },
+    { gap = true },
+    { header = "BGM Composer" },
+    { line = "Taichenko, Tatsuoto" },
+    { gap = true },
+    { header = "Pagoda Theme Song “preserve”" },
+    { line = "Dashy" },
+    { gap = true },
+    { header = "Credits Song" },
+    { line = "TRY" },
+    { line = "A letter from Ume, to you (Arr. OpenTaiko Sound Team \"Dashy\")" },
+    { gap = true },
+    { header = "Composers" },
+    { composers = true },
+    { gap = true },
+    { header = "Special Thanks" },
+    { gap = true },
+    { line = "YSTAR-T, Bol, DragonRatTiger" },
+    { gap = true },
+    { line = "and You!" },
+    { gap = true },
+    { gap = true },
+    { gap = true },
+    { last = "Thank you for playing!" },
+}

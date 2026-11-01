@@ -1,0 +1,1981 @@
+{
+    "_note": "Pagoda animation: timings, speeds, easing and motion, one group per part of the stage (stage = the files at the pagoda root).",
+    "encounter": {
+        "_note": "The encounter screens' motion and timing. Times are in seconds unless the key names another unit (_ms, _frames); angles name their unit (_deg, _rad). Each sub-group is one encounter file (folders nest: cutscenes, credits, bands, items).",
+        "cutscenes": {
+            "corruption": {
+                "_note": "Bits per second at full strength; lifetimes are [min, max] seconds. default_s / default_tail_s: start()'s defaults.",
+                "rise_s": 0.3,
+                "shards_per_s": 16,
+                "shard_life_s": [0.07, 0.22],
+                "slivers_per_s": 9,
+                "sliver_life_s": [0.05, 0.12],
+                "default_s": 3,
+                "default_tail_s": 0.8
+            },
+            "glitch": {
+                "_note": "Ranges are [min, max] seconds, picked at random. burst_every_s is at rate 1; a burst redraws its slices every reslice_s; a voiced burst plays the glitch sound at sound_odds. A held ambient tile jumps by up to jump_px at jump_per_s chances per second.",
+                "burst_every_s": [4.0, 9.0],
+                "burst_s": [0.12, 0.34],
+                "reslice_s": 0.05,
+                "sound_odds": 0.6,
+                "ambient_hold_s": [0.6, 2.2],
+                "ambient_gap_s": [0.2, 1.4],
+                "ambient_fade_s": 0.18,
+                "jump_per_s": 0.35,
+                "jump_px": { "x": 60, "y": 24 }
+            },
+            "level10": {
+                "_note": "idle: the encounter/motion counter idle (period, squash). The emerge fades in over emerge_s from emerge_sink_px deep and is held emerge_beat_s more; the buildup loop fades in over build_fade_s and out over build_out_s under the reveal's slam; pop: the monster form's punch-in overshoot; the swirl gathers gather_beat_s after the sprite is gone; loom_grow is a scale share.",
+                "idle": { "period_s": 1.6, "squash": 0.018 },
+                "emerge_s": 1.3,
+                "emerge_sink_px": 34,
+                "emerge_beat_s": 0.35,
+                "emerge_shake_px": 14,
+                "emerge_shake_s": 0.7,
+                "darken_s": 2.4,
+                "rumble_px": 5,
+                "build_fade_s": 1.0,
+                "build_out_s": 0.4,
+                "smoke_per_s": 20,
+                "pop": 0.06,
+                "pop_s": 0.4,
+                "gather_beat_s": 0.6,
+                "loom_s": 3.2,
+                "loom_grow": 0.08,
+                "loom_drop_px": 30
+            },
+            "level20": {
+                "_note": "Tobiraph bobs and sways about its eye (px over a period in seconds). *_fade_to, gleam_peak / gleam_rest and finial_under_bean are opacity levels 0-1. fade_from_s delays the backdrop's fade; after_rate: how often the corrupt figure still glitches (silently). away: the ascent. Shafts and the finial breathe between *_breath_min and *_breath_min + *_breath_amp (shaft_breath_rate in radians per second, shaft_phase_step per shaft). Ume fades out over ume_fade_share of ume_out_s after ume_fade_delay_share of it.",
+                "bob_px": 16,
+                "bob_s": 4.4,
+                "sway_px": 10,
+                "sway_s": 7.3,
+                "ume_in_delay_s": 0.2,
+                "ume_in_s": 1.2,
+                "slam_shake_px": 18,
+                "slam_shake_s": 0.5,
+                "rumble_px": 6,
+                "calm_s": 2.8,
+                "fade_from_s": 0.5,
+                "fade_s": 3.1,
+                "corrupt_s": 3.6,
+                "corrupt_tail_s": 0.8,
+                "ume_clear_s": 0.8,
+                "buildup_fade_s": 0.6,
+                "after_rate": 0.5,
+                "tobi_fade_to": 0.65,
+                "tobi_fade_s": 2.0,
+                "away_s": 4.5,
+                "away_fade_to": 0.5,
+                "gleam_s": 2.5,
+                "gleam_peak": 0.5,
+                "gleam_rest": 0.2,
+                "gleam_peak_at_s": 0.6,
+                "shaft_breath_min": 0.8,
+                "shaft_breath_amp": 0.2,
+                "shaft_breath_rate": 0.9,
+                "shaft_phase_step": 1.7,
+                "finial_s": 1.2,
+                "finial_breath_min": 0.85,
+                "finial_breath_amp": 0.15,
+                "finial_breath_hz": 0.6,
+                "finial_under_bean": 0.45,
+                "bean_s": 2.4,
+                "bean_rise_px": 90,
+                "bean_rumble_px": 3,
+                "hop_s": 0.6,
+                "hops": 2,
+                "hop_stretch": 0.05,
+                "final_s": 1.6,
+                "gust_s": 2.6,
+                "ume_out_s": 1.3,
+                "ume_fade_share": 0.7,
+                "ume_fade_delay_share": 0.3,
+                "wind_hold_s": 2.4,
+                "wind_fade_at_s": 2.0,
+                "wind_fade_s": 0.9
+            },
+            "stair_air": {
+                "_note": "Each ray breathes over its period and rocks by +-ray_sway_deg; the sun glow breathes by sun_breath_opacity. The forest_leaves preset (fx/presets) keeps about preset_leaves_aloft leaves aloft; the stair keeps leaves_aloft.",
+                "ray_period_s": [8, 10],
+                "ray_sway_deg": 1.5,
+                "sun_breath_opacity": 0.05,
+                "sun_period_s": 8,
+                "leaves_aloft": 18,
+                "preset_leaves_aloft": 14
+            },
+            "star": {
+                "_note": "The figure shrinks into its eye over shrink_s (to 1 - figure_shrink of its size); the star pops at pop_at_s and flies off at fly_at_s by fly_dx_px and up to fly_to_y (screen space), shrinking by fly_shrink; busy until done_at_s. The trail sheds a sparkle every trail_every_s within trail_jitter_px, falling at trail_fall_px_per_s [min, max] and shrinking by trail_shrink over its life. The inner star turns at inner_spin_share of the spin, the other way.",
+                "shrink_s": 0.9,
+                "figure_shrink": 0.96,
+                "pop_at_s": 0.85,
+                "pop_s": 0.35,
+                "fly_at_s": 1.7,
+                "fly_s": 1.15,
+                "done_at_s": 3.0,
+                "fly_dx_px": 170,
+                "fly_to_y": -180,
+                "fly_shrink": 0.45,
+                "twinkle_hz": 3.2,
+                "twinkle_amp": 0.08,
+                "spin_deg_per_s": 40,
+                "inner_spin_share": 0.5,
+                "trail_every_s": 0.025,
+                "trail_life_s": 0.55,
+                "trail_jitter_px": 10,
+                "trail_fall_px_per_s": [10, 40],
+                "trail_shrink": 0.5
+            },
+            "storm": {
+                "_note": "The strikes repeat every cycle_s: at at_s, a flash of flash_opacity, with a far bolt and the near clap when bolt is true (the others rumble far off). flash_env: the flash rises to 1 over rise_s, dips to dip at dip_at_s, comes back to back at back_at_s, then fades out by flash_s. Rain speeds are [min, max] px per second per depth (far, near); slant is rain dx per dy. A gust rises over gust_rise_s and falls over gust_fall_s, the clouds going cloud_gust_speedup times as fast at its height; calm slows the clouds by calm_cloud_slow.",
+                "cycle_s": 22.681,
+                "strikes": [
+                    { "at_s": 2.75, "flash_opacity": 0.16, "bolt": false },
+                    { "at_s": 8.3, "flash_opacity": 0.18, "bolt": false },
+                    { "at_s": 12.3, "flash_opacity": 0.2, "bolt": false },
+                    { "at_s": 16.2, "flash_opacity": 0.4, "bolt": true },
+                    { "at_s": 18.1, "flash_opacity": 0.28, "bolt": true }
+                ],
+                "flash_s": 0.55,
+                "bolt_s": 0.24,
+                "flash_env": {
+                    "rise_s": 0.05,
+                    "dip_at_s": 0.1,
+                    "back_at_s": 0.15,
+                    "dip": 0.3,
+                    "back": 0.8
+                },
+                "rain_px_per_s": [
+                    [1250, 1650],
+                    [1900, 2500]
+                ],
+                "slant": -0.2,
+                "gust_slant": -0.75,
+                "gust_rise_s": 0.35,
+                "gust_fall_s": 1.4,
+                "cloud_px_per_s": -70,
+                "cloud_gust_speedup": 3,
+                "calm_cloud_slow": 0.4,
+                "default_calm_s": 2,
+                "default_gust_s": 2
+            }
+        },
+        "bands": {
+            "checkpoint": {
+                "_note": "On a first clear the darkness scatters over scatter_s while the room crossfades to clear from crossfade_at_s over crossfade_s; clearBusy() holds clear_tail_s after both. Shafts breathe between shaft_breath_min and shaft_breath_min + shaft_breath_amp over their periods; each lantern's flicker is offset by lantern_flicker_phase_step.",
+                "scatter_s": 1.4,
+                "crossfade_at_s": 0.35,
+                "crossfade_s": 1.1,
+                "clear_tail_s": 0.2,
+                "shaft_period_s": [9, 12],
+                "shaft_breath_min": 0.85,
+                "shaft_breath_amp": 0.15,
+                "lantern_flicker_phase_step": 1.7
+            },
+            "forest": {
+                "_note": "Per variant: trail, stair. Each ray breathes over its period and rocks by +-ray_sway_deg; the sun glow breathes by sun_breath_opacity. The forest_leaves preset (fx/presets) keeps about preset_leaves_aloft leaves aloft; each variant keeps leaves_aloft.",
+                "ray_period_s": {
+                    "trail": [7, 9, 11],
+                    "stair": [8, 10]
+                },
+                "ray_sway_deg": 1.5,
+                "sun_breath_opacity": 0.05,
+                "sun_period_s": 8,
+                "leaves_aloft": { "trail": 14, "stair": 18 },
+                "preset_leaves_aloft": 14
+            },
+            "pagoda": {
+                "_note": "tint_breath: share of the room's tint that follows the firelight. The returned overlay fades in after lost_delay_s over lost_fade_s; the open door over door_fade_s. Shafts breathe between shaft_breath_min and shaft_breath_min + shaft_breath_amp over their periods.",
+                "tint_breath": 0.03,
+                "lost_delay_s": 0.45,
+                "lost_fade_s": 0.6,
+                "door_fade_s": 0.7,
+                "shaft_period_s": [9, 13],
+                "shaft_breath_min": 0.85,
+                "shaft_breath_amp": 0.15
+            },
+            "sky": {
+                "_note": "wisps_vx_px_per_s: the wisps' [min, max] drift; cloud_px_per_s: each cloud row's drift, the far row first.",
+                "wisps_vx_px_per_s": [6, 10],
+                "cloud_px_per_s": [4, 10]
+            },
+            "view": {
+                "_note": "The background's push-in: from push_from_scale at reset to 1 over push_s.",
+                "push_from_scale": 1.035,
+                "push_s": 1.6
+            }
+        },
+        "band_label": {
+            "_note": "The name pops in (from pop_from_scale, Easing.outBack overshoot pop_overshoot, over pop_s), the number number_delay_s later. rainbow_speed: the roof floors' rainbow.",
+            "pop_s": 0.34,
+            "pop_from_scale": 1.6,
+            "pop_overshoot": 1.9,
+            "number_delay_s": 0.14,
+            "rainbow_speed": 0.35
+        },
+        "banner": {
+            "clear": {
+                "_note": "CLEAR!: a letter every pop_every_s pops over pop_s from pop_from_scale (Easing.outBack overshoot pop_overshoot), dropping pop_drop_px and turning back from pop_tilt_deg, alternating; its glitter bursts (glitter_burst sparkles) at pop_land_share of the pop; it fades in over fade_in_share of the pop. The spin wave starts wave_at_s after the last pop, a letter every wave_every_s, each hopping wave_hop_px and tucking in by wave_shrink; shown() rest_s after it. Letters bob by bob_px at bob_hz, phase bob_phase_step apart.",
+                "pop_every_s": 0.11,
+                "pop_s": 0.42,
+                "pop_from_scale": 0.25,
+                "pop_overshoot": 3,
+                "pop_drop_px": 46,
+                "pop_tilt_deg": 14,
+                "pop_land_share": 0.35,
+                "fade_in_share": 0.15,
+                "wave_at_s": 0.25,
+                "wave_every_s": 0.09,
+                "wave_s": 0.36,
+                "wave_hop_px": 34,
+                "wave_spin_deg": 360,
+                "wave_shrink": 0.16,
+                "rest_s": 0.15,
+                "bob_px": 3,
+                "bob_hz": 0.9,
+                "bob_phase_step": 0.6,
+                "glitter_burst": 8
+            },
+            "fail": {
+                "_note": "FAILED...: a letter every fall_every_s falls over fall_s from fall_from_px above its rest, fading in over fade_in_share of the fall, then bounces for bounce_s (a hop of bounce_px decaying at hop_decay, a squash of squash springing at spring_freq half-turns per bounce decaying at spring_decay, a wobble of land_wobble_deg at land_wobble_freq half-turns decaying at land_wobble_decay). Per letter: tilt at rest (deg), drop at rest (px) and the extra turn it falls with (deg). At rest it wobbles by wobble_deg at wobble_hz, phase wobble_phase_step apart.",
+                "fall_every_s": 0.13,
+                "fall_s": 0.34,
+                "fall_from_px": 260,
+                "fade_in_share": 0.12,
+                "bounce_s": 0.6,
+                "bounce_px": 26,
+                "hop_decay": 3,
+                "squash": 0.22,
+                "spring_freq": 4,
+                "spring_decay": 6,
+                "land_wobble_deg": 10,
+                "land_wobble_freq": 6,
+                "land_wobble_decay": 5,
+                "tilt_deg": [-9, 6, -3, 11, -6, 4, 14, -8, 18],
+                "drop_px": [2, -6, 4, -2, 6, -4, 10, 16, 24],
+                "spin_deg": [50, -70, 40, -60, 80, -45, 120, -140, 160],
+                "wobble_deg": 2.0,
+                "wobble_hz": 0.7,
+                "wobble_phase_step": 1.3
+            },
+            "fade": {
+                "_note": "The word fades out over fade_s; CLEAR! swells by grow, FAILED... sags by sink_px.",
+                "fade_s": 0.35,
+                "grow": 0.06,
+                "sink_px": 24
+            }
+        },
+        "items": {
+            "_note": "Ume's items. Times in seconds; _hz are cycles per second; a _freq is the argument of a sin per second (radians per second); _back is the Easing outBack / inBack amount; a [min, max] pair is a random range.",
+            "init": { "new_hold_s": 0.7 },
+            "charm": {
+                "_note": "The drop falls from drop_from_y (stretching, thinning, its trail rising and growing), splashes, and rings spread out at their speeds, slowing by ring_slow over their life. rings: delay after the splash, peak opacity, speed in px per second; the first ring's speed times the reveals.",
+                "dim_in_s": 0.3,
+                "dim_out_s": 0.6,
+                "drop_at_s": 0.12,
+                "fall_s": 0.6,
+                "drop_from_y": -80,
+                "drop_stretch": 0.35,
+                "drop_thin": 0.15,
+                "trail_rise_px": 40,
+                "trail_grow_y": 0.9,
+                "rings": [
+                    { "delay_s": 0, "opacity": 0.95, "speed_px_per_s": 1000 },
+                    { "delay_s": 0.14, "opacity": 0.7, "speed_px_per_s": 860 },
+                    { "delay_s": 0.3, "opacity": 0.5, "speed_px_per_s": 740 },
+                    { "delay_s": 0.5, "opacity": 0.35, "speed_px_per_s": 640 }
+                ],
+                "ring_life_s": 1.7,
+                "ring_slow": 0.18,
+                "ring_fade_power": 1.5,
+                "splash": {
+                    "_note": "The splash's drops: count, speed range, spread in degrees either side of straight up, gravity in px per second squared, life and size ranges; they shrink by shrink over their life.",
+                    "count": 12,
+                    "speed": [260, 620],
+                    "spread_deg": 70,
+                    "gravity": 1500,
+                    "life_s": [0.55, 0.9],
+                    "size": [0.8, 1.4],
+                    "shrink": 0.4
+                },
+                "flash_s": 0.6,
+                "flash_end_scale": 1.2,
+                "flash_grow": 0.2,
+                "bar_flash_s": 0.6,
+                "glint_rise_px": 30,
+                "glint_spin_deg_per_s": 140,
+                "glint_turn_step_deg": 30,
+                "after_s": 0.6
+            },
+            "icons": {
+                "_note": "The icons pop in one after the other; a refilled one turns back to colour refill_delay_s after it is in. The focused icon's ring pulses by halo_pulse at halo_hz. A new item's burst: a ring growing from burst_ring_from_px by burst_ring_grow_px, glints flying out to burst_r_px while turning.",
+                "pop_s": 0.38,
+                "pop_stagger_s": 0.1,
+                "pop_back": 2.0,
+                "turn_s": 0.45,
+                "flash_s": 0.5,
+                "refill_delay_s": 0.5,
+                "new_s": 1.3,
+                "halo_hz": 1.6,
+                "halo_pulse": 0.04,
+                "burst_ring_from_px": 30,
+                "burst_ring_grow_px": 110,
+                "burst_r_px": 86,
+                "burst_turn_rad": 1.2,
+                "burst_glint_scale": 1.1,
+                "burst_glint_scale_min": 0.3,
+                "burst_glint_spin_deg": 180,
+                "shake_s": 0.35,
+                "shake_px": 7,
+                "shake_freq": 26
+            },
+            "popup": {
+                "_note": "The panel springs in from in_from (scale) and shrinks by out_shrink as it goes; decide closes it after hold_s. The item bobs, its halo pulses between halo_pulse_min and halo_pulse_min + halo_pulse, the glints orbit and twinkle.",
+                "in_s": 0.32,
+                "out_s": 0.2,
+                "hold_s": 0.6,
+                "in_from": 0.86,
+                "in_back": 1.8,
+                "out_shrink": 0.04,
+                "bob_px": 5,
+                "bob_hz": 0.6,
+                "halo_hz": 0.8,
+                "halo_pulse_min": 0.8,
+                "halo_pulse": 0.2,
+                "glint_orbit_freq": 0.5,
+                "glint_twinkle_freq": 3,
+                "glint_twinkle_phase": 1.7,
+                "glint_spin_deg_per_s": 60
+            },
+            "tambourine": {
+                "_note": "The tambourine pops up, shakes and shrinks away; waves ripple out (speed in px per second, slowing by wave_slow over their life, turning in degrees per second the other way every second wave, swelling by wave_breath) and glints orbit out to glint_r_px. The song bars sway at wobble_at_s and leave at leave_at_s; the screen jolts by screen_shake_px.",
+                "pop_s": 0.35,
+                "pop_back": 2.2,
+                "fade_in_s": 0.12,
+                "shake_deg": 14,
+                "shake_hz": 9,
+                "shake_s": 0.9,
+                "gone_at_s": 1.0,
+                "gone_s": 0.35,
+                "gone_back": 1.4,
+                "waves": 5,
+                "wave_every_s": 0.16,
+                "wave_at_s": 0.06,
+                "wave_speed_px_per_s": 820,
+                "wave_life_s": 1.6,
+                "wave_slow": 0.2,
+                "wave_turn_deg_per_s": 24,
+                "wave_turn_step_deg": 17,
+                "wave_breath": 0.05,
+                "wave_breath_hz": 2.5,
+                "wave_fade_power": 1.4,
+                "wave_fade_step": 0.12,
+                "glint_r_px": 150,
+                "glint_out_s": 0.6,
+                "glint_orbit_freq": 1.6,
+                "glint_scale_min": 0.6,
+                "glint_twinkle": 0.4,
+                "glint_twinkle_freq": 11,
+                "glint_twinkle_phase": 2.1,
+                "glint_spin_deg_per_s": 200,
+                "glint_turn_step_deg": 40,
+                "wobble_at_s": 0.3,
+                "leave_at_s": 0.95,
+                "screen_shake_px": 6,
+                "screen_shake_s": 0.25
+            },
+            "tooltip": { "fade_s": 0.16, "rise_px": 10 }
+        },
+        "songbars": {
+            "_note": "The bars float (px and degrees, _hz cycles per second, each bar's phase offset by its index times *_phase radians), slide in from the left and out to the left (x offsets in px, turns in degrees), sway in a wave (wobble) and pop a revealed name's letters in. label_at_s is after the last bar is in, badge_at_s after the label starts, destiny_beat_s after everything is in; load_wait_s is the longest a new roll's bars wait for their art.",
+            "float_y_px": 3.5,
+            "float_hz": 0.22,
+            "float_phase": 1.3,
+            "float_rot_deg": 0.35,
+            "float_rot_hz": 0.15,
+            "float_rot_phase": 0.8,
+            "in_stagger_s": 0.14,
+            "in_s": 0.5,
+            "in_from_x": -1150,
+            "in_rot_deg": -8,
+            "in_back": 1.4,
+            "emblem_at_s": 0.28,
+            "emblem_s": 0.3,
+            "emblem_back": 2.2,
+            "label_at_s": 0.25,
+            "badge_at_s": 0.2,
+            "badge_s": 0.35,
+            "destiny_beat_s": 0.4,
+            "out_stagger_s": 0.09,
+            "out_s": 0.42,
+            "out_to_x": -1250,
+            "out_rot_deg": 9,
+            "out_back": 1.6,
+            "exit_s": 0.55,
+            "pop_step_s": 0.04,
+            "pop_s": 0.3,
+            "lift_s": 0.7,
+            "lift_pop_at_s": 0.25,
+            "wob_stagger_s": 0.07,
+            "wob_s": 0.9,
+            "wob_hz": 3.2,
+            "wob_rot_deg": 3.2,
+            "wob_y_px": 7,
+            "load_wait_s": 1.5
+        },
+        "song_bar": { "flavor_speed_px_per_s": 28 },
+        "speed_badge": {
+            "_note": "The two arrows pulse at beat_bpm at x1 (scaled by the speed, the beat held between beat_min_ms and beat_max_ms), their opacity between arrow_min_opacity and arrow_min_opacity + arrow_pulse_opacity.",
+            "beat_bpm": 120,
+            "beat_min_ms": 150,
+            "beat_max_ms": 2000,
+            "arrow_min_opacity": 0.25,
+            "arrow_pulse_opacity": 0.75
+        },
+        "bar_flames": {
+            "_note": "Flame tongues born at rate per second (at most max alive, at most spawn_backlog owed), in three zones: share of the births, rise in px per second, life in seconds and scale ranges, and where they are born in the bar's local px (inset from the edge, a random band). They lean up to lean_deg, sway sway_px at sway_hz, swell in (fade_in_k) and grow between *_min and *_min + grow; once stopped they age burn_out times faster. A new fire is run prewarm_s ahead at prewarm_fps.",
+            "rate": 64,
+            "max": 52,
+            "spawn_backlog": 8,
+            "zones": {
+                "bottom": {
+                    "share": 0.5,
+                    "rise": [40, 80],
+                    "life_s": [0.55, 0.95],
+                    "sx": [1.1, 1.8],
+                    "sy": [0.6, 1.0],
+                    "inset_x": 16,
+                    "inset_y": 4,
+                    "band_y": 10
+                },
+                "top": {
+                    "share": 0.38,
+                    "rise": [12, 30],
+                    "life_s": [0.35, 0.6],
+                    "sx": [0.9, 1.5],
+                    "sy": [0.24, 0.42],
+                    "inset_x": 20,
+                    "inset_y": 4,
+                    "band_y": 10
+                },
+                "ends": {
+                    "share": 0.12,
+                    "rise": [25, 55],
+                    "life_s": [0.45, 0.8],
+                    "sx": [0.7, 1.1],
+                    "sy": [0.45, 0.8],
+                    "inset_x": 8,
+                    "band_x": 24,
+                    "spread_y": 0.7
+                }
+            },
+            "lean_deg": 12,
+            "sway_px": 5,
+            "sway_hz": 1.8,
+            "glow_share": 0.4,
+            "burn_out": 4,
+            "prewarm_s": 0.8,
+            "prewarm_fps": 20,
+            "fade_in_k": 1.6,
+            "grow_x_min": 0.75,
+            "grow_x": 0.25,
+            "grow_y_min": 0.45,
+            "grow_y": 0.55
+        },
+        "bar_text": { "pop_grow": 0.7 },
+        "ui_pill": {
+            "_note": "The selected pill bounces by bounce_amp at bounce_freq (radians per second), the marker bobs marker_bob_px at marker_freq.",
+            "bounce_amp": 0.04,
+            "bounce_freq": 7,
+            "marker_bob_px": 6,
+            "marker_freq": 6
+        },
+        "cast": {
+            "_note": "The cast's run-in, landing, idle and walk-out. run_settle: the share of the run over which the waddle dies down; the skid leans the top back (left). land: a damped spring on the squash over s seconds plus a hop. The idle is a motion \"counter\" ramping in over idle.ramp_s. ume / student: when each one starts relative to the other, and its knockback launch.",
+            "run_s": 0.8,
+            "skid_s": 0.22,
+            "run_settle": 0.3,
+            "skid_lean_deg": 10,
+            "land": {
+                "squash_y": 0.13,
+                "squash_x": 0.1,
+                "decay": 8,
+                "hz": 3,
+                "hop_px": 10,
+                "hop_s": 0.18,
+                "s": 1.0
+            },
+            "arrive_hold_s": 0.3,
+            "idle": { "period_s": 0.8, "amp": 0.06, "ramp_s": 0.4 },
+            "exit_s": 0.62,
+            "dust_count": 8,
+            "ume": {
+                "delay_s": 0.0,
+                "exit_delay_s": 0.08,
+                "lag_s": 0.0,
+                "run_delay_s": 0.1,
+                "knock_delay_s": 0.06,
+                "knock_px_per_s": 1100,
+                "knock_spin_deg_per_s": 680
+            },
+            "student": {
+                "delay_s": 0.18,
+                "exit_delay_s": 0.0,
+                "lag_s": 0.1,
+                "run_delay_s": 0.0,
+                "knock_delay_s": 0.0,
+                "knock_px_per_s": 1250,
+                "knock_spin_deg_per_s": 800
+            }
+        },
+        "cast_moves": {
+            "_note": "Pose curves of the cast's moves. squash_widen: the share of a squash that widens; stretch_thin: the share of a stretch that thins. waddle: the run cycle's sharp tilt (sharpness shapes it) with a hop on every step. cheer: a wind-up squash, the hops, then a spring that dies into the idle. run: the run off-screen (diag: up the stairs; up: up the roof, shrinking up_shrink over up_shrink_px, its shadow gone after up_shadow_px). climb: brake to the door, turn, then steps hopping up and to the left (dx, dy) that shrink and fade from fade_at of the climb. knock: a hit-stop squash, then a spinning launch on a low arc.",
+            "squash_widen": 0.7,
+            "stretch_thin": 0.6,
+            "waddle": { "deg": 20, "hz": 3.4, "sharpness": 3, "hop_px": 14 },
+            "cheer": {
+                "antic_s": 0.1,
+                "antic_squash": 0.16,
+                "hops": [
+                    { "px": 36, "s": 0.34 },
+                    { "px": 14, "s": 0.22 }
+                ],
+                "contact_s": 0.07,
+                "contact_squash": 0.13,
+                "stretch": 0.1,
+                "spring": 0.13,
+                "spring_hz": 3.0,
+                "spring_decay": 5.0
+            },
+            "run": {
+                "speed_px_per_s": 1600,
+                "accel_s": 0.35,
+                "waddle_in_s": 0.12,
+                "diag_deg": 17,
+                "up_shrink": 0.16,
+                "up_shrink_px": 700,
+                "up_shadow_px": 160
+            },
+            "climb": {
+                "brake_s": 0.3,
+                "brake_lean_deg": 10,
+                "stop_hold_s": 0.1,
+                "stop_squash": 0.06,
+                "turn_s": 0.2,
+                "turn_hop_px": 16,
+                "turn_beat_s": 0.1,
+                "climb_s": 0.8,
+                "steps": 3,
+                "dx": -55,
+                "dy": -95,
+                "shrink": 0.1,
+                "step_hop_px": 12,
+                "step_tilt_deg": 6,
+                "fade_at": 0.25
+            },
+            "knock": {
+                "hold_s": 0.07,
+                "squash_x": 0.18,
+                "squash_y": 0.08,
+                "unsquash_per_s": 14,
+                "vy_px_per_s": 560,
+                "gravity_px_per_s2": 1500,
+                "shadow_s": 0.3
+            }
+        },
+        "destiny": {
+            "_note": "Level 20's destiny sequence, in seconds from its start (pop_*, flavor_*, ping_at_s: from the shatter). Three cracks, each shaking the bar shake.px[i] decaying over shake.s (the sounds crack1..crack3 go with them). Shards: speeds at the zoomed scale, fading out from fade_from of their life and shrinking by shrink.",
+            "zoom_in_s": 0.75,
+            "crack_at_s": [1.05, 1.6, 2.15],
+            "shake": {
+                "px": [8, 11, 15],
+                "s": 0.3,
+                "x_rad_per_s": 83,
+                "y_rad_per_s": 61,
+                "y_share": 0.7
+            },
+            "shatter_at_s": 2.75,
+            "pop_at_s": 0.1,
+            "pop_step_s": 0.045,
+            "pop_s": 0.32,
+            "flavor_at_s": 0.3,
+            "flavor_s": 0.8,
+            "ping_at_s": 0.35,
+            "zoom_out_at_s": 5.6,
+            "zoom_out_s": 0.7,
+            "shard": {
+                "speed_px_per_s": [260, 640],
+                "scatter_px_per_s": 80,
+                "vy_share": 0.6,
+                "lift_px_per_s": 180,
+                "gravity_px_per_s2": 1500,
+                "spin_deg_per_s": [120, 460],
+                "life_s": [0.85, 1.3],
+                "fade_from": 0.5,
+                "shrink": 0.15
+            },
+            "flash_s": 0.45
+        },
+        "exclaim": {
+            "_note": "The \"!\" bubble: pops up over pop_s, bobs while the line lasts, shrinks away over out_s.",
+            "pop_s": 0.28,
+            "out_s": 0.18,
+            "bob_px": 4,
+            "bob_hz": 1.4
+        },
+        "monster": {
+            "_note": "Seconds between one member's notice, charge or vanish and the next one's.",
+            "notice_lag_s": 0.12,
+            "charge_lag_s": 0.1,
+            "vanish_lag_s": 0.12
+        },
+        "monsters": {
+            "_note": "The monsters' idles (encounter/motion), by art key: counter = period_s and amp of the squash; float = hover_px and tilt_deg, or hover_mul scaling the whole float. pair: floor 6's norm4b and critter both wander range_px, the critter's idle clock running critter_tempo times as fast.",
+            "idle": {
+                "norm3": { "period_s": 0.8, "amp": 0.07 },
+                "norm5": { "period_s": 0.8, "amp": 0.06 },
+                "pagodaguard": { "period_s": 1.6, "amp": 0.05 },
+                "scare2": { "period_s": 1.6, "amp": 0.045 },
+                "scare1": { "hover_px": 34, "tilt_deg": 3 },
+                "monster4": { "period_s": 1.6, "amp": 0.05 },
+                "monster6": { "period_s": 1.6, "amp": 0.05 },
+                "monster7": { "period_s": 1.6, "amp": 0.04 },
+                "monster9": { "period_s": 1.6, "amp": 0.05 },
+                "monsterfinal": { "hover_mul": 1.2 }
+            },
+            "pair": { "range_px": 28, "critter_tempo": 1.12 }
+        },
+        "monster_body": {
+            "_note": "The doors' monsters' glow pulses at base + pulse * sin(rad_per_s * t) of its opacity.",
+            "glow": { "rad_per_s": 2.3, "base": 0.8, "pulse": 0.2 }
+        },
+        "monster_moves": {
+            "_note": "The monster's result-screen moves. charge: antic is the share of the charge spent winding up (pull_px back, back_deg, coil), then the rush leaning lean_deg (reached over lean_in of it) and stretching; hop: hops of hop_px, swoop: rise_px then dive_px; after the hit a recoil and a spring, the idle coming back from settle_s over blend_s. default_s / min_s: the charge's length when none is given / at least. squish: wide and low, then thin and tall (tall_overshoot), zipping up zip_px as it fades over s.",
+            "charge": {
+                "default_s": 0.55,
+                "min_s": 0.1,
+                "antic": 0.24,
+                "pull_px": 26,
+                "back_deg": 6,
+                "coil_x": 0.08,
+                "coil_y": 0.1,
+                "lean_deg": 14,
+                "lean_in": 0.3,
+                "stretch": 0.1,
+                "stretch_thin": 0.6,
+                "hop_px": 34,
+                "hops": 2,
+                "rise_px": 30,
+                "dive_px": 24,
+                "recoil_px": 64,
+                "recoil_s": 0.32,
+                "squash": 0.16,
+                "squash_widen": 0.5,
+                "decay": 7,
+                "hz": 2.4,
+                "settle_s": 0.12,
+                "blend_s": 0.5
+            },
+            "squish": {
+                "s": 0.6,
+                "antic_s": 0.12,
+                "wide": 0.16,
+                "low": 0.14,
+                "thin": 0.1,
+                "tall": 1.75,
+                "tall_overshoot": 1.2,
+                "zip_px": 60
+            }
+        },
+        "motion": {
+            "_note": "Idle animations of the encounter actors. Every pose's scale stays between scale_min and scale_max; notice is a short pop. Chances and shares pick the next random move of an idle (looks only).",
+            "scale_min": 0.8,
+            "scale_max": 1.2,
+            "notice_s": 0.3,
+            "notice_pop": 0.06,
+            "star": {
+                "_note": "Bounces of height_px every period_s, squashing over contact of each bounce, tilting, and every spin_min_s..spin_max_s spinning through one airtime.",
+                "period_s": 0.58,
+                "height_px": 52,
+                "contact": 0.08,
+                "squash_y": 0.18,
+                "squash_x": 0.14,
+                "tilt_deg": 6,
+                "spin_min_s": 2.8,
+                "spin_max_s": 4.6
+            },
+            "wander": {
+                "_note": "Rests, then walks min_step_px..max_step_px or (hop_chance) hops hop_dx within range_px of its spot; after a move it may turn back (turn_chance) turn_delay_s into the rest. flip_*: the width springing back from flip_from as it turns.",
+                "rest_min_s": 0.7,
+                "rest_max_s": 1.8,
+                "range_px": 50,
+                "min_step_px": 24,
+                "max_step_px": 70,
+                "speed_px_per_s": 40,
+                "bob_px": 5,
+                "bob_hz": 2.4,
+                "rock_deg": 3.5,
+                "ease_s": 0.12,
+                "hop_chance": 0.3,
+                "antic_s": 0.1,
+                "antic_squash_y": 0.14,
+                "antic_squash_x": 0.1,
+                "air_s": 0.4,
+                "air_stretch_y": 0.08,
+                "air_stretch_x": 0.06,
+                "land_s": 0.16,
+                "land_squash_y": 0.16,
+                "land_squash_x": 0.12,
+                "hop_px": 62,
+                "hop_dx": 24,
+                "flip_from": 0.8,
+                "flip_s": 0.14,
+                "turn_chance": 0.5,
+                "turn_delay_s": 0.5
+            },
+            "counter": {
+                "_note": "Squash-and-stretch in place: the default period_s and amp (a monster's params replace them), squashing over the first accent of each period and widening widen of the squash.",
+                "period_s": 0.8,
+                "amp": 0.06,
+                "accent": 0.28,
+                "widen": 0.6
+            },
+            "float": {
+                "hover_px": 34,
+                "bob_px": 16,
+                "bob_s": 3.2,
+                "drift_px": 7,
+                "drift_s": 6.1,
+                "tilt_deg": 2.2,
+                "tilt_s": 4.4,
+                "tilt_phase_rad": 0.9
+            },
+            "erratic": {
+                "_note": "A glitching thing: a tremor of small angles held tremor_hold_s, and one glitch every gap_s. Ranges are [min, max]. shares: the chance of each glitch, in the order twitch, jitter, skip, stretch, freeze.",
+                "gap_s": [0.12, 1.0],
+                "tremor_deg": 1.8,
+                "tremor_hold_s": [0.05, 0.18],
+                "twitch": {
+                    "deg": [6, 16],
+                    "s": [0.06, 0.28]
+                },
+                "jitter": {
+                    "s": [0.14, 0.34],
+                    "hz": 28,
+                    "px": 8,
+                    "deg": 6
+                },
+                "skip": {
+                    "s": [0.05, 0.16],
+                    "dx": [12, 28],
+                    "dy": [4, 12]
+                },
+                "stretch": {
+                    "s": [0.05, 0.12],
+                    "amount": [0.06, 0.12]
+                },
+                "freeze": {
+                    "s": [0.1, 0.3]
+                },
+                "shares": [0.32, 0.22, 0.18, 0.14, 0.14]
+            }
+        },
+        "reveal": {
+            "_note": "The monster's reveal: its eyes rise to eyes_peak by eyes_rise_s, settle to eyes_rest by eyes_settle_s (seconds into the line), then pulse; the body fades in after fade_delay_s, catch_up times faster when the player asks to advance.",
+            "eyes_peak": 0.95,
+            "eyes_rest": 0.6,
+            "eyes_rise_s": 0.5,
+            "eyes_settle_s": 1.6,
+            "pulse_amp": 0.1,
+            "pulse_hz": 1.3,
+            "fade_delay_s": 0.4,
+            "catch_up": 3
+        },
+        "scene": {
+            "_note": "cover_s: the black cover's fade for a cover line without `sec`. rumble: a steady shake's wobble rates.",
+            "cover_s": 0.6,
+            "rumble": { "x_rad_per_s": 53, "y_rad_per_s": 41, "y_share": 0.6 }
+        },
+        "script": {
+            "_note": "The dialog's typing speed and a voice blip every blip_every_chars characters.",
+            "chars_per_s": 42,
+            "blip_every_chars": 3
+        },
+        "shake": {
+            "_note": "A screen shake dying down over its duration; default_px / default_s when a caller gives none.",
+            "default_px": 12,
+            "default_s": 0.3,
+            "x_rad_per_s": 62,
+            "y_rad_per_s": 47,
+            "y_share": 0.6
+        },
+        "credits": {
+            "_note": "The end credits' backgrounds (encounter/credits/). Times in seconds; a scene's times count from when it starts fading in. Idle params are encounter/motion.lua's (P = period in s, A = amplitude).",
+            "actor": {
+                "_note": "A turn: the width snaps to flip_from and springs back over flip_s, as a wandering monster turning (encounter/motion.lua).",
+                "flip_from": 0.8,
+                "flip_s": 0.14
+            },
+            "backdrop": {
+                "_note": "Roll seconds each scene starts fading in (hug, forest, watch, chase, fall, loading, beanstalk), and how long each takes to fade into the next.",
+                "scene_at_s": [0, 10, 25, 41, 56, 68, 78],
+                "crossfade_s": 2.0
+            },
+            "beanstalk": {
+                "_note": "The light shafts flicker between shaft_flicker_base - amp and base + amp (frequency in radians per second, each shaft phase_step radians on); the finial breathes between breath_base - amp and base + amp at finial_breath_hz.",
+                "cloud_speed_px_per_s": -42,
+                "shaft_flicker_base": 0.8,
+                "shaft_flicker_amp": 0.2,
+                "shaft_flicker_freq": 0.9,
+                "shaft_flicker_phase_step": 1.7,
+                "finial_breath_hz": 0.6,
+                "finial_breath_base": 0.85,
+                "finial_breath_amp": 0.15
+            },
+            "chase": {
+                "_note": "descent: coming down the stairs, the climb through the door (encounter/cast_moves.lua) run backwards: steps hops over s seconds, travelling dx, dy px, shrinking by shrink, hop px high, tilting tilt deg, fading in after fade_at of it. walk_k is the run cycle's share in the walk, which eases in and out over walk_ease of it. chasers: when each norm3 comes down and when it starts the chase.",
+                "descent": {
+                    "s": 0.8,
+                    "steps": 3,
+                    "dx": -55,
+                    "dy": -95,
+                    "shrink": 0.1,
+                    "hop": 12,
+                    "tilt": 6,
+                    "fade_at": 0.25
+                },
+                "ume_down_at_s": 3.0,
+                "ume_turn_at_s": 4.0,
+                "walk_at_s": 4.2,
+                "walk_s": 1.6,
+                "walk_k": 0.7,
+                "walk_ease": 0.15,
+                "notice_at_s": 9.2,
+                "startle_px": 26,
+                "startle_s": 0.3,
+                "flee_at_s": 10.0,
+                "idle_ramp_s": 0.4,
+                "chasers": [
+                    { "at_s": 7.4, "chase_at_s": 10.3 },
+                    { "at_s": 8.0, "chase_at_s": 10.5 }
+                ],
+                "chase_hop_px": 30,
+                "chase_hop_s": 0.32,
+                "chase_lean_deg": 8,
+                "shaft_periods_s": [9, 13],
+                "shaft_pulse_base": 0.85,
+                "shaft_pulse_amp": 0.15,
+                "ume_idle": {
+                    "kind": "counter",
+                    "params": { "P": 0.8, "A": 0.06 }
+                }
+            },
+            "fall": {
+                "_note": "The tumblers roll left along the treads at speed px/s, growing by accel px/s^2; each bounce takes bounce_s and squashes by squash (widening by squash_widen of it) for squash_s where it meets a step, in a puff of dust_count motes. tumblers: start, spin (degrees/s, counter-clockwise: rolling left) and bounce height px, in the order of the Lua list of keys.",
+                "speed_px_per_s": 360,
+                "accel": 60,
+                "bounce_s": 0.42,
+                "squash": 0.14,
+                "squash_widen": 0.7,
+                "squash_s": 0.12,
+                "dust_count": 6,
+                "tumblers": [
+                    { "at_s": 2.2, "spin_deg_per_s": 420, "hop_px": 70 },
+                    { "at_s": 2.7, "spin_deg_per_s": 300, "hop_px": 60 },
+                    { "at_s": 3.5, "spin_deg_per_s": 340, "hop_px": 80 }
+                ]
+            },
+            "forest": {
+                "_note": "walkers: px/s leftwards (used when the monster does not wander) and, when present, range, which widens a wanderer's walk around its x, in the order of the Lua list of keys. The ones whose idle stays in place bob step_px at step_hz. Rays sway ray_sway_deg and pulse between ray_opacity [min, max]; the sun breathes sun_breath around its opacity over sun_period_s.",
+                "walkers": [
+                    { "speed": 55 },
+                    { "speed": 60, "range": 170 },
+                    { "speed": 90 },
+                    { "speed": 65, "range": 150 },
+                    { "speed": 70 },
+                    { "speed": 75, "range": 140 }
+                ],
+                "step_px": 6,
+                "step_hz": 2.4,
+                "ray_periods_s": [7, 9, 11],
+                "ray_opacity": [0.1, 0.2],
+                "ray_sway_deg": 1.5,
+                "sun_breath": 0.05,
+                "sun_period_s": 8
+            },
+            "hug": {
+                "_note": "The picture grows by push over push_s (about the roll's length, set in credits.lua).",
+                "push": 0.04,
+                "push_s": 105
+            },
+            "loading": { "pan_s": 12 },
+            "watch": {
+                "_note": "spirits: start (seconds after the Student) and idle tempo, in the order of the Lua list of keys; they run at idle_weight of their idle and bound spirit_hop_px every spirit_hop_s; the Student's brake raises dust_count motes.",
+                "student_at_s": 6.5,
+                "back_at_s": 15.0,
+                "spirits": [
+                    { "at_s": 0.85, "tempo": 1.0 },
+                    { "at_s": 1.2, "tempo": 1.12 },
+                    { "at_s": 1.6, "tempo": 0.94 },
+                    { "at_s": 1.95, "tempo": 1.08 },
+                    { "at_s": 2.35, "tempo": 0.97 },
+                    { "at_s": 2.7, "tempo": 1.05 }
+                ],
+                "idle_weight": 0.4,
+                "spirit_hop_px": 34,
+                "spirit_hop_s": 0.3,
+                "dust_count": 8,
+                "ume_idle": {
+                    "kind": "counter",
+                    "params": { "P": 0.8, "A": 0.06 }
+                }
+            }
+        },
+        "document": {
+            "_note": "The roof monster, a floating window (encounter/document.lua). Now and then its box spins once, its eye looks at the player (to the left) and back, it blinks, and its neon crown lights up with a flicker, flashes while lit, and flickers out. [a, b] ranges are seconds picked at random each time; px are in the box art's pixels.",
+            "spin": {
+                "every_s": [6, 11],
+                "turn_s": 0.7,
+                "turns": 1,
+                "ease": "inOutCubic"
+            },
+            "look": {
+                "every_s": [3, 7],
+                "hold_s": [1.2, 2.4],
+                "move_s": 0.25,
+                "ease": "inOutSine",
+                "eye_px": 32,
+                "pupil_px": 50
+            },
+            "blink": {
+                "every_s": [2.5, 6],
+                "close_s": 0.07,
+                "shut_s": 0.05,
+                "open_s": 0.12,
+                "shut_scale": 0.06,
+                "double_chance": 0.25,
+                "double_gap_s": 0.12
+            },
+            "crown": {
+                "_note": "flicker_s: the lighting flicker, segments alternately lit and dark starting lit; out_flicker_s: the going-out flicker, alternately dark and lit starting dark. hum: how much the lit tube dims and brightens, at hum_hz.",
+                "every_s": [5, 10],
+                "flicker_s": [0.06, 0.08, 0.05, 0.2],
+                "lit_s": [2.5, 4.5],
+                "out_flicker_s": [0.05, 0.07, 0.04],
+                "flash_every_s": [0.6, 1.2],
+                "flash_s": 0.3,
+                "flash_opacity": 0.8,
+                "hum": 0.08,
+                "hum_hz": 7
+            }
+        }
+    },
+    "fx": {
+        "_note": "The shared effects' motion and timing (fx/*). Times are in seconds unless the key names another unit; ranges are [min, max], picked at random; a _share is a fraction of a life or a run. Each sub-group is one fx file.",
+        "emitter": {
+            "_note": "The emitter spawns at most spawn_backlog_max particles in one update to catch up, and simulates a prewarm at prewarm_steps_per_s. defaults: what a preset without life, sway freq, twinkle hz, fade or fin / fout gets. A flutter squeezes scale x down to flutter.base and back (base + amp * |cos|).",
+            "spawn_backlog_max": 6,
+            "prewarm_steps_per_s": 20,
+            "flutter": { "base": 0.25, "amp": 0.75 },
+            "defaults": {
+                "life_s": 1,
+                "sway_freq_hz": 0.5,
+                "twinkle_hz": 1,
+                "fade": "arch",
+                "fade_in_s": 0.5,
+                "fade_out_s": 0.5
+            }
+        },
+        "presets": {
+            "_note": "Named emitter presets (the fields are listed in fx/emitter.lua); the texture each preset draws with is set in fx/presets.lua. Positions (area, zones: x, y, w, h; p is a zone's chance) are in 1920x1080 screen space, sizes are scales of the texture, speeds are px/s, gravity px/s per s, spin deg/s, life, prewarm, every, fin and fout seconds, sway freq and twinkle / turb hz in Hz. A sway, turb or twinkle given as rad_per_s instead is divided by 2 pi into Hz. colors and ramp are 0-1 RGB, alpha 0-1. Steady population is about rate x mean life; setRate scales it up to max.",
+            "pollen": {
+                "blend": "Add",
+                "rate": 7.3,
+                "max": 40,
+                "life": [4, 7],
+                "prewarm": 6,
+                "area": [0, 150, 1920, 750],
+                "size": [0.25, 0.75],
+                "vx": [-8, 8],
+                "vy": [-14, -6],
+                "sway": {
+                    "amp": 12,
+                    "freq": [0.2, 0.33]
+                },
+                "colors": [
+                    [1, 0.96, 0.8]
+                ],
+                "alpha": 0.75,
+                "fade": "arch",
+                "twinkle": { "amp": 0.4, "rad_per_s": 9 }
+            },
+            "fireflies": {
+                "blend": "Add",
+                "rate": 1.2,
+                "max": 8,
+                "life": [5, 9],
+                "prewarm": 8,
+                "area": [0, 560, 1920, 440],
+                "size": [0.6, 1.0],
+                "vx": [-14, 14],
+                "vy": [-9, 9],
+                "sway": {
+                    "amp": 18,
+                    "freq": [0.15, 0.3]
+                },
+                "colors": [
+                    [0.8, 1, 0.5]
+                ],
+                "alpha": 1,
+                "fade": "inout",
+                "fin": 0.8,
+                "fout": 1.2,
+                "twinkle": {
+                    "amp": 1,
+                    "hz": [0.5, 1.5]
+                }
+            },
+            "forest_leaves": {
+                "_note": "the trail keeps about 14 aloft; the stair band asks for 18 with setRate(18 / 14)",
+                "blend": "Normal",
+                "rate": 0.78,
+                "max": 18,
+                "life": [14, 22],
+                "prewarm": 12,
+                "area": [200, -40, 1700, 0],
+                "size": [0.75, 1.1],
+                "vx": [-30, -10],
+                "vy": [45, 80],
+                "spin": [40, 120],
+                "flutterHz": 1.7,
+                "sway": { "amp": 26, "rad_per_s": 2.1 },
+                "alpha": 0.9,
+                "fade": "inout",
+                "fin": 0.5,
+                "fout": 0.8
+            },
+            "near_leaves": {
+                "blend": "Normal",
+                "rate": 0.2,
+                "max": 3,
+                "life": [12, 18],
+                "prewarm": 10,
+                "area": [-150, 560, 2070, 440],
+                "size": 2.4,
+                "vx": [25, 45],
+                "vy": [8, 20],
+                "spin": [15, 45],
+                "flutterHz": 0.9,
+                "sway": {
+                    "amp": 30,
+                    "freq": [0.15, 0.25]
+                },
+                "colors": [
+                    [0.35, 0.55, 0.35]
+                ],
+                "alpha": 0.55,
+                "fade": "inout",
+                "fin": 1.5,
+                "fout": 1.5
+            },
+            "mist": {
+                "blend": "Normal",
+                "rate": 0.06,
+                "max": 3,
+                "life": [40, 60],
+                "prewarm": 60,
+                "area": [-400, 760, 2100, 140],
+                "size": [1.5, 2.0],
+                "vx": [10, 14],
+                "vy": 0,
+                "alpha": 0.18,
+                "fade": "inout",
+                "fin": 6,
+                "fout": 6
+            },
+            "interior_dust": {
+                "_note": "70% of the motes hang in the window and door light",
+                "blend": "Normal",
+                "addMix": 0.5,
+                "rate": 7.5,
+                "max": 60,
+                "life": [6, 10],
+                "prewarm": 8,
+                "zones": [
+                    {
+                        "rect": [1000, 330, 450, 230],
+                        "p": 0.35
+                    },
+                    {
+                        "rect": [1640, 300, 160, 600],
+                        "p": 0.35
+                    }
+                ],
+                "size": [0.25, 0.6],
+                "vx": [-6, 6],
+                "vy": [-6, 6],
+                "turb": { "amp": 6, "hz": 0.3 },
+                "colors": [
+                    [1, 0.92, 0.75]
+                ],
+                "alpha": 0.55,
+                "fade": "arch",
+                "twinkle": {
+                    "amp": 0.35,
+                    "hz": [0.3, 0.8]
+                }
+            },
+            "ceiling_specks": {
+                "_note": "one burst of 12 from a random beam x along the area, every 4-8 s",
+                "blend": "Normal",
+                "rate": 0,
+                "max": 36,
+                "life": [2, 3],
+                "every": [4, 8],
+                "burst": 12,
+                "spread": [30, 6],
+                "area": [260, 120, 1440, 0],
+                "size": [0.2, 0.4],
+                "vx": [-6, 6],
+                "vy": [60, 120],
+                "sway": {
+                    "amp": 8,
+                    "freq": [0.6, 1.0]
+                },
+                "colors": [
+                    [0.55, 0.5, 0.45]
+                ],
+                "alpha": 0.8,
+                "fade": "inout",
+                "fin": 0.2,
+                "fout": 0.8
+            },
+            "fire_puffs": {
+                "blend": "Add",
+                "rate": 22,
+                "max": 24,
+                "life": [0.45, 0.75],
+                "size": 0.55,
+                "sizeEnd": 0.15,
+                "vx": [-10, 10],
+                "vy": [-120, -70],
+                "sway": {
+                    "amp": 4,
+                    "freq": [1.5, 2.5]
+                },
+                "ramp": [
+                    [1, 0.95, 0.6],
+                    [1, 0.55, 0.12],
+                    [0.8, 0.15, 0.05]
+                ],
+                "alpha": 0.9,
+                "fade": "out"
+            },
+            "fire_tongues": {
+                "blend": "Add",
+                "rate": 0,
+                "max": 4,
+                "life": [0.5, 0.55],
+                "every": [0.25, 0.25],
+                "burst": 1,
+                "spread": [4, 0],
+                "size": 0.8,
+                "sizeEnd": 0.25,
+                "vy": [-85, -75],
+                "ramp": [
+                    [1, 0.95, 0.6],
+                    [1, 0.55, 0.12],
+                    [0.8, 0.15, 0.05]
+                ],
+                "alpha": 0.9,
+                "fade": "out"
+            },
+            "embers": {
+                "blend": "Add",
+                "rate": 6,
+                "max": 18,
+                "life": [1.2, 2.4],
+                "size": [0.5, 1.0],
+                "vx": [-25, 25],
+                "vy": [-90, -40],
+                "drag": 0.6,
+                "turb": { "amp": 30, "rad_per_s": 4 },
+                "rangeX": 70,
+                "ramp": [
+                    [1, 0.7, 0.3],
+                    [1, 0.35, 0.1]
+                ],
+                "alpha": 1,
+                "fade": "inout",
+                "fin": 0.1,
+                "fout": 0.6,
+                "twinkle": { "amp": 0.3, "rad_per_s": 25 }
+            },
+            "dust_puff": {
+                "blend": "Normal",
+                "rate": 0,
+                "max": 24,
+                "life": [0.5, 0.8],
+                "spread": [10, 4],
+                "size": 0.4,
+                "sizeEnd": 1.1,
+                "vx": [-140, -40],
+                "vy": [-60, -20],
+                "drag": 1.5,
+                "alpha": 0.5,
+                "fade": "out"
+            },
+            "divine_shine": {
+                "_note": "the Tobiraph aura: half of 16/s each, 48 motes in total",
+                "blend": "Add",
+                "rate": 8,
+                "max": 24,
+                "life": [0.9, 1.7],
+                "size": [0.48, 1.28],
+                "vy": [-75, -30],
+                "sway": { "amp": 12, "rad_per_s": 2.2 },
+                "colors": [
+                    [1.0, 0.93, 0.62]
+                ],
+                "alpha": 0.9,
+                "fade": "arch"
+            },
+            "divine_dark": {
+                "blend": "Normal",
+                "rate": 8,
+                "max": 24,
+                "life": [0.9, 1.7],
+                "size": [0.93, 1.87],
+                "vy": [12, 34],
+                "sway": { "amp": 12, "rad_per_s": 2.2 },
+                "colors": [
+                    [0.16, 0.05, 0.22]
+                ],
+                "alpha": 0.75,
+                "fade": "arch"
+            },
+            "door_dark": {
+                "_note": "darkness seeping out of the doors' monsters (floors 11-19), drawn behind the body",
+                "blend": "Normal",
+                "rate": 14,
+                "max": 40,
+                "life": [2.2, 3.4],
+                "prewarm": 3,
+                "size": [2.2, 3.6],
+                "vx": [-12, 12],
+                "vy": [-22, -6],
+                "sway": { "amp": 16, "rad_per_s": 1.2 },
+                "colors": [
+                    [0.06, 0.02, 0.09]
+                ],
+                "alpha": 0.2,
+                "fade": "arch"
+            },
+            "spores": {
+                "blend": "Add",
+                "rate": 2.5,
+                "max": 16,
+                "life": [5, 8],
+                "prewarm": 8,
+                "size": [0.4, 0.9],
+                "vx": [-8, 8],
+                "vy": [-14, -4],
+                "sway": {
+                    "amp": 10,
+                    "freq": [0.2, 0.4]
+                },
+                "colors": [
+                    [0.6, 1, 0.8]
+                ],
+                "alpha": 0.9,
+                "fade": "arch",
+                "twinkle": {
+                    "amp": 0.5,
+                    "hz": [0.4, 1.0]
+                }
+            },
+            "sky_glints": {
+                "blend": "Add",
+                "rate": 6,
+                "max": 30,
+                "life": [3, 5],
+                "prewarm": 5,
+                "area": [0, 0, 1920, 700],
+                "size": [0.25, 0.6],
+                "alpha": 0.8,
+                "fade": "arch",
+                "twinkle": {
+                    "amp": 0.6,
+                    "hz": [0.5, 1.2]
+                }
+            },
+            "glitter": {
+                "_note": "sparkles around the CLEAR! letters; the banner sets the area and bursts one per letter",
+                "blend": "Add",
+                "rate": 20,
+                "max": 56,
+                "life": [0.45, 0.9],
+                "spread": [60, 50],
+                "size": [0.5, 1.3],
+                "vx": [-12, 12],
+                "vy": [-34, -6],
+                "spin": [30, 120],
+                "colors": [
+                    [1, 0.95, 0.7],
+                    [1, 1, 1],
+                    [1, 0.8, 0.4]
+                ],
+                "alpha": 1,
+                "fade": "arch",
+                "twinkle": {
+                    "amp": 0.5,
+                    "hz": [3, 6]
+                }
+            },
+            "impact_spark": {
+                "_note": "stars and sparks of the fail collision: one burst of about 18 at the hit point",
+                "blend": "Normal",
+                "rate": 0,
+                "max": 40,
+                "life": [0.5, 0.85],
+                "spread": [20, 20],
+                "size": [0.6, 1.2],
+                "sizeEnd": 0.35,
+                "vx": [-900, 900],
+                "vy": [-1000, 150],
+                "gravity": 1900,
+                "drag": 1.0,
+                "spin": [180, 540],
+                "colors": [
+                    [1, 0.88, 0.2],
+                    [1, 1, 1],
+                    [1, 0.62, 0.16]
+                ],
+                "alpha": 1,
+                "fade": "inout",
+                "fin": 0.02,
+                "fout": 0.35
+            },
+            "guard_smoke": {
+                "_note": "black wisps rising off the level-10 guardian as it turns black; the cutscene places each puff",
+                "blend": "Normal",
+                "rate": 0,
+                "max": 90,
+                "life": [1.6, 2.8],
+                "spread": [8, 8],
+                "size": [0.9, 1.6],
+                "sizeEnd": 2.8,
+                "vx": [-14, 14],
+                "vy": [-140, -70],
+                "drag": 0.3,
+                "sway": {
+                    "amp": 16,
+                    "freq": [0.3, 0.6]
+                },
+                "colors": [
+                    [0.05, 0.03, 0.07]
+                ],
+                "alpha": 0.7,
+                "fade": "arch"
+            }
+        },
+        "darkness": {
+            "_note": "Per visible box: per_s motes and spirals, spawning at most backlog_max in one update, up to max_particles in all. Motes and spirals rise at rise_px_per_s (world px/s) and swirl sideways at swirl.px_per_s on a phase turning at swirl.rad_per_s; spirals spin at spin_deg_per_s in a random direction. The bank drifts by drift_px and its puffs sway by sway_px (half that vertically). A scatter: particles within reach_px of the box rise at rise_px_per_s, are pushed sideways at push_px_per_s and age life_drain times faster; the bank's puffs spread by cloud_spread and rise cloud_rise_px as scatter goes 0 -> 1.",
+            "max_particles": 260,
+            "rise_px_per_s": [12, 95],
+            "mote": {
+                "per_s": 72,
+                "life_s": [0.9, 2.3],
+                "backlog_max": 8
+            },
+            "spiral": {
+                "per_s": 7,
+                "life_s": [1.3, 2.6],
+                "spin_deg_per_s": [70, 250],
+                "backlog_max": 4
+            },
+            "swirl": { "px_per_s": 55, "rad_per_s": 3 },
+            "cloud": {
+                "drift_px": 24,
+                "drift_rad_per_s": 0.5,
+                "sway_px": 10,
+                "sway_x_rad_per_s": 0.9,
+                "sway_y_rad_per_s": 0.6,
+                "sway_y_phase_step": 1.7
+            },
+            "scatter": {
+                "reach_px": 60,
+                "rise_px_per_s": 260,
+                "push_px_per_s": 300,
+                "life_drain": 1.8,
+                "cloud_spread": 1.6,
+                "cloud_rise_px": 120
+            }
+        },
+        "light": {
+            "_note": "flicker: base plus, for each wave i = 1, 2, 3, wave_amps[i] * sin(wave_rad_per_s[i] * t + i * seed). The grain jumps grain_steps_per_s times a second. rays: the defaults of a ray entry without period / phase / aMin / aMax (default_phase_step times its index); the sway runs on sway_period_ratio times the period at sway_phase_ratio times the phase.",
+            "flicker": {
+                "base": 0.86,
+                "wave_amps": [0.08, 0.04, 0.02],
+                "wave_rad_per_s": [13.1, 23.7, 41]
+            },
+            "grain_steps_per_s": 12,
+            "rays": {
+                "default_period_s": 9,
+                "default_phase_step": 1.9,
+                "default_min_opacity": 0.1,
+                "default_max_opacity": 0.2,
+                "sway_period_ratio": 1.37,
+                "sway_phase_ratio": 0.7
+            }
+        },
+        "dissolve": {
+            "_note": "dark_s to the black silhouette; the front starts at eat_from_s and runs top to bottom in eat_s, its speed easing as u * (front_ease.base + front_ease.amp * u). The front's raggedness: two waves drifting sideways (amp, waves across the sprite, waves per second), a fixed jitter per strip and a flicker per strip at column_flicker_hz (base + jitter * random). grain and haze: what a silhouette point sheds when the front passes it (count_base of each, plus one at extra_chance); size_end scales the size over the life, fade_out_share is the share of the life spent fading out. The dust drifts right on wind_px_per_s, is pulled up by rise_px_per_s2, loses drag_per_s of its speed per second and flutters sideways at turb_px_per_s on turb_hz.",
+            "dark_s": 0.25,
+            "eat_from_s": 0.22,
+            "eat_s": 1.0,
+            "front_ease": { "base": 0.6, "amp": 0.4 },
+            "front_noise": {
+                "wave_a": { "amp": 0.4, "across": 1.7, "hz": 0.5 },
+                "wave_b": { "amp": 0.2, "across": 4.3, "hz": 0.9 },
+                "jitter": 0.25,
+                "flicker": 0.15
+            },
+            "column_flicker_hz": { "base": 1.5, "jitter": 1.5 },
+            "grain": {
+                "count_base": 1,
+                "extra_chance": 0.5,
+                "max": 360,
+                "life_s": [0.8, 1.3],
+                "size": [0.45, 0.9],
+                "size_end": 1.5,
+                "squash": 0.2,
+                "spin_deg_per_s": [30, 120],
+                "vx_px_per_s": [-25, 25],
+                "vy_px_per_s": [-60, -10],
+                "opacity": 0.95,
+                "fade_in_s": 0.06,
+                "fade_out_share": 0.6
+            },
+            "haze": {
+                "count_base": 0,
+                "extra_chance": 0.3,
+                "max": 90,
+                "life_s": [0.7, 1.1],
+                "size": [0.6, 1.0],
+                "size_end": 2.0,
+                "squash": 0.25,
+                "vx_px_per_s": [-15, 15],
+                "vy_px_per_s": [-35, -10],
+                "opacity": 0.28,
+                "fade_in_s": 0.15,
+                "fade_out_share": 0.7
+            },
+            "wind_px_per_s": [30, 90],
+            "rise_px_per_s2": -200,
+            "drag_per_s": 0.9,
+            "turb_px_per_s": 70,
+            "turb_hz": [0.8, 2.0]
+        },
+        "dust_trail": {
+            "_note": "speck and smoke: what a point sheds into the swirl (count_base of each, plus one at extra_chance); ghost: whether a flying piece has a ghost copy. puff: a soft puff left where a point is shed, at chance, rising at rise_px_per_s. The swirl: a piece falls onto its radius with time constant pull_s, at most pull_max_px_per_s; it turns at spin_rad_per_s (negative: the left side runs down) at spin_r_px, faster nearer the middle (counted from at least spin_min_radius_px), at most spin_max_rad_per_s, at spin_jitter.base + spin_jitter.jitter * random of that; it bobs by bob.px at bob.hz, reaching the full bob in bob.in_s. The trail: release_s from the first piece leaving to the last, each piece runs fly_s along the curve, speeding up into the end (u = k ^ accel), spending join_share of the run joining the curve; the slither is wave.amp_px, wave.along waves along the curve moving wave.per_s waves a second, under a sin ^ envelope_power envelope. A piece fades out after fade_from_share of its run and loses shrink_share of its size by the end; the ghost lags ghost_lag_s behind.",
+            "speck": {
+                "count_base": 1,
+                "extra_chance": 0.5,
+                "max": 420,
+                "size": [0.55, 1.05],
+                "squash": 0.2,
+                "spin_deg_per_s": [30, 120],
+                "opacity": 0.95,
+                "fade_in_s": 0.08,
+                "ghost": true
+            },
+            "smoke": {
+                "count_base": 0,
+                "extra_chance": 0.7,
+                "max": 220,
+                "size": [1.0, 1.8],
+                "squash": 0.25,
+                "spin_deg_per_s": [10, 40],
+                "opacity": 0.4,
+                "fade_in_s": 0.25,
+                "ghost": false
+            },
+            "puff": {
+                "chance": 0.3,
+                "max": 90,
+                "life_s": [0.7, 1.1],
+                "size": [0.6, 1.0],
+                "size_end": 2.0,
+                "squash": 0.25,
+                "rise_px_per_s": [-35, -10],
+                "opacity": 0.28,
+                "fade_in_s": 0.15,
+                "fade_out_share": 0.7
+            },
+            "pull_s": 0.45,
+            "pull_max_px_per_s": 1200,
+            "spin_rad_per_s": -3.0,
+            "spin_r_px": 100,
+            "spin_min_radius_px": 30,
+            "spin_max_rad_per_s": 6,
+            "spin_jitter": { "base": 0.8, "jitter": 0.4 },
+            "bob": {
+                "px": 7,
+                "hz": [0.6, 1.2],
+                "in_s": 0.6
+            },
+            "release_s": 2.0,
+            "fly_s": [1.0, 1.2],
+            "accel": 1.3,
+            "join_share": 0.25,
+            "wave": { "amp_px": 40, "along": 2.2, "per_s": 1.2, "envelope_power": 0.8 },
+            "fade_from_share": 0.84,
+            "shrink_share": 0.5,
+            "ghost_lag_s": 0.05
+        },
+        "fire": {
+            "_note": "The core's squash flicker and lean: scale x times 1 + squash_x.amp * sin(rad_per_s * t), scale y times 1 + the two squash_y waves (the first shifted by its phase), a lean of lean.deg on its own sine.",
+            "core": {
+                "squash_x": { "amp": 0.08, "rad_per_s": 17 },
+                "squash_y": { "amp": 0.12, "rad_per_s": 11, "phase": 0.6 },
+                "squash_y2": { "amp": 0.05, "rad_per_s": 29 },
+                "lean": { "deg": 4, "rad_per_s": 3.1 }
+            }
+        },
+        "impact": {
+            "_note": "The ouch burst pops in pop_s from pop_from_scale with an outBack overshoot of pop_overshoot (fading in over pop_fade_in_share of the pop), holds hold_s, then fades out in out_s while growing by out_grow_scale. It tilts by up to +-tilt_deg; sparks: the burst of the impact_spark preset.",
+            "pop_s": 0.16,
+            "hold_s": 0.22,
+            "out_s": 0.28,
+            "pop_from_scale": 0.25,
+            "pop_overshoot": 2.6,
+            "pop_fade_in_share": 0.3,
+            "out_grow_scale": 0.18,
+            "tilt_deg": 14,
+            "sparks": 18
+        }
+    },
+    "play_bg": {
+        "_note": "The play screen's upper background. Times in seconds; periods are one full sine cycle in seconds; speeds in px per second. Emitter groups (named after their fx/presets preset) replace those fields of the preset: rate_per_s (spawns per second), life_s [min, max], prewarm_s, vx_px_per_s [min, max].",
+        "max_frame_dt_s": 0.1,
+        "flash": {
+            "_note": "The monster's white flash as a note lands: it starts at the hit's opacity (0-1; a hit never lowers a brighter flash still fading) and fades out over duration_s.",
+            "duration_s": 0.13,
+            "hit_opacity": 0.8,
+            "big_opacity": 1,
+            "roll_opacity": 0.5
+        },
+        "beat": {
+            "_note": "An idle cycle runs over the power of two of beats nearest its own length, kept within these.",
+            "min_cycle_beats": 0.25,
+            "max_cycle_beats": 16
+        },
+        "checkpoint": {
+            "_note": "shaft_breath: each shaft's opacity is base + amp * sin over its period.",
+            "darkness_max_dt_s": 0.1,
+            "shaft_period_s": [9, 12],
+            "shaft_breath": { "base": 0.85, "amp": 0.15 },
+            "interior_dust": { "rate_per_s": 1.75 }
+        },
+        "forest": {
+            "_note": "Each god ray breathes between ray_opacity_min and ray_opacity_max over its period and rocks by +-ray_sway_deg. The sun glow breathes by +-breath_opacity.",
+            "ray_period_s": [7, 9, 11],
+            "ray_opacity_min": 0.06,
+            "ray_opacity_max": 0.13,
+            "ray_sway_deg": 1.5,
+            "sun": { "breath_opacity": 0.05, "period_s": 8 },
+            "pollen": { "rate_per_s": 2.9 },
+            "fireflies": { "rate_per_s": 0.6 },
+            "forest_leaves": {
+                "life_s": [6, 9],
+                "rate_per_s": 0.8,
+                "prewarm_s": 8
+            },
+            "near_leaves": { "rate_per_s": 0.12 }
+        },
+        "pagoda": {
+            "_note": "shaft_breath: each shaft's opacity is base + amp * sin over its period.",
+            "shaft_period_s": [9, 13],
+            "shaft_breath": { "base": 0.85, "amp": 0.15 },
+            "interior_dust": { "rate_per_s": 3 }
+        },
+        "roof": {
+            "_note": "cloud_speed_px_per_s: the drift of each cloud row (far row first).",
+            "cloud_speed_px_per_s": [4, 9],
+            "mist": {
+                "vx_px_per_s": [6, 10]
+            },
+            "sky_glints": { "rate_per_s": 3 },
+            "spores": { "rate_per_s": 1.25 }
+        },
+        "storm": {
+            "_note": "settle_s: seconds of encounter view time run at once so its push-in is settled.",
+            "settle_s": 10
+        },
+        "tobiraph": {
+            "_note": "As in encounter/cutscenes/level20.lua: the bob (on the beat) and the sway, amplitude in px and period in seconds.",
+            "bob_px": 16,
+            "bob_period_s": 4.4,
+            "sway_px": 10,
+            "sway_period_s": 7.3
+        }
+    },
+    "stage": {
+        "_note": "Timings and motion of the stage's own screens (the root .lua files), in seconds and 1920x1080 pixels.",
+        "script": {
+            "_note": "Script.lua. bgm_fade_s matches dan_doors_back's FADE_OUT_SECONDS / FADE_IN_SECONDS. sky_speed multiplies the day sky's clock (clouds and sun drift off it; 1:1 with real time feels static). The puchichara floats float_amp px on a sine that steps sine_steps_per_s degrees a second, and changes frame (of frames in its sheet) every frame_step_s.",
+            "bgm_fade_s": 0.7,
+            "sky_speed": 5,
+            "puchi": { "float_amp": 6.0, "frames": 2, "sine_steps_per_s": 120, "frame_step_s": 4.8 }
+        },
+        "pagoda": {
+            "_note": "pagoda.lua: how long a status message shows (it fades over its last second)",
+            "status": { "default_s": 2.0, "load_fail_s": 3.0 }
+        },
+        "title_screen": { "rainbow_speed": 0.35 },
+        "selector": {
+            "_note": "exp-smoothing rate of the tower scroll toward the selection",
+            "scroll_rate": 9.0
+        },
+        "sky": {
+            "_note": "skybox.lua: stiffness of the spring the sky's hour glides on toward a new floor's (floor select, floor transition, back to the title); at 3.5 it is 80% there after 0.9 s, 99% after 1.8 s",
+            "hour_stiffness": 3.5
+        },
+        "confirm": {
+            "_note": "selector_confirm.lua: the panel grows from open_from_scale while it fades in; Yes before the story fades to black over accept_fade_s; Yes before song_loading eases the panel out over close_s",
+            "open_s": 0.22,
+            "close_s": 0.18,
+            "open_from_scale": 0.92,
+            "accept_fade_s": 0.5
+        },
+        "floor_transition": {
+            "_note": "floor_transition.lua: the beaten floor's darkness disperses (scatter_s), a beat so it reads before the camera moves (settle_s), the camera climbs (scroll_s), a beat to read the destination plaque (hold_s), the fade out (fade_s)",
+            "scatter_s": 1.4,
+            "settle_s": 0.45,
+            "scroll_s": 0.9,
+            "hold_s": 0.9,
+            "fade_s": 0.5
+        },
+        "credits": {
+            "_note": "credits.lua, seconds into the song: the first line comes up from the bottom edge at roll_start_s, the last line rests in the middle at roll_stop_s (the song's last chord) after slowing down over settle_s, the screen fades out at done_at_s. The roll starts with the song, or after song_wait_s without it. The picture darkens over bg_darken_s. Holding decide runs the roll fast times faster, easing in and out at speed_rate; a roll that comes to rest ahead_fade_s ahead of the song fades the song out until the end.",
+            "bg_darken_s": 1.2,
+            "roll_start_s": 1.5,
+            "roll_stop_s": 100.0,
+            "settle_s": 4.0,
+            "done_at_s": 105.0,
+            "song_wait_s": 0.5,
+            "fast": 6,
+            "speed_rate": 5,
+            "ahead_fade_s": 1.0
+        },
+        "fail_flight": {
+            "_note": "fail_flight.lua. talk_at_s: seconds into the flight before the lines start; hold_s: without lines, how long they tumble before dropping; land_beat_s: after they are out of sight, before the stomp; land_hold_s: after the stomp, before the landing is held (outlasts the shake); ring_fade_s: the stomp's ring fades out over the held landing. Scroll speeds are at full flight speed (px/s, to the right): the mountains (far to near), the sky pans (yaw) and its clouds drift along (cloud_drift times faster), and everything eases to a stop over ease_s once they drop. Each mountain starts at a random offset up to mountain_start_offset_max_px. Actors spin counter-clockwise, with a phase so the two never move in step and a lag behind the first one.",
+            "load_timeout_s": 1.5,
+            "fade_in_s": 0.45,
+            "talk_at_s": 1.3,
+            "hold_s": 2.5,
+            "drop_max_s": 3.0,
+            "land_beat_s": 0.5,
+            "scrim_fade_s": 0.3,
+            "stomp": { "amp": 24, "duration_s": 0.5 },
+            "land_hold_s": 0.7,
+            "ring_fade_s": 0.6,
+            "mountain_speeds_px_per_s": [170, 460, 1050],
+            "mountain_start_offset_max_px": 4000,
+            "yaw_rate_deg_per_s": -3.2,
+            "cloud_drift": 6,
+            "ease_s": 1.5,
+            "clouds_back": {
+                "speed_px_per_s": [1300, 1900]
+            },
+            "clouds_front": {
+                "speed_px_per_s": [2600, 3000]
+            },
+            "ume": { "spin_deg_per_s": 170, "phase": 0.0, "lag_s": 0.0 },
+            "student": { "spin_deg_per_s": 125, "phase": 1.7, "lag_s": 0.12 },
+            "solo": { "spin_deg_per_s": 125, "phase": 1.7, "lag_s": 0.0 },
+            "enter": { "dx": 1300, "dy": -260, "duration_s": 1.1 },
+            "sway": { "px": 26, "hz": 0.3 },
+            "bob": { "px": 18, "hz": 0.55 },
+            "wobble": { "deg": 16, "hz": 1.3 },
+            "squash": { "amount": 0.08, "hz": 2.1 },
+            "drop": {
+                "_note": "leftward speed and acceleration, downward speed and gravity once they drop",
+                "vx": 120,
+                "ax": 500,
+                "vy": 60,
+                "g": 1500
+            }
+        },
+        "floor_enter": {
+            "_note": "floor_enter.lua: load_timeout_s: the screen starts even when the art is still loading; entrance_at_s: the cast's run-in start after the fade-in begins; a cutscene's opening animation holds the dialog cut_opening_max_s at most",
+            "load_timeout_s": 2.0,
+            "fade_s": 0.45,
+            "entrance_at_s": 0.2,
+            "cut_opening_max_s": 8.0
+        },
+        "floor_result": {
+            "_note": "floor_result.lua: settle_s after the fade-in before the sequence starts; the banner stays up banner_beat_s once it has fully landed; lines_hold_s is held instead of the dialog when the floor has no lines; charge_s is the monster's rush to the cast; flown_beat_s after the cast has flown off, before the fade-out. timeouts: a step that never reports its end moves on after this long (come_in_s: the dark room's monster coming in with its light).",
+            "load_timeout_s": 2.0,
+            "fade_s": 0.45,
+            "settle_s": 0.35,
+            "banner_beat_s": 0.6,
+            "lines_hold_s": 1.0,
+            "charge_s": 0.55,
+            "flown_beat_s": 0.5,
+            "credits_fade_s": 1.0,
+            "impact_shake": { "amp": 22, "duration_s": 0.45 },
+            "timeouts": {
+                "vanish_s": 3.0,
+                "clear_fx_s": 5.0,
+                "banner_s": 6.0,
+                "run_s": 4.0,
+                "charge_s": 2.0,
+                "fly_s": 3.0,
+                "come_in_s": 3.0,
+                "credits_s": 300
+            }
+        },
+        "bestiary": {
+            "_note": "bestiary.lua: the pop a newly selected card grows by, easing out over select_pop_s, and the panel's fade-in after a change; scroll_rate: how fast the description eases to its scroll (exp smoothing, per second).",
+            "select_pop_s": 0.18,
+            "select_pop_scale": 0.08,
+            "panel_fade_s": 0.2,
+            "scroll_rate": 14
+        }
+    },
+    "selectui": {
+        "_note": "The floor select's UI pieces. Times in seconds; overshoots are the Easing outBack amount.",
+        "carets": {
+            "_note": "The chevrons bob outward by up to bob_px on a sine of bob_speed (radians per second), their scale pulsing by +-pulse_scale on the same sine.",
+            "bob_px": 10,
+            "bob_speed": 3.2,
+            "pulse_scale": 0.04
+        },
+        "hover": {
+            "_note": "The border stays still. The sheen sweeps sheen_delay_s after a new selection, then once every sheen_period_s, taking sheen_s.",
+            "sheen_delay_s": 0.24,
+            "sheen_period_s": 3.2,
+            "sheen_s": 0.7
+        },
+        "plaque": {
+            "_note": "A new number pops in from pop_from_scale over pop_s. rainbow_speed: the roof rainbow's Rainbow.draw speed; glitter_rate_per_s: its glitter's sparkles per second.",
+            "pop_s": 0.26,
+            "pop_from_scale": 1.16,
+            "pop_overshoot": 1.7,
+            "rainbow_speed": 0.35,
+            "glitter_rate_per_s": 7
+        }
+    },
+    "story": {
+        "_note": "Timings of the story layer: the VN player (story/vn.lua), the reaction flashes (story/react.lua), the background drift, the music fades (story/vn_music.lua) and the stage directions of the story scripts (story/entrance.lua, story/cutscenes). Times in seconds, shakes in pixels, opacities 0-1.",
+        "vn": {
+            "ume": {
+                "_note": "A sprite enter/leave fades over fade_s. A face change: he squashes, springs back taller, then settles over bounce_s; squash_share is the deepest squash, as a share of his height (he widens by half of it).",
+                "fade_s": 0.35,
+                "bounce_s": 0.36,
+                "squash_share": 0.04
+            },
+            "screen_fade_s": 0.45,
+            "typing": {
+                "_note": "Typing speed of the box and the glyphs per typing blip.",
+                "chars_per_s": 42,
+                "blip_every_glyphs": 3
+            },
+            "background_wait_s": 2.0,
+            "shake_direction": {
+                "_note": "The camera shake of a { shake = true } line.",
+                "amplitude_px": 14,
+                "duration_s": 0.35
+            }
+        },
+        "react": {
+            "_note": "The white flash of a reaction: it starts at peak_opacity and falls off over duration_s; shock also shakes the screen. Below min_visible_opacity the flash is not drawn.",
+            "surprise": { "peak_opacity": 0.7, "duration_s": 0.22 },
+            "shock": {
+                "peak_opacity": 0.85,
+                "duration_s": 0.34,
+                "shake_amplitude_px": 10,
+                "shake_s": 0.3
+            },
+            "min_visible_opacity": 0.002
+        },
+        "backgrounds": {
+            "_note": "Horizontal drift of a repeating background layer, px per second.",
+            "beanstalk": {
+                "cloud": { "scroll_px_per_s": -40 }
+            }
+        },
+        "music": {
+            "_note": "A loop fades in over fade_in_s, gives way to another over crossfade_s, and a scene's fade out never takes less than min_fade_out_s.",
+            "fade_in_s": 1.6,
+            "crossfade_s": 1.2,
+            "min_fade_out_s": 0.05
+        },
+        "entrance": {
+            "_note": "Seconds the floor's monster takes to fade in on a revealMonster line.",
+            "reveal_monster": { "floor_1_s": 0.5, "floor_15_s": 2.6 }
+        },
+        "cutscenes": {
+            "level10": {
+                "_note": "The fail's black cover: its opacity and the seconds it takes to fade in.",
+                "fail_cover": { "opacity": 1, "fade_s": 1.2 }
+            }
+        }
+    },
+    "title_ui": {
+        "_note": "The title screen's UI pieces. Times in seconds.",
+        "shine": {
+            "_note": "first_s before the first sweep, every_s between sweeps, sweep_s per sweep; the glitter trails the bars at glitter_rate_per_s sparkles per second.",
+            "first_s": 1.2,
+            "every_s": 4.5,
+            "sweep_s": 0.9,
+            "glitter_rate_per_s": 30
+        }
+    },
+    "towerfx": {
+        "_note": "The floor-select ambience's motion (towerfx/*). Times are in seconds; ranges are [min, max], picked per particle; life_s is a particle's life before it respawns elsewhere; fade_in_share / fade_out_share are the shares of that life spent fading in and out. A wave is px (or deg) * sin(t * rad_per_s + phase); hz waves are in turns per second. A blink or glint is base + amp * sin(...). Each sub-group is one towerfx file.",
+        "base": {
+            "dust": {
+                "life_s": [6, 10],
+                "drift_px_per_s": 14,
+                "sway_x": { "px": 8, "rad_per_s": 0.9 },
+                "sway_y": { "px": 10, "rad_per_s": 0.6 },
+                "fade_in_share": 0.25,
+                "fade_out_share": 0.35
+            },
+            "flies": {
+                "life_s": [4, 7],
+                "wander_x": { "px": 30, "rad_per_s": 0.37 },
+                "wander_y": { "px": 18, "rad_per_s": 0.45, "phase_ratio": 1.3 },
+                "blink": { "base": 0.55, "amp": 0.45, "rad_per_s": 2.1 },
+                "fade_in_share": 0.2,
+                "fade_out_share": 0.3
+            }
+        },
+        "checkpoint": {
+            "_note": "Lantern i flickers (fx/light flicker) on seed i * flicker_seed_step. Sparks sway on sway and rise at rise_px_per_s.",
+            "flicker_seed_step": 1.7,
+            "sparks": {
+                "life_s": [2.5, 4],
+                "sway": { "px": 6, "rad_per_s": 2.2 },
+                "rise_px_per_s": [14, 24],
+                "fade_in_share": 0.15,
+                "fade_out_share": 0.5
+            }
+        },
+        "doors": {
+            "_note": "The door glow breathes between its opacities at rad_per_s, shifted level_phase per level; window shaft i breathes over period_s, shifted window_phase per window (and 1 per level). Dust sways on two waves, rises at rise_px_per_s and glints at a rate picked in glint.rad_per_s.",
+            "door_glow": {
+                "opacity": [0.1, 0.16],
+                "rad_per_s": 0.8,
+                "level_phase": 1.3
+            },
+            "shaft": {
+                "opacity": [0.05, 0.1],
+                "period_s": 9,
+                "window_phase": 2.1
+            },
+            "dust": {
+                "life_s": [6, 10],
+                "sway_a": { "px": 16, "rad_per_s": 0.5 },
+                "sway_b": { "px": 6, "rad_per_s": 1.7 },
+                "rise_px_per_s": [5, 12],
+                "glint": {
+                    "base": 0.6,
+                    "amp": 0.4,
+                    "rad_per_s": [1.5, 3.5]
+                },
+                "fade_in_share": 0.25,
+                "fade_out_share": 0.3
+            }
+        },
+        "forest": {
+            "_note": "Shafts breathe between their opacities over a period picked in period_s and rock by +-sway_deg over sway_period_ratio times it. Flies wander on three waves (phase_ratio times the fly's phase) and sink rise_px over a life. Leaves drift at vx / vy, sway, spin at spin_deg_per_s (random direction) and flip (scale x base + amp * |cos|) at flip.hz.",
+            "shafts": {
+                "sway_deg": 2.5,
+                "opacity": [0.06, 0.14],
+                "period_s": [7, 11],
+                "sway_period_ratio": 1.7
+            },
+            "flies": {
+                "life_s": [4, 7],
+                "wander_a": { "px": 46, "rad_per_s": 0.33 },
+                "wander_b": { "px": 14, "rad_per_s": 1.1, "phase_ratio": 2 },
+                "wander_y": { "px": 22, "rad_per_s": 0.41, "phase_ratio": 1.7 },
+                "rise_px": 18,
+                "blink": {
+                    "base": 0.55,
+                    "amp": 0.45,
+                    "rad_per_s": [1.4, 2.6]
+                },
+                "fade_in_share": 0.2,
+                "fade_out_share": 0.3
+            },
+            "leaves": {
+                "life_s": [7, 11],
+                "vx_px_per_s": [12, 34],
+                "vy_px_per_s": [32, 48],
+                "sway": { "px": 28, "hz": 0.32 },
+                "spin_deg_per_s": [40, 110],
+                "flip": { "base": 0.3, "amp": 0.7, "hz": 0.8 },
+                "fade_in_share": 0.1,
+                "fade_out_share": 0.2
+            }
+        },
+        "roofs": {
+            "_note": "The night effects take over between the hours of night_hours. Clouds drift at speed_px_per_s and breathe between their opacities over a period picked in breath_period_s. Wind lines run at speed_px_per_s through their life, bobbing bob_px once. Stars twinkle at a rate picked in twinkle_rad_per_s.",
+            "night_hours": [17.5, 21],
+            "back_clouds": {
+                "speed_px_per_s": [10, 18],
+                "opacity": [0.22, 0.38]
+            },
+            "front_clouds": {
+                "speed_px_per_s": [24, 34],
+                "opacity": [0.12, 0.2]
+            },
+            "cloud_breath_period_s": [10, 16],
+            "winds": {
+                "life_s": [1.2, 2.0],
+                "speed_px_per_s": [420, 620],
+                "bob_px": 6
+            },
+            "stars": {
+                "life_s": [4, 8],
+                "twinkle_rad_per_s": [2, 5],
+                "fade_in_share": 0.3,
+                "fade_out_share": 0.3
+            }
+        },
+        "stairs": {
+            "_note": "Mist banks drift right at speed_px_per_s and breathe over a period picked in breath_period_s. Petals drift at vx / vy, sway, spin at spin_deg_per_s and flip at flip.hz. A flock crosses during the first flight_s of each gap (a gap picked in gap_s), sinking sink_px and bobbing bob_px; its wings flap at flap_hz through frames frames, each bird flap_phase_step behind the one before.",
+            "mists": {
+                "speed_px_per_s": [10, 20],
+                "opacity": [0.08, 0.18],
+                "breath_period_s": [9, 15]
+            },
+            "petals": {
+                "life_s": [9, 13],
+                "vx_px_per_s": [45, 75],
+                "vy_px_per_s": [16, 28],
+                "sway": { "px": 20, "hz": 0.4 },
+                "spin_deg_per_s": 70,
+                "flip": { "base": 0.3, "amp": 0.7, "hz": 1.2 },
+                "fade_in_share": 0.1,
+                "fade_out_share": 0.2
+            },
+            "birds": {
+                "gap_s": [18, 26],
+                "flight_s": 7,
+                "flap_hz": 7,
+                "frames": 2,
+                "flap_phase_step": 0.4,
+                "sink_px": 18,
+                "bob_px": 4,
+                "bob_rad_per_s": 3
+            }
+        }
+    }
+}
