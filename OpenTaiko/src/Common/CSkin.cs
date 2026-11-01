@@ -1000,7 +1000,14 @@ internal class CSkin : IDisposable {
 	public bool bIsValid(string skinPathFullName) {
 		string filePathTitle;
 		filePathTitle = System.IO.Path.Combine(skinPathFullName, @$"Graphics{System.IO.Path.DirectorySeparatorChar}1_Title{System.IO.Path.DirectorySeparatorChar}Background.png");
-		return (File.Exists(filePathTitle));
+		if (!File.Exists(filePathTitle))
+			return false;
+		// the game enters these two stages at boot, so a skin without them cannot run
+		foreach (string stage in LuaStageWrapper.CoreStages) {
+			if (!File.Exists(System.IO.Path.Combine(skinPathFullName, "Modules", "Stages", stage, "Script.lua")))
+				return false;
+		}
+		return true;
 	}
 
 

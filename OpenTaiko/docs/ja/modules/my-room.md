@@ -39,5 +39,5 @@ Open-World Memories は、古い `Exit("stage", "myroom")` の呼び出しとエ
 - 家具の名前 (`lang/<code>/items.json`、家具 id がキー) を含む文字列は、自身の `lang/` フォルダに 9 言語で置かれています。
 - 家具のカタログは、ステージのフォルダの `data/furniture.json` です。
 - プレースホルダー・マトリックスは、`Global/Modules/Stages/` にあるデバッグステージだけを一覧します。これらのデバッグステージと、テレビが使う `video_player` ROActivity もグローバルのモジュールです。
-- ポッドは、`Global/Modules/Stages/` にステージ `mysterypod` が存在するとき、またはスキン独自の `mysterypod` ステージが `onStart` で共有文字列 `mysterypod_installed` を `"1"` に設定したときに、そのステージを開きます。
+- ポッドは、ステージがインストールされているときにそのステージを開きます。
 - オンラインの訪問では、移動前と同じく、ルーム id `"myroom"` とそのペイロードのバージョン 2 を使います。

@@ -66,8 +66,14 @@ local EXAM_NAME_OUTLINE   = ExamBar.name_outline_color
 local EXAM_RANGE_MORE_COL = ExamBar.range_more_color
 local EXAM_RANGE_LESS_COL = ExamBar.range_less_color
 
--- Range display strings (RangeAsInt: 0=More, 1=Less)
+-- Range display strings (RangeAsInt: 0=More, 1=Less), read in the current language by M.load()
 local EXAM_RANGE_STRINGS  = {"or More", "Less than"}
+
+local function tr(key, fallback)
+    local ok, s = pcall(function() return THEME:GetSkinString(key) end)
+    if ok and type(s) == "string" and s ~= "" and s:sub(1, 1) ~= "[" then return s end
+    return fallback
+end
 
 -- Pre-baked number character set (0-9, -, .)
 local NUM_CHARS    = "0123456789-."
@@ -210,6 +216,7 @@ end
 -- ── Lifecycle ─────────────────────────────────────────────────────────────────
 
 function M.load()
+    EXAM_RANGE_STRINGS = { tr("DANSELECT_EXAM_MORE", "or More"), tr("DANSELECT_EXAM_LESS", "Less than") }
     tx_dan_song  = TEXTURE:CreateTexture(TX .. "DanSong.png")
     tx_nb        = TEXTURE:CreateTexture(TX .. "DanSongNb.png")
     for i = 0, 4 do

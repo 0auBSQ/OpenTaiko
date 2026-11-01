@@ -161,7 +161,7 @@ end
 | `node.IsLocked  (bool)` | 该歌曲当前被锁定时为 true；非歌曲始终为 false。 |
 | `node.HiddenIndex  (int)` | 解锁系统的显示状态：0 显示，1 灰显，2 模糊，3 隐藏（非歌曲为 0）。 |
 | `node.Rarity  (string)` | 稀有度标签；没有解锁条目的歌曲为 "Common"，非歌曲为 "-"。 |
-| `node:Mount(p1diff, p2diff, p3diff, p4diff, p5diff)  -> bool` | 按每个玩家给定的难度索引（默认 0）选定本歌曲用于演奏。它只检查前 CONFIG.PlayerCount 个索引；节点不是歌曲，或某个活跃玩家的难度缺失或超出范围时返回 false。 |
+| `node:Mount(p1diff, p2diff, p3diff, p4diff, p5diff)  -> bool` | 按每个玩家给定的难度索引（默认 0）选定本歌曲用于演奏。它只检查前 CONFIG.PlayerCount 个索引；节点不是歌曲，或某个活跃玩家的难度缺失或超出范围时返回 false。在只读模块中返回 false。 |
 | `node:MountIfNotLocked(p1diff, p2diff, p3diff, p4diff, p5diff)  -> bool` | 与 Mount 相同，但歌曲被锁定时返回 false 且不挂载。 |
 
 ### 谱面
@@ -197,14 +197,14 @@ end
 | `chart.DanTickColor  (color)` | 段位牌刻度颜色（谱面没有谱面信息时为白色）。 |
 | `chart.DanSongs  (array of dan songs)` | 组成本段位谱面的歌曲。 |
 | `chart.DanExams  (array of dan exams)` | 本段位谱面的全局考核条件。 |
-| `chart:GetSongExam(songIdx, examSlot)  -> dan exam` | 返回给定 1 起歌曲索引和 1 起考核槽位的单曲考核；不存在时结果的 IsSet 为 false。 |
+| `chart:GetSongExam(songIdx, examSlot)  -> dan exam` | 返回给定 0 起歌曲索引和 1 起考核槽位的单曲考核；不存在或索引超出范围时结果的 IsSet 为 false。 |
 | `chart:GetPlayerBestScore(save)  -> best score info` | 返回给定存档在本谱面上的最佳成绩摘要。 |
 | `chart:GetCustomCommand(key)  -> string` | 返回一个谱面范围自定义命令的值（本 COURSE 块内以点开头的头部，key 包含点），或 nil。 |
 | `chart:GetCustomCommands()  -> dictionary` | 以 C# 字典对象返回所有谱面范围的自定义命令。 |
 | `chart.SongFolder  (string)` | 存放谱面文件的绝对文件夹路径。 |
 | `chart.ChartPath  (string)` | 谱面文件的绝对路径。 |
 | `chart.UniqueId  (string)` | 歌曲的唯一 id，或空字符串。 |
-| `chart:Select(player)  -> bool` | 把本谱面标记为给定玩家选定的难度；玩家 0 同时设置选定的歌曲。谱面无效时返回 false。 |
+| `chart:Select(player)  -> bool` | 把本谱面标记为给定玩家选定的难度；玩家 0 同时设置选定的歌曲。谱面无效或在只读模块中时返回 false。 |
 
 ### 最佳成绩信息
 
@@ -263,15 +263,15 @@ chart.DanExams 的元素，或由 chart:GetSongExam() 返回。所有成员均�
 用于在内存中由歌曲节点、难度和考核条件组装段位课程并挂载以供演奏的全局对象。
 
 <div class="callout warn">
-以全局对象 DANBUILDER 的形式提供。歌曲和槽位索引从 1 起，但传给 AddSong 的难度是从 0 起的难度索引。考核槽位为 1 到 7。考核类型字符串（不区分大小写，括号内为简写）："judgeperfect"（jp）、"judgegood"（jg）、"judgebad"（jb）、"score"（s）、"roll"（r）、"hit"（h）、"combo"（c）、"accuracy"（a）、"judgeadlib"（ja）、"judgemine"（jm）；其他任何字符串都表示魂槽。lessThan = true 使考核成为“少于”检查，false 为“至少”检查。构建器在调用之间保留状态；构建新课程前请调用 Clear()。
+以全局对象 DANBUILDER 的形式提供。歌曲索引从 0 起，与 API 中的所有列表一致，传给 AddSong 的难度也从 0 起。考核槽位从 1 起，为 1 到 7，因为考核编号为 EXAM1 到 EXAM7。考核类型字符串（不区分大小写，括号内为简写）："judgeperfect"（jp）、"judgegood"（jg）、"judgebad"（jb）、"score"（s）、"roll"（r）、"hit"（h）、"combo"（c）、"accuracy"（a）、"judgeadlib"（ja）、"judgemine"（jm）；其他任何字符串都表示魂槽。lessThan = true 使考核成为“少于”检查，false 为“至少”检查。构建器在调用之间保留状态；构建新课程前请调用 Clear()。
 </div>
 
 | 方法 | 说明 |
 | --- | --- |
 | `DANBUILDER.SongCount  (int)` | 目前已添加的歌曲数量。 |
 | `DANBUILDER:AddSong(node, diff)  -> void` | 以给定的 0 起难度索引追加一个歌曲节点。 |
-| `DANBUILDER:GetSong(i)  -> song node` | 返回 1 起索引 i 处的歌曲节点，或 nil。 |
-| `DANBUILDER:GetSongDiff(i)  -> int` | 返回为 1 起索引 i 处的歌曲存储的难度索引，或 -1。 |
+| `DANBUILDER:GetSong(i)  -> song node` | 返回 0 起索引 i 处的歌曲节点，或 nil。 |
+| `DANBUILDER:GetSongDiff(i)  -> int` | 返回为 0 起索引 i 处的歌曲存储的难度索引，或 -1。 |
 | `DANBUILDER:SetTitle(title)  -> void` | 设置课程标题（默认 "Dynamic Dan"）。 |
 | `DANBUILDER:SetSubtitle(subtitle)  -> void` | 设置课程副标题。 |
 | `DANBUILDER:SetDanTick(tick)  -> void` | 设置段位牌刻度值（默认 2）。 |
@@ -279,9 +279,9 @@ chart.DanExams 的元素，或由 chart:GetSongExam() 返回。所有成员均�
 | `DANBUILDER:SetGenreTitle(title)  -> void` | 设置演奏时分类牌上的文字。默认情况下，分类牌显示当前歌曲所在的分类文件夹。 |
 | `DANBUILDER:SetGenreColor(r, g, b)  -> void` | 从 0-255 的分量设置分类牌颜色。默认使用所显示分类文件夹的颜色；若已用 SetGenreTitle 设置文字，则为白色。 |
 | `DANBUILDER:SetGlobalExam(slot, type, red, gold, lessThan)  -> void` | 在给定槽位设置一条课程范围的考核。 |
-| `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | 按 1 起歌曲索引和槽位设置一条只作用于一首歌曲的考核。 |
+| `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | 按 0 起歌曲索引和 1 起槽位设置一条只作用于一首歌曲的考核。索引超出范围时不做任何事。 |
 | `DANBUILDER:Clear()  -> void` | 移除所有歌曲和考核，并把元数据重置为默认值。 |
-| `DANBUILDER:Mount()  -> bool` | 在内存中构建课程谱面，并以段位难度为玩家 1 选定它用于演奏；构建器中没有歌曲或构建失败时返回 false。 |
+| `DANBUILDER:Mount()  -> bool` | 在内存中构建课程谱面，并以段位难度为玩家 1 选定它用于演奏；构建器中没有歌曲或构建失败时返回 false，在只读模块中始终返回 false。 |
 
 ```lua
 DANBUILDER:Clear()
@@ -289,7 +289,7 @@ DANBUILDER:SetTitle("Custom course")
 DANBUILDER:AddSong(list:GetSongByUniqueId(id1), 3)
 DANBUILDER:AddSong(list:GetSongByUniqueId(id2), 3)
 DANBUILDER:SetGlobalExam(1, "gauge", 90, 100, false)
-DANBUILDER:SetPerSongExam(2, 2, "judgebad", 10, 5, true)
+DANBUILDER:SetPerSongExam(1, 2, "judgebad", 10, 5, true)
 if DANBUILDER:Mount() then
     return Exit("play")
 end
@@ -319,7 +319,7 @@ node.UnlockCondition 返回此对象。HasCondition 是属性；其余是方法�
 用于读写五个虚拟角色槽位（V1-V5）以及把玩家位重定向为显示某个槽位视觉内容的全局对象。
 
 <div class="callout warn">
-以全局对象 VIRTUALSLOTS 的形式提供。槽位索引为 1 到 5；setter 忽略超出范围的索引，getter 对其返回默认值。这些方法不会向磁盘写入任何内容。AI 槽位由引擎管理，本全局对象无法编辑它。
+以全局对象 VIRTUALSLOTS 的形式提供。槽位索引为 1 到 5；setter 忽略超出范围的索引，getter 对其返回默认值。这些方法不会向磁盘写入任何内容。AI 槽位由引擎管理，本全局对象无法编辑它。在只读模块中，setter 和 MountSlot 会记录一条错误并且不做任何事；getter 仍然正常工作。
 </div>
 
 | 方法 | 说明 |

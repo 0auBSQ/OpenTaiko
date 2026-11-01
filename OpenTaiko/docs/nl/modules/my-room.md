@@ -39,5 +39,5 @@ Om vanuit je eigen stage een meubelstuk te geven, tel je 1 op bij beide tellers,
 - De strings, inclusief de meubelnamen (`lang/<code>/items.json`, met het meubel-id als sleutel), staan in de eigen map `lang/`, in de negen talen.
 - De meubelcatalogus is `data/furniture.json` in de map van de stage.
 - De Placeholder Matrix toont alleen de debugstages die in `Global/Modules/Stages/` aanwezig zijn. Die debugstages en de ROActivity `video_player` die de tv gebruikt, zijn ook globale modules.
-- De capsule opent de stage `mysterypod` als die in `Global/Modules/Stages/` bestaat, of als de eigen stage `mysterypod` van een skin in zijn `onStart` de gedeelde string `mysterypod_installed` op `"1"` zet.
+- De capsule opent een stage als er een geïnstalleerd is.
 - Online bezoeken gebruiken het kamer-id `"myroom"` met versie 2 van de payload, net als vóór de verhuizing.

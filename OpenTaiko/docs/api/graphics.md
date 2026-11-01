@@ -297,7 +297,7 @@ Paths are relative to the script directory. The decoder opens on a background th
 A video decoder returned by `VIDEO:CreateVideo`.
 
 <div class="callout warn">
-Positions are in milliseconds; Duration is in seconds. Read Texture every frame to get the current frame as a texture handle. That handle wraps the video's own frame texture: draw it and leave disposal to the video handle. SetSpeed ignores values of 0 or below.
+Positions are in milliseconds; Duration is in seconds. Read Texture every frame to get the current frame as a texture handle. That handle wraps the video's own frame texture: draw it and leave disposal to the video handle. SetSpeed ignores values of 0 or below. The aliases below are permanent: both names are supported, as are Duration and DurationMs.
 </div>
 
 | Method | Description |
@@ -320,10 +320,10 @@ Positions are in milliseconds; Duration is in seconds. Read Texture every frame 
 | `video:SetTimestampMs(ms)  -> nil` | Seeks to a position in milliseconds. |
 | `video:GetSpeed()  -> number` | Current playback speed multiplier (1 = normal). |
 | `video:SetSpeed(speed)  -> nil` | Sets the playback speed multiplier. |
-| `video:GetPlayPosition()  -> number` | Current position in seconds (older name for GetTimestampMs / 1000). |
-| `video:SetPlayPosition(seconds)  -> nil` | Seeks to a position in seconds (older name for SetTimestampMs). |
-| `video:GetPlaySpeed()  -> number` | Older name for GetSpeed. |
-| `video:SetPlaySpeed(speed)  -> nil` | Older name for SetSpeed. |
+| `video:GetPlayPosition()  -> number` | Current position in seconds (alias of GetTimestampMs / 1000). |
+| `video:SetPlayPosition(seconds)  -> nil` | Seeks to a position in seconds (alias of SetTimestampMs, in seconds). |
+| `video:GetPlaySpeed()  -> number` | Alias of GetSpeed. |
+| `video:SetPlaySpeed(speed)  -> nil` | Alias of SetSpeed. |
 | `video:Dispose()  -> nil` | Frees the decoder and its frame texture. |
 
 ```lua

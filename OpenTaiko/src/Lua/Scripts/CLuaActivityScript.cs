@@ -58,6 +58,9 @@ namespace OpenTaiko {
 		public bool StepOnStart(out float progress) => tStepYieldable(out progress);
 
 		public void AfterSongsEnum() {
+			// a skin reload rebuilds these lists after script construction (as in Activate)
+			LuaScript["CHARACTERLIST"] = OpenTaiko.Tx?.LuaCharacterDb;
+			LuaScript["PUCHICHARALIST"] = OpenTaiko.Tx?.LuaPuchicharaDb;
 			RunLuaCode(lfAfterSongEnum);
 		}
 
@@ -67,7 +70,7 @@ namespace OpenTaiko {
 
 		#endregion
 
-		// Handle resources independently in Lua stages, ultimately nameplate script and modal script no longer needing the old hardcoded lua script methods would be a good longer term goal
+		// Handle resources independently in Lua stages
 		public CLuaActivityScriptBase(string dir, string name, string? texturesDir = null, string? soundsDir = null, bool loadAssets = false, bool writable = true)
 			: base(dir, texturesDir, soundsDir, loadAssets, writable: writable) {
 			_activityName = name;

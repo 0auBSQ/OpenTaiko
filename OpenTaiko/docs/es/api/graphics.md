@@ -297,7 +297,7 @@ Las rutas son relativas al directorio del script. El decodificador se abre en un
 Un decodificador de vídeo devuelto por `VIDEO:CreateVideo`.
 
 <div class="callout warn">
-Las posiciones están en milisegundos; Duration está en segundos. Lee Texture cada fotograma para obtener el fotograma actual como handle de textura. Ese handle envuelve la textura de fotograma propia del vídeo: dibújala y deja que el handle de vídeo se encargue de liberarla. SetSpeed ignora los valores de 0 o menos.
+Las posiciones están en milisegundos; Duration está en segundos. Lee Texture cada fotograma para obtener el fotograma actual como handle de textura. Ese handle envuelve la textura de fotograma propia del vídeo: dibújala y deja que el handle de vídeo se encargue de liberarla. SetSpeed ignora los valores de 0 o menos. Los alias de abajo son permanentes: se admiten ambos nombres, igual que Duration y DurationMs.
 </div>
 
 | Método | Descripción |
@@ -320,10 +320,10 @@ Las posiciones están en milisegundos; Duration está en segundos. Lee Texture c
 | `video:SetTimestampMs(ms)  -> nil` | Salta a una posición en milisegundos. |
 | `video:GetSpeed()  -> number` | Multiplicador de velocidad de reproducción actual (1 = normal). |
 | `video:SetSpeed(speed)  -> nil` | Establece el multiplicador de velocidad de reproducción. |
-| `video:GetPlayPosition()  -> number` | Posición actual en segundos (nombre antiguo de GetTimestampMs / 1000). |
-| `video:SetPlayPosition(seconds)  -> nil` | Salta a una posición en segundos (nombre antiguo de SetTimestampMs). |
-| `video:GetPlaySpeed()  -> number` | Nombre antiguo de GetSpeed. |
-| `video:SetPlaySpeed(speed)  -> nil` | Nombre antiguo de SetSpeed. |
+| `video:GetPlayPosition()  -> number` | Posición actual en segundos (alias de GetTimestampMs / 1000). |
+| `video:SetPlayPosition(seconds)  -> nil` | Salta a una posición en segundos (alias de SetTimestampMs, en segundos). |
+| `video:GetPlaySpeed()  -> number` | Alias de GetSpeed. |
+| `video:SetPlaySpeed(speed)  -> nil` | Alias de SetSpeed. |
 | `video:Dispose()  -> nil` | Libera el decodificador y su textura de fotograma. |
 
 ```lua

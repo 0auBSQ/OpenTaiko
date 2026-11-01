@@ -2,11 +2,11 @@
 
 # So funktionieren Module
 
-OpenTaiko 0.6.1 erlaubt es einem Skin, Bildschirme mit Lua hinzuzufügen und zu ersetzen. Der Modules-Ordner eines Skins enthält einen Ordner pro Modul, und jedes Modul besitzt eine Script.lua, die einen festen Satz globaler Callback-Funktionen definiert. Das Spiel lädt jede Script.lua in einen eigenen, abgeschotteten Lua-Zustand, registriert die globalen Objekte der Engine (TEXTURE, SOUND, INPUT, CONFIG und die weiteren, die in der [API-Referenz](api/README.md) dokumentiert sind) und ruft die Callbacks zum passenden Zeitpunkt auf. [Module und Lebenszyklus](api/activities.md) listet die genauen Signaturen auf.
+OpenTaiko 0.7.0 erlaubt es einem Skin, Bildschirme mit Lua hinzuzufügen und zu ersetzen. Der Modules-Ordner eines Skins enthält einen Ordner pro Modul, und jedes Modul besitzt eine Script.lua, die einen festen Satz globaler Callback-Funktionen definiert. Das Spiel lädt jede Script.lua in einen eigenen, abgeschotteten Lua-Zustand, registriert die globalen Objekte der Engine (TEXTURE, SOUND, INPUT, CONFIG und die weiteren, die in der [API-Referenz](api/README.md) dokumentiert sind) und ruft die Callbacks zum passenden Zeitpunkt auf. [Module und Lebenszyklus](api/activities.md) listet die genauen Signaturen auf.
 
 ## Bevor Sie beginnen
 
-- OpenTaiko 0.6.1 und ein Skin-Ordner mit einem Modules-Verzeichnis. Der mitgelieferte Skin ist System/Open-World Memories.
+- OpenTaiko 0.7.0 und ein Skin-Ordner mit einem Modules-Verzeichnis. Der mitgelieferte Skin ist System/Open-World Memories.
 - Ein Texteditor und Grundkenntnisse in Lua (Funktionen, Tabellen, require).
 - Die mitgelieferten Stages unter System/Open-World Memories/Modules/Stages und Global/Modules/Stages. Die kleinen Demos in Global/Modules/Stages/demo_overall zeigen die Form der Callbacks; die größeren Stages zeigen, wie echte Bildschirme aufgebaut sind.
 
@@ -70,7 +70,7 @@ end
 ## Der Lebenszyklus einer Stage
 
 - onStart(): Das Spiel ruft es einmal nach dem Laden des Skins auf und erneut nach jedem Neuladen des Skins, unabhängig davon, ob die Stage auf dem Bildschirm ist. Laden Sie hier Texturen, Sounds und Videos. Es läuft als Coroutine, sodass sich ein langer Ladevorgang mit dem Hilfsobjekt LOADING hinter dem Ladebalken auf mehrere Frames verteilen kann.
-- activate(): Das Spiel ruft es bei jedem Betreten der Stage auf. Setzen Sie hier den Zustand pro Besuch zurück, starten Sie Musik und öffnen Sie Datenbanken. Es läuft ebenfalls als Coroutine und kann LOADING verwenden. Das Spiel aktualisiert die Charakter- und Puchichara-Listen (CHARACTERLIST, PUCHICHARALIST) unmittelbar bevor activate läuft; lesen Sie sie also hier. onStart läuft vor dieser Aktualisierung.
+- activate(): Das Spiel ruft es bei jedem Betreten der Stage auf. Setzen Sie hier den Zustand pro Besuch zurück, starten Sie Musik und öffnen Sie Datenbanken. Es läuft ebenfalls als Coroutine und kann LOADING verwenden. Das Spiel aktualisiert die Charakter- und Puchichara-Listen (CHARACTERLIST, PUCHICHARALIST) unmittelbar bevor activate läuft und erneut vor afterSongEnum; lesen Sie sie also in einer der beiden Funktionen. onStart läuft vor der ersten Aktualisierung.
 - update(timestamp): Das Spiel ruft es jeden Frame vor draw auf und übergibt die Spieluhr in Millisekunden. Verarbeiten Sie hier Eingaben und ändern Sie den Zustand. Sobald die Stage Exit aufgerufen hat, ruft das Spiel update nicht mehr auf und ruft draw bis zum Ende des Ausblendens weiter auf.
 - draw(): Das Spiel ruft es jeden Frame auf. Zeichnen Sie nur, und halten Sie die Allokationen pro Frame gering.
 - deactivate(): Das Spiel ruft es beim Verlassen der Stage auf. Die Datenbank-Demo von demo_overall gibt hier ihre Datenbanken frei; seine erste Demo stoppt ihre Musik und ihr Video.
@@ -124,7 +124,20 @@ local Dialogue  = require("nokon_dialogue")           -- der Modulordner
 
 ## Schreibgeschützte Module
 
-Das Spiel erzeugt ROActivities und Hintergründe mit eingeschränkten globalen Objekten, bevor ihre Script.lua läuft: CONFIG ist eine schreibgeschützte Ansicht, GetSaveFile(player) liefert einen schreibgeschützten Spielstand, DATABASE öffnet schreibgeschützte Speicher, und ACTIVITY ist nil (verwenden Sie ROACTIVITY). Ein Schreibzugriff über eines dieser Objekte protokolliert eine Fehlerbenachrichtigung, tut nichts und löst keinen Lua-Fehler aus. Ein Modul, das Einstellungen, Spielstände oder eine Datenbank ändern muss, muss eine Activity oder eine Stage sein.
+Das Spiel erzeugt ROActivities und Hintergründe mit eingeschränkten globalen Objekten, bevor ihre Script.lua läuft. Ein Schreibzugriff über sie protokolliert eine Fehlerbenachrichtigung, tut nichts und löst keinen Lua-Fehler aus:
+
+- CONFIG ist eine schreibgeschützte Ansicht: Ihre Setter tun nichts.
+- GetSaveFile(player) liefert einen schreibgeschützten Spielstand.
+- DATABASE öffnet schreibgeschützte Speicher.
+- THEME:SetThemeSetting und THEME:SetThemeSettingForPlayer geben false zurück.
+- STORAGE:WriteText und STORAGE:WriteLobbyCode geben false zurück.
+- SQL:OpenSQLDatabase(path) öffnet die Datenbank schreibgeschützt: Lesen funktioniert, eine schreibende Anweisung schlägt fehl, protokolliert den SQLite-Fehler und liefert ein leeres Ergebnis, und eine fehlende Datenbankdatei wird nicht angelegt.
+- Die VIRTUALSLOTS-Setter und VIRTUALSLOTS:MountSlot tun nichts; die Getter funktionieren weiterhin.
+- DANBUILDER:Mount() gibt false zurück; der Builder lässt sich weiterhin befüllen.
+- Mount und MountIfNotLocked eines Song-Knotens sowie Select eines Charts geben false zurück, egal woher der Knoten stammt.
+- ACTIVITY ist nil (verwenden Sie ROACTIVITY).
+
+Ein Modul, das Einstellungen, Spielstände oder eine Datenbank ändern oder einen Song zum Spielen auswählen muss, muss eine Activity oder eine Stage sein.
 
 ## Lokalisierung mit lang/
 

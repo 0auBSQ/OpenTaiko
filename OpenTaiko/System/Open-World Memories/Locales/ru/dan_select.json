@@ -10,6 +10,10 @@
         "DANSELECT_EXIT": "Выход",
         "DANSELECT_CONFIRM": "Принять вызов?",
         "DANSELECT_NOT_RECORDED": "Не сохраняется",
-        "DANSELECT_NO_GRADE": "Не сохраняется, ранг дана не присваивается"
+        "DANSELECT_NO_GRADE": "Не сохраняется, ранг дана не присваивается",
+
+        // The standard dan list: the exam range labels
+        "DANSELECT_EXAM_MORE": "или больше",
+        "DANSELECT_EXAM_LESS": "меньше"
     }
 }

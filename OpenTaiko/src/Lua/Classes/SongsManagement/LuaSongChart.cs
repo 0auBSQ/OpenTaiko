@@ -191,10 +191,10 @@
 		}
 
 		/// <summary>Returns the per-song exam for a given song and exam slot.
-		/// Both <paramref name="songIdx"/> and <paramref name="examSlot"/> are 1-based.
+		/// <paramref name="songIdx"/> is 0-based, like the song list; <paramref name="examSlot"/> is 1-based, like the exam slots.
 		/// Returns an exam with IsSet=false when no per-song exam exists for that combination.</summary>
 		public LuaSongDanExam GetSongExam(int songIdx, int examSlot) {
-			int si = songIdx - 1;
+			int si = songIdx;
 			int ei = examSlot - 1;
 			var songs = _parentListNode?.DanSongs;
 			if (songs == null || si < 0 || si >= songs.Count) return new LuaSongDanExam(null);
@@ -228,6 +228,7 @@
 		public string UniqueId => _parentListNode?.uniqueId?.data.id ?? "";
 
 		public bool Select(int player) {
+			if (CLuaScript.BlockedInReadOnly("SongChart.Select")) return false;
 			if (!NotNull) return false;
 
 			// Player 0 owns the global song-selection state; always sync it so song loading

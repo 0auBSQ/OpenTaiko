@@ -55,7 +55,7 @@ end
 由 `SOUND` 工厂方法返回的可播放声音。
 
 <div class="callout warn">
-在音频流就绪之前，句柄会缓冲 Play 和所有 Set* 调用，getter 返回下面列出的默认值。音量是百分比（100 = 文件自身的电平）。声像从 -100（左）经 0（中）到 100（右）。位置和时长以毫秒计。Play 会从头重新开始播放流，因此请在调用 Play 之后再跳转。
+在音频流就绪之前，句柄会缓冲 Play 和所有 Set* 调用，getter 返回下面列出的默认值。音量是百分比（100 = 文件自身的电平）。声像从 -100（左）经 0（中）到 100（右）。位置和时长以毫秒计。Play 会从头重新开始播放流，因此请在调用 Play 之后再跳转。下面的别名是永久的：两个名称都受支持。
 </div>
 
 | 方法 | 说明 |
@@ -70,16 +70,16 @@ end
 | `sound:GetLoop()  -> bool` | 返回是否启用了循环。 |
 | `sound:SetVolumePercent(vol)  -> nil` | 以百分比设置音量。 |
 | `sound:GetVolumePercent()  -> number` | 返回百分比音量（未加载时为 100）。 |
-| `sound:SetVolume(vol)  -> nil` | SetVolumePercent 的旧名称（整数）。 |
+| `sound:SetVolume(vol)  -> nil` | SetVolumePercent 的别名（整数）。 |
 | `sound:SetPan(pan)  -> nil` | 设置立体声声像，-100..100。 |
 | `sound:GetPan()  -> int` | 返回当前声像（未加载时为 0）。 |
 | `sound:SetSpeed(speed)  -> nil` | 设置播放速度倍率（1 = 正常）。 |
 | `sound:GetSpeed()  -> number` | 返回播放速度倍率（未加载时为 1）。 |
 | `sound:SetTimestampMs(ms)  -> nil` | 跳转到以毫秒计的位置。 |
-| `sound:SetTimestamp(ms)  -> nil` | SetTimestampMs 的旧名称。 |
+| `sound:SetTimestamp(ms)  -> nil` | SetTimestampMs 的别名。 |
 | `sound:GetTimestampMs()  -> number` | 返回当前位置（毫秒）（未加载时为 0）。 |
 | `sound.DurationMs  -> number` | 总时长（毫秒）（未加载时为 0）。 |
-| `sound:GetDurationMs()  -> number` | DurationMs 的旧名称。 |
+| `sound:GetDurationMs()  -> number` | DurationMs 的别名。 |
 | `sound.Loaded  -> bool` | 渲染线程构建完音频流后为 true。 |
 | `sound.IsPlaying  -> bool` | 声音正在播放时为 true。 |
 | `sound:IsFinished()  -> bool` | 播放到达末尾后为 true（暂停或未加载时为 false）。 |

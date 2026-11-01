@@ -43,6 +43,9 @@
         "TITLE_PLAYERS_2": "2 Spelers",
         "TITLE_PLAYERS_3": "3 Spelers",
         "TITLE_PLAYERS_4": "4 Spelers",
-        "TITLE_PLAYERS_5": "5 Spelers"
+        "TITLE_PLAYERS_5": "5 Spelers",
+
+        // Boot screen
+        "BOOT_PRESS_ENTER": "Druk op Enter om te beginnen!"
     }
 }

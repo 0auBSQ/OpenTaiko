@@ -297,7 +297,7 @@ Pfade sind relativ zum Skriptverzeichnis. Der Decoder öffnet auf einem Hintergr
 Ein Video-Decoder, der von `VIDEO:CreateVideo` zurückgegeben wird.
 
 <div class="callout warn">
-Positionen sind in Millisekunden; Duration ist in Sekunden. Lesen Sie Texture jeden Frame, um das aktuelle Bild als Textur-Handle zu erhalten. Dieses Handle kapselt die eigene Bildtextur des Videos: Zeichnen Sie es und überlassen Sie die Freigabe dem Video-Handle. SetSpeed ignoriert Werte von 0 oder darunter.
+Positionen sind in Millisekunden; Duration ist in Sekunden. Lesen Sie Texture jeden Frame, um das aktuelle Bild als Textur-Handle zu erhalten. Dieses Handle kapselt die eigene Bildtextur des Videos: Zeichnen Sie es und überlassen Sie die Freigabe dem Video-Handle. SetSpeed ignoriert Werte von 0 oder darunter. Die Aliase unten sind dauerhaft: Beide Namen werden unterstützt, ebenso Duration und DurationMs.
 </div>
 
 | Methode | Beschreibung |
@@ -320,10 +320,10 @@ Positionen sind in Millisekunden; Duration ist in Sekunden. Lesen Sie Texture je
 | `video:SetTimestampMs(ms)  -> nil` | Springt zu einer Position in Millisekunden. |
 | `video:GetSpeed()  -> number` | Aktueller Geschwindigkeitsfaktor der Wiedergabe (1 = normal). |
 | `video:SetSpeed(speed)  -> nil` | Setzt den Geschwindigkeitsfaktor der Wiedergabe. |
-| `video:GetPlayPosition()  -> number` | Aktuelle Position in Sekunden (älterer Name für GetTimestampMs / 1000). |
-| `video:SetPlayPosition(seconds)  -> nil` | Springt zu einer Position in Sekunden (älterer Name für SetTimestampMs). |
-| `video:GetPlaySpeed()  -> number` | Älterer Name für GetSpeed. |
-| `video:SetPlaySpeed(speed)  -> nil` | Älterer Name für SetSpeed. |
+| `video:GetPlayPosition()  -> number` | Aktuelle Position in Sekunden (Alias von GetTimestampMs / 1000). |
+| `video:SetPlayPosition(seconds)  -> nil` | Springt zu einer Position in Sekunden (Alias von SetTimestampMs, in Sekunden). |
+| `video:GetPlaySpeed()  -> number` | Alias von GetSpeed. |
+| `video:SetPlaySpeed(speed)  -> nil` | Alias von SetSpeed. |
 | `video:Dispose()  -> nil` | Gibt den Decoder und seine Bildtextur frei. |
 
 ```lua

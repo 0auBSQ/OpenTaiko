@@ -4,7 +4,7 @@
 
 ## Calendar.almanac
 
-Datumsmuster für Ereignisse, die mit dem Kalender kommen und gehen: ein hervorgehobener Ladenartikel zu Weihnachten, eine Aprilscherz-Szene, ein monatlicher Bonus. Tage sind Tage der Japanischen Normalzeit (UTC+9), unabhängig von der Uhr des Spielers, sodass jeder Spieler denselben Tag sieht. Ein Muster kann als undurchsichtiges `enc:`-Token geschrieben werden, damit eine Überraschung nicht im Quelltext zu sehen ist.
+Datumsmuster für Ereignisse, die mit dem Kalender kommen und gehen: ein hervorgehobener Ladenartikel zu Weihnachten, ein Sommerereignis, ein monatlicher Bonus. Tage sind Tage der Japanischen Normalzeit (UTC+9), unabhängig von der Uhr des Spielers, sodass jeder Spieler denselben Tag sieht. Ein Muster kann als undurchsichtiges `enc:`-Token geschrieben werden, damit eine Überraschung nicht im Quelltext zu sehen ist.
 
 | Muster | Trifft zu auf |
 | --- | --- |

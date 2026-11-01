@@ -161,7 +161,7 @@ Le handle de liste de chansons, SONGMOUNT:ChosenSongNode() et DANBUILDER:GetSong
 | `node.IsLocked  (bool)` | Vrai quand cette chanson est actuellement verrouillée ; toujours false pour les non-chansons. |
 | `node.HiddenIndex  (int)` | L'état d'affichage du système de déblocage : 0 affichée, 1 grisée, 2 floutée, 3 masquée (0 pour les non-chansons). |
 | `node.Rarity  (string)` | Le libellé de rareté ; "Common" pour les chansons sans entrée de déblocage, "-" pour les non-chansons. |
-| `node:Mount(p1diff, p2diff, p3diff, p4diff, p5diff)  -> bool` | Sélectionne cette chanson pour la partie avec l'indice de difficulté donné par joueur (0 par défaut). Elle ne vérifie que les CONFIG.PlayerCount premiers indices et renvoie false si le nœud n'est pas une chanson ou si la difficulté d'un joueur actif est absente ou hors limites. |
+| `node:Mount(p1diff, p2diff, p3diff, p4diff, p5diff)  -> bool` | Sélectionne cette chanson pour la partie avec l'indice de difficulté donné par joueur (0 par défaut). Elle ne vérifie que les CONFIG.PlayerCount premiers indices et renvoie false si le nœud n'est pas une chanson ou si la difficulté d'un joueur actif est absente ou hors limites. Renvoie false dans un module en lecture seule. |
 | `node:MountIfNotLocked(p1diff, p2diff, p3diff, p4diff, p5diff)  -> bool` | Identique à Mount, mais renvoie false sans monter quand la chanson est verrouillée. |
 
 ### Partition
@@ -197,14 +197,14 @@ GetChart(diff) d'un nœud de chanson renvoie une partition. Les propriétés son
 | `chart.DanTickColor  (color)` | Couleur de graduation de la plaque de dan (blanc quand la partition n'a pas d'informations de partition). |
 | `chart.DanSongs  (array of dan songs)` | Les chansons qui composent cette partition Dan. |
 | `chart.DanExams  (array of dan exams)` | Les conditions d'examen globales de cette partition Dan. |
-| `chart:GetSongExam(songIdx, examSlot)  -> dan exam` | Renvoie l'examen par chanson pour l'indice de chanson (à partir de 1) et l'emplacement d'examen (à partir de 1) ; le résultat a IsSet = false quand il n'en existe aucun. |
+| `chart:GetSongExam(songIdx, examSlot)  -> dan exam` | Renvoie l'examen par chanson pour l'indice de chanson (à partir de 0) et l'emplacement d'examen (à partir de 1) ; le résultat a IsSet = false quand il n'en existe aucun ou qu'un indice est hors limites. |
 | `chart:GetPlayerBestScore(save)  -> best score info` | Renvoie le résumé de la meilleure partie du fichier de sauvegarde donné pour cette partition. |
 | `chart:GetCustomCommand(key)  -> string` | Renvoie la valeur d'une commande personnalisée de portée partition (un en-tête préfixé d'un point à l'intérieur de ce bloc COURSE ; la clé inclut le point), ou nil. |
 | `chart:GetCustomCommands()  -> dictionary` | Renvoie toutes les commandes personnalisées de portée partition sous forme d'objet dictionnaire C#. |
 | `chart.SongFolder  (string)` | Le dossier absolu contenant le fichier de partition. |
 | `chart.ChartPath  (string)` | Le chemin absolu du fichier de partition. |
 | `chart.UniqueId  (string)` | L'identifiant unique de la chanson, ou une chaîne vide. |
-| `chart:Select(player)  -> bool` | Marque cette partition comme la difficulté choisie pour le joueur donné ; le joueur 0 définit aussi la chanson choisie. Renvoie false quand la partition n'est pas valide. |
+| `chart:Select(player)  -> bool` | Marque cette partition comme la difficulté choisie pour le joueur donné ; le joueur 0 définit aussi la chanson choisie. Renvoie false quand la partition n'est pas valide ou dans un module en lecture seule. |
 
 ### Informations de meilleur score
 
@@ -263,15 +263,15 @@ Une condition de réussite/échec d'un parcours Dan.
 Globale permettant d'assembler en mémoire un parcours Dan à partir de nœuds de chanson, de difficultés et de conditions d'examen, puis de le monter pour la partie.
 
 <div class="callout warn">
-Disponible comme la globale DANBUILDER. Les indices de chanson et d'emplacement commencent à 1, sauf la difficulté passée à AddSong, qui est un indice de difficulté à partir de 0. Les emplacements d'examen vont de 1 à 7. Chaînes de type d'examen (insensibles à la casse, forme courte entre parenthèses) : "judgeperfect" (jp), "judgegood" (jg), "judgebad" (jb), "score" (s), "roll" (r), "hit" (h), "combo" (c), "accuracy" (a), "judgeadlib" (ja), "judgemine" (jm) ; toute autre chaîne signifie jauge. lessThan = true fait de l'examen une vérification "moins de", false une vérification "au moins". Le constructeur conserve son état entre les appels ; appelez Clear() avant de construire un nouveau parcours.
+Disponible comme la globale DANBUILDER. Les indices de chanson commencent à 0, comme toute liste de l'API, de même que la difficulté passée à AddSong. Les emplacements d'examen commencent à 1 et vont de 1 à 7, car les examens sont numérotés de EXAM1 à EXAM7. Chaînes de type d'examen (insensibles à la casse, forme courte entre parenthèses) : "judgeperfect" (jp), "judgegood" (jg), "judgebad" (jb), "score" (s), "roll" (r), "hit" (h), "combo" (c), "accuracy" (a), "judgeadlib" (ja), "judgemine" (jm) ; toute autre chaîne signifie jauge. lessThan = true fait de l'examen une vérification "moins de", false une vérification "au moins". Le constructeur conserve son état entre les appels ; appelez Clear() avant de construire un nouveau parcours.
 </div>
 
 | Méthode | Description |
 | --- | --- |
 | `DANBUILDER.SongCount  (int)` | Nombre de chansons ajoutées jusqu'ici. |
 | `DANBUILDER:AddSong(node, diff)  -> void` | Ajoute un nœud de chanson à l'indice de difficulté donné (à partir de 0). |
-| `DANBUILDER:GetSong(i)  -> song node` | Renvoie le nœud de chanson à l'indice i (à partir de 1), ou nil. |
-| `DANBUILDER:GetSongDiff(i)  -> int` | Renvoie l'indice de difficulté stocké pour la chanson à l'indice i (à partir de 1), ou -1. |
+| `DANBUILDER:GetSong(i)  -> song node` | Renvoie le nœud de chanson à l'indice i (à partir de 0), ou nil. |
+| `DANBUILDER:GetSongDiff(i)  -> int` | Renvoie l'indice de difficulté stocké pour la chanson à l'indice i (à partir de 0), ou -1. |
 | `DANBUILDER:SetTitle(title)  -> void` | Définit le titre du parcours ("Dynamic Dan" par défaut). |
 | `DANBUILDER:SetSubtitle(subtitle)  -> void` | Définit le sous-titre du parcours. |
 | `DANBUILDER:SetDanTick(tick)  -> void` | Définit la valeur de graduation de la plaque de dan (2 par défaut). |
@@ -279,9 +279,9 @@ Disponible comme la globale DANBUILDER. Les indices de chanson et d'emplacement 
 | `DANBUILDER:SetGenreTitle(title)  -> void` | Définit le texte de la plaque de genre pendant la partie. Par défaut, la plaque affiche le dossier de genre de la chanson jouée. |
 | `DANBUILDER:SetGenreColor(r, g, b)  -> void` | Définit la couleur de la plaque de genre à partir de composantes 0-255. Par défaut, la plaque prend la couleur du dossier de genre qu'elle affiche, ou le blanc si SetGenreTitle a défini le texte. |
 | `DANBUILDER:SetGlobalExam(slot, type, red, gold, lessThan)  -> void` | Définit un examen à l'échelle du parcours dans l'emplacement donné. |
-| `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | Définit un examen qui s'applique à une seule chanson, par indice de chanson (à partir de 1) et emplacement. |
+| `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | Définit un examen qui s'applique à une seule chanson, par indice de chanson (à partir de 0) et emplacement (à partir de 1). Des indices hors limites ne font rien. |
 | `DANBUILDER:Clear()  -> void` | Retire toutes les chansons et tous les examens et remet les métadonnées à leurs valeurs par défaut. |
-| `DANBUILDER:Mount()  -> bool` | Construit la partition du parcours en mémoire et la sélectionne pour la partie à la difficulté Dan pour le joueur 1 ; renvoie false si le constructeur ne contient aucune chanson ou si la construction a échoué. |
+| `DANBUILDER:Mount()  -> bool` | Construit la partition du parcours en mémoire et la sélectionne pour la partie à la difficulté Dan pour le joueur 1 ; renvoie false si le constructeur ne contient aucune chanson ou si la construction a échoué, et toujours dans un module en lecture seule. |
 
 ```lua
 DANBUILDER:Clear()
@@ -289,7 +289,7 @@ DANBUILDER:SetTitle("Custom course")
 DANBUILDER:AddSong(list:GetSongByUniqueId(id1), 3)
 DANBUILDER:AddSong(list:GetSongByUniqueId(id2), 3)
 DANBUILDER:SetGlobalExam(1, "gauge", 90, 100, false)
-DANBUILDER:SetPerSongExam(2, 2, "judgebad", 10, 5, true)
+DANBUILDER:SetPerSongExam(1, 2, "judgebad", 10, 5, true)
 if DANBUILDER:Mount() then
     return Exit("play")
 end
@@ -319,7 +319,7 @@ node.UnlockCondition renvoie cet objet. HasCondition est une propriété ; le r
 Globale permettant de lire et d'écrire les cinq emplacements de personnage virtuels (V1-V5) et de rediriger un spot de joueur pour afficher les visuels d'un emplacement.
 
 <div class="callout warn">
-Disponible comme la globale VIRTUALSLOTS. Les indices d'emplacement vont de 1 à 5 ; les mutateurs ignorent les indices hors limites et les accesseurs renvoient les valeurs par défaut pour ceux-ci. Ces méthodes n'écrivent rien sur le disque. Le moteur gère l'emplacement IA, que cette globale ne peut pas modifier.
+Disponible comme la globale VIRTUALSLOTS. Les indices d'emplacement vont de 1 à 5 ; les mutateurs ignorent les indices hors limites et les accesseurs renvoient les valeurs par défaut pour ceux-ci. Ces méthodes n'écrivent rien sur le disque. Le moteur gère l'emplacement IA, que cette globale ne peut pas modifier. Dans un module en lecture seule, les mutateurs et MountSlot journalisent une erreur et ne font rien ; les accesseurs fonctionnent toujours.
 </div>
 
 | Méthode | Description |

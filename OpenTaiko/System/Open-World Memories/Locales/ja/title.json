@@ -43,6 +43,9 @@
         "TITLE_PLAYERS_2": "2人プレイ",
         "TITLE_PLAYERS_3": "3人プレイ",
         "TITLE_PLAYERS_4": "4人プレイ",
-        "TITLE_PLAYERS_5": "5人プレイ"
+        "TITLE_PLAYERS_5": "5人プレイ",
+
+        // Boot screen
+        "BOOT_PRESS_ENTER": "Enterキーでスタート！"
     }
 }

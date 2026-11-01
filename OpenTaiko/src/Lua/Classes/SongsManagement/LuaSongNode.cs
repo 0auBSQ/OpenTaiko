@@ -453,6 +453,7 @@
 
 		// Mount the song node so it gets played when transitioning to the gameplay screen
 		public bool Mount(int p1diff = 0, int p2diff = 0, int p3diff = 0, int p4diff = 0, int p5diff = 0) {
+			if (CLuaScript.BlockedInReadOnly("SongNode.Mount")) return false;
 			if (!IsSong || _node == null) return false;
 
 			int[] diffs = { p1diff, p2diff, p3diff, p4diff, p5diff };

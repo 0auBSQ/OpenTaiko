@@ -4,7 +4,7 @@
 
 Save files, nameplates, characters, puchicharas, play state, themes and the current language.
 
-Player indices are 0-based (0 to 4) everywhere on this page except THEME:GetThemeSettingForPlayer, which is 1-based. Read-only modules (ROActivities and backgrounds) receive a save-file handle whose write methods log an error and do nothing; everything else here behaves the same in every module type.
+Player indices are 0-based (0 to 4) everywhere on this page. Read-only modules (ROActivities and backgrounds) receive a save-file handle whose write methods log an error and do nothing, and their THEME setters log an error and return false; everything else here behaves the same in every module type.
 
 ## Save files
 
@@ -462,16 +462,16 @@ The UnlockCondition property of nameplate info handles, character list entries a
 The skin's resolution, theme settings, skin-scoped localized strings and the theme-setting definitions.
 
 <div class="callout warn">
-The skin declares theme settings in ThemeSettings.json and stores their values in ThemeSettings.db3 next to it. The getters always return setting values as strings; a missing setting returns its declared default, or an empty string if no declaration exists. GetThemeSettingForPlayer takes a 1-based player number. Definition indices are 0-based.
+The skin declares theme settings in ThemeSettings.json and stores their values in ThemeSettings.db3 next to it. The getters always return setting values as strings; a missing setting returns its declared default, or an empty string if no declaration exists. The ForPlayer methods clamp an out-of-range player to 0 or 4. Definition indices are 0-based.
 </div>
 
 | Method | Description |
 | --- | --- |
 | `THEME:GetResolution()  -> vector2` | The skin's resolution. |
 | `THEME:GetThemeSetting(settingId)  -> string` | Value of a global-scope setting. |
-| `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | Value of a save-scope setting for the 1-based player, or its default if the save has no value. |
-| `THEME:SetThemeSetting(settingId, value)  -> bool` | Writes a global-scope setting declared in ThemeSettings.json (a session setting is only kept for this run); false for an unknown id. |
-| `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | Writes a save-scope setting for the 1-based player; false for an unknown id. |
+| `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | Value of a save-scope setting for the player, or its default if the save has no value. |
+| `THEME:SetThemeSetting(settingId, value)  -> bool` | Writes a global-scope setting declared in ThemeSettings.json (a session setting is only kept for this run); false for an unknown id or in a read-only module. |
+| `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | Writes a save-scope setting for the player; false for an unknown id or in a read-only module. |
 | `THEME:GetNotesSkinFile(kind, file)  -> string` | Path of a file of the selected pack of `kind` (`"taiko"`, `"bongo"` or `"judges"`), relative to the skin's Graphics folder, taken from pack 1 when the selected pack lacks it; an empty string when the skin has no such pack or file. See [Adding notes and judges packs](../guides/notes-skins.md). |
 | `THEME:GetSkinString(key)  -> string` | Localized string from the skin's Locales folder: current language first, then the skin's default locale, then `[LOCALE NOT FOUND: key]`. |
 | `THEME:GetDefinitionCount()  -> integer` | Number of setting definitions in ThemeSettings.json. |
@@ -490,7 +490,7 @@ GetString formats the entry with any extra arguments. GetLanguageIds and GetLang
 | Method | Description |
 | --- | --- |
 | `LANG:GetString(key, ...)  -> string` | The localized string for a key, with format placeholders filled from the extra arguments. |
-| `LANG:ChangeLanguage(id)  -> bool` | Switches the active language if the id exists and differs from the current one, then calls `reloadLanguage` on every loaded script; returns whether it switched. It leaves CONFIG.Language unchanged. |
+| `LANG:ChangeLanguage(id)  -> bool` | Switches the active language if the id exists and differs from the current one: sets CONFIG.Language to the id first (the game saves it to Config.ini when it closes), then calls `reloadLanguage` on every loaded script; returns whether it switched. |
 | `LANG:GetLanguageIds()  -> string[]` | Ids of the available languages. |
 | `LANG:GetLanguageId()  -> string` | Id of the language in use. |
 | `LANG:GetLanguageNames()  -> string[]` | Display names of the available languages, in the same order. |

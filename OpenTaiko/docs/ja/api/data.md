@@ -73,7 +73,7 @@ SQL 文を実行するために、モジュールディレクトリ内の SQLite
 
 | メソッド | 説明 |
 | --- | --- |
-| `SQL:OpenSQLDatabase(path)  -> sql` | モジュールディレクトリからの相対パスにある SQLite データベースを開きます。 |
+| `SQL:OpenSQLDatabase(path)  -> sql` | モジュールディレクトリからの相対パスにある SQLite データベースを開きます。読み取り専用モジュールでは接続も読み取り専用です。読み取りは動作し、書き込む文は失敗して空の結果を返し、存在しないファイルは作成されません。 |
 
 ### SQL ハンドル
 
@@ -106,7 +106,7 @@ end
 モジュールディレクトリを起点とするファイルアクセスと、オンラインロビーコードを共有するためのヘルパーです。
 
 <div class="callout warn">
-WriteText はモジュールフォルダ内にのみ書き込みます。絶対パスと、フォルダの外に解決されるパスを拒否します。ReadText は絶対パスも受け付けます。ロビーコードのヘルパーは実行ファイルの隣の共有 `Global/Lobbycodes/` フォルダを使います。読み取り専用モジュールも STORAGE のすべてのメソッドを使えます。
+WriteText はモジュールフォルダ内にのみ書き込みます。絶対パスと、フォルダの外に解決されるパスを拒否します。ReadText は絶対パスも受け付けます。ロビーコードのヘルパーは実行ファイルの隣の共有 `Global/Lobbycodes/` フォルダを使います。読み取り専用モジュールでは WriteText と WriteLobbyCode がエラーをログに出力して false を返します。その他のメソッドは動作します。
 </div>
 
 | メソッド | 説明 |
@@ -290,6 +290,7 @@ CONFIG の定数テーブルは上記の整数値に名前を与えます。`SON
 | `CONFIG.STEALTH` | `Off`、`Doron`、`Stealth`、`Hidden`、`Flashlight`。 |
 | `CONFIG.FUN` | `None`、`Avalanche`、`Minesweeper`、`DynamicBeat`、`Total`。 |
 | `CONFIG.JUSTICE` | `None`、`Just`、`Safe`。 |
+| `CONFIG.TIMINGZONE` | `Loose` (-2)、`Lenient` (-1)、`Normal` (0)、`Strict` (1)、`Rigorous` (2)。Normal からの差です。GetTimingZone と SetTimingZone は 0..4 を使うので、定数とは `CONFIG:GetTimingZone(player) - 2` を比較し、SetTimingZone には定数 + 2 を渡します。 |
 
 ```lua
 local multiplier = CONFIG.SONGSPEED:ToActual(CONFIG.SongSpeed)

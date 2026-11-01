@@ -1,9 +1,12 @@
 namespace OpenTaiko {
 	public class LuaStorageFunc {
 		private string DirPath;
+		// false in read-only modules: the writes then log an error and write nothing
+		private readonly bool _writable;
 
-		public LuaStorageFunc(string dirPath) {
+		public LuaStorageFunc(string dirPath, bool writable = true) {
 			DirPath = dirPath;
+			_writable = writable;
 		}
 
 		public string[] GetFiles(string dir, string ext) {
@@ -31,6 +34,7 @@ namespace OpenTaiko {
 		/// <summary>Write text to a file under the stage directory (creating subdirectories as needed). Rejects
 		/// absolute paths and ".." traversal so a stage can only write inside its own folder. Returns true on success.</summary>
 		public bool WriteText(string name, string contents) {
+			if (!_writable) { CLuaScript.BlockWrite("STORAGE.WriteText"); return false; }
 			if (string.IsNullOrEmpty(name) || Path.IsPathRooted(name)) return false;
 			string fullPath = Path.GetFullPath(Path.Combine(DirPath, name));
 			string root = Path.GetFullPath(DirPath);
@@ -62,6 +66,7 @@ namespace OpenTaiko {
 		/// <summary>Write a lobby code to <exe>/Global/Lobbycodes/&lt;name&gt;. Access is limited to that subfolder
 		/// (rooted paths / ".." rejected). Returns true on success.</summary>
 		public bool WriteLobbyCode(string name, string contents) {
+			if (!_writable) { CLuaScript.BlockWrite("STORAGE.WriteLobbyCode"); return false; }
 			if (string.IsNullOrEmpty(name) || Path.IsPathRooted(name) || name.Contains("..")) return false;
 			try {
 				string dir = LobbyCodesDir();

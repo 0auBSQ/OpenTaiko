@@ -73,7 +73,7 @@ end
 
 | 方法 | 说明 |
 | --- | --- |
-| `SQL:OpenSQLDatabase(path)  -> sql` | 在相对于模块目录的路径上打开一个 SQLite 数据库。 |
+| `SQL:OpenSQLDatabase(path)  -> sql` | 在相对于模块目录的路径上打开一个 SQLite 数据库。在只读模块中连接也是只读的：读取正常，写入的语句会失败并返回空结果，缺失的文件不会被创建。 |
 
 ### SQL 句柄
 
@@ -106,7 +106,7 @@ end
 以模块目录为根的文件访问，以及用于分享在线大厅码的辅助方法。
 
 <div class="callout warn">
-WriteText 只在模块文件夹内写入：它拒绝绝对路径和解析到文件夹之外的路径。ReadText 也接受绝对路径。大厅码辅助方法使用可执行文件旁的共享 `Global/Lobbycodes/` 文件夹。只读模块可以使用 STORAGE 的每一个方法。
+WriteText 只在模块文件夹内写入：它拒绝绝对路径和解析到文件夹之外的路径。ReadText 也接受绝对路径。大厅码辅助方法使用可执行文件旁的共享 `Global/Lobbycodes/` 文件夹。在只读模块中，WriteText 和 WriteLobbyCode 会记录一条错误并返回 false；其他方法正常工作。
 </div>
 
 | 方法 | 说明 |
@@ -290,6 +290,7 @@ CONFIG 上的常量表为上述整数值提供名称。`SONGSPEED` 和 `SCROLLSP
 | `CONFIG.STEALTH` | `Off`、`Doron`、`Stealth`、`Hidden`、`Flashlight`。 |
 | `CONFIG.FUN` | `None`、`Avalanche`、`Minesweeper`、`DynamicBeat`、`Total`。 |
 | `CONFIG.JUSTICE` | `None`、`Just`、`Safe`。 |
+| `CONFIG.TIMINGZONE` | `Loose`（-2）、`Lenient`（-1）、`Normal`（0）、`Strict`（1）、`Rigorous`（2）：相对 Normal 的偏移。GetTimingZone 和 SetTimingZone 使用 0..4，因此请用 `CONFIG:GetTimingZone(player) - 2` 与常量比较，并向 SetTimingZone 传入常量 + 2。 |
 
 ```lua
 local multiplier = CONFIG.SONGSPEED:ToActual(CONFIG.SongSpeed)

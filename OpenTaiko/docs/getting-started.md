@@ -2,11 +2,11 @@
 
 # How modules work
 
-OpenTaiko 0.6.1 lets a skin add and replace screens with Lua. A skin's Modules folder holds one folder per module, and each module has a Script.lua that defines a fixed set of global callback functions. The game loads every Script.lua into its own sandboxed Lua state, registers the engine globals (TEXTURE, SOUND, INPUT, CONFIG and the others documented in the [API reference](api/README.md)), and calls the callbacks at the right time. [Modules and lifecycle](api/activities.md) lists the exact signatures.
+OpenTaiko 0.7.0 lets a skin add and replace screens with Lua. A skin's Modules folder holds one folder per module, and each module has a Script.lua that defines a fixed set of global callback functions. The game loads every Script.lua into its own sandboxed Lua state, registers the engine globals (TEXTURE, SOUND, INPUT, CONFIG and the others documented in the [API reference](api/README.md)), and calls the callbacks at the right time. [Modules and lifecycle](api/activities.md) lists the exact signatures.
 
 ## Before you start
 
-- OpenTaiko 0.6.1 and a skin folder with a Modules directory. The bundled skin is System/Open-World Memories.
+- OpenTaiko 0.7.0 and a skin folder with a Modules directory. The bundled skin is System/Open-World Memories.
 - A text editor and basic Lua (functions, tables, require).
 - The bundled stages under System/Open-World Memories/Modules/Stages and Global/Modules/Stages. The small demos in Global/Modules/Stages/demo_overall show the callback shape; the larger stages show how real screens are organized.
 
@@ -70,7 +70,7 @@ end
 ## The stage lifecycle
 
 - onStart(): the game calls it once after the skin loads, and again after every skin reload, whether or not the stage is on screen. Load textures, sounds and videos here. It runs as a coroutine, so a long load can spread across frames behind the loading bar with the LOADING helper.
-- activate(): the game calls it on every entry into the stage. Reset per-visit state, start music and open databases here. It also runs as a coroutine and can use LOADING. The game refreshes the character and puchichara lists (CHARACTERLIST, PUCHICHARALIST) right before activate runs, so read them here; onStart runs before that refresh.
+- activate(): the game calls it on every entry into the stage. Reset per-visit state, start music and open databases here. It also runs as a coroutine and can use LOADING. The game refreshes the character and puchichara lists (CHARACTERLIST, PUCHICHARALIST) right before activate runs, and again before afterSongEnum, so read them in either; onStart runs before the first refresh.
 - update(timestamp): the game calls it every frame before draw and passes the game clock in milliseconds. Handle input and change state here. Once the stage has called Exit, the game stops calling update and keeps calling draw through the fade-out.
 - draw(): the game calls it every frame. Draw only, and keep per-frame allocations low.
 - deactivate(): the game calls it when leaving the stage. demo_overall's database demo disposes its databases here; its first demo stops its music and video.
@@ -124,7 +124,20 @@ local Dialogue  = require("nokon_dialogue")           -- the module folder
 
 ## Read-only modules
 
-The game creates ROActivities and backgrounds with restricted globals before their Script.lua runs: CONFIG is a read-only view, GetSaveFile(player) returns a read-only save file, DATABASE opens read-only stores, and ACTIVITY is nil (use ROACTIVITY). A write through any of these logs an error notification, does nothing, and raises no Lua error. A module that needs to change settings, save data or a database must be an Activity or a Stage.
+The game creates ROActivities and backgrounds with restricted globals before their Script.lua runs. A write through them logs an error notification, does nothing, and raises no Lua error:
+
+- CONFIG is a read-only view: its setters do nothing.
+- GetSaveFile(player) returns a read-only save file.
+- DATABASE opens read-only stores.
+- THEME:SetThemeSetting and THEME:SetThemeSettingForPlayer return false.
+- STORAGE:WriteText and STORAGE:WriteLobbyCode return false.
+- SQL:OpenSQLDatabase(path) opens the database read-only: reads work, a statement that writes fails, logs the SQLite error and returns an empty result, and a missing database file is not created.
+- The VIRTUALSLOTS setters and VIRTUALSLOTS:MountSlot do nothing; the getters still work.
+- DANBUILDER:Mount() returns false; the builder can still be filled.
+- A song node's Mount and MountIfNotLocked and a chart's Select return false, wherever the node came from.
+- ACTIVITY is nil (use ROACTIVITY).
+
+A module that needs to change settings, save data or a database, or to choose a song to play, must be an Activity or a Stage.
 
 ## Localization with lang/
 

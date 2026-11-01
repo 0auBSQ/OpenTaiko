@@ -1,5 +1,6 @@
 {
   "_comment": "화면 조작 안내, 상호작용 프롬프트, 방 선택기(Script.lua)의 한국어 텍스트. 키는 고정 ID이며, 없는 ID는 영어 텍스트(lang/en)로 표시됩니다.",
+  "title": "마이 룸",
   "ctl_move": "WASD — 이동",
   "ctl_orbit": "우클릭 / Q·E — 시점 회전",
   "ctl_zoom": "휠 — 확대/축소",

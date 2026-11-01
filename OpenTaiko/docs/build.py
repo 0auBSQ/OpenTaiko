@@ -18,7 +18,7 @@ A page missing in a language falls back to English in the viewer, so translation
 import io, json, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-VERSION = "0.6.1"
+VERSION = "0.7.0"
 NAME = "OpenTaiko Documentation"
 HOME = "README"
 LANGS = [

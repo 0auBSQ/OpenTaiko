@@ -55,7 +55,7 @@ end
 Un sonido reproducible devuelto por los métodos de fábrica de `SOUND`.
 
 <div class="callout warn">
-Hasta que el flujo está listo, el handle almacena Play y todas las llamadas Set*, y los getters devuelven los valores por defecto listados abajo. El volumen es un porcentaje (100 = el nivel propio del archivo). El paneo va de -100 (izquierda) pasando por 0 (centro) hasta 100 (derecha). Las posiciones y duraciones están en milisegundos. Play reinicia el flujo desde el principio, así que busca la posición después de llamar a Play.
+Hasta que el flujo está listo, el handle almacena Play y todas las llamadas Set*, y los getters devuelven los valores por defecto listados abajo. El volumen es un porcentaje (100 = el nivel propio del archivo). El paneo va de -100 (izquierda) pasando por 0 (centro) hasta 100 (derecha). Las posiciones y duraciones están en milisegundos. Play reinicia el flujo desde el principio, así que busca la posición después de llamar a Play. Los alias de abajo son permanentes: se admiten ambos nombres.
 </div>
 
 | Método | Descripción |
@@ -70,16 +70,16 @@ Hasta que el flujo está listo, el handle almacena Play y todas las llamadas Set
 | `sound:GetLoop()  -> bool` | Devuelve si la repetición está activada. |
 | `sound:SetVolumePercent(vol)  -> nil` | Establece el volumen en porcentaje. |
 | `sound:GetVolumePercent()  -> number` | Devuelve el volumen en porcentaje (100 cuando no está cargado). |
-| `sound:SetVolume(vol)  -> nil` | Nombre antiguo de SetVolumePercent (entero). |
+| `sound:SetVolume(vol)  -> nil` | Alias de SetVolumePercent (entero). |
 | `sound:SetPan(pan)  -> nil` | Establece el paneo estéreo, -100..100. |
 | `sound:GetPan()  -> int` | Devuelve el paneo actual (0 cuando no está cargado). |
 | `sound:SetSpeed(speed)  -> nil` | Establece el multiplicador de velocidad de reproducción (1 = normal). |
 | `sound:GetSpeed()  -> number` | Devuelve el multiplicador de velocidad de reproducción (1 cuando no está cargado). |
 | `sound:SetTimestampMs(ms)  -> nil` | Salta a una posición en milisegundos. |
-| `sound:SetTimestamp(ms)  -> nil` | Nombre antiguo de SetTimestampMs. |
+| `sound:SetTimestamp(ms)  -> nil` | Alias de SetTimestampMs. |
 | `sound:GetTimestampMs()  -> number` | Devuelve la posición actual en milisegundos (0 cuando no está cargado). |
 | `sound.DurationMs  -> number` | Duración total en milisegundos (0 cuando no está cargado). |
-| `sound:GetDurationMs()  -> number` | Nombre antiguo de DurationMs. |
+| `sound:GetDurationMs()  -> number` | Alias de DurationMs. |
 | `sound.Loaded  -> bool` | Verdadero una vez que el hilo de renderizado ha construido el flujo. |
 | `sound.IsPlaying  -> bool` | Verdadero mientras el sonido se está reproduciendo. |
 | `sound:IsFinished()  -> bool` | Verdadero una vez que la reproducción ha llegado al final (falso mientras está en pausa o no cargado). |

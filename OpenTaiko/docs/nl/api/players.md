@@ -4,7 +4,7 @@
 
 Opslagbestanden, naamplaatjes, personages, puchichara's, spelstatus, thema's en de huidige taal.
 
-Spelerindices beginnen overal op deze pagina bij 0 (0 tot 4), behalve bij THEME:GetThemeSettingForPlayer, dat bij 1 begint. Alleen-lezen modules (ROActivities en achtergronden) ontvangen een opslagbestand-handle waarvan de schrijfmethoden een fout loggen en niets doen; al het andere hier gedraagt zich in elk moduletype hetzelfde.
+Spelerindices beginnen overal op deze pagina bij 0 (0 tot 4). Alleen-lezen modules (ROActivities en achtergronden) ontvangen een opslagbestand-handle waarvan de schrijfmethoden een fout loggen en niets doen, en hun THEME-setters loggen een fout en geven false terug; al het andere hier gedraagt zich in elk moduletype hetzelfde.
 
 ## Opslagbestanden
 
@@ -462,16 +462,16 @@ De eigenschap UnlockCondition van naamplaatje-info-handles, personagelijstitems 
 De resolutie van de skin, thema-instellingen, gelokaliseerde strings op skinniveau en de definities van thema-instellingen.
 
 <div class="callout warn">
-De skin declareert thema-instellingen in ThemeSettings.json en slaat hun waarden op in de ThemeSettings.db3 ernaast. De getters geven instellingswaarden altijd als strings terug; een ontbrekende instelling geeft haar gedeclareerde standaardwaarde terug, of een lege string als er geen declaratie bestaat. GetThemeSettingForPlayer neemt een 1-gebaseerd spelernummer. Definitie-indices beginnen bij 0.
+De skin declareert thema-instellingen in ThemeSettings.json en slaat hun waarden op in de ThemeSettings.db3 ernaast. De getters geven instellingswaarden altijd als strings terug; een ontbrekende instelling geeft haar gedeclareerde standaardwaarde terug, of een lege string als er geen declaratie bestaat. De ForPlayer-methoden zetten een speler buiten bereik op 0 of 4. Definitie-indices beginnen bij 0.
 </div>
 
 | Methode | Beschrijving |
 | --- | --- |
 | `THEME:GetResolution()  -> vector2` | De resolutie van de skin. |
 | `THEME:GetThemeSetting(settingId)  -> string` | Waarde van een instelling met globale scope. |
-| `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | Waarde van een instelling met save-scope voor de 1-gebaseerde speler, of haar standaardwaarde als het opslagbestand geen waarde heeft. |
-| `THEME:SetThemeSetting(settingId, value)  -> bool` | Schrijft een in ThemeSettings.json gedeclareerde globale instelling (een sessie-instelling blijft alleen voor deze run bewaard); false bij een onbekend id. |
-| `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | Schrijft een save-gebonden instelling voor de 1-gebaseerde speler; false bij een onbekend id. |
+| `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | Waarde van een instelling met save-scope voor de speler, of haar standaardwaarde als het opslagbestand geen waarde heeft. |
+| `THEME:SetThemeSetting(settingId, value)  -> bool` | Schrijft een in ThemeSettings.json gedeclareerde globale instelling (een sessie-instelling blijft alleen voor deze run bewaard); false bij een onbekend id of in een alleen-lezen module. |
+| `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | Schrijft een save-gebonden instelling voor de speler; false bij een onbekend id of in een alleen-lezen module. |
 | `THEME:GetNotesSkinFile(kind, file)  -> string` | Pad van een bestand van het geselecteerde pakket van `kind` (`"taiko"`, `"bongo"` of `"judges"`), relatief ten opzichte van de map Graphics van de skin, genomen uit pakket 1 wanneer het geselecteerde pakket het mist; een lege string wanneer de skin zo'n pakket of bestand niet heeft. Zie [Noten- en beoordelingspakketten toevoegen](../guides/notes-skins.md). |
 | `THEME:GetSkinString(key)  -> string` | Gelokaliseerde string uit de map Locales van de skin: eerst de huidige taal, dan de standaardlocale van de skin, dan `[LOCALE NOT FOUND: key]`. |
 | `THEME:GetDefinitionCount()  -> integer` | Aantal instellingsdefinities in ThemeSettings.json. |
@@ -490,7 +490,7 @@ GetString formatteert het item met eventuele extra argumenten. GetLanguageIds en
 | Methode | Beschrijving |
 | --- | --- |
 | `LANG:GetString(key, ...)  -> string` | De gelokaliseerde string voor een sleutel, met formatplaceholders ingevuld vanuit de extra argumenten. |
-| `LANG:ChangeLanguage(id)  -> bool` | Wisselt de actieve taal als het id bestaat en verschilt van de huidige, en roept daarna `reloadLanguage` aan op elk geladen script; geeft terug of er is gewisseld. Het laat CONFIG.Language ongewijzigd. |
+| `LANG:ChangeLanguage(id)  -> bool` | Wisselt de actieve taal als het id bestaat en verschilt van de huidige: zet eerst CONFIG.Language op dat id (het spel slaat het bij het afsluiten op in Config.ini) en roept daarna `reloadLanguage` aan op elk geladen script; geeft terug of er is gewisseld. |
 | `LANG:GetLanguageIds()  -> string[]` | Id's van de beschikbare talen. |
 | `LANG:GetLanguageId()  -> string` | Id van de gebruikte taal. |
 | `LANG:GetLanguageNames()  -> string[]` | Weergavenamen van de beschikbare talen, in dezelfde volgorde. |

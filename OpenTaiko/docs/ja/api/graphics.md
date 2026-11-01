@@ -297,7 +297,7 @@ end
 `VIDEO:CreateVideo` が返す動画デコーダです。
 
 <div class="callout warn">
-位置はミリ秒、Duration は秒です。現在のフレームをテクスチャハンドルとして得るには毎フレーム Texture を読みます。そのハンドルは動画自身のフレームテクスチャをラップしています。描画に使い、破棄は動画ハンドルに任せてください。SetSpeed は 0 以下の値を無視します。
+位置はミリ秒、Duration は秒です。現在のフレームをテクスチャハンドルとして得るには毎フレーム Texture を読みます。そのハンドルは動画自身のフレームテクスチャをラップしています。描画に使い、破棄は動画ハンドルに任せてください。SetSpeed は 0 以下の値を無視します。下の別名は恒久的なもので、どちらの名前も使えます。Duration と DurationMs も同様です。
 </div>
 
 | メソッド | 説明 |
@@ -320,10 +320,10 @@ end
 | `video:SetTimestampMs(ms)  -> nil` | ミリ秒単位の位置にシークします。 |
 | `video:GetSpeed()  -> number` | 現在の再生速度の倍率 (1 = 通常)。 |
 | `video:SetSpeed(speed)  -> nil` | 再生速度の倍率を設定します。 |
-| `video:GetPlayPosition()  -> number` | 現在の位置 (秒) (GetTimestampMs / 1000 の古い名前)。 |
-| `video:SetPlayPosition(seconds)  -> nil` | 秒単位の位置にシークします (SetTimestampMs の古い名前)。 |
-| `video:GetPlaySpeed()  -> number` | GetSpeed の古い名前。 |
-| `video:SetPlaySpeed(speed)  -> nil` | SetSpeed の古い名前。 |
+| `video:GetPlayPosition()  -> number` | 現在の位置 (秒) (GetTimestampMs / 1000 の別名)。 |
+| `video:SetPlayPosition(seconds)  -> nil` | 秒単位の位置にシークします (秒単位の SetTimestampMs の別名)。 |
+| `video:GetPlaySpeed()  -> number` | GetSpeed の別名。 |
+| `video:SetPlaySpeed(speed)  -> nil` | SetSpeed の別名。 |
 | `video:Dispose()  -> nil` | デコーダとそのフレームテクスチャを解放します。 |
 
 ```lua

@@ -87,7 +87,10 @@ namespace OpenTaiko {
 		// counts the sessions of this instance (raised by Leave): a worker of an earlier room holds an older number
 		private int _session;
 
-		public LuaNetworking() { KickDiscovery(); }   // public IP + UPnP lookup, once per process
+		// public IP + UPnP lookup, once per process, only when online connections are allowed
+		public LuaNetworking() {
+			if (OpenTaiko.ConfigIni?.bAllowLuaNetworkingConnections == true) KickDiscovery();
+		}
 
 		private readonly List<int> _mappedPorts = new();   // ports we asked the router to forward → undone on Leave
 		private int Port => PortOverride > 0 ? PortOverride : DEFAULT_PORT;

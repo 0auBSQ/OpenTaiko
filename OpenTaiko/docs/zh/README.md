@@ -2,9 +2,7 @@
 
 # OpenTaiko 文档
 
-<span class="badge-new">游戏版本 0.6.1</span>
-
-<div class="callout warn">本文档仍在审阅中，在发布之前可能会有所变动。</div>
+<span class="badge-new">游戏版本 0.7.0</span>
 
 OpenTaiko 中除核心演奏之外的几乎每一个界面都由随皮肤一起发布的 Lua 脚本绘制：菜单、选曲界面、房间与剧情场景、背景，以及结算界面。本站记录这些脚本所使用的 Lua API，并逐步讲解皮肤作者最常见的需求。
 

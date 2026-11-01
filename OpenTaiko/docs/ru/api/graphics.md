@@ -297,7 +297,7 @@ end
 Видеодекодер, возвращаемый `VIDEO:CreateVideo`.
 
 <div class="callout warn">
-Позиции задаются в миллисекундах; Duration — в секундах. Читайте Texture каждый кадр, чтобы получить текущий кадр как дескриптор текстуры. Этот дескриптор оборачивает собственную текстуру кадра видео: рисуйте его, а освобождение оставьте дескриптору видео. SetSpeed игнорирует значения 0 и ниже.
+Позиции задаются в миллисекундах; Duration — в секундах. Читайте Texture каждый кадр, чтобы получить текущий кадр как дескриптор текстуры. Этот дескриптор оборачивает собственную текстуру кадра видео: рисуйте его, а освобождение оставьте дескриптору видео. SetSpeed игнорирует значения 0 и ниже. Псевдонимы ниже постоянные: поддерживаются оба имени, как и Duration и DurationMs.
 </div>
 
 | Метод | Описание |
@@ -320,10 +320,10 @@ end
 | `video:SetTimestampMs(ms)  -> nil` | Перематывает на позицию в миллисекундах. |
 | `video:GetSpeed()  -> number` | Текущий множитель скорости воспроизведения (1 = обычная). |
 | `video:SetSpeed(speed)  -> nil` | Задаёт множитель скорости воспроизведения. |
-| `video:GetPlayPosition()  -> number` | Текущая позиция в секундах (старое имя для GetTimestampMs / 1000). |
-| `video:SetPlayPosition(seconds)  -> nil` | Перематывает на позицию в секундах (старое имя для SetTimestampMs). |
-| `video:GetPlaySpeed()  -> number` | Старое имя для GetSpeed. |
-| `video:SetPlaySpeed(speed)  -> nil` | Старое имя для SetSpeed. |
+| `video:GetPlayPosition()  -> number` | Текущая позиция в секундах (псевдоним GetTimestampMs / 1000). |
+| `video:SetPlayPosition(seconds)  -> nil` | Перематывает на позицию в секундах (псевдоним SetTimestampMs, в секундах). |
+| `video:GetPlaySpeed()  -> number` | Псевдоним GetSpeed. |
+| `video:SetPlaySpeed(speed)  -> nil` | Псевдоним SetSpeed. |
 | `video:Dispose()  -> nil` | Освобождает декодер и его текстуру кадра. |
 
 ```lua

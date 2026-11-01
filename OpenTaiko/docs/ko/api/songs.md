@@ -161,7 +161,7 @@ end
 | `node.IsLocked  (bool)` | 이 곡이 현재 잠겨 있으면 true. 곡이 아니면 항상 false. |
 | `node.HiddenIndex  (int)` | 잠금 해제 시스템의 표시 상태: 0 표시, 1 회색 처리, 2 흐림 처리, 3 숨김(곡이 아니면 0). |
 | `node.Rarity  (string)` | 희귀도 라벨. 잠금 해제 항목이 없는 곡은 "Common", 곡이 아니면 "-". |
-| `node:Mount(p1diff, p2diff, p3diff, p4diff, p5diff)  -> bool` | 플레이어별 난이도 인덱스(기본값 0)로 이 곡을 플레이용으로 선택합니다. 처음 CONFIG.PlayerCount개의 인덱스만 검사하며, 노드가 곡이 아니거나 활성 플레이어의 난이도가 없거나 범위를 벗어나면 false를 반환합니다. |
+| `node:Mount(p1diff, p2diff, p3diff, p4diff, p5diff)  -> bool` | 플레이어별 난이도 인덱스(기본값 0)로 이 곡을 플레이용으로 선택합니다. 처음 CONFIG.PlayerCount개의 인덱스만 검사하며, 노드가 곡이 아니거나 활성 플레이어의 난이도가 없거나 범위를 벗어나면 false를 반환합니다. 읽기 전용 모듈에서는 false를 반환합니다. |
 | `node:MountIfNotLocked(p1diff, p2diff, p3diff, p4diff, p5diff)  -> bool` | Mount와 같지만 곡이 잠겨 있으면 마운트하지 않고 false를 반환합니다. |
 
 ### 채보
@@ -197,14 +197,14 @@ end
 | `chart.DanTickColor  (color)` | 단위 플레이트 틱 색(채보에 채보 정보가 없으면 흰색). |
 | `chart.DanSongs  (array of dan songs)` | 이 단위 채보를 이루는 곡. |
 | `chart.DanExams  (array of dan exams)` | 이 단위 채보의 전체 시험 조건. |
-| `chart:GetSongExam(songIdx, examSlot)  -> dan exam` | 1부터 시작하는 곡 인덱스와 1부터 시작하는 시험 슬롯의 곡별 시험을 반환합니다. 없으면 결과의 IsSet이 false입니다. |
+| `chart:GetSongExam(songIdx, examSlot)  -> dan exam` | 0부터 시작하는 곡 인덱스와 1부터 시작하는 시험 슬롯의 곡별 시험을 반환합니다. 없거나 인덱스가 범위를 벗어나면 결과의 IsSet이 false입니다. |
 | `chart:GetPlayerBestScore(save)  -> best score info` | 이 채보에 대한 지정한 세이브 파일의 최고 플레이 요약을 반환합니다. |
 | `chart:GetCustomCommand(key)  -> string` | 채보 범위 커스텀 명령(이 COURSE 블록 안의 점 접두어 헤더. key는 점을 포함)의 값을 반환하며, 없으면 nil. |
 | `chart:GetCustomCommands()  -> dictionary` | 모든 채보 범위 커스텀 명령을 C# 딕셔너리 객체로 반환합니다. |
 | `chart.SongFolder  (string)` | 채보 파일이 있는 절대 폴더. |
 | `chart.ChartPath  (string)` | 채보 파일의 절대 경로. |
 | `chart.UniqueId  (string)` | 곡의 고유 id. 없으면 빈 문자열. |
-| `chart:Select(player)  -> bool` | 이 채보를 지정한 플레이어의 선택 난이도로 표시합니다. 플레이어 0은 선택 곡도 설정합니다. 채보가 유효하지 않으면 false를 반환합니다. |
+| `chart:Select(player)  -> bool` | 이 채보를 지정한 플레이어의 선택 난이도로 표시합니다. 플레이어 0은 선택 곡도 설정합니다. 채보가 유효하지 않거나 읽기 전용 모듈이면 false를 반환합니다. |
 
 ### 최고 스코어 정보
 
@@ -263,15 +263,15 @@ chart.DanExams의 원소이거나 chart:GetSongExam()이 반환합니다. 모든
 곡 노드, 난이도, 시험 조건으로 단위 코스를 메모리에서 조립한 뒤 플레이용으로 마운트하는 전역입니다.
 
 <div class="callout warn">
-전역 DANBUILDER로 사용할 수 있습니다. 곡과 슬롯 인덱스는 1부터 시작합니다. 예외는 AddSong에 넘기는 난이도로, 0부터 시작하는 난이도 인덱스입니다. 시험 슬롯은 1에서 7까지입니다. 시험 유형 문자열(대소문자 구분 없음, 괄호 안은 축약형): "judgeperfect" (jp), "judgegood" (jg), "judgebad" (jb), "score" (s), "roll" (r), "hit" (h), "combo" (c), "accuracy" (a), "judgeadlib" (ja), "judgemine" (jm). 다른 문자열은 게이지를 뜻합니다. lessThan = true는 시험을 "미만" 검사로, false는 "이상" 검사로 만듭니다. 빌더는 호출 사이에 상태를 유지하므로 새 코스를 만들기 전에 Clear()를 호출하십시오.
+전역 DANBUILDER로 사용할 수 있습니다. 곡 인덱스는 API의 모든 목록처럼 0부터 시작하며, AddSong에 넘기는 난이도도 마찬가지입니다. 시험 슬롯은 1부터 시작하여 1에서 7까지입니다. 시험 번호가 EXAM1부터 EXAM7까지이기 때문입니다. 시험 유형 문자열(대소문자 구분 없음, 괄호 안은 축약형): "judgeperfect" (jp), "judgegood" (jg), "judgebad" (jb), "score" (s), "roll" (r), "hit" (h), "combo" (c), "accuracy" (a), "judgeadlib" (ja), "judgemine" (jm). 다른 문자열은 게이지를 뜻합니다. lessThan = true는 시험을 "미만" 검사로, false는 "이상" 검사로 만듭니다. 빌더는 호출 사이에 상태를 유지하므로 새 코스를 만들기 전에 Clear()를 호출하십시오.
 </div>
 
 | 메서드 | 설명 |
 | --- | --- |
 | `DANBUILDER.SongCount  (int)` | 지금까지 추가된 곡 수. |
 | `DANBUILDER:AddSong(node, diff)  -> void` | 0부터 시작하는 난이도 인덱스로 곡 노드를 덧붙입니다. |
-| `DANBUILDER:GetSong(i)  -> song node` | 1부터 시작하는 인덱스 i의 곡 노드를 반환하며, 없으면 nil. |
-| `DANBUILDER:GetSongDiff(i)  -> int` | 1부터 시작하는 인덱스 i의 곡에 저장된 난이도 인덱스를 반환하며, 없으면 -1. |
+| `DANBUILDER:GetSong(i)  -> song node` | 0부터 시작하는 인덱스 i의 곡 노드를 반환하며, 없으면 nil. |
+| `DANBUILDER:GetSongDiff(i)  -> int` | 0부터 시작하는 인덱스 i의 곡에 저장된 난이도 인덱스를 반환하며, 없으면 -1. |
 | `DANBUILDER:SetTitle(title)  -> void` | 코스 제목을 설정합니다(기본값 "Dynamic Dan"). |
 | `DANBUILDER:SetSubtitle(subtitle)  -> void` | 코스 부제를 설정합니다. |
 | `DANBUILDER:SetDanTick(tick)  -> void` | 단위 플레이트 틱 값을 설정합니다(기본값 2). |
@@ -279,9 +279,9 @@ chart.DanExams의 원소이거나 chart:GetSongExam()이 반환합니다. 모든
 | `DANBUILDER:SetGenreTitle(title)  -> void` | 플레이 중 장르 플레이트의 텍스트를 설정합니다. 기본적으로 플레이트는 연주 중인 곡의 장르 폴더를 표시합니다. |
 | `DANBUILDER:SetGenreColor(r, g, b)  -> void` | 0-255 성분으로 장르 플레이트 색을 설정합니다. 기본적으로 표시 중인 장르 폴더의 색을 쓰며, SetGenreTitle로 텍스트를 설정한 경우 흰색입니다. |
 | `DANBUILDER:SetGlobalExam(slot, type, red, gold, lessThan)  -> void` | 지정한 슬롯에 코스 전체 시험을 설정합니다. |
-| `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | 1부터 시작하는 곡 인덱스와 슬롯으로 곡 하나에 적용되는 시험을 설정합니다. |
+| `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | 0부터 시작하는 곡 인덱스와 1부터 시작하는 슬롯으로 곡 하나에 적용되는 시험을 설정합니다. 범위를 벗어난 인덱스는 아무것도 하지 않습니다. |
 | `DANBUILDER:Clear()  -> void` | 모든 곡과 시험을 제거하고 메타데이터를 기본값으로 재설정합니다. |
-| `DANBUILDER:Mount()  -> bool` | 코스 채보를 메모리에 만들고 플레이어 1의 Dan 난이도로 플레이용으로 선택합니다. 빌더에 곡이 없거나 빌드가 실패하면 false를 반환합니다. |
+| `DANBUILDER:Mount()  -> bool` | 코스 채보를 메모리에 만들고 플레이어 1의 Dan 난이도로 플레이용으로 선택합니다. 빌더에 곡이 없거나 빌드가 실패하면 false를 반환하며, 읽기 전용 모듈에서는 항상 false입니다. |
 
 ```lua
 DANBUILDER:Clear()
@@ -289,7 +289,7 @@ DANBUILDER:SetTitle("Custom course")
 DANBUILDER:AddSong(list:GetSongByUniqueId(id1), 3)
 DANBUILDER:AddSong(list:GetSongByUniqueId(id2), 3)
 DANBUILDER:SetGlobalExam(1, "gauge", 90, 100, false)
-DANBUILDER:SetPerSongExam(2, 2, "judgebad", 10, 5, true)
+DANBUILDER:SetPerSongExam(1, 2, "judgebad", 10, 5, true)
 if DANBUILDER:Mount() then
     return Exit("play")
 end
@@ -319,7 +319,7 @@ node.UnlockCondition이 이 객체를 반환합니다. HasCondition은 프로퍼
 다섯 개의 가상 캐릭터 슬롯(V1-V5)을 읽고 쓰며, 플레이어 스팟을 슬롯의 비주얼을 표시하도록 리다이렉트하는 전역입니다.
 
 <div class="callout warn">
-전역 VIRTUALSLOTS로 사용할 수 있습니다. 슬롯 인덱스는 1에서 5까지입니다. 범위 밖 인덱스는 setter가 무시하고 getter는 기본값을 반환합니다. 이 메서드들은 디스크에 아무것도 기록하지 않습니다. AI 슬롯은 엔진이 관리하며 이 전역으로는 편집할 수 없습니다.
+전역 VIRTUALSLOTS로 사용할 수 있습니다. 슬롯 인덱스는 1에서 5까지입니다. 범위 밖 인덱스는 setter가 무시하고 getter는 기본값을 반환합니다. 이 메서드들은 디스크에 아무것도 기록하지 않습니다. AI 슬롯은 엔진이 관리하며 이 전역으로는 편집할 수 없습니다. 읽기 전용 모듈에서는 setter와 MountSlot이 오류를 기록하고 아무것도 하지 않습니다. getter는 계속 동작합니다.
 </div>
 
 | 메서드 | 설명 |

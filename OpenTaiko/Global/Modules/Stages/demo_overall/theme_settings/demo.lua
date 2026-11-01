@@ -71,7 +71,7 @@ local function buildRows()
         local type_ = THEME:GetDefinitionType(i)
         local value
         if scope == "save" then
-            value = THEME:GetThemeSettingForPlayer(id, 1)
+            value = THEME:GetThemeSettingForPlayer(id, 0)
         else
             value = THEME:GetThemeSetting(id)
         end

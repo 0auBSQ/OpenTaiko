@@ -228,7 +228,7 @@ function _launch_dan()
     --  EXAM2: oks < 1000 / 500  (global)
     DANBUILDER:SetGlobalExam(2, "jg", 1000, 500, true)
     --  EXAM3: bads < 50 / 20  (per song)
-    for i = 1, #selected do
+    for i = 0, #selected - 1 do
         DANBUILDER:SetPerSongExam(i, 3, "jb", 50, 20, true)
     end
 

@@ -55,7 +55,7 @@ end
 Ein abspielbarer Sound, der von den Fabrikmethoden von `SOUND` zurückgegeben wird.
 
 <div class="callout warn">
-Bis der Stream bereit ist, puffert das Handle Play und jeden Set*-Aufruf, und die Getter liefern die unten aufgeführten Standardwerte. Die Lautstärke ist ein Prozentwert (100 = der eigene Pegel der Datei). Pan reicht von -100 (links) über 0 (Mitte) bis 100 (rechts). Positionen und Dauern sind in Millisekunden. Play startet den Stream von vorn; suchen Sie daher nach dem Aufruf von Play.
+Bis der Stream bereit ist, puffert das Handle Play und jeden Set*-Aufruf, und die Getter liefern die unten aufgeführten Standardwerte. Die Lautstärke ist ein Prozentwert (100 = der eigene Pegel der Datei). Pan reicht von -100 (links) über 0 (Mitte) bis 100 (rechts). Positionen und Dauern sind in Millisekunden. Play startet den Stream von vorn; suchen Sie daher nach dem Aufruf von Play. Die Aliase unten sind dauerhaft: Beide Namen werden unterstützt.
 </div>
 
 | Methode | Beschreibung |
@@ -70,16 +70,16 @@ Bis der Stream bereit ist, puffert das Handle Play und jeden Set*-Aufruf, und di
 | `sound:GetLoop()  -> bool` | Gibt zurück, ob die Schleife aktiviert ist. |
 | `sound:SetVolumePercent(vol)  -> nil` | Setzt die Lautstärke in Prozent. |
 | `sound:GetVolumePercent()  -> number` | Gibt die Lautstärke in Prozent zurück (100, wenn nicht geladen). |
-| `sound:SetVolume(vol)  -> nil` | Älterer Name für SetVolumePercent (Ganzzahl). |
+| `sound:SetVolume(vol)  -> nil` | Alias von SetVolumePercent (Ganzzahl). |
 | `sound:SetPan(pan)  -> nil` | Setzt das Stereo-Panning, -100..100. |
 | `sound:GetPan()  -> int` | Gibt das aktuelle Panning zurück (0, wenn nicht geladen). |
 | `sound:SetSpeed(speed)  -> nil` | Setzt den Geschwindigkeitsfaktor der Wiedergabe (1 = normal). |
 | `sound:GetSpeed()  -> number` | Gibt den Geschwindigkeitsfaktor der Wiedergabe zurück (1, wenn nicht geladen). |
 | `sound:SetTimestampMs(ms)  -> nil` | Springt zu einer Position in Millisekunden. |
-| `sound:SetTimestamp(ms)  -> nil` | Älterer Name für SetTimestampMs. |
+| `sound:SetTimestamp(ms)  -> nil` | Alias von SetTimestampMs. |
 | `sound:GetTimestampMs()  -> number` | Gibt die aktuelle Position in Millisekunden zurück (0, wenn nicht geladen). |
 | `sound.DurationMs  -> number` | Gesamtdauer in Millisekunden (0, wenn nicht geladen). |
-| `sound:GetDurationMs()  -> number` | Älterer Name für DurationMs. |
+| `sound:GetDurationMs()  -> number` | Alias von DurationMs. |
 | `sound.Loaded  -> bool` | True, sobald der Render-Thread den Stream aufgebaut hat. |
 | `sound.IsPlaying  -> bool` | True, während der Sound abgespielt wird. |
 | `sound:IsFinished()  -> bool` | True, sobald die Wiedergabe das Ende erreicht hat (false während der Pause oder wenn nicht geladen). |

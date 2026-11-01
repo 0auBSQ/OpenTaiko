@@ -55,7 +55,7 @@ end
 Een afspeelbaar geluid, teruggegeven door de factorymethoden van `SOUND`.
 
 <div class="callout warn">
-Tot de stream klaar is, buffert de handle Play en elke Set*-aanroep, en geven de getters de hieronder vermelde standaardwaarden terug. Volume is een percentage (100 = het eigen niveau van het bestand). Pan loopt van -100 (links) via 0 (midden) tot 100 (rechts). Posities en duren zijn in milliseconden. Play herstart de stream vanaf het begin, dus zoek pas na het aanroepen van Play.
+Tot de stream klaar is, buffert de handle Play en elke Set*-aanroep, en geven de getters de hieronder vermelde standaardwaarden terug. Volume is een percentage (100 = het eigen niveau van het bestand). Pan loopt van -100 (links) via 0 (midden) tot 100 (rechts). Posities en duren zijn in milliseconden. Play herstart de stream vanaf het begin, dus zoek pas na het aanroepen van Play. De aliassen hieronder zijn blijvend: beide namen worden ondersteund.
 </div>
 
 | Methode | Beschrijving |
@@ -70,16 +70,16 @@ Tot de stream klaar is, buffert de handle Play en elke Set*-aanroep, en geven de
 | `sound:GetLoop()  -> bool` | Geeft terug of herhalen is ingeschakeld. |
 | `sound:SetVolumePercent(vol)  -> nil` | Stelt het volume in procenten in. |
 | `sound:GetVolumePercent()  -> number` | Geeft het volume in procenten terug (100 wanneer niet geladen). |
-| `sound:SetVolume(vol)  -> nil` | Oudere naam voor SetVolumePercent (geheel getal). |
+| `sound:SetVolume(vol)  -> nil` | Alias van SetVolumePercent (geheel getal). |
 | `sound:SetPan(pan)  -> nil` | Stelt de stereopan in, -100..100. |
 | `sound:GetPan()  -> int` | Geeft de huidige pan terug (0 wanneer niet geladen). |
 | `sound:SetSpeed(speed)  -> nil` | Stelt de afspeelsnelheidsfactor in (1 = normaal). |
 | `sound:GetSpeed()  -> number` | Geeft de afspeelsnelheidsfactor terug (1 wanneer niet geladen). |
 | `sound:SetTimestampMs(ms)  -> nil` | Springt naar een positie in milliseconden. |
-| `sound:SetTimestamp(ms)  -> nil` | Oudere naam voor SetTimestampMs. |
+| `sound:SetTimestamp(ms)  -> nil` | Alias van SetTimestampMs. |
 | `sound:GetTimestampMs()  -> number` | Geeft de huidige positie in milliseconden terug (0 wanneer niet geladen). |
 | `sound.DurationMs  -> number` | Totale duur in milliseconden (0 wanneer niet geladen). |
-| `sound:GetDurationMs()  -> number` | Oudere naam voor DurationMs. |
+| `sound:GetDurationMs()  -> number` | Alias van DurationMs. |
 | `sound.Loaded  -> bool` | True zodra de renderthread de stream heeft opgebouwd. |
 | `sound.IsPlaying  -> bool` | True terwijl het geluid speelt. |
 | `sound:IsFinished()  -> bool` | True zodra het afspelen het einde heeft bereikt (false tijdens pauze of wanneer niet geladen). |

@@ -2,11 +2,11 @@
 
 # Hoe modules werken
 
-Met OpenTaiko 0.6.1 kan een skin schermen toevoegen en vervangen met Lua. De map Modules van een skin bevat één map per module, en elke module heeft een Script.lua die een vaste set globale callbackfuncties definieert. Het spel laadt elke Script.lua in een eigen gesandboxte Lua-state, registreert de engine-globals (TEXTURE, SOUND, INPUT, CONFIG en de andere die in de [API-referentie](api/README.md) zijn gedocumenteerd) en roept de callbacks op het juiste moment aan. [Modules en levenscyclus](api/activities.md) somt de exacte signaturen op.
+Met OpenTaiko 0.7.0 kan een skin schermen toevoegen en vervangen met Lua. De map Modules van een skin bevat één map per module, en elke module heeft een Script.lua die een vaste set globale callbackfuncties definieert. Het spel laadt elke Script.lua in een eigen gesandboxte Lua-state, registreert de engine-globals (TEXTURE, SOUND, INPUT, CONFIG en de andere die in de [API-referentie](api/README.md) zijn gedocumenteerd) en roept de callbacks op het juiste moment aan. [Modules en levenscyclus](api/activities.md) somt de exacte signaturen op.
 
 ## Voordat je begint
 
-- OpenTaiko 0.6.1 en een skinmap met een map Modules. De meegeleverde skin is System/Open-World Memories.
+- OpenTaiko 0.7.0 en een skinmap met een map Modules. De meegeleverde skin is System/Open-World Memories.
 - Een teksteditor en basiskennis van Lua (functies, tabellen, require).
 - De meegeleverde stages onder System/Open-World Memories/Modules/Stages en Global/Modules/Stages. De kleine demo's in Global/Modules/Stages/demo_overall tonen de vorm van de callbacks; de grotere stages laten zien hoe echte schermen zijn opgebouwd.
 
@@ -70,7 +70,7 @@ end
 ## De levenscyclus van een stage
 
 - onStart(): het spel roept het eenmalig aan nadat de skin is geladen, en opnieuw na elke herlaadbeurt van de skin, of de stage nu op het scherm staat of niet. Laad hier texturen, geluiden en video's. Het draait als een coroutine, dus een lange laadbeurt kan zich met de LOADING-helper over meerdere frames achter de laadbalk uitspreiden.
-- activate(): het spel roept het aan bij elke binnenkomst in de stage. Reset hier de status per bezoek, start muziek en open databases. Het draait eveneens als een coroutine en kan LOADING gebruiken. Het spel vernieuwt de personage- en puchichara-lijsten (CHARACTERLIST, PUCHICHARALIST) vlak voordat activate draait, dus lees ze hier; onStart draait vóór die vernieuwing.
+- activate(): het spel roept het aan bij elke binnenkomst in de stage. Reset hier de status per bezoek, start muziek en open databases. Het draait eveneens als een coroutine en kan LOADING gebruiken. Het spel vernieuwt de personage- en puchichara-lijsten (CHARACTERLIST, PUCHICHARALIST) vlak voordat activate draait, en opnieuw vóór afterSongEnum, dus lees ze in een van beide; onStart draait vóór de eerste vernieuwing.
 - update(timestamp): het spel roept het elk frame aan vóór draw en geeft de spelklok in milliseconden door. Verwerk hier invoer en wijzig de status. Zodra de stage Exit heeft aangeroepen, stopt het spel met update aanroepen en blijft het draw aanroepen tijdens de fade-out.
 - draw(): het spel roept het elk frame aan. Alleen tekenen, en houd allocaties per frame laag.
 - deactivate(): het spel roept het aan bij het verlaten van de stage. De databasedemo van demo_overall geeft hier zijn databases vrij; de eerste demo stopt zijn muziek en video.
@@ -124,7 +124,20 @@ local Dialogue  = require("nokon_dialogue")           -- de modulemap
 
 ## Alleen-lezen modules
 
-Het spel maakt ROActivities en achtergronden met beperkte globals aan voordat hun Script.lua draait: CONFIG is een alleen-lezen weergave, GetSaveFile(player) geeft een alleen-lezen opslagbestand terug, DATABASE opent alleen-lezen stores, en ACTIVITY is nil (gebruik ROACTIVITY). Een schrijfactie via een van deze logt een foutmelding, doet niets en werpt geen Lua-fout op. Een module die instellingen, opslagdata of een database moet wijzigen, moet een Activity of een Stage zijn.
+Het spel maakt ROActivities en achtergronden met beperkte globals aan voordat hun Script.lua draait. Een schrijfactie via deze globals logt een foutmelding, doet niets en werpt geen Lua-fout op:
+
+- CONFIG is een alleen-lezen weergave: de setters doen niets.
+- GetSaveFile(player) geeft een alleen-lezen opslagbestand terug.
+- DATABASE opent alleen-lezen stores.
+- THEME:SetThemeSetting en THEME:SetThemeSettingForPlayer geven false terug.
+- STORAGE:WriteText en STORAGE:WriteLobbyCode geven false terug.
+- SQL:OpenSQLDatabase(path) opent de database alleen-lezen: lezen werkt, een statement dat schrijft mislukt, logt de SQLite-fout en geeft een leeg resultaat terug, en een ontbrekend databasebestand wordt niet aangemaakt.
+- De VIRTUALSLOTS-setters en VIRTUALSLOTS:MountSlot doen niets; de getters werken nog steeds.
+- DANBUILDER:Mount() geeft false terug; de builder kan nog steeds gevuld worden.
+- Mount en MountIfNotLocked van een nummerknoop en Select van een chart geven false terug, waar de knoop ook vandaan komt.
+- ACTIVITY is nil (gebruik ROACTIVITY).
+
+Een module die instellingen, opslagdata of een database moet wijzigen, of een nummer moet kiezen om te spelen, moet een Activity of een Stage zijn.
 
 ## Lokalisatie met lang/
 

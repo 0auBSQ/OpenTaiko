@@ -4,11 +4,11 @@
 
 Een personage is een map onder `Global/Characters/` in de installatiemap van het spel. Elke submap die het spel daar vindt, wordt één selecteerbaar personage. Een map bevat een `Metadata.json` (naam, zeldzaamheid, auteur), een `CharaConfig.txt` (posities en animatietiming), de animatie-inhoud, en optioneel `Effects.json`, `Unlock.json`, `Palettes.json` en stemfragmenten. De animatie-inhoud bestaat ofwel uit mappen met genummerde PNG-frames, die het ingebouwde personagescript van het spel rendert, ofwel uit wat een `Script.lua` per personage zelf kiest te tekenen (het meegeleverde 3D-sjabloon tekent een glTF-model).
 
-Compatibiliteit: OpenTaiko 0.6.1 laadt personages die voor 0.6.0 zijn gemaakt nog steeds zonder wijzigingen. Deze pagina beschrijft de huidige opbouw; gebruik die voor nieuwe personages.
+Compatibiliteit: OpenTaiko 0.7.0 laadt personages die voor 0.6.0 zijn gemaakt nog steeds zonder wijzigingen. Deze pagina beschrijft de huidige opbouw; gebruik die voor nieuwe personages.
 
 ## Voordat je begint
 
-- OpenTaiko 0.6.1 geïnstalleerd. Het spel leest personages uit `Global/Characters/` naast het uitvoerbare bestand van het spel, en alle skins delen ze.
+- OpenTaiko 0.7.0 geïnstalleerd. Het spel leest personages uit `Global/Characters/` naast het uitvoerbare bestand van het spel, en alle skins delen ze.
 - Een teksteditor voor JSON- en INI-achtige bestanden.
 - Voor een 2D-personage: de tekeningen geëxporteerd als genummerde PNG-frames (`0.png`, `1.png`, ...) met een transparante achtergrond, één map per animatiestatus.
 - Voor een 3D-personage: een `model.glb` (binaire glTF) met de animatieclips, en een stilstaande `Render.png`.
@@ -108,7 +108,7 @@ Ontbrekende statussen vallen terug op een andere status, zodat een personage een
 De volledige sleutellijst, met standaardwaarden, is de tabel `load_chara_config_defs` bovenaan het ingebouwde `CharaScript.lua`. Het script negeert sleutels die het niet kent, dus de meegeleverde `01 - Template/CharaConfig.txt` bevat ook enkele sleutels van de skinkant die in dit bestand geen effect hebben.
 
 ```ini
-Chara_Version=0.6.1.0
+Chara_Version=0.7.0.0
 Chara_Resolution=1920,1080
 
 ;X-positie van het personage (1P,2P)

@@ -43,6 +43,9 @@
         "TITLE_PLAYERS_2": "2인 플레이",
         "TITLE_PLAYERS_3": "3인 플레이",
         "TITLE_PLAYERS_4": "4인 플레이",
-        "TITLE_PLAYERS_5": "5인 플레이"
+        "TITLE_PLAYERS_5": "5인 플레이",
+
+        // Boot screen
+        "BOOT_PRESS_ENTER": "Enter 키를 눌러 시작!"
     }
 }

@@ -72,7 +72,7 @@ namespace OpenTaiko {
 		public int GetPan() => _sound?.nPosition_CurrentlyPlayingSound ?? 0;
 		/// <summary>Returns the total duration of the sound in milliseconds, or 0 if not loaded.</summary>
 		public double DurationMs => _sound?.nLength ?? 0;
-		public double GetDurationMs() => DurationMs; // older API
+		public double GetDurationMs() => DurationMs; // permanent alias of DurationMs
 		/// <summary>Returns the current playback position in milliseconds.</summary>
 		public double GetTimestampMs() => _sound?.msTimeStamp_nowSound ?? 0;
 
@@ -93,12 +93,12 @@ namespace OpenTaiko {
 		public void SetTimestampMs(double ms) {
 			if (_sound != null) _sound.SetTimestamp((long)ms); else _pendingTimestamp = (long)ms;
 		}
-		public void SetTimestamp(double ms) => SetTimestampMs(ms); // older API
+		public void SetTimestamp(double ms) => SetTimestampMs(ms); // permanent alias of SetTimestampMs
 
 		public void SetVolumePercent(double vol) {
 			if (_sound != null) _sound.SetVolume((int)vol); else _pendingVolume = vol;
 		}
-		public void SetVolume(int vol) => SetVolumePercent(vol); // older API
+		public void SetVolume(int vol) => SetVolumePercent(vol); // permanent alias of SetVolumePercent
 
 		/// <summary>Sets the playback speed multiplier (1.0 = normal).</summary>
 		public void SetSpeed(double speed) {

@@ -2,7 +2,7 @@
 
 # API-Referenz
 
-<span class="badge-new">Spielversion 0.6.1</span>
+<span class="badge-new">Spielversion 0.7.0</span>
 
 Die Referenz für jedes globale Objekt, das die OpenTaiko-Lua-Laufzeit einem Skin zur Verfügung stellt. Wählen Sie in der Seitenleiste eine Kategorie oder beginnen Sie mit [Module und Lebenszyklus](activities.md), falls Sie noch kein Modul geschrieben haben.
 

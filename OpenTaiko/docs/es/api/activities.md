@@ -21,7 +21,7 @@ Cuando se carga un skin, el motor crea y arranca los módulos en este orden: Tra
 | `update(timestamp)` | Se llama cada fotograma antes de draw; timestamp es el reloj del juego en milisegundos. Un stage deja de recibir update una vez que ha llamado a Exit; draw sigue ejecutándose durante el fundido de salida. Activity/ROActivity: el anfitrión lo llama a través de `handle:Update()`. |
 | `draw(...)` | Se llama cada fotograma. Activity/ROActivity: el anfitrión lo llama a través de `handle:Draw(...)` con sus propios argumentos; los valores de retorno vuelven al anfitrión. |
 | `deactivate(...)` | Stage: se llama cuando el motor abandona el stage. Activity/ROActivity: el anfitrión lo llama a través de `handle:Deactivate(...)`, o el propio módulo lo llama sobre sí mismo mediante `DEACTIVATE()`; los valores de retorno vuelven al anfitrión. |
-| `afterSongEnum()` | Se llama cada vez que termina la enumeración de canciones, incluido el arranque y tras una recarga suave o completa de canciones, incluso cuando el módulo no está activo. |
+| `afterSongEnum()` | Se llama cada vez que termina la enumeración de canciones, incluido el arranque y tras una recarga suave o completa de canciones, incluso cuando el módulo no está activo. El motor actualiza las globales CHARACTERLIST y PUCHICHARALIST justo antes de que se ejecute. |
 | `onDestroy()` | Se llama antes de que el motor descargue el skin, para que el módulo pueda liberar lo que posee. |
 | `reloadLanguage(lang)` | Se llama en cada módulo cargado cuando cambia el idioma del juego; lang es el nuevo código de idioma. |
 
@@ -558,6 +558,7 @@ Registrado como la global info y creado por módulo. Cada campo calcula su valor
 | --- | --- |
 | `info.playerCount  -> number` | El número de jugadores configurado. |
 | `info.lang  -> string` | El código del idioma actual. |
+| `info.gameVersion  -> string` | La versión del juego, cuatro números con la forma main.major.minor.patch (por ejemplo `"0.7.0.0"`). |
 | `info.simplemode  -> boolean` | Verdadero cuando el Modo Simple está activado. |
 | `info.p1IsBlue  -> boolean` | Verdadero cuando el jugador 1 usa el lado azul. |
 | `info.online  -> boolean` | Verdadero cuando hay disponible una interfaz de red utilizable. |

@@ -4,7 +4,7 @@
 
 Spielstände, Namensschilder, Charaktere, Puchicharas, Spielzustand, Themes und die aktuelle Sprache.
 
-Spielerindizes sind überall auf dieser Seite 0-basiert (0 bis 4), mit Ausnahme von THEME:GetThemeSettingForPlayer, das 1-basiert ist. Schreibgeschützte Module (ROActivities und Hintergründe) erhalten ein Spielstand-Handle, dessen Schreibmethoden einen Fehler protokollieren und nichts tun; alles andere hier verhält sich in jedem Modultyp gleich.
+Spielerindizes sind überall auf dieser Seite 0-basiert (0 bis 4). Schreibgeschützte Module (ROActivities und Hintergründe) erhalten ein Spielstand-Handle, dessen Schreibmethoden einen Fehler protokollieren und nichts tun, und ihre THEME-Setter protokollieren einen Fehler und geben false zurück; alles andere hier verhält sich in jedem Modultyp gleich.
 
 ## Spielstände
 
@@ -462,16 +462,16 @@ Die Eigenschaft UnlockCondition von Namensschild-Info-Handles, Charakterlisten-E
 Die Auflösung des Skins, Theme-Einstellungen, skinweite lokalisierte Strings und die Definitionen der Theme-Einstellungen.
 
 <div class="callout warn">
-Der Skin deklariert Theme-Einstellungen in ThemeSettings.json und speichert ihre Werte in der ThemeSettings.db3 daneben. Die Getter geben Einstellungswerte immer als Strings zurück; eine fehlende Einstellung gibt ihren deklarierten Standardwert zurück, oder einen leeren String, wenn keine Deklaration existiert. GetThemeSettingForPlayer nimmt eine 1-basierte Spielernummer. Definitionsindizes sind 0-basiert.
+Der Skin deklariert Theme-Einstellungen in ThemeSettings.json und speichert ihre Werte in der ThemeSettings.db3 daneben. Die Getter geben Einstellungswerte immer als Strings zurück; eine fehlende Einstellung gibt ihren deklarierten Standardwert zurück, oder einen leeren String, wenn keine Deklaration existiert. Die ForPlayer-Methoden setzen einen Spieler außerhalb des Bereichs auf 0 oder 4. Definitionsindizes sind 0-basiert.
 </div>
 
 | Methode | Beschreibung |
 | --- | --- |
 | `THEME:GetResolution()  -> vector2` | Die Auflösung des Skins. |
 | `THEME:GetThemeSetting(settingId)  -> string` | Wert einer Einstellung mit globalem Geltungsbereich. |
-| `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | Wert einer Einstellung mit Spielstand-Geltungsbereich für den 1-basierten Spieler, oder ihr Standardwert, wenn der Spielstand keinen Wert hat. |
-| `THEME:SetThemeSetting(settingId, value)  -> bool` | Schreibt eine in ThemeSettings.json deklarierte globale Einstellung (eine Sitzungseinstellung wird nur für diesen Lauf behalten); false bei unbekannter Id. |
-| `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | Schreibt eine spielstandbezogene Einstellung für den 1-basierten Spieler; false bei unbekannter Id. |
+| `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | Wert einer Einstellung mit Spielstand-Geltungsbereich für den Spieler, oder ihr Standardwert, wenn der Spielstand keinen Wert hat. |
+| `THEME:SetThemeSetting(settingId, value)  -> bool` | Schreibt eine in ThemeSettings.json deklarierte globale Einstellung (eine Sitzungseinstellung wird nur für diesen Lauf behalten); false bei unbekannter Id oder in einem schreibgeschützten Modul. |
+| `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | Schreibt eine spielstandbezogene Einstellung für den Spieler; false bei unbekannter Id oder in einem schreibgeschützten Modul. |
 | `THEME:GetNotesSkinFile(kind, file)  -> string` | Pfad einer Datei des ausgewählten Pakets der Art `kind` (`"taiko"`, `"bongo"` oder `"judges"`), relativ zum Graphics-Ordner des Skins, aus Paket 1 genommen, wenn sie dem ausgewählten Paket fehlt; ein leerer String, wenn der Skin kein solches Paket oder keine solche Datei hat. Siehe [Noten- und Bewertungspakete hinzufügen](../guides/notes-skins.md). |
 | `THEME:GetSkinString(key)  -> string` | Lokalisierter String aus dem Locales-Ordner des Skins: zuerst die aktuelle Sprache, dann die Standard-Locale des Skins, dann `[LOCALE NOT FOUND: key]`. |
 | `THEME:GetDefinitionCount()  -> integer` | Anzahl der Einstellungsdefinitionen in ThemeSettings.json. |
@@ -490,7 +490,7 @@ GetString formatiert den Eintrag mit den zusätzlichen Argumenten. GetLanguageId
 | Methode | Beschreibung |
 | --- | --- |
 | `LANG:GetString(key, ...)  -> string` | Der lokalisierte String für einen Schlüssel, mit aus den zusätzlichen Argumenten gefüllten Formatplatzhaltern. |
-| `LANG:ChangeLanguage(id)  -> bool` | Wechselt die aktive Sprache, wenn die ID existiert und sich von der aktuellen unterscheidet, und ruft dann `reloadLanguage` auf jedem geladenen Skript auf; gibt zurück, ob gewechselt wurde. CONFIG.Language lässt es unverändert. |
+| `LANG:ChangeLanguage(id)  -> bool` | Wechselt die aktive Sprache, wenn die ID existiert und sich von der aktuellen unterscheidet: setzt zuerst CONFIG.Language auf die ID (das Spiel speichert sie beim Beenden in Config.ini) und ruft dann `reloadLanguage` auf jedem geladenen Skript auf; gibt zurück, ob gewechselt wurde. |
 | `LANG:GetLanguageIds()  -> string[]` | IDs der verfügbaren Sprachen. |
 | `LANG:GetLanguageId()  -> string` | Id der verwendeten Sprache. |
 | `LANG:GetLanguageNames()  -> string[]` | Anzeigenamen der verfügbaren Sprachen, in derselben Reihenfolge. |

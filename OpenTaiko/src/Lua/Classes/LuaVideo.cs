@@ -64,7 +64,7 @@ namespace OpenTaiko {
 		public int Width => _video?.FrameSize.Width ?? -1;
 		public int Height => _video?.FrameSize.Height ?? -1;
 		public double DurationMs => Duration * 1000.0;
-		public double Duration => _video?.Duration ?? 1; // older API
+		public double Duration => _video?.Duration ?? 1; // permanent name, in seconds (DurationMs in milliseconds)
 		public LuaTexture Texture {
 			get {
 				if (_video != null) {
@@ -80,10 +80,10 @@ namespace OpenTaiko {
 		}
 
 		public double GetTimestampMs() => _video?.msPlayPosition ?? 0;
-		public double GetPlayPosition() => GetTimestampMs() / 1000.0; // older API
+		public double GetPlayPosition() => GetTimestampMs() / 1000.0; // permanent alias of GetTimestampMs, in seconds
 
 		public double GetSpeed() => _video?.dbPlaySpeed ?? 1;
-		public double GetPlaySpeed() => GetSpeed(); // older API
+		public double GetPlaySpeed() => GetSpeed(); // permanent alias of GetSpeed
 
 		// the audio track, when the video was opened with one
 		public bool HasAudio => _video?.HasAudio ?? false;
@@ -98,12 +98,12 @@ namespace OpenTaiko {
 		public void SetTimestampMs(double ms) {
 			if (_video != null) _video.Seek((long)ms); else _pendingSeek = ms;
 		}
-		public void SetPlayPosition(double position) => SetTimestampMs(position * 1000.0); // older API
+		public void SetPlayPosition(double position) => SetTimestampMs(position * 1000.0); // permanent alias of SetTimestampMs, in seconds
 
 		public void SetSpeed(double speed) {
 			if (_video != null) _video.dbPlaySpeed = speed; else _pendingSpeed = speed;
 		}
-		public void SetPlaySpeed(double playSpeed) => SetSpeed(playSpeed); // older API
+		public void SetPlaySpeed(double playSpeed) => SetSpeed(playSpeed); // permanent alias of SetSpeed
 
 		public void SetVolumePercent(double vol) {
 			if (_video != null) _video.Audio?.SetGain((int)Math.Clamp(vol, 0, 100)); else _pendingVolume = vol;

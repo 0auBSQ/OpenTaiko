@@ -4,7 +4,7 @@
 
 세이브 파일, 네임플레이트, 캐릭터, 푸치캬라, 플레이 상태, 테마, 현재 언어.
 
-이 페이지에서 플레이어 인덱스는 1부터 시작하는 THEME:GetThemeSettingForPlayer를 제외하고 모두 0부터 시작합니다(0에서 4). 읽기 전용 모듈(ROActivity와 배경)은 쓰기 메서드가 오류를 기록하고 아무것도 하지 않는 세이브 파일 핸들을 받습니다. 그 외의 모든 것은 모든 모듈 종류에서 같게 동작합니다.
+이 페이지에서 플레이어 인덱스는 모두 0부터 시작합니다(0에서 4). 읽기 전용 모듈(ROActivity와 배경)은 쓰기 메서드가 오류를 기록하고 아무것도 하지 않는 세이브 파일 핸들을 받으며, THEME setter도 오류를 기록하고 false를 반환합니다. 그 외의 모든 것은 모든 모듈 종류에서 같게 동작합니다.
 
 ## 세이브 파일
 
@@ -462,16 +462,16 @@ PUCHICHARALIST와 sf:GetPuchichara가 이 핸들을 반환합니다. 텍스처�
 스킨의 해상도, 테마 설정, 스킨 범위의 지역화 문자열, 테마 설정 정의입니다.
 
 <div class="callout warn">
-스킨은 테마 설정을 ThemeSettings.json에 선언하고 값은 그 옆의 ThemeSettings.db3에 저장합니다. getter는 설정 값을 항상 문자열로 반환합니다. 없는 설정은 선언된 기본값을, 선언이 없으면 빈 문자열을 반환합니다. GetThemeSettingForPlayer는 1부터 시작하는 플레이어 번호를 받습니다. 정의 인덱스는 0부터 시작합니다.
+스킨은 테마 설정을 ThemeSettings.json에 선언하고 값은 그 옆의 ThemeSettings.db3에 저장합니다. getter는 설정 값을 항상 문자열로 반환합니다. 없는 설정은 선언된 기본값을, 선언이 없으면 빈 문자열을 반환합니다. ForPlayer 메서드는 범위를 벗어난 플레이어를 0 또는 4로 처리합니다. 정의 인덱스는 0부터 시작합니다.
 </div>
 
 | 메서드 | 설명 |
 | --- | --- |
 | `THEME:GetResolution()  -> vector2` | 스킨의 해상도. |
 | `THEME:GetThemeSetting(settingId)  -> string` | 전역 범위 설정의 값. |
-| `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | 1부터 시작하는 플레이어의 세이브 범위 설정 값. 세이브에 값이 없으면 기본값. |
-| `THEME:SetThemeSetting(settingId, value)  -> bool` | ThemeSettings.json에 선언된 전역 설정을 씁니다 (세션 설정은 이번 실행 동안만 유지). 알 수 없는 id면 false. |
-| `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | 1부터 시작하는 플레이어의 세이브 단위 설정을 씁니다. 알 수 없는 id면 false. |
+| `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | 플레이어의 세이브 범위 설정 값. 세이브에 값이 없으면 기본값. |
+| `THEME:SetThemeSetting(settingId, value)  -> bool` | ThemeSettings.json에 선언된 전역 설정을 씁니다 (세션 설정은 이번 실행 동안만 유지). 알 수 없는 id이거나 읽기 전용 모듈이면 false. |
+| `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | 플레이어의 세이브 단위 설정을 씁니다. 알 수 없는 id이거나 읽기 전용 모듈이면 false. |
 | `THEME:GetNotesSkinFile(kind, file)  -> string` | `kind`(`"taiko"`, `"bongo"`, `"judges"`)의 선택된 팩에 있는 파일의 경로로, 스킨의 Graphics 폴더 기준 상대 경로입니다. 선택된 팩에 그 파일이 없으면 팩 1에서 가져옵니다. 스킨에 그런 팩이나 파일이 없으면 빈 문자열. [노트와 판정 팩 추가하기](../guides/notes-skins.md)를 참고하십시오. |
 | `THEME:GetSkinString(key)  -> string` | 스킨의 Locales 폴더에서 온 지역화 문자열: 현재 언어 먼저, 그다음 스킨의 기본 로케일, 그다음 `[LOCALE NOT FOUND: key]`. |
 | `THEME:GetDefinitionCount()  -> integer` | ThemeSettings.json의 설정 정의 수. |
@@ -490,7 +490,7 @@ GetString은 추가 인자로 항목을 형식화합니다. GetLanguageIds와 Ge
 | 메서드 | 설명 |
 | --- | --- |
 | `LANG:GetString(key, ...)  -> string` | 키의 지역화 문자열. 형식 자리 표시자는 추가 인자로 채워집니다. |
-| `LANG:ChangeLanguage(id)  -> bool` | id가 존재하고 현재와 다르면 활성 언어를 전환한 뒤 로드된 모든 스크립트에서 `reloadLanguage`를 호출합니다. 전환했는지 반환합니다. CONFIG.Language는 바꾸지 않습니다. |
+| `LANG:ChangeLanguage(id)  -> bool` | id가 존재하고 현재와 다르면 활성 언어를 전환하고, 먼저 CONFIG.Language를 그 id로 설정한 뒤(게임이 종료할 때 Config.ini에 저장) 로드된 모든 스크립트에서 `reloadLanguage`를 호출합니다. 전환했는지 반환합니다. |
 | `LANG:GetLanguageIds()  -> string[]` | 사용 가능한 언어의 id. |
 | `LANG:GetLanguageId()  -> string` | 사용 중인 언어의 id. |
 | `LANG:GetLanguageNames()  -> string[]` | 사용 가능한 언어의 표시 이름, 같은 순서. |

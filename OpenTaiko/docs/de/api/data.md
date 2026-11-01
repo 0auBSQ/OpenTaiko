@@ -73,7 +73,7 @@ end
 
 | Methode | Beschreibung |
 | --- | --- |
-| `SQL:OpenSQLDatabase(path)  -> sql` | Öffnet eine SQLite-Datenbank unter einem Pfad relativ zum Modulverzeichnis. |
+| `SQL:OpenSQLDatabase(path)  -> sql` | Öffnet eine SQLite-Datenbank unter einem Pfad relativ zum Modulverzeichnis. In einem schreibgeschützten Modul ist die Verbindung schreibgeschützt: Lesen funktioniert, eine schreibende Anweisung schlägt fehl und liefert ein leeres Ergebnis, und eine fehlende Datei wird nicht angelegt. |
 
 ### SQL-Handle
 
@@ -106,7 +106,7 @@ end
 Dateizugriff mit dem Modulverzeichnis als Wurzel, plus Hilfsfunktionen zum Teilen von Online-Lobby-Codes.
 
 <div class="callout warn">
-WriteText schreibt nur innerhalb des Modulordners: Es lehnt absolute Pfade und Pfade ab, die außerhalb aufgelöst werden. ReadText akzeptiert auch einen absoluten Pfad. Die Lobby-Code-Hilfsfunktionen verwenden den gemeinsamen Ordner `Global/Lobbycodes/` neben der ausführbaren Datei. Schreibgeschützte Module können jede STORAGE-Methode verwenden.
+WriteText schreibt nur innerhalb des Modulordners: Es lehnt absolute Pfade und Pfade ab, die außerhalb aufgelöst werden. ReadText akzeptiert auch einen absoluten Pfad. Die Lobby-Code-Hilfsfunktionen verwenden den gemeinsamen Ordner `Global/Lobbycodes/` neben der ausführbaren Datei. In schreibgeschützten Modulen protokollieren WriteText und WriteLobbyCode einen Fehler und geben false zurück; die übrigen Methoden funktionieren.
 </div>
 
 | Methode | Beschreibung |
@@ -290,6 +290,7 @@ Konstantentabellen auf CONFIG geben den obigen Ganzzahlwerten Namen. `SONGSPEED`
 | `CONFIG.STEALTH` | `Off`, `Doron`, `Stealth`, `Hidden`, `Flashlight`. |
 | `CONFIG.FUN` | `None`, `Avalanche`, `Minesweeper`, `DynamicBeat`, `Total`. |
 | `CONFIG.JUSTICE` | `None`, `Just`, `Safe`. |
+| `CONFIG.TIMINGZONE` | `Loose` (-2), `Lenient` (-1), `Normal` (0), `Strict` (1), `Rigorous` (2): Abstände zu Normal. GetTimingZone und SetTimingZone verwenden 0..4; vergleichen Sie also `CONFIG:GetTimingZone(player) - 2` mit einer Konstante und übergeben Sie SetTimingZone die Konstante + 2. |
 
 ```lua
 local multiplier = CONFIG.SONGSPEED:ToActual(CONFIG.SongSpeed)

@@ -4,11 +4,11 @@
 
 Ein Charakter ist ein Ordner unter `Global/Characters/` im Installationsordner des Spiels. Jeder Unterordner, den das Spiel dort findet, wird zu einem auswählbaren Charakter. Ein Ordner enthält eine `Metadata.json` (Name, Seltenheit, Autor), eine `CharaConfig.txt` (Positionen und Animationstiming), den Animationsinhalt und optional `Effects.json`, `Unlock.json`, `Palettes.json` und Sprachclips. Der Animationsinhalt besteht entweder aus Ordnern mit nummerierten PNG-Frames, die das eingebaute Charakterskript des Spiels rendert, oder aus dem, was eine charakterspezifische `Script.lua` zu zeichnen wählt (die mitgelieferte 3D-Vorlage zeichnet ein glTF-Modell).
 
-Kompatibilität: OpenTaiko 0.6.1 lädt für 0.6.0 erstellte Charaktere weiterhin ohne Änderungen. Diese Seite beschreibt den aktuellen Aufbau; verwenden Sie ihn für neue Charaktere.
+Kompatibilität: OpenTaiko 0.7.0 lädt für 0.6.0 erstellte Charaktere weiterhin ohne Änderungen. Diese Seite beschreibt den aktuellen Aufbau; verwenden Sie ihn für neue Charaktere.
 
 ## Bevor Sie beginnen
 
-- OpenTaiko 0.6.1 ist installiert. Das Spiel liest Charaktere aus `Global/Characters/` neben der ausführbaren Datei des Spiels, und alle Skins nutzen sie gemeinsam.
+- OpenTaiko 0.7.0 ist installiert. Das Spiel liest Charaktere aus `Global/Characters/` neben der ausführbaren Datei des Spiels, und alle Skins nutzen sie gemeinsam.
 - Ein Texteditor für JSON- und INI-artige Dateien.
 - Für einen 2D-Charakter: die Grafik als nummerierte PNG-Frames (`0.png`, `1.png`, ...) mit transparentem Hintergrund exportiert, ein Ordner pro Animationszustand.
 - Für einen 3D-Charakter: eine `model.glb` (binäres glTF) mit den Animationsclips und ein Standbild `Render.png`.
@@ -108,7 +108,7 @@ Fehlende Zustände fallen auf einen anderen Zustand zurück, sodass ein Charakte
 Die vollständige Schlüsselliste mit Standardwerten ist die Tabelle `load_chara_config_defs` am Anfang der eingebauten `CharaScript.lua`. Das Skript ignoriert Schlüssel, die es nicht kennt, weshalb die mitgelieferte `01 - Template/CharaConfig.txt` auch einige skinseitige Schlüssel enthält, die in dieser Datei keine Wirkung haben.
 
 ```ini
-Chara_Version=0.6.1.0
+Chara_Version=0.7.0.0
 Chara_Resolution=1920,1080
 
 ;Charakter-X-Position (1P,2P)

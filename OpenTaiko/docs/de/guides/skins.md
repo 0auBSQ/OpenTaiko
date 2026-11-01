@@ -8,15 +8,15 @@ Ein Skin enthält auch die Lua-Module, die jeden Bildschirm ausführen. Das Spie
 
 ## Bevor Sie beginnen
 
-- OpenTaiko 0.6.1 ist installiert, mit dem mitgelieferten Skin `System/Open-World Memories/`.
+- OpenTaiko 0.7.0 ist installiert, mit dem mitgelieferten Skin `System/Open-World Memories/`.
 - Ein Texteditor für `SkinConfig.ini`, die eingebundenen `*Config.ini`-Dateien und die Lua-Module.
 - Grundkenntnisse in Lua, wenn Sie das Verhalten von Bildschirmen ändern möchten. Ein reines Re-Texturing (Ersetzen von PNG- und OGG-Dateien und Bearbeiten von `.ini`-Werten) benötigt kein Lua.
 
 ## Schritt 1: Verstehen, was einen Ordner zu einem Skin macht
 
-Beim Start listet das Spiel die Unterordner von `System/` auf. Ein Ordner zählt nur dann als Skin, wenn darin `Graphics/1_Title/Background.png` existiert; jeden anderen Ordner überspringt das Spiel. Fehlt der ausgewählte Skin-Ordner, fällt das Spiel auf `System/Default/` zurück, dann auf den ersten gültigen Skin in alphabetischer Reihenfolge, dann auf `System/` selbst.
+Beim Start listet das Spiel die Unterordner von `System/` auf. Ein Ordner zählt nur dann als Skin, wenn darin `Graphics/1_Title/Background.png`, `Modules/Stages/_boot/Script.lua` und `Modules/Stages/_title/Script.lua` existieren; jeden anderen Ordner überspringt das Spiel. Fehlt der ausgewählte Skin-Ordner oder besteht er diese Prüfung nicht, fällt das Spiel auf `System/Default/` zurück, dann auf den ersten gültigen Skin in alphabetischer Reihenfolge, dann auf `System/` selbst.
 
-Diese Prüfung sorgt nur dafür, dass der Ordner aufgelistet wird. Schritt 8 nennt die Module, die zusätzlich existieren müssen, bevor der Skin läuft.
+Diese Prüfung betrachtet nur diese drei Dateien. Schritt 8 nennt die übrigen Module, die zusätzlich existieren müssen, bevor der Skin läuft.
 
 ```
 System/
@@ -37,7 +37,8 @@ Kopieren Sie `System/Open-World Memories/` in einen neuen Nachbarordner, zum Bei
 `SkinConfig.ini` ist eine `Key=Value`-Datei, eine Einstellung pro Zeile. Der Parser entfernt führende Leerzeichen und Tabulatoren, behandelt Zeilen, die mit `;` beginnen, als Kommentare und liest eine Zeile nur, wenn sie genau ein `=` enthält. Der Schlüsselvergleich ist exakt, und der Parser ignoriert einen unbekannten Schlüssel, ohne einen Fehler zu melden. Die Schlüssel auf Skin-Ebene sind:
 
 - `Name=`: Anzeigename. Nur Metadaten; der Ordnername wählt den Skin aus.
-- `Version=`, `Creator=`: frei wählbare Strings (Standard `Unknown`). Das Spiel validiert sie nicht.
+- `Version=`: die Version des Skins als vier Zahlen, main.major.minor.patch, wie die des Spiels (Standard `Unknown`). Der Hub hält einen Skin für kompatibel, wenn seine ersten drei Teile mit der Version des Spiels übereinstimmen: Ein Skin für OpenTaiko 0.7.0.0 verwendet `0.7.0.x`. Das Spiel selbst prüft sie nicht.
+- `Creator=`: frei wählbarer String (Standard `Unknown`). Das Spiel validiert ihn nicht.
 - `DefaultLocale=`: Locale-ID, die das Spiel verwendet, wenn die aktive Spielsprache keine Datei unter `Locales/` hat (Standard `en`).
 - `Resolution=W,H`: die Auflösung, für die Sie die Layout-Werte erstellen (Standard `1280,720`). Der mitgelieferte Skin verwendet `1920,1080`.
 - `Resolutions=`: auswählbare Render-Skalierungsfaktoren (Schritt 4).
@@ -53,7 +54,7 @@ Jeder andere Schlüssel (`Game_*`, `Result_*`, `Title_*` und so weiter) ist ein 
 ;Skin-Informationen
 Name=My New Skin
 DefaultLocale=en
-Version=1.0.0
+Version=0.7.0.0
 Creator=Your Name
 Resolution=1920,1080
 ;Auswählbare Render-Skalierungsfaktoren (<=1; Dezimalzahl oder a/b-Bruch, kommagetrennt). 1 ist immer verfügbar und der Standard.
@@ -187,7 +188,7 @@ Modules/
 `Script.lua` läuft einmal, wenn das Spiel das Modul erzeugt, mit den bereits definierten globalen Objekten der Engine (`TEXTURE`, `SOUND`, `INPUT`, `CONFIG`, `THEME` und den übrigen). Das Spiel schlägt dann globale Funktionen per Name nach und ruft sie auf. Für eine Stage:
 
 - `onStart()`: einmal, wenn der Skin geladen wird. Läuft als Coroutine, sodass aufwendiges Laden `coroutine.yield()` oder die `LOADING`-Hilfsfunktionen aufrufen kann, um die Arbeit hinter dem Ladebalken auf mehrere Frames zu verteilen.
-- `activate()`: jedes Mal, wenn das Spiel die Stage betritt. Ebenfalls eine Coroutine. Das Spiel aktualisiert die globalen Objekte `CHARACTERLIST` und `PUCHICHARALIST` unmittelbar davor; bauen Sie also alles, was von ihnen abhängt, hier auf. In `onStart` sind sie noch leer.
+- `activate()`: jedes Mal, wenn das Spiel die Stage betritt. Ebenfalls eine Coroutine. Das Spiel aktualisiert die globalen Objekte `CHARACTERLIST` und `PUCHICHARALIST` unmittelbar davor und erneut vor `afterSongEnum`; bauen Sie also alles, was von ihnen abhängt, in einer dieser beiden Funktionen auf. In `onStart` sind sie noch leer.
 - `update(timestamp)`: jeden Frame. Geben Sie `Exit(target, name, transition)` zurück, um die Stage zu verlassen. `target` ist `"title"`, `"play"`, `"stage"` (mit `name` = ein Stage-Ordner) oder `"legacy"` (mit `name` = `heya`, `config`, `exit` oder `onlinelounge`); `transition` ist ein Ordner unter `Modules/Transitions/` und ist standardmäßig `default`.
 - `draw()`: jeden Frame.
 - `deactivate()`: wenn das Spiel die Stage verlässt.
@@ -248,11 +249,11 @@ SkinPath=My New Skin\
 
 ## Fehlerbehebung und Hinweise
 
-- Die Auswahl listet den Skin nicht auf: `Graphics/1_Title/Background.png` fehlt, oder der Ordner liegt nicht direkt unter `System/`.
-- Das Spiel meldet direkt nach der Auswahl des Skins einen Fehler: Ein erforderliches Modul fehlt (Schritt 8), oder eines davon hat einen Lua-Fehler ausgelöst. Testen Sie einen Skin, indem Sie zu ihm wechseln.
+- Die Auswahl listet den Skin nicht auf: `Graphics/1_Title/Background.png`, `Modules/Stages/_boot/Script.lua` oder `Modules/Stages/_title/Script.lua` fehlt, oder der Ordner liegt nicht direkt unter `System/`.
+- Das Spiel meldet direkt nach der Auswahl des Skins einen Fehler: Ein weiteres erforderliches Modul fehlt (Schritt 8), oder ein Modul hat einen Lua-Fehler ausgelöst. Testen Sie einen Skin, indem Sie zu ihm wechseln.
 - Ein `SkinConfig.ini`-Schlüssel hat keine Wirkung: Der Schlüssel ist falsch geschrieben, die Zeile enthält mehr als ein `=`, oder der Wert konnte nicht geparst werden. Der Parser ignoriert unbekannte Schlüssel, ohne sie zu melden.
 - `Resolutions=` zeigt nur `1`: Die Liste hat Semikolons verwendet (ein Kommentarzeichen), oder jeder Wert lag außerhalb von 0 < Wert <= 1.
 - Ein Schriftschlüssel hat keine Wirkung: Der Dateipfad existiert relativ zur Skin-Wurzel nicht.
-- `CHARACTERLIST` oder `PUCHICHARALIST` ist in `onStart` leer: Das Spiel befüllt sie, nachdem es die Module erzeugt hat. Verwenden Sie sie aus `activate`.
+- `CHARACTERLIST` oder `PUCHICHARALIST` ist in `onStart` leer: Das Spiel befüllt sie, nachdem es die Module erzeugt hat. Verwenden Sie sie aus `activate` oder `afterSongEnum`.
 - Das Umbenennen des Skin-Ordners ändert seine Identität; `SkinPath` in `Config.ini` muss auf den neuen Namen zeigen.
-- `Name=`, `Version=` und `Creator=` sind rein informativ. Das Spiel führt keine Kompatibilitätsprüfung auf ihnen durch.
+- Das Spiel führt keine Kompatibilitätsprüfung auf `Name=`, `Version=` oder `Creator=` durch. Nur der Hub liest `Version=`, um zu erkennen, ob der Skin zum installierten Spiel passt (Schritt 3).

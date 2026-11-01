@@ -4,7 +4,7 @@
 
 ## Calendar.almanac
 
-Des motifs de dates pour les événements qui vont et viennent avec le calendrier : un article mis en avant dans la boutique à Noël, une scène de poisson d'avril, un bonus mensuel. Les jours sont ceux de l'heure normale du Japon (UTC+9), quelle que soit l'horloge du joueur, si bien que tous les joueurs voient le même jour. Un motif peut s'écrire sous la forme d'un jeton opaque `enc:`, pour qu'une surprise n'apparaisse pas dans le code source.
+Des motifs de dates pour les événements qui vont et viennent avec le calendrier : un article mis en avant dans la boutique à Noël, un événement d'été, un bonus mensuel. Les jours sont ceux de l'heure normale du Japon (UTC+9), quelle que soit l'horloge du joueur, si bien que tous les joueurs voient le même jour. Un motif peut s'écrire sous la forme d'un jeton opaque `enc:`, pour qu'une surprise n'apparaisse pas dans le code source.
 
 | Motif | Correspond à |
 | --- | --- |

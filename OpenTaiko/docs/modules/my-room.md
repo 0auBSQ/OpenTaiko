@@ -39,5 +39,5 @@ To give a piece of furniture from your own stage, add 1 to both counters, as [Pa
 - Its strings, the furniture names included (`lang/<code>/items.json`, keyed by furniture id), live in its own `lang/` folder, in the nine languages.
 - The furniture catalogue is `data/furniture.json` in the stage's folder.
 - The placeholder matrix lists only the debug stages present in `Global/Modules/Stages/`. These debug stages and the `video_player` ROActivity the TV uses are global modules too.
-- The pod opens the stage `mysterypod` when it exists in `Global/Modules/Stages/`, or when a skin's own `mysterypod` stage sets the shared string `mysterypod_installed` to `"1"` in its `onStart`.
+- The pod opens a stage when one is installed.
 - Online visits use the room id `"myroom"` with version 2 of its payload, the same as before the move.

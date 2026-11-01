@@ -297,7 +297,7 @@ Paden zijn relatief ten opzichte van de scriptmap. De decoder opent op een achte
 Een videodecoder, teruggegeven door `VIDEO:CreateVideo`.
 
 <div class="callout warn">
-Posities zijn in milliseconden; Duration is in seconden. Lees elk frame Texture om het huidige frame als textuur-handle te krijgen. Die handle omhult de eigen frametextuur van de video: teken hem en laat het vrijgeven over aan de video-handle. SetSpeed negeert waarden van 0 of lager.
+Posities zijn in milliseconden; Duration is in seconden. Lees elk frame Texture om het huidige frame als textuur-handle te krijgen. Die handle omhult de eigen frametextuur van de video: teken hem en laat het vrijgeven over aan de video-handle. SetSpeed negeert waarden van 0 of lager. De aliassen hieronder zijn blijvend: beide namen worden ondersteund, net als Duration en DurationMs.
 </div>
 
 | Methode | Beschrijving |
@@ -320,10 +320,10 @@ Posities zijn in milliseconden; Duration is in seconden. Lees elk frame Texture 
 | `video:SetTimestampMs(ms)  -> nil` | Springt naar een positie in milliseconden. |
 | `video:GetSpeed()  -> number` | Huidige afspeelsnelheidsfactor (1 = normaal). |
 | `video:SetSpeed(speed)  -> nil` | Stelt de afspeelsnelheidsfactor in. |
-| `video:GetPlayPosition()  -> number` | Huidige positie in seconden (oudere naam voor GetTimestampMs / 1000). |
-| `video:SetPlayPosition(seconds)  -> nil` | Springt naar een positie in seconden (oudere naam voor SetTimestampMs). |
-| `video:GetPlaySpeed()  -> number` | Oudere naam voor GetSpeed. |
-| `video:SetPlaySpeed(speed)  -> nil` | Oudere naam voor SetSpeed. |
+| `video:GetPlayPosition()  -> number` | Huidige positie in seconden (alias van GetTimestampMs / 1000). |
+| `video:SetPlayPosition(seconds)  -> nil` | Springt naar een positie in seconden (alias van SetTimestampMs, in seconden). |
+| `video:GetPlaySpeed()  -> number` | Alias van GetSpeed. |
+| `video:SetPlaySpeed(speed)  -> nil` | Alias van SetSpeed. |
 | `video:Dispose()  -> nil` | Geeft de decoder en zijn frametextuur vrij. |
 
 ```lua

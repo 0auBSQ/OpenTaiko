@@ -277,7 +277,7 @@ local function buildSelInfo(node)
     sel.hasVideo, sel.explicit = node.HasVideo == true, node.Explicit == true
     sel.isVault  = node.Genre == "Secret Vault"
     sel.subtitle = node.Subtitle
-    sel.charter  = "Chart - " .. node.Maker
+    sel.charter  = string.format(G.skinText("SONGSELECT_INFO_CHART", "Chart - %s"), node.Maker)
     sel.diffs = {}
     for i = 0, 4 do
         local c = node:GetChart(i)

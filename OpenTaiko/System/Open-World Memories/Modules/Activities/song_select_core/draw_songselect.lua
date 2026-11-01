@@ -792,7 +792,7 @@ function M.drawPanel()
             -- rebuild the length string only when the async preview load lands a new duration
             if sel.lenMs ~= G.previewDurationMs then
                 sel.lenMs   = G.previewDurationMs
-                sel.lenText = "Length - " .. formatDuration(sel.lenMs)
+                sel.lenText = string.format(G.skinText("SONGSELECT_INFO_LENGTH", "Length - %s"), formatDuration(sel.lenMs))
             end
             G.textSmall:Draw(hide and "???" or sel.lenText, SONGINFO_LENGTH_ORIGIN_X - G.songSelectShift, SONGINFO_LENGTH_ORIGIN_Y,
                 nil, nil, 1, 1, SONGINFO_LENGTH_MWIDTH)

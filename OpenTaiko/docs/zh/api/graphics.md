@@ -297,7 +297,7 @@ end
 由 `VIDEO:CreateVideo` 返回的视频解码器。
 
 <div class="callout warn">
-位置以毫秒计；Duration 以秒计。每帧读取 Texture 以获得作为纹理句柄的当前帧。该句柄包装了视频自己的帧纹理：绘制它即可，释放交给视频句柄处理。SetSpeed 会忽略 0 或以下的值。
+位置以毫秒计；Duration 以秒计。每帧读取 Texture 以获得作为纹理句柄的当前帧。该句柄包装了视频自己的帧纹理：绘制它即可，释放交给视频句柄处理。SetSpeed 会忽略 0 或以下的值。下面的别名是永久的：两个名称都受支持，Duration 和 DurationMs 也是如此。
 </div>
 
 | 方法 | 说明 |
@@ -320,10 +320,10 @@ end
 | `video:SetTimestampMs(ms)  -> nil` | 跳转到以毫秒计的位置。 |
 | `video:GetSpeed()  -> number` | 当前播放速度倍率（1 = 正常）。 |
 | `video:SetSpeed(speed)  -> nil` | 设置播放速度倍率。 |
-| `video:GetPlayPosition()  -> number` | 当前位置（秒）（GetTimestampMs / 1000 的旧名称）。 |
-| `video:SetPlayPosition(seconds)  -> nil` | 跳转到以秒计的位置（SetTimestampMs 的旧名称）。 |
-| `video:GetPlaySpeed()  -> number` | GetSpeed 的旧名称。 |
-| `video:SetPlaySpeed(speed)  -> nil` | SetSpeed 的旧名称。 |
+| `video:GetPlayPosition()  -> number` | 当前位置（秒）（GetTimestampMs / 1000 的别名）。 |
+| `video:SetPlayPosition(seconds)  -> nil` | 跳转到以秒计的位置（以秒计的 SetTimestampMs 别名）。 |
+| `video:GetPlaySpeed()  -> number` | GetSpeed 的别名。 |
+| `video:SetPlaySpeed(speed)  -> nil` | SetSpeed 的别名。 |
 | `video:Dispose()  -> nil` | 释放解码器及其帧纹理。 |
 
 ```lua

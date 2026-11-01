@@ -43,6 +43,9 @@
         "TITLE_PLAYERS_2": "2 игрока",
         "TITLE_PLAYERS_3": "3 игрока",
         "TITLE_PLAYERS_4": "4 игрока",
-        "TITLE_PLAYERS_5": "5 игроков"
+        "TITLE_PLAYERS_5": "5 игроков",
+
+        // Boot screen
+        "BOOT_PRESS_ENTER": "Нажмите Enter, чтобы начать!"
     }
 }

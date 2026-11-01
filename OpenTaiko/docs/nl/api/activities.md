@@ -21,7 +21,7 @@ Wanneer een skin laadt, maakt de engine de modules in deze volgorde aan en start
 | `update(timestamp)` | Elk frame aangeroepen vóór draw; timestamp is de spelklok in milliseconden. Een stage ontvangt geen update meer zodra hij Exit heeft aangeroepen; draw blijft tijdens de fade-out draaien. Activity/ROActivity: de host roept het aan via `handle:Update()`. |
 | `draw(...)` | Elk frame aangeroepen. Activity/ROActivity: de host roept het aan via `handle:Draw(...)` met zijn eigen argumenten; de retourwaarden gaan terug naar de host. |
 | `deactivate(...)` | Stage: aangeroepen wanneer de engine de stage verlaat. Activity/ROActivity: de host roept het aan via `handle:Deactivate(...)`, of de module roept het op zichzelf aan via `DEACTIVATE()`; de retourwaarden gaan terug naar de host. |
-| `afterSongEnum()` | Aangeroepen telkens wanneer de nummerenumeratie is afgerond, ook bij het opstarten en na een zachte of harde herlaadbeurt van de nummers, zelfs wanneer de module niet actief is. |
+| `afterSongEnum()` | Aangeroepen telkens wanneer de nummerenumeratie is afgerond, ook bij het opstarten en na een zachte of harde herlaadbeurt van de nummers, zelfs wanneer de module niet actief is. De engine vernieuwt de globals CHARACTERLIST en PUCHICHARALIST vlak voordat het draait. |
 | `onDestroy()` | Aangeroepen voordat de engine de skin ontlaadt, zodat de module kan vrijgeven wat hij vasthoudt. |
 | `reloadLanguage(lang)` | Aangeroepen op elke geladen module wanneer de speltaal verandert; lang is de nieuwe taalcode. |
 
@@ -558,6 +558,7 @@ Geregistreerd als de info-global en per module aangemaakt. Elk veld berekent zij
 | --- | --- |
 | `info.playerCount  -> number` | Het ingestelde aantal spelers. |
 | `info.lang  -> string` | De huidige taalcode. |
+| `info.gameVersion  -> string` | De spelversie, vier getallen in de vorm main.major.minor.patch (bijvoorbeeld `"0.7.0.0"`). |
 | `info.simplemode  -> boolean` | True wanneer Simple Mode aan staat. |
 | `info.p1IsBlue  -> boolean` | True wanneer speler 1 de blauwe kant gebruikt. |
 | `info.online  -> boolean` | True wanneer een bruikbare netwerkinterface beschikbaar is. |

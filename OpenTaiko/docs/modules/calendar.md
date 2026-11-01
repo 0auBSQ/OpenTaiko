@@ -4,7 +4,7 @@
 
 ## Calendar.almanac
 
-Date patterns for events that come and go with the calendar: a featured shop item at Christmas, an April Fools scene, a monthly bonus. Days are Japan Standard Time days (UTC+9) whatever the player's clock, so every player sees the same day. A pattern can be written as an opaque `enc:` token, so a surprise does not show in the source.
+Date patterns for events that come and go with the calendar: a featured shop item at Christmas, a summer event, a monthly bonus. Days are Japan Standard Time days (UTC+9) whatever the player's clock, so every player sees the same day. A pattern can be written as an opaque `enc:` token, so a surprise does not show in the source.
 
 | Pattern | Matches |
 | --- | --- |

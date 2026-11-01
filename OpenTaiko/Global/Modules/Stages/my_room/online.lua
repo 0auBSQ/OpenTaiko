@@ -211,7 +211,7 @@ function MO.join(code)
     code = (code or ""):gsub("%s", "")               -- strip whitespace from a pasted code
     if code == "" then net.msg = PHONE:tr("code_empty"); return false end
     local sid = NET:PeekStageId(code)
-    if sid ~= "myroom" then net.msg = sid and ("That code is for a '" .. sid .. "' room, not My Room.") or "That code isn't valid."; return false end
+    if sid ~= "myroom" then net.msg = sid and PHONE:trf("code_wrong_room", sid) or PHONE:tr("code_invalid"); return false end
     NET:SetLocalPlayer(MO.selfInfo())
     net.connecting, net.isHost, net.gotRoom = true, false, false
     net.nameByPeer, net.lookByPeer, net.posByPeer = {}, {}, {}
@@ -299,7 +299,7 @@ function MO.drain()
         elseif ty == "roomclosed" then
             net.roomGone = true
         elseif ty == "error" then
-            net.msg = e.Data or "Network error."; if not net.online then net.connecting = false end
+            net.msg = e.Data or PHONE:tr("network_error"); if not net.online then net.connecting = false end
         elseif ty == "message" then
             if e.Channel == "pos" then
                 MO.applyPos(e.Peer, e.Data)

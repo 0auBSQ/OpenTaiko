@@ -4,7 +4,7 @@
 
 存档、名牌、角色、小角色、演奏状态、主题和当前语言。
 
-本页所有地方的玩家索引都从 0 起（0 到 4），只有 THEME:GetThemeSettingForPlayer 从 1 起。只读模块（只读活动和背景）收到的存档句柄的写入方法会记录一条错误并且不做任何事；这里的其他内容在每种模块类型中行为相同。
+本页所有地方的玩家索引都从 0 起（0 到 4）。只读模块（只读活动和背景）收到的存档句柄的写入方法会记录一条错误并且不做任何事，它们的 THEME setter 也会记录一条错误并返回 false；这里的其他内容在每种模块类型中行为相同。
 
 ## 存档
 
@@ -462,16 +462,16 @@ PUCHICHARALIST 和 sf:GetPuchichara 返回这些句柄。列表拥有这些纹�
 皮肤的分辨率、主题设置、皮肤范围的本地化字符串，以及主题设置的定义。
 
 <div class="callout warn">
-皮肤在 ThemeSettings.json 中声明主题设置，并把其值存储在旁边的 ThemeSettings.db3 中。getter 始终以字符串返回设置值；缺失的设置返回其声明的默认值，没有声明时返回空字符串。GetThemeSettingForPlayer 接受 1 起的玩家编号。定义索引从 0 起。
+皮肤在 ThemeSettings.json 中声明主题设置，并把其值存储在旁边的 ThemeSettings.db3 中。getter 始终以字符串返回设置值；缺失的设置返回其声明的默认值，没有声明时返回空字符串。ForPlayer 方法把超出范围的玩家按 0 或 4 处理。定义索引从 0 起。
 </div>
 
 | 方法 | 说明 |
 | --- | --- |
 | `THEME:GetResolution()  -> vector2` | 皮肤的分辨率。 |
 | `THEME:GetThemeSetting(settingId)  -> string` | 一个全局范围设置的值。 |
-| `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | 1 起玩家的一个存档范围设置的值；存档没有值时为其默认值。 |
-| `THEME:SetThemeSetting(settingId, value)  -> bool` | 写入 ThemeSettings.json 中声明的全局设置（会话设置只在本次运行中保留）；id 未知时返回 false。 |
-| `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | 为从 1 起的玩家写入存档级设置；id 未知时返回 false。 |
+| `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | 该玩家的一个存档范围设置的值；存档没有值时为其默认值。 |
+| `THEME:SetThemeSetting(settingId, value)  -> bool` | 写入 ThemeSettings.json 中声明的全局设置（会话设置只在本次运行中保留）；id 未知或在只读模块中时返回 false。 |
+| `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | 为该玩家写入存档级设置；id 未知或在只读模块中时返回 false。 |
 | `THEME:GetNotesSkinFile(kind, file)  -> string` | `kind`（`"taiko"`、`"bongo"` 或 `"judges"`）所选包中某个文件的路径，相对于皮肤的 Graphics 文件夹；所选包缺少该文件时取自包 1；皮肤没有这种包或文件时为空字符串。见[添加音符包与判定包](../guides/notes-skins.md)。 |
 | `THEME:GetSkinString(key)  -> string` | 来自皮肤 Locales 文件夹的本地化字符串：先查当前语言，再查皮肤的默认区域设置，然后是 `[LOCALE NOT FOUND: key]`。 |
 | `THEME:GetDefinitionCount()  -> integer` | ThemeSettings.json 中设置定义的数量。 |
@@ -490,7 +490,7 @@ GetString 用额外的参数格式化条目。GetLanguageIds 和 GetLanguageName
 | 方法 | 说明 |
 | --- | --- |
 | `LANG:GetString(key, ...)  -> string` | 某个键的本地化字符串，格式占位符由额外参数填充。 |
-| `LANG:ChangeLanguage(id)  -> bool` | 若该 id 存在且不同于当前语言，则切换当前语言，然后对每个已加载脚本调用 `reloadLanguage`；返回是否切换了。它不会改动 CONFIG.Language。 |
+| `LANG:ChangeLanguage(id)  -> bool` | 若该 id 存在且不同于当前语言，则切换当前语言：先把 CONFIG.Language 设为该 id（游戏关闭时写入 Config.ini），再对每个已加载脚本调用 `reloadLanguage`；返回是否切换了。 |
 | `LANG:GetLanguageIds()  -> string[]` | 可用语言的 id。 |
 | `LANG:GetLanguageId()  -> string` | 当前使用语言的 id。 |
 | `LANG:GetLanguageNames()  -> string[]` | 可用语言的显示名称，顺序相同。 |

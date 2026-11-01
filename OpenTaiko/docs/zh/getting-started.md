@@ -2,11 +2,11 @@
 
 # 模块的工作原理
 
-OpenTaiko 0.6.1 允许皮肤用 Lua 添加和替换界面。皮肤的 Modules 文件夹中每个模块占一个文件夹，每个模块都有一个 Script.lua，其中定义一组固定名称的全局回调函数。游戏把每个 Script.lua 加载到各自独立的沙箱 Lua 状态中，注册引擎全局对象（TEXTURE、SOUND、INPUT、CONFIG 以及 [API 参考](api/README.md)中记录的其他对象），并在合适的时机调用这些回调。[模块与生命周期](api/activities.md)列出了确切的函数签名。
+OpenTaiko 0.7.0 允许皮肤用 Lua 添加和替换界面。皮肤的 Modules 文件夹中每个模块占一个文件夹，每个模块都有一个 Script.lua，其中定义一组固定名称的全局回调函数。游戏把每个 Script.lua 加载到各自独立的沙箱 Lua 状态中，注册引擎全局对象（TEXTURE、SOUND、INPUT、CONFIG 以及 [API 参考](api/README.md)中记录的其他对象），并在合适的时机调用这些回调。[模块与生命周期](api/activities.md)列出了确切的函数签名。
 
 ## 开始之前
 
-- OpenTaiko 0.6.1，以及一个带有 Modules 目录的皮肤文件夹。自带皮肤位于 System/Open-World Memories。
+- OpenTaiko 0.7.0，以及一个带有 Modules 目录的皮肤文件夹。自带皮肤位于 System/Open-World Memories。
 - 一个文本编辑器和基础的 Lua 知识（函数、表、require）。
 - System/Open-World Memories/Modules/Stages 和 Global/Modules/Stages 下的自带舞台。Global/Modules/Stages/demo_overall 中的小演示展示了回调的形态；较大的舞台展示了真实界面的组织方式。
 
@@ -70,7 +70,7 @@ end
 ## 舞台的生命周期
 
 - onStart()：游戏在皮肤加载完成后调用它一次，此后每次重新加载皮肤时再次调用，无论舞台是否显示在屏幕上。在这里加载纹理、声音和视频。它以协程方式运行，因此耗时较长的加载可以借助 LOADING 辅助对象分散到多帧中，在加载进度条后面进行。
-- activate()：游戏在每次进入舞台时调用它。在这里重置每次访问的状态、开始播放音乐并打开数据库。它同样以协程方式运行，并且可以使用 LOADING。游戏会在 activate 运行前刷新角色和小角色列表（CHARACTERLIST、PUCHICHARALIST），因此请在这里读取它们；onStart 在该刷新之前运行。
+- activate()：游戏在每次进入舞台时调用它。在这里重置每次访问的状态、开始播放音乐并打开数据库。它同样以协程方式运行，并且可以使用 LOADING。游戏会在 activate 运行前以及 afterSongEnum 运行前刷新角色和小角色列表（CHARACTERLIST、PUCHICHARALIST），因此请在两者之一中读取它们；onStart 在第一次刷新之前运行。
 - update(timestamp)：游戏每帧在 draw 之前调用它，并传入以毫秒计的游戏时钟。在这里处理输入并改变状态。舞台一旦调用了 Exit，游戏就停止调用 update，而在淡出期间继续调用 draw。
 - draw()：游戏每帧调用它。只做绘制，并尽量减少每帧的内存分配。
 - deactivate()：游戏在离开舞台时调用它。demo_overall 的数据库演示在这里释放数据库；它的第一个演示在这里停止音乐和视频。
@@ -124,7 +124,20 @@ local Dialogue  = require("nokon_dialogue")           -- 模块文件夹
 
 ## 只读模块
 
-游戏在只读活动和背景的 Script.lua 运行之前，就以受限的全局对象创建它们：CONFIG 是只读视图，GetSaveFile(player) 返回只读的存档，DATABASE 打开只读的存储，ACTIVITY 为 nil（请改用 ROACTIVITY）。通过这些对象进行的写入会记录一条错误通知，不做任何事，也不抛出 Lua 错误。需要更改设置、存档数据或数据库的模块必须是活动或舞台。
+游戏在只读活动和背景的 Script.lua 运行之前，就以受限的全局对象创建它们。通过这些对象进行的写入会记录一条错误通知，不做任何事，也不抛出 Lua 错误：
+
+- CONFIG 是只读视图：其 setter 不做任何事。
+- GetSaveFile(player) 返回只读的存档。
+- DATABASE 打开只读的存储。
+- THEME:SetThemeSetting 和 THEME:SetThemeSettingForPlayer 返回 false。
+- STORAGE:WriteText 和 STORAGE:WriteLobbyCode 返回 false。
+- SQL:OpenSQLDatabase(path) 以只读方式打开数据库：读取正常，写入的语句会失败、记录 SQLite 错误并返回空结果，缺失的数据库文件不会被创建。
+- VIRTUALSLOTS 的 setter 和 VIRTUALSLOTS:MountSlot 不做任何事；getter 仍然正常工作。
+- DANBUILDER:Mount() 返回 false；构建器仍可填充内容。
+- 歌曲节点的 Mount 和 MountIfNotLocked 以及谱面的 Select 返回 false，无论节点从何而来。
+- ACTIVITY 为 nil（请改用 ROACTIVITY）。
+
+需要更改设置、存档数据或数据库，或者需要选择要演奏的歌曲的模块，必须是活动或舞台。
 
 ## 通过 lang/ 进行本地化
 

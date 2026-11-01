@@ -21,7 +21,7 @@ When a skin loads, the engine creates and starts modules in this order: Transiti
 | `update(timestamp)` | Called every frame before draw; timestamp is the game clock in milliseconds. A stage stops receiving update once it has called Exit; draw keeps running through the fade-out. Activity/ROActivity: the host calls it through `handle:Update()`. |
 | `draw(...)` | Called every frame. Activity/ROActivity: the host calls it through `handle:Draw(...)` with its own arguments; the return values go back to the host. |
 | `deactivate(...)` | Stage: called when the engine leaves the stage. Activity/ROActivity: the host calls it through `handle:Deactivate(...)`, or the module calls it on itself through `DEACTIVATE()`; the return values go back to the host. |
-| `afterSongEnum()` | Called every time song enumeration finishes, including at boot and after a soft or hard song reload, even when the module is not active. |
+| `afterSongEnum()` | Called every time song enumeration finishes, including at boot and after a soft or hard song reload, even when the module is not active. The engine refreshes the CHARACTERLIST and PUCHICHARALIST globals right before it runs. |
 | `onDestroy()` | Called before the engine unloads the skin, so the module can free what it holds. |
 | `reloadLanguage(lang)` | Called on every loaded module when the game language changes; lang is the new language code. |
 
@@ -558,6 +558,7 @@ Registered as the info global and created per module. Each field computes its va
 | --- | --- |
 | `info.playerCount  -> number` | The configured number of players. |
 | `info.lang  -> string` | The current language code. |
+| `info.gameVersion  -> string` | The game version, four numbers in the form main.major.minor.patch (for example `"0.7.0.0"`). |
 | `info.simplemode  -> boolean` | True when Simple Mode is on. |
 | `info.p1IsBlue  -> boolean` | True when player 1 uses the blue side. |
 | `info.online  -> boolean` | True when a usable network interface is available. |

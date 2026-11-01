@@ -73,7 +73,7 @@ SQL 문을 실행하기 위해 모듈 디렉터리 안의 SQLite 데이터베이
 
 | 메서드 | 설명 |
 | --- | --- |
-| `SQL:OpenSQLDatabase(path)  -> sql` | 모듈 디렉터리 기준 상대 경로의 SQLite 데이터베이스를 엽니다. |
+| `SQL:OpenSQLDatabase(path)  -> sql` | 모듈 디렉터리 기준 상대 경로의 SQLite 데이터베이스를 엽니다. 읽기 전용 모듈에서는 연결도 읽기 전용입니다. 읽기는 동작하고, 쓰는 문은 실패하여 빈 결과를 반환하며, 없는 파일은 만들지 않습니다. |
 
 ### SQL 핸들
 
@@ -106,7 +106,7 @@ end
 모듈 디렉터리를 루트로 하는 파일 접근과 온라인 로비 코드 공유 헬퍼입니다.
 
 <div class="callout warn">
-WriteText는 모듈 폴더 안에만 씁니다. 절대 경로와 폴더 밖으로 해석되는 경로를 거부합니다. ReadText는 절대 경로도 받습니다. 로비 코드 헬퍼는 실행 파일 옆의 공용 `Global/Lobbycodes/` 폴더를 사용합니다. 읽기 전용 모듈도 모든 STORAGE 메서드를 사용할 수 있습니다.
+WriteText는 모듈 폴더 안에만 씁니다. 절대 경로와 폴더 밖으로 해석되는 경로를 거부합니다. ReadText는 절대 경로도 받습니다. 로비 코드 헬퍼는 실행 파일 옆의 공용 `Global/Lobbycodes/` 폴더를 사용합니다. 읽기 전용 모듈에서는 WriteText와 WriteLobbyCode가 오류를 기록하고 false를 반환합니다. 나머지 메서드는 동작합니다.
 </div>
 
 | 메서드 | 설명 |
@@ -290,6 +290,7 @@ CONFIG의 상수 테이블은 위의 정수 값에 이름을 붙입니다. `SONG
 | `CONFIG.STEALTH` | `Off`, `Doron`, `Stealth`, `Hidden`, `Flashlight`. |
 | `CONFIG.FUN` | `None`, `Avalanche`, `Minesweeper`, `DynamicBeat`, `Total`. |
 | `CONFIG.JUSTICE` | `None`, `Just`, `Safe`. |
+| `CONFIG.TIMINGZONE` | `Loose` (-2), `Lenient` (-1), `Normal` (0), `Strict` (1), `Rigorous` (2): Normal 기준의 차이입니다. GetTimingZone과 SetTimingZone은 0..4를 사용하므로 상수와는 `CONFIG:GetTimingZone(player) - 2`를 비교하고, SetTimingZone에는 상수 + 2를 넘기십시오. |
 
 ```lua
 local multiplier = CONFIG.SONGSPEED:ToActual(CONFIG.SongSpeed)

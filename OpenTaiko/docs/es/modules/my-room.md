@@ -39,5 +39,5 @@ Para dar un mueble desde tu propio stage, suma 1 a ambos contadores, como hacen 
 - Sus cadenas, incluidos los nombres de los muebles (`lang/<code>/items.json`, con el id del mueble como clave), viven en su propia carpeta `lang/`, en los nueve idiomas.
 - El catálogo de muebles es `data/furniture.json`, en la carpeta del stage.
 - La matriz de pruebas solo lista los stages de depuración presentes en `Global/Modules/Stages/`. Estos stages de depuración y la ROActivity `video_player` que usa la televisión también son módulos globales.
-- La cápsula abre el stage `mysterypod` cuando existe en `Global/Modules/Stages/`, o cuando el propio stage `mysterypod` de un skin establece la cadena compartida `mysterypod_installed` a `"1"` en su `onStart`.
+- La cápsula abre un stage cuando hay uno instalado.
 - Las visitas en línea usan el id de habitación `"myroom"` con la versión 2 de su contenido, igual que antes del traslado.

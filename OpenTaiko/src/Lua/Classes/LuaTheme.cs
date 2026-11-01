@@ -1,5 +1,10 @@
 namespace OpenTaiko {
 	public class LuaThemeFunc {
+		// false in read-only modules: the setters then log an error and change nothing
+		private readonly bool _writable;
+
+		public LuaThemeFunc(bool writable = true) => _writable = writable;
+
 		public LuaVector2 GetResolution() {
 			return new LuaVector2(OpenTaiko.Skin.Resolution[0], OpenTaiko.Skin.Resolution[1]);
 		}
@@ -14,12 +19,12 @@ namespace OpenTaiko {
 
 		/// <summary>
 		/// Returns the current value of a save-scoped theme setting for the given player.
-		/// <paramref name="player"/> is 1-based (matching the Lua convention used elsewhere).
+		/// <paramref name="player"/> is 0-based, like every other player argument.
 		/// Looks up the SaveId from the player's loaded save file.
 		/// Returns the setting's default value if no row exists for that SaveId.
 		/// </summary>
 		public string GetThemeSettingForPlayer(string settingId, int player) {
-			int slot = Math.Max(0, Math.Min(player - 1, OpenTaiko.SaveFileInstances.Length - 1));
+			int slot = Math.Max(0, Math.Min(player, OpenTaiko.SaveFileInstances.Length - 1));
 			long saveId = OpenTaiko.SaveFileInstances[slot]?.data?.SaveId ?? 0L;
 			return OpenTaiko.Databases?.DBThemeSettings?.GetSettingForSave(settingId, saveId) ?? "";
 		}
@@ -29,17 +34,19 @@ namespace OpenTaiko {
 		/// for this run). Returns false for an unknown id.
 		/// </summary>
 		public bool SetThemeSetting(string settingId, string value) {
+			if (!_writable) { CLuaScript.BlockWrite("THEME.SetThemeSetting"); return false; }
 			var db = OpenTaiko.Databases?.DBThemeSettings;
 			if (db == null || !db.Definitions.Any(d => d.Id == settingId)) return false;
 			db.SetSetting(settingId, value ?? "");
 			return true;
 		}
 
-		/// <summary>Writes a save-scoped theme setting for the 1-based player. Returns false for an unknown id.</summary>
+		/// <summary>Writes a save-scoped theme setting for the 0-based player. Returns false for an unknown id.</summary>
 		public bool SetThemeSettingForPlayer(string settingId, int player, string value) {
+			if (!_writable) { CLuaScript.BlockWrite("THEME.SetThemeSettingForPlayer"); return false; }
 			var db = OpenTaiko.Databases?.DBThemeSettings;
 			if (db == null || !db.Definitions.Any(d => d.Id == settingId)) return false;
-			int slot = Math.Max(0, Math.Min(player - 1, OpenTaiko.SaveFileInstances.Length - 1));
+			int slot = Math.Max(0, Math.Min(player, OpenTaiko.SaveFileInstances.Length - 1));
 			long saveId = OpenTaiko.SaveFileInstances[slot]?.data?.SaveId ?? 0L;
 			db.SetSettingForSave(settingId, saveId, value ?? "");
 			return true;

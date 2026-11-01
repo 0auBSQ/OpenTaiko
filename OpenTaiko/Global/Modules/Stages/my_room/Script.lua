@@ -1438,7 +1438,7 @@ function draw()
     if NAMEPLATE and NAMEPLATE.DrawPlayerNameplate then
         pcall(function() NAMEPLATE:DrawPlayerNameplate(40, 18, 255, playerIndex) end)
     end
-    hud:drawTextEx(26, "My Room", SCREEN_W / 2, 22, { 255, 255, 255 }, { 0, 0, 0, 255 }, 1, 1, 0, "top")
+    hud:drawTextEx(26, HUD:tr("title"), SCREEN_W / 2, 22, { 255, 255, 255 }, { 0, 0, 0, 255 }, 1, 1, 0, "top")
 
     -- online presence: a status line + a floating name tag above each visitor's avatar
     if net.online then

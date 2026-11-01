@@ -4,7 +4,7 @@
 
 セーブファイル、ネームプレート、キャラクター、ぷちキャラ、プレイ状態、テーマ、現在の言語。
 
-このページのプレイヤーインデックスは、1 始まりの THEME:GetThemeSettingForPlayer を除いてすべて 0 始まり (0 から 4) です。読み取り専用モジュール (ROActivity とバックグラウンド) は、書き込みメソッドがエラーをログに出力して何もしないセーブファイルハンドルを受け取ります。それ以外はすべてのモジュール種類で同じように振る舞います。
+このページのプレイヤーインデックスはすべて 0 始まり (0 から 4) です。読み取り専用モジュール (ROActivity とバックグラウンド) は、書き込みメソッドがエラーをログに出力して何もしないセーブファイルハンドルを受け取り、THEME のセッターもエラーをログに出力して false を返します。それ以外はすべてのモジュール種類で同じように振る舞います。
 
 ## セーブファイル
 
@@ -462,16 +462,16 @@ PUCHICHARALIST と sf:GetPuchichara がこのハンドルを返します。テ�
 スキンの解像度、テーマ設定、スキンスコープのローカライズ文字列、テーマ設定の定義。
 
 <div class="callout warn">
-スキンはテーマ設定を ThemeSettings.json で宣言し、その値を隣の ThemeSettings.db3 に保存します。ゲッターは設定値を常に文字列として返します。存在しない設定は宣言された既定値を返し、宣言がなければ空文字列を返します。GetThemeSettingForPlayer は 1 始まりのプレイヤー番号を取ります。定義のインデックスは 0 始まりです。
+スキンはテーマ設定を ThemeSettings.json で宣言し、その値を隣の ThemeSettings.db3 に保存します。ゲッターは設定値を常に文字列として返します。存在しない設定は宣言された既定値を返し、宣言がなければ空文字列を返します。ForPlayer 系のメソッドは範囲外のプレイヤーを 0 または 4 として扱います。定義のインデックスは 0 始まりです。
 </div>
 
 | メソッド | 説明 |
 | --- | --- |
 | `THEME:GetResolution()  -> vector2` | スキンの解像度。 |
 | `THEME:GetThemeSetting(settingId)  -> string` | グローバルスコープの設定の値。 |
-| `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | 1 始まりのプレイヤーに対するセーブスコープの設定の値。セーブに値がなければその既定値。 |
-| `THEME:SetThemeSetting(settingId, value)  -> bool` | ThemeSettings.json で宣言されたグローバル設定を書き込みます (セッション設定は今回の起動中だけ保持されます)。未知の id では false。 |
-| `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | 1 始まりのプレイヤーのセーブ単位の設定を書き込みます。未知の id では false。 |
+| `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | プレイヤーに対するセーブスコープの設定の値。セーブに値がなければその既定値。 |
+| `THEME:SetThemeSetting(settingId, value)  -> bool` | ThemeSettings.json で宣言されたグローバル設定を書き込みます (セッション設定は今回の起動中だけ保持されます)。未知の id または読み取り専用モジュールでは false。 |
+| `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | プレイヤーのセーブ単位の設定を書き込みます。未知の id または読み取り専用モジュールでは false。 |
 | `THEME:GetNotesSkinFile(kind, file)  -> string` | `kind` (`"taiko"`、`"bongo"`、`"judges"`) の選択中のパックにあるファイルのパス。スキンの Graphics フォルダからの相対パスで、選択中のパックにそのファイルがなければパック 1 から取ります。スキンにそのようなパックやファイルがなければ空文字列。[音符と判定のパックの追加](../guides/notes-skins.md)を参照してください。 |
 | `THEME:GetSkinString(key)  -> string` | スキンの Locales フォルダのローカライズ文字列。現在の言語、次にスキンの既定ロケール、最後に `[LOCALE NOT FOUND: key]` の順です。 |
 | `THEME:GetDefinitionCount()  -> integer` | ThemeSettings.json の設定定義の数。 |
@@ -490,7 +490,7 @@ GetString は追加の引数でエントリを書式化します。GetLanguageId
 | メソッド | 説明 |
 | --- | --- |
 | `LANG:GetString(key, ...)  -> string` | キーのローカライズ文字列。書式プレースホルダは追加の引数で埋められます。 |
-| `LANG:ChangeLanguage(id)  -> bool` | id が存在し現在のものと異なればアクティブな言語を切り替え、読み込み済みのすべてのスクリプトで `reloadLanguage` を呼びます。切り替えたかどうかを返します。CONFIG.Language は変更しません。 |
+| `LANG:ChangeLanguage(id)  -> bool` | id が存在し現在のものと異なればアクティブな言語を切り替え、まず CONFIG.Language をその id に設定してから (ゲームは終了時に Config.ini に保存します)、読み込み済みのすべてのスクリプトで `reloadLanguage` を呼びます。切り替えたかどうかを返します。 |
 | `LANG:GetLanguageIds()  -> string[]` | 利用可能な言語の id。 |
 | `LANG:GetLanguageId()  -> string` | 使用中の言語の ID。 |
 | `LANG:GetLanguageNames()  -> string[]` | 利用可能な言語の表示名 (同じ順序)。 |

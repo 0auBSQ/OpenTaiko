@@ -73,7 +73,7 @@ Abre un archivo de base de datos SQLite dentro del directorio del módulo para e
 
 | Método | Descripción |
 | --- | --- |
-| `SQL:OpenSQLDatabase(path)  -> sql` | Abre una base de datos SQLite en una ruta relativa al directorio del módulo. |
+| `SQL:OpenSQLDatabase(path)  -> sql` | Abre una base de datos SQLite en una ruta relativa al directorio del módulo. En un módulo de solo lectura la conexión es de solo lectura: las lecturas funcionan, una sentencia que escribe falla y devuelve un resultado vacío, y un archivo que falta no se crea. |
 
 ### Handle SQL
 
@@ -106,7 +106,7 @@ end
 Acceso a archivos con raíz en el directorio del módulo, más utilidades para compartir códigos de sala en línea.
 
 <div class="callout warn">
-WriteText solo escribe dentro de la carpeta del módulo: rechaza rutas absolutas y rutas que se resuelvan fuera de ella. ReadText también acepta una ruta absoluta. Las utilidades de códigos de sala usan la carpeta compartida `Global/Lobbycodes/` junto al ejecutable. Los módulos de solo lectura pueden usar todos los métodos de STORAGE.
+WriteText solo escribe dentro de la carpeta del módulo: rechaza rutas absolutas y rutas que se resuelvan fuera de ella. ReadText también acepta una ruta absoluta. Las utilidades de códigos de sala usan la carpeta compartida `Global/Lobbycodes/` junto al ejecutable. En los módulos de solo lectura, WriteText y WriteLobbyCode registran un error y devuelven false; los demás métodos funcionan.
 </div>
 
 | Método | Descripción |
@@ -290,6 +290,7 @@ Las tablas de constantes de CONFIG dan nombre a los valores enteros anteriores. 
 | `CONFIG.STEALTH` | `Off`, `Doron`, `Stealth`, `Hidden`, `Flashlight`. |
 | `CONFIG.FUN` | `None`, `Avalanche`, `Minesweeper`, `DynamicBeat`, `Total`. |
 | `CONFIG.JUSTICE` | `None`, `Just`, `Safe`. |
+| `CONFIG.TIMINGZONE` | `Loose` (-2), `Lenient` (-1), `Normal` (0), `Strict` (1), `Rigorous` (2): desplazamientos respecto a Normal. GetTimingZone y SetTimingZone usan 0..4, así que compara `CONFIG:GetTimingZone(player) - 2` con una constante y pasa la constante + 2 a SetTimingZone. |
 
 ```lua
 local multiplier = CONFIG.SONGSPEED:ToActual(CONFIG.SongSpeed)

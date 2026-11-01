@@ -39,5 +39,5 @@ Pour donner un meuble depuis votre propre stage, ajoutez 1 aux deux compteurs, c
 - Ses chaînes, noms de meubles compris (`lang/<code>/items.json`, indexés par identifiant de meuble), se trouvent dans son propre dossier `lang/`, dans les neuf langues.
 - Le catalogue des meubles est `data/furniture.json` dans le dossier du stage.
 - La Placeholder Matrix ne liste que les stages de débogage présents dans `Global/Modules/Stages/`. Ces stages de débogage et la ROActivity `video_player` qu'utilise la télévision sont eux aussi des modules globaux.
-- La capsule ouvre le stage `mysterypod` quand il existe dans `Global/Modules/Stages/`, ou quand le stage `mysterypod` propre à un skin définit la chaîne partagée `mysterypod_installed` à `"1"` dans son `onStart`.
+- La capsule ouvre un stage dès qu'il est installé.
 - Les visites en ligne utilisent l'identifiant de chambre `"myroom"` avec la version 2 de sa charge utile, comme avant le déménagement.

@@ -21,7 +21,7 @@ Beim Laden eines Skins erzeugt und startet die Engine die Module in dieser Reihe
 | `update(timestamp)` | Wird jeden Frame vor draw aufgerufen; timestamp ist die Spieluhr in Millisekunden. Eine Stage erhält kein update mehr, sobald sie Exit aufgerufen hat; draw läuft bis zum Ende des Ausblendens weiter. Activity/ROActivity: der Host ruft es über `handle:Update()` auf. |
 | `draw(...)` | Wird jeden Frame aufgerufen. Activity/ROActivity: der Host ruft es über `handle:Draw(...)` mit seinen eigenen Argumenten auf; die Rückgabewerte gehen an den Host zurück. |
 | `deactivate(...)` | Stage: wird aufgerufen, wenn die Engine die Stage verlässt. Activity/ROActivity: der Host ruft es über `handle:Deactivate(...)` auf, oder das Modul ruft es auf sich selbst über `DEACTIVATE()` auf; die Rückgabewerte gehen an den Host zurück. |
-| `afterSongEnum()` | Wird jedes Mal aufgerufen, wenn die Song-Enumeration abgeschlossen ist, auch beim Start und nach einem weichen oder harten Neuladen der Songs, selbst wenn das Modul nicht aktiv ist. |
+| `afterSongEnum()` | Wird jedes Mal aufgerufen, wenn die Song-Enumeration abgeschlossen ist, auch beim Start und nach einem weichen oder harten Neuladen der Songs, selbst wenn das Modul nicht aktiv ist. Die Engine aktualisiert die globalen Objekte CHARACTERLIST und PUCHICHARALIST unmittelbar davor. |
 | `onDestroy()` | Wird aufgerufen, bevor die Engine den Skin entlädt, damit das Modul freigeben kann, was es hält. |
 | `reloadLanguage(lang)` | Wird auf jedem geladenen Modul aufgerufen, wenn sich die Spielsprache ändert; lang ist der neue Sprachcode. |
 
@@ -558,6 +558,7 @@ Als globales Objekt info registriert und pro Modul erzeugt. Jedes Feld berechnet
 | --- | --- |
 | `info.playerCount  -> number` | Die konfigurierte Spieleranzahl. |
 | `info.lang  -> string` | Der aktuelle Sprachcode. |
+| `info.gameVersion  -> string` | Die Spielversion, vier Zahlen in der Form main.major.minor.patch (zum Beispiel `"0.7.0.0"`). |
 | `info.simplemode  -> boolean` | True, wenn Simple Mode aktiv ist. |
 | `info.p1IsBlue  -> boolean` | True, wenn Spieler 1 die blaue Seite verwendet. |
 | `info.online  -> boolean` | True, wenn eine nutzbare Netzwerkschnittstelle verfügbar ist. |

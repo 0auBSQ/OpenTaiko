@@ -707,7 +707,7 @@ function M.drawPanel()
     -- AI level slider (AI battle only)
     if G.activeConfig.mountAISlotToP2 then
         local cx      = AILevel.x + xshift
-        G.textSmall:Draw("Starting AI Level", cx, AILevel.label_y, nil, nil, opacityNorm, 1, AILevel.label_max_width, "center")
+        G.textSmall:Draw(G.skinText("SONGSELECT_AI_LEVEL", "Starting AI Level"), cx, AILevel.label_y, nil, nil, opacityNorm, 1, AILevel.label_max_width, "center")
         G.text:Draw(tostring(CONFIG.AILevel), cx, AILevel.value_y, nil, nil, opacityNorm, 1, AILevel.value_max_width, "center")
         local ax = G.arrowsDistance
         if CONFIG.AILevel > 1 then

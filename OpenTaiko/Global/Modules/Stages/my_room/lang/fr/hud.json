@@ -1,5 +1,6 @@
 {
   "_comment": "French texts for on-screen controls, interaction prompts and the room picker (Script.lua). Keys are stable ids; a missing id shows the English text (lang/en).",
+  "title": "Ma Chambre",
   "ctl_move": "WASD — Se déplacer",
   "ctl_orbit": "Clic droit / Q·E — Orbiter",
   "ctl_zoom": "Molette — Zoom",

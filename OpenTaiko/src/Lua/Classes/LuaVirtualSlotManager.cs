@@ -7,6 +7,17 @@ namespace OpenTaiko;
 /// Exposed as the global <c>VIRTUALSLOTS</c> inside Lua stages.
 /// </summary>
 public class LuaVirtualSlotManager {
+	// false in read-only modules: the setters and MountSlot then log an error and change nothing
+	private readonly bool _writable;
+
+	public LuaVirtualSlotManager(bool writable = true) => _writable = writable;
+
+	private bool Blocked(string member) {
+		if (_writable) return false;
+		CLuaScript.BlockWrite($"VIRTUALSLOTS.{member}");
+		return true;
+	}
+
 	// ── V-slot data getters/setters ────────────────────────────────────────────
 
 	/// <summary>Gets the character folder name for slot V<paramref name="slot"/> (1-5).</summary>
@@ -17,6 +28,7 @@ public class LuaVirtualSlotManager {
 
 	/// <summary>Sets the character folder name for slot V<paramref name="slot"/> (1-5).</summary>
 	public void SetCharacter(int slot, string folderName) {
+		if (Blocked(nameof(SetCharacter))) return;
 		var v = GetV(slot);
 		if (v != null) v.CharacterFolderName = folderName ?? "None";
 	}
@@ -29,6 +41,7 @@ public class LuaVirtualSlotManager {
 
 	/// <summary>Sets the puchichara folder name for slot V<paramref name="slot"/> (1-5).</summary>
 	public void SetPuchichara(int slot, string folderName) {
+		if (Blocked(nameof(SetPuchichara))) return;
 		var v = GetV(slot);
 		if (v != null) v.PuchicharaFolderName = folderName ?? "None";
 	}
@@ -41,6 +54,7 @@ public class LuaVirtualSlotManager {
 
 	/// <summary>Sets the nameplate player name for slot V<paramref name="slot"/> (1-5).</summary>
 	public void SetNameplateName(int slot, string name) {
+		if (Blocked(nameof(SetNameplateName))) return;
 		var v = GetV(slot);
 		if (v != null) v.NameplatePlayerName = name ?? "VSlot";
 	}
@@ -53,6 +67,7 @@ public class LuaVirtualSlotManager {
 
 	/// <summary>Sets the nameplate title text for slot V<paramref name="slot"/> (1-5).</summary>
 	public void SetNameplateTitle(int slot, string title) {
+		if (Blocked(nameof(SetNameplateTitle))) return;
 		var v = GetV(slot);
 		if (v != null) v.NameplateTitle = title ?? "";
 	}
@@ -65,6 +80,7 @@ public class LuaVirtualSlotManager {
 
 	/// <summary>Sets the nameplate dan text for slot V<paramref name="slot"/> (1-5).</summary>
 	public void SetNameplateDan(int slot, string dan) {
+		if (Blocked(nameof(SetNameplateDan))) return;
 		var v = GetV(slot);
 		if (v != null) v.NameplateDan = dan ?? "";
 	}
@@ -78,6 +94,7 @@ public class LuaVirtualSlotManager {
 	/// An empty id, or one unknown on this machine, shows the plate without a title.
 	/// </summary>
 	public void SetNameplateById(int slot, object nameplateId) {
+		if (Blocked(nameof(SetNameplateById))) return;
 		var v = GetV(slot);
 		if (v == null) return;
 		v.VirtualData.TitleId = DBNameplateUnlockables.tKey(nameplateId);
@@ -87,24 +104,28 @@ public class LuaVirtualSlotManager {
 
 	/// <summary>Sets the nameplate title TYPE (style index) for slot V<paramref name="slot"/> (1-5) directly.</summary>
 	public void SetNameplateType(int slot, int type) {
+		if (Blocked(nameof(SetNameplateType))) return;
 		var v = GetV(slot);
 		if (v != null) v.VirtualData.TitleType = type;
 	}
 
 	/// <summary>Sets the nameplate title RARITY (lang int) for slot V<paramref name="slot"/> (1-5) directly.</summary>
 	public void SetNameplateRarity(int slot, int rarity) {
+		if (Blocked(nameof(SetNameplateRarity))) return;
 		var v = GetV(slot);
 		if (v != null) v.VirtualData.TitleRarityInt = rarity;
 	}
 
 	/// <summary>Sets the dan-plate TYPE for slot V<paramref name="slot"/> (1-5).</summary>
 	public void SetNameplateDanType(int slot, int danType) {
+		if (Blocked(nameof(SetNameplateDanType))) return;
 		var v = GetV(slot);
 		if (v != null) v.VirtualData.DanType = danType;
 	}
 
 	/// <summary>Sets whether the dan plate is rendered gold for slot V<paramref name="slot"/> (1-5).</summary>
 	public void SetNameplateDanGold(int slot, bool gold) {
+		if (Blocked(nameof(SetNameplateDanGold))) return;
 		var v = GetV(slot);
 		if (v != null) v.VirtualData.DanGold = gold;
 	}
@@ -122,6 +143,7 @@ public class LuaVirtualSlotManager {
 	/// Nothing is written to disk; the override lasts until MountSlot is called again.
 	/// </summary>
 	public void MountSlot(int playerSpot, string slotInfo) {
+		if (Blocked(nameof(MountSlot))) return;
 		CVirtualSlotManager.MountSlot(playerSpot, slotInfo);
 	}
 

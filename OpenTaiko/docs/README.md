@@ -2,9 +2,7 @@
 
 # OpenTaiko Documentation
 
-<span class="badge-new">Game version 0.6.1</span>
-
-<div class="callout warn">This documentation is still under review and may change until the release.</div>
+<span class="badge-new">Game version 0.7.0</span>
 
 OpenTaiko draws almost every screen outside of core gameplay with Lua scripts that ship inside a skin: the menus, the song select, the room and story scenes, the backgrounds, the results screen. This site documents the Lua API those scripts use and walks through the most common things a skinner wants to do.
 

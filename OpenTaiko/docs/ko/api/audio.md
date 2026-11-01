@@ -55,7 +55,7 @@ end
 `SOUND` 팩토리 메서드가 반환하는 재생 가능한 소리입니다.
 
 <div class="callout warn">
-스트림이 준비될 때까지 핸들은 Play와 모든 Set* 호출을 버퍼링하고 getter는 아래에 나열된 기본값을 반환합니다. Volume은 백분율입니다(100 = 파일 자체의 레벨). Pan은 -100(왼쪽)에서 0(가운데)을 거쳐 100(오른쪽)까지입니다. 위치와 길이는 밀리초 단위입니다. Play는 스트림을 처음부터 다시 시작하므로 Play를 호출한 뒤에 탐색하십시오.
+스트림이 준비될 때까지 핸들은 Play와 모든 Set* 호출을 버퍼링하고 getter는 아래에 나열된 기본값을 반환합니다. Volume은 백분율입니다(100 = 파일 자체의 레벨). Pan은 -100(왼쪽)에서 0(가운데)을 거쳐 100(오른쪽)까지입니다. 위치와 길이는 밀리초 단위입니다. Play는 스트림을 처음부터 다시 시작하므로 Play를 호출한 뒤에 탐색하십시오. 아래의 별칭은 영구적이며 두 이름 모두 지원됩니다.
 </div>
 
 | 메서드 | 설명 |
@@ -70,16 +70,16 @@ end
 | `sound:GetLoop()  -> bool` | 루프가 켜져 있는지 반환합니다. |
 | `sound:SetVolumePercent(vol)  -> nil` | 볼륨을 퍼센트로 설정합니다. |
 | `sound:GetVolumePercent()  -> number` | 볼륨을 퍼센트로 반환합니다(로드되지 않았으면 100). |
-| `sound:SetVolume(vol)  -> nil` | SetVolumePercent의 옛 이름(정수). |
+| `sound:SetVolume(vol)  -> nil` | SetVolumePercent의 별칭(정수). |
 | `sound:SetPan(pan)  -> nil` | 스테레오 팬을 설정합니다, -100..100. |
 | `sound:GetPan()  -> int` | 현재 팬을 반환합니다(로드되지 않았으면 0). |
 | `sound:SetSpeed(speed)  -> nil` | 재생 속도 배율을 설정합니다(1 = 보통). |
 | `sound:GetSpeed()  -> number` | 재생 속도 배율을 반환합니다(로드되지 않았으면 1). |
 | `sound:SetTimestampMs(ms)  -> nil` | 밀리초 단위 위치로 탐색합니다. |
-| `sound:SetTimestamp(ms)  -> nil` | SetTimestampMs의 옛 이름. |
+| `sound:SetTimestamp(ms)  -> nil` | SetTimestampMs의 별칭. |
 | `sound:GetTimestampMs()  -> number` | 현재 위치를 밀리초로 반환합니다(로드되지 않았으면 0). |
 | `sound.DurationMs  -> number` | 전체 길이(밀리초)(로드되지 않았으면 0). |
-| `sound:GetDurationMs()  -> number` | DurationMs의 옛 이름. |
+| `sound:GetDurationMs()  -> number` | DurationMs의 별칭. |
 | `sound.Loaded  -> bool` | 렌더 스레드가 스트림을 만들면 true. |
 | `sound.IsPlaying  -> bool` | 소리가 재생 중인 동안 true. |
 | `sound:IsFinished()  -> bool` | 재생이 끝에 도달하면 true(일시정지 중이거나 로드되지 않았으면 false). |

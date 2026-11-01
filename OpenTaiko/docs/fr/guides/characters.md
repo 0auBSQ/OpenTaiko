@@ -4,11 +4,11 @@
 
 Un personnage est un dossier sous `Global/Characters/` dans le dossier d'installation du jeu. Chaque sous-dossier que le jeu y trouve devient un personnage sélectionnable. Un dossier contient un `Metadata.json` (nom, rareté, auteur), un `CharaConfig.txt` (positions et minutage des animations), le contenu des animations, et éventuellement `Effects.json`, `Unlock.json`, `Palettes.json` et des extraits vocaux. Le contenu des animations est soit des dossiers de frames PNG numérotées, que le script de personnage intégré au jeu rend, soit tout ce qu'un `Script.lua` propre au personnage choisit de dessiner (le modèle 3D fourni dessine un modèle glTF).
 
-Compatibilité : OpenTaiko 0.6.1 charge toujours sans modification les personnages créés pour la version 0.6.0. Cette page décrit la structure actuelle ; utilisez-la pour les nouveaux personnages.
+Compatibilité : OpenTaiko 0.7.0 charge toujours sans modification les personnages créés pour la version 0.6.0. Cette page décrit la structure actuelle ; utilisez-la pour les nouveaux personnages.
 
 ## Avant de commencer
 
-- OpenTaiko 0.6.1 installé. Le jeu lit les personnages depuis `Global/Characters/` à côté de l'exécutable du jeu, et tous les skins les partagent.
+- OpenTaiko 0.7.0 installé. Le jeu lit les personnages depuis `Global/Characters/` à côté de l'exécutable du jeu, et tous les skins les partagent.
 - Un éditeur de texte pour les fichiers JSON et de type INI.
 - Pour un personnage 2D : les dessins exportés en frames PNG numérotées (`0.png`, `1.png`, ...) avec un fond transparent, un dossier par état d'animation.
 - Pour un personnage 3D : un `model.glb` (glTF binaire) contenant les clips d'animation, et une image fixe `Render.png`.
@@ -108,7 +108,7 @@ Les états manquants retombent sur un autre état, si bien qu'un personnage peut
 La liste complète des clés, avec leurs valeurs par défaut, est la table `load_chara_config_defs` en tête du `CharaScript.lua` intégré. Le script ignore les clés qu'il ne connaît pas ; le `01 - Template/CharaConfig.txt` fourni contient donc aussi quelques clés côté skin sans effet dans ce fichier.
 
 ```ini
-Chara_Version=0.6.1.0
+Chara_Version=0.7.0.0
 Chara_Resolution=1920,1080
 
 ;Position X du personnage (1P,2P)

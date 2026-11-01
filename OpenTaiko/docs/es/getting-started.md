@@ -2,11 +2,11 @@
 
 # Cómo funcionan los módulos
 
-OpenTaiko 0.6.1 permite que un skin añada y reemplace pantallas con Lua. La carpeta Modules de un skin contiene una carpeta por módulo, y cada módulo tiene un Script.lua que define un conjunto fijo de funciones de callback globales. El juego carga cada Script.lua en su propio estado Lua aislado (sandbox), registra las globales del motor (TEXTURE, SOUND, INPUT, CONFIG y las demás documentadas en la [referencia de la API](api/README.md)) y llama a los callbacks en el momento adecuado. [Módulos y ciclo de vida](api/activities.md) recoge las firmas exactas.
+OpenTaiko 0.7.0 permite que un skin añada y reemplace pantallas con Lua. La carpeta Modules de un skin contiene una carpeta por módulo, y cada módulo tiene un Script.lua que define un conjunto fijo de funciones de callback globales. El juego carga cada Script.lua en su propio estado Lua aislado (sandbox), registra las globales del motor (TEXTURE, SOUND, INPUT, CONFIG y las demás documentadas en la [referencia de la API](api/README.md)) y llama a los callbacks en el momento adecuado. [Módulos y ciclo de vida](api/activities.md) recoge las firmas exactas.
 
 ## Antes de empezar
 
-- OpenTaiko 0.6.1 y una carpeta de skin con un directorio Modules. El skin incluido es System/Open-World Memories.
+- OpenTaiko 0.7.0 y una carpeta de skin con un directorio Modules. El skin incluido es System/Open-World Memories.
 - Un editor de texto y nociones básicas de Lua (funciones, tablas, require).
 - Los stages incluidos en System/Open-World Memories/Modules/Stages y Global/Modules/Stages. Las pequeñas demos de Global/Modules/Stages/demo_overall muestran la forma de los callbacks; los stages grandes muestran cómo se organizan pantallas reales.
 
@@ -70,7 +70,7 @@ end
 ## El ciclo de vida de un stage
 
 - onStart(): el juego lo llama una vez después de cargar el skin, y de nuevo tras cada recarga del skin, esté o no el stage en pantalla. Carga aquí texturas, sonidos y vídeos. Se ejecuta como corrutina, así que una carga larga puede repartirse entre fotogramas detrás de la barra de carga con la utilidad LOADING.
-- activate(): el juego lo llama cada vez que se entra en el stage. Reinicia aquí el estado por visita, arranca la música y abre las bases de datos. También se ejecuta como corrutina y puede usar LOADING. El juego actualiza las listas de personajes y puchicharas (CHARACTERLIST, PUCHICHARALIST) justo antes de que se ejecute activate, así que léelas aquí; onStart se ejecuta antes de esa actualización.
+- activate(): el juego lo llama cada vez que se entra en el stage. Reinicia aquí el estado por visita, arranca la música y abre las bases de datos. También se ejecuta como corrutina y puede usar LOADING. El juego actualiza las listas de personajes y puchicharas (CHARACTERLIST, PUCHICHARALIST) justo antes de que se ejecute activate, y de nuevo antes de afterSongEnum, así que léelas en cualquiera de las dos; onStart se ejecuta antes de la primera actualización.
 - update(timestamp): el juego lo llama cada fotograma antes de draw y le pasa el reloj del juego en milisegundos. Gestiona aquí la entrada y cambia el estado. Una vez que el stage ha llamado a Exit, el juego deja de llamar a update y sigue llamando a draw durante el fundido de salida.
 - draw(): el juego lo llama cada fotograma. Solo dibuja, y mantén bajas las asignaciones por fotograma.
 - deactivate(): el juego lo llama al abandonar el stage. La demo de bases de datos de demo_overall libera aquí sus bases de datos; su primera demo detiene su música y su vídeo.
@@ -124,7 +124,20 @@ local Dialogue  = require("nokon_dialogue")           -- la carpeta del módulo
 
 ## Módulos de solo lectura
 
-El juego crea las ROActivities y los fondos con globales restringidas antes de que se ejecute su Script.lua: CONFIG es una vista de solo lectura, GetSaveFile(player) devuelve un archivo de guardado de solo lectura, DATABASE abre almacenes de solo lectura y ACTIVITY es nil (usa ROACTIVITY). Una escritura a través de cualquiera de ellos registra una notificación de error, no hace nada y no lanza ningún error de Lua. Un módulo que necesite cambiar ajustes, datos de guardado o una base de datos debe ser una Activity o un Stage.
+El juego crea las ROActivities y los fondos con globales restringidas antes de que se ejecute su Script.lua. Una escritura a través de ellas registra una notificación de error, no hace nada y no lanza ningún error de Lua:
+
+- CONFIG es una vista de solo lectura: sus setters no hacen nada.
+- GetSaveFile(player) devuelve un archivo de guardado de solo lectura.
+- DATABASE abre almacenes de solo lectura.
+- THEME:SetThemeSetting y THEME:SetThemeSettingForPlayer devuelven false.
+- STORAGE:WriteText y STORAGE:WriteLobbyCode devuelven false.
+- SQL:OpenSQLDatabase(path) abre la base de datos en solo lectura: las lecturas funcionan, una sentencia que escribe falla, registra el error de SQLite y devuelve un resultado vacío, y un archivo de base de datos que falta no se crea.
+- Los setters de VIRTUALSLOTS y VIRTUALSLOTS:MountSlot no hacen nada; los getters siguen funcionando.
+- DANBUILDER:Mount() devuelve false; el constructor aún se puede rellenar.
+- Mount y MountIfNotLocked de un nodo de canción y Select de un chart devuelven false, venga de donde venga el nodo.
+- ACTIVITY es nil (usa ROACTIVITY).
+
+Un módulo que necesite cambiar ajustes, datos de guardado o una base de datos, o elegir una canción para jugar, debe ser una Activity o un Stage.
 
 ## Localización con lang/
 

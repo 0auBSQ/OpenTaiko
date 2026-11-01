@@ -21,7 +21,7 @@
 | `update(timestamp)` | 毎フレーム draw の前に呼ばれます。timestamp はミリ秒単位のゲームクロックです。ステージは Exit を呼んだ後 update を受け取らなくなります。draw はフェードアウトの間も呼ばれ続けます。アクティビティ/ROActivity: ホストが `handle:Update()` を通じて呼びます。 |
 | `draw(...)` | 毎フレーム呼ばれます。アクティビティ/ROActivity: ホストが `handle:Draw(...)` を通じてホスト自身の引数で呼びます。戻り値はホストに返ります。 |
 | `deactivate(...)` | ステージ: エンジンがステージを離れるときに呼ばれます。アクティビティ/ROActivity: ホストが `handle:Deactivate(...)` を通じて呼ぶか、モジュール自身が `DEACTIVATE()` で自分に対して呼び出します。戻り値はホストに返ります。 |
-| `afterSongEnum()` | 起動時とソフト/ハードの楽曲リロード後を含め、楽曲の列挙が完了するたびに、モジュールがアクティブでなくても呼ばれます。 |
+| `afterSongEnum()` | 起動時とソフト/ハードの楽曲リロード後を含め、楽曲の列挙が完了するたびに、モジュールがアクティブでなくても呼ばれます。エンジンは CHARACTERLIST と PUCHICHARALIST グローバルをこの直前に更新します。 |
 | `onDestroy()` | エンジンがスキンをアンロードする前に、モジュールが保持しているものを解放できるよう呼ばれます。 |
 | `reloadLanguage(lang)` | ゲームの言語が変更されたときにすべての読み込み済みモジュールで呼ばれます。lang は新しい言語コードです。 |
 
@@ -558,6 +558,7 @@ info グローバルとして登録され、モジュールごとに作成され
 | --- | --- |
 | `info.playerCount  -> number` | 設定されているプレイヤー数。 |
 | `info.lang  -> string` | 現在の言語コード。 |
+| `info.gameVersion  -> string` | ゲームのバージョン。main.major.minor.patch 形式の 4 つの数字 (例: `"0.7.0.0"`)。 |
 | `info.simplemode  -> boolean` | シンプルモードが有効なとき true。 |
 | `info.p1IsBlue  -> boolean` | プレイヤー 1 が青側を使うとき true。 |
 | `info.online  -> boolean` | 使用可能なネットワークインターフェースがあるとき true。 |

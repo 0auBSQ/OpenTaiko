@@ -73,7 +73,7 @@ Opent een SQLite-databasebestand binnen de modulemap om SQL-instructies uit te v
 
 | Methode | Beschrijving |
 | --- | --- |
-| `SQL:OpenSQLDatabase(path)  -> sql` | Opent een SQLite-database op een pad relatief ten opzichte van de modulemap. |
+| `SQL:OpenSQLDatabase(path)  -> sql` | Opent een SQLite-database op een pad relatief ten opzichte van de modulemap. In een alleen-lezen module is de verbinding alleen-lezen: lezen werkt, een statement dat schrijft mislukt en geeft een leeg resultaat terug, en een ontbrekend bestand wordt niet aangemaakt. |
 
 ### SQL-handle
 
@@ -106,7 +106,7 @@ end
 Bestandstoegang met de modulemap als basis, plus helpers voor het delen van online lobbycodes.
 
 <div class="callout warn">
-WriteText schrijft alleen binnen de modulemap: het weigert absolute paden en paden die buiten de map uitkomen. ReadText accepteert ook een absoluut pad. Lobbycode-helpers gebruiken de gedeelde map `Global/Lobbycodes/` naast het uitvoerbare bestand. Alleen-lezen modules kunnen elke STORAGE-methode gebruiken.
+WriteText schrijft alleen binnen de modulemap: het weigert absolute paden en paden die buiten de map uitkomen. ReadText accepteert ook een absoluut pad. Lobbycode-helpers gebruiken de gedeelde map `Global/Lobbycodes/` naast het uitvoerbare bestand. In alleen-lezen modules loggen WriteText en WriteLobbyCode een fout en geven ze false terug; de andere methoden werken.
 </div>
 
 | Methode | Beschrijving |
@@ -290,6 +290,7 @@ Constantentabellen op CONFIG geven namen aan de bovenstaande integerwaarden. `SO
 | `CONFIG.STEALTH` | `Off`, `Doron`, `Stealth`, `Hidden`, `Flashlight`. |
 | `CONFIG.FUN` | `None`, `Avalanche`, `Minesweeper`, `DynamicBeat`, `Total`. |
 | `CONFIG.JUSTICE` | `None`, `Just`, `Safe`. |
+| `CONFIG.TIMINGZONE` | `Loose` (-2), `Lenient` (-1), `Normal` (0), `Strict` (1), `Rigorous` (2): afstanden tot Normal. GetTimingZone en SetTimingZone gebruiken 0..4, dus vergelijk `CONFIG:GetTimingZone(player) - 2` met een constante en geef SetTimingZone de constante + 2. |
 
 ```lua
 local multiplier = CONFIG.SONGSPEED:ToActual(CONFIG.SongSpeed)

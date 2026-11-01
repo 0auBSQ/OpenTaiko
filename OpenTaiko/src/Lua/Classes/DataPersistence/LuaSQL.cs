@@ -4,8 +4,9 @@ namespace OpenTaiko {
 	public class LuaSQL {
 		private readonly string _connectionString;
 
-		public LuaSQL(string path) {
-			_connectionString = @$"Data Source={path}";
+		// a read-only connection fails, with an error, on any statement that writes
+		public LuaSQL(string path, bool readOnly = false) {
+			_connectionString = readOnly ? @$"Data Source={path};Mode=ReadOnly" : @$"Data Source={path}";
 		}
 
 		public Dictionary<int, Dictionary<string, object?>> Query(string query) {
@@ -43,14 +44,17 @@ namespace OpenTaiko {
 
 	public class LuaSQLFunc {
 		private string DirPath;
+		// false in read-only modules, whose databases open read-only
+		private readonly bool _writable;
 
-		public LuaSQLFunc(string dirPath) {
+		public LuaSQLFunc(string dirPath, bool writable = true) {
 			DirPath = dirPath;
+			_writable = writable;
 		}
 
 		public LuaSQL OpenSQLDatabase(string path) {
 			string full_path = $@"{DirPath}{Path.DirectorySeparatorChar}{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
-			return new LuaSQL(full_path);
+			return new LuaSQL(full_path, readOnly: !_writable);
 		}
 	}
 }

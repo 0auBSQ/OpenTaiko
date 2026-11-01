@@ -21,7 +21,7 @@
 | `update(timestamp)` | 每帧在 draw 之前调用；timestamp 是以毫秒计的游戏时钟。舞台一旦调用了 Exit 就不再收到 update；draw 会在淡出期间继续运行。活动/只读活动：宿主通过 `handle:Update()` 调用它。 |
 | `draw(...)` | 每帧调用。活动/只读活动：宿主通过 `handle:Draw(...)` 以自己的参数调用它；返回值回到宿主。 |
 | `deactivate(...)` | 舞台：引擎离开舞台时调用。活动/只读活动：宿主通过 `handle:Deactivate(...)` 调用它，或由模块自身通过 `DEACTIVATE()` 调用；返回值回到宿主。 |
-| `afterSongEnum()` | 每次歌曲枚举完成时调用，包括启动时以及歌曲软重载或硬重载之后，即使模块并未激活。 |
+| `afterSongEnum()` | 每次歌曲枚举完成时调用，包括启动时以及歌曲软重载或硬重载之后，即使模块并未激活。引擎会在它运行前刷新 CHARACTERLIST 和 PUCHICHARALIST 全局对象。 |
 | `onDestroy()` | 引擎卸载皮肤前调用，以便模块释放其持有的资源。 |
 | `reloadLanguage(lang)` | 游戏语言变更时对每个已加载模块调用；lang 是新的语言代码。 |
 
@@ -558,6 +558,7 @@ end
 | --- | --- |
 | `info.playerCount  -> number` | 配置的玩家数量。 |
 | `info.lang  -> string` | 当前语言代码。 |
+| `info.gameVersion  -> string` | 游戏版本，main.major.minor.patch 形式的四个数字（例如 `"0.7.0.0"`）。 |
 | `info.simplemode  -> boolean` | 简易模式开启时为 true。 |
 | `info.p1IsBlue  -> boolean` | 玩家 1 使用蓝色侧时为 true。 |
 | `info.online  -> boolean` | 存在可用的网络接口时为 true。 |

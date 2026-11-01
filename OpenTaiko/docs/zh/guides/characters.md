@@ -4,11 +4,11 @@
 
 角色是游戏安装目录下 `Global/Characters/` 中的一个文件夹。游戏在那里找到的每个子文件夹都会成为一个可选择的角色。文件夹中包含一个 `Metadata.json`（名称、稀有度、作者）、一个 `CharaConfig.txt`（位置和动画时序）、动画内容，以及可选的 `Effects.json`、`Unlock.json`、`Palettes.json` 和语音片段。动画内容要么是按编号命名的 PNG 帧文件夹，由游戏内置的角色脚本渲染，要么是每角色 `Script.lua` 自行选择绘制的任何内容（自带的 3D 模板绘制一个 glTF 模型）。
 
-兼容性：OpenTaiko 0.6.1 仍能无需修改地加载为 0.6.0 制作的角色。本页描述的是当前结构，新角色请使用它。
+兼容性：OpenTaiko 0.7.0 仍能无需修改地加载为 0.6.0 制作的角色。本页描述的是当前结构，新角色请使用它。
 
 ## 开始之前
 
-- 已安装 OpenTaiko 0.6.1。游戏从游戏可执行文件旁的 `Global/Characters/` 读取角色，所有皮肤共享它们。
+- 已安装 OpenTaiko 0.7.0。游戏从游戏可执行文件旁的 `Global/Characters/` 读取角色，所有皮肤共享它们。
 - 一个用于编辑 JSON 和 INI 风格文件的文本编辑器。
 - 2D 角色：导出为带透明背景、按编号命名的 PNG 帧（`0.png`、`1.png`、...），每个动画状态一个文件夹。
 - 3D 角色：一个包含动画片段的 `model.glb`（二进制 glTF），以及一张静态的 `Render.png`。
@@ -108,7 +108,7 @@
 带默认值的完整键列表是内置 `CharaScript.lua` 顶部的 `load_chara_config_defs` 表。脚本会忽略它不认识的键，因此自带的 `01 - Template/CharaConfig.txt` 中也包含一些在此文件里不起作用的皮肤侧键。
 
 ```ini
-Chara_Version=0.6.1.0
+Chara_Version=0.7.0.0
 Chara_Resolution=1920,1080
 
 ;角色 X 位置（1P,2P）

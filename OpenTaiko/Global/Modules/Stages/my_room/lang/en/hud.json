@@ -1,5 +1,6 @@
 {
   "_comment": "English texts for on-screen controls, interaction prompts and the room picker (Script.lua). Keys are stable ids; this file is the fallback for every other language.",
+  "title": "My Room",
   "ctl_move": "WASD — Move",
   "ctl_orbit": "RMB / Q·E — Orbit",
   "ctl_zoom": "Wheel — Zoom",

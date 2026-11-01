@@ -143,6 +143,19 @@ G.startCounter = function(key, startVal, endVal, interval, mode, updateCallback,
     return c
 end
 
+-- A skin locale string (Locales/<lang>/), the English fallback when the key is missing. Kept until
+-- activate() empties G.skinTexts, so a language change applies on the next visit.
+G.skinTexts = {}
+G.skinText = function(key, fallback)
+    local s = G.skinTexts[key]
+    if s == nil then
+        local ok, v = pcall(function() return THEME:GetSkinString(key) end)
+        s = (ok and type(v) == "string" and v ~= "" and v:sub(1, 1) ~= "[") and v or fallback
+        G.skinTexts[key] = s
+    end
+    return s
+end
+
 -- Number rendering — used by draw_songselect and diffselect panels.
 G.calculateNumberWidth = function(nb, txstr)
     local str = tostring(nb)
@@ -440,6 +453,7 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly
     end
 
     G.speedLabel = nil                  -- read again in the current language
+    G.skinTexts = {}
 
     -- the online lobby's preview plays on at full volume while its song stays selected (navigation hands it over)
     if G.activeConfig.songOnly then
@@ -585,11 +599,11 @@ function draw(mode)
     if G.eventOver then return end   -- leaving for the thank-you screen: nothing under the fade
     -- Loading / no-songs guard: black screen with status message.
     if IsSongsEnumerating() then
-        drawWaitScreen("Loading songs, please wait...")
+        drawWaitScreen(G.skinText("VAULT_LOADING", "Loading songs, please wait..."))
         return
     end
     if G.songList == nil or G.songList:GetSongNodeAtOffset(0) == nil then
-        drawWaitScreen("No song found.")
+        drawWaitScreen(G.skinText("SONGSELECT_NO_SONGS", "No song found."))
         return
     end
 

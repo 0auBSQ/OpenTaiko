@@ -10,6 +10,10 @@
         "DANSELECT_EXIT": "Afsluiten",
         "DANSELECT_CONFIRM": "De uitdaging aangaan?",
         "DANSELECT_NOT_RECORDED": "Wordt niet opgeslagen",
-        "DANSELECT_NO_GRADE": "Niet opgeslagen, geen dan-rang"
+        "DANSELECT_NO_GRADE": "Niet opgeslagen, geen dan-rang",
+
+        // The standard dan list: the exam range labels
+        "DANSELECT_EXAM_MORE": "of meer",
+        "DANSELECT_EXAM_LESS": "minder dan"
     }
 }

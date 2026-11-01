@@ -39,5 +39,5 @@ Um aus Ihrer eigenen Stage ein Möbelstück zu vergeben, addieren Sie 1 zu beide
 - Seine Strings, einschließlich der Möbelnamen (`lang/<code>/items.json`, mit der Möbel-ID als Schlüssel), liegen in seinem eigenen Ordner `lang/`, in den neun Sprachen.
 - Der Möbelkatalog ist `data/furniture.json` im Ordner der Stage.
 - Die Placeholder Matrix listet nur die Debug-Stages auf, die in `Global/Modules/Stages/` vorhanden sind. Diese Debug-Stages und die ROActivity `video_player`, die der Fernseher verwendet, sind ebenfalls globale Module.
-- Die Kapsel öffnet die Stage `mysterypod`, wenn sie in `Global/Modules/Stages/` existiert oder wenn die eigene Stage `mysterypod` eines Skins in ihrem `onStart` den gemeinsamen String `mysterypod_installed` auf `"1"` setzt.
+- Die Kapsel öffnet eine Stage, wenn eine installiert ist.
 - Online-Besuche verwenden die Zimmer-ID `"myroom"` mit Version 2 ihrer Nutzdaten, wie vor dem Umzug.

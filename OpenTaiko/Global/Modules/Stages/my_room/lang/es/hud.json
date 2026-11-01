@@ -1,5 +1,6 @@
 {
   "_comment": "Spanish texts for on-screen controls, interaction prompts and the room picker (Script.lua). Keys are stable ids; a missing id shows the English text (lang/en).",
+  "title": "Mi Habitación",
   "ctl_move": "WASD — Moverse",
   "ctl_orbit": "Clic der. / Q·E — Orbitar",
   "ctl_zoom": "Rueda — Zoom",

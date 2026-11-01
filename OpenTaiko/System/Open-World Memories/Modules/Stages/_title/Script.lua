@@ -439,7 +439,7 @@ function draw()
     -- Version watermark (top-left, no anchor)
     if textVersion ~= nil then
         local V = Layout.version
-        local vTex = textVersion:GetText("OpenTaiko 0.6.1 Pre-release 1 (Demo)", false, V.max_width, Config.color(V.text_color), Config.color(V.outline_color))
+        local vTex = textVersion:GetText("OpenTaiko " .. info.gameVersion, false, V.max_width, Config.color(V.text_color), Config.color(V.outline_color))
         if vTex ~= nil then vTex:Draw(V.x, V.y) end
     end
 

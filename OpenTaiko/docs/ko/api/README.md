@@ -2,7 +2,7 @@
 
 # API 레퍼런스
 
-<span class="badge-new">게임 버전 0.6.1</span>
+<span class="badge-new">게임 버전 0.7.0</span>
 
 OpenTaiko Lua 런타임이 스킨에 노출하는 모든 전역의 레퍼런스입니다. 사이드바에서 분류를 고르거나, 아직 모듈을 작성해 본 적이 없다면 [모듈과 생명 주기](activities.md)부터 시작하십시오.
 

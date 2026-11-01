@@ -2,11 +2,11 @@
 
 # 모듈의 동작 방식
 
-OpenTaiko 0.6.1에서는 스킨이 Lua로 화면을 추가하고 교체할 수 있습니다. 스킨의 Modules 폴더에는 모듈마다 하나의 폴더가 있고, 각 모듈에는 정해진 전역 콜백 함수 집합을 정의하는 Script.lua가 있습니다. 게임은 각 Script.lua를 독립된 샌드박스 Lua 상태로 로드하고, 엔진 전역(TEXTURE, SOUND, INPUT, CONFIG 등 [API 레퍼런스](api/README.md)에 문서화된 것들)을 등록한 뒤, 적절한 시점에 콜백을 호출합니다. 정확한 시그니처는 [모듈과 생명 주기](api/activities.md)에 나열되어 있습니다.
+OpenTaiko 0.7.0에서는 스킨이 Lua로 화면을 추가하고 교체할 수 있습니다. 스킨의 Modules 폴더에는 모듈마다 하나의 폴더가 있고, 각 모듈에는 정해진 전역 콜백 함수 집합을 정의하는 Script.lua가 있습니다. 게임은 각 Script.lua를 독립된 샌드박스 Lua 상태로 로드하고, 엔진 전역(TEXTURE, SOUND, INPUT, CONFIG 등 [API 레퍼런스](api/README.md)에 문서화된 것들)을 등록한 뒤, 적절한 시점에 콜백을 호출합니다. 정확한 시그니처는 [모듈과 생명 주기](api/activities.md)에 나열되어 있습니다.
 
 ## 시작하기 전에
 
-- OpenTaiko 0.6.1과 Modules 디렉터리가 있는 스킨 폴더. 기본 제공 스킨은 System/Open-World Memories입니다.
+- OpenTaiko 0.7.0과 Modules 디렉터리가 있는 스킨 폴더. 기본 제공 스킨은 System/Open-World Memories입니다.
 - 텍스트 편집기와 기초적인 Lua 지식(함수, 테이블, require).
 - System/Open-World Memories/Modules/Stages와 Global/Modules/Stages 아래의 기본 제공 스테이지. Global/Modules/Stages/demo_overall의 작은 데모들은 콜백의 형태를 보여 주고, 큰 스테이지는 실제 화면이 어떻게 구성되는지 보여 줍니다.
 
@@ -70,7 +70,7 @@ end
 ## 스테이지 생명 주기
 
 - onStart(): 게임은 스킨이 로드된 뒤 한 번, 그리고 스킨을 다시 로드할 때마다 스테이지가 화면에 있든 없든 이 함수를 호출합니다. 여기서 텍스처, 소리, 비디오를 로드하십시오. 코루틴으로 실행되므로 긴 로드는 LOADING 헬퍼로 로딩 바 뒤에서 여러 프레임에 걸쳐 나눌 수 있습니다.
-- activate(): 게임은 스테이지에 들어갈 때마다 이 함수를 호출합니다. 방문마다 초기화할 상태를 재설정하고, 음악을 시작하고, 데이터베이스를 여는 곳입니다. 역시 코루틴으로 실행되며 LOADING을 사용할 수 있습니다. 게임은 캐릭터와 푸치캬라 목록(CHARACTERLIST, PUCHICHARALIST)을 activate 실행 직전에 갱신하므로 여기서 읽으십시오. onStart는 그 갱신보다 먼저 실행됩니다.
+- activate(): 게임은 스테이지에 들어갈 때마다 이 함수를 호출합니다. 방문마다 초기화할 상태를 재설정하고, 음악을 시작하고, 데이터베이스를 여는 곳입니다. 역시 코루틴으로 실행되며 LOADING을 사용할 수 있습니다. 게임은 캐릭터와 푸치캬라 목록(CHARACTERLIST, PUCHICHARALIST)을 activate 실행 직전과 afterSongEnum 실행 직전에 갱신하므로 둘 중 한 곳에서 읽으십시오. onStart는 첫 갱신보다 먼저 실행됩니다.
 - update(timestamp): 게임은 매 프레임 draw 앞에서 이 함수를 호출하며 밀리초 단위 게임 시계를 전달합니다. 여기서 입력을 처리하고 상태를 바꾸십시오. 스테이지가 Exit를 호출한 뒤에는 게임이 update 호출을 멈추고 페이드아웃 동안 draw만 계속 호출합니다.
 - draw(): 게임은 매 프레임 이 함수를 호출합니다. 그리기만 하고, 프레임당 할당을 적게 유지하십시오.
 - deactivate(): 게임은 스테이지를 떠날 때 이 함수를 호출합니다. demo_overall의 데이터베이스 데모는 여기서 데이터베이스를 해제하고, 첫 데모는 음악과 비디오를 정지합니다.
@@ -124,7 +124,20 @@ local Dialogue  = require("nokon_dialogue")           -- 모듈 폴더
 
 ## 읽기 전용 모듈
 
-게임은 ROActivity와 배경을 Script.lua가 실행되기 전에 제한된 전역으로 생성합니다. CONFIG는 읽기 전용 뷰이고, GetSaveFile(player)는 읽기 전용 세이브 파일을 반환하며, DATABASE는 읽기 전용 저장소를 열고, ACTIVITY는 nil입니다(ROACTIVITY를 사용). 이들을 통한 쓰기는 오류 알림을 기록하고, 아무것도 하지 않으며, Lua 오류를 발생시키지 않습니다. 설정, 세이브 데이터, 데이터베이스를 바꿔야 하는 모듈은 액티비티나 스테이지여야 합니다.
+게임은 ROActivity와 배경을 Script.lua가 실행되기 전에 제한된 전역으로 생성합니다. 이들을 통한 쓰기는 오류 알림을 기록하고, 아무것도 하지 않으며, Lua 오류를 발생시키지 않습니다.
+
+- CONFIG는 읽기 전용 뷰이며 setter는 아무것도 하지 않습니다.
+- GetSaveFile(player)는 읽기 전용 세이브 파일을 반환합니다.
+- DATABASE는 읽기 전용 저장소를 엽니다.
+- THEME:SetThemeSetting과 THEME:SetThemeSettingForPlayer는 false를 반환합니다.
+- STORAGE:WriteText와 STORAGE:WriteLobbyCode는 false를 반환합니다.
+- SQL:OpenSQLDatabase(path)는 데이터베이스를 읽기 전용으로 엽니다. 읽기는 동작하고, 쓰는 문은 실패하여 SQLite 오류를 기록하고 빈 결과를 반환하며, 없는 데이터베이스 파일은 만들지 않습니다.
+- VIRTUALSLOTS의 setter와 VIRTUALSLOTS:MountSlot은 아무것도 하지 않습니다. getter는 계속 동작합니다.
+- DANBUILDER:Mount()는 false를 반환합니다. 빌더에 내용을 채우는 것은 여전히 가능합니다.
+- 곡 노드의 Mount와 MountIfNotLocked, 채보의 Select는 노드를 어디서 얻었든 false를 반환합니다.
+- ACTIVITY는 nil입니다(ROACTIVITY를 사용).
+
+설정, 세이브 데이터, 데이터베이스를 바꾸거나 플레이할 곡을 골라야 하는 모듈은 액티비티나 스테이지여야 합니다.
 
 ## lang/을 이용한 지역화
 

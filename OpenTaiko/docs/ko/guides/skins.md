@@ -8,15 +8,15 @@
 
 ## 시작하기 전에
 
-- OpenTaiko 0.6.1 설치, 기본 제공 스킨 `System/Open-World Memories/` 존재.
+- OpenTaiko 0.7.0 설치, 기본 제공 스킨 `System/Open-World Memories/` 존재.
 - `SkinConfig.ini`, 포함되는 `*Config.ini` 파일, Lua 모듈을 위한 일반 텍스트 편집기.
 - 화면 동작을 바꾸려면 기초적인 Lua 지식. 순수한 리텍스처(PNG와 OGG 파일 교체, `.ini` 값 편집)에는 Lua가 필요 없습니다.
 
 ## 1단계: 무엇이 폴더를 스킨으로 만드는지 이해하기
 
-시작 시 게임은 `System/`의 하위 폴더를 나열합니다. 폴더 안에 `Graphics/1_Title/Background.png`가 있을 때만 스킨으로 셉니다. 다른 폴더는 게임이 건너뜁니다. 선택된 스킨 폴더가 없으면 게임은 `System/Default/`로, 그다음 알파벳 순으로 첫 유효한 스킨으로, 그다음 `System/` 자체로 대체합니다.
+시작 시 게임은 `System/`의 하위 폴더를 나열합니다. 폴더 안에 `Graphics/1_Title/Background.png`, `Modules/Stages/_boot/Script.lua`, `Modules/Stages/_title/Script.lua`가 모두 있을 때만 스킨으로 셉니다. 다른 폴더는 게임이 건너뜁니다. 선택된 스킨 폴더가 없거나 이 검사를 통과하지 못하면 게임은 `System/Default/`로, 그다음 알파벳 순으로 첫 유효한 스킨으로, 그다음 `System/` 자체로 대체합니다.
 
-이 검사는 폴더를 목록에 올릴 뿐입니다. 스킨이 실행되기 위해 함께 있어야 하는 모듈은 8단계에서 명시합니다.
+이 검사는 이 세 파일만 확인합니다. 스킨이 실행되기 위해 함께 있어야 하는 나머지 모듈은 8단계에서 명시합니다.
 
 ```
 System/
@@ -37,7 +37,8 @@ System/
 `SkinConfig.ini`는 한 줄에 설정 하나인 `Key=Value` 파일입니다. 파서는 앞의 공백과 탭을 제거하고, `;`로 시작하는 줄을 주석으로 취급하며, 줄에 `=`가 정확히 하나 있을 때만 읽습니다. 키 대조는 정확히 이루어지며, 파서는 알 수 없는 키를 오류 보고 없이 무시합니다. 스킨 수준 키는 다음과 같습니다.
 
 - `Name=`: 표시 이름. 메타데이터일 뿐이며, 스킨은 폴더 이름이 선택합니다.
-- `Version=`, `Creator=`: 자유 형식 문자열(기본값 `Unknown`). 게임은 이를 검증하지 않습니다.
+- `Version=`: 스킨의 버전으로, 게임과 마찬가지로 main.major.minor.patch의 네 숫자입니다(기본값 `Unknown`). Hub는 앞의 세 부분이 게임 버전과 같으면 스킨이 호환된다고 봅니다. OpenTaiko 0.7.0.0용 스킨은 `0.7.0.x`를 사용합니다. 게임 자체는 이를 확인하지 않습니다.
+- `Creator=`: 자유 형식 문자열(기본값 `Unknown`). 게임은 이를 검증하지 않습니다.
 - `DefaultLocale=`: 활성 게임 언어에 `Locales/` 아래 파일이 없을 때 게임이 사용하는 로케일 id(기본값 `en`).
 - `Resolution=W,H`: 레이아웃 값을 작성하는 기준 해상도(기본값 `1280,720`). 기본 제공 스킨은 `1920,1080`을 사용합니다.
 - `Resolutions=`: 선택 가능한 렌더 스케일 배율(4단계).
@@ -53,7 +54,7 @@ System/
 ;스킨 정보
 Name=My New Skin
 DefaultLocale=en
-Version=1.0.0
+Version=0.7.0.0
 Creator=Your Name
 Resolution=1920,1080
 ;선택 가능한 렌더 스케일 배율 (<=1; 소수 또는 a/b 분수, 쉼표 구분). 1은 항상 사용 가능하며 기본값입니다.
@@ -187,7 +188,7 @@ Modules/
 `Script.lua`는 게임이 모듈을 생성할 때 엔진 전역(`TEXTURE`, `SOUND`, `INPUT`, `CONFIG`, `THEME` 등)이 이미 정의된 상태로 한 번 실행됩니다. 그다음 게임은 전역 함수를 이름으로 찾아 호출합니다. 스테이지의 경우:
 
 - `onStart()`: 스킨이 로드될 때 한 번. 코루틴으로 실행되므로 무거운 로드는 `coroutine.yield()`나 `LOADING` 헬퍼를 호출해 로딩 바 뒤에서 작업을 여러 프레임에 나눌 수 있습니다.
-- `activate()`: 게임이 스테이지에 들어갈 때마다. 역시 코루틴입니다. 게임은 `CHARACTERLIST`와 `PUCHICHARALIST` 전역을 실행 직전에 갱신하므로, 이에 의존하는 것은 여기서 만드십시오. `onStart`에서는 아직 비어 있습니다.
+- `activate()`: 게임이 스테이지에 들어갈 때마다. 역시 코루틴입니다. 게임은 `CHARACTERLIST`와 `PUCHICHARALIST` 전역을 실행 직전과 `afterSongEnum` 직전에 갱신하므로, 이에 의존하는 것은 둘 중 한 곳에서 만드십시오. `onStart`에서는 아직 비어 있습니다.
 - `update(timestamp)`: 매 프레임. 스테이지를 떠나려면 `Exit(target, name, transition)`을 반환하십시오. `target`은 `"title"`, `"play"`, `"stage"`(`name` = 스테이지 폴더), `"legacy"`(`name` = `heya`, `config`, `exit`, `onlinelounge`)입니다. `transition`은 `Modules/Transitions/` 아래 폴더이며 기본값은 `default`입니다.
 - `draw()`: 매 프레임.
 - `deactivate()`: 게임이 스테이지를 떠날 때.
@@ -248,11 +249,11 @@ SkinPath=My New Skin\
 
 ## 문제 해결과 참고
 
-- 선택기에 스킨이 나오지 않음: `Graphics/1_Title/Background.png`가 없거나 폴더가 `System/` 바로 아래에 있지 않습니다.
-- 스킨을 선택한 직후 게임이 오류를 냄: 필수 모듈이 없거나(8단계) 그중 하나가 Lua 오류를 발생시켰습니다. 스킨은 전환해서 테스트하십시오.
+- 선택기에 스킨이 나오지 않음: `Graphics/1_Title/Background.png`, `Modules/Stages/_boot/Script.lua`, `Modules/Stages/_title/Script.lua` 중 하나가 없거나 폴더가 `System/` 바로 아래에 있지 않습니다.
+- 스킨을 선택한 직후 게임이 오류를 냄: 다른 필수 모듈이 없거나(8단계) 어떤 모듈이 Lua 오류를 발생시켰습니다. 스킨은 전환해서 테스트하십시오.
 - `SkinConfig.ini` 키가 효과가 없음: 키 철자가 틀렸거나, 줄에 `=`가 둘 이상 있거나, 값 파싱에 실패했습니다. 파서는 알 수 없는 키를 보고하지 않고 무시합니다.
 - `Resolutions=`에 `1`만 표시됨: 목록에 세미콜론(주석 표시)을 썼거나 모든 값이 0 < 값 <= 1 밖이었습니다.
 - 폰트 키가 효과가 없음: 파일 경로가 스킨 루트 기준으로 존재하지 않습니다.
-- `onStart`에서 `CHARACTERLIST`나 `PUCHICHARALIST`가 비어 있음: 게임은 모듈을 생성한 뒤에 이를 채웁니다. `activate`에서 사용하십시오.
+- `onStart`에서 `CHARACTERLIST`나 `PUCHICHARALIST`가 비어 있음: 게임은 모듈을 생성한 뒤에 이를 채웁니다. `activate`나 `afterSongEnum`에서 사용하십시오.
 - 스킨 폴더 이름을 바꾸면 식별자가 바뀝니다. `Config.ini`의 `SkinPath`가 새 이름을 가리켜야 합니다.
-- `Name=`, `Version=`, `Creator=`는 정보용일 뿐입니다. 게임은 이들에 대해 호환성 검사를 하지 않습니다.
+- 게임은 `Name=`, `Version=`, `Creator=`에 대해 호환성 검사를 하지 않습니다. `Version=`은 Hub만 읽으며, 스킨이 설치된 게임에 맞는지 판단하는 데 씁니다(3단계).

@@ -8,15 +8,15 @@
 
 ## 始める前に
 
-- OpenTaiko 0.6.1 がインストールされ、同梱スキン `System/Open-World Memories/` が存在すること。
+- OpenTaiko 0.7.0 がインストールされ、同梱スキン `System/Open-World Memories/` が存在すること。
 - `SkinConfig.ini`、インクルードされる `*Config.ini` ファイル、Lua モジュール用のプレーンテキストエディタ。
 - 画面の動作を変えるつもりなら基本的な Lua の知識。純粋な再テクスチャ (PNG と OGG ファイルの置き換えと `.ini` の値の編集) に Lua は不要です。
 
 ## ステップ 1: フォルダをスキンたらしめるものを理解する
 
-起動時にゲームは `System/` のサブフォルダを列挙します。フォルダは、その中に `Graphics/1_Title/Background.png` が存在する場合にのみスキンとみなされ、それ以外のフォルダはゲームがスキップします。選択されたスキンフォルダが存在しない場合、ゲームは `System/Default/`、次にアルファベット順で最初の有効なスキン、次に `System/` 自体にフォールバックします。
+起動時にゲームは `System/` のサブフォルダを列挙します。フォルダは、その中に `Graphics/1_Title/Background.png`、`Modules/Stages/_boot/Script.lua`、`Modules/Stages/_title/Script.lua` がすべて存在する場合にのみスキンとみなされ、それ以外のフォルダはゲームがスキップします。選択されたスキンフォルダが存在しないかこのチェックを通らない場合、ゲームは `System/Default/`、次にアルファベット順で最初の有効なスキン、次に `System/` 自体にフォールバックします。
 
-このチェックはフォルダをリストに載せるだけです。ステップ 8 で、スキンが動作する前に存在していなければならないモジュールを挙げます。
+このチェックが見るのはこの 3 つのファイルだけです。ステップ 8 で、スキンが動作する前に存在していなければならないその他のモジュールを挙げます。
 
 ```
 System/
@@ -37,7 +37,8 @@ System/
 `SkinConfig.ini` は 1 行に 1 つの設定を持つ `Key=Value` ファイルです。パーサーは先頭の空白とタブを取り除き、`;` で始まる行をコメントとして扱い、行にちょうど 1 つの `=` が含まれているときにのみその行を読み取ります。キーの照合は厳密で、パーサーは不明なキーをエラーを報告せずに無視します。スキンレベルのキーは次のとおりです。
 
 - `Name=`: 表示名。メタデータのみで、スキンを選択するのはフォルダ名です。
-- `Version=`、`Creator=`: 自由形式の文字列 (既定 `Unknown`)。ゲームはこれらを検証しません。
+- `Version=`: スキンのバージョン。ゲーム本体と同じく main.major.minor.patch の 4 つの数字で書きます (既定 `Unknown`)。Hub は先頭の 3 つがゲームのバージョンと一致するスキンを互換と見なします。OpenTaiko 0.7.0.0 向けのスキンは `0.7.0.x` を使います。ゲーム自体はこれを確認しません。
+- `Creator=`: 自由形式の文字列 (既定 `Unknown`)。ゲームはこれを検証しません。
 - `DefaultLocale=`: アクティブなゲーム言語のファイルが `Locales/` にないときにゲームが使うロケール id (既定 `en`)。
 - `Resolution=W,H`: レイアウト値を作成する基準となる解像度 (既定 `1280,720`)。同梱スキンは `1920,1080` を使っています。
 - `Resolutions=`: 選択可能なレンダースケールの倍率 (ステップ 4)。
@@ -53,7 +54,7 @@ System/
 ;Skin information
 Name=My New Skin
 DefaultLocale=en
-Version=1.0.0
+Version=0.7.0.0
 Creator=Your Name
 Resolution=1920,1080
 ;Selectable render-scale multipliers (<=1; decimal or a/b fraction, comma-separated). 1 is always available and is the default.
@@ -187,7 +188,7 @@ Modules/
 `Script.lua` は、エンジンのグローバル (`TEXTURE`、`SOUND`、`INPUT`、`CONFIG`、`THEME` など) がすでに定義された状態で、ゲームがモジュールを作成するときに 1 回実行されます。その後ゲームはグローバル関数を名前で探して呼び出します。ステージの場合:
 
 - `onStart()`: スキンの読み込み時に 1 回。コルーチンとして実行されるため、重い読み込みでは `coroutine.yield()` や `LOADING` ヘルパーを呼んで、ローディングバーの裏で作業を複数フレームに分散できます。
-- `activate()`: ゲームがステージに入るたび。これもコルーチンです。ゲームは `CHARACTERLIST` と `PUCHICHARALIST` グローバルをこの直前に更新するので、それらに依存するものはここで構築してください。`onStart` ではまだ空です。
+- `activate()`: ゲームがステージに入るたび。これもコルーチンです。ゲームは `CHARACTERLIST` と `PUCHICHARALIST` グローバルをこの直前と `afterSongEnum` の直前に更新するので、それらに依存するものはこのどちらかで構築してください。`onStart` ではまだ空です。
 - `update(timestamp)`: 毎フレーム。ステージを離れるには `Exit(target, name, transition)` を返します。`target` は `"title"`、`"play"`、`"stage"` (`name` = ステージフォルダ)、`"legacy"` (`name` = `heya`、`config`、`exit`、`onlinelounge`) のいずれかで、`transition` は `Modules/Transitions/` の下のフォルダで、既定は `default` です。
 - `draw()`: 毎フレーム。
 - `deactivate()`: ゲームがステージを離れるとき。
@@ -248,11 +249,11 @@ SkinPath=My New Skin\
 
 ## トラブルシューティングと注意点
 
-- 選択画面にスキンが載らない: `Graphics/1_Title/Background.png` がないか、フォルダが `System/` の直下にありません。
-- スキンを選択した直後にゲームがエラーになる: 必要なモジュールがない (ステップ 8) か、そのいずれかが Lua エラーを発生させています。スキンは切り替えてテストしてください。
+- 選択画面にスキンが載らない: `Graphics/1_Title/Background.png`、`Modules/Stages/_boot/Script.lua`、`Modules/Stages/_title/Script.lua` のいずれかがないか、フォルダが `System/` の直下にありません。
+- スキンを選択した直後にゲームがエラーになる: ほかの必要なモジュールがない (ステップ 8) か、いずれかのモジュールが Lua エラーを発生させています。スキンは切り替えてテストしてください。
 - `SkinConfig.ini` のキーが効かない: キーのスペルが違う、行に複数の `=` がある、または値の解析に失敗しています。パーサーは不明なキーを報告せずに無視します。
 - `Resolutions=` に `1` しか表示されない: リストがセミコロン (コメント記号) を使っているか、すべての値が 0 < 値 <= 1 の範囲外です。
 - フォントキーが効かない: スキンのルートからの相対パスにファイルが存在しません。
-- `onStart` で `CHARACTERLIST` や `PUCHICHARALIST` が空: ゲームはモジュールの作成後にこれらを設定します。`activate` から使ってください。
+- `onStart` で `CHARACTERLIST` や `PUCHICHARALIST` が空: ゲームはモジュールの作成後にこれらを設定します。`activate` か `afterSongEnum` から使ってください。
 - スキンフォルダの名前を変えると識別子が変わります。`Config.ini` の `SkinPath` は新しい名前を指す必要があります。
-- `Name=`、`Version=`、`Creator=` は情報のみです。ゲームはこれらに対する互換性チェックを行いません。
+- ゲームは `Name=`、`Version=`、`Creator=` に対する互換性チェックを行いません。`Version=` を読むのは Hub だけで、スキンがインストール済みのゲームに合うかどうかの判断に使います (ステップ 3)。

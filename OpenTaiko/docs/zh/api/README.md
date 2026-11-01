@@ -2,7 +2,7 @@
 
 # API 参考
 
-<span class="badge-new">游戏版本 0.6.1</span>
+<span class="badge-new">游戏版本 0.7.0</span>
 
 OpenTaiko Lua 运行时向皮肤公开的每一个全局对象的参考。从侧边栏中选择一个分类；如果你还没有写过模块，请先从[模块与生命周期](activities.md)开始。
 

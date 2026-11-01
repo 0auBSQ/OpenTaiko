@@ -55,7 +55,7 @@ end
 `SOUND` ファクトリメソッドが返す再生可能なサウンドです。
 
 <div class="callout warn">
-ストリームの準備ができるまで、ハンドルは Play とすべての Set* 呼び出しをバッファし、ゲッターは以下に示す既定値を返します。音量はパーセントです (100 = ファイル本来のレベル)。パンは -100 (左) から 0 (中央) を経て 100 (右) までです。位置と長さはミリ秒です。Play はストリームを先頭から再開するため、シークは Play を呼んだ後に行ってください。
+ストリームの準備ができるまで、ハンドルは Play とすべての Set* 呼び出しをバッファし、ゲッターは以下に示す既定値を返します。音量はパーセントです (100 = ファイル本来のレベル)。パンは -100 (左) から 0 (中央) を経て 100 (右) までです。位置と長さはミリ秒です。Play はストリームを先頭から再開するため、シークは Play を呼んだ後に行ってください。下の別名は恒久的なもので、どちらの名前も使えます。
 </div>
 
 | メソッド | 説明 |
@@ -70,16 +70,16 @@ end
 | `sound:GetLoop()  -> bool` | ループが有効かどうかを返します。 |
 | `sound:SetVolumePercent(vol)  -> nil` | 音量をパーセントで設定します。 |
 | `sound:GetVolumePercent()  -> number` | 音量をパーセントで返します (未読み込み時は 100)。 |
-| `sound:SetVolume(vol)  -> nil` | SetVolumePercent の古い名前 (整数)。 |
+| `sound:SetVolume(vol)  -> nil` | SetVolumePercent の別名 (整数)。 |
 | `sound:SetPan(pan)  -> nil` | ステレオのパンを設定します (-100..100)。 |
 | `sound:GetPan()  -> int` | 現在のパンを返します (未読み込み時は 0)。 |
 | `sound:SetSpeed(speed)  -> nil` | 再生速度の倍率を設定します (1 = 通常)。 |
 | `sound:GetSpeed()  -> number` | 再生速度の倍率を返します (未読み込み時は 1)。 |
 | `sound:SetTimestampMs(ms)  -> nil` | ミリ秒単位の位置にシークします。 |
-| `sound:SetTimestamp(ms)  -> nil` | SetTimestampMs の古い名前。 |
+| `sound:SetTimestamp(ms)  -> nil` | SetTimestampMs の別名。 |
 | `sound:GetTimestampMs()  -> number` | 現在の位置をミリ秒で返します (未読み込み時は 0)。 |
 | `sound.DurationMs  -> number` | 合計時間 (ミリ秒) (未読み込み時は 0)。 |
-| `sound:GetDurationMs()  -> number` | DurationMs の古い名前。 |
+| `sound:GetDurationMs()  -> number` | DurationMs の別名。 |
 | `sound.Loaded  -> bool` | レンダースレッドがストリームを構築すると true。 |
 | `sound.IsPlaying  -> bool` | サウンドの再生中は true。 |
 | `sound:IsFinished()  -> bool` | 再生が末尾に達すると true (一時停止中や未読み込み時は false)。 |

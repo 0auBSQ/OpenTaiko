@@ -4,7 +4,7 @@
 
 Fichiers de sauvegarde, plaques de nom, personnages, puchicharas, état de la partie, thèmes et langue courante.
 
-Les indices de joueur commencent à 0 (0 à 4) partout sur cette page, sauf pour THEME:GetThemeSettingForPlayer, qui commence à 1. Les modules en lecture seule (ROActivities et arrière-plans) reçoivent un handle de fichier de sauvegarde dont les méthodes d'écriture journalisent une erreur et ne font rien ; tout le reste ici se comporte de la même façon dans chaque type de module.
+Les indices de joueur commencent à 0 (0 à 4) partout sur cette page. Les modules en lecture seule (ROActivities et arrière-plans) reçoivent un handle de fichier de sauvegarde dont les méthodes d'écriture journalisent une erreur et ne font rien, et leurs mutateurs THEME journalisent une erreur et renvoient false ; tout le reste ici se comporte de la même façon dans chaque type de module.
 
 ## Fichiers de sauvegarde
 
@@ -462,16 +462,16 @@ La propriété UnlockCondition des handles d'informations de plaque de nom, des 
 La résolution du skin, les réglages du thème, les chaînes localisées propres au skin et les définitions des réglages du thème.
 
 <div class="callout warn">
-Le skin déclare les réglages du thème dans ThemeSettings.json et stocke leurs valeurs dans le ThemeSettings.db3 voisin. Les accesseurs renvoient toujours les valeurs de réglage sous forme de chaînes ; un réglage absent renvoie sa valeur par défaut déclarée, ou une chaîne vide si aucune déclaration n'existe. GetThemeSettingForPlayer prend un numéro de joueur à partir de 1. Les indices de définition commencent à 0.
+Le skin déclare les réglages du thème dans ThemeSettings.json et stocke leurs valeurs dans le ThemeSettings.db3 voisin. Les accesseurs renvoient toujours les valeurs de réglage sous forme de chaînes ; un réglage absent renvoie sa valeur par défaut déclarée, ou une chaîne vide si aucune déclaration n'existe. Les méthodes ForPlayer ramènent un joueur hors limites à 0 ou 4. Les indices de définition commencent à 0.
 </div>
 
 | Méthode | Description |
 | --- | --- |
 | `THEME:GetResolution()  -> vector2` | La résolution du skin. |
 | `THEME:GetThemeSetting(settingId)  -> string` | Valeur d'un réglage de portée globale. |
-| `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | Valeur d'un réglage de portée sauvegarde pour le joueur (à partir de 1), ou sa valeur par défaut si la sauvegarde n'a pas de valeur. |
-| `THEME:SetThemeSetting(settingId, value)  -> bool` | Écrit un réglage global déclaré dans ThemeSettings.json (un réglage de session n'est gardé que pour cette exécution) ; false pour un id inconnu. |
-| `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | Écrit un réglage par sauvegarde pour le joueur (à partir de 1) ; false pour un id inconnu. |
+| `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | Valeur d'un réglage de portée sauvegarde pour le joueur, ou sa valeur par défaut si la sauvegarde n'a pas de valeur. |
+| `THEME:SetThemeSetting(settingId, value)  -> bool` | Écrit un réglage global déclaré dans ThemeSettings.json (un réglage de session n'est gardé que pour cette exécution) ; false pour un id inconnu ou dans un module en lecture seule. |
+| `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | Écrit un réglage par sauvegarde pour le joueur ; false pour un id inconnu ou dans un module en lecture seule. |
 | `THEME:GetNotesSkinFile(kind, file)  -> string` | Chemin d'un fichier du pack sélectionné de type `kind` (`"taiko"`, `"bongo"` ou `"judges"`), relatif au dossier Graphics du skin, pris dans le pack 1 quand il manque au pack sélectionné ; une chaîne vide quand le skin n'a pas ce pack ou ce fichier. Voir [Ajouter des packs de notes et de jugements](../guides/notes-skins.md). |
 | `THEME:GetSkinString(key)  -> string` | Chaîne localisée depuis le dossier Locales du skin : d'abord la langue courante, puis la locale par défaut du skin, puis `[LOCALE NOT FOUND: key]`. |
 | `THEME:GetDefinitionCount()  -> integer` | Nombre de définitions de réglage dans ThemeSettings.json. |
@@ -490,7 +490,7 @@ GetString formate l'entrée avec les arguments supplémentaires. GetLanguageIds 
 | Méthode | Description |
 | --- | --- |
 | `LANG:GetString(key, ...)  -> string` | La chaîne localisée pour une clé, avec les substituts de format remplis à partir des arguments supplémentaires. |
-| `LANG:ChangeLanguage(id)  -> bool` | Bascule la langue active si l'identifiant existe et diffère de la langue courante, puis appelle `reloadLanguage` sur chaque script chargé ; renvoie si la bascule a eu lieu. Elle laisse CONFIG.Language inchangé. |
+| `LANG:ChangeLanguage(id)  -> bool` | Bascule la langue active si l'identifiant existe et diffère de la langue courante : règle d'abord CONFIG.Language sur cet identifiant (le jeu l'enregistre dans Config.ini à sa fermeture), puis appelle `reloadLanguage` sur chaque script chargé ; renvoie si la bascule a eu lieu. |
 | `LANG:GetLanguageIds()  -> string[]` | Identifiants des langues disponibles. |
 | `LANG:GetLanguageId()  -> string` | Id de la langue en cours. |
 | `LANG:GetLanguageNames()  -> string[]` | Noms d'affichage des langues disponibles, dans le même ordre. |

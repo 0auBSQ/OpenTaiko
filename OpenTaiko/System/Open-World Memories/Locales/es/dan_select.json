@@ -10,6 +10,10 @@
         "DANSELECT_EXIT": "Salir",
         "DANSELECT_CONFIRM": "¿Aceptas el desafío?",
         "DANSELECT_NOT_RECORDED": "No se guarda",
-        "DANSELECT_NO_GRADE": "No se guarda, sin rango de dan"
+        "DANSELECT_NO_GRADE": "No se guarda, sin rango de dan",
+
+        // The standard dan list: the exam range labels
+        "DANSELECT_EXAM_MORE": "o más",
+        "DANSELECT_EXAM_LESS": "menos de"
     }
 }

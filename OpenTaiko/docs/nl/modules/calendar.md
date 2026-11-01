@@ -4,7 +4,7 @@
 
 ## Calendar.almanac
 
-Datumpatronen voor gebeurtenissen die met de kalender komen en gaan: een uitgelicht winkelitem met Kerstmis, een aprilgrapscène, een maandelijkse bonus. Dagen zijn dagen in Japanse standaardtijd (UTC+9), ongeacht de klok van de speler, zodat elke speler dezelfde dag ziet. Een patroon kan als ondoorzichtig `enc:`-token worden geschreven, zodat een verrassing niet in de broncode te zien is.
+Datumpatronen voor gebeurtenissen die met de kalender komen en gaan: een uitgelicht winkelitem met Kerstmis, een zomerevenement, een maandelijkse bonus. Dagen zijn dagen in Japanse standaardtijd (UTC+9), ongeacht de klok van de speler, zodat elke speler dezelfde dag ziet. Een patroon kan als ondoorzichtig `enc:`-token worden geschreven, zodat een verrassing niet in de broncode te zien is.
 
 | Patroon | Komt overeen met |
 | --- | --- |

@@ -21,7 +21,7 @@
 | `update(timestamp)` | 매 프레임 draw 앞에서 호출됩니다. timestamp는 밀리초 단위 게임 시계입니다. 스테이지는 Exit를 호출한 뒤 update를 더 받지 않으며, draw는 페이드아웃 동안 계속 실행됩니다. 액티비티/ROActivity: 호스트가 `handle:Update()`를 통해 호출합니다. |
 | `draw(...)` | 매 프레임 호출됩니다. 액티비티/ROActivity: 호스트가 자신의 인자와 함께 `handle:Draw(...)`를 통해 호출하며, 반환값은 호스트로 돌아갑니다. |
 | `deactivate(...)` | 스테이지: 엔진이 스테이지를 떠날 때 호출됩니다. 액티비티/ROActivity: 호스트가 `handle:Deactivate(...)`를 통해 호출하거나 모듈이 스스로 `DEACTIVATE()`로 호출하며, 반환값은 호스트로 돌아갑니다. |
-| `afterSongEnum()` | 곡 열거가 끝날 때마다 호출됩니다. 부팅 시와 곡의 소프트 또는 하드 리로드 후를 포함하며, 모듈이 활성 상태가 아니어도 호출됩니다. |
+| `afterSongEnum()` | 곡 열거가 끝날 때마다 호출됩니다. 부팅 시와 곡의 소프트 또는 하드 리로드 후를 포함하며, 모듈이 활성 상태가 아니어도 호출됩니다. 엔진은 CHARACTERLIST와 PUCHICHARALIST 전역을 실행 직전에 갱신합니다. |
 | `onDestroy()` | 엔진이 스킨을 언로드하기 전에 호출되어 모듈이 보유한 것을 해제할 수 있게 합니다. |
 | `reloadLanguage(lang)` | 게임 언어가 바뀔 때 로드된 모든 모듈에서 호출됩니다. lang은 새 언어 코드입니다. |
 
@@ -558,6 +558,7 @@ info 전역으로 등록되며 모듈마다 생성됩니다. 각 필드는 접�
 | --- | --- |
 | `info.playerCount  -> number` | 설정된 플레이어 수. |
 | `info.lang  -> string` | 현재 언어 코드. |
+| `info.gameVersion  -> string` | 게임 버전. main.major.minor.patch 형식의 네 숫자(예: `"0.7.0.0"`). |
 | `info.simplemode  -> boolean` | 심플 모드가 켜져 있으면 true. |
 | `info.p1IsBlue  -> boolean` | 플레이어 1이 파란 쪽을 사용하면 true. |
 | `info.online  -> boolean` | 사용 가능한 네트워크 인터페이스가 있으면 true. |

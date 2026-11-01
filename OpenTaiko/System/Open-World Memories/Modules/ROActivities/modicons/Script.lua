@@ -137,7 +137,7 @@ function draw(x, y, player, layout, alpha)
     -- Slot 6: Timing zone  (2 = Normal → no icon)
     local timing = CONFIG:GetTimingZone(player)
     local TIMING = CONFIG.TIMINGZONE
-    if timing ~= TIMING.Normal then
+    if timing - 2 ~= TIMING.Normal then
          drawIcon(tx["Timing_" .. timing], x + ox[6], y + oy[6], alpha)
     else drawIcon(tx["None"],              x + ox[6], y + oy[6], alpha)
     end
@@ -211,7 +211,7 @@ function drawFlags(x, y, mods, scroll, song, timing, layout, alpha)
 
     -- Slot 6: Timing zone (2 = Normal → no icon)
     local TIMING = CONFIG.TIMINGZONE
-    if timing ~= nil and timing ~= TIMING.Normal then
+    if timing ~= nil and timing - 2 ~= TIMING.Normal then
          drawIcon(tx["Timing_" .. timing], x + ox[6], y + oy[6], alpha)
     else drawIcon(tx["None"],              x + ox[6], y + oy[6], alpha)
     end

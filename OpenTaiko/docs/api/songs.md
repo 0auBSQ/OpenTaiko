@@ -161,7 +161,7 @@ The song list handle, SONGMOUNT:ChosenSongNode() and DANBUILDER:GetSong() return
 | `node.IsLocked  (bool)` | True when this song is currently locked; always false for non-songs. |
 | `node.HiddenIndex  (int)` | The unlock-system display state: 0 displayed, 1 grayed, 2 blurred, 3 hidden (0 for non-songs). |
 | `node.Rarity  (string)` | The rarity label; "Common" for songs without an unlock entry, "-" for non-songs. |
-| `node:Mount(p1diff, p2diff, p3diff, p4diff, p5diff)  -> bool` | Selects this song for play with the given difficulty index per player (defaults 0). It checks only the first CONFIG.PlayerCount indices and returns false if the node is not a song or an active player's difficulty is missing or out of range. |
+| `node:Mount(p1diff, p2diff, p3diff, p4diff, p5diff)  -> bool` | Selects this song for play with the given difficulty index per player (defaults 0). It checks only the first CONFIG.PlayerCount indices and returns false if the node is not a song or an active player's difficulty is missing or out of range. Returns false in a read-only module. |
 | `node:MountIfNotLocked(p1diff, p2diff, p3diff, p4diff, p5diff)  -> bool` | Same as Mount, but returns false without mounting when the song is locked. |
 
 ### Chart
@@ -197,14 +197,14 @@ A song node's GetChart(diff) returns a chart. Properties are read-only. BPM, Lif
 | `chart.DanTickColor  (color)` | Dan plate tick color (white when the chart has no chart info). |
 | `chart.DanSongs  (array of dan songs)` | The songs that make up this Dan chart. |
 | `chart.DanExams  (array of dan exams)` | The global exam conditions of this Dan chart. |
-| `chart:GetSongExam(songIdx, examSlot)  -> dan exam` | Returns the per-song exam for the 1-based song index and 1-based exam slot; the result has IsSet = false when none exists. |
+| `chart:GetSongExam(songIdx, examSlot)  -> dan exam` | Returns the per-song exam for the 0-based song index and 1-based exam slot; the result has IsSet = false when none exists or an index is out of range. |
 | `chart:GetPlayerBestScore(save)  -> best score info` | Returns the best-play summary of the given save file for this chart. |
 | `chart:GetCustomCommand(key)  -> string` | Returns the value of a chart-scope custom command (a dot-prefixed header inside this COURSE block, key includes the dot), or nil. |
 | `chart:GetCustomCommands()  -> dictionary` | Returns all chart-scope custom commands as a C# dictionary object. |
 | `chart.SongFolder  (string)` | The absolute folder holding the chart file. |
 | `chart.ChartPath  (string)` | The absolute path of the chart file. |
 | `chart.UniqueId  (string)` | The song's unique id, or an empty string. |
-| `chart:Select(player)  -> bool` | Marks this chart as the chosen difficulty for the given player; player 0 also sets the chosen song. Returns false when the chart is not valid. |
+| `chart:Select(player)  -> bool` | Marks this chart as the chosen difficulty for the given player; player 0 also sets the chosen song. Returns false when the chart is not valid or in a read-only module. |
 
 ### Best score info
 
@@ -263,15 +263,15 @@ Elements of chart.DanExams, or returned by chart:GetSongExam(). All members are 
 Global for assembling a Dan course in memory from song nodes, difficulties and exam conditions, then mounting it for play.
 
 <div class="callout warn">
-Available as the global DANBUILDER. Song and slot indices are 1-based, except the difficulty passed to AddSong, which is a 0-based difficulty index. Exam slots run from 1 to 7. Exam type strings (case-insensitive, short form in parentheses): "judgeperfect" (jp), "judgegood" (jg), "judgebad" (jb), "score" (s), "roll" (r), "hit" (h), "combo" (c), "accuracy" (a), "judgeadlib" (ja), "judgemine" (jm); any other string means gauge. lessThan = true makes the exam a "less than" check, false an "at least" check. The builder keeps its state between calls; call Clear() before building a new course.
+Available as the global DANBUILDER. Song indices are 0-based, like every list in the API, and so is the difficulty passed to AddSong. Exam slots are 1-based and run from 1 to 7, because exams are numbered EXAM1 to EXAM7. Exam type strings (case-insensitive, short form in parentheses): "judgeperfect" (jp), "judgegood" (jg), "judgebad" (jb), "score" (s), "roll" (r), "hit" (h), "combo" (c), "accuracy" (a), "judgeadlib" (ja), "judgemine" (jm); any other string means gauge. lessThan = true makes the exam a "less than" check, false an "at least" check. The builder keeps its state between calls; call Clear() before building a new course.
 </div>
 
 | Method | Description |
 | --- | --- |
 | `DANBUILDER.SongCount  (int)` | Number of songs added so far. |
 | `DANBUILDER:AddSong(node, diff)  -> void` | Appends a song node at the given 0-based difficulty index. |
-| `DANBUILDER:GetSong(i)  -> song node` | Returns the song node at 1-based index i, or nil. |
-| `DANBUILDER:GetSongDiff(i)  -> int` | Returns the difficulty index stored for the song at 1-based index i, or -1. |
+| `DANBUILDER:GetSong(i)  -> song node` | Returns the song node at 0-based index i, or nil. |
+| `DANBUILDER:GetSongDiff(i)  -> int` | Returns the difficulty index stored for the song at 0-based index i, or -1. |
 | `DANBUILDER:SetTitle(title)  -> void` | Sets the course title (default "Dynamic Dan"). |
 | `DANBUILDER:SetSubtitle(subtitle)  -> void` | Sets the course subtitle. |
 | `DANBUILDER:SetDanTick(tick)  -> void` | Sets the Dan plate tick value (default 2). |
@@ -279,9 +279,9 @@ Available as the global DANBUILDER. Song and slot indices are 1-based, except th
 | `DANBUILDER:SetGenreTitle(title)  -> void` | Sets the text of the genre plate during play. By default the plate shows the genre folder of the song being played. |
 | `DANBUILDER:SetGenreColor(r, g, b)  -> void` | Sets the genre plate color from 0-255 components. By default the plate takes the color of the genre folder it shows, or white when SetGenreTitle set the text. |
 | `DANBUILDER:SetGlobalExam(slot, type, red, gold, lessThan)  -> void` | Sets a course-wide exam in the given slot. |
-| `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | Sets an exam that applies to one song, by 1-based song index and slot. |
+| `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | Sets an exam that applies to one song, by 0-based song index and 1-based slot. Out-of-range indices do nothing. |
 | `DANBUILDER:Clear()  -> void` | Removes all songs and exams and resets the metadata to defaults. |
-| `DANBUILDER:Mount()  -> bool` | Builds the course chart in memory and selects it for play at the Dan difficulty for player 1; returns false if the builder holds no songs or the build failed. |
+| `DANBUILDER:Mount()  -> bool` | Builds the course chart in memory and selects it for play at the Dan difficulty for player 1; returns false if the builder holds no songs or the build failed, and always in a read-only module. |
 
 ```lua
 DANBUILDER:Clear()
@@ -289,7 +289,7 @@ DANBUILDER:SetTitle("Custom course")
 DANBUILDER:AddSong(list:GetSongByUniqueId(id1), 3)
 DANBUILDER:AddSong(list:GetSongByUniqueId(id2), 3)
 DANBUILDER:SetGlobalExam(1, "gauge", 90, 100, false)
-DANBUILDER:SetPerSongExam(2, 2, "judgebad", 10, 5, true)
+DANBUILDER:SetPerSongExam(1, 2, "judgebad", 10, 5, true)
 if DANBUILDER:Mount() then
     return Exit("play")
 end
@@ -319,7 +319,7 @@ node.UnlockCondition returns this object. HasCondition is a property; the rest a
 Global for reading and writing the five virtual character slots (V1-V5) and for redirecting a player spot to display a slot's visuals.
 
 <div class="callout warn">
-Available as the global VIRTUALSLOTS. Slot indices run from 1 to 5; setters ignore out-of-range indices and getters return the defaults for them. These methods write nothing to disk. The engine manages the AI slot, which this global cannot edit.
+Available as the global VIRTUALSLOTS. Slot indices run from 1 to 5; setters ignore out-of-range indices and getters return the defaults for them. These methods write nothing to disk. The engine manages the AI slot, which this global cannot edit. In a read-only module the setters and MountSlot log an error and do nothing; the getters still work.
 </div>
 
 | Method | Description |

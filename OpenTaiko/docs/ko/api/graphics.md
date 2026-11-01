@@ -297,7 +297,7 @@ end
 `VIDEO:CreateVideo`가 반환하는 비디오 디코더입니다.
 
 <div class="callout warn">
-위치는 밀리초, Duration은 초 단위입니다. 현재 프레임을 텍스처 핸들로 얻으려면 매 프레임 Texture를 읽으십시오. 그 핸들은 비디오 자체의 프레임 텍스처를 감싸므로 그리기만 하고 해제는 비디오 핸들에 맡기십시오. SetSpeed는 0 이하의 값을 무시합니다.
+위치는 밀리초, Duration은 초 단위입니다. 현재 프레임을 텍스처 핸들로 얻으려면 매 프레임 Texture를 읽으십시오. 그 핸들은 비디오 자체의 프레임 텍스처를 감싸므로 그리기만 하고 해제는 비디오 핸들에 맡기십시오. SetSpeed는 0 이하의 값을 무시합니다. 아래의 별칭은 영구적이며 두 이름 모두 지원됩니다. Duration과 DurationMs도 마찬가지입니다.
 </div>
 
 | 메서드 | 설명 |
@@ -320,10 +320,10 @@ end
 | `video:SetTimestampMs(ms)  -> nil` | 밀리초 단위 위치로 탐색합니다. |
 | `video:GetSpeed()  -> number` | 현재 재생 속도 배율(1 = 보통). |
 | `video:SetSpeed(speed)  -> nil` | 재생 속도 배율을 설정합니다. |
-| `video:GetPlayPosition()  -> number` | 현재 위치(초)(GetTimestampMs / 1000의 옛 이름). |
-| `video:SetPlayPosition(seconds)  -> nil` | 초 단위 위치로 탐색합니다(SetTimestampMs의 옛 이름). |
-| `video:GetPlaySpeed()  -> number` | GetSpeed의 옛 이름. |
-| `video:SetPlaySpeed(speed)  -> nil` | SetSpeed의 옛 이름. |
+| `video:GetPlayPosition()  -> number` | 현재 위치(초)(GetTimestampMs / 1000의 별칭). |
+| `video:SetPlayPosition(seconds)  -> nil` | 초 단위 위치로 탐색합니다(초 단위 SetTimestampMs의 별칭). |
+| `video:GetPlaySpeed()  -> number` | GetSpeed의 별칭. |
+| `video:SetPlaySpeed(speed)  -> nil` | SetSpeed의 별칭. |
 | `video:Dispose()  -> nil` | 디코더와 프레임 텍스처를 해제합니다. |
 
 ```lua

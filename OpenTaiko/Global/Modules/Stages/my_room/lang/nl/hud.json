@@ -1,5 +1,6 @@
 {
   "_comment": "Dutch texts for on-screen controls, interaction prompts and the room picker (Script.lua). Keys are stable ids; a missing id shows the English text (lang/en).",
+  "title": "Mijn kamer",
   "ctl_move": "WASD — Lopen",
   "ctl_orbit": "Rechtsklik / Q·E — Draaien",
   "ctl_zoom": "Scrollwiel — Zoom",

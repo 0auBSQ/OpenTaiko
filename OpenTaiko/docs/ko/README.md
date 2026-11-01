@@ -2,9 +2,7 @@
 
 # OpenTaiko 문서
 
-<span class="badge-new">게임 버전 0.6.1</span>
-
-<div class="callout warn">이 문서는 아직 검토 중이며 출시 전까지 변경될 수 있습니다.</div>
+<span class="badge-new">게임 버전 0.7.0</span>
 
 OpenTaiko는 핵심 게임플레이를 제외한 거의 모든 화면(메뉴, 곡 선택, 방과 스토리 장면, 배경, 결과 화면)을 스킨에 포함된 Lua 스크립트로 그립니다. 이 사이트는 그 스크립트가 사용하는 Lua API를 문서화하고, 스킨 제작자가 가장 자주 하고 싶어 하는 작업을 단계별로 안내합니다.
 

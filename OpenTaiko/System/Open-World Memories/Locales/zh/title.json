@@ -43,6 +43,9 @@
         "TITLE_PLAYERS_2": "2人游戏",
         "TITLE_PLAYERS_3": "3人游戏",
         "TITLE_PLAYERS_4": "4人游戏",
-        "TITLE_PLAYERS_5": "5人游戏"
+        "TITLE_PLAYERS_5": "5人游戏",
+
+        // Boot screen
+        "BOOT_PRESS_ENTER": "按 Enter 键开始！"
     }
 }

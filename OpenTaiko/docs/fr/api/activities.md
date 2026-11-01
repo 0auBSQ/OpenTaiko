@@ -21,7 +21,7 @@ Au chargement d'un skin, le moteur crée et démarre les modules dans cet ordre�
 | `update(timestamp)` | Appelée à chaque frame avant draw ; timestamp est l'horloge du jeu en millisecondes. Un stage cesse de recevoir update dès qu'il a appelé Exit ; draw continue pendant le fondu de sortie. Activity/ROActivity : l'hôte l'appelle via `handle:Update()`. |
 | `draw(...)` | Appelée à chaque frame. Activity/ROActivity : l'hôte l'appelle via `handle:Draw(...)` avec ses propres arguments ; les valeurs de retour reviennent à l'hôte. |
 | `deactivate(...)` | Stage : appelée quand le moteur quitte le stage. Activity/ROActivity : l'hôte l'appelle via `handle:Deactivate(...)`, ou le module l'appelle sur lui-même via `DEACTIVATE()` ; les valeurs de retour reviennent à l'hôte. |
-| `afterSongEnum()` | Appelée chaque fois que l'énumération des chansons se termine, y compris au démarrage et après un rechargement léger ou complet des chansons, même quand le module n'est pas actif. |
+| `afterSongEnum()` | Appelée chaque fois que l'énumération des chansons se termine, y compris au démarrage et après un rechargement léger ou complet des chansons, même quand le module n'est pas actif. Le moteur rafraîchit les globales CHARACTERLIST et PUCHICHARALIST juste avant son exécution. |
 | `onDestroy()` | Appelée avant que le moteur ne décharge le skin, pour que le module libère ce qu'il détient. |
 | `reloadLanguage(lang)` | Appelée sur chaque module chargé quand la langue du jeu change ; lang est le nouveau code de langue. |
 
@@ -558,6 +558,7 @@ Enregistré comme la globale info et créé par module. Chaque champ calcule sa 
 | --- | --- |
 | `info.playerCount  -> number` | Le nombre de joueurs configuré. |
 | `info.lang  -> string` | Le code de langue courant. |
+| `info.gameVersion  -> string` | La version du jeu, quatre nombres de la forme main.major.minor.patch (par exemple `"0.7.0.0"`). |
 | `info.simplemode  -> boolean` | Vrai quand le mode simple est activé. |
 | `info.p1IsBlue  -> boolean` | Vrai quand le joueur 1 utilise le côté bleu. |
 | `info.online  -> boolean` | Vrai quand une interface réseau utilisable est disponible. |

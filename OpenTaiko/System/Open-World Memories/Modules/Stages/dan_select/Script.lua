@@ -114,6 +114,7 @@ local snd_bgm = nil
 -- ── Fonts ────────────────────────────────────────────────────────────────────
 
 local font_loading = nil
+local loading_text = "Please wait for song enumeration to complete..."   -- set by activate() in the current language
 local gfont_title, gfont_desc, gfont_exit = nil, nil, nil
 local col_ink, col_none = nil, nil
 
@@ -287,6 +288,7 @@ function activate()
     exiting     = false
     dan_bgm_vol = 100.0
     entries = menuEntries()   -- built on every entry so the texts follow the language
+    loading_text = tr("VAULT_LOADING", "Please wait for song enumeration to complete...")
     menu_t, out_target, to_pagoda = 0, nil, false
     -- dan_doors shows the dojo's name first and leaves how long (s) here
     local title_sec = tonumber(SHARED:GetSharedString("dan_doors_title")) or 0
@@ -582,7 +584,7 @@ function draw()
     -- ── LOADING ───────────────────────────────────────────────────────────────
     if state == "loading" then
         if font_loading ~= nil then
-            font_loading:GetText("Please wait for song enumeration to complete...", false, Layout.loading.max_width)
+            font_loading:GetText(loading_text, false, Layout.loading.max_width)
                 :DrawAtAnchor(res_w / 2, res_h / 2, "center")
         end
         return

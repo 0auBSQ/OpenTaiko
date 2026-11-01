@@ -10,6 +10,10 @@
         "DANSELECT_EXIT": "退出",
         "DANSELECT_CONFIRM": "接受挑战？",
         "DANSELECT_NOT_RECORDED": "不会记录成绩",
-        "DANSELECT_NO_GRADE": "不会记录成绩，也无法获得段位"
+        "DANSELECT_NO_GRADE": "不会记录成绩，也无法获得段位",
+
+        // The standard dan list: the exam range labels
+        "DANSELECT_EXAM_MORE": "以上",
+        "DANSELECT_EXAM_LESS": "未满"
     }
 }

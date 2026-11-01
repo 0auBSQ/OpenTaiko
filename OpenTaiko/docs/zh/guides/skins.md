@@ -8,15 +8,15 @@
 
 ## 开始之前
 
-- 已安装 OpenTaiko 0.6.1，且自带皮肤 `System/Open-World Memories/` 存在。
+- 已安装 OpenTaiko 0.7.0，且自带皮肤 `System/Open-World Memories/` 存在。
 - 一个用于编辑 `SkinConfig.ini`、被包含的 `*Config.ini` 文件和 Lua 模块的纯文本编辑器。
 - 如果打算更改界面行为，需要基础的 Lua 知识。纯换图（替换 PNG 和 OGG 文件并编辑 `.ini` 值）不需要 Lua。
 
 ## 第 1 步：了解什么使一个文件夹成为皮肤
 
-启动时游戏列出 `System/` 的子文件夹。只有内部存在 `Graphics/1_Title/Background.png` 的文件夹才算皮肤；游戏会跳过其他文件夹。如果选定的皮肤文件夹缺失，游戏依次回退到 `System/Default/`、按字母顺序的第一个有效皮肤，最后是 `System/` 本身。
+启动时游戏列出 `System/` 的子文件夹。只有内部同时存在 `Graphics/1_Title/Background.png`、`Modules/Stages/_boot/Script.lua` 和 `Modules/Stages/_title/Script.lua` 的文件夹才算皮肤；游戏会跳过其他文件夹。如果选定的皮肤文件夹缺失或未通过此检查，游戏依次回退到 `System/Default/`、按字母顺序的第一个有效皮肤，最后是 `System/` 本身。
 
-此检查只是让文件夹被列出。第 8 步指明皮肤要能运行还必须存在哪些模块。
+此检查只查看这三个文件。第 8 步指明皮肤要能运行还必须存在的其他模块。
 
 ```
 System/
@@ -37,7 +37,8 @@ System/
 `SkinConfig.ini` 是一个 `Key=Value` 文件，每行一项设置。解析器会去掉行首的空格和制表符，把以 `;` 开头的行视为注释，并且只在一行恰好包含一个 `=` 时才读取它。键的匹配是精确的，解析器会忽略未知的键且不报错。皮肤级别的键有：
 
 - `Name=`：显示名称。仅为元数据；选择皮肤依据的是文件夹名称。
-- `Version=`、`Creator=`：任意字符串（默认 `Unknown`）。游戏不校验它们。
+- `Version=`：皮肤的版本，与游戏本身一样写成 main.major.minor.patch 四个数字（默认 `Unknown`）。Hub 在其前三部分与游戏版本一致时认为皮肤兼容：面向 OpenTaiko 0.7.0.0 的皮肤使用 `0.7.0.x`。游戏本身不检查它。
+- `Creator=`：任意字符串（默认 `Unknown`）。游戏不校验它。
 - `DefaultLocale=`：当前游戏语言在 `Locales/` 下没有文件时游戏使用的区域设置 id（默认 `en`）。
 - `Resolution=W,H`：你编写布局值时所依据的分辨率（默认 `1280,720`）。自带皮肤使用 `1920,1080`。
 - `Resolutions=`：可选的渲染缩放倍率（第 4 步）。
@@ -53,7 +54,7 @@ System/
 ;皮肤信息
 Name=My New Skin
 DefaultLocale=en
-Version=1.0.0
+Version=0.7.0.0
 Creator=Your Name
 Resolution=1920,1080
 ;可选的渲染缩放倍率（<=1；小数或 a/b 分数，逗号分隔）。1 始终可用且为默认值。
@@ -187,7 +188,7 @@ Modules/
 `Script.lua` 在游戏创建模块时运行一次，此时引擎全局对象（`TEXTURE`、`SOUND`、`INPUT`、`CONFIG`、`THEME` 等）已定义。游戏随后按名称查找全局函数并调用它们。对舞台而言：
 
 - `onStart()`：皮肤加载时调用一次。以协程方式运行，因此耗时的加载可以调用 `coroutine.yield()` 或 `LOADING` 辅助对象，把工作分散到加载进度条后面的多帧中。
-- `activate()`：每次游戏进入舞台时调用。同样是协程。游戏会在它运行前刷新 `CHARACTERLIST` 和 `PUCHICHARALIST` 全局对象，因此依赖它们的内容请在这里构建；在 `onStart` 中它们仍然为空。
+- `activate()`：每次游戏进入舞台时调用。同样是协程。游戏会在它运行前以及 `afterSongEnum` 运行前刷新 `CHARACTERLIST` 和 `PUCHICHARALIST` 全局对象，因此依赖它们的内容请在这两者之一中构建；在 `onStart` 中它们仍然为空。
 - `update(timestamp)`：每帧调用。返回 `Exit(target, name, transition)` 以离开舞台。`target` 为 `"title"`、`"play"`、`"stage"`（`name` = 舞台文件夹）或 `"legacy"`（`name` = `heya`、`config`、`exit` 或 `onlinelounge`）；`transition` 是 `Modules/Transitions/` 下的文件夹，默认为 `default`。
 - `draw()`：每帧调用。
 - `deactivate()`：游戏离开舞台时调用。
@@ -248,11 +249,11 @@ SkinPath=My New Skin\
 
 ## 故障排除与注意事项
 
-- 选择器没有列出皮肤：`Graphics/1_Title/Background.png` 缺失，或文件夹不直接位于 `System/` 下。
-- 选择皮肤后游戏立刻报错：缺少必需的模块（第 8 步），或其中某个模块抛出了 Lua 错误。请通过切换到皮肤来测试它。
+- 选择器没有列出皮肤：缺少 `Graphics/1_Title/Background.png`、`Modules/Stages/_boot/Script.lua` 或 `Modules/Stages/_title/Script.lua`，或文件夹不直接位于 `System/` 下。
+- 选择皮肤后游戏立刻报错：缺少其他必需的模块（第 8 步），或某个模块抛出了 Lua 错误。请通过切换到皮肤来测试它。
 - 某个 `SkinConfig.ini` 键不起作用：键拼写错误、该行包含多于一个 `=`，或值解析失败。解析器会忽略未知的键且不报告。
 - `Resolutions=` 只显示 `1`：列表使用了分号（注释标记），或所有值都在 0 < 值 <= 1 之外。
 - 字体键不起作用：文件路径相对于皮肤根目录不存在。
-- `CHARACTERLIST` 或 `PUCHICHARALIST` 在 `onStart` 中为空：游戏在创建模块之后才填充它们。请在 `activate` 中使用。
+- `CHARACTERLIST` 或 `PUCHICHARALIST` 在 `onStart` 中为空：游戏在创建模块之后才填充它们。请在 `activate` 或 `afterSongEnum` 中使用。
 - 重命名皮肤文件夹会改变其身份；`Config.ini` 中的 `SkinPath` 必须指向新名称。
-- `Name=`、`Version=` 和 `Creator=` 仅供参考。游戏不会基于它们做兼容性检查。
+- 游戏不会基于 `Name=`、`Version=` 或 `Creator=` 做兼容性检查。只有 Hub 会读取 `Version=`，用来判断皮肤是否与已安装的游戏相符（第 3 步）。

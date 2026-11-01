@@ -8,15 +8,15 @@ Een skin bevat ook de Lua-modules die elk scherm draaien. Het spel laadt specifi
 
 ## Voordat je begint
 
-- OpenTaiko 0.6.1 geïnstalleerd, met de meegeleverde skin `System/Open-World Memories/` aanwezig.
+- OpenTaiko 0.7.0 geïnstalleerd, met de meegeleverde skin `System/Open-World Memories/` aanwezig.
 - Een teksteditor voor `SkinConfig.ini`, de ingesloten `*Config.ini`-bestanden en de Lua-modules.
 - Basiskennis van Lua als je het schermgedrag wilt veranderen. Een pure hertexturering (PNG- en OGG-bestanden vervangen en `.ini`-waarden bewerken) vereist geen Lua.
 
 ## Stap 1: Begrijp wat een map tot een skin maakt
 
-Bij het opstarten somt het spel de submappen van `System/` op. Een map telt alleen als skin als `Graphics/1_Title/Background.png` erin bestaat; het spel slaat elke andere map over. Als de geselecteerde skinmap ontbreekt, valt het spel terug op `System/Default/`, dan op de eerste geldige skin in alfabetische volgorde, dan op `System/` zelf.
+Bij het opstarten somt het spel de submappen van `System/` op. Een map telt alleen als skin als `Graphics/1_Title/Background.png`, `Modules/Stages/_boot/Script.lua` en `Modules/Stages/_title/Script.lua` erin bestaan; het spel slaat elke andere map over. Als de geselecteerde skinmap ontbreekt of deze controle niet doorstaat, valt het spel terug op `System/Default/`, dan op de eerste geldige skin in alfabetische volgorde, dan op `System/` zelf.
 
-Deze controle zorgt er alleen voor dat de map wordt vermeld. Stap 8 noemt de modules die ook moeten bestaan voordat de skin draait.
+Deze controle kijkt alleen naar die drie bestanden. Stap 8 noemt de overige modules die ook moeten bestaan voordat de skin draait.
 
 ```
 System/
@@ -37,7 +37,8 @@ Kopieer `System/Open-World Memories/` naar een nieuwe map ernaast, bijvoorbeeld 
 `SkinConfig.ini` is een `Key=Value`-bestand, één instelling per regel. De parser verwijdert voorloopspaties en -tabs, behandelt regels die met `;` beginnen als commentaar, en leest een regel alleen wanneer die precies één `=` bevat. Sleutels worden exact vergeleken, en de parser negeert een onbekende sleutel zonder een fout te melden. De sleutels op skinniveau zijn:
 
 - `Name=`: weergavenaam. Alleen metadata; de mapnaam selecteert de skin.
-- `Version=`, `Creator=`: vrije strings (standaard `Unknown`). Het spel valideert ze niet.
+- `Version=`: de versie van de skin als vier getallen, main.major.minor.patch, net als die van het spel (standaard `Unknown`). De Hub beschouwt een skin als compatibel wanneer de eerste drie delen overeenkomen met de versie van het spel: een skin voor OpenTaiko 0.7.0.0 gebruikt `0.7.0.x`. Het spel zelf controleert hem niet.
+- `Creator=`: vrije string (standaard `Unknown`). Het spel valideert hem niet.
 - `DefaultLocale=`: locale-id dat het spel gebruikt wanneer de actieve speltaal geen bestand onder `Locales/` heeft (standaard `en`).
 - `Resolution=W,H`: de resolutie waarvoor je de lay-outwaarden maakt (standaard `1280,720`). De meegeleverde skin gebruikt `1920,1080`.
 - `Resolutions=`: selecteerbare renderschaalfactoren (Stap 4).
@@ -53,7 +54,7 @@ Elke andere sleutel (`Game_*`, `Result_*`, `Title_*` enzovoort) is een lay-outwa
 ;Skininformatie
 Name=My New Skin
 DefaultLocale=en
-Version=1.0.0
+Version=0.7.0.0
 Creator=Your Name
 Resolution=1920,1080
 ;Selecteerbare renderschaalfactoren (<=1; decimaal of a/b-breuk, door komma's gescheiden). 1 is altijd beschikbaar en is de standaard.
@@ -187,7 +188,7 @@ Modules/
 `Script.lua` draait eenmaal wanneer het spel de module aanmaakt, met de engine-globals (`TEXTURE`, `SOUND`, `INPUT`, `CONFIG`, `THEME` en de rest) al gedefinieerd. Het spel zoekt daarna globale functies op naam op en roept ze aan. Voor een stage:
 
 - `onStart()`: eenmalig, wanneer de skin laadt. Draait als een coroutine, dus zwaar laadwerk kan `coroutine.yield()` of de `LOADING`-helpers aanroepen om het werk achter de laadbalk over meerdere frames te verdelen.
-- `activate()`: elke keer dat het spel de stage betreedt. Ook een coroutine. Het spel vernieuwt de globals `CHARACTERLIST` en `PUCHICHARALIST` vlak voordat het draait, dus bouw alles wat ervan afhangt hier op; in `onStart` zijn ze nog leeg.
+- `activate()`: elke keer dat het spel de stage betreedt. Ook een coroutine. Het spel vernieuwt de globals `CHARACTERLIST` en `PUCHICHARALIST` vlak voordat het draait, en opnieuw vóór `afterSongEnum`, dus bouw alles wat ervan afhangt in een van beide op; in `onStart` zijn ze nog leeg.
 - `update(timestamp)`: elk frame. Geef `Exit(target, name, transition)` terug om de stage te verlaten. `target` is `"title"`, `"play"`, `"stage"` (met `name` = een stagemap) of `"legacy"` (met `name` = `heya`, `config`, `exit` of `onlinelounge`); `transition` is een map onder `Modules/Transitions/` en is standaard `default`.
 - `draw()`: elk frame.
 - `deactivate()`: wanneer het spel de stage verlaat.
@@ -248,11 +249,11 @@ SkinPath=My New Skin\
 
 ## Probleemoplossing en opmerkingen
 
-- De kiezer vermeldt de skin niet: `Graphics/1_Title/Background.png` ontbreekt, of de map staat niet rechtstreeks onder `System/`.
-- Het spel geeft meteen nadat je de skin selecteert een fout: een vereiste module ontbreekt (Stap 8) of een ervan heeft een Lua-fout opgeworpen. Test een skin door ernaar te wisselen.
+- De kiezer vermeldt de skin niet: `Graphics/1_Title/Background.png`, `Modules/Stages/_boot/Script.lua` of `Modules/Stages/_title/Script.lua` ontbreekt, of de map staat niet rechtstreeks onder `System/`.
+- Het spel geeft meteen nadat je de skin selecteert een fout: een andere vereiste module ontbreekt (Stap 8) of een module heeft een Lua-fout opgeworpen. Test een skin door ernaar te wisselen.
 - Een sleutel in `SkinConfig.ini` heeft geen effect: de sleutel is verkeerd gespeld, de regel bevat meer dan één `=`, of de waarde kon niet worden geparseerd. De parser negeert onbekende sleutels zonder ze te melden.
 - `Resolutions=` toont alleen `1`: de lijst gebruikte puntkomma's (een commentaarteken) of elke waarde lag buiten 0 < waarde <= 1.
 - Een lettertypesleutel heeft geen effect: het bestandspad bestaat niet relatief ten opzichte van de skinroot.
-- `CHARACTERLIST` of `PUCHICHARALIST` is leeg in `onStart`: het spel vult ze nadat het de modules heeft aangemaakt. Gebruik ze vanuit `activate`.
+- `CHARACTERLIST` of `PUCHICHARALIST` is leeg in `onStart`: het spel vult ze nadat het de modules heeft aangemaakt. Gebruik ze vanuit `activate` of `afterSongEnum`.
 - De skinmap hernoemen verandert zijn identiteit; `SkinPath` in `Config.ini` moet naar de nieuwe naam wijzen.
-- `Name=`, `Version=` en `Creator=` zijn uitsluitend informatief. Het spel voert er geen compatibiliteitscontrole op uit.
+- Het spel voert geen compatibiliteitscontrole uit op `Name=`, `Version=` of `Creator=`. Alleen de Hub leest `Version=`, om te bepalen of de skin bij het geïnstalleerde spel past (Stap 3).

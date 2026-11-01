@@ -161,7 +161,7 @@ end
 | `node.IsLocked  (bool)` | この楽曲が現在ロックされているとき true。楽曲以外では常に false。 |
 | `node.HiddenIndex  (int)` | アンロックシステムの表示状態: 0 表示、1 グレー表示、2 ぼかし表示、3 非表示 (楽曲以外では 0)。 |
 | `node.Rarity  (string)` | レアリティラベル。アンロックエントリのない楽曲では "Common"、楽曲以外では "-"。 |
-| `node:Mount(p1diff, p2diff, p3diff, p4diff, p5diff)  -> bool` | プレイヤーごとに指定した難易度インデックス (既定 0) でこの楽曲をプレイ用に選択します。先頭の CONFIG.PlayerCount 個のインデックスだけを確認し、ノードが楽曲でないか、アクティブなプレイヤーの難易度が存在しないか範囲外の場合は false を返します。 |
+| `node:Mount(p1diff, p2diff, p3diff, p4diff, p5diff)  -> bool` | プレイヤーごとに指定した難易度インデックス (既定 0) でこの楽曲をプレイ用に選択します。先頭の CONFIG.PlayerCount 個のインデックスだけを確認し、ノードが楽曲でないか、アクティブなプレイヤーの難易度が存在しないか範囲外の場合は false を返します。読み取り専用モジュールでは false を返します。 |
 | `node:MountIfNotLocked(p1diff, p2diff, p3diff, p4diff, p5diff)  -> bool` | Mount と同じですが、楽曲がロックされている場合はマウントせずに false を返します。 |
 
 ### 譜面
@@ -197,14 +197,14 @@ end
 | `chart.DanTickColor  (color)` | 段位プレートの目盛り色 (譜面に譜面情報がない場合は白)。 |
 | `chart.DanSongs  (array of dan songs)` | この Dan 譜面を構成する楽曲。 |
 | `chart.DanExams  (array of dan exams)` | この Dan 譜面のグローバルな試験条件。 |
-| `chart:GetSongExam(songIdx, examSlot)  -> dan exam` | 1 始まりの楽曲インデックスと 1 始まりの試験スロットに対する楽曲ごとの試験を返します。存在しなければ結果の IsSet は false です。 |
+| `chart:GetSongExam(songIdx, examSlot)  -> dan exam` | 0 始まりの楽曲インデックスと 1 始まりの試験スロットに対する楽曲ごとの試験を返します。存在しないかインデックスが範囲外なら結果の IsSet は false です。 |
 | `chart:GetPlayerBestScore(save)  -> best score info` | 指定したセーブファイルのこの譜面に対するベストプレイの要約を返します。 |
 | `chart:GetCustomCommand(key)  -> string` | 譜面スコープのカスタムコマンド (この COURSE ブロック内のドット始まりのヘッダ。key はドットを含む) の値を返します。なければ nil。 |
 | `chart:GetCustomCommands()  -> dictionary` | すべての譜面スコープのカスタムコマンドを C# の辞書オブジェクトとして返します。 |
 | `chart.SongFolder  (string)` | 譜面ファイルを含むフォルダの絶対パス。 |
 | `chart.ChartPath  (string)` | 譜面ファイルの絶対パス。 |
 | `chart.UniqueId  (string)` | 楽曲の固有 id。なければ空文字列。 |
-| `chart:Select(player)  -> bool` | この譜面を指定したプレイヤーの選択難易度としてマークします。プレイヤー 0 は選択楽曲も設定します。譜面が有効でなければ false を返します。 |
+| `chart:Select(player)  -> bool` | この譜面を指定したプレイヤーの選択難易度としてマークします。プレイヤー 0 は選択楽曲も設定します。譜面が有効でないか読み取り専用モジュールでは false を返します。 |
 
 ### ベストスコア情報
 
@@ -263,15 +263,15 @@ chart.DanExams の要素、または chart:GetSongExam() から返されます�
 楽曲ノード、難易度、試験条件から段位コースをメモリ上に組み立て、プレイ用にマウントするためのグローバルです。
 
 <div class="callout warn">
-グローバル DANBUILDER として利用できます。楽曲とスロットのインデックスは 1 始まりです。ただし AddSong に渡す難易度は 0 始まりの難易度インデックスです。試験スロットは 1 から 7 です。試験の種類の文字列 (大文字小文字を区別しません。括弧内は短縮形): "judgeperfect" (jp)、"judgegood" (jg)、"judgebad" (jb)、"score" (s)、"roll" (r)、"hit" (h)、"combo" (c)、"accuracy" (a)、"judgeadlib" (ja)、"judgemine" (jm)。それ以外の文字列はゲージを意味します。lessThan = true で試験は「未満」の判定に、false で「以上」の判定になります。ビルダーは呼び出し間で状態を保持します。新しいコースを構築する前に Clear() を呼んでください。
+グローバル DANBUILDER として利用できます。楽曲インデックスは API のすべてのリストと同じく 0 始まりで、AddSong に渡す難易度も 0 始まりです。試験スロットは 1 始まりで 1 から 7 です。試験が EXAM1 から EXAM7 と番号付けされているためです。試験の種類の文字列 (大文字小文字を区別しません。括弧内は短縮形): "judgeperfect" (jp)、"judgegood" (jg)、"judgebad" (jb)、"score" (s)、"roll" (r)、"hit" (h)、"combo" (c)、"accuracy" (a)、"judgeadlib" (ja)、"judgemine" (jm)。それ以外の文字列はゲージを意味します。lessThan = true で試験は「未満」の判定に、false で「以上」の判定になります。ビルダーは呼び出し間で状態を保持します。新しいコースを構築する前に Clear() を呼んでください。
 </div>
 
 | メソッド | 説明 |
 | --- | --- |
 | `DANBUILDER.SongCount  (int)` | これまでに追加された楽曲数。 |
 | `DANBUILDER:AddSong(node, diff)  -> void` | 指定した 0 始まりの難易度インデックスで楽曲ノードを追加します。 |
-| `DANBUILDER:GetSong(i)  -> song node` | 1 始まりのインデックス i の楽曲ノードを返します。なければ nil。 |
-| `DANBUILDER:GetSongDiff(i)  -> int` | 1 始まりのインデックス i の楽曲に保存された難易度インデックスを返します。なければ -1。 |
+| `DANBUILDER:GetSong(i)  -> song node` | 0 始まりのインデックス i の楽曲ノードを返します。なければ nil。 |
+| `DANBUILDER:GetSongDiff(i)  -> int` | 0 始まりのインデックス i の楽曲に保存された難易度インデックスを返します。なければ -1。 |
 | `DANBUILDER:SetTitle(title)  -> void` | コースのタイトルを設定します (既定 "Dynamic Dan")。 |
 | `DANBUILDER:SetSubtitle(subtitle)  -> void` | コースのサブタイトルを設定します。 |
 | `DANBUILDER:SetDanTick(tick)  -> void` | 段位プレートの目盛り値を設定します (既定 2)。 |
@@ -279,9 +279,9 @@ chart.DanExams の要素、または chart:GetSongExam() から返されます�
 | `DANBUILDER:SetGenreTitle(title)  -> void` | プレイ中のジャンルプレートの文字を設定します。既定では、演奏中の楽曲のジャンルフォルダを表示します。 |
 | `DANBUILDER:SetGenreColor(r, g, b)  -> void` | 0-255 の成分からジャンルプレートの色を設定します。既定では表示中のジャンルフォルダの色になり、SetGenreTitle で文字を設定した場合は白になります。 |
 | `DANBUILDER:SetGlobalExam(slot, type, red, gold, lessThan)  -> void` | 指定したスロットにコース全体の試験を設定します。 |
-| `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | 1 始まりの楽曲インデックスとスロットで、1 つの楽曲に適用される試験を設定します。 |
+| `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | 0 始まりの楽曲インデックスと 1 始まりのスロットで、1 つの楽曲に適用される試験を設定します。範囲外のインデックスでは何もしません。 |
 | `DANBUILDER:Clear()  -> void` | すべての楽曲と試験を取り除き、メタデータを既定値にリセットします。 |
-| `DANBUILDER:Mount()  -> bool` | コースの譜面をメモリ上に構築し、プレイヤー 1 の Dan 難易度でプレイ用に選択します。ビルダーに楽曲がないか構築に失敗した場合は false を返します。 |
+| `DANBUILDER:Mount()  -> bool` | コースの譜面をメモリ上に構築し、プレイヤー 1 の Dan 難易度でプレイ用に選択します。ビルダーに楽曲がないか構築に失敗した場合は false を返し、読み取り専用モジュールでは常に false を返します。 |
 
 ```lua
 DANBUILDER:Clear()
@@ -289,7 +289,7 @@ DANBUILDER:SetTitle("Custom course")
 DANBUILDER:AddSong(list:GetSongByUniqueId(id1), 3)
 DANBUILDER:AddSong(list:GetSongByUniqueId(id2), 3)
 DANBUILDER:SetGlobalExam(1, "gauge", 90, 100, false)
-DANBUILDER:SetPerSongExam(2, 2, "judgebad", 10, 5, true)
+DANBUILDER:SetPerSongExam(1, 2, "judgebad", 10, 5, true)
 if DANBUILDER:Mount() then
     return Exit("play")
 end
@@ -319,7 +319,7 @@ node.UnlockCondition がこのオブジェクトを返します。HasCondition �
 5 つの仮想キャラクタースロット (V1-V5) の読み書きと、プレイヤースポットをスロットの見た目で表示するようリダイレクトするためのグローバルです。
 
 <div class="callout warn">
-グローバル VIRTUALSLOTS として利用できます。スロットインデックスは 1 から 5 です。セッターは範囲外のインデックスを無視し、ゲッターはその場合に既定値を返します。これらのメソッドはディスクには何も書き込みません。AI スロットはエンジンが管理しており、このグローバルからは編集できません。
+グローバル VIRTUALSLOTS として利用できます。スロットインデックスは 1 から 5 です。セッターは範囲外のインデックスを無視し、ゲッターはその場合に既定値を返します。これらのメソッドはディスクには何も書き込みません。AI スロットはエンジンが管理しており、このグローバルからは編集できません。読み取り専用モジュールでは、セッターと MountSlot はエラーをログに出力して何もしません。ゲッターは引き続き動作します。
 </div>
 
 | メソッド | 説明 |

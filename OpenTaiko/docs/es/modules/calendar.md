@@ -4,7 +4,7 @@
 
 ## Calendar.almanac
 
-Patrones de fecha para eventos que van y vienen con el calendario: un artículo destacado de la tienda en Navidad, una escena de broma del 1 de abril, una bonificación mensual. Los días son días de la hora estándar de Japón (UTC+9), sea cual sea el reloj del jugador, así que todos los jugadores ven el mismo día. Un patrón puede escribirse como un token opaco `enc:`, para que una sorpresa no se vea en el código fuente.
+Patrones de fecha para eventos que van y vienen con el calendario: un artículo destacado de la tienda en Navidad, un evento de verano, una bonificación mensual. Los días son días de la hora estándar de Japón (UTC+9), sea cual sea el reloj del jugador, así que todos los jugadores ven el mismo día. Un patrón puede escribirse como un token opaco `enc:`, para que una sorpresa no se vea en el código fuente.
 
 | Patrón | Coincide con |
 | --- | --- |

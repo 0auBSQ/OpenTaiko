@@ -2,7 +2,7 @@
 
 # Referencia de la API
 
-<span class="badge-new">Versión del juego 0.6.1</span>
+<span class="badge-new">Versión del juego 0.7.0</span>
 
 La referencia de todas las globales que el runtime Lua de OpenTaiko expone a un skin. Elige una categoría en la barra lateral, o empieza por [Módulos y ciclo de vida](activities.md) si todavía no has escrito un módulo.
 

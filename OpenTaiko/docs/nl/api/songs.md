@@ -161,7 +161,7 @@ De nummerlijst-handle, SONGMOUNT:ChosenSongNode() en DANBUILDER:GetSong() geven 
 | `node.IsLocked  (bool)` | True wanneer dit nummer momenteel vergrendeld is; altijd false voor niet-nummers. |
 | `node.HiddenIndex  (int)` | De weergavestatus van het ontgrendelsysteem: 0 weergegeven, 1 vergrijsd, 2 vervaagd, 3 verborgen (0 voor niet-nummers). |
 | `node.Rarity  (string)` | Het zeldzaamheidslabel; "Common" voor nummers zonder ontgrendelitem, "-" voor niet-nummers. |
-| `node:Mount(p1diff, p2diff, p3diff, p4diff, p5diff)  -> bool` | Selecteert dit nummer om te spelen met de gegeven moeilijkheidsindex per speler (standaard 0). Het controleert alleen de eerste CONFIG.PlayerCount indices en geeft false terug als de knoop geen nummer is of de moeilijkheid van een actieve speler ontbreekt of buiten bereik is. |
+| `node:Mount(p1diff, p2diff, p3diff, p4diff, p5diff)  -> bool` | Selecteert dit nummer om te spelen met de gegeven moeilijkheidsindex per speler (standaard 0). Het controleert alleen de eerste CONFIG.PlayerCount indices en geeft false terug als de knoop geen nummer is of de moeilijkheid van een actieve speler ontbreekt of buiten bereik is. Geeft false terug in een alleen-lezen module. |
 | `node:MountIfNotLocked(p1diff, p2diff, p3diff, p4diff, p5diff)  -> bool` | Hetzelfde als Mount, maar geeft false terug zonder te mounten wanneer het nummer vergrendeld is. |
 
 ### Chart
@@ -197,14 +197,14 @@ GetChart(diff) van een nummerknoop geeft een chart terug. Eigenschappen zijn all
 | `chart.DanTickColor  (color)` | Tickkleur van het dan-plaatje (wit wanneer de chart geen chartinfo heeft). |
 | `chart.DanSongs  (array of dan songs)` | De nummers waaruit deze Dan-chart bestaat. |
 | `chart.DanExams  (array of dan exams)` | De globale examenvoorwaarden van deze Dan-chart. |
-| `chart:GetSongExam(songIdx, examSlot)  -> dan exam` | Geeft het examen per nummer terug voor de 1-gebaseerde nummerindex en het 1-gebaseerde examenslot; het resultaat heeft IsSet = false wanneer er geen bestaat. |
+| `chart:GetSongExam(songIdx, examSlot)  -> dan exam` | Geeft het examen per nummer terug voor de 0-gebaseerde nummerindex en het 1-gebaseerde examenslot; het resultaat heeft IsSet = false wanneer er geen bestaat of een index buiten bereik is. |
 | `chart:GetPlayerBestScore(save)  -> best score info` | Geeft de samenvatting van de beste spelbeurt van het gegeven opslagbestand voor deze chart terug. |
 | `chart:GetCustomCommand(key)  -> string` | Geeft de waarde van een aangepast commando op chartniveau terug (een header met puntvoorvoegsel binnen dit COURSE-blok; key bevat de punt), of nil. |
 | `chart:GetCustomCommands()  -> dictionary` | Geeft alle aangepaste commando's op chartniveau terug als C#-dictionary-object. |
 | `chart.SongFolder  (string)` | De absolute map die het chartbestand bevat. |
 | `chart.ChartPath  (string)` | Het absolute pad van het chartbestand. |
 | `chart.UniqueId  (string)` | Het unieke id van het nummer, of een lege string. |
-| `chart:Select(player)  -> bool` | Markeert deze chart als de gekozen moeilijkheid voor de gegeven speler; speler 0 stelt ook het gekozen nummer in. Geeft false terug wanneer de chart niet geldig is. |
+| `chart:Select(player)  -> bool` | Markeert deze chart als de gekozen moeilijkheid voor de gegeven speler; speler 0 stelt ook het gekozen nummer in. Geeft false terug wanneer de chart niet geldig is of in een alleen-lezen module. |
 
 ### Beste-score-info
 
@@ -263,15 +263,15 @@ Elementen van chart.DanExams, of teruggegeven door chart:GetSongExam(). Alle led
 Global om in het geheugen een Dan-cursus samen te stellen uit nummerknopen, moeilijkheden en examenvoorwaarden, en die vervolgens te mounten om te spelen.
 
 <div class="callout warn">
-Beschikbaar als de global DANBUILDER. Nummer- en slotindices beginnen bij 1, behalve de moeilijkheid die aan AddSong wordt doorgegeven, die een 0-gebaseerde moeilijkheidsindex is. Examenslots lopen van 1 tot 7. Examentypestrings (niet hoofdlettergevoelig, korte vorm tussen haakjes): "judgeperfect" (jp), "judgegood" (jg), "judgebad" (jb), "score" (s), "roll" (r), "hit" (h), "combo" (c), "accuracy" (a), "judgeadlib" (ja), "judgemine" (jm); elke andere string betekent gauge. lessThan = true maakt van het examen een "minder dan"-controle, false een "minstens"-controle. De builder behoudt zijn status tussen aanroepen; roep Clear() aan voordat je een nieuwe cursus bouwt.
+Beschikbaar als de global DANBUILDER. Nummerindices beginnen bij 0, zoals elke lijst in de API, en dat geldt ook voor de moeilijkheid die aan AddSong wordt doorgegeven. Examenslots beginnen bij 1 en lopen van 1 tot 7, omdat examens genummerd zijn van EXAM1 tot EXAM7. Examentypestrings (niet hoofdlettergevoelig, korte vorm tussen haakjes): "judgeperfect" (jp), "judgegood" (jg), "judgebad" (jb), "score" (s), "roll" (r), "hit" (h), "combo" (c), "accuracy" (a), "judgeadlib" (ja), "judgemine" (jm); elke andere string betekent gauge. lessThan = true maakt van het examen een "minder dan"-controle, false een "minstens"-controle. De builder behoudt zijn status tussen aanroepen; roep Clear() aan voordat je een nieuwe cursus bouwt.
 </div>
 
 | Methode | Beschrijving |
 | --- | --- |
 | `DANBUILDER.SongCount  (int)` | Aantal tot nu toe toegevoegde nummers. |
 | `DANBUILDER:AddSong(node, diff)  -> void` | Voegt een nummerknoop toe op de gegeven 0-gebaseerde moeilijkheidsindex. |
-| `DANBUILDER:GetSong(i)  -> song node` | Geeft de nummerknoop op 1-gebaseerde index i terug, of nil. |
-| `DANBUILDER:GetSongDiff(i)  -> int` | Geeft de moeilijkheidsindex terug die is opgeslagen voor het nummer op 1-gebaseerde index i, of -1. |
+| `DANBUILDER:GetSong(i)  -> song node` | Geeft de nummerknoop op 0-gebaseerde index i terug, of nil. |
+| `DANBUILDER:GetSongDiff(i)  -> int` | Geeft de moeilijkheidsindex terug die is opgeslagen voor het nummer op 0-gebaseerde index i, of -1. |
 | `DANBUILDER:SetTitle(title)  -> void` | Stelt de cursustitel in (standaard "Dynamic Dan"). |
 | `DANBUILDER:SetSubtitle(subtitle)  -> void` | Stelt de cursusondertitel in. |
 | `DANBUILDER:SetDanTick(tick)  -> void` | Stelt de tickwaarde van het dan-plaatje in (standaard 2). |
@@ -279,9 +279,9 @@ Beschikbaar als de global DANBUILDER. Nummer- en slotindices beginnen bij 1, beh
 | `DANBUILDER:SetGenreTitle(title)  -> void` | Stelt de tekst van het genreplaatje tijdens het spelen in. Standaard toont het plaatje de genremap van het nummer dat gespeeld wordt. |
 | `DANBUILDER:SetGenreColor(r, g, b)  -> void` | Stelt de kleur van het genreplaatje in vanuit componenten 0-255. Standaard krijgt het plaatje de kleur van de genremap die het toont, of wit als SetGenreTitle de tekst heeft ingesteld. |
 | `DANBUILDER:SetGlobalExam(slot, type, red, gold, lessThan)  -> void` | Stelt een cursusbreed examen in het gegeven slot in. |
-| `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | Stelt een examen in dat op één nummer van toepassing is, per 1-gebaseerde nummerindex en slot. |
+| `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | Stelt een examen in dat op één nummer van toepassing is, per 0-gebaseerde nummerindex en 1-gebaseerd slot. Indices buiten bereik doen niets. |
 | `DANBUILDER:Clear()  -> void` | Verwijdert alle nummers en examens en zet de metadata terug op de standaardwaarden. |
-| `DANBUILDER:Mount()  -> bool` | Bouwt de cursuschart in het geheugen en selecteert die om te spelen op de Dan-moeilijkheid voor speler 1; geeft false terug als de builder geen nummers bevat of het bouwen is mislukt. |
+| `DANBUILDER:Mount()  -> bool` | Bouwt de cursuschart in het geheugen en selecteert die om te spelen op de Dan-moeilijkheid voor speler 1; geeft false terug als de builder geen nummers bevat of het bouwen is mislukt, en altijd in een alleen-lezen module. |
 
 ```lua
 DANBUILDER:Clear()
@@ -289,7 +289,7 @@ DANBUILDER:SetTitle("Custom course")
 DANBUILDER:AddSong(list:GetSongByUniqueId(id1), 3)
 DANBUILDER:AddSong(list:GetSongByUniqueId(id2), 3)
 DANBUILDER:SetGlobalExam(1, "gauge", 90, 100, false)
-DANBUILDER:SetPerSongExam(2, 2, "judgebad", 10, 5, true)
+DANBUILDER:SetPerSongExam(1, 2, "judgebad", 10, 5, true)
 if DANBUILDER:Mount() then
     return Exit("play")
 end
@@ -319,7 +319,7 @@ node.UnlockCondition geeft dit object terug. HasCondition is een eigenschap; de 
 Global om de vijf virtuele personageslots (V1-V5) te lezen en te schrijven en om een spelerplek om te leiden naar de visuals van een slot.
 
 <div class="callout warn">
-Beschikbaar als de global VIRTUALSLOTS. Slotindices lopen van 1 tot 5; setters negeren indices buiten bereik en getters geven daarvoor de standaardwaarden terug. Deze methoden schrijven niets naar schijf. De engine beheert het AI-slot, dat deze global niet kan bewerken.
+Beschikbaar als de global VIRTUALSLOTS. Slotindices lopen van 1 tot 5; setters negeren indices buiten bereik en getters geven daarvoor de standaardwaarden terug. Deze methoden schrijven niets naar schijf. De engine beheert het AI-slot, dat deze global niet kan bewerken. In een alleen-lezen module loggen de setters en MountSlot een fout en doen ze niets; de getters werken nog steeds.
 </div>
 
 | Methode | Beschrijving |

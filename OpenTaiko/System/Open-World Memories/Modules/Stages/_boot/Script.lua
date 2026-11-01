@@ -49,6 +49,13 @@ local function cancelled()
 	return NavInput.cancel()
 end
 
+-- the "press enter" line in the current language (Locales/<lang>/title.json)
+local function pressEnterText()
+	local ok, s = pcall(function() return THEME:GetSkinString("BOOT_PRESS_ENTER") end)
+	if ok and type(s) == "string" and s ~= "" and s:sub(1, 1) ~= "[" then return s end
+	return "Press Enter to Start!"
+end
+
 local function updateVolText()
 	if text ~= nil then
 		menu_vols = {
@@ -182,6 +189,7 @@ function update()
 		elseif confirmed() then
 			if firsttimepage == 1 then
 				LANG:ChangeLanguage(menu_langs[langindex].Id)
+				text_enter = text:GetText(pressEnterText())
 				updateVolText()
 				menu_vols[volindex].Text:SetColor(color_red)
 				firsttimepage = 2
@@ -230,7 +238,7 @@ end
 
 function activate()
 	text = TEXT:Create(Layout.font_size)
-	text_enter = text:GetText("Press Enter to Start!")
+	text_enter = text:GetText(pressEnterText())
 	-- the intro plays its own audio track, clocked together with the picture
 	local intro = "Videos/intro.mp4"
 	if LANG:GetLanguageId() == "en" then intro = "Videos/intro_en.mp4" end

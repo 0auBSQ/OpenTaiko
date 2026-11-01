@@ -342,10 +342,10 @@ function M.drawVaultCondsPanel()
     if condCache == nil then refreshCondCache() end
     if condCache.mode == "vault" then
         G.bars["condsbox"]:DrawAtAnchor(VAULT_BOX.x, VAULT_BOX.y, "topleft")
-        drawCondText("Get this song in the Secret Vault menu", 1)
+        drawCondText(G.skinText("SONGSELECT_VAULT_SONG", "Get this song in the Secret Vault menu"), 1)
     elseif condCache.mode == "vaultFolder" then
         G.bars["condsbox"]:DrawAtAnchor(VAULT_BOX.x, VAULT_BOX.y, "topleft")
-        drawCondText("4 keys is what you need...", 1)
+        drawCondText(G.skinText("SONGSELECT_VAULT_FOLDER", "4 keys is what you need..."), 1)
     end
 end
 

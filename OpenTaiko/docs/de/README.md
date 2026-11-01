@@ -2,9 +2,7 @@
 
 # OpenTaiko-Dokumentation
 
-<span class="badge-new">Spielversion 0.6.1</span>
-
-<div class="callout warn">Diese Dokumentation befindet sich noch in der Überprüfung und kann sich bis zur Veröffentlichung noch ändern.</div>
+<span class="badge-new">Spielversion 0.7.0</span>
 
 OpenTaiko zeichnet fast jeden Bildschirm außerhalb des eigentlichen Spielgeschehens mit Lua-Skripten, die in einem Skin mitgeliefert werden: die Menüs, die Songauswahl, die Raum- und Story-Szenen, die Hintergründe, den Ergebnisbildschirm. Diese Seite dokumentiert die Lua-API, die diese Skripte verwenden, und führt durch die häufigsten Aufgaben, die ein Skin-Autor erledigen möchte.
 

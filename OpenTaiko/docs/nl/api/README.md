@@ -2,7 +2,7 @@
 
 # API-referentie
 
-<span class="badge-new">Spelversie 0.6.1</span>
+<span class="badge-new">Spelversie 0.7.0</span>
 
 De referentie voor elke global die de Lua-runtime van OpenTaiko aan een skin beschikbaar stelt. Kies een categorie in de zijbalk, of begin met [Modules en levenscyclus](activities.md) als je nog geen module hebt geschreven.
 

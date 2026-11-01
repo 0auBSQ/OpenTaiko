@@ -2,9 +2,7 @@
 
 # OpenTaiko-documentatie
 
-<span class="badge-new">Spelversie 0.6.1</span>
-
-<div class="callout warn">Deze documentatie wordt nog nagekeken en kan tot de release nog veranderen.</div>
+<span class="badge-new">Spelversie 0.7.0</span>
 
 OpenTaiko tekent bijna elk scherm buiten de kerngameplay met Lua-scripts die in een skin worden meegeleverd: de menu's, de nummerselectie, de kamer- en verhaalscènes, de achtergronden, het resultatenscherm. Deze site documenteert de Lua-API die deze scripts gebruiken en loopt de meest voorkomende dingen door die een skinner wil doen.
 

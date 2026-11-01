@@ -1,5 +1,6 @@
 {
   "_comment": "Japanese texts for on-screen controls, interaction prompts and the room picker (Script.lua). Keys are stable ids; a missing id shows the English text (lang/en).",
+  "title": "マイルーム",
   "ctl_move": "WASD — 移動",
   "ctl_orbit": "右クリック / Q·E — 視点回転",
   "ctl_zoom": "ホイール — ズーム",

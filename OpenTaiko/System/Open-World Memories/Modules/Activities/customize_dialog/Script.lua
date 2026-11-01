@@ -15,6 +15,13 @@ local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
 
+-- a skin locale string (Locales/<lang>/), the English fallback when the key is missing
+local function tr(key, fallback)
+    local ok, s = pcall(function() return THEME:GetSkinString(key) end)
+    if ok and type(s) == "string" and s ~= "" and s:sub(1, 1) ~= "[" then return s end
+    return fallback or key
+end
+
 -- ─── State ────────────────────────────────────────────────────────────────────
 
 local reactive = false
@@ -27,7 +34,7 @@ local currentScreen = "main"
 
 -- Main-menu cursor (1-based).  1-7 = categories, 8 = OK, 9 = Cancel.
 local mainIdx    = 1
-local MAIN_LABELS = { "Character", "Palette", "Puchichara", "Nameplate title", "Dan title", "Player name", "Hitsounds" }
+local MAIN_LABELS = {}   -- filled by loadStrings
 local MAIN_COUNT  = 9   -- 7 categories + OK + Cancel
 local OK_IDX      = 8
 local CANCEL_IDX  = 9
@@ -155,6 +162,35 @@ local FLOAT = Animation.puchichara_float
 local COL_WHITE  = Layout.colors.white_color
 local COL_YELLOW = Layout.colors.yellow_color
 
+-- ─── Texts ────────────────────────────────────────────────────────────────────
+
+-- the dialog's texts in the current language, read on activate
+local strings = {}
+
+local function loadStrings()
+    strings.title          = tr("SONGSELECT_CUSTOMIZE_TITLE", "Customize")
+    strings.character      = tr("SONGSELECT_CUSTOMIZE_CHARACTER", "Character")
+    strings.palette        = tr("SONGSELECT_CUSTOMIZE_PALETTE", "Palette")
+    strings.puchichara     = tr("SONGSELECT_CUSTOMIZE_PUCHICHARA", "Puchichara")
+    strings.nameplateTitle = tr("SONGSELECT_CUSTOMIZE_NAMEPLATE_TITLE", "Nameplate title")
+    strings.danTitle       = tr("SONGSELECT_CUSTOMIZE_DAN_TITLE", "Dan title")
+    strings.playerName     = tr("SONGSELECT_CUSTOMIZE_PLAYER_NAME", "Player name")
+    strings.hitsounds      = tr("SONGSELECT_CUSTOMIZE_HITSOUNDS", "Hitsounds")
+    strings.desc           = tr("SONGSELECT_CUSTOMIZE_DESC", "Choose your character, puchichara, nameplate and hitsounds.")
+    strings.ok             = tr("SONGSELECT_CONFIRM_OK", "OK")
+    strings.cancel         = tr("SONGSELECT_CONFIRM_CANCEL", "Cancel")
+    strings.paletteDefault = tr("SONGSELECT_CUSTOMIZE_PALETTE_DEFAULT", "Default")
+    strings.paletteLock    = tr("SONGSELECT_CUSTOMIZE_PALETTE_LOCK", "Play %d more times with this character to unlock")
+    strings.paletteLockOne = tr("SONGSELECT_CUSTOMIZE_PALETTE_LOCK_ONE", "Play %d more time with this character to unlock")
+    strings.noCharacters   = tr("SONGSELECT_CUSTOMIZE_NO_CHARACTERS", "No characters available.")
+    strings.noPuchichara   = tr("SONGSELECT_CUSTOMIZE_NO_PUCHICHARA", "No puchichara available.")
+    strings.noDanTitles    = tr("SONGSELECT_CUSTOMIZE_NO_DAN_TITLES", "No dan titles available.")
+    strings.noHitsounds    = tr("SONGSELECT_CUSTOMIZE_NO_HITSOUNDS", "No hitsound sets available.")
+    strings.nameHint       = tr("SONGSELECT_CUSTOMIZE_NAME_HINT", "Enter: confirm   Esc: cancel")
+    MAIN_LABELS = { strings.character, strings.palette, strings.puchichara, strings.nameplateTitle,
+                    strings.danTitle, strings.playerName, strings.hitsounds }
+end
+
 -- ─── Misc helpers ─────────────────────────────────────────────────────────────
 
 local function modWrap(v, n) return (v % n + n) % n end
@@ -245,7 +281,7 @@ end
 local function buildPaletteList()
     disposePaletteGradients()
     currentPaletteFolder = ""
-    paletteList = { { name = "Default", plays = 0, blend = 0, luaStops = nil } }
+    paletteList = { { name = strings.paletteDefault, plays = 0, blend = 0, luaStops = nil } }
 
     if loadedCharaInst == nil or not loadedCharaInst.IsValid then return end
     currentPaletteFolder = loadedCharaInst.FolderName
@@ -271,7 +307,7 @@ local function buildPaletteList()
         paletteList[i] = { name = name, plays = plays, blend = blend, luaStops = luaStops }
     end
     if #paletteList == 0 then
-        paletteList = { { name = "Default", plays = 0, blend = 0, luaStops = nil } }
+        paletteList = { { name = strings.paletteDefault, plays = 0, blend = 0, luaStops = nil } }
     end
 end
 
@@ -654,7 +690,7 @@ function draw()
     drawPreview(alpha)
 
     -- Title
-    local titleTx = textLarge:GetText("Customize", false, Layout.title.max_w)
+    local titleTx = textLarge:GetText(strings.title, false, Layout.title.max_w)
     titleTx:SetOpacity(alpha)
     titleTx:Draw(MENU_TITLE_X, MENU_TITLE_Y)
 
@@ -671,17 +707,17 @@ function draw()
         -- ── OK / Cancel footer (matches mod_select_dialog layout) ──
         local okCol  = (mainIdx == OK_IDX)     and COLOR:CreateColorFromHex(COL_YELLOW) or COLOR:CreateColorFromHex(COL_WHITE)
         local canCol = (mainIdx == CANCEL_IDX) and COLOR:CreateColorFromHex(COL_YELLOW) or COLOR:CreateColorFromHex(COL_WHITE)
-        local okTx  = text:GetText("OK",     false, FOOTER.button_max_w, okCol)
-        local canTx = text:GetText("Cancel", false, FOOTER.button_max_w, canCol)
+        local okTx  = text:GetText(strings.ok,     false, FOOTER.button_max_w, okCol)
+        local canTx = text:GetText(strings.cancel, false, FOOTER.button_max_w, canCol)
         okTx:SetOpacity(alpha)  ; okTx:Draw(MENU_OK_X,     MENU_FOOTER_Y)
         canTx:SetOpacity(alpha) ; canTx:Draw(MENU_CANCEL_X, MENU_FOOTER_Y)
 
-        local desc = textSmall:GetText("Choose your character, puchichara, nameplate and hitsounds.", false, DESC.max_w)
+        local desc = textSmall:GetText(strings.desc, false, DESC.max_w)
         desc:SetOpacity(alpha)
         desc:DrawAtAnchor(MENU_CX, DESC.y, "top")
 
     elseif currentScreen == "palette" then
-        local ttl = text:GetText("Palette", false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
+        local ttl = text:GetText(strings.palette, false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
         ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, SCREEN_TITLE_Y, "top")
 
         local playCount          = getCharPlayCount()
@@ -710,70 +746,68 @@ function draw()
         if not selUnlocked then
             local lock = Layout.palette_lock
             local msgCol = palFlashColor or COLOR:CreateColorFromHex(lock.color)
-            local s = selRemaining == 1 and "" or "s"
-            local msg = textSmall:GetText(
-                "Play " .. selRemaining .. " more time" .. s .. " with this character to unlock",
-                false, lock.max_w, msgCol)
+            local pattern = selRemaining == 1 and strings.paletteLockOne or strings.paletteLock
+            local msg = textSmall:GetText(string.format(pattern, selRemaining), false, lock.max_w, msgCol)
             msg:SetOpacity(alpha)
             msg:DrawAtAnchor(MENU_CX, NP_LIST_CY + NP_HALF_VIS * NP_ROW_H + lock.y, "top")
         end
 
     elseif currentScreen == "character" then
-        local ttl = text:GetText("Character", false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
+        local ttl = text:GetText(strings.character, false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
         ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, SCREEN_TITLE_Y, "top")
 
         if #characterList == 0 then
-            local e = textSmall:GetText("No characters available.", false, EMPTY_MAX_W)
+            local e = textSmall:GetText(strings.noCharacters, false, EMPTY_MAX_W)
             e:SetOpacity(alpha) ; e:DrawAtAnchor(MENU_CX, LIST_CY, "center")
         else
             drawHorizList(characterList, charSubIdx, alpha, drawCharItem)
         end
 
     elseif currentScreen == "puchichara" then
-        local ttl = text:GetText("Puchichara", false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
+        local ttl = text:GetText(strings.puchichara, false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
         ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, SCREEN_TITLE_Y, "top")
 
         if #puchiList == 0 then
-            local e = textSmall:GetText("No puchichara available.", false, EMPTY_MAX_W)
+            local e = textSmall:GetText(strings.noPuchichara, false, EMPTY_MAX_W)
             e:SetOpacity(alpha) ; e:DrawAtAnchor(MENU_CX, LIST_CY, "center")
         else
             drawHorizList(puchiList, puchiSubIdx, alpha, drawPuchiItem)
         end
 
     elseif currentScreen == "nameplate_title" then
-        local ttl = text:GetText("Nameplate title", false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
+        local ttl = text:GetText(strings.nameplateTitle, false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
         ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, SCREEN_TITLE_Y, "top")
 
         drawNameplateList(alpha)
 
     elseif currentScreen == "dan_title" then
-        local ttl = text:GetText("Dan title", false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
+        local ttl = text:GetText(strings.danTitle, false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
         ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, SCREEN_TITLE_Y, "top")
 
         if #danList == 0 then
-            local e = textSmall:GetText("No dan titles available.", false, EMPTY_MAX_W)
+            local e = textSmall:GetText(strings.noDanTitles, false, EMPTY_MAX_W)
             e:SetOpacity(alpha) ; e:DrawAtAnchor(MENU_CX, NP_LIST_CY, "center")
         else
             drawDanTitleList(alpha)
         end
 
     elseif currentScreen == "player_name" then
-        local ttl = text:GetText("Player name", false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
+        local ttl = text:GetText(strings.playerName, false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
         ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, SCREEN_TITLE_Y, "top")
 
         local displayText = playerNameInput ~= nil and playerNameInput.DisplayText or stagedPlayerName
         local nameTx = text:GetText(displayText, false, NAME_SCREEN.max_w)
         nameTx:SetOpacity(alpha) ; nameTx:DrawAtAnchor(MENU_CX, NAME_SCREEN.y, "center")
 
-        local hint = textSmall:GetText("Enter: confirm   Esc: cancel", false, NAME_SCREEN.hint_max_w)
+        local hint = textSmall:GetText(strings.nameHint, false, NAME_SCREEN.hint_max_w)
         hint:SetOpacity(alpha) ; hint:DrawAtAnchor(MENU_CX, NAME_SCREEN.hint_y, "top")
 
     elseif currentScreen == "hitsounds" then
-        local ttl = text:GetText("Hitsounds", false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
+        local ttl = text:GetText(strings.hitsounds, false, SCREEN_TITLE.max_w, COLOR:CreateColorFromHex(COL_YELLOW))
         ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, SCREEN_TITLE_Y, "top")
 
         if #hitsoundList == 0 then
-            local e = textSmall:GetText("No hitsound sets available.", false, EMPTY_MAX_W)
+            local e = textSmall:GetText(strings.noHitsounds, false, EMPTY_MAX_W)
             e:SetOpacity(alpha) ; e:DrawAtAnchor(MENU_CX, HS_LIST_CY, "center")
         else
             drawHitsoundList(alpha)
@@ -948,6 +982,7 @@ end
 function activate(pl)
     player = pl or 0
     save   = GetSaveFile(player)
+    loadStrings()
 
     -- Build filtered lists (unlocked / no-condition items only)
     buildCharacterList()
@@ -1046,6 +1081,7 @@ function onStart()
     textSmall = TEXT:Create(Layout.fonts.small_size)
     text      = TEXT:Create(Layout.fonts.text_size)
     textLarge = TEXT:Create(Layout.fonts.large_size)
+    loadStrings()
 
     tx["bg"]     = TEXTURE:CreateTexture("Textures/Background.png")
     tx["bgtile"] = TEXTURE:CreateTexture("Textures/BgTile.png")

@@ -43,6 +43,9 @@
         "TITLE_PLAYERS_2": "2 Joueurs",
         "TITLE_PLAYERS_3": "3 Joueurs",
         "TITLE_PLAYERS_4": "4 Joueurs",
-        "TITLE_PLAYERS_5": "5 Joueurs"
+        "TITLE_PLAYERS_5": "5 Joueurs",
+
+        // Boot screen
+        "BOOT_PRESS_ENTER": "Appuyez sur Entrée pour commencer !"
     }
 }

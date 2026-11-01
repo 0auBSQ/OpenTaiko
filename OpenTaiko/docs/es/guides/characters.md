@@ -4,11 +4,11 @@
 
 Un personaje es una carpeta dentro de `Global/Characters/` en la carpeta de instalación del juego. Cada subcarpeta que el juego encuentra ahí se convierte en un personaje seleccionable. Una carpeta contiene un `Metadata.json` (nombre, rareza, autor), un `CharaConfig.txt` (posiciones y temporización de animaciones), el contenido de animación y, opcionalmente, `Effects.json`, `Unlock.json`, `Palettes.json` y clips de voz. El contenido de animación es o bien carpetas de fotogramas PNG numerados, que renderiza el script de personaje integrado del juego, o bien cualquier cosa que un `Script.lua` por personaje decida dibujar (la plantilla 3D incluida dibuja un modelo glTF).
 
-Compatibilidad: OpenTaiko 0.6.1 sigue cargando sin cambios los personajes creados para 0.6.0. Esta página describe la estructura actual; úsala para los personajes nuevos.
+Compatibilidad: OpenTaiko 0.7.0 sigue cargando sin cambios los personajes creados para 0.6.0. Esta página describe la estructura actual; úsala para los personajes nuevos.
 
 ## Antes de empezar
 
-- OpenTaiko 0.6.1 instalado. El juego lee los personajes de `Global/Characters/` junto al ejecutable del juego, y todos los skins los comparten.
+- OpenTaiko 0.7.0 instalado. El juego lee los personajes de `Global/Characters/` junto al ejecutable del juego, y todos los skins los comparten.
 - Un editor de texto para archivos JSON y de estilo INI.
 - Para un personaje 2D: el arte exportado como fotogramas PNG numerados (`0.png`, `1.png`, ...) con fondo transparente, una carpeta por estado de animación.
 - Para un personaje 3D: un `model.glb` (glTF binario) que contenga los clips de animación, y una imagen fija `Render.png`.
@@ -108,7 +108,7 @@ Los estados ausentes recurren a otro estado, así que un personaje puede incluir
 La lista completa de claves, con sus valores por defecto, es la tabla `load_chara_config_defs` al principio del `CharaScript.lua` integrado. El script ignora las claves que no conoce, así que el `01 - Template/CharaConfig.txt` incluido también contiene algunas claves del lado del skin que no tienen efecto en este archivo.
 
 ```ini
-Chara_Version=0.6.1.0
+Chara_Version=0.7.0.0
 Chara_Resolution=1920,1080
 
 ;Posición X del personaje (1P,2P)

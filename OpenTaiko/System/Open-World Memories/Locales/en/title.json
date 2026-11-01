@@ -43,6 +43,9 @@
         "TITLE_PLAYERS_2": "2 Players",
         "TITLE_PLAYERS_3": "3 Players",
         "TITLE_PLAYERS_4": "4 Players",
-        "TITLE_PLAYERS_5": "5 Players"
+        "TITLE_PLAYERS_5": "5 Players",
+
+        // Boot screen
+        "BOOT_PRESS_ENTER": "Press Enter to Start!"
     }
 }

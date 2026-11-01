@@ -4,7 +4,7 @@
 
 Archivos de guardado, placas de nombre, personajes, puchicharas, estado de la partida, temas y el idioma actual.
 
-Los índices de jugador empiezan en 0 (0 a 4) en toda esta página excepto en THEME:GetThemeSettingForPlayer, que empieza en 1. Los módulos de solo lectura (ROActivities y fondos) reciben un handle de archivo de guardado cuyos métodos de escritura registran un error y no hacen nada; todo lo demás aquí se comporta igual en todos los tipos de módulo.
+Los índices de jugador empiezan en 0 (0 a 4) en toda esta página. Los módulos de solo lectura (ROActivities y fondos) reciben un handle de archivo de guardado cuyos métodos de escritura registran un error y no hacen nada, y sus setters de THEME registran un error y devuelven false; todo lo demás aquí se comporta igual en todos los tipos de módulo.
 
 ## Archivos de guardado
 
@@ -462,16 +462,16 @@ La propiedad UnlockCondition de los handles de información de placa de nombre, 
 La resolución del skin, los ajustes de tema, las cadenas localizadas de ámbito de skin y las definiciones de ajustes de tema.
 
 <div class="callout warn">
-El skin declara los ajustes de tema en ThemeSettings.json y guarda sus valores en el ThemeSettings.db3 contiguo. Los getters devuelven siempre los valores de los ajustes como cadenas; un ajuste ausente devuelve su valor por defecto declarado, o una cadena vacía si no existe ninguna declaración. GetThemeSettingForPlayer recibe un número de jugador desde 1. Los índices de definición empiezan en 0.
+El skin declara los ajustes de tema en ThemeSettings.json y guarda sus valores en el ThemeSettings.db3 contiguo. Los getters devuelven siempre los valores de los ajustes como cadenas; un ajuste ausente devuelve su valor por defecto declarado, o una cadena vacía si no existe ninguna declaración. Los métodos ForPlayer ajustan un jugador fuera de rango a 0 o 4. Los índices de definición empiezan en 0.
 </div>
 
 | Método | Descripción |
 | --- | --- |
 | `THEME:GetResolution()  -> vector2` | La resolución del skin. |
 | `THEME:GetThemeSetting(settingId)  -> string` | Valor de un ajuste de ámbito global. |
-| `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | Valor de un ajuste de ámbito de guardado para el jugador (desde 1), o su valor por defecto si el guardado no tiene valor. |
-| `THEME:SetThemeSetting(settingId, value)  -> bool` | Escribe un ajuste global declarado en ThemeSettings.json (un ajuste de sesión solo se conserva durante esta ejecución); false si el id es desconocido. |
-| `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | Escribe un ajuste por partida para el jugador (desde 1); false si el id es desconocido. |
+| `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | Valor de un ajuste de ámbito de guardado para el jugador, o su valor por defecto si el guardado no tiene valor. |
+| `THEME:SetThemeSetting(settingId, value)  -> bool` | Escribe un ajuste global declarado en ThemeSettings.json (un ajuste de sesión solo se conserva durante esta ejecución); false si el id es desconocido o en un módulo de solo lectura. |
+| `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | Escribe un ajuste por partida para el jugador; false si el id es desconocido o en un módulo de solo lectura. |
 | `THEME:GetNotesSkinFile(kind, file)  -> string` | Ruta de un archivo del paquete seleccionado del tipo `kind` (`"taiko"`, `"bongo"` o `"judges"`), relativa a la carpeta Graphics del skin, tomada del paquete 1 cuando al paquete seleccionado le falta; una cadena vacía cuando el skin no tiene ese paquete o ese archivo. Consulta [Añadir paquetes de notas y juicios](../guides/notes-skins.md). |
 | `THEME:GetSkinString(key)  -> string` | Cadena localizada de la carpeta Locales del skin: primero el idioma actual, luego la configuración regional por defecto del skin, luego `[LOCALE NOT FOUND: key]`. |
 | `THEME:GetDefinitionCount()  -> integer` | Número de definiciones de ajustes en ThemeSettings.json. |
@@ -490,7 +490,7 @@ GetString formatea la entrada con los argumentos adicionales. GetLanguageIds y G
 | Método | Descripción |
 | --- | --- |
 | `LANG:GetString(key, ...)  -> string` | La cadena localizada de una clave, con los marcadores de formato rellenados con los argumentos adicionales. |
-| `LANG:ChangeLanguage(id)  -> bool` | Cambia el idioma activo si el id existe y difiere del actual, y luego llama a `reloadLanguage` en todos los scripts cargados; devuelve si cambió. Deja CONFIG.Language sin cambios. |
+| `LANG:ChangeLanguage(id)  -> bool` | Cambia el idioma activo si el id existe y difiere del actual: primero establece CONFIG.Language en ese id (el juego lo guarda en Config.ini al cerrarse) y luego llama a `reloadLanguage` en todos los scripts cargados; devuelve si cambió. |
 | `LANG:GetLanguageIds()  -> string[]` | Ids de los idiomas disponibles. |
 | `LANG:GetLanguageId()  -> string` | Id del idioma en uso. |
 | `LANG:GetLanguageNames()  -> string[]` | Nombres de visualización de los idiomas disponibles, en el mismo orden. |

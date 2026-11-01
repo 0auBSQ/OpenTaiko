@@ -10,6 +10,8 @@ namespace OpenTaiko {
 
 		public bool ChangeLanguage(string id) {
 			if (CLangManager.Langcodes.Contains(id) && CLangManager.fetchLang() != id) {
+				// set first so reloadLanguage already sees the new id; saved to Config.ini at shutdown
+				OpenTaiko.ConfigIni.sLang = id;
 				CLangManager.langAttach(id);
 				return true;
 			}

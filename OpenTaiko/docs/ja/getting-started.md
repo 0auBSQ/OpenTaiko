@@ -2,11 +2,11 @@
 
 # モジュールの仕組み
 
-OpenTaiko 0.6.1 では、スキンが Lua で画面を追加したり置き換えたりできます。スキンの Modules フォルダにはモジュールごとに 1 つのフォルダがあり、各モジュールは、決まった名前のグローバルコールバック関数を定義する Script.lua を持ちます。ゲームはそれぞれの Script.lua をサンドボックス化された独立の Lua ステートに読み込み、エンジンのグローバル (TEXTURE、SOUND、INPUT、CONFIG など、[API リファレンス](api/README.md)に記載されているもの) を登録し、適切なタイミングでコールバックを呼び出します。正確なシグネチャは[モジュールとライフサイクル](api/activities.md)に一覧があります。
+OpenTaiko 0.7.0 では、スキンが Lua で画面を追加したり置き換えたりできます。スキンの Modules フォルダにはモジュールごとに 1 つのフォルダがあり、各モジュールは、決まった名前のグローバルコールバック関数を定義する Script.lua を持ちます。ゲームはそれぞれの Script.lua をサンドボックス化された独立の Lua ステートに読み込み、エンジンのグローバル (TEXTURE、SOUND、INPUT、CONFIG など、[API リファレンス](api/README.md)に記載されているもの) を登録し、適切なタイミングでコールバックを呼び出します。正確なシグネチャは[モジュールとライフサイクル](api/activities.md)に一覧があります。
 
 ## 始める前に
 
-- OpenTaiko 0.6.1 と、Modules ディレクトリを持つスキンフォルダ。同梱スキンは System/Open-World Memories です。
+- OpenTaiko 0.7.0 と、Modules ディレクトリを持つスキンフォルダ。同梱スキンは System/Open-World Memories です。
 - テキストエディタと、基本的な Lua の知識 (関数、テーブル、require)。
 - System/Open-World Memories/Modules/Stages と Global/Modules/Stages にある同梱ステージ。Global/Modules/Stages/demo_overall の小さなデモはコールバックの形を示し、大きなステージは実際の画面がどう構成されているかを示します。
 
@@ -70,7 +70,7 @@ end
 ## ステージのライフサイクル
 
 - onStart(): ゲームはスキンの読み込み後に 1 回、そしてスキンの再読み込みのたびに、ステージが表示中かどうかにかかわらずこれを呼びます。テクスチャ、サウンド、動画はここで読み込みます。コルーチンとして実行されるため、時間のかかる読み込みは LOADING ヘルパーを使ってローディングバーの裏で複数フレームに分散できます。
-- activate(): ゲームはステージに入るたびにこれを呼びます。訪問ごとの状態のリセット、音楽の開始、データベースのオープンはここで行います。これもコルーチンとして実行され、LOADING を使えます。ゲームはキャラクターとぷちキャラのリスト (CHARACTERLIST、PUCHICHARALIST) を activate の実行直前に更新するので、ここで読み取ってください。onStart はその更新より前に実行されます。
+- activate(): ゲームはステージに入るたびにこれを呼びます。訪問ごとの状態のリセット、音楽の開始、データベースのオープンはここで行います。これもコルーチンとして実行され、LOADING を使えます。ゲームはキャラクターとぷちキャラのリスト (CHARACTERLIST、PUCHICHARALIST) を activate の実行直前と afterSongEnum の実行直前に更新するので、そのどちらかで読み取ってください。onStart は最初の更新より前に実行されます。
 - update(timestamp): ゲームは毎フレーム draw の前にこれを呼び、ミリ秒単位のゲームクロックを渡します。入力の処理と状態の変更はここで行います。ステージが Exit を呼んだ後、ゲームは update を呼ぶのをやめ、draw はフェードアウトの間も呼び続けます。
 - draw(): ゲームは毎フレームこれを呼びます。描画のみを行い、フレームごとのアロケーションは少なく保ってください。
 - deactivate(): ゲームはステージを離れるときにこれを呼びます。demo_overall のデータベースデモはここでデータベースを破棄し、最初のデモは音楽と動画を停止します。
@@ -124,7 +124,20 @@ local Dialogue  = require("nokon_dialogue")           -- the module folder
 
 ## 読み取り専用モジュール
 
-ゲームは ROActivity とバックグラウンドを、Script.lua が実行される前に制限されたグローバルで作成します。CONFIG は読み取り専用のビュー、GetSaveFile(player) は読み取り専用のセーブファイルを返し、DATABASE は読み取り専用のストアを開き、ACTIVITY は nil です (ROACTIVITY を使ってください)。これらを通じた書き込みはエラー通知をログに出力し、何もせず、Lua エラーも発生させません。設定、セーブデータ、データベースを変更する必要があるモジュールは、アクティビティかステージでなければなりません。
+ゲームは ROActivity とバックグラウンドを、Script.lua が実行される前に制限されたグローバルで作成します。これらを通じた書き込みはエラー通知をログに出力し、何もせず、Lua エラーも発生させません。
+
+- CONFIG は読み取り専用のビューで、セッターは何もしません。
+- GetSaveFile(player) は読み取り専用のセーブファイルを返します。
+- DATABASE は読み取り専用のストアを開きます。
+- THEME:SetThemeSetting と THEME:SetThemeSettingForPlayer は false を返します。
+- STORAGE:WriteText と STORAGE:WriteLobbyCode は false を返します。
+- SQL:OpenSQLDatabase(path) はデータベースを読み取り専用で開きます。読み取りは動作し、書き込む文は失敗して SQLite のエラーをログに出力し、空の結果を返します。存在しないデータベースファイルは作成されません。
+- VIRTUALSLOTS のセッターと VIRTUALSLOTS:MountSlot は何もしません。ゲッターは引き続き動作します。
+- DANBUILDER:Mount() は false を返します。ビルダーへの登録はこれまでどおりできます。
+- 楽曲ノードの Mount と MountIfNotLocked、譜面の Select は、ノードの入手元にかかわらず false を返します。
+- ACTIVITY は nil です (ROACTIVITY を使ってください)。
+
+設定、セーブデータ、データベースを変更したり、プレイする楽曲を選んだりする必要があるモジュールは、アクティビティかステージでなければなりません。
 
 ## lang/ によるローカライズ
 

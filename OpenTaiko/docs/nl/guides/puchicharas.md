@@ -4,11 +4,11 @@
 
 Een puchichara is de kleine metgezel die tijdens het spelen naast de gauge stuitert. Elke puchichara is één map onder `Global/PuchiChara/` in de installatiemap van het spel, met een spritesheet van twee frames en enkele optionele JSON-bestanden. Je schrijft geen code: maak de map met de juiste bestandsnamen aan en het spel pikt hem bij de volgende start op.
 
-Compatibiliteit: OpenTaiko 0.6.1 laadt puchichara's die voor 0.6.0 zijn gemaakt nog steeds zonder wijzigingen.
+Compatibiliteit: OpenTaiko 0.7.0 laadt puchichara's die voor 0.6.0 zijn gemaakt nog steeds zonder wijzigingen.
 
 ## Voordat je begint
 
-- OpenTaiko 0.6.1 geïnstalleerd. Het spel leest puchichara's uit `Global/PuchiChara/` naast het uitvoerbare bestand van het spel, en alle skins delen de map.
+- OpenTaiko 0.7.0 geïnstalleerd. Het spel leest puchichara's uit `Global/PuchiChara/` naast het uitvoerbare bestand van het spel, en alle skins delen de map.
 - Een afbeeldingsbewerker die PNG met transparantie exporteert.
 - Een teksteditor voor de JSON-bestanden.
 - Optioneel: een kort `.ogg`-fragment voor `Welcome.ogg`.

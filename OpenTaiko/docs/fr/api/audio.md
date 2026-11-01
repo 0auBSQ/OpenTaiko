@@ -55,7 +55,7 @@ end
 Un son lisible renvoyé par les méthodes de fabrique de `SOUND`.
 
 <div class="callout warn">
-Tant que le flux n'est pas prêt, le handle met en tampon Play et chaque appel Set*, et les accesseurs renvoient les valeurs par défaut listées ci-dessous. Le volume est un pourcentage (100 = le niveau propre du fichier). Le panoramique va de -100 (gauche) à 100 (droite) en passant par 0 (centre). Les positions et durées sont en millisecondes. Play redémarre le flux depuis le début ; positionnez-vous donc après avoir appelé Play.
+Tant que le flux n'est pas prêt, le handle met en tampon Play et chaque appel Set*, et les accesseurs renvoient les valeurs par défaut listées ci-dessous. Le volume est un pourcentage (100 = le niveau propre du fichier). Le panoramique va de -100 (gauche) à 100 (droite) en passant par 0 (centre). Les positions et durées sont en millisecondes. Play redémarre le flux depuis le début ; positionnez-vous donc après avoir appelé Play. Les alias ci-dessous sont permanents : les deux noms sont pris en charge.
 </div>
 
 | Méthode | Description |
@@ -70,16 +70,16 @@ Tant que le flux n'est pas prêt, le handle met en tampon Play et chaque appel S
 | `sound:GetLoop()  -> bool` | Indique si la lecture en boucle est activée. |
 | `sound:SetVolumePercent(vol)  -> nil` | Définit le volume en pourcentage. |
 | `sound:GetVolumePercent()  -> number` | Renvoie le volume en pourcentage (100 quand non chargé). |
-| `sound:SetVolume(vol)  -> nil` | Ancien nom de SetVolumePercent (entier). |
+| `sound:SetVolume(vol)  -> nil` | Alias de SetVolumePercent (entier). |
 | `sound:SetPan(pan)  -> nil` | Définit le panoramique stéréo, -100..100. |
 | `sound:GetPan()  -> int` | Renvoie le panoramique courant (0 quand non chargé). |
 | `sound:SetSpeed(speed)  -> nil` | Définit le multiplicateur de vitesse de lecture (1 = normal). |
 | `sound:GetSpeed()  -> number` | Renvoie le multiplicateur de vitesse de lecture (1 quand non chargé). |
 | `sound:SetTimestampMs(ms)  -> nil` | Se positionne à une position en millisecondes. |
-| `sound:SetTimestamp(ms)  -> nil` | Ancien nom de SetTimestampMs. |
+| `sound:SetTimestamp(ms)  -> nil` | Alias de SetTimestampMs. |
 | `sound:GetTimestampMs()  -> number` | Renvoie la position courante en millisecondes (0 quand non chargé). |
 | `sound.DurationMs  -> number` | Durée totale en millisecondes (0 quand non chargé). |
-| `sound:GetDurationMs()  -> number` | Ancien nom de DurationMs. |
+| `sound:GetDurationMs()  -> number` | Alias de DurationMs. |
 | `sound.Loaded  -> bool` | Vrai une fois que le thread de rendu a construit le flux. |
 | `sound.IsPlaying  -> bool` | Vrai pendant la lecture du son. |
 | `sound:IsFinished()  -> bool` | Vrai une fois que la lecture a atteint la fin (faux en pause ou non chargé). |

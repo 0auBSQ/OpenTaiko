@@ -4,11 +4,11 @@
 
 Ein Puchichara ist der kleine Begleiter, der während des Spiels neben der Gauge hüpft. Jeder Puchichara ist ein Ordner unter `Global/PuchiChara/` im Installationsordner des Spiels, der ein Sprite-Sheet mit zwei Frames und einige optionale JSON-Dateien enthält. Sie schreiben keinen Code: Legen Sie den Ordner mit den richtigen Dateinamen an, und das Spiel erkennt ihn beim nächsten Start.
 
-Kompatibilität: OpenTaiko 0.6.1 lädt für 0.6.0 erstellte Puchicharas weiterhin ohne Änderungen.
+Kompatibilität: OpenTaiko 0.7.0 lädt für 0.6.0 erstellte Puchicharas weiterhin ohne Änderungen.
 
 ## Bevor Sie beginnen
 
-- OpenTaiko 0.6.1 ist installiert. Das Spiel liest Puchicharas aus `Global/PuchiChara/` neben der ausführbaren Datei des Spiels, und alle Skins nutzen den Ordner gemeinsam.
+- OpenTaiko 0.7.0 ist installiert. Das Spiel liest Puchicharas aus `Global/PuchiChara/` neben der ausführbaren Datei des Spiels, und alle Skins nutzen den Ordner gemeinsam.
 - Ein Bildeditor, der PNG mit Transparenz exportiert.
 - Ein Texteditor für die JSON-Dateien.
 - Optional: ein kurzer `.ogg`-Clip für `Welcome.ogg`.

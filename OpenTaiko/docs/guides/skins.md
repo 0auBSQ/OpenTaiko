@@ -8,15 +8,15 @@ A skin also carries the Lua modules that run each screen. The game loads specifi
 
 ## Before you start
 
-- OpenTaiko 0.6.1 installed, with the shipped skin `System/Open-World Memories/` present.
+- OpenTaiko 0.7.0 installed, with the shipped skin `System/Open-World Memories/` present.
 - A plain-text editor for `SkinConfig.ini`, the included `*Config.ini` files and the Lua modules.
 - Basic Lua if you intend to change screen behaviour. A pure re-texture (replacing PNG and OGG files and editing `.ini` values) needs no Lua.
 
 ## Step 1: Understand what makes a folder a skin
 
-At start-up the game lists the subfolders of `System/`. A folder counts as a skin only if `Graphics/1_Title/Background.png` exists inside it; the game skips any other folder. If the selected skin folder is missing, the game falls back to `System/Default/`, then to the first valid skin in alphabetical order, then to `System/` itself.
+At start-up the game lists the subfolders of `System/`. A folder counts as a skin only if `Graphics/1_Title/Background.png`, `Modules/Stages/_boot/Script.lua` and `Modules/Stages/_title/Script.lua` all exist inside it; the game skips any other folder. If the selected skin folder is missing or fails this check, the game falls back to `System/Default/`, then to the first valid skin in alphabetical order, then to `System/` itself.
 
-This check only gets the folder listed. Step 8 names the modules that must also exist before the skin runs.
+This check looks only at those three files. Step 8 names the other modules that must also exist before the skin runs.
 
 ```
 System/
@@ -37,7 +37,8 @@ Copy `System/Open-World Memories/` to a new sibling folder, for example `System/
 `SkinConfig.ini` is a `Key=Value` file, one setting per line. The parser trims leading spaces and tabs, treats lines starting with `;` as comments, and reads a line only when it contains exactly one `=`. Key matching is exact, and the parser ignores an unknown key without reporting an error. The skin-level keys are:
 
 - `Name=`: display name. Metadata only; the folder name selects the skin.
-- `Version=`, `Creator=`: free-form strings (default `Unknown`). The game does not validate them.
+- `Version=`: the skin's version as four numbers, main.major.minor.patch, like the game's own (default `Unknown`). The Hub treats a skin as compatible when its first three parts match the game's version: a skin for OpenTaiko 0.7.0.0 uses `0.7.0.x`. The game itself does not check it.
+- `Creator=`: free-form string (default `Unknown`). The game does not validate it.
 - `DefaultLocale=`: locale id the game uses when the active game language has no file under `Locales/` (default `en`).
 - `Resolution=W,H`: the resolution you author the layout values for (default `1280,720`). The shipped skin uses `1920,1080`.
 - `Resolutions=`: selectable render-scale multipliers (Step 4).
@@ -53,7 +54,7 @@ Every other key (`Game_*`, `Result_*`, `Title_*` and so on) is a screen layout v
 ;Skin information
 Name=My New Skin
 DefaultLocale=en
-Version=1.0.0
+Version=0.7.0.0
 Creator=Your Name
 Resolution=1920,1080
 ;Selectable render-scale multipliers (<=1; decimal or a/b fraction, comma-separated). 1 is always available and is the default.
@@ -187,7 +188,7 @@ Modules/
 `Script.lua` runs once when the game creates the module, with the engine globals (`TEXTURE`, `SOUND`, `INPUT`, `CONFIG`, `THEME` and the rest) already defined. The game then looks up global functions by name and calls them. For a stage:
 
 - `onStart()`: once, when the skin loads. Runs as a coroutine, so heavy loading can call `coroutine.yield()` or the `LOADING` helpers to spread work across frames behind the loading bar.
-- `activate()`: each time the game enters the stage. Also a coroutine. The game refreshes the `CHARACTERLIST` and `PUCHICHARALIST` globals right before it runs, so build anything that depends on them here; in `onStart` they are still empty.
+- `activate()`: each time the game enters the stage. Also a coroutine. The game refreshes the `CHARACTERLIST` and `PUCHICHARALIST` globals right before it runs, and again before `afterSongEnum`, so build anything that depends on them in one of the two; in `onStart` they are still empty.
 - `update(timestamp)`: every frame. Return `Exit(target, name, transition)` to leave the stage. `target` is `"title"`, `"play"`, `"stage"` (with `name` = a stage folder) or `"legacy"` (with `name` = `heya`, `config`, `exit` or `onlinelounge`); `transition` is a folder under `Modules/Transitions/` and defaults to `default`.
 - `draw()`: every frame.
 - `deactivate()`: when the game leaves the stage.
@@ -248,11 +249,11 @@ SkinPath=My New Skin\
 
 ## Troubleshooting and notes
 
-- The chooser does not list the skin: `Graphics/1_Title/Background.png` is missing, or the folder is not directly under `System/`.
-- The game errors right after you select the skin: a required module is missing (Step 8) or one of them raised a Lua error. Test a skin by switching to it.
+- The chooser does not list the skin: `Graphics/1_Title/Background.png`, `Modules/Stages/_boot/Script.lua` or `Modules/Stages/_title/Script.lua` is missing, or the folder is not directly under `System/`.
+- The game errors right after you select the skin: another required module is missing (Step 8) or a module raised a Lua error. Test a skin by switching to it.
 - A `SkinConfig.ini` key has no effect: the key is misspelled, the line contains more than one `=`, or the value failed to parse. The parser ignores unknown keys without reporting them.
 - `Resolutions=` shows only `1`: the list used semicolons (a comment marker) or every value was outside 0 < value <= 1.
 - A font key has no effect: the file path does not exist relative to the skin root.
-- `CHARACTERLIST` or `PUCHICHARALIST` is empty in `onStart`: the game fills them after it creates the modules. Use them from `activate`.
+- `CHARACTERLIST` or `PUCHICHARALIST` is empty in `onStart`: the game fills them after it creates the modules. Use them from `activate` or `afterSongEnum`.
 - Renaming the skin folder changes its identity; `SkinPath` in `Config.ini` must point at the new name.
-- `Name=`, `Version=` and `Creator=` are informational only. The game makes no compatibility check on them.
+- The game makes no compatibility check on `Name=`, `Version=` or `Creator=`. Only the Hub reads `Version=`, to tell whether the skin matches the installed game (Step 3).

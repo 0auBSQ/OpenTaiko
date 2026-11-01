@@ -4,11 +4,11 @@
 
 A character is a folder under `Global/Characters/` in the game's install folder. Every subfolder the game finds there becomes one selectable character. A folder holds a `Metadata.json` (name, rarity, author), a `CharaConfig.txt` (positions and animation timing), the animation content, and optionally `Effects.json`, `Unlock.json`, `Palettes.json` and voice clips. The animation content is either folders of numbered PNG frames, which the game's built-in character script renders, or anything a per-character `Script.lua` chooses to draw (the shipped 3D template draws a glTF model).
 
-Compatibility: OpenTaiko 0.6.1 still loads characters made for 0.6.0 without changes. This page describes the current layout; use it for new characters.
+Compatibility: OpenTaiko 0.7.0 still loads characters made for 0.6.0 without changes. This page describes the current layout; use it for new characters.
 
 ## Before you start
 
-- OpenTaiko 0.6.1 installed. The game reads characters from `Global/Characters/` next to the game executable, and all skins share them.
+- OpenTaiko 0.7.0 installed. The game reads characters from `Global/Characters/` next to the game executable, and all skins share them.
 - A text editor for JSON and INI-style files.
 - For a 2D character: the art exported as numbered PNG frames (`0.png`, `1.png`, ...) with a transparent background, one folder per animation state.
 - For a 3D character: a `model.glb` (binary glTF) containing the animation clips, and a still `Render.png`.
@@ -108,7 +108,7 @@ Missing states fall back to another state, so a character can ship a subset. The
 The complete key list, with defaults, is the `load_chara_config_defs` table at the top of the built-in `CharaScript.lua`. The script ignores keys it does not know, so the shipped `01 - Template/CharaConfig.txt` also contains a few skin-side keys that have no effect in this file.
 
 ```ini
-Chara_Version=0.6.1.0
+Chara_Version=0.7.0.0
 Chara_Resolution=1920,1080
 
 ;Character X position (1P,2P)

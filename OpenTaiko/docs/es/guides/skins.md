@@ -8,15 +8,15 @@ Un skin también contiene los módulos Lua que ejecutan cada pantalla. El juego 
 
 ## Antes de empezar
 
-- OpenTaiko 0.6.1 instalado, con el skin incluido `System/Open-World Memories/` presente.
+- OpenTaiko 0.7.0 instalado, con el skin incluido `System/Open-World Memories/` presente.
 - Un editor de texto plano para `SkinConfig.ini`, los archivos `*Config.ini` incluidos y los módulos Lua.
 - Nociones básicas de Lua si pretendes cambiar el comportamiento de las pantallas. Un simple cambio de texturas (reemplazar archivos PNG y OGG y editar valores `.ini`) no necesita Lua.
 
 ## Paso 1: Entender qué convierte una carpeta en un skin
 
-Al arrancar, el juego lista las subcarpetas de `System/`. Una carpeta cuenta como skin solo si existe `Graphics/1_Title/Background.png` dentro de ella; el juego omite cualquier otra carpeta. Si la carpeta del skin seleccionado no existe, el juego recurre a `System/Default/`, luego al primer skin válido en orden alfabético, y luego al propio `System/`.
+Al arrancar, el juego lista las subcarpetas de `System/`. Una carpeta cuenta como skin solo si dentro de ella existen `Graphics/1_Title/Background.png`, `Modules/Stages/_boot/Script.lua` y `Modules/Stages/_title/Script.lua`; el juego omite cualquier otra carpeta. Si la carpeta del skin seleccionado no existe o no supera esta comprobación, el juego recurre a `System/Default/`, luego al primer skin válido en orden alfabético, y luego al propio `System/`.
 
-Esta comprobación solo hace que la carpeta aparezca en la lista. El Paso 8 nombra los módulos que deben existir además para que el skin funcione.
+Esta comprobación solo mira esos tres archivos. El Paso 8 nombra los demás módulos que deben existir para que el skin funcione.
 
 ```
 System/
@@ -37,7 +37,8 @@ Copia `System/Open-World Memories/` a una nueva carpeta hermana, por ejemplo `Sy
 `SkinConfig.ini` es un archivo `Key=Value`, un ajuste por línea. El analizador recorta los espacios y tabuladores iniciales, trata las líneas que empiezan por `;` como comentarios, y lee una línea solo cuando contiene exactamente un `=`. La comparación de claves es exacta, y el analizador ignora una clave desconocida sin informar de ningún error. Las claves a nivel de skin son:
 
 - `Name=`: nombre de visualización. Solo metadatos; el nombre de carpeta selecciona el skin.
-- `Version=`, `Creator=`: cadenas libres (por defecto `Unknown`). El juego no las valida.
+- `Version=`: la versión del skin en cuatro números, main.major.minor.patch, como la del juego (por defecto `Unknown`). El Hub considera compatible un skin cuando sus tres primeras partes coinciden con la versión del juego: un skin para OpenTaiko 0.7.0.0 usa `0.7.0.x`. El juego en sí no la comprueba.
+- `Creator=`: cadena libre (por defecto `Unknown`). El juego no la valida.
 - `DefaultLocale=`: id de configuración regional que el juego usa cuando el idioma activo del juego no tiene archivo en `Locales/` (por defecto `en`).
 - `Resolution=W,H`: la resolución para la que diseñas los valores de disposición (por defecto `1280,720`). El skin incluido usa `1920,1080`.
 - `Resolutions=`: multiplicadores de escala de renderizado seleccionables (Paso 4).
@@ -53,7 +54,7 @@ Todas las demás claves (`Game_*`, `Result_*`, `Title_*`, etc.) son valores de d
 ;Información del skin
 Name=My New Skin
 DefaultLocale=en
-Version=1.0.0
+Version=0.7.0.0
 Creator=Your Name
 Resolution=1920,1080
 ;Multiplicadores de escala de renderizado seleccionables (<=1; decimal o fracción a/b, separados por comas). 1 siempre está disponible y es el valor por defecto.
@@ -187,7 +188,7 @@ Modules/
 `Script.lua` se ejecuta una vez cuando el juego crea el módulo, con las globales del motor (`TEXTURE`, `SOUND`, `INPUT`, `CONFIG`, `THEME` y el resto) ya definidas. El juego busca entonces funciones globales por nombre y las llama. Para un stage:
 
 - `onStart()`: una vez, cuando se carga el skin. Se ejecuta como corrutina, así que una carga pesada puede llamar a `coroutine.yield()` o a las utilidades `LOADING` para repartir el trabajo entre fotogramas detrás de la barra de carga.
-- `activate()`: cada vez que el juego entra en el stage. También es una corrutina. El juego actualiza las globales `CHARACTERLIST` y `PUCHICHARALIST` justo antes de que se ejecute, así que construye aquí todo lo que dependa de ellas; en `onStart` todavía están vacías.
+- `activate()`: cada vez que el juego entra en el stage. También es una corrutina. El juego actualiza las globales `CHARACTERLIST` y `PUCHICHARALIST` justo antes de que se ejecute, y de nuevo antes de `afterSongEnum`, así que construye en una de las dos todo lo que dependa de ellas; en `onStart` todavía están vacías.
 - `update(timestamp)`: cada fotograma. Devuelve `Exit(target, name, transition)` para abandonar el stage. `target` es `"title"`, `"play"`, `"stage"` (con `name` = una carpeta de stage) o `"legacy"` (con `name` = `heya`, `config`, `exit` u `onlinelounge`); `transition` es una carpeta dentro de `Modules/Transitions/` y por defecto es `default`.
 - `draw()`: cada fotograma.
 - `deactivate()`: cuando el juego abandona el stage.
@@ -248,11 +249,11 @@ SkinPath=My New Skin\
 
 ## Resolución de problemas y notas
 
-- El selector no lista el skin: falta `Graphics/1_Title/Background.png`, o la carpeta no está directamente dentro de `System/`.
-- El juego da error justo después de que selecciones el skin: falta un módulo obligatorio (Paso 8) o uno de ellos lanzó un error de Lua. Prueba un skin cambiando a él.
+- El selector no lista el skin: falta `Graphics/1_Title/Background.png`, `Modules/Stages/_boot/Script.lua` o `Modules/Stages/_title/Script.lua`, o la carpeta no está directamente dentro de `System/`.
+- El juego da error justo después de que selecciones el skin: falta otro módulo obligatorio (Paso 8) o un módulo lanzó un error de Lua. Prueba un skin cambiando a él.
 - Una clave de `SkinConfig.ini` no tiene efecto: la clave está mal escrita, la línea contiene más de un `=`, o el valor no se pudo analizar. El analizador ignora las claves desconocidas sin informar de ellas.
 - `Resolutions=` solo muestra `1`: la lista usaba puntos y coma (un marcador de comentario) o todos los valores estaban fuera de 0 < valor <= 1.
 - Una clave de fuente no tiene efecto: la ruta del archivo no existe respecto a la raíz del skin.
-- `CHARACTERLIST` o `PUCHICHARALIST` están vacías en `onStart`: el juego las rellena después de crear los módulos. Úsalas desde `activate`.
+- `CHARACTERLIST` o `PUCHICHARALIST` están vacías en `onStart`: el juego las rellena después de crear los módulos. Úsalas desde `activate` o `afterSongEnum`.
 - Renombrar la carpeta del skin cambia su identidad; `SkinPath` en `Config.ini` debe apuntar al nuevo nombre.
-- `Name=`, `Version=` y `Creator=` son solo informativos. El juego no hace ninguna comprobación de compatibilidad con ellos.
+- El juego no hace ninguna comprobación de compatibilidad con `Name=`, `Version=` ni `Creator=`. Solo el Hub lee `Version=`, para saber si el skin corresponde al juego instalado (Paso 3).

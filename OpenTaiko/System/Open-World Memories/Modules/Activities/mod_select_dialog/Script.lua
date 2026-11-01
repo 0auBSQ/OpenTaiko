@@ -5,6 +5,13 @@ local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
 
+-- a skin locale string (Locales/<lang>/), the English fallback when the key is missing
+local function tr(key, fallback)
+    local ok, s = pcall(function() return THEME:GetSkinString(key) end)
+    if ok and type(s) == "string" and s ~= "" and s:sub(1, 1) ~= "[" then return s end
+    return fallback or key
+end
+
 -- Reactive once the enter animation is done
 local reactive = false
 local player = 0
@@ -91,9 +98,13 @@ local SPECIAL_MODS = {
     { id = 4, color = COL_RED },      -- Timed (Hard)
 }
 
+-- Texts: key is the locale key of the label (Locales/<lang>/song_select.json), key .. "_DESC" the one of the
+-- description; labelKey replaces the label's key, lang takes the label from the game's Lang/ instead.
+-- text, label and desc are the English fallbacks.
 local OPTION_DEFS = {
     {
         meta = "scroll-speed",
+        key  = "SONGSELECT_MODS_SCROLL_SPEED",
         text = "Scroll Speed",
         desc = "Determines how fast the notes scroll through the lane.",
         type = "scroll",
@@ -102,74 +113,80 @@ local OPTION_DEFS = {
     },
     {
         meta = "game-mode",
+        key  = "SONGSELECT_MODS_GAME_MODE",
         text = "Game Mode",
         desc = "Play with your favorite instrument!",
         type = "multi",
         choices = {
-            { label = "Taiko", color = COL_WHITE, desc = "Play with a Taiko drum." },
-            { label = "Bongo", color = COL_WHITE, desc = "Play with bongos." },
+            { key = "SONGSELECT_MODS_TAIKO", label = "Taiko", color = COL_WHITE, desc = "Play with a Taiko drum." },
+            { key = "SONGSELECT_MODS_BONGO", label = "Bongo", color = COL_WHITE, desc = "Play with bongos." },
         }
     },
     {
         meta = "timing",
+        key  = "SONGSELECT_MODS_TIMING",
         text = "Timing",
         desc = "Adjust the precision required for a good/ok/bad input.",
         type = "multi",
         choices = {
-            { label = "Loose",    color = COL_GREEN,      desc = "Very forgiving timing windows, for beginners." },
-            { label = "Lenient",  color = COL_LIGHTGREEN, desc = "Forgiving timing windows." },
-            { label = "Normal",   color = COL_WHITE,      desc = "Standard timing windows." },
-            { label = "Strict",   color = COL_ORANGE,     desc = "Tight timing windows." },
-            { label = "Rigorous", color = COL_RED,        desc = "Very tight timing windows, for experts only." },
+            { key = "SONGSELECT_MODS_TIMING1", lang = "MOD_TIMING1", label = "Loose",    color = COL_GREEN,      desc = "Very forgiving timing windows, for beginners." },
+            { key = "SONGSELECT_MODS_TIMING2", lang = "MOD_TIMING2", label = "Lenient",  color = COL_LIGHTGREEN, desc = "Forgiving timing windows." },
+            { key = "SONGSELECT_MODS_TIMING3", lang = "MOD_TIMING3", label = "Normal",   color = COL_WHITE,      desc = "Standard timing windows." },
+            { key = "SONGSELECT_MODS_TIMING4", lang = "MOD_TIMING4", label = "Strict",   color = COL_ORANGE,     desc = "Tight timing windows." },
+            { key = "SONGSELECT_MODS_TIMING5", lang = "MOD_TIMING5", label = "Rigorous", color = COL_RED,        desc = "Very tight timing windows, for experts only." },
         }
     },
     {
         meta = "just",
+        key  = "SONGSELECT_MODS_JUST",
         text = "Just",
         desc = "Only 2 judge zones, all or nothing.",
         type = "multi",
         choices = {
-            { label = "Normal", color = COL_WHITE, desc = "Standard 3-zone judgement." },
-            { label = "Just",   color = COL_RED,   desc = "Good or Miss only. No leniency at all." },
-            { label = "Safe",   color = COL_GREEN, desc = "Ok counts as Good. Very forgiving." },
+            { key = "SONGSELECT_MODS_JUST_NORMAL", label = "Normal", color = COL_WHITE, desc = "Standard 3-zone judgement." },
+            { key = "SONGSELECT_MODS_JUST_JUST",   label = "Just",   color = COL_RED,   desc = "Good or Miss only. No leniency at all." },
+            { key = "SONGSELECT_MODS_JUST_SAFE",   label = "Safe",   color = COL_GREEN, desc = "Ok counts as Good. Very forgiving." },
         }
     },
     {
         meta = "invisible",
+        key  = "SONGSELECT_MODS_INVISIBLE",
         text = "Invisible",
         desc = "Hide the notes, in one way or another, and rely on your memory and reflexes!",
         type = "multi",
         choices = {
-            { label = "None",       color = COL_WHITE, desc = "Notes are fully visible." },
-            { label = "Doron",      color = COL_WHITE, desc = "Invisible notes, but SE notes indications are still here." },
-            { label = "Stealth",    color = COL_WHITE, desc = "Nothing here, only your memory can help you!" },
-            { label = "Hidden",     color = COL_WHITE, desc = "Notes fade away as they approach the judge zone. Read ahead!" },
-            { label = "Flashlight", color = COL_WHITE, desc = "Only a circle of light around the judge zone shows the notes, and it shrinks as your combo grows." },
+            { key = "SONGSELECT_MODS_INVISIBLE_NONE", labelKey = "SONGSELECT_MODS_NONE", label = "None", color = COL_WHITE, desc = "Notes are fully visible." },
+            { key = "SONGSELECT_MODS_DORON",      label = "Doron",      color = COL_WHITE, desc = "Invisible notes, but SE notes indications are still here." },
+            { key = "SONGSELECT_MODS_STEALTH",    label = "Stealth",    color = COL_WHITE, desc = "Nothing here, only your memory can help you!" },
+            { key = "SONGSELECT_MODS_HIDDEN",     label = "Hidden",     color = COL_WHITE, desc = "Notes fade away as they approach the judge zone. Read ahead!" },
+            { key = "SONGSELECT_MODS_FLASHLIGHT", label = "Flashlight", color = COL_WHITE, desc = "Only a circle of light around the judge zone shows the notes, and it shrinks as your combo grows." },
         }
     },
     {
         meta = "shuffle",
+        key  = "SONGSELECT_MODS_SHUFFLE",
         text = "Shuffle",
         desc = "Swap dons and kas to challenge your muscle memory!",
         type = "multi",
         choices = {
-            { label = "None",    color = COL_WHITE, desc = "No note modification." },
-            { label = "Random",  color = COL_WHITE, desc = "Don/Ka notes are randomly swapped." },
-            { label = "Mirror",  color = COL_WHITE, desc = "Don/Ka notes are mirrored." },
-            { label = "Chaos",   color = COL_WHITE, desc = "Notes are randomly rearranged." },
-            { label = "MRandom", color = COL_WHITE, desc = "Mirror and Random combined." },
+            { key = "SONGSELECT_MODS_SHUFFLE_NONE", labelKey = "SONGSELECT_MODS_NONE", label = "None", color = COL_WHITE, desc = "No note modification." },
+            { key = "SONGSELECT_MODS_RANDOM",  label = "Random",  color = COL_WHITE, desc = "Don/Ka notes are randomly swapped." },
+            { key = "SONGSELECT_MODS_MIRROR",  label = "Mirror",  color = COL_WHITE, desc = "Don/Ka notes are mirrored." },
+            { key = "SONGSELECT_MODS_CHAOS",   label = "Chaos",   color = COL_WHITE, desc = "Notes are randomly rearranged." },
+            { key = "SONGSELECT_MODS_MRANDOM", label = "MRandom", color = COL_WHITE, desc = "Mirror and Random combined." },
         }
     },
     {
         meta = "fun-mod",
+        key  = "SONGSELECT_MODS_FUN",
         text = "Fun Mod",
         desc = "Add some goofiness to your play!",
         type = "multi",
         choices = {
-            { label = "None",         color = COL_WHITE, desc = "No fun mod active." },
-            { label = "Avalanche",    color = COL_WHITE, desc = "Very chaotic scroll speeds!" },
-            { label = "Minesweeper",  color = COL_WHITE, desc = "Watch out for notes swapped to bombs!" },
-            { label = "Dynamic Beat", color = COL_WHITE, desc = "The song speeds up as you play well, and slows down on mistakes. Shared among all players in local play; per-player online." },
+            { key = "SONGSELECT_MODS_FUN_NONE", labelKey = "SONGSELECT_MODS_NONE", label = "None", color = COL_WHITE, desc = "No fun mod active." },
+            { key = "SONGSELECT_MODS_AVALANCHE",    label = "Avalanche",    color = COL_WHITE, desc = "Very chaotic scroll speeds!" },
+            { key = "SONGSELECT_MODS_MINESWEEPER",  label = "Minesweeper",  color = COL_WHITE, desc = "Watch out for notes swapped to bombs!" },
+            { key = "SONGSELECT_MODS_DYNAMIC_BEAT", label = "Dynamic Beat", color = COL_WHITE, desc = "The song speeds up as you play well, and slows down on mistakes. Shared among all players in local play; per-player online." },
         }
     },
     {
@@ -187,6 +204,17 @@ local TOTAL_ITEMS   = OPTION_COUNT + 2
 -- Navigation state
 local selectedIndex = 0    -- 0-based; 0..OPTION_COUNT-1 = options, OK_INDEX, CANCEL_INDEX
 local editingOption = false -- true when in step 2 (editing a specific option)
+
+-- the title, footer buttons and their descriptions in the current language
+local strings = {}
+
+local function loadStrings()
+    strings.title      = tr("SONGSELECT_MODS_TITLE", "Mod Select")
+    strings.ok         = tr("SONGSELECT_CONFIRM_OK", "OK")
+    strings.cancel     = tr("SONGSELECT_CONFIRM_CANCEL", "Cancel")
+    strings.okDesc     = tr("SONGSELECT_MODS_OK_DESC", "Confirm all changes and exit the menu.")
+    strings.cancelDesc = tr("SONGSELECT_MODS_CANCEL_DESC", "Discard all changes and exit the menu.")
+end
 
 -- ============================================================
 -- Helper: counter
@@ -231,9 +259,9 @@ end
 -- ============================================================
 local function getCurrentDesc()
     if selectedIndex == OK_INDEX then
-        return "Confirm all changes and exit the menu."
+        return strings.okDesc
     elseif selectedIndex == CANCEL_INDEX then
-        return "Discard all changes and exit the menu."
+        return strings.cancelDesc
     end
 
     local opt = options[selectedIndex + 1]
@@ -248,6 +276,16 @@ local function getCurrentDesc()
     return opt.desc
 end
 
+-- the choices of a definition with their texts in the current language
+local function localizedChoices(defChoices)
+    local list = {}
+    for i, c in ipairs(defChoices) do
+        local label = c.lang and LANG:GetString(c.lang) or tr(c.labelKey or c.key, c.label)
+        list[i] = { label = label, color = c.color, desc = tr(c.key .. "_DESC", c.desc) }
+    end
+    return list
+end
+
 -- ============================================================
 -- loadOptions – reads current config values into the options table
 -- ============================================================
@@ -256,6 +294,8 @@ local function loadOptions()
     for _, def in ipairs(OPTION_DEFS) do
         local val
         local label, desc, choices = def.text, def.desc, def.choices
+        if def.key ~= nil then label, desc = tr(def.key, def.text), tr(def.key .. "_DESC", def.desc) end
+        if choices ~= nil then choices = localizedChoices(choices) end
         if def.meta == "special" then
             -- the choices carry their CONFIG value in id; online, Auto is not offered
             local current = CONFIG:GetSpecialMod(player)
@@ -326,7 +366,7 @@ function draw()
     local alpha = bgtlop / 255
 
     -- Title
-    local titleTx = textLarge:GetText("Mod Select", false, Layout.title.max_w)
+    local titleTx = textLarge:GetText(strings.title, false, Layout.title.max_w)
     titleTx:SetOpacity(alpha)
     titleTx:Draw(MENU_TITLE_X, MENU_TITLE_Y)
 
@@ -389,8 +429,8 @@ function draw()
     local canCol = (selectedIndex == CANCEL_INDEX) and COLOR:CreateColorFromHex(COL_HIGHLIGHT)
                                                    or  COLOR:CreateColorFromHex(COL_WHITE)
 
-    local okTx  = text:GetText("OK",     false, FOOTER.button_max_w, okCol)
-    local canTx = text:GetText("Cancel", false, FOOTER.button_max_w, canCol)
+    local okTx  = text:GetText(strings.ok,     false, FOOTER.button_max_w, okCol)
+    local canTx = text:GetText(strings.cancel, false, FOOTER.button_max_w, canCol)
     okTx:SetOpacity(alpha)
     canTx:SetOpacity(alpha)
     okTx:Draw(MENU_OK_X,     MENU_FOOTER_Y)
@@ -519,6 +559,7 @@ function activate(pl, restrict)
     restrictMods = restrict == true
     save   = GetSaveFile(pl)
     player = pl
+    loadStrings()
     loadOptions()
 
     selectedIndex = 0
@@ -545,6 +586,7 @@ function onStart()
     textSmall = TEXT:Create(Layout.fonts.small_size)
     text      = TEXT:Create(Layout.fonts.text_size)
     textLarge = TEXT:Create(Layout.fonts.large_size)
+    loadStrings()
 
     tx["bg"]     = TEXTURE:CreateTexture("Textures/Background.png")
     tx["bgtile"] = TEXTURE:CreateTexture("Textures/BgTile.png")

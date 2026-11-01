@@ -32,20 +32,23 @@ namespace OpenTaiko {
 		private string _genreTitle = "";
 		private Color? _genreColor = null;
 
+		// false in read-only modules: Mount then logs an error and mounts nothing
+		private readonly bool _writable;
+
+		public LuaDanBuildFunc(bool writable = true) => _writable = writable;
+
 		// ── Lua-visible API ───────────────────────────────────────────────────
 
 		public int SongCount => _songs.Count;
 
-		/// <summary>Returns the LuaSongNode at 1-based index <paramref name="i"/>, or null.</summary>
+		/// <summary>Returns the LuaSongNode at 0-based index <paramref name="i"/>, or null.</summary>
 		public LuaSongNode? GetSong(int i) {
-			int idx = i - 1;
-			return (idx >= 0 && idx < _songs.Count) ? _songs[idx].node : null;
+			return (i >= 0 && i < _songs.Count) ? _songs[i].node : null;
 		}
 
-		/// <summary>Returns the difficulty index at 1-based song index <paramref name="i"/>, or -1.</summary>
+		/// <summary>Returns the difficulty index at 0-based song index <paramref name="i"/>, or -1.</summary>
 		public int GetSongDiff(int i) {
-			int idx = i - 1;
-			return (idx >= 0 && idx < _songs.Count) ? _songs[idx].diff : -1;
+			return (i >= 0 && i < _songs.Count) ? _songs[i].diff : -1;
 		}
 
 		/// <summary>Appends a song to the Dan. <paramref name="diff"/> is 0-based (0=Easy … 4=Edit).</summary>
@@ -78,10 +81,11 @@ namespace OpenTaiko {
 
 		/// <summary>
 		/// Sets a per-song exam.
-		/// <paramref name="songIndex"/> and <paramref name="slot"/> are both 1-based.
+		/// <paramref name="songIndex"/> is 0-based, like the song list; <paramref name="slot"/> is 1-based (1–7), like
+		/// the exam slots of SetGlobalExam.
 		/// </summary>
 		public void SetPerSongExam(int songIndex, int slot, string type, int red, int gold, bool lessThan) {
-			int sIdx = songIndex - 1;
+			int sIdx = songIndex;
 			int eIdx = slot - 1;
 			if (sIdx < 0 || sIdx >= _perSongExams.Count) return;
 			if (eIdx < 0 || eIdx >= CExamInfo.cMaxExam) return;
@@ -107,6 +111,7 @@ namespace OpenTaiko {
 		/// Returns true on success.
 		/// </summary>
 		public bool Mount() {
+			if (!_writable) { CLuaScript.BlockWrite("DANBUILDER.Mount"); return false; }
 			if (_songs.Count == 0) return false;
 			try {
 				CTja outputCtja = BuildDanCtja();
@@ -792,6 +797,7 @@ namespace OpenTaiko {
 			_ => Exam.Type.Gauge,
 		};
 
-		public static LuaDanBuildFunc Generate() => new LuaDanBuildFunc();
+		// internal, so a script only has its own DANBUILDER (which cannot mount in a read-only module)
+		internal static LuaDanBuildFunc Generate() => new LuaDanBuildFunc();
 	}
 }

@@ -73,7 +73,7 @@ Opens a SQLite database file inside the module directory for running SQL stateme
 
 | Method | Description |
 | --- | --- |
-| `SQL:OpenSQLDatabase(path)  -> sql` | Opens a SQLite database at a path relative to the module directory. |
+| `SQL:OpenSQLDatabase(path)  -> sql` | Opens a SQLite database at a path relative to the module directory. In a read-only module the connection is read-only: reads work, a statement that writes fails and returns an empty result, and a missing file is not created. |
 
 ### SQL handle
 
@@ -106,7 +106,7 @@ end
 File access rooted at the module directory, plus helpers for sharing online lobby codes.
 
 <div class="callout warn">
-WriteText only writes inside the module folder: it rejects absolute paths and paths that resolve outside it. ReadText also accepts an absolute path. Lobby-code helpers use the shared `Global/Lobbycodes/` folder next to the executable. Read-only modules can use every STORAGE method.
+WriteText only writes inside the module folder: it rejects absolute paths and paths that resolve outside it. ReadText also accepts an absolute path. Lobby-code helpers use the shared `Global/Lobbycodes/` folder next to the executable. In read-only modules WriteText and WriteLobbyCode log an error and return false; the other methods work.
 </div>
 
 | Method | Description |
@@ -290,6 +290,7 @@ Constant tables on CONFIG give names to the integer values above. `SONGSPEED` an
 | `CONFIG.STEALTH` | `Off`, `Doron`, `Stealth`, `Hidden`, `Flashlight`. |
 | `CONFIG.FUN` | `None`, `Avalanche`, `Minesweeper`, `DynamicBeat`, `Total`. |
 | `CONFIG.JUSTICE` | `None`, `Just`, `Safe`. |
+| `CONFIG.TIMINGZONE` | `Loose` (-2), `Lenient` (-1), `Normal` (0), `Strict` (1), `Rigorous` (2): offsets from Normal. GetTimingZone and SetTimingZone use 0..4, so compare `CONFIG:GetTimingZone(player) - 2` with a constant and pass the constant + 2 to SetTimingZone. |
 
 ```lua
 local multiplier = CONFIG.SONGSPEED:ToActual(CONFIG.SongSpeed)

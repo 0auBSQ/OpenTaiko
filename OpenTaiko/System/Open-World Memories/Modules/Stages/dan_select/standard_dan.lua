@@ -147,7 +147,7 @@ local function _build_dan_song_exams(chart, song_count)
     for si = 1, song_count do
         t[si] = {}
         for slot = 1, 7 do
-            t[si][slot] = chart:GetSongExam(si, slot)
+            t[si][slot] = chart:GetSongExam(si - 1, slot)
         end
     end
     return t

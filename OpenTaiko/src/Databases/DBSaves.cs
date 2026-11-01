@@ -23,6 +23,8 @@ internal class DBSaves {
 		} catch (Exception ex) {
 			Trace.TraceError(ex.ToString());
 			LogNotification.PopError(_DBNotFoundError);
+			// closed, so the next call opens it again and retries the update instead of using a half-updated database
+			try { SavesDBConnection?.Close(); } catch { }
 			return null;
 		}
 	}

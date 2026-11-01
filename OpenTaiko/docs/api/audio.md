@@ -55,7 +55,7 @@ end
 A playable sound returned by the `SOUND` factory methods.
 
 <div class="callout warn">
-Until the stream is ready, the handle buffers Play and every Set* call, and the getters return the defaults listed below. Volume is a percentage (100 = the file's own level). Pan runs from -100 (left) through 0 (centre) to 100 (right). Positions and durations are in milliseconds. Play restarts the stream from the beginning, so seek after calling Play.
+Until the stream is ready, the handle buffers Play and every Set* call, and the getters return the defaults listed below. Volume is a percentage (100 = the file's own level). Pan runs from -100 (left) through 0 (centre) to 100 (right). Positions and durations are in milliseconds. Play restarts the stream from the beginning, so seek after calling Play. The aliases below are permanent: both names are supported.
 </div>
 
 | Method | Description |
@@ -70,16 +70,16 @@ Until the stream is ready, the handle buffers Play and every Set* call, and the 
 | `sound:GetLoop()  -> bool` | Returns whether looping is enabled. |
 | `sound:SetVolumePercent(vol)  -> nil` | Sets the volume in percent. |
 | `sound:GetVolumePercent()  -> number` | Returns the volume in percent (100 when not loaded). |
-| `sound:SetVolume(vol)  -> nil` | Older name for SetVolumePercent (integer). |
+| `sound:SetVolume(vol)  -> nil` | Alias of SetVolumePercent (integer). |
 | `sound:SetPan(pan)  -> nil` | Sets the stereo pan, -100..100. |
 | `sound:GetPan()  -> int` | Returns the current pan (0 when not loaded). |
 | `sound:SetSpeed(speed)  -> nil` | Sets the playback speed multiplier (1 = normal). |
 | `sound:GetSpeed()  -> number` | Returns the playback speed multiplier (1 when not loaded). |
 | `sound:SetTimestampMs(ms)  -> nil` | Seeks to a position in milliseconds. |
-| `sound:SetTimestamp(ms)  -> nil` | Older name for SetTimestampMs. |
+| `sound:SetTimestamp(ms)  -> nil` | Alias of SetTimestampMs. |
 | `sound:GetTimestampMs()  -> number` | Returns the current position in milliseconds (0 when not loaded). |
 | `sound.DurationMs  -> number` | Total duration in milliseconds (0 when not loaded). |
-| `sound:GetDurationMs()  -> number` | Older name for DurationMs. |
+| `sound:GetDurationMs()  -> number` | Alias of DurationMs. |
 | `sound.Loaded  -> bool` | True once the render thread has built the stream. |
 | `sound.IsPlaying  -> bool` | True while the sound is playing. |
 | `sound:IsFinished()  -> bool` | True once playback has reached the end (false while paused or not loaded). |

@@ -39,5 +39,5 @@ Open-World Memories 为旧的 `Exit("stage", "myroom")` 调用和引擎的 `"hey
 - 它的字符串，包括家具名称（`lang/<code>/items.json`，以家具 id 为键），放在它自己的 `lang/` 文件夹中，共九种语言。
 - 家具目录是舞台文件夹中的 `data/furniture.json`。
 - 占位矩阵只列出 `Global/Modules/Stages/` 中存在的调试舞台。这些调试舞台以及电视使用的 `video_player` 只读活动也都是全局模块。
-- 当 `Global/Modules/Stages/` 中存在舞台 `mysterypod`，或者皮肤自己的 `mysterypod` 舞台在其 `onStart` 中把共享字符串 `mysterypod_installed` 设为 `"1"` 时，舱体会打开该舞台。
+- 安装了相应舞台时，舱体会打开该舞台。
 - 在线访问使用房间 id `"myroom"` 及其载荷的第 2 版，与迁移之前相同。

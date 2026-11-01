@@ -39,5 +39,5 @@ Open-World Memories는 예전 `Exit("stage", "myroom")` 호출과 엔진의 `"he
 - 가구 이름(`lang/<code>/items.json`, 가구 id가 키)을 포함한 문자열은 자체 `lang/` 폴더에 아홉 개 언어로 있습니다.
 - 가구 카탈로그는 스테이지 폴더의 `data/furniture.json`입니다.
 - 플레이스홀더 매트릭스는 `Global/Modules/Stages/`에 있는 디버그 스테이지만 나열합니다. 이 디버그 스테이지들과 TV가 쓰는 `video_player` ROActivity도 전역 모듈입니다.
-- 포드는 `Global/Modules/Stages/`에 스테이지 `mysterypod`가 있을 때, 또는 스킨 자체의 `mysterypod` 스테이지가 `onStart`에서 공유 문자열 `mysterypod_installed`를 `"1"`로 설정할 때 그 스테이지를 엽니다.
+- 포드는 스테이지가 설치되어 있으면 그 스테이지를 엽니다.
 - 온라인 방문은 이동 전과 마찬가지로 방 id `"myroom"`과 그 페이로드의 버전 2를 씁니다.

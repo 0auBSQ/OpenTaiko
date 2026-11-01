@@ -5,6 +5,8 @@ internal class CLuaInfo {
 	public string lang => OpenTaiko.ConfigIni.sLang;
 	public bool simplemode => OpenTaiko.ConfigIni.SimpleMode;
 	public bool p1IsBlue => OpenTaiko.P1IsBlue();
+	// the game's version, four numbers such as "0.7.0.0" (the project's Version)
+	public string gameVersion => OpenTaiko.VERSION;
 	// Lazy, on-demand only (the periodic ping/connectivity check + the connection icon were removed). No
 	// cost unless a script actually reads it; reports whether a usable network interface is up.
 	public bool online => System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable();

@@ -1,12 +1,12 @@
 [
   {
     "name": "Student 1",
-    "names": {"fr": "Élève 1", "ja": "学生1", "es": "Estudiante 1", "ru": "Студент 1", "ko": "학생 1", "zh": "学生1"},
+    "names": {"fr": "Élève 1", "ja": "学生1", "de": "Schüler 1", "es": "Estudiante 1", "nl": "Leerling 1", "ru": "Студент 1", "ko": "학생 1", "zh": "学生1"},
     "stops": null
   },
   {
     "name": "Student 2",
-    "names": {"fr": "Élève 2", "ja": "学生2", "es": "Estudiante 2", "ru": "Студент 2", "ko": "학생 2", "zh": "学生2"},
+    "names": {"fr": "Élève 2", "ja": "学生2", "de": "Schüler 2", "es": "Estudiante 2", "nl": "Leerling 2", "ru": "Студент 2", "ko": "학생 2", "zh": "学生2"},
     "blend": 0.15,
     "stops": [
       [0, 0, 0, 0],
@@ -19,7 +19,7 @@
   },
   {
     "name": "Student 3",
-    "names": {"fr": "Élève 3", "ja": "学生3", "es": "Estudiante 3", "ru": "Студент 3", "ko": "학생 3", "zh": "学生3"},
+    "names": {"fr": "Élève 3", "ja": "学生3", "de": "Schüler 3", "es": "Estudiante 3", "nl": "Leerling 3", "ru": "Студент 3", "ko": "학생 3", "zh": "学生3"},
     "blend": 0.25,
     "stops": [
       [0, 0, 0, 0],
@@ -32,7 +32,7 @@
   },
   {
     "name": "Student 4",
-    "names": {"fr": "Élève 4", "ja": "学生4", "es": "Estudiante 4", "ru": "Студент 4", "ko": "학생 4", "zh": "学生4"},
+    "names": {"fr": "Élève 4", "ja": "学生4", "de": "Schüler 4", "es": "Estudiante 4", "nl": "Leerling 4", "ru": "Студент 4", "ko": "학생 4", "zh": "学生4"},
     "blend": 0.4,
     "stops": [
       [0, 0, 0, 0],
@@ -45,7 +45,7 @@
   },
   {
     "name": "Student 5",
-    "names": {"fr": "Élève 5", "ja": "学生5", "es": "Estudiante 5", "ru": "Студент 5", "ko": "학생 5", "zh": "学生5"},
+    "names": {"fr": "Élève 5", "ja": "学生5", "de": "Schüler 5", "es": "Estudiante 5", "nl": "Leerling 5", "ru": "Студент 5", "ko": "학생 5", "zh": "学生5"},
     "blend": 0.45,
     "stops": [
       [0, 0, 0, 0],
@@ -59,7 +59,7 @@
   },
   {
     "name": "Student 6",
-    "names": {"fr": "Élève 6", "ja": "学生6", "es": "Estudiante 6", "ru": "Студент 6", "ko": "학생 6", "zh": "学生6"},
+    "names": {"fr": "Élève 6", "ja": "学生6", "de": "Schüler 6", "es": "Estudiante 6", "nl": "Leerling 6", "ru": "Студент 6", "ko": "학생 6", "zh": "学生6"},
     "blend": 0.5,
     "stops": [
       [0, 0, 0, 0],
@@ -73,7 +73,7 @@
   },
   {
     "name": "Student 7",
-    "names": {"fr": "Élève 7", "ja": "学生7", "es": "Estudiante 7", "ru": "Студент 7", "ko": "학생 7", "zh": "学生7"},
+    "names": {"fr": "Élève 7", "ja": "学生7", "de": "Schüler 7", "es": "Estudiante 7", "nl": "Leerling 7", "ru": "Студент 7", "ko": "학생 7", "zh": "学生7"},
     "blend": 0.55,
     "stops": [
       [0, 0, 0, 0],
