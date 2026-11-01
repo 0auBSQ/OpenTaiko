@@ -3,9 +3,18 @@ using NLua;
 
 namespace OpenTaiko {
 	public static class LuaSecurity {
-		private const string luaScriptSecure = $$"""
+		internal const string luaScriptSecure = $$"""
 loadfile = nil
 dofile = nil
+
+do
+	local _load = load
+	load = function(chunk, chunkname, _, ...)
+		return _load(chunk, chunkname, "t", ...)
+	end
+end
+
+local _loaded = package.loaded
 
 os = { time = os.time, difftime = os.difftime, date = os.date }
 io = nil
@@ -13,6 +22,15 @@ debug = nil
 
 CLRPackage = nil
 luanet = nil
+
+-- require hands out what this table holds: keep only the libraries scripts are given
+do
+	local keep = { _G = true, coroutine = true, math = true, string = true, table = true, utf8 = true }
+	for k in pairs(_loaded) do
+		if not keep[k] then _loaded[k] = nil end
+	end
+	_loaded.os = os
+end
 
 do
 	local allowed = { config, searchers, searchpath }
