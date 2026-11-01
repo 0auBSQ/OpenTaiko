@@ -1,5 +1,47 @@
 # Changelog
 
+## [0.7.0.0] - 2026-11-01 (Beta)
+
+(Note that 0.6.0 skins are no longer supported from this version)
+
+### Major changes
+
+- New My Room: decorate your own room, play your songs on the jukebox, rewatch cutscenes and visit the rooms of other local players
+- Pagoda of the Unknown, in The Fox Dojo: climb a run of randomized Dan floors, with Ume's story along the way
+- Intro Nokon: a music quiz where you name the song from its intro, for 1 to 5 players
+- Replays: watch your best plays again from song select
+- Port to .NET 10
+
+### New features
+
+- OpenTaiko's General Store: spend your coins on new goods refreshed daily
+- Online Lobby (Beta): play together through a room code (off by default, as sharing a room code shares your IP address)
+- Event Mode: a kiosk mode for conventions, with a play limit and a timer on the song choice (OWM specific)
+- Custom Stages menu, to play stages made by the community
+- New result screens (regular, Dan and Survival Mode) and a new Survival Mode select
+- Search, sort and favourites in song select, plus a "Recommended for beginners" folder
+- Note and judgement skins, selectable in the settings
+- Hidden and Flashlight in the Stealth mod, and the Dynamic Beat fun mod
+- Master Volume, Window Mode (windowed, fullscreen or borderless) and Render Resolution settings
+- Characters can come in several colour palettes, and AI Battle has its own opponent character
+- Chart compatibility modes (`COMPAT:`), so charts written for TaikoJiro or TJAPlayer3 play as their charters intended, plus new TJA commands
+- Experimental support for `.osu` charts
+- Game event broadcasting, for stream overlays and other tools
+- Export gameplay videos from the command line
+- Something cool if you gather the 4 keys...
+- Full Lua API for skins, stages and characters, documented in nine languages
+
+### Changed features
+
+- AI Battle opponents hit with more human-like timing and use the same randomized mods as you
+- Level 3 and 5 judge zones retuned
+- Auto-roll no longer depends on the frame rate, and its speed can be set
+- Faster song loading and fewer lag spikes during play
+- Text in any language displays correctly, falling back to other fonts for missing characters
+- On Windows, the game follows changes of the audio output device
+- Many crash, softlock and sound fixes, including Linux/Wayland startup and the Windows taskbar icon
+- Base structure for iOS and Android future releases
+
 ## [0.6.0.112] - 2026-10-30 (Beta)
 
 - [Fix] Network pinging can crash due to Math.Abs() negated long.MinValue when checking the timestamp
