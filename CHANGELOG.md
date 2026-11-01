@@ -25,7 +25,8 @@
 - Master Volume, Window Mode (windowed, fullscreen or borderless) and Render Resolution settings
 - Characters can come in several colour palettes, and AI Battle has its own opponent character
 - Chart compatibility modes (`COMPAT:`), so charts written for TaikoJiro or TJAPlayer3 play as their charters intended, plus new TJA commands
-- Experimental support for `.osu` charts
+- Experimental support for `.osu` charts via the `.optktci` format
+- `.optktcm` and `.optktct` formats to make Dan and Tower charts from existing charts
 - Game event broadcasting, for stream overlays and other tools
 - Export gameplay videos from the command line
 - Something cool if you gather the 4 keys...
