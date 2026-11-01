@@ -333,7 +333,7 @@ internal class CTja : CActivity {
 	public bool bLoadChart;
 	public string ARTIST = "";
 	public string BACKGROUND = "";
-	public double BASEBPM;
+	public double BASEBPM = double.NaN; // NaN for "not specified"
 	public double BPM = 120.0;
 	public double MinBPM;
 	public double MaxBPM;
@@ -2996,6 +2996,10 @@ internal class CTja : CActivity {
 		this.listChip.Add(this.NewEventChipAtDefCursor(0x9D, argInt: 0x00));
 
 		// apply initial BPM
+		if (double.IsNaN(this.BASEBPM)) { // missing `BPM:`
+			this.MinBPM = this.MaxBPM = this.BASEBPM = this.dbNowBPM;
+			this.AddWarn($"No valid BPM: headers are specified. Defaulted it to {this.BASEBPM}");
+		}
 		for (int ib = 0; ib < 3; ++ib) {
 			CBPM bpmPointInit = this.SetBPMPointAtDefCursor((ECourse)ib, EBPMPointType.InitBpm)!;
 
