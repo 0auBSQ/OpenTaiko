@@ -403,6 +403,7 @@ function loadAssets()
     sounds.ClockTick      = SOUND:CreateSFX("Sounds/ClockTick.ogg")
     sounds.ClockTickTense = SOUND:CreateSFX("Sounds/ClockTickTense.ogg")
     sounds.ClockRing      = SOUND:CreateSFX("Sounds/ClockRing.ogg")
+    for i = 1, 4 do sounds["NokonBlip" .. i] = SOUND:CreateSFX("Sounds/NokonBlip" .. i .. ".ogg") end
 
     -- Opening textures
     textures["Curtain"]     = TEXTURE:CreateTexture("Textures/Curtain.png")
@@ -504,7 +505,7 @@ function onStart()
 
     Opening.init(textures, sounds)
     Setup.init(textures, sounds, texts, countSongsInScope)
-    Dialogue.init(textures)
+    Dialogue.init(textures, sounds)
     Stage.init(textures, sounds, texts)
     Game.init(Stage, Dialogue, utils, texts)
 end

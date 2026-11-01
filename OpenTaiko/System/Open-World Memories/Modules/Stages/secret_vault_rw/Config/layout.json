@@ -102,7 +102,7 @@
     },
     "caspian": {
         "_note": "Mr.Caspian's feet (bottom centre) and his dialogue box (box and theme are handed to the shared dialogue library, its own key names, 0-255).",
-        "foot": { "x": 1555, "y": 855 },
+        "foot": { "x": 1555, "y": 780 },
         "box": { "x": 300, "y": 822, "w": 1320, "h": 210 },
         "portrait_size": 0,
         "theme": {
@@ -113,7 +113,7 @@
     },
     "cards": {
         "_note": "The chest cards (Leave plus one per chest) around center_x: the front one at y, the next spread1 to its side, the ones after spread2 further. A card one place off is near_shrink smaller per place; further ones far_scale less far_shrink per place. Side cards are shaded by side_shade, drop side_drop px, turn rot_deg per place, and fade out from fade_from places over fade_over. On a card: the title at title_y (confirm_squeeze narrower when asking to confirm), the chest at chest_y scaled chest_scale, the stock message, the key chip at chip_y; on Leave, its label at leave_label_y. face_w is the card face's text width.",
-        "center_x": 960,
+        "center_x": 620,
         "y": 452,
         "spread1": 440,
         "spread2": 330,

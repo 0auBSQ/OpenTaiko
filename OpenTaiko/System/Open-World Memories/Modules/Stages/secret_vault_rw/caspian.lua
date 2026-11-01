@@ -12,7 +12,8 @@ local Hop = Motion.hop
 local C = {}
 
 local FOOT_X, FOOT_Y = Look.foot.x, Look.foot.y
-local FRAMES = { neutral = "Neutral", happy = "Happy", laugh = "Laugh", grumpy = "Grumpy" }
+-- three faces: a happy line wears the idle one
+local FRAMES = { neutral = "Idle", happy = "Idle", laugh = "Laugh", grumpy = "Stern" }
 local BOX = Config.plain(Look.box)
 local CPS = Motion.chars_per_s
 local LAUGH = Motion.laugh_s
@@ -264,35 +265,33 @@ function C.update(dt, now)
     return nil
 end
 
-local function hopShape(b, amp)
+-- his height only: his bottom edge is his arms on the counter, so it never moves
+local function hopStretch(b, amp)
     local riseEnd = Hop.squash_s + Hop.rise_s
-    if b == nil or b < 0 or b >= riseEnd + Hop.settle_s then return 1, 1, 0 end
+    if b == nil or b < 0 or b >= riseEnd + Hop.settle_s then return 1 end
     if b < Hop.squash_s then
-        local k = Easing.outQuad(b / Hop.squash_s) * amp
-        return 1 + Hop.squash_x * k, 1 - Hop.squash_y * k, 0
+        return 1 - Hop.squash * Easing.outQuad(b / Hop.squash_s) * amp
     end
     if b < riseEnd then
         local u = (b - Hop.squash_s) / Hop.rise_s
-        local v = math.abs(math.cos(u * math.pi)) * amp
-        return 1 - Hop.stretch_x * v, 1 + Hop.stretch_y * v, Hop.height_px * amp * math.sin(u * math.pi)
+        return 1 - Hop.squash * amp * (1 - u) * (1 - u) + Hop.stretch * amp * math.sin(u * math.pi)
     end
     local d = (b - riseEnd) / Hop.settle_s
-    local e = (1 - d) * (1 - d) * math.cos(d * Hop.settle_wobbles * math.pi) * amp
-    return 1 + Hop.settle_x * e, 1 - Hop.settle_y * e, 0
+    return 1 - Hop.settle * amp * (1 - d) * (1 - d) * math.sin(d * Hop.settle_wobbles * math.pi)
 end
 
 function C.drawBody(now)
     clock = now
     local tex = ctx.tex["Cabin/Caspian/" .. FRAMES[C.expr]]
-    if not Tex.ok(tex) then tex = ctx.tex["Cabin/Caspian/Neutral"] end
+    if not Tex.ok(tex) then tex = ctx.tex["Cabin/Caspian/Idle"] end
     if not Tex.ok(tex) then return end
-    local sx, sy, lift = hopShape(hopT and (now - hopT) or nil, hopAmp)
-    local breath = 1 + Motion.breath.amp * math.sin(now * 2 * math.pi / Motion.breath.period_s)
+    local sy = hopStretch(hopT and (now - hopT) or nil, hopAmp)
+    sy = sy * (1 + Motion.breath.amp * math.sin(now * 2 * math.pi / Motion.breath.period_s))
     if C.expr == "laugh" then
         local a = now - exprT
-        if a >= 0 and a < LAUGH then lift = lift + Motion.laugh.bounce_px * math.abs(math.sin(a * 2 * math.pi * Motion.laugh.hz)) * (1 - a / LAUGH) end
+        if a >= 0 and a < LAUGH then sy = sy * (1 + Motion.laugh.stretch * math.abs(math.sin(a * 2 * math.pi * Motion.laugh.hz)) * (1 - a / LAUGH)) end
     end
-    Tex.place(tex, FOOT_X, FOOT_Y - lift, "bottom", sx, sy * breath)
+    Tex.place(tex, FOOT_X, FOOT_Y, "bottom", 1, sy)
 end
 
 function C.drawBox(opacity)

@@ -16,6 +16,7 @@ local Dlg         = Layout.dialogue
 local M = {}
 
 local tx = {}
+local snd = {}
 
 -- ── Layout constants ──────────────────────────────────────────────────────────
 local NOKON_Y     = Dlg.nokon_y
@@ -26,6 +27,12 @@ local SLIDE_DUR   = Animation.dialogue.slide_s
 local BOX = Config.plain(Dlg.box)
 
 local CHARS_PER_SEC = Animation.dialogue.chars_per_s
+local BLIP_EVERY    = Animation.dialogue.blip_every
+local VOICES        = 4
+-- marks that make no sound: wide (CJK) punctuation and spaces
+local SILENT = {}
+for _, ch in ipairs({ "、", "。", "，", "．", "！", "？", "：", "；", "…", "‥", "・", "「", "」", "『", "』", "（", "）",
+    "～", "—", "–", "　", "¡", "¿", "«", "»", "“", "”", "‘", "’" }) do SILENT[ch] = true end
 
 local SCREEN_W, SCREEN_H = 1920, 1080
 
@@ -40,6 +47,27 @@ local nokonX = NOKON_X_OUT
 local slideCounter = nil
 local dlg = nil
 local gfont, gfontName = nil, nil
+local lastVoice = nil
+
+-- the n-th letter shown of the line being typed
+local function shownChar(n)
+    if dlg == nil or dlg.glines == nil then return nil end
+    for _, l in ipairs(dlg.glines) do
+        if n <= l.n then return l.chars[n] end
+        n = n - l.n
+    end
+    return nil
+end
+
+local function blip()
+    local ch = shownChar(math.floor(dlg.revealed or 0))
+    if ch == nil or SILENT[ch] or ch:match("^[%s%p]$") then return end
+    local i = math.random(1, VOICES)
+    if i == lastVoice then i = i % VOICES + 1 end
+    lastVoice = i
+    local s = snd["NokonBlip" .. i]
+    if s then s:Play() end
+end
 
 local function tileOverlay(opacity)
     local t = tx["bgtile"]
@@ -70,8 +98,9 @@ end
 
 -- ── Public API ────────────────────────────────────────────────────────────────
 
-function M.init(t)
+function M.init(t, s)
     tx = t
+    snd = s or {}
     -- single-arg CreateGlyphCached only (NLua params-cache pitfall — see nlua-params-cache-nre)
     gfont     = TEXT:CreateGlyphCached(Dlg.fonts.text)
     gfontName = TEXT:CreateGlyphCached(Dlg.fonts.name)
@@ -82,6 +111,7 @@ function M.init(t)
         box = BOX,
         portraitSize = Dlg.portrait_size,
         cps = CHARS_PER_SEC,
+        onBlip = blip, blipEvery = BLIP_EVERY,
         advanceInput = function() return INPUT:Pressed("Decide") end,
     })
 end

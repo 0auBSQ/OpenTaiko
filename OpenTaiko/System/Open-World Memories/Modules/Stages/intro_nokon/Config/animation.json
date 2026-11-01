@@ -21,5 +21,5 @@
     "game": { "_note": "The genre shows this long before its song starts.", "genre_reveal_s": 1 },
     "clock": { "_note": "The stopwatch floats bob_px up and down, once every bob_s; when it rings it zooms to pulse_scale and back over pulse_s.", "bob_px": 6, "bob_s": 2.6, "pulse_scale": 1.25, "pulse_s": 0.6 },
     "board_lights": { "_note": "While a player chooses, chase_pattern (\"red\", \"blue\", \"off\") turns one bulb every chase_step_s; a right answer flashes them blue, one way over flash_half_s.", "chase_step_s": 0.1, "chase_pattern": ["red", "off", "blue", "off"], "flash_half_s": 0.2 },
-    "dialogue": { "_note": "Nokon slides in and out over slide_s; the text types chars_per_s letters a second.", "slide_s": 0.4, "chars_per_s": 28 }
+    "dialogue": { "_note": "Nokon slides in and out over slide_s; the text types chars_per_s letters a second, a meow every blip_every letters.", "slide_s": 0.4, "chars_per_s": 20, "blip_every": 4 }
 }

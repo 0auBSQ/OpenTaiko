@@ -31,7 +31,7 @@ local TEXTURES = {
     "Cabin/Fish1", "Cabin/Fish2", "Cabin/Fish3", "Cabin/Fish4", "Cabin/Fish5", "Cabin/Fish6",
     "Cabin/Seaweed1", "Cabin/Seaweed2", "Cabin/Seaweed3",
     "Cabin/Table",
-    "Cabin/Caspian/Neutral", "Cabin/Caspian/Happy", "Cabin/Caspian/Laugh", "Cabin/Caspian/Grumpy",
+    "Cabin/Caspian/Idle", "Cabin/Caspian/Laugh", "Cabin/Caspian/Stern",
     "Chest/Chest1", "Chest/Chest2", "Chest/Chest3", "Chest/Chest1Open", "Chest/Chest2Open", "Chest/Chest3Open",
     "Chest/Key1", "Chest/Key2", "Chest/Key3", "Chest/KeyFront1", "Chest/KeyFront2", "Chest/KeyFront3", "Chest/Impact",
     "UI/Card", "UI/CardLeave", "UI/Chip", "UI/Key1", "UI/Key2", "UI/Key3",

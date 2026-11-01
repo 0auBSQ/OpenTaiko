@@ -58,27 +58,23 @@
         }
     },
     "caspian": {
-        "_note": "Mr.Caspian's text types chars_per_s letters a second, a voice blip every blip_every letters. He hops (change_hop) when his face changes, nods (nod_hop) when it stays, hops kick_hop at the kick. A laugh bounces him bounce_px at hz for laugh_s. He breathes (scale amp every period_s).",
+        "_note": "Mr.Caspian's text types chars_per_s letters a second, a voice blip every blip_every letters. His arms rest on the counter, so he only stretches up from his bottom edge, never lifts: a hop of change_hop when his face changes, nod_hop when it stays, kick_hop at the kick. A laugh stretches him up to stretch at hz for laugh_s. He breathes (scale amp every period_s).",
         "chars_per_s": 38,
         "blip_every": 3,
         "laugh_s": 1.4,
-        "laugh": { "bounce_px": 7, "hz": 2.6 },
+        "laugh": { "stretch": 0.006, "hz": 2.6 },
         "breath": { "amp": 0.009, "period_s": 3.6 },
         "change_hop": 1,
         "nod_hop": 0.4,
         "kick_hop": 1.4,
         "hop": {
-            "_note": "Squash over squash_s (scale 1 + squash_x, 1 - squash_y), rise over rise_s (scale 1 - stretch_x, 1 + stretch_y, height_px up), settle over settle_s (settle_wobbles half-turns, scale 1 + settle_x, 1 - settle_y); all times the hop amount.",
+            "_note": "Height scales, times the hop amount: down by squash over squash_s, up by stretch over rise_s, then settle_wobbles half-turns of settle over settle_s.",
             "squash_s": 0.08,
             "rise_s": 0.30,
             "settle_s": 0.24,
-            "squash_x": 0.06,
-            "squash_y": 0.07,
-            "stretch_x": 0.04,
-            "stretch_y": 0.06,
-            "height_px": 16,
-            "settle_x": 0.06,
-            "settle_y": 0.07,
+            "squash": 0.035,
+            "stretch": 0.03,
+            "settle": 0.035,
             "settle_wobbles": 3
         }
     },
