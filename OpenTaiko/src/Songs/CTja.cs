@@ -326,24 +326,24 @@ internal class CTja : CActivity {
 	public int nBGMAdjust {
 		get;
 		private set;
-	}
+	} = 0;
 
-	public int nPlayerSide; //2017.08.14 kairera0467 引数で指定する
+	public int nPlayerSide = 0; //2017.08.14 kairera0467 引数で指定する
 	public bool bLoadChart;
-	public string ARTIST;
-	public string BACKGROUND;
+	public string ARTIST = "";
+	public string BACKGROUND = "";
 	public double BASEBPM;
-	public double BPM;
+	public double BPM = 120.0;
 	public double MinBPM;
 	public double MaxBPM;
-	public string COMMENT;
-	public string GENRE;
-	public string MAKER;
-	public bool EXPLICIT;
-	public string SELECTBG;
+	public string COMMENT = "";
+	public string GENRE = "";
+	public string MAKER = "";
+	public bool EXPLICIT = false;
+	public string SELECTBG = "";
 	public bool HIDDENLEVEL;
-	public int LEVEL;
-	public bool bLyrics;
+	public int LEVEL = 0;
+	public bool bLyrics = false;
 	public ESide SIDE = ESide.eBoth;
 	public ETjaCompat COMPAT = ETjaCompat.OOS;
 	public CSongUniqueID uniqueID = null!;
@@ -407,17 +407,17 @@ internal class CTja : CActivity {
 	/// of reading a TJA file from disk.
 	/// </summary>
 	public const string DanBuilderSentinelPath = "::dan_builder::";
-	public string PANEL;
-	public string PATH_WAV;
+	public string PANEL = "";
+	public string PATH_WAV = "";
 	public string? PREIMAGE = null;
-	public string PREVIEW;
+	public string PREVIEW = "";
 	public string? strHashofDTXFile;
-	public string strFileName;
-	public string strFullPath;
-	public string strFolderPath;
+	public string strFileName = "";
+	public string strFullPath = "";
+	public string strFolderPath = "";
 	public CLocalizationData SUBTITLE = new CLocalizationData();
 	public CLocalizationData TITLE = new CLocalizationData();
-	public double dbDTXVPlaySpeed;
+	public double dbDTXVPlaySpeed = 1.0f;
 	public int nDemoBGMOffset;
 
 	private int nCurrentMeasureCount = 0; // 0: pre-#START, >= 1: post-#START (reset and updated when parsing either player-side headers or notechart definition)
@@ -451,7 +451,7 @@ internal class CTja : CActivity {
 	public int[] nNotesCount_Branch = new int[3]; // [iBranch], including common
 	public int nTotalAdLib;
 	public int nTotalMine;
-	public CChip[] pDan_LastChip;
+	public CChip[] pDan_LastChip = new CChip[1];
 
 	private List<int>? divsPerMeasureAllBranches = null; // [iMeasureAllBranches] // null when parsing headers
 
@@ -484,7 +484,7 @@ internal class CTja : CActivity {
 
 	//Normal Regular Masterにしたいけどここは我慢。
 	private List<int>[] listBalloon_Branch = null!; // [3] for common
-	private byte[] listBalloon_Branch_defined; // [3] for common; 0 = not defined, 1 = defined for previous player sides, 2 = defined for current player sides
+	private byte[] listBalloon_Branch_defined = Enumerable.Repeat<byte>(0, 4).ToArray(); // [3] for common; 0 = not defined, 1 = defined for previous player sides, 2 = defined for current player sides
 
 	public List<SKBitmap> listLyric = null!; // lyric lines from #LYRIC, not including #LYRIC for songs having loaded lyric file
 	public List<STLYRIC> listLyric2 = null!; // lyric lines from loaded lyric files
@@ -495,7 +495,7 @@ internal class CTja : CActivity {
 	// If lyric file is used (VTT/LRC) for the i-th song, ignore #LYRIC commands for the i-th song
 	public List<bool> usingLyricsFile = [];
 
-	private int[] listBalloon_Branch_iLast; // [3] for common
+	private int[] listBalloon_Branch_iLast = Enumerable.Repeat(-1, 4).ToArray(); // [3] for common
 
 	public string[] scenePresets = [];
 
@@ -526,13 +526,13 @@ internal class CTja : CActivity {
 
 	public string? strBGM_PATH = null;
 	public int SongVol;
-	public LoudnessMetadata? SongLoudnessMetadata;
+	public LoudnessMetadata? SongLoudnessMetadata = null;
 
 	public bool bGOGOTIME; //2018.03.11 kairera0467
 
 	public bool[] IsBranchBarDraw = new bool[4]; // 仕様変更により、黄色lineの表示法を変更.2020.04.21.akasoko26
 	public bool IsEndedBranching = true; // BRANCHENDが呼び出されたかどうか
-	public Dan_C?[] Dan_C;
+	public Dan_C?[] Dan_C = new Dan_C?[CExamInfo.cMaxExam];
 
 	public bool IsEnabledFixSENote;
 	public int FixSENote;
@@ -545,7 +545,7 @@ internal class CTja : CActivity {
 	public string? PendingGiantNoteGoodTrigger;
 	public bool PendingGiantNoteLink;
 	public string? PendingCommandIfTrigger;
-	public GaugeIncreaseMode GaugeIncreaseMode;
+	public GaugeIncreaseMode GaugeIncreaseMode = GaugeIncreaseMode.Normal;
 
 	#region [ EXTENDED VARiABLES ]
 	public Dictionary<string, CSongObject> listObj = null!;
@@ -613,54 +613,13 @@ internal class CTja : CActivity {
 	// Constructor
 
 	public CTja() {
-		this.nPlayerSide = 0;
 		this.TITLE.SetString("default", "");
 		this.SUBTITLE.SetString("default", "");
-		this.ARTIST = "";
-		this.COMMENT = "";
-		this.PANEL = "";
-		this.GENRE = "";
-		this.MAKER = "";
-		this.EXPLICIT = false;
-		this.SELECTBG = "";
-		this.bLyrics = false;
-		this.PREVIEW = "";
-		this.BACKGROUND = "";
-		this.PATH_WAV = "";
-		this.BPM = 120.0;
-		this.msOFFSET_Abs = 0;
-		this.isOFFSET_Negative = false;
-		this.LEVEL = 0;
-		this.strFileName = "";
-		this.strFolderPath = "";
-		this.strFullPath = "";
-		this.nInfiniteWAV = new int[36 * 36];
-		this.nInfiniteBPM = new int[36 * 36];
-		this.nInfinitePAN = new int[36 * 36];
-		this.nInfiniteSIZE = new int[36 * 36];
-		this.listBalloon_Branch_defined = Enumerable.Repeat<byte>(0, 4).ToArray();
-		this.listBalloon_Branch_iLast = Enumerable.Repeat(-1, 4).ToArray();
-		this.nRESULTIMAGEPriority = new int[7];
-		this.nRESULTMOVIEPriority = new int[7];
-		this.nRESULTSOUNDPriority = new int[7];
 
-		this.nBGMAdjust = 0;
 		this.nPolyphonicSounds = OpenTaiko.ConfigIni.nPoliphonicSounds;
-		this.dbDTXVPlaySpeed = 1.0f;
-
 		this.SongVol = CSound.DefaultSongVol;
-		this.SongLoudnessMetadata = null;
-
-		GaugeIncreaseMode = GaugeIncreaseMode.Normal;
 
 		Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture; // Change default culture to invariant, fixes (Purota)
-		Dan_C = new Dan_C?[CExamInfo.cMaxExam];
-		pDan_LastChip = new CChip[1];
-
-		LocalCounters = new CLocalCounters();
-		LocalTriggers = new CLocalTriggers();
-
-		this.CutSceneOutros = new();
 	}
 	public CTja(string strFileName, ETjaCompat? compatMode = null, Difficulty difficulty = Difficulty.Easy, int nPlayerSide = 0, bool loadChart = false, int nBGMAdjust = 0)
 		: this() {
@@ -4958,13 +4917,13 @@ internal class CTja : CActivity {
 
 	private const int idxListWAVWave1to = 1; // wav list index 1 is for WAVE:
 	private int nInternalNumberWAV1to = idxListWAVWave1to + 1;
-	private int[]? nInfiniteBPM;
-	private int[]? nInfinitePAN;
-	private int[]? nInfiniteSIZE;
-	private int[]? nInfiniteWAV;
-	private int[] nRESULTIMAGEPriority;
-	private int[] nRESULTMOVIEPriority;
-	private int[] nRESULTSOUNDPriority;
+	private int[]? nInfiniteBPM = new int[36 * 36];
+	private int[]? nInfinitePAN = new int[36 * 36];
+	private int[]? nInfiniteSIZE = new int[36 * 36];
+	private int[]? nInfiniteWAV = new int[36 * 36];
+	private int[] nRESULTIMAGEPriority = new int[7];
+	private int[] nRESULTMOVIEPriority = new int[7];
+	private int[] nRESULTSOUNDPriority = new int[7];
 
 	private CChip? currentCamVMoveChip;
 	private CChip? currentCamHMoveChip;
