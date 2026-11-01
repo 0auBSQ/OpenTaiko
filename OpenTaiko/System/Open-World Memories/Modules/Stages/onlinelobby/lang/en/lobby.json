@@ -3,6 +3,7 @@
   "menu_subtitle": "Beta - share your room code only with people you trust",
   "menu_create": "Create a room (host)",
   "menu_join": "Join a room (enter a code)",
+  "menu_exit": "Exit",
   "hint_menu": "Up/Down choose   %s select   %s back",
   "code_title": "Join a Room",
   "code_prompt": "Paste the room code, then press Enter:",

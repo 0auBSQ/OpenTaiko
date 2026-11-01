@@ -3,6 +3,7 @@
   "menu_subtitle": "베타 - 방 코드는 신뢰할 수 있는 사람에게만 공유하세요",
   "menu_create": "방 만들기 (호스트)",
   "menu_join": "방 참가 (코드 입력)",
+  "menu_exit": "나가기",
   "hint_menu": "위/아래 선택   %s 결정   %s 뒤로",
   "code_title": "방 참가",
   "code_prompt": "방 코드를 붙여넣고 Enter를 누르세요:",

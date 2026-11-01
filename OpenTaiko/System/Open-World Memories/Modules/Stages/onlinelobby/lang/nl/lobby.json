@@ -3,6 +3,7 @@
   "menu_subtitle": "Bèta - deel je kamercode alleen met mensen die je vertrouwt",
   "menu_create": "Kamer maken (host)",
   "menu_join": "Kamer binnengaan (code invoeren)",
+  "menu_exit": "Verlaten",
   "hint_menu": "Omhoog/Omlaag kiezen   %s bevestigen   %s terug",
   "code_title": "Kamer binnengaan",
   "code_prompt": "Plak de kamercode en druk op Enter:",

@@ -258,9 +258,9 @@ end
 
 PANELS.menu = function()
     ui:panel{ x = MENU.x, y = MENU.y, w = MENU.w, h = MENU.h, pad = MENU.pad, title = L("logo_title") }
-    ui:menu(wrapping{ x = CX - MENU.list.w / 2, y = MENU.y + MENU.list.y_offset, w = MENU.list.w, h = 2 * MENU_ROW, rowHeight = MENU_ROW,
-        items = { L("menu_create"), L("menu_join") }, selected = 1, onSelect = function(i) click.pick = i end })
-    backButton()
+    -- Exit is an item so the drums alone can leave (they have no cancel)
+    ui:menu(wrapping{ x = CX - MENU.list.w / 2, y = MENU.y + MENU.list.y_offset, w = MENU.list.w, h = 3 * MENU_ROW, rowHeight = MENU_ROW,
+        items = { L("menu_create"), L("menu_join"), L("menu_exit") }, selected = 1, onSelect = function(i) click.pick = i end })
     ui:focusStay()
 end
 
@@ -638,7 +638,7 @@ local function step(ts)
         if click.pick == 1 then
             if LO.host() then mode = "lobby"; tab = 1 else playError(); setMsg(net.msg or L("msg_open_failed"), MSG.open_failed) end
         elseif click.pick == 2 then mode = "code"; ti = INPUT:CreateTextInput("", 4096) end
-        if navPn.cancel() or click.back then return Exit("stage", "_title") end
+        if click.pick == 3 or navPn.cancel() then return Exit("stage", "_title") end
 
     elseif mode == "code" then
         widgets(ts)

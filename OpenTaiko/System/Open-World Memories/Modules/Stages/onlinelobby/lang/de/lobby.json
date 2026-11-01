@@ -3,6 +3,7 @@
   "menu_subtitle": "Beta - teile deinen Raumcode nur mit Personen, denen du vertraust",
   "menu_create": "Raum erstellen (Host)",
   "menu_join": "Raum beitreten (Code eingeben)",
+  "menu_exit": "Verlassen",
   "hint_menu": "Hoch/Runter wählen   %s bestätigen   %s zurück",
   "code_title": "Raum beitreten",
   "code_prompt": "Füge den Raumcode ein und drücke Enter:",

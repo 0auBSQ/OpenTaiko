@@ -3,6 +3,7 @@
   "menu_subtitle": "Beta - comparte tu código de sala solo con personas de confianza",
   "menu_create": "Crear una sala (anfitrión)",
   "menu_join": "Unirse a una sala (introducir código)",
+  "menu_exit": "Salir",
   "hint_menu": "Arriba/Abajo elegir   %s confirmar   %s volver",
   "code_title": "Unirse a una sala",
   "code_prompt": "Pega el código de la sala y pulsa Intro:",

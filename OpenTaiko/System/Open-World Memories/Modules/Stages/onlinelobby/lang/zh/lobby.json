@@ -3,6 +3,7 @@
   "menu_subtitle": "测试版 - 请只与你信任的人分享房间代码",
   "menu_create": "创建房间（房主）",
   "menu_join": "加入房间（输入代码）",
+  "menu_exit": "退出",
   "hint_menu": "上/下 选择   %s 确定   %s 返回",
   "code_title": "加入房间",
   "code_prompt": "粘贴房间代码，然后按 Enter：",

@@ -3,6 +3,7 @@
   "menu_subtitle": "Bêta - ne partagez votre code de salon qu'avec des personnes de confiance",
   "menu_create": "Créer un salon (hôte)",
   "menu_join": "Rejoindre un salon (saisir un code)",
+  "menu_exit": "Quitter",
   "hint_menu": "Haut/Bas choisir   %s valider   %s retour",
   "code_title": "Rejoindre un salon",
   "code_prompt": "Collez le code du salon, puis appuyez sur Entrée :",

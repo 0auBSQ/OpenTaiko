@@ -3,6 +3,7 @@
   "menu_subtitle": "ベータ版 - ルームコードは信頼できる人にだけ共有してください",
   "menu_create": "ルームを作る（ホスト）",
   "menu_join": "ルームに参加（コードを入力）",
+  "menu_exit": "退出",
   "hint_menu": "上/下 カーソル移動   %s 選ぶ   %s 戻る",
   "code_title": "ルームに参加",
   "code_prompt": "ルームコードを貼り付けて、Enterを押してください：",
