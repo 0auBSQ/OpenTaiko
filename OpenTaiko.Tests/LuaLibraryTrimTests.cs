@@ -12,7 +12,7 @@ public class LuaLibraryTrimTests {
 		var lua = new Lua();
 		lua["_csReadFile"] = (Func<string, string?>)(_ => null);
 		lua["_csPackagePaths"] = new List<string>();
-		lua["_csMemberHidden"] = (Func<object?, string, bool>)LuaSecurity.IsMemberHidden;
+		lua["_csMemberHidden"] = (Func<object?, string?>)LuaSecurity.HiddenMemberNames;
 		lua.DoString(LuaSecurity.luaScriptSecure, "prelude");
 		return lua;
 	}

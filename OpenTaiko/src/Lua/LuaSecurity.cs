@@ -9,27 +9,29 @@ namespace OpenTaiko {
 loadfile = nil
 dofile = nil
 
--- engine objects show their documented members only; IsMemberHidden decides once per type and name
+-- engine objects show their documented members only; HiddenMemberNames lists, once per type, the names to hide
 do
-	local type, realMetatable, hidden = type, debug.getmetatable, _csMemberHidden
+	local type, gmatch, realMetatable, hiddenNames = type, string.gmatch, debug.getmetatable, _csMemberHidden
 	local registry = debug.getregistry()
 	local index = registry.luaNet_indexfunction
-	local verdicts = setmetatable({}, { __mode = "k" })
+	local hiddenSets = setmetatable({}, { __mode = "k" })
+	local everything = {}
 	local function filtered(obj, name)
 		if type(name) == "string" then
 			local meta = realMetatable(obj)
 			if meta == nil then return nil end
-			local seen = verdicts[meta]
-			if seen == nil then
-				seen = {}
-				verdicts[meta] = seen
+			local set = hiddenSets[meta]
+			if set == nil then
+				local names = hiddenNames(obj)
+				if names == nil then
+					set = everything
+				else
+					set = {}
+					for n in gmatch(names, "[^\n]+") do set[n] = true end
+				end
+				hiddenSets[meta] = set
 			end
-			local hide = seen[name]
-			if hide == nil then
-				hide = hidden(obj, name)
-				seen[name] = hide
-			end
-			if hide then return nil end
+			if set == everything or set[name] then return nil end
 		end
 		return index(obj, name)
 	end
@@ -136,7 +138,7 @@ import = function () end
 				paths.AddRange(globalLib);
 			}
 			lua["_csPackagePaths"] = paths;
-			lua["_csMemberHidden"] = (Func<object?, string, bool>)IsMemberHidden;
+			lua["_csMemberHidden"] = (Func<object?, string?>)HiddenMemberNames;
 
 			lua.DoString(luaScriptSecure, nameof(luaScriptSecure));
 
@@ -144,26 +146,30 @@ import = function () end
 			lua.State.GarbageCollector(KeraLua.LuaGC.Collect, 0);
 		}
 
-		private static readonly ConcurrentDictionary<(Type, string), bool> hiddenMembers = new();
+		private static readonly ConcurrentDictionary<Type, string?> hiddenNames = new();
 
-		// GetType, reflection objects themselves, and members whose value is a reflection type
-		internal static bool IsMemberHidden(object? obj, string name) {
-			if (obj == null) return false;
-			return hiddenMembers.GetOrAdd((obj.GetType(), name), key => ComputeHidden(key.Item1, key.Item2));
+		// GetType and the members whose value is a reflection type, one per line; null when the object is itself a reflection object (all hidden)
+		internal static string? HiddenMemberNames(object? obj) {
+			if (obj == null) return "";
+			return hiddenNames.GetOrAdd(obj.GetType(), ComputeHiddenNames);
 		}
 
-		private static bool ComputeHidden(Type type, string name) {
-			if (name == nameof(object.GetType) || IsReflectionType(type)) return true;
-			foreach (MemberInfo member in type.GetMember(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy)) {
+		internal static bool IsMemberHidden(object? obj, string name) =>
+			HiddenMemberNames(obj) is not { } names || names.Split('\n').Contains(name);
+
+		private static string? ComputeHiddenNames(Type type) {
+			if (IsReflectionType(type)) return null;
+			HashSet<string> names = new() { nameof(object.GetType) };
+			foreach (MemberInfo member in type.GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy)) {
 				Type? valueType = member switch {
 					MethodInfo method => method.ReturnType,
 					PropertyInfo property => property.PropertyType,
 					FieldInfo field => field.FieldType,
 					_ => null,
 				};
-				if (valueType != null && Carries(valueType, 0)) return true;
+				if (valueType != null && Carries(valueType, 0)) names.Add(member.Name);
 			}
-			return false;
+			return string.Join('\n', names);
 		}
 
 		// the type itself, an array or by-ref of it, or a generic argument (List<Type>, Func<MethodInfo>)

@@ -49,6 +49,14 @@ public class LuaMemberAccessTests {
 	}
 
 	[Fact]
+	public void DictionaryKeysStillWork() {
+		using var lua = LuaLibraryTrimTests.NewState();
+		lua["dict"] = new Dictionary<string, int> { ["peer1"] = 4, ["peer2"] = 6 };
+		Assert.Equal(10L, Eval(lua, "return dict['peer1'] + dict.peer2"));
+		Assert.Equal(true, Eval(lua, "return dict.GetType == nil"));
+	}
+
+	[Fact]
 	public void GetTypeIsHidden() {
 		using var lua = LuaLibraryTrimTests.NewState();
 		lua["obj"] = new Sample();
