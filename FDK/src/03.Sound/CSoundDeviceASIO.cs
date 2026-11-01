@@ -119,11 +119,11 @@ internal class CSoundDeviceASIO : ISoundDevice {
 
 		if (!Bass.Configure(Configuration.UpdatePeriod, 0)) // 0:BASSストリームの自動更新を行わない。
 		{
-			Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdatePeriod)}) に失敗しました。[{Bass.LastError.ToString()}]");
+			Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdatePeriod)}) failed. [{Bass.LastError.ToString()}]");
 		}
 		if (!Bass.Configure(Configuration.UpdateThreads, 0)) // 0:BASSストリームの自動更新を行わない。
 		{
-			Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdateThreads)}) に失敗しました。[{Bass.LastError.ToString()}]");
+			Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdateThreads)}) failed. [{Bass.LastError.ToString()}]");
 		}
 
 		// BASS の初期化。

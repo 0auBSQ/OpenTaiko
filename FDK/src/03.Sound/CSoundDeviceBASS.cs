@@ -103,10 +103,10 @@ public partial class CSoundDeviceBASS : ISoundDevice {
 		bool isMobile = OperatingSystem.IsIOS() || OperatingSystem.IsAndroid();
 		if (!isMobile) {
 			if (!Bass.Configure(Configuration.UpdatePeriod, updatePeriod)) {
-				Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdatePeriod)}) に失敗しました。[{Bass.LastError}]");
+				Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdatePeriod)}) failed. [{Bass.LastError}]");
 			}
 			if (!Bass.Configure(Configuration.UpdateThreads, 1)) {
-				Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdateThreads)}) に失敗しました。[{Bass.LastError}]");
+				Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdateThreads)}) failed. [{Bass.LastError}]");
 			}
 
 			Bass.Configure(Configuration.PlaybackBufferLength, bufferSize);

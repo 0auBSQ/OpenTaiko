@@ -654,7 +654,7 @@ internal class CSongManager {
 					cSongListNode.score[i] = null;
 					cSongListNode.difficultiesCount--;
 					this.nSearchScoreCount--;
-					Trace.TraceError("曲データファイルの読み込みに失敗しました。({0})", path);
+					Trace.TraceError("Failed to read the chart file. ({0})", path);
 				}
 			}
 			//-----------------
@@ -1018,7 +1018,7 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 					}
 				}
 			} catch (Exception ex) {
-				Trace.TraceError($"[CSongs管理] Failed to process TCM/TCT file '{filePath}': {ex}");
+				Trace.TraceError($"[CSongManager] Failed to process TCM/TCT file '{filePath}': {ex}");
 			}
 		}
 	}

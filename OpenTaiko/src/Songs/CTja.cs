@@ -773,12 +773,12 @@ internal class CTja : CActivity {
 					}
 				} catch (Exception e) {
 					cwav.rSound[i] = null;
-					Trace.TraceError("サウンドの作成に失敗しました。({0})({1})", cwav.strCommentText, str);
+					Trace.TraceError("Failed to create the sound. ({0})({1})", cwav.strCommentText, str);
 					Trace.TraceError(e.ToString());
 				}
 			}
 		} catch (Exception exception) {
-			Trace.TraceError("サウンドの生成に失敗しました。({0})({1})", cwav.strCommentText, str);
+			Trace.TraceError("Failed to load the sound. ({0})({1})", cwav.strCommentText, str);
 			Trace.TraceError(exception.ToString());
 
 			for (int j = 0; j < nPolyphonicSounds; j++) {
@@ -1681,7 +1681,7 @@ internal class CTja : CActivity {
 				this.divsPerMeasureAllBranches.Add(divPerMeasure); // after last comma
 			} catch (Exception ex) {
 				Trace.TraceError(ex.ToString());
-				Trace.TraceError("例外が発生しましたが処理を継続します。 (9e401212-0b78-4073-88d0-f7e791f36a91)");
+				Trace.TraceError("An exception occurred; continuing. (9e401212-0b78-4073-88d0-f7e791f36a91)");
 			}
 
 			//読み込み部分本体に渡す譜面を作成。
@@ -1712,7 +1712,7 @@ internal class CTja : CActivity {
 
 			} catch (Exception ex) {
 				Trace.TraceError(ex.ToString());
-				Trace.TraceError("例外が発生しましたが処理を継続します。 (2da1e880-6b63-4e82-b018-bf18c3568335)");
+				Trace.TraceError("An exception occurred; continuing. (2da1e880-6b63-4e82-b018-bf18c3568335)");
 			}
 			#endregion
 		}
@@ -4200,7 +4200,7 @@ internal class CTja : CActivity {
 			this.tSenotes_Core_V2(listNoteOnlyList, true);
 		} catch (Exception ex) {
 			Trace.TraceError(ex.ToString());
-			Trace.TraceError("例外が発生しましたが処理を継続します。 (b67473e4-1930-44f1-b320-4ead5786e74c)");
+			Trace.TraceError("An exception occurred; continuing. (b67473e4-1930-44f1-b320-4ead5786e74c)");
 		}
 
 	}

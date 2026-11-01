@@ -91,7 +91,7 @@ internal class CStageSongLoading : CStage {
 				_activateTime = DateTime.Now;
 			} catch (CTextureCreateFailedException e) {
 				Trace.TraceError(e.ToString());
-				Trace.TraceError("テクスチャの生成に失敗しました。({0})", new object[] { this.strSTAGEFILE });
+				Trace.TraceError("Failed to create the texture. ({0})", new object[] { this.strSTAGEFILE });
 				this.txTitle = null;
 				this.txSubtitle = null;
 			}

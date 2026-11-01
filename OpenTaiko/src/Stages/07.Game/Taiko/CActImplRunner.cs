@@ -206,7 +206,7 @@ internal class CActImplRunner : CActivity {
 					continue;
 				} catch (Exception exception) {
 					Trace.TraceError(exception.ToString());
-					Trace.TraceError("例外が発生しましたが処理を継続します。 (6a32cc37-1527-412e-968a-512c1f0135cd)");
+					Trace.TraceError("An exception occurred; continuing. (6a32cc37-1527-412e-968a-512c1f0135cd)");
 					continue;
 				}
 			}

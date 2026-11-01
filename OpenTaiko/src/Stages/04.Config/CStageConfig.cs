@@ -139,11 +139,11 @@ internal class CStageConfig : CStage {
 			base.DeActivate();
 		} catch (UnauthorizedAccessException e) {
 			Trace.TraceError(e.ToString());
-			Trace.TraceError("ファイルが読み取り専用になっていないか、管理者権限がないと書き込めなくなっていないか等を確認して下さい");
-			Trace.TraceError("例外が発生しましたが処理を継続します。 (7a61f01b-1703-4aad-8d7d-08bd88ae8760)");
+			Trace.TraceError("Check that the file is not read-only and can be written without administrator rights.");
+			Trace.TraceError("An exception occurred; continuing. (7a61f01b-1703-4aad-8d7d-08bd88ae8760)");
 		} catch (Exception e) {
 			Trace.TraceError(e.ToString());
-			Trace.TraceError("例外が発生しましたが処理を継続します。 (83f0d93c-bb04-4a19-a596-bc32de39f496)");
+			Trace.TraceError("An exception occurred; continuing. (83f0d93c-bb04-4a19-a596-bc32de39f496)");
 		} finally {
 			Trace.TraceInformation("コンフィグステージの非活性化を完了しました。");
 			Trace.Unindent();

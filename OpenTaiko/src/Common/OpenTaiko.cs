@@ -563,7 +563,7 @@ internal class OpenTaiko : Game {
 					Directory.CreateDirectory(strSavePath);
 				} catch {
 					Trace.TraceError(ToString());
-					Trace.TraceError("例外が発生しましたが処理を継続します。 (0bfe6bff-2a56-4df4-9333-2df26d9b765b)");
+					Trace.TraceError("An exception occurred; continuing. (0bfe6bff-2a56-4df4-9333-2df26d9b765b)");
 					success = false;
 				}
 			}
@@ -605,7 +605,7 @@ internal class OpenTaiko : Game {
 				ConfigIni.LoadFromFile(path);
 			} catch (Exception e) {
 				Trace.TraceError(e.ToString());
-				Trace.TraceError("例外が発生しましたが処理を継続します。 (b8d93255-bbe4-4ca3-8264-7ee5175b19f3)");
+				Trace.TraceError("An exception occurred; continuing. (b8d93255-bbe4-4ca3-8264-7ee5175b19f3)");
 			}
 		} else {
 			ConfigIsNew = true;

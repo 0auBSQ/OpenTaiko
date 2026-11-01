@@ -264,9 +264,9 @@ public class SoundManager   // : CSound
 				break;
 			} catch (Exception e) {
 				Trace.TraceError(e.ToString());
-				Trace.TraceError("例外が発生しましたが処理を継続します。 (2609806d-23e8-45c2-9389-b427e80915bc)");
+				Trace.TraceError("An exception occurred; continuing. (2609806d-23e8-45c2-9389-b427e80915bc)");
 				if (deviceType == ESoundDeviceType.Unknown) {
-					Trace.TraceError(string.Format("サウンドデバイスの初期化に失敗しました。"));
+					Trace.TraceError(string.Format("Failed to initialize the sound device."));
 					break;
 				}
 			}

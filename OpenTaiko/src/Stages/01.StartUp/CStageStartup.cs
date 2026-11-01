@@ -43,7 +43,7 @@ internal class CStageStartup : CStage {
 			this.listProgressString = null;
 			if (es != null) {
 				if ((es.thDTXFileEnumerate != null) && es.thDTXFileEnumerate.IsAlive) {
-					Trace.TraceWarning("リスト構築スレッドを強制停止します。");
+					Trace.TraceWarning("Forcing the song list thread to stop.");
 					es.Abort();   // Thread.Abort is not supported on .NET: the enumeration is cancelled and waited for
 				}
 			}

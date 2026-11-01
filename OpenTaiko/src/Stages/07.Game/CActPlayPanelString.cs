@@ -43,7 +43,7 @@ internal class CActPlayPanelString : CActivity {
 					txStage = OpenTaiko.Tx.TxCGen("Songs");
 				} catch (CTextureCreateFailedException e) {
 					Trace.TraceError(e.ToString());
-					Trace.TraceError("パネル文字列テクスチャの生成に失敗しました。");
+					Trace.TraceError("Failed to create the panel text texture.");
 				}
 			}
 

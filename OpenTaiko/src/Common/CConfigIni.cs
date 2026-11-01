@@ -2060,7 +2060,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 				}
 			} catch (Exception exception) {
 				Trace.TraceError(exception.ToString());
-				Trace.TraceError("例外が発生しましたが処理を継続します。 (93c4c5cd-4996-4e8c-a82f-a179ff590b44)");
+				Trace.TraceError("An exception occurred; continuing. (93c4c5cd-4996-4e8c-a82f-a179ff590b44)");
 			}
 		}
 	}

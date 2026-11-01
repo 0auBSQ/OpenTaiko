@@ -189,7 +189,7 @@ internal class CSkin : IDisposable {
 				throw new InvalidOperationException("ファイル名が無効です。");
 
 			if (!File.Exists(CSkin.Path(this.strFileName))) {
-				Trace.TraceWarning($"ファイルが存在しません。: {this.strFileName}");
+				Trace.TraceWarning($"File not found: {this.strFileName}");
 				return;
 			}
 
@@ -215,7 +215,7 @@ internal class CSkin : IDisposable {
 					tLoading();
 				} catch (Exception e) {
 					Trace.TraceError(e.ToString());
-					Trace.TraceError("例外が発生しましたが処理を継続します。 (17668977-4686-4aa7-b3f0-e0b9a44975b8)");
+					Trace.TraceError("An exception occurred; continuing. (17668977-4686-4aa7-b3f0-e0b9a44975b8)");
 					this.bNotLoadedYet = false;
 				}
 			}
@@ -279,7 +279,7 @@ internal class CSkin : IDisposable {
 					tLoading();
 				} catch (Exception e) {
 					Trace.TraceError(e.ToString());
-					Trace.TraceError("例外が発生しましたが処理を継続します。 (17668977-4686-4aa7-b3f0-e0b9a44975b8)");
+					Trace.TraceError("An exception occurred; continuing. (17668977-4686-4aa7-b3f0-e0b9a44975b8)");
 					this.bNotLoadedYet = false;
 				}
 			}
@@ -846,10 +846,10 @@ internal class CSkin : IDisposable {
 							Trace.TraceInformation("システムサウンドを読み込みました。({0})", cSystemSound.strFileName);
 						} catch (FileNotFoundException e) {
 							Trace.TraceWarning(e.ToString());
-							Trace.TraceWarning("システムサウンドが存在しません。({0})", cSystemSound.strFileName);
+							Trace.TraceWarning("System sound not found. ({0})", cSystemSound.strFileName);
 						} catch (Exception e) {
 							Trace.TraceWarning(e.ToString());
-							Trace.TraceWarning("システムサウンドの読み込みに失敗しました。({0})", cSystemSound.strFileName);
+							Trace.TraceWarning("Failed to load the system sound. ({0})", cSystemSound.strFileName);
 						}
 					}
 				}
@@ -1087,7 +1087,7 @@ internal class CSkin : IDisposable {
 							if (int.TryParse(strParam, out var unparsedValue)) {
 								setValue(unparsedValue);
 							} else {
-								Trace.TraceWarning($"SkinConfigの値 {strCommand} は整数値である必要があります。現在の値: {strParam}");
+								Trace.TraceWarning($"SkinConfig value {strCommand} must be an integer. Current value: {strParam}");
 							}
 						}
 						switch (strCommand) {
@@ -5984,7 +5984,7 @@ internal class CSkin : IDisposable {
 					continue;
 				} catch (Exception exception) {
 					Trace.TraceError(exception.ToString());
-					Trace.TraceError("例外が発生しましたが処理を継続します。 (6a32cc37-1527-412e-968a-512c1f0135cd)");
+					Trace.TraceError("An exception occurred; continuing. (6a32cc37-1527-412e-968a-512c1f0135cd)");
 					continue;
 				}
 			}

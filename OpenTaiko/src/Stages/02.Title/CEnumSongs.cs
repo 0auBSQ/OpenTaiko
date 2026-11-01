@@ -305,7 +305,7 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 									throw; // forward cancellation
 								} catch (Exception e) {
 									Trace.TraceError(e.ToString());
-									Trace.TraceError("例外が発生しましたが処理を継続します。 (105fd674-e722-4a4e-bd9a-e6f82ac0b1d3)");
+									Trace.TraceError("An exception occurred; continuing. (105fd674-e722-4a4e-bd9a-e6f82ac0b1d3)");
 								} finally {
 									Trace.Unindent();
 								}
@@ -313,7 +313,7 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 						}
 					}
 				} else {
-					Trace.TraceWarning("曲データの検索パス(TJAPath)の指定がありません。");
+					Trace.TraceWarning("No song search path (TJAPath) is set.");
 				}
 			} finally {
 				this.SongManager!.ClearPreparse();   // no longer required once the tree is built
@@ -340,7 +340,7 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 				throw; // forward cancellation
 			} catch (Exception e) {
 				Trace.TraceError(e.ToString());
-				Trace.TraceError("例外が発生しましたが処理を継続します。 (6480ffa0-1cc1-40d4-9cc9-aceeecd0264b)");
+				Trace.TraceError("An exception occurred; continuing. (6480ffa0-1cc1-40d4-9cc9-aceeecd0264b)");
 			} finally {
 				Trace.TraceInformation("曲リストへの後処理を完了しました。");
 				Trace.Unindent();

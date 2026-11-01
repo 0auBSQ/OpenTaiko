@@ -123,7 +123,7 @@ public class CFontRenderer : IDisposable {
 			}
 			return;
 		} catch (Exception e) {
-			Trace.TraceWarning("SkiaSharpでのフォント生成に失敗しました。" + e.ToString());
+			Trace.TraceWarning("Failed to create the font with SkiaSharp. " + e.ToString());
 			this.textRenderer?.Dispose();
 			throw;
 		}
