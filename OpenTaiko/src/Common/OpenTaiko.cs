@@ -1512,7 +1512,7 @@ internal class OpenTaiko : Game {
 #if !DEBUG
 		catch (Exception e) {
 			Trace.TraceInformation("Skin failed to initialize.");
-			TriggerSystemError(CSystemError.Errno.ENO_SKINNOTFOUND);
+			TriggerSystemError(CSystemError.Errno.ENO_SKINNOTFOUND, null, e is DirectoryNotFoundException ? e.Message + "\n" : null);
 			return;
 			//throw;
 		} finally {

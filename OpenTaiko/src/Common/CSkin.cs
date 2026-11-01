@@ -869,7 +869,7 @@ internal class CSkin : IDisposable {
 	/// 以下の優先順位で存在確認の上strSystemSkinSubfolderFullNameを再設定する。
 	/// 1. System/Default/
 	/// 2. System/*****/ で最初にenumerateされたもの
-	/// 3. System/ (従来互換)
+	/// Skins older than MinimumSkinVersion are not valid; with no valid skin it throws.
 	/// </summary>
 	public void ReloadSkinPaths() {
 		#region [ Enumerate System ]
@@ -902,6 +902,8 @@ internal class CSkin : IDisposable {
 		Trace.TraceInformation("SkinPath入力: {0}", strSystemSkinSubfolderFullName);
 		Array.Resize(ref strSystemSkinSubfolders, size);
 		Array.Sort(strSystemSkinSubfolders);    // BinarySearch実行前にSortが必要
+		if (size == 0)
+			throw new DirectoryNotFoundException($"No skin made for OpenTaiko {MinimumSkinVersion} or newer was found in the System folder.");
 		#endregion
 
 		#region [ 現在のSkinパスがbox.defスキンをCONFIG指定していた場合のために、最初にこれが有効かチェックする。有効ならこれを使う。 ]
@@ -919,10 +921,9 @@ internal class CSkin : IDisposable {
 			return;
 		#endregion
 		#region [ カレントのSkinパスが消滅しているので、以下で再設定する。]
-		/// 以下の優先順位で現在使用中のSkinパスを再設定する。
+		/// The skin from Config.ini is missing or too old: like an unset one, it falls back to
 		/// 1. System/Default/
-		/// 2. System/*****/ で最初にenumerateされたもの
-		/// 3. System/ (従来互換)
+		/// 2. the first valid skin enumerated in System/
 		#region [ System/Default/ があるなら、そこにカレントSkinパスを設定する]
 		string tempSkinPath_default = System.IO.Path.Combine(strSystemSkinRoot, "Default" + System.IO.Path.DirectorySeparatorChar);
 		if (Array.BinarySearch(strSystemSkinSubfolders, tempSkinPath_default,
@@ -932,14 +933,7 @@ internal class CSkin : IDisposable {
 		}
 		#endregion
 		#region [ System/SkinFiles.*****/ で最初にenumerateされたものを、カレントSkinパスに再設定する ]
-		if (strSystemSkinSubfolders.Length > 0) {
-			strSystemSkinSubfolderFullName = strSystemSkinSubfolders[0];
-			return;
-		}
-		#endregion
-		#region [ System/ に、カレントSkinパスを再設定する。]
-		strSystemSkinSubfolderFullName = strSystemSkinRoot;
-		strSystemSkinSubfolders = new string[1] { strSystemSkinSubfolderFullName };
+		strSystemSkinSubfolderFullName = strSystemSkinSubfolders[0];
 		#endregion
 		#endregion
 	}
@@ -1007,7 +1001,41 @@ internal class CSkin : IDisposable {
 			if (!File.Exists(System.IO.Path.Combine(skinPathFullName, "Modules", "Stages", stage, "Script.lua")))
 				return false;
 		}
+		Version? version = ReadSkinVersion(skinPathFullName);
+		if (version == null || version < MinimumSkinVersion) {
+			Trace.TraceInformation("Skin ignored, made for an older version ({0}): {1}", version?.ToString() ?? "no version", skinPathFullName);
+			return false;
+		}
 		return true;
+	}
+
+	// skins made for an older game version are neither offered nor loaded
+	public static readonly Version MinimumSkinVersion = new Version(0, 7, 0, 0);
+
+	// the Version= of a skin's SkinConfig.ini, missing parts read as 0 (0.7 = 0.7.0.0); null when absent or unreadable
+	public static Version? ReadSkinVersion(string skinPathFullName) {
+		string file = System.IO.Path.Combine(skinPathFullName, "SkinConfig.ini");
+		if (!File.Exists(file))
+			return null;
+		Version? found = null;
+		try {
+			foreach (string line in File.ReadLines(file, Encoding.UTF8)) {
+				string[] kv = line.Split('=');
+				if (kv.Length != 2 || kv[0].Trim() != "Version")
+					continue;
+				var m = System.Text.RegularExpressions.Regex.Match(kv[1].Trim(), @"^\d+(\.\d+){0,3}");
+				if (!m.Success) {
+					found = null;
+					continue;
+				}
+				int[] p = m.Value.Split('.').Select(int.Parse).ToArray();
+				found = new Version(p[0], p.Length > 1 ? p[1] : 0, p.Length > 2 ? p[2] : 0, p.Length > 3 ? p[3] : 0);
+			}
+		} catch (Exception e) {
+			Trace.TraceWarning("Could not read the skin version of {0}: {1}", skinPathFullName, e.Message);
+			return null;
+		}
+		return found;
 	}
 
 
@@ -3114,7 +3142,7 @@ internal class CSkin : IDisposable {
 								}
 							case "DaniSelect_Exam_Interval": {
 									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
+									for (int i = 0; i < 2; i++) {
 										DaniSelect_Exam_Interval[i] = int.Parse(strSplit[i]);
 									}
 									break;

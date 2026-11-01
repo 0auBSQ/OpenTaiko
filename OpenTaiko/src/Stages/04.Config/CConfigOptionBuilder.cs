@@ -281,11 +281,10 @@ public static class CConfigOptionBuilder {
 	}
 
 	private static void BuildSkinChooser(List<CLuaConfigOption> O, CConfigIni cfg) {
-		int ns = OpenTaiko.Skin.strSystemSkinSubfolders?.Length ?? 0;
-		int nb = OpenTaiko.Skin.strBoxDefSkinSubfolders?.Length ?? 0;
-		var folders = new string[ns + nb];
-		for (int i = 0; i < ns; i++) folders[i] = OpenTaiko.Skin.strSystemSkinSubfolders![i];
-		for (int i = 0; i < nb; i++) folders[ns + i] = OpenTaiko.Skin.strBoxDefSkinSubfolders![i];
+		// the System skins are already checked; a box.def skin too old for this version is left out
+		var folders = (OpenTaiko.Skin.strSystemSkinSubfolders ?? [])
+			.Concat((OpenTaiko.Skin.strBoxDefSkinSubfolders ?? []).Where(OpenTaiko.Skin.bIsValid))
+			.ToArray();
 		Array.Sort(folders);
 		_skinSubFolders = folders;
 		string[] names = CSkin.GetSkinName(folders);

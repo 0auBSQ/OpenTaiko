@@ -5,7 +5,8 @@ using OpenTaiko;
 using Xunit;
 
 namespace OpenTaikoTests {
-	// a skin folder counts as a skin only with its title background and its _boot and _title stages
+	// a skin folder counts as a skin only with its title background, its _boot and _title stages and a
+	// SkinConfig.ini version of at least CSkin.MinimumSkinVersion
 	public class SkinValidityTests : IDisposable {
 		private readonly string dir = Path.Combine(Path.GetTempPath(), "skin_valid_" + Guid.NewGuid().ToString("N"));
 
@@ -31,6 +32,12 @@ namespace OpenTaikoTests {
 			Assert.False(skin.bIsValid(dir));
 
 			Add(Path.Combine("Modules", "Stages", "_title", "Script.lua"));
+			Assert.False(skin.bIsValid(dir));
+
+			File.WriteAllText(Path.Combine(dir, "SkinConfig.ini"), "Name=Old\nVersion=0.6.0.24\n");
+			Assert.False(skin.bIsValid(dir));
+
+			File.WriteAllText(Path.Combine(dir, "SkinConfig.ini"), "Name=New\nVersion=0.7.0.0\n");
 			Assert.True(skin.bIsValid(dir));
 
 			File.Delete(Path.Combine(dir, "Graphics", "1_Title", "Background.png"));
