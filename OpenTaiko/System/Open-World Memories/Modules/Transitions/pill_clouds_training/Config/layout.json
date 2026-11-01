@@ -1,0 +1,9 @@
+{
+    "_note": "The four pill colours, left to right, as [r, g, b] from 0 to 1. Everything else about the pills and clouds is in Lib/PillClouds.lua.",
+    "pill_colors": [
+        [0.96, 1.0, 0.5],
+        [0.80, 1.0, 0.50],
+        [0.96, 1.0, 0.5],
+        [0.80, 1.0, 0.50]
+    ]
+}

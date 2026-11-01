@@ -12,7 +12,7 @@ class HSongTraverse {
 	public static int GetSongsMatchingCondition(CSongListNode parentBox, Func<CSongListNode, bool> payload) {
 		int count = 0;
 
-		foreach (CSongListNode child in parentBox.childrenList) {
+		foreach (CSongListNode child in parentBox.childrenList!) {
 			if (IsRegularFolder(child)) count += GetSongsMatchingCondition(child, payload);
 			else if (child.nodeType == CSongListNode.ENodeType.SCORE && payload(child)) count += 1;
 		}

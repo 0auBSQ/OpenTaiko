@@ -27,12 +27,12 @@ internal class TaikoLaneFlash : CActivity {
 
 	public override int Draw() {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			PlayerLane[i].Draw();
+			PlayerLane[i]!.Draw();
 		}
 		return base.Draw();
 	}
 
-	public PlayerLane[] PlayerLane;
+	public PlayerLane?[] PlayerLane = null!;
 
 }
 public class PlayerLane {

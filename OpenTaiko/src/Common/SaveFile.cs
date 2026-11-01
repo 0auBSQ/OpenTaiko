@@ -20,16 +20,19 @@ internal class SaveFile {
 
 	public void tInitSaveFile() {
 		lock (this) {
-			// Best plays
-			data.bestPlays = DBSaves.GetBestPlaysAsDict(data.SaveId);
-			data.tFactorizeBestPlays();
+		// Best plays
+		data.bestPlays = DBSaves.GetBestPlaysAsDict(data.SaveId);
+		data.tFactorizeBestPlays();
 
-			// Global triggers
-			data.ActiveTriggers = DBSaves.GetActiveTriggersSet(data.SaveId);
+		// Global triggers
+		data.ActiveTriggers = DBSaves.GetActiveTriggersSet(data.SaveId);
 
-			// Global counters
-			data.GlobalCounters = DBSaves.GetGlobalCountersDict(data.SaveId);
-		}
+		// Global counters
+		data.GlobalCounters = DBSaves.GetGlobalCountersDict(data.SaveId);
+
+		// Global strings
+		data.GlobalStrings = DBSaves.GetGlobalStringsDict(data.SaveId);
+	}
 	}
 
 	public void tLoadUnlockables() {
@@ -65,6 +68,16 @@ internal class SaveFile {
 		return counterValue;
 	}
 
+	public void tSetGlobalString(string stringName, string stringValue) {
+		data.GlobalStrings[stringName] = stringValue;
+		DBSaves.DBSetGlobalString(data.SaveId, stringName, stringValue);
+	}
+
+	// "" when the save has no value of that name
+	public string tGetGlobalString(string stringName) {
+		return data.GlobalStrings.TryGetValue(stringName, out string? stringValue) ? stringValue : "";
+	}
+
 	#endregion
 
 
@@ -80,16 +93,6 @@ internal class SaveFile {
 		DBSaves.AlterCoinsAndTotalPlayCount(data.SaveId, amount, 1);
 	}
 
-	// Return false if the current amount of coins is to low
-	public bool tSpendCoins(int amount) {
-		if (data.Medals < amount)
-			return false;
-
-		data.Medals -= amount;
-		DBSaves.AlterCoinsAndTotalPlayCount(data.SaveId, -amount, 0);
-		return true;
-	}
-
 	public void tRegisterAIBattleModePlay(bool IsWon) {
 		data.AIBattleModePlaycount++;
 		if (IsWon) data.AIBattleModeWins++;
@@ -100,32 +103,29 @@ internal class SaveFile {
 
 	#region [Dan titles]
 
+	// returns true when the grade is new, or better than the one saved (gold, or a better clear)
 	public bool tUpdateDanTitle(string title, bool isGold, int clearStatus) {
-		bool changed = false;
-
-		bool iG = isGold;
-		int cs = clearStatus;
-
 		if (this.data.DanTitles == null)
 			this.data.DanTitles = new Dictionary<string, CDanTitle>();
 
-		if (this.data.DanTitles.ContainsKey(title)) {
-			if (this.data.DanTitles[title].clearStatus > cs)
-				cs = this.data.DanTitles[title].clearStatus;
-			if (this.data.DanTitles[title].isGold)
-				iG = true;
-		}
+		bool known = this.data.DanTitles.TryGetValue(title, out var old);
+		bool iG = isGold || (known && old!.isGold);
+		int cs = known ? Math.Max(old!.clearStatus, clearStatus) : clearStatus;
+		bool changed = !known || iG != old!.isGold || cs != old.clearStatus;
 
-		// Automatically set the dan to nameplate if new
-		// Add a function within the NamePlate.cs file to update the title texture
-
-		if (!this.data.DanTitles.ContainsKey(title) || cs != clearStatus || iG != isGold) {
+		if (changed)
 			DBSaves.RegisterDanTitle(data.SaveId, title, clearStatus, isGold);
-			changed = true;
-		}
-		CDanTitle danTitle = new CDanTitle(iG, cs);
-		this.data.DanTitles[title] = danTitle;
+		this.data.DanTitles[title] = new CDanTitle(iG, cs);
 		return changed;
+	}
+
+	// shows the dan grade saved under title on the player's nameplate, as the nameplate menu does
+	public void tSetNameplateDan(string title) {
+		if (this.data.DanTitles == null || !this.data.DanTitles.TryGetValue(title, out var grade)) return;
+		this.data.Dan = title;
+		this.data.DanGold = grade.isGold;
+		this.data.DanType = grade.clearStatus;
+		this.tApplyHeyaChanges();
 	}
 
 	#endregion
@@ -200,11 +200,15 @@ internal class SaveFile {
 		[JsonProperty("saveId")]
 		public Int64 SaveId = 0;
 
+		[JsonProperty("saveUID")]
+		public string SaveUID = "";   // uuid4, unique per save; keys per-save data such as the My Room save
+
 		[JsonProperty("name")]
 		public string Name = "プレイヤー1";
 
+		// Title, TitleType and TitleRarityInt are filled from the nameplate catalogue by TitleId (DBNameplateUnlockables.tResolveNameplate)
 		[JsonProperty("title")]
-		public string Title = "初心者";
+		public string Title = "";
 
 		[JsonProperty("dan")]
 		public string Dan = "新人";
@@ -221,8 +225,9 @@ internal class SaveFile {
 		[JsonIgnore]
 		public int TitleRarityInt = 1;
 
+		// the equipped nameplate's id, "" = none
 		[JsonIgnore]
-		public int TitleId = -1;
+		public string TitleId = "";
 
 		[JsonProperty("puchiChara")]
 		public string PuchiChara = "0";
@@ -242,6 +247,11 @@ internal class SaveFile {
 
 		[JsonIgnore]
 		public int AIBattleModeWins = 0;
+
+		/// <summary>Folder name of the selected hitsound set (e.g. "Taiko").
+		/// Stored per save-file so every player can have their own hitsounds.</summary>
+		[JsonIgnore]
+		public string SelectedHitsounds = "Taiko";
 
 		[JsonProperty("character")]
 		public int Character = 0;
@@ -266,7 +276,7 @@ internal class SaveFile {
 		public List<string> UnlockedSongs = new List<string>();
 
 		[JsonIgnore]
-		public List<int> UnlockedNameplateIds = new List<int>();
+		public HashSet<string> UnlockedNameplateIds = new HashSet<string>();
 
 		// Global Triggers
 		[JsonProperty("activeTriggers")]
@@ -274,6 +284,9 @@ internal class SaveFile {
 
 		[JsonIgnore]
 		public Dictionary<string, double> GlobalCounters = new Dictionary<string, double>();
+
+		[JsonIgnore]
+		public Dictionary<string, string> GlobalStrings = new Dictionary<string, string>();
 
 		[JsonIgnore]
 		public Dictionary<string, BestPlayRecords.CBestPlayRecord> bestPlays = new Dictionary<string, BestPlayRecords.CBestPlayRecord>();
@@ -292,6 +305,10 @@ internal class SaveFile {
 
 		[JsonIgnore]
 		public BestPlayRecords.CBestPlayStats bestPlaysStats = new BestPlayRecords.CBestPlayStats();
+
+		// Never null once the _boot stage is active
+		[JsonIgnore]
+		public CLuaCharacterScript? mountedCharacter = null;
 
 		public BestPlayRecords.CSongSelectTableEntry tGetSongSelectTableEntry(string uniqueId) {
 			if (songSelectTableEntries.ContainsKey(uniqueId)) return songSelectTableEntries[uniqueId];
@@ -357,10 +374,14 @@ internal class SaveFile {
 					songSelectTableEntries[key].ClearStatusDifficulty = (int)bestPlay.ChartDifficulty;
 					songSelectTableEntries[key].ClearStatus = (int)bestPlay.ClearStatus;
 				}
-				if ((int)bestPlay.ChartDifficulty == (int)Difficulty.Tower) songSelectTableEntries[key].TowerReachedFloor = (int)bestPlay.TowerBestFloor;
-				songSelectTableEntries[key].HighScore[(int)bestPlay.ChartDifficulty] = (int)bestPlay.HighScore;
-				songSelectTableEntries[key].ScoreRanks[(int)bestPlay.ChartDifficulty] = (int)bestPlay.ScoreRank + 1; // 0 start
-				songSelectTableEntries[key].ClearStatuses[(int)bestPlay.ChartDifficulty] = (int)bestPlay.ClearStatus + 1; // 0 start
+				// one record per chart and mod set: the table keeps the best of them
+				var entry = songSelectTableEntries[key];
+				int diff = (int)bestPlay.ChartDifficulty;
+				if (diff == (int)Difficulty.Tower) entry.TowerReachedFloor = Math.Max(entry.TowerReachedFloor, (int)bestPlay.TowerBestFloor);
+				entry.HighScore[diff] = Math.Max(entry.HighScore[diff], (int)bestPlay.HighScore);
+				entry.ScoreRanks[diff] = Math.Max(entry.ScoreRanks[diff], (int)bestPlay.ScoreRank + 1); // 0 start
+				entry.ClearStatuses[diff] = Math.Max(entry.ClearStatuses[diff], (int)bestPlay.ClearStatus + 1); // 0 start
+				songSelectTableEntries[key].PlayedDifficulties[(int)bestPlay.ChartDifficulty] = true;
 			}
 
 			bestPlaysStats = BestPlayRecords.tGenerateBestPlayStats(bestPlaysDistinctCharts.Values, bestPlaysDistinctSongs.Values);

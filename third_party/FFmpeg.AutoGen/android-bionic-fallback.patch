@@ -1,0 +1,60 @@
+diff -ruN a/Native/AndroidNativeMethods.cs b/Native/AndroidNativeMethods.cs
+--- a/Native/AndroidNativeMethods.cs
++++ b/Native/AndroidNativeMethods.cs
+@@ -0,0 +1,19 @@
++using System;
++using System.Runtime.InteropServices;
++
++namespace FFmpeg.AutoGen.Native
++{
++    public static class AndroidNativeMethods
++    {
++        public const int RTLD_NOW = 0x002;
++
++        // Bionic exports dlopen/dlsym from libdl.so; glibc's libdl.so.2 does not exist on Android.
++        private const string Libdl = "libdl.so";
++
++        [DllImport(Libdl)]
++        public static extern IntPtr dlsym(IntPtr handle, string symbol);
++
++        [DllImport(Libdl)]
++        public static extern IntPtr dlopen(string fileName, int flag);
++    }
++}
+diff -ruN a/Native/FunctionLoader.cs b/Native/FunctionLoader.cs
+--- a/Native/FunctionLoader.cs
++++ b/Native/FunctionLoader.cs
+@@ -66,6 +66,9 @@
+                     throw new PlatformNotSupportedException();
+             }
+ #else
++            // Android does not report OSPlatform.Linux and bionic has no libdl.so.2.
++            if (RuntimeInformation.IsOSPlatform(OSPlatform.Create("ANDROID")))
++                return AndroidNativeMethods.dlsym(nativeLibraryHandle, functionName);
+             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                 return LinuxNativeMethods.dlsym(nativeLibraryHandle, functionName);
+             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+diff -ruN a/Native/LibraryLoader.cs b/Native/LibraryLoader.cs
+--- a/Native/LibraryLoader.cs
++++ b/Native/LibraryLoader.cs
+@@ -20,6 +20,8 @@
+                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return PlatformID.Win32NT;
+                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) return PlatformID.Unix;
+                 if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return PlatformID.MacOSX;
++                // Android is Linux-like (bionic EAGAIN = 11) but does not report OSPlatform.Linux.
++                if (RuntimeInformation.IsOSPlatform(OSPlatform.Create("ANDROID"))) return PlatformID.Unix;
+                 // iOS is Darwin, so fall back to macOS naming and dlsym instead of throwing.
+                 return PlatformID.MacOSX;
+ #endif
+@@ -89,7 +91,10 @@
+                 case PlatformID.MacOSX:
+                     return MacNativeMethods.dlopen(libraryName, MacNativeMethods.RTLD_NOW);
+                 case PlatformID.Unix:
+-                    return LinuxNativeMethods.dlopen(libraryName, LinuxNativeMethods.RTLD_NOW);
++                    // Android maps to PlatformID.Unix but bionic has no libdl.so.2.
++                    return RuntimeInformation.IsOSPlatform(OSPlatform.Create("ANDROID"))
++                        ? AndroidNativeMethods.dlopen(libraryName, AndroidNativeMethods.RTLD_NOW)
++                        : LinuxNativeMethods.dlopen(libraryName, LinuxNativeMethods.RTLD_NOW);
+                 case PlatformID.Win32NT:
+                 case PlatformID.Win32S:
+                 case PlatformID.Win32Windows:

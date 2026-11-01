@@ -32,7 +32,7 @@ internal static class CDTXCompanionFileFinder {
 		// the file by interpreting the byte representation encoded
 		// just above, this time in terms of some other encoding which
 		// might be in use in the user's file system.
-		bool TryFindViaDecodedFileName(string prefix, Encoding encoding, out string foundCompanionFileName) {
+		bool TryFindViaDecodedFileName(string prefix, Encoding encoding, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out string? foundCompanionFileName) {
 			var decodedCompanionFileName = DecodeToLegalFileName(encodedCompanionFileNameBytes, encoding);
 
 			try {
@@ -142,7 +142,7 @@ internal static class CDTXCompanionFileFinder {
 		string directory,
 		string mainFileName,
 		string expectedCompanionPath,
-		out string foundCompanionFileName) {
+		[System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out string? foundCompanionFileName) {
 		var mainFilePath = Path.Combine(directory, mainFileName);
 
 		var companionFileExtension = Path.GetExtension(expectedCompanionPath);
@@ -172,7 +172,7 @@ internal static class CDTXCompanionFileFinder {
 	private static bool TryFindViaCompanionFileExtension(
 		string directory,
 		string expectedCompanionPath,
-		out string foundCompanionFileName) {
+		[System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out string? foundCompanionFileName) {
 		var companionFileExtension = Path.GetExtension(expectedCompanionPath);
 
 		if (string.IsNullOrEmpty(companionFileExtension)) {

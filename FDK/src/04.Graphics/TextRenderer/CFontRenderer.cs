@@ -42,17 +42,18 @@ public class CFontRenderer : IDisposable {
 	[Flags]
 	public enum DrawMode {
 		Normal = 0,
-		Edge,
-		Gradation
+		Edge = 1,
+		Gradation = 2,
+		NoFill = 4   // stroke the edge but skip the fill (glyph-composed text draws outlines in their own pass)
 	}
 
 	[Flags]
 	public enum FontStyle {
 		Regular = 0,
-		Bold,
-		Italic,
-		Underline,
-		Strikeout
+		Bold = 1,
+		Italic = 2,
+		Underline = 4,
+		Strikeout = 8
 	}
 
 	public static string DefaultFontName {
@@ -69,6 +70,35 @@ public class CFontRenderer : IDisposable {
 
 	public static bool FontExists(string fontpath) {
 		return SKFontManager.Default.FontFamilies.Contains(fontpath) || File.Exists(fontpath);
+	}
+
+	/// <summary>The fallback font lists: Main for the text in the main fonts, Sub for the text in the box fonts.</summary>
+	public enum FallbackList {
+		Main,
+		Sub
+	}
+
+	/// <summary>Fonts (font files or installed family names) that draw, in order, the characters a renderer's own font
+	/// lacks, for the renderers using this list; after them comes the font the system offers for each character. Set by
+	/// the game from its skin.</summary>
+	public static void SetFallbackFonts(FallbackList list, IEnumerable<string> fonts) => CSkiaSharpTextRenderer.SetFallbackFonts(list, fonts);
+
+	/// <summary>The typeface that draws this character for a text in <paramref name="typeface"/>: the typeface itself when
+	/// it has the character, else the fallback font or the system font that has it.</summary>
+	public static SKTypeface TypefaceFor(SKTypeface typeface, int codepoint, FallbackList list = FallbackList.Main)
+		=> CSkiaSharpTextRenderer.TypefaceFor(typeface, codepoint, list);
+
+	/// <summary>The font features text is shaped with, from the skin: the font's kerning, and its proportional widths for
+	/// Japanese (the OpenType feature palt). Text drawn or measured afterwards uses them.</summary>
+	public static void SetShapingFeatures(bool kerning, bool proportionalJapanese) => CTextShaper.SetFeatures(kerning, proportionalJapanese);
+
+	/// <summary>Changes whenever the shaping features change: text measured or drawn under another value is out of date.</summary>
+	public static int ShapingGeneration => CTextShaper.Generation;
+
+	/// <summary>The fallback list this renderer uses (Main unless set); set it before drawing.</summary>
+	public FallbackList Fallbacks {
+		get => this.textRenderer.Fallbacks;
+		set => this.textRenderer.Fallbacks = value;
 	}
 
 	#region [ コンストラクタ ]
@@ -89,11 +119,11 @@ public class CFontRenderer : IDisposable {
 				this.textRenderer = new CSkiaSharpTextRenderer(fontpath, pt, style);
 			}
 			else {
-				this.textRenderer = new CSkiaSharpTextRenderer(Assembly.GetExecutingAssembly().GetManifestResourceStream(@"FDK.mplus-1p-medium.ttf"), pt, style);
+				this.textRenderer = new CSkiaSharpTextRenderer(Assembly.GetExecutingAssembly().GetManifestResourceStream(@"FDK.mplus-1p-medium.ttf")!, "FDK.mplus-1p-medium.ttf", pt, style);
 			}
 			return;
 		} catch (Exception e) {
-			Trace.TraceWarning("SkiaSharpでのフォント生成に失敗しました。" + e.ToString());
+			Trace.TraceWarning("Failed to create the font with SkiaSharp. " + e.ToString());
 			this.textRenderer?.Dispose();
 			throw;
 		}
@@ -114,10 +144,35 @@ public class CFontRenderer : IDisposable {
 	public SKBitmap DrawText(string drawstr, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradataionBottomColor, int edge_Ratio, bool keepCenter = false) {
 		return DrawText(drawstr, CFontRenderer.DrawMode.Edge | CFontRenderer.DrawMode.Gradation, fontColor, edgeColor, secondEdgeColor, gradationTopColor, gradataionBottomColor, edge_Ratio, keepCenter);
 	}
+
+	// the edge stroke alone, on the same bitmap geometry as DrawText
+	public SKBitmap DrawTextEdgeOnly(string drawstr, Color edgeColor, int edge_Ratio) {
+		return DrawText(drawstr, CFontRenderer.DrawMode.Edge | CFontRenderer.DrawMode.NoFill, Color.White, edgeColor, null, Color.White, Color.White, edge_Ratio, false);
+	}
+
+	// a single white glyph (or its edge stroke) on a tight straight-alpha bitmap: `margin` px left/right/bottom,
+	// ascender line at y = 0. The fast path for glyph caches: no tokenizing, no compositing pass, one raster.
+	// strokeWidth > 0 sets the edge stroke's width in px instead of the ratio's.
+	public SKBitmap DrawGlyph(string glyph, bool edgeOnly, int edge_Ratio, int margin, float strokeWidth = 0) {
+		return this.textRenderer.DrawGlyph(glyph, edgeOnly, edge_Ratio, margin, strokeWidth);
+	}
 	protected SKBitmap DrawText(string drawstr, CFontRenderer.DrawMode drawmode, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradationBottomColor, int edge_Ratio, bool keepCenter = false) {
 		//横書きに対してのCorrectionは廃止
 		return this.textRenderer.DrawText(drawstr, drawmode, fontColor, edgeColor, secondEdgeColor, gradationTopColor, gradationBottomColor, edge_Ratio, keepCenter);
 	}
+
+	// Per-side bitmap padding the text renderer bakes around the ink (the +50/+25 constants in its DrawText):
+	// 25px left/right/bottom; the ink top sits at y=0 of the returned bitmap.
+	public const int TextPadding = 25;
+
+	// advance width of s in px (no padding; includes trailing spaces) — for glyph-composed layout
+	public float MeasureText(string s) => this.textRenderer?.MeasureText(s) ?? 0f;
+
+	// how far the font's kerning moves `second` when it follows `first` in DrawText (negative tucks it in)
+	public float MeasureKerning(string first, string second) => this.textRenderer?.PairKerning(first, second) ?? 0f;
+
+	// ink line height (ascent + descent); a 1-line DrawText bitmap is this + TextPadding tall
+	public float GetLineHeight() => this.textRenderer?.GetLineHeight() ?? 0f;
 
 
 	public SKBitmap DrawText_V(string drawstr, Color fontColor, bool keepCenter = false) {
@@ -146,22 +201,18 @@ public class CFontRenderer : IDisposable {
 		List<CSkiaSharpTextRenderer.SStringToken> tokens = new List<CSkiaSharpTextRenderer.SStringToken>();
 		tokens = this.textRenderer.Tokenize(drawstr, fontColor, edgeColor, secondEdgeColor, gradationTopColor, gradationBottomColor);
 
-		string purified = this.textRenderer.Purify(drawstr);
-		string[] strList = new string[purified.Length];
-		for (int i = 0; i < purified.Length; i++)
-			strList[i] = purified.Substring(i, 1);
-		SKBitmap[] strImageList = new SKBitmap[purified.Length];
+		// one cell per character, with its marks and both halves of a surrogate pair
+		string[] strList = tokens.SelectMany(tok => TextElements(tok.s)).ToArray();
+		SKBitmap[] strImageList = new SKBitmap[strList.Length];
 
 		int nWidth = 0;
 		int nHeight = 0;
 		int _idx = 0;
 		foreach (SStringToken tok in tokens) {
-			string[] splitted = new string[tok.s.Length];
-			for (int i = 0; i < tok.s.Length; i++)
-				splitted[i] = tok.s.Substring(i, 1);
+			string[] splitted = TextElements(tok.s);
 
 			for (int i = 0; i < splitted.Length; i++) {
-				strImageList[_idx] = this.textRenderer.DrawText(splitted[i], drawmode, tok.TextColor, tok.OutlineColor, secondEdgeColor, tok.GradiantTop, tok.GradiantBottom, edge_Ratio, false);
+				strImageList[_idx] = this.textRenderer.DrawText(splitted[i], drawmode, tok.TextColor, tok.OutlineColor, secondEdgeColor, tok.GradiantTop, tok.GradiantBottom, edge_Ratio, false, perCharacter: true);
 
 				//回転する文字
 				if (Rotate_Chara_List_Vertical.Contains(splitted[i])) {
@@ -247,14 +298,23 @@ public class CFontRenderer : IDisposable {
 		}
 
 
-		SKImage image = skSurface.Snapshot();
+		// Snapshot the surface, then copy into the returned bitmap; the SKImage is native, so dispose it via using.
+		using SKImage image = skSurface.Snapshot();
 		//返します
 		return SKBitmap.FromImage(image);
 	}
 
-	public void Dispose() {
+	private static string[] TextElements(string s) {
+		var elements = new List<string>();
+		var enumerator = System.Globalization.StringInfo.GetTextElementEnumerator(s);
+		while (enumerator.MoveNext())
+			elements.Add(enumerator.GetTextElement());
+		return elements.ToArray();
+	}
+
+	public virtual void Dispose() {
 		this.textRenderer.Dispose();
 	}
 
-	private ITextRenderer textRenderer;
+	private ITextRenderer textRenderer = null!;
 }

@@ -5,7 +5,9 @@ namespace SevenZip.Compression.LZMA;
 
 public static class SevenZipHelper {
 
-	static int dictionary = 1 << 23;
+	// the encoder's working memory grows with it: saving 20000 replay inputs allocated 92 MB at 1 << 23 and 1.7 MB at
+	// 1 << 16, for the same file size. The decoder reads the size from the file, so older replays still load
+	static int dictionary = 1 << 16;
 
 	// static Int32 posStateBits = 2;
 	// static Int32 litContextBits = 3; // for normal files
@@ -44,7 +46,7 @@ public static class SevenZipHelper {
 
 
 	public static byte[] Compress(byte[] inputBytes) {
-		byte[] retVal = null;
+		byte[]? retVal = null;
 		SevenZip.Compression.LZMA.Encoder encoder = new SevenZip.Compression.LZMA.Encoder();
 		encoder.SetCoderProperties(propIDs, properties);
 
@@ -66,7 +68,7 @@ public static class SevenZipHelper {
 
 
 	public static byte[] Compress(string inFileName) {
-		byte[] retVal = null;
+		byte[]? retVal = null;
 		SevenZip.Compression.LZMA.Encoder encoder = new SevenZip.Compression.LZMA.Encoder();
 		encoder.SetCoderProperties(propIDs, properties);
 
@@ -113,7 +115,7 @@ public static class SevenZipHelper {
 
 
 	public static byte[] Decompress(string inFileName) {
-		byte[] retVal = null;
+		byte[]? retVal = null;
 
 		SevenZip.Compression.LZMA.Decoder decoder = new SevenZip.Compression.LZMA.Decoder();
 
@@ -181,7 +183,7 @@ public static class SevenZipHelper {
 
 
 	public static byte[] Decompress(byte[] inputBytes) {
-		byte[] retVal = null;
+		byte[]? retVal = null;
 
 		SevenZip.Compression.LZMA.Decoder decoder = new SevenZip.Compression.LZMA.Decoder();
 

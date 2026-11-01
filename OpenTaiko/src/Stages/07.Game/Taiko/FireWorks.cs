@@ -21,32 +21,32 @@ internal class FireWorks : CActivity {
 	public virtual void Start(NotesManager.ENoteType nLane, EGameType gameType, int nPlayer, double x, double y) {
 		if (OpenTaiko.ConfigIni.SimpleMode) return;
 
-		for (int i = 0; i < 32; i++) {
-			if (!FireWork[i].IsUsing) {
-				FireWork[i].IsUsing = true;
-				FireWork[i].Lane = nLane;
-				FireWork[i].GameType = gameType;
-				FireWork[i].Player = nPlayer;
-				FireWork[i].X = x;
-				FireWork[i].Y = y;
-				FireWork[i].Counter = new CCounter(0, OpenTaiko.Skin.Game_Effect_FireWorks[2] - 1, OpenTaiko.Skin.Game_Effect_FireWorks_Timer, OpenTaiko.Timer);
-				break;
-			}
+		ref var fireWork = ref FireWork[FireWorkTail];
+		if (!fireWork.IsUsing) {
+			FireWorkTail = (FireWorkTail + 1) % FIRE_WORK_COUNT;
+			fireWork.IsUsing = true;
+			fireWork.Lane = nLane;
+			fireWork.GameType = gameType;
+			fireWork.Player = nPlayer;
+			fireWork.X = x;
+			fireWork.Y = y;
+			fireWork.Counter = new CCounter(0, OpenTaiko.Skin.Game_Effect_FireWorks[2] - 1, OpenTaiko.Skin.Game_Effect_FireWorks_Timer, OpenTaiko.Timer);
 		}
 	}
 
 	// CActivity 実装
 
 	public override void Activate() {
-		for (int i = 0; i < 32; i++) {
-			FireWork[i] = new Status();
-			FireWork[i].IsUsing = false;
-			FireWork[i].Counter = new CCounter();
+		for (int i = 0; i < FIRE_WORK_COUNT; i++) {
+			ref var fireWork = ref FireWork[i];
+			fireWork = new Status();
+			fireWork.IsUsing = false;
+			fireWork.Counter = new CCounter();
 		}
 		base.Activate();
 	}
 	public override void DeActivate() {
-		for (int i = 0; i < 32; i++) {
+		for (int i = 0; i < FIRE_WORK_COUNT; i++) {
 			FireWork[i].Counter = null;
 		}
 		base.DeActivate();
@@ -59,13 +59,21 @@ internal class FireWorks : CActivity {
 	}
 	public override int Draw() {
 		if (!base.IsDeActivated && !OpenTaiko.ConfigIni.SimpleMode) {
-			for (int i = 0; i < 32; i++) {
-				if (FireWork[i].IsUsing) {
-					FireWork[i].Counter.Tick();
-					OpenTaiko.Tx.Effects_Hit_FireWorks?.t2D中心基準描画((float)FireWork[i].X, (float)FireWork[i].Y, 1, new Rectangle(FireWork[i].Counter.CurrentValue * OpenTaiko.Skin.Game_Effect_FireWorks[0], 0, OpenTaiko.Skin.Game_Effect_FireWorks[0], OpenTaiko.Skin.Game_Effect_FireWorks[1]));
-					if (FireWork[i].Counter.IsEnded) {
-						FireWork[i].Counter.Stop();
-						FireWork[i].IsUsing = false;
+			var prevHead = FireWorkHead;
+			for (int i = 0; i < FIRE_WORK_COUNT; i++) {
+				var iFireWork = (prevHead + i) % FIRE_WORK_COUNT;
+				ref var fireWork = ref FireWork[iFireWork];
+				if (!fireWork.IsUsing) {
+					if (iFireWork == FireWorkTail)
+						break;
+				} else {
+					fireWork.Counter!.Tick();
+					OpenTaiko.Tx.Effects_Hit_FireWorks?.t2DCenterBasedDraw((float)fireWork.X, (float)fireWork.Y, 1, new Rectangle(fireWork.Counter.CurrentValue * OpenTaiko.Skin.Game_Effect_FireWorks[0], 0, OpenTaiko.Skin.Game_Effect_FireWorks[0], OpenTaiko.Skin.Game_Effect_FireWorks[1]));
+					if (fireWork.Counter.IsEnded) {
+						fireWork.Counter.Stop();
+						fireWork.IsUsing = false;
+						if (iFireWork == FireWorkHead)
+							FireWorkHead = (FireWorkHead + 1) % FIRE_WORK_COUNT;
 					}
 				}
 			}
@@ -84,11 +92,14 @@ internal class FireWorks : CActivity {
 		public EGameType GameType;
 		public int Player;
 		public bool IsUsing;
-		public CCounter Counter;
+		public CCounter? Counter;
 		public double X;
 		public double Y;
 	}
-	private Status[] FireWork = new Status[32];
+	private const int FIRE_WORK_COUNT = 32;
+	private Status[] FireWork = new Status[FIRE_WORK_COUNT];
+	private int FireWorkHead;
+	private int FireWorkTail;
 
 	//-----------------
 	#endregion

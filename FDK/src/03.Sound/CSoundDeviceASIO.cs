@@ -69,12 +69,14 @@ internal class CSoundDeviceASIO : ISoundDevice {
 		protected set;
 	}
 
+	public long nBytesPerSec { get; protected set; }
+
 
 	// マスターボリュームの制御コードは、WASAPI/ASIOで全く同じ。
 	public int nMasterVolume {
 		get {
-			float f音量 = 0.0f;
-			bool b = Bass.ChannelGetAttribute(this.hMixer, ChannelAttribute.Volume, out f音量);
+			float fVolume = 0.0f;
+			bool b = Bass.ChannelGetAttribute(this.hMixer, ChannelAttribute.Volume, out fVolume);
 			if (!b) {
 				Errors be = Bass.LastError;
 				Trace.TraceInformation("ASIO Master Volume Get Error: " + be.ToString());
@@ -82,7 +84,7 @@ internal class CSoundDeviceASIO : ISoundDevice {
 				//Trace.TraceInformation( "ASIO Master Volume Get Success: " + (f音量 * 100) );
 
 			}
-			return (int)(f音量 * 100);
+			return (int)(fVolume * 100);
 		}
 		set {
 			bool b = Bass.ChannelSetAttribute(this.hMixer, ChannelAttribute.Volume, (float)(value / 100.0));
@@ -102,11 +104,13 @@ internal class CSoundDeviceASIO : ISoundDevice {
 		// 初期化。
 
 		Trace.TraceInformation("BASS (ASIO) の初期化を開始します。");
+		if (DriverAbandoned)
+			throw new Exception("The ASIO driver crashed or stopped answering earlier; ASIO opens again after a restart.");
 		this.SoundDeviceType = ESoundDeviceType.Unknown;
 		this.OutputDelay = 0;
 		this.ElapsedTimeMs = 0;
 		this.UpdateSystemTimeMs = CTimer.UnusedNum;
-		this.SystemTimer = new CTimer(CTimer.TimerType.MultiMedia);
+		this.SystemTimer = new CTimer(CTimer.TimerType.GameTimeAtDraw);
 		this.ASIODevice = deviceIndex;
 
 		// BASS の設定。
@@ -115,18 +119,18 @@ internal class CSoundDeviceASIO : ISoundDevice {
 
 		if (!Bass.Configure(Configuration.UpdatePeriod, 0)) // 0:BASSストリームの自動更新を行わない。
 		{
-			Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdatePeriod)}) に失敗しました。[{Bass.LastError.ToString()}]");
+			Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdatePeriod)}) failed. [{Bass.LastError.ToString()}]");
 		}
 		if (!Bass.Configure(Configuration.UpdateThreads, 0)) // 0:BASSストリームの自動更新を行わない。
 		{
-			Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdateThreads)}) に失敗しました。[{Bass.LastError.ToString()}]");
+			Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdateThreads)}) failed. [{Bass.LastError.ToString()}]");
 		}
 
 		// BASS の初期化。
 
-		int nデバイス = 0;      // 0:"no device" … BASS からはデバイスへアクセスさせない。アクセスは BASSASIO アドオンから行う。
-		int n周波数 = 44100;   // 仮決め。最終的な周波数はデバイス（≠ドライバ）が決める。
-		if (!Bass.Init(nデバイス, n周波数, DeviceInitFlags.Default, IntPtr.Zero))
+		int nDevice = 0;      // 0:"no device" … BASS からはデバイスへアクセスさせない。アクセスは BASSASIO アドオンから行う。
+		int nFrequency = 44100;   // 仮決め。最終的な周波数はデバイス（≠ドライバ）が決める。
+		if (!Bass.Init(nDevice, nFrequency, DeviceInitFlags.Latency, IntPtr.Zero))
 			throw new Exception(string.Format("BASS の初期化に失敗しました。(BASS_Init)[{0}]", Bass.LastError.ToString()));
 
 		Bass.Configure(Configuration.LogarithmicVolumeCurve, true);
@@ -152,20 +156,25 @@ internal class CSoundDeviceASIO : ISoundDevice {
 			//-----------------
 			this.SoundDeviceType = ESoundDeviceType.ASIO;
 			BassAsio.GetInfo(out asioInfo);
-			this.n出力チャンネル数 = asioInfo.Outputs;
-			this.db周波数 = BassAsio.Rate;
-			this.fmtASIOデバイスフォーマット = BassAsio.ChannelGetFormat(false, 0);
+			this.nOutputChannelCount = asioInfo.Outputs;
+			this.dbFrequency = BassAsio.Rate;
+			this.fmtASIODeviceFormat = BassAsio.ChannelGetFormat(false, 0);
 
 			Trace.TraceInformation("BASS を初期化しました。(ASIO, デバイス:\"{0}\", 入力{1}, 出力{2}, {3}Hz, バッファ{4}～{6}sample ({5:0.###}～{7:0.###}ms), デバイスフォーマット:{8})",
 				asioInfo.Name,
 				asioInfo.Inputs,
 				asioInfo.Outputs,
-				this.db周波数.ToString("0.###"),
-				asioInfo.MinBufferLength, asioInfo.MinBufferLength * 1000 / this.db周波数,
-				asioInfo.MaxBufferLength, asioInfo.MaxBufferLength * 1000 / this.db周波数,
-				this.fmtASIOデバイスフォーマット.ToString()
+				this.dbFrequency.ToString("0.###"),
+				asioInfo.MinBufferLength, asioInfo.MinBufferLength * 1000 / this.dbFrequency,
+				asioInfo.MaxBufferLength, asioInfo.MaxBufferLength * 1000 / this.dbFrequency,
+				this.fmtASIODeviceFormat.ToString()
 			);
 			this.bIsBASSFree = false;
+			// the driver asks to be reset when its device goes away or changes: the game then reopens it
+			BassAsio.SetNotify(SoundManager.AsioNotify, IntPtr.Zero);
+			// a crash on one of the driver's own threads ends that thread, not the game
+			if (BassAsio.GetDeviceInfo(ASIODevice, out AsioDeviceInfo driverInfo))
+				AsioCrashGuard.Watch(driverInfo.Driver);
 			#region [ debug: channel format ]
 			//BASS_ASIO_CHANNELINFO chinfo = new BASS_ASIO_CHANNELINFO();
 			//int chan = 0;
@@ -197,7 +206,7 @@ internal class CSoundDeviceASIO : ISoundDevice {
 
 		// ASIO 出力チャンネルの初期化。
 
-		this.tAsioProc = new AsioProcedure(this.tAsio処理);       // アンマネージに渡す delegate は、フィールドとして保持しておかないとGCでアドレスが変わってしまう。
+		this.tAsioProc = new AsioProcedure(this.tAsioProcess);       // アンマネージに渡す delegate は、フィールドとして保持しておかないとGCでアドレスが変わってしまう。
 		if (!BassAsio.ChannelEnable(false, 0, this.tAsioProc, IntPtr.Zero))     // 出力チャンネル0 の有効化。
 		{
 			#region [ ASIO 出力チャンネルの初期化に失敗。]
@@ -209,7 +218,7 @@ internal class CSoundDeviceASIO : ISoundDevice {
 			//-----------------
 			#endregion
 		}
-		for (int i = 1; i < this.n出力チャンネル数; i++)        // 出力チャネルを全てチャネル0とグループ化する。
+		for (int i = 1; i < this.nOutputChannelCount; i++)        // 出力チャネルを全てチャネル0とグループ化する。
 		{                                                       // チャネル1だけを0とグループ化すると、3ch以上の出力をサポートしたカードでの動作がおかしくなる
 			if (!BassAsio.ChannelJoin(false, i, 0)) {
 				#region [ 初期化に失敗。]
@@ -222,7 +231,7 @@ internal class CSoundDeviceASIO : ISoundDevice {
 				#endregion
 			}
 		}
-		if (!BassAsio.ChannelSetFormat(false, 0, this.fmtASIOチャンネルフォーマット))  // 出力チャンネル0のフォーマット
+		if (!BassAsio.ChannelSetFormat(false, 0, this.fmtASIOChannelFormat))  // 出力チャンネル0のフォーマット
 		{
 			#region [ ASIO 出力チャンネルの初期化に失敗。]
 			//-----------------
@@ -237,9 +246,9 @@ internal class CSoundDeviceASIO : ISoundDevice {
 		// ASIO 出力と同じフォーマットを持つ BASS ミキサーを作成。
 
 		var flag = BassFlags.MixerNonStop | BassFlags.Decode;   // デコードのみ＝発声しない。ASIO に出力されるだけ。
-		if (this.fmtASIOデバイスフォーマット == AsioSampleFormat.Float)
+		if (this.fmtASIODeviceFormat == AsioSampleFormat.Float)
 			flag |= BassFlags.Float;
-		this.hMixer = BassMix.CreateMixerStream((int)this.db周波数, this.n出力チャンネル数, flag);
+		this.hMixer = BassMix.CreateMixerStream((int)this.dbFrequency, this.nOutputChannelCount, flag);
 
 		if (this.hMixer == 0) {
 			Errors err = Bass.LastError;
@@ -252,16 +261,16 @@ internal class CSoundDeviceASIO : ISoundDevice {
 		// BASS ミキサーの1秒あたりのバイト数を算出。
 
 		var mixerInfo = Bass.ChannelGetInfo(this.hMixer);
-		int nサンプルサイズbyte = 0;
-		switch (this.fmtASIOチャンネルフォーマット) {
-			case AsioSampleFormat.Bit16: nサンプルサイズbyte = 2; break;
-			case AsioSampleFormat.Bit24: nサンプルサイズbyte = 3; break;
-			case AsioSampleFormat.Bit32: nサンプルサイズbyte = 4; break;
-			case AsioSampleFormat.Float: nサンプルサイズbyte = 4; break;
+		int nSampleSizebyte = 0;
+		switch (this.fmtASIOChannelFormat) {
+			case AsioSampleFormat.Bit16: nSampleSizebyte = 2; break;
+			case AsioSampleFormat.Bit24: nSampleSizebyte = 3; break;
+			case AsioSampleFormat.Bit32: nSampleSizebyte = 4; break;
+			case AsioSampleFormat.Float: nSampleSizebyte = 4; break;
 		}
 		//long nミキサーの1サンプルあたりのバイト数 = /*mixerInfo.chans*/ 2 * nサンプルサイズbyte;
-		long nミキサーの1サンプルあたりのバイト数 = mixerInfo.Channels * nサンプルサイズbyte;
-		this.nミキサーの1秒あたりのバイト数 = nミキサーの1サンプルあたりのバイト数 * mixerInfo.Frequency;
+		long nMixer1SamplePerByteCount = mixerInfo.Channels * nSampleSizebyte;
+		this.nBytesPerSec = nMixer1SamplePerByteCount * mixerInfo.Frequency;
 
 
 		// 単純に、hMixerの音量をMasterVolumeとして制御しても、
@@ -269,7 +278,7 @@ internal class CSoundDeviceASIO : ISoundDevice {
 		// そのため、もう一段mixerを噛ませて、一段先のmixerからChannelGetData()することで、
 		// hMixerの音量制御を反映させる。
 		this.hMixer_DeviceOut = BassMix.CreateMixerStream(
-			(int)this.db周波数, this.n出力チャンネル数, flag);
+			(int)this.dbFrequency, this.nOutputChannelCount, flag);
 		if (this.hMixer_DeviceOut == 0) {
 			Errors errcode = Bass.LastError;
 			BassAsio.Free();
@@ -291,9 +300,9 @@ internal class CSoundDeviceASIO : ISoundDevice {
 
 		// 出力を開始。
 
-		this.nバッファサイズsample = (int)(bufferSize * this.db周波数 / 1000.0);
+		this.nBufferSizesample = (int)(bufferSize * this.dbFrequency / 1000.0);
 		//this.nバッファサイズsample = (int)  nバッファサイズbyte;
-		if (!BassAsio.Start(this.nバッファサイズsample))       // 範囲外の値を指定した場合は自動的にデフォルト値に設定される。
+		if (!BassAsio.Start(this.nBufferSizesample))       // 範囲外の値を指定した場合は自動的にデフォルト値に設定される。
 		{
 			Errors err = BassAsio.LastError;
 			BassAsio.Free();
@@ -301,25 +310,83 @@ internal class CSoundDeviceASIO : ISoundDevice {
 			this.bIsBASSFree = true;
 			throw new Exception("ASIO デバイス出力開始に失敗しました。" + err.ToString());
 		} else {
-			int n遅延sample = BassAsio.GetLatency(false); // この関数は BASS_ASIO_Start() 後にしか呼び出せない。
-			int n希望遅延sample = (int)(bufferSize * this.db周波数 / 1000.0);
-			this.BufferSize = this.OutputDelay = (long)(n遅延sample * 1000.0f / this.db周波数);
-			Trace.TraceInformation("ASIO デバイス出力開始：バッファ{0}sample(希望{1}) [{2}ms(希望{3}ms)]", n遅延sample, n希望遅延sample, this.OutputDelay, bufferSize);
+			this.OpenedTick = Environment.TickCount64;
+			Volatile.Write(ref this.lastCallbackTick, this.OpenedTick);
+			int nDelaysample = BassAsio.GetLatency(false); // この関数は BASS_ASIO_Start() 後にしか呼び出せない。
+			int nDesiredDelaysample = (int)(bufferSize * this.dbFrequency / 1000.0);
+			this.BufferSize = this.OutputDelay = (long)(nDelaysample * 1000.0f / this.dbFrequency);
+			Trace.TraceInformation("ASIO デバイス出力開始：バッファ{0}sample(希望{1}) [{2}ms(希望{3}ms)]", nDelaysample, nDesiredDelaysample, this.OutputDelay, bufferSize);
 		}
 	}
 
 	#region [ tサウンドを作成する() ]
-	public CSound tCreateSound(string strファイル名, ESoundGroup soundGroup) {
+	public CSound tCreateSound(string strFileName, ESoundGroup soundGroup) {
 		var sound = new CSound(soundGroup);
-		sound.CreateASIOSound(strファイル名, this.hMixer);
+		sound.CreateASIOSound(strFileName, this.hMixer);
 		return sound;
 	}
 
-	public void tCreateSound(string strファイル名, CSound sound) {
-		sound.CreateASIOSound(strファイル名, this.hMixer);
+	public void tCreateSound(string strFileName, CSound sound) {
+		sound.CreateASIOSound(strFileName, this.hMixer);
+	}
+
+	public CSound tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, ESoundGroup soundGroup) {
+		var sound = new CSound(soundGroup);
+		sound.CreateBassUserSound(frequency, channels, durationSeconds, this.hMixer, proc, ESoundDeviceType.ASIO, SoundManager.bIsTimeStretch);
+		return sound;
+	}
+
+	public void tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, CSound sound) {
+		sound.CreateBassUserSound(frequency, channels, durationSeconds, this.hMixer, proc, ESoundDeviceType.ASIO, SoundManager.bIsTimeStretch);
 	}
 	#endregion
 
+
+	/// <summary>The driver stops asking for sound (tAsioProcess is no longer called); Dispose closes it. A driver
+	/// that does not answer in time or crashes meanwhile is left alone (<see cref="Abandon"/>).</summary>
+	public void StopOutput() {
+		if (bIsBASSFree || abandoned) return;
+		Trace.TraceInformation("Stopping the ASIO output.");
+		if (CallDriver(BassAsio.Stop))
+			Trace.TraceInformation("ASIO output stopped.");
+		else
+			Abandon();
+	}
+
+	/// <summary>True once an ASIO driver crashed or stopped answering in this run: it is never called again, and
+	/// no ASIO device opens until the game restarts.</summary>
+	public static bool DriverAbandoned { get; private set; }
+	private static readonly List<CSoundDeviceASIO> abandonedDevices = new();   // their procedures stay callable
+	private bool abandoned;
+
+	/// <summary>Leaves the driver alone from now on: it is neither stopped nor closed (it may hold its own locks).</summary>
+	public void Abandon() {
+		if (abandoned) return;
+		abandoned = true;
+		DriverAbandoned = true;
+		lock (abandonedDevices) abandonedDevices.Add(this);
+		Trace.TraceWarning("The ASIO driver is left alone until the game restarts: it crashed or stopped answering.");
+	}
+
+	// a call into a driver that may have crashed, on a thread of its own: a driver that hangs, or whose thread
+	// AsioCrashGuard ended, cannot stop the game. False when it did not return in time or the driver crashed.
+	private bool CallDriver(Func<bool> call) {
+		int device = ASIODevice;
+		var returned = new ManualResetEventSlim();
+		var thread = new Thread(() => {
+			try {
+				BassAsio.CurrentDevice = device;   // the current device is per thread
+				call();
+			} catch (Exception e) {
+				Trace.TraceWarning("ASIO driver call failed: " + e.Message);
+			} finally {
+				returned.Set();
+			}
+		}) { IsBackground = true, Name = "ASIO driver call" };
+		thread.Start();
+		return returned.Wait(DriverAnswerMs) && !AsioCrashGuard.CrashPending;
+	}
+	private const int DriverAnswerMs = 2000;
 
 	#region [ Dispose-Finallizeパターン実装 ]
 	//-----------------
@@ -329,17 +396,31 @@ internal class CSoundDeviceASIO : ISoundDevice {
 	}
 	protected void Dispose(bool bManagedDispose) {
 		SoundDeviceType = ESoundDeviceType.Unknown;     // まず出力停止する(Dispose中にクラス内にアクセスされることを防ぐ)
+		// the driver stops calling tAsioProcess first: it reads both mixers
+		if (!bIsBASSFree) {
+			if (!abandoned) {
+				Trace.TraceInformation("Closing the ASIO driver.");
+				// システムタイマより先に呼び出すこと。（tAsio処理() の中でシステムタイマを参照してるため）
+				if (CallDriver(BassAsio.Free))
+					Trace.TraceInformation("ASIO driver closed.");
+				else
+					Abandon();
+			}
+		}
+		if (hMixer_DeviceOut != -1) {
+			Bass.StreamFree(hMixer_DeviceOut);
+		}
 		if (hMixer != -1) {
 			Bass.StreamFree(hMixer);
 		}
 		if (!bIsBASSFree) {
-			BassAsio.Free();    // システムタイマより先に呼び出すこと。（tAsio処理() の中でシステムタイマを参照してるため）
 			Bass.Free();
+			bIsBASSFree = true;
 		}
 
 		if (bManagedDispose) {
 			SystemTimer.Dispose();
-			SystemTimer = null;
+			SystemTimer = null!;
 		}
 	}
 	~CSoundDeviceASIO() {
@@ -351,16 +432,17 @@ internal class CSoundDeviceASIO : ISoundDevice {
 
 	protected int hMixer = -1;
 	protected int hMixer_DeviceOut = -1;
-	protected int n出力チャンネル数 = 0;
-	protected double db周波数 = 0.0;
-	protected int nバッファサイズsample = 0;
-	protected AsioSampleFormat fmtASIOデバイスフォーマット = AsioSampleFormat.Unknown;
-	protected AsioSampleFormat fmtASIOチャンネルフォーマット = AsioSampleFormat.Bit16;     // 16bit 固定
+	protected int nOutputChannelCount = 0;
+	protected double dbFrequency = 0.0;
+	protected int nBufferSizesample = 0;
+	protected AsioSampleFormat fmtASIODeviceFormat = AsioSampleFormat.Unknown;
+	protected AsioSampleFormat fmtASIOChannelFormat = AsioSampleFormat.Bit16;     // 16bit 固定
 																				//protected BASSASIOFormat fmtASIOチャンネルフォーマット = BASSASIOFormat.BASS_ASIO_FORMAT_32BIT;// 16bit 固定
-	protected AsioProcedure tAsioProc = null;
+	protected AsioProcedure? tAsioProc = null;
 
-	protected int tAsio処理(bool input, int channel, IntPtr buffer, int length, IntPtr user) {
-		if (input) return 0;
+	protected int tAsioProcess(bool input, int channel, IntPtr buffer, int length, IntPtr user) {
+		// nothing once closed: a driver left alone may still call (its mixers and timer are gone)
+		if (input || this.SoundDeviceType != ESoundDeviceType.ASIO) return 0;
 
 
 		// BASSミキサからの出力データをそのまま ASIO buffer へ丸投げ。
@@ -373,7 +455,7 @@ internal class CSoundDeviceASIO : ISoundDevice {
 		// 経過時間を更新。
 		// データの転送差分ではなく累積転送バイト数から算出する。
 
-		this.dbElapsedTimeMs = (this.n累積転送バイト数 * 1000.0 / this.nミキサーの1秒あたりのバイト数) - this.OutputDelay;
+		this.dbElapsedTimeMs = (this.nCumulativeTransferByteCount * 1000.0 / this.nBytesPerSec) - this.OutputDelay;
 		this.ElapsedTimeMs = (long)this.dbElapsedTimeMs;
 		this.UpdateSystemTimeMs = this.SystemTimer.SystemTimeMs;
 		this.dbUpdateSystemTimeMs = this.SystemTimer.SystemTimeMs_Double;
@@ -381,11 +463,21 @@ internal class CSoundDeviceASIO : ISoundDevice {
 
 		// 経過時間を更新後に、今回分の累積転送バイト数を反映。
 
-		this.n累積転送バイト数 += num;
+		this.nCumulativeTransferByteCount += num;
+		Volatile.Write(ref this.lastCallbackTick, Environment.TickCount64);
+		this.calledBack = true;
 		return num;
 	}
 
-	private long nミキサーの1秒あたりのバイト数 = 0;
-	private long n累積転送バイト数 = 0;
+	/// <summary>Environment.TickCount64 of the driver's last request for sound (or of the start).</summary>
+	public long LastCallbackTick => Volatile.Read(ref this.lastCallbackTick);
+	private long lastCallbackTick;
+	/// <summary>Whether the driver asked for sound since the start: some take half a second to begin.</summary>
+	public bool HasCalledBack => this.calledBack;
+	private volatile bool calledBack;
+	/// <summary>Environment.TickCount64 of the start.</summary>
+	public long OpenedTick { get; private set; }
+
+	private long nCumulativeTransferByteCount = 0;
 	private bool bIsBASSFree = true;
 }

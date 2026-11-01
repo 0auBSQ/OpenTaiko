@@ -45,7 +45,7 @@ public class CIntervalProcessing : IDisposable {
 
 	#region [ protected ]
 	//-----------------
-	protected CTimer timer = new CTimer(CTimer.TimerType.MultiMedia);
+	protected CTimer timer = new CTimer(CTimer.TimerType.GameTimeAtDraw);
 	protected long PrevTime = CTimer.UnusedNum;
 	//-----------------
 	#endregion

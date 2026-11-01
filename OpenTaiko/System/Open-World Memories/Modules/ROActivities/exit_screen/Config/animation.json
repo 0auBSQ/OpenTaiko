@@ -1,0 +1,4 @@
+{
+    "_note": "Exit screen animation. The circle speeds are for Circle1.png, Circle2.png and Circle3.png, in degrees per second; a negative speed turns the other way.",
+    "circle_speeds_deg_per_s": [30, -20, 10]
+}

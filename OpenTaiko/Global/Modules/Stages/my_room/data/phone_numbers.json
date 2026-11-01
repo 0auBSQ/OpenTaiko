@@ -1,0 +1,65 @@
+{
+  "_comment": "The numbers the My Room phone can dial, and what each one does.",
+  "1122": {
+    "sound": "egg"
+  },
+  "67": {
+    "name": "",
+    "text": "egg_67"
+  },
+  "canabi": {
+    "name": "Dashy",
+    "text": "egg_canabi",
+    "effect": "bombs"
+  },
+  "ootd": {
+    "name": "bol",
+    "text": "egg_ootd"
+  },
+  "dragoon": {
+    "name": "Tatsuoto",
+    "text": "egg_dragoon"
+  },
+  "887": {
+    "name": "",
+    "text": "egg_nice_try"
+  },
+  "888": {
+    "name": "Dashy",
+    "blip": "blip_narrator",
+    "start": "dashy_hello",
+    "close": "dashy_bye",
+    "daily": "dashy_busy",
+    "choices": {
+      "dashy_hello": [
+        { "label": "dashy_ask_ribbons", "next": "dashy_ribbons" },
+        { "label": "dashy_ask_met", "next": "dashy_met" },
+        { "label": "dashy_ask_depiction", "next": "dashy_depiction" }
+      ],
+      "dashy_met": [
+        { "label": "dashy_ask_riku", "next": "dashy_riku" },
+        { "label": "dashy_ask_calla", "next": "dashy_calla" },
+        { "label": "dashy_ask_hikaru", "next": "dashy_hikaru" }
+      ],
+      "dashy_depiction": [
+        { "label": "dashy_ask_own", "next": "dashy_own" },
+        { "label": "dashy_ask_apeiroscopy", "next": "dashy_apeiroscopy" },
+        { "label": "dashy_ask_love_songs", "next": "dashy_love_songs" }
+      ]
+    }
+  },
+  "889": {
+    "name": "",
+    "text": "egg_nice_try"
+  },
+  "133221333123111": {
+    "give": "toybox"
+  },
+  "78222286": {
+    "lines": [
+      { "name": "", "text": "egg_piano_1" },
+      { "name": "???", "text": "egg_piano_2", "blip": "blip1" },
+      { "name": "", "text": "egg_piano_3" }
+    ]
+  }
+}

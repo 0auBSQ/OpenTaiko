@@ -14,35 +14,38 @@ internal class CActImplRollEffect : CActivity {
 	// メソッド
 	public virtual void Start(int player) {
 		if (OpenTaiko.ConfigIni.SimpleMode) return;
+		if (OpenTaiko.Tx.Effects_Roll == null || OpenTaiko.Tx.Effects_Roll.Length == 0) return;
 
-		for (int i = 0; i < 128; i++) {
-			if (!RollCharas[i].IsUsing) {
-				RollCharas[i].IsUsing = true;
-				RollCharas[i].Type = random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Ptn);
-				RollCharas[i].OldValue = 0;
-				RollCharas[i].Counter = new CCounter(0, 5000, 1, OpenTaiko.Timer);
+		for (int i = 0; i < ROLL_CHARA_COUNT; i++) {
+			ref var rollChara = ref RollCharas[RollCharaTail];
+			if (!rollChara.IsUsing) {
+				RollCharaTail = (RollCharaTail + 1) % ROLL_CHARA_COUNT;
+				rollChara.IsUsing = true;
+				rollChara.Type = random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Ptn);
+				rollChara.OldValue = 0;
+				rollChara.Counter = new CCounter(0, 5000, 1, OpenTaiko.Timer);
 				if (OpenTaiko.stageGameScreen.isMultiPlay) {
 					switch (player) {
 						case 0:
-							RollCharas[i].X = OpenTaiko.Skin.Game_Effect_Roll_StartPoint_1P_X[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_StartPoint_1P_X.Length)];
-							RollCharas[i].Y = OpenTaiko.Skin.Game_Effect_Roll_StartPoint_1P_Y[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_StartPoint_1P_Y.Length)];
-							RollCharas[i].XAdd = OpenTaiko.Skin.Game_Effect_Roll_Speed_1P_X[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Speed_1P_X.Length)];
-							RollCharas[i].YAdd = OpenTaiko.Skin.Game_Effect_Roll_Speed_1P_Y[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Speed_1P_Y.Length)];
+							rollChara.X = OpenTaiko.Skin.Game_Effect_Roll_StartPoint_1P_X[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_StartPoint_1P_X.Length)];
+							rollChara.Y = OpenTaiko.Skin.Game_Effect_Roll_StartPoint_1P_Y[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_StartPoint_1P_Y.Length)];
+							rollChara.XAdd = OpenTaiko.Skin.Game_Effect_Roll_Speed_1P_X[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Speed_1P_X.Length)];
+							rollChara.YAdd = OpenTaiko.Skin.Game_Effect_Roll_Speed_1P_Y[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Speed_1P_Y.Length)];
 							break;
 						case 1:
-							RollCharas[i].X = OpenTaiko.Skin.Game_Effect_Roll_StartPoint_2P_X[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_StartPoint_2P_X.Length)];
-							RollCharas[i].Y = OpenTaiko.Skin.Game_Effect_Roll_StartPoint_2P_Y[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_StartPoint_2P_Y.Length)];
-							RollCharas[i].XAdd = OpenTaiko.Skin.Game_Effect_Roll_Speed_2P_X[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Speed_2P_X.Length)];
-							RollCharas[i].YAdd = OpenTaiko.Skin.Game_Effect_Roll_Speed_2P_Y[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Speed_2P_Y.Length)];
+							rollChara.X = OpenTaiko.Skin.Game_Effect_Roll_StartPoint_2P_X[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_StartPoint_2P_X.Length)];
+							rollChara.Y = OpenTaiko.Skin.Game_Effect_Roll_StartPoint_2P_Y[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_StartPoint_2P_Y.Length)];
+							rollChara.XAdd = OpenTaiko.Skin.Game_Effect_Roll_Speed_2P_X[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Speed_2P_X.Length)];
+							rollChara.YAdd = OpenTaiko.Skin.Game_Effect_Roll_Speed_2P_Y[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Speed_2P_Y.Length)];
 							break;
 						default:
 							return;
 					}
 				} else {
-					RollCharas[i].X = OpenTaiko.Skin.Game_Effect_Roll_StartPoint_X[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_StartPoint_X.Length)];
-					RollCharas[i].Y = OpenTaiko.Skin.Game_Effect_Roll_StartPoint_Y[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_StartPoint_Y.Length)];
-					RollCharas[i].XAdd = OpenTaiko.Skin.Game_Effect_Roll_Speed_X[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Speed_X.Length)];
-					RollCharas[i].YAdd = OpenTaiko.Skin.Game_Effect_Roll_Speed_Y[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Speed_Y.Length)];
+					rollChara.X = OpenTaiko.Skin.Game_Effect_Roll_StartPoint_X[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_StartPoint_X.Length)];
+					rollChara.Y = OpenTaiko.Skin.Game_Effect_Roll_StartPoint_Y[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_StartPoint_Y.Length)];
+					rollChara.XAdd = OpenTaiko.Skin.Game_Effect_Roll_Speed_X[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Speed_X.Length)];
+					rollChara.YAdd = OpenTaiko.Skin.Game_Effect_Roll_Speed_Y[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Speed_Y.Length)];
 				}
 				break;
 			}
@@ -54,18 +57,20 @@ internal class CActImplRollEffect : CActivity {
 
 	public override void Activate() {
 
-		for (int i = 0; i < 128; i++) {
-			RollCharas[i] = new RollChara();
-			RollCharas[i].IsUsing = false;
-			RollCharas[i].Counter = new CCounter();
+		for (int i = 0; i < ROLL_CHARA_COUNT; i++) {
+			ref var rollChara = ref RollCharas[i];
+			rollChara = new RollChara();
+			rollChara.IsUsing = false;
+			rollChara.Counter = new CCounter();
 		}
+		RollCharaHead = RollCharaTail = 0;
 		// SkinConfigで指定されたいくつかの変数からこのクラスに合ったものに変換していく
 
 		base.Activate();
 	}
 	public override void DeActivate() {
 
-		for (int i = 0; i < 128; i++) {
+		for (int i = 0; i < ROLL_CHARA_COUNT; i++) {
 			RollCharas[i].Counter = null;
 		}
 		base.DeActivate();
@@ -83,31 +88,39 @@ internal class CActImplRollEffect : CActivity {
 
 			if (OpenTaiko.ConfigIni.nPlayerCount > 2) return 0;
 
-			for (int i = 0; i < 128; i++) {
-				if (RollCharas[i].IsUsing) {
-					RollCharas[i].OldValue = RollCharas[i].Counter.CurrentValue;
-					RollCharas[i].Counter.Tick();
-					if (RollCharas[i].Counter.IsEnded) {
-						RollCharas[i].Counter.Stop();
-						RollCharas[i].IsUsing = false;
+			var prevHead = RollCharaHead;
+			for (int i = 0; i < ROLL_CHARA_COUNT; i++) {
+				var iRollChara = (prevHead + i) % ROLL_CHARA_COUNT;
+				ref var rollChara = ref RollCharas[iRollChara];
+				if (!rollChara.IsUsing) {
+					if (iRollChara == RollCharaTail)
+						break;
+				} else {
+					rollChara.OldValue = rollChara.Counter!.CurrentValue;
+					rollChara.Counter.Tick();
+					if (rollChara.Counter.IsEnded) {
+						rollChara.Counter.Stop();
+						rollChara.IsUsing = false;
+						if (iRollChara == RollCharaHead)
+							RollCharaHead = (RollCharaHead + 1) % ROLL_CHARA_COUNT;
 					}
-					for (int l = RollCharas[i].OldValue; l < RollCharas[i].Counter.CurrentValue; l++) {
-						RollCharas[i].X += RollCharas[i].XAdd;
-						RollCharas[i].Y += RollCharas[i].YAdd;
+					for (int l = rollChara.OldValue; l < rollChara.Counter.CurrentValue; l++) {
+						rollChara.X += rollChara.XAdd;
+						rollChara.Y += rollChara.YAdd;
 					}
 
-					if (OpenTaiko.Tx.Effects_Roll[RollCharas[i].Type] != null) {
-						OpenTaiko.Tx.Effects_Roll[RollCharas[i].Type]?.t2D描画(RollCharas[i].X, RollCharas[i].Y);
+					if (OpenTaiko.Tx.Effects_Roll[rollChara.Type] != null) {
+						OpenTaiko.Tx.Effects_Roll[rollChara.Type]?.t2DDraw(rollChara.X, rollChara.Y);
 
 						// 画面外にいたら描画をやめさせる
-						if (RollCharas[i].X < 0 - OpenTaiko.Tx.Effects_Roll[RollCharas[i].Type].szTextureSize.Width || RollCharas[i].X > OpenTaiko.Skin.Resolution[0]) {
-							RollCharas[i].Counter.Stop();
-							RollCharas[i].IsUsing = false;
+						if (rollChara.X < 0 - OpenTaiko.Tx.Effects_Roll[rollChara.Type]!.szTextureSize.Width || rollChara.X > OpenTaiko.Skin.Resolution[0]) {
+							rollChara.Counter.Stop();
+							rollChara.IsUsing = false;
 						}
 
-						if (RollCharas[i].Y < 0 - OpenTaiko.Tx.Effects_Roll[RollCharas[i].Type].szTextureSize.Height || RollCharas[i].Y > OpenTaiko.Skin.Resolution[1]) {
-							RollCharas[i].Counter.Stop();
-							RollCharas[i].IsUsing = false;
+						if (rollChara.Y < 0 - OpenTaiko.Tx.Effects_Roll[rollChara.Type]!.szTextureSize.Height || rollChara.Y > OpenTaiko.Skin.Resolution[1]) {
+							rollChara.Counter.Stop();
+							rollChara.IsUsing = false;
 						}
 					}
 
@@ -124,27 +137,26 @@ internal class CActImplRollEffect : CActivity {
 	#region [ private ]
 	//-----------------
 	//private CTexture[] txChara;
-	private int nTex枚数;
 
 	[StructLayout(LayoutKind.Sequential)]
-	private struct ST連打キャラ {
+	private struct STRollChar {
 		public int nColor;
-		public bool b使用中;
-		public CCounter ct進行;
-		public int n前回のValue;
+		public bool bUse;
+		public CCounter ctProgress;
+		public int nPreviousValue;
 		public float fX;
 		public float fY;
-		public float fX開始点;
-		public float fY開始点;
-		public float f進行方向; //進行方向 0:左→右 1:左下→右上 2:右→左
-		public float fX加速度;
-		public float fY加速度;
+		public float fXStartPoint;
+		public float fYStartPoint;
+		public float fProgressDirection; //進行方向 0:左→右 1:左下→右上 2:右→左
+		public float fXAcceleration;
+		public float fYAcceleration;
 	}
-	private ST連打キャラ[] st連打キャラ = new ST連打キャラ[64];
+	private STRollChar[] stRollChar = new STRollChar[64];
 
 	[StructLayout(LayoutKind.Sequential)]
 	private struct RollChara {
-		public CCounter Counter;
+		public CCounter? Counter;
 		public int Type;
 		public bool IsUsing;
 		public float X;
@@ -154,17 +166,13 @@ internal class CActImplRollEffect : CActivity {
 		public int OldValue;
 	}
 
-	private RollChara[] RollCharas = new RollChara[128];
+	private const int ROLL_CHARA_COUNT = 128; // circular queue
+	private readonly RollChara[] RollCharas = new RollChara[ROLL_CHARA_COUNT];
+	private int RollCharaHead;
+	private int RollCharaTail;
 
 	private Random random = new Random();
 
-	private int[,] StartPoint;
-	private int[,] StartPoint_1P;
-	private int[,] StartPoint_2P;
-	private float[,] Speed;
-	private float[,] Speed_1P;
-	private float[,] Speed_2P;
-	private int CharaPtn;
 	//-----------------
 	#endregion
 }

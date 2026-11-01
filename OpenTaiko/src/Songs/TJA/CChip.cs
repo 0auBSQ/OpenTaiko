@@ -1,4 +1,5 @@
-﻿using FDK;
+﻿using System.Numerics;
+using FDK;
 using static OpenTaiko.CTja;
 
 namespace OpenTaiko;
@@ -8,18 +9,17 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public bool bHit; // note is hit/broken or roll end is reached
 	public bool bVisible = true;
 	public bool bHideBarLine = true;
-	public bool bProcessed = false; // roll-type-only: roll is hit once (roll-head-only) or chip time is reached
+	public bool bProcessed = false; // roll-type: roll is hit once (roll-head-only) or chip time is reached; barline shown (Jiro1)
 	public bool bShow;
-	public bool bShowRoll;
+	public bool canShowBody = true; // not hidden by cutoff rules
 	public bool bBranch = false;
 	public double dbChipSizeRatio = 1.0;
-	public double db実数値;
+	public double dbDoubleValue;
 	public double dbBPM;
 	public float fNow_Measure_s = 4.0f;//強制分岐のために追加.2020.04.21.akasoko26
 	public float fNow_Measure_m = 4.0f;//強制分岐のために追加.2020.04.21.akasoko26
 	public bool IsEndedBranching = false;//分岐が終わった時の連打譜面が非可視化になってしまうためフラグを追加.2020.04.21.akasoko26
-	public double dbSCROLL;
-	public double dbSCROLL_Y;
+	public Complex dbSCROLL;
 	public ECourse nBranch;
 	public int idxDefine = -1;
 	public int idxBranchSection;
@@ -57,35 +57,44 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public int VideoStartTimeMs;
 	public int nHorizontalChipDistance;
 	public int nVerticalChipDistance;
-	public int n整数値;
-	public int n文字数 = 16;
+	public int nIntValue; // a debug-only value of chip's final index within CTja.listChip[]
+	public int nTextCount = 16;
 
-	public int n整数値_内部番号;
+	public CBPM? bpmPoint;
+	public int nIntValue_InternalNumber; // either channel-specific integer argument or the index of the chip within the same channel
 	public int nOpacity = 255;
-	public int n発声位置;
+	public int nSoundPos;
 	public double nBranchCondition1_Professional;
 	public double nBranchCondition2_Master;
 	public (Exam.Type type, EBranchCondBig big) eBranchCondition;
-	public Exam.Range eBranchConditionRange;
+	public CTExprRange eBranchConditionRange;
 	public bool[] hasLevelHold = []; // [iBranch]
 
-	public double db発声位置;  // 発声時刻を格納していた変数のうちの１つをfloat型からdouble型に変更。(kairera0467)
-	public double fBMSCROLLTime;
-	private int _n発声時刻ms;
-	public int n発声時刻ms { get => _n発声時刻ms; set => db発声時刻ms = _n発声時刻ms = value; }
+	public double dbSoundPos;  // 発声時刻を格納していた変数のうちの１つをfloat型からdouble型に変更。(kairera0467)
+	public Complex fBMSCROLLTime;
+	public Complex dbHISPEED = 1.0; // #HISPEED in effect at the chip
+	private int _nSoundTimems;
+	public int nSoundTimems { get => _nSoundTimems; set => _dbSoundTimems = _nSoundTimems = value; }
 
 	private double _msBorder = double.PositiveInfinity; // Branch judge chip: Branch point time, Kusudama: Bonus border time
-	public double n分岐時刻ms { get => _msBorder; set => _msBorder = value; } // Branch judge chip
+	public double nBranchTimems { get => _msBorder; set => _msBorder = value; } // Branch judge chip
 	public double msKusudamaBonusBorder { get => _msBorder; set => _msBorder = value; } // Kusudama
 
-	public double db発声時刻ms;
+	private double _dbSoundTimems;
+	public double dbSoundTimems {
+		get => _dbSoundTimems;
+		set {
+			_dbSoundTimems = value;
+			_nSoundTimems = (int)Math.Clamp(Math.Floor(_dbSoundTimems), int.MinValue, int.MaxValue);
+		}
+	}
 
 	// for #SUDDEN
 	public bool bShowSudden;
 	public double msShowOffset = double.PositiveInfinity;
 	public double msMoveOffset = double.PositiveInfinity;
 	public bool IsSuddenHideRoll; // TJAP3's >0s (show) but =0s (move) hides roll "bug"
-	public double th16DBeatPreMove; // pre-calculated HBScroll beat distance when the note should move
+	public Complex th16DBeatPreMove; // pre-calculated HBScroll beat distance when the note should move
 
 	public int nLag;                // 2011.2.1 yyagi
 	public bool bGOGOTIME = false; //2018.03.11 k1airera0467 ゴーゴータイム内のチップであるか
@@ -94,6 +103,47 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public bool IsMissed = false;
 
 	public bool IsPartnerNote = false;
+	public bool IsGiantNote = false;
+
+	// #STOREC chip (channel 0xEA)
+	public string? StoreCKey;
+	public string? StoreCExpression;
+
+	// #STORET chip (channel 0xEB)
+	public string? StoreTKey;
+	public string? StoreTExpression;
+
+	// #ELEVATEC chip (channel 0xEC)
+	public string? ElevateCKey;
+
+	// #ELEVATET chip (channel 0xED)
+	public string? ElevateTKey;
+
+	// #SONGJUMP chip (channel 0xEE)
+	public string? SongJumpUniqueId;
+	public int SongJumpDifficulty;
+
+	// #COMMANDIF — gates any command chip on a local trigger
+	public string? CommandIfTrigger;
+
+	// #NOTEIF — a note (not a roll) takes no hit while its trigger is false, and is skipped (not missed) if the trigger is
+	// still false when its time arrives
+	public string? NoteIfTrigger;
+	// #NOTEIF ...,true: the note glows while it is visible; msNoteIfShown: the game time it first showed (-1 before)
+	public bool NoteIfGlow;
+	public double msNoteIfShown = -1;
+
+	// #GIANTNOTE — triggers activated on note hit result
+	public string? GiantNoteOkTrigger;
+	public string? GiantNoteGoodTrigger;
+	public bool GiantNoteLink;
+
+	// #BRANCHSTART lc: — local counter branch thresholds stored in existing nBranchCondition fields
+	public string? BranchLcKey;
+
+	// #BRANCHSTART lt — local trigger keys for expert/master branches
+	public string? BranchLt1Key;
+	public string? BranchLt2Key;
 
 	public CChip start; // defaults to this, never null
 	public CChip end; // defaults to this, never null
@@ -101,11 +151,11 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public CChip?[,]? multiLink; // [iPlayer, iBranch]
 
 	//EXTENDED COMMANDS
-	public Color4 borderColor;
+	public Color4 borderColor = null!;
 
-	public int fObjTimeMs;
-	public string strObjName;
-	public string strObjEaseType;
+	public double fObjTimeMs;
+	public string strObjName = null!;
+	public string strObjEaseType = null!;
 	public Easing.CalcType objCalcType;
 
 	public float fObjX;
@@ -116,10 +166,10 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 	public CSongObject? obj;
 
-	public string strTargetTxName;
-	public string strNewPath;
+	public string strTargetTxName = null!;
+	public string strNewPath = null!;
 
-	public string strConfigValue;
+	public string strConfigValue = null!;
 
 	public double dbAnimInterval;
 
@@ -129,7 +179,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	//
 
 
-	public bool b自動再生音チャンネルである {
+	public bool bAutoPlaySoundChannel {
 		get {
 			int num = this.nChannelNo;
 			if ((((num != 1) && ((0x61 > num) || (num > 0x69))) && ((0x70 > num) || (num > 0x79))) && ((0x80 > num) || (num > 0x89))) {
@@ -141,7 +191,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 
 
-	public bool b演奏終了後も再生が続くチップである; // #32248 2013.10.14 yyagi
+	public bool bPlayEndAfterPlaybackContinuesChip; // #32248 2013.10.14 yyagi
 	public CCounter? RollDelay; // 18.9.22 AioiLight Add 連打時に赤くなるやつのタイマー
 	public CCounter? RollInputTime; // 18.9.22 AioiLight Add  連打入力後、RollDelayが作動するまでのタイマー
 	public int RollEffectLevel; // 18.9.22 AioiLight Add 連打時に赤くなるやつの度合い
@@ -178,19 +228,19 @@ internal class CChip : IComparable<CChip>, ICloneable {
 		this.start = this;
 		this.end = this;
 	}
-	public void t初期化() {
+	public void tInitialize() {
 		this.bBranch = false;
 		this.nChannelNo = 0;
-		this.n整数値 = 0; //整数値をList上の番号として用いる。
-		this.n整数値_内部番号 = 0;
-		this.db実数値 = 0.0;
-		this.n発声位置 = 0;
-		this.db発声位置 = 0.0D;
-		this.n発声時刻ms = 0;
-		this.db発声時刻ms = 0.0D;
+		this.nIntValue = 0; //整数値をList上の番号として用いる。
+		this.nIntValue_InternalNumber = 0;
+		this.dbDoubleValue = 0.0;
+		this.nSoundPos = 0;
+		this.dbSoundPos = 0.0D;
+		this.dbSoundTimems = 0.0D;
 		this.fBMSCROLLTime = 0;
+		this.dbHISPEED = 1.0;
 		this.nLag = int.MinValue;
-		this.b演奏終了後も再生が続くチップである = false;
+		this.bPlayEndAfterPlaybackContinuesChip = false;
 		this.dbChipSizeRatio = 1.0;                             // Unused
 		this.bHit = false;
 		this.IsMissed = false;
@@ -203,7 +253,6 @@ internal class CChip : IComparable<CChip>, ICloneable {
 		this.fNow_Measure_s = 4.0f;
 		this.nScrollDirection = 0;
 		this.dbSCROLL = 1.0;
-		this.dbSCROLL_Y = 0.0f;
 	}
 
 	public static implicit operator NotesManager.ENoteType(CChip? chip) => NotesManager.GetNoteType(chip);
@@ -277,16 +326,16 @@ internal class CChip : IComparable<CChip>, ICloneable {
 				"??", "??", "??", "??", "??", "??", "??", "??",
 			};
 		return string.Format("CChip: 位置:{0:D4}.{1:D3}, 時刻{2:D6}, Ch:{3:X2}({4}), Pn:{5}({11})(内部{6}), Pd:{7}, Sz:{8}, BMScroll:{9}, Auto:{10}, コース:{11}",
-			this.n発声位置 / 384, this.n発声位置 % 384,
-			this.n発声時刻ms,
+			this.nSoundPos / 384, this.nSoundPos % 384,
+			this.nSoundTimems,
 			this.nChannelNo, chToStr[this.nChannelNo],
-			this.n整数値, this.n整数値_内部番号,
-			this.db実数値,
+			this.nIntValue, this.nIntValue_InternalNumber,
+			this.dbDoubleValue,
 			this.dbChipSizeRatio,
 			this.fBMSCROLLTime,
-			this.b自動再生音チャンネルである,
+			this.bAutoPlaySoundChannel,
 			this.nBranch,
-			CTja.tZZ(this.n整数値));
+			CTja.tZZ(this.nIntValue));
 	}
 	/// <summary>
 	/// チップの再生長を取得する。現状、WAVチップとBGAチップでのみ使用可能。
@@ -297,17 +346,17 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 		if (this.nChannelNo == 0x01)       // WAV
 		{
-			CTja.CWAV wc;
-			OpenTaiko.TJA.listWAV.TryGetValue(this.n整数値_内部番号, out wc);
+			CTja.CWAV? wc;
+			OpenTaiko.TJA!.listWAV.TryGetValue(this.nIntValue_InternalNumber, out wc);
 			if (wc == null) {
 				nDuration = 0;
 			} else {
-				nDuration = (wc.rSound[0] == null) ? 0 : wc.rSound[0].TotalPlayTime;
+				nDuration = (wc.rSound[0] == null) ? 0 : wc.rSound[0]!.TotalPlayTime;
 			}
 		} else if (this.nChannelNo == 0x54) // AVI
 		{
-			CVideoDecoder wc;
-			OpenTaiko.TJA.listVD.TryGetValue(this.n整数値_内部番号, out wc);
+			CVideoDecoder? wc;
+			OpenTaiko.TJA!.listVD!.TryGetValue(this.nIntValue_InternalNumber, out wc);
 			if (wc == null) {
 				nDuration = 0;
 			} else {
@@ -321,34 +370,29 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	#region [ IComparable 実装 ]
 	//-----------------
 
-	private static readonly byte[] n優先度 = new byte[] {
-			5, 5, 3, 7, 5, 5, 5, 5, 3, 5, 5, 5, 5, 5, 5, 5, //0x00
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x10
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x20
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x30
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x40
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x50 // preserve definition order of bar lines relative to notes
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x60
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x70
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x80
-			5, 5, 5, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 9, 9, //0x90
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0xA0
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0xB0
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0xC0
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 6, //0xD0 // required process order: notes -> 0xDE (branch animation) -> 0xDD (#SECTION)
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0xE0
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0xF0
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x100
-		};
+	// required process order: notes -> 0xDE (branch animation) -> 0xDD (#SECTION)
+	private static int nPriority(int channelNo) => channelNo switch {
+		0xDD => 7, // #SECTION
+		0xDE => 6, // branch animation
+		_ => 5,   // default
+	};
 
-	public static readonly int nChannelNoMostPrior = Array.IndexOf(n優先度, n優先度.Min());
-	public static readonly int nChannelNoLeastPrior = Array.IndexOf(n優先度, n優先度.Max());
+	public const int nChannelNoMostPrior = 0;
+	public const int nChannelNoLeastPrior = 0xDD; // #SECTION
 
-	public int CompareTo(CChip other) {
+	public static CChip GetSearchChipAtOrAfter(long msTjaTimeInt, bool allowAt) => new() {
+		_nSoundTimems = (int)Math.Clamp(msTjaTimeInt, int.MinValue, int.MaxValue),
+		_dbSoundTimems = allowAt ? double.NegativeInfinity : double.PositiveInfinity,
+		nChannelNo = allowAt ? nChannelNoMostPrior : nChannelNoLeastPrior,
+	};
+	public static CChip GetSearchChipAtOrAfter(long msTjaTimeInt) => GetSearchChipAtOrAfter(msTjaTimeInt, allowAt: true);
+	public static CChip GetSearchChipAfter(long msTjaTimeInt) => GetSearchChipAtOrAfter(msTjaTimeInt, allowAt: false);
+
+	public int CompareTo(CChip? other) {
 		//譜面解析メソッドV4では発声時刻msで比較する。
 		// 位置が同じなら優先度で比較。
-		return (this.n発声時刻ms, this.db発声時刻ms, n優先度[this.nChannelNo], this.idxDefine)
-			.CompareTo((other.n発声時刻ms, other.db発声時刻ms, n優先度[other.nChannelNo], other.idxDefine));
+		return (this.nSoundTimems, this.dbSoundTimems, nPriority(this.nChannelNo), this.idxDefine)
+			.CompareTo((other!.nSoundTimems,other.dbSoundTimems, nPriority(other.nChannelNo), other.idxDefine));
 	}
 	//-----------------
 	#endregion

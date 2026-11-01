@@ -5,5 +5,6 @@ public enum ESoundGroup {
 	Voice = 2,
 	SongPreview = 3,
 	SongPlayback = 4,
-	Unknown = 0
+	Unknown = 0,
+	Master = -1
 }

@@ -1,0 +1,46 @@
+{
+    "_note": "Secret Vault water layout, in 1920x1080 pixels. COLOR colours are [r, g, b, a] from 0 to 255; SetColor colours are [r, g, b] from 0 to 1; the name's gradient colours are #RRGGBB text markup; opacities 0 to 1.",
+    "screen": { "width": 1920, "height": 1080 },
+    "surface": {
+        "_note": "the rising surface line starts below_screen under the screen's bottom and ends at to_y, out of sight both times",
+        "below_screen": 60,
+        "to_y": -160
+    },
+    "edge": {
+        "_note": "the lower edge of the lifting water starts below_screen under the screen's bottom and ends at to_y, out of sight both times",
+        "below_screen": 130,
+        "to_y": -50
+    },
+    "flat": {
+        "_note": "the stand-in when the water effect cannot run: the water, and the line along its edge",
+        "water_color": [0.04, 0.24, 0.40],
+        "line_color": [0.86, 0.97, 1.0],
+        "line_width": 8
+    },
+    "name": {
+        "_note": "a name wider than max_width shrinks to it; a space is space_em font sizes; text_nudge moves the text inside its glyph box",
+        "font_size": 104,
+        "max_width": 1640,
+        "space_em": 0.32,
+        "text_nudge": -1,
+        "gradient_top_color": "#EFFCFF",
+        "gradient_bottom_color": "#58B9DA",
+        "fore_color": [255, 255, 255, 255],
+        "outline_color": [8, 38, 70, 255],
+        "shadow_color": [0, 12, 30, 255],
+        "clear_color": [0, 0, 0, 0],
+        "shadow_y": 8,
+        "shadow_opacity": 0.45
+    },
+    "bubbles": {
+        "_note": "a bubble rises from start_below under the screen, margin_x or more from the sides, at a scale from scale_min to scale_max; it is dropped above remove_y and shows only surface_margin below the surface and edge_margin above the lower edge",
+        "margin_x": 40,
+        "start_below": 30,
+        "scale_min": 0.3,
+        "scale_max": 1.0,
+        "opacity": 0.75,
+        "remove_y": -40,
+        "surface_margin": 40,
+        "edge_margin": 30
+    }
+}

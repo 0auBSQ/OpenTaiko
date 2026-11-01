@@ -1,0 +1,25 @@
+{
+    "_note": "Net debug panel layout, in 1920x1080 pixels. Colours are [r, g, b] from 0 to 255.",
+    "fonts": { "big": 40, "mid": 24, "small": 18 },
+    "text": {
+        "_note": "max_width wraps every line; the default colour is used when a line names none; the outline is the same for all.",
+        "max_width": 1860,
+        "default_color": [235, 235, 245],
+        "outline_color": [0, 0, 0]
+    },
+    "title": { "x": 40, "y": 24, "color": [255, 230, 140] },
+    "keys": { "x": 40, "y": 78, "color": [200, 210, 230] },
+    "status": { "x": 40, "y": 116, "color": [150, 230, 160] },
+    "room_code": {
+        "_note": "max_chars: the code is cut after this many characters, with an ellipsis.",
+        "x": 40, "y": 152, "color": [235, 200, 120], "max_chars": 70
+    },
+    "roster": { "x": 40, "y": 178, "color": [180, 200, 235] },
+    "log": {
+        "_note": "rows: how many event lines stay shown (the oldest go first); join_code_chars: the joined code is shown cut to this many characters.",
+        "title_x": 40, "title_y": 214, "title_color": [255, 255, 255],
+        "x": 48, "y": 246, "row_height": 26, "color": [220, 220, 230],
+        "rows": 18,
+        "join_code_chars": 14
+    }
+}

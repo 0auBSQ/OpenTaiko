@@ -6,101 +6,101 @@
 internal class CItemInteger : CItemBase {
 	// Properties
 
-	public int n現在の値;
-	public bool b値がフォーカスされている;
+	public int nCurrentValue;
+	public bool bValueFocus;
 
 
 	// Constructor
 
 	public CItemInteger() {
-		base.e種別 = CItemBase.E種別.整数;
-		this.n最小値 = 0;
-		this.n最大値 = 0;
-		this.n現在の値 = 0;
-		this.b値がフォーカスされている = false;
+		base.eType = CItemBase.EType.Int;
+		this.nMinValue = 0;
+		this.nMaxValue = 0;
+		this.nCurrentValue = 0;
+		this.bValueFocus = false;
 	}
-	public CItemInteger(string str項目名, int n最小値, int n最大値, int n初期値)
+	public CItemInteger(string strItemName, int nMinValue, int nMaxValue, int nInitialValue)
 		: this() {
-		this.t初期化(str項目名, n最小値, n最大値, n初期値);
+		this.tInitialize(strItemName, nMinValue, nMaxValue, nInitialValue);
 	}
-	public CItemInteger(string str項目名, int n最小値, int n最大値, int n初期値, string str説明文jp)
+	public CItemInteger(string strItemName, int nMinValue, int nMaxValue, int nInitialValue, string strDescriptionjp)
 		: this() {
-		this.t初期化(str項目名, n最小値, n最大値, n初期値, str説明文jp);
+		this.tInitialize(strItemName, nMinValue, nMaxValue, nInitialValue, strDescriptionjp);
 	}
-	public CItemInteger(string str項目名, int n最小値, int n最大値, int n初期値, string str説明文jp, string str説明文en)
+	public CItemInteger(string strItemName, int nMinValue, int nMaxValue, int nInitialValue, string strDescriptionjp, string strDescriptionen)
 		: this() {
-		this.t初期化(str項目名, n最小値, n最大値, n初期値, str説明文jp, str説明文en);
+		this.tInitialize(strItemName, nMinValue, nMaxValue, nInitialValue, strDescriptionjp, strDescriptionen);
 	}
 
 
-	public CItemInteger(string str項目名, int n最小値, int n最大値, int n初期値, CItemBase.EPanelType eパネル種別)
+	public CItemInteger(string strItemName, int nMinValue, int nMaxValue, int nInitialValue, CItemBase.EPanelType ePanelType)
 		: this() {
-		this.t初期化(str項目名, n最小値, n最大値, n初期値, eパネル種別);
+		this.tInitialize(strItemName, nMinValue, nMaxValue, nInitialValue, ePanelType);
 	}
-	public CItemInteger(string str項目名, int n最小値, int n最大値, int n初期値, CItemBase.EPanelType eパネル種別, string str説明文jp)
+	public CItemInteger(string strItemName, int nMinValue, int nMaxValue, int nInitialValue, CItemBase.EPanelType ePanelType, string strDescriptionjp)
 		: this() {
-		this.t初期化(str項目名, n最小値, n最大値, n初期値, eパネル種別, str説明文jp);
+		this.tInitialize(strItemName, nMinValue, nMaxValue, nInitialValue, ePanelType, strDescriptionjp);
 	}
-	public CItemInteger(string str項目名, int n最小値, int n最大値, int n初期値, CItemBase.EPanelType eパネル種別, string str説明文jp, string str説明文en)
+	public CItemInteger(string strItemName, int nMinValue, int nMaxValue, int nInitialValue, CItemBase.EPanelType ePanelType, string strDescriptionjp, string strDescriptionen)
 		: this() {
-		this.t初期化(str項目名, n最小値, n最大値, n初期値, eパネル種別, str説明文jp, str説明文en);
+		this.tInitialize(strItemName, nMinValue, nMaxValue, nInitialValue, ePanelType, strDescriptionjp, strDescriptionen);
 	}
 
 
 	// CItemBase 実装
 
-	public override void tEnter押下() {
-		this.b値がフォーカスされている = !this.b値がフォーカスされている;
+	public override void tEnterPressed() {
+		this.bValueFocus = !this.bValueFocus;
 	}
-	public override void t項目値を次へ移動() {
-		if (++this.n現在の値 > this.n最大値) {
-			this.n現在の値 = this.n最大値;
+	public override void tItemValueNextMove() {
+		if (++this.nCurrentValue > this.nMaxValue) {
+			this.nCurrentValue = this.nMaxValue;
 		}
 	}
-	public override void t項目値を前へ移動() {
-		if (--this.n現在の値 < this.n最小値) {
-			this.n現在の値 = this.n最小値;
+	public override void tItemValuePrevMove() {
+		if (--this.nCurrentValue < this.nMinValue) {
+			this.nCurrentValue = this.nMinValue;
 		}
 	}
-	public void t初期化(string str項目名, int n最小値, int n最大値, int n初期値) {
-		this.t初期化(str項目名, n最小値, n最大値, n初期値, CItemBase.EPanelType.Normal, "", "");
+	public void tInitialize(string strItemName, int nMinValue, int nMaxValue, int nInitialValue) {
+		this.tInitialize(strItemName, nMinValue, nMaxValue, nInitialValue, CItemBase.EPanelType.Normal, "", "");
 	}
-	public void t初期化(string str項目名, int n最小値, int n最大値, int n初期値, string str説明文jp) {
-		this.t初期化(str項目名, n最小値, n最大値, n初期値, CItemBase.EPanelType.Normal, str説明文jp, str説明文jp);
+	public void tInitialize(string strItemName, int nMinValue, int nMaxValue, int nInitialValue, string strDescriptionjp) {
+		this.tInitialize(strItemName, nMinValue, nMaxValue, nInitialValue, CItemBase.EPanelType.Normal, strDescriptionjp, strDescriptionjp);
 	}
-	public void t初期化(string str項目名, int n最小値, int n最大値, int n初期値, string str説明文jp, string str説明文en) {
-		this.t初期化(str項目名, n最小値, n最大値, n初期値, CItemBase.EPanelType.Normal, str説明文jp, str説明文en);
+	public void tInitialize(string strItemName, int nMinValue, int nMaxValue, int nInitialValue, string strDescriptionjp, string strDescriptionen) {
+		this.tInitialize(strItemName, nMinValue, nMaxValue, nInitialValue, CItemBase.EPanelType.Normal, strDescriptionjp, strDescriptionen);
 	}
 
 
-	public void t初期化(string str項目名, int n最小値, int n最大値, int n初期値, CItemBase.EPanelType eパネル種別) {
-		this.t初期化(str項目名, n最小値, n最大値, n初期値, eパネル種別, "", "");
+	public void tInitialize(string strItemName, int nMinValue, int nMaxValue, int nInitialValue, CItemBase.EPanelType ePanelType) {
+		this.tInitialize(strItemName, nMinValue, nMaxValue, nInitialValue, ePanelType, "", "");
 	}
-	public void t初期化(string str項目名, int n最小値, int n最大値, int n初期値, CItemBase.EPanelType eパネル種別, string str説明文jp) {
-		this.t初期化(str項目名, n最小値, n最大値, n初期値, eパネル種別, str説明文jp, str説明文jp);
+	public void tInitialize(string strItemName, int nMinValue, int nMaxValue, int nInitialValue, CItemBase.EPanelType ePanelType, string strDescriptionjp) {
+		this.tInitialize(strItemName, nMinValue, nMaxValue, nInitialValue, ePanelType, strDescriptionjp, strDescriptionjp);
 	}
-	public void t初期化(string str項目名, int n最小値, int n最大値, int n初期値, CItemBase.EPanelType eパネル種別, string str説明文jp, string str説明文en) {
-		base.t初期化(str項目名, eパネル種別, str説明文jp, str説明文en);
-		this.n最小値 = n最小値;
-		this.n最大値 = n最大値;
-		this.n現在の値 = n初期値;
-		this.b値がフォーカスされている = false;
+	public void tInitialize(string strItemName, int nMinValue, int nMaxValue, int nInitialValue, CItemBase.EPanelType ePanelType, string strDescriptionjp, string strDescriptionen) {
+		base.tInitialize(strItemName, ePanelType, strDescriptionjp, strDescriptionen);
+		this.nMinValue = nMinValue;
+		this.nMaxValue = nMaxValue;
+		this.nCurrentValue = nInitialValue;
+		this.bValueFocus = false;
 	}
-	public override object obj現在値() {
-		return this.n現在の値;
+	public override object objCurrentValue() {
+		return this.nCurrentValue;
 	}
 	public override int GetIndex() {
-		return this.n現在の値;
+		return this.nCurrentValue;
 	}
 	public override void SetIndex(int index) {
-		this.n現在の値 = index;
+		this.nCurrentValue = index;
 	}
 	// その他
 
 	#region [ private ]
 	//-----------------
-	private int n最小値;
-	private int n最大値;
+	private int nMinValue;
+	private int nMaxValue;
 	//-----------------
 	#endregion
 }

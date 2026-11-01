@@ -8,7 +8,7 @@ using RectangleF = System.Drawing.RectangleF;
 
 namespace FDK;
 
-public class CTexture : IDisposable {
+public partial class CTexture : IDisposable {   // streaming subsystem is in CTexture.Streaming.cs
 	/// <summary>
 	/// バッファの集まり
 	/// </summary>
@@ -65,6 +65,8 @@ public class CTexture : IDisposable {
 
 	private static int NoiseEffectID;
 	private static int TimeID;
+	private static int GradientMapSamplerID;
+	private static int GradientBlendID;
 
 	/// <summary>
 	/// 描画に使用する共通のバッファを作成
@@ -94,14 +96,16 @@ public class CTexture : IDisposable {
                 }"
 			,
 			@"#version 100
-                precision mediump float;
+                precision highp float;
 
                 uniform vec4 color;
                 uniform sampler2D texture1;
+                uniform sampler2D gradientMap;
                 uniform vec4 textureRect;
                 uniform vec2 scale;
                 uniform int noteMode;
 				uniform int useNoiseEffect;
+				uniform float gradientBlend;
 				uniform float time;
 
                 varying vec2 texcoord;
@@ -125,7 +129,16 @@ public class CTexture : IDisposable {
                         rect = vec2(textureRect.xy + (texcoord * textureRect.zw));
                     }
 
-					vec4 texColor = texture2D(texture1, rect) * color;
+					vec4 rawColor = texture2D(texture1, rect);
+
+					// texels hold straight colour (not multiplied by their alpha)
+					if (gradientBlend > 0.0) {
+						float luma = dot(rawColor.rgb, vec3(0.299, 0.587, 0.114));
+						vec4 mapped = texture2D(gradientMap, vec2(luma, 0.5));
+						rawColor = vec4(mix(rawColor.rgb, mapped.rgb, gradientBlend), rawColor.a * mapped.a);
+					}
+
+					vec4 texColor = rawColor * color;
 
 					if (useNoiseEffect == 1) {
 						float n = randomGrayscale(rect);
@@ -133,6 +146,9 @@ public class CTexture : IDisposable {
 						// texColor.a = 1.0;
 					}
 
+					// the output colour is multiplied by its alpha: the blend modes expect it. A tint above 1 saturates
+					// first, so a texture tinted far above 1 still draws white at its opacity
+					texColor.rgb = min(texColor.rgb, vec3(1.0)) * texColor.a;
                     gl_FragColor = texColor;
                 }"
 		);
@@ -147,6 +163,14 @@ public class CTexture : IDisposable {
 		NoteModeID = Game.Gl.GetUniformLocation(ShaderProgram, "noteMode"); //テクスチャの切り抜きの座標と大きさ
 		NoiseEffectID = Game.Gl.GetUniformLocation(ShaderProgram, "useNoiseEffect");
 		TimeID = Game.Gl.GetUniformLocation(ShaderProgram, "time");
+		GradientMapSamplerID = Game.Gl.GetUniformLocation(ShaderProgram, "gradientMap");
+		GradientBlendID = Game.Gl.GetUniformLocation(ShaderProgram, "gradientBlend");
+
+		// Bind sampler uniforms to fixed texture units (persists for the program's lifetime).
+		// texture1 stays on unit 0 (the default); gradientMap uses unit 1.
+		Game.Gl.UseProgram(ShaderProgram);
+		Game.Gl.Uniform1(Game.Gl.GetUniformLocation(ShaderProgram, "texture1"), 0);
+		Game.Gl.Uniform1(GradientMapSamplerID, 1);
 
 		//------
 
@@ -252,34 +276,49 @@ public class CTexture : IDisposable {
 
 	// Properties
 
+	/// <summary>
+	/// When non-zero, applied as the gradient map for every draw call until reset to 0.
+	/// Takes priority over per-instance <see cref="SetGradientMap"/>.
+	/// </summary>
+	public static uint ActiveGradientMapId = 0;
+	public static float ActiveGradientMapBlend = 1.0f;
+
+	private uint _gradientMapTextureId = 0;
+	private float _gradientMapBlend = 1.0f;
+	/// <summary>Assigns a permanent gradient map to this texture instance.</summary>
+	public void SetGradientMap(uint textureId, float blend = 1.0f) { _gradientMapTextureId = textureId; _gradientMapBlend = blend; }
+	/// <summary>Removes the per-instance gradient map.</summary>
+	public void ClearGradientMap() { _gradientMapTextureId = 0; _gradientMapBlend = 1.0f; }
+
 	public bool bUseNoiseEffect {
 		get;
 		set;
 	}
 
-	public bool b加算合成 {
+	public BlendType blendType = BlendType.Normal;
+	public bool bAddBlend {
 		get;
 		set;
 	}
-	public bool b乗算合成 {
+	public bool bMultiplyBlend {
 		get;
 		set;
 	}
-	public bool b減算合成 {
+	public bool bSubtractBlend {
 		get;
 		set;
 	}
-	public bool bスクリーン合成 {
+	public bool bScreenBlend {
 		get;
 		set;
 	}
-	public float fZ軸中心回転 {
+	public float fZAxisCenterRotate {
 		get;
 		set;
 	}
 	public float fZRotation {
-		get => fZ軸中心回転;
-		set { fZ軸中心回転 = value; }
+		get => fZAxisCenterRotate;
+		set { fZAxisCenterRotate = value; }
 	}
 	public int Opacity {
 		get {
@@ -295,68 +334,303 @@ public class CTexture : IDisposable {
 			}
 		}
 	}
+	// A texture queued for async upload has no pixels yet, but its size must never read as 0: the decode worker
+	// publishes it, or else the first size read takes it from the file header (tResolvePendingSize). Any size set
+	// (the upload, a resize) replaces it; the lock keeps a late header read from overwriting the upload's size.
+	private volatile bool _sizePending;
+	private readonly object _sizeLock = new();
+	private Size _szTextureSize, _szImageSize;
 	public Size szTextureSize {
-		get;
-		private set;
+		get { if (_sizePending) tResolvePendingSize(); return _szTextureSize; }
+		private set { lock (_sizeLock) { _szTextureSize = value; _sizePending = false; } }
 	}
-	public Size sz画像サイズ {
-		get;
-		protected set;
+	public Size szImageSize {
+		get { if (_sizePending) tResolvePendingSize(); return _szImageSize; }
+		protected set { lock (_sizeLock) { _szImageSize = value; _sizePending = false; } }
 	}
+
+	// A queued texture whose pixels are still on their way: it draws nothing until they land.
+	private volatile bool _uploadPending;
+	private Action? _onUploaded;
+	public bool UploadPending => _uploadPending;
+	public bool IsDisposed => bDisposeCompleteDone;
+
+	/// <summary>Runs the action once the pending upload lands, or at once when nothing is pending. Render thread.</summary>
+	public void WhenUploaded(Action action) {
+		if (_uploadPending) _onUploaded += action;
+		else action();
+	}
+
+	// UploadOne takes these before uploading (a failed upload disposes the texture, and they must still run),
+	// then ends the pending state and runs them. Render thread.
+	internal Action? tTakeUploadCallbacks() {
+		var done = _onUploaded;
+		_onUploaded = null;
+		return done;
+	}
+	internal void tEndUpload() => _uploadPending = false;
+	internal bool tSizeKnown => !_sizePending;
+
+	// the GL texture's own size (smaller than the logical size under render-scale or the GL size limit)
+	private int _glW, _glH;
 	public Vector3D<float> vcScaleRatio;
 
 	// 画面が変わるたび以下のプロパティを設定し治すこと。
 
-	public static Size sz論理画面 = Size.Empty;
-	public static Size sz物理画面 = Size.Empty;
-	public static Rectangle rc物理画面描画領域 = Rectangle.Empty;
+	public static Size szLogicLogicScreen = Size.Empty;
+	public static Size szPhysicalScreen = Size.Empty;
+	public static Rectangle rcPhysicalScreenDrawRegion = Rectangle.Empty;
 	/// <summary>
 	/// <para>論理画面を1とする場合の物理画面の倍率。</para>
 	/// <para>論理値×画面比率＝物理値。</para>
 	/// </summary>
-	public static float f画面比率 = 1.0f;
+	public static float fScreenRatio = 1.0f;
+
+	private TextureWrapMode _wrapMode = TextureWrapMode.ClampToEdge;
+	public TextureWrapMode WrapMode {
+		get { return _wrapMode; }
+		set { SetTextureWrapMode(value); }
+	}
 
 	public uint Pointer { get; internal set; }
+
+	// Cache properties
+	public readonly Dictionary<System.Collections.IDictionary, object> CacheKeys = []; // [cacheDict] = key
 
 	// Constructor
 
 	public CTexture() {
-		this.sz画像サイズ = new Size(0, 0);
+		this.szImageSize = new Size(0, 0);
 		this.szTextureSize = new Size(0, 0);
 		this._opacity = 0xff;
-		this.b加算合成 = false;
-		this.fZ軸中心回転 = 0f;
+		this.bAddBlend = false;
+		this.fZAxisCenterRotate = 0f;
 		this.vcScaleRatio = new Vector3D<float>(1f, 1f, 1f);
 		//			this._txData = null;
 	}
 
 	public CTexture(CTexture tx) {
-		this.sz画像サイズ = tx.sz画像サイズ;
+		this.szImageSize = tx.szImageSize;
 		this.szTextureSize = tx.szTextureSize;
 		this._opacity = tx._opacity;
-		this.b加算合成 = tx.b加算合成;
-		this.fZ軸中心回転 = tx.fZ軸中心回転;
+		this.bAddBlend = tx.bAddBlend;
+		this.fZAxisCenterRotate = tx.fZAxisCenterRotate;
 		this.vcScaleRatio = tx.vcScaleRatio;
 		Pointer = tx.Pointer;
 		//			this._txData = null;
 	}
 
-	public void UpdateTexture(CTexture texture, int n幅, int n高さ) {
+	public void UpdateTexture(CTexture texture, int width, int height) {
+		if (texture.bDisposeCompleteDone)
+			return;
 		Pointer = texture.Pointer;
-		this.sz画像サイズ = new Size(n幅, n高さ);
-		this.szTextureSize = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
-		this.rc全画像 = new Rectangle(0, 0, this.sz画像サイズ.Width, this.sz画像サイズ.Height);
+		_glW = texture._glW;   // the shared GL texture's own size
+		_glH = texture._glH;
+		this.szImageSize = new Size(width, height);
+		this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
+		this.rcFullImage = new Rectangle(0, 0, this.szImageSize.Width, this.szImageSize.Height);
+
+		this.bDisposeCompleteDone = texture.bDisposeCompleteDone;
 	}
 
 	public void UpdateTexture(IntPtr texture, int width, int height, PixelFormat rgbaType) {
+		if (texture == 0)
+			return;
 		unsafe {
 			Game.Gl.DeleteTexture(Pointer); //解放
 			void* data = texture.ToPointer();
 			Pointer = GenTexture(data, (uint)width, (uint)height, rgbaType);
 		}
-		this.sz画像サイズ = new Size(width, height);
-		this.szTextureSize = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
-		this.rc全画像 = new Rectangle(0, 0, this.sz画像サイズ.Width, this.sz画像サイズ.Height);
+		this.szImageSize = new Size(width, height);
+		this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
+		this.rcFullImage = new Rectangle(0, 0, this.szImageSize.Width, this.szImageSize.Height);
+	}
+
+	private int _pixBufW = 0;
+	private int _pixBufH = 0;
+
+	// Render-scale: a surface whose GL pixel buffer is smaller than its LOGICAL display size (a 3D scene rendered at
+	// reduced internal resolution). When set, the texture lays out + draws at the logical size while sampling the
+	// smaller GL texture (UVs are fractions of rcFullImage, so this is transparent). Re-asserted after pixel-buffer
+	// reallocations so a CPU-rasterised canvas keeps presenting at full size.
+	private int _logicalW = 0, _logicalH = 0;
+	public void SetLogicalSize(int w, int h) {
+		_logicalW = w; _logicalH = h;
+		if (w > 0 && h > 0) {
+			this.szImageSize = new Size(w, h);
+			this.rcFullImage = new Rectangle(0, 0, w, h);
+			this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
+		}
+	}
+
+	/// <summary>
+	/// Creates or updates this texture from a raw RGBA pixel buffer
+	/// (length = width * height * 4, top-left origin).
+	/// Uses glTexSubImage2D when the size is unchanged (cheap per-frame upload),
+	/// otherwise (re)allocates the GL texture. Safe to call off the render thread
+	/// (the upload is then deferred to the main thread with a copy of the data).
+	/// </summary>
+	public void UpdatePixelBuffer(byte[] data, int width, int height) {
+		if (data == null || width <= 0 || height <= 0)
+			return;
+
+		void DoUpload(byte[] buf) {
+			unsafe {
+				fixed (byte* p = buf) {
+					if (Pointer == 0 || width != _pixBufW || height != _pixBufH) {
+						if (Pointer != 0)
+							Game.Gl.DeleteTexture(Pointer);
+						Pointer = GenTexture(p, (uint)width, (uint)height, PixelFormat.Rgba);
+						_pixBufW = width;
+						_pixBufH = height;
+						this.szImageSize = new Size(width, height);
+						this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
+						this.rcFullImage = new Rectangle(0, 0, width, height);
+						if (_logicalW > 0 && _logicalH > 0) {   // render-scale: keep the logical display size despite the smaller buffer
+							this.szImageSize = new Size(_logicalW, _logicalH);
+							this.rcFullImage = new Rectangle(0, 0, _logicalW, _logicalH);
+							this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
+						}
+					} else {
+						Game.Gl.BindTexture(TextureTarget.Texture2D, Pointer);
+						Game.Gl.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0,
+							(uint)width, (uint)height, PixelFormat.Rgba, GLEnum.UnsignedByte, p);
+						Game.Gl.BindTexture(TextureTarget.Texture2D, 0);
+					}
+				}
+			}
+		}
+
+		if (Thread.CurrentThread.ManagedThreadId == Game.MainThreadID) {
+			DoUpload(data);
+		} else {
+			var copy = (byte[])data.Clone();
+			Game.AsyncActions.Enqueue(() => DoUpload(copy));
+		}
+	}
+
+	private byte[]? _regionBuf = null;
+
+	/// <summary>
+	/// Updates only a sub-rectangle of the texture from the full RGBA buffer
+	/// <paramref name="data"/> (size <paramref name="fullW"/>×<paramref name="fullH"/>).
+	/// Far cheaper than re-uploading the whole texture when only a small area changed
+	/// (e.g. a brush stroke). Falls back to a full (re)create when needed.
+	/// </summary>
+	public void UpdatePixelBufferRegion(byte[] data, int fullW, int fullH,
+		int rx, int ry, int rw, int rh) {
+		if (data == null || fullW <= 0 || fullH <= 0) return;
+		// First upload or a resize → must allocate the whole texture.
+		if (Pointer == 0 || fullW != _pixBufW || fullH != _pixBufH) {
+			UpdatePixelBuffer(data, fullW, fullH);
+			return;
+		}
+		// clamp the region to the texture
+		if (rx < 0) { rw += rx; rx = 0; }
+		if (ry < 0) { rh += ry; ry = 0; }
+		if (rx + rw > fullW) rw = fullW - rx;
+		if (ry + rh > fullH) rh = fullH - ry;
+		if (rw <= 0 || rh <= 0) return;
+		// whole-texture update → upload directly without the row-copy
+		if (rx == 0 && ry == 0 && rw == fullW && rh == fullH) {
+			UpdatePixelBuffer(data, fullW, fullH);
+			return;
+		}
+
+		void DoUpload(byte[] buf) {
+			int rowBytes = rw * 4;
+			int need = rowBytes * rh;
+			if (_regionBuf == null || _regionBuf.Length < need)
+				_regionBuf = new byte[need];
+			// pack the (possibly non-contiguous) sub-rect rows into a tight buffer
+			for (int row = 0; row < rh; row++)
+				System.Buffer.BlockCopy(buf, ((ry + row) * fullW + rx) * 4, _regionBuf, row * rowBytes, rowBytes);
+			unsafe {
+				fixed (byte* p = _regionBuf) {
+					Game.Gl.BindTexture(TextureTarget.Texture2D, Pointer);
+					Game.Gl.TexSubImage2D(TextureTarget.Texture2D, 0, rx, ry,
+						(uint)rw, (uint)rh, PixelFormat.Rgba, GLEnum.UnsignedByte, p);
+					Game.Gl.BindTexture(TextureTarget.Texture2D, 0);
+				}
+			}
+		}
+
+		if (Thread.CurrentThread.ManagedThreadId == Game.MainThreadID) {
+			DoUpload(data);
+		} else {
+			var copy = (byte[])data.Clone();
+			Game.AsyncActions.Enqueue(() => DoUpload(copy));
+		}
+	}
+
+	/// <summary>Upload a tightly packed straight-alpha RGBA block (rw*rh*4 bytes) into the region at (rx, ry) of an
+	/// already allocated pixel-buffer texture (see UpdatePixelBuffer). Glyph atlases stamp glyphs with this: one
+	/// TexSubImage2D, no page-sized copy. Main thread only; a no-op until the texture is allocated.</summary>
+	public void UpdateSubRegionTight(byte[] tight, int rx, int ry, int rw, int rh) {
+		if (tight == null || Pointer == 0 || rw <= 0 || rh <= 0) return;
+		if (rx < 0 || ry < 0 || rx + rw > _pixBufW || ry + rh > _pixBufH) return;
+		if (tight.Length < rw * rh * 4) return;
+		unsafe {
+			fixed (byte* p = tight) {
+				Game.Gl.BindTexture(TextureTarget.Texture2D, Pointer);
+				Game.Gl.TexSubImage2D(TextureTarget.Texture2D, 0, rx, ry,
+					(uint)rw, (uint)rh, PixelFormat.Rgba, GLEnum.UnsignedByte, p);
+				Game.Gl.BindTexture(TextureTarget.Texture2D, 0);
+			}
+		}
+	}
+
+	/// <summary>
+	/// Reads this texture's pixels back from the GPU as a top-left-origin RGBA byte buffer
+	/// (length = Width*Height*4). Attaches the texture to a temporary framebuffer and uses
+	/// glReadPixels. Returns null if the texture isn't allocated. Main-thread only (GL calls);
+	/// note this forces a GPU sync, so use it for one-off operations, not per frame.
+	/// </summary>
+	public byte[]? ReadPixelsRGBA(out int width, out int height) {
+		tRealizeDeferred();   // a never-drawn lazy texture still has pixels to give
+		width = this.szImageSize.Width;
+		height = this.szImageSize.Height;
+		if (Pointer == 0 || width <= 0 || height <= 0) return null;
+		// read what the GL texture really holds, then bring it to the logical size if it is stored smaller
+		int gw = _glW > 0 ? _glW : width, gh = _glH > 0 ? _glH : height;
+		if (gw != width || gh != height) {
+			byte[]? small = tReadBack(gw, gh);
+			if (small == null) return null;
+			var srcInfo = new SKImageInfo(gw, gh, SKColorType.Rgba8888, SKAlphaType.Unpremul);
+			using var src = new SKBitmap();
+			unsafe {
+				fixed (byte* p = small) {
+					if (!src.InstallPixels(srcInfo, (IntPtr)p, srcInfo.RowBytes)) return null;
+					using var big = src.Resize(new SKImageInfo(width, height, SKColorType.Rgba8888, SKAlphaType.Unpremul), SKFilterQuality.Medium);
+					if (big == null) return null;
+					return big.Bytes;
+				}
+			}
+		}
+		return tReadBack(width, height);
+	}
+
+	// glReadPixels of the whole GL texture (width x height must be its stored size)
+	private byte[]? tReadBack(int width, int height) {
+		byte[] px = new byte[width * height * 4];
+		// remember the currently-bound framebuffer so we restore the engine's render target
+		uint prevFbo = (uint)Game.Gl.GetInteger(GLEnum.FramebufferBinding);
+		uint fbo = Game.Gl.GenFramebuffer();
+		Game.Gl.BindFramebuffer(FramebufferTarget.Framebuffer, fbo);
+		Game.Gl.FramebufferTexture2D(FramebufferTarget.Framebuffer,
+			FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, Pointer, 0);
+		bool ok = Game.Gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer) == GLEnum.FramebufferComplete;
+		if (ok) {
+			unsafe {
+				fixed (byte* p = px) {
+					Game.Gl.ReadPixels(0, 0, (uint)width, (uint)height,
+						PixelFormat.Rgba, GLEnum.UnsignedByte, p);
+				}
+			}
+		}
+		Game.Gl.BindFramebuffer(FramebufferTarget.Framebuffer, prevFbo);
+		Game.Gl.DeleteFramebuffer(fbo);
+		return ok ? px : null;
 	}
 
 	/// <summary>
@@ -380,15 +654,15 @@ public class CTexture : IDisposable {
 		}
 	}
 
-	public CTexture(int n幅, int n高さ)
+	public CTexture(int nWidth, int nHeight)
 		: this() {
 		try {
-			this.sz画像サイズ = new Size(n幅, n高さ);
-			this.szTextureSize = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
-			this.rc全画像 = new Rectangle(0, 0, this.sz画像サイズ.Width, this.sz画像サイズ.Height);
+			this.szImageSize = new Size(nWidth, nHeight);
+			this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
+			this.rcFullImage = new Rectangle(0, 0, this.szImageSize.Width, this.szImageSize.Height);
 		} catch (Exception ex) {
 			this.Dispose();
-			throw new CTextureCreateFailedException(string.Format("テクスチャの生成に失敗しました。\n({0}x{1}, {2})", n幅, n高さ), innerException: ex);
+			throw new CTextureCreateFailedException(string.Format("テクスチャの生成に失敗しました。\n({0}x{1}, {2})", nWidth, nHeight), innerException: ex);
 		}
 	}
 
@@ -405,32 +679,261 @@ public class CTexture : IDisposable {
 	/// <param name="b黒を透過する">画像の黒（0xFFFFFFFF）を透過させるなら true。</param>
 	/// <param name="pool">テクスチャの管理方法。</param>
 	/// <exception cref="CTextureCreateFailedException">テクスチャの作成に失敗しました。</exception>
-	public CTexture(string strファイル名, bool b黒を透過する)
+	public CTexture(string strFileName, bool bBlackTransparent)
 		: this() {
-		MakeTexture(strファイル名, b黒を透過する);
+		MakeTexture(strFileName, bBlackTransparent);
 	}
-	public void MakeTexture(string strファイル名, bool b黒を透過する) {
-		if (!File.Exists(strファイル名))     // #27122 2012.1.13 from: ImageInformation では FileNotFound 例外は返ってこないので、ここで自分でチェックする。わかりやすいログのために。
-			throw new FileNotFoundException(string.Format("ファイルが存在しません。\n[{0}]", strファイル名));
-
-		SKBitmap bitmap = SKBitmap.Decode(strファイル名);
-		MakeTexture(bitmap, b黒を透過する);
-		bitmap.Dispose();
-	}
-
-	public CTexture(SKBitmap bitmap, bool b黒を透過する)
+	public CTexture(string strFileName, bool bBlackTransparent, int maxDimension)
 		: this() {
-		MakeTexture(bitmap, b黒を透過する);
+		MakeTexture(strFileName, bBlackTransparent, maxDimension);
+	}
+	public void MakeTexture(string strFileName, bool bBlackTransparent) => MakeTexture(strFileName, bBlackTransparent, 0);
+
+	// maxDimension > 0 clamps the DECODED size: the bitmap is downscaled at load time so its long side is at
+	// most maxDimension px. Use for oversized art drawn small (song jackets: a 3000x3000 source decodes to
+	// 34MB but displays at ~400px). Width/Height then report the clamped size — callers that scale to a
+	// target box (w/tex.Width) are unaffected.
+	public void MakeTexture(string strFileName, bool bBlackTransparent, int maxDimension) {
+		// Remember the source so the LRU cache can re-decode this texture at the same clamp after eviction.
+		this._sourcePath = strFileName;
+		this._sourceBlackTransparent = bBlackTransparent;
+		this._sourceMaxDimension = maxDimension;
+		// Async fast path: queue the decode + GL upload instead of doing GL here (see CTexture.Streaming.cs).
+		// Triggered by a runtime async load (AsyncLoad) or a load phase (StreamingLoad); SyncForce overrides it
+		// (pixels needed now). The GL upload always lands on the render thread (Game.AsyncActions), so this is
+		// REQUIRED off the render thread (e.g. the off-thread chart parse's #ADDOBJECT textures) — doing GL there
+		// is unreliable. Background decode workers call the MakeTexture(SKBitmap) overload, never this. The texture
+		// stays blank (t2DDraw no-ops) until uploaded.
+		if (!SyncForce && (StreamingLoad || AsyncLoad)
+			&& tQueueAsyncTexture(strFileName, bBlackTransparent, maxDimension))
+			return;
+
+		if (!FileExistsCached(strFileName))     // #27122 2012.1.13 from: ImageInformation では FileNotFound 例外は返ってこないので、ここで自分でチェックする。わかりやすいログのために。
+			throw new FileNotFoundException(string.Format("ファイルが存在しません。\n[{0}]", strFileName));
+
+		// Read only the header dimensions now and defer the pixel decode + GL upload to first draw,
+		// so undrawn textures never reach GPU memory.
+		// Skip when maxDimension clamps the size: the header is full-size and would misreport Width/Height.
+		// Skip under SyncForce: the caller needs the PIXELS now (e.g. RegisterSpriteFromTexture reads them
+		// back immediately) — deferring here left Pointer==0 and every billboard sprite registered empty.
+		try {
+			using var fs = File.OpenRead(strFileName);   // a stream, not a path string: long Windows paths
+			using var codec = SKCodec.Create(fs);
+			if (!SyncForce && maxDimension == 0 && codec != null && codec.Info.Width > 0 && codec.Info.Height > 0) {
+				this.szImageSize = new Size(codec.Info.Width, codec.Info.Height);
+				this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
+				// t2DDraw reads rcFullImage before the deferred upload sets it, so set it here too.
+				this.rcFullImage = new Rectangle(0, 0, this.szImageSize.Width, this.szImageSize.Height);
+				this._deferred = true;
+				return;
+			}
+		} catch { /* fall through to eager decode */ }
+
+		// Decode straight into the zero-copy upload format (BGRA8888 unpremul) — a plain SKBitmap.Decode
+		// yields premul, forcing a full-size conversion pass per image at upload time. A failed decode
+		// falls through to MakeTexture's null-guard (blank 10x10), as before.
+		SKBitmap? bitmap = tClampToMaxDimension(tDecodeForUpload(strFileName), maxDimension);
+		MakeTexture(bitmap, bBlackTransparent);
+		bitmap?.Dispose();
+	}
+
+	// Downscale so the long side is at most maxDimension px (0 = no clamp). Keeps the zero-copy upload
+	// format; disposes the original when a resize happens.
+	internal static SKBitmap? tClampToMaxDimension(SKBitmap? bmp, int maxDimension) {
+		if (bmp == null || maxDimension <= 0) return bmp;
+		int longSide = Math.Max(bmp.Width, bmp.Height);
+		if (longSide <= maxDimension) return bmp;
+		double f = (double)maxDimension / longSide;
+		int dw = Math.Max(1, (int)Math.Round(bmp.Width * f));
+		int dh = Math.Max(1, (int)Math.Round(bmp.Height * f));
+		var resized = bmp.Resize(new SKImageInfo(dw, dh, SKColorType.Bgra8888, SKAlphaType.Unpremul), SKFilterQuality.Medium);
+		if (resized == null) return bmp;
+		bmp.Dispose();
+		return resized;
+	}
+
+	// The render-scale shrink MakeTexture(SKBitmap) does, done ahead by a decode worker so the render thread only
+	// uploads. Keeps the bitmap's own pixel format (straight alpha stays straight: no conversion at upload).
+	internal static SKBitmap? tApplyRenderScale(SKBitmap? bmp) {
+		float rs = Game.RenderScale;
+		if (bmp == null || rs >= 0.999f) return bmp;
+		int dw = Math.Max(1, (int)Math.Round(bmp.Width * rs));
+		int dh = Math.Max(1, (int)Math.Round(bmp.Height * rs));
+		if (dw >= bmp.Width && dh >= bmp.Height) return bmp;
+		var resized = bmp.Resize(bmp.Info.WithSize(dw, dh), SKFilterQuality.Medium);
+		if (resized == null) return bmp;
+		bmp.Dispose();
+		return resized;
+	}
+
+	// The size of a queued texture before its upload: read the file header (cheap, no pixel decode) and apply the
+	// maxDimension shrink the upload applies, so the size does not change when the pixels arrive. An unreadable
+	// file gets the 10x10 placeholder size a failed upload ends with.
+	private void tResolvePendingSize() {
+		int w = 0, h = 0;
+		if (!bDisposeCompleteDone && _sourcePath != null) {
+			try {
+				// opened as the decode opens it: a path string fails on long Windows paths, a stream does not
+				using var fs = File.OpenRead(_sourcePath);
+				using var codec = SKCodec.Create(fs);
+				if (codec != null) { w = codec.Info.Width; h = codec.Info.Height; }
+			} catch { }
+		}
+		if (w <= 0 || h <= 0) {
+			if (!bDisposeCompleteDone)
+				System.Diagnostics.Trace.TraceWarning($"Texture: cannot read the size of '{_sourcePath}', using a 10x10 placeholder.");
+			w = 10; h = 10;
+		} else if (_sourceMaxDimension > 0 && Math.Max(w, h) > _sourceMaxDimension) {
+			double f = (double)_sourceMaxDimension / Math.Max(w, h);   // the rounding tClampToMaxDimension uses
+			w = Math.Max(1, (int)Math.Round(w * f));
+			h = Math.Max(1, (int)Math.Round(h * f));
+		}
+		tPublishPendingSize(w, h);
+	}
+
+	// set the size of a queued texture unless the upload, a resize or Dispose got there first. Any thread.
+	internal void tPublishPendingSize(int w, int h) {
+		lock (_sizeLock) {
+			if (!_sizePending) return;
+			_szImageSize = new Size(w, h);
+			_szTextureSize = this.tGetOptimalTextureSize(_szImageSize);
+			this.rcFullImage = new Rectangle(0, 0, w, h);
+			_sizePending = false;
+		}
+	}
+
+	/// <summary>The image as RGBA bytes at its logical size. A file-backed texture is decoded from its file (so it
+	/// works before the upload and whatever the render scale); anything else is read back from the GPU.</summary>
+	public byte[]? ReadImageRGBA(out int width, out int height) {
+		if (_sourcePath != null && !bDisposeCompleteDone) {
+			try {
+				using SKBitmap? bmp = tClampToMaxDimension(tDecodeForUpload(_sourcePath), _sourceMaxDimension);
+				if (bmp != null && bmp.Width > 0 && bmp.Height > 0) {
+					var info = new SKImageInfo(bmp.Width, bmp.Height, SKColorType.Rgba8888, SKAlphaType.Unpremul);
+					byte[] px = new byte[info.BytesSize];
+					bool ok;
+					using (var pm = bmp.PeekPixels()) {
+						unsafe {
+							fixed (byte* p = px) ok = pm != null && pm.ReadPixels(info, (IntPtr)p, info.RowBytes);
+						}
+					}
+					if (ok) {
+						width = bmp.Width;
+						height = bmp.Height;
+						return px;
+					}
+				}
+			} catch { /* fall back to the GPU copy */ }
+		}
+		return ReadPixelsRGBA(out width, out height);
+	}
+
+	// ── Streamed (deferred) texture loading ───────────────────────────────────────────────────────
+	// Implemented in CTexture.Streaming.cs (StreamingLoad / BeginStreaming / StartStreamDecode / PumpUploads
+	// / EndStreaming / CancelStreaming / StreamFraction / StreamComplete + tQueueStreamedTexture). The
+	// streaming branch at the top of MakeTexture(string) above calls tQueueStreamedTexture.
+
+	public CTexture(SKBitmap bitmap, bool bBlackTransparent)
+		: this() {
+		MakeTexture(bitmap, bBlackTransparent);
+	}
+
+	// iOS GPUs can report a smaller GL_MAX_TEXTURE_SIZE than desktop; uploads larger than it render black.
+	// Cached once (0 = not yet queried) and used by MakeTexture(SKBitmap) to downscale oversized bitmaps.
+	private static int _maxTextureSize = 0;
+
+	// iOS texture memory cache: LRU eviction on top of the streaming model.
+	// Live GPU texture memory: bytes uploaded via GenTexture, freed on Dispose or eviction. Under memory
+	// pressure the least-recently-drawn file-backed textures free their GL handle and re-decode on next draw.
+	public static long s_gpuTextureBytes = 0;
+	public static int s_gpuTextureCount = 0;
+	public static long TotalTextureBytes => s_gpuTextureBytes;
+	private long _gpuBytes = 0;
+	private string? _sourcePath;            // file this texture was loaded from, for re-decode after eviction
+	private bool _sourceBlackTransparent;
+	private int _sourceMaxDimension;         // clamp applied at load, re-applied when re-decoding after eviction
+	private uint _lastDrawnTick;            // Game.TimeMs at last draw — LRU order
+	private bool _deferred;                  // Pointer==0 but uploadable from _sourcePath on next draw (lazy-pending OR evicted)
+	private static readonly HashSet<CTexture> s_liveTextures = new();
+	private static readonly object s_cacheLock = new();
+
+	/// <summary>Free the least-recently-drawn file-backed textures (keeping them re-uploadable) until the
+	/// total uploaded texture memory is at or below <paramref name="targetBytes"/>. Render thread (GL context
+	/// current). Returns the bytes freed.</summary>
+	public static long EvictLeastRecentlyDrawnDownTo(long targetBytes) {
+		if (s_gpuTextureBytes <= targetBytes) return 0;
+		CTexture[] snapshot;
+		lock (s_cacheLock) snapshot = s_liveTextures.ToArray();
+		Array.Sort(snapshot, static (a, b) => a._lastDrawnTick.CompareTo(b._lastDrawnTick)); // oldest first
+		long freed = 0;
+		foreach (var t in snapshot) {
+			if (s_gpuTextureBytes <= targetBytes) break;
+			if (t._sourcePath == null || t.Pointer == 0) continue;   // not re-loadable (render target/text) ⇒ keep
+			long b = t._gpuBytes;
+			t.ReleaseGpu();
+			freed += b;
+		}
+		return freed;
+	}
+
+	// Free this texture's GL handle but keep it re-uploadable (re-decoded from _sourcePath on next draw).
+	internal void ReleaseGpu() {
+		if (Pointer == 0 || _sourcePath == null) return;
+		try { Game.Gl.DeleteTexture(Pointer); } catch { }
+		Pointer = 0;
+		if (_gpuBytes > 0) { s_gpuTextureBytes -= _gpuBytes; s_gpuTextureCount--; _gpuBytes = 0; }
+		_deferred = true;
+		lock (s_cacheLock) s_liveTextures.Remove(this);
+	}
+
+	// At the top of every draw: stamp the LRU time, and upload if the texture is deferred
+	// (first draw or after eviction).
+	private void tCacheOnDraw() {
+		_lastDrawnTick = (uint)Game.TimeMs;
+		tRealizeDeferred();
+	}
+
+	/// <summary>Decode + upload this texture now if it is deferred (first draw not yet reached). Used to
+	/// warm gameplay textures during the song-load screen so they don't decode inline on first draw.</summary>
+	public void RealizeIfDeferred() => tRealizeDeferred();
+
+	// Realize a deferred/evicted texture NOW (decode from _sourcePath + GL upload). Also used by
+	// ReadPixelsRGBA: a readback must see the pixels even if the texture was never drawn.
+	private void tRealizeDeferred() {
+		if (Pointer == 0 && _deferred && _sourcePath != null && !bDisposeCompleteDone) {
+			_deferred = false;
+			try { using SKBitmap? bmp = tClampToMaxDimension(tDecodeForUpload(_sourcePath), _sourceMaxDimension); if (bmp != null) MakeTexture(bmp, _sourceBlackTransparent); }
+			catch { }
+		}
 	}
 
 	private unsafe uint GenTexture(void* data, uint width, uint height, PixelFormat pixelFormat) {
+		_glW = (int)width;
+		_glH = (int)height;
 		//テクスチャハンドルの作成-----
 		uint handle = Game.Gl.GenTexture();
 		Game.Gl.BindTexture(TextureTarget.Texture2D, handle);
 		//-----
 
 		//テクスチャのデータをVramに送る
-		if (OperatingSystem.IsMacOS()) {
+		if (OperatingSystem.IsAndroid() && pixelFormat == PixelFormat.Bgra) {
+			// Android GLES has no BGRA upload format (iOS gets one via APPLE_texture_format_BGRA8888;
+			// a BGRA upload here fails silently and the incomplete texture samples as opaque black).
+			// Upload the same bytes as RGBA and swap R/B in the sampler via the ES 3.0 texture swizzle.
+			Game.Gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, GLEnum.UnsignedByte, data);
+			Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureSwizzleR, (int)GLEnum.Blue);
+			Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureSwizzleB, (int)GLEnum.Red);
+		} else if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) {
+			// Native GLES (iOS/Android) requires the unsized GL_RGBA internalformat for BGRA uploads; sized formats render black.
+			int internalFormat = pixelFormat switch {
+				PixelFormat.Bgra => (int)InternalFormat.Rgba,
+				PixelFormat.Rgba => (int)InternalFormat.Rgba,
+				PixelFormat.Rgb => (int)InternalFormat.Rgb,
+				_ => (int)InternalFormat.Rgba
+			};
+
+			Game.Gl.TexImage2D(TextureTarget.Texture2D, 0, internalFormat, width, height, 0, pixelFormat, GLEnum.UnsignedByte, data);
+		} else if (OperatingSystem.IsMacOS()) {
 			// Desktop OpenGL requires sized internal formats
 			int internalFormat = pixelFormat switch {
 				PixelFormat.Bgra => (int)InternalFormat.Rgba8,
@@ -438,7 +941,7 @@ public class CTexture : IDisposable {
 				PixelFormat.Rgb => (int)InternalFormat.Rgb8,
 				_ => (int)InternalFormat.Rgba8
 			};
-			
+
 			Game.Gl.TexImage2D(TextureTarget.Texture2D, 0, internalFormat, width, height, 0, pixelFormat, GLEnum.UnsignedByte, data);
 		} else {
 			// OpenGL ES allows unsized internal formats
@@ -447,44 +950,162 @@ public class CTexture : IDisposable {
 		//-----
 
 		//拡大縮小の時の補完を指定------
-		Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureMinFilter, (int)TextureMinFilter.Nearest); //この場合は補完しない
-		Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureMagFilter, (int)TextureMinFilter.Nearest);
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMinFilter, (int)TextureMinFilter.Linear); //この場合は補完しない
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMagFilter, (int)TextureMagFilter.Linear);
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)_wrapMode);
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)_wrapMode);
 		//------
 
 		Game.Gl.BindTexture(TextureTarget.Texture2D, 0); //バインドを解除することを忘れないように
 
+		// Account live GPU bytes (replace this instance's prior figure to handle re-uploads) + register for LRU.
+		long newBytes = (long)width * height * 4;
+		s_gpuTextureBytes += newBytes - _gpuBytes;
+		if (_gpuBytes == 0) s_gpuTextureCount++;
+		_gpuBytes = newBytes;
+		_deferred = false;
+		lock (s_cacheLock) s_liveTextures.Add(this);   // HashSet ⇒ idempotent
+
 		return handle;
 	}
 
-	public void MakeTexture(SKBitmap bitmap, bool b黒を透過する) {
+	/// <summary>Create a GL texture from a bitmap, ZERO-COPY when possible. Textures hold straight
+	/// (unpremultiplied) alpha, so: if the bitmap is already Unpremul Bgra/Rgba, hand GL its native buffer via
+	/// GetPixels() (no managed copy); otherwise read .Pixels, which converts to unpremultiplied BGRA (correct,
+	/// but copies the whole image — the old behavior, kept as a safe fallback). Render thread only (calls GL).</summary>
+	// Returns a bitmap tGenFromBitmap can upload zero-copy (straight-alpha or opaque BGRA/RGBA), owned by the
+	// caller. takeOwnership: src is either returned directly or disposed after conversion; otherwise src is
+	// left intact and a copy is returned.
+	private static SKBitmap tPrepareUploadBitmap(SKBitmap src, bool takeOwnership) {
+		bool eligible = (src.AlphaType == SKAlphaType.Unpremul || src.AlphaType == SKAlphaType.Opaque)
+			&& (src.ColorType == SKColorType.Bgra8888 || src.ColorType == SKColorType.Rgba8888);
+		if (eligible)
+			return takeOwnership ? src : src.Copy();
+
+		var info = new SKImageInfo(src.Width, src.Height, SKColorType.Bgra8888, SKAlphaType.Unpremul);
+		var conv = new SKBitmap(info);
+		bool ok;
+		using (var pm = src.PeekPixels())
+			ok = pm != null && conv.GetPixels() != IntPtr.Zero && pm.ReadPixels(info, conv.GetPixels(), conv.RowBytes);
+		if (!ok) {
+			conv.Dispose();
+			return takeOwnership ? src : src.Copy();   // tGenFromBitmap's fallback converts it instead
+		}
+		if (takeOwnership) src.Dispose();
+		return conv;
+	}
+
+	private uint tGenFromBitmap(SKBitmap b) {
+		// Zero-copy upload: raw bytes are already straight-alpha (or fully opaque — decoded JPEGs) BGRA/RGBA.
+		if ((b.AlphaType == SKAlphaType.Unpremul || b.AlphaType == SKAlphaType.Opaque)
+			&& (b.ColorType == SKColorType.Bgra8888 || b.ColorType == SKColorType.Rgba8888)) {
+			var fmt = b.ColorType == SKColorType.Rgba8888 ? PixelFormat.Rgba : PixelFormat.Bgra;
+			unsafe {
+				void* p = (void*)b.GetPixels();
+				if (p != null)
+					return GenTexture(p, (uint)b.Width, (uint)b.Height, fmt);
+			}
+		}
+		// Everything else (premul PNG decodes, exotic color types): convert to straight-alpha BGRA natively.
+		// Never use SKBitmap.Pixels here — it allocates a w*h managed SKColor[] per upload (8-30MB of LOH
+		// garbage per decoded image; scrolling song select stacked hundreds of MB of it between Gen2 GCs).
+		var info = new SKImageInfo(b.Width, b.Height, SKColorType.Bgra8888, SKAlphaType.Unpremul);
+		using (var conv = new SKBitmap(info))
+		using (var pm = b.PeekPixels()) {
+			unsafe {
+				void* dst = (void*)conv.GetPixels();
+				if (dst != null && pm != null && pm.ReadPixels(info, conv.GetPixels(), conv.RowBytes))
+					return GenTexture(dst, (uint)b.Width, (uint)b.Height, PixelFormat.Bgra);
+			}
+		}
+		unsafe {
+			fixed (void* data = b.Pixels) {
+				return GenTexture(data, (uint)b.Width, (uint)b.Height, PixelFormat.Bgra);
+			}
+		}
+	}
+
+	// Live-texture accounting for the [MEMTRACE] debug line: decoded size (w*h*4) is added on MakeTexture
+	// and removed on Dispose, so a climbing LiveBytes means textures are created but never disposed.
+	public static int LiveCount;
+	public static long LiveBytes;
+	private long _countedBytes;
+
+	public void MakeTexture(SKBitmap? bitmap, bool bBlackTransparent) => MakeTexture(bitmap, bBlackTransparent, 0, 0);
+
+	// scaledFromW/H > 0: the bitmap was already shrunk for the render scale (tApplyRenderScale) from an image of
+	// that size, which stays the texture's size
+	internal void MakeTexture(SKBitmap? bitmap, bool bBlackTransparent, int scaledFromW, int scaledFromH) {
 		try {
-			if (bitmap == null) {
+			if (bitmap == null)
 				bitmap = new SKBitmap(10, 10);
+
+			// Scale down if the bitmap exceeds GL_MAX_TEXTURE_SIZE (smaller on iOS GPUs); oversized uploads render black.
+			if (_maxTextureSize == 0) {
+				_maxTextureSize = Game.Gl.GetInteger(GLEnum.MaxTextureSize);
+				if (_maxTextureSize <= 0) _maxTextureSize = 4096;
+			}
+			// the LOGICAL size is taken before the GL size limit: like render-scale below, a limited texture only
+			// stores fewer pixels, so its size (and every source rect in image pixels) stays the image's own
+			bool preScaled = scaledFromW > 0 && scaledFromH > 0;
+			int logicalW = preScaled ? scaledFromW : bitmap.Width, logicalH = preScaled ? scaledFromH : bitmap.Height;
+			SKBitmap? scaledBitmap = null;
+			if (bitmap.Width > _maxTextureSize || bitmap.Height > _maxTextureSize) {
+				float scale = Math.Min((float)_maxTextureSize / bitmap.Width, (float)_maxTextureSize / bitmap.Height);
+				int newW = Math.Max(1, (int)(bitmap.Width * scale));
+				int newH = Math.Max(1, (int)(bitmap.Height * scale));
+				scaledBitmap = new SKBitmap(newW, newH);
+				using (var canvas = new SKCanvas(scaledBitmap)) {
+					canvas.DrawBitmap(bitmap, new SKRect(0, 0, newW, newH));
+				}
+				bitmap = scaledBitmap;
 			}
 
-			unsafe {
-				fixed (void* data = bitmap.Pixels) {
-					if (Thread.CurrentThread.ManagedThreadId == Game.MainThreadID) {
-						Pointer = GenTexture(data, (uint)bitmap.Width, (uint)bitmap.Height, PixelFormat.Bgra);
-					} else {
-						SKBitmap bm = bitmap.Copy();
-						Action createInstance = () => {
-							fixed (void* data2 = bitmap.Pixels) {
-								Pointer = GenTexture(data2, (uint)bitmap.Width, (uint)bitmap.Height, PixelFormat.Bgra);
-							}
-							bm.Dispose();
-						};
-						Game.AsyncActions.Add(createInstance);
-						while (Game.AsyncActions.Contains(createInstance)) {
+			int origW = bitmap.Width, origH = bitmap.Height;   // stored size (after the GL limit)
 
-						}
-					}
+			long newBytes = (long)origW * origH * 4;
+			Interlocked.Add(ref LiveBytes, newBytes - _countedBytes);
+			if (_countedBytes == 0)
+				Interlocked.Increment(ref LiveCount);
+			_countedBytes = newBytes;
+
+			// Render-scale: downsample the GL texture to cut VRAM + upload bandwidth on low-end machines. szImageSize
+			// stays the ORIGINAL size, so every draw (incl. sprite-sheet sub-rects) is unchanged — only sampling detail
+			// drops. UVs are fractions of rcFullImage, independent of the GL texture's pixel count, so this is transparent.
+			SKBitmap glBitmap = bitmap;
+			bool ownGlBitmap = false;
+			float rs = Game.RenderScale;
+			if (rs < 0.999f && !preScaled) {
+				int dw = Math.Max(1, (int)Math.Round(origW * rs));
+				int dh = Math.Max(1, (int)Math.Round(origH * rs));
+				if (dw < origW || dh < origH) {
+					// the source's own format: a straight-alpha bitmap then uploads without a conversion pass
+					var resized = bitmap.Resize(bitmap.Info.WithSize(dw, dh), SKFilterQuality.Medium);
+					if (resized != null) { glBitmap = resized; ownGlBitmap = true; }
 				}
 			}
+			if (Thread.CurrentThread.ManagedThreadId == Game.MainThreadID) {
+				Pointer = tGenFromBitmap(glBitmap);
+				if (ownGlBitmap) glBitmap.Dispose();
+			} else {
+				// Pre-convert on this (background) thread so the queued render-thread action is a pure
+				// zero-copy GL upload — converting a large image there stalls the frame.
+				var asyncCopy = tPrepareUploadBitmap(glBitmap, ownGlBitmap);
+				Action createInstance = () => {
+					try {
+						Pointer = tGenFromBitmap(asyncCopy);
+					} finally {
+						asyncCopy.Dispose();
+					}
+				};
+				Game.AsyncActions.Enqueue(createInstance);
+			}
 
-			this.sz画像サイズ = new Size(bitmap.Width, bitmap.Height);
-			this.rc全画像 = new Rectangle(0, 0, this.sz画像サイズ.Width, this.sz画像サイズ.Height);
-			this.szTextureSize = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
+			this.szImageSize = new Size(logicalW, logicalH);
+			this.rcFullImage = new Rectangle(0, 0, this.szImageSize.Width, this.szImageSize.Height);
+			this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
+
+			scaledBitmap?.Dispose();
 		} catch (Exception ex) {
 			this.Dispose();
 			// throw new CTextureCreateFailedException( string.Format( "テクスチャの生成に失敗しました。\n{0}", strファイル名 ) );
@@ -492,147 +1113,158 @@ public class CTexture : IDisposable {
 		}
 	}
 
+
 	public void tSetScale(float x, float y) {
 		vcScaleRatio.X = x;
 		vcScaleRatio.Y = y;
+	}
+
+	public void SetTextureWrapMode(TextureWrapMode wrapMode) {
+		Game.Gl.BindTexture(TextureTarget.Texture2D, Pointer);
+
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)wrapMode);
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)wrapMode);
+
+		Game.Gl.BindTexture(TextureTarget.Texture2D, 0);
+		_wrapMode = wrapMode;
 	}
 
 	// メソッド
 
 	// 2016.11.10 kairera0467 拡張
 	// Rectangleを使う場合、座標調整のためにテクスチャサイズの値をそのまま使うとまずいことになるため、Rectragleから幅を取得して調整をする。
-	public void t2D中心基準描画(int x, int y) {
-		this.t2D描画(x - (this.szTextureSize.Width / 2), y - (this.szTextureSize.Height / 2), 1f, this.rc全画像);
+	public void t2DCenterBasedDraw(int x, int y) {
+		this.t2DDraw(x - (this.szTextureSize.Width / 2), y - (this.szTextureSize.Height / 2), 1f, this.rcFullImage);
 	}
 
-	public void t2D中心基準描画Mirrored(int x, int y) {
-		this.t2D左右反転描画(x - (this.szTextureSize.Width / 2), y - (this.szTextureSize.Height / 2), 1f, this.rc全画像);
+	public void t2DCenterBasedDrawMirrored(int x, int y) {
+		this.t2DFlipHDraw(x - (this.szTextureSize.Width / 2), y - (this.szTextureSize.Height / 2), 1f, this.rcFullImage);
 	}
 
-	public void t2D中心基準描画Mirrored(float x, float y) {
-		this.t2D左右反転描画(x - (this.szTextureSize.Width / 2), y - (this.szTextureSize.Height / 2), 1f, this.rc全画像);
+	public void t2DCenterBasedDrawMirrored(float x, float y) {
+		this.t2DFlipHDraw(x - (this.szTextureSize.Width / 2), y - (this.szTextureSize.Height / 2), 1f, this.rcFullImage);
 	}
 
-	public void t2D中心基準描画(int x, int y, Rectangle rc画像内の描画領域) {
-		this.t2D描画(x - (rc画像内の描画領域.Width / 2), y - (rc画像内の描画領域.Height / 2), 1f, rc画像内の描画領域);
+	public void t2DCenterBasedDraw(int x, int y, Rectangle rcImageInDrawRegion) {
+		this.t2DDraw(x - (rcImageInDrawRegion.Width / 2), y - (rcImageInDrawRegion.Height / 2), 1f, rcImageInDrawRegion);
 	}
-	public void t2D中心基準描画(float x, float y) {
-		this.t2D描画((int)x - (this.szTextureSize.Width / 2), (int)y - (this.szTextureSize.Height / 2), 1f, this.rc全画像);
+	public void t2DCenterBasedDraw(float x, float y) {
+		this.t2DDraw((int)x - (this.szTextureSize.Width / 2), (int)y - (this.szTextureSize.Height / 2), 1f, this.rcFullImage);
 	}
-	public void t2D中心基準描画(float x, float y, Rectangle rc画像内の描画領域) {
-		this.t2D描画((int)x - (rc画像内の描画領域.Width / 2), (int)y - (rc画像内の描画領域.Height / 2), 1.0f, rc画像内の描画領域);
+	public void t2DCenterBasedDraw(float x, float y, Rectangle rcImageInDrawRegion) {
+		this.t2DDraw((int)x - (rcImageInDrawRegion.Width / 2), (int)y - (rcImageInDrawRegion.Height / 2), 1.0f, rcImageInDrawRegion);
 	}
-	public void t2D中心基準描画(float x, float y, float depth, Rectangle rc画像内の描画領域) {
-		this.t2D描画((int)x - (rc画像内の描画領域.Width / 2), (int)y - (rc画像内の描画領域.Height / 2), depth, rc画像内の描画領域);
+	public void t2DCenterBasedDraw(float x, float y, float depth, Rectangle rcImageInDrawRegion) {
+		this.t2DDraw((int)x - (rcImageInDrawRegion.Width / 2), (int)y - (rcImageInDrawRegion.Height / 2), depth, rcImageInDrawRegion);
 	}
 
 	// 下を基準にして描画する(拡大率考慮)メソッドを追加。 (AioiLight)
-	public void t2D拡大率考慮下基準描画(int x, int y) {
-		this.t2D描画(x, y - (szTextureSize.Height * this.vcScaleRatio.Y), 1f, this.rc全画像);
+	public void t2DScaledBottomBasedDraw(int x, int y) {
+		this.t2DDraw(x, y - (szTextureSize.Height * this.vcScaleRatio.Y), 1f, this.rcFullImage);
 	}
-	public void t2D拡大率考慮下基準描画(int x, int y, Rectangle rc画像内の描画領域) {
-		this.t2D描画(x, y - (rc画像内の描画領域.Height * this.vcScaleRatio.Y), 1f, rc画像内の描画領域);
+	public void t2DScaledBottomBasedDraw(int x, int y, Rectangle rcImageInDrawRegion) {
+		this.t2DDraw(x, y - (rcImageInDrawRegion.Height * this.vcScaleRatio.Y), 1f, rcImageInDrawRegion);
 	}
-	public void t2D拡大率考慮下中心基準描画(int x, int y) {
-		this.t2D描画(x - (this.szTextureSize.Width / 2 * this.vcScaleRatio.X), y - (szTextureSize.Height * this.vcScaleRatio.Y), 1f, this.rc全画像);
-	}
-
-	public void t2D拡大率考慮下中心基準描画Mirrored(int x, int y) {
-		this.t2D左右反転描画(x - (this.szTextureSize.Width / 2 * this.vcScaleRatio.X), y - (szTextureSize.Height * this.vcScaleRatio.Y), 1f, this.rc全画像);
-	}
-	public void t2D拡大率考慮下中心基準描画Mirrored(float x, float y) {
-		this.t2D左右反転描画(x - (this.szTextureSize.Width / 2 * this.vcScaleRatio.X), y - (szTextureSize.Height * this.vcScaleRatio.Y), 1f, this.rc全画像);
+	public void t2DScaledBottomCenterBasedDraw(int x, int y) {
+		this.t2DDraw(x - (this.szTextureSize.Width / 2 * this.vcScaleRatio.X), y - (szTextureSize.Height * this.vcScaleRatio.Y), 1f, this.rcFullImage);
 	}
 
-	public void t2D拡大率考慮下基準描画(float x, float y) {
-		this.t2D描画(x, y - (szTextureSize.Height * this.vcScaleRatio.Y), 1f, this.rc全画像);
+	public void t2DScaledBottomCenterBasedDrawMirrored(int x, int y) {
+		this.t2DFlipHDraw(x - (this.szTextureSize.Width / 2 * this.vcScaleRatio.X), y - (szTextureSize.Height * this.vcScaleRatio.Y), 1f, this.rcFullImage);
 	}
-	public void t2D拡大率考慮下基準描画(float x, float y, RectangleF rc画像内の描画領域) {
-		this.t2D描画(x, y - (rc画像内の描画領域.Height * this.vcScaleRatio.Y), 1f, rc画像内の描画領域);
-	}
-	public void t2D拡大率考慮下中心基準描画(float x, float y) {
-		this.t2D拡大率考慮下中心基準描画((int)x, (int)y);
+	public void t2DScaledBottomCenterBasedDrawMirrored(float x, float y) {
+		this.t2DFlipHDraw(x - (this.szTextureSize.Width / 2 * this.vcScaleRatio.X), y - (szTextureSize.Height * this.vcScaleRatio.Y), 1f, this.rcFullImage);
 	}
 
-	public void t2D拡大率考慮下中心基準描画(int x, int y, Rectangle rc画像内の描画領域) {
-		this.t2D描画(x - ((rc画像内の描画領域.Width / 2)), y - (rc画像内の描画領域.Height * this.vcScaleRatio.Y), 1f, rc画像内の描画領域);
+	public void t2DScaledBottomBasedDraw(float x, float y) {
+		this.t2DDraw(x, y - (szTextureSize.Height * this.vcScaleRatio.Y), 1f, this.rcFullImage);
 	}
-	public void t2D拡大率考慮下中心基準描画(float x, float y, Rectangle rc画像内の描画領域) {
-		this.t2D拡大率考慮下中心基準描画((int)x, (int)y, rc画像内の描画領域);
+	public void t2DScaledBottomBasedDraw(float x, float y, RectangleF rcImageInDrawRegion) {
+		this.t2DDraw(x, y - (rcImageInDrawRegion.Height * this.vcScaleRatio.Y), 1f, rcImageInDrawRegion);
 	}
-	public void t2D下中央基準描画(int x, int y) {
-		this.t2D描画(x - (this.szTextureSize.Width / 2), y - (szTextureSize.Height), this.rc全画像);
+	public void t2DScaledBottomCenterBasedDraw(float x, float y) {
+		this.t2DScaledBottomCenterBasedDraw((int)x, (int)y);
 	}
-	public void t2D下中央基準描画(int x, int y, Rectangle rc画像内の描画領域) {
-		this.t2D描画(x - (rc画像内の描画領域.Width / 2), y - (rc画像内の描画領域.Height), rc画像内の描画領域);
+
+	public void t2DScaledBottomCenterBasedDraw(int x, int y, Rectangle rcImageInDrawRegion) {
+		this.t2DDraw(x - ((rcImageInDrawRegion.Width / 2)), y - (rcImageInDrawRegion.Height * this.vcScaleRatio.Y), 1f, rcImageInDrawRegion);
+	}
+	public void t2DScaledBottomCenterBasedDraw(float x, float y, Rectangle rcImageInDrawRegion) {
+		this.t2DScaledBottomCenterBasedDraw((int)x, (int)y, rcImageInDrawRegion);
+	}
+	public void t2DBottomCenterBasedDraw(int x, int y) {
+		this.t2DDraw(x - (this.szTextureSize.Width / 2), y - (szTextureSize.Height), this.rcFullImage);
+	}
+	public void t2DBottomCenterBasedDraw(int x, int y, Rectangle rcImageInDrawRegion) {
+		this.t2DDraw(x - (rcImageInDrawRegion.Width / 2), y - (rcImageInDrawRegion.Height), rcImageInDrawRegion);
 		//this.t2D描画(devicek x, y, rc画像内の描画領域;
 	}
 
 	public void t2D_DisplayImage_RollNote(int x, int y, RectangleF rc) {
-		this.t2D描画(x - (rc.Width / 2 * this.vcScaleRatio.X), y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc, true);
+		this.t2DDraw(x - (rc.Width / 2 * this.vcScaleRatio.X), y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc, true);
 	}
 
-	public void t2D拡大率考慮中央基準描画(int x, int y) {
-		this.t2D描画(x - (this.szTextureSize.Width / 2 * this.vcScaleRatio.X), y - (szTextureSize.Height / 2 * this.vcScaleRatio.Y), 1f, this.rc全画像);
+	public void t2DScaledCenterBasedDraw(int x, int y) {
+		this.t2DDraw(x - (this.szTextureSize.Width / 2 * this.vcScaleRatio.X), y - (szTextureSize.Height / 2 * this.vcScaleRatio.Y), 1f, this.rcFullImage);
 	}
-	public void t2D拡大率考慮中央基準描画(int x, int y, RectangleF rc) {
-		this.t2D描画(x - (rc.Width / 2 * this.vcScaleRatio.X), y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc);
+	public void t2DScaledCenterBasedDraw(int x, int y, RectangleF rc) {
+		this.t2DDraw(x - (rc.Width / 2 * this.vcScaleRatio.X), y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc);
 	}
 	public void t2D_DisplayImage_AnchorCenterLeft(int x, int y, RectangleF rc) {
-		this.t2D描画(x, y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc);
+		this.t2DDraw(x, y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc);
 	}
-	public void t2D拡大率考慮上中央基準描画(int x, int y, RectangleF rc) {
-		this.t2D描画(x - (rc.Width / 2 * this.vcScaleRatio.X), y, 1f, rc);
+	public void t2DScaledTopCenterBasedDraw(int x, int y, RectangleF rc) {
+		this.t2DDraw(x - (rc.Width / 2 * this.vcScaleRatio.X), y, 1f, rc);
 	}
 	public void t2D_DisplayImage_AnchorUpRight(int x, int y, RectangleF rc) {
-		this.t2D描画(x - (rc.Width * this.vcScaleRatio.X), y, 1f, rc);
+		this.t2DDraw(x - (rc.Width * this.vcScaleRatio.X), y, 1f, rc);
 	}
-	public void t2D拡大率考慮上中央基準描画(int x, int y) {
-		this.t2D描画(x - (rc全画像.Width / 2 * this.vcScaleRatio.X), y, 1f, rc全画像);
+	public void t2DScaledTopCenterBasedDraw(int x, int y) {
+		this.t2DDraw(x - (rcFullImage.Width / 2 * this.vcScaleRatio.X), y, 1f, rcFullImage);
 	}
-	public void t2D拡大率考慮中央基準描画(float x, float y) {
-		this.t2D描画(x - (this.szTextureSize.Width / 2 * this.vcScaleRatio.X), y - (szTextureSize.Height / 2 * this.vcScaleRatio.Y), 1f, this.rc全画像);
+	public void t2DScaledCenterBasedDraw(float x, float y) {
+		this.t2DDraw(x - (this.szTextureSize.Width / 2 * this.vcScaleRatio.X), y - (szTextureSize.Height / 2 * this.vcScaleRatio.Y), 1f, this.rcFullImage);
 	}
-	public void t2D拡大率考慮中央基準描画Mirrored(float x, float y) {
-		this.t2D左右反転描画(x - (this.szTextureSize.Width / 2 * this.vcScaleRatio.X), y - (szTextureSize.Height / 2 * this.vcScaleRatio.Y), 1f, this.rc全画像);
+	public void t2DScaledCenterBasedDrawMirrored(float x, float y) {
+		this.t2DFlipHDraw(x - (this.szTextureSize.Width / 2 * this.vcScaleRatio.X), y - (szTextureSize.Height / 2 * this.vcScaleRatio.Y), 1f, this.rcFullImage);
 	}
-	public void t2D拡大率考慮中央基準描画(float x, float y, RectangleF rc) {
-		this.t2D描画(x - (rc.Width / 2 * this.vcScaleRatio.X), y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc);
+	public void t2DScaledCenterBasedDraw(float x, float y, RectangleF rc) {
+		this.t2DDraw(x - (rc.Width / 2 * this.vcScaleRatio.X), y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc);
 	}
-	public void t2D拡大率考慮描画(RefPnt refpnt, float x, float y) {
-		this.t2D拡大率考慮描画(refpnt, x, y, rc全画像);
+	public void t2DScaledDraw(RefPnt refpnt, float x, float y) {
+		this.t2DScaledDraw(refpnt, x, y, rcFullImage);
 	}
-	public void t2D拡大率考慮描画(RefPnt refpnt, float x, float y, Rectangle rect) {
-		this.t2D拡大率考慮描画(refpnt, x, y, 1f, rect);
+	public void t2DScaledDraw(RefPnt refpnt, float x, float y, Rectangle rect) {
+		this.t2DScaledDraw(refpnt, x, y, 1f, rect);
 	}
-	public void t2D拡大率考慮描画(RefPnt refpnt, float x, float y, float depth, Rectangle rect) {
+	public void t2DScaledDraw(RefPnt refpnt, float x, float y, float depth, Rectangle rect) {
 		switch (refpnt) {
 			case RefPnt.UpLeft:
-				this.t2D描画(x, y, depth, rect);
+				this.t2DDraw(x, y, depth, rect);
 				break;
 			case RefPnt.Up:
-				this.t2D描画(x - (rect.Width / 2 * this.vcScaleRatio.X), y, depth, rect);
+				this.t2DDraw(x - (rect.Width / 2 * this.vcScaleRatio.X), y, depth, rect);
 				break;
 			case RefPnt.UpRight:
-				this.t2D描画(x - rect.Width * this.vcScaleRatio.X, y, depth, rect);
+				this.t2DDraw(x - rect.Width * this.vcScaleRatio.X, y, depth, rect);
 				break;
 			case RefPnt.Left:
-				this.t2D描画(x, y - (rect.Height / 2 * this.vcScaleRatio.Y), depth, rect);
+				this.t2DDraw(x, y - (rect.Height / 2 * this.vcScaleRatio.Y), depth, rect);
 				break;
 			case RefPnt.Center:
-				this.t2D描画(x - (rect.Width / 2 * this.vcScaleRatio.X), y - (rect.Height / 2 * this.vcScaleRatio.Y), depth, rect);
+				this.t2DDraw(x - (rect.Width / 2 * this.vcScaleRatio.X), y - (rect.Height / 2 * this.vcScaleRatio.Y), depth, rect);
 				break;
 			case RefPnt.Right:
-				this.t2D描画(x - rect.Width * this.vcScaleRatio.X, y - (rect.Height / 2 * this.vcScaleRatio.Y), depth, rect);
+				this.t2DDraw(x - rect.Width * this.vcScaleRatio.X, y - (rect.Height / 2 * this.vcScaleRatio.Y), depth, rect);
 				break;
 			case RefPnt.DownLeft:
-				this.t2D描画(x, y - rect.Height * this.vcScaleRatio.Y, depth, rect);
+				this.t2DDraw(x, y - rect.Height * this.vcScaleRatio.Y, depth, rect);
 				break;
 			case RefPnt.Down:
-				this.t2D描画(x - (rect.Width / 2 * this.vcScaleRatio.X), y - rect.Height * this.vcScaleRatio.Y, depth, rect);
+				this.t2DDraw(x - (rect.Width / 2 * this.vcScaleRatio.X), y - rect.Height * this.vcScaleRatio.Y, depth, rect);
 				break;
 			case RefPnt.DownRight:
-				this.t2D描画(x - rect.Width * this.vcScaleRatio.X, y - rect.Height * this.vcScaleRatio.Y, depth, rect);
+				this.t2DDraw(x - rect.Width * this.vcScaleRatio.X, y - rect.Height * this.vcScaleRatio.Y, depth, rect);
 				break;
 			default:
 				break;
@@ -640,13 +1272,13 @@ public class CTexture : IDisposable {
 
 	}
 	public void t2D_DisplayImage_AnchorCenter(int x, int y) {
-		this.t2D描画(x - (this.rc全画像.Width / 2 * this.vcScaleRatio.X), y - (this.rc全画像.Height / 2 * this.vcScaleRatio.Y), 1f, this.rc全画像);
+		this.t2DDraw(x - (this.rcFullImage.Width / 2 * this.vcScaleRatio.X), y - (this.rcFullImage.Height / 2 * this.vcScaleRatio.Y), 1f, this.rcFullImage);
 	}
 	public void t2D_DisplayImage_AnchorCenter(int x, int y, Rectangle rc) {
-		this.t2D描画(x - (rc.Width / 2 * this.vcScaleRatio.X), y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc);
+		this.t2DDraw(x - (rc.Width / 2 * this.vcScaleRatio.X), y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc);
 	}
 	public void t2D_DisplayImage_AnchorCenter(int x, int y, RectangleF rc) {
-		this.t2D描画(x - (rc.Width / 2 * this.vcScaleRatio.X), y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc);
+		this.t2DDraw(x - (rc.Width / 2 * this.vcScaleRatio.X), y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc);
 	}
 
 	public enum RefPnt {
@@ -662,13 +1294,13 @@ public class CTexture : IDisposable {
 	}
 
 	public void t2D_DisplayImage(int x, int y) {
-		this.t2D描画(x, y, 1f, this.rc全画像);
+		this.t2DDraw(x, y, 1f, this.rcFullImage);
 	}
-	public void t2D_DisplayImage(int x, int y, Rectangle rc画像内の描画領域) {
-		this.t2D描画(x, y, 1f, rc画像内の描画領域);
+	public void t2D_DisplayImage(int x, int y, Rectangle rcImageInDrawRegion) {
+		this.t2DDraw(x, y, 1f, rcImageInDrawRegion);
 	}
 	public void t2D_DisplayImage(int x, int y, RectangleF rc) {
-		this.t2D描画(x, y, 1f, rc);
+		this.t2DDraw(x, y, 1f, rc);
 	}
 
 	/// <summary>
@@ -677,39 +1309,55 @@ public class CTexture : IDisposable {
 	/// <param name="device">Direct3D9 デバイス。</param>
 	/// <param name="x">描画位置（テクスチャの左上位置の X 座標[dot]）。</param>
 	/// <param name="y">描画位置（テクスチャの左上位置の Y 座標[dot]）。</param>
-	public void t2D描画(int x, int y) {
-		this.t2D描画(x, y, 1f, this.rc全画像);
+	public void t2DDraw(int x, int y) {
+		this.t2DDraw(x, y, 1f, this.rcFullImage);
 	}
-	public void t2D描画(int x, int y, RectangleF rc画像内の描画領域) {
-		this.t2D描画(x, y, 1f, rc画像内の描画領域);
+	public void t2DDraw(int x, int y, RectangleF rcImageInDrawRegion) {
+		this.t2DDraw(x, y, 1f, rcImageInDrawRegion);
 	}
-	public void t2D描画(float x, float y) {
-		this.t2D描画((int)x, (int)y, 1f, this.rc全画像);
+	public void t2DDraw(float x, float y) {
+		this.t2DDraw((int)x, (int)y, 1f, this.rcFullImage);
 	}
-	public void t2D描画(float x, float y, RectangleF rc画像内の描画領域) {
-		this.t2D描画((int)x, (int)y, 1f, rc画像内の描画領域);
+	public void t2DDraw(float x, float y, RectangleF rcImageInDrawRegion) {
+		this.t2DDraw((int)x, (int)y, 1f, rcImageInDrawRegion);
 	}
-	public void t2D描画(float x, float y, float depth, RectangleF rc画像内の描画領域, bool flipX = false, bool flipY = false, bool rollMode = false) {
+	public void t2DDraw(float x, float y, float depth, RectangleF rcImageInDrawRegion, bool flipX = false, bool flipY = false, bool rollMode = false) {
+		tCacheOnDraw();             // LRU stamp + transparent re-upload if this texture was evicted
+		if (Pointer == 0) return;   // not-yet-streamed stub or disposed texture ⇒ clean no-op
 		this.color4.Alpha = this._opacity / 255f;
 
-		BlendType blendType;
-		if (b加算合成) {
-			blendType = BlendType.Add;
-		} else if (b乗算合成) {
-			blendType = BlendType.Multi;
-		} else if (b減算合成) {
-			blendType = BlendType.Sub;
-		} else if (bスクリーン合成) {
-			blendType = BlendType.Screen;
-		} else {
-			blendType = BlendType.Normal;
+		BlendType blend_type = blendType;
+		if (blend_type == BlendType.Normal) {
+			if (bAddBlend) {
+				blend_type = BlendType.Add;
+			} else if (bMultiplyBlend) {
+				blend_type = BlendType.Multi;
+			} else if (bSubtractBlend) {
+				blend_type = BlendType.Sub;
+			} else if (bScreenBlend) {
+				blend_type = BlendType.Screen;
+			} else {
+				blend_type = BlendType.Normal;
+			}
 		}
 
-		BlendHelper.SetBlend(blendType);
+		BlendHelper.SetPremultipliedBlend(blend_type);
 
 		Game.Gl.UseProgram(ShaderProgram);//Uniform4よりこれが先
 
+		Game.Gl.ActiveTexture(TextureUnit.Texture0);
 		Game.Gl.BindTexture(TextureTarget.Texture2D, Pointer); //テクスチャをバインド
+
+		uint _gmId = ActiveGradientMapId != 0 ? ActiveGradientMapId : _gradientMapTextureId;
+		float _gmBlend = ActiveGradientMapId != 0 ? ActiveGradientMapBlend : _gradientMapBlend;
+		if (_gmId != 0) {
+			Game.Gl.ActiveTexture(TextureUnit.Texture1);
+			Game.Gl.BindTexture(TextureTarget.Texture2D, _gmId);
+			Game.Gl.ActiveTexture(TextureUnit.Texture0);
+			Game.Gl.Uniform1(GradientBlendID, _gmBlend);
+		} else {
+			Game.Gl.Uniform1(GradientBlendID, 0.0f);
+		}
 
 		//MVPを設定----
 		unsafe {
@@ -719,19 +1367,19 @@ public class CTexture : IDisposable {
 
 
 			//スケーリング-----
-			mvp *= Matrix4X4.CreateScale(rc画像内の描画領域.Width / GameWindowSize.Width, rc画像内の描画領域.Height / GameWindowSize.Height, 1) *
+			mvp *= Matrix4X4.CreateScale(rcImageInDrawRegion.Width / GameWindowSize.Width, rcImageInDrawRegion.Height / GameWindowSize.Height, 1) *
 				   Matrix4X4.CreateScale(flipX ? -vcScaleRatio.X : vcScaleRatio.X, flipY ? -vcScaleRatio.Y : vcScaleRatio.Y, 1.0f);
 			//-----
 
 			//回転-----
 			mvp *= Matrix4X4.CreateScale(1.0f * gameAspect, 1.0f, 1.0f) * //ここでアスペクト比でスケーリングしないとおかしなことになる
-				   Matrix4X4.CreateRotationZ(fZ軸中心回転) *
+				   Matrix4X4.CreateRotationZ(fZAxisCenterRotate) *
 				   Matrix4X4.CreateScale(1.0f / gameAspect, 1.0f, 1.0f);//回転した後戻してあげる
 																		//-----
 
 			//移動----
-			float offsetX = rc画像内の描画領域.Width * vcScaleRatio.X / GameWindowSize.Width;
-			float offsetY = rc画像内の描画領域.Height * vcScaleRatio.Y / GameWindowSize.Height;
+			float offsetX = rcImageInDrawRegion.Width * vcScaleRatio.X / GameWindowSize.Width;
+			float offsetY = rcImageInDrawRegion.Height * vcScaleRatio.Y / GameWindowSize.Height;
 			mvp *= Matrix4X4.CreateTranslation(offsetX, -offsetY, 0.0f);
 			mvp *= Matrix4X4.CreateTranslation(-1.0f, 1.0f, 0);
 			mvp *= Matrix4X4.CreateTranslation(x / GameWindowSize.Width * 2, -y / GameWindowSize.Height * 2, 0.0f);
@@ -748,12 +1396,12 @@ public class CTexture : IDisposable {
 
 		//テクスチャの切り抜きの座標と大きさを設定
 		Game.Gl.Uniform4(TextureRectID, new System.Numerics.Vector4(
-			rc画像内の描画領域.X / rc全画像.Width, rc画像内の描画領域.Y / rc全画像.Height, //始まり
-			rc画像内の描画領域.Width / rc全画像.Width, rc画像内の描画領域.Height / rc全画像.Height)); //大きさ、終わりではない
+			rcImageInDrawRegion.X / rcFullImage.Width, rcImageInDrawRegion.Y / rcFullImage.Height, //始まり
+			rcImageInDrawRegion.Width / rcFullImage.Width, rcImageInDrawRegion.Height / rcFullImage.Height)); //大きさ、終わりではない
 
 		Game.Gl.Uniform1(NoteModeID, rollMode ? 1 : 0);
 
-		float _time = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) % 100;
+		float _time = (float)Game.dbTimeMs % 100;
 		Game.Gl.Uniform1(TimeID, _time);
 		Game.Gl.Uniform1(NoiseEffectID, bUseNoiseEffect ? 1 : 0);
 
@@ -766,86 +1414,133 @@ public class CTexture : IDisposable {
 
 		BlendHelper.SetBlend(BlendType.Normal);
 	}
-	public void t2D描画(int x, int y, float depth, Rectangle rc画像内の描画領域) {
-		t2D描画((float)x, (float)y, depth, rc画像内の描画領域);
-	}
-	public void t2D上下反転描画(int x, int y) {
-		this.t2D上下反転描画(x, y, 1f, this.rc全画像);
-	}
-	public void t2D上下反転描画(int x, int y, Rectangle rc画像内の描画領域) {
-		this.t2D上下反転描画(x, y, 1f, rc画像内の描画領域);
-	}
-	public void t2D左右反転描画(int x, int y) {
-		this.t2D左右反転描画(x, y, 1f, this.rc全画像);
-	}
-	public void t2D左右反転描画(float x, float y) {
-		this.t2D左右反転描画(x, y, 1f, this.rc全画像);
-	}
-	public void t2D左右反転描画(int x, int y, Rectangle rc画像内の描画領域) {
-		this.t2D左右反転描画(x, y, 1f, rc画像内の描画領域);
-	}
-	public void t2D左右反転描画(float x, float y, float depth, Rectangle rc画像内の描画領域) {
-		t2D描画(x, y, depth, rc画像内の描画領域, flipX: true);
-	}
-	public void t2D上下反転描画(int x, int y, float depth, Rectangle rc画像内の描画領域) {
-		t2D描画(x, y, depth, rc画像内の描画領域, flipY: true);
-	}
-	public void t2D上下反転描画(Point pt) {
-		this.t2D上下反転描画(pt.X, pt.Y, 1f, this.rc全画像);
-	}
-	public void t2D上下反転描画(Point pt, Rectangle rc画像内の描画領域) {
-		this.t2D上下反転描画(pt.X, pt.Y, 1f, rc画像内の描画領域);
-	}
-	public void t2D上下反転描画(Point pt, float depth, Rectangle rc画像内の描画領域) {
-		this.t2D上下反転描画(pt.X, pt.Y, depth, rc画像内の描画領域);
+	public void t2DDraw(int x, int y, float depth, Rectangle rcImageInDrawRegion) {
+		t2DDraw((float)x, (float)y, depth, rcImageInDrawRegion);
 	}
 
-	public static Vector3D<float> t論理画面座標をワールド座標へ変換する(int x, int y) {
-		return CTexture.t論理画面座標をワールド座標へ変換する(new Vector3D<float>((float)x, (float)y, 0f));
+	// ── Solid-rectangle primitive ────────────────────────────────────────────────────────────────────
+	// A shared 1×1 white texture, tinted + scaled to draw an arbitrary filled rectangle without needing
+	// any asset file. Used for the programmatic loading bars (see CLoadingProgress / the Lua loading
+	// screens). Only ever called from the render thread during draw, so lazy GL creation is safe; the
+	// single instance lives for the app lifetime (1 texel — negligible) and is never disposed.
+	private static CTexture? _solidWhite;
+	public static void FillBox(int x, int y, int w, int h, int r, int g, int b, int a) {
+		if (w <= 0 || h <= 0 || a <= 0)
+			return;
+
+		if (_solidWhite == null) {
+			using var bmp = new SKBitmap(1, 1);
+			bmp.SetPixel(0, 0, new SKColor(0xFF, 0xFF, 0xFF, 0xFF));
+			_solidWhite = new CTexture(bmp);
+		}
+
+		var tex = _solidWhite;
+		// Save/restore: it is a shared instance and other FillBox calls (or a future reuse) must not
+		// inherit this call's tint/scale.
+		var savedScale = tex.vcScaleRatio;
+		var savedColor = tex.color4;
+		var savedOpacity = tex.Opacity;
+
+		tex.vcScaleRatio = new Vector3D<float>(w, h, 1f);   // 1px image × (w,h) ⇒ a w×h rectangle
+		tex.color4 = new Color4(r / 255f, g / 255f, b / 255f, 1f);
+		tex.Opacity = a;
+		tex.t2DDraw(x, y);
+
+		tex.vcScaleRatio = savedScale;
+		tex.color4 = savedColor;
+		tex.Opacity = savedOpacity;
 	}
-	public static Vector3D<float> t論理画面座標をワールド座標へ変換する(float x, float y) {
-		return CTexture.t論理画面座標をワールド座標へ変換する(new Vector3D<float>(x, y, 0f));
+	public void t2DFlipVDraw(int x, int y) {
+		this.t2DFlipVDraw(x, y, 1f, this.rcFullImage);
 	}
-	public static Vector3D<float> t論理画面座標をワールド座標へ変換する(Point pt論理画面座標) {
-		return CTexture.t論理画面座標をワールド座標へ変換する(new Vector3D<float>(pt論理画面座標.X, pt論理画面座標.Y, 0.0f));
+	public void t2DFlipVDraw(int x, int y, Rectangle rcImageInDrawRegion) {
+		this.t2DFlipVDraw(x, y, 1f, rcImageInDrawRegion);
 	}
-	public static Vector3D<float> t論理画面座標をワールド座標へ変換する(Vector2D<float> v2論理画面座標) {
-		return CTexture.t論理画面座標をワールド座標へ変換する(new Vector3D<float>(v2論理画面座標, 0f));
+	public void t2DFlipHDraw(int x, int y) {
+		this.t2DFlipHDraw(x, y, 1f, this.rcFullImage);
 	}
-	public static Vector3D<float> t論理画面座標をワールド座標へ変換する(Vector3D<float> v3論理画面座標) {
+	public void t2DFlipHDraw(float x, float y) {
+		this.t2DFlipHDraw(x, y, 1f, this.rcFullImage);
+	}
+	public void t2DFlipHDraw(int x, int y, Rectangle rcImageInDrawRegion) {
+		this.t2DFlipHDraw(x, y, 1f, rcImageInDrawRegion);
+	}
+	public void t2DFlipHDraw(float x, float y, float depth, Rectangle rcImageInDrawRegion) {
+		t2DDraw(x, y, depth, rcImageInDrawRegion, flipX: true);
+	}
+	public void t2DFlipVDraw(int x, int y, float depth, Rectangle rcImageInDrawRegion) {
+		t2DDraw(x, y, depth, rcImageInDrawRegion, flipY: true);
+	}
+	public void t2DFlipVDraw(Point pt) {
+		this.t2DFlipVDraw(pt.X, pt.Y, 1f, this.rcFullImage);
+	}
+	public void t2DFlipVDraw(Point pt, Rectangle rcImageInDrawRegion) {
+		this.t2DFlipVDraw(pt.X, pt.Y, 1f, rcImageInDrawRegion);
+	}
+	public void t2DFlipVDraw(Point pt, float depth, Rectangle rcImageInDrawRegion) {
+		this.t2DFlipVDraw(pt.X, pt.Y, depth, rcImageInDrawRegion);
+	}
+
+	public static Vector3D<float> tLogicalToWorldCoord(int x, int y) {
+		return CTexture.tLogicalToWorldCoord(new Vector3D<float>((float)x, (float)y, 0f));
+	}
+	public static Vector3D<float> tLogicalToWorldCoord(float x, float y) {
+		return CTexture.tLogicalToWorldCoord(new Vector3D<float>(x, y, 0f));
+	}
+	public static Vector3D<float> tLogicalToWorldCoord(Point ptLogicalScreenCoord) {
+		return CTexture.tLogicalToWorldCoord(new Vector3D<float>(ptLogicalScreenCoord.X, ptLogicalScreenCoord.Y, 0.0f));
+	}
+	public static Vector3D<float> tLogicalToWorldCoord(Vector2D<float> v2LogicalScreenCoord) {
+		return CTexture.tLogicalToWorldCoord(new Vector3D<float>(v2LogicalScreenCoord, 0f));
+	}
+	public static Vector3D<float> tLogicalToWorldCoord(Vector3D<float> v3LogicalScreenCoord) {
 		return new Vector3D<float>(
-			(v3論理画面座標.X - (CTexture.sz論理画面.Width / 2.0f)) * CTexture.f画面比率,
-			(-(v3論理画面座標.Y - (CTexture.sz論理画面.Height / 2.0f)) * CTexture.f画面比率),
-			v3論理画面座標.Z);
+			(v3LogicalScreenCoord.X - (CTexture.szLogicLogicScreen.Width / 2.0f)) * CTexture.fScreenRatio,
+			(-(v3LogicalScreenCoord.Y - (CTexture.szLogicLogicScreen.Height / 2.0f)) * CTexture.fScreenRatio),
+			v3LogicalScreenCoord.Z);
 	}
 
 
 
 
-	public void t2D描画SongObj(float x, float y, float xScale, float yScale) {
+	public void t2DDrawSongObj(float x, float y, float xScale, float yScale) {
+		tCacheOnDraw();             // LRU stamp + transparent re-upload if this texture was evicted
+		if (Pointer == 0) return;   // not-yet-streamed stub or disposed texture ⇒ clean no-op
 		this.color4.Alpha = this._opacity / 255f;
 
-		var rc画像内の描画領域 = rc全画像;
+		var rcImageInDrawRegion = rcFullImage;
 		this.color4.Alpha = this._opacity / 255f;
 
 		BlendType blendType;
-		if (b加算合成) {
+		if (bAddBlend) {
 			blendType = BlendType.Add;
-		} else if (b乗算合成) {
+		} else if (bMultiplyBlend) {
 			blendType = BlendType.Multi;
-		} else if (b減算合成) {
+		} else if (bSubtractBlend) {
 			blendType = BlendType.Sub;
-		} else if (bスクリーン合成) {
+		} else if (bScreenBlend) {
 			blendType = BlendType.Screen;
 		} else {
 			blendType = BlendType.Normal;
 		}
 
-		BlendHelper.SetBlend(blendType);
+		BlendHelper.SetPremultipliedBlend(blendType);
 
 		Game.Gl.UseProgram(ShaderProgram);//Uniform4よりこれが先
 
+		Game.Gl.ActiveTexture(TextureUnit.Texture0);
 		Game.Gl.BindTexture(TextureTarget.Texture2D, Pointer); //テクスチャをバインド
+
+		uint _gmIdSong = ActiveGradientMapId != 0 ? ActiveGradientMapId : _gradientMapTextureId;
+		float _gmBlendSong = ActiveGradientMapId != 0 ? ActiveGradientMapBlend : _gradientMapBlend;
+		if (_gmIdSong != 0) {
+			Game.Gl.ActiveTexture(TextureUnit.Texture1);
+			Game.Gl.BindTexture(TextureTarget.Texture2D, _gmIdSong);
+			Game.Gl.ActiveTexture(TextureUnit.Texture0);
+			Game.Gl.Uniform1(GradientBlendID, _gmBlendSong);
+		} else {
+			Game.Gl.Uniform1(GradientBlendID, 0.0f);
+		}
 
 		//MVPを設定----
 		unsafe {
@@ -855,19 +1550,19 @@ public class CTexture : IDisposable {
 
 
 			//スケーリング-----
-			mvp *= Matrix4X4.CreateScale((float)rc画像内の描画領域.Width / GameWindowSize.Width, (float)rc画像内の描画領域.Height / GameWindowSize.Height, 1) *
+			mvp *= Matrix4X4.CreateScale((float)rcImageInDrawRegion.Width / GameWindowSize.Width, (float)rcImageInDrawRegion.Height / GameWindowSize.Height, 1) *
 				   Matrix4X4.CreateScale(xScale, yScale, 1.0f);
 			//-----
 
 			//回転-----
 			mvp *= Matrix4X4.CreateScale(1.0f * gameAspect, 1.0f, 1.0f) * //ここでアスペクト比でスケーリングしないとおかしなことになる
-				   Matrix4X4.CreateRotationZ(fZ軸中心回転) *
+				   Matrix4X4.CreateRotationZ(fZAxisCenterRotate) *
 				   Matrix4X4.CreateScale(1.0f / gameAspect, 1.0f, 1.0f);//回転した後戻してあげる
 																		//-----
 
 			//移動----
-			float offsetX = rc画像内の描画領域.Width * xScale / GameWindowSize.Width;
-			float offsetY = rc画像内の描画領域.Height * yScale / GameWindowSize.Height;
+			float offsetX = rcImageInDrawRegion.Width * xScale / GameWindowSize.Width;
+			float offsetY = rcImageInDrawRegion.Height * yScale / GameWindowSize.Height;
 			mvp *= Matrix4X4.CreateTranslation(offsetX, -offsetY, 0.0f);
 			mvp *= Matrix4X4.CreateTranslation(-1.0f, 1.0f, 0);
 			mvp *= Matrix4X4.CreateTranslation(x / GameWindowSize.Width * 2, -y / GameWindowSize.Height * 2, 0.0f);
@@ -884,12 +1579,12 @@ public class CTexture : IDisposable {
 
 		//テクスチャの切り抜きの座標と大きさを設定
 		Game.Gl.Uniform4(TextureRectID, new System.Numerics.Vector4(
-			rc画像内の描画領域.X / rc全画像.Width, rc画像内の描画領域.Y / rc全画像.Height, //始まり
-			rc画像内の描画領域.Width / rc全画像.Width, rc画像内の描画領域.Height / rc全画像.Height)); //大きさ、終わりではない
+			rcImageInDrawRegion.X / rcFullImage.Width, rcImageInDrawRegion.Y / rcFullImage.Height, //始まり
+			rcImageInDrawRegion.Width / rcFullImage.Width, rcImageInDrawRegion.Height / rcFullImage.Height)); //大きさ、終わりではない
 
 		Game.Gl.Uniform1(NoteModeID, 0);
 
-		float _time = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) % 100;
+		float _time = (float)Game.dbTimeMs % 100;
 		Game.Gl.Uniform1(TimeID, _time);
 		Game.Gl.Uniform1(NoiseEffectID, bUseNoiseEffect ? 1 : 0);
 
@@ -906,10 +1601,27 @@ public class CTexture : IDisposable {
 	#region [ IDisposable 実装 ]
 	//-----------------
 	public void Dispose() {
-		if (!this.bDispose完了済み) {
+		if (!this.bDisposeCompleteDone) {
+			foreach (var (cacheDict, key) in this.CacheKeys)
+				cacheDict.Remove(key);
+			this.CacheKeys.Clear();
 			Game.Gl.DeleteTexture(Pointer); //解放
+			this.Pointer = 0;
+			s_gpuTextureBytes -= _gpuBytes;
+			if (_gpuBytes > 0) s_gpuTextureCount--;
+			_gpuBytes = 0;
+			lock (s_cacheLock) s_liveTextures.Remove(this);
 
-			this.bDispose完了済み = true;
+			if (_countedBytes != 0) {
+				Interlocked.Add(ref LiveBytes, -_countedBytes);
+				Interlocked.Decrement(ref LiveCount);
+				_countedBytes = 0;
+			}
+
+			this.bDisposeCompleteDone = true;
+			_sizePending = false;
+			_uploadPending = false;
+			_onUploaded = null;
 		}
 	}
 	//-----------------
@@ -921,10 +1633,10 @@ public class CTexture : IDisposable {
 	#region [ private ]
 	//-----------------
 	private int _opacity;
-	private bool bDispose完了済み;
+	private bool bDisposeCompleteDone;
 
-	private Size t指定されたサイズを超えない最適なテクスチャサイズを返す(Size sz指定サイズ) {
-		return sz指定サイズ;
+	private Size tGetOptimalTextureSize(Size szSpecifiedSize) {
+		return szSpecifiedSize;
 	}
 
 	private int ToArgb(Color4 col4) {
@@ -944,7 +1656,7 @@ public class CTexture : IDisposable {
 
 	// 2012.3.21 さらなる new の省略作戦
 
-	protected Rectangle rc全画像;                              // テクスチャ作ったらあとは不変
+	protected Rectangle rcFullImage;                              // テクスチャ作ったらあとは不変
 	public Color4 color4 = new Color4(1f, 1f, 1f, 1f);  // アルファ以外は不変
 
 	public void tUpdateColor4(Color4 c4) {

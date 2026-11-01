@@ -1,0 +1,9 @@
+{
+  "_comment": "거울(mirror.lua)의 한국어 텍스트. 키는 고정 ID이며, 없는 ID는 영어 텍스트(lang/en)로 표시됩니다.",
+  "student": "학생",
+  "student_a": "학생 A",
+  "student_b": "학생 B",
+  "palette": "팔레트",
+  "worn": "착용 중",
+  "locked": "이 학생으로 플레이: %d / %d"
+}

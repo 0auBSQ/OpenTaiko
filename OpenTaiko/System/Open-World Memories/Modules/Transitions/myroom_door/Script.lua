@@ -1,0 +1,96 @@
+---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
+-- myroom_door: My Room's door, between the title and My Room both ways.
+
+local TA = require("TransitionArt")
+
+-- sizes: Config/layout.json; timings and the swing: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+local CLOSE = Animation.close
+local SWING = Animation.swing
+
+FADE_OUT_SECONDS = Animation.fade_out_s
+FADE_IN_SECONDS  = Animation.fade_in_s
+
+local SCREEN_H = Layout.screen_height
+local OVERSCAN = Layout.door.overscan
+local SLAM_AT = CLOSE.slam_at
+local OPEN_SPAN = Animation.open.span
+
+local tx_door = nil
+local snd_close, snd_open = nil, nil
+local slammed, creaked = false, false
+local lastPhase = nil
+local wait = TA.new()
+
+-- the texture lives only during a trip (Lib/TransitionArt)
+local function loadTextures()
+	if tx_door == nil then tx_door = TEXTURE:CreateTexture("Textures/Door.png") end
+end
+
+local function freeTextures()
+	if tx_door then tx_door:Dispose(); tx_door = nil end
+end
+
+local function easeIn(x) return x * x * x end
+local function easeInOut(x) return x < 0.5 and 4 * x * x * x or 1 - (-2 * x + 2) ^ 3 / 2 end
+
+-- angle: 0 = shut, 1 = fully open
+local function drawDoor(angle, dx, dy)
+	if tx_door == nil or angle >= 1 then return end
+	local theta = angle * math.pi / 2
+	local shade = SWING.shade_base + SWING.shade_by_angle * math.cos(theta)
+	tx_door:SetScale(math.cos(theta), 1 + SWING.grow_by_angle * math.sin(theta))   -- the free edge swings toward the viewer
+	tx_door:SetColor(shade, shade, shade)
+	tx_door:DrawAtAnchor(-OVERSCAN + dx, SCREEN_H / 2 + dy, "left")
+	tx_door:SetScale(1, 1)
+	tx_door:SetColor(1, 1, 1)
+end
+
+function fadeOut(t)
+	if lastPhase ~= "out" then                -- a new trip
+		lastPhase = "out"
+		slammed, creaked = false, false
+		loadTextures(); wait:reset()
+	end
+	t = wait:progress(t, tx_door)
+	if t < SLAM_AT then
+		drawDoor(1 - easeIn(t / SLAM_AT), 0, 0)
+		return
+	end
+	if not slammed then
+		slammed = true
+		if snd_close then snd_close:Play() end
+	end
+	local k = (t - SLAM_AT) / (1 - SLAM_AT)                 -- 0..1 after the slam
+	local rebound = CLOSE.rebound * math.sin(k * math.pi) * (1 - k)  -- it bounces off the frame once
+	local amp = CLOSE.shake_px * (1 - k) ^ 2
+	drawDoor(rebound, amp * math.sin(k * CLOSE.shake_freq_x), amp * math.cos(k * CLOSE.shake_freq_y))
+end
+
+function loading(progress, elapsed)
+	lastPhase = "load"
+	drawDoor(0, 0, 0)
+end
+
+function fadeIn(t)
+	lastPhase = "in"
+	if not creaked then
+		creaked = true
+		if snd_open then snd_open:Play() end
+	end
+	drawDoor(easeInOut(math.min(1, t / OPEN_SPAN)), 0, 0)
+	if t >= 1 then freeTextures() end   -- the trip is over
+end
+
+function onStart()
+	snd_close = SOUND:CreateSFX("Sounds/DoorClose.ogg")
+	snd_open = SOUND:CreateSFX("Sounds/DoorOpen.ogg")
+end
+
+function onDestroy()
+	freeTextures()
+	if snd_close then snd_close:Dispose(); snd_close = nil end
+	if snd_open then snd_open:Dispose(); snd_open = nil end
+end

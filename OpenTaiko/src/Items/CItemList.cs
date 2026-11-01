@@ -6,80 +6,80 @@
 internal class CItemList : CItemBase {
 	// Properties
 
-	public List<string> list項目値;
-	public int n現在選択されている項目番号;
+	public List<string> listItemValue;
+	public int nCurrentSelectedItemNumber;
 
 
 	// Constructor
 
 	public CItemList() {
-		base.e種別 = CItemBase.E種別.リスト;
-		this.n現在選択されている項目番号 = 0;
-		this.list項目値 = new List<string>();
+		base.eType = CItemBase.EType.List;
+		this.nCurrentSelectedItemNumber = 0;
+		this.listItemValue = new List<string>();
 	}
-	public CItemList(string str項目名)
+	public CItemList(string strItemName)
 		: this() {
-		this.t初期化(str項目名);
+		this.tInitialize(strItemName);
 	}
-	public CItemList(string str項目名, CItemBase.EPanelType eパネル種別)
+	public CItemList(string strItemName, CItemBase.EPanelType ePanelType)
 		: this() {
-		this.t初期化(str項目名, eパネル種別);
+		this.tInitialize(strItemName, ePanelType);
 	}
-	public CItemList(string str項目名, CItemBase.EPanelType eパネル種別, int n初期インデックス値, params string[] arg項目リスト)
+	public CItemList(string strItemName, CItemBase.EPanelType ePanelType, int nInitialIndexValue, params string[] argItemList)
 		: this() {
-		this.t初期化(str項目名, eパネル種別, n初期インデックス値, arg項目リスト);
+		this.tInitialize(strItemName, ePanelType, nInitialIndexValue, argItemList);
 	}
-	public CItemList(string str項目名, CItemBase.EPanelType eパネル種別, int n初期インデックス値, string str説明文jp, params string[] arg項目リスト)
+	public CItemList(string strItemName, CItemBase.EPanelType ePanelType, int nInitialIndexValue, string strDescriptionjp, params string[] argItemList)
 		: this() {
-		this.t初期化(str項目名, eパネル種別, n初期インデックス値, str説明文jp, arg項目リスト);
+		this.tInitialize(strItemName, ePanelType, nInitialIndexValue, strDescriptionjp, argItemList);
 	}
-	public CItemList(string str項目名, CItemBase.EPanelType eパネル種別, int n初期インデックス値, string str説明文jp, string str説明文en, params string[] arg項目リスト)
+	public CItemList(string strItemName, CItemBase.EPanelType ePanelType, int nInitialIndexValue, string strDescriptionjp, string strDescriptionen, params string[] argItemList)
 		: this() {
-		this.t初期化(str項目名, eパネル種別, n初期インデックス値, str説明文jp, str説明文en, arg項目リスト);
+		this.tInitialize(strItemName, ePanelType, nInitialIndexValue, strDescriptionjp, strDescriptionen, argItemList);
 	}
 
 
 	// CItemBase 実装
 
-	public override void tEnter押下() {
-		this.t項目値を次へ移動();
+	public override void tEnterPressed() {
+		this.tItemValueNextMove();
 	}
-	public override void t項目値を次へ移動() {
-		if (++this.n現在選択されている項目番号 >= this.list項目値.Count) {
-			this.n現在選択されている項目番号 = 0;
+	public override void tItemValueNextMove() {
+		if (++this.nCurrentSelectedItemNumber >= this.listItemValue.Count) {
+			this.nCurrentSelectedItemNumber = 0;
 		}
 	}
-	public override void t項目値を前へ移動() {
-		if (--this.n現在選択されている項目番号 < 0) {
-			this.n現在選択されている項目番号 = this.list項目値.Count - 1;
+	public override void tItemValuePrevMove() {
+		if (--this.nCurrentSelectedItemNumber < 0) {
+			this.nCurrentSelectedItemNumber = this.listItemValue.Count - 1;
 		}
 	}
-	public override void t初期化(string str項目名, CItemBase.EPanelType eパネル種別) {
-		base.t初期化(str項目名, eパネル種別);
-		this.n現在選択されている項目番号 = 0;
-		this.list項目値.Clear();
+	public override void tInitialize(string strItemName, CItemBase.EPanelType ePanelType) {
+		base.tInitialize(strItemName, ePanelType);
+		this.nCurrentSelectedItemNumber = 0;
+		this.listItemValue.Clear();
 	}
-	public void t初期化(string str項目名, CItemBase.EPanelType eパネル種別, int n初期インデックス値, params string[] arg項目リスト) {
-		this.t初期化(str項目名, eパネル種別, n初期インデックス値, "", "", arg項目リスト);
+	public void tInitialize(string strItemName, CItemBase.EPanelType ePanelType, int nInitialIndexValue, params string[] argItemList) {
+		this.tInitialize(strItemName, ePanelType, nInitialIndexValue, "", "", argItemList);
 	}
-	public void t初期化(string str項目名, CItemBase.EPanelType eパネル種別, int n初期インデックス値, string str説明文jp, params string[] arg項目リスト) {
-		this.t初期化(str項目名, eパネル種別, n初期インデックス値, str説明文jp, str説明文jp, arg項目リスト);
+	public void tInitialize(string strItemName, CItemBase.EPanelType ePanelType, int nInitialIndexValue, string strDescriptionjp, params string[] argItemList) {
+		this.tInitialize(strItemName, ePanelType, nInitialIndexValue, strDescriptionjp, strDescriptionjp, argItemList);
 	}
-	public void t初期化(string str項目名, CItemBase.EPanelType eパネル種別, int n初期インデックス値, string str説明文jp, string str説明文en, params string[] arg項目リスト) {
-		base.t初期化(str項目名, eパネル種別, str説明文jp, str説明文en);
-		this.n現在選択されている項目番号 = n初期インデックス値;
-		foreach (string str in arg項目リスト) {
-			this.list項目値.Add(str);
+	public void tInitialize(string strItemName, CItemBase.EPanelType ePanelType, int nInitialIndexValue, string strDescriptionjp, string strDescriptionen, params string[] argItemList) {
+		base.tInitialize(strItemName, ePanelType, strDescriptionjp, strDescriptionen);
+		this.nCurrentSelectedItemNumber = nInitialIndexValue;
+		foreach (string str in argItemList) {
+			this.listItemValue.Add(str);
 		}
 	}
-	public override object obj現在値() {
-		return this.list項目値[n現在選択されている項目番号];
+	public override object objCurrentValue() {
+		return this.listItemValue[nCurrentSelectedItemNumber];
 	}
 	public override int GetIndex() {
-		return n現在選択されている項目番号;
+		return nCurrentSelectedItemNumber;
 	}
 	public override void SetIndex(int index) {
-		n現在選択されている項目番号 = index;
+		nCurrentSelectedItemNumber = index;
 	}
 }
 
@@ -94,32 +94,32 @@ internal class CSwitchItemList : CItemList {
 	// Constructor
 
 	public CSwitchItemList() {
-		base.e種別 = CItemBase.E種別.切替リスト;
-		this.n現在選択されている項目番号 = 0;
-		this.list項目値 = new List<string>();
+		base.eType = CItemBase.EType.SwitchList;
+		this.nCurrentSelectedItemNumber = 0;
+		this.listItemValue = new List<string>();
 	}
-	public CSwitchItemList(string str項目名)
+	public CSwitchItemList(string strItemName)
 		: this() {
-		this.t初期化(str項目名);
+		this.tInitialize(strItemName);
 	}
-	public CSwitchItemList(string str項目名, CItemBase.EPanelType eパネル種別)
+	public CSwitchItemList(string strItemName, CItemBase.EPanelType ePanelType)
 		: this() {
-		this.t初期化(str項目名, eパネル種別);
+		this.tInitialize(strItemName, ePanelType);
 	}
-	public CSwitchItemList(string str項目名, CItemBase.EPanelType eパネル種別, int n初期インデックス値, params string[] arg項目リスト)
+	public CSwitchItemList(string strItemName, CItemBase.EPanelType ePanelType, int nInitialIndexValue, params string[] argItemList)
 		: this() {
-		this.t初期化(str項目名, eパネル種別, n初期インデックス値, arg項目リスト);
+		this.tInitialize(strItemName, ePanelType, nInitialIndexValue, argItemList);
 	}
-	public CSwitchItemList(string str項目名, CItemBase.EPanelType eパネル種別, int n初期インデックス値, string str説明文jp, params string[] arg項目リスト)
+	public CSwitchItemList(string strItemName, CItemBase.EPanelType ePanelType, int nInitialIndexValue, string strDescriptionjp, params string[] argItemList)
 		: this() {
-		this.t初期化(str項目名, eパネル種別, n初期インデックス値, str説明文jp, arg項目リスト);
+		this.tInitialize(strItemName, ePanelType, nInitialIndexValue, strDescriptionjp, argItemList);
 	}
-	public CSwitchItemList(string str項目名, CItemBase.EPanelType eパネル種別, int n初期インデックス値, string str説明文jp, string str説明文en, params string[] arg項目リスト)
+	public CSwitchItemList(string strItemName, CItemBase.EPanelType ePanelType, int nInitialIndexValue, string strDescriptionjp, string strDescriptionen, params string[] argItemList)
 		: this() {
-		this.t初期化(str項目名, eパネル種別, n初期インデックス値, str説明文jp, str説明文en, arg項目リスト);
+		this.tInitialize(strItemName, ePanelType, nInitialIndexValue, strDescriptionjp, strDescriptionen, argItemList);
 	}
 
-	public override void tEnter押下() {
+	public override void tEnterPressed() {
 		// this.t項目値を次へ移動();	// 何もしない
 	}
 }

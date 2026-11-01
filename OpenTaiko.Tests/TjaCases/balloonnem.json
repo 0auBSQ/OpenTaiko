@@ -1,0 +1,29 @@
+{
+	"tja": "balloonnem.tja",
+	"cases": [
+		{
+			"difficulty": 3,
+			"playerCount": 3,
+			"playerSide": 0,
+			"expect": {
+				"popCounts": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 ]
+			}
+		},
+		{
+			"difficulty": 3,
+			"playerCount": 3,
+			"playerSide": 1,
+			"expect": {
+				"popCounts": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 ]
+			}
+		},
+		{
+			"difficulty": 3,
+			"playerCount": 3,
+			"playerSide": 2,
+			"expect": {
+				"popCounts": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 ]
+			}
+		}
+	]
+}

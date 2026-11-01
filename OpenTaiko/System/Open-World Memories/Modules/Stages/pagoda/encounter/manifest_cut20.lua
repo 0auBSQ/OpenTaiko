@@ -1,0 +1,30 @@
+-- Level 20 cutscene art: each texture's path, size, placement and pivot.
+return {
+    tex = {
+        cut20_bg        = { path = "Textures/encounter/cut20/bg.jpg", w = 480, h = 270, x = 0, y = 0 },
+        cut20_tobiraph  = { path = "Textures/encounter/cut20/tobiraph.png", w = 1924, h = 1406, x = -19.8, y = -166, fx = 1025.8, fy = 628 },
+        cut20_corrupt   = { path = "Textures/encounter/cut20/tobiraph_corrupt.png", w = 1924, h = 1406, x = -19.8, y = -166, fx = 1025.8, fy = 628 },
+        cut20_ume       = { path = "Textures/encounter/cut20/ume.png", w = 589, h = 359, x = 68, y = 721 },
+        cut20_ume_clear = { path = "Textures/encounter/cut20/ume_clear.png", w = 589, h = 359, x = 68, y = 721 },
+        cut20_glitch    = { path = "Textures/encounter/cut20/glitch.png", w = 640, h = 453 },
+        cut20_rain      = { path = "Textures/encounter/cut20/rain.png", w = 8, h = 120, fx = 4, fy = 60 },
+        cut20_bolt      = { path = "Textures/encounter/cut20/bolt.png", w = 300, h = 780, fx = 150, fy = 0 },
+        cut20_star      = { path = "Textures/encounter/cut20/star.png", w = 160, h = 160, fx = 80, fy = 80 },
+        cut20_white     = { path = "Textures/encounter/cut20/white.png", w = 8, h = 8 },
+        cut20_final     = { path = "Textures/encounter/cut20/final.jpg", w = 1920, h = 1080, x = 0, y = 0 },
+        cut20_bean      = { path = "Textures/story/bg/beanstalk/bean.png", w = 1571, h = 1080, x = 349, y = 0 },
+        cut20_cloud     = { path = "Textures/story/bg/beanstalk/cloud.png", w = 720, h = 411, x = 0, y = 258 },
+    },
+    cut20_glitch = {
+        { x = 0, y = 0, w = 285, h = 301 },
+        { x = 285, y = 0, w = 131, h = 123 },
+        { x = 416, y = 0, w = 178, h = 106 },
+        { x = 0, y = 301, w = 172, h = 96 },
+        { x = 172, y = 301, w = 174, h = 93 },
+        { x = 346, y = 301, w = 73, h = 91 },
+        { x = 419, y = 301, w = 182, h = 82 },
+        { x = 0, y = 397, w = 78, h = 56 },
+        { x = 78, y = 397, w = 61, h = 42 },
+    },
+    cut20 = { cloud_scale = 2, finial_x = 984, finial_y = 1080 },
+}

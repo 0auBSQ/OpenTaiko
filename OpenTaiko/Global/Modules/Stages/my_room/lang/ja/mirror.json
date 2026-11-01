@@ -1,0 +1,9 @@
+{
+  "_comment": "鏡（mirror.lua）の日本語テキスト。",
+  "student": "学生",
+  "student_a": "学生A",
+  "student_b": "学生B",
+  "palette": "パレット",
+  "worn": "着用中",
+  "locked": "この学生でのプレイ回数：%d / %d"
+}

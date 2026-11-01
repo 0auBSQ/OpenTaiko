@@ -1,0 +1,39 @@
+{
+  "_comment": "German texts for the Placeholder Matrix (matrix.lua). Keys are stable ids; a missing id shows the English text (lang/en).",
+  "hint": "Wähle eine Szene zum Projizieren.",
+  "unlock_title": "Gesperrte Szene",
+  "unlock_q": "„%s“ freischalten?",
+  "unlock_yes": "Freischalten",
+  "unlock_no": "Zurück",
+  "broke": "Nicht genug Münzen.",
+  "scenes": {
+    "demo_overall": {
+      "name": "Gesamtdemo",
+      "desc": "Fünf kleine Demos in einer Stage; die Tasten 1 bis 5 wechseln zwischen ihnen."
+    },
+    "demo_canvas": {
+      "name": "Canvas-Demo",
+      "desc": "Ein kleines Malprogramm: mit der Maus auf ein weißes Blatt zeichnen, mit LuaCanvas und Mauseingabe."
+    },
+    "demo_particles": {
+      "name": "Partikel-Demo",
+      "desc": "Ein Belastungstest der Partikel-Engine von Lua3DScene."
+    },
+    "demo_modal": {
+      "name": "Modal-Demo",
+      "desc": "Spielt die Belohnungs- und Freischalt-Modals jeder Seltenheit und jedes Typs ab."
+    },
+    "demo_aviutl2": {
+      "name": "AviUtl2-Demo",
+      "desc": "AviUtl2-Projekte (.aup2), im Videoplayer abgespielt."
+    },
+    "demo_rt": {
+      "name": "Raytracer-Demo",
+      "desc": "Der pfadverfolgende Raytracer-Modus von Lua3DScene."
+    },
+    "demo_dan_builder": {
+      "name": "Dan-Builder-Demo",
+      "desc": "Ein minimalistischer zufälliger Dan-Spieler."
+    }
+  }
+}

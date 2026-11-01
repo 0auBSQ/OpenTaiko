@@ -13,54 +13,70 @@ internal class FlyingNotes : CActivity {
 
 	// メソッド
 	public virtual void Start(NotesManager.ENoteType nLane, EGameType gameType, int nPlayer, bool? forceFirework = null) {
-		if (OpenTaiko.ConfigIni.nPlayerCount > 2 || OpenTaiko.ConfigIni.SimpleMode || nLane is NotesManager.ENoteType.Empty or NotesManager.ENoteType.Unknown)
+		if (!Flies(OpenTaiko.ConfigIni, nLane) || nPlayer < 0 || nPlayer >= StartPointX.Length)
 			return;
 
 		if (OpenTaiko.Tx.Notes[(int)gameType] != null) {
-			for (int i = 0; i < 128; i++) {
-				if (!Flying[i].IsUsing) {
-					// 初期化
-					Flying[i].IsUsing = true;
-					Flying[i].Lane = nLane;
-					Flying[i].GameType = gameType;
-					Flying[i].Player = nPlayer;
-					Flying[i].X = -100; //StartPointX[nPlayer];
-					Flying[i].Y = -100; //TJAPlayer3.Skin.Game_Effect_FlyingNotes_StartPoint_Y[nPlayer];
-					Flying[i].StartPointX = StartPointX[nPlayer];
-					Flying[i].StartPointY = OpenTaiko.Skin.Game_Effect_FlyingNotes_StartPoint_Y[nPlayer];
-					Flying[i].OldValue = 0;
-					Flying[i].ForceFirework = forceFirework; // for balloons; no firework for big roll in some style (not followed)
-					// 角度の決定
-					Flying[i].Height = Math.Abs(OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[nPlayer] - OpenTaiko.Skin.Game_Effect_FlyingNotes_StartPoint_Y[nPlayer]);
-					Flying[i].Width = (Math.Abs((OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[nPlayer] - StartPointX[nPlayer])) / 2);
-					//Console.WriteLine("{0}, {1}", width2P, height2P);
-					Flying[i].Theta = ((Math.Atan2(Flying[i].Height, Flying[i].Width) * 180.0) / Math.PI);
-					Flying[i].Counter = new CCounter(0, 140, OpenTaiko.Skin.Game_Effect_FlyingNotes_Timer, OpenTaiko.Timer);
-					//Flying[i].Counter = new CCounter(0, 200000, CDTXMania.Skin.Game_Effect_FlyingNotes_Timer, CDTXMania.Timer);
+			ref var flying = ref Flying[FlyingTail];
+			if (!flying.IsUsing) {
+				FlyingTail = (FlyingTail + 1) % FLYING_COUNT;
+				// 初期化
+				flying.IsUsing = true;
+				flying.Lane = nLane;
+				flying.GameType = gameType;
+				flying.Player = nPlayer;
+				flying.X = -100; //StartPointX[nPlayer];
+				flying.Y = -100; //TJAPlayer3.Skin.Game_Effect_FlyingNotes_StartPoint_Y[nPlayer];
+				flying.StartPointX = StartPointX[nPlayer];
+				flying.StartPointY = OpenTaiko.Skin.Game_Effect_FlyingNotes_StartPoint_Y[nPlayer];
+				flying.OldValue = 0;
+				flying.ForceFirework = forceFirework; // for balloons; no firework for big roll in some style (not followed)
+				// 角度の決定
+				flying.Height = Math.Abs(OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[nPlayer] - OpenTaiko.Skin.Game_Effect_FlyingNotes_StartPoint_Y[nPlayer]);
+				flying.Width = (Math.Abs((OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[nPlayer] - StartPointX[nPlayer])) / 2);
+				//Console.WriteLine("{0}, {1}", width2P, height2P);
+				flying.Theta = ((Math.Atan2(flying.Height, flying.Width) * 180.0) / Math.PI);
+				flying.Counter = new CCounter(0, 140, OpenTaiko.Skin.Game_Effect_FlyingNotes_Timer, OpenTaiko.Timer);
+				//flying.Counter = new CCounter(0, 200000, CDTXMania.Skin.Game_Effect_FlyingNotes_Timer, CDTXMania.Timer);
 
-					Flying[i].IncreaseX = (1.00 * Math.Abs((OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[nPlayer] - StartPointX[nPlayer]))) / (180);
-					Flying[i].IncreaseY = (1.00 * Math.Abs((OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[nPlayer] - OpenTaiko.Skin.Game_Effect_FlyingNotes_StartPoint_Y[nPlayer]))) / (180);
-					break;
-				}
+				flying.IncreaseX = (1.00 * Math.Abs((OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[nPlayer] - StartPointX[nPlayer]))) / (180);
+				flying.IncreaseY = (1.00 * Math.Abs((OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[nPlayer] - OpenTaiko.Skin.Game_Effect_FlyingNotes_StartPoint_Y[nPlayer]))) / (180);
 			}
 		}
+	}
+
+	// the skin has fly coordinates for the 1 and 2 player layouts only, so 3 players or more drop them
+	internal static bool Flies(CConfigIni config, NotesManager.ENoteType nLane)
+		=> config.nPlayerCount <= 2 && !config.SimpleMode
+			&& nLane is not (NotesManager.ENoteType.Empty or NotesManager.ENoteType.Unknown);
+
+	// the flight positions of one frame: every multiple of step passed since the last frame, once each, then the
+	// current position; a step of 0 or less gives no multiples
+	internal static IEnumerable<(int mid, bool onStep)> MidValues(int old, int current, int step, bool needMid) {
+		if (needMid && step > 0) {
+			for (int mid = (old / step + 1) * step; mid <= current; mid += step)
+				yield return (mid, true);
+		}
+		yield return (current, false);
 	}
 
 	// CActivity 実装
 
 	public override void Activate() {
-		for (int i = 0; i < 128; i++) {
-			Flying[i] = new Status();
-			Flying[i].IsUsing = false;
-			Flying[i].Counter = new CCounter();
+		for (int i = 0; i < FLYING_COUNT; i++) {
+			ref var flying = ref Flying[i];
+			flying = new Status();
+			flying.IsUsing = false;
+			flying.Counter = new CCounter();
 		}
+		FlyingHead = FlyingTail = 0;
 		for (int i = 0; i < 2; i++) {
 			StartPointX[i] = OpenTaiko.Skin.Game_Effect_FlyingNotes_StartPoint_X[i];
 		}
 		base.Activate();
 	}
 	public override void DeActivate() {
-		for (int i = 0; i < 128; i++) {
+		for (int i = 0; i < FLYING_COUNT; i++) {
 			Flying[i].Counter = null;
 		}
 		base.DeActivate();
@@ -73,80 +89,95 @@ internal class FlyingNotes : CActivity {
 	}
 	public override int Draw() {
 		if (!base.IsDeActivated && !OpenTaiko.ConfigIni.SimpleMode) {
-			for (int i = 0; i < 128; i++) {
-				if (Flying[i].IsUsing) {
-					Flying[i].OldValue = Flying[i].Counter.CurrentValue;
-					Flying[i].Counter.Tick();
-					if (Flying[i].Counter.IsEnded) {
-						Flying[i].Counter.Stop();
-						Flying[i].IsUsing = false;
-						OpenTaiko.stageGameScreen.actGauge.Start(Flying[i].Lane, Flying[i].GameType, ENoteJudge.Perfect, Flying[i].Player);
-						OpenTaiko.stageGameScreen.actChipEffects.Start(Flying[i].Player, Flying[i].Lane, Flying[i].GameType);
+			var prevHead = FlyingHead;
+			for (int i = 0; i < FLYING_COUNT; i++) {
+				var iState = (prevHead + i) % FLYING_COUNT;
+				ref var state = ref Flying[iState];
+				if (!state.IsUsing) {
+					if (iState == FlyingTail)
+						break;
+				} else {
+					// the shown gameplay background can make the notes land on its own art
+					bool toBackground = OpenTaiko.stageGameScreen.actBackground.FlyTarget(state.Player, out double bgX, out double bgY);
+					state.OldValue = state.Counter!.CurrentValue;
+					state.Counter.Tick();
+					if (state.Counter.IsEnded) {
+						state.Counter.Stop();
+						state.IsUsing = false;
+						if (iState == FlyingHead)
+							FlyingHead = (FlyingHead + 1) % FLYING_COUNT;
+						OpenTaiko.stageGameScreen.actGauge.Start(state.Lane, state.GameType, ENoteJudge.Perfect, state.Player);
+						if (!toBackground)
+							OpenTaiko.stageGameScreen.actChipEffects.Start(state.Player, state.Lane, state.GameType);
+						OpenTaiko.stageGameScreen.actBackground.NoteLanded(state.Player);
 					}
-					for (int n = Flying[i].OldValue; n < Flying[i].Counter.CurrentValue; n += 16) {
-						int endX;
-						int endY;
 
-						if (OpenTaiko.ConfigIni.bAIBattleMode) {
-							endX = OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X_AI[Flying[i].Player];
-							endY = OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y_AI[Flying[i].Player];
-						} else {
-							endX = OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[Flying[i].Player];
-							endY = OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[Flying[i].Player];
-						}
+					int endX;
+					int endY;
 
-						int movingDistanceX = endX - StartPointX[Flying[i].Player];
-						int movingDistanceY = endY - OpenTaiko.Skin.Game_Effect_FlyingNotes_StartPoint_Y[Flying[i].Player];
+					if (toBackground) {
+						endX = (int)bgX;
+						endY = (int)bgY;
+					} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
+						endX = OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X_AI[state.Player];
+						endY = OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y_AI[state.Player];
+					} else {
+						endX = OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[state.Player];
+						endY = OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[state.Player];
+					}
 
+					int movingDistanceX = endX - StartPointX[state.Player];
+					int movingDistanceY = endY - OpenTaiko.Skin.Game_Effect_FlyingNotes_StartPoint_Y[state.Player];
+
+					bool needFireWork = state.ForceFirework ?? NotesManager.IsBigNoteTaiko(state.Lane, state.GameType);
+					foreach ((int mid, bool onStep) in MidValues(state.OldValue, state.Counter.CurrentValue, OpenTaiko.Skin.Game_Effect_FireWorks_Timing, needFireWork)) {
 						/*
                         if (TJAPlayer3.Skin.Game_Effect_FlyingNotes_IsUsingEasing)
                         {
-                            Flying[i].X = (Flying[i].StartPointX + movingDistanceX + ((-Math.Cos(Flying[i].Counter.n現在の値 * (Math.PI / 180)) * movingDistanceX))) - 85;
-                            //Flying[i].X += (Math.Cos(Flying[i].Counter.n現在の値 * (Math.PI / 180))) * Flying[i].Increase;
+                            flying.X = (flying.StartPointX + movingDistanceX + ((-Math.Cos(flying.Counter.n現在の値 * (Math.PI / 180)) * movingDistanceX))) - 85;
+                            //flying.X += (Math.Cos(flying.Counter.n現在の値 * (Math.PI / 180))) * flying.Increase;
                         }
                         else
                         {
-                            Flying[i].X += Flying[i].IncreaseX;
+                            flying.X += flying.IncreaseX;
                         }
                         */
 
-						double value = (Flying[i].Counter.CurrentValue / 140.0);
+						double movingRate = (mid / 140.0);
 
-						Flying[i].X = StartPointX[Flying[i].Player] + OpenTaiko.stageGameScreen.GetJPOSCROLLX(Flying[i].Player) + (movingDistanceX * value);
-						Flying[i].Y = OpenTaiko.Skin.Game_Effect_FlyingNotes_StartPoint_Y[Flying[i].Player] + OpenTaiko.stageGameScreen.GetJPOSCROLLY(Flying[i].Player) + (int)(movingDistanceY * value);
+						state.X = StartPointX[state.Player] + OpenTaiko.stageGameScreen.GetJPOSCROLLX(state.Player) + (movingDistanceX * movingRate);
+						state.Y = OpenTaiko.Skin.Game_Effect_FlyingNotes_StartPoint_Y[state.Player] + OpenTaiko.stageGameScreen.GetJPOSCROLLY(state.Player) + (int)(movingDistanceY * movingRate);
 
 						if (OpenTaiko.ConfigIni.bAIBattleMode) {
-							Flying[i].Y += Math.Sin(value * Math.PI) * ((Flying[i].Player == 0 ? -OpenTaiko.Skin.Game_Effect_FlyingNotes_Sine : OpenTaiko.Skin.Game_Effect_FlyingNotes_Sine) / 3.0);
+							state.Y += Math.Sin(movingRate * Math.PI) * ((state.Player == 0 ? -OpenTaiko.Skin.Game_Effect_FlyingNotes_Sine : OpenTaiko.Skin.Game_Effect_FlyingNotes_Sine) / 3.0);
 						} else {
-							Flying[i].Y += Math.Sin(value * Math.PI) * (Flying[i].Player == 0 ? -OpenTaiko.Skin.Game_Effect_FlyingNotes_Sine : OpenTaiko.Skin.Game_Effect_FlyingNotes_Sine);
+							state.Y += Math.Sin(movingRate * Math.PI) * (state.Player == 0 ? -OpenTaiko.Skin.Game_Effect_FlyingNotes_Sine : OpenTaiko.Skin.Game_Effect_FlyingNotes_Sine);
 						}
 
 						if (OpenTaiko.Skin.Game_Effect_FlyingNotes_IsUsingEasing) {
 						} else {
 						}
 
-						if (n % OpenTaiko.Skin.Game_Effect_FireWorks_Timing == 0 && Flying[i].Counter.CurrentValue > 18) {
-							if (Flying[i].ForceFirework ?? NotesManager.IsBigNoteTaiko(Flying[i].Lane, Flying[i].GameType)) {
-								OpenTaiko.stageGameScreen.FireWorks.Start(Flying[i].Lane, Flying[i].GameType, Flying[i].Player, Flying[i].X, Flying[i].Y);
-							}
+						if (needFireWork && onStep && mid > 8) {
+							OpenTaiko.stageGameScreen.FireWorks.Start(state.Lane, state.GameType, state.Player, state.X, state.Y);
 						}
 
 						/*
-                        if (Flying[i].Player == 0)
+                        if (flying.Player == 0)
                         {
-                            Flying[i].Y = ((TJAPlayer3.Skin.Game_Effect_FlyingNotes_StartPoint_Y[Flying[i].Player]) + -Math.Sin(Flying[i].Counter.n現在の値 * (Math.PI / 180)) * 559) + 329;
-                            Flying[i].Y -= Flying[i].IncreaseY * Flying[i].Counter.n現在の値;
+                            flying.Y = ((TJAPlayer3.Skin.Game_Effect_FlyingNotes_StartPoint_Y[flying.Player]) + -Math.Sin(flying.Counter.n現在の値 * (Math.PI / 180)) * 559) + 329;
+                            flying.Y -= flying.IncreaseY * flying.Counter.n現在の値;
                         }
                         else
                         {
-                            Flying[i].Y = ((TJAPlayer3.Skin.Game_Effect_FlyingNotes_StartPoint_Y[Flying[i].Player]) + Math.Sin(Flying[i].Counter.n現在の値 * (Math.PI / 180)) * 559) - 329;
-                            Flying[i].Y += Flying[i].IncreaseY * Flying[i].Counter.n現在の値;
+                            flying.Y = ((TJAPlayer3.Skin.Game_Effect_FlyingNotes_StartPoint_Y[flying.Player]) + Math.Sin(flying.Counter.n現在の値 * (Math.PI / 180)) * 559) - 329;
+                            flying.Y += flying.IncreaseY * flying.Counter.n現在の値;
                         }
                         */
 					}
-					//Flying[i].OldValue = Flying[i].Counter.n現在の値;
+					//flying.OldValue = flying.Counter.n現在の値;
 
-					NotesManager.DisplayNote(Flying[i].Player, (int)Flying[i].X, (int)Flying[i].Y, Flying[i].Lane, Flying[i].GameType);
+					NotesManager.DisplayNote(state.Player, (int)state.X, (int)state.Y, state.Lane, state.GameType);
 				}
 			}
 		}
@@ -163,7 +194,7 @@ internal class FlyingNotes : CActivity {
 		public EGameType GameType;
 		public int Player;
 		public bool IsUsing;
-		public CCounter Counter;
+		public CCounter? Counter;
 		public int OldValue;
 		public double X;
 		public double Y;
@@ -177,7 +208,10 @@ internal class FlyingNotes : CActivity {
 		public double Theta;
 	}
 
-	private Status[] Flying = new Status[128];
+	private const int FLYING_COUNT = 128; // circular queue
+	private readonly Status[] Flying = new Status[FLYING_COUNT];
+	private int FlyingHead = 0;
+	private int FlyingTail = 0;
 
 	public readonly int[] StartPointX = new int[2];
 

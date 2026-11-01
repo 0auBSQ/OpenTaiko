@@ -1,0 +1,14 @@
+{
+    "_note": "Cutscene layout, in 1920x1080 pixels. Colours are [r, g, b] from 0 to 1; opacities 0 to 1. backdrop_color fills the letterbox, the dim behind the popup and the fade at the end; dim_opacity is how dark the picture goes behind the popup.",
+    "screen": { "width": 1920, "height": 1080 },
+    "backdrop_color": [0, 0, 0],
+    "dim_opacity": 0.5,
+    "popup": {
+        "_note": "the pause panel, centred on the screen; the menu starts menu_y below the panel's content top",
+        "width": 560,
+        "height": 300,
+        "padding": 30,
+        "row_height": 72,
+        "menu_y": 10
+    }
+}

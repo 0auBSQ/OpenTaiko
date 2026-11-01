@@ -1,0 +1,48 @@
+{
+    "_note": "Newspaper way back timings. Times in seconds; distances in 1920x1080 pixels; angles in degrees; rates in radians per second. A '_min' / '_extra' pair is a random value from min to min + extra. fade_out_s: the papers fly in. The papers fly off at scatter_at_s into the fade-in, for scatter_s (the end of the fade-in); the next stage starts to show between them reveal_after_s after scatter_at_s. flap_squash: how thin a flapping page gets.",
+    "fade_out_s": 1.3,
+    "scatter_at_s": 0.1,
+    "scatter_s": 1.35,
+    "reveal_after_s": 0.7,
+    "arrive": {
+        "_note": "the papers flying in, in parts (0 to 1) of the fade-out: page k (0 first, 1 last) starts at spread * k, give or take jitter / 2, and takes duration_min + duration_extra. It comes from up to from_y / 2 above or below, arcs by arc, spins in by spin_deg and flaps flap times while flying; ease is the power of its slow-down, spin_ease the power of its turn.",
+        "spread": 0.46,
+        "jitter": 0.05,
+        "duration_min": 0.36,
+        "duration_extra": 0.22,
+        "from_y": 440,
+        "arc_min": 20,
+        "arc_extra": 60,
+        "spin_deg_min": 25,
+        "spin_deg_extra": 50,
+        "flap_min": 1.2,
+        "flap_extra": 1.4,
+        "ease": 2.5,
+        "spin_ease": 1.5
+    },
+    "leave": {
+        "_note": "the papers flying off, in seconds from scatter_at_s: the top page first, page k (0 first, 1 last) at spread * (1 - k) plus up to jitter; each ends end_margin_s before the scatter does. It flies to up to to_y / 2 above or below; ease is the power of its speed-up; it lifts off the pile at lift_rate per unit of its flight.",
+        "spread": 0.5,
+        "jitter": 0.06,
+        "end_margin_s": 0.02,
+        "duration_min": 0.55,
+        "duration_extra": 0.3,
+        "to_y": 320,
+        "spin_deg_min": 15,
+        "spin_deg_extra": 30,
+        "flap_min": 1.0,
+        "flap_extra": 1.2,
+        "ease": 2.2,
+        "lift_rate": 2.5
+    },
+    "flap_squash": 0.3,
+    "drift": {
+        "_note": "every page drifts while it lies: x_px at x_rate, y_px at y_rate, turn_deg at turn_rate",
+        "x_px": 6,
+        "x_rate": 0.8,
+        "y_px": 5,
+        "y_rate": 0.6,
+        "turn_deg": 0.7,
+        "turn_rate": 0.5
+    }
+}

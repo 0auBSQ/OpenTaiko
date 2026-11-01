@@ -1,0 +1,6 @@
+{
+    "title": "Stages personalizados",
+    "empty": "Todavía no hay stages personalizados instalados.",
+    "empty_hint": "Coloca la carpeta de un stage en Global/Modules/Stages y reinicia el juego.",
+    "ok": "Aceptar"
+}

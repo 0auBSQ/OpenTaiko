@@ -1,0 +1,17 @@
+{
+    "_note": "Rainbow spectrum and glitter looks (Lib/Rainbow), used when the caller's opts leave a value out. Saturation and value 0 to 1; scales are factors of the caller's sparkle texture.",
+    "spectrum": {
+        "_note": "strip_px: source pixels per tinted strip; cycles: hue turns across the span; sat and val: the tint's saturation and value",
+        "strip_px": 4,
+        "cycles": 1,
+        "sat": 0.65,
+        "val": 1
+    },
+    "glitter": {
+        "_note": "at most max sparkles at once; a sparkle's scale is scale_min plus up to scale_range more, at random, and it starts turned up to rot_range_deg",
+        "max": 24,
+        "scale_min": 0.6,
+        "scale_range": 0.4,
+        "rot_range_deg": 90
+    }
+}

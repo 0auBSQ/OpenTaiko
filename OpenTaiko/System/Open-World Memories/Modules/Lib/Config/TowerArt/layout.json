@@ -1,0 +1,4 @@
+{
+    "_note": "Tower art (Lib/TowerArt). look_defaults: the values a look gets for any key its own TowerArt/<look>/Config.json leaves out, in the pieces' pixels: floor_height (how far a floor's bottom sits above the one below), deco_dx / deco_dy (the decoration's bottom centre, from its floor's bottom centre).",
+    "look_defaults": { "floor_height": 216, "deco_dx": -135, "deco_dy": -27 }
+}

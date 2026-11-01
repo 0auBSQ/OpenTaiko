@@ -28,8 +28,8 @@ public static class LoudnessMetadataScanner {
 	private static readonly object LockObject = new object();
 	private static readonly Queue<double> RecentFileScanDurations = new Queue<double>();
 
-	private static Thread ScanningThread;
-	private static Semaphore Semaphore;
+	private static Thread? ScanningThread;
+	private static Semaphore? Semaphore;
 
 	public static void StartBackgroundScanning() {
 		var tracePrefix = $"{nameof(LoudnessMetadataScanner)}.{nameof(StartBackgroundScanning)}";
@@ -67,7 +67,7 @@ public static class LoudnessMetadataScanner {
 
 		lock (LockObject) {
 			ScanningThread = null;
-			Semaphore.Release();
+			Semaphore!.Release();
 			Semaphore = null;
 		}
 
@@ -98,7 +98,7 @@ public static class LoudnessMetadataScanner {
 
 	private static string GetLoudnessMetadataPath(string absoluteBgmPath) {
 		return Path.Combine(
-			Path.GetDirectoryName(absoluteBgmPath),
+			Path.GetDirectoryName(absoluteBgmPath)!,
 			Path.GetFileNameWithoutExtension(absoluteBgmPath) + ".bs1770gain.xml");
 	}
 
@@ -234,7 +234,7 @@ public static class LoudnessMetadataScanner {
 	}
 
 	private static string Execute(
-		string workingDirectory, string fileName, string arguments, bool shouldFailOnStdErrDataReceived = false) {
+		string? workingDirectory, string fileName, string arguments, bool shouldFailOnStdErrDataReceived = false) {
 		var processStartInfo = new ProcessStartInfo(fileName, arguments) {
 			CreateNoWindow = true,
 			RedirectStandardError = true,
@@ -245,7 +245,7 @@ public static class LoudnessMetadataScanner {
 
 		var stdoutWriter = new StringWriter();
 		var stderrWriter = new StringWriter();
-		using (var process = Process.Start(processStartInfo)) {
+		using (var process = Process.Start(processStartInfo)!) {
 			process.OutputDataReceived += (s, e) => {
 				if (e.Data != null) {
 					stdoutWriter.Write(e.Data);
@@ -292,5 +292,5 @@ public static class LoudnessMetadataScanner {
 		public bool IsActivelyScanning { get; private set; }
 	}
 
-	public static event EventHandler<ScanningStateChangedEventArgs> ScanningStateChanged;
+	public static event EventHandler<ScanningStateChangedEventArgs>? ScanningStateChanged;
 }

@@ -19,7 +19,7 @@ internal class CLang {
 		get { return File.Exists(Path.Combine(Folder, _boxFontName)) ? Path.Combine(Folder, _boxFontName) : _boxFontName; }
 		private set { _boxFontName = value; }
 	}
-	public string Folder { get { return @$"{OpenTaiko.strEXEのあるフォルダ}Lang{Path.DirectorySeparatorChar}{Id}{Path.DirectorySeparatorChar}"; } }
+	public string Folder { get { return OpenTaiko.ResolveAssetPath(@$"{OpenTaiko.strEXEFolder}Lang{Path.DirectorySeparatorChar}{Id}{Path.DirectorySeparatorChar}"); } }
 
 	private string _fontName = CFontRenderer.DefaultFontName;
 	private string _boxFontName = CFontRenderer.DefaultFontName;
@@ -34,14 +34,14 @@ internal class CLang {
 
 			JsonNodeOptions options = new JsonNodeOptions() { PropertyNameCaseInsensitive = false };
 			JsonDocumentOptions doc = new JsonDocumentOptions() { CommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true };
-			JsonNode node = JsonNode.Parse(data, options, doc);
+			JsonNode node = JsonNode.Parse(data, options, doc)!;
 
 			clang.Id = id;
-			clang.Language = node["Language"].Deserialize<string>();
-			clang.Entries = node["Entries"].Deserialize<Dictionary<string, string>>();
-			clang.InvalidKey = node["InvalidKey"].Deserialize<string>();
-			clang.FontName = node["FontName"].Deserialize<string>().FixPath();
-			clang.BoxFontName = node["BoxFontName"].Deserialize<string>().FixPath();
+			clang.Language = node["Language"].Deserialize<string>()!;
+			clang.Entries = node["Entries"].Deserialize<Dictionary<string, string>>()!;
+			clang.InvalidKey = node["InvalidKey"].Deserialize<string>()!;
+			clang.FontName = node["FontName"].Deserialize<string>()!.FixPath();
+			clang.BoxFontName = node["BoxFontName"].Deserialize<string>()!.FixPath();
 
 			return clang;
 		} else {
@@ -57,6 +57,10 @@ internal class CLang {
 		out_path = Path.Combine(Folder, "lang.json");
 		return File.Exists(out_path);
 	}
+
+	/// <summary>True if this language file actually defines <paramref name="key"/> (so callers can fall back to
+	/// another source, e.g. a per-skin locale, instead of getting the InvalidKey placeholder).</summary>
+	public bool HasString(string key) => Entries != null && Entries.ContainsKey(key);
 
 	public string GetString(string key) {
 		return (Entries.TryGetValue(key, out string? value)) ? value : InvalidKey.SafeFormat(key);

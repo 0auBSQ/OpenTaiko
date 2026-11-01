@@ -1,0 +1,12 @@
+{
+  "msg_open_failed": "No se pudo abrir la sala.",
+  "msg_room_open": "¡Sala abierta! El código se guardó en una carpeta - compártelo para que tus amigos se unan.",
+  "msg_no_code": "No se ha introducido ningún código.",
+  "msg_code_other": "Ese código es de una sala «%s».",
+  "msg_code_invalid": "Ese código no es válido.",
+  "msg_join_failed": "No se pudo unir a la sala.",
+  "connecting": "Conectando...",
+  "msg_chart_failed": "No se pudo cargar la partitura.",
+  "msg_network_error": "Error de red.",
+  "unknown_song": "Canción desconocida"
+}

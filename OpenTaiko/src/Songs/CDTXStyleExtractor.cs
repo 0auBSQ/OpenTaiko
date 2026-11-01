@@ -153,15 +153,15 @@ public static class CDTXStyleExtractor {
 			(>= SectionKind.StyleSingle, _) => (19, (int)sk, (int)ssk),
 		};
 
-	public static (string upperHeaders, string sheet) tセッション譜面がある(
-		string strTJAGlobal, string strTJACourse, Difficulty difficulty, int playerCount, int playerSide, string strファイル名の絶対パス
+	public static (string upperHeaders, string sheet) tSessionChart(
+		string strTJAGlobal, string strTJACourse, Difficulty difficulty, int playerCount, int playerSide, string strFileNameAbsolutePath
 		) {
 		void TraceError(string subMessage) {
 			Trace.TraceError(FormatTraceMessage(subMessage));
 		}
 
 		string FormatTraceMessage(string subMessage) {
-			return $"{nameof(CDTXStyleExtractor)} {subMessage} (playerCount={playerCount}, playerSide={playerSide}, {strファイル名の絶対パス})";
+			return $"{nameof(CDTXStyleExtractor)} {subMessage} (playerCount={playerCount}, playerSide={playerSide}, {strFileNameAbsolutePath})";
 		}
 
 		//入力された譜面がnullでないかチェック。

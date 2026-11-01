@@ -1,0 +1,47 @@
+{
+  "_comment": "The debug scenes the Placeholder Matrix (matrix.lua) lists, in order. stage = the Lua stage folder it opens; price = coins to unlock it once per save (0 = open from the start). name and desc are the English fallbacks; the shown texts are lang/<code>/matrix.json's scenes.<stage>.",
+  "scenes": [
+    {
+      "stage": "demo_overall",
+      "name": "Overall Demo",
+      "desc": "Five small demos in one stage; the keys 1 to 5 switch between them.",
+      "price": 0
+    },
+    {
+      "stage": "demo_canvas",
+      "name": "Canvas Demo",
+      "desc": "A tiny paint program: draw on a white sheet with the mouse, demonstrating the LuaCanvas + mouse input.",
+      "price": 50
+    },
+    {
+      "stage": "demo_particles",
+      "name": "Particle Demo",
+      "desc": "A stress test of the Lua3DScene particle engine.",
+      "price": 100
+    },
+    {
+      "stage": "demo_modal",
+      "name": "Modal Demo",
+      "desc": "Plays the reward and unlock modals of every rarity and type.",
+      "price": 150
+    },
+    {
+      "stage": "demo_aviutl2",
+      "name": "AviUtl2 Demo",
+      "desc": "AviUtl2 projects (.aup2) played in the video player.",
+      "price": 200
+    },
+    {
+      "stage": "demo_rt",
+      "name": "Raytracer Demo",
+      "desc": "The Lua3DScene path-traced raytracer mode.",
+      "price": 300
+    },
+    {
+      "stage": "demo_dan_builder",
+      "name": "Dan Builder Demo",
+      "desc": "A minimalist random Dan player.",
+      "price": 500
+    }
+  ]
+}

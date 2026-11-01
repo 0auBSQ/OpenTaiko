@@ -1,0 +1,57 @@
+{
+    "_note": "Sort and search dialogs layout, in 1920x1080 pixels. Colours are [r, g, b] or [r, g, b, a] from 0 to 255. theme and close_button.style are handed to PopUI as they are, so their keys keep PopUI's names. Offsets are from the panel's top left unless named otherwise.",
+    "theme": {
+        "colors": {
+            "surface": [250, 252, 255, 255], "surface2": [230, 236, 244, 255],
+            "primary": [96, 132, 180, 255], "primary2": [72, 108, 156, 255],
+            "accent": [126, 196, 200, 255], "accent2": [96, 168, 176, 255],
+            "outline": [70, 84, 104, 255], "text": [44, 56, 74, 255], "textOnAccent": [255, 255, 255, 255]
+        },
+        "font": { "small": 18, "label": 22, "button": 22, "title": 30 }
+    },
+    "dim_color": [8, 10, 18, 150],
+    "muted_color": [108, 114, 146],
+    "close_button": {
+        "_note": "The round close button on the panel's top right corner: x is panel right - inset_right, y is panel top - above.",
+        "w": 60,
+        "h": 60,
+        "inset_right": 62,
+        "above": 14,
+        "style": {
+            "radius": 40,
+            "colors": {
+                "primary": [208, 62, 56, 255], "primary2": [158, 34, 30, 255],
+                "outline": [96, 24, 20, 255], "textOnAccent": [255, 255, 255, 255]
+            }
+        }
+    },
+    "sort": {
+        "_note": "Panel height = header_h + one row_h per method + footer_h. The three direction buttons sit against the right margin; the method label fills the space left of them, less label_gap.",
+        "panel_w": 900,
+        "header_h": 96,
+        "row_h": 66,
+        "footer_h": 120,
+        "rows_y": 84,
+        "margin_x": 40,
+        "label_gap": 60,
+        "dir_button": { "w": 124, "h": 50, "gap": 8, "font_size": 18 },
+        "ok_button": { "w": 280, "h": 60, "bottom": 90 }
+    },
+    "search": {
+        "_note": "Panel height = header_h + 6 rows of row_h + footer_h. Fields start at field_x and end margin_x before the panel's right edge; widget y offsets are from their row's top.",
+        "panel_w": 940,
+        "header_h": 96,
+        "row_h": 74,
+        "footer_h": 170,
+        "rows_y": 90,
+        "margin_x": 40,
+        "field_x": 330,
+        "label_y": 20,
+        "label_max_w": 270,
+        "chooser_h": 60,
+        "slider": { "y": 10, "h": 40, "shorter_by": 90 },
+        "textbox": { "y": -4, "h": 64 },
+        "counter_y": 8,
+        "buttons": { "w": 280, "h": 60, "gap": 40, "bottom": 90 }
+    }
+}

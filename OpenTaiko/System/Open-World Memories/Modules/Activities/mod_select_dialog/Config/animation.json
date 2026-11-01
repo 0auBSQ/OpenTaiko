@@ -1,0 +1,8 @@
+{
+    "_note": "Mod select animation. The screen slides up from below on open and back down on close: distance_px in duration_s; it fades in over the last fade_distance_px of the slide.",
+    "slide": {
+        "distance_px": 1080,
+        "duration_s": 0.5,
+        "fade_distance_px": 540
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "_note": "Shortcuts (Lib/Shortcuts.lua): the song select's look, in 1920x1080 pixels.",
+    "panel": {
+        "_note": "the help panel, centred on the screen",
+        "panel_w": 1040, "row_h": 46, "head_h": 96, "foot_h": 70,
+        "key_x": 40, "key_col_w": 190, "text_gap": 28, "text_right_margin": 110, "font_size": 22,
+        "key_color": [72, 108, 156], "text_color": [44, 56, 74], "text_outline_color": [255, 255, 255, 160],
+        "dim_color": [8, 10, 18, 150],
+        "close_x": { "right": 62, "y": -14, "size": 60 },
+        "close_button": { "w": 260, "h": 56, "y": 6 },
+        "theme": {
+            "colors": {
+                "surface": [250, 252, 255, 255], "surface2": [230, 236, 244, 255],
+                "primary": [96, 132, 180, 255], "primary2": [72, 108, 156, 255],
+                "accent": [126, 196, 200, 255], "accent2": [96, 168, 176, 255],
+                "outline": [70, 84, 104, 255], "text": [44, 56, 74, 255], "textOnAccent": [255, 255, 255, 255]
+            },
+            "font": { "small": 18, "label": 22, "button": 22, "title": 30 }
+        },
+        "close_style": {
+            "radius": 40,
+            "colors": { "primary": [208, 62, 56, 255], "primary2": [158, 34, 30, 255],
+                        "outline": [96, 24, 20, 255], "textOnAccent": [255, 255, 255, 255] }
+        }
+    },
+    "helper": {
+        "_note": "the \"[key] - Show shortcuts\" line",
+        "font": 24, "pad_x": 16, "pad_y": 8,
+        "box_alpha": 150, "box_radius": 10, "box_color": [0, 0, 0],
+        "text_color": [255, 255, 255], "outline_color": [0, 0, 0],
+        "pulse_ms": 2400, "opacity_min": 0.45
+    },
+    "speed": {
+        "_note": "the song speed notice",
+        "label_font": 18, "value_font": 28, "value_dy": 24, "note_dy": 34, "arrow_gap": 40,
+        "slow_color": "FF95CCFF", "fast_color": "FFFF9EC3",
+        "arrow_opacity_min": 0.25,
+        "beat_min_ms": 150, "beat_max_ms": 2000, "beat_default_ms": 600
+    }
+}

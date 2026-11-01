@@ -6,7 +6,7 @@ public class CStage : CActivity {
 	internal EStage eStageID;
 
 	// Only used if eStageID is EStage.CUSTOM
-	internal string customStageName;
+	internal string? customStageName;
 
 	public enum EStage {
 		None,
@@ -20,12 +20,11 @@ public class CStage : CActivity {
 		Game,
 		Results,
 		ChangeSkin,                     // #28195 2011.5.4 yyagi
-		Heya,
+		Transition,                     // smooth stage→stage fade + loading screen (CStageTransition)
 		TaikoTowers,
 		BoukenTitle,
 		BoukenMap,
 		OnlineLounge,
-		Encyclopedia,
 		AIBattleMode,
 		PlayerStats,
 		ChartEditor,
@@ -50,7 +49,6 @@ public class CStage : CActivity {
 		Startup_4_LoadSongsNotSeenInScoreCacheAndApplyThem,
 		Startup_5_PostProcessSonglist,
 		Startup_6_LoadTextures,
-		Startup_7_SetUpNewConfig,
 		Startup_Complete,
 		Title_FadeIn,
 		SongSelect_FadeInFromResults,
@@ -62,6 +60,7 @@ public class CStage : CActivity {
 		SongLoading_LoadWAVFile,
 		SongLoading_WaitWAVLoaded,
 		SongLoading_LoadBMPFile,
+		SongLoading_StreamTextures,
 		SongLoading_WaitForSoundSystemBGM,
 		Game_STAGE_FAILED,
 		Game_EndChart,

@@ -1,7 +1,4 @@
 ﻿using FDK;
-using static OpenTaiko.CActSelect曲リスト;
-using Color = System.Drawing.Color;
-using Rectangle = System.Drawing.Rectangle;
 
 namespace OpenTaiko;
 
@@ -16,7 +13,6 @@ internal class CActImplBackground : CActivity {
 
 	public void tFadeIn(int player) {
 		//this.ct上背景クリアインタイマー[player] = new CCounter(0, 100, 2, TJAPlayer3.Timer);
-		this.eFadeMode = EFIFOMode.FadeIn;
 	}
 
 	//public void tFadeOut(int player)
@@ -30,13 +26,50 @@ internal class CActImplBackground : CActivity {
         this.ct上背景クリアインタイマー[player].n現在の値 = 0;
         this.ct上背景FIFOタイマー = new CCounter(0, 100, 2, TJAPlayer3.Timer);
         this.ct上背景FIFOタイマー.n現在の値 = 0;*/
-		UpScript?.ClearIn(player);
-		DownScript?.ClearIn(player);
+		UpScript?.Call("clearIn", player);
+		DownScript?.Call("clearIn", player);
 	}
 
 	public void ClearOut(int player) {
-		UpScript?.ClearOut(player);
-		DownScript?.ClearOut(player);
+		UpScript?.Call("clearOut", player);
+		DownScript?.Call("clearOut", player);
+	}
+
+	/// <summary>A note hit of the player, read by the Up and Down backgrounds from their state.</summary>
+	public void AddHit(int player, NotesManager.ENoteType note, string judge) => _state.AddHit(player, note, judge);
+
+	/// <summary>A flying note of the player reached the end of its flight.</summary>
+	public void NoteLanded(int player) {
+		if (player >= 0 && player < _state.landCount.Length) _state.landCount[player]++;
+	}
+
+	/// <summary>The point the shown background wants the player's flying notes to land on, if it set one.</summary>
+	public bool FlyTarget(int player, out double x, out double y) {
+		x = y = 0;
+		return Shown && _state.TryGetFlyTarget(player, out x, out y);
+	}
+
+	/// <summary>Whether the play screen drew this background on the current frame.</summary>
+	public bool Shown;
+
+	// background folders forced on the next play (SONGMOUNT:SetBackgrounds), null for the usual pick
+	internal static string? NextUpDir, NextDownDir;
+
+	/// <summary>The forced background folders, cleared so that only one play uses them.</summary>
+	internal static (string? up, string? down) TakeForcedBackgrounds() {
+		var forced = (NextUpDir, NextDownDir);
+		NextUpDir = NextDownDir = null;
+		return forced;
+	}
+
+	/// <summary>The Down folder of the tower chart's look (its TOWERTYPE), or null when the chart names none or
+	/// the skin has no folder of that name (a preset or a random pick then applies).</summary>
+	private static string? TowerLookPath(string bgOrigindir) {
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Tower) return null;
+		string? look = OpenTaiko.SongMount.rChoosenSong?.score[(int)Difficulty.Tower]?.ChartInfo.nTowerType;
+		if (string.IsNullOrEmpty(look) || look.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0) return null;
+		string path = $@"{bgOrigindir}{Path.DirectorySeparatorChar}Down{Path.DirectorySeparatorChar}{look}";
+		return Directory.Exists(path) ? path : null;
 	}
 
 	public override void Activate() {
@@ -44,7 +77,7 @@ internal class CActImplBackground : CActivity {
 			return;
 
 		var bgOrigindir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.BACKGROUND}");
-		var preset = HScenePreset.GetBGPreset();
+		var preset = OpenTaiko.stageGameScreen.ScenePreset;
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 			bgOrigindir += "Tower";
 		} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
@@ -56,65 +89,89 @@ internal class CActImplBackground : CActivity {
 		}
 
 		Random random = new Random();
+		_state.RefreshConst();
+		_state.ResetHits();
 
-		if (System.IO.Directory.Exists($@"{bgOrigindir}{Path.DirectorySeparatorChar}Up")) {
-			var upDirs = System.IO.Directory.GetDirectories($@"{bgOrigindir}{Path.DirectorySeparatorChar}Up");
+		var (forcedUp, forcedDown) = TakeForcedBackgrounds();
 
-			// If there is a preset upper background and this preset exists on the skin use it, else random upper background
-			var _presetPath = (preset != null && preset.UpperBackground != null) ? $@"{bgOrigindir}{Path.DirectorySeparatorChar}Up{Path.DirectorySeparatorChar}" + preset.UpperBackground[random.Next(0, preset.UpperBackground.Length)] : "";
-			var upPath = (preset != null && System.IO.Directory.Exists(_presetPath))
-				? _presetPath
-				: upDirs[random.Next(0, upDirs.Length)];
+		if (forcedUp != null || System.IO.Directory.Exists($@"{bgOrigindir}{Path.DirectorySeparatorChar}Up")) {
+			var upPath = forcedUp;
+			if (upPath == null) {
+				var upDirs = System.IO.Directory.GetDirectories($@"{bgOrigindir}{Path.DirectorySeparatorChar}Up");
 
-			UpScript = new ScriptBG($@"{upPath}{Path.DirectorySeparatorChar}Script.lua");
-			UpScript.Init();
+				// If there is a preset upper background and this preset exists on the skin use it, else random upper background
+				var _presetPath = (preset?.UpperBackground?.Length > 0) ? $@"{bgOrigindir}{Path.DirectorySeparatorChar}Up{Path.DirectorySeparatorChar}" + preset.UpperBackground[random.Next(0, preset.UpperBackground.Length)] : "";
+				upPath = (preset != null && System.IO.Directory.Exists(_presetPath))
+					? _presetPath
+					: (upDirs.Length > 0 ? upDirs[random.Next(0, upDirs.Length)] : null);
+			}
 
-			IsUpNotFound = false;
+			// an empty folder counts as not found
+			if (upPath != null) {
+				UpScript = new LuaBackgroundWrapper(upPath);
+				UpScript.Activate(_state);
+
+				IsUpNotFound = !UpScript.Exists;
+			} else {
+				IsUpNotFound = true;
+			}
 		} else {
 			IsUpNotFound = true;
 		}
 
-		if (System.IO.Directory.Exists($@"{bgOrigindir}{Path.DirectorySeparatorChar}Down")) {
-			var downDirs = System.IO.Directory.GetDirectories($@"{bgOrigindir}{Path.DirectorySeparatorChar}Down");
+		if (forcedDown != null || System.IO.Directory.Exists($@"{bgOrigindir}{Path.DirectorySeparatorChar}Down")) {
+			var downPath = forcedDown;
+			if (downPath == null) {
+				var downDirs = System.IO.Directory.GetDirectories($@"{bgOrigindir}{Path.DirectorySeparatorChar}Down");
 
-			// If there is a preset lower background and this preset exists on the skin use it, else random upper background
-			var _presetPath = (preset != null && preset.LowerBackground != null) ? $@"{bgOrigindir}{Path.DirectorySeparatorChar}Down{Path.DirectorySeparatorChar}" + preset.LowerBackground[random.Next(0, preset.LowerBackground.Length)] : "";
-			var downPath = (preset != null && System.IO.Directory.Exists(_presetPath))
-				? _presetPath
-				: downDirs[random.Next(0, downDirs.Length)];
+				// If there is a preset lower background and this preset exists on the skin use it, else random upper background
+				var _presetPath = (preset?.LowerBackground?.Length > 0) ? $@"{bgOrigindir}{Path.DirectorySeparatorChar}Down{Path.DirectorySeparatorChar}" + preset.LowerBackground[random.Next(0, preset.LowerBackground.Length)] : "";
+				downPath = (preset != null && System.IO.Directory.Exists(_presetPath))
+					? _presetPath
+					: (downDirs.Length > 0 ? downDirs[random.Next(0, downDirs.Length)] : null);
 
-			DownScript = new ScriptBG($@"{downPath}{Path.DirectorySeparatorChar}Script.lua");
-			DownScript?.Init();
+				// A tower chart names its look (TOWERTYPE): the Down folder of that name holds the sky and the tower
+				var towerLook = TowerLookPath(bgOrigindir);
+				if (towerLook != null) downPath = towerLook;
+			}
 
-			if (DownScript.Exists()) IsDownNotFound = false;
+			if (downPath != null) {
+				DownScript = new LuaBackgroundWrapper(downPath);
+				DownScript.Activate(_state);
+
+				IsDownNotFound = !DownScript.Exists;
+			} else {
+				IsDownNotFound = true;
+			}
 		} else {
 			IsDownNotFound = true;
 		}
 
-		this.pfTowerText = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Game_Tower_Font_TowerText);
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+			CCharacter.AddEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_STANDING);
+			CCharacter.AddEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_STANDING_TIRED);
+			CCharacter.AddEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_CLIMBING);
+			CCharacter.AddEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_CLIMBING_TIRED);
+			CCharacter.AddEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_RUNNING);
+			CCharacter.AddEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_RUNNING_TIRED);
+			CCharacter.AddEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_CLEAR);
+			CCharacter.AddEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_CLEAR_TIRED);
+			CCharacter.AddEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_FAIL);
 
-		/*
-        if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-        {
-            this.pfTowerText = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.Game_Tower_Font_TowerText);
-        }
-        else
-        {
-            this.pfTowerText = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.Game_Tower_Font_TowerText);
-        }
-        */
+			CCharacter.AddEssentialVoice(0, CCharacter.VOICE_TOWER_MISS);
+		}
 
-		this.ttkTouTatsuKaiSuu = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_FLOOR_REACHED"), pfTowerText, Color.White, Color.Black, 700);
-		this.ttkKai = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_FLOOR_INITIAL"), pfTowerText, Color.White, Color.Black, 700);
+		// the floor and lives display over the upper background is the tower_hud ROActivity
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
+			TowerHud?.Activate(OpenTaiko.SongMount.rChoosenSong?.score[(int)Difficulty.Tower]?.ChartInfo.nTotalFloor ?? 1);
 
-		this.ct炎 = new CCounter(0, 6, 50, OpenTaiko.Timer);
+		this.currentCharacter = Math.Max(0, Math.Min(OpenTaiko.SaveFileInstances[0].data.Character, OpenTaiko.Tx.Characters.Length - 1));
 
-		this.currentCharacter = Math.Max(0, Math.Min(OpenTaiko.SaveFileInstances[0].data.Character, OpenTaiko.Skin.Characters_Ptn - 1));
-
-		float resolutionScaleX = OpenTaiko.Skin.Resolution[0] / (float)OpenTaiko.Skin.Characters_Resolution[currentCharacter][0];
-		float resolutionScaleY = OpenTaiko.Skin.Resolution[1] / (float)OpenTaiko.Skin.Characters_Resolution[currentCharacter][1];
+		//float resolutionScaleX = OpenTaiko.Skin.Resolution[0] / (float)OpenTaiko.Skin.Characters_Resolution[currentCharacter][0];
+		//float resolutionScaleY = OpenTaiko.Skin.Resolution[1] / (float)OpenTaiko.Skin.Characters_Resolution[currentCharacter][1];
 
 		// Scale tower chara
+		/*
 		foreach (CTexture texture in OpenTaiko.Tx.Characters_Tower_Standing[currentCharacter]) {
 			texture.vcScaleRatio.X = resolutionScaleX;
 			texture.vcScaleRatio.Y = resolutionScaleY;
@@ -151,10 +208,11 @@ internal class CActImplBackground : CActivity {
 			texture.vcScaleRatio.X = resolutionScaleX;
 			texture.vcScaleRatio.Y = resolutionScaleY;
 		}
+		*/
 
-		this.ctSlideAnimation = new CCounter();
 		this.ctClimbDuration = new CCounter();
-		this.ctStandingAnimation = new CCounter(0, 1000, (60000f / (float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0])) * OpenTaiko.Skin.Characters_Beat_Tower_Standing[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Standing_Ptn[currentCharacter], OpenTaiko.Timer);
+		//this.ctStandingAnimation = new CCounter(0, 1000, (60000f / (float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0])) * OpenTaiko.Skin.Characters_Beat_Tower_Standing[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Standing_Ptn[currentCharacter], OpenTaiko.Timer);
+		this.ctStandingAnimation = new CCounter(0, 1000, OpenTaiko.stageGameScreen.actPlayInfo.msPerGameBeatAbs(0) * 1 / 1, OpenTaiko.Timer);
 		this.ctClimbingAnimation = new CCounter();
 		this.ctRunningAnimation = new CCounter();
 		this.ctClearAnimation = new CCounter();
@@ -165,6 +223,7 @@ internal class CActImplBackground : CActivity {
 		this.ctClearTiredAnimation = new CCounter();
 
 		TowerFinished = false;
+		this.lastSeenFloor = 1;
 
 		base.Activate();
 	}
@@ -173,10 +232,24 @@ internal class CActImplBackground : CActivity {
 		if (this.IsDeActivated)
 			return;
 
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+			CCharacter.RemoveEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_STANDING);
+			CCharacter.RemoveEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_STANDING_TIRED);
+			CCharacter.RemoveEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_CLIMBING);
+			CCharacter.RemoveEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_CLIMBING_TIRED);
+			CCharacter.RemoveEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_RUNNING);
+			CCharacter.RemoveEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_RUNNING_TIRED);
+			CCharacter.RemoveEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_CLEAR);
+			CCharacter.RemoveEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_CLEAR_TIRED);
+			CCharacter.RemoveEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_FAIL);
+
+			CCharacter.RemoveEssentialVoice(0, CCharacter.VOICE_TOWER_MISS);
+		}
+
 		OpenTaiko.tDisposeSafely(ref UpScript);
 		OpenTaiko.tDisposeSafely(ref DownScript);
 
-		OpenTaiko.tDisposeSafely(ref pfTowerText);
+		if (TowerHud != null && TowerHud.IsActive) TowerHud.Deactivate();
 
 		base.DeActivate();
 	}
@@ -193,121 +266,21 @@ internal class CActImplBackground : CActivity {
 		if (base.IsDeActivated)
 			return 0;
 
+		// One per-frame state refresh, shared by both the Up (here) and Down (Tower / non-Tower below) draws.
+		_state.RefreshGameplay();
 
 		//this.ct上背景FIFOタイマー?.t進行();
-
-
-		#region [Tower specific variables declaration]
-
-		float currentFloorPositionMax140 = 0;
-
-		#endregion
 
 		// fNow_Measure_s (/ m)
 
 		#region [Upper background]
 
 		if (!IsUpNotFound) {
-			if (!OpenTaiko.stageGameScreen.bPAUSE) UpScript?.Update();
-			UpScript?.Draw();
-			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-				#region [Tower animations variables]
-
-				this.bFloorChanged = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor > 0 && (OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor < OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1);
-
-				int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5].譜面情報.nTotalFloor;
-				int nightTime = Math.Max(140, maxFloor / 2);
-
-				currentFloorPositionMax140 = Math.Min(OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
-
-				#endregion
-
-				#region [Tower background informations]
-
-				if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-					TitleTextureKey.ResolveTitleTexture(ttkTouTatsuKaiSuu).t2D描画(OpenTaiko.Skin.Game_Tower_Font_TouTatsuKaiSuu[0], OpenTaiko.Skin.Game_Tower_Font_TouTatsuKaiSuu[1]);
-					TitleTextureKey.ResolveTitleTexture(ttkKai).t2D描画(OpenTaiko.Skin.Game_Tower_Font_Kai[0], OpenTaiko.Skin.Game_Tower_Font_Kai[1]);
-
-					this.ct炎.TickLoop();
-					OpenTaiko.stageGameScreen.FloorManagement.loopFrames();
-
-					#region [Floor number]
-
-					if (OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives > 0) {
-						OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor = OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1;
-						if (!(OpenTaiko.stageGameScreen.IsChartEnded(0) || OpenTaiko.stageGameScreen.IsFinishedPlaying(0))) {
-							if (OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor >= maxFloor)
-								OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor = maxFloor - 1;
-						}
-					}
-
-					string floorStr = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor.ToString();
-
-					int len = floorStr.Length;
-
-					int digitLength = OpenTaiko.Tx.Taiko_Combo[0].szTextureSize.Width / 10;
-
-					OpenTaiko.Tx.Taiko_Combo[0].color4 = new Color4(1f, 0.6f, 0.2f, 1f);
-					OpenTaiko.Tx.Taiko_Combo[0].vcScaleRatio.X = 1.4f;
-					OpenTaiko.Tx.Taiko_Combo[0].vcScaleRatio.Y = 1.4f;
-
-					for (int idx = len - 1; idx >= 0; idx--) {
-						int currentNum = int.Parse(floorStr[idx].ToString());
-
-						OpenTaiko.Tx.Taiko_Combo[0].t2D描画(OpenTaiko.Skin.Game_Tower_Floor_Number[0] - ((digitLength - 8) * (len - idx) * 1.4f),
-							OpenTaiko.Skin.Game_Tower_Floor_Number[1],
-							new Rectangle(digitLength * currentNum, 0,
-								digitLength, OpenTaiko.Tx.Taiko_Combo[0].szTextureSize.Height));
-					}
-
-					#endregion
-
-					#region [Life Tamashii icon]
-
-					int soulfire_width = OpenTaiko.Tx.Gauge_Soul_Fire.szTextureSize.Width / 8;
-					int soulfire_height = OpenTaiko.Tx.Gauge_Soul_Fire.szTextureSize.Height;
-
-					int soul_height = OpenTaiko.Tx.Gauge_Soul.szTextureSize.Height / 2;
-
-					OpenTaiko.Tx.Gauge_Soul_Fire?.t2D描画(OpenTaiko.Skin.Gauge_Soul_Fire_X_Tower, OpenTaiko.Skin.Gauge_Soul_Fire_Y_Tower, new Rectangle(soulfire_width * (this.ct炎.CurrentValue), 0, soulfire_width, soulfire_height));
-					OpenTaiko.Tx.Gauge_Soul?.t2D描画(OpenTaiko.Skin.Gauge_Soul_X_Tower, OpenTaiko.Skin.Gauge_Soul_Y_Tower, new Rectangle(0, soul_height, OpenTaiko.Tx.Gauge_Soul.szTextureSize.Width, soul_height));
-
-					#endregion
-
-					#region [Life number]
-					string lifeStr = OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives.ToString();
-
-					len = lifeStr.Length;
-
-					bool lifeSpecialCase = OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives == 1 && OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives != 1;
-					float lifeRatio = OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives / (float)OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives;
-
-					Color4 lifeColor = (lifeRatio > 0.5f && !lifeSpecialCase) ? new Color4(0.2f, 1f, 0.2f, 1f)
-						: ((lifeRatio >= 0.2f && !lifeSpecialCase) ? new Color4(1f, 1f, 0.2f, 1f)
-							: new Color4(1f, 0.2f, 0.2f, 1f));
-
-					OpenTaiko.Tx.Taiko_Combo[0].color4 = lifeColor;
-					OpenTaiko.Tx.Taiko_Combo[0].vcScaleRatio.X = 1.1f;
-					OpenTaiko.Tx.Taiko_Combo[0].vcScaleRatio.Y = 1.1f;
-
-					for (int idx = 0; idx < len; idx++) {
-						int currentNum = int.Parse(lifeStr[len - idx - 1].ToString());
-
-						OpenTaiko.Tx.Taiko_Combo[0].t2D描画(OpenTaiko.Skin.Game_Tower_Life_Number[0] + ((digitLength - 8) * (len - idx) * 1.1f),
-							OpenTaiko.Skin.Game_Tower_Life_Number[1],
-							new Rectangle(digitLength * currentNum, 0,
-								digitLength, OpenTaiko.Tx.Taiko_Combo[0].szTextureSize.Height));
-					}
-
-					OpenTaiko.Tx.Taiko_Combo[0].color4 = new Color4(1f, 1f, 1f, 1f);
-
-					#endregion
-
-				}
-
-				#endregion
-			}
+			if (!OpenTaiko.stageGameScreen.bPAUSE) UpScript?.Update(_state);
+			UpScript?.Draw(_state);
 		}
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
+			this.DrawTowerHud();
 
 		#endregion
 
@@ -315,132 +288,88 @@ internal class CActImplBackground : CActivity {
 
 
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-			int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5].譜面情報.nTotalFloor;
-
-			OpenTaiko.actTextConsole.Print(0, 0, CTextConsole.EFontType.White, maxFloor.ToString());
-
-			int nightTime = Math.Max(140, maxFloor / 2);
-
-			int currentTowerType = Array.IndexOf(OpenTaiko.Skin.Game_Tower_Names, OpenTaiko.SongMount.rChoosenSong.score[5].譜面情報.nTowerType);
-
-			if (currentTowerType < 0 || currentTowerType >= OpenTaiko.Skin.Game_Tower_Ptn)
-				currentTowerType = 0;
-
 			#region [Tower lower background]
 
-			float nextPositionMax140 = Math.Min((OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1) / (float)nightTime, 1f);
-
-			if (bFloorChanged == true)
-				ctSlideAnimation.Start(0, 1000, 120f / CTja.TjaBeatSpeedToGameBeatSpeed((float)OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]), OpenTaiko.Timer);
-
-			float progressFactor = (nextPositionMax140 - currentFloorPositionMax140) * (ctSlideAnimation.CurrentValue / 1000f);
-
-
-
-			#region [Skybox]
-
-			//int skyboxYPosition = (int)((TJAPlayer3.Tx.Tower_Sky_Gradient.szテクスチャサイズ.Height - TJAPlayer3.Skin.Game_Tower_Sky_Gradient_Size[1]) * (1f - (currentFloorPositionMax140 + progressFactor)));
-
-			//TJAPlayer3.Tx.Tower_Sky_Gradient?.t2D描画(TJAPlayer3.Skin.Game_Tower_Sky_Gradient[0], TJAPlayer3.Skin.Game_Tower_Sky_Gradient[1],
-			//new Rectangle(0, skyboxYPosition, TJAPlayer3.Skin.Game_Tower_Sky_Gradient_Size[0], TJAPlayer3.Skin.Game_Tower_Sky_Gradient_Size[1]));
-
-			if (!OpenTaiko.stageGameScreen.bPAUSE) DownScript.Update();
-			DownScript.Draw();
-
-			#endregion
-
-
-			#region [Tower body]
-
-			progressFactor = ctSlideAnimation.CurrentValue / 1000f;
-
-			int currentTower = currentTowerType;
-
-			// Will implement the roof later, need the beforehand total floor count calculation before
-			int nextTowerBase = ((OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1) / 10) % OpenTaiko.Skin.Game_Tower_Ptn_Base[currentTower];
-			int towerBase = (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] / 10) % OpenTaiko.Skin.Game_Tower_Ptn_Base[currentTower];
-
-			int currentDeco = OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] % OpenTaiko.Skin.Game_Tower_Ptn_Deco[currentTower];
-			int nextDeco = (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1) % OpenTaiko.Skin.Game_Tower_Ptn_Deco[currentTower];
-
-			// Microfix for the first floor suddenly changing texture
-			if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] == 0 && OpenTaiko.Skin.Game_Tower_Ptn_Deco[currentTower] > 1)
-				currentDeco++;
-			if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] == 0 && OpenTaiko.Skin.Game_Tower_Ptn_Base[currentTower] > 1)
-				towerBase++;
-
-			int widthChange = (int)(progressFactor * OpenTaiko.Skin.Game_Tower_Floors_Move[0]);
-			int heightChange = (int)(progressFactor * OpenTaiko.Skin.Game_Tower_Floors_Move[1]);
-
-			// Current trunk
-			if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] < maxFloor)
-				OpenTaiko.Tx.Tower_Base[currentTower][towerBase]?.t2D下中央基準描画(
-					OpenTaiko.Skin.Game_Tower_Floors_Body[0] + widthChange,
-					OpenTaiko.Skin.Game_Tower_Floors_Body[1] + heightChange); // 316 + 360
-			else
-				OpenTaiko.Tx.Tower_Top[currentTower]?.t2D下中央基準描画(
-					OpenTaiko.Skin.Game_Tower_Floors_Body[0] + widthChange,
-					OpenTaiko.Skin.Game_Tower_Floors_Body[1] + heightChange);
-
-			// Current deco
-			OpenTaiko.Tx.Tower_Deco[currentTower][currentDeco]?.t2D下中央基準描画(
-				OpenTaiko.Skin.Game_Tower_Floors_Deco[0] + widthChange,
-				OpenTaiko.Skin.Game_Tower_Floors_Deco[1] + heightChange);
-
-			int originY = OpenTaiko.Skin.Game_Tower_Floors_Move[1] - heightChange;
-
-			// Next trunk
-			if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1 < maxFloor)
-				OpenTaiko.Tx.Tower_Base[currentTower][nextTowerBase]?.t2D下中央基準描画(
-					OpenTaiko.Skin.Game_Tower_Floors_Body[0] - OpenTaiko.Skin.Game_Tower_Floors_Move[0] + widthChange,
-					OpenTaiko.Skin.Game_Tower_Floors_Body[1] - OpenTaiko.Skin.Game_Tower_Floors_Move[1] + heightChange,
-					new Rectangle(0, originY, OpenTaiko.Tx.Tower_Base[currentTower][nextTowerBase].szTextureSize.Width, OpenTaiko.Tx.Tower_Base[currentTower][nextTowerBase].szTextureSize.Height - originY));
-			else if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1 == maxFloor) {
-				OpenTaiko.Tx.Tower_Top[currentTower]?.t2D下中央基準描画(
-					OpenTaiko.Skin.Game_Tower_Floors_Body[0] - OpenTaiko.Skin.Game_Tower_Floors_Move[0] + widthChange,
-					OpenTaiko.Skin.Game_Tower_Floors_Body[1] - OpenTaiko.Skin.Game_Tower_Floors_Move[1] + heightChange,
-					new Rectangle(0, originY, OpenTaiko.Tx.Tower_Top[currentTower].szTextureSize.Width, OpenTaiko.Tx.Tower_Top[currentTower].szTextureSize.Height - originY));
-			}
-
-			// Next deco
-			if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1 <= maxFloor)
-				OpenTaiko.Tx.Tower_Deco[currentTower][nextDeco]?.t2D下中央基準描画(
-					OpenTaiko.Skin.Game_Tower_Floors_Deco[0] - OpenTaiko.Skin.Game_Tower_Floors_Move[0] + widthChange,
-					OpenTaiko.Skin.Game_Tower_Floors_Deco[1] - OpenTaiko.Skin.Game_Tower_Floors_Move[1] + heightChange);
-
-
-			#endregion
+			// the tower look's Down script draws the sky and the tower body (the floors sliding under the player)
+			if (!OpenTaiko.stageGameScreen.bPAUSE) DownScript?.Update(_state);
+			DownScript?.Draw(_state);
 
 			#region [Climbing don]
 
-			float liveState = (OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives / (float)OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives);
-			bool ctIsTired = !(liveState >= 0.2f && !(OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives == 1 && OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives != 1));
+			CCharacter character = CCharacter.GetCharacter(0);
+			bool ctIsTired = OpenTaiko.stageGameScreen.FloorManagement.IsTired;
 
 			bool stageEnded = OpenTaiko.stageGameScreen.IsStageCompleted() || OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives == 0;
 
-			if (bFloorChanged == true) {
-				float floorBPM = (float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]);
-				ctClimbDuration.Start(0, 1500, 120f / floorBPM, OpenTaiko.Timer);
+			// the climb starts on the frame the floor goes up (the stage moves the floor before this draw)
+			int floor = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor;
+			bool bFloorChanged = floor > this.lastSeenFloor;
+			this.lastSeenFloor = floor;
+
+			if (bFloorChanged) {
+				// float floorBPM = (float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]);
+				ctClimbDuration.Start(0, 1500, OpenTaiko.stageGameScreen.actPlayInfo.msPerGameBeatAbs(0) / 500, OpenTaiko.Timer);
+				//character.TowerNextFloor();
+				/*
 				ctStandingAnimation.Start(0, 1000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Standing[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Standing_Ptn[currentCharacter], OpenTaiko.Timer);
 				ctClimbingAnimation.Start(0, 1000, (120000f / floorBPM) / OpenTaiko.Skin.Characters_Tower_Climbing_Ptn[currentCharacter], OpenTaiko.Timer);
 				ctRunningAnimation.Start(0, 1000, (60000f / floorBPM) / OpenTaiko.Skin.Characters_Tower_Running_Ptn[currentCharacter], OpenTaiko.Timer);
 				ctStandTiredAnimation.Start(0, 1000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Standing_Tired[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Standing_Tired_Ptn[currentCharacter], OpenTaiko.Timer);
 				ctClimbTiredAnimation.Start(0, 1000, (120000f / floorBPM) / OpenTaiko.Skin.Characters_Tower_Climbing_Tired_Ptn[currentCharacter], OpenTaiko.Timer);
 				ctRunTiredAnimation.Start(0, 1000, (60000f / floorBPM) / OpenTaiko.Skin.Characters_Tower_Running_Tired_Ptn[currentCharacter], OpenTaiko.Timer);
+				*/
 			}
 
 			bool isClimbing = ctClimbDuration.CurrentValue > 0 && ctClimbDuration.CurrentValue < 1500;
 
 			if (stageEnded && !TowerFinished && !isClimbing) {
-				float floorBPM = (float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]);
+				//float floorBPM = (float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]);
+				/*
 				ctClearAnimation.Start(0, 20000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Clear[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Clear_Ptn[currentCharacter], OpenTaiko.Timer);
 				ctClearTiredAnimation.Start(0, 20000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Clear_Tired[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Clear_Tired_Ptn[currentCharacter], OpenTaiko.Timer);
 				ctFailAnimation.Start(0, 20000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Fail[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Fail_Ptn[currentCharacter], OpenTaiko.Timer);
+				*/
+				//character.TowerFinish();
 				TowerFinished = true;
 			}
 
+			float x = OpenTaiko.Skin.Game_Tower_Don[0];
+			float y = OpenTaiko.Skin.Game_Tower_Don[1];
+
+			string animation = CCharacter.ANIM_GAME_TOWER_STANDING;
+			if (isClimbing) {
+				if (ctClimbDuration.CurrentValue <= 1000) {
+					animation = ctIsTired ? CCharacter.ANIM_GAME_TOWER_CLIMBING_TIRED : CCharacter.ANIM_GAME_TOWER_CLIMBING;
+
+					float value = ctClimbDuration.CurrentValue / 1000f;
+					x += value * OpenTaiko.Skin.Game_Tower_Don_Move[0];
+					y += value * OpenTaiko.Skin.Game_Tower_Don_Move[1];
+				} else if (ctClimbDuration.CurrentValue < 1500) {
+					animation = ctIsTired ? CCharacter.ANIM_GAME_TOWER_RUNNING_TIRED : CCharacter.ANIM_GAME_TOWER_RUNNING;
+
+					float value = (ctClimbDuration.CurrentValue - 1000) / 500f;
+					float returnValue = 1.0f - value;
+					x += returnValue * OpenTaiko.Skin.Game_Tower_Don_Move[0];
+					y += returnValue * OpenTaiko.Skin.Game_Tower_Don_Move[1];
+				}
+			} else if (stageEnded && OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives == 0) {
+				animation = CCharacter.ANIM_GAME_TOWER_FAIL;
+			} else if (stageEnded && OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives > 0) {
+				animation = ctIsTired ? CCharacter.ANIM_GAME_TOWER_CLEAR_TIRED : CCharacter.ANIM_GAME_TOWER_CLEAR;
+			} else if (!stageEnded) {
+				animation = ctIsTired ? CCharacter.ANIM_GAME_TOWER_STANDING_TIRED : CCharacter.ANIM_GAME_TOWER_STANDING;
+			}
+
+			character.SetAnimationCyclesFromBPM(animation, OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]);
+
+			if (!OpenTaiko.stageGameScreen.bPAUSE) {
+				character.Update(animation);
+			}
+			character.Draw(animation, x, y, gradientMap: PaletteManager.GetEffectivePalette(0)?.LuaMap);
+
 			if (isClimbing) {
 				// Tired Climb
+				/*
 				if (ctIsTired && (ctClimbDuration.CurrentValue <= 1000) && OpenTaiko.Skin.Characters_Tower_Climbing_Tired_Ptn[currentCharacter] > 0) {
 					int animChar = ctClimbTiredAnimation.CurrentValue % OpenTaiko.Skin.Characters_Tower_Climbing_Ptn[currentCharacter];
 					int distDonX = (int)(ctClimbDuration.CurrentValue * (OpenTaiko.Skin.Game_Tower_Don_Move[0] / 1000f));
@@ -468,7 +397,9 @@ internal class CActImplBackground : CActivity {
 					int distDonY = (int)((1500 - ctClimbDuration.CurrentValue) * (OpenTaiko.Skin.Game_Tower_Don_Move[1] / 500f));
 					OpenTaiko.Tx.Characters_Tower_Running[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(OpenTaiko.Skin.Game_Tower_Don[0] + distDonX, OpenTaiko.Skin.Game_Tower_Don[1] + distDonY);
 				}
+				*/
 			} else {
+				/*
 				// Fail
 				if (OpenTaiko.Skin.Characters_Tower_Fail_Ptn[currentCharacter] > 0 && OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives == 0) {
 					int animChar = OpenTaiko.Skin.Characters_Tower_Fail_IsLooping[currentCharacter] ?
@@ -501,6 +432,7 @@ internal class CActImplBackground : CActivity {
 					int animChar = ctStandingAnimation.CurrentValue % OpenTaiko.Skin.Characters_Tower_Standing_Ptn[currentCharacter];
 					OpenTaiko.Tx.Characters_Tower_Standing[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(OpenTaiko.Skin.Game_Tower_Don[0], OpenTaiko.Skin.Game_Tower_Don[1]); // Center X - 50
 				}
+				*/
 			}
 
 			#endregion
@@ -510,12 +442,11 @@ internal class CActImplBackground : CActivity {
 			if (OpenTaiko.stageGameScreen.FloorManagement.InvincibilityFrames != null && OpenTaiko.stageGameScreen.FloorManagement.InvincibilityFrames.CurrentValue < OpenTaiko.stageGameScreen.FloorManagement.InvincibilityDurationSpeedDependent) {
 				if (OpenTaiko.Tx.Tower_Miss != null)
 					OpenTaiko.Tx.Tower_Miss.Opacity = Math.Min(255, 1000 - OpenTaiko.stageGameScreen.FloorManagement.InvincibilityFrames.CurrentValue);
-				OpenTaiko.Tx.Tower_Miss?.t2D下中央基準描画(OpenTaiko.Skin.Game_Tower_Miss[0], OpenTaiko.Skin.Game_Tower_Miss[1]);
+				OpenTaiko.Tx.Tower_Miss?.t2DBottomCenterBasedDraw(OpenTaiko.Skin.Game_Tower_Miss[0], OpenTaiko.Skin.Game_Tower_Miss[1]);
 			}
 
 			#endregion
 
-			ctSlideAnimation?.Tick();
 			ctClimbDuration?.Tick();
 			ctStandingAnimation?.TickLoop();
 			ctClimbingAnimation?.TickLoop();
@@ -530,8 +461,8 @@ internal class CActImplBackground : CActivity {
 			#endregion
 		} else if (!OpenTaiko.stageGameScreen.isMultiPlay && OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
 			if (!IsDownNotFound) {
-				if (!OpenTaiko.stageGameScreen.bPAUSE) DownScript?.Update();
-				DownScript?.Draw();
+				if (!OpenTaiko.stageGameScreen.bPAUSE) DownScript?.Update(_state);
+				DownScript?.Draw(_state);
 			}
 		}
 
@@ -542,6 +473,13 @@ internal class CActImplBackground : CActivity {
 	}
 
 	public bool IsFinishedTowerClimbing() => ctClimbDuration?.IsEnded ?? true;
+
+	// the floor and lives planks (tower_hud ROActivity) read the floor and the lives from PLAYSTATE
+	public void DrawTowerHud() {
+		if (TowerHud == null || !TowerHud.IsActive) return;
+		if (!OpenTaiko.stageGameScreen.bPAUSE) TowerHud.Update();
+		TowerHud.Draw();
+	}
 
 	#region[ private ]
 	//-----------------
@@ -576,34 +514,30 @@ internal class CActImplBackground : CActivity {
 	//private CTexture tx下背景クリアメイン;
 	//private CTexture tx下背景クリアサブ1;
 
-	public ScriptBG UpScript;
-	public ScriptBG DownScript;
+	public LuaBackgroundWrapper? UpScript;
+	public LuaBackgroundWrapper? DownScript;
+	private readonly LuaBackgroundState _state = new();
 
-	private TitleTextureKey ttkTouTatsuKaiSuu;
-	private TitleTextureKey ttkKai;
-	private CCachedFontRenderer pfTowerText;
+	private static LuaROActivityWrapper? TowerHud => LuaROActivityWrapper.GetROActivity("tower_hud");
 
-	private bool bFloorChanged = false;
+	private int lastSeenFloor = 1;
 	private int currentCharacter;
-	private CCounter ctSlideAnimation;
-	private CCounter ctStandingAnimation;
-	private CCounter ctClimbingAnimation;
-	private CCounter ctRunningAnimation;
-	private CCounter ctClearAnimation;
-	private CCounter ctFailAnimation;
-	private CCounter ctStandTiredAnimation;
-	private CCounter ctClimbTiredAnimation;
-	private CCounter ctRunTiredAnimation;
-	private CCounter ctClearTiredAnimation;
-	private CCounter ctClimbDuration;
+	private CCounter ctStandingAnimation = null!;
+	private CCounter ctClimbingAnimation = null!;
+	private CCounter ctRunningAnimation = null!;
+	private CCounter ctClearAnimation = null!;
+	private CCounter ctFailAnimation = null!;
+	private CCounter ctStandTiredAnimation = null!;
+	private CCounter ctClimbTiredAnimation = null!;
+	private CCounter ctRunTiredAnimation = null!;
+	private CCounter ctClearTiredAnimation = null!;
+	private CCounter ctClimbDuration = null!;
 	private bool TowerFinished;
 
-	private CCounter ct炎;
 
 	private bool IsUpNotFound;
 	private bool IsDownNotFound;
 
-	private EFIFOMode eFadeMode;
 	//-----------------
 	#endregion
 }

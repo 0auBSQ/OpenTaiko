@@ -1,0 +1,51 @@
+{
+    "_note": "Song enumeration overlay, in 1920x1080 pixels. Colours are [r, g, b, a] from 0 to 255.",
+    "theme": {
+        "_note": "the panel's PopUI theme: the settings menu's palette (config_ui ConfigCalm) so the box matches, with opaque faces. surface / surface2: the panel face's top and bottom; primary: the progress fill; track: the progress track.",
+        "colors": {
+            "surface": [250, 252, 255, 255],
+            "surface2": [230, 236, 244, 255],
+            "primary": [96, 132, 180, 255],
+            "primary2": [72, 108, 156, 255],
+            "outline": [70, 84, 104, 255],
+            "text": [44, 56, 74, 255],
+            "shadow": [40, 52, 72, 70],
+            "gloss": [255, 255, 255, 90],
+            "track": [214, 222, 232, 255]
+        },
+        "radius": 22,
+        "outline_width": 4,
+        "gloss": true,
+        "shadow": { "dx": 0, "dy": 5, "layers": 4, "grow": 3 }
+    },
+    "panel": {
+        "_note": "the panel's top-left at x, y; padding between its edge and its content; it sizes to the message, its content between min_content_width and max_content_width wide, text_margin wider than the widest line",
+        "x": 32,
+        "y": 28,
+        "padding": 26,
+        "min_content_width": 320,
+        "max_content_width": 700,
+        "text_margin": 8
+    },
+    "message": {
+        "_note": "line_extra is added to the font size for the line spacing; text_y moves the text down from its row's middle",
+        "font_size": 24,
+        "line_extra": 10,
+        "text_y": 2
+    },
+    "bar": {
+        "_note": "row_gap: between the message block and the bar row; column_gap: between the bar and the count; the fill sits inset inside the track; the bar is never narrower than min_width; the waiting marquee is marquee_width wide",
+        "height": 18,
+        "row_gap": 20,
+        "column_gap": 16,
+        "inset": 2,
+        "min_width": 40,
+        "marquee_width": 90
+    },
+    "count": {
+        "_note": "the bar row is at least the count's font size plus row_extra tall; text_y moves the text down from the row's middle",
+        "font_size": 18,
+        "row_extra": 4,
+        "text_y": 2
+    }
+}

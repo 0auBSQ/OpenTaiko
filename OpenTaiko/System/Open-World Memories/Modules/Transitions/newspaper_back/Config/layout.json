@@ -1,0 +1,40 @@
+{
+    "_note": "Newspaper way back layout, in 1920x1080 pixels. Opacities 0 to 1; angles in degrees. A page (and its shadow) offscreen past a screen edge is out of sight.",
+    "screen_width": 1920,
+    "offscreen": 820,
+    "sheets": {
+        "_note": "where each page comes to rest, in the order they arrive (a later page lies on top): bx, by the centre and s the scale. Every trip moves each by up to jitter_x / jitter_y in all (half each way), turns it by up to jitter_deg in all, and lays one in upside_down_chance upside down.",
+        "jitter_x": 60,
+        "jitter_y": 50,
+        "jitter_deg": 30,
+        "upside_down_chance": 0.12,
+        "lift_grow": 0.1,
+        "rest": [
+            { "bx": 1685, "by": 830, "s": 0.90 },
+            { "bx": 1180, "by": 260, "s": 0.92 },
+            { "bx": 700,  "by": 830, "s": 0.88 },
+            { "bx": 1685, "by": 245, "s": 0.90 },
+            { "bx": 240,  "by": 290, "s": 0.92 },
+            { "bx": 1200, "by": 800, "s": 0.90 },
+            { "bx": 700,  "by": 280, "s": 0.88 },
+            { "bx": 230,  "by": 820, "s": 0.90 },
+            { "bx": 1420, "by": 560, "s": 0.84 },
+            { "bx": 460,  "by": 520, "s": 0.84 },
+            { "bx": 960,  "by": 600, "s": 0.86 },
+            { "bx": 1830, "by": 500, "s": 0.82 },
+            { "bx": 90,   "by": 600, "s": 0.82 },
+            { "bx": 1000, "by": 150, "s": 0.80 },
+            { "bx": 760,  "by": 980, "s": 0.84 }
+        ]
+    },
+    "shadow": {
+        "_note": "a resting page's shadow offset; a page lifted off the pile (lift 0 to 1) grows its shadow by lift_grow, fades it by lift_fade and moves it lift_x / lift_y further",
+        "opacity": 0.34,
+        "x": 10,
+        "y": 14,
+        "lift_grow": 0.05,
+        "lift_fade": 0.35,
+        "lift_x": 36,
+        "lift_y": 46
+    }
+}

@@ -1,0 +1,6 @@
+{
+    "title": "Custom Stages",
+    "empty": "No custom stages are installed yet.",
+    "empty_hint": "Put a stage folder in Global/Modules/Stages, then restart the game.",
+    "ok": "OK"
+}

@@ -1,0 +1,6 @@
+{
+    "title": "自定义舞台",
+    "empty": "尚未安装任何自定义舞台。",
+    "empty_hint": "将舞台文件夹放入 Global/Modules/Stages，然后重新启动游戏。",
+    "ok": "确定"
+}

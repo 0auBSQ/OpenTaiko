@@ -1,0 +1,13 @@
+{
+  "_comment": "电视（tv.lua）的中文文本：菜单与过场动画浏览器。键为固定 ID；缺少的 ID 显示英文文本（lang/en）。",
+  "title": "电视",
+  "menu_on": "打开",
+  "menu_off": "关闭",
+  "menu_rewatch": "重温过场动画",
+  "tab_songs": "歌曲过场动画",
+  "intro": "开场",
+  "outro": "结尾 %d",
+  "unknown_song": "???",
+  "empty": "未找到过场动画。",
+  "waiting": "正在调台……歌曲列表仍在准备中。"
+}

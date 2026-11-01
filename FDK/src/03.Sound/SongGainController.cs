@@ -15,7 +15,7 @@ public sealed class SongGainController {
 	public bool ApplySongVol { private get; set; }
 
 	public void Set(int songVol, LoudnessMetadata? songLoudnessMetadata, CSound sound) {
-		if (ApplyLoudnessMetadata && songLoudnessMetadata.HasValue) {
+		if (songLoudnessMetadata != null && ApplyLoudnessMetadata && songLoudnessMetadata.HasValue) {
 			var gain = TargetLoudness - songLoudnessMetadata.Value.Integrated;
 
 			sound.SetGain(gain, songLoudnessMetadata.Value.TruePeak);

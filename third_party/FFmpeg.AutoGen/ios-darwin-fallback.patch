@@ -1,0 +1,24 @@
+--- a/Native/LibraryLoader.cs
++++ b/Native/LibraryLoader.cs
+@@ -20,7 +20,8 @@
+                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return PlatformID.Win32NT;
+                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) return PlatformID.Unix;
+                 if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return PlatformID.MacOSX;
+-                throw new PlatformNotSupportedException();
++                // iOS is Darwin, so fall back to macOS naming and dlsym instead of throwing.
++                return PlatformID.MacOSX;
+ #endif
+             };
+ 
+--- a/Native/FunctionLoader.cs
++++ b/Native/FunctionLoader.cs
+@@ -72,7 +72,8 @@
+                 return MacNativeMethods.dlsym(nativeLibraryHandle, functionName);
+             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                 return WindowsNativeMethods.GetProcAddress(nativeLibraryHandle, functionName);
+-            throw new PlatformNotSupportedException();
++            // iOS is Darwin and resolves symbols with the same dlsym as macOS.
++            return MacNativeMethods.dlsym(nativeLibraryHandle, functionName);
+ #endif
+         }
+     }

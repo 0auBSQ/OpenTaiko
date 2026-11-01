@@ -1,7 +1,0 @@
-[Song Select Only]
-
-function playAnime()
-Called when a player on the difficulty select screen swaps
-between Extreme and Extra difficulty.
-
-Animation duration is specified in the Skin Config files.

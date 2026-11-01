@@ -15,7 +15,7 @@ class CVisualLogManager {
 			=> timeSinceCreation = new CCounter(0, 10000, 1, OpenTaiko.Timer);
 
 		public int Display(int y) {
-			if (timeSinceCreation.IsStoped) {
+			if (timeSinceCreation.IsStopped) {
 				// OpenTaiko.Timer was null. Reinitialize.
 				InitTimeSinceCreation();
 			}
@@ -36,7 +36,7 @@ class CVisualLogManager {
 			return timeSinceCreation.IsEnded;
 		}
 
-		private CCounter timeSinceCreation;
+		private CCounter timeSinceCreation = null!;
 		private TraceEventType lct;
 		private string msg;
 	}
@@ -46,18 +46,26 @@ class CVisualLogManager {
 	}
 
 	public void Display() {
-		if (this.firstCard?.IsExpired() ?? true) {
-			while (this.cards.TryDequeue(out this.firstCard) && this.firstCard.IsExpired())
-				;
+		LogCard? firstCard;
+		lock (this.cards) { // concurrent with only Display()
+			firstCard = this.firstCard;
+			if (firstCard == null || firstCard.IsExpired()) {
+				while (this.cards.TryDequeue(out firstCard) && (firstCard == null || firstCard.IsExpired()))
+					;
+			}
+			this.firstCard = firstCard;
 		}
 		int y = 0;
-		if (this.firstCard != null)
-			y = this.firstCard.Display(y);
+		if (firstCard != null)
+			y = firstCard.Display(y);
 		try {
-			foreach (var card in this.cards)
-				y = card.Display(y);
-		} catch (InvalidOperationException ex) {
-			// item updated during drawing; skip
+			for (int i = 0; i < this.cards.Count; ++i) { // concurrent with PushCard()
+				var card = this.cards.ElementAtOrDefault(i);
+				if (card != null)
+					y = card.Display(y);
+			}
+		} catch (InvalidOperationException) {
+			// skip display
 		}
 	}
 

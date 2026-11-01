@@ -10,4 +10,6 @@ public struct STInputEvent {
 	public bool Released { get; set; }
 	public long nTimeStamp { get; set; }
 	public int nVelocity { get; set; }
+	// handled on the thread that delivered the press (see CInputButtonsBase.PressArrived)
+	public bool HandledOnArrival { get; set; }
 }

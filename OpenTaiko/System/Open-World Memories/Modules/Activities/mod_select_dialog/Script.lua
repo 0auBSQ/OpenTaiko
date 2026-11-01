@@ -1,0 +1,606 @@
+local NavInput = require("NavInput")
+
+-- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+local Animation = Config.load("Config/animation.json")
+
+-- a skin locale string (Locales/<lang>/), the English fallback when the key is missing
+local function tr(key, fallback)
+    local ok, s = pcall(function() return THEME:GetSkinString(key) end)
+    if ok and type(s) == "string" and s ~= "" and s:sub(1, 1) ~= "[" then return s end
+    return fallback or key
+end
+
+-- Reactive once the enter animation is done
+local reactive = false
+local player = 0
+local save = nil
+local restrictMods = false   -- online lobby: when true, only the Auto choice of Special Mods is hidden (Fun Mod incl. Dynamic Beat stays, per-player)
+
+-- Mod options
+local options = {}
+
+local SETTER_MAP = {
+    ["special"]      = "SetSpecialMod",
+    ["scroll-speed"] = "SetScrollSpeed",
+    ["game-mode"]    = "SetGameType",
+    ["timing"]       = "SetTimingZone",
+    ["just"]         = "SetJusticeMod",
+    ["invisible"]    = "SetStealthMod",
+    ["shuffle"]      = "SetRandomMod",
+    ["fun-mod"]      = "SetFunMod"
+}
+
+-- Fonts
+local textSmall = nil
+local text = nil
+local textLarge = nil
+
+-- Textures
+local tx = {}
+
+-- Sounds
+local sounds = {}
+
+-- Animations and counters
+local ctx = {}
+
+local SLIDE = Animation.slide
+local SLIDE_DIST = SLIDE.distance_px
+local SLIDE_STEP = SLIDE.duration_s / SLIDE_DIST   -- the counter's seconds per pixel of the slide
+
+local bgpos = SLIDE_DIST
+local bgtlop = 0
+
+-- ============================================================
+-- UI Layout Constants
+-- ============================================================
+local OPTIONS = Layout.options
+local FOOTER = Layout.footer
+local TILE = Layout.background_tile
+local MENU_TITLE_X          = Layout.title.x
+local MENU_TITLE_Y          = Layout.title.y
+local MENU_ORIGIN_Y         = OPTIONS.y            -- Y of the first option row
+local MENU_OPTION_SPACING_Y = OPTIONS.spacing_y    -- Vertical gap between option rows
+local MENU_LABEL_X          = OPTIONS.label_x      -- X of the option name label
+local MENU_CHOICES_ORIGIN_X = OPTIONS.choices_x    -- X where choices/values start
+local MENU_CHOICE_SPACING_X = OPTIONS.choice_spacing_x    -- Horizontal gap between individual choices
+local MENU_FOOTER_Y         = FOOTER.y             -- Y of the OK / Cancel row
+local MENU_OK_X             = FOOTER.ok_x          -- X of the OK button
+local MENU_CANCEL_X         = FOOTER.cancel_x      -- X of the Cancel button
+local MENU_DESC_Y           = Layout.description.y -- Y of the description line at the bottom
+local MENU_DESC_X           = Layout.description.x -- X of the description line
+
+-- ============================================================
+-- Color palette (hex strings for COLOR:CreateColorFromHex)
+-- ============================================================
+local COLORS = Layout.colors
+local COL_WHITE      = COLORS.white_color
+local COL_GRAY       = COLORS.gray_color
+local COL_HIGHLIGHT  = COLORS.highlight_color   -- selected option label
+local COL_GREEN      = COLORS.green_color
+local COL_LIGHTGREEN = COLORS.light_green_color
+local COL_ORANGE     = COLORS.orange_color
+local COL_RED        = COLORS.red_color
+
+-- ============================================================
+-- Static option definitions (choices, colors, per-choice desc)
+-- ============================================================
+-- Special Mods: the values of CONFIG:GetSpecialMod / SetSpecialMod. The label of value n is the locale key
+-- MOD_SPECIAL<n+1>, its description MOD_SPECIAL<n+1>_DESC.
+local SPECIAL_AUTO = 1
+local SPECIAL_MODS = {
+    { id = 0, color = COL_WHITE },    -- None
+    { id = 1, color = COL_WHITE },    -- Auto
+    { id = 2, color = COL_RED },      -- Flawless
+    { id = 3, color = COL_ORANGE },   -- Timed
+    { id = 4, color = COL_RED },      -- Timed (Hard)
+}
+
+-- Texts: key is the locale key of the label (Locales/<lang>/song_select.json), key .. "_DESC" the one of the
+-- description; labelKey replaces the label's key, lang takes the label from the game's Lang/ instead.
+-- text, label and desc are the English fallbacks.
+local OPTION_DEFS = {
+    {
+        meta = "scroll-speed",
+        key  = "SONGSELECT_MODS_SCROLL_SPEED",
+        text = "Scroll Speed",
+        desc = "Determines how fast the notes scroll through the lane.",
+        type = "scroll",
+        min  = 0,
+        max  = 99,
+    },
+    {
+        meta = "game-mode",
+        key  = "SONGSELECT_MODS_GAME_MODE",
+        text = "Game Mode",
+        desc = "Play with your favorite instrument!",
+        type = "multi",
+        choices = {
+            { key = "SONGSELECT_MODS_TAIKO", label = "Taiko", color = COL_WHITE, desc = "Play with a Taiko drum." },
+            { key = "SONGSELECT_MODS_BONGO", label = "Bongo", color = COL_WHITE, desc = "Play with bongos." },
+        }
+    },
+    {
+        meta = "timing",
+        key  = "SONGSELECT_MODS_TIMING",
+        text = "Timing",
+        desc = "Adjust the precision required for a good/ok/bad input.",
+        type = "multi",
+        choices = {
+            { key = "SONGSELECT_MODS_TIMING1", lang = "MOD_TIMING1", label = "Loose",    color = COL_GREEN,      desc = "Very forgiving timing windows, for beginners." },
+            { key = "SONGSELECT_MODS_TIMING2", lang = "MOD_TIMING2", label = "Lenient",  color = COL_LIGHTGREEN, desc = "Forgiving timing windows." },
+            { key = "SONGSELECT_MODS_TIMING3", lang = "MOD_TIMING3", label = "Normal",   color = COL_WHITE,      desc = "Standard timing windows." },
+            { key = "SONGSELECT_MODS_TIMING4", lang = "MOD_TIMING4", label = "Strict",   color = COL_ORANGE,     desc = "Tight timing windows." },
+            { key = "SONGSELECT_MODS_TIMING5", lang = "MOD_TIMING5", label = "Rigorous", color = COL_RED,        desc = "Very tight timing windows, for experts only." },
+        }
+    },
+    {
+        meta = "just",
+        key  = "SONGSELECT_MODS_JUST",
+        text = "Just",
+        desc = "Only 2 judge zones, all or nothing.",
+        type = "multi",
+        choices = {
+            { key = "SONGSELECT_MODS_JUST_NORMAL", label = "Normal", color = COL_WHITE, desc = "Standard 3-zone judgement." },
+            { key = "SONGSELECT_MODS_JUST_JUST",   label = "Just",   color = COL_RED,   desc = "Good or Miss only. No leniency at all." },
+            { key = "SONGSELECT_MODS_JUST_SAFE",   label = "Safe",   color = COL_GREEN, desc = "Ok counts as Good. Very forgiving." },
+        }
+    },
+    {
+        meta = "invisible",
+        key  = "SONGSELECT_MODS_INVISIBLE",
+        text = "Invisible",
+        desc = "Hide the notes, in one way or another, and rely on your memory and reflexes!",
+        type = "multi",
+        choices = {
+            { key = "SONGSELECT_MODS_INVISIBLE_NONE", labelKey = "SONGSELECT_MODS_NONE", label = "None", color = COL_WHITE, desc = "Notes are fully visible." },
+            { key = "SONGSELECT_MODS_DORON",      label = "Doron",      color = COL_WHITE, desc = "Invisible notes, but SE notes indications are still here." },
+            { key = "SONGSELECT_MODS_STEALTH",    label = "Stealth",    color = COL_WHITE, desc = "Nothing here, only your memory can help you!" },
+            { key = "SONGSELECT_MODS_HIDDEN",     label = "Hidden",     color = COL_WHITE, desc = "Notes fade away as they approach the judge zone. Read ahead!" },
+            { key = "SONGSELECT_MODS_FLASHLIGHT", label = "Flashlight", color = COL_WHITE, desc = "Only a circle of light around the judge zone shows the notes, and it shrinks as your combo grows." },
+        }
+    },
+    {
+        meta = "shuffle",
+        key  = "SONGSELECT_MODS_SHUFFLE",
+        text = "Shuffle",
+        desc = "Swap dons and kas to challenge your muscle memory!",
+        type = "multi",
+        choices = {
+            { key = "SONGSELECT_MODS_SHUFFLE_NONE", labelKey = "SONGSELECT_MODS_NONE", label = "None", color = COL_WHITE, desc = "No note modification." },
+            { key = "SONGSELECT_MODS_RANDOM",  label = "Random",  color = COL_WHITE, desc = "Don/Ka notes are randomly swapped." },
+            { key = "SONGSELECT_MODS_MIRROR",  label = "Mirror",  color = COL_WHITE, desc = "Don/Ka notes are mirrored." },
+            { key = "SONGSELECT_MODS_CHAOS",   label = "Chaos",   color = COL_WHITE, desc = "Notes are randomly rearranged." },
+            { key = "SONGSELECT_MODS_MRANDOM", label = "MRandom", color = COL_WHITE, desc = "Mirror and Random combined." },
+        }
+    },
+    {
+        meta = "fun-mod",
+        key  = "SONGSELECT_MODS_FUN",
+        text = "Fun Mod",
+        desc = "Add some goofiness to your play!",
+        type = "multi",
+        choices = {
+            { key = "SONGSELECT_MODS_FUN_NONE", labelKey = "SONGSELECT_MODS_NONE", label = "None", color = COL_WHITE, desc = "No fun mod active." },
+            { key = "SONGSELECT_MODS_AVALANCHE",    label = "Avalanche",    color = COL_WHITE, desc = "Very chaotic scroll speeds!" },
+            { key = "SONGSELECT_MODS_MINESWEEPER",  label = "Minesweeper",  color = COL_WHITE, desc = "Watch out for notes swapped to bombs!" },
+            { key = "SONGSELECT_MODS_DYNAMIC_BEAT", label = "Dynamic Beat", color = COL_WHITE, desc = "The song speeds up as you play well, and slows down on mistakes. Shared among all players in local play; per-player online." },
+        }
+    },
+    {
+        meta = "special",
+        type = "multi",
+    },
+}
+
+-- Total selectable items in step 1 (8 options + OK + Cancel)
+local OPTION_COUNT  = #OPTION_DEFS
+local OK_INDEX      = OPTION_COUNT        -- 0-based index
+local CANCEL_INDEX  = OPTION_COUNT + 1
+local TOTAL_ITEMS   = OPTION_COUNT + 2
+
+-- Navigation state
+local selectedIndex = 0    -- 0-based; 0..OPTION_COUNT-1 = options, OK_INDEX, CANCEL_INDEX
+local editingOption = false -- true when in step 2 (editing a specific option)
+
+-- the title, footer buttons and their descriptions in the current language
+local strings = {}
+
+local function loadStrings()
+    strings.title      = tr("SONGSELECT_MODS_TITLE", "Mod Select")
+    strings.ok         = tr("SONGSELECT_CONFIRM_OK", "OK")
+    strings.cancel     = tr("SONGSELECT_CONFIRM_CANCEL", "Cancel")
+    strings.okDesc     = tr("SONGSELECT_MODS_OK_DESC", "Confirm all changes and exit the menu.")
+    strings.cancelDesc = tr("SONGSELECT_MODS_CANCEL_DESC", "Discard all changes and exit the menu.")
+end
+
+-- ============================================================
+-- Helper: counter
+-- ============================================================
+local function startCounter(key, startVal, endVal, interval, mode, updateCallback, onFinish)
+    local c = COUNTER:CreateCounter(startVal, endVal, interval, onFinish)
+    if mode == "loop" then c:SetLoop(true)
+    elseif mode == "bounce" then c:SetBounce(true) end
+    if updateCallback then c:Listen(updateCallback) end
+    c:Start()
+    ctx[key] = c
+    return c
+end
+
+local function updateTransitionVisuals(val)
+    bgpos = val
+    local bgOpacity = 255 - (val * (255 / SLIDE.fade_distance_px))
+    bgtlop = math.max(0, math.min(255, bgOpacity))
+end
+
+-- ============================================================
+-- Helper: background draw (saves ~8 MB of RAM vs full texture)
+-- ============================================================
+local function drawBg(opacity)
+    tx["bgtile"]:SetOpacity((opacity * bgtlop) / 255)
+    for i = 0, TILE.columns - 1, 1 do
+        for j = 0, TILE.rows - 1, 1 do
+            tx["bgtile"]:Draw(i * TILE.step_x, j * TILE.step_y)
+        end
+    end
+end
+
+-- ============================================================
+-- Helper: scroll speed display  e.g. value 19 -> "2.0"
+-- ============================================================
+local function scrollSpeedDisplay(value)
+    return string.format("%.1f", CONFIG.SCROLLSPEED:ToActual(value))
+end
+
+-- ============================================================
+-- Helper: footer description depending on current state
+-- ============================================================
+local function getCurrentDesc()
+    if selectedIndex == OK_INDEX then
+        return strings.okDesc
+    elseif selectedIndex == CANCEL_INDEX then
+        return strings.cancelDesc
+    end
+
+    local opt = options[selectedIndex + 1]
+    if opt == nil then return "" end
+
+    -- In edit mode, show per-choice desc (scroll always shows general desc)
+    if editingOption and opt.type ~= "scroll" then
+        local choice = opt.choices[opt.value + 1]
+        if choice then return choice.desc end
+    end
+
+    return opt.desc
+end
+
+-- the choices of a definition with their texts in the current language
+local function localizedChoices(defChoices)
+    local list = {}
+    for i, c in ipairs(defChoices) do
+        local label = c.lang and LANG:GetString(c.lang) or tr(c.labelKey or c.key, c.label)
+        list[i] = { label = label, color = c.color, desc = tr(c.key .. "_DESC", c.desc) }
+    end
+    return list
+end
+
+-- ============================================================
+-- loadOptions – reads current config values into the options table
+-- ============================================================
+local function loadOptions()
+    options = {}
+    for _, def in ipairs(OPTION_DEFS) do
+        local val
+        local label, desc, choices = def.text, def.desc, def.choices
+        if def.key ~= nil then label, desc = tr(def.key, def.text), tr(def.key .. "_DESC", def.desc) end
+        if choices ~= nil then choices = localizedChoices(choices) end
+        if def.meta == "special" then
+            -- the choices carry their CONFIG value in id; online, Auto is not offered
+            local current = CONFIG:GetSpecialMod(player)
+            label, desc, choices = LANG:GetString("MOD_SPECIAL"), LANG:GetString("MOD_SPECIAL_DESC"), {}
+            val = 0
+            for _, mod in ipairs(SPECIAL_MODS) do
+                if not (restrictMods and mod.id == SPECIAL_AUTO) then
+                    local key = "MOD_SPECIAL" .. (mod.id + 1)
+                    table.insert(choices, { id = mod.id, label = LANG:GetString(key), color = mod.color, desc = LANG:GetString(key .. "_DESC") })
+                    if mod.id == current then val = #choices - 1 end
+                end
+            end
+        elseif def.meta == "scroll-speed" then val = CONFIG:GetScrollSpeed(player)
+        elseif def.meta == "game-mode"    then val = CONFIG:GetGameType(player)
+        elseif def.meta == "timing"       then val = CONFIG:GetTimingZone(player)
+        elseif def.meta == "just"         then val = CONFIG:GetJusticeMod(player)
+        elseif def.meta == "invisible"    then val = CONFIG:GetStealthMod(player)
+        elseif def.meta == "shuffle"      then val = CONFIG:GetRandomMod(player)
+        elseif def.meta == "fun-mod"      then val = CONFIG:GetFunMod(player)
+        end
+        table.insert(options, {
+            meta    = def.meta,
+            value   = val,
+            text    = label,
+            desc    = desc,
+            type    = def.type,
+            choices = choices,      -- nil for scroll type
+            spacing = def.spacing or MENU_CHOICE_SPACING_X,
+            min     = def.min,      -- scroll only
+            max     = def.max,      -- scroll only
+        })
+    end
+    -- recompute the navigation counts from the option list, so the OK/Cancel indices always follow it
+    OPTION_COUNT = #options
+    OK_INDEX     = OPTION_COUNT
+    CANCEL_INDEX = OPTION_COUNT + 1
+    TOTAL_ITEMS  = OPTION_COUNT + 2
+end
+
+-- ============================================================
+-- saveOptions – writes modified values back to config
+-- ============================================================
+local function saveOptions()
+    for _, option in ipairs(options) do
+        local methodName = SETTER_MAP[option.meta]
+        if methodName and CONFIG[methodName] then
+            local value = option.value
+            if option.meta == "special" then value = option.choices[value + 1].id end  -- the choice's CONFIG value
+            CONFIG[methodName](CONFIG, player, value)
+        else
+            debugLog("No setter mapping found for: " .. tostring(option.meta))
+        end
+    end
+end
+
+-- ============================================================
+-- Draw
+-- ============================================================
+function draw()
+    drawBg(TILE.opacity)
+    tx["bg"]:SetOpacity(bgtlop / 255)
+    tx["bg"]:Draw(0, bgpos)
+
+    tx["player"..player]:SetOpacity(bgtlop / 255)
+    tx["player"..player]:DrawAtAnchor(Layout.player_art.x,Layout.player_art.y+bgpos,"bottomright")
+
+    if bgtlop == 0 then return end
+    local alpha = bgtlop / 255
+
+    -- Title
+    local titleTx = textLarge:GetText(strings.title, false, Layout.title.max_w)
+    titleTx:SetOpacity(alpha)
+    titleTx:Draw(MENU_TITLE_X, MENU_TITLE_Y)
+
+    -- --------------------------------------------------------
+    -- Option rows
+    -- --------------------------------------------------------
+    for i, opt in ipairs(options) do
+        local idx    = i - 1
+        local ypos   = MENU_ORIGIN_Y + idx * MENU_OPTION_SPACING_Y
+        local isSel  = (selectedIndex == idx)
+        local isEdit = (editingOption and isSel)
+
+        -- Label (highlighted when row is selected in step 1 or being edited in step 2)
+        local labelCol = isSel and COLOR:CreateColorFromHex(COL_HIGHLIGHT)
+                                or COLOR:CreateColorFromHex(COL_WHITE)
+        local labelTx = text:GetText(opt.text, false, OPTIONS.label_max_w, labelCol)
+        labelTx:SetOpacity(alpha)
+        labelTx:Draw(MENU_LABEL_X, ypos)
+
+        -- Value area
+        if opt.type == "scroll" then
+            -- Single value display; highlighted when being edited
+            local valCol = isEdit and COLOR:CreateColorFromHex(COL_HIGHLIGHT)
+                                   or COLOR:CreateColorFromHex(COL_WHITE)
+            local valTx = text:GetText(scrollSpeedDisplay(opt.value), false, OPTIONS.value_max_w, valCol)
+            valTx:SetOpacity(alpha)
+            valTx:Draw(MENU_CHOICES_ORIGIN_X, ypos)
+        else
+            -- Choices side by side
+            local xpos = MENU_CHOICES_ORIGIN_X
+            for ci, choice in ipairs(opt.choices) do
+                local choiceVal = ci - 1
+                local isActive  = (opt.value == choiceVal)
+
+                -- Color logic:
+                --   Active choice: use its defined color
+                --   Inactive choice: gray
+                --   When NOT in edit mode the active choice is always shown in its color
+                --     so the player can see what is currently set at a glance
+                local choiceCol
+                if isActive then
+                    choiceCol = COLOR:CreateColorFromHex(choice.color)
+                else
+                    choiceCol = COLOR:CreateColorFromHex(COL_GRAY)
+                end
+
+                local choiceTx = text:GetText(choice.label, false, opt.spacing - OPTIONS.choice_padding, choiceCol)
+                choiceTx:SetOpacity(alpha)
+                choiceTx:Draw(xpos, ypos)
+                xpos = xpos + opt.spacing
+            end
+        end
+    end
+
+    -- --------------------------------------------------------
+    -- OK / Cancel footer buttons
+    -- --------------------------------------------------------
+    local okCol  = (selectedIndex == OK_INDEX)     and COLOR:CreateColorFromHex(COL_HIGHLIGHT)
+                                                   or  COLOR:CreateColorFromHex(COL_WHITE)
+    local canCol = (selectedIndex == CANCEL_INDEX) and COLOR:CreateColorFromHex(COL_HIGHLIGHT)
+                                                   or  COLOR:CreateColorFromHex(COL_WHITE)
+
+    local okTx  = text:GetText(strings.ok,     false, FOOTER.button_max_w, okCol)
+    local canTx = text:GetText(strings.cancel, false, FOOTER.button_max_w, canCol)
+    okTx:SetOpacity(alpha)
+    canTx:SetOpacity(alpha)
+    okTx:Draw(MENU_OK_X,     MENU_FOOTER_Y)
+    canTx:Draw(MENU_CANCEL_X, MENU_FOOTER_Y)
+
+    -- --------------------------------------------------------
+    -- Description line (bottom)
+    -- --------------------------------------------------------
+    local descStr = getCurrentDesc()
+    if descStr and descStr ~= "" then
+        local descTx = textSmall:GetText(descStr, false, Layout.description.max_w)
+        descTx:SetOpacity(alpha)
+        descTx:Draw(MENU_DESC_X, MENU_DESC_Y)
+    end
+end
+
+-- ============================================================
+-- Update
+-- ============================================================
+function update()
+    for k, counter in pairs(ctx) do
+        counter:Tick()
+    end
+
+    if reactive == false then return end
+
+    local navPn = NavInput.p[player+1]
+
+    if editingOption == false then
+        -- --------------------------------------------------------
+        -- Step 1 – navigate the list
+        -- --------------------------------------------------------
+        if navPn.right() then
+            sounds.Skip:Play()
+            selectedIndex = (selectedIndex + 1) % TOTAL_ITEMS
+
+        elseif navPn.left() then
+            sounds.Skip:Play()
+            selectedIndex = (selectedIndex - 1 + TOTAL_ITEMS) % TOTAL_ITEMS
+
+        elseif navPn.decide() then
+            if selectedIndex == OK_INDEX then
+                sounds.Decide:Play()
+                reactive = false
+                startCounter("screen_transition", 0, SLIDE_DIST, SLIDE_STEP, "none", updateTransitionVisuals, function()
+                    saveOptions()
+                    DEACTIVATE()
+                end)
+
+            elseif selectedIndex == CANCEL_INDEX then
+                sounds.Cancel:Play()
+                reactive = false
+                startCounter("screen_transition", 0, SLIDE_DIST, SLIDE_STEP, "none", updateTransitionVisuals, function()
+                    DEACTIVATE()
+                end)
+
+            else
+                -- Enter edit mode for this option
+                sounds.Decide:Play()
+                editingOption = true
+            end
+
+        elseif navPn.cancel() then
+            -- Escape from menu without saving
+            sounds.Cancel:Play()
+            reactive = false
+            startCounter("screen_transition", 0, SLIDE_DIST, SLIDE_STEP, "none", updateTransitionVisuals, function()
+                DEACTIVATE()
+            end)
+        end
+
+    else
+        -- --------------------------------------------------------
+        -- Step 2 – edit selected option value
+        -- --------------------------------------------------------
+        local opt = options[selectedIndex + 1]
+        if opt == nil then editingOption = false return end
+
+        if opt.type == "scroll" then
+            -- Left/right move value by 1, clamped to [min, max]
+            if navPn.right() then
+                sounds.Skip:Play()
+                opt.value = math.min(opt.max, opt.value + 1)
+
+            elseif navPn.left() then
+                sounds.Skip:Play()
+                opt.value = math.max(opt.min, opt.value - 1)
+
+            elseif navPn.decide() then
+                sounds.Decide:Play()
+                editingOption = false
+
+            elseif navPn.cancel() then
+                sounds.Cancel:Play()
+                editingOption = false
+            end
+
+        else
+            -- Left/right cycle through choices (modulo)
+            local choiceCount = #opt.choices
+
+            if navPn.right() then
+                sounds.Skip:Play()
+                opt.value = (opt.value + 1) % choiceCount
+
+            elseif navPn.left() then
+                sounds.Skip:Play()
+                opt.value = (opt.value - 1 + choiceCount) % choiceCount
+
+            elseif navPn.decide() then
+                sounds.Decide:Play()
+                editingOption = false
+
+            elseif navPn.cancel() then
+                sounds.Cancel:Play()
+                editingOption = false
+            end
+        end
+    end
+end
+
+-- ============================================================
+-- Lifecycle
+-- ============================================================
+function activate(pl, restrict)
+    restrictMods = restrict == true
+    save   = GetSaveFile(pl)
+    player = pl
+    loadStrings()
+    loadOptions()
+
+    selectedIndex = 0
+    editingOption = false
+
+    sounds.Skip      = SHARED:GetSharedSound("Skip")
+    sounds.Cancel    = SHARED:GetSharedSound("Cancel")
+    sounds.Decide    = SHARED:GetSharedSound("Decide")
+    sounds.SongDecide = SHARED:GetSharedSound("SongDecide")
+
+    startCounter("screen_transition", SLIDE_DIST, 0, -SLIDE_STEP, "none", updateTransitionVisuals, function()
+        reactive = true
+    end)
+end
+
+function deactivate()
+    for k, counter in pairs(ctx) do
+        counter = COUNTER:EmptyCounter()
+    end
+    -- Note: saveOptions() is called explicitly before DEACTIVATE() only on OK
+end
+
+function onStart()
+    textSmall = TEXT:Create(Layout.fonts.small_size)
+    text      = TEXT:Create(Layout.fonts.text_size)
+    textLarge = TEXT:Create(Layout.fonts.large_size)
+    loadStrings()
+
+    tx["bg"]     = TEXTURE:CreateTexture("Textures/Background.png")
+    tx["bgtile"] = TEXTURE:CreateTexture("Textures/BgTile.png")
+    for i = 1, 5, 1 do
+        tx["player"..(i-1)] = TEXTURE:CreateTexture("Textures/"..i.."P.png")
+    end
+end
+
+function onDestroy()
+    if text      ~= nil then text:Dispose()      end
+    if textSmall ~= nil then textSmall:Dispose() end
+    if textLarge ~= nil then textLarge:Dispose() end
+
+    for _, t in pairs(tx) do
+        t:Dispose()
+    end
+end

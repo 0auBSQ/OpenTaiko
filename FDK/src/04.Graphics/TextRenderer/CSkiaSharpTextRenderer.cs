@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using SkiaSharp;
 using Color = System.Drawing.Color;
@@ -16,15 +17,16 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 		Initialize(fontpath, pt, style);
 	}
 
-	public CSkiaSharpTextRenderer(Stream fontstream, int pt, CFontRenderer.FontStyle style) {
-		Initialize(fontstream, pt, style);
+	public CSkiaSharpTextRenderer(Stream fontstream, string fontKey, int pt, CFontRenderer.FontStyle style) {
+		Initialize(fontstream, fontKey, pt, style);
 	}
 
-	protected void Initialize(Stream fontstream, int pt, CFontRenderer.FontStyle style) {
+	protected void Initialize(Stream fontstream, string fontKey, int pt, CFontRenderer.FontStyle style) {
 		paint = new SKPaint();
 
 		//stream・filepathから生成した場合に、style設定をどうすればいいのかがわからない
-		paint.Typeface = SKFontManager.Default.CreateTypeface(fontstream);
+		// A stream has no path, so the caller provides the source name as the cache key.
+		paint.Typeface = GetCachedTypeface($"stream:{fontKey}", () => SKFontManager.Default.CreateTypeface(fontstream));
 
 		paint.TextSize = (pt * 1.3f);
 		paint.IsAntialias = true;
@@ -51,21 +53,31 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 			//paint.FontMetrics.UnderlinePosition;
 		}
 
+		// Typefaces are cached and shared (see _typefaceCache): loading one copies the whole
+		// font file into native memory, SKPaint does not own/free its Typeface, and renderers
+		// are created per stage/HUD element. Resolve into a local rather than reading
+		// paint.Typeface back, so paint disposal can never dispose a cached typeface.
+		SKTypeface? typeface = null;
+
 		if (SKFontManager.Default.FontFamilies.Contains(fontpath))
-			paint.Typeface = SKTypeface.FromFamilyName(fontpath, weight, width, slant);
+			typeface = GetCachedTypeface($"family:{fontpath}:{weight}:{width}:{slant}",
+				() => SKTypeface.FromFamilyName(fontpath, weight, width, slant));
 
 		//stream・filepathから生成した場合に、style設定をどうすればいいのかがわからない
-		if (File.Exists(fontpath))
-			paint.Typeface = SKTypeface.FromFile(fontpath, 0);
+		if (File.Exists(fontpath)) {
+			typeface = FileTypeface(fontpath);
+		}
 
-		if (paint.Typeface == null) {
+		if (typeface == null) {
 			Trace.TraceWarning($"The requested font '{fontpath}' could not be found from a file or font family name. Falling back to SkiaSharp's default typeface.");
-			paint.Typeface = SKTypeface.CreateDefault();
+			typeface = GetCachedTypeface("default", () => SKTypeface.CreateDefault());
 		}
 
 		// If a font couldn't be loaded despite the fallback implemented above, we're absolutely cooked.
-		if (paint.Typeface == null)
+		if (typeface == null)
 			throw new FileNotFoundException("All attempts to load this font failed, including using SkiaSharp's default typeface as a fallback.", fontpath);
+
+		paint.Typeface = typeface;
 
 		paint.TextSize = (pt * 1.3f);
 		paint.IsAntialias = true;
@@ -79,14 +91,32 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 		public Color GradiantBottom;
 		public bool UseOutline;
 		public Color OutlineColor;
+		public float OutlineWidth;   // how far the outline reaches past the letters, in px; 0 = the ratio's width
 	}
 
 	// Purify is equivalent to RemoveTags on ObjectExtensions.cs, update both if changing TagRegex
+	// <c.#fore>, <c.#fore.#outline>, either with an outline width: <c.#fore.#outline[3]>; <g.#top.#bottom>
 
-	private const string TagRegex = @"<(/?)([gc](?:\.#[0-9a-fA-F]{6})*?)>";
+	private const string TagRegex = @"<(/?)([gc](?:\.#[0-9a-fA-F]{6})*?)(?:\[(\d+(?:\.\d+)?)\])?>";
 
 	public string Purify(string input) {
 		return Regex.Replace(input, TagRegex, "");
+	}
+
+	// advance width in px (includes trailing spaces) — the same measure DrawText uses to place tokens
+	public float MeasureText(string s) => Width(this.Shape(s, CTextShaper.Options.Current));
+
+	// how much the font's kerning moves `second` when it follows `first` (0 with kerning off or across typefaces)
+	public float PairKerning(string first, string second) {
+		if (!CTextShaper.Kerning)
+			return 0;
+		string pair = first + second;
+		return Width(this.Shape(pair, CTextShaper.Options.Current)) - Width(this.Shape(pair, CTextShaper.Options.Current with { Kerning = false }));
+	}
+
+	// ink line height (ascent + descent) — the line pitch DrawText uses when stacking \n lines
+	public float GetLineHeight() {
+		return paint.FontMetrics.Descent - paint.FontMetrics.Ascent;
 	}
 
 	public List<SStringToken> Tokenize(string input, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradationBottomColor) {
@@ -112,6 +142,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 					TextColor = (tokenStack.Count == 0) ? fontColor : tokenStack.Peek().TextColor,
 					UseOutline = tokenStack.Count > 0 && tokenStack.Peek().UseOutline,
 					OutlineColor = (tokenStack.Count == 0) ? edgeColor : tokenStack.Peek().OutlineColor,
+					OutlineWidth = (tokenStack.Count == 0) ? 0 : tokenStack.Peek().OutlineWidth,
 				};
 				tokens.Add(token);
 			}
@@ -130,6 +161,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 					TextColor = (tokenStack.Count == 0) ? fontColor : tokenStack.Peek().TextColor,
 					UseOutline = tokenStack.Count > 0 ? tokenStack.Peek().UseOutline : false,
 					OutlineColor = (tokenStack.Count == 0) ? edgeColor : tokenStack.Peek().OutlineColor,
+					OutlineWidth = (tokenStack.Count == 0) ? 0 : tokenStack.Peek().OutlineWidth,
 				};
 
 				string[] _varSplit = match.Groups[2].Value.Split(".");
@@ -152,6 +184,10 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 									newToken.UseOutline = true;
 									newToken.OutlineColor = ColorTranslator.FromHtml(_varSplit[2]);
 								}
+								if (match.Groups[3].Success) {
+									newToken.UseOutline = true;
+									newToken.OutlineWidth = float.Parse(match.Groups[3].Value, System.Globalization.CultureInfo.InvariantCulture);
+								}
 								break;
 							}
 
@@ -172,6 +208,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 				TextColor = (tokenStack.Count == 0) ? fontColor : tokenStack.Peek().TextColor,
 				UseOutline = tokenStack.Count > 0 && tokenStack.Peek().UseOutline,
 				OutlineColor = (tokenStack.Count == 0) ? edgeColor : tokenStack.Peek().OutlineColor,
+				OutlineWidth = (tokenStack.Count == 0) ? 0 : tokenStack.Peek().OutlineWidth,
 			};
 			tokens.Add(token);
 		}
@@ -179,7 +216,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 		return tokens;
 	}
 
-	public SKBitmap DrawText(string drawstr, CFontRenderer.DrawMode drawMode, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradationBottomColor, int edge_Ratio, bool keepCenter) {
+	public SKBitmap DrawText(string drawstr, CFontRenderer.DrawMode drawMode, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradationBottomColor, int edge_Ratio, bool keepCenter, bool perCharacter = false) {
 		if (string.IsNullOrEmpty(drawstr)) {
 			//nullか""だったら、1x1を返す
 			return new SKBitmap(1, 1);
@@ -193,62 +230,95 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 		}
 
 		SKBitmap[] images = new SKBitmap[strs.Length];
+		var options = perCharacter ? CTextShaper.Options.PerCharacter : CTextShaper.Options.Current;
 
 		for (int i = 0; i < strs.Length; i++) {
-			SKRect bounds = new SKRect();
-
-			int width = (int)Math.Ceiling(paint.MeasureText(Purify(strs[i]), ref bounds)) + 50;
+			// every token shaped once: the line is as wide as its tokens, drawn side by side
+			var shaped = new List<CTextShaper.Segment>[tokens[i].Count];
+			float lineWidth = 0;
+			for (int t = 0; t < shaped.Length; t++) {
+				shaped[t] = this.Shape(tokens[i][t].s, options);
+				lineWidth += Width(shaped[t]);
+			}
+			int width = (int)Math.Ceiling(lineWidth) + 50;
 			int height = (int)Math.Ceiling(paint.FontMetrics.Descent - paint.FontMetrics.Ascent) + 50;
 
 			//少し大きめにとる(定数じゃない方法を考えましょう)
 			SKBitmap bitmap = new SKBitmap(width, height, SKColorType.Rgba8888, SKAlphaType.Premul);
-			SKCanvas canvas = new SKCanvas(bitmap);
+			// Canvas that composites the glyph layers onto the bitmap; native, disposed via using.
+			using SKCanvas canvas = new SKCanvas(bitmap);
 
 			int x_offset = 0;
 
-			foreach (SStringToken tok in tokens[i]) {
-				int token_width = (int)Math.Ceiling(paint.MeasureText(tok.s, ref bounds));
+			for (int t = 0; t < shaped.Length; t++) {
+				SStringToken tok = tokens[i][t];
+				// the token's shaped segments (one unless the font lacks some characters or the script changes)
+				var segments = shaped[t];
+				float baseline = -paint.FontMetrics.Ascent + 25;
+				int token_width = (int)Math.Ceiling(Width(segments));
 
 				if (drawMode.HasFlag(CFontRenderer.DrawMode.Edge) || tok.UseOutline) {
-
-					SKPath path = paint.GetTextPath(tok.s, 25 + x_offset, -paint.FontMetrics.Ascent + 25);
-
+					// Temporary paints for the outlines; native, disposed via using.
+					using SKPaint secondEdgePaint = new SKPaint();
 					if (secondEdgeColor != null) {
-						SKPaint secondEdgePaint = new SKPaint();
 						secondEdgePaint.StrokeWidth = paint.TextSize * 8 / edge_Ratio;
 						secondEdgePaint.StrokeJoin = SKStrokeJoin.Round;
 						secondEdgePaint.Color = new SKColor(secondEdgeColor.Value.R, secondEdgeColor.Value.G, secondEdgeColor.Value.B, secondEdgeColor.Value.A);
 						secondEdgePaint.Style = SKPaintStyle.Stroke;
 						secondEdgePaint.IsAntialias = true;
-						canvas.DrawPath(path, secondEdgePaint);
 					}
 
-					SKPaint edgePaint = new SKPaint();
-					edgePaint.StrokeWidth = paint.TextSize * (secondEdgeColor == null ? 8 : 4) / edge_Ratio;
+					using SKPaint edgePaint = new SKPaint();
+					// the stroke is centred on the glyph path: it reaches half its width past the letters
+					edgePaint.StrokeWidth = tok.OutlineWidth > 0 ? tok.OutlineWidth * 2 : paint.TextSize * (secondEdgeColor == null ? 8 : 4) / edge_Ratio;
 					edgePaint.StrokeJoin = SKStrokeJoin.Round;
 					edgePaint.Color = new SKColor(tok.OutlineColor.R, tok.OutlineColor.G, tok.OutlineColor.B, tok.OutlineColor.A);
 					edgePaint.Style = SKPaintStyle.Stroke;
 					edgePaint.IsAntialias = true;
-					canvas.DrawPath(path, edgePaint);
+
+					float run_x = 25 + x_offset;
+					foreach (var segment in segments) {
+						// Glyph outline path for the edge stroke; native, disposed via using.
+						using SKPath path = this.GlyphPath(segment, run_x, baseline);
+						if (secondEdgeColor != null)
+							canvas.DrawPath(path, secondEdgePaint);
+						canvas.DrawPath(path, edgePaint);
+						run_x += segment.Advance;
+					}
 				}
 
-				if (tok.UseGradiant) {
-					//https://docs.microsoft.com/ja-jp/xamarin/xamarin-forms/user-interface/graphics/skiasharp/effects/shaders/linear-gradient
-					paint.Shader = SKShader.CreateLinearGradient(
-						new SKPoint(0, 25),
-						new SKPoint(0, height - 25),
-						new SKColor[] {
-							new SKColor(tok.GradiantTop.R, tok.GradiantTop.G, tok.GradiantTop.B, tok.GradiantTop.A),
-							new SKColor(tok.GradiantBottom.R, tok.GradiantBottom.G, tok.GradiantBottom.B, tok.GradiantBottom.A) },
-						new float[] { 0, 1 },
-						SKShaderTileMode.Clamp);
-					paint.Color = new SKColor(0xffffffff);
-				} else {
-					paint.Shader = null;
-					paint.Color = new SKColor(tok.TextColor.R, tok.TextColor.G, tok.TextColor.B);
-				}
+				if (!drawMode.HasFlag(CFontRenderer.DrawMode.NoFill)) {
+					SKShader? shader = null;
+					SKColor color;
+					if (tok.UseGradiant) {
+						//https://docs.microsoft.com/ja-jp/xamarin/xamarin-forms/user-interface/graphics/skiasharp/effects/shaders/linear-gradient
+						shader = SKShader.CreateLinearGradient(
+							new SKPoint(0, 25),
+							new SKPoint(0, height - 25),
+							new SKColor[] {
+								new SKColor(tok.GradiantTop.R, tok.GradiantTop.G, tok.GradiantTop.B, tok.GradiantTop.A),
+								new SKColor(tok.GradiantBottom.R, tok.GradiantBottom.G, tok.GradiantBottom.B, tok.GradiantBottom.A) },
+							new float[] { 0, 1 },
+							SKShaderTileMode.Clamp);
+						color = new SKColor(0xffffffff);
+					} else {
+						color = new SKColor(tok.TextColor.R, tok.TextColor.G, tok.TextColor.B);
+					}
 
-				canvas.DrawText(tok.s, 25 + x_offset, -paint.FontMetrics.Ascent + 25, paint);
+					float run_x = 25 + x_offset;
+					foreach (var segment in segments) {
+						SKPaint runPaint = this.PaintFor(segment.Typeface);
+						runPaint.Shader = shader;
+						runPaint.Color = color;
+						this.DrawSegment(canvas, segment, run_x, baseline, runPaint);
+						runPaint.Shader = null;
+						run_x += segment.Advance;
+					}
+
+					// the paints are persistent members; release the per-token gradient shader so its native
+					// memory isn't leaked until finalization (the GC heap doesn't track it).
+					shader?.Dispose();
+				}
 
 				x_offset += token_width;
 			}
@@ -292,14 +362,247 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 
 
 
-		SKImage image = skSurface.Snapshot();
+		// Snapshot the surface, then copy into the returned bitmap; the SKImage is native, so dispose it via using.
+		using SKImage image = skSurface.Snapshot();
 		//返します
 		return SKBitmap.FromImage(image);
 	}
 
-	public void Dispose() {
-		paint.Dispose();
+	public SKBitmap DrawGlyph(string glyph, bool edgeOnly, int edge_Ratio, int margin, float strokeWidth = 0) {
+		// the glyph's own typeface when the font lacks it; the line metrics stay the font's, so every glyph shares a baseline
+		var segments = this.Shape(glyph, CTextShaper.Options.Current);
+		var fm = paint.FontMetrics;
+		int width = (int)Math.Ceiling(Width(segments)) + 2 * margin;
+		int height = (int)Math.Ceiling(fm.Descent - fm.Ascent) + margin;
+		// Skia rasterises premultiplied; the straight-alpha copy below is what the GL upload wants
+		using var premul = new SKBitmap(width, height, SKColorType.Rgba8888, SKAlphaType.Premul);
+		using (var canvas = new SKCanvas(premul)) {
+			float baseline = -fm.Ascent;
+			if (edgeOnly) {
+				// stroking the text through a stroke-style paint is the same outline stroke as extracting the
+				// glyph path and stroking that, at a fraction of the cost (measured 16x)
+				if (strokePaint == null) {
+					strokePaint = new SKPaint();
+					strokePaint.Typeface = paint.Typeface;
+					strokePaint.TextSize = paint.TextSize;
+					strokePaint.IsAntialias = true;
+					strokePaint.StrokeJoin = SKStrokeJoin.Round;
+					strokePaint.Style = SKPaintStyle.Stroke;
+					strokePaint.Color = SKColors.White;
+				}
+				strokePaint.StrokeWidth = strokeWidth > 0 ? strokeWidth : paint.TextSize * 8 / edge_Ratio;
+				float x = margin;
+				foreach (var segment in segments) {
+					this.DrawSegment(canvas, segment, x, baseline, strokePaint);
+					x += segment.Advance;
+				}
+			} else {
+				float x = margin;
+				foreach (var segment in segments) {
+					SKPaint glyphPaint = this.PaintFor(segment.Typeface);
+					glyphPaint.Shader = null;
+					glyphPaint.Color = SKColors.White;
+					this.DrawSegment(canvas, segment, x, baseline, glyphPaint);
+					x += segment.Advance;
+				}
+			}
+			canvas.Flush();
+		}
+		var info = new SKImageInfo(width, height, SKColorType.Rgba8888, SKAlphaType.Unpremul);
+		var straight = new SKBitmap(info);
+		using (var pm = premul.PeekPixels()) {
+			if (pm == null || !pm.ReadPixels(info, straight.GetPixels(), straight.RowBytes)) {
+				straight.Dispose();
+				return premul.Copy();
+			}
+		}
+		return straight;
 	}
 
-	private SKPaint paint = null;
+	public void Dispose() {
+		paint.Dispose();
+		strokePaint?.Dispose();
+		foreach (SKPaint fallbackPaint in fallbackPaints.Values)
+			fallbackPaint.Dispose();
+		foreach (SKFont font in fonts.Values)
+			font.Dispose();
+	}
+
+	// ── fallback fonts ───────────────────────────────────────────────────────────────────────────
+	// A character a font lacks is drawn with the first font that has it in the renderer's fallback list (set by the
+	// game from its skin, CFontRenderer.SetFallbackFonts), then with the font the system offers for that character.
+
+	private static readonly SKTypeface[][] _fallbacks = [[], []];   // indexed by CFontRenderer.FallbackList
+	private static readonly System.Collections.Concurrent.ConcurrentDictionary<(int codepoint, int weight, int width, SKFontStyleSlant slant), SKTypeface?> _systemFallbacks = new();
+
+	internal static void SetFallbackFonts(CFontRenderer.FallbackList list, IEnumerable<string> fonts) {
+		var typefaces = new List<SKTypeface>();
+		foreach (string font in fonts) {
+			SKTypeface? typeface = null;
+			if (File.Exists(font))
+				typeface = FileTypeface(font);
+			else if (SKFontManager.Default.FontFamilies.Contains(font))
+				typeface = GetCachedTypeface($"family:{font}", () => SKTypeface.FromFamilyName(font));
+			if (typeface != null)
+				typefaces.Add(typeface);
+			else
+				Trace.TraceWarning($"The fallback font '{font}' could not be found from a file or font family name.");
+		}
+		Volatile.Write(ref _fallbacks[(int)list], typefaces.ToArray());
+	}
+
+	// the typeface that draws this character for a text in `typeface`: itself when it has the character
+	internal static SKTypeface TypefaceFor(SKTypeface typeface, int codepoint, CFontRenderer.FallbackList list) {
+		if (typeface.ContainsGlyph(codepoint))
+			return typeface;
+		foreach (SKTypeface fallback in Volatile.Read(ref _fallbacks[(int)list])) {
+			if (fallback.ContainsGlyph(codepoint))
+				return fallback;
+		}
+		return SystemTypefaceFor(typeface, codepoint) ?? typeface;
+	}
+
+	// the system's font for this character in the style of `typeface` (null when it has none), one shared instance
+	// per family and style
+	private static SKTypeface? SystemTypefaceFor(SKTypeface typeface, int codepoint)
+		=> _systemFallbacks.GetOrAdd((codepoint, typeface.FontWeight, typeface.FontWidth, typeface.FontSlant), key => {
+			SKTypeface found = SKFontManager.Default.MatchCharacter(null, (SKFontStyleWeight)key.weight, (SKFontStyleWidth)key.width, key.slant, null, key.codepoint);
+			if (found == null)
+				return null;
+			SKTypeface shared = _typefaceCache.GetOrAdd($"system:{found.FamilyName}:{found.FontWeight}:{found.FontWidth}:{found.FontSlant}", found);
+			if (!ReferenceEquals(shared, found))
+				found.Dispose();
+			return shared;
+		});
+
+	// marks, joiners, variation selectors, invisible formatting characters and spaces stay in the typeface of the
+	// character before them when it has them
+	private static bool StaysWithPrevious(int codepoint) {
+		if ((codepoint >= 0xFE00 && codepoint <= 0xFE0F) || (codepoint >= 0xE0100 && codepoint <= 0xE01EF))
+			return true;
+		return CharUnicodeInfo.GetUnicodeCategory(codepoint) is UnicodeCategory.NonSpacingMark or UnicodeCategory.SpacingCombiningMark
+			or UnicodeCategory.EnclosingMark or UnicodeCategory.SpaceSeparator or UnicodeCategory.Format or UnicodeCategory.Control;
+	}
+
+	// the text in runs that one typeface draws; one run when the font has every character
+	private List<CTextShaper.FaceRun> Runs(string s) {
+		var runs = new List<CTextShaper.FaceRun>();
+		if (s.Length == 0 || paint.ContainsGlyphs(s)) {
+			runs.Add(new(0, s.Length, paint.Typeface));
+			return runs;
+		}
+		SKTypeface? current = null;
+		int start = 0;
+		for (int i = 0; i < s.Length;) {
+			int length = char.IsSurrogatePair(s, i) ? 2 : 1;
+			int codepoint = length == 2 ? char.ConvertToUtf32(s, i) : s[i];
+			SKTypeface typeface = (current != null && StaysWithPrevious(codepoint) && current.ContainsGlyph(codepoint))
+				? current : TypefaceFor(paint.Typeface, codepoint, this.Fallbacks);
+			if (current != null && !ReferenceEquals(typeface, current)) {
+				runs.Add(new(start, i - start, current));
+				start = i;
+			}
+			current = typeface;
+			i += length;
+		}
+		runs.Add(new(start, s.Length - start, current!));
+		return runs;
+	}
+
+	// the text shaped in the typefaces that draw it, in drawing order
+	private List<CTextShaper.Segment> Shape(string s, CTextShaper.Options options)
+		=> CTextShaper.Shape(s, this.Runs(s), paint.TextSize, options);
+
+	private static float Width(List<CTextShaper.Segment> segments) {
+		float width = 0;
+		foreach (var segment in segments)
+			width += segment.Advance;
+		return width;
+	}
+
+	// a segment's glyphs drawn with `segmentPaint` (its colour, shader and style), the segment's origin at (x, baseline)
+	private void DrawSegment(SKCanvas canvas, CTextShaper.Segment segment, float x, float baseline, SKPaint segmentPaint) {
+		if (segment.Glyphs.Length == 0)
+			return;
+		using var builder = new SKTextBlobBuilder();
+		builder.AddPositionedRun(segment.Glyphs, this.FontFor(segment.Typeface), segment.Positions);
+		using SKTextBlob blob = builder.Build();
+		if (blob != null)
+			canvas.DrawText(blob, x, baseline, segmentPaint);
+	}
+
+	// the outlines of a segment's glyphs, the segment's origin at (x, baseline)
+	private SKPath GlyphPath(CTextShaper.Segment segment, float x, float baseline) {
+		var path = new SKPath();
+		SKFont font = this.FontFor(segment.Typeface);
+		for (int g = 0; g < segment.Glyphs.Length; g++) {
+			using SKPath glyphPath = font.GetGlyphPath(segment.Glyphs[g]);
+			if (glyphPath != null)
+				path.AddPath(glyphPath, x + segment.Positions[g].X, baseline + segment.Positions[g].Y);
+		}
+		return path;
+	}
+
+	// the font (typeface, size, edging) a typeface's glyphs draw with: one per typeface this renderer has needed
+	private readonly Dictionary<SKTypeface, SKFont> fonts = new();
+
+	private SKFont FontFor(SKTypeface typeface) {
+		if (!fonts.TryGetValue(typeface, out SKFont? font)) {
+			font = this.PaintFor(typeface).ToFont();
+			fonts[typeface] = font;
+		}
+		return font;
+	}
+
+	public CFontRenderer.FallbackList Fallbacks { get; set; }
+
+	// `paint` drawing with another typeface: one per typeface this renderer has needed
+	private readonly Dictionary<SKTypeface, SKPaint> fallbackPaints = new();
+
+	private SKPaint PaintFor(SKTypeface typeface) {
+		if (ReferenceEquals(typeface, paint.Typeface))
+			return paint;
+		if (!fallbackPaints.TryGetValue(typeface, out SKPaint? fallbackPaint)) {
+			fallbackPaint = paint.Clone();
+			fallbackPaint.Typeface = typeface;
+			fallbackPaint.Shader = null;
+			fallbackPaints[typeface] = fallbackPaint;
+		}
+		return fallbackPaint;
+	}
+
+	// Typefaces are immutable and safe to share across SKPaint instances. Loading one copies
+	// the entire font file (~16 MB for CJK fonts) into native memory and SKPaint does not free
+	// its Typeface, so without this cache every per-stage/per-HUD renderer leaked a full font
+	// copy. Cached for the application's lifetime (a small, bounded set of font/style combos).
+	private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, SKTypeface> _typefaceCache = new();
+
+	private static SKTypeface? FileTypeface(string fontpath)
+		=> GetCachedTypeface($"file:{fontpath}", () => {
+			SKTypeface typeface;
+			if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) {
+				// SKTypeface.FromFile can silently return a broken typeface on iOS (stream
+				// loading is equally safe on Android); load via stream on mobile.
+				using var fs = File.OpenRead(fontpath);
+				typeface = SKTypeface.FromStream(fs);
+			} else {
+				typeface = SKTypeface.FromFile(fontpath, 0);
+			}
+			if (typeface != null)
+				CTextShaper.RegisterFile(typeface, fontpath);
+			return typeface;
+		});
+
+	private static SKTypeface? GetCachedTypeface(string key, Func<SKTypeface?> factory) {
+		if (_typefaceCache.TryGetValue(key, out var cached))
+			return cached;
+		var created = factory();
+		if (created != null)
+			_typefaceCache[key] = created;
+		return created;
+	}
+
+	private SKPaint paint = null!;
+
+	private SKPaint? strokePaint;   // the edge stroke's paint, built on first use from `paint`
 }

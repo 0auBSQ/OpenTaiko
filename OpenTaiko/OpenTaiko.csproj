@@ -1,45 +1,60 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\FDK\FDK.csproj" />
+    <!-- BuildingAsLibrary is local to OpenTaiko. Undefine it here and below to avoid rebuilding FDK
+         when not needed. -->
+    <ProjectReference Include="..\FDK\FDK.csproj" UndefineProperties="BuildingAsLibrary" />
+    <!-- The iOS build sets UseVendoredFFmpeg=true and compiles from source instead of using Nuget.
+         See third_party/FFmpeg.AutoGen/README.md. -->
+    <PackageReference Include="FFmpeg.AutoGen" Version="5.1.1" Condition="'$(UseVendoredFFmpeg)' != 'true'" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../third_party/FFmpeg.AutoGen/FFmpeg.AutoGen.csproj" Condition="'$(UseVendoredFFmpeg)' == 'true'" UndefineProperties="BuildingAsLibrary" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="8.0.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.10" />
+    <PackageReference Include="LightningDB" Version="0.18.1" />
+    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="10.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.14" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="SevenZip" Version="19.0.0" />
     <PackageReference Include="NLua" Version="1.7.3" />
     <PackageReference Include="DiscordRichPresence" Version="1.2.1.24" />
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Databases/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Documentation/**" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="Encyclopedia/**" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="FFmpeg/**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="docs/**" Exclude="docs/*.py;docs/__pycache__/**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="FFmpeg/**" CopyToOutputDirectory="PreserveNewest" Condition="'$(BuildingAsLibrary)' != 'true'" />
     <Content Include="Global/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Lang/**" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="Libs/**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Libs/**" CopyToOutputDirectory="PreserveNewest" Condition="'$(BuildingAsLibrary)' != 'true'" />
     <Content Include="Licenses/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Songs/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="System/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include=".init/**" CopyToOutputDirectory="PreserveNewest" />
-    <None Remove="system\open-world memories\modules\modal\Config.json" />
-    <Content Include="BGScriptAPI.lua" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="CharaScript.lua" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="OpenTaiko.ico" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="README.md" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="System\Open-World Memories\Modules\Modal\Textures\" />
-    <Folder Include="System\Open-World Memories\Modules\Modal\Sounds\" />
-  </ItemGroup>
   <PropertyGroup>
-    <Version>0.6.0.112</Version>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-        <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
+    <Version>0.7.0.0</Version>
+    <OutputType Condition="'$(BuildingAsLibrary)' != 'true'">WinExe</OutputType>
+    <OutputType Condition="'$(BuildingAsLibrary)' == 'true'">Library</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- .NET 9+ marks the exe compatible with hardware-enforced stack protection (Intel CET); a native library
+         (the sound stack) is not, and Windows stops the game as the sound device opens (0xc0000409, fast fail 57) -->
+    <CETCompat>false</CETCompat>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ApplicationIcon>OpenTaiko.ico</ApplicationIcon>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- GLSL sources of the 3D renderers, read through ShaderSources -->
+    <EmbeddedResource Include="src/Lua/3D/Shaders/*.vert;src/Lua/3D/Shaders/*.frag;src/Lua/3D/Shaders/*.comp" LogicalName="OpenTaiko.Shaders.%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="OpenTaiko.iOS" />
+    <InternalsVisibleTo Include="OpenTaiko.Android" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="OpenTaiko.Tests" />
+  </ItemGroup>
 </Project>

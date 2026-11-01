@@ -1,0 +1,13 @@
+{
+  "_comment": "German texts for the TV (tv.lua): its menu and the cutscene browser. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "title": "TV",
+  "menu_on": "Einschalten",
+  "menu_off": "Ausschalten",
+  "menu_rewatch": "Zwischensequenzen ansehen",
+  "tab_songs": "Song-Zwischensequenzen",
+  "intro": "Intro",
+  "outro": "Outro %d",
+  "unknown_song": "???",
+  "empty": "Keine Zwischensequenzen gefunden.",
+  "waiting": "Sender werden eingestellt... die Songliste wird noch vorbereitet."
+}

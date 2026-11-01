@@ -14,22 +14,22 @@ internal class DBSkinPreset {
 		}
 
 		[JsonProperty("UP")]
-		public string[] UpperBackground;
+		public string[]? UpperBackground;
 
 		[JsonProperty("DOWN")]
-		public string[] LowerBackground;
+		public string[]? LowerBackground;
 
 		[JsonProperty("DANCER")]
-		public string[] DancerSet;
+		public string[]? DancerSet;
 
 		[JsonProperty("FOOTER")]
-		public string[] FooterSet;
+		public string[]? FooterSet;
 
 		[JsonProperty("MOB")]
-		public string[] MobSet;
+		public string[]? MobSet;
 
 		[JsonProperty("RUNNER")]
-		public string[] RunnerSet;
+		public string[]? RunnerSet;
 	}
 	public class SkinPreset {
 		public SkinPreset() {

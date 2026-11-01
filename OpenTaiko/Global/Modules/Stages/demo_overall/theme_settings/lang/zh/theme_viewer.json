@@ -1,0 +1,10 @@
+{
+  "_comment": "Chinese texts for the theme settings viewer. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "title": "主题设置查看器",
+  "col_id": "ID",
+  "col_scope": "范围",
+  "col_type": "类型",
+  "col_value": "值",
+  "hint_scroll": "上/下滚动   取消退出",
+  "hint_exit": "取消退出"
+}

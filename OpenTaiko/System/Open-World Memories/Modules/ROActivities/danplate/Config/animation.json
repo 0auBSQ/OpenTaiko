@@ -1,0 +1,10 @@
+{
+    "_note": "Dan plate animation: the rainbow plate's colours run speed cycles per second in steps gradient maps per cycle (the animation's phase steps); the glitter spawns rate sparkles per second.",
+    "rainbow": {
+        "speed": 0.35,
+        "steps": 48
+    },
+    "glitter": {
+        "rate": 4
+    }
+}

@@ -1,0 +1,23 @@
+{
+    "key_1": "Tresorschlüssel",
+    "key_2": "Tresorschlüssel (Gold)",
+    "key_3": "Tresorschlüssel (OpTk)",
+    "chest_1": "Holztruhe",
+    "chest_2": "Goldtruhe",
+    "chest_3": "Platintruhe",
+    "new_furniture": "Neues Möbelstück!",
+    "furniture_wooden_chest": "Holztruhe",
+    "furniture_barrel": "Fass",
+    "furniture_coin_piles": "Münzstapel",
+    "furniture_pirate_key": "Schlüssel",
+    "furniture_pirate_swords": "Piratensäbel",
+    "furniture_gold_bag": "Goldbeutel",
+    "furniture_skull": "Totenkopf-Modell",
+    "furniture_anchor": "Anker",
+    "furniture_gold_key": "Goldener Schlüssel",
+    "furniture_cannon": "Kanone",
+    "furniture_caspian_mug": "Mr.Caspians Krug",
+    "furniture_chalice": "Kelch",
+    "furniture_crystal": "Kristall",
+    "furniture_fishtank": "Aquarium"
+}

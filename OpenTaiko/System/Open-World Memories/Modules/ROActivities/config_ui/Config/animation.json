@@ -1,0 +1,4 @@
+{
+    "_note": "Settings menu animation: the list's scroll eases toward its target at scroll_follow_per_s (the share of the distance covered per second, capped at all of it in one frame).",
+    "scroll_follow_per_s": 16
+}

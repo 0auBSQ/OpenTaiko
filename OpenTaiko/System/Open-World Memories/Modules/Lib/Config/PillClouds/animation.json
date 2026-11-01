@@ -1,0 +1,10 @@
+{
+    "_note": "pill_clouds timings (Lib/PillClouds). The *_s fade lengths are in seconds (pills_out_s: pills then clouds, clouds_out_s: clouds only); arrive and clouds_from are fractions of the fade-out (0 to 1); max_frame_s caps one frame's time step.",
+    "pills_out_s": 1.5,
+    "clouds_out_s": 0.9,
+    "in_s": 1.0,
+    "max_frame_s": 0.1,
+    "pills": { "_note": "the pills cover the screen at arrive, then drift creep_px further", "arrive": 0.4, "creep_px": 60 },
+    "clouds_from": 0.45,
+    "drift_px_per_s": 25
+}

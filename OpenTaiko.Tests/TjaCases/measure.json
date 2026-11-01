@@ -1,0 +1,7 @@
+{
+  "expect": {
+    "dons": 3,
+    "noteGapsMs": [2000, 1000],
+    "gapToleranceMs": 10
+  }
+}

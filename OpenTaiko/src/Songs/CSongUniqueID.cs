@@ -1,13 +1,24 @@
-﻿namespace OpenTaiko;
+﻿using System.Diagnostics;
+
+namespace OpenTaiko;
 
 [Serializable()]
 internal class CSongUniqueID {
 	public CSongUniqueID(string path) {
 		filePath = path;
 
-		tGenerateUniqueID();
-		tSongUniqueID();
+		if (File.Exists(filePath)) {
+			tLoadFile();
+		} else {
+			tGenerateUniqueID();
+			tSaveFile();
+		}
 	}
+
+	// For the JSON song cache: the serializer creates the object and sets the fields directly.
+	// Must be at least internal so the source-generated (same-assembly) code can call it.
+	[System.Text.Json.Serialization.JsonConstructor]
+	internal CSongUniqueID() { }
 
 	public void tSongUniqueID() {
 		if (!File.Exists(filePath))
@@ -37,12 +48,17 @@ internal class CSongUniqueID {
 
 	public Data data = new Data();
 
-	public string filePath;
+	public string filePath = null!;
 
 	#region [private]
 
 	private void tSaveFile() {
-		ConfigManager.SaveConfig(data, filePath);
+		try {
+			ConfigManager.SaveConfig(data, filePath);
+		} catch (IOException ex) {
+			// Log instead of swallowing: the file may already exist with different casing on case-sensitive filesystems.
+			Trace.TraceWarning($"CSongUniqueID: could not save {filePath}: {ex.Message}");
+		}
 	}
 
 	private void tLoadFile() {

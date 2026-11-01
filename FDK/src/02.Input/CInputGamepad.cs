@@ -86,8 +86,18 @@ public class CInputGamepad : CInputButtonsBase, IInputDevice, IDisposable {
 	private int TriggerCount;
 	private int ThumbstickCount;
 
+	public override void Dispose() {
+		if (!this.IsDisposed && this.Device is IGamepad gamepad) {
+			gamepad.ButtonDown -= Gamepad_ButtonDown;
+			gamepad.ButtonUp -= Gamepad_ButtonUp;
+			gamepad.ThumbstickMoved -= Gamepad_ThumbstickMoved;
+			gamepad.TriggerMoved -= Gamepad_TriggerMoved;
+		}
+		base.Dispose();
+	}
+
 	public string GetButtonName(int index) {
-		var gamepad = (IGamepad)Device;
+		var gamepad = (IGamepad)Device!;
 		if (index >= ButtonCount + TriggerCount) {
 			int thumbstick_index = index - (ButtonCount + TriggerCount);
 			return $"Thumbstick{thumbstick_index / 4} - {(ThumbstickDirection)(thumbstick_index % 4)}";

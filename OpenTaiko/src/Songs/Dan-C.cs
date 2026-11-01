@@ -1,4 +1,6 @@
-﻿namespace OpenTaiko;
+﻿using System.Text.Json.Serialization;
+
+namespace OpenTaiko;
 
 /// <summary>
 /// 段位認定を管理するクラス。
@@ -45,6 +47,7 @@ public class Dan_C {
 	/// 段位認定の条件が有効であるかどうかを返します。
 	/// </summary>
 	/// <returns>段位認定の条件が有効であるかどうか。</returns>
+	[JsonIgnore]  // Cache IsEnable instead
 	public bool ExamIsEnable => this.IsEnable;
 
 	/// <summary>
@@ -72,6 +75,7 @@ public class Dan_C {
 	/// 条件の種別を設定します。
 	/// </summary>
 	/// <param name="type">条件の種別。</param>
+	[JsonIgnore]  // Cache Type instead
 	public Exam.Type ExamType { get => this.Type; private set => this.Type = value; }
 
 	/// <summary>
@@ -82,6 +86,7 @@ public class Dan_C {
 	/// 条件の範囲を設定します。
 	/// </summary>
 	/// <param name="range"></param>
+	[JsonIgnore]  // Cache Range instead
 	public Exam.Range ExamRange { get => this.Range; private set => this.Range = value; }
 
 	/// <summary>
@@ -145,22 +150,24 @@ public class Dan_C {
 
 
 	#region [ Serialized fields, keep their name untouched ]
+	// Internal with [JsonInclude] so the mobile JSON song cache round-trips these fields. Source
+	// generation sees only public or [JsonInclude] members.
 	/// <summary>
 	/// その条件が有効であるかどうか。
 	/// </summary>
-	private bool IsEnable;
+	[JsonInclude] internal bool IsEnable;
 	/// <summary>
 	/// 条件の種別。
 	/// </summary>
-	private Exam.Type Type;
+	[JsonInclude] internal Exam.Type Type;
 	/// <summary>
 	/// 条件の範囲。
 	/// </summary>
-	private Exam.Range Range;
+	[JsonInclude] internal Exam.Range Range;
 	/// <summary>
 	/// 条件の値。
 	/// </summary>
-	private int[] Value = new int[] { 0, 0 };
+	[JsonInclude] internal int[] Value = new int[] { 0, 0 };
 	/// <summary>
 	/// 量。
 	/// </summary>
@@ -180,10 +187,11 @@ public class Dan_C {
 	/// この変数が一度trueになれば、基本的にfalseに戻ることはない。
 	/// (スコア加算については、この限りではない。)
 	/// </summary>
-	[Obsolete("use `ReachStatus == Exam.ReachStatus.Failure`")] private bool NotReached = false;
 	#endregion
 
-	[NonSerialized] public Exam.ReachStatus ReachStatus = Exam.ReachStatus.Low;
+	[NonSerialized]
+	[JsonIgnore]  // Runtime reach state, recomputed during play.
+	public Exam.ReachStatus ReachStatus = Exam.ReachStatus.Low;
 }
 
 public static class Exam {
@@ -208,6 +216,9 @@ public static class Exam {
 		PercentPerfect,
 		BalloonHits,
 		TotalBranch,
+		// for local counter / trigger branch conditions
+		LocalCounter,
+		LocalTrigger,
 	}
 
 	/// <summary>

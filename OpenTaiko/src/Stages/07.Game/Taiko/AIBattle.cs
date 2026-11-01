@@ -41,13 +41,13 @@ class AIBattle : CStage {
 		BarFlashCounter.TickLoopDB();
 		BatchAnimeCounter.TickDB();
 
-		OpenTaiko.Tx.AIBattle_SectionTime_Panel?.t2D描画(OpenTaiko.Skin.Game_AIBattle_SectionTime_Panel[0], OpenTaiko.Skin.Game_AIBattle_SectionTime_Panel[1]);
+		OpenTaiko.Tx.AIBattle_SectionTime_Panel?.t2DDraw(OpenTaiko.Skin.Game_AIBattle_SectionTime_Panel[0], OpenTaiko.Skin.Game_AIBattle_SectionTime_Panel[1]);
 
-		OpenTaiko.Tx.AIBattle_SectionTime_Bar_Base?.t2D描画(OpenTaiko.Skin.Game_AIBattle_SectionTime_Bar[0], OpenTaiko.Skin.Game_AIBattle_SectionTime_Bar[1],
+		OpenTaiko.Tx.AIBattle_SectionTime_Bar_Base?.t2DDraw(OpenTaiko.Skin.Game_AIBattle_SectionTime_Bar[0], OpenTaiko.Skin.Game_AIBattle_SectionTime_Bar[1],
 			new System.Drawing.RectangleF(0, 0, OpenTaiko.Tx.AIBattle_SectionTime_Bar_Base.szTextureSize.Width, OpenTaiko.Tx.AIBattle_SectionTime_Bar_Base.szTextureSize.Height));
 
-		void drawBar(CTexture barTex, float length) {
-			barTex?.t2D描画(OpenTaiko.Skin.Game_AIBattle_SectionTime_Bar[0], OpenTaiko.Skin.Game_AIBattle_SectionTime_Bar[1],
+		void drawBar(CTexture? barTex, float length) {
+			barTex?.t2DDraw(OpenTaiko.Skin.Game_AIBattle_SectionTime_Bar[0], OpenTaiko.Skin.Game_AIBattle_SectionTime_Bar[1],
 				new System.Drawing.RectangleF(0, 0, barTex.szTextureSize.Width * length, barTex.szTextureSize.Height));
 		}
 
@@ -59,11 +59,14 @@ class AIBattle : CStage {
 		if (nowLength < 0.75) {
 			drawBar(OpenTaiko.Tx.AIBattle_SectionTime_Bar_Normal, nowLength);
 		} else {
-			OpenTaiko.Tx.AIBattle_SectionTime_Bar_Finish.Opacity = (int)(Math.Sin((BarFlashCounter.CurrentValue / 1000.0) * Math.PI) * 255);
+			if (OpenTaiko.Tx.AIBattle_SectionTime_Bar_Finish != null)
+				OpenTaiko.Tx.AIBattle_SectionTime_Bar_Finish.Opacity = (int)(Math.Sin((BarFlashCounter.CurrentValue / 1000.0) * Math.PI) * 255);
 			drawBar(OpenTaiko.Tx.AIBattle_SectionTime_Bar_Finish, nowLength);
 		}
 
 		for (int i = 0; i < OpenTaiko.stageGameScreen.AIBattleSections.Count; i++) {
+			if (OpenTaiko.Tx.AIBattle_Batch_Base == null) break;
+
 			int upDown = (i % 2);
 
 			int base_width = OpenTaiko.Tx.AIBattle_Batch_Base.szTextureSize.Width / 6;
@@ -82,7 +85,7 @@ class AIBattle : CStage {
 				nowBatchBaseRectX = (upDown == 0 ? 0 : 1);
 			}
 
-			OpenTaiko.Tx.AIBattle_Batch_Base?.t2D描画(base_x, base_y, new System.Drawing.RectangleF(base_width * nowBatchBaseRectX, 0, base_width, base_height));
+			OpenTaiko.Tx.AIBattle_Batch_Base?.t2DDraw(base_x, base_y, new System.Drawing.RectangleF(base_width * nowBatchBaseRectX, 0, base_width, base_height));
 		}
 
 		for (int i = 0; i < OpenTaiko.stageGameScreen.NowAIBattleSectionCount; i++) {
@@ -91,8 +94,8 @@ class AIBattle : CStage {
 
 			int upDown = (i % 2);
 
-			int width = OpenTaiko.Tx.AIBattle_Batch.szTextureSize.Width / 6;
-			int height = OpenTaiko.Tx.AIBattle_Batch.szTextureSize.Height / 2;
+			int width = (OpenTaiko.Tx.AIBattle_Batch?.szTextureSize.Width ?? 0) / 6;
+			int height = (OpenTaiko.Tx.AIBattle_Batch?.szTextureSize.Height ?? 0) / 2;
 
 			float value = 0.0f;
 
@@ -128,21 +131,24 @@ class AIBattle : CStage {
 			float size_y = OpenTaiko.Skin.Game_AIBattle_Batch_Anime_Size[1] +
 						   ((OpenTaiko.Skin.Game_AIBattle_Batch_Size[1] - OpenTaiko.Skin.Game_AIBattle_Batch_Anime_Size[1]) * value);
 
+			// without the badge image only the animation state above advances
+			if (OpenTaiko.Tx.AIBattle_Batch == null) continue;
+
 			OpenTaiko.Tx.AIBattle_Batch.vcScaleRatio.X = (size_x / (float)width) + inScale;
 			OpenTaiko.Tx.AIBattle_Batch.vcScaleRatio.Y = (size_y / (float)height) + inScale;
 
 			switch (section.End) {
-				case CStage演奏画面共通.AIBattleSection.EndType.Clear:
-					OpenTaiko.Tx.AIBattle_Batch?.t2D拡大率考慮中央基準描画(_x, _y, new System.Drawing.RectangleF(width * drawFrame, 0, width, height));
+				case CStagePlayScreenCommon.AIBattleSection.EndType.Clear:
+					OpenTaiko.Tx.AIBattle_Batch?.t2DScaledCenterBasedDraw(_x, _y, new System.Drawing.RectangleF(width * drawFrame, 0, width, height));
 					break;
-				case CStage演奏画面共通.AIBattleSection.EndType.Lose:
-					OpenTaiko.Tx.AIBattle_Batch?.t2D拡大率考慮中央基準描画(_x, _y, new System.Drawing.RectangleF(width * drawFrame, height, width, height));
+				case CStagePlayScreenCommon.AIBattleSection.EndType.Lose:
+					OpenTaiko.Tx.AIBattle_Batch?.t2DScaledCenterBasedDraw(_x, _y, new System.Drawing.RectangleF(width * drawFrame, height, width, height));
 					break;
 			}
 		}
 
 		for (int player = 0; player < 2; player++) {
-			OpenTaiko.Tx.AIBattle_Judge_Meter[player]?.t2D描画(OpenTaiko.Skin.Game_AIBattle_Judge_Meter_X[player], OpenTaiko.Skin.Game_AIBattle_Judge_Meter_Y[player]);
+			OpenTaiko.Tx.AIBattle_Judge_Meter[player]?.t2DDraw(OpenTaiko.Skin.Game_AIBattle_Judge_Meter_X[player], OpenTaiko.Skin.Game_AIBattle_Judge_Meter_Y[player]);
 
 
 			int[] numArr = new int[4]
@@ -180,21 +186,23 @@ class AIBattle : CStage {
 
 	#region [Private]
 
-	private CCounter BarFlashCounter;
-	public CCounter BatchAnimeCounter;
+	private CCounter BarFlashCounter = null!;
+	public CCounter BatchAnimeCounter = null!;
 
 	private void DrawJudgeNumber(int x, int y, int num) {
+		if (OpenTaiko.Tx.AIBattle_Judge_Number == null) return;
+
 		int[] nums = CConversion.SeparateDigits(num);
 		for (int j = 0; j < nums.Length; j++) {
 			float offset = j - (nums.Length / 2.0f);
 
-			float width = OpenTaiko.Tx.AIBattle_Judge_Number.sz画像サイズ.Width / 10.0f;
-			float height = OpenTaiko.Tx.AIBattle_Judge_Number.sz画像サイズ.Height;
+			float width = OpenTaiko.Tx.AIBattle_Judge_Number.szImageSize.Width / 10.0f;
+			float height = OpenTaiko.Tx.AIBattle_Judge_Number.szImageSize.Height;
 
 			float _x = x - (OpenTaiko.Skin.Game_AIBattle_Judge_Number_Interval[0] * offset);
 			float _y = y - (OpenTaiko.Skin.Game_AIBattle_Judge_Number_Interval[1] * offset);
 
-			OpenTaiko.Tx.AIBattle_Judge_Number.t2D拡大率考慮中央基準描画(_x + (width / 2), _y + (height / 2),
+			OpenTaiko.Tx.AIBattle_Judge_Number.t2DScaledCenterBasedDraw(_x + (width / 2), _y + (height / 2),
 				new RectangleF(width * nums[j], 0, width, height));
 		}
 	}

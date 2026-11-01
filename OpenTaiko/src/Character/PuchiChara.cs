@@ -10,9 +10,11 @@ class PuchiChara : CActivity {
 	}
 
 	public override void Activate() {
-		Counter = new CCounter(0, OpenTaiko.Skin.Game_PuchiChara[2] - 1, OpenTaiko.Skin.Game_PuchiChara_Timer * 0.5f, OpenTaiko.Timer);
-		SineCounter = new CCounter(0, 360, OpenTaiko.Skin.Game_PuchiChara_SineTimer, SoundManager.PlayTimer);
-		SineCounterIdle = new CCounter(1, 360, (float)OpenTaiko.Skin.Game_PuchiChara_SineTimer * 2f, OpenTaiko.Timer);
+		Counter = new CCounter(0, OpenTaiko.Skin.Game_PuchiChara[2] - 1, OpenTaiko.Skin.Game_PuchiChara_Timer / (float)OpenTaiko.Skin.Game_PuchiChara[2], OpenTaiko.Timer); // 1 / (Timer/1000 = 4.8), cycles/s
+		// SineCounter = new CCounter(0, 360, OpenTaiko.Skin.Game_PuchiChara_SineTimer, SoundManager.PlayTimer); // 1 / (SineTimer = 2), degrees/s
+		SineCounter = new CCounter(0, 360, OpenTaiko.Skin.Game_PuchiChara_SineTimer / 180.0f, SoundManager.PlayTimer); // (1/2) / (SineTimer = 2), cycles/s
+		// SineCounterIdle = new CCounter(1, 360, (float)OpenTaiko.Skin.Game_PuchiChara_SineTimer * 2f, OpenTaiko.Timer); // (25/18 = 1.3888...) / (SineTimer = 2), cycles/s
+		SineCounterIdle = new CCounter(1, 360, 1000 * OpenTaiko.Skin.Game_PuchiChara_SineTimer / 180.0f, OpenTaiko.Timer); // (1/2) / (SineTimer = 2), cycles/s
 		this.inGame = false;
 		base.Activate();
 	}
@@ -23,15 +25,25 @@ class PuchiChara : CActivity {
 		base.DeActivate();
 	}
 
+	private static readonly DBPuchichara.PuchicharaEffect NoEffect = new();
+
+	// the effects of a player's puchichara on the play; the AI battle's AI plays without any
+	internal static DBPuchichara.PuchicharaEffect tGetEffect(int p)
+		=> AIBattleModMirror.IsAI(OpenTaiko.ConfigIni, p) ? NoEffect : OpenTaiko.Tx.Puchichara[tGetPuchiCharaIndexByName(p)].effect;
+
 	public static int tGetPuchiCharaIndexByName(int p) {
-		var _pc = OpenTaiko.SaveFileInstances[p].data.PuchiChara;
+		var _pc = CVirtualSlotManager.GetPuchicharaName(p);
 		var _pcs = OpenTaiko.Skin.Puchicharas_NameToIndex;
 		return _pcs.GetValueOrDefault(_pc, 0);
 	}
 
 	public void ChangeBPM(double secPerBeat) {
-		Counter = new CCounter(0, OpenTaiko.Skin.Game_PuchiChara[2] - 1, (int)(OpenTaiko.Skin.Game_PuchiChara_Timer * secPerBeat / OpenTaiko.Skin.Game_PuchiChara[2]), OpenTaiko.Timer);
-		SineCounter = new CCounter(1, 360, OpenTaiko.Skin.Game_PuchiChara_SineTimer * secPerBeat / 180, SoundManager.PlayTimer);
+		Counter!.ChangeInterval(OpenTaiko.Skin.Game_PuchiChara_Timer * secPerBeat / OpenTaiko.Skin.Game_PuchiChara[2]); // 1 / (Timer/1000 = 4.8) = 25/120, cycles/beat
+		SineCounter!.ChangeInterval(1000 * OpenTaiko.Skin.Game_PuchiChara_SineTimer * secPerBeat / 180); // (1/2) / (SineTimer = 2), cycles/beat
+		if (!this.inGame) { // initialize value
+			Counter.CurrentValue = 0;
+			SineCounter.CurrentValue = 1;
+		}
 		this.inGame = true;
 	}
 
@@ -46,14 +58,14 @@ class PuchiChara : CActivity {
 	/// <param name="y">Y coordinate (center)</param>
 	/// <param name="alpha">Opacity (0-255)</param>
 	/// <returns></returns>
-	public int On進行描画(int x, int y, bool isGrowing, int alpha = 255, bool isBalloon = false, int player = 0, float scale = 1.0f) {
+	public int OnProgressDraw(int x, int y, bool isGrowing, int alpha = 255, bool isBalloon = false, int player = 0, float scale = 1.0f) {
 		if (!OpenTaiko.ConfigIni.ShowPuchiChara) return base.Draw();
 		if (Counter == null || SineCounter == null || OpenTaiko.Tx.Puchichara == null) return base.Draw();
 		Counter.TickLoop();
 		SineCounter.TickLoopDB();
-		SineCounterIdle.TickLoop();
+		SineCounterIdle!.TickLoop();
 
-		int p = OpenTaiko.GetActualPlayer(player);
+		int p = player;
 
 		if (inGame)
 			sineY = (double)SineCounter.CurrentValue;
@@ -81,41 +93,16 @@ class PuchiChara : CActivity {
 			int adjustedX = x - 32;
 			int adjustedY = y - 32;
 
-			chara.t2D拡大率考慮中央基準描画(adjustedX, adjustedY + (int)sineY, new Rectangle((Counter.CurrentValue % OpenTaiko.Skin.Game_PuchiChara[2]) * OpenTaiko.Skin.Game_PuchiChara[0], 0, OpenTaiko.Skin.Game_PuchiChara[0], OpenTaiko.Skin.Game_PuchiChara[1]));
+			chara.t2DScaledCenterBasedDraw(adjustedX, adjustedY + (int)sineY, new Rectangle((Counter.CurrentValue % OpenTaiko.Skin.Game_PuchiChara[2]) * OpenTaiko.Skin.Game_PuchiChara[0], 0, OpenTaiko.Skin.Game_PuchiChara[0], OpenTaiko.Skin.Game_PuchiChara[1]));
 		}
 
 		return base.Draw();
 	}
 
-	public void DrawPuchichara(int index, int x, int y, float scale = 1.0f, int alpha = 255, bool useSine = true) {
-		DrawPuchichara(index, x, y, Counter.CurrentValue % OpenTaiko.Skin.Game_PuchiChara[2], scale, alpha, useSine);
-	}
-	public void DrawPuchichara(int index, int x, int y, int sprite, float scale = 1.0f, int alpha = 255, bool useSine = true) {
-		if (OpenTaiko.Tx.Puchichara.Length <= index || index < 0) return;
-		if (OpenTaiko.Tx.Puchichara[index].tx == null) return;
-
-		CTexture puchi = OpenTaiko.Tx.Puchichara[index].tx;
-
-		puchi.vcScaleRatio = new(1);
-		puchi.vcScaleRatio.X *= scale;
-		puchi.vcScaleRatio.Y *= scale;
-		puchi.Opacity = alpha;
-
-		sineY = (double)SineCounterIdle.CurrentValue;
-		sineY = (Math.Sin(sineY * (Math.PI / 180)) * (OpenTaiko.Skin.Game_PuchiChara_Sine * OpenTaiko.Skin.Game_PuchiChara_Scale[0]));
-
-		puchi.t2D拡大率考慮中央基準描画(x, y + (useSine ? (int)sineY : 0),
-			new((puchi.szTextureSize.Width / OpenTaiko.Skin.Game_PuchiChara[2]) * sprite, 0,
-			puchi.szTextureSize.Width / OpenTaiko.Skin.Game_PuchiChara[2], puchi.szTextureSize.Height));
-
-		puchi.vcScaleRatio = new(1);
-		puchi.Opacity = 255;
-	}
-
 	public double sineY;
 
-	public CCounter Counter;
-	private CCounter SineCounter;
-	private CCounter SineCounterIdle;
+	public CCounter? Counter;
+	private CCounter? SineCounter;
+	private CCounter? SineCounterIdle;
 	private bool inGame;
 }

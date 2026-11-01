@@ -31,6 +31,7 @@ namespace OpenTaiko {
 
 		protected int RequiredArgCount = -1;
 		protected string ConditionId = "";
+		public string Id => ConditionId;
 
 		// For (future?) combined unlock conditions
 		protected List<CUnlockCondition> ChildrenCondition = new List<CUnlockCondition>();

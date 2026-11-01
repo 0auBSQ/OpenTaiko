@@ -1,0 +1,183 @@
+---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
+-- PillClouds: shared drawing for the pill_clouds transitions.
+-- Four tilted pills rise over the screen, then a cloud bank rises over them.
+
+-- positions, sizes and colours: Config/PillClouds/layout.json; timings: Config/PillClouds/animation.json
+local HERE = require("Core.Here")(...)
+local Config = require("Core.Config")
+local Layout = Config.load(HERE .. "Config/PillClouds/layout.json")
+local Animation = Config.load(HERE .. "Config/PillClouds/animation.json")
+
+local TA = require("TransitionArt")
+
+local PC = {}
+PC.__index = PC
+
+PC.PILLS_OUT_SECONDS = Animation.pills_out_s     -- pills, then clouds
+PC.CLOUDS_OUT_SECONDS = Animation.clouds_out_s   -- clouds only
+PC.IN_SECONDS = Animation.in_s
+
+local SCREEN_W, SCREEN_H = 1920, 1080
+local TILT = Layout.tilt_deg             -- degrees; everything moves up along this lean
+local SIN, COS = math.sin(math.rad(TILT)), math.cos(math.rad(TILT))
+local REACH = Layout.reach               -- farthest screen corner along the travel axis
+
+local Pills = Layout.pills
+local PILL_W, PILL_L = Pills.w, Pills.l
+local PILL_PX_W, PILL_PX_L = Pills.px_w, Pills.px_l   -- the capsule in Pill.png, inside its clear border
+local PILL_STEP = Pills.step             -- neighbours overlap by PILL_W - PILL_STEP px
+local PILL_START = -(REACH + PILL_L / 2 + Pills.start_gap)   -- below the screen
+local ARRIVE = Animation.pills.arrive    -- fade-out progress when the pills cover the screen
+local CREEP = Animation.pills.creep_px   -- then they drift this far (px)
+local CLOUDS_FROM = Animation.clouds_from   -- fade-out progress when the clouds start
+
+local Clouds = Layout.clouds
+local EDGE_W, EDGE_H = Clouds.edge_w, Clouds.edge_h   -- CloudEdge.png size; it repeats across
+local TIPS, SOLID, BASE = Clouds.tips, Clouds.solid, Clouds.base   -- CloudEdge.png rows: first puff, first all body colour, clear border
+local STRIP_W = Clouds.strip_w           -- the edge is one quad this long, its ends off screen
+local BURY = Clouds.bury                 -- the body ends this far under the edge's solid rows
+local BODY_PX = Clouds.body_px           -- CloudBody.png size
+local BODY_W = Clouds.body_w
+local BODY_OVERDRAW = Clouds.body_overdraw
+local MARGIN = Clouds.margin
+local FRONT_START = -REACH - MARGIN + TIPS   -- puffs just below the screen
+local FRONT_END = REACH + MARGIN + SOLID     -- screen fully covered
+local BACK_START = -REACH - MARGIN - SOLID   -- fade-in: the bank's back, from below the screen
+local BACK_END = REACH + MARGIN - TIPS       -- to past the top
+local DRIFT = Animation.drift_px_per_s   -- px/s the puffs slide across
+local MAX_DT = Animation.max_frame_s
+
+local function clamp01(x) return x < 0 and 0 or (x > 1 and 1 or x) end
+local function easeInOut(x) return x < 0.5 and 4 * x * x * x or 1 - (-2 * x + 2) ^ 3 / 2 end
+
+local function frameDt()
+	local ok, d = pcall(function() return fps.deltaTime end)
+	d = ok and tonumber(d) or 0
+	return d < 0 and 0 or (d > MAX_DT and MAX_DT or d)
+end
+
+-- screen point from the centre, `along` and `across` the travel axis
+local function place(along, across)
+	return SCREEN_W / 2 + along * SIN + across * COS, SCREEN_H / 2 - along * COS + across * SIN
+end
+
+-- cols: four { r, g, b } pill colours (0-1), or nil for clouds only
+function PC.new(cols)
+	return setmetatable({ cols = cols, clock = 0, phase = nil, wait = TA.new() }, PC)
+end
+
+function PC:load()
+	self.sndWind = SOUND:CreateSFX("Sounds/Wind.ogg")
+end
+
+-- the textures live only during a trip (Lib/TransitionArt)
+function PC:loadTextures()
+	if self.edge ~= nil then return end
+	if self.cols then
+		self.pill = TEXTURE:CreateTexture("Textures/Pill.png")
+		self.shine = TEXTURE:CreateTexture("Textures/PillShine.png")
+	end
+	self.edge = TEXTURE:CreateTexture("Textures/CloudEdge.png")
+	self.edge:SetWrapMode("Repeat")
+	self.body = TEXTURE:CreateTexture("Textures/CloudBody.png")
+end
+
+function PC:freeTextures()
+	for _, k in ipairs({ "pill", "shine", "edge", "body" }) do
+		if self[k] then self[k]:Dispose(); self[k] = nil end
+	end
+end
+
+local function play(snd) if snd then snd:Play() end end
+
+function PC:dispose()
+	self:freeTextures()
+	if self.sndWind then self.sndWind:Dispose(); self.sndWind = nil end
+end
+
+function PC:drawPills(along)
+	local pill, shine = self.pill, self.shine
+	if pill == nil or shine == nil then return end
+	for _, tex in ipairs({ pill, shine }) do
+		tex:SetScale(PILL_W / PILL_PX_W, PILL_L / PILL_PX_L)
+		tex:SetRotation(-TILT)                                      -- tops lean right
+	end
+	for i, c in ipairs(self.cols) do
+		local x, y = place(along, (i - 2.5) * PILL_STEP)
+		pill:SetColor(c[1], c[2], c[3])
+		pill:DrawAtAnchor(x, y, "center")
+		shine:DrawAtAnchor(x, y, "center")                          -- untinted gloss
+	end
+	for _, tex in ipairs({ pill, shine }) do tex:SetScale(1, 1); tex:SetRotation(0) end
+	pill:SetColor(1, 1, 1)
+end
+
+-- the bank's body, from `lo` to `hi` along the travel axis
+function PC:drawBody(lo, hi)
+	lo, hi = math.max(lo, -REACH - BODY_OVERDRAW), math.min(hi, REACH + BODY_OVERDRAW)
+	if hi <= lo or self.body == nil then return end
+	local x, y = place((lo + hi) / 2, 0)
+	self.body:SetScale(BODY_W / BODY_PX, (hi - lo) / BODY_PX)
+	self.body:SetRotation(-TILT)
+	self.body:DrawAtAnchor(x, y, "center")
+	self.body:SetScale(1, 1); self.body:SetRotation(0)
+end
+
+-- a row of puffs facing forward (front) or back; `mid` is its centre along the travel axis.
+-- One long quad: the texture repeats across, and its clear top and bottom rows keep the long sides soft.
+function PC:drawEdge(mid, front)
+	local edge = self.edge
+	if edge == nil or mid < -REACH - EDGE_H or mid > REACH + EDGE_H then return end
+	local shift = (self.clock * DRIFT) % EDGE_W                   -- the puffs slide right
+	local whole = math.floor(shift)
+	local x, y = place(mid, shift - whole)                         -- the part under a pixel moves the quad
+	edge:SetRotation(front and -TILT or 180 - TILT)
+	edge:DrawRectAtAnchor(x, y, front and -whole or whole, 0, STRIP_W, EDGE_H, "center")
+	edge:SetRotation(0)
+end
+
+-- the bank below its front row; row r of the edge sits at `front - r`
+function PC:drawFront(front)
+	self:drawBody(-100000, front - BASE + BURY)
+	self:drawEdge(front - EDGE_H / 2, true)
+end
+
+-- the bank above its back row; row r of the edge sits at `back + r`
+function PC:drawBack(back)
+	self:drawBody(back + BASE - BURY, 100000)
+	self:drawEdge(back + EDGE_H / 2, false)
+end
+
+function PC:fadeOut(t)
+	self.clock = self.clock + frameDt()
+	if self.phase ~= "out" then                                  -- a new trip
+		self.phase, self.cloudsIn = "out", false
+		self:loadTextures(); self.wait:reset()
+	end
+	t = self.wait:progress(t, self.pill, self.shine, self.edge, self.body)
+	local k = t
+	if self.cols then
+		local along = t < ARRIVE and PILL_START * (1 - t / ARRIVE) ^ 3 or CREEP * (t - ARRIVE) / (1 - ARRIVE)
+		self:drawPills(along)
+		k = clamp01((t - CLOUDS_FROM) / (1 - CLOUDS_FROM))
+	end
+	if k > 0 then
+		if not self.cloudsIn then self.cloudsIn = true; play(self.sndWind) end
+		self:drawFront(FRONT_START + (FRONT_END - FRONT_START) * easeInOut(k))
+	end
+end
+
+function PC:loading()
+	self.phase = "load"
+	self.clock = self.clock + frameDt()
+	self:drawFront(FRONT_END)
+end
+
+function PC:fadeIn(t)
+	self.phase = "in"
+	self.clock = self.clock + frameDt()
+	self:drawBack(BACK_START + (BACK_END - BACK_START) * easeInOut(t))
+	if t >= 1 then self:freeTextures() end   -- the trip is over
+end
+
+return PC

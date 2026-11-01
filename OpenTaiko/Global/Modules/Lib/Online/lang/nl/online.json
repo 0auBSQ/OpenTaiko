@@ -1,0 +1,12 @@
+{
+  "msg_open_failed": "De kamer kon niet worden geopend.",
+  "msg_room_open": "Kamer geopend! De code is in een map opgeslagen - deel hem zodat vrienden kunnen meedoen.",
+  "msg_no_code": "Geen code ingevoerd.",
+  "msg_code_other": "Die code hoort bij een „%s”-kamer.",
+  "msg_code_invalid": "Die code is niet geldig.",
+  "msg_join_failed": "Binnengaan in de kamer lukte niet.",
+  "connecting": "Verbinden...",
+  "msg_chart_failed": "De chart kon niet worden geladen.",
+  "msg_network_error": "Netwerkfout.",
+  "unknown_song": "Onbekend nummer"
+}

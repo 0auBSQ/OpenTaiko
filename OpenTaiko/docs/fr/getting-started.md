@@ -1,0 +1,181 @@
+<!-- getting-started.md -->
+
+# Fonctionnement des modules
+
+OpenTaiko 0.7.0 permet à un skin d'ajouter et de remplacer des écrans en Lua. Le dossier Modules d'un skin contient un dossier par module, et chaque module possède un Script.lua qui définit un ensemble fixe de fonctions de rappel globales. Le jeu charge chaque Script.lua dans son propre état Lua isolé (bac à sable), enregistre les globales du moteur (TEXTURE, SOUND, INPUT, CONFIG et les autres documentées dans la [référence de l'API](api/README.md)) et appelle les fonctions de rappel au bon moment. [Modules et cycle de vie](api/activities.md) liste les signatures exactes.
+
+## Avant de commencer
+
+- OpenTaiko 0.7.0 et un dossier de skin contenant un répertoire Modules. Le skin fourni est System/Open-World Memories.
+- Un éditeur de texte et des bases de Lua (fonctions, tables, require).
+- Les stages fournis sous System/Open-World Memories/Modules/Stages et Global/Modules/Stages. Les petites démos de Global/Modules/Stages/demo_overall montrent la forme des fonctions de rappel ; les plus grands stages montrent comment de vrais écrans sont organisés.
+
+## Où se trouvent les modules
+
+Chaque type de module a son propre dossier sous Modules, et chaque module est un dossier dont le nom est l'identifiant du module :
+
+```
+Modules/
+  Stages/        <name>/Script.lua   écrans complets
+  Activities/    <name>/Script.lua   sous-écrans pilotés par un stage
+  ROActivities/  <name>/Script.lua   sous-écrans et superpositions en lecture seule
+  Transitions/   <name>/Script.lua   fondus entre les stages (chargés en premier)
+  Lib/           fichiers .lua partagés accessibles via require ; non analysés comme modules
+```
+
+Le fichier d'entrée est toujours Script.lua. Les chemins de ressources que vous passez à TEXTURE, SOUND, VIDEO et aux autres chargeurs sont relatifs au dossier du module ; par convention, les modules fournis les rangent dans les sous-dossiers Textures, Sounds, Videos et Databases, et placent les traductions dans un dossier lang.
+
+Deux types de scripts vivent ailleurs :
+
+- Les arrière-plans (arrière-plans d'écran, couches de gameplay, foules, animations de réussite, le kusudama) sont des fichiers Script.lua placés sous le dossier Graphics du skin, dans le répertoire de l'écran qu'ils décorent. Voir la section Arrière-plans de [Modules et cycle de vie](api/activities.md).
+- Les personnages sont des dossiers sous Global/Characters. Un dossier de personnage peut embarquer son propre Script.lua ; sans lui, le jeu utilise son script de personnage intégré. Voir [Ajouter des personnages](guides/characters.md).
+
+## Script.lua définit des fonctions globales
+
+Le Script.lua d'un module définit des fonctions globales de premier niveau aux noms fixes, et le jeu lit chacune d'elles comme une globale. Le jeu ne trouve jamais une fonction enveloppée dans une table locale puis renvoyée, et il n'appelle jamais un nom mal orthographié (OnStart à la place de onStart), car il traite une fonction de rappel non définie comme une opération vide et ne signale rien. Tout le reste du fichier peut être local, et vous pouvez répartir le module sur plusieurs fichiers chargés avec require.
+
+Voici la forme minimale à copier :
+
+```lua
+-- Modules/Stages/mystage/Script.lua
+local text = nil
+local textTex = nil
+
+function onStart()          -- une fois au chargement du skin : chargez les ressources ici
+    text = TEXT:Create(16)
+end
+
+function activate()         -- à chaque entrée dans le stage
+    textTex = text:GetText("Hello")
+end
+
+function update(timestamp)  -- à chaque frame : entrées et changements d'état
+    if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
+        return Exit("title", nil)
+    end
+end
+
+function draw()             -- à chaque frame : dessin uniquement
+    if textTex ~= nil then textTex:Draw(200, 200) end
+end
+
+function deactivate()       -- quand le stage est quitté : arrêtez les sons, fermez les bases de données
+end
+
+function onDestroy()        -- avant le déchargement du skin : libérez ce que vous avez créé
+    if textTex ~= nil then textTex:Dispose() end
+end
+```
+
+## Le cycle de vie d'un stage
+
+- onStart() : le jeu l'appelle une fois après le chargement du skin, et de nouveau après chaque rechargement du skin, que le stage soit à l'écran ou non. Chargez ici les textures, les sons et les vidéos. Elle s'exécute dans une coroutine, si bien qu'un chargement long peut s'étaler sur plusieurs frames derrière la barre de chargement grâce à l'assistant LOADING.
+- activate() : le jeu l'appelle à chaque entrée dans le stage. Réinitialisez ici l'état propre à chaque visite, lancez la musique et ouvrez les bases de données. Elle s'exécute aussi dans une coroutine et peut utiliser LOADING. Le jeu rafraîchit les listes de personnages et de puchicharas (CHARACTERLIST, PUCHICHARALIST) juste avant l'exécution d'activate, puis de nouveau avant afterSongEnum ; lisez-les donc dans l'une des deux, car onStart s'exécute avant le premier rafraîchissement.
+- update(timestamp) : le jeu l'appelle à chaque frame avant draw et lui passe l'horloge du jeu en millisecondes. Gérez ici les entrées et modifiez l'état. Une fois que le stage a appelé Exit, le jeu cesse d'appeler update et continue d'appeler draw pendant le fondu de sortie.
+- draw() : le jeu l'appelle à chaque frame. Dessinez uniquement, et limitez les allocations par frame.
+- deactivate() : le jeu l'appelle quand il quitte le stage. La démo des bases de données de demo_overall y libère ses bases de données ; sa première démo y arrête sa musique et sa vidéo.
+- afterSongEnum() : le jeu l'appelle chaque fois que l'énumération des chansons se termine, au démarrage et après un rechargement léger ou complet, même quand le stage n'est pas actif. Utilisez-la quand le module dépend de la liste des chansons.
+- onDestroy() : le jeu l'appelle avant de décharger le skin. La première démo de demo_overall y libère sa texture, sa vidéo, sa texture de texte et ses sons.
+- reloadLanguage(lang) : le jeu l'appelle quand la langue change (voir la section sur la localisation ci-dessous).
+
+Au chargement d'un skin, le jeu crée les modules type par type, d'abord les Transitions, puis les Stages, les Activities et les ROActivities. Au sein d'un type, il exécute chaque Script.lua avant d'appeler le moindre onStart. Les Activities et les ROActivities n'existent donc pas encore pendant le onStart d'un stage ; recherchez-les dans activate.
+
+Les autres types utilisent des variantes de cet ensemble. Les Activities et les ROActivities ont les mêmes fonctions de rappel, mais le stage hôte invoque activate, deactivate, draw et update et reçoit leurs valeurs de retour. Les arrière-plans reçoivent un objet d'état dans activate(state), update(timestamp, state) et draw(state) et peuvent définir des crochets d'événement tels que clearIn, playEndAnime et kusuBroke. Les transitions définissent fadeOut(t), loading(progress, elapsed) et fadeIn(t). Les personnages définissent leur propre jeu d'animations et de voix. [Modules et cycle de vie](api/activities.md) les liste tous.
+
+## Choisir un type de module
+
+- Stage (Modules/Stages) : un écran complet vers lequel le jeu bascule. Il possède la frame, gère les entrées et se quitte en appelant Exit. Utilisez-le pour tout ce qui constitue un écran à part entière.
+- Activity (Modules/Activities) : un sous-écran qu'un stage utilise depuis l'intérieur, comme une boîte de dialogue. C'est un singleton que vous obtenez avec ACTIVITY:GetActivity(name) ; le stage hôte appelle ses méthodes Activate, Update, Draw et Deactivate. Utilisez-la pour des éléments partagés susceptibles d'écrire l'état du jeu.
+- ROActivity (Modules/ROActivities) : la forme en lecture seule d'une Activity, que vous obtenez avec ROACTIVITY:GetROActivity(name). Elle reçoit CONFIG, DATABASE et GetSaveFile en lecture seule et n'a pas de globale ACTIVITY. Utilisez-la pour les éléments qui ne font que lire l'état, ce qui couvre la plupart des interfaces réutilisables. Le moteur héberge plusieurs de ses propres superpositions sous forme de ROActivities aux noms fixes (nameplate, modal, modicons, danplate, popup_menu, config_ui, song_enum, cutscene) ; un skin en remplace une en fournissant un dossier de ce nom, en conservant les fonctions de rappel que le moteur appelle.
+- Arrière-plan : un Script.lua sous Graphics qui dessine derrière ou par-dessus l'un des écrans du moteur. Les arrière-plans reçoivent les mêmes globales en lecture seule que les ROActivities.
+- Transition (Modules/Transitions) : le fondu de sortie, le chargement et le fondu d'entrée que le jeu joue entre deux stages. Un stage en choisit une par son nom dans le troisième argument d'Exit ; le jeu se rabat sur celle nommée default quand le stage n'en nomme aucune ou que le nom n'existe pas, et joue celle nommée song_loading pour entrer dans le gameplay.
+- Personnage : voir [Ajouter des personnages](guides/characters.md).
+
+## Quitter un stage avec Exit
+
+Seuls les stages disposent de la globale Exit. Elle accepte jusqu'à trois arguments et tolère nil à n'importe quelle position : la cible ("title", "play", "stage" ou "legacy" ; nil signifie "title"), le nom du stage de destination quand la cible est "stage" (ou une clé legacy quand elle est "legacy"), et le nom d'un module de transition. Les stages fournis écrivent `return Exit(...)` à l'intérieur d'update pour que rien d'autre ne s'exécute dans cette frame.
+
+```lua
+-- dans le update() d'un stage
+if INPUT:KeyboardPressed("S") == true then
+    sounds.Skip:Play()
+    return Exit("stage", "mystage") -- aller vers Modules/Stages/mystage
+end
+-- ...
+return Exit("title", nil)           -- retour à l'écran titre
+```
+
+## Le bac à sable
+
+Chaque Script.lua s'exécute dans un état Lua restreint :
+
+- os ne conserve que time, date et difftime. Le bac à sable retire io, debug, loadfile et dofile, et import ne fait rien.
+- package se réduit à un chargeur personnalisé : package.path et package.cpath sont vides et le bac à sable remplace les chercheurs standard, si bien que seuls les chemins ci-dessous sont consultables.
+- require cherche d'abord dans le dossier du module lui-même, puis dans le dossier Modules/Lib du skin, puis dans Global/Modules/Lib dans le dossier du jeu, et charge le premier fichier trouvé. Un module de Global/Modules cherche dans Global/Modules/Lib avant le Modules/Lib du skin. Un fichier du module et un fichier de Lib portant le même nom se résolvent vers le fichier du module. Les points du nom deviennent des séparateurs de chemin : require("DBControllers.dbScores") et require("DBControllers/dbScores") chargent tous deux DBControllers/dbScores.lua. La recherche ignore la casse, et les chemins non ASCII fonctionnent.
+- Un fichier de Lib s'exécute dans l'état Lua du module qui l'a chargé avec require, si bien que les require qu'il contient suivent l'ordre de ce module. Le jeu livre une bibliothèque de fichiers de Lib dans Global/Modules/Lib sous des noms à espace de noms comme require("Core.Easing") et require("UI.Pick") ; [Modules fournis](modules/README.md) les décrit.
+
+```lua
+-- extrait de intro_nokon/Script.lua
+local DBScores  = require("DBControllers/dbScores")  -- le sous-dossier du module
+local I18N      = require("i18n")                     -- Modules/Lib/i18n.lua
+local Opening   = require("opening")                  -- le dossier du module
+local Dialogue  = require("nokon_dialogue")           -- le dossier du module
+```
+
+## Modules en lecture seule
+
+Le jeu crée les ROActivities et les arrière-plans avec des globales restreintes avant l'exécution de leur Script.lua. Une écriture à travers elles journalise une notification d'erreur, ne fait rien et ne lève aucune erreur Lua :
+
+- CONFIG est une vue en lecture seule : ses mutateurs ne font rien.
+- GetSaveFile(player) renvoie un fichier de sauvegarde en lecture seule.
+- DATABASE ouvre des magasins en lecture seule.
+- THEME:SetThemeSetting et THEME:SetThemeSettingForPlayer renvoient false.
+- STORAGE:WriteText et STORAGE:WriteLobbyCode renvoient false.
+- SQL:OpenSQLDatabase(path) ouvre la base de données en lecture seule : les lectures fonctionnent, une instruction qui écrit échoue, journalise l'erreur SQLite et renvoie un résultat vide, et un fichier de base de données absent n'est pas créé.
+- Les mutateurs de VIRTUALSLOTS et VIRTUALSLOTS:MountSlot ne font rien ; les accesseurs fonctionnent toujours.
+- DANBUILDER:Mount() renvoie false ; le constructeur peut toujours être rempli.
+- Mount et MountIfNotLocked d'un nœud de chanson et Select d'une partition renvoient false, quelle que soit la provenance du nœud.
+- ACTIVITY vaut nil (utilisez ROACTIVITY).
+
+Un module qui doit modifier les paramètres, les données de sauvegarde ou une base de données, ou choisir une chanson à jouer, doit être une Activity ou un Stage.
+
+## Localisation avec lang/
+
+Un module traduit ses propres chaînes avec le module fourni [Locale.i18n](modules/locale.md) plutôt qu'avec le dossier Locales du skin, si bien que les traductions voyagent avec le module. Ses textes se trouvent dans lang/<code>/<name>.json à côté de Script.lua, un fichier par fonctionnalité, indexés par des identifiants stables ; lang/en contient l'anglais, qui sert de repli pour toutes les autres langues.
+
+Les principales fonctions de la bibliothèque :
+
+- texts(name) renvoie les textes de lang/<code>/<name>.json dans le dossier du module lui-même. Un fichier de Lib passe son propre dossier en second argument (voir [Modules fournis](modules/README.md)).
+- detect() lit la langue actuelle du jeu via la globale LANG, et chaque recherche l'utilise à partir de là. Tant que vous ne l'appelez pas, les recherches utilisent l'anglais.
+- texts:tr(id) renvoie le texte de id, ou l'identifiant lui-même quand aucune langue ne l'a ; texts:trf(id, ...) utilise ce texte comme motif string.format.
+
+Appelez detect() dans activate, puis construisez votre texte avec texts:tr et texts:trf. activate s'exécute à chaque entrée dans le module, si bien qu'une langue changée par le joueur dans les réglages prend effet à la visite suivante, et le module n'a besoin d'aucun autre point d'accroche. Chaque fichier de langue reprend les clés du fichier anglais, et une traduction doit conserver tels quels les substituts tels que %s.
+
+```
+Modules/Stages/mystage/lang/en/quiz.json   { "speaker": "Nokon", "start": "Alright, quiz time!" }
+Modules/Stages/mystage/lang/ja/quiz.json   { "speaker": "ノコン", "start": "さあ、クイズの時間である！" }
+```
+
+```lua
+-- Modules/Stages/mystage/Script.lua
+local I18N = require("Locale.i18n")
+local T = I18N.texts("quiz")
+local title
+
+function activate()
+    I18N.detect()
+    title = T:tr("start")
+end
+```
+
+Quelques stages plus anciens du skin fourni, comme intro_nokon, utilisent à la place la première forme de la bibliothèque : un lang/ja.lua qui renvoie une table associant chaque chaîne anglaise à sa traduction, lue avec I18N.tr(s). [Locale.i18n](modules/locale.md) documente les deux.
+
+Le jeu appelle aussi une fonction globale reloadLanguage(lang) sur chaque module chargé quand la langue change. Seul un module qui reste à l'écran pendant le changement de langue en a besoin, par exemple un écran avec un sélecteur de langue ; appelez-y detect() de nouveau et reconstruisez le texte pré-rendu.
+
+## Points de vigilance
+
+- Le jeu libère les textures, sons, vidéos et objets de texte créés par un module quand il libère le module, si bien qu'un rechargement du skin ne les fait pas fuir. Libérez dans deactivate les ressources que vous ouvrez à chaque visite, comme les bases de données, comme le fait la démo des bases de données de demo_overall, et libérez dans onDestroy ce que vous avez créé, comme le fait sa première démo.
+- GetText met en cache une texture par chaîne distincte sur son objet texte. Une chaîne qui change à chaque frame ajoute une texture à chaque frame et le jeu ralentit progressivement. Dessinez les valeurs changeantes avec le moteur de glyphes (TEXT:CreateGlyphCached), ou conservez une seule texture jusqu'à ce que la valeur change.
+- LOADING ne fonctionne que dans les fonctions de rappel exécutées en coroutine : le onStart de n'importe quel module et l'activate d'un stage. Appeler LOADING:Tick depuis l'activate d'une Activity, ou depuis update ou draw, lève une erreur Lua.
+- Quand une fonction de rappel lève une erreur Lua, le jeu affiche une fois la première erreur de cette fonction et continue d'appeler le module. Un stage qui a rencontré une erreur revient à l'écran titre (sauf _boot et _title), les paramètres se ferment quand config_ui en a rencontré une, et l'écran de résultats saute les cartes de récompense quand modal en a rencontré une.
+- onStart et afterSongEnum s'exécutent alors que le module est hors écran. Écrivez-les de façon à ce qu'ils fonctionnent sans que le stage soit visible.

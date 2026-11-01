@@ -1,7 +1,0 @@
-- Result screen voices :
-Result/BestScore
-Result/ClearFailed
-Result/ClearSuccess
-Result/DanFailed
-Result/DanRedPass
-Result/DanGoldPass

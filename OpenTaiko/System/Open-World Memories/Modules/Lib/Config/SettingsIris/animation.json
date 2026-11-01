@@ -1,0 +1,12 @@
+{
+    "_note": "settings_iris timings (Lib/SettingsIris). Fade lengths in seconds; max_frame_s caps one frame's time step.",
+    "out_s": 0.6,
+    "in_s": 0.6,
+    "max_frame_s": 0.1,
+    "scroll_px_per_s": 60,
+    "tools": {
+        "_note": "the crossed tools grow from start_scale by scale_change as the settings circle opens on the way in, and shrink by scale_change as it closes on the way back",
+        "start_scale": 0.6,
+        "scale_change": 0.4
+    }
+}

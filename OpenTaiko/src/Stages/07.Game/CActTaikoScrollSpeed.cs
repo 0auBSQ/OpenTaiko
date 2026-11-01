@@ -19,7 +19,7 @@ internal class CActTaikoScrollSpeed : CActivity {
 
 	public override void Activate() {
 		for (int i = 0; i < 5; i++) {
-			this.dbConfigScrollSpeed[i] = (double)OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.GetActualPlayer(i)];
+			this.dbConfigScrollSpeed[i] = (double)OpenTaiko.ConfigIni.nScrollSpeed[i];
 			this.nScrollExclusiveTimer[i] = -1;
 		}
 
@@ -39,7 +39,7 @@ internal class CActTaikoScrollSpeed : CActivity {
 			}
 			long nNowTime = SoundManager.PlayTimer.NowTimeMs;
 			for (int i = 0; i < 5; i++) {
-				double dbScrollSpeed = (double)OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.GetActualPlayer(i)];
+				double dbScrollSpeed = (double)OpenTaiko.ConfigIni.nScrollSpeed[i];
 				if (nNowTime < this.nScrollExclusiveTimer[i]) {
 					this.nScrollExclusiveTimer[i] = nNowTime;
 				}

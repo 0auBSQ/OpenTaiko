@@ -1,0 +1,11 @@
+{
+  "_comment": "Japanese texts for the jukebox player (jukebox.lua); its dialog lines are in dialogs.json. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "title": "ジュークボックス",
+  "tab_bgm": "BGM",
+  "tab_songs": "曲",
+  "bgm_title": "マイルームBGM",
+  "nothing_playing": "再生中の曲はありません",
+  "waiting": "レコードを整理中…楽曲リストを準備しています。",
+  "no_songs": "再生できる曲が見つかりません。",
+  "speed": "速度"
+}

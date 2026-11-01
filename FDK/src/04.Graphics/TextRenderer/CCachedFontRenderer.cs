@@ -79,8 +79,9 @@ public class CCachedFontRenderer : CFontRenderer {
 	#endregion
 
 	protected new SKBitmap DrawText(string drawstr, DrawMode drawmode, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradationBottomColor, int edge_Ratio, bool keepCenter = false) {
+		this.DropCacheOnShapingChange();
 		#region [ 以前レンダリングしたことのある文字列/フォントか? (キャッシュにヒットするか?) ]
-		int index = listFontCache.FindIndex(
+		int index = listFontCache!.FindIndex(
 			delegate (FontCache fontcache) {
 				return (
 					drawstr == fontcache.drawstr &&
@@ -111,11 +112,9 @@ public class CCachedFontRenderer : CFontRenderer {
 			fc.Vertical = false;
 			fc.KeepCenter = keepCenter;
 			listFontCache.Add(fc);
-			Debug.WriteLine(drawstr + ": Cacheにヒットせず。(cachesize=" + listFontCache.Count + ")");
 			#endregion
 			#region [ もしキャッシュがあふれたら、最も古いキャッシュを破棄する ]
 			if (listFontCache.Count > MAXCACHESIZE) {
-				Debug.WriteLine("Cache溢れ。" + listFontCache[0].drawstr + " を解放します。");
 				if (listFontCache[0].bmp != null) {
 					listFontCache[0].bmp.Dispose();
 				}
@@ -126,7 +125,6 @@ public class CCachedFontRenderer : CFontRenderer {
 			// 呼び出し元のDispose()でキャッシュもDispose()されないように、Clone()で返す。
 			return listFontCache[listFontCache.Count - 1].bmp.Copy();
 		} else {
-			Debug.WriteLine(drawstr + ": Cacheにヒット!! index=" + index);
 			#region [ キャッシュにヒット。レンダリングは行わず、キャッシュ内のデータを返して終了。]
 			// 呼び出し元のDispose()でキャッシュもDispose()されないように、Clone()で返す。
 			return listFontCache[index].bmp.Copy();
@@ -135,8 +133,9 @@ public class CCachedFontRenderer : CFontRenderer {
 	}
 
 	protected new SKBitmap DrawText_V(string drawstr, DrawMode drawmode, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradationBottomColor, int edge_Ratio, bool keepCenter = false) {
+		this.DropCacheOnShapingChange();
 		#region [ 以前レンダリングしたことのある文字列/フォントか? (キャッシュにヒットするか?) ]
-		int index = listFontCache.FindIndex(
+		int index = listFontCache!.FindIndex(
 			delegate (FontCache fontcache) {
 				return (
 					drawstr == fontcache.drawstr &&
@@ -166,11 +165,9 @@ public class CCachedFontRenderer : CFontRenderer {
 			fc.Vertical = true;
 			fc.KeepCenter = keepCenter;
 			listFontCache.Add(fc);
-			Debug.WriteLine(drawstr + ": Cacheにヒットせず。(cachesize=" + listFontCache.Count + ")");
 			#endregion
 			#region [ もしキャッシュがあふれたら、最も古いキャッシュを破棄する ]
 			if (listFontCache.Count > MAXCACHESIZE) {
-				Debug.WriteLine("Cache溢れ。" + listFontCache[0].drawstr + " を解放します。");
 				if (listFontCache[0].bmp != null) {
 					listFontCache[0].bmp.Dispose();
 				}
@@ -181,7 +178,6 @@ public class CCachedFontRenderer : CFontRenderer {
 			// 呼び出し元のDispose()でキャッシュもDispose()されないように、Clone()で返す。
 			return listFontCache[listFontCache.Count - 1].bmp.Copy();
 		} else {
-			Debug.WriteLine(drawstr + ": Cacheにヒット!! index=" + index);
 			#region [ キャッシュにヒット。レンダリングは行わず、キャッシュ内のデータを返して終了。]
 			// 呼び出し元のDispose()でキャッシュもDispose()されないように、Clone()で返す。
 			return listFontCache[index].bmp.Copy();
@@ -189,9 +185,21 @@ public class CCachedFontRenderer : CFontRenderer {
 		}
 	}
 
+	// the cached bitmaps were shaped with other font features: render again from now on
+	private void DropCacheOnShapingChange() {
+		int generation = ShapingGeneration;
+		if (generation == this.shapingGeneration)
+			return;
+		this.shapingGeneration = generation;
+		foreach (FontCache bc in listFontCache!)
+			bc.bmp?.Dispose();
+		listFontCache!.Clear();
+	}
+	private int shapingGeneration = ShapingGeneration;
+
 	#region [ IDisposable 実装 ]
 	//-----------------
-	public new void Dispose() {
+	public override void Dispose() {
 		if (!this.bDisposed_CCachedFontRenderer) {
 			if (listFontCache != null) {
 				//Debug.WriteLine( "Disposing CCachedFontRenderer()" );
@@ -232,7 +240,7 @@ public class CCachedFontRenderer : CFontRenderer {
 		public bool Vertical;
 		public bool KeepCenter;
 	}
-	private List<FontCache> listFontCache;
+	private List<FontCache>? listFontCache;
 
 	protected bool bDisposed_CCachedFontRenderer;
 	//-----------------

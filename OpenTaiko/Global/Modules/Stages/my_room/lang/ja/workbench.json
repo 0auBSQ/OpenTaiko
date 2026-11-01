@@ -1,0 +1,8 @@
+{
+  "_comment": "Japanese texts for the workbench window (workbench.lua). Keys are stable ids; lang/en is the fallback for every other language.",
+  "stock": "在庫",
+  "color": "色",
+  "amount": "数量",
+  "recolor": "色を変える",
+  "empty": "色を変えられるものがありません。色違いのある床や壁紙がここに表示されます。"
+}

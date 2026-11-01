@@ -8,26 +8,26 @@ namespace OpenTaiko;
 internal class Program {
 	#region [ 二重起動チェック、DLL存在チェック ]
 	//-----------------------------
-	private static Mutex mutex二重起動防止用;
+	private static Mutex? mutexDoubleStartupPrevent;
 
-	private static bool tDLLの存在チェック(string strDll名, string str存在しないときに表示するエラー文字列jp, string str存在しないときに表示するエラー文字列en, bool bLoadDllCheck) {
-		string str存在しないときに表示するエラー文字列 = (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ja") ?
-			str存在しないときに表示するエラー文字列jp : str存在しないときに表示するエラー文字列en;
+	private static bool tDLLExistsCheck(string strDllName, string strNotFoundErrorTextJp, string strNotFoundErrorTextEn, bool bLoadDllCheck) {
+		string strNotFoundErrorText = (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ja") ?
+			strNotFoundErrorTextJp : strNotFoundErrorTextEn;
 		if (bLoadDllCheck) {
-			IntPtr hModule = LoadLibrary(strDll名);      // 実際にLoadDll()してチェックする
+			IntPtr hModule = LoadLibrary(strDllName);      // 実際にLoadDll()してチェックする
 			if (hModule == IntPtr.Zero) {
 				return false;
 			}
 			FreeLibrary(hModule);
 		} else {                                                    // 単純にファイルの存在有無をチェックするだけ (プロジェクトで「参照」していたり、アンマネージドなDLLが暗黙リンクされるものはこちら)
-			string path = Path.Combine(System.IO.Directory.GetCurrentDirectory(), strDll名);
+			string path = Path.Combine(System.IO.Directory.GetCurrentDirectory(), strDllName);
 			if (!File.Exists(path)) {
 				return false;
 			}
 		}
 		return true;
 	}
-	private static bool tDLLの存在チェック(string strDll名, string str存在しないときに表示するエラー文字列jp, string str存在しないときに表示するエラー文字列en) {
+	private static bool tDLLExistsCheck(string strDllName, string strNotFoundErrorTextJp, string strNotFoundErrorTextEn) {
 		return true;
 	}
 
@@ -41,16 +41,54 @@ internal class Program {
 	//-----------------------------
 	#endregion
 
+	// On Linux the soname files (libavformat.so.59, ...) ship empty, as symlinks do not survive a zip made on
+	// Windows, and the libraries carry no rpath. So each one loads from its full-version file, after the ones it
+	// needs, which it then finds by soname among the loaded libraries. Without the files, a system FFmpeg of the
+	// same version is used.
+	private static readonly Dictionary<string, IntPtr> ffmpegLibraries = new();
+
+	private static IntPtr LoadFFmpegLibrary(string name) {
+		IntPtr handle = TryLoadFFmpegLibrary(name);
+		if (handle == IntPtr.Zero)
+			throw new DllNotFoundException($"Unable to load lib{name}.so.{FFmpeg.AutoGen.ffmpeg.LibraryVersionMap[name]} from {FFmpeg.AutoGen.ffmpeg.RootPath} or the system.");
+		return handle;
+	}
+
+	private static IntPtr TryLoadFFmpegLibrary(string name) {
+		lock (ffmpegLibraries) {
+			if (ffmpegLibraries.TryGetValue(name, out IntPtr handle))
+				return handle;
+			if (FFmpeg.AutoGen.ffmpeg.LibraryDependenciesMap.TryGetValue(name, out string[]? dependencies))
+				foreach (string dependency in dependencies)
+					TryLoadFFmpegLibrary(dependency);
+			string soname = $"lib{name}.so.{FFmpeg.AutoGen.ffmpeg.LibraryVersionMap[name]}";
+			string? file = Directory.Exists(FFmpeg.AutoGen.ffmpeg.RootPath)
+				? new DirectoryInfo(FFmpeg.AutoGen.ffmpeg.RootPath).GetFiles(soname + "*")
+					.Where(f => f.Length > 0).OrderByDescending(f => f.Name.Length).FirstOrDefault()?.FullName
+				: null;
+			if (file == null || !NativeLibrary.TryLoad(file, out handle))
+				NativeLibrary.TryLoad(soname, out handle);
+			ffmpegLibraries[name] = handle;
+			return handle;
+		}
+	}
+
 	[STAThread]
 	static void Main(params string[] args) {
 		Console.WriteLine("Args: " + (args.Length > 0 ? string.Join(" ", args) : "(None)"));
 		Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-		mutex二重起動防止用 = new Mutex(false, "DTXManiaMutex");
+		// app-level CLI: --mode=record (offline video export) / --mode=checkgl (graphics self-test).
+		// Both run as their own process even while the game is open, so they bypass the single-instance lock.
+		CommandLineArgs cli = CommandLineArgs.Parse(args);
+		bool bVideoExport = cli.Mode == AppMode.Record && VideoExporter.Begin(cli);
+		if (cli.Mode == AppMode.CheckGl) { FDK.Game.GraphicsSelfTest = true; Environment.ExitCode = 70; }
+		bool bSpecialMode = cli.Mode != AppMode.Normal;
 
-		if (mutex二重起動防止用.WaitOne(0, false)) {
+		mutexDoubleStartupPrevent = new Mutex(false, bSpecialMode ? "OpenTaiko-" + Guid.NewGuid().ToString("N") : "DTXManiaMutex");
+
+		if (mutexDoubleStartupPrevent.WaitOne(0, false)) {
 			string newLine = Environment.NewLine;
-			bool bDLLnotfound = false;
 
 			Trace.WriteLine("Current Directory: " + Environment.CurrentDirectory);
 			Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
@@ -70,6 +108,8 @@ internal class Program {
 						osplatform = "osx";
 					else if (OperatingSystem.IsLinux())
 						osplatform = "linux";
+					else if (OperatingSystem.IsIOS())
+						osplatform = "ios";
 					else
 						throw new PlatformNotSupportedException("OpenTaiko does not support this OS.");
 
@@ -92,16 +132,23 @@ internal class Program {
 							throw new PlatformNotSupportedException($"OpenTaiko does not support this architecture. ({RuntimeInformation.ProcessArchitecture})");
 					}
 
-					FFmpeg.AutoGen.ffmpeg.RootPath = AppContext.BaseDirectory + @"FFmpeg/" + osplatform + "-" + platform + "/";
-					DirectoryInfo info = new DirectoryInfo(AppContext.BaseDirectory + @"Libs/" + osplatform + "-" + platform + "/");
+					if (!OperatingSystem.IsIOS()) {
+						// iOS bundles native libraries in the app framework; no runtime copy needed.
+						FFmpeg.AutoGen.ffmpeg.RootPath = AppContext.BaseDirectory + @"FFmpeg/" + osplatform + "-" + platform + "/";
+						if (OperatingSystem.IsLinux())
+							FFmpeg.AutoGen.ffmpeg.GetOrLoadLibrary = LoadFFmpegLibrary;
+						DirectoryInfo info = new DirectoryInfo(AppContext.BaseDirectory + @"Libs/" + osplatform + "-" + platform + "/");
 
-					//実行ファイルの階層にライブラリをコピー
-					foreach (FileInfo fileinfo in info.GetFiles()) {
-						fileinfo.CopyTo(AppContext.BaseDirectory + fileinfo.Name, true);
+						//実行ファイルの階層にライブラリをコピー
+						foreach (FileInfo fileinfo in info.GetFiles()) {
+							fileinfo.CopyTo(AppContext.BaseDirectory + fileinfo.Name, true);
+						}
 					}
 
-					using (var mania = new OpenTaiko(args))
+					using (var mania = new OpenTaiko(args)) {
+						if (cli.Hidden) mania.StartHidden = true;
 						mania.Run();
+					}
 
 					Trace.WriteLine("");
 					Trace.WriteLine("Thank you for playing!");
@@ -124,8 +171,8 @@ internal class Program {
 
 			// BEGIN #24615 2011.03.09 from: Mutex.WaitOne() が true を返した場合は、Mutex のリリースが必要である。
 
-			mutex二重起動防止用.ReleaseMutex();
-			mutex二重起動防止用 = null;
+			mutexDoubleStartupPrevent.ReleaseMutex();
+			mutexDoubleStartupPrevent = null;
 
 			// END #24615 2011.03.09 from
 		} else      // DTXManiaが既に起動中
@@ -143,11 +190,11 @@ internal class Program {
 
 				Process current = Process.GetCurrentProcess();
 				Process[] running = Process.GetProcessesByName(current.ProcessName);
-				Process target = null;
+				Process? target = null;
 				foreach (Process p in running) {
 					if (p.Id != current.Id) // プロセス名は同じでかつ、プロセスIDが自分自身とは異なるものを探す
 					{
-						if (p.MainModule.FileName == current.MainModule.FileName && p.MainWindowHandle != IntPtr.Zero) {
+						if (p.MainModule!.FileName == current.MainModule!.FileName && p.MainWindowHandle != IntPtr.Zero) {
 							target = p;
 							break;
 						}
@@ -159,7 +206,7 @@ internal class Program {
 				if (target != null) {
 					string[] commandLineArgs = Environment.GetCommandLineArgs();
 					if (commandLineArgs != null && commandLineArgs.Length > 1) {
-						string arg = null;
+						string? arg = null;
 						for (int j = 1; j < commandLineArgs.Length; j++) {
 							if (j == 1) {
 								arg += commandLineArgs[j];

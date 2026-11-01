@@ -1,0 +1,110 @@
+{
+  "layers": [
+    {
+      "type": "image",
+      "file": "bg.png"
+    },
+    {
+      "type": "rays",
+      "x": 1750,
+      "y": -150,
+      "angles": [
+        22,
+        34,
+        47
+      ],
+      "length": 1.6,
+      "width": 1.6,
+      "color": "FFE3B8",
+      "opacity": [
+        0.1,
+        0.28
+      ],
+      "pulse_ms": 7000,
+      "sway_deg": 2,
+      "sway_ms": 11000
+    },
+    {
+      "type": "particles",
+      "sprite": "dot",
+      "count": 26,
+      "size": [
+        60,
+        180
+      ],
+      "color": "FFD9A8",
+      "opacity": [
+        0.05,
+        0.14
+      ],
+      "speed": [
+        6,
+        14
+      ],
+      "direction": "up",
+      "sway": 30,
+      "sway_ms": 9000,
+      "twinkle_ms": 6000,
+      "blend": "add"
+    },
+    {
+      "type": "particles",
+      "sprite": "dot",
+      "count": 60,
+      "size": [
+        3,
+        9
+      ],
+      "color": "FFF4DC",
+      "opacity": [
+        0.25,
+        0.7
+      ],
+      "speed": [
+        8,
+        22
+      ],
+      "direction": "up",
+      "sway": 14,
+      "sway_ms": 5000,
+      "twinkle_ms": 2500,
+      "blend": "add"
+    },
+    {
+      "type": "particles",
+      "sprite": "dot",
+      "count": 2,
+      "size": [
+        1300,
+        1700
+      ],
+      "color": "FFB07A",
+      "opacity": [
+        0.05,
+        0.09
+      ],
+      "speed": [
+        25,
+        40
+      ],
+      "direction": "right",
+      "blend": "add",
+      "area": [
+        -900,
+        -300,
+        2800,
+        1000
+      ]
+    },
+    {
+      "type": "glow",
+      "color": "FF9A6A",
+      "opacity": [
+        0.03,
+        0.1
+      ],
+      "pulse_ms": 6500,
+      "blend": "add"
+    }
+  ]
+}

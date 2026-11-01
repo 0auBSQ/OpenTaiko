@@ -153,7 +153,7 @@ public class CConversion {
 		) ? (ch2.ToString() + ch1.ToString())
 		: "00";
 
-	public static int[] StringToIntArray(string str) {
+	public static int[]? StringToIntArray(string? str) {
 		//0,1,2 ...の形式で書かれたstringをint配列に変換する。
 		//一応実装はしたものの、例外処理などはまだ完成していない。
 		//str = "0,1,2";
@@ -165,8 +165,8 @@ public class CConversion {
 		listIntArray = new List<int>();
 
 		for (int n = 0; n < strArray.Length; n++) {
-			int n追加する数値 = Convert.ToInt32(strArray[n]);
-			listIntArray.Add(n追加する数値);
+			int nAddValue = Convert.ToInt32(strArray[n]);
+			listIntArray.Add(nAddValue);
 		}
 		int[] nArray = new int[] { 1 };
 		nArray = listIntArray.ToArray();

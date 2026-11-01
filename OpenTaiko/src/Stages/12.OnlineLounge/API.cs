@@ -5,17 +5,17 @@ namespace OpenTaiko;
 
 internal class API {
 	public class APICharterInfo {
-		public string charter_name;
+		public string? charter_name;
 	}
 
 	public class APIGenreInfo {
-		public string genre;
+		public string? genre;
 	}
 
 	public class APISongData {
 		public int Id;
-		public string SongTitle;
-		public string SongSubtitle;
+		public string SongTitle = null!;
+		public string SongSubtitle = null!;
 		public int D0; // Easy
 		public int D1; // Normal
 		public int D2; // Hard
@@ -24,11 +24,11 @@ internal class API {
 		public int D5; // Tower
 		public int D6; // Dan
 		public int Life; // Tower only
-		public string Md5;
+		public string Md5 = null!;
 
 		// Additional
-		public APICharterInfo charter;
-		public APIGenreInfo Genre;
+		public APICharterInfo? charter;
+		public APIGenreInfo? Genre;
 
 		[JsonIgnore]
 		public bool DownloadNow;
@@ -68,9 +68,9 @@ internal class API {
 		}
 
 		protected override string ResolvePropertyName(string propertyName) {
-			string resolvedName = null;
+			string? resolvedName = null;
 			var resolved = this.PropertyMappings.TryGetValue(propertyName, out resolvedName);
-			return (resolved) ? resolvedName : base.ResolvePropertyName(propertyName);
+			return (resolved) ? resolvedName! : base.ResolvePropertyName(propertyName);
 		}
 	}
 
@@ -101,7 +101,7 @@ internal class API {
 
 	private DBCDN.CDNData cdnData;
 
-	private async Task<APISongData[]> GetCallAPI(string url) {
+	private async Task<APISongData[]?> GetCallAPI(string url) {
 		try {
 			using (HttpClient client = new HttpClient()) {
 				var response = await client.GetAsync(url).ConfigureAwait(false);
@@ -115,7 +115,7 @@ internal class API {
 					return JsonConvert.DeserializeObject<APISongData[]>(jsonString, settings);
 				}
 			}
-		} catch (Exception e) {
+		} catch (Exception) {
 			//throw e;
 		}
 		return null;

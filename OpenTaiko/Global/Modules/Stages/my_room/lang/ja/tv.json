@@ -1,0 +1,13 @@
+{
+  "_comment": "Japanese texts for the TV (tv.lua): its menu and the cutscene browser. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "title": "テレビ",
+  "menu_on": "電源を入れる",
+  "menu_off": "電源を切る",
+  "menu_rewatch": "カットシーンを見直す",
+  "tab_songs": "楽曲カットシーン",
+  "intro": "イントロ",
+  "outro": "アウトロ %d",
+  "unknown_song": "???",
+  "empty": "カットシーンが見つかりません。",
+  "waiting": "チャンネルを調整中…楽曲リストを準備しています。"
+}

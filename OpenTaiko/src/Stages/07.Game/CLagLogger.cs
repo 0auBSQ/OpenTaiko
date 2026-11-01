@@ -16,7 +16,7 @@ internal static class CLagLogger {
 			return;
 		}
 
-		if (!NotesManager.IsGenericRoll(pChip))
+		if (NotesManager.IsGenericRoll(pChip) || NotesManager.IsADLIB(pChip) || NotesManager.IsMine(pChip))
 			return;
 
 		var pChipNLag = pChip.nLag;
@@ -26,6 +26,7 @@ internal static class CLagLogger {
 
 	public static double? LogAndReturnMeanLag() {
 		if (LagValues.Count < 30) {
+			LagValues.Clear();
 			return null;
 		}
 

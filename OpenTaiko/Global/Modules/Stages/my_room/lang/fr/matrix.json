@@ -1,0 +1,39 @@
+{
+  "_comment": "Textes français de la Matrice (matrix.lua).",
+  "hint": "Choisissez une scène à projeter.",
+  "unlock_title": "Scène verrouillée",
+  "unlock_q": "Déverrouiller « %s » ?",
+  "unlock_yes": "Déverrouiller",
+  "unlock_no": "Retour",
+  "broke": "Pas assez de pièces.",
+  "scenes": {
+    "demo_overall": {
+      "name": "Démo générale",
+      "desc": "Cinq petites démos en un seul stage ; les touches 1 à 5 passent de l'une à l'autre."
+    },
+    "demo_canvas": {
+      "name": "Démo du canvas",
+      "desc": "Un petit programme de dessin : dessinez à la souris sur une feuille blanche, avec LuaCanvas et la souris."
+    },
+    "demo_particles": {
+      "name": "Démo des particules",
+      "desc": "Un test de charge du moteur de particules de Lua3DScene."
+    },
+    "demo_modal": {
+      "name": "Démo des modales",
+      "desc": "Joue les modales de récompense et de déblocage de chaque rareté et de chaque type."
+    },
+    "demo_aviutl2": {
+      "name": "Démo AviUtl2",
+      "desc": "Des projets AviUtl2 (.aup2) lus dans le lecteur vidéo."
+    },
+    "demo_rt": {
+      "name": "Démo du raytracer",
+      "desc": "Le mode raytracer en tracé de chemins de Lua3DScene."
+    },
+    "demo_dan_builder": {
+      "name": "Démo du Dan Builder",
+      "desc": "Un lecteur de Dan aléatoire minimaliste."
+    }
+  }
+}

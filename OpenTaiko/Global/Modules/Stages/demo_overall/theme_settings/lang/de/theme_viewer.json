@@ -1,0 +1,10 @@
+{
+  "_comment": "German texts for the theme settings viewer. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "title": "Themeneinstellungs-Anzeige",
+  "col_id": "ID",
+  "col_scope": "Bereich",
+  "col_type": "Typ",
+  "col_value": "Wert",
+  "hint_scroll": "oben/unten scrollen   Abbrechen zum Beenden",
+  "hint_exit": "Abbrechen zum Beenden"
+}

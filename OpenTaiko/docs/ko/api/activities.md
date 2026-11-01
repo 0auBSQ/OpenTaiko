@@ -1,0 +1,603 @@
+<!-- api/activities.md -->
+
+# 모듈과 생명 주기
+
+엔진은 모듈의 Script.lua에서 정해진 콜백 집합을 호출합니다. 이 페이지는 그 콜백과 함께 액티비티·배경·트랜지션을 구동하는 전역, 그리고 모든 모듈이 받는 카운터, 카메라, 진단 헬퍼를 나열합니다. 모듈을 작성해 본 적이 없다면 먼저 [모듈의 동작 방식](../getting-started.md)을 읽으십시오.
+
+## 생명 주기 콜백
+
+엔진은 각 모듈의 Script.lua에서 최상위 전역 함수를 이름으로 찾아 정해진 시점에 호출합니다. 정의하지 않은 콜백은 엔진이 건너뜁니다. 엔진이 어떤 콜백을 호출하는지는 모듈 종류가 결정합니다.
+
+<div class="callout warn">
+스킨이 로드될 때 엔진은 모듈을 Transitions, Stages, Activities, ROActivities 순서로 생성하고 시작합니다. 각 종류 안에서 엔진은 모든 모듈의 Script.lua(최상위 코드)를 먼저 실행한 뒤 각각에 onStart를 호출합니다. 따라서 스테이지의 onStart가 실행되는 동안 액티비티와 ROActivity는 아직 로드되지 않았고 거기서 찾으면 nil이 반환되므로, activate에서 찾으십시오. 스킨 변경이나 종료 시에는 onDestroy가 Stages, 그다음 ROActivities와 Activities, 그다음 Transitions 순으로 실행됩니다.
+</div>
+
+### 스테이지, 액티비티, ROActivity
+
+| 메서드 | 설명 |
+| --- | --- |
+| `onStart()` | 엔진이 모듈을 생성한 뒤 한 번 호출됩니다. 부팅 시와 엔진이 스킨을 로드하거나 다시 로드할 때마다 일어납니다. 코루틴으로 실행되므로(아래 LOADING 참고) 여기서 에셋을 로드하십시오. |
+| `activate(...)` | 스테이지: 엔진이 스테이지에 들어갈 때마다 코루틴으로 호출됩니다. 액티비티/ROActivity: 호스트가 자신의 인자와 함께 `handle:Activate(...)`로 호출하며, 반환값은 호스트로 돌아갑니다. 엔진은 CHARACTERLIST와 PUCHICHARALIST 전역을 실행 직전에 갱신합니다. |
+| `update(timestamp)` | 매 프레임 draw 앞에서 호출됩니다. timestamp는 밀리초 단위 게임 시계입니다. 스테이지는 Exit를 호출한 뒤 update를 더 받지 않으며, draw는 페이드아웃 동안 계속 실행됩니다. 액티비티/ROActivity: 호스트가 `handle:Update()`를 통해 호출합니다. |
+| `draw(...)` | 매 프레임 호출됩니다. 액티비티/ROActivity: 호스트가 자신의 인자와 함께 `handle:Draw(...)`를 통해 호출하며, 반환값은 호스트로 돌아갑니다. |
+| `deactivate(...)` | 스테이지: 엔진이 스테이지를 떠날 때 호출됩니다. 액티비티/ROActivity: 호스트가 `handle:Deactivate(...)`를 통해 호출하거나 모듈이 스스로 `DEACTIVATE()`로 호출하며, 반환값은 호스트로 돌아갑니다. |
+| `afterSongEnum()` | 곡 열거가 끝날 때마다 호출됩니다. 부팅 시와 곡의 소프트 또는 하드 리로드 후를 포함하며, 모듈이 활성 상태가 아니어도 호출됩니다. 엔진은 CHARACTERLIST와 PUCHICHARALIST 전역을 실행 직전에 갱신합니다. |
+| `onDestroy()` | 엔진이 스킨을 언로드하기 전에 호출되어 모듈이 보유한 것을 해제할 수 있게 합니다. |
+| `reloadLanguage(lang)` | 게임 언어가 바뀔 때 로드된 모든 모듈에서 호출됩니다. lang은 새 언어 코드입니다. |
+
+### 배경
+
+각 화면은 자체 배경을 호스팅합니다. 아래 배경 절에서 state 인자와 이벤트 훅을 설명합니다.
+
+| 메서드 | 설명 |
+| --- | --- |
+| `onStart()` | 호스트가 배경을 처음 활성화할 때 한 번, 동기적으로 호출됩니다. |
+| `activate(state)` | 호스트가 배경을 활성화할 때마다 호출됩니다. 재활성화 시 onStart가 다시 실행되지는 않습니다. |
+| `update(timestamp, state)` | 매 프레임 호출됩니다(게임플레이가 일시정지된 동안은 제외). timestamp는 밀리초 단위의 `state.timeStamp`입니다. |
+| `draw(state)` | 매 프레임 호출됩니다. |
+| `reloadLanguage(lang)` | 게임 언어가 바뀔 때 호출됩니다. |
+
+엔진은 배경에서 afterSongEnum이나 onDestroy를 호출하지 않습니다. 호스트가 배경을 해제하면 엔진이 배경이 생성한 리소스를 해제합니다.
+
+### 트랜지션
+
+| 메서드 | 설명 |
+| --- | --- |
+| `onStart()` | 스킨이 로드될 때 스테이지와 액티비티보다 먼저, 코루틴으로 한 번 호출됩니다. |
+| `fadeOut(t)` | 나가는 스테이지 위에 페이드아웃을 그립니다. t는 0에서 1까지 변합니다. |
+| `loading(progress, elapsed)` | 로딩 화면을 그립니다. progress는 0에서 1, elapsed는 로드가 시작된 뒤 경과한 초입니다. |
+| `fadeIn(t)` | 새 스테이지 위에 페이드인을 그립니다. t는 0에서 1까지 변합니다. |
+| `onDestroy()` | 엔진이 스킨을 언로드하기 전, 스테이지와 액티비티 다음에 호출됩니다. |
+| `reloadLanguage(lang)` | 게임 언어가 바뀔 때 호출됩니다. |
+
+아래 트랜지션 절에서 각 단계의 타이밍을 설명합니다.
+
+### 캐릭터
+
+캐릭터의 Script.lua는 다른 집합을 정의합니다. loadAnimation, disposeAnimation, availableAnimation, setAnimationDuration, resetAnimationCounter, update, draw, getDrawSize, getAIBattlePosition, loadVoice, disposeVoice, playVoice입니다. [캐릭터 추가하기](../guides/characters.md)에서 다룹니다.
+
+### Exit
+
+엔진이 스테이지 스크립트에만 등록하는 함수입니다. 호출하면 엔진에 스테이지를 떠나도록 요청합니다.
+
+<div class="callout warn">
+Modules/Stages 스크립트에서만 사용할 수 있습니다. 액티비티와 ROActivity는 호스트가 구동하므로 이 함수를 받지 않습니다. 0~3개의 인자를 받고 어느 위치에서든 nil을 허용합니다. 호출 자체가 종료를 요청합니다. 기본 제공 스테이지는 그 프레임에서 다른 것이 실행되지 않도록 update 안에서 `return Exit(...)`를 씁니다. target은 "title", "play", "stage", "legacy" 중 하나이며, nil이나 다른 값은 "title"을 뜻합니다. target이 "stage"이면 name은 이동할 Modules/Stages 모듈이고, "legacy"이면 name은 "heya", "config", "exit", "onlinelounge" 중 하나입니다(다른 값은 타이틀로 갑니다). transition은 Modules/Transitions 모듈을 지정합니다. 생략했거나 엔진이 찾을 수 없으면 엔진은 "default"라는 이름의 모듈을 사용하고, 스킨에 트랜지션이 전혀 없으면 단순한 검은 페이드아웃이 재생됩니다. 스테이지와 트랜지션 이름은 호출한 쪽을 우선합니다. 스킨 스테이지는 그 이름의 스킨 모듈을, Global/Modules의 스테이지는 전역 모듈을 먼저 찾으며, 각각 다른 쪽으로 폴백합니다. "heya" 키는 별칭으로 남아 있습니다. Modules/Stages에 있는 스킨의 `myroom` 모듈을 열며, 스킨에 그 모듈이 없으면 타이틀로 갑니다.
+</div>
+
+| 메서드 | 설명 |
+| --- | --- |
+| `Exit(target?, name?, transition?)  -> number` | 지정한 목적지로 스테이지 종료를 요청합니다. 선택적으로 대상 모듈과 트랜지션 모듈을 지정할 수 있으며, 0을 반환합니다. |
+
+```lua
+function update(timestamp)
+    if INPUT:KeyboardPressed("S") then
+        return Exit("stage", "mystage")        -- Modules/Stages/mystage로 이동
+    end
+    if INPUT:Pressed("Cancel") then
+        return Exit("title", nil, "nokon_curtain")   -- 지정한 트랜지션을 거쳐 타이틀로 돌아가기
+    end
+end
+```
+
+### STAGES
+
+스테이지 네임스페이스를 위한 전역입니다. 스테이지는 네임스페이스를 선언하고, 어떤 모듈이든 네임스페이스의 스테이지 목록을 얻을 수 있습니다. 예를 들어 그 네임스페이스를 위해 만든 스테이지들의 메뉴를 만들 때 씁니다.
+
+<div class="callout warn">
+모든 모듈에 STAGES 전역으로 등록되지만, 네임스페이스를 가질 수 있는 것은 스테이지 스크립트뿐입니다. 다른 모듈에서 SetNamespace는 아무것도 하지 않고 false를 반환합니다. 스테이지는 한 번에 하나의 네임스페이스를 가지며, 나중의 호출이 이를 바꾸고 nil 또는 ""는 지웁니다. 호출은 Script.lua 맨 위, 함수 밖에서도 모든 콜백 안에서도 작동합니다. Script.lua의 맨 위는 스킨을 불러올 때 엔진이 스테이지를 만들면서 실행되므로, 스테이지는 어떤 onStart보다도 먼저 목록에 오릅니다. 엔진은 info를 읽지 않고 단순한 데이터로 보관합니다. 문자열, 숫자, 불리언과 그것들의 테이블(최대 8단계 중첩)이며, 함수와 엔진 객체는 빠집니다. ListNamespace는 스테이지 이름마다 하나의 항목을 반환하는데, 호출한 모듈에서 Exit("stage", name)이 열 스테이지입니다. 스킨 모듈은 그 이름의 스킨 스테이지를, 전역 모듈은 전역 스테이지를 받고 각각 반대쪽으로 대체하며, 그 스테이지가 네임스페이스를 선언했을 때만 목록에 오릅니다. 항목은 이름순이며 각 info는 새 사본입니다. 스킨의 스테이지가 모두 만들어지면 모든 스테이지가 존재하므로 목록은 onStart 이후에 얻으세요. Script.lua 맨 위에서는 호출자보다 먼저 만들어진 스테이지만 있습니다. 스킨의 커스텀 스테이지 메뉴가 보여 주는 CStage 네임스페이스는 [커스텀 스테이지](../modules/custom-stages.md)에서 설명합니다.
+</div>
+
+| 메서드 | 설명 |
+| --- | --- |
+| `STAGES:SetNamespace(namespace, info?)  -> boolean` | 호출한 스테이지의 네임스페이스를 선언하며, 선택적인 info 테이블은 목록을 얻는 스테이지에 돌려줍니다. 스테이지 스크립트 밖에서는 false입니다. |
+| `STAGES:SetResolution(width, height)  -> boolean` | 호출한 스테이지가 그리는 해상도를 선언합니다. 스킨의 해상도가 다르면 스테이지가 그리는 모든 것이 그 해상도의 스킨 전체처럼 비율을 유지한 채 가운데에 맞춰 스킨의 해상도로 크기가 조정됩니다. 마우스 좌표, `INPUT:GetSurfaceWidth/Height`, 클립도 따르며, 스테이지가 여는 스킨의 ROActivity는 스킨의 해상도를 유지합니다. 0이면 해제하며, Stage 스크립트 밖에서는 false입니다. |
+| `STAGES:ListNamespace(namespace)  -> table` | 네임스페이스의 스테이지를 1부터 시작하는 `{ name, isGlobal, info }` 테이블 배열로 반환합니다. 폴더 이름, Global/Modules/Stages의 스테이지이면 true, 그리고 선언된 info(주어지지 않았으면 빈 테이블)입니다. |
+
+```lua
+-- Modules/Stages/color_tool/Script.lua, at the top
+STAGES:SetNamespace("MyTools", { title = { en = "Colour picker", fr = "Pipette" } })
+STAGES:SetResolution(1920, 1080)
+
+-- another stage lists them
+function activate()
+    for _, s in ipairs(STAGES:ListNamespace("MyTools")) do
+        debugLog(s.name .. (s.isGlobal and " (global)" or ""))
+    end
+end
+```
+
+### LOADING
+
+코루틴으로 실행되는 콜백(모든 모듈 종류의 onStart, 그리고 스테이지의 activate)을 위한 로딩 바 헬퍼입니다.
+
+<div class="callout warn">
+모든 모듈에 LOADING 전역으로 정의됩니다. 이 콜백들은 엔진이 매 프레임 재개하는 엔진 소유 코루틴에서 실행됩니다. 한 번의 재개가 시간 예산을 다 쓰면 엔진이 자동으로 양보하며, coroutine.yield(progress)나 LOADING:Tick(sub)으로 직접 양보할 수도 있습니다. LOADING:Add로 등록한 블록은 콜백 본문이 반환된 뒤 순서대로 실행되고, 각 블록이 끝날 때마다 바가 전진합니다. 블록의 weight는 바에서 차지하는 비중입니다(기본값 1). LOADING:Tick(sub)은 블록 안에서 한 프레임 양보하고 그 블록 안의 0~1 진행률을 보고합니다. 코루틴이 아닌 콜백(액티비티나 ROActivity의 activate, 모든 update나 draw)에서는 양보할 대상이 없으므로 LOADING:Tick이 Lua 오류를 발생시키고, LOADING:Add로 큐에 넣은 블록은 실행되지 않습니다.
+</div>
+
+| 메서드 | 설명 |
+| --- | --- |
+| `LOADING:Add(fn)  -> nil` | 콜백이 반환된 뒤 실행할 로드 블록을 등록합니다. |
+| `LOADING:Add(label, fn)  -> nil` | 라벨이 있는 로드 블록을 등록합니다. |
+| `LOADING:Add(label, weight, fn)  -> nil` | 라벨과 명시적 weight가 있는 로드 블록을 등록합니다. |
+| `LOADING:Tick(sub)  -> nil` | 블록 안에서 한 프레임 양보하고 현재 블록 안의 0~1 하위 진행률을 보고합니다. |
+
+```lua
+function onStart()
+    LOADING:Add("textures", 3, function()
+        for i, name in ipairs(names) do
+            tx[name] = TEXTURE:CreateTexture(name)
+            LOADING:Tick(i / #names)
+        end
+    end)
+    LOADING:Add("sounds", 1, function()
+        bgm = SOUND:CreateBGM("Sounds/BGM.ogg")
+    end)
+end
+```
+
+## 액티비티
+
+### ACTIVITY
+
+로드된 액티비티를 이름으로 찾는 전역입니다.
+
+<div class="callout warn">
+ROActivity와 배경을 제외한 모든 모듈에 ACTIVITY 전역으로 등록됩니다. ROActivity와 배경에서는 nil이며, 그 모듈들은 ROACTIVITY를 사용합니다. 엔진은 액티비티를 Modules/Activities/{name}에서 로드합니다. ACTIVITY는 ROACTIVITY:GetROActivity와 같은 동작을 하는 GetROActivity도 노출합니다. 조회는 호출한 쪽을 우선합니다. 스킨 모듈은 그 이름의 스킨 액티비티를, Global/Modules의 모듈은 Global/Modules/Activities의 것을 받으며, 자기 쪽에 없으면 각각 다른 쪽으로 폴백합니다. Lib 파일은 자신을 require한 모듈의 쪽에서 조회합니다.
+</div>
+
+| 메서드 | 설명 |
+| --- | --- |
+| `ACTIVITY:GetActivity(name)  -> activity handle` | 지정한 폴더 이름의 로드된 액티비티 핸들을 반환하며, 로드된 것이 없으면 nil을 반환합니다. |
+| `ACTIVITY:GetROActivity(name)  -> activity handle` | ROACTIVITY:GetROActivity와 같습니다. |
+
+### ROACTIVITY
+
+로드된 읽기 전용 액티비티(ROActivity)를 이름으로 찾는 전역입니다.
+
+<div class="callout warn">
+모든 모듈에 ROACTIVITY 전역으로 등록됩니다. 엔진은 ROActivity를 Modules/ROActivities/{name}에서 로드하고 읽기 전용 CONFIG, DATABASE, GetSaveFile 전역을 주므로, 그 스크립트는 게임 상태를 바꿀 수 없습니다(모듈의 동작 방식의 읽기 전용 모듈 절 참고). 액티비티와 ROActivity는 이름을 키로 하는 싱글턴입니다. 폴더마다 인스턴스 하나가 있고 모든 호스트가 이를 공유합니다. GetROActivity는 ACTIVITY:GetActivity와 마찬가지로 Modules/ROActivities와 Global/Modules/ROActivities 사이에서 호출한 쪽을 우선합니다.
+</div>
+
+| 메서드 | 설명 |
+| --- | --- |
+| `ROACTIVITY:GetROActivity(name)  -> activity handle` | 지정한 폴더 이름의 로드된 ROActivity 핸들을 반환하며, 로드된 것이 없으면 nil을 반환합니다. |
+
+### 액티비티 핸들
+
+ACTIVITY:GetActivity와 ROACTIVITY:GetROActivity가 반환하는 객체입니다. 호스트는 이것으로 모듈의 콜백을 구동합니다.
+
+<div class="callout warn">
+Activate, Deactivate, Draw는 인자를 모듈의 activate, deactivate, draw 콜백에 전달합니다. Update는 현재 게임 시간(밀리초)으로 update를 호출합니다. 각각은 콜백이 반환한 값을 0부터 시작하는 배열로 반환하며, 콜백이 아무것도 반환하지 않았거나 정의되지 않았으면 nil을 반환합니다. 첫 값은 `result[0]`으로 읽습니다. Call은 모듈 스크립트가 정의한 임의의 전역 함수를 호출합니다.
+</div>
+
+| 메서드 | 설명 |
+| --- | --- |
+| `handle.IsActive  -> boolean` | Activate가 실행된 뒤부터 Deactivate(또는 모듈 자신의 DEACTIVATE())가 실행될 때까지 true입니다. |
+| `handle:Activate(...)  -> array` | 지정한 인자로 모듈의 activate 콜백을 호출합니다. |
+| `handle:Deactivate(...)  -> array` | 지정한 인자로 모듈의 deactivate 콜백을 호출합니다. |
+| `handle:Update()  -> array` | 현재 게임 시간(밀리초)으로 모듈의 update 콜백을 호출합니다. |
+| `handle:Draw(...)  -> array` | 지정한 인자로 모듈의 draw 콜백을 호출합니다. |
+| `handle:Call(functionName, ...)  -> array` | 지정한 인자로 모듈 스크립트의 이름이 지정된 전역 함수를 호출합니다. |
+
+```lua
+local act = nil
+
+function activate()
+    if act == nil then act = ACTIVITY:GetActivity("song_select_core") end
+    act:Activate()
+end
+
+function update(timestamp)
+    local result = act:Update()
+    local signal = result ~= nil and result[0] or nil
+    if signal == "play" then return Exit("play", nil) end
+    if signal == "cancel" then return Exit("title", nil) end
+end
+
+function draw()
+    act:Draw()
+end
+
+function deactivate()
+    act:Deactivate()
+end
+```
+
+### DEACTIVATE
+
+엔진이 액티비티와 ROActivity 스크립트 안에 등록하는 함수입니다. 모듈이 스스로를 비활성화할 수 있게 합니다.
+
+<div class="callout warn">
+호출하면 모듈을 비활성으로 표시하고(handle.IsActive가 false가 됨) 모듈 자신의 deactivate 콜백을 실행합니다. 기본 제공 대화 상자는 플레이어가 확인하거나 취소할 때 이를 호출하며, 호스트는 IsActive를 지켜보고 대화 상자가 닫혔음을 압니다.
+</div>
+
+| 메서드 | 설명 |
+| --- | --- |
+| `DEACTIVATE(...)` | 현재 모듈을 비활성화하고 지정한 인자로 그 deactivate 콜백을 호출합니다. |
+
+### 엔진이 호스팅하는 ROActivity
+
+엔진은 일부 ROActivity를 정해진 폴더 이름으로 찾아 직접 구동합니다. 스킨은 그 이름의 Modules/ROActivities 폴더를 제공해 이를 교체합니다. 정의해야 하는 콜백은 아래에 나열된 엔진 호출 지점이 정합니다. 하나가 없으면 엔진은 해당 기능을 그리지 않습니다.
+
+| 이름 | 엔진이 호출하는 것 |
+| --- | --- |
+| `nameplate` | 플레이어의 플레이트가 바뀔 때 `activate(player, name, title, dan, data)`; 프레임마다 한 번 `update()`; `draw(mode, ...)`에서 mode 0 = 전체 플레이트 `(x, y, opacity, player, side)`, 1 = 단위 플레이트 `(x, y, opacity, danGrade, textTexture)`, 2 = 칭호 플레이트 `(x, y, opacity, type, textTexture, rarity, nameplateId)`. |
+| `modal` | 큐에 있는 각 잠금 해제 모달에 대해 `activate(player, rarity, modalType, ...)`, 그다음 매 프레임 `update()`와 `draw()`. 스크립트는 DEACTIVATE()를 호출해 모달을 닫고, 엔진은 그다음 것을 활성화합니다. |
+| `modicons` | 한 번 `activate()`, 그다음 layout이 "menu" 또는 "game"인 `draw(x, y, player, layout, alpha)`. MODICONS 전역이 이를 감쌉니다. |
+| `danplate` | 결과 화면과 단위 코스에서 `draw(x, y, opacity, danTick, r, g, b, titleText)`. |
+| `results_tower` | 타워 결과 화면이 열릴 때 플레이를 LuaResultInfo(`ReachedFloor`, `TotalFloors`, `Lives`, `TowerRank`, `IsNewBestFloor`, `GetScore(player)` 같은 읽기 전용 getter)로 넘겨 `activate(info)`; 매 프레임 `update()`와 `draw()`; 결정 시 Call로 `skip()`, 아직 애니메이션 중이면 true를 반환(그 결정은 건너뛰기만 함); `deactivate()`. |
+| `results_regular` | 플레이 결과(AI 배틀 포함)가 열릴 때 플레이를 LuaResultInfo(0부터 시작하는 플레이어별 getter `GetGauge(p)`, `GetClearType(p)`, `GetScoreRank(p)`, `GetScore(p)`, 그리고 `IsAIBattle`, `GetAISectionEnd(i)`)로 넘겨 `activate(info)`; 매 프레임 결과 배경 위에 `update()`와 `draw()`; 결정 시 Call로 `skip()`, 아직 애니메이션 중이면 true를 반환(배경에는 `skipAnime`이 전달됨); `deactivate()`. |
+| `results_dan` | 단위 플레이 결과가 열릴 때 플레이를 LuaResultInfo(`DanResult`, `DanCombo`, `GetDanSong(i)`, `GetExam(i)`, `exam:GetSong(i)`, `exam.PreviousBestAmount`, `DanGradeChange`, `DanGrade`)로 넘겨 `activate(info)`; 매 프레임 단위 결과 배경 위에 `update()`와 `draw()`; 결정 시 Call로 `skip()`, 아직 애니메이션 중이면 true를 반환; 이어서 결정 시 Call로 `advance()`, 보상 팝업 전에 화면을 하나 더 보여 줄 때 true를 반환(새 단위나 오른 단위는 엔진이 이미 네임플레이트에 반영했으므로, 모듈은 공개할 때까지 `PreviousNameplateDan`을 그림); 왼쪽 또는 오른쪽에서 Call로 `swap()`, 화면을 전환하면 true를 반환; `deactivate()`. |
+| `tower_hud` | 타워 플레이 시작 시 `activate(maxFloor)`; 매 프레임 상단 배경 위에 `update()`와 `draw()`; `deactivate()`. 층과 라이프는 PLAYSTATE에서 읽습니다. |
+| `popup_menu` | `activate(title, items, fontSize, ...)`. items는 줄바꿈으로 이어진 라벨이고, 그 뒤에 PopupMenu 스킨 위치가 옵니다. 매 프레임 `draw(selected)`; 닫힐 때 `deactivate()`. |
+| `config_ui` | 설정 모델과 함께 `activate(model)`; 매 프레임 `update()`를 호출하며 "exit"를 반환하면 설정 화면을 떠남, 그 뒤에 Modules/Transitions 모듈 이름을 반환하면 돌아갈 때 그 트랜지션을 사용(스킨·해상도·사운드 장치 변경이 적용 대기 중이면 기본 페이드); `draw()`; 엔진이 모델을 다시 만들 때 Call을 통한 `reload(model)`; `deactivate()`. |
+| `song_enum` | `activate()`, 그다음 곡 스캔이 실행되는 동안 매 프레임 `draw(isCommandSongDataGet, done, total)`; `deactivate()`. |
+| `cutscene` | `activate(paths, fadeOutSeconds)`: 동영상 파일을 순서대로, 이어서 마지막 동영상 뒤의 검은 페이드 초(0이면 없음); 매 프레임 `update()`를 호출하며 모든 동영상이 재생되고 페이드가 끝나면 "finished"를 반환; `draw()`; `deactivate()`. 각 파일을 자체 오디오 트랙과 함께 재생하고 일시정지 팝업도 담당합니다. 컷신의 용도는 호출하는 쪽이 정합니다. |
+
+세 results ROActivity는 결과 화면의 음악을 직접 재생합니다. 보상 팝업이 표시되는 동안 엔진은 Call로 `setMusicLevel(percent)`(0에서 100)를 호출해 음악을 줄입니다. 화면이 검게 페이드아웃되면 엔진이 모듈을 비활성화하고, 음악도 함께 멈춥니다.
+
+### 결과 정보
+
+결과 스테이지가 results_tower, results_regular, results_dan의 activate 콜백에 넘기는 LuaResultInfo 객체입니다.
+
+<div class="callout warn">
+결과 스테이지는 플레이가 저장된 뒤 이를 채우며, 그 후에는 바뀌지 않습니다. 모든 멤버는 읽기 전용입니다. 속성은 점 구문(`info.Title`), 메서드는 콜론 구문을 사용합니다. 플레이어 인수는 0부터 시작하며, 범위를 벗어나면 메서드는 0, false 또는 빈 문자열을 반환합니다. 모듈 이름이 붙은 멤버는 그 화면에서만 채워지고, 다른 화면에서는 그 기본값을 유지합니다.
+</div>
+
+| 메서드 | 설명 |
+| --- | --- |
+| `info.Title  -> string` | 채보의 제목. |
+| `info.Subtitle  -> string` | 채보의 부제. |
+| `info.PlayerCount  -> number` | 플레이어 수(타워와 단위 결과에서는 1). |
+| `info.PlayerSide  -> number` | 플레이어 1의 네임플레이트 쪽: 파란 쪽에서 플레이하면 1, 아니면 0. |
+| `info:GetGoodCount(player)  -> number` | Good 판정 수. |
+| `info:GetOkCount(player)  -> number` | Ok 판정 수. |
+| `info:GetBadCount(player)  -> number` | Bad 판정 수. |
+| `info:GetRollCount(player)  -> number` | 연타 수. |
+| `info:GetMaxCombo(player)  -> number` | 최대 콤보. |
+| `info:GetADLibCount(player)  -> number` | 친 AD-LIB 노트 수. |
+| `info:GetBoomCount(player)  -> number` | 친 폭탄 수. |
+| `info:GetScore(player)  -> number` | 최종 점수. |
+| `info:GetPreviousBestScore(player)  -> number` | 이 플레이가 저장되기 전, 이 채보와 난이도에서의 플레이어 최고 점수. 없으면 0. |
+| `info:IsSaved(player)  -> boolean` | 플레이가 플레이어의 세이브에 기록되면 true(오토, 시청한 리플레이, 미지의 탑처럼 실행 중에 만든 단위는 기록되지 않음). |
+| `info:GetDifficulty(player)  -> number` | results_regular: 플레이한 난이도, 0 쉬움부터 4 뒷귀신. |
+| `info:GetGauge(player)  -> number` | results_regular: 플레이가 끝날 때의 혼 게이지, 0에서 100. |
+| `info:GetGaugeType(player)  -> number` | results_regular: 0 노멀, 1 하드, 2 익스트림. |
+| `info:GetNorma(player)  -> number` | results_regular: 노멀 게이지가 클리어되는 게이지 값. |
+| `info:GetKillZone(player)  -> number` | results_regular: 익스트림 게이지의 킬 존, 0에서 100(다른 게이지에서는 0). |
+| `info:GetClearType(player)  -> number` | results_regular: 0 미클리어, 1 어시스트 클리어, 2 클리어, 3 풀 콤보, 4 퍼펙트. |
+| `info:GetScoreRank(player)  -> number` | results_regular: 0 없음, 그다음 1부터 7까지의 점수 랭크. |
+| `info:IsCleared(player)  -> boolean` | results_regular: 클리어하면 true. AI 배틀에서는 플레이어 1이 이겼을 때. |
+| `info:GetSpeechText(player, mood)  -> string` | results_regular: 플레이어 캐릭터의 기분별 결과 대사, 0(최악)에서 5(퍼펙트). |
+| `info.IsAIBattle  -> boolean` | results_regular: AI 배틀이면 true. |
+| `info.AISectionCount  -> number` | results_regular: AI 배틀의 구간 수. |
+| `info:GetAISectionEnd(section)  -> number` | results_regular: 구간(0부터)이 끝난 방식: 0 끝까지 플레이하지 않음, 1 승리, 2 패배. |
+| `info.TowerType  -> string` | results_tower: 채보의 TOWERTYPE, 지정이 없으면 "". |
+| `info.TowerSide  -> number` | results_tower: 0 Sweet, 1 Spicy. |
+| `info.ReachedFloor  -> number` | results_tower: 도달한 층. |
+| `info.TotalFloors  -> number` | results_tower: 타워의 층수. |
+| `info.Lives  -> number` | results_tower: 남은 라이프. |
+| `info.MaxLives  -> number` | results_tower: 시작할 때의 라이프. |
+| `info.TowerRank  -> number` | results_tower: 0 없음, 그다음 1부터 7: 10, 25, 50, 75 %, 클리어, 풀 콤보, 퍼펙트. |
+| `info.PreviousBestFloor  -> number` | results_tower: 이 플레이가 저장되기 전의 최고 층. |
+| `info.IsNewBestFloor  -> boolean` | results_tower: 저장된 플레이가 최고 층을 넘으면 true. |
+| `info.IsNewBestScore  -> boolean` | results_tower: 저장된 플레이가 최고 점수를 넘으면 true. |
+| `info.IsTired  -> boolean` | results_tower: 타워 캐릭터가 지친 상태(라이프가 얼마 남지 않음)로 플레이가 끝나면 true. |
+| `info.Bpm  -> number` | results_tower: 플레이가 끝날 때의 BPM. |
+| `info.DanTick  -> number` | results_dan: 단위 플레이트의 눈금(DANTICK). |
+| `info.DanTickColor  -> color` | results_dan: 눈금 색(DANTICKCOLOR). |
+| `info.DanResult  -> number` | results_dan: 0 불합격, 1 합격(빨강), 2 합격(금). |
+| `info.DanCombo  -> number` | results_dan: 0, 1 Bad 없음(풀 콤보), 2 Bad와 Ok 없음(퍼펙트). |
+| `info.TotalHits  -> number` | results_dan: Good, Ok, 연타를 합친 수. |
+| `info.DanSongCount  -> number` | results_dan: 단위의 곡 수. |
+| `info.DanSongReached  -> number` | results_dan: 플레이가 끝난 곡, 0부터. |
+| `info.DanExamSong  -> number` | results_dan: 곡별 시험이 마지막으로 표시된 곡, 0부터. |
+| `info:GetDanSong(song)  -> dan song` | results_dan: 단위의 i번째 곡(0부터), 없으면 nil. |
+| `info.ExamCount  -> number` | results_dan: 단위의 시험 수. |
+| `info:GetExam(exam)  -> dan exam` | results_dan: i번째 시험(0부터, 채보 순서), 없으면 nil. |
+| `info.DanGradeChange  -> number` | results_dan: 0 변화 없음, 1 새 단위, 2 이미 합격한 단위의 더 나은 등급(금, 또는 더 나은 클리어). 엔진이 새 등급이나 더 나은 등급을 플레이어의 네임플레이트에 반영합니다. |
+| `info.DanGrade  -> dan grade` | results_dan: 이 플레이 후 세이브에 기록된 이 단위의 등급. 합격한 적이 없으면 Title은 "". |
+| `info.PreviousNameplateDan  -> dan grade` | results_dan: 이 플레이 전에 네임플레이트에 표시되던 단위 등급(없으면 Title은 ""). |
+
+### 단위 곡
+
+info:GetDanSong이 반환하는 읽기 전용 객체입니다.
+
+| 메서드 | 설명 |
+| --- | --- |
+| `song.Title  -> string` | 곡의 제목. 채보가 숨긴 곡은 "???". |
+| `song.Subtitle  -> string` | 곡의 부제. 채보가 숨긴 곡은 "". |
+| `song.Difficulty  -> number` | 0 쉬움부터 4 뒷귀신. |
+| `song.Level  -> number` | 곡의 레벨. |
+| `song.Good  -> number` | 그 곡의 Good 판정 수. |
+| `song.Ok  -> number` | 그 곡의 Ok 판정 수. |
+| `song.Bad  -> number` | 그 곡의 Bad 판정 수. |
+| `song.Roll  -> number` | 그 곡의 연타 수. |
+
+### 단위 시험
+
+info:GetExam과 exam:GetSong이 반환하는 읽기 전용 객체로, 플레이가 끝난 시점의 시험입니다.
+
+| 메서드 | 설명 |
+| --- | --- |
+| `exam.Type  -> number` | 0 게이지, 1 Good, 2 Ok, 3 Bad, 4 점수, 5 연타, 6 타격 수, 7 콤보, 8 정확도, 9 AD-LIB, 10 BOOM. 이름은 LANG:GetExamName(type)으로 얻습니다. |
+| `exam.Range  -> number` | 0 Value 이상, 1 Value 미만. |
+| `exam.Value  -> number` | 합격(빨강) 값. |
+| `exam.Amount  -> number` | 표시되는 값. "미만" 시험에서는 불합격까지 남은 양. |
+| `exam.PreviousBestAmount  -> number` | 이 플레이가 저장되기 전, 이 시험에서의 플레이어 최고 Amount, 같은 기준(클수록 좋음). 없으면 -1. 곡별 시험에서는 각 곡(exam:GetSong)이 각자의 값을 가집니다. |
+| `exam.Percent  -> number` | Value 대비 Amount, 0에서 100. |
+| `exam.Status  -> number` | 0 불합격, 1 합격, 2 금합격. |
+| `exam.IsPerSong  -> boolean` | 곡마다 판정되는 시험이면 true. 이때 이 시험 자체는 마지막 곡의 것입니다. |
+| `exam:GetSong(song)  -> dan exam` | 곡별 시험의 i번째 곡(0부터) 것, 없으면 nil. |
+
+### 단위 등급
+
+info.DanGrade와 info.PreviousNameplateDan이 반환하는 객체(읽기 전용).
+
+| 메서드 | 설명 |
+| --- | --- |
+| `grade.Title  -> string` | 네임플레이트에 표시되는 단위 이름(채보 제목의 처음 최대 네 글자). 없으면 "". |
+| `grade.Gold  -> boolean` | 금 합격이면 true. |
+| `grade.Tier  -> number` | 0 클리어, 1 풀 콤보, 2 퍼펙트. |
+
+## 배경
+
+### 배경 모듈
+
+화면 배경, 게임플레이 레이어, 몹, 클리어 애니메이션, 쿠스다마 효과 중 하나를 그리는 Script.lua로, 엔진 자체 화면이 호스팅합니다.
+
+<div class="callout warn">
+배경은 Modules 폴더 밖, 스킨의 Graphics 폴더 아래 꾸미는 화면의 디렉터리에 있습니다. 예를 들어 Graphics/0_Startup/Script.lua, Graphics/6_Result/Script.lua, Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua, Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua, Graphics/5_Game/3_Mob/{variant}/Script.lua, Graphics/5_Game/9_End/{result}/Script.lua, Graphics/5_Game/11_Balloon/Kusudama/Script.lua입니다. 폴더에 여러 변형이 있으면 엔진이 플레이마다 하나를 무작위로(또는 채보의 장면 프리셋에서) 고릅니다. 호스트 화면이 배경 인스턴스를 생성하고(게임플레이 배경은 엔진이 게임 화면에 들어갈 때마다) 화면과 함께 해제하므로, 게임플레이 중에는 여러 개가 동시에 살아 있습니다. 배경 스크립트는 ROActivity와 같은 전역(읽기 전용 CONFIG, DATABASE, GetSaveFile; ACTIVITY 없음)을 받습니다. 아래 이벤트 훅은 선택 사항이며, 엔진은 각 훅을 해당 이벤트가 일어날 때 한 번 호출합니다. 타워에서는 채보의 `TOWERTYPE`이 Down 폴더를 지정합니다.
+</div>
+
+| 메서드 | 설명 |
+| --- | --- |
+| `clearIn(player)` | 게임플레이 Up 및 Down 배경: 플레이어의 게이지가 클리어 구간에 도달했습니다. |
+| `clearOut(player)` | 게임플레이 Up 및 Down 배경: 플레이어의 게이지가 클리어 구간에서 벗어났습니다. |
+| `playEndAnime(player)` | 클리어 애니메이션(Graphics/5_Game/9_End): 플레이어의 종료 애니메이션이 시작됩니다. |
+| `kusuIn()` / `kusuBroke()` / `kusuMiss()` | 쿠스다마: 풍선이 나타남, 플레이어가 터뜨림, 플레이어가 놓침. |
+| `skipAnime()` | 결과 배경: 플레이어가 결과 애니메이션을 건너뛰었습니다. |
+
+### 배경 state
+
+호스트가 배경의 activate, update, draw에 전달하는 객체입니다.
+
+<div class="callout warn">
+호스트마다 인스턴스 하나가 있으며 호스트가 매 프레임 제자리에서 갱신합니다. 배열 필드는 엔진의 플레이어별 배열을 공유하며 0부터 시작합니다(`state.gauge[0]`이 플레이어 1). 게임플레이 필드는 게임플레이 호스트만 갱신합니다. 다른 호스트는 기본값으로 두며, 게임플레이 밖에서는 timeStamp가 -1로 유지됩니다. state에는 프레임 타이밍이 없으므로 fps 전역을 읽으십시오.
+</div>
+
+| 메서드 | 설명 |
+| --- | --- |
+| `state.playerCount  -> number` | 플레이어 수. |
+| `state.p1IsBlue  -> boolean` | 플레이어 1이 파란 쪽을 사용하면 true. |
+| `state.lang  -> string` | 현재 언어 코드. |
+| `state.simplemode  -> boolean` | 심플 모드가 켜져 있으면 true. |
+| `state.puchicharaRarities  -> string[]` | 각 플레이어 푸치캬라의 희귀도. |
+| `state.characterRarities  -> string[]` | 각 플레이어 캐릭터의 희귀도. |
+| `state.isClear  -> boolean[]` | 각 플레이어가 현재 클리어 구간에 있는지 여부. 노멀 게이지의 단위에서는 첫 히트에서 true가 되고, 플레이가 실패하거나 시험이 불합격하면 false가 된다. |
+| `state.gauge  -> number[]` | 각 플레이어의 게이지 값. |
+| `state.bpm  -> number[]` | 각 플레이어의 현재 BPM. |
+| `state.gogo  -> boolean[]` | 각 플레이어가 고고타임인지 여부. |
+| `state.towerNightNum  -> number` | 타워의 낮에서 밤으로의 계수, 0에서 1. |
+| `state.towerFloor  -> number` | 플레이 중인 층, 0부터 (타워 플레이). |
+| `state.towerMaxFloor  -> number` | 채보의 층 수 (타워 플레이). |
+| `state.battleState  -> number` | AI 배틀 상태 코드. |
+| `state.battleWin  -> boolean` | 플레이어가 AI 배틀에서 이기고 있으면 true. |
+| `state.timeStamp  -> number` | 채보에 동기화된 시간(초). 게임플레이 밖에서는 -1. |
+| `state.paused  -> boolean` | 게임플레이가 일시정지된 동안 true. |
+| `state.player  -> number` | 플레이어별 호스트(클리어 애니메이션)가 그리고 있는 플레이어. |
+| `state.hitRing  -> number` | hitNote, hitBig, hitJudge에 보관되는 최근 히트 수(32). |
+| `state.hitCount  -> number[]` | 배경이 시작된 이후 각 플레이어의 히트 수: 판정된 노트(미스 포함), 연타 히트, 터뜨린 풍선. 0부터 센 n번째 히트는 hitNote, hitBig, hitJudge의 인덱스 n % hitRing에 있습니다. |
+| `state.hitNote  -> string[][]` | 보관된 각 히트의 노트, 플레이어별: "don", "ka" 또는 "kadon". |
+| `state.hitBig  -> boolean[][]` | 보관된 히트가 큰 노트였으면 true, 플레이어별. |
+| `state.hitJudge  -> string[][]` | 보관된 각 히트의 판정, 플레이어별: "perfect", "great", "good", "poor", "miss", "roll" 또는 "balloon". |
+| `state.landCount  -> number[]` | 배경이 시작된 이후 비행의 끝에 도달한 각 플레이어의 날아가는 노트 수. |
+| `state:SetFlyTarget(player, x, y)` | 이 게임플레이 배경이 표시되는 동안 플레이어의 날아가는 노트가 화면 픽셀 단위의 (x, y)에 착지하며, 스킨의 착지 효과는 생략됩니다. |
+| `state:ClearFlyTarget(player)` | 플레이어의 날아가는 노트가 다시 스킨의 평소 위치에 착지합니다. |
+
+## 트랜지션
+
+### 트랜지션 모듈
+
+두 스테이지 사이의 페이드아웃, 로딩, 페이드인 단계를 그리는 Modules/Transitions/{name}/Script.lua입니다.
+
+<div class="callout warn">
+Exit의 세 번째 인자가 트랜지션을 선택합니다. 호출에서 이름을 지정하지 않았거나 엔진이 그 이름을 찾을 수 없으면 엔진은 "default"를 사용합니다. Exit("play") 뒤의 게임플레이 로드는 항상 "song_loading"이라는 이름의 트랜지션을 사용하며, 스킨에 없으면 "default"를 사용합니다. 엔진은 단계를 순서대로 구동합니다. t가 1에 도달할 때까지 나가는 스테이지 위에서 매 프레임 fadeOut(t)를 호출하고, 그다음 나가는 스테이지를 언마운트하고 새 스테이지를 로드하는 동안 매 프레임 loading(progress, elapsed)를 호출하며, 그다음 t가 1에 도달할 때까지 새 스테이지 위에서 fadeIn(t)를 호출합니다. 각 페이드는 스크립트가 FADE_OUT_SECONDS나 FADE_IN_SECONDS를 설정하지 않는 한 0.5초 동안 지속됩니다. 양수가 아닌 값은 엔진이 무시합니다. 스테이지 전환에서 엔진은 로드가 0.5초보다 오래 걸린 뒤에만 loading을 호출합니다. 그 전에는 fadeOut(1)을 호출해 짧은 로드에서 로딩 화면이 깜빡이지 않게 합니다. 곡 로딩 경로는 로딩 단계를 즉시 보여 줍니다. 로드나 페이드인 동안 새 스테이지가 시작한 BGM은 기다렸다가 페이드인이 끝나면 재생됩니다(게임플레이로 가는 로드는 제외). 트랜지션 자신의 사운드는 바로 재생됩니다. 페이드인 동안 새 스테이지는 입력을 받지 않습니다. 단, 페이드인이 게임플레이를 보여 주는 경우는 예외입니다. 플레이어가 게임플레이 로딩을 취소하면 엔진은 곡 선택으로 돌아가 fadeIn(t)로 그 화면을 보여 줍니다. 따라서 모든 트랜지션은 fadeIn(1) 호출로 끝납니다.
+</div>
+
+| 메서드 | 설명 |
+| --- | --- |
+| `FADE_OUT_SECONDS  -> number` | 선택적 최상위 전역: 페이드아웃 길이(초). |
+| `FADE_IN_SECONDS  -> number` | 선택적 최상위 전역: 페이드인 길이(초). |
+
+```lua
+FADE_OUT_SECONDS = 0.3
+FADE_IN_SECONDS = 0.3
+
+local pixel = nil
+
+local function cover(alpha)
+    pixel:SetColor(0, 0, 0)
+    pixel:SetOpacity(alpha)
+    pixel:SetScale(8000, 8000)
+    pixel:Draw(0, 0)
+end
+
+function onStart()
+    pixel = TEXTURE:CreateTexture("pixel.png")
+end
+
+function fadeOut(t) cover(t) end
+function fadeIn(t) cover(1.0 - t) end
+function loading(progress, elapsed) cover(1.0) end
+
+function onDestroy()
+    if pixel ~= nil then pixel:Dispose() end
+end
+```
+
+## 타이밍과 카메라
+
+### COUNTER
+
+시간에 따라 값을 시작값에서 끝값으로 움직이는 애니메이션 카운터의 팩토리입니다.
+
+<div class="callout warn">
+COUNTER 전역으로 등록됩니다. 카운터는 Tick을 호출할 때만 프레임 델타를 interval로 나눈 만큼 전진합니다. interval은 값 1단위당 초입니다. interval의 부호는 방향과 일치해야 합니다. end가 begin보다 크면 양수, 작으면 음수입니다. 부호가 맞지 않으면 카운터는 양 끝을 맞바꾸고 첫 tick에서 끝납니다. CreateCounterDuration은 전체 지속 시간을 받고 부호를 스스로 정합니다. interval이 0이거나 begin과 end가 같으면 카운터는 첫 tick에서 끝납니다. 카운터는 값이 끝에 도달할 때, 그리고 루프나 바운스 중에는 완료된 사이클마다 한 번 선택적 ended 함수를 호출합니다.
+</div>
+
+| 메서드 | 설명 |
+| --- | --- |
+| `COUNTER:CreateCounter(begin, end, interval, ended?)  -> counter` | 1단위당 interval초로 begin에서 end로 움직이며 완료 시 ended를 호출하는 카운터를 만듭니다. |
+| `COUNTER:CreateCounterDuration(begin, end, seconds, ended?)  -> counter` | 지정한 초 동안 begin에서 end로 움직이는 카운터를 만듭니다. seconds가 양수가 아니거나 begin과 end가 같으면 빈 카운터를 반환합니다. |
+| `COUNTER:EmptyCounter()  -> counter` | 값이 0에 머무는 비활성 카운터를 만듭니다. 자리 표시자로 쓸 수 있습니다. |
+
+### 카운터 핸들
+
+COUNTER가 만든 카운터입니다.
+
+<div class="callout warn">
+매 프레임 Value를 읽고 매 프레임 Tick을 호출해 전진시키십시오. 시작하지 않았거나 멈춘 카운터는 Tick을 무시합니다. Begin, End, Interval은 읽고 쓸 수 있는 필드입니다. SetLoop과 SetBounce는 서로 배타적입니다. SetEasing은 보고되는 Value의 형태만 바꾸며, 카운터는 내부적으로 여전히 선형으로 전진합니다. 리스너는 마지막 tick을 포함한 모든 tick에서 현재 값을 받습니다.
+</div>
+
+| 메서드 | 설명 |
+| --- | --- |
+| `counter.Value  -> number` | 현재 값. 이징이 설정되어 있으면 적용된 값이며, 대입하면 카운터가 그 값으로 점프합니다. |
+| `counter.Begin  -> number` | 시작값(읽기/쓰기 가능). |
+| `counter.End  -> number` | 끝값(읽기/쓰기 가능). |
+| `counter.Interval  -> number` | 값 1단위당 초(읽기/쓰기 가능). |
+| `counter:Start()  -> nil` | 값을 Begin으로 재설정하고 tick을 시작합니다. |
+| `counter:Resume()  -> nil` | 값을 재설정하지 않고 tick을 시작합니다. |
+| `counter:Stop()  -> nil` | tick을 멈춥니다. |
+| `counter:Pause()  -> nil` | Stop과 같습니다. |
+| `counter:Reset()  -> nil` | tick 여부를 바꾸지 않고 값을 Begin으로 되돌립니다. |
+| `counter:Tick()  -> nil` | 값을 한 프레임만큼 전진시키고, 필요에 따라 리스너와 ended 함수를 호출합니다. |
+| `counter:SetLoop(loop)  -> nil` | 값이 끝에 도달하면 Begin으로 되돌아갑니다. 바운스를 끕니다. |
+| `counter:SetBounce(bounce)  -> nil` | 값이 어느 끝에든 도달하면 방향을 뒤집습니다. 루프를 끕니다. |
+| `counter:GetLoop()  -> boolean` | 루프가 켜져 있는지 여부. |
+| `counter:GetBounce()  -> boolean` | 바운스가 켜져 있는지 여부. |
+| `counter:SetEasing(type, function)  -> nil` | 보고되는 값에 이징 곡선을 적용합니다. type은 IN, OUT, INOUT, OUTIN이고 function은 LINEAR, SINE, QUAD, CUBIC, QUART, QUINT, EXPO, CIRC, ELASTIC, BACK, BOUNCE입니다(대소문자 구분 없음. 알 수 없는 이름은 카운터가 무시함). |
+| `counter:ClearEasing()  -> nil` | 이징을 제거합니다. |
+| `counter:Listen(listener)  -> nil` | 각 tick에서 현재 값과 함께 호출되는 함수를 등록합니다. |
+| `counter:ClearListeners()  -> nil` | 모든 리스너를 제거합니다. |
+
+```lua
+local fade = nil
+
+function activate()
+    fade = COUNTER:CreateCounterDuration(0, 1, 0.5, function() debugLog("fade done") end)
+    fade:SetEasing("OUT", "QUAD")
+    fade:Start()
+end
+
+function update(timestamp)
+    fade:Tick()
+end
+
+function draw()
+    background:SetOpacity(fade.Value)
+    background:Draw(0, 0)
+end
+```
+
+### GLOBALCAMERA
+
+화면 전체 2D 카메라입니다. 렌더링된 프레임 전체를 이동, 확대/축소, 회전하고 감쇠하는 화면 흔들림을 더합니다.
+
+<div class="callout warn">
+GLOBALCAMERA 전역으로 등록됩니다. TJA #CAMERA 명령과 같은 화면 변환을 구동하며, 블릿된 3D 씬을 포함해 그려지는 모든 것에 영향을 줍니다. 오프셋은 1280x720 기준 픽셀, 회전은 도 단위이며, zoom 1은 확대/축소 없음을 뜻합니다. 기본 변환은 직접 바꿀 때까지 유지됩니다. 매 프레임 Update(dt)를 호출해 적용하고 흔들림을 전진시키며, 스테이지를 떠날 때 Reset()을 호출해 다음 스테이지로 넘어가지 않게 하십시오. 3D 씬 자체의 카메라는 씬 객체에 설정합니다.
+</div>
+
+| 메서드 | 설명 |
+| --- | --- |
+| `GLOBALCAMERA:SetOffset(x, y)  -> nil` | 화면을 (x, y) 픽셀만큼 이동합니다. |
+| `GLOBALCAMERA:SetZoom(sx, sy)  -> nil` | X와 Y 계수를 따로 두어 화면을 확대/축소합니다. |
+| `GLOBALCAMERA:SetUniformZoom(s)  -> nil` | 화면을 균일하게 확대/축소합니다. |
+| `GLOBALCAMERA:SetRotation(deg)  -> nil` | 화면을 중심을 기준으로 회전합니다. |
+| `GLOBALCAMERA:GetOffsetX()  -> number` | 기본 X 오프셋. |
+| `GLOBALCAMERA:GetOffsetY()  -> number` | 기본 Y 오프셋. |
+| `GLOBALCAMERA:GetZoomX()  -> number` | X 확대/축소 계수. |
+| `GLOBALCAMERA:GetZoomY()  -> number` | Y 확대/축소 계수. |
+| `GLOBALCAMERA:GetRotation()  -> number` | 기본 회전(도). |
+| `GLOBALCAMERA:Shake(amplitudePx, seconds, rotAmpDeg?)  -> nil` | 지정한 픽셀 진폭에서 지정한 초 동안 선형으로 감쇠하는 흔들림을 시작하며, 선택적으로 도 단위의 회전 흔들림을 더합니다. seconds가 0 이하인 호출은 카메라가 무시합니다. 새 흔들림은 진폭이 현재 것과 같거나 더 클 때만 현재 흔들림을 대체합니다. |
+| `GLOBALCAMERA.IsShaking  -> boolean` | 흔들림이 아직 감쇠 중이면 true. |
+| `GLOBALCAMERA:Update(dt)  -> nil` | 흔들림을 dt초만큼(0.25로 제한) 전진시키고 기본 변환과 흔들림을 화면에 적용합니다. |
+| `GLOBALCAMERA:Reset()  -> nil` | 카메라를 중앙으로 되돌리고, 확대/축소와 회전을 재설정하며, 모든 흔들림을 멈춥니다. |
+
+```lua
+function update(timestamp)
+    if INPUT:Pressed("LRed") or INPUT:Pressed("RRed") then GLOBALCAMERA:Shake(18, 0.35) end
+    GLOBALCAMERA:Update(fps.deltaTime)
+end
+
+function deactivate()
+    GLOBALCAMERA:Reset()
+end
+```
+
+## 곡 열거
+
+두 전역 함수가 곡 스캔의 상태를 보고합니다. afterSongEnum 콜백과 함께 사용하십시오.
+
+| 메서드 | 설명 |
+| --- | --- |
+| `IsSongsEnumerating()  -> boolean` | 곡 열거 패스가 실행 중이면 true. |
+| `IsSongsEnumDone()  -> boolean` | 곡 스캔이 끝나면 true. 스캔이 시작되기 전과 실행 중에는 false입니다. IsSongsEnumerating은 시작 전 상태와 완료 상태 모두에서 false이므로, 목록이 준비되었는지 알려면 이 함수를 확인하십시오. |
+
+## 진단
+
+### info
+
+기본 게임 상태와 모듈 자체 디렉터리를 담은 읽기 전용 객체입니다.
+
+<div class="callout warn">
+info 전역으로 등록되며 모듈마다 생성됩니다. 각 필드는 접근 시 값을 계산합니다. online은 읽을 때마다 운영 체제에 질의합니다.
+</div>
+
+| 메서드 | 설명 |
+| --- | --- |
+| `info.playerCount  -> number` | 설정된 플레이어 수. |
+| `info.lang  -> string` | 현재 언어 코드. |
+| `info.gameVersion  -> string` | 게임 버전. main.major.minor.patch 형식의 네 숫자(예: `"0.7.0.0"`). |
+| `info.skinName  -> string` | 현재 스킨의 SkinConfig.ini에 있는 `Name=` (없으면 `"Unknown"`). |
+| `info.skinVersion  -> string` | 현재 스킨의 SkinConfig.ini에 있는 `Version=`. 예: `"0.7.0.0"` (없으면 `"Unknown"`). |
+| `info.skinCreator  -> string` | 현재 스킨의 SkinConfig.ini에 있는 `Creator=` (없으면 `"Unknown"`). |
+| `info.simplemode  -> boolean` | 심플 모드가 켜져 있으면 true. |
+| `info.p1IsBlue  -> boolean` | 플레이어 1이 파란 쪽을 사용하면 true. |
+| `info.online  -> boolean` | 사용 가능한 네트워크 인터페이스가 있으면 true. |
+| `info.dir  -> string` | 이 모듈의 디렉터리. |
+
+### fps
+
+프레임 타이밍과 고해상도 시계를 담은 읽기 전용 객체입니다.
+
+| 메서드 | 설명 |
+| --- | --- |
+| `fps.deltaTime  -> number` | 이전 프레임 이후 경과한 초. |
+| `fps.fps  -> number` | 현재 측정된 초당 프레임 수. |
+| `fps.ms  -> number` | 밀리초 단위의 단조 시계. 차이를 구해 Lua 구간의 시간을 재는 데 씁니다. |
+
+### debugLog
+
+| 메서드 | 설명 |
+| --- | --- |
+| `debugLog(message)  -> nil` | Lua 로그임을 표시하는 접두어를 붙여 문자열을 엔진 추적 로그에 기록합니다. |
+
+## 다른 전역
+
+엔진은 이 전역들을 모든 모듈에 등록합니다. 각자의 페이지에서 문서화합니다.
+
+| 전역 | 페이지 |
+| --- | --- |
+| `GetSaveFile(player)` | [플레이어와 프로필](players.md). ROActivity와 배경 안에서는 읽기 전용 핸들을 반환합니다. |
+| `RequestSongList(settings)`, `GenerateSongListSettings()` | [곡과 채보](songs.md). |
+| `MODICONS` | [곡과 채보](songs.md). |
+| `CONFIG`, `DATABASE`, `SHARED`, `STORAGE`, `JSONLOADER`, `INILOADER`, `SQL` | [데이터와 영속성](data.md). |
+| `TEXTURE`, `CANVAS`, `GRAPHICS`, `TEXT`, `VIDEO`, `COLOR`, `GRADIENT`, `SIZE` | [그래픽과 텍스트](graphics.md). |
+| `SOUND`, `HITSOUNDSLIST` | [오디오](audio.md). |
+| `INPUT` | [입력](input.md). |
+| `NAMEPLATE`, `NAMEPLATESLIST`, `CHARACTER`, `CHARACTERLIST`, `PUCHICHARALIST`, `PLAYSTATE`, `THEME`, `LANG` | [플레이어와 프로필](players.md). |
+| `VECTOR`, `VECTOR2`, `VECTOR3`, `VECTOR4`, `MATRIX`, `MATRIX2`, `MATRIX3`, `MATRIX4`, `QUATERNION` | [수학](math.md). |
+| `SONGMOUNT`, `REPLAY`, `DANBUILDER`, `VIRTUALSLOTS` | [곡과 채보](songs.md). |
+| `NET` | [온라인 네트워킹](networking.md). |
+| `SCENE3D`, `MODEL`, `PHYSICS`, `COLLIDERS`, `PATHFIND`, `HEIGHTMAP` | [3D 엔진: 래스터라이저 월드](3d.md), [3D 엔진: 레이트레이서 월드](3d-raytrace.md), [3D 엔진: 물리](3d-physics.md) <span class="badge-exp">실험적</span>. |

@@ -40,7 +40,7 @@ namespace OpenTaiko {
 			string _resexp = this.ResolveAllVariables(expr);
 			this._expr = string.Join(" ", _resexp.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries));
 			this._player = player;
-			this._actual = OpenTaiko.GetActualPlayer(player);
+			this._actual = player;
 			this._pos = 0;
 			this._sfref = (player >= 0) ? OpenTaiko.SaveFileInstances[this._actual] : null;
 		}

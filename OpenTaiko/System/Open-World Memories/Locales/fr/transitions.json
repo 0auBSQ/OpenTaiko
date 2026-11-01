@@ -1,0 +1,14 @@
+﻿{
+    // Skin locale file — French: Stage transitions: the titles they show
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/fr/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Stage transitions: the titles shown while one plays
+        "TRANSITION_TOWERS_TITLE": "MODE\nSURVIE",
+        "TRANSITION_ONLINE_TITLE": "SALON EN LIGNE",
+        "TRANSITION_DOJO_TITLE": "LE DOJO\nDU RENARD",
+        "TRANSITION_AI_IN": "Initialisation d'AItritus...",
+        "TRANSITION_AI_OUT": "Déconnexion d'AItritus...",
+        "TRANSITION_NOKON_TITLE": "INTRO NOKON"
+    }
+}

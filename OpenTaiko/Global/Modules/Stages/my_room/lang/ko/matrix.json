@@ -1,0 +1,39 @@
+{
+  "_comment": "Placeholder Matrix(matrix.lua)의 한국어 텍스트. 키는 고정 ID이며, 없는 ID는 영어 텍스트(lang/en)로 표시됩니다.",
+  "hint": "투영할 장면을 고르세요.",
+  "unlock_title": "잠긴 장면",
+  "unlock_q": "\"%s\"을(를) 해제할까요?",
+  "unlock_yes": "해제",
+  "unlock_no": "뒤로",
+  "broke": "코인이 부족합니다.",
+  "scenes": {
+    "demo_overall": {
+      "name": "종합 데모",
+      "desc": "작은 데모 다섯 개를 한 스테이지에 담았습니다. 1~5 키로 전환합니다."
+    },
+    "demo_canvas": {
+      "name": "캔버스 데모",
+      "desc": "작은 그림판: 마우스로 흰 종이에 그립니다 (LuaCanvas와 마우스 입력)."
+    },
+    "demo_particles": {
+      "name": "파티클 데모",
+      "desc": "Lua3DScene 파티클 엔진의 부하 테스트입니다."
+    },
+    "demo_modal": {
+      "name": "모달 데모",
+      "desc": "모든 희귀도와 유형의 보상·잠금 해제 모달을 재생합니다."
+    },
+    "demo_aviutl2": {
+      "name": "AviUtl2 데모",
+      "desc": "AviUtl2 프로젝트(.aup2)를 비디오 플레이어로 재생합니다."
+    },
+    "demo_rt": {
+      "name": "레이트레이서 데모",
+      "desc": "Lua3DScene의 경로 추적 레이트레이서 모드입니다."
+    },
+    "demo_dan_builder": {
+      "name": "단위 빌더 데모",
+      "desc": "미니멀한 무작위 단위 플레이어입니다."
+    }
+  }
+}

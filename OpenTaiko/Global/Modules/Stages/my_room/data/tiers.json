@@ -1,0 +1,15 @@
+[
+  {
+    "_comment": "Room size tiers, in purchase order. iw/ih = interior size, cost = coins the landlord charges to reach THIS tier (tier 1 = the free base room). The landlord's lines for each tier live in dialogs.json under landlord.tiers (keyed by tier number, 'more' for every tier past 4). Add a tier by appending an entry.",
+    "iw": 5,
+    "ih": 5,
+    "cost": 0
+  },
+  { "iw": 6, "ih": 6, "cost": 100 },
+  { "iw": 7, "ih": 7, "cost": 1000 },
+  { "iw": 8, "ih": 8, "cost": 5000 },
+  { "iw": 9, "ih": 8, "cost": 10000 },
+  { "iw": 10, "ih": 8, "cost": 10000 },
+  { "iw": 10, "ih": 9, "cost": 10000 },
+  { "iw": 10, "ih": 10, "cost": 10000 }
+]

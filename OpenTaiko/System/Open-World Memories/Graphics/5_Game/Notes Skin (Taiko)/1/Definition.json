@@ -1,0 +1,22 @@
+{
+	"Name": {
+		"strings": {
+			"default": "Default"
+		}
+	},
+	"Notes": {
+		"Frames": 1,
+		"Animation": []
+	},
+	"Rolls": {
+		"Frames": 1,
+		"Animation": []
+	},
+	"Balloons": {
+		"Frames": 1,
+		"Animation": []
+	},
+	"FlyingNotesFrame": 0,
+	"PartnerNotesScale": 1.4142,
+	"GiantNotesScale": 2.0
+}

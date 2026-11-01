@@ -1,0 +1,10 @@
+{
+  "_comment": "Russian texts for the theme settings viewer. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "title": "Просмотр настроек темы",
+  "col_id": "ID",
+  "col_scope": "Область",
+  "col_type": "Тип",
+  "col_value": "Значение",
+  "hint_scroll": "вверх/вниз — прокрутка   Отмена — выход",
+  "hint_exit": "Отмена — выход"
+}

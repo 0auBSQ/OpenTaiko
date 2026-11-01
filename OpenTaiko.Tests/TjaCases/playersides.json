@@ -1,0 +1,61 @@
+{
+	"tja": "playersides.tja",
+	"cases": [
+		{
+			"difficulty": 3,
+			"playerCount": 7,
+			"playerSide": 0,
+			"expect": {
+				"dons": 1
+			}
+		},
+		{
+			"difficulty": 3,
+			"playerCount": 7,
+			"playerSide": 1,
+			"expect": {
+				"dons": 2
+			}
+		},
+		{
+			"difficulty": 3,
+			"playerCount": 7,
+			"playerSide": 2,
+			"expect": {
+				"dons": 3
+			}
+		},
+		{
+			"difficulty": 3,
+			"playerCount": 7,
+			"playerSide": 3,
+			"expect": {
+				"dons": 4
+			}
+		},
+		{
+			"difficulty": 3,
+			"playerCount": 7,
+			"playerSide": 4,
+			"expect": {
+				"dons": 5
+			}
+		},
+		{
+			"difficulty": 3,
+			"playerCount": 7,
+			"playerSide": 5,
+			"expect": {
+				"dons": 6
+			}
+		},
+		{
+			"difficulty": 3,
+			"playerCount": 7,
+			"playerSide": 6,
+			"expect": {
+				"dons": 7
+			}
+		}
+	]
+}

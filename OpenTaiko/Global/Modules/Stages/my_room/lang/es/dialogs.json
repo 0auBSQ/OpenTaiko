@@ -1,0 +1,109 @@
+{
+  "_comment": "Dialog lines, Spanish. Translation of lang/en/dialogs.json with the same structure; a missing key or line falls back to English. {size}/{cost} are filled by the code; {shake:..} is dialogue markup; {sfx:purse} at the start of a line brings the purse up.",
+  "landlord": {
+    "_comment": "The landlord's phone call. Lists are said line by line. first_call plays once per save file (no offer); greetings picks one line at random; tiers.<n> is the offer for room tier n (2 = 6x6, 3 = 7x7, 4 = 8x8, more = every 10k tier): pitch, then broke (not enough coins, no choice) or the Yes/No choice on the last pitch line, then accepted. refuse_first/second after a No (the count resets on entering the room); refused_out replaces the call after two refusals; maxed when no bigger tier exists. {sfx:purse} at the start of a line brings the purse up (the caller's onSfx handles it).",
+    "name": "Casero",
+    "first_call": [
+      "Así que usted es el nuevo inquilino...",
+      "Espero que no sea muy ruidoso, ¿sabe? No es nada bueno para el negocio...",
+      "¿Que la habitación es demasiado pequeña, dice? Mmm...",
+      "Vuelva a llamarme, y asegúrese de traer doblones bien relucientes.",
+      "Si puede pagar un generoso extra, quizá me lo piense.",
+      "Y ahora largo, el tiempo es dinero, y esta llamada me está arruinando."
+    ],
+    "greetings": [
+      "Ah, es usted. Veamos qué nos trae hoy.",
+      "¿Me llama para ampliar la habitación? Veamos cuánto me va a enriquecer hoy.",
+      "¿Viene a cerrar un trato? Hora de hablar de negocios de verdad.",
+      "Huelo... la fragancia de billetes recién impresos.",
+      "¿Quiere una habitación más grande? ¡Yo quiero un monedero más grande! Hablemos."
+    ],
+    "tiers": {
+      "2": {
+        "pitch": [
+          "{sfx:purse}Empecemos por algo sencillo. Por cien de sus relucientes, le doy una primera ampliación decente de su casa.",
+          "Estoy siendo muy generoso, ¿sabe? Esto está un poco estrecho, ¿no?...",
+          "¿Y bien, qué me dice? ¿Trato hecho?"
+        ],
+        "broke": [
+          "... Espere",
+          "Como sea, pelagatos.",
+          "Adiós."
+        ],
+        "accepted": [
+          "Excelente, disfrute de su habitación más grande, mientras yo disfruto de mis bolsillos más llenos...",
+          "¿Cómo logré ampliarla así? Dejaría de pagar si le revelara mis secretos.",
+          "Vuelva a llamarme si aún le parece pequeña..."
+        ]
+      },
+      "3": {
+        "pitch": [
+          "¿Así que la habitación actual se le queda pequeña?",
+          "{sfx:purse}Entendido. Pero esta vez serán mil, ¡grandes precios para grandes ambiciones!",
+          "¡Basta de charla, que decida la pasta!"
+        ],
+        "broke": [
+          "¡Ah! ¿Sin pasta?",
+          "Qué lástima, ¡pero las águilas no vuelan con palomas!",
+          "¡Sayonara, campesino!"
+        ],
+        "accepted": [
+          "¿Lo ha comprado? Increíble...",
+          "¿Que cómo encontré espacio para ampliar su habitación, dice?",
+          "No se preocupe por eso.",
+          "¡Solo eché a su vecino, total, era ruidoso! Jaja",
+          "Al menos ahora también dormirá mejor, ¿no?"
+        ]
+      },
+      "4": {
+        "pitch": [
+          "Parece que nunca tiene suficiente...",
+          "{sfx:purse}5 mil. Lo toma o lo deja."
+        ],
+        "broke": [
+          "... ¡Ja!",
+          "Claro que un crío como usted no tiene tanto dinero.",
+          "¡Va a tener que trabajar más en OpenBurgers, muchacho!"
+        ],
+        "accepted": [
+          "Espere, ¿de verdad lo ha pagado?",
+          "No es que me moleste, pero ya sabe...",
+          "¡Si sigue siendo tan ingenuo, voy a empezar a sentirme culpable!",
+          "Bah, ¡a usted no parece importarle! ¡Que llueva la pasta!"
+        ]
+      },
+      "more": {
+        "pitch": [
+          "...",
+          "{sfx:purse}10 mil. En mi OpenBank, como siempre."
+        ],
+        "broke": [
+          "...",
+          "*cuelga*"
+        ],
+        "accepted": [
+          "Gracias.",
+          "..."
+        ]
+      }
+    },
+    "maxed": "Lo siento, no hay ninguna ampliación más grande.",
+    "refuse_first": "Qué lástima. Vuelva a llamarme si cambia de opinión.",
+    "refuse_second": "...",
+    "refused_out": [
+      "... No, no me haga perder el tiempo.",
+      "No vuelva a llamar nunca."
+    ],
+    "choice_yes": "Trato hecho",
+    "choice_no": "No hay trato"
+  },
+  "backpack": {
+    "look": "La mochila con la que me mudé aquí; mirarla siempre me trae recuerdos"
+  },
+  "pod": {
+    "locked": "Pulsas el panel de la cápsula misteriosa, pero no pasa nada."
+  },
+  "phone": {
+    "enum_wait": "Hay una nota junto al teléfono: «No usar mientras se carga el catálogo de canciones»."
+  }
+}

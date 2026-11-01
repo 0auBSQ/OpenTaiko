@@ -1,0 +1,8 @@
+{
+  "_comment": "Chinese texts for demo_overall. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "demo_theme_settings": "主题设置",
+  "demo_gradient": "渐变映射",
+  "demo_database": "数据库",
+  "demo_dan_plate": "段位牌",
+  "demo_first_demo": "第一个演示"
+}

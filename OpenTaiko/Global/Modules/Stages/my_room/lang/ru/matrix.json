@@ -1,0 +1,39 @@
+{
+  "_comment": "Russian texts for the Placeholder Matrix (matrix.lua). Keys are stable ids; a missing id shows the English text (lang/en).",
+  "hint": "Выберите сцену для проекции.",
+  "unlock_title": "Закрытая сцена",
+  "unlock_q": "Открыть «%s»?",
+  "unlock_yes": "Открыть",
+  "unlock_no": "Назад",
+  "broke": "Недостаточно монет.",
+  "scenes": {
+    "demo_overall": {
+      "name": "Общее демо",
+      "desc": "Пять небольших демо в одной сцене; клавиши 1–5 переключают их."
+    },
+    "demo_canvas": {
+      "name": "Демо холста",
+      "desc": "Простая рисовалка: рисуйте мышью на белом листе (LuaCanvas и мышь)."
+    },
+    "demo_particles": {
+      "name": "Демо частиц",
+      "desc": "Нагрузочный тест движка частиц Lua3DScene."
+    },
+    "demo_modal": {
+      "name": "Демо модальных окон",
+      "desc": "Окна наград и разблокировок всех редкостей и типов."
+    },
+    "demo_aviutl2": {
+      "name": "Демо AviUtl2",
+      "desc": "Проекты AviUtl2 (.aup2) в видеоплеере."
+    },
+    "demo_rt": {
+      "name": "Демо трассировки лучей",
+      "desc": "Режим трассировки путей в Lua3DScene."
+    },
+    "demo_dan_builder": {
+      "name": "Демо Dan Builder",
+      "desc": "Минималистичный случайный проигрыватель дан."
+    }
+  }
+}

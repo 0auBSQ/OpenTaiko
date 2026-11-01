@@ -1,0 +1,10 @@
+{
+  "_comment": "Japanese texts for the theme settings viewer. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "title": "テーマ設定ビューワー",
+  "col_id": "ID",
+  "col_scope": "スコープ",
+  "col_type": "タイプ",
+  "col_value": "値",
+  "hint_scroll": "上/下でスクロール   キャンセルで終了",
+  "hint_exit": "キャンセルで終了"
+}

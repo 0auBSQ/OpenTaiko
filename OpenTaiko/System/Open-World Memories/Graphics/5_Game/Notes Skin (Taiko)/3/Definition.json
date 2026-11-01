@@ -1,0 +1,210 @@
+{
+	"Name": {
+		"strings": {
+			"default": "Sky Spirits"
+		}
+	},
+	"Notes": {
+		"Frames": 3,
+		"Animation": [
+			{
+				"FromCombo": 0,
+				"Rows": [
+					0
+				]
+			},
+			{
+				"FromCombo": 10,
+				"FromComboByDifficulty": {
+					"Easy": 5,
+					"Normal": 5,
+					"Hard": 10,
+					"Extreme": 10,
+					"ExtraExtreme": 10
+				},
+				"Rows": [
+					1,
+					1,
+					0,
+					0
+				],
+				"RowsOnEntry": [
+					0
+				]
+			},
+			{
+				"FromCombo": 50,
+				"FromComboByDifficulty": {
+					"Easy": 10,
+					"Normal": 10,
+					"Hard": 30,
+					"Extreme": 50,
+					"ExtraExtreme": 50
+				},
+				"Rows": [
+					0,
+					1
+				]
+			},
+			{
+				"FromCombo": 100,
+				"FromComboByDifficulty": {
+					"Easy": 30,
+					"Normal": 30,
+					"Hard": 50,
+					"Extreme": 100,
+					"ExtraExtreme": 100
+				},
+				"Rows": [
+					0,
+					2
+				],
+				"RowsByNote": {
+					"BigDon": [
+						1,
+						2
+					],
+					"BigKa": [
+						1,
+						2
+					],
+					"KaDon": [
+						1,
+						2
+					]
+				},
+				"RowsOnEntry": [
+					0,
+					1
+				]
+			}
+		]
+	},
+	"Rolls": {
+		"Frames": 3,
+		"Animation": [
+			{
+				"FromCombo": 0,
+				"Rows": [
+					0
+				]
+			},
+			{
+				"FromCombo": 10,
+				"FromComboByDifficulty": {
+					"Easy": 5,
+					"Normal": 5,
+					"Hard": 10,
+					"Extreme": 10,
+					"ExtraExtreme": 10
+				},
+				"Rows": [
+					1,
+					1,
+					0,
+					0
+				],
+				"RowsOnEntry": [
+					0
+				]
+			},
+			{
+				"FromCombo": 50,
+				"FromComboByDifficulty": {
+					"Easy": 10,
+					"Normal": 10,
+					"Hard": 30,
+					"Extreme": 50,
+					"ExtraExtreme": 50
+				},
+				"Rows": [
+					0,
+					1
+				]
+			},
+			{
+				"FromCombo": 100,
+				"FromComboByDifficulty": {
+					"Easy": 30,
+					"Normal": 30,
+					"Hard": 50,
+					"Extreme": 100,
+					"ExtraExtreme": 100
+				},
+				"Rows": [
+					0,
+					2
+				],
+				"RowsOnEntry": [
+					0,
+					1
+				]
+			}
+		]
+	},
+	"Balloons": {
+		"Frames": 3,
+		"Animation": [
+			{
+				"FromCombo": 0,
+				"Rows": [
+					0
+				]
+			},
+			{
+				"FromCombo": 10,
+				"FromComboByDifficulty": {
+					"Easy": 5,
+					"Normal": 5,
+					"Hard": 10,
+					"Extreme": 10,
+					"ExtraExtreme": 10
+				},
+				"Rows": [
+					1,
+					1,
+					0,
+					0
+				],
+				"RowsOnEntry": [
+					0
+				]
+			},
+			{
+				"FromCombo": 50,
+				"FromComboByDifficulty": {
+					"Easy": 10,
+					"Normal": 10,
+					"Hard": 30,
+					"Extreme": 50,
+					"ExtraExtreme": 50
+				},
+				"Rows": [
+					0,
+					1
+				]
+			},
+			{
+				"FromCombo": 100,
+				"FromComboByDifficulty": {
+					"Easy": 30,
+					"Normal": 30,
+					"Hard": 50,
+					"Extreme": 100,
+					"ExtraExtreme": 100
+				},
+				"Rows": [
+					0,
+					2
+				],
+				"RowsOnEntry": [
+					0,
+					1
+				]
+			}
+		]
+	},
+	"FlyingNotesFrame": 1,
+	"PartnerNotesScale": 1.4142,
+	"GiantNotesScale": 2.0
+}

@@ -1,0 +1,11 @@
+{
+  "_comment": "Russian texts for the jukebox player (jukebox.lua); its dialog lines are in dialogs.json. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "title": "Джукбокс",
+  "tab_bgm": "BGM",
+  "tab_songs": "Песни",
+  "bgm_title": "BGM Моей комнаты",
+  "nothing_playing": "Ничего не играет",
+  "waiting": "Сортируем пластинки... список песен ещё готовится.",
+  "no_songs": "Песни для игры не найдены.",
+  "speed": "Скорость"
+}

@@ -1,0 +1,15 @@
+{
+    "_note": "Boot screen layout, in 1920x1080 pixels. Colours are [r, g, b] from 0 to 255; opacities 0 to 1.",
+    "font_size": 32,
+    "press_enter": { "x": 960, "y": 960 },
+    "first_time_menu": {
+        "_note": "The language and volume lists of the first start, centred on center_x/center_y, one row every row_height. A volume being set shows its value over its name, the name at editing_opacity.",
+        "center_x": 960,
+        "center_y": 540,
+        "row_height": 60,
+        "editing_opacity": 0.25,
+        "text_color": [255, 255, 255],
+        "selected_color": [255, 50, 50],
+        "editing_color": [255, 255, 50]
+    }
+}

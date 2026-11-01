@@ -1,0 +1,14 @@
+{
+    // Skin locale file — Japanese: Stage transitions: the titles they show
+    // Format: { "Entries": { "KEY": "value", ... } }. Every file in Locales/ja/ is read; a key
+    // missing here falls back to the skin's default locale.
+    "Entries": {
+        // Stage transitions: the titles shown while one plays
+        "TRANSITION_TOWERS_TITLE": "サバイバル\nモード",
+        "TRANSITION_ONLINE_TITLE": "オンラインロビー",
+        "TRANSITION_DOJO_TITLE": "狐の\n道場",
+        "TRANSITION_AI_IN": "AItritus を起動中...",
+        "TRANSITION_AI_OUT": "AItritus を切断中...",
+        "TRANSITION_NOKON_TITLE": "イントロ・ノコン"
+    }
+}

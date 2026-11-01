@@ -1,0 +1,11 @@
+{
+    // Skin locale file, Japanese: dan results (results_dan ROActivity); {0} is a number
+    "Entries": {
+        "DAN_RESULTS_NEW_BEST": "自己ベスト更新！",
+        "DAN_RESULTS_BEST": "ベスト {0}",
+        "DAN_RESULTS_EXAM_MORE": "{0}以上",
+        "DAN_RESULTS_EXAM_LESS": "{0}未満",
+        "DAN_RESULTS_DETAILS": "左右：詳細",
+        "DAN_RESULTS_SUMMARY": "左右：まとめ"
+    }
+}

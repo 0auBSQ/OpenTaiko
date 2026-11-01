@@ -57,7 +57,7 @@ internal class CActImplJudgeText : CActivity {
 						y += (moveValue * OpenTaiko.Skin.Game_Judge_Move[1]) + OpenTaiko.stageGameScreen.GetJPOSCROLLY(j);
 
 						OpenTaiko.Tx.Judge.Opacity = (int)(255f - (judgeC.counter.CurrentValue >= 360 ? ((judgeC.counter.CurrentValue - 360) / 50.0f) * 255f : 0f));
-						OpenTaiko.Tx.Judge.t2D描画(x, y, judgeC.rc);
+						OpenTaiko.Tx.Judge.t2DDraw(x, y, judgeC.rc);
 					}
 				}
 			}
@@ -81,7 +81,9 @@ internal class CActImplJudgeText : CActivity {
 			return;
 		}
 
-		int height = OpenTaiko.Tx.Judge.szTextureSize.Height / 5;
+		if (OpenTaiko.Tx.Judge == null) return;
+
+		int height = OpenTaiko.Tx.Judge.szTextureSize.Height / CNotesSkins.JudgeFrames;
 		judgeAnime.rc = new Rectangle(0, (int)njudge * height, OpenTaiko.Tx.Judge.szTextureSize.Width, height);
 
 		JudgeAnimes[player].Enqueue(judgeAnime);

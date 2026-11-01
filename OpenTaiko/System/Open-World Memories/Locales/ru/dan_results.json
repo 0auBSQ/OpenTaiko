@@ -1,0 +1,11 @@
+{
+    // Skin locale file, Russian: dan results (results_dan ROActivity); {0} is a number
+    "Entries": {
+        "DAN_RESULTS_NEW_BEST": "Новый рекорд!",
+        "DAN_RESULTS_BEST": "рекорд {0}",
+        "DAN_RESULTS_EXAM_MORE": "{0} или больше",
+        "DAN_RESULTS_EXAM_LESS": "меньше {0}",
+        "DAN_RESULTS_DETAILS": "Влево / вправо: подробности",
+        "DAN_RESULTS_SUMMARY": "Влево / вправо: итог"
+    }
+}

@@ -38,8 +38,8 @@ static class CScoreIni_Importer {
 
 			//Trace.TraceInformation(Status);
 			try {
-				string directory = Path.GetDirectoryName(_score);
-				DirectoryInfo dir_parent = Directory.GetParent(directory);
+				string directory = Path.GetDirectoryName(_score)!;
+				DirectoryInfo dir_parent = Directory.GetParent(directory)!;
 
 				string[] TJAData = Array.Empty<string>();
 				if (File.Exists(GetTJAFile(_score)))

@@ -1,20 +1,27 @@
---func:DrawRectGraph(x, y, rect_x, rect_y, rect_width, rect_height, filename);
+---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
+-- Up background 0: scrolling dots + bouncing dango, with a per-player clear fade.
+-- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
+--   func:AddGraph        -> TEXTURE:CreateTextureSync into the local `tx` registry (onStart)
+--   func:DrawRectGraph   -> tx[name]:DrawRect              (Repeat wrap → identical tiling)
+--   func:SetScale/Opacity-> tx[name]:SetScale / SetOpacity (0-255 → 0-1)
+--   prelude globals      -> the `state` table passed to update/draw; deltaTime -> fps.deltaTime
+
 local loopWidth = 1920
 local loopHeight = 288
-
 local secondPlayerY = 804
 
+local tx = {}            -- name -> LuaTexture
 local bgScrollX = 0
 local bgScrollY = 0
 local dangoCounter = 0
 local bgClearFade = { 0, 0 }
 
-function updateClearFade()
-    for player = 0, playerCount - 1 do
-        if isClear[player] then
-            bgClearFade[player + 1] = bgClearFade[player + 1] + (2000 * deltaTime)
+local function updateClearFade(state)
+    for player = 0, state.playerCount - 1 do
+        if state.isClear[player] then
+            bgClearFade[player + 1] = bgClearFade[player + 1] + (2000 * fps.deltaTime)
         else
-            bgClearFade[player + 1] = bgClearFade[player + 1] - (2000 * deltaTime)
+            bgClearFade[player + 1] = bgClearFade[player + 1] - (2000 * fps.deltaTime)
         end
 
         if bgClearFade[player + 1] > 255 then
@@ -32,115 +39,111 @@ end
 function clearOut(player)
 end
 
-function init()
-    func:AddGraph("BG_Red.png")
-    func:AddGraph("BG_Blue.png")
-    func:AddGraph("BG_Clear.png")
+function onStart()
+    tx["BG_Red.png"] = TEXTURE:CreateTextureSync("BG_Red.png")
+    tx["BG_Blue.png"] = TEXTURE:CreateTextureSync("BG_Blue.png")
+    tx["BG_Clear.png"] = TEXTURE:CreateTextureSync("BG_Clear.png")
 
-    func:AddGraph("Dot_Red.png")
-    func:AddGraph("Dot_Blue.png")
-    func:AddGraph("Dot_Clear.png")
+    tx["Dot_Red.png"] = TEXTURE:CreateTextureSync("Dot_Red.png")
+    tx["Dot_Blue.png"] = TEXTURE:CreateTextureSync("Dot_Blue.png")
+    tx["Dot_Clear.png"] = TEXTURE:CreateTextureSync("Dot_Clear.png")
 
-    func:AddGraph("Dango_Red.png")
-    func:AddGraph("Dango_Blue.png")
-    func:AddGraph("Dango_Clear.png")
+    tx["Dango_Red.png"] = TEXTURE:CreateTextureSync("Dango_Red.png")
+    tx["Dango_Blue.png"] = TEXTURE:CreateTextureSync("Dango_Blue.png")
+    tx["Dango_Clear.png"] = TEXTURE:CreateTextureSync("Dango_Clear.png")
 end
 
-function update()
-    bgScrollX = bgScrollX + (59 * deltaTime)
-    bgScrollY = bgScrollY + (14 * deltaTime)
-    dangoCounter = dangoCounter + deltaTime
+function update(timestamp, state)
+    bgScrollX = bgScrollX + (59 * fps.deltaTime)
+    bgScrollY = bgScrollY + (14 * fps.deltaTime)
+    dangoCounter = dangoCounter + fps.deltaTime
 
     if dangoCounter > 3 then
-      dangoCounter = 0
+        dangoCounter = 0
     end
 
     -- don't bother if player count is 3 or higher, use clear BG for 3P instead
-    if playerCount < 3 then
-      updateClearFade()
+    if state.playerCount < 3 then
+        updateClearFade(state)
     end
 end
 
-
-function draw()
-
+function draw(state)
     -- dango effects
+    local moveY = math.sin(math.min(dangoCounter, 1) * math.pi) * 30
+    local moveY2 = math.sin(math.min(math.max(((dangoCounter - 1) * 4), 0), 1) * math.pi) / 12.0
+    local moveY3 = 274 * moveY2
+    local dangoOffset = -moveY + moveY3 - 36
 
-    moveY = math.sin(math.min(dangoCounter, 1) * math.pi) * 30
-    moveY2 = math.sin(math.min(math.max(((dangoCounter - 1) * 4), 0), 1) * math.pi) / 12.0
-    moveY3 = 274 * moveY2
-    dangoOffset = -moveY + moveY3 - 36
-
-    func:SetScale(1, 1.0 - moveY2, "Dango_Red.png")
-    func:SetScale(1, 1.0 - moveY2, "Dango_Blue.png")
-    func:SetScale(1, 1.0 - moveY2, "Dango_Clear.png")
+    tx["Dango_Red.png"]:SetScale(1, 1.0 - moveY2)
+    tx["Dango_Blue.png"]:SetScale(1, 1.0 - moveY2)
+    tx["Dango_Clear.png"]:SetScale(1, 1.0 - moveY2)
 
     -- draw the stuff
-    if playerCount == 1 and p1IsBlue == false then
+    if state.playerCount == 1 and state.p1IsBlue == false then
 
-      func:SetOpacity(bgClearFade[1], "BG_Clear.png")
-      func:SetOpacity(bgClearFade[1], "Dot_Clear.png")
-      func:SetOpacity(bgClearFade[1], "Dango_Clear.png")
+        tx["BG_Clear.png"]:SetOpacity(bgClearFade[1] / 255)
+        tx["Dot_Clear.png"]:SetOpacity(bgClearFade[1] / 255)
+        tx["Dango_Clear.png"]:SetOpacity(bgClearFade[1] / 255)
 
-      func:DrawRectGraph(0, 0, 0, 0, loopWidth, loopHeight, "BG_Red.png")
-      func:DrawRectGraph(0, 0, bgScrollX, bgScrollY, loopWidth, loopHeight, "Dot_Red.png")
-      func:DrawRectGraph(0, dangoOffset, bgScrollX, 0, loopWidth, loopHeight, "Dango_Red.png")
+        tx["BG_Red.png"]:DrawRect(0, 0, 0, 0, loopWidth, loopHeight)
+        tx["Dot_Red.png"]:DrawRect(0, 0, bgScrollX, bgScrollY, loopWidth, loopHeight)
+        tx["Dango_Red.png"]:DrawRect(0, dangoOffset, bgScrollX, 0, loopWidth, loopHeight)
 
-      func:DrawRectGraph(0, 0, 0, 0, loopWidth, loopHeight, "BG_Clear.png")
-      func:DrawRectGraph(0, 0, bgScrollX, bgScrollY, loopWidth, loopHeight, "Dot_Clear.png")
-      func:DrawRectGraph(0, dangoOffset, bgScrollX, 0, loopWidth, loopHeight, "Dango_Clear.png")
+        tx["BG_Clear.png"]:DrawRect(0, 0, 0, 0, loopWidth, loopHeight)
+        tx["Dot_Clear.png"]:DrawRect(0, 0, bgScrollX, bgScrollY, loopWidth, loopHeight)
+        tx["Dango_Clear.png"]:DrawRect(0, dangoOffset, bgScrollX, 0, loopWidth, loopHeight)
 
-    elseif playerCount == 1 and p1IsBlue == true then
+    elseif state.playerCount == 1 and state.p1IsBlue == true then
 
-      func:SetOpacity(bgClearFade[1], "BG_Clear.png")
-      func:SetOpacity(bgClearFade[1], "Dot_Clear.png")
-      func:SetOpacity(bgClearFade[1], "Dango_Clear.png")
+        tx["BG_Clear.png"]:SetOpacity(bgClearFade[1] / 255)
+        tx["Dot_Clear.png"]:SetOpacity(bgClearFade[1] / 255)
+        tx["Dango_Clear.png"]:SetOpacity(bgClearFade[1] / 255)
 
-      func:DrawRectGraph(0, 0, 0, 0, loopWidth, loopHeight, "BG_Blue.png")
-      func:DrawRectGraph(0, 0, bgScrollX, bgScrollY, loopWidth, loopHeight, "Dot_Blue.png")
-      func:DrawRectGraph(0, dangoOffset, bgScrollX, 0, loopWidth, loopHeight, "Dango_Blue.png")
+        tx["BG_Blue.png"]:DrawRect(0, 0, 0, 0, loopWidth, loopHeight)
+        tx["Dot_Blue.png"]:DrawRect(0, 0, bgScrollX, bgScrollY, loopWidth, loopHeight)
+        tx["Dango_Blue.png"]:DrawRect(0, dangoOffset, bgScrollX, 0, loopWidth, loopHeight)
 
-      func:DrawRectGraph(0, 0, 0, 0, loopWidth, loopHeight, "BG_Clear.png")
-      func:DrawRectGraph(0, 0, bgScrollX, bgScrollY, loopWidth, loopHeight, "Dot_Clear.png")
-      func:DrawRectGraph(0, dangoOffset, bgScrollX, 0, loopWidth, loopHeight, "Dango_Clear.png")
+        tx["BG_Clear.png"]:DrawRect(0, 0, 0, 0, loopWidth, loopHeight)
+        tx["Dot_Clear.png"]:DrawRect(0, 0, bgScrollX, bgScrollY, loopWidth, loopHeight)
+        tx["Dango_Clear.png"]:DrawRect(0, dangoOffset, bgScrollX, 0, loopWidth, loopHeight)
 
-    elseif playerCount == 2 then
+    elseif state.playerCount == 2 then
 
-      func:DrawRectGraph(0, 0, 0, 0, loopWidth, loopHeight, "BG_Red.png")
-      func:DrawRectGraph(0, secondPlayerY, 0, 0, loopWidth, loopHeight, "BG_Blue.png")
-      func:DrawRectGraph(0, 0, bgScrollX, bgScrollY, loopWidth, loopHeight, "Dot_Red.png")
-      func:DrawRectGraph(0, secondPlayerY, bgScrollX, bgScrollY, loopWidth, loopHeight, "Dot_Blue.png")
-      func:DrawRectGraph(0, dangoOffset, bgScrollX, 0, loopWidth, loopHeight, "Dango_Red.png")
-      func:DrawRectGraph(0, secondPlayerY + dangoOffset, bgScrollX, 0, loopWidth, loopHeight, "Dango_Blue.png")
+        tx["BG_Red.png"]:DrawRect(0, 0, 0, 0, loopWidth, loopHeight)
+        tx["BG_Blue.png"]:DrawRect(0, secondPlayerY, 0, 0, loopWidth, loopHeight)
+        tx["Dot_Red.png"]:DrawRect(0, 0, bgScrollX, bgScrollY, loopWidth, loopHeight)
+        tx["Dot_Blue.png"]:DrawRect(0, secondPlayerY, bgScrollX, bgScrollY, loopWidth, loopHeight)
+        tx["Dango_Red.png"]:DrawRect(0, dangoOffset, bgScrollX, 0, loopWidth, loopHeight)
+        tx["Dango_Blue.png"]:DrawRect(0, secondPlayerY + dangoOffset, bgScrollX, 0, loopWidth, loopHeight)
 
-      for player = 0, 1 do
-        func:SetOpacity(bgClearFade[player + 1], "BG_Clear.png")
-        func:SetOpacity(bgClearFade[player + 1], "Dot_Clear.png")
-        func:SetOpacity(bgClearFade[player + 1], "Dango_Clear.png")
+        for player = 0, 1 do
+            tx["BG_Clear.png"]:SetOpacity(bgClearFade[player + 1] / 255)
+            tx["Dot_Clear.png"]:SetOpacity(bgClearFade[player + 1] / 255)
+            tx["Dango_Clear.png"]:SetOpacity(bgClearFade[player + 1] / 255)
 
-        func:DrawRectGraph(0, player * secondPlayerY, 0, 0, loopWidth, loopHeight, "BG_Clear.png")
-        func:DrawRectGraph(0, player * secondPlayerY, bgScrollX, bgScrollY, loopWidth, loopHeight, "Dot_Clear.png")
-        func:DrawRectGraph(0, (player * secondPlayerY) + dangoOffset, bgScrollX, 0, loopWidth, loopHeight, "Dango_Clear.png")
-      end
+            tx["BG_Clear.png"]:DrawRect(0, player * secondPlayerY, 0, 0, loopWidth, loopHeight)
+            tx["Dot_Clear.png"]:DrawRect(0, player * secondPlayerY, bgScrollX, bgScrollY, loopWidth, loopHeight)
+            tx["Dango_Clear.png"]:DrawRect(0, (player * secondPlayerY) + dangoOffset, bgScrollX, 0, loopWidth, loopHeight)
+        end
 
-    elseif playerCount == 3 then
+    elseif state.playerCount == 3 then
 
-      func:DrawRectGraph(0, 0, 0, 0, loopWidth, 1920, "BG_Clear.png")
-      func:DrawRectGraph(0, 0, bgScrollX, bgScrollY, loopWidth, 1920, "Dot_Clear.png")
-      func:DrawRectGraph(0, secondPlayerY + dangoOffset, bgScrollX, 0, loopWidth, loopHeight, "Dango_Clear.png")
+        tx["BG_Clear.png"]:DrawRect(0, 0, 0, 0, loopWidth, 1920)
+        tx["Dot_Clear.png"]:DrawRect(0, 0, bgScrollX, bgScrollY, loopWidth, 1920)
+        tx["Dango_Clear.png"]:DrawRect(0, secondPlayerY + dangoOffset, bgScrollX, 0, loopWidth, loopHeight)
 
-    elseif playerCount == 4 then
+    elseif state.playerCount == 4 then
 
-      func:DrawRectGraph(0, 0, 0, 0, loopWidth, 1920, "BG_Clear.png")
-      func:DrawRectGraph(0, 0, bgScrollX, bgScrollY, loopWidth, 1920, "Dot_Clear.png")
+        tx["BG_Clear.png"]:DrawRect(0, 0, 0, 0, loopWidth, 1920)
+        tx["Dot_Clear.png"]:DrawRect(0, 0, bgScrollX, bgScrollY, loopWidth, 1920)
 
     end
+end
 
-    -- Vulkan Debugging
-    -- func:DrawText(192,0,"Dango Scroll X: "..tostring(bgScrollX).."("..tostring(bgScrollX / 492)..")")
-    -- func:DrawText(192,16,"Dot Scroll X: "..tostring(bgScrollX).."("..tostring(bgScrollX/38)..")")
-    -- func:DrawText(192,32,"Dot Scroll Y: "..tostring(bgScrollY).."("..tostring(bgScrollY/42)..")")
-    -- func:DrawText(192,48,"Loop Width: "..tostring(loopWidth).."("..tostring(bgScrollX/loopWidth)..")")
-    -- func:DrawText(192,64,"Loop Height: "..tostring(loopHeight).."("..tostring(bgScrollY/loopHeight)..")")
-    
+function onDestroy()
+    for _, t in pairs(tx) do
+        if t ~= nil then t:Dispose() end
+    end
+    tx = {}
 end

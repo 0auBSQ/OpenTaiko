@@ -1,0 +1,7 @@
+{
+    "_note": "Boot screen animation.",
+    "press_enter": {
+        "_note": "The prompt fades in and out (0 to 1 opacity and back); fade_s is the counter's interval, the seconds one fade takes.",
+        "fade_s": 1.0
+    }
+}

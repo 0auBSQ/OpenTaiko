@@ -9,7 +9,7 @@ internal class LocalizedStringConverter<T> : JsonConverter {
 		return false;
 	}
 
-	public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
+	public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer) {
 		JToken token = JToken.Load(reader);
 		if (token.Type == JTokenType.Object) {
 			return token.ToObject<T>(serializer);
@@ -17,7 +17,7 @@ internal class LocalizedStringConverter<T> : JsonConverter {
 		return token.ToString();
 	}
 
-	public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
+	public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer) {
 		serializer.Serialize(writer, value);
 	}
 }

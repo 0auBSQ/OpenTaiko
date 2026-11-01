@@ -1,0 +1,31 @@
+{
+    "_note": "Event Mode countdown hud, in 1920x1080 pixels. Colours are [r, g, b, a] from 0 to 255. edge_color is the text outline; text_nudge moves the text inside its glyph box.",
+    "stopwatch": {
+        "_note": "the stopwatch's face centred at x, y; the seconds in its box, box_dy below, at most text_width wide (the glyph box, 25 px padding each side included)",
+        "x": 80,
+        "y": 114,
+        "box_dy": 81,
+        "text_width": 98
+    },
+    "countdown": {
+        "_note": "the seconds turn red (and tick each second) from red_from_s down",
+        "font_size": 20,
+        "red_from_s": 10,
+        "color": [20, 18, 24, 255],
+        "red_color": [214, 40, 40, 255]
+    },
+    "plays": {
+        "_note": "the plays left in a cream pill, its top-left at x, y beside the stopwatch, or at solo_x, solo_y without a countdown",
+        "x": 152,
+        "y": 94,
+        "solo_x": 24,
+        "solo_y": 16,
+        "width": 236,
+        "height": 40,
+        "color": [250, 242, 222, 235],
+        "font_size": 22,
+        "text_margin": 30
+    },
+    "text_nudge": -1,
+    "edge_color": [0, 0, 0, 0]
+}

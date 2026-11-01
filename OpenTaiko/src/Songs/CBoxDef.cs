@@ -9,7 +9,7 @@ internal class CBoxDef {
 	// Properties
 
 	public Color Color;
-	public string SelectBG;
+	public string? SelectBG;
 	public string Genre;
 	public CLocalizationData Title = new CLocalizationData();
 	public CLocalizationData[] strBoxText = new CLocalizationData[3] { new CLocalizationData(), new CLocalizationData(), new CLocalizationData() };
@@ -27,8 +27,10 @@ internal class CBoxDef {
 	public bool IsChangedBgType;
 	public string BoxChara;
 	public bool IsChangedBoxChara;
-	public string DefaultPreimage;
-	public string ScenePreset;
+	public string? DefaultPreimage;
+	public string? ScenePreset;
+	public bool IsChangedCompat;
+	public CTja.ETjaCompat Compat;
 
 	// Constructor
 
@@ -43,19 +45,20 @@ internal class CBoxDef {
 		BgColor = Color.White;
 		DefaultPreimage = null;
 		ScenePreset = null;
+		Compat = CTja.ETjaCompat.OOS;
 	}
-	public CBoxDef(string boxdefファイル名)
+	public CBoxDef(string boxdefFileName)
 		: this() {
-		this.t読み込み(boxdefファイル名);
+		this.tLoad(boxdefFileName);
 	}
 
 	// メソッド
 	private static readonly Regex KeyAndValueRegex =
 		new Regex(@"^[ \t]*(#[A-Z0-9]+)(?::\s?|\s)(.+?)?$", RegexOptions.Compiled);
 
-	public void t読み込み(string boxdefファイル名) {
-		StreamReader reader = new StreamReader(boxdefファイル名, Encoding.GetEncoding(OpenTaiko.sEncType));
-		string str = null;
+	public void tLoad(string boxdefFileName) {
+		StreamReader reader = new StreamReader(boxdefFileName, Encoding.GetEncoding(OpenTaiko.sEncType));
+		string? str = null;
 		while ((str = reader.ReadLine()) != null) {
 			if (str.Length != 0) {
 				try {
@@ -112,7 +115,10 @@ internal class CBoxDef {
 							} else if (key == "#SCENEPRESET") {
 								this.ScenePreset = value;
 							} else if (key == "#DEFAULTPREIMAGE") {
-								this.DefaultPreimage = Path.Combine(Directory.GetParent(boxdefファイル名).FullName, value);
+								this.DefaultPreimage = Path.Combine(Directory.GetParent(boxdefFileName)!.FullName, value);
+							} else if (key == "#COMPAT") {
+								this.Compat = CTja.strConvertTjaCompat(value);
+								IsChangedCompat = true;
 							} else {
 								for (int i = 0; i < 3; i++) {
 									if (key == "#BOXEXPLANATION" + (i + 1).ToString()) {
@@ -128,7 +134,7 @@ internal class CBoxDef {
 					continue;
 				} catch (Exception e) {
 					Trace.TraceError(e.ToString());
-					Trace.TraceError("例外が発生しましたが処理を継続します。 (178a9a36-a59e-4264-8e4c-b3c3459db43c)");
+					Trace.TraceError("An exception occurred; continuing. (178a9a36-a59e-4264-8e4c-b3c3459db43c)");
 					continue;
 				}
 			}

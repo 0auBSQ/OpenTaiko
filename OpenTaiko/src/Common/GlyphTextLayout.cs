@@ -1,0 +1,175 @@
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Text;
+using System.Text.RegularExpressions;
+
+namespace OpenTaiko;
+
+// Pure layout helpers for glyph-composed text rendering (LuaGlyphText): color-tag tokenizing, word wrap and
+// squish math. No font or GPU dependencies — advances and pair kerning are supplied by the caller — so all of it
+// is unit-testable headless.
+public static class GlyphTextLayout {
+	// keep in sync with CSkiaSharpTextRenderer.TagRegex and StringExtensions.TagRegex
+	private static readonly Regex TagRegex = new(@"<(/?)([gc](?:\.#[0-9a-fA-F]{6})*?)(?:\[(\d+(?:\.\d+)?)\])?>", RegexOptions.Compiled);
+
+	// a color override introduced by a <c.#rrggbb>/<c.#rrggbb.#rrggbb> (fore / fore+outline) or a
+	// <g.#top.#bottom> vertical-gradient tag (GradTop/GradBottom set, applied per glyph at bake time).
+	// A c tag may end with an outline width, <c.#rrggbb.#rrggbb[3]>: how far the outline reaches past the letters, in px
+	public readonly record struct Style(Color Fore, Color? Outline, Color? GradTop = null, Color? GradBottom = null, float? OutlineWidth = null);
+
+	// one Unicode code point with the style active at its position; StyleId -1 = the caller's default colors
+	public readonly record struct StyledRune(int CodePoint, int StyleId);
+
+	// Split text into code points + a style table. Mirrors CSkiaSharpTextRenderer.Tokenize semantics:
+	// <c.#fore> / <c.#fore#outline> push a color override, </c> pops, tags nest, unclosed tags run to the end.
+	// <g.#top.#bottom> pushes a vertical-gradient override (GradTop/GradBottom); the caller (LuaGlyphText)
+	// bakes each glyph with that gradient. </g> pops. Gradient and flat-color tags may nest.
+	public static (List<StyledRune> Runes, List<Style> Styles) Tokenize(string text) {
+		var runes = new List<StyledRune>();
+		var styles = new List<Style>();
+		if (string.IsNullOrEmpty(text)) return (runes, styles);
+
+		var stack = new Stack<int>();   // style ids; empty = default (-1)
+		int lastPos = 0;
+		foreach (Match match in TagRegex.Matches(text)) {
+			AppendRunes(runes, text, lastPos, match.Index, stack.Count > 0 ? stack.Peek() : -1);
+			lastPos = match.Index + match.Length;
+
+			if (match.Groups[1].Value == "/") {
+				if (stack.Count > 0) stack.Pop();
+				continue;
+			}
+			// inherit the current style, then apply the tag's colors on top
+			Style current = stack.Count > 0 ? styles[stack.Peek()] : new Style(Color.Empty, null);
+			string[] parts = match.Groups[2].Value.Split('.');
+			if (parts[0] == "c") {
+				if (parts.Length > 1) current = current with { Fore = ColorTranslator.FromHtml(parts[1]) };
+				if (parts.Length > 2) current = current with { Outline = ColorTranslator.FromHtml(parts[2]) };
+				if (match.Groups[3].Success)
+					current = current with { OutlineWidth = float.Parse(match.Groups[3].Value, System.Globalization.CultureInfo.InvariantCulture) };
+			} else if (parts[0] == "g") {
+				if (parts.Length > 2) current = current with { GradTop = ColorTranslator.FromHtml(parts[1]), GradBottom = ColorTranslator.FromHtml(parts[2]) };
+			}
+			styles.Add(current);
+			stack.Push(styles.Count - 1);
+		}
+		AppendRunes(runes, text, lastPos, text.Length, stack.Count > 0 ? stack.Peek() : -1);
+		return (runes, styles);
+	}
+
+	private static void AppendRunes(List<StyledRune> runes, string text, int start, int end, int styleId) {
+		int i = start;
+		while (i < end) {
+			// surrogate-safe code-point iteration
+			int cp = char.ConvertToUtf32(text, i);
+			runes.Add(new StyledRune(cp, styleId));
+			i += char.IsSurrogatePair(text, i) ? 2 : 1;
+		}
+	}
+
+	// a wrapped line: runes[Start .. Start+Count), Width = advance sum incl. inner spaces and the kerning between the
+	// line's runes (edge spaces dropped)
+	public readonly record struct Line(int Start, int Count, double Width);
+
+	// The kerning between runes[i] and runes[i + 1], from kern(first, second): only between neighbours of one style,
+	// since the string renderer shapes the text between colour tags on its own, and never across a line break.
+	public static double PairKern(IReadOnlyList<StyledRune> runes, int i, Func<int, int, double>? kern) {
+		if (kern == null || i < 0 || i + 1 >= runes.Count) return 0;
+		StyledRune a = runes[i], b = runes[i + 1];
+		if (a.StyleId != b.StyleId || a.CodePoint == '\n' || b.CodePoint == '\n') return 0;
+		return kern(a.CodePoint, b.CodePoint);
+	}
+
+	// Greedy word wrap. '\n' always breaks; spaces are break points and are dropped at line edges; CJK runes
+	// may break between any two runes; an unbreakable run wider than maxWidth hard-breaks mid-run.
+	// maxWidth <= 0 disables width wrapping (only '\n' splits). advance() supplies each rune's width in the
+	// same unit as maxWidth, kern() the kerning between two neighbouring runes (none when null).
+	public static List<Line> Wrap(IReadOnlyList<StyledRune> runes, double maxWidth, Func<int, double> advance, Func<int, int, double>? kern = null) {
+		var lines = new List<Line>();
+		int n = runes.Count;
+		int lineStart = -1, lineEnd = -1;   // current line rune range (-1 = empty line so far)
+		double lineWidth = 0;
+		int pendingSpaces = 0;              // spaces seen since the last word, not yet committed to the line
+		double pendingWidth = 0;
+		double K(int at) => PairKern(runes, at, kern);   // kerning between runes[at] and runes[at + 1]
+
+		void Flush() {
+			lines.Add(lineStart < 0 ? new Line(0, 0, 0) : new Line(lineStart, lineEnd - lineStart, lineWidth));
+			lineStart = lineEnd = -1; lineWidth = 0; pendingSpaces = 0; pendingWidth = 0;
+		}
+		void Append(int start, int endEx, double width) {
+			if (lineStart < 0) { lineStart = start; lineWidth = 0; } else { lineWidth += pendingWidth + K(start - 1); }
+			lineEnd = endEx; lineWidth += width;
+			pendingSpaces = 0; pendingWidth = 0;
+		}
+
+		int i = 0;
+		while (i < n) {
+			int cp = runes[i].CodePoint;
+			if (cp == '\n') { Flush(); i++; continue; }
+			if (cp == ' ') {
+				// a space joins the line after its predecessor (the line's end or an earlier pending space)
+				pendingSpaces++; pendingWidth += (lineStart >= 0 ? K(i - 1) : 0) + advance(cp); i++; continue;
+			}
+
+			// collect one unbreakable word: a single CJK rune, or a run of non-space non-CJK runes
+			int wordStart = i;
+			double wordWidth = 0;
+			if (IsCjk(cp)) {
+				wordWidth = advance(cp);
+				i++;
+			} else {
+				while (i < n && runes[i].CodePoint != ' ' && runes[i].CodePoint != '\n' && !IsCjk(runes[i].CodePoint)) {
+					wordWidth += (i > wordStart ? K(i - 1) : 0) + advance(runes[i].CodePoint);
+					i++;
+				}
+			}
+
+			if (maxWidth > 0 && lineStart >= 0 && lineWidth + pendingWidth + K(wordStart - 1) + wordWidth > maxWidth) {
+				Flush();   // drops the pending spaces at the break
+			}
+			if (maxWidth > 0 && lineStart < 0 && wordWidth > maxWidth && (i - wordStart) > 1) {
+				// hard-break an overlong word: emit maxWidth-sized chunks, leave the tail as the current line
+				int j = wordStart;
+				double w = 0;
+				int chunkStart = wordStart;
+				while (j < i) {
+					double a = advance(runes[j].CodePoint);
+					double k = j > chunkStart ? K(j - 1) : 0;
+					if (w > 0 && w + k + a > maxWidth) {
+						lines.Add(new Line(chunkStart, j - chunkStart, w));
+						chunkStart = j; w = 0; k = 0;
+					}
+					w += k + a; j++;
+				}
+				Append(chunkStart, i, w);
+				continue;
+			}
+			Append(wordStart, i, wordWidth);
+		}
+		Flush();   // final line (also emits one empty line for empty/blank-tail input)
+		return lines;
+	}
+
+	// scripts written without spaces, where a line may break between any two characters
+	public static bool IsCjk(int cp) {
+		return (cp >= 0x1100 && cp <= 0x11FF)      // Hangul Jamo
+			|| (cp >= 0x2E80 && cp <= 0x303F)      // CJK radicals, Kangxi, CJK symbols/punctuation (、。)
+			|| (cp >= 0x3040 && cp <= 0x30FF)      // hiragana + katakana
+			|| (cp >= 0x3130 && cp <= 0x318F)      // Hangul compatibility Jamo
+			|| (cp >= 0x31F0 && cp <= 0x31FF)      // katakana phonetic extensions
+			|| (cp >= 0x3400 && cp <= 0x4DBF)      // CJK ext A
+			|| (cp >= 0x4E00 && cp <= 0x9FFF)      // CJK unified
+			|| (cp >= 0xAC00 && cp <= 0xD7AF)      // Hangul syllables
+			|| (cp >= 0xF900 && cp <= 0xFAFF)      // CJK compatibility
+			|| (cp >= 0xFF00 && cp <= 0xFFEF)      // fullwidth forms
+			|| (cp >= 0x20000 && cp <= 0x2FA1F);   // CJK ext B+ (astral)
+	}
+
+	// per-letter squish: 1.0 while the text fits, else the shrink factor that makes it exactly maxWidth wide
+	public static double SquishFactor(double naturalWidth, double maxWidth) {
+		if (maxWidth <= 0 || naturalWidth <= 0 || naturalWidth <= maxWidth) return 1.0;
+		return maxWidth / naturalWidth;
+	}
+}

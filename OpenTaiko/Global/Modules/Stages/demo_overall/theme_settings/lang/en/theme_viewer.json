@@ -1,0 +1,10 @@
+{
+  "_comment": "English texts for the theme settings viewer. Keys are stable ids; this file is the fallback for every other language.",
+  "title": "Theme Settings Viewer",
+  "col_id": "ID",
+  "col_scope": "Scope",
+  "col_type": "Type",
+  "col_value": "Value",
+  "hint_scroll": "up/down to scroll   Cancel to exit",
+  "hint_exit": "Cancel to exit"
+}

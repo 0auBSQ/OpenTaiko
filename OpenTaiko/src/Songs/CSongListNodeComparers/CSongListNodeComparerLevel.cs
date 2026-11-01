@@ -7,9 +7,9 @@ internal sealed class CSongListNodeComparerLevel : IComparer<CSongListNode> {
 		this._order = order;
 	}
 
-	public int Compare(CSongListNode n1, CSongListNode n2) {
-		int _n1s = (n1.nodeType != CSongListNode.ENodeType.SCORE) ? 0 : 1;
-		int _n2s = (n2.nodeType != CSongListNode.ENodeType.SCORE) ? 0 : 1;
+	public int Compare(CSongListNode? n1, CSongListNode? n2) {
+		int _n1s = (n1!.nodeType != CSongListNode.ENodeType.SCORE) ? 0 : 1;
+		int _n2s = (n2!.nodeType != CSongListNode.ENodeType.SCORE) ? 0 : 1;
 
 
 		if (_n1s == 0 || _n2s == 0) {
@@ -19,6 +19,7 @@ internal sealed class CSongListNodeComparerLevel : IComparer<CSongListNode> {
 	}
 
 	private int _diffOf(CSongListNode n1) {
-		return n1.nLevel[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(n1)];
+		int diff = Math.Clamp(OpenTaiko.ConfigIni.nDefaultCourse, 0, n1.nLevel.Length - 1);
+		return n1.nLevel[diff];
 	}
 }

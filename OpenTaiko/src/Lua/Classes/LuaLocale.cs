@@ -1,0 +1,66 @@
+﻿using System.Text.Json.Nodes;
+using Newtonsoft.Json;
+using NLua;
+
+namespace OpenTaiko {
+	public class LuaLangFunc {
+		public string GetString(string key, params object?[] args) {
+			return CLangManager.LangInstance.GetString(key, args);
+		}
+
+		public bool ChangeLanguage(string id) {
+			if (CLangManager.Langcodes.Contains(id) && CLangManager.fetchLang() != id) {
+				// set first so reloadLanguage already sees the new id; saved to Config.ini at shutdown
+				OpenTaiko.ConfigIni.sLang = id;
+				CLangManager.langAttach(id);
+				return true;
+			}
+			return false;
+		}
+
+		public string[] GetLanguageIds() {
+			return CLangManager.Langcodes;
+		}
+
+		// the id of the language in use (the Lang/ folder name), "en" and so on
+		public string GetLanguageId() {
+			return CLangManager.fetchLang();
+		}
+		public string[] GetLanguageNames() {
+			return CLangManager.Languages;
+		}
+		public Dictionary<string, string> GetAvailableLanguages() {
+			return CLangManager.LanguageDict;
+		}
+
+		/// <summary>Returns the localized exam condition name for the given Exam.Type integer.</summary>
+		public string GetExamName(int typeAsInt) => CLangManager.LangInstance.GetExamName(typeAsInt);
+
+		// I18N
+
+		private Dictionary<string, string> _ConvertToStringDict(Dictionary<string, object> dict) {
+			return dict.ToDictionary(
+				kvp => kvp.Key,
+				kvp => kvp.Value?.ToString() ?? string.Empty
+			);
+		}
+
+		public CLocalizationData AsLocalizationData(JsonNode obj) {
+			string _str = System.Text.Json.JsonSerializer.Serialize(obj);
+			return JsonConvert.DeserializeObject<CLocalizationData>(_str) ?? new CLocalizationData();
+		}
+
+		public CLocalizationData FromDict(Dictionary<string, object> dict) {
+			var _loc = new CLocalizationData(_ConvertToStringDict(dict));
+			return _loc;
+		}
+
+		public CLocalizationData FromString(string _str) {
+			var _strdct = JsonConvert.DeserializeObject<Dictionary<string, string>>(_str) ?? null;
+			if (_strdct != null) {
+				return new CLocalizationData(_strdct);
+			}
+			return new CLocalizationData();
+		}
+	}
+}

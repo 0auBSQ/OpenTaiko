@@ -19,33 +19,41 @@ public class AngleContext : IGLContext {
 	[DllImport("libwayland-egl.so.1")] private static extern void wl_egl_window_resize(nint eglWindow, int width, int height, int dx, int dy);
 	[DllImport("libwayland-egl.so.1")] private static extern void wl_egl_window_destroy(nint eglWindow);
 
+	// which window system the handles below belong to: without it, ANGLE takes Linux handles as X11 ones
+	private const int EGL_PLATFORM_ANGLE_NATIVE_PLATFORM_TYPE_ANGLE = 0x348F;
+	private const int EGL_PLATFORM_X11_EXT = 0x31D5;
+	private const int EGL_PLATFORM_WAYLAND_EXT = 0x31D8;
+
 	public AngleContext(AnglePlatformType anglePlatformType, IWindow window, string flag_override = "") {
 		nint windowHandle;
 		nint display;
+		int nativePlatform = 0;
 		NativeWindowFlags selectedflag; // For logging
 
 		bool flag_has_override = !string.IsNullOrWhiteSpace(flag_override);
-		if ((window.Native.Kind.HasFlag(NativeWindowFlags.Win32) && !flag_has_override) || flag_override == "win32") {
+		if ((window.Native!.Kind.HasFlag(NativeWindowFlags.Win32) && !flag_has_override) || flag_override == "win32") {
 			selectedflag = NativeWindowFlags.Win32;
-			windowHandle = window.Native.Win32.Value.Hwnd;
-			display = window.Native.Win32.Value.HDC;
+			windowHandle = window.Native.Win32!.Value.Hwnd;
+			display = window.Native.Win32!.Value.HDC;
 			Console.WriteLine("Handle set to Win32");
 		} else if ((window.Native.Kind.HasFlag(NativeWindowFlags.X11) && !flag_has_override) || flag_override == "x11") {
 			selectedflag = NativeWindowFlags.X11;
-			windowHandle = (nint)window.Native.X11.Value.Window;
+			windowHandle = (nint)window.Native.X11!.Value.Window;
 			// Temporary fix for the segfaults
 			// Note than X11 Display number is NOT always 0, it can be 1, 2 and so on for example in cases of user switching
 			display = 0;// Egl.GetDisplay(window.Native.X11.Value.Display);
+			nativePlatform = EGL_PLATFORM_X11_EXT;
 			Console.WriteLine("Handle set to X11");
 		} else if ((window.Native.Kind.HasFlag(NativeWindowFlags.Cocoa) && !flag_has_override) || flag_override == "cocoa") {
 			selectedflag = NativeWindowFlags.Cocoa;
-			windowHandle = window.Native.Cocoa.Value;
+			windowHandle = window.Native.Cocoa!.Value;
 			display = 0;
 			Console.WriteLine("Handle set to Cocoa");
 		} else if ((window.Native.Kind.HasFlag(NativeWindowFlags.Wayland) && !flag_has_override) || flag_override == "wayland") {
 			selectedflag = NativeWindowFlags.Wayland;
-			display = window.Native.Wayland.Value.Display;
-			nint wlSurface = window.Native.Wayland.Value.Surface;
+			display = window.Native.Wayland!.Value.Display;
+			nativePlatform = EGL_PLATFORM_WAYLAND_EXT;
+			nint wlSurface = window.Native.Wayland!.Value.Surface;
 			// Wrap the wl_surface in a wl_egl_window; eglCreateWindowSurface needs THIS, not the raw
 			// surface. Size it to the window (matching the viewport math, which is driven by Size, not
 			// the framebuffer), keep it in sync on resize, and free it on dispose.
@@ -89,11 +97,9 @@ public class AngleContext : IGLContext {
 				platform = Egl.PLATFORM_ANGLE_TYPE_METAL_ANGLE;
 				break;
 		}
-		int[] platformAttributes = new int[]
-		{
-			Egl.PLATFORM_ANGLE_TYPE_ANGLE, platform,
-			Egl.NONE
-		};
+		int[] platformAttributes = nativePlatform != 0
+			? new int[] { Egl.PLATFORM_ANGLE_TYPE_ANGLE, platform, EGL_PLATFORM_ANGLE_NATIVE_PLATFORM_TYPE_ANGLE, nativePlatform, Egl.NONE }
+			: new int[] { Egl.PLATFORM_ANGLE_TYPE_ANGLE, platform, Egl.NONE };
 
 		//getEGLNativeDisplay
 		Display = Egl.GetPlatformDisplayEXT(Egl.PLATFORM_ANGLE_ANGLE, display, platformAttributes);
@@ -118,14 +124,37 @@ public class AngleContext : IGLContext {
 			Egl.ChooseConfig(Display, configAttributes, configs, configs.Length, out int num_config);
 		}
 
-		int[] contextAttributes = new int[]
-		{
-            //Egl.CONTEXT_CLIENT_VERSION, 2,
-            Egl.CONTEXT_MAJOR_VERSION, 2,
-			Egl.CONTEXT_MINOR_VERSION, 0,
-			Egl.NONE
-		};
-		Context = Egl.CreateContext(Display, configs[0], 0, contextAttributes);
+		// Try to create a GLES 3.1 context (required for compute shaders — the GPU renderer path); fall
+		// back to GLES 2.0 if the driver/ANGLE backend can't provide one, so startup is never broken.
+		// Set OPENTAIKO_FORCE_GLES2=1 to force the legacy 2.0 path.
+		const int OPENGL_ES3_BIT_KHR = 0x00000040;
+		bool preferES31 = Environment.GetEnvironmentVariable("OPENTAIKO_FORCE_GLES2") != "1";
+		Context = 0;
+		if (preferES31) {
+			IntPtr[] configs3 = new IntPtr[1];
+			int num3 = 0;
+			int[] configAttributes3 = new int[]
+			{
+				Egl.RENDERABLE_TYPE, OPENGL_ES3_BIT_KHR,
+				Egl.RED_SIZE, 8,
+				Egl.GREEN_SIZE, 8,
+				Egl.BLUE_SIZE, 8,
+				Egl.BUFFER_SIZE, 0,
+				Egl.NONE
+			};
+			unsafe { Egl.ChooseConfig(Display, configAttributes3, configs3, configs3.Length, out num3); }
+			if (num3 > 0 && configs3[0] != 0) {
+				int[] ctx31 = { Egl.CONTEXT_MAJOR_VERSION, 3, Egl.CONTEXT_MINOR_VERSION, 1, Egl.NONE };
+				Context = Egl.CreateContext(Display, configs3[0], 0, ctx31);
+				if (Context != 0) { configs[0] = configs3[0]; ContextMajor = 3; ContextMinor = 1; }
+			}
+		}
+		if (Context == 0) {
+			int[] contextAttributes = { Egl.CONTEXT_MAJOR_VERSION, 2, Egl.CONTEXT_MINOR_VERSION, 0, Egl.NONE };
+			Context = Egl.CreateContext(Display, configs[0], 0, contextAttributes);
+			ContextMajor = 2; ContextMinor = 0;
+		}
+		Console.WriteLine($"GLES context created: {ContextMajor}.{ContextMinor}" + (ContextMajor >= 3 && ContextMinor >= 1 ? " (compute shaders available)" : " (no compute shaders)"));
 
 		int[] surfaceAttributes = new int[]
 		{
@@ -148,6 +177,10 @@ public class AngleContext : IGLContext {
 	}
 
 	public nint Handle { get; set; }
+
+	/// <summary>The GLES version actually granted (3.1 enables compute shaders; otherwise 2.0).</summary>
+	public int ContextMajor { get; private set; }
+	public int ContextMinor { get; private set; }
 
 	public IGLContextSource? Source { get; set; }
 

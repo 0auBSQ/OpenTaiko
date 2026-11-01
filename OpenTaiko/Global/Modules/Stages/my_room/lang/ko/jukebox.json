@@ -1,0 +1,11 @@
+{
+  "_comment": "주크박스 플레이어(jukebox.lua)의 한국어 텍스트. 대사는 dialogs.json에 있습니다. 키는 고정 ID이며, 없는 ID는 영어 텍스트(lang/en)로 표시됩니다.",
+  "title": "주크박스",
+  "tab_bgm": "BGM",
+  "tab_songs": "곡",
+  "bgm_title": "마이 룸 BGM",
+  "nothing_playing": "재생 중인 곡 없음",
+  "waiting": "레코드 정리 중... 곡 목록을 아직 준비하고 있습니다.",
+  "no_songs": "재생할 수 있는 곡이 없습니다.",
+  "speed": "속도"
+}

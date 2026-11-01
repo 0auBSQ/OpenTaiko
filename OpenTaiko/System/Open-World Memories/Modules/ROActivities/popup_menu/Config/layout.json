@@ -1,0 +1,4 @@
+{
+    "_note": "Pause popup layout. Its positions and font size come from the skin's PopupMenu_* settings; this file holds only the cursor's look: the highlight is a left cap, middle_tiles middle tiles and a right cap from Menu_Highlight.png.",
+    "cursor": { "middle_tiles": 16 }
+}

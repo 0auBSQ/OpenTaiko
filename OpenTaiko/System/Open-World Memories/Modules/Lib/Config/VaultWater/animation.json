@@ -1,0 +1,5 @@
+{
+    "_note": "Secret Vault water motion (Lib/VaultWater). waves_px: the wave height at the surface and the lower edge when setSwell gives none; max_frame_s: a slower frame counts as this long.",
+    "waves_px": 15,
+    "max_frame_s": 0.5
+}

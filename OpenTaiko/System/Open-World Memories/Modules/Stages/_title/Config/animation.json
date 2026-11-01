@@ -1,0 +1,79 @@
+{
+    "_note": "Title screen animation. Times in milliseconds.",
+    "hold_scroll": {
+        "_note": "Holding a direction: auto-repeat starts after delay_ms, then steps every repeat_ms (the menu and the player selector).",
+        "delay_ms": 180,
+        "repeat_ms": 70
+    },
+    "menu_scroll": {
+        "_note": "The menu eases toward the chosen box by exponential smoothing (45 ms: a half-life of about 31 ms, about 120 ms to arrive), and snaps once within snap_distance boxes.",
+        "time_constant_ms": 45.0,
+        "snap_distance": 0.005
+    },
+    "locked_static": {
+        "_note": "The locked vault entry flickers: every check_interval_ms a burst starts with a chance of chance in chance_out_of (2 in 10: about 2 bursts a second), lasting burst_min_ms to burst_max_ms.",
+        "check_interval_ms": 100,
+        "chance": 2,
+        "chance_out_of": 10,
+        "burst_min_ms": 150,
+        "burst_max_ms": 500
+    },
+    "player_select": {
+        "_note": "The open timeline: the upper band lands at upper_land_ms; the lower one enters at lower_in_ms and lands at lower_land_ms. The selected box starts popping in at pop_at_ms, each box further out pop_step_ms later, each pop taking pop_ms. Decide is refused before decide_lock_ms; the decide confirm lasts decide_ms, the cancel outro close_ms (the prompt fades out over its first outro_fade_ms). The dim fades in over dim_in_ms.",
+        "upper_land_ms": 460,
+        "lower_in_ms": 70,
+        "lower_land_ms": 530,
+        "pop_at_ms": 180,
+        "pop_step_ms": 60,
+        "pop_ms": 320,
+        "decide_lock_ms": 200,
+        "decide_ms": 300,
+        "close_ms": 260,
+        "outro_fade_ms": 160,
+        "dim_in_ms": 220,
+        "band": {
+            "_note": "The bands scroll at scroll_px_per_s, building up over build_up_ms once both have landed, rushing up to scroll_px_per_s + rush_px_per_s while deciding. After a count change the previous ribbons fade out over swap_fade_ms. On cancel the bands slide close_travel_px off over close_ms.",
+            "scroll_px_per_s": 60,
+            "rush_px_per_s": 900,
+            "build_up_ms": 300,
+            "swap_fade_ms": 120,
+            "close_travel_px": 136,
+            "close_ms": 240
+        },
+        "prompt": {
+            "_note": "The prompt fades in from delay_ms over fade_ms, sliding from start_offset_px (vertical) to its place.",
+            "delay_ms": 140,
+            "fade_ms": 260,
+            "start_offset_px": -24
+        },
+        "carousel": {
+            "_note": "The carousel eases toward the selection by exponential smoothing and snaps once within snap_distance boxes.",
+            "time_constant_ms": 55,
+            "snap_distance": 0.001
+        },
+        "box": {
+            "_note": "The selected box bobs by bob_px every bob_period_ms. Deciding pulses it by decide_pulse (scale) while the others fade by decide_others_fade over decide_others_fade_ms. On cancel the boxes shrink by close_shrink and fade out over close_ms.",
+            "bob_px": 4,
+            "bob_period_ms": 1800,
+            "decide_pulse": 0.08,
+            "decide_others_fade": 0.65,
+            "decide_others_fade_ms": 200,
+            "close_ms": 200,
+            "close_shrink": 0.15
+        },
+        "bounce": {
+            "_note": "A selection change bounces the box's art for ms: by press_amount on a press, hold_amount on a hold-repeat step (scale).",
+            "ms": 240,
+            "press_amount": 0.06,
+            "hold_amount": 0.03
+        },
+        "ring": {
+            "_note": "The selection ring fades in over fade_in_ms once its box has popped, then pulses between pulse_base and pulse_base + pulse_range opacity every pulse_period_ms; deciding flashes it for flash_ms.",
+            "fade_in_ms": 150,
+            "pulse_base": 0.8,
+            "pulse_range": 0.2,
+            "pulse_period_ms": 900,
+            "flash_ms": 240
+        }
+    }
+}

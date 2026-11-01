@@ -1,0 +1,173 @@
+﻿using System.Diagnostics;
+using FDK;
+
+namespace OpenTaiko {
+	public interface ILuaSeekableInMs : ILuaSeekable {
+		bool IsFinished();
+		double DurationMs { get; }
+		double GetTimestampMs();
+		double GetSpeed();
+		void SetTimestampMs(double ms);
+		void SetSpeed(double speed);
+	}
+
+	public class LuaSound : IDisposable, ILuaSeekableInMs, ILuaLoopable {
+		internal CSkin.CSystemSound? _sound;
+		internal HashSet<LuaSound>? _disposeList = null;
+		internal bool HoldExempt;   // a transition's sound: never held back
+
+		// State set on the stub before the deferred sound is built (async-load path) — applied on LoadDeferred,
+		// so e.g. SetLoop(true)/Play() called in onStart aren't lost while the BASS stream is still being created.
+		private bool? _pendingLoop;
+		private double? _pendingVolume;
+		private int? _pendingPan;
+		private long? _pendingTimestamp;
+		private double? _pendingSpeed;
+		private bool _pendingPlay;
+
+		public string Path { get; private set; } = "";
+		public LuaSound() {
+			_sound = null;
+		}
+		public LuaSound(string path, ESoundGroup group) {
+			Path = path;
+			_sound = new(path, false, false, false, group);
+			_sound.tLoading();
+		}
+
+		// Build the underlying sound in-place (async-load path: created empty, filled on the render thread).
+		// Until this runs, every method is a harmless no-op.
+		internal void LoadDeferred(string path, ESoundGroup group) {
+			if (_disposedValue) return;   // disposed while still queued: don't resurrect an unowned native sound
+			Path = path;
+			var s = new CSkin.CSystemSound(path, false, false, false, group) { HoldExempt = HoldExempt };
+			s.tLoading();
+			_sound = s;
+			// Apply anything set on the stub while it was still loading. Play BEFORE the buffered seek:
+			// tPlay -> PlayStart rewinds the stream to 0, so a pending SetTimestamp must land AFTER it —
+			// the same Play-then-SetTimestamp discipline live callers follow (song-select preview, the
+			// myroom jukebox starting mid-track for late-joining guests).
+			if (_pendingLoop.HasValue) s.bLoop = _pendingLoop.Value;
+			if (_pendingVolume.HasValue) s.SetVolume((int)_pendingVolume.Value);
+			if (_pendingPan.HasValue) s.SetPanning(_pendingPan.Value);
+			if (_pendingSpeed.HasValue) s.SetSpeed(_pendingSpeed.Value);
+			if (_pendingPlay) s.tPlay();
+			if (_pendingTimestamp.HasValue) s.SetTimestamp(_pendingTimestamp.Value);
+			_pendingLoop = null; _pendingVolume = null; _pendingPan = null; _pendingTimestamp = null; _pendingSpeed = null; _pendingPlay = false;
+		}
+
+		#region Sound
+		public void Play() { if (_sound != null) _sound.tPlay(); else _pendingPlay = true; }
+		public void Start() => Play();
+		public void Resume() { if (_sound != null) _sound.tResume(); else _pendingPlay = true; }
+		public void Pause() { if (_sound != null) _sound.tPause(); else _pendingPlay = false; }
+		public void Stop() { if (_sound != null) _sound.tStop(); else _pendingPlay = false; }
+		public void Reset() => SetTimestamp(0);
+
+		#endregion
+		#region Gets
+		public bool Loaded => _sound != null;
+		public bool IsPlaying => _sound?.bIsPlaying ?? false;
+		public bool GetLoop() => _sound?.bLoop ?? false;
+		public int GetPan() => _sound?.nPosition_CurrentlyPlayingSound ?? 0;
+		/// <summary>Returns the total duration of the sound in milliseconds, or 0 if not loaded.</summary>
+		public double DurationMs => _sound?.nLength ?? 0;
+		public double GetDurationMs() => DurationMs; // permanent alias of DurationMs
+		/// <summary>Returns the current playback position in milliseconds.</summary>
+		public double GetTimestampMs() => _sound?.msTimeStamp_nowSound ?? 0;
+
+		public double GetVolumePercent() => _sound?.VolumePercent ?? 100;
+
+		public double GetSpeed() => _sound?.Speed ?? 1;
+
+		public bool IsFinished() => _sound?.bIsFinishedPlaying ?? false;
+		#endregion
+		#region Sets
+		public void SetLoop(bool loop) {
+			if (_sound != null) _sound.bLoop = loop; else _pendingLoop = loop;
+		}
+		public void SetPan(int panning) {
+			if (_sound != null) _sound.SetPanning(panning); else _pendingPan = panning;
+		}
+
+		public void SetTimestampMs(double ms) {
+			if (_sound != null) _sound.SetTimestamp((long)ms); else _pendingTimestamp = (long)ms;
+		}
+		public void SetTimestamp(double ms) => SetTimestampMs(ms); // permanent alias of SetTimestampMs
+
+		public void SetVolumePercent(double vol) {
+			if (_sound != null) _sound.SetVolume((int)vol); else _pendingVolume = vol;
+		}
+		public void SetVolume(int vol) => SetVolumePercent(vol); // permanent alias of SetVolumePercent
+
+		/// <summary>Sets the playback speed multiplier (1.0 = normal).</summary>
+		public void SetSpeed(double speed) {
+			if (_sound != null) _sound.SetSpeed(speed); else _pendingSpeed = speed;
+		}
+
+		#endregion
+		#region Dispose
+		private bool _disposedValue;
+		protected virtual void Dispose(bool disposing) {
+			if (!_disposedValue) {
+				if (disposing) {
+					Path = string.Empty;
+				}
+				_sound?.Dispose();
+				_sound = null;
+				_disposeList?.Remove(this);
+
+				_disposedValue = true;
+			}
+		}
+
+		public void Dispose() {
+			Dispose(disposing: true);
+			GC.SuppressFinalize(this);
+		}
+		#endregion
+	}
+	public class LuaSoundFunc {
+		private HashSet<LuaSound> Sounds;
+		private string DirPath;
+		internal bool HoldExempt;   // set for a transition's scripts
+
+		public LuaSoundFunc(HashSet<LuaSound> sounds, string dirPath) {
+			Sounds = sounds;
+			DirPath = dirPath;
+		}
+
+		public LuaSound CreateSFX(string path) => CreateSound(path, ESoundGroup.SoundEffect);
+		public LuaSound CreateVoice(string path) => CreateSound(path, ESoundGroup.Voice);
+		public LuaSound CreateBGM(string path) => CreateSound(path, ESoundGroup.SongPlayback);
+		public LuaSound CreatePreview(string path) => CreateSound(path, ESoundGroup.SongPreview);
+		public LuaSound CreateSFXFromAbsolutePath(string path) => CreateSoundFromAbsolutePath(path, ESoundGroup.SoundEffect);
+		public LuaSound CreateVoiceFromAbsolutePath(string path) => CreateSoundFromAbsolutePath(path, ESoundGroup.Voice);
+		public LuaSound CreateBGMFromAbsolutePath(string path) => CreateSoundFromAbsolutePath(path, ESoundGroup.SongPlayback);
+		public LuaSound CreatePreviewFromAbsolutePath(string path) => CreateSoundFromAbsolutePath(path, ESoundGroup.SongPreview);
+		internal LuaSound CreateSound(string path, ESoundGroup group, bool autoDispose = true)
+			=> CreateSoundFromAbsolutePath($@"{DirPath}{Path.DirectorySeparatorChar}{path}", group, autoDispose);
+
+		internal LuaSound CreateSoundFromAbsolutePath(string path, ESoundGroup group, bool autoDispose = true) {
+			string full_path = $@"{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
+			if (OpenTaiko.TraceAllocations) Trace.TraceInformation($"[ALLOC_SND] {full_path}");
+
+			// Return an empty stub + create the BASS stream non-blocking on the render thread (BASS is sync-
+			// critical, so it is NOT moved off-thread — just spread across frames). Until it's built every method
+			// is a harmless no-op and Play/Set* are buffered, so the sound simply starts working when ready.
+			LuaSound sound = new() { HoldExempt = HoldExempt };
+			Sounds.Add(sound);
+			if (autoDispose)
+				sound._disposeList = this.Sounds;
+			Action build = () => {
+				try { sound.LoadDeferred(full_path, group); }
+				catch (Exception e) { LogNotification.PopError($"Lua Sound failed to load: {e}"); }
+			};
+			if (CAsyncLoad.ShouldDefer)
+				CAsyncLoad.TrackRenderThread(build);   // in a load phase → also counts toward the loading bar
+			else
+				Game.AsyncActions.Enqueue(build);      // runtime → just the per-frame finalize budget, non-blocking
+			return sound;
+		}
+	}
+}

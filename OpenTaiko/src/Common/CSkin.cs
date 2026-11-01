@@ -7,33 +7,33 @@ using FDK;
 namespace OpenTaiko;
 // グローバル定数
 
-public enum Eシステムサウンド {
-	BGMオプション画面 = 0,
-	BGMコンフィグ画面,
-	BGM起動画面,
-	BGM選曲画面,
-	SOUNDステージ失敗音,
-	SOUNDカーソル移動音,
-	SOUNDゲーム開始音,
-	SOUNDゲーム終了音,
-	SOUNDステージクリア音,
-	SOUNDタイトル音,
-	SOUNDフルコンボ音,
-	SOUND歓声音,
-	SOUND曲読込開始音,
-	SOUND決定音,
-	SOUND取消音,
-	SOUND変更音,
+public enum ESystemSound {
+	BGMOptionScreen = 0,
+	BGMConfigScreen,
+	BGMStartupScreen,
+	BGMSelSongScreen,
+	SOUNDStageFailureSound,
+	SOUNDCursorMoveSound,
+	SOUNDGameStartSound,
+	SOUNDGameEndSound,
+	SOUNDStageClearSound,
+	SOUNDTitleSound,
+	SOUNDFullComboSound,
+	SOUNDCheerSound,
+	SOUNDSongLoadStartSound,
+	SOUNDDecideSound,
+	SOUNDCancelSound,
+	SOUNDChangeSound,
 	//SOUND赤,
 	//SOUND青,
-	SOUND風船,
-	SOUND曲決定音,
-	SOUND成績発表,
-	SOUND特訓再生,
-	SOUND特訓停止,
-	sound特訓ジャンプポイント,
-	sound特訓スキップ音,
-	SOUND特訓スクロール,
+	SOUNDBalloon,
+	SOUNDSongDecideSound,
+	SOUNDGradeAnnounce,
+	SOUNDTrainingPlayback,
+	SOUNDTrainingStop,
+	soundTrainingJumpPoint,
+	soundTrainingSkipSound,
+	SOUNDTrainingScroll,
 	Count               // システムサウンド総数の計算用
 }
 
@@ -43,76 +43,112 @@ internal class CSkin : IDisposable {
 	public class CSystemSound : IDisposable {
 		// static フィールド
 
-		public static CSkin.CSystemSound r最後に再生した排他システムサウンド;
+		public static CSkin.CSystemSound? rLastPlaybackExclusiveSystemSound;
 
-		private readonly ESoundGroup _soundGroup;
+		public ESoundGroup SoundGroup { get; private init; }
 
 		// フィールド、プロパティ
 
 		public bool bPlayed;
-		public bool bCompact対象;
-		public bool bLoop;
+		public bool bCompactTarget;
+		private bool _bLoop;
+		public bool bLoop {
+			get => _bLoop;
+			set {
+				this.rSound[0]?.SetLoop(value);
+				this.rSound[1]?.SetLoop(value);
+				_bLoop = value;
+			}
+		}
 		public bool bNotLoadedYet;
 		public bool bLoadedSuccessfuly;
 		public bool bExclusive;
 		public string strFileName = "";
-		public bool bIsPlaying {
-			get {
-				if (this.rSound[1 - this.nNextPlayingSoundNumber] == null)
-					return false;
 
-				return this.rSound[1 - this.nNextPlayingSoundNumber].IsPlaying;
+		// a BGM started during a transition waits until the fade-in ends; it reads as playing meanwhile
+		internal bool HoldExempt;                    // a transition's own sounds play at once
+		private bool _held, _heldResume;
+		private long? _heldTimestamp;
+		private static readonly List<CSystemSound> _heldSounds = [];
+
+		private bool HoldBack => SoundGroup == ESoundGroup.SongPlayback && !HoldExempt && CStageTransition.HoldsNewBgm;
+
+		private void Hold(bool resume) {
+			if (!_held) { _held = true; _heldSounds.Add(this); }
+			_heldResume = resume;
+			_heldTimestamp = null;
+		}
+
+		private void DropHold() {
+			if (!_held) return;
+			_held = false;
+			_heldSounds.Remove(this);
+		}
+
+		internal static void ReleaseHeld() {
+			var held = _heldSounds.ToArray();
+			_heldSounds.Clear();
+			foreach (var s in held) {
+				if (!s._held) continue;
+				s._held = false;
+				if (s.bDisposed) continue;
+				s.tPlay(s._heldResume);
+				if (s._heldTimestamp is long ms) s.SetTimestamp(ms);
 			}
+		}
+
+		internal static void DropHeld() {
+			foreach (var s in _heldSounds) s._held = false;
+			_heldSounds.Clear();
+		}
+
+		private CSound? nowSound => this.rSound[1 - this.nNextPlayingSoundNumber];
+		private CSound? nextSound => this.rSound[this.nNextPlayingSoundNumber];
+		public bool bIsPlaying {
+			get => _held || (this.nowSound?.IsPlaying ?? false);
+		}
+		public bool bIsFinishedPlaying {
+			get => !_held && (this.nowSound?.IsFinishedPlaying ?? false);
 		}
 		public int nPosition_CurrentlyPlayingSound {
-			get {
-				return this.rSound[1 - this.nNextPlayingSoundNumber]?.SoundPosition ?? 0;
-			}
-			set {
-				this.rSound[1 - this.nNextPlayingSoundNumber]?.SetPanning(value);
-			}
+			get => this.nowSound?.SoundPosition ?? 0;
+			set => this.nowSound?.SetPanning(value);
 		}
 		public int nPosition_NextPlayingSound {
-			get {
-				return this.rSound[this.nNextPlayingSoundNumber]?.SoundPosition ?? 0;
-			}
-			set {
-				this.rSound[this.nNextPlayingSoundNumber]?.SetPanning(value);
-			}
+			get => nextSound?.SoundPosition ?? 0;
+			set => nextSound?.SetPanning(value);
 		}
-		public int nAutomationLevel_現在のサウンド {
-			get {
-				CSound sound = this.rSound[1 - this.nNextPlayingSoundNumber];
-				if (sound == null)
-					return 0;
-
-				return sound.AutomationLevel;
-			}
+		public double VolumePercent => this.nowSound?.GetGainPercent() ?? 100;
+		public int nAutomationLevel_CurrentSound {
+			get => this.nowSound?.AutomationLevel ?? 0;
 			set {
-				CSound sound = this.rSound[1 - this.nNextPlayingSoundNumber];
+				CSound? sound = this.nowSound;
 				if (sound != null) {
 					sound.AutomationLevel = value;
 				}
 			}
 		}
-		public int n長さ_現在のサウンド {
+		public double msTimeStamp_nowSound {
 			get {
-				CSound sound = this.rSound[1 - this.nNextPlayingSoundNumber];
-				if (sound == null) {
-					return 0;
-				}
-				return sound.TotalPlayTime;
+				if (_held) return _heldTimestamp ?? 0;
+				double msTimeStamp = 0;
+				this.nowSound?.tGetPlayPosition(out var bytesTimeStamp, out msTimeStamp);
+				return msTimeStamp;
 			}
 		}
-		public int n長さ_次に鳴るサウンド {
+		public double msTimeStamp_nextSound {
 			get {
-				CSound sound = this.rSound[this.nNextPlayingSoundNumber];
-				if (sound == null) {
-					return 0;
-				}
-				return sound.TotalPlayTime;
+				double msTimeStamp = 0;
+				this.nextSound?.tGetPlayPosition(out var bytesTimeStamp, out msTimeStamp);
+				return msTimeStamp;
 			}
 		}
+		public double Speed => this.nowSound?.PlaySpeed ?? 1;
+		public double nLength => nLength_of(0); // all rSound[i] has the same audio loaded
+		public double nLength_of(int i)
+			=> this.rSound[i]?.dbTotalPlayTime ?? 0; // only for debugging purpose
+
+		public uint Pointer { get => this.rSound[0]?.Pointer ?? 0; }
 
 
 		/// <summary>
@@ -122,14 +158,25 @@ internal class CSkin : IDisposable {
 		/// <param name="bLoop"></param>
 		/// <param name="bExclusive"></param>
 		/// <param name="bCompact対象"></param>
-		public CSystemSound(string strFileName, bool bLoop, bool bExclusive, bool bCompact対象, ESoundGroup soundGroup) {
+		public CSystemSound(string strFileName, bool bLoop, bool bExclusive, bool bCompactTarget, ESoundGroup soundGroup) {
 			this.strFileName = strFileName;
 			this.bLoop = bLoop;
 			this.bExclusive = bExclusive;
-			this.bCompact対象 = bCompact対象;
-			_soundGroup = soundGroup;
+			this.bCompactTarget = bCompactTarget;
+			SoundGroup = soundGroup;
 			this.bNotLoadedYet = true;
 			this.bPlayed = false;
+		}
+
+		public void UpdateSound(CSystemSound sound) {
+			if (sound.bDisposed)
+				return;
+			this.Dispose();
+			this.rSound = sound.rSound;
+			this.strFileName = sound.strFileName;
+
+			this.bLoadedSuccessfuly = sound.bLoadedSuccessfuly;
+			this.bDisposed = sound.bDisposed;
 		}
 
 
@@ -142,64 +189,109 @@ internal class CSkin : IDisposable {
 				throw new InvalidOperationException("ファイル名が無効です。");
 
 			if (!File.Exists(CSkin.Path(this.strFileName))) {
-				Trace.TraceWarning($"ファイルが存在しません。: {this.strFileName}");
+				Trace.TraceWarning($"File not found: {this.strFileName}");
 				return;
 			}
 
 			for (int i = 0; i < 2; i++)     // 一旦Cloneを止めてASIO対応に専念
 			{
 				try {
-					this.rSound[i] = OpenTaiko.SoundManager?.tCreateSound(CSkin.Path(this.strFileName), _soundGroup);
+					this.rSound[i] = OpenTaiko.SoundManager?.tCreateSound(CSkin.Path(this.strFileName), SoundGroup);
 				} catch {
 					this.rSound[i] = null;
 					throw;
 				}
 			}
 			this.bLoadedSuccessfuly = true;
+			this.bDisposed = false;
 		}
-		public void tPlay() {
+		public void tPlay(bool resume, double? msFrameworkTime = null) {
+			if (HoldBack) {
+				Hold(resume);
+				return;
+			}
 			if (this.bNotLoadedYet) {
 				try {
 					tLoading();
 				} catch (Exception e) {
 					Trace.TraceError(e.ToString());
-					Trace.TraceError("例外が発生しましたが処理を継続します。 (17668977-4686-4aa7-b3f0-e0b9a44975b8)");
+					Trace.TraceError("An exception occurred; continuing. (17668977-4686-4aa7-b3f0-e0b9a44975b8)");
 					this.bNotLoadedYet = false;
 				}
 			}
 			if (this.bExclusive) {
-				if (r最後に再生した排他システムサウンド != null)
-					r最後に再生した排他システムサウンド.tStop();
+				if (rLastPlaybackExclusiveSystemSound != null)
+					rLastPlaybackExclusiveSystemSound.tStop(msFrameworkTime);
 
-				r最後に再生した排他システムサウンド = this;
+				rLastPlaybackExclusiveSystemSound = this;
 			}
-			CSound sound = this.rSound[this.nNextPlayingSoundNumber];
-			if (sound != null)
-				sound.PlayStart(this.bLoop);
+			if (resume) {
+				this.rSound[0]?.Resume(this.bLoop, msFrameworkTime);
+				this.rSound[1]?.Resume(this.bLoop, msFrameworkTime);
+			} else {
+				this.nextSound?.PlayStart(this.bLoop, msFrameworkTime);
+			}
 
 			this.bPlayed = true;
 			this.nNextPlayingSoundNumber = 1 - this.nNextPlayingSoundNumber;
 		}
-		public void tStop() {
+		public void tPlay(double? msFrameworkTime = null) => tPlay(resume: false, msFrameworkTime: msFrameworkTime);
+		public void tResume(double? msFrameworkTime = null) => tPlay(resume: true, msFrameworkTime: msFrameworkTime);
+		public void tStop(bool pause, double? msFrameworkTime = null) {
+			DropHold();
 			this.bPlayed = false;
 
-			this.rSound[0]?.Stop();
-			this.rSound[1]?.Stop();
-
-			if (r最後に再生した排他システムサウンド == this)
-				r最後に再生した排他システムサウンド = null;
+			if (pause) {
+				this.rSound[0]?.Pause(msFrameworkTime);
+				this.rSound[1]?.Pause(msFrameworkTime);
+			} else {
+				this.rSound[0]?.tStop(msFrameworkTime);
+				this.rSound[1]?.tStop(msFrameworkTime);
+			}
+			if (rLastPlaybackExclusiveSystemSound == this)
+				rLastPlaybackExclusiveSystemSound = null;
 		}
+		public void tStop(double? msFrameworkTime = null) => tStop(pause: false, msFrameworkTime: msFrameworkTime);
+		public void tPause(double? msFrameworkTime = null) => tStop(pause: true, msFrameworkTime: msFrameworkTime);
 
 		public void SetPanning(int pan) {
 			nPosition_CurrentlyPlayingSound = pan;
 			nPosition_NextPlayingSound = pan;
 		}
 
+		public void SetVolume(int vol) {
+			this.rSound[0]?.SetGain(vol);
+			this.rSound[1]?.SetGain(vol);
+		}
+
+		public void SetSpeed(double speed) {
+			if (this.rSound[0] != null) this.rSound[0]!.SetSpeedWhilePlaying(speed);
+			if (this.rSound[1] != null) this.rSound[1]!.SetSpeedWhilePlaying(speed);
+		}
+
+		public void SetTimestamp(long ms) {
+			if (_held) {
+				_heldTimestamp = ms;
+				return;
+			}
+			if (this.bNotLoadedYet) {
+				try {
+					tLoading();
+				} catch (Exception e) {
+					Trace.TraceError(e.ToString());
+					Trace.TraceError("An exception occurred; continuing. (17668977-4686-4aa7-b3f0-e0b9a44975b8)");
+					this.bNotLoadedYet = false;
+				}
+			}
+			// the buffer that plays; the idle one starts from the beginning whenever it is next used
+			this.nowSound?.tSetPosition(ms);
+		}
+
 		public void tRemoveMixer() {
 			if (OpenTaiko.SoundManager.GetCurrentSoundDeviceType() != "DirectShow") {
 				for (int i = 0; i < 2; i++) {
 					if (this.rSound[i] != null) {
-						OpenTaiko.SoundManager.RemoveMixer(this.rSound[i]);
+						OpenTaiko.SoundManager.RemoveMixer(this.rSound[i]!);
 					}
 				}
 			}
@@ -208,10 +300,11 @@ internal class CSkin : IDisposable {
 		#region [ IDisposable 実装 ]
 		//-----------------
 		public void Dispose() {
+			DropHold();
 			if (!this.bDisposed) {
 				for (int i = 0; i < 2; i++) {
 					if (this.rSound[i] != null) {
-						OpenTaiko.SoundManager.tDisposeSound(this.rSound[i]);
+						OpenTaiko.SoundManager.tDisposeSound(this.rSound[i]!);
 						this.rSound[i] = null;
 					}
 				}
@@ -226,7 +319,7 @@ internal class CSkin : IDisposable {
 		//-----------------
 		private bool bDisposed;
 		private int nNextPlayingSoundNumber;
-		private CSound[] rSound = new CSound[2];
+		private CSound?[] rSound = new CSound?[2];
 		//-----------------
 		#endregion
 	}
@@ -236,7 +329,7 @@ internal class CSkin : IDisposable {
 
 	// Hitsounds
 
-	public CHitSounds hsHitSoundsInformations = null;
+	public CHitSounds hsHitSoundsInformations = null!;
 
 	// Character specific voice samples
 
@@ -278,255 +371,81 @@ internal class CSkin : IDisposable {
 
 	// General sound effects (Skin specific)
 
-	public CSystemSound bgmオプション画面 = null;
-	public CSystemSound bgmコンフィグ画面 = null;
-	public CSystemSound bgm起動画面 = null;
-	public CSystemSound soundSTAGEFAILED音 = null;
-	public CSystemSound soundカーソル移動音 = null;
-	public CSystemSound soundゲーム開始音 = null;
-	public CSystemSound soundゲーム終了音 = null;
-	public CSystemSound soundステージクリア音 = null;
-	public CSystemSound soundフルコンボ音 = null;
-	public CSystemSound sound歓声音 = null;
-	public CSystemSound sound曲読込開始音 = null;
-	public CSystemSound soundDecideSFX = null;
-	public CSystemSound soundCancelSFX = null;
-	public CSystemSound soundChangeSFX = null;
-	public CSystemSound soundSongSelectChara = null;
-	public CSystemSound soundSkip = null;
-	public CSystemSound soundEntry = null;
-	public CSystemSound soundError = null;
-	public CSystemSound soundsanka = null;
-	public CSystemSound soundBomb = null;
+	public CSystemSound bgmOptionScreen = null!;
+	public CSystemSound bgmConfigScreen = null!;
+	public CSystemSound bgmStartupScreen = null!;
+	public CSystemSound soundSTAGEFAILEDSound = null!;
+	public CSystemSound soundCursorMoveSound = null!;
+	public CSystemSound soundGameStartSound = null!;
+	public CSystemSound soundGameEndSound = null!;
+	public CSystemSound soundStageClearSound = null!;
+	public CSystemSound soundFullComboSound = null!;
+	public CSystemSound soundCheerSound = null!;
+	public CSystemSound soundSongLoadStartSound = null!;
+	public CSystemSound soundDecideSFX = null!;
+	public CSystemSound soundCancelSFX = null!;
+	public CSystemSound soundChangeSFX = null!;
+	public CSystemSound? soundSongSelectChara = null;
+	public CSystemSound soundSkip = null!;
+	public CSystemSound soundEntry = null!;
+	public CSystemSound soundError = null!;
+	public CSystemSound? soundsanka = null;
+	public CSystemSound soundBomb = null!;
 	//add
-	public CSystemSound sound曲決定音 = null;
-	public CSystemSound soundSongDecide_AI = null;
-	public CSystemSound bgmリザルトイン音 = null;
-	public CSystemSound bgmリザルト音 = null;
-	public CSystemSound bgmResultIn_AI = null;
-	public CSystemSound bgmResult_AI = null;
+	public CSystemSound soundSongDecideSound = null!;
+	public CSystemSound soundSongDecide_AI = null!;
 
-	public CSystemSound bgmDanResult = null;
+	public CSystemSound bgmTitle = null!;
+	public CSystemSound bgmTitleIn = null!;
+	public CSystemSound bgmSelSongScreen = null!;
+	public CSystemSound bgmSelSongScreenIn = null!;
+	public CSystemSound bgmSongSelect_AI = null!;
+	public CSystemSound bgmSongSelect_AI_In = null!;
 
-	public CSystemSound bgmタイトル = null;
-	public CSystemSound bgmタイトルイン = null;
-	public CSystemSound bgm選曲画面 = null;
-	public CSystemSound bgm選曲画面イン = null;
-	public CSystemSound bgmSongSelect_AI = null;
-	public CSystemSound bgmSongSelect_AI_In = null;
-	public CSystemSound bgmリザルト = null;
-	public CSystemSound bgmリザルトイン = null;
+	public CSystemSound soundTrainingPlaybackSound = null!;
+	public CSystemSound soundTrainingStopSound = null!;
+	public CSystemSound soundTrainingToggleBookmarkSFX = null!;
+	public CSystemSound soundTrainingSkipSound = null!;
+	public CSystemSound soundTrainingModeScrollSFX = null!;
+	public CSystemSound? soundChallengeVoice = null;
+	public CSystemSound? soundDanSelectStart = null;
+	public CSystemSound? soundDanSongSelectCheck = null;
 
-	public CSystemSound SoundBanapas = null;
+	public CSystemSound soundDanSongSelectIn = null!;
 
-	public CSystemSound sound特訓再生音 = null;
-	public CSystemSound sound特訓停止音 = null;
-	public CSystemSound soundTrainingToggleBookmarkSFX = null;
-	public CSystemSound sound特訓スキップ音 = null;
-	public CSystemSound soundTrainingModeScrollSFX = null;
-	public CSystemSound soundPon = null;
-	public CSystemSound soundGauge = null;
-	public CSystemSound soundScoreDon = null;
-	public CSystemSound soundChallengeVoice = null;
-	public CSystemSound soundDanSelectStart = null;
-	public CSystemSound soundDanSongSelectCheck = null;
+	public CSystemSound soundDanSelectBGM = null!;
+	public CSystemSound soundDanSongSelect = null!;
 
-	public CSystemSound soundDanSongSelectIn = null;
+	public CSystemSound soundOnlineLoungeBGM = null!;
+	public CSystemSound soundTowerSelectBGM = null!;
 
-	public CSystemSound soundDanSelectBGM = null;
-	public CSystemSound soundDanSongSelect = null;
+	public CSystemSound[] soundExToExtra = null!;
+	public CSystemSound[] soundExtraToEx = null!;
 
-	public CSystemSound soundHeyaBGM = null;
-	public CSystemSound soundOnlineLoungeBGM = null;
-	public CSystemSound soundEncyclopediaBGM = null;
-	public CSystemSound soundTowerSelectBGM = null;
+	public CSystemSound calibrationTick = null!;
 
-	public CSystemSound[] soundExToExtra = null;
-	public CSystemSound[] soundExtraToEx = null;
+	public CSystemSound[] soundModal = null!;
 
-	public CSystemSound calibrationTick = null;
 
-	public CSystemSound[] soundModal = null;
-
-	public CSystemSound soundCrownIn = null;
-	public CSystemSound soundRankIn = null;
-
-	public CSystemSound soundSelectAnnounce = null;
+	public CSystemSound? soundSelectAnnounce = null;
 
 	// Tower Sfx
-	public CSystemSound soundTowerMiss = null;
-	public CSystemSound bgmTowerResult = null;
+	public CSystemSound? soundTowerMiss = null;
 
 	//public Cシステムサウンド soundRed = null;
 	//public Cシステムサウンド soundBlue = null;
-	public CSystemSound soundBalloon = null;
-	public CSystemSound soundKusudama = null;
-	public CSystemSound soundKusudamaMiss = null;
+	public CSystemSound soundBalloon = null!;
+	public CSystemSound soundKusudama = null!;
+	public CSystemSound soundKusudamaMiss = null!;
 
+	#region [ For disposing ]
+	public List<CSystemSound> listSystemSound = new();
+	#endregion
 
-	public readonly int nシステムサウンド数 = (int)Eシステムサウンド.Count;
-	public CSystemSound this[Eシステムサウンド sound] {
-		get {
-			switch (sound) {
-				case Eシステムサウンド.SOUNDカーソル移動音:
-					return this.soundカーソル移動音;
-
-				case Eシステムサウンド.SOUND決定音:
-					return this.soundDecideSFX;
-
-				case Eシステムサウンド.SOUND変更音:
-					return this.soundChangeSFX;
-
-				case Eシステムサウンド.SOUND取消音:
-					return this.soundCancelSFX;
-
-				case Eシステムサウンド.SOUND歓声音:
-					return this.sound歓声音;
-
-				case Eシステムサウンド.SOUNDステージ失敗音:
-					return this.soundSTAGEFAILED音;
-
-				case Eシステムサウンド.SOUNDゲーム開始音:
-					return this.soundゲーム開始音;
-
-				case Eシステムサウンド.SOUNDゲーム終了音:
-					return this.soundゲーム終了音;
-
-				case Eシステムサウンド.SOUNDステージクリア音:
-					return this.soundステージクリア音;
-
-				case Eシステムサウンド.SOUNDフルコンボ音:
-					return this.soundフルコンボ音;
-
-				case Eシステムサウンド.SOUND曲読込開始音:
-					return this.sound曲読込開始音;
-
-				case Eシステムサウンド.SOUNDタイトル音:
-					return this.bgmタイトル;
-
-				case Eシステムサウンド.BGM起動画面:
-					return this.bgm起動画面;
-
-				case Eシステムサウンド.BGMオプション画面:
-					return this.bgmオプション画面;
-
-				case Eシステムサウンド.BGMコンフィグ画面:
-					return this.bgmコンフィグ画面;
-
-				case Eシステムサウンド.BGM選曲画面:
-					return this.bgm選曲画面;
-
-				//case Eシステムサウンド.SOUND赤:
-				//    return this.soundRed;
-
-				//case Eシステムサウンド.SOUND青:
-				//    return this.soundBlue;
-
-				case Eシステムサウンド.SOUND風船:
-					return this.soundBalloon;
-
-				case Eシステムサウンド.SOUND曲決定音:
-					return this.sound曲決定音;
-
-				case Eシステムサウンド.SOUND成績発表:
-					return this.bgmリザルトイン音;
-
-				case Eシステムサウンド.SOUND特訓再生:
-					return this.sound特訓再生音;
-
-				case Eシステムサウンド.SOUND特訓停止:
-					return this.sound特訓停止音;
-
-				case Eシステムサウンド.sound特訓ジャンプポイント:
-					return this.soundTrainingToggleBookmarkSFX;
-
-				case Eシステムサウンド.sound特訓スキップ音:
-					return this.sound特訓スキップ音;
-
-				case Eシステムサウンド.SOUND特訓スクロール:
-					return this.soundTrainingModeScrollSFX;
-
-			}
-			throw new IndexOutOfRangeException();
-		}
-	}
-	public CSystemSound this[int index] {
-		get {
-			switch (index) {
-				case 0:
-					return this.soundカーソル移動音;
-
-				case 1:
-					return this.soundDecideSFX;
-
-				case 2:
-					return this.soundChangeSFX;
-
-				case 3:
-					return this.soundCancelSFX;
-
-				case 4:
-					return this.sound歓声音;
-
-				case 5:
-					return this.soundSTAGEFAILED音;
-
-				case 6:
-					return this.soundゲーム開始音;
-
-				case 7:
-					return this.soundゲーム終了音;
-
-				case 8:
-					return this.soundステージクリア音;
-
-				case 9:
-					return this.soundフルコンボ音;
-
-				case 10:
-					return this.sound曲読込開始音;
-
-				case 11:
-					return this.bgmタイトル;
-
-				case 12:
-					return this.bgm起動画面;
-
-				case 13:
-					return this.bgmオプション画面;
-
-				case 14:
-					return this.bgmコンフィグ画面;
-
-				case 15:
-					return this.bgm選曲画面;
-
-				case 16:
-					return this.soundBalloon;
-
-				case 17:
-					return this.sound曲決定音;
-
-				case 18:
-					return this.bgmリザルトイン音;
-
-				case 19:
-					return this.sound特訓再生音;
-
-				case 20:
-					return this.sound特訓停止音;
-
-				case 21:
-					return this.soundTrainingModeScrollSFX;
-
-				case 22:
-					return this.soundTrainingToggleBookmarkSFX;
-
-				case 23:
-					return this.sound特訓スキップ音;
-			}
-			throw new IndexOutOfRangeException();
-		}
+	internal CSystemSound SndCAbsolute(string FileName, bool bLoop, bool bExclusive, bool bCompactTarget, ESoundGroup soundGroup) {
+		CSystemSound snd = new(FileName, bLoop, bExclusive, bCompactTarget, soundGroup);
+		listSystemSound.Add(snd);
+		return snd;
 	}
 
 
@@ -551,10 +470,10 @@ internal class CSkin : IDisposable {
 	private object lockBoxDefSkin;
 	public static bool bUseBoxDefSkin = true;                       // box.defからのスキン変更を許容するか否か
 
-	public string strSystemSkinRoot = null;
-	public string[] strSystemSkinSubfolders = null;     // List<string>だとignoreCaseな検索が面倒なので、配列に逃げる :-)
-	private string[] _strBoxDefSkinSubfolders = null;
-	public string[] strBoxDefSkinSubfolders {
+	public string strSystemSkinRoot = null!;
+	public string[] strSystemSkinSubfolders = null!;     // List<string>だとignoreCaseな検索が面倒なので、配列に逃げる :-)
+	private string[]? _strBoxDefSkinSubfolders = null;
+	public string[]? strBoxDefSkinSubfolders {
 		get {
 			lock (lockBoxDefSkin) {
 				return _strBoxDefSkinSubfolders;
@@ -567,7 +486,7 @@ internal class CSkin : IDisposable {
 		}
 	}           // 別スレッドからも書き込みアクセスされるため、スレッドセーフなアクセス法を提供
 
-	private static string strSystemSkinSubfolderFullName;           // Config画面で設定されたスキン
+	private static string strSystemSkinSubfolderFullName = null!;           // Config画面で設定されたスキン
 	private static string strBoxDefSkinSubfolderFullName = "";      // box.defで指定されているスキン
 
 	/// <summary>
@@ -595,9 +514,203 @@ internal class CSkin : IDisposable {
 		}
 	}
 
+	#region [ Lua Stages and Custom Menus ]
+
+	public CMainMenuSettings MainMenuSettings = null!;
+
+	public void CleanupModules() {
+		LuaStageWrapper.PropagateOnDestroy();
+		LuaStageWrapper.ResetLuaStagesDictionary();
+		LuaActivityWrapper.PropagateOnDestroy();
+		LuaActivityWrapper.ResetLuaActivityDictionary();
+		// Transitions LAST — onDestroy runs after Stages/Activities (mirror of the load order).
+		LuaTransitionWrapper.PropagateOnDestroy();
+		LuaTransitionWrapper.ResetTransitionsDictionary();
+	}
+
+	// Closing the game tears the skin down too: every module gets its onDestroy while the engine is still up.
+	// Nothing is disposed afterwards, as the process ends.
+	public static void DestroyModulesOnExit() {
+		LuaStageWrapper.PropagateOnDestroy();
+		LuaActivityWrapper.PropagateOnDestroy();
+		LuaTransitionWrapper.PropagateOnDestroy();
+	}
+
+	/// <summary>
+	/// Loads the skin's Lua modules (Stages / Activities / ROActivities) INCREMENTALLY: instantiate each,
+	/// then onStart()/loadAssets each, yielding a 0..1 progress fraction after every unit. The boot stage
+	/// drives this from its Draw loop (a time-budgeted batch per frame), so the loading screen renders +
+	/// the bar advances normally instead of blocking. Per-unit granularity keeps any single step short.
+	/// Instantiate-all-then-onStart-all per category preserves the original ordering (a module's onStart may
+	/// reference another already-instantiated module).
+	/// </summary>
+	// Boot-screen status of the incremental module preload: what is loading right now and how far along
+	// (the startup stage prints it under its step list).
+	public static volatile string LoadingModuleLabel = "";
+	public static volatile int LoadingModuleStep = 0;
+	public static volatile int LoadingModuleTotal = 0;
+
+	// <game>/Global/Modules/<type>: the Lua modules every skin loads, laid out like a skin's Modules folder
+	public static string GlobalModulesFolder(string type) =>
+		System.IO.Path.Combine(OpenTaiko.strEXEFolder, "Global", "Modules", type);
+
+	public static string GlobalModulePath(string type, string name) =>
+		OpenTaiko.ResolveAssetPath(System.IO.Path.Combine(GlobalModulesFolder(type), name));
+
+	// true for a script under Global/Modules: its lookups by name and its require look at the global modules first
+	public static bool IsGlobalModuleFolder(string dir) {
+		if (string.IsNullOrWhiteSpace(dir)) return false;
+		string full = System.IO.Path.GetFullPath(dir);
+		bool under(string? root) => root != null && full.StartsWith(
+			System.IO.Path.GetFullPath(System.IO.Path.Combine(root, "Global", "Modules")) + System.IO.Path.DirectorySeparatorChar,
+			StringComparison.OrdinalIgnoreCase);
+		return under(OpenTaiko.strEXEFolder) || under(OpenTaiko.strBundleFolder);
+	}
+
+	private static string[] SkinModuleNames(string type) =>
+		DirectoryUtils.SafeGetDirectories(CSkin.Path($"Modules/{type}")).Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
+
+	private static string[] GlobalModuleNames(string type) =>
+		OpenTaiko.GetMergedDirectories(GlobalModulesFolder(type)).Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
+
+	internal IEnumerator<float> LoadModulesIncrementally() {
+		// the nameplate list with this skin's pack, before the skin's scripts read it
+		OpenTaiko.Databases?.DBNameplateUnlockables?.tReload(CSkin.Path(""));
+
+		// Main Menu Settings
+		MainMenuSettings = new CMainMenuSettings();
+		MainMenuSettings.tReloadMenus();
+
+		string[] _transitionsList = SkinModuleNames("Transitions");
+		string[] _globalTransitionsList = GlobalModuleNames("Transitions");
+		string[] _modulesList = SkinModuleNames("Stages");
+		string[] _globalModulesList = GlobalModuleNames("Stages");
+		string[] _actList = SkinModuleNames("Activities");
+		string[] _globalActList = GlobalModuleNames("Activities");
+		string[] _roActList = SkinModuleNames("ROActivities");
+		string[] _globalRoActList = GlobalModuleNames("ROActivities");
+
+		// _boot and _title belong to the skin: with either in Global/Modules/Stages no module loads,
+		// and the first stage change shows the error instead
+		LuaStageWrapper.GlobalCoreStage = _globalModulesList.FirstOrDefault(n => LuaStageWrapper.CoreStages.Contains(n));
+		if (LuaStageWrapper.GlobalCoreStage != null) {
+			Trace.TraceError($"Global/Modules/Stages/{LuaStageWrapper.GlobalCoreStage}: _boot and _title must be in the skin's Modules/Stages folder.");
+			yield break;
+		}
+
+		// Each item is processed twice (instantiate, then onStart).
+		int total = (_transitionsList.Length + _globalTransitionsList.Length + _modulesList.Length + _globalModulesList.Length
+			+ _actList.Length + _globalActList.Length + _roActList.Length + _globalRoActList.Length) * 2;
+		if (total <= 0) yield break;
+		int done = 0;
+
+		// onStart is driven as a coroutine (BeginOnStart + StepOnStart): a stage that calls coroutine.yield(p)
+		// in its onStart spreads its load across many MoveNext()s with live sub-progress, so a heavy onStart
+		// no longer blocks one whole step (the boot/skin-reload freeze). A non-yielding onStart finishes on
+		// the first step ⇒ same as before.
+
+		// Each unit of work announces itself to the boot screen (kind, name, phase, step count); debug builds
+		// also time each module's instantiation (its script's top-level chunk) and onStart into the log, so a
+		// slow module shows up by name when the boot bar stalls.
+		var sw = new Stopwatch();
+		LoadingModuleTotal = total; LoadingModuleStep = 0;
+		void beginStep(string kind, string name, string phase) {
+			LoadingModuleLabel = $"{kind} {name} ({phase})";
+			LoadingModuleStep = done + 1;
+			sw.Restart();
+		}
+		void logStep(string kind, string name, string phase) {
+#if DEBUG
+			Trace.TraceInformation($"[BOOT] {kind} {name} {phase}: {sw.Elapsed.TotalMilliseconds:F0} ms (step {done + 1}/{total})");
+#endif
+		}
+
+		// Transitions FIRST — onStart runs before Stages/Activities so they're ready for the first stage switch.
+		var transitions = new List<(string name, LuaTransitionWrapper w)>();
+		foreach (string _t in _transitionsList) {
+			beginStep("transition", _t, "load"); transitions.Add((_t, new LuaTransitionWrapper(_t, false))); logStep("transition", _t, "load");
+			yield return ++done / (float)total;
+		}
+		foreach (string _t in _globalTransitionsList) {
+			beginStep("global transition", _t, "load"); transitions.Add((_t, new LuaTransitionWrapper(_t, true))); logStep("global transition", _t, "load");
+			yield return ++done / (float)total;
+		}
+		foreach (var (name, _t) in transitions) {
+			beginStep("transition", name, "onStart"); _t.BeginOnStart();
+			while (_t.StepOnStart(out var sub)) yield return (done + Math.Clamp(sub, 0f, 1f)) / total;
+			logStep("transition", name, "onStart");
+			yield return ++done / (float)total;
+		}
+
+		// Lua Stages
+		var stages = new List<(string name, LuaStageWrapper w)>();
+		foreach (string _module in _modulesList) {
+			beginStep("stage", _module, "load"); stages.Add((_module, new LuaStageWrapper(_module, false))); logStep("stage", _module, "load");
+			yield return ++done / (float)total;
+		}
+		foreach (string _module in _globalModulesList) {
+			beginStep("global stage", _module, "load"); stages.Add((_module, new LuaStageWrapper(_module, true))); logStep("global stage", _module, "load");
+			yield return ++done / (float)total;
+		}
+		foreach (var (name, _s) in stages) {
+			beginStep("stage", name, "onStart"); _s.BeginOnStart();
+			while (_s.StepOnStart(out var sub)) yield return (done + Math.Clamp(sub, 0f, 1f)) / total;
+			logStep("stage", name, "onStart");
+			yield return ++done / (float)total;
+		}
+
+		// Lua Activities
+		var acts = new List<(string name, LuaActivityWrapper w)>();
+		foreach (string _act in _actList) {
+			beginStep("activity", _act, "load"); acts.Add((_act, new LuaActivityWrapper(_act, false))); logStep("activity", _act, "load");
+			yield return ++done / (float)total;
+		}
+		foreach (string _act in _globalActList) {
+			beginStep("global activity", _act, "load"); acts.Add((_act, new LuaActivityWrapper(_act, true))); logStep("global activity", _act, "load");
+			yield return ++done / (float)total;
+		}
+		foreach (var (name, _a) in acts) {
+			beginStep("activity", name, "onStart"); _a.BeginOnStart();
+			while (_a.StepOnStart(out var sub)) yield return (done + Math.Clamp(sub, 0f, 1f)) / total;
+			logStep("activity", name, "onStart");
+			yield return ++done / (float)total;
+		}
+
+		// Lua RO Activities
+		var roActs = new List<(string name, LuaROActivityWrapper w)>();
+		foreach (string _act in _roActList) {
+			beginStep("roactivity", _act, "load"); roActs.Add((_act, new LuaROActivityWrapper(_act, false))); logStep("roactivity", _act, "load");
+			yield return ++done / (float)total;
+		}
+		foreach (string _act in _globalRoActList) {
+			beginStep("global roactivity", _act, "load"); roActs.Add((_act, new LuaROActivityWrapper(_act, true))); logStep("global roactivity", _act, "load");
+			yield return ++done / (float)total;
+		}
+		foreach (var (name, _a) in roActs) {
+			beginStep("roactivity", name, "onStart"); _a.BeginOnStart();
+			while (_a.StepOnStart(out var sub)) yield return (done + Math.Clamp(sub, 0f, 1f)) / total;
+			logStep("roactivity", name, "onStart");
+			yield return ++done / (float)total;
+		}
+		LoadingModuleLabel = ""; LoadingModuleStep = total;
+	}
+
+	/// <summary>
+	/// Synchronous full load of all skin modules — used by the skin reload/change path (<c>LoadSkin</c>),
+	/// where blocking is acceptable. The boot uses the incremental <see cref="LoadModulesIncrementally"/>
+	/// (driven by the boot stage's render loop) so its loading bar animates.
+	/// </summary>
+	public void FetchMenusAndModules() {
+		var steps = LoadModulesIncrementally();
+		while (steps.MoveNext()) { }
+	}
+
+	#endregion
+
 
 	// Constructor
 	public CSkin(string _strSkinSubfolderFullName, bool _bUseBoxDefSkin) {
+		CleanupModules();
 		lockBoxDefSkin = new object();
 		strSystemSkinSubfolderFullName = _strSkinSubfolderFullName;
 		bUseBoxDefSkin = _bUseBoxDefSkin;
@@ -605,7 +718,9 @@ internal class CSkin : IDisposable {
 		ReloadSkinPaths();
 		PrepareReloadSkin();
 	}
+
 	public CSkin() {
+		CleanupModules();
 		lockBoxDefSkin = new object();
 		InitializeSkinPathRoot();
 		bUseBoxDefSkin = true;
@@ -613,7 +728,7 @@ internal class CSkin : IDisposable {
 		PrepareReloadSkin();
 	}
 	private string InitializeSkinPathRoot() {
-		strSystemSkinRoot = System.IO.Path.Combine(OpenTaiko.strEXEのあるフォルダ, "System" + System.IO.Path.DirectorySeparatorChar);
+		strSystemSkinRoot = System.IO.Path.Combine(OpenTaiko.strEXEFolder, "System" + System.IO.Path.DirectorySeparatorChar);
 		return strSystemSkinRoot;
 	}
 
@@ -621,8 +736,8 @@ internal class CSkin : IDisposable {
 	/// Skin(Sounds)を再読込する準備をする(再生停止,Dispose,ファイル名再設定)。
 	/// あらかじめstrSkinSubfolderを適切に設定しておくこと。
 	/// その後、ReloadSkinPaths()を実行し、strSkinSubfolderの正当性を確認した上で、本メソッドを呼び出すこと。
-	/// 本メソッド呼び出し後に、ReloadSkin()を実行することで、システムサウンドを読み込み直す。
-	/// ReloadSkin()の内容は本メソッド内に含めないこと。起動時はReloadSkin()相当の処理をCEnumSongsで行っているため。
+	/// 本メソッド呼び出し後に、PreloadSystemSounds()を実行することで、システムサウンドを読み込み直す。
+	/// PreloadSystemSounds()の内容は本メソッド内に含めないこと。起動時はPreloadSystemSounds()相当の処理をCEnumSongsで行っているため。
 	/// </summary>
 	public void PrepareReloadSkin() {
 		Trace.TraceInformation("SkinPath設定: {0}",
@@ -631,117 +746,118 @@ internal class CSkin : IDisposable {
 				strBoxDefSkinSubfolderFullName
 		);
 
-		for (int i = 0; i < nシステムサウンド数; i++) {
-			if (this[i] != null && this[i].bLoadedSuccessfuly) {
-				this[i].tStop();
-				this[i].Dispose();
-			}
-		}
-
-		this.soundカーソル移動音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Move.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.soundDecideSFX = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Decide.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.soundChangeSFX = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Change.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.soundCancelSFX = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Cancel.ogg", false, false, true, ESoundGroup.SoundEffect);
-		this.sound歓声音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Audience.ogg", false, false, true, ESoundGroup.SoundEffect);
-		this.soundSTAGEFAILED音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Stage failed.ogg", false, true, true, ESoundGroup.Voice);
-		this.soundゲーム開始音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Game start.ogg", false, false, false, ESoundGroup.Voice);
-		this.soundゲーム終了音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Game end.ogg", false, true, false, ESoundGroup.Voice);
-		this.soundステージクリア音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Stage clear.ogg", false, true, true, ESoundGroup.Voice);
-		this.soundフルコンボ音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Full combo.ogg", false, false, true, ESoundGroup.Voice);
-		this.sound曲読込開始音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Now loading.ogg", false, true, true, ESoundGroup.Unknown);
-		//this.bgm選曲画面 = new Cシステムサウンド(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Select BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
-		//this.soundSongSelectChara = new Cシステムサウンド(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongSelect Chara.ogg", false, false, false, ESoundGroup.SongPlayback);
-		this.soundSkip = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Skip.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.SoundBanapas = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Banapas.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.soundEntry = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Entry.ogg", true, false, false, ESoundGroup.Voice);
-		this.soundError = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Error.ogg", false, false, false, ESoundGroup.SoundEffect);
-		//this.soundsanka = new Cシステムサウンド(@$"Sounds{System.IO.Path.DirectorySeparatorChar}sanka.ogg", false, false, false, ESoundGroup.Voice);
-		this.soundBomb = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Bomb.ogg", false, false, false, ESoundGroup.SoundEffect);
-
-		//this.soundRed               = new Cシステムサウンド( @$"Sounds{System.IO.Path.DirectorySeparatorChar}dong.ogg",            false, false, true, ESoundType.SoundEffect );
-		//this.soundBlue              = new Cシステムサウンド( @$"Sounds{System.IO.Path.DirectorySeparatorChar}ka.ogg",              false, false, true, ESoundType.SoundEffect );
-		this.soundBalloon = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}balloon.ogg", false, false, true, ESoundGroup.SoundEffect);
-		this.soundKusudama = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Kusudama.ogg", false, false, true, ESoundGroup.SoundEffect);
-		this.soundKusudamaMiss = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}KusudamaMiss.ogg", false, false, true, ESoundGroup.SoundEffect);
-		this.sound曲決定音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongDecide.ogg", false, false, true, ESoundGroup.Voice);
-		this.soundSongDecide_AI = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongDecide_AI.ogg", false, false, true, ESoundGroup.Voice);
-
-		this.bgm起動画面 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Setup.ogg", true, true, false, ESoundGroup.SongPlayback);
-		this.bgmタイトルイン = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Title_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
-		this.bgmタイトル = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Title.ogg", true, false, true, ESoundGroup.SongPlayback);
-		this.bgmオプション画面 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Option.ogg", true, true, false, ESoundGroup.SongPlayback);
-		this.bgmコンフィグ画面 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Config.ogg", true, true, false, ESoundGroup.SongPlayback);
-		this.bgm選曲画面イン = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
-		this.bgm選曲画面 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect.ogg", true, false, true, ESoundGroup.SongPlayback);
-		this.bgmSongSelect_AI_In = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect_AI_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
-		this.bgmSongSelect_AI = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect_AI.ogg", true, false, true, ESoundGroup.SongPlayback);
-		this.bgmリザルトイン音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result_In.ogg", false, false, true, ESoundGroup.SongPlayback);
-		this.bgmリザルト音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result.ogg", true, false, true, ESoundGroup.SongPlayback);
-		this.bgmResultIn_AI = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result_In_AI.ogg", false, false, true, ESoundGroup.SongPlayback);
-		this.bgmResult_AI = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result_AI.ogg", true, false, true, ESoundGroup.SongPlayback);
-
-		this.bgmDanResult = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Dan{System.IO.Path.DirectorySeparatorChar}Dan_Result.ogg", true, false, false, ESoundGroup.SongPlayback);
-
-		this.bgmTowerResult = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Tower{System.IO.Path.DirectorySeparatorChar}Tower_Result.ogg", true, false, false, ESoundGroup.SongPlayback);
-
-		this.soundCrownIn = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}ResultScreen{System.IO.Path.DirectorySeparatorChar}CrownIn.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.soundRankIn = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}ResultScreen{System.IO.Path.DirectorySeparatorChar}RankIn.ogg", false, false, false, ESoundGroup.SoundEffect);
-
-		this.sound特訓再生音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Resume.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.sound特訓停止音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Pause.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.soundTrainingModeScrollSFX = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Scroll.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.soundTrainingToggleBookmarkSFX = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Jump Point.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.sound特訓スキップ音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Traning Skip.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.soundPon = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Pon.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.soundGauge = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Gauge.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.soundScoreDon = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}ScoreDon.ogg", false, false, false, ESoundGroup.SoundEffect);
-
-		this.soundDanSongSelectIn = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Dan{System.IO.Path.DirectorySeparatorChar}Dan_In.ogg", false, false, false, ESoundGroup.SoundEffect);
-
-		this.soundDanSelectBGM = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Dan{System.IO.Path.DirectorySeparatorChar}DanSelectBGM.ogg", true, false, false, ESoundGroup.SongPlayback);
-		this.soundDanSongSelect = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Dan{System.IO.Path.DirectorySeparatorChar}DanSongSelect.ogg", false, false, false, ESoundGroup.SoundEffect);
-
-		this.soundHeyaBGM = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Heya{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
-		this.soundOnlineLoungeBGM = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}OnlineLounge{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
-		this.soundEncyclopediaBGM = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Encyclopedia{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
-		this.soundTowerSelectBGM = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Tower{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
-
-		soundExToExtra = new CSystemSound[1] { new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongSelect{System.IO.Path.DirectorySeparatorChar}0{System.IO.Path.DirectorySeparatorChar}ExToExtra.ogg", false, false, false, ESoundGroup.SoundEffect) }; // Placeholder until Komi decides
-		soundExtraToEx = new CSystemSound[1] { new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongSelect{System.IO.Path.DirectorySeparatorChar}0{System.IO.Path.DirectorySeparatorChar}ExtraToEx.ogg", false, false, false, ESoundGroup.SoundEffect) }; // what to do with it lol
-
-		calibrationTick = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Calibrate.ogg", false, false, false, ESoundGroup.SoundEffect);
-
-		soundModal = new CSystemSound[6];
-		for (int i = 0; i < soundModal.Length - 1; i++) {
-			soundModal[i] = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Modals{System.IO.Path.DirectorySeparatorChar}" + i.ToString() + ".ogg", false, false, false, ESoundGroup.SoundEffect);
-		}
-		soundModal[soundModal.Length - 1] = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Modals{System.IO.Path.DirectorySeparatorChar}Coin.ogg", false, false, false, ESoundGroup.SoundEffect);
-
-		ReloadSkin();
+		ReloadSystemSounds();
 		tReadSkinConfig();
 
 		//hsHitSoundsInformations = new CHitSounds(Path(@$"Sounds{System.IO.Path.DirectorySeparatorChar}HitSounds{System.IO.Path.DirectorySeparatorChar}HitSounds.json"));
 		hsHitSoundsInformations = new CHitSounds(@$"Global{System.IO.Path.DirectorySeparatorChar}HitSounds");
 	}
 
-	public void ReloadSkin() {
-		for (int i = 0; i < nシステムサウンド数; i++) {
-			if (!this[i].bExclusive)   // BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
-			{
-				CSystemSound cシステムサウンド = this[i];
-				if (cシステムサウンド.bCompact対象) {
-					try {
-						cシステムサウンド.tLoading();
-						Trace.TraceInformation("システムサウンドを読み込みました。({0})", cシステムサウンド.strFileName);
-					} catch (FileNotFoundException e) {
-						Trace.TraceWarning(e.ToString());
-						Trace.TraceWarning("システムサウンドが存在しません。({0})", cシステムサウンド.strFileName);
-					} catch (Exception e) {
-						Trace.TraceWarning(e.ToString());
-						Trace.TraceWarning("システムサウンドの読み込みに失敗しました。({0})", cシステムサウンド.strFileName);
+	public void ReloadSystemSounds() {
+		UnloadSystemSounds();
+
+		this.soundCursorMoveSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Move.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundDecideSFX = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Decide.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundChangeSFX = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Change.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundCancelSFX = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Cancel.ogg", false, false, true, ESoundGroup.SoundEffect);
+		this.soundCheerSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Audience.ogg", false, false, true, ESoundGroup.SoundEffect);
+		this.soundSTAGEFAILEDSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Stage failed.ogg", false, true, true, ESoundGroup.Voice);
+		this.soundGameStartSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Game start.ogg", false, false, false, ESoundGroup.Voice);
+		this.soundGameEndSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Game end.ogg", false, true, false, ESoundGroup.Voice);
+		this.soundStageClearSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Stage clear.ogg", false, true, true, ESoundGroup.Voice);
+		this.soundFullComboSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Full combo.ogg", false, false, true, ESoundGroup.Voice);
+		this.soundSongLoadStartSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Now loading.ogg", false, true, true, ESoundGroup.Unknown);
+		//this.bgm選曲画面 = new Cシステムサウンド(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Select BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
+		//this.soundSongSelectChara = new Cシステムサウンド(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongSelect Chara.ogg", false, false, false, ESoundGroup.SongPlayback);
+		this.soundSkip = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Skip.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundEntry = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Entry.ogg", true, false, false, ESoundGroup.Voice);
+		this.soundError = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Error.ogg", false, false, false, ESoundGroup.SoundEffect);
+		//this.soundsanka = new Cシステムサウンド(@$"Sounds{System.IO.Path.DirectorySeparatorChar}sanka.ogg", false, false, false, ESoundGroup.Voice);
+		this.soundBomb = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Bomb.ogg", false, false, false, ESoundGroup.SoundEffect);
+
+		//this.soundRed               = new Cシステムサウンド( @$"Sounds{System.IO.Path.DirectorySeparatorChar}dong.ogg",            false, false, true, ESoundType.SoundEffect );
+		//this.soundBlue              = new Cシステムサウンド( @$"Sounds{System.IO.Path.DirectorySeparatorChar}ka.ogg",              false, false, true, ESoundType.SoundEffect );
+		this.soundBalloon = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}balloon.ogg", false, false, true, ESoundGroup.SoundEffect);
+		this.soundKusudama = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Kusudama.ogg", false, false, true, ESoundGroup.SoundEffect);
+		this.soundKusudamaMiss = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}KusudamaMiss.ogg", false, false, true, ESoundGroup.SoundEffect);
+		this.soundSongDecideSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongDecide.ogg", false, false, true, ESoundGroup.Voice);
+		this.soundSongDecide_AI = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongDecide_AI.ogg", false, false, true, ESoundGroup.Voice);
+
+		this.bgmStartupScreen = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Setup.ogg", true, true, false, ESoundGroup.SongPlayback);
+		this.bgmTitleIn = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Title_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
+		this.bgmTitle = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Title.ogg", true, false, true, ESoundGroup.SongPlayback);
+		this.bgmOptionScreen = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Option.ogg", true, true, false, ESoundGroup.SongPlayback);
+		this.bgmConfigScreen = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Config.ogg", true, true, false, ESoundGroup.SongPlayback);
+		this.bgmSelSongScreenIn = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
+		this.bgmSelSongScreen = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect.ogg", true, false, true, ESoundGroup.SongPlayback);
+		this.bgmSongSelect_AI_In = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect_AI_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
+		this.bgmSongSelect_AI = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect_AI.ogg", true, false, true, ESoundGroup.SongPlayback);
+
+		this.soundTrainingPlaybackSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Resume.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundTrainingStopSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Pause.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundTrainingModeScrollSFX = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Scroll.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundTrainingToggleBookmarkSFX = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Jump Point.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundTrainingSkipSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Traning Skip.ogg", false, false, false, ESoundGroup.SoundEffect);
+
+		this.soundDanSongSelectIn = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Dan{System.IO.Path.DirectorySeparatorChar}Dan_In.ogg", false, false, false, ESoundGroup.SoundEffect);
+
+		this.soundDanSelectBGM = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Dan{System.IO.Path.DirectorySeparatorChar}DanSelectBGM.ogg", true, false, false, ESoundGroup.SongPlayback);
+		this.soundDanSongSelect = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Dan{System.IO.Path.DirectorySeparatorChar}DanSongSelect.ogg", false, false, false, ESoundGroup.SoundEffect);
+
+		this.soundOnlineLoungeBGM = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}OnlineLounge{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
+		this.soundTowerSelectBGM = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Tower{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
+
+		soundExToExtra = new[] { SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongSelect{System.IO.Path.DirectorySeparatorChar}0{System.IO.Path.DirectorySeparatorChar}ExToExtra.ogg", false, false, false, ESoundGroup.SoundEffect) }; // Placeholder until Komi decides
+		soundExtraToEx = new[] { SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongSelect{System.IO.Path.DirectorySeparatorChar}0{System.IO.Path.DirectorySeparatorChar}ExtraToEx.ogg", false, false, false, ESoundGroup.SoundEffect) }; // what to do with it lol
+
+		calibrationTick = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Calibrate.ogg", false, false, false, ESoundGroup.SoundEffect);
+
+		soundModal = new CSystemSound[6];
+		for (int i = 0; i < soundModal.Length - 1; i++) {
+			soundModal[i] = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Modals{System.IO.Path.DirectorySeparatorChar}" + i.ToString() + ".ogg", false, false, false, ESoundGroup.SoundEffect);
+		}
+		soundModal[soundModal.Length - 1] = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Modals{System.IO.Path.DirectorySeparatorChar}Coin.ogg", false, false, false, ESoundGroup.SoundEffect);
+	}
+
+	public void UnloadSystemSounds() {
+		// concurrent
+		var list = Interlocked.Exchange(ref this.listSystemSound, []);
+		for (int i = 0; i < list.Count; ++i) {
+			var snd = list.ElementAtOrDefault(i);
+			if (snd?.bLoadedSuccessfuly ?? false) {
+				snd.tStop();
+				snd.Dispose();
+			}
+		}
+		list.Clear();
+	}
+
+	public void PreloadSystemSounds() {
+		int count = this.listSystemSound.Count;
+		for (int i = 0; i < count; ++i) { // concurrent
+			try {
+				var snd = this.listSystemSound.ElementAtOrDefault(i);
+				if (snd != null && !snd.bExclusive)   // BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
+				{
+					CSystemSound cSystemSound = snd;
+					if (cSystemSound.bCompactTarget) {
+						try {
+							cSystemSound.tLoading();
+							Trace.TraceInformation("システムサウンドを読み込みました。({0})", cSystemSound.strFileName);
+						} catch (FileNotFoundException e) {
+							Trace.TraceWarning(e.ToString());
+							Trace.TraceWarning("System sound not found. ({0})", cSystemSound.strFileName);
+						} catch (Exception e) {
+							Trace.TraceWarning(e.ToString());
+							Trace.TraceWarning("Failed to load the system sound. ({0})", cSystemSound.strFileName);
+						}
 					}
 				}
+			} catch (InvalidOperationException) {
+				// ignore this elements
 			}
+			// Boot loading bar: modules 0-60%, then system sounds 60-66%, then textures 66-100%.
+			CLoadingProgress.ReportSegment(0.60f, 0.66f, i + 1, count);
 		}
 	}
 
@@ -757,10 +873,11 @@ internal class CSkin : IDisposable {
 	/// </summary>
 	public void ReloadSkinPaths() {
 		#region [ Enumerate System ]
-		if (!Directory.Exists(strSystemSkinRoot))
+		string resolvedSkinRoot = OpenTaiko.ResolveAssetPath(strSystemSkinRoot);
+		if (!Directory.Exists(resolvedSkinRoot))
 			throw new DirectoryNotFoundException("OpenTaiko could not find the System folder, which contains the skin(s) needed to load the game.");
 
-		string[] tempSkinSubfolders = System.IO.Directory.GetDirectories(strSystemSkinRoot, "*");
+		string[] tempSkinSubfolders = OpenTaiko.GetMergedDirectories(strSystemSkinRoot, "*");
 
 		if (tempSkinSubfolders.Length == 0)
 			throw new DirectoryNotFoundException("OpenTaiko found the System folder, but could not find any skin(s) to load.");
@@ -829,11 +946,11 @@ internal class CSkin : IDisposable {
 
 	// メソッド
 
-	public static string Path(string strファイルの相対パス) {
+	public static string Path(string strFileRelativePath) {
 		if (strBoxDefSkinSubfolderFullName == "" || !bUseBoxDefSkin) {
-			return System.IO.Path.Combine(strSystemSkinSubfolderFullName, strファイルの相対パス);
+			return System.IO.Path.Combine(strSystemSkinSubfolderFullName, strFileRelativePath);
 		} else {
-			return System.IO.Path.Combine(strBoxDefSkinSubfolderFullName, strファイルの相対パス);
+			return System.IO.Path.Combine(strBoxDefSkinSubfolderFullName, strFileRelativePath);
 		}
 	}
 
@@ -843,7 +960,8 @@ internal class CSkin : IDisposable {
 	/// </summary>
 	/// <param name="skinPathFullName">スキンが格納されたパス名(フルパス)</param>
 	/// <returns>スキン名</returns>
-	public static string GetSkinName(string skinPathFullName) {
+	[return: System.Diagnostics.CodeAnalysis.NotNullIfNotNull(nameof(skinPathFullName))]
+	public static string? GetSkinName(string skinPathFullName) {
 		if (skinPathFullName != null) {
 			if (skinPathFullName == "")     // 「box.defで未定義」用
 				skinPathFullName = strSystemSkinSubfolderFullName;
@@ -861,12 +979,12 @@ internal class CSkin : IDisposable {
 	}
 
 
-	public string GetSkinSubfolderFullNameFromSkinName(string skinName) {
+	public string? GetSkinSubfolderFullNameFromSkinName(string skinName) {
 		foreach (string s in strSystemSkinSubfolders) {
 			if (GetSkinName(s) == skinName)
 				return s;
 		}
-		foreach (string b in strBoxDefSkinSubfolders) {
+		foreach (string b in strBoxDefSkinSubfolders!) {
 			if (GetSkinName(b) == skinName)
 				return b;
 		}
@@ -882,15 +1000,28 @@ internal class CSkin : IDisposable {
 	public bool bIsValid(string skinPathFullName) {
 		string filePathTitle;
 		filePathTitle = System.IO.Path.Combine(skinPathFullName, @$"Graphics{System.IO.Path.DirectorySeparatorChar}1_Title{System.IO.Path.DirectorySeparatorChar}Background.png");
-		return (File.Exists(filePathTitle));
+		if (!File.Exists(filePathTitle))
+			return false;
+		// the game enters these two stages at boot, so a skin without them cannot run
+		foreach (string stage in LuaStageWrapper.CoreStages) {
+			if (!File.Exists(System.IO.Path.Combine(skinPathFullName, "Modules", "Stages", stage, "Script.lua")))
+				return false;
+		}
+		return true;
 	}
 
 
 	public void tRemoveMixerAll() {
-		for (int i = 0; i < nシステムサウンド数; i++) {
-			if (this[i] != null && this[i].bLoadedSuccessfuly) {
-				this[i].tStop();
-				this[i].tRemoveMixer();
+		for (int i = 0; i < this.listSystemSound.Count; ++i) { // concurrent
+			try {
+				var snd = this.listSystemSound.ElementAtOrDefault(i);
+				// a one-shot sound still playing (the loading jingle) is left to finish
+				if ((snd?.bLoadedSuccessfuly ?? false) && !(snd.bIsPlaying && !snd.bLoop)) {
+					snd.tStop();
+					snd.tRemoveMixer();
+				}
+			} catch (InvalidOperationException) {
+				// ignore this element
 			}
 		}
 
@@ -901,7 +1032,7 @@ internal class CSkin : IDisposable {
 	/// </summary>
 	public void tSkinConfigInit() {
 		this.eDiffDispMode = EDifficultyDisplayType.ImageOnMTaiko;
-		this.b現在のステージ数を表示しない = false;
+		this.bCurrentStageCountDisplay = false;
 	}
 
 	public void LoadSkinConfigFromFile(string path, ref string work) {
@@ -909,7 +1040,7 @@ internal class CSkin : IDisposable {
 		using (var streamReader = new StreamReader(Path(path), Encoding.GetEncoding(OpenTaiko.sEncType))) {
 			while (streamReader.Peek() > -1) // 一行ずつ読み込む。
 			{
-				var nowLine = streamReader.ReadLine();
+				var nowLine = streamReader.ReadLine()!;
 				if (nowLine.StartsWith("#include")) {
 					// #include hogehoge.iniにぶち当たった
 					var includePath = nowLine.Substring("#include ".Length).Trim();
@@ -924,11 +1055,18 @@ internal class CSkin : IDisposable {
 	public void tReadSkinConfig() {
 		var str = "";
 		LoadSkinConfigFromFile(Path(@$"SkinConfig.ini"), ref str);
-		this.t文字列から読み込み(str);
+		_fontFallbacksMain = new List<string>();
+		_fontFallbacksSub = null;
+		_fontKerning = true;
+		_fontPalt = false;
+		this.tLoadFromString(str);
+		CFontRenderer.SetFallbackFonts(CFontRenderer.FallbackList.Main, _fontFallbacksMain);
+		CFontRenderer.SetFallbackFonts(CFontRenderer.FallbackList.Sub, _fontFallbacksSub ?? _fontFallbacksMain);
+		CFontRenderer.SetShapingFeatures(_fontKerning, _fontPalt);
 
 	}
 
-	private void t文字列から読み込み(string strAllSettings)  // 2011.4.13 yyagi; refactored to make initial KeyConfig easier.
+	private void tLoadFromString(string strAllSettings)  // 2011.4.13 yyagi; refactored to make initial KeyConfig easier.
 	{
 		string[] delimiter = { "\n" };
 		string[] strSingleLine = strAllSettings.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
@@ -949,7 +1087,7 @@ internal class CSkin : IDisposable {
 							if (int.TryParse(strParam, out var unparsedValue)) {
 								setValue(unparsedValue);
 							} else {
-								Trace.TraceWarning($"SkinConfigの値 {strCommand} は整数値である必要があります。現在の値: {strParam}");
+								Trace.TraceWarning($"SkinConfig value {strCommand} must be an integer. Current value: {strParam}");
 							}
 						}
 						switch (strCommand) {
@@ -961,11 +1099,49 @@ internal class CSkin : IDisposable {
 									this.Skin_Version = strParam;
 									break;
 								}
+							case "DefaultLocale": {
+									this.Skin_DefaultLocale = strParam;
+									break;
+								}
 							case "Creator": {
 									this.Skin_Creator = strParam;
 									break;
 								}
-							case "Resolution": {
+							case "Resolutions": {
+										// comma list of render-scale multipliers; each a decimal (e.g. 0.5) or an a/b
+										// fraction (e.g. 2/3), clamped to (0,1]. 1.0 is always present + first. (';' can't
+										// separate — it starts a comment line in SkinConfig.ini.)
+										var list = new List<(double val, string label)>();
+										foreach (var rawTok in strParam.Split(',')) {
+											var tok = rawTok.Trim();
+											if (tok.Length == 0) continue;
+											double v;
+											int slash = tok.IndexOf('/');
+											if (slash > 0) {
+												if (double.TryParse(tok.Substring(0, slash).Trim(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var num)
+													&& double.TryParse(tok.Substring(slash + 1).Trim(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var den)
+													&& den != 0.0) {
+													v = num / den;
+												} else continue;
+											} else if (!double.TryParse(tok, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out v)) {
+												continue;
+											}
+											if (v > 0.0 && v <= 1.0 && !list.Any(e => Math.Abs(e.val - v) < 1e-6)) list.Add((v, tok));
+										}
+										if (!list.Any(e => Math.Abs(e.val - 1.0) < 1e-6)) list.Add((1.0, "1"));
+										list.Sort((a, b) => b.val.CompareTo(a.val));   // 1.0 first, descending
+										this.Resolutions = list;
+										break;
+									}
+								case "AIBattleCharacter": {
+										this.AIBattleCharacter = strParam;
+										break;
+									}
+								case "AIBattleNameplate": {
+										this.AIBattleNameplate = strParam;
+										break;
+									}
+								case "Resolution": {
 									string[] strSplit = strParam.Split(',');
 									for (int i = 0; i < 2; i++) {
 										Resolution[i] = int.Parse(strSplit[i]);
@@ -1018,7 +1194,7 @@ internal class CSkin : IDisposable {
 									break;
 								}
 							case "NowStageDisp": {
-									this.b現在のステージ数を表示しない = CConversion.bONorOFF(strParam[0]);
+									this.bCurrentStageCountDisplay = CConversion.bONorOFF(strParam[0]);
 									break;
 								}
 
@@ -1393,14 +1569,14 @@ internal class CSkin : IDisposable {
 								}
 							case "Config_Item_X": {
 									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
+									for (int i = 0; i < Math.Min(strSplit.Length, Config_Item_X.Length); i++) {
 										Config_Item_X[i] = int.Parse(strSplit[i]);
 									}
 									break;
 								}
 							case "Config_Item_Y": {
 									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
+									for (int i = 0; i < Math.Min(strSplit.Length, Config_Item_Y.Length); i++) {
 										Config_Item_Y[i] = int.Parse(strSplit[i]);
 									}
 									break;
@@ -1587,10 +1763,6 @@ internal class CSkin : IDisposable {
 								}
 							case "SongSelect_BoxExplanation_Interval": {
 									SongSelect_BoxExplanation_Interval = int.Parse(strParam);
-									break;
-								}
-							case "SongSelect_GenreName": {
-									SongSelect_GenreName = this.strStringを配列に直す(strParam);
 									break;
 								}
 							case "SongSelect_Bar_Count": {
@@ -1935,20 +2107,6 @@ internal class CSkin : IDisposable {
 									string[] strSplit = strParam.Split(',');
 									for (int i = 0; i < 2; i++) {
 										SongSelect_Box_Chara_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NamePlate_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
-										SongSelect_NamePlate_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NamePlate_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
-										SongSelect_NamePlate_Y[i] = int.Parse(strSplit[i]);
 									}
 									break;
 								}
@@ -2706,169 +2864,6 @@ internal class CSkin : IDisposable {
 									for (int i = 0; i < 2; i++) {
 										SongSelect_Option_ModMults2_Y[i] = int.Parse(strSplit[i]);
 									}
-									break;
-								}
-							case "SongSelect_NewHeya_Close_Select": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										SongSelect_NewHeya_Close_Select[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_PlayerPlate_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
-										SongSelect_NewHeya_PlayerPlate_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_PlayerPlate_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
-										SongSelect_NewHeya_PlayerPlate_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_ModeBar_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
-										SongSelect_NewHeya_ModeBar_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_ModeBar_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
-										SongSelect_NewHeya_ModeBar_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_ModeBar_Font_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										SongSelect_NewHeya_ModeBar_Font_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_Box_Count": {
-									SongSelect_NewHeya_Box_Count = int.Parse(strParam);
-									break;
-								}
-							case "SongSelect_NewHeya_Box_X": {
-									string[] strSplit = strParam.Split(',');
-									SongSelect_NewHeya_Box_X = new int[SongSelect_NewHeya_Box_Count];
-									for (int i = 0; i < SongSelect_NewHeya_Box_Count; i++) {
-										SongSelect_NewHeya_Box_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_Box_Y": {
-									string[] strSplit = strParam.Split(',');
-									SongSelect_NewHeya_Box_Y = new int[SongSelect_NewHeya_Box_Count];
-									for (int i = 0; i < SongSelect_NewHeya_Box_Count; i++) {
-										SongSelect_NewHeya_Box_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_Box_Chara_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										SongSelect_NewHeya_Box_Chara_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_Box_Name_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										SongSelect_NewHeya_Box_Name_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_Box_Author_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										SongSelect_NewHeya_Box_Author_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_Lock_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										SongSelect_NewHeya_Lock_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_InfoSection_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										SongSelect_NewHeya_InfoSection_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-
-
-							case "SongSelect_ForeColor_JPOP": {
-									SongSelect_ForeColor_JPOP = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_ForeColor_Anime": {
-									SongSelect_ForeColor_Anime = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_ForeColor_VOCALOID": {
-									SongSelect_ForeColor_VOCALOID = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_ForeColor_Children": {
-									SongSelect_ForeColor_Children = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_ForeColor_Variety": {
-									SongSelect_ForeColor_Variety = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_ForeColor_Classic": {
-									SongSelect_ForeColor_Classic = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_ForeColor_GameMusic": {
-									SongSelect_ForeColor_GameMusic = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case nameof(SongSelect_ForeColor_Namco): {
-									SongSelect_ForeColor_GameMusic = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_BackColor_JPOP": {
-									SongSelect_BackColor_JPOP = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_BackColor_Anime": {
-									SongSelect_BackColor_Anime = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_BackColor_VOCALOID": {
-									SongSelect_BackColor_VOCALOID = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_BackColor_Children": {
-									SongSelect_BackColor_Children = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_BackColor_Variety": {
-									SongSelect_BackColor_Variety = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_BackColor_Classic": {
-									SongSelect_BackColor_Classic = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_BackColor_GameMusic": {
-									SongSelect_BackColor_GameMusic = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case nameof(SongSelect_BackColor_Namco): {
-									SongSelect_BackColor_Namco = ColorTranslator.FromHtml(strParam);
 									break;
 								}
 							case nameof(SongSelect_CorrectionX_Chara): {
@@ -3839,6 +3834,60 @@ internal class CSkin : IDisposable {
 									}
 									break;
 								}
+							case "Game_Chara_Scale": {
+									Game_Chara_Scale = float.Parse(strParam);
+									break;
+								}
+							case "Game_Chara_Scale_4P": {
+									Game_Chara_Scale_4P = float.Parse(strParam);
+									break;
+								}
+							case "Game_Chara_Scale_5P": {
+									Game_Chara_Scale_5P = float.Parse(strParam);
+									break;
+								}
+							case "Game_Chara_Scale_AI": {
+									Game_Chara_Scale_AI = float.Parse(strParam);
+									break;
+								}
+							case "Game_Chara_Balloon_Scale": {
+									Game_Chara_Balloon_Scale = float.Parse(strParam);
+									break;
+								}
+							case "Game_Chara_Kusudama_Scale": {
+									Game_Chara_Kusudama_Scale = float.Parse(strParam);
+									break;
+								}
+							case "Game_Chara_AI_X":
+							case "Game_Chara_X_AI": {
+									string[] strSplit = strParam.Split(',');
+									for (int i = 0; i < 2; i++) {
+										Game_Chara_AI_X[i] = int.Parse(strSplit[i]);
+									}
+									break;
+								}
+							case "Game_Chara_AI_Y":
+							case "Game_Chara_Y_AI": {
+									string[] strSplit = strParam.Split(',');
+									for (int i = 0; i < 2; i++) {
+										Game_Chara_AI_Y[i] = int.Parse(strSplit[i]);
+									}
+									break;
+								}
+							case "Game_Chara_4P": {
+									string[] strSplit = strParam.Split(',');
+									for (int i = 0; i < 2; i++) {
+										Game_Chara_4P[i] = int.Parse(strSplit[i]);
+									}
+									break;
+								}
+							case "Game_Chara_5P": {
+									string[] strSplit = strParam.Split(',');
+									for (int i = 0; i < 2; i++) {
+										Game_Chara_5P[i] = int.Parse(strSplit[i]);
+									}
+									break;
+								}
 							case "Game_Chara_Balloon_X": {
 									string[] strSplit = strParam.Split(',');
 									for (int i = 0; i < 2; i++) {
@@ -3853,44 +3902,32 @@ internal class CSkin : IDisposable {
 									}
 									break;
 								}
-							case nameof(Game_Chara_Balloon_Timer): {
-									if (int.Parse(strParam) > 0)
-										Game_Chara_Balloon_Timer = int.Parse(strParam);
+							case "Game_Chara_Balloon_4P": {
+									string[] strSplit = strParam.Split(',');
+									for (int i = 0; i < 2; i++) {
+										Game_Chara_Balloon_4P[i] = int.Parse(strSplit[i]);
+									}
 									break;
 								}
-							case nameof(Game_Chara_Balloon_Delay): {
-									if (int.Parse(strParam) > 0)
-										Game_Chara_Balloon_Delay = int.Parse(strParam);
+							case "Game_Chara_Balloon_5P": {
+									string[] strSplit = strParam.Split(',');
+									for (int i = 0; i < 2; i++) {
+										Game_Chara_Balloon_5P[i] = int.Parse(strSplit[i]);
+									}
 									break;
 								}
-							case nameof(Game_Chara_Balloon_FadeOut): {
-									if (int.Parse(strParam) > 0)
-										Game_Chara_Balloon_FadeOut = int.Parse(strParam);
+							case "Game_Chara_Kusudama_X": {
+									string[] strSplit = strParam.Split(',');
+									for (int i = 0; i < 5; i++) {
+										Game_Chara_Kusudama_X[i] = int.Parse(strSplit[i]);
+									}
 									break;
 								}
-							// パターン数の設定はTextureLoader.csで反映されます。
-							case "Game_Chara_Motion_Normal": {
-									Game_Chara_Motion_Normal = strParam;
-									break;
-								}
-							case "Game_Chara_Motion_Clear": {
-									Game_Chara_Motion_Clear = strParam;
-									break;
-								}
-							case "Game_Chara_Motion_GoGo": {
-									Game_Chara_Motion_GoGo = strParam;
-									break;
-								}
-							case "Game_Chara_Beat_Normal": {
-									ParseInt32(value => Game_Chara_Beat_Normal = value);
-									break;
-								}
-							case "Game_Chara_Beat_Clear": {
-									ParseInt32(value => Game_Chara_Beat_Clear = value);
-									break;
-								}
-							case "Game_Chara_Beat_GoGo": {
-									ParseInt32(value => Game_Chara_Beat_GoGo = value);
+							case "Game_Chara_Kusudama_Y": {
+									string[] strSplit = strParam.Split(',');
+									for (int i = 0; i < 5; i++) {
+										Game_Chara_Kusudama_Y[i] = int.Parse(strSplit[i]);
+									}
 									break;
 								}
 							#endregion
@@ -4080,6 +4117,10 @@ internal class CSkin : IDisposable {
 									for (int i = 0; i < 2; i++) {
 										Game_Taiko_Y[i] = int.Parse(strSplit[i]);
 									}
+									break;
+								}
+							case "Game_Taiko_VisibleExPlayerCount": {
+									Game_Taiko_VisibleExPlayerCount = CConversion.bONorOFF(strParam[0]);
 									break;
 								}
 							case "Game_Taiko_Combo_X": {
@@ -4437,14 +4478,6 @@ internal class CSkin : IDisposable {
 									Gauge_Soul_Y_AI = int.Parse(strParam);
 									break;
 								}
-							case "Gauge_Soul_X_Tower": {
-									Gauge_Soul_X_Tower = int.Parse(strParam);
-									break;
-								}
-							case "Gauge_Soul_Y_Tower": {
-									Gauge_Soul_Y_Tower = int.Parse(strParam);
-									break;
-								}
 							case "Gauge_Soul_Fire_X": {
 									string[] strSplit = strParam.Split(',');
 									for (int i = 0; i < 2; i++) {
@@ -4467,50 +4500,10 @@ internal class CSkin : IDisposable {
 									Gauge_Soul_Fire_Y_AI = int.Parse(strParam);
 									break;
 								}
-							case "Gauge_Soul_Fire_X_Tower": {
-									Gauge_Soul_Fire_X_Tower = int.Parse(strParam);
-									break;
-								}
-							case "Gauge_Soul_Fire_Y_Tower": {
-									Gauge_Soul_Fire_Y_Tower = int.Parse(strParam);
-									break;
-								}
 							case "Game_Gauge_Rainbow_Timer": {
 									if (int.Parse(strParam) != 0) {
 										Game_Gauge_Rainbow_Timer = int.Parse(strParam);
 									}
-									break;
-								}
-							case "Game_Tower_Floor_Number": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Game_Tower_Floor_Number[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Game_Tower_Life_Number": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Game_Tower_Life_Number[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Game_Tower_Font_TouTatsuKaiSuu": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Game_Tower_Font_TouTatsuKaiSuu[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Game_Tower_Font_Kai": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Game_Tower_Font_Kai[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Game_Tower_Font_TowerText": {
-									Game_Tower_Font_TowerText = int.Parse(strParam);
 									break;
 								}
 
@@ -5374,27 +5367,6 @@ internal class CSkin : IDisposable {
 									}
 									break;
 								}
-							case "Game_Tower_Floors_Body": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Game_Tower_Floors_Body[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Game_Tower_Floors_Deco": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Game_Tower_Floors_Deco[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Game_Tower_Floors_Move": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Game_Tower_Floors_Move[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
 							case "Game_Tower_Don": {
 									string[] strSplit = strParam.Split(',');
 									for (int i = 0; i < 2; i++) {
@@ -5561,1421 +5533,10 @@ internal class CSkin : IDisposable {
 							#endregion
 
 							#region Result
-							case "Result_Use1PUI": {
-									Result_Use1PUI = CConversion.bONorOFF(strParam[0]);
-									break;
-								}
-							case nameof(Result_Cloud_Count): {
-									Result_Cloud_Count = int.Parse(strParam);
-									break;
-								}
-							case "Result_Cloud_X": {
-									Result_Cloud_X = new int[Result_Cloud_Count];
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Result_Cloud_Count; i++) {
-										Result_Cloud_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Result_Cloud_Y": {
-									Result_Cloud_Y = new int[Result_Cloud_Count];
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Result_Cloud_Count; i++) {
-										Result_Cloud_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Result_Cloud_MaxMove": {
-									Result_Cloud_MaxMove = new int[Result_Cloud_Count];
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Result_Cloud_Count; i++) {
-										Result_Cloud_MaxMove[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case nameof(Result_Shine_Count): {
-									Result_Shine_Count = int.Parse(strParam);
-									break;
-								}
-							case "Result_Shine_1P_X": {
-									Result_Shine_X[0] = new int[Result_Shine_Count];
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Result_Shine_Count; i++) {
-										Result_Shine_X[0][i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Shine_2P_X": {
-									Result_Shine_X[1] = new int[Result_Shine_Count];
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Result_Shine_Count; i++) {
-										Result_Shine_X[1][i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Shine_1P_Y": {
-									Result_Shine_Y[0] = new int[Result_Shine_Count];
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Result_Shine_Count; i++) {
-										Result_Shine_Y[0][i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Shine_2P_Y": {
-									Result_Shine_Y[1] = new int[Result_Shine_Count];
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Result_Shine_Count; i++) {
-										Result_Shine_Y[1][i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Shine_Size": {
-									Result_Shine_Size = new float[Result_Shine_Count];
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Result_Cloud_Count; i++) {
-										Result_Shine_Size[i] = float.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Work_1P_X": {
-									Result_Work_X[0] = new int[3];
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Result_Cloud_Count; i++) {
-										Result_Work_X[0][i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Work_2P_X": {
-									Result_Work_X[1] = new int[3];
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Result_Cloud_Count; i++) {
-										Result_Work_X[1][i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Work_1P_Y": {
-									Result_Work_Y[0] = new int[3];
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Result_Cloud_Count; i++) {
-										Result_Work_Y[0][i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Work_2P_Y": {
-									Result_Work_Y[1] = new int[3];
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Result_Cloud_Count; i++) {
-										Result_Work_Y[1][i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_DifficultyBar_Size": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_DifficultyBar_Size[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_DifficultyBar_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_DifficultyBar_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_DifficultyBar_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_DifficultyBar_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Gauge_Base_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Gauge_Base_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Gauge_Base_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Gauge_Base_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Gauge_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Gauge_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Gauge_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Gauge_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Gauge_Rect": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 4; i++) {
-										Result_Gauge_Rect[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Gauge_Rainbow_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Gauge_Rainbow_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Gauge_Rainbow_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Gauge_Rainbow_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Gauge_Rainbow_Interval": {
-									Result_Gauge_Rainbow_Interval = int.Parse(strParam);
-									break;
-								}
-							case "Result_Gauge_ClearText_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Gauge_ClearText_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Gauge_ClearText_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Gauge_ClearText_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Gauge_ClearText_Rect": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 4; i++) {
-										Result_Gauge_ClearText_Rect[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Gauge_ClearText_Clear_Rect": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 4; i++) {
-										Result_Gauge_ClearText_Clear_Rect[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
 							case "Result_Number_Interval": {
 									string[] strSplit = strParam.Split(',');
 									for (int i = 0; i < 2; i++) {
 										Result_Number_Interval[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Number_Scale_4P": {
-									Result_Number_Scale_4P = float.Parse(strParam);
-									break;
-								}
-							case "Result_Number_Scale_5P": {
-									Result_Number_Scale_5P = float.Parse(strParam);
-									break;
-								}
-							case "Result_Soul_Fire_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Soul_Fire_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Soul_Fire_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Soul_Fire_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Soul_Text_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Soul_Text_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Soul_Text_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Soul_Text_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Perfect_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Perfect_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Perfect_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Perfect_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Good_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Good_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Good_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Good_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Miss_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Miss_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Miss_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Miss_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Roll_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Roll_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Roll_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Roll_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_MaxCombo_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_MaxCombo_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_MaxCombo_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_MaxCombo_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_ADLib_Show": {
-									Result_ADLib_Show = CConversion.bONorOFF(strParam[0]);
-									break;
-								}
-							case "Result_ADLib_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_ADLib_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_ADLib_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_ADLib_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Bomb_Show": {
-									Result_Bomb_Show = CConversion.bONorOFF(strParam[0]);
-									break;
-								}
-							case "Result_Bomb_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Bomb_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Bomb_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Bomb_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Score_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Score_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Score_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Score_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Score_Number_Interval": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Score_Number_Interval[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Score_Scale_4P": {
-									Result_Score_Scale_4P = float.Parse(strParam);
-									break;
-								}
-							case "Result_Score_Scale_5P": {
-									Result_Score_Scale_5P = float.Parse(strParam);
-									break;
-								}
-							case "Result_ScoreRankEffect_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_ScoreRankEffect_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_ScoreRankEffect_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_ScoreRankEffect_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_CrownEffect_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_CrownEffect_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_CrownEffect_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_CrownEffect_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Speech_Bubble_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Speech_Bubble_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Speech_Bubble_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Speech_Bubble_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Speech_Bubble_V2_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Speech_Bubble_V2_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Speech_Bubble_V2_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Speech_Bubble_V2_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Speech_Bubble_V2_2P_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Speech_Bubble_V2_2P_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Speech_Bubble_V2_2P_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Speech_Bubble_V2_2P_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case nameof(Result_MusicName_X): {
-									Result_MusicName_X = int.Parse(strParam);
-									break;
-								}
-							case nameof(Result_MusicName_Y): {
-									Result_MusicName_Y = int.Parse(strParam);
-									break;
-								}
-							case nameof(Result_MusicName_FontSize): {
-									if (int.Parse(strParam) > 0)
-										Result_MusicName_FontSize = int.Parse(strParam);
-									break;
-								}
-							case nameof(Result_MusicName_MaxSize): {
-									Result_MusicName_MaxSize = int.Parse(strParam);
-									break;
-								}
-							case nameof(Result_MusicName_ReferencePoint): {
-									Result_MusicName_ReferencePoint = (ReferencePoint)int.Parse(strParam);
-									break;
-								}
-							case nameof(Result_StageText_X): {
-									Result_StageText_X = int.Parse(strParam);
-									break;
-								}
-							case nameof(Result_StageText_Y): {
-									Result_StageText_Y = int.Parse(strParam);
-									break;
-								}
-							case nameof(Result_StageText_FontSize): {
-									if (int.Parse(strParam) > 0)
-										Result_StageText_FontSize = int.Parse(strParam);
-									break;
-								}
-							case nameof(Result_StageText_ReferencePoint): {
-									Result_StageText_ReferencePoint = (ReferencePoint)int.Parse(strParam);
-									break;
-								}
-
-							case nameof(Result_MusicName_ForeColor): {
-									Result_MusicName_ForeColor = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case nameof(Result_StageText_ForeColor): {
-									Result_StageText_ForeColor = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							//case nameof(Result_StageText_ForeColor_Red):
-							//{
-							//    Result_StageText_ForeColor_Red = ColorTranslator.FromHtml(strParam);
-							//}
-							case nameof(Result_MusicName_BackColor): {
-									Result_MusicName_BackColor = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case nameof(Result_StageText_BackColor): {
-									Result_StageText_BackColor = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							//case nameof(Result_StageText_BackColor_Red):
-							//{
-							//    Result_StageText_BackColor_Red = ColorTranslator.FromHtml(strParam);
-							//}
-
-							case "Result_NamePlate_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_NamePlate_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_NamePlate_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_NamePlate_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_ModIcons_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_ModIcons_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_ModIcons_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_ModIcons_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Flower_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Flower_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Flower_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Flower_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Flower_Rotate_1P_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
-										Result_Flower_Rotate_X[0][i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Flower_Rotate_2P_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
-										Result_Flower_Rotate_X[1][i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Flower_Rotate_1P_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
-										Result_Flower_Rotate_Y[0][i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Flower_Rotate_2P_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
-										Result_Flower_Rotate_Y[1][i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case nameof(Result_PlateShine_Count): {
-									Result_PlateShine_Count = int.Parse(strParam);
-									break;
-								}
-							case "Result_PlateShine_1P_X": {
-									Result_PlateShine_X[0] = new int[Result_PlateShine_Count];
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Result_PlateShine_Count; i++) {
-										Result_PlateShine_X[0][i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_PlateShine_2P_X": {
-									Result_PlateShine_X[1] = new int[Result_PlateShine_Count];
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Result_PlateShine_Count; i++) {
-										Result_PlateShine_X[1][i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_PlateShine_1P_Y": {
-									Result_PlateShine_Y[0] = new int[Result_PlateShine_Count];
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Result_PlateShine_Count; i++) {
-										Result_PlateShine_Y[0][i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_PlateShine_2P_Y": {
-									Result_PlateShine_Y[1] = new int[Result_PlateShine_Count];
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Result_PlateShine_Count; i++) {
-										Result_PlateShine_Y[1][i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-
-							case nameof(Result_Dan): {
-									Result_Dan = strParam.Split(',').Select(int.Parse).ToArray();
-									break;
-								}
-							case nameof(Result_Dan_XY): {
-									Result_Dan_XY = strParam.Split(',').Select(int.Parse).ToArray();
-									break;
-								}
-							case nameof(Result_Dan_Plate_XY): {
-									Result_Dan_Plate_XY = strParam.Split(',').Select(int.Parse).ToArray();
-									break;
-								}
-
-
-							case "Result_UIMove_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 4; i++) {
-										int moveX = int.Parse(strSplit[0]);
-										Result_UIMove_4P_X[i] = moveX * i;
-
-										int moveY = int.Parse(strSplit[1]);
-										Result_UIMove_4P_Y[i] = moveY * i;
-									}
-									break;
-								}
-							case "Result_UIMove_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
-										int moveX = int.Parse(strSplit[0]);
-										Result_UIMove_5P_X[i] = moveX * i;
-
-										int moveY = int.Parse(strSplit[1]);
-										Result_UIMove_5P_Y[i] = moveY * i;
-									}
-									break;
-								}
-							case "Result_UIMove_4P_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 4; i++) {
-										Result_UIMove_4P_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_UIMove_4P_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 4; i++) {
-										Result_UIMove_4P_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_UIMove_5P_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
-										Result_UIMove_5P_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_UIMove_5P_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
-										Result_UIMove_5P_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_DifficultyBar_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_DifficultyBar_4P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_DifficultyBar_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_DifficultyBar_5P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Gauge_Base_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Gauge_Base_4P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Gauge_Base_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Gauge_Base_5P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Gauge_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Gauge_4P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Gauge_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Gauge_5P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Gauge_ClearText_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Gauge_ClearText_4P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Gauge_ClearText_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Gauge_ClearText_5P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Gauge_Rainbow_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Gauge_Rainbow_4P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Gauge_Rainbow_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Gauge_Rainbow_5P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Soul_Fire_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Soul_Fire_4P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Soul_Fire_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Soul_Fire_5P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Soul_Text_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Soul_Text_4P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Soul_Text_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Soul_Text_5P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Perfect_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Perfect_4P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Perfect_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Perfect_5P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Good_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Good_4P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Good_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Good_5P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Miss_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Miss_4P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Miss_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Miss_5P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Roll_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Roll_4P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Roll_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Roll_5P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_MaxCombo_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_MaxCombo_4P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_MaxCombo_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_MaxCombo_5P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_ADLib_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_ADLib_4P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_ADLib_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_ADLib_5P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Bomb_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Bomb_4P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Bomb_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Bomb_5P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Score_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Score_4P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Score_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Score_5P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_ScoreRankEffect_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_ScoreRankEffect_4P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_ScoreRankEffect_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_ScoreRankEffect_5P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_CrownEffect_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_CrownEffect_4P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_CrownEffect_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_CrownEffect_5P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Speech_Bubble_V2_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Speech_Bubble_V2_4P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Speech_Bubble_V2_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Speech_Bubble_V2_5P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Speech_Text_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_Speech_Text_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_Speech_Text_Size": {
-									Result_Speech_Text_Size = int.Parse(strParam);
-									break;
-								}
-							case "Result_Speech_Text_MaxWidth": {
-									Result_Speech_Text_MaxWidth = int.Parse(strParam);
-									break;
-								}
-							case "Result_NamePlate_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_NamePlate_4P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_NamePlate_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_NamePlate_5P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_ModIcons_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_ModIcons_4P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_ModIcons_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_ModIcons_5P[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-
-							#endregion
-
-							#region AIResult
-							case "Result_AIBattle_Batch": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_AIBattle_Batch[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_AIBattle_Batch_Move": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_AIBattle_Batch_Move[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_AIBattle_SectionPlate_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_AIBattle_SectionPlate_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_AIBattle_SectionText_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_AIBattle_SectionText_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Result_AIBattle_SectionText_Scale": {
-									Result_AIBattle_SectionText_Scale = int.Parse(strParam);
-									break;
-								}
-							case "Result_AIBattle_WinFlag": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Result_AIBattle_WinFlag[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							#endregion
-
-							#region DanResult
-							case "DanResult_StatePanel": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										DanResult_StatePanel[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_SongPanel_Main_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
-										DanResult_SongPanel_Main_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_SongPanel_Main_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
-										DanResult_SongPanel_Main_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_Difficulty_Cymbol_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
-										DanResult_Difficulty_Cymbol_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_Difficulty_Cymbol_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
-										DanResult_Difficulty_Cymbol_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_Level_Number_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
-										DanResult_Level_Number_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_Level_Number_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
-										DanResult_Level_Number_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_Sections_Perfect_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
-										DanResult_Sections_Perfect_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_Sections_Perfect_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
-										DanResult_Sections_Perfect_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_Sections_Good_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
-										DanResult_Sections_Good_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_Sections_Good_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
-										DanResult_Sections_Good_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_Sections_Miss_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
-										DanResult_Sections_Miss_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_Sections_Miss_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
-										DanResult_Sections_Miss_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_Sections_Roll_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
-										DanResult_Sections_Roll_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_Sections_Roll_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
-										DanResult_Sections_Roll_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_Perfect": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										DanResult_Perfect[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_Good": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										DanResult_Good[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_Miss": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										DanResult_Miss[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_Roll": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										DanResult_Roll[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_MaxCombo": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										DanResult_MaxCombo[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_TotalHit": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										DanResult_TotalHit[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_Score": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										DanResult_Score[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_Exam": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										DanResult_Exam[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_DanTitles_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
-										DanResult_DanTitles_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_DanTitles_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
-										DanResult_DanTitles_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_DanIcon_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
-										DanResult_DanIcon_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_DanIcon_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
-										DanResult_DanIcon_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_Rank": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										DanResult_Rank[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "DanResult_Font_DanTitles_Size": {
-									DanResult_Font_DanTitles_Size = int.Parse(strParam);
-									break;
-								}
-							#endregion
-
-							#region TowerResult
-							case "TowerResult_ScoreRankEffect": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerResult_ScoreRankEffect[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerResult_Toutatsu": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerResult_Toutatsu[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerResult_MaxFloors": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerResult_MaxFloors[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerResult_Ten": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerResult_Ten[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerResult_Score": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerResult_Score[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerResult_CurrentFloor": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerResult_CurrentFloor[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerResult_ScoreCount": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerResult_ScoreCount[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerResult_RemainingLifes": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerResult_RemainingLifes[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerResult_Gauge_Soul": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerResult_Gauge_Soul[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerResult_Font_TowerText": {
-									TowerResult_Font_TowerText = int.Parse(strParam);
-									break;
-								}
-							case "TowerResult_Font_TowerText48": {
-									TowerResult_Font_TowerText48 = int.Parse(strParam);
-									break;
-								}
-							case "TowerResult_Font_TowerText72": {
-									TowerResult_Font_TowerText72 = int.Parse(strParam);
-									break;
-								}
-							#endregion
-
-							#region Heya
-							case "Heya_Main_Menu_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Math.Min(6, strSplit.Length); i++) {
-										Heya_Main_Menu_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_Main_Menu_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Math.Min(6, strSplit.Length); i++) {
-										Heya_Main_Menu_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_Main_Menu_Font_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Heya_Main_Menu_Font_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_Font_Scale": {
-									Heya_Font_Scale = int.Parse(strParam);
-									break;
-								}
-							case "Heya_Center_Menu_Box_Count": {
-									Heya_Center_Menu_Box_Count = int.Parse(strParam);
-									break;
-								}
-							case "Heya_Center_Menu_Box_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Heya_Center_Menu_Box_Count; i++) {
-										Heya_Center_Menu_Box_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_Center_Menu_Box_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Heya_Center_Menu_Box_Count; i++) {
-										Heya_Center_Menu_Box_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_Center_Menu_Box_Item_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Heya_Center_Menu_Box_Item_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_Center_Menu_Box_Name_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Heya_Center_Menu_Box_Name_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_Center_Menu_Box_Authors_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Heya_Center_Menu_Box_Authors_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_Side_Menu_Count": {
-									Heya_Side_Menu_Count = int.Parse(strParam);
-									break;
-								}
-							case "Heya_Side_Menu_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Heya_Side_Menu_Count; i++) {
-										Heya_Side_Menu_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_Side_Menu_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < Heya_Side_Menu_Count; i++) {
-										Heya_Side_Menu_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_Side_Menu_Font_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Heya_Side_Menu_Font_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_InfoSection": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Heya_InfoSection[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Heya_DescriptionTextOrigin": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Heya_DescriptionTextOrigin[i] = int.Parse(strSplit[i]);
 									}
 									break;
 								}
@@ -7079,110 +5640,6 @@ internal class CSkin : IDisposable {
 								}
 							case "OnlineLounge_Font_OLFontLarge": {
 									OnlineLounge_Font_OLFontLarge = int.Parse(strParam);
-									break;
-								}
-							#endregion
-
-							#region TowerSelect
-							case "TowerSelect_Title_Size": {
-									TowerSelect_Title_Size = int.Parse(strParam);
-									break;
-								}
-							case "TowerSelect_Title_MaxWidth": {
-									TowerSelect_Title_MaxWidth = int.Parse(strParam);
-									break;
-								}
-							case "TowerSelect_Title_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerSelect_Title_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerSelect_SubTitle_Size": {
-									TowerSelect_SubTitle_Size = int.Parse(strParam);
-									break;
-								}
-							case "TowerSelect_SubTitle_MaxWidth": {
-									TowerSelect_SubTitle_MaxWidth = int.Parse(strParam);
-									break;
-								}
-							case "TowerSelect_SubTitle_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerSelect_SubTitle_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerSelect_Bar_Count": {
-									TowerSelect_Bar_Count = int.Parse(strParam);
-									break;
-								}
-							case "TowerSelect_Bar_X": {
-									TowerSelect_Bar_X = new int[TowerSelect_Bar_Count];
-
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < TowerSelect_Bar_Count; i++) {
-										TowerSelect_Bar_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerSelect_Bar_Y": {
-									TowerSelect_Bar_Y = new int[TowerSelect_Bar_Count];
-
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < TowerSelect_Bar_Count; i++) {
-										TowerSelect_Bar_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							#endregion
-
-							#region OpenEncyclopedia
-							case "OpenEncyclopedia_Context_Item2": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										OpenEncyclopedia_Context_Item2[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "OpenEncyclopedia_Context_Item3": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										OpenEncyclopedia_Context_Item3[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "OpenEncyclopedia_Context_PageText": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										OpenEncyclopedia_Context_PageText[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "OpenEncyclopedia_Side_Menu": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										OpenEncyclopedia_Side_Menu[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "OpenEncyclopedia_Side_Menu_Move": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										OpenEncyclopedia_Side_Menu_Move[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "OpenEncyclopedia_Side_Menu_Text_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										OpenEncyclopedia_Side_Menu_Text_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "OpenEncyclopedia_Font_EncyclopediaMenu_Size": {
-									OpenEncyclopedia_Font_EncyclopediaMenu_Size = int.Parse(strParam);
 									break;
 								}
 							#endregion
@@ -7480,6 +5937,28 @@ internal class CSkin : IDisposable {
 									break;
 								}
 							#endregion
+							case "FontFallbacksMain":
+							case "FontFallbacksSub": {
+									var fonts = new List<string>();
+									foreach (string font in strParam.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)) {
+										string fontPath = font.Replace('/', System.IO.Path.DirectorySeparatorChar).Replace('\\', System.IO.Path.DirectorySeparatorChar);
+										if (HPrivateFastFont.FontExists(fontPath))
+											fonts.Add(fontPath);
+										else if (HPrivateFastFont.FontExists(Path(fontPath)))
+											fonts.Add(Path(fontPath));
+									}
+									if (strCommand == "FontFallbacksMain")
+										_fontFallbacksMain = fonts;
+									else
+										_fontFallbacksSub = fonts;
+									break;
+								}
+							case "FontKerning":
+								_fontKerning = strParam != "0";
+								break;
+							case "FontPalt":
+								_fontPalt = strParam == "1";
+								break;
 							default:
 								foreach (string code in CLangManager.Langcodes) {
 									if (strCommand == "FontName" + code.ToUpper()) {
@@ -7505,14 +5984,14 @@ internal class CSkin : IDisposable {
 					continue;
 				} catch (Exception exception) {
 					Trace.TraceError(exception.ToString());
-					Trace.TraceError("例外が発生しましたが処理を継続します。 (6a32cc37-1527-412e-968a-512c1f0135cd)");
+					Trace.TraceError("An exception occurred; continuing. (6a32cc37-1527-412e-968a-512c1f0135cd)");
 					continue;
 				}
 			}
 		}
 	}
 
-	private void t座標の追従設定() {
+	private void tCoordAddFollowSettings() {
 		//
 		if (bFieldBgPointOverride == true) {
 
@@ -7522,11 +6001,14 @@ internal class CSkin : IDisposable {
 	#region [ IDisposable 実装 ]
 	//-----------------
 	public void Dispose() {
-		if (!this.bDisposed済み) {
-			for (int i = 0; i < this.nシステムサウンド数; i++)
-				this[i].Dispose();
+		if (!this.bDisposedDone) {
+			// concurrent
+			var list = Interlocked.Exchange(ref this.listSystemSound, []);
+			for (int i = 0; i < list.Count; ++i)
+				list.ElementAtOrDefault(i)?.Dispose();
+			list.Clear();
 
-			this.bDisposed済み = true;
+			this.bDisposedDone = true;
 		}
 	}
 	//-----------------
@@ -7537,7 +6019,7 @@ internal class CSkin : IDisposable {
 
 	#region [ private ]
 	//-----------------
-	private bool bDisposed済み;
+	private bool bDisposedDone;
 	//-----------------
 	#endregion
 
@@ -7592,7 +6074,7 @@ internal class CSkin : IDisposable {
 	public float fComboNumberSpacing_l = 0;
 
 	public EDifficultyDisplayType eDiffDispMode;
-	public bool b現在のステージ数を表示しない;
+	public bool bCurrentStageCountDisplay;
 
 	//リザルト画面
 	//現在のデフォルト値はダミーです。
@@ -7621,7 +6103,7 @@ internal class CSkin : IDisposable {
 	public int nResultGaugeBodyP1Y = 125;
 	#endregion
 
-	public string[] strStringを配列に直す(string str) {
+	public string[] strStringArrayConvert(string str) {
 		string[] strArray = str.Split(',');
 		return strArray;
 	}
@@ -7643,13 +6125,35 @@ internal class CSkin : IDisposable {
 	public string Skin_Name = "Unknown";
 	public string Skin_Version = "Unknown";
 	public string Skin_Creator = "Unknown";
+	/// <summary>
+	/// Locale id used as the fallback when the active game language has no skin locale file.
+	/// Set via <c>DefaultLocale=</c> in SkinConfig.ini; defaults to "en".
+	/// </summary>
+	public string Skin_DefaultLocale = "en";
 	public int[] Resolution = new int[] { 1280, 720 };
 	public double ScaleX => Resolution[0] / 1280.0;
 	public double ScaleY => Resolution[1] / 720.0;
-	public string FontName { get { return _fontNameLocalized.TryGetValue(CLangManager.fetchLang(), out string value) ? value : ""; } }
+		/// <summary>
+		/// Selectable render-scale multipliers (each in (0,1]) from SkinConfig.ini <c>Resolutions=</c> (decimals or
+		/// <c>a/b</c> fractions, semicolon-separated). <c>1.0</c> is always present and is the default. The internal
+		/// render resolution = <see cref="Resolution"/> × multiplier, upscaled to the window — lets low-end machines
+		/// trade sharpness for speed. Sorted descending (1.0 first).
+		/// </summary>
+		public List<(double val, string label)> Resolutions = new List<(double, string)> { (1.0, "1") };
+		/// <summary>Character folder name used for the AI battle slot; set via <c>AIBattleCharacter=</c> in SkinConfig.ini.</summary>
+		public string AIBattleCharacter = "10v2 - AItritus";
+		/// <summary>Id of the nameplate the AI battle opponent wears; set via <c>AIBattleNameplate=</c> in SkinConfig.ini.</summary>
+		public string AIBattleNameplate = "66";
+	public string FontName { get { return _fontNameLocalized.TryGetValue(CLangManager.fetchLang(), out string? value) ? value : ""; } }
 	private Dictionary<string, string> _fontNameLocalized = new Dictionary<string, string>();
-	public string BoxFontName { get { return _boxFontNameLocalized.TryGetValue(CLangManager.fetchLang(), out string value) ? value : ""; } }
+	public string BoxFontName { get { return _boxFontNameLocalized.TryGetValue(CLangManager.fetchLang(), out string? value) ? value : ""; } }
 	private Dictionary<string, string> _boxFontNameLocalized = new Dictionary<string, string>();
+	// FontFallbacksMain / FontFallbacksSub (null: the Main list)
+	private List<string> _fontFallbacksMain = new List<string>();
+	private List<string>? _fontFallbacksSub;
+	// FontKerning (the font's kerning, on unless 0) / FontPalt (the font's proportional widths for Japanese, off unless 1)
+	private bool _fontKerning = true;
+	private bool _fontPalt;
 	#endregion
 
 	#region Config
@@ -7660,8 +6164,8 @@ internal class CSkin : IDisposable {
 	public int[] Config_Arrow_Focus_X = new int[] { 552, 552 };
 	public int[] Config_Arrow_Focus_Y = new int[] { 279, 381 };
 
-	public int[] Config_Item_X = new int[] { 282, 282, 282 };
-	public int[] Config_Item_Y = new int[] { 153, 192, 231 };
+	public int[] Config_Item_X = new int[] { 282, 282, 282, 282 };
+	public int[] Config_Item_Y = new int[] { 153, 192, 231, 270 };
 	public int Config_Item_Width = 100;
 	public int[] Config_Item_Font_Offset = new int[] { 0, 8 };
 
@@ -7699,143 +6203,143 @@ internal class CSkin : IDisposable {
 	#region Puchichara
 
 	public int Puchichara_Ptn;
-	public string[] Puchicharas_Name;
+	public string[] Puchicharas_Name = [];
 	public Dictionary<string, int> Puchicharas_NameToIndex = [];
+
 
 	#endregion
 
 	#region Characters
 
 	public int Characters_Ptn;
-	public string[] Characters_DirName;
-	public int[] Characters_Normal_Ptn,
-		Characters_Normal_Missed_Ptn,
-		Characters_Normal_MissedDown_Ptn,
-		Characters_Normal_Cleared_Ptn,
-		Characters_Normal_Maxed_Ptn,
-		Characters_MissIn_Ptn,
-		Characters_MissDownIn_Ptn,
-		Characters_GoGoTime_Ptn,
-		Characters_GoGoTime_Maxed_Ptn,
-		Characters_10Combo_Ptn,
-		Characters_10Combo_Clear_Ptn,
-		Characters_10Combo_Maxed_Ptn,
-		Characters_GoGoStart_Ptn,
-		Characters_GoGoStart_Clear_Ptn,
-		Characters_GoGoStart_Maxed_Ptn,
-		Characters_Become_Cleared_Ptn,
-		Characters_Become_Maxed_Ptn,
-		Characters_SoulOut_Ptn,
-		Characters_ClearOut_Ptn,
-		Characters_Return_Ptn,
-		Characters_Balloon_Breaking_Ptn,
-		Characters_Balloon_Broke_Ptn,
-		Characters_Balloon_Miss_Ptn,
-		Characters_Kusudama_Idle_Ptn,
-		Characters_Kusudama_Breaking_Ptn,
-		Characters_Kusudama_Broke_Ptn,
-		Characters_Kusudama_Miss_Ptn,
-		Characters_Title_Entry_Ptn,
-		Characters_Title_Normal_Ptn,
-		Characters_Menu_Loop_Ptn,
-		Characters_Menu_Select_Ptn,
-		Characters_Menu_Start_Ptn,
-		Characters_Menu_Wait_Ptn,
-		Characters_Result_Clear_Ptn,
-		Characters_Result_Failed_Ptn,
-		Characters_Result_Failed_In_Ptn,
-		Characters_Result_Normal_Ptn,
-		Characters_Tower_Standing_Ptn,
-		Characters_Tower_Climbing_Ptn,
-		Characters_Tower_Running_Ptn,
-		Characters_Tower_Clear_Ptn,
-		Characters_Tower_Fail_Ptn,
-		Characters_Tower_Standing_Tired_Ptn,
-		Characters_Tower_Climbing_Tired_Ptn,
-		Characters_Tower_Running_Tired_Ptn,
-		Characters_Tower_Clear_Tired_Ptn;
+	public string[] Characters_DirName = null!;
+	public int[] Characters_Normal_Ptn = null!,
+		Characters_Normal_Missed_Ptn = null!,
+		Characters_Normal_MissedDown_Ptn = null!,
+		Characters_Normal_Cleared_Ptn = null!,
+		Characters_Normal_Maxed_Ptn = null!,
+		Characters_MissIn_Ptn = null!,
+		Characters_MissDownIn_Ptn = null!,
+		Characters_GoGoTime_Ptn = null!,
+		Characters_GoGoTime_Maxed_Ptn = null!,
+		Characters_10Combo_Ptn = null!,
+		Characters_10Combo_Clear_Ptn = null!,
+		Characters_10Combo_Maxed_Ptn = null!,
+		Characters_GoGoStart_Ptn = null!,
+		Characters_GoGoStart_Clear_Ptn = null!,
+		Characters_GoGoStart_Maxed_Ptn = null!,
+		Characters_Become_Cleared_Ptn = null!,
+		Characters_Become_Maxed_Ptn = null!,
+		Characters_SoulOut_Ptn = null!,
+		Characters_ClearOut_Ptn = null!,
+		Characters_Return_Ptn = null!,
+		Characters_Balloon_Breaking_Ptn = null!,
+		Characters_Balloon_Broke_Ptn = null!,
+		Characters_Balloon_Miss_Ptn = null!,
+		Characters_Kusudama_Idle_Ptn = null!,
+		Characters_Kusudama_Breaking_Ptn = null!,
+		Characters_Kusudama_Broke_Ptn = null!,
+		Characters_Kusudama_Miss_Ptn = null!,
+		Characters_Title_Entry_Ptn = null!,
+		Characters_Title_Normal_Ptn = null!,
+		Characters_Menu_Loop_Ptn = null!,
+		Characters_Menu_Select_Ptn = null!,
+		Characters_Menu_Start_Ptn = null!,
+		Characters_Menu_Wait_Ptn = null!,
+		Characters_Result_Clear_Ptn = null!,
+		Characters_Result_Failed_Ptn = null!,
+		Characters_Result_Failed_In_Ptn = null!,
+		Characters_Result_Normal_Ptn = null!,
+		Characters_Tower_Standing_Ptn = null!,
+		Characters_Tower_Climbing_Ptn = null!,
+		Characters_Tower_Running_Ptn = null!,
+		Characters_Tower_Clear_Ptn = null!,
+		Characters_Tower_Fail_Ptn = null!,
+		Characters_Tower_Standing_Tired_Ptn = null!,
+		Characters_Tower_Climbing_Tired_Ptn = null!,
+		Characters_Tower_Running_Tired_Ptn = null!,
+		Characters_Tower_Clear_Tired_Ptn = null!;
 
 	// Config
 
-	public int[][] Characters_Resolution;
-	public int[][] Characters_Heya_Render_Offset;
-	public bool[] Characters_UseResult1P;
-	public int[][] Characters_Menu_Offset;
-	public int[][] Characters_Result_Offset;
-	public int[][] Characters_X;
-	public int[][] Characters_Y;
-	public int[][] Characters_4P;
-	public int[][] Characters_5P;
-	public int[][] Characters_X_AI;
-	public int[][] Characters_Y_AI;
-	public int[][] Characters_Balloon_X;
-	public int[][] Characters_Balloon_Y;
-	public int[][] Characters_Balloon_4P;
-	public int[][] Characters_Balloon_5P;
-	public int[][] Characters_Kusudama_X;
-	public int[][] Characters_Kusudama_Y;
-	public int[][] Characters_Motion_Normal,
-		Characters_Motion_10Combo,
-		Characters_Motion_10Combo_Clear,
-		Characters_Motion_10ComboMax,
-		Characters_Motion_Miss,
-		Characters_Motion_MissDown,
-		Characters_Motion_ClearIn,
-		Characters_Motion_Clear,
-		Characters_Motion_ClearMax,
-		Characters_Motion_MissIn,
-		Characters_Motion_MissDownIn,
-		Characters_Motion_GoGoStart,
-		Characters_Motion_GoGoStart_Clear,
-		Characters_Motion_GoGoStartMax,
-		Characters_Motion_GoGo,
-		Characters_Motion_GoGoMax,
-		Characters_Motion_SoulIn,
-		Characters_Motion_SoulOut,
-		Characters_Motion_ClearOut,
-		Characters_Motion_Return;
-	public float[] Characters_Beat_Normal,
-		Characters_Beat_10Combo,
-		Characters_Beat_10Combo_Clear,
-		Characters_Beat_10ComboMax,
-		Characters_Beat_Miss,
-		Characters_Beat_MissDown,
-		Characters_Beat_ClearIn,
-		Characters_Beat_Clear,
-		Characters_Beat_ClearMax,
-		Characters_Beat_MissIn,
-		Characters_Beat_MissDownIn,
-		Characters_Beat_GoGoStart,
-		Characters_Beat_GoGoStart_Clear,
-		Characters_Beat_GoGoStartMax,
-		Characters_Beat_GoGo,
-		Characters_Beat_GoGoMax,
-		Characters_Beat_SoulIn,
-		Characters_Beat_SoulOut,
-		Characters_Beat_ClearOut,
-		Characters_Beat_Return,
-		Characters_Beat_Tower_Standing,
-		Characters_Beat_Tower_Standing_Tired,
-		Characters_Beat_Tower_Fail,
-		Characters_Beat_Tower_Clear,
-		Characters_Beat_Tower_Clear_Tired;
-	public bool[] Characters_Tower_Clear_IsLooping,
-		Characters_Tower_Clear_Tired_IsLooping,
-		Characters_Tower_Fail_IsLooping;
-	public int[] Characters_Balloon_Timer;
-	public int[] Characters_Balloon_Delay;
-	public int[] Characters_Balloon_FadeOut;
+	public int[][] Characters_Resolution = null!;
+	public bool[] Characters_UseResult1P = null!;
+	public int[][] Characters_Menu_Offset = null!;
+	public int[][] Characters_Result_Offset = null!;
+	public int[][] Characters_X = null!;
+	public int[][] Characters_Y = null!;
+	public int[][] Characters_4P = null!;
+	public int[][] Characters_5P = null!;
+	public int[][] Characters_X_AI = null!;
+	public int[][] Characters_Y_AI = null!;
+	public int[][] Characters_Balloon_X = null!;
+	public int[][] Characters_Balloon_Y = null!;
+	public int[][] Characters_Balloon_4P = null!;
+	public int[][] Characters_Balloon_5P = null!;
+	public int[][] Characters_Kusudama_X = null!;
+	public int[][] Characters_Kusudama_Y = null!;
+	public int[][] Characters_Motion_Normal = null!,
+		Characters_Motion_10Combo = null!,
+		Characters_Motion_10Combo_Clear = null!,
+		Characters_Motion_10ComboMax = null!,
+		Characters_Motion_Miss = null!,
+		Characters_Motion_MissDown = null!,
+		Characters_Motion_ClearIn = null!,
+		Characters_Motion_Clear = null!,
+		Characters_Motion_ClearMax = null!,
+		Characters_Motion_MissIn = null!,
+		Characters_Motion_MissDownIn = null!,
+		Characters_Motion_GoGoStart = null!,
+		Characters_Motion_GoGoStart_Clear = null!,
+		Characters_Motion_GoGoStartMax = null!,
+		Characters_Motion_GoGo = null!,
+		Characters_Motion_GoGoMax = null!,
+		Characters_Motion_SoulIn = null!,
+		Characters_Motion_SoulOut = null!,
+		Characters_Motion_ClearOut = null!,
+		Characters_Motion_Return = null!;
+	public float[] Characters_Beat_Normal = null!,
+		Characters_Beat_10Combo = null!,
+		Characters_Beat_10Combo_Clear = null!,
+		Characters_Beat_10ComboMax = null!,
+		Characters_Beat_Miss = null!,
+		Characters_Beat_MissDown = null!,
+		Characters_Beat_ClearIn = null!,
+		Characters_Beat_Clear = null!,
+		Characters_Beat_ClearMax = null!,
+		Characters_Beat_MissIn = null!,
+		Characters_Beat_MissDownIn = null!,
+		Characters_Beat_GoGoStart = null!,
+		Characters_Beat_GoGoStart_Clear = null!,
+		Characters_Beat_GoGoStartMax = null!,
+		Characters_Beat_GoGo = null!,
+		Characters_Beat_GoGoMax = null!,
+		Characters_Beat_SoulIn = null!,
+		Characters_Beat_SoulOut = null!,
+		Characters_Beat_ClearOut = null!,
+		Characters_Beat_Return = null!,
+		Characters_Beat_Tower_Standing = null!,
+		Characters_Beat_Tower_Standing_Tired = null!,
+		Characters_Beat_Tower_Fail = null!,
+		Characters_Beat_Tower_Clear = null!,
+		Characters_Beat_Tower_Clear_Tired = null!;
+	public bool[] Characters_Tower_Clear_IsLooping = null!,
+		Characters_Tower_Clear_Tired_IsLooping = null!,
+		Characters_Tower_Fail_IsLooping = null!;
+	public int[] Characters_Balloon_Timer = null!;
+	public int[] Characters_Balloon_Delay = null!;
+	public int[] Characters_Balloon_FadeOut = null!;
 
-	public int[] Characters_Title_Entry_AnimationDuration;
-	public int[] Characters_Title_Normal_AnimationDuration;
-	public int[] Characters_Menu_Loop_AnimationDuration;
-	public int[] Characters_Menu_Select_AnimationDuration;
-	public int[] Characters_Menu_Start_AnimationDuration;
-	public int[] Characters_Menu_Wait_AnimationDuration;
-	public int[] Characters_Result_Normal_AnimationDuration;
-	public int[] Characters_Result_Clear_AnimationDuration;
-	public int[] Characters_Result_Failed_In_AnimationDuration;
-	public int[] Characters_Result_Failed_AnimationDuration;
+	public int[] Characters_Title_Entry_AnimationDuration = null!;
+	public int[] Characters_Title_Normal_AnimationDuration = null!;
+	public int[] Characters_Menu_Loop_AnimationDuration = null!;
+	public int[] Characters_Menu_Select_AnimationDuration = null!;
+	public int[] Characters_Menu_Start_AnimationDuration = null!;
+	public int[] Characters_Menu_Wait_AnimationDuration = null!;
+	public int[] Characters_Result_Normal_AnimationDuration = null!;
+	public int[] Characters_Result_Clear_AnimationDuration = null!;
+	public int[] Characters_Result_Failed_In_AnimationDuration = null!;
+	public int[] Characters_Result_Failed_AnimationDuration = null!;
 
 	#endregion
 
@@ -7918,8 +6422,6 @@ internal class CSkin : IDisposable {
 	#endregion
 
 	#region SongSelect
-	public string[] SongSelect_GenreName = { "ポップス", "アニメ", "ゲームバラエティ", "ナムコオリジナル", "クラシック", "バラエティ", "キッズ", "ボーカロイド", "最近遊んだ曲" };
-
 	public int SongSelect_Bar_Count = 9;
 
 	public int[] SongSelect_Bar_X = new int[] { 214, 239, 263, 291, 324, 358, 386, 411, 436 };
@@ -8013,8 +6515,6 @@ internal class CSkin : IDisposable {
 
 	public int SongSelect_BoxExplanation_Interval = 30;
 
-	public int[] SongSelect_NamePlate_X = new int[] { 36, 1020, 216, 840, 396 };
-	public int[] SongSelect_NamePlate_Y = new int[] { 615, 615, 561, 561, 615 };
 	public int[] SongSelect_Auto_X = new int[] { 60, 950 };
 	public int[] SongSelect_Auto_Y = new int[] { 650, 650 };
 	public int[] SongSelect_ModIcons_X = new int[] { 40, 1020, 220, 840, 400 };
@@ -8175,42 +6675,6 @@ internal class CSkin : IDisposable {
 	public int[] SongSelect_Option_ModMults2_X = new int[] { 108, 1096 };
 	public int[] SongSelect_Option_ModMults2_Y = new int[] { 52, 52 };
 
-
-	public int[] SongSelect_NewHeya_Close_Select = new int[] { 0, 0 };
-
-	public int[] SongSelect_NewHeya_PlayerPlate_X = new int[] { 0, 256, 513, 770, 1026 };
-	public int[] SongSelect_NewHeya_PlayerPlate_Y = new int[] { 66, 66, 66, 66, 66 };
-
-	public int[] SongSelect_NewHeya_ModeBar_X = new int[] { 0, 256, 513, 770, 1026 };
-	public int[] SongSelect_NewHeya_ModeBar_Y = new int[] { 200, 200, 200, 200, 200 };
-	public int[] SongSelect_NewHeya_ModeBar_Font_Offset = new int[] { 128, 33 };
-
-
-	public int SongSelect_NewHeya_Box_Count = 7;
-	public int[] SongSelect_NewHeya_Box_X = new int[] { -424, -120, 184, 488, 792, 1096, 1400 };
-	public int[] SongSelect_NewHeya_Box_Y = new int[] { 273, 273, 273, 273, 273, 273, 273 };
-	public int[] SongSelect_NewHeya_Box_Chara_Offset = new int[] { 152, 200 };
-	public int[] SongSelect_NewHeya_Box_Name_Offset = new int[] { 152, 386 };
-	public int[] SongSelect_NewHeya_Box_Author_Offset = new int[] { 152, 413 };
-	public int[] SongSelect_NewHeya_Lock_Offset = new int[] { 0, 73 };
-	public int[] SongSelect_NewHeya_InfoSection_Offset = new int[] { 152, 206 };
-
-	public Color SongSelect_ForeColor_JPOP = ColorTranslator.FromHtml("#FFFFFF");
-	public Color SongSelect_ForeColor_Anime = ColorTranslator.FromHtml("#FFFFFF");
-	public Color SongSelect_ForeColor_VOCALOID = ColorTranslator.FromHtml("#FFFFFF");
-	public Color SongSelect_ForeColor_Children = ColorTranslator.FromHtml("#FFFFFF");
-	public Color SongSelect_ForeColor_Variety = ColorTranslator.FromHtml("#FFFFFF");
-	public Color SongSelect_ForeColor_Classic = ColorTranslator.FromHtml("#FFFFFF");
-	public Color SongSelect_ForeColor_GameMusic = ColorTranslator.FromHtml("#FFFFFF");
-	public Color SongSelect_ForeColor_Namco = ColorTranslator.FromHtml("#FFFFFF");
-	public Color SongSelect_BackColor_JPOP = ColorTranslator.FromHtml("#01455B");
-	public Color SongSelect_BackColor_Anime = ColorTranslator.FromHtml("#99001F");
-	public Color SongSelect_BackColor_VOCALOID = ColorTranslator.FromHtml("#5B6278");
-	public Color SongSelect_BackColor_Children = ColorTranslator.FromHtml("#9D3800");
-	public Color SongSelect_BackColor_Variety = ColorTranslator.FromHtml("#366600");
-	public Color SongSelect_BackColor_Classic = ColorTranslator.FromHtml("#875600");
-	public Color SongSelect_BackColor_GameMusic = ColorTranslator.FromHtml("#412080");
-	public Color SongSelect_BackColor_Namco = ColorTranslator.FromHtml("#980E00");
 
 	public string[] SongSelect_CorrectionX_Chara = { "ここにX座標を補正したい文字をカンマで区切って記入" };
 	public string[] SongSelect_CorrectionY_Chara = { "ここにY座標を補正したい文字をカンマで区切って記入" };
@@ -8424,35 +6888,28 @@ internal class CSkin : IDisposable {
 	public int[] Game_ScoreRank_4P = new int[] { 87, 88 };
 	public int[] Game_ScoreRank_5P = new int[] { 87, 80 };
 
-	public DBSkinPreset.SkinPreset Game_SkinScenes = null;
+	public DBSkinPreset.SkinPreset Game_SkinScenes = null!;
 
 	#region Chara
 
 	public int[] Game_Chara_X = new int[] { 0, 0 };
 	public int[] Game_Chara_Y = new int[] { 0, 537 };
-	public int[] Game_Chara_Balloon_X = new int[] { 240, 240, 0, 0 };
-	public int[] Game_Chara_Balloon_Y = new int[] { 0, 297, 0, 0 };
-	public int Game_Chara_Ptn_Normal,
-		Game_Chara_Ptn_GoGo,
-		Game_Chara_Ptn_Clear,
-		Game_Chara_Ptn_10combo,
-		Game_Chara_Ptn_10combo_Max,
-		Game_Chara_Ptn_GoGoStart,
-		Game_Chara_Ptn_GoGoStart_Max,
-		Game_Chara_Ptn_ClearIn,
-		Game_Chara_Ptn_SoulIn,
-		Game_Chara_Ptn_Balloon_Breaking,
-		Game_Chara_Ptn_Balloon_Broke,
-		Game_Chara_Ptn_Balloon_Miss;
-	public string Game_Chara_Motion_Normal,
-		Game_Chara_Motion_Clear,
-		Game_Chara_Motion_GoGo = "0";
-	public int Game_Chara_Beat_Normal = 1;
-	public int Game_Chara_Beat_Clear = 2;
-	public int Game_Chara_Beat_GoGo = 2;
-	public int Game_Chara_Balloon_Timer = 28;
-	public int Game_Chara_Balloon_Delay = 500;
-	public int Game_Chara_Balloon_FadeOut = 84;
+	public float Game_Chara_Scale = 0.8f;
+	public float Game_Chara_Scale_4P = 0.4f;
+	public float Game_Chara_Scale_5P = 0.35f;
+	public float Game_Chara_Scale_AI = 0.464f;
+	public float Game_Chara_Balloon_Scale = 0.8f;
+	public float Game_Chara_Kusudama_Scale = 0.96f;
+	public int[] Game_Chara_AI_X = new int[] { 0, 0 };
+	public int[] Game_Chara_AI_Y = new int[] { 0, 537 };
+	public int[] Game_Chara_4P = new int[] { 380, 276 };
+	public int[] Game_Chara_5P = new int[] { 380, 220 };
+	public int[] Game_Chara_Balloon_X = new int[] { 240, 240 };
+	public int[] Game_Chara_Balloon_Y = new int[] { 0, 297 };
+	public int[] Game_Chara_Balloon_4P = new int[] { 0, 297 };
+	public int[] Game_Chara_Balloon_5P = new int[] { 0, 297 };
+	public int[] Game_Chara_Kusudama_X = new int[] { 240, 240, 240, 240, 240 };
+	public int[] Game_Chara_Kusudama_Y = new int[] { 0, 297, 297, 297, 297 };
 
 	#endregion
 
@@ -8462,19 +6919,6 @@ internal class CSkin : IDisposable {
 	public int[] Game_Dancer_Y = new int[] { 500, 500, 500, 500, 500 };
 	public string Game_Dancer_Motion = "0";
 	public int[] Game_Dancer_Gauge = new int[] { 0, 0, 0, 40, 80 };
-
-	#endregion
-
-	#region Tower
-
-	public int Game_Tower_Ptn;
-	public int[] Game_Tower_Ptn_Deco,
-		Game_Tower_Ptn_Base;
-
-	public string[] Game_Tower_Names;
-	public int Game_Tower_Ptn_Result;
-
-	public int Game_Tower_Ptn_Don;
 
 	#endregion
 
@@ -8590,6 +7034,8 @@ internal class CSkin : IDisposable {
 	public int[] Game_Taiko_4P = new int[] { 205, 30 };
 	public int[] Game_Taiko_5P = new int[] { 205, 22 };
 
+	public bool Game_Taiko_VisibleExPlayerCount = true;
+
 	public int[] Game_Taiko_Combo_4P = new int[] { 267, 73 };
 	public int[] Game_Taiko_Combo_5P = new int[] { 267, 65 };
 
@@ -8622,14 +7068,10 @@ internal class CSkin : IDisposable {
 	public int[] Gauge_Soul_Y = new int[] { 125, 516 };
 	public int Gauge_Soul_X_AI = 1200;
 	public int Gauge_Soul_Y_AI = 140;
-	public int Gauge_Soul_X_Tower = 958;
-	public int Gauge_Soul_Y_Tower = 95;
 	public int[] Gauge_Soul_Fire_X = new int[] { 1112, 1112 };
 	public int[] Gauge_Soul_Fire_Y = new int[] { 52, 443 };
 	public int Gauge_Soul_Fire_X_AI = 1143;
 	public int Gauge_Soul_Fire_Y_AI = 83;
-	public int Gauge_Soul_Fire_X_Tower = 886;
-	public int Gauge_Soul_Fire_Y_Tower = 22;
 	public int Game_Gauge_Rainbow_Ptn;
 	public int Game_Gauge_Rainbow_2PGauge_Ptn;
 	public int Game_Gauge_Rainbow_Flat_Ptn;
@@ -8842,23 +7284,14 @@ internal class CSkin : IDisposable {
 	public int[] Game_Tower_Sky_Gradient = new int[] { 0, 360 };
 	public int[] Game_Tower_Sky_Gradient_Size = new int[] { 1280, 316 };
 
-	public int[] Game_Tower_Floors_Body = new int[] { 640, 676 };
-	public int[] Game_Tower_Floors_Deco = new int[] { 460, 640 };
-	public int[] Game_Tower_Floors_Move = new int[] { 0, 288 };
-
 	public int[] Game_Tower_Don = new int[] { 590, 648 };
 	public int[] Game_Tower_Don_Move = new int[] { 300, 0 };
 
 	public int[] Game_Tower_Miss = new int[] { 640, 520 };
 
-	public int[] Game_Tower_Floor_Number = new int[] { 556, 84 };
 
-	public int[] Game_Tower_Life_Number = new int[] { 996, 106 };
 
-	public int[] Game_Tower_Font_TouTatsuKaiSuu = new int[] { 350, 32 };
-	public int[] Game_Tower_Font_Kai = new int[] { 550, 104 };
 
-	public int Game_Tower_Font_TowerText = 28;
 	#endregion
 	#region AIBattle
 	public int Game_AIBattle_CharaMove = 71;
@@ -8897,330 +7330,7 @@ internal class CSkin : IDisposable {
 	#endregion
 	#region Result
 
-	public bool Result_Use1PUI = false;
-	public int[] Result_UIMove_4P_X = new int[] { 0, 320, 640, 960 };
-	public int[] Result_UIMove_4P_Y = new int[] { 0, 0, 0, 0 };
-	public int[] Result_UIMove_5P_X = new int[] { 0, 256, 512, 768, 1024 };
-	public int[] Result_UIMove_5P_Y = new int[] { 0, 0, 0, 0, 0 };
-
-	public int Result_Cloud_Count = 11;
-	public int[] Result_Cloud_X = new int[] { 642, 612, 652, 1148, 1180, 112, 8, 1088, 1100, 32, 412 };
-	public int[] Result_Cloud_Y = new int[] { 202, 424, 636, 530, 636, 636, 102, 52, 108, 326, 644 };
-	public int[] Result_Cloud_MaxMove = new int[] { 150, 120, 180, 60, 90, 150, 120, 50, 45, 120, 180 };
-
-	public int Result_Shine_Count = 6;
-	public int[][] Result_Shine_X = new int[][] {
-		new int[] { 885, 1255, 725, 890, 1158, 1140 },
-		new int[] { 395, 25, 555, 390, 122, 140 },
-	};
-	public int[][] Result_Shine_Y = new int[][] {
-		new int[] { 650, 405, 645, 420, 202, 585 },
-		new int[] { 650, 405, 645, 420, 202, 585 }
-	};
-	public float[] Result_Shine_Size = { 0.44f, 0.6f, 0.4f, 0.15f, 0.35f, 0.6f };
-
-	public int[][] Result_Work_X = new int[][] {
-		new int[] { 800, 900, 1160 },
-		new int[] { 480, 380, 120 }
-	};
-	public int[][] Result_Work_Y = new int[][] {
-		new int[] { 435, 185, 260 },
-		new int[] { 435, 185, 260 }
-	};
-
-	public int[] Result_DifficultyBar_Size = new int[] { 185, 54 };
-	public int[] Result_DifficultyBar_X = new int[] { 18, 653 };
-	public int[] Result_DifficultyBar_Y = new int[] { 101, 101 };
-
-	public int[] Result_Gauge_Base_X = new int[] { 55, 690 };
-	public int[] Result_Gauge_Base_Y = new int[] { 140, 140 };
-
-	public int[] Result_Gauge_X = new int[] { 57, 692 };
-	public int[] Result_Gauge_Y = new int[] { 140, 140 };
-	public int[] Result_Gauge_Rect = new int[] { 0, 0, 487, 36 };
-
-	public int[] Result_Gauge_Rainbow_X = new int[] { 57, 692 };
-	public int[] Result_Gauge_Rainbow_Y = new int[] { 144, 144 };
-	public int Result_Gauge_Rainbow_Ptn;
-	public int Result_Gauge_Rainbow_Interval = 1000 / 60;
-
-	public int[] Result_Gauge_ClearText_X = new int[] { 441, 1076 };
-	public int[] Result_Gauge_ClearText_Y = new int[] { 142, 142 };
-	public int[] Result_Gauge_ClearText_Rect = new int[] { 0, 35, 42, 20 };
-	public int[] Result_Gauge_ClearText_Clear_Rect = new int[] { 42, 35, 42, 20 };
-
 	public int[] Result_Number_Interval = new int[] { 22, 0 };
-
-	public float Result_Number_Scale_4P = 1.0f;
-
-	public float Result_Number_Scale_5P = 1.0f;
-
-	public int[] Result_Soul_Fire_X = new int[] { 576, 1211 };
-	public int[] Result_Soul_Fire_Y = new int[] { 160, 160 };
-
-	public int[] Result_Soul_Text_X = new int[] { 575, 1210 };
-	public int[] Result_Soul_Text_Y = new int[] { 159, 159 };
-
-	public int[] Result_Perfect_X = new int[] { 490, 1125 };
-	public int[] Result_Perfect_Y = new int[] { 188, 188 };
-
-	public int[] Result_Good_X = new int[] { 490, 1125 };
-	public int[] Result_Good_Y = new int[] { 230, 230 };
-
-	public int[] Result_Miss_X = new int[] { 490, 1125 };
-	public int[] Result_Miss_Y = new int[] { 272, 272 };
-
-	public int[] Result_Roll_X = new int[] { 490, 1125 };
-	public int[] Result_Roll_Y = new int[] { 314, 314 };
-
-	public int[] Result_MaxCombo_X = new int[] { 490, 1125 };
-	public int[] Result_MaxCombo_Y = new int[] { 356, 356 };
-
-	public bool Result_ADLib_Show = false;
-	public int[] Result_ADLib_X = new int[] { 0, 0 };
-	public int[] Result_ADLib_Y = new int[] { 0, 0 };
-
-	public bool Result_Bomb_Show = false;
-	public int[] Result_Bomb_X = new int[] { 0, 0 };
-	public int[] Result_Bomb_Y = new int[] { 0, 0 };
-
-	public int[] Result_Score_X = new int[] { 295, 930 };
-	public int[] Result_Score_Y = new int[] { 212, 212 };
-	public int[] Result_Score_Number_Interval = new int[] { 33, 0 };
-
-	public float Result_Score_Scale_4P = 1.0f;
-	public float Result_Score_Scale_5P = 1.0f;
-
-	public int[] Result_ScoreRankEffect_X = new int[] { 135, 770 };
-	public int[] Result_ScoreRankEffect_Y = new int[] { 339, 339 };
-
-	public int[] Result_CrownEffect_X = new int[] { 262, 897 };
-	public int[] Result_CrownEffect_Y = new int[] { 336, 336 };
-
-	public int[] Result_Speech_Bubble_X = new int[] { 430, 850 };
-	public int[] Result_Speech_Bubble_Y = new int[] { 526, 526 };
-
-	public int[] Result_Speech_Bubble_V2_X = new int[] { 0, 0 };
-	public int[] Result_Speech_Bubble_V2_Y = new int[] { 0, 0 };
-
-	public int[] Result_Speech_Bubble_V2_2P_X = new int[] { 0, 0 };
-	public int[] Result_Speech_Bubble_V2_2P_Y = new int[] { 0, 0 };
-
-	public int[] Result_NamePlate_X = new int[] { 28, 1032 };
-	public int[] Result_NamePlate_Y = new int[] { 621, 621 };
-
-	public int[] Result_ModIcons_X = new int[] { 32, 1028 };
-	public int[] Result_ModIcons_Y = new int[] { 678, 678 };
-
-	public int[] Result_Flower_X = new int[] { 182, 1098 };
-	public int[] Result_Flower_Y = new int[] { 602, 602 };
-
-	public int[][] Result_Flower_Rotate_X = new int[][] {
-		new int[] { 48, 125, 48, 240, 87 },
-		new int[] { 964, 1041, 964, 1156, 1003 },
-	};
-	public int[][] Result_Flower_Rotate_Y = new int[][] {
-		new int[] { 549, 585, 546, 501, 509 },
-		new int[] { 549, 585, 546, 501, 509 }
-	};
-
-	public int Result_PlateShine_Count = 6;
-	public int[][] Result_PlateShine_X = new int[][] {
-		new int[] { 333, 342, 184, 198, 189, 309 },
-		new int[] { 1249, 1258, 1100, 1114, 1105, 1225 }
-	};
-	public int[][] Result_PlateShine_Y = new int[][] {
-		new int[] { 670, 620, 650, 687, 558, 542 },
-		new int[] { 670, 620, 650, 687, 558, 542 }
-	};
-
-	public int Result_MusicName_X = 640;
-	public int Result_MusicName_Y = 30;
-	public int Result_MusicName_FontSize = 25;
-	public int Result_MusicName_MaxSize = 660;
-	public ReferencePoint Result_MusicName_ReferencePoint = ReferencePoint.Center;
-	public int Result_StageText_X = 230;
-	public int Result_StageText_Y = 6;
-	public int Result_StageText_FontSize = 30;
-	public ReferencePoint Result_StageText_ReferencePoint = ReferencePoint.Left;
-
-	public Color Result_MusicName_ForeColor = ColorTranslator.FromHtml("#FFFFFF");
-	public Color Result_StageText_ForeColor = ColorTranslator.FromHtml("#FFFFFF");
-	public Color Result_MusicName_BackColor = ColorTranslator.FromHtml("#000000");
-	public Color Result_StageText_BackColor = ColorTranslator.FromHtml("#000000");
-
-	public int[] Result_Dan = new int[] { 500, 500 };
-	public int[] Result_Dan_XY = new int[] { 0, 420 };
-	public int[] Result_Dan_Plate_XY = new int[] { 149, 149 };
-
-	public int[] Result_DifficultyBar_4P = new int[] { 6, 101 };
-	public int[] Result_DifficultyBar_5P = new int[] { -9, 101 };
-
-	public int[] Result_Gauge_Base_4P = new int[] { 25, 140 };
-	public int[] Result_Gauge_Base_5P = new int[] { 4, 140 };
-
-	public int[] Result_Gauge_4P = new int[] { 27, 140 };
-	public int[] Result_Gauge_5P = new int[] { 6, 140 };
-
-	public int[] Result_Gauge_ClearText_4P = new int[] { 218, 142 };
-	public int[] Result_Gauge_ClearText_5P = new int[] { 197, 142 };
-
-	public int[] Result_Gauge_Rainbow_4P = new int[] { 26, 144 };
-	public int[] Result_Gauge_Rainbow_5P = new int[] { 5, 144 };
-
-	public int[] Result_Soul_Fire_4P = new int[] { 284, 160 };
-	public int[] Result_Soul_Fire_5P = new int[] { 232, 120 };
-
-	public int[] Result_Soul_Text_4P = new int[] { 283, 159 };
-	public int[] Result_Soul_Text_5P = new int[] { 231, 119 };
-
-	public int[] Result_Perfect_4P = new int[] { 183, 251 };
-	public int[] Result_Perfect_5P = new int[] { 151, 251 };
-
-	public int[] Result_Good_4P = new int[] { 183, 293 };
-	public int[] Result_Good_5P = new int[] { 151, 293 };
-
-	public int[] Result_Miss_4P = new int[] { 183, 335 };
-	public int[] Result_Miss_5P = new int[] { 151, 335 };
-
-	public int[] Result_Roll_4P = new int[] { 183, 377 };
-	public int[] Result_Roll_5P = new int[] { 151, 377 };
-
-	public int[] Result_MaxCombo_4P = new int[] { 183, 419 };
-	public int[] Result_MaxCombo_5P = new int[] { 151, 419 };
-
-	public int[] Result_ADLib_4P = new int[] { 0, 0 };
-	public int[] Result_ADLib_5P = new int[] { 0, 0 };
-
-	public int[] Result_Bomb_4P = new int[] { 0, 0 };
-	public int[] Result_Bomb_5P = new int[] { 0, 0 };
-
-	public int[] Result_Score_4P = new int[] { 253, 180 };
-	public int[] Result_Score_5P = new int[] { 221, 180 };
-
-	public int[] Result_ScoreRankEffect_4P = new int[] { 100, 545 };
-	public int[] Result_ScoreRankEffect_5P = new int[] { 68, 545 };
-
-	public int[] Result_CrownEffect_4P = new int[] { 220, 545 };
-	public int[] Result_CrownEffect_5P = new int[] { 188, 545 };
-
-
-	public int[] Result_Speech_Bubble_V2_4P = new int[] { 0, 0 };
-
-	public int[] Result_Speech_Bubble_V2_5P = new int[] { 0, 0 };
-
-
-	public int[] Result_Speech_Text_Offset = new int[] { 0, 0 };
-	public int Result_Speech_Text_Size = 60;
-	public int Result_Speech_Text_MaxWidth = 560;
-
-	public int[] Result_NamePlate_4P = new int[] { 80, 621 };
-	public int[] Result_NamePlate_5P = new int[] { 31, 621 };
-
-	public int[] Result_ModIcons_4P = new int[] { 15, 678 };
-	public int[] Result_ModIcons_5P = new int[] { -17, 678 };
-	#endregion
-
-	#region AIResult
-
-	public int[] Result_AIBattle_Batch = new int[] { 884, 188 };
-	public int[] Result_AIBattle_Batch_Move = new int[] { 104, 43 };
-	public int[] Result_AIBattle_SectionPlate_Offset = new int[] { 55, 8 };
-
-	public int[] Result_AIBattle_SectionText_Offset = new int[] { 110, 27 };
-	public int Result_AIBattle_SectionText_Scale = 13;
-
-	public int[] Result_AIBattle_WinFlag = new int[] { 946, 526 };
-
-	#endregion
-
-	#region DanResult
-
-	public int[] DanResult_StatePanel = new int[] { 0, -4 };
-
-	public int[] DanResult_SongPanel_Main_X = new int[] { 255, 255, 255 };
-	public int[] DanResult_SongPanel_Main_Y = new int[] { 100, 283, 466 };
-
-	public int[] DanResult_Difficulty_Cymbol_X = new int[] { 377, 377, 377 };
-	public int[] DanResult_Difficulty_Cymbol_Y = new int[] { 146, 329, 512 };
-
-	public int[] DanResult_Level_Number_X = new int[] { 383, 383, 383 };
-	public int[] DanResult_Level_Number_Y = new int[] { 173, 356, 539 };
-
-	public int[] DanResult_Sections_Perfect_X = new int[] { 455, 455, 455 };
-	public int[] DanResult_Sections_Perfect_Y = new int[] { 204, 387, 570 };
-
-	public int[] DanResult_Sections_Good_X = new int[] { 666, 666, 666 };
-	public int[] DanResult_Sections_Good_Y = new int[] { 204, 387, 570 };
-
-	public int[] DanResult_Sections_Miss_X = new int[] { 877, 877, 877 };
-	public int[] DanResult_Sections_Miss_Y = new int[] { 204, 387, 570 };
-
-	public int[] DanResult_Sections_Roll_X = new int[] { 1088, 1088, 1088 };
-	public int[] DanResult_Sections_Roll_Y = new int[] { 204, 387, 570 };
-
-
-	public int[] DanResult_Perfect = new int[] { 720, 95 };
-	public int[] DanResult_Good = new int[] { 720, 137 };
-	public int[] DanResult_Miss = new int[] { 720, 179 };
-	public int[] DanResult_Roll = new int[] { 1022, 95 };
-	public int[] DanResult_MaxCombo = new int[] { 1022, 137 };
-	public int[] DanResult_TotalHit = new int[] { 1022, 179 };
-	public int[] DanResult_Score = new int[] { 566, 119 };
-
-	public int[] DanResult_Exam = new int[] { 232, 254 };
-
-	public int[] DanResult_DanTitles_X = new int[] { 401, 401, 401 };
-	public int[] DanResult_DanTitles_Y = new int[] { 139, 322, 505 };
-
-	public int[] DanResult_DanIcon_X = new int[] { 315, 315, 315 };
-	public int[] DanResult_DanIcon_Y = new int[] { 158, 342, 526 };
-
-	public int[] DanResult_Rank = new int[] { 130, 380 };
-
-	public int DanResult_Font_DanTitles_Size = 24;
-
-	#endregion
-
-	#region TowerResult
-
-	public int[] TowerResult_ScoreRankEffect = new int[] { 1000, 220 };
-
-	public int[] TowerResult_Toutatsu = new int[] { 196, 160 };
-	public int[] TowerResult_MaxFloors = new int[] { 616, 296 };
-	public int[] TowerResult_Ten = new int[] { 982, 394 };
-	public int[] TowerResult_Score = new int[] { 248, 394 };
-
-	public int[] TowerResult_CurrentFloor = new int[] { 688, 258 };
-	public int[] TowerResult_ScoreCount = new int[] { 1026, 394 };
-	public int[] TowerResult_RemainingLifes = new int[] { 1068, 490 };
-
-	public int[] TowerResult_Gauge_Soul = new int[] { 248, 474 };
-
-	public int TowerResult_Font_TowerText = 28;
-	public int TowerResult_Font_TowerText48 = 48;
-	public int TowerResult_Font_TowerText72 = 72;
-
-	#endregion
-
-	#region Heya
-
-	public int[] Heya_Main_Menu_X = new int[] { 164, 164, 164, 164, 164, 164 };
-	public int[] Heya_Main_Menu_Y = new int[] { 26, 106, 186, 266, 346, 426 };
-	public int[] Heya_Main_Menu_Font_Offset = new int[] { 0, 14 };
-	public int Heya_Center_Menu_Box_Count = 11;
-	public int[] Heya_Center_Menu_Box_X = new int[] { -890, -588, -286, 16, 318, 620, 922, 1224, 1526, 1828, 2130 };
-	public int[] Heya_Center_Menu_Box_Y = new int[] { 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200 };
-	public int[] Heya_Center_Menu_Box_Item_Offset = new int[] { 0, 120 };
-	public int[] Heya_Center_Menu_Box_Name_Offset = new int[] { 0, 234 };
-	public int[] Heya_Center_Menu_Box_Authors_Offset = new int[] { 0, 260 };
-	public int Heya_Side_Menu_Count = 13;
-	public int[] Heya_Side_Menu_X = new int[] { 670, 680, 690, 700, 710, 720, 730, 720, 710, 700, 690, 680, 670 };
-	public int[] Heya_Side_Menu_Y = new int[] { -80, -10, 60, 130, 200, 270, 340, 410, 480, 550, 620, 690, 760 };
-	public int[] Heya_Side_Menu_Font_Offset = new int[] { 0, 14 };
-	public int[] Heya_InfoSection = new int[] { 620, 560 };
-	public int[] Heya_DescriptionTextOrigin = new int[] { 0, 0 };
-	public int Heya_Font_Scale = 14;
 
 	#endregion
 
@@ -9245,32 +7355,6 @@ internal class CSkin : IDisposable {
 
 	public int OnlineLounge_Font_OLFont = 14;
 	public int OnlineLounge_Font_OLFontLarge = 28;
-
-	#endregion
-
-	#region TowerSelect
-
-	public int TowerSelect_Title_Size = 30;
-	public int TowerSelect_Title_MaxWidth = 230;
-	public int[] TowerSelect_Title_Offset = new int[] { 0, -30 };
-	public int TowerSelect_SubTitle_Size = 30;
-	public int TowerSelect_SubTitle_MaxWidth = 230;
-	public int[] TowerSelect_SubTitle_Offset = new int[] { 0, 10 };
-	public int TowerSelect_Bar_Count = 7;
-	public int[] TowerSelect_Bar_X = new int[] { -260, 40, 340, 640, 940, 1240, 1540 };
-	public int[] TowerSelect_Bar_Y = new int[] { 420, 400, 380, 360, 380, 400, 420 };
-
-	#endregion
-
-	#region OpenEncyclopedia
-
-	public int[] OpenEncyclopedia_Context_Item2 = new int[] { 960, 180 };
-	public int[] OpenEncyclopedia_Context_Item3 = new int[] { 640, 360 };
-	public int[] OpenEncyclopedia_Context_PageText = new int[] { 960, 720 };
-	public int[] OpenEncyclopedia_Side_Menu = new int[] { 320, 360 };
-	public int[] OpenEncyclopedia_Side_Menu_Move = new int[] { 0, 90 };
-	public int[] OpenEncyclopedia_Side_Menu_Text_Offset = new int[] { 0, 0 };
-	public int OpenEncyclopedia_Font_EncyclopediaMenu_Size = 14;
 
 	#endregion
 

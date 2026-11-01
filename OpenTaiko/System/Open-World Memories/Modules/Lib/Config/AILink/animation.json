@@ -1,0 +1,26 @@
+{
+    "_note": "AI Battle transition timings. out_s and in_s are the fade lengths in seconds; the fade_out values are fractions of the fade-out (0 to 1); max_frame_s caps one frame's time step.",
+    "out_s": 1.5,
+    "in_s": 0.7,
+    "max_frame_s": 0.1,
+    "fade_out": {
+        "_note": "the dark screen fades in over bg_in; the chip lights up from chip_at for chip_in; the traces grow from grow_at until the box opens at box_at, for box_open; the status line types in from type_at to type_end",
+        "bg_in": 0.3,
+        "chip_at": 0.08,
+        "chip_in": 0.14,
+        "grow_at": 0.2,
+        "box_at": 0.7,
+        "box_open": 0.12,
+        "type_at": 0.8,
+        "type_end": 0.98
+    },
+    "chip": { "_note": "the chip grows from grow_from to grow_from + grow_by of its size as it lights up", "grow_from": 0.8, "grow_by": 0.2 },
+    "via_ring": { "_note": "a via's ring scale grows from scale_from by scale_grow_by over the first grow_px of growth past the trace's end", "scale_from": 0.6, "scale_grow_by": 0.4, "grow_px": 60 },
+    "pulses": {
+        "_note": "signals leaving the chip while loading: one per trace, gap_px of quiet between its runs, starting lead_px before the chip",
+        "speed_px_per_s": 700,
+        "gap_px": 300,
+        "lead_px": 150
+    },
+    "cursor_toggles_per_s": 2.5
+}

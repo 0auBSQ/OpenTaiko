@@ -1,3 +1,9 @@
+---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
+-- Up background "Outfox": Project OutFox crossover BG. Simple mode = static red/blue/clear bg + simple note strip;
+-- regular mode = horizontally scrolling bg with animated note rows (notes/pump/bemu) and hopping tiny foxes,
+-- driven by bpm/totalTime. Per-player clear fade for 1P/2P. Ported from old ScriptBG func: API to the
+-- ROActivity LuaTexture API (texture loads unconditional in onStart; player/mode conditionals kept in draw).
+
 -- Please note that the Project OutFox branding or graphics included are not permitted
 -- for use outside of OpenTaiko without permission from the Project OutFox Developers.
 
@@ -23,12 +29,14 @@ local foxRotRed = { 45, 0, 0, -45, 0, 0, 0, 0, 0 }
 
 local noteSize = 225
 
-function updateClearFade()
-    for player = 0, playerCount - 1 do
-        if isClear[player] then
-            bgClearFade[player + 1] = bgClearFade[player + 1] + (2000 * deltaTime)
+local tx = {}            -- name -> LuaTexture
+
+function updateClearFade(state)
+    for player = 0, state.playerCount - 1 do
+        if state.isClear[player] then
+            bgClearFade[player + 1] = bgClearFade[player + 1] + (2000 * fps.deltaTime)
         else
-            bgClearFade[player + 1] = bgClearFade[player + 1] - (2000 * deltaTime)
+            bgClearFade[player + 1] = bgClearFade[player + 1] - (2000 * fps.deltaTime)
         end
 
         if bgClearFade[player + 1] > 255 then
@@ -52,21 +60,21 @@ function drawTinyFox(x_start, x_end, y_start, y_end, rot, progress, useAlt, lazy
     if lazyArrowFix then
         arrowFix = 0.7
     end
-    func:SetRotation(rot, "tinyfox.png")
+    tx["tinyfox.png"]:SetRotation(rot)
 
     if progress >= 1.66 then
-        func:DrawGraphRectCenter(x_start - ((x_start - x_end)), y_start - ((y_start - y_end)), 512, 0, 128, 138, "tinyfox.png") --Tail
-        func:DrawGraphRectCenter(x_start - ((x_start - x_end)), y_start - ((y_start - y_end)), foxRect[5], foxRect[6], 128, 138, "tinyfox.png") --Body
+        tx["tinyfox.png"]:DrawRectAtAnchor(x_start - ((x_start - x_end)), y_start - ((y_start - y_end)), 512, 0, 128, 138, "center") --Tail
+        tx["tinyfox.png"]:DrawRectAtAnchor(x_start - ((x_start - x_end)), y_start - ((y_start - y_end)), foxRect[5], foxRect[6], 128, 138, "center") --Body
     elseif progress >= 1.33 then
-        func:DrawGraphRectCenter(x_start - ((x_start - x_end)), y_start - ((y_start - y_end)), 384, 0, 128, 138, "tinyfox.png") --Tail
-        func:DrawGraphRectCenter(x_start - ((x_start - x_end)), y_start - ((y_start - y_end)), foxRect[5], foxRect[6], 128, 138, "tinyfox.png") --Body
+        tx["tinyfox.png"]:DrawRectAtAnchor(x_start - ((x_start - x_end)), y_start - ((y_start - y_end)), 384, 0, 128, 138, "center") --Tail
+        tx["tinyfox.png"]:DrawRectAtAnchor(x_start - ((x_start - x_end)), y_start - ((y_start - y_end)), foxRect[5], foxRect[6], 128, 138, "center") --Body
     elseif progress >= 1 then
-        func:DrawGraphRectCenter(x_start - ((x_start - x_end)), y_start - ((y_start - y_end)), 256, 0, 128, 138, "tinyfox.png") --Tail
-        func:DrawGraphRectCenter(x_start - ((x_start - x_end)), y_start - ((y_start - y_end)), foxRect[5], foxRect[6], 128, 138, "tinyfox.png") --Body
+        tx["tinyfox.png"]:DrawRectAtAnchor(x_start - ((x_start - x_end)), y_start - ((y_start - y_end)), 256, 0, 128, 138, "center") --Tail
+        tx["tinyfox.png"]:DrawRectAtAnchor(x_start - ((x_start - x_end)), y_start - ((y_start - y_end)), foxRect[5], foxRect[6], 128, 138, "center") --Body
     elseif progress >= 0.85 then
-        func:DrawGraphRectCenter(x_start - ((x_start - x_end) * progress), y_start - ((y_start - y_end) * progress), foxRect[3], foxRect[4], 128, 138 * progress, "tinyfox.png")
+        tx["tinyfox.png"]:DrawRectAtAnchor(x_start - ((x_start - x_end) * progress), y_start - ((y_start - y_end) * progress), foxRect[3], foxRect[4], 128, 138 * progress, "center")
     elseif progress >= arrowFix then
-        func:DrawGraphRectCenter(x_start - ((x_start - x_end) * progress), y_start - ((y_start - y_end) * progress), foxRect[1], foxRect[2], 128, 138 * progress, "tinyfox.png")
+        tx["tinyfox.png"]:DrawRectAtAnchor(x_start - ((x_start - x_end) * progress), y_start - ((y_start - y_end) * progress), foxRect[1], foxRect[2], 128, 138 * progress, "center")
     end
 end
 
@@ -104,12 +112,12 @@ function drawOFNotes(y_offset, drawBlue)
             end
         end
 
-        func:DrawGraph(calculated_x_offset, calculated_y_offset, notePath)
+        tx[notePath]:Draw(calculated_x_offset, calculated_y_offset)
 
-        func:SetRotation(-180 * bpmTime, bemuPath)
-        func:DrawRectGraph(225 + calculated_x_offset, calculated_y_offset, noteSize, 0, noteSize, noteSize, bemuPath) -- Bemu
+        tx[bemuPath]:SetRotation(-180 * bpmTime)
+        tx[bemuPath]:DrawRect(225 + calculated_x_offset, calculated_y_offset, noteSize, 0, noteSize, noteSize) -- Bemu
 
-        func:DrawRectGraph(1350 + calculated_x_offset, calculated_y_offset, noteSize * pump_offsetX, noteSize * pump_offsetY, noteSize, noteSize, pumpPath) -- Pump
+        tx[pumpPath]:DrawRect(1350 + calculated_x_offset, calculated_y_offset, noteSize * pump_offsetX, noteSize * pump_offsetY, noteSize, noteSize) -- Pump
 
         if progress >= 1 then
             for j = foxSet + 1, 9, 3 do
@@ -124,10 +132,7 @@ function drawOFNotes(y_offset, drawBlue)
             end
         end
 
-        -- Debug Stuff
-        -- func:DrawNum(0,0,progress)
-        -- func:DrawNum(0,16,totalTime % 8)
-        -- func:DrawNum(0,32,foxSet + 1)
+        -- Debug Stuff (was func:DrawNum, removed)
     end
 end
 
@@ -137,140 +142,125 @@ end
 function clearOut(player)
 end
 
-function init()
+function onStart()
+    -- Load every variant up front; draw() selects by state/mode. onStart runs before `state` arrives,
+    -- so loads are unconditional (the player/mode gating in the old init() is kept in draw() only).
 
-    if simplemode then -- SimpleMode Assets
+    -- SimpleMode Assets
+    tx["notes_red_simple.png"] = TEXTURE:CreateTextureSync("notes_red_simple.png")
+    tx["notes_blue_simple.png"] = TEXTURE:CreateTextureSync("notes_blue_simple.png")
 
-        if (playerCount == 1 and p1IsBlue == false) or playerCount == 2 then
-            func:AddGraph("bg_red.png")
-            func:AddGraph("notes_red_simple.png")
-        end
-        if (playerCount == 1 and p1IsBlue == true) or (playerCount > 1 and playerCount < 5) then
-            func:AddGraph("bg_blue.png")
-            if (playerCount < 4) then
-                func:AddGraph("notes_blue_simple.png")
-            end
-        end
-        if playerCount < 3 then
-            func:AddGraph("bg_clear.png")
-        end
-        
-    else -- Regular Assets
+    -- Regular Assets
+    tx["notes_red.png"] = TEXTURE:CreateTextureSync("notes_red.png")
+    tx["pump_red.png"] = TEXTURE:CreateTextureSync("pump_red.png")
+    tx["bemu_red.png"] = TEXTURE:CreateTextureSync("bemu_red.png")
+    tx["notes_blue.png"] = TEXTURE:CreateTextureSync("notes_blue.png")
+    tx["pump_blue.png"] = TEXTURE:CreateTextureSync("pump_blue.png")
+    tx["bemu_blue.png"] = TEXTURE:CreateTextureSync("bemu_blue.png")
+    tx["tinyfox.png"] = TEXTURE:CreateTextureSync("tinyfox.png")
 
-        if (playerCount == 1 and p1IsBlue == false) or playerCount == 2 then
-            func:AddGraph("bg_red.png")
-            func:AddGraph("notes_red.png")
-            func:AddGraph("pump_red.png")
-            func:AddGraph("bemu_red.png")
-            end
-        if (playerCount == 1 and p1IsBlue == true) or (playerCount > 1 and playerCount < 5) then
-            func:AddGraph("bg_blue.png")
-            if (playerCount < 4) then
-                func:AddGraph("notes_blue.png")
-                func:AddGraph("pump_blue.png")
-                func:AddGraph("bemu_blue.png")
-            end
-        end
-        if playerCount < 3 then
-            func:AddGraph("bg_clear.png")
-        end
-        if playerCount < 4 then
-            func:AddGraph("tinyfox.png")
-        end
-
-    end
-
+    -- Shared backgrounds
+    tx["bg_red.png"] = TEXTURE:CreateTextureSync("bg_red.png")
+    tx["bg_blue.png"] = TEXTURE:CreateTextureSync("bg_blue.png")
+    tx["bg_clear.png"] = TEXTURE:CreateTextureSync("bg_clear.png")
 end
 
-function update()
-    totalTime = totalTime + deltaTime
-    bgScrollX = bgScrollX - (59 * deltaTime)
-    bpmTime = bpmTime + (deltaTime * (bpm[0] / 120))
+function update(timestamp, state)
+    totalTime = totalTime + fps.deltaTime
+    bgScrollX = bgScrollX - (59 * fps.deltaTime)
+    bpmTime = bpmTime + (fps.deltaTime * (state.bpm[0] / 120))
 
     -- Only needed for 1/2 player(s)
-    if playerCount < 3 then
-      updateClearFade()
+    if state.playerCount < 3 then
+      updateClearFade(state)
     end
 end
 
 
-function draw()
+function draw(state)
 
-    if simplemode then
+    if state.simplemode then
 
-        if playerCount == 1 and p1IsBlue == false then
+        if state.playerCount == 1 and state.p1IsBlue == false then
 
-            func:SetOpacity(bgClearFade[1], "bg_clear.png")
-            func:DrawRectGraph(0, 0, 0, 0, loopWidth, loopHeight, "bg_red.png")
-            func:DrawRectGraph(0, 0, 0, 0, loopWidth, loopHeight, "bg_clear.png")
-            func:DrawRectGraph(0, 0, 0, 0, loopWidth, simpleHeight, "notes_red_simple.png")
+            tx["bg_clear.png"]:SetOpacity(bgClearFade[1] / 255)
+            tx["bg_red.png"]:DrawRect(0, 0, 0, 0, loopWidth, loopHeight)
+            tx["bg_clear.png"]:DrawRect(0, 0, 0, 0, loopWidth, loopHeight)
+            tx["notes_red_simple.png"]:DrawRect(0, 0, 0, 0, loopWidth, simpleHeight)
 
-        elseif playerCount == 1 and p1IsBlue == true then
+        elseif state.playerCount == 1 and state.p1IsBlue == true then
 
-            func:SetOpacity(bgClearFade[1], "bg_clear.png")
-            func:DrawRectGraph(0, 0, 0, 0, loopWidth, loopHeight, "bg_blue.png")
-            func:DrawRectGraph(0, 0, 0, 0, loopWidth, loopHeight, "bg_clear.png")
-            func:DrawRectGraph(0, 0, 0, 0, loopWidth, simpleHeight, "notes_blue_simple.png")
+            tx["bg_clear.png"]:SetOpacity(bgClearFade[1] / 255)
+            tx["bg_blue.png"]:DrawRect(0, 0, 0, 0, loopWidth, loopHeight)
+            tx["bg_clear.png"]:DrawRect(0, 0, 0, 0, loopWidth, loopHeight)
+            tx["notes_blue_simple.png"]:DrawRect(0, 0, 0, 0, loopWidth, simpleHeight)
 
-        elseif playerCount == 2 then
+        elseif state.playerCount == 2 then
 
-            func:SetOpacity(bgClearFade[1], "bg_clear.png")
-            func:DrawRectGraph(0, 0, 0, 0, loopWidth, loopHeight, "bg_red.png")
-            func:DrawRectGraph(0, 0, 0, 0, loopWidth, loopHeight, "bg_clear.png")
-            func:DrawRectGraph(0, 0, 0, 0, loopWidth, simpleHeight, "notes_red_simple.png")
-            
-            func:SetOpacity(bgClearFade[2], "bg_clear.png")
-            func:DrawRectGraph(0, pos2PY, 0, 0, loopWidth, loopHeight, "bg_blue.png")
-            func:DrawRectGraph(0, pos2PY, 0, 0, loopWidth, loopHeight, "bg_clear.png")
-            func:DrawRectGraph(0, pos2PY, 0, 0, loopWidth, simpleHeight, "notes_blue_simple.png")
+            tx["bg_clear.png"]:SetOpacity(bgClearFade[1] / 255)
+            tx["bg_red.png"]:DrawRect(0, 0, 0, 0, loopWidth, loopHeight)
+            tx["bg_clear.png"]:DrawRect(0, 0, 0, 0, loopWidth, loopHeight)
+            tx["notes_red_simple.png"]:DrawRect(0, 0, 0, 0, loopWidth, simpleHeight)
 
-        elseif playerCount == 3 then
+            tx["bg_clear.png"]:SetOpacity(bgClearFade[2] / 255)
+            tx["bg_blue.png"]:DrawRect(0, pos2PY, 0, 0, loopWidth, loopHeight)
+            tx["bg_clear.png"]:DrawRect(0, pos2PY, 0, 0, loopWidth, loopHeight)
+            tx["notes_blue_simple.png"]:DrawRect(0, pos2PY, 0, 0, loopWidth, simpleHeight)
 
-            func:DrawRectGraph(0, pos2PY, 0, 0, loopWidth, loopHeight, "bg_blue.png")
-            func:DrawRectGraph(0, pos2PY, 0, 0, loopWidth, simpleHeight, "notes_blue_simple.png")
+        elseif state.playerCount == 3 then
 
-        elseif playerCount == 4 then
+            tx["bg_blue.png"]:DrawRect(0, pos2PY, 0, 0, loopWidth, loopHeight)
+            tx["notes_blue_simple.png"]:DrawRect(0, pos2PY, 0, 0, loopWidth, simpleHeight)
 
-            func:DrawRectGraph(0, 0, 0, 0, 1920, 1080, "bg_blue.png")
+        elseif state.playerCount == 4 then
 
-        end   
+            tx["bg_blue.png"]:DrawRect(0, 0, 0, 0, 1920, 1080)
+
+        end
 
     else
-        if playerCount == 1 and p1IsBlue == false then
+        if state.playerCount == 1 and state.p1IsBlue == false then
 
-            func:SetOpacity(bgClearFade[1], "bg_clear.png")
-            func:DrawRectGraph(0, 0, -bgScrollX, 0, loopWidth, loopHeight, "bg_red.png")
-            func:DrawRectGraph(0, 0, -bgScrollX, 0, loopWidth, loopHeight, "bg_clear.png")
+            tx["bg_clear.png"]:SetOpacity(bgClearFade[1] / 255)
+            tx["bg_red.png"]:DrawRect(0, 0, -bgScrollX, 0, loopWidth, loopHeight)
+            tx["bg_clear.png"]:DrawRect(0, 0, -bgScrollX, 0, loopWidth, loopHeight)
             drawOFNotes(28, false)
 
-        elseif playerCount == 1 and p1IsBlue == true then
+        elseif state.playerCount == 1 and state.p1IsBlue == true then
 
-            func:SetOpacity(bgClearFade[1], "bg_clear.png")
-            func:DrawRectGraph(0, 0, -bgScrollX, 0, loopWidth, loopHeight, "bg_blue.png")
-            func:DrawRectGraph(0, 0, -bgScrollX, 0, loopWidth, loopHeight, "bg_clear.png")
+            tx["bg_clear.png"]:SetOpacity(bgClearFade[1] / 255)
+            tx["bg_blue.png"]:DrawRect(0, 0, -bgScrollX, 0, loopWidth, loopHeight)
+            tx["bg_clear.png"]:DrawRect(0, 0, -bgScrollX, 0, loopWidth, loopHeight)
             drawOFNotes(28, true)
 
-        elseif playerCount == 2 then
+        elseif state.playerCount == 2 then
 
-            func:SetOpacity(bgClearFade[1], "bg_clear.png")
-            func:DrawRectGraph(0, 0, -bgScrollX, 0, loopWidth, loopHeight, "bg_red.png")
-            func:DrawRectGraph(0, 0, -bgScrollX, 0, loopWidth, loopHeight, "bg_clear.png")
+            tx["bg_clear.png"]:SetOpacity(bgClearFade[1] / 255)
+            tx["bg_red.png"]:DrawRect(0, 0, -bgScrollX, 0, loopWidth, loopHeight)
+            tx["bg_clear.png"]:DrawRect(0, 0, -bgScrollX, 0, loopWidth, loopHeight)
             drawOFNotes(28, false)
-            func:SetOpacity(bgClearFade[2], "bg_clear.png")
-            func:DrawRectGraph(0, pos2PY, -bgScrollX, 0, loopWidth, loopHeight, "bg_blue.png")
-            func:DrawRectGraph(0, pos2PY, -bgScrollX, 0, loopWidth, loopHeight, "bg_clear.png")
+            tx["bg_clear.png"]:SetOpacity(bgClearFade[2] / 255)
+            tx["bg_blue.png"]:DrawRect(0, pos2PY, -bgScrollX, 0, loopWidth, loopHeight)
+            tx["bg_clear.png"]:DrawRect(0, pos2PY, -bgScrollX, 0, loopWidth, loopHeight)
             drawOFNotes(pos2PY + 28, true)
 
-        elseif playerCount == 3 then
+        elseif state.playerCount == 3 then
 
-            func:DrawRectGraph(0, pos2PY, -bgScrollX, 0, loopWidth, loopHeight, "bg_blue.png")
+            tx["bg_blue.png"]:DrawRect(0, pos2PY, -bgScrollX, 0, loopWidth, loopHeight)
             drawOFNotes(pos2PY + 28, true)
 
-        elseif playerCount == 4 then
+        elseif state.playerCount == 4 then
 
-            func:DrawRectGraph(0, 0, -bgScrollX, 0, 1920, 1080, "bg_blue.png")
+            tx["bg_blue.png"]:DrawRect(0, 0, -bgScrollX, 0, 1920, 1080)
 
         end
     end
 
+end
+
+function onDestroy()
+    for _, t in pairs(tx) do
+        if t ~= nil then t:Dispose() end
+    end
+    tx = {}
 end

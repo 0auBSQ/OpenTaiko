@@ -4,8 +4,6 @@ namespace OpenTaiko;
 
 class CActImplScoreRank : CActivity {
 	public override void Activate() {
-		double RollTimems = 0;
-
 		/*
         foreach (var chip in TJAPlayer3.DTX.listChip)
         {
@@ -23,17 +21,16 @@ class CActImplScoreRank : CActivity {
 				this.counter[player][i] = new CCounter();
 			}
 		}
+		// a tower play's rank effect: made here, inside the song load (queued with the game screen's textures and
+		// waited for), so it is ready before its first draw mid-play; freed when the play ends
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
+			TowerResult_ScoreRankEffect ??= OpenTaiko.tTextureCreate(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.TOWERRESULT}ScoreRankEffect.png"));
 		base.Activate();
 	}
 
 	public override void DeActivate() {
+		OpenTaiko.tDisposeSafely(ref TowerResult_ScoreRankEffect);
 		base.DeActivate();
-	}
-
-	public override void CreateManagedResource() {
-		TowerResult_ScoreRankEffect = OpenTaiko.tテクスチャの生成(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.TOWERRESULT}ScoreRankEffect.png"));
-
-		base.CreateManagedResource();
 	}
 
 	public override void ReleaseManagedResource() {
@@ -46,7 +43,7 @@ class CActImplScoreRank : CActivity {
 	private void displayScoreRank(int i, int player, float x, float y, int mode = 0) {
 		CCounter cct = this.counter[player][i];
 
-		CTexture tex = OpenTaiko.Tx.ScoreRank;
+		CTexture? tex = OpenTaiko.Tx.ScoreRank;
 		if (mode == 1) // tower
 			tex = TowerResult_ScoreRankEffect;
 
@@ -113,9 +110,9 @@ class CActImplScoreRank : CActivity {
 		}
 
 		if (mode == 0)
-			tex.t2D拡大率考慮中央基準描画(xpos, ypos, new System.Drawing.Rectangle(0, height * i, width, height));
+			tex.t2DScaledCenterBasedDraw(xpos, ypos, new System.Drawing.Rectangle(0, height * i, width, height));
 		else if (mode == 1 && player == 0)
-			tex.t2D拡大率考慮中央基準描画(xpos, ypos, new System.Drawing.Rectangle(width * i, 0, width, height));
+			tex.t2DScaledCenterBasedDraw(xpos, ypos, new System.Drawing.Rectangle(width * i, 0, width, height));
 	}
 
 	public override int Draw() {
@@ -177,7 +174,7 @@ class CActImplScoreRank : CActivity {
 				} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 					#region [Tower score ranks]
 
-					double progress = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor / ((double)OpenTaiko.SongMount.rChoosenSong.score[5].譜面情報.nTotalFloor);
+					double progress = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor / ((double)OpenTaiko.SongMount.rChoosenSong!.score[5]!.ChartInfo.nTotalFloor);
 
 					bool[] conditions =
 					{
@@ -217,7 +214,7 @@ class CActImplScoreRank : CActivity {
 		return base.Draw();
 	}
 
-	private CTexture TowerResult_ScoreRankEffect;
+	private CTexture? TowerResult_ScoreRankEffect;
 
 	public int[][] ScoreRank = new int[5][];
 	private CCounter[][] counter = new CCounter[5][] {

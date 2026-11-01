@@ -1,0 +1,4 @@
+{
+    "_note": "Dojo doors layout, in 1920x1080 pixels.",
+    "screen": { "width": 1920, "height": 1080, "_note": "the doors' size when the texture reports none" }
+}

@@ -1,0 +1,113 @@
+{
+  "layers": [
+    {
+      "type": "image",
+      "file": "bg.png"
+    },
+    {
+      "type": "sprites",
+      "files": [
+        "cloud2.png",
+        "cloud1.png"
+      ],
+      "count": 5,
+      "y": [
+        120,
+        520
+      ],
+      "speed": [
+        6,
+        12
+      ],
+      "scale": [
+        0.35,
+        0.6
+      ],
+      "opacity": [
+        0.55,
+        0.8
+      ],
+      "margin": 40
+    },
+    {
+      "type": "sprites",
+      "files": [
+        "cloud1.png",
+        "cloud3.png",
+        "cloud2.png"
+      ],
+      "count": 5,
+      "y": [
+        40,
+        640
+      ],
+      "speed": [
+        14,
+        26
+      ],
+      "scale": [
+        0.8,
+        1.3
+      ],
+      "opacity": [
+        0.9,
+        1.0
+      ],
+      "margin": 80
+    },
+    {
+      "type": "rays",
+      "x": 1560,
+      "y": 150,
+      "angles": [
+        15,
+        32,
+        50,
+        68
+      ],
+      "length": 1.8,
+      "width": 2.0,
+      "color": "FFF5D0",
+      "opacity": [
+        0.08,
+        0.2
+      ],
+      "pulse_ms": 8000,
+      "sway_deg": 3,
+      "sway_ms": 13000
+    },
+    {
+      "type": "particles",
+      "sprite": "dot",
+      "count": 20,
+      "size": [
+        4,
+        10
+      ],
+      "color": "FFFFFF",
+      "opacity": [
+        0.15,
+        0.45
+      ],
+      "speed": [
+        4,
+        10
+      ],
+      "direction": "right",
+      "sway": 20,
+      "sway_ms": 6000,
+      "twinkle_ms": 3000,
+      "blend": "add"
+    },
+    {
+      "type": "glow",
+      "color": "FFF0C0",
+      "opacity": [
+        0.0,
+        0.06
+      ],
+      "pulse_ms": 9000,
+      "blend": "add"
+    }
+  ]
+}

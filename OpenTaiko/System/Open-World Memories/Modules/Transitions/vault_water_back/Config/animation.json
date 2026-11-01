@@ -1,0 +1,28 @@
+{
+    "_note": "Secret Vault water way back timings. Times in seconds; distances in 1920x1080 pixels.",
+    "water": {
+        "_note": "rise_s: the fade-out, the water rising over the screen; drain_s: the fade-in, the water draining down (its first moments out of sight); the drain's sound plays surface_sound_at_s into the fade-in. Wave height (px), froth and churn (how fast the pattern inside moves) go from their calm value at rest to their swell value at the water's fastest; the pattern moves carry of the surface's way, so the water flows as it moves.",
+        "rise_s": 1.6,
+        "drain_s": 1.7,
+        "surface_sound_at_s": 0.3,
+        "wave_calm_px": 13,
+        "wave_swell_px": 26,
+        "froth_calm": 0.55,
+        "froth_swell": 1.3,
+        "churn_calm": 1,
+        "churn_swell": 3.4,
+        "carry": 0.35
+    },
+    "bubbles": {
+        "_note": "bubbles spawn at about spawn_rising / spawn_covered / spawn_draining per second while the water rises, covers the screen and drains; each rises at speed_min to speed_max px per second and wobbles wobble_min to wobble_max px at wobble_hz_min to wobble_hz_max times per second",
+        "spawn_rising": 22,
+        "spawn_covered": 9,
+        "spawn_draining": 6,
+        "speed_min": 120,
+        "speed_max": 260,
+        "wobble_min": 4,
+        "wobble_max": 12,
+        "wobble_hz_min": 0.6,
+        "wobble_hz_max": 1.5
+    }
+}

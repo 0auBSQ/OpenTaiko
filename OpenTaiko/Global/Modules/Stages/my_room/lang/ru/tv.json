@@ -1,0 +1,13 @@
+{
+  "_comment": "Russian texts for the TV (tv.lua): its menu and the cutscene browser. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "title": "Телевизор",
+  "menu_on": "Включить",
+  "menu_off": "Выключить",
+  "menu_rewatch": "Пересмотреть ролики",
+  "tab_songs": "Ролики песен",
+  "intro": "Интро",
+  "outro": "Аутро %d",
+  "unknown_song": "???",
+  "empty": "Ролики не найдены.",
+  "waiting": "Настраиваем каналы... список песен ещё готовится."
+}

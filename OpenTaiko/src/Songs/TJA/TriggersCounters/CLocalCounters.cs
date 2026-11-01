@@ -22,7 +22,7 @@
 			if (OpenTaiko.ConfigIni.bAutoPlay[_player] || (OpenTaiko.ConfigIni.bAIBattleMode && _player == 1)) return;
 
 			double _val = this.Get(counterName);
-			SaveFile _sf = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(_player)];
+			SaveFile _sf = OpenTaiko.SaveFileInstances[_player];
 			_sf.tSetGlobalCounter(counterName, _val);
 		}
 

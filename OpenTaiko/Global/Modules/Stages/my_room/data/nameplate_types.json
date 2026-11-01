@@ -1,0 +1,9 @@
+{
+  "_comment": "Nameplate TYPE flags: special = 1 hides the type's name until the player owns an unlocked plate of it. Names live in lang/<code>/nameplate_types.json.",
+  "10": {
+    "special": 1
+  },
+  "38": {
+    "special": 1
+  }
+}

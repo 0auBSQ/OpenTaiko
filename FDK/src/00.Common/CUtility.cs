@@ -37,8 +37,8 @@ public class CUtility {
 
 	// IO
 
-	public static string t指定した拡張子を持つファイルを検索し最初に見つけたファイルの絶対パスを返す(string strフォルダパス, List<string> extensions) {
-		string[] files = Directory.GetFiles(strフォルダパス);     // GetFiles() は完全パスを返す。
+	public static string? tFindFirstFileWithExtension(string strFolderPath, List<string> extensions) {
+		string[] files = Directory.GetFiles(strFolderPath);     // GetFiles() は完全パスを返す。
 
 
 		// ファイル順より拡張子順を優先して検索する。→ 拡張子リストの前方の拡張子ほど先に発見されるようにするため。
@@ -55,24 +55,24 @@ public class CUtility {
 		return null;    // なかった
 	}
 
-	public static void ReadXML<T>(string fileName, out T xmlObject) {
+	public static void ReadXML<T>(string fileName, out T? xmlObject) {
 		xmlObject = default(T);
 
-		FileStream fs = null;
-		StreamReader sr = null;
+		FileStream? fs = null;
+		StreamReader? sr = null;
 		try {
 			fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite); // FileShare を付けとかないと、Close() 後もロックがかかる。
 			sr = new StreamReader(fs, Encoding.UTF8);
 			var xmlsl = new System.Xml.Serialization.XmlSerializer(typeof(T));
-			xmlObject = (T)xmlsl.Deserialize(sr);
+			xmlObject = (T?)xmlsl.Deserialize(sr);
 		} finally {
 			if (sr != null)
 				sr.Close();     // fr も一緒にClose()される
 		}
 	}
 	public static void WriteXML<T>(string fileName, T xmlObject) {
-		FileStream fs = null;
-		StreamWriter sw = null;
+		FileStream? fs = null;
+		StreamWriter? sw = null;
 		try {
 			fs = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);  // FileShare を付けとかないと、Close() 後もロックがかかる。
 			sw = new StreamWriter(fs, Encoding.UTF8);

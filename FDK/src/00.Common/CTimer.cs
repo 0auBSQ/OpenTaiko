@@ -5,9 +5,9 @@ namespace FDK;
 public class CTimer : CTimerBase {
 	public enum TimerType {
 		Unknown = -1,
-		PerformanceCounter = 0, // always accurate, mainly for event-based input timing
-		MultiMedia = 1, // same accuracy at integer frame but not fraction frame, mainly for drawing
-		GetTickCount = 2, // 10~16ms low precision (unused)
+		GameTimeReal = 0, // always accurate, mainly for event-based input timing
+		GameTimeAtDraw = 1, // same accuracy at integer frame but not fraction frame, mainly for drawing
+		SystemTimeCoarse = 2, // 10~16ms low precision (unused)
 	}
 	public TimerType CurrentTimerType {
 		get;
@@ -17,18 +17,18 @@ public class CTimer : CTimerBase {
 
 	public override long SystemTimeMs {
 		get => this.CurrentTimerType switch {
-			TimerType.PerformanceCounter => performanceTimer?.ElapsedMilliseconds ?? 0,
-			TimerType.MultiMedia => Game.TimeMs,
-			TimerType.GetTickCount => (long)Environment.TickCount,
+			TimerType.GameTimeReal => Game.TimeMsReal,
+			TimerType.GameTimeAtDraw => Game.TimeMs,
+			TimerType.SystemTimeCoarse => Environment.TickCount64,
 			_ => 0,
 		};
 	}
 
 	public override double SystemTimeMs_Double {
 		get => this.CurrentTimerType switch {
-			TimerType.PerformanceCounter => performanceTimer?.Elapsed.TotalMilliseconds ?? 0,
-			TimerType.MultiMedia => Game.dbTimeMs,
-			TimerType.GetTickCount => Environment.TickCount,
+			TimerType.GameTimeReal => Game.dbTimeMsReal,
+			TimerType.GameTimeAtDraw => Game.dbTimeMs,
+			TimerType.SystemTimeCoarse => Environment.TickCount64,
 			_ => 0,
 		};
 	}
@@ -39,16 +39,9 @@ public class CTimer : CTimerBase {
 
 		if (ReferenceCount[(int)this.CurrentTimerType] == 0) {
 			switch (this.CurrentTimerType) {
-				case TimerType.PerformanceCounter:
-					if (!this.GetSetPerformanceCounter())
-						this.GetSetTickCount();
-					break;
-
-				case TimerType.MultiMedia:
-					break;
-
-				case TimerType.GetTickCount:
-					this.GetSetTickCount();
+				case TimerType.GameTimeReal:
+				case TimerType.GameTimeAtDraw:
+				case TimerType.SystemTimeCoarse:
 					break;
 
 				default:
@@ -68,34 +61,12 @@ public class CTimer : CTimerBase {
 		int type = (int)this.CurrentTimerType;
 
 		ReferenceCount[type] = Math.Max(ReferenceCount[type] - 1, 0);
-
-		if (ReferenceCount[type] == 0) {
-			if (this.CurrentTimerType == TimerType.PerformanceCounter) {
-				performanceTimer?.Stop();
-				performanceTimer = null;
-			}
-		}
-
 		this.CurrentTimerType = TimerType.Unknown;
 	}
 
 	#region [ protected ]
 	//-----------------
-	protected static Stopwatch? performanceTimer = null;
 	protected static int[] ReferenceCount = new int[3];
-
-	protected bool GetSetTickCount() {
-		this.CurrentTimerType = TimerType.GetTickCount;
-		return true;
-	}
-	protected bool GetSetPerformanceCounter() {
-		performanceTimer = Stopwatch.StartNew();
-		if (Stopwatch.Frequency != 0) {
-			this.CurrentTimerType = TimerType.PerformanceCounter;
-			return true;
-		}
-		return false;
-	}
 	//-----------------
 	#endregion
 }

@@ -1,0 +1,45 @@
+{
+    "_note": "Coin purse widget (Lib/CoinBox), in 1920x1080 pixels. Colours are [r, g, b] from 0 to 255; opacities 0 to 1, alphas (_alpha) 0 to 255; scales are factors of the pill's coin icon.",
+    "pill": {
+        "_note": "the box a caller that passes none gets: w x h, right_margin px in from the screen's right edge, y from the top; its shadow is the same pill, moved by (shadow_dx, shadow_dy)",
+        "w": 300,
+        "h": 66,
+        "right_margin": 60,
+        "y": 60,
+        "face_color": [255, 250, 226],
+        "shadow_color": [40, 34, 60],
+        "shadow_opacity": 0.35,
+        "shadow_dx": 4,
+        "shadow_dy": 6
+    },
+    "icon": { "_note": "the coin on the pill: its size and its gap from the pill's left edge", "size": 44, "left": 11 },
+    "fallback_coin": {
+        "_note": "the drawn coin when the Coin shared texture is missing: a rim px rim, a red top half, a blue bottom half and a glint at (glint_dx, glint_dy) times the inner radius up and left of the middle, glint_size times it across (at least glint_min px)",
+        "rim": 3,
+        "rim_color": [24, 24, 30],
+        "top_color": [232, 52, 44],
+        "bottom_color": [52, 120, 236],
+        "glint_color": [255, 200, 200],
+        "glint_dx": 0.4,
+        "glint_dy": 0.45,
+        "glint_size": 0.18,
+        "glint_min": 2
+    },
+    "text": {
+        "_note": "labels are anchored by their middle, where the glyph box draws its ink high: they move down nudge times their font size. right_inset: the balance and the line above it, from the pill's right edge; above_dy: that line (price, bonus) over the pill's top",
+        "ink_color": [52, 58, 92],
+        "red_color": [214, 64, 56],
+        "green_color": [62, 168, 92],
+        "outline_color": [255, 255, 255],
+        "outline_alpha": 220,
+        "nudge": 0.36,
+        "right_inset": 24,
+        "above_dy": 26,
+        "balance_size": 30,
+        "price_size": 24,
+        "bonus_size": 26,
+        "drop_size": 24,
+        "rise_size": 26
+    },
+    "flying_coin": { "_note": "a flying coin's scale: scale_x wide, wobbling by wobble (it reads as a spin), scale_y high", "scale_x": 0.5, "wobble": 0.2, "scale_y": 0.5 }
+}

@@ -31,8 +31,8 @@ public class CCourse {
 	//            指定されたデータは上にあるものから順に演奏されます。
 
 
-	public void t入力(string strファイル名) {
-		StreamReader reader = new StreamReader(strファイル名);
+	public void tInput(string strFileName) {
+		StreamReader reader = new StreamReader(strFileName);
 		string str = reader.ReadToEnd();
 		reader.Close();
 	}

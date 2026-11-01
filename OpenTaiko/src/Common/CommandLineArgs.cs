@@ -1,0 +1,99 @@
+using System;
+using System.Linq;
+
+namespace OpenTaiko;
+
+/// <summary>Which mode the process runs in, selected by <c>--mode=…</c>.</summary>
+internal enum AppMode {
+	Normal,    // play the game (default)
+	Record,    // --mode=record : offline gameplay-video export (see VideoExporter)
+	CheckGl,   // --mode=checkgl : boot the window + GL context, report, and quit (Linux/Wayland test)
+}
+
+/// <summary>
+/// Parses OpenTaiko's OWN command-line options — the app mode plus the recorder's settings — into one
+/// typed object. FDK-level windowing/platform flags (<c>-w</c>/<c>-p</c>/<c>-f</c>) are parsed separately
+/// inside <see cref="FDK.Game"/>; this only owns the app-level switches.
+///
+/// Forms accepted for every option: <c>--name value</c> and <c>--name=value</c> (case-insensitive).
+///   --mode=record  --uid &lt;id&gt;  [--difficulties 3,4] [--fps 60] [--size 1920x1080] [--sample-rate 48000] [--out file.mp4]
+///   --mode=checkgl
+///   --hidden       run without showing the window or making a sound (automated boot checks; the log still records everything)
+/// </summary>
+internal sealed class CommandLineArgs {
+	public AppMode Mode = AppMode.Normal;
+	public bool Hidden = false;   // --hidden: the window is created but never shown, and the master volume stays at 0
+
+	// --mode=record options (unused in other modes)
+	public string Uid = "";
+	public int[] Difficulties = Array.Empty<int>();
+	public int Fps = 60;
+	public int Width = 1920, Height = 1080;
+	public int SampleRate = 48000;
+	public string OutPath = "";
+	public string? DifficultiesError;   // set when --difficulties was malformed (surfaced by the consumer)
+	public List<string> Warns = [];
+
+	public static CommandLineArgs Parse(string[] args) {
+		var cli = new CommandLineArgs();
+		cli.Mode = (Get(args, "--mode") ?? "").ToLowerInvariant() switch {
+			"record" => AppMode.Record,
+			"checkgl" => AppMode.CheckGl,
+			_ => AppMode.Normal,
+		};
+		cli.Hidden = args.Any(a => a.Equals("--hidden", StringComparison.OrdinalIgnoreCase));
+		if (cli.Mode != AppMode.Record) return cli;
+
+		cli.Uid = (Get(args, "--uid") ?? "").Trim();
+
+		string diffs = Get(args, "--difficulties") ?? Get(args, "--diff") ?? "3";
+		try {
+			cli.Difficulties = diffs.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+				.Select(int.Parse).ToArray();
+		} catch { cli.Difficulties = Array.Empty<int>(); }
+		if (cli.Difficulties.Length < 1 || cli.Difficulties.Length > 5 || cli.Difficulties.Any(d => d < 0 || d > 4))
+			cli.DifficultiesError = "--difficulties must be 1 to 5 comma-separated values between 0 and 4.";
+
+		string? strFps = Get(args, "--fps");
+		if (strFps != null) {
+			const int fpsMin = 10, fpsMax = 240;
+			if (int.TryParse(strFps, out int fps) && fps >= fpsMin && fps <= fpsMax)
+				cli.Fps = fps;
+			else
+				cli.Warns.Add($"--fps must be a valid whole number between {fpsMin} and {fpsMax}; defaulted to {cli.Fps}.");
+		}
+
+		string? size = Get(args, "--size");
+		if (size != null) {
+			var p = size.ToLowerInvariant().Split('x');
+			if (p.Length == 2 && int.TryParse(p[0], out int w) && int.TryParse(p[1], out int h) && w > 0 && h > 0) {
+				cli.Width = w; cli.Height = h;
+			} else {
+				cli.Warns.Add($"--size must be WxH, where W and H are positive whole numbers; defaulted to {cli.Width}x{cli.Height}.");
+			}
+		}
+
+		string? strSampleRate = Get(args, "--sample-rate");
+		if (strSampleRate != null) {
+			const int sampleRateMin = 44100, sampleRateMax = 96000;
+			if (int.TryParse(strSampleRate, out int sampleRate) && sampleRate >= sampleRateMin && sampleRate <= sampleRateMax)
+				cli.SampleRate = sampleRate;
+			else
+				cli.Warns.Add($"--sample-rate must be a valid whole number between {sampleRateMin} and {sampleRateMax}; defaulted to {cli.SampleRate}.");
+		}
+
+		cli.OutPath = Get(args, "--out") ?? $"export_{cli.Uid}_{string.Join("-", cli.Difficulties)}.mp4";
+		return cli;
+	}
+
+	/// <summary>Value for <c>--name value</c> or <c>--name=value</c> (case-insensitive); null if absent.</summary>
+	private static string? Get(string[] args, string name) {
+		for (int i = 0; i < args.Length; i++) {
+			if (args[i].Equals(name, StringComparison.OrdinalIgnoreCase))
+				return i + 1 < args.Length ? args[i + 1] : "";
+			if (args[i].StartsWith(name + "=", StringComparison.OrdinalIgnoreCase))
+				return args[i].Substring(name.Length + 1);
+		}
+		return null;
+	}
+}

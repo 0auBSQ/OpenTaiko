@@ -27,25 +27,21 @@ public unsafe class CFrameConverter : IDisposable {
 		ffmpeg.av_image_fill_arrays(ref _dstData, ref _dstLinesize, (byte*)_convertedFrameBufferPtr, CVPxfmt, FrameSize.Width, FrameSize.Height, 1);
 	}
 
-	public AVFrame* Convert(AVFrame* framep) {
-		if (this.IsConvert) {
-			ffmpeg.sws_scale(convert_context, framep->data, framep->linesize, 0, framep->height, _dstData, _dstLinesize);
+	public void Convert(AVFrame* framep) {
+		if (!this.IsConvert)
+			return;
 
-			AVFrame* tmp = ffmpeg.av_frame_alloc();
-			tmp = ffmpeg.av_frame_alloc();
-			tmp->best_effort_timestamp = framep->best_effort_timestamp;
-			tmp->width = FrameSize.Width;
-			tmp->height = FrameSize.Height;
-			tmp->data = new byte_ptrArray8();
-			tmp->data.UpdateFrom(_dstData);
-			tmp->linesize = new int_array8();
-			tmp->linesize.UpdateFrom(_dstLinesize);
+		var timestamp = framep->best_effort_timestamp;
+		ffmpeg.sws_scale(convert_context, framep->data, framep->linesize, 0, framep->height, _dstData, _dstLinesize);
+		ffmpeg.av_frame_unref(framep);
 
-			ffmpeg.av_frame_unref(framep);
-			return tmp;
-		} else {
-			return framep;
-		}
+		framep->best_effort_timestamp = timestamp;
+		framep->width = FrameSize.Width;
+		framep->height = FrameSize.Height;
+		framep->data = new byte_ptrArray8();
+		framep->data.UpdateFrom(_dstData);
+		framep->linesize = new int_array8();
+		framep->linesize.UpdateFrom(_dstLinesize);
 	}
 
 	public void Dispose() {

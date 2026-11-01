@@ -1,0 +1,14 @@
+{
+    "_note": "Song loading timings. Times in seconds; scroll speeds in pixels per second, scroll limits in pixels (1920x1080).",
+    "fade_out_s": 1.0,
+    "fade_in_s": 1.0,
+    "slide": {
+        "_note": "the characters slide in, one after another stagger_s apart, all the staggers together never longer than stagger_total_s; easing is the counter's SetEasing mode and curve",
+        "duration_s": 0.35,
+        "stagger_s": 0.28,
+        "stagger_total_s": 0.7,
+        "easing": ["OUT", "QUAD"]
+    },
+    "tower_scroll": { "speed_px_per_s": 20, "max": 120 },
+    "dan_scroll": { "speed_px_per_s": 20, "max": 60 }
+}

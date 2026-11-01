@@ -1,0 +1,13 @@
+{
+  "_comment": "English texts for the TV (tv.lua): its menu and the cutscene browser. Keys are stable ids; this file is the fallback for every other language.",
+  "title": "TV",
+  "menu_on": "Turn on",
+  "menu_off": "Turn off",
+  "menu_rewatch": "Rewatch cutscenes",
+  "tab_songs": "Song cutscenes",
+  "intro": "Intro",
+  "outro": "Outro %d",
+  "unknown_song": "???",
+  "empty": "No cutscenes found.",
+  "waiting": "Tuning the channels... the song list is still being prepared."
+}

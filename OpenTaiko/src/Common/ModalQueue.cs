@@ -33,6 +33,10 @@ internal class ModalQueue {
 		return _modalQueues[player].Count < 1;
 	}
 
+	public void tClear() {
+		foreach (var queue in _modalQueues) queue.Clear();
+	}
+
 	public bool tAreBothQueuesEmpty() {
 		return tIsQueueEmpty(0) && tIsQueueEmpty(1) && tIsQueueEmpty(2) && tIsQueueEmpty(3) && tIsQueueEmpty(4);
 	}

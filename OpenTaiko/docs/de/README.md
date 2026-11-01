@@ -1,0 +1,33 @@
+<!-- docs/README.md -->
+
+# OpenTaiko-Dokumentation
+
+<span class="badge-new">Spielversion 0.7.0</span>
+
+OpenTaiko zeichnet fast jeden Bildschirm außerhalb des eigentlichen Spielgeschehens mit Lua-Skripten, die in einem Skin mitgeliefert werden: die Menüs, die Songauswahl, die Raum- und Story-Szenen, die Hintergründe, den Ergebnisbildschirm. Diese Seite dokumentiert die Lua-API, die diese Skripte verwenden, und führt durch die häufigsten Aufgaben, die ein Skin-Autor erledigen möchte.
+
+## Wo Sie anfangen sollten
+
+- Falls Sie noch kein Modul geschrieben haben, lesen Sie [So funktionieren Module](getting-started.md): die Ordnerstruktur eines Skins, die Modularten und die Lebenszyklus-Callbacks, die ein Skript erhält.
+- Um eine Funktion nachzuschlagen, öffnen Sie die [API-Referenz](api/) und wählen Sie in der Seitenleiste eine Kategorie.
+- Um auf dem aufzubauen, was das Spiel mitliefert (eine UI-Bibliothek, ein Dialogfenster, die Regeln von Pagode, Tresor und Laden, Mein Zimmer), lesen Sie [Bereitgestellte Module](modules/).
+- Für ein konkretes Ziel führen die Anleitungen Schritt für Schritt durch [Charaktere](guides/characters.md), [Puchicharas](guides/puchicharas.md), [Namensschilder](guides/nameplates.md), [Skins und Themes](guides/skins.md), [Noten- und Bewertungspakete](guides/notes-skins.md) sowie [Chart-Freischaltungen](guides/unlockables.md).
+
+## Was Sie bauen können
+
+| Bereich | Wo es liegt | Was es ist |
+| --- | --- | --- |
+| Module | Der Ordner `Modules/` des Skins | Stages (vollständige Bildschirme mit eigener Eingabe, eigenem Zeichnen und eigenem Zustand: eine Songauswahl, ein Raum, eine Story-Szene), Activities (Unterbildschirme und Overlays wie Dialoge und Namensschilder) und Übergänge (die Überblendungen und Ladebildschirme zwischen Stages). |
+| Hintergründe | Der Ordner `Graphics/` des Skins | Skripte, die einen Bildschirm dekorieren: den Startbildschirm, den Gameplay-Hintergrund und den Mob, den Ergebnisbildschirm. |
+| Skins und Themes | `System/`, neben dem Spiel | Ein vollständiges visuelles Paket, das ein Spieler installiert und auswählt, mit den Theme-Einstellungen, die es im Optionsbildschirm bereitstellt. |
+| Charaktere und Puchicharas | `Global/Characters/` und `Global/PuchiChara/`, von allen Skins gemeinsam genutzt | Die Tänzer und die kleinen Maskottchen, die während des Spiels reagieren. |
+| Namensschilder | `Global/Nameplates/` oder der Ordner `Nameplates/` des Skins | Pakete mit Namensschildtiteln, die Spieler freischalten und ausrüsten. |
+| Chart-Freischaltungen | Der Songordner, neben dem Chart | Eine `Unlock.json`, die einen Song gesperrt hält, bis der Spieler ihn sich verdient hat. |
+
+## Experimentelle Abschnitte
+
+Einige Seiten tragen in der Seitenleiste die Kennzeichnung <span class="badge-exp">Experimentell</span>. Die Funktionen, die sie beschreiben, funktionieren in der aktuellen Version, aber ihre API kann sich zwischen Versionen noch ohne Übergangsfrist ändern. Ein Skin, der auf sie angewiesen ist, sollte angeben, für welche Spielversion er gedacht ist, und Sie sollten ihn nach jedem Update erneut testen.
+
+## Sprachen
+
+Die Dokumentation existiert in jeder Sprache, die OpenTaiko mitliefert; wählen Sie eine mit der Sprachauswahl oben in der Seitenleiste. Die Website zeigt eine Seite auf Englisch an, bis eine Übersetzung vorliegt.

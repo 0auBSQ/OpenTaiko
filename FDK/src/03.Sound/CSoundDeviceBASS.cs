@@ -4,7 +4,7 @@ using ManagedBass.Mix;
 
 namespace FDK;
 
-public class CSoundDeviceBASS : ISoundDevice {
+public partial class CSoundDeviceBASS : ISoundDevice {
 	// Properties
 
 	public ESoundDeviceType SoundDeviceType {
@@ -43,11 +43,17 @@ public class CSoundDeviceBASS : ISoundDevice {
 		protected set;
 	}
 
+	public long nBytesPerSec { get; protected set; }
+
 	public float CPUUsage => (float)Bass.CPUUsage;
 
 	// マスターボリュームの制御コードは、WASAPI/ASIOで全く同じ。
 	public int nMasterVolume {
 		get {
+			// Direct playback (mobile) has no master mixer stream — the global stream volume is
+			// the master control there.
+			if (this.MixerHandle == CSound.NoMixerHandle)
+				return Bass.GlobalStreamVolume / 100;
 			float fVolume = 0.0f;
 			bool b = Bass.ChannelGetAttribute(this.MixerHandle, ChannelAttribute.Volume, out fVolume);
 			if (!b) {
@@ -57,6 +63,10 @@ public class CSoundDeviceBASS : ISoundDevice {
 			return (int)(fVolume * 100);
 		}
 		set {
+			if (this.MixerHandle == CSound.NoMixerHandle) {
+				Bass.GlobalStreamVolume = Math.Clamp(value, 0, 100) * 100;   // 0..10000
+				return;
+			}
 			bool b = Bass.ChannelSetAttribute(this.MixerHandle, ChannelAttribute.Volume, (float)(value / 100.0));
 			if (!b) {
 				Errors be = Bass.LastError;
@@ -65,13 +75,14 @@ public class CSoundDeviceBASS : ISoundDevice {
 		}
 	}
 
-	public CSoundDeviceBASS(int updatePeriod, int bufferSize) {
+	// device: -1 the system's default output; 0 BASS's silent device (the mixer runs, nothing is heard)
+	public CSoundDeviceBASS(int updatePeriod, int bufferSize, int device = -1) {
 		Trace.TraceInformation("Start initialization of BASS");
 		this.SoundDeviceType = ESoundDeviceType.Unknown;
 		this.OutputDelay = 0;
 		this.ElapsedTimeMs = 0;
 		this.UpdateSystemTimeMs = CTimer.UnusedNum;
-		this.SystemTimer = new CTimer(CTimer.TimerType.MultiMedia);
+		this.SystemTimer = new CTimer(CTimer.TimerType.GameTimeAtDraw);
 
 		this.IsBASSSoundFree = true;
 
@@ -79,19 +90,50 @@ public class CSoundDeviceBASS : ISoundDevice {
 
 		int freq = 44100;
 
-		if (!Bass.Init(-1, freq, DeviceInitFlags.Latency))
-			throw new Exception(string.Format("BASS の初期化に失敗しました。(BASS_Init)[{0}]", Bass.LastError.ToString()));
+		// Android: burst-aligned AAudio output at the device's native rate (see
+		// CSoundDeviceBASS.Android.cs) — the configs must be applied BEFORE Bass.Init.
+		if (OperatingSystem.IsAndroid())
+			freq = ConfigureAndroidLowLatency();
+		// Linux: PipeWire and PulseAudio run at 48 kHz, so asking for it saves them a resampling step
+		else if (OperatingSystem.IsLinux())
+			freq = 48000;
 
-		if (!Bass.Configure(Configuration.UpdatePeriod, updatePeriod)) {
-			Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdatePeriod)}) に失敗しました。[{Bass.LastError}]");
-		}
-		if (!Bass.Configure(Configuration.UpdateThreads, 1)) {
-			Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdateThreads)}) に失敗しました。[{Bass.LastError}]");
+		// Desktop: configured before Bass.Init, since the device buffer (Linux) only applies to devices
+		// opened afterwards; the other options are global and unchanged by the order
+		bool isMobile = OperatingSystem.IsIOS() || OperatingSystem.IsAndroid();
+		if (!isMobile) {
+			if (!Bass.Configure(Configuration.UpdatePeriod, updatePeriod)) {
+				Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdatePeriod)}) failed. [{Bass.LastError}]");
+			}
+			if (!Bass.Configure(Configuration.UpdateThreads, 1)) {
+				Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdateThreads)}) failed. [{Bass.LastError}]");
+			}
+
+			Bass.Configure(Configuration.PlaybackBufferLength, bufferSize);
+			if (OperatingSystem.IsLinux())
+				Bass.Configure(Configuration.DeviceBufferLength, bufferSize);
+			Bass.Configure(Configuration.LogarithmicVolumeCurve, true);
 		}
 
-		Bass.Configure(Configuration.PlaybackBufferLength, bufferSize);
-		Bass.Configure(Configuration.DeviceBufferLength, bufferSize);
-		Bass.Configure(Configuration.LogarithmicVolumeCurve, true);
+		if (!Bass.Init(device, freq, DeviceInitFlags.Latency)) {
+			// The tuned Android config can be rejected by some devices/HALs — fall back to safe
+			// defaults before giving up (audio at default latency beats no audio).
+			if (!(OperatingSystem.IsAndroid() && RetryAndroidDefaultInit(out freq)))
+				throw new Exception(string.Format("BASS の初期化に失敗しました。(BASS_Init)[{0}]", Bass.LastError.ToString()));
+			Trace.TraceWarning("BASS_Init failed with the tuned Android config; using defaults.");
+		}
+
+		// Mobile plays each sound straight through Bass.ChannelPlay: BassMix's manual
+		// StreamProc→device pump produces no audio on iOS or Android (verified — the mixer runs but
+		// emits pure silence and is pulled well below realtime). Desktop keeps the mixer pipeline.
+		if (isMobile) {
+			InitializeDirectPlayback();
+			return;
+		}
+
+		// macOS outputs at the device's own rate whatever was asked: the mixers run at it too
+		if (OperatingSystem.IsMacOS() && Bass.GetInfo(out var deviceInfo) && deviceInfo.SampleRate > 0)
+			freq = deviceInfo.SampleRate;
 
 		this.STREAMPROC = new StreamProcedure(StreamProc);
 		this.MainStreamHandle = Bass.CreateStream(freq, 2, BassFlags.Default, this.STREAMPROC, IntPtr.Zero);
@@ -153,6 +195,7 @@ public class CSoundDeviceBASS : ISoundDevice {
 			this.BufferSize = this.OutputDelay = info.Latency + bufferSize;//求め方があっているのだろうか…
 
 			Trace.TraceInformation("BASS デバイス出力開始:[{0}ms]", this.OutputDelay);
+			Trace.TraceInformation($"BASS device: mixer {freq} Hz, device rate {info.SampleRate} Hz, latency {info.Latency} ms, minimum buffer {info.MinBufferLength} ms, buffer setting {bufferSize} ms");
 		}
 
 		Bass.ChannelPlay(this.MainStreamHandle, false);
@@ -168,6 +211,16 @@ public class CSoundDeviceBASS : ISoundDevice {
 
 	public void tCreateSound(string strFilename, CSound sound) {
 		sound.CreateBassSound(strFilename, this.MixerHandle);
+	}
+
+	public CSound tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, ESoundGroup soundGroup) {
+		var sound = new CSound(soundGroup);
+		sound.CreateBassUserSound(frequency, channels, durationSeconds, this.MixerHandle, proc, ESoundDeviceType.Bass, SoundManager.bIsTimeStretch);
+		return sound;
+	}
+
+	public void tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, CSound sound) {
+		sound.CreateBassUserSound(frequency, channels, durationSeconds, this.MixerHandle, proc, ESoundDeviceType.Bass, SoundManager.bIsTimeStretch);
 	}
 	#endregion
 
@@ -193,7 +246,7 @@ public class CSoundDeviceBASS : ISoundDevice {
 
 		if (bManagedDispose) {
 			SystemTimer.Dispose();
-			this.SystemTimer = null;
+			this.SystemTimer = null!;
 		}
 	}
 	~CSoundDeviceBASS() {
@@ -229,7 +282,7 @@ public class CSoundDeviceBASS : ISoundDevice {
 	protected int MainStreamHandle = -1;
 	protected int MixerHandle = -1;
 	protected int Mixer_DeviceOut = -1;
-	protected StreamProcedure STREAMPROC = null;
+	protected StreamProcedure? STREAMPROC = null;
 	private bool IsBASSSoundFree = true;
 
 	//WASAPIとASIOはLinuxでは使えないので、ここだけで良し

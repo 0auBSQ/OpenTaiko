@@ -22,7 +22,7 @@
 			if (OpenTaiko.ConfigIni.bAutoPlay[_player] || (OpenTaiko.ConfigIni.bAIBattleMode && _player == 1)) return;
 
 			bool _val = this.Get(triggerName);
-			SaveFile _sf = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(_player)];
+			SaveFile _sf = OpenTaiko.SaveFileInstances[_player];
 			_sf.tSetGlobalTrigger(triggerName, _val);
 		}
 

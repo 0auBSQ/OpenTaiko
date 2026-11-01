@@ -1,6 +1,8 @@
 ﻿namespace FDK;
 
 public class Color4 {
+	public static readonly Color4 White = new Color4(1, 1, 1, 1);
+
 	public float Red;
 	public float Green;
 	public float Blue;

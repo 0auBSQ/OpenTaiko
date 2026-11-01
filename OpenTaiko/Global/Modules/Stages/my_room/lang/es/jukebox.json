@@ -1,0 +1,11 @@
+{
+  "_comment": "Spanish texts for the jukebox player (jukebox.lua); its dialog lines are in dialogs.json. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "title": "Jukebox",
+  "tab_bgm": "BGM",
+  "tab_songs": "Canciones",
+  "bgm_title": "BGM de Mi Habitación",
+  "nothing_playing": "No suena nada",
+  "waiting": "Ordenando los discos... la lista de canciones aún se está preparando.",
+  "no_songs": "No se encontraron canciones jugables.",
+  "speed": "Velocidad"
+}

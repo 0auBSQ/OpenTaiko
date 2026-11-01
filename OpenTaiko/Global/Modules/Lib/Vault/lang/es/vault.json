@@ -1,0 +1,23 @@
+{
+    "key_1": "Llave de la bóveda",
+    "key_2": "Llave de la bóveda (oro)",
+    "key_3": "Llave de la bóveda (OpTk)",
+    "chest_1": "Cofre de madera",
+    "chest_2": "Cofre dorado",
+    "chest_3": "Cofre de platino",
+    "new_furniture": "¡Mueble conseguido!",
+    "furniture_wooden_chest": "Cofre de madera",
+    "furniture_barrel": "Barril",
+    "furniture_coin_piles": "Montones de monedas",
+    "furniture_pirate_key": "Llave",
+    "furniture_pirate_swords": "Espadas piratas",
+    "furniture_gold_bag": "Bolsa de oro",
+    "furniture_skull": "Calavera decorativa",
+    "furniture_anchor": "Ancla",
+    "furniture_gold_key": "Llave dorada",
+    "furniture_cannon": "Cañón",
+    "furniture_caspian_mug": "La jarra de Mr.Caspian",
+    "furniture_chalice": "Cáliz",
+    "furniture_crystal": "Cristal",
+    "furniture_fishtank": "Pecera"
+}

@@ -90,8 +90,8 @@ internal class HttpEventReporter(string host, int port) {
         NotesManager.ENoteType noteType = NotesManager.GetNoteType(chip);
         Dictionary<int, int> mappingForPlayer =
             this._noteOrdinalMappingByPlayer.GetValueOrDefault(player, new());
-        int? noteOrdinalByChar = mappingForPlayer.ContainsKey(chip.n整数値_内部番号)
-            ? mappingForPlayer[chip.n整数値_内部番号]
+        int? noteOrdinalByChar = mappingForPlayer.ContainsKey(chip.nIntValue_InternalNumber)
+            ? mappingForPlayer[chip.nIntValue_InternalNumber]
             : null;
         if (!(NotesManager.IsHittableNote(chip) && !NotesManager.IsGenericRoll(chip))) { return; }
         this.Broadcast(new {
@@ -150,7 +150,7 @@ internal class HttpEventReporter(string host, int port) {
         foreach (CChip chip in tja.listNoteChip) {
             NotesManager.ENoteType noteType = NotesManager.GetNoteType(chip);
             numNotesSeenByType.TryGetValue(noteType, out int numNotes);
-            mappingForPlayer[chip.n整数値_内部番号] = numNotes;
+            mappingForPlayer[chip.nIntValue_InternalNumber] = numNotes;
             numNotesSeenByType[noteType] = numNotes + 1;
         }
         List<CChip> noteChips = tja.listNoteChip;

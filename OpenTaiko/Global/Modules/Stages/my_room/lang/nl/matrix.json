@@ -1,0 +1,39 @@
+{
+  "_comment": "Dutch texts for the Placeholder Matrix (matrix.lua). Keys are stable ids; a missing id shows the English text (lang/en).",
+  "hint": "Kies een scène om te projecteren.",
+  "unlock_title": "Vergrendelde scène",
+  "unlock_q": "„%s” ontgrendelen?",
+  "unlock_yes": "Ontgrendelen",
+  "unlock_no": "Terug",
+  "broke": "Niet genoeg munten.",
+  "scenes": {
+    "demo_overall": {
+      "name": "Totaaldemo",
+      "desc": "Vijf kleine demo's in één stage; de toetsen 1 tot 5 wisselen ertussen."
+    },
+    "demo_canvas": {
+      "name": "Canvasdemo",
+      "desc": "Een klein tekenprogramma: teken met de muis op een wit vel, met LuaCanvas en muisinvoer."
+    },
+    "demo_particles": {
+      "name": "Deeltjesdemo",
+      "desc": "Een stresstest van de deeltjesengine van Lua3DScene."
+    },
+    "demo_modal": {
+      "name": "Modaldemo",
+      "desc": "Speelt de beloning- en ontgrendelmodals van elke zeldzaamheid en elk type af."
+    },
+    "demo_aviutl2": {
+      "name": "AviUtl2-demo",
+      "desc": "AviUtl2-projecten (.aup2), afgespeeld in de videospeler."
+    },
+    "demo_rt": {
+      "name": "Raytracerdemo",
+      "desc": "De path-traced raytracermodus van Lua3DScene."
+    },
+    "demo_dan_builder": {
+      "name": "Dan Builder-demo",
+      "desc": "Een minimalistische willekeurige Dan-speler."
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+    "_note": "Intro Nokon curtain layout, in 1920x1080 pixels. COLOR colours are [r, g, b, a] from 0 to 255; SetColor colours are [r, g, b] from 0 to 1; the ink gradient colours are #RRGGBB text markup; opacities 0 to 1.",
+    "screen": { "width": 1920, "height": 1080 },
+    "curtain_half_width": 960,
+    "title": {
+        "_note": "the name, letter by letter: tracking_em between letters and space_em for a space, in font sizes; a line wider than max_width shrinks to it; y is the middle of the lines, line_gap between their centres; text_nudge moves the text inside its glyph box",
+        "font_size": 150,
+        "line_gap": 180,
+        "tracking_em": 0.06,
+        "space_em": 0.35,
+        "max_width": 1700,
+        "y": 520,
+        "text_nudge": -1,
+        "ink_top_color": "#FFF3A8",
+        "ink_bottom_color": "#F2A024",
+        "ink_color": [255, 255, 255, 255],
+        "edge_color": [138, 26, 16, 255],
+        "shadow_color": [30, 8, 4, 255],
+        "shadow_offset": { "x": 6, "y": 8 },
+        "shadow_opacity": 0.45
+    },
+    "lights": {
+        "_note": "texture_size is Spot.png's size; the two spots circle in on an orbit of orbit_x by orbit_y around the screen's centre; the merged spot the name stands in sits under the title",
+        "dim_color": [0, 0, 0],
+        "dim_opacity": 0.62,
+        "spot_texture_size": 256,
+        "spot_color": [1, 0.95, 0.78],
+        "spot_size": 380,
+        "spot_opacity": 0.85,
+        "orbit_x": 620,
+        "orbit_y": 330,
+        "merged_size": 900,
+        "merged_opacity": 0.75,
+        "flash_color": [1, 0.97, 0.88],
+        "flash_opacity": 0.45
+    },
+    "confetti": {
+        "_note": "count pieces, starting start_y to start_y - spread_y above the screen, at a scale of scale_min to scale_min + scale_extra; a flipping piece is never thinner than min_flip; a piece more than cull_margin off the screen is not drawn",
+        "count": 150,
+        "start_y": -20,
+        "spread_y": 700,
+        "scale_min": 0.8,
+        "scale_extra": 0.6,
+        "min_flip": 0.15,
+        "cull_margin": 30,
+        "colors": [
+            [0.95, 0.26, 0.26], [1.00, 0.78, 0.18], [0.26, 0.62, 0.95],
+            [0.30, 0.82, 0.42], [0.95, 0.45, 0.80], [1.00, 0.55, 0.15]
+        ]
+    }
+}

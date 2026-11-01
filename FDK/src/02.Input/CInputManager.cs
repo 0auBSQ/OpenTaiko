@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using Silk.NET.Input;
 using Silk.NET.Windowing;
 using Commons.Music.Midi;
@@ -11,31 +12,45 @@ public class CInputManager : IDisposable {
 	public static int DefaultVolume = 110;
 
 
-	// Properties
+	// value-like properties
 
 	public List<IInputDevice> InputDevices {
 		get;
 		private set;
-	}
-	public IInputDevice? Keyboard => this._Keyboard ??= this.InputDevices.FirstOrDefault(device => device.CurrentType == InputDeviceType.Keyboard);
-	public IInputDevice? Mouse => this._Mouse ??= this.InputDevices.FirstOrDefault(device => device.CurrentType == InputDeviceType.Mouse);
+	} = null!;
+	// Define a null device for platforms without a physical keyboard/mouse (such as iOS).
+	private static readonly IInputDevice _nullDevice = new CInputNull();
 	public float Deadzone = 0.5f;
 
 
 	// Constructor
-	public CInputManager(IWindow window, bool useBufferedInput, bool bUseMidiIn = true, float gamepad_deadzone = 0.5f) {
-		Initialize(window, useBufferedInput, bUseMidiIn, gamepad_deadzone);
+	public CInputManager(IWindow window, IInputContext context, bool useBufferedInput, bool bUseMidiIn = true, float gamepad_deadzone = 0.5f) {
+		Initialize(window, context, useBufferedInput, bUseMidiIn, gamepad_deadzone);
 	}
 
-	public void Initialize(IWindow window, bool useBufferedInput, bool bUseMidiIn, float controller_deadzone) {
-		Context = window.CreateInput();
+	/// <summary>
+	/// iOS constructor: no Silk.NET window/input context, just registers external input devices (touch).
+	/// </summary>
+	public CInputManager(IEnumerable<IInputDevice> externalDevices) {
+		this.InputDevices = new List<IInputDevice>(externalDevices);
+		Trace.TraceInformation("Found {0} Input Device{1}", InputDevices.Count, InputDevices.Count != 1 ? "s:" : ":");
+		for (int i = 0; i < InputDevices.Count; i++) {
+			try {
+				Trace.TraceInformation("Input Device #" + i + " (" + InputDevices[i].CurrentType.ToString() + " - " + InputDevices[i].Name + ")");
+			} catch { }
+		}
+	}
+
+	// the context is created and disposed by the window thread, which runs its device callbacks
+	public void Initialize(IWindow window, IInputContext context, bool useBufferedInput, bool bUseMidiIn, float controller_deadzone) {
+		Context = context;
 		Context.ConnectionChanged += this.ConnectionChanged;
 		Deadzone = controller_deadzone;
 
 		this.InputDevices = new List<IInputDevice>(10);
 		#region [ Enumerate keyboard/mouse: exception is masked if keyboard/mouse is not connected ]
-		CInputKeyboard cinputkeyboard = null;
-		CInputMouse cinputmouse = null;
+		CInputKeyboard? cinputkeyboard = null;
+		CInputMouse? cinputmouse = null;
 		try {
 			cinputkeyboard = new CInputKeyboard(Context.Keyboards[0]);
 			cinputmouse = new CInputMouse(Context.Mice[0]);
@@ -82,7 +97,11 @@ public class CInputManager : IDisposable {
 		Game.InitImGuiController(window, Context);
 	}
 
-	private void ConnectionChanged(Silk.NET.Input.IInputDevice device, bool connected) {
+	// Silk raises this on whichever thread pumps events; the device list only changes in Polling, on the update thread
+	private void ConnectionChanged(Silk.NET.Input.IInputDevice device, bool connected)
+		=> this.pendingConnectionChanges.Enqueue((device, connected));
+
+	private void ApplyConnectionChange(Silk.NET.Input.IInputDevice device, bool connected) {
 		if (connected) {
 			if (device is IKeyboard) {
 				if (Keyboard == null) {
@@ -131,12 +150,14 @@ public class CInputManager : IDisposable {
 	}
 
 
-	// メソッド
+	// methods / method-like properties
 
 	public IInputDevice? FindDevice(InputDeviceType type, int ID)
 		=> InputDevices.FirstOrDefault(device => (device.CurrentType == type) && (device.ID == ID));
 	public IInputDevice? FindDevice(InputDeviceType type, string GUID)
 		=> InputDevices.FirstOrDefault(device => (device.CurrentType == type) && device.GUID.Equals(GUID));
+	public IInputDevice Keyboard => this._Keyboard ??= this.InputDevices.FirstOrDefault(device => device.CurrentType == InputDeviceType.Keyboard) ?? _nullDevice;
+	public IInputDevice Mouse => this._Mouse ??= this.InputDevices.FirstOrDefault(device => device.CurrentType == InputDeviceType.Mouse) ?? _nullDevice;
 	public IInputDevice? Joystick(int ID) => FindDevice(InputDeviceType.Joystick, ID);
 	public IInputDevice? Joystick(string GUID) => FindDevice(InputDeviceType.Joystick, GUID);
 	public IInputDevice? Gamepad(int ID) => FindDevice(InputDeviceType.Gamepad, ID);
@@ -144,14 +165,18 @@ public class CInputManager : IDisposable {
 	public IInputDevice? MidiIn(int ID) => FindDevice(InputDeviceType.MidiIn, ID);
 	public IInputDevice? MidiIn(string GUID) => FindDevice(InputDeviceType.MidiIn, GUID);
 
-	public void Polling() {
+	public void Polling(bool accumulate = false) {
 		lock (this.lockInputDevices) {
+			if (!accumulate) {
+				while (this.pendingConnectionChanges.TryDequeue(out var change))
+					this.ApplyConnectionChange(change.device, change.connected);
+			}
 			//				foreach( IInputDevice device in this.list入力デバイス )
 			for (int i = this.InputDevices.Count - 1; i >= 0; i--)    // #24016 2011.1.6 yyagi: change not to use "foreach" to avoid InvalidOperation exception by Remove().
 			{
 				try {
 					IInputDevice device = this.InputDevices[i];
-					device.Polling();
+					device.Polling(accumulate);
 				} catch (Exception e)                                      // #24016 2011.1.6 yyagi: catch exception for unplugging USB joystick, and remove the device object from the polling items.
 				{
 					Trace.TraceWarning($"Error polling input device {i}.");
@@ -170,7 +195,7 @@ public class CInputManager : IDisposable {
 		this.Dispose(true);
 	}
 	public void Dispose(bool disposeManagedObjects) {
-		if (!this.bDisposed済み) {
+		if (!this.bDisposedDone) {
 			if (disposeManagedObjects) {
 				foreach (IInputDevice device in this.InputDevices) {
 					if (device is CInputMIDI tmidi)
@@ -180,10 +205,8 @@ public class CInputManager : IDisposable {
 				lock (this.lockInputDevices) {
 					this.InputDevices.Clear();
 				}
-
-				Context.Dispose();
 			}
-			this.bDisposed済み = true;
+			this.bDisposedDone = true;
 		}
 	}
 
@@ -226,11 +249,12 @@ public class CInputManager : IDisposable {
 
 	#region [ private ]
 	//-----------------
-	private IInputContext Context;
+	private IInputContext? Context;
 	private IInputDevice? _Keyboard;
 	private IInputDevice? _Mouse;
-	private bool bDisposed済み;
+	private bool bDisposedDone;
 	private object lockInputDevices = new object();
+	private readonly ConcurrentQueue<(Silk.NET.Input.IInputDevice device, bool connected)> pendingConnectionChanges = new();
 	//private CTimer timer;
 
 	//-----------------

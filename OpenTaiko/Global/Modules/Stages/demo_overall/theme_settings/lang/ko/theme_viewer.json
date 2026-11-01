@@ -1,0 +1,10 @@
+{
+  "_comment": "Korean texts for the theme settings viewer. Keys are stable ids; a missing id shows the English text (lang/en).",
+  "title": "테마 설정 뷰어",
+  "col_id": "ID",
+  "col_scope": "범위",
+  "col_type": "유형",
+  "col_value": "값",
+  "hint_scroll": "위/아래로 스크롤   취소로 종료",
+  "hint_exit": "취소로 종료"
+}

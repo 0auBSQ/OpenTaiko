@@ -1,0 +1,7 @@
+{
+  "expect": {
+    "rolls": 1,
+    "bigRolls": 1,
+    "rollEnds": 2
+  }
+}

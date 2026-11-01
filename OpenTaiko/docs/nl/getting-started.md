@@ -1,0 +1,181 @@
+<!-- getting-started.md -->
+
+# Hoe modules werken
+
+Met OpenTaiko 0.7.0 kan een skin schermen toevoegen en vervangen met Lua. De map Modules van een skin bevat één map per module, en elke module heeft een Script.lua die een vaste set globale callbackfuncties definieert. Het spel laadt elke Script.lua in een eigen gesandboxte Lua-state, registreert de engine-globals (TEXTURE, SOUND, INPUT, CONFIG en de andere die in de [API-referentie](api/README.md) zijn gedocumenteerd) en roept de callbacks op het juiste moment aan. [Modules en levenscyclus](api/activities.md) somt de exacte signaturen op.
+
+## Voordat je begint
+
+- OpenTaiko 0.7.0 en een skinmap met een map Modules. De meegeleverde skin is System/Open-World Memories.
+- Een teksteditor en basiskennis van Lua (functies, tabellen, require).
+- De meegeleverde stages onder System/Open-World Memories/Modules/Stages en Global/Modules/Stages. De kleine demo's in Global/Modules/Stages/demo_overall tonen de vorm van de callbacks; de grotere stages laten zien hoe echte schermen zijn opgebouwd.
+
+## Waar modules staan
+
+Elke soort module heeft een eigen map onder Modules, en elke module is één map waarvan de naam het id van de module is:
+
+```
+Modules/
+  Stages/        <name>/Script.lua   volledige schermen
+  Activities/    <name>/Script.lua   subschermen aangestuurd door een stage
+  ROActivities/  <name>/Script.lua   alleen-lezen subschermen en overlays
+  Transitions/   <name>/Script.lua   fades tussen stages (als eerste geladen)
+  Lib/           gedeelde .lua-bestanden bereikbaar via require; niet als modules gescand
+```
+
+Het instapbestand is altijd Script.lua. De assetpaden die je aan TEXTURE, SOUND, VIDEO en de andere loaders doorgeeft, zijn relatief ten opzichte van de modulemap; de meegeleverde modules bewaren ze bij conventie in de submappen Textures, Sounds, Videos en Databases, en zetten vertalingen in een map lang.
+
+Twee soorten scripts staan elders:
+
+- Achtergronden (schermachtergronden, gameplaylagen, mobs, clear-animaties, de kusudama) zijn Script.lua-bestanden onder de map Graphics van de skin, in de map van het scherm dat ze aankleden. Zie de sectie Achtergronden van [Modules en levenscyclus](api/activities.md).
+- Personages zijn mappen onder Global/Characters. Een personagemap kan een eigen Script.lua bevatten; zonder die gebruikt het spel zijn ingebouwde personagescript. Zie [Personages toevoegen](guides/characters.md).
+
+## Script.lua definieert globale functies
+
+De Script.lua van een module definieert globale functies op het hoogste niveau met vaste namen, en het spel leest elke functie als een global. Het spel vindt een functie die je in een lokale tabel stopt en teruggeeft nooit, en roept een verkeerd gespelde naam (OnStart in plaats van onStart) nooit aan, omdat het een niet-gedefinieerde callback als no-op behandelt en niets meldt. Al het andere in het bestand kan lokaal zijn, en je kunt de module over meerdere bestanden verdelen die je met require laadt.
+
+Dit is de minimale vorm om te kopiëren:
+
+```lua
+-- Modules/Stages/mystage/Script.lua
+local text = nil
+local textTex = nil
+
+function onStart()          -- eenmalig wanneer de skin laadt: laad hier assets
+    text = TEXT:Create(16)
+end
+
+function activate()         -- elke keer dat de stage wordt betreden
+    textTex = text:GetText("Hello")
+end
+
+function update(timestamp)  -- elk frame: invoer en statuswijzigingen
+    if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
+        return Exit("title", nil)
+    end
+end
+
+function draw()             -- elk frame: alleen tekenen
+    if textTex ~= nil then textTex:Draw(200, 200) end
+end
+
+function deactivate()       -- wanneer de stage wordt verlaten: stop geluiden, sluit databases
+end
+
+function onDestroy()        -- voordat de skin wordt ontladen: geef vrij wat je hebt aangemaakt
+    if textTex ~= nil then textTex:Dispose() end
+end
+```
+
+## De levenscyclus van een stage
+
+- onStart(): het spel roept het eenmalig aan nadat de skin is geladen, en opnieuw na elke herlaadbeurt van de skin, of de stage nu op het scherm staat of niet. Laad hier texturen, geluiden en video's. Het draait als een coroutine, dus een lange laadbeurt kan zich met de LOADING-helper over meerdere frames achter de laadbalk uitspreiden.
+- activate(): het spel roept het aan bij elke binnenkomst in de stage. Reset hier de status per bezoek, start muziek en open databases. Het draait eveneens als een coroutine en kan LOADING gebruiken. Het spel vernieuwt de personage- en puchichara-lijsten (CHARACTERLIST, PUCHICHARALIST) vlak voordat activate draait, en opnieuw vóór afterSongEnum, dus lees ze in een van beide; onStart draait vóór de eerste vernieuwing.
+- update(timestamp): het spel roept het elk frame aan vóór draw en geeft de spelklok in milliseconden door. Verwerk hier invoer en wijzig de status. Zodra de stage Exit heeft aangeroepen, stopt het spel met update aanroepen en blijft het draw aanroepen tijdens de fade-out.
+- draw(): het spel roept het elk frame aan. Alleen tekenen, en houd allocaties per frame laag.
+- deactivate(): het spel roept het aan bij het verlaten van de stage. De databasedemo van demo_overall geeft hier zijn databases vrij; de eerste demo stopt zijn muziek en video.
+- afterSongEnum(): het spel roept het aan telkens wanneer de nummerenumeratie is afgerond, bij het opstarten en na een zachte of harde herlaadbeurt, ook wanneer de stage niet actief is. Gebruik het wanneer de module van de nummerlijst afhangt.
+- onDestroy(): het spel roept het aan voordat het de skin ontlaadt. De eerste demo van demo_overall geeft hier zijn textuur, video, teksttextuur en geluiden vrij.
+- reloadLanguage(lang): het spel roept het aan wanneer de taal verandert (zie de sectie over lokalisatie hieronder).
+
+Wanneer een skin laadt, maakt het spel de modules soort per soort aan: eerst Transitions, dan Stages, Activities en ROActivities. Binnen een soort draait het elke Script.lua voordat het een onStart aanroept. Activities en ROActivities bestaan dus nog niet terwijl de onStart van een stage draait; zoek ze op in activate.
+
+De andere soorten gebruiken varianten van deze set. Activities en ROActivities hebben dezelfde callbacks, maar de hostende stage roept activate, deactivate, draw en update aan en ontvangt hun retourwaarden. Achtergronden ontvangen een state-object in activate(state), update(timestamp, state) en draw(state) en kunnen event-hooks zoals clearIn, playEndAnime en kusuBroke definiëren. Transities definiëren fadeOut(t), loading(progress, elapsed) en fadeIn(t). Personages definiëren een eigen set animatie- en stemfuncties. [Modules en levenscyclus](api/activities.md) somt ze allemaal op.
+
+## Een soort module kiezen
+
+- Stage (Modules/Stages): een volledig scherm waarnaar het spel overschakelt. Hij bezit het frame, verwerkt invoer en vertrekt door Exit aan te roepen. Gebruik het voor alles wat een scherm op zichzelf is.
+- Activity (Modules/Activities): een subscherm dat een stage van binnenuit gebruikt, zoals een dialoogvenster. Het is een singleton die je opzoekt met ACTIVITY:GetActivity(name); de hostende stage roept zijn Activate, Update, Draw en Deactivate aan. Gebruik het voor gedeelde onderdelen die spelstatus mogen schrijven.
+- ROActivity (Modules/ROActivities): de alleen-lezen vorm van een Activity, die je opzoekt met ROACTIVITY:GetROActivity(name). Hij krijgt een alleen-lezen CONFIG, DATABASE en GetSaveFile en heeft geen ACTIVITY-global. Gebruik het voor onderdelen die alleen status lezen, wat het merendeel van herbruikbare UI dekt. De engine host meerdere eigen overlays als ROActivities met vaste namen (nameplate, modal, modicons, danplate, popup_menu, config_ui, song_enum, cutscene); een skin vervangt er een door een map met die naam mee te leveren en de callbacks die de engine aanroept te behouden.
+- Achtergrond: een Script.lua onder Graphics die achter of boven op een van de engine-schermen tekent. Achtergronden krijgen dezelfde alleen-lezen globals als ROActivities.
+- Transitie (Modules/Transitions): de fade-out, het laden en de fade-in die het spel tussen stages afspeelt. Een stage kiest er een op naam in het derde argument van Exit; het spel valt terug op de transitie met de naam default wanneer de stage er geen noemt of de naam niet bestaat, en speelt de transitie met de naam song_loading af om de gameplay te betreden.
+- Personage: zie [Personages toevoegen](guides/characters.md).
+
+## Een stage verlaten met Exit
+
+Alleen stages hebben de Exit-global. Hij neemt maximaal drie argumenten en accepteert nil op elke positie: het doel ("title", "play", "stage" of "legacy"; nil betekent "title"), de naam van de bestemmingsstage wanneer het doel "stage" is (of een legacy-sleutel wanneer het "legacy" is), en de naam van een transitiemodule. De meegeleverde stages schrijven `return Exit(...)` binnen update, zodat er verder niets meer in dat frame draait.
+
+```lua
+-- binnen de update() van een stage
+if INPUT:KeyboardPressed("S") == true then
+    sounds.Skip:Play()
+    return Exit("stage", "mystage") -- spring naar Modules/Stages/mystage
+end
+-- ...
+return Exit("title", nil)           -- terug naar het titelscherm
+```
+
+## De sandbox
+
+Elke Script.lua draait in een beperkte Lua-state:
+
+- os behoudt alleen time, date en difftime. De sandbox verwijdert io, debug, loadfile en dofile, en import doet niets.
+- package krimpt tot een aangepaste loader: package.path en package.cpath zijn leeg en de sandbox vervangt de standaard searchers, zodat alleen de onderstaande paden doorzoekbaar zijn.
+- require kijkt eerst in de eigen map van de module, daarna in de map Modules/Lib van de skin, daarna in Global/Modules/Lib in de spelmap, en laadt het eerste bestand dat het vindt. Een module in Global/Modules kijkt in Global/Modules/Lib vóór de Modules/Lib van de skin. Een modulebestand en een Lib-bestand met dezelfde naam leiden naar het modulebestand. Punten in de naam worden padscheidingstekens, dus require("DBControllers.dbScores") en require("DBControllers/dbScores") laden beide DBControllers/dbScores.lua. Het opzoeken negeert hoofdletters, en niet-ASCII-paden werken.
+- Een Lib-bestand draait in de Lua-state van de module die het met require heeft geladen, dus de requires erin volgen de volgorde van die module. Het spel levert in Global/Modules/Lib een bibliotheek van Lib-bestanden mee onder namen met een naamruimte, zoals require("Core.Easing") en require("UI.Pick"); [Meegeleverde modules](modules/README.md) beschrijft ze.
+
+```lua
+-- uit intro_nokon/Script.lua
+local DBScores  = require("DBControllers/dbScores")  -- de eigen submap van de module
+local I18N      = require("i18n")                     -- Modules/Lib/i18n.lua
+local Opening   = require("opening")                  -- de modulemap
+local Dialogue  = require("nokon_dialogue")           -- de modulemap
+```
+
+## Alleen-lezen modules
+
+Het spel maakt ROActivities en achtergronden met beperkte globals aan voordat hun Script.lua draait. Een schrijfactie via deze globals logt een foutmelding, doet niets en werpt geen Lua-fout op:
+
+- CONFIG is een alleen-lezen weergave: de setters doen niets.
+- GetSaveFile(player) geeft een alleen-lezen opslagbestand terug.
+- DATABASE opent alleen-lezen stores.
+- THEME:SetThemeSetting en THEME:SetThemeSettingForPlayer geven false terug.
+- STORAGE:WriteText en STORAGE:WriteLobbyCode geven false terug.
+- SQL:OpenSQLDatabase(path) opent de database alleen-lezen: lezen werkt, een statement dat schrijft mislukt, logt de SQLite-fout en geeft een leeg resultaat terug, en een ontbrekend databasebestand wordt niet aangemaakt.
+- De VIRTUALSLOTS-setters en VIRTUALSLOTS:MountSlot doen niets; de getters werken nog steeds.
+- DANBUILDER:Mount() geeft false terug; de builder kan nog steeds gevuld worden.
+- Mount en MountIfNotLocked van een nummerknoop en Select van een chart geven false terug, waar de knoop ook vandaan komt.
+- ACTIVITY is nil (gebruik ROACTIVITY).
+
+Een module die instellingen, opslagdata of een database moet wijzigen, of een nummer moet kiezen om te spelen, moet een Activity of een Stage zijn.
+
+## Lokalisatie met lang/
+
+Een module vertaalt zijn eigen strings met de meegeleverde module [Locale.i18n](modules/locale.md) in plaats van met de map Locales van de skin, zodat de vertalingen met de module meereizen. Zijn teksten staan in lang/<code>/<name>.json naast Script.lua, één bestand per onderdeel, met stabiele id's als sleutels; lang/en bevat het Engels, dat de terugval is voor elke andere taal.
+
+De belangrijkste functies van de bibliotheek:
+
+- texts(name) geeft de teksten van lang/<code>/<name>.json in de eigen map van de module terug. Een Lib-bestand geeft zijn eigen map mee als tweede argument (zie [Meegeleverde modules](modules/README.md)).
+- detect() leest de huidige speltaal via de global LANG, en elke opzoeking gebruikt die vanaf dan. Tot je het aanroept, gebruiken de opzoekingen Engels.
+- texts:tr(id) geeft de tekst van id terug, of het id zelf als geen enkele taal het heeft; texts:trf(id, ...) gebruikt die tekst als string.format-patroon.
+
+Roep detect() aan in activate en bouw daarna je tekst op met texts:tr en texts:trf. activate draait bij elke binnenkomst in de module, dus een taal die de speler in de instellingen heeft gewijzigd wordt bij het volgende bezoek van kracht, en de module heeft geen andere hook nodig. Elk taalbestand neemt de sleutels van het Engelse bestand over, en een vertaling moet placeholders zoals %s letterlijk behouden.
+
+```
+Modules/Stages/mystage/lang/en/quiz.json   { "speaker": "Nokon", "start": "Alright, quiz time!" }
+Modules/Stages/mystage/lang/ja/quiz.json   { "speaker": "ノコン", "start": "さあ、クイズの時間である！" }
+```
+
+```lua
+-- Modules/Stages/mystage/Script.lua
+local I18N = require("Locale.i18n")
+local T = I18N.texts("quiz")
+local title
+
+function activate()
+    I18N.detect()
+    title = T:tr("start")
+end
+```
+
+Enkele oudere stages van de meegeleverde skin, zoals intro_nokon, gebruiken in plaats daarvan de eerste vorm van de bibliotheek: een lang/ja.lua die een tabel teruggeeft die elke Engelse string aan zijn vertaling koppelt, gelezen met I18N.tr(s). [Locale.i18n](modules/locale.md) documenteert beide.
+
+Het spel roept bij een taalwijziging ook een globale reloadLanguage(lang) aan op elke geladen module. Alleen een module die op het scherm blijft terwijl de taal verandert heeft die nodig, zoals een scherm met een taalkeuze; roep daar detect() opnieuw aan en bouw de vooraf gerenderde tekst opnieuw op.
+
+## Waar je op moet letten
+
+- Het spel geeft de texturen, geluiden, video's en tekstobjecten die een module heeft aangemaakt vrij wanneer het de module vrijgeeft, zodat een herlaadbeurt van de skin ze niet lekt. Geef resources die je per bezoek opent, zoals databases, vrij in deactivate, zoals de databasedemo van demo_overall doet, en geef in onDestroy vrij wat je hebt aangemaakt, zoals de eerste demo daarvan doet.
+- GetText cachet één textuur per afzonderlijke string op zijn tekstobject. Een string die elk frame verandert, voegt elk frame een textuur toe en het spel wordt geleidelijk trager. Teken veranderende waarden met de glyph-renderer (TEXT:CreateGlyphCached), of bewaar één textuur tot de waarde verandert.
+- LOADING werkt alleen in callbacks die als coroutine draaien: onStart van elke module, en activate van een stage. LOADING:Tick aanroepen vanuit de activate van een Activity, of vanuit update of draw, werpt een Lua-fout op.
+- Als een callback een Lua-fout geeft, toont het spel de eerste fout van die functie één keer en blijft het de module aanroepen. Een stage met een fout gaat terug naar het titelscherm (behalve _boot en _title), de instellingen sluiten als config_ui een fout had, en het resultatenscherm slaat de beloningskaarten over als modal een fout had.
+- onStart en afterSongEnum draaien terwijl de module niet op het scherm staat. Schrijf ze zo dat ze werken zonder dat de stage zichtbaar is.

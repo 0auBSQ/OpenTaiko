@@ -1,0 +1,278 @@
+---@diagnostic disable: undefined-global  -- CONFIG/TEXTURE injected by CLuaScript at runtime
+
+-- modicons ROActivity
+-- Draws the 8 active mod icons for a given player.
+-- Images live in Textures/Mods/ so custom skins can override them.
+--
+-- Usage from any script that has ROACTIVITY:
+--   local modicons = ROACTIVITY:GetROActivity("modicons")
+--   modicons:Draw(x, y, player)            -- uses "menu" layout (single row)
+--   modicons:Draw(x, y, player, "game")    -- uses "game" layout (2×4 grid)
+
+-- slot offsets, the value font and its colour: Config/layout.json
+local Config = require("Core.Config")
+local Layout = Config.load("Config/layout.json")
+
+local _isActive = false
+
+-- Loaded in onStart(), disposed in onDestroy()
+local tx = {}
+local valueFont       -- glyph font for the scroll/song-speed value numbers
+local colWhite        -- white text colour
+
+-- ─── Layouts ─────────────────────────────────────────────────────────────────
+-- Each table has 8 entries (one per slot, Lua-1-based):
+--   Slot 1: HS   2: Stealth   3: Random   4: Fun
+--   Slot 5: Just  6: Timing   7: SongSpeed  8: Auto / special mod
+--
+-- "menu" : single horizontal row
+local OFFSET_X_MENU = Layout.menu.offset_x
+local OFFSET_Y_MENU = Layout.menu.offset_y
+
+-- "game" : 4+4 grid (top row = slots 1-4, bottom row = slots 5-8)
+local OFFSET_X_GAME = Layout.game.offset_x
+local OFFSET_Y_GAME = Layout.game.offset_y
+
+-- ─── Speed values ────────────────────────────────────────────────────────────
+-- Scroll speed: nScrollSpeed 9 = x1 (multiplier = (value+1)/10). Any other value shows a single HS icon plus
+-- the numeric value (1 decimal). Song speed: 20 = x1 (multiplier = value/20), value shown with 2 decimals.
+-- Icons are ~37px, so keep the value font small.
+local SCROLL_SPEED_NORMAL = CONFIG.SCROLLSPEED.Normal
+local SONG_SPEED_NORMAL = CONFIG.SONGSPEED.Normal
+local VALUE_FONT_SIZE = Layout.value.font_size
+
+-- Icon of each CONFIG:GetSpecialMod value shown in the Auto slot (Auto itself follows CONFIG:GetAutoStatus)
+local SPECIAL_ICONS = { [2] = "Flawless", [3] = "Timed", [4] = "TimedHard" }
+
+-- ─── Helpers ─────────────────────────────────────────────────────────────────
+
+local function drawIcon(icon, x, y, alpha)
+    if icon == nil then return end
+    if alpha ~= nil then icon:SetOpacity(alpha / 255) end
+    icon:Draw(x, y)
+    if alpha ~= nil then icon:SetOpacity(1) end
+end
+
+-- x1 (nScrollSpeed 9) shows nothing; any other value shows the single HS icon (the value is drawn as text).
+local function getHsIconForSpeed(speed)
+    if speed == SCROLL_SPEED_NORMAL then return tx["None"] end
+    return tx["HS"]
+end
+
+-- Value labels (nil when x1 → no text). Scroll = 1 decimal ((v+1)/10), Song = 2 decimals (v/20).
+-- (explicit if, not `cond and nil or x` — that Lua idiom breaks when the true-value is nil)
+local function scrollValueText(speed)
+    if speed == SCROLL_SPEED_NORMAL then return nil end
+    return string.format("%.1f", CONFIG.SCROLLSPEED:ToActual(speed))
+end
+local function songValueText(song)
+    if song == SONG_SPEED_NORMAL then return nil end
+    return string.format("%.2f", CONFIG.SONGSPEED:ToActual(song))
+end
+
+-- Draw a small value number at the bottom-centre of an already-drawn icon. The glyph box carries ~25px of
+-- padding (bigger than these ~37px icons), so a "bottom" anchor overshoots upward; instead we CENTRE the text
+-- half a font-height above the icon's bottom edge, which sits the number on the bottom for any icon size.
+-- maxWidth caps it to the icon width (+ glyph padding) so long values squish to fit rather than overflow.
+local function drawValue(str, icon, x, y, alpha)
+    if str == nil or icon == nil or valueFont == nil then return end
+    valueFont:Draw(str, x + icon.Width / 2, y + icon.Height - VALUE_FONT_SIZE / 2, colWhite, nil,
+        (alpha or 255) / 255, 1, icon.Width + 50, "center")
+end
+
+-- ─── Lifecycle ───────────────────────────────────────────────────────────────
+
+function activate()   _isActive = true  end
+function deactivate() _isActive = false end
+
+-- x, y   : top-left anchor for slot 1
+-- player : 0-based player index
+-- layout : "menu" (default, single row) | "game" (2×4 grid)
+-- alpha  : opacity 0-255 (default 255)
+function draw(x, y, player, layout, alpha)
+    if not _isActive then return end
+
+    local ox = (layout == "game") and OFFSET_X_GAME or OFFSET_X_MENU
+    local oy = (layout == "game") and OFFSET_Y_GAME or OFFSET_Y_MENU
+
+    -- Slot 1: Scroll speed (single HS icon + numeric value when not x1)
+    local scroll = CONFIG:GetScrollSpeed(player)
+    local hsIcon = getHsIconForSpeed(scroll)
+    drawIcon(hsIcon, x + ox[1], y + oy[1], alpha)
+    drawValue(scrollValueText(scroll), hsIcon, x + ox[1], y + oy[1], alpha)
+
+    -- Slot 2: Doron / Stealth / Hidden / Flashlight
+    local stealth = CONFIG:GetStealthMod(player)
+    local STEALTH = CONFIG.STEALTH
+    for _, v in ipairs{ { STEALTH.Doron, "Doron" }, { STEALTH.Stealth, "Stealth" },
+        { STEALTH.Hidden or -1, "Hidden" }, { STEALTH.Flashlight or -1, "Flashlight" }, { stealth, "None" } } do
+        local mod, key = table.unpack(v)
+        if stealth == mod then drawIcon(tx[key], x + ox[2], y + oy[2], alpha); break end
+    end
+
+    -- Slot 3: Random / Mirror / Super / Hyper
+    local random = CONFIG:GetRandomMod(player)
+    local RANDOM = CONFIG.RANDOM
+    for _, v in ipairs{ { RANDOM.Random, "Random" }, { RANDOM.Mirror, "Mirror" },
+        { RANDOM.SuperRandom, "Super" }, { RANDOM.MirrorRandom, "Hyper" }, { random, "None" },
+        } do
+        local mod, key = table.unpack(v)
+        if random == mod then drawIcon(tx[key], x + ox[3], y + oy[3], alpha); break end
+    end
+
+    -- Slot 4: Fun Mod
+    local fun = CONFIG:GetFunMod(player)
+    if fun > 0 then drawIcon(tx["Fun_" .. fun], x + ox[4], y + oy[4], alpha)
+    else            drawIcon(tx["None"],        x + ox[4], y + oy[4], alpha)
+    end
+
+    -- Slot 5: Just / Safe
+    local just = CONFIG:GetJusticeMod(player)
+    local JUST = CONFIG.JUSTICE
+    for _, v in ipairs{ { JUST.Just, "Just" }, { JUST.Safe, "Safe" }, { just, "None" } } do
+        local mod, key = table.unpack(v)
+        if just == mod then drawIcon(tx[key], x + ox[5], y + oy[5], alpha); break end
+    end
+
+    -- Slot 6: Timing zone  (2 = Normal → no icon)
+    local timing = CONFIG:GetTimingZone(player)
+    local TIMING = CONFIG.TIMINGZONE
+    if timing - 2 ~= TIMING.Normal then
+         drawIcon(tx["Timing_" .. timing], x + ox[6], y + oy[6], alpha)
+    else drawIcon(tx["None"],              x + ox[6], y + oy[6], alpha)
+    end
+
+    -- Slot 7: Song speed  (20 = 1.0× → no icon; numeric value shown when not x1)
+    local songSpeed = CONFIG.SongSpeed
+    local ssIcon = (songSpeed > SONG_SPEED_NORMAL) and tx["SongSpeed_1"]
+        or (songSpeed < SONG_SPEED_NORMAL) and tx["SongSpeed_0"]
+        or tx["None"]
+    drawIcon(ssIcon, x + ox[7], y + oy[7], alpha)
+    drawValue(songValueText(songSpeed), ssIcon, x + ox[7], y + oy[7], alpha)
+
+    -- Slot 8: the special mod, else Auto (auto-play or a replay). The AI battle's AI plays under none of its own.
+    local special = SPECIAL_ICONS[CONFIG:GetSpecialMod(player)]
+    if CONFIG.IsAIBattleMode and player == 1 then special = nil end
+    if special ~= nil then                   drawIcon(tx[special], x + ox[8], y + oy[8], alpha)
+    elseif CONFIG:GetAutoStatus(player) then drawIcon(tx["Auto"],  x + ox[8], y + oy[8], alpha)
+    else                                     drawIcon(tx["None"],  x + ox[8], y + oy[8], alpha)
+    end
+end
+
+-- Draw the mod icons for an arbitrary recorded play (e.g. a replay) instead of a live player's CONFIG.
+-- mods   : the replay's ModFlags bitfield (see CSongReplay.EModFlag)
+-- scroll : scroll-speed value (9 = x1), song : song-speed value (20 = x1), timing : timing zone (2 = Normal)
+-- The last slot shows the play's special mod when it has one; Auto is never recorded, so it stays empty otherwise.
+function drawFlags(x, y, mods, scroll, song, timing, layout, alpha)
+    if not _isActive then return end
+    mods = mods or 0
+    local ox = (layout == "game") and OFFSET_X_GAME or OFFSET_X_MENU
+    local oy = (layout == "game") and OFFSET_Y_GAME or OFFSET_Y_MENU
+
+    local function has(flags) return mods & flags == flags end
+    local MOD = REPLAY.MODFLAG
+
+    -- Slot 1: Scroll speed (single HS icon + numeric value when not x1)
+    local sc = scroll or SCROLL_SPEED_NORMAL
+    local hsIcon = getHsIconForSpeed(sc)
+    drawIcon(hsIcon, x + ox[1], y + oy[1], alpha)
+    drawValue(scrollValueText(sc), hsIcon, x + ox[1], y + oy[1], alpha)
+
+    -- Slot 2: Doron / Stealth / Hidden / Flashlight
+    for _, v in ipairs{ { MOD.Invisible, "Doron" }, { MOD.PerfectMemory, "Stealth" },
+        { MOD.Hidden or -1, "Hidden" }, { MOD.Flashlight or -1, "Flashlight" }, { 0, "None" } } do
+        local bit, name = table.unpack(v)
+        if has(bit) then drawIcon(tx[name], x + ox[2], y + oy[2], alpha); break end
+    end
+
+    -- Slot 3: Random / Mirror / Super / Hyper (Mirror+Random)
+    for _, v in ipairs{
+        { MOD.Mirror | MOD.Random, "Hyper" }, { MOD.SuperRandom, "Super" },
+        { MOD.Random, "Random" }, { MOD.Mirror, "Mirror" }, { 0, "None" },
+        } do
+        local bit, name = table.unpack(v)
+        if has(bit) then drawIcon(tx[name], x + ox[3], y + oy[3], alpha); break end
+    end
+
+    -- Slot 4: Fun Mod
+    for _, v in ipairs{
+        { MOD.Avalanche, "Fun_1" }, { MOD.Minesweeper, "Fun_2" },
+        { MOD.DynamicBeat, "Fun_3" }, { 0, "None" },
+        } do
+        local bit, name = table.unpack(v)
+        if has(bit) then drawIcon(tx[name], x + ox[4], y + oy[4], alpha); break end
+    end
+
+    -- Slot 5: Just / Safe
+    for _, v in ipairs{ { MOD.Just, "Just" }, { MOD.Safe, "Safe" }, { 0, "None" } } do
+        local bit, name = table.unpack(v)
+        if has(bit) then drawIcon(tx[name], x + ox[5], y + oy[5], alpha); break end
+    end
+
+    -- Slot 6: Timing zone (2 = Normal → no icon)
+    local TIMING = CONFIG.TIMINGZONE
+    if timing ~= nil and timing - 2 ~= TIMING.Normal then
+         drawIcon(tx["Timing_" .. timing], x + ox[6], y + oy[6], alpha)
+    else drawIcon(tx["None"],              x + ox[6], y + oy[6], alpha)
+    end
+
+    -- Slot 7: Song speed (20 = 1.0× → no icon; numeric value shown when not x1)
+    local sp = song or SONG_SPEED_NORMAL
+    local ssIcon = (sp > SONG_SPEED_NORMAL) and tx["SongSpeed_1"]
+        or (sp < SONG_SPEED_NORMAL) and tx["SongSpeed_0"]
+        or tx["None"]
+    drawIcon(ssIcon, x + ox[7], y + oy[7], alpha)
+    drawValue(songValueText(sp), ssIcon, x + ox[7], y + oy[7], alpha)
+
+    -- Slot 8: Flawless / Timed / Timed (Hard)
+    for _, v in ipairs{ { MOD.Flawless or -1, "Flawless" }, { MOD.TimedHard or -1, "TimedHard" }, { MOD.Timed or -1, "Timed" } } do
+        local bit, name = table.unpack(v)
+        if has(bit) then drawIcon(tx[name], x + ox[8], y + oy[8], alpha); break end
+    end
+end
+
+function update(...) end
+
+function onStart()
+    tx["None"]    = TEXTURE:CreateTexture("Textures/Mods/None.png")
+    tx["Auto"]    = TEXTURE:CreateTexture("Textures/Mods/Auto.png")
+    tx["Flawless"]  = TEXTURE:CreateTexture("Textures/Mods/Flawless.png")
+    tx["Timed"]     = TEXTURE:CreateTexture("Textures/Mods/Timed.png")
+    tx["TimedHard"] = TEXTURE:CreateTexture("Textures/Mods/TimedHard.png")
+    tx["Doron"]   = TEXTURE:CreateTexture("Textures/Mods/Doron.png")
+    tx["Stealth"] = TEXTURE:CreateTexture("Textures/Mods/Stealth.png")
+    tx["Hidden"]  = TEXTURE:CreateTexture("Textures/Mods/Hidden.png")
+    tx["Flashlight"] = TEXTURE:CreateTexture("Textures/Mods/Flashlight.png")
+    tx["Just"]    = TEXTURE:CreateTexture("Textures/Mods/Just.png")
+    tx["Safe"]    = TEXTURE:CreateTexture("Textures/Mods/Safe.png")
+    tx["Mirror"]  = TEXTURE:CreateTexture("Textures/Mods/Mirror.png")
+    tx["Random"]  = TEXTURE:CreateTexture("Textures/Mods/Random.png")
+    tx["Super"]   = TEXTURE:CreateTexture("Textures/Mods/Super.png")
+    tx["Hyper"]   = TEXTURE:CreateTexture("Textures/Mods/Hyper.png")
+    tx["SongSpeed_0"] = TEXTURE:CreateTexture("Textures/Mods/SongSpeed/0.png")
+    tx["SongSpeed_1"] = TEXTURE:CreateTexture("Textures/Mods/SongSpeed/1.png")
+
+    -- Single HS icon for any non-x1 scroll speed (the exact value is drawn as text over it)
+    tx["HS"] = TEXTURE:CreateTexture("Textures/Mods/HS.png")
+
+    valueFont = TEXT:CreateGlyphCached(VALUE_FONT_SIZE)
+    colWhite  = Config.color(Layout.value.color)
+
+    -- Fun: 1=Avalanche, 2=Minesweeper, 3=DynamicBeat
+    for i = 1, 3 do
+        tx["Fun_" .. i] = TEXTURE:CreateTexture("Textures/Mods/Fun/" .. i .. ".png")
+    end
+
+    -- Timing: 0=Loose … 4=Rigorous  (2=Normal is hidden, but loaded for completeness)
+    for i = 0, 4 do
+        tx["Timing_" .. i] = TEXTURE:CreateTexture("Textures/Mods/Timing/" .. i .. ".png")
+    end
+end
+
+function onDestroy()
+    for _, t in pairs(tx) do
+        if t ~= nil then t:Dispose() end
+    end
+    tx = {}
+    if valueFont ~= nil then valueFont:Dispose(); valueFont = nil end
+end

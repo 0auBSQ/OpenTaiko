@@ -1,0 +1,170 @@
+﻿using FDK;
+
+namespace OpenTaiko;
+
+internal class CActPlayComboSound : CActivity {
+	// コンストラクタ
+
+	public CActPlayComboSound() {
+		base.IsDeActivated = true;
+	}
+
+	// メソッド
+	public void tPlay(int nCombo, int player) {
+		tPlayReached(ListCombo[player], ref VoiceIndex[player], nCombo);
+	}
+
+	public void tPlayFloorSound() {
+		tPlayReached(ListFloor[0], ref FloorIndex![0], OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor);
+	}
+
+	// plays the voices numbered value and steps past every number already reached, so a duplicate number or a skipped
+	// value does not hold back the later voices
+	private static void tPlayReached(List<CComboVoice> voices, ref int index, int value) {
+		for (; index < voices.Count && voices[index].nCombo <= value; index++) {
+			if (voices[index].nCombo == value)
+				voices[index].soundComboVoice!.PlayStart();
+		}
+	}
+
+	// back to the first floor voice: a retry climbs from the first floor again
+	public void tResetFloor() {
+		if (FloorIndex != null) Array.Fill(FloorIndex, 0);
+	}
+
+	/// <summary>
+	/// カーソルを戻す。
+	/// コンボが切れた時に使う。
+	/// </summary>
+	public void tReset(int nPlayer) {
+		VoiceIndex[nPlayer] = 0;
+	}
+
+	// CActivity 実装
+
+	public override void Activate() {
+		for (int i = 0; i < 5; i++) {
+			ListCombo[i] = new List<CComboVoice>();
+			ListFloor[i] = new List<CComboVoice>();
+		}
+		VoiceIndex = new int[] { 0, 0, 0, 0, 0 };
+		FloorIndex = new int[] { 0, 0, 0, 0, 0 };
+
+
+
+
+		// フォルダ内を走査してコンボボイスをListに入れていく
+		// 1P、2P コンボボイス
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			#region [Combo voices]
+
+			string charaPath = CCharacter.GetCharacter(i).info._path;
+
+			var currentDir = OpenTaiko.ResolveAssetPath(Path.Combine(charaPath, "Sounds", "Combo") + Path.DirectorySeparatorChar);
+			if (Directory.Exists(currentDir)) {
+				foreach (var item in Directory.GetFiles(currentDir)) {
+					if (!int.TryParse(Path.GetFileNameWithoutExtension(item), out int threshold)) continue;
+					// a file that cannot be decoded is skipped
+					var sound = OpenTaiko.SoundManager.tCreateSound(item, ESoundGroup.Voice);
+					if (sound == null) continue;
+					var comboVoice = new CComboVoice();
+					comboVoice.bFileFound = true;
+					comboVoice.nPlayer = i;
+					comboVoice.strFilePath = item;
+					comboVoice.soundComboVoice = sound;
+					comboVoice.soundComboVoice.SoundPosition = OpenTaiko.ConfigIni.nPanning[OpenTaiko.ConfigIni.nPlayerCount - 1][i];
+					comboVoice.nCombo = threshold;
+					ListCombo[i].Add(comboVoice);
+				}
+				if (ListCombo[i].Count > 0) {
+					ListCombo[i].Sort();
+				}
+			}
+
+			#endregion
+
+			#region [Floor voices]
+
+			var floorDir = OpenTaiko.ResolveAssetPath(Path.Combine(charaPath, "Sounds", "Tower_Combo") + Path.DirectorySeparatorChar);
+			if (Directory.Exists(floorDir)) {
+				foreach (var item in Directory.GetFiles(floorDir)) {
+					if (!int.TryParse(Path.GetFileNameWithoutExtension(item), out int threshold)) continue;
+					var sound = OpenTaiko.SoundManager.tCreateSound(item, ESoundGroup.Voice);
+					if (sound == null) continue;
+					var comboVoice = new CComboVoice();
+					comboVoice.bFileFound = true;
+					comboVoice.nPlayer = i;
+					comboVoice.strFilePath = item;
+					comboVoice.soundComboVoice = sound;
+					comboVoice.nCombo = threshold;
+					ListFloor[i].Add(comboVoice);
+				}
+				if (ListFloor[i].Count > 0) {
+					ListFloor[i].Sort();
+				}
+			}
+
+			#endregion
+
+		}
+
+		base.Activate();
+	}
+
+	public override void DeActivate() {
+		if (!base.IsDeActivated) {
+			for (int i = 0; i < 5; i++) {
+				foreach (var item in ListCombo[i]) {
+					OpenTaiko.SoundManager.tDisposeSound(item.soundComboVoice!);
+				}
+				ListCombo[i].Clear();
+
+				foreach (var item in ListFloor[i]) {
+					OpenTaiko.SoundManager.tDisposeSound(item.soundComboVoice!);
+				}
+				ListFloor[i].Clear();
+			}
+
+			base.DeActivate();
+		}
+	}
+	public override void CreateManagedResource() {
+		base.CreateManagedResource();
+	}
+	public override void ReleaseManagedResource() {
+		base.ReleaseManagedResource();
+	}
+
+	#region [ private ]
+	//-----------------
+	int[] VoiceIndex = null!;
+	int[]? FloorIndex;
+
+	readonly List<CComboVoice>[] ListCombo = new List<CComboVoice>[5];
+	readonly List<CComboVoice>[] ListFloor = new List<CComboVoice>[5];
+	//-----------------
+	#endregion
+}
+
+public class CComboVoice : IComparable<CComboVoice> {
+	public bool bFileFound;
+	public int nCombo;
+	public int nPlayer;
+	public string strFilePath;
+	public CSound? soundComboVoice;
+
+	public CComboVoice() {
+		bFileFound = false;
+		nCombo = 0;
+		nPlayer = 0;
+		strFilePath = "";
+		soundComboVoice = null;
+	}
+
+	public int CompareTo(CComboVoice? other) {
+		if (this.nCombo > other!.nCombo) return 1;
+		else if (this.nCombo < other.nCombo) return -1;
+
+		return 0;
+	}
+}

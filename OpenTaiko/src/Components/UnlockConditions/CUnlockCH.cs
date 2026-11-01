@@ -1,6 +1,7 @@
-﻿namespace OpenTaiko {
-	internal class CUnlockCH : CUnlockCondition {
+using static OpenTaiko.CUnlockCondition;
 
+namespace OpenTaiko {
+	internal class CUnlockCH : CUnlockCondition {
 
 		public CUnlockCH(CUnlockConditionFactory.UnlockConditionJsonRaw rawJson) : base(rawJson) {
 			this.RequiredArgCount = 1;
@@ -9,20 +10,16 @@
 		}
 
 		public override (bool, string?) tConditionMet(int player, EScreen screen = EScreen.MyRoom) {
+			// Coin songs are only unlocked by an explicit purchase — never by the
+			// automatic post-play unlock sweep.
+			if (screen == EScreen.Internal) return (false, "");
+
 			if (this.Values.Length == this.RequiredArgCount) {
 				int _medals = (int)OpenTaiko.SaveFileInstances[player].data.Medals;
 
-				if (screen == EScreen.MyRoom) {
-					// Coins are strictly more or equal
-					this.Type = "me";
-					bool fulfiled = this.tValueRequirementMet(_medals, this.Values[0]);
-					return (fulfiled, CLangManager.LangInstance.GetString(fulfiled ? "UNLOCK_COIN_BOUGHT" : "UNLOCK_COIN_MORE"));
-				} else if (screen == EScreen.Internal) {
-					return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
-				} else {
-					return (false, null);
-				}
-
+				this.Type = "me";
+				bool fulfiled = this.tValueRequirementMet(_medals, this.Values[0]);
+				return (fulfiled, CLangManager.LangInstance.GetString(fulfiled ? "UNLOCK_COIN_BOUGHT" : "UNLOCK_COIN_MORE"));
 			} else
 				return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.ConditionId, this.RequiredArgCount.ToString()));
 		}
@@ -31,13 +28,7 @@
 			if (this.Values.Length < this.RequiredArgCount)
 				return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.ConditionId, this.RequiredArgCount);
 
-			// Only the player loaded as 1P can check unlockables in real time
-			var SaveData = OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].data;
-			var ChartStats = SaveData.bestPlaysStats;
-
-			if (screen == EScreen.MyRoom)
-				return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_COST", this.Values[0]);
-			return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
+			return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_COST", this.Values[0]);
 		}
 
 		protected override int tGetCountChartsPassingCondition(int player) {

@@ -22,7 +22,7 @@ public class CFPS {
 	public CFPS() {
 		this.NowFPS = 0;
 		this.DeltaTime = 0;
-		this.FPSTimer = new CTimer(CTimer.TimerType.MultiMedia);
+		this.FPSTimer = new CTimer(CTimer.TimerType.GameTimeAtDraw);
 		this.BeginTime = this.FPSTimer.NowTimeMs;
 		this.CoreFPS = 0;
 		this.ChangedFPS = false;

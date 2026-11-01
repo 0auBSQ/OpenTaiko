@@ -8,8 +8,8 @@ internal class CSystemError : CStage {
 	public bool GameCrashed = false;
 	public string ErrorMessage = "";
 
-	private CCachedFontRenderer _pfText = null;
-	private TitleTextureKey _ttkText = null;
+	private CCachedFontRenderer? _pfText = null;
+	private TitleTextureKey? _ttkText = null;
 
 	public enum Errno {
 		ENO_UNKNOWN = 0,
@@ -19,14 +19,16 @@ internal class CSystemError : CStage {
 		ENO_INPUTINITFAILED = 4,
 		ENO_SONGLISTINITFAILED = 5,
 		ENO_INVALIDSTAGENAME = 6,
-		ENO_BOOTNOTFOUND = 7
+		ENO_BOOTNOTFOUND = 7,
+		ENO_TITLENOTFOUND = 8,
+		ENO_GLOBALCORESTAGE = 9
 	};
 
 	public void LoadError(Errno errno, Exception? exception = null, string? message = null) {
 		GameCrashed = true;
 
 		// Head with the error code
-		ErrorMessage = "\n\nError Code " + ((int)errno).ToString("0000") + "\n\n";
+		ErrorMessage = $"\n\nError Code {((int)errno).ToString("0000")} ({errno.ToString()})\n\n";
 		ErrorMessage += "An error has occured.\n\n";
 
 		switch (errno) {
@@ -79,17 +81,30 @@ internal class CSystemError : CStage {
 				}
 			case Errno.ENO_INVALIDSTAGENAME: {
 					ErrorMessage += "The requested stage name was not found.\n";
-					ErrorMessage += "Please ensure that your skin is compatible with your current OpenTaiko version.";
+					ErrorMessage += "Please ensure that your skin is compatible with your current OpenTaiko version.\n";
 					ErrorMessage += "If you are currently making a Lua module, please ensure that the requested Lua Stage name exists.";
 					break;
 				}
 			case Errno.ENO_BOOTNOTFOUND: {
 					ErrorMessage += "The boot stage was not found in the selected skin.\n";
-					ErrorMessage += "Please ensure that your skin is compatible with your current OpenTaiko version.";
+					ErrorMessage += "Please ensure that your skin is compatible with your current OpenTaiko version.\n";
 					ErrorMessage += "If you are currently making a skin, please ensure that stage is present in your Modules/Stages/_boot folder.";
 					break;
 				}
-
+			case Errno.ENO_TITLENOTFOUND: {
+					ErrorMessage += "The title stage was not found in the selected skin.\n";
+					ErrorMessage += "Please ensure that your skin is compatible with your current OpenTaiko version.\n";
+					ErrorMessage += "If you are currently making a skin, please ensure that stage is present in your Modules/Stages/_title folder.";
+					break;
+				}
+			case Errno.ENO_GLOBALCORESTAGE: {
+					ErrorMessage += "A _boot or _title stage was found in the Global/Modules/Stages folder.\n";
+					if (!string.IsNullOrEmpty(message))
+						ErrorMessage += "Folder: " + message + "\n";
+					ErrorMessage += "These two stages belong to each skin and cannot be shared between skins.\n";
+					ErrorMessage += "Please move that folder into your skin's Modules/Stages folder, or remove it.";
+					break;
+				}
 		};
 
 		// Append a call to contact if necessary
@@ -110,7 +125,7 @@ internal class CSystemError : CStage {
 	// CStage Implementation
 
 	public override void Activate() {
-		// Allocate the resource exceptionally on Activate as CreateManagedResource is conditionned to PreloadAssets
+		// Allocate the resource exceptionally on Activate as CreateManagedResource is conditioned to PreloadAssets
 		this._pfText = HPrivateFastFont.tInstantiateFont("", 20); // Force fallback font
 		base.Activate();
 	}
@@ -126,9 +141,9 @@ internal class CSystemError : CStage {
 	public override int Draw() {
 		if (!base.IsDeActivated) {
 			if (this._pfText != null) {
-				this._ttkText = new TitleTextureKey(ErrorMessage, this._pfText, Color.White, Color.Black, 1280);
+				this._ttkText = new TitleTextureKey(ErrorMessage, this._pfText, Color.White, Color.Black, 1920);
 				CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(this._ttkText);
-				tmpTex.t2D描画(0, 0);
+				tmpTex.t2DDraw(0, 0);
 			}
 		}
 		return 0;

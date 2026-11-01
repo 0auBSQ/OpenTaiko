@@ -31,11 +31,25 @@ public static class ConfigManager {
 		using (var stream = new System.IO.StreamReader(filePath, Encoding.UTF8)) {
 			json = stream.ReadToEnd();
 		}
-		return JsonConvert.DeserializeObject<T>(json, Settings);
+		return JsonConvert.DeserializeObject<T>(json, Settings)!;
 	}
 
 	public static T? JsonParse<T>(string json) where T : new() {
 		return JsonConvert.DeserializeObject<T>(json, Settings);
+	}
+
+	/// <summary>
+	/// Reads a file with <paramref name="read"/>, or returns <paramref name="fallback"/> when the file is missing or
+	/// broken (the error goes to the log), so one bad file does not stop everything loaded after it.
+	/// </summary>
+	public static T ReadOr<T>(string filePath, Func<string, T?> read, T fallback) {
+		if (!File.Exists(filePath)) return fallback;
+		try {
+			return read(filePath) ?? fallback;
+		} catch (Exception e) {
+			System.Diagnostics.Trace.TraceWarning($"Could not read {filePath}, using defaults: {e.Message}");
+			return fallback;
+		}
 	}
 
 	/// <summary>
@@ -44,7 +58,7 @@ public static class ConfigManager {
 	/// <param name="obj">Object to serialize.</param>
 	/// <param name="filePath">File name.</param>
 	public static void SaveConfig(object obj, string filePath) {
-		(new FileInfo(filePath)).Directory.Create();
+		(new FileInfo(filePath)).Directory!.Create();
 		using (var stream = new System.IO.StreamWriter(filePath, false, Encoding.UTF8)) {
 			stream.Write(JsonConvert.SerializeObject(obj, Formatting.None, Settings));
 		}

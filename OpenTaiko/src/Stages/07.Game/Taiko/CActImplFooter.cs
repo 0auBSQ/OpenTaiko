@@ -12,7 +12,7 @@ internal class CActImplFooter : CActivity {
 
 	public override void Activate() {
 		var footerDir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.FOOTER}");
-		var preset = HScenePreset.GetBGPreset();
+		var preset = OpenTaiko.stageGameScreen.ScenePreset;
 
 		if (preset == null) return;
 
@@ -26,7 +26,7 @@ internal class CActImplFooter : CActivity {
 					? _presetPath
 					: (upDirs.Length > 0 ? upDirs[random.Next(0, upDirs.Length)] : "");
 
-				Mob_Footer = OpenTaiko.tテクスチャの生成(path);
+				Mob_Footer = OpenTaiko.tTextureCreate(path);
 			}
 		}
 
@@ -48,13 +48,13 @@ internal class CActImplFooter : CActivity {
 	}
 
 	public override int Draw() {
-		this.Mob_Footer?.t2D描画(0, OpenTaiko.Skin.Resolution[1] - this.Mob_Footer.szTextureSize.Height);
+		this.Mob_Footer?.t2DDraw(0, OpenTaiko.Skin.Resolution[1] - this.Mob_Footer.szTextureSize.Height);
 		return base.Draw();
 	}
 
 	#region[ private ]
 	//-----------------
-	public CTexture Mob_Footer;
+	public CTexture? Mob_Footer;
 	//-----------------
 	#endregion
 }

@@ -19,10 +19,12 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 * THE SOFTWARE.
 */
+using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
-using FDK;
 using ImGuiNET;
 using Silk.NET.Core;
 using Silk.NET.GLFW;
@@ -31,6 +33,7 @@ using Silk.NET.Maths;
 using Silk.NET.OpenGLES;
 using Silk.NET.OpenGLES.Extensions.ImGui;
 using Silk.NET.Windowing;
+using Silk.NET.Windowing.Sdl;
 using SkiaSharp;
 
 namespace FDK;
@@ -38,11 +41,15 @@ namespace FDK;
 /// <summary>
 /// Presents an easy to use wrapper for making games and samples.
 /// </summary>
-public abstract class Game : IDisposable {
-	public static GL Gl { get; private set; }
-	public static Silk.NET.Core.Contexts.IGLContext Context { get; private set; }
+public abstract partial class Game : IDisposable {
+	public static GL Gl { get; private set; } = null!;
+	public static Silk.NET.Core.Contexts.IGLContext Context { get; private set; } = null!;
+
+	/// <summary>True when the GL context is GLES 3.1+, i.e. compute shaders (the GPU renderer path)
+	/// are usable. False on the GLES 2.0 fallback, where the CPU renderers are used instead.</summary>
+	public static bool ComputeShadersAvailable { get; private set; }
 	
-	private static string[] parameters;
+	private static string[] parameters = null!;
 	private static string GetParameterValue(string parameter = "", string parameter_full = "") {
 		if (parameters.Length == 0) return "";
 		int index = parameters.Contains(parameter) || parameters.Contains(parameter_full)
@@ -51,23 +58,25 @@ public abstract class Game : IDisposable {
 		return index > -1 && parameters.Length > index ? parameters[index + 1] : "";
 	}
 
-	public static ImGuiController ImGuiController { get; private set; }
+	public static ImGuiController? ImGuiController { get; private set; }
 	public static ImGuiIOPtr ImGuiIO { get; private set; }
-	private static CTexture ImGuiFontAtlas;
+	private static CTexture? ImGuiFontAtlas;
 
 	public static void InitImGuiController(IView window, IInputContext context) {
 		if (ImGuiController != null) return;
 
-		ImGuiController = new ImGuiController(Gl, window, context);
+		// the controller reads key states on the game thread: it gets a keyboard of its own (see ImGuiInputContext)
+		ImGuiController = new ImGuiController(Gl, window, new ImGuiInputContext(context));
+		BridgeImGuiChars(context);
 		ImGuiIO = ImGui.GetIO();
 		ImGui.StyleColorsDark();
 #if DEBUG
 		try {
 			ImGuiIO.Fonts.Clear();
 			unsafe {
-				Stream data = Assembly.GetExecutingAssembly().GetManifestResourceStream(@"FDK.mplus-1p-medium.ttf");
+				Stream data = Assembly.GetExecutingAssembly().GetManifestResourceStream(@"FDK.mplus-1p-medium.ttf")!;
 				byte[] stream_data = new byte[data.Length];
-				data.Read(stream_data);
+				data.ReadExactly(stream_data);
 				fixed (byte* stream = stream_data) {
 					ImFontConfigPtr config = new ImFontConfigPtr(ImGuiNative.ImFontConfig_ImFontConfig());
 					ImGuiIO.Fonts.AddFontFromMemoryTTF((IntPtr)stream, 64, 16.0f, config, ImGuiIO.Fonts.GetGlyphRangesDefault());
@@ -87,18 +96,65 @@ public abstract class Game : IDisposable {
 					ImGuiIO.Fonts.SetTexID((nint)ImGuiFontAtlas.Pointer);
 				}
 			}
-		} catch (Exception ex) {
+		} catch (Exception) {
 			ImGuiIO.Fonts.Clear();
 			ImGuiIO.Fonts.AddFontDefault();
 		}
 #endif
 	}
 
-	public static List<Action> AsyncActions { get; private set; } = new();
+	// Silk's ImGui controller collects typed characters in a list that its keyboard handler fills. The handler runs on the
+	// window thread while the controller reads the list on the game thread, so the characters are queued instead and
+	// handed to the controller before each of its updates.
+	private static readonly ConcurrentQueue<char> _imguiChars = new();
+	private static Action<char>? _imguiPressChar;
 
-	public SemaphoreSlim thInputLock = new(1, 1);
-	public Thread thInput { get; private set; }
-	private CancellationTokenSource thInputCancel;
+	private static void BridgeImGuiChars(IInputContext context) {
+		const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
+		var onKeyChar = typeof(ImGuiController).GetMethod("OnKeyChar", flags);
+		var pressChar = typeof(ImGuiController).GetMethod("PressChar", flags);
+		if (onKeyChar == null || pressChar == null || context.Keyboards.Count == 0) {
+			Trace.TraceWarning("ImGui text input could not be moved to the game thread.");
+			return;
+		}
+		IKeyboard keyboard = context.Keyboards[0];
+		keyboard.KeyChar -= onKeyChar.CreateDelegate<Action<IKeyboard, char>>(ImGuiController);
+		keyboard.KeyChar += (_, c) => _imguiChars.Enqueue(c);
+		_imguiPressChar = pressChar.CreateDelegate<Action<char>>(ImGuiController);
+	}
+
+	private static void DrainImGuiChars() {
+		if (_imguiPressChar == null)
+			return;
+		while (_imguiChars.TryDequeue(out char c))
+			_imguiPressChar(c);
+	}
+
+	public static ConcurrentQueue<Action> AsyncActions { get; private set; } = new ConcurrentQueue<Action>();
+
+	// Per-frame time budget for draining AsyncActions (the single render-thread "finalize" queue: deferred GL
+	// texture uploads + sound/shared creation). Small in normal gameplay so runtime async loads trickle in
+	// without hurting fps; CLoadSession raises it behind a loading screen, where nothing else needs the frame.
+	public const double DefaultAsyncBudgetMs = 3.0;
+	public static double AsyncBudgetMs = DefaultAsyncBudgetMs;
+
+	// Desktop threads: the main thread keeps the window, waits for its events and stamps input as it arrives; the game
+	// thread owns the GL context and runs Update and Draw. Window calls made on the game thread are queued for the
+	// window thread (RunOnWindowThread).
+	private static readonly ConcurrentQueue<Action> _windowCommands = new();
+	private static int _windowThreadId;
+	private static volatile bool _gameThreadStarted;
+	private static bool _usingGlfw;
+	private Thread? _gameThread;
+	private volatile bool _quitRequested;
+	private volatile bool _gameThreadDone;
+	private ExceptionDispatchInfo? _gameThreadException;
+	private CultureInfo? _gameCulture, _gameUICulture;
+	private readonly object _resizeLock = new();
+	private Vector2D<int>? _pendingResize;
+
+	/// <summary>The window's input context, created on the window thread before the game thread starts.</summary>
+	protected IInputContext? WindowInput { get; private set; }
 
 	private string strIconFileName;
 
@@ -110,14 +166,14 @@ public abstract class Game : IDisposable {
 		set {
 			_Text = value;
 			if (Window_ != null) {
-				Window_.Title = value;
+				RunOnWindowThread(() => Window_.Title = value);
 			}
 		}
 	}
 
 	public static AnglePlatformType GraphicsDeviceType_ = AnglePlatformType.OpenGL;
 
-	public IWindow Window_;
+	public IWindow? Window_;
 
 	private Vector2D<int> _WindowSize;
 	public Vector2D<int> WindowSize {
@@ -127,7 +183,7 @@ public abstract class Game : IDisposable {
 		set {
 			_WindowSize = value;
 			if (Window_ != null) {
-				Window_.Size = value;
+				RunOnWindowThread(() => Window_.Size = value);
 			}
 		}
 	}
@@ -140,7 +196,7 @@ public abstract class Game : IDisposable {
 		set {
 			_WindowPosition = value;
 			if (Window_ != null) {
-				Window_.Position = value;
+				RunOnWindowThread(() => Window_.Position = value);
 			}
 		}
 	}
@@ -159,16 +215,72 @@ public abstract class Game : IDisposable {
 		}
 	}
 
-	private bool _FullScreen;
-	public bool FullScreen {
-		get {
-			return _FullScreen;
-		}
+	private int _windowMode;   // 0 = Windowed, 1 = Fullscreen (exclusive), 2 = Borderless Fullscreen
+	public int WindowMode {
+		get { return _windowMode; }
 		set {
-			_FullScreen = value;
-			if (Window_ != null) {
-				Window_.WindowState = value ? WindowState.Fullscreen : WindowState.Normal;
-			}
+			_windowMode = value;
+			ApplyWindowMode();
+		}
+	}
+	// Compat for callers that only distinguish fullscreen vs windowed: both Fullscreen (1) and Borderless (2)
+	// count as "fullscreen".
+	public bool FullScreen {
+		get { return _windowMode != 0; }
+		set { WindowMode = value ? 1 : 0; }
+	}
+
+	/// <summary>Apply the current <see cref="WindowMode"/> to the live window (no-op before the window exists; the
+	/// initial WindowOptions also seed it at creation). Borderless = an undecorated window filling the monitor.</summary>
+	private void ApplyWindowMode() {
+		// Skip entirely for a deliberately-hidden window (offline video export, --mode=record): the
+		// WindowState/WindowBorder/Size/Position setters below force a hidden GLFW window to show itself,
+		// which would pop the export window open. Export only reads the backbuffer, so it needs no mode.
+		if (Window_ == null || StartHidden) return;
+		RunOnWindowThread(this.ApplyWindowModeOnWindowThread);
+	}
+
+	private void ApplyWindowModeOnWindowThread() {
+		switch (_windowMode) {
+			case 1:   // exclusive fullscreen
+				Window_!.WindowBorder = WindowBorder.Resizable;
+				if (!_usingGlfw) this.SetSdlFullscreen(true);
+				Window_.WindowState = WindowState.Fullscreen;
+				break;
+			case 2:   // borderless fullscreen
+				if (!_usingGlfw) this.SetSdlFullscreen(false);
+				Window_!.WindowState = WindowState.Normal;
+				Window_.WindowBorder = WindowBorder.Hidden;
+				var mon = Window_.Monitor;
+				if (mon != null) {
+					Window_.Position = mon.Bounds.Origin;
+					Window_.Size = mon.Bounds.Size;
+				}
+				break;
+			default:  // windowed
+				if (!_usingGlfw) this.SetSdlFullscreen(false);
+				Window_!.WindowState = WindowState.Normal;
+				Window_.WindowBorder = WindowBorder.Resizable;
+				// Restore the configured windowed size/position — borderless (and exclusive fullscreen) resized the
+				// window to the monitor, so without this the window stays monitor-sized and looks still-borderless.
+				Window_.Size = WindowSize;
+				Window_.Position = WindowPosition;
+				break;
+		}
+	}
+
+	// SDL's fullscreen takes the display mode nearest the window size, so the screen would switch to the windowed
+	// resolution: it is given the desktop's mode, as GLFW's takes. Restoring an SDL window does not leave fullscreen.
+	private unsafe void SetSdlFullscreen(bool fullscreen) {
+		if (Window_!.Native?.Sdl is not nint handle || handle == 0) return;
+		var sdl = Silk.NET.SDL.SdlProvider.SDL.Value;
+		var window = (Silk.NET.SDL.Window*)handle;
+		if (fullscreen) {
+			Silk.NET.SDL.DisplayMode mode;
+			if (sdl.GetDesktopDisplayMode(sdl.GetWindowDisplayIndex(window), &mode) == 0)
+				sdl.SetWindowDisplayMode(window, &mode);
+		} else {
+			sdl.SetWindowFullscreen(window, 0);
 		}
 	}
 
@@ -186,10 +298,25 @@ public abstract class Game : IDisposable {
 		}
 	}
 
+	// the thread that owns the GL context: the game thread on desktop
 	public static int MainThreadID { get; private set; }
 
-	private Vector2D<int> ViewPortSize = new Vector2D<int>();
-	private Vector2D<int> ViewPortOffset = new Vector2D<int>();
+	// ── virtual clock (offline video export) ────────────────────────────────────────────────────
+	// When enabled, TimeMs/dbTimeMs come from VirtualClockMs instead of the window's wall clock.
+	// Everything timed off Game.TimeMs (CTimer.GameTimeAtDraw, CSoundTimer in OS-timer mode, video
+	// decoders) then advances exactly as fast as the exporter steps this value — one fixed step
+	// per rendered frame — so render duration no longer affects game time at all.
+	public static bool VirtualClockEnabled = false;
+	public static double VirtualClockMs = 0;
+	/// <summary>Create the window invisible (offline export); set before Run().</summary>
+	public bool StartHidden = false;
+
+	// Public so input mapping can convert window-pixel mouse coords into game-surface
+	// coords (the rendered surface is aspect-fit inside the window, leaving letterbox
+	// borders described by these two values).
+	public static Vector2D<int> ViewPortSize = new Vector2D<int>();
+	public static Vector2D<int> ViewPortOffset = new Vector2D<int>();
+	public static Vector2D<int> WindowBorderSize = new Vector2D<int>();
 
 	public unsafe SKBitmap GetScreenShot() {
 		int ViewportWidth = ViewPortSize.X;
@@ -249,6 +376,9 @@ public abstract class Game : IDisposable {
 
 	public static double dbTimeMs;
 	public static long TimeMs;
+	public static Func<double>? dbGetTimeMsReal;
+	public static double dbTimeMsReal => dbGetTimeMsReal?.Invoke() ?? dbTimeMs;
+	public static long TimeMsReal => (long)dbTimeMsReal;
 
 	public static Matrix4X4<float> Camera;
 
@@ -280,10 +410,74 @@ public abstract class Game : IDisposable {
 		//GetError();
 	}
 
-	private RawImage GetIconData(string fileName) {
-		SKCodec codec = SKCodec.Create(fileName);
-		using SKBitmap bitmap = SKBitmap.Decode(codec, new SKImageInfo(codec.Info.Width, codec.Info.Height, SKColorType.Rgba8888));
-		return new RawImage(bitmap.Width, bitmap.Height, bitmap.GetPixelSpan().ToArray());
+	[DllImport("user32.dll")] private static extern nint SendMessage(nint h, uint msg, nuint w, nint l);
+	[DllImport("user32.dll")] private static extern nint SetClassLongPtr(nint h, int idx, nint val);
+
+	// glfwSetWindowIcon sets ICON_SMALL (title bar) and ICON_BIG, but never ICON_SMALL2.
+	// Windows 10/11 taskbar reads ICON_SMALL2 for the button icon — sync it here.
+	private static void SyncTaskbarIcon(nint hwnd) {
+		nint hIcon = SendMessage(hwnd, 0x007F /* WM_GETICON */, 1 /* ICON_BIG */, 0);
+		if (hIcon == 0) return;
+		SendMessage(hwnd, 0x0080 /* WM_SETICON */, 2 /* ICON_SMALL2 */, hIcon);
+		SetClassLongPtr(hwnd, -14 /* GCLP_HICON */, hIcon);
+	}
+
+	// Every picture of the icon file, one per size, so the window takes the one made for the size it
+	// shows (title bar, task bar) and no other gets shrunk into it.
+	private RawImage[] GetIconData(string fileName) {
+		var icons = new List<RawImage>();
+		try {
+			string path = Path.IsPathRooted(fileName) ? fileName : Path.Combine(AppContext.BaseDirectory, fileName);
+			byte[] file = File.ReadAllBytes(path);
+			if (file.Length > 6 && file[0] == 0 && file[1] == 0 && file[2] == 1 && file[3] == 0) {
+				int count = BitConverter.ToUInt16(file, 4);
+				for (int i = 0; i < count; i++) {
+					int entry = 6 + i * 16;
+					if (entry + 16 > file.Length) break;
+					int size = BitConverter.ToInt32(file, entry + 8), offset = BitConverter.ToInt32(file, entry + 12);
+					if (size <= 0 || offset < 0 || (long)offset + size > file.Length) continue;
+					if (AddIconBitmap(icons, file, offset, size)) continue;
+					using var one = SKBitmap.Decode(new ReadOnlySpan<byte>(file, offset, size));
+					AddIcon(icons, one);
+				}
+			}
+			if (icons.Count == 0) {
+				using var whole = SKBitmap.Decode(file);
+				AddIcon(icons, whole);
+			}
+		} catch (Exception ex) {
+			Trace.TraceWarning($"[GetIconData] {ex.Message}");
+		}
+		// largest first: a windowing backend that takes one picture only takes the first
+		icons.Sort((x, y) => y.Width.CompareTo(x.Width));
+		return icons.ToArray();
+	}
+
+	// an entry stored the classic way: a 32-bit bitmap with no file header, bottom row first, blue first
+	private static bool AddIconBitmap(List<RawImage> icons, byte[] file, int offset, int size) {
+		if (size < 40 || BitConverter.ToInt32(file, offset) != 40) return false;
+		int w = BitConverter.ToInt32(file, offset + 4), h = BitConverter.ToInt32(file, offset + 8) / 2;
+		if (BitConverter.ToInt16(file, offset + 14) != 32 || BitConverter.ToInt32(file, offset + 16) != 0) return false;
+		if (w <= 0 || h <= 0 || w > 1024 || h > 1024 || 40L + (long)w * h * 4 > size) return false;
+		var rgba = new byte[w * h * 4];
+		for (int y = 0; y < h; y++) {
+			int from = offset + 40 + (h - 1 - y) * w * 4, to = y * w * 4;
+			for (int x = 0; x < w; x++, from += 4, to += 4) {
+				rgba[to] = file[from + 2]; rgba[to + 1] = file[from + 1]; rgba[to + 2] = file[from]; rgba[to + 3] = file[from + 3];
+			}
+		}
+		icons.Add(new RawImage(w, h, rgba));
+		return true;
+	}
+
+	// the window wants colours that are not multiplied by their opacity
+	private static void AddIcon(List<RawImage> icons, SKBitmap? src) {
+		if (src == null || src.Width <= 0 || src.Height <= 0) return;
+		var info = new SKImageInfo(src.Width, src.Height, SKColorType.Rgba8888, SKAlphaType.Unpremul);
+		using var rgba = new SKBitmap(info);
+		using var pixels = src.PeekPixels();
+		if (pixels == null || !pixels.ReadPixels(info, rgba.GetPixels(), rgba.RowBytes)) return;
+		icons.Add(new RawImage(rgba.Width, rgba.Height, rgba.Bytes));
 	}
 
 	/// <summary>
@@ -301,7 +495,15 @@ public abstract class Game : IDisposable {
 		parameters = args;
 
 		MainThreadID = Thread.CurrentThread.ManagedThreadId;
+		_windowThreadId = MainThreadID;
 		Configuration();
+
+		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) {
+			// Window and GL context are managed externally by the host (iOS GameViewController /
+			// Android MainActivity).
+			// The host calls InitWithExternalContext() and drives the game loop directly.
+			return;
+		}
 
 		//GlfwProvider.GLFW.Value.WindowHint(WindowHintContextApi.ContextCreationApi, ContextApi.EglContextApi);
 
@@ -311,13 +513,16 @@ public abstract class Game : IDisposable {
 		options.Position = WindowPosition;
 		options.UpdatesPerSecond = VSync ? 0 : Framerate;
 		options.FramesPerSecond = VSync ? 0 : Framerate;
-		options.WindowState = FullScreen ? WindowState.Fullscreen : WindowState.Normal;
+		options.WindowState = (WindowMode == 1) ? WindowState.Fullscreen : WindowState.Normal;
 		options.VSync = VSync;
 
 		if (!OperatingSystem.IsMacOS()) options.API = GraphicsAPI.None;
 
-		options.WindowBorder = WindowBorder.Resizable;
+		// border already invisible if window is hidden
+		// but for exporting video, this prevent the window from being shrunk to fit inside the monitor due to the window border
+		options.WindowBorder = (WindowMode == 2 || StartHidden) ? WindowBorder.Hidden : WindowBorder.Resizable;
 		options.Title = Text;
+		options.IsVisible = !StartHidden;
 
 		#region Override Windowing
 		string windowing_override = GetParameterValue("-w", "--windowing");
@@ -326,12 +531,21 @@ public abstract class Game : IDisposable {
 		// Use SDL on Linux with Wayland, otherwise use GLFW for everything else
 		if ((OperatingSystem.IsLinux() && Environment.GetEnvironmentVariable("XDG_SESSION_TYPE") == "wayland" && windowing_override != "glfw")
 		|| windowing_override == "sdl") {
+			// X11 (XWayland) whenever an X server is there: the SDL found on the system may otherwise open a
+			// native Wayland window, which the game does not render to reliably yet
+			if (OperatingSystem.IsLinux() && !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DISPLAY")))
+				Silk.NET.SDL.SdlProvider.UninitializedSDL.Value.SetHintWithPriority(Silk.NET.SDL.Sdl.HintVideodriver, "x11", Silk.NET.SDL.HintPriority.Override);
 			Silk.NET.Windowing.Sdl.SdlWindowing.Use();
 			Trace.TraceInformation("SDL selected for Windowing");
 		} else {
 			Silk.NET.Windowing.Glfw.GlfwWindowing.Use();
+			_usingGlfw = true;
 			Trace.TraceInformation("GLFW selected for Windowing");
 		}
+		// SDL would create it fullscreen in the display mode nearest the window size: it goes fullscreen once
+		// it exists instead (ApplyWindowMode), in the desktop's mode
+		if (!_usingGlfw && options.WindowState == WindowState.Fullscreen)
+			options.WindowState = WindowState.Normal;
 
 		try {
 			Window_ = Window.Create(options);
@@ -342,15 +556,17 @@ public abstract class Game : IDisposable {
 			throw;
         }
 
+		// temporary values until the window has been loaded or the host sets the viewport
+		WindowBorderSize = Window_.Size;
 		ViewPortSize.X = Window_.Size.X;
 		ViewPortSize.Y = Window_.Size.Y;
 		ViewPortOffset.X = 0;
 		ViewPortOffset.Y = 0;
 
+		dbGetTimeMsReal = () => VirtualClockEnabled ? VirtualClockMs : Window_.Time * 1000;
+
 		Window_.Load += Window_Load;
 		Window_.Closing += Window_Closing;
-		Window_.Update += Window_Update;
-		Window_.Render += Window_Render;
 		Window_.Resize += Window_Resize;
 		Window_.Move += Window_Move;
 		Window_.FramebufferResize += Window_FramebufferResize;
@@ -358,11 +574,11 @@ public abstract class Game : IDisposable {
 
 	private void UpdateWindowFramerate(bool vsync, int value) {
 		if (vsync) {
-			Window_.UpdatesPerSecond = 0;
+			Window_!.UpdatesPerSecond = 0;
 			Window_.FramesPerSecond = 0;
 			Context.SwapInterval(1);
 		} else {
-			Window_.UpdatesPerSecond = value;
+			Window_!.UpdatesPerSecond = value;
 			Window_.FramesPerSecond = value;
 			Context.SwapInterval(0);
 		}
@@ -372,11 +588,123 @@ public abstract class Game : IDisposable {
 	/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 	/// </summary>
 	public void Dispose() {
-		Window_.Dispose();
+		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid())
+			return;
+		Window_!.Dispose();
 	}
 
+	// Hosted (mobile) builds have no window to close: the host installs a callback here and
+	// tears its render loop/activity down when the game asks to exit (e.g. the exit stage).
+	public static Action? HostExitRequested;
+
 	public void Exit() {
-		Window_.Close();
+		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) {
+			HostExitRequested?.Invoke();
+			return;
+		}
+		// the game thread ends after this frame and shuts down; the window thread then closes the window
+		this._quitRequested = true;
+	}
+
+	/// <summary>
+	/// Initializes the GL context and game systems using an externally-provided GL context.
+	/// Used when the window and GL surface are managed by an external host.
+	/// </summary>
+	public void InitWithExternalContext(Silk.NET.Core.Contexts.IGLContext externalContext, int viewportWidth, int viewportHeight) {
+		Context = externalContext;
+		Context.MakeCurrent();
+
+		Gl = GL.GetApi(Context);
+
+		Gl.Enable(GLEnum.Blend);
+		BlendHelper.SetBlend(BlendType.Normal);
+		CTexture.Init();
+
+		// Detect compute-shader capability (GLES 3.1+) so renderers can pick the GPU or CPU path;
+		// mirrors the desktop probe in Window_Load, which hosted contexts never run.
+		ComputeShadersAvailable = false;
+		try {
+			int glMaj = Gl.GetInteger(GLEnum.MajorVersion);
+			int glMin = Gl.GetInteger(GLEnum.MinorVersion);
+			ComputeShadersAvailable = glMaj > 3 || (glMaj == 3 && glMin >= 1);
+			if (ComputeShadersAvailable && !Context.TryGetProcAddress("glDispatchCompute", out _))
+				ComputeShadersAvailable = false;
+		} catch { ComputeShadersAvailable = false; }
+		Trace.TraceInformation($"Compute shaders available (hosted): {ComputeShadersAvailable}");
+
+		Gl.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		this.ApplyViewport(new Vector2D<int>(viewportWidth, viewportHeight));
+
+		Context.SwapInterval(VSync ? 1 : 0);
+
+		Initialize();
+		LoadContent();
+	}
+
+	private long _hostStartTimeMs;
+	private bool _hostTimeInitialized;
+
+	// Render target supplied by the host; the hosted frame draws the scene into it at game resolution, and the host presents it.
+	public uint HostRenderTargetFbo;
+
+	/// <summary>
+	/// Called by the host once per frame; drives Update() and the render.
+	/// </summary>
+	public void RenderHostedFrame(double deltaTime) {
+		if (!_hostTimeInitialized) {
+			_hostStartTimeMs = Stopwatch.GetTimestamp();
+			_hostTimeInitialized = true;
+			dbGetTimeMsReal = () => (Stopwatch.GetTimestamp() - _hostStartTimeMs) * 1000.0 / Stopwatch.Frequency;
+		}
+		// Set BOTH clocks: dbTimeMs feeds CTimer.NowTimeMs_Double -> CFPS.DeltaTime, which drives the Lua
+		// counters that advance screen transitions.
+		dbTimeMs = dbGetTimeMsReal!();
+		TimeMs = (long)dbTimeMs;
+
+		Update();
+
+		Camera = Matrix4X4<float>.Identity;
+
+		// Drain queued main-thread actions (deferred GL uploads from background loaders and texture
+		// streaming) within a time budget. Same idiom as Window_Render, see the note there.
+		if (!AsyncActions.IsEmpty) {
+			long asyncStart = System.Diagnostics.Stopwatch.GetTimestamp();
+			while (AsyncActions.TryDequeue(out var action)) {
+				try {
+					action();
+				} catch (Exception ex) {
+					Console.Error.WriteLine($"Error in async action: {ex}");
+				}
+				if (System.Diagnostics.Stopwatch.GetElapsedTime(asyncStart).TotalMilliseconds >= AsyncBudgetMs)
+					break;
+			}
+		}
+
+		// Draw the scene into the host's render target; the host presents it (no GL swap).
+		Gl.BindFramebuffer(FramebufferTarget.Framebuffer, HostRenderTargetFbo);
+		Gl.Viewport(0, 0, (uint)GameWindowSize.Width, (uint)GameWindowSize.Height);
+		// Border color fills any margin the camera transform leaves around the scene.
+		Gl.ClearColor(BorderColor.Red, BorderColor.Green, BorderColor.Blue, BorderColor.Alpha);
+		Gl.Clear(ClearBufferMask.ColorBufferBit);
+		Draw();
+		Gl.Flush(); // submit GL commands so the host can sample the rendered surface
+	}
+
+	/// <summary>
+	/// Called by the host when shutting down.
+	/// </summary>
+	public void ShutdownHosted() {
+		CTexture.Terminate();
+		UnloadContent();
+		OnExiting();
+		Context.Dispose();
+	}
+
+	/// <summary>
+	/// Called by the host when the viewport size changes.
+	/// </summary>
+	public void ResizeViewport(int width, int height) {
+		this.ApplyViewport(new Vector2D<int>(width, height));
 	}
 
 	protected void ToggleWindowMode() {
@@ -410,20 +738,102 @@ public abstract class Game : IDisposable {
 	/// Runs the game.
 	/// </summary>
 	public void Run() {
-		// adapted from Window_.Run();
-		Window_.Initialize();
-		Window_.Run(delegate {
-			this.EventsNoWait();
-			if (!Window_.IsClosing) {
-				Window_.DoUpdate();
-			}
+		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) {
+			// The game loop is driven externally by the host.
+			// Run() is a no-op; the host calls InitWithExternalContext() then RenderHostedFrame() each frame.
+			return;
+		}
+		// This thread keeps the window: it waits for window events (waking on input, or after 1 ms to poll the pads),
+		// and the device callbacks stamp each press as it arrives. The game runs on its own thread (GameThreadMain).
+		Window_!.Initialize();
+		if (OperatingSystem.IsMacOS())
+			Window_.GLContext?.Clear(); // made current on the game thread
+		WindowInput = Window_.CreateInput();
 
-			if (!Window_.IsClosing) {
-				Window_.DoRender();
+		_gameCulture = Thread.CurrentThread.CurrentCulture;
+		_gameUICulture = Thread.CurrentThread.CurrentUICulture;
+		_gameThread = new Thread(this.GameThreadMain, 8 * 1024 * 1024) { Name = "GameThread" };
+		if (OperatingSystem.IsWindows())
+			_gameThread.SetApartmentState(ApartmentState.STA); // as the main thread it takes over from
+		_gameThreadStarted = true;
+		_gameThread.Start();
+
+		try {
+			while (!this._gameThreadDone) {
+				while (_windowCommands.TryDequeue(out var command)) {
+					try {
+						command();
+					} catch (Exception e) {
+						Trace.TraceWarning($"Window command failed: {e}");
+					}
+				}
+				// a hidden run stays hidden whatever the windowing backend applied
+				if (StartHidden && Window_.IsVisible) Window_.IsVisible = false;
+				if (_usingGlfw)
+					GlfwProvider.GLFW.Value.WaitEventsTimeout(0.001);
+				else
+					Thread.Sleep(1);
+				this.OnEvents();
+				if (Window_.IsClosing)
+					this._quitRequested = true;
 			}
-		});
-		this.EventsNoWait();
+		} finally {
+			// also when this loop fails: the game thread still shuts down before the window goes away
+			this._quitRequested = true;
+			_gameThread.Join();
+		}
+		WindowInput?.Dispose();
+		_gameThreadException?.Throw();
 		Window_.Reset();
+	}
+
+	// game thread: owns the GL context and runs Update and Draw until a quit is requested, then shuts the game down
+	private void GameThreadMain() {
+		Thread.CurrentThread.CurrentCulture = _gameCulture!;
+		Thread.CurrentThread.CurrentUICulture = _gameUICulture!;
+		MainThreadID = Environment.CurrentManagedThreadId;
+		try {
+			this.InitializeGraphics();
+			this.Initialize();
+			this.LoadContent();
+			var clock = Stopwatch.StartNew();
+			double last = 0;
+			while (!this._quitRequested) {
+				double now = clock.Elapsed.TotalSeconds;
+				double delta = Math.Max(now - last, 1e-6);
+				last = now;
+				this.ApplyPendingResize();
+				this.Window_Update(delta);
+				if (this._quitRequested)
+					break;
+				this.Window_Render(delta);
+			}
+		} catch (Exception e) {
+			this._gameThreadException = ExceptionDispatchInfo.Capture(e);
+		} finally {
+			try {
+				this.ShutdownGame();
+			} catch (Exception e) {
+				Trace.TraceError($"Shutdown failed: {e}");
+			}
+			this._gameThreadDone = true;
+			if (_usingGlfw)
+				GlfwProvider.GLFW.Value.PostEmptyEvent();
+		}
+	}
+
+	/// <summary>
+	/// Runs a call that the windowing backend only allows on the window thread: at once when called there (or before the
+	/// game thread exists), otherwise on the window thread's next pass, in order.
+	/// </summary>
+	public static void RunOnWindowThread(Action action) {
+		if (!_gameThreadStarted || Environment.CurrentManagedThreadId == _windowThreadId) {
+			action();
+			return;
+		}
+		_windowCommands.Enqueue(action);
+		if (_usingGlfw)
+			GlfwProvider.GLFW.Value.PostEmptyEvent();
 	}
 
 	protected virtual void Configuration() {
@@ -451,27 +861,16 @@ public abstract class Game : IDisposable {
 
 	}
 
-	protected void EventsNoWait() {
-		if (this.thInputLock.Wait(0)) {
-			try {
-				this.OnEvents();
-			} finally {
-				this.thInputLock.Release();
-			}
-		}
-	}
-
-	protected void Events() {
-		this.thInputLock.Wait();
-		try {
-			this.OnEvents();
-		} finally {
-			this.thInputLock.Release();
-		}
-	}
-
 	protected virtual void OnEvents() {
-		Window_.DoEvents();
+		// Silk's GLFW event pump can intermittently throw (seen as "Nullable object must have a
+		// value") under very rapid input, especially with the cursor locked. It's a transient in
+		// the windowing backend, not our state — swallow it and re-pump next frame instead of
+		// letting it crash the whole game.
+		try {
+			Window_!.DoEvents();
+		} catch (Exception e) {
+			System.Diagnostics.Trace.TraceWarning($"Window event pump threw (ignored): {e}");
+		}
 	}
 
 	protected virtual void Update() {
@@ -491,15 +890,31 @@ public abstract class Game : IDisposable {
 	}
 
 
+	// window thread, inside Window_.Initialize
 	public void Window_Load() {
-		Window_.SetWindowIcon(new ReadOnlySpan<RawImage>(GetIconData(strIconFileName)));
+		// a hidden run stays hidden whatever the windowing backend applied after creating the window
+		if (StartHidden && Window_!.IsVisible) Window_.IsVisible = false;
+		var icons = GetIconData(strIconFileName);
+		if (icons.Length > 0) {
+			Window_!.SetWindowIcon(new ReadOnlySpan<RawImage>(icons));
+			if (OperatingSystem.IsWindows() && Window_.Native?.Win32 is { } w && w.Hwnd != 0)
+				SyncTaskbarIcon(w.Hwnd);
+		}
 
+		if (OperatingSystem.IsMacOS() && Window_!.GLContext == null) {
+			throw new Exception("No native OpenGL context available");
+		}
+
+		// Finalise the window mode now that the window + monitor exist (esp. Borderless, which needs the monitor
+		// bounds to size the undecorated window — WindowOptions can't query the monitor before creation).
+		ApplyWindowMode();
+	}
+
+	// game thread: the GL context and the state that needs it
+	private void InitializeGraphics() {
 		if (OperatingSystem.IsMacOS()) {
-			if (Window_.GLContext == null) {
-				throw new Exception("No native OpenGL context available");
-			}
-
-			Context = Window_.GLContext;
+			Context = Window_!.GLContext!;
+			Context.MakeCurrent();
 		} else {
 			#region Override Platform
 			GraphicsDeviceType_ = GetParameterValue("-p", "--platform") switch {
@@ -514,12 +929,27 @@ public abstract class Game : IDisposable {
 			Console.WriteLine("Platform set to " + GraphicsDeviceType_);
 			#endregion
 
-			Context = new AngleContext(GraphicsDeviceType_, Window_, GetParameterValue("-f", "--flag"));
+			Context = new AngleContext(GraphicsDeviceType_, Window_!, GetParameterValue("-f", "--flag"));
 
 			Context.MakeCurrent();
 		}
 
 		Gl = GL.GetApi(Context);
+
+		// Detect compute-shader capability (GLES 3.1+) so renderers can pick the GPU or CPU path.
+		ComputeShadersAvailable = false;
+		try {
+			if (Context is AngleContext ac) {
+				ComputeShadersAvailable = ac.ContextMajor > 3 || (ac.ContextMajor == 3 && ac.ContextMinor >= 1);
+			} else {
+				int glMaj = Gl.GetInteger(GLEnum.MajorVersion);
+				int glMin = Gl.GetInteger(GLEnum.MinorVersion);
+				ComputeShadersAvailable = glMaj > 3 || (glMaj == 3 && glMin >= 1);
+			}
+			if (ComputeShadersAvailable && !Context.TryGetProcAddress("glDispatchCompute", out _))
+				ComputeShadersAvailable = false;
+		} catch { ComputeShadersAvailable = false; }
+		Trace.TraceInformation($"Compute shaders available: {ComputeShadersAvailable}");
 
 		Gl.Enable(GLEnum.Blend);
 		BlendHelper.SetBlend(BlendType.Normal);
@@ -528,84 +958,229 @@ public abstract class Game : IDisposable {
 		Gl.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 		if (!OperatingSystem.IsMacOS())
-			Gl.Viewport(0, 0, (uint)Window_.Size.X, (uint)Window_.Size.Y);
-		
+			this.ApplyViewport(WindowBorderSize);
+
 		Context.SwapInterval(VSync ? 1 : 0);
-
-		Initialize();
-		LoadContent();
-
-		try {
-			this.thInputCancel = new CancellationTokenSource();
-			ThreadStart thInputFunc = new (async () => {
-				using PeriodicTimer timer = new(TimeSpan.FromMilliseconds(1));
-				while (!this.thInputCancel.IsCancellationRequested) { // ensure alive
-					try {
-						while (await timer.WaitForNextTickAsync(this.thInputCancel.Token))
-							this.Events();
-					} catch (OperationCanceledException) {
-						// ignore
-					} finally {
-						if (this.thInputCancel.IsCancellationRequested)
-							Trace.TraceInformation("Input thread terminated.");
-					}
-				}
-			});
-			this.thInput = new Thread(thInputFunc) {
-				Name = "InputThread",
-				IsBackground = true,
-			};
-			this.thInput.Start();
-			Trace.TraceInformation("Input thread started.");
-		} catch (Exception ex) {
-			Trace.TraceWarning(ex.ToString());
-			Trace.TraceWarning("Input thread failed to start. Fell back to poll input per draw frame.");
-		}
 	}
 
+	// the window was asked to close (its close button, the system): the game thread ends after its frame and shuts down
 	public void Window_Closing() {
+		this._quitRequested = true;
+	}
+
+	// game thread, after its last frame
+	private void ShutdownGame() {
 		CTexture.Terminate();
+		DeleteRenderScaleFbo();
 
 		UnloadContent();
 		OnExiting();
 
-		this.thInputCancel.Cancel();
-		Context.Dispose();
+		Context?.Dispose();
 	}
 
 	public void Window_Update(double deltaTime) {
 		double fps = 1.0f / deltaTime;
-		dbTimeMs = Window_.Time * 1000;
-		TimeMs = (long)(Window_.Time * 1000);
-
+		dbTimeMs = dbGetTimeMsReal!();
+		TimeMs = (long)dbTimeMs;
 		Update();
 
+		DrainImGuiChars();
 		ImGuiController?.Update((float)deltaTime);
 	}
 
+	// ── Logical resolution of a module ────────────────────────────────────────────────────────────
+	// A module made for another resolution than the skin's (a global stage) draws in its own: while pushed,
+	// GameWindowSize is that size and the viewport its largest centred fit inside the current one, so what it
+	// draws, its clips and the mouse are rescaled the way a whole skin of that resolution is. Push and Pop pair
+	// up; PushBaseResolution gives a module drawn inside one (a skin ROActivity) the frame's own space back.
+	private struct LogicalFrame {
+		public int W, H, VpX, VpY, VpW, VpH;
+		public Vector2D<int> PortOffset, PortSize;
+	}
+	private static readonly Stack<LogicalFrame> _logicalFrames = new();
+	private static LogicalFrame _baseFrame;
+
+	public static bool InLogicalResolution => _logicalFrames.Count > 0;
+
+	private static LogicalFrame CaptureFrame() {
+		Span<int> vp = stackalloc int[4];
+		Gl?.GetInteger(GLEnum.Viewport, vp);
+		return new LogicalFrame {
+			W = GameWindowSize.Width, H = GameWindowSize.Height, VpX = vp[0], VpY = vp[1], VpW = vp[2], VpH = vp[3],
+			PortOffset = ViewPortOffset, PortSize = ViewPortSize,
+		};
+	}
+
+	private static void ApplyFrame(in LogicalFrame f) {
+		GameWindowSize.Width = f.W;
+		GameWindowSize.Height = f.H;
+		ViewPortOffset = f.PortOffset;
+		ViewPortSize = f.PortSize;
+		Gl?.Viewport(f.VpX, f.VpY, (uint)Math.Max(0, f.VpW), (uint)Math.Max(0, f.VpH));
+	}
+
+	// w x h fitted inside f, centred (bars on the sides or on top and bottom when the shapes differ)
+	private static LogicalFrame FitFrame(in LogicalFrame f, int w, int h) {
+		double s = Math.Min((double)f.W / w, (double)f.H / h);
+		double fw = w * s / f.W, fh = h * s / f.H, fx = (1 - fw) / 2, fy = (1 - fh) / 2;
+		static int R(double v) => (int)Math.Round(v);
+		return new LogicalFrame {
+			W = w, H = h,
+			VpX = f.VpX + R(fx * f.VpW), VpY = f.VpY + R(fy * f.VpH), VpW = R(fw * f.VpW), VpH = R(fh * f.VpH),
+			PortOffset = new Vector2D<int>(f.PortOffset.X + R(fx * f.PortSize.X), f.PortOffset.Y + R(fy * f.PortSize.Y)),
+			PortSize = new Vector2D<int>(R(fw * f.PortSize.X), R(fh * f.PortSize.Y)),
+		};
+	}
+
+	public static void PushLogicalResolution(int w, int h) {
+		var cur = CaptureFrame();
+		if (_logicalFrames.Count == 0) _baseFrame = cur;
+		_logicalFrames.Push(cur);
+		if (w <= 0 || h <= 0 || cur.W <= 0 || cur.H <= 0 || (w == cur.W && h == cur.H)) return;
+		ApplyFrame(FitFrame(cur, w, h));
+	}
+
+	public static void PushBaseResolution() {
+		var cur = CaptureFrame();
+		if (_logicalFrames.Count == 0) _baseFrame = cur;
+		_logicalFrames.Push(cur);
+		ApplyFrame(_baseFrame);
+	}
+
+	public static void PopLogicalResolution() {
+		if (_logicalFrames.Count > 0) ApplyFrame(_logicalFrames.Pop());
+	}
+
+	// ── Render-scale (global resolution downscale) ────────────────────────────────────────────────
+	// When RenderScale < 1, the whole frame (all 2D + composited 3D) is rendered into an offscreen FBO sized
+	// (GameWindowSize × RenderScale) and then upscale-blitted to the window's letterboxed region on present. Content
+	// keeps drawing in the unchanged GameWindowSize logical coordinates, so nothing else needs to know about the scale —
+	// it just renders into fewer physical pixels. Set by the skin's chosen resolution multiplier.
+	public static float RenderScale = 1.0f;
+	private uint _rsFbo, _rsColorTex, _rsDepthRb;
+	private int _rsW, _rsH;
+
+	private unsafe bool EnsureRenderScaleFbo() {
+		int tw = Math.Max(1, (int)Math.Round(GameWindowSize.Width * RenderScale));
+		int th = Math.Max(1, (int)Math.Round(GameWindowSize.Height * RenderScale));
+		if (_rsFbo != 0 && _rsW == tw && _rsH == th) return true;
+		DeleteRenderScaleFbo();
+		_rsW = tw; _rsH = th;
+		_rsFbo = Gl.GenFramebuffer();
+		Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _rsFbo);
+		_rsColorTex = Gl.GenTexture();
+		Gl.BindTexture(TextureTarget.Texture2D, _rsColorTex);
+		Gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Rgba8, (uint)tw, (uint)th, 0, PixelFormat.Rgba, PixelType.UnsignedByte, (void*)0);
+		Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
+		Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
+		Gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, _rsColorTex, 0);
+		_rsDepthRb = Gl.GenRenderbuffer();
+		Gl.BindRenderbuffer(RenderbufferTarget.Renderbuffer, _rsDepthRb);
+		Gl.RenderbufferStorage(RenderbufferTarget.Renderbuffer, InternalFormat.DepthComponent24, (uint)tw, (uint)th);
+		Gl.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, _rsDepthRb);
+		var status = Gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
+		Gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+		Gl.BindTexture(TextureTarget.Texture2D, 0);
+		if (status != GLEnum.FramebufferComplete) {
+			Trace.TraceWarning($"Render-scale FBO incomplete ({status}); rendering at full resolution.");
+			DeleteRenderScaleFbo();
+			return false;
+		}
+		return true;
+	}
+
+	private void DeleteRenderScaleFbo() {
+		if (_rsColorTex != 0) { Gl.DeleteTexture(_rsColorTex); _rsColorTex = 0; }
+		if (_rsDepthRb != 0) { Gl.DeleteRenderbuffer(_rsDepthRb); _rsDepthRb = 0; }
+		if (_rsFbo != 0) { Gl.DeleteFramebuffer(_rsFbo); _rsFbo = 0; }
+		_rsW = _rsH = 0;
+	}
+
 	public void Window_Render(double deltaTime) {
+		if (GraphicsSelfTest) { RunGraphicsSelfTest(); return; }   // --mode=checkgl (see Game.GraphicsSelfTest.cs)
+		Gl.Disable(EnableCap.ScissorTest);   // a leaked UI clip (GRAPHICS:SetClip) must never survive the frame
 		Camera = Matrix4X4<float>.Identity;
 		Gl.ClearColor(BorderColor.Red, BorderColor.Green, BorderColor.Blue, BorderColor.Alpha);
 
+		/*
 		if (AsyncActions.Count > 0) {
 			AsyncActions[0]?.Invoke();
 			AsyncActions.Remove(AsyncActions[0]);
 		}
-		Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+		*/
 
-		Draw();
+		// Drain queued main-thread actions (mostly deferred GL texture uploads from background loaders —
+		// boot atlas, song-load game-screen activation). Process a batch within a small time budget so a
+		// large burst uploads quickly instead of trickling out one-per-frame, while still capping the time
+		// spent so the frame rate stays smooth. When the queue is empty (the normal in-game case) the very
+		// first TryDequeue fails and the loop exits immediately — no per-frame cost.
+		if (!AsyncActions.IsEmpty) {
+			long asyncStart = System.Diagnostics.Stopwatch.GetTimestamp();
+			while (AsyncActions.TryDequeue(out var action)) {
+				try {
+					action();
+				} catch (Exception ex) {
+					Console.Error.WriteLine($"Error in async action: {ex}");
+				}
+				if (System.Diagnostics.Stopwatch.GetElapsedTime(asyncStart).TotalMilliseconds >= AsyncBudgetMs)
+					break;
+			}
+		}
+
+		bool useScale = RenderScale < 0.999f && EnsureRenderScaleFbo();
+		if (useScale) {
+			// clear the window first (the letterbox bars stay the border colour), render the whole frame into the
+			// scaled offscreen FBO, then upscale-blit it into the window's letterboxed region.
+			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+			Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _rsFbo);
+			Gl.Viewport(0, 0, (uint)_rsW, (uint)_rsH);
+			Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+			Draw();
+			Gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, _rsFbo);
+			Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
+			Gl.BlitFramebuffer(0, 0, _rsW, _rsH,
+				ViewPortOffset.X, ViewPortOffset.Y, ViewPortOffset.X + ViewPortSize.X, ViewPortOffset.Y + ViewPortSize.Y,
+				ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+			Gl.Viewport(ViewPortOffset.X, ViewPortOffset.Y, (uint)ViewPortSize.X, (uint)ViewPortSize.Y);   // restore for post
+		} else {
+			Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+			Draw();
+		}
 
 		double fps = 1.0f / deltaTime;
 
 #if DEBUG
+		Gl.Viewport(0, 0, (uint)WindowBorderSize.X, (uint)WindowBorderSize.Y); // prevent ImGui GUI from being distorted
 		ImGuiController?.Render();
+		Gl.Viewport(ViewPortOffset.X, ViewPortOffset.Y, (uint)ViewPortSize.X, (uint)ViewPortSize.Y); // restore for post
 #endif
 
-		if (!OperatingSystem.IsMacOS()) Context.SwapBuffers();
+		Context.SwapBuffers();
 	}
 
+	// window thread: the game thread applies the size at its next frame
 	public void Window_Resize(Vector2D<int> size) {
+		lock (this._resizeLock)
+			this._pendingResize = size;
+	}
+
+	private void ApplyPendingResize() {
+		Vector2D<int>? size;
+		lock (this._resizeLock) {
+			size = this._pendingResize;
+			this._pendingResize = null;
+		}
+		if (size.HasValue)
+			this.ApplyViewport(size.Value);
+	}
+
+	// GL thread: the letterboxed viewport for a window of this size
+	private void ApplyViewport(Vector2D<int> size) {
 		if (size.X > 0 && size.Y > 0) {
+			WindowBorderSize = size;
 			float resolutionAspect = (float)GameWindowSize.Width / GameWindowSize.Height;
 			float windowAspect = (float)size.X / size.Y;
 			if (windowAspect > resolutionAspect) {
@@ -617,8 +1192,8 @@ public abstract class Game : IDisposable {
 			}
 		}
 
-		ViewPortOffset.X = (size.X - ViewPortSize.X) / 2;
-		ViewPortOffset.Y = (size.Y - ViewPortSize.Y) / 2;
+		ViewPortOffset.X = (WindowBorderSize.X - ViewPortSize.X) / 2;
+		ViewPortOffset.Y = (WindowBorderSize.Y - ViewPortSize.Y) / 2;
 
 
 		Gl.Viewport(ViewPortOffset.X, ViewPortOffset.Y, (uint)ViewPortSize.X, (uint)ViewPortSize.Y);

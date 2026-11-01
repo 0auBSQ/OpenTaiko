@@ -1,9 +1,9 @@
 ﻿namespace OpenTaiko;
 
-internal class CActImplCombo : CAct演奏Combo共通 {
+internal class CActImplCombo : CActPlayComboCommon {
 	// CAct演奏Combo共通 実装
 
-	protected override void tコンボ表示_太鼓(int nCombo値, int nジャンプインデックス, int nPlayer) {
-		base.tコンボ表示_太鼓(nCombo値, nジャンプインデックス, nPlayer);
+	protected override void tComboDisplay_Taiko(int nComboValue, int nJumpIndex, int nPlayer) {
+		base.tComboDisplay_Taiko(nComboValue, nJumpIndex, nPlayer);
 	}
 }
