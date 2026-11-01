@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.7.0.1] - 2026-11-01 (Beta)
+
+- [Fix] Ignore skins older than 0.7.0.0 to prevent missing _boot obscure issues
+- [Fix] Autobuild script did exclude recursively folders with Songs excluding actually important stages folders
+
 ## [0.7.0.0] - 2026-11-01 (Beta)
 
 (Note that 0.6.0 skins are no longer supported from this version)
