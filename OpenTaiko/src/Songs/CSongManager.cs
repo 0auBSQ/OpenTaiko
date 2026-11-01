@@ -127,7 +127,7 @@ internal class CSongManager {
 	// Song file extensions counted toward the progress total (must match the ones tSongSearchListCreate
 	// turns into nodes and increments nSearchFileCount for).
 	private static readonly HashSet<string> SongFileExtensions = new(StringComparer.OrdinalIgnoreCase) {
-		".tja", ".tci", ".optktci", ".tcm", ".optktcm"
+		".tja", ".tci", ".optktci", ".tcm", ".optktcm", ".tct", ".optktct"
 	};
 
 	/// <summary>
@@ -408,7 +408,8 @@ internal class CSongManager {
 							this.nSearchSongNodeCount++;
 						}
 					}
-				} else if ((strExt.Equals(".optktcm") || strExt.Equals(".tcm")) && deferredTcm != null) {
+				} else if ((strExt is ".optktcm" or ".tcm" or ".optktct" or ".tct") && deferredTcm != null) {
+					// built once every song is known: they reference songs by unique ID
 					deferredTcm.Add((strBaseFolder + fileinfo.Name, listNodeList, nodeParent));
 				}
 			}
@@ -984,7 +985,7 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 	private void ProcessDeferredTcm(List<(string filePath, List<CSongListNode> nodeList, CSongListNode? parent)> deferred) {
 		foreach (var (filePath, nodeList, parent) in deferred) {
 			SlowOrSuspendSearchTask();
-			this.nSearchFileCount++;    // enumeration progress (deferred .tcm song files parsed so far)
+			this.nSearchFileCount++;    // enumeration progress (deferred .tcm/.tct song files parsed so far)
 			try {
 				using SHA1 tcmHash = SHA1.Create();
 				using var tcmFs = File.OpenRead(filePath);
@@ -999,8 +1000,10 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 					ApplyParentSettings(tcmCached, parent);
 					this.nSearchSongNodeCount++;
 				} else {
-					CTcm tcm = new CTcm(filePath);
-					CSongListNode? tcmNode = tcm.BuildSongListNode();
+					string ext = Path.GetExtension(filePath).ToLowerInvariant();
+					CSongListNode? tcmNode = ext is ".optktct" or ".tct"
+						? new CTct(filePath).BuildSongListNode()
+						: new CTcm(filePath).BuildSongListNode();
 					if (tcmNode != null) {
 						tcmNode.rParentNode = parent;
 						tcmNode.strBreadcrumbs = (tcmNode.rParentNode == null)
@@ -1015,7 +1018,7 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 					}
 				}
 			} catch (Exception ex) {
-				Trace.TraceError($"[CSongs管理] Failed to process TCM file '{filePath}': {ex}");
+				Trace.TraceError($"[CSongs管理] Failed to process TCM/TCT file '{filePath}': {ex}");
 			}
 		}
 	}

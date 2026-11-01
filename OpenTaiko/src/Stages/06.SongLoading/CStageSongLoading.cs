@@ -335,6 +335,16 @@ internal class CStageSongLoading : CStage {
 							for (int i = 0; i < playerCount; i++)
 								captured[i] = built;
 						}, cts.Token);
+					} else if (strExt is ".optktct" or ".tct") {
+						// TCT tower: one course of the referenced song, played as a tower.
+						var capturedStr = str;
+						_dtxLoadTask = Task.Run(() => {
+							var tct = new CTct(capturedStr);
+							for (int i = 0; i < playerCount; i++) {
+								cts.Token.ThrowIfCancellationRequested();
+								captured[i] = tct.BuildCtja(i);
+							}
+						}, cts.Token);
 					} else if (strExt is ".optktci" or ".tci") {
 						// TCI individual song: build CTja from osu course.
 						var capturedStr = str;
