@@ -2,11 +2,6 @@
 
 ## [0.7.0.0] - 2026-11-01 (Beta)
 
----------
-Co-authored-by: Wei-Cheng Yeh (IID) <iid@ccns.ncku.edu.tw>
-Co-authored-by: Jack <jack9966qk@gmail.com>
-Co-authored-by: Brandon <shrandonm@users.noreply.github.com>
-Co-authored-by: DashyDesu <83197762+DashyDesu@users.noreply.github.com>
 (Note that 0.6.0 skins are no longer supported from this version)
 
 ### Major changes
