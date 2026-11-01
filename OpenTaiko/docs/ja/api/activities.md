@@ -561,6 +561,7 @@ info グローバルとして登録され、モジュールごとに作成され
 | `info.gameVersion  -> string` | ゲームのバージョン。main.major.minor.patch 形式の 4 つの数字 (例: `"0.7.0.0"`)。 |
 | `info.skinName  -> string` | 現在のスキンの SkinConfig.ini にある `Name=` (ない場合は `"Unknown"`)。 |
 | `info.skinVersion  -> string` | 現在のスキンの SkinConfig.ini にある `Version=`。例: `"0.7.0.0"` (ない場合は `"Unknown"`)。 |
+| `info.skinCreator  -> string` | 現在のスキンの SkinConfig.ini にある `Creator=` (ない場合は `"Unknown"`)。 |
 | `info.simplemode  -> boolean` | シンプルモードが有効なとき true。 |
 | `info.p1IsBlue  -> boolean` | プレイヤー 1 が青側を使うとき true。 |
 | `info.online  -> boolean` | 使用可能なネットワークインターフェースがあるとき true。 |

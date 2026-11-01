@@ -561,6 +561,7 @@ end
 | `info.gameVersion  -> string` | Версия игры: четыре числа в виде main.major.minor.patch (например, `"0.7.0.0"`). |
 | `info.skinName  -> string` | `Name=` текущего скина из его SkinConfig.ini (`"Unknown"`, если его нет). |
 | `info.skinVersion  -> string` | `Version=` текущего скина из его SkinConfig.ini, например `"0.7.0.0"` (`"Unknown"`, если её нет). |
+| `info.skinCreator  -> string` | `Creator=` текущего скина из его SkinConfig.ini (`"Unknown"`, если его нет). |
 | `info.simplemode  -> boolean` | Истина, когда включён Simple Mode. |
 | `info.p1IsBlue  -> boolean` | Истина, когда игрок 1 использует синюю сторону. |
 | `info.online  -> boolean` | Истина, когда доступен пригодный сетевой интерфейс. |
