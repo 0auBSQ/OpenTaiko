@@ -1,6 +1,7 @@
 {
     "_note": "1920x1080 pixels; x/y lists are per side (left, right) for one or two players; 4p and 5p are added to ui_move for 3-4 and 5 players",
     "use_1p_ui": true,
+    "panel_dy": { "_note": "the panels and what is on them, this far below their ui_move place (per player)", "4p": [145, 125, 145, 125] },
     "ui_move": {
         "4p": {
             "x": [-190, 290, 770, 1220],
@@ -19,12 +20,18 @@
         "color": [255, 255, 255, 255],
         "outline": [0, 0, 0, 255]
     },
-    "difficulty_bar": {
-        "x": [60, 1630],
-        "y": [685, 685],
-        "4p": [330, -40],
-        "5p": [-13, 374],
-        "size": [277, 86]
+    "difficulty": {
+        "_note": "the played difficulty's circle with its level, as the song select's song info, centred; over_characters: the layouts that draw it over the characters",
+        "x": [338, 1588],
+        "y": [258, 258],
+        "4p": [450, -43],
+        "5p": [290, 52],
+        "scale_2p": 0.85,
+        "scale_4p": 0.8,
+        "scale_5p": 0.85,
+        "over_characters": ["5p"],
+        "plus_dx": -8,
+        "plus_dy": -14
     },
     "gauge_frame": {
         "x": [10061, 10000],
@@ -49,7 +56,7 @@
     "clear_text": {
         "x": [35, 1698],
         "y": [10000, 10000],
-        "4p": [866, 34],
+        "4p": [598, 369],
         "5p": [560, 430],
         "rect": [72, 54, 72, 26],
         "clear_rect": [0, 54, 72, 26]
@@ -138,13 +145,17 @@
         "x": [350, 1550],
         "y": [630, 630],
         "4p": [540, 810],
-        "5p": [280, 270]
+        "5p": [285, 255],
+        "scale_4p": 0.6,
+        "scale_5p": 0.4
     },
     "crown": {
         "x": [530, 1390],
         "y": [870, 870],
-        "4p": [355, 810],
-        "5p": [100, 270]
+        "4p": [540, 670],
+        "5p": [55, 50],
+        "scale_4p": 0.7,
+        "scale_5p": 0.55
     },
     "nameplate": {
         "x": [50, 1548],
@@ -160,7 +171,10 @@
     },
     "chara": {
         "_note": "the character stands at the nameplate, dx right of its left edge",
-        "dx": 165
+        "dx": 165,
+        "dx_4p": 120,
+        "scale_4p": 0.7,
+        "scale_5p": 0.6
     },
     "puchichara": {
         "_note": "off the character; frames side by side in its Chara.png",

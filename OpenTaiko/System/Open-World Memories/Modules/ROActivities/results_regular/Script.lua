@@ -25,6 +25,8 @@ local players, drawn, layoutN, kind, is1P, is2PSide = 1, 1, 1, "2p", true, false
 local endSeg = {}               -- each player's gauge, in segments of 2 %
 local times = {}                -- the timeline, from the fullest gauge
 local randomText = 0
+local charts = {}               -- each player's chart: { level, plus }
+local vault = false             -- the song is in the Secret Vault
 
 -- ── helpers ──────────────────────────────────────────────────────────────────────────────────────────
 
@@ -56,6 +58,20 @@ local function place(el, pos, ui)
     end
     local base, move = el[kind], Layout.ui_move[kind]
     return base[1] + move.x[pos + 1], base[2] + move.y[pos + 1]
+end
+
+-- how far the panel at pos sits below its ui_move place for this many players (panel_dy: one value, or one per
+-- player)
+local function panelDy(pos)
+    local d = Config.optional(Layout.panel_dy, kind) or 0
+    if type(d) == "table" then d = d[pos + 1] or 0 end
+    return d
+end
+
+-- a panel element's place: place, moved with the panels
+local function panelPlace(el, pos, ui)
+    local x, y = place(el, pos, ui)
+    return x, y + panelDy(pos)
 end
 
 -- 1.3 down to 1 over pop ms from t0, as the old screen popped its counts and pictures in
@@ -135,6 +151,73 @@ local function drawScore(x, y, value, scale, pop)
     t:SetScale(1, 1)
 end
 
+-- a layout element's scale for this many players: its scale_2p (1-2 players), scale_4p (3-4) or scale_5p, else 1
+local function scaleFor(el)
+    return Config.optional(el, "scale_" .. kind) or 1
+end
+
+-- this layout draws the difficulty over the characters (difficulty.over_characters), not with the panels
+local function difficultyOverCharas()
+    for _, k in ipairs(Layout.difficulty.over_characters) do
+        if k == kind then return true end
+    end
+    return false
+end
+
+-- each player's chart (its level and plus) and the song's vault, read once from the mounted song's node
+local function readCharts()
+    charts, vault = {}, false
+    local node = SONGMOUNT:ChosenSongNode()
+    if node == nil then return end
+    vault = node.Genre == "Secret Vault"
+    for p = 0, drawn - 1 do
+        local chart = node:GetChart(info:GetDifficulty(p))
+        if chart ~= nil then charts[p] = { level = chart.Level, plus = chart.IsPlus == true } end
+    end
+end
+
+-- the played difficulty as the song select's song info shows it: its circle with the level in it, and a plus
+-- level's "+" over the last digit's top-right corner
+local function drawDifficulty(p, pos, ui)
+    local D = Layout.difficulty
+    local chart = charts[p]
+    local circle = vault and tex.diffVault or tex.diffCircle[info:GetDifficulty(p) + 1]
+    if circle == nil or chart == nil then return end
+    local x, y = panelPlace(D, pos, ui)
+    local k = scaleFor(D)
+    circle:SetScale(k, k)
+    circle:DrawAtAnchor(x, y, "center")
+    circle:SetScale(1, 1)
+    -- the song select's digit layout: each digit starts half the previous one's width after it
+    local s = tostring(chart.level)
+    local w, prev = 0, 0
+    for i = 1, #s do
+        local t = tex.diffDigit[s:byte(i) - 47]
+        if t ~= nil then
+            if i > 1 then w = w + prev * 0.5 end
+            prev = t.Width
+        end
+    end
+    w = w + prev
+    local cx = x - w * k / 2
+    prev = 0
+    for i = 1, #s do
+        local t = tex.diffDigit[s:byte(i) - 47]
+        if t ~= nil then
+            if i > 1 then cx = cx + prev * 0.5 * k end
+            t:SetScale(k, k)
+            t:DrawAtAnchor(cx + t.Width * k / 2, y, "center")
+            t:SetScale(1, 1)
+            prev = t.Width
+        end
+    end
+    if chart.plus and tex.diffPlus ~= nil then
+        tex.diffPlus:SetScale(k, k)
+        tex.diffPlus:DrawAtAnchor(x + (w / 2 + D.plus_dx) * k, y + D.plus_dy * k, "center")
+        tex.diffPlus:SetScale(1, 1)
+    end
+end
+
 -- a texture part from its top left corner, scaled
 local function part(t, x, y, rx, ry, rw, rh, sx, sy)
     if t == nil or rw <= 0 or rh <= 0 then return end
@@ -173,7 +256,7 @@ local function drawGauge(p, pos, shift, ui)
     local box = G.rect
     local boxW = box[3]
     local sx = (players >= 3) and G.scale_x_3p or 1
-    local x, y = place(G, pos, ui)
+    local x, y = panelPlace(G, pos, ui)
     local diff = info:GetDifficulty(p)
     if diff > 4 then return end
     local gtype = info:GetGaugeType(p)
@@ -204,7 +287,7 @@ local function drawGauge(p, pos, shift, ui)
         end
         if #rainbowFrames > 0 and percent >= 100 then
             local f = rainbowFrames[(math.floor(math.max(0, clock - times.rainbow) / GAUGE.rainbow_frame) % #rainbowFrames) + 1]
-            local rx, ry = place(Layout.rainbow, pos, ui)
+            local rx, ry = panelPlace(Layout.rainbow, pos, ui)
             f:SetScale(sx, 1)
             f:DrawAtAnchor(rx, ry, "topleft")
             f:SetScale(1, 1)
@@ -221,7 +304,7 @@ local function drawGauge(p, pos, shift, ui)
     if normal then lit = percent >= norma else lit = math.min(100, percent) < 100 - (100 - kz) * 0.7 end
     local C = Layout.clear_text
     local r = lit and C.clear_rect or C.rect
-    local cx, cy = place(C, pos, ui)
+    local cx, cy = panelPlace(C, pos, ui)
     part(icon, cx, cy, r[1], r[2], r[3], r[4], sx, 1)
 
     if normal then
@@ -229,12 +312,12 @@ local function drawGauge(p, pos, shift, ui)
         if fire ~= nil and percent >= 100 then
             local fw = fire.Width / GAUGE.soul_frames
             local frame = math.floor(math.max(0, clock - times.rainbow) / GAUGE.soul_frame) % GAUGE.soul_frames
-            local fx, fy = place(Layout.soul_fire, pos, ui)
+            local fx, fy = panelPlace(Layout.soul_fire, pos, ui)
             part(fire, fx - math.floor(fire.Width / 16), fy - math.floor(fire.Height / 2), frame * fw, 0, fw, fire.Height)
         end
         if letter ~= nil then
             local lh = math.floor(letter.Height / 2)
-            local lx, ly = place(Layout.soul_text, pos, ui)
+            local lx, ly = panelPlace(Layout.soul_text, pos, ui)
             part(letter, lx - math.floor(letter.Width / 2), ly - math.floor(letter.Height / 4), 0, (percent >= norma) and 0 or lh, letter.Width, lh)
         end
     end
@@ -304,7 +387,8 @@ end
 -- the nameplate's place, which the character and its puchichara stand at
 local function plateAt(pos) return place(Layout.nameplate, pos) end
 
-local function drawPuchichara(p, pos, x, y)
+-- beside its character, scaled with it (k), its offsets too
+local function drawPuchichara(p, pos, x, y, k)
     local ok, show = pcall(function() return CONFIG.ShowPuchiChara end)
     if ok and show == false then return end
     local puchi = PUCHICHARALIST ~= nil and PUCHICHARALIST:GetPlayerPuchichara(p) or nil
@@ -315,8 +399,8 @@ local function drawPuchichara(p, pos, x, y)
     local fw = t.Width / P.frames
     local frame = math.floor(clock / Animation.puchichara.frame) % P.frames
     local bob = math.sin(rad(1 + (clock % Animation.puchichara.bob) / Animation.puchichara.bob * 359)) * P.bob_px
-    t:SetScale(P.scale, P.scale)
-    t:DrawRectAtAnchor(x + P.dx[side] + P.offset[1], y + P.dy[side] + P.offset[2] + bob, frame * fw, 0, fw, t.Height, "center")
+    t:SetScale(P.scale * k, P.scale * k)
+    t:DrawRectAtAnchor(x + (P.dx[side] + P.offset[1]) * k, y + (P.dy[side] + P.offset[2] + bob) * k, frame * fw, 0, fw, t.Height, "center")
     t:SetScale(1, 1)
 end
 
@@ -395,7 +479,7 @@ local function drawBubbles(p, pos)
     if b == nil then return end
     local bx, by, scale
     if kind ~= "2p" then
-        bx, by = place(V, pos)
+        bx, by = panelPlace(V, pos)
         scale = V.scale_more
     elseif layoutN == 2 then
         bx, by, scale = V.x_2p[pos + 1], V.y_2p[pos + 1], V.scale_more
@@ -478,14 +562,11 @@ local function drawPanel(i, ui)
     else
         local t = tex.panelN[i + 1]
         local move = Layout.ui_move[kind]
-        if t ~= nil then t:Draw(move.x[i + 1], move.y[i + 1]) end
+        if t ~= nil then t:Draw(move.x[i + 1], move.y[i + 1] + panelDy(i)) end
     end
 
     if tex.gaugeFrame ~= nil then
-        local D = Layout.difficulty_bar
-        local bx, by = place(D, pos, ui)
-        part(tex.diffBar, bx, by, 0, info:GetDifficulty(i) * D.size[2], D.size[1], D.size[2])
-        local fx, fy = place(Layout.gauge_frame, pos, ui)
+        local fx, fy = panelPlace(Layout.gauge_frame, pos, ui)
         tex.gaugeFrame:SetScale((kind == "2p") and 1 or 0.5, 1)
         tex.gaugeFrame:Draw(fx, fy)
         tex.gaugeFrame:SetScale(1, 1)
@@ -502,7 +583,7 @@ local function drawPanel(i, ui)
         if clock < t0 then break end
         local shown = row.show ~= false
         if shown then
-            local x, y = place(row, pos, ui)
+            local x, y = panelPlace(row, pos, ui)
             drawNumber(x, y, ROW_VALUE[row.value](i), numScale, popAt(t0))
             cue("pon", "pon" .. k)
         end
@@ -515,7 +596,7 @@ local function drawPanel(i, ui)
         local pop = 1
         if t <= SCORE.grow then pop = 1 + math.sin(rad(t / 1.5)) * SCORE.grow_by
         elseif t <= SCORE.grow + SCORE.settle then pop = 1 - math.sin(rad(t - SCORE.grow)) * SCORE.settle_by end
-        local x, y = place(S, pos, ui)
+        local x, y = panelPlace(S, pos, ui)
         drawScore(x, y, info:GetScore(i), scale, pop)
         cue("score_don", "score")
     end
@@ -534,22 +615,26 @@ local function badge(t0)
     return 1, 1
 end
 
-local function drawBadges(p, pos, ui)
+local function drawRank(p, pos, ui)
     local rank = info:GetScoreRank(p)
     if rank > 0 then
         local s, o = badge(times.rank)
         if s ~= nil then
             local x, y = place(Layout.score_rank, pos, ui)
-            sheetCell(tex.rank, x, y, 7, 4, rank - 1, flashRow(Animation.flash.rank_at), s, o)
+            sheetCell(tex.rank, x, y, 7, 4, rank - 1, flashRow(Animation.flash.rank_at), s * scaleFor(Layout.score_rank), o)
             if clock >= times.rank + BADGES.sound_after then cue("rank_in", "rank") end
         end
     end
+end
+
+-- the clear badge (crown)
+local function drawCrown(p, pos, ui)
     local clearType = info:GetClearType(p)
     if clearType >= 1 then
         local s, o = badge(times.crown)
         if s ~= nil then
             local x, y = place(Layout.crown, pos, ui)
-            sheetCell(tex.crown, x, y, 4, 4, clearType - 1, flashRow(Animation.flash.crown_at), s, o)
+            sheetCell(tex.crown, x, y, 4, 4, clearType - 1, flashRow(Animation.flash.crown_at), s * scaleFor(Layout.crown), o)
             if clock >= times.crown + BADGES.sound_after then cue("crown_in", "crown") end
         end
     end
@@ -566,7 +651,7 @@ local function drawPlayers()
             plate:Draw(0, x, y, 255, i, info.PlayerSide)
         end
         if mods ~= nil then
-            local x, y = place(Layout.modicons, pos)
+            local x, y = panelPlace(Layout.modicons, pos)
             mods:Draw(x, y, i, "menu")
         end
     end
@@ -652,7 +737,11 @@ local function loadTextures()
     end
     tex.soulText = load(RESULT .. "Soul_Text.png")
     tex.soulFire = load(RESULT .. "Result_Soul_Fire.png")
-    tex.diffBar = load(RESULT .. "DifficultyBar.png")
+    tex.diffCircle, tex.diffDigit = {}, {}
+    for d = 0, 4 do tex.diffCircle[d + 1] = load(RESULT .. "Difficulty/" .. d .. ".png") end
+    tex.diffVault = load(RESULT .. "Difficulty/vault.png")
+    for d = 0, 9 do tex.diffDigit[d + 1] = load(RESULT .. "Difficulty/Level/" .. d .. ".png") end
+    tex.diffPlus = load(RESULT .. "Difficulty/Level/plus.png")
     tex.number = load(RESULT .. "Number.png")
     tex.scoreNumber = load(RESULT .. "Score_Number.png")
     tex.rank = load(RESULT .. "ScoreRankEffect.png")
@@ -691,6 +780,7 @@ function activate(result)
     randomText = math.random(0, 2)
     clock, played = 0, {}
     buildTimes()
+    readCharts()
     loadTextures()
     for name, path in pairs(Animation.sounds) do
         if name ~= "_note" and STORAGE:FileExists(path) then sounds[name] = SOUND:CreateSFX(path) end
@@ -757,19 +847,34 @@ function draw()
     local ui = uiOffset()
     if not info.IsAIBattle and tex.header ~= nil then tex.header:Draw(0, 0) end
     for i = 0, drawn - 1 do drawPanel(i, ui) end
+    -- the difficulty sits over the score boxes, or over the characters (below)
+    if not difficultyOverCharas() then
+        for i = 0, drawn - 1 do drawDifficulty(i, posOf(i), ui) end
+    end
     if info.IsAIBattle then drawAI() end
+    local ck = scaleFor(Layout.chara)
+    local dx = Config.optional(Layout.chara, "dx_" .. kind) or Layout.chara.dx
     for p = 0, drawn - 1 do
         local pos = posOf(p)
         local x, y = plateAt(pos)
-        local cx, cy = x + Layout.chara.dx, y
+        local cx, cy = x + dx, y
         local s = charas[p]
-        if s ~= nil then s.c:Draw(cx, cy, s.action or s.loop, (pos % 2 == 1) and -1 or 1, 1) end
-        drawPuchichara(p, pos, cx, cy)
+        -- two players: each character stands in front of its score rank
+        local rankUnder = layoutN == 2
+        if rankUnder then drawRank(p, pos, ui) end
+        -- one or two players face each other; more always face right
+        local flip = (kind == "2p" and pos % 2 == 1) and -1 or 1
+        if s ~= nil then s.c:Draw(cx, cy, s.action or s.loop, flip * ck, ck) end
+        drawPuchichara(p, pos, cx, cy, ck)
         if clock >= times.clear then
             if info:GetClearType(p) >= 1 and layoutN <= 2 then drawFlowers(pos) end
             drawBubbles(p, pos)
         end
-        drawBadges(p, pos, ui)
+        if not rankUnder then drawRank(p, pos, ui) end
+        drawCrown(p, pos, ui)
+    end
+    if difficultyOverCharas() then
+        for p = 0, drawn - 1 do drawDifficulty(p, posOf(p), ui) end
     end
     local M = Layout.music_name
     fonts.title:Draw(info.Title, M.x, M.y, col.title, col.titleOutline, 1, 1, M.max_width, "top")
