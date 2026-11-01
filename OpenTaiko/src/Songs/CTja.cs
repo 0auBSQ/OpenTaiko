@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Globalization;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -1893,6 +1894,11 @@ internal class CTja : CActivity {
 		return (false, false);
 	}
 
+	private static void ThrowIfNaNForTiming(double value, [CallerArgumentExpression(nameof(value))] string? paramName = null) {
+		if (double.IsNaN(value))
+			throw new ArgumentOutOfRangeException(paramName, value, "NaN is forbidden for timing commands");
+	}
+
 	// returns whether `#END` is reached
 	private bool ParseCommand(string command, string argument, string argumentFull) {
 		if (command == "#START") {
@@ -1902,7 +1908,7 @@ internal class CTja : CActivity {
 			return true;
 		} else if (command == "#BPMCHANGE") {
 			double dbBPM = 0;
-			ParseArg(command, argument, "bpm_real", arg => dbBPM = arg.ParseReal());
+			ParseArg(command, argument, "bpm_real", arg => ThrowIfNaNForTiming(dbBPM = arg.ParseReal()));
 			this.dbNowBPM = dbBPM;
 
 			if (dbBPM > MaxBPM) {
@@ -1969,6 +1975,7 @@ internal class CTja : CActivity {
 				var strArray = arg.Split(new char[] { '/' }, 2);
 				dbLength[0] = strArray[0].ParseReal();
 				dbLength[1] = strArray[1].ParseReal();
+				ThrowIfNaNForTiming(dbLength[0] / dbLength[1]);
 			});
 
 			double dbMeasureLengthScale = dbLength[0] / dbLength[1];
@@ -1980,7 +1987,7 @@ internal class CTja : CActivity {
 			this.listChip.Add(this.NewEventChipAtDefCursor(0x02, 1, argDb: dbMeasureLengthScale));
 		} else if (command == "#DELAY") {
 			double nDELAY = 0;
-			ParseArg(command, argument, "secDelay_real", arg => nDELAY = arg.ParseReal());
+			ParseArg(command, argument, "secDelay_real", arg => ThrowIfNaNForTiming(nDELAY = arg.ParseReal()));
 			nDELAY *= 1000;
 			if (this.COMPAT is ETjaCompat.Jiro1 or ETjaCompat.Jiro2) {
 				nDELAY = Math.Truncate(nDELAY);
@@ -3996,7 +4003,7 @@ internal class CTja : CActivity {
 				strCommandParam = strCommandParam.Replace(',', '.');
 
 			double dbBPM = 0;
-			ParseArg(strCommandName, strCommandParam, "bpm_real", arg => dbBPM = arg.ParseReal());
+			ParseArg(strCommandName, strCommandParam, "bpm_real", arg => ThrowIfNaNForTiming(dbBPM = arg.ParseReal()));
 			this.BPM = dbBPM;
 			this.BASEBPM = dbBPM;
 			this.MinBPM = dbBPM;
