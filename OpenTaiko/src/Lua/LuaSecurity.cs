@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+using System.Reflection;
 using System.Text;
 using NLua;
 
@@ -6,6 +8,39 @@ namespace OpenTaiko {
 		internal const string luaScriptSecure = $$"""
 loadfile = nil
 dofile = nil
+
+-- engine objects show their documented members only; IsMemberHidden decides once per type and name
+do
+	local type, realMetatable, hidden = type, debug.getmetatable, _csMemberHidden
+	local registry = debug.getregistry()
+	local index = registry.luaNet_indexfunction
+	local verdicts = setmetatable({}, { __mode = "k" })
+	local function filtered(obj, name)
+		if type(name) == "string" then
+			local meta = realMetatable(obj)
+			if meta == nil then return nil end
+			local seen = verdicts[meta]
+			if seen == nil then
+				seen = {}
+				verdicts[meta] = seen
+			end
+			local hide = seen[name]
+			if hide == nil then
+				hide = hidden(obj, name)
+				seen[name] = hide
+			end
+			if hide then return nil end
+		end
+		return index(obj, name)
+	end
+	registry.luaNet_indexfunction = filtered
+	for _, v in pairs(registry) do
+		if type(v) == "table" and rawget(v, "__index") == index then
+			rawset(v, "__index", filtered)
+		end
+	end
+end
+_csMemberHidden = nil
 
 do
 	local _load = load
@@ -101,11 +136,49 @@ import = function () end
 				paths.AddRange(globalLib);
 			}
 			lua["_csPackagePaths"] = paths;
+			lua["_csMemberHidden"] = (Func<object?, string, bool>)IsMemberHidden;
 
 			lua.DoString(luaScriptSecure, nameof(luaScriptSecure));
 
 			// remove dropped references
 			lua.State.GarbageCollector(KeraLua.LuaGC.Collect, 0);
 		}
+
+		private static readonly ConcurrentDictionary<(Type, string), bool> hiddenMembers = new();
+
+		// GetType, reflection objects themselves, and members whose value is a reflection type
+		internal static bool IsMemberHidden(object? obj, string name) {
+			if (obj == null) return false;
+			return hiddenMembers.GetOrAdd((obj.GetType(), name), key => ComputeHidden(key.Item1, key.Item2));
+		}
+
+		private static bool ComputeHidden(Type type, string name) {
+			if (name == nameof(object.GetType) || IsReflectionType(type)) return true;
+			foreach (MemberInfo member in type.GetMember(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy)) {
+				Type? valueType = member switch {
+					MethodInfo method => method.ReturnType,
+					PropertyInfo property => property.PropertyType,
+					FieldInfo field => field.FieldType,
+					_ => null,
+				};
+				if (valueType != null && Carries(valueType, 0)) return true;
+			}
+			return false;
+		}
+
+		// the type itself, an array or by-ref of it, or a generic argument (List<Type>, Func<MethodInfo>)
+		private static bool Carries(Type type, int depth) {
+			if (IsReflectionType(type)) return true;
+			if (depth > 4) return false;
+			if (type.HasElementType && Carries(type.GetElementType()!, depth + 1)) return true;
+			return type.IsGenericType && type.GetGenericArguments().Any(arg => Carries(arg, depth + 1));
+		}
+
+		private static bool IsReflectionType(Type type) =>
+			typeof(MemberInfo).IsAssignableFrom(type) || typeof(Assembly).IsAssignableFrom(type)
+			|| typeof(Module).IsAssignableFrom(type) || typeof(ParameterInfo).IsAssignableFrom(type)
+			|| type == typeof(RuntimeTypeHandle) || type == typeof(RuntimeMethodHandle)
+			|| type == typeof(RuntimeFieldHandle) || type == typeof(ModuleHandle)
+			|| (type.Namespace is { } ns && (ns.StartsWith("System.Reflection") || ns.StartsWith("System.Runtime.Loader")));
 	}
 }

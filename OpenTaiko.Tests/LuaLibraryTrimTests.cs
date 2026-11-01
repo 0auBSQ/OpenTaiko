@@ -8,10 +8,11 @@ namespace OpenTaiko.Tests;
 // LuaSecurity's prelude: scripts get the trimmed standard libraries both as globals and through require,
 // and load takes text chunks only
 public class LuaLibraryTrimTests {
-	private static Lua NewState() {
+	internal static Lua NewState() {
 		var lua = new Lua();
 		lua["_csReadFile"] = (Func<string, string?>)(_ => null);
 		lua["_csPackagePaths"] = new List<string>();
+		lua["_csMemberHidden"] = (Func<object?, string, bool>)LuaSecurity.IsMemberHidden;
 		lua.DoString(LuaSecurity.luaScriptSecure, "prelude");
 		return lua;
 	}
