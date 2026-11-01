@@ -13,7 +13,7 @@ Les chansons, les personnages, les puchicharas et les plaques de nom utilisent u
 | `type` | string | La comparaison que les conditions à valeur utilisent (voir Types de comparaison). |
 | `references` | string array | Identifiants de chanson, noms de genre, noms de créateur ou noms de drapeau, selon la condition. |
 
-Le `Unlock.json` d'une chanson ajoute ses propres champs (`hidden_index`, `rarity`, `custom_unlock_text`), que décrit le guide [Déblocage de partitions](unlockables.md).
+Le `Unlock.json` d'une chanson ajoute ses propres champs (`hidden_index`, `rarity`, `custom_unlock_text`), que décrit le guide [Déblocage de partitions](unlockables.md). Le `Unlock.json` d'un personnage ou d'un puchichara lit aussi ces trois champs : `custom_unlock_text` remplace le message de la condition dans l'écran de la chambre (même pour les conditions `gt` et `gc`, qui sinon affichent « ??? »), `rarity` remplace partout la rareté de son `Metadata.json` (affichage, notification de déblocage, multiplicateur de pièces), et `hidden_index` est lu et transmis aux skins, qui ne l'utilisent pas encore.
 
 ## Identifiants de condition
 

@@ -13,7 +13,7 @@
 | `type` | string | 基于数值的条件所使用的比较方式（见“比较类型”）。 |
 | `references` | string 数组 | 歌曲 id、分类名称、谱师名称或标志名称，取决于条件。 |
 
-歌曲的 `Unlock.json` 还有自己的字段（`hidden_index`、`rarity`、`custom_unlock_text`），见[谱面解锁条件](unlockables.md)指南。
+歌曲的 `Unlock.json` 还有自己的字段（`hidden_index`、`rarity`、`custom_unlock_text`），见[谱面解锁条件](unlockables.md)指南。 角色或小角色的 `Unlock.json` 也会读取这三个字段：`custom_unlock_text` 在房间界面中代替条件本身的说明（即使是平时显示“???”的 `gt` 和 `gc` 条件也一样），`rarity` 在所有地方（显示、解锁通知、金币倍率）代替其 `Metadata.json` 中的稀有度，`hidden_index` 会被读取并提供给皮肤，但皮肤目前还不使用它。
 
 ## 条件 id
 

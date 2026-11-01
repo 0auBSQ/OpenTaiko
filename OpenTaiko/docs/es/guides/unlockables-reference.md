@@ -13,7 +13,7 @@ Las canciones, los personajes, los puchicharas y las placas de nombre usan un mi
 | `type` | string | La comparación que usan las condiciones basadas en valores (consulta Tipos de comparación). |
 | `references` | string array | Ids de canción, nombres de género, nombres de autor o nombres de bandera, según la condición. |
 
-El `Unlock.json` de una canción añade sus propios campos (`hidden_index`, `rarity`, `custom_unlock_text`), descritos en la guía [Desbloqueables de charts](unlockables.md).
+El `Unlock.json` de una canción añade sus propios campos (`hidden_index`, `rarity`, `custom_unlock_text`), descritos en la guía [Desbloqueables de charts](unlockables.md). El `Unlock.json` de un personaje o de un puchichara también lee estos tres campos: `custom_unlock_text` sustituye el mensaje de la condición en la pantalla de la habitación (incluso para las condiciones `gt` y `gc`, que si no muestran "???"), `rarity` sustituye en todas partes la rareza de su `Metadata.json` (visualización, notificación de desbloqueo, multiplicador de monedas), y `hidden_index` se lee y se pasa a las skins, que aún no lo usan.
 
 ## Ids de condición
 

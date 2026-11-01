@@ -13,7 +13,7 @@ Songs, characters, puchicharas and nameplates use one unlock condition format. S
 | `type` | string | The comparison that value-based conditions use (see Comparison types). |
 | `references` | string array | Song ids, genre names, charter names or flag names, depending on the condition. |
 
-A song's `Unlock.json` adds its own fields (`hidden_index`, `rarity`, `custom_unlock_text`), described in the [Chart unlockables](unlockables.md) guide.
+A song's `Unlock.json` adds its own fields (`hidden_index`, `rarity`, `custom_unlock_text`), described in the [Chart unlockables](unlockables.md) guide. A character's or puchichara's `Unlock.json` reads these three fields too: `custom_unlock_text` replaces the condition's message in the room screen (even for `gt` and `gc` conditions, which otherwise show "???"), `rarity` replaces the rarity of its `Metadata.json` everywhere (display, unlock notification, coin multiplier), and `hidden_index` is read and given to skins, which do not use it yet.
 
 ## Condition ids
 

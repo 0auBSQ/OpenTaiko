@@ -13,7 +13,7 @@ Nummers, personages, puchichara's en naamplaatjes gebruiken één formaat voor o
 | `type` | string | De vergelijking die waardegebaseerde voorwaarden gebruiken (zie Vergelijkingstypen). |
 | `references` | string-array | Nummer-id's, genrenamen, charternamen of vlagnamen, afhankelijk van de voorwaarde. |
 
-De `Unlock.json` van een nummer voegt eigen velden toe (`hidden_index`, `rarity`, `custom_unlock_text`), die de handleiding [Ontgrendelvoorwaarden voor charts](unlockables.md) beschrijft.
+De `Unlock.json` van een nummer voegt eigen velden toe (`hidden_index`, `rarity`, `custom_unlock_text`), die de handleiding [Ontgrendelvoorwaarden voor charts](unlockables.md) beschrijft. Ook de `Unlock.json` van een personage of puchichara leest deze drie velden: `custom_unlock_text` vervangt het bericht van de voorwaarde in het kamerscherm (ook bij `gt`- en `gc`-voorwaarden, die anders "???" tonen), `rarity` vervangt overal de zeldzaamheid uit zijn `Metadata.json` (weergave, ontgrendelmelding, muntvermenigvuldiger), en `hidden_index` wordt gelezen en aan skins doorgegeven, die hem nog niet gebruiken.
 
 ## Voorwaarde-id's
 

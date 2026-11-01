@@ -13,7 +13,7 @@
 | `type` | string | 값 기반 조건에 사용하는 비교(비교 유형 섹션 참고). |
 | `references` | string 배열 | 조건에 따라 곡 id, 장르 이름, 채보 제작자 이름, 플래그 이름. |
 
-곡의 `Unlock.json`에는 고유한 필드(`hidden_index`, `rarity`, `custom_unlock_text`)가 더해지며, [채보 잠금 해제 요소](unlockables.md) 가이드에서 설명합니다.
+곡의 `Unlock.json`에는 고유한 필드(`hidden_index`, `rarity`, `custom_unlock_text`)가 더해지며, [채보 잠금 해제 요소](unlockables.md) 가이드에서 설명합니다. 캐릭터나 푸치캐릭터의 `Unlock.json`도 이 세 필드를 읽습니다. `custom_unlock_text`는 룸 화면에서 조건 메시지 대신 표시되고(평소 "???"로 표시되는 `gt`와 `gc` 조건에서도 마찬가지입니다), `rarity`는 `Metadata.json`의 레어도를 모든 곳(표시, 잠금 해제 알림, 코인 배율)에서 대체하며, `hidden_index`는 읽혀서 스킨에 전달되지만 스킨은 아직 사용하지 않습니다.
 
 ## 조건 id
 

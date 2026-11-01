@@ -13,7 +13,7 @@ Songs, Charaktere, Puchicharas und Namensschilder verwenden dasselbe Format für
 | `type` | string | Der Vergleich, den wertbasierte Bedingungen verwenden (siehe Vergleichsarten). |
 | `references` | string array | Song-IDs, Genrenamen, Chart-Autorennamen oder Flag-Namen, je nach Bedingung. |
 
-Die `Unlock.json` eines Songs ergänzt eigene Felder (`hidden_index`, `rarity`, `custom_unlock_text`), die die Anleitung [Chart-Freischaltungen](unlockables.md) beschreibt.
+Die `Unlock.json` eines Songs ergänzt eigene Felder (`hidden_index`, `rarity`, `custom_unlock_text`), die die Anleitung [Chart-Freischaltungen](unlockables.md) beschreibt. Auch die `Unlock.json` eines Charakters oder Puchicharas liest diese drei Felder: `custom_unlock_text` ersetzt die Meldung der Bedingung im Zimmerbildschirm (auch bei `gt`- und `gc`-Bedingungen, die sonst "???" zeigen), `rarity` ersetzt überall die Seltenheit aus seiner `Metadata.json` (Anzeige, Freischaltmeldung, Münzmultiplikator), und `hidden_index` wird gelesen und an Skins weitergegeben, die ihn noch nicht nutzen.
 
 ## Bedingungs-IDs
 

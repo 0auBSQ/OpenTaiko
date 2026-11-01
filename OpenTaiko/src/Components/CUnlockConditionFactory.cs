@@ -31,6 +31,18 @@ namespace OpenTaiko {
 			// Referenced charts
 			[JsonProperty("references")]
 			public string[] Reference;
+
+			// The song Unlock.json fields, for characters and puchicharas (songs read theirs in DBSongUnlockables):
+			// the text shown instead of the condition's own message, how a locked entry is presented (0-3, as a
+			// song's hidden_index) and the rarity that replaces Metadata.json's
+			[JsonProperty("custom_unlock_text")]
+			public CLocalizationData? CustomUnlockText;
+
+			[JsonProperty("hidden_index")]
+			public int HiddenIndex;
+
+			[JsonProperty("rarity")]
+			public string? Rarity;
 		}
 
 		/*

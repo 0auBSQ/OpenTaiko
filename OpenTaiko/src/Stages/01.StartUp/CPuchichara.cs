@@ -59,5 +59,6 @@ class CPuchichara {
 		metadata = ConfigManager.ReadOr(Path.Combine(path, "Metadata.json"), ConfigManager.GetConfig<DBPuchichara.PuchicharaData>, new DBPuchichara.PuchicharaData());
 		effect = ConfigManager.ReadOr(Path.Combine(path, "Effects.json"), ConfigManager.GetConfig<DBPuchichara.PuchicharaEffect>, new DBPuchichara.PuchicharaEffect());
 		unlock = ConfigManager.ReadOr<CUnlockCondition?>(Path.Combine(path, "Unlock.json"), p => OpenTaiko.UnlockConditionFactory.GenerateUnlockObjectFromJsonPath(p), null);
+		metadata.Rarity = CUnlockCondition.tRarityOverride(unlock, metadata.Rarity, path);
 	}
 }

@@ -13,7 +13,7 @@
 | `type` | string | 値に基づく条件が使う比較 (「比較の種類」の節を参照)。 |
 | `references` | string 配列 | 条件に応じて、楽曲 id、ジャンル名、譜面作者名、フラグ名。 |
 
-楽曲の `Unlock.json` には独自のフィールド (`hidden_index`、`rarity`、`custom_unlock_text`) が加わります。これらは[譜面のアンロック要素](unlockables.md)ガイドで説明しています。
+楽曲の `Unlock.json` には独自のフィールド (`hidden_index`、`rarity`、`custom_unlock_text`) が加わります。これらは[譜面のアンロック要素](unlockables.md)ガイドで説明しています。 キャラクターやぷちキャラの `Unlock.json` もこの 3 つのフィールドを読みます。`custom_unlock_text` はルーム画面で条件のメッセージの代わりに表示され (普段は「???」と表示される `gt` と `gc` の条件でも同じです)、`rarity` は `Metadata.json` のレア度をすべての場所 (表示、アンロック通知、コイン倍率) で置き換え、`hidden_index` は読み込まれてスキンに渡されますが、スキンはまだ使いません。
 
 ## 条件 id
 

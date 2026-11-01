@@ -4,9 +4,22 @@ namespace OpenTaiko {
 	public class LuaUnlockCondition {
 		private CUnlockCondition? _cUC;
 
+		/// <summary>The Unlock.json's custom_unlock_text in the game language when it has one, else the condition's own message.</summary>
 		public string GetConditionMessage() {
-			return _cUC?.tConditionMessage(EScreen.MyRoom) ?? "";
+			if (_cUC == null) return "";
+			if (_cUC.CustomText != null && _cUC.CustomText.Strings.Count > 0)
+				return _cUC.CustomText.GetString(_cUC.tConditionMessage(EScreen.MyRoom));
+			return _cUC.tConditionMessage(EScreen.MyRoom);
 		}
+
+		/// <summary>True when the Unlock.json gives its own text (custom_unlock_text) for this condition.</summary>
+		public bool HasCustomMessage => _cUC?.CustomText != null && _cUC.CustomText.Strings.Count > 0;
+
+		/// <summary>The Unlock.json's hidden_index, 0-3 as for songs (0 displayed, 1 grayed, 2 blurred, 3 hidden); 0 without one.</summary>
+		public int GetHiddenIndex() => _cUC?.HiddenIndex ?? 0;
+
+		/// <summary>The Unlock.json's rarity, or "" when it gives none (the asset's Rarity already includes it).</summary>
+		public string GetRarity() => _cUC?.Rarity ?? "";
 
 		/// <summary>Returns true when this entry has an explicit unlock condition. Items with no condition are available by default.</summary>
 		public bool HasCondition => _cUC != null;

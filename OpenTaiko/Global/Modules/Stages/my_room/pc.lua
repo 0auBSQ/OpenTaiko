@@ -75,7 +75,7 @@ local TAB_W, TAB_STEP, TAB_X0 = 278, 290, PANEL.x + 36
 -- conditions that read exactly "???" — re-checked against the FULL CUnlockConditionFactory list
 -- (ch/cs/cm/ce coin paths, sd/dp/lp/sp/sg/sc performance, tp/ap/aw play counts are all earnable
 -- and self-describing): "ig" is literally "Impossible to Get"; "gt"/"gc" are story-driven global
--- trigger/counter flags with no player-readable condition
+-- trigger/counter flags with no player-readable condition, unless the Unlock.json gives its own text
 local OPAQUE_COND = { ig = true, gt = true, gc = true }
 
 local RARITY_COL = {
@@ -924,7 +924,9 @@ function PC:refreshDetail()
         -- a locked entry must ALWAYS show a real line: message → blocked reason → coin price;
         -- "???" only for the genuinely hidden condition types
         local m = ""
-        if OPAQUE_COND[ctype] then
+        local custom = false
+        pcall(function() custom = uc.HasCustomMessage == true end)
+        if OPAQUE_COND[ctype] and not custom then
             m = T:tr("unknown")
         else
             pcall(function() m = uc:GetConditionMessage() or "" end)

@@ -305,6 +305,7 @@ abstract class CCharacter : IDisposable {
 			metadata = ConfigManager.ReadOr(Path.Combine(path, "Metadata.json"), ConfigManager.GetConfig<DBCharacter.CharacterData>, new DBCharacter.CharacterData());
 			effect = ConfigManager.ReadOr(Path.Combine(path, "Effects.json"), ConfigManager.GetConfig<DBCharacter.CharacterEffect>, new DBCharacter.CharacterEffect());
 			unlock = ConfigManager.ReadOr<CUnlockCondition?>(Path.Combine(path, "Unlock.json"), p => OpenTaiko.UnlockConditionFactory.GenerateUnlockObjectFromJsonPath(p), null);
+			metadata.Rarity = CUnlockCondition.tRarityOverride(unlock, metadata.Rarity, path);
 		}
 	}
 

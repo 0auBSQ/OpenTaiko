@@ -9,6 +9,9 @@ namespace OpenTaiko {
 				Type = rawJson.Type;
 				Reference = rawJson.Reference.Copy();
 				CoinStack = 0;
+				CustomText = rawJson.CustomUnlockText;
+				HiddenIndex = Math.Clamp(rawJson.HiddenIndex, 0, 3);
+				Rarity = string.IsNullOrWhiteSpace(rawJson.Rarity) ? null : rawJson.Rarity;
 			} else {
 				Values = [];
 				Type = "me";
@@ -28,6 +31,22 @@ namespace OpenTaiko {
 
 		// Used to get recursively coin counts on OR/AND comb conditions
 		public int CoinStack;
+
+		// The Unlock.json's custom_unlock_text, shown instead of the condition's own message
+		public CLocalizationData? CustomText;
+
+		// The Unlock.json's hidden_index (0-3, as songs' EHiddenIndex) and rarity (null when it gives none)
+		public int HiddenIndex;
+		public string? Rarity;
+
+		// The rarity a character or puchichara uses everywhere: its Unlock.json's when that names a known one,
+		// else its Metadata.json's
+		public static string tRarityOverride(CUnlockCondition? unlock, string metadataRarity, string folder) {
+			if (unlock?.Rarity == null) return metadataRarity;
+			if (HRarity.tIsRarity(unlock.Rarity)) return unlock.Rarity;
+			System.Diagnostics.Trace.TraceWarning($"{folder}: Unlock.json has an unknown rarity \"{unlock.Rarity}\", the Metadata.json one is used.");
+			return metadataRarity;
+		}
 
 		protected int RequiredArgCount = -1;
 		protected string ConditionId = "";
