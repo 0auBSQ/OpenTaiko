@@ -89,9 +89,10 @@ local function at(t, key, fn)
 end
 
 local function ordinal(n)
+    if n == 1 then return LANG:GetString("DAN_ST", n) end
     local m = n % 100
-    if m >= 11 and m <= 13 then return n .. "th" end
-    return n .. (({ "st", "nd", "rd" })[n % 10] or "th")
+    if m >= 11 and m <= 13 then return LANG:GetString("DAN_TH", n) end
+    return ({ LANG:GetString("DAN_UNIEME", n), LANG:GetString("DAN_ND", n), LANG:GetString("DAN_RD", n) })[n % 10] or LANG:GetString("DAN_TH", n)
 end
 
 local function statusIndex(s) return math.max(0, math.min(2, s)) + 1 end
