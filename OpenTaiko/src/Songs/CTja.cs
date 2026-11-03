@@ -484,13 +484,14 @@ internal class CTja : CActivity {
 	private List<int>[] listBalloon_Branch = null!; // [3] for common
 	private byte[] listBalloon_Branch_defined; // [3] for common; 0 = not defined, 1 = defined for previous player sides, 2 = defined for current player sides
 
-	public List<SKBitmap> listLyric = null!; //歌詞を格納していくリスト。スペル忘れた(ぉい
-	public List<STLYRIC> listLyric2 = null!;
+	public List<SKBitmap> listLyric = null!; // lyric lines from #LYRIC, not including #LYRIC for songs having loaded lyric file
+	public List<STLYRIC> listLyric2 = null!; // lyric lines from loaded lyric files
 	public List<int> IdxLyric2AtSongEnds = null!;
 
 	//public Dictionary<double, CChip> kusudaMAP = new Dictionary<double, CChip>();
 
-	public bool usingLyricsFile; //If lyric file is used (VTT/LRC), ignore #LYRIC commands & ignore other LYRICS:/LYRICFILE: headers
+	// If lyric file is used (VTT/LRC) for the i-th song, ignore #LYRIC commands for the i-th song & ignore other LYRICS:/LYRICFILE: headers
+	public List<bool> usingLyricsFile = [];
 
 	private int[] listBalloon_Branch_iLast; // [3] for common
 
@@ -621,7 +622,6 @@ internal class CTja : CActivity {
 		this.EXPLICIT = false;
 		this.SELECTBG = "";
 		this.bLyrics = false;
-		this.usingLyricsFile = false;
 		this.PREVIEW = "";
 		this.PREIMAGE = "";
 		this.BACKGROUND = "";
@@ -2508,7 +2508,7 @@ internal class CTja : CActivity {
 			this.bBARLINECUE[0] = 0;
 
 			this.listChip.Add(chip);
-		} else if (command == "#LYRIC" && !usingLyricsFile && OpenTaiko.ConfigIni.nPlayerCount < 4) // Ignore #LYRIC if a lyric file is already loaded
+		} else if (command == "#LYRIC" && !usingLyricsFile.ElementAtOrDefault(Math.Max(0, List_DanSongs.Count - 1)) && OpenTaiko.ConfigIni.nPlayerCount < 4) // Ignore #LYRIC if a lyric file for the song is already loaded
 		{
 			if (this.bLoadChart)//起動時に重たくなってしまう問題の修正用
 				this.listLyric.Add(this.pfLyricsFont!.DrawText(argumentFull, OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30));
@@ -4232,7 +4232,7 @@ internal class CTja : CActivity {
 			}
 			this.CutSceneOutros = outros;
 		} else if (strCommandName.Equals("LYRICS") || strCommandName.Equals("LYRICFILE")) {
-			if (usingLyricsFile) {
+			if (usingLyricsFile.Any()) {
 				this.AddWarn($"ignoring an extra LYRICS / LYRICFILE header, argument: {strCommandParam}");
 			} else {
 				bool isLoadingLyrics = this.bLoadChart && OpenTaiko.ConfigIni.nPlayerCount < 4;
@@ -4243,6 +4243,8 @@ internal class CTja : CActivity {
 				string[] files = SplitComma(strCommandParam);
 				if (files.Length > 0 && string.IsNullOrWhiteSpace(files[^1])) // empty list, or trailing comma (,) (not trimmed for headers)
 					Array.Resize(ref files, files.Length - 1);
+
+				List<bool> isLyricFileLoaded = Enumerable.Repeat(false, files.Length).ToList();
 				for (int i = 0; i < files.Length; i++) {
 					if (string.IsNullOrEmpty(files[i])) {
 						idxLyric2AtSongEnds.Add(listLyrics.Count);
@@ -4273,6 +4275,7 @@ internal class CTja : CActivity {
 									this.AddArgError(strCommandName, strCommandParam, i, null, arg, $"Unknown lyric file extension");
 									return;
 								}
+								isLyricFileLoaded[i] = true;
 							} finally {
 								idxLyric2AtSongEnds.Add(listLyrics.Count);
 							}
@@ -4282,7 +4285,8 @@ internal class CTja : CActivity {
 
 				this.listLyric2 = listLyrics;
 				this.IdxLyric2AtSongEnds = idxLyric2AtSongEnds;
-				this.bLyrics = this.usingLyricsFile = (nEntries > 0);
+				this.usingLyricsFile = isLyricFileLoaded;
+				this.bLyrics = (nEntries > 0);
 			}
 		} else if (strCommandName.Equals("COMPAT")) {
 			ParseArg(strCommandName, strCommandParam, "enumCompat_str", arg => this.COMPAT = strConvertTjaCompat(arg));
