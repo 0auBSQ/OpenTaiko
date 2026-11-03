@@ -5,9 +5,11 @@
   "menu_off": "Uitzetten",
   "menu_rewatch": "Tussenfilmpjes terugkijken",
   "tab_songs": "Tussenfilmpjes van nummers",
+  "tab_videos": "Chartvideo's",
   "intro": "Intro",
   "outro": "Outro %d",
   "unknown_song": "???",
   "empty": "Geen tussenfilmpjes gevonden.",
+  "empty_videos": "Geen chartvideo's gevonden.",
   "waiting": "Zenders afstemmen... de lijst met nummers wordt nog voorbereid."
 }

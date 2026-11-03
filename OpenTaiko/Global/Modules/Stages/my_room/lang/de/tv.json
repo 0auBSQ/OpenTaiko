@@ -5,9 +5,11 @@
   "menu_off": "Ausschalten",
   "menu_rewatch": "Zwischensequenzen ansehen",
   "tab_songs": "Song-Zwischensequenzen",
+  "tab_videos": "Chart-Videos",
   "intro": "Intro",
   "outro": "Outro %d",
   "unknown_song": "???",
   "empty": "Keine Zwischensequenzen gefunden.",
+  "empty_videos": "Keine Chart-Videos gefunden.",
   "waiting": "Sender werden eingestellt... die Songliste wird noch vorbereitet."
 }

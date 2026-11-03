@@ -147,6 +147,8 @@ end
 | `node.Side  (int)` | SIDE 값: 0 normal, 1 ex, 2 both. |
 | `node.Explicit  (bool)` | 곡에 explicit 플래그가 있으면 true. 곡이 아니면 nil. |
 | `node.HasVideo  (bool)` | 곡에 배경 동영상이 있으면 true. 곡이 아니면 nil. |
+| `node.VideoPath  (string)` | 채보 배경 동영상(BGMOVIE)의 절대 경로. 없으면 빈 문자열. |
+| `node.VideoOffsetMs  (int)` | MOVIEOFFSET(밀리초). 동영상은 곡의 BGM보다 이만큼 늦게 시작하며, 음수면 더 일찍 시작합니다. |
 | `node.DemoStart  (int)` | 미리 듣기 BGM 오프셋(밀리초). |
 | `node.AudioPath  (string)` | 곡 BGM 파일의 절대 경로. 없으면 빈 문자열. |
 | `node.HasPreimage  (bool)` | 곡이 프리이미지를 선언했으면 true. |

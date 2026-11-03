@@ -147,6 +147,8 @@ The song list handle, SONGMOUNT:ChosenSongNode() and DANBUILDER:GetSong() return
 | `node.Side  (int)` | The SIDE value: 0 normal, 1 ex, 2 both. |
 | `node.Explicit  (bool)` | True when the song is flagged explicit; nil for non-songs. |
 | `node.HasVideo  (bool)` | True when the song has a background movie; nil for non-songs. |
+| `node.VideoPath  (string)` | The absolute path of the chart's background movie (BGMOVIE), or an empty string. |
+| `node.VideoOffsetMs  (int)` | The MOVIEOFFSET in milliseconds: the movie starts this long after the song's BGM, before it when negative. |
 | `node.DemoStart  (int)` | The preview BGM offset in milliseconds. |
 | `node.AudioPath  (string)` | The absolute path of the song's BGM file, or an empty string. |
 | `node.HasPreimage  (bool)` | True when the song declares a preimage. |

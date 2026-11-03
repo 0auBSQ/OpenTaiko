@@ -5,9 +5,11 @@
   "menu_off": "Turn off",
   "menu_rewatch": "Rewatch cutscenes",
   "tab_songs": "Song cutscenes",
+  "tab_videos": "Chart videos",
   "intro": "Intro",
   "outro": "Outro %d",
   "unknown_song": "???",
   "empty": "No cutscenes found.",
+  "empty_videos": "No chart videos found.",
   "waiting": "Tuning the channels... the song list is still being prepared."
 }

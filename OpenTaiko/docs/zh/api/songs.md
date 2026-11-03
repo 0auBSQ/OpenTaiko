@@ -147,6 +147,8 @@ end
 | `node.Side  (int)` | SIDE 值：0 普通，1 ex，2 两者。 |
 | `node.Explicit  (bool)` | 歌曲被标记为含不宜内容时为 true；非歌曲为 nil。 |
 | `node.HasVideo  (bool)` | 歌曲有背景影片时为 true；非歌曲为 nil。 |
+| `node.VideoPath  (string)` | 谱面背景影片（BGMOVIE）的绝对路径，或空字符串。 |
+| `node.VideoOffsetMs  (int)` | MOVIEOFFSET（毫秒）：影片比歌曲的 BGM 晚这么久开始；为负数时提前开始。 |
 | `node.DemoStart  (int)` | 试听 BGM 的偏移（毫秒）。 |
 | `node.AudioPath  (string)` | 歌曲 BGM 文件的绝对路径，或空字符串。 |
 | `node.HasPreimage  (bool)` | 歌曲声明了预览图片时为 true。 |

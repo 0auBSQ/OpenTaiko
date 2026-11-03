@@ -147,6 +147,8 @@ Das Songlisten-Handle, SONGMOUNT:ChosenSongNode() und DANBUILDER:GetSong() geben
 | `node.Side  (int)` | Der SIDE-Wert: 0 normal, 1 ex, 2 beide. |
 | `node.Explicit  (bool)` | True, wenn der Song als explizit gekennzeichnet ist; nil für Nicht-Songs. |
 | `node.HasVideo  (bool)` | True, wenn der Song ein Hintergrundvideo hat; nil für Nicht-Songs. |
+| `node.VideoPath  (string)` | Der absolute Pfad des Hintergrundvideos des Charts (BGMOVIE), oder ein leerer String. |
+| `node.VideoOffsetMs  (int)` | Der MOVIEOFFSET in Millisekunden: Das Video startet so lange nach der BGM des Songs, bei negativem Wert davor. |
 | `node.DemoStart  (int)` | Der Offset der Vorschau-BGM in Millisekunden. |
 | `node.AudioPath  (string)` | Der absolute Pfad der BGM-Datei des Songs, oder ein leerer String. |
 | `node.HasPreimage  (bool)` | True, wenn der Song ein Preimage deklariert. |

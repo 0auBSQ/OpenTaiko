@@ -5,7 +5,9 @@
 -- play/pause, 10 s ahead, stop), a timeline that can be clicked and dragged, a speed dropdown, a mute
 -- button, a volume slider and a close button. The video plays its own audio track and is clocked by it,
 -- so every control acts on picture and sound together. A path ending in .aup2 plays that AviUtl2 project
--- the same way. Driven by any stage: activate(absolutePath), then
+-- the same way. activate(absolutePath, songAudioPath, offsetMs) plays a chart's video under its song
+-- instead, as in game: the song clocks everything, and the video starts offsetMs after it (MOVIEOFFSET).
+-- Driven by any stage: activate(absolutePath), then
 -- update() and draw() every frame while IsActive; it deactivates itself when closed (the X button, or
 -- cancel on a keyboard or pad; both play the cancel sound). deactivate() frees the video.
 -- Everything works without a mouse: focus starts on play/pause, pad left/right or the arrow keys walk the
@@ -42,6 +44,16 @@ local scrubTarget, scrubSeekAt = nil, 0
 local speedIndex = 3
 local closing = false
 
+-- song mode: the video is silent and follows the song's audio
+local song = nil
+local offsetMs = 0
+local ready = false         -- the song and the video have both loaded
+local videoOn = false       -- the song has reached the video's start
+local videoRunning = false  -- the video's clock runs (its Pause and Resume nest, so each pause gets one resume)
+local songPausedAt = 0      -- the song's position while it is not playing
+local endCheckAt = 0        -- the end check waits until this time after a start or a seek
+local nowTs = 0             -- the last update's time
+
 local function sfx(name)
     pcall(function() SHARED:GetSharedSound(name):Play() end)
 end
@@ -62,7 +74,74 @@ local function setPlaying(p)
     playBtn:setIcon(p and "pause" or "play")
 end
 
+local function speed() return SPEEDS[speedIndex] end
+
+local function songPos()
+    if not playing then return songPausedAt end
+    return song:GetTimestampMs()
+end
+
+local function currentMs()
+    if song then return songPos() end
+    return video:GetTimestampMs()
+end
+
+-- a seek on the song takes the time at the current speed; the position it reports is the song's own
+local function songStartAt(ms)
+    song:SetSpeed(speed())
+    song:Play()   -- Play rewinds to 0, so the seek comes after it
+    if ms > 0 then song:SetTimestampMs(math.floor(ms / speed())) end
+end
+
+local function videoPause()
+    if videoRunning then video:Pause(); videoRunning = false end
+end
+
+local function videoResume()
+    if not videoRunning then video:Resume(); videoRunning = true end
+end
+
+-- the video follows the song: it waits on black until its start and holds its last frame after its end.
+-- It is placed on every start, seek, pause and resume, then runs on its own clock as in game: a seek
+-- restarts decoding from the previous keyframe, so correcting it while it plays only sets it back.
+local function syncVideo(force, at)
+    local vt = (at or songPos()) - offsetMs
+    if vt < 0 then
+        if videoOn or force then
+            videoPause()
+            video:SetTimestampMs(0)
+            videoOn = false
+        end
+        return
+    end
+    if force or not videoOn then
+        video:SetTimestampMs(vt)
+        if playing then videoResume() else videoPause() end
+        videoOn = true
+    end
+end
+
+local function songPlay()
+    if stopped or songPausedAt >= durationMs - 25 then songPausedAt = 0 end
+    stopped = false
+    songStartAt(songPausedAt)
+    setPlaying(true)
+    endCheckAt = nowTs + 500
+    syncVideo(true, songPausedAt)
+end
+
+local function songPause(at)
+    songPausedAt = at or song:GetTimestampMs()
+    song:Stop()
+    videoPause()
+    setPlaying(false)
+end
+
 local function play()
+    if song then
+        if ready then songPlay() end
+        return
+    end
     if stopped or video:IsFinished() then
         stopped = false
         video:Start()   -- from the top once stopped or ended
@@ -73,23 +152,52 @@ local function play()
 end
 
 local function pause()
+    if song then
+        if ready and playing then songPause() end
+        return
+    end
     video:Pause()
     setPlaying(false)
 end
 
 local function stop()
+    if song then
+        if not ready then return end
+        if playing then songPause(0) end
+        songPausedAt = 0
+        stopped = true
+        syncVideo(true, 0)
+        videoOn = false   -- black until it plays again
+        return
+    end
     video:Stop()
     stopped = true
     setPlaying(false)
 end
 
+local seekTo
+
 local function restart()
+    if song then return seekTo(0) end
     if stopped then return play() end
     video:Reset()   -- back to 0; paused stays paused and shows the first frame
 end
 
 -- a seek never changes whether the video plays: paused stays paused, showing the frame at the target
-local function seekTo(ms)
+seekTo = function(ms)
+    if song then
+        if not ready then return end
+        ms = math.max(0, math.min(durationMs, ms))
+        stopped = false
+        if playing then
+            song:SetTimestampMs(math.floor(ms / speed()))
+            endCheckAt = nowTs + 500
+        else
+            songPausedAt = ms
+        end
+        syncVideo(true, ms)
+        return
+    end
     if stopped then
         stopped = false
         video:Start()
@@ -109,6 +217,7 @@ end
 local function setSpeedIndex(i)
     speedIndex = i
     video:SetSpeed(SPEEDS[i])
+    if song and ready and playing then song:SetSpeed(SPEEDS[i]) end   -- a paused song takes it when it plays
     speedBtn:setText(SPEED_LABELS[i])
     closeSpeedMenu()
 end
@@ -119,6 +228,10 @@ local function toggleSpeedMenu()
     speedMenu:setEnabled(true)
     speedMenu:setSelected(speedIndex, false)
     focusWidget(speedMenu)   -- the keys land in the list at once
+end
+
+local function setVolume(v)
+    if song then song:SetVolumePercent(v) else video:SetVolumePercent(v) end
 end
 
 local function close()
@@ -159,9 +272,9 @@ function onStart()
         return px
     end
     ui:button{ icon = "restart", x = place(ICON_BTN_W), y = ROW_Y, w = ICON_BTN_W, h = ROW_H, onClick = restart }
-    ui:button{ icon = "rewind",  x = place(ICON_BTN_W), y = ROW_Y, w = ICON_BTN_W, h = ROW_H, onClick = function() seekTo(math.max(0, video:GetTimestampMs() - 10000)) end }
+    ui:button{ icon = "rewind",  x = place(ICON_BTN_W), y = ROW_Y, w = ICON_BTN_W, h = ROW_H, onClick = function() seekTo(math.max(0, currentMs() - 10000)) end }
     playBtn = ui:button{ icon = "play", x = place(ICON_BTN_W + 24), y = ROW_Y, w = ICON_BTN_W + 24, h = ROW_H, accent = true, onClick = function() if playing then pause() else play() end end }
-    ui:button{ icon = "forward", x = place(ICON_BTN_W), y = ROW_Y, w = ICON_BTN_W, h = ROW_H, onClick = function() seekTo(math.min(durationMs, video:GetTimestampMs() + 10000)) end }
+    ui:button{ icon = "forward", x = place(ICON_BTN_W), y = ROW_Y, w = ICON_BTN_W, h = ROW_H, onClick = function() seekTo(math.min(durationMs, currentMs() + 10000)) end }
     ui:button{ icon = "stop",    x = place(ICON_BTN_W), y = ROW_Y, w = ICON_BTN_W, h = ROW_H, onClick = stop }
     readoutX = x + GAP   -- the time text starts here
 
@@ -185,15 +298,15 @@ function onStart()
     muteBtn = ui:button{ icon = "volume", x = muteX, y = ROW_Y, w = ICON_BTN_W, h = ROW_H,
         onClick = function()
             muted = not muted
-            if muted then volumeBeforeMute = volume.value; volume:setValue(0, true); video:SetVolumePercent(0)
-            else volume:setValue(volumeBeforeMute, true); video:SetVolumePercent(volumeBeforeMute) end
+            if muted then volumeBeforeMute = volume.value; volume:setValue(0, true); setVolume(0)
+            else volume:setValue(volumeBeforeMute, true); setVolume(volumeBeforeMute) end
             muteBtn:setIcon(muted and "muted" or "volume")
         end }
     volume = ui:slider{ x = volumeX, y = ROW_CY - 20, w = volumeW, h = 40, min = 0, max = 100, step = 5, value = 100,
         sfx = { cancel = false },   -- leaving the slider is not a cancel
         onChange = function(v)
             if v > 0 and muted then muted = false; muteBtn:setIcon("volume") end
-            video:SetVolumePercent(v)
+            setVolume(v)
         end }
     -- the one control that sounds like a cancel: it is one
     ui:button{ icon = "close", x = closeX, y = ROW_Y, w = CLOSE_BTN_W, h = ROW_H, accent = true, style = CLOSE_STYLE,
@@ -214,7 +327,7 @@ function onStart()
 end
 
 -- returns the loaded video or project, for a caller that wants to set it up further
-function activate(path)
+function activate(path, songAudioPath, songOffsetMs)
     durationMs = 0
     stopped, closing = false, false
     scrubTarget = nil
@@ -228,6 +341,16 @@ function activate(path)
     muteBtn:setIcon("volume")
     focusWidget(playBtn)
     isProject = tostring(path):lower():match("%.aup2$") ~= nil
+    song, ready, videoOn, videoRunning, songPausedAt = nil, false, false, false, 0
+    offsetMs = tonumber(songOffsetMs) or 0
+    if not isProject and songAudioPath ~= nil and songAudioPath ~= "" then
+        -- both load in the background; update() starts them together once they have
+        video = VIDEO:CreateVideoFromAbsolutePath(path, false)
+        song = SOUND:CreateBGMFromAbsolutePath(songAudioPath)
+        song:SetVolumePercent(100)
+        setPlaying(false)
+        return video
+    end
     if isProject then video = AVIUTL2:LoadProjectFromAbsolutePath(path)
     else video = VIDEO:CreateVideoFromAbsolutePath(path, true) end
     video:SetVolumePercent(100)
@@ -237,15 +360,45 @@ function activate(path)
 end
 
 function deactivate()
+    if song ~= nil then
+        pcall(function() song:Stop() end)
+        song:Dispose()
+        song = nil
+    end
     if video ~= nil then
         video:Dispose()
         video = nil
     end
 end
 
+-- song mode, every frame: start once both have loaded, start the video at its time, pause at the song's end
+local function updateSong(ts)
+    if not ready then
+        if song.Loaded and song.DurationMs > 0 and video.Width > 0 then
+            ready = true
+            durationMs = song.DurationMs
+            timeline.max = math.max(1, durationMs)
+            video:SetSpeed(speed())
+            video:Start()
+            videoRunning = true
+            songPlay()
+        end
+        return
+    end
+    if playing then
+        syncVideo(false)   -- starts the video when the song reaches it
+        if ts > endCheckAt and (not song.IsPlaying or song:GetTimestampMs() >= durationMs - 25) then
+            songPause(durationMs)
+        end
+    end
+end
+
 function update(ts)
     if video == nil then return end
-    if durationMs <= 0 and video.Width > 0 then
+    nowTs = ts
+    if song then
+        updateSong(ts)
+    elseif durationMs <= 0 and video.Width > 0 then
         durationMs = video.DurationMs
         timeline.max = math.max(1, durationMs)
     end
@@ -270,11 +423,11 @@ function update(ts)
         scrubTarget = nil
     end
     if not timeline.pressed and scrubTarget == nil then
-        timeline:setValue(video:GetTimestampMs(), true)
+        timeline:setValue(currentMs(), true)
     end
 
     -- the end pauses the video itself, so a seek from there stays paused
-    if playing and video:IsFinished() then pause() end
+    if song == nil and playing and video:IsFinished() then pause() end
 end
 
 function draw()
@@ -286,7 +439,7 @@ function draw()
     ui:rect(VIEW_X, VIEW_Y, VIEW_W, VIEW_H, 0, 0, 0, 255)
     if isProject then
         video:DrawFit(VIEW_X, VIEW_Y, VIEW_W, VIEW_H)
-    elseif video.Width > 0 and video.Height > 0 then
+    elseif video.Width > 0 and video.Height > 0 and (song == nil or videoOn) then
         local tex = video.Texture
         local s = math.min(VIEW_W / video.Width, VIEW_H / video.Height)
         local w, h = video.Width * s, video.Height * s
@@ -298,13 +451,15 @@ function draw()
     ui:draw()
 
     -- the time sits on the row's centre line the way the button glyphs do
-    ui:drawTextEx(READOUT_SIZE, fmt(video:GetTimestampMs()) .. " / " .. fmt(durationMs), readoutX, ROW_CY + ui:textNudge(READOUT_SIZE),
+    ui:drawTextEx(READOUT_SIZE, fmt(currentMs()) .. " / " .. fmt(durationMs), readoutX, ROW_CY + ui:textNudge(READOUT_SIZE),
         { 235, 238, 245, 255 }, nil, 1, 1, readoutRight - readoutX, "left")
 end
 
 function afterSongEnum() end
 
 function onDestroy()
+    if song ~= nil then song:Dispose() end
+    song = nil
     if video ~= nil then video:Dispose() end
     video = nil
     if fill ~= nil then pcall(function() fill:Dispose() end) end

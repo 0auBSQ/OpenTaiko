@@ -147,6 +147,8 @@ Le handle de liste de chansons, SONGMOUNT:ChosenSongNode() et DANBUILDER:GetSong
 | `node.Side  (int)` | La valeur SIDE : 0 normal, 1 ex, 2 les deux. |
 | `node.Explicit  (bool)` | Vrai quand la chanson est marquée explicite ; nil pour les non-chansons. |
 | `node.HasVideo  (bool)` | Vrai quand la chanson a une vidéo d'arrière-plan ; nil pour les non-chansons. |
+| `node.VideoPath  (string)` | Le chemin absolu de la vidéo d'arrière-plan de la partition (BGMOVIE), ou une chaîne vide. |
+| `node.VideoOffsetMs  (int)` | Le MOVIEOFFSET en millisecondes : la vidéo démarre ce délai après la musique de la chanson, avant elle s'il est négatif. |
 | `node.DemoStart  (int)` | Le décalage de la musique d'aperçu en millisecondes. |
 | `node.AudioPath  (string)` | Le chemin absolu du fichier de musique de la chanson, ou une chaîne vide. |
 | `node.HasPreimage  (bool)` | Vrai quand la chanson déclare une image d'aperçu (preimage). |

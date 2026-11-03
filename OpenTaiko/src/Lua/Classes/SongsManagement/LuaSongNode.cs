@@ -381,6 +381,19 @@
 			}
 		}
 
+		/// <summary>The absolute path of the chart's background video (BGMOVIE), or "" when it has none.</summary>
+		public string VideoPath {
+			get {
+				var score = _GetFirstAvailableScore();
+				string name = _node?.strMovieFileName ?? "";
+				if (score == null || name == "") return "";
+				return (Path.IsPathRooted(name) ? "" : score.FileInfo.FolderAbsolutePath) + name;
+			}
+		}
+
+		/// <summary>MOVIEOFFSET in milliseconds: the video starts this long after the song audio (negative: before it).</summary>
+		public int VideoOffsetMs => _node?.msMovieOffset ?? 0;
+
 		#endregion
 
 		#region [Tree structure internal methods]

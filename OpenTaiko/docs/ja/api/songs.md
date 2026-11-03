@@ -147,6 +147,8 @@ end
 | `node.Side  (int)` | SIDE の値: 0 通常、1 裏、2 両方。 |
 | `node.Explicit  (bool)` | 楽曲が露骨な内容としてフラグ付けされているとき true。楽曲以外では nil。 |
 | `node.HasVideo  (bool)` | 楽曲に背景動画があるとき true。楽曲以外では nil。 |
+| `node.VideoPath  (string)` | 譜面の背景動画 (BGMOVIE) の絶対パス。なければ空文字列。 |
+| `node.VideoOffsetMs  (int)` | MOVIEOFFSET (ミリ秒)。動画は楽曲の BGM からこの時間だけ遅れて始まります。負の値なら BGM より前に始まります。 |
 | `node.DemoStart  (int)` | プレビュー BGM のオフセット (ミリ秒)。 |
 | `node.AudioPath  (string)` | 楽曲の BGM ファイルの絶対パス。なければ空文字列。 |
 | `node.HasPreimage  (bool)` | 楽曲がプレビュー画像を宣言しているとき true。 |

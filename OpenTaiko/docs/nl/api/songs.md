@@ -147,6 +147,8 @@ De nummerlijst-handle, SONGMOUNT:ChosenSongNode() en DANBUILDER:GetSong() geven 
 | `node.Side  (int)` | De SIDE-waarde: 0 normaal, 1 ex, 2 beide. |
 | `node.Explicit  (bool)` | True wanneer het nummer als expliciet is gemarkeerd; nil voor niet-nummers. |
 | `node.HasVideo  (bool)` | True wanneer het nummer een achtergrondfilm heeft; nil voor niet-nummers. |
+| `node.VideoPath  (string)` | Het absolute pad van de achtergrondfilm van de chart (BGMOVIE), of een lege string. |
+| `node.VideoOffsetMs  (int)` | De MOVIEOFFSET in milliseconden: de film begint zo lang na de BGM van het nummer, ervoor als de waarde negatief is. |
 | `node.DemoStart  (int)` | De offset van de preview-BGM in milliseconden. |
 | `node.AudioPath  (string)` | Het absolute pad van het BGM-bestand van het nummer, of een lege string. |
 | `node.HasPreimage  (bool)` | True wanneer het nummer een preimage declareert. |

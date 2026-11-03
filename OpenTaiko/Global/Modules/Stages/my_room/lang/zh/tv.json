@@ -5,9 +5,11 @@
   "menu_off": "关闭",
   "menu_rewatch": "重温过场动画",
   "tab_songs": "歌曲过场动画",
+  "tab_videos": "谱面视频",
   "intro": "开场",
   "outro": "结尾 %d",
   "unknown_song": "???",
   "empty": "未找到过场动画。",
+  "empty_videos": "未找到谱面视频。",
   "waiting": "正在调台……歌曲列表仍在准备中。"
 }

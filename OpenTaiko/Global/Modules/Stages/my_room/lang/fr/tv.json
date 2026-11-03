@@ -5,9 +5,11 @@
   "menu_off": "Éteindre",
   "menu_rewatch": "Revoir les cinématiques",
   "tab_songs": "Cinématiques des chansons",
+  "tab_videos": "Vidéos des chansons",
   "intro": "Intro",
   "outro": "Outro %d",
   "unknown_song": "???",
   "empty": "Aucune cinématique trouvée.",
+  "empty_videos": "Aucune vidéo de chanson trouvée.",
   "waiting": "Réglage des chaînes… la liste des chansons est encore en préparation."
 }

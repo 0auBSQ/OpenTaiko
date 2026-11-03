@@ -423,6 +423,7 @@ internal class CTja : CActivity {
 	private bool isOFFSET_Negative = false;
 	private int msMOVIEOFFSET_Abs = 0; // from music begin to video begin
 	private bool isMOVIEOFFSET_Negative = false;
+	public int msMovieOffset => this.isMOVIEOFFSET_Negative ? -this.msMOVIEOFFSET_Abs : this.msMOVIEOFFSET_Abs;
 	private double dbNowBPM = 120.0;
 
 	public bool[] bHasBranchDan = new bool[1] { false };

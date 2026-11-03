@@ -5,9 +5,11 @@
   "menu_off": "끄기",
   "menu_rewatch": "컷신 다시 보기",
   "tab_songs": "곡 컷신",
+  "tab_videos": "채보 영상",
   "intro": "인트로",
   "outro": "아웃트로 %d",
   "unknown_song": "???",
   "empty": "컷신이 없습니다.",
+  "empty_videos": "채보 영상이 없습니다.",
   "waiting": "채널 맞추는 중... 곡 목록을 아직 준비하고 있습니다."
 }

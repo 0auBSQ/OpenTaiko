@@ -65,6 +65,8 @@ internal class CSongListNode {
 	public CTja.ESide nSide = CTja.ESide.eEx;
 	public bool bExplicit = false;
 	public bool bMovie = false;
+	public string strMovieFileName = "";    // BGMOVIE, relative to the chart's folder
+	public int msMovieOffset = 0;           // MOVIEOFFSET: the video starts this long after the song audio
 	public int[] nLevel = new int[(int)Difficulty.Total] { 0, 0, 0, 0, 0, 0, 0 };
 	// The LEVEL value with its fractional part kept (e.g. 12.888); parallels nLevel. -1 = no decimal known,
 	// in which case consumers fall back to nLevel. Only the .tja path carries a real fraction; .tci/.tcm use the int.

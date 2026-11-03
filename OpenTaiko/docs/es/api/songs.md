@@ -147,6 +147,8 @@ El handle de lista de canciones, SONGMOUNT:ChosenSongNode() y DANBUILDER:GetSong
 | `node.Side  (int)` | El valor SIDE: 0 normal, 1 ex, 2 ambos. |
 | `node.Explicit  (bool)` | Verdadero cuando la canción está marcada como explícita; nil en los nodos que no son canciones. |
 | `node.HasVideo  (bool)` | Verdadero cuando la canción tiene una película de fondo; nil en los nodos que no son canciones. |
+| `node.VideoPath  (string)` | La ruta absoluta de la película de fondo del chart (BGMOVIE), o una cadena vacía. |
+| `node.VideoOffsetMs  (int)` | El MOVIEOFFSET en milisegundos: la película empieza ese tiempo después del BGM de la canción, o antes si es negativo. |
 | `node.DemoStart  (int)` | El desplazamiento del BGM de vista previa en milisegundos. |
 | `node.AudioPath  (string)` | La ruta absoluta del archivo de BGM de la canción, o una cadena vacía. |
 | `node.HasPreimage  (bool)` | Verdadero cuando la canción declara una preimagen. |

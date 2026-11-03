@@ -6,12 +6,14 @@
 -- a small palette, and the same colour is cast into the room as a live point light. The screen ignores
 -- the sun and the shadow map, so it reads as bright without any global illumination.
 --
--- The window: Enter on the TV opens a small menu (turn on/off, rewatch cutscenes). The cutscene
--- browser has one tab, Song cutscenes: the left list holds every genre folder with a song that has
--- a cutscene, the right list that genre's cutscenes ([song] · Intro / Outro n). Undiscovered ones are
--- locked rows with a padlock; a locked song shows ??? for its title. Cutscenes are read from the
--- songs' .CUTSCENE_* chart headers and their discovered state from the save's triggers; a discovered
--- one plays in the video_player ROActivity, with the jukebox ducked meanwhile.
+-- The window: Enter on the TV opens a small menu (turn on/off, rewatch cutscenes). The browser has two
+-- tabs. Song cutscenes: the left list holds every genre folder with a song that has a cutscene, the
+-- right list that genre's cutscenes ([song] · Intro / Outro n). Chart videos: the same, with one row per
+-- song whose chart has a video (BGMOVIE), dan and tower charts left out. Undiscovered ones are locked
+-- rows with a padlock; a locked song shows ??? for its title. Cutscenes are read from the songs'
+-- .CUTSCENE_* chart headers and their discovered state from the save's triggers; a chart video counts
+-- as discovered once the song has been played. Both play in the video_player ROActivity, a chart video
+-- under its song's audio as in game, with the jukebox ducked meanwhile.
 
 local UI = require("uilib")           -- the skin's UI library (UI.Pick), picked on first use
 local I18N = require("Locale.i18n")
@@ -21,7 +23,7 @@ local TV = {}
 
 -- ── layout (the jukebox window's frame) ────────────────────────────────────────────────────────
 local PANEL = { x = 160, y = 90, w = 1600, h = 900 }
-local TAB   = { x = PANEL.x + 40, y = PANEL.y + 88, w = 300, h = 64 }
+local TAB   = { x = PANEL.x + 40, y = PANEL.y + 88, w = 300, h = 64, gap = 16 }
 local LEFT  = { x = PANEL.x + 40, y = PANEL.y + 190, w = 560, h = 620, row = 64 }
 local RIGHT = { x = PANEL.x + 640, y = PANEL.y + 190, w = PANEL.w - 640 - 50, h = 620, row = 64 }
 local MENU_W, MENU_H, MENU_ROW = 620, 320, 72
@@ -131,6 +133,7 @@ local justOpened = false    -- eat the Enter edge that opened the window
 local player = nil          -- the video_player ROActivity while a cutscene plays
 local grouped = nil         -- { { genre=, songs={ { title=, locked=, cuts={...} } } }, ... }
 local curGenre = nil
+local tab = "cuts"          -- "cuts" | "videos"
 
 local function playCancel() pcall(function() SHARED:GetSharedSound("Cancel"):Play() end) end
 
@@ -223,8 +226,9 @@ local function songCutScenes(n, folder, sf, played)
     return cuts
 end
 
--- every listable song with at least one cutscene, grouped by genre in library order
-local function buildGrouped()
+-- every listable song keep(n) accepts, made into entries by make(n, sf, saveIndex) (nil skips it) and
+-- grouped by genre in library order; dan and tower folders and charts are left out
+local function buildGrouped(keep, make)
     local out, order = {}, {}
     local ok = pcall(function()
         local lsls = GenerateSongListSettings()
@@ -238,24 +242,18 @@ local function buildGrouped()
         local list = RequestSongList(lsls)
         if list == nil then return end
         local res = list:SearchSongsByPredicate(function(n)
-            local keep = false
+            local k = false
             pcall(function()
-                keep = n.IsSong and (n.HiddenIndex or 0) < 3 and hasCutScenes(n)
+                k = n.IsSong and (n.HiddenIndex or 0) < 3 and keep(n)
             end)
-            return keep
+            return k
         end)
         local sf = ctx and ctx.save and ctx.save() or nil
         local saveIndex = ctx and ctx.playerIndex and ctx.playerIndex() or 0
         for i = 0, res.Count - 1 do
             local n = res[i]
             local e = nil
-            pcall(function()
-                local folder, played = songInfo(n, saveIndex)
-                if folder == nil then return end
-                local cuts = songCutScenes(n, folder, sf, played)
-                if #cuts == 0 then return end
-                e = { title = n.Title or "?", locked = n.IsLocked == true, genre = n.Genre or "?", cuts = cuts }
-            end)
+            pcall(function() e = make(n, sf, saveIndex) end)
             if e then
                 local g = out[e.genre]
                 if g == nil then g = { genre = e.genre, songs = {} }; out[e.genre] = g; order[#order + 1] = g end
@@ -267,8 +265,30 @@ local function buildGrouped()
     return order
 end
 
+local function cutSceneEntry(n, sf, saveIndex)
+    local folder, played = songInfo(n, saveIndex)
+    if folder == nil then return nil end
+    local cuts = songCutScenes(n, folder, sf, played)
+    if #cuts == 0 then return nil end
+    return { title = n.Title or "?", locked = n.IsLocked == true, genre = n.Genre or "?", cuts = cuts }
+end
+
+-- a chart video plays under the song's audio, starting MOVIEOFFSET after it as in game
+local function hasChartVideo(n)
+    return n.HasVideo == true and (n.VideoPath or "") ~= ""
+end
+
+local function chartVideoEntry(n, sf, saveIndex)
+    local _, played = songInfo(n, saveIndex)
+    local locked = n.IsLocked == true
+    local video = { kind = "video", path = n.VideoPath, audio = n.AudioPath or "", offset = n.VideoOffsetMs or 0,
+                    discovered = played and not locked }
+    return { title = n.Title or "?", locked = locked, genre = n.Genre or "?", cuts = { video } }
+end
+
 local function cutText(e, c)
     local title = e.locked and tr("unknown_song") or e.title
+    if c.kind == "video" then return title end
     local kind = (c.kind == "outro") and string.format(tr("outro"), c.index) or tr("intro")
     return title .. "  ·  " .. kind
 end
@@ -286,11 +306,12 @@ local function disposeWindow()
 end
 
 -- ── the cutscene player ────────────────────────────────────────────────────────────────────────
-local function openPlayer(path)
+local function openPlayer(c)
     player = ROACTIVITY:GetROActivity("video_player")
     if player == nil then return end
     if ctx and ctx.duck then ctx.duck(true) end
-    player:Activate(path)
+    if c.kind == "video" then player:Activate(c.path, c.audio, c.offset)
+    else player:Activate(c.path) end
     mode = "player"
 end
 
@@ -319,7 +340,7 @@ end
 
 local function onCutSelect(_, it)
     local c = it.value
-    if type(c) == "table" and c.discovered then openPlayer(c.path) end
+    if type(c) == "table" and c.discovered then openPlayer(c) end
 end
 
 rebuildRight = function()
@@ -343,22 +364,21 @@ rebuildRight = function()
     end
 end
 
-local function buildBrowser()
-    disposeWindow()
-    ui = UI.new{ theme = ctx and ctx.theme or nil, navPlayer = (ctx and ctx.playerIndex() or 0) + 1 }
-    ui:panel{ x = PANEL.x, y = PANEL.y, w = PANEL.w, h = PANEL.h, title = tr("title") }
-    -- the one tab for now: styled like the jukebox's tabs, but out of the key/pad walk since it leads nowhere
-    W.tab = ui:button{ x = TAB.x, y = TAB.y, w = TAB.w, h = TAB.h, text = tr("tab_songs"), accent = true,
-                       focusable = false, onClick = function() end }
-    W.note = ui:label{ x = PANEL.x + PANEL.w / 2, y = LEFT.y + 40, w = PANEL.w - 80, h = 48, size = 26,
-                       align = "center", maxWidth = PANEL.w - 80, text = "" }
+local function tabButton(t) return t == "videos" and W.tabVideos or W.tabCuts end
+
+-- the current tab's genre list and rows (rebuilt on every open and tab switch: always fresh)
+local function rebuildLists()
+    for _, k in ipairs({ "right", "left" }) do
+        if W[k] then ui:remove(W[k]); W[k]:dispose(); W[k] = nil end
+    end
     W.note:setVisible(false)
-    grouped = songsReady() and buildGrouped() or nil
+    if tab == "videos" then grouped = songsReady() and buildGrouped(hasChartVideo, chartVideoEntry) or nil
+    else grouped = songsReady() and buildGrouped(hasCutScenes, cutSceneEntry) or nil end
     curGenre = nil
     if not songsReady() then
         W.note:setText(tr("waiting")); W.note:setVisible(true)
     elseif grouped == nil then
-        W.note:setText(tr("empty")); W.note:setVisible(true)
+        W.note:setText(tr(tab == "videos" and "empty_videos" or "empty")); W.note:setVisible(true)
     else
         local items = {}
         for _, g in ipairs(grouped) do
@@ -370,8 +390,34 @@ local function buildBrowser()
                           items = items, onChange = onGenreChange, onSelect = onGenreSelect }
         curGenre = grouped[1]
         rebuildRight()
-        focusWidget(W.left)
     end
+end
+
+local function switchTab(t)
+    if tab == t then return end
+    tab = t
+    W.tabCuts.accent = (t == "cuts"); W.tabCuts:restyle()
+    W.tabVideos.accent = (t == "videos"); W.tabVideos:restyle()
+    rebuildLists()
+end
+
+local function buildBrowser()
+    disposeWindow()
+    ui = UI.new{ theme = ctx and ctx.theme or nil, navPlayer = (ctx and ctx.playerIndex() or 0) + 1 }
+    ui:panel{ x = PANEL.x, y = PANEL.y, w = PANEL.w, h = PANEL.h, title = tr("title") }
+    -- the tabs, styled like the jukebox's: the current one is lit
+    local x = TAB.x
+    local function tabW(text) return math.max(TAB.w, math.ceil(ui:measureText(ui.theme.font.button, text)) + 40) end
+    local cutsText, videosText = tr("tab_songs"), tr("tab_videos")
+    W.tabCuts = ui:button{ x = x, y = TAB.y, w = tabW(cutsText), h = TAB.h, text = cutsText, accent = (tab == "cuts"),
+                           onClick = function() switchTab("cuts") end }
+    x = x + tabW(cutsText) + TAB.gap
+    W.tabVideos = ui:button{ x = x, y = TAB.y, w = tabW(videosText), h = TAB.h, text = videosText, accent = (tab == "videos"),
+                             onClick = function() switchTab("videos") end }
+    W.note = ui:label{ x = PANEL.x + PANEL.w / 2, y = LEFT.y + 40, w = PANEL.w - 80, h = 48, size = 26,
+                       align = "center", maxWidth = PANEL.w - 80, text = "" }
+    rebuildLists()
+    focusWidget(W.left or tabButton(tab))
     mode = "browser"
 end
 
@@ -418,7 +464,7 @@ end
 function TV.close(silent)
     if mode == "player" then closePlayer() end
     disposeWindow()
-    mode, openItem, curGenre, grouped = nil, nil, nil, nil
+    mode, openItem, curGenre, grouped, tab = nil, nil, nil, nil, "cuts"
     if not silent then playCancel() end
 end
 
@@ -438,8 +484,11 @@ function TV.update(dt, ts)
     if r == "cancel" then
         if mode == "browser" then
             playCancel()
-            if W.right and W.left and ui.focusables[ui.focusIdx] == W.right then
-                focusWidget(W.left)   -- from the cutscenes back to the genres
+            local f = ui.focusables[ui.focusIdx]
+            if W.right and W.left and f == W.right then
+                focusWidget(W.left)   -- from the rows back to the genres
+            elseif W.left and f == W.left then
+                focusWidget(tabButton(tab))   -- from the genres up to the tabs
             else
                 buildMenu(ctx and ctx.displayName and ctx.displayName() or nil)   -- back to the TV menu
             end

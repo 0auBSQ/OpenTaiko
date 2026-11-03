@@ -5,9 +5,11 @@
   "menu_off": "電源を切る",
   "menu_rewatch": "カットシーンを見直す",
   "tab_songs": "楽曲カットシーン",
+  "tab_videos": "譜面動画",
   "intro": "イントロ",
   "outro": "アウトロ %d",
   "unknown_song": "???",
   "empty": "カットシーンが見つかりません。",
+  "empty_videos": "譜面動画が見つかりません。",
   "waiting": "チャンネルを調整中…楽曲リストを準備しています。"
 }

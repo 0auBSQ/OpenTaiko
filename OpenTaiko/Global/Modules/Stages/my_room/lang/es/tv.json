@@ -5,9 +5,11 @@
   "menu_off": "Apagar",
   "menu_rewatch": "Volver a ver cinemáticas",
   "tab_songs": "Cinemáticas de canciones",
+  "tab_videos": "Videos de partituras",
   "intro": "Intro",
   "outro": "Outro %d",
   "unknown_song": "???",
   "empty": "No se encontraron cinemáticas.",
+  "empty_videos": "No se encontraron videos de partituras.",
   "waiting": "Sintonizando los canales... la lista de canciones aún se está preparando."
 }

@@ -190,6 +190,8 @@ internal class CSongManager {
 			node.nSide = dtx.SIDE;
 			node.bExplicit = dtx.EXPLICIT;
 			node.bMovie = !string.IsNullOrEmpty(dtx.strBGVIDEO_PATH);
+			node.strMovieFileName = dtx.strBGVIDEO_PATH ?? "";
+			node.msMovieOffset = dtx.msMovieOffset;
 
 			// Shallow copy, works well because dict<string, string> but wouldn't if dict<string, T>
 			node.customMetadataGScope = new Dictionary<string, string>(dtx.GlobalCustomMetadata);

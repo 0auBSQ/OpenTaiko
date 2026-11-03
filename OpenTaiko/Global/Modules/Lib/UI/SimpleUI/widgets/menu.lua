@@ -177,9 +177,9 @@ function Menu:draw()
                 self:bakeShared("_lock", "menu.lock", isz + 8, isz + 8, function(cv)
                     Shape.icon(cv, "lock", (isz + 8) * 0.5, (isz + 8) * 0.5, isz, { 236, 238, 244 })
                 end, nil, isz)
-                if self._lock and ry + self.rowHeight <= vy1 + 1 and ry >= vy0 - 1 then
+                if self._lock then
                     self._lock.canvas:SetColor(1, 1, 1); self._lock.canvas:SetOpacity(1); self._lock.canvas:SetScale(1, 1)
-                    self._lock.canvas:DrawAtAnchor(math.floor(self.x + self.w - 24 - isz * 0.5), rcy, "center")
+                    drawPieceClipped(self._lock, math.floor(self.x + self.w - 24 - isz * 0.5), rcy, vy0, vy1)   -- cut at the list's edges like its row
                 end
             end
         end

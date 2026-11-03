@@ -147,6 +147,8 @@ end
 | `node.Side  (int)` | Значение SIDE: 0 обычная, 1 ex, 2 обе. |
 | `node.Explicit  (bool)` | Истина, если песня помечена как explicit; nil для не-песен. |
 | `node.HasVideo  (bool)` | Истина, если у песни есть фоновое видео; nil для не-песен. |
+| `node.VideoPath  (string)` | Абсолютный путь к фоновому видео чарта (BGMOVIE) или пустая строка. |
+| `node.VideoOffsetMs  (int)` | MOVIEOFFSET в миллисекундах: видео начинается на это время позже BGM песни, а при отрицательном значении раньше. |
 | `node.DemoStart  (int)` | Смещение превью BGM в миллисекундах. |
 | `node.AudioPath  (string)` | Абсолютный путь к файлу BGM песни или пустая строка. |
 | `node.HasPreimage  (bool)` | Истина, если песня объявляет превью-изображение (preimage). |
