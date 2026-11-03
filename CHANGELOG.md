@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.7.0.3] - 2026-11-03 (Beta)
+
+- [Feat] Add a Chart Videos tab in My Room's TV
+
 ## [0.7.0.2] - 2026-11-01 (Beta)
 
 - [Fix] Characters and Puchis didn't provide custom unlock texts and hidden indexes on their API
