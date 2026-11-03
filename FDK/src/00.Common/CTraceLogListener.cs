@@ -7,7 +7,14 @@ public class CTraceLogListener : TraceListener {
 		this.LogStreamWriter = stream;
 	}
 
+	// While set (during play), lines wait in the writer's buffer instead of each reaching the disk on the game
+	// thread; an error still goes out at once.
+	public static bool HoldFlush;
+	private bool errorPending;
+
 	public override void Flush() {
+		if (HoldFlush && !this.errorPending) return;
+		this.errorPending = false;
 		if (this.LogStreamWriter != null) {
 			try {
 				this.LogStreamWriter.Flush();
@@ -68,6 +75,7 @@ public class CTraceLogListener : TraceListener {
 	private StreamWriter? LogStreamWriter;
 
 	private void LogEventType(TraceEventType eventType) {
+		if ((eventType & (TraceEventType.Error | TraceEventType.Critical)) != 0) this.errorPending = true;
 		if (this.LogStreamWriter != null) {
 			try {
 				var now = DateTime.Now;

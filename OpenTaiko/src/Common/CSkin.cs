@@ -287,6 +287,16 @@ internal class CSkin : IDisposable {
 			this.nowSound?.tSetPosition(ms);
 		}
 
+		public void tAddMixer() {
+			if (OpenTaiko.SoundManager.GetCurrentSoundDeviceType() != "DirectShow") {
+				for (int i = 0; i < 2; i++) {
+					if (this.rSound[i] != null) {
+						OpenTaiko.SoundManager.AddMixer(this.rSound[i]!);
+					}
+				}
+			}
+		}
+
 		public void tRemoveMixer() {
 			if (OpenTaiko.SoundManager.GetCurrentSoundDeviceType() != "DirectShow") {
 				for (int i = 0; i < 2; i++) {
@@ -1053,6 +1063,20 @@ internal class CSkin : IDisposable {
 			}
 		}
 
+		// the sounds the play itself makes are loaded and go back at once, so that their first play in a chart
+		// only seeks and starts
+		foreach (var snd in new[] { this.soundBalloon, this.soundKusudama, this.soundKusudamaMiss, this.soundBomb, this.soundTowerMiss, this.soundChangeSFX }) {
+			if (snd == null) continue;
+			if (snd.bNotLoadedYet) {
+				try {
+					snd.tLoading();
+				} catch (Exception e) {
+					Trace.TraceError(e.ToString());
+					snd.bNotLoadedYet = false;
+				}
+			}
+			if (snd.bLoadedSuccessfuly) snd.tAddMixer();
+		}
 	}
 
 	/// <summary>

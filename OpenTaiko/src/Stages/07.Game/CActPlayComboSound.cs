@@ -67,6 +67,8 @@ internal class CActPlayComboSound : CActivity {
 					// a file that cannot be decoded is skipped
 					var sound = OpenTaiko.SoundManager.tCreateSound(item, ESoundGroup.Voice);
 					if (sound == null) continue;
+					// in the mixer now, paused: its first play mid-song only unpauses it
+					OpenTaiko.SoundManager.AddMixer(sound);
 					var comboVoice = new CComboVoice();
 					comboVoice.bFileFound = true;
 					comboVoice.nPlayer = i;
@@ -91,6 +93,7 @@ internal class CActPlayComboSound : CActivity {
 					if (!int.TryParse(Path.GetFileNameWithoutExtension(item), out int threshold)) continue;
 					var sound = OpenTaiko.SoundManager.tCreateSound(item, ESoundGroup.Voice);
 					if (sound == null) continue;
+					OpenTaiko.SoundManager.AddMixer(sound);
 					var comboVoice = new CComboVoice();
 					comboVoice.bFileFound = true;
 					comboVoice.nPlayer = i;

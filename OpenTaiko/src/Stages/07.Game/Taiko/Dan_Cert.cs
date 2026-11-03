@@ -169,6 +169,11 @@ internal class Dan_Cert : CActivity {
 		Sound_Section = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Section.ogg"), ESoundGroup.SoundEffect);
 		Sound_Section_First = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Section_First.wav"), ESoundGroup.SoundEffect);
 		Sound_Failed = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Failed.ogg"), ESoundGroup.SoundEffect);
+		// in the mixer now, paused: their first play mid-dan only unpauses them
+		foreach (var sound in new[] { Sound_Section, Sound_Section_First, Sound_Failed }) {
+			if (sound != null)
+				OpenTaiko.SoundManager.AddMixer(sound);
+		}
 
 		base.Activate();
 	}

@@ -13,11 +13,16 @@ namespace OpenTaiko;
 /// </summary>
 internal class CLuaBackgroundScript : CLuaROActivityScript {
 	private NamedLuaFunction lfUpdateState = new("update");
+	private readonly object?[] _updateArgs = new object?[2];   // reused every frame
 
 	public CLuaBackgroundScript(string dir, string name) : base(dir, name) {
 		lfUpdateState.Load(LuaScript);
 	}
 
 	/// <summary>Call Lua <c>update(timestamp, state)</c> with <paramref name="state"/> passed directly (not nested).</summary>
-	public void UpdateState(long timestamp, object state) => RunLuaCode(lfUpdateState, timestamp, state);
+	public void UpdateState(long timestamp, object state) {
+		SetArg(_updateArgs, 0, timestamp);
+		_updateArgs[1] = state;
+		RunLuaCode(lfUpdateState, _updateArgs);
+	}
 }

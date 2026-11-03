@@ -164,6 +164,19 @@ internal class CActImplClearAnimation : CActivity {
 			this.soundPerfectCombo[i] ??= OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AllPerfect.ogg"), ESoundGroup.SoundEffect);
 		}
 
+		// in the mixer now, paused: their first play at the end of the chart only unpauses them
+		CSound?[] modeSounds = [
+			this.soundTowerDropout, this.soundTowerTopPass, this.soundTowerTopFC, this.soundTowerTopPerfect,
+			this.soundDanFailed, this.soundDanRedClear, this.soundDanRedFC, this.soundDanRedPerfect,
+			this.soundDanGoldClear, this.soundDanGoldFC, this.soundDanGoldPerfect,
+			this.soundAILose, this.soundAIWin, this.soundAIWinFullCombo, this.soundAIWinPerfectCombo,
+			.. this.soundClear, .. this.soundFailed, .. this.soundFullCombo, .. this.soundPerfectCombo,
+		];
+		foreach (var sound in modeSounds) {
+			if (sound != null)
+				OpenTaiko.SoundManager.AddMixer(sound);
+		}
+
 		this.InitScripts();
 
 		base.Activate();

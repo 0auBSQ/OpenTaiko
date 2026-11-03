@@ -731,7 +731,9 @@ internal class OpenTaiko : Game {
 					Console.WriteLine($"[OpenTaiko] Stage: {rCurrentStage!.eStageID}{(string.IsNullOrEmpty(rCurrentStage.customStageName) ? "" : $" ({rCurrentStage.customStageName})")}, Phase: {rCurrentStage.ePhaseID}");
 				}
 				OpenTaiko.NamePlate?.Update();
+				CFrameProfiler.Section("stage");
 				this.nDrawLoopReturnValue = (rCurrentStage != null) ? rCurrentStage.Draw() : 0;
+				CFrameProfiler.Section("after stage");
 
 				if (VideoExporter.Active)
 					this.nDrawLoopReturnValue = VideoExporter.Tick(this, this.nDrawLoopReturnValue);
@@ -759,6 +761,21 @@ internal class OpenTaiko : Game {
 
 				actEnumSongs?.Draw();                            // "Enumerating Songs..." icon
 
+				// The scan waits while a song loads or plays: a reload from the settings keeps the old list in use,
+				// so a song can be played before the new list is done.
+				if (EnumSongs != null && !EnumSongs.IsSongListEnumCompletelyDone) {
+					bool playing = rCurrentStage!.eStageID is CStage.EStage.Game or CStage.EStage.SongLoading
+						|| (rCurrentStage == stageTransition && stageTransition.Target == stageGameScreen);
+					if (playing) {
+						if (EnumSongs.state == CEnumSongs.DTXEnumState.Ongoing) {
+							EnumSongs.Suspend();
+							UnmountActivity(actEnumSongs);
+						}
+					} else if (EnumSongs.state == CEnumSongs.DTXEnumState.Suspended) {
+						EnumSongs.Resume();
+						if (EnumSongs.state == CEnumSongs.DTXEnumState.Ongoing) MountActivity(actEnumSongs);
+					}
+				}
 
 				switch (rCurrentStage!.eStageID) {
 					case CStage.EStage.StartUp:
@@ -774,23 +791,6 @@ internal class OpenTaiko : Game {
 								MountActivity(actEnumSongs);
 								EnumSongs.Init();   // 取得した曲数を、新インスタンスにも与える
 								EnumSongs.StartEnumFromDisk();      // 曲検索スレッドの起動_開始
-							}
-							#endregion
-
-							#region [ 曲検索の中断と再開 ]
-							if (rCurrentStage.eStageID == CStage.EStage.SongSelect && !EnumSongs.IsSongListEnumCompletelyDone) {
-								switch (this.nDrawLoopReturnValue) {
-									case 0:     // 何もない
-										EnumSongs.Resume();
-										EnumSongs.IsSlowdown = false;
-										MountActivity(actEnumSongs);
-										break;
-
-									case 2:     // 曲決定
-										EnumSongs.Suspend();                        // #27060 バックグラウンドの曲検索を一時停止
-										UnmountActivity(actEnumSongs);
-										break;
-								}
 							}
 							#endregion
 
@@ -920,7 +920,7 @@ internal class OpenTaiko : Game {
 
 							Trace.TraceInformation("----------------------");
 							Trace.TraceInformation("■ Gameplay (Drum Screen)");
-							this.tExecuteGarbageCollection();
+							CollectBeforePlay();
 
 							// Gameplay was already activated during the song load. Hand off via a reveal transition
 							// (fade the loading screen out + the game screen in, both clock-driven so audio/notes stay
@@ -2087,6 +2087,14 @@ internal class OpenTaiko : Game {
 
 	internal static void CollectInBackground() {
 		GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, blocking: false, compacting: false);
+	}
+
+	// At the end of a song load the loading screen is up and still, its sounds are done and the chart's clock has
+	// not started, so a blocking collection there is not seen, and the load's garbage is gone before play.
+	internal static void CollectBeforePlay() {
+		GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, blocking: true, compacting: true);
+		GC.WaitForPendingFinalizers();
+		GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, blocking: true, compacting: true);
 	}
 
 	// [STAGE_MEM] debug line: what the process holds at this point, without forcing a collection. memory is what

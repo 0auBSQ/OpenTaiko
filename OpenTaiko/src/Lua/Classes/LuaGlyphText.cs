@@ -65,6 +65,20 @@ namespace OpenTaiko {
 		}
 		private readonly List<Placement> _placements = [];
 
+		// the tokens and lines of recently drawn strings, so a string drawn every frame is laid out once
+		private const int LAYOUT_CACHE_SIZE = 64;
+		private readonly record struct LayoutKey(string Text, double WrapWidth);
+		private sealed class CachedLayout {
+			public LayoutKey Key;
+			public List<GlyphTextLayout.StyledRune> Runes = null!;
+			public List<GlyphTextLayout.Style> Styles = null!;
+			public List<GlyphTextLayout.Line> Lines = null!;
+			public double? Width;   // Measure's unscaled width
+			public LinkedListNode<CachedLayout> Node = null!;
+		}
+		private readonly Dictionary<LayoutKey, CachedLayout> _layouts = [];
+		private readonly LinkedList<CachedLayout> _layoutOrder = new();   // most recently used first
+
 		private static readonly Color DefaultFore = Color.White;
 		private static readonly Color DefaultOutline = Color.Black;
 
@@ -121,20 +135,56 @@ namespace OpenTaiko {
 			_shapingGeneration = generation;
 			_advances.Clear();
 			_kerns.Clear();
+			ClearLayouts();
 			ClearGlyphs();
+		}
+
+		// text tokenized and wrapped to wrapWidth (0: '\n' splits only), from the cache when it was laid out lately
+		private CachedLayout LayoutOf(string text, double wrapWidth) {
+			var key = new LayoutKey(text, wrapWidth);
+			if (_layouts.TryGetValue(key, out var hit)) {
+				if (hit.Node != _layoutOrder.First) {
+					_layoutOrder.Remove(hit.Node);
+					_layoutOrder.AddFirst(hit.Node);
+				}
+				return hit;
+			}
+			var (runes, styles) = GlyphTextLayout.Tokenize(text);
+			var layout = new CachedLayout {
+				Key = key, Runes = runes, Styles = styles,
+				Lines = GlyphTextLayout.Wrap(runes, wrapWidth, _advanceOf, _kernOf),
+			};
+			layout.Node = _layoutOrder.AddFirst(layout);
+			_layouts[key] = layout;
+			if (_layouts.Count > LAYOUT_CACHE_SIZE) {
+				var oldest = _layoutOrder.Last!;
+				_layoutOrder.RemoveLast();
+				_layouts.Remove(oldest.Value.Key);
+			}
+			return layout;
+		}
+
+		private void ClearLayouts() {
+			_layouts.Clear();
+			_layoutOrder.Clear();
 		}
 
 		// ink advance of the widest \n-line, color tags stripped (a GetText texture is this + 50 wide)
 		public double Measure(string text, double scale = 1.0) {
 			if (string.IsNullOrEmpty(text) || _font == null) return 0;
 			Revalidate();
-			var (runes, _) = GlyphTextLayout.Tokenize(text);
-			double best = 0, w = 0;
-			for (int i = 0; i < runes.Count; i++) {
-				if (runes[i].CodePoint == '\n') { best = Math.Max(best, w); w = 0; continue; }
-				w += Step(runes, i, runes.Count);
+			var layout = LayoutOf(text, 0);
+			if (layout.Width is not double width) {
+				var runes = layout.Runes;
+				double best = 0, w = 0;
+				for (int i = 0; i < runes.Count; i++) {
+					if (runes[i].CodePoint == '\n') { best = Math.Max(best, w); w = 0; continue; }
+					w += Step(runes, i, runes.Count);
+				}
+				width = Math.Max(best, w);
+				layout.Width = width;
 			}
-			return Math.Max(best, w) * scale;
+			return width * scale;
 		}
 
 		// ── glyph cache ─────────────────────────────────────────────────────────────
@@ -299,8 +349,10 @@ namespace OpenTaiko {
 			Color outline = FromLua(backcolor, DefaultOutline);
 			double sy = scaleY > 0 ? scaleY : scale;
 
-			var (runes, styles) = GlyphTextLayout.Tokenize(text);
-			var lines = GlyphTextLayout.Wrap(runes, 0, _advanceOf, _kernOf);   // '\n' splits only
+			var layout = LayoutOf(text, 0);   // '\n' splits only
+			var runes = layout.Runes;
+			var styles = layout.Styles;
+			var lines = layout.Lines;
 
 			double inkW = 0;
 			foreach (var line in lines) inkW = Math.Max(inkW, line.Width);
@@ -438,8 +490,9 @@ namespace OpenTaiko {
 		public string[] WrapToLines(string text, double wrapWidth, double scale = 1.0) {
 			if (string.IsNullOrEmpty(text) || _font == null) return [];
 			Revalidate();
-			var (runes, _) = GlyphTextLayout.Tokenize(text);
-			var lines = GlyphTextLayout.Wrap(runes, scale > 0 ? wrapWidth / scale : wrapWidth, _advanceOf, _kernOf);
+			var layout = LayoutOf(text, scale > 0 ? wrapWidth / scale : wrapWidth);
+			var runes = layout.Runes;
+			var lines = layout.Lines;
 			var result = new string[lines.Count];
 			var sb = new System.Text.StringBuilder();
 			for (int li = 0; li < lines.Count; li++) {
@@ -455,8 +508,7 @@ namespace OpenTaiko {
 		public double MeasureWrapped(string text, double wrapWidth, double scale = 1.0, double lineSpacing = 1.0) {
 			if (string.IsNullOrEmpty(text) || _font == null) return 0;
 			Revalidate();
-			var (runes, _) = GlyphTextLayout.Tokenize(text);
-			var lines = GlyphTextLayout.Wrap(runes, scale > 0 ? wrapWidth / scale : wrapWidth, _advanceOf, _kernOf);
+			var lines = LayoutOf(text, scale > 0 ? wrapWidth / scale : wrapWidth).Lines;
 			return (lines.Count - 1) * LineHeight * scale * lineSpacing + BoxHeight * scale;
 		}
 
@@ -470,8 +522,10 @@ namespace OpenTaiko {
 			Color fore = FromLua(forecolor, DefaultFore);
 			Color outline = FromLua(backcolor, DefaultOutline);
 
-			var (runes, styles) = GlyphTextLayout.Tokenize(text);
-			var lines = GlyphTextLayout.Wrap(runes, scale > 0 ? wrapWidth / scale : wrapWidth, _advanceOf, _kernOf);
+			var layout = LayoutOf(text, scale > 0 ? wrapWidth / scale : wrapWidth);
+			var runes = layout.Runes;
+			var styles = layout.Styles;
+			var lines = layout.Lines;
 			double pitch = LineHeight * scale * lineSpacing;
 
 			for (int li = 0; li < lines.Count; li++) {
@@ -530,6 +584,7 @@ namespace OpenTaiko {
 		protected virtual void Dispose(bool disposing) {
 			if (!_disposedValue) {
 				ClearGlyphs();
+				ClearLayouts();
 				_placements.Clear();
 				_advances.Clear();
 				_kerns.Clear();

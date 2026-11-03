@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Runtime.InteropServices;
 using FFmpeg.AutoGen;
 
 namespace FDK;
@@ -33,6 +34,13 @@ public class CDecodedFrame : IDisposable {
 		return _frame;
 	}
 
+	// the converted picture of this slot, allocated on first use
+	private IntPtr _buffer;
+	internal IntPtr GetConvertBuffer(int size) {
+		if (this._buffer == 0) this._buffer = Marshal.AllocHGlobal(size);
+		return this._buffer;
+	}
+
 	public unsafe void UpdateFrame(double time) {
 		this.Time = time;
 		this.TexPointer = (IntPtr)this._frame->data[0];
@@ -52,6 +60,10 @@ public class CDecodedFrame : IDisposable {
 				ffmpeg.av_frame_free(pThisFrame);
 			}
 			this._frame = null;
+		}
+		if (this._buffer != 0) {
+			Marshal.FreeHGlobal(this._buffer);
+			this._buffer = 0;
 		}
 		this.TexPointer = 0;
 		this.Using = false;

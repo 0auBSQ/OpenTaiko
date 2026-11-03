@@ -126,8 +126,24 @@ class CNamePlate {
 
 	/// <summary>Draws the full nameplate for a player slot.</summary>
 	public void Draw(double x, double y, int opacity, int player, int side) {
-		Script?.Draw(DrawModeFull, x, y, opacity, player, side);
+		var script = Script;
+		if (script == null) return;
+		if (player < 0 || player >= _drawArgs.Length) {
+			script.Draw(DrawModeFull, x, y, opacity, player, side);
+			return;
+		}
+		var args = _drawArgs[player];
+		CLuaScript.SetArg(args, 0, DrawModeFull);
+		CLuaScript.SetArg(args, 1, x);
+		CLuaScript.SetArg(args, 2, y);
+		CLuaScript.SetArg(args, 3, opacity);
+		CLuaScript.SetArg(args, 4, player);
+		CLuaScript.SetArg(args, 5, side);
+		script.Draw(args);
 	}
+
+	// each player's draw arguments, reused every frame
+	private readonly object[][] _drawArgs = [new object[6], new object[6], new object[6], new object[6], new object[6]];
 
 	/// <summary>Draws only the dan plate (used in My Room gallery).</summary>
 	public void DrawDan(double x, double y, int opacity, int danGrade, LuaTexture text) {

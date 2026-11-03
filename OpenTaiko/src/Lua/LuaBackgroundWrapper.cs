@@ -187,6 +187,7 @@ public sealed class LuaBackgroundState {
 public sealed class LuaBackgroundWrapper : IDisposable {
 	private CLuaBackgroundScript? _script;
 	private bool _started;   // onStart is driven once; re-Activate (e.g. per-song clear-anims) only re-runs activate(state)
+	private readonly object[] _drawArgs = new object[1];   // reused every frame
 
 	/// <summary>True when a Script.lua was found + loaded (false ⇒ every call no-ops, like a missing ScriptBG).</summary>
 	public bool Exists => _script != null;
@@ -225,7 +226,11 @@ public sealed class LuaBackgroundWrapper : IDisposable {
 	public void Update(LuaBackgroundState state) => _script?.UpdateState((long)(state.timeStamp * 1000.0), state);
 
 	/// <summary>Lua <c>draw(state)</c>.</summary>
-	public void Draw(LuaBackgroundState state) => _script?.Draw(state);
+	public void Draw(LuaBackgroundState state) {
+		if (_script == null) return;
+		_drawArgs[0] = state;
+		_script.Draw(_drawArgs);
+	}
 
 	/// <summary>Call an optional event hook (clearIn/clearOut/playEndAnime/kusuIn/kusuBroke/kusuMiss/skipAnime). No-ops
 	/// silently when the script does not define it. Event-rate only — do not call per frame.</summary>

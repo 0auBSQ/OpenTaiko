@@ -373,6 +373,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 
 	// the GL texture's own size (smaller than the logical size under render-scale or the GL size limit)
 	private int _glW, _glH;
+	private PixelFormat _glFormat;
 	public Vector3D<float> vcScaleRatio;
 
 	// 画面が変わるたび以下のプロパティを設定し治すこと。
@@ -426,6 +427,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		Pointer = texture.Pointer;
 		_glW = texture._glW;   // the shared GL texture's own size
 		_glH = texture._glH;
+		_glFormat = texture._glFormat;
 		this.szImageSize = new Size(width, height);
 		this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
 		this.rcFullImage = new Rectangle(0, 0, this.szImageSize.Width, this.szImageSize.Height);
@@ -437,9 +439,23 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		if (texture == 0)
 			return;
 		unsafe {
-			Game.Gl.DeleteTexture(Pointer); //解放
 			void* data = texture.ToPointer();
-			Pointer = GenTexture(data, (uint)width, (uint)height, rgbaType);
+			// a frame of the same size and format (a video's next frame) goes into the texture it already has
+			if (Pointer != 0 && width == _glW && height == _glH && rgbaType == _glFormat
+				&& !(OperatingSystem.IsAndroid() && rgbaType == PixelFormat.Bgra)) {
+#if DEBUG
+				long prof = CFrameProfiler.ExtraBegin();
+#endif
+				Game.Gl.BindTexture(TextureTarget.Texture2D, Pointer);
+				Game.Gl.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, (uint)width, (uint)height, rgbaType, GLEnum.UnsignedByte, data);
+				Game.Gl.BindTexture(TextureTarget.Texture2D, 0);
+#if DEBUG
+				CFrameProfiler.ExtraEnd(ProfSlot(ref s_profSubImage, "gl: texture sub-upload"), prof);
+#endif
+			} else {
+				Game.Gl.DeleteTexture(Pointer); //解放
+				Pointer = GenTexture(data, (uint)width, (uint)height, rgbaType);
+			}
 		}
 		this.szImageSize = new Size(width, height);
 		this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
@@ -694,6 +710,19 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 	// 34MB but displays at ~400px). Width/Height then report the clamped size — callers that scale to a
 	// target box (w/tex.Width) are unaffected.
 	public void MakeTexture(string strFileName, bool bBlackTransparent, int maxDimension) {
+#if DEBUG
+		long prof = CFrameProfiler.ExtraBegin();
+		try {
+			MakeTextureFromFile(strFileName, bBlackTransparent, maxDimension);
+		} finally {
+			CFrameProfiler.ExtraEnd(ProfSlot(ref s_profFromFile, "texture: create from file"), prof);
+		}
+#else
+		MakeTextureFromFile(strFileName, bBlackTransparent, maxDimension);
+#endif
+	}
+
+	private void MakeTextureFromFile(string strFileName, bool bBlackTransparent, int maxDimension) {
 		// Remember the source so the LRU cache can re-decode this texture at the same clamp after eviction.
 		this._sourcePath = strFileName;
 		this._sourceBlackTransparent = bBlackTransparent;
@@ -902,14 +931,44 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 	private void tRealizeDeferred() {
 		if (Pointer == 0 && _deferred && _sourcePath != null && !bDisposeCompleteDone) {
 			_deferred = false;
+			RealizedLog?.Add(Path.GetFileName(_sourcePath));
+#if DEBUG
+			long prof = CFrameProfiler.ExtraBegin();
+#endif
 			try { using SKBitmap? bmp = tClampToMaxDimension(tDecodeForUpload(_sourcePath), _sourceMaxDimension); if (bmp != null) MakeTexture(bmp, _sourceBlackTransparent); }
 			catch { }
+#if DEBUG
+			CFrameProfiler.ExtraEnd(ProfSlot(ref s_profRealize, "texture: decode on first draw"), prof);
+#endif
 		}
 	}
 
+	// set while a play is measured (the [PLAY] debug line): the files decoded on their first draw
+	public static List<string>? RealizedLog;
+
+#if DEBUG
+	private bool _gpuDrawn;   // drawn since its GL texture was made (the profiler's first-draw list)
+	private static int s_profRealize = -1, s_profUpload = -1, s_profSubImage = -1, s_profFromFile = -1;
+	private static int ProfSlot(ref int slot, string name) => slot >= 0 ? slot : slot = CFrameProfiler.Extra(name);
+#endif
+
 	private unsafe uint GenTexture(void* data, uint width, uint height, PixelFormat pixelFormat) {
+#if DEBUG
+		long prof = CFrameProfiler.ExtraBegin();
+		try {
+			return GenTextureCore(data, width, height, pixelFormat);
+		} finally {
+			CFrameProfiler.ExtraEnd(ProfSlot(ref s_profUpload, "gl: texture create + upload"), prof);
+		}
+#else
+		return GenTextureCore(data, width, height, pixelFormat);
+#endif
+	}
+
+	private unsafe uint GenTextureCore(void* data, uint width, uint height, PixelFormat pixelFormat) {
 		_glW = (int)width;
 		_glH = (int)height;
+		_glFormat = pixelFormat;
 		//テクスチャハンドルの作成-----
 		uint handle = Game.Gl.GenTexture();
 		Game.Gl.BindTexture(TextureTarget.Texture2D, handle);
@@ -964,6 +1023,9 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		if (_gpuBytes == 0) s_gpuTextureCount++;
 		_gpuBytes = newBytes;
 		_deferred = false;
+#if DEBUG
+		_gpuDrawn = false;
+#endif
 		lock (s_cacheLock) s_liveTextures.Add(this);   // HashSet ⇒ idempotent
 
 		return handle;
@@ -1408,6 +1470,12 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 
 		//描画-----
 		Game.Gl.BindVertexArray(VAO);
+#if DEBUG
+		if (!_gpuDrawn) {
+			_gpuDrawn = true;
+			CFrameProfiler.FirstDraw(_sourcePath, _gpuBytes);
+		}
+#endif
 		unsafe {
 			Game.Gl.DrawElements(PrimitiveType.Triangles, IndicesCount, DrawElementsType.UnsignedInt, (void*)0);//描画!
 		}
@@ -1590,6 +1658,12 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 
 		//描画-----
 		Game.Gl.BindVertexArray(VAO);
+#if DEBUG
+		if (!_gpuDrawn) {
+			_gpuDrawn = true;
+			CFrameProfiler.FirstDraw(_sourcePath, _gpuBytes);
+		}
+#endif
 		unsafe {
 			Game.Gl.DrawElements(PrimitiveType.Triangles, IndicesCount, DrawElementsType.UnsignedInt, (void*)0);//描画!
 		}

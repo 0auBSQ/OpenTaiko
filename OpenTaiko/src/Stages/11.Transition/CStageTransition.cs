@@ -252,7 +252,8 @@ internal class CStageTransition : CStage {
 				}
 				if (!more && _loadDone == 0) {
 					_session.End();
-					_loadDone = now;
+					if (_revealsGameplay) OpenTaiko.CollectBeforePlay();   // the settle time starts after it
+					_loadDone = Stopwatch.GetTimestamp();
 				}
 				if (_loadDone != 0 && Elapsed(_loadDone) >= SettleSeconds) {
 					_phase = Phase.FadeIn;

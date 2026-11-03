@@ -336,7 +336,12 @@ internal class CActImplMtaiko : CActivity {
 
 			var _ro = LuaROActivityWrapper.GetROActivity("modicons");
 			if (_ro != null && !_ro.IsActive) _ro.Activate();
-			_ro?.Draw(modIcons_x, modIcons_y, i, "game");
+			if (_ro != null) {
+				var args = this.modIconsArgs[i] ??= new object[] { 0, 0, i, "game" };
+				CLuaScript.SetArg(args, 0, modIcons_x);
+				CLuaScript.SetArg(args, 1, modIcons_y);
+				_ro.Draw(args);
+			}
 
 			if (OpenTaiko.Tx.Couse_Symbol[OpenTaiko.SongMount.nChoosenSongDifficulty[i]] != null) {
 				OpenTaiko.Tx.Couse_Symbol[OpenTaiko.SongMount.nChoosenSongDifficulty[i]]!.t2DDraw(
@@ -522,6 +527,7 @@ internal class CActImplMtaiko : CActivity {
 	public CTja.ECourse[] After = null!;
 	public CTja.ECourse[] Before = null!;
 	private CCounter[] ctSymbolFlash = new CCounter[5];
+	private readonly object[]?[] modIconsArgs = new object[]?[5];
 	//-----------------
 	#endregion
 

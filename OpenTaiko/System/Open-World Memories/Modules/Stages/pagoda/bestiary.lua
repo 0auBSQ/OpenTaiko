@@ -34,6 +34,10 @@ local NAMES = {
 }
 local DESCRIPTIONS = {
     scare3 = "A flame-like spirit that houses itself in grown crops and carves wooden masks to imitate forest creatures, in an attempt to blend in with nature. Despite their potentially dangerous appearance, Mimics are very child-like, and love nothing more than to simply scare unsuspecting travelers, even when the effectiveness of their disguises and spookiness are very poor.",
+    monster7 = "The large Dragoon, accented in maroon, with a halo like a typhoon, and eyes like the blood moon, noisy like a buffoon. He specializes in fire breathing.\nAs a dragon traditionally would, he’s quite possessive of his spot in the pagoda, and has an incredibly short temper.\n... He’s very insistent that you get his name right, even though he doesn’t tell you it at first.",
+    monster8 = "The seemingly friendly woman, with a head and wings made from crystals of ice. Known to have an incredibly strong usage of ice magic.\nDespite her kindness, her underlying intentions get revealed rather quickly, making interactions with her incredibly difficult. Her cold tone seems a little like that of Ume’s sister at times.",
+    monster9 = "A poor lost soul, constantly calling out for the sunlight…?\nIt seems more like a familiar being who’s being puppeteered by something.\nIts pitiful nature that makes you want to help it can wind you up in some awful situations.",
+    monsterfinal = "The source of the whole commotion.\nWith the energy and mannerisms comparable to a divinity, Tobiraph is a being of light that doesn’t feel warm nor cold, and makes choices only to follow some kind of inhumane order. They are simply a being of immense power with a strange sense of mystery that creates their being.",
 }
 local DESCRIPTION = "A description of this monster will come soon."   -- for a monster without one
 local UNMET_DESCRIPTION = "You have not met this monster yet."

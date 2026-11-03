@@ -86,12 +86,11 @@ internal class HttpEventReporter(string host, int port) {
     }
 
     public void ReportNoteJudgement(ENoteJudge noteJudge, int player, CChip? chip, int? msDelta) {
-        if (chip == null) return;
+        if (chip == null || !this.started || this._clients.Count == 0) return;
         NotesManager.ENoteType noteType = NotesManager.GetNoteType(chip);
-        Dictionary<int, int> mappingForPlayer =
-            this._noteOrdinalMappingByPlayer.GetValueOrDefault(player, new());
-        int? noteOrdinalByChar = mappingForPlayer.ContainsKey(chip.nIntValue_InternalNumber)
-            ? mappingForPlayer[chip.nIntValue_InternalNumber]
+        int? noteOrdinalByChar = this._noteOrdinalMappingByPlayer.TryGetValue(player, out var mappingForPlayer)
+            && mappingForPlayer.TryGetValue(chip.nIntValue_InternalNumber, out int ordinal)
+            ? ordinal
             : null;
         if (!(NotesManager.IsHittableNote(chip) && !NotesManager.IsGenericRoll(chip))) { return; }
         this.Broadcast(new {
@@ -120,6 +119,7 @@ internal class HttpEventReporter(string host, int port) {
 	}
 
     public void ReportGameplayStart() {
+        if (!this.started) return;
         this._noteOrdinalMappingByPlayer = new();
         var tjaSummaries = Enumerable.Range(0, OpenTaiko.ConfigIni.nPlayerCount).Select(i => {
 			CTja? tja = OpenTaiko.GetTJA(i);

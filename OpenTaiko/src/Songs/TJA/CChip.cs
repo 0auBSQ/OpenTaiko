@@ -388,6 +388,13 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public static CChip GetSearchChipAtOrAfter(long msTjaTimeInt) => GetSearchChipAtOrAfter(msTjaTimeInt, allowAt: true);
 	public static CChip GetSearchChipAfter(long msTjaTimeInt) => GetSearchChipAtOrAfter(msTjaTimeInt, allowAt: false);
 
+	// a chip kept for searches (made by new() and otherwise untouched) then compares as GetSearchChipAtOrAfter's chip
+	public void SetAsSearchChip(long msTjaTimeInt, bool allowAt) {
+		this._nSoundTimems = (int)Math.Clamp(msTjaTimeInt, int.MinValue, int.MaxValue);
+		this._dbSoundTimems = allowAt ? double.NegativeInfinity : double.PositiveInfinity;
+		this.nChannelNo = allowAt ? nChannelNoMostPrior : nChannelNoLeastPrior;
+	}
+
 	public int CompareTo(CChip? other) {
 		//譜面解析メソッドV4では発声時刻msで比較する。
 		// 位置が同じなら優先度で比較。

@@ -799,6 +799,7 @@ public abstract partial class Game : IDisposable {
 			var clock = Stopwatch.StartNew();
 			double last = 0;
 			while (!this._quitRequested) {
+				CFrameProfiler.FrameBegin();
 				double now = clock.Elapsed.TotalSeconds;
 				double delta = Math.Max(now - last, 1e-6);
 				last = now;
@@ -980,6 +981,7 @@ public abstract partial class Game : IDisposable {
 	}
 
 	public void Window_Update(double deltaTime) {
+		CFrameProfiler.Section("update");
 		double fps = 1.0f / deltaTime;
 		dbTimeMs = dbGetTimeMsReal!();
 		TimeMs = (long)dbTimeMs;
@@ -1115,6 +1117,7 @@ public abstract partial class Game : IDisposable {
 		// large burst uploads quickly instead of trickling out one-per-frame, while still capping the time
 		// spent so the frame rate stays smooth. When the queue is empty (the normal in-game case) the very
 		// first TryDequeue fails and the loop exits immediately — no per-frame cost.
+		CFrameProfiler.Section("async actions");
 		if (!AsyncActions.IsEmpty) {
 			long asyncStart = System.Diagnostics.Stopwatch.GetTimestamp();
 			while (AsyncActions.TryDequeue(out var action)) {
@@ -1128,6 +1131,7 @@ public abstract partial class Game : IDisposable {
 			}
 		}
 
+		CFrameProfiler.Section("draw");
 		bool useScale = RenderScale < 0.999f && EnsureRenderScaleFbo();
 		if (useScale) {
 			// clear the window first (the letterbox bars stay the border colour), render the whole frame into the
@@ -1153,12 +1157,15 @@ public abstract partial class Game : IDisposable {
 		double fps = 1.0f / deltaTime;
 
 #if DEBUG
+		CFrameProfiler.Section("imgui");
 		Gl.Viewport(0, 0, (uint)WindowBorderSize.X, (uint)WindowBorderSize.Y); // prevent ImGui GUI from being distorted
 		ImGuiController?.Render();
 		Gl.Viewport(ViewPortOffset.X, ViewPortOffset.Y, (uint)ViewPortSize.X, (uint)ViewPortSize.Y); // restore for post
 #endif
 
+		CFrameProfiler.Section("swap buffers");
 		Context.SwapBuffers();
+		CFrameProfiler.Section("loop");
 	}
 
 	// window thread: the game thread applies the size at its next frame

@@ -376,6 +376,7 @@ public unsafe class CVideoDecoder : IDisposable {
 		}
 		framelistHead = framelistTail = 0;
 		this.presentAfterSeek = true;   // the picture at the new time shows even while paused
+		this.seekCatchUp = true;
 		this.EnsureEnqueuingFrames();
 		// callers draw the texture right after GetNowFrame, so there is always one: the last picture stays
 		// up until the frame at the new time replaces it
@@ -573,15 +574,27 @@ public unsafe class CVideoDecoder : IDisposable {
 			this.UnpickDecodedFrameAt(slot.idx);
 			return;
 		}
-		frameconv.Convert(frame);
-
 		double msVideoTime = (frame->best_effort_timestamp - video_stream->start_time) * (video_stream->time_base.num / (double)video_stream->time_base.den) * 1000;
+		// after a seek, the frames from the keyframe up to the target are never shown: dropped unconverted
+		if (this.seekCatchUp) {
+			double frameMs = Framerate.num > 0 ? 1000.0 * Framerate.den / Framerate.num : 1000.0 / 30;
+			if (msVideoTime + frameMs <= this.msPlayPosition) {
+				this.UnpickDecodedFrameAt(slot.idx);
+				return;
+			}
+			this.seekCatchUp = false;
+		}
+		if (frameconv.IsConvert)
+			frameconv.Convert(frame, slot.frame.GetConvertBuffer(frameconv.BufferSize));
+
 		if (msVideoTime < this.msPlayPosition) { // evict non-empty outdated frames
 			for ((int idx, CDecodedFrame frame)? f; (f = this.FirstUsedFrame()) != null && f.Value.idx != slot.idx;)
 				this.RemoveFrameAt(f.Value.idx);
 		}
 		slot.frame.UpdateFrame(msVideoTime);
 	}
+
+	private bool seekCatchUp;
 
 	// decodes one audio packet and queues its samples; those before a seek target are dropped
 	private void PushAudioPacket(AVPacket* packet) {

@@ -579,6 +579,7 @@ internal class CStageSongLoading : CStage {
 
 					OpenTaiko.Timer.Update();
 					//CSound管理.rc演奏用タイマ.t更新();
+					_queueWaitStart = DateTime.Now;
 					base.ePhaseID = CStage.EPhase.SongLoading_WaitForSoundSystemBGM;
 					return (int)ESongLoadingScreenReturnValue.Continue;
 				}
@@ -590,7 +591,10 @@ internal class CStageSongLoading : CStage {
 
 					//						if ( ( nCurrentTime - this.nBGM再生開始時刻 ) > ( this.nBGMの総再生時間ms - 1000 ) )
 					if ((nCurrentTime - this.nBGMPlaybackStartTime) >= (this.nBGMTotalPlaybackTimems)    // #27787 2012.3.10 yyagi 1000ms == フェードイン分の時間
-						&& (DateTime.Now - _activateTime).TotalSeconds >= 2.0)
+						&& (DateTime.Now - _activateTime).TotalSeconds >= 2.0
+						// the queued work (the video, the chart's object textures, FastRender) is done before play,
+						// or given up on after 10 s so that something queueing every frame cannot hold the load
+						&& (Game.AsyncActions.IsEmpty || (DateTime.Now - _queueWaitStart).TotalSeconds >= 10.0))
 					{
 						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 					}
@@ -643,6 +647,7 @@ internal class CStageSongLoading : CStage {
 	private DateTime timeBeginLoad;
 	private DateTime timeBeginLoadWAV;
 	private DateTime _activateTime;
+	private DateTime _queueWaitStart;
 	private CancellationTokenSource? _loadCts;
 	private Task? _dtxLoadTask;
 	private CTja[]? _loadedTjas;

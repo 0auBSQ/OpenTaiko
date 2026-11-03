@@ -108,7 +108,12 @@ class NotesManager {
 	public static Complex getN4Beats(Complex msDTime, Complex th16DBeat, double bpm, Complex scroll, EScrollMode eScrollMode) {
 		if (eScrollMode is EScrollMode.BMScroll)
 			scroll = 1.0;
-		return getN4Beats(scroll * msDTime, scroll * th16DBeat, bpm, eScrollMode);
+		// only the product the mode reads is taken
+		return eScrollMode switch {
+			EScrollMode.Normal => getN4Beats(scroll * msDTime, default, bpm, eScrollMode),
+			EScrollMode.BMScroll or EScrollMode.HBScroll => getN4Beats(default, scroll * th16DBeat, bpm, eScrollMode),
+			_ => 0,
+		};
 	}
 
 	public static Complex getN4Beats(Complex msDTime, Complex th16DBeat, double bpm, EScrollMode eScrollMode)
@@ -321,6 +326,10 @@ class NotesManager {
 	private static Cell? FlyingCell(ENoteType Lane, EGameType gt)
 		=> Lane is ENoteType.Kadon ? NoteCell(Lane, EGameType.Taiko) : KindCell(NoteTextureColumnFast(Lane) - 1, gt);
 
+	// the color left on a chip effect sheet after its draw, shared by every call; only a draw reads it, and it sets the
+	// alpha itself
+	private static readonly Color4 ChipEffectWhite = new(1f, 1f, 1f, 1f);
+
 	// The flash over a note that has landed: the pack's ChipEffect.png cell (the same columns as Notes.png), else the
 	// note itself drawn additively
 	public static void DisplayChipEffect(int x, int y, ENoteType Lane, EGameType gt, Color4 color, int opacity) {
@@ -341,7 +350,8 @@ class NotesManager {
 			fx.color4 = color;
 			fx.Opacity = opacity;
 			fx.t2DCenterBasedDraw(x, y, new Rectangle(col * w, 0, w, h));
-			fx.color4 = new Color4(1f, 1f, 1f, 1f);
+			ChipEffectWhite.Red = ChipEffectWhite.Green = ChipEffectWhite.Blue = ChipEffectWhite.Alpha = 1f;
+			fx.color4 = ChipEffectWhite;
 			fx.Opacity = 255;
 			return;
 		}
@@ -361,13 +371,21 @@ class NotesManager {
 
 	// Draws with a texture faded to `opacity` (0..1) and restores its opacity afterwards: the Hidden mod's
 	// fade-out, applied to every note-related texture without leaving state behind.
-	private static void DrawFaded(CTexture? tex, float opacity, Action<CTexture> draw) {
-		if (tex == null) return;
-		if (opacity >= 1f) { draw(tex); return; }
-		if (opacity <= 0f) return;
+	private static void DrawFaded(CTexture? tex, float opacity, float x, float y, RectangleF? rect, NoteLook look) {
+		if (tex == null || opacity <= 0f) return;
+		if (opacity >= 1f) { DrawWithLook(tex, x, y, rect, look); return; }
 		int saved = tex.Opacity;
 		tex.Opacity = (int)(saved * opacity);
-		draw(tex);
+		DrawWithLook(tex, x, y, rect, look);
+		tex.Opacity = saved;
+	}
+
+	private static void DrawFaded(CTexture? tex, float opacity, int x, int y, Rectangle rect) {
+		if (tex == null || opacity <= 0f) return;
+		if (opacity >= 1f) { tex.t2DDraw(x, y, rect); return; }
+		int saved = tex.Opacity;
+		tex.Opacity = (int)(saved * opacity);
+		tex.t2DDraw(x, y, rect);
 		tex.Opacity = saved;
 	}
 
@@ -511,7 +529,7 @@ class NotesManager {
 
 		if (IsMine(nt)) {
 			float scale = giant ? def.GiantNotesScale * def.PartnerNotesScale : partner ? def.PartnerNotesScale : 1f;
-			DrawFaded(OpenTaiko.Tx.Note_Mine, opacity, t => DrawWithLook(t, x, y, null, look with { Scale = look.Scale * scale }));
+			DrawFaded(OpenTaiko.Tx.Note_Mine, opacity, x, y, null, look with { Scale = look.Scale * scale });
 			return;
 		}
 
@@ -525,8 +543,7 @@ class NotesManager {
 				float cw = sheet.szTextureSize.Width / (float)(giant ? GiantColumns(_gt) : NotesColumns(_gt));
 				float ch = sheet.szTextureSize.Height / (float)Math.Max(1, def.Notes.Frames);
 				int col = giant ? GiantColumn(cell.Col, _gt) : cell.Col;
-				DrawFaded(sheet, opacity,
-					t => DrawWithLook(t, x + (wNote - cw) / 2, y + (hNote - ch) / 2, new RectangleF(col * cw, row * ch, cw, ch), look));
+				DrawFaded(sheet, opacity, x + (wNote - cw) / 2, y + (hNote - ch) / 2, new RectangleF(col * cw, row * ch, cw, ch), look);
 				return;
 			}
 		}
@@ -544,9 +561,7 @@ class NotesManager {
 			look = look with { Scale = look.Scale * scale };
 		}
 
-		var c = cell;
-		DrawFaded(c.Tex, opacity,
-			t => DrawWithLook(t, x, y, new RectangleF(c.Col * wNote, row * hNote, c.Span * wNote, hNote), look));
+		DrawFaded(cell.Tex, opacity, x, y, new RectangleF(cell.Col * wNote, row * hNote, cell.Span * wNote, hNote), look);
 	}
 
 	// Roll display
@@ -672,15 +687,15 @@ class NotesManager {
 		int w = OpenTaiko.Skin.Game_SENote_Size[0], h = OpenTaiko.Skin.Game_SENote_Size[1];
 
 		if (IsMine(nt)) {
-			DrawFaded(OpenTaiko.Tx.SENotesExtension, opacity, t => t.t2DDraw(x, y, new Rectangle(0, h, w, h)));
+			DrawFaded(OpenTaiko.Tx.SENotesExtension, opacity, x, y, new Rectangle(0, h, w, h));
 		} else if (IsPurpleNoteTaiko(nt, _gt)) {
-			DrawFaded(OpenTaiko.Tx.SENotesExtension, opacity, t => t.t2DDraw(x, y, new Rectangle(0, 0, w, h)));
+			DrawFaded(OpenTaiko.Tx.SENotesExtension, opacity, x, y, new Rectangle(0, 0, w, h));
 		} else if (IsFuzeRoll(nt)) {
-			DrawFaded(OpenTaiko.Tx.SENotesExtension, opacity, t => t.t2DDraw(x, y, new Rectangle(0, h * 2, w, h)));
+			DrawFaded(OpenTaiko.Tx.SENotesExtension, opacity, x, y, new Rectangle(0, h * 2, w, h));
 		} else if (IsKusudama(nt)) {
-			DrawFaded(OpenTaiko.Tx.SENotesExtension, opacity, t => t.t2DDraw(x, y, new Rectangle(0, h * 3, w, h)));
+			DrawFaded(OpenTaiko.Tx.SENotesExtension, opacity, x, y, new Rectangle(0, h * 3, w, h));
 		} else {
-			DrawFaded(OpenTaiko.Tx.SENotes[(int)_gt], opacity, t => t.t2DDraw(x, y, new Rectangle(0, h * chip.nSenote, w, h)));
+			DrawFaded(OpenTaiko.Tx.SENotes[(int)_gt], opacity, x, y, new Rectangle(0, h * chip.nSenote, w, h));
 		}
 	}
 

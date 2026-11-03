@@ -38,13 +38,24 @@ class CCharacterLua : CCharacter {
 	public override void Draw(string animationType, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null, float rotation = 0f, string? blendMode = null, string? wrapMode = null, LuaGradientMap? gradientMap = null) {
 		string resolvedAnimation = this.GetAnimation(animationType);
 		string? contextType = (resolvedAnimation != animationType) ? animationType : null;
-		Script.Draw(resolvedAnimation, x, y, scaleX, scaleY, opacity, new LuaColor(color ?? Color4.White), contextType, rotation, blendMode, wrapMode, gradientMap);
+		Script.Draw(resolvedAnimation, x, y, scaleX, scaleY, opacity, DrawColor(color), contextType, rotation, blendMode, wrapMode, gradientMap);
 	}
 
 	public override void DrawAtAnchor(string animationType, float x, float y, string anchor, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null, float? clipW = null, float? clipH = null, float clipX = 0f, float clipY = 0f, float rotation = 0f, string? blendMode = null, string? wrapMode = null, LuaGradientMap? gradientMap = null) {
 		string resolvedAnimation = this.GetAnimation(animationType);
 		string? contextType = (resolvedAnimation != animationType) ? animationType : null;
-		Script.DrawAtAnchor(resolvedAnimation, x, y, anchor, scaleX, scaleY, opacity, new LuaColor(color ?? Color4.White), contextType, clipW, clipH, clipX, clipY, rotation, blendMode, wrapMode, gradientMap);
+		Script.DrawAtAnchor(resolvedAnimation, x, y, anchor, scaleX, scaleY, opacity, DrawColor(color), contextType, clipW, clipH, clipX, clipY, rotation, blendMode, wrapMode, gradientMap);
+	}
+
+	// the colour passed to the script's draw, the same object while the colour stays the same
+	private LuaColor? _drawColor;
+
+	private LuaColor DrawColor(Color4? color) {
+		var c = color ?? Color4.White;
+		byte r = (byte)(c.Red * 255), g = (byte)(c.Green * 255), b = (byte)(c.Blue * 255), a = (byte)(c.Alpha * 255);
+		var last = _drawColor;
+		if (last != null && last.R == r && last.G == g && last.B == b && last.A == a) return last;
+		return _drawColor = new LuaColor(r, g, b, a);
 	}
 
 	public override LuaVector2 GetDrawSize(string animationType) {

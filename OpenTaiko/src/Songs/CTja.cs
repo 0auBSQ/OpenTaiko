@@ -750,7 +750,12 @@ internal class CTja : CActivity {
 
 			for (int i = 0; i < nPoly; i++) {
 				try {
-					cwav.rSound[i] = OpenTaiko.SoundManager.tCreateSound(str, ESoundGroup.SongPlayback);
+					CSound.ReadSongFileWhole = true;
+					try {
+						cwav.rSound[i] = OpenTaiko.SoundManager.tCreateSound(str, ESoundGroup.SongPlayback);
+					} finally {
+						CSound.ReadSongFileWhole = false;
+					}
 
 					if (!OpenTaiko.ConfigIni.bDynamicBassMixerManagement) {
 						cwav.rSound[i]!.AddBassSoundFromMixer();
@@ -4795,7 +4800,7 @@ internal class CTja : CActivity {
 	public void UpdateScrolledChipPosition(CChip chip, CBPM nowBpmPoint, double msTjaNowTime, Complex th16NowBeat, double scrollRate) {
 		CChip velocityRefChip = NotesManager.GetVelocityRefChip(chip, this.COMPAT);
 		if (velocityRefChip.eScrollMode is EScrollMode.BMScroll or EScrollMode.HBScroll
-			&& nowBpmPoint.point_type.HasFlag(EBPMPointType.DelayStop)
+			&& (nowBpmPoint.point_type & EBPMPointType.DelayStop) == EBPMPointType.DelayStop
 			) {
 			msTjaNowTime = this.RawTjaTimeToTjaTimeNote(nowBpmPoint.bpm_change_time);
 		}
@@ -4864,7 +4869,7 @@ internal class CTja : CActivity {
 			return false;
 
 		// TaikoJiro 1 behavior: HB/BMScroll Scrolled objects during delay do not move, including those forced to NMScroll
-		if (bpmPointNow.point_type.HasFlag(EBPMPointType.DelayStop)) {
+		if ((bpmPointNow.point_type & EBPMPointType.DelayStop) == EBPMPointType.DelayStop) {
 			return this.TjaTimeToRawTjaTimeNote(chip.dbSoundTimems) <= bpmPointNow.bpm_change_time;
 		}
 		// Otherwise, scrolled objects past the judgement time are forced to NMScroll

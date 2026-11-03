@@ -98,6 +98,12 @@ class TextureLoader {
 		return tex;
 	}
 
+	private void WarmForPlay(CTexture? tex, WarmNeed need = WarmNeed.Always) {
+		if (tex == null) return;
+		gameplayTextures.Add(tex);
+		if (need != WarmNeed.Always) _warmNeeds[tex] = need;
+	}
+
 	// what the coming play can draw: its mode, its players and its charts (loaded by now)
 	private static WarmNeed tPlayNeeds() {
 		var cfg = OpenTaiko.ConfigIni;
@@ -657,6 +663,12 @@ class TextureLoader {
 		Result_Number = TxC(RESULT + @$"Number.png");
 
 		#endregion
+
+		// loaded with other screens but drawn during play too
+		WarmForPlay(Result_Number);
+		WarmForPlay(Tile_Black);
+		WarmForPlay(Dani_DanIcon, WarmNeed.Dan);
+		WarmForPlay(Dani_DanIcon_Fade, WarmNeed.Dan);
 
 		#region [11_Characters]
 

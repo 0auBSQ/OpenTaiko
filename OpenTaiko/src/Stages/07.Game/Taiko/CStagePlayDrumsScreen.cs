@@ -197,6 +197,9 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				if (this.soundBlue[actual] != null) this.soundBlue[actual]!.SoundPosition = _panning;
 				if (this.soundAdlib[actual] != null) this.soundAdlib[actual]!.SoundPosition = _panning;
 				if (this.soundClap[actual] != null) this.soundClap[actual]!.SoundPosition = _panning;
+				// in the mixer now, so that the first hit of each only seeks and starts
+				foreach (var snd in new[] { this.soundRed[actual], this.soundBlue[actual], this.soundAdlib[actual], this.soundClap[actual] })
+					if (snd != null) OpenTaiko.SoundManager.AddMixer(snd);
 			});
 		}
 
@@ -403,6 +406,8 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				base.IsFirstDraw = false;
 			}
 			#endregion
+			CFrameProfiler.PlayFrame(this.GetChartTimeNow(0));
+			CFrameProfiler.Section("play:state");
 			// stage-fail check
 			bool isTower = (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower);
 
@@ -434,6 +439,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			}
 			this.EndDanClearIfExamFailed(0);
 
+			CFrameProfiler.Section("play:background");
 			bool BGA_Shown = OpenTaiko.ConfigIni.bEnableAVI && OpenTaiko.TJA!.listVD!.Count > 0 && ShowVideo;
 
 			// Layer: background
@@ -456,6 +462,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			if (isTower && !bBackgroundDrawn)
 				actBackground.DrawTowerHud();
 
+			CFrameProfiler.Section("play:dancer");
 			// Layer: below-character background elements
 			if (!BGA_Shown && !OpenTaiko.ConfigIni.bTokkunMode) {
 				actRollChara.Draw();
@@ -473,6 +480,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			//this.t進行描画_DANGER();
 			//this.t進行描画_判定ライン();
 
+			CFrameProfiler.Section("play:chara");
 			this.actChara.Update();
 
 			// 1/2-player mode character
@@ -480,11 +488,13 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				this.actChara.Draw();
 			}
 
+			CFrameProfiler.Section("play:mob");
 			// Layer: above-character background elements
 
 			if (!BGA_Shown && !OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.ConfigIni.ShowMob)
 				this.actMob.Draw();
 
+			CFrameProfiler.Section("play:game");
 			this.actGame.Draw();
 
 			this.tProgressDraw_ChartScrollSpeed();
@@ -492,6 +502,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 			// Layer: note lane + below-note foreground elements
 
+			CFrameProfiler.Section("play:lane");
 			this.actLaneTaiko.Draw();
 
 			if (OpenTaiko.ConfigIni.ShowRunner && !OpenTaiko.ConfigIni.bAIBattleMode && !this.isMultiPlay)
@@ -503,6 +514,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			if (BGA_Shown && !OpenTaiko.ConfigIni.bTokkunMode && !this.isMultiPlay)
 				this.actAVI.tWindowDisplay();
 
+			CFrameProfiler.Section("play:gauge");
 			if (!OpenTaiko.ConfigIni.bNoInfo && !OpenTaiko.ConfigIni.bTokkunMode)
 				this.tProgressDraw_Gauge();
 
@@ -510,11 +522,13 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 			// bIsFinishedPlaying was dependent on 2P in this case
 
+			CFrameProfiler.Section("play:dan");
 			this.actDan.Draw();
 			this.actGame.DrawTimers();
 
 			// Layer: notes & bar lines. Players under the Flashlight canvas draw first, then the canvas,
 			// then the players it must not darken (their judge frames included).
+			CFrameProfiler.Section("play:chips");
 			this.ctHandHold!.TickLoop();
 
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
@@ -532,6 +546,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 			// Layer: above-note elements
 
+			CFrameProfiler.Section("play:mtaiko");
 			this.actMtaiko.Draw();
 			this.tDrawReplayModeIndicator();
 
@@ -539,14 +554,17 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				this.actAIBattle.Draw();
 			}
 
+			CFrameProfiler.Section("play:gogo");
 			this.GoGoSplash.Draw();
 			this.tProgressDraw_RealTimeJudgeCountDisplay();
 
+			CFrameProfiler.Section("play:combo+score");
 			if (!OpenTaiko.ConfigIni.bNoInfo)
 				this.tProgressDraw_Combo();
 			if (!OpenTaiko.ConfigIni.bNoInfo && !OpenTaiko.ConfigIni.bTokkunMode)
 				this.tProgressDraw_Score();
 
+			CFrameProfiler.Section("play:effects");
 			// note effects
 			this.Rainbow.Draw();
 			this.FireWorks.Draw();
@@ -557,6 +575,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			if (!OpenTaiko.ConfigIni.bNoInfo)
 				this.tProgressDraw_PanelString();
 
+			CFrameProfiler.Section("play:balloons");
 			// dialogue balloons
 
 			this.actComboBalloon.Draw();
@@ -565,6 +584,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				this.actRoll.OnProgressDraw(this.nCurrentRollCount[i], i);
 			}
 
+			CFrameProfiler.Section("play:judge+chara balloon");
 			// infos
 
 			if (!OpenTaiko.ConfigIni.bNoInfo)
@@ -576,10 +596,12 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
 				this.actComboVoice.tPlayFloorSound();
 
+			CFrameProfiler.Section("play:control");
 			this.tTotalControlMethod();
 
 			this.ScoreRank.Draw();
 
+			CFrameProfiler.Section("play:objects");
 			// object rendering
 			if (!OpenTaiko.ConfigIni.bTokkunMode) {
 				foreach (var (key, obj) in OpenTaiko.TJA!.listObj)
@@ -593,6 +615,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				actTokkun.Draw();
 			}
 
+			CFrameProfiler.Section("play:lyrics");
 			// LYRIC[S/FILE]: & #LYRIC
 
 			// every line now due is passed at once and only the last one is shown (a training seek passes many)
@@ -610,6 +633,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 			this.actPanel.tLyricsTextureDraw();
 
+			CFrameProfiler.Section("play:pause+end");
 			// Online VS: drive remote player spots — broadcast my score + feed peers' score/gauge (no-op offline)
 			OnlinePlaySync.Tick(this);
 
@@ -703,20 +727,24 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				base.ePhaseID = CStage.EPhase.Game_EndChart;
 			}
 
+			CFrameProfiler.Section("play:info");
 			this.tProgressDraw_PlayInfo();
 
 			// draw above anything
 			this.actPauseMenu.Draw();
 
 			if (bIsFinishedFadeout) {
+				CFrameProfiler.Stop();
 				Debug.WriteLine("Total On進行描画=" + sw.ElapsedMilliseconds + "ms");
 				return (int)this.eFadeOutCompleteWhenReturnValue;
 			}
 
+			CFrameProfiler.Section("play:mixer");
 			ManageMixerQueue();
 
 			// キー入力
 
+			CFrameProfiler.Section("play:input");
 			this.tKeyInput();
 
 
@@ -1176,6 +1204,14 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				}
 				#endregion
 
+				if (pChip.nSoundTimems < (long)nPlayTime) {
+					this.actGame.OnNoteReached(nPlayer);
+				}
+
+				// off screen: nothing is drawn, and the stealth and split lane below only serve the draw
+				if (!(x > 0 - OpenTaiko.Skin.Game_Notes_Size[0] && x < OpenTaiko.Skin.Resolution[0]))
+					return;
+
 				#region[ HIDSUD & STEALTH ]
 				EStealthMode hiddenMode = OpenTaiko.ConfigIni.eSTEALTH[nPlayer];
 				if (hiddenMode != EStealthMode.Stealth && !(pChip.bShow && pChip.bShowSudden))
@@ -1190,10 +1226,6 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 					} else if (NotesManager.IsAcceptBlue(nt, _gt) && !NotesManager.IsAcceptRed(nt, _gt)) {
 						y += NotesManager.PxSplitLaneDistance;
 					}
-				}
-
-				if (pChip.nSoundTimems < (long)nPlayTime) {
-					this.actGame.OnNoteReached(nPlayer);
 				}
 
 				if (x > 0 - OpenTaiko.Skin.Game_Notes_Size[0] && x < OpenTaiko.Skin.Resolution[0]) {
@@ -1213,6 +1245,10 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		}
 		#endregion
 	}
+
+	// the roll colors, set again before each roll is drawn; only a draw reads them, and it sets the alpha itself
+	private readonly Color4 rollNormalColor = new(1f, 1f, 1f, 1f), rollEffectedColor = new(1f, 1f, 1f, 1f);
+
 	protected override void tProgressDraw_Chip_TaikoRoll(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, double msTjaNowTime, Complex th16NowBeat, NotesManager.ENoteType nt, EGameType _gt, bool isEnd = false) {
 		// 2016.11.2 kairera0467
 		// 黄連打音符を赤くするやつの実装方法メモ
@@ -1309,8 +1345,12 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 					}
 						}
 					float fDecreaseColor = 1.0f - ((0.95f / 100) * pChip.RollEffectLevel);
-					var effectedColor = new Color4(1.0f, fDecreaseColor, fDecreaseColor, 1f);
-					var normalColor = new Color4(1.0f, 1.0f, 1.0f, 1f);
+					var effectedColor = this.rollEffectedColor;
+					effectedColor.Red = 1.0f;
+					effectedColor.Green = effectedColor.Blue = fDecreaseColor;
+					effectedColor.Alpha = 1f;
+					var normalColor = this.rollNormalColor;
+					normalColor.Red = normalColor.Green = normalColor.Blue = normalColor.Alpha = 1f;
 
 						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ctHandHold!.CurrentValue, hiddenMode: hiddenMode, opacity: opacity);
 						NotesManager.DisplayRoll(nPlayer, x, y, pChip, noteAnim, normalColor, effectedColor, xEnd, yEnd, hiddenMode, opacity);
@@ -1456,10 +1496,9 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	protected override void tProgressDraw_Chip_MeasureLine(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, double nowTime, bool isBranched) {
 		//int n小節番号plus1 = pChip.n発声位置 / 384;
 		//int n小節番号plus1 = this.actPlayInfo.NowMeasure[nPlayer];
-		int x = GetNoteOriginX(nPlayer) + pChip.nHorizontalChipDistance;
-		int y = GetNoteOriginY(nPlayer) + pChip.nVerticalChipDistance;
-
 		if ((pChip.bVisible && !pChip.bHideBarLine && pChip.canShowBody) && (OpenTaiko.Tx.Bar != null)) {
+			int x = GetNoteOriginX(nPlayer) + pChip.nHorizontalChipDistance;
+			int y = GetNoteOriginY(nPlayer) + pChip.nVerticalChipDistance;
 			var width = OpenTaiko.Tx.Bar.szTextureSize.Width;
 			var height = OpenTaiko.Skin.Game_Notes_Size[1];
 			var maxRadius = width + height; // upper limit of Math.Hypot(width, height) and a close approximant because width is small
@@ -1533,6 +1572,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			}
 		}
 
+		this.tPlayStatsFrame();
 		if (!this.actTokkun.bTrainingPAUSE)
 			this.tCheckBgmDrift();
 
@@ -1668,7 +1708,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		float width = OpenTaiko.Tx.Result_Number!.szImageSize.Width / 11.0f;
 		float height = OpenTaiko.Tx.Result_Number.szImageSize.Height / 2.0f;
 
-		int[] nums = CConversion.SeparateDigits(num);
+		Span<int> nums = SeparateDigits(num, stackalloc int[10]);
 
 		if (drawPercent) {
 			OpenTaiko.Tx.Result_Number.t2DScaledCenterBasedDraw(x + (OpenTaiko.Skin.Result_Number_Interval[0] * 3.0f) + (width / 2),
@@ -1687,7 +1727,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	}
 
 	private void tLargeDisplay(int x, int y, int num) {
-		int[] nums = CConversion.SeparateDigits(num);
+		Span<int> nums = SeparateDigits(num, stackalloc int[10]);
 		for (int j = 0; j < nums.Length; j++) {
 			float offset = j - 1.5f;
 			float _x = x - ((OpenTaiko.Skin.Result_Number_Interval[0] * 1.27f) * offset);
@@ -1699,6 +1739,21 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			OpenTaiko.Tx.Result_Number.t2DScaledCenterBasedDraw(_x + (width / 2), _y + (height / 2),
 				new System.Drawing.RectangleF(width * nums[j], height, width, height));
 		}
+	}
+
+	// CConversion.SeparateDigits(num) in the buffer, ones first, without its string and array
+	private static Span<int> SeparateDigits(int num, Span<int> buffer) {
+		if (num < 0)
+			return CConversion.SeparateDigits(num); // its minus sign counts as a digit
+		int length = 1;
+		for (int v = num; v >= 10; v /= 10)
+			length++;
+		Span<int> digits = buffer[..length];
+		for (int i = 0; i < length; i++) {
+			digits[i] = num % 10;
+			num /= 10;
+		}
+		return digits;
 	}
 	#endregion
 }

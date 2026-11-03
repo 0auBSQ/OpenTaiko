@@ -539,7 +539,24 @@ public class SoundManager   // : CSound
 		return SoundDevice!.tCreateUserSound(frequency, channels, durationSeconds, proc, soundGroup);
 	}
 
+#if DEBUG
+	private static int s_profCreate = -1;
+#endif
+
 	public CSound? tCreateSound(string filename, ESoundGroup soundGroup) {
+#if DEBUG
+		long prof = CFrameProfiler.ExtraBegin();
+		try {
+			return this.tCreateSoundCore(filename, soundGroup);
+		} finally {
+			if (prof != 0) CFrameProfiler.ExtraEnd(s_profCreate >= 0 ? s_profCreate : s_profCreate = CFrameProfiler.Extra("sound: create"), prof);
+		}
+#else
+		return this.tCreateSoundCore(filename, soundGroup);
+#endif
+	}
+
+	private CSound? tCreateSoundCore(string filename, ESoundGroup soundGroup) {
 		if (!File.Exists(filename)) {
 			Trace.TraceWarning($"[i18n] File does not exist: {filename}");
 			return null;

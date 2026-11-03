@@ -27,27 +27,41 @@ internal class CActPlayPanelString : CActivity {
 	/// <param name="stageText">曲数</param>
 	public void SetPanelString(string songName, string genreName, string? stageText = null, CSongListNode? songNode = null) {
 		if (base.IsActivated) {
-			OpenTaiko.tDisposeSafely(ref this.txMusicName);
-			OpenTaiko.tDisposeSafely(ref this.txStage);
-			OpenTaiko.tDisposeSafely(ref this.txGENRE);
-			this.tReleaseGenre();
+			this.tReleaseMusicName();
+			this.txStage = null;
+			this.txGENRE = null;
 			if ((songName != null) && (songName.Length > 0)) {
 				try {
-					using (var bmpSongTitle = pfMusicName!.DrawText(songName, OpenTaiko.Skin.Game_MusicName_ForeColor, OpenTaiko.Skin.Game_MusicName_BackColor, null, 30)) {
-						this.txMusicName = OpenTaiko.tTextureCreate(bmpSongTitle, false);
+					if (this.txDanTitles.TryGetValue(songName, out var prepared)) {
+						this.txMusicName = prepared;
+					} else {
+						using (var bmpSongTitle = pfMusicName!.DrawText(songName, OpenTaiko.Skin.Game_MusicName_ForeColor, OpenTaiko.Skin.Game_MusicName_BackColor, null, 30)) {
+							this.txMusicName = OpenTaiko.tTextureCreate(bmpSongTitle, false);
+						}
 					}
 					if (txMusicName != null) {
 						this.txMusicName.vcScaleRatio.X = OpenTaiko.GetSongNameXScaling(ref txMusicName);
 					}
 
-					txStage = OpenTaiko.Tx.TxCGen("Songs");
+					// the plates are loaded once and kept: a dan sets the panel again for each of its songs
+					if (!this.bStagePlateLoaded) {
+						this.txStagePlate = OpenTaiko.Tx.TxCGen("Songs");
+						this.bStagePlateLoaded = true;
+					}
+					txStage = this.txStagePlate;
+					if (txStage != null)
+						txStage.Opacity = 255;
 				} catch (CTextureCreateFailedException e) {
 					Trace.TraceError(e.ToString());
 					Trace.TraceError("Failed to create the panel text texture.");
 				}
 			}
 
-			this.txGENRE = OpenTaiko.Tx.TxCGen("Template");
+			if (!this.bGenrePlateLoaded) {
+				this.txGenrePlate = OpenTaiko.Tx.TxCGen("Template");
+				this.bGenrePlateLoaded = true;
+			}
+			this.txGENRE = this.txGenrePlate;
 
 			// Genre text color comes from the box's color (boxdef); default to white otherwise.
 			Color stageColor = Color.White;
@@ -57,9 +71,11 @@ internal class CActPlayPanelString : CActivity {
 			if (this.txGENRE != null)
 				this.txGENRE.color4 = CConversion.ColorToColor4(stageColor);
 
-			pfGENRE = HPrivateFastFont.tInstantiateBoxFont(OpenTaiko.Skin.Game_GenreText_FontSize);
-
-			this.ttkGENRE = new TitleTextureKey(genreName, this.pfGENRE, Color.White, Color.Black, 1000);
+			// the same genre keeps its label; another one is drawn again on its first draw
+			if (this.ttkGENRE?.str != genreName) {
+				TitleTextureKey.Release(this.ttkGENRE);
+				this.ttkGENRE = new TitleTextureKey(genreName, this.pfGENRE!, Color.White, Color.Black, 1000);
+			}
 
 			this.ctForProgress = new CCounter(0, 2000, 2, OpenTaiko.Timer);
 			this.Start();
@@ -74,6 +90,33 @@ internal class CActPlayPanelString : CActivity {
 		TitleTextureKey.Release(this.ttkGENRE);
 		this.ttkGENRE = null!;
 		OpenTaiko.tDisposeSafely(ref this.pfGENRE);
+	}
+
+	// the shown title, freed unless it is one of the dan's prepared titles
+	private void tReleaseMusicName() {
+		if (this.txMusicName != null && !this.txDanTitles.ContainsValue(this.txMusicName))
+			this.txMusicName.Dispose();
+		this.txMusicName = null;
+	}
+
+	// a dan sets the panel to each song's title as it reaches the song: those titles are drawn here, behind the
+	// loading screen. A title that fails is left to SetPanelString, as before.
+	private void tPrepareDanTitles() {
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan || OpenTaiko.TJA == null)
+			return;
+		foreach (var danSong in OpenTaiko.TJA.List_DanSongs) {
+			string title = danSong.Title;
+			if (string.IsNullOrEmpty(title) || this.txDanTitles.ContainsKey(title))
+				continue;
+			try {
+				using var bmp = pfMusicName!.DrawText(title, OpenTaiko.Skin.Game_MusicName_ForeColor, OpenTaiko.Skin.Game_MusicName_BackColor, null, 30);
+				var tx = OpenTaiko.tTextureCreate(bmp, false);
+				if (tx != null)
+					this.txDanTitles[title] = tx;
+			} catch (Exception e) {
+				Trace.TraceWarning($"Could not prepare the dan song title '{title}': {e.Message}");
+			}
+		}
 	}
 
 	public void tLyricsTextureCreate(SKBitmap bmplyric) {
@@ -110,15 +153,23 @@ internal class CActPlayPanelString : CActivity {
 
 	public override void Activate() {
 		this.pfMusicName = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Game_MusicName_FontSize);
+		this.pfGENRE = HPrivateFastFont.tInstantiateBoxFont(OpenTaiko.Skin.Game_GenreText_FontSize);
+		this.tPrepareDanTitles();
 		this.ctForProgress = new CCounter();
 		this.Start();
 		base.Activate();
 	}
 	public override void DeActivate() {
 		this.ctForProgress = null;
-		OpenTaiko.tDisposeSafely(ref this.txMusicName);
-		OpenTaiko.tDisposeSafely(ref this.txStage);
-		OpenTaiko.tDisposeSafely(ref this.txGENRE);
+		this.tReleaseMusicName();
+		foreach (var tx in this.txDanTitles.Values)
+			tx.Dispose();
+		this.txDanTitles.Clear();
+		this.txStage = null;
+		this.txGENRE = null;
+		OpenTaiko.tDisposeSafely(ref this.txStagePlate);
+		OpenTaiko.tDisposeSafely(ref this.txGenrePlate);
+		this.bStagePlateLoaded = this.bGenrePlateLoaded = false;
 		this.tReleaseGenre();
 		OpenTaiko.tDisposeSafely(ref this.pfMusicName);
 		OpenTaiko.tDisposeSafely(ref this.pfLyricsFont);
@@ -214,6 +265,9 @@ internal class CActPlayPanelString : CActivity {
 	private CTexture? txMusicName;
 	private CTexture? txStage;
 	private CTexture? txGENRE;
+	private CTexture? txStagePlate, txGenrePlate;
+	private bool bStagePlateLoaded, bGenrePlateLoaded;
+	private readonly Dictionary<string, CTexture> txDanTitles = new();
 	private CCachedFontRenderer? pfGENRE;
 	private TitleTextureKey? ttkGENRE;
 	private CTexture? txLyricsTexture;

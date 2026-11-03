@@ -147,15 +147,29 @@ internal class CSongManager {
 		this.nTotalSongFilesToSearch = 2 * paths.Count + nonTja;
 		this.nSearchFileCount = 0;
 		var dict = new ConcurrentDictionary<string, (string, CSongListNode?)>();
-		Parallel.ForEach(paths, p => {
+		// one core is left to the game, and the workers yield to it and wait while a song plays
+		var options = new ParallelOptions { MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount - 1) };
+		Parallel.ForEach(paths, options, (p, loop) => {
+			var thread = Thread.CurrentThread;
+			var priority = thread.Priority;
+			thread.Priority = ThreadPriority.BelowNormal;
 			try {
+				while (this.bIsSuspending && !this.bIsCanceled) Thread.Sleep(50);
+				if (this.bIsCanceled) {
+					loop.Stop();
+					return;
+				}
 				string hash = TjaHash(p);
 				// Create song nodes except for the charts already in the cache.
 				dict[p] = (hash, listSongsDB.ContainsKey(p + hash) ? null : ParseUnparentedSongNode(p));
-			} catch { }
+			} catch {
+			} finally {
+				thread.Priority = priority;
+			}
 			Interlocked.Increment(ref _nSearchFileCount);
 		});
 		_preparsed = dict;
+		if (this.bIsCanceled) throw new OperationCanceledException();
 	}
 
 	// Parses a chart file into an unparented song node, without retaining the CTja object.

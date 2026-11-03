@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using FDK;
-using Newtonsoft.Json;
 using NLua;
 
 namespace OpenTaiko;
@@ -105,22 +105,56 @@ public abstract class CLuaScript : IDisposable {
 
 	private readonly HashSet<string> _reportedFunctions = new();
 
+	// functions that raised an error are not called again, so a failing update or draw does not throw every frame.
+	// A function called with a string first (an animation or voice name) is skipped for that string only, up to
+	// MaxFailedNames strings; null = every call is skipped
+	private readonly Dictionary<string, HashSet<string>?> _failedCalls = new();
+	private const int MaxFailedNames = 16;
+
+	private bool IsFailedCall(string name, string? firstArg)
+		=> _failedCalls.TryGetValue(name, out var names) && (names == null || (firstArg != null && names.Contains(firstArg)));
+
+	private void RememberFailedCall(string name, string? firstArg) {
+		if (firstArg == null) {
+			_failedCalls[name] = null;
+			return;
+		}
+		if (!_failedCalls.TryGetValue(name, out var names))
+			_failedCalls[name] = names = new();
+		if (names == null) return;
+		names.Add(firstArg);
+		if (names.Count > MaxFailedNames) _failedCalls[name] = null;
+	}
+
 	protected object[]? RunLuaCode(NamedLuaFunction luaFunction, params object?[] args) {
 		var outer = _running;
+		string? firstArg = args is { Length: > 0 } ? args[0] as string : null;
 		try {
 			if (luaFunction.Func == null) {
 				// To prevent lag
 				return null;
 			}
+			if (_failedCalls.Count > 0 && IsFailedCall(luaFunction.Name, firstArg))
+				return null;
 			_running = this;
 			// Lua's own incremental collector runs as the script allocates and keeps the heap within about twice
 			// its live data (Lua's default pause of 200)
+#if DEBUG
+			long profStart = CFrameProfiler.ExtraBegin();
+			long profAlloc = CFrameProfiler.AllocNow();
+			try {
+				return luaFunction.Func.Call(args);
+			} finally {
+				if (profStart != 0) CFrameProfiler.ExtraEnd(this.ProfSlot(luaFunction.Name), profStart, profAlloc);
+			}
+#else
 			return luaFunction.Func.Call(args);
+#endif
 		} catch (Exception exception) {
+			RememberFailedCall(luaFunction.Name, firstArg);
 			// only a function's first error is shown: a failing update or draw would add an error card and a log entry every frame
 			if (_reportedFunctions.Add(luaFunction.Name)) {
-				var argsAsReprStrings = args.Select(v => JsonConvert.SerializeObject(v));
-				Crash(exception, $"RunLuaCode - {luaFunction.Name}({string.Join(", ", argsAsReprStrings)})");
+				Crash(exception, $"RunLuaCode - {luaFunction.Name}({DescribeArgs(args)})");
 			} else {
 				bCrashed = true;
 			}
@@ -129,6 +163,49 @@ public abstract class CLuaScript : IDisposable {
 		}
 		return null;
 	}
+
+#if DEBUG
+	// the profiler's slot of a function of this script, named after the script's last folders
+	private readonly Dictionary<string, int> _profSlots = new();
+	private int ProfSlot(string function) {
+		if (_profSlots.TryGetValue(function, out int slot)) return slot;
+		var parts = (strDir ?? "").TrimEnd('/', '\\').Split('/', '\\');
+		string label = string.Join("/", parts.Skip(Math.Max(0, parts.Length - 3)));
+		return _profSlots[function] = CFrameProfiler.Register($"lua:{label}/{function}");
+	}
+#endif
+
+	// the arguments of a failed call for its error card: short values as they are, objects by type name
+	private static string DescribeArgs(object?[]? args) => args == null ? "" : string.Join(", ", args.Select(DescribeArg));
+
+	private static string DescribeArg(object? v) {
+		if (v == null) return "null";
+		if (v is string s) return s.Length <= 64 ? $"\"{s}\"" : $"\"{s[..64]}...\"";
+		if (v is bool b) return b ? "true" : "false";
+		if (v.GetType().IsPrimitive) return Convert.ToString(v, CultureInfo.InvariantCulture) ?? "";
+		return v.GetType().Name;
+	}
+
+	// fill a reused argument array, keeping a slot's box while its value is unchanged
+	internal static void SetArg(object?[] args, int i, float v) {
+		if (args[i] is not float old || BitConverter.SingleToInt32Bits(old) != BitConverter.SingleToInt32Bits(v)) args[i] = v;
+	}
+	internal static void SetArg(object?[] args, int i, float? v) {
+		if (v is float f) SetArg(args, i, f);
+		else args[i] = null;
+	}
+	internal static void SetArg(object?[] args, int i, double v) {
+		if (args[i] is not double old || BitConverter.DoubleToInt64Bits(old) != BitConverter.DoubleToInt64Bits(v)) args[i] = v;
+	}
+	internal static void SetArg(object?[] args, int i, int v) {
+		if (args[i] is not int old || old != v) args[i] = v;
+	}
+	internal static void SetArg(object?[] args, int i, long v) {
+		if (args[i] is not long old || old != v) args[i] = v;
+	}
+	internal static void SetArg(object?[] args, int i, bool v) => args[i] = v ? BoxedTrue : BoxedFalse;
+	private static readonly object BoxedTrue = true;
+	private static readonly object BoxedFalse = false;
 
 	// Run a hook (onStart / activate) as an engine-owned Lua coroutine: a count hook on the thread fires often +
 	// cheaply, but only YIELDS once the current resume has run past YieldBudgetMs of wall-clock. So a long load

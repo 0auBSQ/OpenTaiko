@@ -68,8 +68,8 @@ internal class CActImplLaneTaiko : CActivity {
 		#region[ レーン本体 ]
 
 
-		int[] x = new int[5];
-		int[] y = new int[5];
+		int[] x = this.laneX;
+		int[] y = this.laneY;
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
@@ -297,7 +297,7 @@ internal class CActImplLaneTaiko : CActivity {
 
 	private void DrawBranchText(int[] x, int[] y) {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			if (!OpenTaiko.stageGameScreen.bUseBranch[i] || OpenTaiko.Tx.Lane_Text.Any(x => (x == null))) {
+			if (!OpenTaiko.stageGameScreen.bUseBranch[i] || AnyNull(OpenTaiko.Tx.Lane_Text)) {
 				continue;
 			}
 
@@ -365,7 +365,7 @@ internal class CActImplLaneTaiko : CActivity {
 	public void DrawBranchBG(int[] x, int[] y) {
 		//アニメーション中の分岐レイヤー(背景)の描画を行う。
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			if (!OpenTaiko.stageGameScreen.bUseBranch[i] || OpenTaiko.Tx.Lane_Base.Any(x => (x == null))) {
+			if (!OpenTaiko.stageGameScreen.bUseBranch[i] || AnyNull(OpenTaiko.Tx.Lane_Base)) {
 				continue;
 			}
 
@@ -421,6 +421,19 @@ internal class CActImplLaneTaiko : CActivity {
 		}
 	}
 
+	// the lanes' positions, set again for the players in play each frame
+	private readonly int[] laneX = new int[5], laneY = new int[5];
+
+	private static readonly float[] GoGoFlameScales = { 0.8f, 1.2f, 1.7f, 2.5f, 2.3f, 2.2f, 2.0f, 1.8f, 1.7f, 1.6f, 1.6f, 1.5f, 1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1.0f };
+
+	private static bool AnyNull(CTexture?[] textures) {
+		foreach (CTexture? t in textures) {
+			if (t == null)
+				return true;
+		}
+		return false;
+	}
+
 	public void ResetPlayStates() {
 		for (int i = 0; i < 5; ++i) {
 			this.nTotalMoveTime[i] = -1;
@@ -450,7 +463,7 @@ internal class CActImplLaneTaiko : CActivity {
 				if (OpenTaiko.Tx.Effects_Fire != null) {
 					float fScale = 1.0f;
 
-					float[] arScale = new float[] { 0.8f, 1.2f, 1.7f, 2.5f, 2.3f, 2.2f, 2.0f, 1.8f, 1.7f, 1.6f, 1.6f, 1.5f, 1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1.0f };
+					float[] arScale = GoGoFlameScales;
 
 					fScale = arScale[this.ctGoGo!.CurrentValue];
 
