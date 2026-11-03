@@ -43,23 +43,17 @@ internal class CActTaikoScrollSpeed : CActivity {
 				if (nNowTime < this.nScrollExclusiveTimer[i]) {
 					this.nScrollExclusiveTimer[i] = nNowTime;
 				}
-				while ((nNowTime - this.nScrollExclusiveTimer[i]) >= 2)                               // 1 loop per 2 ms
+				var nSteps = (nNowTime - this.nScrollExclusiveTimer[i]) / 2.0; // 1 step per 2 ms
+				if (nSteps > 0)
 				{
-					if (this.dbConfigScrollSpeed[i] < dbScrollSpeed) {
-						this.dbConfigScrollSpeed[i] += 0.012;
-
-						if (this.dbConfigScrollSpeed[i] > dbScrollSpeed) {
-							this.dbConfigScrollSpeed[i] = dbScrollSpeed;
-						}
-					} else if (this.dbConfigScrollSpeed[i] > dbScrollSpeed) {
-						this.dbConfigScrollSpeed[i] -= 0.012;
-
-						if (this.dbConfigScrollSpeed[i] < dbScrollSpeed) {
-							this.dbConfigScrollSpeed[i] = dbScrollSpeed;
-						}
+					ref double rSpeed = ref this.dbConfigScrollSpeed[i];
+					if (rSpeed < dbScrollSpeed) {
+						rSpeed = Math.Min(dbScrollSpeed, rSpeed + 0.012 * nSteps);
+					} else if (rSpeed > dbScrollSpeed) {
+						rSpeed = Math.Max(dbScrollSpeed, rSpeed - 0.012 * nSteps);
 					}
-					this.nScrollExclusiveTimer[i] += 2;
 				}
+				this.nScrollExclusiveTimer[i] = nNowTime;
 			}
 		}
 		return 0;
