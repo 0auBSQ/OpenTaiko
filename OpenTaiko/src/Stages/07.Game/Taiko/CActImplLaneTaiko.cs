@@ -97,24 +97,26 @@ internal class CActImplLaneTaiko : CActivity {
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			#region[ 分岐アニメ制御タイマー ]
-			long num = FDK.SoundManager.PlayTimer.NowTimeMs;
-			if (num < this.stBranch[i].nFlashControlTimer) {
-				this.stBranch[i].nFlashControlTimer = num;
+			long msNow = FDK.SoundManager.PlayTimer.NowTimeMs;
+			if (msNow < this.stBranch[i].nFlashControlTimer) {
+				this.stBranch[i].nFlashControlTimer = msNow;
 			}
-			while ((num - this.stBranch[i].nFlashControlTimer) >= 30) {
-				if (this.stBranch[i].nBranchLayerOpacity <= 255) {
-					this.stBranch[i].nBranchLayerOpacity += 10;
-				}
+			const int msFlashDelay = 30 - 8;
+			var nSteps = (msNow - this.stBranch[i].nFlashControlTimer - msFlashDelay) / 8;
+			if (nSteps > 0) {
+				ref int rOpacityLayer = ref this.stBranch[i].nBranchLayerOpacity;
+				if (rOpacityLayer <= 255)
+					rOpacityLayer = (int)Math.Min(255, rOpacityLayer + 10 * nSteps);
 
-				if (this.stBranch[i].nBranchTextOpacity >= 0) {
-					this.stBranch[i].nBranchTextOpacity -= 10;
-				}
+				ref int rOpacityText = ref this.stBranch[i].nBranchTextOpacity;
+				if (rOpacityText >= 0)
+					rOpacityText = (int)Math.Max(0, rOpacityText - 10 * nSteps);
 
-				if (this.stBranch[i].nYCoord != 0 && this.stBranch[i].nYCoord <= 20) {
-					this.stBranch[i].nYCoord++;
-				}
+				ref int rYText = ref this.stBranch[i].nYCoord;
+				if (rYText != 0 && rYText < 21)
+					rYText = (int)Math.Min(21, rYText + nSteps);
 
-				this.stBranch[i].nFlashControlTimer += 8;
+				this.stBranch[i].nFlashControlTimer += 8 * nSteps;
 			}
 
 			if (!this.stBranch[i].ctBranchAnimeProgress!.IsStopped) {
@@ -301,7 +303,7 @@ internal class CActImplLaneTaiko : CActivity {
 				continue;
 			}
 
-			if (OpenTaiko.ConfigIni.nBranchAnime == 1 && this.stBranch[i].nYCoord == 21) {
+			if (OpenTaiko.ConfigIni.nBranchAnime == 1 && this.stBranch[i].nYCoord > 20) {
 				this.stBranch[i].nYCoord = 0;
 			}
 			if (OpenTaiko.ConfigIni.SimpleMode || !this.stBranch[i].ctBranchAnimeProgress!.IsTicked || (OpenTaiko.ConfigIni.nBranchAnime == 1 && this.stBranch[i].nYCoord == 0)) {
