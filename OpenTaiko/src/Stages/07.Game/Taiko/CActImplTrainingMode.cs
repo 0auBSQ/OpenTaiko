@@ -21,23 +21,10 @@ class CActImplTrainingMode : CActivity {
 		var measureCount = 1;
 		var bIsInGoGo = false;
 
-		long endtime = 1;
-		long bgmlength = 1;
+		var endtime = OpenTaiko.stageGameScreen.msChartLength;
+		var bgmlength = OpenTaiko.stageGameScreen.msBgmLength;
 
-		for (int index = 0; index < OpenTaiko.TJA!.listChip.Count; index++) {
-			if (OpenTaiko.TJA.listChip[index].nChannelNo == 0xff) {
-				endtime = OpenTaiko.TJA.listChip[index].nSoundTimems;
-				break;
-			}
-		}
-		for (int index = 0; index < OpenTaiko.TJA.listChip.Count; index++) {
-			if (OpenTaiko.TJA.listChip[index].nChannelNo == 0x01) {
-				bgmlength = OpenTaiko.TJA.listChip[index].GetDuration().SaturatingAdd(OpenTaiko.TJA.listChip[index].nSoundTimems);
-				break;
-			}
-		}
-
-		length = Math.Max(endtime, bgmlength);
+		length = long.CreateSaturating(Math.Max(endtime, bgmlength));
 
 		gogoXList = new List<int>();
 		JumpPointList = new List<STJUMPP>();
