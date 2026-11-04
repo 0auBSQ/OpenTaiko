@@ -1766,7 +1766,11 @@ internal class CTja : CActivity {
 		}
 		if (!string.IsNullOrEmpty(input))
 			sb.Append($" | Input: [{input}]");
-		LogNotification.PopWarning(sb.ToString());
+
+		if (this.bLoadChart)
+			LogNotification.PopWarning(sb.ToString());
+		else
+			Trace.TraceWarning(sb.ToString());
 		Trace.TraceWarning($"TJA file: '{strFullPath}', at {(Difficulty)this.nReferenceDifficulty}, line {nNowReadLine}" + ((ex == null) ? "" : $", Error: {ex.ToString()}"));
 	}
 
