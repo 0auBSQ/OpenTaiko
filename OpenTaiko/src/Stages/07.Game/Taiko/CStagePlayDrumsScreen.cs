@@ -271,7 +271,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			DateTime now = DateTime.UtcNow;
 			DateTime end;
 			try {
-				end = now.AddMilliseconds(OpenTaiko.TJA!.TjaTimeToGameTime(OpenTaiko.TJA.listChip[^1].dbSoundTimems));
+				end = now.AddMilliseconds(OpenTaiko.TJA!.TjaTimeToGameTime(this.msChartLength));
 			} catch (ArgumentOutOfRangeException) {
 				end = DateTime.MaxValue;
 			}
