@@ -96,7 +96,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 
 		for (int index = OpenTaiko.TJA!.listChip.Count - 1; index >= 0; index--) {
 			if (OpenTaiko.TJA.listChip[index].nChannelNo == 0x01) {
-				this.bgmlength = OpenTaiko.TJA.listChip[index].GetDuration().SaturatingAdd(OpenTaiko.TJA.listChip[index].nSoundTimems);
+				this.msBgmLength = OpenTaiko.TJA.listChip[index].GetDuration().SaturatingAdd(OpenTaiko.TJA.listChip[index].nSoundTimems);
 				break;
 			}
 		}
@@ -519,7 +519,7 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 
 
 	public override void DeActivate() {
-		this.bgmlength = 1;
+		this.msBgmLength = 1;
 		this.ctChipPatternAnime = null;
 
 		OpenTaiko.ResetCameraStates();
@@ -789,9 +789,10 @@ internal abstract partial class CStagePlayScreenCommon : CStage {
 	protected CCounter? ctChipPatternAnime;
 	public CCounter?[] ctChipAnime = new CCounter[OpenTaiko.MAX_PLAYERS];
 	public CCounter?[] ctChipAnimeLag = new CCounter[OpenTaiko.MAX_PLAYERS];
-	private long bgmlength = 1;
+	// the chart's length to the last song chip's music end, in chart time (1x)
+	public long msBgmLength { get; private set; } = 1;
 	// the chart's length to its end chip, in chart time (1x): the tower's coin length bonus
-	public double msChartLength = 0;
+	public double msChartLength { get; private set; } = 0;
 
 	protected EGameplayScreenReturnValue eFadeOutCompleteWhenReturnValue;
 	protected readonly int[] nChannel0AtoPad08 = new int[] { 1, 2, 3, 4, 5, 7, 6, 1, 8, 0, 9, 9 };
