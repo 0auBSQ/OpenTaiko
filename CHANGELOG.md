@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.7.0.4] - 2026-11-04 (Beta)
+
+- [Enhancement] Various minor additions reducing lag spikes
+
 ## [0.7.0.3] - 2026-11-03 (Beta)
 
 - [Feat] Add a Chart Videos tab in My Room's TV
