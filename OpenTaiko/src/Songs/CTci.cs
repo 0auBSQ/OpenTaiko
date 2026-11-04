@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using FDK;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -23,6 +24,7 @@ internal class CTci {
 		[JsonProperty("bpm")]      public double?  Bpm { get; set; }
 		[JsonProperty("offset")]   public double?  Offset { get; set; }
 		[JsonProperty("courses")]  public List<TciCourseJson>? Courses { get; set; }
+		[JsonExtensionData] public IDictionary<string, JToken>? Extra { get; set; }   // ".NAME" custom commands
 	}
 
 	private class TciCourseJson {
@@ -32,6 +34,7 @@ internal class CTci {
 		// OpenTaiko extensions (not in spec)
 		[JsonProperty("life")]  public int  Life { get; set; } = 5;
 		[JsonProperty("side")]  public string? Side { get; set; }
+		[JsonExtensionData] public IDictionary<string, JToken>? Extra { get; set; }   // the course's custom commands
 	}
 
 	// ── Parsed data ───────────────────────────────────────────────────────────
@@ -52,6 +55,7 @@ internal class CTci {
 	public double FIRST_BPM = 120.0;
 	public double MIN_BPM   = 120.0;
 	public double MAX_BPM   = 120.0;
+	public Dictionary<string, string> CUSTOM_COMMANDS = new();   // the file's, as a .tja's before its first COURSE
 	public CSongUniqueID UniqueID;
 	public string FolderPath;
 	public string FilePath;
@@ -66,6 +70,7 @@ internal class CTci {
 		public string OsuFilePath = "";
 		public int Life = 5;
 		public CTja.ESide Side = CTja.ESide.eEx;
+		public Dictionary<string, string> CustomCommands = new();
 	}
 
 	public List<CourseInfo> Courses = new();
@@ -91,6 +96,7 @@ internal class CTci {
 		node.bExplicit  = EXPLICIT;
 		node.uniqueId   = UniqueID;
 		node.DanSongs   = new();
+		node.customMetadataGScope = new(CUSTOM_COMMANDS);
 
 		var notesDesigners = new string[(int)Difficulty.Total];
 		var levels         = new int[(int)Difficulty.Total];
@@ -109,6 +115,7 @@ internal class CTci {
 			levels[i]         = course.Level;
 			levelDecimals[i]  = course.LevelDecimal;
 			levelIcons[i]     = course.LevelIcon;
+			node.customMetadataCScope[i] = new(course.CustomCommands);
 			node.difficultiesCount++;
 
 			var score = new CScore();
@@ -202,6 +209,9 @@ internal class CTci {
 		tja.PlayerSideMetadata.LEVELtaiko        = course.Level;
 		tja.PlayerSideMetadata.LEVELtaikoDecimal = course.LevelDecimal;
 		tja.PlayerSideMetadata.LEVELtaikoIcon    = course.LevelIcon;
+		tja.GlobalCustomMetadata = new(CUSTOM_COMMANDS);
+		tja.SongListCourseMetadata[difficulty].CustomMetadata = new(course.CustomCommands);
+		tja.PlayerSideMetadata.CustomMetadata = new(course.CustomCommands);
 		return tja;
 	}
 
@@ -210,8 +220,9 @@ internal class CTci {
 	private void Parse(string filePath) {
 		try {
 			string json = File.ReadAllText(filePath);
-			var data = JsonConvert.DeserializeObject<TciJson>(json);
+			var data = JsonConvert.DeserializeObject<TciJson>(json, ReadSettings);
 			if (data == null) return;
+			CUSTOM_COMMANDS = CustomCommandsOf(data.Extra);
 
 			TITLE    = ParseLocalized(data.Title);
 			SUBTITLE = ParseLocalized(data.Subtitle);
@@ -260,6 +271,7 @@ internal class CTci {
 					OsuFilePath   = osuPath,
 					Life = c.Life,
 					Side = ParseSide(c.Side),
+					CustomCommands = CustomCommandsOf(c.Extra),
 				});
 			}
 			// Fallback: use TCI's declared BPM if timing points weren't available
@@ -412,6 +424,27 @@ internal class CTci {
 
 	// ── Shared parsers ────────────────────────────────────────────────────────
 
+	// strings stay as written (a date-like one is not turned into a date)
+	internal static readonly JsonSerializerSettings ReadSettings = new() { DateParseHandling = DateParseHandling.None };
+
+	// The ".NAME" keys of a JSON object, read like a .tja's custom commands (the key keeps its dot): a string as
+	// written, a number or true/false as text, null as "", an object or array as its JSON
+	internal static Dictionary<string, string> CustomCommandsOf(IDictionary<string, JToken>? extra) {
+		var commands = new Dictionary<string, string>();
+		if (extra == null) return commands;
+		foreach (var (key, value) in extra) {
+			if (key.Length < 2 || key[0] != '.') continue;
+			commands[key] = value.Type switch {
+				JTokenType.String => (string?)value ?? "",
+				JTokenType.Null or JTokenType.Undefined => "",
+				JTokenType.Boolean => (bool)value ? "true" : "false",
+				JTokenType.Integer or JTokenType.Float => Convert.ToString(((JValue)value).Value, CultureInfo.InvariantCulture) ?? "",
+				_ => value.ToString(Formatting.None),
+			};
+		}
+		return commands;
+	}
+
 	internal static CLocalizationData ParseLocalized(JToken? token) {
 		var ld = new CLocalizationData();
 		if (token == null) return ld;
@@ -429,6 +462,12 @@ internal class CTci {
 		if (token.Type == JTokenType.String) return token.ToString();
 		if (token is JArray arr && arr.Count > 0) return arr[0].ToString();
 		return null;
+	}
+
+	// the +/- icon of a JSON level: a fraction of .5 or more is +, any other fraction -, a whole number none
+	internal static CTja.ELevelIcon LevelIconOf(double level) {
+		double frac = level - (int)level;
+		return frac >= 0.5 ? CTja.ELevelIcon.ePlus : (frac > 0 ? CTja.ELevelIcon.eMinus : CTja.ELevelIcon.eNone);
 	}
 
 	internal static int ParseDifficulty(string? s) => s?.ToLowerInvariant() switch {

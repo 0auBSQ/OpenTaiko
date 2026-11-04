@@ -19,6 +19,7 @@
   "prompt_fishtank": "[Enter] Свет в аквариуме",
   "prompt_lantern": "[Enter] Зажечь/погасить фонарь",
   "prompt_workbench": "[Enter] Использовать верстак",
+  "prompt_recycle": "[Enter] Использовать контейнер для переработки",
   "prompt_exit": "[Enter] Выйти из комнаты",
   "prompt_switch": "[Tab] Сменить цель",
   "player_entry": "Игрок %d — %s",

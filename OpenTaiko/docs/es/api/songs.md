@@ -156,7 +156,7 @@ El handle de lista de canciones, SONGMOUNT:ChosenSongNode() y DANBUILDER:GetSong
 | `node:GetPreimage()  -> texture` | Carga la preimagen desde disco y devuelve una textura nueva, o nil si la canción no tiene ninguna. Libera la textura cuando termines con ella. |
 | `node.ChartMd5  (string)` | MD5 del archivo de chart (hexadecimal en mayúsculas), o una cadena vacía. Se mantiene igual entre instalaciones; UniqueId no. |
 | `node:GetChart(diff)  -> chart` | Devuelve el chart para el índice de dificultad indicado, o nil si la canción no tiene ese chart. |
-| `node:GetCustomCommand(key)  -> string` | Devuelve el valor de un comando personalizado de ámbito global (una cabecera con prefijo de punto colocada antes del primer COURSE; la clave incluye el punto, por ejemplo ".VAULT_NAME"), o nil. |
+| `node:GetCustomCommand(key)  -> string` | Devuelve el valor de un comando personalizado de ámbito global (una cabecera con prefijo de punto colocada antes del primer COURSE, o una clave con prefijo de punto en el nivel superior de un archivo .tci, .tcm o .tct; la clave incluye el punto, por ejemplo ".VAULT_NAME"), o nil. En esos archivos, un número o true/false se devuelve como texto. |
 | `node:GetCustomCommands()  -> dictionary` | Devuelve todos los comandos personalizados de ámbito global como un objeto diccionario C#. Prefiere GetCustomCommand para las búsquedas. |
 | `node.UnlockCondition  (unlock condition)` | El objeto de condición de desbloqueo (consulta Condición de desbloqueo). |
 | `node.UnlockText  (string)` | El texto de desbloqueo personalizado si la canción define uno; si no, el mensaje de condición generado. |
@@ -201,7 +201,7 @@ El GetChart(diff) de un nodo de canción devuelve un chart. Las propiedades son 
 | `chart.DanExams  (array of dan exams)` | Las condiciones de examen globales de este chart Dan. |
 | `chart:GetSongExam(songIdx, examSlot)  -> dan exam` | Devuelve el examen por canción para el índice de canción (desde 0) y la ranura de examen (desde 1); el resultado tiene IsSet = false cuando no existe ninguno o un índice está fuera de rango. |
 | `chart:GetPlayerBestScore(save)  -> best score info` | Devuelve el resumen de la mejor partida del archivo de guardado indicado para este chart. |
-| `chart:GetCustomCommand(key)  -> string` | Devuelve el valor de un comando personalizado de ámbito de chart (una cabecera con prefijo de punto dentro de este bloque COURSE; la clave incluye el punto), o nil. |
+| `chart:GetCustomCommand(key)  -> string` | Devuelve el valor de un comando personalizado de ámbito de chart (una cabecera con prefijo de punto dentro de este bloque COURSE, una clave con prefijo de punto en este curso de un .tci, o una del nivel superior de un .tcm o .tct, que tienen un único curso; la clave incluye el punto), o nil. |
 | `chart:GetCustomCommands()  -> dictionary` | Devuelve todos los comandos personalizados de ámbito de chart como un objeto diccionario C#. |
 | `chart.SongFolder  (string)` | La carpeta absoluta que contiene el archivo de chart. |
 | `chart.ChartPath  (string)` | La ruta absoluta del archivo de chart. |
@@ -241,6 +241,7 @@ Elementos de chart.DanSongs. Todos los miembros son de solo lectura.
 | `dansong.SubTitle  (string)` | El subtítulo de la canción. |
 | `dansong.Genre  (string)` | El género de la canción. |
 | `dansong.Level  (int)` | El nivel de estrellas de la canción. |
+| `dansong.LevelDecimal  (number)` | El nivel con sus decimales (p. ej. 10.5); el nivel entero cuando el dan no da decimales. |
 | `dansong.Difficulty  (enum)` | La dificultad como objeto enum. |
 | `dansong.DifficultyAsInt  (int)` | El índice de dificultad. |
 

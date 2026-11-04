@@ -213,6 +213,28 @@ local function buildCatalogFromJson()
             end
             e.iconYaw = jnum(jget(node, "iconYaw"))      -- the icon's camera yaw, for a model that faces another way
             e.fit = jnum(jget(node, "fit"))              -- the share of its footprint the model fills (0.92 when absent)
+            e.sell = jnum(jget(node, "sell"))            -- the recycle bin's price for an item from outside the shop
+            -- the colours the workbench can give it (rrggbb), and its own colour (a chip for the default)
+            local cl = jget(node, "colors")
+            if cl then
+                e.colors = {}
+                for c = 1, JSONLOADER:JsonCount(cl) do
+                    local hex = tostring(jget(cl, c) or ""):lower()
+                    if hex:match("^%x%x%x%x%x%x$") then e.colors[#e.colors + 1] = hex end
+                end
+            end
+            local own = tostring(jget(node, "color") or ""):lower()
+            if own:match("^%x%x%x%x%x%x$") then e.color = own end
+            -- the GLB materials that take the colour it is kept in: { material, shade (1 when absent) }
+            local cp = jget(node, "colorParts")
+            if cp then
+                e.colorParts = {}
+                for i = 1, JSONLOADER:JsonCount(cp) do
+                    local p = jget(cp, i)
+                    local mat = p and jget(p, "material")
+                    if mat then e.colorParts[#e.colorParts + 1] = { material = mat, shade = jnum(jget(p, "shade")) or 1 } end
+                end
+            end
             -- a footprint that is not a full rectangle: one string per row of the w×h box (front of the
             -- list = the row nearest the back wall), "X" for a covered cell, "." for an empty one
             local sh = jget(node, "shape")
@@ -270,7 +292,7 @@ local function buildDecoFromJson(file, target)
         local id = jget(order, i)
         local node = id and jget(doc, id)
         if node then
-            target[id] = { tex = jget(node, "tex"), colors = {} }
+            target[id] = { tex = jget(node, "tex"), colors = {}, sell = jnum(jget(node, "sell")) }
             -- the colours the workbench can give it (rrggbb), besides its default one
             local cl = jget(node, "colors")
             for c = 1, (cl and JSONLOADER:JsonCount(cl) or 0) do
@@ -343,8 +365,9 @@ for _, id in ipairs(Room.SHOP_MODEL_IDS) do Room.SHOP_IDS[#Room.SHOP_IDS + 1] = 
 for id in pairs(Room.SHOP_SWATCH_TEX) do Room.SHOP_IDS[#Room.SHOP_IDS + 1] = id end
 function Room.shopCounter(id) return ".myroom_" .. id end
 
--- A flooring or paint in a colour is kept as "<id>:<rrggbb>" (in the inventory and on the tiles); the
--- plain id is its default colour. Every colour of an item shares its name.
+-- A flooring, paint or furniture in a colour is kept as "<id>:<rrggbb>" in the inventory (and on the tiles
+-- for floorings and paints; a placed furniture entry keeps its colour as `hex`); the plain id is its default
+-- colour. Every colour of an item shares its name.
 function Room.splitColor(key)
     local id, hex = tostring(key):match("^([^:]+):(%x%x%x%x%x%x)$")
     if id then return id, hex:lower() end
@@ -354,11 +377,26 @@ function Room.colorKey(id, hex)
     if hex == nil or hex == "" then return id end
     return id .. ":" .. hex
 end
--- the colours a flooring or paint can take besides its default one
+-- the stock key a placed furniture entry goes back to
+function Room.stockKey(it) return Room.colorKey(it.id, it.hex) end
+-- the colours an item can take besides its default one
 function Room.decoColors(id)
-    local d = Room.FLOORDECO[id] or Room.WALLPAINT[id]
+    local d = Room.FLOORDECO[id] or Room.WALLPAINT[id] or rawget(Room.CATALOG, id)
     return (d and d.colors) or {}
 end
+-- a furniture's own colour (furniture.json `color`) as { r, g, b }, or nil
+function Room.defaultColor(id)
+    local c = rawget(Room.CATALOG, id)
+    local hex = c and c.color
+    if hex == nil then return nil end
+    return { tonumber(hex:sub(1, 2), 16), tonumber(hex:sub(3, 4), 16), tonumber(hex:sub(5, 6), 16) }
+end
+-- a stock key in a colour reads its item's catalogue entry (placing, footprints, the edit bar)
+setmetatable(Room.CATALOG, { __index = function(t, k)
+    local id, hex = Room.splitColor(k)
+    if hex then return rawget(t, id) end
+    return nil
+end })
 
 -- localized display name for a furniture / floor / wall-paint id (falls back to the id), from My Room's
 -- own lang/<code>/items.json
@@ -881,8 +919,10 @@ function Room:attachFurniture(it)
     it.on = (self:surfaceUnder(it.id, it.c, it.r, it.facing or 0) ~= nil) and true or nil
     self.furniture[#self.furniture + 1] = it
 end
-function Room:addFurniture(id, c, r, facing)
-    self:attachFurniture({ id = id, c = c, r = r, facing = facing or 0 })
+-- key: a stock key (an item in a colour keeps it as `hex`)
+function Room:addFurniture(key, c, r, facing)
+    local id, hex = Room.splitColor(key)
+    self:attachFurniture({ id = id, c = c, r = r, facing = facing or 0, hex = hex })
 end
 -- plain list removal, NO stacked-rider cascade (the move flow detaches surface + rider as a unit)
 function Room:detachFurniture(it)
@@ -898,15 +938,18 @@ function Room:removeFurniture(it)
         if cat and cat.surface then
             for _, st in ipairs(self:stackedItemsOn(it)) do
                 self:removeFurniture(st)
-                self:invAdd(st.id)
+                self:invAdd(Room.stockKey(st))
             end
         end
     end
 end
 function Room:invAdd(id, n) self.inventory[id] = (self.inventory[id] or 0) + (n or 1) end
--- how many of an item the room has, in stock and placed
+-- how many of an item the room has, in stock (every colour) and placed
 function Room:heldCount(id)
-    local n = self.inventory[id] or 0
+    local n = 0
+    for key, k in pairs(self.inventory) do
+        if Room.splitColor(key) == id then n = n + (k or 0) end
+    end
     for _, it in ipairs(self.furniture) do if it.id == id then n = n + 1 end end
     for _, it in ipairs(self.wallItems) do if it.id == id then n = n + 1 end end
     return n
@@ -1260,6 +1303,19 @@ local function tryModel(world, id, cx, cz, yaw, cat, baseY, it)
         parts = parts or {}
         for _, p in ipairs(cat.alphaParts) do parts[#parts + 1] = { material = p.material, alpha = p.alpha } end
     end
+    -- catalog colorParts: an item kept in a colour (it.hex, from the workbench) shows it on those materials
+    -- (a flat albedo, shaded); a part routed above for its glow takes the colour on the same object
+    if cat and cat.colorParts and it and it.hex then
+        local hex = it.hex
+        local rgb = { tonumber(hex:sub(1, 2), 16) / 255, tonumber(hex:sub(3, 4), 16) / 255, tonumber(hex:sub(5, 6), 16) / 255 }
+        parts = parts or {}
+        for _, cp in ipairs(cat.colorParts) do
+            local col = { rgb[1] * cp.shade, rgb[2] * cp.shade, rgb[3] * cp.shade }
+            local same = nil
+            for _, p in ipairs(parts) do if p.material == cp.material then same = p end end
+            if same then same.color = col else parts[#parts + 1] = { material = cp.material, color = col } end
+        end
+    end
     -- catalog screenPart: while the item is on (it.tvOn) its screen ignores the sun and the shadow map
     -- and draws a flat colour pushed over the bloom threshold; tv.lua writes the colour every frame
     if cat and cat.screenPart and it and it.tvOn then
@@ -1325,7 +1381,7 @@ function Room:buildOneProp(world, phys, gh, it, baseY, stacked)
     local yaw = (it.facing or 0) * 90
     -- the model already standing for this piece is moved in place, unless its parts must change
     -- (an on TV routes its screen to its own part)
-    local key = it.id .. (it.tvOn and ":on" or "")
+    local key = Room.stockKey(it) .. (it.tvOn and ":on" or "")
     local inst = world._propOld and world._propOld[it]
     if inst and inst._key == key then
         world._propOld[it] = nil

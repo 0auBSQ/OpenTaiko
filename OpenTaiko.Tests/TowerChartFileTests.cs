@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Xunit;
 
@@ -63,6 +64,33 @@ public class TowerChartFileTests : IDisposable {
 	}
 
 	[Fact]
+	public void DotKeysAreCustomCommands() {
+		var tct = Load("""
+			{
+				"id": "abc-123",
+				".NAME": "Tower of Tests",
+				".COUNT": 2,
+				".RATIO": 1.5,
+				".ON": true,
+				".NONE": null,
+				".LIST": [1, "a"],
+				".DATE": "2024-01-02",
+				"other": "not a command",
+				".": "no name"
+			}
+			""");
+		Assert.Equal(new Dictionary<string, string> {
+			[".NAME"] = "Tower of Tests",
+			[".COUNT"] = "2",
+			[".RATIO"] = "1.5",
+			[".ON"] = "true",
+			[".NONE"] = "",
+			[".LIST"] = """[1,"a"]""",
+			[".DATE"] = "2024-01-02",
+		}, tct.CUSTOM_COMMANDS);
+	}
+
+	[Fact]
 	public void KeepsAtLeastOneLife() {
 		Assert.Equal(1, Load("""{ "id": "abc-123", "life": 0 }""").LIFE);
 	}
@@ -85,7 +113,7 @@ public class TowerChartFromSongTests : IClassFixture<OpenTaikoTests.TjaFixture>,
 		string songDir = Path.Combine(dir, "song") + Path.DirectorySeparatorChar;
 		Directory.CreateDirectory(songDir);
 		string tjaPath = songDir + "song.tja";
-		File.WriteAllText(tjaPath, "TITLE:Source\nBPM:120\nWAVE:song.ogg\nPREIMAGE:jacket.png\n\nCOURSE:Oni\nLEVEL:8\n\n#START\n1010,\n2020,\n1111,\n2222,\n#END\n");
+		File.WriteAllText(tjaPath, "TITLE:Source\nBPM:120\nWAVE:song.ogg\nPREIMAGE:jacket.png\n.SONG_ONLY:yes\n\nCOURSE:Oni\nLEVEL:8\n.COURSE_ONLY:yes\n\n#START\n1010,\n2020,\n1111,\n2222,\n#END\n");
 
 		song = new CSongListNode { nodeType = CSongListNode.ENodeType.SCORE, uniqueId = new CSongUniqueID(songDir + "uniqueID.json") };
 		song.ldTitle.SetString("default", "Source");
@@ -165,6 +193,31 @@ public class TowerChartFromSongTests : IClassFixture<OpenTaikoTests.TjaFixture>,
 		var tja = tct.BuildCtja(0);
 		Assert.Equal("Own title", tja.TITLE.GetString(""));
 		tja.DeActivate();
+	}
+
+	[Fact]
+	public void ItsDotKeysReachTheCustomCommandApi() {
+		var tct = Tower(""", ".VAULT_NAME": "Tower of Tests", ".FLOORS": 3 """);
+		var node = tct.BuildSongListNode()!;
+		int tower = (int)Difficulty.Tower;
+		// the song's (what node:GetCustomCommand reads) and the tower course's, as a .tja's before and inside its COURSE
+		Assert.Equal("Tower of Tests", node.customMetadataGScope[".VAULT_NAME"]);
+		Assert.Equal("Tower of Tests", new LuaSongChart(null, node, tower).GetCustomCommand(".VAULT_NAME"));
+		Assert.Equal("3", new LuaSongChart(null, node, tower).GetCustomCommand(".FLOORS"));
+		Assert.Null(new LuaSongChart(null, node, tower).GetCustomCommand(".MISSING"));
+		var tja = tct.BuildCtja(0);
+		Assert.Equal("Tower of Tests", tja.GlobalCustomMetadata[".VAULT_NAME"]);
+		Assert.Equal("Tower of Tests", tja.PlayerSideMetadata.CustomMetadata[".VAULT_NAME"]);
+		tja.DeActivate();
+	}
+
+	[Fact]
+	public void TheSongsOwnCommandsStayTheSongs() {
+		var tja = Tower().BuildCtja(0);
+		Assert.False(tja.GlobalCustomMetadata.ContainsKey(".SONG_ONLY"));
+		Assert.False(tja.PlayerSideMetadata.CustomMetadata.ContainsKey(".COURSE_ONLY"));
+		tja.DeActivate();
+		Assert.Empty(Tower().BuildSongListNode()!.customMetadataGScope);
 	}
 
 	[Fact]

@@ -156,7 +156,7 @@ end
 | `node:GetPreimage()  -> texture` | 从磁盘加载预览图片并返回一张新纹理；歌曲没有预览图片时返回 nil。用完后请释放该纹理。 |
 | `node.ChartMd5  (string)` | 谱面文件的 MD5（大写十六进制），或空字符串。它在不同安装之间保持不变；UniqueId 则不会。 |
 | `node:GetChart(diff)  -> chart` | 返回给定难度索引的谱面；歌曲没有该谱面时返回 nil。 |
-| `node:GetCustomCommand(key)  -> string` | 返回一个全局范围自定义命令的值（放在第一个 COURSE 之前、以点开头的头部，key 包含点，例如 ".VAULT_NAME"），或 nil。 |
+| `node:GetCustomCommand(key)  -> string` | 返回一个全局范围自定义命令的值（放在第一个 COURSE 之前、以点开头的头部，或 .tci、.tcm、.tct 文件顶层以点开头的键；key 包含点，例如 ".VAULT_NAME"），或 nil。在这些文件中，数字或 true/false 以文本返回。 |
 | `node:GetCustomCommands()  -> dictionary` | 以 C# 字典对象返回所有全局范围的自定义命令。查找时优先使用 GetCustomCommand。 |
 | `node.UnlockCondition  (unlock condition)` | 解锁条件对象（见“解锁条件”）。 |
 | `node.UnlockText  (string)` | 歌曲定义了自定义解锁文本时为该文本，否则为生成的条件消息。 |
@@ -201,7 +201,7 @@ end
 | `chart.DanExams  (array of dan exams)` | 本段位谱面的全局考核条件。 |
 | `chart:GetSongExam(songIdx, examSlot)  -> dan exam` | 返回给定 0 起歌曲索引和 1 起考核槽位的单曲考核；不存在或索引超出范围时结果的 IsSet 为 false。 |
 | `chart:GetPlayerBestScore(save)  -> best score info` | 返回给定存档在本谱面上的最佳成绩摘要。 |
-| `chart:GetCustomCommand(key)  -> string` | 返回一个谱面范围自定义命令的值（本 COURSE 块内以点开头的头部，key 包含点），或 nil。 |
+| `chart:GetCustomCommand(key)  -> string` | 返回一个谱面范围自定义命令的值（本 COURSE 块内以点开头的头部、.tci 中本难度内以点开头的键，或只有一个难度的 .tcm、.tct 顶层的键；key 包含点），或 nil。 |
 | `chart:GetCustomCommands()  -> dictionary` | 以 C# 字典对象返回所有谱面范围的自定义命令。 |
 | `chart.SongFolder  (string)` | 存放谱面文件的绝对文件夹路径。 |
 | `chart.ChartPath  (string)` | 谱面文件的绝对路径。 |
@@ -241,6 +241,7 @@ chart.DanSongs 的元素。所有成员均为只读。
 | `dansong.SubTitle  (string)` | 歌曲的副标题。 |
 | `dansong.Genre  (string)` | 歌曲的分类。 |
 | `dansong.Level  (int)` | 歌曲的星级。 |
+| `dansong.LevelDecimal  (number)` | 带小数的等级（例如 10.5）；段位未给出小数时为整数等级。 |
 | `dansong.Difficulty  (enum)` | 以枚举对象表示的难度。 |
 | `dansong.DifficultyAsInt  (int)` | 难度索引。 |
 

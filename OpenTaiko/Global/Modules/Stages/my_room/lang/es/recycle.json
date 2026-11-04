@@ -1,0 +1,9 @@
+{
+  "_comment": "Spanish texts for the recycle bin window (recycle.lua). Keys are stable ids; lang/en is the fallback for every other language.",
+  "stock": "En existencias",
+  "price": "Se vende por",
+  "amount": "Cantidad",
+  "total": "Total",
+  "sell": "Vender",
+  "empty": "Nada que vender: aquí aparecen los muebles, suelos y pinturas en existencias que se pueden vender."
+}

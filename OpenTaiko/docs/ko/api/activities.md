@@ -309,6 +309,7 @@ info:GetDanSong이 반환하는 읽기 전용 객체입니다.
 | `song.Subtitle  -> string` | 곡의 부제. 채보가 숨긴 곡은 "". |
 | `song.Difficulty  -> number` | 0 쉬움부터 4 뒷귀신. |
 | `song.Level  -> number` | 곡의 레벨. |
+| `song.LevelDecimal  -> number` | 소수를 포함한 레벨(예: 10.5). 단위가 소수를 주지 않으면 정수 레벨. |
 | `song.Good  -> number` | 그 곡의 Good 판정 수. |
 | `song.Ok  -> number` | 그 곡의 Ok 판정 수. |
 | `song.Bad  -> number` | 그 곡의 Bad 판정 수. |

@@ -309,6 +309,7 @@ El objeto que devuelve info:GetDanSong, de solo lectura.
 | `song.Subtitle  -> string` | El subtítulo de la canción; "" para una canción que el chart mantiene oculta. |
 | `song.Difficulty  -> number` | De 0 Easy a 4 Extra. |
 | `song.Level  -> number` | El nivel de la canción. |
+| `song.LevelDecimal  -> number` | El nivel con sus decimales (p. ej. 10.5); el nivel entero cuando el dan no da decimales. |
 | `song.Good  -> number` | Golpes Good en la canción. |
 | `song.Ok  -> number` | Golpes Ok en la canción. |
 | `song.Bad  -> number` | Golpes Bad en la canción. |

@@ -34,8 +34,9 @@ local function map(t, value)
     return out
 end
 local function onlyTrue(v) return v == true or nil end
+local function hex(v) return type(v) == "string" and v:match("^%x%x%x%x%x%x$") and v:lower() or nil end
 
-local FURNITURE = { id = str, c = int, r = int, facing = int, on = bool, lit = bool, tvOn = bool }
+local FURNITURE = { id = str, c = int, r = int, facing = int, on = bool, lit = bool, tvOn = bool, hex = hex }
 local WALL_ITEM = { id = str, c = int, r = int, mount = str }
 local ROOM = { v = int, tier = int, iw = int, ih = int, exitCol = int, win = int }
 local JUKEBOX = { kind = str, md5 = str, uid = str, title = str, genre = str, pos = num, speed = num,

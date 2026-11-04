@@ -156,7 +156,7 @@ end
 | `node:GetPreimage()  -> texture` | 디스크에서 프리이미지를 로드해 새 텍스처를 반환하며, 곡에 없으면 nil. 다 쓰면 텍스처를 해제하십시오. |
 | `node.ChartMd5  (string)` | 채보 파일의 MD5(대문자 16진수). 없으면 빈 문자열. 설치 간에 같은 값을 유지하며, UniqueId는 그렇지 않습니다. |
 | `node:GetChart(diff)  -> chart` | 지정한 난이도 인덱스의 채보를 반환하며, 곡에 그런 채보가 없으면 nil. |
-| `node:GetCustomCommand(key)  -> string` | 전역 범위 커스텀 명령(첫 COURSE 앞에 둔 점 접두어 헤더. key는 점을 포함, 예: ".VAULT_NAME")의 값을 반환하며, 없으면 nil. |
+| `node:GetCustomCommand(key)  -> string` | 전역 범위 커스텀 명령(첫 COURSE 앞에 둔 점 접두어 헤더, 또는 .tci·.tcm·.tct 파일 최상위의 점 접두어 키. key는 점을 포함, 예: ".VAULT_NAME")의 값을 반환하며, 없으면 nil. 이 파일들에서 숫자나 true/false는 텍스트로 반환됩니다. |
 | `node:GetCustomCommands()  -> dictionary` | 모든 전역 범위 커스텀 명령을 C# 딕셔너리 객체로 반환합니다. 조회에는 GetCustomCommand를 사용하는 편이 좋습니다. |
 | `node.UnlockCondition  (unlock condition)` | 잠금 해제 조건 객체(잠금 해제 조건 참고). |
 | `node.UnlockText  (string)` | 곡이 정의한 커스텀 잠금 해제 텍스트. 없으면 생성된 조건 메시지. |
@@ -201,7 +201,7 @@ end
 | `chart.DanExams  (array of dan exams)` | 이 단위 채보의 전체 시험 조건. |
 | `chart:GetSongExam(songIdx, examSlot)  -> dan exam` | 0부터 시작하는 곡 인덱스와 1부터 시작하는 시험 슬롯의 곡별 시험을 반환합니다. 없거나 인덱스가 범위를 벗어나면 결과의 IsSet이 false입니다. |
 | `chart:GetPlayerBestScore(save)  -> best score info` | 이 채보에 대한 지정한 세이브 파일의 최고 플레이 요약을 반환합니다. |
-| `chart:GetCustomCommand(key)  -> string` | 채보 범위 커스텀 명령(이 COURSE 블록 안의 점 접두어 헤더. key는 점을 포함)의 값을 반환하며, 없으면 nil. |
+| `chart:GetCustomCommand(key)  -> string` | 채보 범위 커스텀 명령(이 COURSE 블록 안의 점 접두어 헤더, .tci의 이 코스 안의 점 접두어 키, 또는 코스가 하나뿐인 .tcm·.tct 최상위의 키. key는 점을 포함)의 값을 반환하며, 없으면 nil. |
 | `chart:GetCustomCommands()  -> dictionary` | 모든 채보 범위 커스텀 명령을 C# 딕셔너리 객체로 반환합니다. |
 | `chart.SongFolder  (string)` | 채보 파일이 있는 절대 폴더. |
 | `chart.ChartPath  (string)` | 채보 파일의 절대 경로. |
@@ -241,6 +241,7 @@ chart.DanSongs의 원소입니다. 모든 멤버는 읽기 전용입니다.
 | `dansong.SubTitle  (string)` | 곡 부제. |
 | `dansong.Genre  (string)` | 곡 장르. |
 | `dansong.Level  (int)` | 곡의 별 레벨. |
+| `dansong.LevelDecimal  (number)` | 소수를 포함한 레벨(예: 10.5). 단위가 소수를 주지 않으면 정수 레벨. |
 | `dansong.Difficulty  (enum)` | 열거형 객체로서의 난이도. |
 | `dansong.DifficultyAsInt  (int)` | 난이도 인덱스. |
 

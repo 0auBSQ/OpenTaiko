@@ -565,6 +565,7 @@ namespace OpenTaiko {
 					Genre = luaNode.Genre ?? "",
 					FileName = absoluteBgmPath,
 					Level = internalNode.nLevel[diff],
+					LevelDecimal = internalNode.dLevel[diff],
 					Difficulty = diff,
 					ScoreInit = src.PlayerSideMetadata.nScoreInit[0],
 					ScoreDiff = src.PlayerSideMetadata.nScoreDiff,

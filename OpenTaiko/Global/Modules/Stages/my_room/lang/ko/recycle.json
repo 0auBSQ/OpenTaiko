@@ -1,0 +1,9 @@
+{
+  "_comment": "Korean texts for the recycle bin window (recycle.lua). Keys are stable ids; lang/en is the fallback for every other language.",
+  "stock": "보유",
+  "price": "판매가",
+  "amount": "수량",
+  "total": "합계",
+  "sell": "판매",
+  "empty": "팔 것이 없습니다. 보유 중인 팔 수 있는 가구, 바닥, 벽지가 여기에 표시됩니다."
+}

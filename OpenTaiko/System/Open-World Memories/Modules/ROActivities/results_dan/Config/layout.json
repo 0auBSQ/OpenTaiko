@@ -3,7 +3,7 @@
     "font_sizes": {
         "ticket_score": 52, "ticket_count": 34, "tag": 19, "best": 20, "hint": 20,
         "tile_name": 21, "tile_value": 28,
-        "song_title": 30, "song_sub": 19, "ordinal": 26, "level": 24, "count": 26,
+        "song_title": 30, "song_sub": 19, "ordinal": 26, "level": 22, "level_plus": 14, "count": 26,
         "gauge": 19, "exam_name": 21, "exam_cond": 18, "exam_value": 30, "exam_best": 17,
         "block_ordinal": 18, "block_value": 28, "block_best": 14,
         "kanji": 200
@@ -73,6 +73,8 @@
             "nb_text": [46, 49],
             "diff": [94, 0],
             "level": [156, 74],
+            "level_max_width": 80,
+            "level_plus": { "_note": "The level is drawn as in the dan select. A plus level's \"+\": centred dx/dy from the last digit's right edge and the level's centre; the number moves by shift to stay centred.", "dx": -1, "dy": -8, "shift": -2 },
             "title": [250, 32],
             "sub": [250, 70],
             "text_right": 719,

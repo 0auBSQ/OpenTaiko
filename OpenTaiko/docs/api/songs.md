@@ -156,7 +156,7 @@ The song list handle, SONGMOUNT:ChosenSongNode() and DANBUILDER:GetSong() return
 | `node:GetPreimage()  -> texture` | Loads the preimage from disk and returns a new texture, or nil if the song has none. Dispose the texture when you are done with it. |
 | `node.ChartMd5  (string)` | MD5 of the chart file (uppercase hex), or an empty string. It stays the same across installs; UniqueId does not. |
 | `node:GetChart(diff)  -> chart` | Returns the chart for the given difficulty index, or nil if the song has no such chart. |
-| `node:GetCustomCommand(key)  -> string` | Returns the value of a global-scope custom command (a dot-prefixed header placed before the first COURSE, key includes the dot, for example ".VAULT_NAME"), or nil. |
+| `node:GetCustomCommand(key)  -> string` | Returns the value of a global-scope custom command (a dot-prefixed header placed before the first COURSE, or a dot-prefixed key at the top level of a .tci, .tcm or .tct file; key includes the dot, for example ".VAULT_NAME"), or nil. In those files a number or true/false comes back as text. |
 | `node:GetCustomCommands()  -> dictionary` | Returns all global-scope custom commands as a C# dictionary object. Prefer GetCustomCommand for lookups. |
 | `node.UnlockCondition  (unlock condition)` | The unlock condition object (see Unlock condition). |
 | `node.UnlockText  (string)` | The custom unlock text if the song defines one, otherwise the generated condition message. |
@@ -201,7 +201,7 @@ A song node's GetChart(diff) returns a chart. Properties are read-only. BPM, Lif
 | `chart.DanExams  (array of dan exams)` | The global exam conditions of this Dan chart. |
 | `chart:GetSongExam(songIdx, examSlot)  -> dan exam` | Returns the per-song exam for the 0-based song index and 1-based exam slot; the result has IsSet = false when none exists or an index is out of range. |
 | `chart:GetPlayerBestScore(save)  -> best score info` | Returns the best-play summary of the given save file for this chart. |
-| `chart:GetCustomCommand(key)  -> string` | Returns the value of a chart-scope custom command (a dot-prefixed header inside this COURSE block, key includes the dot), or nil. |
+| `chart:GetCustomCommand(key)  -> string` | Returns the value of a chart-scope custom command (a dot-prefixed header inside this COURSE block, a dot-prefixed key in this course of a .tci, or one at the top level of a .tcm or .tct, which have a single course; key includes the dot), or nil. |
 | `chart:GetCustomCommands()  -> dictionary` | Returns all chart-scope custom commands as a C# dictionary object. |
 | `chart.SongFolder  (string)` | The absolute folder holding the chart file. |
 | `chart.ChartPath  (string)` | The absolute path of the chart file. |
@@ -241,6 +241,7 @@ Elements of chart.DanSongs. All members are read-only.
 | `dansong.SubTitle  (string)` | The song's subtitle. |
 | `dansong.Genre  (string)` | The song's genre. |
 | `dansong.Level  (int)` | The song's star level. |
+| `dansong.LevelDecimal  (number)` | The level with its decimals (e.g. 10.5); the whole level when the dan gives none. |
 | `dansong.Difficulty  (enum)` | The difficulty as an enum object. |
 | `dansong.DifficultyAsInt  (int)` | The difficulty index. |
 

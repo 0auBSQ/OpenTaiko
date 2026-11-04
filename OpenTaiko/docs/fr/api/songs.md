@@ -156,7 +156,7 @@ Le handle de liste de chansons, SONGMOUNT:ChosenSongNode() et DANBUILDER:GetSong
 | `node:GetPreimage()  -> texture` | Charge l'image d'aperçu depuis le disque et renvoie une nouvelle texture, ou nil si la chanson n'en a pas. Libérez la texture quand vous en avez terminé. |
 | `node.ChartMd5  (string)` | MD5 du fichier de partition (hexadécimal en majuscules), ou une chaîne vide. Il reste le même entre installations ; UniqueId non. |
 | `node:GetChart(diff)  -> chart` | Renvoie la partition pour l'indice de difficulté donné, ou nil si la chanson n'a pas cette partition. |
-| `node:GetCustomCommand(key)  -> string` | Renvoie la valeur d'une commande personnalisée de portée globale (un en-tête préfixé d'un point placé avant le premier COURSE ; la clé inclut le point, par exemple ".VAULT_NAME"), ou nil. |
+| `node:GetCustomCommand(key)  -> string` | Renvoie la valeur d'une commande personnalisée de portée globale (un en-tête préfixé d'un point placé avant le premier COURSE, ou une clé préfixée d'un point au premier niveau d'un fichier .tci, .tcm ou .tct ; la clé inclut le point, par exemple ".VAULT_NAME"), ou nil. Dans ces fichiers, un nombre ou true/false est renvoyé sous forme de texte. |
 | `node:GetCustomCommands()  -> dictionary` | Renvoie toutes les commandes personnalisées de portée globale sous forme d'objet dictionnaire C#. Préférez GetCustomCommand pour les recherches. |
 | `node.UnlockCondition  (unlock condition)` | L'objet de condition de déblocage (voir Condition de déblocage). |
 | `node.UnlockText  (string)` | Le texte de déblocage personnalisé si la chanson en définit un, sinon le message de condition généré. |
@@ -201,7 +201,7 @@ GetChart(diff) d'un nœud de chanson renvoie une partition. Les propriétés son
 | `chart.DanExams  (array of dan exams)` | Les conditions d'examen globales de cette partition Dan. |
 | `chart:GetSongExam(songIdx, examSlot)  -> dan exam` | Renvoie l'examen par chanson pour l'indice de chanson (à partir de 0) et l'emplacement d'examen (à partir de 1) ; le résultat a IsSet = false quand il n'en existe aucun ou qu'un indice est hors limites. |
 | `chart:GetPlayerBestScore(save)  -> best score info` | Renvoie le résumé de la meilleure partie du fichier de sauvegarde donné pour cette partition. |
-| `chart:GetCustomCommand(key)  -> string` | Renvoie la valeur d'une commande personnalisée de portée partition (un en-tête préfixé d'un point à l'intérieur de ce bloc COURSE ; la clé inclut le point), ou nil. |
+| `chart:GetCustomCommand(key)  -> string` | Renvoie la valeur d'une commande personnalisée de portée partition (un en-tête préfixé d'un point à l'intérieur de ce bloc COURSE, une clé préfixée d'un point dans ce course d'un .tci, ou une clé du premier niveau d'un .tcm ou d'un .tct, qui n'ont qu'un course ; la clé inclut le point), ou nil. |
 | `chart:GetCustomCommands()  -> dictionary` | Renvoie toutes les commandes personnalisées de portée partition sous forme d'objet dictionnaire C#. |
 | `chart.SongFolder  (string)` | Le dossier absolu contenant le fichier de partition. |
 | `chart.ChartPath  (string)` | Le chemin absolu du fichier de partition. |
@@ -241,6 +241,7 @@ Une entrée de chanson dans un parcours Dan.
 | `dansong.SubTitle  (string)` | Le sous-titre de la chanson. |
 | `dansong.Genre  (string)` | Le genre de la chanson. |
 | `dansong.Level  (int)` | Le niveau en étoiles de la chanson. |
+| `dansong.LevelDecimal  (number)` | Le niveau avec ses décimales (par ex. 10.5) ; le niveau entier quand le dan n'en donne pas. |
 | `dansong.Difficulty  (enum)` | La difficulté sous forme d'objet enum. |
 | `dansong.DifficultyAsInt  (int)` | L'indice de difficulté. |
 

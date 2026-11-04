@@ -17,6 +17,8 @@
 local M = {}
 
 local function key(c, r) return c .. "," .. r end
+-- the stock key an evicted piece goes back to (a piece in a colour keeps it, see Room.stockKey)
+local function stockKey(it) return it.hex and (it.id .. ":" .. it.hex) or it.id end
 
 -- take one piece out of the room and into the inventory, riders first when it carried any
 local function evict(room, catalog, it, out, gone)
@@ -26,7 +28,7 @@ local function evict(room, catalog, it, out, gone)
     if cat and cat.surface then
         for _, rider in ipairs(room:stackedItemsOn(it)) do evict(room, catalog, rider, out, gone) end
     end
-    room:invAdd(it.id)
+    room:invAdd(stockKey(it))
     out[#out + 1] = it.id
 end
 
@@ -109,7 +111,7 @@ function M.sweep(room)
             for _, s in ipairs(slots) do taken[s] = true end
         elseif tiles == nil or blocked or #front > 0 then
             if room:removeWallItem(it) then
-                room:invAdd(it.id)
+                room:invAdd(stockKey(it))
                 out[#out + 1] = it.id
             end
         else

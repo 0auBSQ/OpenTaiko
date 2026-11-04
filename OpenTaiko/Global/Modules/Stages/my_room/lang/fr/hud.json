@@ -19,6 +19,7 @@
   "prompt_fishtank": "[Entrée] Allumer ou éteindre l'aquarium",
   "prompt_lantern": "[Entrée] Allumer ou éteindre la lanterne",
   "prompt_workbench": "[Entrée] Utiliser l'établi",
+  "prompt_recycle": "[Entrée] Utiliser le bac de recyclage",
   "prompt_exit": "[Entrée] Quitter la chambre",
   "prompt_switch": "[Tab] Changer de cible",
   "player_entry": "Joueur %d — %s",

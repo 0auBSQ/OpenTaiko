@@ -309,6 +309,7 @@ Das Objekt, das info:GetDanSong zurückgibt, schreibgeschützt.
 | `song.Subtitle  -> string` | Der Untertitel des Songs; "" für einen Song, den der Chart verborgen hält. |
 | `song.Difficulty  -> number` | 0 Easy bis 4 Extra. |
 | `song.Level  -> number` | Das Level des Songs. |
+| `song.LevelDecimal  -> number` | Das Level mit Nachkommastellen (z. B. 10.5); das ganze Level, wenn der Dan keine angibt. |
 | `song.Good  -> number` | Good-Treffer im Song. |
 | `song.Ok  -> number` | Ok-Treffer im Song. |
 | `song.Bad  -> number` | Bad-Treffer im Song. |

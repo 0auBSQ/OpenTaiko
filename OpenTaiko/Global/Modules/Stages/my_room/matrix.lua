@@ -2,7 +2,7 @@
 -- matrix.lua — the Placeholder Matrix furniture (My Room).
 --
 -- The spot: a floor emitter whose cubes float and turn (the GLB's own animation, started once the
--- room is built). Its glow part and a green point light breathe together.
+-- room is built). Its glow part and a point light in its colour (green, or the workbench's) breathe together.
 --
 -- The window: Enter on it lists the debug scenes of data/placeholder_matrix.json. A scene with no
 -- price is open from the start; a priced one shows its price and is unlocked once per save with
@@ -39,11 +39,12 @@ local PURSE_Y = (1080 + PANEL.h) / 2 - 30
 local GLOW = { 0.3, 1.0, 0.5 }
 local GLOW_SCALE = 0.9
 local LIGHT_INTENSITY, LIGHT_RANGE = 0.6, 3.5
--- the cubes glow in their own colours
+-- the cubes glow in their own colours; the green ones take the matrix's colour when it has one, this much dimmer
 local PART_GLOW = {
     MatrixCubeGrey  = { 0.85, 0.92, 0.88 },
     MatrixCubeGreen = { 0.15, 0.85, 0.40 },
 }
+local TAKES_COLOR = { MatrixCubeGreen = 0.85 }
 
 local ctx = nil             -- Script.lua closures (see M.init)
 local clock = 0
@@ -69,6 +70,14 @@ end
 
 local function pulse() return 0.75 + 0.25 * math.sin(clock * 2.4) end
 
+-- the colour a placed matrix projects: its own (the workbench's, kept as `hex`) or the default green. Its glow
+-- disc and green cubes show it too (furniture.json colorParts, applied when the model is built)
+local function colorOf(it)
+    local hex = it and it.hex
+    if hex == nil then return GLOW end
+    return { tonumber(hex:sub(1, 2), 16) / 255, tonumber(hex:sub(3, 4), 16) / 255, tonumber(hex:sub(5, 6), 16) / 255 }
+end
+
 local function clearBeams(scene)
     if scene ~= nil and scene == beamScene then
         for _, obj in ipairs(beams) do pcall(function() scene:DeleteObject(obj) end) end
@@ -76,7 +85,7 @@ local function clearBeams(scene)
     beams = {}
 end
 
-local function addBeam(scene, inst)
+local function addBeam(scene, inst, col)
     if scene == nil or scene.ObjAddSprite == nil then return end
     if scene ~= beamScene then
         beamScene = scene
@@ -89,13 +98,22 @@ local function addBeam(scene, inst)
     scene:ObjBegin(obj)
     scene:ObjAddSprite(obj, inst.x, inst.y + BEAM_FOOT * s, inst.z, BEAM_W * s, BEAM_H * s, BEAM_SPRITE, 1, 0)
     scene:ObjSetPass(obj, 1, 1, 1, 1, BEAM_ALPHA)
-    scene:ObjSetTint(obj, GLOW[1] + 0.3, GLOW[2], GLOW[3] + 0.25)
+    -- the beam: its matrix's colour, paler
+    local function pale(v) return math.min(1, v + (1 - v) * 0.43) end
+    scene:ObjSetTint(obj, pale(col[1]), pale(col[2]), pale(col[3]))
     beams[#beams + 1] = obj
 end
 
--- the glow part's current emissive, for the focus highlight to keep as its base
-function M.glowNow(material)
-    local c = PART_GLOW[material] or GLOW
+-- a glow part's current emissive (the glow disc in the matrix's colour, the cubes in theirs), for the focus
+-- highlight to keep as its base
+function M.glowNow(material, it)
+    local c = PART_GLOW[material]
+    local k = TAKES_COLOR[material]
+    if k and it and it.hex then
+        local col = colorOf(it)
+        c = { col[1] * k, col[2] * k, col[3] * k }
+    end
+    c = c or colorOf(it)
     local p = pulse() * GLOW_SCALE
     return { c[1] * p, c[2] * p, c[3] * p }
 end
@@ -110,10 +128,11 @@ function M.lights(world)
     for _, it in ipairs(placed()) do
         local inst = ctx.propInstFor(it)
         if inst then
-            pcall(addBeam, scene, inst)
+            local col = colorOf(it)
+            pcall(addBeam, scene, inst, col)
             if inst.anim == nil and inst.play then pcall(function() inst:play(0) end) end
             local s = inst.scale or 1
-            local def = { x = inst.x, y = inst.y + 0.7 * s, z = inst.z, r = GLOW[1], g = GLOW[2], b = GLOW[3],
+            local def = { x = inst.x, y = inst.y + 0.7 * s, z = inst.z, r = col[1], g = col[2], b = col[3],
                           intensity = LIGHT_INTENSITY, range = LIGHT_RANGE, live = true }
             lightDefs[it] = def
             out[#out + 1] = def
@@ -131,7 +150,7 @@ function M.tick(dt)
         local inst = ctx.propInstFor(it)
         if inst and inst.parts and scene and scene.ObjSetEmissive then
             for _, p in ipairs(inst.parts) do
-                local g = M.glowNow(p.material)
+                local g = M.glowNow(p.material, it)
                 pcall(function() scene:ObjSetEmissive(p.obj, g[1], g[2], g[3]) end)
             end
         end

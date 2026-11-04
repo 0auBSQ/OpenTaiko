@@ -156,7 +156,7 @@ De nummerlijst-handle, SONGMOUNT:ChosenSongNode() en DANBUILDER:GetSong() geven 
 | `node:GetPreimage()  -> texture` | Laadt de preimage van schijf en geeft een nieuwe textuur terug, of nil als het nummer er geen heeft. Geef de textuur vrij wanneer je klaar bent. |
 | `node.ChartMd5  (string)` | MD5 van het chartbestand (hex in hoofdletters), of een lege string. Hij blijft hetzelfde over installaties heen; UniqueId niet. |
 | `node:GetChart(diff)  -> chart` | Geeft de chart voor de gegeven moeilijkheidsindex terug, of nil als het nummer die chart niet heeft. |
-| `node:GetCustomCommand(key)  -> string` | Geeft de waarde van een aangepast commando op globaal niveau terug (een header met puntvoorvoegsel vóór de eerste COURSE; key bevat de punt, bijvoorbeeld ".VAULT_NAME"), of nil. |
+| `node:GetCustomCommand(key)  -> string` | Geeft de waarde van een aangepast commando op globaal niveau terug (een header met puntvoorvoegsel vóór de eerste COURSE, of een sleutel met puntvoorvoegsel op het hoogste niveau van een .tci-, .tcm- of .tct-bestand; key bevat de punt, bijvoorbeeld ".VAULT_NAME"), of nil. In die bestanden komen een getal of true/false terug als tekst. |
 | `node:GetCustomCommands()  -> dictionary` | Geeft alle aangepaste commando's op globaal niveau terug als C#-dictionary-object. Gebruik bij voorkeur GetCustomCommand voor opzoekingen. |
 | `node.UnlockCondition  (unlock condition)` | Het ontgrendelvoorwaarde-object (zie Ontgrendelvoorwaarde). |
 | `node.UnlockText  (string)` | De aangepaste ontgrendeltekst als het nummer die definieert, anders het gegenereerde voorwaardebericht. |
@@ -201,7 +201,7 @@ GetChart(diff) van een nummerknoop geeft een chart terug. Eigenschappen zijn all
 | `chart.DanExams  (array of dan exams)` | De globale examenvoorwaarden van deze Dan-chart. |
 | `chart:GetSongExam(songIdx, examSlot)  -> dan exam` | Geeft het examen per nummer terug voor de 0-gebaseerde nummerindex en het 1-gebaseerde examenslot; het resultaat heeft IsSet = false wanneer er geen bestaat of een index buiten bereik is. |
 | `chart:GetPlayerBestScore(save)  -> best score info` | Geeft de samenvatting van de beste spelbeurt van het gegeven opslagbestand voor deze chart terug. |
-| `chart:GetCustomCommand(key)  -> string` | Geeft de waarde van een aangepast commando op chartniveau terug (een header met puntvoorvoegsel binnen dit COURSE-blok; key bevat de punt), of nil. |
+| `chart:GetCustomCommand(key)  -> string` | Geeft de waarde van een aangepast commando op chartniveau terug (een header met puntvoorvoegsel binnen dit COURSE-blok, een sleutel met puntvoorvoegsel in deze course van een .tci, of een op het hoogste niveau van een .tcm of .tct, die één course hebben; key bevat de punt), of nil. |
 | `chart:GetCustomCommands()  -> dictionary` | Geeft alle aangepaste commando's op chartniveau terug als C#-dictionary-object. |
 | `chart.SongFolder  (string)` | De absolute map die het chartbestand bevat. |
 | `chart.ChartPath  (string)` | Het absolute pad van het chartbestand. |
@@ -241,6 +241,7 @@ Elementen van chart.DanSongs. Alle leden zijn alleen-lezen.
 | `dansong.SubTitle  (string)` | De ondertitel van het nummer. |
 | `dansong.Genre  (string)` | Het genre van het nummer. |
 | `dansong.Level  (int)` | Het sterrenniveau van het nummer. |
+| `dansong.LevelDecimal  (number)` | Het niveau met decimalen (bijv. 10.5); het hele niveau als de dan er geen geeft. |
 | `dansong.Difficulty  (enum)` | De moeilijkheid als enum-object. |
 | `dansong.DifficultyAsInt  (int)` | De moeilijkheidsindex. |
 

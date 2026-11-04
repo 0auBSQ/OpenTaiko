@@ -84,19 +84,24 @@ function M.applyItems(room, t, catalog, starterStock)
     end
     -- computer split-out migration (v1 AND older v2 saves): the PC used to be baked into the
     -- desk — spawn a computer stacked on the first desk so nobody loses their PC, and seed one
-    -- spare into inventories that predate the item
-    local hasComputer = false
-    for _, it in ipairs(room.furniture) do if it.id == "computer" then hasComputer = true end end
-    if not hasComputer then
-        for _, it in ipairs(room.furniture) do
-            if it.id == "desk" and not it.on then
-                room.furniture[#room.furniture + 1] =
-                    { id = "computer", c = it.c, r = it.r, facing = it.facing or 0, on = true }
-                break
+    -- spare into inventories that predate the item. Once per save, recorded in the gift ledger: on
+    -- every load it gave back each computer taken off the desk or sold
+    if not (type(t.gifts) == "table" and t.gifts[M.COMPUTER_SPLIT] == true) then
+        local hasComputer = false
+        for _, it in ipairs(room.furniture) do if it.id == "computer" then hasComputer = true end end
+        if not hasComputer then
+            for _, it in ipairs(room.furniture) do
+                if it.id == "desk" and not it.on then
+                    room.furniture[#room.furniture + 1] =
+                        { id = "computer", c = it.c, r = it.r, facing = it.facing or 0, on = true }
+                    break
+                end
             end
         end
+        if room.inventory.computer == nil then room.inventory.computer = 1 end
+        t.gifts = type(t.gifts) == "table" and t.gifts or {}
+        t.gifts[M.COMPUTER_SPLIT] = true
     end
-    if room.inventory.computer == nil then room.inventory.computer = 1 end
     -- seed any NEW starter item the save predates (new furniture variants, souvenir pictures,
     -- floorings, wall paints) so existing rooms get the new content without resetting counts
     room.inventory = room.inventory or {}
@@ -106,11 +111,13 @@ end
 -- items every room gets: brand-new rooms have them placed (starter_room.json), saved rooms receive them
 -- once through applyGifts
 M.GIFTS = { mirror = 1, backpack = 1 }
+M.COMPUTER_SPLIT = "computer_split"     -- the ledger's mark of the computer split-out (applyItems)
 
--- the gift ledger of a brand-new room: everything already given
+-- the gift ledger of a brand-new room: everything already given, the computer split-out done
 function M.allGifts()
     local given = {}
     for id in pairs(M.GIFTS) do given[id] = true end
+    given[M.COMPUTER_SPLIT] = true
     return given
 end
 

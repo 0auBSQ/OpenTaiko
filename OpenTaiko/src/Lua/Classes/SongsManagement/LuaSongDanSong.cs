@@ -32,6 +32,13 @@
 			}
 		}
 
+		/// <summary>The level with its decimals (e.g. 10.5); the whole Level when the dan gives none.</summary>
+		public double LevelDecimal {
+			get {
+				return _dsInfo.LevelDecimal >= 0 ? _dsInfo.LevelDecimal : _dsInfo.Level;
+			}
+		}
+
 		public Difficulty Difficulty {
 			get {
 				return (Difficulty)_dsInfo.Difficulty;

@@ -1,0 +1,9 @@
+{
+  "_comment": "German texts for the recycle bin window (recycle.lua). Keys are stable ids; lang/en is the fallback for every other language.",
+  "stock": "Vorrat",
+  "price": "Verkaufspreis",
+  "amount": "Menge",
+  "total": "Gesamt",
+  "sell": "Verkaufen",
+  "empty": "Nichts zu verkaufen: Möbel, Böden und Wandfarben im Vorrat, die sich verkaufen lassen, erscheinen hier."
+}

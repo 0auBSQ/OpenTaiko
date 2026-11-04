@@ -309,6 +309,7 @@ info:GetDanSong が返す読み取り専用のオブジェクトです。
 | `song.Subtitle  -> string` | 曲のサブタイトル。譜面が隠している曲では ""。 |
 | `song.Difficulty  -> number` | 0 かんたん から 4 裏鬼。 |
 | `song.Level  -> number` | 曲のレベル。 |
+| `song.LevelDecimal  -> number` | 小数を含むレベル（例: 10.5）。段位が小数を指定しないときは整数のレベル。 |
 | `song.Good  -> number` | その曲の良の数。 |
 | `song.Ok  -> number` | その曲の可の数。 |
 | `song.Bad  -> number` | その曲の不可の数。 |

@@ -17,8 +17,13 @@ internal class CTcm {
 		// OpenTaiko extensions
 		[JsonProperty("dan_tick")]       public int   DanTick { get; set; }
 		[JsonProperty("dan_tick_color")] public int[]? DanTickColor { get; set; }
+		// read from .optktcm only: the scene presets of the dan, comma-separated like a .tja's SCENEPRESET:,
+		// and the dan's own level (10 when missing)
+		[JsonProperty("scene_preset")]   public string? ScenePreset { get; set; }
+		[JsonProperty("level")]          public double? Level { get; set; }
 		[JsonProperty("exams")]  public List<TcmExamJson?>? Exams { get; set; }
 		[JsonProperty("charts")] public List<TcmChartJson?>? Charts { get; set; }
+		[JsonExtensionData] public IDictionary<string, JToken>? Extra { get; set; }   // ".NAME" custom commands
 	}
 
 	private class TcmExamJson {
@@ -44,6 +49,10 @@ internal class CTcm {
 	public string GENRE     = "段位道場";
 	public int    DAN_TICK  = 2;
 	public Color  DAN_TICK_COLOR = Color.White;
+	public string[] SCENE_PRESETS = [];
+	public double LEVEL = 10;
+	// the file's custom commands: the dan's one course, so both the song's and its course's
+	public Dictionary<string, string> CUSTOM_COMMANDS = new();
 	public CSongUniqueID UniqueID;
 	public string FolderPath;
 	public string FilePath;
@@ -99,6 +108,7 @@ internal class CTcm {
 				Genre    = refNode.songGenre,
 				FileName = refNode.score[diff]!.FileInfo.FileAbsolutePath ?? "",
 				Level      = refNode.nLevel[diff],
+				LevelDecimal = refNode.dLevel[diff],
 				Difficulty = diff,
 				ScoreInit  = 300,
 				ScoreDiff  = 120,
@@ -122,6 +132,8 @@ internal class CTcm {
 		node.uniqueId   = UniqueID;
 		node.DanSongs   = danSongsList;
 		node.difficultiesCount = 1;
+		node.customMetadataGScope = new(CUSTOM_COMMANDS);
+		node.customMetadataCScope[(int)Difficulty.Dan] = new(CUSTOM_COMMANDS);
 
 		var danC = new Dan_C[CExamInfo.cMaxExam];
 		for (int i = 0; i < CExamInfo.cMaxExam; i++) {
@@ -145,16 +157,20 @@ internal class CTcm {
 		score.FileInfo.LastUpdateDateTime        = FileInfo.LastWriteTime;
 		score.ChartInfo.Title       = TITLE.GetString("");
 		score.ChartInfo.strSubtitle = SUBTITLE.GetString("");
+		int dan = (int)Difficulty.Dan;
+		var levelIcon = CTci.LevelIconOf(LEVEL);
 		score.ChartInfo.nLevel        = Enumerable.Repeat(-1, (int)Difficulty.Total).ToArray();
-		score.ChartInfo.nLevel[(int)Difficulty.Dan] = 10;
+		score.ChartInfo.nLevel[dan] = (int)LEVEL;
 		score.ChartInfo.nLevelIcon  = new CTja.ELevelIcon[(int)Difficulty.Total];
+		score.ChartInfo.nLevelIcon[dan] = levelIcon;
 		score.ChartInfo.bChartBranch    = new bool[(int)Difficulty.Total];
 		score.ChartInfo.nDanTick    = DAN_TICK;
 		score.ChartInfo.cDanTickColor = DAN_TICK_COLOR;
 		node.score[(int)Difficulty.Dan] = score;
 		node.nLevel = Enumerable.Repeat(-1, (int)Difficulty.Total).ToArray();
-		node.nLevel[(int)Difficulty.Dan] = 10;
-		node.dLevel[(int)Difficulty.Dan] = 10;
+		node.nLevel[dan] = (int)LEVEL;
+		node.dLevel[dan] = LEVEL;
+		node.nLevelIcon[dan] = levelIcon;
 
 		return node;
 	}
@@ -189,7 +205,12 @@ internal class CTcm {
 			}
 		}
 
-		return builder.BuildDanCtjaInternal();
+		CTja dan = builder.BuildDanCtjaInternal();
+		dan.scenePresets = SCENE_PRESETS;
+		dan.GlobalCustomMetadata = new(CUSTOM_COMMANDS);
+		dan.SongListCourseMetadata[(int)Difficulty.Dan].CustomMetadata = new(CUSTOM_COMMANDS);
+		dan.PlayerSideMetadata.CustomMetadata = new(CUSTOM_COMMANDS);
+		return dan;
 	}
 
 	// ── Private helpers ───────────────────────────────────────────────────────
@@ -197,13 +218,20 @@ internal class CTcm {
 	private void Parse(string filePath) {
 		try {
 			string json = File.ReadAllText(filePath);
-			var data = JsonConvert.DeserializeObject<TcmJson>(json);
+			var data = JsonConvert.DeserializeObject<TcmJson>(json, CTci.ReadSettings);
 			if (data == null) return;
+			CUSTOM_COMMANDS = CTci.CustomCommandsOf(data.Extra);
 
 			TITLE    = CTci.ParseLocalized(data.Title);
 			SUBTITLE = CTci.ParseLocalized(data.Subtitle);
 			ALBUMART = data.Albumart ?? "";
 			DAN_TICK = data.DanTick;
+			if (Path.GetExtension(filePath).Equals(".optktcm", StringComparison.OrdinalIgnoreCase)) {
+				if (!string.IsNullOrEmpty(data.ScenePreset))
+					SCENE_PRESETS = CTja.SplitComma(data.ScenePreset);
+				if (data.Level is >= 0)
+					LEVEL = data.Level.Value;
+			}
 			if (data.DanTickColor is { Length: >= 3 })
 				DAN_TICK_COLOR = Color.FromArgb(
 					Math.Clamp(data.DanTickColor[0], 0, 255),

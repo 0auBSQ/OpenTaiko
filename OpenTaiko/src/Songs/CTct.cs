@@ -18,6 +18,7 @@ internal class CTct {
 		[JsonProperty("life")]       public int Life { get; set; } = 5;
 		[JsonProperty("side")]       public string? Side { get; set; }        // normal or ex; from the course when missing
 		[JsonProperty("towertype")]  public string? TowerType { get; set; }   // the tower's look (Tower/Down/<look>)
+		[JsonExtensionData] public IDictionary<string, JToken>? Extra { get; set; }   // ".NAME" custom commands
 	}
 
 	// ── Parsed data ───────────────────────────────────────────────────────────
@@ -30,6 +31,8 @@ internal class CTct {
 	public int LIFE = 5;
 	public CTja.ESide? SIDE;
 	public string? TOWERTYPE;
+	// the file's custom commands: the tower's one course, so both the song's and its course's
+	public Dictionary<string, string> CUSTOM_COMMANDS = new();
 	public CSongUniqueID UniqueID;
 	public string FolderPath;
 	public string FilePath;
@@ -67,7 +70,7 @@ internal class CTct {
 		int tower = (int)Difficulty.Tower;
 		int level = LEVEL.HasValue ? (int)LEVEL.Value : srcNode.nLevel[SourceDifficulty];
 		double levelDecimal = LEVEL ?? srcNode.dLevel[SourceDifficulty];
-		var levelIcon = LEVEL.HasValue ? LevelIconOf(LEVEL.Value) : srcNode.nLevelIcon[SourceDifficulty];
+		var levelIcon = LEVEL.HasValue ? CTci.LevelIconOf(LEVEL.Value) : srcNode.nLevelIcon[SourceDifficulty];
 
 		var node = new CSongListNode();
 		node.nodeType   = CSongListNode.ENodeType.SCORE;
@@ -84,6 +87,8 @@ internal class CTct {
 		node.nLife       = LIFE;
 		node.nTotalFloor = floors;
 		node.nTowerType  = TOWERTYPE;
+		node.customMetadataGScope = new(CUSTOM_COMMANDS);
+		node.customMetadataCScope[tower] = new(CUSTOM_COMMANDS);
 
 		node.strNotesDesigner = Enumerable.Repeat("", (int)Difficulty.Total).ToArray();
 		node.strNotesDesigner[tower] = srcNode.strNotesDesigner[SourceDifficulty];
@@ -147,6 +152,9 @@ internal class CTct {
 		tja.SIDE = Side;
 		if (TITLE != null) tja.TITLE = TITLE;
 		if (SUBTITLE != null) tja.SUBTITLE = SUBTITLE;
+		// the tower's own commands, not the song's
+		tja.GlobalCustomMetadata = new(CUSTOM_COMMANDS);
+		tja.PlayerSideMetadata.CustomMetadata = new(CUSTOM_COMMANDS);
 		return tja;
 	}
 
@@ -182,11 +190,6 @@ internal class CTct {
 		return floors + 1;
 	}
 
-	private static CTja.ELevelIcon LevelIconOf(double level) {
-		double frac = level - (int)level;
-		return frac >= 0.5 ? CTja.ELevelIcon.ePlus : (frac > 0 ? CTja.ELevelIcon.eMinus : CTja.ELevelIcon.eNone);
-	}
-
 	private static void Report(string msg) {
 		Trace.TraceError(msg);
 		LogNotification.PopError(msg);
@@ -195,8 +198,9 @@ internal class CTct {
 	private void Parse(string filePath) {
 		try {
 			string json = File.ReadAllText(filePath);
-			var data = JsonConvert.DeserializeObject<TctJson>(json);
+			var data = JsonConvert.DeserializeObject<TctJson>(json, CTci.ReadSettings);
 			if (data == null) return;
+			CUSTOM_COMMANDS = CTci.CustomCommandsOf(data.Extra);
 
 			if (data.Title != null) TITLE = CTci.ParseLocalized(data.Title);
 			if (data.Subtitle != null) SUBTITLE = CTci.ParseLocalized(data.Subtitle);

@@ -309,6 +309,7 @@ end
 | `song.Subtitle  -> string` | Подзаголовок песни; "" для песни, которую чарт скрывает. |
 | `song.Difficulty  -> number` | От 0 Easy до 4 Extra. |
 | `song.Level  -> number` | Уровень песни. |
+| `song.LevelDecimal  -> number` | Уровень с дробной частью (например, 10.5); целый уровень, если дан её не задаёт. |
 | `song.Good  -> number` | Попадания Good в песне. |
 | `song.Ok  -> number` | Попадания Ok в песне. |
 | `song.Bad  -> number` | Попадания Bad в песне. |

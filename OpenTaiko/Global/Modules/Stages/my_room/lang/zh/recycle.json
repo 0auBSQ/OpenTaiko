@@ -1,0 +1,9 @@
+{
+  "_comment": "Chinese texts for the recycle bin window (recycle.lua). Keys are stable ids; lang/en is the fallback for every other language.",
+  "stock": "库存",
+  "price": "售价",
+  "amount": "数量",
+  "total": "合计",
+  "sell": "出售",
+  "empty": "没有可以出售的东西：库存中可以出售的家具、地板和墙漆会显示在这里。"
+}

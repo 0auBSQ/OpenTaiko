@@ -1,0 +1,9 @@
+{
+  "_comment": "Russian texts for the recycle bin window (recycle.lua). Keys are stable ids; lang/en is the fallback for every other language.",
+  "stock": "В запасе",
+  "price": "Цена продажи",
+  "amount": "Количество",
+  "total": "Итого",
+  "sell": "Продать",
+  "empty": "Нечего продавать: здесь появляются мебель, полы и краски из запаса, которые можно продать."
+}

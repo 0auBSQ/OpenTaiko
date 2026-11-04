@@ -1,0 +1,9 @@
+{
+  "_comment": "French texts for the recycle bin window (recycle.lua). Keys are stable ids; lang/en is the fallback for every other language.",
+  "stock": "En stock",
+  "price": "Se vend",
+  "amount": "Quantité",
+  "total": "Total",
+  "sell": "Vendre",
+  "empty": "Rien à vendre : les meubles, sols et peintures en stock qui se vendent apparaissent ici."
+}

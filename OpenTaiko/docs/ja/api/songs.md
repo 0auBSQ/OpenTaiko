@@ -156,7 +156,7 @@ end
 | `node:GetPreimage()  -> texture` | ディスクからプレビュー画像を読み込み、新しいテクスチャを返します。楽曲に画像がなければ nil。使い終わったらテクスチャを破棄してください。 |
 | `node.ChartMd5  (string)` | 譜面ファイルの MD5 (大文字の 16 進)。なければ空文字列。インストールをまたいでも同じ値のままです。UniqueId は変わります。 |
 | `node:GetChart(diff)  -> chart` | 指定した難易度インデックスの譜面を返します。楽曲にその譜面がなければ nil。 |
-| `node:GetCustomCommand(key)  -> string` | グローバルスコープのカスタムコマンド (最初の COURSE より前に置かれたドット始まりのヘッダ。key はドットを含む。例: ".VAULT_NAME") の値を返します。なければ nil。 |
+| `node:GetCustomCommand(key)  -> string` | グローバルスコープのカスタムコマンド (最初の COURSE より前に置かれたドット始まりのヘッダ、または .tci・.tcm・.tct ファイルの最上位にあるドット始まりのキー。key はドットを含む。例: ".VAULT_NAME") の値を返します。なければ nil。これらのファイルでは、数値や true/false は文字列として返ります。 |
 | `node:GetCustomCommands()  -> dictionary` | すべてのグローバルスコープのカスタムコマンドを C# の辞書オブジェクトとして返します。検索には GetCustomCommand を使ってください。 |
 | `node.UnlockCondition  (unlock condition)` | アンロック条件オブジェクト (アンロック条件を参照)。 |
 | `node.UnlockText  (string)` | 楽曲が定義していればカスタムのアンロックテキスト、そうでなければ生成された条件メッセージ。 |
@@ -201,7 +201,7 @@ end
 | `chart.DanExams  (array of dan exams)` | この Dan 譜面のグローバルな試験条件。 |
 | `chart:GetSongExam(songIdx, examSlot)  -> dan exam` | 0 始まりの楽曲インデックスと 1 始まりの試験スロットに対する楽曲ごとの試験を返します。存在しないかインデックスが範囲外なら結果の IsSet は false です。 |
 | `chart:GetPlayerBestScore(save)  -> best score info` | 指定したセーブファイルのこの譜面に対するベストプレイの要約を返します。 |
-| `chart:GetCustomCommand(key)  -> string` | 譜面スコープのカスタムコマンド (この COURSE ブロック内のドット始まりのヘッダ。key はドットを含む) の値を返します。なければ nil。 |
+| `chart:GetCustomCommand(key)  -> string` | 譜面スコープのカスタムコマンド (この COURSE ブロック内のドット始まりのヘッダ、.tci のこのコース内のドット始まりのキー、またはコースがひとつだけの .tcm・.tct の最上位のキー。key はドットを含む) の値を返します。なければ nil。 |
 | `chart:GetCustomCommands()  -> dictionary` | すべての譜面スコープのカスタムコマンドを C# の辞書オブジェクトとして返します。 |
 | `chart.SongFolder  (string)` | 譜面ファイルを含むフォルダの絶対パス。 |
 | `chart.ChartPath  (string)` | 譜面ファイルの絶対パス。 |
@@ -241,6 +241,7 @@ chart.DanSongs の要素です。すべてのメンバーは読み取り専用�
 | `dansong.SubTitle  (string)` | 楽曲のサブタイトル。 |
 | `dansong.Genre  (string)` | 楽曲のジャンル。 |
 | `dansong.Level  (int)` | 楽曲の星の数によるレベル。 |
+| `dansong.LevelDecimal  (number)` | 小数を含むレベル（例: 10.5）。段位が小数を指定しないときは整数のレベル。 |
 | `dansong.Difficulty  (enum)` | 列挙オブジェクトとしての難易度。 |
 | `dansong.DifficultyAsInt  (int)` | 難易度インデックス。 |
 

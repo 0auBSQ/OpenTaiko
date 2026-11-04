@@ -309,6 +309,7 @@ info:GetDanSong 返回的只读对象。
 | `song.Subtitle  -> string` | 歌曲的副标题；谱面隐藏的歌曲为 ""。 |
 | `song.Difficulty  -> number` | 0 简单 到 4 里魔王。 |
 | `song.Level  -> number` | 歌曲的等级。 |
+| `song.LevelDecimal  -> number` | 带小数的等级（例如 10.5）；段位未给出小数时为整数等级。 |
 | `song.Good  -> number` | 该曲的良的数量。 |
 | `song.Ok  -> number` | 该曲的可的数量。 |
 | `song.Bad  -> number` | 该曲的不可的数量。 |

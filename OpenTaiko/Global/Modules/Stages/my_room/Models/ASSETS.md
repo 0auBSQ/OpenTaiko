@@ -37,6 +37,7 @@ Models taken from `Models/GLTF format/`.
 | chalice.glb | Chalice (https://poly.pizza/m/VZencXtC2I) | poly.pizza (Quaternius) | Quaternius | CC0 1.0 |
 | crystal.glb | Mineral (https://poly.pizza/m/STixpWYaTd) | poly.pizza (Quaternius) | Quaternius | CC0 1.0 |
 | lsofa.glb | Sofa (https://poly.pizza/m/X5kQPKzAWp) | poly.pizza (Quaternius) | Quaternius | CC0 1.0 |
+| recycle_bin.glb | Dumpster (https://poly.pizza/m/PKsbolkZSr) | poly.pizza (Quaternius) | Quaternius | CC0 1.0 |
 | tree.glb | Tree (https://poly.pizza/m/QN3Ru02ayU) | poly.pizza (Kenney) | Kenney | CC0 1.0 |
 | large_tree.glb | Tree Large (https://poly.pizza/m/ORCbG8dslS) | poly.pizza (Kenney) | Kenney | CC0 1.0 |
 | small_rock.glb | Rock (https://poly.pizza/m/cBqdRdLDDL) | poly.pizza (Kenney) | Kenney | CC0 1.0 |
@@ -51,7 +52,7 @@ Downloaded from that page: `Low Poly Household Items.zip`; model taken from `Low
 converted from FBX to binary glTF (turned to face -z, scaled, base on the floor).
 
 The models coloured only by material colours (wooden_chest, coin_piles, pirate_key, caspian_mug, chalice, crystal,
-fishtank, toybox, lsofa, workbench, tree, large_tree, small_rock, log, bonsai, fox_statue) have those colours converted
+fishtank, toybox, lsofa, workbench, tree, large_tree, small_rock, log, bonsai, fox_statue, recycle_bin) have those colours converted
 from linear to sRGB values, the colours the game draws. large_rock, fox and stone_lantern keep their colours as
 downloaded (they already hold those values); mini_pagoda is textured.
 

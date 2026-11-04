@@ -27,6 +27,7 @@ local NO_OPTIONS = {}
 local W, H = 1920, 1080
 local tex = {}
 local fonts = {}
+local barFonts = {}   -- the song bars' level, in the dan select's text
 local col = {}
 local sounds = {}
 local strings = {}
@@ -491,7 +492,23 @@ local function drawSongRow(i, x, y, op)
     local dt = tex.diff[d]
     dt:SetOpacity(op)
     dt:Draw(x + B.diff[1], y + B.diff[2])
-    text(fonts.level, tostring(s.Level), x + B.level[1], y + B.level[2], "center", { color = col.white, shadowColor = col.diff[d + 1], shadowOpacity = 1, opacity = op })
+    -- the level as the dan select draws it: white with the difficulty's outline; a plus level's "+" overlaps the
+    -- last digit's top-right corner
+    local P = B.level_plus
+    local plus = s.LevelDecimal - s.Level >= 0.5
+    local lx, ly = x + B.level[1] + (plus and P.shift or 0), y + B.level[2]
+    local outline = col.diff[d + 1]
+    local lt = barFonts.level:GetText(tostring(s.Level), false, B.level_max_width, col.white, outline)
+    if lt ~= nil then
+        lt:SetOpacity(op)
+        lt:DrawAtAnchor(lx, ly, "center")
+        local pt = plus and barFonts.levelPlus:GetText("+", false, B.level_max_width, col.white, outline) or nil
+        if pt ~= nil then
+            pt:SetOpacity(op)
+            -- the digits' right edge: the text bitmap keeps 25px clear on each side
+            pt:DrawAtAnchor(lx + lt.Width / 2 - 25 + P.dx, ly + P.dy, "center")
+        end
+    end
     local tw = B.text_right - B.title[1]
     local o = { color = col.ink, shadow = 0, opacity = op, maxW = tw }
     if s.Subtitle ~= "" then
@@ -971,7 +988,8 @@ function onStart()
     fonts.songTitle = TEXT:CreateGlyphCached(F.song_title)
     fonts.songSub = TEXT:CreateGlyphCached(F.song_sub)
     fonts.ordinal = TEXT:CreateGlyphCached(F.ordinal)
-    fonts.level = TEXT:CreateGlyphCached(F.level)
+    barFonts.level = TEXT:Create(F.level, "regular")
+    barFonts.levelPlus = TEXT:Create(F.level_plus, "regular")
     fonts.count = TEXT:CreateGlyphCached(F.count)
     fonts.gauge = TEXT:CreateGlyphCached(F.gauge)
     fonts.exam_name = TEXT:CreateGlyphCached(F.exam_name)
@@ -1120,7 +1138,7 @@ function activate(result)
     startMusic(Config.optional(Animation.music, "intro"), Config.optional(Animation.music, "loop"))
     -- the glyphs shown later are baked now, not on their first draw while the screen animates
     local off = -10000
-    for _, f in pairs(fonts) do f:Draw("0123456789%-", off, off, col.text, col.clear) end
+    for _, f in pairs(fonts) do f:Draw("0123456789%-+", off, off, col.text, col.clear) end
     for i = 0, info.DanSongCount - 1 do
         local s = info:GetDanSong(i)
         fonts.songTitle:Draw(s.Title, off, off, col.text, col.clear)
@@ -1234,4 +1252,6 @@ function onDestroy()
     deactivate()
     for _, f in pairs(fonts) do pcall(function() f:Dispose() end) end
     fonts = {}
+    for _, f in pairs(barFonts) do pcall(function() f:Dispose() end) end
+    barFonts = {}
 end

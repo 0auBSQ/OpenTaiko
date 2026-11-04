@@ -78,7 +78,7 @@
     "contents": {
         "_note": "The chosen dan's songs and exams inside Contents.png, from its top-left. Song bars are clipped to clip_top..clip_bottom. The _fallback sizes stand in for an art's size while it is not loaded.",
         "fonts": {
-            "title": 28, "sub": 20, "ordinal": 22, "level": 22,
+            "title": 28, "sub": 20, "ordinal": 22, "level": 22, "level_plus": 14,
             "exam_name": 20, "exam_range": 18, "number_big": 28, "number_small": 20
         },
         "clip_top": 33,
@@ -90,11 +90,11 @@
             "bar_h_fallback": 100
         },
         "song_bar": {
-            "_note": "Within DanSong.png, from its top-left: the ordinal stamp (nb) and its text, the difficulty stamp, the level, the title and the genre (sub).",
+            "_note": "Within DanSong.png, from its top-left: the ordinal stamp (nb) and its text, the difficulty stamp, the level, the title and the genre (sub). A plus level's \"+\" is centred plus_dx/plus_dy from the last digit's right edge and the level's centre; the number moves by plus_shift to stay centred.",
             "nb": { "x": 0, "y": 0 },
             "nb_text": { "x": 46, "y": 49, "max_width": 120 },
             "diff": { "x": 94, "y": 0 },
-            "level": { "x": 156, "y": 74, "max_width": 80 },
+            "level": { "x": 156, "y": 74, "max_width": 80, "plus_dx": -1, "plus_dy": -8, "plus_shift": -2 },
             "title": { "x": 250, "y": 32, "max_width": 840 },
             "sub": { "x": 250, "y": 72, "max_width": 840 }
         },

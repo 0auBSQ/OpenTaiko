@@ -177,6 +177,7 @@ internal class CStageResult : CStage {
 					subtitle = s.bTitleShow ? "" : s.SubTitle ?? "",
 					difficulty = s.Difficulty,
 					level = s.Level,
+					levelDecimal = s.LevelDecimal >= 0 ? s.LevelDecimal : s.Level,
 					good = counts?.nGreat ?? 0,
 					ok = counts?.nGood ?? 0,
 					bad = counts?.nMiss ?? 0,

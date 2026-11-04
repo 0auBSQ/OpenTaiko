@@ -309,6 +309,7 @@ Het object dat info:GetDanSong teruggeeft, alleen-lezen.
 | `song.Subtitle  -> string` | De ondertitel van het nummer; "" voor een nummer dat de chart verborgen houdt. |
 | `song.Difficulty  -> number` | 0 Easy tot 4 Extra. |
 | `song.Level  -> number` | Het niveau van het nummer. |
+| `song.LevelDecimal  -> number` | Het niveau met decimalen (bijv. 10.5); het hele niveau als de dan er geen geeft. |
 | `song.Good  -> number` | Good-slagen in het nummer. |
 | `song.Ok  -> number` | Ok-slagen in het nummer. |
 | `song.Bad  -> number` | Bad-slagen in het nummer. |

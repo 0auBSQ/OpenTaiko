@@ -35,6 +35,7 @@ local NB_REL_X      = SongBar.nb.x        ; local NB_REL_Y      = SongBar.nb.y
 local NB_TXT_REL_X  = SongBar.nb_text.x   ; local NB_TXT_REL_Y  = SongBar.nb_text.y
 local DIFF_REL_X    = SongBar.diff.x      ; local DIFF_REL_Y     = SongBar.diff.y
 local LVL_REL_X     = SongBar.level.x     ; local LVL_REL_Y      = SongBar.level.y
+local LVL_PLUS_DX   = SongBar.level.plus_dx ; local LVL_PLUS_DY  = SongBar.level.plus_dy ; local LVL_PLUS_SHIFT = SongBar.level.plus_shift
 local TITLE_REL_X   = SongBar.title.x     ; local TITLE_REL_Y    = SongBar.title.y  ; local TITLE_MAX_W    = SongBar.title.max_width
 local SUB_REL_X     = SongBar.sub.x       ; local SUB_REL_Y      = SongBar.sub.y    ; local SUB_MAX_W      = SongBar.sub.max_width
 
@@ -118,6 +119,7 @@ local font_title      = nil  -- title text
 local font_sub        = nil  -- subtitle / genre text
 local font_nb         = nil  -- ordinal label
 local font_level      = nil  -- star-level number
+local font_level_plus = nil  -- the "+" of a plus level
 local font_exam_name  = nil  -- exam condition name
 local font_exam_range = nil  -- exam range label
 
@@ -234,6 +236,7 @@ function M.load()
         font_sub        = TEXT:Create(Fonts.sub, "regular")
         font_nb         = TEXT:Create(Fonts.ordinal, "regular")
         font_level      = TEXT:Create(Fonts.level, "regular")
+        font_level_plus = TEXT:Create(Fonts.level_plus, "regular")
         font_exam_name  = TEXT:Create(Fonts.exam_name, "regular")
         font_exam_range = TEXT:Create(Fonts.exam_range, "regular")
         font_num_big    = TEXT:Create(Fonts.number_big, "regular")
@@ -271,6 +274,7 @@ function M.destroy()
     sd(font_sub)        ; font_sub        = nil
     sd(font_nb)         ; font_nb         = nil
     sd(font_level)      ; font_level      = nil
+    sd(font_level_plus) ; font_level_plus = nil
     sd(font_exam_name)  ; font_exam_name  = nil
     sd(font_exam_range) ; font_exam_range = nil
     sd(font_num_big)    ; font_num_big    = nil
@@ -338,13 +342,24 @@ local function drawBar(song_idx, ds, bar_rel_x, bar_rel_y, abs_x, abs_y)
         bar_rel_y + DIFF_REL_Y,
         abs_x, abs_y)
 
-    -- Level number
+    -- Level number; a plus level's "+" overlaps the last digit's top-right corner
     local dc = DIFF_OUTLINE[diff + 1] or DIFF_OUTLINE[1]
     local lvl_outline = COLOR:CreateColorFromARGB(255, dc[1], dc[2], dc[3])
+    local plus = ds.LevelDecimal - ds.Level >= 0.5
+    local lvl_x = LVL_REL_X + (plus and LVL_PLUS_SHIFT or 0)
     drawTextCenter(font_level, tostring(ds.Level), SongBar.level.max_width, white, lvl_outline,
-        bar_rel_x + LVL_REL_X,
+        bar_rel_x + lvl_x,
         bar_rel_y + LVL_REL_Y,
         abs_x, abs_y)
+    local t = (plus and font_level ~= nil) and font_level:GetText(tostring(ds.Level), false, SongBar.level.max_width, white, lvl_outline) or nil
+    if t ~= nil then
+        -- the digits' right edge: the text bitmap keeps 25px clear on each side
+        local right = lvl_x + math.floor(t.Width / 2) - 25
+        drawTextCenter(font_level_plus, "+", SongBar.level.max_width, white, lvl_outline,
+            bar_rel_x + right + LVL_PLUS_DX,
+            bar_rel_y + LVL_REL_Y + LVL_PLUS_DY,
+            abs_x, abs_y)
+    end
 
     -- ── Title ─────────────────────────────────────────────────────────────────
     drawTextLeft(font_title, ds.Title or "", TITLE_MAX_W, black, no_outline,

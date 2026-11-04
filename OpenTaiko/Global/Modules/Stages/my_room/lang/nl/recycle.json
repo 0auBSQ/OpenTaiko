@@ -1,0 +1,9 @@
+{
+  "_comment": "Dutch texts for the recycle bin window (recycle.lua). Keys are stable ids; lang/en is the fallback for every other language.",
+  "stock": "Op voorraad",
+  "price": "Verkoopprijs",
+  "amount": "Aantal",
+  "total": "Totaal",
+  "sell": "Verkopen",
+  "empty": "Niets te verkopen: meubels, vloeren en verven op voorraad die verkocht kunnen worden verschijnen hier."
+}

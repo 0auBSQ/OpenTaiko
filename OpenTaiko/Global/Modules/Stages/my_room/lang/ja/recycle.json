@@ -1,0 +1,9 @@
+{
+  "_comment": "Japanese texts for the recycle bin window (recycle.lua). Keys are stable ids; lang/en is the fallback for every other language.",
+  "stock": "在庫",
+  "price": "売値",
+  "amount": "数量",
+  "total": "合計",
+  "sell": "売る",
+  "empty": "売れるものがありません。在庫にある売れる家具、床、壁紙がここに表示されます。"
+}

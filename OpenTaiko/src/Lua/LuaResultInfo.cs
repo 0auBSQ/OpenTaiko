@@ -164,6 +164,7 @@ public sealed class LuaResultDanSong {
 	internal string title = "";
 	internal string subtitle = "";
 	internal int difficulty, level, good, ok, bad, roll;
+	internal double levelDecimal;
 
 	/// <summary>"???" for a song the chart keeps hidden.</summary>
 	public string Title => title;
@@ -172,6 +173,8 @@ public sealed class LuaResultDanSong {
 	/// <summary>0 Easy to 4 Extra.</summary>
 	public int Difficulty => difficulty;
 	public int Level => level;
+	/// <summary>The level with its decimals (e.g. 10.5); the whole Level when the dan gives none.</summary>
+	public double LevelDecimal => levelDecimal;
 	public int Good => good;
 	public int Ok => ok;
 	public int Bad => bad;

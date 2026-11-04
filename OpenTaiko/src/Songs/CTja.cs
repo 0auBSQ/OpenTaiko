@@ -228,6 +228,7 @@ internal class CTja : CActivity {
 		public int ScoreInit;
 		public int ScoreDiff;
 		public int Level;
+		public double LevelDecimal = -1;   // the level as written, decimals kept; -1 when only Level is known
 		public int Difficulty;
 		[Obsolete("use List_DanSongs.Count")] public static int Number = 0;
 		public bool bTitleShow;
@@ -2538,8 +2539,14 @@ internal class CTja : CActivity {
 			dansongs.ScoreInit = (strArray.Length > 4 && !string.IsNullOrWhiteSpace(strArray[4])) ? int.Parse(strArray[4]) : -1;
 			dansongs.ScoreDiff = (strArray.Length > 5 && !string.IsNullOrWhiteSpace(strArray[5])) ? int.Parse(strArray[5]) : -1;
 
-			// optional in TJAP3-Dev-ReW and OpTk
-			dansongs.Level = (strArray.Length > 6 && !string.IsNullOrWhiteSpace(strArray[6])) ? int.Parse(strArray[6]) : 10;
+			// optional in TJAP3-Dev-ReW and OpTk; the level may have decimals, like a chart's LEVEL
+			if (strArray.Length > 6 && !string.IsNullOrWhiteSpace(strArray[6])) {
+				double level = strArray[6].ParseReal();
+				dansongs.Level = Math.Max(0, (int)level);
+				dansongs.LevelDecimal = Math.Max(0, level);
+			} else {
+				dansongs.Level = 10;
+			}
 			dansongs.Difficulty = (strArray.Length > 7 && !string.IsNullOrWhiteSpace(strArray[7])) ? strConvertCourse(strArray[7]) : 3;
 			dansongs.bTitleShow = (strArray.Length > 8 && !string.IsNullOrWhiteSpace(strArray[8])) ? bool.Parse(strArray[8]) : false;
 

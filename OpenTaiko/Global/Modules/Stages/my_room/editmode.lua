@@ -22,6 +22,7 @@
 
 local A         = require("assets")
 local Room      = require("room")
+local Grid      = require("itemgrid")      -- the stock names (an item in a colour: its colour in brackets)
 local Sfx       = require("editsfx")     -- the edit mode's own sound set; see editsfx.lua
 -- the PopUI bar and the inline buttons speak the edit set too: a tick on hover and on focus moves,
 -- silent clicks (the tab, item and action handlers play what actually happened)
@@ -56,6 +57,7 @@ local CATS = {
 -- bar geometry (tab row on top, item grid underneath)
 local TAB_X0, TAB_Y, TAB_W, TAB_H, TAB_STEP = 28, BAR_Y + 18, 168, 52, 178
 local GRID_X0, GRID_Y, SLOT_W, SLOT_H, SLOT_STEP = 28, BAR_Y + 84, 118, 150, 130
+local BAR_NAME = { sizes = { 15, 13 } }                    -- a slot's name, on up to two lines
 
 local THEME = {
     colors = {
@@ -471,6 +473,7 @@ local function makeIcon(id, res, cpu)
 end
 
 function Edit:modelIconFor(id)
+    id = Room.splitColor(id)                                  -- every colour of an item shares its icon
     self.modelIcons = self.modelIcons or {}
     local cached = self.modelIcons[id]
     if cached ~= nil then
@@ -673,9 +676,9 @@ function Edit:doRemove(it)
     local room = self.room
     local cat = Room.CATALOG[it.id]
     if cat and cat.place == "wall" then
-        if room:removeWallItem(it) then room:invAdd(it.id); self:commit(); self._barDirty = true end
+        if room:removeWallItem(it) then room:invAdd(Room.stockKey(it)); self:commit(); self._barDirty = true end
     else
-        room:removeFurniture(it); room:invAdd(it.id); self:commit(); self._barDirty = true
+        room:removeFurniture(it); room:invAdd(Room.stockKey(it)); self:commit(); self._barDirty = true
     end
     self:deselect(true)
     Sfx.play("remove")
@@ -1152,11 +1155,11 @@ function Edit:updateEraser(mx, my, lpressed, lpressing)
     end
     if (lpressed or lpressing) and self.delTarget then
         if self.delKind == "furn" then
-            room:removeFurniture(self.delTarget); room:invAdd(self.delTarget.id)
+            room:removeFurniture(self.delTarget); room:invAdd(Room.stockKey(self.delTarget))
             Sfx.play("remove")
         elseif self.delKind == "wall" then
             if not room:removeWallItem(self.delTarget) then return end
-            room:invAdd(self.delTarget.id)
+            room:invAdd(Room.stockKey(self.delTarget))
             Sfx.play("remove")
         elseif self.delKind == "floor" then
             room:invAdd(self.delTarget); room:setFloor(c, r, nil)
@@ -1424,6 +1427,7 @@ function Edit:buildOverlays()
 end
 
 function Edit:ghostFurniture(id, c, r, facing, ok)
+    id = Room.splitColor(id)                                  -- a stock key in a colour previews its item
     local world = self.world
     local cat = Room.CATALOG[id]; if cat == nil then return end
     local w, h = cat.w, cat.h; if facing % 2 == 1 then w, h = h, w end
@@ -1516,15 +1520,8 @@ function Edit:draw()
         end
         local fg = s.sel and { 255, 255, 255 } or { 92, 62, 46 }
         local bg = s.sel and { 120, 60, 20, 220 } or { 255, 255, 255, 160 }
-        -- the name on up to two lines across the whole slot (a longer one squeezes its last line)
-        local lines = ui:wrapLines(15, Room.displayName(s.id), s.w - 10)
-        if #lines <= 1 then
-            ui:drawTextEx(15, lines[1] or "", floor(s.x + s.w / 2), s.y + s.h - 42, fg, bg, 1, 1, s.w - 10, "top")
-        else
-            local rest = table.concat(lines, " ", 2)
-            ui:drawTextEx(15, lines[1], floor(s.x + s.w / 2), s.y + s.h - 50, fg, bg, 1, 1, s.w - 10, "top")
-            ui:drawTextEx(15, rest, floor(s.x + s.w / 2), s.y + s.h - 30, fg, bg, 1, 1, s.w - 10, "top")
-        end
+        -- the name on up to two lines across the whole slot (an item in a colour: the colour in brackets after it)
+        Grid.drawName(ui, s.id, s.x + 5, s.y + s.h - 64, s.w - 10, 58, fg, bg, BAR_NAME)
         if s.n >= 0 then                                        -- infinite default swatches show no count
             local pill = self:badgePill()
             pill:SetColor(1, 1, 1); pill:SetScale(1, 1); pill:SetOpacity(1)

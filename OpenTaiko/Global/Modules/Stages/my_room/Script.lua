@@ -36,6 +36,7 @@ local MR       = require("mirror")          -- the mirror: the student and palet
 local FT       = require("fishtank")        -- the Fish Tank: its fish, kelp and blue lights; see fishtank.lua
 local LT       = require("lantern")         -- the Stone Lantern: its fire and warm light; see lantern.lua
 local WB       = require("workbench")       -- the Workbench: recolours floorings and paints; see workbench.lua
+local RB       = require("recycle")         -- the Recycle Bin: sells furniture, floorings and paints; see recycle.lua
 local AV       = require("avatar")          -- the students' billboard sprites (player + visitors); see avatar.lua
 local Student  = require("Characters.Student")   -- the chosen story student and its palette
 local Purse    = require("purse")           -- the coin purse laid over the landlord's offers; see purse.lua
@@ -356,6 +357,7 @@ function deactivate()
     MX.dispose()
     MR.dispose()
     WB.dispose()
+    RB.dispose()
     AV.dispose()
     look.set = nil
     purse:dispose()
@@ -414,6 +416,8 @@ local function interactablesInRange()
                         seen[it] = true; list[#list + 1] = { kind = "look", it = it, key = "look:" .. tostring(it) }
                     elseif cat.interact == "workbench" then
                         seen[it] = true; list[#list + 1] = { kind = "workbench", it = it, key = "workbench:" .. tostring(it) }
+                    elseif cat.interact == "recycle" then
+                        seen[it] = true; list[#list + 1] = { kind = "recycle", it = it, key = "recycle:" .. tostring(it) }
                     elseif cat.interact == "fishtank" then
                         seen[it] = true; list[#list + 1] = { kind = "fishtank", it = it, key = "fishtank:" .. tostring(it) }
                     elseif cat.interact == "lantern" then
@@ -472,7 +476,7 @@ local function interactGlow(focused)
         end
         if focused.kind == "matrix" and inst.parts then
             partBase = {}
-            for _, pp in ipairs(inst.parts) do partBase[pp.obj] = MX.glowNow(pp.material) end
+            for _, pp in ipairs(inst.parts) do partBase[pp.obj] = MX.glowNow(pp.material, focused.it) end
         end
         -- an on TV's screen keeps its own light: only the body pulses
         local skipObj = (focused.kind == "tv") and TV.screenObj(focused.it) or nil
@@ -850,6 +854,15 @@ WB.init{
     onChanged = function() saveRoom() end,
 }
 
+-- Recycle Bin context: it sells from the stock of the room shown, the coins go to the current save
+RB.init{
+    theme = PHONE_THEME,
+    playerIndex = function() return playerIndex end,
+    room = function() return room end,
+    save = function() return curSave() end,
+    onChanged = function() saveRoom() end,
+}
+
 local buildPhoneMenu   -- forward decl (the textbox panes route Back into it)
 
 local function buildPhoneTextPane(title, hintText, maxLen, confirmLabel, onConfirm)
@@ -1214,6 +1227,9 @@ function update(ts)
     elseif mode == "workbench" then
         if WB.update(dt, ts) == "closed" or not WB.isOpen() then mode = "play" end
         settlePlayer(dt); world:update(dt, px, py, pz); return nil
+    elseif mode == "recycle" then
+        if RB.update(dt, ts) == "closed" or not RB.isOpen() then mode = "play" end
+        settlePlayer(dt); world:update(dt, px, py, pz); return nil
     elseif mode == "edit" then
         if edit:update(ts, getEditCameraFuncs(dt)) == "exit" then
             mode = "play"; pmoving = false
@@ -1355,6 +1371,10 @@ function update(ts)
             SHARED:GetSharedSound("Decide"):Play()
             WB.open()
             mode = "workbench"
+        elseif focused.kind == "recycle" then
+            SHARED:GetSharedSound("Decide"):Play()
+            RB.open()
+            mode = "recycle"
         elseif focused.kind == "fishtank" then
             SHARED:GetSharedSound("Move"):Play()
             FT.toggle(focused.it)
@@ -1490,6 +1510,9 @@ function draw()
     elseif mode == "workbench" then
         hud:rect(0, 0, SCREEN_W, SCREEN_H, 8, 10, 18, 130)
         WB.draw()
+    elseif mode == "recycle" then
+        hud:rect(0, 0, SCREEN_W, SCREEN_H, 8, 10, 18, 130)
+        RB.draw()
     else
         -- input instructions: TOP-RIGHT, right-aligned, one per line (readability). The contextual
         -- action prompt (bright) leads, then any [Tab] switch, then the persistent controls.
@@ -1506,6 +1529,7 @@ function draw()
         elseif prompt == "fishtank" then instr[#instr + 1] = { t = HUD:tr("prompt_fishtank"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "lantern" then instr[#instr + 1] = { t = HUD:tr("prompt_lantern"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "workbench" then instr[#instr + 1] = { t = HUD:tr("prompt_workbench"), c = { 150, 230, 255 }, s = 24 }
+        elseif prompt == "recycle" then instr[#instr + 1] = { t = HUD:tr("prompt_recycle"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "exit" then instr[#instr + 1] = { t = HUD:tr("prompt_exit"), c = { 255, 230, 150 }, s = 24 }
         end
         if interCount > 1 then instr[#instr + 1] = { t = HUD:tr("prompt_switch"), c = { 200, 220, 240 }, s = 18 } end

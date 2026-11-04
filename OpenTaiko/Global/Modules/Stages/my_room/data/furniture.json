@@ -1,5 +1,5 @@
 {
-  "_comment": "AUTHORITATIVE furniture catalog (room.lua builds Room.CATALOG from this; the Lua DEFAULTS are only an emergency fallback). Fields: w/h footprint cells, place ground|wall, name, collH/collW/collD collision, surface+surfaceH (stackables sit on top), stackOn (may ride a surface), computer/fixed/interact behavior flags, emissiveColor [r,g,b,scale] = the emissivePart's glow (default a dim warm white), model = GLB stem override (Models/<id>.glb is auto-used when present), screen {tex,emit} + accent [r,g,b] arcade variants (tex resolves via A.SCREEN), picture resolves via A.PICTURE, wallGlb {file,h,axis,flip} wall-mounted GLB metadata, legacyMirror mirrors into the v1 furniture array, fit = the share of its footprint the model fills (0.92 when absent), shop = sold in the coin shop (3D thumbnail baked at onStart). New items: add an entry AND its id to _order plus a GLB in Models/ (a plain placeholder box renders until the model exists). Display names are the skin's ITEM_<ID> strings (Locales/<code>/), shared with the coin shop and the vault.",
+  "_comment": "AUTHORITATIVE furniture catalog (room.lua builds Room.CATALOG from this; the Lua DEFAULTS are only an emergency fallback). Fields: w/h footprint cells, place ground|wall, name, collH/collW/collD collision, surface+surfaceH (stackables sit on top), stackOn (may ride a surface), computer/fixed/interact behavior flags, emissiveColor [r,g,b,scale] = the emissivePart's glow (default a dim warm white), model = GLB stem override (Models/<id>.glb is auto-used when present), screen {tex,emit} + accent [r,g,b] arcade variants (tex resolves via A.SCREEN), picture resolves via A.PICTURE, wallGlb {file,h,axis,flip} wall-mounted GLB metadata, legacyMirror mirrors into the v1 furniture array, fit = the share of its footprint the model fills (0.92 when absent), shop = sold in the coin shop (3D thumbnail baked at onStart), sell = the coins an item from outside the shop fetches in the recycle bin (a shop item fetches 40% of its shop price; an item with neither is not sold there), colors = the colours (rrggbb) the workbench can give it, kept in stock as <id>:<rrggbb> and on a placed entry as `hex`, color = its own colour (the workbench's chip for the default), colorParts [{material, shade}] = the GLB materials an item in a colour shows it on (its colour times shade, 1 when absent). New items: add an entry AND its id to _order plus a GLB in Models/ (a plain placeholder box renders until the model exists). Display names are the skin's ITEM_<ID> strings (Locales/<code>/), shared with the coin shop and the vault.",
   "_order": [
     "desk",
     "chair",
@@ -49,7 +49,8 @@
     "stone_lantern",
     "bonsai",
     "fox",
-    "fox_statue"
+    "fox_statue",
+    "recycle_bin"
   ],
   "desk": {
     "w": 2,
@@ -232,6 +233,25 @@
     "collD": 0.8,
     "interact": "matrix",
     "shop": true,
+    "color": "4dff80",
+    "colors": [
+      "2e6bff",
+      "2ee6ff",
+      "ffe22e",
+      "ff2e3a",
+      "ffffff",
+      "a64dff",
+      "ff8a1f"
+    ],
+    "colorParts": [
+      {
+        "material": "MatrixGlow"
+      },
+      {
+        "material": "MatrixCubeGreen",
+        "shade": 0.55
+      }
+    ],
     "emissivePart": "MatrixGlow",
     "emissiveColor": [
       0.3,
@@ -325,6 +345,7 @@
     "w": 1,
     "h": 1,
     "place": "ground",
+    "sell": 50,
     "collH": 0.75,
     "rarity": "Common"
   },
@@ -332,6 +353,7 @@
     "w": 1,
     "h": 1,
     "place": "ground",
+    "sell": 60,
     "collH": 0.85,
     "fit": 0.7,
     "rarity": "Common"
@@ -340,6 +362,7 @@
     "w": 1,
     "h": 1,
     "place": "ground",
+    "sell": 150,
     "collH": 0.25,
     "collW": 0.4,
     "collD": 0.4,
@@ -350,6 +373,7 @@
     "w": 1,
     "h": 1,
     "place": "wall",
+    "sell": 170,
     "wallGlb": {
       "file": "pirate_key",
       "h": 0.25,
@@ -361,6 +385,7 @@
     "w": 1,
     "h": 1,
     "place": "wall",
+    "sell": 190,
     "wallGlb": {
       "file": "pirate_swords",
       "h": 0.6,
@@ -372,6 +397,7 @@
     "w": 1,
     "h": 1,
     "place": "ground",
+    "sell": 200,
     "collH": 0.6,
     "fit": 0.6,
     "rarity": "Uncommon"
@@ -380,6 +406,7 @@
     "w": 1,
     "h": 1,
     "place": "ground",
+    "sell": 220,
     "collH": 0.45,
     "fit": 0.5,
     "rarity": "Uncommon"
@@ -388,6 +415,7 @@
     "w": 1,
     "h": 1,
     "place": "ground",
+    "sell": 240,
     "collH": 0.15,
     "fit": 0.8,
     "stackOn": true,
@@ -397,6 +425,7 @@
     "w": 1,
     "h": 1,
     "place": "wall",
+    "sell": 600,
     "wallGlb": {
       "file": "gold_key",
       "h": 0.3,
@@ -408,6 +437,7 @@
     "w": 1,
     "h": 2,
     "place": "ground",
+    "sell": 700,
     "collH": 1.0,
     "rarity": "Rare"
   },
@@ -415,6 +445,7 @@
     "w": 1,
     "h": 1,
     "place": "ground",
+    "sell": 800,
     "collH": 0.3,
     "collW": 0.35,
     "collD": 0.35,
@@ -426,6 +457,7 @@
     "w": 1,
     "h": 1,
     "place": "ground",
+    "sell": 900,
     "collH": 0.4,
     "collW": 0.35,
     "collD": 0.35,
@@ -437,6 +469,7 @@
     "w": 1,
     "h": 1,
     "place": "ground",
+    "sell": 2500,
     "collH": 0.6,
     "fit": 0.7,
     "emissivePart": "Pink",
@@ -462,6 +495,7 @@
     "w": 1,
     "h": 2,
     "place": "ground",
+    "sell": 4000,
     "collH": 0.9,
     "stackOn": true,
     "interact": "fishtank",
@@ -481,6 +515,7 @@
     "w": 1,
     "h": 1,
     "place": "ground",
+    "sell": 30,
     "collH": 1.5,
     "fit": 0.6,
     "rarity": "Common"
@@ -489,6 +524,7 @@
     "w": 1,
     "h": 1,
     "place": "ground",
+    "sell": 80,
     "collH": 2.4,
     "rarity": "Uncommon"
   },
@@ -496,6 +532,7 @@
     "w": 1,
     "h": 1,
     "place": "ground",
+    "sell": 40,
     "collH": 0.35,
     "fit": 0.7,
     "rarity": "Common"
@@ -504,6 +541,7 @@
     "w": 1,
     "h": 1,
     "place": "ground",
+    "sell": 90,
     "collH": 1.05,
     "rarity": "Uncommon"
   },
@@ -511,6 +549,7 @@
     "w": 3,
     "h": 1,
     "place": "ground",
+    "sell": 200,
     "collH": 0.75,
     "fit": 0.85,
     "rarity": "Rare"
@@ -519,6 +558,7 @@
     "w": 2,
     "h": 2,
     "place": "ground",
+    "sell": 3000,
     "collH": 2.4,
     "rarity": "Legendary"
   },
@@ -526,6 +566,7 @@
     "w": 1,
     "h": 1,
     "place": "ground",
+    "sell": 240,
     "collH": 1.45,
     "fit": 0.45,
     "interact": "lantern",
@@ -535,6 +576,7 @@
     "w": 1,
     "h": 1,
     "place": "ground",
+    "sell": 50,
     "collH": 0.5,
     "collW": 0.55,
     "collD": 0.45,
@@ -546,6 +588,7 @@
     "w": 1,
     "h": 1,
     "place": "ground",
+    "sell": 100,
     "collH": 0.55,
     "collW": 0.35,
     "collD": 0.4,
@@ -558,8 +601,17 @@
     "w": 1,
     "h": 1,
     "place": "ground",
+    "sell": 120,
     "collH": 1.35,
     "fit": 0.6,
     "rarity": "Uncommon"
+  },
+  "recycle_bin": {
+    "w": 2,
+    "h": 1,
+    "place": "ground",
+    "collH": 1.45,
+    "interact": "recycle",
+    "shop": true
   }
 }
