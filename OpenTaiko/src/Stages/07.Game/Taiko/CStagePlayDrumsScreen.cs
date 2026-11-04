@@ -1059,8 +1059,8 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 					continue;
 				if (msPumpTjaTime > nowTja) // future
 					break;
-				long tHit = long.CreateSaturating(inputs[replayCursor[p]].Item1);
-				this.ProcessPadInput(p, (EPad)inputs[replayCursor[p]].Item2, tHit);
+				var (msHit, iPad) = inputs[replayCursor[p]];
+				this.ProcessPadInput(p, (EPad)iPad, msHit);
 			}
 		}
 	}
