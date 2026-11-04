@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0.5] - 2026-11-04 (Beta)
+
+- [Feat] Allow to sell no longer used furniture via the recycle bin
+- [Feat] Support decimal difficulties on dans
+- [Feat] Support custom metadata on .optktci/m/t charts
+- [Enhancement] Improve My Room's Workbench UI and make the Placeholder Matrix colorable
+
 ## [0.7.0.4] - 2026-11-04 (Beta)
 
 - [Enhancement] Various minor additions reducing lag spikes
