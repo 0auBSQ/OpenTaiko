@@ -1706,7 +1706,8 @@ internal class CTja : CActivity {
 						if (String.IsNullOrEmpty(line))
 							continue;
 						nNowReadLine++;
-						this.tInput_LineParseChart_V4(line);
+						if (this.tInput_LineParseChart_V4(line))
+							break;
 					}
 					this.EndChartDefinitionBody(); // handled here as #END might be missing
 				}
@@ -1913,28 +1914,27 @@ internal class CTja : CActivity {
 		#endregion
 	}
 
-	private void TryParseCommand(string InputText) {
+	private (bool success, bool endReached) TryParseCommand(string InputText) {
 		if (!TokenizeCommand(InputText, out string command, out string argumentFull, out string argument))
-			return;
+			return (false, false);
 
 		try {
-			this.ParseCommand(command, argument, argumentFull);
+			return (true, this.ParseCommand(command, argument, argumentFull));
 		} catch (NthArgError ex) {
 			this.AddArgError(ex);
 		} catch (Exception ex) {
 			this.AddCommandError(command, argumentFull, ex: ex);
 		}
+		return (false, false);
 	}
 
-	/// <summary>
-	/// 譜面読み込みメソッドV4で使用。
-	/// </summary>
-	/// <param name="InputText"></param>
-	private void ParseCommand(string command, string argument, string argumentFull) {
+	// returns whether `#END` is reached
+	private bool ParseCommand(string command, string argument, string argumentFull) {
 		if (command == "#START") {
 			InitializeChartDefinitionBody();
 		} else if (command == "#END") {
 			// handled at end of input
+			return true;
 		} else if (command == "#BPMCHANGE") {
 			double dbBPM = 0;
 			ParseArg(command, argument, "bpm_real", arg => dbBPM = arg.ParseReal());
@@ -2749,6 +2749,7 @@ internal class CTja : CActivity {
 			chip.nSoundPos -= 1;
 			this.listChip.Add(chip);
 		}
+		return false;
 	}
 
 	private static int strConvertBGAIndex(string strIndex) {
@@ -3298,15 +3299,15 @@ internal class CTja : CActivity {
 		);
 	}
 
-	private void tInput_LineParseChart_V4(string InputText) {
+	// returns whether `#END` is reached
+	private bool tInput_LineParseChart_V4(string InputText) {
 		if (!String.IsNullOrEmpty(InputText)) {
 			if (InputText.StartsWith("#")) {
 				// Call orders here
-				this.TryParseCommand(InputText);
-				return;
+				return this.TryParseCommand(InputText).endReached;
 			} else if (InputText.StartsWith("EXAM")) {
 				this.TryDanExamLoad(InputText);
-				return;
+				return false;
 			} else {
 				int nTextCount = this.nDivsNowMeasure!.Value;
 				if (this.bMeasureLineInsert == false) {
@@ -3351,7 +3352,7 @@ internal class CTja : CActivity {
 							this.SetBPMPointAtDefCursor(EBPMPointType.BpmMeasEnd, isAfterLastBpmPoint: true);
 						}
 						this.isBpmChangedMeasure = false;
-						return;
+						return false;
 					}
 					if (string.IsNullOrWhiteSpace(inputChar)) {
 						continue; // skip whitespaces
@@ -3409,6 +3410,7 @@ internal class CTja : CActivity {
 				}
 			}
 		}
+		return false;
 	}
 
 	// the visual beat (HBScroll/BMScroll) advances at #HISPEED × BPM: by a beat distance (a div) or by a time (a delay)
