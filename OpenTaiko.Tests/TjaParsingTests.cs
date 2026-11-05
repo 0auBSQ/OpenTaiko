@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using FDK.ExtensionMethods;
 using OpenTaiko;
 using Xunit;
 
@@ -52,12 +54,16 @@ namespace OpenTaikoTests {
 				.OrderBy(p => p, StringComparer.OrdinalIgnoreCase)
 				.Select(p => new object[] { Path.GetFileNameWithoutExtension(p) });
 
+		private static readonly JsonSerializerOptions deserializeDoubleOption = new() {
+			NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
+		};
+
 		[Theory]
 		[MemberData(nameof(Cases))]
 		public void Case(string name) {
 			using var doc = JsonDocument.Parse(File.ReadAllText(Path.Combine(CasesDir, name + ".json")));
 			var root = doc.RootElement;
-			string tjaName = root.TryGetProperty("tja", out var t) ? t.GetString() : name + ".tja";
+			string? tjaName = root.TryGetProperty("tja", out var t) ? t.GetString() : name + ".tja";
 			bool loadChart = !root.TryGetProperty("loadChart", out var lc) || lc.GetBoolean();
 			if (root.TryGetProperty("cases", out var cases)) { // grouped case for testing multiple difficulties or player-sides
 				foreach (var (expect, i) in cases.EnumerateArray().Select((v, i) => (v, i)))
@@ -67,13 +73,13 @@ namespace OpenTaikoTests {
 			}
 		}
 
-		private static void SimpleCase(string name, string tjaName, bool loadChart, JsonElement root) {
+		private static void SimpleCase(string name, string? tjaName, bool loadChart, JsonElement root) {
 			Difficulty difficulty = root.TryGetProperty("difficulty", out var d) ? (Difficulty)d.GetInt32() : Difficulty.Oni;
 			int playerCount = root.TryGetProperty("playerCount", out var pc) ? pc.GetInt32() : 1;
 			int playerSide = root.TryGetProperty("playerSide", out var ps) ? ps.GetInt32() : 0;
 
 			OpenTaiko.OpenTaiko.ConfigIni.nPlayerCount = playerCount;
-			var tja = Parse(Path.Combine(CasesDir, tjaName), difficulty, playerSide, loadChart);
+			var tja = Parse((tjaName == null) ? null : Path.Combine(CasesDir, tjaName), difficulty, playerSide, loadChart);
 			Assert.NotNull(tja.listChip);   // the parse must at least have survived
 
 			if (!root.TryGetProperty("expect", out var exp)) return;
@@ -81,7 +87,7 @@ namespace OpenTaikoTests {
 			if (exp.TryGetProperty("title", out var v))
 				Assert.Equal(v.GetString(), tja.TITLE.GetString(""));
 			if (exp.TryGetProperty("bpm", out v))
-				Assert.Equal(v.GetDouble(), tja.BPM, 3);
+				Assert.Equal(v.Deserialize<double>(deserializeDoubleOption), tja.BPM, 3);
 
 			foreach (var (key, channel) in CountKeys) {
 				if (!exp.TryGetProperty(key, out v)) continue;
@@ -96,14 +102,14 @@ namespace OpenTaikoTests {
 			}
 
 			if (exp.TryGetProperty("noteGapsMs", out v)) {
-				int tol = exp.TryGetProperty("gapToleranceMs", out var tv) ? tv.GetInt32() : 10;
+				uint tol = (uint)Math.Max(0, exp.TryGetProperty("gapToleranceMs", out var tv) ? tv.GetInt32() : 10);
 				var times = NoteTimes(tja);
-				var gaps = times.Zip(times.Skip(1), (a, b) => b - a).ToList();
-				var want = v.EnumerateArray().Select(x => x.GetInt32()).ToList();
+				var gaps = times.Zip(times.Skip(1), (a, b) => b.SaturatingSubBy(a)).ToList();
+				var want = v.EnumerateArray().Select(x => x.GetInt64()).ToList();
 				Assert.True(want.Count == gaps.Count,
 					$"{name}: expected {want.Count} note gaps, got {gaps.Count} [{string.Join(", ", gaps)}]");
 				for (int i = 0; i < want.Count; i++)
-					Assert.True(Math.Abs(want[i] - gaps[i]) <= tol,
+					Assert.True(want[i].AbsDiffTo(gaps[i]) <= tol,
 						$"{name}: gap {i} expected {want[i]}±{tol}ms, got {gaps[i]}ms");
 			}
 
@@ -119,12 +125,15 @@ namespace OpenTaikoTests {
 		}
 
 		/// <summary>Parse in a temp copy: t入力 writes a uniqueID.json next to the chart.</summary>
-		private static CTja Parse(string tjaPath, Difficulty difficulty, int playerSide, bool loadChart) {
+		private static CTja Parse(string? tjaPath, Difficulty difficulty, int playerSide, bool loadChart) {
 			string dir = Path.Combine(Path.GetTempPath(), "ot_tja_" + Guid.NewGuid().ToString("N"));
 			Directory.CreateDirectory(dir);
 			try {
-				string p = Path.Combine(dir, Path.GetFileName(tjaPath));
-				File.Copy(tjaPath, p);
+				string p = dir; // unloadable as file
+				if (!string.IsNullOrEmpty(tjaPath)) {
+					p = Path.Combine(dir, Path.GetFileName(tjaPath));
+					File.Copy(tjaPath, p);
+				}
 				var tja = new CTja();
 				tja.Activate();   // allocates listChip & friends (CActivity lifecycle)
 				tja.tInput(p, difficulty, playerSide, loadChart, 0);
@@ -134,7 +143,7 @@ namespace OpenTaikoTests {
 
 		// listChip order (the engine's play order) — monotonicity is checked against it, not re-sorted
 		private static List<long> NoteTimes(CTja tja)
-			=> tja.listChip.Where(c => c.nChannelNo >= 0x11 && c.nChannelNo <= 0x14)
+			=> tja.listChip.Where(c => NotesManager.IsHittableNote(c))
 				.Select(c => c.nSoundTimems).ToList();
 
 		// listNoteChip[] order (the definition order), includes branches in their definition order as in TJA

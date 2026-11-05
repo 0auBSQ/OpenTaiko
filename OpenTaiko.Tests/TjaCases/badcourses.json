@@ -1,0 +1,32 @@
+{
+	"cases": [
+		{
+			"difficulty": 0,
+			"expect": {
+				"dons": 2
+			}
+		},
+		{
+			"difficulty": 3,
+			"expect": {
+				"dons": 2
+			}
+		},
+		{
+			"difficulty": 3,
+			"playerCount": 2,
+			"playerSide": 0,
+			"expect": {
+				"dons": 2
+			}
+		},
+		{
+			"difficulty": 3,
+			"playerCount": 2,
+			"playerSide": 1,
+			"expect": {
+				"dons": 3
+			}
+		}
+	]
+}

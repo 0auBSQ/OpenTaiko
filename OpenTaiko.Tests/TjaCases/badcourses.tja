@@ -1,0 +1,19 @@
+TITLE:Bad Courses
+BPM:120
+
+STYLE:2
+
+#START P1
+11,
+#END
+
+#START P2
+111,
+#END
+
+COURSE:
+STYLE:1
+
+#START
+1,
+#END
