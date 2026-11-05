@@ -228,6 +228,8 @@ public sealed class CLuaKeyConfigService {
 				var key = (SlimDXKeys.Key)ev.nKey;
 				if (key == SlimDXKeys.Key.Escape) { OpenTaiko.Skin.soundCancelSFX.tPlay(); FinishKeyName(""); return (true, false); }
 				if (key == SlimDXKeys.Key.Return) { OpenTaiko.Skin.soundError.tPlay(); continue; }
+				if (key == SlimDXKeys.Key.Backspace) { OpenTaiko.Skin.soundError.tPlay(); continue; }
+				if (key == SlimDXKeys.Key.Delete) { OpenTaiko.Skin.soundError.tPlay(); continue; }
 				OpenTaiko.Skin.soundDecideSFX.tPlay();
 				FinishKeyName(key.ToString());
 				return (true, true);
@@ -242,6 +244,8 @@ public sealed class CLuaKeyConfigService {
 						this.Finish(false);
 						return (true, false);
 					case SlimDXKeys.Key.Return:
+					case SlimDXKeys.Key.Backspace:
+					case SlimDXKeys.Key.Delete:
 						OpenTaiko.Skin.soundError.tPlay();
 						goto nextKey;
 				}
