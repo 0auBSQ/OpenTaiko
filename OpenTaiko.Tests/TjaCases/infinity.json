@@ -1,0 +1,20 @@
+{
+	"cases": [
+		{
+			"difficulty": 0,
+			"expect": {
+				"bpm": "Infinity",
+				"noteGapsMs": [ 2000, 2000, 0, 9223372036854771807, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+				"gapToleranceMs": 0
+			}
+		},
+		{
+			"difficulty": 1,
+			"expect": {
+				"bpm": "Infinity",
+				"noteGapsMs": [ 0, 2000, 9223372036854773807, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+				"gapToleranceMs": 0
+			}
+		}
+	]
+}
