@@ -1701,15 +1701,18 @@ internal class CTja : CActivity {
 			try {
 				{
 					using StringReader reader = new(strCourse);
+					bool endReached = false;
 					for (string? line; (line = reader.ReadLine()) != null;) {
 						line = RemoveCommandFromTJALine(line, 1);
 						if (String.IsNullOrEmpty(line))
 							continue;
 						nNowReadLine++;
-						if (this.tInput_LineParseChart_V4(line))
+						if (this.tInput_LineParseChart_V4(line)) {
+							endReached = true;
 							break;
+						}
 					}
-					this.EndChartDefinitionBody(); // handled here as #END might be missing
+					this.EndChartDefinitionBody(endReached); // handled here as #END might be missing
 				}
 
 				// Retrieve all the global exams (non individual) at the end
@@ -1997,6 +2000,8 @@ internal class CTja : CActivity {
 
 			this.SetBPMPointAtDefCursor(EBPMPointType.HiSpeed);
 		} else if (command == "#MEASURE") {
+			if (this.iDivNowMeasure != 0)
+				this.AddWarn($"Mid-measure {command} has parser-dependent behaviors; applied immediately");
 			double[] dbLength = new double[2];
 			ParseArg(command, argument, "timeSignature_fractionReal", arg => {
 				var strArray = arg.Split(new char[] { '/' }, 2);
@@ -2326,6 +2331,9 @@ internal class CTja : CActivity {
 		} else if (command == "#SECTION") {
 			this.listChip.Add(this.NewEventChipAtDefCursor(0xDD, 1)); //分岐:条件リセット
 		} else if (command == "#BRANCHSTART") {
+			if (this.iDivNowMeasure != 0)
+				this.AddWarn($"Mid-measure {command} has parser-dependent behaviors; judged at head of current measure and colored the bar line for the next measure");
+
 			//分岐:分岐スタート
 			#region [ 譜面分岐のパース方法を作り直し ]
 			this.PlayerSideMetadata.bHasBranch = true;
@@ -2460,11 +2468,11 @@ internal class CTja : CActivity {
 				this.bHasBranchDan[List_DanSongs.Count - 1] = true;
 			}
 		} else if (command == "#N") {
-			this.SwitchBranch(ECourse.eNormal);//分岐:普通譜面
+			this.SwitchBranch(command, ECourse.eNormal);
 		} else if (command == "#E") {
-			this.SwitchBranch(ECourse.eExpert);//分岐:玄人譜面
+			this.SwitchBranch(command, ECourse.eExpert);
 		} else if (command == "#M") {
-			this.SwitchBranch(ECourse.eMaster);//分岐:達人譜面
+			this.SwitchBranch(command, ECourse.eMaster);
 		} else if (command == "#LEVELHOLD") {
 			var chip = this.NewEventChipAtDefCursor(0xE1, 1);
 			chip.nSoundPos -= 1;
@@ -2641,6 +2649,8 @@ internal class CTja : CActivity {
 			PendingCommandIfTrigger = null;
 			this.listChip.Add(chip);
 		} else if (command == "#NEXTSONG") {
+			if ((Difficulty)this.nReferenceDifficulty != Difficulty.Dan)
+				this.AddWarn($"{command} is for {Difficulty.Dan} difficulty, but the chart is declared as {(Difficulty)this.nReferenceDifficulty} difficulty");
 			// prevent branch section across songs
 			this.GotoBranchEnd(forced: true);
 
@@ -3047,9 +3057,15 @@ internal class CTja : CActivity {
 		this.SaveBranchPoint();
 	}
 
-	private void EndChartDefinitionBody() {
-		if (this.nCurrentMeasureCount <= 0) // empty chart with missing #START
+	private void EndChartDefinitionBody(bool endReached) {
+		if (this.nCurrentMeasureCount <= 0) { // empty chart with missing #START
+			this.AddWarn("Missing #START command at the start of notechart definition");
 			this.InitializeChartDefinitionBody();
+		}
+		if (this.iDivNowMeasure > 0)
+			this.AddWarn("Missing measure-ending comma (,) at the end of the last measure of the notechart definition");
+		if (!endReached)
+			this.AddWarn("Missing #END command at the end of notechart definition");
 
 		// prevent ending too early for some branches
 		this.GotoBranchEnd(forced: true);
@@ -3144,7 +3160,10 @@ internal class CTja : CActivity {
 		}
 	}
 
-	private void SwitchBranch(ECourse branch) {
+	private void SwitchBranch(string command, ECourse branch) {
+		if (this.iDivNowMeasure != 0)
+			this.AddWarn($"Mid-measure {command} has parser-dependent behaviors; notes within the current measure in all branches will be misplaced");
+
 		this.ResetNoteSymbolOneShotCommands(endOfSection: true);
 
 		#region [ 記録した情報をNow~に適応 ]
@@ -3312,8 +3331,13 @@ internal class CTja : CActivity {
 				int nTextCount = this.nDivsNowMeasure!.Value;
 				if (this.bMeasureLineInsert == false) {
 					// 小節線にもやってあげないと
-					if (this.nCurrentMeasureCount <= 0) // missing #START
+					if (this.nCurrentMeasureCount <= 0) {
+						this.AddWarn("Missing #START command at the start of notechart definition");
 						this.InitializeChartDefinitionBody();
+					}
+					if (this.nCurrentMeasureCount == 1 && (Difficulty)this.nReferenceDifficulty == Difficulty.Dan && List_DanSongs.Count <= 0)
+						this.AddWarn($"Note symbols placed before the first #NEXTSONG command in {Difficulty.Dan} difficulty", input: InputText);
+
 					this.ForEachCurrentBranch((branch) => {
 						int iBranch = (int)branch;
 						CChip chip = this.NewScrolledChipAtDefCursor(0x50, 0, Math.Max(1, nTextCount), branch);
