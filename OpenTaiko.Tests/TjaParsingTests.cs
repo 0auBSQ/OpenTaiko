@@ -34,6 +34,21 @@ namespace OpenTaikoTests {
 			if (OpenTaiko.OpenTaiko.rCurrentStage == null)
 				OpenTaiko.OpenTaiko.rCurrentStage = new CStage();
 		}
+
+		internal static CTja ParseTjaFile(string path, Difficulty difficulty = Difficulty.Oni, int playerCount = 1, int playerSide = 0, bool loadChart = true) {
+			OpenTaiko.OpenTaiko.ConfigIni.nPlayerCount = playerCount;
+			var tja = new CTja();
+			tja.Activate();   // allocates listChip & friends (CActivity lifecycle)
+			tja.tInput(path, difficulty, playerSide, loadChart, 0);
+			return tja;
+		}
+
+		internal static CTja ParseTjaText(string tmpDirPrefix, string filename, string content, Difficulty difficulty = Difficulty.Oni, int playerCount = 1, int playerSide = 0, bool loadChart = true) {
+			using TempDir dir = new(tmpDirPrefix);
+			string p = Path.Combine(dir, filename);
+			File.WriteAllText(p, content);
+			return ParseTjaFile(p, difficulty, playerCount, playerSide, loadChart);
+		}
 	}
 
 	[Collection("tja")]
@@ -78,8 +93,7 @@ namespace OpenTaikoTests {
 			int playerCount = root.TryGetProperty("playerCount", out var pc) ? pc.GetInt32() : 1;
 			int playerSide = root.TryGetProperty("playerSide", out var ps) ? ps.GetInt32() : 0;
 
-			OpenTaiko.OpenTaiko.ConfigIni.nPlayerCount = playerCount;
-			var tja = Parse((tjaName == null) ? null : Path.Combine(CasesDir, tjaName), difficulty, playerSide, loadChart);
+			var tja = Parse((tjaName == null) ? null : Path.Combine(CasesDir, tjaName), difficulty, playerCount, playerSide, loadChart);
 			Assert.NotNull(tja.listChip);   // the parse must at least have survived
 
 			if (!root.TryGetProperty("expect", out var exp)) return;
@@ -125,20 +139,14 @@ namespace OpenTaikoTests {
 		}
 
 		/// <summary>Parse in a temp copy: t入力 writes a uniqueID.json next to the chart.</summary>
-		private static CTja Parse(string? tjaPath, Difficulty difficulty, int playerSide, bool loadChart) {
-			string dir = Path.Combine(Path.GetTempPath(), "ot_tja_" + Guid.NewGuid().ToString("N"));
-			Directory.CreateDirectory(dir);
-			try {
-				string p = dir; // unloadable as file
-				if (!string.IsNullOrEmpty(tjaPath)) {
-					p = Path.Combine(dir, Path.GetFileName(tjaPath));
-					File.Copy(tjaPath, p);
-				}
-				var tja = new CTja();
-				tja.Activate();   // allocates listChip & friends (CActivity lifecycle)
-				tja.tInput(p, difficulty, playerSide, loadChart, 0);
-				return tja;
-			} finally { try { Directory.Delete(dir, true); } catch { } }
+		private static CTja Parse(string? tjaPath, Difficulty difficulty, int playerCount, int playerSide, bool loadChart) {
+			using TempDir dir = new("ot_tja_");
+			string p = dir; // unloadable as file
+			if (!string.IsNullOrEmpty(tjaPath)) {
+				p = Path.Combine(dir, Path.GetFileName(tjaPath));
+				File.Copy(tjaPath, p);
+			}
+			return TjaFixture.ParseTjaFile(p, difficulty, playerCount, playerSide, loadChart);
 		}
 
 		// listChip order (the engine's play order) — monotonicity is checked against it, not re-sorted

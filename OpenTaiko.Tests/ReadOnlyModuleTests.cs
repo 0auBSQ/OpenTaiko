@@ -8,13 +8,9 @@ using Xunit;
 namespace OpenTaikoTests {
 	// read-only modules (ROActivities, backgrounds) cannot write STORAGE files, change SQL databases or mount songs
 	public class ReadOnlyModuleTests : IDisposable {
-		private readonly string dir = Path.Combine(Path.GetTempPath(), "ro_module_" + Guid.NewGuid().ToString("N"));
+		private readonly TempDir dir = new TempDir("ro_module_");
 
-		public ReadOnlyModuleTests() => Directory.CreateDirectory(dir);
-
-		public void Dispose() {
-			try { Directory.Delete(dir, true); } catch (IOException) { }
-		}
+		public void Dispose() => dir.Dispose();
 
 		[Fact]
 		public void Storage_WritesOnlyWhenWritable() {

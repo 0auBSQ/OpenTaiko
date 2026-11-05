@@ -9,14 +9,13 @@ namespace OpenTaiko.Tests;
 // #NEXTSONG's level may have decimals, like a chart's LEVEL: the song keeps the whole level and the decimal one
 [Collection("tja")]
 public class DanSongLevelTests : IDisposable, IClassFixture<OpenTaikoTests.TjaFixture> {
-	private readonly string dir = Path.Combine(Path.GetTempPath(), "optk-dan-" + Guid.NewGuid().ToString("N"));
+	private readonly OpenTaikoTests.TempDir dir = new("optk-dan-");
 
 	public DanSongLevelTests(OpenTaikoTests.TjaFixture _) {
 		Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);   // #NEXTSONG's file lookup reads Shift_JIS, as the game registers at start
-		Directory.CreateDirectory(dir);
 	}
 
-	public void Dispose() => Directory.Delete(dir, true);
+	public void Dispose() => dir.Dispose();
 
 	private CTja.DanSongs[] Load(params string[] levels) {
 		string path = Path.Combine(dir, "dan.tja");
