@@ -178,19 +178,6 @@ namespace OpenTaikoTests {
 			+ "#BRANCHSTART p,50,80\n#N\n1111,\n#E\n2222,\n#M\n3344,\n#BRANCHEND\n"
 			+ "1111222211112222,\n7000000800000000,\n2121212121212121,\n#END\n";
 
-		private static CTja Parse(int playerSide) {
-			string dir = Path.Combine(Path.GetTempPath(), "ot_tja_" + Guid.NewGuid().ToString("N"));
-			Directory.CreateDirectory(dir);
-			try {
-				string path = Path.Combine(dir, "placeholder.tja");
-				File.WriteAllText(path, PlaceholderChart);
-				var tja = new CTja();
-				tja.Activate();
-				tja.tInput(path, Difficulty.Oni, playerSide, true, 0);
-				return tja;
-			} finally { try { Directory.Delete(dir, true); } catch { } }
-		}
-
 		// events only player 1's timeline holds, as the mixer plan adds them, with their definition indexes
 		private static void AddMixerEvents(CTja player1) {
 			int idx = player1.listChip.Count;
@@ -199,11 +186,13 @@ namespace OpenTaikoTests {
 			player1.listChip.Sort();
 		}
 
+		private static CTja ParseOneSide(int playerSide)
+			=> TjaFixture.ParseTjaText("ot_tja_", "placeholder.tja", PlaceholderChart, playerCount: 1, playerSide: playerSide);
+
 		// player 1's chart and the AI's are two loads of one course; only player 1's holds the mixer events
 		private static (CTja player1, CTja ai) LoadBothSides() {
-			OpenTaiko.OpenTaiko.ConfigIni.nPlayerCount = 1;
-			var player1 = Parse(0);
-			var ai = Parse(1);
+			var player1 = ParseOneSide(0);
+			var ai = ParseOneSide(1);
 			AddMixerEvents(player1);
 			return (player1, ai);
 		}
@@ -287,24 +276,21 @@ namespace OpenTaikoTests {
 		// a TCI course defines no chip indexes; two builds of it still get the same mines and fuses
 		[Fact]
 		public void MirroredAI_GetsPlayer1sMines_OnATciCourse() {
-			string dir = Path.Combine(Path.GetTempPath(), "ot_tci_" + Guid.NewGuid().ToString("N"));
-			Directory.CreateDirectory(dir);
-			try {
-				File.WriteAllText(Path.Combine(dir, "chart.tci"), PlaceholderTci);
-				File.WriteAllText(Path.Combine(dir, "o.osu"), PlaceholderOsu());
-				var tci = new CTci(Path.Combine(dir, "chart.tci"));
-				var player1 = tci.BuildCtja((int)Difficulty.Oni);
-				var ai = tci.BuildCtja((int)Difficulty.Oni);
-				Assert.All(ai.listChip, c => Assert.Equal(-1, c.idxDefine));
-				AddMixerEvents(player1);
+			using TempDir dir = new("ot_tci_");
+			File.WriteAllText(Path.Combine(dir, "chart.tci"), PlaceholderTci);
+			File.WriteAllText(Path.Combine(dir, "o.osu"), PlaceholderOsu());
+			var tci = new CTci(Path.Combine(dir, "chart.tci"));
+			var player1 = tci.BuildCtja((int)Difficulty.Oni);
+			var ai = tci.BuildCtja((int)Difficulty.Oni);
+			Assert.All(ai.listChip, c => Assert.Equal(-1, c.idxDefine));
+			AddMixerEvents(player1);
 
-				var effect = new DBCharacter.CharacterEffect { BombFactor = 40, FuseRollFactor = 100 };
-				ApplyFunMod(EFunMods.Minesweeper, player1, ai, 2024, effect);
-				Assert.Equal(Shape(player1), Shape(ai));
-				Assert.Contains(ai.listChip, c => c.nChannelNo == 0x1C);
-				Assert.Contains(ai.listChip, c => c.nChannelNo == 0x1D);
-				Assert.Contains(ai.listChip, c => NotesManager.IsMissableNote(c));
-			} finally { try { Directory.Delete(dir, true); } catch { } }
+			var effect = new DBCharacter.CharacterEffect { BombFactor = 40, FuseRollFactor = 100 };
+			ApplyFunMod(EFunMods.Minesweeper, player1, ai, 2024, effect);
+			Assert.Equal(Shape(player1), Shape(ai));
+			Assert.Contains(ai.listChip, c => c.nChannelNo == 0x1C);
+			Assert.Contains(ai.listChip, c => c.nChannelNo == 0x1D);
+			Assert.Contains(ai.listChip, c => NotesManager.IsMissableNote(c));
 		}
 	}
 }

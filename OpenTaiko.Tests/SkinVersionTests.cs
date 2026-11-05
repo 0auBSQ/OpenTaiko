@@ -6,10 +6,9 @@ namespace OpenTaiko.Tests;
 
 // CSkin.ReadSkinVersion: the SkinConfig.ini version that decides whether a skin is offered and loaded
 public class SkinVersionTests : IDisposable {
-	private readonly string _dir = Path.Combine(Path.GetTempPath(), "otk_skinver_" + Guid.NewGuid().ToString("N"));
+	private readonly OpenTaikoTests.TempDir _dir = new("otk_skinver_");
 
-	public SkinVersionTests() => Directory.CreateDirectory(_dir);
-	public void Dispose() => Directory.Delete(_dir, true);
+	public void Dispose() => _dir.Dispose();
 
 	private Version? Read(string config) {
 		File.WriteAllText(Path.Combine(_dir, "SkinConfig.ini"), config);

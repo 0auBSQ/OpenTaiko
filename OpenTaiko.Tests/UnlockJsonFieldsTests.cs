@@ -7,10 +7,9 @@ namespace OpenTaiko.Tests;
 // A character's or puchichara's Unlock.json reads the song fields too: custom_unlock_text, hidden_index and rarity
 // (which replaces the Metadata.json rarity); a file without them reads as before
 public class UnlockJsonFieldsTests : IDisposable {
-	private readonly string dir = Path.Combine(Path.GetTempPath(), "optk-unlock-" + Guid.NewGuid().ToString("N"));
+	private readonly OpenTaikoTests.TempDir dir = new("optk-unlock-");
 
-	public UnlockJsonFieldsTests() => Directory.CreateDirectory(dir);
-	public void Dispose() => Directory.Delete(dir, true);
+	public void Dispose() => dir.Dispose();
 
 	private CUnlockCondition Read(string json) {
 		string file = Path.Combine(dir, "Unlock.json");
