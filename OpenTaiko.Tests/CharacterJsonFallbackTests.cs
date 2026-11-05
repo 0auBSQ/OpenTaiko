@@ -7,10 +7,9 @@ namespace OpenTaiko.Tests;
 // ConfigManager.ReadOr and character folders: a broken json gives the defaults instead of throwing, so one bad
 // character cannot stop the boot before CHARACTERLIST exists
 public class CharacterJsonFallbackTests : IDisposable {
-	private readonly string dir = Path.Combine(Path.GetTempPath(), "optk-chara-" + Guid.NewGuid().ToString("N"));
+	private readonly OpenTaikoTests.TempDir dir = new("optk-chara-");
 
-	public CharacterJsonFallbackTests() => Directory.CreateDirectory(dir);
-	public void Dispose() => Directory.Delete(dir, true);
+	public void Dispose() => dir.Dispose();
 
 	[Fact]
 	public void BrokenJsonGivesTheFallback() {

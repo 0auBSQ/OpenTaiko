@@ -8,19 +8,16 @@ using Xunit;
 namespace OpenTaikoTests {
 	// v0.6.1.3: global strings, one text value per save and name; the counters and triggers take their names as parameters
 	public class GlobalStringsTests : IDisposable {
-		private readonly string dir = Path.Combine(Path.GetTempPath(), "global_strings_" + Guid.NewGuid().ToString("N"));
+		private readonly TempDir dir = new("global_strings_");
 		private readonly string db;
 
 		public GlobalStringsTests() {
-			Directory.CreateDirectory(dir);
 			db = Path.Combine(dir, "Saves.db3");
 			string template = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "OpenTaiko", ".init", "Saves.db3");
 			File.Copy(template, db);
 		}
 
-		public void Dispose() {
-			try { Directory.Delete(dir, true); } catch (IOException) { }
-		}
+		public void Dispose() => dir.Dispose();
 
 		private SqliteConnection Open() {
 			var connection = new SqliteConnection($"Data Source={db};Pooling=False");

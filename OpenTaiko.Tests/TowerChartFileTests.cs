@@ -7,11 +7,9 @@ namespace OpenTaiko.Tests;
 
 // .optktct / .tct: one course of any song, by unique ID, played as a tower
 public class TowerChartFileTests : IDisposable {
-	private readonly string dir = Path.Combine(Path.GetTempPath(), "optk-tct-" + Guid.NewGuid().ToString("N"));
+	private readonly OpenTaikoTests.TempDir dir = new("optk-tct-");
 
-	public TowerChartFileTests() => Directory.CreateDirectory(dir);
-
-	public void Dispose() => Directory.Delete(dir, true);
+	public void Dispose() => dir.Dispose();
 
 	private CTct Load(string json) {
 		string path = Path.Combine(dir, "tower.optktct");
@@ -106,7 +104,7 @@ public class TowerChartFileTests : IDisposable {
 // a .tct over a real .tja song: the tower node and the chart played as a tower
 [Collection("tja")]
 public class TowerChartFromSongTests : IClassFixture<OpenTaikoTests.TjaFixture>, IDisposable {
-	private readonly string dir = Path.Combine(Path.GetTempPath(), "optk-tct-song-" + Guid.NewGuid().ToString("N"));
+	private readonly OpenTaikoTests.TempDir dir = new("optk-tct-song-");
 	private readonly CSongListNode song;
 
 	public TowerChartFromSongTests(OpenTaikoTests.TjaFixture _) {
@@ -132,7 +130,7 @@ public class TowerChartFromSongTests : IClassFixture<OpenTaikoTests.TjaFixture>,
 
 	public void Dispose() {
 		CSongDict.tRemoveSongNode(song.uniqueId);
-		Directory.Delete(dir, true);
+		dir.Dispose();
 	}
 
 	private CTct Tower(string extra = "") {

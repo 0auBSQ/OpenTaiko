@@ -17,17 +17,14 @@ namespace OpenTaikoTests {
 			"[scene.0]\r\nscene=0\r\nname=Root\r\nvideo.width=1920\r\nvideo.height=1080\r\nvideo.rate=60\r\nvideo.scale=1\r\naudio.rate=44100\r\n";
 
 		private readonly ITestOutputHelper _output;
-		private readonly string _folder;
+		private readonly TempDir _folder;
 
 		public AviUtl2ScriptTests(ITestOutputHelper output) {
 			_output = output;
-			_folder = Path.Combine(Path.GetTempPath(), "aup2-scripts-" + Guid.NewGuid().ToString("N"));
-			Directory.CreateDirectory(_folder);
+			_folder = new("aup2-scripts-");
 		}
 
-		public void Dispose() {
-			try { Directory.Delete(_folder, true); } catch (IOException) { }
-		}
+		public void Dispose() => _folder.Dispose();
 
 		private sealed class FakeHost : IAup2Host {
 			public int Polys, Triangles, Draws, Figures, Reads, Composed;
@@ -220,7 +217,7 @@ namespace OpenTaikoTests {
 		[Fact]
 		public void AScriptMovesTheObjectWithItsSetting() {
 			Write("move.anm2", "--track@vx:X速度,-10,10,2\n--check@down:下へ,0\nobj.ox = obj.ox + vx * obj.time\nif down == 1 then obj.oy = 7 end\n");
-			using var lib = new Aup2ScriptLibrary(new[] { _folder });
+			using var lib = new Aup2ScriptLibrary(new[] { _folder.Dir });
 			var host = new FakeHost();
 			string constant = Shape("effect.name=move\r\nX速度=5.00\r\n下へ=1\r\n");
 			Assert.Equal(100, Play(lib, host, constant, 0).X, 6);
@@ -244,7 +241,7 @@ namespace OpenTaikoTests {
 				"@shift\n--track0:dx,-100,100,10\n--check0:twice,0\n--dialog:倍率,local k=2;on/chk,local on=1;list,local pts={1,2,3};\n" +
 				"local d = obj.track0 * k\nif obj.check0 then d = d * 2 end\nif on == 1 then obj.ox = obj.ox + d + #pts end\n",
 				CodePagesEncodingProvider.Instance.GetEncoding(932));
-			using var lib = new Aup2ScriptLibrary(new[] { _folder });
+			using var lib = new Aup2ScriptLibrary(new[] { _folder.Dir });
 			var host = new FakeHost();
 			Assert.Equal(100 + 10 * 2 + 3, Play(lib, host, Shape("effect.name=shift@old\r\n"), 0).X, 6);
 			Assert.Equal(100 + 4 * 3 * 2 + 2, Play(lib, host, Shape("effect.name=shift\r\ndx=4.00\r\ntwice=1\r\n倍率=3\r\nlist={5,6}\r\n"), 0).X, 6);
@@ -277,7 +274,7 @@ namespace OpenTaikoTests {
 				"obj.drawpoly({ { 0, 0, 0, 0, 0 }, { 1, 0, 0, 1, 0 }, { 1, 1, 0, 1, 1 }, { 0, 0, 1, 0, 0 }, { 1, 0, 1, 1, 0 }, { 1, 1, 1, 1, 1 } }, 3)\n" +
 				"obj.drawpoly({ { 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, w, 0, w, h, 0, h } })\n" +
 				"print(r, \",\", g, \",\", b, \",\", a, \",\", w, \",\", h, \",\", obj.w, \",\", RGB(1, 2, 3), \",\", OR(1, 2), \",\", SHIFT(8, -1), \",\", 7 / 2 * 2)\n");
-			using var lib = new Aup2ScriptLibrary(new[] { _folder });
+			using var lib = new Aup2ScriptLibrary(new[] { _folder.Dir });
 			var host = new FakeHost();
 			Play(lib, host, Shape("effect.name=many\r\n"), 0);
 			Assert.Empty(lib.Errors);
@@ -311,7 +308,7 @@ namespace OpenTaikoTests {
 		[Fact]
 		public void AnErrorOrAnEndlessLoopLeavesTheObjectAsItWas() {
 			Write("@bad.anm2", "@broken\nobj.ox = 50\nobj.zoom = 3\nerror(\"no\")\n@typo\nobj.ox = = 1\n@forever\nobj.ox = 9\nwhile true do end\n@fine\nobj.ox = 1\n");
-			using var lib = new Aup2ScriptLibrary(new[] { _folder }) { BudgetMs = 150 };
+			using var lib = new Aup2ScriptLibrary(new[] { _folder.Dir }) { BudgetMs = 150 };
 			var host = new FakeHost();
 			foreach (string name in new[] { "broken", "typo", "forever" }) {
 				var item = Play(lib, host, Shape("effect.name=" + name + "@bad\r\n"), 0);
