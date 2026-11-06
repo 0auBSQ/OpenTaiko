@@ -383,6 +383,8 @@ internal class CTja : CActivity {
 	public int DANTICK = 0;
 	public Color DANTICKCOLOR = Color.White;
 
+	private const int idxListVDBgMovie1to = 1; // video list index 1 is for BGMOVIE:
+	private const int idxListVDBga1to = idxListVDBgMovie1to + 1;
 	public Dictionary<int, CVideoDecoder>? listVD;
 	public List<CBPM> listBPM = null!; // Initial 3 for each branch
 	public List<CChip> listChip = null!; // increasing time > chip priority > definition order
@@ -407,7 +409,7 @@ internal class CTja : CActivity {
 	public const string DanBuilderSentinelPath = "::dan_builder::";
 	public string PANEL;
 	public string PATH_WAV;
-	public string PREIMAGE;
+	public string? PREIMAGE = null;
 	public string PREVIEW;
 	public string? strHashofDTXFile;
 	public string strFileName;
@@ -486,11 +488,11 @@ internal class CTja : CActivity {
 
 	public List<SKBitmap> listLyric = null!; // lyric lines from #LYRIC, not including #LYRIC for songs having loaded lyric file
 	public List<STLYRIC> listLyric2 = null!; // lyric lines from loaded lyric files
-	public List<int> IdxLyric2AtSongEnds = null!;
+	public List<int>? IdxLyric2AtSongEnds = null; // null: not specified
 
 	//public Dictionary<double, CChip> kusudaMAP = new Dictionary<double, CChip>();
 
-	// If lyric file is used (VTT/LRC) for the i-th song, ignore #LYRIC commands for the i-th song & ignore other LYRICS:/LYRICFILE: headers
+	// If lyric file is used (VTT/LRC) for the i-th song, ignore #LYRIC commands for the i-th song
 	public List<bool> usingLyricsFile = [];
 
 	private int[] listBalloon_Branch_iLast; // [3] for common
@@ -515,14 +517,14 @@ internal class CTja : CActivity {
 	//6:左上
 	//7:左下
 
-	public string? strBGIMAGE_PATH;
-	public string? strBGVIDEO_PATH;
+	public string? strBGIMAGE_PATH = null;
+	public string? strBGVIDEO_PATH = null;
 
 	// In TJA notation but scaled to ms
 	public double msSuddenShowOffset = 0;
 	public double msSuddenMoveOffset = 0;
 
-	public string? strBGM_PATH;
+	public string? strBGM_PATH = null;
 	public int SongVol;
 	public LoudnessMetadata? SongLoudnessMetadata;
 
@@ -623,7 +625,6 @@ internal class CTja : CActivity {
 		this.SELECTBG = "";
 		this.bLyrics = false;
 		this.PREVIEW = "";
-		this.PREIMAGE = "";
 		this.BACKGROUND = "";
 		this.PATH_WAV = "";
 		this.BPM = 120.0;
@@ -1125,7 +1126,6 @@ internal class CTja : CActivity {
 				this.nInfinitePAN![j] = -10000 - j;
 				this.nInfiniteSIZE![j] = -j;
 			}
-			this.nInternalNumberWAV1to = 1;
 			this.bStackSkipIfToEndif = new Stack<bool>();
 			this.bStackSkipIfToEndif.Push(false);
 			for (int k = 0; k < 7; k++) {
@@ -1249,16 +1249,19 @@ internal class CTja : CActivity {
 									chip.dbSoundTimems += this.msOFFSET_Abs;
 
 								#region[listlyric2の時間合わせ]
-								if (this.IdxLyric2AtSongEnds.Count > 0) {
-									// has #NEXTSONG -> skip WAVE: (if exist)
-									bool skipWave = (this.strBGM_PATH != null) && (List_DanSongs.Count > 0);
-									int lyricFileIndex = Math.Clamp(chip.nIntValue_InternalNumber - (skipWave ? 2 : 1), 0, this.IdxLyric2AtSongEnds.Count - 1);
-									int idxStart = this.IdxLyric2AtSongEnds[Math.Max(0, lyricFileIndex - 1)];
-									int idxEnd = this.IdxLyric2AtSongEnds[lyricFileIndex];
-									for (int ind = idxStart; ind < idxEnd; ind++) {
-										STLYRIC lyrictmp = this.listLyric2[ind];
-										lyrictmp.Time = origListLyricTime[ind].SaturatingAdd(chip.nSoundTimems);
-										this.listLyric2[ind] = lyrictmp;
+								if (this.IdxLyric2AtSongEnds != null && this.IdxLyric2AtSongEnds.Count > 0) {
+									bool isWave = (chip.nIntValue_InternalNumber == idxListWAVWave1to);
+									if (!(isWave && this.List_DanSongs.Count > 0)) { // any #NEXTSONG skips WAVE:
+										int idxLyricFile = isWave ? 0 : chip.nIntValue_InternalNumber - (idxListWAVWave1to + 1);
+										if (idxLyricFile >= 0 && idxLyricFile < this.IdxLyric2AtSongEnds.Count) {
+											int idxStart = (idxLyricFile == 0) ? 0 : this.IdxLyric2AtSongEnds[idxLyricFile - 1];
+											int idxEnd = this.IdxLyric2AtSongEnds[idxLyricFile];
+											for (int ind = idxStart; ind < idxEnd; ind++) {
+												STLYRIC lyrictmp = this.listLyric2[ind];
+												lyrictmp.Time = origListLyricTime[ind].SaturatingAdd(chip.nSoundTimems);
+												this.listLyric2[ind] = lyrictmp;
+											}
+										}
 									}
 								}
 								#endregion
@@ -2084,14 +2087,14 @@ internal class CTja : CActivity {
 		} else if (command == "#BGAON") {
 			var commandData = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 			int index = 2;
-			ParseArg(command, argument, commandData, 0, "indexBGA_2digits", arg => index = strConvertBGAIndex(arg) + 2);
+			ParseArg(command, argument, commandData, 0, "indexBGA_2digits", arg => index = strConvertBGAIndex(arg) + idxListVDBga1to);
 
 			var chip = this.NewEventChipAtDefCursor(0x54, index, index);
 			ParseArg(command, argument, commandData, 1, "msSeek_real", arg => chip.VideoStartTimeMs = (int)(arg.ParseRealF() * 1000));
 			this.listChip.Add(chip);
 		} else if (command == "#BGAOFF") {
 			int index = 2;
-			ParseArg(command, argument, "indexBGA_2digits", arg => index = strConvertBGAIndex(arg.Trim()) + 2);
+			ParseArg(command, argument, "indexBGA_2digits", arg => index = strConvertBGAIndex(arg.Trim()) + idxListVDBga1to);
 			this.listChip.Add(this.NewEventChipAtDefCursor(0x55, index, index));
 		} else if (command == "#CAMVMOVESTART") {
 			//starts vertical camera moving: <start x> to <end y>
@@ -2707,6 +2710,11 @@ internal class CTja : CActivity {
 			if (strArray.Length > 8 && !string.IsNullOrWhiteSpace(strArray[8]))
 				this.TryArg(() => ParseArg(command, argumentFull, strArray, 8, "boolHideTitle", arg => dansongs.bTitleShow = bool.Parse(arg), $"Defaulted it to {dansongs.bTitleShow}"));
 
+			// silence `WAVE:` playback if `WAVE:` is not for the initial part of the chart
+			bool chartInitial = this.List_DanSongs.Count == 0 && this.nCurrentMeasureCount == 1 && this.iDivNowMeasure == 0;
+			if (chartInitial && this.listWAV.TryGetValue(idxListWAVWave1to, out var wavWave))
+				wavWave.strFileName = "";
+
 			var chipBgm = this.NewEventChipAtDefCursor(0x01, this.nInternalNumberWAV1to, 0x01);
 
 			dansongs.Wave = new CWAV {
@@ -2722,10 +2730,10 @@ internal class CTja : CActivity {
 			};
 			dansongs.Wave.SongLoudnessMetadata = LoudnessMetadataScanner.LoadForAudioPath(dansongs.Wave.strFileName);
 			List_DanSongs.Add(dansongs);
+
 			this.listWAV.Add(this.nInternalNumberWAV1to, dansongs.Wave);
 			this.nInternalNumberWAV1to++;
 
-			this.listWAV[1].strFileName = "";
 
 			Array.Resize(ref bHasBranchDan, List_DanSongs.Count);
 			Array.Resize(ref nDan_NotesCount, List_DanSongs.Count);
@@ -3045,7 +3053,7 @@ internal class CTja : CActivity {
 		// add music start chip
 		//#STARTと同時に鳴らすのはどうかと思うけどしゃーなしだな。
 		var chipBgm = this.NewEventChipAtDefCursor(0x01, 1, 0x01);
-		if (this.listWAV.TryGetValue(1, out var wavBgm))
+		if (this.listWAV.TryGetValue(idxListWAVWave1to, out var wavBgm))
 			wavBgm.PlayChip = chipBgm;
 		this.listChip.Add(chipBgm);
 
@@ -3082,6 +3090,13 @@ internal class CTja : CActivity {
 				}
 				InsertNoteAtDefCursor(NotesManager.ENoteType.EndRoll, 0, 1, branch);
 			}
+		}
+
+		// ignore unused extra lyrics files
+		var nSongs = Math.Max(1, this.List_DanSongs?.Count ?? 0); // the first is for the whole chart if no #NEXTSONG in the chart
+		if (this.IdxLyric2AtSongEnds != null && nSongs < this.IdxLyric2AtSongEnds.Count) {
+			var idxLyrics2End = this.IdxLyric2AtSongEnds[nSongs - 1];
+			this.listLyric2.RemoveRange(idxLyrics2End, this.listLyric2.Count - idxLyrics2End);
 		}
 
 		this.InsertEndOfChartChips(this.dbNowTime, this.nCurrentMeasureCount, msFadeOutDelay: 1000); //2016.07.16 kairera0467 終了時から1秒後に設置するよう変更。
@@ -3993,6 +4008,13 @@ internal class CTja : CActivity {
 			}
 		}
 
+		bool checkGlobalness(object? saved) {
+			if (this.nowCourseScope == (int)Difficulty.Total || saved == null)
+				return true;
+			this.AddWarn($"ignoring an extra post-COURSE {strCommandName} header, argument: {strCommandParam}");
+			return false;
+		}
+
 		//パラメータを分別、そこから割り当てていきます。
 		if (strCommandName.Equals("TITLE")) {
 			this.TITLE.SetString("default", strCommandParam);
@@ -4008,7 +4030,8 @@ internal class CTja : CActivity {
 			string _lang = strCommandName.Substring(8).ToLowerInvariant();
 			this.SUBTITLE.SetString(_lang, strCommandParam);
 		} else if (strCommandName.Equals("PREIMAGE")) {
-			this.PREIMAGE = strCommandParam;
+			if (checkGlobalness(this.PREIMAGE))
+				this.PREIMAGE = strCommandParam;
 		} else if (strCommandName.Equals("BPM")) {
 			if (strCommandParam.Contains(","))
 				strCommandParam = strCommandParam.Replace(',', '.');
@@ -4021,32 +4044,38 @@ internal class CTja : CActivity {
 			this.MaxBPM = dbBPM;
 			this.dbNowBPM = dbBPM;
 		} else if (strCommandName.Equals("WAVE")) {
-			if (strBGM_PATH != null) {
-				this.AddWarn($"ignoring an extra WAVE header, argument: {strCommandParam}");
-			} else {
-				this.strBGM_PATH = CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, strCommandParam);
-				//tbWave.Text = strCommandParam;
-				if (this.listWAV != null) {
-					// 2018-08-27 twopointzero - DO attempt to load (or queue scanning) loudness metadata here.
-					//                           TJAP3 is either launching, enumerating songs, or is about to
-					//                           begin playing a song. If metadata is available, we want it now.
-					//                           If is not yet available then we wish to queue scanning.
-					var absoluteBgmPath = Path.Combine(this.strFolderPath, this.strBGM_PATH);
-					this.SongLoudnessMetadata = LoudnessMetadataScanner.LoadForAudioPath(absoluteBgmPath);
+			if (checkGlobalness(this.strBGM_PATH)) {
+				if (this.listWAV.TryGetValue(idxListWAVWave1to, out var wavPrev))
+					wavPrev.Dispose();
 
-					var wav = new CWAV() {
-						nInternalNumber = this.nInternalNumberWAV1to,
-						nNotationTopNumber = 1,
-						nChipSize = this.nInfiniteSIZE![this.nInternalNumberWAV1to],
-						nPosition = this.nInfinitePAN![this.nInternalNumberWAV1to],
-						SongVol = this.SongVol,
-						SongLoudnessMetadata = this.SongLoudnessMetadata,
-						strFileName = this.strBGM_PATH,
-						strCommentText = "TJA BGM",
-					};
+				if (string.IsNullOrEmpty(strCommandParam)) {
+					this.strBGM_PATH = "";
+					this.SongLoudnessMetadata = null;
+					this.listWAV.Remove(idxListWAVWave1to);
+				} else {
+					this.strBGM_PATH = CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, strCommandParam);
+					//tbWave.Text = strCommandParam;
+					if (this.listWAV != null) {
+						// 2018-08-27 twopointzero - DO attempt to load (or queue scanning) loudness metadata here.
+						//                           TJAP3 is either launching, enumerating songs, or is about to
+						//                           begin playing a song. If metadata is available, we want it now.
+						//                           If is not yet available then we wish to queue scanning.
+						var absoluteBgmPath = Path.Combine(this.strFolderPath, this.strBGM_PATH);
+						this.SongLoudnessMetadata = LoudnessMetadataScanner.LoadForAudioPath(absoluteBgmPath);
 
-					this.listWAV.Add(this.nInternalNumberWAV1to, wav);
-					this.nInternalNumberWAV1to++;
+						var wav = new CWAV() {
+							nInternalNumber = idxListWAVWave1to,
+							nNotationTopNumber = idxListWAVWave1to,
+							nChipSize = this.nInfiniteSIZE![idxListWAVWave1to],
+							nPosition = this.nInfinitePAN![idxListWAVWave1to],
+							SongVol = this.SongVol,
+							SongLoudnessMetadata = this.SongLoudnessMetadata,
+							strFileName = this.strBGM_PATH,
+							strCommentText = "TJA BGM",
+						};
+
+						this.listWAV[idxListWAVWave1to] = wav;
+					}
 				}
 			}
 		} else if (strCommandName.Equals("OFFSET")) {
@@ -4109,55 +4138,68 @@ internal class CTja : CActivity {
 		} else if (strCommandName.Equals("BGMOVIE")) {
 			//2016.02.02 kairera0467
 			//背景動画の定義。DTXから入力もできるが、tjaからも入力できるようにする。
+			if (checkGlobalness(this.strBGVIDEO_PATH)) {
+				if (this.listVD!.TryGetValue(idxListVDBgMovie1to, out var vdPrev))
+					vdPrev.Dispose();
 
-			this.strBGVIDEO_PATH = string.IsNullOrEmpty(strCommandParam) ? strCommandParam
-				: CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, strCommandParam);
+				if (string.IsNullOrEmpty(strCommandParam)) {
+					this.strBGVIDEO_PATH = "";
+					this.listVD!.Remove(idxListVDBgMovie1to);
+				} else {
+					this.strBGVIDEO_PATH = CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, strCommandParam);
 
-			string strVideoFilename;
-			if (!string.IsNullOrEmpty(this.PATH_WAV))
-				strVideoFilename = this.PATH_WAV + this.strBGVIDEO_PATH;
-			else
-				strVideoFilename = this.strFolderPath + this.strBGVIDEO_PATH;
+					string strVideoFilename;
+					if (!string.IsNullOrEmpty(this.PATH_WAV))
+						strVideoFilename = this.PATH_WAV + this.strBGVIDEO_PATH;
+					else
+						strVideoFilename = this.strFolderPath + this.strBGVIDEO_PATH;
 
-			try {
-				// Only open the native (FFmpeg) video decoder when the chart is actually being loaded
-				// for play. During metadata enumeration (bLoadChart == false) the decoder is never used
-				// (tAVILoad is itself gated on bLoadChart) and would leak native memory, since the parsed
-				// CTja is discarded without Dispose. Enumeration still records strBGVIDEO_PATH above.
-				// Only the first player's chart shows videos, so the other players' charts open none.
-				if (this.bLoadChart && this.nPlayerSide == 0)
-					this.listVD![1] = new CVideoDecoder(strVideoFilename);
-			} catch (Exception e) {
-				this.AddWarn($"{strCommandName}: Exception when generating decoder for video {strVideoFilename}: {e.Message}; continued", e);
-				this.listVD!.Remove(1);
+					try {
+						// Only open the native (FFmpeg) video decoder when the chart is actually being loaded
+						// for play. During metadata enumeration (bLoadChart == false) the decoder is never used
+						// (tAVILoad is itself gated on bLoadChart) and would leak native memory, since the parsed
+						// CTja is discarded without Dispose. Enumeration still records strBGVIDEO_PATH above.
+						// Only the first player's chart shows videos, so the other players' charts open none.
+						if (this.bLoadChart && this.nPlayerSide == 0)
+							this.listVD[idxListVDBgMovie1to] = new CVideoDecoder(strVideoFilename);
+					} catch (Exception e) {
+						this.AddWarn($"{strCommandName}: Exception when generating decoder for video {strVideoFilename}: {e.Message}; continued", e);
+						this.listVD!.Remove(idxListVDBgMovie1to);
+					}
+				}
 			}
 		} else if (strCommandName.StartsWith("BGA")) {
 			//2016.02.02 kairera0467
 			//背景動画の定義。DTXから入力もできるが、tjaからも入力できるようにする。
 			var indexText = strCommandName.Remove(0, 3);
 			var index = 2;
-			ParseArg(strCommandName, strCommandParam, null, [indexText], "indexBGASuffix_2digits", arg => index = strConvertBGAIndex(arg) + 2);
+			ParseArg(strCommandName, strCommandParam, null, [indexText], "indexBGASuffix_2digits", arg => index = strConvertBGAIndex(arg) + idxListVDBga1to);
 
-			string videoPath = string.IsNullOrEmpty(strCommandParam) ? strCommandParam
-					: CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, strCommandParam);
+			if (this.listVD!.TryGetValue(index, out var vdPrev))
+				vdPrev.Dispose();
 
-			string strVideoFilename;
-			if (!string.IsNullOrEmpty(this.PATH_WAV))
-				strVideoFilename = this.PATH_WAV + videoPath;
-			else
-				strVideoFilename = this.strFolderPath + videoPath;
-
-			try {
-				// As with BGMOVIE: only open the native decoder for actual play, not metadata enumeration.
-				if (this.bLoadChart && this.nPlayerSide == 0)
-					this.listVD![index] = new CVideoDecoder(strVideoFilename);
-			} catch (Exception e) {
-				this.AddWarn($"{strCommandName}: Exception when generating decoder for video {strVideoFilename}: {e.Message}; continued.", e);
+			if (string.IsNullOrEmpty(strCommandParam)) {
 				this.listVD!.Remove(index);
+			} else {
+				string videoPath = CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, strCommandParam);
+				string strVideoFilename;
+				if (!string.IsNullOrEmpty(this.PATH_WAV))
+					strVideoFilename = this.PATH_WAV + videoPath;
+				else
+					strVideoFilename = this.strFolderPath + videoPath;
+				try {
+					// As with BGMOVIE: only open the native decoder for actual play, not metadata enumeration.
+					if (this.bLoadChart && this.nPlayerSide == 0)
+						this.listVD[index] = new CVideoDecoder(strVideoFilename);
+				} catch (Exception e) {
+					this.AddWarn($"{strCommandName}: Exception when generating decoder for video {strVideoFilename}: {e.Message}; continued.", e);
+					this.listVD!.Remove(index);
+				}
 			}
 		} else if (strCommandName.Equals("BGIMAGE")) {
 			//2016.02.02 kairera0467
-			this.strBGIMAGE_PATH = strCommandParam;
+			if (checkGlobalness(this.strBGIMAGE_PATH))
+				this.strBGIMAGE_PATH = strCommandParam;
 		} else if (strCommandName.Equals(".CUTSCENE_INTRO")) { // .CUTSCENE_INTRO:<path>,<repeat?>
 			string[] args = SplitComma(strCommandParam);
 			string path = !(0 < args.Length) ? "" : CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, args[0]);
@@ -4232,9 +4274,7 @@ internal class CTja : CActivity {
 			}
 			this.CutSceneOutros = outros;
 		} else if (strCommandName.Equals("LYRICS") || strCommandName.Equals("LYRICFILE")) {
-			if (usingLyricsFile.Any()) {
-				this.AddWarn($"ignoring an extra LYRICS / LYRICFILE header, argument: {strCommandParam}");
-			} else {
+			if (checkGlobalness(this.IdxLyric2AtSongEnds)) {
 				bool isLoadingLyrics = this.bLoadChart && OpenTaiko.ConfigIni.nPlayerCount < 4;
 				List<STLYRIC> listLyrics = [];
 				List<int> idxLyric2AtSongEnds = [];
@@ -4821,7 +4861,6 @@ internal class CTja : CActivity {
 		this.listBRANCH = new List<CChip>();
 		this.listLyric = new List<SKBitmap>();
 		this.listLyric2 = new List<STLYRIC>();
-		this.IdxLyric2AtSongEnds = new();
 		this.List_DanSongs = new List<DanSongs>();
 		this.listObj = new Dictionary<string, CSongObject>();
 		this.listTextures = new Dictionary<string, CTexture?>();
@@ -4859,7 +4898,7 @@ internal class CTja : CActivity {
 
 		this.listLyric?.Clear();
 		this.listLyric2?.Clear();
-		this.IdxLyric2AtSongEnds.Clear();
+		this.IdxLyric2AtSongEnds?.Clear();
 
 		if (this.listObj != null) {
 			foreach (KeyValuePair<string, CSongObject> pair in this.listObj) {
@@ -4917,7 +4956,8 @@ internal class CTja : CActivity {
 
 	private int nPolyphonicSounds = 4;                          // #28228 2012.5.1 yyagi
 
-	private int nInternalNumberWAV1to;
+	private const int idxListWAVWave1to = 1; // wav list index 1 is for WAVE:
+	private int nInternalNumberWAV1to = idxListWAVWave1to + 1;
 	private int[]? nInfiniteBPM;
 	private int[]? nInfinitePAN;
 	private int[]? nInfiniteSIZE;
