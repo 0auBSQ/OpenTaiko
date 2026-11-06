@@ -863,11 +863,11 @@ public class CSound : IDisposable {
 
 		nBytes = durationSeconds > 0 ? Bass.ChannelSeconds2Bytes(this._hBassStream, durationSeconds) : long.MaxValue;
 
+		this.CurrentSoundDeviceType = deviceType; // set before common processings, so that IsBassSound is true and the sound's attributes can be successfully initialized
 		tBASSSoundCreate_StreamCreateAfterCommonProcess(hMixer);
 		// with time-stretch the tempo stream is the one in the mixer from the start, so the speed can change
 		// at any time without touching the mixer
 		if (timeStretch && this._hTempoStream != 0) this.hBassStream = this._hTempoStream;
-		this.CurrentSoundDeviceType = deviceType;   // set once creation succeeded, like the file-backed sounds
 	}
 
 	// the speed on the stream that is in the mixer: tempo (pitch kept) when the tempo stream is there,
