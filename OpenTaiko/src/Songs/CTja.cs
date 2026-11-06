@@ -250,9 +250,11 @@ internal class CTja : CActivity {
 
 	public struct STLYRIC {
 		public long Time;
-		public SKBitmap TextTex;
+		public SKBitmap? TextTex; // allow null for skin-less test
 		public string Text;
 		public int index;
+
+		public override string ToString() => $"{nameof(STLYRIC)}#{index + 1} ({Time} ms): [{Text}]";
 	}
 
 
@@ -2483,8 +2485,8 @@ internal class CTja : CActivity {
 			this.listChip.Add(chip);
 		} else if (command == "#LYRIC" && !usingLyricsFile.ElementAtOrDefault(Math.Max(0, List_DanSongs.Count - 1)) && OpenTaiko.ConfigIni.nPlayerCount < 4) // Ignore #LYRIC if a lyric file for the song is already loaded
 		{
-			if (this.bLoadChart)//起動時に重たくなってしまう問題の修正用
-				this.listLyric.Add(this.pfLyricsFont!.DrawText(argumentFull, OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30));
+			if (this.bLoadChart && this.pfLyricsFont != null)//起動時に重たくなってしまう問題の修正用
+				this.listLyric.Add(this.pfLyricsFont.DrawText(argumentFull, OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30));
 
 			var chip = this.NewEventChipAtDefCursor(0xF1, this.listLyric.Count - 1);
 			this.listChip.Add(chip);
@@ -4400,7 +4402,7 @@ internal class CTja : CActivity {
 					for (int listindex = 0; listindex < list.Count; listindex++) {
 						STLYRIC stlrc;
 						stlrc.Text = line;
-						stlrc.TextTex = this.pfLyricsFont!.DrawText(line, OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30);
+						stlrc.TextTex = this.pfLyricsFont?.DrawText(line, OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30);
 						stlrc.Time = list[listindex];
 						stlrc.index = lrclist.Count;
 						lrclist.Add(stlrc);
