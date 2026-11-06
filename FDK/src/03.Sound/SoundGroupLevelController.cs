@@ -49,6 +49,9 @@ public sealed class SoundGroupLevelController {
 		_sounds = sounds;
 
 		_sounds.CollectionChanged += SoundsOnCollectionChanged;
+
+		foreach (CSound sound in sounds) // level not set yet
+			SetLevel(sound);
 	}
 
 	public void SetLevel(ESoundGroup soundGroup, int level) {

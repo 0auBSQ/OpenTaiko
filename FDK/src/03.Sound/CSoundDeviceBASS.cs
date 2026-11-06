@@ -202,28 +202,10 @@ public partial class CSoundDeviceBASS : ISoundDevice {
 
 	}
 
-	#region [ tCreateSound() ]
-	public CSound tCreateSound(string strFilename, ESoundGroup soundGroup) {
-		var sound = new CSound(soundGroup);
-		sound.CreateBassSound(strFilename, this.MixerHandle);
-		return sound;
-	}
-
-	public void tCreateSound(string strFilename, CSound sound) {
-		sound.CreateBassSound(strFilename, this.MixerHandle);
-	}
-
-	public CSound tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, ESoundGroup soundGroup) {
-		var sound = new CSound(soundGroup);
-		sound.CreateBassUserSound(frequency, channels, durationSeconds, this.MixerHandle, proc, ESoundDeviceType.Bass, SoundManager.bIsTimeStretch);
-		return sound;
-	}
-
-	public void tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, CSound sound) {
-		sound.CreateBassUserSound(frequency, channels, durationSeconds, this.MixerHandle, proc, ESoundDeviceType.Bass, SoundManager.bIsTimeStretch);
-	}
-	#endregion
-
+	public void tCreateSound(string strFilename, CSound sound)
+		=> sound.CreateBassSound(strFilename, this.MixerHandle, this.MixerHandle == CSound.NoMixerHandle ? BassFlags.Default : BassFlags.Decode, ESoundDeviceType.Bass);
+	public void tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, CSound sound)
+		=> sound.CreateBassUserSound(frequency, channels, durationSeconds, this.MixerHandle, proc, ESoundDeviceType.Bass, SoundManager.bIsTimeStretch);
 
 	#region [ Dispose-Finallizeパターン実装 ]
 	//-----------------

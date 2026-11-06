@@ -319,28 +319,10 @@ internal class CSoundDeviceASIO : ISoundDevice {
 		}
 	}
 
-	#region [ tサウンドを作成する() ]
-	public CSound tCreateSound(string strFileName, ESoundGroup soundGroup) {
-		var sound = new CSound(soundGroup);
-		sound.CreateASIOSound(strFileName, this.hMixer);
-		return sound;
-	}
-
-	public void tCreateSound(string strFileName, CSound sound) {
-		sound.CreateASIOSound(strFileName, this.hMixer);
-	}
-
-	public CSound tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, ESoundGroup soundGroup) {
-		var sound = new CSound(soundGroup);
-		sound.CreateBassUserSound(frequency, channels, durationSeconds, this.hMixer, proc, ESoundDeviceType.ASIO, SoundManager.bIsTimeStretch);
-		return sound;
-	}
-
-	public void tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, CSound sound) {
-		sound.CreateBassUserSound(frequency, channels, durationSeconds, this.hMixer, proc, ESoundDeviceType.ASIO, SoundManager.bIsTimeStretch);
-	}
-	#endregion
-
+	public void tCreateSound(string strFileName, CSound sound)
+		=> sound.CreateBassSound(strFileName, this.hMixer, BassFlags.Decode, ESoundDeviceType.ASIO);
+	public void tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, CSound sound)
+		=> sound.CreateBassUserSound(frequency, channels, durationSeconds, this.hMixer, proc, ESoundDeviceType.ASIO, SoundManager.bIsTimeStretch);
 
 	/// <summary>The driver stops asking for sound (tAsioProcess is no longer called); Dispose closes it. A driver
 	/// that does not answer in time or crashes meanwhile is left alone (<see cref="Abandon"/>).</summary>

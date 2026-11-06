@@ -22,11 +22,11 @@ public class CSound : IDisposable {
 	// We will revisit this if/when song select BGM fade-in/fade-out needs
 	// updating due to changing the type or range of AutomationLevel
 	public const int MaximumAutomationLevel = 100;
-	public const int DefaultAutomationLevel = 100;
+	public const int DefaultAutomationLevel = 100; // expected volume before applying any adjustments
 
 	public const int MinimumGroupLevel = 0;
 	public const int MaximumGroupLevel = 100;
-	public const int DefaultGroupLevel = 100;
+	public const int DefaultGroupLevel = 100; // expected volume before applying any adjustments
 	public const int DefaultMasterLevel = 20;
 	public const int DefaultSoundEffectLevel = 80;
 	public const int DefaultVoiceLevel = 90;
@@ -36,7 +36,7 @@ public class CSound : IDisposable {
 	public static readonly Lufs MinimumLufs = new Lufs(-100.0);
 	public static readonly Lufs MaximumLufs = new Lufs(10.0); // support an approximate doubling in volume.
 
-	private static readonly Lufs DefaultGain = new Lufs(0.0);
+	private static readonly Lufs DefaultGain = new Lufs(0.0); // expected volume before applying any adjustments
 
 	public readonly ESoundGroup SoundGroup;
 
@@ -77,37 +77,46 @@ public class CSound : IDisposable {
 			return _PlaySpeed;
 		}
 		set {
-			if (this.IsUserStream) { this.SetSpeedLive(value); return; }
-			if (_PlaySpeed != value) {
-				_PlaySpeed = value;
-				IsNormalSpeed = (_PlaySpeed == 1.000f);
-				if (IsBassSound) {
-					if (_hTempoStream != 0 && !this.IsNormalSpeed)  // 再生速度がx1.000のときは、TempoStreamを用いないようにして高速化する
-					{
-						this.hBassStream = _hTempoStream;
-					} else {
-						this.hBassStream = _hBassStream;
-					}
+			if (this.IsUserStream)
+				this.SetSpeedWhilePlaying(value);
+			else if (_PlaySpeed != value)
+				this.SetSpeed(value);
+		}
+	}
 
-					if (SoundManager.bIsTimeStretch) {
-						Bass.ChannelSetAttribute(this.hBassStream, ChannelAttribute.Tempo, (float)(PlaySpeed * 100 - 100));
-						// clear a sample rate SetSpeedWhilePlaying left on either stream
-						Bass.ChannelSetAttribute(_hBassStream, ChannelAttribute.Frequency, (float)(_Frequency * nOriginalFrequency));
-						if (_hTempoStream != 0)
-							Bass.ChannelSetAttribute(_hTempoStream, ChannelAttribute.Frequency, (float)(_Frequency * nOriginalFrequency));
-						//double seconds = Bass.BASS_ChannelBytes2Seconds( this.hTempoStream, nBytes );
-						//this.n総演奏時間ms = (int) ( seconds * 1000 );
-					} else {
-						Bass.ChannelSetAttribute(this.hBassStream, ChannelAttribute.Frequency, (float)(_Frequency * _PlaySpeed * nOriginalFrequency));
-					}
-				}
+	/// <summary>
+	/// Sets playback speed on all BASS streams.
+	/// With time-stretch it sets the tempo (pitch kept); otherwise it scales the sample rate,
+	/// so the pitch shifts with the speed.
+	/// </summary>
+	private void SetSpeed(double value) {
+		_PlaySpeed = value;
+		IsNormalSpeed = (_PlaySpeed == 1.000f);
+		if (IsBassSound) {
+			if (_hTempoStream != 0 && !this.IsNormalSpeed)  // 再生速度がx1.000のときは、TempoStreamを用いないようにして高速化する
+			{
+				this.hBassStream = _hTempoStream;
+			} else {
+				this.hBassStream = _hBassStream;
+			}
+
+			if (SoundManager.bIsTimeStretch) {
+				Bass.ChannelSetAttribute(this.hBassStream, ChannelAttribute.Tempo, (float)(PlaySpeed * 100 - 100));
+				// clear a sample rate SetSpeedWhilePlaying left on either stream
+				Bass.ChannelSetAttribute(_hBassStream, ChannelAttribute.Frequency, (float)(_Frequency * nOriginalFrequency));
+				if (_hTempoStream != 0)
+					Bass.ChannelSetAttribute(_hTempoStream, ChannelAttribute.Frequency, (float)(_Frequency * nOriginalFrequency));
+				//double seconds = Bass.BASS_ChannelBytes2Seconds( this.hTempoStream, nBytes );
+				//this.n総演奏時間ms = (int) ( seconds * 1000 );
+			} else {
+				Bass.ChannelSetAttribute(this.hBassStream, ChannelAttribute.Frequency, (float)(_Frequency * _PlaySpeed * nOriginalFrequency));
 			}
 		}
 	}
 
 	/// <summary>
 	/// Sets playback speed on whichever BASS stream is currently connected to the mixer.
-	/// Unlike setting <see cref="PlaySpeed"/> directly, this works even when the sound
+	/// Unlike <see cref="SetSpeed"/>, this works even when the sound
 	/// was initially added to the mixer at 1.0x speed (i.e. via <c>_hBassStream</c>).
 	/// With time-stretch and the tempo stream in the mixer it sets the tempo (pitch kept); otherwise it scales the sample
 	/// rate, so the pitch shifts with the speed.
@@ -117,10 +126,12 @@ public class CSound : IDisposable {
 		IsNormalSpeed = (speed == 1.000);
 		if (IsBassSound && nOriginalFrequency != 0) {
 			// Find which stream is actually connected to the mixer and apply there.
-			int streamInMixer = BassMix.ChannelGetMixer(_hBassStream) != 0
-				? _hBassStream
-				: (BassMix.ChannelGetMixer(_hTempoStream) != 0 ? _hTempoStream : hBassStream);
-			if (SoundManager.bIsTimeStretch && _hTempoStream != 0 && streamInMixer == _hTempoStream)
+			// IsUserStream: the speed on the stream that is in the mixer: tempo (pitch kept) when the tempo stream is there, the sample rate otherwise
+			int streamInMixer = this.IsUserStream ? hBassStream
+				: (BassMix.ChannelGetMixer(_hBassStream) != 0) ? _hBassStream
+				: (BassMix.ChannelGetMixer(_hTempoStream) != 0) ? _hTempoStream
+				: hBassStream;
+			if ((this.IsUserStream || SoundManager.bIsTimeStretch) && _hTempoStream != 0 && streamInMixer == _hTempoStream)
 				Bass.ChannelSetAttribute(streamInMixer, ChannelAttribute.Tempo, (float)(speed * 100 - 100));
 			else
 				Bass.ChannelSetAttribute(streamInMixer, ChannelAttribute.Frequency, (float)(_Frequency * speed * nOriginalFrequency));
@@ -316,19 +327,6 @@ public class CSound : IDisposable {
 		//			this._cbRemoveMixerChannel = new WaitCallback( RemoveMixerChannelLater );
 		this._hBassStream = -1;
 		this._hTempoStream = 0;
-	}
-
-	public void CreateBassSound(string fileName, int hMixer) {
-		this.CurrentSoundDeviceType = ESoundDeviceType.Bass;        // 作成後に設定する。（作成に失敗してると例外発出されてここは実行されない）
-		this.CreateBassSound(fileName, hMixer, hMixer == NoMixerHandle ? BassFlags.Default : BassFlags.Decode);
-	}
-	public void CreateASIOSound(string fileName, int hMixer) {
-		this.CurrentSoundDeviceType = ESoundDeviceType.ASIO;        // 作成後に設定する。（作成に失敗してると例外発出されてここは実行されない）
-		this.CreateBassSound(fileName, hMixer, BassFlags.Decode);
-	}
-	public void CreateWASAPISound(string fileName, int hMixer, ESoundDeviceType deviceType) {
-		this.CurrentSoundDeviceType = deviceType;       // 作成後に設定する。（作成に失敗してると例外発出されてここは実行されない）
-		this.CreateBassSound(fileName, hMixer, BassFlags.Decode | BassFlags.Float);
 	}
 
 	#region [ DTXMania用の変換 ]
@@ -654,7 +652,6 @@ public class CSound : IDisposable {
 						device.tCreateUserSound(s._userFrequency, s._userChannels, s._userSeconds, s._userProc!, s);
 						break;
 				}
-				sounds[i].ReapplyAttributes();
 			} catch (Exception e) {
 				// one sound that cannot be rebuilt (its file gone) leaves the others to rebuild
 				Trace.TraceWarning($"Could not rebuild a sound on the new device ({Path.GetFileName(sounds[i].FileName)}): {e.Message}");
@@ -666,13 +663,10 @@ public class CSound : IDisposable {
 	private void ReapplyAttributes() {
 		if (!this.IsBassSound) return;
 		this.SetVolume();
-		if (this.IsUserStream) {
-			this.SetSpeedLive(this._PlaySpeed);
-			return;
-		}
-		double speed = this._PlaySpeed;
-		this._PlaySpeed = double.NaN;   // so the setter applies it
-		this.PlaySpeed = speed;
+		if (this.IsUserStream)
+			this.SetSpeedWhilePlaying(this._PlaySpeed);
+		else
+			this.SetSpeed(this._PlaySpeed);
 	}
 
 	/// <summary>What a sound was doing when the sound device is about to be rebuilt.</summary>
@@ -839,14 +833,29 @@ public class CSound : IDisposable {
 
 	// A stream fed from code through a BASS stream procedure (a video's audio track). The owner holds the
 	// samples and the position, so the BASS position calls are no-ops here; pause, resume and volume work as
-	// on any other sound, and the speed is applied live on the stream in the mixer (SetSpeedLive). When the
+	// on any other sound, and the speed is applied live on the stream in the mixer (SetSpeedWhilePlaying). When the
 	// sound device is rebuilt it is rebuilt in place around the same procedure.
 	public bool IsUserStream { get; private set; }
 	private StreamProcedure? _userProc;   // referenced for as long as BASS may call it
 	private int _userFrequency, _userChannels;
 	private double _userSeconds;
 
-	public void CreateBassUserSound(int frequency, int channels, double durationSeconds, int hMixer, StreamProcedure proc, ESoundDeviceType deviceType = ESoundDeviceType.Bass, bool timeStretch = false) {
+	private void CreateBassGenericSound(Action<CSound> createImpl, ESoundDeviceType deviceType) {
+		try {
+			this.CurrentSoundDeviceType = deviceType; // set before common processings, so that IsBassSound is true and the sound's attributes can be successfully initialized
+			createImpl(this);
+			++SoundManager.nStreams;
+		} catch (Exception) {
+			this.CurrentSoundDeviceType = ESoundDeviceType.Unknown;
+			throw;
+		}
+	}
+	public void CreateBassSound(string strFileName, int hMixer, BassFlags flags = BassFlags.Decode, ESoundDeviceType deviceType = ESoundDeviceType.Bass)
+		=> CreateBassGenericSound(sound => sound.CreateBassSoundImpl(strFileName, hMixer, flags), deviceType);
+	public void CreateBassUserSound(int frequency, int channels, double durationSeconds, int hMixer, StreamProcedure proc, ESoundDeviceType deviceType = ESoundDeviceType.Bass, bool timeStretch = false)
+		=> CreateBassGenericSound(sound => sound.CreateBassUserSoundImpl(frequency, channels, durationSeconds, hMixer, proc, timeStretch), deviceType);
+
+	private void CreateBassUserSoundImpl(int frequency, int channels, double durationSeconds, int hMixer, StreamProcedure proc, bool timeStretch = false) {
 		this.CurrnetCreateType = CreateType.UserStream;
 		this.FileName = "";
 		this.IsUserStream = true;
@@ -863,23 +872,7 @@ public class CSound : IDisposable {
 
 		nBytes = durationSeconds > 0 ? Bass.ChannelSeconds2Bytes(this._hBassStream, durationSeconds) : long.MaxValue;
 
-		tBASSSoundCreate_StreamCreateAfterCommonProcess(hMixer);
-		// with time-stretch the tempo stream is the one in the mixer from the start, so the speed can change
-		// at any time without touching the mixer
-		if (timeStretch && this._hTempoStream != 0) this.hBassStream = this._hTempoStream;
-		this.CurrentSoundDeviceType = deviceType;   // set once creation succeeded, like the file-backed sounds
-	}
-
-	// the speed on the stream that is in the mixer: tempo (pitch kept) when the tempo stream is there,
-	// the sample rate otherwise
-	public void SetSpeedLive(double speed) {
-		this._PlaySpeed = speed;
-		this.IsNormalSpeed = (speed == 1.000);
-		if (!this.IsBassSound) return;
-		if (this.hBassStream == this._hTempoStream && this._hTempoStream != 0)
-			Bass.ChannelSetAttribute(this.hBassStream, ChannelAttribute.Tempo, (float)(speed * 100 - 100));
-		else
-			Bass.ChannelSetAttribute(this.hBassStream, ChannelAttribute.Frequency, (float)(this._Frequency * speed * this.nOriginalFrequency));
+		tBASSSoundCreate_StreamCreateAfterCommonProcess(hMixer, timeStretch);
 	}
 
 	/// <summary>Bytes taken from the stream procedure and not yet heard: the mixer's buffering, or BASS's own playback buffer without a mixer.</summary>
@@ -907,7 +900,7 @@ public class CSound : IDisposable {
 
 	public long UserStreamBytesPerSecond => this.IsBassSound ? Bass.ChannelSeconds2Bytes(this._hBassStream, 1.0) : 0;
 
-	public void CreateBassSound(string strFileName, int hMixer, BassFlags flags) {
+	private void CreateBassSoundImpl(string strFileName, int hMixer, BassFlags flags) {
 		this.CurrnetCreateType = CreateType.FromFile;
 		this.FileName = strFileName;
 
@@ -963,9 +956,7 @@ public class CSound : IDisposable {
 		this.tFreePinnedFile();
 	}
 
-	private void tBASSSoundCreate_StreamCreateAfterCommonProcess(int hMixer) {
-		SoundManager.nStreams++;
-
+	private void tBASSSoundCreate_StreamCreateAfterCommonProcess(int hMixer, bool userTimeStretch = false) {
 		// 個々のストリームの出力をテンポ変更のストリームに入力する。テンポ変更ストリームの出力を、Mixerに出力する。
 
 		//			if ( CSound管理.bIsTimeStretch )	// TimeStretchのON/OFFに関わりなく、テンポ変更のストリームを生成する。後からON/OFF切り替え可能とするため。
@@ -980,7 +971,9 @@ public class CSound : IDisposable {
 			}
 		}
 
-		if (_hTempoStream != 0 && !this.IsNormalSpeed)  // 再生速度がx1.000のときは、TempoStreamを用いないようにして高速化する
+		// with time-stretch the tempo stream is the one in the mixer from the start, so the speed can change
+		// at any time without touching the mixer
+		if (_hTempoStream != 0 && (userTimeStretch || !this.IsNormalSpeed))  // 再生速度がx1.000のときは、TempoStreamを用いないようにして高速化する
 		{
 			this.hBassStream = _hTempoStream;
 		} else {
@@ -1011,6 +1004,7 @@ public class CSound : IDisposable {
 
 		// インスタンスリストに登録。
 
+		this.ReapplyAttributes();
 		lock (_soundInstancesLock) { CSound.SoundInstances.Add(this); }
 	}
 	//-----------------

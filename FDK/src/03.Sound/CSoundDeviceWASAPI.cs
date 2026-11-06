@@ -378,27 +378,11 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 		this.hMixer = this.hMixer_DeviceOut = -1;
 		this.bIsBASSFree = true;
 	}
-	#region [ tサウンドを作成する() ]
-	public CSound tCreateSound(string strFileName, ESoundGroup soundGroup) {
-		var sound = new CSound(soundGroup);
-		sound.CreateWASAPISound(strFileName, this.hMixer, this.SoundDeviceType);
-		return sound;
-	}
 
-	public void tCreateSound(string strFileName, CSound sound) {
-		sound.CreateWASAPISound(strFileName, this.hMixer, this.SoundDeviceType);
-	}
-
-	public CSound tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, ESoundGroup soundGroup) {
-		var sound = new CSound(soundGroup);
-		sound.CreateBassUserSound(frequency, channels, durationSeconds, this.hMixer, proc, this.SoundDeviceType, SoundManager.bIsTimeStretch);
-		return sound;
-	}
-
-	public void tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, CSound sound) {
-		sound.CreateBassUserSound(frequency, channels, durationSeconds, this.hMixer, proc, this.SoundDeviceType, SoundManager.bIsTimeStretch);
-	}
-	#endregion
+	public void tCreateSound(string strFileName, CSound sound)
+		=> sound.CreateBassSound(strFileName, this.hMixer, BassFlags.Decode | BassFlags.Float, this.SoundDeviceType);
+	public void tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, CSound sound)
+		=> sound.CreateBassUserSound(frequency, channels, durationSeconds, this.hMixer, proc, this.SoundDeviceType, SoundManager.bIsTimeStretch);
 
 	#region [ Dispose-Finallizeパターン実装 ]
 	//-----------------
