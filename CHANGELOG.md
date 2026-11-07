@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.7.0.6] - 2026-11-07 (Beta)
+
+- [Enhancement] 3D engine minor additions and optimizations
+
 ## [0.7.0.5] - 2026-11-04 (Beta)
 
 - [Feat] Allow to sell no longer used furniture via the recycle bin
