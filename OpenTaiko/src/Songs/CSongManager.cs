@@ -607,7 +607,7 @@ internal class CSongManager {
 					cSongListNode.score[i]!.ChartInfo.MinBpm = cdtx.MinBPM;
 					cSongListNode.score[i]!.ChartInfo.MaxBpm = cdtx.MaxBPM;
 					cSongListNode.score[i]!.ChartInfo.Duration = 0;    //  (cdtx.listChip == null)? 0 : cdtx.listChip[ cdtx.listChip.Count - 1 ].n発声時刻ms;
-					cSongListNode.score[i]!.ChartInfo.strBGMFileName = cdtx.strBGM_PATH;
+					cSongListNode.score[i]!.ChartInfo.strBGMFileName = cdtx.strBGM_PATH ?? "";
 					cSongListNode.score[i]!.ChartInfo.SongVol = cdtx.SongVol;
 					cSongListNode.score[i]!.ChartInfo.SongLoudnessMetadata = cdtx.SongLoudnessMetadata;
 					cSongListNode.score[i]!.ChartInfo.nDemoBGMOffset = cdtx.nDemoBGMOffset;

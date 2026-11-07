@@ -554,7 +554,7 @@ public static class ImGuiDebugWindow {
 								ImGui.TreePop();
 							}
 
-							ImGui.Text("Lyrics: " + (dtx.usingLyricsFile ? dtx.listLyric2.Count : dtx.listLyric.Count));
+							ImGui.Text("Lyrics: " + (dtx.listLyric.Count + dtx.listLyric2.Count));
 
 							ImGui.NewLine();
 

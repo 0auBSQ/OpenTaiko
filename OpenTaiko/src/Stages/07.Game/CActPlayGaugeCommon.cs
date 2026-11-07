@@ -87,7 +87,7 @@ internal class CActPlayGaugeCommon : CActivity {
 		float gaugeRate = 0f;
 		float dbDamageRate = 2.0f;
 
-		int nanidou = this.DTX[nPlayer].nInstanceDifficulty;
+		int nanidou = this.DTX[nPlayer].nReferenceDifficulty;
 
 		switch (this.DTX[nPlayer].PlayerSideMetadata.LEVELtaiko) {
 			case 0:
@@ -262,7 +262,7 @@ internal class CActPlayGaugeCommon : CActivity {
 					fDamage = this.dbGaugeIncreaseAmount_Branch[nCourse, 2][nPlayer];
 
 					int level = this.DTX[nPlayer].PlayerSideMetadata.LEVELtaiko;
-					int nanidou = this.DTX[nPlayer].nInstanceDifficulty;
+					int nanidou = this.DTX[nPlayer].nReferenceDifficulty;
 
 					switch (HGaugeMethods.tGetGaugeTypeEnum(nPlayer)) {
 						case HGaugeMethods.EGaugeType.HARD:

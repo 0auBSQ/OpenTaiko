@@ -54,25 +54,14 @@ namespace OpenTaikoTests {
 			return r;
 		}
 
-		private static CTja Parse(string tjaText) {
-			string dir = Path.Combine(Path.GetTempPath(), "ot_tja_" + Guid.NewGuid().ToString("N"));
-			Directory.CreateDirectory(dir);
-			try {
-				string p = Path.Combine(dir, "chart.tja");
-				File.WriteAllText(p, tjaText);
-				OpenTaiko.OpenTaiko.ConfigIni.nPlayerCount = 1;
-				var tja = new CTja();
-				tja.Activate();
-				tja.tInput(p, Difficulty.Oni, 0, true, 0);
-				return tja;
-			} finally { try { Directory.Delete(dir, true); } catch { } }
-		}
-
 		private static List<CChip> Dons(CTja tja)
 			=> tja.listChip.Where(c => c.nChannelNo == 0x11).OrderBy(c => c.idxDefine).ToList();
 
 		private static void AssertClose(double expected, double actual, string what, double tol = 1e-6)
 			=> Assert.True(Math.Abs(expected - actual) <= tol, $"{what}: expected {expected}, got {actual}");
+
+		private static CTja Parse(string tjaText)
+			=> TjaFixture.ParseTjaText("ot_tja_", "chart.tja", tjaText);
 
 		// the chart is TMG (imaginary axis up, as the Desmos draws it); the default compat must agree on every beat
 		[Theory]

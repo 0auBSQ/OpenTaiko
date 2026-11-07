@@ -9,10 +9,12 @@ class CSongReplay {
 	 * 600 = 0.6.0
 	 * 601 = 0.6.1 (adds the note-shuffle RandomSeed at the end of the file)
 	 * 602 = 0.6.1 (the special mod in ModFlags; judgement, fail and clear rules changed since 601)
+	 * 603 = 0.7.0 (patch to 602, reverts judge timing comparison to early 601 and earlier)
 	 * 700 = 0.7.0
 	 * 1000 = 1.0.0
 	 */
-	public const int STORED_GAME_VERSION = 602;
+	public const int STORED_GAME_VERSION = 603;
+	public const int DYNAMIC_BEAT_RULE_VERSION = 602;
 	public string REPLAY_FOLDER_NAME = "Replay";
 
 	/* Mod Flags
@@ -260,10 +262,10 @@ class CSongReplay {
 	// null when watchable, else a reason code the skin turns into its own wording ("rng_mods",
 	// "dynamic_beat_version" or "unseeded_shuffle").
 	// Dynamic Beat is deterministic given the replayed inputs (the warp factor is re-derived from the same
-	// judgements), but only while the evaluation logic matches the recorder's — so it needs the same version.
+	// judgements), but only while the evaluation logic matches the recorder's.
 	public static string? tUnwatchableReason(int modFlags, int randomSeed, int gameVersion) {
 		if ((modFlags & RNG_UNSEEDED_MODS) != 0) return "rng_mods";
-		if ((modFlags & (int)EModFlag.DynamicBeat) != 0 && gameVersion != STORED_GAME_VERSION)
+		if ((modFlags & (int)EModFlag.DynamicBeat) != 0 && gameVersion < DYNAMIC_BEAT_RULE_VERSION)
 			return "dynamic_beat_version";
 		if ((modFlags & RNG_SEEDABLE_MODS) != 0 && randomSeed < 0)
 			return "unseeded_shuffle";

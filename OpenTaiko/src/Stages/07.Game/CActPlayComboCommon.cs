@@ -574,15 +574,18 @@ internal class CActPlayComboCommon : CActivity {
 			#region [ nジャンプインデックス値 の進行。]
 			//-----------------
 			if (this.status[i].nJumpIndexValue < 360) {
-				if ((this.status[i].nPreviousTime_Jump == -1) || (OpenTaiko.Timer.NowTimeMs < this.status[i].nPreviousTime_Jump))
-					this.status[i].nPreviousTime_Jump = OpenTaiko.Timer.NowTimeMs;
+				long msNow = OpenTaiko.Timer.NowTimeMs;
+				if ((this.status[i].nPreviousTime_Jump == -1) || msNow < this.status[i].nPreviousTime_Jump)
+					this.status[i].nPreviousTime_Jump = msNow;
 
-				const long INTERVAL = 2;
-				while ((OpenTaiko.Timer.NowTimeMs - this.status[i].nPreviousTime_Jump) >= INTERVAL) {
-					if (this.status[i].nJumpIndexValue < 2000)
-						this.status[i].nJumpIndexValue += 3;
+				const long msINTERVAL = 2;
+				var nSteps = (msNow - this.status[i].nPreviousTime_Jump) / msINTERVAL;
+				if (nSteps > 0) {
+					ref var rJump = ref this.status[i].nJumpIndexValue;
+					if (rJump < 2000)
+						rJump = (int)Math.Min(2000, rJump + 3 * nSteps);
 
-					this.status[i].nPreviousTime_Jump += INTERVAL;
+					this.status[i].nPreviousTime_Jump += msINTERVAL * nSteps;
 				}
 			}
 		//-----------------

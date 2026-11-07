@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using FDK;
+using FDK.ExtensionMethods;
 using static OpenTaiko.CTja;
 
 namespace OpenTaiko;
@@ -73,19 +74,19 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public double dbSoundPos;  // 発声時刻を格納していた変数のうちの１つをfloat型からdouble型に変更。(kairera0467)
 	public Complex fBMSCROLLTime;
 	public Complex dbHISPEED = 1.0; // #HISPEED in effect at the chip
-	private int _nSoundTimems;
-	public int nSoundTimems { get => _nSoundTimems; set => _dbSoundTimems = _nSoundTimems = value; }
+	private long _nSoundTimems; // for judgement
+	public long nSoundTimems { get => _nSoundTimems; set => _dbSoundTimems = _nSoundTimems = value; }
 
 	private double _msBorder = double.PositiveInfinity; // Branch judge chip: Branch point time, Kusudama: Bonus border time
 	public double nBranchTimems { get => _msBorder; set => _msBorder = value; } // Branch judge chip
 	public double msKusudamaBonusBorder { get => _msBorder; set => _msBorder = value; } // Kusudama
 
-	private double _dbSoundTimems;
+	private double _dbSoundTimems; // for displaying and hit sound timestamp
 	public double dbSoundTimems {
 		get => _dbSoundTimems;
 		set {
 			_dbSoundTimems = value;
-			_nSoundTimems = (int)Math.Clamp(Math.Floor(_dbSoundTimems), int.MinValue, int.MaxValue);
+			_nSoundTimems = ms_long(_dbSoundTimems);
 		}
 	}
 
@@ -155,7 +156,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 	public double fObjTimeMs;
 	public string strObjName = null!;
-	public string strObjEaseType = null!;
+	public Easing.PointType objEaseType;
 	public Easing.CalcType objCalcType;
 
 	public float fObjX;
@@ -341,8 +342,8 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	/// チップの再生長を取得する。現状、WAVチップとBGAチップでのみ使用可能。
 	/// </summary>
 	/// <returns>再生長(ms)</returns>
-	public int GetDuration() {
-		int nDuration = 0;
+	public long GetDuration() {
+		long nDuration = 0;
 
 		if (this.nChannelNo == 0x01)       // WAV
 		{
@@ -360,12 +361,16 @@ internal class CChip : IComparable<CChip>, ICloneable {
 			if (wc == null) {
 				nDuration = 0;
 			} else {
-				nDuration = (int)(wc.Duration * 1000);
+				nDuration = long.CreateSaturating(wc.Duration * 1000);
 			}
 		}
 
 		return nDuration;
 	}
+
+	public static long ms_long(double ms) => long.CreateSaturating(Math.Floor(ms));
+	public ulong msAbsDiffToHit(long msHit) => nSoundTimems.AbsDiffTo(msHit);
+	public ulong msAbsDiffToHit(double msHit) => msAbsDiffToHit(ms_long(msHit));
 
 	#region [ IComparable 実装 ]
 	//-----------------
@@ -380,17 +385,17 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public const int nChannelNoMostPrior = 0;
 	public const int nChannelNoLeastPrior = 0xDD; // #SECTION
 
-	public static CChip GetSearchChipAtOrAfter(long msTjaTimeInt, bool allowAt) => new() {
-		_nSoundTimems = (int)Math.Clamp(msTjaTimeInt, int.MinValue, int.MaxValue),
-		_dbSoundTimems = allowAt ? double.NegativeInfinity : double.PositiveInfinity,
-		nChannelNo = allowAt ? nChannelNoMostPrior : nChannelNoLeastPrior,
-	};
+	public static CChip GetSearchChipAtOrAfter(long msTjaTimeInt, bool allowAt) {
+		CChip chip = new();
+		chip.SetAsSearchChip(msTjaTimeInt, allowAt);
+		return chip;
+	}
 	public static CChip GetSearchChipAtOrAfter(long msTjaTimeInt) => GetSearchChipAtOrAfter(msTjaTimeInt, allowAt: true);
 	public static CChip GetSearchChipAfter(long msTjaTimeInt) => GetSearchChipAtOrAfter(msTjaTimeInt, allowAt: false);
 
 	// a chip kept for searches (made by new() and otherwise untouched) then compares as GetSearchChipAtOrAfter's chip
 	public void SetAsSearchChip(long msTjaTimeInt, bool allowAt) {
-		this._nSoundTimems = (int)Math.Clamp(msTjaTimeInt, int.MinValue, int.MaxValue);
+		this._nSoundTimems = msTjaTimeInt;
 		this._dbSoundTimems = allowAt ? double.NegativeInfinity : double.PositiveInfinity;
 		this.nChannelNo = allowAt ? nChannelNoMostPrior : nChannelNoLeastPrior;
 	}

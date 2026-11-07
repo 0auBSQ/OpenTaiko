@@ -295,7 +295,8 @@
 		public string AudioPath {
 			get {
 				var score = _GetFirstAvailableScore() ?? null;
-				if (score == null) return "";
+				if (string.IsNullOrEmpty(score?.ChartInfo.strBGMFileName))
+					return "";
 				return score.FileInfo.FolderAbsolutePath + score.ChartInfo.strBGMFileName;
 			}
 		}
