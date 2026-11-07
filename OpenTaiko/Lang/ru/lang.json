@@ -397,6 +397,11 @@
 		"ONLINE_MULTIPLAYER": "Сетевые многопользовательский (Не доступен)",
 
 		// Dan Dojo
+		"DAN_ST": "{0}-я",
+		"DAN_ND": "{0}-я",
+		"DAN_RD": "{0}-я",
+		"DAN_TH": "{0}-я",
+		"DAN_UNIEME": "{0}-я",
 		"DAN_CONDITION_NAME_SOUL": "Датчик души",
 		"DAN_CONDITION_NAME_GOOD": "Количество Хорошо",
 		"DAN_CONDITION_NAME_OK": "Количество OK",
