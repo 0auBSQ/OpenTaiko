@@ -24,6 +24,7 @@ uniform vec2 uSplatSize;      // splat world coverage (world.xz -> splat uv)
 uniform int uNormOn;          // 1 = the bound texture has a normal map (SetTextureNormalMap) on uNormTex
 uniform sampler2D uNormTex;
 uniform float uTexScale;      // world units -> layer uv repeats
+uniform vec4 uUVAnim;         // textured surfaces: xy = uv scroll per second of uTime, z = wobble amplitude, w = its world frequency
 out vec4 frag;
 #ifdef SHADOWS
 uniform mat4 uLightVP; uniform sampler2D uShadow; uniform float uShadowTexel;
@@ -104,6 +105,8 @@ void main(){
 #endif
         if (uFog == 1){ float f = clamp((vCamZ - uFogStart) * uFogInv, 0.0, 1.0); c.rgb = mix(c.rgb, uFogCol, f); } frag = c; return; }
     vec3 base;
+    vec2 uv = vUV + uUVAnim.xy * uTime;   // scrolled and wobbled uv (ObjSetUVScroll / ObjSetUVWarp; 0 = vUV)
+    if (uUVAnim.z > 0.0) uv += uUVAnim.z * vec2(sin(vWorld.z * uUVAnim.w + uTime * 1.3), cos(vWorld.x * uUVAnim.w + uTime * 1.1));
     if (uMode == 0){ base = uFlat; }
     else if (uMode == 5){
         // TERRAIN SPLAT: blend the four layer textures per pixel by the (linear-filtered) weight
@@ -115,15 +118,15 @@ void main(){
               + texture(uTex3, luv).rgb * w.b + texture(uTex4, luv).rgb * w.a) / ws;
         base *= uTint;
     }
-    else { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; base = t.rgb * uTint; }
+    else { vec4 t = texture(uTex, uv); if (t.a < 0.5) discard; base = t.rgb * uTint; }
     if (uFlatCol.a > 0.5) base = uFlatCol.rgb;   // flat albedo override: recolour a routed part (still shades)
     vec3 N = normalize(vNormal);
     float relief = 1.0;
     if (uNormOn == 1 && uMode == 1){
         // the normal map, turned onto the surface: the surface frame comes from the screen derivatives of
         // the position and the uv (the vertices carry no tangents); B runs down the image like the map's green
-        vec3 m = texture(uNormTex, vUV).rgb * 2.0 - 1.0;
-        vec3 dp1 = dFdx(vWorld), dp2 = dFdy(vWorld); vec2 du1 = dFdx(vUV), du2 = dFdy(vUV);
+        vec3 m = texture(uNormTex, uv).rgb * 2.0 - 1.0;
+        vec3 dp1 = dFdx(vWorld), dp2 = dFdy(vWorld); vec2 du1 = dFdx(uv), du2 = dFdy(uv);
         vec3 c2 = cross(dp2, N), c1 = cross(N, dp1);
         vec3 T = c2 * du1.x + c1 * du2.x, B = c2 * du1.y + c1 * du2.y;
         float k = inversesqrt(max(max(dot(T, T), dot(B, B)), 1e-20));

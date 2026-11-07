@@ -22,7 +22,7 @@ namespace OpenTaiko {
 		// Node/Skinned: which scene node placed this primitive (glTF node TRS applies to non-skinned
 		// meshes; skinned meshes are posed purely by their joints per the glTF spec). Node -1 = raw
 		// (legacy models whose meshes are not referenced by any node).
-		private sealed class Prim { public float[] Pos = null!, Uv = null!, Wt = null!; public int[] Jt = null!, Idx = null!; public int Mat; public int Node = -1; public bool Skinned; }
+		private sealed class Prim { public float[] Pos = null!, Uv = null!, Wt = null!; public float[]? Nrm; public int[] Jt = null!, Idx = null!; public int Mat; public int Node = -1; public bool Skinned; }
 		private sealed class Node { public double[] T = {0,0,0}; public double[] R = {0,0,0,1}; public double[] S = {1,1,1}; public int[] Children = Array.Empty<int>(); }
 		// Path 0=T,1=R,2=S; Interp 0=LINEAR,1=STEP,2=CUBICSPLINE (3 values per key: in-tangent, value, out-tangent)
 		private sealed class Channel { public int Path, Stride, Interp; public double[] Times = null!; public float[] Vals = null!; }
@@ -33,6 +33,7 @@ namespace OpenTaiko {
 		private int[] _jointNodes = Array.Empty<int>();
 		private double[][] _ibm = Array.Empty<double[]>();
 		private Node[] _nodes = Array.Empty<Node>();
+		private string[] _nodeNames = Array.Empty<string>();
 		private int[] _parent = Array.Empty<int>();
 		private int[] _order = Array.Empty<int>();   // node indices with every parent before its children
 		private readonly List<Anim> _anims = new();
@@ -49,6 +50,23 @@ namespace OpenTaiko {
 		private double[][] _global = Array.Empty<double[]>();
 		private double[][] _bone = Array.Empty<double[]>();
 		private int[] _route = Array.Empty<int>();   // target object per part for the current Pose
+
+		// smooth (Gouraud) shading from the file's vertex normals; off by default, so a model looks as it always did
+		private bool _smooth;
+		/// <summary>Shade this model smoothly from its glTF vertex normals (NORMAL) instead of one flat shade per
+		/// triangle; primitives without normals stay flat. Off by default. The model is shared per file, so this
+		/// applies to every object it poses from the next Pose on.</summary>
+		public void SetSmoothShading(bool on) { _smooth = on; }
+		/// <summary>Whether smooth shading is on (see <see cref="SetSmoothShading"/>).</summary>
+		public bool GetSmoothShading() => _smooth;
+
+		// the yaw the shade light is taken at, rounded to this many degrees (0 = the exact yaw)
+		private double _shadeYawStep;
+		/// <summary>Shade the posed triangles as if the model were turned by its yaw rounded to <paramref name="deg"/>
+		/// degrees; the placement keeps the exact yaw. A Pose whose clip and time did not change then only places the
+		/// model while it turns within one step, instead of re-skinning it every frame. 0 (the default) shades at the
+		/// exact yaw. The model is shared per file, so this applies to every object it poses.</summary>
+		public void SetShadeYawStep(double deg) { _shadeYawStep = deg > 0 ? deg : 0; }
 
 		public int AnimCount() => _anims.Count;
 		public string AnimName(int i) => (i >= 0 && i < _anims.Count) ? _anims[i].Name : "";
@@ -144,11 +162,12 @@ namespace OpenTaiko {
 				for (int p = 0; p < _route.Length; p++) _route[p] = _partObj.TryGetValue(p, out int mapped) ? mapped : objId;
 				route = _route;
 			}
-			bool current = scene.PoseIsCurrent(objId, this, anim, time, yawDeg, mirror, route);
+			double shadeYaw = _shadeYawStep > 0 ? Math.Round(yawDeg / _shadeYawStep) * _shadeYawStep : yawDeg;
+			bool current = scene.PoseIsCurrent(objId, this, anim, time, shadeYaw, mirror, route, _smooth);
 			if (current && route != null)
 				foreach (var kv in _partObj)
-					if (kv.Value != objId && !scene.PoseIsCurrent(kv.Value, this, anim, time, yawDeg, mirror, route)) { current = false; break; }
-			if (!current) Emit(scene, objId, route, anim, time, yawDeg, mirror);
+					if (kv.Value != objId && !scene.PoseIsCurrent(kv.Value, this, anim, time, shadeYaw, mirror, route, _smooth)) { current = false; break; }
+			if (!current) Emit(scene, objId, route, anim, time, shadeYaw, mirror);
 
 			scene.PlaceModel(objId, x, y, z, yawDeg, scale);
 			if (route != null)
@@ -166,7 +185,7 @@ namespace OpenTaiko {
 			GatherTargets(objId, route);
 			for (int i = 0; i < _tgt.Count; i++) {
 				var fp = _tgtFp[i];
-				_tgtKeep[i] = _tgtHasFp[i] && scene.PoseHolds(_tgt[i], this, yawDeg, mirror, route, CollectionsMarshal.AsSpan(fp));
+				_tgtKeep[i] = _tgtHasFp[i] && scene.PoseHolds(_tgt[i], this, yawDeg, mirror, route, CollectionsMarshal.AsSpan(fp), _smooth);
 				if (!_tgtKeep[i]) scene.ObjBegin(_tgt[i]);
 			}
 
@@ -179,23 +198,332 @@ namespace OpenTaiko {
 				if (_tgtKeep[TargetIndex(target)]) continue;
 				int texId = tb + (pr.Mat >= 0 && pr.Mat < _matRgb.Length ? pr.Mat : 0);
 				TransformPrim(pr);
-				var idx = pr.Idx;
-				for (int t = 0; t < idx.Length; t += 3) {
-					int i0 = idx[t], i1 = idx[t+1], i2 = idx[t+2];
-					double x0=sg*_skx[i0], y0=sg*_sky[i0], z0=sg*_skz[i0];
-					double x1=sg*_skx[i1], y1=sg*_sky[i1], z1=sg*_skz[i1];
-					double x2=sg*_skx[i2], y2=sg*_sky[i2], z2=sg*_skz[i2];
-					double shade = ModelPlacement.Shade(x0, y0, z0, x1, y1, z1, x2, y2, z2, lx, ly, lz);
-					scene.ObjAddTriTex(target,
-						x0,y0,z0, pr.Uv[i0*2], pr.Uv[i0*2+1],
-						x1,y1,z1, pr.Uv[i1*2], pr.Uv[i1*2+1],
-						x2,y2,z2, pr.Uv[i2*2], pr.Uv[i2*2+1],
-						texId, shade);
-				}
+				WritePrim(scene, target, pr, texId, lx, ly, lz, sg);
 			}
 
 			for (int i = 0; i < _tgt.Count; i++)
-				scene.StampPose(_tgt[i], this, anim, time, yawDeg, mirror, route, CollectionsMarshal.AsSpan(_tgtFp[i]), _tgtHasFp[i]);
+				scene.StampPose(_tgt[i], this, anim, time, yawDeg, mirror, route, CollectionsMarshal.AsSpan(_tgtFp[i]), _tgtHasFp[i], _smooth);
+		}
+
+		// one primitive's triangles, placed by TransformPrim, into object `target` (sg -1 mirrors them through the origin)
+		private void WritePrim(Lua3DScene scene, int target, Prim pr, int texId, double lx, double ly, double lz, double sg) {
+			var idx = pr.Idx;
+			if (_smooth && pr.Nrm != null) {   // smooth: a shade and a normal per corner
+				TransformNormals(pr);
+				for (int t = 0; t < idx.Length; t += 3) {
+					int i0 = idx[t], i1 = idx[t+1], i2 = idx[t+2];
+					CornerShade(i0, 0, lx, ly, lz); CornerShade(i1, 4, lx, ly, lz); CornerShade(i2, 8, lx, ly, lz);
+					scene.ObjAddTriTexSmooth(target,
+						sg*_skx[i0], sg*_sky[i0], sg*_skz[i0], pr.Uv[i0*2], pr.Uv[i0*2+1],
+						sg*_skx[i1], sg*_sky[i1], sg*_skz[i1], pr.Uv[i1*2], pr.Uv[i1*2+1],
+						sg*_skx[i2], sg*_sky[i2], sg*_skz[i2], pr.Uv[i2*2], pr.Uv[i2*2+1],
+						texId, _vs, 0);
+				}
+				return;
+			}
+			for (int t = 0; t < idx.Length; t += 3) {
+				int i0 = idx[t], i1 = idx[t+1], i2 = idx[t+2];
+				double x0=sg*_skx[i0], y0=sg*_sky[i0], z0=sg*_skz[i0];
+				double x1=sg*_skx[i1], y1=sg*_sky[i1], z1=sg*_skz[i1];
+				double x2=sg*_skx[i2], y2=sg*_sky[i2], z2=sg*_skz[i2];
+				double shade = ModelPlacement.Shade(x0, y0, z0, x1, y1, z1, x2, y2, z2, lx, ly, lz);
+				scene.ObjAddTriTex(target,
+					x0,y0,z0, pr.Uv[i0*2], pr.Uv[i0*2+1],
+					x1,y1,z1, pr.Uv[i1*2], pr.Uv[i1*2+1],
+					x2,y2,z2, pr.Uv[i2*2], pr.Uv[i2*2+1],
+					texId, shade);
+			}
+		}
+
+		// ── joints: the skin's joints as points (ragdolls) ──────────────────────────────────
+		// joint j's nearest ancestor that is a joint (-1 none), its child joints, and every joint with its parent first
+		private int[]? _jointParent; private int[][]? _jointKids; private int[]? _jointOrder;
+		private double[] _jq = Array.Empty<double>(), _jp = Array.Empty<double>(), _jrot = Array.Empty<double>();
+		private readonly double[] _jm = new double[16], _jt = new double[16], _ja = new double[9];
+		// add joint k's offset from joint j (rest to now, weight wt) to the fit matrix _ja (row-major: sum of now x rest)
+		private void FitAdd(int j, int k, double wt) {
+			double ax = _jq[k*3] - _jq[j*3], ay = _jq[k*3+1] - _jq[j*3+1], az = _jq[k*3+2] - _jq[j*3+2];
+			double bx = _jp[k*3] - _jp[j*3], by = _jp[k*3+1] - _jp[j*3+1], bz = _jp[k*3+2] - _jp[j*3+2];
+			_ja[0] += wt*bx*ax; _ja[1] += wt*bx*ay; _ja[2] += wt*bx*az;
+			_ja[3] += wt*by*ax; _ja[4] += wt*by*ay; _ja[5] += wt*by*az;
+			_ja[6] += wt*bz*ax; _ja[7] += wt*bz*ay; _ja[8] += wt*bz*az;
+		}
+		private readonly double[] _jn = new double[16], _jv = new double[16];
+		// the turn that best takes the rest offsets onto the offsets now (the fit matrix _ja), as the unit quaternion of
+		// the largest eigenvalue of Horn's 4x4 matrix (Jacobi sweeps); (w0..w3) comes in as the guess, which a small pull
+		// keeps when several turns fit as well (offsets on one line)
+		private void FitQuat(ref double w0, ref double w1, ref double w2, ref double w3) {
+			double Sxx = _ja[0], Syx = _ja[1], Szx = _ja[2], Sxy = _ja[3], Syy = _ja[4], Szy = _ja[5], Sxz = _ja[6], Syz = _ja[7], Szz = _ja[8];
+			var n = _jn; var v = _jv;
+			n[0] = Sxx + Syy + Szz; n[5] = Sxx - Syy - Szz; n[10] = -Sxx + Syy - Szz; n[15] = -Sxx - Syy + Szz;
+			n[1] = n[4] = Syz - Szy; n[2] = n[8] = Szx - Sxz; n[3] = n[12] = Sxy - Syx;
+			n[6] = n[9] = Sxy + Syx; n[7] = n[13] = Szx + Sxz; n[11] = n[14] = Syz + Szy;
+			double scale = Math.Abs(Sxx) + Math.Abs(Syy) + Math.Abs(Szz) + Math.Abs(Sxy) + Math.Abs(Syx) + Math.Abs(Sxz) + Math.Abs(Szx) + Math.Abs(Syz) + Math.Abs(Szy);
+			if (scale < 1e-12) return;
+			double ql = Math.Sqrt(w0*w0 + w1*w1 + w2*w2 + w3*w3);
+			if (ql > 1e-9) {
+				for (int i = 0; i < 4; i++) v[i] = (i == 0 ? w0 : i == 1 ? w1 : i == 2 ? w2 : w3) / ql;
+				double eps = 1e-3 * scale;
+				for (int r = 0; r < 4; r++) for (int c = 0; c < 4; c++) n[r*4+c] += eps * v[r] * v[c];
+			}
+			for (int i = 0; i < 16; i++) v[i] = (i % 5 == 0) ? 1 : 0;
+			for (int sweep = 0; sweep < 12; sweep++) {
+				double off = 0;
+				for (int p = 0; p < 3; p++) for (int q = p + 1; q < 4; q++) off += n[p*4+q] * n[p*4+q];
+				if (off < 1e-24 * scale * scale) break;
+				for (int p = 0; p < 3; p++)
+					for (int q = p + 1; q < 4; q++) {
+						double apq = n[p*4+q];
+						if (Math.Abs(apq) < 1e-30) continue;
+						double th = (n[q*4+q] - n[p*4+p]) / (2 * apq);
+						double t = Math.Sign(th) / (Math.Abs(th) + Math.Sqrt(th * th + 1));
+						if (th == 0) t = 1;
+						double c = 1 / Math.Sqrt(t * t + 1), s = t * c;
+						for (int k = 0; k < 4; k++) {
+							double akp = n[k*4+p], akq = n[k*4+q];
+							n[k*4+p] = c * akp - s * akq; n[k*4+q] = s * akp + c * akq;
+						}
+						for (int k = 0; k < 4; k++) {
+							double apk = n[p*4+k], aqk = n[q*4+k];
+							n[p*4+k] = c * apk - s * aqk; n[q*4+k] = s * apk + c * aqk;
+						}
+						for (int k = 0; k < 4; k++) {
+							double vkp = v[k*4+p], vkq = v[k*4+q];
+							v[k*4+p] = c * vkp - s * vkq; v[k*4+q] = s * vkp + c * vkq;
+						}
+					}
+			}
+			int best = 0;
+			for (int i = 1; i < 4; i++) if (n[i*5] > n[best*5]) best = i;
+			double e0 = v[best], e1 = v[4+best], e2 = v[8+best], e3 = v[12+best];
+			if (e0*w0 + e1*w1 + e2*w2 + e3*w3 < 0) { e0 = -e0; e1 = -e1; e2 = -e2; e3 = -e3; }
+			w0 = e0; w1 = e1; w2 = e2; w3 = e3;
+		}
+
+		private void EnsureJoints() {
+			if (_jointParent != null) return;
+			int nj = _jointNodes.Length, nn = _nodes.Length;
+			var jointOf = new int[nn];
+			for (int i = 0; i < nn; i++) jointOf[i] = -1;
+			for (int j = 0; j < nj; j++) { int nd = _jointNodes[j]; if (nd >= 0 && nd < nn && jointOf[nd] < 0) jointOf[nd] = j; }
+			var par = new int[nj];
+			var kids = new List<int>[nj];
+			for (int j = 0; j < nj; j++) kids[j] = new List<int>();
+			for (int j = 0; j < nj; j++) {
+				int nd = _jointNodes[j], p = (nd >= 0 && nd < nn) ? _parent[nd] : -1, guard = 0;
+				while (p >= 0 && jointOf[p] < 0 && guard++ < nn) p = _parent[p];
+				par[j] = (p >= 0 && jointOf[p] >= 0 && jointOf[p] != j) ? jointOf[p] : -1;
+				if (par[j] >= 0) kids[par[j]].Add(j);
+			}
+			var order = new List<int>(nj);
+			var placed = new bool[nj];
+			foreach (int nd in _order)
+				for (int j = 0; j < nj; j++) if (_jointNodes[j] == nd && !placed[j]) { placed[j] = true; order.Add(j); }
+			for (int j = 0; j < nj; j++) if (!placed[j]) order.Add(j);
+			_jointKids = new int[nj][];
+			for (int j = 0; j < nj; j++) _jointKids[j] = kids[j].ToArray();
+			_jointOrder = order.ToArray();
+			_jointParent = par;
+		}
+
+		/// <summary>Number of skin joints (0 without a skin).</summary>
+		public int JointCount() => _jointNodes.Length;
+		/// <summary>The glTF node name of joint <paramref name="j"/> (0-based), or "".</summary>
+		public string JointName(int j) {
+			if (j < 0 || j >= _jointNodes.Length) return "";
+			int nd = _jointNodes[j];
+			return (nd >= 0 && nd < _nodeNames.Length) ? _nodeNames[nd] : "";
+		}
+		/// <summary>The joint that is joint <paramref name="j"/>'s nearest joint ancestor, or -1.</summary>
+		public int JointParent(int j) {
+			if (j < 0 || j >= _jointNodes.Length) return -1;
+			EnsureJoints();
+			return _jointParent![j];
+		}
+		/// <summary>Where joint <paramref name="j"/> is in model space (scale 1) at animation <paramref name="anim"/> and
+		/// <paramref name="time"/> (-1: the bind pose).</summary>
+		public (double x, double y, double z) JointPosition(int anim, double time, int j) {
+			if (j < 0 || j >= _jointNodes.Length) return (0, 0, 0);
+			if (anim < 0 || anim >= _anims.Count) { anim = -1; time = 0; }
+			ComputeGlobals(anim, time);
+			int nd = _jointNodes[j];
+			if (nd < 0 || nd >= _global.Length) return (0, 0, 0);
+			var g = _global[nd];
+			return (g[12], g[13], g[14]);
+		}
+
+		private static double Num(object? v, double fallback) {
+			double d = v switch { double dd => dd, long l => l, int i => i, float f => f, _ => fallback };
+			return double.IsFinite(d) ? d : fallback;
+		}
+
+		/// <summary>Pose the model from where its joints are (ragdolls): <paramref name="pts"/> holds 3 numbers per joint
+		/// (x, y, z in model space, joint order, 1-based), and the pose at <paramref name="anim"/>/<paramref name="time"/>
+		/// is the rest it bends from. Each joint moves to its point and turns so its child joints sit on their points: with
+		/// one child the bone turns by the shortest arc from its parent's turn, with several the turn that fits them best,
+		/// and a joint without children turns with its parent. The triangles are rebuilt every call and the object is
+		/// placed as Pose places it; the next Pose rebuilds them again. Without a skin it is Pose.</summary>
+		public void PoseJoints(Lua3DScene scene, int objId, int anim, double time, NLua.LuaTable pts,
+			double x, double y, double z, double yawDeg, double scale) {
+			int nj = _jointNodes.Length;
+			if (nj == 0 || pts == null || _bone.Length != nj) { Pose(scene, objId, anim, time, x, y, z, yawDeg, scale); return; }
+			if (anim < 0 || anim >= _anims.Count) { anim = -1; time = 0; }
+			ComputeGlobals(anim, time);   // the rest: joint places in _global, rest bones in _bone
+			EnsureJoints();
+			if (_jq.Length < nj * 3) { _jq = new double[nj * 3]; _jp = new double[nj * 3]; _jrot = new double[nj * 4]; }
+			for (int j = 0; j < nj; j++) {
+				int nd = _jointNodes[j];
+				var g = (nd >= 0 && nd < _global.Length) ? _global[nd] : null;
+				double qx = g != null ? g[12] : 0, qy = g != null ? g[13] : 0, qz = g != null ? g[14] : 0;
+				_jq[j*3] = qx; _jq[j*3+1] = qy; _jq[j*3+2] = qz;
+				_jp[j*3] = Num(pts[j*3+1], qx); _jp[j*3+1] = Num(pts[j*3+2], qy); _jp[j*3+2] = Num(pts[j*3+3], qz);
+			}
+			var kids = _jointKids!; var par = _jointParent!;
+			foreach (int j in _jointOrder!) {
+				int p = par[j];
+				double w0 = 1, w1 = 0, w2 = 0, w3 = 0;   // the turn as a quaternion (w, x, y, z)
+				if (p >= 0) { w0 = _jrot[p*4]; w1 = _jrot[p*4+1]; w2 = _jrot[p*4+2]; w3 = _jrot[p*4+3]; }
+				var ks = kids[j];
+				if (ks.Length >= 1) {   // the first child's shortest arc (with several children, where the fit starts)
+					int k = ks[0];
+					double ax = _jq[k*3] - _jq[j*3], ay = _jq[k*3+1] - _jq[j*3+1], az = _jq[k*3+2] - _jq[j*3+2];
+					QRot(w0, w1, w2, w3, ref ax, ref ay, ref az);
+					double bx = _jp[k*3] - _jp[j*3], by = _jp[k*3+1] - _jp[j*3+1], bz = _jp[k*3+2] - _jp[j*3+2];
+					Arc(ax, ay, az, bx, by, bz, out double a0, out double a1, out double a2, out double a3);
+					QMul(a0, a1, a2, a3, w0, w1, w2, w3, out w0, out w1, out w2, out w3);
+				}
+				if (ks.Length > 1) {
+					// the best fit turn of the children's offsets, with the grandchildren's and the parent's at half weight
+					// (the grandchildren settle the turn when the children sit on one line)
+					Array.Clear(_ja, 0, 9);
+					if (p >= 0) FitAdd(j, p, 0.5);
+					foreach (int k in ks) { FitAdd(j, k, 1.0); foreach (int k2 in kids[k]) FitAdd(j, k2, 0.5); }
+					FitQuat(ref w0, ref w1, ref w2, ref w3);
+				}
+				double ql = Math.Sqrt(w0*w0 + w1*w1 + w2*w2 + w3*w3);
+				if (ql < 1e-9) { w0 = 1; w1 = w2 = w3 = 0; } else { w0 /= ql; w1 /= ql; w2 /= ql; w3 /= ql; }
+				_jrot[j*4] = w0; _jrot[j*4+1] = w1; _jrot[j*4+2] = w2; _jrot[j*4+3] = w3;
+			}
+			// a root with one child (the placement joint under a body) turns with that child, whose fit holds the twist
+			foreach (int j in _jointOrder!)
+				if (par[j] < 0 && kids[j].Length == 1) {
+					int k = kids[j][0];
+					for (int c = 0; c < 4; c++) _jrot[j*4+c] = _jrot[k*4+c];
+				}
+			for (int j = 0; j < nj; j++) {
+				// bone = [R | P - R Q] times the rest bone (column-major 4x4)
+				QMat(_jrot[j*4], _jrot[j*4+1], _jrot[j*4+2], _jrot[j*4+3], _jm);
+				double r00=_jm[0], r01=_jm[1], r02=_jm[2], r10=_jm[3], r11=_jm[4], r12=_jm[5], r20=_jm[6], r21=_jm[7], r22=_jm[8];
+				double Qx = _jq[j*3], Qy = _jq[j*3+1], Qz = _jq[j*3+2];
+				var m = _jt;
+				m[0]=r00; m[1]=r10; m[2]=r20; m[3]=0;
+				m[4]=r01; m[5]=r11; m[6]=r21; m[7]=0;
+				m[8]=r02; m[9]=r12; m[10]=r22; m[11]=0;
+				m[12]=_jp[j*3]   - (r00*Qx + r01*Qy + r02*Qz);
+				m[13]=_jp[j*3+1] - (r10*Qx + r11*Qy + r12*Qz);
+				m[14]=_jp[j*3+2] - (r20*Qx + r21*Qy + r22*Qz);
+				m[15]=1;
+				Mul(m, _bone[j], _jm);
+				Array.Copy(_jm, _bone[j], 16);
+			}
+
+			// write every part with these bones, into the default object and each routed one
+			bool mirror = scale < 0;
+			double shadeYaw = _shadeYawStep > 0 ? Math.Round(yawDeg / _shadeYawStep) * _shadeYawStep : yawDeg;
+			_tgt.Clear(); _tgtHasFp.Clear(); _tgtKeep.Clear();
+			AddTarget(objId);
+			for (int pi = 0; pi < _prims.Count; pi++) AddTarget(_partObj.TryGetValue(pi, out int mo) ? mo : objId);
+			for (int i = 0; i < _tgt.Count; i++) scene.ObjBegin(_tgt[i]);
+			ModelPlacement.Light(shadeYaw, out double lx, out double ly, out double lz);
+			int tb = TexBase(scene);
+			for (int pi = 0; pi < _prims.Count; pi++) {
+				var pr = _prims[pi];
+				int target = _partObj.TryGetValue(pi, out int mo) ? mo : objId;
+				int texId = tb + (pr.Mat >= 0 && pr.Mat < _matRgb.Length ? pr.Mat : 0);
+				TransformPrim(pr);
+				WritePrim(scene, target, pr, texId, lx, ly, lz, mirror ? -1 : 1);
+			}
+			for (int i = 0; i < _tgt.Count; i++) scene.PlaceModel(_tgt[i], x, y, z, yawDeg, scale);
+		}
+
+		// quaternion helpers (w, x, y, z)
+		private static void QMul(double a0, double a1, double a2, double a3, double b0, double b1, double b2, double b3,
+			out double o0, out double o1, out double o2, out double o3) {
+			o0 = a0*b0 - a1*b1 - a2*b2 - a3*b3;
+			o1 = a0*b1 + a1*b0 + a2*b3 - a3*b2;
+			o2 = a0*b2 - a1*b3 + a2*b0 + a3*b1;
+			o3 = a0*b3 + a1*b2 - a2*b1 + a3*b0;
+		}
+		private static void QRot(double w, double x, double y, double z, ref double vx, ref double vy, ref double vz) {
+			double tx = 2 * (y*vz - z*vy), ty = 2 * (z*vx - x*vz), tz = 2 * (x*vy - y*vx);
+			double nx = vx + w*tx + (y*tz - z*ty), ny = vy + w*ty + (z*tx - x*tz), nz = vz + w*tz + (x*ty - y*tx);
+			vx = nx; vy = ny; vz = nz;
+		}
+		// row-major 3x3 rotation of a unit quaternion into m[0..8]
+		private static void QMat(double w, double x, double y, double z, double[] m) {
+			m[0] = 1 - 2*(y*y + z*z); m[1] = 2*(x*y - w*z);     m[2] = 2*(x*z + w*y);
+			m[3] = 2*(x*y + w*z);     m[4] = 1 - 2*(x*x + z*z); m[5] = 2*(y*z - w*x);
+			m[6] = 2*(x*z - w*y);     m[7] = 2*(y*z + w*x);     m[8] = 1 - 2*(x*x + y*y);
+		}
+		// the shortest-arc turn taking direction a to direction b (identity when either is zero)
+		private static void Arc(double ax, double ay, double az, double bx, double by, double bz,
+			out double w, out double x, out double y, out double z) {
+			double la = Math.Sqrt(ax*ax + ay*ay + az*az), lb = Math.Sqrt(bx*bx + by*by + bz*bz);
+			w = 1; x = y = z = 0;
+			if (la < 1e-9 || lb < 1e-9) return;
+			ax /= la; ay /= la; az /= la; bx /= lb; by /= lb; bz /= lb;
+			double d = ax*bx + ay*by + az*bz;
+			if (d < -0.999999) {   // opposite: half a turn about any axis square to a
+				double px = Math.Abs(ax) < 0.9 ? 1 : 0, py = px == 1 ? 0 : 1;
+				double cx = ay*0 - az*py, cy = az*px - ax*0, cz = ax*py - ay*px;
+				double cl = Math.Sqrt(cx*cx + cy*cy + cz*cz);
+				w = 0; x = cx / cl; y = cy / cl; z = cz / cl; return;
+			}
+			w = 1 + d; x = ay*bz - az*by; y = az*bx - ax*bz; z = ax*by - ay*bx;
+			double l = Math.Sqrt(w*w + x*x + y*y + z*z);
+			w /= l; x /= l; y /= l; z /= l;
+		}
+
+		// vertex normals of one primitive in MODEL space into _snx/_sny/_snz, placed the way TransformPrim places its
+		// positions (skin blend or the node's matrix), unit length. Mirroring keeps them as they are: the renderers
+		// take the face normal of mirrored corners unchanged too.
+		private double[] _snx = Array.Empty<double>(), _sny = Array.Empty<double>(), _snz = Array.Empty<double>();
+		private readonly double[] _vs = new double[12];
+		private void TransformNormals(Prim pr) {
+			int nv = pr.Pos.Length / 3;
+			if (_snx.Length < nv) { _snx = new double[nv]; _sny = new double[nv]; _snz = new double[nv]; }
+			var nrm = pr.Nrm!;
+			bool skin = pr.Skinned && _bone.Length > 0;
+			double[]? g = (!skin && pr.Node >= 0 && pr.Node < _global.Length) ? _global[pr.Node] : null;
+			for (int v = 0; v < nv; v++) {
+				double nx = nrm[v*3], ny = nrm[v*3+1], nz = nrm[v*3+2], ax, ay, az;
+				if (skin) {
+					ax = 0; ay = 0; az = 0;
+					for (int k = 0; k < 4; k++) {
+						double wgt = pr.Wt[v*4+k];
+						if (wgt == 0) continue;
+						int jb = pr.Jt[v*4+k];
+						if (jb < 0 || jb >= _bone.Length) continue;
+						var b = _bone[jb];
+						ax += wgt * (b[0]*nx + b[4]*ny + b[8]*nz);
+						ay += wgt * (b[1]*nx + b[5]*ny + b[9]*nz);
+						az += wgt * (b[2]*nx + b[6]*ny + b[10]*nz);
+					}
+				} else if (g != null) {
+					ax = g[0]*nx + g[4]*ny + g[8]*nz;
+					ay = g[1]*nx + g[5]*ny + g[9]*nz;
+					az = g[2]*nx + g[6]*ny + g[10]*nz;
+				} else { ax = nx; ay = ny; az = nz; }
+				double l = Math.Sqrt(ax*ax + ay*ay + az*az);
+				if (l > 1e-9) { ax /= l; ay /= l; az /= l; } else { ax = 0; ay = 1; az = 0; }
+				_snx[v] = ax; _sny[v] = ay; _snz[v] = az;
+			}
+		}
+		// corner v's shade (as the flat shade: 0.5 + 0.5·|n·l|) and normal into _vs at o
+		private void CornerShade(int v, int o, double lx, double ly, double lz) {
+			double nx = _snx[v], ny = _sny[v], nz = _snz[v];
+			double nd = nx * lx + ny * ly + nz * lz; if (nd < 0) nd = -nd;
+			_vs[o] = 0.5 + 0.5 * nd; _vs[o + 1] = nx; _vs[o + 2] = ny; _vs[o + 3] = nz;
 		}
 
 		// the objects one Emit writes (the default one, then each routed one once), and for each the placement matrices of
@@ -577,12 +905,14 @@ namespace OpenTaiko {
 						var pr = new Prim {
 							Pos = ReadF(posA.GetInt32(), 3),
 							Uv  = att.TryGetProperty("TEXCOORD_0", out var uvA) ? ReadF(uvA.GetInt32(), 2) : null!,
+							Nrm = att.TryGetProperty("NORMAL", out var nA) ? ReadF(nA.GetInt32(), 3) : null,
 							Wt  = att.TryGetProperty("WEIGHTS_0", out var wA) ? ReadF(wA.GetInt32(), 4) : null!,
 							Jt  = att.TryGetProperty("JOINTS_0", out var jA) ? ReadI(jA.GetInt32()) : null!,
 							Idx = ReadI(idxA.GetInt32()),
 							Mat = prim.TryGetProperty("material", out var mi) ? mi.GetInt32() : 0,
 						};
 						int nv = pr.Pos.Length / 3;
+						if (pr.Nrm != null && pr.Nrm.Length != pr.Pos.Length) pr.Nrm = null;   // one normal per vertex, or none
 						if (pr.Uv == null) pr.Uv = new float[nv * 2];
 						if (pr.Wt == null) { pr.Wt = new float[nv * 4]; for (int v = 0; v < nv; v++) pr.Wt[v*4] = 1; }
 						if (pr.Jt == null) pr.Jt = new int[nv * 4];
@@ -597,7 +927,7 @@ namespace OpenTaiko {
 			bool[] nodeSkin = Array.Empty<bool>();
 			if (root.TryGetProperty("nodes", out var nodesEl)) {
 				int nc = nodesEl.GetArrayLength();
-				g._nodes = new Node[nc]; g._parent = new int[nc];
+				g._nodes = new Node[nc]; g._parent = new int[nc]; g._nodeNames = new string[nc];
 				nodeMesh = new int[nc]; nodeSkin = new bool[nc];
 				for (int i = 0; i < nc; i++) {
 					var nd = nodesEl[i]; var node = new Node();
@@ -616,6 +946,7 @@ namespace OpenTaiko {
 					}
 					nodeMesh[i] = nd.TryGetProperty("mesh", out var nm2) ? nm2.GetInt32() : -1;
 					nodeSkin[i] = nd.TryGetProperty("skin", out _);
+					g._nodeNames[i] = nd.TryGetProperty("name", out var nnEl) && nnEl.ValueKind == JsonValueKind.String ? (nnEl.GetString() ?? "") : "";
 					g._nodes[i] = node; g._parent[i] = -1;
 				}
 				for (int i = 0; i < nc; i++) foreach (var c in g._nodes[i].Children) if (c >= 0 && c < nc) g._parent[c] = i;
@@ -632,7 +963,7 @@ namespace OpenTaiko {
 				anyNodeMesh = true;
 				foreach (var tpl in meshTemplates[mi2]) {
 					g._prims.Add(new Prim {
-						Pos = tpl.Pos, Uv = tpl.Uv, Wt = tpl.Wt, Jt = tpl.Jt, Idx = tpl.Idx, Mat = tpl.Mat,
+						Pos = tpl.Pos, Uv = tpl.Uv, Nrm = tpl.Nrm, Wt = tpl.Wt, Jt = tpl.Jt, Idx = tpl.Idx, Mat = tpl.Mat,
 						Node = i, Skinned = nodeSkin[i],
 					});
 				}

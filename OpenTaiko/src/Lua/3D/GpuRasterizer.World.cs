@@ -98,6 +98,9 @@ namespace OpenTaiko {
 			void Quad(double[] d, int k, double uM, double vM, double sh, double nx, double ny, double nz);
 			/// <summary>A textured triangle at d[k], with the uvs it holds.</summary>
 			void Tri(double[] d, int k, double sh, double nx, double ny, double nz);
+			/// <summary>A textured triangle at d[k] with a shade and a normal per corner: vn[j..j+12) holds three
+			/// corners of (shade, nx, ny, nz) (smooth shading).</summary>
+			void TriV(double[] d, int k, double[] vn, int j);
 		}
 
 		// one object's quads and triangles into the sink, in order; a flat quad is a quad with no uv extent and full shade
@@ -118,9 +121,11 @@ namespace OpenTaiko {
 					sink.Quad(d, k, 0, 0, 1, nx, ny, nz);
 				}
 			} else if (o.Kind == 2) {
+				var vn = o.VnOn ? o.VN : null;
 				for (int i = 0; i < o.N; i++) {
 					int k = i * PrimLayout.TexTriStride;
 					if (!sink.Use(1, (int)d[k + PrimLayout.TexTriTex])) continue;
+					if (vn != null) { sink.TriV(d, k, vn, i * 12); continue; }
 					Nrm(o, d[k], d[k + 1], d[k + 2], d[k + 5], d[k + 6], d[k + 7], d[k + 10], d[k + 11], d[k + 12], out double nx, out double ny, out double nz);
 					sink.Tri(d, k, d[k + PrimLayout.TexTriShade], nx, ny, nz);
 				}
@@ -166,6 +171,14 @@ namespace OpenTaiko {
 				Put(w, 9, d[k + 5], d[k + 6], d[k + 7], d[k + 8], d[k + 9], sh, nx, ny, nz);
 				Put(w, 18, d[k + 10], d[k + 11], d[k + 12], d[k + 13], d[k + 14], sh, nx, ny, nz);
 			}
+			public void TriV(double[] d, int k, double[] vn, int j) {
+				var w = Grow(3);
+				for (int c = 0; c < 3; c++) {
+					int q = k + c * 5, p = j + c * 4;
+					double u = Pal ? _pu : d[q + 3], v = Pal ? _pv : d[q + 4];
+					Put(w, c * 9, d[q], d[q + 1], d[q + 2], u, v, vn[p], vn[p + 1], vn[p + 2], vn[p + 3]);
+				}
+			}
 			// room for n more vertices at the end of Dst
 			private readonly Span<float> Grow(int n) {
 				int at = Dst.Count;
@@ -210,6 +223,7 @@ namespace OpenTaiko {
 			Walk(o, ref b); b.Flush();
 			Gl.BindBuffer(BufferTargetARB.ArrayBuffer, c.Vbo);
 			Gl.BufferData<float>(BufferTargetARB.ArrayBuffer, (ReadOnlySpan<float>)CollectionsMarshal.AsSpan(_tmp), BufferUsageARB.StaticDraw);
+			_stUploads++; _stUploadVerts += _tmp.Count / STRIDE;
 			return c;
 		}
 
@@ -347,6 +361,7 @@ namespace OpenTaiko {
 			// instead of z-fighting it (road stripes on the road, ground shadows, etc.).
 			if (o.DepthBias != 0f) { Gl.Enable(EnableCap.PolygonOffsetFill); Gl.PolygonOffset(o.DepthBias, o.DepthBias); }
 			float fr = (float)(o.R / 255.0), fg = (float)(o.G / 255.0), fb = (float)(o.B / 255.0);
+			UUVAnim(o);
 			foreach (var bt in c.Batches) {
 				int a = Math.Max(bt.Start, from), b = Math.Min(bt.Start + bt.Count, to);
 				if (a >= b) continue;
@@ -357,6 +372,7 @@ namespace OpenTaiko {
 				else { BindNormalFor(s, bt.TexId); Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, gt); }
 				Gl.DrawArrays(PrimitiveType.Triangles, a, (uint)(b - a));
 			}
+			if (_cUvAnim) { _cUvAnim = false; Gl.Uniform4(_uUVAnim, 0f, 0f, 0f, 0f); }   // later draws (merged geometry) never scroll
 			if (o.DepthBias != 0f) Gl.Disable(EnableCap.PolygonOffsetFill);
 		}
 		// terrain floor with splat shading: bind the four layer textures + the weight sprite and draw

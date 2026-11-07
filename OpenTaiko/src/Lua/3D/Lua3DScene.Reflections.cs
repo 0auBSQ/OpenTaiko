@@ -59,6 +59,77 @@ namespace OpenTaiko {
 			_rtRevision = rtRev;
 		}
 
+		// a view render's screen rectangle, in render-target pixels (inclusive); the CPU rasterizer draws nothing outside it
+		internal bool _scOn; internal int _scX0, _scY0, _scX1, _scY1;
+
+		/// <summary>Render the scene from any camera into texture <paramref name="texId"/> (reduced res per
+		/// SetReflectionScale), for portals, mirrors and monitors. (ex,ey,ez) is the eye; (fx,fy,fz) the forward and
+		/// (ux,uy,uz) the up direction (normalised here, up made square to forward), so the view may roll; fovDeg is
+		/// the vertical field of view (pass the main camera's so the surface's screen-pixel sampling lines up).
+		/// mirrored = 1 negates the right axis: a planar mirror's left-handed camera. A non-zero (cnx,cny,cnz) cuts
+		/// away geometry and particles behind the plane through (cpx,cpy,cpz), keeping the side the normal points to.
+		/// (sx0,sy0)-(sx1,sy1) limits the render to that rectangle of the main view, in the screen coordinates
+		/// WorldToScreen returns (all 0 = the whole view); outside it the texture keeps the clear colour. The CPU
+		/// capture applies it; the GPU pass renders the whole view. Sampling follows RenderView's convention.</summary>
+		public void RenderViewEx(int texId, double ex, double ey, double ez, double fx, double fy, double fz,
+			double ux, double uy, double uz, double fovDeg, int mirrored,
+			double cpx, double cpy, double cpz, double cnx, double cny, double cnz,
+			double sx0, double sy0, double sx1, double sy1, int clr, int clg, int clb) {
+			if (_disposedValue) return;
+			double fl = Math.Sqrt(fx * fx + fy * fy + fz * fz);
+			if (fl < 1e-9) return;
+			fx /= fl; fy /= fl; fz /= fl;
+			double d = ux * fx + uy * fy + uz * fz;
+			ux -= d * fx; uy -= d * fy; uz -= d * fz;
+			double ul = Math.Sqrt(ux * ux + uy * uy + uz * uz);
+			if (ul < 1e-9) {   // up along forward: any square direction does
+				if (Math.Abs(fy) < 0.9) { ux = -fx * fy; uy = 1 - fy * fy; uz = -fz * fy; }
+				else { ux = 1 - fx * fx; uy = -fy * fx; uz = -fz * fx; }
+				ul = Math.Sqrt(ux * ux + uy * uy + uz * uz);
+			}
+			ux /= ul; uy /= ul; uz /= ul;
+			double rx = uy * fz - uz * fy, ry = uz * fx - ux * fz, rz = ux * fy - uy * fx;   // right = up x forward, as SetCameraAngles
+			if (mirrored != 0) { rx = -rx; ry = -ry; rz = -rz; }
+
+			_reflectTrue.Remove(texId);
+			int rw = _w >> _rttShift, rh = _h >> _rttShift;
+			if (rw < 1) rw = 1; if (rh < 1) rh = 1;
+			double kx = (double)rw / _logicalW, ky = (double)rh / _logicalH;   // screen coordinates -> view texels (render scale and shift)
+			var cam = SaveCamera();
+			int rtRev = _rtRevision;
+
+			_w = rw; _h = rh;
+			_rttPass = true;
+			SetCameraPosition(ex, ey, ez); SetCameraFov(fovDeg);
+			_yaw = Math.Atan2(fx, fz) * 180.0 / Math.PI; _pitch = Math.Asin(Math.Clamp(fy, -1, 1)) * 180.0 / Math.PI;
+			_Fx = fx; _Fy = fy; _Fz = fz; _Ux = ux; _Uy = uy; _Uz = uz; _Rx = rx; _Ry = ry; _Rz = rz;
+			double cl = Math.Sqrt(cnx * cnx + cny * cny + cnz * cnz);
+			if (cl > 1e-9) {
+				_clipOn = true; _clipNx = cnx / cl; _clipNy = cny / cl; _clipNz = cnz / cl;
+				_clipD = -(cpx * _clipNx + cpy * _clipNy + cpz * _clipNz);
+			}
+			if (sx1 > sx0 && sy1 > sy0) {
+				_scOn = true;
+				_scX0 = Math.Clamp((int)Math.Floor(sx0 * kx) - 1, 0, rw - 1); _scY0 = Math.Clamp((int)Math.Floor(sy0 * ky) - 1, 0, rh - 1);
+				_scX1 = Math.Clamp((int)Math.Ceiling(sx1 * kx) + 1, 0, rw - 1); _scY1 = Math.Clamp((int)Math.Ceiling(sy1 * ky) + 1, 0, rh - 1);
+			}
+
+			try {
+				if (_reflectGpu && _renderer is IRenderTargets gpu) {
+					try { gpu.RenderToTexture(this, texId, rw, rh, clr, clg, clb); }
+					catch (Exception e) { ReflectGpuFailed(e); }
+				} else {
+					CaptureCpuRtt(texId, rw, rh, clr, clg, clb);
+					rtRev++;
+				}
+			} finally {
+				_clipOn = false; _scOn = false;
+				_rttPass = false;
+				RestoreCamera(cam);
+				_rtRevision = rtRev;
+			}
+		}
+
 		// The CPU capture of a reflection pass: the CPU rasterizer renders the current camera into texture id texId's
 		// own canvas of rw x rh pixels, cleared to (clr, clg, clb), and its pixels become the id's texture.
 		private void CaptureCpuRtt(int texId, int rw, int rh, int clr, int clg, int clb) {
@@ -72,14 +143,30 @@ namespace OpenTaiko {
 				_rttDepth = _rttDepths[texId];
 			}
 			_canvas = _rttCanvas; _depth = _rttDepth;
-			_rttCanvas.Clear(clr, clg, clb, 255);
-			_rasterizer.Render(this);
 			if (!_rttBufs.TryGetValue(texId, out var px) || px.Length != rw * rh) { px = new int[rw * rh]; _rttBufs[texId] = px; }
+			// Outside the view's screen rectangle the texture keeps the clear colour, so only the rectangle drawn last
+			// time and the one drawn now need clearing and copying; the result is the same as a whole clear and copy.
+			int col = (clr << 16) | (clg << 8) | clb;
+			int x0 = 0, y0 = 0, x1 = rw - 1, y1 = rh - 1;
+			if (_scOn) { x0 = _scX0; y0 = _scY0; x1 = _scX1; y1 = _scY1; }
+			if (!_rttLast.TryGetValue(texId, out var last)) { last = new RttRect(); _rttLast[texId] = last; }
+			int ux0 = x0, uy0 = y0, ux1 = x1, uy1 = y1;
+			if (ReferenceEquals(last.Canvas, _rttCanvas) && ReferenceEquals(last.Px, px) && last.Col == col) {
+				ux0 = Math.Min(ux0, last.X0); uy0 = Math.Min(uy0, last.Y0); ux1 = Math.Max(ux1, last.X1); uy1 = Math.Max(uy1, last.Y1);
+			} else { ux0 = 0; uy0 = 0; ux1 = rw - 1; uy1 = rh - 1; }
+			_rttCanvas.FillRect(ux0, uy0, ux1 - ux0 + 1, uy1 - uy0 + 1, clr, clg, clb, 255);
+			_rasterizer.Render(this);
 			var buf = _rttCanvas._buf;
-			for (int i = 0; i < px.Length; i++) { int o = i * 4; px[i] = (buf[o] << 16) | (buf[o + 1] << 8) | buf[o + 2]; }
+			for (int y = uy0; y <= uy1; y++)
+				for (int i = y * rw + ux0, end = y * rw + ux1; i <= end; i++) { int o = i * 4; px[i] = (buf[o] << 16) | (buf[o + 1] << 8) | buf[o + 2]; }
+			last.Canvas = _rttCanvas; last.Px = px; last.Col = col; last.X0 = x0; last.Y0 = y0; last.X1 = x1; last.Y1 = y1;
 			RegisterTexturePixels(texId, px, rw, rh);
+			if (_tex.TryGetValue(texId, out var te)) { te.SubRev = te.Rev; te.SubX0 = ux0; te.SubY0 = uy0; te.SubX1 = ux1; te.SubY1 = uy1; }
 			_canvas = sc; _depth = sd;
 		}
+		// per view texture: the rectangle its last capture drew, on which canvas and pixel buffer, with which clear colour
+		private sealed class RttRect { public LuaCanvas? Canvas; public int[]? Px; public int Col, X0, Y0, X1, Y1; }
+		private readonly Dictionary<int, RttRect> _rttLast = new();
 
 		// ── TRUE planar reflection (correct-by-construction) ─────────────────────────────────────────
 		// The legacy RenderView(flipX) only negates the camera RIGHT axis — that is a mirror composed
@@ -161,6 +248,9 @@ namespace OpenTaiko {
 		/// the CPU rasterizer (much faster; each texId gets its own FBO). Off by default — existing
 		/// stages keep the proven CPU path; the OWM3d water opts in.</summary>
 		public void SetReflectionGpu(bool on) { _reflectGpu = on; }
+		/// <summary>Whether view renders go through the GPU off-screen pass now: SetReflectionGpu is on and the active
+		/// renderer has that pass. False again after a failed GPU pass, which turns SetReflectionGpu off.</summary>
+		public bool GetReflectionGpu() => _reflectGpu && _renderer is IRenderTargets;
 		private void ReflectGpuFailed(Exception e) {
 			_reflectGpu = false;
 			System.Diagnostics.Trace.TraceError("Lua3DScene: GPU reflection pass failed, reflections use the CPU capture from now on.\n" + e);

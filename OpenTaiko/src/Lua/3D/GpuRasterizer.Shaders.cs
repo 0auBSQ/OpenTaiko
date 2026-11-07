@@ -15,9 +15,10 @@ namespace OpenTaiko {
 		private int _uFlatCol;                                         // per-object flat albedo override (recolour a routed GLB part)
 		private int _uTex2, _uTex3, _uTex4, _uSplat, _uSplatSize, _uTexScale;   // terrain splat blending
 		private int _uNormOn;                                                   // normal-mapped textures
+		private int _uUVAnim;                                                   // uv scroll + wobble (ObjSetUVScroll / ObjSetUVWarp)
 
 		// cached world-program uniform locations per variant; BindWorldProgram copies the active set into _u*
-		private struct WLoc { public FrameLoc Frame; public int Model, NormalMat, Mode, Tex, Cutout, Tint, Alpha, Flat, Rsh, Lit, SunDir, SunCol, Amb, NumLights, LightPosR, LightCol, LightVP, Shadow, ShadowTexel, Emissive, Wet, Time, Ripple, RttFlip, Clip, Fres, Flat2, DeepOn, Tex2, Tex3, Tex4, Splat, SplatSize, TexScale, FlatCol, NormOn, NormTex; }
+		private struct WLoc { public FrameLoc Frame; public int Model, NormalMat, Mode, Tex, Cutout, Tint, Alpha, Flat, Rsh, Lit, SunDir, SunCol, Amb, NumLights, LightPosR, LightCol, LightVP, Shadow, ShadowTexel, Emissive, Wet, Time, Ripple, RttFlip, Clip, Fres, Flat2, DeepOn, Tex2, Tex3, Tex4, Splat, SplatSize, TexScale, FlatCol, NormOn, NormTex, UVAnim; }
 		private WLoc _locDef, _locSh;
 
 		// Last values sent to the bound world program's per-draw uniforms, so a draw skips the ones that did not
@@ -25,6 +26,7 @@ namespace OpenTaiko {
 		private int _cMode, _cCutout, _cLit, _cNormOn;
 		private float _cTr, _cTg, _cTb, _cAlpha, _cEr, _cEg, _cEb, _cFr, _cFg, _cFb, _cKr, _cKg, _cKb, _cKa;
 		private bool _cIdent;
+		private bool _cUvAnim;       // the bound program's uUVAnim is non-zero (only animated objects set it)
 		private double[]? _cModel;   // the transform last sent, by reference (nothing changes a transform during a pass)
 
 		// the shader sources (src/Lua/3D/Shaders, embedded in the assembly)
@@ -88,7 +90,7 @@ namespace OpenTaiko {
 				Clip = g("uClip"), Fres = g("uFres"), Flat2 = g("uFlat2"), DeepOn = g("uDeepOn"),
 				Tex2 = g("uTex2"), Tex3 = g("uTex3"), Tex4 = g("uTex4"), Splat = g("uSplat"),
 				SplatSize = g("uSplatSize"), TexScale = g("uTexScale"), FlatCol = g("uFlatCol"),
-				NormOn = g("uNormOn"), NormTex = g("uNormTex"),
+				NormOn = g("uNormOn"), NormTex = g("uNormTex"), UVAnim = g("uUVAnim"),
 			};
 		}
 
@@ -108,10 +110,11 @@ namespace OpenTaiko {
 			_uClip = L.Clip; _uFres = L.Fres; _uFlat2 = L.Flat2; _uDeepOn = L.DeepOn;
 			_uTex2 = L.Tex2; _uTex3 = L.Tex3; _uTex4 = L.Tex4; _uSplat = L.Splat;
 			_uSplatSize = L.SplatSize; _uTexScale = L.TexScale; _uFlatCol = L.FlatCol;
-			_uNormOn = L.NormOn;
+			_uNormOn = L.NormOn; _uUVAnim = L.UVAnim;
 			Gl.Uniform1(L.NormTex, 6);   // normal maps sit on texture unit 6
 			ResetUniformCache();
 			UNormOn(0);
+			Gl.Uniform4(_uUVAnim, 0f, 0f, 0f, 0f); _cUvAnim = false;
 		}
 
 		// ── per-draw uniforms of the world program, sent only when they change (see _cMode) ──
@@ -119,6 +122,13 @@ namespace OpenTaiko {
 			_cMode = _cCutout = _cLit = _cNormOn = int.MinValue;
 			_cTr = _cTg = _cTb = _cAlpha = _cEr = _cEg = _cEb = _cFr = _cFg = _cFb = _cKr = _cKg = _cKb = _cKa = float.NaN;
 			_cIdent = false; _cModel = null;
+		}
+		// the uv animation of one object; zero is sent only to clear a previous object's animation
+		private void UUVAnim(SceneObject o) {
+			bool on = o.UvDu != 0 || o.UvDv != 0 || o.UvWarp > 0;
+			if (!on && !_cUvAnim) return;
+			_cUvAnim = on;
+			Gl.Uniform4(_uUVAnim, (float)o.UvDu, (float)o.UvDv, (float)o.UvWarp, (float)o.UvWarpFreq);
 		}
 		private void UMode(int v) { if (v != _cMode) { _cMode = v; Gl.Uniform1(_uMode, v); } }
 		private void UCutout(int v) { if (v != _cCutout) { _cCutout = v; Gl.Uniform1(_uCutout, v); } }

@@ -87,6 +87,20 @@ namespace OpenTaiko {
 			var o = Obj(id); if (o != null) { bool was = o.MergeCandidate; if (o.EmR != r || o.EmG != g || o.EmB != b) RtEdit(); o.EmR = r; o.EmG = g; o.EmB = b; MergeFlip(o, was); }
 		}
 
+		/// <summary>Scroll an object's texture: uv moves by (du, dv) per second of the shader clock (SetTime), on the
+		/// textured quads and triangles of both rasterizers. 0, 0 = still (default; non-zero keeps the object out of
+		/// the static merge).</summary>
+		public void ObjSetUVScroll(int id, double du, double dv) {
+			var o = Obj(id); if (o != null) { bool was = o.MergeCandidate; o.UvDu = du; o.UvDv = dv; MergeFlip(o, was); }
+		}
+
+		/// <summary>Wobble an object's texture (liquids): uv shifts by up to <paramref name="amp"/> along two crossed
+		/// world-space waves of frequency <paramref name="freq"/>, animated by the shader clock. Per pixel on the GPU,
+		/// per vertex on the CPU. 0 amplitude = off (default).</summary>
+		public void ObjSetUVWarp(int id, double amp, double freq) {
+			var o = Obj(id); if (o != null) { bool was = o.MergeCandidate; o.UvWarp = amp < 0 ? 0 : amp; o.UvWarpFreq = freq; MergeFlip(o, was); }
+		}
+
 		/// <summary>X-RAY silhouette for a sprite object: where its billboards are OCCLUDED by world
 		/// geometry they re-draw as a faint ghost (depth-greater pass at this alpha, 0..1; 0 = off).
 		/// Keeps the player/NPCs readable behind walls, hills and buildings without moving the camera.</summary>
@@ -99,6 +113,7 @@ namespace OpenTaiko {
 			var o = Obj(id); if (o == null) return;
 			if (o.MergeCandidate) _geomRevision++;
 			o.N = 0; o.Kind = -1; o.GeomVersion++; RtEdit();
+			o.VnOn = false;
 			if (!o.BoundsSet) o.HasBounds = false;
 		}
 		public void ObjSetVisible(int id, bool v) { var o = Obj(id); if (o != null) { bool was = o.MergeCandidate; if (o.Visible != v) _rtRevision++; o.Visible = v; MergeFlip(o, was); } }
@@ -175,30 +190,30 @@ namespace OpenTaiko {
 		// ── model posing (IModel.Pose): triangles in model space, placed by the object's transform ──
 		/// <summary>True when object <paramref name="id"/> still holds what a Pose of this model with the same clip,
 		/// time, yaw, mirror and part routing wrote into it, so the new Pose only has to place it.</summary>
-		internal bool PoseIsCurrent(int id, object model, int anim, double time, double yawDeg, bool mirror, int[]? route) {
+		internal bool PoseIsCurrent(int id, object model, int anim, double time, double yawDeg, bool mirror, int[]? route, bool smooth = false) {
 			var o = Obj(id); var p = o?.Pose;
 			if (p == null || p.Version != o!.GeomVersion || !ReferenceEquals(p.Model, model) || p.Anim != anim
-				|| !p.Time.Equals(time) || !p.Yaw.Equals(yawDeg) || p.Mirror != mirror) return false;
+				|| !p.Time.Equals(time) || !p.Yaw.Equals(yawDeg) || p.Mirror != mirror || p.Smooth != smooth) return false;
 			if (p.Route == null || route == null) return p.Route == null && route == null;
 			return p.Route.AsSpan().SequenceEqual(route);
 		}
 		/// <summary>True when object <paramref name="id"/> holds what a Pose of this model with the same yaw, mirror and
 		/// part routing wrote into it while its parts sat at <paramref name="mats"/> (their placement matrices), at any
 		/// clip time: a Pose whose parts did not move leaves it as it is.</summary>
-		internal bool PoseHolds(int id, object model, double yawDeg, bool mirror, int[]? route, ReadOnlySpan<double> mats) {
+		internal bool PoseHolds(int id, object model, double yawDeg, bool mirror, int[]? route, ReadOnlySpan<double> mats, bool smooth = false) {
 			var o = Obj(id); var p = o?.Pose;
 			if (p == null || p.Version != o!.GeomVersion || !ReferenceEquals(p.Model, model) || p.MatsLen != mats.Length
-				|| !p.Yaw.Equals(yawDeg) || p.Mirror != mirror) return false;
+				|| !p.Yaw.Equals(yawDeg) || p.Mirror != mirror || p.Smooth != smooth) return false;
 			if ((p.Route == null) != (route == null) || (route != null && !p.Route.AsSpan().SequenceEqual(route))) return false;
 			return p.Mats.AsSpan(0, p.MatsLen).SequenceEqual(mats);
 		}
 		/// <summary>Record what a Pose just wrote into object <paramref name="id"/> (see <see cref="PoseIsCurrent"/>), with
 		/// the placement matrices of its parts when <paramref name="hasMats"/> (see <see cref="PoseHolds"/>).</summary>
 		internal void StampPose(int id, object model, int anim, double time, double yawDeg, bool mirror, int[]? route,
-			ReadOnlySpan<double> mats = default, bool hasMats = false) {
+			ReadOnlySpan<double> mats = default, bool hasMats = false, bool smooth = false) {
 			var o = Obj(id); if (o == null) return;
 			var p = o.Pose ??= new PoseStamp();
-			p.Model = model; p.Anim = anim; p.Time = time; p.Yaw = yawDeg; p.Mirror = mirror; p.Version = o.GeomVersion;
+			p.Model = model; p.Anim = anim; p.Time = time; p.Yaw = yawDeg; p.Mirror = mirror; p.Version = o.GeomVersion; p.Smooth = smooth;
 			if (route == null) p.Route = null;
 			else {
 				if (p.Route == null || p.Route.Length != route.Length) p.Route = new int[route.Length];
@@ -261,7 +276,39 @@ namespace OpenTaiko {
 			d[k + PrimLayout.TexTriTex] = texId; d[k + PrimLayout.TexTriShade] = shade;
 			o.GrowBounds(k, 3, 5);
 			o.N++; o.GeomVersion++; RtEdit();
+			if (o.VnOn) { EnsureVn(o); FlatVn(o, o.N - 1); }
 			if (o.MergeCandidate) _geomRevision++;
+		}
+
+		/// <summary>A textured triangle with a shade and a normal per corner (smooth shading): <paramref name="vs"/>
+		/// holds, from <paramref name="at"/>, three corners of (shade, nx, ny, nz) in the object's own space. Triangles
+		/// already in the object keep their flat look.</summary>
+		internal void ObjAddTriTexSmooth(int id,
+			double x0, double y0, double z0, double u0, double v0,
+			double x1, double y1, double z1, double u1, double v1,
+			double x2, double y2, double z2, double u2, double v2,
+			int texId, double[] vs, int at) {
+			var o = Obj(id); if (o == null) return;
+			int before = o.N;
+			ObjAddTriTex(id, x0, y0, z0, u0, v0, x1, y1, z1, u1, v1, x2, y2, z2, u2, v2, texId, (vs[at] + vs[at + 4] + vs[at + 8]) / 3.0);
+			if (o.N != before + 1) return;
+			EnsureVn(o);
+			if (!o.VnOn) { for (int i = 0; i < before; i++) FlatVn(o, i); o.VnOn = true; }
+			Array.Copy(vs, at, o.VN!, before * 12, 12);
+		}
+		private static void EnsureVn(SceneObject o) {
+			int need = o.N * 12;
+			if (o.VN == null || o.VN.Length < need) Array.Resize(ref o.VN, Math.Max(need, o.VN == null ? 12 * 64 : o.VN.Length * 2));
+		}
+		// triangle i's corners take its flat shade and face normal
+		private static void FlatVn(SceneObject o, int i) {
+			var d = o.D; int k = i * PrimLayout.TexTriStride, j = i * 12; var vn = o.VN!;
+			double ex1 = d[k + 5] - d[k], ey1 = d[k + 6] - d[k + 1], ez1 = d[k + 7] - d[k + 2];
+			double ex2 = d[k + 10] - d[k], ey2 = d[k + 11] - d[k + 1], ez2 = d[k + 12] - d[k + 2];
+			double nx = ey1 * ez2 - ez1 * ey2, ny = ez1 * ex2 - ex1 * ez2, nz = ex1 * ey2 - ey1 * ex2;
+			double l = Math.Sqrt(nx * nx + ny * ny + nz * nz); if (l > 1e-9) { nx /= l; ny /= l; nz /= l; }
+			double sh = d[k + PrimLayout.TexTriShade];
+			for (int c = 0; c < 3; c++) { vn[j + c * 4] = sh; vn[j + c * 4 + 1] = nx; vn[j + c * 4 + 2] = ny; vn[j + c * 4 + 3] = nz; }
 		}
 
 		/// <summary>Add a billboarded 2D sprite (2D-in-3D) to an object: an alpha-textured quad of

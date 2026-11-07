@@ -49,6 +49,22 @@ namespace OpenTaiko {
 			}
 			return tex;
 		}
+		// replace the texels of rectangle (x0, y0)-(x1, y1), inclusive, of texture `tex` (w texels wide) with those of px
+		private unsafe void UploadRect(uint tex, int[] px, int w, int x0, int y0, int x1, int y1, ref bool opaque) {
+			int rw = x1 - x0 + 1, rh = y1 - y0 + 1;
+			if (rw <= 0 || rh <= 0) return;
+			var b = _uploadBuf;
+			if (b == null || b.Length < rw * rh * 4) _uploadBuf = b = new byte[rw * rh * 4];
+			int k = 0;
+			for (int y = y0; y <= y1; y++)
+				for (int i = y * w + x0, end = y * w + x1; i <= end; i++, k += 4) {
+					int p = px[i];
+					b[k] = (byte)(p >> 16); b[k + 1] = (byte)(p >> 8); b[k + 2] = (byte)p; b[k + 3] = p < 0 ? (byte)0 : (byte)255;
+					if (p < 0) opaque = false;
+				}
+			Gl.BindTexture(TextureTarget.Texture2D, tex);
+			fixed (byte* dp = b) Gl.TexSubImage2D(TextureTarget.Texture2D, 0, x0, y0, (uint)rw, (uint)rh, PixelFormat.Rgba, PixelType.UnsignedByte, dp);
+		}
 		// the GL texture for a scene texture id, (re)uploaded when its revision changed (new pixels, a live mirror
 		// capture, a filter change); 0 while the id has no pixels. An upload binds on the active texture unit.
 		private uint TexFor(Lua3DScene s, int id) {
@@ -59,6 +75,12 @@ namespace OpenTaiko {
 			if (had && e.Rev == rev) return e.Tex;
 			if (te?.Pix == null) return 0;
 			int w = te.W, h = te.H;
+			if (had && e.Rev == rev - 1 && te.SubRev == rev && e.W == w && e.H == h) {
+				// a view capture changed one rectangle since the copy here: upload that part only
+				UploadRect(e.Tex, te.Pix, w, te.SubX0, te.SubY0, te.SubX1, te.SubY1, ref e.Opaque);
+				e.Rev = rev; _glTex[id] = e;
+				return e.Tex;
+			}
 			_uploadOpaque = true;
 			e.Tex = UploadTexture(had ? e.Tex : 0, had && e.W == w && e.H == h, te.Pix, w, h, false, te.Filter);
 			e.Rev = rev; e.W = w; e.H = h; e.Opaque = _uploadOpaque; _glTex[id] = e;

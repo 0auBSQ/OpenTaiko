@@ -183,6 +183,13 @@ namespace OpenTaiko {
 				Vtx(L, d[k + 10], d[k + 11], d[k + 12], d[k + 13], d[k + 14], sh, nx, ny, nz);
 				var I = Sc.I; I.Add(b); I.Add(b + 1); I.Add(b + 2);
 			}
+			public void TriV(double[] d, int k, double[] vn, int j) {
+				var L = Sc!.V; uint b = (uint)(L.Count / STRIDE);
+				Vtx(L, d[k], d[k + 1], d[k + 2], d[k + 3], d[k + 4], vn[j], vn[j + 1], vn[j + 2], vn[j + 3]);
+				Vtx(L, d[k + 5], d[k + 6], d[k + 7], d[k + 8], d[k + 9], vn[j + 4], vn[j + 5], vn[j + 6], vn[j + 7]);
+				Vtx(L, d[k + 10], d[k + 11], d[k + 12], d[k + 13], d[k + 14], vn[j + 8], vn[j + 9], vn[j + 10], vn[j + 11]);
+				var I = Sc.I; I.Add(b); I.Add(b + 1); I.Add(b + 2);
+			}
 		}
 
 		// drop the merged buffers and everything that refers to objects (the next frame rebuilds them)

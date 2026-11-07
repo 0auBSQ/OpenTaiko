@@ -29,6 +29,8 @@ namespace OpenTaiko {
 		public bool Overlay;          // drawn last over a cleared depth buffer (e.g. first-person viewmodel)
 		public bool ScreenTex;        // sample the texture by screen pixel, not UV (mirrors / portals)
 		public double RippleAmp, RippleFreq, RippleSpeed;   // screen-tex sample distortion (animated water reflection)
+		public double UvDu, UvDv;     // texture scroll in uv per second of the shader clock (SetTime); 0, 0 = still
+		public double UvWarp, UvWarpFreq;   // uv wobble: amplitude (uv) and world-space frequency; 0 amplitude = off
 		public double XrayAlpha;      // >0: sprites re-draw where occluded (depth-greater silhouette at this alpha)
 		public double FresnelF0 = -1; // screen-tex mirrors: per-pixel Schlick reflectivity (F0; <0 = legacy per-vertex shade)
 		public double DeepR = -1, DeepG, DeepB;   // screen-tex water: deep colour (vShade lerps base→deep; DeepR<0 = off)
@@ -43,6 +45,10 @@ namespace OpenTaiko {
 		public double Dist;           // scratch: squared distance to camera (set each Render)
 		public int GeomVersion;       // bumped on ObjBegin and every ObjAdd*; GPU rasterizer re-uploads this object's VBO only when it changes
 		public PoseStamp? Pose;       // what a model's Pose last wrote here (null = not posed)
+		// smooth shading (textured triangles only): per triangle three corners of (shade, nx, ny, nz) in the object's
+		// own space, used while VnOn; ObjBegin turns it off, so objects that never ask for it draw exactly as before
+		public double[]? VN;
+		public bool VnOn;
 		// GPU rasterizer: the GeomVersion it last saw, the frame that changed it and how many changes came a frame or
 		// two apart; GeomBusy keeps geometry the stage rebuilds every frame out of the static merge until it settles
 		public int GeomSeen = int.MinValue, GeomChangedAt, GeomStreak;
@@ -52,7 +58,8 @@ namespace OpenTaiko {
 		/// quads or triangles with no transform, tint, emissive, colour override, terrain splat or special drawing.</summary>
 		public bool MergeCandidate => (Kind == 0 || Kind == 2) && N > 0 && Visible && Pass == 0 && Transform == null && Lit
 			&& !Overlay && !ScreenTex && A == 255 && TintR == 1.0 && TintG == 1.0 && TintB == 1.0
-			&& EmR == 0.0 && EmG == 0.0 && EmB == 0.0 && FlatR < 0 && SplatSprite < 0 && CastShadow;
+			&& EmR == 0.0 && EmG == 0.0 && EmB == 0.0 && FlatR < 0 && SplatSprite < 0 && CastShadow
+			&& UvDu == 0.0 && UvDv == 0.0 && UvWarp == 0.0;
 
 		/// <summary>Whether a camera at (x, y, z) is behind this planar group's facing plane (ObjSetNormal), tested
 		/// against its bounds in its own space. False without a normal, or when the transform cannot be inverted.</summary>
@@ -188,6 +195,7 @@ namespace OpenTaiko {
 		public int Anim;
 		public double Time, Yaw;
 		public bool Mirror;
+		public bool Smooth;           // the triangles were written with vertex normals (smooth shading)
 		public int[]? Route;          // target object per part, or null when every part went to the posed object
 		public int Version;           // the object's GeomVersion right after the Pose wrote it
 		// the placement matrices of the object's own parts at that Pose (Mats[0..MatsLen)), MatsLen -1 when unknown: a later
@@ -204,6 +212,9 @@ namespace OpenTaiko {
 		public int Filter;            // GPU sampling filter: 0 nearest, 1 linear, 2 mipmap (textures only)
 		public int Normal = -1;       // textures: the normal map's texture id (SetTextureNormalMap), -1 = none
 		public int Rev;               // bumped whenever the pixels or the filter change; the GPU re-uploads its copy then
+		// a view capture (RenderViewEx) changed only this rectangle (inclusive) at revision SubRev: a copy one revision
+		// behind needs only that part again. SubRev 0 = no such rectangle.
+		public int SubRev, SubX0, SubY0, SubX1, SubY1;
 	}
 
 	/// <summary>A point light. Used by the raytracer (inverse-square) and the rasterizer's

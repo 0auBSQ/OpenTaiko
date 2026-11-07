@@ -65,7 +65,7 @@ namespace OpenTaiko {
 			return Math.Sqrt(dx * dx + dy * dy + dz * dz);
 		}
 
-		// A* from node `start` to node `goal`; the returned path is the transit points crossed, then (goalX,goalY,goalZ).
+		// A* from node `start` to node `goal` (binary-heap open set); the returned path is the transit points crossed, then (goalX,goalY,goalZ).
 		// Returns null if unreachable / bad indices. start==goal -> just the goal point.
 		public NavPath? FindPath(int start, int goal, double goalX, double goalY, double goalZ) {
 			int n = _nx.Count;
@@ -75,23 +75,29 @@ namespace OpenTaiko {
 
 			double gx = _nx[goal], gy = _ny[goal], gz = _nz[goal];
 			var g = new double[n]; var came = new int[n]; var viaX = new double[n]; var viaY = new double[n]; var viaZ = new double[n];
-			var inOpen = new bool[n]; var closed = new bool[n];
+			var closed = new bool[n];
 			for (int i = 0; i < n; i++) { g[i] = double.MaxValue; came[i] = -1; }
-			g[start] = 0; inOpen[start] = true;
+			g[start] = 0;
 
-			while (true) {
-				// pick the open node with the lowest f (linear scan — graphs here are small)
-				int cur = -1; double bestF = double.MaxValue;
-				for (int i = 0; i < n; i++) if (inOpen[i]) { double f = g[i] + Heur(i, gx, gy, gz); if (f < bestF) { bestF = f; cur = i; } }
-				if (cur < 0) return null;                 // open set empty -> unreachable
-				if (cur == goal) break;
-				inOpen[cur] = false; closed[cur] = true;
+			// the open set is a binary heap keyed by f; a node improved later is pushed again and its older
+			// entry is skipped when it comes out (it is already closed by then)
+			var open = new PriorityQueue<int, double>();
+			open.Enqueue(start, Heur(start, gx, gy, gz));
+			bool found = false;
+			while (open.TryDequeue(out int cur, out _)) {
+				if (closed[cur]) continue;
+				if (cur == goal) { found = true; break; }
+				closed[cur] = true;
 				foreach (var e in _adj[cur]) {
 					int to = e.To - 1; if (closed[to]) continue;
 					double ng = g[cur] + e.W;
-					if (ng < g[to]) { g[to] = ng; came[to] = cur; viaX[to] = e.Px; viaY[to] = e.Py; viaZ[to] = e.Pz; inOpen[to] = true; }
+					if (ng < g[to]) {
+						g[to] = ng; came[to] = cur; viaX[to] = e.Px; viaY[to] = e.Py; viaZ[to] = e.Pz;
+						open.Enqueue(to, ng + Heur(to, gx, gy, gz));
+					}
 				}
 			}
+			if (!found) return null;                      // open set empty -> unreachable
 
 			// reconstruct: collect the transit points from goal back to start, reverse, append the goal point
 			var stack = new List<(double, double, double)>();

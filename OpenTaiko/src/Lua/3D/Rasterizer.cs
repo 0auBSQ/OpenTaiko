@@ -317,9 +317,18 @@ namespace OpenTaiko {
 			}
 		}
 
+		// uv animation of the object being built (ObjSetUVScroll / ObjSetUVWarp): offset and wobble at the shader clock
+		private bool _uvAnim; private double _uo, _vo, _wa, _wf, _wt;
+		private void UvAt(int i, double wx, double wz) {
+			_vu[i] += _uo; _vv[i] += _vo;
+			if (_wa > 0) { _vu[i] += _wa * Math.Sin(wz * _wf + _wt * 1.3); _vv[i] += _wa * Math.Cos(wx * _wf + _wt * 1.1); }
+		}
+
 		public void Build(SceneObject o) {
 			var d = o.D; var t = o.Transform;
 			_screenT = o.ScreenTex;
+			_wt = s._shaderTime; _uo = o.UvDu * _wt; _vo = o.UvDv * _wt; _wa = o.UvWarp; _wf = o.UvWarpFreq;
+			_uvAnim = !_screenT && (_uo != 0 || _vo != 0 || _wa > 0);
 			if (_screenT) { _baseR = RenderUtil.CB(o.R); _baseG = RenderUtil.CB(o.G); _baseB = RenderUtil.CB(o.B); }
 			// screen-tex mirrors take neither the colour override nor the emissive, as on the GPU
 			_recol = o.FlatR >= 0 && !_screenT;
@@ -344,6 +353,7 @@ namespace OpenTaiko {
 					ToCam(wx1,wy1,wz1, out _vx[1], out _vy[1], out _vz[1]); _vu[1]=uMax; _vv[1]=vMax;
 					ToCam(wx2,wy2,wz2, out _vx[2], out _vy[2], out _vz[2]); _vu[2]=uMax; _vv[2]=0;
 					ToCam(wx3,wy3,wz3, out _vx[3], out _vy[3], out _vz[3]); _vu[3]=0;    _vv[3]=0;
+					if (_uvAnim) { UvAt(0, wx0, wz0); UvAt(1, wx1, wz1); UvAt(2, wx2, wz2); UvAt(3, wx3, wz3); }
 					double flR = _kR * (shade + _eR), flG = _kG * (shade + _eG), flB = _kB * (shade + _eB); bool fg = false;
 					if (objLit) {
 						FaceNormal(o, wx0,wy0,wz0, wx1,wy1,wz1, wx3,wy3,wz3, out double nx, out double ny, out double nz);
@@ -397,6 +407,7 @@ namespace OpenTaiko {
 					for (int tri = 1; tri < m - 1; tri++) AddFlatTri(0, tri, tri+1, br, bg, bb, o.A, fg, flR, flG, flB);
 				}
 			} else if (o.Kind == 2) {                           // textured triangles (models)
+				var vn = o.VnOn ? o.VN : null;                  // smooth shading: a shade and a normal per corner
 				for (int i = 0; i < o.N; i++) {
 					int k = i * PrimLayout.TexTriStride;
 					if (!s.TryTex((int)d[k + PrimLayout.TexTriTex], out var te)) continue;
@@ -407,8 +418,22 @@ namespace OpenTaiko {
 					ToCam(wx0,wy0,wz0, out _vx[0], out _vy[0], out _vz[0]); _vu[0]=d[k+3];  _vv[0]=d[k+4];
 					ToCam(wx1,wy1,wz1, out _vx[1], out _vy[1], out _vz[1]); _vu[1]=d[k+8];  _vv[1]=d[k+9];
 					ToCam(wx2,wy2,wz2, out _vx[2], out _vy[2], out _vz[2]); _vu[2]=d[k+13]; _vv[2]=d[k+14];
+					if (_uvAnim) { UvAt(0, wx0, wz0); UvAt(1, wx1, wz1); UvAt(2, wx2, wz2); }
 					double flR = _kR * (shade + _eR), flG = _kG * (shade + _eG), flB = _kB * (shade + _eB); bool fg = false;
-					if (objLit) {
+					if (vn != null) {
+						int j = i * 12;
+						for (int c = 0; c < 3; c++) {
+							double sc = vn[j + c * 4];
+							if (objLit) {
+								double nx = vn[j + c * 4 + 1], ny = vn[j + c * 4 + 2], nz = vn[j + c * 4 + 3];
+								o.NormalToWorld(ref nx, ref ny, ref nz);
+								double nl = Math.Sqrt(nx * nx + ny * ny + nz * nz); if (nl > 1e-9) { nx /= nl; ny /= nl; nz /= nl; }
+								double cx = c == 0 ? wx0 : c == 1 ? wx1 : wx2, cy = c == 0 ? wy0 : c == 1 ? wy1 : wy2, cz = c == 0 ? wz0 : c == 1 ? wz1 : wz2;
+								LightAt(cx, cy, cz, nx, ny, nz, sc, out _vlr[c], out _vlg[c], out _vlb[c]);
+							} else { _vlr[c] = sc; _vlg[c] = sc; _vlb[c] = sc; }
+						}
+						Surface(3); fg = !Uniform(3); flR = _vlr[0]; flG = _vlg[0]; flB = _vlb[0];
+					} else if (objLit) {
 						FaceNormal(o, wx0,wy0,wz0, wx1,wy1,wz1, wx2,wy2,wz2, out double nx, out double ny, out double nz);
 						if (perVertex) {
 							LightAt(wx0,wy0,wz0, nx,ny,nz, shade, out _vlr[0], out _vlg[0], out _vlb[0]);
@@ -516,7 +541,8 @@ namespace OpenTaiko {
 		public void Render(Lua3DScene s) {
 			_s = s;
 			_lit = s._useLights;
-			Array.Clear(s._depth, 0, s._depth.Length);
+			if (s._scOn) Array.Clear(s._depth, s._scY0 * s._w, (s._scY1 - s._scY0 + 1) * s._w);   // a view render only reads its rectangle's rows
+			else Array.Clear(s._depth, 0, s._depth.Length);
 
 			_opaque.Clear(); _transp.Clear(); _overlay.Clear();
 			foreach (var o in s._objects.Values) {
@@ -525,6 +551,7 @@ namespace OpenTaiko {
 				if (o.Overlay) { _overlay.Add(o); continue; }   // viewmodel: drawn last, depth-cleared
 				bool bounded = o.WorldSphere(out double cx, out double cy, out double cz, out double radius);
 				if (Culled(o, bounded, cx, cy, cz, radius)) continue;
+				if (s._scOn && bounded && OutsideScissor(s, cx, cy, cz, radius)) continue;   // a view render draws nothing outside its rectangle
 				double vx = cx - s._camX, vy = cy - s._camY, vz = cz - s._camZ;
 				o.Dist = vx * vx + vy * vy + vz * vz;   // an unbounded object sorts by its origin
 				if (o.Pass == 0) _opaque.Add(o); else _transp.Add(o);
@@ -628,6 +655,7 @@ namespace OpenTaiko {
 			int W = s._w, H = s._h;
 			double cxp = s._camX, cyp = s._camY, czp = s._camZ;
 			double Rx = s._Rx, Ry = s._Ry, Rz = s._Rz, Ux = s._Ux, Uy = s._Uy, Uz = s._Uz, Fx = s._Fx, Fy = s._Fy, Fz = s._Fz;
+			bool clip = s._clipOn; double cnx = s._clipNx, cny = s._clipNy, cnz = s._clipNz, cd = s._clipD;   // a view's clip plane cuts particles too
 			for (int si = 0; si < systems.Count; si++) {
 				var psys = systems[si]; var arr = psys.P; int cnt = psys.Count;
 				for (int i = 0; i < cnt; i++) {
@@ -635,6 +663,7 @@ namespace OpenTaiko {
 					double lf = p.LifeLeft;
 					double a = p.A0 * p.FadeAt(lf); if (a <= 0) continue; if (a > 1) a = 1;   // opacity and size over life
 					double size = p.SizeAt(lf); if (size <= 0) continue;
+					if (clip && p.X * cnx + p.Y * cny + p.Z * cnz + cd < 0) continue;
 					double rxw = p.X - cxp, ryw = p.Y - cyp, rzw = p.Z - czp;
 					double cz = rxw * Fx + ryw * Fy + rzw * Fz; if (cz < near) continue;
 					double w = 1.0 / cz;
@@ -672,6 +701,7 @@ namespace OpenTaiko {
 					int x1 = (int)System.Math.Ceiling(p.Sx + ext); if (x1 > W - 1) x1 = W - 1;
 					int y0 = (int)System.Math.Floor(p.Sy - ext); if (y0 < by0) y0 = by0;
 					int y1 = (int)System.Math.Ceiling(p.Sy + ext); if (y1 > by1 - 1) y1 = by1 - 1;
+					if (s._scOn) Scissor(s, ref x0, ref x1, ref y0, ref y1);
 					if (x0 > x1 || y0 > y1) continue;
 					if (p.Turned) { TurnedParticle(ref p, B, Dp, W, x0, x1, y0, y1); continue; }
 					float fw = p.W; bool add = p.Add; double a = p.A;
@@ -843,6 +873,32 @@ namespace OpenTaiko {
 			return o.FacesAway(s._camX, s._camY, s._camZ);
 		}
 
+		// Whether a bounding sphere projects wholly outside a view render's screen rectangle (RenderViewEx), so none of
+		// the object's pixels could land inside it. The sphere's box in camera space bounds x/z and y/z; a sphere that
+		// reaches the near plane is kept.
+		private static bool OutsideScissor(Lua3DScene s, double cx, double cy, double cz, double r) {
+			double vx = cx - s._camX, vy = cy - s._camY, vz = cz - s._camZ;
+			double x = vx * s._Rx + vy * s._Ry + vz * s._Rz;
+			double y = vx * s._Ux + vy * s._Uy + vz * s._Uz;
+			double z = vx * s._Fx + vy * s._Fy + vz * s._Fz;
+			double zn = z - r;
+			if (zn <= s._near) return false;
+			double zf = z + r;
+			double xHi = x + r, xLo = x - r, yHi = y + r, yLo = y - r;
+			double rxMax = xHi >= 0 ? xHi / zn : xHi / zf, rxMin = xLo >= 0 ? xLo / zf : xLo / zn;
+			double ryMax = yHi >= 0 ? yHi / zn : yHi / zf, ryMin = yLo >= 0 ? yLo / zf : yLo / zn;
+			double hw = s._w * 0.5, hh = s._h * 0.5, sc = s._scale;
+			double sx0 = hw + rxMin * sc, sx1 = hw + rxMax * sc;   // screen y grows downwards: y up is a smaller row
+			double sy0 = hh - ryMax * sc, sy1 = hh - ryMin * sc;
+			return sx1 < s._scX0 - 2 || sx0 > s._scX1 + 3 || sy1 < s._scY0 - 2 || sy0 > s._scY1 + 3;
+		}
+
+		// a view render's screen rectangle (RenderViewEx) narrows a pixel box
+		private static void Scissor(Lua3DScene s, ref int minX, ref int maxX, ref int minY, ref int maxY) {
+			if (minX < s._scX0) minX = s._scX0; if (maxX > s._scX1) maxX = s._scX1;
+			if (minY < s._scY0) minY = s._scY0; if (maxY > s._scY1) maxY = s._scY1;
+		}
+
 		private unsafe void RasterFlatBand(ref RTri t, int by0, int by1) {
 			var s = _s;
 			double x0 = t.X0, y0 = t.Y0, w0 = t.W0;
@@ -861,6 +917,7 @@ namespace OpenTaiko {
 			int maxX = (int)Math.Ceiling(Math.Max(x0, Math.Max(x1, x2))); if (maxX > s._w - 1) maxX = s._w - 1;
 			int minY = (int)Math.Floor(Math.Min(y0, Math.Min(y1, y2))); if (minY < by0) minY = by0;
 			int maxY = (int)Math.Ceiling(Math.Max(y0, Math.Max(y1, y2))); if (maxY > by1 - 1) maxY = by1 - 1;
+			if (s._scOn) Scissor(s, ref minX, ref maxX, ref minY, ref maxY);
 			if (minX > maxX || minY > maxY) return;
 			byte r = t.R, g = t.G, b = t.B; int alpha = t.Alpha;
 			double invA = 1.0 / area;
@@ -933,6 +990,7 @@ namespace OpenTaiko {
 			int maxX = (int)Math.Ceiling(Math.Max(x0, Math.Max(x1, x2))); if (maxX > s._w - 1) maxX = s._w - 1;
 			int minY = (int)Math.Floor(Math.Min(y0, Math.Min(y1, y2))); if (minY < by0) minY = by0;
 			int maxY = (int)Math.Ceiling(Math.Max(y0, Math.Max(y1, y2))); if (maxY > by1 - 1) maxY = by1 - 1;
+			if (s._scOn) Scissor(s, ref minX, ref maxX, ref minY, ref maxY);
 			if (minX > maxX || minY > maxY) return;
 			int[] tex = t.Tex; int tw = t.Tw, th = t.Th; int alpha = t.Alpha; bool screenT = t.ScreenTex;
 			bool sprite = t.Sprite, cutout = t.Cutout, add = t.Additive;   // alpha-textured 2D-in-3D sprite quad

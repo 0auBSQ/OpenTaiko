@@ -153,6 +153,7 @@ namespace OpenTaiko {
 			EnsureGL();
 			End2D();   // 2D drawn after an earlier Render goes back to its target first
 			_frame++;
+			_stUploads = 0; _stUploadVerts = 0;
 			var pass = GlPass.Begin(Gl);
 			try { DrawFrame(s); }
 			finally { pass.End(Gl); }
