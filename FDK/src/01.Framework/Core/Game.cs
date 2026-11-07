@@ -747,11 +747,27 @@ public abstract partial class Game : IDisposable {
 		// and the device callbacks stamp each press as it arrives. The game runs on its own thread (GameThreadMain).
 		Window_!.Initialize();
 		if (OperatingSystem.IsMacOS())
+			// GLFW's cocoa init chdirs to the bundle's Resources folder; the game's relative paths
+			// (Songs, .init, Config.ini) live next to the executable.
+			Directory.SetCurrentDirectory(AppContext.BaseDirectory);
+		if (OperatingSystem.IsMacOS())
 			Window_.GLContext?.Clear(); // made current on the game thread
 		WindowInput = Window_.CreateInput();
 
 		_gameCulture = Thread.CurrentThread.CurrentCulture;
 		_gameUICulture = Thread.CurrentThread.CurrentUICulture;
+		if (OperatingSystem.IsMacOS()) {
+			// macOS: GLFW requires window ops and the window's GL context on the main thread, so the game
+			// loop runs here too — a second thread rendering while the main thread pumps window events
+			// races the GL-on-Metal layer (abort: "command encoder is already encoding").
+			_gameThreadStarted = true;
+			this.GameThreadMain();
+			WindowInput?.Dispose();
+			_gameThreadException?.Throw();
+			Window_.Reset();
+			return;
+		}
+
 		_gameThread = new Thread(this.GameThreadMain, 8 * 1024 * 1024) { Name = "GameThread" };
 		if (OperatingSystem.IsWindows())
 			_gameThread.SetApartmentState(ApartmentState.STA); // as the main thread it takes over from
@@ -780,7 +796,7 @@ public abstract partial class Game : IDisposable {
 		} finally {
 			// also when this loop fails: the game thread still shuts down before the window goes away
 			this._quitRequested = true;
-			_gameThread.Join();
+			_gameThread?.Join();
 		}
 		WindowInput?.Dispose();
 		_gameThreadException?.Throw();
@@ -799,6 +815,21 @@ public abstract partial class Game : IDisposable {
 			var clock = Stopwatch.StartNew();
 			double last = 0;
 			while (!this._quitRequested) {
+				if (OperatingSystem.IsMacOS()) {
+					// single-threaded on macOS: this loop is the window thread too (see Run)
+					while (_windowCommands.TryDequeue(out var command)) {
+						try {
+							command();
+						} catch (Exception e) {
+							Trace.TraceWarning($"Window command failed: {e}");
+						}
+					}
+					this.OnEvents();
+					if (Window_!.IsClosing)
+						this._quitRequested = true;
+					if (this._quitRequested)
+						break;
+				}
 				CFrameProfiler.FrameBegin();
 				double now = clock.Elapsed.TotalSeconds;
 				double delta = Math.Max(now - last, 1e-6);
