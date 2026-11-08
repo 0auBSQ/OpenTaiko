@@ -68,6 +68,10 @@ sips -s format icns "$TMP_ICON" --out "$APP/Contents/Resources/OpenTaiko.icns" >
 echo "[package-osx-app] skipping codesign (macOS 26 rejects bundles containing unsigned data files; \
 an unsigned local build opens directly, other Macs need right-click -> Open)"
 
+echo "[package-osx-app] NOTE: move the app out of Downloads (e.g. to /Applications) before first \
+launch — macOS runs downloaded apps from a read-only temporary copy, where the game cannot save \
+settings or scores."
+
 echo "[package-osx-app] zipping..."
 rm -f "$PROJECT_DIR/OpenTaiko-osx-arm64.zip"
 ditto -c -k --keepParent "$APP" "$PROJECT_DIR/OpenTaiko-osx-arm64.zip"

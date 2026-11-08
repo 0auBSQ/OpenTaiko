@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Runtime.Loader;
 using System.Text;
 
 namespace OpenTaiko;
@@ -143,11 +144,27 @@ internal class Program {
 						FFmpeg.AutoGen.ffmpeg.RootPath = AppContext.BaseDirectory + @"FFmpeg/" + osplatform + "-" + platform + "/";
 						if (OperatingSystem.IsLinux())
 							FFmpeg.AutoGen.ffmpeg.GetOrLoadLibrary = LoadFFmpegLibrary;
-						DirectoryInfo info = new DirectoryInfo(AppContext.BaseDirectory + @"Libs/" + osplatform + "-" + platform + "/");
-
-						//実行ファイルの階層にライブラリをコピー
-						foreach (FileInfo fileinfo in info.GetFiles()) {
-							fileinfo.CopyTo(AppContext.BaseDirectory + fileinfo.Name, true);
+						if (OperatingSystem.IsMacOS()) {
+							// No copy next to the executable: the packaged app must not write into its own
+							// bundle (read-only under App Translocation, and it would break any future code
+							// signature). BASS loads straight from Libs/osx-*/ via this resolver.
+							string libsDir = AppContext.BaseDirectory + @"Libs/" + osplatform + "-" + platform + "/";
+							AssemblyLoadContext.Default.ResolvingUnmanagedDll += (assembly, name) => {
+								string? file = name switch {
+									"bass" => "libbass.dylib",
+									"bass_fx" => "libbass_fx.dylib",
+									"bassmix" => "libbassmix.dylib",
+									"bassopus" => "libbassopus.dylib",
+									_ => null,
+								};
+								return file == null ? IntPtr.Zero : NativeLibrary.Load(Path.Combine(libsDir, file));
+							};
+						} else {
+							//実行ファイルの階層にライブラリをコピー
+							DirectoryInfo info = new DirectoryInfo(AppContext.BaseDirectory + @"Libs/" + osplatform + "-" + platform + "/");
+							foreach (FileInfo fileinfo in info.GetFiles()) {
+								fileinfo.CopyTo(AppContext.BaseDirectory + fileinfo.Name, true);
+							}
 						}
 					}
 

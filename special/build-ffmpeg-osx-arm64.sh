@@ -3,8 +3,8 @@
 # OpenTaiko/FFmpeg/osx-arm64/. Native host build (no cross-compile), same 7 libraries and
 # plain dylib names as FFmpeg/osx-x64/.
 #
-# The dylibs keep a consistent --prefix install_name, mirroring osx-x64 where dependency
-# resolution works because FFmpeg.AutoGen loads providers before consumers.
+# The dylibs target macOS 13 (the app's LSMinimumSystemVersion) via MACOSX_DEPLOYMENT_TARGET,
+# and use @loader_path install names so they find each other inside the bundle on their own.
 
 set -e
 
@@ -28,6 +28,10 @@ curl -sL "https://ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.tar.xz" | tar xJ 
 SRC="$(echo "$WORK"/ffmpeg-* "$WORK"/FFmpeg-* 2>/dev/null | tr ' ' '\n' | grep -vE '\*' | head -1)"
 echo "[build-ffmpeg-osx-arm64] source: $SRC"
 
+# The Mac that builds this sets the deployment target: without one, the dylibs require that
+# Mac's own macOS version (min 26 on a macOS 26 host) and refuse to load on older systems.
+export MACOSX_DEPLOYMENT_TARGET=13.0
+
 # Decode-focused but keeps encoders/muxers/avfilter (VideoExporter uses avfilter).
 # Decode-only bits match OpenTaiko.iOS/scripts/build-ffmpeg.sh.
 COMMON_CONFIG=(
@@ -38,6 +42,9 @@ COMMON_CONFIG=(
   --enable-bsf=h264_mp4toannexb,hevc_mp4toannexb,extract_extradata,vp9_superframe
   --enable-protocol=file
   --disable-gpl --disable-nonfree
+  --extra-cflags=-mmacosx-version-min=13.0
+  --extra-ldflags=-mmacosx-version-min=13.0
+  --install-name-dir='@loader_path'
 )
 
 echo "[build-ffmpeg-osx-arm64] configuring..."
