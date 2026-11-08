@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.7.0.7] - 2026-11-08 (Beta)
+
+- [Feat] Add extra my room items
+- [Enhancement] Minor global modules UI enhancements
+- [Enhancement] Contacts page in the phone for numbers you got from other characters
+
 ## [0.7.0.6] - 2026-11-07 (Beta)
 
 - [Enhancement] 3D engine minor additions and optimizations
