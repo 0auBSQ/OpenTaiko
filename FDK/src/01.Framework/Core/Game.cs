@@ -796,7 +796,7 @@ public abstract partial class Game : IDisposable {
 		} finally {
 			// also when this loop fails: the game thread still shuts down before the window goes away
 			this._quitRequested = true;
-			_gameThread?.Join();
+			_gameThread.Join();
 		}
 		WindowInput?.Dispose();
 		_gameThreadException?.Throw();
