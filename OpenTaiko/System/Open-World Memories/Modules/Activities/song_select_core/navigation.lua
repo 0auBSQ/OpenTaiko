@@ -3,6 +3,7 @@
 --                    input handling for song_select_core.
 
 local Config    = require("Core.Config")
+local SongTitle = require("Songs.Title")
 local Layout    = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
 local List      = Layout.song_list
@@ -172,7 +173,7 @@ local function vaultLockKey(node)
 end
 
 local function buildSlot(node, isSelected)
-    local slot = { text = node.Title, gold = isSelected }
+    local slot = { text = SongTitle.of(node), gold = isSelected }
     slot.isSong, slot.isFolder = node.IsSong == true, node.IsFolder == true
     slot.isRandom, slot.isReturn = node.IsRandom == true, node.IsReturn == true
     slot.genre = node.Genre
@@ -276,7 +277,7 @@ local function buildSelInfo(node)
     sel.hi = G.unlocks.effectiveHiddenIndex(node)
     sel.hasVideo, sel.explicit = node.HasVideo == true, node.Explicit == true
     sel.isVault  = node.Genre == "Secret Vault"
-    sel.subtitle = node.Subtitle
+    sel.subtitle = SongTitle.subtitleOf(node)
     sel.charter  = string.format(G.skinText("SONGSELECT_INFO_CHART", "Chart - %s"), node.Maker)
     sel.diffs = {}
     for i = 0, 4 do

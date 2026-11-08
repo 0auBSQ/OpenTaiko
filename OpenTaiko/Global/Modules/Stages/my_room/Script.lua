@@ -41,6 +41,14 @@ local AV       = require("avatar")          -- the students' billboard sprites (
 local Student  = require("Characters.Student")   -- the chosen story student and its palette
 local Purse    = require("purse")           -- the coin purse laid over the landlord's offers; see purse.lua
 local Landlord = require("landlord")        -- the landlord's phone call; see landlord.lua
+-- Mr.Caspian's and Gris's numbers: the secret vault's small talks, which only Open-World Memories has (its
+-- Modules/Lib); with another skin these numbers answer like any other
+local Talk     = nil
+do
+    local ok, mod = pcall(require, "Vault.Talk")
+    if ok and type(mod) == "table" then Talk = mod end
+end
+local Chests   = require("Vault.Chests")    -- the song Gris's call unlocks, shown like a vault reward
 local Integrity = require("integrity")      -- the load-time placement sweep; see integrity.lua
 local Store    = require("store")           -- the room and the jukebox in the save's "my_room" string; see store.lua
 local NavInput = require("Input.NavInput")
@@ -81,6 +89,11 @@ local ringT, ringScript, ringDue = 0, nil, false  -- an outgoing call: coin, the
 local phoneSfx = {}            -- cached dialable-number SFX (stem → sound|false); disposed in onDestroy
 local bombFx = nil             -- the "Canabi" bomb-storm state (declared here so onDestroy sees it)
 local branchCall = nil         -- the running call that branches (data/phone_numbers.json "start")
+local talkCo, talkRun = nil, nil       -- a call to Mr.Caspian or Gris (a Vault.Talk flow), and the lines it says
+local talkPlay = nil                   -- the song that call asks for: the room leaves for it
+local talkAway, talkBack = false, nil  -- left for that song; back: whether it was cleared
+local talkCafe = false                 -- the call is Mr.Caspian's: the cafe can be heard behind him
+local cafeSnd, cafeOn, cafeK, cafeTo, cafeNode = nil, false, 0, nil, nil
 
 -- ── persistence (local save only; the network payload goes through online.lua as JSON) ────────────
 -- the room and the jukebox's song live in one string of the save (store.lua); a visitor never writes,
@@ -301,6 +314,7 @@ function activate()
     purse:hide()
     ringT, ringScript, ringDue = 0, nil, false
     branchCall = nil
+    if talkAway then talkAway = false; talkBack = Talk.cleared() end
     if world ~= nil then return end
     LOADING:Add("Room", 5, function()
         world = OWM.World.new{ rw = RW, rh = RH, screenW = SCREEN_W, screenH = SCREEN_H,
@@ -376,6 +390,8 @@ function onDestroy()
     PCS.disposeBgm()
     if Edit.disposeSfx then Edit.disposeSfx() end
     for _, s in pairs(phoneSfx) do if s then pcall(function() s:Dispose() end) end end
+    if cafeSnd then pcall(function() cafeSnd:Dispose() end) end
+    cafeSnd = nil
     Pod.dispose()
     phoneSfx = {}; bombFx = nil
 end
@@ -615,7 +631,37 @@ local function callStep(call, step)
     end
     return nodes
 end
+-- the cafe behind Mr.Caspian's voice: his first line brings it in, the lines of Vault.Talk.CAFE set its level
+local CAFE_VOLUME = 60
+local function stopCafe()
+    if cafeSnd and cafeOn then pcall(function() cafeSnd:Stop() end) end
+    talkCafe, cafeOn, cafeK, cafeTo, cafeNode = false, false, 0, nil, nil
+end
+local function tickCafe(dt)
+    local nd = dlg.activeFlag and dlg.node or nil
+    if nd ~= nil and nd ~= cafeNode then
+        cafeNode = nd
+        if nd.cafe ~= nil then cafeTo = nd.cafe elseif nd.who == "C" and cafeTo == nil then cafeTo = 1 end
+    end
+    if cafeTo == nil then return end
+    if cafeSnd == nil then
+        pcall(function() cafeSnd = SOUND:CreateSFX("Sounds/phone_cafe.ogg") end)
+        cafeSnd = cafeSnd or false
+    end
+    if not cafeSnd then return end
+    if cafeTo <= 0 then cafeK = 0                                  -- the line clicks
+    elseif cafeK < cafeTo then cafeK = math.min(cafeTo, cafeK + dt / 0.5)
+    else cafeK = math.max(cafeTo, cafeK - dt / 1.5) end
+    if not cafeOn then
+        cafeOn = true
+        cafeSnd:SetLoop(true)
+        cafeSnd:SetVolumePercent(0)
+        cafeSnd:Play()
+    end
+    cafeSnd:SetVolumePercent(CAFE_VOLUME * cafeK)
+end
 local function endCall()
+    stopCafe()
     branchCall = nil
     mode = "play"; phoneFlow = nil
     playPhoneSound("phone_cut")
@@ -640,8 +686,62 @@ local function branchNext(result)
     if branchCall == nil or branchCall.answered or type(result) ~= "string" then return nil end
     return callStep(branchCall, result)
 end
+-- Mr.Caspian's and Gris's numbers: Vault.Talk runs the call (its lines, menus and Gris's song), the
+-- phone's dialogue says it
+local TALK_BLIP = { C = "blip_caspian", O = "blip_caspian", G = "blip_gris", U = "blip_gris", N = "blip_narrator" }
+local talkStep
+local function talkNodes(list)
+    local nodes = {}
+    for i, n in ipairs(list) do
+        local node = { name = Talk.name(n.who), text = (Talk.text(n.key):gsub("[{}]", "")), blip = TALK_BLIP[n.who],
+                       who = n.who, cafe = Talk.CAFE[n.key] }
+        if n.choices then
+            node.choices = {}
+            for j, c in ipairs(n.choices) do node.choices[j] = { label = (c.label:gsub("[{}]", "")), value = j } end
+        end
+        nodes[i] = node
+    end
+    return nodes
+end
+local function talkResume(...)
+    if talkCo ~= nil then
+        local ok, r = coroutine.resume(talkCo, ...)
+        if not ok then
+            if debugLog then debugLog("my_room call: " .. tostring(r)) end
+        elseif coroutine.status(talkCo) ~= "dead" and r ~= nil then
+            if r[1] == "say" then talkRun = r[2]; return talkStep() end
+            if r[1] == "play" then talkPlay = r[2]; return end
+            if r[1] == "reward" and Chests.showReward(r[2]) then mode = "reward"; return end
+            return talkResume()          -- the vault's staging: nothing to do on the phone
+        end
+    end
+    talkCo, talkRun = nil, nil
+    endCall()
+end
+talkStep = function()
+    local kind, x = talkRun:step()
+    if kind == "lines" then
+        dlg:start(talkNodes(x))
+        if x[1].shown then dlg.revealed = dlg.total or 0 end
+        return
+    end
+    talkResume(kind == "action" and x or nil)
+end
 local function dialPhone(input)
     local key = tostring(input or ""):gsub("%s+", ""):lower()
+    local flow = nil
+    if Talk then
+        Talk.slot = playerIndex
+        flow = Talk.call(key)
+    end
+    if flow ~= nil then
+        -- the coin is in: the ring, then the other side picks up
+        talkCo, talkRun, talkPlay = flow, nil, nil
+        talkCafe = key == Talk.CASPIAN_NUMBER
+        mode = "dialogue"; phoneFlow = "talk"
+        ringT, ringScript, ringDue = 2.6, talkResume, true
+        return true
+    end
     local doc = phoneNumbersDoc()
     local ev = nil
     pcall(function() ev = doc and doc[key] or nil end)
@@ -880,6 +980,33 @@ local function buildPhoneTextPane(title, hintText, maxLen, confirmLabel, onConfi
                onClick = function() buildPhoneMenu() end, sfx = { click = "cancel" } }
 end
 
+-- the numbers the player has (Vault.Talk.contacts); choosing one dials it
+local function phoneContacts()
+    if Talk == nil then return {} end
+    Talk.slot = playerIndex
+    return Talk.contacts()
+end
+local function buildContactsPane(list)
+    if phoneUI then phoneUI:disposeWidgets() end
+    local ui = UI.new{ theme = PHONE_THEME, navPlayer = playerIndex + 1 }
+    phoneUI = ui
+    local items = {}
+    for i, c in ipairs(list) do items[i] = { text = c.name .. "  (" .. c.number .. ")", value = c.number } end
+    items[#items + 1] = { text = PHONE:tr("back"), value = "back" }
+    local x, y, w = SCREEN_W / 2 - 360, 260, 720
+    local h = 130 + #items * 78 + 60
+    ui:panel{ x = x, y = y, w = w, h = h, title = PHONE:tr("contacts_title") }
+    ui:menu{
+        x = x + 36, y = y + 96, w = w - 72, h = #items * 78, rowHeight = 78, items = items,
+        onSelect = function(_, it)
+            if it.value == "back" then buildPhoneMenu(); return true end
+            closePhone()
+            playPhoneSound("phone_coin")
+            return dialPhone(it.value)
+        end,
+    }
+end
+
 buildPhoneMenu = function()
     if phoneUI then phoneUI:disposeWidgets() end
     local ui = UI.new{ theme = PHONE_THEME, navPlayer = playerIndex + 1 }
@@ -892,6 +1019,8 @@ buildPhoneMenu = function()
         entries = {
             { label = PHONE:tr("menu_landlord"), value = "landlord" },
             { label = PHONE:tr("menu_number"), value = "number" },
+            -- greyed while the player has no number
+            { label = PHONE:tr("menu_contacts"), value = "contacts", locked = #phoneContacts() == 0 },
         }
         if not net.online and not net.connecting then
             entries[#entries + 1] = { label = PHONE:tr("menu_invite"), value = "invite" }
@@ -900,15 +1029,19 @@ buildPhoneMenu = function()
     end
     entries[#entries + 1] = { label = PHONE:tr("menu_hang_up"), value = "close" }
     local items = {}
-    for i, e in ipairs(entries) do items[i] = { text = e.label, value = e.value } end
+    for i, e in ipairs(entries) do items[i] = { text = e.label, value = e.value, locked = e.locked } end
     local x, y, w = SCREEN_W / 2 - 360, 260, 720
     local h = 130 + #items * 78 + 60
     ui:panel{ x = x, y = y, w = w, h = h, title = PHONE:tr("title") }
     ui:menu{
         x = x + 36, y = y + 96, w = w - 72, h = #items * 78, rowHeight = 78, items = items,
+        drawLocked = function() end,     -- a greyed row, without the padlock
         onSelect = function(_, it)
             local v = it.value
-            if v == "landlord" then
+            if v == "contacts" then
+                buildContactsPane(phoneContacts())
+                return true
+            elseif v == "landlord" then
                 closePhone(); phoneFlow = "landlord"
                 placeCall(Landlord.script())
             elseif v == "number" then
@@ -1020,6 +1153,12 @@ openPlayerSelect = function()
 end
 
 local function onDialogueDone(result)
+    if phoneFlow == "talk" then
+        if talkRun == nil then endCall(); return end
+        if talkRun.asking then talkRun:answer(result) end
+        talkStep()
+        return
+    end
     if phoneFlow == "branch" then
         local nxt = branchNext(result)
         if nxt then dlg:start(nxt) ; return end
@@ -1145,6 +1284,13 @@ function update(ts)
     OWM.ModelIcon.newFrame()       -- per-frame first-render budget for the edit-grid preview icons
     if world == nil or map == nil then return nil end
     tickBombs(dt)                  -- the Canabi bomb storm runs across every mode (incl. its message)
+    if talkBack ~= nil and mode == "play" then
+        -- back from Gris's song: her call goes on
+        local cleared = talkBack
+        talkBack = nil
+        mode = "dialogue"; phoneFlow = "talk"
+        talkResume(cleared)
+    end
 
     -- online: drain events + advance remote avatars every frame (even under a menu)
     if net.online or net.connecting then
@@ -1167,16 +1313,34 @@ function update(ts)
 
     -- ── modal overlays ──
     if mode == "dialogue" then
+        if talkPlay ~= nil then
+            -- Gris's song: the room leaves for it, and the call goes on once the room is back
+            local node = talkPlay
+            talkPlay = nil
+            if Talk.mount(node) then
+                talkAway = true
+                MO.leave(); GLOBALCAMERA:Reset(); saveRoom(); rememberPlace()
+                return Exit("play", nil)
+            end
+            talkResume(false)
+        end
         purse:update(dt)
         if ringT > 0 then
             ringT = ringT - dt
             if ringDue and ringT <= 1.6 then ringDue = false ; playPhoneSound("phone_ring") end
-            if ringT <= 0 and ringScript then dlg:start(ringScript) ; ringScript = nil end
+            if ringT <= 0 and ringScript then
+                local s = ringScript
+                ringScript = nil
+                if type(s) == "function" then s() else dlg:start(s) end
+            end
         elseif dlg:update(dt) == "done" then onDialogueDone(dlg.result) end
+        if talkCafe then tickCafe(dt) end
         settlePlayer(dt); world:update(dt, px, py, pz); return nil
     elseif mode == "reward" then
         local modal = ROACTIVITY:GetROActivity("modal")
-        if modal ~= nil and modal.IsActive then modal:Update() else mode = "play" end
+        if modal ~= nil and modal.IsActive then modal:Update()
+        elseif phoneFlow == "talk" then mode = "dialogue"; talkResume()
+        else mode = "play" end
         settlePlayer(dt); world:update(dt, px, py, pz); return nil
     elseif mode == "pod" then
         if Pod.update(dt) == "go" then

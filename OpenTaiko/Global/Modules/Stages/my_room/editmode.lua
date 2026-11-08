@@ -58,6 +58,16 @@ local CATS = {
 local TAB_X0, TAB_Y, TAB_W, TAB_H, TAB_STEP = 28, BAR_Y + 18, 168, 52, 178
 local GRID_X0, GRID_Y, SLOT_W, SLOT_H, SLOT_STEP = 28, BAR_Y + 84, 118, 150, 130
 local BAR_NAME = { sizes = { 15, 13 } }                    -- a slot's name, on up to two lines
+local ARROW_W, ARROW_GAP = 44, 10                          -- the grid's page arrows, up while not every item fits
+
+-- the grid's layout for n items: the first slot's x, how many slots show, and whether the arrows are up
+local function gridLayout(n)
+    local fit = floor((SW - 2 * GRID_X0 - SLOT_W) / SLOT_STEP) + 1
+    if n <= fit then return GRID_X0, fit, false end
+    local lo, hi = GRID_X0 + ARROW_W + ARROW_GAP, SW - GRID_X0 - ARROW_W - ARROW_GAP
+    local shown = floor((hi - lo - SLOT_W) / SLOT_STEP) + 1
+    return lo + floor((hi - lo - SLOT_W - (shown - 1) * SLOT_STEP) / 2), shown, true
+end
 
 local THEME = {
     colors = {
@@ -288,6 +298,7 @@ function Edit:enter(pc, pr)
     self.playerC, self.playerR = pc, pr
     self.sel, self.hold, self.pressItem = nil, nil, nil
     self.dragExit = false
+    self.barFirst = 0
     self.facing, self.mount = 0, "low"
     self.ghostModels, self.activeGhost = {}, nil
     self.ghostWallModels, self.activeWallGhost = {}, nil
@@ -515,6 +526,7 @@ function Edit:setCategory(i)
         if self.hold then self:restoreHold(true) end
         self.cat = i
         self.sel = nil
+        self.barFirst = 0
         self:deselect(true)
         self._barDirty = true
         Sfx.play("select")
@@ -820,22 +832,45 @@ function Edit:buildBar()
 
     -- item grid: square buttons — icon + name underneath + a ×N stock pill (drawn in draw())
     local ids = self:items()
-    for i, id in ipairs(ids) do
-        local iid = id
-        local x = GRID_X0 + (i - 1) * SLOT_STEP
+    local x0, shown, paged = gridLayout(#ids)
+    local first = max(0, min(self.barFirst or 0, #ids - shown))
+    self.barFirst, self.barShown, self.barPaged = first, shown, paged
+    if paged then
+        ui:button{
+            text = "<", x = GRID_X0, y = GRID_Y, w = ARROW_W, h = SLOT_H, enabled = first > 0,
+            onClick = function() edit:scrollBar(-shown) end,
+        }
+        ui:button{
+            text = ">", x = SW - GRID_X0 - ARROW_W, y = GRID_Y, w = ARROW_W, h = SLOT_H, enabled = first + shown < #ids,
+            onClick = function() edit:scrollBar(shown) end,
+        }
+    end
+    for k = 1, min(shown, #ids - first) do
+        local iid = ids[first + k]
+        local x = x0 + (k - 1) * SLOT_STEP
         local y = GRID_Y
-        if x + SLOT_W < SW - 16 then
-            local selOn = (self.sel == iid)
-            ui:button{
-                text = "", x = x, y = y, w = SLOT_W, h = SLOT_H, accent = selOn,
-                onClick = function() edit:setSelection(iid) end,
-            }
-            local infinite = (iid == Room.DEFAULT_FLOOR or iid == Room.DEFAULT_PAINT)
-            self.barSlots[#self.barSlots + 1] = { id = iid, x = x, y = y, w = SLOT_W, h = SLOT_H,
-                                                  n = infinite and -1 or (self.room.inventory[iid] or 0), sel = selOn }
-        end
+        local selOn = (self.sel == iid)
+        ui:button{
+            text = "", x = x, y = y, w = SLOT_W, h = SLOT_H, accent = selOn,
+            onClick = function() edit:setSelection(iid) end,
+        }
+        local infinite = (iid == Room.DEFAULT_FLOOR or iid == Room.DEFAULT_PAINT)
+        self.barSlots[#self.barSlots + 1] = { id = iid, x = x, y = y, w = SLOT_W, h = SLOT_H,
+                                              n = infinite and -1 or (self.room.inventory[iid] or 0), sel = selOn }
     end
     ui:clearPrevFocus()
+end
+
+-- scrolls the item grid by d slots; false while every item fits
+function Edit:scrollBar(d)
+    if not self.barPaged then return false end
+    local first = max(0, min((self.barFirst or 0) + d, #self:items() - (self.barShown or 0)))
+    if first ~= self.barFirst then
+        self.barFirst = first
+        self._barDirty = true
+        Sfx.play("hover")
+    end
+    return true
 end
 
 -- the rounded ×N stock pill (baked once with PopUI Shape in the theme's accent colours)
@@ -989,7 +1024,8 @@ function Edit:update(ts, editCameraFuncs)
             self:updateBrowse(mx, my, lpressed, lpressing, lreleased)
         end
     else
-        editCameraFuncs.zoom(sdy)
+        -- the wheel over the item grid scrolls it while not every item fits, else it zooms
+        if not (sdy ~= 0 and my >= GRID_Y and self:scrollBar(sdy > 0 and -1 or 1)) then editCameraFuncs.zoom(sdy) end
         self.hoverC, self.hoverR, self.hoverSlot, self.hoverTile, self.hoverExitC = nil, nil, nil, nil, nil
         self.hoverItem, self.hoverWallItem, self.hoverExit = nil, nil, false
         if lreleased then self.pressItem = nil end

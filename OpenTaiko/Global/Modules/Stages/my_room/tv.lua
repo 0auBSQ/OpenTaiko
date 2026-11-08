@@ -17,6 +17,7 @@
 
 local UI = require("uilib")           -- the skin's UI library (UI.Pick), picked on first use
 local I18N = require("Locale.i18n")
+local SongTitle = require("Songs.Title")
 local T = I18N.texts("tv")     -- lang/<code>/tv.json
 
 local TV = {}
@@ -270,7 +271,7 @@ local function cutSceneEntry(n, sf, saveIndex)
     if folder == nil then return nil end
     local cuts = songCutScenes(n, folder, sf, played)
     if #cuts == 0 then return nil end
-    return { title = n.Title or "?", locked = n.IsLocked == true, genre = n.Genre or "?", cuts = cuts }
+    return { title = SongTitle.of(n) or "?", locked = n.IsLocked == true, genre = n.Genre or "?", cuts = cuts }
 end
 
 -- a chart video plays under the song's audio, starting MOVIEOFFSET after it as in game
@@ -283,7 +284,7 @@ local function chartVideoEntry(n, sf, saveIndex)
     local locked = n.IsLocked == true
     local video = { kind = "video", path = n.VideoPath, audio = n.AudioPath or "", offset = n.VideoOffsetMs or 0,
                     discovered = played and not locked }
-    return { title = n.Title or "?", locked = locked, genre = n.Genre or "?", cuts = { video } }
+    return { title = SongTitle.of(n) or "?", locked = locked, genre = n.Genre or "?", cuts = { video } }
 end
 
 local function cutText(e, c)

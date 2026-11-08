@@ -3,6 +3,8 @@
   "title": "Teléfono",
   "menu_landlord": "Llamar al casero",
   "menu_number": "Marcar un número",
+  "menu_contacts": "Contactos",
+  "contacts_title": "Contactos",
   "menu_invite": "Invitar amigos (abrir una sala)",
   "menu_join": "Unirse a un amigo (introducir código)",
   "menu_stop_hosting": "Dejar de alojar (cerrar la sala)",

@@ -8,6 +8,7 @@
 local I18N = require("i18n")
 local NavInput = require("NavInput")
 local Config = require("Core.Config")
+local SongTitle = require("Songs.Title")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
 local Results, DialogueLayout = Layout.results, Layout.dialogue
@@ -272,7 +273,7 @@ local function eEvalCorrect()
     Stage.setScore(1, scores[1])
     setState("e_correct")
     local sel = utils.getSelectedSong()
-    local songTitle = (sel and sel.Title) or "?"
+    local songTitle = (sel and SongTitle.of(sel)) or "?"
     Stage.setBlackboard(songTitle, winsLine(1, 1))
     local line
     if singleSongMode and scores[1] >= 100 then
@@ -303,7 +304,7 @@ local function eEvalFail()
     Stage.setSongList(nil, nil)
     -- reveal the correct answer on the stage panel
     local sel = utils.getSelectedSong()
-    Stage.setBlackboard(sel and sel.Title or nil, I18N.tr("It's a wrap!"))
+    Stage.setBlackboard(sel and SongTitle.of(sel) or nil, I18N.tr("It's a wrap!"))
     Stage.setBoardLights("wrong")
     Stage.setDarken(true)
     Stage.setShowFail(true)
@@ -361,7 +362,7 @@ local function vsEvalFail()
     Stage.setSongList(nil, nil)
     -- nobody found it in time — reveal the correct answer on the stage panel
     local sel = utils.getSelectedSong()
-    Stage.setBlackboard(sel and sel.Title or nil, I18N.tr("It's a wrap!"))
+    Stage.setBlackboard(sel and SongTitle.of(sel) or nil, I18N.tr("It's a wrap!"))
     Stage.clearRoundState()
     Stage.setBoardLights("wrong")
     Stage.setDarken(true)
@@ -395,7 +396,7 @@ local function vsEvalWin(winner, score)
     setState("vs_win")
     local wname = playerNames[winner] or ("Player " .. winner)
     local wsel = utils.getSelectedSong()
-    local wtitle = (wsel and wsel.Title) or "?"
+    local wtitle = (wsel and SongTitle.of(wsel)) or "?"
     Stage.setBlackboard(wtitle, winsLine(winner, score))
     showDialogue({
         { text = I18N.trf(pick({

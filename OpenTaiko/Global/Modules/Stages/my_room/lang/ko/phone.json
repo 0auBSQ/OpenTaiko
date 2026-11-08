@@ -3,6 +3,8 @@
   "title": "전화",
   "menu_landlord": "집주인에게 전화",
   "menu_number": "번호 입력",
+  "menu_contacts": "연락처",
+  "contacts_title": "연락처",
   "menu_invite": "친구 초대 (방 열기)",
   "menu_join": "친구 방 참가 (코드 입력)",
   "menu_stop_hosting": "호스트 종료 (방 닫기)",

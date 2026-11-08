@@ -108,8 +108,22 @@
         "theme": {
             "face": [46, 54, 66, 255], "face2": [28, 34, 44, 255], "outline": [196, 152, 86, 255],
             "namePill": [210, 166, 96, 255], "namePill2": [152, 108, 54, 255], "nameText": [255, 250, 236],
-            "text": [244, 238, 226], "caret": [232, 192, 112], "shadow": [0, 10, 20, 110]
+            "text": [244, 238, 226], "caret": [232, 192, 112], "shadow": [0, 10, 20, 110],
+            "choiceRow": [36, 44, 56, 235], "choiceSel": [150, 108, 54, 255], "choiceText": [244, 238, 226]
         }
+    },
+    "talk": {
+        "_note": "The small talks. Gris in the tank swims along a side wall (side, d behind the glass, at depth z, height y), drifting drift px and bobbing bob px, scaled scale at z = 1 and shaded shade. At the side window and at the counter: her bottom centre and scale; at the window her closed eye (StandBlink.png) goes at (blink_x, blink_y) px of StandOpen.png. The room dims to dim around the light spot (a cone from top, w wide and h tall, centred on x) and the glow on Mr.Caspian; with Gris at the counter both widen to wide_x and wide_w / wide_size. The counter is dimmed from table_dim_y down, with its own glow. The cup slides from from_x to x on the counter (bottom centre). A faded line darkens the screen to fade.",
+        "gris_tank": { "side": 1, "d": 140, "drift": 60, "y": -40, "bob": 26, "z": 1.55, "scale": 0.75, "shade": 0.85 },
+        "gris_window": { "x": 455, "y": 800, "scale": 0.95, "blink_x": 53, "blink_y": 60 },
+        "gris_counter": { "x": 905, "y": 792, "scale": 1.0 },
+        "dim": 0.5,
+        "spot": { "x": 1555, "wide_x": 1240, "w": 640, "wide_w": 1100, "top": -60, "h": 880, "opacity": 0.22, "color": [255, 236, 200] },
+        "glow": { "x": 1555, "wide_x": 1240, "y": 470, "size": 1150, "wide_size": 1600, "opacity": 0.32, "color": [255, 214, 160] },
+        "counter_glow": { "x": 1400, "wide_x": 1150, "y": 815, "w": 900, "h": 260, "opacity": 0.22 },
+        "table_dim_y": 772,
+        "cup": { "x": 1335, "from_x": -220, "y": 806, "scale": 0.9 },
+        "fade": 0.86
     },
     "cards": {
         "_note": "The chest cards (Leave plus one per chest) around center_x: the front one at y, the next spread1 to its side, the ones after spread2 further. A card one place off is near_shrink smaller per place; further ones far_scale less far_shrink per place. Side cards are shaded by side_shade, drop side_drop px, turn rot_deg per place, and fade out from fade_from places over fade_over. On a card: the title at title_y (confirm_squeeze narrower when asking to confirm), the chest at chest_y scaled chest_scale, the stock message, the key chip at chip_y; on Leave, its label at leave_label_y. face_w is the card face's text width.",

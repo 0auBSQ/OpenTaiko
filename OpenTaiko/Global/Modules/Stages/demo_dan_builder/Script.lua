@@ -11,6 +11,8 @@
 -- ║    Escape   Return to title                                               ║
 -- ╚══════════════════════════════════════════════════════════════════════════╝
 
+local SongTitle = require("Songs.Title")
+
 -- ── Constants ────────────────────────────────────────────────────────────────
 
 -- drawn in 1920x1080: a skin of another resolution rescales it
@@ -361,7 +363,7 @@ function draw()
         for i, entry in ipairs(selected) do
             local node  = entry.node
             local diff  = entry.diff
-            local title = node.Title or "(unknown)"
+            local title = SongTitle.of(node) or "(unknown)"
             local dname = DIFF_NAMES[diff] or "?"
             local dcol  = DIFF_COLORS[diff] or C_FALLBACK
 

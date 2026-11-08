@@ -3,6 +3,8 @@
 -- Reads sort state from the highlighted player's save file and reorders
 -- the current folder's Children list in-place.
 
+local SongTitle = require("Songs.Title")
+
 local M = {}
 local G   -- shared state injected by Script.lua
 
@@ -93,10 +95,10 @@ function M.applySort()
     for _, node in ipairs(regular) do
         local p, s, t = 0, 0, origPos[node] or 0
         if methodIdx0 == 1 then                        -- title (case-insensitive), 2nd=filepath
-            p = (node.Title or ""):lower()
+            p = (SongTitle.of(node) or ""):lower()
             s = origPos[node] or 0
         elseif methodIdx0 == 2 then                    -- subtitle (case-insensitive), 2nd=filepath
-            p = (node.Subtitle or ""):lower()
+            p = (SongTitle.subtitleOf(node) or ""):lower()
             s = origPos[node] or 0
         elseif methodIdx0 == 3 then                    -- level (+0.5 for IsPlus), 2nd=filepath
             local c    = getChart(node)

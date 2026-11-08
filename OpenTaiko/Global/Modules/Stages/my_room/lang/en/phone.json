@@ -3,6 +3,8 @@
   "title": "Phone",
   "menu_landlord": "Call the landlord",
   "menu_number": "Enter a number",
+  "menu_contacts": "Contacts",
+  "contacts_title": "Contacts",
   "menu_invite": "Invite friends (host a room)",
   "menu_join": "Join a friend (enter code)",
   "menu_stop_hosting": "Stop hosting (close the room)",

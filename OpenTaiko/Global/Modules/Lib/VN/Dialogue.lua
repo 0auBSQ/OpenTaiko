@@ -20,6 +20,7 @@
 --   ui="plain"|"popui",             -- box style: classic flat panel, or a rounded/shadowed box (UI shapes)
 --   theme={...},                    -- popui box colours (see THEME_DEFAULT below), all optional
 --   box={x=,y=,w=,h=},              -- geometry override (defaults preserved)
+--   growLines=2,                    -- glyph path: the box grows upward a line for each line past this many
 --   portraitSize=,                  -- 0 hides the portrait area (e.g. when big VN sprites are drawn instead)
 --   mouse=true,                     -- also advance / confirm choices with left click
 --   drawBox=false,                  -- skip the box/name chrome
@@ -45,6 +46,8 @@ local DEF_PORTRAIT = 210                      -- portrait square size
 local LINE_GAP = 8
 local FIT_LINES, FIT_PAD = 4, 8               -- a glyph text of this many lines or more ends FIT_PAD above the box's bottom
 local DEFAULT_CPS = 42
+local GROW_RATE = 14                          -- how fast a box grows or shrinks to its text (eased)
+local GROW_CUT = 32                           -- a grown box stretches only between bands this far into its top and bottom
 -- a glyph box anchored by its middle draws its ink high; centred labels move down by this much
 local NAME_NUDGE, CHOICE_NUDGE = 9, 8
 -- the selected choice's marker: a triangle every skin font has (they lack the small one), drawn small
@@ -112,6 +115,9 @@ function Dialogue.new(opts)
     self.textX = self.boxX + (self.portraitSize > 0 and (self.portraitSize + 40) or 40)
     self.textY = self.boxY + 64
     self.textW = self.boxW - (self.portraitSize > 0 and (self.portraitSize + 80) or 80)
+    self.growLines = opts.growLines
+    self.baseBoxY, self.baseBoxH = self.boxY, self.boxH
+    self.growPx, self.growTo = 0, 0
     self.mouse = opts.mouse == true
     self.drawBox = opts.drawBox ~= false  -- false → caller draws its own box art; text/choices/caret only
     self.advanceInput = opts.advanceInput -- optional extra advance predicate (e.g. the drum Decide pad)
@@ -246,12 +252,25 @@ function Dialogue:layoutGlyph(text)
     return lines, remapped, total
 end
 
+-- a grown box keeps its bottom: its top and the text move up
+function Dialogue:placeBox()
+    self.boxY = self.baseBoxY - self.growPx
+    self.boxH = self.baseBoxH + self.growPx
+    self.textY = self.boxY + 64
+end
+
 function Dialogue:start(script)
+    local was = self.activeFlag
     self.script = script or {}
     self.nodeIdx = 0
     self.result = nil
     self.activeFlag = true
     self:nextNode()
+    -- a box that was not up takes its size at once; one already up grows or shrinks to it
+    if self.growLines and not was then
+        self.growPx = self.growTo
+        self:placeBox()
+    end
 end
 
 function Dialogue:nextNode()
@@ -261,6 +280,9 @@ function Dialogue:nextNode()
     self.node = node
     if self.gfont ~= nil then
         self.glines, self.cmds, self.total = self:layoutGlyph(node.text or "")
+        if self.growLines then
+            self.growTo = math.max(0, #self.glines - self.growLines) * (self.gfont.LineHeight + LINE_GAP)
+        end
     else
         self.glyphs, self.cmds = self:layout(node.text or "")
         self.total = #self.glyphs
@@ -286,7 +308,16 @@ function Dialogue:advancePressed()
         or (self.advanceInput ~= nil and self.advanceInput())
 end
 
+-- a growing box eases toward its text's size (update does it; a caller revealing text itself calls it)
+function Dialogue:tickGrow(dt)
+    if not self.growLines or self.growPx == self.growTo then return end
+    self.growPx = self.growPx + (self.growTo - self.growPx) * math.min(1, (dt or 0) * GROW_RATE)
+    if math.abs(self.growTo - self.growPx) < 0.5 then self.growPx = self.growTo end
+    self:placeBox()
+end
+
 function Dialogue:update(dt)
+    self:tickGrow(dt)
     if not self.activeFlag then return "done" end
     local node = self.node
     -- choices phase
@@ -380,10 +411,11 @@ function Dialogue:bakeFancyBox()
     local Shape = require("UI.SimpleUI.shape")
     local m = 24                                             -- shadow margin
     local t = self.theme
-    local cv = CANVAS:CreateCanvas(self.boxW + 2 * m, self.boxH + 2 * m)
+    local bh = self.growLines and self.baseBoxH or self.boxH  -- a growing box is baked at its smallest
+    local cv = CANVAS:CreateCanvas(self.boxW + 2 * m, bh + 2 * m)
     cv:ClearTransparent()
-    Shape.dropShadow(cv, m, m, self.boxW, self.boxH, 26, { col = t.shadow })
-    Shape.panel(cv, m, m, self.boxW, self.boxH, {
+    Shape.dropShadow(cv, m, m, self.boxW, bh, 26, { col = t.shadow })
+    Shape.panel(cv, m, m, self.boxW, bh, {
         radius = 26, outline = { col = t.outline, width = 3 },
         top = t.face, bottom = t.face2, gloss = { 255, 255, 255, 40 },
     })
@@ -416,8 +448,26 @@ function Dialogue:bakeFancyBox()
         })
         pfr:Upload()
     end
-    self._fbox = { cv = cv, m = m, pill = pill, pw = pw, ph = ph, row = row, rw = rw, rh = rh, pfr = pfr }
+    self._fbox = { cv = cv, m = m, cw = self.boxW + 2 * m, ch = bh + 2 * m, pill = pill, pw = pw, ph = ph,
+                   row = row, rw = rw, rh = rh, pfr = pfr }
     return self._fbox
+end
+
+-- the baked box at a grown height: its top and bottom bands as baked, the band between stretched
+function Dialogue:drawGrownBox(fb)
+    local cv, w, h = fb.cv, fb.cw, fb.ch
+    local cut = fb.m + GROW_CUT
+    local mid = h - 2 * cut
+    -- whole pixels, and the stretched band a row taller at both ends under the others: a band edge that falls
+    -- between two pixels would half cover that row, and what is behind the box would show through it
+    local x, y = math.floor(self.boxX - fb.m + 0.5), math.floor(self.boxY - fb.m + 0.5)
+    if mid <= 0 then cv:Draw(x, y); return end
+    local midTo = mid + math.floor(self.growPx + 0.5)
+    cv:SetScale(1, (midTo + 2) / mid)
+    cv:DrawRectAtAnchor(x, y + cut - 1, 0, cut, w, mid, "topleft")
+    cv:SetScale(1, 1)
+    cv:DrawRect(x, y, 0, 0, w, cut)
+    cv:DrawRect(x, y + cut + midTo, 0, h - cut, w, cut)
 end
 
 function Dialogue:dispose()
@@ -441,7 +491,8 @@ function Dialogue:draw()
     elseif self.ui == "popui" then
         local fb = self:bakeFancyBox()
         fb.cv:SetColor(1, 1, 1); fb.cv:SetOpacity(op); fb.cv:SetScale(1, 1)
-        fb.cv:Draw(self.boxX - fb.m, self.boxY - fb.m)
+        if self.growLines and self.growPx > 0 then self:drawGrownBox(fb)
+        else fb.cv:Draw(self.boxX - fb.m, self.boxY - fb.m) end
         if node.name and node.name ~= "" then
             -- the pill sits above the box, aligned with the TEXT column (right of the portrait
             -- frame). At the old boxX+30 it overlapped the portrait frame's top band (the pill

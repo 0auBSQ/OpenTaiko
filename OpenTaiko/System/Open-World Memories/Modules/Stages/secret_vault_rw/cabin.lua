@@ -245,6 +245,7 @@ function C.drawBack(now, dt)
         Tex.place(tex["Cabin/Water"], 0, 0, "topleft")
     end
     drawSea()
+    if C.behindGlass then C.behindGlass(project) end
     Tex.place(tex["Cabin/Room"], 0, 0, "topleft")
 end
 

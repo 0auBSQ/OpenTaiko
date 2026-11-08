@@ -6,6 +6,7 @@ local Caspian = require("caspian")
 local Cards = require("cards")
 local Opening = require("opening")
 local Vault = require("vault")
+local TalkScene = require("talk")
 local NavInput = require("NavInput")
 local MusicDuck = require("MusicDuck")
 -- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
@@ -35,12 +36,16 @@ local TEXTURES = {
     "Chest/Chest1", "Chest/Chest2", "Chest/Chest3", "Chest/Chest1Open", "Chest/Chest2Open", "Chest/Chest3Open",
     "Chest/Key1", "Chest/Key2", "Chest/Key3", "Chest/KeyFront1", "Chest/KeyFront2", "Chest/KeyFront3", "Chest/Impact",
     "UI/Card", "UI/CardLeave", "UI/Chip", "UI/Key1", "UI/Key2", "UI/Key3",
+    "Talk/White", "Talk/Spotlight", "Talk/Glow", "Talk/Cup",
+    "Cabin/Gris/Idle", "Cabin/Gris/Talk", "Cabin/Gris/TalkWorry", "Cabin/Gris/TalkDiscomfort", "Cabin/Gris/Discomfort",
+    "Cabin/Gris/StandOpen", "Cabin/Gris/StandBlink", "Cabin/Gris/Tank",
 }
 
 local SOUNDS = {
     "Cancel", "Decide", "NoKey", "Skip", "Unlock",
     "KeySnap", "Shatter", "ChestDrop", "ChestOpen", "KeyIn", "KeyTurn", "Whoosh", "Punch", "ChestFar",
     "VoiceBlip1", "VoiceBlip2", "VoiceBlip3", "VoiceBlip4",
+    "GrisBlip1", "GrisBlip2", "GrisBlip3", "GrisBlip4", "Clink",
 }
 
 local textures = {}
@@ -90,10 +95,7 @@ local function refreshInfo()
     end
 end
 
-local function startMusic()
-    if musicOn then return end
-    musicOn = true
-    if sounds.BGM then sounds.BGM:SetLoop(true); sounds.BGM:Play() end
+local function startAmbience()
     if sounds.Underwater then
         sounds.Underwater:SetLoop(true)
         sounds.Underwater:SetVolumePercent(AMBIENCE_VOLUME)
@@ -101,10 +103,18 @@ local function startMusic()
     end
 end
 
+local function startMusic()
+    if musicOn then return end
+    musicOn = true
+    if sounds.BGM then sounds.BGM:SetLoop(true); sounds.BGM:Play() end
+    startAmbience()
+end
+
 local function stopMusic()
     musicOn = false
     if sounds.BGM then sounds.BGM:Stop() end
     if sounds.Underwater then sounds.Underwater:Stop() end
+    if sounds.Jazz then sounds.Jazz:Stop() end
 end
 
 local function talk(event, after)
@@ -221,11 +231,9 @@ local function confirmInput()
         reward = Vault.roll(c)   -- roll at once (anti save-scum)
         play("Decide")
         Cards.setConfirm(false, now)
-        -- the key is spent now; what is left in the chests shows once the chest is open
-        for i = 1, 3 do
-            keys[i] = Vault.keyCount(i)
-            if info[i] then info[i].keys = keys[i] end
-        end
+        -- the key is spent now; a key won, and what is left in the chests, show once the chest reveals them
+        keys[c] = math.max(0, keys[c] - 1)
+        if info[c] then info[c].keys = keys[c] end
         Opening.start(c, reward, now)
         menuTarget, boxTarget = 0, 0
         nextRemark = "prompt"
@@ -258,9 +266,12 @@ function draw()
     local gnow = gateNow()
     if not Gate.covers(gnow) then
         Cabin.drawBack(now, dt)
+        TalkScene.drawRoom(now)
         Opening.drawBack(now)
         Caspian.drawBody(now)
+        TalkScene.drawCounter(now)
         Cabin.drawFront(now)
+        TalkScene.drawFront(now)
         Opening.draw(now, dt)
     end
     Gate.draw(gnow, dt, state == "gate_locked")
@@ -277,6 +288,7 @@ function draw()
     Cards.drawChips(now, chipA, keys, (state == "menu" or state == "confirm") and Cards.chest() or nil)
     Opening.drawBanner(now)
     Caspian.drawBox(boxA)
+    TalkScene.drawBox()
     Opening.drawKick(now)
 
     if state == "modal" then
@@ -290,7 +302,7 @@ function update()
     Gate.update(gateNow())
     local caspian = Caspian.update(dt, now)
 
-    if musicDuck then
+    if musicDuck and not TalkScene.ownsMusic() then
         local modal = ROACTIVITY:GetROActivity("modal")
         musicDuck:update(dt, modal ~= nil and modal.IsActive)
     end
@@ -299,6 +311,13 @@ function update()
         local ev = Opening.update(now)
         if ev == "talk" then
             local snapped = not (reward and reward.type == "key")
+            if not snapped then
+                -- the won key is on screen: it joins the counts
+                for i = 1, 3 do
+                    keys[i] = Vault.keyCount(i)
+                    if info[i] then info[i].keys = keys[i] end
+                end
+            end
             talk(snapped and "snap" or "keygot", function()
                 -- cutting his taunt short punches the chest away; hearing it out leaves the chest be
                 if snapped and Caspian.wasCut() then
@@ -329,10 +348,17 @@ function update()
             end
             Opening.leave(now)
         elseif ev == "done" then
+            local opened = reward ~= nil and reward.type ~= "snap"
+            local chest = reward and reward.openedChest
             reward = nil
             refreshInfo()
             -- behind the kick the punched chest ends while he talks: the menu does not come back
             if state == "opening" then
+                if opened and TalkScene.offer(chest) then
+                    chipTarget = 0
+                    state = "smalltalk"
+                    return
+                end
                 openMenu(nextRemark)
                 return
             end
@@ -382,6 +408,15 @@ function update()
             Opening.leave(now)
             state = "opening"
         end
+    elseif state == "smalltalk" then
+        local r = TalkScene.update(dt, now)
+        if r == "done" then
+            openMenu("prompt")
+        elseif r == "play" and TalkScene.mountPending() then
+            stopMusic()
+            Opening.reset()
+            return Exit("play", nil)
+        end
     elseif state == "closing" then
         if Gate.isClosed(now) then
             closedAt = closedAt or now
@@ -414,6 +449,7 @@ local function fitNameFont()
         fonts.name = TEXT:CreateGlyphCached(math.max(Layout.name_tag.min_font, math.floor(NAME_SIZE * NAME_INK / ink)))
     end
     Caspian.setNameFont(fonts.name)
+    TalkScene.setNameFont(fonts.name)
 end
 
 local function loadTextures()
@@ -451,6 +487,20 @@ function activate()
     Caspian.reset()
     Cards.reset(0, 2)
     Gate.reset(unlocked and "unlocked" or "locked", now, revealAt)
+    if TalkScene.returning() then
+        -- back from a song played in the middle of a talk: straight into the cabin, the talk goes on
+        unlocked = true
+        Cabin.open()
+        Gate.openNow(now)
+        refreshInfo()
+        musicOn = true
+        startAmbience()
+        TalkScene.afterPlay()
+        state = "smalltalk"
+        return
+    end
+    TalkScene.reset()
+    TalkScene.visit()            -- where Gris is: in the room from the first frame the cabin shows
     if songsEnumerated then
         startGate()
     else
@@ -465,6 +515,7 @@ function deactivate()
     Cabin.close()
     Caspian.reset()
     Caspian.dispose()
+    TalkScene.dispose()
     freeTextures()
 end
 
@@ -485,6 +536,7 @@ function onStart()
 
     if STORAGE:FileExists("Sounds/BGM.ogg") then sounds.BGM = SOUND:CreateBGM("Sounds/BGM.ogg") end
     if STORAGE:FileExists("Sounds/Underwater.ogg") then sounds.Underwater = SOUND:CreateSFX("Sounds/Underwater.ogg") end
+    if STORAGE:FileExists("Sounds/Jazz.ogg") then sounds.Jazz = SOUND:CreateBGM("Sounds/Jazz.ogg") end
     for _, name in ipairs(SOUNDS) do
         local path = "Sounds/" .. name .. ".ogg"
         if STORAGE:FileExists(path) then sounds[name] = SOUND:CreateSFX(path) end
@@ -494,6 +546,8 @@ function onStart()
     Gate.init(ctx)
     Cabin.init(ctx)
     Caspian.init(ctx)
+    TalkScene.init(ctx)
+    Cabin.behindGlass = TalkScene.drawTank
     fitNameFont()
     Cards.init(ctx)
     Opening.init(ctx)
@@ -502,6 +556,7 @@ end
 function onDestroy()
     Cabin.close()
     Caspian.dispose()
+    TalkScene.dispose()
     freeTextures()
     for _, f in pairs(fonts)  do if f then f:Dispose() end end
     for _, s in pairs(sounds) do if s then s:Dispose() end end

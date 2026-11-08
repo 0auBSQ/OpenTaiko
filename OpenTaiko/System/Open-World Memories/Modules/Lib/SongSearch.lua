@@ -11,6 +11,8 @@
 --   S.count(folder, params)                 how many songs match
 --   S.write(save, params) / S.read(save)    the parameters through the save file (ss_* counters + shared strings)
 
+local SongTitle = require("Songs.Title")
+
 local M = {}
 
 -- the level sliders: from 0..LEVEL_MAX, to 0..LEVEL_MAX-1 then an open end ("13~") at LEVEL_MAX
@@ -48,8 +50,8 @@ function M.buildPredicate(params)
             if not sf:GetGlobalTrigger(".vault_opened") then return false end
             if not sf:GetGlobalTrigger(".vault_song_unlocked_" .. (node.UniqueId or "")) then return false end
         end
-        if titlePat    ~= "" and not (node.Title    or ""):lower():find(titlePat,    1, true) then return false end
-        if subtitlePat ~= "" and not (node.Subtitle or ""):lower():find(subtitlePat, 1, true) then return false end
+        if titlePat    ~= "" and not (SongTitle.of(node) or ""):lower():find(titlePat, 1, true) then return false end
+        if subtitlePat ~= "" and not (SongTitle.subtitleOf(node) or ""):lower():find(subtitlePat, 1, true) then return false end
 
         local charts = {}
         for i = 0, 4 do

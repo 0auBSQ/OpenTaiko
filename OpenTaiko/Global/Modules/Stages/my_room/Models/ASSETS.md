@@ -44,6 +44,10 @@ Models taken from `Models/GLTF format/`.
 | large_rock.glb | Rock Formation (https://poly.pizza/m/pRY9BCFbmQ) | poly.pizza (Kenney) | Kenney | CC0 1.0 |
 | log.glb | Wood Log (https://poly.pizza/m/L4E32Wee6C) | poly.pizza (Quaternius) | Quaternius | CC0 1.0 |
 | fox_statue.glb | Fox Statue (https://poly.pizza/m/abxyXID5EA) | poly.pizza (Quaternius) | Quaternius | CC0 1.0 |
+| gris_teddy.glb | toy bear lowpoly (https://opengameart.org/content/toy-bear-lowpoly), bear_dae.zip | OpenGameArt | NephthysGameDev | CC0 1.0 |
+| gris_crane.glb | Origami like crane (https://www.printables.com/model/239787-origami-like-crane), its 4 STL parts | Printables | Kyboky | CC0 1.0 |
+| gris_cat.glb | Cat (https://poly.pizza/m/2f54vbV0In) | poly.pizza (Quaternius) | Quaternius | CC0 1.0 |
+| gris_flowers.glb | Flowers (https://poly.pizza/m/dOO6kMDd8L) + Weizen Glass (https://poly.pizza/m/n0mfRT90q3) | poly.pizza (Quaternius, MilkAndBanana) | Quaternius, MilkAndBanana | CC0 1.0 |
 
 mirror.glb source pack: **Anker's Assets — Low Poly Household Items Pack**, license **CC0 1.0** (the asset license
 stated on the pack page: Creative Commons Zero v1.0 Universal).
@@ -57,6 +61,17 @@ from linear to sRGB values, the colours the game draws. large_rock, fox and ston
 downloaded (they already hold those values); mini_pagoda is textured.
 
 backpack.glb's pins use **Coin** by Quaternius (https://poly.pizza/m/7IrL01B97W, CC0 1.0) as their base.
+
+The gris_* models (Gris's gifts) were edited as follows; their colours are the values the game draws (sRGB).
+- gris_teddy.glb: converted from the pack's Collada file (bear.dae); the colours of its palette texture
+  (bear_palette.png) became 8 flat material colours; Z-up turned to Y-up, base on the floor.
+- gris_crane.glb: the kit's printed parts (body, head, tail, wing) put together into one model, the wing used
+  twice; one flat grey material.
+- gris_cat.glb: the rigged model saved as a static mesh in its rest pose (no skeleton, no animations); its orange
+  fur and stripes recoloured grey, its eye whites made brighter.
+- gris_flowers.glb: one stem of Flowers used seven times, each flower in its own petal colour, standing in
+  Weizen Glass widened into a vase; the glass's texture replaced by a flat "Glass" material, made see-through
+  by furniture.json `alphaParts`.
 
 The fish and kelp in the fish tank (`../Textures/FishTank/`) are from **Kenney — Fish Pack** (https://kenney.nl/assets/fish-pack, CC0 1.0).
 
@@ -88,3 +103,9 @@ License: **CC BY 3.0** (https://creativecommons.org/licenses/by/3.0/) unless not
 jukebox.glb credit line (per the download's license.txt): This work is based on "Jukebox"
 (https://sketchfab.com/3d-models/jukebox-188e71ce378f4b6786054d9f74dd3a25) by Rescue3D Assets
 (https://sketchfab.com/rescue3d) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/).
+
+## Made for OpenTaiko
+
+| File | Source |
+|---|---|
+| plush_komi.glb | Plush_Komi.glb, supplied for the game (2026-11-08) |

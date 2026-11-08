@@ -22,6 +22,7 @@
 
 local UI = require("uilib")           -- the skin's UI library (UI.Pick), picked on first use
 local I18N = require("Locale.i18n")
+local SongTitle = require("Songs.Title")
 local T = I18N.texts("jukebox")   -- lang/<code>/jukebox.json
 
 local JB = {}
@@ -81,7 +82,7 @@ local function clamp(v, a, b) if v < a then return a end if v > b then return b 
 -- ── song list (filtered, grouped by genre) ─────────────────────────────────────────────────────
 local function nodeEntry(n)
     local ok, e = pcall(function()
-        return { kind = "song", title = n.Title or "?", subtitle = n.Subtitle or "", genre = n.Genre or "?",
+        return { kind = "song", title = SongTitle.of(n) or "?", subtitle = SongTitle.subtitleOf(n) or "", genre = n.Genre or "?",
                  audioPath = n.AudioPath or "", jacket = (n.HasPreimage and n.PreimagePath) or nil,
                  node = n, uid = n.UniqueId or "" }
     end)

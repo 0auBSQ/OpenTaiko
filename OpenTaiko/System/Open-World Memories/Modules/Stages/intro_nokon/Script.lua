@@ -1,5 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local, redundant-parameter, inject-field
 local DBScores  = require("DBControllers/dbScores")
+local SongTitle = require("Songs.Title")
 local I18N      = require("i18n")
 local Opening   = require("opening")
 local Setup     = require("setup")
@@ -123,7 +124,7 @@ local function refreshQuizSongListCache()
         if node ~= nil and node.IsSong then
             currentPageCache[i] = {
                 node = node,
-                text = text:GetText(node.Title, false, 99999,
+                text = text:GetText(SongTitle.of(node), false, 99999,
                     i == 0 and Config.color(Layout.list.highlight_color) or nil),
             }
         else

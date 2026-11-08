@@ -7,6 +7,8 @@
 -- The shared string "presound_path" names the audio in "presound": a song select that leaves the same
 -- song playing hands the preview back to the lobby, which keeps it going instead of restarting it.
 
+local SongTitle = require("Songs.Title")
+
 local floor = math.floor
 
 local M = {}
@@ -37,7 +39,7 @@ function M.haveSong(uid) return findSong(uid) ~= nil end
 
 function M.resolveTitle(uid)
     local node = findSong(uid); if not node then return nil end
-    local ok, t = pcall(function() return node.Title end); return ok and t or nil
+    local ok, t = pcall(function() return SongTitle.of(node) end); return ok and t or nil
 end
 
 function M.stopPreview()
@@ -75,7 +77,7 @@ function M.load(st)
     local node = findSong(st.song.uid)
     if not node then M.stopPreview(); st.iLackSong = true; placeholderPreimage(); return end
     st.iLackSong = false
-    pcall(function() st.songSubtitle = node.Subtitle end)
+    pcall(function() st.songSubtitle = SongTitle.subtitleOf(node) end)
     -- the shared "preimage" keeps the previous jacket until the new one is loaded, then swaps
     pcall(function()
         if node.HasPreimage then SHARED:SetSharedTextureUsingAbsolutePath("preimage", node.PreimagePath, setBorder)

@@ -3,6 +3,8 @@
   "title": "電話",
   "menu_landlord": "大家さんに電話",
   "menu_number": "番号を入力",
+  "menu_contacts": "電話帳",
+  "contacts_title": "電話帳",
   "menu_invite": "友達を招待（ルームを開く）",
   "menu_join": "友達に参加（コード入力）",
   "menu_stop_hosting": "ホスト終了（ルームを閉じる）",

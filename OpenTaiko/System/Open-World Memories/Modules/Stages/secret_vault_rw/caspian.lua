@@ -165,7 +165,7 @@ function C.init(c)
     ctx = c
     dlg = Dialogue.new{
         gfont = c.fonts.talk, gfontName = c.fonts.name,
-        ui = "popui", theme = THEME, box = BOX, portraitSize = Look.portrait_size, cps = CPS,
+        ui = "popui", theme = THEME, box = BOX, portraitSize = Look.portrait_size, cps = CPS, growLines = 2,
         sfx = { click = function() if c.snd.Decide then c.snd.Decide:Play() end end },
         onExpr = function(e) C.setExpr(e) end,
         onBlip = blip, blipEvery = BLIP_EVERY,
@@ -253,6 +253,7 @@ function C.update(dt, now)
             return "done"
         end
     elseif mode == "remark" and dlg.activeFlag then
+        dlg:tickGrow(dt)
         local total = dlg.total or 0
         if (dlg.revealed or 0) < total then
             dlg.revealed = math.min(total, (dlg.revealed or 0) + CPS * dt)

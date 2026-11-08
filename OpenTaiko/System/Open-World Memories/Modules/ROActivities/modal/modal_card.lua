@@ -15,6 +15,7 @@
 
 local Fx = require("modal_fx")
 local Config = require("Core.Config")
+local SongTitle = require("Songs.Title")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
 
@@ -135,8 +136,8 @@ function M:start(kind, modalInt, key, info, picture, header)
             self.plateTex = self.A.fontPlate:GetText(self.name, false, 99999, self.A.colPlateFg, self.A.colPlateBg)
         elseif kind == 4 then
             self.header = LANG:GetString("MODAL_TITLE_SONG")
-            self.name = info.Title or "???"
-            local sub = info.Subtitle
+            self.name = SongTitle.of(info) or "???"
+            local sub = SongTitle.subtitleOf(info)
             if sub ~= nil and sub ~= "" then self.detail = sub end
             self.preimage = info:GetPreimage()
             self.genreTitle, self.genreColor = genreOf(info)

@@ -10,6 +10,7 @@
 local Replay = require("replaylist")
 local Color  = require("Color")            -- Lib: colour space conversions / adjustments
 local Config    = require("Core.Config")
+local SongTitle = require("Songs.Title")
 local Layout    = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
 local DS        = Layout.difficulty_select
@@ -668,8 +669,8 @@ function M.drawPanel()
     G.bgtx["overlay_difficulty"]:SetOpacity(opacityNorm)
     G.bgtx["overlay_difficulty"]:DrawAtAnchor(1920, 0, "TopRight")
     if G.selectedSongNode ~= nil then
-        G.textLarge:Draw(G.selectedSongNode.Title, Title.x - G.songSelectShift, Title.y, nil, nil, opacityNorm, 1, Title.max_width)
-        G.text:Draw(G.selectedSongNode.Subtitle, Title.x - G.songSelectShift, Title.subtitle_y, nil, nil, opacityNorm, 1, Title.max_width)
+        G.textLarge:Draw(SongTitle.of(G.selectedSongNode), Title.x - G.songSelectShift, Title.y, nil, nil, opacityNorm, 1, Title.max_width)
+        G.text:Draw(SongTitle.subtitleOf(G.selectedSongNode), Title.x - G.songSelectShift, Title.subtitle_y, nil, nil, opacityNorm, 1, Title.max_width)
     end
 
     -- Characters and nameplates

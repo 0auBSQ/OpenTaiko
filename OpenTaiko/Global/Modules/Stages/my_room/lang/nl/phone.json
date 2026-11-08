@@ -3,6 +3,8 @@
   "title": "Telefoon",
   "menu_landlord": "De huisbaas bellen",
   "menu_number": "Nummer invoeren",
+  "menu_contacts": "Contacten",
+  "contacts_title": "Contacten",
   "menu_invite": "Vrienden uitnodigen (kamer hosten)",
   "menu_join": "Bij een vriend aansluiten (code invoeren)",
   "menu_stop_hosting": "Stoppen met hosten (kamer sluiten)",

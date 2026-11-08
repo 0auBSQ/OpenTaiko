@@ -182,6 +182,12 @@ function G.startOpen(now)
     open(now, FAST)
 end
 
+-- already open, without a sound (back from a song in the middle of a talk)
+function G.openNow(now)
+    open(now - 1000, FAST)
+    cues = {}
+end
+
 function G.startClose(now)
     local from = seq ~= nil and value("spin", now) or spinRest
     local T = CLOSE

@@ -78,6 +78,27 @@
             "settle_wobbles": 3
         }
     },
+    "talk": {
+        "_note": "The small talks. The room dims and the light comes up over in_s; the vault BGM fades out over bgm_fade_s; the jazz starts after jazz_start_s and fades in over jazz_fade_s; the cup slides in over cup_s after cup_delay_s. At the end it all goes back over out_s, the cup leaving over cup_out_s. Gris crosses from the window to the counter (and back) in come_s; a faded line darkens over fade_s. Volumes in percent. Gris swims one bob in tank_period_s; her voice blips every blip_every letters; at the counter she breathes (breath_amp every breath_s); at the side window she blinks for blink_s, every blink_every_s (picked in that range).",
+        "in_s": 1.6,
+        "out_s": 1.2,
+        "bgm_fade_s": 1.4,
+        "jazz_start_s": 1.0,
+        "jazz_fade_s": 1.0,
+        "cup_delay_s": 0.3,
+        "cup_s": 1.0,
+        "cup_out_s": 0.6,
+        "come_s": 0.7,
+        "fade_s": 0.5,
+        "bgm_volume": 100,
+        "jazz_volume": 85,
+        "tank_period_s": 5.0,
+        "blip_every": 3,
+        "breath_amp": 0.006,
+        "breath_s": 3.2,
+        "blink_every_s": [2.5, 5.5],
+        "blink_s": 0.13
+    },
     "cards": {
         "_note": "The cards roll to the chosen one at roll_rate_per_s and pop in over enter_s from enter_start_scale (outBack with enter_overshoot); hidden, they drop hide_drop_px. A card without a key shakes sideways. Asked to confirm, the front card rises (confirm_lift) and its question pulses (amp at hz, after a pop over pop_s). The chip of the chest in focus is drawn at scale, pulsing amp once a second.",
         "roll_rate_per_s": 11,

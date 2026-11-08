@@ -18,6 +18,7 @@
     "clock",
     "poster_nokon",
     "poster_bol",
+    "plush_komi",
     "phone",
     "placeholder_matrix",
     "mirror",
@@ -50,6 +51,10 @@
     "bonsai",
     "fox",
     "fox_statue",
+    "gris_teddy",
+    "gris_crane",
+    "gris_cat",
+    "gris_flowers",
     "recycle_bin"
   ],
   "desk": {
@@ -201,6 +206,17 @@
     "h": 1,
     "place": "wall",
     "picture": "bol",
+    "shop": true
+  },
+  "plush_komi": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "collH": 0.55,
+    "collW": 0.45,
+    "collD": 0.4,
+    "fit": 0.45,
+    "stackOn": true,
     "shop": true
   },
   "phone": {
@@ -605,6 +621,56 @@
     "collH": 1.35,
     "fit": 0.6,
     "rarity": "Uncommon"
+  },
+  "gris_teddy": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "collH": 0.4,
+    "collW": 0.4,
+    "collD": 0.4,
+    "fit": 0.4,
+    "stackOn": true,
+    "rarity": "Epic"
+  },
+  "gris_crane": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "collH": 0.4,
+    "collW": 0.55,
+    "collD": 0.4,
+    "fit": 0.55,
+    "stackOn": true,
+    "rarity": "Epic"
+  },
+  "gris_cat": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "collH": 0.3,
+    "collW": 0.3,
+    "collD": 0.3,
+    "fit": 0.3,
+    "stackOn": true,
+    "rarity": "Epic"
+  },
+  "gris_flowers": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "collH": 0.5,
+    "collW": 0.4,
+    "collD": 0.4,
+    "fit": 0.42,
+    "stackOn": true,
+    "alphaParts": [
+      {
+        "material": "Glass",
+        "alpha": 80
+      }
+    ],
+    "rarity": "Epic"
   },
   "recycle_bin": {
     "w": 2,

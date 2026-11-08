@@ -1,6 +1,7 @@
 -- What the encounter's song bars reveal of the floor's rolled songs.
 
 local levels = require("levels")
+local SongTitle = require("Songs.Title")
 
 local M = {}
 
@@ -17,7 +18,7 @@ local function songInfo(node, diff)
     local info = { diff = diff or 0, name = nil, level = nil, plus = false, id = "" }
     if node == nil then return info end
     pcall(function()
-        info.name = node.Title
+        info.name = SongTitle.of(node)
         info.id = node.UniqueId or info.name or ""
     end)
     pcall(function()

@@ -17,6 +17,7 @@ local PopUI = require("PopUI")
 
 -- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
 local Config = require("Core.Config")
+local SongTitle = require("Songs.Title")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
 
@@ -154,7 +155,7 @@ end
 function activate(player, node, mode)
     _player    = player or 0
     _node      = node
-    _title     = (node ~= nil and node.Title) or "???"
+    _title     = (node ~= nil and SongTitle.of(node)) or "???"
     _coinPrice = (node ~= nil) and node.UnlockCondition:GetCoinPrice() or 0
     _waitingForModal = false
     _modalQueue = {}

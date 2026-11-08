@@ -4,6 +4,7 @@
 -- decide (true while still animating) and deactivate().
 
 local Config = require("Core.Config")
+local SongTitle = require("Songs.Title")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
 local GAUGE, NUMBERS, SCORE, BADGES, CLEAR = Animation.gauge, Animation.numbers, Animation.score, Animation.badges, Animation.clear
@@ -18,6 +19,7 @@ local col = {}
 local played = {}
 local charas = {}
 local info = nil
+local title = ""
 local active = false
 local clock = 0                 -- milliseconds since activate
 
@@ -771,6 +773,7 @@ end
 function activate(result)
     deactivate()
     info = result
+    title = SongTitle.alternative(SONGMOUNT:ChosenSongNode()) or info.Title
     players = math.max(1, info.PlayerCount)
     drawn = info.IsAIBattle and 1 or players
     layoutN = info.IsAIBattle and 2 or players
@@ -790,7 +793,7 @@ function activate(result)
     local ai = info.IsAIBattle and "ai_" or ""
     startMusic(Config.optional(M, ai .. "intro"), Config.optional(M, ai .. "loop"))
     -- the glyphs shown later are made now, not on their first draw
-    fonts.title:Draw(info.Title, -10000, -10000, col.title, col.titleOutline)
+    fonts.title:Draw(title, -10000, -10000, col.title, col.titleOutline)
     for p = 0, drawn - 1 do
         local _, moodV2 = moods(p)
         fonts.speech:Draw(info:GetSpeechText(p, moodV2), -10000, -10000, col.speech, col.speechOutline)
@@ -877,7 +880,7 @@ function draw()
         for p = 0, drawn - 1 do drawDifficulty(p, posOf(p), ui) end
     end
     local M = Layout.music_name
-    fonts.title:Draw(info.Title, M.x, M.y, col.title, col.titleOutline, 1, 1, M.max_width, "top")
+    fonts.title:Draw(title, M.x, M.y, col.title, col.titleOutline, 1, 1, M.max_width, "top")
     drawPlayers()
 end
 

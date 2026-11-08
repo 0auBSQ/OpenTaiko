@@ -3,6 +3,8 @@
   "title": "Téléphone",
   "menu_landlord": "Appeler le propriétaire",
   "menu_number": "Composer un numéro",
+  "menu_contacts": "Répertoire",
+  "contacts_title": "Répertoire",
   "menu_invite": "Inviter des amis (héberger un salon)",
   "menu_join": "Rejoindre un ami (saisir le code)",
   "menu_stop_hosting": "Arrêter l'hébergement (fermer le salon)",

@@ -3,6 +3,8 @@
   "title": "Telefon",
   "menu_landlord": "Vermieter anrufen",
   "menu_number": "Nummer eingeben",
+  "menu_contacts": "Kontakte",
+  "contacts_title": "Kontakte",
   "menu_invite": "Freunde einladen (Raum hosten)",
   "menu_join": "Einem Freund beitreten (Code eingeben)",
   "menu_stop_hosting": "Hosten beenden (Raum schließen)",
