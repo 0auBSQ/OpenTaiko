@@ -23,7 +23,9 @@ public abstract partial class Game {
 			string ver = Gl.GetStringS(StringName.Version);
 			string rend = Gl.GetStringS(StringName.Renderer);
 			string vend = Gl.GetStringS(StringName.Vendor);
-			if (!OperatingSystem.IsMacOS()) Context.SwapBuffers();
+			// macOS only: the game-owned NSOpenGLContext can present too; only skip when macOS has no such
+			// context (the hosted/iOS path never gets here).
+			if (!OperatingSystem.IsMacOS() || _cocoaContext != null) Context.SwapBuffers();
 			string line = $"[checkgl] OK  version='{ver}' renderer='{rend}' vendor='{vend}' compute={ComputeShadersAvailable}";
 			Trace.TraceInformation(line);
 			Console.WriteLine(line);
