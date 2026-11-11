@@ -12,6 +12,9 @@ indent_style = tab
 indent_size = 4
 trim_trailing_whitespace = true
 
+[*.diff]
+trim_trailing_whitespace = false
+
 [project.json]
 indent_size = 2
 
