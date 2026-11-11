@@ -31,7 +31,7 @@ namespace FDK;
 /// all existing sound objects group levels by iterating that same
 /// observable collection.
 /// </summary>
-public sealed class SoundGroupLevelController {
+public sealed class SoundGroupLevelController : IDisposable {
 	private readonly Dictionary<ESoundGroup, int> _levelBySoundGroup = new Dictionary<ESoundGroup, int> {
 		[ESoundGroup.SoundEffect] = CSound.DefaultSoundEffectLevel,
 		[ESoundGroup.Voice] = CSound.DefaultVoiceLevel,
@@ -40,6 +40,8 @@ public sealed class SoundGroupLevelController {
 		[ESoundGroup.Unknown] = CSound.MaximumGroupLevel,
 		[ESoundGroup.Master] = CSound.DefaultMasterLevel
 	};
+	public double GetPercentageGroupVolume(ESoundGroup soundGroup)
+		=> _levelBySoundGroup[soundGroup] * (_levelBySoundGroup[ESoundGroup.Master] / 100.0);
 
 	private readonly ObservableCollection<CSound> _sounds;
 	private readonly Func<CSound[]> _getAllSoundsSnapshot;
@@ -54,6 +56,9 @@ public sealed class SoundGroupLevelController {
 		foreach (CSound sound in getAllSoundsSnapshot()) // level not set yet
 			SetLevel(sound);
 	}
+
+	public void Dispose()
+		=> _sounds.CollectionChanged -= SoundsOnCollectionChanged;
 
 	public void SetLevel(ESoundGroup soundGroup, int level) {
 		var clampedLevel = level.Clamp(CSound.MinimumGroupLevel, CSound.MaximumGroupLevel);
@@ -88,7 +93,7 @@ public sealed class SoundGroupLevelController {
 	}
 
 	private void SetLevel(CSound sound) {
-		sound.GroupLevel = (int)(_levelBySoundGroup[sound.SoundGroup] * (_levelBySoundGroup[ESoundGroup.Master] / 100.0));
+		sound.GroupLevel = (int)this.GetPercentageGroupVolume(sound.SoundGroup);
 	}
 
 	private void SoundsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) {
