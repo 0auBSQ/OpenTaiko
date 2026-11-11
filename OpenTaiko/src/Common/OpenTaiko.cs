@@ -1631,7 +1631,7 @@ internal class OpenTaiko : Game {
 			// iOS: the desktop branch below also creates these; without SongGainController the first note NREs (CTja.tチップの再生).
 			SongGainController = new SongGainController();
 			ConfigIniToSongGainControllerBinder.Bind(ConfigIni, SongGainController);
-			SoundGroupLevelController = new SoundGroupLevelController(CSound.SoundInstances);
+			SoundGroupLevelController = new SoundGroupLevelController(CSound.SoundInstances, CSound.GetAllSoundsSnapshot);
 			ConfigIniToSoundGroupLevelControllerBinder.Bind(ConfigIni, SoundGroupLevelController);
 		} else {
 			Trace.TraceInformation("Initializing sound device...");
@@ -1680,7 +1680,7 @@ internal class OpenTaiko : Game {
 					SongGainController = new SongGainController();
 					ConfigIniToSongGainControllerBinder.Bind(ConfigIni, SongGainController);
 
-					SoundGroupLevelController = new SoundGroupLevelController(CSound.SoundInstances);
+					SoundGroupLevelController = new SoundGroupLevelController(CSound.SoundInstances, CSound.GetAllSoundsSnapshot);
 					ConfigIniToSoundGroupLevelControllerBinder.Bind(ConfigIni, SoundGroupLevelController);
 				} finally {
 					Trace.Unindent();

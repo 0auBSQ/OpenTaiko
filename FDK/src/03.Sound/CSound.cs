@@ -310,11 +310,14 @@ public class CSound : IDisposable {
 	public static readonly ObservableCollection<CSound> SoundInstances = new ObservableCollection<CSound>();
 	private static readonly object _soundInstancesLock = new object();
 
+	public static CSound[] GetAllSoundsSnapshot() {
+		lock (_soundInstancesLock)
+			return SoundInstances.ToArray();
+	}
+
 	public static void ShowAllCSoundFiles() {
-		CSound[] snapshot;
-		lock (_soundInstancesLock) { snapshot = SoundInstances.ToArray(); }
 		int i = 0;
-		foreach (CSound cs in snapshot) {
+		foreach (CSound cs in GetAllSoundsSnapshot()) {
 			Debug.WriteLine(i++.ToString("d3") + ": " + Path.GetFileName(cs.FileName));
 		}
 	}
@@ -615,9 +618,7 @@ public class CSound : IDisposable {
 
 
 	public static void tResetAllSound() {
-		CSound[] snapshot;
-		lock (_soundInstancesLock) { snapshot = CSound.SoundInstances.ToArray(); }
-		foreach (var sound in snapshot) {
+		foreach (var sound in GetAllSoundsSnapshot()) {
 			sound.tDispose(false, keepFileData: true);   // tReloadSound makes the streams again from the same bytes
 		}
 	}
@@ -673,10 +674,8 @@ public class CSound : IDisposable {
 	internal readonly record struct PlayState(CSound Sound, int Pan, bool Playing, bool Paused, bool Looped, long WallMs);
 
 	internal static List<PlayState> tCaptureStates() {
-		CSound[] snapshot;
-		lock (_soundInstancesLock) { snapshot = CSound.SoundInstances.ToArray(); }
 		var states = new List<PlayState>();
-		foreach (var s in snapshot) {
+		foreach (var s in GetAllSoundsSnapshot()) {
 			if (!s.IsBassSound) continue;
 			bool playing = s.IsPlaying, paused = !playing && s.IsPaused;
 			bool looped = Bass.ChannelHasFlag(s.hBassStream, BassFlags.Loop);

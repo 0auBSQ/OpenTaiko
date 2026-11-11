@@ -42,15 +42,16 @@ public sealed class SoundGroupLevelController {
 	};
 
 	private readonly ObservableCollection<CSound> _sounds;
+	private readonly Func<CSound[]> _getAllSoundsSnapshot;
 
 	private int _keyboardSoundLevelIncrement;
 
-	public SoundGroupLevelController(ObservableCollection<CSound> sounds) {
+	public SoundGroupLevelController(ObservableCollection<CSound> sounds, Func<CSound[]> getAllSoundsSnapshot) {
 		_sounds = sounds;
-
 		_sounds.CollectionChanged += SoundsOnCollectionChanged;
+		_getAllSoundsSnapshot = getAllSoundsSnapshot;
 
-		foreach (CSound sound in sounds) // level not set yet
+		foreach (CSound sound in getAllSoundsSnapshot()) // level not set yet
 			SetLevel(sound);
 	}
 
@@ -63,10 +64,13 @@ public sealed class SoundGroupLevelController {
 
 		_levelBySoundGroup[soundGroup] = clampedLevel;
 
-		// There's a rare chance that a null CSound slips into the `_sounds` list. Still not sure what is causing this. 
-		foreach (var sound in soundGroup == ESoundGroup.Master ? _sounds.Where(sound => sound != null) : _sounds.Where(sound => sound != null && sound.SoundGroup == soundGroup)) {
+		// There was a rare chance that a null CSound slips into the `_sounds` list. Still not sure what was causing that.
+		var allSounds = this._getAllSoundsSnapshot();
+		var sounds = (soundGroup == ESoundGroup.Master) ?
+			allSounds.Where(sound => sound != null)
+			: allSounds.Where(sound => sound != null && sound.SoundGroup == soundGroup);
+		foreach (var sound in sounds)
 			SetLevel(sound);
-		}
 
 		RaiseLevelChanged(soundGroup, clampedLevel);
 	}
