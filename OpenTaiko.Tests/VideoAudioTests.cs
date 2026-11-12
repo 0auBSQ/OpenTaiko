@@ -226,7 +226,7 @@ namespace OpenTaikoTests {
 
 				// volume survives a seek, and Start after Stop begins again from the top
 				// checked by mastered volume
-				var percentVolGroup = (int)soundGroupLevelController.GetPercentageGroupVolume(video.Audio!.SoundGroup);
+				var percentVolGroup = soundGroupLevelController.GetPercentageGroupVolume(video.Audio!.SoundGroup);
 				var percentVolErr = percentVolGroup / 100.0;
 				var percentVolBefore = video.Audio!.GetGainPercent() * percentVolGroup / 100.0;
 				Assert.InRange(100 * video.Audio!.tGetChannelLevels().volume, percentVolBefore - percentVolErr, percentVolBefore + percentVolErr);

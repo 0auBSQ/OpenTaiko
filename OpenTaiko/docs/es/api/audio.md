@@ -70,9 +70,9 @@ Hasta que el flujo está listo, el handle almacena Play y todas las llamadas Set
 | `sound:GetLoop()  -> bool` | Devuelve si la repetición está activada. |
 | `sound:SetVolumePercent(vol)  -> nil` | Establece el volumen en porcentaje. |
 | `sound:GetVolumePercent()  -> number` | Devuelve el volumen en porcentaje (100 cuando no está cargado). |
-| `sound:SetVolume(vol)  -> nil` | Alias de SetVolumePercent (entero). |
+| `sound:SetVolume(vol)  -> nil` | Alias de SetVolumePercent. |
 | `sound:SetPan(pan)  -> nil` | Establece el paneo estéreo, -100..100. |
-| `sound:GetPan()  -> int` | Devuelve el paneo actual (0 cuando no está cargado). |
+| `sound:GetPan()  -> number` | Devuelve el paneo actual (0 cuando no está cargado). |
 | `sound:SetSpeed(speed)  -> nil` | Establece el multiplicador de velocidad de reproducción (1 = normal). |
 | `sound:GetSpeed()  -> number` | Devuelve el multiplicador de velocidad de reproducción (1 cuando no está cargado). |
 | `sound:SetTimestampMs(ms)  -> nil` | Salta a una posición en milisegundos. |

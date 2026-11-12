@@ -192,7 +192,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				this.soundAdlib[actual] = OpenTaiko.SoundManager.tCreateSound(hs.adlib[actual], ESoundGroup.SoundEffect);
 				this.soundClap[actual] = OpenTaiko.SoundManager.tCreateSound(hs.clap[actual], ESoundGroup.SoundEffect);
 
-				int _panning = OpenTaiko.ConfigIni.nPanning[OpenTaiko.ConfigIni.nPlayerCount - 1][actual];
+				var _panning = OpenTaiko.ConfigIni.nPanning[OpenTaiko.ConfigIni.nPlayerCount - 1][actual];
 				if (this.soundRed[actual] != null) this.soundRed[actual]!.SoundPosition = _panning;
 				if (this.soundBlue[actual] != null) this.soundBlue[actual]!.SoundPosition = _panning;
 				if (this.soundAdlib[actual] != null) this.soundAdlib[actual]!.SoundPosition = _panning;

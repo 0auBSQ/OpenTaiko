@@ -350,7 +350,7 @@ internal class CActImplClearAnimation : CActivity {
 			};
 
 			if (!bSoundPlayed[iPlayer]) {
-				int pan = OpenTaiko.ConfigIni.nPanning[nDrawnPlayers - 1][iPlayer];
+				var pan = OpenTaiko.ConfigIni.nPanning[nDrawnPlayers - 1][iPlayer];
 				script?.Call("playEndAnime", iPlayer);
 				sound?.SetPanning(pan);
 				sound?.PlayStart();

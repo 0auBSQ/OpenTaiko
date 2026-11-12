@@ -461,7 +461,7 @@ function PC.tickBgmFade(dt)
     local step = (dt or 0) * 340                      -- full 0..100 sweep in ~0.3s
     if math.abs(bgmTarget - bgmVol) <= step then bgmVol = bgmTarget
     else bgmVol = bgmVol + (bgmTarget > bgmVol and step or -step) end
-    pcall(function() bgm:SetVolume(math.floor(bgmVol)) end)
+    pcall(function() bgm:SetVolume(bgmVol) end)
     if bgmStopAt0 and bgmVol <= 0 then
         bgmStopAt0 = false
         pcall(function() bgm:Stop() end)

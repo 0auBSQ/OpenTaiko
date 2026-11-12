@@ -557,7 +557,7 @@ local function previewUpdate(dt)
         local ms = preview.target > preview.vol and P.fade_in_ms or P.fade_out_ms
         local stepv = ms > 0 and 100 * dt * 1000 / ms or 100
         preview.vol = preview.vol < preview.target and math.min(preview.target, preview.vol + stepv) or math.max(preview.target, preview.vol - stepv)
-        snd:SetVolume(math.floor(preview.vol + 0.5))
+        snd:SetVolume(preview.vol)
     end
     if preview.loaded then
         if snd.IsPlaying then preview.playing = true

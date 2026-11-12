@@ -70,9 +70,9 @@ Tant que le flux n'est pas prêt, le handle met en tampon Play et chaque appel S
 | `sound:GetLoop()  -> bool` | Indique si la lecture en boucle est activée. |
 | `sound:SetVolumePercent(vol)  -> nil` | Définit le volume en pourcentage. |
 | `sound:GetVolumePercent()  -> number` | Renvoie le volume en pourcentage (100 quand non chargé). |
-| `sound:SetVolume(vol)  -> nil` | Alias de SetVolumePercent (entier). |
+| `sound:SetVolume(vol)  -> nil` | Alias de SetVolumePercent. |
 | `sound:SetPan(pan)  -> nil` | Définit le panoramique stéréo, -100..100. |
-| `sound:GetPan()  -> int` | Renvoie le panoramique courant (0 quand non chargé). |
+| `sound:GetPan()  -> number` | Renvoie le panoramique courant (0 quand non chargé). |
 | `sound:SetSpeed(speed)  -> nil` | Définit le multiplicateur de vitesse de lecture (1 = normal). |
 | `sound:GetSpeed()  -> number` | Renvoie le multiplicateur de vitesse de lecture (1 quand non chargé). |
 | `sound:SetTimestampMs(ms)  -> nil` | Se positionne à une position en millisecondes. |

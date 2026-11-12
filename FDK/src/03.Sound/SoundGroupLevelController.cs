@@ -93,7 +93,7 @@ public sealed class SoundGroupLevelController : IDisposable {
 	}
 
 	private void SetLevel(CSound sound) {
-		sound.GroupLevel = (int)this.GetPercentageGroupVolume(sound.SoundGroup);
+		sound.GroupLevel = (float)this.GetPercentageGroupVolume(sound.SoundGroup);
 	}
 
 	private void SoundsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) {

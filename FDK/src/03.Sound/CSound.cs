@@ -150,11 +150,11 @@ public class CSound : IDisposable {
 	/// (e.g. AutomationLevel) and mixing group level (e.g. GroupLevel) before
 	/// the audio is output.
 	/// 
-	/// This method, taking an integer representing a percent value, is used
+	/// This method, taking an number representing a percent value, is used
 	/// for mixing in the SONGVOL value, when available. It is also used for
 	/// DTXViewer preview mode.
 	/// </summary>
-	public void SetGain(int songVol) {
+	public void SetGain(double songVol) {
 		SetGain(LinearPercentToLufs(songVol), null);
 	}
 
@@ -207,7 +207,7 @@ public class CSound : IDisposable {
 	/// case right now for the song selection screen background music fade
 	/// in and fade out.
 	/// </summary>
-	public int AutomationLevel {
+	public float AutomationLevel {
 		get => _automationLevel;
 		set {
 			if (_automationLevel == value) {
@@ -233,7 +233,7 @@ public class CSound : IDisposable {
 	///
 	/// See the SoundGroupLevelController and related classes for more.
 	/// </summary>
-	public int GroupLevel {
+	public float GroupLevel {
 		private get => _groupLevel;
 		set {
 			if (_groupLevel == value) {
@@ -274,14 +274,14 @@ public class CSound : IDisposable {
 	/// <summary>
 	/// <para>左:-100～中央:0～100:右。set のみ。</para>
 	/// </summary>
-	public int SoundPosition {
+	public float SoundPosition {
 		get {
 			if (this.IsBassSound) {
 				float fPosition = 0.0f;
 				if (!Bass.ChannelGetAttribute(this.hBassStream, ChannelAttribute.Pan, out fPosition))
 					//if( BassMix.BASS_Mixer_ChannelGetEnvelopePos( this.hBassStream, BASSMIXEnvelope.BASS_MIXER_ENV_PAN, ref f位置 ) == -1 )
 					return 0;
-				return (int)(fPosition * 100);
+				return fPosition * 100;
 			}
 			return -9999;
 		}
@@ -295,7 +295,7 @@ public class CSound : IDisposable {
 		}
 	}
 
-	public void SetPanning(int pan) {
+	public void SetPanning(float pan) {
 		if (SoundPosition == pan) return;
 
 		SoundPosition = pan;
@@ -671,7 +671,7 @@ public class CSound : IDisposable {
 	}
 
 	/// <summary>What a sound was doing when the sound device is about to be rebuilt.</summary>
-	internal readonly record struct PlayState(CSound Sound, int Pan, bool Playing, bool Paused, bool Looped, long WallMs);
+	internal readonly record struct PlayState(CSound Sound, float Pan, bool Playing, bool Paused, bool Looped, long WallMs);
 
 	internal static List<PlayState> tCaptureStates() {
 		var states = new List<PlayState>();
@@ -821,8 +821,8 @@ public class CSound : IDisposable {
 	private bool IsBassSound => SoundManager.IsDeviceTypeSupported(this.CurrentSoundDeviceType);
 	private Lufs _gain = DefaultGain;
 	private Lufs? _truePeak = null;
-	private int _automationLevel = DefaultAutomationLevel;
-	private int _groupLevel = DefaultGroupLevel;
+	private float _automationLevel = DefaultAutomationLevel;
+	private float _groupLevel = DefaultGroupLevel;
 	private long nBytes = 0;
 	private int PauseCount = 0;
 	private int nOriginalFrequency = 0;
