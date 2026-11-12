@@ -845,6 +845,7 @@ public class CSound : IDisposable {
 			createImpl(this);
 			++SoundManager.nStreams;
 		} catch (Exception) {
+			this.tFreeFailedMemoryStream();
 			this.CurrentSoundDeviceType = ESoundDeviceType.Unknown;
 			throw;
 		}
@@ -930,7 +931,6 @@ public class CSound : IDisposable {
 		}
 		if (this._hBassStream == 0) {
 			Errors errcode = Bass.LastError;
-			this.tFreePinnedFile();
 			throw new Exception(string.Format("サウンドストリームの生成に失敗しました。(BASS_StreamCreateFile)[{0}]", errcode.ToString()));
 		}
 
@@ -947,9 +947,10 @@ public class CSound : IDisposable {
 
 	// a creation that failed after its stream was made from memory: the stream goes before the bytes it reads
 	private void tFreeFailedMemoryStream() {
-		if (!this.hGC.IsAllocated) return;
-		if (this._hTempoStream != 0) Bass.StreamFree(this._hTempoStream);   // frees its source as well
-		Bass.StreamFree(this._hBassStream);
+		if (this._hTempoStream != 0)
+			Bass.StreamFree(this._hTempoStream);   // frees its source as well
+		if (this._hBassStream != -1)
+			Bass.StreamFree(this._hBassStream);
 		this._hTempoStream = 0;
 		this._hBassStream = -1;
 		this.hBassStream = -1;
@@ -964,7 +965,6 @@ public class CSound : IDisposable {
 			this._hTempoStream = BassFx.TempoCreate(this._hBassStream, BassFlags.Decode | BassFlags.FxFreeSource);
 			if (this._hTempoStream == 0) {
 				Errors errcode = Bass.LastError;
-				this.tFreeFailedMemoryStream();
 				throw new Exception(string.Format("サウンドストリームの生成に失敗しました。(BASS_FX_TempoCreate)[{0}]", errcode.ToString()));
 			} else {
 				Bass.ChannelSetAttribute(this._hTempoStream, ChannelAttribute.TempoUseQuickAlgorithm, 1f);  // 高速化(音の品質は少し落ちる)
@@ -997,7 +997,6 @@ public class CSound : IDisposable {
 		float freq = 0.0f;
 		if (!Bass.ChannelGetAttribute(this._hBassStream, ChannelAttribute.Frequency, out freq)) {
 			Errors errcode = Bass.LastError;
-			this.tFreeFailedMemoryStream();
 			throw new Exception(string.Format("サウンドストリームの周波数取得に失敗しました。(BASS_ChannelGetAttribute)[{0}]", errcode.ToString()));
 		}
 		this.nOriginalFrequency = (int)freq;
