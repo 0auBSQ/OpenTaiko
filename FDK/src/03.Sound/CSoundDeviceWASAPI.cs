@@ -380,7 +380,7 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 	}
 
 	public void tCreateSound(string strFileName, CSound sound)
-		=> sound.CreateBassSound(strFileName, this.hMixer, BassFlags.Decode | BassFlags.Float, this.SoundDeviceType);
+		=> sound.CreateBassSound(strFileName, this.hMixer, BassFlags.Float, deviceType: this.SoundDeviceType);
 	public void tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, CSound sound)
 		=> sound.CreateBassUserSound(frequency, channels, durationSeconds, this.hMixer, proc, this.SoundDeviceType, SoundManager.bIsTimeStretch);
 

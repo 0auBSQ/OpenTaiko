@@ -849,8 +849,9 @@ public class CSound : IDisposable {
 			throw;
 		}
 	}
-	public void CreateBassSound(string strFileName, int hMixer, BassFlags flags = BassFlags.Decode, ESoundDeviceType deviceType = ESoundDeviceType.Bass)
-		=> CreateBassGenericSound(sound => sound.CreateBassSoundImpl(strFileName, hMixer, flags), deviceType);
+	// Without mixer: playable stream (direct output). With mixer: decoding-only stream (output from mixer).
+	public void CreateBassSound(string strFileName, int hMixer, BassFlags flags = BassFlags.Default, ESoundDeviceType deviceType = ESoundDeviceType.Bass)
+		=> CreateBassGenericSound(sound => sound.CreateBassSoundImpl(strFileName, hMixer, flags | ((hMixer == NoMixerHandle) ? 0 : BassFlags.Decode)), deviceType);
 	public void CreateBassUserSound(int frequency, int channels, double durationSeconds, int hMixer, StreamProcedure proc, ESoundDeviceType deviceType = ESoundDeviceType.Bass, bool timeStretch = false)
 		=> CreateBassGenericSound(sound => sound.CreateBassUserSoundImpl(frequency, channels, durationSeconds, hMixer, proc, timeStretch), deviceType);
 
@@ -863,8 +864,8 @@ public class CSound : IDisposable {
 		this._userChannels = channels;
 		this._userSeconds = durationSeconds;
 
-		// a decoding stream for a mixer; a playable one when there is no mixer (direct output)
-		var flags = hMixer == NoMixerHandle ? BassFlags.Float : BassFlags.Decode | BassFlags.Float;
+		// Without mixer: playable stream (direct output). With mixer: decoding-only stream (output from mixer).
+		var flags = BassFlags.Float | ((hMixer == NoMixerHandle) ? 0 : BassFlags.Decode);
 		this._hBassStream = Bass.CreateStream(frequency, channels, flags, proc, IntPtr.Zero);
 		if (this._hBassStream == 0)
 			throw new Exception(string.Format("サウンドストリームの生成に失敗しました。(BASS_StreamCreate user)[{0}]", Bass.LastError.ToString()));

@@ -203,7 +203,7 @@ public partial class CSoundDeviceBASS : ISoundDevice {
 	}
 
 	public void tCreateSound(string strFilename, CSound sound)
-		=> sound.CreateBassSound(strFilename, this.MixerHandle, this.MixerHandle == CSound.NoMixerHandle ? BassFlags.Default : BassFlags.Decode, ESoundDeviceType.Bass);
+		=> sound.CreateBassSound(strFilename, this.MixerHandle, deviceType: ESoundDeviceType.Bass);
 	public void tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, CSound sound)
 		=> sound.CreateBassUserSound(frequency, channels, durationSeconds, this.MixerHandle, proc, ESoundDeviceType.Bass, SoundManager.bIsTimeStretch);
 
