@@ -2786,6 +2786,139 @@
 			"type": 61,
 			"rarity": "Legendary",
 			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "398",
+			"title": "<c.#FFFFFF.#262626><g.#FFFFFF.#9C9C9C>Prisoneer</g></c>",
+			"type": 62,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "399",
+			"title": "<c.#FFFFFF.#262626><g.#FFFFFF.#9C9C9C>World's End</g></c>",
+			"type": 62,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "400",
+			"title": "<c.#FFFFFF.#262626><g.#FFFFFF.#9C9C9C>Build Failed</g></c>",
+			"type": 62,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "401",
+			"title": "<c.#FFFFFF.#262626><g.#FFFFFF.#9C9C9C>simplestyleSweat</g></c>",
+			"type": 62,
+			"rarity": "Common",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "402",
+			"title": "<c.#FFFFFF.#262626><g.#FFFFFF.#9C9C9C>the interchan incident</g></c>",
+			"type": 62,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "403",
+			"title": "<c.#FFFFFF.#262626><g.#FFFFFF.#9C9C9C>S'Key'l Issue</g></c>",
+			"type": 62,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "404",
+			"title": "<c.#FFFFFF.#262626><g.#FFFFFF.#9C9C9C>Atychiphobia</g></c>",
+			"type": 62,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "405",
+			"title": "<c.#FFFFFF.#262626><g.#FFFFFF.#9C9C9C>BasicStyle</g></c>",
+			"type": 62,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "406",
+			"title": "<c.#FFFFFF.#262626><g.#FFFFFF.#9C9C9C>no context optk development</g></c>",
+			"type": 62,
+			"rarity": "Uncommon",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "407",
+			"title": "<c.#FFFFFF.#262626><g.#FFFFFF.#9C9C9C>Develop-BSQ</g></c>",
+			"type": 62,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "408",
+			"title": "<c.#FFFFFF.#262626><g.#FFFFFF.#9C9C9C>OpenTaiko Original</g></c>",
+			"type": 62,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "409",
+			"title": "<c.#FFFFFF.#262626><g.#FFFFFF.#9C9C9C>The Vaultkeeper</g></c>",
+			"type": 62,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "410",
+			"title": "<c.#FFFFFF.#262626><g.#FFFFFF.#9C9C9C>lost_archive</g></c>",
+			"type": 62,
+			"rarity": "Epic",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "411",
+			"title": "<c.#FFFFFF.#262626><g.#FFFFFF.#9C9C9C>Ryuto as Student B</g></c>",
+			"type": 62,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "412",
+			"title": "<c.#FFFFFF.#262626><g.#FFFFFF.#9C9C9C>5th Generation</g></c>",
+			"type": 62,
+			"rarity": "Rare",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "413",
+			"title": "<c.#FFFFFF.#262626><g.#FFFFFF.#9C9C9C>flippedKatsu Chain</g></c>",
+			"type": 62,
+			"rarity": "Epic",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "414",
+			"title": "<c.#FFFFFF.#262626><g.#FFFFFF.#9C9C9C>Surely Someday</g></c>",
+			"type": 62,
+			"rarity": "Epic",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "415",
+			"title": "<c.#FFFFFF.#262626><g.#FFFFFF.#9C9C9C>Fading Memories</g></c>",
+			"type": 62,
+			"rarity": "Epic",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
+		},
+		{
+			"key": "416",
+			"title": "<c.#FFFFFF.#262626><g.#FFFFFF.#9C9C9C>Princess Oto-Chan</g></c>",
+			"type": 62,
+			"rarity": "Legendary",
+			"unlock": { "condition": "ig", "values": [], "type": "me", "references": [] }
 		}
 	]
 }

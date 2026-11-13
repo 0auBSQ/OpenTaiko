@@ -117,6 +117,7 @@ Plaattypen (`type`) van de meegeleverde skin, Open-World Memories. De pc in My R
 | 59 | Pagode (Bonenstaak, dag) |  |
 | 60 | Pagode (Bonenstaak, zonsondergang) |  |
 | 61 | Pagode (Bonenstaak, nacht) |  |
+| 62 | Geheime kluis (Poort) |  |
 
 Een titel staat zwart op zijn plaatje. Kleur hem op een donker plaatje met een tag, zoals de meegeleverde naamplaatjes van de kluis en de pagode: `<c.#FFFFFF.#000000>Titel</c>` tekent witte letters met een zwarte rand.
 

@@ -117,6 +117,7 @@ Schildtypen (`type`) des mitgelieferten Skins, Open-World Memories. Der PC in My
 | 59 | Pagode (Bohnenranke, Tag) |  |
 | 60 | Pagode (Bohnenranke, Sonnenuntergang) |  |
 | 61 | Pagode (Bohnenranke, Nacht) |  |
+| 62 | Geheimtresor (Tor) |  |
 
 Ein Titel erscheint schwarz auf seinem Schild. Auf einem dunklen Schild färbt man ihn mit einem Tag, wie die mitgelieferten Namensschilder des Tresors und der Pagode: `<c.#FFFFFF.#000000>Titel</c>` zeichnet weiße Buchstaben mit schwarzem Rand.
 

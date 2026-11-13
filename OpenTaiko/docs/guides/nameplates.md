@@ -117,6 +117,7 @@ Plate types (`type`) of the shipped skin, Open-World Memories. The PC in My Room
 | 59 | Pagoda (Beanstalk Day) |  |
 | 60 | Pagoda (Beanstalk Sunset) |  |
 | 61 | Pagoda (Beanstalk Night) |  |
+| 62 | Secret Vault (Gate) |  |
 
 A title shows black on its plate. On a dark plate, colour it with a tag, as the shipped vault and pagoda nameplates do: `<c.#FFFFFF.#000000>Title</c>` draws white letters with a black border.
 

@@ -1,6 +1,6 @@
 -- Vault.Chests: the secret vault's three chests, 1 wooden, 2 golden, 3 platinum, each opened with its own
 -- key (Vault.Keys). A chest gives one reward per key from a weighted pool: nothing (the key snaps), coins,
--- the next chest's key, a nameplate (361-380), My Room furniture, or a song of the "Secret Vault" folder.
+-- the next chest's key, a nameplate (361-380, 398-416), My Room furniture, or a song of the "Secret Vault" folder.
 --   Chests.enter()        -- once per visit: the first visit's free key, the song pools
 --   Chests.roll(i)        -- spends a key of chest i, grants and saves the reward, returns it
 --   Chests.showReward(r)  -- its pop-up through the "modal" ROActivity (false for a snap or a key)
@@ -17,9 +17,9 @@ M.SONG_FOLDER = "Secret Vault"
 M.SONG_UNLOCKED = ".vault_song_unlocked_"      -- .. the song's unique id
 
 M.NAMEPLATE_POOLS = {
-    {361, 362, 363, 364, 365, 366, 367, 368},   -- Simple
-    {369, 370, 371, 372, 373, 374, 375},          -- Gold
-    {376, 377, 378, 379, 380},                    -- OpTk
+    {361, 362, 363, 364, 365, 366, 367, 368, 398, 399, 400, 401, 402, 403, 404},   -- Simple
+    {369, 370, 371, 372, 373, 374, 375, 405, 406, 407, 408, 409, 410},             -- Gold
+    {376, 377, 378, 379, 380, 411, 412, 413, 414, 415, 416},                       -- OpTk
 }
 
 -- My Room furniture found in each chest, with its rarity. My Room hands over what a grant counter adds

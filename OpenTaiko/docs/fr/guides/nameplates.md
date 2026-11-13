@@ -117,6 +117,7 @@ Types de plaque (`type`) du skin fourni, Open-World Memories. Le PC de My Room r
 | 59 | Pagode (Haricot magique, jour) |  |
 | 60 | Pagode (Haricot magique, coucher de soleil) |  |
 | 61 | Pagode (Haricot magique, nuit) |  |
+| 62 | Fort Boyaux (Porte) |  |
 
 Un titre s'affiche en noir sur sa plaque. Sur une plaque sombre, colorez-le avec une balise, comme les plaques de nom fournies du coffre et de la pagode : `<c.#FFFFFF.#000000>Titre</c>` dessine des lettres blanches avec une bordure noire.
 

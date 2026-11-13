@@ -553,9 +553,10 @@ internal class CStageResult : CStage {
 				int maxFloors = OpenTaiko.SongMount.rChoosenSong.score[(int)Difficulty.Tower]!.ChartInfo.nTotalFloor;
 
 				double floorRate = Math.Pow(OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor / (double)maxFloors, 2);
-				// longer towers pay more: one share every two minutes of chart (at 1x), at least one; the floor count is no
-				// measure of length, as a chart can stack countless empty measures into seconds
-				double lengthBonus = Math.Max(1, OpenTaiko.stageGameScreen.msChartLength / 120000.0);
+				// longer towers pay more: one share every two minutes played (the chart's length at the song speed), at
+				// least one; the floor count is no measure of length, as a chart can stack countless empty measures into seconds
+				double msPlayed = OpenTaiko.stageGameScreen.msChartLength / OpenTaiko.ConfigIni.SongPlaybackSpeed;
+				double lengthBonus = Math.Max(1, msPlayed / 120000.0);
 
 				#region [Clear modifier]
 

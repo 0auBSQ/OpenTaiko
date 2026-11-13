@@ -117,6 +117,7 @@ Tipos de placa (`type`) del skin incluido, Open-World Memories. El ordenador de 
 | 59 | Pagoda (Tallo de habichuela, día) |  |
 | 60 | Pagoda (Tallo de habichuela, atardecer) |  |
 | 61 | Pagoda (Tallo de habichuela, noche) |  |
+| 62 | Bóveda Secreta (Puerta) |  |
 
 Un título se ve negro sobre su placa. En una placa oscura, coloréalo con una etiqueta, como hacen las placas de nombre incluidas de la bóveda y la pagoda: `<c.#FFFFFF.#000000>Título</c>` dibuja letras blancas con borde negro.
 

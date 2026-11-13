@@ -60,3 +60,4 @@
 59 - Pagoda (Beanstalk Day)
 60 - Pagoda (Beanstalk Sunset)
 61 - Pagoda (Beanstalk Night)
+62 - Secret Vault (Gate)
