@@ -34,7 +34,7 @@ namespace OpenTaiko {
 			_video = video;
 			if (_pendingSeek.HasValue) video.Seek((long)_pendingSeek.Value);
 			if (_pendingSpeed.HasValue) video.dbPlaySpeed = _pendingSpeed.Value;
-			if (_pendingVolume.HasValue) video.Audio?.SetGain((int)Math.Clamp(_pendingVolume.Value, 0, 100));
+			if (_pendingVolume.HasValue) video.Audio?.SetGain(Math.Clamp(_pendingVolume.Value, 0, 100));
 			if (_pendingStart) video.Start();
 			_pendingStart = false; _pendingSeek = null; _pendingSpeed = null; _pendingVolume = null;
 		}
@@ -106,7 +106,7 @@ namespace OpenTaiko {
 		public void SetPlaySpeed(double playSpeed) => SetSpeed(playSpeed); // permanent alias of SetSpeed
 
 		public void SetVolumePercent(double vol) {
-			if (_video != null) _video.Audio?.SetGain((int)Math.Clamp(vol, 0, 100)); else _pendingVolume = vol;
+			if (_video != null) _video.Audio?.SetGain(Math.Clamp(vol, 0, 100)); else _pendingVolume = vol;
 		}
 
 		#endregion

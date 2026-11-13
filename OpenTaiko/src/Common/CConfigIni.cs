@@ -474,13 +474,13 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 	public int[] nHitSounds = new int[5] { 0, 0, 0, 0, 0 };
 
-	public int[][] nPanning = new int[5][] {
-		new int[1] { 0 },
-		new int[2] { -100, 100 },
-		new int[3] { -100, 0, 100 },
-		new int[4] { -100, -33, 33, 100 },
-		new int[5] { -100, -50, 0, 50, 100 },
-	};
+	public float[][] nPanning = [
+		[0],
+		[-100, 100],
+		[-100, 0, 100],
+		[-100, -33, 33, 100],
+		[-100, -50, 0, 50, 100],
+	];
 
 	public string[] sSaveFile = new string[5] { "1P", "2P", "3P", "4P", "5P" };
 

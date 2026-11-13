@@ -20,7 +20,7 @@ namespace OpenTaiko {
 		// so e.g. SetLoop(true)/Play() called in onStart aren't lost while the BASS stream is still being created.
 		private bool? _pendingLoop;
 		private double? _pendingVolume;
-		private int? _pendingPan;
+		private float? _pendingPan;
 		private long? _pendingTimestamp;
 		private double? _pendingSpeed;
 		private bool _pendingPlay;
@@ -48,7 +48,7 @@ namespace OpenTaiko {
 			// the same Play-then-SetTimestamp discipline live callers follow (song-select preview, the
 			// myroom jukebox starting mid-track for late-joining guests).
 			if (_pendingLoop.HasValue) s.bLoop = _pendingLoop.Value;
-			if (_pendingVolume.HasValue) s.SetVolume((int)_pendingVolume.Value);
+			if (_pendingVolume.HasValue) s.SetVolume(_pendingVolume.Value);
 			if (_pendingPan.HasValue) s.SetPanning(_pendingPan.Value);
 			if (_pendingSpeed.HasValue) s.SetSpeed(_pendingSpeed.Value);
 			if (_pendingPlay) s.tPlay();
@@ -69,7 +69,7 @@ namespace OpenTaiko {
 		public bool Loaded => _sound != null;
 		public bool IsPlaying => _sound?.bIsPlaying ?? false;
 		public bool GetLoop() => _sound?.bLoop ?? false;
-		public int GetPan() => _sound?.nPosition_CurrentlyPlayingSound ?? 0;
+		public float GetPan() => _sound?.nPosition_CurrentlyPlayingSound ?? 0;
 		/// <summary>Returns the total duration of the sound in milliseconds, or 0 if not loaded.</summary>
 		public double DurationMs => _sound?.nLength ?? 0;
 		public double GetDurationMs() => DurationMs; // permanent alias of DurationMs
@@ -86,7 +86,7 @@ namespace OpenTaiko {
 		public void SetLoop(bool loop) {
 			if (_sound != null) _sound.bLoop = loop; else _pendingLoop = loop;
 		}
-		public void SetPan(int panning) {
+		public void SetPan(float panning) {
 			if (_sound != null) _sound.SetPanning(panning); else _pendingPan = panning;
 		}
 
@@ -96,9 +96,9 @@ namespace OpenTaiko {
 		public void SetTimestamp(double ms) => SetTimestampMs(ms); // permanent alias of SetTimestampMs
 
 		public void SetVolumePercent(double vol) {
-			if (_sound != null) _sound.SetVolume((int)vol); else _pendingVolume = vol;
+			if (_sound != null) _sound.SetVolume(vol); else _pendingVolume = vol;
 		}
-		public void SetVolume(int vol) => SetVolumePercent(vol); // permanent alias of SetVolumePercent
+		public void SetVolume(double vol) => SetVolumePercent(vol); // permanent alias of SetVolumePercent
 
 		/// <summary>Sets the playback speed multiplier (1.0 = normal).</summary>
 		public void SetSpeed(double speed) {

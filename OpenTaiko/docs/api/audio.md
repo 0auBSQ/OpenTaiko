@@ -70,9 +70,9 @@ Until the stream is ready, the handle buffers Play and every Set* call, and the 
 | `sound:GetLoop()  -> bool` | Returns whether looping is enabled. |
 | `sound:SetVolumePercent(vol)  -> nil` | Sets the volume in percent. |
 | `sound:GetVolumePercent()  -> number` | Returns the volume in percent (100 when not loaded). |
-| `sound:SetVolume(vol)  -> nil` | Alias of SetVolumePercent (integer). |
+| `sound:SetVolume(vol)  -> nil` | Alias of SetVolumePercent. |
 | `sound:SetPan(pan)  -> nil` | Sets the stereo pan, -100..100. |
-| `sound:GetPan()  -> int` | Returns the current pan (0 when not loaded). |
+| `sound:GetPan()  -> number` | Returns the current pan (0 when not loaded). |
 | `sound:SetSpeed(speed)  -> nil` | Sets the playback speed multiplier (1 = normal). |
 | `sound:GetSpeed()  -> number` | Returns the playback speed multiplier (1 when not loaded). |
 | `sound:SetTimestampMs(ms)  -> nil` | Seeks to a position in milliseconds. |

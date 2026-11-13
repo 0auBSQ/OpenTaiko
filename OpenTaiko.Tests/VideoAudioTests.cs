@@ -171,6 +171,10 @@ namespace OpenTaikoTests {
 			if (!OperatingSystem.IsWindows()) return;
 			string intro = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "OpenTaiko", "System", "Open-World Memories", "Modules", "Stages", "_boot", "Videos", "intro.mp4"));
 			if (!File.Exists(intro)) return;
+
+			// for applying the mastering gain as in a real run
+			SoundGroupLevelController soundGroupLevelController = new(CSound.SoundInstances, CSound.GetAllSoundsSnapshot);
+
 			ffmpeg_setup();
 			int mixer = 0, main = 0;
 			StreamProcedure? proc = null;
@@ -221,9 +225,15 @@ namespace OpenTaikoTests {
 				video.dbPlaySpeed = 1.0;
 
 				// volume survives a seek, and Start after Stop begins again from the top
+				// checked by mastered volume
+				var percentVolGroup = soundGroupLevelController.GetPercentageGroupVolume(video.Audio!.SoundGroup);
+				var percentVolErr = percentVolGroup / 100.0;
+				var percentVolBefore = video.Audio!.GetGainPercent() * percentVolGroup / 100.0;
+				Assert.InRange(100 * video.Audio!.tGetChannelLevels().volume, percentVolBefore - percentVolErr, percentVolBefore + percentVolErr);
 				video.Audio!.SetGain(40);
 				video.Seek(5000);
-				Assert.InRange(video.Audio!.GetGainPercent(), 39.0, 41.0);
+				var percentVolAdvanced = 40.0 * percentVolGroup / 100.0;
+				Assert.InRange(100 * video.Audio!.tGetChannelLevels().volume, percentVolAdvanced - percentVolErr, percentVolAdvanced + percentVolErr);
 				video.Stop();
 				video.Start();
 				Thread.Sleep(500);
@@ -234,6 +244,7 @@ namespace OpenTaikoTests {
 				if (main != 0) Bass.StreamFree(main);
 				if (mixer != 0) Bass.StreamFree(mixer);
 				GC.KeepAlive(proc);
+				soundGroupLevelController.Dispose();
 			}
 		}
 

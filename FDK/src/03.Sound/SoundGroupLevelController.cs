@@ -31,7 +31,7 @@ namespace FDK;
 /// all existing sound objects group levels by iterating that same
 /// observable collection.
 /// </summary>
-public sealed class SoundGroupLevelController {
+public sealed class SoundGroupLevelController : IDisposable {
 	private readonly Dictionary<ESoundGroup, int> _levelBySoundGroup = new Dictionary<ESoundGroup, int> {
 		[ESoundGroup.SoundEffect] = CSound.DefaultSoundEffectLevel,
 		[ESoundGroup.Voice] = CSound.DefaultVoiceLevel,
@@ -40,16 +40,25 @@ public sealed class SoundGroupLevelController {
 		[ESoundGroup.Unknown] = CSound.MaximumGroupLevel,
 		[ESoundGroup.Master] = CSound.DefaultMasterLevel
 	};
+	public double GetPercentageGroupVolume(ESoundGroup soundGroup)
+		=> _levelBySoundGroup[soundGroup] * (_levelBySoundGroup[ESoundGroup.Master] / 100.0);
 
 	private readonly ObservableCollection<CSound> _sounds;
+	private readonly Func<CSound[]> _getAllSoundsSnapshot;
 
 	private int _keyboardSoundLevelIncrement;
 
-	public SoundGroupLevelController(ObservableCollection<CSound> sounds) {
+	public SoundGroupLevelController(ObservableCollection<CSound> sounds, Func<CSound[]> getAllSoundsSnapshot) {
 		_sounds = sounds;
-
 		_sounds.CollectionChanged += SoundsOnCollectionChanged;
+		_getAllSoundsSnapshot = getAllSoundsSnapshot;
+
+		foreach (CSound sound in getAllSoundsSnapshot()) // level not set yet
+			SetLevel(sound);
 	}
+
+	public void Dispose()
+		=> _sounds.CollectionChanged -= SoundsOnCollectionChanged;
 
 	public void SetLevel(ESoundGroup soundGroup, int level) {
 		var clampedLevel = level.Clamp(CSound.MinimumGroupLevel, CSound.MaximumGroupLevel);
@@ -60,10 +69,13 @@ public sealed class SoundGroupLevelController {
 
 		_levelBySoundGroup[soundGroup] = clampedLevel;
 
-		// There's a rare chance that a null CSound slips into the `_sounds` list. Still not sure what is causing this. 
-		foreach (var sound in soundGroup == ESoundGroup.Master ? _sounds.Where(sound => sound != null) : _sounds.Where(sound => sound != null && sound.SoundGroup == soundGroup)) {
+		// There was a rare chance that a null CSound slips into the `_sounds` list. Still not sure what was causing that.
+		var allSounds = this._getAllSoundsSnapshot();
+		var sounds = (soundGroup == ESoundGroup.Master) ?
+			allSounds.Where(sound => sound != null)
+			: allSounds.Where(sound => sound != null && sound.SoundGroup == soundGroup);
+		foreach (var sound in sounds)
 			SetLevel(sound);
-		}
 
 		RaiseLevelChanged(soundGroup, clampedLevel);
 	}
@@ -81,7 +93,7 @@ public sealed class SoundGroupLevelController {
 	}
 
 	private void SetLevel(CSound sound) {
-		sound.GroupLevel = (int)(_levelBySoundGroup[sound.SoundGroup] * (_levelBySoundGroup[ESoundGroup.Master] / 100.0));
+		sound.GroupLevel = (float)this.GetPercentageGroupVolume(sound.SoundGroup);
 	}
 
 	private void SoundsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) {

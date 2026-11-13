@@ -1101,11 +1101,11 @@ internal class CStageResult : CStage {
 		double k = Math.Clamp((OpenTaiko.Timer.NowTimeMs - this.modalDuckStartMs) / this.modalDuckMs, 0.0, 1.0);
 		k = k * k * (3.0 - 2.0 * k);
 		this.modalDuck = this.modalDuckFrom + (this.modalDuckTo - this.modalDuckFrom) * k;
-		this.tSetMusicLevel((int)Math.Round(this.modalDuck));
+		this.tSetMusicLevel(this.modalDuck);
 	}
 
 	// the results module plays the music, at this level
-	private void tSetMusicLevel(int level) {
+	private void tSetMusicLevel(double level) {
 		if (ActiveResults is { IsActive: true } results) results.Call("setMusicLevel", level);
 	}
 

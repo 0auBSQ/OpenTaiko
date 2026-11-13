@@ -671,7 +671,7 @@ function update(ts)
             else
                 G.previewFadeVol = math.max(G.previewFadeTarget, G.previewFadeVol - step)
             end
-            psnd:SetVolume(math.floor(G.previewFadeVol * duck + 0.5))
+            psnd:SetVolume(G.previewFadeVol * duck)
         end
     end
     if ts ~= nil then G.previewPrevTs = ts end

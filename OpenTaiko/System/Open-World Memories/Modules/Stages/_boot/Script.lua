@@ -87,7 +87,7 @@ local function setVolume(channel, volume)
 		CONFIG.VoiceVolume = volume
 	elseif channel == "song" then
 		CONFIG.SongVolume = volume
-		CONFIG.PreviewVolume = math.floor(volume * 0.9)
+		CONFIG.PreviewVolume = volume * 0.9
 	end
 end
 local function getVolume(channel)

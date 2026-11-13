@@ -746,7 +746,7 @@ public unsafe class CVideoDecoder : IDisposable {
 					}
 				}
 				this._dbPlaySpeed = value;
-				this.audio?.SetSpeedLive(value);   // on the stream already in the mixer; the clock is in media time either way
+				this.audio?.SetSpeedWhilePlaying(value);   // on the stream already in the mixer; the clock is in media time either way
 			} else {
 				throw new ArgumentOutOfRangeException();
 			}

@@ -70,9 +70,9 @@ end
 | `sound:GetLoop()  -> bool` | ループが有効かどうかを返します。 |
 | `sound:SetVolumePercent(vol)  -> nil` | 音量をパーセントで設定します。 |
 | `sound:GetVolumePercent()  -> number` | 音量をパーセントで返します (未読み込み時は 100)。 |
-| `sound:SetVolume(vol)  -> nil` | SetVolumePercent の別名 (整数)。 |
+| `sound:SetVolume(vol)  -> nil` | SetVolumePercent の別名。 |
 | `sound:SetPan(pan)  -> nil` | ステレオのパンを設定します (-100..100)。 |
-| `sound:GetPan()  -> int` | 現在のパンを返します (未読み込み時は 0)。 |
+| `sound:GetPan()  -> number` | 現在のパンを返します (未読み込み時は 0)。 |
 | `sound:SetSpeed(speed)  -> nil` | 再生速度の倍率を設定します (1 = 通常)。 |
 | `sound:GetSpeed()  -> number` | 再生速度の倍率を返します (未読み込み時は 1)。 |
 | `sound:SetTimestampMs(ms)  -> nil` | ミリ秒単位の位置にシークします。 |

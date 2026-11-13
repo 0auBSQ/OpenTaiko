@@ -110,16 +110,16 @@ internal class CSkin : IDisposable {
 		public bool bIsFinishedPlaying {
 			get => !_held && (this.nowSound?.IsFinishedPlaying ?? false);
 		}
-		public int nPosition_CurrentlyPlayingSound {
+		public float nPosition_CurrentlyPlayingSound {
 			get => this.nowSound?.SoundPosition ?? 0;
 			set => this.nowSound?.SetPanning(value);
 		}
-		public int nPosition_NextPlayingSound {
+		public float nPosition_NextPlayingSound {
 			get => nextSound?.SoundPosition ?? 0;
 			set => nextSound?.SetPanning(value);
 		}
 		public double VolumePercent => this.nowSound?.GetGainPercent() ?? 100;
-		public int nAutomationLevel_CurrentSound {
+		public float nAutomationLevel_CurrentSound {
 			get => this.nowSound?.AutomationLevel ?? 0;
 			set {
 				CSound? sound = this.nowSound;
@@ -254,12 +254,12 @@ internal class CSkin : IDisposable {
 		public void tStop(double? msFrameworkTime = null) => tStop(pause: false, msFrameworkTime: msFrameworkTime);
 		public void tPause(double? msFrameworkTime = null) => tStop(pause: true, msFrameworkTime: msFrameworkTime);
 
-		public void SetPanning(int pan) {
+		public void SetPanning(float pan) {
 			nPosition_CurrentlyPlayingSound = pan;
 			nPosition_NextPlayingSound = pan;
 		}
 
-		public void SetVolume(int vol) {
+		public void SetVolume(double vol) {
 			this.rSound[0]?.SetGain(vol);
 			this.rSound[1]?.SetGain(vol);
 		}

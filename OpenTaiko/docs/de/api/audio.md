@@ -70,9 +70,9 @@ Bis der Stream bereit ist, puffert das Handle Play und jeden Set*-Aufruf, und di
 | `sound:GetLoop()  -> bool` | Gibt zurück, ob die Schleife aktiviert ist. |
 | `sound:SetVolumePercent(vol)  -> nil` | Setzt die Lautstärke in Prozent. |
 | `sound:GetVolumePercent()  -> number` | Gibt die Lautstärke in Prozent zurück (100, wenn nicht geladen). |
-| `sound:SetVolume(vol)  -> nil` | Alias von SetVolumePercent (Ganzzahl). |
+| `sound:SetVolume(vol)  -> nil` | Alias von SetVolumePercent. |
 | `sound:SetPan(pan)  -> nil` | Setzt das Stereo-Panning, -100..100. |
-| `sound:GetPan()  -> int` | Gibt das aktuelle Panning zurück (0, wenn nicht geladen). |
+| `sound:GetPan()  -> number` | Gibt das aktuelle Panning zurück (0, wenn nicht geladen). |
 | `sound:SetSpeed(speed)  -> nil` | Setzt den Geschwindigkeitsfaktor der Wiedergabe (1 = normal). |
 | `sound:GetSpeed()  -> number` | Gibt den Geschwindigkeitsfaktor der Wiedergabe zurück (1, wenn nicht geladen). |
 | `sound:SetTimestampMs(ms)  -> nil` | Springt zu einer Position in Millisekunden. |
