@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.7.0.8] - 2026-11-13 (Beta)
+
+- [Fix] `LuaVideo` volume defaulted to play at full volume regardless of volume settings, until manually adjusted to different volume after initialized
+- [Fix] "Collection was modified" exception was possible when changing volume settings while opening video with audio
+- [Fix] `CSound`: Ensure using playable stream instead of decoding-only stream when mixer is not used, for all sound APIs
+- [Fix] `CSound` stream was not freed when `TempoCreate` or `ChannelGetAttribute` failed for non-user `CSound`s
+- [Enhance] Increase sound panning precision to float and Volume precision to double
+- [Test] Check for mastered volume in `VideoAudioTests.VideoPacketsMuxedAheadOfAudio_StillStart()`
+- [Chore] Fix edited `git add -p` patches to existing codes with trailing spaces could not be applied because NVim respects .editorconfig and removed the trailing space
+
 ## [0.7.0.7] - 2026-11-08 (Beta)
 
 - [Feat] Add extra my room items
