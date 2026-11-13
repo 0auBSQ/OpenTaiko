@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.7.0.10] - 2026-11-13 (Beta)
+
+- [Fix] Add an effort value for charts to avoid rewarding too much charts with very little notecount and very high set level
+
 ## [0.7.0.9] - 2026-11-13 (Beta)
 
 - [Feat] Add new nameplates and hide the name of secret nameplate types until obtained to prevent spoilers
