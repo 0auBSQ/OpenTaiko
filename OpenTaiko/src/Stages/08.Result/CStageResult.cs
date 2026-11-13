@@ -571,9 +571,12 @@ internal class CStageResult : CStage {
 
 				#endregion
 
+				int towerTable = OpenTaiko.SongMount.rChoosenSong.nSide == CTja.ESide.eNormal ? (int)Difficulty.Normal : (int)Difficulty.Oni;
+				double effort = tCoinEffort(towerTable, stars, nTotalHits);
+
 				// this.nEarnedMedalsCount[0] = stars;
 				this.nEarnedMedalsCount[0] = 5 + (int)((diffModifier * (starRate + redStarRate)) * (floorRate * lengthBonus)) + clearModifier;
-				this.nEarnedMedalsCount[0] = Math.Max(5, (int)(this.nEarnedMedalsCount[0] * modMultipliers[0] * getCoinMul(0)));
+				this.nEarnedMedalsCount[0] = tFinalCoins(this.nEarnedMedalsCount[0], modMultipliers[0] * getCoinMul(0), effort);
 			} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 				int partialScore = 0;
 
@@ -600,6 +603,9 @@ internal class CStageResult : CStage {
 
 				#region [Partial scores]
 
+				var songValues = new List<int>();
+				var songEfforts = new List<double>();
+				var danSongScore = OpenTaiko.stageGameScreen.DanSongScore;
 				for (int i = 0; i < OpenTaiko.SongMount.rChoosenSong!.DanSongs!.Count; i++) {
 					if (OpenTaiko.SongMount.rChoosenSong.DanSongs[i] != null) {
 						int diff = OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Difficulty;
@@ -611,7 +617,13 @@ internal class CStageResult : CStage {
 						starRate = Math.Min(10, stars) / 2;
 						redStarRate = Math.Max(0, stars - 10) * 4;
 
-						partialScore += (int)(diffModifier * (starRate + redStarRate));
+						int songValue = (int)(diffModifier * (starRate + redStarRate));
+						partialScore += songValue;
+
+						var songScore = i < danSongScore.Length ? danSongScore[i] : null;
+						int songNotes = songScore == null ? 0 : songScore.nGreat + songScore.nGood + songScore.nMiss;
+						songValues.Add(songValue);
+						songEfforts.Add(tCoinEffort(diff, stars, songNotes));
 					}
 
 				}
@@ -622,7 +634,8 @@ internal class CStageResult : CStage {
 					this.nEarnedMedalsCount[0] = 10;
 				else {
 					this.nEarnedMedalsCount[0] = 10 + goukakuModifier + clearModifier + (int)(partialScore * dAccuracyRate);
-					this.nEarnedMedalsCount[0] = Math.Max(10, (int)(this.nEarnedMedalsCount[0] * modMultipliers[0] * getCoinMul(0)));
+					this.nEarnedMedalsCount[0] = tFinalCoins(this.nEarnedMedalsCount[0], modMultipliers[0] * getCoinMul(0),
+						tDanCoinEffort(songValues, songEfforts), 10);
 				}
 			} else {
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
@@ -674,8 +687,9 @@ internal class CStageResult : CStage {
 					if (clearModifier < 0)
 						this.nEarnedMedalsCount[i] = 5;
 					else {
+						double effort = tCoinEffort(diff, stars, nTotalHits);
 						this.nEarnedMedalsCount[i] = (int)(5 + (int)((diffModifier * (starRate + redStarRate)) * dAccuracyRate) + clearModifier + scoreRankModifier);
-						this.nEarnedMedalsCount[i] = Math.Max(5, (int)(this.nEarnedMedalsCount[i] * modMultipliers[i] * getCoinMul(i)));
+						this.nEarnedMedalsCount[i] = tFinalCoins(this.nEarnedMedalsCount[i], modMultipliers[i] * getCoinMul(i), effort);
 					}
 				}
 			}
@@ -1081,6 +1095,46 @@ internal class CStageResult : CStage {
 
 	// Coins information
 	private int[] nEarnedMedalsCount = { 0, 0, 0, 0, 0 };
+
+	// the notes a play goes through for its whole coins, per difficulty row and level (the first value is 1 star, which
+	// every level under 1 takes too); a level past a row's end takes the next harder row's value, and the Oni row's last
+	// value covers every level above
+	private static readonly int[][] FullCoinNotes = {
+		new[] { 1, 40, 50, 60, 70, 80, 90, 100 },                                       // Easy
+		new[] { 1, 40, 50, 60, 70, 80, 90, 100 },                                       // Normal (and Tower Sweet)
+		new[] { 1, 50, 70, 90, 100, 130, 160, 200, 250, 300 },                         // Hard
+		new[] { 1, 100, 150, 200, 250, 300, 300, 350, 400, 500, 800, 1000, 1500 },    // Oni, Edit (and Tower Spicy)
+	};
+
+	// the share of its coins a play earns, 0 to 1 (mods and multipliers included; a play never earns under the base 5):
+	// the notes it went through (hits and misses) against the row's count
+	internal static double tCoinEffort(int difficulty, int stars, int notes) {
+		int row = Math.Clamp(difficulty, 0, FullCoinNotes.Length - 1);
+		int level = Math.Max(1, stars);
+		while (row < FullCoinNotes.Length - 1 && level > FullCoinNotes[row].Length) row++;
+		int[] counts = FullCoinNotes[row];
+		int need = counts[Math.Min(level, counts.Length) - 1];
+		return Math.Clamp(notes / (double)need, 0.0, 1.0);
+	}
+
+	// a play's coins: its amount with the mods and multipliers, scaled by its effort share, never under its base
+	internal static int tFinalCoins(int amount, double multiplier, double effort, int minimum = 5)
+		=> Math.Max(minimum, (int)(amount * multiplier * effort));
+
+	// a dan's effort share: each song's own, weighed by what the song is worth in the partial score (the plain average
+	// when no song is worth anything, 1 for a dan without songs)
+	internal static double tDanCoinEffort(IReadOnlyList<int> songValues, IReadOnlyList<double> songEfforts) {
+		int n = Math.Min(songValues.Count, songEfforts.Count);
+		if (n == 0) return 1.0;
+		double weighed = 0, worth = 0, sum = 0;
+		for (int i = 0; i < n; i++) {
+			int value = Math.Max(0, songValues[i]);
+			weighed += value * songEfforts[i];
+			worth += value;
+			sum += songEfforts[i];
+		}
+		return worth > 0 ? weighed / worth : sum / n;
+	}
 
 	// The result music dims while a reward modal plays so the modal's own sounds are heard: its level (percent)
 	// eases with a smoothstep down to MODAL_DUCK_LEVEL and back up, so neither edge is rough.

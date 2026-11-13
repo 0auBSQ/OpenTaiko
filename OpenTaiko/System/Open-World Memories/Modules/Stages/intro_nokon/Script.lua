@@ -42,6 +42,7 @@ local OPTK_DIRECT_GENRES = {
     "Classical Arrangements",
     "OpenTaiko Headquarters",
     "Rainy Memories",
+    "Rainy Diary",
     "Dashy's Secrets",
     "Deceiver's Defiances",
 }
