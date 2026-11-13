@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.7.0.9] - 2026-11-13 (Beta)
+
+- [Feat] Add new nameplates and hide the name of secret nameplate types until obtained to prevent spoilers
+- [Fix] Tower play length bonus (for coins) now take account of the song speed in its calculation
+
 ## [0.7.0.8] - 2026-11-13 (Beta)
 
 - [Fix] `LuaVideo` volume defaulted to play at full volume regardless of volume settings, until manually adjusted to different volume after initialized
