@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using FDK;
+using FDK.ExtensionMethods;
 
 namespace OpenTaiko;
 
@@ -20,23 +21,10 @@ class CActImplTrainingMode : CActivity {
 		var measureCount = 1;
 		var bIsInGoGo = false;
 
-		int endtime = 1;
-		int bgmlength = 1;
+		var endtime = OpenTaiko.stageGameScreen.msChartLength;
+		var bgmlength = OpenTaiko.stageGameScreen.msBgmLength;
 
-		for (int index = 0; index < OpenTaiko.TJA!.listChip.Count; index++) {
-			if (OpenTaiko.TJA.listChip[index].nChannelNo == 0xff) {
-				endtime = OpenTaiko.TJA.listChip[index].nSoundTimems;
-				break;
-			}
-		}
-		for (int index = 0; index < OpenTaiko.TJA.listChip.Count; index++) {
-			if (OpenTaiko.TJA.listChip[index].nChannelNo == 0x01) {
-				bgmlength = OpenTaiko.TJA.listChip[index].GetDuration() + OpenTaiko.TJA.listChip[index].nSoundTimems;
-				break;
-			}
-		}
-
-		length = Math.Max(endtime, bgmlength);
+		length = long.CreateSaturating(Math.Max(endtime, bgmlength));
 
 		gogoXList = new List<int>();
 		JumpPointList = new List<STJUMPP>();
@@ -53,7 +41,7 @@ class CActImplTrainingMode : CActivity {
 				var width = 0;
 				if (OpenTaiko.Tx.Tokkun_ProgressBar != null) width = OpenTaiko.Tx.Tokkun_ProgressBar.szTextureSize.Width;
 
-				this.gogoXList.Add((int)(width * (current / length)));
+				this.gogoXList.Add(int.CreateSaturating(width * (current / length)));
 			}
 			if (pChip.nChannelNo == 0x9F && bIsInGoGo) {
 				bIsInGoGo = false;
@@ -416,12 +404,14 @@ class CActImplTrainingMode : CActivity {
 	}
 
 	private bool tIsArrayValueBelowInterval(ref long[] array, long num, int interval) {
+		if (interval < 0)
+			return false;
 		long[] arraytmp = array;
 		for (int index = 0; index < (array.Length - 1); index++) {
 			array[index] = array[index + 1];
 		}
 		array[array.Length - 1] = num;
-		return Math.Abs(num - arraytmp[0]) <= interval;
+		return num.AbsDiffTo(arraytmp[0]) <= (uint)interval;
 	}
 
 	public int nCurrentMeasure;
