@@ -10,8 +10,8 @@ namespace FDK;
 /// callbacks never issue [NSOpenGLContext update] from the window thread.
 ///
 /// The context and pixel format are created on the main thread (together with setView:). The game thread makes
-/// it current and performs all rendering and presentation; the window thread applies drawable updates. Both
-/// sides take the same CGL lock, so the GL-on-Metal context is never used by two threads at once.
+/// it current and performs all rendering, presentation and drawable updates; the main thread only releases it
+/// after the game thread has finished.
 /// </summary>
 internal sealed class CocoaGLContext : IGLContext {
 	private const string ObjCRuntime = "/usr/lib/libobjc.A.dylib";
@@ -63,8 +63,6 @@ internal sealed class CocoaGLContext : IGLContext {
 	private readonly nint _glFramework;
 	private readonly nint _selMakeCurrentContext, _selFlushBuffer, _selUpdate, _selClearDrawable;
 	private readonly nint _selSetValues, _selClearCurrentContext;
-	private nint _cglContext;
-	private readonly object _sync = new();
 	private int _swapInterval;
 	private bool _disposed;
 
@@ -117,29 +115,7 @@ internal sealed class CocoaGLContext : IGLContext {
 		// readback math. A best-resolution (Retina) drawable would need those to use FramebufferSize instead.
 		SendVoid(view, sel_registerName("setWantsBestResolutionOpenGLSurface:"), 0);
 		SendVoid(_context, sel_registerName("setView:"), view);
-
-		_cglContext = Send(_context, sel_registerName("CGLContextObj"));
 	}
-
-	/// <summary>
-	/// Serializes the game thread's GL work with the window thread's [NSOpenGLContext update] (and with AppKit's
-	/// own NSOpenGLView backing-layer display, which takes the same lock). CGL locks are recursive per thread.
-	/// </summary>
-	public void Lock() {
-		if (_cglContext != 0)
-			CGLLockContext(_cglContext);
-	}
-
-	public void Unlock() {
-		if (_cglContext != 0)
-			CGLUnlockContext(_cglContext);
-	}
-
-	[DllImport(OpenGLFramework)]
-	private static extern int CGLLockContext(nint ctx);
-
-	[DllImport(OpenGLFramework)]
-	private static extern int CGLUnlockContext(nint ctx);
 
 	public nint Handle { get; set; }
 
@@ -178,60 +154,44 @@ internal sealed class CocoaGLContext : IGLContext {
 	}
 
 	/// <summary>
-	/// macOS only: the drawable follows the view. Runs on the window thread outside AppKit callbacks, and takes
-	/// the same CGL lock as the game thread's frames, so the GL-on-Metal context is never used concurrently.
+	/// macOS only: the drawable follows the view. Runs on the game thread, the only thread that uses the
+	/// context, so no lock is needed.
 	/// </summary>
 	public void Update() {
-		lock (_sync) {
-			if (_disposed || _context == 0 || _cglContext == 0)
-				return;
-			CGLLockContext(_cglContext);
-			try {
-				// [NSOpenGLContext update] applies to the calling thread's current context; make it current here
-				// (the game thread is outside its frame under the CGL lock) and leave the window thread clean.
-				SendVoid(_context, _selMakeCurrentContext);
-				SendVoid(_context, _selUpdate);
-				SendVoid(objc_getClass("NSOpenGLContext"), _selClearCurrentContext);
-			} finally {
-				CGLUnlockContext(_cglContext);
-			}
-		}
+		if (_disposed || _context == 0)
+			return;
+		SendVoid(_context, _selUpdate);
+	}
+
+	/// <summary>Stops the context being current on the calling (game) thread.</summary>
+	public void ReleaseCurrent() {
+		if (_context == 0 || !IsCurrent)
+			return;
+		SendVoid(objc_getClass("NSOpenGLContext"), _selClearCurrentContext);
+		IsCurrent = false;
 	}
 
 	public void Clear() {
 	}
 
+	/// <summary>Releases the context. Called on the main thread, after the game thread has finished.</summary>
 	public void Dispose() {
-		lock (_sync) {
-			if (_disposed)
-				return;
-			_disposed = true;
+		if (_disposed)
+			return;
+		_disposed = true;
 
-			if (_context != 0) {
-				if (_cglContext != 0)
-					CGLLockContext(_cglContext);
-				try {
-					if (IsCurrent) {
-						SendVoid(objc_getClass("NSOpenGLContext"), _selClearCurrentContext);
-						IsCurrent = false;
-					}
-					SendVoid(_context, _selClearDrawable);
-				} finally {
-					if (_cglContext != 0)
-						CGLUnlockContext(_cglContext);
-				}
-				objc_release(_context);
-				Trace.TraceInformation($"Cocoa GL context released (swap interval was {_swapInterval}).");
-				_context = 0;
-				_cglContext = 0;
-				Handle = 0;
-			}
-
-			if (_pixelFormat != 0)
-				objc_release(_pixelFormat);
-
-			if (_glFramework != 0)
-				NativeLibrary.Free(_glFramework);
+		if (_context != 0) {
+			SendVoid(_context, _selClearDrawable);
+			objc_release(_context);
+			Trace.TraceInformation($"Cocoa GL context released (swap interval was {_swapInterval}).");
+			_context = 0;
+			Handle = 0;
 		}
+
+		if (_pixelFormat != 0)
+			objc_release(_pixelFormat);
+
+		if (_glFramework != 0)
+			NativeLibrary.Free(_glFramework);
 	}
 }

@@ -38,6 +38,7 @@ COMMON_CONFIG=(
   --target-os=darwin --arch=arm64 --enable-pic
   --enable-shared --disable-static
   --disable-programs --disable-doc --disable-debug --disable-autodetect
+  --enable-zlib --enable-videotoolbox
   --disable-network --disable-bsfs
   --enable-bsf=h264_mp4toannexb,hevc_mp4toannexb,extract_extradata,vp9_superframe
   --enable-protocol=file

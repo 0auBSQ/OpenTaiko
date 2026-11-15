@@ -147,9 +147,10 @@ internal class Program {
 						if (OperatingSystem.IsMacOS()) {
 							// No copy next to the executable: the packaged app must not write into its own
 							// bundle (read-only under App Translocation, and it would break any future code
-							// signature). BASS loads straight from Libs/osx-*/ via this resolver.
+							// signature). The per-assembly resolvers below run before default probing, so a stale
+							// copy beside the executable can never win; BASS loads straight from Libs/osx-*/.
 							string libsDir = AppContext.BaseDirectory + @"Libs/" + osplatform + "-" + platform + "/";
-							AssemblyLoadContext.Default.ResolvingUnmanagedDll += (assembly, name) => {
+							DllImportResolver bassResolver = (name, assembly, searchPath) => {
 								string? file = name switch {
 									"bass" => "libbass.dylib",
 									"bass_fx" => "libbass_fx.dylib",
@@ -159,6 +160,8 @@ internal class Program {
 								};
 								return file == null ? IntPtr.Zero : NativeLibrary.Load(Path.Combine(libsDir, file));
 							};
+							foreach (var bassAssembly in new[] { typeof(ManagedBass.Bass).Assembly, typeof(ManagedBass.Fx.BassFx).Assembly, typeof(ManagedBass.Mix.BassMix).Assembly })
+								NativeLibrary.SetDllImportResolver(bassAssembly, bassResolver);
 						} else {
 							//実行ファイルの階層にライブラリをコピー
 							DirectoryInfo info = new DirectoryInfo(AppContext.BaseDirectory + @"Libs/" + osplatform + "-" + platform + "/");

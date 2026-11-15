@@ -29,7 +29,11 @@ for dir in FFmpeg Libs; do
 done
 
 echo "[package-osx-app] writing Info.plist..."
-cat > "$APP/Contents/Info.plist" <<'EOF'
+# Version comes from OpenTaiko.csproj (a.b.c.d); the short version keeps three components, which is what
+# CFBundleShortVersionString allows for notarization.
+FULL_VERSION="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' "$PROJECT_DIR/OpenTaiko/OpenTaiko.csproj" | head -1)"
+SHORT_VERSION="$(echo "$FULL_VERSION" | cut -d. -f1-3)"
+cat > "$APP/Contents/Info.plist" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -49,9 +53,9 @@ cat > "$APP/Contents/Info.plist" <<'EOF'
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.7.0.5</string>
+	<string>${SHORT_VERSION}</string>
 	<key>CFBundleVersion</key>
-	<string>0.7.0.5</string>
+	<string>${FULL_VERSION}</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>13.0</string>
 	<key>NSHighResolutionCapable</key>
