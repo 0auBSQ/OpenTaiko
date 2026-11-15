@@ -154,7 +154,8 @@ public abstract partial class Game : IDisposable {
 	private Vector2D<int>? _pendingResize;
 
 	// macOS only: the game owns the GL context (the window is created with GLFW_NO_API) and makes it current
-	// only on the game thread. The drawable follows the view on that same thread, from _macDrawableDirty.
+	// only on the game thread. The drawable follows the view from the window thread (from _macDrawableDirty),
+	// under the same CGL lock that the game thread holds for each frame.
 	private CocoaGLContext? _cocoaContext;
 	private volatile bool _macDrawableDirty;
 
@@ -548,6 +549,11 @@ public abstract partial class Game : IDisposable {
 		} else {
 			Silk.NET.Windowing.Glfw.GlfwWindowing.Use();
 			_usingGlfw = true;
+			// macOS only: keep GLFW's cocoa init from chdir-ing into the bundle's Resources folder. It has to be set
+			// before GLFW initializes (Window.Create); the game's relative paths (Songs, .init, Config.ini) live
+			// next to the executable (Program sets that directory).
+			if (OperatingSystem.IsMacOS())
+				GlfwProvider.UninitializedGLFW.Value.InitHint((InitHint)0x00051001 /* GLFW_COCOA_CHDIR_RESOURCES */, false);
 			Trace.TraceInformation("GLFW selected for Windowing");
 		}
 		// SDL would create it fullscreen in the display mode nearest the window size: it goes fullscreen once
@@ -753,10 +759,6 @@ public abstract partial class Game : IDisposable {
 		}
 		// This thread keeps the window: it waits for window events (waking on input, or after 1 ms to poll the pads),
 		// and the device callbacks stamp each press as it arrives. The game runs on its own thread (GameThreadMain).
-		// macOS only: keep GLFW's cocoa init from chdir-ing into the bundle's Resources folder; the game's
-		// relative paths (Songs, .init, Config.ini) live next to the executable (Program sets that directory).
-		if (OperatingSystem.IsMacOS() && _usingGlfw)
-			GlfwProvider.UninitializedGLFW.Value.InitHint((InitHint)0x00051001 /* GLFW_COCOA_CHDIR_RESOURCES */, false);
 		Window_!.Initialize();
 		if (OperatingSystem.IsMacOS()) {
 			// macOS only: the game owns the GL context. The window was created with GLFW_NO_API, so GLFW
@@ -795,6 +797,14 @@ public abstract partial class Game : IDisposable {
 				else
 					Thread.Sleep(1);
 				this.OnEvents();
+				if (OperatingSystem.IsMacOS() && _macDrawableDirty) {
+					// macOS only: apply the drawable change here, outside AppKit callbacks, on the main thread (AppKit
+					// objects belong to it); Update takes the CGL lock, so it waits for the game thread's current frame
+					// and never overlaps its GL work. Calling it from the game thread instead hangs the app: the
+					// game thread spins inside [NSOpenGLContext update] while AppKit's layer display waits for the lock.
+					_macDrawableDirty = false;
+					_cocoaContext?.Update();
+				}
 				if (Window_.IsClosing)
 					this._quitRequested = true;
 			}
@@ -815,9 +825,14 @@ public abstract partial class Game : IDisposable {
 		Thread.CurrentThread.CurrentUICulture = _gameUICulture!;
 		MainThreadID = Environment.CurrentManagedThreadId;
 		try {
-			this.InitializeGraphics();
-			this.Initialize();
-			this.LoadContent();
+			LockMacGL();
+			try {
+				this.InitializeGraphics();
+				this.Initialize();
+				this.LoadContent();
+			} finally {
+				UnlockMacGL();
+			}
 			var clock = Stopwatch.StartNew();
 			double last = 0;
 			while (!this._quitRequested) {
@@ -825,17 +840,18 @@ public abstract partial class Game : IDisposable {
 				double now = clock.Elapsed.TotalSeconds;
 				double delta = Math.Max(now - last, 1e-6);
 				last = now;
-				// macOS only: the drawable follows the view here, on the thread that owns the context, so it also
-				// follows during a live resize (the window thread is inside AppKit's resize loop then).
-				if (OperatingSystem.IsMacOS() && _macDrawableDirty) {
-					_macDrawableDirty = false;
-					_cocoaContext?.Update();
+				// macOS only: the same CGL lock the window thread takes for its drawable update, so neither thread
+				// uses the GL-on-Metal context while the other does.
+				LockMacGL();
+				try {
+					this.ApplyPendingResize();
+					this.Window_Update(delta);
+					if (this._quitRequested)
+						break;
+					this.Window_Render(delta);
+				} finally {
+					UnlockMacGL();
 				}
-				this.ApplyPendingResize();
-				this.Window_Update(delta);
-				if (this._quitRequested)
-					break;
-				this.Window_Render(delta);
 			}
 		} catch (Exception e) {
 			this._gameThreadException = ExceptionDispatchInfo.Capture(e);
@@ -849,6 +865,17 @@ public abstract partial class Game : IDisposable {
 			if (_usingGlfw)
 				GlfwProvider.GLFW.Value.PostEmptyEvent();
 		}
+	}
+
+	// macOS only: the game thread's frames and the window thread's drawable update share this CGL lock.
+	private void LockMacGL() {
+		if (OperatingSystem.IsMacOS())
+			_cocoaContext?.Lock();
+	}
+
+	private void UnlockMacGL() {
+		if (OperatingSystem.IsMacOS())
+			_cocoaContext?.Unlock();
 	}
 
 	/// <summary>
@@ -996,18 +1023,25 @@ public abstract partial class Game : IDisposable {
 
 	// game thread, after its last frame
 	private void ShutdownGame() {
-		CTexture.Terminate();
-		DeleteRenderScaleFbo();
+		// macOS only: under the CGL lock, so the window thread's drawable update cannot use the context while its
+		// objects are deleted
+		LockMacGL();
+		try {
+			CTexture.Terminate();
+			DeleteRenderScaleFbo();
 
-		UnloadContent();
-		OnExiting();
+			UnloadContent();
+			OnExiting();
 
-		// macOS only: the NSOpenGLContext is released on the window thread after this thread joins (AppKit
-		// objects belong to the main thread); here it only stops being current.
-		if (OperatingSystem.IsMacOS())
-			_cocoaContext?.ReleaseCurrent();
-		else
-			Context?.Dispose();
+			// macOS only: the NSOpenGLContext is released on the window thread after this thread joins (AppKit
+			// objects belong to the main thread); here it only stops being current.
+			if (OperatingSystem.IsMacOS())
+				_cocoaContext?.ReleaseCurrent();
+			else
+				Context?.Dispose();
+		} finally {
+			UnlockMacGL();
+		}
 	}
 
 	public void Window_Update(double deltaTime) {

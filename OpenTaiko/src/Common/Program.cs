@@ -91,9 +91,8 @@ internal class Program {
 		if (mutexDoubleStartupPrevent.WaitOne(0, false)) {
 			string newLine = Environment.NewLine;
 
-			// .NET's apphost chdirs into Contents/Resources when launched from a .app bundle; the game's
-			// relative paths (Songs, .init, Config.ini) live next to the executable. GLFW's cocoa init
-			// chdirs again during window creation, so Game.Run re-asserts this after Window.Initialize.
+			// The game's relative paths (Songs, .init, Config.ini) live next to the executable, but a launch
+			// from a .app bundle does not start there. Game keeps GLFW's cocoa init from changing it again.
 			if (OperatingSystem.IsMacOS())
 				Directory.SetCurrentDirectory(AppContext.BaseDirectory);
 
