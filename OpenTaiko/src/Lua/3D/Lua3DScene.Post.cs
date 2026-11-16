@@ -41,12 +41,19 @@ namespace OpenTaiko {
 		///   uniform int uRsh, uRttFlip;   //  flip rows when uRttFlip == 1)
 		///   uniform vec3 uCam, uTint, uFlat; uniform float uTime, uAlpha; uniform vec4 uUser[4];
 		///   out vec4 frag;
+		/// Optional, filled when declared: int uFog; vec3 uFogCol; float uFogStart, uFogInv
+		///   (fog = clamp((vCamZ - uFogStart) * uFogInv, 0, 1)); vec3 uSunDir (toward the sun), uSunCol, uAmb,
+		///   uSkyHor, uSkyZen; vec4 uFogSky[6]; sampler2D uTex2; mat4 uLightVP; highp sampler2D uShadow; float uShadowOn
+		///   (1 = map bound: p = uLightVP * world pos, p.xyz / p.w * 0.5 + 0.5, lit where p.z - bias is under the texel)
 		/// Compile failure traces, surfaces GetShaderError, and falls back to the built-in path.
 		/// nil/"" detaches. Programs are cached per distinct source and freed with the render caches.</summary>
 		public void ObjSetSurfaceShader(int id, string fragSrc) {
 			var o = Obj(id); if (o == null) return;
 			o.SurfaceSrc = string.IsNullOrWhiteSpace(fragSrc) ? null : fragSrc;
 		}
+
+		/// <summary>uTex2 of a custom surface shader; negative = none.</summary>
+		public void ObjSetSurfaceTexture2(int id, int texId) { var o = Obj(id); if (o != null) o.SurfaceTex2 = texId < 0 ? -1 : texId; }
 
 		/// <summary>Set uUser[slot] (slot 0..3) shared by every custom surface shader.</summary>
 		public void SetSurfaceUniform(int slot, double x, double y, double z, double w) {

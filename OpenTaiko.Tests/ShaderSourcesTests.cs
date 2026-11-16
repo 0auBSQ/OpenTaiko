@@ -12,7 +12,7 @@ namespace OpenTaikoTests {
 		private static readonly string[] Files = {
 			"world.vert", "world.frag", "depth.vert", "depth.frag", "depth_sprite.vert", "depth_sprite.frag",
 			"particle.vert", "particle.frag", "fullscreen.vert", "sky.vert", "post.frag", "outline.frag", "diorama.frag",
-			"grass.vert", "grass.frag", "overlay2d.vert", "overlay2d.frag", "rt_present.vert", "rt_present.frag", "raytrace.comp",
+			"grass.vert", "grass.frag", "grasstile.vert", "grasstile.frag", "terrain.frag", "overlay2d.vert", "overlay2d.frag", "rt_present.vert", "rt_present.frag", "raytrace.comp",
 		};
 
 		[Fact]

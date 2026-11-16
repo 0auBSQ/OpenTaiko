@@ -395,6 +395,7 @@ Eine Instanz pro Host, die der Host jeden Frame an Ort und Stelle aktualisiert. 
 | `state.landCount  -> number[]` | Fliegende Noten jedes Spielers, die seit dem Start des Hintergrunds das Ende ihres Flugs erreicht haben. |
 | `state:SetFlyTarget(player, x, y)` | Solange dieser Gameplay-Hintergrund angezeigt wird, landen die fliegenden Noten des Spielers auf (x, y) in Bildschirmpixeln, und der Landeeffekt des Skins entfällt. |
 | `state:ClearFlyTarget(player)` | Die fliegenden Noten des Spielers landen wieder an der üblichen Stelle des Skins. |
+| `state:SetCrowdHidden(hidden)` | Solange dieser Gameplay-Hintergrund angezeigt wird, lässt true die Tänzer und den Mob weg, die über dem unteren Hintergrund gezeichnet werden; false zeichnet sie wieder. Ein neuer Hintergrund beginnt mit ihnen. |
 
 ## Übergänge
 

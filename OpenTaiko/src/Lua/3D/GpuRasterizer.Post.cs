@@ -22,7 +22,7 @@ namespace OpenTaiko {
 		// a compile failure traces once and disables the pass until the source changes again.
 		private uint _progUser; private int _upTex, _upRes, _upTime, _upUser; private int _userPostRev = -1; private bool _userPostOk;
 		// Lua-attached SKY pass (SetSkyShader): same lifecycle, drawn behind the opaque world (DrawWorld).
-		private uint _progSky; private int _skRes, _skTime, _skUser, _skNoise; private int _skyRev = -1; private bool _skyOk;
+		private uint _progSky; private int _skRes, _skTime, _skUser, _skNoise, _skFogSky; private int _skyRev = -1; private bool _skyOk;
 		// the noise texture a sky shader reads through uNoise when it declares it: a random byte per point of a 256 x 256
 		// lattice that wraps, and texel (x, y) holds the bytes of points (x, y), (x + 1, y), (x, y + 1), (x + 1, y + 1)
 		// in r, g, b, a, so one fetch gives a lattice cell's four corners (NoiseTex)
@@ -85,6 +85,7 @@ namespace OpenTaiko {
 				_skTime = Gl.GetUniformLocation(_progSky, "uTime");
 				_skUser = Gl.GetUniformLocation(_progSky, "uUser[0]");
 				_skNoise = Gl.GetUniformLocation(_progSky, "uNoise");
+				_skFogSky = Gl.GetUniformLocation(_progSky, "uFogSky[0]");
 				_skyOk = true;
 			} catch (Exception e) {
 				LastShaderError = "sky: " + e.Message;
@@ -156,6 +157,7 @@ namespace OpenTaiko {
 				Gl.Uniform1(_skNoise, NOISE_UNIT);
 				Gl.ActiveTexture(TextureUnit.Texture0);
 			}
+			if (_skFogSky >= 0) Gl.Uniform4(_skFogSky, 6u, (ReadOnlySpan<float>)s._fogSky);
 			if (_skUser >= 0 && !ownBasis) Gl.Uniform4(_skUser, 8u, (ReadOnlySpan<float>)s._skyUser);
 			else if (_skUser >= 0) {
 				Span<float> su = stackalloc float[32];

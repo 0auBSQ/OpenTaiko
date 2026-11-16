@@ -147,6 +147,7 @@ internal class Program {
 
 					using (var mania = new OpenTaiko(args)) {
 						if (cli.Hidden) mania.StartHidden = true;
+						mania.StartStage = cli.Stage;
 						mania.Run();
 					}
 

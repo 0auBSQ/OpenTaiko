@@ -14,6 +14,8 @@ IsoMap.__index = IsoMap
 
 local WALL_H = 2.2          -- visible + collision height of wall cells
 
+local function wallTop(cell) return (cell.h or 0) + (cell.wallH or WALL_H) end
+
 -- ── height queries (parity with iso_demo2/maps.lua) ──────────────────────────────────────────────
 local function cellAt(def, wx, wz)
     local c = math.floor(wx)
@@ -89,7 +91,13 @@ function IsoMap.build(world, def, texId)
         elseif edge == "w" then q = { x0, y0, z0 + 1, x0, y0, z0, x0, ya, z0, x0, yb, z0 + 1, 0.74 }
         elseif edge == "s" then q = { x0, y0, z0 + 1, x0 + 1, y0, z0 + 1, x0 + 1, yb, z0 + 1, x0, ya, z0 + 1, 0.66 }
         else                    q = { x0 + 1, y0, z0, x0, y0, z0, x0, ya, z0, x0 + 1, yb, z0, 0.9 } end
-        scene:ObjAddQuadTex(world.wallObj, q[1], q[2], q[3], q[4], q[5], q[6], q[7], q[8], q[9], q[10], q[11], q[12], tex, 1, v, q[13])
+        -- e/w reversed: normal out of the cell
+        local a, b, c, d = 1, 4, 7, 10
+        if edge == "e" or edge == "w" then a, b, c, d = 4, 1, 10, 7 end
+        -- ramp triangle side: last corner repeats the third
+        if math.abs(q[d + 1] - q[a + 1]) <= 0.001 then d = c end
+        scene:ObjAddQuadTex(world.wallObj, q[a], q[a + 1], q[a + 2], q[b], q[b + 1], q[b + 2],
+            q[c], q[c + 1], q[c + 2], q[d], q[d + 1], q[d + 2], tex, 1, v, q[13])
         phys:addQuad(q[1], q[2], q[3], q[4], q[5], q[6], q[7], q[8], q[9], q[10], q[11], q[12])
     end
 
@@ -111,12 +119,12 @@ function IsoMap.build(world, def, texId)
     end
 
     local function cellTopMax(cell)
-        if cell.wall then return (cell.h or 0) + WALL_H end
+        if cell.wall then return wallTop(cell) end
         local a, b, cc, d = cornerHeights(cell)
         return math.max(a, b, cc, d)
     end
     local function cellTopMin(cell)
-        if cell.wall then return (cell.h or 0) + WALL_H end
+        if cell.wall then return wallTop(cell) end
         local a, b, cc, d = cornerHeights(cell)
         return math.min(a, b, cc, d)
     end
@@ -128,7 +136,7 @@ function IsoMap.build(world, def, texId)
                 if cell.wall then
                     -- a wall cell: a full box (top + 4 sides down to the lowest neighbour floor)
                     local base = cell.h or 0
-                    local top = base + WALL_H
+                    local top = wallTop(cell)
                     local x0, z0 = c, (def.gridH - 1 - r)
                     local tex = texId(cell.tex)
                     scene:ObjAddQuadTex(world.floorObj, x0, top, z0, x0, top, z0 + 1, x0 + 1, top, z0 + 1, x0 + 1, top, z0, tex, 1, 1, 1.0)
@@ -136,10 +144,10 @@ function IsoMap.build(world, def, texId)
                         local nc, nr = neighbour(c, r, e)
                         local ncell = (nc >= 0 and nc < def.gridW and nr >= 0 and nr < def.gridH)
                             and def.cells[nr] and def.cells[nr][nc] or nil
-                        local ny = ncell and (ncell.wall and ((ncell.h or 0) + WALL_H) or cellTopMin(ncell)) or 0
+                        local ny = ncell and (ncell.wall and wallTop(ncell) or cellTopMin(ncell)) or 0
                         if ny < top - 0.001 then addSide(c, r, e, ny, top, top, cell.tex) end
                     end
-                    phys:addBox(x0, base, z0, x0 + 1, top, z0 + 1)
+                    phys:addBox(x0, base, z0, x0 + 1, math.max(top, base + WALL_H), z0 + 1)
                 else
                     addTop(c, r, cell)
                     -- side faces down to lower neighbours (visible + collision, no gaps under ramps)
@@ -150,7 +158,7 @@ function IsoMap.build(world, def, texId)
                             and def.cells[nr] and def.cells[nr][nc] or nil
                         local ny
                         if ncell == nil then ny = math.min(0, cellTopMin(cell))       -- map border: drop to 0
-                        elseif ncell.wall then ny = nil                                -- wall neighbour covers it
+                        elseif ncell.wall then ny = wallTop(ncell)
                         else
                             -- neighbour's matching edge tops
                             local mirror = { e = "w", w = "e", s = "n", n = "s" }
@@ -234,8 +242,8 @@ function IsoMap.build(world, def, texId)
                 local ca, sa = cos(ang), sin(ang)
                 local pxd, pzd = d.dx * ca - d.dz * sa, d.dx * sa + d.dz * ca
                 local ex, ez = d.hx + pxd * d.w, d.hz + pzd * d.w
-                scene2:ObjAddQuadTex(world.doorObj, d.hx, d.y0, d.hz, ex, d.y0, ez,
-                    ex, d.y0 + d.h, ez, d.hx, d.y0 + d.h, d.hz, d.tex, 1, 1, 0.95)
+                scene2:ObjAddQuadTex(world.doorObj, ex, d.y0, ez, d.hx, d.y0, d.hz,
+                    d.hx, d.y0 + d.h, d.hz, ex, d.y0 + d.h, ez, d.tex, 1, 1, 0.95)
             end
         end,
     } })
@@ -244,6 +252,7 @@ end
 
 -- one building: walls/windows/roof into the lit layers + wall collision boxes. Ported from
 -- isoengine:building() with the addition of the physics quads. Returns the door hinge (or nil).
+-- b.windows: any of "s", "n", "e", "w" (default { "s" })
 function IsoMap.buildBuilding(world, def, b, groundY, tex, phys)
     local scene = world.scene
     local x0, z1 = b.c, (def.gridH - 1 - b.r) + 1
@@ -263,8 +272,9 @@ function IsoMap.buildBuilding(world, def, b, groundY, tex, phys)
         local roofTop = y1 + (b.roofH or 1.3) + 0.4
         local function seg(s0, s1, yb, yt)
             if s1 - s0 < 0.01 then return end
-            scene:ObjAddQuadTex(world.wallObj, ax + ux * s0, yb, az + uz * s0, ax + ux * s1, yb, az + uz * s1,
-                ax + ux * s1, yt, az + uz * s1, ax + ux * s0, yt, az + uz * s0, wallTex, s1 - s0, yt - yb, 1.0)
+            -- reversed winding: outward normal
+            scene:ObjAddQuadTex(world.wallObj, ax + ux * s1, yb, az + uz * s1, ax + ux * s0, yb, az + uz * s0,
+                ax + ux * s0, yt, az + uz * s0, ax + ux * s1, yt, az + uz * s1, wallTex, s1 - s0, yt - yb, 1.0)
             -- THICK axis-aligned collision box (a thin quad tunnels under a fast collide-and-slide);
             -- building walls run along an axis, so the inflated box hugs the visual wall
             local p0x, p0z = ax + ux * s0, az + uz * s0
@@ -282,20 +292,30 @@ function IsoMap.buildBuilding(world, def, b, groundY, tex, phys)
         local mx, mz = (ax + bx) / 2, (az + bz) / 2
         local yawD = math.deg(math.atan(ux, uz)) + 90
         world._boxTarget = world.prop3dObj
-        IsoMap.box(world, mx, y0, mz, len + 0.08, 0.30, 0.16, yawD, tex.stoneTrim or wallTex, 0.8, 0.6)
-        IsoMap.box(world, mx, y1 - 0.16, mz, len + 0.08, 0.14, 0.14, yawD, tex.timber or wallTex, 0.62, 0.45)
+        IsoMap.boxOut(world, mx, y0, mz, len + 0.08, 0.30, 0.16, yawD, tex.stoneTrim or wallTex, 0.8, 0.6)
+        IsoMap.boxOut(world, mx, y1 - 0.16, mz, len + 0.08, 0.14, 0.14, yawD, tex.timber or wallTex, 0.62, 0.45)
     end
     if ds == "s" then wallRun(x0, z0, x1, z0, dOff, dOff + DW) else wallRun(x0, z0, x1, z0) end
     if ds == "n" then wallRun(x1, z1, x0, z1, b.w - dOff - DW, b.w - dOff) else wallRun(x1, z1, x0, z1) end
     if ds == "w" then wallRun(x0, z1, x0, z0, b.d - dOff - DW, b.d - dOff) else wallRun(x0, z1, x0, z0) end
     if ds == "e" then wallRun(x1, z0, x1, z1, dOff, dOff + DW) else wallRun(x1, z0, x1, z1) end
 
-    -- windows (south wall, skipping the door bay)
+    -- windows: box -z face turned outward
     local wy = y0 + 1.25
-    for i = 0, b.w - 1 do
-        if not (ds == "s" and i >= dOff and i < dOff + DW) and (i % 2 == (b.winPhase or 0) % 2) then
-            IsoMap.box(world, x0 + i + 0.5, wy, z0 + 0.02, 0.56, 0.7, 0.07, 0, tex.window, 1.45, 1.3)
-            IsoMap.box(world, x0 + i + 0.5, wy - 0.42, z0 + 0.04, 0.7, 0.08, 0.10, 0, tex.timber, 0.7, 0.5)
+    local phase = (b.winPhase or 0) % 2
+    world._boxTarget = world.prop3dObj
+    for _, side in ipairs(b.windows or { "s" }) do
+        local count = (side == "s" or side == "n") and b.w or b.d
+        for i = 0, count - 1 do
+            if not (ds == side and i >= dOff and i < dOff + DW) and (i % 2 == phase) then
+                local cx, cz, ox, oz, yawW
+                if side == "s" then     cx, cz, ox, oz, yawW = x0 + i + 0.5, z0, 0, 1, 0
+                elseif side == "n" then cx, cz, ox, oz, yawW = x0 + i + 0.5, z1, 0, -1, 180
+                elseif side == "e" then cx, cz, ox, oz, yawW = x1, z0 + i + 0.5, -1, 0, 90
+                else                    cx, cz, ox, oz, yawW = x0, z0 + i + 0.5, 1, 0, 270 end
+                IsoMap.boxOut(world, cx + ox * 0.02, wy, cz + oz * 0.02, 0.56, 0.7, 0.07, yawW, tex.window, 1.45, 1.3)
+                IsoMap.boxOut(world, cx + ox * 0.04, wy - 0.42, cz + oz * 0.04, 0.7, 0.08, 0.10, yawW, tex.timber, 0.7, 0.5)
+            end
         end
     end
 
@@ -303,22 +323,35 @@ function IsoMap.buildBuilding(world, def, b, groundY, tex, phys)
     local ridgeY = y1 + (b.roofH or 1.3)
     local zm = (z0 + z1) / 2
     local ov = 0.35
-    scene:ObjAddQuadTex(world.roofObj, x0 - ov, y1, z0 - ov, x1 + ov, y1, z0 - ov, x1 + ov, ridgeY, zm, x0 - ov, ridgeY, zm, roofTex, b.w + 1, 2, 1.0)
-    scene:ObjAddQuadTex(world.roofObj, x1 + ov, y1, z1 + ov, x0 - ov, y1, z1 + ov, x0 - ov, ridgeY, zm, x1 + ov, ridgeY, zm, roofTex, b.w + 1, 2, 0.86)
+    scene:ObjAddQuadTex(world.roofObj, x1 + ov, y1, z0 - ov, x0 - ov, y1, z0 - ov, x0 - ov, ridgeY, zm, x1 + ov, ridgeY, zm, roofTex, b.w + 1, 2, 1.0)
+    scene:ObjAddQuadTex(world.roofObj, x0 - ov, y1, z1 + ov, x1 + ov, y1, z1 + ov, x1 + ov, ridgeY, zm, x0 - ov, ridgeY, zm, roofTex, b.w + 1, 2, 0.86)
     scene:ObjAddQuadTex(world.roofObj, x0, y1, z0, x0, y1, z1, x0, ridgeY, zm, x0, ridgeY, zm, wallTex, b.d, 1.4, 0.92)
     scene:ObjAddQuadTex(world.roofObj, x1, y1, z1, x1, y1, z0, x1, ridgeY, zm, x1, ridgeY, zm, wallTex, b.d, 1.4, 0.86)
-    IsoMap.box(world, x0 + 0.8, ridgeY - 0.5, zm + 0.2, 0.4, 1.1, 0.4, 0, tex.stoneTrim or wallTex, 0.9, 0.7)
+    world._boxTarget = world.prop3dObj
+    IsoMap.boxOut(world, x0 + 0.8, ridgeY - 0.5, zm + 0.2, 0.4, 1.1, 0.4, 0, tex.stoneTrim or wallTex, 0.9, 0.7)
 
     -- dark backing inside the doorway (unless this building streams a real interior group)
-    if ds == "s" and not b.interiorGroup then
-        scene:ObjAddQuadTex(world.wallObj, x0 + dOff, y0, z0 + 0.35, x0 + dOff + DW, y0, z0 + 0.35,
-            x0 + dOff + DW, y0 + 2.0, z0 + 0.35, x0 + dOff, y0 + 2.0, z0 + 0.35, wallTex, 1, 1, 0.02)
+    if ds ~= nil and not b.interiorGroup then
+        local yd = y0 + 2.0
+        if ds == "s" then
+            local z = z0 + 0.35
+            scene:ObjAddQuadTex(world.wallObj, x0 + dOff + DW, y0, z, x0 + dOff, y0, z, x0 + dOff, yd, z, x0 + dOff + DW, yd, z, wallTex, 1, 1, 0.02)
+        elseif ds == "n" then
+            local z = z1 - 0.35
+            scene:ObjAddQuadTex(world.wallObj, x0 + dOff, y0, z, x0 + dOff + DW, y0, z, x0 + dOff + DW, yd, z, x0 + dOff, yd, z, wallTex, 1, 1, 0.02)
+        elseif ds == "e" then
+            local x = x1 - 0.35
+            scene:ObjAddQuadTex(world.wallObj, x, y0, z0 + dOff + DW, x, y0, z0 + dOff, x, yd, z0 + dOff, x, yd, z0 + dOff + DW, wallTex, 1, 1, 0.02)
+        else
+            local x = x0 + 0.35
+            scene:ObjAddQuadTex(world.wallObj, x, y0, z0 + dOff, x, y0, z0 + dOff + DW, x, yd, z0 + dOff + DW, x, yd, z0 + dOff, wallTex, 1, 1, 0.02)
+        end
     end
 
     if ds == nil then return nil end
     if ds == "s" then return { hx = x0 + dOff, hz = z0, dx = 1, dz = 0, w = DW, h = 2.0 }
-    elseif ds == "n" then return { hx = x1 - dOff, hz = z1, dx = -1, dz = 0, w = DW, h = 2.0 }
-    elseif ds == "w" then return { hx = x0, hz = z1 - dOff, dx = 0, dz = -1, w = DW, h = 2.0 }
+    elseif ds == "n" then return { hx = x0 + dOff + DW, hz = z1, dx = -1, dz = 0, w = DW, h = 2.0 }
+    elseif ds == "w" then return { hx = x0, hz = z0 + dOff + DW, dx = 0, dz = -1, w = DW, h = 2.0 }
     else return { hx = x1, hz = z0 + dOff, dx = 0, dz = 1, w = DW, h = 2.0 } end
 end
 
@@ -338,6 +371,23 @@ function IsoMap.box(world, cx, y0, cz, sx, sy, sz, yaw, texId, sTop, sSide)
     scene:ObjAddQuadTex(o, x1, y0, z1, x2, y0, z2, x2, yt, z2, x1, yt, z1, texId, 1, 1, sSide * 0.9)
     scene:ObjAddQuadTex(o, x2, y0, z2, x3, y0, z3, x3, yt, z3, x2, yt, z2, texId, 1, 1, sSide * 0.8)
     scene:ObjAddQuadTex(o, x3, y0, z3, x0, y0, z0, x0, yt, z0, x3, yt, z3, texId, 1, 1, sSide)
+end
+
+function IsoMap.boxOut(world, cx, y0, cz, sx, sy, sz, yaw, texId, sTop, sSide)
+    sTop = sTop or 1.0; sSide = sSide or 0.72
+    local hx, hz = sx * 0.5, sz * 0.5
+    local yr = (yaw or 0) * pi / 180; local cw, sw = cos(yr), sin(yr)
+    local function rot(dx, dz) return cx + dx * cw - dz * sw, cz + dx * sw + dz * cw end
+    local x0, z0 = rot(-hx, -hz); local x1, z1 = rot(hx, -hz)
+    local x2, z2 = rot(hx, hz);   local x3, z3 = rot(-hx, hz)
+    local yt = y0 + sy
+    local o = world._boxTarget
+    local scene = world.scene
+    scene:ObjAddQuadTex(o, x0, yt, z0, x3, yt, z3, x2, yt, z2, x1, yt, z1, texId, 1, 1, sTop)
+    scene:ObjAddQuadTex(o, x1, y0, z1, x0, y0, z0, x0, yt, z0, x1, yt, z1, texId, 1, 1, sSide)
+    scene:ObjAddQuadTex(o, x2, y0, z2, x1, y0, z1, x1, yt, z1, x2, yt, z2, texId, 1, 1, sSide * 0.9)
+    scene:ObjAddQuadTex(o, x3, y0, z3, x2, y0, z2, x2, yt, z2, x3, yt, z3, texId, 1, 1, sSide * 0.8)
+    scene:ObjAddQuadTex(o, x0, y0, z0, x3, y0, z3, x3, yt, z3, x0, yt, z0, texId, 1, 1, sSide)
 end
 
 return IsoMap

@@ -238,7 +238,18 @@
     "model": "jukebox",
     "interact": "jukebox",
     "shop": true,
-    "emissivePart": "Jukebox_Emission"
+    "emissivePart": "Jukebox_Emission",
+    "emissiveParts": [
+      {
+        "material": "Jukebox_Rainbow",
+        "color": [
+          1,
+          0.95,
+          0.8,
+          0.12
+        ]
+      }
+    ]
   },
   "placeholder_matrix": {
     "w": 1,

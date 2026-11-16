@@ -37,29 +37,42 @@ namespace OpenTaiko {
 			Gl.Uniform3(_uSunDir, (float)s._sunX, (float)s._sunY, (float)s._sunZ);
 			Gl.Uniform3(_uSunCol, (float)s._sunR, (float)s._sunG, (float)s._sunB);
 			Gl.Uniform3(_uAmb, (float)s._ambR, (float)s._ambG, (float)s._ambB);
-			var lights = s._lights;
+			var lights = LightsInView(s);
 			int nl = PickLights(lights, s._camX, s._camY, s._camZ, MAXL, _lightPick, ref _lightKey, ref _lightIdx);
+			_passLights = nl;
 			for (int i = 0; i < nl; i++) {
 				var L = lights[_lightPick[i]];
 				_lpos[i * 4] = (float)L.X; _lpos[i * 4 + 1] = (float)L.Y; _lpos[i * 4 + 2] = (float)L.Z; _lpos[i * 4 + 3] = (float)L.Range;
 				_lcol[i * 3] = (float)L.R; _lcol[i * 3 + 1] = (float)L.G; _lcol[i * 3 + 2] = (float)L.B;
 			}
+			BuildLightGrid(s, nl);
 			Gl.Uniform1(_uNumLights, nl);
 			if (nl > 0) { Gl.Uniform4(_uLightPosR, (uint)nl, new ReadOnlySpan<float>(_lpos, 0, nl * 4)); Gl.Uniform3(_uLightCol, (uint)nl, new ReadOnlySpan<float>(_lcol, 0, nl * 3)); }
+			if (_worldExt) SendLightGrid(WorldProg, true);
 			// (the shadow map + light matrix are bound by the main pass only when the shadow variant is active;
 			// the default variant has no shadow uniforms at all, so there's nothing to reset here.)
+		}
+
+		private int _passLights;
+		private readonly List<SceneLight> _lightsSeen = new(64);
+		private List<SceneLight> LightsInView(Lua3DScene s) {
+			var all = s._lights;
+			_lightsSeen.Clear();
+			foreach (var L in all)
+				if (!(L.Range > 0) || _view.SphereInView(L.X, L.Y, L.Z, L.Range)) _lightsSeen.Add(L);
+			return _lightsSeen.Count == all.Count ? all : _lightsSeen;
 		}
 
 		/// <summary>The uniforms every world-space program declares, located in one program: the camera and projection
 		/// (uCam, uR, uU, uF, uSx, uSy, uA, uB) and the distance fog (uFog, uFogCol, uFogStart, uFogInv; -1 where a
 		/// program has none). <see cref="SetCamera"/> and <see cref="SetFog"/> send a pass's values to them.</summary>
 		private struct FrameLoc {
-			public int Cam, R, U, F, Sx, Sy, A, B, Fog, FogCol, FogStart, FogInv;
+			public int Cam, R, U, F, Sx, Sy, A, B, Fog, FogCol, FogStart, FogInv, FogSky;
 			public static FrameLoc Of(GL gl, uint p) {
 				int g(string n) => gl.GetUniformLocation(p, n);
 				return new FrameLoc {
 					Cam = g("uCam"), R = g("uR"), U = g("uU"), F = g("uF"), Sx = g("uSx"), Sy = g("uSy"), A = g("uA"), B = g("uB"),
-					Fog = g("uFog"), FogCol = g("uFogCol"), FogStart = g("uFogStart"), FogInv = g("uFogInv"),
+					Fog = g("uFog"), FogCol = g("uFogCol"), FogStart = g("uFogStart"), FogInv = g("uFogInv"), FogSky = g("uFogSky[0]"),
 				};
 			}
 		}
@@ -79,6 +92,7 @@ namespace OpenTaiko {
 		private void SetFog(in FrameLoc l, Lua3DScene s) {
 			if (s._fog) { Gl.Uniform1(l.Fog, 1); Gl.Uniform3(l.FogCol, (float)(s._fogR / 255.0), (float)(s._fogG / 255.0), (float)(s._fogB / 255.0)); Gl.Uniform1(l.FogStart, (float)s._fogStart); Gl.Uniform1(l.FogInv, (float)s._fogInv); }
 			else Gl.Uniform1(l.Fog, 0);
+			if (l.FogSky >= 0) Gl.Uniform4(l.FogSky, 6u, (ReadOnlySpan<float>)s._fogSky);
 		}
 
 		/// <summary>The point lights a pass sends: every light when there are at most <paramref name="max"/>, else the

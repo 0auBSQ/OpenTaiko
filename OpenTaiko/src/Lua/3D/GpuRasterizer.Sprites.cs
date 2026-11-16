@@ -73,10 +73,39 @@ namespace OpenTaiko {
 			return _view.DistSq((mnx + (double)mxx) * 0.5, (mny + (double)mxy) * 0.5, (mnz + (double)mxz) * 0.5);
 		}
 
+		private bool AnyAfterPost(Lua3DScene s) {
+			if (s._rttPass) return false;
+			foreach (var bt in _sprBatches) if (bt.Obj.AfterPost) return true;
+			return false;
+		}
+		// world-pass depth test, alpha blend; no depth write, light, shadow or fog; in the order added
+		private void DrawAfterPost(Lua3DScene s) {
+			GlPass.Target(Gl, _fbo, s._w, s._h);
+			GlPass.DepthTested(Gl); GlPass.Transparent(Gl); Gl.Disable(EnableCap.CullFace);
+			BindWorldProgram(false); Gl.BindVertexArray(_vao);
+			SetCamera(_uFrame, s); Gl.Uniform1(_uTex, 0);
+			Gl.Uniform1(_uFrame.Fog, 0);
+			Gl.Uniform4(_uClip, 0f, 0f, 0f, -1e30f);
+			Gl.Uniform1(_uNumLights, 0);
+			if (_worldExt) SendLightGrid(WorldProg, false);
+			UEmissive(0f, 0f, 0f); UFlatCol(0f, 0f, 0f, 0f);
+			Bind3D(_spriteVbo);
+			UModel(null); UMode(2); UCutout(0); ULit(0); USprLit(0f);
+			foreach (var bt in _sprBatches) {
+				var o = bt.Obj;
+				if (!o.AfterPost) continue;
+				UTint((float)o.TintR, (float)o.TintG, (float)o.TintB); UAlpha(o.A / 255.0f);
+				Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, bt.Tex);
+				Gl.DrawArrays(PrimitiveType.Triangles, bt.Start, (uint)bt.Count);
+			}
+			InvalidateDepth();
+		}
+
 		private void DrawSprite(SprBatch bt) {
 			var o = bt.Obj;
 			UModel(null);
 			UMode(2); UCutout(bt.Cutout); ULit(0);
+			USprLit((float)o.SpriteLit);
 			UTint((float)o.TintR, (float)o.TintG, (float)o.TintB); UAlpha(o.A / 255.0f);
 			Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, bt.Tex);
 			Gl.DrawArrays(PrimitiveType.Triangles, bt.Start, (uint)bt.Count);

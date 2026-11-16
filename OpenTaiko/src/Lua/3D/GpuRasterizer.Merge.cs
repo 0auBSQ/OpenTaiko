@@ -11,7 +11,7 @@ namespace OpenTaiko {
 		// Cheap separate-format binding keeps the extra draw calls (one per non-empty bucket·texture) free.
 		// Quads share their corner vertices through an index buffer.
 		private const double BS = 32.0;   // bucket size in world units (2×2 voxel chunks)
-		private struct MergeBuf { public uint Vbo, Ebo; public int Count, Rev; public double Cx, Cy, Cz, Hx, Hy, Hz; }   // index count, upload number, the box around its vertices (centre, half extents)
+		private struct MergeBuf { public uint Vbo, Ebo; public int Count, Rev, Bytes; public double Cx, Cy, Cz, Hx, Hy, Hz; }   // index count, upload number, the box around its vertices (centre, half extents)
 		private readonly Dictionary<(int bx, int bz, int tex), MergeBuf> _merge = new();
 		private int _mergeUploads;
 		// per-object merge state: the geometry version and bucket it was merged with, and its texture ids
@@ -134,7 +134,7 @@ namespace OpenTaiko {
 				return;
 			}
 			if (!_merge.TryGetValue(key, out var mb)) mb = new MergeBuf { Vbo = Gl.GenBuffer(), Ebo = Gl.GenBuffer() };
-			mb.Count = sc.I.Count; mb.Rev = ++_mergeUploads;
+			mb.Count = sc.I.Count; mb.Rev = ++_mergeUploads; mb.Bytes = (sc.V.Count + sc.I.Count) * 4;
 			var v = sc.V;
 			float mnx = float.MaxValue, mny = float.MaxValue, mnz = float.MaxValue, mxx = float.MinValue, mxy = float.MinValue, mxz = float.MinValue;
 			for (int i = 0; i < v.Count; i += STRIDE) {

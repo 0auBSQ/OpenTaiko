@@ -18,6 +18,7 @@ namespace OpenTaiko {
 
 		public int W() => _w;
 		public int H() => _h;
+		internal ushort[] Data => _d;   // row-major
 
 		/// <summary>Deterministically drop the sample buffer (map unload) — a 401² field is ~320 KB of
 		/// ushorts that would otherwise wait on two GC generations across the NLua boundary. At/Sample

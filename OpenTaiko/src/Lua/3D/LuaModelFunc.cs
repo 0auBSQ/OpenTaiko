@@ -13,6 +13,29 @@ namespace OpenTaiko {
 		/// must reload their models afterwards — OWM3d calls this from World:dispose() only.</summary>
 		public void PurgeCache() { GltfModel.PurgeFileCache(); ObjModel.PurgeFileCache(); }
 
+		/// <summary>Process memory as "key=megabytes" pairs, without a scene.</summary>
+		public string MemoryReport() => Lua3DScene.ProcessReport();
+
+		private string Full(string relPath) => Path.IsPathRooted(relPath) ? relPath : Path.Combine(_dir, relPath);
+		private static bool IsGltf(string full) { string ext = Path.GetExtension(full).ToLowerInvariant(); return ext == ".glb" || ext == ".gltf"; }
+
+		/// <summary>Worker-thread read ahead of Load; false for non-glTF files.</summary>
+		public bool Preload(string relPath) {
+			try { string full = Full(relPath); return IsGltf(full) && File.Exists(full) && GltfModel.Preload(full); }
+			catch (Exception) { return false; }
+		}
+
+		public bool IsReady(string relPath) {
+			try { string full = Full(relPath); return IsGltf(full) && GltfModel.CacheState(full) == 2; }
+			catch (Exception) { return false; }
+		}
+
+		/// <summary>Drop a glTF file from the cache; delete its objects and Unregister first.</summary>
+		public void Evict(string relPath) {
+			try { string full = Full(relPath); if (IsGltf(full)) GltfModel.Evict(full); }
+			catch (Exception) { }
+		}
+
 		public IModel? Load(string relPath) {
 			try {
 				string full = Path.IsPathRooted(relPath) ? relPath : Path.Combine(_dir, relPath);

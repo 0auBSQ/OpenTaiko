@@ -39,8 +39,10 @@ function Maps:setTextureResolver(fn) self.texResolver = fn end
 -- a single npc:remove errored).
 function Maps:unload()
     local world = self.world
-    if self.current == nil then return end
-    local map = self.current
+    -- building: a failed build left objects but no current map
+    if self.current == nil and not self.building then return end
+    local map = self.current or {}
+    self.building = false
     -- clear layer geometry
     local scene = world.scene
     for _, obj in ipairs({ world.floorObj, world.wallObj, world.roofObj, world.prop3dObj,
@@ -63,6 +65,7 @@ function Maps:unload()
     if scene.GrassClear then scene:GrassClear() end
     -- the floor object is reused by every map — drop the terrain-splat routing (an iso map after a
     -- terrain map would otherwise still be drawn through the splat shader with a stale weight image)
+    pcall(Terrain.unwire, world)
     if scene.ObjSetTerrainSplat then
         scene:ObjSetTerrainSplat(world.floorObj, -1, -1, -1, -1, -1, 1, 1, 1)
         if scene.UnregisterSprite then scene:UnregisterSprite(917) end
@@ -85,6 +88,7 @@ function Maps:load(id, spawnName)
     local reg = self.defs[id]
     if reg == nil then return nil, "unknown map '" .. tostring(id) .. "'" end
 
+    self.building = true
     local map
     if reg.type == "proc" then
         -- procedural maps own their build (they still get the physics session + subsystems)
@@ -97,13 +101,14 @@ function Maps:load(id, spawnName)
         map.spawns = map.spawns or { default = { x = world.gridW / 2, z = world.gridH / 2, yaw = 45 } }
     else
         local def, err = Json.loadMap(reg.dir)
-        if def == nil then return nil, err end
+        if def == nil then self.building = false; return nil, err end
         map = self:buildFromDef(def)
-        if map == nil then return nil, "map build failed" end
+        if map == nil then self:unload(); return nil, "map build failed" end
     end
 
     map.id = id
     self.current = map
+    self.building = false
 
     -- resolve the spawn
     local sp = (map.spawns and (map.spawns[spawnName or "default"] or map.spawns.default))

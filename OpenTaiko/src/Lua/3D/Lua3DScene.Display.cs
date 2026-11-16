@@ -150,6 +150,21 @@ namespace OpenTaiko {
 		}
 		private int[]? _outlineDist;
 
+#if DEBUG
+		/// <summary>Last frame (after post, no 2D) to Capture_img/&lt;name&gt;.png; false if not written.
+		/// GPU readback: single shots only. Debug builds only.</summary>
+		public bool SavePng(string name) {
+			if (_disposedValue || _canvas == null) return false;
+			string? path = LuaGraphicsFunc.CapturePath(name);
+			if (path == null) return false;
+			if (_gpuOwnsCanvas) _overlay2d?.End2D();   // flush open 2D first
+			var tex = _canvas._texture;
+			if (tex == null) return false;
+			byte[]? rgba = tex.ReadPixelsRGBA(out int w, out int h);
+			return rgba != null && LuaGraphicsFunc.WritePng(path, rgba, w, h);
+		}
+#endif
+
 		public void Draw(int x, int y) { if (!_disposedValue) _canvas.Draw(x, y); }
 		public void DrawAtAnchor(int x, int y, string anchor) { if (!_disposedValue) _canvas.DrawAtAnchor(x, y, anchor); }
 		/// <summary>Blit the rendered scene scaled/tinted/faded at an anchor — used by 3D CHARACTERS,

@@ -395,6 +395,7 @@ Eén instantie per host, die de host elk frame ter plekke bijwerkt. De arrayveld
 | `state.landCount  -> number[]` | Vliegende noten van elke speler die sinds de start van de achtergrond het einde van hun vlucht hebben bereikt. |
 | `state:SetFlyTarget(player, x, y)` | Zolang deze gameplay-achtergrond wordt getoond, landen de vliegende noten van de speler op (x, y) in schermpixels en blijft het landingseffect van de skin weg. |
 | `state:ClearFlyTarget(player)` | De vliegende noten van de speler landen weer op de gebruikelijke plek van de skin. |
+| `state:SetCrowdHidden(hidden)` | Zolang deze gameplay-achtergrond wordt getoond, laat true de dansers en de mob weg, die over de onderste achtergrond worden getekend; false tekent ze weer. Een nieuwe achtergrond begint met hen erbij. |
 
 ## Transities
 

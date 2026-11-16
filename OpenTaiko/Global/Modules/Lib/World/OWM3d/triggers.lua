@@ -74,7 +74,7 @@ function Triggers:fire(t)
         elseif kind == "teleport" and a.x then
             if world.onTeleport then world.onTeleport(a.x, a.y or 0, a.z or 0) end
         elseif kind == "map" and a.map then
-            if world.onMapChange then world.onMapChange(a.map, a.spawn or "default") end
+            if world.onMapChange then world.onMapChange(a.map, a.spawn or "default", t) end
         elseif kind == "door" and a.door then
             -- doors auto-open by proximity (isomap.updateDoors); action reserved for locked doors later
         elseif kind == "custom" and a.fn then

@@ -395,6 +395,7 @@ info.DanGrade와 info.PreviousNameplateDan이 반환하는 객체(읽기 전용)
 | `state.landCount  -> number[]` | 배경이 시작된 이후 비행의 끝에 도달한 각 플레이어의 날아가는 노트 수. |
 | `state:SetFlyTarget(player, x, y)` | 이 게임플레이 배경이 표시되는 동안 플레이어의 날아가는 노트가 화면 픽셀 단위의 (x, y)에 착지하며, 스킨의 착지 효과는 생략됩니다. |
 | `state:ClearFlyTarget(player)` | 플레이어의 날아가는 노트가 다시 스킨의 평소 위치에 착지합니다. |
+| `state:SetCrowdHidden(hidden)` | 이 게임플레이 배경이 표시되는 동안 true를 주면 하단 배경 위에 그려지는 댄서와 몹을 그리지 않고, false를 주면 다시 그립니다. 새 배경은 그려지는 상태로 시작합니다. |
 
 ## 트랜지션
 

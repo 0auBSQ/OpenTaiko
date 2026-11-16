@@ -39,5 +39,13 @@ namespace OpenTaiko {
 		/// models, rebuilt surfaces). All 0 with another renderer.</summary>
 		public (int, int, int, int, int, int) GetFrameStats()
 			=> _renderer is GpuRasterizer g ? g.FrameStats : (0, 0, 0, 0, 0, 0);
+
+		internal bool _profile;
+		internal readonly double[] _prof = new double[5];
+		/// <summary>Debug GPU timing: glFinish after each Render pass, durations for GetProfile. Off by default.</summary>
+		public void SetProfile(bool on) { _profile = on; }
+		/// <summary>Clock, then prepare, shadow, world, post, total of the last profiled Render (ms).</summary>
+		public (double, double, double, double, double, double) GetProfile()
+			=> (System.Diagnostics.Stopwatch.GetTimestamp() * 1000.0 / System.Diagnostics.Stopwatch.Frequency, _prof[0], _prof[1], _prof[2], _prof[3], _prof[4]);
 	}
 }

@@ -12,7 +12,7 @@ namespace OpenTaiko {
 		// standard world VS feeds the same varyings the built-in FS gets, so a custom water/mirror
 		// shader is a drop-in replacement for the built-in ripple/fresnel path.
 		// a compiled surface program; Dead once freed, so an object that kept it looks it up again
-		private sealed class SurfProg { public uint Prog; public FrameLoc Frame; public int Model, NormalMat, Tex, Time, User, Rsh, RttFlip, Alpha, Tint, Flat; public long Used; public bool Dead; }
+		private sealed class SurfProg { public uint Prog; public FrameLoc Frame; public int Model, NormalMat, Tex, Time, User, Rsh, RttFlip, Alpha, Tint, Flat, SunDir, SunCol, Amb, SkyHor, SkyZen, Tex2, LightVP, Shadow, ShadowOn; public long Used; public bool Dead; }
 		private readonly Dictionary<string, SurfProg> _surfProgs = new();
 		private const int SURF_CAP = 16;   // distinct sources kept; past this the least recently used is freed, never one drawn this frame
 		private const string SURF_PRELUDE = "#version 300 es\nprecision highp float;\n" +
@@ -37,6 +37,8 @@ namespace OpenTaiko {
 				sp.Tex = g("uTex"); sp.Time = g("uTime"); sp.User = g("uUser[0]");
 				sp.Rsh = g("uRsh"); sp.RttFlip = g("uRttFlip");
 				sp.Alpha = g("uAlpha"); sp.Tint = g("uTint"); sp.Flat = g("uFlat");
+				sp.SunDir = g("uSunDir"); sp.SunCol = g("uSunCol"); sp.Amb = g("uAmb"); sp.SkyHor = g("uSkyHor"); sp.SkyZen = g("uSkyZen");
+				sp.Tex2 = g("uTex2"); sp.LightVP = g("uLightVP"); sp.Shadow = g("uShadow"); sp.ShadowOn = g("uShadowOn");
 			} catch (Exception e) {
 				LastShaderError = "surface: " + e.Message;
 				Trace.TraceError("ObjSetSurfaceShader: surface shader failed to compile, using the built-in path.\n" + e);
@@ -61,11 +63,27 @@ namespace OpenTaiko {
 			Gl.Uniform1(sp.Alpha, o.A / 255.0f);
 			Gl.Uniform3(sp.Tint, (float)o.TintR, (float)o.TintG, (float)o.TintB);
 			Gl.Uniform3(sp.Flat, (float)(o.R / 255.0), (float)(o.G / 255.0), (float)(o.B / 255.0));
+			SetFog(sp.Frame, s);
+			if (sp.SunDir >= 0) Gl.Uniform3(sp.SunDir, (float)s._sunX, (float)s._sunY, (float)s._sunZ);
+			if (sp.SunCol >= 0) Gl.Uniform3(sp.SunCol, (float)s._sunR, (float)s._sunG, (float)s._sunB);
+			if (sp.Amb >= 0) Gl.Uniform3(sp.Amb, (float)s._ambR, (float)s._ambG, (float)s._ambB);
+			if (sp.SkyHor >= 0) Gl.Uniform3(sp.SkyHor, s._skyCol[0], s._skyCol[1], s._skyCol[2]);
+			if (sp.SkyZen >= 0) Gl.Uniform3(sp.SkyZen, s._skyCol[3], s._skyCol[4], s._skyCol[5]);
+			if (sp.Shadow >= 0) {   // unit 1 in a shadowed main pass
+				Gl.Uniform1(sp.Shadow, 1);
+				if (sp.LightVP >= 0) Gl.UniformMatrix4(sp.LightVP, 1, false, (ReadOnlySpan<float>)_lightVP);
+			}
+			if (sp.ShadowOn >= 0) Gl.Uniform1(sp.ShadowOn, _worldShadow ? 1f : 0f);
+			if (sp.Tex2 >= 0) {     // first texture when none
+				uint t2 = o.SurfaceTex2 >= 0 ? TexFor(s, o.SurfaceTex2) : 0;
+				Gl.Uniform1(sp.Tex2, UNIT_SURF_TEX2);
+				Gl.ActiveTexture(TextureUnit.Texture0 + UNIT_SURF_TEX2); Gl.BindTexture(TextureTarget.Texture2D, t2 != 0 ? t2 : gt);
+			}
 			Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, gt);
 			Bind3D(c.Vbo);
 			int total = 0; foreach (var bt in c.Batches) total += bt.Count;
 			Gl.DrawArrays(PrimitiveType.Triangles, 0, (uint)total);
-			Gl.UseProgram(_worldShadow ? _progShadow : _prog);
+			Gl.UseProgram(WorldProg);
 		}
 
 		// A screen-texture mirror/portal surface (uMode 3): the FS samples the live RTT texture by screen

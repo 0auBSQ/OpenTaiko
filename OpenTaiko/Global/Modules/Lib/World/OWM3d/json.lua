@@ -11,6 +11,14 @@ local Json = {}
 
 local SCHEMA_VERSION = 1
 
+-- key lists: JsonGet cannot list object keys
+Json.TERRAIN_LOOK_NUMBERS = { "scale2", "macro", "bump", "sharp", "normal", "tint", "rim", "aniso" }
+Json.TERRAIN_LOOK_ARRAYS = { "triplanar", "skyAmb", "groundAmb", "cloud" }
+Json.GRASS_TILE_NUMBERS = { "density", "quality", "thin", "patchSize", "contrast", "fadeStart", "fadeEnd", "tilt", "windStrength", "gustSize",
+    "gustSpeed", "flutter", "alphaCut", "flowers", "flowerPatch", "dryPatch", "dryAmount", "rootShade", "ownColour", "minWeight",
+    "maxSlope", "cols", "rows", "grassCells", "flowerCells" }
+Json.GRASS_TILE_ARRAYS = { "width", "height", "wind", "tip", "dry", "avg", "cells" }
+
 -- ── .NET → Lua conversion helpers (all access through JsonGet/JsonCount; never direct indexing) ──
 local function jget(d, k) return JSONLOADER:JsonGet(d, k) end
 local function jcount(d) return JSONLOADER:JsonCount(d) end
@@ -38,6 +46,16 @@ local function numArray(d, k)
     for i = 1, jcount(a) do
         local v = jget(a, i)
         out[i] = (type(v) == "number") and v or 0
+    end
+    return out
+end
+local function strArray(d, k)
+    local a = jget(d, k)
+    if a == nil then return nil end
+    local out = {}
+    for i = 1, jcount(a) do
+        local v = jget(a, i)
+        if type(v) == "string" then out[#out + 1] = v end
     end
     return out
 end
@@ -72,6 +90,7 @@ local function parsePalette(cellsD)
             h      = num(p, "h", 0),
             wall   = boolean(p, "wall", false),
             liquid = str(p, "liquid", nil),
+            wallH  = num(p, "wallH", nil),
         }
     end)
     return pal
@@ -110,7 +129,7 @@ local function parseCells(d, gridW, gridH)
         for c = 0, gridW - 1 do
             local pi = idx and idx[c + 1] or 0
             local p = pal[pi + 1] or pal[1]                 -- palette indices are 0-based in JSON
-            cells[r][c] = { h = p.h, tex = p.tex, wall = p.wall or nil, liquid = p.liquid }
+            cells[r][c] = { h = p.h, tex = p.tex, wall = p.wall or nil, liquid = p.liquid, wallH = p.wallH }
         end
     end
     -- per-cell overrides (ramp / tex / h / wall / door)
@@ -121,6 +140,7 @@ local function parseCells(d, gridW, gridH)
             local h = jget(o, "h");    if type(h) == "number" then cell.h = h end
             local t = jget(o, "tex");  if type(t) == "string" then cell.tex = t end
             local w = jget(o, "wall"); if type(w) == "boolean" then cell.wall = w or nil end
+            local wh = jget(o, "wallH"); if type(wh) == "number" then cell.wallH = wh end
             local rampD = jget(o, "ramp")
             if rampD ~= nil then
                 cell.ramp = { dir = str(rampD, "dir", "x+"), lo = num(rampD, "lo", 0), hi = num(rampD, "hi", 0.5) }
@@ -179,6 +199,7 @@ function Json.parse(d, dir)
             maxY     = num(terrD, "maxY", 20),
             cellSize = num(terrD, "cellSize", 1.0),
             splat    = str(terrD, "splat", nil),
+            layerRepeat = num(terrD, "layerRepeat", nil),
             layers   = {},
         }
         local layersA = jget(terrD, "layers")
@@ -204,6 +225,30 @@ function Json.parse(d, dir)
                         { x0 = rect[1], z0 = rect[2], x1 = rect[3], z1 = rect[4] }
                 end
             end)
+            local tileD = jget(grassD, "tile")
+            if tileD ~= nil then
+                local T = {}
+                for _, k in ipairs(Json.GRASS_TILE_NUMBERS) do T[k] = num(tileD, k, nil) end
+                for _, k in ipairs(Json.GRASS_TILE_ARRAYS) do T[k] = numArray(tileD, k) end
+                T.atlas, T.mask, T.meta = str(tileD, "atlas", nil), str(tileD, "mask", nil), str(tileD, "meta", nil)
+                def.terrain.grass.tile = T
+            end
+        end
+        -- baked maps: files beside map.json
+        local mapsD = jget(terrD, "maps")
+        if mapsD ~= nil then
+            def.terrain.maps = {
+                normal = str(mapsD, "normal", nil), tint = str(mapsD, "tint", nil),
+                water = str(mapsD, "water", nil), sound = str(mapsD, "sound", nil),
+                grass = str(mapsD, "grass", nil), size = num(mapsD, "size", nil),
+            }
+        end
+        local lookD = jget(terrD, "look")
+        if lookD ~= nil then
+            local L = {}
+            for _, k in ipairs(Json.TERRAIN_LOOK_NUMBERS) do L[k] = num(lookD, k, nil) end
+            for _, k in ipairs(Json.TERRAIN_LOOK_ARRAYS) do L[k] = numArray(lookD, k) end
+            def.terrain.look = L
         end
         if def.type == "terrain" then
             def.gridW = math.floor(def.terrain.w * def.terrain.cellSize)
@@ -244,6 +289,7 @@ function Json.parse(d, dir)
             winPhase = num(b, "winPhase", 0),
             door = door and { side = str(door, "side", "s"), off = num(door, "off", 1) } or nil,
             interiorGroup = str(b, "interiorGroup", nil),
+            windows = strArray(b, "windows"),
         }
     end)
 

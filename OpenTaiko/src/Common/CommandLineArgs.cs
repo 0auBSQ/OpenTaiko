@@ -19,10 +19,12 @@ internal enum AppMode {
 ///   --mode=record  --uid &lt;id&gt;  [--difficulties 3,4] [--fps 60] [--size 1920x1080] [--sample-rate 48000] [--out file.mp4]
 ///   --mode=checkgl
 ///   --hidden       run without showing the window or making a sound (automated boot checks; the log still records everything)
+///   --stage &lt;name&gt; open that global stage at boot; Config.ini is not saved
 /// </summary>
 internal sealed class CommandLineArgs {
 	public AppMode Mode = AppMode.Normal;
 	public bool Hidden = false;   // --hidden: the window is created but never shown, and the master volume stays at 0
+	public string Stage = "";     // --stage ("" = normal boot)
 
 	// --mode=record options (unused in other modes)
 	public string Uid = "";
@@ -42,6 +44,7 @@ internal sealed class CommandLineArgs {
 			_ => AppMode.Normal,
 		};
 		cli.Hidden = args.Any(a => a.Equals("--hidden", StringComparison.OrdinalIgnoreCase));
+		cli.Stage = (Get(args, "--stage") ?? "").Trim();
 		if (cli.Mode != AppMode.Record) return cli;
 
 		cli.Uid = (Get(args, "--uid") ?? "").Trim();

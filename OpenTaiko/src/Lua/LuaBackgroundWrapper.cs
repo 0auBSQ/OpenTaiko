@@ -61,6 +61,9 @@ public sealed class LuaBackgroundState {
 
 	public void ClearFlyTarget(int player) => SetFlyTarget(player, double.NaN, double.NaN);
 
+	internal bool CrowdHidden { get; private set; }
+	public void SetCrowdHidden(bool hidden) => CrowdHidden = hidden;
+
 	internal bool TryGetFlyTarget(int player, out double x, out double y) {
 		x = y = double.NaN;
 		if (player < 0 || player >= flyX.Length || double.IsNaN(flyX[player]) || double.IsNaN(flyY[player])) return false;
@@ -76,6 +79,7 @@ public sealed class LuaBackgroundState {
 
 	// a new background starts with no hits, no landings and no fly targets
 	internal void ResetHits() {
+		CrowdHidden = false;
 		Array.Clear(hitCount);
 		Array.Clear(landCount);
 		for (int p = 0; p < hitCount.Length; p++) {

@@ -9,3 +9,7 @@ In-Game textures :
 - cien (@CienpixeL) (Nameplates, Rainbox result screen gauge, Drum textures)
 - Waldo - https://pressstart.vip/assets (Tower result screen background and skyboxes)
 - PNG Egg (Fireworks) (Non-commercial)
+
+Sound effects and BGM :
+
+- OtoLogic - https://otologic.jp (CC BY 4.0) (Intro quiz sounds, Coin shop BGM)

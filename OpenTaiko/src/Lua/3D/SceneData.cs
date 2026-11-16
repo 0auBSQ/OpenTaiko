@@ -34,6 +34,7 @@ namespace OpenTaiko {
 		public double XrayAlpha;      // >0: sprites re-draw where occluded (depth-greater silhouette at this alpha)
 		public double FresnelF0 = -1; // screen-tex mirrors: per-pixel Schlick reflectivity (F0; <0 = legacy per-vertex shade)
 		public double DeepR = -1, DeepG, DeepB;   // screen-tex water: deep colour (vShade lerps base→deep; DeepR<0 = off)
+		public int SurfaceTex2 = -1;   // uTex2 texture id, -1 = none
 		public string? SurfaceSrc;     // screen-tex surfaces: optional CUSTOM fragment shader source
 		                              // (replaces the built-in ripple/fresnel path; null = built-in)
 		// TERRAIN SPLAT shading (GPU): blend 4 layer textures per pixel by a weight sprite instead
@@ -42,6 +43,10 @@ namespace OpenTaiko {
 		public int LayerTex1 = -1, LayerTex2 = -1, LayerTex3 = -1, LayerTex4 = -1;
 		public float SplatW = 1, SplatH = 1;      // splat coverage in world units (world.xz → splat uv)
 		public float LayerUvScale = 1;            // world units → layer-texture uv repeat (1/cellSize)
+		// texture ids -1 = none; TerrMapSize: world extent
+		public bool TerrainMaps; public int TerrNormalTex = -1, TerrTintTex = -1; public float TerrMapSize = 1;
+		public double SpriteLit;      // sprites: 0..1 light share, 0 = full bright
+		public bool AfterPost;        // sprites: drawn after post, unshaded
 		public double Dist;           // scratch: squared distance to camera (set each Render)
 		public int GeomVersion;       // bumped on ObjBegin and every ObjAdd*; GPU rasterizer re-uploads this object's VBO only when it changes
 		public PoseStamp? Pose;       // what a model's Pose last wrote here (null = not posed)
@@ -215,6 +220,8 @@ namespace OpenTaiko {
 		// a view capture (RenderViewEx) changed only this rectangle (inclusive) at revision SubRev: a copy one revision
 		// behind needs only that part again. SubRev 0 = no such rectangle.
 		public int SubRev, SubX0, SubY0, SubX1, SubY1;
+		// only copy on the GPU (Pix null); Av*: its average colour
+		public bool GpuOnly; public float AvR = 0.5f, AvG = 0.5f, AvB = 0.5f;
 	}
 
 	/// <summary>A point light. Used by the raytracer (inverse-square) and the rasterizer's

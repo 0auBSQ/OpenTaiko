@@ -133,6 +133,6 @@ namespace OpenTaiko {
 			Gl.DrawArrays(PrimitiveType.Triangles, run.At * 6, (uint)(run.N * 6));
 		}
 		// back to the world program after particle runs
-		private void EndParticles() { Gl.UseProgram(_worldShadow ? _progShadow : _prog); Gl.BindVertexArray(_vao); GlPass.BlendOver(Gl); }
+		private void EndParticles() { Gl.UseProgram(WorldProg); Gl.BindVertexArray(_vao); GlPass.BlendOver(Gl); }
 	}
 }

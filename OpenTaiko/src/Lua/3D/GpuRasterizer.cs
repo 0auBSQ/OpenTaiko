@@ -154,6 +154,7 @@ namespace OpenTaiko {
 			End2D();   // 2D drawn after an earlier Render goes back to its target first
 			_frame++;
 			_stUploads = 0; _stUploadVerts = 0;
+			ReleaseGpuOnly(s);
 			var pass = GlPass.Begin(Gl);
 			try { DrawFrame(s); }
 			finally { pass.End(Gl); }
@@ -164,9 +165,11 @@ namespace OpenTaiko {
 
 		// every pass of one frame into the canvas; the caller restores its GL state around it
 		private void DrawFrame(Lua3DScene s) {
+			if (s._profile) _profT0 = _profT = Stopwatch.GetTimestamp();
 			s._canvas.Upload();
 			EnsureFbo(s);
 			PreparePass(s);
+			Mark(s, 0);
 
 			// ── SUN SHADOW MAP: depth from the light's POV. Casters = merged terrain, splat terrain, the other lit
 			// opaque objects (models, props) + the character sprites (alpha-tested silhouette). Skipped unless the
@@ -177,6 +180,7 @@ namespace OpenTaiko {
 				GatherCasters(s);
 				UpdateShadowMap(s);
 			}
+			Mark(s, 1);
 
 			GlPass.Target(Gl, _fbo, s._w, s._h);
 			// procedural SKY pass (replaces the 2D gradient fill): DrawWorld draws it behind the opaque world, and the frame
@@ -194,10 +198,15 @@ namespace OpenTaiko {
 				Gl.Uniform1(_uShadowTexel, 1.0f / SHADOW_SIZE);
 				Gl.ActiveTexture(TextureUnit.Texture1); Gl.BindTexture(TextureTarget.Texture2D, _shadowTex); Gl.Uniform1(_uShadow, 1);
 				Gl.ActiveTexture(TextureUnit.Texture0);
+				if (_worldExt) {
+					BindShadowCmp();
+					Gl.Uniform1(_uShadowCmp, UNIT_SHADOW_CMP); Gl.Uniform2(_uShadowF, s._shadowSoft, s._shadowFade);
+				}
 			}
 
 			int litScene = s._useLights ? 1 : 0;
 			DrawWorld(s, litScene, s._w, s._h, false);
+			UnbindShadowCmp();
 
 			// overlay pass: viewmodels over a freshly-cleared depth buffer → always on top of the world
 			if (_overlay.Count > 0) {
@@ -207,8 +216,22 @@ namespace OpenTaiko {
 				Gl.Enable(EnableCap.DepthTest); Gl.Enable(EnableCap.Blend); GlPass.BlendCover(Gl);
 				foreach (var o in _overlay) DrawObj(s, o, litScene);
 			}
-			InvalidateDepth();   // nothing reads this frame's depth again: a tiler need not store it
+			Mark(s, 2);
+			bool afterPost = AnyAfterPost(s);
+			if (!afterPost) InvalidateDepth();   // nothing reads this frame's depth again: a tiler need not store it
 			PostChain(s);
+			if (afterPost) DrawAfterPost(s);
+			Mark(s, 3);
+		}
+
+		// SetProfile: ms since the last mark, queued GPU work included
+		private long _profT0, _profT;
+		private void Mark(Lua3DScene s, int i) {
+			if (!s._profile) return;
+			if (s._profileSync) Gl.Finish();
+			long n = Stopwatch.GetTimestamp();
+			s._prof[i] = (n - _profT) * 1000.0 / Stopwatch.Frequency; _profT = n;
+			if (i == 3) s._prof[4] = (n - _profT0) * 1000.0 / Stopwatch.Frequency;
 		}
 
 		// What a pass draws, gathered from its camera: the view, the sprites, the current merge, the objects, merge
@@ -218,12 +241,14 @@ namespace OpenTaiko {
 			_scene = s;
 			_view = ViewFrustum.Of(s);
 			_reach = 0;
+			_passSerial++;
 			BuildSprites(s);
 			UpdateMerged(s);   // synchronous, per-bucket → no spike
 			GatherObjects(s);
 			BuildQueue(s);
 			BuildParticles(s);
 			GatherGrass(s);
+			GatherGrassTile(s);
 			// rounded up to a quarter octave, so the depth mapping (and any coplanar z-fight pattern) holds still while
 			// a particle or a walking sprite moves the farthest point a little
 			double far = Math.Max(_reach * 1.02 + 1.0, s._near + 1.0);
@@ -272,6 +297,7 @@ namespace OpenTaiko {
 			_skyRev = -1; _skyOk = false;
 			if (_noiseTex != 0) { Gl.DeleteTexture(_noiseTex); _noiseTex = 0; }
 			ClearGrass();                             // grass VBO re-uploads on next use
+			ClearOptIn();
 			if (_fbo != 0) { Gl.DeleteFramebuffer(_fbo); _fbo = 0; }
 			if (_depthRb != 0) { Gl.DeleteRenderbuffer(_depthRb); _depthRb = 0; }
 			if (_shadowFbo != 0) { Gl.DeleteFramebuffer(_shadowFbo); _shadowFbo = 0; }

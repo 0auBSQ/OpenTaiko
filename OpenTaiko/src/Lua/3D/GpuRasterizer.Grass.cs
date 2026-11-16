@@ -127,7 +127,7 @@ namespace OpenTaiko {
 				Gl.DrawArraysInstanced(PrimitiveType.Triangles, 0, 6, (uint)count);
 			}
 			// restore the world program's VAO for the passes that follow
-			Gl.UseProgram(_worldShadow ? _progShadow : _prog); Gl.BindVertexArray(_vao);
+			Gl.UseProgram(WorldProg); Gl.BindVertexArray(_vao);
 		}
 
 		private void ClearGrass() {

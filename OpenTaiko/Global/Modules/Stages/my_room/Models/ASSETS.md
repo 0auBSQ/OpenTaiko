@@ -103,6 +103,7 @@ License: **CC BY 3.0** (https://creativecommons.org/licenses/by/3.0/) unless not
 jukebox.glb credit line (per the download's license.txt): This work is based on "Jukebox"
 (https://sketchfab.com/3d-models/jukebox-188e71ce378f4b6786054d9f74dd3a25) by Rescue3D Assets
 (https://sketchfab.com/rescue3d) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/).
+Reduced to ~3000 triangles.
 
 ## Made for OpenTaiko
 

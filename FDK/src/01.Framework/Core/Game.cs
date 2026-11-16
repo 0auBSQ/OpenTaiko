@@ -493,6 +493,7 @@ public abstract partial class Game : IDisposable {
 
 		strIconFileName = iconFileName;
 		parameters = args;
+		if (args.Any(a => a.Equals("--hidden", StringComparison.OrdinalIgnoreCase))) StartHidden = true;
 
 		MainThreadID = Thread.CurrentThread.ManagedThreadId;
 		_windowThreadId = MainThreadID;
@@ -1099,6 +1100,24 @@ public abstract partial class Game : IDisposable {
 		_rsW = _rsH = 0;
 	}
 
+	// one-shot next-frame grab, top-left-origin RGBA at render scale; game thread, cleared before the draw
+	public static Action<byte[], int, int>? FrameGrab;
+
+	// render-scale target bound for reading
+	private unsafe void HandOverFrame(Action<byte[], int, int> handler) {
+		int w = _rsW, h = _rsH, row = w * 4;
+		byte[] raw = new byte[row * h], rgba = new byte[row * h];
+		fixed (byte* p = raw)
+			Gl.ReadPixels(0, 0, (uint)w, (uint)h, PixelFormat.Rgba, PixelType.UnsignedByte, p);
+		for (int y = 0; y < h; y++)   // GL rows start at the bottom
+			System.Buffer.BlockCopy(raw, (h - 1 - y) * row, rgba, y * row, row);
+		try {
+			handler(rgba, w, h);
+		} catch (Exception e) {
+			Trace.TraceWarning($"Frame grab handler failed: {e.Message}");
+		}
+	}
+
 	public void Window_Render(double deltaTime) {
 		if (GraphicsSelfTest) { RunGraphicsSelfTest(); return; }   // --mode=checkgl (see Game.GraphicsSelfTest.cs)
 		Gl.Disable(EnableCap.ScissorTest);   // a leaked UI clip (GRAPHICS:SetClip) must never survive the frame
@@ -1132,7 +1151,9 @@ public abstract partial class Game : IDisposable {
 		}
 
 		CFrameProfiler.Section("draw");
-		bool useScale = RenderScale < 0.999f && EnsureRenderScaleFbo();
+		var grab = FrameGrab;
+		FrameGrab = null;
+		bool useScale = (RenderScale < 0.999f || grab != null) && EnsureRenderScaleFbo();
 		if (useScale) {
 			// clear the window first (the letterbox bars stay the border colour), render the whole frame into the
 			// scaled offscreen FBO, then upscale-blit it into the window's letterboxed region.
@@ -1143,12 +1164,14 @@ public abstract partial class Game : IDisposable {
 			Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 			Draw();
 			Gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, _rsFbo);
+			if (grab != null) HandOverFrame(grab);
 			Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
 			Gl.BlitFramebuffer(0, 0, _rsW, _rsH,
 				ViewPortOffset.X, ViewPortOffset.Y, ViewPortOffset.X + ViewPortSize.X, ViewPortOffset.Y + ViewPortSize.Y,
 				ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
 			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 			Gl.Viewport(ViewPortOffset.X, ViewPortOffset.Y, (uint)ViewPortSize.X, (uint)ViewPortSize.Y);   // restore for post
+			if (RenderScale >= 0.999f) DeleteRenderScaleFbo();   // made for the grab only
 		} else {
 			Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 			Draw();

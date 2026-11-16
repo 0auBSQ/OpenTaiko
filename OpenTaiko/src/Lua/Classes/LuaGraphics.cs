@@ -40,5 +40,41 @@ namespace OpenTaiko {
 		public void ClearClip() {
 			Game.Gl?.Disable(EnableCap.ScissorTest);
 		}
+
+#if DEBUG
+		/// <summary>Next frame (2D + 3D) to Capture_img/&lt;name&gt;.png; false for a bad or taken name. Debug builds only.</summary>
+		public bool SaveScreenPng(string name) {
+			string? path = CapturePath(name);
+			if (path == null) return false;
+			Game.FrameGrab = (rgba, w, h) => WritePng(path, rgba, w, h);
+			return true;
+		}
+#endif
+
+		internal static string? CapturePath(string name) {
+			if (string.IsNullOrEmpty(name) || name.Length > 64) return null;
+			foreach (char c in name)
+				if (!(char.IsAsciiLetterOrDigit(c) || c == '_' || c == '-')) return null;
+			string path = Path.Combine(OpenTaiko.strEXEFolder, "Capture_img", name + ".png");
+			return File.Exists(path) ? null : path;
+		}
+
+		// rgba: top-left origin; written opaque
+		internal static bool WritePng(string path, byte[] rgba, int w, int h) {
+			try {
+				if (w <= 0 || h <= 0 || rgba.Length < w * h * 4) return false;
+				Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+				var info = new SkiaSharp.SKImageInfo(w, h, SkiaSharp.SKColorType.Rgba8888, SkiaSharp.SKAlphaType.Opaque);
+				using var image = SkiaSharp.SKImage.FromPixelCopy(info, rgba);
+				using var data = image?.Encode(SkiaSharp.SKEncodedImageFormat.Png, 100);
+				if (data == null) return false;
+				using var file = new FileStream(path, FileMode.CreateNew, FileAccess.Write);
+				data.SaveTo(file);
+				return true;
+			} catch (Exception e) {
+				System.Diagnostics.Trace.TraceWarning($"Capture to {path} failed: {e.Message}");
+				return false;
+			}
+		}
 	}
 }

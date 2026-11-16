@@ -467,7 +467,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			if (!BGA_Shown && !OpenTaiko.ConfigIni.bTokkunMode) {
 				actRollChara.Draw();
 				if (!this.isMultiPlay) {
-					if (OpenTaiko.ConfigIni.ShowDancer)
+					if (OpenTaiko.ConfigIni.ShowDancer && !actBackground.CrowdHidden)
 						actDancer.Draw();
 					if (OpenTaiko.ConfigIni.ShowFooter)
 						this.actFooter.Draw();
@@ -491,7 +491,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			CFrameProfiler.Section("play:mob");
 			// Layer: above-character background elements
 
-			if (!BGA_Shown && !OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.ConfigIni.ShowMob)
+			if (!BGA_Shown && !OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.ConfigIni.ShowMob && !actBackground.CrowdHidden)
 				this.actMob.Draw();
 
 			CFrameProfiler.Section("play:game");

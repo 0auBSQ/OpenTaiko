@@ -17,12 +17,11 @@ namespace OpenTaiko {
 		internal bool TryTex(int id, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out TexEntry e) => _tex.TryGetValue(id, out e) && e.Pix != null;
 		private void SetTexPixels(int id, int[] px, int w, int h) { var e = TexOf(id); e.Pix = px; e.W = w; e.H = h; e.Rev++; _texRevision++; }
 
-		/// <summary>Per-texture GPU sampling filter: "nearest" (default), "linear" or "mipmap"
-		/// (trilinear; call once after registering the texture — mip chain is generated on upload).
+		/// <summary>GPU filter: "nearest" (default), "linear", "mipmap" (after registering), "aniso" (8x), "anisoN".
 		/// Photo textures (wood/plaster/brick) want mipmap; pixel-art stays nearest.</summary>
 		public void SetTextureFilter(int id, string mode) {
 			var e = TexOf(id);
-			e.Filter = mode == "mipmap" ? 2 : (mode == "linear" ? 1 : 0);
+			e.Filter = FilterCode(mode);
 			e.Rev++; _texRevision++;
 		}
 
@@ -40,6 +39,11 @@ namespace OpenTaiko {
 			_texRevision++;
 			RtEdit();
 		}
+
+		// 3 = mipmap + aniso 8x, 30 + n = mipmap + aniso n
+		private static int FilterCode(string mode) => mode switch {
+			"linear" => 1, "mipmap" => 2, "aniso" => 3, "aniso2" => 32, "aniso4" => 34, "aniso8" => 38, "aniso16" => 46, _ => 0
+		};
 
 		public void RegisterTexture(int id, LuaTable pixels, int w, int h) {
 			if (_disposedValue || pixels == null || w <= 0 || h <= 0) return;
@@ -115,6 +119,13 @@ namespace OpenTaiko {
 			return first;
 		}
 
+		// content-shared model images: key to texture id (models' range)
+		private readonly Dictionary<string, int> _sharedModelTex = new(StringComparer.Ordinal);
+		internal int SharedTextureId(string key) {
+			if (!_sharedModelTex.TryGetValue(key, out int id)) _sharedModelTex[key] = id = _nextModelTex++;
+			return id;
+		}
+
 		/// <summary>Forget a registered texture: frees the CPU pixel copy, its filter and normal map, the GPU
 		/// upload and any reflection RTT target bound to this id. Sampling it afterwards draws nothing until it
 		/// is re-registered.</summary>
@@ -147,11 +158,10 @@ namespace OpenTaiko {
 		private TexEntry SpriteOf(int id) { if (!_sprites.TryGetValue(id, out var e)) _sprites[id] = e = new TexEntry(); return e; }
 		/// <summary>The entry of sprite <paramref name="id"/> when it has registered pixels.</summary>
 		internal bool TrySprite(int id, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out TexEntry e) => _sprites.TryGetValue(id, out e) && e.Pix != null;
-		/// <summary>Sampling filter for a particle/billboard sprite: "nearest" (default) or "linear"
-		/// (soft edges — particles, foam, grass blades).</summary>
+		/// <summary>Sprite filter: "nearest" (default), "linear", "mipmap" (keeps cut-out cover), "aniso".</summary>
 		public void SetSpriteFilter(int id, string mode) {
 			var e = SpriteOf(id);
-			e.Filter = mode == "linear" ? 1 : 0;
+			e.Filter = FilterCode(mode);
 			e.Rev++;
 		}
 

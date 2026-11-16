@@ -395,6 +395,7 @@ One instance per host, which the host updates in place each frame. The array fie
 | `state.landCount  -> number[]` | Each player's flying notes that reached the end of their flight since the background started. |
 | `state:SetFlyTarget(player, x, y)` | While this gameplay background is shown, the player's flying notes land on (x, y) in screen pixels and the skin's landing effect is left out. |
 | `state:ClearFlyTarget(player)` | The player's flying notes land at the skin's usual place again. |
+| `state:SetCrowdHidden(hidden)` | While this gameplay background is shown, true leaves out the dancers and the mob, which are drawn over the lower background; false draws them again. A new background starts with them drawn. |
 
 ## Transitions
 

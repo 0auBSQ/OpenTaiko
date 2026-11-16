@@ -27,6 +27,28 @@ uniform float uTexScale;      // world units -> layer uv repeats
 uniform vec4 uUVAnim;         // textured surfaces: xy = uv scroll per second of uTime, z = wobble amplitude, w = its world frequency
 out vec4 frag;
 #ifdef SHADOWS
+#ifdef EXT
+// EXT: filtered compares, fade toward the map border
+uniform mat4 uLightVP; uniform highp sampler2DShadow uShadowCmp; uniform float uShadowTexel;
+uniform vec2 uShadowF;        // radius (texels), fade (share of the half extent)
+float sunShadow(vec3 wp, vec3 N){
+    vec4 lp = uLightVP * vec4(wp + N * 0.10, 1.0);
+    vec3 p = lp.xyz / lp.w * 0.5 + 0.5;
+    vec2 e = abs(p.xy * 2.0 - 1.0);
+    float edge = max(e.x, e.y);
+    if (p.z > 1.0 || edge >= 1.0) return 1.0;
+    float ndl = max(dot(N, uSunDir), 0.0);
+    float t = p.z - max(0.00012, 0.0006 * (1.0 - ndl));
+    float r = uShadowF.x * uShadowTexel;
+    float sh = texture(uShadowCmp, vec3(p.xy + vec2(-0.75, -0.25) * r, t))
+             + texture(uShadowCmp, vec3(p.xy + vec2( 0.25, -0.75) * r, t))
+             + texture(uShadowCmp, vec3(p.xy + vec2( 0.75,  0.25) * r, t))
+             + texture(uShadowCmp, vec3(p.xy + vec2(-0.25,  0.75) * r, t));
+    sh *= 0.25;
+    float fade = uShadowF.y > 0.0 ? clamp((edge - (1.0 - uShadowF.y)) / uShadowF.y, 0.0, 1.0) : 0.0;
+    return mix(sh, 1.0, fade);
+}
+#else
 uniform mat4 uLightVP; uniform sampler2D uShadow; uniform float uShadowTexel;
 float sunShadow(vec3 wp, vec3 N){
     // NORMAL-OFFSET sampling (~1.6 shadow texels along the surface normal) carries most of the
@@ -46,6 +68,62 @@ float sunShadow(vec3 wp, vec3 N){
     return sh * 0.25;
 }
 #endif
+#endif
+#ifdef EXT
+uniform vec4 uFogSky[6];      // 0 horizon+switch, 1 zenith+rise, 2 below+band, 3 glow+focus, 4 glow dir+height fall, 5 terrain
+vec3 fogColor(vec3 wp){
+    if (uFogSky[0].w <= 0.0) return uFogCol;
+    vec3 d = normalize(wp - uCam);
+    vec3 c = mix(uFogSky[0].rgb, uFogSky[1].rgb, 1.0 - exp(-max(d.y, 0.0) * uFogSky[1].w));
+    c = mix(uFogSky[2].rgb, c, smoothstep(-uFogSky[2].w, uFogSky[2].w, d.y));
+    float g = max(dot(d.xz / max(length(d.xz), 1e-4), uFogSky[4].xz), 0.0);
+    return c + uFogSky[3].rgb * (pow(g, uFogSky[3].w) * exp(-abs(d.y) * uFogSky[4].w));
+}
+uniform float uSprLit;        // 0..1 scene light share
+uniform float uSprNear;       // dissolve distance, 0 = off
+uniform float uCel;
+uniform highp sampler2D uLightGrid;   // per cell: light index + 1, 0 ends the list
+uniform vec4 uLightGridXf;            // corner x, z; cells per unit; cells per side (0 = no grid)
+uniform int uLightGlobal;             // leading unranged lights (in no cell)
+int lightSlots(vec3 wp, out vec4 ga, out vec4 gb){
+    ga = vec4(0.0); gb = vec4(0.0);
+    if (uLightGridXf.w <= 0.0) return uNumLights;
+    int n = int(uLightGridXf.w);
+    ivec2 c = ivec2(floor((wp.xz - uLightGridXf.xy) * uLightGridXf.z));
+    if (c.x < 0 || c.y < 0 || c.x >= n || c.y >= n) return uLightGlobal;
+    ga = texelFetch(uLightGrid, c, 0) * 255.0;
+    if (ga.x < 0.5) return uLightGlobal;
+    if (ga.w > 0.5) gb = texelFetch(uLightGrid, ivec2(c.x, c.y + n), 0) * 255.0;   // more than four: second texel
+    return uLightGlobal + 8;
+}
+// -1 = no more in the cell
+int lightOf(int k, vec4 ga, vec4 gb){
+    if (uLightGridXf.w <= 0.0 || k < uLightGlobal) return k;
+    int j = k - uLightGlobal;
+    float v = j == 0 ? ga.x : j == 1 ? ga.y : j == 2 ? ga.z : j == 3 ? ga.w : j == 4 ? gb.x : j == 5 ? gb.y : j == 6 ? gb.z : gb.w;
+    return int(v + 0.5) - 1;
+}
+vec3 spriteShade(vec3 wp){
+    float sh = 1.0;
+    vec3 plain = vec3(1.0);
+#ifdef SHADOWS
+    sh = sunShadow(wp + uSunDir * 0.6, vNormal);
+    plain = vec3(0.55 + 0.45 * sh);
+#endif
+    vec3 l = uAmb * 1.15 + uSunCol * (0.62 * sh);
+    vec4 ga, gb; int ns = lightSlots(wp, ga, gb);
+    for (int k = 0; k < ns; k++){
+        int i = lightOf(k, ga, gb); if (i < 0) break;
+        vec3 dp = uLightPosR[i].xyz - wp; float range = uLightPosR[i].w;
+        float d2 = dot(dp, dp);
+        if (range > 0.0){
+            if (d2 >= range*range) continue;
+            float f = 1.0 - sqrt(d2)/range; l += uLightCol[i] * (f*f*0.8);
+        } else l += uLightCol[i] * (0.8 / (d2 + 1.0));
+    }
+    return mix(plain, l, uSprLit);
+}
+#endif
 vec3 lightAt(vec3 N, vec3 wp){
     float e = sqrt(max(vShade, 0.0));
 #ifdef SHADOWS
@@ -53,8 +131,19 @@ vec3 lightAt(vec3 N, vec3 wp){
 #else
     float shf = 1.0;
 #endif
+#ifdef EXT
+    float sd = max(dot(N, uSunDir), 0.0) * 3.0, sf = floor(sd);   // uCel: blend toward three steps
+    vec3 l = e * (uAmb + mix(sd / 3.0, (sf + smoothstep(0.30, 0.70, sd - sf)) / 3.0, uCel) * uSunCol * shf);
+#else
     vec3 l = e * (uAmb + max(dot(N, uSunDir), 0.0) * uSunCol * shf);
+#endif
+#ifdef EXT
+    vec4 ga, gb; int ns = lightSlots(wp, ga, gb);
+    for (int k = 0; k < ns; k++){
+        int i = lightOf(k, ga, gb); if (i < 0) break;
+#else
     for (int i = 0; i < uNumLights; i++){
+#endif
         vec3 dp = uLightPosR[i].xyz - wp; float range = uLightPosR[i].w;
         float d2 = dot(dp, dp);
         if (range > 0.0){
@@ -97,13 +186,22 @@ void main(){
         frag = vec4(col, uAlpha); return;
     }
     if (uMode == 2){ vec4 t = texture(uTex, vUV); vec4 c = vec4(t.rgb * uTint, t.a * uAlpha); if (uCutout == 1 && c.a < 0.5) discard;
+#ifdef EXT
+        if (uSprNear > 0.0 && vCamZ < uSprNear && (vCamZ / uSprNear - 0.33) * 1.5 <= fract(sin(dot(floor(gl_FragCoord.xy), vec2(12.9898, 78.233))) * 43758.5453)) discard;
+        c.rgb *= spriteShade(vWorld);
+#else
 #ifdef SHADOWS
         // characters RECEIVE the sun shadow (a wall's shade dims them). Sample 0.6 units TOWARD the
         // sun: the sprite's own sun-facing caster quad passes through its centre, so sampling at the
         // fragment itself made every character shade ITSELF; real occluders sit further than 0.6.
         c.rgb *= (0.55 + 0.45 * sunShadow(vWorld + uSunDir * 0.6, vNormal));
 #endif
+#endif
+#ifdef EXT
+        if (uFog == 1){ float f = clamp((vCamZ - uFogStart) * uFogInv, 0.0, 1.0); if (f > 0.0) c.rgb = mix(c.rgb, fogColor(vWorld), f); } frag = c; return; }
+#else
         if (uFog == 1){ float f = clamp((vCamZ - uFogStart) * uFogInv, 0.0, 1.0); c.rgb = mix(c.rgb, uFogCol, f); } frag = c; return; }
+#endif
     vec3 base;
     vec2 uv = vUV + uUVAnim.xy * uTime;   // scrolled and wobbled uv (ObjSetUVScroll / ObjSetUVWarp; 0 = vUV)
     if (uUVAnim.z > 0.0) uv += uUVAnim.z * vec2(sin(vWorld.z * uUVAnim.w + uTime * 1.3), cos(vWorld.x * uUVAnim.w + uTime * 1.1));
@@ -146,6 +244,10 @@ void main(){
         col += uSunCol * (pow(max(dot(N, H), 0.0), 48.0) * 0.7 * uWet * sqrt(max(vShade, 0.0)));
     }
     col += base * uEmissive;
+#ifdef EXT
+    if (uFog == 1){ float f = clamp((vCamZ - uFogStart) * uFogInv, 0.0, 1.0); if (f > 0.0) col = mix(col, fogColor(vWorld), f); }
+#else
     if (uFog == 1){ float f = clamp((vCamZ - uFogStart) * uFogInv, 0.0, 1.0); col = mix(col, uFogCol, f); }
+#endif
     frag = vec4(col, uAlpha);
 }

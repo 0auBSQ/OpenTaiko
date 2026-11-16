@@ -75,6 +75,17 @@ namespace OpenTaiko {
 		// per-material decoded base-colour TEXTURE (null = flat colour). Transparent texels are encoded
 		// as NEGATIVE ints — the engine's cutout convention across both renderers.
 		private int[][]? _matPix; private int[]? _matTexW, _matTexH;
+		// material extras "filter"; null = nearest
+		private string?[]? _matFilter;
+		// content-share key ("filter"/"maxSize" extras); null = the file's own texture
+		private string?[]? _matShare;
+		private static readonly Dictionary<string, (int[] pix, int w, int h)> s_sharedPix = new();
+		private static readonly int[] s_handedOver = Array.Empty<int>();
+		private string _path = "";   // re-read for handed-over pixels
+		// per-image lock: one decode across Preload threads
+		private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, object> s_sharedGates = new();
+		private int TexId(Lua3DScene scene, int tb, int m)
+			=> _matShare != null && m < _matShare.Length && _matShare[m] is string k ? scene.SharedTextureId(k) : tb + m;
 
 		// material m is texture TexBase(scene) + m, in the scene's block for this model file
 		private int TexBase(Lua3DScene scene) => scene.ModelTextureBase(_key, Math.Max(1, _matRgb.Length));
@@ -84,7 +95,27 @@ namespace OpenTaiko {
 			int tb = TexBase(scene);
 			for (int m = 0; m < _matRgb.Length; m++) {
 				if (_matPix != null && _matPix[m] != null) {     // real base-colour texture (VRM etc.)
-					scene.RegisterTexturePixels(tb + m, _matPix[m], _matTexW![m], _matTexH![m]);
+					int id = TexId(scene, tb, m);
+					bool sharedId = id != tb + m, gone = ReferenceEquals(_matPix[m], s_handedOver);
+					bool gpuOnly = scene._gpuOnlyMin > 0 && (long)_matTexW![m] * _matTexH![m] >= scene._gpuOnlyMin;
+					if (sharedId && !gone && scene.TryTex(id, out var te) && ReferenceEquals(te.Pix, _matPix[m])) {   // another file registered this image
+						if (gpuOnly) _matPix[m] = s_handedOver;
+						continue;
+					}
+					if ((gone || (sharedId && gpuOnly)) && scene.HoldsTexture(id, _matTexW![m], _matTexH![m])) {
+						if (gpuOnly) _matPix[m] = s_handedOver;
+						continue;
+					}
+					if (gone) {
+						RereadPixels();
+						if (ReferenceEquals(_matPix[m], s_handedOver)) continue;
+					}
+					scene.RegisterTexturePixels(id, _matPix[m], _matTexW![m], _matTexH![m]);
+					if (_matFilter?[m] is string mf) scene.SetTextureFilter(id, mf);
+					if (gpuOnly) {
+						if (_matShare?[m] is string sk) lock (s_sharedPix) s_sharedPix[sk] = (s_handedOver, _matTexW![m], _matTexH![m]);
+						_matPix[m] = s_handedOver;
+					}
 					continue;
 				}
 				int rgb = _matRgb[m];
@@ -92,6 +123,11 @@ namespace OpenTaiko {
 				scene.RegisterTexturePixels(tb + m, px, 2, 2);
 			}
 			if (_matRgb.Length == 0) { scene.RegisterTexturePixels(tb, new int[4] { 0xB0A090, 0xB0A090, 0xB0A090, 0xB0A090 }, 2, 2); }
+			List<int>? shared = null;
+			if (_matShare != null)
+				for (int m = 0; m < _matRgb.Length && m < _matShare.Length; m++)
+					if (_matShare[m] is string k && _matPix != null && _matPix[m] != null) (shared ??= new()).Add(scene.SharedTextureId(k));
+			scene.ModelRegistered(_key, shared);
 		}
 
 		// ── pose math shared by Pose / BuildCollider / GetBounds ─────────────────────────────
@@ -196,7 +232,7 @@ namespace OpenTaiko {
 				var pr = _prims[p];
 				int target = route != null ? route[p] : objId;
 				if (_tgtKeep[TargetIndex(target)]) continue;
-				int texId = tb + (pr.Mat >= 0 && pr.Mat < _matRgb.Length ? pr.Mat : 0);
+				int texId = TexId(scene, tb, pr.Mat >= 0 && pr.Mat < _matRgb.Length ? pr.Mat : 0);
 				TransformPrim(pr);
 				WritePrim(scene, target, pr, texId, lx, ly, lz, sg);
 			}
@@ -439,7 +475,7 @@ namespace OpenTaiko {
 			for (int pi = 0; pi < _prims.Count; pi++) {
 				var pr = _prims[pi];
 				int target = _partObj.TryGetValue(pi, out int mo) ? mo : objId;
-				int texId = tb + (pr.Mat >= 0 && pr.Mat < _matRgb.Length ? pr.Mat : 0);
+				int texId = TexId(scene, tb, pr.Mat >= 0 && pr.Mat < _matRgb.Length ? pr.Mat : 0);
 				TransformPrim(pr);
 				WritePrim(scene, target, pr, texId, lx, ly, lz, mirror ? -1 : 1);
 			}
@@ -740,14 +776,92 @@ namespace OpenTaiko {
 		// parts into a rebuilt scene. CPU pixel buffers are kept so later scenes (model-icon previews)
 		// can Register too — bounded at ≤ ~1 MB × the distinct files shipped.
 		private static readonly Dictionary<string, GltfModel> _fileCache = new(StringComparer.OrdinalIgnoreCase);
-		public static void PurgeFileCache() { lock (_fileCache) _fileCache.Clear(); }
+		public static void PurgeFileCache() { lock (_fileCache) _fileCache.Clear(); lock (s_sharedPix) s_sharedPix.Clear(); }
+		/// <summary>File cache readout (bytes); shared images counted once.</summary>
+		internal static (int files, long geom, long pix) CacheStats() {
+			long geom = 0, pix = 0; int n = 0;
+			var seen = new HashSet<int[]>(System.Collections.Generic.ReferenceEqualityComparer.Instance);
+			lock (_fileCache) {
+				foreach (var g in _fileCache.Values) {
+					n++;
+					foreach (var p in g._prims)
+						geom += ((long)p.Pos.Length + p.Uv.Length + (p.Wt?.Length ?? 0) + (p.Nrm?.Length ?? 0) + (p.Jt?.Length ?? 0) + p.Idx.Length) * 4;
+					if (g._matPix != null) foreach (var a in g._matPix) if (a != null && seen.Add(a)) pix += (long)a.Length * 4;
+				}
+			}
+			return (n, geom, pix);
+		}
+		private static readonly Dictionary<string, System.Threading.Tasks.Task<GltfModel?>> _loading = new(StringComparer.OrdinalIgnoreCase);
+		private static string CacheKey(string path) { try { return Path.GetFullPath(path); } catch { return path; } }
 		public static GltfModel Load(string path) {
-			string key;
-			try { key = Path.GetFullPath(path); } catch { key = path; }
-			lock (_fileCache) if (_fileCache.TryGetValue(key, out var hit)) return hit;
+			string key = CacheKey(path);
+			System.Threading.Tasks.Task<GltfModel?>? pending;
+			lock (_fileCache) {
+				if (_fileCache.TryGetValue(key, out var hit)) return hit;
+				_loading.TryGetValue(key, out pending);
+			}
+			if (pending != null) {
+				GltfModel? got = null;
+				try { got = pending.Result; } catch (Exception) { }
+				if (got != null) return got;
+			}
 			var fresh = LoadUncached(path, key);
 			lock (_fileCache) _fileCache[key] = fresh;
 			return fresh;
+		}
+		/// <summary>Worker-thread read into the cache. True when cached, being read or started.</summary>
+		public static bool Preload(string path) {
+			string key = CacheKey(path);
+			lock (_fileCache) {
+				if (_fileCache.ContainsKey(key) || _loading.ContainsKey(key)) return true;
+				_loading[key] = System.Threading.Tasks.Task.Run<GltfModel?>(() => {
+					GltfModel? m = null;
+					try { m = LoadUncached(path, key); }
+					catch (Exception e) { System.Diagnostics.Trace.TraceWarning("MODEL preload failed: " + e.Message); }
+					lock (_fileCache) { if (m != null) _fileCache[key] = m; _loading.Remove(key); }
+					return m;
+				});
+			}
+			return true;
+		}
+		/// <summary>0 = not cached, 1 = being read, 2 = cached.</summary>
+		public static int CacheState(string path) {
+			string key = CacheKey(path);
+			lock (_fileCache) return _fileCache.ContainsKey(key) ? 2 : _loading.ContainsKey(key) ? 1 : 0;
+		}
+		/// <summary>Drop a file and its unused shared images from the cache; scene textures stay.</summary>
+		public static void Evict(string path) {
+			string key = CacheKey(path);
+			lock (_fileCache) {
+				if (!_fileCache.Remove(key)) return;
+				var used = new HashSet<int[]>(System.Collections.Generic.ReferenceEqualityComparer.Instance);
+				foreach (var g in _fileCache.Values)
+					if (g._matPix != null) foreach (var a in g._matPix) if (a != null) used.Add(a);
+				lock (s_sharedPix) {
+					List<string>? dead = null;
+					foreach (var kv in s_sharedPix) if (!used.Contains(kv.Value.pix)) (dead ??= new()).Add(kv.Key);
+					if (dead != null) foreach (var k in dead) s_sharedPix.Remove(k);
+				}
+			}
+		}
+		/// <summary>Free this model's scene textures; delete its objects first. Register restores them.</summary>
+		public void Unregister(Lua3DScene scene) { scene?.ModelUnregistered(_key); }
+		/// <summary>Scene dropped a handed-over shared image: later reads decode it again.</summary>
+		internal static void ForgetShared(string key) {
+			lock (s_sharedPix) if (s_sharedPix.TryGetValue(key, out var e) && ReferenceEquals(e.pix, s_handedOver)) s_sharedPix.Remove(key);
+		}
+		private void RereadPixels() {
+			try {
+				if (_matShare != null)
+					for (int m = 0; m < _matShare.Length; m++)
+						if (_matShare[m] is string k && _matPix != null && ReferenceEquals(_matPix[m], s_handedOver)) ForgetShared(k);
+				var fresh = LoadUncached(_path.Length > 0 ? _path : _key, _key);
+				if (fresh._matPix == null || _matPix == null) return;
+				for (int m = 0; m < _matPix.Length && m < fresh._matPix.Length; m++)
+					if (ReferenceEquals(_matPix[m], s_handedOver) && fresh._matPix[m] != null && !ReferenceEquals(fresh._matPix[m], s_handedOver)) {
+						_matPix[m] = fresh._matPix[m]; _matTexW![m] = fresh._matTexW![m]; _matTexH![m] = fresh._matTexH![m];
+					}
+			} catch (Exception e) { System.Diagnostics.Trace.TraceWarning("GltfModel: could not read the textures again: " + e.Message); }
 		}
 		// Coordinates are used exactly as the file stores them, with no axis flip and no winding change:
 		// glTF's right-handed axes land as they are in the scene's left-handed camera basis (+X right,
@@ -771,7 +885,7 @@ namespace OpenTaiko {
 			}
 			string dir = Path.GetDirectoryName(Path.GetFullPath(path)) ?? ".";
 
-			var g = new GltfModel { _key = key };
+			var g = new GltfModel { _key = key, _path = path };
 			using var doc = JsonDocument.Parse(json);
 			var root = doc.RootElement;
 			var accs = root.GetProperty("accessors");
@@ -835,6 +949,7 @@ namespace OpenTaiko {
 				g._matNames = new string[nm];
 				g._matEmissive = new double[nm][];
 				g._matPix = new int[nm][]; g._matTexW = new int[nm]; g._matTexH = new int[nm];
+				g._matFilter = new string?[nm]; g._matShare = new string?[nm];
 				for (int m = 0; m < nm; m++) {
 					g._matNames[m] = mats[m].TryGetProperty("name", out var mnEl) ? (mnEl.GetString() ?? "") : "";
 					if (mats[m].TryGetProperty("emissiveFactor", out var emEl) && emEl.GetArrayLength() >= 3)
@@ -865,11 +980,30 @@ namespace OpenTaiko {
 									imgBytes = new byte[vLen];
 									Array.Copy(src, vOff, imgBytes, 0, vLen);
 								} else if (img.TryGetProperty("uri", out var iu)) imgBytes = ReadUri(iu.GetString() ?? "", dir);
-								using var bmp = imgBytes != null ? SkiaSharp.SKBitmap.Decode(imgBytes) : null;
+								// cap huge textures (VRoid ships 2048²); 512² is plenty at chara scale
+								// extras "maxSize" (16..2048), "filter": image shared by content
+								int max = 512; string? shareKey = null;
+								if (mats[m].TryGetProperty("extras", out var ex) && ex.ValueKind == System.Text.Json.JsonValueKind.Object) {
+									bool asked = false;
+									if (ex.TryGetProperty("maxSize", out var ms) && ms.ValueKind == System.Text.Json.JsonValueKind.Number) {
+										max = Math.Clamp(ms.GetInt32(), 16, 2048); asked = true;
+									}
+									if (ex.TryGetProperty("filter", out var fe) && fe.ValueKind == System.Text.Json.JsonValueKind.String
+										&& (fe.GetString() ?? "") is "linear" or "mipmap" or "aniso" or "aniso2" or "aniso4" or "aniso16") {
+										g._matFilter![m] = fe.GetString(); asked = true;
+									}
+									if (asked && imgBytes != null)
+										shareKey = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(imgBytes)) + ":" + max + ":" + g._matFilter![m];
+								}
+								g._matShare![m] = shareKey;
+								lock (shareKey != null ? s_sharedGates.GetOrAdd(shareKey, _ => new object()) : new object()) {
+								(int[] pix, int w, int h) kept = default;
+								bool have = false;
+								if (shareKey != null) lock (s_sharedPix) have = s_sharedPix.TryGetValue(shareKey, out kept);
+								if (have) { g._matPix[m] = kept.pix!; g._matTexW[m] = kept.w; g._matTexH[m] = kept.h; }
+								using var bmp = !have && imgBytes != null ? SkiaSharp.SKBitmap.Decode(imgBytes) : null;
 								if (bmp != null) {
 									int tw = bmp.Width, th = bmp.Height;
-									// cap huge textures (VRoid ships 2048²); 512² is plenty at chara scale
-									int max = 512;
 									SkiaSharp.SKBitmap use = bmp;
 									if (tw > max || th > max) {
 										int nw = Math.Max(1, tw * max / Math.Max(tw, th)), nh = Math.Max(1, th * max / Math.Max(tw, th));
@@ -884,7 +1018,9 @@ namespace OpenTaiko {
 										px2[i] = c2.Alpha < 128 ? (packed | unchecked((int)0x80000000)) : packed;
 									}
 									g._matPix[m] = px2; g._matTexW[m] = tw; g._matTexH[m] = th;
+									if (shareKey != null) lock (s_sharedPix) s_sharedPix[shareKey] = (px2, tw, th);
 									if (!ReferenceEquals(use, bmp)) use.Dispose();
+								}
 								}
 							} catch (Exception e) { System.Diagnostics.Trace.TraceWarning("GltfModel texture decode failed: " + e.Message); }
 						}

@@ -395,6 +395,7 @@ Una instancia por anfitrión, que el anfitrión actualiza en el sitio cada fotog
 | `state.landCount  -> number[]` | Notas voladoras de cada jugador que llegaron al final de su vuelo desde que empezó el fondo. |
 | `state:SetFlyTarget(player, x, y)` | Mientras se muestra este fondo de juego, las notas voladoras del jugador aterrizan en (x, y) en píxeles de pantalla y se omite el efecto de aterrizaje del skin. |
 | `state:ClearFlyTarget(player)` | Las notas voladoras del jugador vuelven a aterrizar en el lugar habitual del skin. |
+| `state:SetCrowdHidden(hidden)` | Mientras se muestra este fondo de juego, true deja fuera a los bailarines y al mob, que se dibujan sobre el fondo inferior; false vuelve a dibujarlos. Un fondo nuevo empieza con ellos dibujados. |
 
 ## Transiciones
 

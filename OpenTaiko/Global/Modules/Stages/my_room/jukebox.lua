@@ -350,7 +350,9 @@ end
 
 -- ── screen glow (the GLB's emissivePart part objects; falls back to nothing on box art) ────────
 local glowItem = nil            -- the furniture entry whose screen we last touched (to restore)
-local function setScreenGlow(item, r, g, b)
+local RAINBOW_PART = "Jukebox_Rainbow"   -- tube part, u runs along the loop
+local RAINBOW_SCROLL = 0.5              -- u per second while playing (one lap in 4 s)
+local function setScreenGlow(item, r, g, b, du)
     if ctx == nil or item == nil then return end
     local inst = ctx.propInstFor(item)
     if inst == nil or inst.parts == nil then return end
@@ -358,6 +360,9 @@ local function setScreenGlow(item, r, g, b)
     if scene == nil or scene.ObjSetEmissive == nil then return end
     for _, p in ipairs(inst.parts) do
         pcall(function() scene:ObjSetEmissive(p.obj, r, g, b) end)
+        if p.material == RAINBOW_PART and scene.ObjSetUVScroll then
+            pcall(function() scene:ObjSetUVScroll(p.obj, du or 0, 0) end)
+        end
     end
 end
 
@@ -373,7 +378,7 @@ local function tickGlow(t)
     glowItem = item
     if pb.playing then
         local p = 0.55 + 0.3 * math.sin(t * 3.2)
-        setScreenGlow(item, p, p * 0.95, p * 0.8)
+        setScreenGlow(item, p, p * 0.95, p * 0.8, RAINBOW_SCROLL)
     elseif pb.paused then
         setScreenGlow(item, 0.3, 0.285, 0.24)
     else

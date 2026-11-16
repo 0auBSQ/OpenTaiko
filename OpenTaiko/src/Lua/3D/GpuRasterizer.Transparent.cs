@@ -138,7 +138,7 @@ namespace OpenTaiko {
 			}
 			for (int i = 0; i < _sprBatches.Count; i++) {
 				var bt = _sprBatches[i];
-				if (bt.Pass == 1 && bt.Obj.Kind == 3) _tq.Add(new TQItem { Key = bt.Key, Seq = _tq.Count, Piece = -1, Spr = i });
+				if (bt.Pass == 1 && bt.Obj.Kind == 3 && !bt.Obj.AfterPost) _tq.Add(new TQItem { Key = bt.Key, Seq = _tq.Count, Piece = -1, Spr = i });
 			}
 			int n = _tq.Count;
 			if (n == 0) return;

@@ -183,6 +183,20 @@ function World:setFog(on, near, far)
     if near then self.fogNear = near end
     if far then self.fogFar = far end
 end
+function World:setTerrainLook(look) return require("World.OWM3d.terrain").setLook(self, look) end
+function World:setGrassTile(tile) return require("World.OWM3d.terrain").setGrass(self, tile) end
+-- soft: radius in shadow texels; fade: share of the half extent
+function World:setShadowFilter(soft, fade)
+    if self.scene.SetShadowFilter == nil then return false end
+    self.scene:SetShadowFilter(soft or 0, fade or 0)
+    return true
+end
+-- k: 0..1 (0 = smooth)
+function World:setCelShade(k)
+    if self.scene.SetCelShade == nil then return false end
+    self.scene:SetCelShade(k or 0)
+    return true
+end
 -- thin passthroughs for the Lua-attached post shader (visuals phase; guarded so older builds no-op)
 function World:setPostShader(src) if self.scene.SetPostShader then self.scene:SetPostShader(src or "") end end
 function World:setPostUniform(slot, a, b, c, d) if self.scene.SetPostUniform then self.scene:SetPostUniform(slot, a or 0, b or 0, c or 0, d or 0) end end
@@ -251,7 +265,11 @@ end
 
 -- a flat backdrop instead of the day sky (interiors, voids): nil restores the sky
 function World:setSolidSky(r, g, b)
-    if r == nil then self.solidSky = nil ; return end
+    if r == nil then
+        if self.solidSky ~= nil and self.daynight then self.daynight._skyInstalled = false end
+        self.solidSky = nil
+        return
+    end
     self.solidSky = { r, g, b }
     if self.scene.SetSkyShader then pcall(function() self.scene:SetSkyShader("") end) end
 end
@@ -281,6 +299,10 @@ function World:drawSky()
     if not hour then local t = os.date("*t"); hour = t.hour + t.min / 60 end
     local top, hor = skyAt(hour)
     self.curSky = { top = top, hor = hor }          -- fog + reflection clear colours track the hour either way
+    if self.scene.SetSkyColors then
+        local pal = require("World.OWM3d.sky").paletteAt(hour)
+        self.scene:SetSkyColors(pal.hor[1], pal.hor[2], pal.hor[3], pal.zen[1], pal.zen[2], pal.zen[3])
+    end
     -- GPU path: the procedural sky shader paints the frame (clouds/sun/stars/moon) — skip the 2D bands
     if self.scene.SkyShaderActive and self.scene:SkyShaderActive() and self.daynight and self.daynight.sunX then
         local dn = self.daynight
@@ -315,7 +337,12 @@ function World:render()
         if g then self.scene:SetDiorama(true, g.tilt, g.sat, g.vig, g.bloom)
         else self.scene:SetDiorama(false, 0, 1, 0, 0) end
     end
-    if self.scene.SetShadowFocus then self.scene:SetShadowFocus(self.cam.tx, self.cam.ty, self.cam.tz) end
+    if self._grassTile and self.scene.GrassTileFocus then self.scene:GrassTileFocus(self.cam.tx, self.cam.tz) end
+    if self.scene.SetShadowFocus then
+        local f = self.shadowFocus   -- { x, y, z } from the stage; nil = camera target
+        if f then self.scene:SetShadowFocus(f[1], f[2], f[3])
+        else self.scene:SetShadowFocus(self.cam.tx, self.cam.ty, self.cam.tz) end
+    end
     self.scene:Render()
     self.scene:Upload()
     -- surface sky/post shader compile failures once (they otherwise degrade silently)

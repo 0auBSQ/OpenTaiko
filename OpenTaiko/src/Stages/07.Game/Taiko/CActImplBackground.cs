@@ -52,6 +52,9 @@ internal class CActImplBackground : CActivity {
 	/// <summary>Whether the play screen drew this background on the current frame.</summary>
 	public bool Shown;
 
+	/// <summary>The shown background hides the dancers and mob.</summary>
+	public bool CrowdHidden => Shown && _state.CrowdHidden;
+
 	// background folders forced on the next play (SONGMOUNT:SetBackgrounds), null for the usual pick
 	internal static string? NextUpDir, NextDownDir;
 

@@ -26,6 +26,7 @@ function Models.new(world)
     self.cache = {}          -- file → IModel (kept for the stage's lifetime; glTF loads are heavy)
     self.list = {}           -- live instances
     self.groups = {}         -- group name → { instances }
+    self.uses = {}           -- file → live instance count
     return self
 end
 
@@ -47,6 +48,31 @@ function Models:loadModel(file)
         self.cache[file] = m
     end
     return m
+end
+
+-- worker-thread read ahead of add(); true = cached, being read or started
+function Models:preload(file)
+    if self.cache[file] ~= nil then return true end
+    if MODEL == nil or MODEL.Preload == nil then return false end
+    local ok, r = pcall(function() return MODEL:Preload(file) end)
+    return ok and r == true
+end
+
+function Models:ready(file)
+    if self.cache[file] ~= nil then return true end
+    if MODEL == nil or MODEL.IsReady == nil then return false end
+    local ok, r = pcall(function() return MODEL:IsReady(file) end)
+    return ok and r == true
+end
+
+-- drop an unused file from scene and caches; false while an instance is alive
+function Models:unload(file)
+    if (self.uses[file] or 0) > 0 then return false end
+    local m = self.cache[file]
+    self.cache[file] = nil
+    if m ~= nil and m.Unregister then pcall(function() m:Unregister(self.world.scene) end) end
+    if MODEL and MODEL.Evict then pcall(function() MODEL:Evict(file) end) end
+    return m ~= nil
 end
 
 -- create an instance (renderable immediately; collision happens via emitCollision during map build)
@@ -157,6 +183,7 @@ function Models:add(o)
     inst:applyVisible()
 
     self.list[#self.list + 1] = inst
+    self.uses[inst.file] = (self.uses[inst.file] or 0) + 1
     if inst.group then
         self.groups[inst.group] = self.groups[inst.group] or {}
         table.insert(self.groups[inst.group], inst)
@@ -227,6 +254,7 @@ function Models:clear()
     end
     self.list = {}
     self.groups = {}
+    self.uses = {}
     -- the model cache is kept: reloading a map reuses parsed GLBs
 end
 
@@ -238,7 +266,10 @@ function Models:remove(inst)
     local scene = self.world.scene
     for _, id in ipairs(inst.objs or {}) do scene:DeleteObject(id) end
     for i = #self.list, 1, -1 do
-        if self.list[i] == inst then table.remove(self.list, i) end
+        if self.list[i] == inst then
+            table.remove(self.list, i)
+            if inst.file then self.uses[inst.file] = math.max(0, (self.uses[inst.file] or 1) - 1) end
+        end
     end
     if inst.group and self.groups[inst.group] then
         local g = self.groups[inst.group]

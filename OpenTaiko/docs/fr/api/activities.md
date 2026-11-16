@@ -395,6 +395,7 @@ Une instance par hôte, que l'hôte met à jour sur place à chaque frame. Les c
 | `state.landCount  -> number[]` | Notes volantes de chaque joueur arrivées au bout de leur vol depuis le démarrage de l'arrière-plan. |
 | `state:SetFlyTarget(player, x, y)` | Tant que cet arrière-plan de gameplay est affiché, les notes volantes du joueur atterrissent sur (x, y) en pixels d'écran et l'effet d'atterrissage du skin est omis. |
 | `state:ClearFlyTarget(player)` | Les notes volantes du joueur atterrissent de nouveau à l'emplacement habituel du skin. |
+| `state:SetCrowdHidden(hidden)` | Tant que cet arrière-plan de gameplay est affiché, true retire les danseurs et le mob, dessinés par-dessus l'arrière-plan inférieur ; false les dessine de nouveau. Un nouvel arrière-plan commence avec eux. |
 
 ## Transitions
 

@@ -63,6 +63,8 @@ function DayNight:update(dt)
     end
     local hour = self.hour
     local scene = world.scene
+    -- optional stage overrides; colours { r, g, b }; nil = defaults
+    local look = self.look
 
     local daylight = 0
     if hour >= 6 and hour <= 19 then daylight = max(0, sin(pi * (hour - 6) / 13)) end
@@ -82,8 +84,10 @@ function DayNight:update(dt)
         local pal = require("World.OWM3d.sky").paletteAt(hour)
         local dim = (0.25 + 0.75 * min(1, daylight * 2.5)) * 0.92
         sr, sg, sb = pal.sun[1] * dim, pal.sun[2] * dim * 0.92, pal.sun[3] * dim * 0.82
+        if look and look.daySun then sr, sg, sb = sr * look.daySun[1], sg * look.daySun[2], sb * look.daySun[3] end
     else
         sr, sg, sb = 0.13, 0.15, 0.24                    -- moonlight (keeps the shadow map alive)
+        if look and look.moon then sr, sg, sb = look.moon[1], look.moon[2], look.moon[3] end
     end
     local ca = cos(el)
     scene:SetSun(-dx * ca, sin(el), -dz * ca, sr, sg, sb)
@@ -106,6 +110,11 @@ function DayNight:update(dt)
     local ar = (0.42 - 0.25 * nightF) * (0.85 + 0.5 * zen[1])
     local ag = (0.42 - 0.24 * nightF) * (0.85 + 0.4 * zen[2])
     local ab = (0.47 - 0.20 * nightF) * (0.85 + 0.35 * zen[3])
+    if look then
+        local d, n = look.dayAmb, look.nightAmb
+        if d then ar, ag, ab = ar * d[1], ag * d[2], ab * d[3] end
+        if n then ar, ag, ab = ar + (n[1] - ar) * nightF, ag + (n[2] - ag) * nightF, ab + (n[3] - ab) * nightF end
+    end
     scene:SetAmbient(ar, ag, ab)
 
     -- ── colour grade (dusk warmth, night blues); weather may darken it further ──
@@ -117,6 +126,15 @@ function DayNight:update(dt)
         local gr = 1.0 + 0.10 * duskW - 0.16 * nightF
         local gg = 1.0 - 0.02 * duskW - 0.09 * nightF
         local gb = 1.0 - 0.12 * duskW + 0.13 * nightF
+        if look then
+            if look.nightExposure then exp = 1.0 - (1.0 - look.nightExposure) * nightF end
+            local g = look.nightGrade
+            if g then
+                gr = 1.0 + 0.10 * duskW + (g[1] - 1.0) * nightF
+                gg = 1.0 - 0.02 * duskW + (g[2] - 1.0) * nightF
+                gb = 1.0 - 0.12 * duskW + (g[3] - 1.0) * nightF
+            end
+        end
         local weather = world.weather
         if weather and weather.applyGrade then exp, gr, gg, gb = weather:applyGrade(exp, gr, gg, gb) end
         scene:SetColorGrade(exp, gr, gg, gb)

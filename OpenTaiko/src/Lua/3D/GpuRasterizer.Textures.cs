@@ -24,6 +24,10 @@ namespace OpenTaiko {
 				b[i * 4 + 3] = sprite ? (byte)(p >> 24) : (p < 0 ? (byte)0 : (byte)255);
 				if (p < 0) _uploadOpaque = false;
 			}
+			int aniso = filter == 3 ? 8 : filter >= 30 ? filter - 30 : 0;
+			if (aniso > 0) filter = 2;
+			bool ownMips = sprite && filter == 2;
+			if (ownMips) SpreadColour(b, w, h);
 			if (tex == 0) { tex = Gl.GenTexture(); sameSize = false; }
 			Gl.BindTexture(TextureTarget.Texture2D, tex);
 			fixed (byte* dp = b) {
@@ -37,7 +41,9 @@ namespace OpenTaiko {
 			Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, wrap);
 			// SetTextureFilter opt-in: 1 linear, 2 trilinear mipmap (photo textures); default stays nearest (pixel art)
 			if (filter == 2) {
-				Gl.GenerateMipmap(TextureTarget.Texture2D);
+				if (ownMips) SpriteMips(b, w, h);
+				else Gl.GenerateMipmap(TextureTarget.Texture2D);
+				if (MaxAniso() > 1f) Gl.TexParameter(TextureTarget.Texture2D, (TextureParameterName)0x84FE, Math.Clamp((float)aniso, 1f, MaxAniso()));
 				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.LinearMipmapLinear);
 				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
 			} else if (filter == 1) {
@@ -48,6 +54,80 @@ namespace OpenTaiko {
 				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Nearest);
 			}
 			return tex;
+		}
+		// -1 = not queried, 0 = no anisotropic filtering
+		private static float s_maxAniso = -1;
+		private float MaxAniso() {
+			if (s_maxAniso >= 0) return s_maxAniso;
+			s_maxAniso = 0;
+			try {
+				int n = Gl.GetInteger(GLEnum.NumExtensions);
+				for (uint i = 0; i < n; i++)
+					if (Gl.GetStringS(StringName.Extensions, i) == "GL_EXT_texture_filter_anisotropic") { s_maxAniso = Gl.GetFloat((GLEnum)0x84FF); break; }
+			} catch (Exception) { s_maxAniso = 0; }
+			System.Diagnostics.Trace.TraceInformation("GpuRasterizer: anisotropic filtering " + (s_maxAniso > 1 ? "up to " + s_maxAniso + "x" : "not available"));
+			return s_maxAniso;
+		}
+		// transparent texels take nearby opaque colours (filtered cut-out edges)
+		private static void SpreadColour(byte[] b, int w, int h) {
+			int n = w * h;
+			var have = new bool[n]; var next = new bool[n];
+			bool any = false, all = true;
+			for (int i = 0; i < n; i++) { have[i] = b[i * 4 + 3] != 0; any |= have[i]; all &= have[i]; }
+			if (!any || all) return;
+			for (int pass = 0; pass < 12; pass++) {
+				bool grew = false;
+				Array.Copy(have, next, n);
+				for (int y = 0; y < h; y++)
+					for (int x = 0; x < w; x++) {
+						int i = y * w + x;
+						if (have[i]) continue;
+						int r = 0, g = 0, bl = 0, c = 0;
+						if (x > 0 && have[i - 1]) { r += b[(i - 1) * 4]; g += b[(i - 1) * 4 + 1]; bl += b[(i - 1) * 4 + 2]; c++; }
+						if (x < w - 1 && have[i + 1]) { r += b[(i + 1) * 4]; g += b[(i + 1) * 4 + 1]; bl += b[(i + 1) * 4 + 2]; c++; }
+						if (y > 0 && have[i - w]) { r += b[(i - w) * 4]; g += b[(i - w) * 4 + 1]; bl += b[(i - w) * 4 + 2]; c++; }
+						if (y < h - 1 && have[i + w]) { r += b[(i + w) * 4]; g += b[(i + w) * 4 + 1]; bl += b[(i + w) * 4 + 2]; c++; }
+						if (c == 0) continue;
+						b[i * 4] = (byte)(r / c); b[i * 4 + 1] = (byte)(g / c); b[i * 4 + 2] = (byte)(bl / c);
+						next[i] = true; grew = true;
+					}
+				(have, next) = (next, have);
+				if (!grew) break;
+			}
+		}
+		// 2x2 mean; alpha rescaled to keep level 0's share of texels past the 0.5 cut-out
+		private unsafe void SpriteMips(byte[] b, int w, int h) {
+			long pass0 = 0; int n0 = w * h;
+			for (int i = 0; i < n0; i++) if (b[i * 4 + 3] >= 128) pass0++;
+			double cover = pass0 / (double)n0;
+			byte[] prev = b; int pw = w, ph = h, level = 0;
+			Span<int> hist = stackalloc int[256];
+			while (pw > 1 || ph > 1) {
+				int cw = Math.Max(1, pw / 2), ch = Math.Max(1, ph / 2);
+				var cur = new byte[cw * ch * 4];
+				for (int y = 0; y < ch; y++) {
+					int y0 = Math.Min(ph - 1, y * 2), y1 = Math.Min(ph - 1, y * 2 + 1);
+					for (int x = 0; x < cw; x++) {
+						int x0 = Math.Min(pw - 1, x * 2), x1 = Math.Min(pw - 1, x * 2 + 1);
+						int a = (y0 * pw + x0) * 4, c = (y0 * pw + x1) * 4, d = (y1 * pw + x0) * 4, e = (y1 * pw + x1) * 4, o = (y * cw + x) * 4;
+						for (int k = 0; k < 4; k++) cur[o + k] = (byte)((prev[a + k] + prev[c + k] + prev[d + k] + prev[e + k] + 2) >> 2);
+					}
+				}
+				hist.Clear();
+				int n = cw * ch;
+				for (int i = 0; i < n; i++) hist[cur[i * 4 + 3]]++;
+				int want = (int)Math.Round(cover * n), cut = 255, sum = 0;
+				for (; cut > 1; cut--) { sum += hist[cut]; if (sum >= want) break; }
+				double scale = Math.Clamp(128.0 / Math.Max(cut, 1), 1.0, 6.0);
+				var up = cur;
+				if (scale > 1.001) {
+					up = (byte[])cur.Clone();
+					for (int i = 0; i < n; i++) up[i * 4 + 3] = (byte)Math.Min(255, (int)(cur[i * 4 + 3] * scale + 0.5));
+				}
+				level++;
+				fixed (byte* dp = up) Gl.TexImage2D(TextureTarget.Texture2D, level, (int)InternalFormat.Rgba8, (uint)cw, (uint)ch, 0, PixelFormat.Rgba, PixelType.UnsignedByte, dp);
+				prev = cur; pw = cw; ph = ch;
+			}
 		}
 		// replace the texels of rectangle (x0, y0)-(x1, y1), inclusive, of texture `tex` (w texels wide) with those of px
 		private unsafe void UploadRect(uint tex, int[] px, int w, int x0, int y0, int x1, int y1, ref bool opaque) {
@@ -73,7 +153,11 @@ namespace OpenTaiko {
 			int rev = te?.Rev ?? 0;
 			bool had = _glTex.TryGetValue(id, out var e);
 			if (had && e.Rev == rev) return e.Tex;
-			if (te?.Pix == null) return 0;
+			if (te?.Pix == null) {
+				if (te == null || !te.GpuOnly || !had) return 0;
+				e.Rev = rev; _glTex[id] = e;   // GPU holds the only copy
+				return e.Tex;
+			}
 			int w = te.W, h = te.H;
 			if (had && e.Rev == rev - 1 && te.SubRev == rev && e.W == w && e.H == h) {
 				// a view capture changed one rectangle since the copy here: upload that part only
@@ -84,10 +168,28 @@ namespace OpenTaiko {
 			_uploadOpaque = true;
 			e.Tex = UploadTexture(had ? e.Tex : 0, had && e.W == w && e.H == h, te.Pix, w, h, false, te.Filter);
 			e.Rev = rev; e.W = w; e.H = h; e.Opaque = _uploadOpaque; _glTex[id] = e;
+			if (s._gpuOnlyMin > 0 && (long)w * h >= s._gpuOnlyMin && te.SubRev == 0) _gpuOnlyDue.Add((false, id, rev, _frame));
 			return e.Tex;
 		}
+		private readonly List<(bool sprite, int id, int rev, int frame)> _gpuOnlyDue = new();
+		// drops CPU copies after two frames while still the entry's pixels
+		private void ReleaseGpuOnly(Lua3DScene s) {
+			if (_gpuOnlyDue.Count == 0) return;
+			for (int i = _gpuOnlyDue.Count - 1; i >= 0; i--) {
+				var d = _gpuOnlyDue[i];
+				if (_frame - d.frame < 2) continue;
+				_gpuOnlyDue.RemoveAt(i);
+				TexEntry? te;
+				if (d.sprite) { if (!s._sprites.TryGetValue(d.id, out te) || !_glSprite.TryGetValue(d.id, out var gs) || gs.Rev != d.rev) continue; }
+				else { if (!s._tex.TryGetValue(d.id, out te) || !_glTex.TryGetValue(d.id, out var gt) || gt.Rev != d.rev || _rttColor.ContainsKey(d.id)) continue; }
+				if (te.Pix == null || te.Rev != d.rev) continue;
+				if (!d.sprite) { var (r, g, b) = TexAverage(s, d.id); te.AvR = r; te.AvG = g; te.AvB = b; }
+				te.Pix = null; te.GpuOnly = true;
+			}
+		}
 		// whether a draw with this texture id shows anything (registered pixels or a live GPU target)
-		private bool HasTex(Lua3DScene s, int id) => _rttColor.ContainsKey(id) || s.TryTex(id, out _);
+		private bool HasTex(Lua3DScene s, int id) => _rttColor.ContainsKey(id) || s.TryTex(id, out _)
+			|| (_glTex.ContainsKey(id) && s._tex.TryGetValue(id, out var only) && only.GpuOnly);
 		// whether texture id shows and has no cut-out texel, so an alpha test with it discards nothing (uploads it when needed)
 		private bool OpaqueTex(Lua3DScene s, int id) {
 			if (_rttColor.ContainsKey(id) || TexFor(s, id) == 0) return false;
@@ -186,12 +288,17 @@ namespace OpenTaiko {
 			int rev = se?.Rev ?? 0;
 			bool had = _glSprite.TryGetValue(id, out var e);
 			if (had && e.Rev == rev) return e.Tex;
-			if (se?.Pix == null) return 0;
+			if (se?.Pix == null) {
+				if (se == null || !se.GpuOnly || !had) return 0;
+				e.Rev = rev; _glSprite[id] = e;
+				return e.Tex;
+			}
 			int w = se.W, h = se.H;
 			// per-sprite filter opt-in (SetSpriteFilter): particles/foam/grass want LINEAR soft edges,
 			// while the pixel-art character billboards stay crisp NEAREST (the diorama look)
 			e.Tex = UploadTexture(had ? e.Tex : 0, had && e.W == w && e.H == h, se.Pix, w, h, true, se.Filter);
 			e.Rev = rev; e.W = w; e.H = h; _glSprite[id] = e;
+			if (s._gpuOnlyMin > 0 && (long)w * h >= s._gpuOnlyMin) _gpuOnlyDue.Add((true, id, rev, _frame));
 			return e.Tex;
 		}
 

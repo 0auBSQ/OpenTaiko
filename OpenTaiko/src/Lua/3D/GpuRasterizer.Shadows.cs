@@ -153,7 +153,7 @@ namespace OpenTaiko {
 			double shl = Math.Sqrt(sdx * sdx + sdz * sdz);
 			double rx, rz; if (shl > 1e-6) { rx = sdz / shl; rz = -sdx / shl; } else { rx = 1; rz = 0; }   // horizontal ⟂ to sun
 			foreach (var o in s._objects.Values) {
-				if (o.Kind != 3 || o.N <= 0 || !o.Visible || !o.CastShadow) continue;   // only billboard sprites (Kind 3); Kind 4 = flat decals; CastShadow=false skips UI markers/bubbles
+				if (o.Kind != 3 || o.N <= 0 || !o.Visible || !o.CastShadow || o.AfterPost) continue;   // only billboard sprites (Kind 3); Kind 4 = flat decals; CastShadow=false skips UI markers/bubbles
 				var d = o.D; var t = o.Transform;
 				uint curTex = uint.MaxValue; int curSprite = -1, start = _casterVerts.Count / STRIDE;
 				void Flush() { int cnt = _casterVerts.Count / STRIDE - start; if (cnt > 0) _casterBatches.Add(new CBatch { Tex = curTex, Sprite = curSprite, Start = start, Count = cnt }); start = _casterVerts.Count / STRIDE; }

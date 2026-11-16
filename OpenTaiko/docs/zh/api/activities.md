@@ -395,6 +395,7 @@ info.DanGrade 和 info.PreviousNameplateDan 返回的对象，只读。
 | `state.landCount  -> number[]` | 自背景启动以来每个玩家已到达飞行终点的飞行音符。 |
 | `state:SetFlyTarget(player, x, y)` | 在此演奏背景显示期间，该玩家的飞行音符落在以屏幕像素计的 (x, y) 处，并省略皮肤的落点效果。 |
 | `state:ClearFlyTarget(player)` | 该玩家的飞行音符重新落在皮肤通常的位置。 |
+| `state:SetCrowdHidden(hidden)` | 在此演奏背景显示期间，传入 true 会不再绘制画在下层背景之上的舞者和观众，传入 false 则重新绘制。新的背景开始时会绘制它们。 |
 
 ## 过渡
 

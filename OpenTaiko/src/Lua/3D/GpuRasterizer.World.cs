@@ -13,6 +13,7 @@ namespace OpenTaiko {
 		internal const int PAL_TEX = int.MinValue;
 		private sealed class ObjCache {
 			public uint Vbo; public int Version = int.MinValue; public readonly List<OBatch> Batches = new();
+			public int Bytes;
 			public SurfProg? Surf; public string? SurfSrc;   // the custom surface program last resolved for this object
 			public readonly List<Piece> Pieces = new(); public int PieceVersion = int.MinValue;   // transparent queue pieces
 			public int Serial;                                // bumped by every rebuild of the buffer
@@ -223,6 +224,7 @@ namespace OpenTaiko {
 			Walk(o, ref b); b.Flush();
 			Gl.BindBuffer(BufferTargetARB.ArrayBuffer, c.Vbo);
 			Gl.BufferData<float>(BufferTargetARB.ArrayBuffer, (ReadOnlySpan<float>)CollectionsMarshal.AsSpan(_tmp), BufferUsageARB.StaticDraw);
+			c.Bytes = _tmp.Count * sizeof(float);
 			_stUploads++; _stUploadVerts += _tmp.Count / STRIDE;
 			return c;
 		}
@@ -299,17 +301,18 @@ namespace OpenTaiko {
 				DrawMerged(mb);
 			}
 			foreach (var o in _opaque) DrawObj(s, o, litScene);
+			DrawGrassTile(s);                                    // tuft cards (cutout, depth-written)
 			DrawGrass(s);                                        // wind-swayed blade field (cutout, depth-written)
 			foreach (var o in _screenTex) if (o.Pass == 0) DrawScreenTex(s, o);   // OPAQUE mirrors/portals (depth-written)
 			// pass boundary: assert opaque state (never assume); soft sprite edges must not lower the canvas alpha
 			GlPass.Covered(Gl);
 			Bind3D(_spriteVbo);
-			foreach (var bt in _sprBatches) if (bt.Pass == 0) DrawSprite(bt);
+			foreach (var bt in _sprBatches) if (bt.Pass == 0 && !bt.Obj.AfterPost) DrawSprite(bt);
 			// the sky on the pixels the opaque world left uncovered (the depth test skips the rest, before they shade); the
 			// transparent pass blends over it
 			if (_skyOk) {
 				DrawSky(s, w, h, skyOwnBasis);
-				Gl.UseProgram(_worldShadow ? _progShadow : _prog); Gl.BindVertexArray(_vao);
+				Gl.UseProgram(WorldProg); Gl.BindVertexArray(_vao);
 			}
 
 			// Transparent pass, no depth write. The surfaces come first: translucent screen-tex surfaces (water, whose
@@ -320,7 +323,7 @@ namespace OpenTaiko {
 			GlPass.Transparent(Gl);
 			foreach (var o in _screenTex) if (o.Pass == 1) DrawScreenTex(s, o);
 			Bind3D(_spriteVbo);
-			foreach (var bt in _sprBatches) if (bt.Pass == 1 && bt.Obj.Kind == 4) DrawSprite(bt);
+			foreach (var bt in _sprBatches) if (bt.Pass == 1 && bt.Obj.Kind == 4 && !bt.Obj.AfterPost) DrawSprite(bt);
 			DrawQueue(s, litScene);
 
 			// X-RAY silhouettes: sprites flagged ObjSetXray re-draw ONLY where they lost the depth test
@@ -335,6 +338,7 @@ namespace OpenTaiko {
 				foreach (var bt in _sprBatches) {
 					var o = bt.Obj;
 					if (o.XrayAlpha <= 0) continue;
+					USprLit((float)o.SpriteLit);
 					UTint((float)(o.TintR * 0.75), (float)(o.TintG * 0.85), (float)o.TintB);
 					UAlpha((float)(o.A / 255.0 * o.XrayAlpha));
 					Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, bt.Tex);
@@ -381,6 +385,7 @@ namespace OpenTaiko {
 			uint t1 = TexFor(s, o.LayerTex1), t2 = TexFor(s, o.LayerTex2), t3 = TexFor(s, o.LayerTex3), t4 = TexFor(s, o.LayerTex4);
 			uint sp = SpriteFor(s, o.SplatSprite);
 			if (t1 == 0 || sp == 0) return;
+			if (o.TerrainMaps && DrawTerrainObj(s, o, c, t1, t2, t3, t4, sp)) return;
 			UMode(5);
 			Gl.Uniform1(_uTex2, 2); Gl.Uniform1(_uTex3, 3); Gl.Uniform1(_uTex4, 4); Gl.Uniform1(_uSplat, 5);
 			Gl.Uniform2(_uSplatSize, o.SplatW, o.SplatH);
