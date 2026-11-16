@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0.11] - 2026-11-16 (Beta)
+
+- [Feat] Add a background state command allowing to hide Dancers and Mobs for custom game modes
+- [Enhancement] Reduce the polygon count of the Jukebox in My Room
+- [Chore] Add `--stage` in command line to open the game directly on a given global stage to facilitate their testing
+- [Chore] 3D engine additions for experimental/unreleased stages yet (no changes in my room/tower select) and minor optimizations
+
 ## [0.7.0.10] - 2026-11-13 (Beta)
 
 - [Fix] Add an effort value for charts to avoid rewarding too much charts with very little notecount and very high set level
