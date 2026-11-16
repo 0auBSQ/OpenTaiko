@@ -52,8 +52,20 @@ internal class CActSelectDanList {
 	public static void tDisplayDanIcon(int count, float x, float y, int opacity, float scale, bool showFade = false) {
 		pfDanIconTitle ??= HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.DaniSelect_DanIconTitle_Size);
 
-		string ex = count switch { 1 => "st", 2 => "nd", 3 => "rd", _ => "th" };
-		TitleTextureKey ttkTmp = new TitleTextureKey(count.ToString() + ex, pfDanIconTitle, Color.White, Color.Black, 1000);
+		string ex;
+		if (count == 1) {
+			ex = CLangManager.LangInstance.GetString("DAN_ST", count);
+		} else if (count / 10 % 10 == 1) {
+			ex = CLangManager.LangInstance.GetString("DAN_TH", count);
+		} else {
+			ex = (count % 10) switch {
+				1 => CLangManager.LangInstance.GetString("DAN_UNIEME", count),
+				2 => CLangManager.LangInstance.GetString("DAN_ND", count),
+				3 => CLangManager.LangInstance.GetString("DAN_RD", count),
+				_ => CLangManager.LangInstance.GetString("DAN_TH", count)
+			};
+		}
+		TitleTextureKey ttkTmp = new TitleTextureKey(ex, pfDanIconTitle, Color.White, Color.Black, 1000);
 
 		if (showFade && OpenTaiko.Tx.Dani_DanIcon_Fade != null) {
 			OpenTaiko.Tx.Dani_DanIcon_Fade.vcScaleRatio = new Silk.NET.Maths.Vector3D<float>(scale, scale, 1.0f);

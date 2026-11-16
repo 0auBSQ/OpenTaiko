@@ -399,6 +399,11 @@
 		"ONLINE_MULTIPLAYER": "온라인 멀티플레이 (사용 불가)",
 
 		// Dan Dojo
+		"DAN_ST": "{0}st",
+		"DAN_ND": "{0}nd",
+		"DAN_RD": "{0}rd",
+		"DAN_TH": "{0}th",
+		"DAN_UNIEME": "{0}st",
 		"DAN_CONDITION_NAME_SOUL": "게이지",
 		"DAN_CONDITION_NAME_GOOD": "얼쑤 개수",
 		"DAN_CONDITION_NAME_OK": "좋다 개수",

@@ -399,6 +399,11 @@
 		"ONLINE_MULTIPLAYER": "オンラインマルチプレイ (準備中)",
 
 		// Dan Dojo
+		"DAN_ST": "{0}st",
+		"DAN_ND": "{0}nd",
+		"DAN_RD": "{0}rd",
+		"DAN_TH": "{0}th",
+		"DAN_UNIEME": "{0}st",
 		"DAN_CONDITION_NAME_SOUL": "魂ゲージ",
 		"DAN_CONDITION_NAME_GOOD": "良の数",
 		"DAN_CONDITION_NAME_OK": "可の数",

@@ -136,18 +136,20 @@ local exam_val_scroll_x = 0.0  -- horizontal scroll for individual ExamValue blo
 
 local function ordinal(n)
     local mod100 = n % 100
-    local suffix
-    if mod100 >= 11 and mod100 <= 13 then
-        suffix = "th"
+    local ordinal
+    if n == 1 then
+        ordinal = LANG:GetString("DAN_ST", n)
+    elseif mod100 >= 11 and mod100 <= 13 then
+        ordinal = LANG:GetString("DAN_TH", n)
     else
         local mod10 = n % 10
-        if     mod10 == 1 then suffix = "st"
-        elseif mod10 == 2 then suffix = "nd"
-        elseif mod10 == 3 then suffix = "rd"
-        else                    suffix = "th"
+        if     mod10 == 1 then ordinal = LANG:GetString("DAN_UNIEME", n)
+        elseif mod10 == 2 then ordinal = LANG:GetString("DAN_ND", n)
+        elseif mod10 == 3 then ordinal = LANG:GetString("DAN_RD", n)
+        else                   ordinal = LANG:GetString("DAN_TH", n)
         end
     end
-    return tostring(n) .. suffix
+    return ordinal
 end
 
 -- Returns the stamp RGB (1-based song index) and a darkened version for outline.
