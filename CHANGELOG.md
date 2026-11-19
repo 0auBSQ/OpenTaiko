@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.7.0.12] - 2026-11-19 (Beta)
+
+- [Fix] Move theme settings to global to prevent them being wiped on skin update
+- [Fix] Results Background were still parsed through the legacy Backgrounds folder and script which is unintended behavior
+
 ## [0.7.0.11] - 2026-11-16 (Beta)
 
 - [Feat] Add a background state command allowing to hide Dancers and Mobs for custom game modes
