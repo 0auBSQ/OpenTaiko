@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global, lowercase-global, need-check-nil
--- SimpleUI toggle / checkbox: a control + side label. The knob/check springs on change.
+-- SimpleUI toggle / checkbox: control plus side label
 --   ui:toggle{ text="Fullscreen", x=, y=, value=true, onChange=function(v) end }
 --   ui:checkbox{ text="Mute", x=, y=, value=false, onChange=fn }   (variant="checkbox")
 
@@ -43,7 +43,7 @@ function Toggle:onActivate()
     self:setValue(not self.value)
 end
 
--- the tick: two strokes with round ends
+-- check mark: two round-ended strokes
 local function bakeCheck(cv, m, cw, ch, a)
     local x0, y0 = m + cw * 0.24, m + ch * 0.52
     local x1, y1 = m + cw * 0.42, m + ch * 0.72
@@ -88,7 +88,7 @@ function Toggle:restyle()
             Shape.fillRound(knob, m + 3, m + 3, kd - 6, kd - 6, (kd - 6) * 0.5, { 255, 255, 255, 255 })
         end, { m = m, d = kd })
     end
-    -- side label (glyph-composed; +50 = the padding the glyph box keeps)
+    -- side label width (+50 = glyph box padding)
     self._labelInk = self.mgr:measureText(self.eff.font.label, self.text)
     self.h = math.max(ch, self.mgr:textHeight(self.eff.font.label))
     self.w = cw + self.gap + (self._labelInk > 0 and self._labelInk + 50 or 0)
@@ -106,8 +106,8 @@ function Toggle:draw()
     local ctrlCX = self.x + cw * 0.5
     local ctrlCY = self.y + self.h * 0.5
     local s = self._scaleCur
-    local op = self.enabled and 1 or 0.5      -- a disabled toggle fades its label
-    -- focus ring around the control
+    local op = self.enabled and 1 or 0.5      -- disabled: label at half opacity
+    -- focus ring
     if self._ring and self._hiCur > 0.01 then
         self:drawPiece(self._ring, self.x + self.w * 0.5, self.y + self.h * 0.5, s, self._hiCur)
     end

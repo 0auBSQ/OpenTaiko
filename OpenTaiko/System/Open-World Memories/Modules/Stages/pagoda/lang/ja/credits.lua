@@ -1,4 +1,4 @@
--- Japanese for story/credits.lua; a missing key shows the English.
+-- Japanese for story/credits.lua; missing keys fall back to English
 
 local T = {}
 

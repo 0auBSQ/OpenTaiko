@@ -1,4 +1,4 @@
--- Pagoda menu, challenge and practice logic.
+-- pagoda menu and run logic
 
 local NavInput   = require("NavInput")
 local EM         = require("EventMode")
@@ -72,16 +72,16 @@ local function _start_options()
     return Run.startOptions()
 end
 
--- for Script.lua's title scene, which darkens the floors above it
+-- for Script.lua's title scene (darkens the floors above)
 function M.highest_level() return save.highest_level() end
 
--- true on the screens drawn over the title tower; drawing it under the others would also move the selector's camera
+-- screens drawn over the title tower; under the others it would move the selector's camera
 function M.shows_title_scene()
     return not (_pagoda_state == "story" or _pagoda_state == "floor_transition"
                 or _pagoda_state == "floor_enter" or _pagoda_state == "floor_result")
 end
 
--- returns grey (0..1) and whether the sky shows this frame
+-- returns grey 0..1, sky shown this frame
 function M.sky()
     local g, v = nil, nil
     if _pagoda_state == "floor_enter" then g, v = floor_ent.sky()
@@ -128,7 +128,7 @@ local function _open_checkpoint_select()
     selector.open("checkpoint", _start_options(), _challenge_level, _selector_info())
 end
 
--- "abort" returns to the checkpoint selector, "proceed" goes on to the floor transition
+-- "abort": back to the checkpoint selector; "proceed": on to the floor transition
 local function _start_story(level)
     local scene = stories.pick(level, save.highest_level(), save.story_first_seen())
     save.mark_story_first_seen()
@@ -155,7 +155,7 @@ local function _open_transition()
 end
 
 local function _open_practice_select()
-    -- selector.open() falls back to the bottom floor if the level isn't listed
+    -- unlisted level: selector.open() falls back to the bottom floor
     selector.open("practice", Run.practiceLevels(), _practice_hover or _practice_level, _selector_info())
 end
 
@@ -166,7 +166,7 @@ local function _floor_speed(level)
     return Floor.speed(level)
 end
 
--- rolls and caches the level's songs and sets _preview_speed; avoid: optional song ids to skip while the pools have others
+-- caches the roll, sets _preview_speed; avoid: song ids skipped while the pools have others
 local function _build_preview(level, avoid)
     local roll = Floor.rollFloor(level, avoid, songs.get_song_list())
     _preview_songs  = roll.songs
@@ -182,7 +182,7 @@ local function _clear_preview()
     _preview_level  = -1
 end
 
--- Tambourine reroll: avoids the current songs where the pools allow; keepMystery keeps the mystery song; returns the new roll
+-- Tambourine reroll, avoiding current songs; keepMystery keeps the mystery song
 local function _reroll_floor(keepMystery)
     local level = _challenge_level
     local avoid, purple = {}, _preview_purple
@@ -278,7 +278,7 @@ end
 function M.enter(CB)
     _CB    = CB
     save.migrate_save()
-    play_setup.finish()          -- restores the player's mods after a play the game never returned from
+    play_setup.finish()          -- restores mods after a play with no return
     _btn_timer    = 0.15
     _status_msg   = ""
     _status_timer = 0.0
@@ -355,7 +355,7 @@ function M.on_return(CB)
         end
         floor_res.open(played, ctx, passed and "clear" or "fail", got)
         _pagoda_state = "floor_result"
-        -- no title BGM: the result screen, then the transition or the title, own the audio
+        -- no title BGM: the result screen owns the audio, then the transition or title
     elseif _in_practice then
         -- practice has no result screen: back to the selector on the played floor
         _in_practice  = false
@@ -481,7 +481,7 @@ function M.update(dt)
     if _pagoda_state == "floor_result" then
         local r = floor_res.update(dt, navPn)
         if r == "clear" then
-            -- small_talk.roll may give a talk to play before the transition
+            -- small_talk.roll: optional talk before the transition
             local talk = small_talk.roll(_cleared_level)
             if talk ~= nil then
                 _pagoda_state = "story"
@@ -608,7 +608,7 @@ function M.draw()
             COLOR:CreateColorFromRGBA(sc[1], sc[2], sc[3], alpha)):DrawAtAnchor(cx, res_h - Status.bottom_offset, "center")
     end
 
-    -- nameplate only (no character or puchichara), hidden on the full-screen scenes
+    -- nameplate only, hidden on full-screen scenes
     local scene_state = (_pagoda_state == "story" or _pagoda_state == "floor_transition"
                          or _pagoda_state == "floor_enter" or _pagoda_state == "floor_result")
     if not selector.active and not scene_state then

@@ -1,7 +1,4 @@
 -- One encounter song bar, drawn through its transform b.xf (encounter/bar_text's xf).
--- A bar is an entry of encounter/song_reveal; prepare() adds its layouts; draw() reads b.xf, b.alpha,
--- b.crack (0..3), b.flames, b.revealed, b.pops, b.flavor, b.flavorA, b.flavorT (scroll time),
--- b.emblemPop and b.veil (0..1, the lifted darkness).
 
 local I18N  = require("i18n")
 local data  = require("encounter/songbars_data")
@@ -165,7 +162,7 @@ local function at(tx, xf, lx, ly, k, alpha, c, blend)
     reset(tx)
 end
 
--- raises what is darker than c to c (a Sub then an Add pass of one tile), so only the dark letter faces show it
+-- raises what is darker than c to c (Sub then Add pass of one tile); only dark letter faces show it
 local function checker(tx, xf, c, alpha)
     if not ready(tx) or alpha <= 0 then return end
     local bar = data.bar
@@ -258,8 +255,8 @@ local function flavorLayout(b)
     return lay
 end
 
--- characters i..j of one repeat from local x0, in one draw; flip draws the line reversed and turned
--- half a turn, which puts each letter upside down in its own place
+-- characters i..j of one repeat from local x0, in one draw; flip: reversed, turned 180 degrees
+-- (each letter upside down in its own place)
 local function flavorRun(lay, xf, x0, i, j, ly, flip, fore, alpha)
     local c1, c2 = lay.chars[i], lay.chars[j]
     local s = xf.s * FLAVOR_SIZE
@@ -333,6 +330,8 @@ local function darkness(tex, b, xf, alpha)
     if b.flames ~= nil then b.flames:draw(ft, fm, xf, look.glow, true, alpha) end
 end
 
+-- b: an entry of encounter/song_reveal (layouts from prepare()); reads b.xf, b.alpha, b.crack (0..3),
+-- b.flames, b.revealed, b.pops, b.flavor, b.flavorA, b.flavorT (scroll time), b.emblemPop, b.veil (0..1)
 -- tex = key -> handle of the bars' textures
 function M.draw(b, tex)
     local xf = b.xf

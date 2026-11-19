@@ -1,6 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Mob 1: a 3-layer crowd that slides in when the gauge fills (100), idle-bobs while up, and slides out.
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
+-- mob 1: 3-layer crowd (in at gauge 100, bpm bob)
 
 local mob_x = 0
 local mob_front_y = 0

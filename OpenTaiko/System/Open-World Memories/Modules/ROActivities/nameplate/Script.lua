@@ -1,6 +1,4 @@
--- NamePlate ROActivity
--- Ported from Modules/NamePlate/Script.lua to the new Lua API.
--- Textures are loaded from the module's Textures/ folder.
+-- NamePlate ROActivity.
 -- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
 
 local Config = require("Core.Config")
@@ -72,10 +70,9 @@ local slash = nil
 
 local title_stars_folders = { "1", "2", "3", "4" }
 local title_stars = { { } }
--- the rarity stars are the difficulty bars' level star sprites and glitter the same way: each star pulses
--- additively over itself and two glints (Stars/glint.png) blink in turn beside it. STAR_SPOTS = each
--- overlay's star centres, sprite widths and clockwise rotations (the stars fan: left as drawn, middle
--- upright, right leaning the other way); the glint offsets are the bars' own, turned with each star.
+-- rarity stars glitter as the difficulty bars' level stars (Stars/glint.png glints)
+-- STAR_SPOTS: per overlay, star centres, sprite widths and clockwise rotations
+-- glint offsets: the bars' own, turned with each star
 local star_glint = nil
 local star_time = 0
 local RARITY = Layout.rarity_stars
@@ -99,7 +96,7 @@ local font_title = nil
 local font_dan = nil
 
 local player_data = { nil, nil, nil, nil, nil }
--- Stores the raw text and color for each player slot so the text can be drawn at draw time
+-- per player slot: raw text and colour, drawn at draw time
 local name_text    = { nil, nil, nil, nil, nil }
 local title_text   = { nil, nil, nil, nil, nil }
 local dan_text     = { nil, nil, nil, nil, nil }  -- coloured dan string (gold or normal)
@@ -110,9 +107,7 @@ local title_bg     = nil
 local titleplate_counter = 0
 local namePlateEffect_counter = 0
 
--- ────────────────────────────────────────────────────────────────────────────
--- Helpers
--- ────────────────────────────────────────────────────────────────────────────
+-- ==== Helpers ====
 
 local function tableContains(t, value)
 	for i = 1, #t do
@@ -194,7 +189,7 @@ local function implDrawRarityStars(o_x, o_y, opacity, rarity)
 		local ox, oy = x + config_title_plate_offset_x, y + config_title_plate_offset_y
 		tx_titlestar:SetOpacity(op)
 		tx_titlestar:DrawAtAnchor(ox, oy, "topleft")
-		-- the glitter: each star's patch of the overlay pulses additively with its own phase, then its glints
+		-- glitter: additive pulse per star patch (own phase), then its glints
 		local spots = STAR_SPOTS[star_count]
 		local t = star_time
 		tx_titlestar:SetBlendMode("add")
@@ -276,9 +271,7 @@ local function drawDanTitlePlate(x, y, opacity, danType)
 	dan_plategradation[danType]:DrawAtAnchor(x + config_title_plate_offset_x, y + config_title_plate_offset_y, "topleft")
 end
 
--- ────────────────────────────────────────────────────────────────────────────
--- ROActivity lifecycle
--- ────────────────────────────────────────────────────────────────────────────
+-- ==== ROActivity lifecycle ====
 
 function onStart()
 	for i = 0, nameplate_count - 1 do
@@ -352,13 +345,13 @@ function onStart()
 	font_title            = TEXT:CreateGlyphCached(config_font_title_size, "regular")
 	font_dan              = TEXT:CreateGlyphCached(config_font_dan_size, "regular")
 
-	-- Cached color objects for title plate text (black on transparent)
+	-- cached COLOR objects for the title plate text
 	title_fg = Config.color(Layout.title_text_color)
 	title_bg = Config.color(Layout.title_text_back_color)
 end
 
 function activate() end
--- activate(player, name, title, dan, data) — replaces setInfos; stores player info for draw
+-- stores player info for draw (replaces setInfos)
 function activate(player, name, title, dan, data)
 	local player_lua = player + 1
 	player_data[player_lua] = data
@@ -381,9 +374,8 @@ function update()
 	star_time = (star_time + fps.deltaTime * 1000) % STAR_TIME_WRAP
 end
 
--- ── Shared full-nameplate renderer ───────────────────────────────────────────
--- Modes 0, 3, 4, 5 all route through here.  Pass nil for any override to fall
--- back to the value stored in player_data / the activate()-cached text tables.
+-- ==== Shared full-nameplate renderer ====
+-- modes 0, 3, 4, 5; a nil override falls back to player_data / the activate() cache
 -- danGradeOvr is 0-based (same convention as DanType); it is clamped to [1,3] internally.
 local function implDrawFullNameplate(x, y, opacity, player_lua, side_lua,
 		titleTextOvr, titleTypeOvr, rarityIntOvr, nameplateIdOvr,
@@ -393,15 +385,13 @@ local function implDrawFullNameplate(x, y, opacity, player_lua, side_lua,
 	if data == nil then return end
 	local op = toOpacity(opacity)
 
-	-- Resolve each field: use override when provided, else activate()-cached / player_data value.
 	local titleText   = titleTextOvr   ~= nil and titleTextOvr   or title_text[player_lua]
 	local titleType   = titleTypeOvr   ~= nil and titleTypeOvr   or data.TitleType
 	local rarityInt   = rarityIntOvr   ~= nil and rarityIntOvr   or data.TitleRarityInt
 	local nameplateId = nameplateIdOvr ~= nil and nameplateIdOvr or (data.TitleId or "")
 	local danText     = danTextOvr     ~= nil and danTextOvr     or dan_text[player_lua]
 	local danShortTxt = danTextOvr     ~= nil and danTextOvr     or dan_short_text[player_lua]
-	-- In AI battle the dan reflects the current AI level, which may change during song select.
-	-- Read it live so the nameplate stays in sync without any cross-state refresh.
+	-- AI battle: dan from the live AI level (it changes during song select)
 	if CONFIG.IsAIBattleMode and player_lua == 2 then
 		local stages = {"初", "二", "三", "四", "五", "六", "七", "八", "九", "極"}
 		local aiDan = stages[math.max(1, math.min(10, CONFIG.AILevel))] .. "面"
@@ -468,7 +458,7 @@ local function implDrawFullNameplate(x, y, opacity, player_lua, side_lua,
 	end
 end
 
--- draw(mode, ...) — unified draw entry point.
+-- draw(mode, ...):
 --   mode 0: full player nameplate                    → draw(0, x, y, opacity, player, side)
 --   mode 1: dan plate only                           → draw(1, x, y, opacity, danType, titleTex)
 --   mode 2: title plate only                         → draw(2, x, y, opacity, titletype, titleTex, rarityInt, nameplateId)
@@ -480,13 +470,13 @@ function draw(mode, ...)
 	local args = {...}
 
 	if mode == 0 then
-		-- All fields from player_data / activate cache — no overrides.
+		-- no overrides
 		local x, y, opacity, player, side = args[1], args[2], args[3], args[4], args[5]
 		implDrawFullNameplate(x, y, opacity, player + 1, side + 1,
 			nil, nil, nil, nil, nil, nil, nil)
 
 	elseif mode == 1 then
-		-- ── Dan plate only ──
+		-- ==== Dan plate only ====
 		local o_x, o_y, opacity, danType, titleTex = args[1], args[2], args[3], args[4], args[5]
 		local x  = o_x + PLATE_ONLY.offset_x
 		local y  = o_y + PLATE_ONLY.offset_y
@@ -537,7 +527,7 @@ function draw(mode, ...)
 			titleText, titleType, rarityInt, nameplateId, danText, danGrade, playerName)
 
 	elseif mode == 2 then
-		-- ── Title plate only ──
+		-- ==== Title plate only ====
 		local o_x, o_y, opacity, titletype, titleTex, rarityInt, nameplateId =
 			args[1], args[2], args[3], args[4], args[5], args[6], args[7]
 		local x  = o_x + PLATE_ONLY.offset_x

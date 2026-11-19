@@ -1,7 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- nokon_curtain_back: Intro Nokon's stage curtain on the way back to the title (and the fast way in).
--- The two Curtain_Open.png halves slide shut over the outgoing screen (fadeOut), hold closed while the next
--- stage loads (loading — the seam is hidden by the full Curtain.jpg), then part to reveal it (fadeIn).
+-- nokon_curtain_back: Intro Nokon curtain on the way back to the title (and the fast way in)
 
 local TA = require("TransitionArt")
 
@@ -21,7 +19,7 @@ local snd_curtain = nil
 local lastPhase = nil                    -- "out" | "loading" | "in" (for one-shot curtain sfx per phase)
 local wait = TA.new()
 
--- the textures live only during a trip (Lib/TransitionArt)
+-- textures live only during a trip (Lib/TransitionArt)
 local function loadTextures()
 	if tx_closed ~= nil then return end
 	tx_closed = TEXTURE:CreateTexture("Textures/Curtain.jpg")
@@ -36,13 +34,13 @@ end
 -- openness: 0 = fully shut, 1 = fully open (halves off-screen)
 local function draw_curtain(openness)
 	if openness <= 0 then
-		if tx_closed then tx_closed:Draw(0, 0) end   -- seamless closed image
+		if tx_closed then tx_closed:Draw(0, 0) end   -- full image, hides the seam
 		return
 	end
 	if tx_open == nil or tx_open.Width <= 0 then return end
 	local off = math.floor(openness * CURTAIN_W)
-	tx_open:DrawRect(-off,            0,         0, 0, CURTAIN_W, SCREEN_H)   -- left half slides left
-	tx_open:DrawRect(CURTAIN_W + off, 0, CURTAIN_W, 0, CURTAIN_W, SCREEN_H)   -- right half slides right
+	tx_open:DrawRect(-off,            0,         0, 0, CURTAIN_W, SCREEN_H)
+	tx_open:DrawRect(CURTAIN_W + off, 0, CURTAIN_W, 0, CURTAIN_W, SCREEN_H)
 end
 
 local function phaseSfx(phase)
@@ -52,7 +50,7 @@ local function phaseSfx(phase)
 	end
 end
 
--- Close the curtain over the outgoing screen: t 0→1 = open → shut.
+-- t 0..1: open -> shut
 function fadeOut(t)
 	if lastPhase ~= "out" then loadTextures(); wait:reset() end   -- a new trip
 	phaseSfx("out")
@@ -60,13 +58,13 @@ function fadeOut(t)
 	draw_curtain(1.0 - t)
 end
 
--- Hold shut while the next stage loads behind it.
+-- held shut while the next stage loads
 function loading(progress, elapsed)
 	lastPhase = "loading"
 	draw_curtain(0)
 end
 
--- Part the curtain to reveal the loaded stage: t 0→1 = shut → open.
+-- t 0..1: shut -> open
 function fadeIn(t)
 	phaseSfx("in")
 	draw_curtain(t)

@@ -1,4 +1,4 @@
--- Dutch for story/story_*.lua; a missing key shows the English.
+-- Dutch for story/story_*.lua; missing keys fall back to English
 
 local T = {}
 

@@ -1,7 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Down background 0 (TaikoClub): a static base with a horizontally scrolling foreground band
--- that rises/bounces into view on clear (bgClearAnime), plus a clear-state fade overlay.
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
+-- down background 0: TaikoClub
 
 local loopWidth = 1920
 

@@ -226,8 +226,8 @@ end
 | `modicons` | 调用一次 `activate()`，然后调用 `draw(x, y, player, layout, alpha)`，layout 为 "menu" 或 "game"。MODICONS 全局对象封装了它。 |
 | `danplate` | 在结算界面和段位课程中调用 `draw(x, y, opacity, danTick, r, g, b, titleText)`。 |
 | `results_tower` | 打开塔结算画面时以 LuaResultInfo 传入本次游玩并调用 `activate(info)`（只读的 getter，如 `ReachedFloor`、`TotalFloors`、`Lives`、`TowerRank`、`IsNewBestFloor`、`GetScore(player)`）；每帧 `update()` 和 `draw()`；确认时通过 Call 调用 `skip()`，仍在播放动画时返回 true（这次确认只会跳过动画）；`deactivate()`。 |
-| `results_regular` | 打开一局（包括 AI 对战）的结算画面时以 LuaResultInfo 传入本局并调用 `activate(info)`（从 0 开始的按玩家 getter，如 `GetGauge(p)`、`GetClearType(p)`、`GetScoreRank(p)`、`GetScore(p)`，以及 `IsAIBattle`、`GetAISectionEnd(i)`）；每帧在结算背景之上 `update()` 和 `draw()`；确认时通过 Call 调用 `skip()`，仍在播放动画时返回 true（背景随后收到 `skipAnime`）；`deactivate()`。 |
-| `results_dan` | 打开段位结算画面时以 LuaResultInfo 传入本局并调用 `activate(info)`（`DanResult`、`DanCombo`、`GetDanSong(i)`、`GetExam(i)`、`exam:GetSong(i)`、`exam.PreviousBestAmount`、`DanGradeChange`、`DanGrade`）；每帧在段位结算背景之上 `update()` 和 `draw()`；确认时通过 Call 调用 `skip()`，仍在播放动画时返回 true；随后确认时通过 Call 调用 `advance()`，在奖励弹窗之前还要显示一个画面时返回 true（引擎已把新的或更好的段位写到名牌上，因此模块在揭晓之前绘制 `PreviousNameplateDan`）；按左或右时通过 Call 调用 `swap()`，切换画面时返回 true；`deactivate()`。 |
+| `results_regular` | 打开一局（包括 AI 对战）的结算画面时以 LuaResultInfo 传入本局并调用 `activate(info)`（从 0 开始的按玩家 getter，如 `GetGauge(p)`、`GetClearType(p)`、`GetScoreRank(p)`、`GetScore(p)`，以及 `IsAIBattle`、`GetAISectionEnd(i)`）；每帧 `update()` 和 `draw()`（包括结算背景）；确认时通过 Call 调用 `skip()`，仍在播放动画时返回 true；`deactivate()`。 |
+| `results_dan` | 打开段位结算画面时以 LuaResultInfo 传入本局并调用 `activate(info)`（`DanResult`、`DanCombo`、`GetDanSong(i)`、`GetExam(i)`、`exam:GetSong(i)`、`exam.PreviousBestAmount`、`DanGradeChange`、`DanGrade`）；每帧 `update()` 和 `draw()`（包括段位结算背景）；确认时通过 Call 调用 `skip()`，仍在播放动画时返回 true；随后确认时通过 Call 调用 `advance()`，在奖励弹窗之前还要显示一个画面时返回 true（引擎已把新的或更好的段位写到名牌上，因此模块在揭晓之前绘制 `PreviousNameplateDan`）；按左或右时通过 Call 调用 `swap()`，切换画面时返回 true；`deactivate()`。 |
 | `tower_hud` | 塔模式开始时 `activate(maxFloor)`；每帧在上方背景之上 `update()` 和 `draw()`；`deactivate()`。楼层和生命从 PLAYSTATE 读取。 |
 | `popup_menu` | 调用 `activate(title, items, fontSize, ...)`，其中 items 是用换行符连接的标签，其后是 PopupMenu 的皮肤位置；每帧调用 `draw(selected)`；关闭时调用 `deactivate()`。 |
 | `config_ui` | 以设置模型调用 `activate(model)`；每帧调用 `update()`，返回 "exit" 即离开设置界面，其后可再返回一个 Modules/Transitions 模块名作为返回时的过渡（若有待应用的皮肤、分辨率或声音设备更改，则改为普通淡出）；调用 `draw()`；引擎重建模型时通过 Call 调用 `reload(model)`；调用 `deactivate()`。 |
@@ -348,7 +348,7 @@ info.DanGrade 和 info.PreviousNameplateDan 返回的对象，只读。
 绘制一个界面背景、演奏图层、观众、过关动画或花球效果的 Script.lua，由引擎自身的界面承载。
 
 <div class="callout warn">
-背景位于 Modules 文件夹之外，在皮肤的 Graphics 文件夹下、其所装饰界面的目录中，例如 Graphics/0_Startup/Script.lua、Graphics/6_Result/Script.lua、Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua、Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua、Graphics/5_Game/3_Mob/{variant}/Script.lua、Graphics/5_Game/9_End/{result}/Script.lua 和 Graphics/5_Game/11_Balloon/Kusudama/Script.lua。当一个文件夹包含多个变体时，引擎每次演奏随机挑选一个（或按谱面的场景预设挑选）。宿主界面创建背景实例（演奏背景在每次引擎进入游戏界面时创建）并随界面一起释放，因此演奏期间会同时存在多个实例。背景脚本获得与只读活动相同的全局对象（只读的 CONFIG、DATABASE 和 GetSaveFile；没有 ACTIVITY）。下面的事件钩子是可选的，引擎在对应事件发生时调用每个钩子一次。 对塔而言，谱面的 `TOWERTYPE` 指定 Down 文件夹。
+背景位于 Modules 文件夹之外，在皮肤的 Graphics 文件夹下、其所装饰界面的目录中，例如 Graphics/0_Startup/Script.lua、Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua、Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua、Graphics/5_Game/3_Mob/{variant}/Script.lua、Graphics/5_Game/9_End/{result}/Script.lua 和 Graphics/5_Game/11_Balloon/Kusudama/Script.lua。当一个文件夹包含多个变体时，引擎每次演奏随机挑选一个（或按谱面的场景预设挑选）。宿主界面创建背景实例（演奏背景在每次引擎进入游戏界面时创建）并随界面一起释放，因此演奏期间会同时存在多个实例。背景脚本获得与只读活动相同的全局对象（只读的 CONFIG、DATABASE 和 GetSaveFile；没有 ACTIVITY）。下面的事件钩子是可选的，引擎在对应事件发生时调用每个钩子一次。 对塔而言，谱面的 `TOWERTYPE` 指定 Down 文件夹。结算模块自己绘制其画面的背景；Graphics/6_Result/Script.lua（AI 对战时为 Graphics/6_Result/AIBattle/Script.lua）和 Graphics/7_DanResult/Script.lua 只用于没有 results_regular 或 results_dan 的皮肤。
 </div>
 
 | 方法 | 说明 |

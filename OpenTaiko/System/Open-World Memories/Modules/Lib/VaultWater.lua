@@ -1,22 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- VaultWater: the Secret Vault's water, a GPU shader drawn on a 3D scene used as a 2D layer.
---
--- local water = VaultWater.new{ w = 1920, h = 1080 }   -- water.ok is false when the shader cannot run (CPU
---                                                       -- renderer, compile failure): the caller draws its own picture
---                                                       -- (scale = render size against the drawn size, the
---                                                       -- layout's render_scale if left out)
--- water:update(dt)                     -- dt = real seconds since the last frame (frames slower than 0.5 s count 0.5)
--- water:drawUnderwater(opacity)        -- full screen, seen from inside the water
--- water:drawSurface(y, opacity)        -- water below a wavy surface line at screen y; above it nothing is drawn
--- water:drawBody(top, bottom, opacity) -- water between a surface line (nil: above the screen) and a lower edge
---                                      -- (nil: below the screen)
--- water:setDrift(x, y)                 -- shifts the pattern inside the water (parallax), in screen px
--- water:setSwell(waves, foam, churn)   -- the wave height at the surface and the lower edge (px, nil: the look's),
---                                      -- the froth under them (1 = the look's, nil: 1) and how fast the pattern
---                                      -- inside moves (1 = the look's, nil: 1)
--- water:dispose()
--- The draw calls return false when nothing was drawn. Above a surface line and below a lower edge the frame is
--- transparent, so what was drawn before shows through.
+-- VaultWater: the Secret Vault's water, a GPU shader on a 3D scene drawn as a 2D layer.
 
 -- sizes and colours: Config/VaultWater/layout.json; motion: Config/VaultWater/animation.json
 local HERE = require("Core.Here")(...)
@@ -28,8 +11,8 @@ local VaultWater = {}
 VaultWater.__index = VaultWater
 
 local SCALE = Layout.render_scale     -- render size against the drawn size
-local EDGE = Layout.edge_px           -- the frame reaches this far past the drawn area: its texture wraps, so its
-                                      -- outermost rows blend with the opposite side when scaled up
+local EDGE = Layout.edge_px           -- px past the drawn area; the wrapping texture's outer rows
+                                      -- blend with the opposite side when scaled up
 local CULL = Layout.cull_margin_px
 local NONE = 100000                   -- a surface or an edge this far off the screen is not drawn
 local MAX_DT = Animation.max_frame_s
@@ -278,6 +261,8 @@ local function setLook(s)
     s:SetSkyUniform(4, SHALLOW[1], SHALLOW[2], SHALLOW[3], Look.specks)
 end
 
+-- opts = { w, h, scale (render size against the drawn size; default render_scale) };
+-- ok = false when the shader cannot run (the caller draws its own picture)
 function VaultWater.new(opts)
     opts = opts or {}
     local t0 = 100 * math.random()
@@ -300,7 +285,7 @@ function VaultWater.new(opts)
         scene:SetSkyUniform(7, self.w, self.h, EDGE, 0)
         scene:SetSkyShader(SHADER)
     end)
-    -- render once now, so the shader compiles before the first frame that shows it
+    -- render once now: the shader compiles before the first frame that shows it
     ok = ok and self:render(-NONE, NONE)
     ok = ok and scene:SkyShaderActive()
     if not ok then
@@ -311,16 +296,19 @@ function VaultWater.new(opts)
     return self
 end
 
+-- dt: real seconds since the last frame, capped at MAX_DT
 function VaultWater:update(dt)
     dt = clampDt(dt)
     self.t = self.t + dt
     self.ti = self.ti + dt * self.churn
 end
 
+-- pattern shift inside the water (parallax), screen px
 function VaultWater:setDrift(x, y)
     self.dx, self.dy = x or 0, y or 0
 end
 
+-- waves: wave height, px (nil: the look's); froth, churn (pattern speed): 1 = the look's (nil: 1)
 function VaultWater:setSwell(waves, froth, churn)
     self.waves, self.froth = tonumber(waves) or WAVES, tonumber(froth) or 1
     self.churn = math.max(0, tonumber(churn) or 1)
@@ -346,6 +334,8 @@ function VaultWater:render(top, bottom)
     return ok
 end
 
+-- water between surface line top (nil: above the screen) and lower edge bottom (nil: below it);
+-- transparent outside; false when nothing was drawn
 function VaultWater:drawBody(top, bottom, opacity)
     if not self.ok then return false end
     opacity = opacity or 1

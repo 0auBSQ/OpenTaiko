@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
+-- down background: A2_af2026
 
 local loopWidth = 1920
 

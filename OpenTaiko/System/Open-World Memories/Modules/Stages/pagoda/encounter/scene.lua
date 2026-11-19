@@ -230,7 +230,7 @@ local function drawCut(ox, oy)
 end
 
 -- ma = the monster's opacity, eyes = 0..1; a band may hide the body (monsterAlpha), not the eyes.
--- Returns the shake offset so the screen's own layers can follow it.
+-- Returns the shake offset (for the screen's own layers).
 function M.draw(ma, eyes)
     local ox, oy = offset()
     if not _open then return ox, oy end

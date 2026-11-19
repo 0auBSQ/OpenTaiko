@@ -1,5 +1,5 @@
--- lang/nl.lua: the Dutch dictionary of intro_nokon. Keys are the exact English texts (Lib/i18n.lua looks them up when drawing).
--- Nokon, the host, is a pompous cat. Keep {Player N name}, %s and %d as they are (filled in at run time).
+-- intro_nokon Dutch strings; keys are the exact English texts (Lib/i18n.lua).
+-- {Player N name}, %s and %d are filled in at run time.
 local T = {}
 
 -- Host Nokon: the opening

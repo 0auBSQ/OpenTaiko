@@ -1,7 +1,4 @@
--- Pagoda.Floor: a floor's songs and its dan. rollFloor picks the songs (a roll), buildDan hands a roll to
--- DANBUILDER with the floor's plate and exams; the caller then mounts it (DANBUILDER:Mount()).
--- A roll is { songs = { { color, node, entry }, ... }, purple = { node, entry } or nil, speed }: entry is
--- the pool's { id, diff }, node the song, speed the floor's song speed (a CONFIG.SONGSPEED value).
+-- Pagoda.Floor: a floor's song roll and its dan
 
 local Levels = require("Pagoda.Levels")
 local Songs  = require("Pagoda.Songs")
@@ -9,11 +6,10 @@ local Texts  = require("Pagoda.Texts")
 
 local M = {}
 
-M.GENRE_COLOR = { 100, 150, 240 }   -- a lighter blue than the dan folders' #3e51c9
-M.PURPLE_BAD_SCALE = 1.25           -- the bad-count exam is more lenient with a purple song
+M.GENRE_COLOR = { 100, 150, 240 }
+M.PURPLE_BAD_SCALE = 1.25           -- bad-count exam factor with a purple song
 
--- the floor's song speed (a CONFIG.SONGSPEED value); it cannot be chosen. It starts ramping at 穹天18
--- (level 38); below that it stays x1.
+-- floor song speed (CONFIG.SONGSPEED value): x1 below level 38 (穹天18), then ramps
 function M.speed(level)
     local SPEED = CONFIG.SONGSPEED
     local actual = (level >= 38) and (1 + (level - 37) / SPEED.ScaleFromActual) or 1
@@ -30,9 +26,10 @@ local function pick(sl, entries, used_ids)
     return nil
 end
 
--- One blue, one green and one red song in a shuffled order, then a purple 4th song at the level's chance
--- (Levels.purple_prob), never a song already picked. avoid (optional): a set of song ids not to pick while
--- the pools have others. songList (optional): the list to take the songs from (Songs.get_song_list()).
+-- one song per colour in shuffled order, then purple at Levels.purple_prob; no repeats
+-- avoid: optional set of song ids to skip; songList: optional (default Songs.get_song_list())
+-- roll = { songs = { { color, node, entry } }, purple = { node, entry } | nil, speed }
+-- entry = the pool's { id, diff }; speed = a CONFIG.SONGSPEED value
 function M.rollFloor(level, avoid, songList)
     local roll = { songs = {}, purple = nil, speed = M.speed(level) }
     local sl   = songList or Songs.get_song_list()
@@ -59,7 +56,7 @@ function M.rollFloor(level, avoid, songList)
     return roll
 end
 
--- the floor's songs rolled again by the same rules, other songs than roll's where the pools allow;
+-- reroll by the same rules, avoiding roll's songs where the pools allow
 -- keepMystery keeps roll's purple song
 function M.rerollFloor(level, roll, keepMystery, songList)
     local avoid = {}
@@ -71,8 +68,7 @@ function M.rerollFloor(level, roll, keepMystery, songList)
     return out
 end
 
--- the floor's three global exams, as { type, red, gold, lessThan }: the gauge, the accuracy (道/扉) or Ok
--- count (穹天), and the bad count (more lenient with a purple song)
+-- the floor's global exams: 3x { type, red, gold, lessThan }
 function M.exams(level, hadPurple)
     local g_red, g_gold = Levels.exam1_gauge(level)
     local e2_type, e2_red, e2_gold, e2_less = Levels.exam2(level)
@@ -88,10 +84,9 @@ function M.exams(level, hadPurple)
     }
 end
 
--- Sets DANBUILDER up for the floor: the plate (name, tick, colour), the genre, roll's songs and the exams.
--- roll nil rolls the floor now. opts (optional): genre (the genre title, the module's "title" string by
--- default) and genreColor ({ r, g, b }). Returns false when no song could be added; the caller mounts
--- the dan otherwise.
+-- sets up DANBUILDER for the floor (roll nil rolls now); the caller then mounts it
+-- opts: genre (default the "title" string), genreColor ({ r, g, b })
+-- returns false when no song could be added
 function M.buildDan(level, roll, opts)
     opts = opts or {}
     roll = roll or M.rollFloor(level)

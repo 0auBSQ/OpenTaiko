@@ -1,4 +1,4 @@
--- Floor-select ambience sprites (Textures/tower/fx), created and freed with the scene.
+-- floor-select ambience sprites (Textures/tower/fx), owned by the scene
 
 local M = {}
 
@@ -20,7 +20,7 @@ function M.dispose()
     _tex = nil
 end
 
--- the sprite once it can be drawn, else nil
+-- nil until drawable
 function M.get(name)
     local t = _tex ~= nil and _tex[name] or nil
     if t ~= nil and t.Ready then return t end

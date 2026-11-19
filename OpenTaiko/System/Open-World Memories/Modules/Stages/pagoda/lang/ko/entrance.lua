@@ -1,4 +1,4 @@
--- Korean for story/entrance.lua; a missing key shows the English.
+-- Korean for story/entrance.lua; missing keys fall back to English
 
 local T = {}
 

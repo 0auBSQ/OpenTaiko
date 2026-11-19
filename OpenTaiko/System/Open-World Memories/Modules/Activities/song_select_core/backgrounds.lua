@@ -1,28 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- backgrounds.lua — the song-select background.
---
--- A genre can ship a background set in Textures/Backgrounds/<Genre>/: its images plus background.json,
--- which lists layers drawn bottom to top. Genres without one get the default: bg1.png scrolling.
--- The selected node's genre picks the set; changing it crossfades the new set in over the old ones
--- (a stack, so fast scrolling never pops). Sets seen on the visible page are prefetched so their images
--- are decoded before they come into view. Hosts that draw their own background (AI battle, training)
--- pass "shared" to activate and get the SHARED "background" texture scrolling instead.
---
--- background.json:
---   { "layers": [ <layer>, ... ] }
--- Layer types (every field optional unless noted; colours "RRGGBB"; [a, b] = a random range or a
--- min/max for a pulse):
---   image     file*, scroll (px/s, positive = leftwards, images narrower than the screen tile),
---             y, opacity, blend
---   particles sprite ("dot" = _common/dot.png or a file), count, size [min,max] px, color,
---             opacity [min,max], speed [min,max] px/s, direction (up/down/left/right), sway px,
---             sway_ms, twinkle_ms (0 = none), blend, area [x0,y0,x1,y1]
---   sprites   files* [..], count, y [min,max], speed [min,max] px/s (negative = leftwards),
---             scale [min,max], opacity [min,max], blend, margin px
---   rays      x, y (origin), angles [..] deg (0 = straight down, positive = clockwise), length,
---             width, color, opacity [min,max], pulse_ms, sway_deg, sway_ms, blend
---   glow      color, opacity [min,max], pulse_ms, blend — a full-screen tint
--- Files resolve in the set's folder first, then in Textures/Backgrounds/_common/.
+-- song select background
 
 local Config    = require("Core.Config")
 local Layout    = Config.load("Config/layout.json")
@@ -34,8 +11,8 @@ local G
 local COL_WHITE = COLOR:CreateColorFromHex("FFFFFFFF")
 
 local FADE_MS   = BgAnim.fade_ms                   -- crossfade between sets
-local CACHE_MAX = Layout.background.cache_sets     -- decoded sets kept (least recently used go)
-local STACK_MAX = BgAnim.stack_max                 -- sets blended at once while scrolling fast
+local CACHE_MAX = Layout.background.cache_sets     -- decoded sets kept (LRU)
+local STACK_MAX = BgAnim.stack_max                 -- max sets blended while scrolling fast
 local SCREEN_W, SCREEN_H = 1920, 1080
 local TWINKLE_BASE, TWINKLE_AMOUNT = BgAnim.particle_twinkle_base, BgAnim.particle_twinkle_amount
 local FLICKER_BASE, FLICKER_AMOUNT, FLICKER_MS = BgAnim.ray_flicker_base, BgAnim.ray_flicker_amount, BgAnim.ray_flicker_ms
@@ -45,9 +22,9 @@ local DEFAULT_DEF = { layers = { { type = "image", file = "Textures/bg1.png", sc
 local BASE   = "Textures/Backgrounds/"
 local COMMON = BASE .. "_common/"
 
--- ── Textures ─────────────────────────────────────────────────────────────────
+-- ==== Textures ====
 
-local texCache = {}      -- path -> LuaTexture (created async: draws nothing until its pixels are uploaded)
+local texCache = {}      -- path -> LuaTexture (async: draws nothing until uploaded)
 
 local function resolvePath(dir, file)
     if file == nil then return nil end
@@ -67,9 +44,9 @@ local function getTex(path)
     return t
 end
 
--- ── Definitions ──────────────────────────────────────────────────────────────
+-- ==== Definitions ====
 
-local defCache = {}      -- genre -> { def = parsed table, dir = set folder } or false when the genre has none
+local defCache = {}      -- genre -> { def, dir } or false without a set
 
 local function jget(node, key) return JSONLOADER:JsonGet(node, key) end
 
@@ -98,7 +75,19 @@ local function jlist(node, key)
     return out
 end
 
--- one layer table from its JSON node (plain Lua tables from here on: no per-frame dictionary access)
+-- Textures/Backgrounds/<Genre>/background.json: { "layers": [ <layer>, ... ] }, bottom to top
+-- fields optional unless marked *; colours "RRGGBB"; [a, b] = random range or pulse min/max
+--   image     file*, scroll (px/s, positive = leftwards, narrow images tile), y, opacity, blend
+--   particles sprite ("dot" = _common/dot.png or a file), count, size [min,max] px, color,
+--             opacity [min,max], speed [min,max] px/s, direction (up/down/left/right), sway px,
+--             sway_ms, twinkle_ms (0 = none), blend, area [x0,y0,x1,y1]
+--   sprites   files* [..], count, y [min,max], speed [min,max] px/s (negative = leftwards),
+--             scale [min,max], opacity [min,max], blend, margin px
+--   rays      x, y (origin), angles [..] deg (0 = straight down, positive = clockwise), length,
+--             width, color, opacity [min,max], pulse_ms, sway_deg, sway_ms, blend
+--   glow      color, opacity [min,max], pulse_ms, blend (full-screen tint)
+-- files resolve in the set folder, then Textures/Backgrounds/_common/
+-- one layer from JSON (plain Lua tables: no per-frame dictionary access)
 local function parseLayer(node)
     local kind = jstr(node, "type", "image")
     local L = { type = kind, blend = jstr(node, "blend", "normal"), opacity = jrange(node, "opacity", { 1, 1 }) }
@@ -149,7 +138,7 @@ local function loadDef(genre)
     return entry or nil
 end
 
--- ── Instances (a set with its live state) ────────────────────────────────────
+-- ==== Instances ====
 
 local function hexColor(hex)
     if #hex == 6 then hex = "FF" .. hex end
@@ -162,7 +151,7 @@ local function spawnParticle(L, p, fresh)
     p.x = a[1] + (a[3] - a[1]) * math.random()
     p.y = a[2] + (a[4] - a[2]) * math.random()
     if not fresh then
-        -- re-enter from the edge the drift comes from
+        -- re-enter from the drift's source edge
         if L.direction == "up" then p.y = a[4] elseif L.direction == "down" then p.y = a[2]
         elseif L.direction == "left" then p.x = a[3] elseif L.direction == "right" then p.x = a[1] end
     end
@@ -206,13 +195,13 @@ local function newInstance(genre, entry)
     return inst
 end
 
--- ── State ────────────────────────────────────────────────────────────────────
+-- ==== State ====
 
-local stack = {}         -- entries { inst, alpha }, oldest first; the last one is the current set fading in
-                         -- (an instance can appear twice: as the opaque base and again on top, fading in)
-local instances = {}     -- genre key -> instance (kept for reuse, capped to CACHE_MAX)
-local lru = {}           -- genre keys, most recently selected last
-local mode = "genre"     -- or "shared" (host-provided SHARED "background")
+local stack = {}         -- { inst, alpha }, oldest first; the top is the set fading in
+                         -- an instance can appear twice (opaque base and fading top)
+local instances = {}     -- genre key -> instance (capped to CACHE_MAX)
+local lru = {}           -- most recent last
+local mode = "genre"     -- or "shared" (host SHARED "background")
 local lastMs = nil
 
 local function keyOf(genre)
@@ -223,7 +212,7 @@ end
 local function touch(key)
     for i, k in ipairs(lru) do if k == key then table.remove(lru, i); break end end
     lru[#lru + 1] = key
-    -- evict: instances not on the stack, least recently used first
+    -- evict LRU instances not on the stack
     while #lru > CACHE_MAX do
         local victim = nil
         for i, k in ipairs(lru) do
@@ -236,7 +225,7 @@ local function touch(key)
         local inst = instances[k]
         instances[k] = nil
         if inst ~= nil and inst.dir ~= nil then
-            -- the set's own images go with it (common sprites and the default stay cached)
+            -- dispose the set's own images (common and default stay)
             for path, tex in pairs(texCache) do
                 if path:sub(1, #inst.dir) == inst.dir then tex:Dispose(); texCache[path] = nil end
             end
@@ -250,7 +239,7 @@ local function instanceFor(genre)
     if inst == nil then
         local entry = loadDef(genre)
         if entry == nil then
-            -- no set: share the default instance
+            -- no set: shared default instance
             key = "\0default"; inst = instances[key]
             if inst == nil then inst = newInstance(key, nil); instances[key] = inst end
         else
@@ -263,10 +252,10 @@ end
 
 function M.init(g) G = g end
 
--- the default set (bg1.png) is created at onStart so its image loads with the activity
+-- default set (bg1.png), loaded at onStart
 function M.loadDefault() instanceFor(nil) end
 
--- warm the caches for a genre that may come into view (definition parsed, images decoding)
+-- prefetch a genre's set (definition, image decodes)
 function M.prefetch(genre)
     if mode ~= "genre" then return end
     local entry = loadDef(genre)
@@ -280,21 +269,20 @@ function M.prefetch(genre)
     end
 end
 
--- the selected node's genre changed: make its set current (fading in over whatever is showing)
+-- genre changed: fade its set in over the current one
 function M.select(genre)
     if mode ~= "genre" then return end
     local inst = instanceFor(genre)
     local top = stack[#stack]
     if top ~= nil and top.inst == inst then return end
     if #stack == 0 then
-        -- nothing showing yet: the default (loaded at onStart) goes under, so a set still decoding
-        -- fades in over it instead of over black
+        -- empty: default goes under, so a decoding set fades in over it
         local base = instanceFor(nil)
         if base ~= inst then stack[1] = { inst = base, alpha = 1 } else stack[1] = { inst = inst, alpha = 1 }; return end
     end
-    -- entries below the top keep their opacity; only the top fades in, then the stack collapses to it
+    -- only the top fades in; the stack then collapses to it
     stack[#stack + 1] = { inst = inst, alpha = 0 }
-    -- scrolling faster than the fade: drop the faintest entry between the base and the top
+    -- faster than the fade: drop the faintest middle entry
     while #stack > STACK_MAX do
         local victim, low = nil, 2
         for i = 2, #stack - 1 do
@@ -305,8 +293,7 @@ function M.select(genre)
     end
 end
 
--- a set is ready to show once every image layer's pixels are uploaded (a missing file is an empty handle,
--- nothing to wait for)
+-- ready once all image layers are uploaded (missing file: empty handle)
 local function isReady(inst)
     for _, S in ipairs(inst.layers) do
         if S.def.type == "image" and S.tex ~= nil and S.tex.Loaded and not S.tex.Ready then return false end
@@ -314,7 +301,7 @@ local function isReady(inst)
     return true
 end
 
--- "genre" (default) or "shared": the host's SHARED "background" texture, scrolling
+-- "genre" (default) or "shared" (host SHARED "background", scrolling)
 function M.setMode(m)
     mode = (m == "shared") and "shared" or "genre"
     lastMs = nil
@@ -325,7 +312,7 @@ function M.reset()
     lastMs = nil
 end
 
--- ── Update ───────────────────────────────────────────────────────────────────
+-- ==== Update ====
 
 local function updateInstance(inst, dt)
     local ds = dt / 1000
@@ -363,13 +350,13 @@ function M.update()
     if mode ~= "genre" or #stack == 0 then return end
     local n = #stack
     local top = stack[n]
-    -- the crossfade waits for the incoming set's images (prefetched, so usually already there)
+    -- crossfade waits for the incoming images
     if isReady(top.inst) then top.alpha = math.min(1, top.alpha + dt / FADE_MS) end
     local seen = {}
     for _, e in ipairs(stack) do
         if not seen[e.inst] then seen[e.inst] = true; updateInstance(e.inst, dt) end
     end
-    -- the current set is opaque: everything under it is invisible, drop it
+    -- top opaque: drop everything under it
     if top.alpha >= 1 and n > 1 then
         stack = { top }
     else
@@ -377,7 +364,7 @@ function M.update()
     end
 end
 
--- ── Draw ─────────────────────────────────────────────────────────────────────
+-- ==== Draw ====
 
 local function pulse(S, L)
     local rng = L.opacity
@@ -451,7 +438,7 @@ local function drawRays(S, L, alpha)
     for i, ang in ipairs(L.angles) do
         local a = ang + sway * ((i % 2 == 0) and -1 or 1)
         local rad = math.rad(a)
-        -- the beam hangs from its origin: its centre sits half a length along the beam direction
+        -- beam centre half a length from its origin
         local cx = L.x + math.sin(rad) * h / 2 * -1
         local cy = L.y + math.cos(rad) * h / 2
         tex:SetRotation(-a)   -- SetRotation is counter-clockwise
@@ -504,8 +491,8 @@ function M.draw()
     for _, e in ipairs(stack) do drawInstance(e.inst, e.alpha) end
 end
 
--- the background's image layers repainted inside a screen rectangle (the replay list's clip band);
--- the effect layers are left out, they are too small to matter under the strip
+-- image layers redrawn inside a screen rect (replay list clip band)
+-- effect layers skipped under the strip
 function M.drawBand(bx, by, bw, bh)
     if mode ~= "genre" then
         local tex = SHARED:GetSharedTexture("background")
@@ -537,7 +524,7 @@ function M.drawBand(bx, by, bw, bh)
     end
 end
 
--- headless harness hooks
+-- headless test hooks
 function M._top() local e = stack[#stack]; return e and { alpha = e.alpha, genre = e.inst.genre } or nil end
 function M._depth() return #stack end
 function M._textures() return texCache end

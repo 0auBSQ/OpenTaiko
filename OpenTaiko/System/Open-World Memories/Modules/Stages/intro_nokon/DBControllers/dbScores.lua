@@ -8,7 +8,7 @@ local SCORE_KEY     = ".intro_nokon_high_score"
 local LIMIT         = 8
 local SLOTS         = 5
 local DEFAULTS_JSON = "Databases/DefaultScores.json"
-local OLD_STORE     = "IntroNokon/HighScores"   -- the global LMDB table the scores were kept in before
+local OLD_STORE     = "IntroNokon/HighScores"   -- legacy global LMDB table (taken over on first read)
 
 local rivals = nil
 local oldScores = nil

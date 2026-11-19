@@ -1,22 +1,17 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- OWM3d/isomap.lua — iso grid maps: builds the visible geometry (floors / ramps / side faces / wall
--- cells / buildings / door panels — ported from isoengine's builders) AND emits the matching physics
--- triangles, so what you see is exactly what you collide with. Also provides heightAt() (bilinear,
--- identical maths to iso_demo2/maps.lua) for sprite shadows and ground snapping.
---
--- Cell format (from json.lua or procedural builders):
---   cells[r][c] = { h = 0.0, tex = "grass", ramp = {dir="x+",lo=,hi=}, wall = true|nil, liquid = "water"|nil }
+-- OWM3d/isomap.lua: iso grid map geometry with matching collision
 
 local sin, cos, pi, sqrt = math.sin, math.cos, math.pi, math.sqrt
 
 local IsoMap = {}
 IsoMap.__index = IsoMap
 
-local WALL_H = 2.2          -- visible + collision height of wall cells
+local WALL_H = 2.2          -- wall cell height (visual and collision)
 
 local function wallTop(cell) return (cell.h or 0) + (cell.wallH or WALL_H) end
 
--- ── height queries (parity with iso_demo2/maps.lua) ──────────────────────────────────────────────
+-- ==== Height queries ====
+-- def.cells[r][c] = { h, tex, ramp = { dir, lo, hi }, wall, liquid }
 local function cellAt(def, wx, wz)
     local c = math.floor(wx)
     local r = def.gridH - 1 - math.floor(wz)
@@ -45,8 +40,8 @@ function IsoMap.isWall(def, wx, wz)
     return cell ~= nil and cell.wall == true
 end
 
--- ── build: geometry + collision ───────────────────────────────────────────────────────────────────
--- corner heights of cell (c,r): at (x0,z0),(x0+1,z0),(x0+1,z0+1),(x0,z0+1) — matches terrainTopRamp
+-- ==== Build ====
+-- corner heights at (x0,z0), (x0+1,z0), (x0+1,z0+1), (x0,z0+1)
 local function cornerHeights(cell)
     local h = cell.h or 0
     if not cell.ramp then return h, h, h, h end
@@ -57,8 +52,7 @@ local function cornerHeights(cell)
     else return rp.hi, rp.hi, rp.lo, rp.lo end
 end
 
--- build the whole iso map into the world's layers + physics. texId(name) resolves texture names.
--- Returns a map handle with heightAt / doors / dispose.
+-- texId(name) -> texture id; returns the map handle
 function IsoMap.build(world, def, texId)
     local scene = world.scene
     local phys = world.phys
@@ -74,13 +68,13 @@ function IsoMap.build(world, def, texId)
         local x0, z0 = c, (def.gridH - 1 - r)
         local a, b, cc, d = cornerHeights(cell)
         local tex = texId(cell.tex)
-        -- visible top (wound so the normal faces up — isoengine convention)
+        -- top quad (winding: normal up)
         scene:ObjAddQuadTex(world.floorObj, x0, a, z0, x0, d, z0 + 1, x0 + 1, cc, z0 + 1, x0 + 1, b, z0, tex, 1, 1, 1.0)
         -- collision top (same corners)
         phys:addQuad(x0, a, z0, x0, d, z0 + 1, x0 + 1, cc, z0 + 1, x0 + 1, b, z0)
     end
 
-    -- vertical side face between a cell edge and a lower neighbour (visible + collision)
+    -- side face down to a lower neighbour (visual and collision)
     local function addSide(c, r, edge, y0, ya, yb, texName)
         if ya - y0 <= 0.001 and yb - y0 <= 0.001 then return end
         local x0, z0 = c, (def.gridH - 1 - r)
@@ -101,7 +95,7 @@ function IsoMap.build(world, def, texId)
         phys:addQuad(q[1], q[2], q[3], q[4], q[5], q[6], q[7], q[8], q[9], q[10], q[11], q[12])
     end
 
-    -- neighbour corner heights on an edge of (c,r): returns the TWO top heights of that edge
+    -- the two top heights of an edge of (c,r)
     local function edgeTops(cell, edge)
         local a, b, cc, d = cornerHeights(cell)   -- (x0,z0),(x1,z0),(x1,z1),(x0,z1)
         if edge == "e" then return b, cc          -- x = x0+1: (x1,z0), (x1,z1)
@@ -111,7 +105,7 @@ function IsoMap.build(world, def, texId)
         end
 
     local function neighbour(c, r, edge)
-        -- e/w step along x; s = larger z = SMALLER r (row 0 far); n = larger r
+        -- s: larger z = smaller r (row 0 far); n: larger r
         if edge == "e" then return c + 1, r
         elseif edge == "w" then return c - 1, r
         elseif edge == "s" then return c, r - 1
@@ -134,7 +128,7 @@ function IsoMap.build(world, def, texId)
             local cell = def.cells[r] and def.cells[r][c]
             if cell then
                 if cell.wall then
-                    -- a wall cell: a full box (top + 4 sides down to the lowest neighbour floor)
+                    -- wall cell: top + 4 sides down to the neighbour floor
                     local base = cell.h or 0
                     local top = wallTop(cell)
                     local x0, z0 = c, (def.gridH - 1 - r)
@@ -150,7 +144,7 @@ function IsoMap.build(world, def, texId)
                     phys:addBox(x0, base, z0, x0 + 1, math.max(top, base + WALL_H), z0 + 1)
                 else
                     addTop(c, r, cell)
-                    -- side faces down to lower neighbours (visible + collision, no gaps under ramps)
+                    -- side faces down to lower neighbours
                     for _, e in ipairs({ "e", "w", "s", "n" }) do
                         local ya, yb = edgeTops(cell, e)
                         local nc, nr = neighbour(c, r, e)
@@ -175,7 +169,7 @@ function IsoMap.build(world, def, texId)
         if world.buildYield and r % 6 == 5 then world.buildYield(r / def.gridH) end
     end
 
-    -- invisible border walls: the map edge is a hard boundary (no falling off the world)
+    -- invisible border walls
     do
         local W, H = def.gridW, def.gridH
         phys:addQuad(0, -2, 0, W, -2, 0, W, 9, 0, 0, 9, 0)
@@ -184,7 +178,7 @@ function IsoMap.build(world, def, texId)
         phys:addQuad(W, -2, 0, W, -2, H, W, 9, H, W, 9, 0)
     end
 
-    -- ── buildings (ported from isoengine; walls also become collision boxes) ─────────────
+    -- ==== Buildings ====
     local doors = {}
     local tex = setmetatable({}, { __index = function(_, k) return texId(k) end })
     for bi, b in ipairs(def.buildings or {}) do
@@ -197,10 +191,7 @@ function IsoMap.build(world, def, texId)
             hinge.y0 = groundY
             hinge.tex = texId("doorwood")
             doors[#doors + 1] = hinge
-            -- the closed door panel's collision (own group). Half-thickness must EXCEED the
-            -- character radius (0.32): the old ±0.05 slab let the solver's push-out step across it
-            -- in one substep — walking into a closed door could squeeze through the frame (the
-            -- "softlocked inside a house" report).
+            -- closed door collision (own group); a thin slab lets the push-out step through
             phys:setGroup(group)
             local ex, ez = hinge.hx + hinge.dx * hinge.w, hinge.hz + hinge.dz * hinge.w
             local x0, x1 = math.min(hinge.hx, ex), math.max(hinge.hx, ex)
@@ -216,7 +207,7 @@ function IsoMap.build(world, def, texId)
         heightAt = function(_, wx, wz) return IsoMap.heightAt(def, wx, wz) end,
         isWall = function(_, wx, wz) return IsoMap.isWall(def, wx, wz) end,
     }, { __index = {
-        -- auto-open doors near the player + rebuild panels (rebuilt per frame like isoengine)
+        -- per frame: open doors near the player, rebuild panels
         updateDoors = function(m, dt, px, pz)
             if #m.doors == 0 then return end
             local scene2 = world.scene
@@ -250,9 +241,8 @@ function IsoMap.build(world, def, texId)
     return map
 end
 
--- one building: walls/windows/roof into the lit layers + wall collision boxes. Ported from
--- isoengine:building() with the addition of the physics quads. Returns the door hinge (or nil).
--- b.windows: any of "s", "n", "e", "w" (default { "s" })
+-- one building into the lit layers plus wall collision boxes
+-- returns the door hinge or nil; b.windows: sides from "s", "n", "e", "w" (default { "s" })
 function IsoMap.buildBuilding(world, def, b, groundY, tex, phys)
     local scene = world.scene
     local x0, z1 = b.c, (def.gridH - 1 - b.r) + 1
@@ -268,15 +258,14 @@ function IsoMap.buildBuilding(world, def, b, groundY, tex, phys)
     local function wallRun(ax, az, bx, bz, holeA, holeB)
         local len = sqrt((bx - ax) ^ 2 + (bz - az) ^ 2)
         local ux, uz = (bx - ax) / len, (bz - az) / len
-        -- collision top: the wall blocks all the way past the roof line, so nothing can be climbed over
+        -- collision runs past the roof line (no climbing over)
         local roofTop = y1 + (b.roofH or 1.3) + 0.4
         local function seg(s0, s1, yb, yt)
             if s1 - s0 < 0.01 then return end
             -- reversed winding: outward normal
             scene:ObjAddQuadTex(world.wallObj, ax + ux * s1, yb, az + uz * s1, ax + ux * s0, yb, az + uz * s0,
                 ax + ux * s0, yt, az + uz * s0, ax + ux * s1, yt, az + uz * s1, wallTex, s1 - s0, yt - yb, 1.0)
-            -- THICK axis-aligned collision box (a thin quad tunnels under a fast collide-and-slide);
-            -- building walls run along an axis, so the inflated box hugs the visual wall
+            -- thick axis-aligned box: a thin quad tunnels under collide-and-slide
             local p0x, p0z = ax + ux * s0, az + uz * s0
             local p1x, p1z = ax + ux * s1, az + uz * s1
             local x0b, x1b = math.min(p0x, p1x) - 0.09, math.max(p0x, p1x) + 0.09
@@ -319,7 +308,7 @@ function IsoMap.buildBuilding(world, def, b, groundY, tex, phys)
         end
     end
 
-    -- gabled roof (visible only; roofs don't need collision — characters can't reach them)
+    -- gabled roof (no collision: unreachable)
     local ridgeY = y1 + (b.roofH or 1.3)
     local zm = (z0 + z1) / 2
     local ov = 0.35
@@ -330,7 +319,7 @@ function IsoMap.buildBuilding(world, def, b, groundY, tex, phys)
     world._boxTarget = world.prop3dObj
     IsoMap.boxOut(world, x0 + 0.8, ridgeY - 0.5, zm + 0.2, 0.4, 1.1, 0.4, 0, tex.stoneTrim or wallTex, 0.9, 0.7)
 
-    -- dark backing inside the doorway (unless this building streams a real interior group)
+    -- doorway backing quad (skipped with interiorGroup)
     if ds ~= nil and not b.interiorGroup then
         local yd = y0 + 2.0
         if ds == "s" then
@@ -355,7 +344,7 @@ function IsoMap.buildBuilding(world, def, b, groundY, tex, phys)
     else return { hx = x1, hz = z0 + dOff, dx = 0, dz = 1, w = DW, h = 2.0 } end
 end
 
--- shaded box into world._boxTarget (ported from isoengine:box; used for trims/windows/furniture)
+-- box into world._boxTarget
 function IsoMap.box(world, cx, y0, cz, sx, sy, sz, yaw, texId, sTop, sSide)
     sTop = sTop or 1.0; sSide = sSide or 0.72
     local hx, hz = sx * 0.5, sz * 0.5

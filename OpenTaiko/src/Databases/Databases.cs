@@ -8,7 +8,7 @@ class Databases {
 	}
 
 	/// <summary>
-	/// (Re)loads ThemeSettings.json, ThemeSettings.db3, and the skin locale manager for the current skin folder.
+	/// (Re)loads ThemeSettings.json, the skin's settings database and the skin locale manager for the current skin folder.
 	/// Called from TextureLoader after the skin path is resolved.
 	/// </summary>
 	public void LoadThemeSettings() {

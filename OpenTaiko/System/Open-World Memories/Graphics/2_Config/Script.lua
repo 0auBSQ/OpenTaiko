@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Config screen background: static background + header.
+-- config screen background and header
 
 local tx = {}
 

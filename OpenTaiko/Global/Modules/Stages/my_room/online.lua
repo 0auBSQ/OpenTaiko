@@ -1,34 +1,12 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- myroom/online.lua — the P2P "visit my room" logic, built on the NET core. Kept OUT of Script.lua,
--- which owns the stage state machine + drawing and calls in here (mirrors kart_racing/online.lua and
--- doom/online.lua). Script hands over a small `ctx` of accessor closures so this module can swap the
--- room layout + respawn the player without owning those locals.
---
--- Model: the room CREATOR hosts (their room is the shared space); friends JOIN by pasting a code and
--- walk around the host's room as named generic avatars. Guests can't edit, use the phone, or use the
--- computer. The host leaving closes the room (everyone is sent home). A guest leaving (door / Esc) just
--- ends the visit and drops them back in their own room.
---
--- PAYLOAD v2: every v1 key ships unchanged in meaning; v2 adds `"v":2` + `"wallItems"` (id/c/r/mount,
--- phone included). Legacy-renderable wall items (clock) are still mirrored inside `furniture` by
--- Room:toTable(), so an old client visiting a v2 host keeps seeing them; unknown ids fall back to the
--- red placeholder box. A payload WITHOUT `v` is decoded as v1 and migrated by Room:loadTable().
--- Room layout always crosses through Room:toTable()/loadTable(), so stage + net stay consistent.
---
--- SECURITY: the room layout crosses the wire as plain json only, we never load() network data (that
--- would be remote code execution). Maps in floorDeco/wallPaint/inventory ship as [key,value] arrays so
--- the decoder needs no key-enumeration helper; furniture/wallItems ship as object arrays.
---
--- Each player's roster info carries their name plus the student they walk as ("st": "a"|"b") and its
--- palette index ("pal"), so everyone sees everyone else's avatar; info from a client that predates them
--- reads as Student A in the default palette.
+-- My Room P2P visits on the NET core; Script.lua calls in with a ctx of closures
 
 local I18N = require("Locale.i18n")
 local Student = require("Characters.Student")
 local PHONE = I18N.texts("phone")   -- lang/<code>/phone.json
 
 local MO = {}
-local C   -- the context (set by MO.init)
+local C   -- ctx (MO.init)
 
 -- shared network state (Script.lua aliases this as `net`)
 MO.net = {
@@ -45,8 +23,8 @@ local floor, exp = math.floor, math.exp
 
 function MO.init(ctx) C = ctx end
 
--- ── identity ────────────────────────────────────────────────────────────────────────────────────
--- JSON string escaper (robust for player names incl. control chars; UTF-8 bytes pass through)
+-- ==== identity ====
+-- JSON string escape: control chars as \u, UTF-8 bytes pass through
 local function jstr(s)
     return '"' .. tostring(s):gsub('[%c\\"]', function(ch)
         local m = { ['"'] = '\\"', ['\\'] = '\\\\', ['\n'] = '\\n', ['\r'] = '\\r', ['\t'] = '\\t' }
@@ -58,6 +36,7 @@ function MO.myName()
     if n == nil or n == "" then n = "Player" end
     return n
 end
+-- roster info: name, student ("st": "a"|"b"), palette index ("pal")
 function MO.selfInfo()
     local st, pal = "a", 0
     if C and C.look then
@@ -67,7 +46,7 @@ function MO.selfInfo()
     return '{"name":' .. jstr(MO.myName()) .. ',"st":' .. jstr(st) .. ',"pal":' .. string.format("%d", pal) .. '}'
 end
 
--- the look in a peer's roster info; anything missing or malformed reads as Student A, default palette
+-- look from a peer's roster info; missing or malformed reads as Student A, default palette
 local function lookFromInfo(io)
     local st = io and JSONLOADER:JsonGet(io, "st")
     local pal = tonumber(io and JSONLOADER:JsonGet(io, "pal"))
@@ -77,16 +56,15 @@ end
 function MO.isGuest() return net.online and not net.isHost end
 function MO.playerCount() local c = 0; for _ in pairs(net.nameByPeer) do c = c + 1 end return c end
 
--- ── room layout <-> JSON (NEVER load() network data) ─────────────────────────────────────────────
+-- ==== room layout <-> JSON ====
+-- plain JSON only: never load() network data (remote code execution)
 local function encFurniture(furn)
     local b = {}
     for i, it in ipairs(furn) do
-        -- "on" (stacked on a surface) is a v2-additive key: older v2 clients ignore it and draw
-        -- the item at floor level; stacked items are ground furniture, so nothing extra is
-        -- mirrored into the v1 legacy wall list
+        -- "on" (stacked): v2-additive, older v2 clients draw the item at floor level
         b[i] = string.format('{"id":%s,"c":%d,"r":%d,"facing":%d%s%s}', jstr(it.id),
             it.c or 0, it.r or 0, it.facing or 0, it.on and ',"on":true' or "",
-            it.lit == false and ',"lit":false' or "")   -- only OFF needs sending (default on)
+            it.lit == false and ',"lit":false' or "")   -- only lit = false is sent
     end
     return "[" .. table.concat(b, ",") .. "]"
 end
@@ -102,6 +80,8 @@ local function encMap(m, valIsNum)
     for k, v in pairs(m) do b[#b + 1] = "[" .. jstr(k) .. "," .. (valIsNum and string.format("%d", v) or jstr(v)) .. "]" end
     return "[" .. table.concat(b, ",") .. "]"
 end
+-- payload v2: v1 keys plus "v":2 and "wallItems"
+-- maps ship as [key, value] arrays (the decoder has no key enumeration)
 function MO.roomToJson(room)
     local t = room:toTable()
     return string.format('{"v":2,"win":1,"tier":%d,"iw":%d,"ih":%d,"exitCol":%d,"furniture":%s,"floorDeco":%s,"wallPaint":%s,"inventory":%s,"wallItems":%s}',
@@ -140,14 +120,13 @@ local function decMap(arr, valIsNum)
     end
     return out
 end
--- returns a plain table in the Room:toTable() shape. A missing "v" marks a v1 peer's payload — the
--- table is returned WITHOUT v so Room:loadTable() runs its v1 migration on it.
--- a room side from a peer; out of range (or NaN/inf) falls back, so the room build loops stay small
+-- room side from a peer; out of range, NaN or inf falls back, keeping the build loops small
 local function roomSide(v, d)
     v = floor(tonumber(v) or d)
     return (v >= 1 and v <= 32) and v or d
 end
 
+-- -> table in the Room:toTable() shape; a v1 payload (no "v") stays without v for loadTable's migration
 function MO.roomFromJson(json)
     local root = JSONLOADER:JsonParseStringAny(json); if not root then return nil end
     local t = {
@@ -169,7 +148,7 @@ function MO.roomFromJson(json)
     return t
 end
 
--- ── roster ──────────────────────────────────────────────────────────────────────────────────────
+-- ==== roster ====
 function MO.refreshRoster()
     local names, looks = {}, {}
     local arr = JSONLOADER:JsonParseStringAny(NET:PeersJson()); local n = arr and JSONLOADER:JsonCount(arr) or 0
@@ -187,7 +166,7 @@ function MO.refreshRoster()
     for id in pairs(net.posByPeer) do if not names[id] or id == selfId then net.posByPeer[id] = nil end end
 end
 
--- ── session control ─────────────────────────────────────────────────────────────────────────────
+-- ==== session control ====
 local function resetState()
     net.online, net.isHost, net.connecting, net.gotRoom, net.roomGone = false, false, false, false, false
     net.code, net.msg = nil, net.msg
@@ -225,9 +204,9 @@ function MO.leave()
     resetState()
 end
 
--- ── jukebox playback state (host → guests; see jukebox.lua) ─────────────────────────────────────
--- One flat table crosses as one message; guests resolve the song against their own folders by
--- md5/uid/title and stay silent when they don't have the chart. Additive channel: old clients drop it.
+-- ==== jukebox state (host -> guests) ====
+-- one flat table per message; guests match the song by md5/uid/title, silent without the chart
+-- old clients drop the channel
 local function jukeboxToJson(st)
     return string.format(
         '{"kind":%s,"md5":%s,"uid":%s,"title":%s,"genre":%s,"playing":%s,"paused":%s,"pos":%d,"speed":%.3f,"rep":%s,"c":%d,"r":%d}',
@@ -250,10 +229,10 @@ function MO.broadcastJukebox(st)
 end
 
 function MO.sendRoomTo(id) NET:SendTo(id, "room", MO.roomToJson(C.getRoom())) end
--- the host re-shares the layout after an edit so visitors stay in sync
+-- host re-sends the layout after an edit
 function MO.onRoomChanged() if net.online and net.isHost then NET:Broadcast("room", MO.roomToJson(C.getRoom())) end end
 
--- ── presence sync ───────────────────────────────────────────────────────────────────────────────
+-- ==== presence sync ====
 function MO.broadcastPos(dt, x, z, dir, moving)
     if not net.online then return end
     net.sendT = (net.sendT or 0) + dt
@@ -279,7 +258,8 @@ function MO.lerpRemotes(dt)
     end
 end
 
--- ── event drain (call every frame while online/connecting) ──────────────────────────────────────
+-- ==== event drain ====
+-- call every frame while online or connecting
 function MO.drain()
     while true do
         local e = NET:Poll(); if e == nil then break end
@@ -290,7 +270,7 @@ function MO.drain()
             MO.refreshRoster()
             if net.isHost then
                 MO.sendRoomTo(e.Peer)
-                -- late joiners also get the current jukebox state (playing music, position, speed)
+                -- late joiners also get the jukebox state
                 local st = C.jukeboxState and C.jukeboxState() or nil
                 if st then NET:SendTo(e.Peer, "jukebox", jukeboxToJson(st)) end
             end

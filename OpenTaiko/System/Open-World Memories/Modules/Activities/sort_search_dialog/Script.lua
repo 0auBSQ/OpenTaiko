@@ -1,17 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
--- sort_search_dialog — the song select's sort and search dialogs, as PopUI panels over the list.
---
--- Sort: one row per method with three buttons, ascending / descending / off, the active one lit; only one
--- method is on at a time. The choice persists per player in the save file's global counters
--- "ss_sort_method" (0-6) and "ss_sort_dir" (0 = off, 1 = ascending, 2 = descending); song_select_core
--- re-sorts when the dialog closes.
--- Search: a difficulty chooser, level sliders (from 0..13, to 0..12 then "13~" = no upper bound), three
--- text fields, a live match count. Confirming
--- hands the parameters to song_select_core through Lib/SongSearch (save counters + shared strings and the
--- ss_search_ready flag), which opens the results as a virtual folder.
---
--- activate(player, mode, baseFolder): player = whose save file; mode = "sort" (default) | "search";
--- baseFolder = the folder the search counts in.
+-- song select sort and search dialogs, as PopUI panels over the list.
 
 local PopUI = require("PopUI")
 local SongSearch = require("SongSearch")
@@ -48,8 +36,10 @@ local panel = { x = 0, y = 0, w = 0, h = 0 }
 local counter = { text = "", label = nil }
 local sortButtons = {}   -- [method 0-6] = { [1] = asc, [2] = desc, [0] = off }
 
--- ── sort ─────────────────────────────────────────────────────────────────────
+-- ==== Sort ====
 
+-- saved per player: global counters "ss_sort_method" (0-6) and "ss_sort_dir" (0 off, 1 asc, 2 desc);
+-- song_select_core re-sorts when the dialog closes
 local function readSort()
     local sav = GetSaveFile(activePlayer)
     local m = math.floor(sav:GetGlobalCounter(METHOD_KEY) + 0.5)
@@ -66,7 +56,7 @@ local function writeSort(m, d)
     sav:SetGlobalCounter(DIR_KEY, d)
 end
 
--- every row's three buttons show the saved state: the active method's direction is lit, everything else off
+-- buttons show the saved state (the active method's direction lit)
 local function refreshSortButtons()
     local m, d = readSort()
     for method, btns in pairs(sortButtons) do
@@ -106,8 +96,9 @@ local function buildSort()
     refreshSortButtons()
 end
 
--- ── search ───────────────────────────────────────────────────────────────────
+-- ==== Search ====
 
+-- OK hands the parameters over through Lib/SongSearch (ss_search_ready); song_select_core opens the results
 local LEVEL_MAX = SongSearch.LEVEL_MAX
 local search = { diffIdx = 1, from = 0, to = LEVEL_MAX, title = "", subtitle = "", charter = "" }
 
@@ -180,7 +171,7 @@ local function buildSearch()
                onClick = function() sounds.Cancel:Play(); wantClose = true end }
 end
 
--- ── lifecycle ────────────────────────────────────────────────────────────────
+-- ==== Lifecycle ====
 
 function onStart()
     sounds.Decide = SHARED:GetSharedSound("Decide")
@@ -188,6 +179,7 @@ function onStart()
     sounds.Skip   = SHARED:GetSharedSound("Skip")
 end
 
+-- player: whose save file; mode = "sort" (default) | "search"; baseFolder: the folder the search counts in
 function activate(player, mode, baseFolder)
     activePlayer, activeMode, activeBaseFolder = player or 0, mode or "sort", baseFolder
     wantClose, justOpened = false, true

@@ -258,7 +258,7 @@ function EVENTS.tobi_fade()
     tween(_s, "tobiA", TOBI_FADE_TO, TOBI_FADE_SEC, Easing.inOutSine)
 end
 
--- away runs 0..1 with the distance, so the shrink follows perspective
+-- away runs 0..1 with the distance (the shrink follows perspective)
 function EVENTS.ascend()
     tween(_s, "away", 1, AWAY_SEC, Easing.inOutSine)
     tween(_s, "tobiA", AWAY_FADE_TO, AWAY_SEC, Easing.inOutSine)
@@ -274,7 +274,7 @@ local function tobiEye()
     return AWAY_TO[1] + (ex - AWAY_TO[1]) * sc, AWAY_TO[2] + (ey - AWAY_TO[2]) * sc, sc
 end
 
--- the star starts at the figure, which stops shrinking there
+-- star starts at the figure; the figure stops shrinking there
 function EVENTS.star()
     if _star == nil then return end
     _glitch:setRate(0)
@@ -402,7 +402,7 @@ local function drawBean()
     placed(_tx.cut20_bean, m.x, m.y + _s.beanY, _s.bean)
 end
 
--- top-left on whole pixels, so the glitch's slices meet without gaps
+-- top-left on whole px (glitch slices meet without gaps)
 local function drawTobiraph()
     local m = _m.cut20_tobiraph
     if m == nil then return end

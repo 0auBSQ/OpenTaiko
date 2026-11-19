@@ -1,16 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- OWM3d/core.lua — the World: a Lua3DScene, its layer objects, and the frame pipeline that every
--- subsystem (camera / physics / maps / models / triggers / actors) hangs off.
---
--- OWM3d is the story-mode successor to Lib/isoengine.lua (which stays frozen for its remaining
--- consumers). Same cell→world convention: cell (c,r) on a W×H grid maps to world x = c..c+1,
--- z = (gridH-1-r)..(gridH-r); row 0 is the FAR side; 1 cell = 1 world unit; +Y is up.
---
---   local OWM = require("World.OWM3d")
---   local world = OWM.World.new{ rw = 1280, rh = 720, screenW = 1920, screenH = 1080, lit = true }
---   world:registerMap("plaza", { type = "folder", dir = "maps/plaza" })
---   world:loadMap("plaza", "default")
---   -- per frame: world:update(dt) ; world:render() ; world:blit()
+-- OWM3d/core.lua: World scene and frame pipeline
 
 local floor, sin, cos, pi = math.floor, math.sin, math.cos, math.pi
 
@@ -28,7 +17,7 @@ local Particles = require("World.OWM3d.particles")
 local World = {}
 World.__index = World
 
--- ── day/night sky (hour → gradient); daynight.lua takes over in the visuals phase ─────────────────
+-- ==== Sky gradient (hour) ====
 local function lerp(a, b, t) return a + (b - a) * t end
 local function lerpRGB(a, b, t) return { lerp(a[1], b[1], t), lerp(a[2], b[2], t), lerp(a[3], b[3], t) } end
 local SKY_KEYS = {
@@ -52,9 +41,9 @@ local function skyAt(hour)
     end
     return SKY_KEYS[1][2], SKY_KEYS[1][3]
 end
-World.skyAt = skyAt   -- exposed for daynight.lua / harnesses
+World.skyAt = skyAt   -- used by daynight.lua and tests
 
--- ── construction ──────────────────────────────────────────────────────────────────────────────────
+-- ==== Construction ====
 function World.new(o)
     o = o or {}
     local self = setmetatable({}, World)
@@ -77,14 +66,14 @@ function World.new(o)
     self.fogOn, self.fogNear, self.fogFar = true, 22, 120
     self.hour = o.hour                       -- nil = real local time
 
-    -- ── layer objects (same roles as isoengine; models allocate extra objects on demand) ──
+    -- ==== Layer objects ====
     local function obj(litFlag) local id = scene:NewObject(); scene:ObjSetLit(id, litFlag and self.lit or false); return id end
     self.floorObj  = obj(true)
     self.wallObj   = obj(true)
-    self.roofObj   = obj(true)               -- separate so interiors can hide roofs
+    self.roofObj   = obj(true)               -- separate: interiors hide roofs
     self.prop3dObj = obj(false)
     self._boxTarget = self.prop3dObj
-    self.doorObj   = obj(true)               -- swinging door panels (rebuilt per frame)
+    self.doorObj   = obj(true)               -- door panels (rebuilt per frame)
     self.gridObj   = obj(false); scene:ObjSetPass(self.gridObj, 1, 255, 255, 255, 42)
     self.ghostObj  = obj(false); scene:ObjSetPass(self.ghostObj, 1, 0, 0, 0, 150)
     self.hiliteObj = obj(false); scene:ObjSetPass(self.hiliteObj, 1, 80, 220, 120, 120)
@@ -97,7 +86,7 @@ function World.new(o)
     self.markerObj = obj(false); scene:ObjSetPass(self.markerObj, 1, 255, 214, 110, 150)
     self.waterObj  = obj(false); scene:ObjSetPass(self.waterObj, 1, 255, 255, 255, 185)
 
-    -- ── subsystems ──
+    -- ==== Subsystems ====
     self.phys      = Phys.new(self)
     self.cam       = Camera.new(self, { yaw = o.yaw, pitch = o.pitch, fov = o.fov, dist = o.dist })
     self.models    = Models.new(self)
@@ -109,13 +98,15 @@ function World.new(o)
     self.particles = Particles.new(self)
     self.daynight  = DayNight.new(self)
 
-    -- initial shadow-casting light ≈ camera; daynight:update animates the sun from here on
+    -- initial light = camera angles; daynight:update moves it after
     if self.lit then self:setLight(self.cam.canonYaw, self.cam.pitch) end
     self.cam:apply()
     return self
 end
 
--- ── coordinates (identical math to isoengine — parity-tested) ─────────────────────────────────────
+-- ==== Coordinates ====
+-- cell (c, r) -> x = c..c+1, z = (gridH-1-r)..(gridH-r); 1 cell = 1 unit, +Y up
+-- row 0 is the far side
 function World:setGridSize(w, h) self.gridW, self.gridH = w, h end
 function World:cellToWorld(c, r) return c + 0.5, (self.gridH - 1 - r) + 0.5 end
 function World:worldToCell(wx, wz) return floor(wx), self.gridH - 1 - floor(wz) end
@@ -144,7 +135,7 @@ function World:project(wx, wy, wz)
     return sx * (self.SW / self.RW), sy * (self.SH / self.RH), depth
 end
 
--- sprite facing from a world move (port of isoengine's live-yaw projection + hysteresis)
+-- sprite facing (1..4) from a world move, with hysteresis
 local DIRV = { [1] = { -1, -1 }, [2] = { 1, -1 }, [3] = { 1, 1 }, [4] = { -1, 1 } }
 function World:facingFromWorld(wx, wz, prev)
     if wx == 0 and wz == 0 then return prev or 2 end
@@ -161,7 +152,7 @@ function World:facingFromWorld(wx, wz, prev)
     else return (sx >= 0) and 2 or 1 end
 end
 
--- ── shadow light (drives draped sprite shadows + the sun) ─────────────────────────────────────────
+-- ==== Shadow light ====
 function World:setLight(yawDeg, pitchDeg)
     local yr = (yawDeg or self.cam.canonYaw) * pi / 180
     self.lightDx, self.lightDz = sin(yr), cos(yr)
@@ -173,7 +164,7 @@ function World:setLight(yawDeg, pitchDeg)
     self.scene:SetSun(-self.lightDx * ca, math.sin(el), -self.lightDz * ca, 0.85, 0.82, 0.72)
 end
 
--- ── post grade / fog ──────────────────────────────────────────────────────────────────────────────
+-- ==== Post and fog ====
 function World:setDiorama(tilt, sat, vig, bloom)
     if tilt == nil then self.diorama = nil
     else self.diorama = { tilt = tilt or 2.2, sat = sat or 1.2, vig = vig or 0.28, bloom = bloom or 0.5 } end
@@ -197,20 +188,18 @@ function World:setCelShade(k)
     self.scene:SetCelShade(k or 0)
     return true
 end
--- thin passthroughs for the Lua-attached post shader (visuals phase; guarded so older builds no-op)
+-- post shader passthroughs (no-op without engine support)
 function World:setPostShader(src) if self.scene.SetPostShader then self.scene:SetPostShader(src or "") end end
 function World:setPostUniform(slot, a, b, c, d) if self.scene.SetPostUniform then self.scene:SetPostUniform(slot, a or 0, b or 0, c or 0, d or 0) end end
 
--- ── map registry passthroughs ─────────────────────────────────────────────────────────────────────
+-- ==== Map registry ====
 function World:registerMap(id, def) self.maps:register(id, def) end
 function World:loadMap(id, spawnName) return self.maps:load(id, spawnName) end
 function World:unloadMap() self.maps:unload() end
 function World:currentMap() return self.maps.current end
 
--- ── texture name→id pool ──────────────────────────────────────────────────────────────────────────
--- The same name maps to the SAME id for the world's whole lifetime, so re-registering "grass" on a
--- map switch REPLACES the pixels under one id instead of growing the scene's registry with a fresh
--- id per load (the registry only ever holds one entry per distinct texture name).
+-- ==== Texture pool ====
+-- one id per name for the world's lifetime: re-registering replaces the pixels
 function World:texIdFor(name)
     self.texPool = self.texPool or { ids = {}, next = 5000 }
     local id = self.texPool.ids[name]
@@ -222,7 +211,7 @@ function World:texIdFor(name)
     return id
 end
 
--- ── memory readout (debug overlays / leak hunts) ──────────────────────────────────────────────────
+-- ==== Memory stats ====
 function World:getMemoryStats()
     local s = { luaKB = math.floor(collectgarbage("count")) }
     if self.scene.GetMemoryStats then
@@ -240,15 +229,16 @@ function World:getMemoryStats()
     return s
 end
 
--- ── stage-exit disposal (the per-stage tier of the contract) ─────────────────────────────────────
+-- ==== Stage-exit disposal ====
 function World:dispose()
     pcall(function() self.maps:unload() end)
     pcall(function() self.scene:Dispose() end)
     if MODEL and MODEL.PurgeCache then pcall(function() MODEL:PurgeCache() end) end
 end
 
--- ── per-frame pipeline ────────────────────────────────────────────────────────────────────────────
--- world:update(dt, px, py, pz): px/py/pz = the player focus (drives triggers + camera collision).
+-- ==== Frame pipeline ====
+-- per frame: update, render, blit
+-- px, py, pz: player focus (triggers, camera collision)
 function World:update(dt, px, py, pz)
     self.time = (self.time or 0) + dt
     if self.scene.SetTime then self.scene:SetTime(self.time) end
@@ -260,10 +250,10 @@ function World:update(dt, px, py, pz)
     self.weather:update(dt, px, py, pz)
     self.particles:update(dt)
     self.cam:update(dt)
-    self.water:update(dt)   -- after the camera settles: reflections mirror the final eye
+    self.water:update(dt)   -- after cam: reflections use the final eye
 end
 
--- a flat backdrop instead of the day sky (interiors, voids): nil restores the sky
+-- solid sky colour; nil restores the day sky
 function World:setSolidSky(r, g, b)
     if r == nil then
         if self.solidSky ~= nil and self.daynight then self.daynight._skyInstalled = false end
@@ -274,9 +264,8 @@ function World:setSolidSky(r, g, b)
     if self.scene.SetSkyShader then pcall(function() self.scene:SetSkyShader("") end) end
 end
 
--- no backdrop at all: the frame starts fully transparent, so the scene composites over whatever
--- the stage drew before world:blit() (another scene, a canvas animation). Needs the engine's
--- ClearTransparent; without it the previous frame would bleed through, so it falls back to black.
+-- transparent clear: the scene draws over what the stage drew before blit()
+-- falls back to black without ClearTransparent
 function World:setTransparentSky()
     self.solidSky = "none"
     if self.scene.SetSkyShader then pcall(function() self.scene:SetSkyShader("") end) end
@@ -298,17 +287,17 @@ function World:drawSky()
     local hour = self.hour
     if not hour then local t = os.date("*t"); hour = t.hour + t.min / 60 end
     local top, hor = skyAt(hour)
-    self.curSky = { top = top, hor = hor }          -- fog + reflection clear colours track the hour either way
+    self.curSky = { top = top, hor = hor }          -- fog and reflections read this on both paths
     if self.scene.SetSkyColors then
         local pal = require("World.OWM3d.sky").paletteAt(hour)
         self.scene:SetSkyColors(pal.hor[1], pal.hor[2], pal.hor[3], pal.zen[1], pal.zen[2], pal.zen[3])
     end
-    -- GPU path: the procedural sky shader paints the frame (clouds/sun/stars/moon) — skip the 2D bands
+    -- GPU sky shader: skip the 2D bands
     if self.scene.SkyShaderActive and self.scene:SkyShaderActive() and self.daynight and self.daynight.sunX then
         local dn = self.daynight
         local cover = 0
         if self.weather and self.weather.isRaining and self.weather:isRaining() then
-            cover = 0.45 * self.weather.intensity   -- rain overcasts the dome before the drops land
+            cover = 0.45 * self.weather.intensity   -- rain cloud cover
         end
         require("World.OWM3d.sky").update(self.scene, self.cam.fov, self.RW, self.RH,
             dn.sunX, dn.sunY, dn.sunZ, dn.dayF or 1, dn.nightF or 0, hour, cover)
@@ -327,7 +316,7 @@ function World:render()
     local d = self.cam.dist or 0
     if self.fogOn and self.curSky then
         local h = self.curSky.hor
-        local wf = self.weatherFogScale or 1   -- rain pulls the fog in
+        local wf = self.weatherFogScale or 1   -- rain fog scale
         self.scene:SetFog(true, h[1], h[2], h[3], d + (self.fogNear or 24) * wf, d + (self.fogFar or 60) * wf)
     else
         self.scene:SetFog(false, 0, 0, 0, 0, 0)
@@ -345,7 +334,7 @@ function World:render()
     end
     self.scene:Render()
     self.scene:Upload()
-    -- surface sky/post shader compile failures once (they otherwise degrade silently)
+    -- print shader compile errors once
     if self.scene.GetShaderError then
         local err = self.scene:GetShaderError()
         if err ~= "" and err ~= self._lastShaderErr then

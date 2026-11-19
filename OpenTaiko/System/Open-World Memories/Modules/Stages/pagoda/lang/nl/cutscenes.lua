@@ -1,4 +1,4 @@
--- Dutch for story/cutscenes/; a missing key shows the English.
+-- Dutch for story/cutscenes/; missing keys fall back to English
 
 local T = {}
 

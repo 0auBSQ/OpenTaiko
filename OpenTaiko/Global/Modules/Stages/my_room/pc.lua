@@ -1,35 +1,12 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- pc.lua — the computer screen: a PopUI two-pane window over the save file (replaces nameplates.lua).
---
--- Tabs (top row = 1st focus layer, list = 2nd layer, config_ui-style handoff):
---   Characters — browse CHARACTERLIST (rarity + unlock state); select → LuaSaveFile:ChangeCharacter.
---   Puchichara — same via PUCHICHARALIST / ChangePuchichara.
---   Dan Titles — the earned dan ranks (ChangeDan), previewed with the REAL dan plate renderer
---                (NAMEPLATE:DrawDanPlate with the clear-status grade + the gold gradient text markup).
---   Nameplates — NAMEPLATESLIST / ChangeNameplate with a DrawTitlePlate preview, one pack at a time
---                (the pack strip above the list). Unowned MYTHICAL plates stay hidden and opaque
---                conditions (ig/gt/gc) read "???".
---   Rename     — a PopUI textbox (engine text input) → ChangeName.
---
--- Interaction pattern copied from ROActivities/config_ui: Left/Right move between tabs while a tab
--- is focused; Down from a tab enters the list; Up past the first row (or Down past the last) hands
--- focus back to the active tab; the wheel scrolls the hovered list. The list is a ClippedMenu (a
--- stage-local PopUI.Menu subclass) that culls PARTIAL rows entirely — rows can never poke out of
--- the panel — and paints per-row states: locked = desaturated + dimmed, equipped = yellow face.
---
--- Locked entries always show a real unlock line (message → blocked reason → coin price; "???" only
--- for the genuinely hidden condition types). Coin unlocks spend via Coins/SpendCoins like the shop.
--- While the screen is open the C# MyRoom BGM loops (lazy, pcall-guarded).
---
--- NOTE for the planned furniture SHOP on this screen: use OWM3d ModelIcon previews at res = 512,
--- created when the screen opens and dispose()d when it closes (see editmode.lua for the pattern).
+-- computer screen: two-pane window over the save file
 
-local UI = require("uilib")           -- the skin's UI library (UI.Pick), picked on first use
-local Widget = require("UI.SimpleUI.widget")   -- the widget base every library shares (its editable helper runs at load)
+local UI = require("uilib")
+local Widget = require("UI.SimpleUI.widget")   -- shared widget base; Widget.editable runs at load
 local I18N = require("Locale.i18n")
 local T = I18N.texts("computer")   -- lang/<code>/computer.json
 local NavInput = require("Input.NavInput")
-local Purse = require("purse")       -- the coin purse, the same element the room's dialogues use
+local Purse = require("purse")
 local Util = require("Core.Util")
 
 local PC = {}
@@ -42,19 +19,18 @@ local DETAIL_X = LIST.x + LIST.w + 50                -- right pane left edge
 local DETAIL_W = PANEL.x + PANEL.w - 44 - DETAIL_X
 local DETAIL_CX = math.floor(DETAIL_X + DETAIL_W / 2)
 local ROW_H = 66
--- an unlocked character / puchichara: the preview takes the pane's left half, its information the right
+-- unlocked character or puchichara: preview on the left half, info on the right
 local DETAIL_PREVIEW_CX = math.floor(DETAIL_X + DETAIL_W * 0.27)
 local DETAIL_PREVIEW_W  = math.floor(DETAIL_W * 0.5) - 40
 local DETAIL_INFO_X     = DETAIL_X + math.floor(DETAIL_W * 0.53)
 local DETAIL_INFO_W     = DETAIL_X + DETAIL_W - 24 - DETAIL_INFO_X
--- the purse sits under the tab row, flush with the panel's right edge, above the list / detail top
+-- purse: under the tab row, flush with the panel's right edge
 local PURSE = { w = 300, h = 52, x = PANEL.x + PANEL.w - 44 - 300, y = PANEL.y + 140 }
 local GAUGE_COL = { Normal = { 52, 58, 92 }, Hard = { 214, 64, 56 }, Extreme = { 140, 0, 0 } }
--- the Minesweeper rate tags: a pill with the note's icon (Textures/Icons/<name>.png, derived from the
--- mine note and the fuse-roll clock in Graphics/5_Game) and the percentage
+-- Minesweeper rate tags: Textures/Icons/<name>.png icon and percentage in a pill
 local TAG_H, TAG_ICON, TAG_PAD, TAG_GAP, TAG_FONT = 36, 26, 8, 12, 19
 local TAG_FACE, TAG_INK = { 212, 216, 234, 255 }, { 52, 58, 92 }
--- an entry's Effects (a .NET dictionary keyed by the Effects.json field names) as a plain table
+-- entry.Effects (.NET dictionary, Effects.json keys) as a plain table
 local function effectsOf(e)
     local ok, fx = pcall(function()
         local d = e.Effects
@@ -64,7 +40,7 @@ local function effectsOf(e)
     end)
     return (ok and type(fx) == "table") and fx or {}
 end
--- gauge type -> its name id and its note id in computer.json
+-- gauge type -> name id, note id (computer.json)
 local GAUGE_KEYS = {
     Normal = { "gauge_normal", "gauge_normal_desc" }, Hard = { "gauge_hard", "gauge_hard_desc" },
     Extreme = { "gauge_extreme", "gauge_extreme_desc" },
@@ -72,24 +48,20 @@ local GAUGE_KEYS = {
 
 local TABS = { "tab_characters", "tab_puchichara", "tab_dan_titles", "tab_nameplates", "tab_rename" }   -- computer.json ids
 local TAB_W, TAB_STEP, TAB_X0 = 278, 290, PANEL.x + 36
--- conditions that read exactly "???" — re-checked against the FULL CUnlockConditionFactory list
--- (ch/cs/cm/ce coin paths, sd/dp/lp/sp/sg/sc performance, tp/ap/aw play counts are all earnable
--- and self-describing): "ig" is literally "Impossible to Get"; "gt"/"gc" are story-driven global
--- trigger/counter flags with no player-readable condition, unless the Unlock.json gives its own text
+-- shown as "???" unless Unlock.json gives text: ig is impossible to get,
+-- gt/gc are story trigger and counter flags with no readable condition
 local OPAQUE_COND = { ig = true, gt = true, gc = true }
 
 local RARITY_COL = {
     Poor = { 150, 150, 150 }, Common = { 200, 205, 210 }, Uncommon = { 120, 220, 130 }, Rare = { 110, 170, 255 },
     Epic = { 200, 130, 255 }, Legendary = { 255, 200, 90 }, Mythical = { 255, 120, 120 },
 }
--- rarity sort order inside a nameplate type group (Poor → Mythical; DB order is the tiebreak)
+-- sort order in a nameplate type group; DB order breaks ties
 local RARITY_ORDER = { Poor = 1, Common = 2, Uncommon = 3, Rare = 4, Epic = 5, Legendary = 6, Mythical = 7 }
--- Rarity string → modal integer (matches HRarity.RarityToModalInt in C#)
--- Poor=0, Common=0, Uncommon=1, Rare=2, Epic=3, Legendary=4, Mythical=4
+-- matches HRarity.RarityToModalInt in C#
 local RARITY_MODAL = { Poor = 0, Common = 0, Uncommon = 1, Rare = 2, Epic = 3, Legendary = 4, Mythical = 4 }
-local GOLD_MARKUP = "<g.#FFE34A.#EA9622>%s</g>"      -- the gold dan-title gradient
--- gallery text, at font size 14:
---   title plates: Color.Black on Color.Transparent    dan rows: White (gold rows: Color.Gold) on Black
+local GOLD_MARKUP = "<g.#FFE34A.#EA9622>%s</g>"      -- dan-title gradient
+-- gallery text, size 14: plates Color.Black on Transparent; dan rows White (gold: Color.Gold) on Black
 local HEYA_FONT = 14
 local plateFg, plateBg, danFg, danGoldFg, danBg = nil, nil, nil, nil, nil
 local function bakeColors()
@@ -100,8 +72,8 @@ local function bakeColors()
     danBg     = danBg or COLOR:CreateColorFromRGBA(0, 0, 0, 255)
 end
 
--- nameplate types: names in lang/<code>/nameplate_types.json (English fallback), "special" hidden
--- types flagged in data/nameplate_types.json
+-- nameplate type names: lang/<code>/nameplate_types.json (English fallback)
+-- "special" hidden types flagged in data/nameplate_types.json
 local TYPE_NAMES = I18N.texts("nameplate_types")
 local typeCfg, typeCfgTried = nil, false
 local function loadTypeCfg()
@@ -118,19 +90,17 @@ local THEME = {
     },
     font = { small = 17, label = 21, button = 22, title = 30 },
 }
--- the round red close button (w == h and radius ≥ half the size bakes a circle)
+-- close button: w == h and radius >= half the size bakes a circle
 local CLOSE_STYLE = {
     radius = 40,
     colors = { primary = { 208, 62, 56, 255 }, primary2 = { 158, 34, 30, 255 },
                outline = { 96, 24, 20, 255 }, textOnAccent = { 255, 255, 255, 255 } },
 }
 
--- ── ClippedMenu: UI.Menu subclass — edge-faded rows + per-row state faces + scrollbar ──────────
--- rowStyle(i) → "normal" | "locked" | "equipped" | "header". Neither LuaCanvas (baked row faces)
--- nor the glyph fonts expose a source-rectangle draw, so a hard mask is impossible — edge rows use
--- the graceful fallback instead: a row that would overflow the panel SLIDES against the edge and
--- alpha-fades out proportionally to its overflow (no pop-in). visibleRowRects() keeps the strict
--- fully-inside maths for the harness clipping check.
+-- ==== ClippedMenu ====
+-- UI.Menu subclass: per-row state faces and a scrollbar
+-- rowStyle(i) -> "normal" | "locked" | "equipped" | "header"
+-- visibleRowRects(): fully-inside rows, for the harness clip check
 local ClippedMenu = setmetatable({}, { __index = function(_, k) return UI.Menu[k] end })
 ClippedMenu.__index = ClippedMenu
 
@@ -139,7 +109,7 @@ function ClippedMenu.new(o)
     return setmetatable(m, ClippedMenu)
 end
 
--- a row's ink rect at the current scroll, or nil when it isn't FULLY inside (harness contract)
+-- row ink rect at the current scroll; nil unless fully inside (harness contract)
 function ClippedMenu:rowRect(i)
     local rh = self.rowHeight
     local ry = self.y + (i - 1) * rh - self._scrollCur
@@ -157,8 +127,7 @@ function ClippedMenu:visibleRowRects()
     return out
 end
 
--- the draw-time variant: TRUE positions, coarse cull only — rows that overlap the viewport at
--- all are drawn and pixel-cut by the GRAPHICS scissor clip (no fades, no clamping)
+-- draw-time variant: true positions, coarse cull; the GRAPHICS scissor clip cuts the edge rows
 function ClippedMenu:rowDraw(i)
     local rh = self.rowHeight
     local ry = self.y + (i - 1) * rh - self._scrollCur
@@ -167,7 +136,7 @@ function ClippedMenu:rowDraw(i)
     return ry, ink
 end
 
--- side scrollbar pieces, baked ONCE per menu build (content size is fixed until a tab switch)
+-- scrollbar pieces, baked once per menu build (content size fixed until a tab switch)
 local function bakePill(w, h, col)
     local cv = CANVAS:CreateCanvas(w, h)
     cv:ClearTransparent()
@@ -220,9 +189,8 @@ function ClippedMenu:draw()
     if not self.visible then return end
     local c = self.eff.colors
     local U = UI.Util
-    -- TRUE scissor clipping: everything between SetClip/ClearClip (faces, glyph text) is
-    -- pixel-cut at the list rect — partial edge rows render at their real positions and are
-    -- simply cut, exactly like a native scrolling list. ALWAYS paired with ClearClip below.
+    -- scissor clip: faces and glyph text are cut at the list rect
+    -- always paired with ClearClip below
     local clip = GRAPHICS ~= nil and GRAPHICS.SetClip ~= nil
     if clip then GRAPHICS:SetClip(self.x - 8, self.y - 1, self.w + 16, self.h + 2) end
     for i = 1, self:_count() do
@@ -233,21 +201,19 @@ function ClippedMenu:draw()
             local isSel = (i == self.selected)
             local st = self.rowStyle and self.rowStyle(i) or "normal"
             if st == "header" then
-                -- type-section header: no row face / focus ring, just a centred divider label
+                -- type header: centred label, no face or ring
                 local it = self.items[i]
                 local label = it and (it.text or tostring(it)) or ""
                 self.mgr:drawTextEx(self.eff.font.small, label, rcx, rcy,
                     { 108, 114, 146 }, { 255, 255, 255, 140 }, 1, 1, self.w - 40, "center")
             else
                 local tint = (STYLE_TINT[st] or STYLE_TINT.normal)[isSel and 2 or 1]
-                -- failed-unlock feedback: the baked face flashes red for ~0.4 s (tint only,
-                -- no new textures); _flashI/_flashK are driven by PC:update
+                -- failed unlock: the face flashes red for ~0.4 s (tint only); _flashI/_flashK set by PC:update
                 local fk = (self._flashI == i and self._flashK) and self._flashK or 0
                 local tr = math.min(1, tint[1] + fk * 0.9)
                 local tg = tint[2] * (1 - 0.8 * fk)
                 local tb = tint[3] * (1 - 0.8 * fk)
-                -- equipped/locked keep their own face even when selected (state beats selection
-                -- colour); selection still reads via the deeper tint + the focus ring
+                -- equipped/locked keep their face when selected; selection shows by tint and focus ring
                 local piece = (isSel and st == "normal") and self._rowSel or self._row
                 piece.canvas:SetColor(tr, tg, tb)
                 piece.canvas:SetOpacity(1)
@@ -274,11 +240,11 @@ function ClippedMenu:draw()
         end
     end
     if clip then GRAPHICS:ClearClip() end
-    self:drawScrollbar()                 -- the bar lives beside the panel, OUTSIDE the clip
+    self:drawScrollbar()                 -- beside the panel, outside the clip
 end
 
--- clickable scrollbar: thumb dragging scrolls proportionally, track clicks jump a page.
--- Runs inside the widget update (PopUI cursor ctx: mx/my/mPressed/mPressing).
+-- scrollbar: drag the thumb, or click the track to page
+-- runs in the widget update (ctx: mx/my/mPressed/mPressing)
 function ClippedMenu:update(ctx)
     UI.Menu.update(self, ctx)
     if not self._sbThumb then return end
@@ -309,10 +275,9 @@ function ClippedMenu:update(ctx)
     end
 end
 
--- ── PackStrip: the nameplate packs as a row of chips above the list, scrolled sideways ─────────────
--- The keyboard's Left/Right pick a pack. On a pad, Decide puts the strip in its edit mode first (PopUI's
--- editable pattern), so the pad's Left/Right still move between the widgets until then. The wheel scrolls
--- the strip and a click picks the chip under the pointer. Chips outside the strip are cut by the clip.
+-- ==== PackStrip ====
+-- nameplate packs as chips above the list; keyboard Left/Right pick a pack
+-- on a pad, Decide enters edit mode first (editable pattern); until then Left/Right move focus
 local CHIP_W, CHIP_GAP, STRIP_H = 200, 12, 54
 local PackStrip = setmetatable({}, { __index = function(_, k) return UI.Widget[k] end })
 PackStrip.__index = PackStrip
@@ -357,7 +322,7 @@ function PackStrip:_clamp()
     self._scrollTarget = math.max(0, math.min(math.max(0, contentW - self.w), self._scrollTarget))
 end
 
--- scrolls chip i into the strip (instant = no easing)
+-- instant: no easing
 function PackStrip:showChip(i, instant)
     local x0 = (i - 1) * (CHIP_W + CHIP_GAP)
     if x0 < self._scrollTarget then self._scrollTarget = x0 end
@@ -379,7 +344,7 @@ end
 
 Widget.editable(PackStrip, function(self, dir) self:setIndex(self.index + dir) end)
 
--- a click picks the chip under the pointer (Decide goes to onDecide, the edit mode, instead)
+-- click picks the chip under the pointer; Decide goes to onDecide (edit mode)
 function PackStrip:onActivate()
     if self._mx == nil then return end
     local rel = self._mx - self.x + self._scrollCur
@@ -423,11 +388,9 @@ function PackStrip:draw()
     if clip then GRAPHICS:ClearClip() end
 end
 
--- ── the MyRoom BGM with CROSSFADES (created lazily ONCE; disposed via PC.disposeBgm) ──────────────
--- stage-local copy (Sounds/bgm.ogg — the jukebox BGM tab plays the same file). Opening the computer fades this BGM IN
--- (slightly delayed so the room's jukebox — ducked by Script via JB.setDuck — fades down first);
--- closing fades it OUT and stops the stream at silence. Script pumps PC.tickBgmFade(dt) EVERY
--- frame so the fade-out finishes after the screen has closed.
+-- ==== MyRoom BGM ====
+-- Sounds/bgm.ogg, created once (PC.disposeBgm); fades in after the jukebox ducks (JB.setDuck)
+-- Script calls PC.tickBgmFade(dt) every frame: the fade-out ends after the screen closes
 local bgm, bgmFailed = nil, false
 local bgmVol, bgmTarget, bgmDelay = 0, 0, 0
 local bgmStopAt0 = false
@@ -467,12 +430,12 @@ function PC.tickBgmFade(dt)
         pcall(function() bgm:Stop() end)
     end
 end
--- the failed-unlock error blip: the skin's own error sound
+-- failed unlock: the skin's Error sound
 local function errPlay()
     SHARED:GetSharedSound("Error"):Play()
 end
 
--- the unlock sfxs used by unlock modals (Sounds/Unlock/<rarity>.ogg, the modal's own set)
+-- Sounds/Unlock/<modal rarity>.ogg, as the unlock modals use
 local unlockSfxs = {}
 local function unlockPlay(rarity)
     local idx = RARITY_MODAL[rarity] or 0
@@ -499,7 +462,7 @@ function PC.new()
 end
 function PC:active() return self.isOpen end
 
--- ── list building ─────────────────────────────────────────────────────────────────────────────────
+-- ==== list building ====
 function PC:buildLists()
     local save = self.save
     self.chars, self.puchis, self.dans, self.nps = {}, {}, {}, {}
@@ -526,15 +489,14 @@ function PC:buildLists()
             local np = NAMEPLATESLIST:GetByIndex(i)
             if np ~= nil then
                 local owned = save:IsNameplateUnlocked(np.Id)
-                -- unowned MYTHICAL nameplates stay hidden (kept secret until earned)
+                -- unowned Mythical nameplates stay hidden
                 if owned or np.Rarity ~= "Mythical" then
                     self.nps[#self.nps + 1] = np
                 end
             end
         end
     end)
-    -- the packs of the listed nameplates, in catalogue order (the shipped one first); the strip above
-    -- the list picks one, starting on the pack of the equipped nameplate
+    -- packs of the listed nameplates in catalogue order; starts on the equipped nameplate's pack
     self.packs = {}
     local seen = {}
     for _, np in ipairs(self.nps) do
@@ -554,9 +516,8 @@ function PC:buildLists()
     self:buildNameplateRows()
 end
 
--- the rows of the chosen pack's nameplates, grouped by their TYPE (nameplateInfo.iType — the plate art
--- family the customize screen keys on): a named header row opens each type section; entries sort by
--- rarity ascending (Poor → Mythical) with DB order as the tiebreak.
+-- chosen pack's rows, grouped by type (nameplateInfo.iType) under a header row
+-- sorted by rarity ascending, DB order breaks ties
 function PC:buildNameplateRows()
     local pack = self.packs[self.packSel]
     self.npRows = {}
@@ -588,9 +549,8 @@ function PC:buildNameplateRows()
     end
 end
 
--- display name of a nameplate type in the current language (English fallback). "special" types stay
--- "???" until the player owns at least one UNLOCKED nameplate of that type. Unknown types fall back
--- to a generic numbered label.
+-- type name in the current language (English fallback); unknown types get a numbered label
+-- "special" types read "???" until the player owns one of that type
 function PC:typeName(t)
     loadTypeCfg()
     local name = TYPE_NAMES:get(tostring(t), "name")
@@ -620,7 +580,7 @@ function PC:curList()
     return {}
 end
 
--- ── owned / equipped state helpers ────────────────────────────────────────────────────────────────
+-- ==== owned / equipped state ====
 local function isOwned(save, tab, e)
     if tab == 1 then return save:IsCharacterUnlocked(e.FolderName) or not e.UnlockCondition.HasCondition end
     if tab == 2 then return save:IsPuchicharaUnlocked(e.FolderName) or not e.UnlockCondition.HasCondition end
@@ -647,7 +607,7 @@ local function entryName(save, tab, e)
     return owned and (e.Title or "") or T:tr("unknown")
 end
 
--- the ENTRY behind row i (nil for type-section headers on the nameplates tab)
+-- entry behind row i; nil for nameplate type headers
 function PC:entryAt(i)
     if self.tab == 4 then
         local row = self.npRows and self.npRows[i]
@@ -663,7 +623,7 @@ function PC:rowSelectable(i)
     return row ~= nil and row.e ~= nil
 end
 
--- the state of row i in the current list (drives the ClippedMenu row faces)
+-- row i state, for the ClippedMenu faces
 function PC:rowStyleFor(i)
     if self.tab == 4 and not self:rowSelectable(i) then return "header" end
     local e = self:entryAt(i)
@@ -673,13 +633,13 @@ function PC:rowStyleFor(i)
     return "normal"
 end
 
--- ── UI build ──────────────────────────────────────────────────────────────────────────────────────
+-- ==== UI build ====
 local function setFocusTo(ui, w)
     if not w then return end
     for i, fw in ipairs(ui.focusables) do if fw == w then ui.focusIdx = i; return end end
 end
 
--- Left/Right switch tabs while a tab button is focused (config_ui's setupHandleTabKeys)
+-- Left/Right switch tabs while a tab button is focused
 local function setupHandleTabKeys(pc, tab)
     function tab:onNavRight() SHARED:GetSharedSound("Skip"):Play(); return pc:setTab(pc.tab % #TABS + 1) end
     function tab:onNavLeft() SHARED:GetSharedSound("Skip"):Play(); return pc:setTab((pc.tab - 2) % #TABS + 1) end
@@ -701,14 +661,14 @@ function PC:buildUI()
             onClick = function() pc:setTab(i) end,
         }
         t._tab = i
-        -- config_ui handoff: Down from a tab enters the 2nd layer (list / rename box); Up wraps too
+        -- Down (and Up) from a tab focuses the list or rename box
         t.onNavDown = function() return pc:focusList() end
         t.onNavUp = function() return pc:focusList() end
         t.onDecide = function (self) self:keyActivate(); return self:onNavDown() end
         setupHandleTabKeys(pc, t)
         self.tabBtns[i] = t
     end
-    -- the round RED close button
+    -- close button
     ui:button{ text = "×", x = PANEL.x + PANEL.w - 74, y = PANEL.y - 14, w = 64, h = 64,
                accent = true, style = CLOSE_STYLE,
                onClick = function() pc._wantClose = true end, sfx = { click = "" } }
@@ -730,7 +690,7 @@ function PC:buildUI()
         self.tb = nil
         local items = {}
         if self.tab == 4 then
-            -- nameplates: type-section headers interleaved with the entries (rows = npRows)
+            -- nameplates: rows = npRows, type headers between entries
             for _, row in ipairs(self.npRows or {}) do
                 items[#items + 1] = row.e and entryName(self.save, self.tab, row.e) or row.header
             end
@@ -739,7 +699,7 @@ function PC:buildUI()
                 items[#items + 1] = entryName(self.save, self.tab, e)
             end
         end
-        -- the initial cursor may never rest on a header row
+        -- the initial cursor never rests on a header row
         local sel = math.max(1, math.min(self.sel or 1, math.max(1, #items)))
         if not self:rowSelectable(sel) then
             local found = nil
@@ -749,7 +709,7 @@ function PC:buildUI()
             end
             sel = found or sel
         end
-        -- nameplates: the pack strip sits above the list, which loses its top row to it
+        -- nameplates: the pack strip takes the list's top row
         local listY, listH = LIST.y, LIST.h
         self.strip = nil
         if self.tab == 4 and #(self.packs or {}) > 0 then
@@ -772,8 +732,7 @@ function PC:buildUI()
         }
         ui:add(menu)
         self.menu = menu
-        -- 2nd-layer ↔ 1st-layer handoff at the list edges (config_ui pattern); header rows are
-        -- skipped in BOTH directions — the cursor hops straight between the entries around them
+        -- list edges hand focus back to the strip or tab; header rows are skipped both ways
         menu.onNavUpOrPadLeft = function(m)
             local i = m.selected - 1
             while i >= 1 and not pc:rowSelectable(i) do i = i - 1 end
@@ -814,8 +773,8 @@ function PC:setTab(i)
     return false
 end
 
--- the strip picked another pack: the list shows its nameplates (rows, cursor and scroll replaced in
--- place, so the strip keeps its focus and edit mode), the cursor on the equipped one when it is there
+-- another pack picked: rows, cursor and scroll replaced in place (the strip keeps focus and edit mode)
+-- cursor on the equipped nameplate when it is in the pack
 function PC:selectPack(i)
     self.packSel = i
     self:buildNameplateRows()
@@ -845,7 +804,8 @@ function PC:selectPack(i)
     self:refreshDetail()
 end
 
--- ── detail state (recomputed on selection change, drawn every frame) ──────────────────────────────
+-- ==== detail state ====
+-- recomputed on selection change, drawn every frame
 function PC:refreshDetail()
     local save = self.save
     local e = self:entryAt(self.sel or 1)
@@ -863,9 +823,7 @@ function PC:refreshDetail()
         d.rarity = e.Rarity
         uc = e.UnlockCondition
     elseif self.tab == 3 then
-        -- dan plate preview:
-        -- gold ranks: TitleTextureKey("<g...>title</g>", font14, Color.Gold, Color.Black, 1000)
-        -- normal:     TitleTextureKey(title, font14, Color.White, Color.Black, 1000)
+        -- dan plate as C# TitleTextureKey(title, font14, White or Gold, Black, 1000); gold ranks use GOLD_MARKUP
         d.danGrade = e.ClearStatus or 0
         d.danGold = e.IsGold and true or false
         local label = d.danGold and string.format(GOLD_MARKUP, e.Title or "") or (e.Title or "")
@@ -878,14 +836,14 @@ function PC:refreshDetail()
         d.rarity = e.Rarity
         uc = e.UnlockCondition
         local title = d.owned and (e.Title or "") or T:tr("unknown")
-        -- baked EXACTLY like the C# customize gallery: black on transparent, maxwidth 1000
-        -- (the skin's drawTitlePlate clamps the drawn width itself)
+        -- baked as the C# customize gallery: black on transparent, maxwidth 1000
+        -- (the skin's drawTitlePlate clamps the drawn width)
         pcall(function()
             bakeColors()
             d.plateTx = self.ui:font(HEYA_FONT):GetText(title, false, 1000, plateFg, plateBg)
         end)
     end
-    -- an unlocked character / puchichara: its description (under the preview) and its information column
+    -- unlocked character or puchichara: description and info column
     if d.owned and (self.tab == 1 or self.tab == 2) then
         pcall(function() d.description = e.Description or "" end)
         d.info = {}
@@ -921,8 +879,7 @@ function PC:refreshDetail()
         pcall(function() d.price = uc:GetCoinPrice() or 0 end)
         local ctype = ""
         pcall(function() ctype = uc:GetConditionType() or "" end)
-        -- a locked entry must ALWAYS show a real line: message → blocked reason → coin price;
-        -- "???" only for the genuinely hidden condition types
+        -- locked entries show a real line: message, else blocked reason, else coin price; "???" only for OPAQUE_COND
         local m = ""
         local custom = false
         pcall(function() custom = uc.HasCustomMessage == true end)
@@ -939,7 +896,7 @@ function PC:refreshDetail()
         pcall(function() d.unlockable = uc:IsUnlockable(0) end)
     end
     self.detail = d
-    -- action button state
+    -- action button
     if self.actionBtn then
         self.actionBtn:setVisible(true)
         if d.equipped then
@@ -955,13 +912,13 @@ function PC:refreshDetail()
     end
 end
 
--- ── actions ───────────────────────────────────────────────────────────────────────────────────────
+-- ==== actions ====
 function PC:activateSelected()
     local save = self.save
     local e = self:entryAt(self.sel or 1)
     if e == nil then return end          -- header rows (nameplates tab) are inert
     local tab = self.tab
-    -- failed-unlock feedback: red row flash + the error blip (no text line, no rebuild)
+    -- failed unlock: row flash and Error sound, no rebuild
     local function denied()
         if self.menu then
             self.menu._flashI = self.sel
@@ -988,8 +945,8 @@ function PC:activateSelected()
         unlockEquip(save:IsCharacterUnlocked(e.FolderName), e.UnlockCondition, e.Rarity,
             function() return save:UnlockCharacter(e.FolderName) end,
             function()
-                -- the engine frees every animation of the character taken off, its preview included: give the
-                -- preview back first, so hovering that character again loads it anew
+                -- the engine frees every animation of the character taken off, preview included:
+                -- forget it in loadedAnims (hovering it again reloads)
                 local old = self.loadedAnims[save.CharacterName]
                 if old ~= nil and old.FolderName ~= e.FolderName then
                     pcall(function() old.Character:DisposeAnimation(CHARACTER.ANIM_MENU_NORMAL) end)
@@ -1010,9 +967,8 @@ function PC:activateSelected()
             function() return save:UnlockNameplate(e.Id) end,
             function() save:ChangeNameplate(e.Id) end)
     end
-    -- surgical refresh — NO rebuild (scroll + cursor survive): row faces read live save state
-    -- through rowStyle every frame; only the selected row's TEXT can change (a locked "???"
-    -- nameplate revealing its title on unlock), and the detail pane re-derives its state
+    -- no rebuild (scroll and cursor stay): row faces read the save through rowStyle each frame
+    -- only the selected row's text can change (an unlocked "???" nameplate shows its title)
     if self.menu then
         local it = self.menu.items[self.sel or 1]
         if it then it.text = entryName(save, tab, e) end
@@ -1030,9 +986,9 @@ function PC:applyRename()
     end
 end
 
--- ── open / close ──────────────────────────────────────────────────────────────────────────────────
+-- ==== open / close ====
 function PC:openScreen()
-    I18N.detect()                        -- pick up the active game language on every open
+    I18N.detect()                        -- active game language, on every open
     self.save = GetSaveFile(self.playerIndex or 0)   -- the room's chosen player (coins/unlocks are theirs)
     self.isOpen = true
     self.tab = 1
@@ -1070,19 +1026,17 @@ function PC:close()
     SHARED:GetSharedSound("Cancel"):Play()
 end
 
--- returns "closed" once the screen has shut, else "running"
+-- "closed" once the screen has shut, else "running"
 function PC:update(ts)
     if not self.isOpen then return "closed" end
     if self.ui == nil then self:close(); return "closed" end
-    -- consume the opening frame: the Enter/Space edge that opened the screen must never reach the
-    -- freshly built UI (it could read as Decide/cancel inside the manager on the same frame)
+    -- skip the opening frame: the Enter/Space edge that opened the screen
+    -- could read as Decide or cancel in the new UI
     if self._justOpened then self._justOpened = false; return "running" end
-    -- The manager returns NIL on a normal frame and "cancel" only on Esc/Cancel. This was once
-    -- written `self.ui and self.ui:update(ts) or "cancel"` — the nil result collapsed to "cancel",
-    -- closing the screen on its first update (and the next Esc/Enter then quit the stage). Keep the
-    -- comparison explicit.
+    -- ui:update returns nil on a normal frame, "cancel" on Esc/Cancel: keep the comparison explicit
+    -- (an `a and b or "cancel"` form closes the screen on its first update)
     local r = self.ui:update(ts)
-    -- failed-unlock red flash decay (~0.4 s)
+    -- failed-unlock flash decay (~0.4 s)
     local dt = math.max(0, math.min(0.1, (ts - (self._lastTs or ts)) / 1000))
     self._lastTs = ts
     if self.purse then self.purse:update(dt) end
@@ -1101,7 +1055,7 @@ function PC:update(ts)
     return "running"
 end
 
--- ── draw ──────────────────────────────────────────────────────────────────────────────────────────
+-- ==== draw ====
 local function ensureCharaAnim(self, entry)
     if self.loadedAnims[entry.FolderName] == nil then
         local ok = pcall(function() entry.Character:LoadAnimation(CHARACTER.ANIM_MENU_NORMAL) end)
@@ -1111,9 +1065,8 @@ local function ensureCharaAnim(self, entry)
     return true
 end
 
--- a labelled row of icon + percentage pills at (x, y); returns the row's height. The glyph box has the
--- GetText padding around its ink (box height - line height, on every side), so the text is placed by its
--- ink: box x = ink x - pad, box top = ink top.
+-- labelled row of icon + percentage pills at (x, y); returns its height
+-- the glyph box has GetText padding around the ink: box x = ink x - pad, box top = ink top
 function PC:drawTags(row, x, y)
     local ui = self.ui
     ui:drawTextEx(16, row.label, x, y, { 108, 114, 146 }, { 255, 255, 255, 140 })
@@ -1172,12 +1125,11 @@ function PC:draw()
                 local rc = RARITY_COL[d.rarity] or { 190, 195, 200 }
                 ui:drawTextEx(20, tostring(d.rarity), DETAIL_CX, y + 44, rc, { 0, 0, 0, 200 }, 1, 1, 0, "top")
             end
-            -- preview BOX y+96 .. y+396: previews are MEASURED and scaled to stay inside it, so they
-            -- can no longer overlap the name/rarity strip above or the unlock text below
+            -- preview box y+96 .. y+396: previews are measured and scaled to fit inside it
             local boxTop, boxH = y + 96, 300
             local boxBottom = boxTop + boxH
             local e = d.entry
-            -- an unlocked character / puchichara previews on the left half, its information on the right
+            -- unlocked character or puchichara: preview left, info right
             local split = d.info ~= nil
             local pcx = split and DETAIL_PREVIEW_CX or DETAIL_CX
             local pmaxW = split and DETAIL_PREVIEW_W or (DETAIL_W - 100)
@@ -1211,9 +1163,8 @@ function PC:draw()
             elseif self.tab == 3 then
                 if d.plateTx then
                     pcall(function()
-                        -- the dan row (NamePlate.DrawDan):
-                        -- the skin's mode-1 handler shares the mode-2 geometry (Base.png 330x81 drawn
-                        -- top-left at (x-180, y+5)) — pass the plate's centre point like the titles
+                        -- dan row (NamePlate.DrawDan): the skin's mode-1 handler shares the mode-2 geometry
+                        -- (Base.png 330x81 at (x-180, y+5)): pass the plate's centre point
                         NAMEPLATE:DrawDanPlate(math.floor(DETAIL_CX + 15),
                             math.floor(boxTop + boxH / 2 - 46), 255, d.danGrade or 0, d.plateTx)
                     end)
@@ -1221,11 +1172,8 @@ function PC:draw()
             elseif self.tab == 4 then
                 if d.plateTx then
                     pcall(function()
-                        -- the title plate: the skin's mode-2
-                        -- handler draws Base.png (330x81) top-left at (x-180, y+5) and centres
-                        -- the text itself — pass the plate's centre point, never hand-place by
-                        -- the text texture's height. Unowned plates use the fallback args
-                        -- (type -1, rarity 1, id -1: base plate only, no type art / badges).
+                        -- title plate: the skin's mode-2 handler draws Base.png (330x81) at (x-180, y+5) and centres the text
+                        -- pass the plate's centre point; unowned: type -1, rarity 1, id -1 (base plate only)
                         local px2 = math.floor(DETAIL_CX + 15)
                         local py2 = math.floor(boxTop + boxH / 2 - 46)
                         if d.owned then
@@ -1238,8 +1186,7 @@ function PC:draw()
                 end
             end
             if split then
-                -- the information column: the equipped tag, then one line per fact (the gauge's note
-                -- wraps in the small size); the description sits under the preview box
+                -- info column: equipped tag, then one line per fact; the gauge note wraps small
                 local iy = boxTop + 6
                 if d.equipped then
                     ui:drawTextEx(20, T:tr("equipped_tag"), DETAIL_INFO_X, iy, { 255, 226, 130 }, { 0, 0, 0, 220 })
@@ -1257,8 +1204,7 @@ function PC:draw()
                     end
                 end
             end
-            -- status / unlock block, always BELOW the preview box (the coin price line is gone:
-            -- the Buy button already carries the price)
+            -- status / unlock block below the preview box (the Buy button carries the price)
             local yU = boxBottom + 18
             if split then
                 if d.description and d.description ~= "" then
@@ -1268,8 +1214,7 @@ function PC:draw()
                 ui:drawTextEx(20, T:tr("equipped_tag"), DETAIL_CX, yU, { 255, 226, 130 }, { 0, 0, 0, 220 }, 1, 1, 0, "top")
             elseif not d.owned then
                 ui:drawTextEx(20, T:tr("how_to_unlock"), DETAIL_X + 40, yU, { 255, 210, 140 }, { 0, 0, 0, 210 })
-                -- drawWrapped has no outline (transparent back): the condition text must use the
-                -- panel's DARK theme colour — near-white here vanished into the light surface
+                -- drawWrapped has no outline: the condition text uses the panel's dark text colour
                 ui:drawWrapped(19, d.cond or T:tr("unknown"), DETAIL_X + 40, yU + 32, DETAIL_W - 80, { 52, 58, 92 })
             end
         end

@@ -163,7 +163,7 @@ Fehlt dem ausgewählten Paket eine Datei, nimmt das Spiel sie aus Paket 1 dessel
 
 ## Schritt 8: Ein Paket wählen
 
-Hat ein Skin in einem der drei Ordner mindestens 2 Pakete, zeigt die Theme-Seite der Einstellungen zuerst einen Abschnitt Noten-Skins, mit einer Auswahl für diesen Ordner und der Vorschau des Pakets darunter. Das Spiel lädt das gewählte Paket sofort und merkt sich die Wahl für den Skin in `ThemeSettings.db3`. Bei einem einzigen Paket erscheint die Auswahl nicht, und das Spiel verwendet dieses Paket.
+Hat ein Skin in einem der drei Ordner mindestens 2 Pakete, zeigt die Theme-Seite der Einstellungen zuerst einen Abschnitt Noten-Skins, mit einer Auswahl für diesen Ordner und der Vorschau des Pakets darunter. Das Spiel lädt das gewählte Paket sofort und merkt sich die Wahl für den Skin in dessen Einstellungsdatenbank. Bei einem einzigen Paket erscheint die Auswahl nicht, und das Spiel verwendet dieses Paket.
 
 Ein Lua-Modul liest eine Datei des ausgewählten Pakets mit `THEME:GetNotesSkinFile(kind, file)` (siehe [Spieler und Profile](../api/players.md)). Die mitgelieferte Songauswahl verwendet es, um die Bewertungstexte ihrer Replay-Liste zu zeichnen:
 

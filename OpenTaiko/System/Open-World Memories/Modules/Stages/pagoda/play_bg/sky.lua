@@ -1,4 +1,4 @@
--- Band sky in the floor select's colours for an hour, greyed until level 20 is beaten.
+-- band sky in floor select colours for an hour (grey until level 20 is beaten)
 
 local assets = require("encounter/assets")
 local skybox = require("skybox")
@@ -19,7 +19,7 @@ local function luma(c)
     return 0.299 * c[1] + 0.587 * c[2] + 0.114 * c[3]
 end
 
--- grey ramp colour for c's luminance, as the pagoda sky's gradient map greys it
+-- grey ramp colour for c's luminance (pagoda sky gradient map)
 local function grey(c)
     local stops = skybox.GREY_STOPS
     local l = luma(c)
@@ -36,7 +36,7 @@ local function grey(c)
     return { b[2] / 255, b[3] / 255, b[4] / 255 }
 end
 
--- hour: the floor select's hour; greyed: the sky is still grey (level 20 not beaten)
+-- hour: floor select hour; greyed: level 20 not beaten
 function S.new(hour, greyed)
     local pal = Sky3D.paletteAt(hour)
     local zen, hor = pal.zen, pal.hor
@@ -48,7 +48,7 @@ function S.new(hour, greyed)
                           fade = (assets.get("up_sky_fade")) }, S)
 end
 
--- 0..1: how much the stars show at an hour, and at this sky's
+-- 0..1 star share at an hour, and for this sky
 function S.starsAt(hour)
     return Sky3D.paletteAt(hour).star or 0
 end
@@ -57,7 +57,7 @@ function S:stars()
     return self.star or 0
 end
 
--- 0..1: the sky's brightness halfway down the band
+-- 0..1 brightness halfway down the band
 function S:luminance()
     return (luma(self.top) + luma(self.bottom)) * 0.5
 end
@@ -70,7 +70,7 @@ local function fill(tx, w, h, c)
     tx:SetColor(1, 1, 1)
 end
 
--- over the w x h area from the screen's top-left corner
+-- w x h area from the screen top-left
 function S:draw(w, h)
     local white, fade = self.white, self.fade
     if white == nil or not white.Ready or fade == nil or not fade.Ready then return end

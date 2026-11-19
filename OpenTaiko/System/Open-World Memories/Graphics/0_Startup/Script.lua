@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Startup/boot loading background: static background + a small per-character loading animation.
+-- startup loading background (per-character loading animation)
 
 local loadingAnimeType = 0
 

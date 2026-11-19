@@ -1,4 +1,4 @@
--- Fail-collision burst at the hit point; fire() again restarts it.
+-- fail-collision burst at the hit point (fire() restarts)
 
 local assets  = require("encounter/assets")
 local sprite  = require("encounter/sprite")
@@ -17,13 +17,13 @@ local POP_SEC, HOLD_SEC, OUT_SEC = motion.pop_s, motion.hold_s, motion.out_s
 local POP_FROM  = motion.pop_from_scale     -- starting scale
 local POP_BACK  = motion.pop_overshoot      -- Easing.outBack overshoot
 local POP_FADE  = motion.pop_fade_in_share
-local OUT_GROW  = motion.out_grow_scale     -- extra scale while it fades
+local OUT_GROW  = motion.out_grow_scale     -- extra scale during fade
 local TILT      = motion.tilt_deg           -- random tilt range
 local SPARKS    = motion.sparks
 
 local _tex, _meta = nil, nil
 local _sparks = nil
-local _t = nil                  -- seconds since fire(), nil when idle
+local _t = nil                  -- s since fire(), nil when idle
 local _x, _y, _rot = 0, 0, 0
 local _o = { pivot = "foot" }
 
@@ -44,7 +44,7 @@ function M.open()
     end
 end
 
--- x, y: screen px of the burst's centre
+-- x, y: burst centre (screen px)
 function M.fire(x, y)
     _x, _y = x, y
     _t = 0
@@ -60,7 +60,7 @@ function M.update(dt)
     if _sparks ~= nil then _sparks:update(dt) end
 end
 
--- scale and opacity of the burst at time t
+-- scale, opacity at t
 local function pose(t)
     if t < POP_SEC then
         local u = t / POP_SEC

@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- pill_clouds_back: out of the song selects, clouds only (Lib/PillClouds).
+-- pill_clouds_back: out of the song selects, clouds only (Lib/PillClouds)
 
 local PC = require("PillClouds")
 local anim = PC.new(nil)

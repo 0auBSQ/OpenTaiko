@@ -1,22 +1,4 @@
--- DanPlate ROActivity
--- Individual per-tick textures are pre-split in Textures/:
---   Textures/back_{i}.png    – background frame i  (drawn white)
---   Textures/plates_{i}.png  – foreground frame i  (tinted by DANTICKCOLOR)
---   Textures/plates_{i}_ramp.png – foreground frame i as a diagonal grey ramp, coloured through a
---                              rainbow gradient map on a rainbow plate
---   Textures/sparkle.png     – glitter over a rainbow plate
--- danTick values beyond frame_count wrap via modulo.
---
--- While the SHARED string "danplate_style" is "rainbow" (the pagoda sets it for its roof floors),
--- the plate of the chart it was set for (Lib/PlayStrings.lua) runs a diagonal rainbow instead of
--- DANTICKCOLOR, with glitter over its frame.
---
--- draw(x, y, opacity, danTick, r, g, b, titleText)
---   x, y       – centre position (pixels)
---   opacity    – 0–255
---   danTick    – 0-based frame index
---   r, g, b    – 0–255 foreground tint colour (DANTICKCOLOR)
---   titleText  – dan title drawn vertically on the plate
+-- DanPlate ROActivity.
 
 local Rainbow = require("Rainbow")
 local PlayStrings = require("PlayStrings")
@@ -33,7 +15,7 @@ local RAINBOW_CYCLES = Layout.rainbow.cycles         -- hue cycles along the pla
 local RAINBOW_SPEED  = Animation.rainbow.speed       -- cycles per second
 local RAINBOW_STEPS  = Animation.rainbow.steps       -- gradient maps per cycle (the animation's phase steps)
 local RAINBOW_STOPS  = Layout.rainbow.stops          -- colour stops per gradient map
-local RAINBOW_SAT    = Layout.rainbow.saturation     -- a little pastel
+local RAINBOW_SAT    = Layout.rainbow.saturation
 local GLITTER   = { rate = Animation.glitter.rate, size = Layout.glitter.size, max = Layout.glitter.max,
     blend = Layout.glitter.blend }
 local GLITTER_OPACITY = Layout.glitter.opacity
@@ -60,13 +42,9 @@ local glitter   = {}    -- one sparkle state per glitter box
 local rainbow_t = 0
 local last_ms   = nil
 
--- ─────────────────────────────────────────────────────────────────────────────
--- Helpers
--- ─────────────────────────────────────────────────────────────────────────────
+-- ==== Helpers ====
 
---- Draw the dan title vertically, centred on (cx, cy).
---- Uses GetVerticalText which renders white text with a black outline baked in,
---- capped to cfg_title_max_h pixels tall.
+--- dan title, vertical, centred on (cx, cy); GetVerticalText, capped to cfg_title_max_h px
 local function drawTateTitle(cx, cy, text, op)
     if text == nil or text == "" then return end
     if font_title == nil then return end
@@ -79,8 +57,7 @@ local function drawTateTitle(cx, cy, text, op)
     t:DrawAtAnchor(cx, cy, "center")
 end
 
---- Seconds since the previous rainbow draw (0 for a second draw in the same frame), capped so a
---- plate shown again after a pause carries on where it was.
+--- seconds since the previous rainbow draw (0 within the same frame), capped (resumes after a pause)
 local function rainbowStep()
     local now = fps.ms
     local dt = 0
@@ -101,8 +78,7 @@ local function rainbowStops(phase)
     return stops
 end
 
---- The gradient maps are made the first time a rainbow plate shows, during play rather than at boot,
---- the way the stages make theirs.
+--- gradient maps made on the first rainbow plate (during play, not at boot)
 local function ensureRainbowMaps()
     if #rainbow_maps > 0 then return end
     for k = 0, RAINBOW_STEPS - 1 do
@@ -110,8 +86,8 @@ local function ensureRainbowMaps()
     end
 end
 
---- The foreground drawn black (its border stays), then its fill ramp in a running diagonal rainbow over
---- it, centred on (x, y), with glitter over its frame.
+--- foreground drawn black (border kept), then the fill ramp through the rainbow map; centred on (x, y)
+--- glitter over the frame
 local function drawRainbowPlate(plate, tex, x, y, op)
     local dt = rainbowStep()
     ensureRainbowMaps()
@@ -136,11 +112,11 @@ local function drawRainbowPlate(plate, tex, x, y, op)
     end
 end
 
--- ─────────────────────────────────────────────────────────────────────────────
--- ROActivity lifecycle
--- ─────────────────────────────────────────────────────────────────────────────
+-- ==== ROActivity lifecycle ====
 
 function onStart()
+    -- Textures/back_{i}.png: background frame i (drawn white); plates_{i}.png: foreground frame i (DANTICKCOLOR)
+    -- plates_{i}_ramp.png: frame i as a diagonal grey ramp (rainbow plate); danTick wraps by frame_count
     -- Load one texture per tick for both layers
     for i = 0, cfg_frame_count - 1 do
         back_frames[i + 1]  = TEXTURE:CreateTexture(TEXTURES_DIR .. "back_"   .. i .. ".png")
@@ -172,10 +148,10 @@ function onDestroy()
     glitter = {}
 end
 
--- ─────────────────────────────────────────────────────────────────────────────
--- draw(x, y, opacity, danTick, r, g, b, titleText)
--- ─────────────────────────────────────────────────────────────────────────────
+-- ==== Draw ====
 
+-- x, y: centre px; opacity 0-255; danTick: 0-based frame; r, g, b: 0-255 tint (DANTICKCOLOR)
+-- titleText: dan title drawn vertically
 function draw(x, y, opacity, danTick, r, g, b, titleText)
     if x == nil then return end
 
@@ -193,7 +169,7 @@ function draw(x, y, opacity, danTick, r, g, b, titleText)
         tx_back:DrawAtAnchor(x, y, "center")
     end
 
-    -- Foreground (tinted by DANTICKCOLOR, or the rainbow while the style asks for it)
+    -- Foreground: DANTICKCOLOR tint, or the rainbow while SHARED "danplate_style" = "rainbow" (Lib/PlayStrings.lua)
     if tx_plate ~= nil and tx_plate.Loaded then
         local tx_ramp = ramp_frames[tick + 1]
         if tx_ramp ~= nil and tx_ramp.Loaded and PlayStrings.forTitle(STYLE_KEY, titleText) == "rainbow" then

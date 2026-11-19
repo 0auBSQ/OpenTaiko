@@ -1,4 +1,4 @@
--- Pagoda VN player on VN.Scene; play() runs a scene and reports "proceed" or "abort" through onDone.
+-- pagoda VN player on VN.Scene; onDone gets "proceed" or "abort"
 
 local Scene   = require("VN.Scene")
 local runner  = require("story/dialog_runner")
@@ -20,7 +20,7 @@ local UmeAnim   = Animation.story.vn.ume
 local Typing    = Animation.story.vn.typing
 local ShakeDir  = Animation.story.vn.shake_direction
 local FADE_SEC  = Animation.story.vn.screen_fade_s
-local BG_WAIT   = Animation.story.vn.background_wait_s     -- seconds a background may take to load before it shows anyway
+local BG_WAIT   = Animation.story.vn.background_wait_s     -- sec, max background load wait
 
 local BOX = Config.plain(Layout.story.vn.box)
 local Theme = Layout.story.vn.theme
@@ -41,11 +41,10 @@ local _tex = nil
 local _scene = nil
 local _faceCache = {}
 local _umeMain = nil
-local _sfx = {}                 -- blip / shock / roar
-local _lineSound = false        -- the line in the box plays its own sound
+local _sfx = {}                 -- name -> sound
+local _lineSound = false        -- current line has an {sfx:} tag
 
--- resources
--- a layer naming an encounter asset draws that handle while the encounter holds it; other textures are disposed with the scene
+-- returns tex, owned; asset handles stay with the encounter
 local function openLayer(def)
     local tx = (def.asset ~= nil) and assets.get(def.asset) or nil
     if tx ~= nil and tx.Loaded then return tx, false end
@@ -71,14 +70,14 @@ local function playSfx(name)
     if s ~= nil then s:Play() end
 end
 
--- one blip per speaker, keyed on the node's speaker (line.who) so a masked "???" keeps its voice
+-- per-speaker blip; a masked "???" keeps its voice
 local MONSTER_BLIPS = { "blip_monster", "blip_monster2", "blip_monster3" }
 local NAMED_BLIPS = { "needle", "thorncushion", "counterplate", "pincerblaze", "startle",
                       "fray", "dragoon", "frangel", "zirr", "tobiraph" }
 local function blipFor(node)
     if node == nil or node.speaker == "you" then return "blip_narrator" end
     if node.speaker == "ume" or node.voice == "Ume" then return "blip" end
-    -- voices key off the authored name (node.voice), not the localized one
+    -- authored name (node.voice), not the localized one
     local name = node.voice or node.name
     if name == nil or name == "" then return "blip_narrator" end
     local voiced = "blip_" .. name:lower()
@@ -88,7 +87,6 @@ local function blipFor(node)
     return MONSTER_BLIPS[(h % #MONSTER_BLIPS) + 1]
 end
 
--- the reactions' shake is the scene's own
 local function startShake(amp, dur)
     if _scene ~= nil then _scene:shake(amp, dur) end
 end
@@ -103,9 +101,9 @@ local function newScene(fonts)
         box = {
             gfont = fonts.gfont, gfontName = fonts.gfontName,
             ui = "popui", theme = VN_THEME, box = BOX,
-            portraitSize = 0,                 -- Ume is drawn behind the box instead
+            portraitSize = 0,                 -- Ume drawn behind the box
             cps = Typing.chars_per_s,
-            -- the page sound, not the shared Decide sound
+            -- page sound, not shared Decide
             sfx = { click = function() playSfx("page") end },
             blipEvery = Typing.blip_every_glyphs,
             onSfx = function(name)
@@ -126,7 +124,7 @@ local function newScene(fonts)
         },
         backgrounds = {
             defs = bgdefs, path = TEX .. "bg/%s.png", open = openLayer, wait = BG_WAIT,
-            -- effects load first: the layer borrows the handle of their art key
+            -- effects first: the layer borrows their art key's handle
             prepare = function(def) effects.prepare(def) end,
             show = function(def) effects.show(def) end,
             update = function(dt) effects.update(dt) end,
@@ -145,7 +143,6 @@ local function newScene(fonts)
         fadeSec = FADE_SEC,
         outcome = "proceed",
         tr = runner.tr,
-        -- who = "you" speaks under the player's name; the cast under theirs
         speakerName = function(who, _, ctx)
             if who == "you" then return (ctx ~= nil and ctx.playerName) or "You" end
             if who == "ume" then return "Ume" end
@@ -168,10 +165,10 @@ local function newScene(fonts)
     }
 end
 
--- called once by Script.lua; fonts = { gfont, gfontName } (LuaGlyphText)
+-- once, from Script.lua; fonts = { gfont, gfontName } (LuaGlyphText)
 function M.setup(tex, fonts)
     _tex = tex
-    -- created here, not on first draw: a lazy create could show the body frames before the face
+    -- not lazy: the body could show before the face
     if _umeMain == nil then _umeMain = TEXTURE:CreateTexture(TEX .. "ume/main.png") end
     face("neu0")
     for _, n in ipairs({ "blip", "blip_narrator", "blip_monster", "blip_monster2",
@@ -190,7 +187,7 @@ end
 
 function M.active() return _scene ~= nil and _scene:active() end
 
--- returns grey (0..1) and visible for the drawn background; nil = the stage default
+-- grey 0..1, visible; nil: stage default
 function M.sky()
     if not M.active() then return nil end
     local bg = _scene:shownBackground()
@@ -209,7 +206,7 @@ function M.dispose()
     if _umeMain ~= nil then _umeMain:Dispose() ; _umeMain = nil end
 end
 
--- ctx carries startLevel / highest / playerName in, and outcome out.
+-- ctx in: startLevel, highest, playerName; out: outcome
 function M.play(scene, ctx, onDone)
     _scene:play(scene, ctx, onDone)
 end

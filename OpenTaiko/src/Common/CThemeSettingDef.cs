@@ -62,7 +62,7 @@ internal class CThemeSettingDef {
 
 	/// <summary>
 	/// A session setting lives in memory only: it starts at its default on every launch and is never
-	/// written to ThemeSettings.db3 (an event mode switch, a counter for the session).
+	/// written to the skin's settings database (an event mode switch, a counter for the session).
 	/// </summary>
 	[JsonProperty("session")]
 	public bool Session { get; set; } = false;

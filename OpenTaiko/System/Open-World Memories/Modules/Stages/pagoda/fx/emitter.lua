@@ -1,19 +1,4 @@
--- Instance-based 2D particle pool driven by a preset table (fx/presets.lua).
---
--- Preset fields (ranges are {a, b} or a plain number):
---   rate (spawns/s), max, life                  required
---   tex          manifest key or list of keys, looked up when tex is a key -> handle map
---   area         default spawn rect {x, y, w, h} (screen space, fx.emitter.default_area when absent)
---   zones        {{x, y, w, h, p = chance}, ...} rects tried before the area
---   prewarm      seconds simulated on the first update
---   every, burst, spread   periodic bursts: every {a, b} s, `burst` particles, jitter {sx, sy}
---   blend        'Normal' | 'Add'; addMix = chance a particle draws in a second Add pass
---   size, sizeEnd, vx, vy, gravity, drag
---   sway {amp, freq}   horizontal offset amp*sin(2pi*freq*age), freq in Hz
---   spin               deg/s with a random sign; flutterHz squeezes scaleX to 0.25..1
---   turb {amp, hz}     horizontal velocity amp*sin(2pi*hz*age); rangeX clamps x to spawn x +- rangeX
---   colors | ramp {c0, c1[, c2]}
---   alpha, fade 'arch' | 'out' | 'inout' (fin, fout s) | {fin, fout}, twinkle {amp, hz}
+-- 2D particle pool driven by a preset (fx/presets.lua)
 
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
@@ -42,7 +27,7 @@ local function is_handle(t)
     return type(t) == "userdata" or (type(t) == "table" and t.DrawAtAnchor ~= nil)
 end
 
--- the manifest keys a preset draws with, as a list (empty without a preset)
+-- preset manifest keys as a list (empty without preset)
 function E.texKeys(preset)
     local k = preset ~= nil and preset.tex or nil
     if type(k) == "string" then return { k } end
@@ -63,6 +48,20 @@ local function resolve_textures(preset, tex)
     return list
 end
 
+-- preset fields (ranges are {a, b} or a plain number):
+--   rate (spawns/s), max, life                  required
+--   tex          manifest key or list of keys, looked up when tex is a key -> handle map
+--   area         default spawn rect {x, y, w, h} (screen space, fx.emitter.default_area when absent)
+--   zones        {{x, y, w, h, p = chance}, ...} rects tried before the area
+--   prewarm      seconds simulated on the first update
+--   every, burst, spread   periodic bursts: every {a, b} s, `burst` particles, jitter {sx, sy}
+--   blend        'Normal' | 'Add'; addMix = chance of a second Add pass
+--   size, sizeEnd, vx, vy, gravity, drag
+--   sway {amp, freq}   x offset amp*sin(2pi*freq*age), freq in Hz
+--   spin               deg/s, random sign; flutterHz squeezes scaleX to 0.25..1
+--   turb {amp, hz}     x velocity amp*sin(2pi*hz*age); rangeX clamps x to spawn x +- rangeX
+--   colors | ramp {c0, c1[, c2]}
+--   alpha, fade 'arch' | 'out' | 'inout' (fin, fout s) | {fin, fout}, twinkle {amp, hz}
 function E.new(preset, tex)
     local e = setmetatable({
         p = preset,
@@ -95,7 +94,7 @@ function E:setRate(mult)
     self.mult = math.max(0, mult or 1)
 end
 
--- moves the live particles with their source, for an emitter following something that moves
+-- shift live particles with a moving source
 function E:carry(dx, dy)
     if dx == 0 and dy == 0 then return end
     for _, q in ipairs(self.parts) do

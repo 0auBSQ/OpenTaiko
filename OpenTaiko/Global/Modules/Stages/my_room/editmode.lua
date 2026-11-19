@@ -1,35 +1,16 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global
--- editmode.lua — the mouse-driven room editor (Tab toggles it from Script.lua), on PopUI.
---
--- Layout: a bottom bar with a TAB ROW per action (Furniture / Wall / Floor / Paint / Door / Eraser)
--- and the tab's inventory as square shop-style buttons — a live ModelIcon render of the ACTUAL 3D
--- model when the entry is GLB-built (staggered by ModelIcon's per-frame budget; drawn art fills in
--- until it lands), name underneath, and a rounded ×N stock pill in the corner. Door/Eraser tabs show
--- helper text instead of a grid. The 3D area keeps the interactions on the OWM3d overlay layers:
---   browse  — PRESS a placed item to select it INSTANTLY: inline buttons (Rotate/Move/Remove)
---             appear right under it in-world (world:project). Rotate applies live to the placed
---             item; the phone offers Move only. Hold + drag the item (ground OR wall) to move it:
---             the original disappears and the bounds-anchored ghost tracks the hovered cell/slot,
---             dropping on release (an illegal drop restores). The door tile drags along the front.
---   place   — an item is selected in the grid: a green/red ghost previews the spot. Furniture:
---             wheel rotates. Wall items: wheel flips the mount (low/high). Floor/paint: swipe.
---   move    — the inline Move button picks the item up (same in-hand flow as dragging; click drops).
---   door    — the Door tab: a ghost doorway tile follows the hovered front-edge tile; click moves.
---   eraser  — the Eraser tab: hover any placed thing (furniture, wall item, flooring, paint) and
---             click/swipe to remove it back to stock. The phone can never be erased.
--- Every mutation goes through Edit:commit() → onChange (rebuild + save + net sync), which also drops
--- the cached ghost model instances (the rebuild deletes their scene objects).
+-- mouse-driven room editor on the UI library; Script.lua toggles it with Tab
+-- every mutation goes through Edit:commit() -> onChange (rebuild, save, net sync)
 
 local A         = require("assets")
 local Room      = require("room")
-local Grid      = require("itemgrid")      -- the stock names (an item in a colour: its colour in brackets)
-local Sfx       = require("editsfx")     -- the edit mode's own sound set; see editsfx.lua
--- the PopUI bar and the inline buttons speak the edit set too: a tick on hover and on focus moves,
--- silent clicks (the tab, item and action handlers play what actually happened)
+local Grid      = require("itemgrid")      -- stock names
+local Sfx       = require("editsfx")     -- edit mode sounds
+-- bar sounds: hover tick, silent clicks (the handlers play the action's sound)
 local UI_SFX = { hover = function() Sfx.play("hover") end, move = "hover", click = function() end,
                  cancel = function() Sfx.play("back") end }
 local I         = require("icons")
-local UI        = require("uilib")       -- the skin's UI library (UI.Pick), picked on first use
+local UI        = require("uilib")
 local I18N      = require("Locale.i18n")
 local T = I18N.texts("editmode")   -- lang/<code>/editmode.json
 local ModelIcon = require("World.OWM3d").ModelIcon
@@ -54,13 +35,13 @@ local CATS = {
     { key = "eraser", label = "tab_eraser" },
 }
 
--- bar geometry (tab row on top, item grid underneath)
+-- bar geometry: tab row, item grid below
 local TAB_X0, TAB_Y, TAB_W, TAB_H, TAB_STEP = 28, BAR_Y + 18, 168, 52, 178
 local GRID_X0, GRID_Y, SLOT_W, SLOT_H, SLOT_STEP = 28, BAR_Y + 84, 118, 150, 130
-local BAR_NAME = { sizes = { 15, 13 } }                    -- a slot's name, on up to two lines
-local ARROW_W, ARROW_GAP = 44, 10                          -- the grid's page arrows, up while not every item fits
+local BAR_NAME = { sizes = { 15, 13 } }                    -- slot name sizes, up to two lines
+local ARROW_W, ARROW_GAP = 44, 10                          -- page arrows, shown while not every item fits
 
--- the grid's layout for n items: the first slot's x, how many slots show, and whether the arrows are up
+-- -> first slot x, slots shown, arrows shown (n items)
 local function gridLayout(n)
     local fit = floor((SW - 2 * GRID_X0 - SLOT_W) / SLOT_STEP) + 1
     if n <= fit then return GRID_X0, fit, false end
@@ -78,7 +59,7 @@ local THEME = {
     font = { small = 16, label = 19, button = 20, title = 26 },
 }
 
--- ── 3D overlay helpers (ported from isoengine's grid/ghost/hilite, lifted by the platform) ────────
+-- ==== 3D overlay helpers ====
 local function gridClear(world) world.scene:ObjBegin(world.gridObj) end
 local function ghostClear(world) world.scene:ObjBegin(world.ghostObj); world._boxTarget = world.prop3dObj end
 local function hiliteClear(world) world.scene:ObjBegin(world.hiliteObj) end
@@ -98,9 +79,7 @@ local function gridWallRight(world, r)
     world.scene:ObjAddQuadFlat(world.gridObj, x, FY + 0.18, z0 + 0.06, x, FY + 0.18, z0 + 0.94, x, FY + 2.82, z0 + 0.94, x, FY + 2.82, z0 + 0.06)
 end
 
--- y defaults to just above the floor; stacked items pass their surface's top so the highlight
--- visibly wraps the PC/TV instead of hiding under the desk
--- the floor squares of `cells` at height y, appended to the highlight layer (caller owns ObjSetPass+ObjBegin)
+-- floor squares of `cells` at height y, added to the hilite layer (caller owns ObjSetPass+ObjBegin)
 local function cellsInto(world, cells, y)
     for _, cell in ipairs(cells) do
         local x0, z0 = cell[1], (world.gridH - 1 - cell[2])
@@ -108,6 +87,7 @@ local function cellsInto(world, cells, y)
             x0 + 0.96, y, z0 + 0.96, x0 + 0.04, y, z0 + 0.96)
     end
 end
+-- y: default just above the floor; stacked items pass their surface top
 local function hilite(world, cells, r, g, b, a, y)
     y = y or (FY + 0.05)
     world.scene:ObjSetPass(world.hiliteObj, 1, r, g, b, a)
@@ -118,7 +98,7 @@ local function hilite(world, cells, r, g, b, a, y)
             x0 + 0.96, y, z0 + 0.96, x0 + 0.04, y, z0 + 0.96)
     end
 end
--- highlight height for a PLACED item (surface top + epsilon when stacked)
+-- highlight y for a placed item: surface top + epsilon when stacked
 local function itemHiliteY(room, it)
     if it and it.on then
         local surf = room:surfaceUnder(it.id, it.c, it.r, it.facing or 0)
@@ -141,8 +121,7 @@ local function hiliteWallTile(world, slot, valid)
         world.scene:ObjAddQuadFlat(world.hiliteObj, x, FY + 0.12, z0 + 0.05, x, FY + 0.12, z0 + 0.95, x, FY + 2.88, z0 + 0.95, x, FY + 2.88, z0 + 0.05)
     end
 end
--- a thin axis-aligned bar (a small rectangular tube) between two points — the building block of a
--- wireframe box. Faces emitted as flat quads into the hilite object.
+-- thin axis-aligned bar between two points (a wireframe edge), flat quads into hiliteObj
 local function wbar(world, ax, ay, az, bx2, by2, bz2, t)
     local o = world.hiliteObj
     local x0, x1 = math.min(ax, bx2), math.max(ax, bx2)
@@ -159,8 +138,8 @@ local function wbar(world, ax, ay, az, bx2, by2, bz2, t)
     s:ObjAddQuadFlat(o, x1, y0, z0, x1, y0, z1, x1, y1, z1, x1, y1, z0)   -- +x
     s:ObjAddQuadFlat(o, x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0)   -- -x
 end
--- a wireframe box around an AABB (12 edges). *Into = append edges only (caller did ObjSetPass+ObjBegin),
--- so several boxes can share one hilite pass (selected + hovered at once).
+-- wireframe box around an AABB (12 edges); *Into adds edges only (caller did ObjSetPass+ObjBegin)
+-- several boxes can share one hilite pass
 local function wireBoxInto(world, x0, y0, z0, x1, y1, z1, t)
     t = t or 0.03
     wbar(world, x0, y0, z0, x1, y0, z0, t); wbar(world, x0, y0, z1, x1, y0, z1, t)   -- bottom ±z
@@ -175,8 +154,7 @@ local function wireBox(world, x0, y0, z0, x1, y1, z1, r, g, b, a, t)
     world.scene:ObjBegin(world.hiliteObj)
     wireBoxInto(world, x0, y0, z0, x1, y1, z1, t or 0.03)
 end
--- the world AABB of a placed furniture item (its footprint cells × height), sitting on the floor or
--- its host surface top. Used to draw a wireframe box around it on hover/select.
+-- world AABB of a placed furniture item: footprint x height, on the floor or its host surface
 local function itemAABB(world, room, it)
     local cat = Room.CATALOG[it.id]
     local by = FY + 0.02
@@ -184,14 +162,11 @@ local function itemAABB(world, room, it)
         local surf = room:surfaceUnder(it.id, it.c, it.r, it.facing or 0)
         if surf then by = room:surfaceTopY(surf) + 0.02 end
     end
-    -- top: the item's real built top (GLB fit) when known, else the surface/collision height — keeps
-    -- the box hugging elevated items instead of floating a tall box above them
+    -- top: the built top (GLB fit) when known, else surface or collision height
     local top = (it._topY and it._topY > by + 0.05) and it._topY
                 or (by + ((cat and (cat.surface and cat.surfaceH or cat.collH)) or 0.85))
-    -- Prefer the ACTUAL rendered GLB bounds (scaled + yaw-rotated, centred on the footprint) so the box
-    -- hugs the model, NOT the full grid footprint: a desk whose model doesn't fill its 2 cells (modelFit
-    -- keeps aspect, so a non-2:1 desk is scaled narrower) looked "weirdly big". Mirrors buildOneProp's
-    -- collision maths. Falls back to the footprint for box-art items / when there is no live instance.
+    -- prefer the rendered GLB bounds (scaled, yaw-rotated, centred on the footprint)
+    -- modelFit keeps aspect, a model can be narrower than its cells; footprint fallback for box art or no instance
     local inst = world._propInst and world._propInst[it]
     if inst ~= nil and inst.model then
         local got, ax0, az0, ax1, az1 = pcall(function()
@@ -202,9 +177,8 @@ local function itemAABB(world, room, it)
             local ca, sa = math.abs(math.cos(yr)), math.abs(math.sin(yr))
             local hx = (bw * ca + bd * sa) * 0.5
             local hz = (bw * sa + bd * ca) * 0.5
-            -- centre on the FOOTPRINT centre (= where poseFitted anchored the model's bounds-centre),
-            -- NOT inst.x/inst.z which for anchor="bounds" GLBs is the model ORIGIN (offset by the rotated
-            -- bounds-centre). Same anchor as buildOneProp, so the box hugs the rendered model.
+            -- centre on the footprint centre (where poseFitted anchored the bounds centre), not inst.x/z
+            -- (for anchor="bounds" GLBs that is the model origin); same anchor as buildOneProp
             local w, h = cat.w, cat.h
             if (it.facing or 0) % 2 == 1 then w, h = h, w end
             local cxw, czw = world:footprintCenter(it.c, it.r, w, h)
@@ -223,9 +197,8 @@ local function itemAABB(world, room, it)
     end
     return x0 + 0.05, by, z0 + 0.05, x1 - 0.05, top, z1 - 0.05
 end
--- a mount-height band on a wall tile: slot = {wall, c, r, mount, w, h} (or a Room:wallItemSlots() entry);
--- w tiles along the wall (default 1), h bands (2 = low and high). *Into = append the band quad only
--- (caller owns ObjSetPass+ObjBegin).
+-- mount band on a wall tile: slot = {wall, c, r, mount, w, h} or a Room:wallItemSlots() entry
+-- w tiles along the wall (default 1), h bands (2 = low and high); *Into adds the quad only
 local function wallSlotInto(world, s)
     local w, h = s.w or 1, s.h or 1
     local y0 = FY + Room.MOUNT_Y[(h >= 2) and "low" or s.mount] - 0.08
@@ -238,13 +211,13 @@ local function wallSlotInto(world, s)
         world.scene:ObjAddQuadFlat(world.hiliteObj, x, y0, z0 + 0.05, x, y0, z0 + w - 0.05, x, y1, z0 + w - 0.05, x, y1, z0 + 0.05)
     end
 end
--- the slot an item of `id` takes when hung from (c, r, mount): its whole size on its wall
+-- slot of `id` hung from (c, r, mount), its full size on its wall
 local function itemSlot(room, id, c, r, mount)
     local w, h = Room.wallSize(id)
     return { wall = (c == room.iw and r >= 1) and "right" or "back", c = c, r = r,
              mount = Room.wallMountFor(id, mount), w = w, h = h }
 end
--- a hovered slot moved to where an item of `id` can hang from it (kept on its wall)
+-- hovered slot moved to where `id` can hang (same wall)
 local function anchoredSlot(room, id, s)
     if s == nil then return nil end
     local c, r, m = room:wallAnchor(id, s.c, s.r, s.mount)
@@ -267,15 +240,15 @@ local function ghostBegin(world, ok)
 end
 local function ghostEnd(world) world._boxTarget = world.prop3dObj end
 
--- ── construction ──────────────────────────────────────────────────────────────────────────────────
+-- ==== construction ====
 function Edit.new(room, world, onChange)
     local self = setmetatable({}, Edit)
     self.room, self.world, self.onChange = room, world, onChange or function() end
     self.cat = 1
-    self.sel = nil            -- selected CATALOG id (place mode)
+    self.sel = nil            -- selected catalog id (place mode)
     self.facing = 0           -- ground placement facing
     self.mount = "low"        -- wall placement mount height
-    self.selected = nil       -- selected PLACED item: { it, kind = "ground"|"wall" }
+    self.selected = nil       -- selected placed item: { it, kind = "ground"|"wall" }
     self.selUI = nil          -- inline action buttons under the selection
     self.selBtns = nil
     self.hold = nil           -- item in hand: { it, kind, fromC, fromR, fromMount, drag }
@@ -294,7 +267,7 @@ function Edit:catKey() return CATS[self.cat].key end
 function Edit:items() return self.room:categoryItems(self:catKey()) end
 
 function Edit:enter(pc, pr)
-    I18N.detect()                                          -- pick up the active game language
+    I18N.detect()                                          -- active game language
     self.playerC, self.playerR = pc, pr
     self.sel, self.hold, self.pressItem = nil, nil, nil
     self.dragExit = false
@@ -309,23 +282,21 @@ end
 
 function Edit:leave()
     local world = self.world
-    if self.hold then self:restoreHold(true) end               -- never lose an in-hand item (phone!)
+    if self.hold then self:restoreHold(true) end               -- never lose an in-hand item (phone)
     gridClear(world); ghostClear(world); hiliteClear(world)
     self:hideGhostModel()
     self.ghostModels = {}
     self.ghostWallModels = {}
     self:deselect(true)
-    -- keep the 3D preview icons ALIVE across open/close: re-rendering ~20 offscreen GLB scenes on
-    -- every open was the edit-menu lag. They live for the stage session (freed by ModelIcon.disposeAll
-    -- on stage teardown); modelIconFor recreates any that got disposed (e.g. after a deactivate).
+    -- preview icons live for the stage session (ModelIcon.disposeAll at teardown): re-rendering
+    -- ~20 offscreen GLB scenes per open lagged; modelIconFor recreates disposed ones
     self._rotFlash = nil
     if self._badge then self._badge:Dispose(); self._badge = nil end
     if self.ui then self.ui:disposeWidgets(); self.ui = nil end
 end
 
--- every room mutation funnels through here. A full rebuild (onChange → loadMap) deletes ALL model
--- instances including the cached ghost models, so their references go; when only the furniture
--- was updated ("kept") the ghosts are still standing and stay cached
+-- every room mutation goes through here; a full rebuild (onChange -> loadMap) deletes every model
+-- instance, cached ghosts included; "kept" (furniture-only update) leaves them cached
 function Edit:commit()
     self:hideGhostModel()
     if self.onChange() ~= "kept" then
@@ -336,7 +307,8 @@ function Edit:commit()
     end
 end
 
--- ── ghost model instances (the REAL GLB previews placement, bounds-anchored like the placed one) ──
+-- ==== ghost models ====
+-- the GLB previews placement, bounds-anchored like the placed one
 function Edit:ghostModelFor(id)
     local e = self.ghostModels[id]
     if e == false then return nil end
@@ -357,8 +329,7 @@ function Edit:hideGhostModel()
     if self.activeWallGhost then self.activeWallGhost:setVisible(false); self.activeWallGhost = nil end
 end
 
--- parked wall-GLB ghost per id — REUSED every hover frame (the old path called
--- buildWallItemVisual per frame, adding a fresh model instance at every hovered slot)
+-- parked wall-GLB ghost per id, reused every hover frame (no new instance per slot)
 function Edit:ghostWallModelFor(id)
     local g = Room.WALL_GLB and Room.WALL_GLB[id]
     if g == nil then return nil end
@@ -383,8 +354,8 @@ function Edit:ghostWallModelFor(id)
     return inst
 end
 
--- wall-item placement ghost: the parked GLB instance when one exists, else box art on the
--- ghost layer (buildWallItemVisual's ghost flag skips its instance path entirely)
+-- wall placement ghost: the parked GLB when there is one, else box art on the ghost layer
+-- (buildWallItemVisual's ghost flag skips its instance path)
 function Edit:ghostWallItem(id, c, r, mount, ok)
     local world = self.world
     local gi = self:ghostWallModelFor(id)
@@ -399,28 +370,19 @@ function Edit:ghostWallItem(id, c, r, mount, ok)
     ghostEnd(world)
 end
 
--- ── 3D model preview icons (ModelIcon: the ACTUAL GLB rendered into a small offscreen scene) ──────
--- Created lazily while edit mode is open (one per catalog id actually shown, keyed by id) and
--- disposed on leave — allocate-before-use / free-after. First renders are budgeted per frame by
--- ModelIcon.newFrame (Script calls it once per stage update); while an icon waits its turn, draw()
--- returns false and the drawn icons.lua art fills in. Box-built entries and the flooring/paint
--- swatches always keep the drawn art. The PC/shop screens should follow the same pattern with
--- res = 512 previews created on open and disposed on close.
--- EVERY shop entry gets a real 3D snapshot: GLB items via ModelIcon.new, box-art ground items /
--- wall items / flooring / paint via ModelIcon.newBuilder (the procedural builders render into a
--- tiny offscreen scene, textures registered through A.registerInto). The drawn icons.lua art only
--- fills the frame or two an icon spends in the ModelIcon.newFrame budget queue.
--- resolve a catalog id → ModelIcon spec: returns (build, opts) where build is "new"/"builder" (the
--- ModelIcon constructor to call) or nil for flat swatches (floor/paint, which use a colour icon, not a
--- 3D render — a swatch render would also sync-load ~9 surface PNGs per icon, the tab-switch stall).
+-- ==== model preview icons ====
+-- one ModelIcon per catalog id, made on first show; ModelIcon.newFrame (once per stage update) budgets first renders
+-- while one waits, draw() returns false and the icons.lua art shows
+-- GLB items: ModelIcon.new; box-built items: ModelIcon.newBuilder (textures via A.registerInto)
+-- catalog id -> "new" | "builder", ModelIcon opts; nil for flooring and paint swatches
+-- (a swatch render would sync-load ~9 surface PNGs per icon)
 local function iconOptsFor(id)
     local cat = Room.CATALOG[id]
     if not cat then return nil end
     if cat.place ~= "wall" then
-        local stem = Room.modelStem(id)   -- variant items (arcade_neon → arcade.glb) share one GLB
+        local stem = Room.modelStem(id)   -- variant items share one GLB
         if Room.modelAvailable(id, stem) then
-            -- autoFrame: pick the front-3/4 yaw that shows the most of the model + tight projected-AABB fit;
-            -- a catalog iconYaw sets the view itself
+            -- autoFrame: front-3/4 yaw showing the most of the model, tight projected-AABB fit; cat.iconYaw overrides
             return "new", { file = "Models/" .. stem .. ".glb", res = 128, yaw = cat.iconYaw, autoFrame = cat.iconYaw == nil }
         elseif cat.build then
             local w, h = cat.w or 1, cat.h or 1
@@ -438,13 +400,10 @@ local function iconOptsFor(id)
     else
         local g = Room.WALL_GLB and Room.WALL_GLB[id]
         if g and Room.modelAvailable(id, g.file) then
-            -- wall items are FLAT (thin in one axis); faceThin points the camera along that axis so the
-            -- FACE is shown head-on, not the thin edge. (If a model shows its back, flip the yaw sign in
-            -- modelicon.lua's faceThin block.)
+            -- wall items are flat: faceThin points the camera along the thin axis
             return "new", { file = "Models/" .. g.file .. ".glb", res = 128, faceThin = true }
         elseif cat.picture and Room.pictureVisual then
-            -- framed picture (portrait): render the SAME framed quad as placement, built at y=0 so it's
-            -- centred in the icon frame (photo centre ≈ y+0.4). Nearly head-on so it isn't skewed.
+            -- framed picture: same quad as placement, built at y=0 (photo centre ~ y+0.4), nearly head-on
             local picTex = cat.picture
             return "builder", {
                 res = 128, yaw = 6, pitch = -6,
@@ -456,7 +415,7 @@ local function iconOptsFor(id)
             }
         elseif cat.wallBuild then
             local wallBuild = cat.wallBuild
-            -- the frame grows with the item's size (a window spans two tiles and both bands)
+            -- frame grows with the item's size
             local sw, sh = Room.wallSize(id)
             local big = math.max(sw, sh)
             return "builder", {
@@ -465,7 +424,7 @@ local function iconOptsFor(id)
                 populate = function(wld)
                     A.registerInto(wld.scene)
                     wld.icon = true                       -- builders may add what only an icon needs
-                    -- a synthetic back-wall frame at the origin (inward normal -z)
+                    -- back-wall frame at the origin (inward normal -z)
                     wallBuild(wld, { ax = 0, az = 0, nx = 0, nz = -1, tx = 1, tz = 0 }, 0)
                 end,
             }
@@ -490,17 +449,16 @@ function Edit:modelIconFor(id)
     if cached ~= nil then
         if cached == false then return nil end          -- known "no icon"
         if not cached._disposed then return cached end  -- live cache (kept across open/close)
-        -- else it was disposed (stage teardown) → fall through and rebuild
+        -- disposed (stage teardown): rebuild
     end
     local ic = makeIcon(id, 128, false) or false
     self.modelIcons[id] = ic
     return ic or nil
 end
 
--- Bake shop thumbnails: for each id, render it ONCE on the CPU rasterizer (the only path whose canvas
--- has a readable pixel buffer) and copy the image into a SHARED texture keyed `prefix..id`, which the
--- coin shop then draws — reusing My Room's furniture models/geometry without re-declaring them there.
--- Standalone (no Edit instance) so Script can bake at stage load. Returns how many baked (for logging).
+-- shop thumbnails: each id rendered once on the CPU rasterizer (the only readable pixel buffer)
+-- into a shared texture `prefix..id` for the coin shop; no Edit instance needed
+-- returns the count baked
 function Edit.bakeThumbnails(ids, prefix, res)
     local n = 0
     for _, id in ipairs(ids) do
@@ -520,7 +478,8 @@ function Edit:disposeModelIcons()
     self.modelIcons = nil
 end
 
--- ── state setters (also what the PopUI callbacks route through — harness-drivable) ────────────────
+-- ==== state setters ====
+-- the UI callbacks go through these (harness-drivable)
 function Edit:setCategory(i)
     if self.cat ~= i then
         if self.hold then self:restoreHold(true) end
@@ -540,7 +499,8 @@ function Edit:setSelection(id)
     Sfx.play(self.sel and "select" or "back")
 end
 
--- ── selection: inline Rotate / Move / Remove buttons right under the placed item ──────────────────
+-- ==== selection ====
+-- inline Rotate / Move / Remove buttons under the placed item
 function Edit:select(it, kind, silent)
     if self.selected and self.selected.it == it then return end
     self:deselect(true)
@@ -574,7 +534,7 @@ function Edit:deselect(silent)
     self.selUI, self.selected, self.selBtns = nil, nil, nil
 end
 
--- lay the inline buttons right under the selected item (projected to screen each frame)
+-- inline buttons under the selected item, projected each frame
 function Edit:positionSelButtons()
     local s = self.selected
     if not (s and self.selBtns) then return end
@@ -597,8 +557,7 @@ function Edit:positionSelButtons()
     local n = #self.selBtns
     local total = n * 106 + (n - 1) * 8
     local x0 = min(SW - total - 12, max(12, floor(sx - total / 2)))
-    -- sit the buttons well BELOW the item (the floor projection lands mid-item on the tilted camera,
-    -- so a small offset covered it); wall items need less drop
+    -- well below the item: the floor projection lands mid-item on the tilted camera; wall items drop less
     local off = (s.kind == "wall") and 30 or 78
     local by = min(BAR_Y - 60, max(54, floor(sy + off)))
     for i, b in ipairs(self.selBtns) do
@@ -615,7 +574,7 @@ function Edit:mouseOverSelUI(mx, my)
     return false
 end
 
--- error feedback for a refused rotation: an SFX + a brief red flash on the item
+-- refused rotation: refuse sound and a short flash on the item
 local function errPlay()
     Sfx.play("refuse")
 end
@@ -623,11 +582,11 @@ function Edit.disposeSfx()
     Sfx.dispose()
 end
 function Edit:rotateRefused(it)
-    self._rotFlash = { it = it, f = 26 }          -- ~0.4s of red flash at 60fps
+    self._rotFlash = { it = it, f = 26 }          -- frames: ~0.4 s at 60 fps
     errPlay()
 end
 
--- the riders a held surface carries, in the form Room:canPlace takes
+-- held surface's riders, in Room:canPlace form
 local function heldRiders(h)
     if h == nil or h.riders == nil then return nil end
     local out = {}
@@ -642,7 +601,7 @@ function Edit:doRotate(it)
     local cat = Room.CATALOG[it.id]
     local oldFacing = it.facing or 0
     local newFacing = (oldFacing + 1) % 4
-    -- a surface carries its riders through the turn: plan each rider's rotated cell + facing
+    -- surface riders turn with it: plan each rider's rotated cell and facing
     local plan = {}
     if cat and cat.surface then
         for _, st in ipairs(room:stackedItemsOn(it)) do
@@ -650,7 +609,7 @@ function Edit:doRotate(it)
             plan[#plan + 1] = { it = st, nc = nc, nr = nr, nf = ((st.facing or 0) + 1) % 4 }
         end
     end
-    -- detach riders so they don't block the surface's own fit test, then validate as a unit
+    -- detach riders (they would block the surface's fit test), then test as a unit
     for _, p in ipairs(plan) do room:detachFurniture(p.it) end
     it.facing = newFacing
     local ok = room:canPlace(it.id, it.c, it.r, newFacing, it)
@@ -665,18 +624,18 @@ function Edit:doRotate(it)
                 occ[k] = true
             end
             if not ok then break end
-            -- nor run into what hangs on the walls behind
+            -- nor hit wall items behind
             if not room:clearOfWallItems(p.it.id, room:footprint(p.it.id, p.nc, p.nr, p.nf), p.nf, it.id) then ok = false; break end
         end
     end
     if ok then
-        -- turned fully onto a surface (or off one), the piece rides it (or stands on the floor)
+        -- it.on follows the surface under the turned footprint
         it.on = (room:surfaceUnder(it.id, it.c, it.r, newFacing) ~= nil) and true or nil
         for _, p in ipairs(plan) do
             p.it.c, p.it.r, p.it.facing = p.nc, p.nr, p.nf
             room:attachFurniture(p.it)             -- re-stacks onto the rotated surface
         end
-        self:commit()                              -- rebuild: the rotation shows live
+        self:commit()                              -- rebuild
         Sfx.play("rotate")
     else
         it.facing = oldFacing                      -- revert; riders never moved
@@ -696,10 +655,9 @@ function Edit:doRemove(it)
     Sfx.play("remove")
 end
 
--- ── the in-hand move flow (Move button OR press-drag; ground + wall items alike) ──────────────────
--- The item is DETACHED from the room while held, so the original visibly disappears and the ghost
--- at the hovered cell/slot is the live candidate. The phone moves through here too (the detach
--- bypasses the no-remove rule; cancel/leave always restores it).
+-- ==== in-hand move ====
+-- Move button or press-drag, ground and wall items; the item is detached while held
+-- the phone moves here too (detach skips the no-remove rule; cancel and leave restore it)
 function Edit:pickUp(it, kind, viaDrag)
     local room = self.room
     local riders = nil
@@ -708,7 +666,7 @@ function Edit:pickUp(it, kind, viaDrag)
             if w == it then table.remove(room.wallItems, i); break end
         end
     else
-        -- a surface travels WITH all its stacked riders: detach them as a unit (offsets kept)
+        -- a surface carries its riders: detach them with it, offsets kept
         local cat = Room.CATALOG[it.id]
         if cat and cat.surface then
             for _, st in ipairs(room:stackedItemsOn(it)) do
@@ -721,8 +679,7 @@ function Edit:pickUp(it, kind, viaDrag)
     end
     self.hold = { it = it, kind = kind, fromC = it.c, fromR = it.r,
                   fromMount = it.mount, drag = viaDrag and true or false, riders = riders,
-                  -- last VALID (placeable) target; the ghost parks here when the cursor goes off-screen
-                  -- so the piece never "depops". Seeded to its origin (a valid spot).
+                  -- last valid target; the ghost parks here when the cursor leaves the screen, seeded to the origin
                   lastC = it.c, lastR = it.r, lastMount = it.mount,
                   lastSlot = (kind == "wall") and { c = it.c, r = it.r, mount = it.mount or "low" } or nil }
     self:deselect(true)
@@ -756,13 +713,13 @@ function Edit:restoreHold(silent)
     if not silent then Sfx.play("back") end
 end
 
--- try to drop the held item at the hovered target; returns true when it landed
+-- drop the held item at the hovered target; true when it landed
 function Edit:dropHold()
     local h = self.hold
     if h == nil then return false end
     local room = self.room
     if h.kind == "wall" then
-        local s = anchoredSlot(room, h.it.id, self.hoverSlot) or h.lastSlot   -- released off-screen → last valid slot
+        local s = anchoredSlot(room, h.it.id, self.hoverSlot) or h.lastSlot   -- off-screen: last valid slot
         if s and room:canPlaceWall(h.it.id, s.c, s.r, s.mount) then
             h.it.c, h.it.r, h.it.mount = s.c, s.r, s.mount
             room.wallItems[#room.wallItems + 1] = h.it
@@ -775,7 +732,7 @@ function Edit:dropHold()
         end
     else
         local c, r = self.hoverC, self.hoverR
-        if not c then c, r = h.lastC, h.lastR end                -- released off-screen → last valid cell
+        if not c then c, r = h.lastC, h.lastR end                -- off-screen: last valid cell
         if c and room:canPlace(h.it.id, c, r, h.it.facing or 0, nil, heldRiders(h)) then
             h.it.c, h.it.r = c, r
             room:attachFurniture(h.it)      -- lands stacked when dropped onto a surface
@@ -809,7 +766,7 @@ function Edit:moveDoorTo(c)
     return true
 end
 
--- ── the PopUI bar: tab row + square item grid ─────────────────────────────────────────────────────
+-- ==== bar: tab row and item grid ====
 function Edit:buildBar()
     self._barDirty = false
     if self.ui then self.ui:disposeWidgets() end
@@ -830,7 +787,7 @@ function Edit:buildBar()
         }
     end
 
-    -- item grid: square buttons — icon + name underneath + a ×N stock pill (drawn in draw())
+    -- item grid: icon, name and stock pill drawn in draw()
     local ids = self:items()
     local x0, shown, paged = gridLayout(#ids)
     local first = max(0, min(self.barFirst or 0, #ids - shown))
@@ -873,7 +830,7 @@ function Edit:scrollBar(d)
     return true
 end
 
--- the rounded ×N stock pill (baked once with PopUI Shape in the theme's accent colours)
+-- stock pill, baked once with UI.Shape in the theme accents
 function Edit:badgePill()
     if self._badge then return self._badge end
     local cv = CANVAS:CreateCanvas(46, 26)
@@ -885,10 +842,9 @@ function Edit:badgePill()
     return cv
 end
 
--- ── 3D picking (screen-projected, like the old editor) ────────────────────────────────────────────
--- nearest floor cell to the cursor. floorOnly=true tests ONLY the floor point (used by hover so a
--- cursor a BLOCK ABOVE a piece maps to the cell BEHIND it, not the piece); the default also tests each
--- cell's item TOP so placement can aim AT an elevated surface.
+-- ==== 3D picking (screen-projected) ====
+-- nearest floor cell to the cursor; floorOnly tests only the floor point (hover: a cursor above a piece
+-- maps to the cell behind it); the default also tests each cell's item top, for elevated surfaces
 function Edit:pickGround(mx, my, floorOnly)
     local room, world = self.room, self.world
     local best, bc, br = PICK2, nil, nil
@@ -903,8 +859,7 @@ function Edit:pickGround(mx, my, floorOnly)
                     if d < best then best, bc, br = d, c, r end
                 end
                 if not floorOnly then
-                    -- also test the cell's ITEM TOP so an elevated item on a surface (a computer on a
-                    -- desk) is picked by aiming AT it, not at the floor behind it (was clunky)
+                    -- item top too: an elevated item is picked by aiming at it
                     local it = room:furnitureAt(c, r)
                     if it and it._topY and it._topY > FY + 0.1 then
                         local sx2, sy2, d2 = world:project(wx, it._topY, wz)
@@ -919,7 +874,7 @@ function Edit:pickGround(mx, my, floorOnly)
     end
     return bc, br
 end
--- nearest per-(tile × mount) wall-item slot
+-- nearest wall-item slot (tile x mount)
 function Edit:pickWallSlot(mx, my)
     local best, bs = PICK2, nil
     for _, s in ipairs(self.room:wallItemSlots()) do
@@ -958,8 +913,8 @@ function Edit:pickFringeCol(mx, my)
     return bc
 end
 
--- ── input ─────────────────────────────────────────────────────────────────────────────────────────
--- returns "exit" when the editor should close, else nil
+-- ==== input ====
+-- "exit" when the editor should close
 function Edit:update(ts, editCameraFuncs)
     if INPUT:KeyboardPressed("Tab") then
         self:leave()
@@ -986,9 +941,8 @@ function Edit:update(ts, editCameraFuncs)
     editCameraFuncs.pan(dmx, dmy)
     editCameraFuncs.move(dmx, dmy)
 
-    -- inline selection buttons: repositioned every frame, updated before the 3D interactions
-    -- (a click on them must never reach the room). A press-drag that STARTED on the item itself
-    -- may cross the buttons while held — don't let them swallow it.
+    -- inline buttons: repositioned and updated before the 3D interactions (a click on them never reaches the room)
+    -- a press-drag started on the item may cross them while held
     local overSel = false
     if self.selUI then
         self:positionSelButtons()
@@ -996,7 +950,7 @@ function Edit:update(ts, editCameraFuncs)
         overSel = self:mouseOverSelUI(mx, my) and not (self.pressItem and lpressing)
     end
 
-    -- Esc backs out of the current sub-mode (right mouse is reserved for camera rotation in edit mode)
+    -- Esc backs out of the current sub-mode (right mouse rotates the camera)
     if INPUT:KeyboardPressed("Escape") then
         if self.hold then self:restoreHold()
         elseif self.selected then self:deselect()
@@ -1024,7 +978,7 @@ function Edit:update(ts, editCameraFuncs)
             self:updateBrowse(mx, my, lpressed, lpressing, lreleased)
         end
     else
-        -- the wheel over the item grid scrolls it while not every item fits, else it zooms
+        -- wheel over the grid scrolls it while paged, else zooms
         if not (sdy ~= 0 and my >= GRID_Y and self:scrollBar(sdy > 0 and -1 or 1)) then editCameraFuncs.zoom(sdy) end
         self.hoverC, self.hoverR, self.hoverSlot, self.hoverTile, self.hoverExitC = nil, nil, nil, nil, nil
         self.hoverItem, self.hoverWallItem, self.hoverExit = nil, nil, false
@@ -1054,11 +1008,11 @@ function Edit:updatePlace(mx, my, sdy, lpressed, lpressing, zoomCamera, dmx, dmy
                 room:addFurniture(self.sel, c, r, self.facing); self:commit()
                 Sfx.play(Sfx.landed(room.furniture[#room.furniture], "ground"))
             end
-            self.sel = nil; self._barDirty = true                 -- furniture → back to item select
+            self.sel = nil; self._barDirty = true                 -- furniture: back to item select
         end
     elseif key == "wall" then
-        -- point at the LOW or HIGH band of a tile to place on that layer (both coexist per tile);
-        -- the wheel still nudges the preferred mount for when two bands project close together
+        -- point at a tile's low or high band (both can hold an item); the wheel switches
+        -- the preferred mount when two bands project close together
         local s = (dmx ~= 0 or dmy ~= 0) and self:pickWallSlot(mx, my) or self.hoverSlot
         if sdy ~= 0 and s then
             local mount = (self.mount == "low") and "high" or "low"
@@ -1095,7 +1049,7 @@ function Edit:updatePlace(mx, my, sdy, lpressed, lpressing, zoomCamera, dmx, dmy
             if sel ~= nil then room:invTake(sel) end
             room:setFloor(c, r, sel); self:commit(); self._barDirty = true
             Sfx.play("paint_floor")
-            if remain <= 0 then self.sel = nil end  -- out of stock → back to select
+            if remain <= 0 then self.sel = nil end  -- out of stock: back to select
         end
     elseif key == "paint" then
         zoomCamera(sdy)
@@ -1118,7 +1072,7 @@ function Edit:updatePlace(mx, my, sdy, lpressed, lpressing, zoomCamera, dmx, dmy
     end
 end
 
--- the Door tab: the ghost doorway follows the hovered front-fringe tile; click moves the exit there
+-- door tab: ghost doorway follows the hovered front tile; click moves the exit
 function Edit:updateDoor(mx, my, lpressed)
     local c = self:pickFringeCol(mx, my)
     if c and self.hoverExitC ~= c then Sfx.play("hover") end
@@ -1126,7 +1080,7 @@ function Edit:updateDoor(mx, my, lpressed)
     if lpressed then self:moveDoorTo(c) end
 end
 
--- in-hand move (Move button or press-drag): the ghost is the live candidate at the hover
+-- in-hand move: the ghost at the hover is the candidate
 function Edit:updateHold(mx, my, sdy, lpressed, lreleased, zoomCamera)
     local h = self.hold
     local room = self.room
@@ -1136,10 +1090,10 @@ function Edit:updateHold(mx, my, sdy, lpressed, lreleased, zoomCamera)
         if s and (not self.hoverSlot or self.hoverSlot.key ~= s.key) then
             Sfx.play("hover")
         end
-        self.hoverSlot = s                       -- the slot's own mount: drag to the height you want
+        self.hoverSlot = s                       -- the slot's own mount
         self.hoverC, self.hoverR = nil, nil
         local a = anchoredSlot(room, h.it.id, s)
-        if a and room:canPlaceWall(h.it.id, a.c, a.r, a.mount) then h.lastSlot = a end   -- remember last valid target
+        if a and room:canPlaceWall(h.it.id, a.c, a.r, a.mount) then h.lastSlot = a end   -- last valid target
     else
         if sdy ~= 0 then
             h.it.facing = ((h.it.facing or 0) + (sdy > 0 and 1 or 3)) % 4
@@ -1151,7 +1105,7 @@ function Edit:updateHold(mx, my, sdy, lpressed, lreleased, zoomCamera)
         end
         self.hoverC, self.hoverR = c, r
         self.hoverSlot = nil
-        if c and room:canPlace(h.it.id, c, r, h.it.facing or 0, nil, heldRiders(h)) then h.lastC, h.lastR = c, r end   -- remember last valid target
+        if c and room:canPlace(h.it.id, c, r, h.it.facing or 0, nil, heldRiders(h)) then h.lastC, h.lastR = c, r end   -- last valid target
     end
     if h.drag then
         if lreleased then
@@ -1162,7 +1116,7 @@ function Edit:updateHold(mx, my, sdy, lpressed, lreleased, zoomCamera)
     end
 end
 
--- the Eraser tab: hover ANY placed thing and click/swipe to remove it (never the phone)
+-- eraser tab: click or swipe removes the hovered thing (never the phone)
 function Edit:updateEraser(mx, my, lpressed, lpressing)
     local room = self.room
     local prevDelTarget = self.delTarget
@@ -1209,11 +1163,7 @@ function Edit:updateEraser(mx, my, lpressed, lpressing)
     end
 end
 
--- browse mode: PRESS an item to select it instantly (inline buttons); hold + move to drag it;
--- the door (exit) tile drags along the front fringe
--- at a hovered cell, pick WHICH occupant the cursor aims at BY HEIGHT: the elevated stacked item
--- (a computer on a desk) vs the ground surface under it (the desk). Aim high → the item on top; aim
--- low → the table. Falls back to whichever exists.
+-- occupant of a hovered cell by aim height: the stacked item or the surface under it
 function Edit:pickItemAtCell(mx, my, c, r)
     local room, world = self.room, self.world
     local stacked = room:stackedItemAt(c, r)
@@ -1227,14 +1177,12 @@ function Edit:pickItemAtCell(mx, my, c, r)
         if not depth or depth <= 0 then return math.huge end
         local dx, dy = sx - mx, sy - my; return dx * dx + dy * dy
     end
-    local groundMid = (FY + surfTop) * 0.5                                    -- the table's body
-    local stackMid  = (surfTop + (stacked._topY or (surfTop + 0.5))) * 0.5    -- the item-on-top's body
+    local groundMid = (FY + surfTop) * 0.5                                    -- surface body
+    local stackMid  = (surfTop + (stacked._topY or (surfTop + 0.5))) * 0.5    -- stacked item body
     if d(stackMid) <= d(groundMid) then return stacked else return ground end
 end
 
--- pick the ground furniture whose ON-SCREEN bounding box contains the cursor, so hovering a block
--- ABOVE a piece no longer selects it. When boxes overlap (an item stacked on a surface) the SMALLER
--- box wins → aim at the computer to get it, aim at the desk body to get the desk.
+-- ground furniture whose on-screen box holds the cursor; on overlap the smaller box wins
 function Edit:pickHoverItem(mx, my)
     local room, world = self.room, self.world
     local best, bestArea = nil, math.huge
@@ -1260,12 +1208,12 @@ function Edit:pickHoverItem(mx, my)
         end
     end
     if best then return best end
-    -- fallback: the ground item at the cursor's FLOOR cell (floor-only pick, so a cursor a block ABOVE
-    -- a piece resolves to the cell behind it, not the piece). Keeps hover robust for thin/short items.
+    -- fallback: the ground item at the cursor's floor cell (floor-only pick), for thin or short items
     local c, r = self:pickGround(mx, my, true)
     return c and self:pickItemAtCell(mx, my, c, r) or nil
 end
 
+-- browse: press selects at once, press-drag picks up; the exit tile drags along the front
 function Edit:updateBrowse(mx, my, lpressed, lpressing, lreleased)
     local room = self.room
     if self.dragExit then                                        -- continue a door drag
@@ -1282,7 +1230,7 @@ function Edit:updateBrowse(mx, my, lpressed, lpressing, lreleased)
     end
 
     local gc, gr = self:pickGround(mx, my); self.hoverC, self.hoverR = gc, gr
-    local gItem = self:pickHoverItem(mx, my)                   -- precise: cursor must be over the item's box
+    local gItem = self:pickHoverItem(mx, my)                   -- cursor over the item's screen box
     local ws = self:pickWallSlot(mx, my)
     local wItem = ws and room:wallItemAt(ws.c, ws.r, ws.mount)
     local onExit = gc and room:cellType(gc, gr) == "E" and not (gc == self.playerC and gr == self.playerR)
@@ -1312,7 +1260,7 @@ function Edit:updateBrowse(mx, my, lpressed, lpressing, lreleased)
 
     if lpressed then
         if gItem then
-            self:select(gItem, "ground")                         -- INSTANT selection on press
+            self:select(gItem, "ground")                         -- select on press
             self.pressItem = { it = gItem, kind = "ground", c = gc, r = gr }
         elseif self.hoverExit then
             self.dragExit = true
@@ -1326,7 +1274,8 @@ function Edit:updateBrowse(mx, my, lpressed, lpressing, lreleased)
     end
 end
 
--- ── build the 3D overlays (grid, ghost, hilite) for this frame ────────────────────────────────────
+-- ==== 3D overlays ====
+-- grid, ghost and hilite, rebuilt every frame
 function Edit:buildOverlays()
     local room, world = self.room, self.world
     gridBegin(world)
@@ -1352,7 +1301,7 @@ function Edit:buildOverlays()
             if s then
                 local ok = room:canPlaceWall(h.it.id, s.c, s.r, s.mount)
                 self:ghostWallItem(h.it.id, s.c, s.r, s.mount, ok)
-                hiliteWallSlot(world, s, ok, ok)                 -- BLUE while dropping (red only if it can't)
+                hiliteWallSlot(world, s, ok, ok)                 -- blue while valid
             end
         else
             local c, r = self.hoverC, self.hoverR
@@ -1360,7 +1309,7 @@ function Edit:buildOverlays()
             if c then
                 local ok = room:canPlace(h.it.id, c, r, h.it.facing or 0, nil, heldRiders(h))
                 self:ghostFurniture(h.it.id, c, r, h.it.facing or 0, ok)
-                -- BLUE wireframe box at the drop candidate (red if it can't drop there)
+                -- wire box at the drop candidate
                 local cat = Room.CATALOG[h.it.id]
                 local tmp = { id = h.it.id, c = c, r = r, facing = h.it.facing or 0, on = cat and cat.stackOn or false }
                 local x0, y0, z0, x1, y1, z1 = itemAABB(world, room, tmp)
@@ -1377,7 +1326,7 @@ function Edit:buildOverlays()
             room:buildDoorTileVisual(world, c)
             ghostEnd(world)
         end
-    elseif key == "eraser" then                                  -- eraser hover: red on the target
+    elseif key == "eraser" then                                  -- eraser: hilite the target
         if self.delKind == "furn" and self.delTarget then
             hilite(world, room:footprint(self.delTarget.id, self.delTarget.c, self.delTarget.r, self.delTarget.facing or 0),
                 235, 95, 95, 150, itemHiliteY(room, self.delTarget))
@@ -1395,8 +1344,7 @@ function Edit:buildOverlays()
             if c then
                 local ok = room:canPlace(self.sel, c, r, self.facing)
                 self:ghostFurniture(self.sel, c, r, self.facing, ok)
-                -- stackables: draw the placement selector on the HOST SURFACE top (with the ghost),
-                -- not on the ground, so placing a TV/PC onto a desk reads correctly
+                -- stackables: selector on the host surface top, with the ghost
                 local hy = nil
                 local scat = Room.CATALOG[self.sel]
                 if scat and scat.stackOn then
@@ -1419,7 +1367,7 @@ function Edit:buildOverlays()
         elseif key == "paint" then
             if self.hoverTile then hiliteWallTile(world, self.hoverTile, true) end
         end
-    elseif self.selected then                                    -- selected box + STILL show hovered others
+    elseif self.selected then                                    -- selected box, plus the hovered item
         local it = self.selected.it
         world.scene:ObjSetPass(world.hiliteObj, 1, 120, 200, 255, 220)
         world.scene:ObjBegin(world.hiliteObj)                     -- one pass: selected + hover accumulate
@@ -1428,7 +1376,7 @@ function Edit:buildOverlays()
         else
             local x0, y0, z0, x1, y1, z1 = itemAABB(world, room, it)
             wireBoxInto(world, x0, y0, z0, x1, y1, z1, 0.032)     -- selected: thicker box
-            -- and every cell it stands on (a shaped piece shows its shape)
+            -- and the cells it stands on
             cellsInto(world, room:footprint(it.id, it.c, it.r, it.facing or 0), itemHiliteY(room, it))
         end
         if self.hoverItem and self.hoverItem ~= it then          -- hovering a different ground item
@@ -1441,7 +1389,7 @@ function Edit:buildOverlays()
     else                                                         -- browse hover
         if self.hoverItem then
             local x0, y0, z0, x1, y1, z1 = itemAABB(world, room, self.hoverItem)
-            wireBox(world, x0, y0, z0, x1, y1, z1, 150, 210, 255, 150, 0.026)   -- hover: soft box
+            wireBox(world, x0, y0, z0, x1, y1, z1, 150, 210, 255, 150, 0.026)   -- hover box
         elseif self.hoverWallItem and self.hoverSlot then
             local w = self.hoverWallItem
             hiliteWallSlot(world, itemSlot(room, w.id, w.c, w.r, w.mount), true)
@@ -1449,7 +1397,7 @@ function Edit:buildOverlays()
             hilite(world, { { self.hoverC, self.hoverR } }, 255, 225, 150, 140)
         end
     end
-    -- refused-rotation flash: a red footprint over the item (drawn LAST so it wins the hilite obj)
+    -- refused-rotation flash, drawn last to win the hilite object
     if self._rotFlash and self._rotFlash.it then
         local it = self._rotFlash.it
         local cat = Room.CATALOG[it.id]
@@ -1469,14 +1417,14 @@ function Edit:ghostFurniture(id, c, r, facing, ok)
     local w, h = cat.w, cat.h; if facing % 2 == 1 then w, h = h, w end
     local cx, cz = world:footprintCenter(c, r, w, h)
     local yaw = (facing or 0) * 90
-    -- stackables preview at the hovered surface's top (table/desk), else at floor height
+    -- stackables preview at the hovered surface top, else at floor height
     local baseY = nil
     if cat.stackOn then
         local surf = self.room:surfaceUnder(id, c, r, facing)
         if surf then baseY = self.room:surfaceTopY(surf) end
     end
-    -- GLB entries preview with the REAL model instance, bounds-anchored exactly like placement
-    -- (Room.poseFitted passes the ANCHOR POINT — the engine's setTransform owns the yaw offset)
+    -- GLB entries preview with the model instance, bounds-anchored like placement
+    -- (Room.poseFitted passes the anchor point; setTransform owns the yaw offset)
     local gi = self:ghostModelFor(id)
     if gi then
         if Room.poseFitted(gi, cx, cz, yaw, cat, baseY) then
@@ -1493,14 +1441,15 @@ function Edit:ghostFurniture(id, c, r, facing, ok)
     end
 end
 
--- icon for an item id: flooring/paint use a colour swatch, furniture the drawn art (fallback)
+-- drawn fallback icon: swatch for flooring and paint, else icons.lua art
 local function iconFor(id)
     local sw = A.swatchFor(id)
     if sw then return I.swatch(id, sw[1], sw[2], sw[3]) end
     return I.get(id)
 end
 
--- ── draw: the PopUI bar, then icon/name/pill composited over each item button ─────────────────────
+-- ==== draw ====
+-- the bar, then icon, name and pill over each item button
 function Edit:draw()
     local ui = self.ui
     if not ui then return end
@@ -1543,7 +1492,7 @@ function Edit:draw()
 
     ui:draw()
 
-    -- shop-grid dressing: 3D preview icon (budget-staggered; drawn art until it lands), name, ×N pill
+    -- slot dressing: preview icon, or drawn art until it renders
     for _, s in ipairs(self.barSlots) do
         local drawn = false
         local mi = self:modelIconFor(s.id)
@@ -1556,7 +1505,7 @@ function Edit:draw()
         end
         local fg = s.sel and { 255, 255, 255 } or { 92, 62, 46 }
         local bg = s.sel and { 120, 60, 20, 220 } or { 255, 255, 255, 160 }
-        -- the name on up to two lines across the whole slot (an item in a colour: the colour in brackets after it)
+        -- name on up to two lines across the slot
         Grid.drawName(ui, s.id, s.x + 5, s.y + s.h - 64, s.w - 10, 58, fg, bg, BAR_NAME)
         if s.n >= 0 then                                        -- infinite default swatches show no count
             local pill = self:badgePill()

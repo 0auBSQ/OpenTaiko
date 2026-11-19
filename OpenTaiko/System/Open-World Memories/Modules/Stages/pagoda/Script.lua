@@ -1,4 +1,4 @@
--- Pagoda stage shell; the menu and run logic live in pagoda.lua.
+-- pagoda stage shell (menu and run logic in pagoda.lua)
 
 local OWM       = require("OWM3d")
 local pagoda    = require("pagoda")
@@ -25,7 +25,7 @@ local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
 
--- constants
+-- ==== Constants ====
 
 local Puchi = Animation.stage.script.puchi
 local PUCHI_FLOAT_AMP = Puchi.float_amp
@@ -33,35 +33,35 @@ local PUCHI_N_FRAMES  = Puchi.frames
 
 local BGM_FADE_SEC = Animation.stage.script.bgm_fade_s   -- match dan_doors_back FADE_OUT_SECONDS / FADE_IN_SECONDS
 
--- multiplier on the sky scene time (1 = real time)
+-- sky time multiplier (1 = real time)
 local SKY_SPEED = Animation.stage.script.sky_speed
 
 local Fonts = Layout.stage.script.fonts
 local World = Layout.stage.script.world
 local Sky = Layout.stage.sky
 
--- state
+-- ==== State ====
 
 local world        = nil   -- created on first activate
-local world_failed = false -- set on a scene error: no skybox for the session
+local world_failed = false -- scene error: no skybox this session
 local tex         = nil    -- tower + selector textures
 local font_header  = nil   -- selector headers
 local font_name    = nil   -- selector level name
 local gfont        = nil   -- story/VN body text
 local gfont_name   = nil   -- story/VN speaker names
 local gfont_small  = nil   -- floor-entrance dialog
-local fonts_lang   = nil   -- language code the fonts were made for
+local fonts_lang   = nil   -- font language code
 local snd_bgm   = nil
 
 local bgm_vol   = 0.0    -- percent, 0..100
 local bgm_fade  = nil    -- "in" | "out" | nil
 local exiting   = false  -- set once Exit() is called
 local event_timer = nil  -- event_timer ROActivity (Event Mode)
-local event_over  = false -- Event Mode: the run ended in a game over
+local event_over  = false -- Event Mode: run ended in game over
 local was_selecting = false -- Event Mode: pagoda.is_selecting() on the last update
 local keep_avatar = false   -- leaving for a play or re-entering: keep the avatar
 
--- BGM
+-- ==== BGM ====
 
 local function startBGM()
     if snd_bgm == nil then return end
@@ -79,7 +79,7 @@ local function stopBGM()
     bgm_fade = nil
 end
 
--- callbacks for pagoda.lua
+-- ==== Callbacks (pagoda.lua) ====
 
 local CB = {
     startBGM = startBGM,
@@ -123,7 +123,7 @@ local function load_menu_chara()
     if chara ~= nil and chara.IsValid then chara:LoadAnimation(CHARACTER.ANIM_MENU_NORMAL) end
 end
 
--- lazy resources
+-- ==== Lazy resources ====
 
 local function dispose_fonts()
     if font_header  ~= nil then font_header:Dispose()  ; font_header  = nil end
@@ -133,7 +133,7 @@ local function dispose_fonts()
     if gfont_small  ~= nil then gfont_small:Dispose()  ; gfont_small  = nil end
 end
 
--- built on first entry (onStart runs at skin load for every stage), kept until teardown
+-- built on first entry, kept until teardown
 local function ensure_world()
     if world ~= nil then return end
     local res = THEME:GetResolution()
@@ -146,7 +146,7 @@ local function ensure_world()
     skybox.setup(world)
     world:setFog(false)
 
-    -- render once while the doors are shut; a shader compile on the first draw would skip the FadeIn animation
+    -- warm-up render behind the doors (first-draw shader compile skips FadeIn)
     pcall(function() world:update(0, 0, 0, 0) ; world:render() end)
 end
 
@@ -175,7 +175,7 @@ local function ensure_resources()
     end
     tiles.setup()
     title_screen.setup()
-    -- fonts follow the language (SkinConfig FontName<code>) and are rebuilt when it changes
+    -- per-language fonts (SkinConfig FontName<code>), rebuilt on change
     local lang = I18N.currentCode()
     if fonts_lang ~= nil and fonts_lang ~= lang then
         dispose_fonts()
@@ -199,14 +199,14 @@ local function ensure_resources()
     bestiary.setup(tex, story_fonts)
 end
 
--- lifecycle
+-- ==== Lifecycle ====
 
 function onStart()
-    -- nothing heavy here: the scene and textures are made in activate()
+    -- scene and textures made in activate()
     I18N.detect()
 end
 
--- engine-called when the language changes
+-- called by the engine on language change
 function reloadLanguage()
     I18N.detect()
 end
@@ -256,7 +256,7 @@ function activate()
 
     if pagoda.is_returning_from_play() then
         pagoda.activate(CB)
-        -- on_return starts the BGM when needed; otherwise the floor transition owns the audio
+        -- on_return starts the BGM, else the floor transition owns audio
         local outcome = pagoda.on_return(CB)
         if EM.on() then
             EM.resetMods()
@@ -276,10 +276,10 @@ end
 function deactivate()
     stopBGM()
     if event_timer ~= nil and event_timer.IsActive then event_timer:Deactivate() end
-    selector.close()   -- a practice play leaves it open; also restores the sky
-    floor_res.release()   -- frees a lost run's held landing or an unfinished result screen
+    selector.close()   -- open after a practice play; restores the sky
+    floor_res.release()   -- frees a held landing or unfinished result
     pagoda.deactivate()
-    -- leaving the pagoda: player 1's own characters back
+    -- restore P1 characters
     if not keep_avatar then PagodaAvatar.leave() end
 
     for k in pairs(CB.ctx) do CB.ctx[k] = COUNTER:EmptyCounter() end
@@ -288,16 +288,16 @@ function deactivate()
 end
 
 function afterSongEnum()
-    PagodaAvatar.recover()   -- a run the game crashed in; the characters are loaded at this point
+    PagodaAvatar.recover()   -- crashed run (characters loaded by now)
     pagoda.afterSongEnum()
 end
 
--- update
+-- ==== Update ====
 
 function update()
     local dt = fps.deltaTime
 
-    -- guarded: on an error the skybox is dropped for the session
+    -- on error: skybox off for the session
     if world ~= nil and not world_failed then
         if not pcall(world.update, world, dt * SKY_SPEED * skybox.speed(), 0, 0, 0) then world_failed = true end
     end
@@ -319,7 +319,7 @@ function update()
         return Exit("stage", "event_thanks")
     end
 
-    -- Event Mode countdown: runs only while choosing, restarts when choosing resumes
+    -- Event Mode countdown: runs while choosing, restarts on resume
     if event_timer ~= nil and event_timer.IsActive then
         local selecting = pagoda.is_selecting()
         if not selecting then
@@ -346,13 +346,13 @@ function update()
         -- pagoda stopped the BGM before returning "play"
         return Exit("play", nil)
     elseif result == "reopen" then
-        -- lost run: the stage re-enters itself onto a fresh title
+        -- lost run: re-enter onto a fresh title
         exiting = true
         return Exit("stage", "pagoda", "dan_doors_back")
     end
 end
 
--- draw
+-- ==== Draw ====
 
 function draw()
     -- skybox.draw is pcall-guarded
@@ -361,7 +361,7 @@ function draw()
         if not skybox.draw(g, v) then world_failed = true end
     end
 
-    -- selector.draw() renders this scene itself while the selector is up
+    -- selector.draw() renders it while open
     if tex ~= nil and not selector.active and pagoda.shows_title_scene() then
         selector.drawTitle(pagoda.highest_level())
     end

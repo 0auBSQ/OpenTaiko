@@ -1,13 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- Online.Lobby: the online lobby's session on the NET core, with no drawing. Up to 5 players: the player
--- with the host role (NET:HasHostRole, rotated after each round) picks the song and its speed; every player
--- picks their own difficulty and mods and gets ready. On "go" each machine plays the song as a normal
--- N-player game: spot 0 is the local player, the others are mounted on virtual slots and auto-play with
--- their judges sampled from the wire (the gameplay screen does that part). Then every player broadcasts
--- their result and the host role moves on.
---
--- One session per Lua state (the module is a singleton). The skin reads Lobby.net each frame and calls the
--- functions below; see the Online page of the docs for the screen flow and the song-select wiring.
+-- Online.Lobby: online lobby session on NET, no drawing; one per Lua state
+-- the skin reads LO.net each frame; the host role picks the song and rotates after each round
 
 local P = require("Online.Protocol")
 local Identity = require("Online.Identity")
@@ -20,8 +13,8 @@ local LO = {}
 
 LO.net = {
     online = false, isHost = false, connecting = false, roomGone = false, code = nil, msg = nil,
-    msgCode = nil, msgArg = nil,      -- msg's stable code ("open_failed", ..., "net" for a NET text) and its argument
-    notice = nil,                     -- a message NET sent while in a room, for the lobby to show once
+    msgCode = nil, msgArg = nil,      -- msg code ("net" for a NET text) and argument
+    notice = nil,                     -- NET message while in a room, shown once
     nameByPeer = {}, infoByPeer = {}, diffByPeer = {}, modByPeer = {}, readyByPeer = {}, resultByPeer = {},
     lackByPeer = {}, watchByPeer = {},
     song = nil,                       -- {uid, title, diff, speed, dyn(0/1)}
@@ -34,13 +27,13 @@ LO.MAXP = P.MAXP
 LO.ROOM_ID = P.ROOM_ID
 LO.RESULTS_WAIT = 20                  -- seconds the results wait for the last players
 
--- an optional listener the skin sets: LO.onEvent(kind, peer, data) for every event drain handles
+-- optional skin listener: LO.onEvent(kind, peer, data) per drained event
 LO.onEvent = nil
 local function emit(kind, peer, data) if LO.onEvent then LO.onEvent(kind, peer, data) end end
 
 local function setMsg(code, text, arg) net.msg, net.msgCode, net.msgArg = text, code, arg end
 
--- re-exported pieces of the other modules
+-- re-exports
 LO.myName = Identity.myName
 LO.selfInfo = Identity.selfInfo
 LO.selfPaletteJson = Identity.selfPaletteJson
@@ -54,7 +47,7 @@ function LO.tickPreview(dt) Media.tick(net, dt) end
 function LO.amController() return net.online and NET:HasHostRole() end
 function LO.count() local c = 0; for _ in pairs(net.nameByPeer) do c = c + 1 end return c end
 
--- ── roster ──────────────────────────────────────────────────────────────────────────────────────
+-- ==== roster ====
 function LO.refreshRoster()
     local names = {}
     local arr = JSONLOADER:JsonParseStringAny(NET:PeersJson()); local n = arr and JSONLOADER:JsonCount(arr) or 0
@@ -82,7 +75,7 @@ function LO.refreshRoster()
 end
 function LO.peerIds() local ids = {} for id in pairs(net.nameByPeer) do ids[#ids + 1] = id end table.sort(ids) return ids end
 
--- ── session control ───────────────────────────────────────────────────────────────────────────────
+-- ==== session control ====
 local function reset()
     net.online, net.isHost, net.connecting, net.roomGone = false, false, false, false
     net.code = nil
@@ -95,7 +88,7 @@ local function reset()
     Media.stopPreview()
 end
 local function clearLobbyAuto() pcall(function() for sp = 0, 4 do CONFIG:SetAutoStatus(sp, false) end end) end   -- no Auto icon online
--- the reason NET queued for a refused host (read before any room exists, so drain never sees it)
+-- error NET queued for a refused host (before any room, so drain never sees it)
 local function takeError()
     local why = nil
     while true do
@@ -124,7 +117,7 @@ function LO.host()
     return true
 end
 
--- starts joining the room of a code (the answer comes through drain); false with net.msg when refused at once
+-- starts joining a room by code (answer comes through drain); false with net.msg on instant refusal
 function LO.join(code)
     code = (code or ""):gsub("%s", "")
     if code == "" then setMsg("no_code", Texts.tr("msg_no_code")); return false end
@@ -145,12 +138,12 @@ function LO.join(code)
     setMsg("connecting", Texts.tr("connecting"))
     return true
 end
--- always ends the NET session: after a failed join its workers are still there
+-- always ends the NET session (a failed join leaves its workers running)
 function LO.leave() NET:Leave(); reset(); LO.restoreSpots() end
 
--- ── selections ────────────────────────────────────────────────────────────────────────────────────
+-- ==== selections ====
 function LO.rebroadcastSong() if net.song then NET:Broadcast("song", P.songJson(net.song)) end end
--- the difficulties the song has (all 5 when unknown or missing)
+-- the song's difficulties (all 5 when unknown)
 function LO.availDiffs()
     local a = {}
     for d = 0, 4 do if net.songLevels[d] ~= nil then a[#a + 1] = d end end
@@ -161,7 +154,7 @@ function LO.diffAvailable(d)
     for _, a in ipairs(LO.availDiffs()) do if a == d then return true end end
     return false
 end
--- the difficulty nearest to d among those the song has (the lower one on a tie)
+-- song difficulty nearest to d (lower on a tie)
 function LO.nearestDiff(d)
     local best, bestDist = d, math.huge
     for _, a in ipairs(LO.availDiffs()) do
@@ -170,7 +163,7 @@ function LO.nearestDiff(d)
     end
     return best
 end
--- moves my difficulty to the next one the song has in that direction; false at the end of the row
+-- steps my difficulty to the next available one in dir; false at the end
 function LO.stepDiff(dir)
     local d = LO.myDiff() + dir
     while d >= 0 and d <= 4 do
@@ -179,13 +172,12 @@ function LO.stepDiff(dir)
     end
     return false
 end
--- keeps my difficulty on one the song has (call every lobby frame; broadcasts only when it moves)
+-- keeps my difficulty on an available one; call every lobby frame (broadcasts only on change)
 function LO.fixDiff()
     local cur = LO.myDiff()
     if not LO.diffAvailable(cur) then LO.setDiff(LO.nearestDiff(cur)) end
 end
--- a song set or received: clears ready, loads its media, tells the room whether I have it, and keeps my
--- difficulty on one the song has
+-- after a song is set or received (clears ready, loads media)
 local function applySong()
     for id in pairs(net.readyByPeer) do net.readyByPeer[id] = false end
     net.songChanged = true
@@ -202,7 +194,7 @@ function LO.adjustSpeed(delta)
     if not net.song then return end
     LO.setSpeed((net.song.speed or CONFIG.SONGSPEED.Normal) + delta)
 end
--- the controller's song speed; the song select and the lobby share it through CONFIG.SongSpeed
+-- controller's song speed, shared with the song select through CONFIG.SongSpeed
 function LO.setSpeed(sp)
     if not net.song then return end
     local SPEED = CONFIG.SONGSPEED
@@ -212,7 +204,7 @@ function LO.setSpeed(sp)
     end
     net.song.speed = sp
     if LO.amController() then pcall(function() CONFIG.SongSpeed = sp end) end
-    -- the live preview follows at once (guests get it with the song rebroadcast)
+    -- live preview follows at once (guests get it with the song rebroadcast)
     net.previewSpeed = actual
     pcall(function() local snd = SHARED:GetSharedSound("presound"); if snd then snd:SetSpeed(actual) end end)
     if LO.amController() then LO.rebroadcastSong() end
@@ -220,7 +212,7 @@ end
 function LO.setDiff(d) net.diffByPeer[NET:SelfId()] = d; NET:Broadcast("diff", P.diffJson(d)) end
 function LO.setReady(r) net.readyByPeer[NET:SelfId()] = r; NET:Broadcast("ready", P.readyJson(r)) end
 function LO.setWatching(w) net.watchByPeer[NET:SelfId()] = w and true or nil; NET:Broadcast("watch", P.watchJson(w)) end
--- sends all my selections to one peer (a late joiner), who otherwise sees the Normal / no-mods defaults
+-- sends my selections to a late joiner (else they see the Normal / no-mods defaults)
 function LO.sendMyStateTo(peer)
     local me = NET:SelfId()
     NET:SendTo(peer, "diff", P.diffJson(net.diffByPeer[me] or 1))
@@ -230,15 +222,15 @@ function LO.sendMyStateTo(peer)
     NET:SendTo(peer, "have", P.haveJson(not net.iLackSong))
     if net.watchByPeer[me] then NET:SendTo(peer, "watch", P.watchJson(true)) end
 end
--- broadcasts all my selections (just after joining, so the players already there see them)
+-- broadcasts my selections, just after joining
 function LO.broadcastMyState()
     local me = NET:SelfId()
     NET:Broadcast("diff", P.diffJson(net.diffByPeer[me] or 1))
     LO.broadcastMods()
     NET:Broadcast("ready", P.readyJson(net.readyByPeer[me]))
 end
--- reads player 0's mods from CONFIG (no Auto and no fun mod: both are off online), stores and broadcasts
--- them; call it when the skin's mod select closes
+-- reads player 0's mods from CONFIG (no Auto, no fun mod), stores and broadcasts them
+-- call when the skin's mod select closes
 function LO.broadcastMods()
     local m = { r = CONFIG:GetRandomMod(0), st = CONFIG:GetStealthMod(0), ju = CONFIG:GetJusticeMod(0), tz = CONFIG:GetTimingZone(0), ss = CONFIG:GetScrollSpeed(0) }
     m.sm = CONFIG:GetSpecialMod(0)                    -- Flawless / Timed / Timed (Hard); Auto (1) is not sent
@@ -246,7 +238,7 @@ function LO.broadcastMods()
     net.modByPeer[NET:SelfId()] = m
     NET:Broadcast("mod", P.modJson(m))
 end
--- puts a player's mods on a CONFIG player slot, for drawing their mod icons with the modicons ROActivity
+-- puts a player's mods on a CONFIG slot (for the modicons ROActivity)
 function LO.applyModsToSlot(slot, m)
     m = m or P.defMods()
     pcall(function()
@@ -258,8 +250,7 @@ end
 function LO.myReady() return net.readyByPeer[NET:SelfId()] == true end
 function LO.myDiff() return net.diffByPeer[NET:SelfId()] or 1 end
 
--- why the controller cannot start yet: "need_song", "need_players", or nil when it can (players need not be
--- ready)
+-- why the controller can't start: "need_song", "need_players", or nil (ready not required)
 function LO.startProblem()
     if net.song == nil then return "need_song" end
     if LO.count() < 2 then return "need_players" end
@@ -271,17 +262,16 @@ function LO.hostStart()
     NET:Broadcast("go", P.GO); net.goSignal = true
     return true
 end
--- true once when the round started (then call launchPlay)
+-- true once per round start (then call launchPlay)
 function LO.takeGo()
     if not net.goSignal then return false end
     net.goSignal = false
     return true
 end
 
--- ── remote players on the local spots ─────────────────────────────────────────────────────────────
--- The others take the local game's spots 2-5 (virtual slots V1-V4) in the order a round mounts them, as
--- soon as they are in the room: their nameplates can be drawn by spot (LO.spotOf[peer]), and their
--- characters are loaded before the song starts. Leaving the room gives the spots back to the save files.
+-- ==== remote players ====
+-- others take local spots 2-5 (virtual slots V1-V4) once in the room; LO.spotOf[peer] = spot
+-- leaving gives the spots back to the save files
 local mountedKey, mountedAny = nil, false
 LO.spotOf = {}
 function LO.mountRemotes()
@@ -323,10 +313,9 @@ function LO.restoreSpots()
     pcall(function() for p = 2, LO.MAXP do VIRTUALSLOTS:MountSlot(p, p .. "P") end end)
 end
 
--- ── play launch ─────────────────────────────────────────────────────────────────────────────────────
--- on "go": sets up and mounts the room's song, mounts the remote players on virtual slots and opens the
--- play round. Returns true (then Exit("play")), "eject" (this machine lacks the song: leave the room), or
--- false (with net.msg).
+-- ==== play launch ====
+-- on "go": mounts the song and remote players, opens the round
+-- returns true (then Exit("play")), "eject" (song missing: leave), or false (net.msg)
 function LO.launchPlay()
     local s = net.song; if not s then return false end
     local node = Media.findSong(s.uid)
@@ -343,7 +332,7 @@ function LO.launchPlay()
         CONFIG.SongSpeed = s.speed or 20                 -- the room's playback rate
         CONFIG:SetAutoStatus(0, false)                   -- the local player plays for real
         for sp = 1, N - 1 do CONFIG:SetAutoStatus(sp, true) end   -- remote spots auto-play from the wire and are not saved
-        -- Dynamic Beat is a per-player mod: the local fun mod is left as the player set it
+        -- Dynamic Beat is per player: the local fun mod stays as set
     end)
     local mounted = false
     pcall(function() mounted = node:Mount(diffOf(1), diffOf(2), diffOf(3), diffOf(4), diffOf(5)) end)
@@ -356,12 +345,12 @@ function LO.launchPlay()
             VIRTUALSLOTS:SetPuchichara(slot, inf.puchi or "None")
             VIRTUALSLOTS:SetNameplateName(slot, inf.name or ("P" .. id))
             VIRTUALSLOTS:SetNameplateDan(slot, inf.dan or "")
-            -- the nameplate id resolves title, type and rarity from this machine's catalogue (no title if unknown)
+            -- nameplate id resolves from this machine's catalogue (no title if unknown)
             VIRTUALSLOTS:SetNameplateById(slot, inf.npk or "")
             VIRTUALSLOTS:SetNameplateDanType(slot, inf.dtype or 0)
             VIRTUALSLOTS:SetNameplateDanGold(slot, inf.dgold and true or false)
             VIRTUALSLOTS:MountSlot(i, "V" .. slot)
-            -- the remote player's character palette on this spot (player i-1), cleared when they have none
+            -- remote player's palette on this spot (player i-1), cleared when none
             pcall(function()
                 local cha = GetSaveFile(i - 1):GetCharacter()
                 if cha then
@@ -377,8 +366,8 @@ function LO.launchPlay()
     return true
 end
 
--- ── results ─────────────────────────────────────────────────────────────────────────────────────────
--- after the song: reads the local result from PLAYSTATE, broadcasts it and stores it for the standings
+-- ==== results ====
+-- after the song: reads the local result from PLAYSTATE, broadcasts and stores it
 function LO.broadcastResult()
     NET:EndPlaySync()
     local gr = PLAYSTATE:GetGoodCount(0)   -- GREAT (perfect)
@@ -392,8 +381,7 @@ function LO.broadcastResult()
     net.resultByPeer[NET:SelfId()] = r
     NET:Broadcast("result", P.resultJson(r))
 end
--- the skin's stage was entered again after the play started by launchPlay: sends the result, marks me as
--- watching the results and starts their timer
+-- on stage re-entry after launchPlay: sends my result and starts watching the results
 function LO.returnedFromPlay()
     if net.online then LO.broadcastResult(); LO.setWatching(true) end
     net.resultsT, net.resultsReadyT = 0, nil
@@ -402,13 +390,13 @@ function LO.haveAllResults()
     for id in pairs(net.nameByPeer) do if not net.resultByPeer[id] then return false end end
     return true
 end
--- each frame on the results: true once every result is in or RESULTS_WAIT seconds have passed
+-- per frame on the results: true once all results are in or RESULTS_WAIT s passed
 function LO.tickResults(dt)
     net.resultsT = net.resultsT + dt
     if net.resultsReadyT == nil and (LO.haveAllResults() or net.resultsT > LO.RESULTS_WAIT) then net.resultsReadyT = net.resultsT end
     return net.resultsReadyT ~= nil
 end
--- the rows of the results, best score first (aborted or missing results last): { id, name, r }
+-- results rows, best score first (aborted or missing last): { id, name, r }
 function LO.standings()
     local ids = LO.peerIds(); local rows = {}
     for _, id in ipairs(ids) do
@@ -423,7 +411,7 @@ function LO.standings()
     return rows
 end
 
--- back to the lobby for the next round: the server rotates the host role, everyone clears the round
+-- next round: the host rotates the host role, everyone clears the round
 function LO.nextRound()
     if NET:IsHost() then NET:RotateHost() end
     LO.setWatching(false)
@@ -433,17 +421,17 @@ function LO.nextRound()
     Media.stopPreview()
 end
 
--- ── the song-select wiring ──────────────────────────────────────────────────────────────────────────
--- the host role opens its song select: open() activates the skin's song select (song only, no
--- difficulty step); the room's speed is in CONFIG.SongSpeed while it browses
+-- ==== song select ====
+-- host role opens its song select via open() (song only, no difficulty step)
+-- the room's speed sits in CONFIG.SongSpeed while browsing
 function LO.openSongSelect(open)
     CONFIG.IsAIBattleMode = false
     if net.song and net.song.speed then pcall(function() CONFIG.SongSpeed = net.song.speed end) end
     if open then open() end
     CONFIG:SetAutoStatus(0, false)
 end
--- a song was confirmed in the song select (after deactivating it): it becomes the room's song at the speed
--- chosen there. uid defaults to SONGMOUNT:ChosenUniqueId(); fallbackTitle names a song without a title.
+-- song confirmed in the song select (after deactivating it): room song at the speed chosen there
+-- uid defaults to SONGMOUNT:ChosenUniqueId(); fallbackTitle for a song without a title
 function LO.songPicked(uid, fallbackTitle)
     uid = uid or SONGMOUNT:ChosenUniqueId()
     local title = Media.resolveTitle(uid) or fallbackTitle or Texts.tr("unknown_song")
@@ -452,27 +440,27 @@ function LO.songPicked(uid, fallbackTitle)
     LO.setSong(uid, title, 0, sp, dy)
     LO.setDiff(LO.myDiff())
 end
--- the song select was left without a song (after deactivating it): keeps a speed changed there, and puts
--- the room's jacket and preview back
+-- song select left without a song (after deactivating it): keeps its speed, restores jacket and preview
 function LO.songPickCancelled()
     if net.song and CONFIG.SongSpeed ~= net.song.speed then LO.setSpeed(CONFIG.SongSpeed) end
     Media.restore(net)
 end
 
--- ── event drain (call every frame while online or connecting) ──────────────────────────────────────
+-- ==== event drain ====
+-- call every frame while online or connecting
 function LO.drain()
     while true do
         local e = NET:Poll(); if e == nil then break end
         local ty = e.Type
         if ty == "connected" then
             net.online, net.connecting = true, false; LO.refreshRoster()
-            -- the players already in the room get my current selections
+            -- players already in the room get my selections
             LO.broadcastMyState()
             emit("connected", e.Peer)
         elseif ty == "joined" then
             LO.refreshRoster()
             if net.song and LO.amController() then NET:SendTo(e.Peer, "song", P.songJson(net.song)) end
-            -- a newcomer starts everyone at Normal / no mods: my real state goes straight to them
+            -- newcomers start everyone at Normal / no mods: send my real state
             LO.sendMyStateTo(e.Peer)
             emit("joined", e.Peer)
         elseif ty == "left" then

@@ -1,10 +1,10 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- dan_doors: the dojo's shoji doors from the title into the Fox Dojo, with the dojo's name crossing them.
--- The shared string "dan_doors_title" holds the name's duration, so dan_select's boards wait for it.
+-- dan_doors: title -> Fox Dojo shoji door transition with the dojo name
+-- "dan_doors_title" shared string: name duration for dan_select
 
 local TA = require("TransitionArt")
 
--- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+-- layout: Config/layout.json; timings: Config/animation.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
@@ -37,7 +37,7 @@ local closed, opened, swishes = false, false, 0
 local lastPhase = nil
 local wait = TA.new()
 
--- the texture lives only during a trip (Lib/TransitionArt)
+-- texture lives for one trip (Lib/TransitionArt)
 local function loadTextures()
 	if tx_door == nil then tx_door = TEXTURE:CreateTexture("Textures/Door.jpg") end
 end
@@ -49,17 +49,16 @@ end
 local function clamp01(x) return x < 0 and 0 or (x > 1 and 1 or x) end
 local function easeInOut(x) return x < 0.5 and 4 * x * x * x or 1 - (-2 * x + 2) ^ 3 / 2 end
 
--- Draw the doors at the given "openness" (0 = shut / fully covering, 1 = wide open / off-screen). The two
--- halves slide out to the sides as openness → 1, revealing the stage the engine drew behind them.
+-- openness: 0 = shut, 1 = off screen
 local function draw_doors(openness)
 	if tx_door == nil then return end
-	if openness <= 0 then tx_door:Draw(0, 0); return end                 -- fully shut: one seamless image
+	if openness <= 0 then tx_door:Draw(0, 0); return end                 -- shut: one image
 	local w = tx_door.Width  > 0 and tx_door.Width  or SCREEN_W
 	local h = tx_door.Height > 0 and tx_door.Height or SCREEN_H
 	local half = math.floor(w / 2)
 	local off  = math.floor(openness * half)
-	tx_door:DrawRectAtAnchor(-off,       0,    0, 0, half, h, "topleft")  -- left half slides left
-	tx_door:DrawRectAtAnchor(half + off, 0, half, 0, half, h, "topleft")  -- right half slides right
+	tx_door:DrawRectAtAnchor(-off,       0,    0, 0, half, h, "topleft")
+	tx_door:DrawRectAtAnchor(half + off, 0, half, 0, half, h, "topleft")
 end
 
 local function title()
@@ -68,7 +67,7 @@ local function title()
 	return TITLE_DEFAULT
 end
 
--- the upper line crosses left to right, the lower right to left
+-- upper line left to right, lower right to left
 local function layout()
 	lines = {}
 	if font == nil then return end
@@ -83,7 +82,7 @@ local function layout()
 	end
 end
 
--- p goes 0..1: fast in, slow in the middle, fast out, starting and ending off screen
+-- p 0..1: fast in, slow middle, fast out (off screen at both ends)
 local function offset(L, p)
 	local u = 2 * p - 1
 	local far = SCREEN_W / 2 + L.w / 2 + TITLE.offscreen_margin - DRIFT
@@ -100,7 +99,7 @@ local function drawLine(L, p)
 	local x = SCREEN_W / 2 + offset(L, p)
 	local speed = math.abs(offset(L, math.min(1, p + 0.01)) - offset(L, p)) / (0.01 * PASS)   -- px/s
 	local trail = clamp01((speed - TRAIL.min_speed_px_per_s) / TRAIL.speed_range_px_per_s)
-	for k = TRAIL.copies, 1, -1 do                               -- a short streak behind a fast line
+	for k = TRAIL.copies, 1, -1 do                               -- trail copies behind a fast line
 		if trail > 0 then
 			font:Draw(string.format(INK, L.text), x - L.dir * speed * TRAIL.spacing_s * k, L.y + nudge, col_ink, col_edge,
 				trail * TRAIL.opacity / k, 1, 0, "center")
@@ -111,7 +110,7 @@ local function drawLine(L, p)
 	font:Draw(string.format(INK, L.text), x, L.y + nudge, col_ink, col_edge, 1, 1, 0, "center")
 end
 
--- now: seconds into the fade-in
+-- now: s into the fade-in
 local function drawTitle(now)
 	draw_doors(0)
 	for _, L in ipairs(lines) do
@@ -124,7 +123,7 @@ local function drawTitle(now)
 	end
 end
 
--- Close the doors over the outgoing title: t 0→1 = open → shut.
+-- t 0..1: open -> shut over the outgoing title
 function fadeOut(t)
 	if lastPhase ~= "out" then                -- a new trip
 		lastPhase = "out"
@@ -141,13 +140,13 @@ function fadeOut(t)
 	draw_doors(1.0 - t)
 end
 
--- Hold the doors shut while dan_select loads behind them.
+-- doors shut while dan_select loads
 function loading(progress, elapsed)
 	lastPhase = "load"
 	draw_doors(0)
 end
 
--- The name crosses the shut doors, then they open.
+-- name crosses the shut doors, then they open
 function fadeIn(t)
 	lastPhase = "in"
 	local now = t * FADE_IN_SECONDS
@@ -160,7 +159,7 @@ function fadeIn(t)
 		if snd_open then snd_open:Play() end
 	end
 	draw_doors(easeInOut(clamp01((now - TITLE_SECONDS) / OPEN_SECONDS)))
-	if t >= 1 then freeTextures() end   -- the trip is over
+	if t >= 1 then freeTextures() end
 end
 
 function onStart()

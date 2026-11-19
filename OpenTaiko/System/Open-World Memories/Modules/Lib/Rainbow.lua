@@ -1,8 +1,5 @@
--- Rainbow.lua — an animated rainbow spectrum running across a texture, and a little glitter.
--- Rainbow.draw tints column strips of the texture (partial-rect draws), each by the hue at its x,
--- so the spectrum flows across the art and scrolls over time; the tint multiplies, so white or
--- light art takes it best. Rainbow.glitter keeps sparkles in a table the caller owns. Lib code
--- loads no texture: the caller passes its own and every texture state it sets is reset after.
+-- Rainbow: animated hue spectrum across a texture, plus glitter
+-- loads no texture; every texture state set is reset after
 
 -- looks: Config/Rainbow/layout.json; motion: Config/Rainbow/animation.json
 local HERE = require("Core.Here")(...)
@@ -26,14 +23,13 @@ function Rainbow.hsv(h, s, v)
     return Color.hsvToRgb(h % 1, s, v)
 end
 
--- Draws tex where tex:Draw(x, y) ("topleft") or tex:DrawAtAnchor(x, y, "center") would, at the
--- same scale. opts (all optional; cycles, speed, sat, val and strip default to Config/Rainbow):
---   t        clock in seconds          anchor   "topleft" | "center"
+-- drawn where tex:Draw ("topleft") or DrawAtAnchor ("center") would; the tint multiplies (light art works best)
+-- opts (optional; cycles, speed, sat, val, strip default to Config/Rainbow):
+--   t        clock, sec                anchor   "topleft" | "center"
 --   sx, sy   scale                     opacity  0..1
 --   cycles   hue turns across the span        speed  turns per second
 --   sat, val saturation and value              rot    degrees, counter-clockwise like SetRotation
---   x0, span screen x and width the cycles run over (the drawn texture), so several textures
---            can share one spectrum
+--   x0, span screen x and width the cycles run over, to share one spectrum
 --   strip    source px per strip
 function Rainbow.draw(tex, x, y, opts)
     if tex == nil or not tex.Ready then return end
@@ -74,10 +70,9 @@ function Rainbow.draw(tex, x, y, opts)
     tex:SetScale(1, 1)
 end
 
--- Ages, spawns and draws sparkles over the box (x, y, w, h); state is any table the caller keeps
--- (sparkles live in it box-relative, so they follow the box). tex is the caller's sparkle, drawn
--- centred. opts: rate (sparkles per second), size (scale, 1), opacity (1), max, blend ("Normal");
--- rate and max default to Config/Rainbow.
+-- sparkles over the box (x, y, w, h); state: caller table, sparkles box-relative
+-- tex: caller's sparkle, centred; opts: rate (per sec), size (1), opacity (1), max, blend ("Normal")
+-- rate and max default to Config/Rainbow
 function Rainbow.glitter(state, dt, x, y, w, h, tex, opts)
     opts = opts or {}
     local list = state.list

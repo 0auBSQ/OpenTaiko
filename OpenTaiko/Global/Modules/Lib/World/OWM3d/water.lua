@@ -1,14 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- OWM3d/water.lua — water planes. Two kinds:
---   reflect = true  → an ANIMATED wave mesh whose surface is a screen-tex mirror: the reflection
---                     re-render (GPU off-screen pass via SetReflectionGpu, CPU fallback) is sampled
---                     per screen pixel with in-shader ripple wobble, the mesh itself undulates, and
---                     the reflectivity follows the view angle (grazing looks glassier) — so the water
---                     reads as a moving surface, not a glued-on plane.
---   reflect = false → the plain animated rippled quad mesh (cheap; lava pools, small ponds).
---
--- Reflections re-render every OTHER frame at reduced resolution (SetReflectionScale) — halves their
--- cost with no visible loss (the surface animation masks the one-frame latency).
+-- OWM3d/water.lua: water planes
+-- reflect = true: wave mesh with a screen-tex reflection; false: plain ripple mesh
 
 local sin, floor, max, min, sqrt = math.sin, math.floor, math.max, math.min, math.sqrt
 
@@ -17,8 +9,8 @@ local TEX_BASE = 9200          -- reflection texture ids (one per reflective pla
 local Water = {}
 Water.__index = Water
 
--- the standard knee-fence around one water def {x0,z0,x1,z1,y}: players can't wade in. Emitted
--- inside the map's static build session (maps.lua for JSON maps; procedural builders call it too).
+-- invisible fence around a water def {x0, z0, x1, z1, y}
+-- call inside the static build session
 function Water.emitFence(phys, wd)
     local y0, y1w = (wd.y or 0) - 1.4, (wd.y or 0) + 0.6
     phys:addQuad(wd.x0, y0, wd.z0, wd.x1, y0, wd.z0, wd.x1, y1w, wd.z0, wd.x0, y1w, wd.z0)
@@ -41,7 +33,7 @@ function Water.new(world)
 end
 
 local FOAM_SPR = 916
-local foamScenes = setmetatable({}, { __mode = "k" })   -- the scenes that have the foam sprite (a new world has a new scene)
+local foamScenes = setmetatable({}, { __mode = "k" })   -- scenes with the foam sprite
 
 local function ensureFoamSprite(scene)
     if scene.SetSpriteRGBA == nil then return false end
@@ -60,21 +52,19 @@ function Water:add(def)
         reflect = def.reflect and true or false,
         ripple = def.ripple or 0.6,
         texName = def.tex,
-        col = def.color or { 52, 96, 122 },              -- SHALLOW water colour
-        deep = def.deepColor or { 12, 34, 56 },          -- DEEP water colour (depth tint target)
+        col = def.color or { 52, 96, 122 },              -- shallow colour
+        deep = def.deepColor or { 12, 34, 56 },          -- deep colour (depth tint)
     }
     p.cx, p.cz = (p.x0 + p.x1) * 0.5, (p.z0 + p.z1) * 0.5
     p.obj = scene:NewObject()
     scene:ObjSetLit(p.obj, false)
     if p.reflect then
         p.texId = TEX_BASE + #self.planes
-        -- TRANSPARENT pass at ~70% alpha: the reflection blends over the visible bottom/shore
-        -- underneath (an opaque mirror sheet read as a solid slab, not water)
+        -- transparent pass (~70% alpha) over the bottom
         scene:ObjSetPass(p.obj, 1, p.col[1], p.col[2], p.col[3], 178)
         scene:ObjSetScreenTex(p.obj, true)
         if scene.ObjSetScreenTexRipple then scene:ObjSetScreenTexRipple(p.obj, p.ripple * 3.0, 1.7, 2.1) end
-        -- per-pixel Schlick fresnel (grazing mirrors, top-down shows the water body) + depth tint
-        -- (the per-vertex shade slot carries shallow→deep, freed because fresnel owns reflectivity)
+        -- per-pixel Schlick fresnel + depth tint (shade slot = depth)
         if scene.ObjSetFresnel then scene:ObjSetFresnel(p.obj, 0.04) end
         if scene.ObjSetWaterColors then scene:ObjSetWaterColors(p.obj, p.deep[1], p.deep[2], p.deep[3]) end
         self:_mesh(p, 0)
@@ -87,7 +77,7 @@ function Water:add(def)
     return p
 end
 
--- depth factor 0 (shore) → 1 (deep) under a point, from the current map's ground height
+-- depth factor 0 (shore) to 1 (deep) from the map ground height
 function Water:_depthAt(p, x, z)
     local m = self.world.maps and self.world.maps.current
     if m == nil or m.heightAt == nil then return 1 end
@@ -98,8 +88,7 @@ function Water:_depthAt(p, x, z)
     return d
 end
 
--- SHORE FOAM: a soft bright band where the terrain meets the waterline. Built once (static
--- ground); its opacity breathes on the remesh tick so the band reads as lapping water.
+-- shore foam where the ground meets the waterline; built once (static ground)
 function Water:_buildFoam(p)
     if p.foamObj ~= nil or not p.reflect then return end
     local scene = self.world.scene
@@ -130,8 +119,8 @@ function Water:_buildFoam(p)
     end
 end
 
--- rippled wave mesh; reflective surfaces carry the DEPTH factor in the per-vertex shade slot
--- (reflectivity is per-pixel fresnel now). Depth samples are cached — the ground is static.
+-- wave mesh; reflective planes put the depth factor in the shade slot
+-- depth samples are cached (static ground)
 function Water:_mesh(p, t)
     local scene = self.world.scene
     local span = max(p.x1 - p.x0, p.z1 - p.z0)
@@ -157,7 +146,7 @@ function Water:_mesh(p, t)
             for j = 0, seg - 1 do
                 local x0, z0 = p.x0 + i * dx, p.z0 + j * dz
                 local x1, z1 = x0 + dx, z0 + dz
-                -- shade = depth (fresnel path) or fixed reflectivity (older engine fallback)
+                -- shade = depth (fresnel) or fixed reflectivity (fallback)
                 local shade = fresnel and ((p._depths and p._depthSeg == seg) and p._depths[i * seg + j] or 1) or 0.55
                 scene:ObjAddQuadTex(p.obj,
                     x0, h(x0, z0), z0, x1, h(x1, z0), z0,
@@ -183,7 +172,7 @@ function Water:update(dt)
     self.t = self.t + dt
     self._frame = self._frame + 1
 
-    -- surface animation on a 12 Hz tick (per-vertex waves; the shader ripple runs every frame anyway)
+    -- remesh at ~12 Hz (shader ripple runs every frame)
     self._meshT = self._meshT + dt
     local remesh = self._meshT >= 0.085
     if remesh then self._meshT = 0 end
@@ -195,7 +184,7 @@ function Water:update(dt)
                 self:_mesh(p, self.t)
                 self:_buildFoam(p)
                 if p.foamObj then
-                    -- the foam band breathes (reads as lapping at the shoreline)
+                    -- foam alpha pulse
                     local a = 120 + floor(55 * (0.5 + 0.5 * sin(self.t * 1.9)))
                     scene:ObjSetPass(p.foamObj, 1, 255, 255, 255, a)
                 end
@@ -204,12 +193,11 @@ function Water:update(dt)
             local near = camY > p.y and ddx * ddx + ddz * ddz < 90 * 90
             local sky = world.curSky and world.curSky.hor or { 120, 150, 190 }
             if near and scene.RenderViewReflect then
-                -- TRUE planar reflection (reflected eye + full basis + clip plane), EVERY frame —
-                -- the GPU off-screen pass at 1/16 res is cheap and the mirror never lags the camera
+                -- planar reflection every frame (GPU pass at 1/16 res)
                 scene:RenderViewReflect(p.texId, p.cx, p.y, p.cz, 0, 1, 0,
                     floor(sky[1]), floor(sky[2]), floor(sky[3]))
             elseif near and self._frame % 2 == 0 then
-                -- old-engine fallback: the legacy half-mirrored capture on alternating frames
+                -- fallback: mirrored capture on alternate frames
                 scene:RenderView(p.texId,
                     camX, 2 * p.y - camY, camZ,
                     scene:GetCameraYaw(), -scene:GetCameraPitch(), scene:GetCameraFov(),
@@ -226,8 +214,7 @@ function Water:clear()
     for _, p in ipairs(self.planes) do
         scene:DeleteObject(p.obj)
         if p.foamObj then scene:DeleteObject(p.foamObj) end
-        -- reclaim the reflection texture (CPU pixel copy + GL upload + RTT target); the id is
-        -- reused by the next map's planes, which re-register cleanly
+        -- free the reflection texture; the next map reuses the id
         if p.texId and scene.UnregisterTexture then scene:UnregisterTexture(p.texId) end
     end
     self.planes = {}

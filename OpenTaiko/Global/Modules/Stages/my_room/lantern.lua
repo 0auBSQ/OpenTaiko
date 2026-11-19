@@ -1,38 +1,30 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- lantern.lua — the Stone Lantern furniture: a small fire burning in its light box (the flame pictures
--- of Textures/StoneLantern/ played in turn on an upright sprite facing the camera, over a soft glow
--- filling the box) and its warm light, lit and put out by interacting with it (it.lit, saved with the
--- room; out by default).
---
---   LT.init(ctx)         ctx: room(), scene(), propInstFor(it)
---   LT.tick(dt)          moves the flames on
---   LT.draw()            puts the fire of every lit lantern in the scene (each frame)
---   LT.lights(world)     the light of the lanterns that are lit (appended to the room's lights)
---   LT.toggle(it)        lights or puts out a lantern
+-- stone_lantern furniture: flame sprites in its light box and a point light
+-- it.lit: saved with the room, off by default
 
 local LT = {}
 
 local ID = "stone_lantern"
 local FRAMES = 6                         -- Textures/StoneLantern/fire_1.png .. fire_6.png
 local FPS = 10
-local FIRST_SPRITE = 4960                -- sprite ids of the flame pictures, then the glow
+local FIRST_SPRITE = 4960                -- flame frame ids from here, then the glow
 local GLOW_SPRITE = FIRST_SPRITE + FRAMES + 1
--- the light box inside the model, in its own units (Japanese Stone Lamp by Flopsi): the centre of its
--- floor, the size of the flame standing on it, and of the glow around it (the box's opening; it starts
--- under the floor, where the stone hides it, so it sorts behind the flame)
+-- light box in model units (Japanese Stone Lamp by Flopsi): floor centre, flame and glow size
+-- the glow starts under the floor, hidden by the stone, so it sorts behind the flame
 local BOX = { x = 0.0, y = -0.06, z = -0.03 }
-local FIRE_W, FIRE_H = 0.3, 0.28              -- the frames are 56x52
+local FIRE_W, FIRE_H = 0.3, 0.28              -- frames are 56x52
 local GLOW_W, GLOW_H, GLOW_DROP = 0.5, 0.56, 0.14
-local BRIGHT = 1.35                      -- how bright the pictures are drawn
-local LIGHT = { 1.0, 0.66, 0.32 }        -- the colour of its light
+local BRIGHT = 1.35                      -- sprite tint
+local LIGHT = { 1.0, 0.66, 0.32 }
 
 local ctx = nil
-local spritesFor = nil                   -- the scene the sprites were registered in
-local obj, objScene = nil, nil           -- the scene object holding every lantern's flame
+local spritesFor = nil                   -- scene holding the registered sprites
+local obj, objScene = nil, nil           -- one object for every flame
 local clock = 0
-local phases = {}                        -- placed lantern → its own offset in the flame loop
+local phases = {}                        -- placed lantern -> offset in the flame loop
 local cos, sin, random, floor = math.cos, math.sin, math.random, math.floor
 
+-- ctx: room(), scene(), propInstFor(it)
 function LT.init(c) ctx = c end
 
 local function registerSprites(scene)
@@ -60,8 +52,8 @@ end
 
 function LT.tick(dt) clock = clock + dt end
 
--- a point of the model in the world, through the placed instance's pose (the instance's position is
--- the model's origin: Inst:setTransform has already moved it off the anchor point)
+-- model point -> world, through the instance pose
+-- inst position is the model origin (Inst:setTransform already moved it off the anchor)
 local function placer(inst)
     local yr = (inst.yaw or 0) * math.pi / 180
     local c, s, sc = cos(yr), sin(yr), inst.scale or 1
@@ -70,6 +62,7 @@ local function placer(inst)
     end, sc
 end
 
+-- each frame
 function LT.draw()
     if ctx == nil then return end
     local scene = ctx.scene()
@@ -95,6 +88,7 @@ function LT.draw()
     end)
 end
 
+-- lit lanterns' lights, added to the room's lights
 function LT.lights()
     local out = {}
     eachLit(function(_, inst)

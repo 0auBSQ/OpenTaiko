@@ -1,9 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
--- training_song_select
--- Song select for training mode.
--- Player count is locked to 1P.
--- Training mode is enabled on activate and only disabled on deactivate when NOT heading into a play
--- (so the game stage receives IsTrainingMode = true). On cancel it is cleared before returning.
+-- training_song_select: training mode song select, 1P only
+-- IsTrainingMode set on activate; cleared on deactivate unless heading into a play, and on cancel
 
 local act = nil
 local exitingToPlay = false

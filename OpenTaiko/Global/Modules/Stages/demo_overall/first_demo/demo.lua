@@ -1,5 +1,5 @@
--- demo_overall/first_demo/demo.lua — the first demo using Lua stages: a background, a video, music
--- and a counter. Cancel/Escape plays a sound after a second and goes back to My Room.
+-- first Lua stage demo
+-- Cancel/Escape plays a sound after 1 s, then exits to My Room
 
 local D = {}
 

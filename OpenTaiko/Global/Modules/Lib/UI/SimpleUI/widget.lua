@@ -1,10 +1,5 @@
 ---@diagnostic disable: undefined-global, lowercase-global, need-check-nil
--- SimpleUI/widget.lua — the base class every widget extends. Owns the shared interaction state machine
--- (idle/hover/press/focus/disabled), the bouncy scale + highlight tweens, accurate rounded hit-testing,
--- and the draw scaffold (baked body + focus ring + content).
--- Mouse-hover and keyboard/gamepad-focus drive one shared highlight, so both look identical.
--- Common options: x, y, w, h, enabled, visible, focusable, mouseOnly, theme/style, sfx,
--- disabledLook = "fade" (a disabled widget fades instead of turning grey).
+-- SimpleUI base widget class
 
 local U      = require("UI.SimpleUI.util")
 local Shape  = require("UI.SimpleUI.shape")
@@ -14,29 +9,31 @@ local Easing = require("Core.Easing")
 
 local floor, max = math.floor, math.max
 
-local POP_MAX = 16          -- px a highlighted widget grows by at most (big widgets pop less than the ratio)
-local PRESS_MAX = 24        -- px a pressed widget shrinks by at most
-local SLICE_MIN = 480       -- canvases wider than this are baked narrow and stretched in the middle
-local SLICE_MID = 4         -- the plain columns kept in the middle of a narrow bake
+local POP_MAX = 16          -- max px a highlighted widget grows
+local PRESS_MAX = 24        -- max px a pressed widget shrinks
+local SLICE_MIN = 480       -- wider canvases bake narrow, middle stretched
+local SLICE_MID = 4         -- plain middle columns of a narrow bake
 
 local Widget = {}
 Widget.__index = Widget
 
--- ── tweens (advanced by the frame's dt) ──────────────────────────────────────────
+-- ==== tweens ====
 local function newTween() return { t = 1, dur = 1, ease = Easing.linear } end
 local function startTween(tw, time, ease)
     tw.t = 0
     tw.dur = max(0.0001, time)
     tw.ease = ease and Easing.get(ease[1], ease[2]) or Easing.linear
 end
--- the eased progress 0..1 (it can overshoot along a bouncy curve)
+-- eased progress 0..1 (may overshoot)
 local function tickTween(tw, dt)
     if tw.t < 1 then tw.t = math.min(1, tw.t + dt / tw.dur) end
     return tw.ease(tw.t)
 end
 Widget.newTween, Widget.startTween, Widget.tickTween = newTween, startTween, tickTween
 
--- the options become the widget's fields; the caller's table is left as it is
+-- options become fields, caller's table untouched
+-- common: x, y, w, h, enabled, visible, focusable, mouseOnly, theme/style, sfx
+-- disabledLook = "fade": a disabled widget fades instead of the muted body
 function Widget.new(o)
     o = o or {}
     local self = setmetatable({}, Widget)
@@ -69,7 +66,7 @@ end
 
 function Widget:playSfx(name) return Sfx.playSfx(self.sfx, name) end
 
--- ── geometry ────────────────────────────────────────────────────────────────────
+-- ==== geometry ====
 function Widget:centerX() return self.x + self.w * 0.5 end
 function Widget:centerY() return self.y + self.h * 0.5 end
 function Widget:radius() return math.min(self.eff.radius, self.w * 0.5, self.h * 0.5) end
@@ -78,8 +75,7 @@ function Widget:hitTest(px, py)
     return U.pointInRoundRect(px, py, self.x, self.y, self.w, self.h, self:radius())
 end
 
--- the ring shows on the hovered widget, and on the focused one unless the mouse leads (then the pointer's
--- widget alone is lit, and the focus waits for the keys)
+-- highlighted when hovered, or focused while the mouse doesn't lead
 function Widget:isHighlighted()
     if not self.enabled then return false end
     if self.hovered then return true end
@@ -87,8 +83,9 @@ function Widget:isHighlighted()
 end
 function Widget:isCapturingHighlighted() return self.enabled and (self.capturing) end
 
--- ── baking (only place canvases are built; called on construct + restyle) ──────────
--- the margin a body canvas keeps around the widget for its shadow
+-- ==== baking ====
+-- canvases are built only here (construct, restyle)
+-- body canvas margin for the shadow
 function Widget:_bodyMargin()
     local sh = self.eff.shadow
     local m = math.ceil((sh.layers or 4) * (sh.grow or 3) + math.max(math.abs(sh.dx or 0), math.abs(sh.dy or 6)) + 2)
@@ -96,12 +93,10 @@ function Widget:_bodyMargin()
     return m
 end
 
--- A baked surface stored in self[field] as { canvas, key, ... }, shared through the manager's cache with
--- every widget that bakes the same thing: `site` names the bake, w/h its canvas, the resolved theme and
--- the extra key parts (colour overrides, variant numbers) complete the key. bake(cv) runs only for a key
--- no live or parked canvas has; an unchanged key keeps the surface the widget already holds (its extra
--- fields are refreshed). The shared canvas is never drawn into again — every draw sets the scale, colour
--- and opacity it needs first.
+-- baked surface in self[field] as { canvas, key, ... }, shared through the manager's cache
+-- key = site .. size .. theme key .. keyOf(...); bake(cv) runs only for a new key
+-- an unchanged key keeps the held surface (extra refreshed)
+-- the shared canvas is never drawn into again; each draw sets its own state
 function Widget:bakeShared(field, site, w, h, bake, extra, ...)
     w, h = floor(w), floor(h)
     local key = site .. "|" .. w .. "x" .. h .. "|" .. self.mgr:themeKey(self.eff) .. "|" .. self.mgr.keyOf(...)
@@ -127,9 +122,8 @@ function Widget:dropPiece(field)
     self[field] = nil
 end
 
--- A wide surface is baked narrow: its corners and a few plain columns, the middle being the same in every
--- column (a vertical gradient, the gloss band, the shadow). drawPiece stretches those columns back to the
--- full width. Returns the narrow shape width and the width of each end piece, or nil to bake it whole.
+-- wide surfaces bake narrow (corners plus a few plain columns); drawPiece stretches the middle
+-- returns the narrow shape width and the end piece width, or nil to bake whole
 function Widget:_slice(w, r, m)
     if w + 2 * m <= SLICE_MIN then return nil end
     local cap = m + math.ceil(r) + math.abs(self.eff.shadow.dx or 0) + 3
@@ -157,8 +151,7 @@ local function bakeBodyInto(self, field, site, top, bot)
     end, { m = m, cap = cap or false, fullW = w + 2 * m }, top, bot, r)
 end
 
--- bake the standard body: soft shadow + bordered gradient panel + gloss. faceTop/faceBottom override the
--- theme surface gradient (e.g. an accent button passes primary/primary2).
+-- standard body (shadow, panel); faceTop/faceBottom override the theme surface gradient
 function Widget:bakeBody(faceTop, faceBottom)
     local c = self.eff.colors
     self._faceTop, self._faceBot = faceTop or c.surface, faceBottom or c.surface2
@@ -166,7 +159,7 @@ function Widget:bakeBody(faceTop, faceBottom)
     if self._bodyOff then self:_bakeBodyOff() end
 end
 
--- a disabled widget's face: the same body in muted, lighter colours, drawn opaque
+-- disabled face: the body in muted colours, drawn opaque
 local function muted(col)
     local g = col[1] * 0.3 + col[2] * 0.59 + col[3] * 0.11
     local function ch(v) return U.lerp(U.lerp(v, g, 0.75), 255, 0.25) end
@@ -177,7 +170,7 @@ function Widget:_bakeBodyOff()
     bakeBodyInto(self, "_bodyOff", "body", muted(self._faceTop), muted(self._faceBot))
 end
 
--- bake the focus/hover ring (gold rounded outline) as its own canvas, drawn over the body when highlighted
+-- focus/hover ring as its own canvas, drawn over the body when highlighted
 function Widget:bakeRing()
     local c = self.eff.colors
     local m = self:_bodyMargin()
@@ -191,8 +184,7 @@ function Widget:bakeRing()
     end, { m = m, cap = cap or false, fullW = w + 2 * m }, r)
 end
 
--- draws a baked piece centred at (cx, cy) at scale s; a narrow bake is drawn as its two ends with the
--- middle columns stretched between them
+-- draws a baked piece centred at (cx, cy), scale s; narrow bakes stretch their middle columns
 function Widget:drawPiece(e, cx, cy, s, opacity)
     local cv = e.canvas
     s = s or 1
@@ -222,14 +214,14 @@ function Widget:resolveStyle()
     self.sfx = self.mgr:resolveSfx(self.userSfx)
 end
 
--- subclasses override to (re)build their canvases + cached text. Default = a plain body + ring.
+-- subclasses override to rebuild canvases and cached text; default: body + ring
 function Widget:restyle()
     self:resolveStyle()
     self:bakeBody()
     self:bakeRing()
 end
 
--- ── interaction ───────────────────────────────────────────────────────────────────
+-- ==== interaction ====
 function Widget:_hoverScale()
     local hs = self.eff.anim.hoverScale
     local size = max(self.w, self.h)
@@ -300,7 +292,7 @@ function Widget:_refreshHighlight()
     if self._hiT == nil then return end
     local hi = self:isHighlighted()
     if (hi and 1 or 0) ~= self._hiTo then self:_tweenHighlight(hi and 1 or 0) end
-    if self.noPop then return end                  -- widgets whose content doesn't scale don't pop
+    if self.noPop then return end
     local target = hi and self:_hoverScale() or 1.0
     if not self.pressed and target ~= self._scaleTo then self:_tweenScale(target) end
 end
@@ -317,7 +309,7 @@ function Widget:press()
     if not self.noPop then self:_tweenScaleEase(self:_pressScale(), self.eff.anim.pressTime, self.eff.anim.pressEase) end
 end
 
--- release; if `inside` and was pressed, fire the activation
+-- fires onActivate when released inside
 function Widget:release(inside)
     if not self.pressed then return end
     self.pressed = false
@@ -328,8 +320,8 @@ function Widget:release(inside)
     if inside and self.enabled then self:onActivate() end
 end
 
--- keyboard/gamepad activation: snap to the squish then boing back in one shot (a same-frame press+release
--- would cancel the animation), then fire. Used for Decide so Enter shows the same feedback as a click.
+-- keyboard/gamepad activation: snap to the press scale and tween back, then fire
+-- (a same-frame press+release would cancel the tween)
 function Widget:keyActivate()
     if not self.enabled then return end
     if not self.noPop then
@@ -341,13 +333,13 @@ function Widget:keyActivate()
     self:onActivate()
 end
 
--- default activation: buttons override or rely on onClick
+-- default activation: onClick; click sound unless it returns true
 function Widget:onActivate()
     if self.onClick and self.onClick(self) then return end
     self:playSfx("click")
 end
 
--- enabling, disabling, showing or hiding a widget updates where the keys can stop
+-- enable/disable and show/hide rebuild the manager's focus list
 function Widget:setEnabled(b)
     b = b and true or false
     if self.enabled == b then return end
@@ -367,9 +359,9 @@ function Widget:setVisible(b)
     if self.mgr then self.mgr:_rebuildFocus() end
 end
 
--- widgets edited with Left/Right (slider, chooser, settings rows): the keyboard's Left/Right always edit;
--- the pad's Left/Right step the focus unless Decide put the widget in its edit mode, which Cancel leaves.
--- step(self, dir) applies one edit (dir = -1 / 1).
+-- Left/Right-edited widgets: keyboard Left/Right always edit
+-- pad Left/Right move focus unless Decide entered edit mode (Cancel leaves it)
+-- step(self, dir) applies one edit, dir = -1 / 1
 function Widget.editable(cls, step)
     function cls:onCapturing(silence) if not silence then self:playSfx("click") end end
     function cls:onEndCapturing(silence) if not silence then self:playSfx("cancel") end end
@@ -388,9 +380,8 @@ function Widget.editable(cls, step)
     end
 end
 
--- release the GPU canvases this widget baked (LuaCanvas has no finalizer) into the manager's pool, where the
--- next widget of the same size picks them up. Every baked surface is stored as a `{ canvas = <LuaCanvas>, ... }`
--- field (_body/_ring/_track/_knob/_capL/…). Call before dropping a UI.
+-- releases this widget's baked canvases to the manager pool (LuaCanvas has no finalizer)
+-- baked surfaces are `{ canvas = <LuaCanvas>, ... }` fields; call before dropping a UI
 function Widget:dispose()
     local keys = {}
     for k, v in pairs(self) do
@@ -406,7 +397,7 @@ function Widget:dispose()
     end
 end
 
--- ── per-frame ───────────────────────────────────────────────────────────────────
+-- ==== per-frame ====
 function Widget:update(ctx)
     local dt = ctx.dt or 0
     self._scaleCur = U.lerp(self._scaleFrom, self._scaleTo, tickTween(self._scaleT, dt))
@@ -414,7 +405,7 @@ function Widget:update(ctx)
     self._hiCapCur = U.lerp(self._hiCapFrom, self._hiCapTo, tickTween(self._hiCapT, dt))
 end
 
--- the body to draw and its opacity: the muted face while disabled (or the faded body with disabledLook = "fade")
+-- body to draw and its opacity: muted face while disabled, half opacity with disabledLook = "fade"
 function Widget:_bodyNow()
     if self.enabled then return self._body, 1 end
     if self._bodyOff then return self._bodyOff, 1 end

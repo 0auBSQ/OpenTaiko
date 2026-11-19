@@ -1,9 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- AI Win Full Combo end animation: timed glow/star/flower/text reveal over a fading background.
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
---   init -> onStart (CreateTexture into the local `tx` registry); playEndAnime(player) resets the timeline.
---   update(player)/draw(player) -> update(timestamp, state)/draw(state) with `local player = state.player`.
---   func:SetOpacity(v*255) -> tx:SetOpacity(v) (0-255 -> 0-1); deltaTime -> fps.deltaTime.
+-- end anime: AI_Win_FullCombo (group C, player via state.player)
 
 --local Tex = { posx = 0, posy = 0, x = 0, y = 0, w = 0, h = 0 }
 
@@ -31,7 +27,7 @@ local fcGlowTex = { posx = 518, posy = 689, x = 1083, y = 1925, w = 873, h = 202
 
 local tx = {}
 
-function clamp(value, min, max) -- why isn't this part of lua's math library? :(
+function clamp(value, min, max)
   return math.min(math.max(value, min), max)
 end
 
@@ -60,7 +56,7 @@ function draw(state)
     local value = math.min(animeCounter * 4, 1)
     local scale = 2 - value
 
-    --ordered by timeline of appearance
+    -- in timeline order
     local glowIn = clamp(animeCounter - 0, 0, 0.25) * 4
     local baseIn = clamp(animeCounter - 0.25, 0, 0.1) * 10
     local glowOut = clamp(animeCounter - 0.35, 0, 0.25) * 4
@@ -78,37 +74,37 @@ function draw(state)
     local textProgress2 = clamp(animeCounter - 1.51, 0, 0.4) * 2.5
     local flowerGlowProgress = clamp(animeCounter - 1.5, 0, 0.2) - clamp(animeCounter - 1.7, 0, 0.2)
 
-    tx["Background.png"]:SetOpacity(baseIn - glowOut) -- Background
+    tx["Background.png"]:SetOpacity(baseIn - glowOut)
     tx["Background.png"]:DrawRect(0, 0, 0, 0, 1920, 1080)
 
-    tx["Assets.png"]:SetOpacity((dropIn - dropOut)^0.4) -- Water Drop
+    tx["Assets.png"]:SetOpacity((dropIn - dropOut)^0.4)
     tx["Assets.png"]:SetScale((dropIn + dropOut)^0.4, (dropIn + dropOut)^0.4)
     tx["Assets.png"]:DrawRectAtAnchor(waterDropTex.posx, waterDropTex.posy, waterDropTex.x, waterDropTex.y, waterDropTex.w, waterDropTex.h, "center")
 
-    tx["Assets.png"]:SetOpacity(baseIn) -- Stars
+    tx["Assets.png"]:SetOpacity(baseIn)
     tx["Assets.png"]:SetScale(scale, scale)
-    tx["Assets.png"]:DrawRectAtAnchor(star1Tex.posx + 20 - outPos, star1Tex.posy + 20 - outPos, star1Tex.x, star1Tex.y, star1Tex.w, star1Tex.h, "center") -- 1
-    tx["Assets.png"]:DrawRectAtAnchor(star2Tex.posx - 20 + outPos, star2Tex.posy + 20 - outPos, star2Tex.x, star2Tex.y, star2Tex.w, star2Tex.h, "center") -- 2
-    tx["Assets.png"]:DrawRectAtAnchor(star3Tex.posx + 20 - outPos, star3Tex.posy - 20 + outPos, star3Tex.x, star3Tex.y, star3Tex.w, star3Tex.h, "center") -- 3
-    tx["Assets.png"]:DrawRectAtAnchor(star4Tex.posx - 20 + outPos, star4Tex.posy - 20 + outPos, star4Tex.x, star4Tex.y, star4Tex.w, star4Tex.h, "center") -- 4
+    tx["Assets.png"]:DrawRectAtAnchor(star1Tex.posx + 20 - outPos, star1Tex.posy + 20 - outPos, star1Tex.x, star1Tex.y, star1Tex.w, star1Tex.h, "center")
+    tx["Assets.png"]:DrawRectAtAnchor(star2Tex.posx - 20 + outPos, star2Tex.posy + 20 - outPos, star2Tex.x, star2Tex.y, star2Tex.w, star2Tex.h, "center")
+    tx["Assets.png"]:DrawRectAtAnchor(star3Tex.posx + 20 - outPos, star3Tex.posy - 20 + outPos, star3Tex.x, star3Tex.y, star3Tex.w, star3Tex.h, "center")
+    tx["Assets.png"]:DrawRectAtAnchor(star4Tex.posx - 20 + outPos, star4Tex.posy - 20 + outPos, star4Tex.x, star4Tex.y, star4Tex.w, star4Tex.h, "center")
 
-    tx["Assets.png"]:SetOpacity(baseIn * math.sin(animeCounter)^2) -- Glowing Stars
+    tx["Assets.png"]:SetOpacity(baseIn * math.sin(animeCounter)^2)
     tx["Assets.png"]:SetScale(scale, scale)
-    tx["Assets.png"]:DrawRectAtAnchor(star1GlowTex.posx + 20 - outPos, star1GlowTex.posy + 20 - outPos, star1GlowTex.x, star1GlowTex.y, star1GlowTex.w, star1GlowTex.h, "center") -- 1
-    tx["Assets.png"]:DrawRectAtAnchor(star2GlowTex.posx - 20 + outPos, star2GlowTex.posy + 20 - outPos, star2GlowTex.x, star2GlowTex.y, star2GlowTex.w, star2GlowTex.h, "center") -- 2
-    tx["Assets.png"]:DrawRectAtAnchor(star3GlowTex.posx + 20 - outPos, star3GlowTex.posy - 20 + outPos, star3GlowTex.x, star3GlowTex.y, star3GlowTex.w, star3GlowTex.h, "center") -- 3
-    tx["Assets.png"]:DrawRectAtAnchor(star4GlowTex.posx - 20 + outPos, star4GlowTex.posy - 20 + outPos, star4GlowTex.x, star4GlowTex.y, star4GlowTex.w, star4GlowTex.h, "center") -- 4
+    tx["Assets.png"]:DrawRectAtAnchor(star1GlowTex.posx + 20 - outPos, star1GlowTex.posy + 20 - outPos, star1GlowTex.x, star1GlowTex.y, star1GlowTex.w, star1GlowTex.h, "center")
+    tx["Assets.png"]:DrawRectAtAnchor(star2GlowTex.posx - 20 + outPos, star2GlowTex.posy + 20 - outPos, star2GlowTex.x, star2GlowTex.y, star2GlowTex.w, star2GlowTex.h, "center")
+    tx["Assets.png"]:DrawRectAtAnchor(star3GlowTex.posx + 20 - outPos, star3GlowTex.posy - 20 + outPos, star3GlowTex.x, star3GlowTex.y, star3GlowTex.w, star3GlowTex.h, "center")
+    tx["Assets.png"]:DrawRectAtAnchor(star4GlowTex.posx - 20 + outPos, star4GlowTex.posy - 20 + outPos, star4GlowTex.x, star4GlowTex.y, star4GlowTex.w, star4GlowTex.h, "center")
 
-    tx["Assets.png"]:SetOpacity(baseIn) -- Flower & Text
+    tx["Assets.png"]:SetOpacity(baseIn)
     tx["Assets.png"]:SetScale(scale, scale)
-    tx["Assets.png"]:DrawRectAtAnchor(flowerTex.posx, flowerTex.posy, flowerTex.x, flowerTex.y, flowerTex.w, flowerTex.h, "center") -- Flower
-    tx["Assets.png"]:DrawRectAtAnchor(textTex.posx, textTex.posy, textTex.x, textTex.y, textTex.w, textTex.h, "center") -- Text
+    tx["Assets.png"]:DrawRectAtAnchor(flowerTex.posx, flowerTex.posy, flowerTex.x, flowerTex.y, flowerTex.w, flowerTex.h, "center")
+    tx["Assets.png"]:DrawRectAtAnchor(textTex.posx, textTex.posy, textTex.x, textTex.y, textTex.w, textTex.h, "center")
 
-    tx["Assets.png"]:SetOpacity(glowIn - glowOut + flowerGlowProgress) -- Glowing Flower
+    tx["Assets.png"]:SetOpacity(glowIn - glowOut + flowerGlowProgress)
     tx["Assets.png"]:SetScale(scale, scale)
     tx["Assets.png"]:DrawRectAtAnchor(flowerGlowTex.posx, flowerGlowTex.posy, flowerGlowTex.x, flowerGlowTex.y, flowerGlowTex.w, flowerGlowTex.h, "center")
 
-    tx["Assets.png"]:SetOpacity(1) -- Full Combo Text
+    tx["Assets.png"]:SetOpacity(1)
     tx["Assets.png"]:SetScale(1, 1)
     tx["Assets.png"]:DrawRect(fcTex.posx, fcTex.posy, fcTex.x, fcTex.y, fcTex.w * textProgress, fcTex.h)
     tx["Assets.png"]:DrawRect(fcGlowTex.posx + (fcGlowTex.w * textProgress), fcGlowTex.posy, fcGlowTex.x + (fcGlowTex.w * textProgress), fcGlowTex.y, fcGlowTex.w * (textProgress - textProgress2), fcGlowTex.h)

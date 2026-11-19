@@ -1,4 +1,4 @@
--- Corruption darkness over boxes; one instance per screen.
+-- corruption darkness over boxes (one instance per screen)
 
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
@@ -10,12 +10,12 @@ D.__index = D
 local look = Layout.fx.darkness
 local motion = Animation.fx.darkness
 
-local SHADOW_MAX   = motion.max_particles            -- particle pool cap (motes + spirals)
-local SHADOW_RATE  = motion.mote.per_s               -- motes per second per visible box
+local SHADOW_MAX   = motion.max_particles            -- pool cap (motes + spirals)
+local SHADOW_RATE  = motion.mote.per_s               -- per s per visible box
 local SHADOW_LIFE  = motion.mote.life_s
-local SHADOW_RISE  = motion.rise_px_per_s            -- upward drift (world px/s)
+local SHADOW_RISE  = motion.rise_px_per_s            -- world px/s up
 local SHADOW_SIZE  = look.mote.size
-local SHADOW_SWIRL = motion.swirl.px_per_s           -- horizontal swirl (px/s)
+local SHADOW_SWIRL = motion.swirl.px_per_s           -- px/s
 local SWIRL_RATE   = motion.swirl.rad_per_s
 local SHADOW_BACKLOG = motion.mote.backlog_max
 local SHADOW_ALPHA = look.mote.opacity
@@ -38,7 +38,7 @@ local CLOUD_SWAY_Y_STEP = motion.cloud.sway_y_phase_step
 local CLOUD_OPACITY = look.cloud.opacity
 local CLOUD_COL_A   = look.cloud.a_color
 local CLOUD_COL_B   = look.cloud.b_color
--- b.deep (0..1) moves a box toward these colours and a thicker bank
+-- b.deep (0..1) blends toward these and a thicker bank
 local DEEP_SHADOW_COLS = look.deep_shadow_colors
 local DEEP_CLOUD_COL_A = look.cloud.deep_a_color
 local DEEP_CLOUD_COL_B = look.cloud.deep_b_color
@@ -49,11 +49,11 @@ local SCATTER_REACH, SCATTER_RISE, SCATTER_PUSH = scatter.reach_px, scatter.rise
 local SCATTER_DRAIN = scatter.life_drain
 local SCATTER_SPREAD, SCATTER_CLOUD_RISE = scatter.cloud_spread, scatter.cloud_rise_px
 
-local CULL_MARGIN = look.cull_margin_px              -- boxes this far off screen still simulate
+local CULL_MARGIN = look.cull_margin_px              -- px off screen still simulated
 local SPLIT_X = look.split_x_px
 
--- tex = { cloud, shadow, spiral } (their state is reset after drawing); opts: splitX (a scatter blows the
--- motes left of it left, the others right), margin (the cull margin), density (share of the motes, default 1)
+-- tex = { cloud, shadow, spiral } (reset after draw)
+-- opts: splitX (scatter side split), margin (cull), density (mote share, default 1)
 function D.new(tex, opts)
     opts = opts or {}
     local density = opts.density or 1
@@ -241,8 +241,8 @@ local function draw_clouds(self, all)
     cl:SetRotation(0) ; cl:SetBlendMode("Normal")
 end
 
--- once per draw call; a box is { x, wy, w, h } (x screen space, screen y = wy - camY);
--- b.scatter (0..1), when set, stops its emission and blows its motes and bank away
+-- once per draw; box = { x, wy, w, h }, screen y = wy - camY
+-- b.scatter (0..1): stops emission, blows motes and bank away
 function D:frame(dt, boxes, camY)
     boxes = boxes or {}
     self.cam = camY or 0

@@ -18,14 +18,13 @@ local TITLE_Y, CHEST_Y, CHEST_K = Cards.title_y, Cards.chest_y, Cards.chest_scal
 local STOCK_Y, STOCK_H = Stock.y, Stock.h
 local CHIP_Y = Cards.chip_y
 local LEAVE_LABEL_Y = Cards.leave_label_y
-local CAP = Chip.cap                             -- UI/Chip.png's end caps (its middle stretches between them)
-local ICON_PX = Chip.icon_px                     -- a key icon on a chip
-local PAD_L, GAP, PAD_R = Chip.pad_l, Chip.gap, Chip.pad_r   -- inside a chip: left edge, icon, gap, count, right edge
+local CAP = Chip.cap                             -- UI/Chip.png end caps (middle stretches)
+local ICON_PX = Chip.icon_px                     -- chip key icon size
+local PAD_L, GAP, PAD_R = Chip.pad_l, Chip.gap, Chip.pad_r   -- chip: left pad, icon-count gap, right pad
 local Top = Layout.cards.top_chips
-local TOP_Y, TOP_RIGHT, TOP_GAP = Top.y, Top.right, Top.gap   -- the top right chips
+local TOP_Y, TOP_RIGHT, TOP_GAP = Top.y, Top.right, Top.gap   -- top-right chips
 
--- the stock messages: the share of songs and nameplates still to get in the chest picks one (their look:
--- Layout.cards.stock.kinds)
+-- stock message by the share of items left (look: Layout.cards.stock.kinds)
 local STOCK = {
     plenty  = { key = "VAULT_STOCK_PLENTY", en = "There are plenty of items left to get on this chest" },
     various = { key = "VAULT_STOCK_VARIOUS", en = "There are various items left to get on this chest" },
@@ -44,10 +43,10 @@ end
 local CHEST_NAMES = {
     { "VAULT_CHEST_1", "Wooden Chest" },
     { "VAULT_CHEST_2", "Golden Chest" },
-    { "VAULT_CHEST_3", "Platinum Chest" },
+    { "VAULT_CHEST_3", "OpenTaikium Chest" },
 }
 
-local INK = Cards.ink_color                      -- brown ink on the parchment
+local INK = Cards.ink_color
 local RED_INK = Cards.red_ink_color
 local function ink(c, k)
     k = k or 1
@@ -69,7 +68,7 @@ function K.reset(now, index)
     popT = now
 end
 
--- the cards pop in again (the menu coming back)
+-- cards pop in again (menu back)
 function K.pop(now) popT = now end
 
 function K.move(dir) sel = (sel - 1 + dir) % N + 1 end
@@ -79,7 +78,7 @@ function K.chest() return sel > 1 and (sel - 1) or nil end
 function K.shake(now) shakeT = now end
 function K.setConfirm(on, now) confirm, confirmT = on, now end
 
--- an offset between card places, into [-N/2, N/2)
+-- card place offset wrapped into [-N/2, N/2)
 local function wrap(d) return (d + N / 2) % N - N / 2 end
 
 function K.tick(dt)
@@ -96,7 +95,7 @@ function K.stockKind(left, total)
     return "few"
 end
 
--- one line of text centred on f, shrunk to fit w
+-- one line centred on f, shrunk to fit w
 local function line(font, str, f, fore, back, w, op, k)
     local s = (k or 1) * Tex.fitScale(font, str, w / (k or 1))
     Tex.text(font, str, f, fore, back, s, w, "center", op)
@@ -121,7 +120,7 @@ local function drawStock(f, left, total, op)
     end
 end
 
--- a key chip: the pill, key i's icon and the number owned, laid out from the count's width; returns its width
+-- key chip width for count
 local function chipWidth(count)
     return PAD_L + ICON_PX + GAP + Tex.measure(ctx.fonts.text, "x" .. Tex.int(count)) + PAD_R
 end
@@ -206,7 +205,7 @@ function K.draw(now, alpha, info)
     end
 end
 
--- the top right chips, right-aligned, each as wide as its count needs
+-- top-right chips, right-aligned
 local function topChips(keys)
     local xs, x = {}, TOP_RIGHT
     for i = 3, 1, -1 do

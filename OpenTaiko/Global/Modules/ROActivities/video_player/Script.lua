@@ -1,24 +1,12 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
--- video_player ROActivity
--- ------------------------------------------------------------------------------------------------------
--- A video player: the picture in a 16:9 view above a control strip with icon buttons (restart, 10 s back,
--- play/pause, 10 s ahead, stop), a timeline that can be clicked and dragged, a speed dropdown, a mute
--- button, a volume slider and a close button. The video plays its own audio track and is clocked by it,
--- so every control acts on picture and sound together. A path ending in .aup2 plays that AviUtl2 project
--- the same way. activate(absolutePath, songAudioPath, offsetMs) plays a chart's video under its song
--- instead, as in game: the song clocks everything, and the video starts offsetMs after it (MOVIEOFFSET).
--- Driven by any stage: activate(absolutePath), then
--- update() and draw() every frame while IsActive; it deactivates itself when closed (the X button, or
--- cancel on a keyboard or pad; both play the cancel sound). deactivate() frees the video.
--- Everything works without a mouse: focus starts on play/pause, pad left/right or the arrow keys walk the
--- controls, Decide on a slider takes it and left/right then step it (5 s on the timeline).
+-- video_player ROActivity: video player with transport controls
 
 local PopUI = require("UI.Pick")()
 
 local SPEEDS = { 0.5, 0.75, 1, 1.25, 1.5, 2 }
 local SPEED_LABELS = { "0.50x", "0.75x", "1.00x", "1.25x", "1.50x", "2.00x" }
 
--- layout (skin 1920x1080). Every width is measured from what it shows, so nothing overlaps.
+-- layout (skin 1920x1080); widths measured from their content
 local VIEW_X, VIEW_Y, VIEW_W, VIEW_H = 192, 40, 1536, 864
 local TIMELINE_Y, TIMELINE_H = 930, 40
 local ROW_Y, ROW_H = 990, 56
@@ -30,7 +18,7 @@ local MENU_ROW_H = 56
 local READOUT_SIZE = 26
 local FILL = 16
 local TIMELINE_KEY_STEP = 5000
-local CLOSE_STYLE = { colors = { primary = { 236, 76, 76 }, primary2 = { 196, 40, 48 } } }   -- a red face for the X
+local CLOSE_STYLE = { colors = { primary = { 236, 76, 76 }, primary2 = { 196, 40, 48 } } }
 
 local ui, video
 local isProject = false     -- video is an AviUtl2 project: it draws itself
@@ -44,15 +32,15 @@ local scrubTarget, scrubSeekAt = nil, 0
 local speedIndex = 3
 local closing = false
 
--- song mode: the video is silent and follows the song's audio
+-- song mode: the silent video follows the song
 local song = nil
 local offsetMs = 0
-local ready = false         -- the song and the video have both loaded
+local ready = false         -- song and video loaded
 local videoOn = false       -- the song has reached the video's start
-local videoRunning = false  -- the video's clock runs (its Pause and Resume nest, so each pause gets one resume)
+local videoRunning = false  -- video clock runs (Pause/Resume nest: one resume per pause)
 local songPausedAt = 0      -- the song's position while it is not playing
-local endCheckAt = 0        -- the end check waits until this time after a start or a seek
-local nowTs = 0             -- the last update's time
+local endCheckAt = 0        -- no end check before this (after a start or seek)
+local nowTs = 0             -- last update ts
 
 local function sfx(name)
     pcall(function() SHARED:GetSharedSound(name):Play() end)
@@ -86,10 +74,10 @@ local function currentMs()
     return video:GetTimestampMs()
 end
 
--- a seek on the song takes the time at the current speed; the position it reports is the song's own
+-- song positions are song time: seek to ms / speed
 local function songStartAt(ms)
     song:SetSpeed(speed())
-    song:Play()   -- Play rewinds to 0, so the seek comes after it
+    song:Play()   -- Play rewinds to 0: seek after
     if ms > 0 then song:SetTimestampMs(math.floor(ms / speed())) end
 end
 
@@ -101,9 +89,8 @@ local function videoResume()
     if not videoRunning then video:Resume(); videoRunning = true end
 end
 
--- the video follows the song: it waits on black until its start and holds its last frame after its end.
--- It is placed on every start, seek, pause and resume, then runs on its own clock as in game: a seek
--- restarts decoding from the previous keyframe, so correcting it while it plays only sets it back.
+-- video follows the song: placed on each transport change, then runs on its own clock
+-- no correction while playing: a seek restarts decoding from the previous keyframe
 local function syncVideo(force, at)
     local vt = (at or songPos()) - offsetMs
     if vt < 0 then
@@ -167,7 +154,7 @@ local function stop()
         songPausedAt = 0
         stopped = true
         syncVideo(true, 0)
-        videoOn = false   -- black until it plays again
+        videoOn = false   -- hidden until it plays again
         return
     end
     video:Stop()
@@ -180,10 +167,10 @@ local seekTo
 local function restart()
     if song then return seekTo(0) end
     if stopped then return play() end
-    video:Reset()   -- back to 0; paused stays paused and shows the first frame
+    video:Reset()   -- back to 0; keeps the paused state
 end
 
--- a seek never changes whether the video plays: paused stays paused, showing the frame at the target
+-- a seek keeps the play/pause state
 seekTo = function(ms)
     if song then
         if not ready then return end
@@ -227,7 +214,7 @@ local function toggleSpeedMenu()
     speedMenu.visible = true
     speedMenu:setEnabled(true)
     speedMenu:setSelected(speedIndex, false)
-    focusWidget(speedMenu)   -- the keys land in the list at once
+    focusWidget(speedMenu)   -- focus the list
 end
 
 local function setVolume(v)
@@ -256,15 +243,14 @@ local function fillScreen(alpha)
 end
 
 function onStart()
-    ui = PopUI.new{ bg = false }   -- its default sounds are the shared menu ones
+    ui = PopUI.new{ bg = false }   -- default sounds: the shared menu ones
     fill = CANVAS:CreateCanvas(FILL, FILL)
     fill:Clear(255, 255, 255, 255)
     fill:Upload()
 
-    -- widgets are added in the order the keys and the pad walk them: the transport, then the right group,
-    -- then the timeline
+    -- add order = key/pad focus order
 
-    -- transport, left to right: restart, 10 s back, play/pause, 10 s ahead, stop
+    -- transport, left to right
     local x = VIEW_X
     local function place(w)
         local px = x
@@ -276,9 +262,9 @@ function onStart()
     playBtn = ui:button{ icon = "play", x = place(ICON_BTN_W + 24), y = ROW_Y, w = ICON_BTN_W + 24, h = ROW_H, accent = true, onClick = function() if playing then pause() else play() end end }
     ui:button{ icon = "forward", x = place(ICON_BTN_W), y = ROW_Y, w = ICON_BTN_W, h = ROW_H, onClick = function() seekTo(math.min(durationMs, currentMs() + 10000)) end }
     ui:button{ icon = "stop",    x = place(ICON_BTN_W), y = ROW_Y, w = ICON_BTN_W, h = ROW_H, onClick = stop }
-    readoutX = x + GAP   -- the time text starts here
+    readoutX = x + GAP   -- time readout start
 
-    -- right group, laid out right to left: close, the volume slider, a mute button, the speed dropdown
+    -- right group, laid out right to left
     local right = VIEW_X + VIEW_W
     local closeX = right - CLOSE_BTN_W
     right = closeX - GAP * 2
@@ -287,12 +273,11 @@ function onStart()
     right = volumeX - GAP
     local muteX = right - ICON_BTN_W
     right = muteX - GAP * 2
-    -- the dropdown's rows draw their text 28 px in with a width limit of w - 48, and that limit is on the
-    -- text box (the ink plus its 50 px of padding): a row narrower than ink + 98 squishes its label
+    -- menu rows: text limit w - 48 on the text box (ink + 50 px padding), so w >= ink + 98
     local speedW = textButtonWidth(table.unpack(SPEED_LABELS))
     for _, l in ipairs(SPEED_LABELS) do speedW = math.max(speedW, math.ceil(ui:measureText(ui.theme.font.label, l)) + 100) end
     local speedX = right - speedW
-    readoutRight = speedX - GAP * 2   -- the time text must end before the speed button
+    readoutRight = speedX - GAP * 2   -- time readout end
 
     speedBtn = ui:button{ text = SPEED_LABELS[speedIndex], x = speedX, y = ROW_Y, w = speedW, h = ROW_H, onClick = toggleSpeedMenu }
     muteBtn = ui:button{ icon = "volume", x = muteX, y = ROW_Y, w = ICON_BTN_W, h = ROW_H,
@@ -308,11 +293,11 @@ function onStart()
             if v > 0 and muted then muted = false; muteBtn:setIcon("volume") end
             setVolume(v)
         end }
-    -- the one control that sounds like a cancel: it is one
+    -- close plays the cancel sound
     ui:button{ icon = "close", x = closeX, y = ROW_Y, w = CLOSE_BTN_W, h = ROW_H, accent = true, style = CLOSE_STYLE,
                sfx = { click = "cancel" }, onClick = close }
 
-    -- the timeline: the slider's range becomes the duration once the decoder reports it
+    -- timeline: max set to the duration once known
     timeline = ui:slider{ x = VIEW_X, y = TIMELINE_Y, w = VIEW_W, h = TIMELINE_H, min = 0, max = 1000, step = 1, navStep = TIMELINE_KEY_STEP,
         value = 0, showValue = false, sfx = { cancel = false },
         onChange = function(v) scrubTarget = v ; return true end }   -- true: no step sound while scrubbing
@@ -326,7 +311,10 @@ function onStart()
     speedMenu:setEnabled(false)
 end
 
--- returns the loaded video or project, for a caller that wants to set it up further
+-- activate(path): video or .aup2 project, clocked by its own audio
+-- with songAudioPath the song clocks both; the video starts offsetMs in (MOVIEOFFSET)
+-- then update() and draw() each frame while IsActive; closes itself on X or cancel
+-- returns the video or project
 function activate(path, songAudioPath, songOffsetMs)
     durationMs = 0
     stopped, closing = false, false
@@ -344,7 +332,7 @@ function activate(path, songAudioPath, songOffsetMs)
     song, ready, videoOn, videoRunning, songPausedAt = nil, false, false, false, 0
     offsetMs = tonumber(songOffsetMs) or 0
     if not isProject and songAudioPath ~= nil and songAudioPath ~= "" then
-        -- both load in the background; update() starts them together once they have
+        -- both load in the background; updateSong starts them together
         video = VIDEO:CreateVideoFromAbsolutePath(path, false)
         song = SOUND:CreateBGMFromAbsolutePath(songAudioPath)
         song:SetVolumePercent(100)
@@ -371,7 +359,7 @@ function deactivate()
     end
 end
 
--- song mode, every frame: start once both have loaded, start the video at its time, pause at the song's end
+-- song mode per frame: start once loaded, pause at the song end
 local function updateSong(ts)
     if not ready then
         if song.Loaded and song.DurationMs > 0 and video.Width > 0 then
@@ -404,7 +392,7 @@ function update(ts)
     end
 
     local r = ui:update(ts)
-    -- a click on the X inside that update already deactivated this activity and freed the video
+    -- the X click may have closed the activity in ui:update
     if closing or video == nil then return end
     if r == "cancel" then
         if speedMenu.visible then
@@ -416,7 +404,7 @@ function update(ts)
         end
     end
 
-    -- a drag scrubs at most every 150 ms, and the release lands exactly
+    -- drag seeks at most every 150 ms; release seeks exactly
     if scrubTarget ~= nil and (not timeline.pressed or ts - scrubSeekAt > 150) then
         seekTo(scrubTarget)
         scrubSeekAt = ts
@@ -426,7 +414,7 @@ function update(ts)
         timeline:setValue(currentMs(), true)
     end
 
-    -- the end pauses the video itself, so a seek from there stays paused
+    -- pause at the end: a seek from there stays paused
     if song == nil and playing and video:IsFinished() then pause() end
 end
 
@@ -435,7 +423,7 @@ function draw()
     fillScreen(1)
     ui:rect(VIEW_X - 4, VIEW_Y - 4, VIEW_W + 8, VIEW_H + 8, 40, 44, 54, 255)
 
-    -- the picture keeps its shape inside the view: one scale for both axes, centred, black around it
+    -- fit: one scale for both axes, centred
     ui:rect(VIEW_X, VIEW_Y, VIEW_W, VIEW_H, 0, 0, 0, 255)
     if isProject then
         video:DrawFit(VIEW_X, VIEW_Y, VIEW_W, VIEW_H)
@@ -450,7 +438,7 @@ function draw()
 
     ui:draw()
 
-    -- the time sits on the row's centre line the way the button glyphs do
+    -- time readout on the row centre line
     ui:drawTextEx(READOUT_SIZE, fmt(currentMs()) .. " / " .. fmt(durationMs), readoutX, ROW_CY + ui:textNudge(READOUT_SIZE),
         { 235, 238, 245, 255 }, nil, 1, 1, readoutRight - readoutX, "left")
 end

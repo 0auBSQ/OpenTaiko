@@ -1,4 +1,4 @@
--- End credits after the level-20 clear.
+-- end credits after the level-20 clear
 
 local Easing    = require("Easing")
 local I18N      = require("i18n")
@@ -15,21 +15,21 @@ local Look = Layout.stage.credits
 local Time = Animation.stage.credits
 
 local SONG_PATH = "Sounds/credits.ogg"
-local BG_DIM    = Look.bg_dim           -- brightness of the first picture
-local SCENE_DIM = Look.scene_dim        -- brightness of the backgrounds after it
+local BG_DIM    = Look.bg_dim           -- first picture brightness
+local SCENE_DIM = Look.scene_dim        -- later backgrounds brightness
 local BG_DARKEN = Time.bg_darken_s
 
--- timings, seconds into the song
+-- timings: s into the song
 local ROLL_START = Time.roll_start_s
-local ROLL_STOP  = Time.roll_stop_s     -- last line at rest mid-screen, on the song's last chord
+local ROLL_STOP  = Time.roll_stop_s     -- last line at rest mid-screen
 local SETTLE_SEC = Time.settle_s
 local DONE_AT    = Time.done_at_s
-local SONG_WAIT  = Time.song_wait_s     -- the roll starts after this long when no song plays
+local SONG_WAIT  = Time.song_wait_s     -- roll start delay without a song
 
 -- roll speed factor while decide is held
 local FAST       = Time.fast
 local SPEED_RATE = Time.speed_rate
--- a roll resting this far ahead of the song fades the song out
+-- s ahead of the song before it fades out
 local AHEAD_FADE = Time.ahead_fade_s
 
 -- layout
@@ -49,7 +49,7 @@ local _t, _real, _wait = 0, 0, 0
 local _dark = 0                 -- 0..1
 local _started = false
 local _speed = 1
-local _fadeFrom = nil           -- roll time the song fade-out started at, or nil
+local _fadeFrom = nil           -- roll time of the song fade start, or nil
 
 -- fonts = { gfont, gfontName, gfontSmall }
 function M.setup(_, fonts)
@@ -85,7 +85,7 @@ local function addComposers(items, y, cx)
     return y
 end
 
--- returns the items and the roll distance that centres the last line (or a too-tall last section)
+-- items and the roll distance centring the last line (or a tall last section)
 local function layout()
     local res = THEME:GetResolution()
     local cx = res.X * 0.5

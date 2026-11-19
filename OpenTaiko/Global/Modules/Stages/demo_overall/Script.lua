@@ -1,9 +1,8 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global
--- demo_overall/Script.lua — five small debug demos in one stage. The number keys 1-5 switch between
--- them; only the current one is active, with its own activate/update/draw/deactivate. Each lives in
--- its own folder (<name>/demo.lua and its assets). Leaving any of them goes back to My Room.
+-- demo_overall: five debug demos in one stage, keys 1-5 switch
+-- each lives in <name>/demo.lua; leaving goes back to My Room
 
--- drawn in 1920x1080: a skin of another resolution rescales it
+-- drawn in 1920x1080, rescaled for other skin resolutions
 STAGES:SetResolution(1920, 1080)
 
 local I18N = require("Locale.i18n")
@@ -17,7 +16,7 @@ local DEMOS = {
     { id = "first_demo",     mod = require("first_demo.demo") },
 }
 
--- the legend naming each number, shown for a few seconds on entry and after each switch
+-- legend time on entry and after each switch (s)
 local LEGEND_TIME, LEGEND_FADE = 3.5, 0.6
 local LEGEND_Y, LEGEND_STEP, LEGEND_W = 990, 360, 340
 
@@ -74,7 +73,7 @@ function update(ts)
     lastTs = ts
     if legendLeft > 0 then legendLeft = math.max(0, legendLeft - dt) end
 
-    -- the number keys can also be bound to drums (3P-5P by default), so the demo skips the frame they switch on
+    -- number keys may also be drum binds (3P-5P), so a switch frame skips the demo update
     local n = numberPressed()
     if n ~= nil then switchTo(n); return end
 

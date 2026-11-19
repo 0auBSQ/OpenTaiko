@@ -1,26 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
--- stage.lua — Stage/stand rendering and curtain transitions for intro_nokon.
---
--- Public API (called by game.lua and Script.lua):
---   Stage.init(tx, snd, txts)
---   Stage.reset(numPlayers)   — call once when entering the game stage
---   Stage.closeCurtain(onDone)
---   Stage.openCurtain(onDone)
---   Stage.draw()              — draws everything except dialogue
---   Stage.update()
---   Stage.setSpotlight(p, on)
---   Stage.setPlayerPressing(p, on)
---   Stage.setPlayerDenied(p, on)
---   Stage.clearRoundState()   — reset pressing/denied for a new round
---   Stage.setScore(p, score)
---   Stage.setBlackboard(text, line2) — nil to clear; line2 an optional second line
---   Stage.setBoardLights(mode) — the board's lights: "off", "right" (blue, flashing) or "wrong" (red)
---   Stage.setDarken(on)       — darkening overlay for evaluation
---   Stage.setChip(chipIdx)    — player chip to display, nil = none
---   Stage.setSongList(cache, selIdx)  — song list data, nil to hide
---   Stage.setGenreList(genres, selIdx) -- genre list data, nil to hide
---   Stage.setClock(remainingMs, show) -- nil remainingMs hides clock
---   Stage.showFail(on)
+-- intro_nokon stage: stands, board and curtain transitions; called by game.lua and Script.lua.
 
 local I18N = require("i18n")
 local Config = require("Core.Config")
@@ -35,7 +14,7 @@ local tx   = {}
 local snd  = {}
 local txts = {}
 
--- ── Constants ─────────────────────────────────────────────────────────────────
+-- ==== Constants ====
 
 local SCREEN_W  = 1920
 local SCREEN_H  = 1080
@@ -68,7 +47,7 @@ local LIST_ROWS     = List.rows_each_side
 
 local PLAYER_COLORS = nil  -- lazy-initialized
 
--- ── State ─────────────────────────────────────────────────────────────────────
+-- ==== State ====
 
 local numPlayers   = 1
 local standXPos    = {}   -- [p] = x center
@@ -98,17 +77,17 @@ local clockT      = 0     -- the float's clock
 local clockStartS = 0     -- the running clock's first second
 local clockLastS  = nil   -- the last second shown; each new one ticks
 local clockTense  = false -- reached warn_at_s on a clock that started above it
-local clockPulseT = nil   -- time since the warning, while the clock zooms in and out
+local clockPulseT = nil   -- s since the warning, during the pulse
 
 local songList    = nil   -- {cache, selIdx} or nil
 local genreList   = nil   -- {genres, selIdx} or nil
 
--- the board's lights; while a song list is up (a player choosing), the pattern turns around them instead
+-- board lights; while a song list is up, the pattern circles instead
 local lightsMode  = "off"  -- "off"|"right"|"wrong"
 local lightsT     = 0
 local bulbs       = nil    -- the bulbs' centres, clockwise from the ring's top-left corner
 
--- ── Helpers ───────────────────────────────────────────────────────────────────
+-- ==== Helpers ====
 
 local function empty() return COUNTER:EmptyCounter() end
 
@@ -174,7 +153,7 @@ local function darkenColor(hex, factor)
         math.floor(b * factor))
 end
 
--- ── Init / lifecycle ──────────────────────────────────────────────────────────
+-- ==== Init / lifecycle ====
 
 function M.init(t, s, txtsRef)
     tx   = t
@@ -182,6 +161,7 @@ function M.init(t, s, txtsRef)
     txts = txtsRef
 end
 
+-- once on entering the game stage
 function M.reset(n)
     numPlayers  = n or 1
     standXPos   = computeStandPositions(numPlayers)
@@ -210,7 +190,7 @@ function M.reset(n)
     lightsT    = 0
 end
 
--- ── Curtain transitions ───────────────────────────────────────────────────────
+-- ==== Curtain transitions ====
 
 function M.closeCurtain(onDone)
     curtainState = "closing"
@@ -230,19 +210,20 @@ function M.openCurtain(onDone)
     if snd["CurtainOpen"] then snd["CurtainOpen"]:Play() end
 end
 
--- ── Setters ───────────────────────────────────────────────────────────────────
+-- ==== Setters ====
 
 function M.setSpotlight(p, on)      spotlights[p] = on      end
 function M.setPlayerPressing(p, on) pressing[p]   = on      end
 function M.setPlayerDenied(p, on)   denied[p]     = on      end
 function M.setScore(p, v)           scores[p]     = v       end
+-- nil text clears; l2: optional second line
 function M.setBlackboard(text, l2) blackboard = text; blackboard2 = l2 end
 function M.setDarken(on)            darkenOn       = on      end
 function M.setChip(idx)             chipIdx        = idx     end
 function M.setShowFail(on)          showFail       = on      end
 
--- a tick each second; on a clock that started above warn_at_s, reaching it rings and zooms the clock once,
--- then the ticks turn heavy
+-- tick per second; crossing warn_at_s (clock started above it): ring and pulse once,
+-- then the heavy tick
 local function clockSecond(s)
     if not clockTense and clockStartS > Clock.warn_at_s and s <= Clock.warn_at_s then
         clockTense  = true
@@ -277,7 +258,7 @@ function M.clearRoundState()
     lightsMode = "off"
 end
 
--- ── Draw ──────────────────────────────────────────────────────────────────────
+-- ==== Draw ====
 
 local function drawStands()
     lazyColors()
@@ -309,7 +290,7 @@ local function drawStands()
             tx[headKey]:SetColor(col("ffffffff"))
         end
 
-        -- Hands BEHIND stand (under Stand)
+        -- Hands behind the stand
         if not isPressing and tx["player_hands"] then
             tx["player_hands"]:SetColor(gray)
             tx["player_hands"]:DrawAtAnchor(sx, sy + HANDS_DY, "center")
@@ -323,14 +304,14 @@ local function drawStands()
             tx["Stand"]:SetColor(col("ffffffff"))
         end
 
-        -- Hands OVER stand (when pressing)
+        -- Hands over the stand (pressing)
         if isPressing and tx["player_hands_down"] then
             tx["player_hands_down"]:SetColor(gray)
             tx["player_hands_down"]:DrawAtAnchor(sx, sy + HANDS_DY, "center")
             tx["player_hands_down"]:SetColor(col("ffffffff"))
         end
 
-        -- Score text (over Stand) — title renderer for bigger digits
+        -- Score text (over Stand), title renderer
         if txts.title then
             local st = txts.title:GetText(tostring(scores[p] or 0), false, Stands.score_max_width)
             st:DrawAtAnchor(sx, sy + SCORE_DY, "center")
@@ -389,7 +370,7 @@ local function drawScaled(t, x, y, sc, rot)
     t:SetScale(1, 1)
 end
 
--- the stopwatch floats; its hand ticks clockwise from 12 to the seconds left, the number in the box below
+-- hand: clockwise from 12 by the seconds left; number in the box below
 local function drawClock()
     if not clockShow or clockMs == nil then return end
     local sc = clockScale()
@@ -417,7 +398,7 @@ local function drawList(listData, headerText)
         tx["chip_" .. chipIdx]:Draw(0, 0)
     end
 
-    -- Background panel (semi-transparent)
+    -- Background panel
     if tx["SongList"] then
         tx["SongList"]:SetOpacity(List.bg_opacity)
         tx["SongList"]:DrawAtAnchor(LIST_BG_X, LIST_BG_Y, "top")
@@ -447,7 +428,7 @@ local function drawList(listData, headerText)
         local y = LIST_START_Y + (offset + LIST_ROWS) * LIST_SPACING
         local isSel = (offset == 0)
 
-        -- Song block — tinted with the node's genre color (BoxColor)
+        -- Song block, tinted by BoxColor
         if tx["SongBlock"] then
             local nodeColor = (entry.node and entry.node.BoxColor) or col("ffffffff")
             tx["SongBlock"]:SetColor(nodeColor)
@@ -478,6 +459,7 @@ local function drawCurtain()
     end
 end
 
+-- everything but the dialogue
 function M.draw()
     -- Stage background
     if tx["Stage"] then tx["Stage"]:Draw(0, 0) end
@@ -502,14 +484,14 @@ function M.draw()
     drawCurtain()
 end
 
--- Draw Fail.png on top of any dialogue overlay — call after Dialogue.draw().
+-- Fail.png over the dialogue; call after Dialogue.draw()
 function M.drawFail()
     if showFail and tx["Fail"] then
         tx["Fail"]:DrawAtAnchor(SCREEN_W / 2, SCREEN_H / 2, "center")
     end
 end
 
--- ── Update ────────────────────────────────────────────────────────────────────
+-- ==== Update ====
 
 function M.update()
     lightsT = lightsT + fps.deltaTime

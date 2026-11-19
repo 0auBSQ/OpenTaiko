@@ -1,31 +1,25 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global
--- assets.lua — textures + palette for myroom (OWM3d edition).
---   * Floor/wall TEXTURES: procedural fallbacks are always registered first; when the CC0 files in
---     Textures/Surfaces/ exist they overwrite the same ids (RegisterTextureFromImage + mipmap filter).
---   * A PALETTE of solid-colour textures for the shaded-box furniture builders.
---   (The walking students are avatar.lua's.)
+-- My Room textures and the solid-colour palette for box furniture
 
 local floor, sin, random = math.floor, math.sin, math.random
 
 local A = {}
 
 A.TEX = { wood = 200, carpet = 201, wall = 202, skirt = 203 }
--- floor "paints" (flooring) and wall paints, by id → texture id. The DEFAULT floor (wood) and wall
--- (plaster) are NOT paints — they are the empty state, so they are not listed here. The 24x ids are
--- the CC0 surface photos (stone/grass/sand/snow/brick/rock), loaded in FILE_TEX below.
+-- flooring and wall paint id -> texture id; the default floor and wall are the empty state, not listed
+-- 24x ids: CC0 surface photos from FILE_TEX
 A.FLOORPAINT = { carpet = 201, stone = 240, grass = 241, sand = 242, snow = 243, woodfloor_c = 200 }
 A.WALLPAINT  = { blue = 220, beige = 221, sage = 222, brick = 244, rock = 245, stonewall = 240, plaster_c = 202 }
--- representative RGB for the flooring/paint icon swatches (id → {r,g,b})
+-- icon swatch rgb per flooring or paint id
 A.SWATCH = { carpet = { 243, 246, 250 }, blue = { 120, 150, 205 }, beige = { 212, 196, 164 }, sage = { 150, 185, 150 },
              stone = { 150, 148, 142 }, grass = { 96, 150, 78 }, sand = { 214, 196, 150 }, snow = { 200, 200, 201 },
              brick = { 150, 86, 70 }, rock = { 120, 116, 112 }, stonewall = { 150, 148, 142 },
              default_floor = { 150, 110, 66 }, default_paint = { 196, 188, 176 },
-             woodfloor_c = { 150, 110, 66 }, plaster_c = { 196, 188, 176 } }   -- "revert to default" swatches
--- arcade screen art (procedural, generated in buildTextures) + poster/painting picture textures
--- (reuse the CC0 surface photos as landscape "souvenirs"); ids the item definitions reference
+             woodfloor_c = { 150, 110, 66 }, plaster_c = { 196, 188, 176 } }   -- revert-to-default swatches
+-- texture ids the item definitions reference; SCREEN built in buildTextures
 A.SCREEN  = { taiko = 250, retro = 251 }
-A.PICTURE = { nokon = 246, bol = 247 }   -- character portraits (Textures/Screens/*.png), loaded in FILE_TEX
--- solid-colour palette (texture ids) used by the shaded-box builders
+A.PICTURE = { nokon = 246, bol = 247 }   -- Textures/Screens/*.png, loaded in FILE_TEX
+-- solid-colour texture ids for the box builders
 A.COL = { wood = 210, gray = 211, dark = 212, screen = 213, metal = 214, red = 215, white = 216, black = 217,
           green = 230, leaf = 231, fabric = 232, cream = 233, gold = 234, posterA = 235, posterB = 236, canvasArt = 237 }
 
@@ -37,9 +31,10 @@ local function solid(scene, id, r, g, b)
     scene:RegisterTexture(id, { rgb(r, g, b), rgb(r, g, b), rgb(r, g, b), rgb(r, g, b) }, 2, 2)
 end
 
--- ── procedural textures (always registered; the file pass may overwrite them) ─────────────────────
+-- ==== procedural textures ====
+-- always registered first; FILE_TEX may overwrite the ids
 function A.buildTextures(scene)
-    -- wooden floor: planks with grain + plank seams
+    -- wood floor
     do
         local w = 16; local t = {}
         for y = 0, w - 1 do for x = 0, w - 1 do
@@ -49,7 +44,7 @@ function A.buildTextures(scene)
         end end
         scene:RegisterTexture(A.TEX.wood, t, w, w)
     end
-    -- rug: white weave speckle (the same white as rug.png)
+    -- rug (matches rug.png)
     do
         local w = 16; local t = {}
         for i = 1, w * w do local n = (random() * 2 - 1) * 6; t[i] = rgb(238 + n, 241 + n, 246 + n) end
@@ -61,7 +56,7 @@ function A.buildTextures(scene)
         for i = 1, w * w do local n = (random() * 2 - 1) * 8; t[i] = rgb(196 + n, 188 + n, 176 + n) end
         scene:RegisterTexture(A.TEX.wall, t, w, w)
     end
-    -- dark plank skirt for the raised-platform sides
+    -- skirt (raised-platform sides)
     do
         local w = 16; local t = {}
         for y = 0, w - 1 do for x = 0, w - 1 do
@@ -71,7 +66,7 @@ function A.buildTextures(scene)
         end end
         scene:RegisterTexture(A.TEX.skirt, t, w, w)
     end
-    -- wall paints (faint speckle like the plaster, tinted)
+    -- wall paints
     for id, base in pairs({ [A.WALLPAINT.blue] = { 120, 150, 205 }, [A.WALLPAINT.beige] = { 212, 196, 164 }, [A.WALLPAINT.sage] = { 150, 185, 150 } }) do
         local w = 16; local t = {}
         for i = 1, w * w do local n = (random() * 2 - 1) * 8; t[i] = rgb(base[1] + n, base[2] + n, base[3] + n) end
@@ -100,13 +95,13 @@ function A.buildTextures(scene)
         local taiko, retro = {}, {}
         for y = 0, w - 1 do for x = 0, w - 1 do
             local i = y * w + x + 1
-            -- taiko: a big red drum face on cream with a dark rim
+            -- taiko
             local dx, dy = (x - w / 2 + 0.5) / (w / 2), (y - w / 2 + 0.5) / (w / 2)
             local d = math.sqrt(dx * dx + dy * dy)
             if d < 0.62 then taiko[i] = rgb(214, 60, 52)
             elseif d < 0.74 then taiko[i] = rgb(40, 30, 34)
             else taiko[i] = rgb(240, 226, 198) end
-            -- retro: neon grid on near-black
+            -- retro
             local grid = (x % 6 == 0 or y % 6 == 0)
             retro[i] = grid and rgb(70, 220, 200) or rgb(18, 14, 34)
         end end
@@ -115,9 +110,9 @@ function A.buildTextures(scene)
     end
 end
 
--- ── file texture pass: overwrite the procedural ids with the CC0 surfaces when present ────────────
--- Each file load is pcall-guarded and the procedural texture stays if anything is missing/fails.
--- A surface with a `normal` file gets that normal map (DirectX convention) as texture id + NORMAL_OFFSET.
+-- ==== file textures ====
+-- each load pcall-guarded; the procedural texture stays on failure
+-- normal file: normal map (DirectX convention) at id + NORMAL_OFFSET
 local NORMAL_OFFSET = 100
 A.NORMAL_OF = {}   -- texture id → its normal map's id, once registered
 local FILE_TEX = {
@@ -133,9 +128,8 @@ local FILE_TEX = {
     { file = "Textures/Screens/nokon.png",      id = 246 },   -- Nokon portrait (picture wall item)
     { file = "Textures/Screens/bol.png",        id = 247 },   -- Bol portrait (picture wall item)
 }
--- decoded surface PNGs, kept for the whole stage session. CreateTextureSync (disk read + PNG decode)
--- is expensive; doing it per icon scene (every builder icon calls registerInto) was a multi-second
--- stall. Decode ONCE here, then just re-register the cached texture into each scene (upload only).
+-- decoded once per stage session; each scene only re-registers (upload)
+-- CreateTextureSync per icon scene is a multi-second stall
 local fileCache = nil
 function A.buildFileTextures(scene)
     if fileCache == nil then
@@ -171,8 +165,8 @@ function A.buildFileTextures(scene)
     end
 end
 
--- ── colours: a flooring or paint stored as "<id>:<rrggbb>" draws a recolour of its texture (the same
--- grain and normal map), registered on first use under ids from TINT_BASE ──────────────────────────────
+-- ==== colours ====
+-- "<id>:<rrggbb>" floor or paint: tinted copy of its texture (same normal map), ids from TINT_BASE
 local TINT_BASE = 400
 local tintIds, tintNext = {}, TINT_BASE
 local tintScene, tintDone = nil, {}
@@ -183,7 +177,7 @@ local function splitKey(key)
     return key, nil
 end
 
--- the texture id a floor ("floor") or wall paint ("paint") key draws with, nil when it has none
+-- kind: "floor" | "paint"; nil when the key has no texture
 function A.surfaceTex(scene, kind, key)
     local id, hex = splitKey(key)
     local base = ((kind == "floor") and A.FLOORPAINT or A.WALLPAINT)[id]
@@ -203,7 +197,7 @@ function A.surfaceTex(scene, kind, key)
     return tid
 end
 
--- the swatch colour of a floor or paint key: its colour, or the item's own swatch
+-- the key's hex colour, else the item's swatch
 function A.swatchFor(key)
     local id, hex = splitKey(key)
     if hex then return { tonumber(hex:sub(1, 2), 16), tonumber(hex:sub(3, 4), 16), tonumber(hex:sub(5, 6), 16) } end
@@ -215,8 +209,7 @@ function A.buildAll(scene)
     A.buildFileTextures(scene)
 end
 
--- register the procedural + file textures into an ARBITRARY scene —
--- ModelIcon.newBuilder icon scenes start with an empty registry and sample these ids
+-- for any scene: ModelIcon.newBuilder icon scenes start empty and sample these ids
 function A.registerInto(scene)
     A.buildTextures(scene)
     A.buildFileTextures(scene)

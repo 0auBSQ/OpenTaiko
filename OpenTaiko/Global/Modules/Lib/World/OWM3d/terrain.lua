@@ -1,13 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- OWM3d/terrain.lua — heightmap terrain maps: builds a tessellated mesh from a raw heightfield
--- (HEIGHTMAP:Load — see LuaHeightmap.cs) with per-quad splat texturing, emits matching physics
--- triangles, and PLANTS GRASS: wind-swayed GPU blades (scene:GrassAdd) scattered over grass-layer
--- quads with deterministic density. heightAt() is the same bilinear sample the mesh uses.
---
--- def.terrain = { heights="height.r16", w, h, minY, maxY, cellSize, splat="splat.png", layers={...} }
--- The splat image (optional) picks the DOMINANT of up to 4 texture layers per quad (r/g/b/a
--- channels, loaded via HEIGHTMAP:LoadSplat). Without one, layer 1 is used with slope-based rock
--- (layer 2) on steep quads. Long builds may yield through world.buildYield(frac) (loading screens).
+-- OWM3d/terrain.lua: heightmap terrain mesh with collision and grass
 
 local floor, sin, max, min = math.floor, math.sin, math.max, math.min
 
@@ -15,7 +7,7 @@ local Terrain = {}
 Terrain.__index = Terrain
 
 local GRASS_SPR = 915
-local grassScenes = setmetatable({}, { __mode = "k" })   -- the scenes that have the blade sprite (a new world has a new scene)
+local grassScenes = setmetatable({}, { __mode = "k" })   -- scenes with the blade sprite
 
 local function makeHeightAt(hf, terr)
     local cs = terr.cellSize or 1
@@ -56,24 +48,23 @@ local function h2(a, b)
     return n - floor(n)
 end
 
--- a tapered grass-blade sprite (cutout, slightly curved, two green tones)
+-- grass blade sprite (RGBA cutout)
 local function ensureGrassSprite(scene)
     if scene.GrassSprite == nil or scene.SetSpriteRGBA == nil then return false end
     if grassScenes[scene] then return true end
     grassScenes[scene] = true
-    -- higher-res, smoothly tapered blade with a soft edge falloff (reads granular, not chunky)
     local w, h = 24, 64
     local t = {}
     for i = 1, w * h do t[i] = 0 end
     for y = 0, h - 1 do
         local f = 1 - y / (h - 1)                       -- 1 at the tip, 0 at the root
-        local half = 0.9 + (1 - f) * 5.4                -- tapers toward the tip
-        local bend = f * f * 4.2                        -- gentle curve
+        local half = 0.9 + (1 - f) * 5.4                -- half width
+        local bend = f * f * 4.2                        -- tip bend
         local cx = w * 0.5 + bend
         for x = 0, w - 1 do
             local d = math.abs(x - cx)
             if d <= half then
-                local edge = 1 - d / half               -- soft silhouette (alpha ramps at the rim)
+                local edge = 1 - d / half               -- alpha ramp at the rim
                 local a = edge > 0.35 and 255 or floor(edge / 0.35 * 255)
                 local g = 118 + 74 * (1 - f) + (h2(x, y) - 0.5) * 22
                 local r = 50 + 32 * (1 - f)
@@ -82,12 +73,12 @@ local function ensureGrassSprite(scene)
         end
     end
     scene:SetSpriteRGBA(GRASS_SPR, t, w, h)
-    if scene.SetSpriteFilter then scene:SetSpriteFilter(GRASS_SPR, "linear") end   -- soft blade edges
+    if scene.SetSpriteFilter then scene:SetSpriteFilter(GRASS_SPR, "linear") end
     scene:GrassSprite(GRASS_SPR)
     return true
 end
 
--- ── opt-in looks ──
+-- ==== Opt-in looks ====
 local SPLAT_SPR, ATLAS_SPR = 917, 918
 
 local function normPath(p)
@@ -256,8 +247,9 @@ function Terrain.unwire(world)
     world._terrCtx, world._terrLook, world._grassTile = nil, nil, nil
 end
 
--- build the terrain into the world's layers + physics; returns the map handle.
--- texId(name) resolves layer texture names.
+-- texId(name) -> texture id; returns the map handle
+-- def.terrain = { heights, w, h, minY, maxY, cellSize, splat, layers }
+-- no splat: layer 1, layer 2 on steep quads; calls world.buildYield(frac) if set
 function Terrain.build(world, def, texId)
     local scene = world.scene
     local phys = world.phys
@@ -305,11 +297,11 @@ function Terrain.build(world, def, texId)
     local gcfg = terr.grass or {}
     -- density: blades per square unit; clumps scale with the cell
     local density = (gcfg.density or terr.grassDensity or 7) * cs * cs
-    local clump = gcfg.clumpScale or 1                       -- 0 = uniform (legacy), >0 = noisy patches
+    local clump = gcfg.clumpScale or 1                       -- 0 = uniform, >0 = patches
     if density > 0 then clump = clump * cs end
     local blades = 0
 
-    -- map-driven grass exclusions (roads, pads) — applied right after planting
+    -- map grass exclusions (after planting)
     local function applyGrassExcludes()
         if not (grassOk and scene.GrassRemoveRect) then return end
         for _, ex in ipairs(gcfg.exclude or {}) do
@@ -317,9 +309,8 @@ function Terrain.build(world, def, texId)
         end
     end
 
-    -- GPU splat shading: the floor blends its four layer textures per PIXEL by the weight image,
-    -- so painted roads/beaches feather smoothly instead of cutting at quad edges (the per-quad
-    -- dominant texture stays baked in as the CPU-renderer fallback look)
+    -- GPU splat: per-pixel blend of the 4 layers by the weight image
+    -- per-quad dominant texture stays as the CPU fallback
     local function wireSplatShader()
         if splatMap and splatMap.RegisterSprite and scene.ObjSetTerrainSplat then
             splatMap:RegisterSprite(scene, SPLAT_SPR)
@@ -330,8 +321,8 @@ function Terrain.build(world, def, texId)
         end
     end
 
-    -- native bulk path: the whole mesh + physics + grass in ONE interop call (the per-quad Lua
-    -- loop boxed ~8 calls × quad — a huge GC spike on 400² maps). Lua loop below = harness/CPU fallback.
+    -- native path: whole build in one interop call (per-quad Lua calls spike the GC)
+    -- Lua loop below is the fallback
     if HEIGHTMAP.BuildTerrain then
         if world.buildYield then world.buildYield(0.15) end
         blades = HEIGHTMAP:BuildTerrain(scene, world.floorObj, world.phys.w, hf, splatMap,
@@ -369,7 +360,7 @@ function Terrain.build(world, def, texId)
             scene:ObjAddQuadTex(world.floorObj, x0, h00, z0, x0, h01, z1, x1, h11, z1, x1, h10, z0, tex, quadRep, quadRep, 1.0)
             phys:addQuad(x0, h00, z0, x0, h01, z1, x1, h11, z1, x1, h10, z0)
 
-            -- grass on gentle layer-1 quads: deterministic scatter, denser on flatter ground
+            -- grass on flat layer-1 quads (deterministic scatter)
             if grassOk and li == 1 and slope < 0.55 then
                 local n = floor(density * (1 - slope) * (0.5 + h2(ix, iz)))
                 for b = 1, n do
@@ -388,7 +379,7 @@ function Terrain.build(world, def, texId)
         if world.buildYield and iz % 8 == 7 then world.buildYield(iz / H) end
     end
 
-    -- invisible border walls (Lua fallback path; the native builder emits its own)
+    -- invisible border walls (native path emits its own)
     do
         local bw, bd = W * cs, H * cs
         local lo, hi = base - 3, base + range + 6

@@ -1,12 +1,5 @@
--- Pagoda.Run (optional): the rules of a challenge run and of practice, without any screen. A challenge run
--- starts on a checkpoint, climbs one floor per clear and ends on its first loss; its tower shows every
--- floor below the start cleared, then each floor it clears. Practice plays any floor up to the highest a
--- run reached (at least 11), and saves nothing.
---   local run = Run.new(start)          -- start: one of Run.startOptions()
---   run:rollFloor()                     -- the floor's songs (run.roll), shown before the play
---   run:enter()                         -- the run reached the floor: practice opens it
---   run:buildDan(opts)                  -- DANBUILDER set up for the floor; mount it, play
---   run:clear() / run:fail()            -- after the play
+-- Pagoda.Run: challenge run and practice rules, no screen
+-- a run climbs one floor per clear from its start and ends on its first loss
 
 local Progress = require("Pagoda.Progress")
 local Floor    = require("Pagoda.Floor")
@@ -28,7 +21,7 @@ function M.startOptions()
     return opts
 end
 
--- the floors practice offers: 1 up to the highest one a challenge run reached (at least 11)
+-- floors practice offers: 1 up to the highest a run reached (at least 11); practice saves nothing
 function M.practiceLevels()
     local top = math.max(Progress.highest_reached(), M.PRACTICE_MIN_TOP)
     local out = {}
@@ -45,6 +38,7 @@ local Run = {}
 Run.__index = Run
 
 -- a challenge run from the floor start; songList (optional) is the list its songs come from
+-- call order: rollFloor, enter, buildDan, then clear or fail
 function M.new(start, songList)
     return setmetatable({ start = start, level = start, tower = start - 1, roll = nil, songList = songList,
                           over = false }, Run)
@@ -56,8 +50,7 @@ function Run:rollFloor(avoid)
     return self.roll
 end
 
--- the current floor's songs rolled again: other songs where the pools allow; keepMystery keeps its
--- purple song
+-- rerolls the current floor (other songs where the pools allow); keepMystery keeps the mystery song
 function Run:reroll(keepMystery)
     self.roll = Floor.rerollFloor(self.level, self.roll, keepMystery, self.songList)
     return self.roll
@@ -68,17 +61,16 @@ function Run:enter()
     Progress.set_highest_reached(self.level)
 end
 
--- sets DANBUILDER up for the current floor with its roll (rolled now when there is none); false when no
--- song could be added. The roll is used up either way.
+-- sets DANBUILDER up for the current floor's roll (rolled now if none); false when no song was added
+-- the roll is used up either way
 function Run:buildDan(opts)
     local roll = self.roll or Floor.rollFloor(self.level, nil, self.songList)
     self.roll = nil
     return Floor.buildDan(self.level, roll, opts)
 end
 
--- the current floor was cleared: its rewards are granted and saved, the highest level and the tower move
--- up, the run climbs to the next floor. Returns { level, rewards (Rewards.grant), shrouded (the floor sat
--- above the tower) }
+-- current floor cleared: rewards granted and saved, the run climbs one floor
+-- returns { level, rewards (Rewards.grant), shrouded (floor was above the tower) }
 function Run:clear()
     local level = self.level
     local got = Rewards.grant(level)

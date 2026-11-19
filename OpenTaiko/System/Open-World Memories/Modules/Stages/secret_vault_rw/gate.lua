@@ -10,19 +10,19 @@ local Motion = Animation.gate
 
 local G = {}
 
-local CX, CY = Door.center.x, Door.center.y  -- the doorway's centre
-local DOOR_R = Door.door_r                   -- the door; the doorway shows it within 304 px
-local TRAVEL = Motion.travel_px              -- the door rolls this far, into the wall beside the doorway
-local ZOOM_IN = Motion.zoom_in               -- moving in this far, the doorway fills the screen
-local BOLT_OUT, BOLT_IN = Door.bolt_out, Door.bolt_in   -- a bolt's centre from the door's, locked / drawn back
-local GUIDE_R = Door.guide_r                 -- the clamp each bolt slides through; the bolt's collar stops against it
+local CX, CY = Door.center.x, Door.center.y
+local DOOR_R = Door.door_r                   -- door radius (doorway shows 304 px)
+local TRAVEL = Motion.travel_px              -- px roll into the wall
+local ZOOM_IN = Motion.zoom_in               -- zoom where the doorway fills the screen
+local BOLT_OUT, BOLT_IN = Door.bolt_out, Door.bolt_in   -- bolt centre from door centre: locked / drawn back
+local GUIDE_R = Door.guide_r                 -- bolt guide clamp radius
 local WheelShadow = Door.wheel_shadow
 local KeyShadow = Door.key_shadow
-local TURNED = Motion.turned_deg             -- a turned key, a quarter turn clockwise
+local TURNED = Motion.turned_deg             -- deg, turned key (quarter turn clockwise)
 local RING_SPEED = Motion.ring_rate_per_s
-local SLAM = Motion.slam_px                  -- px of shake when the door seats
+local SLAM = Motion.slam_px                  -- px shake on door seat
 
--- a door move's timings (s) and turns of the wheel
+-- door move timings (s) and wheel turns
 local function moves(t, spinSnd, rollSnd)
     return { turns = t.turns, spin = t.spin_s, boltsAt = t.bolts_at_s, bolts = t.bolts_s, rollAt = t.roll_at_s,
              roll = t.roll_s, push = t.push_s, spinSnd = spinSnd, rollSnd = rollSnd }
@@ -38,10 +38,10 @@ local OWN_SOUNDS = { "WheelSpin", "WheelSpinShort", "BoltsOpen", "BoltsShut", "G
 local PANEL_TOP = Panel.top
 local PAD_X, PAD_Y = Panel.pad_x, Panel.pad_y
 local NAME_ROW, HINT_ROW, STATUS_ROW = Panel.name_row, Panel.hint_row, Panel.status_row
-local HINT_MAX = Panel.hint_max_w            -- the hint wraps at this width
+local HINT_MAX = Panel.hint_max_w            -- hint wrap width
 local PANEL_MIN_W, PANEL_MAX_W = Panel.min_w, Panel.max_w
 
--- left to right around the door; each key's keyhole and colour: Layout.gate.keys
+-- left to right; keyholes and colours in Layout.gate.keys
 local KEYS = {
     { id = "greed", tex = "Gate/KeyGreed",
       name = "VAULT_KEY_GREED", en = "Key of Greed",
@@ -65,7 +65,7 @@ local ctx = nil
 local owned = {}
 local turn = {}          -- per key: { t0, dur } while turning
 local turned = {}
-local seq = nil          -- the door's open or close: { kind, done, movingFrom, tw = { spin, bolts, roll, zoom } }
+local seq = nil          -- open or close: { kind, done, movingFrom, tw = { spin, bolts, roll, zoom } }
 local spinRest = 0
 local cues = {}          -- { at, snd }
 local slams = {}         -- { at, amp }
@@ -127,7 +127,7 @@ function G.init(c)
     end
 end
 
--- the gate's own textures join the stage's, so the stage frees them with the rest when it leaves
+-- added to the stage textures (freed with them)
 local function loadTextures()
     for _, name in ipairs(OWN_TEXTURES) do
         local path = "Textures/" .. name .. ".png"
@@ -138,7 +138,7 @@ end
 function G.reset(mode, now, showAt)
     loadTextures()
     owned, turn, turned, cues, slams = {}, {}, {}, {}, {}
-    -- an open vault had all four keys turned in it
+    -- unlocked vault: all four keys turned
     for i, k in ipairs(KEYS) do
         owned[i] = mode == "unlocked" or isOwned(k.id)
         turned[i] = mode == "unlocked"
@@ -152,7 +152,7 @@ function G.reset(mode, now, showAt)
     denyT = nil
 end
 
--- movingFrom: when Gate.moving turns true (the stage starts its music then)
+-- movingFrom: time Gate.moving turns true (stage music starts)
 local function open(now, T, movingFrom)
     local t = {}
     local push = now + T.rollAt + T.roll - Motion.push_overlap_s
@@ -174,7 +174,7 @@ function G.startUnlock(now)
         cue(t, "Unlock")
         t = t + U.stagger_s
     end
-    open(t + U.door_after_s, SLOW, t + U.door_after_s + SLOW.rollAt)   -- the music comes in as the door starts to roll
+    open(t + U.door_after_s, SLOW, t + U.door_after_s + SLOW.rollAt)   -- music starts with the roll
     panelOut = now
 end
 
@@ -182,7 +182,7 @@ function G.startOpen(now)
     open(now, FAST)
 end
 
--- already open, without a sound (back from a song in the middle of a talk)
+-- open at once, silent (back from a song mid-talk)
 function G.openNow(now)
     open(now - 1000, FAST)
     cues = {}
@@ -224,14 +224,14 @@ function G.isOpen(now) return seq ~= nil and seq.kind == "open" and now >= seq.d
 function G.isClosed(now) return seq == nil or (seq.kind == "close" and now >= seq.done) end
 function G.moving(now) return seq ~= nil and now >= seq.movingFrom end
 
--- the shut door and the wall hide everything behind them
+-- shut door and wall hide what is behind
 function G.covers(now)
     local wall, door = ctx.tex["Gate/Wall"], ctx.tex["Gate/Door"]
     return value("roll", now) < 0.5 and value("zoom", now) <= 1.0001
         and wall ~= nil and wall.Ready and door ~= nil and door.Ready
 end
 
--- the selected key's colour, as a glyph colour
+-- key glyph colour
 local function keyColor(k, dim)
     local m = dim and Panel.dim_shade or 1
     return Tex.col(math.floor(k.col[1] * m), math.floor(k.col[2] * m), math.floor(k.col[3] * m))
@@ -280,7 +280,7 @@ local function shake(now)
     return x
 end
 
--- the bolts, their clamps and the wheel, on the door at (x, y) turned by rot
+-- door front parts at (x, y), turned by rot
 local function drawDoorFront(now, x, y, rot, z)
     local bolt = ctx.tex["Gate/Bolt"]
     local r = (BOLT_IN + (BOLT_OUT - BOLT_IN) * value("bolts", now)) * z
@@ -310,7 +310,7 @@ function G.draw(now, dt, ui)
     local rot = -math.deg(roll / DOOR_R)
     local function P(x, y) return CX + (x - CX) * z + sx, CY + (y - CY) * z end
 
-    -- the door rolls behind the wall; at home its bolts reach over the wall's frame
+    -- door rolls behind the wall; at home its bolts overlap the frame
     local dx, dy = P(CX + roll, CY)
     if roll < TRAVEL - 0.5 then
         Tex.sprite(ctx.tex["Gate/Door"], Tex.frame(dx, dy, rot, z))
@@ -340,9 +340,8 @@ function G.draw(now, dt, ui)
     Tex.sprite(ctx.tex["Gate/Hover"], Tex.frame(ringX, ringY, 0, pulse))
 end
 
--- the parchment over (x, y, w, h): its four quarters cropped from the four corners of Gate/HintPanel, a sheet as
--- big as the widest panel, so the paper and its rounded rim are never stretched (only a panel bigger than the sheet
--- stretches its quarters)
+-- panel over (x, y, w, h) from the four corners of Gate/HintPanel
+-- no stretch unless larger than the sheet
 local function plate(tex, x, y, w, h)
     if not Tex.ok(tex) then return end
     local tw, th = tex.Width, tex.Height
@@ -364,7 +363,7 @@ local function plate(tex, x, y, w, h)
     tex:SetScale(1, 1)
 end
 
--- the panel's status line and its ink (red, amber, green or grey on the parchment)
+-- status line and its ink colour
 local function statusLine(now)
     local S = Panel.status_colors
     if denyT ~= nil and now - denyT < Motion.deny_message_s then
@@ -377,7 +376,7 @@ local function statusLine(now)
     return Tex.tr("VAULT_GATE_NOT_OWNED", "This key is still missing."), Tex.col(S.not_owned[1], S.not_owned[2], S.not_owned[3])
 end
 
--- the hint panel, sized to its text
+-- hint panel sized to its text
 function G.drawPanel(now, dt)
     if panelIn == nil then return end
     local a = now - panelIn
@@ -407,7 +406,7 @@ function G.drawPanel(now, dt)
 
     local inkC, hintC = Panel.name_outline_color, Panel.hint_color
     local ink = Tex.col(inkC[1], inkC[2], inkC[3])
-    local brown = Tex.col(hintC[1], hintC[2], hintC[3])               -- the hint in brown ink on the parchment
+    local brown = Tex.col(hintC[1], hintC[2], hintC[3])
     local row = y + PAD_Y
     Tex.text(f.big, name, Tex.frame(cx, row + NAME_ROW / 2), keyColor(k, not owned[sel]), ink, 1, room, "center")
     row = row + NAME_ROW

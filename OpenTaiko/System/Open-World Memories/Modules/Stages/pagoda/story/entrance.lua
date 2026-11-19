@@ -1,9 +1,4 @@
--- Floor entrance dialogs.
--- level -> variants; the first variant whose `when(ctx)` is true plays, so the fallback (no `when`) comes last.
--- Line fields: revealMonster = sec (monster fade-in), pick = pool (one random option), react = "surprise" | "shock".
--- A variant's `sprite` is Ume's pose at the start of the visit.
--- ctx: runStart (the run's start floor), highest (the save's), tower (the tower's shown cleared floor),
--- firstTime (never cleared), lostBefore (a run was lost on it).
+-- floor entrance dialogs: level -> variants
 
 local Config = require("Core.Config")
 local Animation = Config.load("Config/animation.json")
@@ -24,7 +19,7 @@ local STAIRS = {
     { lines = { { who = "ume", text = "…It’s so much colder up here… I can’t stop now, though…" } } },
 }
 
--- after the monster shows (11, 12, 14 and the lit 15)
+-- after the monster shows (11, 12, 14, lit 15)
 local REACTIONS = {
     { lines = { { who = "ume", text = "H-Here it comes…!" } } },
     { lines = { { who = "ume", text = "This one looks a little strong… Stay focused…!" } } },
@@ -33,13 +28,12 @@ local REACTIONS = {
     { lines = { { who = "ume", text = "… I’m scared…" } } },
 }
 
--- true when the run started on this floor (its tutorial plays)
+-- run started on this floor (tutorial)
 local function startedAt(level)
     return function(ctx) return ctx.runStart == level end
 end
 
--- the long meeting plays while the monster was never met, and on every visit once a checkpoint above
--- is unlocked (16 after clearing 15, 21 after clearing 20)
+-- long meeting: monster never met, or a checkpoint above unlocked (16 after 15, 21 after 20)
 local function fullAt(level)
     return function(ctx)
         if ctx.firstTime == true and not ctx.lostBefore then return true end
@@ -48,6 +42,20 @@ local function fullAt(level)
     end
 end
 
+-- first variant with when(ctx) true plays; fallback (no when) last
+-- variant.sprite: Ume's pose at visit start
+-- line fields:
+--   who            "ume" | "you" (player); others: name = "..."
+--   sprite         normal | scared | brave | clear | run | lost | fail
+--   revealMonster  monster fade-in, sec
+--   pick           pool, one option at random
+--   react          "surprise" | "shock"
+-- ctx:
+--   runStart    start floor of the run
+--   highest     highest floor on the save
+--   tower       cleared floor shown on the tower
+--   firstTime   never cleared
+--   lostBefore  a run was lost on it
 return {
     [1] = {
         {

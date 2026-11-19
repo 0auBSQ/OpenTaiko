@@ -1,11 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
--- opening.lua — Curtain intro + title menu for intro_nokon.
---
--- Sequence:
---   closed (1.5s wait) → opening (curtain splits open, ~0.9s)
---   → post_open (1s wait) → menu (BGM + Start/Back selection)
---
--- update() returns "start", "back", or nil.
+-- intro_nokon curtain intro and title menu.
+-- sub-states: closed -> opening -> post_open -> menu
 
 local NavInput = require("NavInput")
 local Config = require("Core.Config")
@@ -44,7 +39,7 @@ local jiggleDelayCounter = nil
 local jiggleCounter      = nil
 local lightRotCounter    = nil
 
--- ── Helpers ───────────────────────────────────────────────────────────────────
+-- ==== Helpers ====
 
 local function empty() return COUNTER:EmptyCounter() end
 
@@ -63,14 +58,14 @@ local function startFlash()
 end
 
 local function startLightRot()
-    -- One full rotation every light_turn_s, looping forever
+    -- one turn per light_turn_s, looping
     lightRotCounter = COUNTER:CreateCounter(0, 360, Anim.light_turn_s / 360)
     lightRotCounter:SetLoop(true)
     lightRotCounter:Listen(function(v) lightAngle = v end)
     lightRotCounter:Start()
 end
 
--- ── Init / lifecycle ──────────────────────────────────────────────────────────
+-- ==== Init / lifecycle ====
 
 function M.init(t, snd)
     tx     = t
@@ -78,7 +73,7 @@ function M.init(t, snd)
 end
 
 
--- Full reset: show closed curtain, wait 1.5 s, then open.
+-- full reset: closed curtain, wait, then open
 function M.reset()
     subState     = "closed"
     curtainX     = 0
@@ -122,7 +117,7 @@ function M.resetToMenu()
     end
 end
 
--- ── Draw ──────────────────────────────────────────────────────────────────────
+-- ==== Draw ====
 
 function M.draw()
     if subState == "closed" then
@@ -133,7 +128,7 @@ function M.draw()
     -- Background layer
     if tx["Background"] then tx["Background"]:Draw(0, 0) end
 
-    -- Light.png (behind Logo, perpetually rotating, centered on Logo center)
+    -- Light.png behind the Logo, rotating about its centre
     if tx["Light"] and tx["Logo"] then
         local cx = Open.logo.x + tx["Logo"].Width  / 2
         local cy = Open.logo.y + tx["Logo"].Height / 2
@@ -142,7 +137,7 @@ function M.draw()
         tx["Light"]:SetRotation(0)
     end
 
-    -- Logo (with occasional jiggle rotation)
+    -- Logo (jiggle rotation)
     if tx["Logo"] then
         tx["Logo"]:SetRotation(logoAngle)
         tx["Logo"]:Draw(Open.logo.x, Open.logo.y)
@@ -169,7 +164,7 @@ function M.draw()
         end
     end
 
-    -- Curtain_Open drawn on top as two sliding halves
+    -- CurtainOpen on top, two halves
     local co = tx["CurtainOpen"]
     if co ~= nil and co.Width > 0 then
         co:DrawRect(-curtainX,            0,         0, 0, CURTAIN_W, 1080)
@@ -177,7 +172,7 @@ function M.draw()
     end
 end
 
--- ── Update ────────────────────────────────────────────────────────────────────
+-- ==== Update ====
 -- Returns "start", "back", or nil.
 
 function M.update()

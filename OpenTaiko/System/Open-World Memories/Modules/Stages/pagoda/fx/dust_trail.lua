@@ -1,4 +1,4 @@
--- Dust of a dissolving sprite gathered into a swirl, then flown along a curve; 1920x1080 screen space.
+-- dissolve dust: swirl, then curve trail (1920x1080 screen space)
 
 local assets = require("encounter/assets")
 local Config = require("Core.Config")
@@ -15,42 +15,42 @@ local min, max, random = math.min, math.max, math.random
 local look = Layout.fx.dust_trail
 local motion = Animation.fx.dust_trail
 
--- what a point sheds into the swirl: `count_base` of each kind, plus one more at the chance `extra_chance`
+-- shed per point: count_base per kind, +1 at extra_chance
 local SPECK = Config.plain(motion.speck)
 SPECK.key = "fx_ash"
 local SMOKE = Config.plain(motion.smoke)
 SMOKE.key = "fx_dust"
 local KINDS = { SMOKE, SPECK }  -- drawing order
--- left where a point is shed
+-- puff at the shed point
 local PUFF = Config.plain(motion.puff)
 PUFF.key = "fx_dust"
 local DUST_R, DUST_G, DUST_B = look.dust_color[1], look.dust_color[2], look.dust_color[3]
 local JITTER = look.spawn_jitter_px
 
--- the swirl
-local FLAT = look.flat                          -- its height over its width
-local RADIUS = look.radius_px                   -- each piece settles on a radius in this range
-local PULL_SEC = motion.pull_s                  -- time constant of a piece's fall onto its radius
-local PULL_MAX = motion.pull_max_px_per_s       -- fastest fall, px/s
+-- swirl
+local FLAT = look.flat                          -- height / width
+local RADIUS = look.radius_px                   -- settle radius range
+local PULL_SEC = motion.pull_s                  -- fall time constant (s)
+local PULL_MAX = motion.pull_max_px_per_s       -- max fall, px/s
 local SPIN = motion.spin_rad_per_s              -- rad/s at SPIN_R
 local SPIN_R, SPIN_MAX = motion.spin_r_px, motion.spin_max_rad_per_s
 local SPIN_MIN_R = motion.spin_min_radius_px
 local SPIN_W_BASE, SPIN_W_JITTER = motion.spin_jitter.base, motion.spin_jitter.jitter
-local BOB, BOB_HZ, BOB_IN = motion.bob.px, motion.bob.hz, motion.bob.in_s   -- px, Hz, seconds to reach the full bob
+local BOB, BOB_HZ, BOB_IN = motion.bob.px, motion.bob.hz, motion.bob.in_s   -- px, Hz, ramp-in s
 
--- the trail
-local SPOUT = math.pi                           -- the swirl's left side
-local SPOUT_R = look.spout_r_px                 -- the curve starts this far left of the swirl's middle
-local RELEASE_SEC = motion.release_s            -- from the first piece leaving to the last
-local FLY_SEC = motion.fly_s                    -- each piece's run along the curve
-local ACCEL = motion.accel                      -- the run speeds up into the end (u = k ^ ACCEL)
-local JOIN = motion.join_share                  -- share of the run spent joining the curve from where it left
+-- trail
+local SPOUT = math.pi                           -- swirl left side (rad)
+local SPOUT_R = look.spout_r_px                 -- curve start, px left of swirl centre
+local RELEASE_SEC = motion.release_s            -- s, first to last piece release
+local FLY_SEC = motion.fly_s                    -- s per piece run
+local ACCEL = motion.accel                      -- u = k ^ ACCEL
+local JOIN = motion.join_share                  -- run share spent joining the curve
 local WAVE_AMP, WAVE_N, WAVE_HZ = motion.wave.amp_px, motion.wave.along, motion.wave.per_s
 local WAVE_ENV = motion.wave.envelope_power
-local SPREAD = look.spread_px                   -- half-width at the trail's start, px, tapering to 0
-local FADE_FROM = motion.fade_from_share        -- share of the run after which a piece fades into the end
-local SHRINK = motion.shrink_share              -- share of the size lost by the end of the run
-local GHOST_LAG = motion.ghost_lag_s            -- lag of a flying speck's ghost copy
+local SPREAD = look.spread_px                   -- px half-width at start, tapers to 0
+local FADE_FROM = motion.fade_from_share        -- run share where fade starts
+local SHRINK = motion.shrink_share              -- size share lost by run end
+local GHOST_LAG = motion.ghost_lag_s            -- s, speck ghost lag
 local GHOST_A, GHOST_S = look.ghost.opacity, look.ghost.scale
 
 local function rnd(r) return r[1] + random() * (r[2] - r[1]) end
@@ -69,8 +69,8 @@ function T.keys()
     return { SPECK.key, SMOKE.key }
 end
 
--- points: silhouette points in sprite px, top-down; centre = { x, y } of the swirl; path = the
--- curve's two inner control points and its end, { { x, y }, { x, y }, { x, y } }
+-- points: silhouette px, top-down; centre: swirl { x, y }
+-- path: two inner control points and the end, { { x, y }, { x, y }, { x, y } }
 function T.new(points, centre, path)
     local cx, cy = centre.x, centre.y
     local pts = points or {}
@@ -111,7 +111,7 @@ local function addPuff(self, x, y)
     }
 end
 
--- sheds the points eaten so far: eaten(x, y) -> bool and place(x, y) -> screen x, y take sprite px
+-- eaten(x, y) -> bool, place(x, y) -> screen x, y (sprite px)
 function T:shed(eaten, place)
     if self.left <= 0 or self.flying then return end
     for i, p in ipairs(self.pts) do
@@ -127,7 +127,7 @@ function T:shed(eaten, place)
     end
 end
 
--- the piece closest to the spout leaves first
+-- nearest the spout leaves first
 function T:fly()
     if self.flying then return end
     self.flying, self.ft = true, 0
@@ -140,7 +140,7 @@ function T:fly()
     for i, o in ipairs(order) do o.q.leaveAt = (n > 1) and (i - 1) / (n - 1) * RELEASE_SEC or 0 end
 end
 
--- the piece's point on the trail k (0..1) into its run, and how far along the curve that is
+-- trail point at run k (0..1), and curve distance
 local function runPoint(self, q, k)
     local u = k ^ ACCEL
     local px, py = self.px, self.py
@@ -164,7 +164,7 @@ local function swirl(self, q, dt)
     q.y = self.cy + q.r * FLAT * sin(q.th) + BOB * sin(TAU * q.hz * q.age + q.ph) * min(1, q.age / BOB_IN)
 end
 
--- true once the piece has run its course
+-- true when the run ends
 local function step(self, k, q, dt)
     q.age = q.age + dt
     q.rot = q.rot + q.spin * dt
@@ -211,7 +211,7 @@ function T:update(dt)
     end
 end
 
--- true once the trail has run and all the dust is gone
+-- true when trail ran and dust is gone
 function T:done()
     if not self.flying or #self.puffs > 0 then return false end
     for _, k in ipairs(KINDS) do
@@ -270,7 +270,7 @@ local function drawKind(self, k, ox, oy)
     tx:SetColor(1, 1, 1)
 end
 
--- ox, oy: the screen shake
+-- ox, oy: screen shake
 function T:draw(ox, oy)
     ox, oy = ox or 0, oy or 0
     drawPuffs(self, ox, oy)

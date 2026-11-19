@@ -1,2 +1,2 @@
--- moved to Global/Modules/Lib/Core/Color.lua
+-- alias of Global/Modules/Lib/Core/Color.lua
 return require("Core.Color")

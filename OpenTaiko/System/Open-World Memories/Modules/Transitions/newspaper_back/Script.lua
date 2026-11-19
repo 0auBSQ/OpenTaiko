@@ -1,30 +1,27 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- newspaper_back: out of the coin shop. Newspapers fly in from the right at different speeds and angles, turning a
--- little as they come, until they cover the screen and drift there while the next stage loads, then fly off to the
--- left. Every trip lays the pile out anew.
--- The shared string "newspaper_cover" holds how long (s) into the fade-in the papers hide the next stage (the coin
--- shop reads it when this is its way in).
+-- newspaper_back: coin shop -> next stage transition
+-- shared string "newspaper_cover": sec into the fade-in the papers hide the next stage (read by the coin shop)
 
 local TA = require("TransitionArt")
 
--- positions and sizes: Config/layout.json; timings and flights: Config/animation.json
+-- layout: Config/layout.json; timings and flights: Config/animation.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
 local ARRIVE, LEAVING, DRIFT = Animation.arrive, Animation.leave, Animation.drift
 local SHADOW = Layout.shadow
 
-local SCATTER_AT, SCATTER = Animation.scatter_at_s, Animation.scatter_s   -- the papers fly off to the left
-local REVEAL_AT = SCATTER_AT + Animation.reveal_after_s   -- the next stage starts to show between the leaving papers
+local SCATTER_AT, SCATTER = Animation.scatter_at_s, Animation.scatter_s   -- papers out
+local REVEAL_AT = SCATTER_AT + Animation.reveal_after_s   -- next stage starts to show
 
-FADE_OUT_SECONDS = Animation.fade_out_s  -- the papers fly in
+FADE_OUT_SECONDS = Animation.fade_out_s  -- papers in
 FADE_IN_SECONDS  = SCATTER_AT + SCATTER
 
 local SCREEN_W = Layout.screen_width
 local PAGES = 6                          -- Textures/Page1..6.png
 local OFF = Layout.offscreen
 
--- every trip moves each page a little, turns it to a random angle and picks its page picture
+-- page layout, re-rolled each trip
 local SHEETS = {}
 for i, R in ipairs(Layout.sheets.rest) do SHEETS[i] = { bx = R.bx, by = R.by, s = R.s } end
 
@@ -33,13 +30,12 @@ local snd_rush, snd_scatter = nil, nil
 
 local lastPhase = nil
 local played = {}
-local clock = 0                          -- seconds since the trip started, for the drift
+local clock = 0                          -- sec since the trip start, for the drift
 local wait = TA.new()
 
 local function clamp01(x) return x < 0 and 0 or (x > 1 and 1 or x) end
 
--- each page's place and flight for this trip: arriving in fractions of the fade-out, leaving in seconds from
--- SCATTER_AT (top first); a few land upside down
+-- arrival: fade-out fraction; leave: sec from SCATTER_AT, top first
 local function plan()
 	local r = math.random
 	local n = #SHEETS
@@ -65,7 +61,7 @@ local function plan()
 	end
 end
 
--- the textures live only during a trip (Lib/TransitionArt)
+-- textures live only during a trip (Lib/TransitionArt)
 local function loadTextures()
 	if tx_shadow ~= nil then return end
 	for i = 1, PAGES do tx_pages[i] = TEXTURE:CreateTexture("Textures/Page" .. i .. ".png") end
@@ -89,7 +85,7 @@ local function tick()
 	clock = clock + (d < 0 and 0 or (d > 0.1 and 0.1 or d))
 end
 
--- lift 0..1: how far the page is off the pile (bigger, its shadow further and lighter)
+-- lift 0..1: height off the pile
 local function drawSheet(tx, x, y, sx, sy, rot, lift)
 	if tx == nil or tx_shadow == nil then return end
 	local grow = 1 + SHADOW.lift_grow * lift
@@ -102,7 +98,7 @@ local function drawSheet(tx, x, y, sx, sy, rot, lift)
 	tx:DrawAtAnchor(x, y, "center")
 end
 
--- arrive: fade-out progress (1 = all landed); away: seconds since SCATTER_AT
+-- arrive: fade-out progress (1 = all landed); away: sec since SCATTER_AT
 local function drawPile(arrive, away)
 	for _, S in ipairs(SHEETS) do
 		local a = S.inDur > 0 and clamp01((arrive - S.inAt) / S.inDur) or 1

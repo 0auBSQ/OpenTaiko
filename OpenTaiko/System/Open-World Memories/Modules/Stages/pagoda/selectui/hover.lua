@@ -1,4 +1,4 @@
--- Selected floor's hover border and sheen.
+-- selected floor hover border and sheen
 
 local Easing  = require("Easing")
 local Config  = require("Core.Config")
@@ -13,7 +13,7 @@ local DIR = "Textures/selector/"
 local Look = Layout.selectui.hover
 local Move = Animation.selectui.hover
 
--- the border rect from the reference (the floor's slot top); its right edge is res.X minus the inset
+-- border rect from the reference (slot top); right edge = res.X - inset
 local RECT_DX0, RECT_DY0 = Look.rect_dx0, Look.rect_dy0
 local RECT_RIGHT_INSET   = Look.rect_right_inset
 local RECT_DY1           = Look.rect_dy1
@@ -51,7 +51,7 @@ local function rect(rx, ry)
            res.X - RECT_RIGHT_INSET,        math.floor(ry + RECT_DY1 + 0.5)
 end
 
--- nine-slice border round the rect (empty middle); the bar's outer edge lies on the rect's edge
+-- nine-slice border (empty middle), outer edge on the rect
 local function draw_border(x0, y0, x1, y1)
     if not _border.Ready then return end
     local x, y = x0 - PAD, y0 - PAD
@@ -93,7 +93,7 @@ local function draw_sheen(x0, y0, x1, y1, r, g, b)
     GRAPHICS:ClearClip()
 end
 
--- r, g, b: the floor's plate colour (white for roofs), tints the sheen
+-- r, g, b: floor plate colour (white for roofs), sheen tint
 function H.draw(level, r, g, b, rx, ry)
     if _border == nil then return end
     local x0, y0, x1, y1 = rect(rx, ry)

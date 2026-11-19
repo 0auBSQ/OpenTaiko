@@ -1,11 +1,11 @@
--- Level-10 cutscene lines; format: story/entrance.lua plus the extras in encounter/cutscenes/init.lua.
+-- level-10 cutscene lines; format: story/entrance.lua + encounter/cutscenes/init.lua
 
 local Config = require("Core.Config")
 local Animation = Config.load("Config/animation.json")
 
 local FailCover = Animation.story.cutscenes.level10.fail_cover
 
-local SNAKE = "blip_monster3"       -- voice blip for every form
+local SNAKE = "blip_monster3"       -- voice blip, all forms
 local UME = "blip"
 
 return {

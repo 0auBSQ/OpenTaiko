@@ -1,4 +1,4 @@
--- Ambience of the pagoda's ground floor (groundfloor.png, level 10).
+-- ambience: pagoda ground floor (groundfloor.png, level 10)
 
 local F   = require("towerfx/field")
 local art = require("towerfx/art")
@@ -12,7 +12,7 @@ local look = Layout.towerfx.base
 local motion = Animation.towerfx.base
 
 local TILE_W = look.tile_w_px
-local FACADE = look.facade                      -- x, y, w, h of the facade in groundfloor.png
+local FACADE = look.facade                      -- x, y, w, h in groundfloor.png
 local VINES  = look.vines                       -- vine area in groundfloor.png
 
 local DUST      = look.dust.count

@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global
--- SimpleUI/util.lua — tiny math/color/geometry helpers. Engine globals are touched only inside functions
--- (never at load) so the module imports cleanly even under a headless test harness.
+-- SimpleUI math, colour and geometry helpers
+-- engine globals only inside functions (loads headless)
 
 local Util = require("Core.Util")
 
@@ -18,7 +18,7 @@ function U.lerpColor(a, b, t)
     }
 end
 
--- multiply a color's brightness (keeps alpha); f>1 lightens via blend to white, f<1 darkens
+-- f < 1 darkens, f > 1 blends to white; keeps alpha
 function U.shade(c, f)
     if f <= 1 then
         return { c[1] * f, c[2] * f, c[3] * f, c[4] or 255 }
@@ -30,12 +30,12 @@ end
 
 function U.withAlpha(c, a) return { c[1], c[2], c[3], a } end
 
--- point inside a rounded rect (x,y,w,h, radius). Used for accurate button/panel hit-testing.
+-- point in rounded rect (x, y, w, h, radius)
 function U.pointInRoundRect(px, py, x, y, w, h, r)
     if px < x or px >= x + w or py < y or py >= y + h then return false end
     r = math.min(r or 0, w * 0.5, h * 0.5)
     if r <= 0 then return true end
-    -- inside the non-corner cross?
+    -- non-corner cross
     if px >= x + r and px < x + w - r then return true end
     if py >= y + r and py < y + h - r then return true end
     -- corner test
@@ -49,7 +49,7 @@ function U.pointInRect(px, py, x, y, w, h)
     return px >= x and px < x + w and py >= y and py < y + h
 end
 
--- packed key for caching COLOR objects
+-- COLOR cache key
 function U.packRGBA(r, g, b, a)
     return math.floor(r) * 0x1000000 + math.floor(g) * 0x10000 + math.floor(b) * 0x100 + math.floor(a or 255)
 end

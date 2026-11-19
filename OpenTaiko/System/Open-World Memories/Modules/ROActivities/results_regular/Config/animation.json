@@ -39,19 +39,12 @@
         "crown_at": [2000, 2160]
     },
     "clear": {
-        "_note": "the clear: the characters react, the flowers and bubbles pop in, a lone player's panel slides aside",
+        "_note": "the clear: the characters react, the bubbles pop in, a lone player's panel slides aside",
         "start": 10275,
         "gauge_ms": 66,
         "pop": 135,
         "ui_move": 500,
         "win_flag": 200
-    },
-    "flowers": {
-        "loop": 1500,
-        "at": [10, 30, 50, 100, 190],
-        "fade": 100,
-        "hold": 300,
-        "turns": [5, 3, -6, 4, -2]
     },
     "plate_shine": {
         "loop": 1000,

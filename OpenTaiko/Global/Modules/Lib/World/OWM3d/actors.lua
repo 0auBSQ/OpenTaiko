@@ -1,7 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- OWM3d/actors.lua — billboard sprite layers (player / NPCs / props / talk bubbles), draped cast
--- shadows, floating ground markers, and animated water surfaces. Ported from isoengine's sprite +
--- shadow + marker + water builders onto the World's layer objects.
+-- OWM3d/actors.lua: sprite and quad builders per layer
 
 local sin, cos, pi = math.sin, math.cos, math.pi
 
@@ -14,13 +12,13 @@ function Actors.new(world)
     return self
 end
 
--- ── static prop sprites (rebuild on map change) ───────────────────────────────────────────────────
+-- ==== Prop sprites (rebuild on map change) ====
 function Actors:propBegin() self.world.scene:ObjBegin(self.world.propObj) end
 function Actors:propSprite(wx, wy, wz, w, h, spriteId)
     self.world.scene:ObjAddSprite(self.world.propObj, wx, wy or 0, wz, w, h, spriteId, 1, 1)
 end
 
--- ── dynamic actors (player + remotes; rebuilt every frame) ────────────────────────────────────────
+-- ==== Actors (rebuilt every frame) ====
 function Actors:actorsBegin() self.world.scene:ObjBegin(self.world.actorObj) end
 function Actors:actorSprite(wx, wy, wz, w, h, spriteId)
     self.world.scene:ObjAddSprite(self.world.actorObj, wx, wy or 0, wz, w, h, spriteId, 1, 1)
@@ -32,13 +30,14 @@ function Actors:npcSprite(wx, wy, wz, w, h, spriteId)
 end
 function Actors:npcTint(r, g, b) self.world.scene:ObjSetTint(self.world.npcObj, r, g, b) end
 
--- ── talk bubbles ──────────────────────────────────────────────────────────────────────────────────
+-- ==== Talk bubbles ====
 function Actors:bubblesBegin() self.world.scene:ObjBegin(self.world.bubbleObj) end
 function Actors:bubble(wx, wy, wz, w, h, spriteId)
     self.world.scene:ObjAddSprite(self.world.bubbleObj, wx, wy, wz, w, h, spriteId, 1, 1)
 end
 
--- ── draped cast shadows (silhouette sprite projected along the light onto the ground) ─────────────
+-- ==== Cast shadows ====
+-- sprite quad projected along the light onto the ground
 function Actors:shadowsBegin() self.world.scene:ObjBegin(self.world.shadowObj) end
 function Actors:shadowSprite(wx, wz, w, h, spriteId, groundFn)
     local world = self.world
@@ -56,7 +55,7 @@ function Actors:shadowSprite(wx, wz, w, h, spriteId, groundFn)
         hrx, gy(hrx, hrz), hrz,  hlx, gy(hlx, hlz), hlz, spriteId, 0)
 end
 
--- soft ellipse shadow (props without a directional silhouette)
+-- ellipse shadow (props without a silhouette)
 function Actors:shadow(wx, wz, rad, height, groundFn)
     local world = self.world
     rad = rad or 0.34; height = height or 1.4
@@ -82,7 +81,7 @@ function Actors:shadow(wx, wz, rad, height, groundFn)
     end
 end
 
--- ── ground ring markers (missions / portals) ──────────────────────────────────────────────────────
+-- ==== Ring markers ====
 function Actors:markersBegin() self.world.scene:ObjBegin(self.world.markerObj) end
 function Actors:markerRing(wx, wy, wz, rIn, rOut)
     local world = self.world
@@ -99,7 +98,7 @@ function Actors:markerRing(wx, wy, wz, rIn, rOut)
     end
 end
 
--- ── animated water surfaces (rebuilt per frame; water.lua adds reflections in the visuals phase) ──
+-- ==== Water surfaces (rebuilt per frame) ====
 function Actors:waterBegin() self.world.scene:ObjBegin(self.world.waterObj) end
 function Actors:waterTile(x0, z0, x1, z1, baseY, t, amp, texId)
     local world = self.world

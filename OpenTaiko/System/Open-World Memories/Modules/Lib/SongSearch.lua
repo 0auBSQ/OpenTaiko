@@ -1,24 +1,14 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- SongSearch.lua — the song search shared by the sort/search dialog (its live count) and song_select_core
--- (applying a confirmed search): the field options, the match predicate, the folder walk, and the
--- hand-over of the parameters through the player's save file.
---
--- Levels are whole numbers: a chart's "+" is ignored, so "Level to 10" includes the 10+ charts.
---
---   S.DIFF_OPTIONS / S.LEVEL_MAX            the difficulty chooser entries; the level sliders' top value
---   S.buildPredicate(params) -> fn(node)    params: diff, levelFrom, levelTo, levelToOpenEnd, title, subtitle, charter
---   S.collectSongs(folder, predicate, out)  every matching song under the folder, depth first
---   S.count(folder, params)                 how many songs match
---   S.write(save, params) / S.read(save)    the parameters through the save file (ss_* counters + shared strings)
+-- song search shared by the sort/search dialog and song_select_core
 
 local SongTitle = require("Songs.Title")
 
 local M = {}
 
--- the level sliders: from 0..LEVEL_MAX, to 0..LEVEL_MAX-1 then an open end ("13~") at LEVEL_MAX
+-- level sliders: from 0..LEVEL_MAX, to 0..LEVEL_MAX-1, then open end ("13~") at LEVEL_MAX
 M.LEVEL_MAX = 13
 
--- value -1 = any; 34 = Oni and Edit together; the labels are locale keys the dialog resolves
+-- value -1 = any; 34 = Oni + Edit; labels are locale keys
 M.DIFF_OPTIONS = {
     { key = "SONGSELECT_SEARCH_ANY",   value = -1 },
     { key = "SONGSELECT_DIFF_EASY",    value = 0 },
@@ -34,6 +24,8 @@ local function acceptsDifficulty(diff, i)
     return i == diff
 end
 
+-- params: diff, levelFrom, levelTo, levelToOpenEnd, title, subtitle, charter -> fn(node)
+-- whole levels: a chart's "+" is ignored
 function M.buildPredicate(params)
     local diff = params.diff or -1
     local titlePat    = (params.title    or ""):lower()
@@ -44,7 +36,7 @@ function M.buildPredicate(params)
 
     return function(node)
         if not node.IsSong or node.IsLocked then return false end
-        -- vault songs only once the vault is open and the song itself unlocked
+        -- vault songs: vault open and song unlocked
         if node.Genre == "Secret Vault" then
             local sf = GetSaveFile(0)
             if not sf:GetGlobalTrigger(".vault_opened") then return false end
@@ -80,6 +72,7 @@ function M.buildPredicate(params)
     end
 end
 
+-- matching songs under the folder, depth first
 function M.collectSongs(folderNode, predicate, results)
     for i = 0, folderNode.ChildrenCount - 1 do
         local node = folderNode:Child(i)
@@ -98,8 +91,8 @@ function M.count(folderNode, params)
     return #results
 end
 
--- the parameters travel through the player's save file: the dialog writes them and raises ss_search_ready,
--- song_select_core reads them back and clears the flag
+-- params pass through the save file (ss_* counters + shared strings); the dialog raises ss_search_ready
+-- song_select_core reads them and clears the flag
 function M.write(sav, params)
     SHARED:SetSharedString("ss_title",    params.title    or "")
     SHARED:SetSharedString("ss_subtitle", params.subtitle or "")

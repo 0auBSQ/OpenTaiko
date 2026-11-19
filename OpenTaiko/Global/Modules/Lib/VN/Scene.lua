@@ -1,76 +1,6 @@
 ---@diagnostic disable: undefined-global, need-check-nil
--- VN.Scene — a visual-novel scene player: background layers that fade in once loaded, a sprite cast
--- (sides, fade and slide in/out, expression faces drawn over the body, speaker dimming, a counter-bounce
--- on each face change), screen fades and shakes, and the VN.Dialogue box with per-speaker blips. The
--- script runs on VN.Runner. Every asset, sound, music track and saved state comes from the caller: the
--- scene loads nothing of its own, and a texture it opens by default is a path the caller gave.
---   local Scene = require("VN.Scene")
---   local vn = Scene.new{ box = { gfont = font, gfontName = nameFont }, cast = { ... }, ... }
---   vn:play(scene, ctx, function(result) ... end)       then vn:update(dt) and vn:draw() every frame
---
--- A scene is { bg = key, music = key, lines = { ... } } (music: played from the start, else the background's)
--- with VN.Runner's line schema and these stage directions built in
---   { enter = who, expr =, side = }   a cast member comes on (held until it has faded in); one already
---                                     on screen only changes its face
---   { leave = who }                   it goes (held until it has gone)
---   { expr = name }                   the face of `who`, or of the focus member (see `focus`)
---   { bg = key }                      the background shown once its layers have loaded
---   { fade = "out" | "in", keepSprite = true }   a fade over the scene (keepSprite: the cast stays lit)
---   { shake = true | amp | { amp, dur } }        a screen shake;  { sfx = name }  a sound
---   { flag = name, value = v }        ctx.flags[name] = v (true when absent)
---   { outcome = value }               the scene fades out and reports value
--- A line of a cast member's that has not entered yet fades it in before its text types. A direction of
--- the caller's that returns "hold" holds the scene until scene:continue(), or until the function it gave
--- scene:waitFor(fn) returns true (fn(dt) is called every frame).
--- onDone(result) gets the outcome (opts.outcome, "done" by default, when the lines just run out).
---
--- Scene.new(opts), opts = {
---   box = { ... },            VN.Dialogue.new options; the scene fills onBlip, onShake, onExpr and onSfx
---                             when they are not set (or dialogue = a VN.Dialogue of the caller's)
---   cast = { [who] = {
---       body = tex or fn(expr) -> tex,   the sprite (the caller owns it); a function gets the expression,
---                                    for casts drawn as one image per expression
---       face = fn(expr) -> tex,      an expression drawn over the body at (faceX, faceY), in body pixels
---       faceX, faceY,                (no face: the body alone)
---       name,                        shown for its lines that carry no name
---       expr,                        the expression it enters with
---       side = "left" | "center" | "right", x,     its centre at rest (x wins over the side)
---       y, anchor = "top" | "bottom",            its top (or bottom) edge at rest (0 / the screen bottom)
---       scale = 1 (or height = px, the scale that fits the body to it),
---       fade = 0.35 (seconds), slide = 0 (pixels it slides in from its side),
---       bounce = 0.36 (seconds, 0 = none), squash = 0.04 (share of its height) } },
---   sides = { left =, center =, right = },     default a quarter, half and three quarters of the width
---   focus = who,              whose face an expr without a cast speaker changes (default: the only cast
---                             member, then whoever entered or spoke last)
---   dim = { r, g, b },        the colour of cast members that are not speaking (none: never dimmed)
---   backgrounds = {
---       defs = { [key] = def }, path = "Textures/bg/%s.png",   a key without a def loads that file
---       resolve = fn(key) -> def,                               (instead of defs + path)
---       open = fn(layer) -> tex, own,     opens a layer (default TEXTURE:CreateTexture(layer.path)); own =
---                                         false: borrowed, never disposed, opened again once it unloads
---       prepare(def), show(def), update(dt), drawBehind(ox, oy), drawOver(ox, oy), close(),
---       wait = 2.0 },                     seconds a background may take to load before it shows anyway
---     A def is one layer or { layers = { ... } }, bottom to top; a layer is { path, x, y, scale, scroll }
---     (no x/y: stretched over the screen; scroll: px per second, repeated across the width), and a def's
---     `music` is the key given to music.play while it shows.
---   music = { play(key), fadeOut(sec), playing(), update(dt), stop() },   all optional
---   sound = fn(name),         plays a sound by name (blips, sfx lines and tags, the click)
---   blip = fn(node) -> name,  the typing blip of a box node (node.speaker, node.voice), nil = silent
---   clickSound = name,        the advance click, when box.sfx is not set
---   cover = tex or fn() -> tex,   the fade's texture, stretched over the screen (or drawCover = fn(alpha))
---   drawBox = fn(dlg, scene), draws the box instead of dlg:draw() (a stage's own chrome over box.drawBox = false)
---   fadeSec = 0.45,
---   tr, speakerName, playerTag, playerName, random, onLine,     passed to VN.Runner
---   directions = { [key] = fn(line, scene) -> verdict },   extra ones, or replacing a built-in
---   order = { ... },          VN.Runner's direction order (default VN.Runner.ORDER)
---   replay = { [key] = fn(line, scene) },   how a resumed bookmark re-applies the caller's directions
---   outcome = "done",
---   onBookmark = fn(mark),    each line that starts: a VN.Runner bookmark to save, for play(..., resume)
---   hooks = { prose = fn(line, scene), start = fn(line, scene), expr = fn(who, old, new, scene),
---             choose = fn(line, value, scene), update = fn(dt, scene), draw = fn(scene), dispose = fn() },
---     prose: a prose line is reached (before its face changes); start: it starts typing; expr: a face
---     changed; choose: a choice was taken (a resumed one too); draw: over everything, the box included.
--- }
+-- VN.Scene: visual-novel scene player on VN.Runner
+-- assets, sounds and saved state all come from the caller
 
 local Dialogue = require("VN.Dialogue")
 local Runner   = require("VN.Runner")
@@ -83,7 +13,34 @@ local DEF_BOUNCE, DEF_SQUASH = 0.36, 0.04
 
 local function call(fn, ...) if fn ~= nil then return fn(...) end end
 
--- ── creation ─────────────────────────────────────────────────────────────────
+-- ==== creation ====
+-- opts:
+--   box = VN.Dialogue.new options (onBlip, onShake, onExpr, onSfx filled when unset), or dialogue = a VN.Dialogue
+--   cast = { [who] = {
+--     body = tex or fn(expr) -> tex (caller owns it), face = fn(expr) -> tex at (faceX, faceY) in body px,
+--     name (lines without one), expr (on enter),
+--     side = "left" | "center" | "right", x (wins over side), y, anchor = "top" | "bottom",
+--     scale = 1 or height = px, fade = 0.35 s, slide = 0 px,
+--     bounce = 0.36 s (0 = none), squash = 0.04 (share of height) } }
+--   sides = { left, center, right }, default 1/4, 1/2, 3/4 of the width
+--   focus = who: member an expr without a cast speaker changes (default: the only one, then the last one)
+--   dim = { r, g, b }: colour of non-speaking members (nil: no dimming)
+--   backgrounds = { defs = { [key] = def }, path = "Textures/bg/%s.png" (key without a def), or resolve = fn(key) -> def,
+--     open = fn(layer) -> tex, own (default TEXTURE:CreateTexture; own = false: borrowed, reopened once unloaded),
+--     prepare(def), show(def), update(dt), drawBehind(ox, oy), drawOver(ox, oy), close(), wait = 2.0 s max load }
+--   def = a layer or { layers = { ... } }, bottom to top; layer = { path, x, y, scale, scroll }
+--     no x/y: stretched over the screen; scroll: px/s, repeated across; def.music: key for music.play
+--   music = { play(key), fadeOut(sec), playing(), update(dt), stop() }, all optional
+--   sound = fn(name); blip = fn(node) -> name (nil: silent); clickSound = name (when box.sfx is unset)
+--   cover = tex or fn() -> tex (fade texture), or drawCover = fn(alpha)
+--   drawBox = fn(dlg, scene) instead of dlg:draw(); fadeSec = 0.45
+--   tr, speakerName, playerTag, playerName, random, onLine: passed to VN.Runner
+--   directions = { [key] = fn(line, scene) -> verdict }, extra or replacing built-ins; order: VN.Runner order
+--   replay = { [key] = fn(line, scene) }: re-applies the caller's directions on resume
+--   outcome = "done"; onBookmark = fn(mark) per started line, for play(..., resume)
+--   hooks = { prose(line, scene), start(line, scene), expr(who, old, new, scene),
+--     choose(line, value, scene), update(dt, scene), draw(scene), dispose() }
+--   prose: before the face changes; start: typing starts; draw: over everything
 function Scene.new(opts)
     opts = opts or {}
     local self = setmetatable({}, Scene)
@@ -139,12 +96,12 @@ end
 
 function Scene:active() return self.phase ~= "idle" end
 
--- the background on screen: { key, def, layers }, or nil
+-- shown background { key, def, layers }, or nil
 function Scene:shownBackground() return self.bgs[self.bgShown] end
 
 function Scene:bookmark() return self.runner ~= nil and self.runner:bookmark() or nil end
 
--- ── backgrounds ──────────────────────────────────────────────────────────────
+-- ==== backgrounds ====
 function Scene:resolveBackground(key)
     if key == nil then return nil end
     local b = self.bgOpts
@@ -184,7 +141,7 @@ function Scene:_releaseBackgrounds()
     self.bgs = {}
 end
 
--- true once every layer can be drawn; a layer whose file did not load counts as settled
+-- true once every layer can be drawn; a layer that failed to load counts as settled
 function Scene:_bgSettled(key)
     local bg = self.bgs[key]
     if bg == nil then return true end
@@ -194,13 +151,13 @@ function Scene:_bgSettled(key)
     return true
 end
 
--- requests a background: the drawn one stays up until this one has loaded
+-- requests a background; the drawn one stays until it has loaded
 function Scene:setBackground(key)
     self:_openBackground(key)
     self.bgKey, self.bgT = key, 0
 end
 
--- ── the cast ─────────────────────────────────────────────────────────────────
+-- ==== cast ====
 local function tex(v, ...) if type(v) == "function" then return v(...) end return v end
 
 function Scene:_face(who, expr)
@@ -209,14 +166,14 @@ function Scene:_face(who, expr)
     return m.face(expr)
 end
 
--- whose face a line's expr changes: its speaker when that is a cast member, else the focus
+-- member a line's expr changes: its speaker if a cast member, else the focus
 function Scene:memberOf(line)
     local w = line.who
     if w ~= nil and self.cast[w] ~= nil then return w end
     return self.focus
 end
 
--- whose face an {expr:} tag changes: the line's speaker when it is a cast member, else the focus
+-- member an {expr:} tag changes: the line's speaker if a cast member, else the focus
 function Scene:_tagMember()
     local node = self.dlg ~= nil and self.dlg.node or nil
     local w = node ~= nil and node.speaker or nil
@@ -233,8 +190,7 @@ function Scene:_enter(who, expr, side)
     return st
 end
 
--- A new face starts the counter-bounce; one still in its squash or stretch carries on, as restarting
--- it would snap the sprite back to rest.
+-- a new face starts the bounce; one before 2/3 of its run carries on (no snap to rest)
 function Scene:setExpr(who, expr)
     local st = who ~= nil and self.sprites[who] or nil
     if st == nil or expr == nil or expr == st.expr then return end
@@ -257,8 +213,7 @@ function Scene:_updateSprites(dt)
     for _, who in ipairs(self.spriteList) do
         local st, m = self.sprites[who], self.cast[who]
         if st ~= nil then
-            -- fading in waits until the body and the face are loaded: easing an invisible sprite would
-            -- make it pop in at full opacity once its art arrives
+            -- fade-in waits for body and face to load (no pop-in at full opacity)
             local body = tex(m.body, st.expr)
             local ready = body ~= nil and body.Ready
             if m.face ~= nil then
@@ -279,7 +234,7 @@ function Scene:_updateSprites(dt)
     end
 end
 
--- starts streaming every face the lines use, their branches and picks included
+-- starts streaming every face the lines use, branches and picks included
 function Scene:_streamFaces(lines)
     for _, l in ipairs(lines or {}) do
         local who = l.who
@@ -298,7 +253,7 @@ function Scene:_streamFaces(lines)
     end
 end
 
--- ── line walking ─────────────────────────────────────────────────────────────
+-- ==== line walking ====
 function Scene:_startLine(line)
     call(self.hooks.start, line, self)
     local node = self.runner:present(self.dlg, line)
@@ -309,8 +264,7 @@ function Scene:_startLine(line)
     if self.opts.onBookmark ~= nil then self.opts.onBookmark(self.runner:bookmark()) end
 end
 
--- a sprite enters or leaves: the line in the box stays as read (no caret, no choices) until the next
--- line replaces it
+-- sprite enter/leave: the box line stays as read (no caret, no choices) until the next one
 function Scene:_spritePhase()
     self.phase = "sprite"
     local node = self.dlg.node
@@ -326,7 +280,7 @@ function Scene:finish(outcome)
     call(self.music.fadeOut, self.fadeSec)
 end
 
--- nothing shows between the current line and the scene's end
+-- true when nothing shows between the current line and the end
 function Scene:_endsAfter()
     return self.runner:ahead(function(l)
         if l.outcome ~= nil then return true end
@@ -349,9 +303,9 @@ end
 
 function BUILTIN.fade(line, s)
     s.fadeTarget = (line.fade == "out") and 1 or 0
-    -- a fade covers the whole scene, the cast included, unless a line opts out
+    -- a fade covers the cast too unless keepSprite
     s.fadeCover = (line.keepSprite ~= true)
-    -- the scene's last fade takes the music with it
+    -- the last fade takes the music with it
     if line.fade == "out" and s:_endsAfter() then call(s.music.fadeOut, s.fadeSec) end
     s.shown = false
     s.phase = "fade"
@@ -374,11 +328,11 @@ function BUILTIN.enter(line, s)
     if who == nil then return nil end
     local st = s.sprites[who]
     if st ~= nil and st.target > 0 then
-        -- already on screen: a new face is a counter-bounce, not a fade out and back in
+        -- already on screen: face change, no fade
         s:setExpr(who, line.expr)
         return nil
     end
-    -- held until it has faded in, so the next line never types over a sprite still invisible
+    -- held until faded in, so the next line never types over an invisible sprite
     s:_enter(who, line.expr, line.side)
     s:_spritePhase()
     return "hold"
@@ -416,7 +370,7 @@ function BUILTIN.text(line, s)
     s:setExpr(s:memberOf(line), line.expr)
     local who = line.who
     if who ~= nil and s.cast[who] ~= nil and s.sprites[who] == nil then
-        -- a speaker that has not entered yet fades in fully first, then its line types
+        -- a speaker not yet on screen fades in first, then its line types
         s:_enter(who, line.expr)
         s.pending = line
         s:_spritePhase()
@@ -431,7 +385,7 @@ function BUILTIN.expr(line, s)
     return nil
 end
 
--- how a resumed bookmark re-applies the built-ins, silently
+-- built-in replay on resume (silent)
 local REPLAY = {}
 function REPLAY.bg(line, s) s:setBackground(line.bg) end
 function REPLAY.enter(line, s)
@@ -444,7 +398,7 @@ function REPLAY.leave(line, s)
     local who = castKey(s, line.leave, line) or s.focus
     if who ~= nil and s.sprites[who] ~= nil then s.sprites[who].target, s.sprites[who].a = 0, 0 end
 end
--- a cast member's line: it came on with it if it had not entered yet
+-- a cast member's line: it enters with it if not on screen yet
 function REPLAY.text(line, s)
     local who = line.who
     if who ~= nil and s.cast[who] ~= nil then
@@ -476,7 +430,7 @@ function Scene:_directions()
     return dirs
 end
 
--- for a direction of the caller's that held: the scene goes on once fn(dt) returns true
+-- for a held caller direction: the scene goes on once fn(dt) returns true
 function Scene:waitFor(fn) self.waitFn = fn end
 
 -- a held scene goes on to its next line
@@ -504,9 +458,21 @@ local function defaultSpeakerName(cast)
     end
 end
 
--- ── public: run a scene ──────────────────────────────────────────────────────
--- ctx is read by the `when` guards and carries the choices and the outcome; resume = a bookmark
--- (scene:bookmark() or onBookmark's) to continue from
+-- ==== play ====
+-- call order: play(scene, ctx, onDone, resume), then update(dt) and draw() every frame
+-- scene = { bg = key, music = key (else the background's), lines = { ... } }, VN.Runner lines plus:
+--   { enter = who, expr =, side = }   held until faded in; already on screen: face change only
+--   { leave = who }                   held until gone
+--   { expr = name }                   face of `who`, else the focus member
+--   { bg = key }                      shown once its layers have loaded
+--   { fade = "out" | "in", keepSprite = true }   keepSprite: the cast stays lit
+--   { shake = true | amp | { amp, dur } }, { sfx = name }
+--   { flag = name, value = v }        ctx.flags[name] = v (true when absent)
+--   { outcome = value }               fade out and report value
+-- a line of a cast member not yet on screen fades it in first
+-- a caller direction returning "hold" waits for scene:continue() or scene:waitFor(fn)
+-- ctx: read by `when` guards, carries choices and outcome; resume: a bookmark to continue from
+-- onDone(result): the outcome (opts.outcome, default "done", when the lines run out)
 function Scene:play(scene, ctx, onDone, resume)
     local o = self.opts
     self.scene, self.ctx, self.onDone = scene, ctx or {}, onDone
@@ -522,7 +488,7 @@ function Scene:play(scene, ctx, onDone, resume)
     self.pending, self.shown, self.speaker, self.waitFn = nil, false, nil, nil
     self.sprites, self.spriteList = {}, {}
     self.focus = self.focus0
-    -- every face of the scene streams in now, so expression swaps never wait (or load in a draw)
+    -- stream every face now, so expression swaps never wait
     self:_streamFaces(self.runner.lines)
     call(self.bgOpts.close)
     self:_releaseBackgrounds()
@@ -530,7 +496,7 @@ function Scene:play(scene, ctx, onDone, resume)
     self.bgKey, self.bgShown, self.bgT = scene.bg, nil, 0
     local def = self.bgs[scene.bg] and self.bgs[scene.bg].def or nil
     call(self.music.play, scene.music or (def and def.music))     -- fades in with the scene
-    self.fade, self.fadeTarget, self.fadeCover = 1, 0, true   -- scenes always fade in from black
+    self.fade, self.fadeTarget, self.fadeCover = 1, 0, true   -- scenes always fade in
     self.phase = "fadein"
     if resume ~= nil then
         self.runner:resume(resume, self:_replay())
@@ -573,7 +539,7 @@ function Scene:update(dt)
         if sh.t >= sh.dur then sh.dur = 0 end
     end
 
-    -- a requested background replaces the drawn one once its layers have loaded
+    -- a requested background replaces the drawn one once loaded
     if self.bgShown ~= self.bgKey then
         self.bgT = self.bgT + dt
         if self:_bgSettled(self.bgKey) or self.bgT >= (self.bgOpts.wait or DEF_BG_WAIT) then
@@ -588,7 +554,7 @@ function Scene:update(dt)
     local bg = self.bgs[self.bgShown]
     if bg ~= nil then
         for i, l in ipairs(bg.layers) do
-            -- a borrowed texture its owner has released since is replaced by one of the scene's own
+            -- a borrowed texture released by its owner is replaced by a scene-owned one
             if not l.own and (l.tex == nil or not l.tex.Loaded) then bg.layers[i] = self:_openLayer(l.def) end
         end
         for _, l in ipairs(bg.layers) do
@@ -599,13 +565,13 @@ function Scene:update(dt)
     self:_updateSprites(dt)
 
     if self.phase == "fadein" then
-        -- the scene fades in once its background is up
+        -- fades in once the background is up
         if self.bgShown == self.bgKey then self.fade = math.max(0, self.fade - dt / self.fadeSec) end
         if self.fade <= 0 then self:_step() end
         return "running"
     end
 
-    -- waiting on a sprite enter / leave to finish; a pending line then starts typing
+    -- waits for sprite enter/leave; then a pending line starts typing
     if self.phase == "sprite" then
         if self:_spritesSettled() then
             if self.pending ~= nil then
@@ -620,7 +586,7 @@ function Scene:update(dt)
     end
 
     if self.phase == "fade" then
-        -- a fade-in waits for a requested background, like the opening one
+        -- a fade-in waits for a requested background
         if self.fade > self.fadeTarget and self.bgShown ~= self.bgKey then return "running" end
         local d = dt / self.fadeSec
         if self.fade < self.fadeTarget then self.fade = math.min(self.fadeTarget, self.fade + d)
@@ -658,7 +624,7 @@ function Scene:update(dt)
     return "running"
 end
 
--- ── draw ─────────────────────────────────────────────────────────────────────
+-- ==== draw ====
 function Scene:_drawFade(res)
     if self.fade <= 0 then return end
     if self.opts.drawCover ~= nil then self.opts.drawCover(self.fade) return end
@@ -670,7 +636,7 @@ function Scene:_drawFade(res)
     b:SetOpacity(1) ; b:SetScale(1, 1)
 end
 
--- a layer without x/y is stretched over the screen; a placed layer with a scroll repeats across it
+-- layer without x/y: stretched over the screen; with scroll: repeated across
 local function drawLayer(l, res, ox, oy)
     local tx, d = l.tex, l.def
     if tx == nil or not tx.Ready then return end
@@ -707,8 +673,7 @@ function Scene:_drawSprite(who, res, ox, oy)
     if st == nil or st.a <= 0 then return end
     local body = tex(m.body, st.expr)
     if body == nil or not body.Ready then return end
-    -- the body is never drawn without a face over it: while the current expression streams in, the
-    -- last drawn face stays on for the frame or two it takes
+    -- body never drawn without a face; while the new face streams in, the last one stays
     local f = nil
     if m.face ~= nil then
         f = self:_face(who, st.expr)
@@ -716,7 +681,7 @@ function Scene:_drawSprite(who, res, ox, oy)
         if f == nil or not f.Ready then return end
         st.lastFace = f
     end
-    -- the counter-bounce: a squash, a smaller stretch past rest, then nothing by its end
+    -- bounce: k = squash * sin(3*pi*u) * (1-u)^2, u = t / bounce
     local k = 0
     if st.bounce ~= nil then
         local u = st.bounce / (m.bounce or DEF_BOUNCE)
@@ -730,8 +695,7 @@ function Scene:_drawSprite(who, res, ox, oy)
         local dir = (st.side == "left") and -1 or 1
         cx = cx + dir * (1 - st.a) * slide
     end
-    -- at rest anchored by its top (or bottom) centre, squashed about its bottom centre; the face rides
-    -- at the same scale so it stays in place
+    -- anchored by top (or bottom) centre, squashed about the bottom centre; the face uses the same scale
     local x0 = cx - body.Width * sx * 0.5 + ox
     local y0
     if m.anchor == "bottom" then
@@ -761,7 +725,7 @@ function Scene:draw()
     if self.phase == "idle" then return end
     local res = THEME:GetResolution()
 
-    -- screen shake: the whole scene is offset while one runs
+    -- screen shake offsets the whole scene
     local ox, oy = 0, 0
     local sh = self.shakeState
     if sh.dur > 0 then
@@ -777,8 +741,8 @@ function Scene:draw()
     end
     call(self.bgOpts.drawOver, ox, oy)
 
-    if not self.fadeCover then self:_drawFade(res) end   -- a backdrop-only fade, the cast stays lit
-    -- the left side first, so the right side and the centre overlap it
+    if not self.fadeCover then self:_drawFade(res) end   -- backdrop-only fade (keepSprite)
+    -- left side first; right and centre overlap it
     for _, who in ipairs(self.spriteList) do
         local st = self.sprites[who]
         if st ~= nil and st.side == "left" then self:_drawSprite(who, res, ox, oy) end

@@ -1,6 +1,4 @@
--- regular_song_select
--- Thin wrapper around the song_select_core activity.
--- Behaviour is identical to the legacy song_select stage.
+-- regular_song_select: wrapper around song_select_core
 
 local act = nil
 
@@ -9,7 +7,7 @@ end
 
 function activate()
 	if act == nil then act = ACTIVITY:GetActivity("song_select_core") end
-	act:Activate()  -- all defaults: allow player count, no lock, no AI slot
+	act:Activate()  -- defaults: allow player count, no lock, no AI slot
 end
 
 function deactivate()

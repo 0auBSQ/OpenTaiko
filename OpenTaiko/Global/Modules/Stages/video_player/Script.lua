@@ -1,10 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
--- video_player (debug stage)
--- ------------------------------------------------------------------------------------------------------
--- The first song cutscene of the library in the video_player ROActivity, to try the audio-track handling:
--- restart, 10 s back, play/pause, 10 s ahead, stop, a timeline that can be clicked and dragged, a speed
--- dropdown and a volume slider. Esc closes the player, which brings My Room back. With no cutscene in the
--- library, My Room comes back at once.
+-- video_player debug stage: first song cutscene in the video_player ROActivity
 
 -- drawn in 1920x1080: a skin of another resolution rescales it
 STAGES:SetResolution(1920, 1080)
@@ -75,7 +70,7 @@ end
 function update(ts)
     if player == nil then return Exit("stage", "my_room") end
     if not started then
-        -- the song list exists once the enumeration is done
+        -- song list needs the enumeration done
         if IsSongsEnumDone ~= nil and not IsSongsEnumDone() then
             if NavInput.cancel() then return Exit("stage", "my_room") end
             return

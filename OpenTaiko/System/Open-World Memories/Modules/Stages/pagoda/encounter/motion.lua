@@ -1,19 +1,4 @@
 -- Idle animations for the encounter actors, one clock per instance.
--- step() returns the pose for this frame:
---   dx, dy    offset from the actor's foot point (px, y down)
---   sx, sy    scale, always positive
---   rot       degrees, counter-clockwise like SetRotation
---   pivot     "foot" or "center" (encounter/sprite.lua)
---   mirrored  true while the actor faces right (the art faces left)
---   jump      true while a hop has it in the air (wander)
---   lift      height of the feet above the ground (px), for the contact shadow
---
--- Kinds and their params:
---   star     (none)
---   wander   { range }
---   counter  { P = period, A = amplitude, phase }
---   float    { hover, tilt, mul }
---   erratic  { float = true: on top of the float idle }
 
 local Easing = require("Easing")
 local Config = require("Core.Config")
@@ -307,7 +292,13 @@ local function erratic(m, pose)
     pose.pivot = "center"
 end
 
--- public
+-- ==== Public ====
+-- kinds and params:
+--   star     (none)
+--   wander   { range }
+--   counter  { P = period, A = amplitude, phase }
+--   float    { hover, tilt, mul }
+--   erratic  { float = true: on top of the float idle }
 function M.new(kind, params, seed)
     local m = {
         kind = kind, params = params or {}, seed = seed or 0, n = 0, t = 0,
@@ -319,6 +310,14 @@ function M.new(kind, params, seed)
     return m
 end
 
+-- returns the pose for this frame:
+--   dx, dy    offset from the actor's foot point (px, y down)
+--   sx, sy    scale, always positive
+--   rot       degrees, counter-clockwise like SetRotation
+--   pivot     "foot" or "center" (encounter/sprite.lua)
+--   mirrored  true while the actor faces right (the art faces left)
+--   jump      true while a hop has it in the air (wander)
+--   lift      height of the feet above the ground (px), for the contact shadow
 function M.step(m, dt)
     dt = max(0, dt or 0)
     m.t = m.t + dt

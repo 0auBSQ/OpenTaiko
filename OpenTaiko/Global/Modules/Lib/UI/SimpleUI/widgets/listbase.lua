@@ -1,20 +1,18 @@
 ---@diagnostic disable: undefined-global, lowercase-global, need-check-nil, undefined-field
--- SimpleUI/widgets/listbase.lua — what the scrolling lists (menu, settingsList) share: the scroll position,
--- eased toward its target; wheel scrolling; keeping a row in view; scrollTo / rowBounds; and an optional
--- scrollbar beside the list (scrollbar = true), shown while the rows don't all fit.
--- A list class calls ListBase.install(cls) and keeps self._scrollCur / self._scrollTarget (in px from the
--- first row) and self:_count() (its number of rows).
+-- SimpleUI list scrolling, shared by menu and settingsList
 
 local U     = require("UI.SimpleUI.util")
 local Shape = require("UI.SimpleUI.shape")
 
 local floor, max = math.floor, math.max
 
-local BAR_W = 8          -- the scrollbar's width
-local BAR_GAP = 12       -- between the list and its scrollbar
+local BAR_W = 8          -- scrollbar width
+local BAR_GAP = 12       -- list to scrollbar gap
 
 local ListBase = {}
 
+-- cls keeps _scrollCur/_scrollTarget (px from the first row) and _count()
+-- scrollbar = true: bar beside the list while the rows don't fit
 function ListBase.install(cls)
     function cls:_contentH() return self:_count() * self.rowHeight end
 
@@ -23,7 +21,7 @@ function ListBase.install(cls)
         self._scrollTarget = U.clamp(self._scrollTarget, 0, maxScroll)
     end
 
-    -- scrolls the least needed for row i to be in view
+    -- least scroll that shows row i
     function cls:_showRow(i)
         local top = (i - 1) * self.rowHeight
         local bot = top + self.rowHeight
@@ -32,18 +30,18 @@ function ListBase.install(cls)
         self:_clampScroll()
     end
 
-    --- Scrolls row i into view (instant = true: no easing).
+    --- scrolls row i into view (instant = true: no easing)
     function cls:scrollTo(i, instant)
         self:_showRow(i)
         if instant then self._scrollCur = self._scrollTarget end
     end
 
-    --- The on-screen box of row i at the current scroll: x, y, w, h (the row's face, without the gap under it).
+    --- on-screen box of row i: x, y, w, h (face only, no gap)
     function cls:rowBounds(i)
         return self.x, self.y + (i - 1) * self.rowHeight - (self._scrollCur or 0), self.w, self.rowHeight - 10
     end
 
-    -- the wheel scrolls a hovered list a row per notch; the shown position eases toward the target
+    -- wheel: one row per notch while hovered; shown position eases to the target
     function cls:_updateScroll(ctx, speed)
         if self.hovered and ctx.scrollDy and ctx.scrollDy ~= 0 then
             self._scrollTarget = self._scrollTarget - ctx.scrollDy * self.rowHeight
@@ -52,7 +50,7 @@ function ListBase.install(cls)
         self._scrollCur = self._scrollCur + (self._scrollTarget - self._scrollCur) * math.min(1, (ctx.dt or 0) * speed)
     end
 
-    -- a dot baked once; the scrollbar draws it as two half circles with its middle row stretched between them
+    -- dot baked once; drawn as two halves with the middle row stretched
     function cls:_bakeBar()
         if not self.scrollbar then return end
         local c = self.eff.colors

@@ -1,15 +1,8 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global
--- netdebug/Script.lua — a tiny smoke test for the P2P NET core (the "OpenTaiko Online" protocol).
---
--- Run TWO copies of the game on the same machine:
---   In copy A press  H  to HOST a room (the room code is shown + written to this stage's netroom.txt /
---                       netroom.json so you can open/copy it, and so copy B can auto-read it on J).
---   In copy B press  J  to JOIN (reads netroom.json written by the host and connects to 127.0.0.1).
---   Then  B  broadcasts a ping to all peers,  R  (host) rotates the host role,  L  leaves,  Esc quits.
--- The panel shows your role / ids / peer roster and a live event log, so you can confirm joins, messages,
--- host-role hand-off and disconnects all flow correctly before the real stages are built on top.
+-- netdebug stage: P2P NET core test
+-- run two copies on one machine: H hosts, J joins (reads netroom.json)
 
--- positions, sizes and colours: Config/layout.json
+-- layout: Config/layout.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local LOG = Layout.log
@@ -47,8 +40,8 @@ local function host()
     NET:SetLocalPlayer('{"name":"HostTester","char":"Bot","plate":0}')
     code = NET:CreateRoom("netdebug", "payload-test", 8)
     if code == nil then add("CreateRoom FAILED (port in use / no socket)"); return end
-    STORAGE:WriteText("netroom.txt", code)                       -- human-openable / copy-pasteable
-    STORAGE:WriteText("netroom.json", '{"code":"' .. code .. '"}') -- the joiner auto-reads this
+    STORAGE:WriteText("netroom.txt", code)                       -- for copy-paste
+    STORAGE:WriteText("netroom.json", '{"code":"' .. code .. '"}') -- read by the joiner
     add("Hosting. Code written to netroom.txt (len " .. #code .. ").")
 end
 
@@ -74,7 +67,7 @@ function update(ts)
     if INPUT:KeyboardPressed("R") then if NET:IsHost() then NET:RotateHost() else add("Only the server can rotate.") end end
     if INPUT:KeyboardPressed("L") then NET:Leave(); add("Left the room.") end
 
-    -- drain every queued network event this frame
+    -- drain queued network events
     while true do
         local e = NET:Poll(); if e == nil then break end
         if e.Type == "connected" then add("CONNECTED " .. e.Data)

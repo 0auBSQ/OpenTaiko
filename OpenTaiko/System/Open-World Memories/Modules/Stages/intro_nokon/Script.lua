@@ -36,7 +36,7 @@ local originalPlayerCount = 1
 local currentPageCache    = {}
 local pendingConfig       = nil
 
--- ── OpTk genre detection ──────────────────────────────────────────────────────
+-- ==== OpTk genre detection ====
 
 local OPTK_DIRECT_GENRES = {
     "Classical Arrangements",
@@ -64,9 +64,7 @@ local function isOpTkGenre(node)
     return false
 end
 
----------------------------------------
--- Utility Functions
----------------------------------------
+-- ==== Utility functions ====
 
 local function stopBGM()
     if sounds.BGM ~= nil then
@@ -101,9 +99,7 @@ local function saveHighScore(score)
     DBScores:RegisterScore(score)
 end
 
----------------------------------------
--- Song List Management
----------------------------------------
+-- ==== Song list ====
 
 local function loadMainSongList()
     local lsls = GenerateSongListSettings()
@@ -195,7 +191,7 @@ local function stopSongPreview()
     SHARED:GetSharedSound("quiz_preview"):Stop()
 end
 
--- Build a table mapping each flat genre folder node → count of unlocked songs.
+-- flat genre folder node -> unlocked song count
 local function buildUnlockedCountByGenre()
     local counts = {}
     local songs = csharpEnumerableToLuaArray(songList:SearchSongsByPredicate(function(node)
@@ -257,9 +253,7 @@ local function countSongsInScope(scope)
     return total
 end
 
----------------------------------------
--- State Handlers
----------------------------------------
+-- ==== State handlers ====
 
 local function handleWaitingEnum()
     -- While songs are loading or unavailable, only allow Cancel/Escape to exit.
@@ -308,9 +302,7 @@ local function handleSetup()
     return false
 end
 
----------------------------------------
--- Main Functions
----------------------------------------
+-- ==== Main functions ====
 
 function draw()
     if state == "waiting_enum" then
@@ -322,8 +314,8 @@ function draw()
     elseif state == "setup" then
         Setup.draw()
     elseif state == "game_transition" then
-        Setup.draw()             -- setup visuals beneath…
-        Stage.drawCurtainOnly()  -- …closing curtain on top
+        Setup.draw()             -- setup under
+        Stage.drawCurtainOnly()  -- curtain on top
     elseif state == "game" then
         Game.draw()
     end
@@ -366,7 +358,7 @@ function activate()
     originalPlayerCount = CONFIG.PlayerCount
 
     if songsEnumerated then
-        -- the entry transition already played the curtain reveal — start straight on the menu
+        -- entry transition already revealed the stage: start on the menu
         state = "opening"
         Opening.resetToMenu()
     else
@@ -382,9 +374,8 @@ function deactivate()
     disposeAssets()   -- the show holds no VRAM/samples while other stages run
 end
 
--- Assets live only while the show is on: filled at activate(), emptied at deactivate(). The module
--- tables (textures/sounds) keep their identity — Opening/Setup/Stage/Dialogue hold references to the
--- tables and index them at draw time, so refilling in place is safe.
+-- assets filled at activate(), emptied at deactivate(); the tables keep their identity
+-- (Opening/Setup/Stage/Dialogue hold the tables and index them at draw time)
 local assetsLoaded = false
 
 function loadAssets()

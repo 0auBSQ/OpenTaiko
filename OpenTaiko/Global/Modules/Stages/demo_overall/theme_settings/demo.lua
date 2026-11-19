@@ -1,49 +1,40 @@
--- demo_overall/theme_settings/demo.lua
--- Simple read-only viewer for all skin-specific settings defined in ThemeSettings.json.
--- Shows each setting's id, scope, type, and current value.
--- RightChange/DownArrow → scroll down
--- LeftChange/UpArrow    → scroll up
--- Cancel/Escape         → exit
+-- read-only viewer for the ThemeSettings.json settings (id, scope, type, value)
+-- Down/Up scroll, Cancel/Escape exits
 
-local NavInput = require("Input.NavInput").p[0]   -- the navigation keys only, no drums
+local NavInput = require("Input.NavInput").p[0]   -- navigation keys only, no drums
 local I18N = require("Locale.i18n")
 local T = I18N.texts("theme_viewer", "theme_settings/")
 
 local D = {}
 
--- ─────────────────────────────────────────────────────────────────────────────
--- State
--- ─────────────────────────────────────────────────────────────────────────────
+-- ==== state ====
 
 local font   = nil
 local sounds = {}
 
--- Current scroll offset (first visible row index, 0-based)
+-- scroll offset: first visible row, 0-based
 local scrollIdx = 0
 
--- Rows built in activate(): list of { id, scope, type, value } strings
+-- rows built in activate(): { id, scope, type, value } strings
 local rows = {}
 
--- How many rows fit on screen at once
 local VISIBLE_ROWS = 20
 local ROW_H        = 44
 local LIST_TOP     = 80
 local LIST_LEFT    = 60
 
--- Column x positions
+-- column x positions
 local COL_SCOPE = LIST_LEFT + 480
 local COL_TYPE  = LIST_LEFT + 680
 local COL_VALUE = LIST_LEFT + 880
 
--- Max widths for text rendering (prevents overflow)
+-- max text widths
 local MAX_W_ID    = 410
 local MAX_W_SCOPE = 190
 local MAX_W_TYPE  = 190
 local MAX_W_VALUE = 600
 
--- ─────────────────────────────────────────────────────────────────────────────
--- Helpers
--- ─────────────────────────────────────────────────────────────────────────────
+-- ==== helpers ====
 
 local function clamp(v, lo, hi)
     if v < lo then return lo end
@@ -84,18 +75,15 @@ local function buildRows()
     end
 end
 
--- Draw a text string anchored at (x, y) top-left, with an optional color.
+-- top-left text at (x, y), optional colour
 local function drawText(str, x, y, maxW, color)
     local tx = font:GetText(str, false, maxW, color)
     tx:DrawAtAnchor(x, y, "topleft")
 end
 
--- ─────────────────────────────────────────────────────────────────────────────
--- update / draw
--- ─────────────────────────────────────────────────────────────────────────────
+-- ==== update / draw ====
 
 function D.update(_timestamp)
-    -- Cancel / Back → exit back to the previous stage
     if NavInput.cancel() then
         sounds.Cancel:Play()
         return Exit("stage", "my_room")
@@ -123,26 +111,24 @@ function D.draw()
     local purple = COLOR:CreateColorFromRGBA(180, 180, 255, 255)
     local gray   = COLOR:CreateColorFromRGBA(160, 160, 160, 255)
 
-    -- Title
     drawText(T:tr("title"), LIST_LEFT, 20, 800, yellow)
 
-    -- Column headers
+    -- column headers
     local headerY = LIST_TOP - ROW_H
     drawText(T:tr("col_id"),    LIST_LEFT,  headerY, MAX_W_ID,    purple)
     drawText(T:tr("col_scope"), COL_SCOPE,  headerY, MAX_W_SCOPE, purple)
     drawText(T:tr("col_type"),  COL_TYPE,   headerY, MAX_W_TYPE,  purple)
     drawText(T:tr("col_value"), COL_VALUE,  headerY, MAX_W_VALUE, purple)
 
-    -- Separator line (rendered as text dashes)
+    -- separator line (text dashes)
     drawText(string.rep("-", 110), LIST_LEFT, LIST_TOP - 10, 1800, gray)
 
-    -- Rows
+    -- rows
     local endIdx = math.min(scrollIdx + VISIBLE_ROWS, #rows)
     for i = scrollIdx + 1, endIdx do
         local row = rows[i]
         local y   = LIST_TOP + (i - scrollIdx - 1) * ROW_H
 
-        -- Alternate row color for id
         local idColor = (i % 2 == 0) and white or COLOR:CreateColorFromRGBA(220, 220, 220, 255)
 
         drawText(row.id,    LIST_LEFT, y, MAX_W_ID,    idColor)
@@ -151,7 +137,7 @@ function D.draw()
         drawText(row.value, COL_VALUE, y, MAX_W_VALUE, yellow)
     end
 
-    -- Scroll indicator / hint
+    -- scroll hint
     if #rows > VISIBLE_ROWS then
         local info = string.format("(%d-%d / %d)   %s",
             scrollIdx + 1, endIdx, #rows, T:tr("hint_scroll"))
@@ -161,9 +147,7 @@ function D.draw()
     end
 end
 
--- ─────────────────────────────────────────────────────────────────────────────
--- Stage events
--- ─────────────────────────────────────────────────────────────────────────────
+-- ==== stage events ====
 
 function D.activate()
     I18N.detect()

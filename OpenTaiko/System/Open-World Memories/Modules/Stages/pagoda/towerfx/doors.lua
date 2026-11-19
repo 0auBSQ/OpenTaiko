@@ -1,4 +1,4 @@
--- Ambience of a door floor's room (normal.png, levels 11-19), in the floor's tint.
+-- ambience: door floor room (normal.png, levels 11-19), floor tint
 
 local F     = require("towerfx/field")
 local art   = require("towerfx/art")
@@ -14,8 +14,8 @@ local motion = Animation.towerfx.doors
 
 local NORMAL_W = look.tile_w_px
 local DOOR       = look.door                    -- door area in normal.png
-local ROOM       = look.room                    -- x, y, w, h of the room's open floor space
-local WINDOWS    = look.windows                 -- x, y, slant of the light from the high windows
+local ROOM       = look.room                    -- x, y, w, h of the open floor
+local WINDOWS    = look.windows                 -- x, y, slant of the window light
 
 local doorGlow   = look.door_glow
 local GLOW_S     = doorGlow.scale
@@ -36,7 +36,6 @@ local DUST_RISE  = dustMove.rise_px_per_s
 local GLINT_BASE, GLINT_AMP, GLINT_W = dustMove.glint.base, dustMove.glint.amp, dustMove.glint.rad_per_s
 local DUST_FIN, DUST_FOUT = dustMove.fade_in_share, dustMove.fade_out_share
 
--- c moved toward white by k
 local function toward_white(c, k) return c + (1 - c) * k end
 
 local function lights(L, t, xl, top, lit, r, g, b)

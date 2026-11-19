@@ -1,10 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- custom_stage_tutorial — what to know to make a custom stage and share it: a list of topics on the left,
--- the selected topic's pages (a heading, a picture and a text) on the right. A custom stage itself: it
--- declares the "CStage" namespace below, so the skin's Custom Stages menu lists it, and it leaves for the
--- stage named by custom_stage_return.
--- Keys: Up/Down a topic, Left/Right a page, Decide the next page, Cancel back. The mouse clicks topics
--- and the Previous, Next and Back buttons.
+-- custom_stage_tutorial: how to make and share a custom stage
 
 -- drawn in 1920x1080: a skin of another resolution rescales it
 STAGES:SetResolution(1920, 1080)
@@ -21,8 +16,8 @@ CS.declare{
     description = CS.allLanguages("tutorial", "stage_desc"),
 }
 
--- each topic's texts are <id>_title, <id>_<n>_head and <id>_<n>_text; each page has its picture, or false
--- for a page of text only. A picture with words in it ships one file per language (namespace_ja.png...).
+-- texts: <id>_title, <id>_<n>_head, <id>_<n>_text; a page is a picture or false (text only)
+-- pictures with words ship one file per language
 local TOPICS = {
     { id = "place",     pages = { "place.png" } },
     { id = "namespace", pages = { "namespace.png" } },
@@ -70,13 +65,13 @@ local function showPage()
     prevB:setEnabled(topic > 1 or page > 1)
     nextB:setEnabled(topic < #TOPICS or page < #t.pages)
     image(t.pages[page])
-    -- the next picture starts loading now, so it is there when the page turns
+    -- preload the next picture
     local nt = t.pages[page + 1]
     if nt == nil and TOPICS[topic + 1] then nt = TOPICS[topic + 1].pages[1] end
     image(nt)
 end
 
--- d = 1 or -1: one page on, past the end of a topic into the next one
+-- d = 1 or -1; crosses into the next or previous topic
 local function turn(d)
     local t = TOPICS[topic]
     local p, k = page + d, topic
@@ -141,7 +136,7 @@ function update(ts)
     if NAV.rightKeyboard() then turn(1) elseif NAV.leftKeyboard() then turn(-1) end
 end
 
--- the text of a page, wrapped to the panel; a line break in the text starts a new paragraph
+-- page text wrapped to width; \n starts a paragraph
 local function textLines(s, width)
     local out = {}
     for para in (s .. "\n"):gmatch("(.-)\n") do

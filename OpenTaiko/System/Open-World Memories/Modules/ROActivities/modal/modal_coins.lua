@@ -1,14 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- modal_coins.lua — the coin reward and the coin payment, both around the piggy bank.
---
--- Gaining: the piggy bank slides in from the left with the coin purse (Lib/CoinBox) riding above it
--- showing the balance before the reward and a green "+n" of what is still to come; coins then drop
--- from the top into the slot one by one, each one squashing the piggy and rolling the purse up, and
--- the last one earns a jingle and a happy hop.
--- Spending (a negative amount): the same entrance, the purse showing the balance before and a red
--- "-n" of what is still to go; coins then spring out of the slot one by one and fly off to the
--- right, each one shaking the piggy and rolling the purse down, and the last one rings the till.
--- The first decide press during the coins skips to the end, the next one closes.
+-- coin reward (amount > 0) and coin payment (amount < 0) around the piggy bank
+-- the first decide during the coins skips to the end, the next one closes
 
 local Fx = require("modal_fx")
 local CoinBox = require("CoinBox")
@@ -21,22 +13,22 @@ M.__index = M
 
 local L = Layout.coins
 local T = Animation.coins
-local PIG_CX, PIG_CY = L.piggy_cx, L.piggy_cy   -- the piggy's resting centre
+local PIG_CX, PIG_CY = L.piggy_cx, L.piggy_cy   -- piggy rest centre
 local PIG_W, PIG_H = L.piggy_w, L.piggy_h
-local SLOT_X, SLOT_Y = L.slot_x, L.slot_y       -- the coin slot's centre inside piggy.png
+local SLOT_X, SLOT_Y = L.slot_x, L.slot_y       -- coin slot centre in piggy.png
 local PIG_FROM_X = -PIG_W                -- off screen left
 local SLIDE_DUR = T.slide_s
 local POUR_START = T.pour_start_s
 local COIN_GAP, COIN_FALL = T.coin_gap_s, T.coin_fall_s
-local COIN_FLY = T.coin_fly_s            -- a spent coin's flight out of the slot until it is gone
+local COIN_FLY = T.coin_fly_s            -- spent coin flight time
 local FLY_VX, FLY_VY, FLY_G = T.fly_vx, T.fly_vy, T.fly_gravity
-local COIN_SIZE = L.coin_size            -- the purse's 44px coin icon scaled up
+local COIN_SIZE = L.coin_size            -- purse coin icon (44px) scaled up
 local PURSE_W = L.purse_w
 local OVERLAY = L.overlay_opacity
 local HEADER_Y = L.header_y
 local FADE_OUT = T.fade_out_s
 
--- a burst's options: its motion from animation.json, its colour from layout.json
+-- burst options: motion from animation.json, colour from layout.json
 local function sparks(motion, color)
     return { speed = motion.speed, size = motion.size, life = motion.life_s, color = color, gravity = motion.gravity }
 end
@@ -61,7 +53,7 @@ local function splitCoins(amount)
     return values
 end
 
--- amount > 0: coins gained, total = the balance after; amount < 0: coins spent, total = the balance after
+-- amount > 0 gained, < 0 spent; total: balance after
 function M:start(amount, total)
     amount = floor(tonumber(amount) or 0)
     self.spend = amount < 0
@@ -111,7 +103,7 @@ function M:land(c)
     self.sparks:burst(self:slotX(), self:slotY(), T.land_sparks.count, sparks(T.land_sparks, L.land_sparks_color))
 end
 
--- a spent coin springs out of the slot: it counts at once, the piggy shakes
+-- spent coin leaves the slot; counted at once
 function M:leave(c)
     if c.landed then return end
     c.landed = true
@@ -124,7 +116,7 @@ function M:leave(c)
     self.sparks:burst(self:slotX(), self:slotY(), T.leave_sparks.count, sparks(T.leave_sparks, L.leave_sparks_color))
 end
 
--- everything in (or out of) the piggy: the jingle and a happy hop, or the till and a last shake
+-- all coins done: fanfare or till
 function M:finish(withFanfare)
     if self.done then return end
     self.done = true
@@ -198,7 +190,7 @@ function M:draw()
     local slotY = self:slotY()
     for _, c in ipairs(self.coins) do
         if self.spend then
-            -- out of the slot and away to the right, spinning, gone once it leaves the screen
+            -- spent coin flight, gone off screen
             local ft = self.tl.t - c.t0
             if ft >= 0 and ft < COIN_FLY and not self.done then
                 local x = c.x + FLY_VX * ft + (c.i % 3 - 1) * T.fly_spread_vx * ft

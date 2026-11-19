@@ -1,10 +1,9 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- _title/player_select.lua  —  player-count selector drawn over the title menu
--- Two ribbon bands, the prompt and a carousel of boxes (back, then 1 to 5 players); the title script feeds it input.
+-- player-count selector over the title menu; input from the title script
 
 local M = {}
 
--- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+-- layout: Config/layout.json; timings: Config/animation.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
@@ -12,15 +11,15 @@ local Animation = Config.load("Config/animation.json")
 local TEX = "Textures/Players/"
 local SND = "Sounds/"
 
--- ── Layout ────────────────────────────────────────────────────────────────────
--- screen px on 1920x1080; the art sizes are fixed, so nothing is read back from a texture size
+-- ==== Layout ====
+-- screen px on 1920x1080; fixed art sizes, no texture size reads
 
 local L = Layout.player_select
 local A = Animation.player_select
 
-local ITEMS = 6   -- item 0 is the back box, items 1 to 5 the player counts
+local ITEMS = 6   -- 0 back box, 1-5 player counts
 
--- box colours, 0..1: brown for back, as the other menus style it, then the player colours
+-- box colours 0..1: back, then the player colours
 local PC = {}
 for i, c in ipairs(L.box_colors) do PC[i - 1] = { c[1] / 255, c[2] / 255, c[3] / 255 } end
 
@@ -28,7 +27,7 @@ for i, c in ipairs(L.box_colors) do PC[i - 1] = { c[1] / 255, c[2] / 255, c[3] /
 local T_UPPER_LAND = A.upper_land_ms
 local T_LOWER_IN   = A.lower_in_ms
 local T_LOWER_LAND = A.lower_land_ms
-local POP_AT       = A.pop_at_ms     -- the selected box starts popping in
+local POP_AT       = A.pop_at_ms     -- selected box pop-in start
 local POP_STEP     = A.pop_step_ms   -- delay per box further out
 local POP_MS       = A.pop_ms
 local DECIDE_LOCK  = A.decide_lock_ms
@@ -36,7 +35,7 @@ local DECIDE_MS    = A.decide_ms
 local CLOSE_MS     = A.close_ms
 local DIM_MAX      = L.dim_opacity
 
--- ── Resources ─────────────────────────────────────────────────────────────────
+-- ==== Resources ====
 
 local tex        = {}
 local sfx        = {}
@@ -46,7 +45,7 @@ local promptTex  = nil
 local labelTex   = {}
 local tr         = function(_, fallback) return fallback end
 
--- ── State ─────────────────────────────────────────────────────────────────────
+-- ==== State ====
 
 local state     = "closed"   -- closed / open / deciding / closing
 local armed     = false      -- opened this frame: the timeline starts on the next update
@@ -66,7 +65,7 @@ local queue     = {}         -- delayed sounds { at, sfx, pan }
 local bands     = { {}, {} } -- 1 = upper, 2 = lower
 local xsU, xsL  = {}, {}
 
--- ── Math ──────────────────────────────────────────────────────────────────────
+-- ==== Math ====
 
 local sin, cos, exp, pi = math.sin, math.cos, math.exp, math.pi
 
@@ -78,16 +77,16 @@ local function outQuart(u) u = clamp01(u); return 1 - (1 - u) ^ 4 end
 local function inCubic(u)  u = clamp01(u); return u ^ 3 end
 local function outBack(u)  u = clamp01(u); return 1 + 2.70158 * (u - 1) ^ 3 + 1.70158 * (u - 1) ^ 2 end
 
--- ── Clocks ────────────────────────────────────────────────────────────────────
+-- ==== Clocks ====
 
--- the open timeline, frozen while the cancel outro runs
+-- open timeline, frozen during the cancel outro
 local function tOpen()
     if armed then return 0 end
     if state == "closing" then return closeTs - openTs end
     return nowTs - openTs
 end
 
--- a clock that keeps running through the outro, for the idle loops
+-- runs through the outro, for the idle loops
 local function tLive()
     if armed then return 0 end
     return nowTs - openTs
@@ -100,10 +99,10 @@ local function outroFade()
     return 1
 end
 
--- box i pops in later the further it sits from the selection at open
+-- staggered by distance from openSel
 local function popStart(i) return POP_AT + math.abs(i - openSel) * POP_STEP end
 
--- ── Sounds ────────────────────────────────────────────────────────────────────
+-- ==== Sounds ====
 
 local function play(s, pan)
     if s == nil then return end
@@ -129,7 +128,7 @@ local function drain(ts)
     end
 end
 
--- ── Bands ─────────────────────────────────────────────────────────────────────
+-- ==== Bands ====
 
 local function resetBand(band)
     band.phase   = 0
@@ -137,12 +136,11 @@ local function resetBand(band)
     band.swapOld = 1
 end
 
--- while entering, the left edge of the upper strip and the right edge of the lower one; each starts with its
--- ribbon tip just off screen
+-- entering strip edges: upper left, lower right; tip starts just off screen
 local function headU(t) return (1920 + L.tip_width) * (1 - outQuart(t / T_UPPER_LAND)) end
 local function headL(t) return (1920 + L.tip_width) * outQuart((t - T_LOWER_IN) / (T_LOWER_LAND - T_LOWER_IN)) - L.tip_width end
 
--- scroll speed in px/s: it builds up once both ribbons have landed, and rushes while deciding
+-- px/s; ramps up once both ribbons land, rushes while deciding
 local function speed()
     local B = A.band
     if state == "deciding" then
@@ -153,8 +151,7 @@ local function speed()
     return B.scroll_px_per_s * clamp01((tOpen() - T_LOWER_LAND) / B.build_up_ms)
 end
 
--- on-screen tile x positions of both bands, plus the tip x while a band slides in: the tiles wrap by the scroll
--- phase, and an entering strip starts at its tip
+-- tile x positions of both bands (wrapped by scroll phase), plus the tip x while sliding in
 local function bandLayout()
     local t = tOpen()
     local nU, nL, tipU, tipL = 0, 0, nil, nil
@@ -182,7 +179,7 @@ local function drawTiles(t, xs, n, y, rot, op)
     t:SetRotation(0)
 end
 
--- the ribbons of the shown count, the previous count fading out over them for a moment after a change
+-- shown count's ribbons; the previous count fades out over them after a change
 local function drawBand(b, xs, n, y, tipX)
     local rot  = (b == 2) and L.lower_rotation_deg or 0
     local band = bands[b]
@@ -213,7 +210,7 @@ local function drawBands()
     drawBand(2, xsL, nL, yL, tipL)
 end
 
--- ── Prompt ────────────────────────────────────────────────────────────────────
+-- ==== Prompt ====
 
 local function textColor() return Config.color(L.text_color) end
 
@@ -236,7 +233,7 @@ local function drawPrompt()
     text:SetOpacity(1)
 end
 
--- ── Carousel ──────────────────────────────────────────────────────────────────
+-- ==== Carousel ====
 
 -- screen x of a box at offset o from the carousel position
 local function carouselX(o)
@@ -267,7 +264,7 @@ local function boxLook(i)
     return carouselX(i - scroll), y, (1 - L.side_shrink * a) * extra, op, 1 - L.side_darken * a
 end
 
--- draws t centred at (x, y) with a scale, tint, opacity and blend, then resets its state
+-- centred at (x, y); resets the texture state after
 local function drawCentered(t, x, y, sc, r, g, b, op, blend)
     if t.Width <= 0 or op <= 0 then return end
     t:SetScale(sc, sc)
@@ -281,7 +278,7 @@ local function drawCentered(t, x, y, sc, r, g, b, op, blend)
     t:SetScale(1, 1)
 end
 
--- the item's label, white with an outline in its darkened colour, like the title menu's box titles
+-- label with a darkened-colour outline, as the title menu's box titles
 local function getLabelTex(i)
     if labelTex[i] == nil and labelFont ~= nil then
         local text = (i == 0) and tr("TITLE_PLAYERS_BACK", "Back")
@@ -294,8 +291,7 @@ local function getLabelTex(i)
     return labelTex[i]
 end
 
--- the tinted box, its label in the top strip, then its art over the section below; returns the box's centre,
--- scale and opacity
+-- returns the box centre, scale, opacity
 local function drawBox(i)
     local x, y, sc, op, f = boxLook(i)
     local c = PC[i]
@@ -321,7 +317,7 @@ local function drawBox(i)
     return x, y, sc, op
 end
 
--- the selection ring, plus its additive flash while deciding
+-- additive flash while deciding
 local function drawRing(x, y, sc, op)
     local R = A.ring
     local fade = clamp01((tOpen() - popStart(sel) - POP_MS) / R.fade_in_ms)
@@ -343,7 +339,7 @@ local function onScreen(i)
     return x + half > 0 and x - half < 1920
 end
 
--- far boxes first, the selected one last with its ring on top
+-- far boxes first; selected one and its ring last
 local function drawCarousel()
     local order = {}
     for i = 0, ITEMS - 1 do
@@ -354,7 +350,7 @@ local function drawCarousel()
     if onScreen(sel) then drawRing(drawBox(sel)) end
 end
 
--- ── Lifecycle ─────────────────────────────────────────────────────────────────
+-- ==== Lifecycle ====
 
 -- trFn: the title's locale lookup, tr(key, fallback)
 function M.load(trFn)
@@ -376,7 +372,7 @@ function M.load(trFn)
     promptFont = TEXT:Create(L.prompt_font_size)
     labelFont  = TEXT:Create(L.label_font_size)
 
-    -- one instance per setting: pan, volume and speed also retune a voice that is playing
+    -- one instance per setting; also retunes a playing voice
     local function sound(name, pan, vol, spd)
         local s = SOUND:CreateSFX(SND .. name .. ".ogg")
         s:SetPan(pan)
@@ -411,7 +407,7 @@ function M.reloadLanguage()
     promptTex, labelTex = nil, {}
 end
 
--- ── Queries ───────────────────────────────────────────────────────────────────
+-- ==== Queries ====
 
 function M.visible()   return state ~= "closed" end
 function M.deciding()  return state == "deciding" end
@@ -427,7 +423,7 @@ function M.dim()
     return math.max(dimCarry, DIM_MAX * outQuad(tOpen() / A.dim_in_ms))
 end
 
--- ── Input ─────────────────────────────────────────────────────────────────────
+-- ==== Input ====
 
 function M.open(count)
     dimCarry = (state == "closing") and M.dim() or 0
@@ -465,13 +461,13 @@ function M.cancel()
     play(sfx.whooshOut)
 end
 
--- ── Update / Draw ─────────────────────────────────────────────────────────────
+-- ==== Update / Draw ====
 
 local function start(ts)
     armed, openTs = false, ts
     schedule(ts, sfx.whooshTop)
     schedule(ts + T_LOWER_IN, sfx.whooshBottom)
-    -- one pop per box as it appears, pitched by its count and panned by its rest x
+    -- one pop per box: pitch by count, pan by rest x
     for i = 0, ITEMS - 1 do
         schedule(ts + popStart(i), sfx.pop[i], round((carouselX(i - openSel) - 960) / 960 * 60))
     end

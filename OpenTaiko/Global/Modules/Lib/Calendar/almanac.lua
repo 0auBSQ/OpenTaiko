@@ -1,24 +1,9 @@
 ---@diagnostic disable: undefined-global
--- almanac.lua — date patterns (JST) and the opaque "enc:" tokens they can be written as, so a
--- schedule does not have to be readable in the source. Encrypt with the companion tool (kept
--- out of the skin) or with Almanac.encrypt.
---
--- Pattern syntax:
---   "2020-06-15"             one day
---   "2020-06-15+30"          that day and the 29 after it (a window of 30 days)
---   "2020-06-15..2020-07-31" inclusive range (both ends fully specified)
---   "*-06-15"                that day every year          "*-06-15+7"   a yearly week
---   "*-*-01"                 the 1st of every month       "2020-*-13"   every 13th of 2020
---   "*-06-*"                 a whole month, every year    "2020-12-*"   one month
---   { "...", "..." }         any of several patterns
---
--- An entry is { code=, when=, priority=, sticky= }: while `when` matches, the entry is active;
--- `sticky` keeps it active for that save file once it has matched. `code` may itself be an
--- "enc:" token (see plain()).
+-- Calendar.almanac: JST date patterns and opaque "enc:" tokens for them (M.encrypt)
 
 local M = {}
 
--- ── one-way mixer (also the keystream source) ────────────────────────────────────────────────
+-- ==== mixer (keystream source) ====
 local function mix(n, salt)
     local h = 2166136261
     local s = tostring(n) .. "|" .. salt
@@ -34,7 +19,8 @@ local function mix(n, salt)
     return h
 end
 
--- ── token cipher: XOR keystream + 16-bit checksum, base32 text ───────────────────────────────
+-- ==== token cipher ====
+-- XOR keystream + 16-bit checksum, base32 text
 local KEY = "0x9E37-79B1|tide"
 local PREFIX = "enc:"
 local ALPHA = "abcdefghijklmnopqrstuvwxyz234567"
@@ -108,7 +94,7 @@ function M.plain(s)
     return s
 end
 
--- ── patterns ─────────────────────────────────────────────────────────────────────────────────
+-- ==== patterns ====
 local function field(s)
     if s == "*" then return false end
     local v = tonumber(s)
@@ -133,7 +119,15 @@ local function dayIndex(y, m, d)
     return era * 146097 + doe - 719468
 end
 
--- one spec string → { y=, m=, d= (number | false for *), days= } or { fromDay=, toDay= }
+-- one spec string -> { y, m, d (number, false for *), days } or { fromDay, toDay }
+-- syntax:
+--   "2020-06-15"             one day
+--   "2020-06-15+30"          that day and the 29 after it
+--   "2020-06-15..2020-07-31" inclusive range (both ends fully specified)
+--   "*-06-15"                that day every year          "*-06-15+7"   a yearly week
+--   "*-*-01"                 the 1st of every month       "2020-*-13"   every 13th of 2020
+--   "*-06-*"                 a whole month, every year    "2020-12-*"   one month
+--   an "enc:" token of any of these
 function M.parse(spec)
     if type(spec) ~= "string" then return nil end
     local text = spec
@@ -188,10 +182,11 @@ function M.matches(spec)
     return M.matchesPattern(M.parse(spec))
 end
 
--- ── entries ──────────────────────────────────────────────────────────────────────────────────
+-- ==== entries ====
 local function trigger(entry) return ".almanac_" .. tostring(M.plain(entry.code) or entry.id or "gate") end
 
--- is this entry active today for this save file (sticky entries stay active once matched)
+-- entry = { code, when, priority, sticky }; code may be an "enc:" token
+-- active while `when` matches; sticky: stays active for the save once matched
 function M.active(entry, saveFile)
     if entry == nil then return false end
     if entry.sticky and saveFile ~= nil then
@@ -205,8 +200,7 @@ function M.active(entry, saveFile)
     return true
 end
 
--- the active entry with the highest priority (ties: first in the list); `skip(entry)` can rule
--- entries out (e.g. already owned)
+-- active entry with the highest priority (ties: first in the list); skip(entry) rules entries out
 function M.pick(entries, saveFile, skip)
     local best = nil
     for _, e in ipairs(entries or {}) do

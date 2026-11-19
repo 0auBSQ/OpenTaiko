@@ -1,4 +1,4 @@
--- Ambience of the roofs and the beanstalk (level 20 up); nothing shows while the roofs are shrouded.
+-- ambience: roofs and beanstalk (level 20 up); none while shrouded
 
 local F   = require("towerfx/field")
 local art = require("towerfx/art")
@@ -13,9 +13,9 @@ local motion = Animation.towerfx.roofs
 
 local SLOT_H = look.slot_h_px
 
-local NIGHT = motion.night_hours        -- hours over which the night effects take over
+local NIGHT = motion.night_hours        -- night effect ramp, hours
 
--- cloud layers: count per slot, hash salt, scale, drift (px/s) and opacity ranges
+-- cloud layers: n per slot, salt, size, drift px/s, opacity ranges
 local BACK_CLOUDS  = { n = look.back_clouds.count, salt = 0, size = look.back_clouds.size,
                        speed = motion.back_clouds.speed_px_per_s, alpha = motion.back_clouds.opacity }
 local FRONT_CLOUDS = { n = look.front_clouds.count, salt = 500, size = look.front_clouds.size,
@@ -97,7 +97,7 @@ local function stars(L, ctx)
     F.reset(tx)
 end
 
--- 0 by day, 1 at night, for the sky's current hour
+-- 0 day, 1 night
 function M.nightOf(hour)
     return F.smooth(NIGHT[1], NIGHT[2], hour or 12)
 end

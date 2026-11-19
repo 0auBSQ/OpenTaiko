@@ -1,12 +1,7 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- mirror.lua — the standing mirror (My Room): who the player walks as, and in which colours.
---
--- The window picks the story student (A or B, used by My Room and the pagoda) and that student's palette
--- among the ones its character offers. Moving over a palette previews it on the turning figure; choosing
--- it wears it. The palette lives on the student character's own counter (Lib/Student), so the customize
--- tab shows the same choice. Locked palettes show their padlock and the plays they need.
+-- standing mirror window: the player's story student and palette
 
-local UI = require("uilib")           -- the skin's UI library (UI.Pick), picked on first use
+local UI = require("uilib")
 local I18N = require("Locale.i18n")
 local Student = require("Characters.Student")
 local AV = require("avatar")
@@ -16,14 +11,14 @@ local M = {}
 
 M.ID = "mirror"
 
--- ── layout ─────────────────────────────────────────────────────────────────────────────────────
+-- ==== layout ====
 local PANEL = { w = 1240, h = 780 }
 local LIST_W, ROW = 600, 60
 local CARD_GAP = 40
-local CARD_W = 460          -- the preview frame, centred in the column right of the list
-local STAGE_PAD = 56        -- space above the figure, and below the hint
-local TEXT_H = 100          -- the name and hint under the figure
-local TURN = 1.6            -- seconds the figure faces each way
+local CARD_W = 460          -- preview card, centred right of the list
+local STAGE_PAD = 56        -- above the figure and below the hint
+local TEXT_H = 100          -- name and hint below the figure
+local TURN = 1.6            -- s per facing
 local TURN_ORDER = { 2, 1, 4, 3 }
 local GREY = { 120, 126, 150, 255 }
 
@@ -31,9 +26,9 @@ local ctx = nil             -- Script.lua closures (see M.init)
 local ui, W = nil, {}
 local open = false
 local justOpened = false
-local student = "a"         -- the student shown (and worn)
-local previewIdx = 0        -- the palette under the cursor
-local pendingStudent = nil  -- a student switch from the chooser, applied after the UI update
+local student = "a"         -- shown and worn
+local previewIdx = 0        -- palette under the cursor
+local pendingStudent = nil  -- chooser switch, applied after ui:update
 local clock = 0
 
 local function tr(id) return T:tr(id) end
@@ -72,7 +67,7 @@ local function showPalette(idx)
     end
 end
 
--- refill the palette list for the shown student, the worn palette selected and marked
+-- worn palette selected and marked
 local function fillList()
     local items, worn = paletteItems()
     local list = W.list
@@ -85,6 +80,7 @@ local function fillList()
     showPalette(worn)
 end
 
+-- stored on the student's counter (Lib/Student), shared with the customize tab
 local function wear(idx)
     local applied = Student.setIndex(save(), student, idx)
     for _, it in ipairs(W.list.items) do it.mark = (it.value == applied) or nil end
@@ -108,7 +104,7 @@ local function build()
     W.list = ui:menu{ x = cx, y = cy + 170, w = LIST_W, h = ch - 170, rowHeight = ROW, items = {},
         onChange = function(_, it) showPalette(it.value) end,
         onSelect = function(_, it) playSfx("Decide"); wear(it.value); return true end }
-    -- the figure is drawn at 1x, the size of the room's sprite frames, so the frame fits it
+    -- figure drawn at 1x (AV.H), card sized to fit
     local colX, colW = cx + LIST_W + CARD_GAP, cw - LIST_W - CARD_GAP
     local kh = STAGE_PAD * 2 + AV.H + TEXT_H
     local kx, ky = math.floor(colX + (colW - CARD_W) / 2), math.floor(cy + (ch - kh) / 2)
@@ -123,9 +119,9 @@ local function build()
     focusWidget(ui, W.list)
 end
 
--- ── public API ─────────────────────────────────────────────────────────────────────────────────
--- ctx: { theme, playerIndex()->n, save()->save file|nil, displayName()->string, onChanged()
---        (the worn student or palette changed) }
+-- ==== public API ====
+-- ctx: { theme, playerIndex() -> n, save() -> save file|nil, displayName() -> string,
+--        onChanged() on a student or palette change }
 function M.init(c) ctx = c end
 
 function M.isOpen() return open end
@@ -134,7 +130,7 @@ function M.open()
     if open or ctx == nil then return end
     open, justOpened, pendingStudent, clock = true, true, nil, 0
     student = Student.ensure(save())
-    AV.frame(student, 2)           -- the preview frames load here, never in draw
+    AV.frame(student, 2)           -- load preview frames here, not in draw
     build()
 end
 
@@ -144,7 +140,7 @@ function M.close(silent)
     if not silent then playSfx("Cancel") end
 end
 
--- returns "closed" the frame the window shuts
+-- "closed" on the frame the window shuts
 function M.update(dt, ts)
     if not open then return nil end
     clock = clock + (dt or 0)

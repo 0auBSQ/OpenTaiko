@@ -1,11 +1,13 @@
 using System.Diagnostics;
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.Data.Sqlite;
 using Newtonsoft.Json;
 
 namespace OpenTaiko;
 
 /// <summary>
-/// Manages ThemeSettings.db3 — a per-skin SQLite database that stores the runtime
+/// Manages SkinSettings_[skin].db3 — a per-skin SQLite database that stores the runtime
 /// values of settings declared in ThemeSettings.json.
 ///
 /// Global settings are keyed by SettingId only.
@@ -44,26 +46,18 @@ internal class DBThemeSettings : IDisposable {
 	// ── Lifecycle ─────────────────────────────────────────────────────────
 
 	/// <summary>
-	/// Loads ThemeSettings.json from <paramref name="skinFolderPath"/> and opens/creates
-	/// ThemeSettings.db3 in the same folder.  Initialises any missing global rows with defaults.
+	/// Loads ThemeSettings.json from <paramref name="skinFolderPath"/> and opens/creates the skin's settings
+	/// database, Global/ApplicationData/SkinSettings_[skin folder name].db3 (outside the skin folder, which a skin
+	/// update deletes). Initialises any missing global rows with defaults.
 	/// Safe to call if the JSON file does not exist — definitions will be empty.
 	/// </summary>
 	public void Load(string skinFolderPath) {
 		(_defs, _sections) = LoadDefinitions(skinFolderPath);
 
-		string dbPath = System.IO.Path.Combine(skinFolderPath, "ThemeSettings.db3");
-		if (OperatingSystem.IsIOS()) {
-			// The skin folder is in the read-only app bundle on iOS, so opening/creating ThemeSettings.db3
-			// there fails ("connection not open") and settings can't save. Mirror it into the writable
-			// UserData area, seeding from the bundle's DB on first run so any shipped values carry over.
-			string writable = OpenTaiko.ResolveWritePath(dbPath);
-			if (writable != dbPath) {
-				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(writable)!);
-				if (!System.IO.File.Exists(writable) && System.IO.File.Exists(dbPath))
-					System.IO.File.Copy(dbPath, writable);
-				dbPath = writable;
-			}
-		}
+		string dbPath = OpenTaiko.ResolveWritePath(System.IO.Path.GetFullPath(
+			DataPath.GetAbsoluteDataPath(SettingsFileName(skinFolderPath))));
+		System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(dbPath)!);
+		MoveFromSkinFolder(skinFolderPath, dbPath);
 		_conn = new SqliteConnection($"Data Source={dbPath}");
 		_conn.Open();
 
@@ -159,6 +153,53 @@ internal class DBThemeSettings : IDisposable {
 	}
 
 	// ── Private helpers ───────────────────────────────────────────────────
+
+	private const int MaxSkinNameLength = 64;
+	private const string ForbiddenNameChars = "<>:\"/\\|?*%";
+
+	/// <summary>SkinSettings_[skin folder name].db3: characters a file name can't hold become %XX (UTF-8), and a name
+	/// over MaxSkinNameLength is cut and ends with 8 hex digits of a hash of the full name.</summary>
+	internal static string SettingsFileName(string skinFolderPath) {
+		string name = System.IO.Path.GetFileName(skinFolderPath.TrimEnd('/', '\\'));
+		var sb = new StringBuilder();
+		for (int i = 0; i < name.Length; i++) {
+			char c = name[i];
+			// Windows drops a trailing dot or space
+			bool trailing = i == name.Length - 1 && (c == '.' || c == ' ');
+			if (c < 0x20 || c == 0x7F || ForbiddenNameChars.IndexOf(c) >= 0 || trailing) {
+				foreach (byte b in Encoding.UTF8.GetBytes(c.ToString())) sb.Append('%').Append(b.ToString("X2"));
+			} else {
+				sb.Append(c);
+			}
+		}
+		string escaped = sb.ToString();
+		if (escaped.Length > MaxSkinNameLength) {
+			string hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(name)))[..8];
+			int cut = MaxSkinNameLength - hash.Length - 1;
+			if (char.IsHighSurrogate(escaped[cut - 1])) cut--;
+			escaped = escaped[..cut] + "_" + hash;
+		}
+		return $"SkinSettings_{escaped}.db3";
+	}
+
+	// moves the skin folder's old ThemeSettings.db3 (or iOS's writable copy of it) once
+	private static void MoveFromSkinFolder(string skinFolderPath, string dbPath) {
+		if (File.Exists(dbPath)) return;
+		string old = System.IO.Path.Combine(skinFolderPath, "ThemeSettings.db3");
+		string writableOld = OpenTaiko.ResolveWritePath(old);
+		if (File.Exists(writableOld)) old = writableOld;
+		if (!File.Exists(old)) return;
+		try {
+			File.Move(old, dbPath);
+		} catch (Exception) {
+			// read-only skin folder (iOS bundle) or a locked file: the values are copied
+			try {
+				File.Copy(old, dbPath);
+			} catch (Exception ex) {
+				Trace.TraceWarning($"[DBThemeSettings] Could not move {old} to {dbPath}: {ex.Message}");
+			}
+		}
+	}
 
 	// the file is either a plain array of definitions, or { "sections": { id: localized header }, "settings": [...] }
 	private sealed class FileForm {

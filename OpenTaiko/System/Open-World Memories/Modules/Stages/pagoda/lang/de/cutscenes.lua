@@ -1,4 +1,4 @@
--- German for story/cutscenes/; a missing key shows the English.
+-- German for story/cutscenes/; missing keys fall back to English
 
 local T = {}
 

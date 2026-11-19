@@ -1,8 +1,4 @@
--- ai_battle_song_select
--- Song select for AI battle mode.
--- Player count is forced to 2 via CONFIG.IsAIBattleMode.
--- The AI virtual slot is mounted onto player spot 2.
--- Background: BG_Space.png (scrolling) + BG_Frame.png (static frame, between BG and UI).
+-- ai_battle_song_select: song select for AI battle mode.
 
 local act = nil
 local bgFrame = nil
@@ -16,7 +12,7 @@ function activate()
 	if act == nil then act = ACTIVITY:GetActivity("song_select_core") end
 	exitingToPlay = false
 	CONFIG.IsAIBattleMode = true
-	-- PlayerCount now returns 2 (forced by IsAIBattleMode); lock it and mount AI slot.
+	-- PlayerCount is 2 (IsAIBattleMode): lock it, AI slot on spot 2
 	act:Activate(false, CONFIG.PlayerCount, true, false, "shared")
 	-- "shared": the activity scrolls this texture instead of its per-genre sets
 	SHARED:SetSharedTexture("background", "Textures/BG_Space.png")
@@ -47,11 +43,11 @@ function update()
 end
 
 function draw()
-	-- Draw scrolling BG_Space only (no UI elements yet)
+	-- BG_Space only
 	act:Draw("bg_only")
-	-- Static frame sits just above the scrolling background
+	-- BG_Frame between the background and the UI
 	bgFrame:Draw(0, 0)
-	-- Draw all song select UI on top
+	-- song select UI
 	act:Draw("no_bg")
 end
 

@@ -1,9 +1,5 @@
--- Pagoda.Rewards: what a challenge clear gives. A floor's first clear gives its nameplate (the shipped
--- pack's "Pagoda Placeholder" ones, 381-397), then each entry of the floor's pool rolls on its own chance,
--- so one clear can give several. grant() saves everything at once; show() then plays one pop-up per
--- reward through the "modal" ROActivity. Vault keys become coins while the secret vault is shut, and all
--- of a clear's coins make one pop-up. Furniture goes to My Room (.myroom_<id> to hand over,
--- .myroom_held_<id> owned).
+-- Pagoda.Rewards: what a challenge clear gives
+-- grant() saves everything at once; show() then plays one "modal" pop-up per reward
 
 local Keys  = require("Vault.Keys")
 local Texts = require("Pagoda.Texts")
@@ -11,7 +7,7 @@ local Texts = require("Pagoda.Texts")
 local M = {}
 
 M.NAMEPLATE_BASE = 380
--- the floors whose first clear gives a nameplate -> its number among them (id NAMEPLATE_BASE + n)
+-- floors whose first clear gives a nameplate -> index among them (id NAMEPLATE_BASE + n)
 M.NAMEPLATES = {
     [1] = 1, [5] = 2, [6] = 3, [10] = 4,
     [11] = 5, [12] = 6, [13] = 7, [14] = 8, [15] = 9, [16] = 10, [17] = 11, [18] = 12, [19] = 13, [20] = 14,
@@ -20,7 +16,7 @@ M.NAMEPLATES = {
 
 M.COIN_CHANCE = 0.5
 
--- My Room furniture: the pop-up's rarity and the name shown without a string
+-- My Room furniture: pop-up rarity, name shown without a string
 M.FURNITURE = {
     tree          = { rarity = "Common",    name = "Tree" },
     small_rock    = { rarity = "Common",    name = "Rock" },
@@ -34,13 +30,13 @@ M.FURNITURE = {
     mini_pagoda   = { rarity = "Legendary", name = "Miniature Pagoda" },
 }
 
--- the secret vault's keys (Vault.Keys): pop-up rarity, and coins per key while the vault is shut
+-- vault keys (Vault.Keys): pop-up rarity, coins per key while the vault is shut
 M.KEYS = {
     simple = { rarity = "Uncommon", coins = 50 },
     gold   = { rarity = "Rare", coins = 100 },
     optk   = { rarity = "Epic", coins = 300 },
 }
-M.KEY_PICTURE = "pagoda_reward_key_"      -- the shared textures the key pop-ups show, one per key, shared by the skin
+M.KEY_PICTURE = "pagoda_reward_key_"      -- shared texture prefix of the key pop-ups, one per key
 
 -- the modal's rarity numbers
 local RARITY_INT = { Poor = 0, Common = 0, Uncommon = 1, Rare = 2, Epic = 3, Legendary = 4, Mythical = 4 }
@@ -108,6 +104,8 @@ end
 
 -- the rewards of a challenge clear of level, saved now; returns the pop-ups to show, in order:
 -- { kind = "nameplate", id }, { kind = "furniture", id }, { kind = "key", key, count }, { kind = "coins", amount }
+-- first clear: the floor's nameplate; then each pool entry rolls on its own chance
+-- keys become coins while the vault is shut; all coins make one pop-up
 function M.grant(level)
     local sf = GetSaveFile(0)
     local out = {}
@@ -129,7 +127,7 @@ function M.grant(level)
     for _, e in ipairs(pool) do
         if math.random() < e.chance then
             if e.furniture ~= nil then
-                -- My Room adds it to the room's stock on its next visit; owned from now on
+                -- .myroom_<id>: added to the room's stock on its next visit; .myroom_held_<id>: owned
                 sf:SetGlobalCounter(".myroom_" .. e.furniture, counter(sf, ".myroom_" .. e.furniture) + 1)
                 sf:SetGlobalCounter(".myroom_held_" .. e.furniture, counter(sf, ".myroom_held_" .. e.furniture) + 1)
                 out[#out + 1] = { kind = "furniture", id = e.furniture }
@@ -152,8 +150,8 @@ function M.grant(level)
     return out
 end
 
--- starts the pop-up of one reward from grant(); false when it can't show. The furniture pop-up shows My
--- Room's shared thumbnail "myroom_thumb_<id>", the key pop-up the skin's shared texture KEY_PICTURE .. key.
+-- starts one grant() reward's pop-up; false when it can't show
+-- furniture shows the shared "myroom_thumb_<id>", keys the shared KEY_PICTURE .. key
 function M.show(r)
     local modal = ROACTIVITY:GetROActivity("modal")
     if modal == nil or r == nil then return false end

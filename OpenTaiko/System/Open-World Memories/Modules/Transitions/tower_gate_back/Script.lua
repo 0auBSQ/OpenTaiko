@@ -78,7 +78,7 @@ function fadeOut(t)
 	end
 	if t < SHUT_AT then
 		local p = t / SHUT_AT
-		drawGate(1 - p * p, 0, 0)                 -- heavy: slow to start, fast at the end
+		drawGate(1 - p * p, 0, 0)                 -- ease-in
 		return
 	end
 	if not slammed then

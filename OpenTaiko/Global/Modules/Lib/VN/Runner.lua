@@ -1,46 +1,6 @@
 ---@diagnostic disable: undefined-global
--- VN.Runner — walks a visual-novel line script: `when` guards, random picks, choices that splice their
--- branch in, and the stage directions the caller registers. It draws nothing: a scene player (VN.Scene)
--- or a stage steps it and puts its prose lines on a VN.Dialogue box.
---   local Runner = require("VN.Runner")
---
--- A line is a table, every field optional:
---   text     the prose, with VN.Dialogue's inline tags; "" (or none) with choices = a bare choice, which
---            keeps the previous prose line on screen, already read, under its choices
---   who      the speaker's id; name = the shown name, which wins over who's (e.g. "???")
---   expr     the speaker's expression
---   choices  { { label =, value = }, ... }; branch = { [value] = { lines } } spliced in after the choice
---   when     function(ctx) -> true when the line plays; a guard that errors counts as false
---   pick     { { lines = { ... }, weight = n }, ... }: one option drawn by weight (1 when absent), never
---            the same one twice in a row, its lines spliced in after the pick line
---   any other key is a stage direction the caller registers (enter, leave, bg, fade, sfx, flag, ...)
--- "<player name>" in a text becomes ctx.playerName.
---
--- Runner.new(opts) -> runner, opts = {
---   lines = { ... },          the script; the runner walks a copy, since branches are spliced into it
---   ctx = { },                what `when` guards read; a choice sets ctx.choice and ctx.choices[value]
---   tr = fn(s) -> s,          translator for texts, names and choice labels (none: shown as written)
---   speakerName = ...,        the name a line with `who` and no `name` shows: a string, a { [who] = name }
---                             table or fn(who, line, ctx)
---   playerTag = "<player name>", playerName = string or fn(ctx)   (default ctx.playerName)
---   directions = { [key] = fn(line, runner) -> verdict },
---   order = { key, ... },     the order directions are tried in (default Runner.ORDER, then the rest sorted)
---   onLine = fn(line, runner) -> verdict,   every line that plays, before its directions
---   onChoose = fn(line, value, runner),     a choice was taken (also when a bookmark is resumed)
---   random = fn() -> [0, 1),  for picks (math.random)
--- }
--- A direction runs when its line carries its key, and returns:
---   false       not handled: the next direction in the order is tried
---   nil, true   handled: the walk goes on to the next line
---   "hold"      the walk stops here until the caller steps again
---   "end"       the script is over
--- "text" is the prose: unless the caller registers its own, a line with text or choices stops the walk
--- as "line", for the caller to show it (runner:present(dlg)) and to report the box's result (runner:choose).
---
--- runner:bookmark() -> { idx, picks, rolls }: the line on screen, the choice values taken and the pick
--- options drawn. runner:resume(mark, replay) walks silently up to that line again, re-taking the same
--- choices and picks; replay = { [key] = fn(line, runner) } re-applies the directions that leave state
--- behind (a background, a flag). The next step() then shows the bookmarked line.
+-- VN.Runner: walks a visual-novel line script, no drawing
+-- stepped by VN.Scene or a stage; prose lines go on a VN.Dialogue box
 
 local Runner = {}
 Runner.__index = Runner
@@ -48,7 +8,7 @@ Runner.__index = Runner
 Runner.ORDER = { "outcome", "fade", "bg", "enter", "leave", "shake", "sfx", "flag", "text", "expr" }
 Runner.PLAYER_TAG = "<player name>"
 
--- ── helpers that need no runner ──────────────────────────────────────────────
+-- ==== static helpers ====
 
 -- a line plays unless its guard says otherwise
 function Runner.passes(line, ctx)
@@ -77,11 +37,9 @@ local function speakerName(o, who, line, ctx)
     return n
 end
 
--- The dialogue node of `line`: name (o.speakerName covers `who`), text and choice labels translated,
--- the player tag substituted. Choice values are never translated. `carry` is the previous prose line:
--- a bare-choice line shows that line's text and speaker instead of an empty box.
--- `speaker` is the true identity (who) even when the shown name masks it, and `voice` the raw
--- untranslated name, so per-speaker sounds never change with the label or the language.
+-- dialogue node of `line`, translated (choice values never), player tag substituted
+-- carry: previous prose line, shown by a bare-choice line
+-- speaker = who (even under a masking name), voice = raw name (per-speaker sounds stay stable)
 function Runner.node(line, ctx, o, carry)
     o = o or {}
     local src, carried = line, false
@@ -101,14 +59,13 @@ function Runner.node(line, ctx, o, carry)
     if type(player) == "function" then player = player(ctx) end
     if player == nil and ctx ~= nil then player = ctx.playerName end
     if player ~= nil then
-        -- a function replacement: a % in the name is not a capture reference
+        -- function replacement: a % in the name is no capture reference
         text = text:gsub(o.playerTag or Runner.PLAYER_TAG, function() return player end)
     end
     return { name = translate(name, o.tr), speaker = src.who, voice = name, text = text, choices = choices }, carried
 end
 
--- starts `line` on a VN.Dialogue box; a carried line shows fully revealed, with no retyping, no blips
--- and its inline tags left unfired
+-- starts `line` on a VN.Dialogue box; a carried line shows fully revealed (no retype, no blips)
 function Runner.start(dlg, line, ctx, o, carry)
     local node, carried = Runner.node(line, ctx, o, carry)
     dlg:start({ node })
@@ -116,7 +73,7 @@ function Runner.start(dlg, line, ctx, o, carry)
     return node, carried
 end
 
--- records the value picked on lines[idx] and splices its branch in after it; false when nothing was picked
+-- records the value picked on lines[idx] and splices its branch in; false when nothing was picked
 function Runner.resolveChoice(lines, idx, ctx, value)
     local line = lines[idx]
     if line == nil or line.choices == nil or value == nil or value == true then return false end
@@ -127,11 +84,11 @@ function Runner.resolveChoice(lines, idx, ctx, value)
     return true
 end
 
--- the option each pool gave last time, so that the next pick from it is another one
+-- last option per pool, so the next pick differs
 local _lastPick = setmetatable({}, { __mode = "k" })
 
--- plays one option of lines[idx].pick: its lines are spliced in after the pick line. `forced` takes that
--- option instead of drawing one (a resumed bookmark). Returns the option's index.
+-- plays one option of lines[idx].pick, splicing its lines in after it
+-- forced: that option instead of a draw (resume); returns its index
 function Runner.resolvePick(lines, idx, random, forced)
     local pool = lines[idx] and lines[idx].pick
     if type(pool) ~= "table" or #pool == 0 then return nil end
@@ -159,8 +116,28 @@ function Runner.resolvePick(lines, idx, random, forced)
     return chosen
 end
 
--- ── a runner ─────────────────────────────────────────────────────────────────
+-- ==== runner ====
 
+-- line fields, all optional:
+--   text     prose with VN.Dialogue inline tags; "" or none with choices = bare choice (keeps the last prose)
+--   who      speaker id; name = shown name, wins over who's
+--   expr     speaker expression
+--   choices  { { label =, value = }, ... }; branch = { [value] = { lines } } spliced in after the choice
+--   when     fn(ctx) -> true when the line plays; an erroring guard counts as false
+--   pick     { { lines = { ... }, weight = n }, ... }: one by weight (default 1), never the same twice in a row
+--   other keys: stage directions the caller registers
+-- "<player name>" in text becomes ctx.playerName
+-- opts:
+--   lines = { ... }: the script, walked as a copy (branches get spliced in)
+--   ctx: read by `when` guards; a choice sets ctx.choice and ctx.choices[value]
+--   tr = fn(s) -> s: translates shown strings (none: as written)
+--   speakerName: name for a line with `who` and no `name`: string, { [who] = name } or fn(who, line, ctx)
+--   playerTag = "<player name>", playerName = string or fn(ctx) (default ctx.playerName)
+--   directions = { [key] = fn(line, runner) -> verdict }
+--   order = { key, ... }: direction order (default Runner.ORDER, then the rest sorted)
+--   onLine = fn(line, runner) -> verdict: every played line, before its directions
+--   onChoose = fn(line, value, runner): a choice was taken (also on resume)
+--   random = fn() -> [0, 1) for picks (default math.random)
 function Runner.new(opts)
     opts = opts or {}
     local self = setmetatable({}, Runner)
@@ -194,7 +171,10 @@ function Runner:current() return self.lines[self.idx] end
 
 local function isProse(line) return line.text ~= nil or line.choices ~= nil end
 
--- the first direction the line carries that handles it
+-- first direction the line carries that handles it; verdicts:
+--   false: not handled, next direction tried; nil or true: the walk goes on
+--   "hold": the walk stops until the caller steps; "end": script over
+-- "text" unless registered: a line with text or choices stops as "line" (present, then choose)
 function Runner:direct(line)
     for _, k in ipairs(self.order) do
         if (k == "text" and isProse(line)) or (k ~= "text" and line[k] ~= nil) then
@@ -218,8 +198,7 @@ function Runner:_roll()
     if chosen ~= nil then self.rolls[#self.rolls + 1] = chosen end
 end
 
--- walks to the next stop: "line" (a prose line to present), "hold" (a direction holds) or "end";
--- the line it stopped on comes second
+-- walks to the next stop: "line" (prose to present), "hold" or "end"; returns verdict, line
 function Runner:step()
     while true do
         self.idx = self.idx + 1
@@ -259,8 +238,7 @@ function Runner:choose(value)
     return false
 end
 
--- true when fn(line) says so for the first line after the current one that it gives an answer for
--- (true or false; nil goes on); `otherwise` when the script ends first
+-- fn(line) of the first later line it answers for (true/false; nil goes on); `otherwise` at the end
 function Runner:ahead(fn, otherwise)
     for i = self.idx + 1, #self.lines do
         local l = self.lines[i]
@@ -272,6 +250,7 @@ function Runner:ahead(fn, otherwise)
     return otherwise
 end
 
+-- { idx, picks, rolls }: the line on screen, choice values taken, pick options drawn
 function Runner:bookmark()
     local p, r = {}, {}
     for i, v in ipairs(self.picks) do p[i] = v end
@@ -279,10 +258,12 @@ function Runner:bookmark()
     return { idx = self.idx, picks = p, rolls = r }
 end
 
+-- walks silently up to mark's line, re-taking its choices and picks
+-- replay = { [key] = fn(line, runner) } re-applies stateful directions; the next step() shows the line
 function Runner:resume(mark, replay)
     if type(mark) ~= "table" or type(mark.idx) ~= "number" then return end
     replay = replay or {}
-    -- the replayed directions, in the walk's order
+    -- replayed directions, in walk order
     local keys, seen = {}, {}
     for _, k in ipairs(self.order) do if replay[k] ~= nil then keys[#keys + 1] = k ; seen[k] = true end end
     local rest = {}

@@ -1,7 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Dan up background (Winter): skybox + horizontally scrolling clouds, a dojo/bush foreground,
--- and three swaying, downward-scrolling snow layers tiled across the screen.
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
+-- dan up background: winter
 
 local bgWidth_1 = 1984
 local bgWidth_4 = 962

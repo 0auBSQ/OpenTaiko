@@ -1,9 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
--- game.lua — Core game logic for intro_nokon (Endurance and VS modes).
---
--- Game.start(config) begins a session.
--- Game.update() / Game.draw() called every frame.
--- Game.update() returns "exit" when the player leaves the result screen.
+-- intro_nokon game logic (Endurance and VS)
 
 local I18N = require("i18n")
 local NavInput = require("NavInput")
@@ -17,10 +13,10 @@ local M = {}
 
 local Stage    = nil
 local Dialogue = nil
-local utils    = nil   -- injected from Script.lua
+local utils    = nil   -- set by Script.lua
 local txts     = {}
 
--- ── State ─────────────────────────────────────────────────────────────────────
+-- ==== State ====
 
 local state      = "idle"
 local gameMode   = "Endurance"
@@ -29,22 +25,20 @@ local playerNames = {}
 local currentRound = 1
 local totalRounds  = 999
 
--- Song/quiz references (set via utils.selectRandomSong)
+-- set via utils.selectRandomSong
 local correctUniqueId = nil
 
--- Wait helper
 local waitCounter = nil
 local waitDoneCb  = nil
 
--- Endurance/VS score (indexed by player 1-5)
+-- per player (1-5)
 local scores = {}
 
--- Clock counter (0→1 over N seconds, value >= 1 means expired)
 local clockCtr    = nil
-local clockMs     = 0   -- kept in sync by counter listener
+local clockMs     = 0   -- ms left, set by the counter listener
 local clockActive = false
 
--- VS state
+-- VS
 local vsMaxScore       = 10
 local vsRoundScore     = 10
 local vsScoreDropCtr   = nil
@@ -52,24 +46,23 @@ local vsAnsweringPlayer = 0
 local vsBuzzScore      = 0
 local vsDenied         = {}
 
--- Endurance: available genres cache
+-- Endurance genres
 local availGenres    = {}
 local selectedGenre  = nil
 
--- VS: genre selection
+-- VS genre select
 local vsGenres       = {}
 local vsGenreIdx     = 1
 
--- Quiz list navigation (page cache for stage display)
+-- stage list page cache
 local pageCache = {}
 
--- Endurance end-of-game data
 local highScores = {}
 
--- Single-song egg mode (Endurance with exactly 1 song in scope)
+-- Endurance with exactly one song
 local singleSongMode = false
 
--- Enter = universal decide for any player; Escape = universal cancel.
+-- Enter decides and Escape cancels for any player
 local function pDecide(p)
     local inp = NavInput.p[p]
     if inp == nil then return false end
@@ -88,7 +81,7 @@ local function pLeft(p)
     return inp.left(p == 1)
 end
 
--- ── Helpers ───────────────────────────────────────────────────────────────────
+-- ==== Helpers ====
 
 local function pick(t)
     if #t == 0 then return "" end
@@ -117,7 +110,7 @@ end
 local function startClock(ms)
     clockMs     = ms
     clockActive = true
-    -- counter: 0→ms over ms/1000 seconds.  interval = (ms/1000)/ms = 1/1000
+    -- counts 0..ms, interval 1/1000 s
     clockCtr = COUNTER:CreateCounter(0, ms, 1 / 1000)
     clockCtr:Listen(function(v) clockMs = math.max(0, ms - v) end)
     clockCtr:Start()
@@ -152,7 +145,7 @@ local function sub(text)
     return text
 end
 
--- the board's second line after a right answer
+-- board second line on a right answer
 local function winsLine(p, n)
     return I18N.trf(n == 1 and "%s wins %d point!" or "%s wins %d points!", playerNames[p] or ("Player " .. p), n)
 end
@@ -165,13 +158,13 @@ local function showDialogue(blocks, onDone, opacity)
     Dialogue.show(processed, onDone, opacity or 0)
 end
 
--- ── Forward declarations (mutual recursion) ───────────────────────────────────
+-- ==== Forward declarations ====
 
 local eStartTurn
 local vsStartTurn
 local vsNextRound
 
--- ── Curtain sequences ─────────────────────────────────────────────────────────
+-- ==== Curtain ====
 
 local function curtainCloseTo(onClosed)
     setState("curtain_closing")
@@ -181,7 +174,7 @@ local function curtainCloseTo(onClosed)
     end)
 end
 
--- ── Opening ceremony ──────────────────────────────────────────────────────────
+-- ==== Opening ceremony ====
 
 local function runCeremony(onDone)
     setState("ceremony")
@@ -194,8 +187,7 @@ local function runCeremony(onDone)
               onConfirm = function() Stage.setSpotlight(1, false) end },
         }, onDone, 0)
     else
-        -- VS: "Let me present..." confirms to spotlight player 1,
-        -- each name block turns off its spotlight and turns on the next one.
+        -- VS: each block moves the spotlight to the next player
         local blocks = {
             { text = "Welcome to today's Intro Nokon session!\nI am Nokon and we are here for a VS session!" },
             { text = "Let me present today's challengers...",
@@ -220,7 +212,7 @@ local function runCeremony(onDone)
     end
 end
 
--- ── Endurance ─────────────────────────────────────────────────────────────────
+-- ==== Endurance ====
 
 eStartTurn = function()
     Stage.clearRoundState()
@@ -239,7 +231,7 @@ eStartTurn = function()
     local sel = utils.getSelectedSong()
     correctUniqueId = sel and sel.UniqueId or nil
     Stage.setBlackboard(genre.Title or "???")
-    utils.playSound("Question")  -- play when the genre name appears on the blackboard
+    utils.playSound("Question")
     setState("e_genre")
 
     startWait(Animation.game.genre_reveal_s, function()
@@ -302,7 +294,7 @@ local function eEvalFail()
     utils.playSound("Wrong")
     Stage.setPlayerPressing(1, false)
     Stage.setSongList(nil, nil)
-    -- reveal the correct answer on the stage panel
+    -- reveal the answer
     local sel = utils.getSelectedSong()
     Stage.setBlackboard(sel and SongTitle.of(sel) or nil, I18N.tr("It's a wrap!"))
     Stage.setBoardLights("wrong")
@@ -329,7 +321,7 @@ local function eEvalFail()
     end, DialogueLayout.fail_dim_opacity)
 end
 
--- ── VS ────────────────────────────────────────────────────────────────────────
+-- ==== VS ====
 
 local function vsAllDenied()
     for i = 1, numPlayers do
@@ -360,7 +352,7 @@ local function vsEvalFail()
     utils.stopPreview()
     utils.playSound("Wrong")
     Stage.setSongList(nil, nil)
-    -- nobody found it in time — reveal the correct answer on the stage panel
+    -- time out: reveal the answer
     local sel = utils.getSelectedSong()
     Stage.setBlackboard(sel and SongTitle.of(sel) or nil, I18N.tr("It's a wrap!"))
     Stage.clearRoundState()
@@ -424,7 +416,7 @@ vsStartTurn = function()
     vsGenres = utils.getGenres()
     if #vsGenres == 0 then vsEvalFail(); return end
 
-    -- Randomly pick up to 5 genres (partial Fisher-Yates)
+    -- up to 5 random genres (partial Fisher-Yates)
     if #vsGenres > 5 then
         for i = 1, 5 do
             local j = math.random(i, #vsGenres)
@@ -434,7 +426,7 @@ vsStartTurn = function()
     end
     vsGenreIdx = 1
 
-    -- Build genre page cache centered on vsGenreIdx
+    -- genre page cache centred on vsGenreIdx
     local function rebuildGenreCache()
         local cache = {}
         local rows = Layout.list.rows_each_side
@@ -455,15 +447,15 @@ vsStartTurn = function()
     end
 
     rebuildGenreCache()
-    utils.playSound("Question")  -- play when genre selection appears
+    utils.playSound("Question")
     Stage.setChip(vsTurnPlayer())
     setState("vs_genre")
 
-    -- Store rebuild fn for navigation
+    -- used by navigation
     M._vsRebuildGenre = rebuildGenreCache
 end
 
--- ── Public API ────────────────────────────────────────────────────────────────
+-- ==== Public API ====
 
 function M.init(stageRef, dialogueRef, utilsRef, txtsRef)
     Stage    = stageRef
@@ -487,7 +479,7 @@ function M.start(config)
     Stage.reset(numPlayers)  -- starts with curtain closed
     for i = 1, numPlayers do Stage.setScore(i, 0) end
 
-    -- Curtain was pre-closed by the setup→game transition; open to reveal stage
+    -- curtain closed by the setup -> game transition
     Stage.openCurtain(function()
         runCeremony(function()
             if gameMode == "Endurance" then
@@ -499,14 +491,14 @@ function M.start(config)
     end)
 end
 
--- ── Draw ──────────────────────────────────────────────────────────────────────
+-- ==== Draw ====
 
 function M.draw()
     Stage.draw()
     Dialogue.draw()
-    Stage.drawFail()  -- over dialogue's darkening overlay
+    Stage.drawFail()  -- over the dialogue dim overlay
 
-    -- VS round counter (always visible during play)
+    -- VS round counter
     if gameMode == "VS" and state ~= "vs_results" and state ~= "idle" and state ~= "ceremony" then
         if txts.label then
             local Counter = Layout.round_counter
@@ -515,7 +507,7 @@ function M.draw()
         end
     end
 
-    -- Result screen text (rendered over the closed curtain)
+    -- result text (over the closed curtain)
     if state == "e_gameover" or state == "vs_results" then
         if txts.title then
             local header = I18N.tr(state == "e_gameover" and "Game Over!" or "Final Results!")
@@ -525,7 +517,6 @@ function M.draw()
             if state == "e_gameover" then
                 local s = txts.label:GetText(I18N.trf("Score: %d", scores[1] or 0), false, Results.score_max_width)
                 s:DrawAtAnchor(Results.x, Results.score_y, "center")
-                -- High scores
                 local hs = txts.label:GetText(I18N.tr("High Scores"), false, Results.high_scores_max_width)
                 hs:DrawAtAnchor(Results.x, Results.high_scores_y, "center")
                 local playerScore = scores[1] or 0
@@ -537,7 +528,7 @@ function M.draw()
                     et:DrawAtAnchor(Results.x, Results.high_score_y + (i - 1) * Results.high_score_gap, "center")
                 end
             else
-                -- VS: sort and show scores
+                -- VS: sorted scores
                 local sorted = {}
                 for i = 1, numPlayers do sorted[#sorted + 1] = {p=i, s=scores[i] or 0} end
                 table.sort(sorted, function(a, b) return a.s > b.s end)
@@ -553,8 +544,8 @@ function M.draw()
     end
 end
 
--- ── Update ────────────────────────────────────────────────────────────────────
--- Returns "exit" when the player dismisses the result/gameover screen.
+-- ==== Update ====
+-- returns "exit" when the result screen is dismissed
 
 function M.update()
     Stage.update()
@@ -562,15 +553,14 @@ function M.update()
     tickWait()
     tickClock()
 
-    -- Don't handle game input while dialogue or curtain is animating
+    -- no input during dialogue or curtain motion
     if Dialogue.isActive() or Stage.isCurtainMoving() then return nil end
-    -- Also skip during wait
     if waitCounter ~= nil then return nil end
 
     local decide = NavInput.decide()
     local cancel = NavInput.cancel()
 
-    -- ── Result / gameover ─────────────────────────────────────────────────────
+    -- ==== Result / gameover ====
 
     if state == "e_gameover" or state == "vs_results" then
         if decide or cancel then
@@ -582,7 +572,7 @@ function M.update()
         return nil
     end
 
-    -- ── Endurance ─────────────────────────────────────────────────────────────
+    -- ==== Endurance ====
 
     if state == "e_listen" then
         if clockMs <= 0 or decide then
@@ -604,7 +594,7 @@ function M.update()
             end
         end
 
-    -- ── VS ────────────────────────────────────────────────────────────────────
+    -- ==== VS ====
 
     elseif state == "vs_genre" then
         local tp = vsTurnPlayer()
@@ -641,7 +631,6 @@ function M.update()
         end
 
     elseif state == "vs_listen" then
-        -- Score drop
         if vsScoreDropCtr then
             vsScoreDropCtr:Tick()
             if vsScoreDropCtr.Value >= 1 then
@@ -655,7 +644,7 @@ function M.update()
         end
         if vsAllDenied() then vsEvalFail(); return nil end
 
-        -- Buzz-in: each player uses their own decide buttons
+        -- buzz-in per player
         for p = 1, numPlayers do
             if pDecide(p) and not vsDenied[p] then
                 vsScoreDropCtr    = nil
@@ -686,7 +675,7 @@ function M.update()
             if sel and correctUniqueId and sel.UniqueId == correctUniqueId then
                 vsEvalWin(ap, vsBuzzScore)
             else
-                -- Wrong: deny player, fixed 10-point penalty; also reduce prize pool
+                -- wrong: deny + 10-point penalty
                 vsDenied[ap] = true
                 Stage.setPlayerDenied(ap, true)
                 Stage.setBoardLights("wrong")

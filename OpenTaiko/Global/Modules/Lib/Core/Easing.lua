@@ -1,14 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global
--- Easing.lua — pure easing curves on a 0..1 ratio, for animations driven by a script's own clock
--- (timelines, particle ages) where the engine's counters (COUNTER + SetEasing, engine-clocked and
--- stateful) are not the right tool. Every curve clamps its input and maps 0 -> 0, 1 -> 1, except
--- hump which rises and falls (0 -> 0, 0.5 -> 1, 1 -> 0).
---
---   local Easing = require("Core.Easing")
---   local k = Easing.outBack(Easing.span(t, startTime, duration))
---   x = Easing.lerp(x0, x1, k)
---
--- Easing.get("OUT", "BACK") returns a curve by the engine's own type / function names.
+-- Core.Easing: easing curves on a 0..1 ratio for script-clocked animations
+-- each clamps its input and maps 0 -> 0, 1 -> 1 (hump: 0 -> 1 -> 0)
 
 local Easing = {}
 
@@ -30,7 +22,7 @@ function Easing.inOutSine(t) t = clamp01(t) ; return -(math.cos(pi * t) - 1) / 2
 function Easing.inExpo(t) t = clamp01(t) ; return t == 0 and 0 or 2 ^ (10 * t - 10) end
 function Easing.outExpo(t) t = clamp01(t) ; return t == 1 and 1 or 1 - 2 ^ (-10 * t) end
 
--- s: the overshoot amount (1.7 is the classic feel)
+-- s: overshoot (default 1.7)
 function Easing.outBack(t, s)
     t = clamp01(t) ; s = s or 1.7 ; local u = t - 1
     return 1 + u * u * ((s + 1) * u + s)
@@ -55,7 +47,7 @@ function Easing.outElastic(t)
     return 2 ^ (-10 * t) * sin((t * 10 - 0.75) * (2 * pi) / 3) + 1
 end
 
--- 0 -> 1 -> 0, for squashes and flashes
+-- 0 -> 1 -> 0
 function Easing.hump(t) return sin(clamp01(t) * pi) end
 
 -- the progress of a window [t0, t0 + dur] at time t

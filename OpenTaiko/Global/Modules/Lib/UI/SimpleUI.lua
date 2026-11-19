@@ -1,26 +1,5 @@
 ---@diagnostic disable: lowercase-global
--- UI.SimpleUI — a minimalist UI library: buttons, labels, toggles, sliders, text fields, panels, bubbles,
--- menus, choosers, settings lists and a coin counter, driven by the mouse, the keyboard and the pad with one
--- shared highlight. Global modules take the library the skin chose through UI.Pick (SimpleUI by default).
---
--- Quick start (in a stage Script.lua):
---   local UI = require("UI.Pick")()             -- or require("UI.SimpleUI") for this one
---   local ui
---   function onStart()
---       ui = UI.new{ bg = true, sfx = { hover = SOUND:CreateSFX("Sounds/Move.ogg"),
---                                       click = SOUND:CreateSFX("Sounds/Decide.ogg") }, navPlayer = 1 }
---       ui:button{ text = "Play", x = 810, y = 460, onClick = function() print("hi") end }
---       ui:toggle{ text = "Fullscreen", x = 120, y = 200, value = true, onChange = function(v) end }
---   end
---   function update(ts) if ui:update(ts) == "cancel" then return Exit("stage", "_title") end end
---   function draw() ui:draw() end
---
--- Everything is theme-customizable: pass `theme = { colors = { primary = {…} }, radius = 12, … }` to
--- new (merged over the library's default theme), or `style = {…}` per widget. Hover (mouse) and focus
--- (keyboard/gamepad: arrows + Decide/Cancel) share one highlight, so both feel identical.
---
--- SimpleUI.derive{ Theme = <theme module>, Coins = <coins widget class>, name = "..." } makes another library
--- with the same widgets, manager, focus and input and its own look (OWM's PopUI is SimpleUI + Bubblegum).
+-- UI.SimpleUI: widget library with one shared hover/focus highlight
 
 local SimpleUI = {}
 
@@ -33,7 +12,7 @@ SimpleUI.Manager = require("UI.SimpleUI.manager")
 SimpleUI.Cache   = require("UI.SimpleUI.cache")
 SimpleUI.Sfx     = require("UI.SimpleUI.sfx")
 
--- widget classes (for advanced users who want to subclass)
+-- widget classes (for subclassing)
 SimpleUI.Button  = require("UI.SimpleUI.widgets.button")
 SimpleUI.Label   = require("UI.SimpleUI.widgets.label")
 SimpleUI.Toggle  = require("UI.SimpleUI.widgets.toggle")
@@ -47,14 +26,14 @@ SimpleUI.SettingsList = require("UI.SimpleUI.widgets.settingslist")
 SimpleUI.ListBase = require("UI.SimpleUI.widgets.listbase")
 SimpleUI.Coins   = require("UI.SimpleUI.widgets.coins")
 
---- Create a UI manager. opts = { theme = {…}?, sfx = { hover, click, move, toggle, error }?, bg = bool?,
---- navPlayer = n?, nav = "spatial"? (the arrow keys move to the nearest widget in their direction) }
+--- opts = { theme? (merged over the default), sfx = { hover, click, move, toggle, error }?, bg?,
+--- navPlayer?, nav = "spatial"? (arrows move to the nearest widget) }
 function SimpleUI.new(opts) return SimpleUI.Manager.new(opts, SimpleUI) end
 
---- Dispose + drop the shared font caches (call when the language — and thus the main font — changes)
+--- dispose the shared font caches (call on a language change)
 function SimpleUI.flushSharedFonts() return SimpleUI.Manager.flushSharedFonts() end
 
---- A library with SimpleUI's behaviour and another look: spec = { Theme = { DEFAULT = {…}, … }, Coins = class?, name = "..."? }
+--- same widgets with another look: spec = { Theme = { DEFAULT = {…}, … }, Coins = class?, name = "..."? }
 function SimpleUI.derive(spec)
     local L = {}
     for k, v in pairs(SimpleUI) do L[k] = v end

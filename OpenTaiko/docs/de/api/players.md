@@ -462,7 +462,7 @@ Die Eigenschaft UnlockCondition von Namensschild-Info-Handles, Charakterlisten-E
 Die Auflösung des Skins, Theme-Einstellungen, skinweite lokalisierte Strings und die Definitionen der Theme-Einstellungen.
 
 <div class="callout warn">
-Der Skin deklariert Theme-Einstellungen in ThemeSettings.json und speichert ihre Werte in der ThemeSettings.db3 daneben. Die Getter geben Einstellungswerte immer als Strings zurück; eine fehlende Einstellung gibt ihren deklarierten Standardwert zurück, oder einen leeren String, wenn keine Deklaration existiert. Die ForPlayer-Methoden setzen einen Spieler außerhalb des Bereichs auf 0 oder 4. Definitionsindizes sind 0-basiert.
+Der Skin deklariert Theme-Einstellungen in ThemeSettings.json und speichert ihre Werte in `Global/ApplicationData/SkinSettings_<skin folder>.db3`, außerhalb des Skin-Ordners, damit sie ein Skin-Update überstehen. Die Getter geben Einstellungswerte immer als Strings zurück; eine fehlende Einstellung gibt ihren deklarierten Standardwert zurück, oder einen leeren String, wenn keine Deklaration existiert. Die ForPlayer-Methoden setzen einen Spieler außerhalb des Bereichs auf 0 oder 4. Definitionsindizes sind 0-basiert.
 </div>
 
 | Methode | Beschreibung |

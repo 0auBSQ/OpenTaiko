@@ -1,7 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Dan Gold Pass end animation: a scroll rises into view then slides open (cubic/quad eases).
--- Group C clear/end script: the host passes the player via the state table; playEndAnime(player)
--- is called directly by the host with the index and (re)starts the per-play counters.
+-- end anime: Dan_Gold_Pass (group C, player via state.player)
 
 local width = 1920
 local height = 1080
@@ -36,7 +34,6 @@ function clearOut(player)
 end
 
 function playEndAnime(player)
-    -- (re)start the per-play counters (the old init reset these too)
     animeTimer = 0
     scrollRiseTransition = 0
     scrollSlideTransition = 0
@@ -69,11 +66,9 @@ function draw(state)
     local player = state.player
 
     if scrollSlideTransition > 0 then
-        -- Draw scroll background
         tx["Scroll_Back.png"]:DrawRect(scrollSlidePos, scrollRisePos, scrollSlidePos - scrollBackWidth - scrollBackXOffset, 0, scrollBackWidth - scrollSlidePos + scrollBackXOffset, scrollHeight)
         tx["Scroll_Back_Overlay.png"]:DrawRect(scrollSlidePos, scrollRisePos, scrollSlidePos - scrollBackWidth - scrollBackXOffset, 0, scrollBackWidth - scrollSlidePos + scrollBackXOffset, scrollHeight)
     end
-    -- Draw scroll
     tx["Scroll.png"]:Draw(scrollSlidePos, scrollRisePos)
 end
 

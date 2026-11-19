@@ -1,10 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- onlinelobby/Script.lua — a P2P 5-player rhythm lobby. Create/join a room (paste-in code); the lobby AUTHORITY
--- (rotates each round) picks the SONG (no difficulty prompt — the jacket + levels + preview show in the lobby) and
--- sets speed/dynamic-beat; every player picks their own difficulty + mods (real mod_select_dialog) + ready. The
--- host's first menu state is "Start play!" (selectable anytime). On start everyone plays the SAME song; remote
--- players render as real virtual-slot spots whose judges are sampled from the broadcast accuracy (no flying notes),
--- with synced loading/finish + results + host rotation. The session logic is the global Online.Lobby (LO).
+-- online lobby stage (P2P, up to 5 players; session logic in Online.Lobby)
 
 local NavInput = require("NavInput")
 local LO = require("Online.Lobby")
@@ -12,7 +7,7 @@ local PopUI = require("PopUI")
 local I18N = require("Locale.i18n")
 local T = I18N.texts("lobby")     -- lang/<code>/lobby.json
 local net = LO.net
--- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+-- layout: Config/layout.json; timings: Config/animation.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
@@ -20,8 +15,7 @@ local COL = Layout.colors
 local MSG = Animation.message_s
 local CX = Layout.center_x
 
--- the lobby's texts, looked up once per visit (resetTexts on activate); the engine's own words for the
--- difficulty names
+-- texts cached per visit (resetTexts on activate)
 local texts = {}
 local function L(id)
     local s = texts[id]
@@ -51,12 +45,12 @@ local ti = nil
 local act = nil                             -- song_select_core (host)
 local modDlg = nil                          -- mod_select_dialog (per-player)
 local modWasActive = false
-local modicons = nil                        -- modicons ROActivity (draws a player's mod icons)
+local modicons = nil                        -- modicons ROActivity
 local pendingReturn = false
 local msg, msgT = nil, 0
 
--- ── keys: theme settings of type "key" ("" = unbound); the song speed keys are the song select's, and
--- choosing / confirming is the decide button ─────────────────────────────────────────────────────────────
+-- ==== Keys ====
+-- theme settings of type "key" ("" = unbound)
 local KEY_SETTINGS = {
     song = { "onlinelobby_key_song", "S" },
     speed_down = { "songselect_key_speed_down", "PageDown" }, speed_up = { "songselect_key_speed_up", "PageUp" },
@@ -75,7 +69,7 @@ local function pressed(id)
     return k ~= nil and k ~= "" and INPUT:KeyboardPressed(k)
 end
 
--- the labels in the hints, kept for the visit (the language and the binds can change between visits)
+-- hint labels, cached per visit
 local keyLabels, bindNames = {}, {}
 
 local function keyLabel(id)
@@ -94,7 +88,7 @@ local function speedLabel()
     return s
 end
 
--- the game's Decide / Cancel buttons, named as the key config names them ("[Decide]", "[Cancel]")
+-- Decide / Cancel names as in the key config
 local function bindLabel(which)
     local s = bindNames[which]
     if s == nil then
@@ -106,16 +100,16 @@ local function bindLabel(which)
     return s
 end
 
--- ── look: PopUI panels on a flat background ───────────────────────────────────────────────────────
+-- ==== Look ====
 local TEX_NAMES = { "Difficulty/Missing", "Difficulty/Level/plus" }
 for d = 0, 4 do TEX_NAMES[#TEX_NAMES + 1] = "Difficulty/" .. d end
 for n = 0, 9 do TEX_NAMES[#TEX_NAMES + 1] = "Difficulty/Level/" .. n end
 local tex = {}
-local ui = nil                               -- the panels and menus of the screen shown
-local builtFor = nil                         -- the screen they were built for
-local builtHost = false                      -- and whether they were built for the room's controller
-local click = {}                             -- what the menus and buttons were asked this frame
-local nextBtn = nil                          -- the results' way back to the lobby, for the mouse
+local ui = nil                               -- current screen widgets
+local builtFor = nil                         -- mode built for
+local builtHost = false                      -- built as controller
+local click = {}                             -- widget requests this frame
+local nextBtn = nil                          -- results back button (mouse)
 
 local INK, DIM, WHITE = COL.ink, COL.dim, COL.white
 local ACCENT, ACCENT_SOFT = COL.accent, COL.accent_soft
@@ -123,8 +117,8 @@ local GREEN, RED, AMBER = COL.green, COL.red, COL.amber
 local BG = COL.background
 local ROW_FACE, ROW_EMPTY = COL.row_face, COL.row_empty
 local NONE = COL.text_outline
-local TEXT_PAD = 25                          -- a glyph box's side padding (PopUI's)
--- each difficulty's text colour: its emblem's hue, darkened for the light panels
+local TEXT_PAD = 25                          -- PopUI glyph box side padding
+-- text colour per difficulty
 local DIFF_COL = {}
 for i, c in ipairs(Layout.difficulty_colors.list) do DIFF_COL[i - 1] = c end
 
@@ -141,7 +135,7 @@ end
 
 local function rect(x, y, w, h, c, a) ui:rect(x, y, w, h, c[1], c[2], c[3], a or 255) end
 
--- text with its ink centred on y; align "left" puts the ink's left edge at x, "right" its right edge
+-- ink centred on y; align "left"/"right" sets the ink edge at x
 local function text(size, str, x, y, c, align, op, maxW)
     align = align or "left"
     local ax = (align == "left") and (x - TEXT_PAD) or (align == "right") and (x + TEXT_PAD) or x
@@ -149,7 +143,7 @@ local function text(size, str, x, y, c, align, op, maxW)
         maxW and (maxW + 2 * TEXT_PAD) or 0, align)
 end
 
--- a texture centred on (x, y), scaled and faded
+-- texture centred on (x, y), scale k, opacity op
 local function sprite(name, x, y, k, op)
     local t = tex[name]
     if t == nil then return end
@@ -158,9 +152,8 @@ local function sprite(name, x, y, k, op)
     t:SetScale(1, 1); t:SetOpacity(1)
 end
 
--- a difficulty emblem centred on (cx, cy) at scale k with its level inside, the digits set like the song
--- select's song info (a plus level's "+" off the last digit's top-right corner); d nil = the empty emblem,
--- level nil = the emblem alone
+-- difficulty emblem at (cx, cy), scale k, level inside
+-- d nil: empty emblem; level nil: no digits
 local EMBLEM = Layout.emblem
 local PLUS_DX, PLUS_DY = EMBLEM.plus_dx, EMBLEM.plus_dy
 local function drawEmblem(d, level, isPlus, cx, cy, k, op)
@@ -192,21 +185,20 @@ local function drawEmblem(d, level, isPlus, cx, cy, k, op)
     if isPlus then sprite("Difficulty/Level/plus", cx + total / 2 + PLUS_DX * k, cy + PLUS_DY * k, k, op) end
 end
 
--- the panels of each screen; they are built from update when the screen changes (never from draw)
+-- per-screen panels, built from update on screen change (never draw)
 local PANELS = {}
 local function prepare()
     local host = (mode == "lobby" and LO.amController()) and true or false
     if ui == nil or (builtFor == mode and builtHost == host) then return end
     ui:disposeWidgets()
-    ui:clear()                               -- disposing frees their canvases; the list is emptied here
+    ui:clear()                               -- dispose frees canvases, clear empties the list
     builtFor, builtHost = mode, host
     nextBtn = nil
     local build = PANELS[mode]
     if build then build() end
 end
 
--- a message on one line, or wrapped onto as many as it needs when it is too long; the lines are kept
--- until the message changes
+-- toast lines, wrapped when too long (cached per message)
 local TOAST = Layout.toast
 local TOAST_W = TOAST.max_width
 local toastOf, toastRows, toastSize = nil, nil, TOAST.font_size
@@ -222,7 +214,7 @@ local function toastLines(s)
     return toastRows, toastSize
 end
 
--- the bar keeps its bottom edge and grows upwards with the lines
+-- bottom-anchored, grows up
 local function drawToast()
     if not (msgT and msgT > 0 and msg) then return end
     local op = math.min(1, msgT / Animation.toast_fade_s)
@@ -239,17 +231,17 @@ end
 local HINT = Layout.hint
 local function drawHint(s) text(HINT.font_size, s, CX, HINT.y, DIM, "center", 1, HINT.max_width) end
 
--- ── menu / code ─────────────────────────────────────────────────────────────────────────────────────
+-- ==== Menu / code ====
 local MENU = Layout.menu
 local MENU_ROW = MENU.row_height
 
--- the way back at the top left of every screen, for the mouse; the keys use the cancel button
+-- top-left back button (mouse); keys use cancel
 local function backButton()
     local B = Layout.back_button
     ui:button{ icon = "back", x = B.x, y = B.y, w = B.w, h = B.h, mouseOnly = true, onClick = function() click.back = true end }
 end
 
--- a menu whose cursor goes round from one end to the other
+-- cursor wraps around
 local function wrapping(o)
     o.onNavDownOrPadRight = function(m) m:setSelected(m.selected % #m.items + 1); return true end
     o.onNavUpOrPadLeft = function(m) m:setSelected((m.selected - 2) % #m.items + 1); return true end
@@ -258,7 +250,7 @@ end
 
 PANELS.menu = function()
     ui:panel{ x = MENU.x, y = MENU.y, w = MENU.w, h = MENU.h, pad = MENU.pad, title = L("logo_title") }
-    -- Exit is an item so the drums alone can leave (they have no cancel)
+    -- Exit item: drums have no cancel
     ui:menu(wrapping{ x = CX - MENU.list.w / 2, y = MENU.y + MENU.list.y_offset, w = MENU.list.w, h = 3 * MENU_ROW, rowHeight = MENU_ROW,
         items = { L("menu_create"), L("menu_join"), L("menu_exit") }, selected = 1, onSelect = function(i) click.pick = i end })
     ui:focusStay()
@@ -291,12 +283,12 @@ local function drawCode()
     drawHint(LF("hint_code", bindLabel("CANCEL")))
 end
 
--- ── lobby ───────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Lobby ====
 local JK = Layout.jacket
-local JK_X, JK_Y, JK_S = JK.x, JK.y, JK.size        -- the jacket
+local JK_X, JK_Y, JK_S = JK.x, JK.y, JK.size
 local SI = Layout.song_info
 
--- the song speed: its multiplier, pink when faster and blue when slower
+-- song speed multiplier (fast / slow colours)
 local SPEED_FAST, SPEED_SLOW = COL.speed_fast, COL.speed_slow
 local function drawSpeed(x, labelY, valueY)
     local mult = net.song.speed and CONFIG.SONGSPEED:ToActual(net.song.speed) or 1
@@ -325,7 +317,7 @@ local function drawSong()
         text(SI.title.font_size, net.song.title or "?", SI.center_x, SI.title.y, INK, "center", 1, SI.max_width)
         if net.songSubtitle and net.songSubtitle ~= "" then text(SI.subtitle.font_size, net.songSubtitle, SI.center_x, SI.subtitle.y, DIM, "center", 1, SI.max_width) end
         drawSpeed(SI.center_x, SI.speed.label_y, SI.speed.value_y)
-        -- every difficulty's emblem with its level; the ones this chart lacks show the empty emblem
+        -- all five emblems; missing ones empty
         local E = SI.emblems
         for d = 0, 4 do
             local lv = net.songLevels[d]
@@ -343,7 +335,7 @@ local function seatStatus(id)
     return L("status_not_ready"), DIM
 end
 
--- the roster: a row per seat with the player's nameplate, difficulty, mods and status
+-- roster: one row per seat
 local function drawRoster(ids, me)
     local cx = ROW_X + ROW_W / 2
     for i = 1, LO.MAXP do
@@ -366,12 +358,12 @@ local function drawRoster(ids, me)
             local d = net.diffByPeer[id] or 1
             local lv = (net.song ~= nil and not net.iLackSong) and net.songLevels[d] or nil
             drawEmblem(d, lv, net.songPlus[d], ROW_X + ROWS.emblem.dx, cy, ROWS.emblem.scale, 1)
-            -- mod icons (real icons): self uses CONFIG[0], others use a scratch slot
+            -- mod icons: self from CONFIG[0], others via a scratch slot
             if modicons then
                 pcall(function()
                     if mine then modicons:Draw(ROW_X + ROWS.mods.dx, cy + ROWS.mods.dy, 0, "menu", 255)
                     else
-                        -- the scratch slot is the local 5th player's: their special mod is put back after the draw
+                        -- scratch slot = local P5; special mod restored after
                         local keep = CONFIG:GetSpecialMod(4)
                         LO.applyModsToSlot(4, net.modByPeer[id]); modicons:Draw(ROW_X + ROWS.mods.dx, cy + ROWS.mods.dy, 4, "menu", 255)
                         CONFIG:SetSpecialMod(4, (keep ~= 1) and keep or 0)
@@ -391,13 +383,12 @@ local function drawRoster(ids, me)
     end
 end
 
--- the difficulty row of the deck: all five emblems, the chosen one full size on a marker, the others
--- scaled down; the ones the song lacks stay greyed (the cursor never stops on them)
+-- deck difficulty row: chosen emblem on a marker; missing ones greyed and skipped
 local DR = Layout.difficulty_row
 local DIFF_STEP = DR.step
 local DIFF_X0, DIFF_CY = DECK_X + DECK_SPLIT + DR.x_offset, DECK_Y + DECK_H / 2
 local DECK_ROW = DECK.row_height
-local SPEED_Y = Layout.speed_buttons.y        -- the host's song speed buttons
+local SPEED_Y = Layout.speed_buttons.y        -- host song speed buttons
 local function drawDiffRow(x0, cy)
     local d = LO.myDiff()
     rect(x0 + d * DIFF_STEP - DR.marker.w / 2, cy - DR.marker.h / 2, DR.marker.w, DR.marker.h, ACCENT_SOFT)
@@ -455,7 +446,7 @@ PANELS.lobby = function()
     ui:panel{ x = SONG.x, y = SONG.y, w = SONG.w, h = SONG.h, pad = SONG.pad, title = L("song_label") }
     ui:panel{ x = ROSTER.x, y = ROSTER.y, w = ROSTER.w, h = ROSTER.h, pad = ROSTER.pad }
     ui:panel{ x = DECK_X, y = DECK_Y, w = DECK_W, h = DECK_H, pad = DECK.pad }
-    -- the deck's menu: choosing a row confirms it, Left / Right change the difficulty on its row
+    -- deck menu: decide confirms a row, Left / Right change difficulty
     ui:menu(wrapping{ x = DECK_X + DECK.menu_dx, y = DECK_Y + (DECK_H - 3 * DECK_ROW) / 2, w = DECK_SPLIT - DECK.menu_w_inset, h = 3 * DECK_ROW,
         rowHeight = DECK_ROW, selected = tab,
         items = { builtHost and L("tab_start") or L("tab_ready"), L("tab_difficulty"), L("tab_mods") },
@@ -492,7 +483,7 @@ local function drawLobby()
     end
 end
 
--- ── results ─────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Results ====
 local RESULTS = Layout.results
 
 PANELS.results = function()
@@ -532,12 +523,10 @@ local function drawResults()
     else drawHint(LF("hint_results_back", bindLabel("DECIDE"))) end
 end
 
--- ── lifecycle ─────────────────────────────────────────────────────────────────────────────────────
+-- ==== Lifecycle ====
 function onStart()
     loadArt()
-    -- NOTE: do NOT fetch activities here. At skin load, stages' PropagateOnStart runs BEFORE Activities and
-    -- ROActivities are registered (see CSkin.FetchMenusAndModules), so GetActivity/GetROActivity return nil in
-    -- onStart. We fetch them in activate() (runs on entry, after everything is loaded) — same as song_select_core.
+    -- activities fetched in activate(): nil here (registered after PropagateOnStart)
 end
 
 function activate()
@@ -564,7 +553,7 @@ end
 function afterSongEnum() end
 function onDestroy() if modicons then pcall(function() modicons:Deactivate() end) end LO.leave() end
 
--- ── helpers ────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Helpers ====
 local function setMsg(m, t) msg = m; msgT = t or MSG.default end
 local function getSignal(result)
     if type(result) == "string" then return result end
@@ -576,20 +565,20 @@ local function backToMenu(m, t) LO.leave(); mode = "menu"; if m then setMsg(m, t
 local function playSfx(name) pcall(function() SHARED:GetSharedSound(name):Play() end) end
 local function playError() playSfx("Error") end
 
--- the screen's menus and buttons take the keys and the mouse; what they were asked is left in click
+-- widgets update; requests land in click
 local function widgets(ts)
     if builtFor == mode then ui:update(ts) end
 end
 
--- a left click inside a box this frame, while the mouse is the device in use
+-- left click in box this frame (mouse active)
 local function clickedIn(x, y, w, h)
     if not (ui:mouseActive() and INPUT:MousePressed("Left")) then return false end
     local mx, my = INPUT:GetMouseXY()
     return mx >= x and mx < x + w and my >= y and my < y + h
 end
 
--- ── host song select (song only — no difficulty prompt; Auto disabled) ────────────────────────────────
--- The song select shares the room's song speed through CONFIG.SongSpeed.
+-- ==== Host song select ====
+-- room song speed via CONFIG.SongSpeed
 local function enterSongSelect()
     if act == nil then act = ACTIVITY:GetActivity("song_select_core") end
     -- allowPlayerCount=false, lockedPlayerCount=1, no AI slot, songOnly=true
@@ -598,18 +587,18 @@ local function enterSongSelect()
 end
 local function updateSongSelect()
     local sig = getSignal(act:Update())
-    if sig == "play" then                    -- a SONG was confirmed (no difficulty step)
+    if sig == "play" then                    -- song confirmed (no difficulty step)
         act:Deactivate(); mode = "lobby"
         LO.songPicked()
     elseif sig == "cancel" then
         act:Deactivate(); mode = "lobby"
-        LO.songPickCancelled()              -- its jacket and preview come back if the song select moved away
+        LO.songPickCancelled()              -- restores jacket and preview
     end
 end
 
--- ── update ───────────────────────────────────────────────────────────────────────────────────────
+-- ==== Update ====
 local function step(ts)
-    -- first frame: the real frame time
+    -- first frame: real frame time
     local dt
     if lastTs == nil then
         local ok, d = pcall(function() return fps.deltaTime end)
@@ -629,7 +618,7 @@ local function step(ts)
         end
         if net.notice then setMsg(net.notice, MSG.network_notice); net.notice = nil end
     end
-    if mode == "lobby" or mode == "results" then LO.tickPreview(dt) end   -- loop the jacket preview (song select owns its own)
+    if mode == "lobby" or mode == "results" then LO.tickPreview(dt) end   -- jacket preview loop (song select has its own)
 
     local navPn = NavInput.p[1]
     click.back, click.pick, click.confirm, click.diff, click.speed, click.next = nil, nil, nil, nil, nil, nil
@@ -654,12 +643,12 @@ local function step(ts)
 
     elseif mode == "lobby" then
         if not net.online then
-            -- a failed join comes back with its reason, shown long enough to read; Cancel gives up the wait
+            -- failed join shows its reason; Cancel stops waiting
             if not net.connecting then backToMenu(net.msg or L("msg_disconnected"), MSG.disconnected)
             elseif navPn.cancel() then backToMenu() end
             return nil
         end
-        -- Play start is handled FIRST, even if the mod dialog is open (it is then force-closed WITHOUT saving).
+        -- play start first; an open mod dialog closes without saving
         if LO.takeGo() then
             if modDlg and modDlg.IsActive then pcall(function() modDlg:Deactivate() end); modWasActive = false end
             local r = LO.launchPlay()
@@ -667,10 +656,10 @@ local function step(ts)
             elseif r == "eject" then backToMenu(L("msg_no_song_eject")); return nil
             else setMsg(net.msg or L("msg_cant_start"), MSG.cant_start) end
         end
-        -- mod_select_dialog modal: while open it owns all input (Esc = its Cancel)
+        -- mod dialog owns input while open (Esc = cancel)
         if modDlg and modDlg.IsActive then modDlg:Update(); modWasActive = true; return nil end
         if modWasActive then modWasActive = false; LO.broadcastMods() end
-        LO.fixDiff()                                -- a song change can take my difficulty away
+        LO.fixDiff()                                -- song change can drop my difficulty
 
         widgets(ts)
         local confirm = click.confirm
@@ -685,9 +674,9 @@ local function step(ts)
                 if confirm then LO.setReady(not LO.myReady()) end
             end
         elseif tab == 2 then
-            -- only the difficulties the song has: the cursor steps over the others and stops at the ends
+            -- skips missing difficulties, stops at the ends
             if click.diff and LO.stepDiff(click.diff) then playSfx("Move") end
-            -- the mouse picks an emblem directly
+            -- mouse picks an emblem
             for d = 0, 4 do
                 if clickedIn(DIFF_X0 + d * DIFF_STEP - DR.marker.w / 2, DIFF_CY - DR.marker.h / 2, DR.marker.w, DR.marker.h) and LO.diffAvailable(d) and d ~= LO.myDiff() then
                     LO.setDiff(d); playSfx("Move")
@@ -695,30 +684,30 @@ local function step(ts)
             end
         elseif tab == 3 then
             if confirm then
-                if not modDlg then modDlg = ACTIVITY:GetActivity("mod_select_dialog") end   -- lazily (re)fetch if onStart missed it
-                if modDlg then modDlg:Activate(0, true) else playError(); setMsg(L("msg_mods_unavailable"), MSG.mods_unavailable) end   -- restrict: no Auto (Dynamic Beat IS allowed, per-player)
+                if not modDlg then modDlg = ACTIVITY:GetActivity("mod_select_dialog") end   -- lazy fetch
+                if modDlg then modDlg:Activate(0, true) else playError(); setMsg(L("msg_mods_unavailable"), MSG.mods_unavailable) end   -- restricted: no Auto (Dynamic Beat allowed)
             end
         end
         -- controller-only song controls
         if LO.amController() then
-            -- the mouse opens the song select from the jacket
+            -- jacket click opens song select
             if pressed("song") or clickedIn(JK_X, JK_Y, JK_S, JK_S) then enterSongSelect(); return nil end
             if net.song then
                 if pressed("speed_down") or click.speed == -1 then LO.adjustSpeed(-1) end
                 if pressed("speed_up") or click.speed == 1 then LO.adjustSpeed(1) end
             end
         end
-        -- Escape: un-ready if readied (Ready is reversible), otherwise leave the room
+        -- cancel: un-ready, else leave the room
         if navPn.cancel() or click.back then
             if LO.myReady() then LO.setReady(false) else backToMenu() end
         end
 
     elseif mode == "results" then
         LO.tickResults(dt)
-        if LO.takeGo() then         -- a new round started while we lingered on the results → kicked
+        if LO.takeGo() then         -- new round started while on results: kicked
             backToMenu(L("msg_kicked_round")); return nil
         end
-        -- stay as long as you want; press Enter (once results are in) to return to the lobby
+        -- back button once results are in
         if nextBtn then nextBtn.visible = net.resultsReadyT ~= nil end
         widgets(ts)
         if net.resultsReadyT ~= nil and (navPn.decide() or click.next) then
@@ -735,7 +724,7 @@ function update(ts)
     return r
 end
 
--- ── draw ───────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Draw ====
 function draw()
     if ui == nil then return end
     if mode == "songselect" then act:Draw(); drawToast(); return end

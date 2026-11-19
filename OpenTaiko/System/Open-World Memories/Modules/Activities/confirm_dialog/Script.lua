@@ -1,21 +1,9 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
--- confirm_dialog — the song select's song unlocks, a PopUI panel over the list.
---
--- activate(player, node, mode)
---   player  : 0-based index of the player who pressed Decide
---   node    : the locked LuaSongNode
---   mode    : "direct" unlocks a met condition right away; otherwise a coin price opens the purchase panel
---
--- Panels:
---   "notP1"    — player != 0: only Player 1 unlocks songs; OK
---   "purchase" — the song's title, the coin purse with the price over it, Buy / Cancel side by side
---
--- Buy pays from the purse (the price drops in, the balance rolls down), then the song is unlocked and the
--- modal ROActivity shows it; the dialog closes when the modal is done.
+-- confirm_dialog: song select song unlocks, a PopUI panel over the list
 
 local PopUI = require("PopUI")
 
--- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+-- layout: Config/layout.json; timings: Config/animation.json
 local Config = require("Core.Config")
 local SongTitle = require("Songs.Title")
 local Layout = Config.load("Config/layout.json")
@@ -27,11 +15,11 @@ local TITLE = Layout.title
 local PURSE = Layout.purse
 local BUTTONS = Layout.buttons
 local BUTTON_W, BUTTON_H, BUTTON_GAP = BUTTONS.w, BUTTONS.h, BUTTONS.gap
-local PAY_WAIT = Animation.pay_wait_s          -- seconds the purse's payment plays before the unlock modal
+local PAY_WAIT = Animation.pay_wait_s          -- sec of purse payment before the unlock modal
 local DIM = Layout.dim_color
 local UI_THEME = Config.plain(Layout.theme)
 
--- Rarity string → modal integer (matches HRarity.RarityToModalInt in C#)
+-- Rarity -> modal int (as HRarity.RarityToModalInt)
 local rarityToInt = { Poor=0, Common=0, Uncommon=1, Rare=2, Epic=3, Legendary=4, Mythical=4 }
 
 local function tr(key, fallback)
@@ -52,14 +40,14 @@ local _title     = ""
 local _mode      = "purchase"
 local _coinPrice = 0
 local wantClose, justOpened = false, false
-local paying = nil            -- seconds left of the payment, nil when not paying
+local paying = nil            -- payment sec left; nil when not paying
 local lastTs = nil
 
--- Set to true after unlock while waiting for the modal animation to complete
+-- after unlock, until the modal is done
 local _waitingForModal = false
-local _modalQueue = {}       -- the modals still to show, each { player, rarity, type, info, secondary }
+local _modalQueue = {}       -- pending modals { player, rarity, type, info, secondary }
 
--- ── Lifecycle ─────────────────────────────────────────────────────────────────
+-- ==== Lifecycle ====
 
 function onStart()
     sounds.Decide = SHARED:GetSharedSound("Decide")
@@ -76,7 +64,7 @@ function onDestroy()
     disposeUI()
 end
 
--- shows the next queued modal; without one (or without the modal activity) the dialog closes
+-- next queued modal; none (or no modal activity): close
 local function nextModal()
     local modal = ROACTIVITY:GetROActivity("modal")
     local m = table.remove(_modalQueue, 1)
@@ -97,6 +85,7 @@ local function doUnlock()
     nextModal()
 end
 
+-- pays from the purse, unlocks, then the modal shows it; closes after the modal
 local function buy()
     if paying ~= nil then return end
     local sf = GetSaveFile(0)
@@ -111,7 +100,7 @@ local function buy()
     paying = PAY_WAIT
 end
 
--- the buttons sit in one row: Left / Right move between them, Up / Down do nothing
+-- one button row: Left / Right move, Up / Down do nothing
 local function rowNav()
     for i, b in ipairs(buttons) do
         local function go(d)
@@ -152,6 +141,9 @@ local function build()
     rowNav()
 end
 
+-- player: 0-based, pressed Decide; node: the locked LuaSongNode
+-- mode "direct": unlock a met condition at once; else a coin price opens the purchase panel
+-- panels: "notP1" (only P1 unlocks, OK) | "purchase" (Buy / Cancel)
 function activate(player, node, mode)
     _player    = player or 0
     _node      = node
@@ -178,10 +170,10 @@ function deactivate()
     disposeUI()
 end
 
--- ── Draw ──────────────────────────────────────────────────────────────────────
+-- ==== Draw ====
 
 function draw()
-    -- While waiting for the modal, delegate drawing entirely to it
+    -- the modal draws alone while waiting
     if _waitingForModal then
         local modal = ROACTIVITY:GetROActivity("modal")
         if modal ~= nil then modal:Draw() end
@@ -196,10 +188,10 @@ function draw()
     end
 end
 
--- ── Update ────────────────────────────────────────────────────────────────────
+-- ==== Update ====
 
 function update(ts)
-    -- While waiting for a modal, update it and move on (or close) when it finishes
+    -- waiting: update the modal; next one or close when done
     if _waitingForModal then
         local modal = ROACTIVITY:GetROActivity("modal")
         if modal == nil or not modal.IsActive then

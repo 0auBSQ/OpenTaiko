@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global, lowercase-global, need-check-nil
--- SimpleUI label: non-interactive text. Optional rounded "chip" background.
+-- SimpleUI label: non-interactive text, optional chip background
 --   ui:label{ text="Hello", x=, y=, size="title"|"label"|"small"|number, color={r,g,b,a}, align="center", chip=true }
 
 local Widget = require("UI.SimpleUI.widget")
@@ -27,7 +27,7 @@ function Label.new(o)
     return self
 end
 
--- a new text re-measures the label (and its chip); the theme is not resolved again
+-- re-measures the label and chip; the theme is not resolved again
 function Label:setText(t)
     t = tostring(t)
     if t == self.text then return end
@@ -44,7 +44,7 @@ function Label:restyle()
     self:resolveStyle()
     local c = self.eff.colors
     self._fg = self.color or c.text
-    -- chip labels keep a black outline; plain labels draw with none
+    -- text outline only on chip labels
     self._bg = (self.chip and self.eff.textOutline ~= false) and { 0, 0, 0, 255 } or U.withAlpha(c.surface, 0)
     self:_layout()
 end
@@ -52,7 +52,7 @@ end
 function Label:_layout()
     local c = self.eff.colors
     local sz = self:_fontSize()
-    -- the glyph box: the ink + 50 px of padding, squeezed down to maxWidth
+    -- glyph box: ink + 50 px padding, capped at maxWidth
     self.w = math.min(self.mgr:measureText(sz, self.text) + 50, self.maxWidth)
     self.h = self.mgr:textHeight(sz)
     if self.chip then
@@ -71,13 +71,13 @@ function Label:_layout()
     end
 end
 
-function Label:update(ctx) end  -- static; no anim
+function Label:update(ctx) end  -- static
 
 function Label:draw()
     if not self.visible then return end
     local x, y = math.floor(self.x), math.floor(self.y)
     if self.chip then
-        -- the chip is centred on the glyph line, not on the text box (which carries the bottom padding)
+        -- chip centred on the glyph line (the text box carries bottom padding)
         local lineH = self.mgr:gfont(self:_fontSize()).LineHeight
         self:drawPiece(self._chip, self.x + self.w * 0.5, self.y + lineH * 0.5, 1, 1)
     end

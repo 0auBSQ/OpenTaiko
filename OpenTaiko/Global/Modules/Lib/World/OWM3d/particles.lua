@@ -1,12 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- OWM3d/particles.lua — ambient particle emitters: engine-defined presets (fire, embers, smoke,
--- leaves, fireflies, fountain_jet, splash, snow, rain-area) driven by map defs or added directly.
---
---   world.particles:add{ preset = "fire", x = 4, y = 1.2, z = 7, rate = 40 }
---   params (per schema): speed, size, life, gravity, spread, rateScale
---
--- Continuous presets emit `rate` particles/sec (fractional accumulation); one-shots (splash) use
--- burst(). Fireflies auto-dim by day when a daynight cycle is present.
+-- OWM3d/particles.lua: particle emitters from engine presets
 
 local sin, random, floor, max, min = math.sin, math.random, math.floor, math.max, math.min
 
@@ -31,12 +24,10 @@ function Particles.new(world)
     return self
 end
 
--- ── presets: emit ONE particle at (x,y,z) with the emitter's params ────────────────────────────────
--- p = params (speed/size/life/gravity/spread), s = scene, ps = system.
--- Each preset also has a SETUP entry (sprite / spin / size+fade curves) applied once per batch —
--- the v2 punch: flames bloom then die, embers flash and drift, petals and leaves actually tumble.
+-- ==== Presets ====
+-- fn(s, ps, x, y, z, p): emit one particle; s = scene, ps = system, p = params
 local PRESETS = {}
--- setup: { sprite = SPR_*, rot = startDeg (-1 random), rotVel = deg/s, size = curve, fade = curve }
+-- setup (once per batch): { sprite = SPR_*, rot = startDeg (-1 random), rotVel = deg/s, size = curve, fade = curve }
 local SETUP = {
     fire       = { rot = -1, rotVel = 40,  size = 2, fade = 2 },
     embers     = { rot = -1, rotVel = 0,   size = 1, fade = 2 },
@@ -108,7 +99,6 @@ PRESETS.snow = function(s, ps, x, y, z, p)
 end
 
 PRESETS.sakura = function(s, ps, x, y, z, p)
-    -- pink petals tumbling down with sideways drift
     s:PsEmit(ps, x + (random() - 0.5) * (p.spread or 10), y + 3 + random() * 3, z + (random() - 0.5) * (p.spread or 10),
         (random() - 0.2) * 1.4, -((p.speed or 0.55) * (0.5 + random() * 0.6)), (random() - 0.5) * 1.4,
         248, 178 + random() * 30, 198 + random() * 25, 0.95, (p.size or 0.16), (p.size or 0.16) * 0.85,
@@ -116,7 +106,7 @@ PRESETS.sakura = function(s, ps, x, y, z, p)
 end
 
 PRESETS.splash = function(s, ps, x, y, z, p)
-    -- one droplet of a splash ring (use burst(...,"splash", 8-14) for the full crown)
+    -- one droplet per call; burst() 8-14 for a ring
     local a = random() * 6.2832
     local sp = (p.speed or 2.4) * (0.6 + random() * 0.7)
     s:PsEmit(ps, x, y + 0.05, z,
@@ -126,7 +116,7 @@ PRESETS.splash = function(s, ps, x, y, z, p)
 end
 
 PRESETS.rain = function(s, ps, x, y, z, p)
-    -- an area shower fixed to the emitter (weather.lua does the player-following version)
+    -- area rain at the emitter (weather.lua follows the player)
     local fall = (p.speed or 15)
     s:PsEmit(ps, x + (random() - 0.5) * (p.spread or 8), y + 6 + random() * 3, z + (random() - 0.5) * (p.spread or 8),
         0.8, -fall, 0.4, 175, 195, 225, 0.4, (p.size or 0.22), (p.size or 0.22),
@@ -135,8 +125,7 @@ end
 
 Particles.PRESETS = PRESETS
 
--- apply a preset's batch setup (sprite + spin + curves); guarded so older engine builds just
--- get the flat look instead of erroring
+-- batch setup for a preset; guarded for engines without the setters
 local function applySetup(scene, ps, preset)
     local su = SETUP[preset] or SETUP.fire
     scene:PsSetSprite(ps, su.crystal and SPR_CRYSTAL or SPR_SOFT)
@@ -145,8 +134,10 @@ local function applySetup(scene, ps, preset)
 end
 Particles.applySetup = applySetup
 
--- ── emitters ───────────────────────────────────────────────────────────────────────────────────────
+-- ==== Emitters ====
 -- e: { preset, x, y, z, rate, params }
+-- rate: particles/s (fractional carry); params: speed, size, life, gravity, spread, rateScale
+-- one-shots (splash) use burst()
 function Particles:add(e)
     local em = {
         preset = e.preset or "embers",
@@ -171,7 +162,7 @@ function Particles:update(dt)
     if not self.enabled then return end
     local scene = self.world.scene
     self.t = self.t + dt
-    -- fireflies only glow at night when a day/night cycle is running
+    -- fireflies scale with the night factor
     local nightF = 1
     local dn = self.world.daynight
     if dn and dn.nightFactor then nightF = dn.nightFactor(dn.hour) end

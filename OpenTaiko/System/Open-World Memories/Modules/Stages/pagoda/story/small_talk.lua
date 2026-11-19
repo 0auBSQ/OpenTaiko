@@ -1,16 +1,15 @@
--- Small talk scene after a cleared floor; roll(level) -> scene or nil.
+-- small talk after a floor clear
 
 local M = {}
 
 local CHANCE = 0.3
 local TOPIC_COUNT = 3
 
--- true when a small talk may follow this cleared floor
 function M.eligible(level)
     return level ~= nil and level >= 1 and level < 20 and level ~= 10 and level ~= 15
 end
 
--- the encounter's background and the story loop
+-- returns bg key, music loop
 local function setting(level)
     if level <= 5 then return "forest", "forest" end
     if level <= 9 then return "stairs", "forest" end
@@ -27,7 +26,7 @@ local function ume(expr, text) return { who = "ume", expr = expr, text = text } 
 local function say(text) return { text = text } end
 local function face(expr) return { expr = expr } end
 
--- a choice; `skips` lists the values that end the topic, every other value plays `rest`
+-- skips: values that end the topic; others play rest (or extra[v])
 local function ask(labels, skips, rest, extra)
     local choices, branch, skip = {}, {}, {}
     for _, v in ipairs(skips or {}) do skip[v] = true end
@@ -133,7 +132,7 @@ local TOPICS = {
     },
 }
 
--- every text the scenes can show, for the translation files
+-- all scene texts, for the translation files
 function M.texts()
     local out, seen = {}, {}
     local function add(s) if s ~= nil and s ~= "" and not seen[s] then seen[s] = true ; out[#out + 1] = s end end
@@ -152,7 +151,7 @@ function M.texts()
     return out
 end
 
--- the scene after clearing `level`, TOPIC_COUNT topics drawn at random; random = fn() -> [0, 1)
+-- TOPIC_COUNT random topics; random: fn() -> [0, 1)
 function M.scene(level, random)
     random = random or math.random
     local order = {}
@@ -188,7 +187,7 @@ function M.scene(level, random)
     }
 end
 
--- the scene to play after clearing `level`, or nil
+-- scene or nil
 function M.roll(level, random)
     random = random or math.random
     if not M.eligible(level) or random() >= CHANCE then return nil end

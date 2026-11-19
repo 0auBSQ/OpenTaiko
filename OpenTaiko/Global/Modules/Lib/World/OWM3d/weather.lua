@@ -1,15 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- OWM3d/weather.lua — the weather STATE MACHINE. Six states, any→any crossfade, and an IMMEDIATE
--- clear path (fade 0 snaps intensity, zeroes wetness, kills every live weather particle) so no
--- weather effect is ever stuck on.
---
---   world.weather:setWeather("rain")          -- fades in over ~2s
---   world.weather:setWeather("storm", 1.5)    -- rain × gusts × lightning
---   world.weather:setWeather("clear", 0)      -- IMMEDIATE: wetness 0, particles cleared
---   world.weather:activeEffects()             -- { {kind="rain", intensity=0.8}, ... }
---
--- States: clear · rain · storm · snow · sakura · embers. Each defines its wetness target, fog
--- pull-in, grade dim and a per-frame emit around the player. Two channels (cur/prev) crossfade.
+-- OWM3d/weather.lua: weather state machine with crossfade
 
 local sin, random, max, min, floor = math.sin, math.random, math.max, math.min, math.floor
 
@@ -18,7 +8,7 @@ local SPR_STREAK, SPR_SPLASH = 905, 906
 local Weather = {}
 Weather.__index = Weather
 
--- ── state table ────────────────────────────────────────────────────────────────────────────────────
+-- ==== State table ====
 -- emit(self, scene, dt, i, px, py, pz, gy) runs while the state's channel intensity i > 0.01
 local STATES = {}
 
@@ -29,8 +19,7 @@ local function emitRain(self, scene, dt, i, px, py, pz, gy, mul, wind)
     if scene.PsSetNextCurves then scene:PsSetNextCurves(self.ps, 0, 0) end
     if scene.PsSetNextRotation then scene:PsSetNextRotation(self.ps, 0, 0) end
     for _ = 1, nDrops do
-        -- smooth spawn band: full density in the 11 m core, fading to zero at 14 m (kills the
-        -- hard pop-in ring the old fixed-radius spawn had)
+        -- spawn band: full density to 11 m, fading to 0 at 14 m
         local rr = 11 + random() * 3
         local keep = 1 - max(0, (rr - 11) / 3)
         if random() < keep then
@@ -70,7 +59,7 @@ STATES.rain = { wet = 1, fogScale = 0.6, gradeDim = 1,
 STATES.storm = { wet = 1, fogScale = 0.45, gradeDim = 1.6,
     emit = function(self, scene, dt, i, px, py, pz, gy)
         emitRain(self, scene, dt, i, px, py, pz, gy, 1.8, 2.5 * sin(self.t * 0.7))
-        -- lightning: rare flashes — a 0.12 s grade pulse + a callback for thunder SFX
+        -- lightning: 0.12 s grade pulse and world.onThunder
         if self._flash > 0 then self._flash = self._flash - dt end
         if random() < dt * 0.15 * i then
             self._flash = 0.12
@@ -121,7 +110,7 @@ STATES.embers = { wet = 0, fogScale = 0.85, gradeDim = 0.4,
 
 Weather.STATES = STATES
 
--- ── construction ───────────────────────────────────────────────────────────────────────────────────
+-- ==== Construction ====
 function Weather.new(world)
     local self = setmetatable({}, Weather)
     self.world = world
@@ -129,7 +118,7 @@ function Weather.new(world)
     self.prevMode = "clear"
     self.intensity = 0      -- current-state channel 0..1
     self.prevI = 0          -- previous-state channel fading out
-    self.wet = 0            -- ground wetness 0..1 (dries slower than the rain stops)
+    self.wet = 0            -- ground wetness 0..1
     self.fade = 2.0
     self.t = 0
     self._flash = 0
@@ -139,7 +128,7 @@ function Weather.new(world)
         self.ps = scene:NewParticleSystem()
         if scene.PsSetCap then scene:PsSetCap(self.ps, 6000) end
         if scene.SetSpriteRGBA then
-            -- rain streak: an 8×24 vertical white line, soft-edged, brightest at the head
+            -- rain streak sprite (8×24)
             local px, w, h = {}, 8, 24
             for y = 0, h - 1 do
                 for x = 0, w - 1 do
@@ -157,7 +146,8 @@ function Weather.new(world)
     return self
 end
 
--- ── state transitions ─────────────────────────────────────────────────────────────────────────────
+-- ==== State transitions ====
+-- fade: seconds (default 2)
 function Weather:setWeather(mode, fade)
     if STATES[mode] == nil then
         if mode ~= nil then print("[OWM3d] unknown weather '" .. tostring(mode) .. "' -> clear") end
@@ -172,7 +162,7 @@ function Weather:setWeather(mode, fade)
         self.intensity = 0
     end
     self.fade = fade or 2.0
-    -- IMMEDIATE semantics: fade 0 = snap everything NOW (map unloads, "clear all effects")
+    -- fade 0: snap at once (map unload, clear all)
     if fade == 0 then
         self.prevI = 0
         self.intensity = (mode == "clear") and 0 or 1
@@ -187,7 +177,7 @@ end
 
 function Weather:isRaining() return (self.mode == "rain" or self.mode == "storm") and self.intensity > 0.05 end
 
--- every live weather effect (for the stage's effects menu / "clear all")
+-- live effects: { { kind, intensity, fading }, ... }
 function Weather:activeEffects()
     local fx = {}
     if self.mode ~= "clear" and self.intensity > 0.01 then
@@ -199,12 +189,12 @@ function Weather:activeEffects()
     return fx
 end
 
--- lets daynight fold the weather mood into its grade (called from daynight:update)
+-- weather dim on the colour grade (called from daynight:update)
 function Weather:applyGrade(exp, r, g, b)
     local dim = (STATES[self.mode].gradeDim or 0) * self.intensity
         + (STATES[self.prevMode].gradeDim or 0) * self.prevI
     if self._flash > 0 then
-        -- lightning pulse: a hard bright flash overrides the storm dim for a beat
+        -- lightning flash overrides the dim
         return exp * 1.9, r * 1.05, g * 1.05, b * 1.15
     end
     if dim <= 0 then return exp, r, g, b end
@@ -212,7 +202,7 @@ function Weather:applyGrade(exp, r, g, b)
     return exp * (1 - 0.125 * dim), r * (1 - 0.0625 * dim), g * (1 - 0.044 * dim), b
 end
 
--- px/py/pz = the player focus (weather follows it); groundYFn(wx, wz) → ground height (optional)
+-- px, py, pz: player focus; groundYFn(wx, wz) -> ground height (optional)
 function Weather:update(dt, px, py, pz, groundYFn)
     local world = self.world
     self.t = self.t + dt
@@ -222,7 +212,7 @@ function Weather:update(dt, px, py, pz, groundYFn)
     elseif self.intensity > target then self.intensity = max(target, self.intensity - step * 1.6) end
     if self.prevI > 0 then self.prevI = max(0, self.prevI - step * 1.6) end
 
-    -- wetness chases the blended target; drying is slow (puddles linger after the shower)
+    -- wetness: rise 0.5/s, dry 0.045/s
     local wetTarget = STATES[self.mode].wet * self.intensity + STATES[self.prevMode].wet * self.prevI
     if wetTarget > 1 then wetTarget = 1 end
     if self.wet < wetTarget then self.wet = min(wetTarget, self.wet + dt * 0.5)

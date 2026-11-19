@@ -1,4 +1,4 @@
--- Non-particle light draws; every handle is reset after use.
+-- non-particle light draws (handles reset after use)
 
 local sprite = require("encounter/sprite")
 local Config = require("Core.Config")
@@ -32,7 +32,7 @@ local function hash(n)
     return v - math.floor(v)
 end
 
--- the shaft pivots at its top centre
+-- shaft pivot: top centre
 local function top_meta(tx)
     local m = _metas[tx]
     if m == nil then
@@ -72,7 +72,7 @@ function Light.glow(tx, x, y, scale, r, g, b, a)
     reset(tx)
 end
 
--- w, h: the area from the top-left corner, the whole screen when absent
+-- w, h: area from top-left (default whole screen)
 function Light.vignette(tx, a, w, h)
     if tx == nil or not tx.Ready or a <= 0 then return end
     local res = THEME:GetResolution()
@@ -83,7 +83,7 @@ function Light.vignette(tx, a, w, h)
     reset(tx)
 end
 
--- tiled through the Repeat wrap over w x h from the top-left corner (the whole screen when absent)
+-- Repeat-wrap tiling over w x h from top-left (default whole screen)
 function Light.grain(tx, a, t, w, h)
     if tx == nil or not tx.Ready or a <= 0 then return end
     local res = THEME:GetResolution()
@@ -100,7 +100,7 @@ function Light.grain(tx, a, t, w, h)
 end
 
 -- list entries: {x, y, rot, sway, sx, sy, r, g, b, aMin, aMax, period[, phase]}
--- opacity between aMin and aMax and rot within +-sway degrees, each on its own sine
+-- opacity aMin..aMax, rot +-sway deg (one sine each)
 local Rays = {}
 Rays.__index = Rays
 
@@ -112,7 +112,7 @@ function Rays:update(dt)
     self.t = self.t + dt
 end
 
--- xf, scale: optional placement transform (x, y) -> sx, sy and its scale; ox, oy apply without one
+-- xf: optional (x, y) -> sx, sy with its scale; ox, oy used without xf
 function Rays:draw(ox, oy, mulR, mulG, mulB, mulA, xf, scale)
     ox, oy, scale = ox or 0, oy or 0, scale or 1
     mulR, mulG, mulB, mulA = mulR or 1, mulG or 1, mulB or 1, mulA or 1

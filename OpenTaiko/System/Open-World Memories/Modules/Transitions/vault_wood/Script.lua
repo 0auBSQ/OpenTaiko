@@ -1,15 +1,15 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
 local TA = require("TransitionArt")
 
--- sizes and shading: Config/layout.json; timings: Config/animation.json
+-- layout: Config/layout.json; timings: Config/animation.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
 local RATTLE = Animation.rattle
 
-local SHUT = Animation.shut_s            -- fade-out: the halves swing shut
-local HOLD, OPEN = Animation.hold_s, Animation.open_s   -- fade-in: a last rattle, then the halves swing open
-local COVER = HOLD + OPEN * Animation.cover_at   -- the stage is in view (the halves nearly edge-on at the sides)
+local SHUT = Animation.shut_s            -- fade-out: halves swing shut
+local HOLD, OPEN = Animation.hold_s, Animation.open_s   -- fade-in: last rattle, then the halves swing open
+local COVER = HOLD + OPEN * Animation.cover_at   -- stage in view (halves nearly edge-on)
 
 FADE_OUT_SECONDS = SHUT
 FADE_IN_SECONDS  = HOLD + OPEN
@@ -31,7 +31,7 @@ local function sfx(path)
 	return nil
 end
 
--- the textures live only during a trip (Lib/TransitionArt)
+-- textures live for one trip (Lib/TransitionArt)
 local function loadTextures()
 	if tx_left ~= nil then return end
 	tx_left = TEXTURE:CreateTexture("Textures/WoodLeft.png")
@@ -57,8 +57,8 @@ local function tick()
 	clock = clock + d
 end
 
--- one half swung by k (0 = edge-on at its hinge, 1 = shut at its own width: the shut halves overlap at the
--- seam), its hinge at x with the anchor on that side
+-- one half swung by k (0 = edge-on at the hinge, 1 = shut, halves overlap at the seam)
+-- hinge at x, anchor on that side
 local function half(tx, x, anchor, k)
 	if tx == nil or not tx.Loaded or k <= 0.001 then return end
 	if tx.Width <= 0 then return end
@@ -71,8 +71,8 @@ local function half(tx, x, anchor, k)
 	tx:SetColor(1, 1, 1)
 end
 
--- k: how shut the gate is; after the thud the halves bounce back a little and the seam rattles sideways (the
--- hinges stay at the screen edges)
+-- k: how shut; bounce and seam rattle after the thud
+-- hinges stay at the screen edges
 local function drawGate(k)
 	local rattle, wob = 0, 0
 	if thudAt ~= nil then
@@ -123,7 +123,7 @@ function fadeIn(t)
 		k = 1 - u * u * (3 - 2 * u)
 	end
 	drawGate(k)
-	if t >= 1 then freeTextures() end   -- the trip is over
+	if t >= 1 then freeTextures() end
 end
 
 function onStart()

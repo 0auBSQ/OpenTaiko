@@ -1,11 +1,4 @@
 -- Plays the encounter dialogs: a floor's entrance variant (open + start) or a line list (play).
--- Line fields besides the story/entrance.lua format:
---   who = "you"     the player's name as the speaker (narration blip)
---   blip = "<name>" the voice blip (one of the Sounds/<name>.ogg loaded below)
---   wait = true     held while hooks.busy(): a line with text cannot advance, one without hides the box
---   cover = a       (cutscenes) a cover fade, held like a wait line
---   pick = { ... }  plays one option of a random pool in its place (story/dialog_runner.lua)
--- A variant's `sprite` is Ume's pose from the start; it reaches hooks.onLine as a line of its own.
 
 local Dialogue = require("dialogue")
 local runner   = require("story/dialog_runner")
@@ -154,6 +147,13 @@ local function copyLines(lines)
     return out
 end
 
+-- line fields besides the story/entrance.lua format:
+--   who = "you"     the player's name as the speaker (narration blip)
+--   blip = "<name>" the voice blip (Sounds/<name>.ogg)
+--   wait = true     held while hooks.busy(): a line with text cannot advance, one without hides the box
+--   cover = a       (cutscenes) a cover fade, held like a wait line
+--   pick = { ... }  plays one option of a random pool in its place (story/dialog_runner.lua)
+-- a variant's `sprite` is Ume's pose from the start; it reaches hooks.onLine as a line of its own
 -- hooks = { onLine = fn(line), onShake = fn(amp, dur), busy = fn() -> bool };
 -- lines (optional, a line list or a variant list) replaces the floor's story/entrance.lua variants
 function M.open(level, ctx, hooks, lines)

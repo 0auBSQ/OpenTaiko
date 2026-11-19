@@ -1,30 +1,11 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Dan Fail end animation: the two gates slam shut, foxes peek/wave, then a localized speech bubble fades in.
--- In a pagoda play (the "pagoda_play_level" shared string is set for this chart) the foxes and their
--- speech stay away.
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API. Group C (clear/end anime):
---   playEndAnime(player) is the per-play (re)start (called by the host with the index directly) — counters
---   AND the per-play speech randomization (seed/special_chance/random line) reset here. update/draw take the
---   `state` table; the old `player` arg is now `state.player`. Textures load once in onStart (sync, behind the
---   loading bar) — every speech variant is pre-loaded because the language (state.lang) isn't known in onStart,
---   so draw just selects which already-loaded variant to show.
-
---Speech tex rects: (0,33,607,220)(608,0,630,253)
---Speech positions (center pos): (329.5,812)(1566,935.5)
---Tsubaki tex rects (body+arms): (692,0,884,1017)(692,1018,253,334)(946,1018,174,345)(1122,1018,377,320)
---Tsubaki positions (body): (1461,63)(1565,63)(1730,63)
---Tsubaki positions (arms): (1574,717)(1670,715)(1569,646)
---Ume tex rects (body+arms): (0,0,691,819)(0,979,248,243)(77,820,105,158)(249,820,322,300)
---Ume positions (body): (-178,297)(-346,297)(-473,297)
---Ume positions (arms): (93,750)(77,750)(-40,717)
---Star position: (1430,427.5)(489,571)
---Star rect: ()
+-- end anime: Dan_Fail (group C, player via state.player)
 
 local PlayStrings = require("PlayStrings")
 
 local speech_rect = {0,33,607,220,608,0,630,253}
 local speech_pos = {329.5,812,1566,935.5}
-local foxes_shown = true      -- false in a pagoda play (set per play in playEndAnime)
+local foxes_shown = true      -- false in a pagoda play
 
 -- x,y,w,h
 local tsubaki_body_rect = {692,0,884,1017}
@@ -48,7 +29,7 @@ local ume_arm_pos = {93,750,77,750,-40,717}
 local star_pos = {1430,427.5,489,571}
 local light_pos = {1436,430,496,573}
 
---Slam time: 1.142s
+-- slam time: 1.142 s
 
 local animeCounter = 0
 
@@ -65,12 +46,11 @@ local dan_in_slam = 0
 
 local seed = 0
 local special_chance = 0
-local speech_line = 0          -- per-play random line index (0-4), chosen in playEndAnime; lang resolved in draw
+local speech_line = 0          -- 0-4, set in playEndAnime
 
 local tx = {}                  -- name -> LuaTexture
 
--- Resolve the per-play speech key from the language (state.lang) + the per-play randomization. Mirrors the old
--- init() selection exactly: special line wins, otherwise a per-language line (en is the fallback for unknown lang).
+-- special line first, else per-lang line (en fallback)
 local function speechKey(lang)
     if special_chance == 1 then
         return "Speech/special/0.png"
@@ -85,7 +65,7 @@ local function speechKey(lang)
     end
 end
 
--- true while a pagoda play runs: the pagoda stage sets this shared string for the chart it mounts
+-- pagoda stage sets pagoda_play_level
 local function pagodaPlay()
     return PlayStrings.get("pagoda_play_level") ~= ""
 end
@@ -99,7 +79,7 @@ function playEndAnime(player)
     dan_second_in_move = 0
     dan_in_slam = 0
 
-    -- per-play speech randomization (was in init() on the old API; redone each play here)
+    -- per-play speech pick
     seed = os.time()
     math.randomseed(seed)
     special_chance = math.random(1, 100)
@@ -121,8 +101,7 @@ function onStart()
 
     tx["Speech/Speech.png"] = TEXTURE:CreateTexture("Speech/Speech.png")
 
-    -- onStart runs before state arrives, so the language is unknown here — pre-load every speech variant and let
-    -- draw pick the one for state.lang + the per-play random line.
+    -- all speech variants (lang unknown in onStart)
     tx["Speech/special/0.png"] = TEXTURE:CreateTexture("Speech/special/0.png")
     for i = 0, 4 do
         tx["Speech/en/" .. i .. ".png"] = TEXTURE:CreateTexture("Speech/en/" .. i .. ".png")
@@ -153,12 +132,12 @@ function draw(state)
 
     local speech_text = speechKey(state.lang)
 
-    -- Foxes (back)
+    -- foxes (back)
     if foxes_shown then
       if animeCounter >= 0.2 and 0.275 >= animeCounter then
         tx["Foxes.png"]:DrawRect(tsubaki_body_pos[5], tsubaki_body_pos[6], tsubaki_body_rect[1], tsubaki_body_rect[2], tsubaki_body_rect[3], tsubaki_body_rect[4])
         tx["Foxes.png"]:DrawRect(ume_body_pos[5], ume_body_pos[6], ume_body_rect[1], ume_body_rect[2], ume_body_rect[3], ume_body_rect[4])
-        -- Draw these arms behind the wall
+        -- arms behind the wall
         tx["Foxes.png"]:DrawRect(tsubaki_arm_pos[5], tsubaki_arm_pos[6], tsubaki_arm3_rect[1], tsubaki_arm3_rect[2], tsubaki_arm3_rect[3], tsubaki_arm3_rect[4])
         tx["Foxes.png"]:DrawRect(ume_arm_pos[5], ume_arm_pos[6], ume_arm3_rect[1], ume_arm3_rect[2], ume_arm3_rect[3], ume_arm3_rect[4])
       elseif animeCounter >= 0.275 and 0.35 >= animeCounter then
@@ -173,17 +152,17 @@ function draw(state)
       elseif animeCounter >= 1.025 and 1.1 >= animeCounter then
         tx["Foxes.png"]:DrawRect(tsubaki_body_pos[5], tsubaki_body_pos[6], tsubaki_body_rect[1], tsubaki_body_rect[2], tsubaki_body_rect[3], tsubaki_body_rect[4])
         tx["Foxes.png"]:DrawRect(ume_body_pos[5], ume_body_pos[6], ume_body_rect[1], ume_body_rect[2], ume_body_rect[3], ume_body_rect[4])
-        -- Draw these arms behind the wall
+        -- arms behind the wall
         tx["Foxes.png"]:DrawRect(tsubaki_arm_pos[5], tsubaki_arm_pos[6], tsubaki_arm3_rect[1], tsubaki_arm3_rect[2], tsubaki_arm3_rect[3], tsubaki_arm3_rect[4])
         tx["Foxes.png"]:DrawRect(ume_arm_pos[5], ume_arm_pos[6], ume_arm3_rect[1], ume_arm3_rect[2], ume_arm3_rect[3], ume_arm3_rect[4])
       end
     end
 
-    -- The Gates
+    -- gates
     tx["Dan_In.png"]:DrawRect(dan_in_move - dan_in_width, 0, 0, 0, dan_in_width, dan_in_height)
     tx["Dan_In.png"]:DrawRect(bg_width - dan_in_move, 0, dan_in_width, 0, dan_in_width, dan_in_height)
 
-    -- Foxes (front)
+    -- foxes (front)
     if foxes_shown then
       if animeCounter >= 0.2 and 0.275 >= animeCounter then
         -- none
@@ -201,13 +180,12 @@ function draw(state)
       end
     end
 
-    -- Gates Slam
     if dan_in_slam > 0 then
       tx["Slam.png"]:SetOpacity((255 - math.min(dan_in_slam * 1020, 255)) / 255)
       tx["Slam.png"]:DrawRect(760 - (dan_in_slam * 400), 0, 0, 0, 200, dan_in_height)
       tx["Slam.png"]:DrawRect(960 + (dan_in_slam * 400), 0, 200, 0, 200, dan_in_height)
 
-      -- the foxes' eye shine and their shadow behind the bars go with them
+      -- fox eye shine and shadow
       if foxes_shown then
         tx["Foxes.png"]:SetOpacity(math.max(math.min((math.min(dan_in_slam - 0.7, 0.25) - math.max(0, dan_in_slam - 0.95)) * 1020, 255), 0) / 255)
         tx["Foxes.png"]:DrawRectAtAnchor(light_pos[1], light_pos[2], light_blue_rect[1], light_blue_rect[2], light_blue_rect[3], light_blue_rect[4], "center")
@@ -226,7 +204,7 @@ function draw(state)
       tx["Message.png"]:Draw(0, 0)
     end
 
-    -- Speech Bubble
+    -- speech bubble
     if foxes_shown then
       if dan_in_slam > 1.2 then
         local speech_fadein = math.max(math.min((dan_in_slam - 1.7) * 1020, 255), 0)

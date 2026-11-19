@@ -1,8 +1,8 @@
 ---@diagnostic disable: undefined-global, lowercase-global, need-check-nil
 -- SimpleUI button
 --   ui:button{ text="Play", x=, y=, w=, h=, accent=true, onClick=function(b) ... end }
---   ui:button{ icon="play", ... }   -- language-agnostic transport glyph instead of text (Shape.icon)
--- w/h auto-size to the label when omitted.
+--   ui:button{ icon="play", ... }   -- Shape.icon glyph instead of text
+-- w/h auto-size to the label when omitted
 
 local Widget = require("UI.SimpleUI.widget")
 local U      = require("UI.SimpleUI.util")
@@ -21,14 +21,14 @@ function Button.new(o)
     local self = Widget.new(o)
     setmetatable(self, Button)
     self.text = o.text or "Button"
-    self.icon = o.icon                 -- transport glyph drawn instead of the text (Shape.icon kinds)
+    self.icon = o.icon                 -- Shape.icon kind, drawn instead of the text
     self.accent = o.accent or false
     self.padX = o.padX or 44
     self.padY = o.padY or 26
     return self
 end
 
--- a new text re-sizes (and re-bakes) the button only when it sizes itself to its label
+-- re-bakes only when the button sizes itself to its label
 function Button:setText(t)
     t = tostring(t)
     if t == self.text then return end
@@ -44,18 +44,18 @@ function Button:restyle()
     self:resolveStyle()
     local c = self.eff.colors
     local size = self.eff.font.button
-    -- text colours: dark outlined text on light face, white outlined text on accent face
+    -- label colours: text on surface, textOnAccent on accent
     self._fg = self.accent and c.textOnAccent or c.text
     self._bg = self.accent and U.shade(c.primary2, 0.55) or U.withAlpha({ 255, 255, 255 }, 200)
     if self.eff.textOutline == false then self._bg = CLEAR end
-    -- glyph-composed label: measure for auto-sizing (+50 = the padding the glyph box keeps)
+    -- glyph label width for auto-sizing (+50 = glyph box padding)
     local ink = self.mgr:measureText(size, self.icon and "" or self.text)
     if self._autoW then self.w = math.max(140, ink + 50 + self.padX * 2) end
     if self._autoH then self.h = math.max(64, self.mgr:textHeight(size) + self.padY * 2) end
     if self.accent then self:bakeBody(c.primary, c.primary2) else self:bakeBody(c.surface, c.surface2) end
     self:bakeRing()
     if self.icon then
-        -- bake the glyph in the face's text colour; rebaked with the body on accent flips
+        -- glyph baked in the label colour, rebaked with the body
         local isz = math.floor(math.min(self.w, self.h) * 0.46)
         local pad = 8
         local icon, fg = self.icon, self._fg
@@ -68,7 +68,7 @@ function Button:restyle()
 end
 
 function Button:drawContent(cx, cy, s)
-    -- on the muted face of a disabled button the label is the plain text colour, half see-through
+    -- disabled with a muted face: plain text colour at half opacity
     local muted = not self.enabled and self._bodyOff ~= nil
     if self.icon and self._icon then
         self:drawPiece(self._icon, cx, cy, s, self.enabled and 1.0 or 0.5)

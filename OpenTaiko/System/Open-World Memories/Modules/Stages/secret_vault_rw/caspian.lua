@@ -12,19 +12,18 @@ local Hop = Motion.hop
 local C = {}
 
 local FOOT_X, FOOT_Y = Look.foot.x, Look.foot.y
--- three faces: a happy line wears the idle one
+-- happy uses the idle face
 local FRAMES = { neutral = "Idle", happy = "Idle", laugh = "Laugh", grumpy = "Stern" }
 local BOX = Config.plain(Look.box)
 local CPS = Motion.chars_per_s
 local LAUGH = Motion.laugh_s
 local BLIP_EVERY = Motion.blip_every
 local VOICES = 4
--- marks that make no sound: wide (CJK) punctuation and spaces
+-- silent marks: CJK punctuation and spaces
 local SILENT = {}
 for _, ch in ipairs({ "、", "。", "，", "．", "！", "？", "：", "；", "…", "‥", "・", "「", "」", "『", "』", "（", "）",
     "～", "—", "–", "　", "¡", "¿", "«", "»", "“", "”", "‘", "’" }) do SILENT[ch] = true end
 
--- the box in the cabin's dark marble and bronze
 local THEME = Config.plain(Look.theme)
 
 -- event -> lines { expression, English }; keys VAULT_TALK_<EVENT>_<n>
@@ -106,7 +105,7 @@ local LINES = {
 local ctx = nil
 local dlg = nil
 local mode = nil          -- "talk", "remark" or nil
-local fresh = false       -- the talk started this frame: its first input waits for the next one
+local fresh = false       -- talk started this frame: skip its input
 local lastPick = {}
 local lastVoice = nil
 local remarkBlipAt = 0
@@ -141,7 +140,7 @@ end
 
 function C.hop() hopT, hopAmp = clock, Motion.kick_hop end
 
--- the n-th letter shown of the line being typed
+-- n-th shown char of the typed line
 local function shownChar(n)
     if dlg == nil or dlg.glines == nil then return nil end
     for _, l in ipairs(dlg.glines) do
@@ -173,7 +172,7 @@ function C.init(c)
     }
 end
 
--- the font the speaker's name is drawn in (sized to fit the name tag)
+-- speaker name font (fits the name tag)
 function C.setNameFont(f)
     if dlg then dlg.gfontName = f end
 end
@@ -189,7 +188,7 @@ function C.dispose()
     if dlg then dlg:dispose() end
 end
 
--- a line's text has no braces of its own, so a {expr:} tag in front is the only command in it
+-- lines have no braces: a leading {expr:} tag is the only command
 local function node(event, i, tagged)
     local e = LINES[event][i][1]
     local text = line(event, i):gsub("[{}]", "")
@@ -205,7 +204,7 @@ local function start(nodes, how)
     C.setExpr(nodes[1].expr)
 end
 
--- the first line's face is set when the talk starts; every later line sets its own as it begins
+-- first face set at talk start; later lines set their own
 function C.talkFirst(gifted)
     local nodes = {}
     local n = #LINES.firstmeet
@@ -216,14 +215,14 @@ function C.talkFirst(gifted)
     start(nodes, "talk")
 end
 
--- cuttable: pressing Decide while the line is still being typed ends the talk there (see C.wasCut)
+-- cuttable: Decide during typing ends the talk (C.wasCut)
 function C.talk(event, cuttable)
     if LINES[event] == nil then return end
     start({ node(event, pick(event), false) }, "talk")
     canCut, cut = cuttable == true, false
 end
 
--- the last talk was cut short by the player
+-- last talk cut short
 function C.wasCut() return cut end
 
 function C.remark(event)
@@ -241,7 +240,7 @@ function C.update(dt, now)
             and (NavInput.decide() or INPUT:KeyboardPressed("Space"))
         if cutNow then canCut, cut = false, true end
         if cutNow or dlg:update(dt) == "done" then
-            -- the last line stays up as a remark, so the box can fade out with it
+            -- last line stays as a remark while the box fades
             local last = dlg.node
             mode = nil
             if last ~= nil then
@@ -266,7 +265,7 @@ function C.update(dt, now)
     return nil
 end
 
--- his height only: his bottom edge is his arms on the counter, so it never moves
+-- height only: bottom edge (arms on the counter) stays fixed
 local function hopStretch(b, amp)
     local riseEnd = Hop.squash_s + Hop.rise_s
     if b == nil or b < 0 or b >= riseEnd + Hop.settle_s then return 1 end

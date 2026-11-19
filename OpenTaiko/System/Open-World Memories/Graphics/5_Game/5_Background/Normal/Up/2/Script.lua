@@ -1,7 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Up background 2: parallax (bg + flower + two cloud layers) with infinite horizontal scroll + per-player clear fade.
--- Loop widths come from the texture sizes, read in onStart via LuaTexture.Width — the load is SYNC
--- (CreateTextureSync), so sizes are valid immediately (the old func:AddGraph forced the same sync load).
+-- up background 2
 
 local bgLoopWidth = 570
 local flowerLoopWidth = 1086
@@ -24,7 +22,7 @@ function clearOut(player)
 end
 
 function onStart()
-    -- Load every variant up front; draw() selects by state. Sizes are valid here (sync load).
+    -- all variants; sizes valid after sync load
     tx["BG_Red.png"] = TEXTURE:CreateTextureSync("BG_Red.png")
     tx["Flower_Red.png"] = TEXTURE:CreateTextureSync("Flower_Red.png")
     tx["Cloud1_Red.png"] = TEXTURE:CreateTextureSync("Cloud1_Red.png")
@@ -45,7 +43,7 @@ function onStart()
     cloud1LoopWidth = tx["Cloud1_Red.png"].Width
     cloud2LoopWidth = tx["Cloud2_Red.png"].Width
 
-    -- random values to create initial depth
+    -- start offsets
     bgScrollX = 500
     cloud1ScrollX = 250
     cloud2ScrollX = 314

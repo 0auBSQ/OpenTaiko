@@ -1,18 +1,16 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- nokon_curtain: from the title into Intro Nokon, like a TV show opening. The curtain closes, then on it the
--- lights dim, two spotlights circle in and merge (drum roll), the show's name falls in letter by letter, each
--- letter hops in turn while confetti rains (applause), and the curtain opens. The way back is nokon_curtain_back.
+-- nokon_curtain: title -> Intro Nokon transition; back: nokon_curtain_back
 
 local TA = require("TransitionArt")
 
--- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+-- layout: Config/layout.json; timings: Config/animation.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
 local TITLE, LIGHTS, CONF = Layout.title, Layout.lights, Layout.confetti
 local CURTAIN, LIGHTS_ANIM, LETTERS, CONF_ANIM = Animation.curtain, Animation.lights, Animation.letters, Animation.confetti
 
--- the show, in seconds from the start of the fade-in (fixed: the fade-in length is read once)
+-- sec from the fade-in start (fade-in length read once)
 local DIM_IN = LIGHTS_ANIM.dim_s
 local SPOT_AT, SPOT_END = LIGHTS_ANIM.spot_at_s, LIGHTS_ANIM.spot_end_s
 local FLASH = LIGHTS_ANIM.flash_s
@@ -57,7 +55,7 @@ local function clamp01(x) return x < 0 and 0 or (x > 1 and 1 or x) end
 local function easeOut(x) return 1 - (1 - x) ^ 3 end
 local function easeInOut(x) return x < 0.5 and 4 * x * x * x or 1 - (-2 * x + 2) ^ 3 / 2 end
 
--- the textures live only during a trip (Lib/TransitionArt)
+-- textures live only during a trip (Lib/TransitionArt)
 local function loadTextures()
 	if tx_closed ~= nil then return end
 	tx_closed = TEXTURE:CreateTexture("Textures/Curtain.jpg")
@@ -81,13 +79,13 @@ end
 -- openness: 0 = fully shut, 1 = fully open (halves off-screen)
 local function draw_curtain(openness)
 	if openness <= 0 then
-		if tx_closed then tx_closed:Draw(0, 0) end   -- seamless closed image
+		if tx_closed then tx_closed:Draw(0, 0) end   -- closed image
 		return
 	end
 	if tx_open == nil or not tx_open.Loaded then return end
 	local off = math.floor(openness * CURTAIN_W)
-	tx_open:DrawRect(-off,            0,         0, 0, CURTAIN_W, SCREEN_H)   -- left half slides left
-	tx_open:DrawRect(CURTAIN_W + off, 0, CURTAIN_W, 0, CURTAIN_W, SCREEN_H)   -- right half slides right
+	tx_open:DrawRect(-off,            0,         0, 0, CURTAIN_W, SCREEN_H)
+	tx_open:DrawRect(CURTAIN_W + off, 0, CURTAIN_W, 0, CURTAIN_W, SCREEN_H)
 end
 
 local function rect(x, y, w, h, r, g, b, a)
@@ -159,9 +157,9 @@ local function drawLetters(now, alpha)
 		if f >= 0 then
 			local y, sx, sy, rot, bump = L.y, 1, 1, 0, 0
 			if f < 1 then
-				y = -FONT_SIZE + (L.y + FONT_SIZE) * f * f                    -- falls faster and faster
+				y = -FONT_SIZE + (L.y + FONT_SIZE) * f * f                    -- quadratic fall
 			else
-				local land = clamp01((f - 1) * FALL / LETTERS.land_s)        -- a short squash as it lands
+				local land = clamp01((f - 1) * FALL / LETTERS.land_s)        -- land squash
 				local sq = math.sin(math.pi * land) * (1 - land)
 				sx, sy = 1 + LETTERS.squash * sq, 1 - LETTERS.squash * sq
 			end
@@ -174,7 +172,7 @@ local function drawLetters(now, alpha)
 			shown[#shown + 1] = { L = L, y = y, sx = sx * L.k, sy = sy * L.k, rot = rot, bump = bump, i = i }
 		end
 	end
-	-- all shadows first, then the letters, the biggest hop last so it stands in front of its neighbours
+	-- shadows first, then letters; biggest hop last (in front)
 	for _, d in ipairs(shown) do
 		font:Draw(d.L.ch, d.L.x + TITLE.shadow_offset.x, d.y + nudge * d.sy + TITLE.shadow_offset.y, col_shadow, col_shadow,
 			TITLE.shadow_opacity * alpha, d.sx, 0, "center", d.sy, d.rot)
@@ -188,7 +186,7 @@ local function drawLetters(now, alpha)
 	end
 end
 
--- a fixed pseudo-random sequence, so every trip looks the same
+-- fixed seed: every trip is the same
 local function rng(seed)
 	local s = seed
 	return function()
@@ -229,7 +227,7 @@ local function drawConfetti(t, alpha)
 	tx_confetti:SetRotation(0); tx_confetti:SetScale(1, 1); tx_confetti:SetColor(1, 1, 1); tx_confetti:SetOpacity(1)
 end
 
--- the stage lights: dim, two spots circling in, then one spot where they met
+-- stage lights: dim and spots
 local function drawLights(now, alpha)
 	local dim, flash = LIGHTS.dim_color, LIGHTS.flash_color
 	rect(0, 0, SCREEN_W, SCREEN_H, dim[1], dim[2], dim[3], LIGHTS.dim_opacity * clamp01(now / DIM_IN) * alpha)
@@ -243,7 +241,7 @@ local function drawLights(now, alpha)
 			spot(CX + math.cos(a) * ORBIT_X * shrink, CY + math.sin(a) * ORBIT_Y * shrink, LIGHTS.spot_size, LIGHTS.spot_opacity * alpha)
 		end
 	elseif p >= 1 then
-		spot(CX, LETTER_Y, LIGHTS.merged_size, LIGHTS.merged_opacity * alpha)   -- the merged spot the name stands in
+		spot(CX, LETTER_Y, LIGHTS.merged_size, LIGHTS.merged_opacity * alpha)   -- merged spot under the name
 		local fl = (now - SPOT_END) / FLASH
 		if fl < 1 then
 			spot(CX, CY, LIGHTS_ANIM.flash_start_size + LIGHTS_ANIM.flash_grow_px * easeOut(fl), (1 - fl) * alpha)
@@ -252,7 +250,7 @@ local function drawLights(now, alpha)
 	end
 end
 
--- Close the curtain over the title: t 0→1 = open → shut.
+-- t 0..1: open -> shut
 function fadeOut(t)
 	if lastPhase ~= "out" then               -- a new trip
 		lastPhase = "out"
@@ -266,13 +264,13 @@ function fadeOut(t)
 	draw_curtain(1.0 - t)
 end
 
--- Hold shut while Intro Nokon loads behind it.
+-- held shut while Intro Nokon loads
 function loading(progress, elapsed)
 	lastPhase = "load"
 	draw_curtain(0)
 end
 
--- The show on the shut curtain, then the curtain opens.
+-- show on the shut curtain, then it opens
 function fadeIn(t)
 	lastPhase = "in"
 	local now = t * FADE_IN_SECONDS
@@ -280,7 +278,7 @@ function fadeIn(t)
 	if now >= HOP_AT then once("applause", snd_applause) end
 	local open = clamp01((now - SHOW_SECONDS) / OPEN_SECONDS)
 	if open > 0 then once("open", snd_curtain) end
-	local fade = 1 - clamp01(open / CURTAIN.lights_fade)   -- the lights and the name go as the curtain parts
+	local fade = 1 - clamp01(open / CURTAIN.lights_fade)   -- lights and name fade as the curtain opens
 	draw_curtain(easeInOut(open))
 	drawLights(now, fade)
 	drawLetters(now, fade)

@@ -1,10 +1,4 @@
--- Lines said after a floor is lost (floor_result.lua and fail_flight.lua).
--- `encounter`: on the encounter screen before the monster charges; `flight`: during the fail flight.
--- Line format (story/entrance.lua):
---   { who = "ume", sprite = "fail", text = "..." }   (sprite: normal, scared, brave, clear, run, lost, fail)
---   { name = "Needle", text = "..." }                 (anybody else)
---   { pick = pool }                                   (one option of the pool, drawn at random)
--- Each part plays the floor's own entry, else `roof` (21+) or `default`; an empty list skips the dialog.
+-- floor fail lines (floor_result.lua, fail_flight.lua); line format: story/entrance.lua
 
 local FLIGHT = {
     { lines = { { who = "ume", sprite = "fail", text = "Auwaugwhauwh… M-My head…" } } },
@@ -15,6 +9,8 @@ local FLIGHT = {
     { lines = { { who = "ume", sprite = "fail", text = "We’re blasting off again!!" } } },
 }
 
+-- encounter: before the monster charges; flight: during the fail flight
+-- per part: [level] entry, else roof (21+), else default; {} skips the dialog
 return {
     encounter = {
         default = {
@@ -23,7 +19,7 @@ return {
 
         roof = {},
 
-        -- [level] = { lines } for a floor's own
+        -- [level] = { lines } per floor
     },
 
     flight = {
@@ -33,6 +29,6 @@ return {
 
         roof = {},
 
-        -- [level] = { lines } for a floor's own
+        -- [level] = { lines } per floor
     },
 }

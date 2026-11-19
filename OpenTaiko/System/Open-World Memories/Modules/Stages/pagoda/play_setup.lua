@@ -1,4 +1,4 @@
--- What a pagoda play changes outside the stage, and how it is put back.
+-- pagoda play changes outside the stage, and their undo
 
 local save        = require("save")
 local PlayStrings = require("PlayStrings")
@@ -9,16 +9,16 @@ local ROOF_LEVEL      = 21
 local PLATE_STYLE_KEY = "danplate_style"
 local BACKGROUND      = "play_bg"
 local LEVEL_KEY       = "pagoda_play_level"
-local MONSTER_KEY     = "pagoda_play_monster"     -- the run's rolled monster on floors 1-4
+local MONSTER_KEY     = "pagoda_play_monster"     -- run's rolled monster on floors 1-4
 local HIGHEST_KEY     = "pagoda_play_highest"
-local PRACTICE_KEY    = "pagoda_play_practice"    -- "1": a practice play, no monster
+local PRACTICE_KEY    = "pagoda_play_practice"    -- "1": practice play, no monster
 local LOADING_BG_KEY  = "song_loading_dan_bg"
 local LOADING_BG      = "Stages/pagoda/Textures/loading/dan.jpg"
 
-local _saved_mods = nil   -- player 1's mod flags before the play
+local _saved_mods = nil   -- P1 mod flags before the play
 
--- right before DANBUILDER:Mount(); monster = the run's monster for the floor or nil;
--- tower = the highest cleared floor the tower shows; practice = a practice play
+-- right before DANBUILDER:Mount(); monster: floor monster or nil
+-- tower: highest cleared floor shown; practice: practice play
 function M.begin(level, song_speed, monster, tower, practice)
     if _saved_mods == nil then
         _saved_mods = CONFIG:GetModFlags(0)
@@ -41,13 +41,13 @@ function M.begin(level, song_speed, monster, tower, practice)
     SONGMOUNT:SetBackgrounds(BACKGROUND)
 end
 
--- right after a successful DANBUILDER:Mount(): stamps the strings with the mounted chart
+-- right after a successful DANBUILDER:Mount(): stamp strings with the chart
 function M.mounted()
     PlayStrings.stamp()
 end
 
--- after the play returns, a failed mount or a fresh entry: player 1's mods and song speed back
--- (from the save after a play the game never returned from); plate style and background strings dropped
+-- after the play, a failed mount or a fresh entry: restore P1 mods and song speed
+-- (save copy if the play never returned); drops plate style and background strings
 function M.finish()
     local flags = _saved_mods or save.held_mods()
     if flags ~= nil then CONFIG:SetModFlags(0, flags) end

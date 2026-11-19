@@ -1,13 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global, need-check-nil, undefined-field
--- SimpleUI settingsList: a scrollable list of settings rows with inline editing. Each row is either a
--- non-focusable section header, or an option row showing "Name .... value". Up/Down moves the selection
--- (scroll + cull like Menu); Left/Right edits the selected value; Decide toggles / activates.
---
--- rows = { {header="Audio"}, {opt=<option>}, ... } where each `opt` exposes (C# CLuaConfigOption OR a mock):
---   .Kind ("Toggle"/"Int"/"Choice"/"Action"/"KeyConfig"), .Name, .Desc, .Index, .ChoiceCount
---   :Display() -> string, :Toggle(), :Add(d), :SetIndex(i), :Activate()
--- Callbacks: onFocusRow(opt) when the selection changes; onActivateRow(opt) for Action/KeyConfig rows.
--- scrollbar = true: a scrollbar beside the list while its rows don't all fit.
+-- SimpleUI settingsList: scrolling settings rows with inline editing
+-- Left/Right edit the selected value; Decide toggles or activates
 
 local Widget   = require("UI.SimpleUI.widget")
 local U        = require("UI.SimpleUI.util")
@@ -18,6 +11,11 @@ local List = setmetatable({}, { __index = Widget })
 List.__index = List
 ListBase.install(List)
 
+-- rows = { {header="Audio"}, {opt=<option>}, ... }; opt is a CLuaConfigOption or a mock with:
+--   .Kind ("Toggle"/"Int"/"Choice"/"Action"/"KeyConfig"), .Name, .Desc, .Index, .ChoiceCount
+--   :Display() -> string, :Toggle(), :Add(d), :SetIndex(i), :Activate()
+-- onFocusRow(opt): selection changed; onActivateRow(opt): Action/KeyConfig rows
+-- scrollbar = true: bar beside the list while the rows don't fit
 function List.new(o)
     o = o or {}
     o.w = o.w or 900; o.h = o.h or 760
@@ -81,7 +79,7 @@ function List:onNavUpOrPadLeft() self:setCapturing(false, true); if self.selecte
 
 function List:_ensureVisible() self:_showRow(self:_selRowIndex() or 1) end
 
--- editing the selected option
+-- edits opt by dir
 local function editOpt(opt, dir)
     if not opt then return end
     local k = opt.Kind
@@ -110,8 +108,8 @@ Widget.editable(List, step)
 function List:update(ctx)
     Widget.update(self, ctx)
     local capturing, silence = self.capturing, false
-    -- mouse hover row -> preview-select; click activates
-    if not self.focused or ctx.mPressed then capturing = false end  -- reset first
+    -- hover previews a row; click activates
+    if not self.focused or ctx.mPressed then capturing = false end
     if self.hovered and ctx.inside and (ctx.moved or not self._wasHovered or self.pressed) then
         local rel = ctx.my - self.y + self._scrollCur
         local rowIdx = math.floor(rel / self.rowHeight) + 1
@@ -119,7 +117,7 @@ function List:update(ctx)
             -- map rowIdx -> focusable index
             for fi, ri in ipairs(self._focusable) do
                 if ri == rowIdx then
-                    -- preview-select on hover / press-select on click; the manager's release fires onActivate
+                    -- select on press/release; the manager's release fires onActivate
                     if fi ~= self.selected then
                         self:setCapturing(false, true)
                         if (ctx.mPressed or ctx.mReleased) then self:_setSelected(fi); silence = true end
@@ -144,7 +142,7 @@ function List:draw()
     local hsz = self.eff.font.small
     local th = self.mgr:textHeight(sz)
     local selRowIdx = self:_selRowIndex()
-    -- rows are cut at the list's box (the ring's margin stays visible at the sides)
+    -- rows clipped to the list box (ring margin stays visible at the sides)
     local clip = GRAPHICS ~= nil and GRAPHICS.SetClip ~= nil
     if clip then GRAPHICS:SetClip(self.x - 8, self.y, self.w + 16, self.h) end
     for i = firstVis, lastVis do
@@ -152,11 +150,10 @@ function List:draw()
         local ry = self.y + (i - 1) * self.rowHeight - self._scrollCur
         local rcy = math.floor(ry + (self.rowHeight - 10) * 0.5 + 5)
         local rcx = math.floor(self.x + self.w * 0.5)
-        -- top-anchored text: the box top sits half a box above the row centre, plus the nudge so the
-        -- glyph line (not the padded box) is what gets centred
+        -- top-anchored text, offset by textNudge so the glyph line is centred
         local ty = math.floor(rcy - th * 0.5 + self.mgr:textNudge(sz))
         if r.header then
-            -- section header: just the label, no row body
+            -- section header: label only, no row body
             self.mgr:drawText(hsz, tostring(r.header), math.floor(self.x + 18), math.floor(rcy - self.mgr:textHeight(hsz) * 0.5 + self.mgr:textNudge(hsz)), self.eff.colors.accent2 or self.eff.colors.primary2)
         else
             local isSel = (i == selRowIdx)

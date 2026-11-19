@@ -1,6 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
--- setup.lua — Game configuration screen (Mode / Players / Songs) for intro_nokon.
--- update() returns "back" or {mode, players, songs} when confirmed, nil otherwise.
+-- intro_nokon setup screen (Mode / Players / Songs)
 
 local I18N = require("i18n")
 local NavInput = require("NavInput")
@@ -12,31 +11,31 @@ local Rolls, Rounds = Layout.setup.rolls, Layout.setup.rounds
 
 local M = {}
 
-local tx         = {}   -- shared textures (allocated in Script.lua)
+local tx         = {}   -- shared textures from Script.lua
 local sounds     = {}   -- shared sounds
-local txts       = {}   -- text renderers: txts.title, txts.label
-local countSongs = nil  -- function(scope) -> int, injected from Script.lua
+local txts       = {}   -- txts.title, txts.label
+local countSongs = nil  -- function(scope) -> int, from Script.lua
 
 local errorMsg   = nil
 local errorTimer = nil
 
--- ── Constants ─────────────────────────────────────────────────────────────────
+-- ==== Constants ====
 
 local SCALE_SEL   = Rolls.selected_scale
 local SCALE_UNSEL = Rolls.other_scale
-local ANIM_DUR    = SetupAnim.zoom_s   -- seconds for zoom transition
-local MAX_GAP     = Rolls.max_gap    -- pixel cap on inter-item gap
+local ANIM_DUR    = SetupAnim.zoom_s   -- s, zoom
+local MAX_GAP     = Rolls.max_gap    -- px, max item gap
 
--- Roll vertical centers (screen is 1080px; title uses top ~110px)
+-- roll centre y
 local ROLL_Y = Rolls.y
 
 local WHITE = "ffffffff"
 
--- ── Roll definitions ─────────────────────────────────────────────────────────
+-- ==== Rolls ====
 
 local function makeRolls()
     return {
-        {   -- roll 1: Mode
+        {
             label = "Mode",
             items = {
                 { key = "mode_endurance", value = "Endurance" },
@@ -45,7 +44,7 @@ local function makeRolls()
             selectedIdx = 1,
             animCounter = nil, animFromIdx = nil, animToIdx = nil,
         },
-        {   -- roll 2: Players
+        {
             label = "Players",
             items = {
                 { key = "player_1", value = 1 },
@@ -57,7 +56,7 @@ local function makeRolls()
             selectedIdx = 1,
             animCounter = nil, animFromIdx = nil, animToIdx = nil,
         },
-        {   -- roll 3: Songs
+        {
             label = "Songs",
             items = {
                 { key = "songs_optk",   value = "OpTk"   },
@@ -80,11 +79,10 @@ local showRounds = false
 local roundCount = 0
 local roundStep  = 1
 
--- ── Helpers ───────────────────────────────────────────────────────────────────
+-- ==== Helpers ====
 
 local function col(hex) return COLOR:CreateColorFromHex(hex) end
 
--- Is item i of roll r available for selection?
 local function isAvailable(r, i)
     if r ~= 2 then return true end
     local modeIdx = rolls[1].selectedIdx
@@ -92,7 +90,7 @@ local function isAvailable(r, i)
     return i >= 2                            -- VS: 2-5P
 end
 
--- Compute horizontal center x of each item in roll r.
+-- item centre x values
 local function itemPositions(r)
     local items = rolls[r].items
     local n     = #items
@@ -103,7 +101,7 @@ local function itemPositions(r)
     end
     if maxW == 0 then maxW = Rolls.item_fallback end
 
-    -- Choose gap so items fit without script overflowing (target total ≤ max_total_w)
+    -- gap so the total fits max_total_w
     local gap = math.max(Rolls.min_gap, math.min(MAX_GAP, math.floor((Rolls.max_total_w - n * maxW) / math.max(1, n - 1))))
     local totalW = n * maxW + (n - 1) * gap
     local x0     = Rolls.center_x - totalW / 2
@@ -115,7 +113,6 @@ local function itemPositions(r)
     return pos
 end
 
--- Current visual scale of item i in roll r.
 local function itemScale(r, i)
     local roll = rolls[r]
     if roll.animCounter ~= nil then
@@ -127,7 +124,6 @@ local function itemScale(r, i)
     return i == roll.selectedIdx and SCALE_SEL or SCALE_UNSEL
 end
 
--- Change selection in roll r to newIdx with zoom animation.
 local function changeSelection(r, newIdx)
     local roll = rolls[r]
     if newIdx == roll.selectedIdx then return end
@@ -138,7 +134,7 @@ local function changeSelection(r, newIdx)
     roll.animCounter:Start()
 end
 
--- After changing Mode, snap Players to first valid option.
+-- after a Mode change: first valid Players option
 local function snapPlayers()
     local modeIdx = rolls[1].selectedIdx
     local pRoll   = rolls[2]
@@ -149,7 +145,7 @@ local function snapPlayers()
     end
 end
 
--- Move selection in roll r by dir, skipping unavailable items.
+-- skips unavailable items
 local function navigate(r, dir)
     local roll = rolls[r]
     local n    = #roll.items
@@ -214,7 +210,7 @@ local function validateAndStart()
     local count = countSongs(cfg.songs)
     local ok    = true
     if cfg.mode == "Endurance" then
-        -- 1-song is the egg mode (allowed); 0 or 2–4 songs are not enough
+        -- 1 song: egg mode; 0 or 2-4: too few
         if count == 0 or (count >= 2 and count <= 4) then ok = false end
     else -- VS
         if count < 5 then ok = false end
@@ -226,7 +222,7 @@ local function validateAndStart()
     end
 end
 
--- ── Init / lifecycle ──────────────────────────────────────────────────────────
+-- ==== Init / lifecycle ====
 
 function M.init(t, snd, txt, countFn)
     tx         = t
@@ -245,14 +241,14 @@ function M.reset()
     errorMsg   = nil
     errorTimer = nil
 
-    -- Resume BGM if needed (e.g. returning from game results)
+    -- resume BGM (back from results)
     if not sounds.BGM.IsPlaying then
         sounds.BGM:SetLoop(true)
         sounds.BGM:Play()
     end
 end
 
--- ── Draw ──────────────────────────────────────────────────────────────────────
+-- ==== Draw ====
 
 local function drawRoll(r, isActive)
     local roll   = rolls[r]
@@ -260,11 +256,10 @@ local function drawRoll(r, isActive)
     local items  = roll.items
     local pos    = itemPositions(r)
 
-    -- Label (gold for active, gray for others)
     if txts.label then
         local lc = isActive and col(Rolls.active_label_color) or col(Rolls.label_color)
         local lt = txts.label:GetText(I18N.tr(roll.label), false, Rolls.label_max_width, lc)
-        -- Position label just above the tallest image
+        -- label above the tallest image
         local maxH = 0
         for _, item in ipairs(items) do
             local t = tx[item.key]
@@ -302,24 +297,21 @@ local function drawRoll(r, isActive)
 end
 
 function M.draw()
-    -- Background
     if tx["Background"] then tx["Background"]:Draw(0, 0) end
 
-    -- Title
     if txts.title then
         local Title = SetupLayout.title
         local tt = txts.title:GetText(I18N.tr("Let's set up the game show!"), false, Title.max_width, col(Title.color))
         tt:Draw(Title.x, Title.y)
     end
 
-    -- All 3 rolls (active highlighting suppressed during rounds step)
+    -- no active highlight during the rounds step
     for r = 1, 3 do
         drawRoll(r, r == activeRoll and not showRounds)
     end
 
-    -- Rounds selection panel (VS only, after Songs)
+    -- rounds panel (VS, after Songs)
     if showRounds then
-        -- Full-screen dark overlay drawn over the rolls
         local bgt = tx["bgtile"]
         if bgt ~= nil and bgt.Loaded then
             local res = THEME:GetResolution()
@@ -342,14 +334,12 @@ function M.draw()
         end
     end
 
-    -- Go.png with bounce opacity (confirms everything is set)
     if showGo and tx["go"] then
         tx["go"]:SetOpacity(goOpacity / 255)
         tx["go"]:Draw(SetupLayout.go.x, SetupLayout.go.y)
         tx["go"]:SetOpacity(1)
     end
 
-    -- Error message (bottom of screen, red)
     if errorMsg ~= nil and txts.label then
         local Err = SetupLayout.error
         local ec = Config.color(Err.color)
@@ -357,11 +347,10 @@ function M.draw()
     end
 end
 
--- ── Update ────────────────────────────────────────────────────────────────────
--- Returns "back", a result table, or nil.
+-- ==== Update ====
+-- returns "back", a result table, or nil
 
 function M.update()
-    -- Tick roll animation counters
     for r = 1, 3 do
         local roll = rolls[r]
         if roll.animCounter then
@@ -370,10 +359,9 @@ function M.update()
         end
     end
 
-    -- Tick Go bounce counter
     if goCounter then goCounter:Tick() end
 
-    -- Tick error timer; any input dismisses the error early
+    -- any input dismisses the error
     if errorTimer ~= nil then
         errorTimer:Tick()
         if errorTimer.Value >= 1 then
@@ -387,7 +375,7 @@ function M.update()
     local pressRight  = NavInput.right()
     local pressLeft   = NavInput.left()
 
-    -- While an error is displayed, consume all input to dismiss it
+    -- error shown: input only dismisses it
     if errorMsg ~= nil then
         if pressDecide or pressCancel or pressRight or pressLeft then
             errorMsg   = nil
@@ -396,7 +384,7 @@ function M.update()
         return nil
     end
 
-    -- Rounds selection step (VS only, between Songs and Go)
+    -- rounds step (VS, between Songs and Go)
     if showRounds then
         if pressRight then
             roundCount = roundCount + roundStep
@@ -416,7 +404,6 @@ function M.update()
         return nil
     end
 
-    -- Go confirmation overlay
     if showGo then
         if pressDecide then
             return buildResult()
@@ -427,7 +414,6 @@ function M.update()
         return nil
     end
 
-    -- Roll navigation
     if pressRight then
         navigate(activeRoll, 1)
         if activeRoll == 1 then snapPlayers() end

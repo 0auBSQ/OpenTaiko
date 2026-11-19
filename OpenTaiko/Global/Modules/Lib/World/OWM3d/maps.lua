@@ -1,15 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- OWM3d/maps.lua — the map registry + load/unload lifecycle. Dispatches the three map types and
--- wires a loaded definition into every subsystem (geometry+collision → models → triggers → NPCs →
--- lights → water → spawn), all inside one physics build session.
---
---   world:registerMap("plaza",   { type = "folder", dir = "maps/plaza" })     -- map.json + assets
---   world:registerMap("volcano", { type = "proc", build = function(world, maps) ... return map end })
---   local map = world:loadMap("plaza", "fromHills")
---
--- A "map handle" is: { def=, heightAt(self,wx,wz)=, isWall=, updateDoors=, spawns=, npcs=,
---                      portals=, waterDefs=, spawnUsed= }. Procedural builders return their own
--- handle (same contract) and manage their geometry directly.
+-- OWM3d/maps.lua: map registry and load/unload
 
 local Json    = require("World.OWM3d.json")
 local IsoMap  = require("World.OWM3d.isomap")
@@ -28,15 +18,13 @@ function Maps.new(world)
     return self
 end
 
+-- def: { type = "folder", dir } or { type = "proc", build(world, maps) -> map }
 function Maps:register(id, def) self.defs[id] = def end
 
--- the stage provides texture resolution (it owns procedural generators + file registration)
 function Maps:setTextureResolver(fn) self.texResolver = fn end
 
--- Unload = the disposal CONTRACT for everything a map session created. Order matters: bodies
--- before physics reset, subsystems before render-cache drop, native buffers last. Every step is
--- pcall-guarded where one failure must not skip the rest (the old version leaked whole maps when
--- a single npc:remove errored).
+-- disposes everything a map session made; bodies before physics reset, native buffers last
+-- pcall per step: one failure must not skip the rest
 function Maps:unload()
     local world = self.world
     -- building: a failed build left objects but no current map
@@ -53,9 +41,9 @@ function Maps:unload()
     end
     scene:ObjSetVisible(world.roofObj, true)
     if scene.ClearLights then scene:ClearLights() end
-    -- NPCs + their bodies (guarded per NPC — one failure must not orphan the rest)
+    -- NPCs and their bodies (pcall per NPC)
     for _, npc in ipairs(map.npcs or {}) do pcall(npc.remove, npc) end
-    -- model instances (file cache stays — it's per-stage)
+    -- model instances (file cache is per stage)
     world.models:clear()
     world.triggers:clear()
     if world.water then world.water:clear() end
@@ -63,25 +51,25 @@ function Maps:unload()
     if world.weather and world.weather.setWeather then pcall(world.weather.setWeather, world.weather, "clear", 0) end
     if world.daynight then world.daynight:setLights(nil) end
     if scene.GrassClear then scene:GrassClear() end
-    -- the floor object is reused by every map — drop the terrain-splat routing (an iso map after a
-    -- terrain map would otherwise still be drawn through the splat shader with a stale weight image)
+    -- floorObj is shared by all maps: drop the terrain splat routing
     pcall(Terrain.unwire, world)
     if scene.ObjSetTerrainSplat then
         scene:ObjSetTerrainSplat(world.floorObj, -1, -1, -1, -1, -1, 1, 1, 1)
         if scene.UnregisterSprite then scene:UnregisterSprite(917) end
     end
-    -- physics: release the soup (trims the native lists; beginStatic only Clear()s them)
+    -- release static geometry (trims native lists; beginStatic only clears)
     if world.phys.clearGeometry then world.phys:clearGeometry()
     else world.phys:beginStatic(); world.phys:endStatic() end
-    -- rebuildable render caches (per-object VBOs / merged buffers / reflection targets)
+    -- rebuildable render caches
     if scene.ClearRenderCaches then scene:ClearRenderCaches() end
-    -- native terrain buffers (heightfield + splat) — deterministic free, not two GC generations
+    -- native terrain buffers: free now, not on GC
     if map.hf and map.hf.Release then pcall(map.hf.Release, map.hf) end
     if map.splat and map.splat.Release then pcall(map.splat.Release, map.splat) end
     self.current = nil
     collectgarbage("collect")
 end
 
+-- map handle: { def, heightAt(self, wx, wz), isWall, updateDoors, spawns, npcs, portals, waterDefs, spawnUsed }
 function Maps:load(id, spawnName)
     local world = self.world
     self:unload()
@@ -91,7 +79,7 @@ function Maps:load(id, spawnName)
     self.building = true
     local map
     if reg.type == "proc" then
-        -- procedural maps own their build (they still get the physics session + subsystems)
+        -- proc maps build themselves inside the physics session
         world.phys:beginStatic()
         map = reg.build(world, self)
         for _, inst in ipairs(world.models.list) do world.models:emitCollision(inst) end
@@ -114,7 +102,7 @@ function Maps:load(id, spawnName)
     local sp = (map.spawns and (map.spawns[spawnName or "default"] or map.spawns.default))
         or { x = world.gridW / 2, z = world.gridH / 2, yaw = 45 }
     map.spawnUsed = sp
-    -- seed trigger states from the spawn point — spawning inside a volume must not phantom-fire
+    -- seed trigger states at spawn: no firing when spawning inside a volume
     if world.triggers.resetStates then
         local sy = 0
         if map.heightAt then local ok, h = pcall(map.heightAt, map, sp.x, sp.z); if ok and h then sy = h end end
@@ -123,11 +111,10 @@ function Maps:load(id, spawnName)
     return map
 end
 
--- build a JSON-defined map (iso or terrain) — the full wiring pass
+-- build a JSON map (iso or terrain)
 function Maps:buildFromDef(def)
     local world = self.world
-    -- resolver: the stage's (it owns procedural generators/registration), else the world's
-    -- name→id pool (stable ids across loads — the registry must not grow per map switch)
+    -- stage resolver, else world:texIdFor (stable ids across loads)
     local texFn = self.texResolver or function(name) return world:texIdFor(name) end
     local function texId(name) return texFn(name, def.textures and def.textures[name] or nil) end
 
@@ -141,7 +128,7 @@ function Maps:buildFromDef(def)
         map = IsoMap.build(world, def, texId)
     end
 
-    -- 2. models (visible immediately; collision emitted into the same session)
+    -- 2. models (collision in the same session)
     for _, m in ipairs(def.models or {}) do
         local inst = world.models:add{
             file = def.dir .. "/" .. m.file,
@@ -152,16 +139,14 @@ function Maps:buildFromDef(def)
         if inst then world.models:emitCollision(inst) end
     end
 
-    -- water is scenery, not a swimming pool: an invisible knee-high fence around each plane keeps
-    -- the player out (emitted inside the session so it's part of the static soup). Grass never
-    -- grows underwater either.
+    -- water: invisible fence around each plane, no grass inside
     local Water = require("World.OWM3d.water")
     for _, wd in ipairs(def.water or {}) do
         Water.emitFence(world.phys, wd)
         if world.scene.GrassRemoveRect then world.scene:GrassRemoveRect(wd.x0, wd.z0, wd.x1, wd.z1) end
     end
 
-    -- stage dressing (props/furniture that also need collision) joins the same build session
+    -- stage props with collision (same session)
     if world.onMapDecorate then world.onMapDecorate(map, def, def.id) end
 
     world.phys:endStatic()
@@ -175,14 +160,14 @@ function Maps:buildFromDef(def)
         }
     end
 
-    -- 4. NPCs (physics bodies must exist AFTER the static build so they rest on real ground)
+    -- 4. NPCs (after the static build: bodies need the ground)
     map.npcs = {}
     self.current = map      -- npc ground snap reads maps.current:heightAt
     for _, n in ipairs(def.npcs or {}) do
         map.npcs[#map.npcs + 1] = NPC.new(world, n)
     end
 
-    -- 5. lights: daynight owns the list (nightOnly scheduling + flicker); static fallback without it
+    -- 5. lights: daynight owns the list; static fallback without it
     map.lightDefs = def.lights or {}
     if world.daynight then
         world.daynight:setLights(map.lightDefs)

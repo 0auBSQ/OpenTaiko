@@ -1,26 +1,13 @@
 ---@diagnostic disable: undefined-global, undefined-field
--- integrity.lua — the placement sweep My Room runs on every load. A saved room can carry pieces that
--- the live rules would refuse (an older build let rotations overlap): this walks the furniture and
--- sends every offender back to the inventory so the room opens consistent.
---
--- Ground pieces go first, in save order (the earlier piece keeps its cells): a ground piece is evicted
--- when any of its cells is off the floor or already taken by another ground piece. Stacked pieces
--- follow: one is evicted when it cannot stack, when its cells are not all hosted by the same surface,
--- or when another stacked piece already holds one of them. An evicted surface takes its riders with
--- it, as removing it in edit mode would. Wall items come last: one is evicted when its tile is not a
--- wall tile, when an earlier item already takes one of its tiles and bands, or when a piece in front
--- of it stands higher than its mount. The phone (Room:ensurePhone keeps it on the walls) and the
--- windows (part of the room's walls) are never evicted: the pieces they would run into go instead.
---
---   Integrity.sweep(room) -> { id, ... }   the ids returned to stock, in eviction order
+-- placement sweep on every load: pieces the live rules refuse go back to the inventory
 
 local M = {}
 
 local function key(c, r) return c .. "," .. r end
--- the stock key an evicted piece goes back to (a piece in a colour keeps it, see Room.stockKey)
+-- same as Room.stockKey: a coloured piece keeps its colour
 local function stockKey(it) return it.hex and (it.id .. ":" .. it.hex) or it.id end
 
--- take one piece out of the room and into the inventory, riders first when it carried any
+-- room -> inventory, with its riders
 local function evict(room, catalog, it, out, gone)
     if not room:detachFurniture(it) then return end
     gone[it] = true
@@ -32,7 +19,7 @@ local function evict(room, catalog, it, out, gone)
     out[#out + 1] = it.id
 end
 
--- a ground piece's cells must all be floor and free of other ground pieces
+-- true when a cell is off the floor or taken
 local function groundFault(room, cells, taken)
     for _, cell in ipairs(cells) do
         if room:cellType(cell[1], cell[2]) ~= "O" or taken[key(cell[1], cell[2])] then return true end
@@ -40,8 +27,7 @@ local function groundFault(room, cells, taken)
     return false
 end
 
--- a stacked piece must be allowed to stack, rest on ONE surface under all its cells, and share no
--- cell with another stacked piece
+-- true unless stackOn, with every cell free and on one surface
 local function stackedFault(room, cat, cells, taken)
     if not cat.stackOn then return true end
     local surf = nil
@@ -55,13 +41,15 @@ local function stackedFault(room, cat, cells, taken)
     return false
 end
 
+-- returns evicted ids, in eviction order
 function M.sweep(room)
     local catalog = room.CATALOG
     local out, gone = {}, {}
-    -- snapshot: evictions edit room.furniture while we walk
+    -- snapshot: evictions edit room.furniture
     local pieces = {}
     for _, it in ipairs(room.furniture) do pieces[#pieces + 1] = it end
 
+    -- ground pieces in save order: the earlier piece keeps its cells
     local taken = {}
     for _, it in ipairs(pieces) do
         local cat = catalog[it.id]
@@ -88,6 +76,7 @@ function M.sweep(room)
         end
     end
 
+    -- wall items: phone and windows stay, the pieces in front of them go
     local walls = {}
     for _, it in ipairs(room.wallItems) do walls[#walls + 1] = it end
     taken = {}

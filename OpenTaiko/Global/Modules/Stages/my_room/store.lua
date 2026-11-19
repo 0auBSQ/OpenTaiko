@@ -1,10 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field
--- store.lua — My Room's saved state: one JSON string per save, the save's global string "my_room":
+-- My Room save state: one JSON string per save, global string "my_room"
 --   { "v": 1, "room": <Room:toTable()>, "jukebox": <JB.persistState(), absent while nothing plays> }
--- Only the fields listed below are written, and only they are read back.
---   Store.read(sf)                  -> room|nil, jukebox|nil, the string as stored ("" when not set yet)
---   Store.write(sf, room, jukebox)  -> true when written; nothing is written for an empty slot
---   Store.legacy(sf, slot)          -> room|nil, jukebox|nil from OWM's old store (temporary, see below)
 
 local Json = require("Core.Json")
 
@@ -15,7 +11,8 @@ Store.VERSION = 1
 
 local floor = math.floor
 
--- ── the saved fields ─────────────────────────────────────────────────────────────────────────────
+-- ==== saved fields ====
+-- only these fields are written and read back
 local function num(v)
     v = tonumber(v)
     if v == nil or v ~= v or v == math.huge or v == -math.huge then return nil end
@@ -77,6 +74,7 @@ end
 
 local function hasSave(sf) return sf ~= nil and type(sf.SaveUID) == "string" and sf.SaveUID ~= "" end
 
+-- -> room|nil, jukebox|nil, the stored string ("" when unset)
 function Store.read(sf)
     if sf == nil then return nil, nil, "" end
     local ok, s = pcall(function() return sf:GetGlobalString(Store.KEY) end)
@@ -90,24 +88,20 @@ function Store.encode(room, jukebox)
     return Json.encode({ v = Store.VERSION, room = Store.cleanRoom(room), jukebox = Store.cleanJukebox(jukebox) })
 end
 
+-- true when written; false for an empty slot
 function Store.write(sf, room, jukebox)
     if not hasSave(sf) or type(room) ~= "table" then return false end
     local text = Store.encode(room, jukebox)
     return (pcall(function() sf:SetGlobalString(Store.KEY, text) end))
 end
 
--- ── temporary: OWM's old store, read once per save (removed at the official release, with OWM's
--- myroom forwarder stage) ──────────────────────────────────────────────────────────────────────────
--- Before my_room, OWM's myroom stage kept the rooms in an LMDB store in its own folder
--- (System/Open-World Memories/Modules/Stages/myroom/myroom), as Lua table source under room_<SaveUID> and
--- jukebox_<SaveUID> (room_slot<n> and jukebox_slot<n> for a save that had no SaveUID yet). The path climbs
--- from this folder (Global/Modules/Stages/my_room) to the game folder; DATABASE remaps it for writing
--- (iOS) the way it remapped the old stage's own path.
+-- ==== legacy OWM store (temporary) ====
+-- OWM myroom LMDB store: Lua table source under room_<SaveUID> and jukebox_<SaveUID> (or slot<n>)
+-- path relative to this folder; DATABASE remaps it for writing (iOS)
 local LEGACY_DIR = "../../../../System/Open-World Memories/Modules/Stages/myroom/myroom"
 local LEGACY_MAX = 1048576
 
--- a stored value is read only when it is plain table source as the old stage wrote it: tables, strings,
--- numbers, true/false/nil, no parentheses and no other names, so nothing in it can call anything
+-- plain table source only: no parentheses, no names beyond LEGACY_WORDS, so nothing can run
 local LEGACY_WORDS = { ["true"] = true, ["false"] = true, ["nil"] = true, inf = true, nan = true }
 local function stripStrings(s)
     local out, i, n = {}, 1, #s
@@ -147,6 +141,7 @@ function Store.legacyValue(s)
     return nil
 end
 
+-- -> room|nil, jukebox|nil
 function Store.legacy(sf, slot)
     if not hasSave(sf) then return nil, nil end
     local okE, exists = pcall(function() return STORAGE:FileExists(LEGACY_DIR .. "/data.mdb") end)

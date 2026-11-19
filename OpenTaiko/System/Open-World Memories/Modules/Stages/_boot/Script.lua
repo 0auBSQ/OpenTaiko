@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global, undefined-field
 
 local NavInput = require("NavInput")
--- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+-- layout: Config/layout.json; timings: Config/animation.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
@@ -16,7 +16,7 @@ local text_enter = TEXTURE:CreateTexture()
 
 local counter = nil
 
--- First Time Menu --
+-- ==== First Time Menu ====
 local database = nil
 local firsttime = false
 local firsttimepage = 1
@@ -34,7 +34,6 @@ local menu_vols = {}
 local color_white = Config.color(MENU.text_color)
 local color_red = Config.color(MENU.selected_color)
 local color_yellow = Config.color(MENU.editing_color)
--- First Time Menu --
 
 local function movedUp()
 	return NavInput.upOrPadLeft()
@@ -228,7 +227,7 @@ function update()
 			text_enter:SetOpacity(counter.Value)
 		end
 
-		-- IsFinished also covers decoders whose play position stalls below Duration.
+		-- IsFinished also covers decoders stalling below Duration
 		if video ~= nil and (video:IsFinished()
 			or (video.Duration > 0.0 and video:GetPlayPosition() >= math.floor(video.Duration))) then
 			return Exit("title", nil)
@@ -283,7 +282,7 @@ function deactivate()
 	if text ~= nil then
 		text:Dispose()
 	end
-	-- First Time Menu
+	-- first time menu
 	if sounds.Song ~= nil then
 		sounds.Song:Dispose()
 	end
@@ -306,9 +305,9 @@ function onStart()
 	SHARED:SetSharedSFX("SongDecide", "Sounds/SongDecide.ogg")
 	SHARED:SetSharedSFX("Error", "../../../Sounds/Error.ogg")
 	SHARED:SetSharedSFX("EventTick", "Sounds/EventTick.ogg")   -- Event Mode: the countdown's last ten seconds
-	-- the coin icon every purse and coin reward draws (Lib/CoinBox, the coin modal)
+	-- coin icon for purses and coin rewards (Lib/CoinBox, coin modal)
 	SHARED:SetSharedTexture("Coin", "Textures/Coin.png")
-	-- the UI library global modules build on (UI.Pick): OWM's PopUI
+	-- UI library for global modules (UI.Pick)
 	SHARED:SetSharedString("ui_library", "PopUI")
 
 	database = DATABASE:OpenGlobalDatabase("GameStatus")

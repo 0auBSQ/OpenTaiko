@@ -176,7 +176,7 @@
         "x": 960,
         "scale": 0.75,
         "h": 300,
-        "hole_y": 171,
+        "hole_y": 178,
         "key_scale": 0.42,
         "key_shadow": { "x": 4, "y": 6, "lift": 14, "opacity": 0.3 },
         "won_y": 300,

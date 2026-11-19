@@ -9,22 +9,22 @@ local Vault = require("vault")
 local TalkScene = require("talk")
 local NavInput = require("NavInput")
 local MusicDuck = require("MusicDuck")
--- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+-- layout: Config/layout.json; timings: Config/animation.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
 
 local EXIT_OPEN, EXIT_LOCKED = "vault_water_back", "vault_wood"
 local COVER_KEY = "vault_cover"
-local FADE = Animation.ui_fade_s          -- the dialogue box and the menu fade in and out this fast
+local FADE = Animation.ui_fade_s          -- dialogue box and menu fade, sec
 local AMBIENCE_VOLUME = 35
-local KICK_SNAPS = 3             -- snapped keys in one visit before Mr.Caspian kicks the player out
+local KICK_SNAPS = 3             -- snapped keys per visit before the kick
 local KICKED = ".vault_kicked_out"
-local KICK_SHUT_AT = Animation.kick_door.shut_after_s        -- s after the kick, the door starts to shut
-local KICK_PACE = Animation.kick_door.pace            -- behind a kicked-out player the door shuts this much faster
-local EXIT_HOLD = Animation.exit_hold_s   -- the shut door stays this long before the stage leaves
+local KICK_SHUT_AT = Animation.kick_door.shut_after_s        -- door starts to shut, sec after the kick
+local KICK_PACE = Animation.kick_door.pace            -- door shut speed-up after a kick
+local EXIT_HOLD = Animation.exit_hold_s   -- sec the shut door holds before the exit
 
--- Cabin/Water.png (the sea when the water shader cannot run) is loaded by cabin.lua only when it is needed
+-- Cabin/Water.png (no water shader fallback): loaded by cabin.lua on demand
 local TEXTURES = {
     "Gate/Door", "Gate/Keyhole", "Gate/Hover", "Gate/HintPanel",
     "Gate/KeyGreed", "Gate/KeyPride", "Gate/KeyWrath", "Gate/KeyEnvy",
@@ -51,13 +51,13 @@ local SOUNDS = {
 local textures = {}
 local sounds   = {}
 local fonts    = {}
-local musicDuck   -- dims the BGM while the reward modal plays
+local musicDuck   -- ducks the BGM during the reward modal
 local ctx = { tex = textures, snd = sounds, fonts = fonts }
 
 local state           = "waiting_enum"
 local active          = false
 local songsEnumerated = false
-local unlocked        = false   -- the vault was already open when the stage started
+local unlocked        = false   -- vault open at stage start
 local now, revealAt   = 0, 0
 local boxA, boxTarget   = 0, 0
 local menuA, menuTarget = 0, 0
@@ -70,18 +70,16 @@ local keys = { 0, 0, 0 }
 local closedAt = nil
 local musicOn = false
 local snaps = 0                 -- keys snapped this visit
-local kickT, shutT = nil, nil   -- the kick, and when the door started to shut behind it
+local kickT, shutT = nil, nil   -- kick time, door shut start
 
----------------------------------------
--- Helpers
----------------------------------------
+-- ==== Helpers ====
 
 local function play(name)
     local s = sounds[name]
     if s then s:Play() end
 end
 
--- the gate's clock: the stage's, except once the door shuts behind a kicked-out player
+-- stage clock; KICK_PACE times faster once the door shuts after a kick
 local function gateNow()
     if shutT == nil then return now end
     return shutT + (now - shutT) * KICK_PACE
@@ -139,7 +137,7 @@ local function enterCabin()
     chipTarget = 1
     startMusic()
     local save = GetSaveFile(0)
-    -- kicked out last time: a warning instead of a greeting, once
+    -- kicked last time: one warning instead of a greeting
     local kicked = save ~= nil and save:GetGlobalTrigger(KICKED) == true
     if kicked then save:SetGlobalTrigger(KICKED, false) end
     if save and save:GetGlobalTrigger(".vault_caspian_met") ~= true then
@@ -190,9 +188,7 @@ local function kickOut()
     state = "kicked"
 end
 
----------------------------------------
--- Menu
----------------------------------------
+-- ==== Menu ====
 
 local function menuInput()
     local nav = NavInput.p[1]
@@ -231,7 +227,7 @@ local function confirmInput()
         reward = Vault.roll(c)   -- roll at once (anti save-scum)
         play("Decide")
         Cards.setConfirm(false, now)
-        -- the key is spent now; a key won, and what is left in the chests, show once the chest reveals them
+        -- key spent now; counts update once the chest reveals
         keys[c] = math.max(0, keys[c] - 1)
         if info[c] then info[c].keys = keys[c] end
         Opening.start(c, reward, now)
@@ -251,9 +247,7 @@ local function confirmInput()
     end
 end
 
----------------------------------------
--- Main Functions
----------------------------------------
+-- ==== Main functions ====
 
 function draw()
     local dt = Tex.dt()
@@ -312,14 +306,14 @@ function update()
         if ev == "talk" then
             local snapped = not (reward and reward.type == "key")
             if not snapped then
-                -- the won key is on screen: it joins the counts
+                -- won key on screen: counts update
                 for i = 1, 3 do
                     keys[i] = Vault.keyCount(i)
                     if info[i] then info[i].keys = keys[i] end
                 end
             end
             talk(snapped and "snap" or "keygot", function()
-                -- cutting his taunt short punches the chest away; hearing it out leaves the chest be
+                -- taunt cut short: chest punched away; heard out: chest stays
                 if snapped and Caspian.wasCut() then
                     snaps = snaps + 1
                     Opening.punch(now)      -- the box stays up for his "hey"
@@ -352,7 +346,7 @@ function update()
             local chest = reward and reward.openedChest
             reward = nil
             refreshInfo()
-            -- behind the kick the punched chest ends while he talks: the menu does not come back
+            -- after a kick the punched chest ends during his talk: no menu
             if state == "opening" then
                 if opened and TalkScene.offer(chest) then
                     chipTarget = 0
@@ -366,7 +360,7 @@ function update()
     end
 
     if state == "waiting_enum" then
-        -- While songs are loading or unavailable, only allow Cancel/Escape to exit.
+        -- loading or no songs: cancel only
         if NavInput.cancel() then
             play("Cancel")
             return exitTo(unlocked and EXIT_OPEN or EXIT_LOCKED)
@@ -434,7 +428,7 @@ function update()
     end
 end
 
--- the dialogue's name tag holds NAME_INK px of ink at size NAME_SIZE: a longer name gets a smaller font
+-- name tag fits NAME_INK px of ink at NAME_SIZE; longer names get a smaller font
 local NAME_SIZE, NAME_INK = Layout.name_tag.font, Layout.name_tag.ink_w
 local nameFor = nil
 local function fitNameFont()
@@ -469,7 +463,7 @@ end
 function activate()
     active = true
     now = 0
-    -- the way in hides the stage this long into its fade-in; the door waits for it
+    -- transition hides the stage this long into its fade-in; the door waits
     revealAt = tonumber(SHARED:GetSharedString(COVER_KEY)) or 0
     SHARED:SetSharedString(COVER_KEY, "")
     local save = GetSaveFile(0)
@@ -482,13 +476,13 @@ function activate()
     afterTalk, reward, nextRemark, closedAt, musicOn = nil, nil, "prompt", nil, false
     snaps, kickT, shutT = 0, nil, nil
     Opening.reset()
-    if unlocked then Cabin.open() end         -- behind the way in; a first unlock makes it when the door opens
+    if unlocked then Cabin.open() end         -- under the transition; a first unlock opens it with the door
     Cabin.reset()
     Caspian.reset()
     Cards.reset(0, 2)
     Gate.reset(unlocked and "unlocked" or "locked", now, revealAt)
     if TalkScene.returning() then
-        -- back from a song played in the middle of a talk: straight into the cabin, the talk goes on
+        -- back from a mid-talk song: straight into the cabin, talk resumes
         unlocked = true
         Cabin.open()
         Gate.openNow(now)
@@ -500,7 +494,7 @@ function activate()
         return
     end
     TalkScene.reset()
-    TalkScene.visit()            -- where Gris is: in the room from the first frame the cabin shows
+    TalkScene.visit()            -- places Gris before the cabin's first frame
     if songsEnumerated then
         startGate()
     else

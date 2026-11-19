@@ -1,6 +1,5 @@
--- Vault.Keys: the secret vault's three chest keys, 1 simple, 2 gold, 3 optk, kept in player 1's save as
--- the counters .vault_key_count_simple / _gold / _optk. A key is named by its number or its id. The
--- vault is open once the trigger .vault_opened is set (the skin's gate sets it).
+-- Vault.Keys: the vault's three chest keys (1 simple, 2 gold, 3 optk), counted in player 1's save
+-- the vault is open once the trigger .vault_opened is set
 
 local Texts = require("Vault.Texts")
 

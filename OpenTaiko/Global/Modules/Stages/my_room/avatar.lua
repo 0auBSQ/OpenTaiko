@@ -1,22 +1,16 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global
--- avatar.lua — the story students as billboard sprites in the room: the player and every visitor.
---
--- Each student has, per facing (1 bottom-left, 2 bottom-right, 3 top-right, 4 top-left), a standing frame
--- and four walk frames in Textures/Students/<id>/<facing>/. A look (student + palette) is registered once
--- per scene as its own block of sprites, recoloured in that palette (Lib/Student), so any number of
--- palettes can share the room. A missing frame borrows the facing's standing frame, or any frame at all.
--- The looks' sprite ids are 4000..4899 (45 looks); the fish tank's start at 4900, the lantern's at 4960.
+-- story students as billboard sprites in the room: player and visitors
 
 local Student = require("Characters.Student")
 
 local AV = {}
 
-AV.W, AV.H = 70, 128               -- a frame's size in pixels (read back from the first frame loaded)
+AV.W, AV.H = 70, 128               -- px, read back from the first frame loaded
 local WALK_FRAMES = 4
 local WALK_STEP = 0.14             -- seconds per walk frame at full speed
-local FIRST_SPRITE = 4000          -- sprite ids: one block of 20 per look
+local FIRST_SPRITE = 4000          -- sprite ids: one block of 20 per look; fishtank from 4900, lantern from 4960
 local BLOCK = 20
-local MAX_BLOCKS = 45              -- looks past this many show no sprite
+local MAX_BLOCKS = 45              -- later looks get no sprite
 local NAMES = { "idle", "walk1", "walk2", "walk3", "walk4" }
 
 local scene = nil
@@ -24,6 +18,7 @@ local textures = {}                -- id → [facing][name] = LuaTexture | false
 local looks = {}                   -- "source:id:palette" →{ [facing] = { idle = spriteId, walk = { ids } } } | false
 local nextBlock = 0
 
+-- facing d: 1 bottom-left, 2 bottom-right, 3 top-right, 4 top-left
 local function frames(id)
     if textures[id] == nil then
         local set = {}
@@ -48,7 +43,7 @@ local function frames(id)
     return textures[id]
 end
 
--- the texture shown for a facing/frame name, with the fallbacks above
+-- fallback: the facing's idle frame, then any frame
 local function pick(set, d, n)
     local f = set[d] and set[d][n]
     if f then return f end
@@ -60,15 +55,15 @@ local function pick(set, d, n)
     return nil
 end
 
--- the scene the sprites go into (a new room world): every look registers again on its next use
+-- new room world: every look registers again on next use
 function AV.attach(s)
     scene = s
     looks = {}
     nextBlock = 0
 end
 
--- the sprites of a student in a palette, registered on first use (call outside draw); visitor: another
--- player's student, whose palette index reads against Lib/Student's visitor list
+-- registered once per scene, recoloured through Lib/Student (call outside draw)
+-- visitor: palette index reads against Lib/Student's visitor list
 function AV.prepare(id, palette, visitor)
     id = Student.valid(id)
     palette = Student.clamp(id, palette, visitor)
@@ -94,7 +89,7 @@ function AV.prepare(id, palette, visitor)
     return looks[key] or nil
 end
 
--- the sprite for a facing, standing or walking (t = the walk clock in seconds)
+-- t: walk clock in s
 function AV.sprite(look, dir, moving, t)
     if look == nil then return nil end
     local f = look[dir] or look[2]
@@ -105,7 +100,7 @@ function AV.sprite(look, dir, moving, t)
     return f.idle or f.walk[1]
 end
 
--- the frame texture for 2D previews (the mirror): facing d, standing or walk frame k
+-- frame texture for 2D previews (mirror); k: walk frame, nil for idle
 function AV.frame(id, d, k)
     local set = frames(Student.valid(id))
     return pick(set, d, (k and k >= 1 and k <= WALK_FRAMES) and ("walk" .. k) or "idle")

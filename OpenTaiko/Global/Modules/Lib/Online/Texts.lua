@@ -1,5 +1,4 @@
--- Online.Texts: the Online modules' own strings, lang/<code>/online.json next to this file, in the game's
--- language (English when a language lacks a file or a key).
+-- Online.Texts: Online strings from lang/<code>/online.json beside this file (English fallback)
 
 local I18N = require("Locale.i18n")
 local HERE = require("Core.Here")(...)

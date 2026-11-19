@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
+-- down background 2: Forest
 
 local loopWidth = 1640
 
@@ -18,8 +18,7 @@ local lightCounter = 0
 
 local taiko_rotate = 0
 
--- onStart runs BEFORE the script receives `state`, so the original init()'s simplemode-gated
--- star-fade seeding is deferred to the first update() via this one-shot flag.
+-- state arrives after onStart: seed star fade in first update()
 local simpleSeeded = false
 
 function clearIn(player)

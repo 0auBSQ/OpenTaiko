@@ -1,7 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Normal down background 1 (Field): a static bottom field image with a clear-fade overlay
--- driven by clearIn/clearOut (clearMultiplier toggles the fade direction).
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
+-- down background 1: Field
 
 local bgClearFade = 0
 local clearMultiplier = -1

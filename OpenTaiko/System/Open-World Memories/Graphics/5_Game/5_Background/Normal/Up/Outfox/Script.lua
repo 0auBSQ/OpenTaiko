@@ -1,8 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Up background "Outfox": Project OutFox crossover BG. Simple mode = static red/blue/clear bg + simple note strip;
--- regular mode = horizontally scrolling bg with animated note rows (notes/pump/bemu) and hopping tiny foxes,
--- driven by bpm/totalTime. Per-player clear fade for 1P/2P. Ported from old ScriptBG func: API to the
--- ROActivity LuaTexture API (texture loads unconditional in onStart; player/mode conditionals kept in draw).
+-- up background: OutFox
 
 -- Please note that the Project OutFox branding or graphics included are not permitted
 -- for use outside of OpenTaiko without permission from the Project OutFox Developers.
@@ -55,8 +52,7 @@ function drawTinyFox(x_start, x_end, y_start, y_end, rot, progress, useAlt, lazy
     if useAlt then
         foxRect = { 256, 138, 384, 138, 128, 0 }
     end
-    -- Due to a lapse in my judgement, a portion of the fox's body shows where it shouldn't on a couple of notes
-    -- Rather than do a bunch of math to account for this, lemme just do this instead lol
+    -- fox body overlap fix (some notes)
     if lazyArrowFix then
         arrowFix = 0.7
     end
@@ -115,9 +111,9 @@ function drawOFNotes(y_offset, drawBlue)
         tx[notePath]:Draw(calculated_x_offset, calculated_y_offset)
 
         tx[bemuPath]:SetRotation(-180 * bpmTime)
-        tx[bemuPath]:DrawRect(225 + calculated_x_offset, calculated_y_offset, noteSize, 0, noteSize, noteSize) -- Bemu
+        tx[bemuPath]:DrawRect(225 + calculated_x_offset, calculated_y_offset, noteSize, 0, noteSize, noteSize)
 
-        tx[pumpPath]:DrawRect(1350 + calculated_x_offset, calculated_y_offset, noteSize * pump_offsetX, noteSize * pump_offsetY, noteSize, noteSize) -- Pump
+        tx[pumpPath]:DrawRect(1350 + calculated_x_offset, calculated_y_offset, noteSize * pump_offsetX, noteSize * pump_offsetY, noteSize, noteSize)
 
         if progress >= 1 then
             for j = foxSet + 1, 9, 3 do
@@ -132,7 +128,6 @@ function drawOFNotes(y_offset, drawBlue)
             end
         end
 
-        -- Debug Stuff (was func:DrawNum, removed)
     end
 end
 
@@ -143,14 +138,13 @@ function clearOut(player)
 end
 
 function onStart()
-    -- Load every variant up front; draw() selects by state/mode. onStart runs before `state` arrives,
-    -- so loads are unconditional (the player/mode gating in the old init() is kept in draw() only).
+    -- all variants (state arrives after onStart)
 
-    -- SimpleMode Assets
+    -- simple mode
     tx["notes_red_simple.png"] = TEXTURE:CreateTextureSync("notes_red_simple.png")
     tx["notes_blue_simple.png"] = TEXTURE:CreateTextureSync("notes_blue_simple.png")
 
-    -- Regular Assets
+    -- regular mode
     tx["notes_red.png"] = TEXTURE:CreateTextureSync("notes_red.png")
     tx["pump_red.png"] = TEXTURE:CreateTextureSync("pump_red.png")
     tx["bemu_red.png"] = TEXTURE:CreateTextureSync("bemu_red.png")
@@ -159,7 +153,7 @@ function onStart()
     tx["bemu_blue.png"] = TEXTURE:CreateTextureSync("bemu_blue.png")
     tx["tinyfox.png"] = TEXTURE:CreateTextureSync("tinyfox.png")
 
-    -- Shared backgrounds
+    -- shared
     tx["bg_red.png"] = TEXTURE:CreateTextureSync("bg_red.png")
     tx["bg_blue.png"] = TEXTURE:CreateTextureSync("bg_blue.png")
     tx["bg_clear.png"] = TEXTURE:CreateTextureSync("bg_clear.png")
@@ -170,7 +164,6 @@ function update(timestamp, state)
     bgScrollX = bgScrollX - (59 * fps.deltaTime)
     bpmTime = bpmTime + (fps.deltaTime * (state.bpm[0] / 120))
 
-    -- Only needed for 1/2 player(s)
     if state.playerCount < 3 then
       updateClearFade(state)
     end

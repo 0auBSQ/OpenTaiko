@@ -1,8 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Dan Gold Perfect end animation: a scroll that rises (eased back-out) then slides open horizontally.
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
--- Group C clear/end script: the host passes the player index via state.player (update/draw) and
--- directly to playEndAnime(player); per-play counters are (re)started in playEndAnime.
+-- end anime: Dan_Gold_Perfect (group C, player via state.player)
 
 local width = 1920
 local height = 1080
@@ -37,7 +34,6 @@ function clearOut(player)
 end
 
 function playEndAnime(player)
-    -- per-play resets (was the old init() body, minus the texture loads which moved to onStart)
     animeTimer = 0
     scrollRiseTransition = 0
     scrollSlideTransition = 0
@@ -70,11 +66,9 @@ function draw(state)
     local player = state.player
 
     if scrollSlideTransition > 0 then
-        -- Draw scroll background
         tx["Scroll_Back.png"]:DrawRect(scrollSlidePos, scrollRisePos, scrollSlidePos - scrollBackWidth - scrollBackXOffset, 0, scrollBackWidth - scrollSlidePos + scrollBackXOffset, scrollHeight)
         tx["Scroll_Back_Overlay.png"]:DrawRect(scrollSlidePos, scrollRisePos, scrollSlidePos - scrollBackWidth - scrollBackXOffset, 0, scrollBackWidth - scrollSlidePos + scrollBackXOffset, scrollHeight)
     end
-    -- Draw scroll
     tx["Scroll.png"]:Draw(scrollSlidePos, scrollRisePos)
 end
 

@@ -1,10 +1,10 @@
--- Stateless particle fields for the floor-select ambience.
+-- stateless particle fields, floor-select ambience
 
 local F = {}
 
 F.TAU = math.pi * 2
 
--- 0..1, the same for the same three numbers; stands in for math.random, whose stream the corruption effect uses
+-- 0..1, deterministic; math.random's stream is used by the corruption effect
 function F.rand(a, b, c)
     local v = math.sin(a * 12.9898 + b * 78.233 + c * 37.719) * 43758.5453
     return v - math.floor(v)
@@ -17,8 +17,8 @@ function F.smooth(e0, e1, x)
     return t * t * (3 - 2 * t)
 end
 
--- particle i of a looping field at time t: cycle number, 0..1 age and life (s); callers hash the
--- cycle number into its spawn values
+-- particle i at time t: returns cycle, age 0..1, life (s)
+-- callers hash the cycle into spawn values
 function F.cycle(i, salt, t, lifeMin, lifeMax)
     local life = lifeMin + (lifeMax - lifeMin) * F.rand(i, salt, 0.5)
     local p = t / life + F.rand(i, salt, 1.5)
@@ -26,7 +26,7 @@ function F.cycle(i, salt, t, lifeMin, lifeMax)
     return k, p - k, life
 end
 
--- 0..1 over a life: rises over the first `fin` and falls over the last `fout` (fractions of it)
+-- 0..1; rises over the first fin, falls over the last fout (life fractions)
 function F.fade(u, fin, fout)
     local a = 1
     if fin > 0 and u < fin then a = u / fin end
@@ -34,7 +34,7 @@ function F.fade(u, fin, fout)
     return a
 end
 
--- x wrapped onto [-margin, width + margin), for things that drift across the whole screen
+-- x wrapped onto [-margin, width + margin)
 function F.wrap(x, width, margin)
     local span = width + 2 * margin
     return (x % span) - margin

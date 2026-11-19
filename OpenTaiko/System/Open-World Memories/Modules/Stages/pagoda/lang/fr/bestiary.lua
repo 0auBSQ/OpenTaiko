@@ -1,4 +1,4 @@
--- French for bestiary.lua; a missing key shows the English.
+-- French for bestiary.lua; missing keys fall back to English
 
 local T = {}
 

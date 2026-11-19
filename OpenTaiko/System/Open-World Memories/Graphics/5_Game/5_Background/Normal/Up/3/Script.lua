@@ -1,6 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Up background 3: parallax (bg + cloud + note layers) with infinite horizontal scroll + per-player clear fade.
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
+-- up background 3
 
 local bgLoopWidth = 1800
 local cloudLoopWidth = 1086
@@ -21,8 +20,7 @@ function clearOut(player)
 end
 
 function onStart()
-    -- Load every variant up front; draw() selects by state. (onStart runs before `state` exists,
-    -- so loads are unconditional — the old init() gated these on player count / p1IsBlue.)
+    -- all variants (state arrives after onStart)
     tx["BG_Red.png"] = TEXTURE:CreateTextureSync("BG_Red.png")
     tx["Cloud_Red.png"] = TEXTURE:CreateTextureSync("Cloud_Red.png")
     tx["Note_Red.png"] = TEXTURE:CreateTextureSync("Note_Red.png")
@@ -39,7 +37,7 @@ function onStart()
     tx["Cloud_Clear.png"] = TEXTURE:CreateTextureSync("Cloud_Clear.png")
     tx["Note_Clear.png"] = TEXTURE:CreateTextureSync("Note_Clear.png")
 
-    -- random values to create initial depth
+    -- start offsets
     bgScrollX = 500
     cloudScrollX = 250
     noteScrollX = 314

@@ -1,7 +1,5 @@
--- Shop.Seasonal: featured items. While an entry's date pattern matches, that item is pinned into the
--- big slot for anyone who does not own it yet. Highest `priority` wins when several match (ties: first
--- in this list). Patterns and item codes can be written in the clear or as "enc:" tokens; see
--- Calendar/almanac.lua for the syntax.
+-- Shop.Seasonal: featured items pinned into the big slot while their date pattern matches
+-- highest priority wins (ties: first listed); pattern syntax in Calendar/almanac.lua
 --   code      Items.db3 code (ownership = its OneTime "<RefText>_owned" trigger)
 --   when      pattern, token, or a list of either (JST)
 --   priority  higher wins

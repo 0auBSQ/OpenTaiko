@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Tower top-reached (Pass) clear animation. Group C end-anime (per-player via state.player).
+-- end anime: Tower_TopReached_Pass (group C, player via state.player)
 
 local y = { 216, 480, 0, 0, 0 }
 
@@ -40,7 +40,6 @@ end
 
 function draw(state)
     local player = state.player
-    -- originally x = 500
     tx["Assets.png"]:DrawRect(883.5, y[player + 1] + 4.5, w * (math.floor(nowFrame[player + 1] / 8)), h * (math.floor(nowFrame[player + 1] % 8)), w, h)
 end
 

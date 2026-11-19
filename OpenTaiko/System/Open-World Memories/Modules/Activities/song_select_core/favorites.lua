@@ -1,43 +1,44 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
--- favorites.lua — Per-save favorites storage and virtual folder for song_select_core.
---
--- Storage: LightningDB at Databases/favorites
---   Key   "fav_<saveId>"  →  pipe-separated UniqueId list  e.g. "uid1|uid2|uid3"
---
--- Public API:
---   M.init(g)                            — inject shared state G
---   M.loadDB()                           — open database (call from onStart)
---   M.isFavorite(saveId, uniqueId)       — true if song is favorited
---   M.toggleFavorite(saveId, uniqueId)   — add or remove from favorites
---   M.openFavoritesFolder(player)        — snapshot virtual folder for player and open it
+-- song_select_core favorites: per-save storage and the virtual folder.
+-- global LightningDB SongFavorites: key "fav_<saveId>" -> pipe-separated UniqueId list
 
 local M = {}
 local G
 
+local FAV_DB = "SongFavorites"
+local OLD_DB = "Databases/favorites"   -- module-local store, deleted by a skin update
+
 local favDB = nil
--- In-memory mirror (saveId -> set). isFavorite() is called for every song bar every frame; LuaDataStorage:Read
--- opens+closes the whole LightningDB environment per call, so reading the DB per draw tanks the song select to
--- single-digit FPS inside folders. We read each save's set ONCE and keep it in sync on writes (favorites only
--- change in-process via toggleFavorite).
+local oldDB = nil
+-- saveId -> set mirror: isFavorite() runs per bar per frame, LuaDataStorage:Read opens the DB per call
+-- read once per save, kept in sync on writes (only toggleFavorite changes it)
 local favCache = {}
 
 function M.init(g)
     G = g
 end
 
+-- call from onStart
 function M.loadDB()
-    favDB = DATABASE:OpenLocalDatabase("Databases/favorites")
+    favDB = DATABASE:OpenGlobalDatabase(FAV_DB)
+    if STORAGE:FileExists(OLD_DB .. "/data.mdb") then oldDB = DATABASE:OpenLocalDatabase(OLD_DB) end
 end
 
--- ── Internal helpers ──────────────────────────────────────────────────────────
+-- ==== Internal helpers ====
 
--- Returns a set (uid → true) for the given saveId. Cached in memory after the first DB read so the per-frame
--- isFavorite() calls never touch the (expensive, open-per-op) LightningDB again.
+-- set (uid -> true) for saveId, cached after the first DB read
 local function readFavSet(saveId)
     if favDB == nil then return {} end
     local cached = favCache[saveId]
     if cached ~= nil then return cached end
-    local raw = favDB:Read("fav_" .. tostring(saveId)) or ""
+    local key = "fav_" .. tostring(saveId)
+    local raw = favDB:Read(key)
+    -- no global entry yet: the old store's list, copied once
+    if raw == nil and oldDB ~= nil then
+        raw = oldDB:Read(key)
+        if raw ~= nil then favDB:Write(key, raw) end
+    end
+    raw = raw or ""
     local set = {}
     for uid in raw:gmatch("[^|]+") do
         set[uid] = true
@@ -57,7 +58,7 @@ local function writeFavSet(saveId, set)
     favDB:Write("fav_" .. tostring(saveId), table.concat(parts, "|"))
 end
 
--- ── Public API ────────────────────────────────────────────────────────────────
+-- ==== Public API ====
 
 function M.isFavorite(saveId, uniqueId)
     if favDB == nil or uniqueId == nil then return false end
@@ -76,8 +77,7 @@ function M.toggleFavorite(saveId, uniqueId)
     writeFavSet(saveId, set)
 end
 
--- Opens a virtual folder containing a snapshot of the highlighted player's
--- favorites at call time.  Contents are NOT updated in real time.
+-- virtual folder with a snapshot of the player's favorites (not updated live)
 function M.openFavoritesFolder(player)
     if G.songList == nil or favDB == nil then
         G.sounds.Cancel:Play()

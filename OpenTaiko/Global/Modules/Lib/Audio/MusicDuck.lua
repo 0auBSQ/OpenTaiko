@@ -1,7 +1,4 @@
--- Dims a stage's own music while something on top of it (a reward modal) needs its sounds heard.
--- Call duck:update(dt, dimmed) every frame: the factor eases between 1 and `level` with a smoothstep,
--- in over inS seconds and back out over outS, and `base * factor` is applied to the sound's volume
--- percent. Music that manages its own volume can leave `sound` nil and multiply the returned factor in.
+-- Audio.MusicDuck: dims a stage's music while a modal needs its sounds heard
 local Duck = {}
 Duck.__index = Duck
 
@@ -28,6 +25,8 @@ function Duck:apply()
     if self.sound then self.sound:SetVolumePercent(self.base * self.factor) end
 end
 
+-- call every frame; factor eases between 1 and `level` (smoothstep), in over inS s, out over outS
+-- volume percent = base * factor; with sound = nil, multiply the returned factor in
 function Duck:update(dt, dimmed)
     local target = dimmed and self.level or 1
     if target ~= self.to then

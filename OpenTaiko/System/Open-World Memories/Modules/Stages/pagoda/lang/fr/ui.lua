@@ -1,4 +1,4 @@
--- French for the recurring names, labels and screen texts; a missing key shows the English.
+-- French UI strings; missing keys fall back to English
 
 local T = {}
 

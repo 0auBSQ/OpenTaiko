@@ -1,16 +1,10 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- OWM3d/npc.lua — NPCs on the real physics world: each gets a small character body, wanders around
--- its home point (or stands still / follows a scripted patrol), collides with the world via the
--- collide-and-slide solver, and faces the player during dialogue.
---
---   local npc = NPC.new(world, { x=7.5, z=9.5, name="Elder", accent={255,210,120},
---                                behavior="wander"|"idle", radius=3, speed=1.7,
---                                lines={{name=,text=},...}, dialogue="key" })
---   npc:update(dt, world) ; npc:faceTowards(px, pz, world) ; npc:pos()
+-- OWM3d/npc.lua: NPCs with physics character bodies
 
 local NPC = {}
 NPC.__index = NPC
 
+-- o: x, z, name, accent, behavior ("wander" | "idle"), radius, speed, lines, dialogue
 function NPC.new(world, o)
     o = o or {}
     local self = setmetatable({}, NPC)
@@ -51,7 +45,7 @@ function NPC:update(dt, world)
         self.frame = "idle"
         return
     end
-    -- wander: pick a new direction every ~2s, drift back toward home when out of radius
+    -- wander: new direction every 1.2-3 s, head home outside radius
     self.moveT = self.moveT - dt
     if self.moveT <= 0 then
         self.moveT = 1.2 + math.random() * 1.8

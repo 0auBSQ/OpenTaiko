@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- settings_iris_back: from the settings back to the title (Lib/SettingsIris), the way in played backwards.
+-- settings_iris_back: settings -> title (Lib/SettingsIris), the way in reversed
 
 local SI = require("SettingsIris")
 local anim = SI.new("back")

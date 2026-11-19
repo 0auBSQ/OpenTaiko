@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
--- draw_songselect.lua  —  Song-select panel drawing for song_select_core.
+-- song select panel drawing (song_select_core)
 
 local Config    = require("Core.Config")
 local Layout    = Config.load("Config/layout.json")
@@ -10,16 +10,16 @@ local Info      = Layout.song_info
 local Colors    = Layout.colors
 
 local M = {}
--- hoisted colors (per-frame COLOR:Create* calls allocate userdata every frame)
+-- hoisted colors (COLOR:Create* allocates per call)
 local SONGLIST_GOLD  = COLOR:CreateColorFromHex(Colors.songlist_gold)   -- selected-bar title tint
 local COL_WHITE      = COLOR:CreateColorFromHex("ffffffff")
 local COL_BPM_SLOW   = COLOR:CreateColorFromHex(Colors.bpm_slow)
 local COL_BPM_FAST   = COLOR:CreateColorFromHex(Colors.bpm_fast)
 
-local statsCache = { player = -1, diff = -1 }   -- clear-count queries are save-file scans; key on (player, course)
-local G   -- shared state injected by Script.lua
+local statsCache = { player = -1, diff = -1 }   -- clear counts scan the save file; keyed on (player, course)
+local G   -- shared state from Script.lua
 
--- ── Layout constants ────────────────────────────────────────────────────────────
+-- ==== Layout ====
 
 local SONGLIST_ORIGIN_X           = List.origin_x
 local SONGLIST_ORIGIN_Y           = List.origin_y
@@ -33,14 +33,13 @@ local SONGLIST_SELECTED_X_DIFF    = List.selected_x_diff
 local SONGLIST_SELECTED_ARROW_GAP = List.selected_arrow_gap
 local SONGBAR_LABEL_X_OFFSET      = List.label_x_offset
 local FAV_ICON_X, FAV_ICON_Y      = List.fav_icon_x, List.fav_icon_y
--- the back bar's colour, and the random bar's rainbow: RAINBOW_STEPS hues made once, pastel enough for the
--- title to stay readable; the rainbow runs along the bar, one full pass every RAINBOW_MS
+-- random bar rainbow: RAINBOW_STEPS hues made once, one pass per RAINBOW_MS
 local BACK_BAR_COLOR = COLOR:CreateColorFromHex(Colors.back_bar)
--- the song info under a BLURRED song, leaning purple
+-- song info tint for a BLURRED song
 local BLURRED_INFO_TINT = COLOR:CreateColorFromHex(Colors.blurred_info)
 local RAINBOW_MS     = ListAnim.random_rainbow_ms
 local RAINBOW_STEPS  = List.random_rainbow_steps
-local RAINBOW_SLICE  = List.random_rainbow_slice   -- px per tinted slice of the bar
+local RAINBOW_SLICE  = List.random_rainbow_slice   -- px per slice
 local RAINBOW_SPAN   = List.random_rainbow_span    -- hue turns across the bar
 local RAINBOW = {}
 for i = 0, RAINBOW_STEPS - 1 do
@@ -54,48 +53,40 @@ for i = 0, RAINBOW_STEPS - 1 do
     RAINBOW[i] = COLOR:CreateColorFromARGB(255, math.floor((r + m) * 255 + 0.5), math.floor((g + m) * 255 + 0.5),
         math.floor((b + m) * 255 + 0.5))
 end
--- The "+" of a plus level rides the last digit's top-right corner: its centre, from the digits' right cell
--- edge and their centre line (BarLevel/plus.png)
+-- plus centre, from the digits' right cell edge and centre line (BarLevel/plus.png)
 local SONGBAR_PLUS_DX             = List.plus_dx
 local SONGBAR_PLUS_DY             = List.plus_dy
--- the plus overhangs the digits' ink by ~9px, so the whole number moves left by half of that to stay centred
+-- number shift left to stay centred with the plus
 local SONGBAR_PLUS_SHIFT          = List.plus_shift
--- the "[key] - Show shortcuts" line under the Select-a-Song overlay: position and its slow opacity pulse
+-- shortcuts helper line: position and opacity pulse
 local HELPER_X           = List.shortcuts_helper_x
 local HELPER_Y           = List.shortcuts_helper_y
 local HELPER_PULSE_MS    = ListAnim.shortcuts_helper_pulse_ms
 local HELPER_OPACITY_MIN = ListAnim.shortcuts_helper_opacity_min
-local HELPER_PAD_X       = List.shortcuts_helper_pad_x       -- the dark box around the line
+local HELPER_PAD_X       = List.shortcuts_helper_pad_x       -- box padding
 local HELPER_PAD_Y       = List.shortcuts_helper_pad_y
 local HELPER_BOX_ALPHA   = List.shortcuts_helper_box_alpha
 local HELPER_BOX_RADIUS  = List.shortcuts_helper_box_radius
 local HELPER_BOX_COLOR   = List.shortcuts_helper_box_color
 local HELPER_TEXT_COLOR    = Config.color(List.shortcuts_helper_text_color)
 local HELPER_OUTLINE_COLOR = Config.color(List.shortcuts_helper_outline_color)
--- the translucent band under the song list, sheared to the bars' diagonal (origin/offset above): its
--- horizontal width, its centre's horizontal offset from the bar centre line, its alpha and edge fade
+-- list backdrop band, sheared to the bars' diagonal
 local BACKDROP_W         = List.backdrop_width
 local BACKDROP_DX        = List.backdrop_offset_x
--- the band's colour and alpha: blending toward a dark grey drains the saturation of what is under the
--- band (chroma scales by 1 - alpha) while pulling its brightness toward the grey, a mild darkening on
--- most backgrounds; black would only darken
 local BACKDROP_COLOR     = List.backdrop_color
 local BACKDROP_ALPHA     = List.backdrop_alpha
 local BACKDROP_FADE      = List.backdrop_fade
 local BACKDROP_FADE_STEP = List.backdrop_fade_step
--- "normal" lays the colour over the background at that alpha; "screen" lightens the background by the
--- colour times the alpha, and never darkens it; "multi" multiplies the background by the colour, the
--- alpha saying how far (255 = the colour itself), and never lightens it
+-- blend: "normal" (over at alpha), "screen" (lighten only), "multi" (multiply, alpha = amount)
 local BACKDROP_BLEND     = List.backdrop_blend
--- Easy / Normal / Hard levels from which the tag plays its checker animation (bar_levelbgchecker<diff>.png)
+-- min level for the checker tag per diff (bar_levelbgchecker<diff>.png)
 local SONGBAR_CHECKER_LEVEL       = {
     [0] = List.checker_level_easy,
     [1] = List.checker_level_normal,
     [2] = List.checker_level_hard,
 }
 
--- the folder info placeholder: a folder (bg_folderinfo.png) tinted with the folder's colour, its top
--- centred on the info column; the rows of its name, description lines and song count
+-- folder info (bg_folderinfo.png, folder colour tint)
 local FolderInfo = Layout.folder_info
 local FOLDERINFO_CENTER_X  = FolderInfo.center_x
 local FOLDERINFO_PANEL_Y   = FolderInfo.panel_y
@@ -121,15 +112,13 @@ local SONGINFO_SUBTITLE_MWIDTH       = Info.subtitle_max_width
 local SONGINFO_BPM_ORIGIN_X          = Info.bpm_origin_x
 local SONGINFO_BPM_ORIGIN_Y          = Info.bpm_origin_y
 local SONGINFO_BPM_MWIDTH            = Info.bpm_max_width
-local SONGINFO_BPM_ROTATION          = Info.bpm_rotation   -- tilt to match the BPM plate image
--- Song speed notice over the metronome (only when the multiplier is not 1): a label and the multiplier,
--- with two large ▶ behind them, centred on the text block, pulsing in turn once per beat of the sped-up
--- BPM. Everything is tinted with the BPM text colour.
+local SONGINFO_BPM_ROTATION          = Info.bpm_rotation   -- matches the BPM plate tilt
+-- song speed notice (multiplier ~= 1)
 local SONGINFO_SPEED_ORIGIN_X        = Info.speed_origin_x
 local SONGINFO_SPEED_LABEL_Y         = Info.speed_label_y
 local SONGINFO_SPEED_VALUE_Y         = Info.speed_value_y
-local SONGINFO_SPEED_ARROW_GAP       = Info.speed_arrow_gap   -- between the two ▶ centres
-local SONGINFO_SPEED_LABEL           = Config.optional(Info, "speed_label")   -- a skin's own text; else the localized one
+local SONGINFO_SPEED_ARROW_GAP       = Info.speed_arrow_gap   -- between arrow centres
+local SONGINFO_SPEED_LABEL           = Config.optional(Info, "speed_label")   -- skin text, else localized
 local InfoAnim = Animation.song_info
 local SPEED_ARROW_OPACITY_MIN        = InfoAnim.speed_arrow_opacity_min
 local SONGINFO_CHARTER_ORIGIN_X      = Info.charter_origin_x
@@ -152,8 +141,8 @@ local HEADER_BOX_TEXT_OFFSET_Y = Header.box_text_offset_y
 local HEADER_BOX_TEXT_MWIDTH   = Header.box_text_max_width
 local HEADER_DIFF_ALPHA        = Header.diffselect_alpha
 
-local BARLEFT_X_OFFSET             = List.barleft_x_offset   -- pixels left of bar.png topleft
-local ARROW_ANGLE                  = math.rad(Animation.selected_arrows.angle_deg)   -- the arrows' bounce direction
+local BARLEFT_X_OFFSET             = List.barleft_x_offset   -- px left of bar.png top-left
+local ARROW_ANGLE                  = math.rad(Animation.selected_arrows.angle_deg)   -- arrow bounce direction
 
 local Nameplate = Layout.nameplate
 local NAMEPLATE_BOX_FOLDED_SIZE_Y  = Nameplate.box_folded_size_y
@@ -166,13 +155,13 @@ local NAMEPLATE_HEIGHT             = Nameplate.height
 local PUCHI_OFFSET_X               = Nameplate.puchi_offset_x
 local STATS_Y, STATS_X             = Nameplate.stats_y, Nameplate.stats_x
 
--- ── Init ──────────────────────────────────────────────────────────────────────
+-- ==== Init ====
 
 function M.init(g)
     G = g
 end
 
--- ── Local utilities ───────────────────────────────────────────────────────────
+-- ==== Utilities ====
 
 local function formatDuration(ms)
     if ms <= 0 then return "?:??" end
@@ -186,17 +175,17 @@ local function formatNumber(n, decimals)
     return s
 end
 
--- lv = the slot's cached { lv, diff, isPlus, isVault } (nil when the node has no chart)
+-- lv: cached { lv, diff, isPlus, isVault }, nil without chart
 local function drawLevelTag(lv, x, y)
     if lv == nil then return end
     local labelH = G.bars["levellabels"].Height / 5
     local labelW = G.bars["levellabels"].Width
 
     if lv.isVault then
-        -- Vault songs: animated strip (same frame counter as storm)
+        -- vault: animated strip (storm frame counter)
         G.bars["levellabelsvault"]:DrawRectAtAnchor(x, y, 0, labelH * G.levelLabelFrame, labelW, labelH, "center")
     elseif lv.diff <= 2 and lv.lv >= SONGBAR_CHECKER_LEVEL[lv.diff] and G.bars["levellabelschecker" .. lv.diff] then
-        -- a high level for its difficulty: the tag's colour with the turning checker
+        -- high level for its diff: checker tag
         G.bars["levellabelschecker" .. lv.diff]:DrawRectAtAnchor(x, y, 0, labelH * G.levelLabelFrame, labelW, labelH, "center")
     elseif lv.diff < 3 or lv.lv <= 10 then
         G.bars["levellabels"]:DrawRectAtAnchor(x, y, 0, labelH * lv.diff, labelW, labelH, "center")
@@ -207,10 +196,9 @@ local function drawLevelTag(lv, x, y)
     end
     if lv.isPlus then x = x + SONGBAR_PLUS_SHIFT end
     G.drawNumberCentered(lv.lv, "levellabels", x, y)
-    -- Fill numbers over the base ones, tinted to the genre (song bar) colour brightened 50% (any level)
+    -- fill digits, genre colour +50%
     G.drawNumberCentered(lv.lv, "levellabelsfill", x, y, lv.fillColor)
     if lv.isPlus then
-        -- the "+" overlaps the last digit's top-right corner
         local px = x + G.calculateNumberWidth(lv.lv, "levellabels") / 2 + SONGBAR_PLUS_DX
         local py = y + SONGBAR_PLUS_DY
         G.bgtx["levellabels+"]:DrawAtAnchor(px, py, "center")
@@ -221,8 +209,7 @@ local function drawLevelTag(lv, x, y)
     end
 end
 
--- Level number of a song-info difficulty icon, centred at (cx,cy); a plus level's "+" overlaps the last
--- digit's top-right corner (SinfoLevel/plus.png)
+-- song info difficulty level, centred at (cx, cy)
 local function drawInfoLevel(d, cx, cy, opacity)
     G.drawNumberCentered(d.level, "sinfo_level", cx, cy, nil, opacity)
     if d.isPlus then
@@ -234,10 +221,7 @@ local function drawInfoLevel(d, cx, cy, opacity)
     end
 end
 
--- The song speed notice over the metronome. The two ▶ go first, behind the text, centred on the value
--- line (its ink top to bottom); they are one shared texture drawn twice with SetColor/SetOpacity,
--- pulsing half a beat apart (the chase runs backward for a slowed-down song). The label and value are
--- glyph text tinted with the BPM colour.
+-- song speed notice; arrows pulse half a beat apart (reversed when slowed)
 local function drawSpeedNotice(sel)
     local x = SONGINFO_SPEED_ORIGIN_X - G.songSelectShift
     local tex = G.bgtx["sinfo_speed_arrow"]
@@ -263,7 +247,7 @@ local function drawSpeedNotice(sel)
     G.text:Draw(sel.speedText, x, SONGINFO_SPEED_VALUE_Y, sel.bpmColor, nil, 1, 1, 0, "top")
 end
 
--- Draw fav.png at (fav_icon_x, fav_icon_y) relative to bar.png top-left (the favorite flag is cached in the page slot).
+-- fav.png at (fav_icon_x, fav_icon_y) from bar.png top-left
 local function drawFavIcon(xpos, ypos)
     if G.favoriteicon == nil then return end
     local bar_tl_x = xpos - G.bars["bar"].Width  / 2
@@ -271,7 +255,7 @@ local function drawFavIcon(xpos, ypos)
     G.favoriteicon:Draw(bar_tl_x + FAV_ICON_X, bar_tl_y + FAV_ICON_Y)
 end
 
--- bl = the slot's cached { played, cs, sr } best-score info (nil when the node has no chart)
+-- bl: cached { played, cs, sr }, nil without chart
 local function drawBarleft(bl, xpos, ypos)
     local barW = G.bars["bar"].Width
     local barH = G.bars["bar"].Height
@@ -290,12 +274,11 @@ local function drawBarleft(bl, xpos, ypos)
     local cs     = bl.cs
     local sr     = bl.sr
 
-    -- cs stored: 0=never played/failed, 1=assisted, 2=clear, 3=FC, 4=perfect.
+    -- cs: 0 failed or unplayed, 1 assisted, 2 clear, 3 FC, 4 perfect
     if not played then
         G.bars["clearstatus_none"]:Draw(lx, ly)
         G.bars["scorerank_none"]:Draw(lx, ly)
     elseif cs == 0 then
-        -- Played but failed
         G.bars["clearstatus_m1"]:Draw(lx, ly)
         if sr == 0 then
             G.bars["scorerank_m1"]:Draw(lx, ly)
@@ -315,7 +298,7 @@ end
 local function drawPreimage()
     local sel = G.selInfo
     if sel == nil or not sel.isSong then return end
-    -- BLURRED: static in the jacket's place, never the jacket
+    -- BLURRED: static instead of the jacket
     if sel.blurredInfo then
         local st = G.bgtx["preimage_load"]
         st:SetUseNoiseEffect(true)
@@ -330,10 +313,9 @@ local function drawPreimage()
         PREIMAGE_ORIGIN_Y + PREIMAGE_SIZE_Y / 2, "center")
     local tex = SHARED:GetSharedTexture("preimage")
     if tex.Height > 0 and tex.Width > 0 then
-        -- Pop-in: scale the jacket around its centre from pop_start_scale up to 1.0 with a short overshoot
-        -- when a new one appears (navigation.lua drives G.preimagePopScale). Centre-anchored so it grows in place.
+        -- pop-in scale (G.preimagePopScale, navigation.lua)
         local pop = G.preimagePopScale or 1
-        -- one scale for both axes: a jacket that is not square fits inside the frame, centred
+        -- uniform fit inside the frame
         local fit = math.min(PREIMAGE_SIZE_X / tex.Width, PREIMAGE_SIZE_Y / tex.Height) * pop
         tex:SetScale(fit, fit)
         tex:DrawAtAnchor(PREIMAGE_ORIGIN_X - G.songSelectShift + PREIMAGE_SIZE_X / 2,
@@ -342,14 +324,13 @@ local function drawPreimage()
     end
 end
 
--- ── Song-list bar drawing (shared by the normal list + the folder open/close animation) ─────
+-- ==== Song-list bars ====
 
 local function drawBarTitle(pt, x, y)
     G.text:Draw(pt.text, x, y, pt.gold and SONGLIST_GOLD or nil, nil, 1, 1, SONGLIST_TITLE_MWIDTH, "center")
 end
 
--- the random bar: bar.png drawn in narrow vertical slices, each tinted the hue its place and the time give,
--- so the rainbow runs along the bar (whole pixels, so the slices meet without seams)
+-- random bar: bar.png in tinted vertical slices (whole px, no seams)
 local function drawRainbowBar(xpos, ypos)
     local tex = G.bars["bar"]
     local w, h = tex.Width, tex.Height
@@ -363,14 +344,14 @@ local function drawRainbowBar(xpos, ypos)
     tex:SetColor(COL_WHITE)
 end
 
--- the black sticker in the level tag's place, with the icon of a random, back or folder bar
+-- sticker in the level tag slot (non-song bars)
 local function drawSticker(kind, xpos, ypos)
     local x = xpos + SONGBAR_LABEL_X_OFFSET
     G.bars["sticker"]:DrawAtAnchor(x, ypos, "center")
     G.bars["sticker_" .. kind]:DrawAtAnchor(x, ypos, "center")
 end
 
--- Draw one song-list bar's full visuals (bar art + overlays + title + level tag) at (xpos, ypos).
+-- one list bar at (xpos, ypos)
 local function drawBar(tx, xpos, ypos)
     if tx == nil then return end
     if tx.isSong or tx.isFolder then
@@ -426,7 +407,7 @@ local function drawBar(tx, xpos, ypos)
 end
 M.drawBar = drawBar
 
--- Rest position of the bar at page offset i (dist = the in-flight scroll amount, 0 at rest).
+-- bar rest position at page offset i (dist: scroll in flight, 0 at rest)
 function M.barPos(i, dist)
     dist = dist or 0
     local xpos = SONGLIST_ORIGIN_X + (i + dist) * SONGLIST_OFFSET_X - G.songSelectShift
@@ -435,12 +416,12 @@ function M.barPos(i, dist)
     return xpos, ypos
 end
 
--- ── The shortcuts helper line: white glyph text on a rounded dark box sized to it ─────────
-local helperBox = nil          -- { canvas, w, h, text }: rebaked when the text changes (language, binding)
+-- ==== Shortcuts helper line ====
+local helperBox = nil          -- { canvas, w, h, text }, rebaked on text change
 local function drawHelperLine(text, opacity)
     local gf = G.textStats
     local inkH = math.ceil(gf.LineHeight)
-    local pad = gf.BoxHeight - inkH            -- the glyph box's padding around the ink
+    local pad = gf.BoxHeight - inkH            -- glyph box padding
     if helperBox == nil or helperBox.text ~= text then
         if helperBox ~= nil then helperBox.canvas:Dispose() end
         local w = math.ceil(gf:Measure(text)) + 2 * HELPER_PAD_X
@@ -463,11 +444,10 @@ local function drawHelperLine(text, opacity)
     gf:Draw(text, HELPER_X + HELPER_PAD_X - pad, HELPER_Y + HELPER_PAD_Y, HELPER_TEXT_COLOR, HELPER_OUTLINE_COLOR, opacity, 1, 0, "topleft")
 end
 
--- ── The song list backdrop: a translucent grey band behind the bars, along their diagonal ──
--- Baked once as a screen-high canvas: every row is the band shifted by the bars' slope (offset_x per
--- offset_y), so its edges are the list's own diagonal; the edges fade over BACKDROP_FADE px in
--- BACKDROP_FADE_STEP px steps (0 = a clean hard edge), never more than a quarter of the band.
-local backdrop = nil           -- { canvas, x0 }: x0 = the canvas' screen x before the panel shift
+-- ==== List backdrop ====
+-- baked once: each row shifted by the bar slope (offset_x per offset_y)
+-- edge fade: BACKDROP_FADE px in BACKDROP_FADE_STEP steps (0 = hard), max a quarter of the band
+local backdrop = nil           -- { canvas, x0 }: x0 = screen x before the panel shift
 local function drawListBackdrop(opacity)
     if backdrop == nil then
         local slope = SONGLIST_OFFSET_X / SONGLIST_OFFSET_Y
@@ -478,9 +458,9 @@ local function drawListBackdrop(opacity)
         local fade = math.max(0, math.min(math.floor(BACKDROP_FADE), math.floor(W / 4)))
         local step = BACKDROP_FADE_STEP
         local cr, cg, cb = BACKDROP_COLOR[1] or 0, BACKDROP_COLOR[2] or 0, BACKDROP_COLOR[3] or 0
-        -- a screen blend reads the colour alone: the alpha goes into the colour, on solid pixels
+        -- screen: alpha baked into the colour, solid pixels
         local screen = BACKDROP_BLEND == "screen"
-        -- a multiply reads the colour times the alpha, next to the alpha
+        -- multi: colour * alpha, plus alpha
         local multi = BACKDROP_BLEND == "multi"
         local function fill(x, y, w, a)
             if screen or multi then
@@ -492,7 +472,7 @@ local function drawListBackdrop(opacity)
         end
         for y = 0, H - 1 do
             if fade == 0 then
-                -- a hard edge: the pixel each edge crosses is filled by the share the band covers
+                -- hard edge: edge pixel filled by coverage
                 local xf = y * slope
                 local x = math.floor(xf)
                 local part = xf - x
@@ -510,7 +490,7 @@ local function drawListBackdrop(opacity)
             end
         end
         cv:Upload()
-        -- the band is centred on the bar centre line (BACKDROP_DX to its right): row 0's left edge
+        -- row 0 left edge (band centred on the bar line + BACKDROP_DX)
         backdrop = { canvas = cv, x0 = SONGLIST_ORIGIN_X + BACKDROP_DX - SONGLIST_ORIGIN_Y * slope - W / 2 }
     end
     local cv = backdrop.canvas
@@ -529,8 +509,8 @@ local function drawListBackdrop(opacity)
     cv:SetOpacity(1)
 end
 
--- the list slot (-rows..rows) whose bar plate is under (mx, my), or nil. The plate is the slanted strip
--- inside the bar texture (song_list.bar_plate).
+-- list slot (-rows..rows) under (mx, my), or nil
+-- plate: slanted strip in the bar texture (song_list.bar_plate)
 local BAR_PLATE = List.bar_plate
 function M.hitTest(mx, my)
     local tex = G.bars["bar"]
@@ -546,17 +526,14 @@ function M.hitTest(mx, my)
     return nil
 end
 
--- ── The selected row: a segment of the band at the centre bar's height, its colour bouncing in and out ──
--- Baked once like the backdrop (same width, slope and edges), as high as the bar plate plus half the gap to
--- the next bar above and below (one row of the list); G.selectBandPulse
--- (0..1, the "selectband_animation" counter) scales its alpha.
+-- ==== Selected row band ====
+-- baked like the backdrop, one list row high; G.selectBandPulse (0..1) scales alpha
 local SELECT_BAND_COLOR = List.select_band_color
--- green at the top level; inside a folder, G.selectBandColor (navigation.lua: the folder's colour, moved
--- away from its bars')
+-- top level colour; in a folder, G.selectBandColor (navigation.lua)
 local SELECT_BAND_TOP = COLOR:CreateColorFromARGB(255, SELECT_BAND_COLOR[1] or 0, SELECT_BAND_COLOR[2] or 0,
     SELECT_BAND_COLOR[3] or 0)
 local SELECT_BAND_ALPHA = List.select_band_alpha
-local selectBand = nil         -- { canvas, dx, y }: dx = its offset from the band's canvas x, y = its screen row
+local selectBand = nil         -- { canvas, dx, y }: dx from the backdrop canvas x, y = screen row
 local function drawSelectBand(opacity)
     local a = opacity * (G.selectBandPulse or 0) * SELECT_BAND_ALPHA / 255
     if a <= 0 then return end
@@ -574,7 +551,7 @@ local function drawSelectBand(opacity)
         local step = BACKDROP_FADE_STEP
         local function fill(x, y, w, al) cv:FillRect(x, y, w, 1, 255, 255, 255, al) end
         for r = 0, H - 1 do
-            -- the band's own row top + r, so both edges line up with the backdrop's
+            -- row top + r, edges match the backdrop
             local xf = (top + r) * slope - dx
             if fade == 0 then
                 local x = math.floor(xf)
@@ -605,12 +582,11 @@ local function drawSelectBand(opacity)
     cv:SetColor(COL_WHITE)
 end
 
--- ── Folder open/close animation ─────────────────────────────────────────────────
--- Driven by G.folderAnim (set up in navigation.lua): { mode="open"/"close", phase=1/2, t=0..1,
--- oldBars/newBars = { {i, pt}, ... } sorted outer-first, folderPt = the folder's own bar }.
--- t is the phase counter's value, already EASED by the counter (navigation sets SetEasing per phase),
--- so drawing is a plain lerp between the bars' rest slots (M.barPos) and the off-screen / centre point.
-local ANIM_OFFLEFT_X = Animation.folder_anim.offscreen_left_x  -- where bars slide out to / in from
+-- ==== Folder open/close animation ====
+-- G.folderAnim (navigation.lua): { mode = "open"/"close", phase = 1/2, t = 0..1,
+--   oldBars/newBars = { {i, pt}, ... } outer-first, folderPt = folder bar }
+-- t is pre-eased (SetEasing per phase): plain lerp
+local ANIM_OFFLEFT_X = Animation.folder_anim.offscreen_left_x  -- bar slide off-screen x
 local function lerp(a, b, t) return a + (b - a) * t end
 
 local function drawFolderAnim()
@@ -619,14 +595,14 @@ local function drawFolderAnim()
     local t = fa.t or 0
     if fa.mode == "open" then
         if fa.phase == 1 then
-            -- slide the parent siblings out to the left; the opened folder bar stays centred
+            -- parent siblings slide out left
             for _, b in ipairs(fa.oldBars) do
                 local bx, by = M.barPos(b.i, 0)
                 drawBar(b.pt, lerp(bx, ANIM_OFFLEFT_X, t), by)
             end
             drawBar(fa.folderPt, cx, cy)
         else
-            -- fan the folder's contents out from the centre into their slots ("opening a book")
+            -- contents fan out from the centre
             for _, b in ipairs(fa.newBars) do
                 local bx, by = M.barPos(b.i, 0)
                 drawBar(b.pt, lerp(cx, bx, t), lerp(cy, by, t))
@@ -634,13 +610,13 @@ local function drawFolderAnim()
         end
     else
         if fa.phase == 1 then
-            -- group the folder's contents back toward the focused spot
+            -- contents gather to the focus
             for _, b in ipairs(fa.oldBars) do
                 local bx, by = M.barPos(b.i, 0)
                 drawBar(b.pt, lerp(bx, cx, t), lerp(by, cy, t))
             end
         else
-            -- the folder bar sits at the focus; the parent siblings slide back in from the left
+            -- parent siblings slide back in
             drawBar(fa.folderPt, cx, cy)
             for _, b in ipairs(fa.newBars) do
                 local bx, by = M.barPos(b.i, 0)
@@ -651,8 +627,8 @@ local function drawFolderAnim()
 end
 M.drawFolderAnim = drawFolderAnim
 
--- ── Header breadcrumb (shared by the normal draw + the folder open/close animation) ──
--- Draw one crumb: its box + title, right edge at xRight, with alpha; plus its connecting arrow (to the left).
+-- ==== Header breadcrumb ====
+-- one crumb, right edge at xRight (arrow to its left)
 local function drawCrumb(title, xRight, alpha, drawArrow)
     local boxW = G.bgtx["header-box"].Width
     local boxH = G.bgtx["header-box"].Height
@@ -668,9 +644,9 @@ local function drawCrumb(title, xRight, alpha, drawArrow)
     G.bgtx["header-arrow"]:SetOpacity(1)
 end
 
--- Header path animation, synced to G.folderAnim (same mode/phase/t as the song-list animation).
--- Opening: existing crumbs slide left (phase 1), the new folder crumb fades in (phase 2).
--- Closing: the innermost crumb fades out (phase 1), the remaining crumbs slide right (phase 2).
+-- header crumbs, synced to G.folderAnim
+-- open: crumbs slide left (phase 1), new crumb fades in (phase 2)
+-- close: innermost fades out (phase 1), rest slide right (phase 2)
 local function drawHeaderCrumbsAnim(opacityNorm)
     local fa  = G.folderAnim
     local old = fa.oldCrumbs or {}
@@ -682,42 +658,42 @@ local function drawHeaderCrumbsAnim(opacityNorm)
 
     if fa.mode == "open" then
         local N = #old                     -- new path = { opened folder } ++ old
-        for j = 1, N do                    -- existing crumbs move from slot (j-1) to slot j
+        for j = 1, N do                    -- slot j-1 -> j
             local x = (fa.phase == 1) and slotX(lerp(j - 1, j, t)) or slotX(j)
             drawCrumb(old[j], x, opacityNorm, j < N)
         end
         if fa.phase == 2 and new[1] ~= nil then
-            drawCrumb(new[1], slotX(0), opacityNorm * t, #new > 1)   -- new folder crumb fades in
+            drawCrumb(new[1], slotX(0), opacityNorm * t, #new > 1)
         end
     else
         local N = #old                     -- old path = { closed folder } ++ new
-        for k = 2, N do                    -- remaining crumbs slide from slot (k-1) to slot (k-2)
+        for k = 2, N do                    -- slot k-1 -> k-2
             local x = (fa.phase == 1) and slotX(k - 1) or slotX(lerp(k - 1, k - 2, t))
             drawCrumb(old[k], x, opacityNorm, k < N)
         end
         if fa.phase == 1 and old[1] ~= nil then
-            drawCrumb(old[1], slotX(0), opacityNorm * (1 - t), N > 1)   -- innermost crumb fades out
+            drawCrumb(old[1], slotX(0), opacityNorm * (1 - t), N > 1)
         end
     end
 end
 M.drawHeaderCrumbsAnim = drawHeaderCrumbsAnim
 
--- ── Draw panel ────────────────────────────────────────────────────────────────
+-- ==== Draw panel ====
 
 function M.drawPanel()
     local opacityNorm = G.songSelectElemOpacity / 255
     local sel = G.selInfo
 
-    -- the translucent band the bars sit on: under everything else of the panel, the song info included
+    -- backdrop under the rest of the panel
     if opacityNorm > 0 then drawListBackdrop(opacityNorm) end
     if G.folderAnim == nil and G.pageTexts ~= nil then drawSelectBand(opacityNorm) end
 
-    -- Random / song info panels (all node-derived data comes from the selection cache — see navigation.lua)
+    -- info panels (node data from the navigation.lua selection cache)
     if sel ~= nil and sel.isRandom then
         G.bgtx["randominfo"]:DrawAtAnchor(1920 - G.songSelectShift, 0, "topright")
     end
 
-    -- folder info (placeholder): its name, its box.def description, and its unlocked / total songs
+    -- folder info (placeholder)
     if sel ~= nil and sel.isFolder and not sel.vaultFolder then
         local cx = FOLDERINFO_CENTER_X - G.songSelectShift
         local panel = G.bgtx["folderinfo"]
@@ -737,7 +713,7 @@ function M.drawPanel()
     end
 
     if sel ~= nil and sel.isSong then
-        -- vault locked: no song info; BLURRED: drawn darker, its texts as ???
+        -- vault locked: no info; BLURRED: darker, texts as ???
         local hide = sel.blurredInfo
         if sel.hi < 2 or hide then
             local tint = hide and BLURRED_INFO_TINT or COL_WHITE
@@ -756,7 +732,7 @@ function M.drawPanel()
                 G.bgtx["sinfo_explicit"]:SetColor(COL_WHITE)
             end
 
-            -- Difficulty icons: hidden for GRAYED and above
+            -- difficulty icons hidden for GRAYED and above
             if sel.hi == 0 then
                 local isVaultSong = sel.isVault
                 local has3, has4 = sel.diffs[3] ~= nil, sel.diffs[4] ~= nil
@@ -773,7 +749,7 @@ function M.drawPanel()
                             drawInfoLevel(d, xpos + difftx.Width / 2, ypos + difftx.Height / 2, G.difficultyFade4 / 255)
                         end
                     elseif d == nil then
-                        -- Vault songs: never show the "missing" indicator
+                        -- vault songs: no missing indicator
                         if not isVaultSong and (not has4 or i ~= 3) then
                             G.bgtx["sinfo_difficulties_missing"]:Draw(xpos, ypos)
                         end
@@ -789,7 +765,7 @@ function M.drawPanel()
                 nil, nil, 1, 1, SONGINFO_SUBTITLE_MWIDTH, "center")
             G.textSmall:Draw(hide and "???" or sel.charter, SONGINFO_CHARTER_ORIGIN_X - G.songSelectShift, SONGINFO_CHARTER_ORIGIN_Y,
                 nil, nil, 1, 1, SONGINFO_CHARTER_MWIDTH)
-            -- rebuild the length string only when the async preview load lands a new duration
+            -- rebuild on new async preview duration
             if sel.lenMs ~= G.previewDurationMs then
                 sel.lenMs   = G.previewDurationMs
                 sel.lenText = string.format(G.skinText("SONGSELECT_INFO_LENGTH", "Length - %s"), formatDuration(sel.lenMs))
@@ -801,7 +777,7 @@ function M.drawPanel()
                 G.text:Draw("???", SONGINFO_BPM_ORIGIN_X - G.songSelectShift, SONGINFO_BPM_ORIGIN_Y,
                     COL_WHITE, nil, 1, 1, SONGINFO_BPM_MWIDTH, "center", 0, SONGINFO_BPM_ROTATION)
             elseif sel.bpmBase ~= nil then
-                -- rebuild the BPM string/color only when the song-speed multiplier changes
+                -- rebuild on song speed change
                 local mult = CONFIG.SONGSPEED:ToActual(CONFIG.SongSpeed)
                 if sel.bpmMult ~= mult then
                     sel.bpmMult = mult
@@ -813,7 +789,7 @@ function M.drawPanel()
                     sel.bpmText  = bpmText
                     sel.bpmColor = (mult < 1) and COL_BPM_SLOW or (mult > 1) and COL_BPM_FAST or COL_WHITE
                     sel.speedText = (mult ~= 1) and string.format("x%.2f", mult) or nil
-                    -- one beat of the sped-up song, in ms (clamped so extreme BPMs still read as a pulse)
+                    -- ms per sped-up beat (clamped)
                     local bpm = (sel.bpmBase or 0) * mult
                     sel.speedBeatMs = (bpm > 0) and math.max(InfoAnim.speed_beat_min_ms, math.min(InfoAnim.speed_beat_max_ms, 60000 / bpm))
                         or InfoAnim.speed_beat_default_ms
@@ -827,8 +803,7 @@ function M.drawPanel()
 
     drawPreimage()
 
-    -- Song list bars. While a folder is opening/closing, the animation owns the list (and hides the
-    -- selected row's band + arrows); otherwise draw the normal diagonal list.
+    -- list bars (folder anim owns the list while it runs)
     if G.folderAnim ~= nil then
         drawFolderAnim()
     elseif G.pageTexts ~= nil then
@@ -837,25 +812,24 @@ function M.drawPanel()
             drawBar(tx, xpos, ypos)
         end
 
-        -- the animated arrows around the selected bar
+        -- selected bar arrows
         local x0     = SONGLIST_ORIGIN_X + SONGLIST_SELECTED_X_DIFF - G.songSelectShift
         local y0     = SONGLIST_ORIGIN_Y
         local ax     = G.arrowsDistance
         local xlshift = ax * math.cos(ARROW_ANGLE)
         local ylshift = ax * math.sin(ARROW_ANGLE)
         local isUnlockedSong = sel ~= nil and sel.isSong and sel.isUnlockedSong
-        -- Left arrow shifts 67px further left when an unlocked song is selected to clear barleft
+        -- left arrow clears barleft on unlocked songs
         local arrowLOffset = isUnlockedSong and BARLEFT_X_OFFSET or 0
         G.bars["selected-arrow-l"]:DrawAtAnchor(x0 - SONGLIST_SELECTED_ARROW_GAP/2 + xlshift + arrowLOffset, y0 - ylshift, "left")
         G.bars["selected-arrow-r"]:DrawAtAnchor(x0 + SONGLIST_SELECTED_ARROW_GAP/2 - xlshift, y0 + ylshift, "right")
     end
 
-    -- Header breadcrumb. Header alpha eases 100%→HEADER_DIFF_ALPHA across songselect→diffselect (matches diffselect).
+    -- header alpha 1 -> HEADER_DIFF_ALPHA toward diffselect
     local headerAlpha = 1.0 - (1.0 - HEADER_DIFF_ALPHA) * math.min(1, G.songSelectShift / 1920)
     G.bgtx["header"]:SetOpacity(headerAlpha)
     G.bgtx["header"]:Draw(-G.songSelectShift, 0)
     G.bgtx["header"]:SetOpacity(1)
-    -- Breadcrumbs: the folder open/close animation drives them (in sync with the list) while it runs.
     if G.folderAnim ~= nil then
         drawHeaderCrumbsAnim(opacityNorm)
     elseif sel ~= nil then
@@ -866,7 +840,7 @@ function M.drawPanel()
         end
     end
 
-    -- Overlay, then the shortcuts helper line under it (song select only: it fades with the panel)
+    -- overlay, then shortcuts helper line (fades with the panel)
     G.bgtx["overlay"]:SetOpacity(opacityNorm)
     G.bgtx["overlay"]:Draw(0, 0)
     local helper = G.shortcuts and G.shortcuts.helperText()
@@ -875,11 +849,11 @@ function M.drawPanel()
         drawHelperLine(helper, opacityNorm * (HELPER_OPACITY_MIN + (1 - HELPER_OPACITY_MIN) * pulse))
     end
 
-    -- Unlock conditions panel (shown when a locked song is highlighted)
+    -- unlock conditions (locked song highlighted)
     G.unlocks.drawCondsPanel()
     G.unlocks.drawVaultCondsPanel()
 
-    -- Nameplates (the online lobby shows its players itself)
+    -- nameplates (online lobby draws its own)
     if G.activeConfig.songOnly then return end
     local playerCount = CONFIG.PlayerCount
     G.highlightedPlayer = G.highlightedPlayer % playerCount
@@ -894,8 +868,7 @@ function M.drawPanel()
         G.drawPlayerPuchi(G.highlightedPlayer, ssCharaX - PUCHI_OFFSET_X, y0 + NAMEPLATE_OFFSET_Y + G.puchiSineY, 1, 1, opacityNorm, false, G.puchiIdxFrame)
         NAMEPLATE:DrawPlayerNameplate(x0 + NAMEPLATE_OFFSET_X, y0 + NAMEPLATE_OFFSET_Y, G.songSelectElemOpacity, G.highlightedPlayer)
 
-        -- Perfect / FC / Clear counts for the highlighted player at the displayed difficulty
-        -- (queried only when the player/course key changes — the counts are save-file scans)
+        -- clear counts at the shown difficulty (re-queried on player/course change)
         if G.textStats ~= nil then
             local diff = math.min(4, CONFIG:GetDefaultCourse(0))
             local sc = statsCache
@@ -924,7 +897,7 @@ function M.drawPanel()
         G.bgtx["placeholder_portrait"]:SetOpacity(opacityNorm)
         G.bgtx["placeholder_portrait"]:DrawAtAnchor(portCx, ypos, "bottom")
         G.bgtx["placeholder_portrait"]:SetOpacity(1)
-        -- Draw Portrait.png over the placeholder if it loaded for this player slot
+        -- Portrait.png over the placeholder when loaded
         local portrait = G.portraits ~= nil and G.portraits[j - 1]
         if portrait ~= nil and portrait.Loaded then
             local gm = CHARACTER:GetPlayerGradientMap(j - 1)

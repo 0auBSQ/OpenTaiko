@@ -1,23 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- OWM3d/modelicon.lua — 3D-model preview thumbnails: renders a glTF/GLB into its own small
--- offscreen scene ONCE (lazily, on first draw) and then draws that image like any texture.
--- Made for catalog/edit-mode icons now and shop/modal previews later — res is caller-chosen,
--- so the same API serves a 96px grid button and a 512px shop card.
---
---   local ModelIcon = require("World.OWM3d").ModelIcon
---   local icon = ModelIcon.new{ file = "Models/chair.glb", res = 128 }   -- allocate (cheap; no render yet)
---   icon:draw(x, y, w, h)                    -- first call renders once, then it's a plain blit
---   icon:drawAtAnchor(x, y, w, h, "center")
---   icon:dispose()                           -- free the GPU scene when the UI closes
---   ModelIcon.disposeAll()                   -- safety net (stage deactivate)
---
--- Memory: each icon owns one res×res scene (colour + depth). Dispose icons when their UI closes;
--- anything missed is still freed with the stage (scenes sit in the engine's per-script dispose
--- list), but don't lean on that for high-res shop previews — those should be created on open and
--- disposed on close. Failed model loads render a transparent image (draw() is always safe).
---
--- opts: file (required) · res (128) · yaw (32) · pitch (-24) · fov (28) · margin (1.12)
---       bg = {r,g,b,a} (default transparent) · sun = {dx,dy,dz,r,g,b} · anim = index (posed at t=0)
+-- OWM3d/modelicon.lua: 3D model thumbnails (one offscreen render, then drawn as a texture)
 
 local rad, sin, cos, max, huge = math.rad, math.sin, math.cos, math.max, math.huge
 
@@ -26,47 +8,40 @@ ModelIcon.__index = ModelIcon
 
 local live = setmetatable({}, { __mode = "k" })   -- weak: disposeAll never keeps icons alive
 
--- ── per-frame render budget ───────────────────────────────────────────────────────────────────────
--- Rendering many first-time icons in one frame stalls it (each is a scene + GLB load). A stage that
--- calls ModelIcon.newFrame() every update caps first-renders per frame (icons stagger in over a few
--- frames); draw() returns false while an icon is still waiting so the caller can show a fallback.
--- Stages that never call newFrame keep the render-immediately behaviour.
+-- ==== Render budget ====
+-- newFrame() each update caps first renders per frame; draw() returns false while waiting
+-- without newFrame calls icons render at once
 ModelIcon.budget = 5
 local frameLeft = math.huge
 function ModelIcon.newFrame() frameLeft = ModelIcon.budget end
 function ModelIcon:ready() return self._rendered and not self._disposed end
 
+-- opts: file, res (128), yaw (45), pitch (-22), fov (28), margin (1.08)
+-- bg = {r,g,b,a} (nil = transparent), sun = {dx,dy,dz,r,g,b}, anim = index (posed at t=0)
 function ModelIcon.new(opts)
     opts = opts or {}
     local self = setmetatable({}, ModelIcon)
     self.file = opts.file
     self.res = opts.res or 128
-    self.yaw = opts.yaw or 45                      -- front-3/4 matching the in-room camera (was 24)
-    self.pitch = opts.pitch or -22                 -- gentle top-down (was -18)
+    self.yaw = opts.yaw or 45                      -- front 3/4 view
+    self.pitch = opts.pitch or -22
     self.fov = opts.fov or 28
-    self.margin = opts.margin or 1.08              -- tight-fit padding (~8%); framing is now projected-AABB
+    self.margin = opts.margin or 1.08              -- fit padding (~8%)
     self.bg = opts.bg                              -- nil = transparent
     self.sun = opts.sun
     self.anim = opts.anim
-    self.cpu = opts.cpu                            -- force CPU raster (needed to capture pixels via ShareCanvasAs)
-    self.faceThin = opts.faceThin                  -- flat wall items: look along the thin (face) axis
-    self.autoFrame = opts.autoFrame                -- pick the front-3/4 yaw that shows the most of the model
+    self.cpu = opts.cpu                            -- CPU raster (needed for ShareCanvasAs)
+    self.faceThin = opts.faceThin                  -- wall items: look along the thin axis
+    self.autoFrame = opts.autoFrame                -- pick the front 3/4 yaw with the largest footprint
     self._rendered = false
     self._disposed = false
     live[self] = true
     return self
 end
 
--- ── builder icons: a 3D snapshot of PROCEDURAL geometry (shaded-box furniture etc.) ──────────────
--- Same lifecycle/draw/budget contract as model icons, but instead of loading a GLB the caller's
--- populate(world) fills a minimal fake world — { scene, _boxTarget, lit } — with geometry around
--- the origin (register any textures it samples into world.scene first). Camera framing comes from
--- opts.frame = { cx=, cy=, cz=, radius= } (radius ≈ half the item's diagonal).
---
---   local icon = ModelIcon.newBuilder{
---       res = 128, frame = { cx = 0, cy = 0.6, cz = 0, radius = 1.1 },
---       populate = function(world) A.registerInto(world.scene); buildChair(world, 0, 0, 0, 0) end,
---   }
+-- ==== Builder icons ====
+-- populate(world) fills { scene, _boxTarget, lit } with geometry around the origin
+-- and registers its textures into world.scene; opts.frame = { cx, cy, cz, radius }
 function ModelIcon.newBuilder(opts)
     opts = opts or {}
     local self = ModelIcon.new(opts)
@@ -75,8 +50,8 @@ function ModelIcon.newBuilder(opts)
     return self
 end
 
--- ── automated framing (research-backed) ────────────────────────────────────────────────────────────
--- The 8 corners of an AABB, as offsets from its centre, for a given (min,max).
+-- ==== Auto framing ====
+-- 8 AABB corners as offsets from the centre
 local function aabbCorners(mnx, mny, mnz, mxx, mxy, mxz, cx, cy, cz)
     return {
         { mnx - cx, mny - cy, mnz - cz }, { mnx - cx, mny - cy, mxz - cz },
@@ -85,16 +60,15 @@ local function aabbCorners(mnx, mny, mnz, mxx, mxy, mxz, cx, cy, cz)
         { mxx - cx, mxy - cy, mnz - cz }, { mxx - cx, mxy - cy, mxz - cz },
     }
 end
--- camera right/up/forward basis for (yaw,pitch) degrees (matches Lua3DScene/camera.lua)
+-- camera right/up/forward for (yaw, pitch) in degrees (same as camera.lua)
 local function camBasis(yaw, pitch)
     local yr, pr = rad(yaw), rad(pitch)
     return cos(yr), -sin(yr),                                   -- right  (rx, rz;  ry = 0)
            -sin(pr) * sin(yr), cos(pr), -sin(pr) * cos(yr),     -- up     (ux, uy, uz)
            sin(yr) * cos(pr), sin(pr), cos(yr) * cos(pr)        -- forward(fx, fy, fz)
 end
--- TIGHT frame-to-fit: the smallest camera distance (looking AT the bbox centre) that keeps every corner
--- inside a square frame of the given fov, accounting for perspective depth — so a flat/elongated model
--- fills the frame instead of floating in a bounding-sphere's worth of empty space. margin ≈ 1.08.
+-- smallest distance (looking at the bbox centre) with every corner inside the fov square
+-- perspective-aware; margin ~ 1.08
 local function fitDistance(corners, yaw, pitch, fov, margin)
     local rx, rz, ux, uy, uz, fx, fy, fz = camBasis(yaw, pitch)
     local tanH = math.tan(rad(fov) * 0.5)
@@ -103,14 +77,12 @@ local function fitDistance(corners, yaw, pitch, fov, margin)
         local dr = o[1] * rx + o[3] * rz
         local du = o[1] * ux + o[2] * uy + o[3] * uz
         local df = o[1] * fx + o[2] * fy + o[3] * fz
-        local need = max(math.abs(dr), math.abs(du)) / tanH - df   -- dist to fit THIS corner (perspective)
+        local need = max(math.abs(dr), math.abs(du)) / tanH - df   -- dist to fit this corner
         if need > dist then dist = need end
     end
     return dist * margin
 end
--- FRONT-3/4 auto view: among front-hemisphere 3/4 yaws, pick the one whose projected footprint is
--- largest (shows the most of the model). The models face +z, so the camera stands on that side;
--- 225 wins ties.
+-- front 3/4 yaw with the largest projected footprint (models face +z); 225 wins ties
 local function bestFrontYaw(corners, pitch)
     local best, bestArea = 225, -1
     for _, yaw in ipairs({ 225, 210, 240, 135, 150, 120 }) do
@@ -139,7 +111,7 @@ function ModelIcon:_render()
         scene:SetAmbient(0.52, 0.52, 0.58)
         local cx, cy, cz, dist
         if self.populate then
-            -- builder icon: the caller fills a minimal fake world with procedural geometry
+            -- builder icon
             local obj = scene:NewObject()
             scene:ObjSetLit(obj, true)
             self.populate({ scene = scene, _boxTarget = obj, lit = true })
@@ -156,20 +128,18 @@ function ModelIcon:_render()
         local rx, ry, rz = (maxX - minX) / 2, (maxY - minY) / 2, (maxZ - minZ) / 2
         local corners = aabbCorners(minX, minY, minZ, maxX, maxY, maxZ, cx, cy, cz)
         if self.faceThin then
-            -- flat wall item (a clock, thin in X): look along the THINNEST axis so its FACE is shown
-            -- head-on, not edge-on (the vertical-bar silhouette). The wall models' face is the + side
-            -- of that axis.
+            -- wall item: look along the thinnest axis (face on its + side)
             if rx <= ry and rx <= rz then self.yaw, self.pitch = 270, -6     -- thin X → face on +x
             elseif rz <= rx and rz <= ry then self.yaw, self.pitch = 180, -6 -- thin Z → face on +z
             else self.yaw, self.pitch = 0, -78 end                          -- thin Y → look down
         elseif self.autoFrame then
-            self.yaw = bestFrontYaw(corners, self.pitch)                     -- best front-3/4 (most coverage)
+            self.yaw = bestFrontYaw(corners, self.pitch)
         end
 
         local obj = scene:NewObject()
         local ai = self.anim or -1
         model:Pose(scene, obj, ai, 0, 0, 0, 0, 0, 1)
-        dist = fitDistance(corners, self.yaw, self.pitch, self.fov, self.margin)   -- TIGHT projected-AABB fit
+        dist = fitDistance(corners, self.yaw, self.pitch, self.fov, self.margin)
         end
 
         local yr, pr = rad(self.yaw), rad(self.pitch)
@@ -180,7 +150,7 @@ function ModelIcon:_render()
         scene:SetCameraAngles(self.yaw, self.pitch)
         scene:SetCameraPosition(cx - fx * dist, cy - fy * dist, cz - fz * dist)
 
-        -- key light from over the camera's shoulder (warm), matching the catalog look
+        -- key light over the camera's shoulder
         local s = self.sun
         if s then scene:SetSun(s[1], s[2], s[3], s[4], s[5], s[6])
         else scene:SetSun(-fx + 0.35, 0.9, -fz + 0.2, 0.9, 0.86, 0.78) end
@@ -196,8 +166,8 @@ function ModelIcon:_render()
     end
 end
 
--- draws the thumbnail at (x, y) scaled to w×h (defaults to the native res). Safe to call every
--- frame — the 3D render happens exactly once.
+-- w, h default to res; renders once on first call
+-- returns false while waiting on the budget
 function ModelIcon:draw(x, y, w, h, opacity)
     if self._disposed then return false end
     if not self._rendered then
@@ -229,9 +199,7 @@ function ModelIcon:drawAtAnchor(x, y, w, h, anchor, opacity)
     scene:SetScale(1, 1); scene:SetOpacity(1.0)
 end
 
--- Render (if needed) and copy the result into the global shared-texture store under `key`, so another
--- stage can draw this thumbnail without re-loading the model. Only meaningful for a cpu=true icon
--- (the scene's CPU buffer is what ShareCanvasAs copies); a no-op if the engine lacks the API.
+-- copy the render into the shared-texture store under key (cpu = true icons only)
 function ModelIcon:shareToSharedTexture(key)
     if self._disposed then return false end
     if not self._rendered then self:_render() end
@@ -241,6 +209,7 @@ function ModelIcon:shareToSharedTexture(key)
     return ok
 end
 
+-- call when the UI closes; disposeAll on stage exit
 function ModelIcon:dispose()
     if self._disposed then return end
     self._disposed = true

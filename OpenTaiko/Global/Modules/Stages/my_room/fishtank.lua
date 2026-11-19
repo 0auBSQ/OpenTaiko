@@ -1,40 +1,32 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- fishtank.lua — the Fish Tank furniture: fish swimming back and forth and kelp swaying inside the
--- tank (flat pictures from Textures/FishTank/ drawn on quads inside the water), and its blue lights,
--- switched on and off by interacting with it (it.lit, saved with the room; off by default).
---
---   FT.init(ctx)         ctx: room(), scene(), propInstFor(it)
---   FT.tick(dt)          moves the fish and the kelp
---   FT.draw()            puts the fish and the kelp of every placed tank in the scene (each frame)
---   FT.lights(world)     the blue lights of the tanks that are on (appended to the room's lights)
---   FT.refresh()         the water's glow of every tank, on or off (after a rebuild or a switch)
---   FT.glowNow(it, mat)  the glow a tank's part has right now (the focus highlight restores it)
---   FT.toggle(it)        switches a tank's lights
+-- fishtank furniture: fish and kelp quads inside the water, and its lights
+-- it.lit: saved with the room, off by default
 
 local FT = {}
 
 local ID = "fishtank"
 local FISH = { "fish_blue", "fish_orange", "fish_pink", "fish_red", "fish_green" }
 local KELP = { "seaweed_green_a", "seaweed_green_b", "seaweed_green_c", "seaweed_green_d" }
-local FIRST_SPRITE = 4900                -- sprite ids of the fish (and their turned copies) and the kelp
--- the water inside the model, in its own units (Fish Tank by J-Toastie): sides, sand top, water top
+local FIRST_SPRITE = 4900                -- fish at +1.., kelp at +21..
+-- water box in model units (Fish Tank by J-Toastie); y0 sand top, y1 water top
 local WATER = { x0 = -0.56, x1 = 0.56, y0 = 0.36, y1 = 1.26, z0 = -1.16, z1 = 1.16 }
 local FISH_SIZE = 0.3
-local LED = { 0.25, 0.55, 1.0 }          -- the colour of the lights
-local LED_GLOW = 0.9                     -- how strongly the water glows when they are on
+local LED = { 0.25, 0.55, 1.0 }
+local LED_GLOW = 0.9                     -- water emissive scale when lit
 
 local ctx = nil
-local spritesFor = nil                   -- the scene the sprites were registered in
-local obj, objScene = nil, nil           -- the scene object holding every tank's fish and kelp
+local spritesFor = nil                   -- scene holding the registered sprites
+local obj, objScene = nil, nil           -- one object for every tank's fish and kelp
 local clock = 0
-local schools = {}                       -- placed tank → its fish and kelp
+local schools = {}                       -- placed tank -> its fish and kelp
 local floor, sin, cos, random = math.floor, math.sin, math.cos, math.random
 
+-- ctx: room(), scene(), propInstFor(it)
 function FT.init(c) ctx = c end
 
 local function spriteId(i) return FIRST_SPRITE + i end
 
--- the pictures go into the scene once; a fish has a copy facing the other way (its quad turned)
+-- once per scene
 local function registerSprites(scene)
     if spritesFor == scene then return true end
     local ok = pcall(function()
@@ -106,8 +98,8 @@ function FT.tick(dt)
     end)
 end
 
--- a point of the model in the world, through the placed instance's pose (its bounds' bottom centre
--- stands at the instance's position)
+-- model point -> world, through the instance pose
+-- bounds' bottom centre stands at the instance position
 local function placer(inst)
     local mnx, mny, mnz, mxx, _, mxz = inst.model:GetBounds()
     local ox, oz = (mnx + mxx) * 0.5, (mnz + mxz) * 0.5
@@ -119,6 +111,7 @@ local function placer(inst)
     end
 end
 
+-- each frame
 function FT.draw()
     if ctx == nil then return end
     local scene = ctx.scene()
@@ -132,7 +125,7 @@ function FT.draw()
         local ok, at = pcall(placer, inst)
         if not ok then return end
         local s = schoolFor(it)
-        -- kelp: rooted in the sand, the top swaying along the tank
+        -- kelp: rooted at WATER.y0, top sways along z
         for _, k in ipairs(s.kelp) do
             local sway = 0.08 * sin(clock * k.speed + k.phase)
             local w = k.h * 0.5
@@ -142,7 +135,7 @@ function FT.draw()
             local x3, y3, z3 = at(k.x, WATER.y0 + k.h, k.z - w * 0.5 + sway)
             scene:ObjAddSpriteQuad(obj, x0, y0, z0, x1, y1, z1, x2, y2, z2, x3, y3, z3, spriteId(20 + k.sprite), 1)
         end
-        -- fish: the picture faces +z as drawn; one swimming the other way has its quad turned
+        -- fish: picture faces +z; dir -1 turns the quad
         for _, f in ipairs(s.fish) do
             local y = f.y + 0.03 * sin(f.bob)
             local hz, hy = f.size * 0.5 * f.dir, f.size * 0.5
@@ -162,6 +155,7 @@ local function waterObj(inst)
     return nil
 end
 
+-- current emissive of a tank part; the focus highlight restores it
 function FT.glowNow(it, material)
     if it ~= nil and it.lit == true and material == "Water" then
         return { LED[1] * LED_GLOW, LED[2] * LED_GLOW, LED[3] * LED_GLOW }
@@ -169,6 +163,7 @@ function FT.glowNow(it, material)
     return { 0, 0, 0 }
 end
 
+-- water emissive of every tank, after a rebuild or a toggle
 function FT.refresh()
     if ctx == nil then return end
     local scene = ctx.scene()
@@ -181,6 +176,7 @@ function FT.refresh()
     end)
 end
 
+-- lit tanks' lights, added to the room's lights
 function FT.lights(world)
     local out = {}
     eachTank(function(it, inst)

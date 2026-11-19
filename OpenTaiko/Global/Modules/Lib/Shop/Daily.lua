@@ -1,15 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field
--- Shop.Daily: one save's shop of the day. Each JST day the shop rolls a big (featured) slot from the
--- "major" rows and 4 normal slots from the "regular" rows (6 when the big roll gives nothing), weighted
--- by PoolSize; Shop.Seasonal can pin an item into the big slot. Rerolls cost 10 coins doubling with each
--- reroll of the day. The day's stock, sold-out slots and rerolls are kept per save file (its SaveUID)
--- in a DATABASE local store of the calling stage, "shop_state" by default.
---   local shop = Daily.open(saveIndex)   -- today's shop for that save (rolled or loaded, then saved)
---   shop.big, shop.normals[1..6]         -- item tables (Catalog rows + LocalizedName, Stock, SoldOut)
---   shop:item(slot)                      -- slot 1..6, or Daily.SLOT_BIG
---   shop:buy(slot, qty)                  -- true, or false + "none" | "soldout" | "poor"
---   shop:reroll()                        -- true, or false + "poor"
---   shop:close()
+-- Shop.Daily: one save's shop of the day (JST days)
+-- state per SaveUID in a DATABASE local store of the calling stage
 
 local Util     = require("Core.Util")
 local Almanac  = require("Calendar.almanac")
@@ -23,7 +14,7 @@ M.STORE = "shop_state"
 
 local function log(s) pcall(debugLog, s) end
 
--- the day number (e.g. 20261018) in JST, the day the stock changes
+-- JST day number (yyyymmdd), the day the stock changes
 function M.freezeKey()
     local jst = os.date("!*t", os.time() + 9 * 3600)
     return jst.year * 10000 + jst.month * 100 + jst.day
@@ -32,6 +23,7 @@ end
 function M.isSoldOut(mask, slot) return ((mask >> (slot - 1)) & 1) == 1 end
 function M.markSoldOut(mask, slot) return mask | (1 << (slot - 1)) end
 
+-- 10 coins, doubling per reroll of the day
 function M.rerollPrice(rerolls) return math.floor(10 * (2 ^ rerolls)) end
 
 -- a shop item from a catalogue row
@@ -43,8 +35,7 @@ local function setupItem(entry)
     return item
 end
 
--- ranged items (StockMax > 0, e.g. paints and floorings) get a random quantity bought one unit at a
--- time; everything else is a single purchase
+-- ranged items (StockMax > 0) get a random stock, bought one unit at a time; others sell once
 local function rollStock(item)
     if item == nil then return end
     local smin = tonumber(item.StockMin) or 0
@@ -61,9 +52,9 @@ end
 local Shop = {}
 Shop.__index = Shop
 
+-- big slot from the "major" rows, 4 normal slots from "regular" (6 without a big), weighted by PoolSize
 function Shop:roll()
-    -- the address of a table as extra seed entropy; %p is platform-dependent (bionic prints "0x...",
-    -- MSVC bare hex), so the trailing hex digits are read explicitly
+    -- table address as extra seed entropy; %p output differs per platform, so the trailing hex digits are read
     local ptr = tonumber(tostring({}):match("(%x+)%s*$") or "0", 16) or 0
     math.randomseed(os.time() + ptr % 0x7FFFFFFF)
 
@@ -152,8 +143,8 @@ function Shop:roll()
     end
 end
 
--- the best active seasonal entry (highest priority, not owned) takes the big slot; a roll and a reroll
--- can both displace it, so this runs after every roll and load
+-- best active seasonal entry (highest priority, not owned) takes the big slot
+-- rolls and rerolls can displace it, so this runs after every roll and load
 function Shop:applySeasonal()
     local save = self.save
     local pick = Almanac.pick(self.seasonal, save, function(e)
@@ -204,6 +195,7 @@ function Shop:load()
     self.rerolls = tonumber(db:Read(p .. "rerolls") or "0") or 0
 end
 
+-- slot 1..6, or M.SLOT_BIG
 function Shop:item(slot)
     if slot == M.SLOT_BIG then return self.big end
     return self.normals[slot]
@@ -220,8 +212,8 @@ function Shop:refusal(slot, qty)
     return nil
 end
 
--- buys qty units of a slot (clamped to its stock): grants them (Catalog.grant), spends price × qty,
--- lowers the stock, marks the slot sold out once it is empty, and saves
+-- buys qty units of a slot (clamped to stock), spends price * qty and saves
+-- true, or false + "none" | "soldout" | "poor"
 function Shop:buy(slot, qty)
     local why = self:refusal(slot, qty)
     if why ~= nil then return false, why end
@@ -238,7 +230,7 @@ function Shop:buy(slot, qty)
     return true
 end
 
--- spends the reroll price, rolls a new stock (every slot back in stock) and saves
+-- spends the reroll price, rolls a new stock and saves; true, or false + "poor"
 function Shop:reroll()
     local price = self:rerollPrice()
     if price > self.save.Coins then return false, "poor" end
@@ -256,6 +248,8 @@ function Shop:close()
     self.db = nil
 end
 
+-- today's shop for a save index (rolled or loaded, then saved)
+-- shop.big, shop.normals[1..6]: Catalog rows + LocalizedName, Stock, SoldOut
 -- opts.store: the local DATABASE name; opts.seasonal: the featured entries (Shop.Seasonal by default)
 function M.open(index, opts)
     opts = opts or {}

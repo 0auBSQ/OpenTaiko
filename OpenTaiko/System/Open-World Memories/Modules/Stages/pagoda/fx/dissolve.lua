@@ -1,4 +1,4 @@
--- Dissolve of a beaten monster's sprite into dust, drawn as column strips through encounter/sprite.
+-- beaten monster sprite dissolve (column strips via encounter/sprite)
 
 local assets = require("encounter/assets")
 local sprite = require("encounter/sprite")
@@ -17,7 +17,7 @@ local look = Layout.fx.dissolve
 local motion = Animation.fx.dissolve
 
 local DARK_SEC = motion.dark_s
-local EAT_FROM, EAT_SEC = motion.eat_from_s, motion.eat_s     -- front start, and its run from top to bottom
+local EAT_FROM, EAT_SEC = motion.eat_from_s, motion.eat_s     -- s: front start, top-to-bottom run
 local FRONT_BASE, FRONT_AMP = motion.front_ease.base, motion.front_ease.amp
 local noise = motion.front_noise
 local NA_AMP, NA_ACROSS, NA_HZ = noise.wave_a.amp, noise.wave_a.across, noise.wave_a.hz
@@ -25,19 +25,19 @@ local NB_AMP, NB_ACROSS, NB_HZ = noise.wave_b.amp, noise.wave_b.across, noise.wa
 local N_JITTER, N_FLICKER = noise.jitter, noise.flicker
 local COL_HZ_BASE, COL_HZ_JITTER = motion.column_flicker_hz.base, motion.column_flicker_hz.jitter
 local DARK_R, DARK_G, DARK_B = look.dark_color[1], look.dark_color[2], look.dark_color[3]
-local COLUMNS, COLUMN_MIN = look.columns, look.column_min_px  -- strips across the sprite, smallest mean strip width (px)
-local RAG, RAG_MIN = look.rag_share, look.rag_min_px          -- ragged front depth: share of the height, px
-local EDGE, EDGE_ALPHA = look.edge_px, look.edge_opacity      -- px under the front drawn thinned
+local COLUMNS, COLUMN_MIN = look.columns, look.column_min_px  -- strip count, min mean width (px)
+local RAG, RAG_MIN = look.rag_share, look.rag_min_px          -- front rag: height share, min px
+local EDGE, EDGE_ALPHA = look.edge_px, look.edge_opacity      -- px under the front, thinned
 local JITTER = look.spawn_jitter_px
 
--- shed per point as the front passes (plain copies: haze has no spin)
+-- shed per point (plain copies: haze has no spin)
 local GRAIN = Config.plain(motion.grain)
 GRAIN.key = "fx_ash"
 local HAZE = Config.plain(motion.haze)
 HAZE.key = "fx_dust"
 local KINDS = { HAZE, GRAIN }               -- drawing order
 local WIND = motion.wind_px_per_s           -- px/s to the right
-local RISE, DRAG = motion.rise_px_per_s2, motion.drag_per_s   -- upward pull (px/s per s), share of the speed lost per s
+local RISE, DRAG = motion.rise_px_per_s2, motion.drag_per_s   -- px/s^2 up, speed share lost per s
 local TURB, TURB_HZ = motion.turb_px_per_s, motion.turb_hz    -- sideways, px/s
 local DUST_R, DUST_G, DUST_B = look.dust_color[1], look.dust_color[2], look.dust_color[3]
 
@@ -49,12 +49,12 @@ function D.keys()
     return keys
 end
 
--- spriteKey = the manifest key of the drawn sprite; the dust starts on manifest_result dissolve[key] (sprite px)
+-- spriteKey: manifest key; dust starts on manifest_result dissolve[key] (sprite px)
 function D.new(spriteKey)
     local meta = assets.meta(spriteKey)
     local w, h = 0, 0
     if meta ~= nil then w, h = meta.w, meta.h end
-    -- strips of random widths around the mean; colAt[x] = the strip holding sprite column x
+    -- random strip widths around the mean; colAt[x] = strip of column x
     local mean = max(COLUMN_MIN, w / COLUMNS)
     local cols, colAt, x0 = {}, {}, 0
     while x0 < w do
@@ -82,14 +82,14 @@ function D.new(spriteKey)
     return d
 end
 
--- the front's base row: from above the top (nothing eaten) to below the bottom (all eaten)
+-- front base row: above top (none eaten) to below bottom (all eaten)
 local function front(self)
     local u = Easing.span(self.t, EAT_FROM, EAT_SEC)
     u = u * (FRONT_BASE + FRONT_AMP * u)
     return -self.rag + (self.h + 2 * self.rag) * u
 end
 
--- each strip's first drawn row: the base row plus noise; it only ever moves down
+-- per-strip first row: base + noise, only moves down
 local function cutColumns(self)
     local base, rag, t, h = front(self), self.rag, self.t, self.h
     for _, c in ipairs(self.cols) do
@@ -114,7 +114,7 @@ local function spawn(self, k, x, y)
     }
 end
 
--- the points the front has passed shed their dust (points are sorted top-down)
+-- passed points shed dust (points sorted top-down)
 local function peel(self, base)
     local pts, peeled, cols, colAt = self.pts, self.peeled, self.cols, self.colAt
     local limit = base + self.rag
@@ -163,7 +163,7 @@ function D:update(dt)
     for _, k in ipairs(KINDS) do move(self.parts[k], dt) end
 end
 
--- true once the sprite is eaten and the last of the dust has faded
+-- true when eaten and dust faded
 function D:done()
     if self.t < EAT_FROM + EAT_SEC then return false end
     for _, k in ipairs(KINDS) do
@@ -172,26 +172,26 @@ function D:done()
     return true
 end
 
--- 0..1: how far the sprite has darkened
+-- 0..1 darkening
 function D:darkness()
     return Easing.outQuad(self.t / DARK_SEC)
 end
 
--- 0..1: the share of the sprite's height not eaten yet
+-- 0..1 height share not eaten
 function D:remaining()
     if self.h <= 0 then return 0 end
     return 1 - Easing.linear(front(self) / self.h)
 end
 
--- true once the front has eaten the sprite's pixel (x, y)
+-- true if sprite px (x, y) is eaten
 function D:eaten(x, y)
     if self.w <= 0 then return true end
     local c = self.cols[self.colAt[max(0, min(self.w - 1, floor(x)))] or 1]
     return c ~= nil and y < c.cut
 end
 
--- a sprite rect placed by its top-left, so strips of any size meet edge to edge; (bx, by) is the
--- shift the "center" anchor gives the whole sprite (half the int size), so the strips line up with it
+-- rect placed by top-left (strips meet edge to edge)
+-- (bx, by): "center" anchor shift of the whole sprite (half the int size)
 local function strip(tex, meta, x, y, o, sx, sy, bx, by, rx, ry, rw, rh)
     local px, py = sprite.point(meta, x, y, o, rx + rw * 0.5, ry + rh * 0.5)
     tex:DrawRectAtAnchor(px + bx - rw * sx * 0.5, py + by - rh * sy * 0.5, rx, ry, rw, rh, "topleft")
@@ -255,8 +255,8 @@ local function drawDust(self, k, meta, x, y, o, sc, alpha, r, g, b)
     tx:SetColor(1, 1, 1)
 end
 
--- tex, meta, x, y, o: the sprite placement encounter/sprite.draw takes (o: sx, sy, rot, pivot);
--- alpha, r, g, b: opacity and filter of the sprite and its dust
+-- tex, meta, x, y, o: as encounter/sprite.draw (o: sx, sy, rot, pivot)
+-- alpha, r, g, b: sprite and dust filter
 function D:draw(tex, meta, x, y, o, alpha, r, g, b)
     alpha, r, g, b = alpha or 1, r or 1, g or 1, b or 1
     if alpha <= 0 then return end

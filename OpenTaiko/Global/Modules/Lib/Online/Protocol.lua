@@ -1,17 +1,16 @@
 ---@diagnostic disable: undefined-global, undefined-field
--- Online.Protocol: the online lobby's wire messages. Each one is a JSON string sent on a NET channel with
--- NET:Broadcast or NET:SendTo. Every skin's lobby speaks these, so a room is joinable from any skin.
---
--- Channels: "song" (the room's song, from the host role), "diff", "mod", "ready", "have" (the song is on
--- this machine), "watch" (back on the results), "go" (start), "result" (a finished play).
+-- Online.Protocol: online lobby wire messages, JSON strings on NET channels
+-- shared by every skin's lobby, so rooms join across skins
 
 local floor = math.floor
 
 local M = {}
 
-M.ROOM_ID = "onlinelobby"   -- the stage id in the room code; every skin's lobby uses it
+M.ROOM_ID = "onlinelobby"   -- stage id in the room code, shared by every skin
 M.MAXP = 5
 
+-- channels: "song" (from the host role), "diff", "mod", "ready", "have" (song on this machine),
+--   "watch" (back on the results), "go" (start), "result" (finished play)
 -- a JSON string literal
 function M.jstr(s)
     return '"' .. tostring(s):gsub('[%c\\"]', function(ch)
@@ -24,7 +23,7 @@ local jstr = M.jstr
 local function jbool(b) return b and "true" or "false" end
 
 -- the mods of a player: random, stealth, justice, timing zone, scroll speed, special mod
--- (none / normal timing / x1 scroll / no special mod)
+-- defaults: none / normal timing / x1 scroll / no special mod
 function M.defMods() return { r = 0, st = 0, ju = 0, tz = 2, ss = 9, sm = 0 } end
 
 function M.modJson(m) return string.format('{"r":%d,"st":%d,"ju":%d,"tz":%d,"ss":%d,"sm":%d}', m.r or 0, m.st or 0, m.ju or 0, m.tz or 2, m.ss or 9, m.sm or 0) end

@@ -1,7 +1,4 @@
 -- End-credits backgrounds, cross-faded on the roll's clock.
--- scene module: keys(), open() (textures created, not Ready yet), update(dt, u) (u = s since its fade-in),
--- draw(a, c) (opacity, brightness), close(); holes = true when the sky shows through it (then a cover
--- over it and the sky dims it; other scenes dim themselves)
 
 local Easing = require("Easing")
 local assets = require("encounter/assets")
@@ -17,6 +14,9 @@ assets.add(require("encounter/credits/manifest"))
 local Anim = Animation.encounter.credits.backdrop
 local XFADE = Anim.crossfade_s
 
+-- scene module: keys(), open() (textures created, not Ready yet), update(dt, u) (u = s since its fade-in),
+-- draw(a, c) (opacity, brightness), close(); holes = true: the sky shows through, dimmed with a cover
+-- (other scenes dim themselves)
 -- at = roll time (s) the scene starts fading in; Anim.scene_at_s is in this order
 local SCENES = {
     { mod = require("encounter/credits/hug") },

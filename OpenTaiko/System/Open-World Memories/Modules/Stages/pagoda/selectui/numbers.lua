@@ -1,4 +1,4 @@
--- 3D floor numbers; the art is greyscale, so SetColor tints the face and the border stays dark.
+-- 3D floor numbers (greyscale art: SetColor tints the face)
 
 local Rainbow = require("Rainbow")
 local Config  = require("Core.Config")
@@ -30,7 +30,7 @@ local function digit_at(text, i)
     return d, metrics.digits[d + 1]
 end
 
--- ink box of the run in unscaled px: its width, and how far it reaches above and below the baseline
+-- run ink box (unscaled px): width, up, down from the baseline
 local function run_box(text)
     local pen, last, up, down = 0, nil, 0, 0
     for i = 1, #text do
@@ -50,7 +50,7 @@ function N.width(text, scale)
     return (run_box(text)) * (scale or 1)
 end
 
--- height of the ink box centre above the baseline, unscaled
+-- ink box centre height above the baseline (unscaled)
 function N.rise(text)
     local _, up, down = run_box(text)
     return (up - down) * 0.5
@@ -66,9 +66,9 @@ local function draw_digit(tx, x, y, s, r, g, b, alpha)
     tx:SetOpacity(1)
 end
 
--- text: digits only; (cx, cy): centre of the run's ink box, kept in place by the scale.
--- rainbow: Rainbow.draw options for one spectrum across the run (sx, sy, x0, span and opacity
--- filled in here), or nil for the r, g, b tint. Returns the drawn ink box: left, top, width, height.
+-- text: digits; (cx, cy): ink box centre, fixed under scale
+-- rainbow: Rainbow.draw options (sx, sy, x0, span, opacity set here), or nil for r, g, b
+-- returns ink box: left, top, width, height
 function N.draw(text, cx, cy, scale, r, g, b, alpha, rainbow)
     if _tex == nil then return cx, cy, 0, 0 end
     local s = scale or 1

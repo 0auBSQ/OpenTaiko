@@ -1,25 +1,16 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
--- cutscene ROActivity
--- ------------------------------------------------------------------------------------------------------
--- Plays cutscene videos one after another, each with its own audio track, and owns the pause popup: the
--- screen dims and a PopUI panel offers Resume and Skip, with the shared menu sounds. It knows nothing about
--- what the cutscene is for; the caller decides which files play and how the end looks. Driven by C#
--- (CStageCutScene for a song's intro and outro):
---   activate(paths, fadeOutSeconds)
---     paths = the video files, in order; fadeOutSeconds = a fade to black after the last one (0 = hand back at once)
---   update() every frame, returning "finished" once every video has played and the fade, if any, is over
---   draw() every frame; deactivate() frees the videos.
--- Esc (or a pad's cancel) and F1 open the popup; Skip ends the current video only.
+-- cutscene ROActivity (videos in order, pause popup)
+-- driven by CStageCutScene (song intro and outro)
 
 local PopUI = require("PopUI")
 local NavInput = require("NavInput")
 
--- positions, sizes and colours: Config/layout.json
+-- layout: Config/layout.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local POPUP = Layout.popup
 
-local INPUT_GRACE_S = 0.15  -- after the popup opens, so the press that opened it does not act on it
+local INPUT_GRACE_S = 0.15  -- s, ignore input after the popup opens
 local DIM = Layout.dim_opacity
 local FILL = 16
 local PANEL_W, PANEL_H, ROW_H = POPUP.width, POPUP.height, POPUP.row_height
@@ -27,9 +18,9 @@ local SCREEN_W, SCREEN_H = Layout.screen.width, Layout.screen.height
 
 local ui, menu
 local paths, index
-local fadeOutS              -- the fade to black after the last video, 0 for none
+local fadeOutS              -- s, final fade (0 = none)
 local video
-local fill                  -- a small white canvas, scaled up for the letterbox, the dim and the fade
+local fill                  -- white canvas, scaled for fills
 local finished, fadeT
 local paused, popupAge
 local lastTs
@@ -47,7 +38,7 @@ local function openVideo(i)
     video:Start()
 end
 
--- every video has played: hand back at once, or after the fade to black the caller asked for
+-- all videos done: hand back now or after the fade
 local function done()
     if fadeOutS > 0 then
         if fadeT == nil then fadeT = 0 end
@@ -61,7 +52,7 @@ local function pause()
     paused, popupAge = true, 0
     if video ~= nil then video:Pause() end
     menu:setSelected(1, false)
-    ui:focusStay()   -- the menu takes the keys at once
+    ui:focusStay()   -- menu takes keys at once
     sfx("Cancel")
 end
 
@@ -72,7 +63,7 @@ end
 
 local function skip()
     paused = false
-    if video ~= nil then video:Stop() end   -- finished: the next video (if any) follows
+    if video ~= nil then video:Stop() end   -- next video follows
 end
 
 local function fillScreen(alpha)
@@ -85,7 +76,7 @@ local function fillScreen(alpha)
     fill:SetScale(1, 1) ; fill:SetOpacity(1) ; fill:SetColor(1, 1, 1)
 end
 
--- the popup, rebuilt on each activation so its strings follow the language
+-- rebuilt per activation (language)
 local function buildPopup()
     ui:disposeWidgets()
     ui:clear()
@@ -98,12 +89,13 @@ local function buildPopup()
 end
 
 function onStart()
-    ui = PopUI.new{ bg = false }   -- its default sounds are the shared menu ones
+    ui = PopUI.new{ bg = false }   -- default sounds: shared menu ones
     fill = CANVAS:CreateCanvas(FILL, FILL)
     fill:Clear(255, 255, 255, 255)
     fill:Upload()
 end
 
+-- pathArray: video files in order; fadeSeconds: fade to black after the last (0 = none)
 function activate(pathArray, fadeSeconds)
     fadeOutS = math.max(0, tonumber(fadeSeconds) or 0)
     paths = {}
@@ -121,6 +113,7 @@ function deactivate()
     paths, paused, fadeT = {}, false, nil
 end
 
+-- returns "finished" after the last video and its fade
 function update(ts)
     local dt = 1 / 60
     if lastTs ~= nil and ts ~= nil then dt = math.max(0, math.min(0.1, (ts - lastTs) / 1000)) end
@@ -162,7 +155,7 @@ end
 function draw()
     fillScreen(1)
     if video ~= nil and video.Width > 0 then
-        -- the picture fits the screen and keeps its shape
+        -- fit, keep aspect
         local tex = video.Texture
         local s = math.min(SCREEN_W / video.Width, SCREEN_H / video.Height)
         local w, h = video.Width * s, video.Height * s

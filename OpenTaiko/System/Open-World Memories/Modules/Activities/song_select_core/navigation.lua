@@ -1,6 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local, redundant-parameter
--- navigation.lua  —  Page management, media loading, hold-scroll and song-select
---                    input handling for song_select_core.
+-- song_select_core page and input handling.
 
 local Config    = require("Core.Config")
 local SongTitle = require("Songs.Title")
@@ -22,13 +21,12 @@ local ROWS                 = List.rows_each_side   -- the page: the selected nod
 local TRANSITION_S         = Animation.screen_transition.duration_s
 local JACKET_MAX_SIZE      = Layout.preimage.decode_max_size
 
--- Preimage/jacket "pop" on appear: scale from PREIMAGE_POP_START up to 1.0 with a short overshoot.
+-- jacket pop: scale PREIMAGE_POP_START -> 1 with overshoot
 local PREIMAGE_POP_START = PopAnim.pop_start_scale
 local PREIMAGE_POP_MS    = PopAnim.pop_duration_ms
 
--- Kick the pop animation (called from the shared-texture onCreate, i.e. the moment the jacket appears).
--- The counter's built-in OUT/BACK easing does the 0→1-with-overshoot "bounce"; the listener already
--- receives the eased value, so we just map it onto [pop_start .. 1].
+-- called from the shared-texture onCreate; the counter's OUT/BACK easing gives the overshoot
+-- the listener value (already eased) maps onto [pop_start .. 1]
 local function startPreimagePop()
     G.preimagePopScale = PREIMAGE_POP_START
     local c = G.startCounter("preimage_pop", 0, 1, PREIMAGE_POP_MS / 1000, "none",
@@ -37,17 +35,16 @@ local function startPreimagePop()
     c:SetEasing(PopAnim.pop_easing[1], PopAnim.pop_easing[2])
 end
 
--- ── Media loaders ─────────────────────────────────────────────────────────────
+-- ==== Media loaders ====
 
 local function reloadPreimage(songNode)
     SHARED:ClearSharedTexture("preimage")
     if songNode.IsSong == true then
         G.startCounter("throttle_preimage", 0, PREVIEW_THROTTLE_MS, PREVIEW_THROTTLE_MS / 1000 / PREVIEW_THROTTLE_MS, "none", nil, function()
-            -- Selection may have changed during the throttle window — only load this node's jacket if it is
-            -- still selected (so a stale jacket / pop-in never lands on the next box).
+            -- skip unless still selected after the throttle window
             if G.songList == nil or G.songList:GetSelectedSongNode() ~= songNode then return end
-            -- maxSize: jackets can be up to 3000x3000 (34MB decoded) but display at ~400px — decode them small.
-            -- onCreate fires when the jacket is actually swapped in → start the pop-in animation then.
+            -- maxSize: jackets up to 3000x3000 (34 MB decoded) show at ~400 px
+            -- onCreate: jacket swapped in, starts the pop
             local function onCreate(tex)
                 tex:SetWrapMode("Border")
                 if G.songList == nil or G.songList:GetSelectedSongNode() ~= songNode then return end
@@ -85,9 +82,8 @@ local function playPreview(songNode)
     G.previewDemoStartRaw   = 0
     G.previewDemoStart      = 0
     G.previewWasPlaying     = false
-    -- Fade the currently-playing preview out promptly (Script.lua eases previewFadeVol → target). The old
-    -- code hard-swapped in silence here, which cut the audio abruptly; now the throttled new preview simply
-    -- replaces the faded-out one when it loads (or it plays out silently if we land on a folder/random).
+    -- fade the playing preview out (Script.lua eases previewFadeVol to the target)
+    -- the throttled new preview replaces it on load
     G.previewFadeTarget     = 0
     if songNode.IsSong == true then
         -- Suppress audio preview for GRAYED/BLURED locked songs
@@ -96,15 +92,13 @@ local function playPreview(songNode)
             return
         end
         G.startCounter("throttle_presound", 0, PREVIEW_THROTTLE_MS, PREVIEW_THROTTLE_MS / 1000 / PREVIEW_THROTTLE_MS, "none", nil, function()
-            -- Selection may have changed during the throttle window (moved to another song / a back box /
-            -- a folder). Only load the preview if this node is still the selected one.
+            -- skip unless still selected after the throttle window
             if G.songList == nil or G.songList:GetSelectedSongNode() ~= songNode then return end
             local demoStart = songNode.DemoStart
             SHARED:SetSharedString("presound_path", songNode.AudioPath)
             SHARED:SetSharedPreviewUsingAbsolutePath("presound", songNode.AudioPath, function(snd)
-                -- The load is async too: bail if the selection moved on while it was loading, so a stale
-                -- preview never starts playing over the next box. (Just don't Play — the load doesn't
-                -- auto-play, and Stopping could cut the shared slot if it's reused for the new selection.)
+                -- async load: skip Play if the selection moved on
+                -- (no Stop: the shared slot may already hold the new selection)
                 if G.songList == nil or G.songList:GetSelectedSongNode() ~= songNode then return end
                 local speed = CONFIG.SONGSPEED:ToActual(CONFIG.SongSpeed)
                 snd:SetSpeed(speed)
@@ -127,7 +121,7 @@ end
 
 function M.init(g)
     G = g
-    -- Expose media reload for any module that needs it via G
+    -- media reload for other modules
     G.reloadMediaForNode = function(node)
         reloadPreimage(node)
         playPreview(node)
@@ -135,14 +129,12 @@ function M.init(g)
     G.navRefreshPage = M.refreshPage
 end
 
--- ── Page refresh ──────────────────────────────────────────────────────────────
--- All node-derived draw data is extracted HERE, once per selection change: every NLua property read
--- (node.IsSong, chart:GetPlayerBestScore, …) allocates on each call, so per-frame reads in the draw loop
--- stack garbage and stutter the GC. The draw code consumes only these plain-Lua caches.
+-- ==== Page refresh ====
+-- node draw data is read here once per selection change: NLua property reads allocate
+-- the draw code reads only these plain-Lua caches
 
--- The genre (song bar) colour brightened by 50% toward white — used to tint the BarLevelFill numbers so
--- they read as a lighter shade of the bar regardless of the chart's star rating. Precomputed per selection
--- (never per frame) since COLOR:Create allocates. Falls back to white when the node has no box colour.
+-- BarLevelFill tint: box colour lifted FILL_LIGHTEN toward white (white without one)
+-- per selection: COLOR:Create allocates
 local FILL_LIGHTEN = List.level_fill_lighten
 local function brightenedFill(boxColor)
     local function up(c) return math.min(255, math.floor(c + (255 - c) * FILL_LIGHTEN)) end
@@ -204,8 +196,8 @@ local function buildSlot(node, isSelected)
     return slot
 end
 
--- a folder's songs, down its whole tree: the unlocked ones, and all of them but the locked mythical ones
--- (those stay a secret); kept per folder node until the next activate
+-- song counts of a folder's whole tree: unlocked, and all but locked mythical ones
+-- cached per folder node until the next activate
 local function folderCounts(node)
     G.folderCountCache = G.folderCountCache or {}
     local c = G.folderCountCache[node]
@@ -229,8 +221,8 @@ local function folderCounts(node)
     return open, total
 end
 
--- the selected row's band inside a folder: the folder's colour, darkened for a light folder and lightened for
--- a dark one so it stands apart from the folder's bars; nil at the top level (the band stays green)
+-- selected-row band in a folder: folder colour, darkened if light, lightened if dark
+-- nil at the top level
 local BAND_LIGHT_THRESHOLD = List.select_band_folder_light_threshold
 local BAND_DARKEN          = List.select_band_folder_darken
 local BAND_LIGHTEN         = List.select_band_folder_lighten
@@ -288,7 +280,7 @@ local function buildSelInfo(node)
     if fc ~= nil then sel.bpmBase, sel.bpmMin, sel.bpmMax = fc.BaseBPM, fc.MinBPM, fc.MaxBPM end
     local vaultLocked = G.unlocks.isVaultLocked(node)
     sel.isUnlockedSong = node.IsLocked ~= true and not vaultLocked
-    -- BLURRED (a vault song excepted): the song info drawn darker, its texts as ???, static for the jacket
+    -- BLURRED (vault songs excepted): texts as ???, static jacket
     sel.blurredInfo = sel.hi == 2 and node.IsLocked == true and not vaultLocked
     return sel
 end
@@ -310,7 +302,7 @@ function M.refreshPage(skipMedia)
                 G.selInfo = buildSelInfo(node)
                 G.selectBandColor = bandColorFor(node.Parent)
             end
-            -- the selected node's genre picks the background; the rest of the page warms its sets up
+            -- selected genre picks the background; other rows prefetch theirs
             if i == 0 then G.backgrounds.select(node.Genre) else G.backgrounds.prefetch(node.Genre) end
             if G.genre_overlays[node.Genre] == nil then
                 if TEXTURE:Exists("Textures/Overlay/"..node.Genre..".png") then
@@ -327,11 +319,8 @@ function M.refreshPage(skipMedia)
         end
     end
 
-    -- Remember which child is focused inside each folder, so reopening that folder returns to it.
-    -- Keyed + valued by the node itself: node wrappers are stable cached objects (like sort.lua's
-    -- originalOrders), so this restores the exact node — robust for boxes, which have no UniqueId.
-    -- Record ANY node type (song / folder / back / random): if you quit while on the back box, reopening
-    -- must land on the back box, not the last song you passed.
+    -- focused child per folder, restored on reopen
+    -- keyed by node (stable cached wrappers; boxes have no UniqueId); any node type, back box included
     local sel = G.currentPage[0]
     if sel ~= nil and sel.Parent ~= nil then
         G.folderReopenMemory = G.folderReopenMemory or {}
@@ -341,8 +330,8 @@ function M.refreshPage(skipMedia)
     if G.ctx["extreme_fade"] then G.ctx["extreme_fade"]:Start() end
 end
 
--- ── Folder open/close animation ───────────────────────────────────────────────
--- Snapshot the current page's bars as { {i, pt}, ... }, sorted outer-first so the centre bar draws on top.
+-- ==== Folder open/close animation ====
+-- page bars as { {i, pt}, ... }, outer first (centre bar on top)
 local function snapshotBars(excludeZero)
     local arr = {}
     for i = -ROWS, ROWS do
@@ -358,7 +347,7 @@ end
 local function animTick(v) if G.folderAnim ~= nil then G.folderAnim.t = v end end
 local function finishFolderAnim() G.folderAnim = nil end   -- normal list draw resumes from the settled page
 
--- copy the current header breadcrumb titles (G.selInfo.crumbs) before an open/close so the header can animate
+-- breadcrumb titles (G.selInfo.crumbs) before an open/close, for the header animation
 local function copyCrumbs()
     local c = {}
     if G.selInfo ~= nil and G.selInfo.crumbs ~= nil then
@@ -368,21 +357,19 @@ local function copyCrumbs()
 end
 
 -- Phase durations (seconds) and easings
-local ANIM_OPEN_OUT_S  = FolderAnim.open_out_s     -- phase 1: parent siblings slide out left
-local ANIM_OPEN_FAN_S  = FolderAnim.open_fan_s     -- phase 2: folder contents fan out
-local ANIM_CLOSE_GRP_S = FolderAnim.close_group_s  -- phase 1: folder contents group at the focus
-local ANIM_CLOSE_IN_S  = FolderAnim.close_in_s     -- phase 2: parent siblings slide back in
+local ANIM_OPEN_OUT_S  = FolderAnim.open_out_s     -- phase 1: parent siblings out
+local ANIM_OPEN_FAN_S  = FolderAnim.open_fan_s     -- phase 2: folder contents in
+local ANIM_CLOSE_GRP_S = FolderAnim.close_group_s  -- phase 1: folder contents to the focus
+local ANIM_CLOSE_IN_S  = FolderAnim.close_in_s     -- phase 2: parent siblings back in
 
--- Start a phase: a 0→1 counter whose value is eased by the engine (SetEasing), so the draw side just lerps.
+-- phase: 0..1 counter eased by the engine (SetEasing); the draw side lerps
 local function startPhase(dur, easing, onFinish)
     local c = G.startCounter("folder_anim", 0, 1, dur, "none", animTick, onFinish)
     c:SetEasing(easing[1], easing[2])   -- listener receives the eased value
 end
 
--- After OpenFolder (cursor at the first child), jump back to the child node that was focused when this
--- folder was last closed. Node wrappers are stable cached objects, so reference == matches the exact node
--- (survives re-sorting between close and reopen). If it was removed / the list was re-enumerated, no match
--- and the cursor stays on the first child.
+-- after OpenFolder: back to the child focused at the last close (reference match)
+-- no match (removed / re-enumerated): stays on the first child
 local function restoreFolderFocus(folder)
     if G.folderReopenMemory == nil then return end
     local target = G.folderReopenMemory[folder]
@@ -395,8 +382,8 @@ local function restoreFolderFocus(folder)
     end
 end
 
--- Opening a real folder: slide the parent list out (keeping the folder bar), then fan the folder's
--- contents into place. Returns false if there is nothing to open (leaves state untouched).
+-- folder open: parent list out (folder bar kept), then contents in
+-- false when there is nothing to open (state untouched)
 local function startOpenAnim(Sort)
     if G.folderAnim ~= nil then return true end
     local folder    = G.songList:GetSelectedSongNode()   -- the folder being opened
@@ -413,14 +400,13 @@ local function startOpenAnim(Sort)
     startPhase(ANIM_OPEN_OUT_S, FolderAnim.open_out_easing, function()
         if G.folderAnim == nil then return end
         G.folderAnim.phase = 2; G.folderAnim.t = 0
-        startPhase(ANIM_OPEN_FAN_S, FolderAnim.open_fan_easing, finishFolderAnim)   -- overshoot = the "book" pop
+        startPhase(ANIM_OPEN_FAN_S, FolderAnim.open_fan_easing, finishFolderAnim)
     end)
     return true
 end
 
--- Closing a folder: group the contents at the focus, show the folder bar, then slide the parent list
--- back in. Virtual folders (favorites/search) aren't in the real structure so they close instantly (no
--- animation). Returns false only if there is no folder to close (at the root → the caller exits).
+-- folder close: contents to the focus, then the parent list back in
+-- virtual folders (favorites/search) close at once; false at the root (the caller exits)
 local function startCloseAnim(Sort)
     if G.folderAnim ~= nil then return true end
     local child     = G.songList:GetSelectedSongNode()
@@ -431,8 +417,7 @@ local function startCloseAnim(Sort)
     Sort.applySort()
     M.refreshPage()
     G.sounds.Cancel:Play()
-    -- A real close lands on the just-closed folder (now the selection); a virtual close restores the
-    -- cursor elsewhere, so the folder is NOT the selection → skip the animation.
+    -- a virtual close moves the cursor off the folder: no animation
     local sel = G.songList:GetSelectedSongNode()
     if not (folder ~= nil and sel ~= nil and sel.IsFolder == true and sel.Title == folder.Title) then
         return true
@@ -447,7 +432,7 @@ local function startCloseAnim(Sort)
     return true
 end
 
--- ── Folder navigation ─────────────────────────────────────────────────────────
+-- ==== Folder navigation ====
 
 local function handleDecideSongSelect(Sort)
     local ssn = G.songList:GetSelectedSongNode()
@@ -482,7 +467,7 @@ local function handleDecideSongSelect(Sort)
     return nil
 end
 
--- ── Hold scroll ───────────────────────────────────────────────────────────────
+-- ==== Hold scroll ====
 
 local startRepeat
 
@@ -516,12 +501,10 @@ local function startHold(dir)
     end)
 end
 
--- ── Song-select input handler ─────────────────────────────────────────────────
--- Returns "cancel", or nil.  Sets G.selectedSongNode and starts screen_transition
--- when a song is chosen.
+-- ==== Song-select input ====
+-- returns "cancel" or nil; a chosen song sets G.selectedSongNode and starts screen_transition
 
--- Event Mode, the countdown over: the hovered song, else a random song of the current box, else a
--- random song of the whole library
+-- Event Mode countdown over: hovered song, else random from the box, else from the library
 local function forcedChoice()
     local ssn = G.songList:GetSelectedSongNode()
     if ssn ~= nil and ssn.IsSong and not ssn.IsLocked and (G.unlocks == nil or not G.unlocks.isVaultLocked(ssn)) then return ssn end
@@ -563,7 +546,7 @@ function M.handleSongSelectInput(Sort, Diff)
         CONFIG:SetDefaultCourse(0, (CONFIG:GetDefaultCourse(0) + 1) % 5)
         Sort.applySort(); M.refreshPage(true)
     end
-    -- shortcuts.lua decides which shortcuts this select can use (player switch, auto P2, player count...)
+    -- shortcuts.lua decides which shortcuts this select can use
     if SC.pressed("player") then
         G.sounds.Skip:Play()
         local prev = G.highlightedPlayer
@@ -583,8 +566,7 @@ function M.handleSongSelectInput(Sort, Diff)
     elseif G.holdDir == -1 and not navPn.leftPressing() then stopHold()
     end
 
-    -- Pointer navigation (one human player only): the mouse wheel moves one song per notch (wheel down =
-    -- the next song); a touch swipe will feed the same step function later
+    -- pointer navigation (one human player): one song per wheel notch, down = next
     local mouse = G.mouseAllowed()
     local _, wheel = INPUT:GetScrollDelta()
     if mouse and wheel ~= 0 and G.songList ~= nil then
@@ -690,8 +672,8 @@ function M.handleSongSelectInput(Sort, Diff)
     -- Song chosen → start transition to difficulty select
     if G.selectedSongNode ~= nil then
         if G.activeConfig.songOnly then
-            -- Online lobby: pick the SONG only — NO difficulty prompt. Set it as the chosen song globally
-            -- (difficulty is chosen per-player back in the lobby) and signal the parent to return.
+            -- online lobby: song only, no difficulty prompt (chosen per player in the lobby)
+            -- sets the global chosen song and tells the parent to return
             stopHold()
             G.sounds.SongDecide:Play()
             pcall(function() G.selectedSongNode:Mount(0, 0, 0, 0, 0) end)

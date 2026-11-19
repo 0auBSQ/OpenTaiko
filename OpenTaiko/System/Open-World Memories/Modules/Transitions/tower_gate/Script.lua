@@ -1,10 +1,9 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- tower_gate: the stone gate from the title into Survival Mode.
--- The title drops onto the shut gate letter by letter, then the gate opens.
+-- tower_gate: title -> Survival Mode gate transition
 
 local TA = require("TransitionArt")
 
--- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+-- layout: Config/layout.json; timings: Config/animation.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
@@ -15,7 +14,7 @@ local SHUT_AT = CLOSE.shut_at
 local ARRIVE = TITLE_ANIM.arrive_s
 local FALL = TITLE_ANIM.fall_s
 local SHOW_AFTER, TITLE_FADE = TITLE_ANIM.show_after_s, TITLE_ANIM.fade_s
-local TITLE_SECONDS = ARRIVE + FALL + SHOW_AFTER + TITLE_FADE   -- the first part of the fade-in
+local TITLE_SECONDS = ARRIVE + FALL + SHOW_AFTER + TITLE_FADE   -- first part of the fade-in
 local OPEN_SECONDS = TITLE_ANIM.open_s
 
 FADE_OUT_SECONDS = CLOSE.fade_out_s
@@ -44,7 +43,7 @@ local slid, slammed, opened, fired = false, false, false, 0
 local lastPhase = nil
 local wait = TA.new()
 
--- the textures live only during a trip (Lib/TransitionArt)
+-- textures live for one trip (Lib/TransitionArt)
 local function loadTextures()
 	if tx_left == nil then
 		tx_left = TEXTURE:CreateTexture("Textures/GateLeft.jpg")
@@ -71,7 +70,7 @@ local function drawGate(openness, dx, dy)
 	tx_right:Draw(SCREEN_W / 2 + travel + dx, TOP + dy)
 end
 
--- dust from the seam, k goes 0..1 over its life
+-- seam dust, k 0..1 over its life
 local function drawDust(k, strength)
 	if tx_dust == nil or k >= 1 then return end
 	tx_dust:SetOpacity(DUST.opacity * (1 - k) * strength)
@@ -86,7 +85,7 @@ local function drawDust(k, strength)
 	tx_dust:SetScale(1, 1); tx_dust:SetRotation(0); tx_dust:SetOpacity(1)
 end
 
--- each landed letter adds a short jolt
+-- jolt per landed letter
 local function shakeAt(now)
 	local dx, dy = 0, 0
 	for i, L in ipairs(letters) do
@@ -106,7 +105,7 @@ local function title()
 	return TITLE_DEFAULT
 end
 
--- splits the title into letters, each line centred
+-- title letters, each line centred
 local function layout()
 	letters = {}
 	if font == nil then return end
@@ -147,7 +146,7 @@ local function drawLetter(L, dx, dy, scale, alpha)
 	font:Draw(string.format(STONE, L.ch), x, y, fore, outline, alpha, scale, 0, "center")
 end
 
--- now: seconds into the fade-in
+-- now: s into the fade-in
 local function drawTitle(now)
 	while fired < #letters and now >= letters[fired + 1].t0 + FALL do
 		fired = fired + 1
@@ -180,7 +179,7 @@ function fadeOut(t)
 	end
 	if t < SHUT_AT then
 		local p = t / SHUT_AT
-		drawGate(1 - p * p, 0, 0)                 -- heavy: slow to start, fast at the end
+		drawGate(1 - p * p, 0, 0)                 -- ease-in (1 - p^2)
 		return
 	end
 	if not slammed then
@@ -212,7 +211,7 @@ function fadeIn(t)
 	local k = clamp01((now - TITLE_SECONDS) / OPEN_SECONDS)
 	drawGate(easeInOut(k), 0, 0)
 	drawDust(clamp01(k / DUST_ANIM.open_life), DUST_ANIM.open_strength)
-	if t >= 1 then freeTextures() end   -- the trip is over
+	if t >= 1 then freeTextures() end
 end
 
 function onStart()

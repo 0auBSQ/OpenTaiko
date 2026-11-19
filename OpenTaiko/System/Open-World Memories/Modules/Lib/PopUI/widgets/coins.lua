@@ -1,14 +1,10 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- PopUI coins: SimpleUI's coins widget in OWM's look, the CoinBox purse (Lib/CoinBox.lua): the pill, the
--- shared "Coin" texture, the coins flying in on gain and pay. plain = true draws the coin and the number only.
---   ui:coins{ x=, y=, w=300, h=66, amount=0, plain=false, size=, color={r,g,b}, edge={r,g,b,a},
---             coinSfx=<sound>?, paySfx=<sound>? }   -- default: the modal's Coin.ogg, the coin shop's Buy.ogg
---   c:setAmount(n)  c:amount()  c:add(n)  c:gain(n)  c:pay(n)  c:setPrice(n)  c:setBonus(n)  c:drawCoin(x, y, sx, sy, opacity)
+-- PopUI coins: SimpleUI coins widget as the CoinBox purse (Lib/CoinBox.lua)
 
 local Widget  = require("UI.SimpleUI.widget")
 local CoinBox = require("CoinBox")
 
--- the sounds are found from this file's folder (Modules/Lib/PopUI/widgets/), so a global caller finds them too
+-- sounds resolved from this file's folder, so global callers find them
 local HERE = require("Core.Here")(...)
 local MODULES = HERE and HERE:match("^(.*/)[^/]+/[^/]+/[^/]+/$") or nil
 local COIN_SFX = "ROActivities/modal/Sounds/Coin.ogg"
@@ -26,6 +22,9 @@ local function sound(rel)
     return ok and s or nil
 end
 
+-- ui:coins{ x, y, w = 300, h = 66, amount = 0, plain = false, size, color = {r,g,b}, edge = {r,g,b,a},
+--   coinSfx, paySfx }; plain: coin and number only; sfx default: modal Coin.ogg, coin shop Buy.ogg
+-- methods: setAmount, amount, add, gain, pay, setPrice, setBonus, drawCoin(x, y, sx, sy, opacity)
 function Coins.new(o)
     o = o or {}
     o.focusable = false; o._focusableWant = false
@@ -69,14 +68,14 @@ function Coins:draw()
     if not self.visible then return end
     local box = self._box
     if not self.plain then box:draw(); return end
-    -- the coin and the number: the number right-aligned to the widget's right edge, the coin left of it
+    -- number right-aligned to the widget edge, coin left of it
     local mgr = self.mgr
     local size = self.size or 28
     local right = self.x + self.w
     local cy = floor(self.y + self.h * 0.5)
     local count = string.format("%d", floor(box.rolling + 0.5))
     mgr:drawTextEx(size, count, right, cy + mgr:textNudge(size), self.color or { 70, 72, 96 }, self.edge or CLEAR, 1, 1, 0, "right")
-    -- the text box carries 25 px around its ink: the coin stands left of the first digit
+    -- text box pads 25 px around its ink
     local first = right - 25 - mgr:measureText(size, count)
     box:drawCoin(first - 10 - 22, cy, 1, 1, 1)
 end

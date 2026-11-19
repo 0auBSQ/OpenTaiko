@@ -1,4 +1,4 @@
--- German pagoda text, keyed by the exact English the code translates.
+-- German pagoda text, keyed by English source string
 
 local merged = {}
 for _, name in ipairs({ "ui", "story", "entrance", "result", "cutscenes", "items", "credits", "small_talk", "bestiary" }) do

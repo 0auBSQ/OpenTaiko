@@ -1,4 +1,4 @@
--- Ambience of the forest path (the dojo and levels 1-5).
+-- ambience: forest path (dojo, levels 1-5)
 
 local F     = require("towerfx/field")
 local art   = require("towerfx/art")

@@ -1,22 +1,10 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- landlord.lua — the landlord's phone call: he sells room tiers (data/tiers.json) by the coin. Every
--- line lives in lang/<code>/dialogs.json under "landlord": first_call (once per save file, no offer),
--- greetings (one at random), tiers.<n>.pitch / broke / accepted per room tier (2, 3, 4, then
--- "more" for every 10k tier), refuse_first / refuse_second after a No, refused_out once the tenant
--- refused twice in one visit, maxed when no bigger tier exists. The purse (purse.lua) appears with
--- the offer, shows the price, and animates the payment.
---
---   Landlord.init{ save = fn() -> save file, room = fn() -> Room, extend = fn(info) -> bool,
---                  dlgLoc = fn(section, key, fallback), dlgList = fn(section, key, ...) -> lines,
---                  coinBox = <a purse.lua instance> }
---   Landlord.reset()           on entering the room: the refusals are forgiven
---   Landlord.script()          the dialogue nodes for a fresh call
---   Landlord.showPurse()       the {sfx:purse} cue in a line: the purse appears with the offer's price
---   Landlord.onDone(result)    after the dialogue ends: the follow-up script, or nil when the call is over
+-- landlord phone call: sells room tiers (data/tiers.json) for coins
+-- lines: lang/<code>/dialogs.json under "landlord", EN as fallback
 
 local Landlord = {}
 
-local MET = "myroom_landlord_met"          -- save-file trigger: the first call has happened
+local MET = "myroom_landlord_met"          -- save trigger: first call done
 
 local EN = {
     name = "Landlord",
@@ -36,20 +24,22 @@ local EN = {
 }
 
 local ctx = nil
-local step = nil               -- "first" | "offer" | "end": what the running call means
+local step = nil               -- "first" | "offer" | "end"
 local refusals = 0             -- No answers this visit
 local tierKey = nil            -- "2" | "3" | "4" | "more" for the running offer
-local offer = nil              -- the tier on offer during the running call
+local offer = nil              -- nextTierInfo of the running offer
 
+-- c: save() -> save file, room() -> Room, extend(info) -> bool, coinBox (a purse)
+--    dlgLoc(section, key, fallback), dlgList(section, key, ...) -> lines
 function Landlord.init(c) ctx = c end
+-- on entering the room: refusals reset
 function Landlord.reset() refusals, step, tierKey, offer = 0, nil, nil, nil end
 function Landlord.refusals() return refusals end
 function Landlord.step() return step end
 
 local function LL(key) return ctx.dlgLoc("landlord", key, EN[key] or key) end
 
--- a list of lines at a dotted path under "landlord" (tiers.2.pitch) in the current language (each line
--- falls back to English); the code's own list when the files or the path are missing
+-- lines at a dotted path under "landlord"; fallback list when missing
 local function lines(path, fallback)
     local out = {}
     if ctx.dlgList then
@@ -77,15 +67,17 @@ local function nodes(list, info)
     return out
 end
 
+-- "more": every tier past 4
 local function tierKeyFor(tier)
     if tier <= 4 then return tostring(tier) end
     return "more"
 end
 
+-- dialogue nodes for a new call
 function Landlord.script()
     local sf, room = ctx.save(), ctx.room()
     if not sf:GetGlobalTrigger(MET) then
-        step = "first"                              -- introductions only; the offer waits for the next call
+        step = "first"                              -- no offer on the first call
         return nodes(lines("first_call", EN.first_call))
     end
     if refusals >= 2 then
@@ -103,7 +95,7 @@ function Landlord.script()
     tierKey, offer = tierKeyFor(room.tier + 1), info
     for _, n in ipairs(nodes(lines("tiers." .. tierKey .. ".pitch", EN.pitch), info)) do script[#script + 1] = n end
     if sf.Coins < info.cost then
-        step = "end"                                -- no choice for an empty purse: he hangs up himself
+        step = "end"                                -- not enough coins: no choice
         for _, n in ipairs(nodes(lines("tiers." .. tierKey .. ".broke", EN.broke), info)) do script[#script + 1] = n end
         return script
     end
@@ -112,13 +104,14 @@ function Landlord.script()
     return script
 end
 
--- the line that names the price carries {sfx:purse}: the purse comes up showing the balance and the price
+-- {sfx:purse} cue in the price line
 function Landlord.showPurse()
     if offer == nil then return end
     ctx.coinBox:show(ctx.save().Coins)
     ctx.coinBox:setPrice(offer.cost)
 end
 
+-- after the dialogue: follow-up nodes, or nil when the call is over
 function Landlord.onDone(result)
     if step == "first" then
         ctx.save():SetGlobalTrigger(MET, true)

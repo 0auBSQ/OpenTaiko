@@ -462,7 +462,7 @@ La propiedad UnlockCondition de los handles de información de placa de nombre, 
 La resolución del skin, los ajustes de tema, las cadenas localizadas de ámbito de skin y las definiciones de ajustes de tema.
 
 <div class="callout warn">
-El skin declara los ajustes de tema en ThemeSettings.json y guarda sus valores en el ThemeSettings.db3 contiguo. Los getters devuelven siempre los valores de los ajustes como cadenas; un ajuste ausente devuelve su valor por defecto declarado, o una cadena vacía si no existe ninguna declaración. Los métodos ForPlayer ajustan un jugador fuera de rango a 0 o 4. Los índices de definición empiezan en 0.
+El skin declara los ajustes de tema en ThemeSettings.json y guarda sus valores en `Global/ApplicationData/SkinSettings_<skin folder>.db3`, fuera de la carpeta del skin, para que sobrevivan a una actualización del skin. Los getters devuelven siempre los valores de los ajustes como cadenas; un ajuste ausente devuelve su valor por defecto declarado, o una cadena vacía si no existe ninguna declaración. Los métodos ForPlayer ajustan un jugador fuera de rango a 0 o 4. Los índices de definición empiezan en 0.
 </div>
 
 | Método | Descripción |

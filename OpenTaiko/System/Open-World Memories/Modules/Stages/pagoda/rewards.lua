@@ -1,2 +1,2 @@
--- Shim for Global/Modules/Lib/Pagoda/Rewards.lua.
+-- alias of Global/Modules/Lib/Pagoda/Rewards.lua
 return require("Pagoda.Rewards")

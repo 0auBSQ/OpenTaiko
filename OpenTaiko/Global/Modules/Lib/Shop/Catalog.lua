@@ -1,12 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field
--- Shop.Catalog: the coin shop's items, the itempool table of Items.db3 next to this file. A row:
---   Code      unique code ("furn_<id>" = My Room furniture, "vault_key_*", "nameplate_<n>", ...)
---   Type      what a purchase grants (see M.GRANTS): "nameplate" (RefInt = nameplate id),
---             "triggerable" (RefText = trigger set), "counterable" (RefText = counter raised by the
---             quantity), "empty" (the big slot stays empty that day)
---   Price, Name (a LANG JSON string), Slot ("regular" or "major"), PoolSize (its weight in the pool),
---   Condition (a trigger that must be set for the row to show), StockMin/StockMax (a ranged stock
---   bought unit by unit when StockMax > 0), OneTime (1 = bought once ever, then never offered again)
+-- Shop.Catalog: coin shop items (itempool table of Items.db3 beside this file)
 
 local Util  = require("Core.Util")
 local Texts = require("Shop.Texts")
@@ -16,7 +9,7 @@ local M = {}
 
 M.SLOTS = { normal = "regular", big = "major" }
 
--- SQL opens paths under the calling module's folder: the database is reached from there
+-- SQL paths are relative to the calling module's folder
 local function dbPath()
     local ok, from = pcall(function() return STORAGE:GetFullPath(".") end)
     if not ok or type(from) ~= "string" or HERE == nil then return "Databases/Items.db3" end
@@ -35,6 +28,9 @@ M.dbPath = dbPath
 
 local db = nil
 
+-- row: Code, Type (see M.GRANTS; "empty" = big slot empty that day), RefInt/RefText, Price,
+-- Name (LANG JSON), Slot ("regular" | "major"), PoolSize (weight), Condition (trigger),
+-- StockMin/StockMax (ranged stock when StockMax > 0), OneTime (1 = once ever)
 -- the rows of one Slot, in the table's order
 function M.rows(slot)
     if db == nil then db = SQL:OpenSQLDatabase(dbPath()) end
@@ -61,9 +57,8 @@ function M.find(code)
     return nil
 end
 
--- One-time items (OneTime = 1, e.g. the pod) are bought once ever. A furniture grant counter
--- (.myroom_<id>) is drained by My Room, so a bought one-time item sets the lasting trigger
--- "<RefText>_owned", which drops it from every later roll.
+-- OneTime = 1: bought once ever; sets the trigger "<RefText>_owned"
+-- (My Room drains the .myroom_<id> grant counter)
 function M.isOneTime(entry) return tonumber(entry.OneTime or 0) == 1 end
 function M.ownedTrigger(entry) return entry.RefText .. "_owned" end
 

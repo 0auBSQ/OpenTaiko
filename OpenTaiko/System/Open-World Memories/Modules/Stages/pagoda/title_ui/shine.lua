@@ -1,4 +1,4 @@
--- Shine bars across a line of text, masked to the letters.
+-- shine bars over a text line, masked to the letters
 
 local Easing = require("Easing")
 local Rainbow = require("Rainbow")
@@ -43,8 +43,8 @@ local function drawBar(mask, x, y, sx, p, hw, a, row0, row1, ymid)
     end
 end
 
--- st = M.new() state; mask = the text's white texture, drawn at (x, y) with x scale sx;
--- row0..row1 = its ink rows; spark = the glitter texture
+-- st: M.new() state; mask: text texture at (x, y), x scale sx
+-- row0..row1: ink rows; spark: glitter texture
 function M.draw(st, dt, mask, x, y, sx, row0, row1, spark)
     st.t = st.t + (dt or 0)
     if mask == nil or not mask.Ready then return end

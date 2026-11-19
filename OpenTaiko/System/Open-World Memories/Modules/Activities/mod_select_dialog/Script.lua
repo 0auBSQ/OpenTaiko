@@ -16,7 +16,7 @@ end
 local reactive = false
 local player = 0
 local save = nil
-local restrictMods = false   -- online lobby: when true, only the Auto choice of Special Mods is hidden (Fun Mod incl. Dynamic Beat stays, per-player)
+local restrictMods = false   -- online lobby: hides the Auto choice of Special Mods
 
 -- Mod options
 local options = {}
@@ -53,9 +53,7 @@ local SLIDE_STEP = SLIDE.duration_s / SLIDE_DIST   -- the counter's seconds per 
 local bgpos = SLIDE_DIST
 local bgtlop = 0
 
--- ============================================================
--- UI Layout Constants
--- ============================================================
+-- ==== UI layout ====
 local OPTIONS = Layout.options
 local FOOTER = Layout.footer
 local TILE = Layout.background_tile
@@ -72,9 +70,7 @@ local MENU_CANCEL_X         = FOOTER.cancel_x      -- X of the Cancel button
 local MENU_DESC_Y           = Layout.description.y -- Y of the description line at the bottom
 local MENU_DESC_X           = Layout.description.x -- X of the description line
 
--- ============================================================
--- Color palette (hex strings for COLOR:CreateColorFromHex)
--- ============================================================
+-- ==== Colours (hex for COLOR:CreateColorFromHex) ====
 local COLORS = Layout.colors
 local COL_WHITE      = COLORS.white_color
 local COL_GRAY       = COLORS.gray_color
@@ -84,9 +80,7 @@ local COL_LIGHTGREEN = COLORS.light_green_color
 local COL_ORANGE     = COLORS.orange_color
 local COL_RED        = COLORS.red_color
 
--- ============================================================
--- Static option definitions (choices, colors, per-choice desc)
--- ============================================================
+-- ==== Option definitions ====
 -- Special Mods: the values of CONFIG:GetSpecialMod / SetSpecialMod. The label of value n is the locale key
 -- MOD_SPECIAL<n+1>, its description MOD_SPECIAL<n+1>_DESC.
 local SPECIAL_AUTO = 1
@@ -195,7 +189,7 @@ local OPTION_DEFS = {
     },
 }
 
--- Total selectable items in step 1 (8 options + OK + Cancel)
+-- step 1 items: the options, then OK and Cancel
 local OPTION_COUNT  = #OPTION_DEFS
 local OK_INDEX      = OPTION_COUNT        -- 0-based index
 local CANCEL_INDEX  = OPTION_COUNT + 1
@@ -216,9 +210,7 @@ local function loadStrings()
     strings.cancelDesc = tr("SONGSELECT_MODS_CANCEL_DESC", "Discard all changes and exit the menu.")
 end
 
--- ============================================================
--- Helper: counter
--- ============================================================
+-- ==== Counter helper ====
 local function startCounter(key, startVal, endVal, interval, mode, updateCallback, onFinish)
     local c = COUNTER:CreateCounter(startVal, endVal, interval, onFinish)
     if mode == "loop" then c:SetLoop(true)
@@ -235,9 +227,8 @@ local function updateTransitionVisuals(val)
     bgtlop = math.max(0, math.min(255, bgOpacity))
 end
 
--- ============================================================
--- Helper: background draw (saves ~8 MB of RAM vs full texture)
--- ============================================================
+-- ==== Background ====
+-- tiled: ~8 MB less RAM than a full texture
 local function drawBg(opacity)
     tx["bgtile"]:SetOpacity((opacity * bgtlop) / 255)
     for i = 0, TILE.columns - 1, 1 do
@@ -247,16 +238,12 @@ local function drawBg(opacity)
     end
 end
 
--- ============================================================
--- Helper: scroll speed display  e.g. value 19 -> "2.0"
--- ============================================================
+-- ==== Scroll speed display ====
 local function scrollSpeedDisplay(value)
     return string.format("%.1f", CONFIG.SCROLLSPEED:ToActual(value))
 end
 
--- ============================================================
--- Helper: footer description depending on current state
--- ============================================================
+-- ==== Footer description ====
 local function getCurrentDesc()
     if selectedIndex == OK_INDEX then
         return strings.okDesc
@@ -286,9 +273,8 @@ local function localizedChoices(defChoices)
     return list
 end
 
--- ============================================================
--- loadOptions – reads current config values into the options table
--- ============================================================
+-- ==== Load options ====
+-- config values -> options
 local function loadOptions()
     options = {}
     for _, def in ipairs(OPTION_DEFS) do
@@ -328,16 +314,15 @@ local function loadOptions()
             max     = def.max,      -- scroll only
         })
     end
-    -- recompute the navigation counts from the option list, so the OK/Cancel indices always follow it
+    -- navigation counts follow the option list (OK/Cancel indices)
     OPTION_COUNT = #options
     OK_INDEX     = OPTION_COUNT
     CANCEL_INDEX = OPTION_COUNT + 1
     TOTAL_ITEMS  = OPTION_COUNT + 2
 end
 
--- ============================================================
--- saveOptions – writes modified values back to config
--- ============================================================
+-- ==== Save options ====
+-- options -> config
 local function saveOptions()
     for _, option in ipairs(options) do
         local methodName = SETTER_MAP[option.meta]
@@ -351,9 +336,7 @@ local function saveOptions()
     end
 end
 
--- ============================================================
--- Draw
--- ============================================================
+-- ==== Draw ====
 function draw()
     drawBg(TILE.opacity)
     tx["bg"]:SetOpacity(bgtlop / 255)
@@ -370,16 +353,14 @@ function draw()
     titleTx:SetOpacity(alpha)
     titleTx:Draw(MENU_TITLE_X, MENU_TITLE_Y)
 
-    -- --------------------------------------------------------
-    -- Option rows
-    -- --------------------------------------------------------
+    -- ==== Option rows ====
     for i, opt in ipairs(options) do
         local idx    = i - 1
         local ypos   = MENU_ORIGIN_Y + idx * MENU_OPTION_SPACING_Y
         local isSel  = (selectedIndex == idx)
         local isEdit = (editingOption and isSel)
 
-        -- Label (highlighted when row is selected in step 1 or being edited in step 2)
+        -- Label: highlighted when selected (step 1) or edited (step 2)
         local labelCol = isSel and COLOR:CreateColorFromHex(COL_HIGHLIGHT)
                                 or COLOR:CreateColorFromHex(COL_WHITE)
         local labelTx = text:GetText(opt.text, false, OPTIONS.label_max_w, labelCol)
@@ -401,11 +382,6 @@ function draw()
                 local choiceVal = ci - 1
                 local isActive  = (opt.value == choiceVal)
 
-                -- Color logic:
-                --   Active choice: use its defined color
-                --   Inactive choice: gray
-                --   When NOT in edit mode the active choice is always shown in its color
-                --     so the player can see what is currently set at a glance
                 local choiceCol
                 if isActive then
                     choiceCol = COLOR:CreateColorFromHex(choice.color)
@@ -421,9 +397,7 @@ function draw()
         end
     end
 
-    -- --------------------------------------------------------
-    -- OK / Cancel footer buttons
-    -- --------------------------------------------------------
+    -- ==== OK / Cancel ====
     local okCol  = (selectedIndex == OK_INDEX)     and COLOR:CreateColorFromHex(COL_HIGHLIGHT)
                                                    or  COLOR:CreateColorFromHex(COL_WHITE)
     local canCol = (selectedIndex == CANCEL_INDEX) and COLOR:CreateColorFromHex(COL_HIGHLIGHT)
@@ -436,9 +410,7 @@ function draw()
     okTx:Draw(MENU_OK_X,     MENU_FOOTER_Y)
     canTx:Draw(MENU_CANCEL_X, MENU_FOOTER_Y)
 
-    -- --------------------------------------------------------
-    -- Description line (bottom)
-    -- --------------------------------------------------------
+    -- ==== Description line ====
     local descStr = getCurrentDesc()
     if descStr and descStr ~= "" then
         local descTx = textSmall:GetText(descStr, false, Layout.description.max_w)
@@ -447,9 +419,7 @@ function draw()
     end
 end
 
--- ============================================================
--- Update
--- ============================================================
+-- ==== Update ====
 function update()
     for k, counter in pairs(ctx) do
         counter:Tick()
@@ -460,9 +430,7 @@ function update()
     local navPn = NavInput.p[player+1]
 
     if editingOption == false then
-        -- --------------------------------------------------------
-        -- Step 1 – navigate the list
-        -- --------------------------------------------------------
+        -- ==== Step 1: list navigation ====
         if navPn.right() then
             sounds.Skip:Play()
             selectedIndex = (selectedIndex + 1) % TOTAL_ITEMS
@@ -503,9 +471,7 @@ function update()
         end
 
     else
-        -- --------------------------------------------------------
-        -- Step 2 – edit selected option value
-        -- --------------------------------------------------------
+        -- ==== Step 2: edit the selected option ====
         local opt = options[selectedIndex + 1]
         if opt == nil then editingOption = false return end
 
@@ -552,9 +518,7 @@ function update()
     end
 end
 
--- ============================================================
--- Lifecycle
--- ============================================================
+-- ==== Lifecycle ====
 function activate(pl, restrict)
     restrictMods = restrict == true
     save   = GetSaveFile(pl)
@@ -579,7 +543,7 @@ function deactivate()
     for k, counter in pairs(ctx) do
         counter = COUNTER:EmptyCounter()
     end
-    -- Note: saveOptions() is called explicitly before DEACTIVATE() only on OK
+    -- saveOptions() runs before DEACTIVATE() on OK only
 end
 
 function onStart()

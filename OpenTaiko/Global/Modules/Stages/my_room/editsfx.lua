@@ -1,16 +1,6 @@
 ---@diagnostic disable: undefined-global
--- editsfx.lua — the edit mode's own sound set: Sounds/Edit/<name>.ogg
--- Loaded on first use and freed with the stage. One name per thing that
--- happens, so editmode.lua reads as the action rather than the nearest menu sound:
---   hover          the cursor lands on another cell, slot, tile or piece
---   select / back  a piece's buttons open / the selection or a sub-mode closes
---   open / close   entering / leaving edit mode
---   pickup         a piece (or the doorway) lifts into the hand
---   place          furniture set on the floor; place_soft set on a surface; hang hung on the wall
---   rotate         a turn or a wall-mount flip; refuse when the room says no
---   remove         a piece back to the inventory; erase for flooring and paint
---   paint_floor / paint_wall
---   door           the doorway moved
+-- edit mode sounds: Sounds/Edit/<name>.ogg, loaded on first use
+-- names: hover select back open close pickup place place_soft hang rotate refuse remove erase paint_floor paint_wall door
 
 local M = {}
 local cache = {}
@@ -28,7 +18,7 @@ function M.play(name)
     if s ~= nil then s:Play() end
 end
 
--- the set-down sound for a piece that just landed: on the wall, on a surface, or on the floor
+-- set-down sound name: wall, surface or floor
 function M.landed(it, kind)
     if kind == "wall" then return "hang" end
     if it.on then return "place_soft" end

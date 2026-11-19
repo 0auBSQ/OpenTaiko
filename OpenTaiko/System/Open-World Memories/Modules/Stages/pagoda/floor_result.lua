@@ -371,7 +371,7 @@ local function startRun()
     setPhase("run")
 end
 
--- the cutscene's state goes; its textures stay for the credits, which open on its last frame
+-- cutscene state goes; its textures stay for the credits (they open on its last frame)
 local function startCredits()
     scene.close()
     _credits.open()

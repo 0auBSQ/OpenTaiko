@@ -1,5 +1,6 @@
 -- Picks an encounter's background band from the level and the run context.
--- Band modules implement:
+
+-- band modules implement:
 --   keys(level, ctx, variant) -> manifest keys to load for the visit
 --   open(level, ctx, variant), close()
 --   sky() -> grey, visible
@@ -7,8 +8,7 @@
 --   update(dt)
 --   drawBehind(ox, oy), drawBack(ox, oy), drawMid(ox, oy), drawFront(ox, oy)
 --   optional monsterAlpha() -> monster body opacity (1 when absent)
--- ox, oy: optional screen-shake offset (view.shake keeps the last one).
-
+-- ox, oy: optional screen-shake offset (view.shake keeps the last one)
 local forest     = require("encounter/bands/forest")
 local pagoda     = require("encounter/bands/pagoda")
 local checkpoint = require("encounter/bands/checkpoint")

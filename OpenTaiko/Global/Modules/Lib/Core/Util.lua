@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global, lowercase-global, need-check-nil
----@-- Util.lua — general math/data structure helpers
+-- math and data helpers
 
 local Util = {}
 
@@ -7,20 +7,19 @@ function Util.clamp(v, lo, hi) if v < lo then return lo elseif v > hi then retur
 function Util.lerp(a, b, t) return a + (b - a) * t end
 function Util.round(v) return math.floor(v + 0.5) end
 
--- recursive functions need to be defined using local references
+-- recursive helpers must be local functions
 
--- Clone a C# Dictionary into a Lua table safely
+-- C# Dictionary -> Lua table (recursive)
 local function cloneTable(t)
     local copy = {}
 
-    -- Get enumerator from the dictionary
     local enumerator = t:GetEnumerator()
     while enumerator:MoveNext() do
         local kvp = enumerator.Current
         local key = kvp.Key
         local value = kvp.Value
 
-        -- Recursively clone if it's another Dictionary
+        -- nested Dictionary
         if value ~= nil and type(value) == "userdata" and value.GetEnumerator then
             copy[key] = cloneTable(value)
         else
@@ -32,7 +31,7 @@ local function cloneTable(t)
 end
 Util.cloneTable = cloneTable
 
--- Deep copy Lua table
+-- deep copy (metatables included)
 local function deepcopy(o, seen)
     seen = seen or {}
     if o == nil then return nil end
@@ -54,7 +53,7 @@ local function deepcopy(o, seen)
 end
 Util.deepcopy = deepcopy
 
--- merge `over` onto a clone of `base` (recursive for sub-tables; scalars replaced whole).
+-- merge `over` onto a clone of `base` (recursive for sub-tables; scalars replaced whole)
 local function merge(base, over)
     if type(over) ~= "table" then return over end
     local out = deepcopy(base)

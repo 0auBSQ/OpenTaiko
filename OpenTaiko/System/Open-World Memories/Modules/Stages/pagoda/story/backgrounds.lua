@@ -1,13 +1,4 @@
--- VN backgrounds by key, for scene.bg and {bg=} lines.
--- A key with no entry loads Textures/story/bg/<key>.png stretched over the screen.
--- An entry is one layer or { layers = { ... } }, bottom to top. Layer keys:
---   path    image file, relative to the stage folder
---   asset   encounter/assets key of the same file, drawn while the encounter holds it
---   x, y    top-left in 1920x1080 space; without them the layer is stretched over the screen
---   scale   draw scale of a placed layer (default 1)
---   scroll  horizontal scroll, px/s; the layer repeats across the screen
--- Entry keys: sky = grey (0..1) of the stage sky shown through it; level = the encounter level whose
--- effects play over it (story/vn_effects); music = the loop played while it shows (story/vn_music.lua).
+-- VN backgrounds by key (scene.bg, {bg=} lines)
 
 local Config = require("Core.Config")
 local Layout    = Config.load("Config/layout.json")
@@ -18,6 +9,18 @@ local BgAnim = Animation.story.backgrounds
 
 local trail = { path = "Textures/encounter/bg/trail.jpg", asset = "bg_trail", level = 1, music = "forest" }
 
+-- no entry: Textures/story/bg/<key>.png, full screen
+-- entry: one layer or { layers = { ... } }, bottom to top
+-- layer keys:
+--   path    file path from the stage folder
+--   asset   encounter/assets key, drawn while the encounter holds it
+--   x, y    top-left in 1920x1080; unset: full screen
+--   scale   default 1
+--   scroll  px/s, repeats horizontally
+-- entry keys:
+--   sky     stage sky grey, 0..1
+--   level   encounter level for story/vn_effects
+--   music   story/vn_music.lua loop
 return {
     forest = trail,
     fox_village = trail,

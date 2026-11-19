@@ -1,7 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Down background 4 (Spooky): a single Assets.png sprite-atlas Halloween scene — scrolling fog/trees
--- base with a per-player(0) clear fade revealing slime, candies, lollipop, bouncing ghosts, scrolling
--- banners and a (front/back/eyes or alt) cat. Ported from the old ScriptBG func: API to ROActivity.
+-- down background 4: Spooky (Assets.png atlas)
 
 local time = 0
 
@@ -125,7 +123,6 @@ function Reset()
     SimpleScale(1)
 end
 
--- function for lazy people (me)
 function DrawRepeat(asset, x, y, x_offset)
     tx["Assets.png"]:DrawRect(x, y + 540, asset.x + x_offset, asset.y, asset.w, asset.h);
 end

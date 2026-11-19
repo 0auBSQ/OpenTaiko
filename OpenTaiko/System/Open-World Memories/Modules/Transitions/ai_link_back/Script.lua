@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- ai_link_back: AI battle song select to the title (drawn by Lib/AILink).
+-- ai_link_back: AI battle song select -> title (Lib/AILink)
 
 local AI = require("AILink")
 local anim = AI.new("TRANSITION_AI_OUT", "Disconnecting AItritus...")

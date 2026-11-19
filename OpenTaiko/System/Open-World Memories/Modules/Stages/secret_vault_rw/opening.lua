@@ -17,32 +17,31 @@ local CHEST_X = Chest.x
 local CHEST_SCALE = Chest.scale
 local CHEST_H, HOLE_Y = Chest.h, Chest.hole_y
 
--- the key: its scale once home and when its tip touches the keyhole; where it starts (px off the keyhole at the
--- keyhole's depth), how close (depth, 1 = the keyhole), turned and seen from the side (1 = end-on)
+-- key scale home and at touch; start: px off the keyhole at its depth
+-- depth 1 = keyhole; yaw 1 = end-on
 local KEY_K = Chest.key_scale
 local TOUCH_K = KeyMotion.touch_scale
 local START_X, START_Y, Z0, START_ROT, YAW = KeyMotion.start_x, KeyMotion.start_y, KeyMotion.start_depth, KeyMotion.start_rot_deg, KeyMotion.start_yaw
 local TURNED, WIND_DEG, OVER = KeyMotion.turned_deg, KeyMotion.wind_deg, KeyMotion.over_deg
-local SHARDS_X, SHARDS_Y = Shards.cols, Shards.rows   -- a broken key falls apart in this many pieces
+local SHARDS_X, SHARDS_Y = Shards.cols, Shards.rows   -- broken key pieces
 
--- seconds from the start
+-- sec from the start
 local DROP_AT, FALL = Time.drop_at_s, Time.fall_s
 local LAND_AT = DROP_AT + FALL
 local KEY_AT, FLY, PUSH = Time.key_at_s, Time.fly_s, Time.push_s
 local TOUCH = KEY_AT + FLY
 local SEATED = TOUCH + PUSH
 local TURN_AT, WIND, TURN, SETTLE = Time.turn_at_s, Time.wind_s, Time.turn_s, Time.settle_s
-local KEYIN_CLICK = Time.keyin_click_s           -- KeyIn.ogg's click, played to land as the key gets home
-local TURN_CLUNK = Time.turn_clunk_s             -- KeyTurn.ogg's bolt, played to land on the turn's furthest point
+local KEYIN_CLICK = Time.keyin_click_s           -- KeyIn.ogg click offset, lands as the key gets home
+local TURN_CLUNK = Time.turn_clunk_s             -- KeyTurn.ogg bolt offset, lands on the turn's furthest point
 local AFTER = Time.after_s
 local SHATTER_AT = AFTER + Time.shatter_after_s
 local OPEN_AT = AFTER + Time.open_after_s
 local POP, LEAVE = Time.pop_s, Time.leave_s
 local WON_Y, BANNER_Y = Chest.won_y, Banner.y
 
--- the punch, in seconds from the hit; the flight is in the room's space (cabin.lua): the chest stands on the desk at
--- depth CHEST_Z and lands on the floor at (LAND_X, LAND_Z), ARC px over its straight path at the top; past BEHIND_Z
--- it is drawn behind Mr.Caspian
+-- punch, sec from the hit; flight in room space (cabin.lua), ARC px over the straight path
+-- from desk depth CHEST_Z to the floor at (LAND_X, LAND_Z); past BEHIND_Z drawn behind Mr.Caspian
 local HIT_X, HIT_Y = Chest.hit.x, Chest.hit.y
 local HITSTOP, FLIGHT, FLASH = Punch.hitstop_s, Punch.flight_s, Punch.flash_s
 local CHEST_Z, BEHIND_Z = Punch.chest_depth, Punch.behind_depth
@@ -53,7 +52,7 @@ local FADE_AT, FADE_OUT = LANDED + Punch.fade_after_s, Punch.fade_s
 local HEY_AT = Punch.hey_after_s
 local PUNCH_END = FADE_AT + FADE_OUT
 
--- the kick, in seconds from it: the flash at the bottom centre, the jolt (px, s, degrees of twist), the tumble
+-- kick, sec from it; jolt: px, s, twist deg
 local KICK_X, KICK_Y, KICK_FLASH = Chest.kick_flash.x, Chest.kick_flash.y, Kick.flash_s
 local JOLT, JOLT_TIME, JOLT_TWIST = Kick.jolt_px, Kick.jolt_s, Kick.jolt_twist_deg
 local TUMBLE_AT, TUMBLE_TIME = Kick.tumble_at_s, Kick.tumble_s
@@ -103,18 +102,16 @@ local function chestTex(open)
     return ctx.tex["Chest/Chest" .. run.chest .. (open and "Open" or "")]
 end
 
----------------------------------------
--- The chest: fall, landing, bounces
----------------------------------------
+-- ==== Chest: fall and bounces ====
 
--- its bottom's y, its squash (sx, sy) and its turn at time t
+-- returns bottom y, sx, sy, turn deg at t
 local function chestPose(t)
     if t < LAND_AT then
         local u = Tex.clamp01((t - DROP_AT) / FALL)
         local y = Tex.lerp(Fall.from_y, DESK_Y, u * u)            -- gravity: from rest above the screen
         return y, 1 - Fall.squash_x * u, 1 + Fall.stretch_y * u, Fall.rot_deg * (1 - u) ^ Fall.rot_ease_pow
     end
-    -- the slam, the first bounce, its knock, the second small bounce, its knock (the sound's knocks)
+    -- phases timed to the sound's knocks
     local B = Bounce
     local slamEnd = B.slam_s
     local bounce1End = slamEnd + B.bounce1_s
@@ -122,11 +119,11 @@ local function chestPose(t)
     local bounce2End = knock1End + B.bounce2_s
     local knock2End = bounce2End + B.knock2_s
     local l = t - LAND_AT
-    if l < slamEnd then                                           -- the slam: flattened, then springing back
+    if l < slamEnd then                                           -- slam
         local q = Easing.hump(l / B.slam_s)
         return DESK_Y, 1 + B.slam_x * q, 1 - B.slam_y * q, 0
     end
-    if l < bounce1End then                                        -- the first bounce, stretched as it leaves
+    if l < bounce1End then                                        -- bounce 1
         local u = (l - slamEnd) / B.bounce1_s
         local st = 1 + B.bounce1_stretch * (1 - u) * (1 - u)
         return DESK_Y - B.bounce1_px * 4 * u * (1 - u), 2 - st, st, B.bounce1_rot_deg * math.sin(u * math.pi)
@@ -135,7 +132,7 @@ local function chestPose(t)
         local q = Easing.hump((l - bounce1End) / B.knock1_s)
         return DESK_Y, 1 + B.knock1_x * q, 1 - B.knock1_y * q, 0
     end
-    if l < bounce2End then                                        -- the second, small one
+    if l < bounce2End then                                        -- bounce 2
         local u = (l - knock1End) / B.bounce2_s
         return DESK_Y - B.bounce2_px * 4 * u * (1 - u), 1, 1, 0
     end
@@ -146,7 +143,7 @@ local function chestPose(t)
     return DESK_Y, 1, 1, 0
 end
 
--- a random value in a [min, max] list
+-- r = { min, max }
 local function rndIn(r) return rnd(r[1], r[2]) end
 
 local function landed(now)
@@ -171,21 +168,21 @@ local function landed(now)
     end
 end
 
--- the zoom that keeps the screen's edge out of sight with the screen turned by deg
+-- zoom hiding the screen edge at rotation deg
 local function cover(deg)
     local r = math.rad(deg)
     local c, s = math.abs(math.cos(r)), math.abs(math.sin(r))
     return c + s * Tex.SW / Tex.SH
 end
-local PEAK = math.deg(math.atan(Tex.SW, Tex.SH))     -- the turn that needs the most zoom (60.6 degrees)
+local PEAK = math.deg(math.atan(Tex.SW, Tex.SH))     -- max-zoom rotation (60.6 deg)
 
--- the kicked view: the jolt, then one full turn; between the turn's first and last peak the zoom holds at its most,
--- so it does not pump
+-- kicked view: jolt, then one full turn
+-- zoom held at max between the turn's peaks (no pumping)
 local function kickCam(now, dt)
     local a = now - kickT
     local deg = 360 * Easing.inOutCubic(Tex.clamp01((a - TUMBLE_AT) / TUMBLE_TIME))
     local need = (deg > PEAK and deg < 360 - PEAK) and cover(PEAK) or cover(deg)
-    local j = Tex.clamp01(1 - a / JOLT_TIME)              -- the jolt still left (it fades out evenly)
+    local j = Tex.clamp01(1 - a / JOLT_TIME)              -- jolt left, linear fade
     pcall(function()
         GLOBALCAMERA:SetRotation(deg < 360 and deg or 0)
         GLOBALCAMERA:SetUniformZoom(need * cover(JOLT_TWIST * j) + Kick.jolt_zoom * j)
@@ -193,7 +190,7 @@ local function kickCam(now, dt)
     end)
 end
 
--- the screen camera while it shakes: zoomed in a little more than it shakes, so no edge shows
+-- zoom just over the shake so no edge shows
 local function camStep(now, dt)
     if camT == nil or GLOBALCAMERA == nil then return end
     if kickT ~= nil then kickCam(now, dt); return end
@@ -206,17 +203,14 @@ local function camStep(now, dt)
     end)
 end
 
----------------------------------------
--- The key, seen from the front
----------------------------------------
+-- ==== Key, front view ====
 
--- the keyhole on screen for a chest bottom at y squashed by sy
+-- keyhole on screen for chest bottom y, squash sy
 local function holeAt(y, sy)
     return CHEST_X, y - (CHEST_H - HOLE_Y) * CHEST_SCALE * sy
 end
 
--- the quarter turn on the key's length, in degrees (clockwise is negative): a small wind back, an eased turn past
--- the quarter, a settle
+-- deg, clockwise negative; phases WIND, TURN, SETTLE
 local function keyAngle(t)
     if t < TURN_AT then return 0 end
     local a = t - TURN_AT
@@ -227,12 +221,11 @@ local function keyAngle(t)
     return TURNED - OVER * math.cos(u * math.pi * KeyMotion.settle_turns) * (1 - u)
 end
 
--- the key at time t: its offset from the keyhole, its scale, its turn (deg) and how far it is seen from the side
--- (1 = end-on); nil before it comes
+-- returns dx, dy from the keyhole, scale, turn deg, yaw (1 = end-on); nil before KEY_AT
 local function keyPose(t)
     if t < KEY_AT then return nil end
     if t < TOUCH then
-        -- coming in from close to us: the nearer, the bigger and the further off the keyhole's axis
+        -- fly-in: size and offset scale with 1 / depth
         local u = (t - KEY_AT) / FLY
         local z = Tex.lerp(Z0, 1, Easing.inOutSine(u))
         local o = 1 - Easing.inOutSine(u)
@@ -240,7 +233,7 @@ local function keyPose(t)
     end
     local k = KEY_K
     if t < SEATED then
-        -- the tip goes in: pushed a little past home, then back
+        -- push: a little past home, then back
         local u = (t - TOUCH) / PUSH
         local split, back = KeyMotion.push_split, KeyMotion.push_back_scale
         if u < split then
@@ -267,7 +260,7 @@ local function drawKey(t, hx, hy, op)
     Tex.sprite(key, Tex.frame(x, y, rot, k), yaw, 1, op)
 end
 
--- the key flies apart where it is: cut in pieces, thrown out and falling
+-- splits the key into SHARDS_X x SHARDS_Y falling pieces
 local function breakKey(t, hx, hy)
     run.shards = {}
     local key = ctx.tex["Chest/KeyFront" .. run.chest]
@@ -306,12 +299,9 @@ local function drawShards(t, dt)
     end
 end
 
----------------------------------------
--- The punch
----------------------------------------
+-- ==== Punch ====
 
--- the punched chest a seconds after the hit: its bottom on screen (x, y), its squash (sx, sy), its turn, its depth
--- and its opacity
+-- a: sec after the hit; returns bottom x, y, sx, sy, turn, depth, opacity
 local function punchPose(a)
     if a < HITSTOP then
         local j = (math.floor(a * Punch.jitter_hz) % 2 == 0) and Punch.jitter_px or -Punch.jitter_px
@@ -322,13 +312,13 @@ local function punchPose(a)
     local FY = Cabin.FLOOR_Y
     if a < LANDED then
         local u = (a - HITSTOP) / FLIGHT
-        local s = 1 - (1 - u) ^ Punch.water_pow                   -- slowed by the water as it goes
+        local s = 1 - (1 - u) ^ Punch.water_pow                   -- water drag
         local z = Tex.lerp(CHEST_Z, LAND_Z, s)
         local Y = Tex.lerp(Y0, FY, u) - ARC * 4 * u * (1 - u)
         local x, y = Cabin.project(Tex.lerp(X0, LAND_X, s), Y, z)
         return x, y, 1, 1, TUMBLE * Easing.outQuad(u), z, op
     end
-    -- on the floor: a squash, one small hop, a smaller squash
+    -- on the floor: squash and hop phases
     local l = a - LANDED
     local sx, sy, Y = 1, 1, FY
     local squashEnd = Punch.land_squash_s
@@ -380,9 +370,7 @@ function O.drawBack(now)
     if run ~= nil and run.punchT ~= nil then drawPunched(now, true) end
 end
 
----------------------------------------
--- The kick
----------------------------------------
+-- ==== Kick ====
 
 function O.kick(now)
     kickT, kickRot = now, rnd(-Kick.rot_deg, Kick.rot_deg)
@@ -394,7 +382,7 @@ function O.kick(now)
     end
 end
 
--- the boot's flash at the bottom of the screen
+-- boot flash, bottom of the screen
 function O.drawKick(now)
     if kickT == nil then return end
     local a = now - kickT
@@ -404,9 +392,7 @@ function O.drawKick(now)
         1 - Easing.inQuad(u))
 end
 
----------------------------------------
--- Main
----------------------------------------
+-- ==== Main ====
 
 function O.update(now)
     local dt = lastNow and math.max(0, math.min(Animation.frame_step_max_s, now - lastNow)) or 0
@@ -468,7 +454,7 @@ local function drawDust(dt)
     end
 end
 
--- the won key rising out of the open chest, up to just over Mr.Caspian's hat
+-- won key rising out of the open chest
 local function wonKey(t)
     local r = run.reward
     if r == nil or r.type ~= "key" then return nil end
@@ -519,7 +505,7 @@ local KEY_NAMES = {
     { "VAULT_KEY_3", "Vault Key (OpTk)" },
 }
 
--- the "new key" banner over the won key
+-- "new key" banner over the won key
 function O.drawBanner(now)
     if run == nil or run.reward == nil or run.reward.type ~= "key" then return end
     local t = now - run.t0

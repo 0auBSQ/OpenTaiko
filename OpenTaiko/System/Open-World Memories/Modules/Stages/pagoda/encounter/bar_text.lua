@@ -19,7 +19,7 @@ local POP_GROW = Animation.encounter.bar_text.pop_grow   -- start size factor of
 local RAD = math.pi / 180
 local cos, sin = math.cos, math.sin
 
--- seeded by the text, so a text always gets the same turns
+-- seeded by the text: same turns per text
 local function seededRandom(text, seed)
     local h = seed or 0
     for i = 1, #text do h = (h * 31 + text:byte(i)) % 2147483647 end

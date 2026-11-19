@@ -1,7 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local, cast-local-type
--- sort.lua  —  Song sorting sub-module for song_select_core
--- Reads sort state from the highlighted player's save file and reorders
--- the current folder's Children list in-place.
+-- song_select_core sorting: reorders the current folder's Children in place.
+-- sort state from the highlighted player's save file.
 
 local SongTitle = require("Songs.Title")
 
@@ -15,7 +14,7 @@ function M.init(g)
     G = g
 end
 
--- ── Internal ─────────────────────────────────────────────────────────────────
+-- ==== Internal ====
 
 local function captureOriginalOrder(folderNode)
     if G.originalOrders[folderNode] ~= nil then return end
@@ -27,7 +26,7 @@ local function captureOriginalOrder(folderNode)
     G.originalOrders[folderNode] = snap
 end
 
--- ── Public ───────────────────────────────────────────────────────────────────
+-- ==== Public ====
 
 function M.applySort()
     if G.songList == nil then return end

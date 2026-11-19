@@ -1,20 +1,12 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- OWM3d/camera.lua — the world camera: named rigs (iso / interior / orbit presets), smoothed follow,
--- orbit/zoom, rig blending, and a PHYSICS-AWARE BOOM so the camera never clips through terrain,
--- walls or models.
---
--- Boom: each frame the desired camera position is target - forward*dist. Five rays are cast from the
--- (slightly lifted) target toward that position — one central plus four offset by the near-plane pad
--- perpendicular to the view — and the camera distance is clamped to the nearest hit minus the pad.
--- Snapping IN is instant (a wall between camera and player must never occlude); easing back OUT is
--- smoothed so the camera doesn't pop when the obstruction clears.
+-- OWM3d/camera.lua: world camera rigs and collision boom
 
 local sin, cos, pi = math.sin, math.cos, math.pi
 
 local Camera = {}
 Camera.__index = Camera
 
--- built-in rig presets (a map/trigger can also define its own {yaw,pitch,fov,dist} tables)
+-- rig presets; setRig/blendRig also take a {yaw, pitch, fov, dist} table
 Camera.RIGS = {
     iso      = { yaw = 45, pitch = -33, fov = 20, dist = 46 },
     interior = { yaw = 45, pitch = -28, fov = 26, dist = 24 },
@@ -34,19 +26,18 @@ function Camera.new(world, o)
     self.gx, self.gy, self.gz = 0, 0.4, 0        -- follow goal
     self.followK = 0
 
-    self.collide = false                          -- opt-in camera physics (world.phys must have geometry)
-    self.pad = 0.32                               -- clearance kept off surfaces (= character radius)
-    self.minBoom = o.minBoom or 2.5               -- the boom never crowds closer than this
-    self.lift = 0.6                               -- ray origin height above the follow target (eye-ish)
-    self.easeOut = 6.0                            -- speed the boom relaxes back out (per second)
-    self._boomDist = self.dist                    -- smoothed physical distance actually applied
+    self.collide = false                          -- needs world.phys geometry
+    self.pad = 0.32                               -- surface clearance (= character radius)
+    self.minBoom = o.minBoom or 2.5               -- min boom distance
+    self.lift = 0.6                               -- ray origin height above target
+    self.easeOut = 6.0                            -- boom ease-out rate (1/s)
+    self._boomDist = self.dist                    -- applied boom distance (smoothed)
 
-    -- rig blending
     self._blend = nil                             -- { from={}, to={}, t, dur }
     return self
 end
 
--- ── rig control ───────────────────────────────────────────────────────────────────────────────────
+-- ==== Rig control ====
 function Camera:setRig(rig)
     if type(rig) == "string" then rig = Camera.RIGS[rig] end
     if rig == nil then return end
@@ -57,7 +48,7 @@ function Camera:setRig(rig)
     self._boomDist = self.dist
     self._blend = nil
 end
--- smoothly blend toward a rig over dur seconds (yaw takes the short way around)
+-- blend to rig over dur seconds (yaw takes the short way)
 function Camera:blendRig(rig, dur)
     if type(rig) == "string" then rig = Camera.RIGS[rig] end
     if rig == nil then return end
@@ -89,7 +80,7 @@ function Camera:setYaw(y) self.yaw = y end
 function Camera:setPitch(p) self.pitch = p end
 function Camera:getYaw() return self.yaw end
 
--- ── per-frame ─────────────────────────────────────────────────────────────────────────────────────
+-- ==== Per frame ====
 local function angleLerp(a, b, t)
     local d = (b - a + 180) % 360 - 180
     return a + d * t
@@ -115,19 +106,18 @@ function Camera:update(dt)
         self.ty = self.ty + (self.gy - self.ty) * k
         self.tz = self.tz + (self.gz - self.tz) * k
     end
-    -- physics boom
+    -- collision boom
     local want = self.dist
     if self.collide then
         local clear = self:clearance(want)
-        local floorD = math.max(self.minBoom or 2.5, want * 0.25)  -- never crowd the player
+        local floorD = math.max(self.minBoom or 2.5, want * 0.25)
         if clear < floorD then clear = floorD end
         if clear < self._boomDist * 0.97 then
-            -- move IN fast but SMOOTHLY (a hard cut reads as a jump), with a little hysteresis so
-            -- grazing hits don't make the camera pump in and out every frame
+            -- ease in fast; 3% hysteresis against grazing hits
             local k = 1 - math.exp(-(self.easeIn or 18.0) * dt)
             self._boomDist = self._boomDist + (clear - self._boomDist) * k
         else
-            local k = 1 - math.exp(-self.easeOut * dt)             -- ease back OUT
+            local k = 1 - math.exp(-self.easeOut * dt)             -- ease out
             self._boomDist = self._boomDist + (math.min(clear, want) - self._boomDist) * k
         end
         if self._boomDist > want then self._boomDist = want end
@@ -138,19 +128,17 @@ function Camera:update(dt)
     self:apply()
 end
 
--- max unobstructed boom distance toward the current camera direction. Five padded rays are cast
--- (centre + 4 offsets); the SECOND-SMALLEST clearance is used, so a single thin occluder — a lamp
--- post, a tree trunk, a fence picket — never yanks the camera, while real walls (which block
--- several rays) still clamp it.
+-- max unobstructed boom distance (5 padded rays)
+-- uses the second-smallest hit: a single thin occluder is ignored
 function Camera:clearance(maxDist)
     local phys = self.world.phys
     if phys == nil or not phys:hasGeometry() then return maxDist end
     local yr, pr = self.yaw * pi / 180, self.pitch * pi / 180
     local fx, fy, fz = sin(yr) * cos(pr), sin(pr), cos(yr) * cos(pr)
-    -- ray dir = from target TOWARD the camera = -forward
+    -- ray dir: target to camera (-forward)
     local dx, dy, dz = -fx, -fy, -fz
-    -- perpendicular basis (right + up of the view) for the padded offset rays
-    local rx, rz = cos(yr), -sin(yr)                               -- camera right (horizontal)
+    -- view right/up for the offset rays
+    local rx, rz = cos(yr), -sin(yr)                               -- camera right
     local ux = -sin(pr) * sin(yr); local uy = cos(pr); local uz = -sin(pr) * cos(yr)   -- camera up
     local ox, oy, oz = self.tx, self.ty + self.lift, self.tz
     local pad = self.pad
@@ -165,7 +153,7 @@ function Camera:clearance(maxDist)
     ray(ox + ux * pad, oy + uy * pad, oz + uz * pad)
     ray(ox - ux * pad, oy + uy * pad, oz - uz * pad)
     table.sort(hits)
-    local best = hits[2] or hits[1]                                -- ignore the single worst outlier
+    local best = hits[2] or hits[1]                                -- skip one outlier
     if best > maxDist then best = maxDist end
     if best < 0.4 then best = 0.4 end
     return best

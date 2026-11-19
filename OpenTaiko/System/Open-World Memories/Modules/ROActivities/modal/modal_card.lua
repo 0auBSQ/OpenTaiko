@@ -1,17 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- modal_card.lua — the "item got!" overlay after the reveal: out of the black, the header strip
--- and body panel (cut from the skin's one panel texture and tinted with the rarity's colour;
--- mythical runs a rainbow across it) pop in one after the other, then the item itself with a burst of sparkles and the
--- rarity's fanfare, then its name, a rarity pill (and the song's genre chip) and one line of
--- detail. A slow wheel of light in the rarity's colour keeps turning behind it and sparkles keep
--- drifting up around the item. Decide closes it (an early press finishes the pop-ins first).
---
--- Item visuals: characters draw their menu animation the way My Room's PC previews them; songs
--- are a CD jewel case in fake 3D, facing slightly down and to the left so its top edge and right
--- edge show as parallelograms, the jacket behind the case's front (case_*.png); puchicharas bounce
--- between their two frames; nameplates go through the real plate renderer; a custom item is the
--- picture the caller shared, fitted to a square. The poor tier's card is an abandoned one: a sepia-tinted panel, cobwebs in
--- its corners, dust motes drifting, no wheel of light.
+-- "item got!" overlay after the reveal; Decide closes it (an early press finishes the pop-ins)
 
 local Fx = require("modal_fx")
 local Config = require("Core.Config")
@@ -34,21 +22,21 @@ local GLOW = Layout.card.glow
 local WHEEL = Layout.card.wheel
 local HEAD = Layout.card.head
 local BODY = Layout.card.body
--- the header strip and body panel inside the 1920x1080 rarity panels: HEAD, BODY
-local RAINBOW_W, RAINBOW_SPEED = L.rainbow_w, T.rainbow_speed   -- one hue cycle of rainbow.png, and how fast it scrolls (px/s)
+-- HEAD, BODY: header strip and body panel inside the 1920x1080 rarity panels
+local RAINBOW_W, RAINBOW_SPEED = L.rainbow_w, T.rainbow_speed   -- rainbow.png hue cycle width; scroll px/s
 local HEADER_TEXT_Y = L.header_text_y
 local ITEM_CX, ITEM_CY = L.item_cx, L.item_cy
-local ITEM_BOX_W, ITEM_BOX_H = L.item_box_w, L.item_box_h   -- what a character preview is scaled to fit
-local ITEM_BOTTOM = ITEM_CY + L.item_bottom_below           -- where a character's feet stand
+local ITEM_BOX_W, ITEM_BOX_H = L.item_box_w, L.item_box_h   -- character preview fit box
+local ITEM_BOTTOM = ITEM_CY + L.item_bottom_below           -- character feet y
 local NAME_Y, PILL_Y, DETAIL_Y = L.name_y, L.pill_y, L.detail_y
-local CASE_W, CASE_H, CASE_D = CASE.w, CASE.h, CASE.d       -- the jewel case (case_front.png / case_side.png / case_top.png)
-local JACKET = CASE.jacket                     -- the front's window the jacket shows through
-local EDGE_SLICES = CASE.edge_slices           -- how many strips each edge is drawn in to skew it
+local CASE_W, CASE_H, CASE_D = CASE.w, CASE.h, CASE.d       -- case_front / case_side / case_top.png
+local JACKET = CASE.jacket                     -- jacket window in the front
+local EDGE_SLICES = CASE.edge_slices           -- strips per skewed edge
 local ATTIC_TINT = L.attic_tint_color
 local ATTIC_DUST = L.attic_dust_color
-local PANEL_PASTEL = L.panel_pastel            -- how far the rarity colour is pulled toward white on the panel
+local PANEL_PASTEL = L.panel_pastel            -- rarity colour pull toward white on the panel
 local PUCHI_SCALE = L.puchichara_scale         -- a 256px frame drawn at 384
-local PICTURE_BOX = L.picture_box              -- the square a custom item's picture is fitted to
+local PICTURE_BOX = L.picture_box              -- custom picture fit square
 local PILL_H, PILL_GAP = L.pill_h, L.pill_gap
 local FADE_OUT = T.fade_out_s
 local T_HEAD, T_BODY, T_ITEM, T_NAME, T_PILL, T_DETAIL = T.head_at_s, T.body_at_s, T.item_at_s, T.name_at_s, T.pill_at_s, T.detail_at_s
@@ -64,7 +52,7 @@ function M.new(A)
     return self
 end
 
--- white pills by width, tinted at draw time
+-- pills cached by width, tinted at draw time
 local function pillCanvas(self, w)
     local cv = self.pills[w]
     if cv then return cv end
@@ -78,7 +66,7 @@ local function pillCanvas(self, w)
     return cv
 end
 
--- the folder a song is found in: the top-most ancestor box sharing its genre, and its bar colour
+-- top-most ancestor box with the same genre, and its bar colour
 local function genreOf(info)
     local title, color
     pcall(function()
@@ -96,16 +84,16 @@ local function genreOf(info)
     return title, color or L.genre_fallback_color
 end
 
--- kind: 1 character (LuaCharacter), 2 puchichara, 3 nameplate, 4 song, 5 custom (info = its name,
--- picture = the shared texture's key, header = the card's title)
--- key (one of Fx.RARITIES) picks the colour, label and fanfare; modalInt is kept for callers
+-- kind: 1 character (LuaCharacter), 2 puchichara, 3 nameplate, 4 song, 5 custom
+-- custom: info = name, picture = shared texture key, header = card title
+-- key: one of Fx.RARITIES; modalInt kept for callers
 function M:start(kind, modalInt, key, info, picture, header)
     self.kind, self.info, self.key = kind, info, key
     self.rarity = max(0, min(4, modalInt or 0))
     self.rainbow = key == "mythical"
     self.attic = key == "poor"
     self.moteAcc = 0
-    -- the panel's tint: sepia for the attic, the rarity's pastel otherwise (common stays as drawn)
+    -- attic: ATTIC_TINT; else the rarity pastel (common untinted)
     if self.attic then self.panelTint = ATTIC_TINT
     elseif key == "common" or self.rainbow then self.panelTint = nil
     else self.panelTint = Fx.pastel(Fx.rarityColor(key), PANEL_PASTEL) end
@@ -181,7 +169,7 @@ function M:update(dt, decide)
             self.sparks:burst(ITEM_CX, ITEM_CY, sp.count, { speed = sp.speed, size = sp.size, life = sp.life_s, color = self:color(), gravity = sp.gravity })
         end
     end
-    -- a trickle of sparkles drifting up around the item (dust motes across the whole attic)
+    -- item sparkles (attic: dust motes)
     if self.itemShown then
         self.emitAcc = self.emitAcc + dt * (self.attic and T.attic_trickle_per_s or T.trickle_per_s)
         while self.emitAcc >= 1 do
@@ -213,8 +201,7 @@ end
 
 local function pop(t, t0) return Fx.outBack(Fx.span(t, t0, T.pop_s), T.pop_overshoot), Fx.span(t, t0, T.pop_fade_s) end
 
--- the panel pieces: one tinted draw; for mythical the untinted panel with a smooth scrolling
--- rainbow multiplied over it (one hue cycle of the strip, stretched to the panel)
+-- one tinted draw; mythical: untinted panel with rainbow.png multiplied over it
 function M:drawPanel(box, s, alpha)
     local cx, cy = box.x + box.w / 2, box.y + box.h / 2
     Fx.draw(self.panel, cx, cy, { s = s, opacity = alpha, rx = box.x, ry = box.y, rw = box.w, rh = box.h, color = self.panelTint })
@@ -236,15 +223,14 @@ function M:drawCase(alpha, s)
     local pitch = CASE_T.pitch_start * (1 - settle) + CASE_T.pitch_rest + CASE_T.pitch_sway * sin(self.t * CASE_T.pitch_sway_freq + CASE_T.pitch_sway_phase)   -- tilted down
     local cy, sy = cos(yaw), sin(yaw)
     local cp, sp = cos(pitch), sin(pitch)
-    local fw, fh = CASE_W * cy * s, CASE_H * cp * s          -- the front, foreshortened
-    local sideW = max(1, CASE_D * sy * s)                     -- the right edge's width on screen
-    local topH = max(1, CASE_D * sp * s)                      -- the top edge's height on screen
+    local fw, fh = CASE_W * cy * s, CASE_H * cp * s          -- front, foreshortened
+    local sideW = max(1, CASE_D * sy * s)                     -- right edge width
+    local topH = max(1, CASE_D * sp * s)                      -- top edge height
     local left, top = ITEM_CX - (fw + sideW) / 2, ITEM_CY - (fh - topH) / 2
     local cxF, cyF = left + fw / 2, top + fh / 2
     Fx.draw(A.tex.glow, ITEM_CX, top + fh + CASE.shadow_y, { sx = CASE.shadow_sx * s, sy = CASE.shadow_sy * s, opacity = CASE.shadow_opacity * alpha, color = CASE.shadow_color })
 
-    -- the top edge: strips from the near row (against the front) to the far row, each shifted
-    -- right toward the far corner
+    -- top edge: strips near to far row, each shifted right
     local n = EDGE_SLICES
     local tex = A.tex.case_top
     local rows = CASE_D / n
@@ -253,8 +239,7 @@ function M:drawCase(alpha, s)
         local y = top - topH * (1 - k)
         Fx.draw(tex, cxF + sideW * (1 - k), y, { sx = fw / CASE_W, sy = topH / CASE_D, opacity = alpha, rx = 0, ry = floor(i * rows), rw = CASE_W, rh = floor(rows) + 1 })
     end
-    -- the right edge: strips from the near column (against the front) to the far column, each
-    -- shifted up toward the far corner
+    -- right edge: strips near to far column, each shifted up
     tex = A.tex.case_side
     local cols = CASE_D / n
     for i = 0, n - 1 do
@@ -263,7 +248,7 @@ function M:drawCase(alpha, s)
         Fx.draw(tex, x, cyF - topH * k, { sx = sideW / CASE_D, sy = fh / CASE_H, opacity = alpha, rx = floor(i * cols), ry = 0, rw = floor(cols) + 1, rh = CASE_H,
                                           color = CASE.side_color })
     end
-    -- the jacket in the window, then the front over it
+    -- jacket, then the front over it
     if pre ~= nil and pre.Width > 0 then
         local k = min(JACKET.w / pre.Width, JACKET.h / pre.Height)
         local jx = left + (JACKET.x + JACKET.w / 2) * cy * s
@@ -273,8 +258,7 @@ function M:drawCase(alpha, s)
     Fx.draw(A.tex.case_front, cxF, cyF, { sx = cy * s, sy = cp * s, opacity = alpha })
 end
 
--- cobwebs in the abandoned panel's corners: the header's top-left, the body's top-right and
--- bottom-left (hung upside down)
+-- attic cobwebs in three corners (bottom-left flipped)
 function M:drawWebs(s, alpha)
     local A = self.A
     local webs = {
@@ -300,7 +284,7 @@ function M:drawItem(alpha, s)
             info:DrawAtAnchor(ITEM_CX, ITEM_BOTTOM, CHARACTER.ANIM_MENU_NORMAL, "bottom")
         end)
     elseif kind == 2 and info ~= nil and info.tx ~= nil then
-        -- the two-frame sheet bounces between its frames like it does on stage
+        -- two-frame sheet, as on stage
         local tx = info.tx
         local fw, fh = floor(tx.Width / 2), tx.Height
         local frame = (floor(self.frame * T.puchichara_frames_per_s) % 2 == 0) and 0 or fw
@@ -320,7 +304,7 @@ function M:drawItem(alpha, s)
     end
 end
 
--- the rarity pill, and the genre chip beside it for songs, centred as a row
+-- rarity pill plus genre chip for songs, centred as a row
 function M:drawChips(s, alpha)
     local A = self.A
     local chips = { { text = self.rarityText, color = self:color() } }
@@ -380,7 +364,7 @@ function M:draw()
     end
 end
 
--- releases what the card owns: the character's animation and the character itself, the jacket
+-- releases the owned character and jacket
 function M:stop()
     local info = self.info
     if self.kind == 1 and info ~= nil then

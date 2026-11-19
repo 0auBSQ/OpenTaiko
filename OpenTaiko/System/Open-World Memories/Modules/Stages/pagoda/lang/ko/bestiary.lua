@@ -1,4 +1,4 @@
--- Korean for bestiary.lua; a missing key shows the English.
+-- Korean for bestiary.lua; missing keys fall back to English
 
 local T = {}
 

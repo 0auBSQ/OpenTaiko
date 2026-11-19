@@ -1,4 +1,4 @@
--- Korean for encounter/items/texts.lua; a missing key shows the English.
+-- Korean for encounter/items/texts.lua; missing keys fall back to English
 
 local T = {}
 

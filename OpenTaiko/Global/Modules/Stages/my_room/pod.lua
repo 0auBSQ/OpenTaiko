@@ -1,33 +1,31 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- pod.lua — the Mysterious Pod's opening sequence: the player steps in, the pod rattles with
--- sparks, rests, vents a cloud of steam, and the room fades to black before Script.lua leaves for
--- the pod's own stage. Script.lua switches to mode "pod" while this runs and draws the player
--- through playerVisual(). Without that stage installed the pod keeps its "does nothing" line.
+-- Mysterious Pod opening sequence, before Script.lua leaves for the pod's stage
+-- Script.lua runs mode "pod" meanwhile and draws the player through playerVisual()
 
 local Room    = require("room")
 local Almanac = require("Calendar.almanac")
 
 local Pod = {}
 
-local ENTER_SEC = 0.55        -- player slides into the pod
-local SHAKE_SEC = 2.4         -- rattling with sparks
-local REST_SEC  = 0.35        -- still, before the steam
-local SMOKE_SEC = 0.9         -- steam venting
-local FADE_SEC  = 0.7         -- black over everything
-local SHAKE_AMP = 0.045       -- world units of rattle
-local SHAKE_YAW = 3.0         -- degrees of rattle
+local ENTER_SEC = 0.55        -- player moves in
+local SHAKE_SEC = 2.4         -- rattle with sparks
+local REST_SEC  = 0.35        -- pause before the steam
+local SMOKE_SEC = 0.9         -- steam
+local FADE_SEC  = 0.7         -- fade to black
+local SHAKE_AMP = 0.045       -- world units
+local SHAKE_YAW = 3.0         -- degrees
 
 local FY = Room.FLOOR_Y
 
--- the stage the pod leads to, when installed: a global stage beside My Room, or a skin's stage that says
--- so in the shared string "<name>_installed" (= "1") from its onStart
+-- target stage: a global stage beside My Room, or a skin stage that sets the
+-- shared string "<name>_installed" = "1" in its onStart
 local STAGE = Almanac.plain("enc:duz5h2ol4uxwav3asmdq") or ""
 
 local _phase = "idle"         -- idle | enter | shake | rest | smoke | fade
 local _t = 0
 local _world, _inst = nil, nil
-local _pose = nil             -- { x, y, z, yaw, s } the pod's resting transform
-local _from = nil             -- { x, z } where the player started walking in
+local _pose = nil             -- { x, y, z, yaw, s } resting transform
+local _from = nil             -- { x, z } player start
 local _sparkAcc = 0
 local _sfx = {}
 
@@ -51,6 +49,7 @@ end
 
 function Pod.stageName() return STAGE end
 
+-- false: the pod keeps its "does nothing" line
 function Pod.stageExists()
     if STAGE == "" then return false end
     local ok, res = pcall(function() return TEXTURE:Exists("../" .. STAGE .. "/Script.lua") end)
@@ -61,8 +60,8 @@ end
 
 function Pod.active() return _phase ~= "idle" end
 
--- it = the furniture entry, inst = its GLB instance (world._propInst[it]); px/pz = player feet;
--- playerIndex = whose room this is (the stage reads it back from a global store)
+-- inst: GLB instance (world._propInst[it]); px/pz: player feet
+-- playerIndex: room owner, read back by the stage from a global store
 function Pod.start(world, it, inst, px, pz, playerIndex)
     _world, _inst = world, inst
     pcall(function()
@@ -108,7 +107,7 @@ local function settle()
     pcall(function() _inst:setTransform(_pose.x, _pose.y, _pose.z, _pose.yaw, _pose.s) end)
 end
 
--- returns nil while running, "go" once the fade is complete
+-- nil while running, "go" once the fade is done
 function Pod.update(dt)
     if _phase == "idle" then return nil end
     _t = _t + dt
@@ -152,7 +151,7 @@ function Pod.update(dt)
     return nil
 end
 
--- where Script.lua draws the player during the sequence: x, z, scale — or nil once inside
+-- player x, z, scale in the enter phase; nil otherwise
 function Pod.playerVisual()
     if _phase == "idle" or _from == nil then return nil end
     if _phase ~= "enter" then return nil end
@@ -161,7 +160,7 @@ function Pod.playerVisual()
     return _from.x + (_pose.x - _from.x) * e, _from.z + (_pose.z - _from.z) * e, 1 - 0.85 * e
 end
 
--- the black cover for the last phase (drawn over the blitted world)
+-- black cover over the blitted world (fade phase)
 function Pod.draw(hud, sw, sh)
     if _phase ~= "fade" then return end
     local a = math.floor(255 * math.min(1, _t / FADE_SEC))

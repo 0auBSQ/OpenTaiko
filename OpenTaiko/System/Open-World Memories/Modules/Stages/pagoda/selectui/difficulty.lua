@@ -1,4 +1,4 @@
--- The level's estimated difficulty line on the selector, with encounter/song_bar emblems.
+-- level difficulty estimate line on the selector (encounter/song_bar emblems)
 
 local data   = require("encounter/songbars_data")
 local Config = require("Core.Config")
@@ -9,13 +9,13 @@ local D = {}
 
 local Look = Layout.selectui.difficulty
 local PLUS_DX, PLUS_DY = Layout.encounter.song_bar.plus_dx, Layout.encounter.song_bar.plus_dy
-local TEXT_PAD = 25                       -- the text texture's clear margin left and right of the line
+local TEXT_PAD = 25                       -- text texture side margin
 
 local EASY, NORMAL, HARD, EXTREME, EXTRA = 0, 1, 2, 3, 4
 
 local function e(diff, level, plus) return { diff = diff, level = level, plus = plus == true } end
 
--- per level: the lowest and highest estimate (one entry when they are the same)
+-- per level: lowest and highest estimate (one entry if equal)
 local RANGES = {
     [1]  = { e(EASY, 1), e(EASY, 2) },          [2]  = { e(EASY, 2), e(EASY, 3) },
     [3]  = { e(EASY, 3), e(EASY, 5) },          [4]  = { e(EASY, 5), e(EASY, 5, true) },
@@ -46,7 +46,7 @@ end
 
 local function ready(tx) return tx ~= nil and tx.Ready end
 
--- font: the selector's label font (GetText)
+-- font: selector label font (GetText)
 function D.setup(font)
     _font = font
     if _white == nil then
@@ -77,7 +77,7 @@ local function at(tx, x, y, s)
     tx:SetScale(1, 1)
 end
 
--- the chart level over the emblem centred on (x, y), set as on a song bar
+-- chart level over the emblem at (x, y), as on a song bar
 local function digits(est, x, y, k)
     local s = tostring(est.level)
     local total, prev, last = 0, 0, 0
@@ -100,13 +100,13 @@ end
 
 local function emblemW() return data.tex.sb_emblem0.w * Look.emblem_scale end
 
--- Extreme draws the Extreme emblem over the Extra Extreme one, down and left of it
+-- Extreme: drawn over Extra Extreme, down-left of it
 local function groupW(est)
     if est.diff == EXTREME then return emblemW() + Look.stack_dx * Look.emblem_scale end
     return emblemW()
 end
 
--- the estimate's emblem(s) from x, centred on y; the level goes on the front one
+-- emblems from x, centred on y; level on the front one
 local function drawGroup(est, x, y)
     local k, w = Look.emblem_scale, emblemW()
     local cx = x + w * 0.5
@@ -126,7 +126,7 @@ local function label(s)
     return tx, math.max(0, tx.Width - 2 * TEXT_PAD)
 end
 
--- the line centred on (cx, cy)
+-- line centred on (cx, cy)
 function D.draw(level, cx, cy)
     if _tex == nil or level == nil then return end
     local est = D.range(level)

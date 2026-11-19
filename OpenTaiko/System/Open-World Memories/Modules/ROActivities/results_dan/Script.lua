@@ -1,8 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, inject-field
 -- results_dan ROActivity: the result screen of a dan play.
--- The result stage calls activate(info) with a LuaResultInfo, update() and draw() every frame, skip() on decide
--- (true while still animating), then advance() (true when a new or better dan grade gets its own screen before the
--- reward pop-ups), swap() on left or right (true when the verdict and the details trade places) and deactivate().
 
 local PlayStrings = require("PlayStrings")
 
@@ -45,7 +42,7 @@ local judgeWords, judgeFrames, judgeCellH = nil, 5, 100
 local stageTint = nil       -- the gradient map of a stage's own background
 local duckMusic             -- with the music, below
 
--- ── helpers ──────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Helpers ====
 
 local function tr(key, fallback)
     local ok, s = pcall(function() return THEME:GetSkinString(key) end)
@@ -55,7 +52,7 @@ end
 
 local function fill(s, value) return (s:gsub("{0}", function() return value end)) end
 
--- "812450", no separators
+-- integer text, no separators
 local function whole(n) return tostring(math.floor(n)) end
 
 local function clamp01(x) return math.max(0, math.min(1, x)) end
@@ -99,7 +96,7 @@ local function statusIndex(s) return math.max(0, math.min(2, s)) + 1 end
 
 local function stampColor(song) return col.stamps[math.min(song + 1, #col.stamps)] end
 
--- ── text ─────────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Text ====
 
 -- the clear margin a glyph line keeps left, right and under its ink (the engine's text padding)
 local function pad(font) return font.BoxHeight - math.ceil(font.LineHeight) end
@@ -107,9 +104,8 @@ local function pad(font) return font.BoxHeight - math.ceil(font.LineHeight) end
 -- a glyph line anchored at its middle sits its ink high by half the box's bottom padding
 local function nudge(font) return math.floor(pad(font) / 2) + Layout.text_nudge end
 
--- a text with its ink's left edge, centre or right edge at x ("left", "center" or "right") and its line's middle
--- at y; no outline, a soft shadow under it. o: color, scale, opacity, maxW (the ink's), shadow (px, 0 for none),
--- shadowColor, shadowOpacity
+-- text with its ink anchored at x ("left", "center" or "right") and its line's middle at y; shadow, no outline
+-- o: color, scale, opacity, maxW (the ink's), shadow (px, 0 for none), shadowColor, shadowOpacity
 local function text(font, s, x, y, anchor, o)
     if s == nil or s == "" then return end
     o = o or NO_OPTIONS
@@ -126,7 +122,7 @@ local function text(font, s, x, y, anchor, o)
     font:Draw(s, x, y, o.color or col.text, col.clear, opacity, scale, maxW, anchor)
 end
 
--- ── shapes ───────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Shapes ====
 
 -- a rounded bar centred at (cx, cy), w by h, turned angle degrees (counter-clockwise, like SetRotation): a disc at
 -- each end and the body stretched between their centres
@@ -168,7 +164,7 @@ end
 
 local WHITE = { 1.0, 1.0, 1.0 }
 
--- a few glitters twinkling round (cx, cy) in colour c ({r, g, b} from 0 to 1), `since` ms after they started
+-- glitters round (cx, cy) in colour c ({r, g, b} from 0 to 1), `since` ms after their start
 local function twinkles(cx, cy, since, count, rMin, rRange, scale, opacity, seed, c)
     for i = 1, count do
         local cycle = since * A3.twinkle_rate_per_ms + i / count
@@ -182,7 +178,7 @@ local function twinkles(cx, cy, since, count, rMin, rRange, scale, opacity, seed
     end
 end
 
--- a hit at (cx, cy), `since` ms after it: a star flare pops and fades while glitters in colour c fly out of it
+-- hit burst at (cx, cy), `since` ms after it: star flare, then glitters in colour c
 local function burst(cx, cy, since, opacity, seed, size, c)
     if since < 0 then return end
     local f = since / A3.flare_ms
@@ -196,7 +192,7 @@ local function burst(cx, cy, since, opacity, seed, size, c)
     end
 end
 
--- ── Asagao's review ticket ───────────────────────────────────────────────────────────────────────────
+-- ==== Asagao's review ticket ====
 
 -- the ticket with its top left at (x, y), its numbers in the font
 local function drawTicket(x, y, s, op)
@@ -217,7 +213,7 @@ local function drawTicket(x, y, s, op)
     end
 end
 
--- ── exams ────────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Exams ====
 
 local function isPercent(e) return e.Type == 0 or e.Type == 8 end
 local function shown(e, v) return whole(v) .. (isPercent(e) and "%" or "") end
@@ -308,7 +304,7 @@ local function marquee(font, items, cx, cy, box, s, op)
     GRAPHICS:ClearClip()
 end
 
--- ── the verdict ──────────────────────────────────────────────────────────────────────────────────────
+-- ==== Verdict ====
 
 local function buildIntro()
     local t = { tiles = {} }
@@ -320,7 +316,7 @@ end
 
 local function tagWidth() return fonts.tag:Measure(strings.newBest) + 2 * TAG.pad_x end
 
--- the New best! tag centred at (cx, cy): a gold pill on a darker rim, a sparkle twinkling at each end
+-- New best! tag centred at (cx, cy), a sparkle at each end
 local function drawTag(cx, cy, s, op)
     local w, h, r = tagWidth() * s, TAG.height * s, TAG.rim * s
     pill(cx, cy, w + 2 * r, h + 2 * r, 0, col.tagRim, op)
@@ -408,7 +404,7 @@ local function drawVerdict(ox, op)
     text(fonts.hint, strings.details, V.hint[1] + ox, V.hint[2], "right", { color = col.note, shadow = 0, opacity = op * progress(timeline.done, 400) })
 end
 
--- ── the details ──────────────────────────────────────────────────────────────────────────────────────
+-- ==== Details ====
 
 -- the judge words, each copied with clear pixels round it (a turned sticker would show their cells cut straight)
 local function buildJudgeWords()
@@ -440,8 +436,8 @@ local function label(cx, cy, w, h, angle, color, opacity)
     t:SetColor(1.0, 1.0, 1.0)
 end
 
--- the stickers over the sheet's top edge naming the columns: the judges pack's words (or the exam names when the
--- pack has no such frame) on white labels, a little turned
+-- column stickers over the sheet's top edge: the judges pack's words (or the exam names when the
+-- pack has no such frame)
 local function drawStickers(sx, sy, op)
     local S = D.stickers
     local names = { 1, 2, 3, 5 }   -- the columns' exam types, for a pack without the frame
@@ -672,7 +668,7 @@ local function drawDetails(ox, op)
     text(fonts.hint, strings.summary, D.hint[1] + ox, D.hint[2], "right", { color = col.note, shadow = 0, opacity = op })
 end
 
--- ── what both screens share ──────────────────────────────────────────────────────────────────────────
+-- ==== Shared by both screens ====
 
 -- 0 on the verdict, 1 on the details, in between while they slide
 local function swapK()
@@ -734,7 +730,7 @@ local function drawPlayer(op)
     end
 end
 
--- ── the grade screen ─────────────────────────────────────────────────────────────────────────────────
+-- ==== Grade screen ====
 
 local function characters(s)
     local out = {}
@@ -781,8 +777,7 @@ local function shake()
     return x, y
 end
 
--- the grade's background over the whole screen (silver, gold or rainbow by the clear), turning slowly: it floods in
--- behind a flash of light and stays to the end
+-- grade background, full screen (BACKS by the clear), turning; comes in behind a flash, stays to the end
 local function drawBackground()
     local since = clock - grade.glow
     if since < 0 then return end
@@ -803,7 +798,7 @@ local function kanjiCenter(i, ox, oy)
     return W / 2 + (i - (n + 1) / 2) * G.kanji.pitch + ox, G.kanji.y + oy
 end
 
--- behind kanji i once it landed: a soft light
+-- light behind kanji i once it landed
 local function drawKanjiLight(i, ox, oy, fade)
     local since = clock - grade.kanji[i] - A3.slam_ms
     if since < 0 then return end
@@ -819,8 +814,7 @@ local function ring(font, ch, x, y, px, copies, color, op, s)
     end
 end
 
--- kanji i slams in, then floats: a shadow, a dark outline, a light ring and a thin rim round it, its fill red or
--- gold as the pass
+-- kanji i: landing, then float; shadow, outline rings and rim, fill red or gold by the pass
 local function drawKanji(i, ox, oy, fade)
     local t0 = grade.kanji[i]
     if clock < t0 then return end
@@ -922,7 +916,7 @@ local function updateGrade()
     end
 end
 
--- ── the music ────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Music ====
 
 local music = {}
 local stageLevel, ownLevel = 100, 100   -- the result stage's (reward pop-ups) and the grade screen's, the lower wins
@@ -972,7 +966,7 @@ function setMusicLevel(percent)
     applyMusicLevel()
 end
 
--- ── lifecycle ────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Lifecycle ====
 
 function onStart()
     local res = THEME:GetResolution()
@@ -1043,7 +1037,7 @@ function onStart()
 end
 
 local TEXTURES = {
-    rank = "Rank.png", ticket = "StatePanel_Main.png",
+    background = "Background.png", rank = "Rank.png", ticket = "StatePanel_Main.png",
     sheet = "Sheet/Contents.png", song = "Sheet/DanSong.png", songNb = "Sheet/DanSongNb.png", gauge = "Sheet/Gauge.png",
     examBar = "Sheet/DanExam.png", examBarLong = "Sheet/DanExamLong.png", examValue = "Sheet/ExamValue.png",
     examRange = "Sheet/ExamRange.png", examTile = "Sheet/ExamTile.png",
@@ -1059,7 +1053,7 @@ local function loadTextures()
     if judgeFile == "" then judgeFile = "5_Game/Judge.png" end
     tex.judge = TEXTURE:CreateTexture(GRAPHICS_DIR .. judgeFile)
     judgeFrames = THEME:GetJudgeFrames()
-    -- a stage's own background for its dan (the pagoda's), in the dan result's blues
+    -- a stage's own background for its dan (the pagoda's), with the stage_background gradient map
     local own = PlayStrings.get(STAGE_BACKGROUND_KEY)
     if own ~= "" then
         tex.stageBack = TEXTURE:CreateTexture("../../" .. own)
@@ -1118,6 +1112,8 @@ local function disposeAll(t)
     end
 end
 
+-- result stage calls activate(result) with a LuaResultInfo, update() and draw() per frame, skip() on decide,
+-- advance(), swap() on left or right, then deactivate()
 function activate(result)
     deactivate()
     info = result
@@ -1234,6 +1230,7 @@ function draw()
     if not active then return end
     buildJudgeWords()
     local op = grade ~= nil and 1 - easeOut(progress(grade.t0, A3.fade_out_ms)) or 1
+    tex.background:Draw(0, 0)
     drawStageBackground()
     if op > 0 then
         local k = swapK()

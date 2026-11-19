@@ -1,10 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- song_loading transition — the whole song-select → gameplay flow as ONE transition, owning ALL the visuals.
---   fadeOut(t)            cover the song-select screen (t 0→1)
---   loading(progress, t)  draw the loading screen (bg, player characters + nameplates / dan plate, song title
---                         + plate, progress bar) while the engine loads the chart / WAV / game screen
---   fadeIn(t)             reveal the loaded game screen (t 0→1), or song select after ESC
--- The C# loader (CStageSongLoading) runs the actual load + reports `progress` (0..1); everything drawn here.
+-- song_loading transition: song select to gameplay, all visuals drawn here.
 
 -- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
 local Config = require("Core.Config")
@@ -12,8 +7,7 @@ local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
 local BAR = Layout.bar
 
--- Fade durations (seconds) for this transition; the engine reads these globals (default is 0.5s elsewhere).
--- The song-select → gameplay flow reads better with a slightly slower 1s curtain in + reveal out.
+-- fade durations, s; read by the engine (0.5 s elsewhere)
 FADE_OUT_SECONDS = Animation.fade_out_s
 FADE_IN_SECONDS  = Animation.fade_in_s
 
@@ -44,10 +38,10 @@ local characters, slide_infos = {}, {}
 local bg_scroll_y = 0
 local dan_tick, dan_r, dan_g, dan_b, dan_title = 0, 255, 255, 255, ""
 local initialized  = false
-local luaPhase     = nil                      -- "out" | "load" | "in" — used to detect a fresh transition
+local luaPhase     = nil                      -- "out" | "load" | "in"; detects a fresh transition
 local wait         = TA.new()
 
--- Tuning (mirrors the old ROActivity)
+-- Tuning
 local SLIDE_DURATION, SLIDE_STAGGER = Animation.slide.duration_s, Animation.slide.stagger_s
 local TOWER_SCROLL_SPEED, TOWER_SCROLL_MAX = Animation.tower_scroll.speed_px_per_s, Animation.tower_scroll.max
 local DAN_SCROLL_SPEED, DAN_SCROLL_MAX = Animation.dan_scroll.speed_px_per_s, Animation.dan_scroll.max
@@ -58,14 +52,14 @@ local TITLE_X, TITLE_Y      = Layout.title.x, Layout.title.y
 local SUBTITLE_X, SUBTITLE_Y = Layout.subtitle.x, Layout.subtitle.y
 local DANPLATE_X, DANPLATE_Y = Layout.danplate.x, Layout.danplate.y
 
--- ── helpers ──────────────────────────────────────────────────────────────────
+-- ==== Helpers ====
 local function rect(x, y, w, h, r, g, b, a)
 	if pixel == nil or w <= 0 or h <= 0 then return end
 	pixel:SetColor(r, g, b); pixel:SetOpacity(a); pixel:SetScale(w, h); pixel:Draw(x, y)
 end
 
--- The loading background for the current mode, at the given opacity (used to cross-fade in from song select).
--- The tower climbs its panorama from the ground to the sky while the chart loads.
+-- loading background for the mode at opacity alpha (cross-fade from song select)
+-- tower mode: the panorama climbs while the chart loads
 local function draw_bg(alpha)
 	if mode == "tower" then
 		if tower_view ~= nil and tower_view.IsActive then tower_view:Draw(bg_scroll_y / TOWER_SCROLL_MAX, alpha) end
@@ -93,7 +87,7 @@ local function close_tower_view()
 	tower_view = nil
 end
 
--- everything drawn is made for one trip and freed at its fadeIn(1), which also ends a cancelled load
+-- made per trip, freed at its fadeIn(1), the end of a cancelled load too
 -- (Lib/TransitionArt)
 local function freeTextures()
 	for i = 1, #characters do
@@ -244,9 +238,8 @@ local function draw_characters(opacity)
 	end
 end
 
--- alpha 0..1 scales the whole screen's opacity (1 while loading; ramps to 0 during the fade-in reveal of
--- gameplay). showBar: only while actually loading. The note chips draw on TOP (main loop), so they stay
--- visible as the loading screen clears.
+-- alpha 0..1: whole screen opacity (1 while loading, to 0 during the fade-in); showBar: loading only
+-- note chips draw on top (main loop)
 local function draw_screen(progress, alpha, showBar)
 	alpha = alpha or 1.0
 	local op = math.floor(alpha * 255)
@@ -275,11 +268,14 @@ local function draw_screen(progress, alpha, showBar)
 	end
 end
 
--- ── transition callbacks ──────────────────────────────────────────────────────
+-- ==== Transition callbacks ====
+-- fadeOut(t): covers the song select (t 0..1)
+-- loading(progress, elapsed): loading screen while CStageSongLoading loads (progress 0..1)
+-- fadeIn(t): reveals the game screen (t 0..1), or song select after ESC
 function fadeOut(t)
 	if luaPhase ~= "out" then initialized = false; luaPhase = "out"; wait:reset() end   -- fresh transition → re-resolve song
 	if not initialized then setup() end
-	draw_bg(wait:progress(t, tx_bg, tower_view_ready()))   -- cross-fade the loading background IN over the song-select screen (not through black)
+	draw_bg(wait:progress(t, tx_bg, tower_view_ready()))   -- cross-fade over the song select, not through black
 end
 
 function loading(progress, elapsed)

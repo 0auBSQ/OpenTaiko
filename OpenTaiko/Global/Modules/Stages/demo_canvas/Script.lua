@@ -1,28 +1,18 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, lowercase-global
--- demo_canvas/Script.lua — A tiny paint program demonstrating LuaCanvas + mouse input.
---
--- Two tools (T switches):
---   Brush — hold LEFT to paint in the current colour, RIGHT to erase (white).
---           The mouse WHEEL changes the brush size.
---   Stamp — a character's Render.png pasted onto the sheet. The mouse WHEEL resizes it,
---           LEFT/RIGHT arrows rotate it (hold to spin), [ ] pick the character, and a
---           single LEFT click stamps it (not held).
---
--- Undo/redo (Ctrl+Z / Ctrl+Y) is handled entirely in Lua as a list of *actions*
--- (brush strokes, stamps, clears). Undo drops the last action and replays the rest onto
--- a blank sheet — so there are no big pixel snapshots to allocate.
+-- demo_canvas: paint demo for LuaCanvas and mouse input
+-- undo replays the action list onto a blank sheet (no pixel snapshots)
 
--- drawn in 1920x1080: a skin of another resolution rescales it
+-- drawn in 1920x1080, rescaled for other skin resolutions
 STAGES:SetResolution(1920, 1080)
 
 local SURF_W, SURF_H = 1920, 1080
 
-local paper       = nil   -- the drawing sheet (full-surface LuaCanvas)
-local baseCanvas  = nil   -- offscreen layer holding actions baked in past the undo cap
-local cursor      = nil   -- small overlay canvas for the brush outline
-local renderPaths = {}    -- 1-based list of every character's Render.png path
+local paper       = nil   -- drawing sheet (full-surface LuaCanvas)
+local baseCanvas  = nil   -- offscreen layer: actions baked in past the undo cap
+local cursor      = nil   -- brush outline overlay
+local renderPaths = {}    -- 1-based Render.png paths, one per character
 local renderCount = 0
-local stampCache  = {}    -- [idx] = lazily-loaded LuaTexture
+local stampCache  = {}    -- [idx] = lazily loaded LuaTexture
 local stampIdx    = 1
 local fontMid, fontSmall = nil, nil
 
@@ -32,25 +22,25 @@ local CURSOR_HALF = CURSOR_BOX / 2
 local floor, min, max = math.floor, math.min, math.max
 local cos, sin, pi = math.cos, math.sin, math.pi
 
--- ── State ───────────────────────────────────────────────────────────────────────
+-- ==== state ====
 local mode       = "brush"     -- "brush" | "stamp"
-local brush      = 7           -- radius in pixels
+local brush      = 7           -- radius, px
 local paperDirty = false
-local lastTs     = 0           -- previous update timestamp (frame-rate-independent dt)
+local lastTs     = 0           -- previous update ts (ms)
 
 local stampScale = 0.30
 local stampRot   = 0.0         -- degrees
 local STAMP_SPIN = 120.0       -- deg/sec while an arrow is held
 
--- undo/redo: a chronological list of applied actions, replayed onto a blank sheet.
+-- undo/redo: applied actions in order, replayed onto a blank sheet
 -- action kinds: {kind="clear"}, {kind="stamp", x,y,scale,rot,idx},
 --               {kind="stroke", size,r,g,b, pts={x0,y0,x1,y1,...}}
 local actions      = {}
 local redoActions  = {}
-local currentStroke = nil      -- the stroke being drawn while a brush button is held
-local UNDO_CAP     = 10         -- keep at most this many undoable actions (older ones bake in)
+local currentStroke = nil      -- stroke in progress while a brush button is held
+local UNDO_CAP     = 10         -- max undoable actions (older ones bake in)
 
--- draw-colour palette (number keys 1-8)
+-- palette (number keys 1-8)
 local PALETTE = {
     { "Red",    255,  40,  40 },
     { "Orange", 255, 140,   0 },
@@ -64,12 +54,12 @@ local PALETTE = {
 local colIdx = 1
 local curR, curG, curB = 255, 40, 40
 
--- cached mouse state for draw()
+-- mouse state cached for draw()
 local mMouseX, mMouseY, mInside = 0, 0, false
 
--- ── Cursor / colour ───────────────────────────────────────────────────────────────
+-- ==== cursor / colour ====
 
--- redraw the brush-outline cursor overlay (black ring + centre swatch in the draw colour)
+-- redraws the brush cursor overlay (ring + centre swatch)
 local function refreshCursor()
     cursor:ClearTransparent()
     local n = max(24, floor(brush * 5))
@@ -90,11 +80,10 @@ local function setColor(i)
     refreshCursor()
 end
 
--- ── Stamps ──────────────────────────────────────────────────────────────────────
+-- ==== stamps ====
 
--- Build the stamp list from CHARACTERLIST. The character DB isn't ready during onStart()
--- (it's empty there), so this runs from activate(). Render.png is always at the character
--- folder root.
+-- stamp list from CHARACTERLIST; runs from activate() (the character DB is empty in onStart())
+-- Render.png sits at the character folder root
 local function buildStampList()
     renderPaths = {}
     local count = (CHARACTERLIST ~= nil) and CHARACTERLIST.Count or 0
@@ -111,7 +100,7 @@ local function buildStampList()
     if stampIdx > renderCount then stampIdx = 1 end
 end
 
--- Lazily load + cache the stamp texture for a given index, or nil if unavailable.
+-- lazily loaded stamp texture for idx, or nil
 local function stampTexAt(idx)
     if idx < 1 or idx > renderCount then return nil end
     local t = stampCache[idx]
@@ -125,16 +114,16 @@ end
 
 local function currentStamp() return stampTexAt(stampIdx) end
 
--- ── Undo / redo (action list) ───────────────────────────────────────────────────
+-- ==== undo / redo ====
 
--- Draw a single action onto a target canvas (does not upload — callers batch the upload).
+-- draws one action onto target (no upload; callers batch it)
 local function applyAction(target, a)
     if a.kind == "clear" then
         target:Clear(255, 255, 255, 255)
     elseif a.kind == "stamp" then
         local st = stampTexAt(a.idx)
         if st ~= nil then
-            -- rotation negated so the paste matches the on-screen preview (screen Y flipped)
+            -- rotation negated to match the on-screen preview (screen Y flipped)
             target:PasteTextureTransformed(st, a.x, a.y, a.scale, -a.rot, "center")
         end
     elseif a.kind == "stroke" then
@@ -150,16 +139,14 @@ local function applyAction(target, a)
     end
 end
 
--- Replay the baked base layer + the live actions onto the sheet (used by undo).
+-- replays the base layer + live actions onto the sheet
 local function rebuild()
     paper:CopyFrom(baseCanvas)
     for i = 1, #actions do applyAction(paper, actions[i]) end
     paper:Upload()
 end
 
--- Register a freshly-finished action (clears the redo branch). When the undo list grows
--- past the cap, the oldest action is permanently baked into the base layer so undo stays
--- cheap (it only ever replays UNDO_CAP actions) while older work is preserved.
+-- registers a finished action (clears redo); past UNDO_CAP the oldest bakes into the base layer
 local function pushAction(a)
     actions[#actions + 1] = a
     redoActions = {}
@@ -192,7 +179,7 @@ local function clearSheet()
     paper:Upload()
 end
 
--- ── Lifecycle ─────────────────────────────────────────────────────────────────────
+-- ==== lifecycle ====
 
 function onStart()
     SURF_W = INPUT:GetSurfaceWidth()
@@ -222,7 +209,7 @@ function deactivate() end
 function afterSongEnum() end
 function onDestroy() end
 
--- ── Draw ────────────────────────────────────────────────────────────────────────
+-- ==== draw ====
 
 local function txt(font, str, r, g, b)
     return font:GetText(str, false, 1800,
@@ -254,7 +241,7 @@ function draw()
         end
     end
 
-    -- HUD (static / change-on-input strings, so GetText caches them)
+    -- HUD strings change only on input (GetText caches them)
     txt(fontMid, "Canvas Test", 255, 255, 255):Draw(24, 16)
     txt(fontSmall,
         "T: brush/stamp   Left: paint/stamp   Right: erase   1-8: colour   wheel: size   arrows: rotate   [ ]: stamp   C: clear   Ctrl+Z/Y: undo/redo   Esc: back",
@@ -269,12 +256,12 @@ function draw()
     end
 end
 
--- ── Update ──────────────────────────────────────────────────────────────────────
+-- ==== update ====
 
 local function kp(k) return INPUT:KeyboardPressed(k) end
 local function kd(k) return INPUT:KeyboardPressing(k) end
 
--- finalise the in-progress brush stroke (called on release / mode switch)
+-- finalises the in-progress stroke (on release / mode switch)
 local function endStroke()
     if currentStroke ~= nil then
         pushAction(currentStroke)
@@ -283,7 +270,7 @@ local function endStroke()
 end
 
 function update(ts)
-    -- real elapsed time so stamp rotation speed is frame-rate independent
+    -- dt in s (frame-rate-independent rotation)
     local dt = (ts - lastTs) / 1000.0
     lastTs = ts
     if dt < 0 then dt = 0 elseif dt > 0.1 then dt = 0.1 end
@@ -316,7 +303,7 @@ function update(ts)
         end
     end
 
-    -- stamp rotation via held arrows + stamp selection via [ ]
+    -- stamp rotation (held arrows) and selection ([ ])
     if mode == "stamp" then
         if kd("LeftArrow")  then stampRot = stampRot - STAMP_SPIN * dt end
         if kd("RightArrow") then stampRot = stampRot + STAMP_SPIN * dt end

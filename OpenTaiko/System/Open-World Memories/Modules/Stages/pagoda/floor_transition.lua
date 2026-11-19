@@ -1,5 +1,5 @@
--- Screen between a story/clear and entering a floor, on the selector's tower scene.
--- update() returns nil while running, then "done" once faded out.
+-- screen between a story/clear and a floor (selector tower scene)
+-- update(): nil while running, "done" once faded out
 
 local scene    = require("selector_scene")
 local selector = require("selector")
@@ -11,7 +11,7 @@ local M = {}
 
 local Time = Animation.stage.floor_transition
 local SCATTER_SEC = Time.scatter_s
-local SETTLE_SEC  = Time.settle_s       -- after the dispersal, before the camera moves
+local SETTLE_SEC  = Time.settle_s       -- after dispersal, before the climb
 local SCROLL_SEC  = Time.scroll_s       -- camera climb
 local HOLD_SEC    = Time.hold_s         -- on the destination plaque
 local FADE_SEC    = Time.fade_s
@@ -21,7 +21,7 @@ local _phase = "idle"          -- idle|scatter|settle|scroll|hold|fadeout
 local _from, _to, _highest = 1, 1, 0
 local _cam, _camFrom, _camTo = 0, 0, 0
 local _t, _fade = 0, 0
-local _scP = 0                 -- linear 0..1 progress of the dispersal
+local _scP = 0                 -- linear 0..1 dispersal
 local _sfx = {}
 
 local function sk(key, fallback)
@@ -41,7 +41,7 @@ local function playSfx(name)
     if s ~= nil then s:Play() end
 end
 
--- the roofs have their own sky hour (as in the selector); below the roofs is noon
+-- roof sky hours as in the selector; noon below
 local function sky_hour(level)
     return skybox.hourFor(level)
 end
@@ -57,26 +57,24 @@ end
 
 function M.active() return _phase ~= "idle" end
 
--- grey, visible for the sky behind the scene; nil while idle
+-- grey, visible for the sky; nil while idle
 function M.sky()
     if _phase == "idle" then return nil end
     if _phase == "scatter" and _from == 20 then return 1 - smoothstep(_scP), true end
     return skybox.rule(_highest), true
 end
 
--- from:    the floor just played (== to when arriving from a story)
--- to:      the floor being entered next
--- highest: highest level the tower shows beaten after the clear (the run's own progress), for
---          the door darkening behind the scene and the sky
--- scatter: true when `from` was still shrouded before this clear, so its darkness disperses first
+-- from: floor just played (== to after a story)
+-- to: floor entered next
+-- highest: highest level shown beaten after the clear (door darkening, sky)
+-- scatter: from was shrouded before the clear (its darkness disperses first)
 function M.open(from, to, highest, scatter)
     _from, _to, _highest = from or to, to, highest or 0
     _camFrom = scene.floor_center(_from) - THEME:GetResolution().Y * 0.5
     _camTo   = scene.floor_center(_to)   - THEME:GetResolution().Y * 0.5
     _cam, _t, _fade = _camFrom, 0, 0
     _scP = 0
-    -- the sky takes the departing floor's hour now: the previous screen reset it to noon and the
-    -- first update comes after this frame's draw
+    -- sky takes the departing floor's hour now (first update follows this draw)
     selector.applySky(sky_hour(_from), _cam)
     if scatter and _from >= 11 and _from <= 20 then
         scene.setScatter(_from, 0)
@@ -94,7 +92,6 @@ function M.update(dt)
 
     if _phase == "scatter" then
         selector.applySky(sky_hour(_from), _cam)
-        -- smoothstep
         _scP = math.min(1, _t / SCATTER_SEC)
         scene.setScatter(_from, smoothstep(_scP))
         if _t >= SCATTER_SEC then
@@ -118,7 +115,7 @@ function M.update(dt)
         local p = math.min(1, _t / SCROLL_SEC)
         local e = 1 - (1 - p) * (1 - p) * (1 - p)          -- ease-out cubic
         _cam = _camFrom + (_camTo - _camFrom) * e
-        -- the sky moves to the next floor's hour during the climb and the hold
+        -- sky glides to the next floor's hour during climb and hold
         selector.applySky(skybox.glideHour(sky_hour(_to), dt), _cam)
         if p >= 1 then
             _t = 0 ; _phase = "hold"
@@ -151,12 +148,11 @@ function M.draw()
     if _phase == "idle" then return end
     local res = THEME:GetResolution()
 
-    -- the beaten floor keeps its darkness until the dispersal ends, so scatter draws against the
-    -- pre-clear highest
+    -- beaten floor stays dark until the dispersal ends (pre-clear highest)
     local shown = (_phase == "scatter") and math.min(_highest, _from - 1) or _highest
     scene.draw(_cam, shown)
 
-    -- plaque level: the floor being left, then the one being entered
+    -- plaque level: floor left, then floor entered
     local plaqueLevel = (_phase == "scroll" or _phase == "hold" or _phase == "fadeout") and _to or _from
     selector.drawPlaque(plaqueLevel, sk("PAGODA_NEXT", "Next..."))
 

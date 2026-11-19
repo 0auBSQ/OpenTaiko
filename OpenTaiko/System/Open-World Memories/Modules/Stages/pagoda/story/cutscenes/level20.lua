@@ -1,4 +1,4 @@
--- Level-20 cutscene lines; event = "..." starts an animation of encounter/cutscenes/level20.lua, a wait line holds until it ends.
+-- level-20 cutscene lines; event = "...": encounter/cutscenes/level20.lua animation, wait holds until it ends
 
 return {
     ending = { clear = "credits", fail = "flight" },

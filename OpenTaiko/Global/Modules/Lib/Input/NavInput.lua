@@ -1,9 +1,9 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- nav_input.lua — handles common keybinds for directional navigation
+-- Input.NavInput: common keybinds for directional navigation
 
 local NavInput = {}
 
--- ─── Player input sets ────────────────────────────────────────────────────────
+-- ==== player input sets ====
 
 local inputSets = {
     -- per-player
@@ -90,7 +90,7 @@ local function inputHandler(event, player, def)
     return chainedHandler or function (useUniversal) return false end
 end
 
--- 1 for P1, 2 for P2, and so on; 0 for using only universal navigation keys; "" or omitted for using the union of all players' keys
+-- player: 1 for P1, 2 for P2, ...; 0 for universal keys only; "" or nil for the union of all players'
 function NavInput.getPn(player)
     if player == nil then player = "" end
     if NavInput.p[player] ~= nil then
@@ -98,7 +98,7 @@ function NavInput.getPn(player)
     end
     local binding_defs = (player == "") and binding_union_defs or binding_player_defs
     local navPn = {}
-    -- navPn.right() aka. navPn.rightPressed(), navPn.rightPressing(), navPn.rightReleased(), and so on.
+    -- navPn.right() aka navPn.rightPressed(); also rightPressing(), rightReleased()
     for i, event in ipairs{ "", "Pressed", "Pressing", "Released" } do
         for binding, def in pairs(binding_defs) do
             navPn[binding .. event] = inputHandler(event, player, def)
@@ -119,9 +119,9 @@ for k, v in pairs(NavInput.p[""]) do
     NavInput[k] = v
 end
 
--- ─── What a binding answers to, for hints ─────────────────────────────────────
+-- ==== binding names for hints ====
 
--- SlimDX key names that read better than their enum name; letters, digits and function keys pass through
+-- display names for SlimDX keys; letters and function keys pass through
 local KEY_NAMES = {
     LeftControl = "L-Ctrl", RightControl = "R-Ctrl", LeftShift = "L-Shift", RightShift = "R-Shift",
     LeftAlt = "L-Alt", RightAlt = "R-Alt", Return = "Enter", Escape = "Esc", Back = "Backspace",
@@ -171,9 +171,8 @@ local function addInput(out, seen, input)
     end
 end
 
--- the display names of everything a binding ("decide", "cancel", "right", ...) answers to for a player (as
--- getPn takes it): its keyboard key first, then the key config's universal inputs, the player's drum
--- inputs and the other players' ones, without repeats
+-- display names of everything a binding ("decide", "right", ...) answers to for a player (as getPn takes it)
+-- keyboard key first, then the key-config inputs, no repeats
 function NavInput.bindingNames(binding, player)
     if player == nil then player = "" end
     local def = ((player == "") and binding_union_defs or binding_player_defs)[binding]

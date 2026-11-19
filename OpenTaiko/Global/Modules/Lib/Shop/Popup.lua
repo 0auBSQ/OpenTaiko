@@ -1,9 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field
--- Shop.Popup: an optional pop-up for a purchase through the "modal" ROActivity, for a skin that wants
--- one (OWM's coin shop has its own feedback and does not use it).
---   Popup.show(item, qty, picture)   -- picture: a SHARED texture name; furniture defaults to My Room's
---                                    -- thumbnail "myroom_thumb_<id>"
---   Popup.update() -> true while it plays, Popup.draw(), Popup.stop()
+-- Shop.Popup: optional purchase pop-up through the "modal" ROActivity
 
 local Catalog = require("Shop.Catalog")
 local Texts   = require("Shop.Texts")
@@ -14,7 +10,7 @@ local RARITY_INT = { Poor = 0, Common = 0, Uncommon = 1, Rare = 2, Epic = 3, Leg
 
 local function modal() return ROACTIVITY:GetROActivity("modal") end
 
--- false when it can't show
+-- picture: a SHARED texture name (furniture default "myroom_thumb_<id>"); false when it can't show
 function M.show(item, qty, picture)
     local m = modal()
     if m == nil or item == nil then return false end
@@ -38,6 +34,7 @@ function M.show(item, qty, picture)
     return true
 end
 
+-- true while it plays
 function M.update()
     local m = modal()
     if m == nil or not m.IsActive then return false end

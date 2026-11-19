@@ -1,4 +1,4 @@
--- Spanish for bestiary.lua; a missing key shows the English.
+-- Spanish for bestiary.lua; missing keys fall back to English
 
 local T = {}
 

@@ -1,18 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
--- song_select_core Activity
--- Core song-select logic shared by regular_song_select, ai_battle_song_select,
--- and training_song_select.
---
--- activate(config) parameters (all optional, nil = default):
---   allowPlayerCount  (bool)  true by default — allow L key to cycle player count
---   lockedPlayerCount (int)   nil by default  — forces CONFIG.PlayerCount to this value
---   mountAISlotToP2   (bool)  false by default — mounts the AI virtual slot onto spot 2
---
--- update() return values:
---   "play"   — a song was successfully mounted, parent stage should Exit("play")
---   "cancel" — user backed out entirely, parent stage should decide where to go
---   nil      — still running, no action needed
--- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+-- song select core, shared by the song select stages
+-- layout: Config/layout.json; timings: Config/animation.json
 
 local Sort    = require("sort")
 local Nav     = require("navigation")
@@ -26,55 +14,51 @@ local Animation = Config.load("Config/animation.json")
 local NavInput = require("NavInput")
 local I18N    = require("i18n")
 
--- Overlays with baked text: localized, so loaded by activate() for the current language and freed by
--- deactivate() (G.bgtx key -> default file; the "<name>_<code>.png" variant is used when it exists)
+-- baked-text overlays, per language: loaded in activate(), freed in deactivate()
+-- G.bgtx key -> default file; "<name>_<code>.png" used when present
 local OVERLAY_FILES = { overlay = "Textures/bg_overlay.png", overlay_difficulty = "Textures/bg_overlay_difficulty.png" }
 
--- Song-preview volume fades
 local PREVIEW_FADE_IN_MS  = Animation.preview.fade_in_ms
 local PREVIEW_FADE_OUT_MS = Animation.preview.fade_out_ms
 local Fonts = Layout.fonts
 local WaitScreen = Layout.wait_screen
 local WAIT_TEXT_COLOR = Config.color(WaitScreen.text_color)
 local MusicDuck = require("MusicDuck")
-local previewDuck = MusicDuck.new()   -- dims the preview while the unlock reward modal plays
+local previewDuck = MusicDuck.new()   -- ducks the preview during the unlock reward modal
 local Search  = require("search")
 local Unlocks = require("unlockables")
 local Favs    = require("favorites")
-local BG      = require("backgrounds")   -- per-genre background sets, crossfaded with the selection
-local SC      = require("shortcuts")     -- keyboard shortcuts (theme "key" settings) + the help panel
+local BG      = require("backgrounds")   -- per-genre background sets
+local SC      = require("shortcuts")     -- keyboard shortcuts (theme "key" settings), help panel
 local Featured = require("featured")     -- curated boxes at the top of the root list
 
--- ── Shared state (G) ─────────────────────────────────────────────────────────
--- All modules receive a reference to this table via their init() call.
--- Mutations through G are visible to every module immediately.
+-- ==== Shared state (G) ====
+-- passed to every module's init()
 
 local G = {
-    -- Fonts
+    -- fonts
     text = nil, textSmall = nil, textLarge = nil, textStats = nil,
 
-    -- Sounds
     sounds = {},
 
-    -- Song list
+    -- song list
     songList = nil,
     currentPage = {}, pageTexts = {}, genre_overlays = {},
 
-    -- Textures
+    -- textures
     bars = {}, bgtx = {},
     favoriteicon = nil,
     portraits = {},
 
-    -- Player
     highlightedPlayer = 0,
 
-    -- Inner activities (dialogs)
+    -- inner activities
     act_inner = {}, modicons_ro = nil,
 
-    -- Counters
+    -- counters
     ctx = {},
 
-    -- Scroll / animation state
+    -- scroll / animation
     nowMs               = 0,
     backgroundScrollX   = 0,
     songSelectShift     = 0,
@@ -86,19 +70,19 @@ local G = {
     selectBoxDist   = 0,
     noteFloatPhase  = 0,
 
-    -- Screen state
+    -- screen state
     activeScreen         = "songselect",
     songSelectModes      = { songselect = true, pretransition = true, transition = true },
     difficultySelectModes = { difficultyselect = true, transition = true },
 
-    -- Dialog-close tracking
+    -- dialog close tracking
     wasCustomizeActive      = false,
     wasSortDialogActive     = false,
     wasConfirmDialogActive  = false,
 
-    -- (search state is managed entirely by LuaSongList:OpenVirtualFolder / CloseFolder)
+    -- search state: LuaSongList:OpenVirtualFolder / CloseFolder
 
-    -- Preview state
+    -- preview
     puchiSineY          = 0,
     puchiIdxFrame       = 0,
     selectedSongNode    = nil,
@@ -106,33 +90,32 @@ local G = {
     previewDemoStart    = 0,
     previewDurationMs   = 0,
     previewLoaded       = false,
-    previewWasPlaying   = false, -- was the preview observed playing? (falling edge → loop restart)
-    previewFadeVol      = 0,    -- current applied preview volume (0..100), eased toward previewFadeTarget
-    previewFadeTarget   = 0,    -- 0 = fading out (scroll), 100 = fading in (new preview playing)
-    preimagePopScale    = 1,    -- jacket pop-in scale multiplier (navigation drives it on appear)
+    previewWasPlaying   = false, -- falling edge restarts the loop
+    previewFadeVol      = 0,    -- applied volume 0..100, eased toward previewFadeTarget
+    previewFadeTarget   = 0,    -- 0: fade out, 100: fade in
+    preimagePopScale    = 1,    -- jacket pop-in scale (set by navigation)
 
-    -- Difficulty select
+    -- difficulty select
     diffBars     = {},
     diffIndex    = {0, 0, 0, 0, 0},
     diffSelected = {false, false, false, false, false},
 
-    -- Config / lifecycle
+    -- config / lifecycle
     activeConfig = {},
     lastSignal   = nil,
 
-    -- Sort state
+    -- sort
     originalOrders = {},
 
-    -- Hold scroll
+    -- hold scroll
     holdDir = 0,
 
-    -- Per-player input bindings
     NavInput = NavInput,
 }
 
--- ── Shared utility functions (stored in G so every module can call them) ──────
+-- ==== Shared helpers (G) ====
 
--- Counter helper — wraps COUNTER:CreateCounter and stores in G.ctx to prevent GC.
+-- kept in G.ctx against GC
 G.startCounter = function(key, startVal, endVal, interval, mode, updateCallback, onFinish)
     local c = COUNTER:CreateCounter(startVal, endVal, interval, onFinish)
     if mode == "loop"   then c:SetLoop(true)
@@ -143,8 +126,8 @@ G.startCounter = function(key, startVal, endVal, interval, mode, updateCallback,
     return c
 end
 
--- A skin locale string (Locales/<lang>/), the English fallback when the key is missing. Kept until
--- activate() empties G.skinTexts, so a language change applies on the next visit.
+-- skin locale string (Locales/<lang>/); fallback when missing
+-- cached until activate() clears G.skinTexts (language change: next visit)
 G.skinTexts = {}
 G.skinText = function(key, fallback)
     local s = G.skinTexts[key]
@@ -156,7 +139,7 @@ G.skinText = function(key, fallback)
     return s
 end
 
--- Number rendering — used by draw_songselect and diffselect panels.
+-- used by draw_songselect and diffselect
 G.calculateNumberWidth = function(nb, txstr)
     local str = tostring(nb)
     local cursorX, prevWidth, lastWidth = 0, 0, 0
@@ -194,7 +177,6 @@ G.drawNumberCentered = function(nb, txstr, x, y, color, opacity)
     end
 end
 
--- Character / nameplate drawing — shared by song select and difficulty select panels.
 G.drawPlayerChara = function(player, x, y, scaleX, scaleY, opacity, flipX)
     local chara = GetSaveFile(player):GetCharacter()
     if chara ~= nil and chara.IsValid then
@@ -226,7 +208,7 @@ G.drawCharaWithNameplate = function(player, x, y, scaleX, scaleY, opacity, flipX
     NAMEPLATE:DrawPlayerNameplate(x, y, opacity * 255, player)
 end
 
--- ── Module initialisation ─────────────────────────────────────────────────────
+-- ==== Module init ====
 
 Sort.init(G)
 Nav.init(G)
@@ -240,7 +222,7 @@ G.backgrounds = BG
 SC.init(G)
 G.shortcuts = SC
 G.songListHit = DrawSS.hitTest
--- the skin's bool theme settings, read once per visit (a missing definition counts as on)
+-- bool theme settings, read once per visit; missing counts as on
 local themeFlags = {}
 G.reloadThemeFlags = function()
     themeFlags = {}
@@ -254,16 +236,14 @@ G.themeFlag = function(id)
     if v == nil then return true end
     return v
 end
--- the mouse drives the song list and the difficulty bars only when one person plays (the AI battle's
--- second slot is the bot, so that mode counts as one) and the theme setting allows it; the best plays
--- list keeps its own mouse handling whatever the setting says
+-- one human player (AI battle counts as one) and songselect_mouse on
+-- the best-plays list handles the mouse on its own
 G.mouseAllowed = function()
     if not G.themeFlag("songselect_mouse") then return false end
     return CONFIG.PlayerCount == 1 or G.activeConfig.mountAISlotToP2 == true
 end
--- Event Mode: the countdown to a forced choice (song select, then difficulty select) and its hud are the
--- event_timer ROActivity; G.eventCountdown says whether one is running this visit (the difficulty select
--- then hides its back bar); G.eventOver = this visit ends the session (the thank-you screen follows)
+-- Event Mode countdown and hud: event_timer ROActivity
+-- eventCountdown: running this visit (diffselect hides its back bar); eventOver: visit ends the session
 G.event = EM
 G.eventTimer = nil
 G.eventCountdown = false
@@ -271,23 +251,21 @@ G.eventOver = false
 G.playedSinceLastVisit = false
 Featured.init(G)
 
--- Expose applySort through G so other modules (e.g. search.lua) can call it
--- without needing a direct reference to Sort.
+-- for modules without a Sort reference
 G.applySort = function() Sort.applySort() end
 
--- Expose Unlocks through G so draw_songselect and navigation can reach it.
 G.unlocks = Unlocks
 
--- ── Lifecycle ─────────────────────────────────────────────────────────────────
+-- ==== Lifecycle ====
 
 function onStart()
-    -- glyph-composed fonts: one texture per unique character (bounded), no per-string texture cache
+    -- glyph fonts: one texture per unique character, no per-string cache
     G.text      = TEXT:CreateGlyphCached(Fonts.text)
     G.textSmall = TEXT:CreateGlyphCached(Fonts.small)
     G.textLarge = TEXT:CreateGlyphCached(Fonts.large)
     G.textStats = TEXT:CreateGlyphCached(Fonts.stats)
 
-    BG.loadDefault()   -- bg1.png, the set every genre without its own falls back to
+    BG.loadDefault()   -- bg1.png, fallback set for genres without one
 
     G.bgtx["load"]                      = TEXTURE:CreateTexture("Textures/load.png")
     G.bgtx["preimage_load"]             = TEXTURE:CreateTexture("Textures/preimage_load.png")
@@ -300,14 +278,14 @@ function onStart()
     G.bgtx["header-arrow"]              = TEXTURE:CreateTexture("Textures/bg_header-arrow.png")
     G.bgtx["nameplate_info"]            = TEXTURE:CreateTexture("Textures/nameplate_info.png")
     G.bgtx["sinfo_video"]               = TEXTURE:CreateTexture("Textures/sinfo_video.png")
-    G.bgtx["sinfo_speed_arrow"]         = TEXTURE:CreateTexture("Textures/sinfo_speed_arrow.png")   -- one white ▶, tinted per draw
+    G.bgtx["sinfo_speed_arrow"]         = TEXTURE:CreateTexture("Textures/sinfo_speed_arrow.png")   -- tinted per draw
     G.bgtx["sinfo_explicit"]            = TEXTURE:CreateTexture("Textures/sinfo_explicit.png")
     G.bgtx["sinfo_difficulties_missing"] = TEXTURE:CreateTexture("Textures/sinfo_difficulties_missing.png")
     G.bgtx["sinfo_difficulties_vault"]      = TEXTURE:CreateTexture("Textures/sinfo_difficulties_vault.png")
     for i = 0, 4 do
         G.bgtx["sinfo_difficulties_" .. i]           = TEXTURE:CreateTexture("Textures/sinfo_difficulties_" .. i .. ".png")
     end
-    -- Level digits, plus the "+" glyph of each set (drawn as the last character of a plus level, e.g. "9+")
+    -- level digits; "+" is the last character of a plus level
     for i = 0, 9 do
         G.bgtx["levellabelsfill" .. i]   = TEXTURE:CreateTexture("Textures/BarLevelFill/" .. i .. ".png")
         G.bgtx["levellabels" .. i]       = TEXTURE:CreateTexture("Textures/BarLevel/" .. i .. ".png")
@@ -319,14 +297,13 @@ function onStart()
     G.bgtx["sinfo_level+"]      = TEXTURE:CreateTexture("Textures/SinfoLevel/plus.png")
     G.bgtx["diffsel_levelcol+"] = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelCol/plus.png")
     G.bgtx["diffsel_levelcol+border"] = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelCol/plus_border.png")
-    -- Level gauge sets: LevelGauge/seg8 (Easy/Normal) and seg10 (the rest), three upright white cells each
-    -- (first / middle / last slice); diffselect places and rotates them from Config/layout.json
+    -- seg8: Easy/Normal, seg10: others; 3 slice cells each, placed by diffselect
     G.bgtx["diffsel_gauge8"]  = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelGauge/seg8.png")
     G.bgtx["diffsel_gauge10"] = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelGauge/seg10.png")
     G.bgtx["diffsel_gauge8_space"]  = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelGauge/seg8_space.png")
     G.bgtx["diffsel_gauge10_space"] = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelGauge/seg10_space.png")
-    -- Level stars (levels past the gauge's 10 slices): DifficultyBars/star<bar>.png per bar texture index
-    -- (2 = Easy .. 6 = Ura, 7 = vault); only the bars that ship one show stars. star_glint.png = the glitter.
+    -- level stars past the gauge's 10 slices: star<bar>.png, bar 2 = Easy .. 6 = Ura, 7 = vault
+    -- optional per bar
     for i = 2, 7 do
         if TEXTURE:Exists("Textures/DifficultyBars/star" .. i .. ".png") then
             G.bgtx["diffsel_star" .. i] = TEXTURE:CreateTexture("Textures/DifficultyBars/star" .. i .. ".png")
@@ -336,7 +313,7 @@ function onStart()
     G.bgtx["placeholder_portrait"] = TEXTURE:CreateTexture("Textures/placeholder_portrait.png")
 
     G.bars["bar"]              = TEXTURE:CreateTexture("Textures/bar.png")
-    -- the black sticker of the random, back and folder bars, and its icons
+    -- sticker of the random / back / folder bars, with icons
     G.bars["sticker"]          = TEXTURE:CreateTexture("Textures/bar_sticker.png")
     G.bars["sticker_random"]   = TEXTURE:CreateTexture("Textures/bar_sticker_random.png")
     G.bars["sticker_back"]     = TEXTURE:CreateTexture("Textures/bar_sticker_back.png")
@@ -348,7 +325,7 @@ function onStart()
     G.bars["levellabelsvault"]   = TEXTURE:CreateTexture("Textures/bar_levelbgvault.png")
     G.bars["levellabelsfire"]    = TEXTURE:CreateTexture("Textures/bar_levelbgfire.png")
     G.bars["levellabelsstorm"]   = TEXTURE:CreateTexture("Textures/bar_levelbgstorm.png")
-    -- Easy / Normal / Hard from their high levels (see draw_songselect's SONGBAR_CHECKER_LEVEL_*)
+    -- Easy / Normal / Hard high levels (draw_songselect SONGBAR_CHECKER_LEVEL_*)
     for i = 0, 2 do
         G.bars["levellabelschecker" .. i] = TEXTURE:CreateTexture("Textures/bar_levelbgchecker" .. i .. ".png")
     end
@@ -358,9 +335,9 @@ function onStart()
     for i = 2, 7 do
         G.bars["difficultybar" .. i] = TEXTURE:CreateTexture("Textures/DifficultyBars/" .. i .. ".png")
     end
-    -- Note.png: the frame all difficulty-select elements are laid out relative to (floats + rotates).
+    -- difficulty select layout frame (floats, rotates)
     G.bars["diffnote"] = TEXTURE:CreateTexture("Textures/DifficultyBars/Note.png")
-    -- Option bars, in the on-screen order 0 / 1 / Customize (see diffselect.lua positions + actions).
+    -- option bars in screen order (diffselect.lua)
     G.bars["smallbar0"] = TEXTURE:CreateTexture("Textures/DifficultyBars/0.png")
     G.bars["smallbar1"] = TEXTURE:CreateTexture("Textures/DifficultyBars/1.png")
     G.bars["smallbar2"] = TEXTURE:CreateTexture("Textures/DifficultyBars/Customize.png")
@@ -386,15 +363,18 @@ function onStart()
     G.favs = Favs
 end
 
--- backgroundMode: nil = the per-genre sets (backgrounds.lua); "shared" = the host draws its own via the
--- SHARED "background" texture (set after this call), scrolled as before
+-- allowPlayerCount: L key cycles the player count (default true)
+-- lockedPlayerCount: forces CONFIG.PlayerCount
+-- mountAISlotToP2: AI virtual slot on spot 2
+-- songOnly: song pick only (online lobby)
+-- backgroundMode: nil = per-genre sets; "shared" = SHARED "background" texture, set after this call
 function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly, backgroundMode)
     G.folderCountCache = nil   -- unlocks may have changed since the last visit
     G.activeConfig = {
         allowPlayerCount  = allowPlayerCount,
         lockedPlayerCount = lockedPlayerCount,
         mountAISlotToP2   = mountAISlotToP2 == true,
-        songOnly          = songOnly == true,   -- online lobby: pick song only (no diff prompt), Auto disabled
+        songOnly          = songOnly == true,   -- online lobby: no difficulty prompt, Auto off
     }
 
     if G.activeConfig.lockedPlayerCount ~= nil then
@@ -421,15 +401,12 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly
     Diff.resetToSongSelect()
     Unlocks.invalidateCondCache()
 
-    -- (search state is owned by LuaSongList; reloading the song list resets it)
-
     BG.setMode(backgroundMode)
     BG.reset()
-    SC.reload()   -- the bindings can change in the settings between visits
+    SC.reload()   -- bindings may change between visits
     G.reloadThemeFlags()
 
-    -- Event Mode: a play just ended counts, resets every player's mods, and may end the session; a
-    -- visit that goes on gets the countdown hud
+    -- Event Mode: count the last play, reset mods; countdown hud unless the session ended
     G.eventOver = false
     G.eventCountdown = false
     G.eventExpired = false
@@ -446,16 +423,16 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly
     end
     G.playedSinceLastVisit = false
 
-    -- localized overlays for the current language (it can change between visits); freed in deactivate()
+    -- language may change between visits; freed in deactivate()
     for key, default in pairs(OVERLAY_FILES) do
         if G.bgtx[key] ~= nil then G.bgtx[key]:Dispose() end
         G.bgtx[key] = TEXTURE:CreateTexture(I18N.localizedPath(default))
     end
 
-    G.speedLabel = nil                  -- read again in the current language
+    G.speedLabel = nil                  -- re-read in the current language
     G.skinTexts = {}
 
-    -- the online lobby's preview plays on at full volume while its song stays selected (navigation hands it over)
+    -- online lobby: a playing preview stays at full volume (navigation takes it over)
     if G.activeConfig.songOnly then
         local ps = SHARED:GetSharedSound("presound")
         if ps ~= nil and ps.Loaded and ps.IsPlaying then G.previewFadeVol, G.previewFadeTarget = 100, 100 end
@@ -466,7 +443,7 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly
         Nav.refreshPage()
     end
 
-    -- Animation counters
+    -- animation counters
     local PUCHI_FLOAT_AMP                  = Puchi.float_amp_px
     local LevelTag = Animation.level_tag
     local SONGBAR_LEVEL_EX_ANIMATION_FRAMECOUNT = LevelTag.frame_count
@@ -480,8 +457,7 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly
         local fadeIn = val - UraFade.fade_in_from; local fadeOut = UraFade.cycle - val
         G.difficultyFade4 = math.max(0, math.min(255, fadeIn, fadeOut))
     end)
-    -- the selected row's green: from select_band_min to full and back, eased at both ends (the counter runs
-    -- 0..1000 over select_band_ms)
+    -- select band pulse select_band_min..1, cosine eased; counter 0..1000 over select_band_ms
     local bandMin = Animation.song_list.select_band_min
     G.startCounter("selectband_animation", 0, 1000, Animation.song_list.select_band_ms / 1000000, "bounce", function(val)
         G.selectBandPulse = bandMin + (1 - bandMin) * (0.5 - 0.5 * math.cos(math.pi * val / 1000))
@@ -503,13 +479,12 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly
     G.startCounter("puchi_frame", 0, 1, Puchi.frame_loop_s, "loop", function(val)
         G.puchiIdxFrame = math.floor(val * PUCHI_N_FRAMES)
     end)
-    -- Difficulty-select Note float/rotation phase (0..360). Ticks in G.ctx every frame regardless of
-    -- activeScreen, so the Note animates during the songselect→diffselect transition too. diffselect reads it.
+    -- diffnote phase 0..360; ticks on every screen, so it runs during the transition
     G.startCounter("diffnote_float", 0, 360, 1 / Animation.difficulty_select.note.phase_speed_deg_per_s, "loop", function(val)
         G.noteFloatPhase = val
     end)
 
-    -- the players' box (characters, portraits) is not shown in the online lobby's song select
+    -- no players' box in the online lobby
     G.portraits = {}
     if G.activeConfig.songOnly then return end
     for p = 0, 4 do
@@ -534,7 +509,7 @@ function deactivate()
     for k in pairs(G.ctx) do G.ctx[k] = COUNTER:EmptyCounter() end
     Diff.resetTransitionVisuals()
 
-    -- the online lobby takes its preview back as it is; anywhere else it stops here
+    -- online lobby keeps its preview playing
     if not G.activeConfig.songOnly then
         SHARED:GetSharedSound("presound"):Stop()
         SHARED:SetSharedString("presound_path", "")
@@ -566,9 +541,9 @@ function afterSongEnum()
     lsls.HideEmptyFolders    = true
     lsls.FlattenOpenedFolders = false
     lsls:SetMandatoryDifficultyList({0, 1, 2, 3, 4})   -- Easy..Edit
-    lsls.MandatoryDifficultyMatchAll = false           -- OR: keep charts with at least one playable difficulty
+    lsls.MandatoryDifficultyMatchAll = false           -- OR: at least one listed difficulty
     G.songList       = RequestSongList(lsls)
-    Featured.insertAll()   -- the curated boxes go in before the first folder; the cursor stays on that folder
+    Featured.insertAll()   -- before the first folder; cursor stays on that folder
     G.originalOrders = {}
     Sort.applySort()
     Nav.refreshPage()
@@ -587,17 +562,16 @@ function onDestroy()
     BG.dispose()
 end
 
--- ── Draw ─────────────────────────────────────────────────────────────────────
+-- ==== Draw ====
 
 local function drawWaitScreen(msg)
-    -- Black fill
     local black = COLOR:CreateColorFromHex("ff000000")
     G.textLarge:Draw(msg, WaitScreen.x, WaitScreen.y, WAIT_TEXT_COLOR, nil, 1, 1, WaitScreen.max_width, "center")
 end
 
 function draw(mode)
     if G.eventOver then return end   -- leaving for the thank-you screen: nothing under the fade
-    -- Loading / no-songs guard: black screen with status message.
+    -- loading / no songs: status message only
     if IsSongsEnumerating() then
         drawWaitScreen(G.skinText("VAULT_LOADING", "Loading songs, please wait..."))
         return
@@ -610,8 +584,7 @@ function draw(mode)
     if mode ~= "no_bg" then BG.draw() end
     if mode == "bg_only" then return end
 
-    -- Song select first, then difficulty select OVER it, so the Note covers the song-select right segment
-    -- as it scrolls in (drawing diff under song select left a cutout there).
+    -- difficulty select over song select: the Note covers its right segment while scrolling in
     if G.songSelectModes[G.activeScreen]        then DrawSS.drawPanel() end
     if G.difficultySelectModes[G.activeScreen] then Diff.drawPanel()   end
 
@@ -622,18 +595,19 @@ function draw(mode)
     if G.eventTimer ~= nil and G.eventTimer.IsActive then G.eventTimer:Draw() end
 end
 
--- ── Update ────────────────────────────────────────────────────────────────────
+-- ==== Update ====
 
+-- returns "play" | "cancel" | "thanks" | nil; the parent stage picks the exit
 function update(ts)
-    G.nowMs = ts                                   -- the frame clock for draw-side animations (song speed arrows)
+    G.nowMs = ts                                   -- frame clock, ms, for draw-side animations
     for _, c in pairs(G.ctx) do c:Tick() end
     BG.update()
 
-    -- the session's last play is done: the stage takes the player to the thank-you screen
+    -- session over: stage goes to the thank-you screen
     if G.eventOver then return "thanks" end
 
-    -- the Event Mode countdown runs whatever is open; when it ends, any dialog in the way closes and the
-    -- screen's input handler makes the choice (the flag waits for it through a folder animation)
+    -- Event Mode countdown runs under dialogs; on expiry they close
+    -- the input handler then picks (eventExpired waits through folder animations)
     if G.eventTimer ~= nil and G.eventTimer.IsActive then
         if EM.signal(G.eventTimer:Update()) == "expired" then
             G.eventExpired = true
@@ -644,7 +618,7 @@ function update(ts)
         end
     end
 
-    -- While songs are loading or unavailable, only allow Cancel/Escape to exit.
+    -- loading or no songs: cancel only
     if IsSongsEnumerating() or G.songList == nil or G.songList:GetSongNodeAtOffset(0) == nil then
         if G.NavInput.cancel() then
             G.sounds.Cancel:Play()
@@ -653,9 +627,8 @@ function update(ts)
         return nil
     end
 
-    -- Ease the preview volume toward its target: a prompt fade-out when scrolling away, a short fade-in
-    -- when a new preview starts (navigation.lua sets the target + resets the volume on start). The
-    -- reward modal (opened by confirm_dialog) dims it on top, so the modal's own sounds are heard.
+    -- preview volume eased to its target (set by navigation.lua)
+    -- reward modal (confirm_dialog) ducks it on top
     do
         local psnd = SHARED:GetSharedSound("presound")
         local dtms = 1000 / 60
@@ -676,11 +649,8 @@ function update(ts)
     end
     if ts ~= nil then G.previewPrevTs = ts end
 
-    -- Loop the preview on the FALLING EDGE of IsPlaying (observed playing, then stopped = genuine end).
-    -- IsPlaying also reads false for a frame right after a fresh start/seek, but there it has never been
-    -- observed true yet, so previewWasPlaying is false and the restart doesn't fire — no race, no cooldown.
-    -- Stop() before Play() additionally guarantees the system sound's two internal buffers never overlap
-    -- (playing both at once was the doubled/loud distorted replay).
+    -- loop on the IsPlaying falling edge: a fresh start/seek reads false before it was ever true
+    -- Stop() before Play(): the two system sound buffers never overlap
     if G.previewLoaded then
         local psnd = SHARED:GetSharedSound("presound")
         if psnd.Loaded then
@@ -695,7 +665,6 @@ function update(ts)
         end
     end
 
-    -- Tick inner activities
     local hasActiveInnerModal = false
     for k, at in pairs(G.act_inner) do
         if at.IsActive then
@@ -704,7 +673,7 @@ function update(ts)
         end
     end
 
-    -- Reload characters when customize_dialog closes
+    -- customize_dialog closed: reload characters
     local isCustomizeActive = G.act_inner["customize_dialog"] ~= nil and G.act_inner["customize_dialog"].IsActive
     if G.wasCustomizeActive and not isCustomizeActive and not G.activeConfig.songOnly then
         for p = 0, 4 do
@@ -720,8 +689,7 @@ function update(ts)
     end
     G.wasCustomizeActive = isCustomizeActive
 
-    -- Handle sort_search_dialog close: search mode is handled by search.lua,
-    -- sort mode just re-applies sort and refreshes.
+    -- sort_search_dialog closed: search.lua handles search, else re-sort
     local isSortDialogActive = G.act_inner["sort_search_dialog"] ~= nil and G.act_inner["sort_search_dialog"].IsActive
     if G.wasSortDialogActive and not isSortDialogActive then
         if not Search.checkSearchReady() then
@@ -730,8 +698,7 @@ function update(ts)
     end
     G.wasSortDialogActive = isSortDialogActive
 
-    -- Handle confirm_dialog close: re-sort so the newly-unlocked song moves out of
-    -- the locked section, then refresh the page.
+    -- confirm_dialog closed: re-sort, the unlocked song leaves the locked section
     local isConfirmDialogActive = G.act_inner["confirm_dialog"] ~= nil and G.act_inner["confirm_dialog"].IsActive
     if G.wasConfirmDialogActive and not isConfirmDialogActive then
         G.applySort()
@@ -739,12 +706,11 @@ function update(ts)
     end
     G.wasConfirmDialogActive = isConfirmDialogActive
 
-    -- Advance unlock-related animations.
     Unlocks.tick()
 
     if hasActiveInnerModal then return nil end
 
-    -- the shortcuts panel takes the input while it is up
+    -- shortcuts panel takes the input while open
     if SC.isOpen() then SC.update(ts); return nil end
 
     if G.activeScreen == "songselect" then

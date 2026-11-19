@@ -1,15 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- PagodaAvatar.lua — in the pagoda, player 1 plays as their story student with Ume as puchichara.
--- The character and puchichara they had are held in the save until they leave or the game closes (the
--- pagoda's onDestroy); a run the game crashed in gives them back at the next title. Every stage runs in
--- its own Lua VM, so all the state lives in the save (and one shared string), never in this module.
---
---   PA.student()              "A" or "B", the story student chosen in My Room's mirror (Lib/Student)
---   PA.studentCharacter(s)    the student's v2 character folder name ("A" / "B", default the chosen one)
---   PA.swapped()              a swap is held in the save
---   PA.enter()                the dan select -> pagoda hand-off: hold the current pair, swap them
---   PA.leave()                put the held pair back (nothing when none is held)
---   PA.recover()              PA.leave() for a swap an earlier session never gave back (a crash)
+-- pagoda avatar: P1 plays as their story student, Ume as puchichara
+-- state in the save and one shared string (each stage has its own Lua VM)
 
 local Student = require("Student")
 
@@ -18,13 +9,12 @@ local PA = {}
 local UME = "A05 - Ume"
 
 local HELD    = "pagoda_avatar_held"     -- global trigger: a pair is held
-local CHARA   = "pagoda_avatar_chara"    -- the held character's folder name
-local PUCHI   = "pagoda_avatar_puchi"    -- the held puchichara's folder name
-local LIVE    = "pagoda_avatar_live"     -- shared string, "1" while the swap belongs to this session
+local CHARA   = "pagoda_avatar_chara"    -- held character folder
+local PUCHI   = "pagoda_avatar_puchi"    -- held puchichara folder
+local LIVE    = "pagoda_avatar_live"     -- shared string, "1" while this session owns the swap
 local PALETTE = ".character_palette_"
 
--- a folder name kept in global counters: its byte count, then 6 bytes per counter (48 bits, exact in
--- a double), so any name survives without reaching the save database's text
+-- name stored in global counters: byte count, then 6 bytes per counter (48 bits, exact in a double)
 local CHUNK   = 6
 local MAX_LEN = 240
 
@@ -63,14 +53,17 @@ local function save()
     return nil
 end
 
+-- "A" or "B": story student chosen in My Room's mirror (Lib/Student)
 function PA.student()
     return Student.current(save()):upper()
 end
 
+-- v2 character folder of student s (default: the chosen one)
 function PA.studentCharacter(s)
     return Student.folder(s or PA.student())
 end
 
+-- a swap is held in the save
 function PA.swapped()
     local sf = save()
     if sf == nil then return false end
@@ -78,7 +71,7 @@ function PA.swapped()
     return ok and held == true
 end
 
--- one Palettes.json entry as SetPaletteGradient's stops, or nil for the default colours
+-- Palettes.json entry -> SetPaletteGradient stops, or nil (default colours)
 local function paletteStops(entry)
     local raw = JSONLOADER:JsonGet(entry, "stops")
     local stops = {}
@@ -99,8 +92,8 @@ local function paletteStops(entry)
     return stops, tonumber(JSONLOADER:JsonGet(entry, "blend")) or 0
 end
 
--- player 1's palette slot follows the character now equipped: its saved index in its Palettes.json,
--- the default colours when the index or the file is missing or bad
+-- P1 palette for the equipped character: saved index in its Palettes.json
+-- default colours when the index or file is missing or bad
 local function applyPalette(sf)
     pcall(function()
         local name = sf.CharacterName
@@ -118,11 +111,12 @@ local function applyPalette(sf)
     end)
 end
 
+-- dan select -> pagoda: hold the current pair, swap in student + Ume
 function PA.enter()
     local sf = save()
     if sf == nil then return end
     pcall(function()
-        -- a pair already held stays the one to give back
+        -- an already held pair stays the one to restore
         if not sf:GetGlobalTrigger(HELD) then
             local puchi = sf:GetPuchichara()
             if not storeString(sf, CHARA, sf.CharacterName or "") then return end
@@ -138,12 +132,13 @@ function PA.enter()
     end)
 end
 
+-- restore the held pair (no-op when none)
 function PA.leave()
     local sf = save()
     if sf == nil then return end
     pcall(function() SHARED:SetSharedString(LIVE, "") end)
     if not PA.swapped() then return end
-    -- the hold is dropped once the character is back, or once there is nothing to put back
+    -- hold dropped once the character is back or nothing is left to restore
     local restored = pcall(function()
         local chara = loadString(sf, CHARA)
         if chara ~= nil and chara ~= "" then sf:ChangeCharacter(chara) end
@@ -156,6 +151,7 @@ function PA.leave()
     if restored then pcall(function() sf:SetGlobalTrigger(HELD, false) end) end
 end
 
+-- leave() for a swap a crashed session never gave back
 function PA.recover()
     local ok, live = pcall(function() return SHARED:GetSharedString(LIVE) end)
     if ok and live == "1" then return end

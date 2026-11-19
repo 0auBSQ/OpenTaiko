@@ -1,10 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- coin_shop/keeper.lua: the shopkeeper's spot behind the desk and its speech bubble.
--- The keeper is one of the part-timers in Textures/Keepers/0, 1, 2..., picked from the day when the shop opens (the
--- same one all day); each folder holds one picture per expression: Neutral, Happy, Surprised and Sad (.png), a
--- missing one showing Neutral. Every event picks one of that part-timer's own lines and its expression (PART_TIMERS
--- below); the keeper hops (squash and stretch) when the expression changes and nods when it keeps it, and the
--- bubble types the line in letter by letter.
+-- coin_shop keeper: the shopkeeper behind the desk and its speech bubble.
 
 local Easing = require("Easing")
 local Config = require("Core.Config")
@@ -26,8 +21,7 @@ local HOLD, HOLD_PER_CHAR = Talk.hold_s, Talk.hold_per_char_s
 local POP, CLOSE = BubbleAnim.pop_s, BubbleAnim.close_s
 local LOW_GAP = Talk.low_gap_s           -- a low-priority line waits this long after the last line finished typing
 
--- part-timer 0, Calla: event -> expression, then her English lines; quiet and tired, says as little as she
--- can (keys SHOP_TALK_CALLA_<EVENT>_<n>)
+-- part-timer 0, Calla: event -> expression, then her English lines (keys SHOP_TALK_CALLA_<EVENT>_<n>)
 local CALLA = {
 	greet     = { "neutral", "...Welcome.", "Oh. Hi. Everything's on the page.", "Welcome in. Look around, if you want." },
 	browse    = { "neutral", "That one's nice. I think.", "People like that one.", "Mm. Good pick." },
@@ -54,7 +48,7 @@ local FRAMES = { neutral = "Neutral", happy = "Happy", surprised = "Surprised", 
 
 local ctx = nil
 local lastPick = {}
-local frames = {}        -- expression -> picture of today's keeper
+local frames = {}        -- expression -> picture of today's keeper (missing: Neutral)
 local who = PART_TIMERS[0]   -- today's part-timer
 K.id = 0
 
@@ -75,7 +69,7 @@ function K.free()
 	end
 end
 
--- day: a whole number for the day (e.g. 20261007); only the picked keeper's pictures are loaded
+-- day: yyyymmdd number, picks the part-timer (Textures/Keepers/<n>/); only its pictures are loaded
 function K.load(day)
 	K.free()
 	K.id, who, lastPick = 0, PART_TIMERS[0], {}

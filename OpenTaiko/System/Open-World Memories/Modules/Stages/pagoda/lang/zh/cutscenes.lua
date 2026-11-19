@@ -1,4 +1,4 @@
--- Chinese for story/cutscenes/; a missing key shows the English.
+-- Chinese for story/cutscenes/; missing keys fall back to English
 
 local T = {}
 

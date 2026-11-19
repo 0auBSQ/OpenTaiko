@@ -1,6 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Down (OutFox) background: scrolling additive tile over a red/blue base, with a single clear fade.
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
+-- down background: OutFox
 
 -- Please note that the Project OutFox branding or graphics included are not permitted
 -- for use outside of OpenTaiko without permission from the Project OutFox Developers.
@@ -23,7 +22,7 @@ function clearOut(player)
 end
 
 function onStart()
-    -- p1IsBlue is unknown until draw() (state arrives after onStart), so load BOTH base textures.
+    -- p1IsBlue unknown before draw: load both
     tx["Down_Red.png"] = TEXTURE:CreateTextureSync("Down_Red.png")
     tx["Down_Blue.png"] = TEXTURE:CreateTextureSync("Down_Blue.png")
     tx["Down_Clear.png"] = TEXTURE:CreateTextureSync("Down_Clear.png")
@@ -38,7 +37,6 @@ function update(timestamp, state)
         bgClearFade = bgClearFade + (-2000 * fps.deltaTime)
     end
 
-    -- Don't scroll while SimpleMode is active
     if not state.simplemode then
         effectScrollY = effectScrollY + (30 * fps.deltaTime)
     end
@@ -53,7 +51,6 @@ function update(timestamp, state)
 end
 
 function draw(state)
-    -- bgPath selection moved here from init() since p1IsBlue is per-frame state now.
     local bgPath = "Down_Red.png"
     if state.p1IsBlue then
         bgPath = "Down_Blue.png"

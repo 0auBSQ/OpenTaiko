@@ -1,10 +1,10 @@
--- Picks the story scene that opens a challenge run.
+-- story scene picker for a challenge run start
 
 local M = {}
 
--- seenFirst: the intro has already played once on this save
--- startLevel: the checkpoint the player chose
+-- startLevel: chosen checkpoint
 -- highest: highest level beaten
+-- seenFirst: intro already played on this save
 function M.pick(startLevel, highest, seenFirst)
     if not seenFirst        then return require("story/story_first")  end
     if startLevel >= 21     then return require("story/story_roof")   end

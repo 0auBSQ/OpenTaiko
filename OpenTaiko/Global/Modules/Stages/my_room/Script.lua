@@ -1,17 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- my_room/Script.lua — the personal room (story-mode My Room) on the OWM3d engine, a global stage.
--- Walk the room on a physics character, interact with the computer (pc.lua save-file screen) and the
--- phone (menus in the skin's UI library + the VN.Dialogue landlord), edit furniture/wall items
--- (editmode.lua), and leave through the door. Persisted per SAVE FILE in its "my_room" string (store.lua).
--- P2P visiting lives in online.lua.
---
--- The way in and back: the stage that opens My Room sets the shared string "my_room_return" to
--- "<stage>" or "<stage>|<transition>" before Exit("stage", "my_room"); My Room reads and clears it on
--- entry and leaves for that stage, or for _title when it is empty.
---
--- vs the old isoengine build: the room is a LIT cosy interior (warm ceiling + window lights, soft
--- shadows, subtle diorama grade), the floor is a raised platform the physics character actually stands
--- on (camera boom collides too), and the day/night sky stays visible through the window (drawSky).
+-- My Room: the personal room global stage, on OWM3d
+-- saved per save file in its "my_room" string (store.lua)
 
 -- drawn in 1920x1080: a skin of another resolution rescales it
 STAGES:SetResolution(1920, 1080)
@@ -22,35 +11,35 @@ local Room     = require("room")
 local Dialogue = require("VN.Dialogue")
 local PCS      = require("pc")
 local Edit     = require("editmode")
-local UI       = require("uilib")           -- the skin's UI library (UI.Pick), picked on first use
+local UI       = require("uilib")
 local SavePicker = require("Saves.SavePicker")
 local I18N      = require("Locale.i18n")
 local PHONE    = I18N.texts("phone")        -- lang/<code>/phone.json
 local HUD      = I18N.texts("hud")          -- lang/<code>/hud.json
-local MO       = require("online")          -- P2P "visit my room" (lobby + presence); see online.lua
-local JB       = require("jukebox")         -- the Jukebox furniture's audio player; see jukebox.lua
-local TV       = require("tv")              -- the TV: on/off screen light + the cutscene browser; see tv.lua
-local Pod      = require("pod")             -- the Mysterious Pod's entry sequence; see pod.lua
-local MX       = require("matrix")          -- the Placeholder Matrix: its glow + the debug scene list; see matrix.lua
-local MR       = require("mirror")          -- the mirror: the student and palette the player wears; see mirror.lua
-local FT       = require("fishtank")        -- the Fish Tank: its fish, kelp and blue lights; see fishtank.lua
-local LT       = require("lantern")         -- the Stone Lantern: its fire and warm light; see lantern.lua
-local WB       = require("workbench")       -- the Workbench: recolours floorings and paints; see workbench.lua
-local RB       = require("recycle")         -- the Recycle Bin: sells furniture, floorings and paints; see recycle.lua
-local AV       = require("avatar")          -- the students' billboard sprites (player + visitors); see avatar.lua
-local Student  = require("Characters.Student")   -- the chosen story student and its palette
-local Purse    = require("purse")           -- the coin purse laid over the landlord's offers; see purse.lua
-local Landlord = require("landlord")        -- the landlord's phone call; see landlord.lua
--- Mr.Caspian's and Gris's numbers: the secret vault's small talks, which only Open-World Memories has (its
--- Modules/Lib); with another skin these numbers answer like any other
+local MO       = require("online")
+local JB       = require("jukebox")
+local TV       = require("tv")
+local Pod      = require("pod")
+local MX       = require("matrix")
+local MR       = require("mirror")
+local FT       = require("fishtank")
+local LT       = require("lantern")
+local WB       = require("workbench")
+local RB       = require("recycle")
+local AV       = require("avatar")
+local Student  = require("Characters.Student")
+local Purse    = require("purse")
+local Landlord = require("landlord")
+-- Mr.Caspian's and Gris's numbers (vault small talks): only Open-World Memories has Vault.Talk
+-- with another skin they answer like any other number
 local Talk     = nil
 do
     local ok, mod = pcall(require, "Vault.Talk")
     if ok and type(mod) == "table" then Talk = mod end
 end
-local Chests   = require("Vault.Chests")    -- the song Gris's call unlocks, shown like a vault reward
-local Integrity = require("integrity")      -- the load-time placement sweep; see integrity.lua
-local Store    = require("store")           -- the room and the jukebox in the save's "my_room" string; see store.lua
+local Chests   = require("Vault.Chests")    -- shows the song Gris's call unlocks as a vault reward
+local Integrity = require("integrity")
+local Store    = require("store")
 local NavInput = require("Input.NavInput")
 local net      = MO.net
 
@@ -68,11 +57,11 @@ local px, py, pz = 0, FY, 0    -- player world position (feet)
 local pdir = 2                 -- facing 1↙ 2↘ 3↗ 4↖ (the students' sprite folders)
 local pframeT = 0              -- walk-cycle timer
 local pmoving = false
-local look = { student = "a", palette = 0, set = nil }   -- the student the player walks as, its palette, its sprites
+local look = { student = "a", palette = 0, set = nil }   -- player's student look (AV sprites in set)
 local moveSpeed = 4.2          -- units/sec
 local prompt = nil             -- current interaction prompt ("computer"/"phone"/"exit"/"lamp")
-local focusKey = nil           -- which in-range interactable is focused (stable across frames; Tab cycles)
-local interCount = 0           -- how many interactables are in range this frame (draw shows [Tab] switch when >1)
+local focusKey = nil           -- focused in-range interactable (stable across frames; Tab cycles)
+local interCount = 0           -- interactables in range this frame (>1: draw shows the [Tab] hint)
 local msg, msgT = nil, 0       -- transient on-screen message
 local editSavedCam = nil       -- full camera state saved on edit-enter, restored on edit-exit
 local savedJukebox = nil       -- the jukebox state stored with the room (one string holds both)
@@ -83,24 +72,23 @@ local mode = "play"            -- "play" | "dialogue" | "pc" | "phone" | "edit"
 local phoneUI = nil            -- the UI manager of the phone (menu / number / join panes)
 local phoneJustOpened = false  -- consume the keypress edge that opened the phone
 local phoneFlow = nil          -- landlord conversation step
-local purse = nil              -- purse.lua: the purse shown over the landlord's offers
+local purse = nil              -- purse over the landlord's offers
 local playPhoneSound           -- forward decl: Sounds/<stem>.ogg, lazily loaded (defined with the dialer)
-local ringT, ringScript, ringDue = 0, nil, false  -- an outgoing call: coin, then the ring, then the answer
+local ringT, ringScript, ringDue = 0, nil, false  -- outgoing call state (placeCall)
 local phoneSfx = {}            -- cached dialable-number SFX (stem → sound|false); disposed in onDestroy
-local bombFx = nil             -- the "Canabi" bomb-storm state (declared here so onDestroy sees it)
+local bombFx = nil             -- "Canabi" bomb-storm state (declared here for onDestroy)
 local branchCall = nil         -- the running call that branches (data/phone_numbers.json "start")
-local talkCo, talkRun = nil, nil       -- a call to Mr.Caspian or Gris (a Vault.Talk flow), and the lines it says
+local talkCo, talkRun = nil, nil       -- Vault.Talk call (Mr.Caspian or Gris) and its lines
 local talkPlay = nil                   -- the song that call asks for: the room leaves for it
 local talkAway, talkBack = false, nil  -- left for that song; back: whether it was cleared
-local talkCafe = false                 -- the call is Mr.Caspian's: the cafe can be heard behind him
+local talkCafe = false                 -- Mr.Caspian's call: cafe ambience behind him
 local cafeSnd, cafeOn, cafeK, cafeTo, cafeNode = nil, false, 0, nil, nil
 
--- ── persistence (local save only; the network payload goes through online.lua as JSON) ────────────
--- the room and the jukebox's song live in one string of the save (store.lua); a visitor never writes,
--- and neither does a slot that holds no save
+-- ==== persistence ====
+-- room and jukebox song in one save string (store.lua); never written by a visitor or an empty slot
 local function curSave() return GetSaveFile(playerIndex) end
 local function canPersist()
-    if net.online and not net.isHost then return false end   -- a visitor must never overwrite their own save with the host's room
+    if net.online and not net.isHost then return false end   -- a visitor never writes the host's room into their own save
     local sf = curSave()
     return sf ~= nil and type(sf.SaveUID) == "string" and sf.SaveUID ~= ""
 end
@@ -108,21 +96,19 @@ local function writeStore()
     if room == nil or not canPersist() then return end
     Store.write(curSave(), room:toTable(), savedJukebox)
 end
--- load the CURRENT player's room INTO the existing room object (Room:reset keeps the same table so
--- edit/MO references stay valid); a player with no saved room gets a fresh default. Coin-shop furniture
--- purchases (per-save global counters) are claimed into the inventory here, then persisted right away.
-local saveRoom   -- forward decl (loadRoom persists the shop-grant claim through it)
-local heldWritten = {}   -- the owned counts last written for the room shown (written again when they change)
--- the jukebox's playing song persists alongside the room (the same string): every playback op
--- writes it (JB ctx.onState) and loadRoom resumes it, so leaving/re-entering keeps the music going
-local persistLocked = false    -- deactivate snapshots the live state, then LOCKS so the teardown
-                               -- stopAll (which fires onState with an empty state) can't wipe it
+local saveRoom   -- forward decl (used by loadRoom)
+local heldWritten = {}   -- owned counts last written (rewritten on change)
+-- the playing song persists with the room: every playback op writes it (JB ctx.onState), loadRoom resumes it
+local persistLocked = false    -- set after deactivate's snapshot: the teardown stopAll
+                               -- fires onState with an empty state
 local function persistJukebox()
     if persistLocked or (IsSongsEnumDone and not IsSongsEnumDone()) then return end
     if not canPersist() then return end   -- never persist a host's song into a guest save
     savedJukebox = JB.persistState()
     writeStore()
 end
+-- loads the current player's room into the existing room object (Room:reset keeps the table for edit/MO)
+-- no saved room: fresh default; coin-shop purchases (global counters) are claimed and saved here
 local function loadRoom()
     persistLocked = false          -- fresh stage entry / room switch: persisting is live again
     heldWritten = {}
@@ -130,8 +116,7 @@ local function loadRoom()
     local sf = curSave()
     local t, jbSaved, stored = Store.read(sf)
     local dirty = false
-    -- temporary, removed at the official release: a save whose string is not set yet takes its room
-    -- from OWM's old store, once; a string already set is never replaced by it
+    -- temporary: a save whose string is unset takes its room from OWM's old store, once
     if stored == "" and canPersist() then
         local oldRoom, oldJukebox = Store.legacy(sf, playerIndex)
         if oldRoom ~= nil or oldJukebox ~= nil then
@@ -141,8 +126,8 @@ local function loadRoom()
     end
     savedJukebox = jbSaved
     if t then
-        if room:loadTable(t) then dirty = true end   -- a gift every room gets (the mirror) joined the stock
-        -- pieces the live rules would refuse (overlaps from older builds) go back to stock
+        if room:loadTable(t) then dirty = true end   -- a gift joined the stock
+        -- pieces the live rules refuse go back to stock
         local evicted = Integrity.sweep(room)
         if #evicted > 0 then
             dirty = true
@@ -153,8 +138,8 @@ local function loadRoom()
         local gained = room:drainShopGrants(function(n) return sf:GetGlobalCounter(n) end)
         if gained then dirty = true end
     end
-    if dirty then saveRoom() end   -- persist the sweep, the claim ledger and new stock right away (idempotent)
-    -- resume this save's jukebox: read BEFORE stopAll (stopping persists an empty state)
+    if dirty then saveRoom() end   -- persist right away (idempotent)
+    -- jbSaved is read before stopAll (stopping persists an empty state)
     JB.stopAll()
     if jbSaved then
         JB.restoreState(jbSaved)
@@ -163,14 +148,14 @@ end
 saveRoom = function()
     if room == nil or not canPersist() then return end
     writeStore()
-    -- the room's size and placed pieces, for the title's save list
+    -- room size and piece count, for the title's save list
     local sf = curSave()
     if sf then
         pcall(function()
             sf:SetGlobalCounter(".myroom_iw", room.iw)
             sf:SetGlobalCounter(".myroom_ih", room.ih)
             sf:SetGlobalCounter(".myroom_items", #room.furniture + #room.wallItems)
-            -- how many of each reward item the save owns (the secret vault reads these)
+            -- owned count per reward item (read by the secret vault)
             for _, id in ipairs(Room.REWARD_IDS) do
                 local n = room:heldCount(id)
                 if heldWritten[id] ~= n then
@@ -182,8 +167,8 @@ saveRoom = function()
     end
 end
 
--- ── build / rebuild the 3D room ───────────────────────────────────────────────────────────────────
--- the room's lights: the ceiling lamp, the window's spill, and what the furniture gives off right now
+-- ==== 3D room build ====
+-- ceiling lamp plus every light source in the room
 local function applyLights()
     local cx, cz = room:centerWorld(world)
     local gh = room:gridH()
@@ -192,17 +177,17 @@ local function applyLights()
     }
     for _, l in ipairs(room:windowLights()) do lights[#lights + 1] = l end      -- daylight through each window
     for _, l in ipairs(room:lampLights(world)) do lights[#lights + 1] = l end   -- lit floor lamps
-    for _, l in ipairs(TV.lights(world)) do lights[#lights + 1] = l end         -- screens of TVs that are on
-    for _, l in ipairs(MX.lights(world)) do lights[#lights + 1] = l end         -- the green glow of each matrix
-    for _, l in ipairs(FT.lights(world)) do lights[#lights + 1] = l end         -- fish tanks with their lights on
-    for _, l in ipairs(LT.lights(world)) do lights[#lights + 1] = l end         -- stone lanterns that are lit
+    for _, l in ipairs(TV.lights(world)) do lights[#lights + 1] = l end         -- TVs that are on
+    for _, l in ipairs(MX.lights(world)) do lights[#lights + 1] = l end         -- matrices
+    for _, l in ipairs(FT.lights(world)) do lights[#lights + 1] = l end         -- lit fish tanks
+    for _, l in ipairs(LT.lights(world)) do lights[#lights + 1] = l end         -- lit lanterns
     for _, l in ipairs(room:itemLights(world)) do lights[#lights + 1] = l end   -- items that always glow
     world.daynight:setLights(lights)
     FT.refresh()
 end
 
 local shellBuilt = nil   -- the shell the room was last fully built with (Room:shellKey)
--- returns "kept" when only the furniture was updated (the models standing were kept)
+-- "kept" when only the furniture was updated (standing models kept)
 local function rebuild()
     if map ~= nil and room._shellPhys ~= nil and shellBuilt == room:shellKey() then
         room:syncProps(world)
@@ -213,8 +198,7 @@ local function rebuild()
         return "kept"
     end
     shellBuilt = room:shellKey()
-    -- a rebuild (edit / lamp toggle / extend) must NOT jolt the camera: preserve the live orbit,
-    -- ZOOM and focus when the room already exists; only frame fresh on the first build.
+    -- keep the live orbit, zoom and focus on a rebuild; frame fresh only on the first build
     local hadRoom = (map ~= nil) and (world.cam ~= nil)
     local keepYaw   = world.cam and world.cam.yaw or 45
     local keepPitch = world.cam and world.cam.pitch or -33
@@ -223,23 +207,22 @@ local function rebuild()
     if hadRoom then keepTx, keepTy, keepTz = world.cam.tx, world.cam.ty, world.cam.tz end
 
     map = world:loadMap("room")
-    -- fit distance from interior size + fov (used only for the first framing + the zoom limits)
+    -- fit distance from interior size and fov (first framing, zoom limits)
     local span = math.max(room.iw, room.ih) + 3
     local fit = span / (2 * math.tan(rad(FOV / 2))) * 1.05
     world.cam:setRig{ yaw = keepYaw, pitch = keepPitch, fov = FOV, dist = keepDist or fit }
-    -- NOT physical: the wall clamp + zoom limits keep the framing sane; the boom stays off so the
-    -- camera never jumps off geometry in the small room
+    -- no camera collision: the wall clamp and zoom limits keep the framing
+    -- (the boom would jump off geometry in the small room)
     world.cam.collide = false
     world.cam.minDist, world.cam.maxDist = fit * 0.45, fit * 1.6
     local cx, cz = room:centerWorld(world)
     if hadRoom then world.cam:setTarget(keepTx, keepTy, keepTz)
     else world.cam:setTarget(cx, FY + 0.4, cz) end
     if world.scene.SetShadowArea then world.scene:SetShadowArea(math.max(room.iw, room.ih) + 5) end
-    -- warm cosy interior: a soft ceiling lamp + a cool spill from the window (re-set after every
-    -- loadMap — unloading a map clears the scene light list). Kept gentle so the room isn't blown out.
+    -- re-set after every loadMap: unloading a map clears the scene light list
     applyLights()
-    -- the new models start at their catalog glow: give them this frame's glow and colours right away,
-    -- so a moved or turned piece does not make every light blink
+    -- new models start at their catalog glow: apply this frame's glow and colours now
+    -- (else a moved piece makes every light blink)
     TV.tick(0)
     MX.tick(0)
     JB.refreshGlow()
@@ -252,7 +235,7 @@ local function spawnAtEntrance()
     player:setPos(px, py + 0.05, pz)
 end
 
--- the student and palette of the save whose room this is (the mirror and the customize tab set them)
+-- student and palette of the room owner's save (set by the mirror and the customize tab)
 local function refreshLook()
     local sf = curSave()
     look.student = Student.ensure(sf)
@@ -261,12 +244,10 @@ local function refreshLook()
 end
 
 
--- ── lifecycle ─────────────────────────────────────────────────────────────────────────────────────
+-- ==== lifecycle ====
 function onStart()
-    -- gfont (LuaGlyphText) drives the UTF-8-aware layout: the classic LuaText path walks the string
-    -- BYTE-by-byte, so multi-byte Japanese rendered as empty glyphs — the landlord/number messages
-    -- "disappeared" in JA. A glyph font makes them render in every language. theme.text = white +
-    -- the dialogue's black outline = readable white-with-border messages on any background.
+    -- gfont (LuaGlyphText): UTF-8-aware layout; the LuaText path walks bytes (Japanese came out empty)
+    -- theme.text white + the dialogue's black outline: readable on any background
     dlg = Dialogue.new({ gfont = TEXT:CreateGlyphCached(26),
                          fonts = { name = TEXT:Create(30), text = TEXT:Create(26) }, portraits = {},
                          theme = { text = { 255, 255, 255 } },
@@ -274,20 +255,17 @@ function onStart()
                          onSfx = function(name)
                              if name == "purse" then Landlord.showPurse() else playPhoneSound(name) end
                          end,
-                         -- the landlord's voice: deep, through a scrambler; any other line types with
-                         -- the voice it names, or in silence
+                         -- landlord voice blips; any other line uses the blip it names, or none
                          onBlip = function()
                              if phoneFlow == "landlord" then playPhoneSound("blip_landlord" .. math.random(3))
                              elseif dlg.node ~= nil and dlg.node.blip ~= nil then playPhoneSound(dlg.node.blip) end
                          end, blipEvery = 3 })
 
-    -- Bake the coin-shop furniture previews ONCE as SHARED textures (the shop reads them by key,
-    -- reusing My Room's models without re-declaring them). GLB/builder furniture is rendered on the CPU
-    -- rasterizer and captured (Edit.bakeThumbnails → ShareCanvasAs); paint/floor swatches just share
-    -- their surface PNGs. Shared textures outlive this stage, so one bake serves the whole session.
+    -- bake the coin-shop furniture previews once as shared textures (the shop reads them by key)
+    -- GLB/builder items via Edit.bakeThumbnails, swatches share their PNGs; one bake per session
     local ok, err = pcall(function()
         local n = Edit.bakeThumbnails(Room.SHOP_MODEL_IDS, "myroom_thumb_", 256)
-        -- the items handed over as rewards, shown by the reward pop-up (the secret vault uses them too)
+        -- reward items, for the reward pop-up and the secret vault
         local extra = {}
         for _, id in ipairs(Room.REWARD_IDS) do
             local sold = false
@@ -310,7 +288,7 @@ function activate()
     I18N.detect()
     takeWayBack()
     INPUT:SetMouseLocked(false)
-    Landlord.reset()                             -- the landlord forgives on every visit
+    Landlord.reset()                             -- refusals reset every visit
     purse:hide()
     ringT, ringScript, ringDue = 0, nil, false
     branchCall = nil
@@ -319,9 +297,9 @@ function activate()
     LOADING:Add("Room", 5, function()
         world = OWM.World.new{ rw = RW, rh = RH, screenW = SCREEN_W, screenH = SCREEN_H,
                                fov = FOV, yaw = 45, pitch = -33, lit = true }
-        world:setDiorama(2.0, 1.1, 0.22, 0.26)     -- gentle cosy grade (softer bloom, not blown out)
-        world:setFog(false)                        -- an interior needs no distance fog
-        world.scene:SetAntialias(true)             -- FXAA: smooths the stair steps on edges
+        world:setDiorama(2.0, 1.1, 0.22, 0.26)
+        world:setFog(false)                        -- interior: no fog
+        world.scene:SetAntialias(true)             -- FXAA
         A.buildAll(world.scene)
         AV.attach(world.scene)
         loadRoom()
@@ -340,7 +318,7 @@ function activate()
             rebuildRoom     = function() rebuild() end,
             spawnAtEntrance = function() spawnAtEntrance() end,
             applyJukebox    = function(t) JB.applyNetState(t) end,   -- guest: mirror the host's player
-            jukeboxState    = function() return JB.netState() end,   -- host: brief late joiners
+            jukeboxState    = function() return JB.netState() end,   -- host: state for late joiners
             look            = function() return look.student, look.palette end,   -- shown to the others
         })
         rebuild()
@@ -360,10 +338,10 @@ function deactivate()
     saveRoom()
     if pcScreen and pcScreen:active() then pcScreen:close() end
     if mode == "edit" and edit then edit:leave() end
-    PCS.tickBgmFade(math.huge)                     -- force finishing fading out
-    persistJukebox()                               -- snapshot the LIVE playing position first...
-    persistLocked = true                           -- ...lock it against the teardown's own onState...
-    JB.stopAll()                                   -- ...then kill jukebox audio + UI with the stage
+    PCS.tickBgmFade(math.huge)                     -- finish the fade-out
+    persistJukebox()                               -- snapshot the live position first,
+    persistLocked = true                           -- lock it against the teardown's onState,
+    JB.stopAll()                                   -- then stop jukebox audio and UI
     JB.close()
     JB.setDuck(false)                              -- reset the PC-screen crossfade for the next visit
     if phoneUI then phoneUI:disposeWidgets(); phoneUI = nil end
@@ -376,13 +354,13 @@ function deactivate()
     look.set = nil
     purse:dispose()
     Pod.reset()
-    -- safety net: free any 3D preview icon (edit grid / popup) its owner missed
+    -- free any preview icon its owner missed
     pcall(function() OWM.ModelIcon.disposeAll() end)
     if world ~= nil then world.scene:Dispose(); world = nil; player = nil; map = nil end
     mode = "play"
 end
 
-function afterSongEnum() JB.onSongEnumDone() end   -- song list ready → jukebox Songs tab unlocks
+function afterSongEnum() JB.onSongEnumDone() end   -- jukebox Songs tab
 
 function onDestroy()
     MO.leave()
@@ -399,11 +377,8 @@ end
 local function kd(k) return INPUT:KeyboardPressing(k) end
 local function kp(k) return INPUT:KeyboardPressed(k) end
 
--- every interactable the player is in range of, as an ordered list (exit → furniture → phone).
--- Each entry: { kind, it (furniture, when applicable), key (stable id for keeping focus) }.
--- Multiplayer rules: GUESTS get nothing but the exit; the HOST, while hosting, keeps only the phone
--- (to stop hosting) and his jukeboxes (playback propagates to every guest) — computer/lamp/pod are
--- solo-only.
+-- interactables in range, ordered exit, furniture, phone: { kind, it?, key (stable focus id) }
+-- guests get only the exit; a hosting host keeps the phone and jukeboxes (playback reaches guests)
 local function interactablesInRange()
     local list = {}
     local pc, pr = world:worldToCell(px, pz)
@@ -448,9 +423,8 @@ local function interactablesInRange()
     return list
 end
 
--- highlight the focused interactable by GLOWING the item itself (a pulsing emissive on its own 3D
--- object) rather than a square on the ground. The exit (a door cell, no model) keeps a soft footprint
--- square. The previous frame's glow is restored to its base emissive before applying the new one.
+-- focus highlight: pulsing emissive on the item's own objects; the exit (no model) gets a footprint square
+-- last frame's glow is restored to its base first
 local function interactGlow(focused)
     local scene = world.scene
     if world._glow then                                   -- restore last frame's glowed object(s)
@@ -466,7 +440,7 @@ local function interactGlow(focused)
     end
     if not focused then return end
 
-    -- the focused item's live model instance: a ground GLB (_propInst) or the wall phone (_wallGlb)
+    -- live model instance: ground GLB (_propInst) or the wall phone (_wallGlb)
     local inst = nil
     if focused.kind == "phone" then
         local p = room:phoneItem()
@@ -476,9 +450,8 @@ local function interactGlow(focused)
     end
 
     if inst and scene.ObjSetEmissive then
-        -- pulse an emissive ADD on the item's own object(s); the lit lamp keeps its warm base emissive,
-        -- and the jukebox's routed screen part keeps its catalog idle glow (else walking away would
-        -- leave the screen fully dark until something replays it)
+        -- pulse an emissive add over each object's base glow
+        -- (the jukebox screen keeps its idle glow, else walking away leaves it dark)
         local br, bg, bb = 0, 0, 0
         if focused.kind == "lamp" and focused.it and focused.it.lit ~= false then br, bg, bb = 0.9, 0.72, 0.36 end
         local partBase = nil
@@ -510,7 +483,7 @@ local function interactGlow(focused)
         return
     end
 
-    -- exit / model-less interactable: a soft pulsing footprint square
+    -- exit or model-less interactable: pulsing footprint square
     local gh = room:gridH()
     local pulse = 70 + math.floor(80 * (0.5 + 0.5 * sin(lastTs * 0.006)))
     scene:ObjSetPass(world.hiliteObj, 1, 110, 185, 255, pulse)
@@ -524,7 +497,8 @@ local function interactGlow(focused)
     end
 end
 
--- ── phone (UI library menus; the landlord stays a VN.Dialogue conversation) ───────────────────────
+-- ==== phone ====
+-- UI library menus; the landlord call is a VN.Dialogue conversation
 local PHONE_THEME = {
     colors = {
         surface  = { 246, 244, 250, 255 }, surface2 = { 224, 226, 240, 255 },
@@ -538,15 +512,14 @@ local function closePhone(hangUp)
     if hangUp then playPhoneSound("phone_hangup") end
 end
 
--- an outgoing call: a coin into the payphone, the ringing tone, then the other side answers with
--- `script` (the dialogue starts once the ring is over)
+-- outgoing call: coin and ring first; `script` starts after the ring
 local function placeCall(script)
     playPhoneSound("phone_coin")
     mode = "dialogue"
     ringT, ringScript, ringDue = 2.6, script, true     -- the ring starts once the coin has dropped
 end
 
--- ── dialable numbers / easter eggs (data/phone_numbers.json) ──────────────────────────────────────
+-- ==== dialable numbers (data/phone_numbers.json) ====
 local phoneDoc, phoneDocTried = nil, false
 local function phoneNumbersDoc()
     if not phoneDocTried then
@@ -558,7 +531,7 @@ end
 playPhoneSound = function(stem)
     if phoneSfx[stem] == nil then
         local s = nil
-        -- easter-egg sounds live in the stage's own Sounds/ folder (e.g. my_room/Sounds/egg.ogg)
+        -- egg sounds: the stage's own Sounds/ folder
         pcall(function() s = SOUND:CreateSFX("Sounds/" .. stem .. ".ogg") end)
         if s then pcall(function() s:SetVolume(100) end) end
         phoneSfx[stem] = s or false
@@ -566,9 +539,9 @@ playPhoneSound = function(stem)
     if phoneSfx[stem] then return pcall(function() phoneSfx[stem]:Play() end) end
     return false
 end
-local function startBombs() bombFx = { t = 0, dur = 3.0, next = 0 } end  -- { t, dur, next }
+local function startBombs() bombFx = { t = 0, dur = 3.0, next = 0 } end
 
--- hands a furniture item over with the reward pop-up; false when it cannot be given here
+-- gives a furniture item with the reward pop-up; false when it can't be given here
 local RARITY_MODAL = { Poor = 0, Common = 0, Uncommon = 1, Rare = 2, Epic = 3, Legendary = 4, Mythical = 4 }
 local function giveFurniture(id)
     local cat = Room.CATALOG[id]
@@ -587,11 +560,9 @@ local function giveFurniture(id)
     end
     return true
 end
--- a call that branches (an entry with "start"): every step is a phone.json id holding one line or a
--- list of lines, all said by the entry's name. A step listed under "choices" ends on those choices,
--- each leading to the step its "next" names; any other step is an answer, followed by the "close"
--- step. With "daily", one answer a day (the shop's day): a later call that day shows the "daily" text
--- with no name, then hangs up
+-- branching call (entry with "start"): each step is a phone.json id of one line or a list, said by the entry's name
+-- a step under "choices" ends on them, each leading to its "next"; any other step is an answer, then "close"
+-- "daily": one answer per shop day; a later call that day shows the "daily" text, then hangs up
 local function evText(v)
     local s = nil
     pcall(function() s = JSONLOADER:ExtractText(v) end)
@@ -631,7 +602,7 @@ local function callStep(call, step)
     end
     return nodes
 end
--- the cafe behind Mr.Caspian's voice: his first line brings it in, the lines of Vault.Talk.CAFE set its level
+-- cafe ambience behind Mr.Caspian: his first line starts it, Vault.Talk.CAFE lines set its level
 local CAFE_VOLUME = 60
 local function stopCafe()
     if cafeSnd and cafeOn then pcall(function() cafeSnd:Stop() end) end
@@ -649,7 +620,7 @@ local function tickCafe(dt)
         cafeSnd = cafeSnd or false
     end
     if not cafeSnd then return end
-    if cafeTo <= 0 then cafeK = 0                                  -- the line clicks
+    if cafeTo <= 0 then cafeK = 0                                  -- instant cut
     elseif cafeK < cafeTo then cafeK = math.min(cafeTo, cafeK + dt / 0.5)
     else cafeK = math.max(cafeTo, cafeK - dt / 1.5) end
     if not cafeOn then
@@ -681,13 +652,12 @@ local function startBranchCall(key, ev)
     phoneFlow = "branch"
     dlg:start(callStep(call, evText(ev["start"])))
 end
--- the call goes on with the step a choice named; nil when the call is over
+-- next step from a choice; nil when the call is over
 local function branchNext(result)
     if branchCall == nil or branchCall.answered or type(result) ~= "string" then return nil end
     return callStep(branchCall, result)
 end
--- Mr.Caspian's and Gris's numbers: Vault.Talk runs the call (its lines, menus and Gris's song), the
--- phone's dialogue says it
+-- Mr.Caspian's and Gris's numbers: Vault.Talk runs the call, the phone dialogue says its lines
 local TALK_BLIP = { C = "blip_caspian", O = "blip_caspian", G = "blip_gris", U = "blip_gris", N = "blip_narrator" }
 local talkStep
 local function talkNodes(list)
@@ -735,7 +705,7 @@ local function dialPhone(input)
         flow = Talk.call(key)
     end
     if flow ~= nil then
-        -- the coin is in: the ring, then the other side picks up
+        -- ring, then the call answers
         talkCo, talkRun, talkPlay = flow, nil, nil
         talkCafe = key == Talk.CASPIAN_NUMBER
         mode = "dialogue"; phoneFlow = "talk"
@@ -745,14 +715,13 @@ local function dialPhone(input)
     local doc = phoneNumbersDoc()
     local ev = nil
     pcall(function() ev = doc and doc[key] or nil end)
-    if ev == nil then                                 -- unassigned number → the placeholder
+    if ev == nil then                                 -- unassigned number: placeholder
         local n = (input and input ~= "" and input) or PHONE:tr("the_number")
         mode = "dialogue"; phoneFlow = nil
         dlg:start({ { name = "", text = PHONE:trf("no_answer", n), blip = "blip_narrator" } })
         return false
     end
-    -- guarded like every other data-file read: a malformed entry (bare string, nested field) must
-    -- degrade to the no-answer placeholder, not error out of the update path
+    -- pcall: a malformed entry falls back to the no-answer line instead of erroring the update
     local name, text, sound, effect, blip, give
     local okEv = pcall(function()
         give   = JSONLOADER:ExtractText(ev["give"])
@@ -769,7 +738,7 @@ local function dialPhone(input)
         return
     end
     if okEv and give ~= nil and give ~= "" then
-        -- a reward number: the item once, then a line saying so for as long as the room holds it
+        -- reward number: the item once, then quest_cleared while the room holds it
         phoneFlow = nil
         if room:holds(give) or not giveFurniture(give) then
             mode = "dialogue"
@@ -806,7 +775,7 @@ local function dialPhone(input)
     if script then
         mode = "dialogue"; phoneFlow = nil
         dlg:start(script)
-    elseif text == nil or text == "" then mode = "play"  -- sound-only (e.g. 1122 → egg.ogg), no message
+    elseif text == nil or text == "" then mode = "play"  -- sound only, no message
     else
         mode = "dialogue"; phoneFlow = nil
         dlg:start({ { name = name or "", text = text or "", blip = (blip ~= nil and blip ~= "") and blip or "blip_narrator" } })
@@ -814,7 +783,7 @@ local function dialPhone(input)
     return wantSilent
 end
 
--- the bomb storm: explosion bursts around the player + screen shake, ticked every frame while active
+-- bomb storm: bursts around the player and camera shake, each frame while active
 local function tickBombs(dt)
     if bombFx == nil then return end
     if world == nil or world.particles == nil then bombFx = nil; return end
@@ -834,15 +803,13 @@ local function tickBombs(dt)
     end
     if bombFx.t >= bombFx.dur then bombFx = nil end
 end
--- the landlord's phone call lives in landlord.lua (script + answers, lang/<code>/dialogs.json lines);
--- the room only lends it the save file, the room, the extension, and the purse widget
--- lang/<code>/dialogs.json: named dialog lines per language (English is the fallback for a missing
--- file, key or line; the code's own fallback covers a missing English file)
+-- landlord.lua runs the landlord call with these closures
+-- lang/<code>/dialogs.json lines; English fills a missing file, key or line
 local DIALOGS = I18N.texts("dialogs")
 local function dlgLoc(section, key, fallback)
     return DIALOGS:get(section, key) or fallback
 end
--- the list of lines at a key path (section, key, ...), each line falling back to English
+-- lines at a key path (section, key, ...), each falling back to English
 local function dlgList(...)
     return DIALOGS:list(...)
 end
@@ -860,8 +827,7 @@ local function doExtend(info)
     return true
 end
 
--- the purse sits on the dialogue box's top edge, level with the speaker's name pill (box y 770,
--- pill at 740..794), at the right
+-- purse on the dialogue box's top edge, level with the name pill (box y 770, pill 740..794), right side
 purse = Purse.new{ x = SCREEN_W - 60 - 300, y = 770 - 36 }
 Landlord.init{
     save = function() return curSave() end,
@@ -871,7 +837,7 @@ Landlord.init{
     coinBox = purse,
 }
 
--- jukebox context: closures over the stage's live state (guarded — world/room are nil until activate)
+-- jukebox ctx: closures over live state (world/room are nil until activate)
 JB.init{
     theme = PHONE_THEME,
     isHost = function() return not MO.isGuest() end,     -- solo counts as the authoritative side
@@ -892,13 +858,12 @@ JB.init{
         for _, it in ipairs(room.furniture or {}) do if it.id == "jukebox" then return it end end
         return nil
     end,
-    onState = function() persistJukebox() end,   -- every playback op → resume state saved per save UID
+    onState = function() persistJukebox() end,   -- every playback op saves the resume state
     scene = function() return world and world.scene or nil end,
 }
--- (the PC screen crossfades with the jukebox: JB.setDuck on open/close + PCS.tickBgmFade in update)
+-- PC screen crossfade: JB.setDuck on open/close, PCS.tickBgmFade in update
 
--- TV context: the screen colour/light of sets that are on, and the cutscene browser (jukebox ducked
--- while a cutscene plays)
+-- TV ctx: jukebox ducked while a cutscene plays
 TV.init{
     theme = PHONE_THEME,
     playerIndex = function() return playerIndex end,
@@ -912,7 +877,6 @@ TV.init{
     duck = function(on) JB.setDuck(on, on and 0 or 0.15) end,
 }
 
--- Placeholder Matrix context: its glow and light, and the debug scene list
 MX.init{
     theme = PHONE_THEME,
     playerIndex = function() return playerIndex end,
@@ -923,21 +887,19 @@ MX.init{
     displayName = function() return Room.displayName(MX.ID) end,
 }
 
--- Fish Tank context: the placed tanks and their models
 FT.init{
     room = function() return room end,
     scene = function() return world and world.scene or nil end,
     propInstFor = function(it) return world and world._propInst and world._propInst[it] or nil end,
 }
 
--- Stone Lantern context: the placed lanterns and their models
 LT.init{
     room = function() return room end,
     scene = function() return world and world.scene or nil end,
     propInstFor = function(it) return world and world._propInst and world._propInst[it] or nil end,
 }
 
--- mirror context: the student and palette it changes belong to the save whose room this is
+-- the mirror changes the room owner's save
 MR.init{
     theme = PHONE_THEME,
     playerIndex = function() return playerIndex end,
@@ -946,7 +908,6 @@ MR.init{
     onChanged = function() refreshLook() end,
 }
 
--- Workbench context: the stock it recolours belongs to the room shown
 WB.init{
     theme = PHONE_THEME,
     playerIndex = function() return playerIndex end,
@@ -954,7 +915,6 @@ WB.init{
     onChanged = function() saveRoom() end,
 }
 
--- Recycle Bin context: it sells from the stock of the room shown, the coins go to the current save
 RB.init{
     theme = PHONE_THEME,
     playerIndex = function() return playerIndex end,
@@ -980,7 +940,7 @@ local function buildPhoneTextPane(title, hintText, maxLen, confirmLabel, onConfi
                onClick = function() buildPhoneMenu() end, sfx = { click = "cancel" } }
 end
 
--- the numbers the player has (Vault.Talk.contacts); choosing one dials it
+-- the player's numbers (Vault.Talk.contacts); choosing one dials it
 local function phoneContacts()
     if Talk == nil then return {} end
     Talk.slot = playerIndex
@@ -1013,7 +973,7 @@ buildPhoneMenu = function()
     phoneUI = ui
     local entries
     if net.online and net.isHost then
-        -- while hosting, the phone only offers to stop hosting (no landlord/number/invite)
+        -- while hosting: stop hosting only
         entries = { { label = PHONE:tr("menu_stop_hosting"), value = "stophost" } }
     else
         entries = {
@@ -1048,7 +1008,7 @@ buildPhoneMenu = function()
                 buildPhoneTextPane(PHONE:tr("menu_number"), PHONE:tr("number_placeholder"), 16, PHONE:tr("call"), function(t)
                     closePhone();
                     playPhoneSound("phone_coin")
-                    return dialPhone(t)  -- looks up data/phone_numbers.json (events/eggs)
+                    return dialPhone(t)  -- data/phone_numbers.json lookup
                 end)
             elseif v == "invite" then
                 if not JB.songsEnumReady() then
@@ -1095,12 +1055,13 @@ local function openPhone()
     buildPhoneMenu()
 end
 
--- ── whose room: chosen on the title, or kept across a trip to another stage ───────────────────────
+-- ==== whose room ====
+-- chosen on the title, or kept across a trip to another stage
 local RETURN_KEY = "my_room_place"   -- "<slot>,<x>,<y>,<z>": whose room and where the player stood, for a round trip
 local BACK_KEY = "my_room_return"    -- the stage to go back to, set by the caller: "<stage>" or "<stage>|<transition>"
 local backRaw = ""                   -- that string as read on entry (put back for a round trip)
 local backStage, backTransition = "_title", nil
--- read and clear the way back (called on every entry)
+-- read and clear the way back on every entry; empty: _title
 takeWayBack = function()
     local ok, s = pcall(function() return SHARED:GetSharedString(BACK_KEY) end)
     pcall(function() SHARED:SetSharedString(BACK_KEY, "") end)
@@ -1110,7 +1071,7 @@ takeWayBack = function()
     backTransition = (transition ~= nil and transition ~= "") and transition or nil
 end
 local function leaveRoom() return Exit("stage", backStage, backTransition) end
--- commit to a player: read THAT save (coins/unlocks via GetSaveFile(playerIndex)) and load its room
+-- commit to a player: their save (GetSaveFile(playerIndex)) and their room
 local function pickPlayer(i)
     MO.playerIndex = i
     if pcScreen then pcScreen.playerIndex = i end
@@ -1125,8 +1086,7 @@ local function pickPlayer(i)
     spawnAtEntrance()
     mode = "play"
 end
--- leaving for a stage that comes back here: remember whose room it is, where the player stands and
--- the way back from the room
+-- before a round trip: store RETURN_KEY and put BACK_KEY back
 local function rememberPlace()
     pcall(function()
         SHARED:SetSharedString(RETURN_KEY, string.format("%d,%.3f,%.3f,%.3f", playerIndex, px, py, pz))
@@ -1168,16 +1128,15 @@ local function onDialogueDone(result)
     if phoneFlow == "landlord" then
         local nxt = Landlord.onDone(result)
         if nxt then dlg:start(nxt) ; return end
-        playPhoneSound("phone_cut")          -- he hangs up on you, every time
+        playPhoneSound("phone_cut")          -- landlord hangs up
     end
     mode = "play"; phoneFlow = nil
 end
 
--- end an online session and drop back into our OWN room (a visitor leaving / being kicked, or a host
--- closing). Reloads the player's own layout from the DB and respawns at the entrance — staying in-stage.
+-- end the online session and go back to our own room, in-stage (visitor leaving or kicked, host closing)
 local function backToOwnRoom(message)
     JB.stopAll()                        -- the host's jukebox does not follow us home
-    JB.close()                          -- nor a stranded (invisible) jukebox window eating input
+    JB.close()                          -- nor a hidden jukebox window taking input
     MO.leave()
     closePhone()
     if pcScreen and pcScreen:active() then pcScreen:close() end
@@ -1186,15 +1145,14 @@ local function backToOwnRoom(message)
     if message then msg = message; msgT = 4 end
 end
 
--- ── per-frame ─────────────────────────────────────────────────────────────────────────────────────
+-- ==== per-frame ====
 local function settlePlayer(dt)
     player:move(dt, 0, 0, 0, false)          -- decelerate + keep gravity while a menu is up
     px, py, pz = player:pos()
 end
 
--- camera orbit clamp: the room only has a back wall (far z) and a right wall (+x); keep the camera
--- on the open corner so both visible walls always face it. Camera forward yaw 45 looks INTO that
--- corner, so the valid window is [10, 80] degrees (wrap-aware, far side splits at 225).
+-- orbit clamp: the room has only a back wall (far z) and a right wall (+x); yaw stays in [10, 80]
+-- (yaw 45 looks into that corner; wrap-aware, the far side splits at 225)
 local YAW_MIN, YAW_MAX = 10, 80
 local YAW_SENS, PITCH_SENS = 0.30, 0.18
 local function clampCamera()
@@ -1209,8 +1167,8 @@ local function clampCamera()
     if cam.pitch > -15 then cam.pitch = -15 elseif cam.pitch < -50 then cam.pitch = -50 end
 end
 
--- getting mouse deltas clears the deltas, so passed by the caller instead of getting here.
--- frameDt = this frame's dt (set by update); Q/E orbit at a fixed degrees-per-second rate.
+-- mouse deltas clear on read: the caller passes them in
+-- frameDt: this frame's dt (set by update); Q/E orbit at a fixed deg/s
 local frameDt = 0
 local function panCamera(dmx, dmy)
     local cam = world.cam
@@ -1244,9 +1202,8 @@ local function getMoveUnitIsoXZ()
     return mx, mz
 end
 
--- edit-mode camera: RMB drag rotates, wheel zooms, WASD/arrows PAN the look-at target on the ground
--- plane, and a middle-button drag pans it too, the ground following the mouse (the player character
--- does not move while editing). Same clamps as play mode.
+-- edit camera: RMB rotates, wheel zooms, WASD/arrows and a middle drag pan the target on the ground
+-- (the player does not move while editing); same clamps as play mode
 local function getEditCameraFuncs(dt) return {
     pan = panCamera,
     zoom = zoomCamera,
@@ -1259,8 +1216,8 @@ local function getEditCameraFuncs(dt) return {
             tx, tz = tx + ix * sp, tz + iz * sp
         end
         if INPUT:MousePressing("middle") and (dmx ~= 0 or dmy ~= 0) then
-            -- world units per pixel at the target's depth; the vertical axis stretches over the
-            -- ground by the camera's pitch. Dragging right slides the ground right (target left).
+            -- world units per pixel at the target's depth; vertical stretched over the ground by pitch
+            -- dragging right slides the ground right (target left)
             local fy = rad(cam.yaw)
             local fwdX, fwdZ = sin(fy), cos(fy)
             local rgtX, rgtZ = cos(fy), -sin(fy)
@@ -1283,7 +1240,7 @@ function update(ts)
     GLOBALCAMERA:Update(dt)
     OWM.ModelIcon.newFrame()       -- per-frame first-render budget for the edit-grid preview icons
     if world == nil or map == nil then return nil end
-    tickBombs(dt)                  -- the Canabi bomb storm runs across every mode (incl. its message)
+    tickBombs(dt)                  -- bomb storm runs in every mode
     if talkBack ~= nil and mode == "play" then
         -- back from Gris's song: her call goes on
         local cleared = talkBack
@@ -1296,22 +1253,21 @@ function update(ts)
     if net.online or net.connecting then
         MO.drain()
         MO.lerpRemotes(dt)
-        -- every visitor's student in their palette (registered once per look, here and never in draw)
+        -- visitor looks, registered once per look (here, never in draw)
         for _, lk in pairs(net.lookByPeer) do lk.set = AV.prepare(lk.student, lk.palette, true) end
         if net.roomGone then backToOwnRoom(PHONE:tr("room_host_closed")) end
     end
 
-    -- jukebox playback upkeep runs in EVERY mode (audio outlives the menu: distance volume, track
-    -- end/repeat, screen glow, net flush); the returned edge feeds the jukebox modal branch below.
-    -- The PC-screen BGM fade is pumped alongside so its fade-out can finish after the screen closes.
+    -- jukebox upkeep runs in every mode (audio outlives the menu); jbRes feeds the jukebox branch below
+    -- the PC-screen BGM fade too: its fade-out ends after the screen closes
     local jbRes = JB.update(dt, ts)
     PCS.tickBgmFade(dt)
-    TV.tick(dt)                    -- the screens of TVs that are on drift their colour in every mode
-    MX.tick(dt)                    -- the matrix glow breathes in every mode
-    FT.tick(dt)                    -- the fish swim and the kelp sways in every mode
-    LT.tick(dt)                    -- the lanterns' fires burn in every mode
+    TV.tick(dt)                    -- these tick in every mode
+    MX.tick(dt)
+    FT.tick(dt)
+    LT.tick(dt)
 
-    -- ── modal overlays ──
+    -- ==== modal overlays ====
     if mode == "dialogue" then
         if talkPlay ~= nil then
             -- Gris's song: the room leaves for it, and the call goes on once the room is back
@@ -1397,7 +1353,7 @@ function update(ts)
     elseif mode == "edit" then
         if edit:update(ts, getEditCameraFuncs(dt)) == "exit" then
             mode = "play"; pmoving = false
-            if editSavedCam then       -- restore the exact camera the player had before editing
+            if editSavedCam then       -- restore the camera from before editing
                 local s = editSavedCam
                 world.cam:setRig{ yaw = s.yaw, pitch = s.pitch, fov = FOV, dist = s.dist }
                 world.cam:setTarget(s.tx, s.ty, s.tz)
@@ -1412,21 +1368,20 @@ function update(ts)
         if MO.isGuest() then backToOwnRoom(PHONE:tr("room_left")); return nil end
         MO.leave(); GLOBALCAMERA:Reset(); saveRoom(); return leaveRoom()
     end
-    -- (interactables + Tab are resolved AFTER movement below, where px/pz are current)
+    -- interactables and Tab resolve after movement, with current px/pz
 
-    -- camera orbit / zoom (iso_demo2 parity), wall-clamped so both walls always face the camera
+    -- camera orbit and zoom, wall-clamped
     local dmx, dmy = INPUT:GetMouseDelta()
     panCamera(dmx, dmy)
     local _, scrollY = INPUT:GetScrollDelta()
     zoomCamera(scrollY)
 
-    -- movement on the physics character, camera-relative like iso_demo2 (wish dir from cam yaw)
+    -- physics character movement, camera-relative (wish dir from cam yaw)
     local ix, iz = getMoveUnitIsoXZ()
     player:move(dt, ix, iz, moveSpeed, false)
     px, py, pz = player:pos()
 
-    -- camera FOLLOWS the player (smoothed target lerp); orbit/zoom stay manual. The target is clamped to
-    -- the room interior so the follow never pans the view off the walls (camera boom is off in here).
+    -- camera follows the player (smoothed); target clamped to the interior (boom is off)
     local gw, gh = room:gridW(), room:gridH()
     local ftx = math.max(0.75, math.min(gw - 1.75, px))
     local ftz = math.max(0.75, math.min(gh - 2.75, pz))
@@ -1443,8 +1398,8 @@ function update(ts)
     end
     if net.online then MO.broadcastPos(dt, px, pz, pdir, pmoving) end
 
-    -- interactables in range (px/pz are now current): Tab cycles focus when 2+ are reachable,
-    -- else Tab enters edit (offline only); focus is kept stable across frames by key.
+    -- interactables in range: Tab cycles focus with 2+, else enters edit (offline only)
+    -- focus stays stable across frames by key
     local inter = interactablesInRange()
     interCount = #inter
     if focusKey then
@@ -1461,7 +1416,7 @@ function update(ts)
             SHARED:GetSharedSound("Skip"):Play()
         elseif not net.online then       -- no room editing while online (hosting or visiting)
             local pc, pr = world:worldToCell(px, pz)
-            -- remember the full camera to restore on exit, then reset to a clean, framed editing view
+            -- save the camera for exit, then frame the room for editing
             editSavedCam = { yaw = world.cam.yaw, pitch = world.cam.pitch, dist = world.cam.dist,
                              tx = world.cam.tx, ty = world.cam.ty, tz = world.cam.tz }
             local span = math.max(room.iw, room.ih) + 3
@@ -1474,7 +1429,7 @@ function update(ts)
         end
     end
 
-    -- resolve the focused interactable; glow it; act on Enter
+    -- focused interactable: glow it, act on Enter
     local focused = nil
     if focusKey then for _, e in ipairs(inter) do if e.key == focusKey then focused = e; break end end end
     prompt = focused and focused.kind or nil
@@ -1494,8 +1449,8 @@ function update(ts)
             openPhone()
         elseif focused.kind == "lamp" then
             SHARED:GetSharedSound("Move"):Play()
-            focused.it.lit = (focused.it.lit == false) and true or false   -- toggle on/off
-            -- only the lamp and the room's lights change: the rest of the room is left as it is
+            focused.it.lit = (focused.it.lit == false) and true or false
+            -- only the lamp and the lights change
             local lamp = world._propInst and world._propInst[focused.it] or nil
             if lamp ~= nil then
                 Room.lampLook(world, focused.it, lamp)
@@ -1507,7 +1462,7 @@ function update(ts)
         elseif focused.kind == "pod" then
             SHARED:GetSharedSound("Decide"):Play()
             if Pod.stageExists() then
-                -- the pod opens: step in, rattle, vent (update handles "go")
+                -- pod sequence (update handles "go")
                 mode = "pod"
                 Pod.start(world, focused.it, world._propInst and world._propInst[focused.it] or nil, px, pz, playerIndex)
             else
@@ -1547,10 +1502,10 @@ function update(ts)
         elseif focused.kind == "lantern" then
             SHARED:GetSharedSound("Move"):Play()
             LT.toggle(focused.it)
-            applyLights()                  -- the lantern's light; its fire is drawn while it is lit
+            applyLights()                  -- light; the fire draws while lit
             saveRoom(); MO.onRoomChanged()
         elseif focused.kind == "look" then
-            -- a keepsake: looking at it says its line (dialogs.json, <item id>.look)
+            -- keepsake: says its line (dialogs.json, <item id>.look)
             local line = dlgLoc(focused.it.id, "look", nil)
             if line ~= nil then
                 SHARED:GetSharedSound("Decide"):Play()
@@ -1565,8 +1520,8 @@ function update(ts)
     return nil
 end
 
--- ── draw ──────────────────────────────────────────────────────────────────────────────────────────
--- this frame's actor sprites, six numbers each (x, y, z, w, h, sprite), and the ones the actor layer holds;
+-- ==== draw ====
+-- this frame's actor sprites (six numbers each: x, y, z, w, h, sprite) and the ones the layer holds
 -- a map load empties the layer
 local actorNow, actorShown, actorNowN, actorShownN, actorMap = {}, {}, 0, 0, nil
 local function actorsBegin() actorNowN = 0 end
@@ -1591,12 +1546,12 @@ function draw()
     local wW = hW * (AV.W / AV.H)
     local function groundAt(x, z) return map:heightAt(x, z) end
 
-    -- the dynamic actor layer (player + remote visitors), written when its sprites change. No blob
-    -- shadows: the sun shadow map already grounds the sprites, so the shadow layer stays empty.
+    -- actor layer (player and visitors), rewritten only when its sprites change
+    -- no blob shadows: the sun shadow map grounds the sprites
     actorsBegin()
     local spr = AV.sprite(look.set, pdir, pmoving, pframeT)
     if mode == "pod" then
-        -- stepping into the pod: the sprite slides to it and shrinks away, then stays hidden
+        -- pod: Pod.playerVisual moves and scales the sprite, nil once inside
         local vx, vz, vs = Pod.playerVisual()
         if spr and vx then actorSprite(vx, py, vz, wW * vs, hW * vs, spr) end
     elseif spr then
@@ -1612,19 +1567,19 @@ function draw()
     end
     actorsEnd()
 
-    FT.draw()                      -- the fish and kelp inside the tanks
-    LT.draw()                      -- the fire inside the lit stone lanterns
+    FT.draw()
+    LT.draw()
     world:render()
     world:blit()
 
-    -- HUD (glyph text via the UI library — dynamic strings never leak textures)
-    -- current player's nameplate at the TOP-LEFT = whose room we're viewing
+    -- HUD: glyph text through the UI library (dynamic strings never leak textures)
+    -- room owner's nameplate at the top left
     if NAMEPLATE and NAMEPLATE.DrawPlayerNameplate then
         pcall(function() NAMEPLATE:DrawPlayerNameplate(40, 18, 255, playerIndex) end)
     end
     hud:drawTextEx(26, HUD:tr("title"), SCREEN_W / 2, 22, { 255, 255, 255 }, { 0, 0, 0, 255 }, 1, 1, 0, "top")
 
-    -- online presence: a status line + a floating name tag above each visitor's avatar
+    -- online: status line and a name tag above each visitor
     if net.online then
         local cnt = MO.playerCount()
         hud:drawTextEx(18, (net.isHost and "Hosting" or "Visiting") .. " — " .. cnt .. (cnt == 1 and " person here" or " people here"),
@@ -1678,8 +1633,7 @@ function draw()
         hud:rect(0, 0, SCREEN_W, SCREEN_H, 8, 10, 18, 130)
         RB.draw()
     else
-        -- input instructions: TOP-RIGHT, right-aligned, one per line (readability). The contextual
-        -- action prompt (bright) leads, then any [Tab] switch, then the persistent controls.
+        -- instructions at the top right, one per line: action prompt first, controls last
         local instr = {}
         if prompt == "computer" then instr[#instr + 1] = { t = HUD:tr("prompt_computer"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "phone" then instr[#instr + 1] = { t = HUD:tr("prompt_phone"), c = { 150, 230, 255 }, s = 24 }

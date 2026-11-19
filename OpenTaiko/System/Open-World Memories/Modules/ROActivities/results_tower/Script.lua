@@ -1,7 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
 -- results_tower ROActivity: the tower result screen.
--- The result stage calls activate(info) with a LuaResultInfo, update() and draw() every frame, skip() on
--- decide (true while still animating) and deactivate().
 
 local TowerArt = require("TowerArt")
 
@@ -43,7 +41,7 @@ local clock = 0              -- seconds on the timeline
 local idle = 0               -- seconds since activate, for the sway (it keeps going after a skip)
 local active = false
 
--- ── helpers ──────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Helpers ====
 
 local function tr(key, fallback)
     local ok, s = pcall(function() return THEME:GetSkinString(key) end)
@@ -53,10 +51,10 @@ end
 
 local function fill(s, value) return (s:gsub("{0}", tostring(value))) end
 
--- "812450", no separators
+-- integer text, no separators
 local function whole(n) return tostring(math.floor(n)) end
 
--- "812,450"
+-- integer text, comma-grouped
 local function grouped(n) return (whole(n):reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", "")) end
 
 local function clamp01(x) return math.max(0, math.min(1, x)) end
@@ -89,7 +87,7 @@ local function popScale(t0, d, over)
     return over + (1 - over) * easeOut((k - 0.6) / 0.4)
 end
 
--- ── boards ───────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Boards ====
 
 local function newBoard(t, cfg, phase)
     local w, h = t.Width, t.Height
@@ -196,7 +194,7 @@ local function put(t, b, q, x, y, scale, angle, opacity)
     putXY(t, b, q, x, y, scale or 1, scale or 1, angle, opacity)
 end
 
--- ── text ─────────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Text ====
 
 -- the clear margin a glyph line keeps left, right and under its ink (the engine's text padding)
 local function pad(font) return font.BoxHeight - math.ceil(font.LineHeight) end
@@ -231,7 +229,7 @@ local function text(font, s, b, q, x, y, anchor, o)
     font:Draw(styled(font, s, o), sx, sy, nil, col.clear, opacity, scale, o.maxW or 0, anchor, 0, angle)
 end
 
--- ── timeline ─────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Timeline ====
 
 local function buildTimeline()
     local tl = {}
@@ -256,7 +254,7 @@ local function buildTimeline()
     return tl
 end
 
--- ── the scene: the sky and the tower ─────────────────────────────────────────────────────────────────
+-- ==== Scene ====
 
 -- how far the floor count has gone, 0 to 1, and the floor the count is at (fractional)
 local function climbProgress() return easeInOut(progress(timeline.floorStart, Animation.floor.count_s)) end
@@ -299,7 +297,7 @@ local function drawScene(f)
     drawChara()
 end
 
--- ── copies made once their sheets are loaded ─────────────────────────────────────────────────────────
+-- ==== Copies of loaded sheets ====
 
 local function loaded(t) return t ~= nil and t.Loaded and t.Ready end
 
@@ -327,8 +325,8 @@ local function buildJudgeWords()
     end
 end
 
--- the badge's cell, for its shine: the light is the badge's own pixels inside a band, added over it (so it lights
--- the badge alone, never the board round it)
+-- badge cell for its shine: the badge's own pixels inside a band, added over it
+-- (lights the badge only, not the board)
 local function buildShine()
     if shine ~= nil or info.TowerRank <= 0 or not loaded(tex.ranks) then return end
     local sheet = tex.ranks
@@ -372,7 +370,7 @@ local function drawShine(sx, sy, scale, angle, since)
     for _ = 1, SHINE.passes do f:DrawAtAnchor(sx, sy, "center") end
 end
 
--- the burst of sparkles when the badge lands, then a few twinkling round it
+-- sparkle burst as the badge lands, then twinkles round it
 local function drawGlitter(b, q, cx, cy, since)
     local G = GLITTER
     local t = tex.glitter
@@ -404,10 +402,10 @@ local function drawGlitter(b, q, cx, cy, since)
     t:SetColor(1.0, 1.0, 1.0)
 end
 
--- ── the boards' contents ─────────────────────────────────────────────────────────────────────────────
+-- ==== Board contents ====
 
--- a rounded bar from x0 to x1 on the board: a disc at each end and the body stretched between their centres,
--- so the moving end stays round and every edge stays smooth when the board turns
+-- rounded bar from x0 to x1 on the board: a disc at each end, the body stretched between their centres
+-- (ends stay round when the board turns)
 local function pill(b, q, x0, x1, y, h, color, opacity, scale)
     scale = scale or 1
     local w = x1 - x0
@@ -432,8 +430,7 @@ end
 -- the width of the New best! tag
 local function tagWidth() return width(fonts.tag, strings.newBest) + 2 * TAG.pad_x end
 
--- the New best! tag centred at (cx, cy) on the board, popping from t0: a gold pill on a darker rim, its text
--- white, a sparkle twinkling at each end
+-- New best! tag centred at (cx, cy) on the board, popping from t0, a sparkle at each end
 local function drawTag(b, q, cx, cy, t0)
     local s = popScale(t0, Animation.new_best.pop_s, Animation.new_best.overshoot)
     if s <= 0 then return end
@@ -658,7 +655,7 @@ local function drawPlayer()
     end
 end
 
--- ── lifecycle ────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Lifecycle ====
 
 function onStart()
     local res = THEME:GetResolution()
@@ -785,6 +782,8 @@ local function loadSounds()
     end
 end
 
+-- result stage calls activate(result) with a LuaResultInfo, update() and draw() per frame, skip() on decide,
+-- then deactivate()
 function activate(result)
     deactivate()
     info = result

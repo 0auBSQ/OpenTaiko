@@ -1,19 +1,7 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- recycle.lua — the Recycle Bin furniture: sells furniture, floorings and paints from the room's stock.
---
--- What an item fetches (M.priceOf):
---   - an item of the coin shop (an Items.db3 "furn_<id>" row) fetches 40% of its shop price, rounded down;
---     a one-time row (OneTime = 1, the pod) is unique and is not sold;
---   - any other item fetches its catalogue `sell` (data/furniture.json, floordeco.json, wallpaint.json), and
---     is not sold without one;
---   - the default floor and paint (infinite) are never sold.
--- An item kept in a colour ("<id>:<rrggbb>") fetches its item's price. Only the stock is listed: a placed
--- item is put back in the stock first (edit mode). The window shows every sellable stack as a tile
--- (itemgrid.lua); beside it, the picked stack large, its price, how many to sell (1 at first) and the total.
--- A sale updates the grid in place. The coins go to the save at once (EarnCoins) and the purse on the
--- window's bottom edge counts them in.
+-- recycle_bin furniture: sells stock items for coins
 
-local UI = require("uilib")           -- the skin's UI library (UI.Pick), picked on first use
+local UI = require("uilib")
 local I18N = require("Locale.i18n")
 local Room = require("room")
 local Purse = require("purse")
@@ -24,19 +12,19 @@ local T = I18N.texts("recycle")       -- lang/<code>/recycle.json
 local M = {}
 
 M.ID = "recycle_bin"
-M.SHOP_SHARE = 0.4                    -- what a shop item fetches, as a share of its shop price
+M.SHOP_SHARE = 0.4                    -- share of the shop price
 
--- ── layout ─────────────────────────────────────────────────────────────────────────────────────
-local PANEL = { w = 1560, h = 880 }  -- its height is made to fit the grid
+-- ==== layout ====
+local PANEL = { w = 1560, h = 880 }  -- h refit to the grid in build
 local GRID_COLS, GRID_ROWS = 5, 3
 local COL_GAP = 48
-local VALUE_W = 90                  -- room right of the amount slider for its number
+local VALUE_W = 90                  -- right of the slider, for its number
 local BTN_H = 76
 local PRICE_SIZE = 34
 local COIN_GAP = 30                 -- from the coin's centre to its number
-local TEXT_PAD = 25                 -- a text box's side padding (the ink starts this far right of a left label's x)
+local TEXT_PAD = 25                 -- label side padding: ink starts this far right of x
 local GREY = { 120, 126, 150, 255 }
--- the purse sits on the window's bottom edge, at its right end
+-- purse: on the panel's bottom edge, right end
 local PURSE_W, PURSE_H = 300, 66
 
 local ctx = nil                     -- Script.lua closures (see M.init)
@@ -44,15 +32,17 @@ local ui, W, grid = nil, {}, nil
 local purse = nil                   -- purse.lua, made on the first open
 local open, justOpened = false, false
 local stacks = {}                   -- { key, id, n, price } for every sellable stack in stock
-local sel = 1                       -- the picked stack
+local sel = 1                       -- picked stack index
 local amount = 1
-local side = nil                    -- the side column's box { x, y, w }
-local box = nil                     -- the panel's box { x, y, w, h }, for the purse
-local soldDue = false               -- a sale changed the stock: shown after the UI update
+local side = nil                    -- side column box { x, y, w }
+local box = nil                     -- panel box { x, y, w, h }, for the purse
+local soldDue = false               -- stock changed: refresh after ui:update
 
 local function tr(id) return T:tr(id) end
 
--- the coins one unit of a stock key fetches, or nil when it is not sold here
+-- coins per unit of a stock key, nil when not sold here
+-- shop row (furn_<id>): SHOP_SHARE of its price, OneTime rows unsold; else the catalogue `sell`
+-- default floor and paint never sold; "<id>:<rrggbb>" sells as <id>
 function M.priceOf(key)
     local id = Room.splitColor(key)
     if id == Room.DEFAULT_FLOOR or id == Room.DEFAULT_PAINT then return nil end
@@ -69,7 +59,7 @@ function M.priceOf(key)
     return price
 end
 
--- every sellable stack in stock, by name
+-- sellable stacks in stock, sorted by name
 local function collect()
     local room = ctx.room()
     local out = {}
@@ -85,7 +75,7 @@ local function collect()
     return out
 end
 
--- the price, slider and total of the picked stack, set in place
+-- side widgets for the picked stack
 local function showStack()
     local s = stacks[sel]
     if s == nil or W.price == nil then return end
@@ -104,7 +94,7 @@ local function build()
     ui = UI.new{ theme = ctx.theme, navPlayer = ctx.playerIndex() + 1, nav = "spatial" }
     local x, y = (1920 - PANEL.w) / 2, (1080 - PANEL.h) / 2
     local panel = ui:panel{ x = x, y = y, w = PANEL.w, h = PANEL.h, pad = 30, title = Room.displayName(M.ID) }
-    -- the panel takes exactly GRID_ROWS rows of tiles under its title (the title's height is the font's)
+    -- panel fits GRID_ROWS rows of tiles under its title (title height comes from the font)
     local cx, cy, cw, ch = panel:content()
     local need = Grid.height(GRID_ROWS)
     if ch ~= need then
@@ -126,8 +116,7 @@ local function build()
         onChoose = function() if W.go then ui:focus(W.go) end end })
     grid:showTile(sel, true)
 
-    -- the stack (drawn), the price of one, how many, the total, then the button (prices: the coin icon left of
-    -- the number)
+    -- side column; prices: coin icon left of the number
     local rx = cx + gw + COL_GAP
     local rw = cx + cw - rx
     side = { x = rx, y = cy, w = rw }
@@ -161,11 +150,11 @@ function M.apply()
     local sf = ctx.save()
     if n < 1 or sf == nil then return end
     local coins = n * s.price
-    room.inventory[s.key] = have - n        -- kept at 0 when sold out, as taking an item from stock does
+    room.inventory[s.key] = have - n        -- kept at 0, as taking from stock does
     sf:EarnCoins(coins)
     if purse then purse:gain(coins) end
     if ctx.onChanged then ctx.onChanged() end
-    -- the same stack stays picked while some is left (else the one now in its place)
+    -- keep the same stack picked while some is left
     local again = collect()
     local keep = nil
     for i, st in ipairs(again) do if st.key == s.key then keep = i end end
@@ -174,15 +163,15 @@ function M.apply()
     soldDue = true
 end
 
--- a price: the coin icon left of its number (a label), centred on the number's glyph line
+-- coin icon left of a price label, centred on its line
 local function drawPrice(label)
     if label == nil or not label.visible or purse == nil then return end
     local lineH = label.mgr:gfont(PRICE_SIZE).LineHeight
     purse:drawCoin(math.floor(label.x + TEXT_PAD - COIN_GAP), math.floor(label.y + lineH * 0.5), 0.8, 0.8)
 end
 
--- ── public API ─────────────────────────────────────────────────────────────────────────────────
--- ctx: { theme, playerIndex()->n, room()->Room, save()->save file|nil, onChanged() (the stock changed) }
+-- ==== public API ====
+-- ctx: { theme, playerIndex() -> n, room() -> Room, save() -> save file|nil, onChanged() on a stock change }
 function M.init(c) ctx = c end
 
 function M.isOpen() return open end
@@ -207,7 +196,7 @@ function M.close(silent)
     if not silent then pcall(function() SHARED:GetSharedSound("Cancel"):Play() end) end
 end
 
--- returns "closed" the frame the window shuts
+-- "closed" on the frame the window shuts
 function M.update(dt, ts)
     if not open then return nil end
     if purse then purse:update(dt) end
@@ -216,7 +205,7 @@ function M.update(dt, ts)
     local r = ui:update(ts)
     if soldDue then
         soldDue = false
-        -- the grid takes the new stock where it is; the window is laid out again only when it runs out
+        -- grid updates in place; full rebuild only when the stock runs out
         local again = collect()
         if grid and #again > 0 then
             stacks = again

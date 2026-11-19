@@ -1,11 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- OWM3d/json.lua — map.json reader/validator (schema v1; see docs/owm3d-map-schema.md).
--- Parses through JSONLOADER (JsonParseFileAny → objects as Dictionary<string,object>, arrays as
--- 1-indexed Dictionary<int,object>) and normalizes everything into PLAIN LUA TABLES with defaults
--- applied, so the rest of the engine (and the lupa harness) never touches .NET types.
---
---   local def, err = Json.loadMap("maps/plaza")     -- reads maps/plaza/map.json
---   def.type == "iso"|"terrain" ; def.cells[r][c] = {h=,tex=,ramp=,wall=,liquid=} ; def.models[...]
+-- OWM3d/json.lua: map.json reader (schema v1, docs/owm3d-map-schema.md)
+-- output: plain Lua tables with defaults applied
 
 local Json = {}
 
@@ -19,7 +14,8 @@ Json.GRASS_TILE_NUMBERS = { "density", "quality", "thin", "patchSize", "contrast
     "maxSlope", "cols", "rows", "grassCells", "flowerCells" }
 Json.GRASS_TILE_ARRAYS = { "width", "height", "wind", "tip", "dry", "avg", "cells" }
 
--- ── .NET → Lua conversion helpers (all access through JsonGet/JsonCount; never direct indexing) ──
+-- ==== .NET to Lua helpers ====
+-- access through JsonGet/JsonCount only; arrays are 1-indexed dicts
 local function jget(d, k) return JSONLOADER:JsonGet(d, k) end
 local function jcount(d) return JSONLOADER:JsonCount(d) end
 
@@ -38,7 +34,7 @@ local function boolean(d, k, def)
     if type(v) == "boolean" then return v end
     return def
 end
--- convert a JSON array (1-indexed dict) of numbers → Lua array
+-- JSON number array -> Lua array
 local function numArray(d, k)
     local a = jget(d, k)
     if a == nil then return nil end
@@ -68,7 +64,7 @@ local function each(d, k, fn)
         if el ~= nil then fn(el, i) end
     end
 end
--- localized name table {en=..., ja=...} or plain string → table
+-- {en=, ja=} table or plain string -> table
 local function locName(d, k)
     local v = jget(d, k)
     if type(v) == "string" then return { en = v } end
@@ -81,7 +77,7 @@ local function locName(d, k)
     return out
 end
 
--- ── cells: palette + CSV rows with RLE ("3x0" = index 0 three times) ─────────────────────────────
+-- ==== Cells (palette + RLE CSV rows) ====
 local function parsePalette(cellsD)
     local pal = {}
     each(cellsD, "palette", function(p, i)
@@ -96,7 +92,7 @@ local function parsePalette(cellsD)
     return pal
 end
 
--- decode one CSV row string into palette indices (supports "NxV" run-length tokens)
+-- CSV row -> palette indices; "NxV" = V repeated N times
 function Json.decodeRow(rowStr, expectW)
     local out = {}
     for rawTok in tostring(rowStr):gmatch("[^,]+") do
@@ -132,7 +128,7 @@ local function parseCells(d, gridW, gridH)
             cells[r][c] = { h = p.h, tex = p.tex, wall = p.wall or nil, liquid = p.liquid, wallH = p.wallH }
         end
     end
-    -- per-cell overrides (ramp / tex / h / wall / door)
+    -- per-cell overrides
     each(cellsD, "overrides", function(o)
         local c, r = num(o, "c", -1), num(o, "r", -1)
         if c >= 0 and c < gridW and r >= 0 and r < gridH then
@@ -150,16 +146,16 @@ local function parseCells(d, gridW, gridH)
     return cells
 end
 
--- ── the loader ────────────────────────────────────────────────────────────────────────────────────
--- dir = map folder relative to the stage (e.g. "maps/plaza"); reads <dir>/map.json.
--- Returns (def, nil) or (nil, "error message").
+-- ==== Loader ====
+-- dir: map folder relative to the stage; reads <dir>/map.json
+-- returns def, nil or nil, err
 function Json.loadMap(dir)
     local ok, d = pcall(function() return JSONLOADER:JsonParseFileAny(dir .. "/map.json") end)
     if not ok or d == nil then return nil, "map.json not found or unreadable in '" .. tostring(dir) .. "'" end
     return Json.parse(d, dir)
 end
 
--- parse an already-loaded JSON dict (harness entry point)
+-- parse a loaded JSON dict
 function Json.parse(d, dir)
     local ver = num(d, "owm3d", -1)
     if ver ~= SCHEMA_VERSION then
@@ -177,7 +173,7 @@ function Json.parse(d, dir)
 
     -- grid + cells (iso)
     local gridD = jget(d, "grid")
-    -- same 1..1024 range as the editor, so a broken size cannot make the row loops endless
+    -- clamp to 1..1024 (editor range): bad sizes would loop forever
     local function side(k)
         local v = math.floor(num(gridD, k, 16))
         return (v >= 1 and v <= 1024) and v or math.max(1, math.min(1024, v == v and v or 16))
@@ -210,7 +206,7 @@ function Json.parse(d, dir)
             end
         end
         def.terrain.grassDensity = num(terrD, "grassDensity", nil)
-        -- optional grass block (v1 addition): { density=, clumpScale=, exclude=[{rect:[x0,z0,x1,z1]},...] }
+        -- optional grass: { density, clumpScale, exclude = [{ rect = [x0, z0, x1, z1] }] }
         local grassD = jget(terrD, "grass")
         if grassD ~= nil then
             def.terrain.grass = {
@@ -262,8 +258,7 @@ function Json.parse(d, dir)
     def.textures = {}
     local texD = jget(d, "textures")
     if texD ~= nil then
-        -- object keys aren't enumerable through JsonGet; textures are therefore an ARRAY of
-        -- {name=,builtin=|file=,filter=} entries in the schema
+        -- array of { name, builtin | file, filter }: JsonGet cannot list keys
         each(d, "textures", function(t)
             local nm = str(t, "name", nil)
             if nm then
@@ -356,7 +351,7 @@ function Json.parse(d, dir)
             reflect = boolean(w, "reflect", false),
             ripple = num(w, "ripple", 0.5),
             tex = str(w, "tex", "water"),
-            color = col, deepColor = deep,      -- optional shallow/deep tint (v1 addition)
+            color = col, deepColor = deep,      -- optional shallow/deep tint
         }
     end)
 
@@ -397,7 +392,7 @@ function Json.parse(d, dir)
         }
     end)
 
-    -- missions anchors (mission DATA still comes from Missions.db3)
+    -- mission anchors (data from Missions.db3)
     def.missions = {}
     each(d, "missions", function(m)
         local pos = numArray(m, "pos") or { 0, 0 }
@@ -451,7 +446,7 @@ function Json.parse(d, dir)
         }
     end)
 
-    -- spawns: array of {name=,x=,z=,yaw=} (same array-of-named-entries pattern as textures)
+    -- spawns: array of { name, x, z, yaw }
     def.spawns = {}
     each(d, "spawns", function(s)
         local nm = str(s, "name", "default")

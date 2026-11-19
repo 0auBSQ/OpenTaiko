@@ -1,8 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- modal_fx.lua — what the unlock sequences share: the once-only cue timeline, a draw helper that
--- sets a texture's scale/opacity/rotation/tint for one draw, full-screen fills, the rarity palette
--- and the particle pools (sparkles, smoke puffs, dust). The curves come from Lib/Easing and the
--- colour maths from Lib/Color; Fx re-exports the curves the flows use.
+-- shared parts of the unlock sequences
+-- curves from Lib/Easing (re-exported), colour maths from Lib/Color
 
 local Easing = require("Easing")
 local Color = require("Color")
@@ -19,11 +17,9 @@ Fx.clamp01, Fx.span, Fx.lerp, Fx.hump = Easing.clamp01, Easing.span, Easing.lerp
 Fx.inQuad, Fx.outQuad, Fx.inCubic, Fx.outCubic = Easing.inQuad, Easing.outQuad, Easing.inCubic, Easing.outCubic
 Fx.outBack, Fx.outBounce = Easing.outBack, Easing.outBounce
 
--- The engine hands modals a collapsed "modal int" (0 common, 1 uncommon, 2 rare, 3 epic,
--- 4 legendary); an item's own Rarity string is preferred whenever it is known, so poor and mythical
--- keep their own chest and colour.
+-- engine modal int: 0 common .. 4 legendary; a known Rarity string wins (poor, mythical)
 Fx.RARITIES = { "poor", "common", "uncommon", "rare", "epic", "legendary", "mythical" }
--- a plain table: looking up a name that is not a rarity gives nil
+-- plain table: nil for a non-rarity name
 Fx.RARITY_COLOR = {}
 for _, r in ipairs(Fx.RARITIES) do Fx.RARITY_COLOR[r] = Layout.rarity_colors[r .. "_color"] end
 Fx.RARITY_LANG_INT = { poor = 0, common = 1, uncommon = 2, rare = 3, epic = 4, legendary = 5, mythical = 6 }
@@ -36,23 +32,23 @@ function Fx.hsv(h, s, v)
     return { floor(r * 255 + 0.5), floor(g * 255 + 0.5), floor(b * 255 + 0.5) }
 end
 
--- the mythical rainbow: a hue at `phase` (0..1, wraps), pulled toward white by `pastel`
+-- mythical rainbow: hue at phase (0..1, wraps), pulled toward white by pastel
 function Fx.rainbow(phase, pastel)
     return Fx.hsv(phase, 1 - (pastel or 0), 1)
 end
 
--- a colour pulled toward white by k (0 = as is, 1 = white): the panel tints
+-- k: 0 as is, 1 white
 function Fx.pastel(col, k)
     return { floor(col[1] + (255 - col[1]) * k + 0.5), floor(col[2] + (255 - col[2]) * k + 0.5), floor(col[3] + (255 - col[3]) * k + 0.5) }
 end
 
--- the colour a rarity draws in; the mythical one cycles with time t
+-- mythical cycles with t
 function Fx.rarityColor(key, t)
     if key == "mythical" then return Fx.rainbow((t or 0) * FX.mythical_hue_per_s, Layout.mythical_pastel) end
     return Fx.RARITY_COLOR[key] or Fx.RARITY_COLOR.common
 end
 
--- the rarity key for a modal: the item's own string when it names a rarity, else the modal int
+-- the item's string when it names a rarity, else from modalInt
 function Fx.rarityKey(modalInt, rarityString)
     if type(rarityString) == "string" then
         local k = rarityString:lower()
@@ -61,7 +57,8 @@ function Fx.rarityKey(modalInt, rarityString)
     return MODAL_INT_KEY[max(0, min(4, floor(tonumber(modalInt) or 0)))]
 end
 
--- ── cue timeline: fires each cue once as t passes it; jump() skips silently ──────────────────
+-- ==== Cue timeline ====
+-- each cue fires once as t passes it
 local Timeline = {}
 Timeline.__index = Timeline
 
@@ -76,13 +73,14 @@ function Timeline:advance(dt)
         if not c.done and self.t >= c.at then c.done = true ; c.fn() end
     end
 end
--- moves to a later time and marks every earlier cue as spent without running it
+-- marks earlier cues spent without running them
 function Timeline:jump(time)
     for _, c in ipairs(self.cues) do if c.at <= time then c.done = true end end
     self.t = time
 end
 
--- ── one-shot draw helper: sets the texture state for this draw and restores the defaults ─────
+-- ==== Draw helper ====
+-- sets the texture state for one draw, then restores the defaults
 -- o: { sx, sy, opacity, rot, color = {r,g,b} 0..255, blend, anchor = "center", rx, ry, rw, rh }
 function Fx.draw(tex, x, y, o)
     if tex == nil then return end
@@ -117,7 +115,8 @@ function Fx.drawCanvas(cv, x, y, o)
     if c then cv:SetColor(1, 1, 1) end
 end
 
--- ── full-screen fills: one small white canvas, scaled and tinted ─────────────────────────────
+-- ==== Full-screen fills ====
+-- one small white canvas, scaled and tinted
 local FILL = 16
 function Fx.makeFill()
     local cv = CANVAS:CreateCanvas(FILL, FILL)
@@ -134,10 +133,9 @@ function Fx.fill(cv, color, alpha)
     cv:SetScale(1, 1) ; cv:SetOpacity(1) ; cv:SetColor(1, 1, 1)
 end
 
--- ── particles ────────────────────────────────────────────────────────────────────────────────
--- every particle: x, y, vx, vy, life, age, s0, s1 (scale over life), rot, spin, color, fade
--- (alpha curve: "out" fades out, "hump" fades in then out, "rise" fades in over `rise` seconds
--- and stays), gravity, drag
+-- ==== Particles ====
+-- particle: x, y, vx, vy, life, age, s0, s1 (scale over life), rot, spin, color, fade, gravity, drag
+-- fade: "out" | "hump" (in then out) | "rise" (in over rise sec, then stays)
 local Pool = {}
 Pool.__index = Pool
 
@@ -155,7 +153,7 @@ function Pool:emit(p)
     p.alpha = p.alpha or 1
     self.list[#self.list + 1] = p
 end
--- n sparkles bursting from (x,y): speed range, size, colour
+-- n sparkles from (x, y); o: speed range, size, colour
 function Pool:burst(x, y, n, o)
     o = o or {}
     for _ = 1, n do
@@ -200,7 +198,8 @@ function Pool:draw(opacity)
     end
 end
 
--- ── screen shake: a decaying jitter the flows add to their draw offsets ──────────────────────
+-- ==== Screen shake ====
+-- decaying jitter, added to the flows' draw offsets
 function Fx.shake(amount, t, dur)
     if t < 0 or t >= dur then return 0, 0 end
     local k = 1 - t / dur

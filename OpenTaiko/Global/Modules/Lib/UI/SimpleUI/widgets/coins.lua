@@ -1,14 +1,13 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- SimpleUI coins: an amount of coins with the coin icon, on a flat pill (plain = true: the coin and the
--- number only, right-aligned to the widget's right edge). Decorative (non-focusable).
+-- SimpleUI coins: amount with the coin icon, non-focusable
+-- plain = true: no pill, coin and number right-aligned to the right edge
 --   ui:coins{ x=, y=, w=, h=, amount=0, plain=false, size=, iconSize=44, color={r,g,b}, edge={r,g,b,a} }
 --   c:setAmount(n)   the shown amount, at once          c:amount()        the amount it is heading to
 --   c:add(n)         the number rolls by n              c:gain(n) / c:pay(n)   the same, with a "+n" / "-n"
 --   c:setPrice(n)    a price above it (nil: none)       c:setBonus(n)     a "+n" (or "-n") above it (nil: none)
 --   c:drawCoin(x, y, sx, sy, opacity)                   the coin icon centred at (x, y), scaled by sx, sy
--- color and edge (the letters' outline colour) may change any frame. The icon is Coin.png in SimpleUI's
--- folder (a copy of OWM's coin picture, its _boot Textures/Coin.png).
--- gain plays the sfx "coin" (none by default; pass sfx = { coin = <sound> }), pay the sfx "pay".
+-- color and edge (text outline colour) may change any frame; icon: Coin.png in SimpleUI's folder
+-- sfx: gain plays "coin" (none by default; pass sfx = { coin = <sound> }), pay plays "pay"
 
 local Widget = require("UI.SimpleUI.widget")
 local U      = require("UI.SimpleUI.util")
@@ -20,7 +19,7 @@ local floor, min = math.floor, math.min
 local CLEAR = { 255, 255, 255, 0 }
 local GAIN, LOSS = { 46, 140, 84, 255 }, { 196, 64, 56, 255 }
 
-local iconTex = nil       -- the coin texture, loaded once per script (false: it could not load)
+local iconTex = nil       -- loaded once per script (false: failed to load)
 local function icon()
     if iconTex == nil then
         iconTex = false
@@ -44,7 +43,7 @@ function Coins.new(o)
     self.plain = o.plain == true
     self.iconSize = o.iconSize or 44
     self.balance = o.amount or 0
-    self.amount = nil                 -- the option, copied onto the widget, would hide the amount() method
+    self.amount = nil                 -- the option would hide the amount() method
     self.rolling = self.balance
     self.pops = {}
     return self
@@ -103,12 +102,12 @@ function Coins:draw()
     local edge = self.edge or CLEAR
     local size = self.size or (self.plain and 28 or self.eff.font.button)
     local count = string.format("%d", floor(self.rolling + 0.5))
-    -- right: where the ink of the number ends (a text box keeps 25 px around its ink)
+    -- right: ink end of the number (text box keeps 25 px around its ink)
     local right
     if self.plain then
         right = self.x + self.w - 25
         mgr:drawTextEx(size, count, right + 25, cy + mgr:textNudge(size), fg, edge, 1, 1, 0, "right")
-        -- the coin stands left of the first digit
+        -- coin left of the first digit
         local first = right - mgr:measureText(size, count)
         self:drawCoin(first - 10 - self.iconSize * 0.5, cy, 1, 1, 1)
     else
@@ -118,7 +117,7 @@ function Coins:draw()
         right = self.x + self.w - 24
         mgr:drawTextEx(size, count, right + 25, cy + mgr:textNudge(size), fg, edge, 1, 1, 0, "right")
     end
-    -- above the coins: a price, or the bonus still to come, and the amounts just gained or paid
+    -- above: price or pending bonus, then gain/pay pops
     local small = self.eff.font.small + 4
     local ay = self.y - 26
     if self.price ~= nil then

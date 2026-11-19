@@ -1,4 +1,4 @@
--- Ambience of the cleared checkpoint gallery (checkpoint_cleared.png, level 15).
+-- ambience: cleared checkpoint gallery (checkpoint_cleared.png, level 15)
 
 local F     = require("towerfx/field")
 local art   = require("towerfx/art")

@@ -1,56 +1,43 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global
--- tv.lua — the TV furniture (My Room).
---
--- The set itself: each placed TV is on or off (it.tvOn, persisted with the room). An on set routes
--- its screen material to an unlit part (room.lua, catalog screenPart) whose flat colour drifts through
--- a small palette, and the same colour is cast into the room as a live point light. The screen ignores
--- the sun and the shadow map, so it reads as bright without any global illumination.
---
--- The window: Enter on the TV opens a small menu (turn on/off, rewatch cutscenes). The browser has two
--- tabs. Song cutscenes: the left list holds every genre folder with a song that has a cutscene, the
--- right list that genre's cutscenes ([song] · Intro / Outro n). Chart videos: the same, with one row per
--- song whose chart has a video (BGMOVIE), dan and tower charts left out. Undiscovered ones are locked
--- rows with a padlock; a locked song shows ??? for its title. Cutscenes are read from the songs'
--- .CUTSCENE_* chart headers and their discovered state from the save's triggers; a chart video counts
--- as discovered once the song has been played. Both play in the video_player ROActivity, a chart video
--- under its song's audio as in game, with the jukebox ducked meanwhile.
+-- tv furniture: screen colour and point light while it.tvOn (saved with the room)
+-- window: on/off menu and a browser for cutscenes and chart videos
 
-local UI = require("uilib")           -- the skin's UI library (UI.Pick), picked on first use
+local UI = require("uilib")
 local I18N = require("Locale.i18n")
 local SongTitle = require("Songs.Title")
 local T = I18N.texts("tv")     -- lang/<code>/tv.json
 
 local TV = {}
 
--- ── layout (the jukebox window's frame) ────────────────────────────────────────────────────────
+-- ==== layout (same frame as the jukebox) ====
 local PANEL = { x = 160, y = 90, w = 1600, h = 900 }
 local TAB   = { x = PANEL.x + 40, y = PANEL.y + 88, w = 300, h = 64, gap = 16 }
 local LEFT  = { x = PANEL.x + 40, y = PANEL.y + 190, w = 560, h = 620, row = 64 }
 local RIGHT = { x = PANEL.x + 640, y = PANEL.y + 190, w = PANEL.w - 640 - 50, h = 620, row = 64 }
 local MENU_W, MENU_H, MENU_ROW = 620, 320, 72
 
--- ── the screen: palette, glow, light ───────────────────────────────────────────────────────────
+-- ==== screen ====
 local PALETTE = {
-    { 0.55, 0.70, 1.00 },   -- cool blue-white
-    { 1.00, 0.85, 0.60 },   -- warm
-    { 0.45, 0.95, 0.85 },   -- cyan
-    { 1.00, 0.55, 0.75 },   -- pink
-    { 0.95, 0.60, 0.30 },   -- orange
-    { 0.60, 0.95, 0.55 },   -- green
-    { 0.85, 0.85, 0.95 },   -- white
+    { 0.55, 0.70, 1.00 },
+    { 1.00, 0.85, 0.60 },
+    { 0.45, 0.95, 0.85 },
+    { 1.00, 0.55, 0.75 },
+    { 0.95, 0.60, 0.30 },
+    { 0.60, 0.95, 0.55 },
+    { 0.85, 0.85, 0.95 },
 }
-TV.SCREEN_EMISSIVE = 0.7    -- the unlit screen's add over its flat colour (room.lua routes with it)
+TV.SCREEN_EMISSIVE = 0.7    -- unlit screen part emissive over its flat colour (room.lua screenPart)
 local LIGHT_INTENSITY, LIGHT_RANGE = 0.5, 4.0
 
 local ctx = nil             -- Script.lua closures (see TV.init)
 local anim = {}             -- furniture entry → { r,g,b, tr,tg,tb, hold }
-local lightDefs = {}        -- furniture entry → the live light def handed to daynight
+local lightDefs = {}        -- furniture entry -> live light def (daynight)
 
 local function tr(id) return T:tr(id) end
 
 function TV.isOn(it) return it ~= nil and it.tvOn == true end
 
--- the routed screen part object of a placed TV, or nil (off, no model, or not built yet)
+-- screen part object of a placed TV; nil without a model or before the build
 function TV.screenObj(it)
     if ctx == nil then return nil end
     local inst = ctx.propInstFor(it)
@@ -79,8 +66,8 @@ local function animFor(it)
     return a
 end
 
--- the light defs of every on TV; Script.rebuild appends them to the room's light list. They are
--- live: the tick writes the colour into these same tables and daynight re-reads them every frame.
+-- light defs of every on TV, added to the room's lights by Script.rebuild
+-- live: tick writes the colour into these tables, daynight reads them each frame
 function TV.lights(world)
     local out = {}
     lightDefs = {}
@@ -102,7 +89,7 @@ function TV.lights(world)
     return out
 end
 
--- every frame: drift each on screen's colour and push it to the part and its light
+-- each frame: ease each on screen's colour to its target, then set part and light
 function TV.tick(dt)
     if ctx == nil then return end
     local scene = ctx.scene()
@@ -125,13 +112,13 @@ function TV.tick(dt)
     end
 end
 
--- ── window state ───────────────────────────────────────────────────────────────────────────────
+-- ==== window state ====
 local mode = nil            -- nil | "menu" | "browser" | "player"
 local ui = nil
 local W = {}
-local openItem = nil        -- the TV the window was opened for
+local openItem = nil        -- TV the window is open for
 local justOpened = false    -- eat the Enter edge that opened the window
-local player = nil          -- the video_player ROActivity while a cutscene plays
+local player = nil          -- video_player ROActivity while a cutscene plays
 local grouped = nil         -- { { genre=, songs={ { title=, locked=, cuts={...} } } }, ... }
 local curGenre = nil
 local tab = "cuts"          -- "cuts" | "videos"
@@ -143,15 +130,14 @@ local function songsReady()
     return false
 end
 
--- ── a song's cutscenes, read from its chart headers ────────────────────────────────────────────
--- .CUTSCENE_INTRO:<file>,<repeat>  and  .CUTSCENE_OUTRO:<file>,<clear status>,<scope>,<repeat>,...
--- are custom (dot) commands, so they come through GetCustomCommand; the file sits in the chart's
--- folder. A cutscene counts as discovered when the save carries the trigger the cutscene stage sets
--- when it plays (.seencutscene_), or one of the ones it sets when its condition is spent or met. An
--- intro plays at every launch, so a song this save has played to its results also counts for it.
+-- ==== song cutscenes ====
+-- .CUTSCENE_INTRO:<file>,<repeat> and .CUTSCENE_OUTRO:<file>,<clear status>,<scope>,<repeat>,...
+-- custom dot commands (GetCustomCommand); the file sits in the chart's folder
+-- discovered: a trigger the cutscene stage sets (.seencutscene_, .regcutscene_, outro .metcutscene_)
+-- intro: also discovered once the song was played (it plays at every launch)
 local INTRO_CMD, OUTRO_CMD = ".CUTSCENE_INTRO", ".CUTSCENE_OUTRO"
 
--- the engine's comma split: "\," is a literal comma, nothing is trimmed
+-- engine comma split: "\," is a literal comma, no trimming
 local function splitComma(s)
     local out, cur, i = {}, {}, 1
     while i <= #s do
@@ -166,7 +152,7 @@ end
 
 local function fileNameOf(path) return path:match("([^/\\]+)$") or path end
 
--- the song's folder and whether this save has played any of its charts
+-- -> song folder, played (any chart, this save)
 local function songInfo(n, saveIndex)
     local folder, played = nil, false
     for d = 0, 6 do
@@ -227,8 +213,8 @@ local function songCutScenes(n, folder, sf, played)
     return cuts
 end
 
--- every listable song keep(n) accepts, made into entries by make(n, sf, saveIndex) (nil skips it) and
--- grouped by genre in library order; dan and tower folders and charts are left out
+-- songs keep(n) accepts, as make(n, sf, saveIndex) entries (nil skips), grouped by genre in library order
+-- dan and tower folders left out
 local function buildGrouped(keep, make)
     local out, order = {}, {}
     local ok = pcall(function()
@@ -274,11 +260,12 @@ local function cutSceneEntry(n, sf, saveIndex)
     return { title = SongTitle.of(n) or "?", locked = n.IsLocked == true, genre = n.Genre or "?", cuts = cuts }
 end
 
--- a chart video plays under the song's audio, starting MOVIEOFFSET after it as in game
+-- chart video plays over the song's audio, MOVIEOFFSET after it, as in game
 local function hasChartVideo(n)
     return n.HasVideo == true and (n.VideoPath or "") ~= ""
 end
 
+-- discovered once played (unlocked songs only)
 local function chartVideoEntry(n, sf, saveIndex)
     local _, played = songInfo(n, saveIndex)
     local locked = n.IsLocked == true
@@ -306,7 +293,7 @@ local function disposeWindow()
     W = {}
 end
 
--- ── the cutscene player ────────────────────────────────────────────────────────────────────────
+-- ==== cutscene player ====
 local function openPlayer(c)
     player = ROACTIVITY:GetROActivity("video_player")
     if player == nil then return end
@@ -323,7 +310,7 @@ local function closePlayer()
     mode = "browser"
 end
 
--- ── the browser ────────────────────────────────────────────────────────────────────────────────
+-- ==== browser ====
 local rebuildRight
 
 local function onGenreChange(_, it)
@@ -347,7 +334,7 @@ end
 rebuildRight = function()
     if ui == nil then return end
     if W.right then
-        ui:remove(W.right)   -- unregister before dispose, as the jukebox does
+        ui:remove(W.right)   -- unregister before dispose
         W.right:dispose()
         W.right = nil
     end
@@ -367,7 +354,7 @@ end
 
 local function tabButton(t) return t == "videos" and W.tabVideos or W.tabCuts end
 
--- the current tab's genre list and rows (rebuilt on every open and tab switch: always fresh)
+-- current tab's genre list and rows, rebuilt on every open and tab switch
 local function rebuildLists()
     for _, k in ipairs({ "right", "left" }) do
         if W[k] then ui:remove(W[k]); W[k]:dispose(); W[k] = nil end
@@ -406,7 +393,7 @@ local function buildBrowser()
     disposeWindow()
     ui = UI.new{ theme = ctx and ctx.theme or nil, navPlayer = (ctx and ctx.playerIndex() or 0) + 1 }
     ui:panel{ x = PANEL.x, y = PANEL.y, w = PANEL.w, h = PANEL.h, title = tr("title") }
-    -- the tabs, styled like the jukebox's: the current one is lit
+    -- tabs: the current one has accent
     local x = TAB.x
     local function tabW(text) return math.max(TAB.w, math.ceil(ui:measureText(ui.theme.font.button, text)) + 40) end
     local cutsText, videosText = tr("tab_songs"), tr("tab_videos")
@@ -422,7 +409,7 @@ local function buildBrowser()
     mode = "browser"
 end
 
--- ── the TV menu ────────────────────────────────────────────────────────────────────────────────
+-- ==== TV menu ====
 local function buildMenu(displayName)
     disposeWindow()
     ui = UI.new{ theme = ctx and ctx.theme or nil, navPlayer = (ctx and ctx.playerIndex() or 0) + 1 }
@@ -447,9 +434,9 @@ local function buildMenu(displayName)
     mode = "menu"
 end
 
--- ── public API ─────────────────────────────────────────────────────────────────────────────────
--- ctx: { theme, playerIndex()->n, save()->save file|nil, room()->room, scene()->scene|nil,
---        propInstFor(it)->inst|nil, catalog(id)->cat|nil, displayName()->string, onToggled(it), duck(on) }
+-- ==== public API ====
+-- ctx: { theme, playerIndex() -> n, save() -> save file|nil, room() -> room, scene() -> scene|nil,
+--        propInstFor(it) -> inst|nil, catalog(id) -> cat|nil, displayName() -> string, onToggled(it), duck(on) }
 function TV.init(c) ctx = c end
 
 function TV.isOpen() return mode ~= nil end
@@ -461,7 +448,7 @@ function TV.openFor(item, displayName)
     buildMenu(displayName)
 end
 
--- silent = true keeps the cancel sound for the caller's own feedback
+-- silent: no cancel sound (the caller plays its own)
 function TV.close(silent)
     if mode == "player" then closePlayer() end
     disposeWindow()
@@ -469,7 +456,7 @@ function TV.close(silent)
     if not silent then playCancel() end
 end
 
--- returns "closed" the frame the window shuts so Script can flip modes
+-- "closed" on the frame the window shuts
 function TV.update(dt, ts)
     if mode == nil then return nil end
     if justOpened then justOpened = false; return nil end

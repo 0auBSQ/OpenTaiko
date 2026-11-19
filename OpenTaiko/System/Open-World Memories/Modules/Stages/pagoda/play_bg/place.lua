@@ -1,4 +1,4 @@
--- Where a floor's group stands on the band (x as encounter/monsters.place).
+-- floor group position on the band (x as encounter/monsters.place)
 
 local monsters = require("encounter/monsters")
 local Config   = require("Core.Config")
@@ -8,8 +8,8 @@ local View     = Layout.play_bg.view
 
 local NONE = { lo = 0, hi = 0 }
 
--- group: monsters.forLevel; metas: the members' band sprite entries, in group order; foes:
--- the manifest's foes. Returns the lead's foot point.
+-- group: monsters.forLevel; metas: band sprite entries in group order; foes: manifest foes
+-- returns the lead's foot point
 return function(group, metas, foes)
     local x = monsters.place(group, metas)
     local lead = metas[1]

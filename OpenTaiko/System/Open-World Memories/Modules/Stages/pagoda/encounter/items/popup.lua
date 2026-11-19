@@ -1,5 +1,5 @@
 -- Popup explaining an item right after Ume presents it.
--- It closes only after a moment, so the press that ended the dialog does not skip it.
+-- close delay: the press that ended the dialog does not skip it
 
 local Easing = require("Easing")
 local I18N   = require("i18n")

@@ -1,8 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Dan Red FullCombo end animation: a scroll rises (cubic/quadratic ease) then unrolls sideways.
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
---   update(player)/draw(player)/playEndAnime(player): host now passes player via state.player;
---   playEndAnime stays a top-level fn taking the index directly + holds the per-play counter reset.
+-- end anime: Dan_Red_FullCombo (group C, player via state.player)
 
 local width = 1920
 local height = 1080
@@ -37,7 +34,6 @@ function clearOut(player)
 end
 
 function playEndAnime(player)
-    -- per-play counter (re)set lives here (the old init() seeded these too)
     animeTimer = 0
     scrollRiseTransition = 0
     scrollSlideTransition = 0
@@ -68,11 +64,9 @@ end
 function draw(state)
     local player = state.player
     if scrollSlideTransition > 0 then
-        -- Draw scroll background
         tx["Scroll_Back.png"]:DrawRect(scrollSlidePos, scrollRisePos, scrollSlidePos - scrollBackWidth - scrollBackXOffset, 0, scrollBackWidth - scrollSlidePos + scrollBackXOffset, scrollHeight)
         tx["Scroll_Back_Overlay.png"]:DrawRect(scrollSlidePos, scrollRisePos, scrollSlidePos - scrollBackWidth - scrollBackXOffset, 0, scrollBackWidth - scrollSlidePos + scrollBackXOffset, scrollHeight)
     end
-    -- Draw scroll
     tx["Scroll.png"]:Draw(scrollSlidePos, scrollRisePos)
 end
 

@@ -1,16 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field
--- Core.Config — a module's configuration files, read once into plain Lua tables.
---   local Config = require("Core.Config")
---   local Animation = Config.load("Config/animation.json")  -- relative to the module's folder
---   local Layout    = Config.load("Config/layout.json")
---   local fadeMs    = Animation.logo.fade_ms                -- numbers, strings, booleans, objects, arrays
---   Config.color(Layout.title.color)                        -- [r, g, b] or [r, g, b, a] (0-255) -> a COLOR
---   Config.optional(Animation.logo, "delay_ms")             -- the value, or nil without a warning
---   Config.plain(Layout.panel)                              -- a plain copy, to hand to a library as options
--- Name the tables Layout and Animation: all-caps names are the engine's globals.
--- The file is the only place a value lives. Reading a key an object lacks logs a warning naming the file and
--- the key path (once per key) and gives 0; a missing or unreadable file logs a warning and reads as empty.
--- Arrays are plain Lua sequences (#, ipairs). Whole numbers come back as integers.
+-- Core.Config: a module's JSON config files, read once into plain Lua tables
+-- name the tables Layout / Animation (all-caps names are engine globals)
 
 local Config = {}
 
@@ -64,6 +54,8 @@ local function convert(v, path)
 end
 
 -- the file's values (cached per module); name is relative to the module's folder
+-- a missing key warns once (file and key path) and reads 0; a missing file warns and reads empty
+-- arrays are plain sequences; whole numbers come back as integers
 function Config.load(name)
     if cache[name] then return cache[name] end
     local ok, doc = pcall(function() return JSONLOADER:JsonParseFileAny(name) end)
@@ -85,8 +77,7 @@ function Config.optional(t, key)
     return rawget(t, key)
 end
 
--- a plain deep copy, without the missing-key warning: for a table handed to a library that tests its options
--- with `opts.x or default`
+-- plain deep copy without the missing-key warning, for a library testing `opts.x or default`
 local function plain(t)
     if type(t) ~= "table" then return t end
     local out = {}

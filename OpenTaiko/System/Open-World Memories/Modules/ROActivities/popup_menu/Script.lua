@@ -1,10 +1,6 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/TEXT injected by CLuaScript at runtime
--- popup_menu ROActivity — renders the in-game / cutscene pause list popup (title + items + cursor).
--- Input + navigation + action dispatch live in C# (CPopupMenuManager); this script only renders.
--- Replaces the old C# CActSelectPopupMenu rendering. Self-contained: its panel + cursor sprites live in Textures/
--- (customize the popup look by editing those). Driven via:
---   activate(title, items("\n"-joined), fontSize, <PopupMenu_* positions...>)
---   draw(selectedIndex)   -- per frame; cursor highlights the selected line
+-- popup_menu ROActivity: pause list popup rendering; input and actions in C# (CPopupMenuManager)
+-- activate(title, items ("\n"-joined), fontSize, <PopupMenu_* positions...>); draw(selectedIndex) per frame
 -- the cursor's tile count: Config/layout.json
 
 local Config = require("Core.Config")
@@ -13,13 +9,13 @@ local CURSOR_TILES = Layout.cursor.middle_tiles
 
 local _active = false
 
-local bg = nil          -- background panel (Textures/Menu_Title.png)
-local cursor = nil      -- highlight strip (Textures/Menu_Highlight.png, drawn as a 16-tile stretch)
+local bg = nil          -- Textures/Menu_Title.png
+local cursor = nil      -- Textures/Menu_Highlight.png, 16-tile stretch
 local font = nil
 local fontSize = 18
 
-local titleTex = nil    -- cached title text texture
-local itemTexs = {}     -- cached item-label text textures
+local titleTex = nil
+local itemTexs = {}
 
 -- positions (skin PopupMenu_*), filled by activate()
 local pTitleBgX, pTitleBgY = 460, 40
@@ -37,7 +33,7 @@ local function split(s)
 end
 
 function onStart()
-    -- Sync load so the cursor's size is valid the moment a pause first opens (loaded once, behind the skin loader).
+    -- sync load: cursor size valid on the first pause
     bg = TEXTURE:CreateTextureSync("Textures/Menu_Title.png")
     cursor = TEXTURE:CreateTextureSync("Textures/Menu_Highlight.png")
 end
@@ -52,8 +48,7 @@ function activate(title, itemsJoined, size,
     pNameX, pNameY = nameX, nameY
     moveX, moveY = mvX, mvY
 
-    -- (Re)build the cached text textures. GetText caches by string, so reopening the same menu is free, and these
-    -- strings are static per open (no per-frame churn). White text / black edge matches the old prvFont.DrawText.
+    -- GetText caches by string: reopening the same menu is free
     if font == nil or size ~= fontSize then
         fontSize = size
         font = TEXT:Create(fontSize)
@@ -72,13 +67,11 @@ end
 function draw(selected)
     if not _active then return end
 
-    -- Background panel
     if bg ~= nil then bg:Draw(pTitleBgX, pTitleBgY) end
 
-    -- Title
     if titleTex ~= nil then titleTex:Draw(pTitleX, pTitleY) end
 
-    -- Cursor highlight (left cap + 16 middle tiles + right cap), positioned at the selected line.
+    -- cursor: left cap + 16 middle tiles + right cap, on the selected line
     if cursor ~= nil then
         local curX = pHlX + (moveX * (selected + 1))
         local curY = pHlY + (moveY * (selected + 1))
@@ -93,13 +86,11 @@ function draw(selected)
         cursor:DrawRect(curX, curY, w, 0, w, h)
     end
 
-    -- Item labels
     for i, t in ipairs(itemTexs) do
         if t ~= nil then t:Draw(pNameX + (i - 1) * moveX, pNameY + (i - 1) * moveY) end
     end
 end
 
 function onDestroy()
-    -- bg/cursor are auto-disposed with the script (CreateTextureSync registers them); text textures are owned by
-    -- the GetText cache. Nothing extra to free.
+    -- bg and cursor disposed with the script (CreateTextureSync); text owned by the GetText cache
 end

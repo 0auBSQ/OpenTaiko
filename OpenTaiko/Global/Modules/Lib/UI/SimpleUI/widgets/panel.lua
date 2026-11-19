@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global, need-check-nil
--- SimpleUI panel: a rounded, shadowed container with an optional title "tab". Decorative (non-focusable);
--- the screen positions child widgets inside panel:content().
+-- SimpleUI panel: non-focusable container with an optional title tab
+-- children go inside panel:content()
 --   ui:panel{ x=, y=, w=, h=, title="Settings" }
 
 local Widget = require("UI.SimpleUI.widget")
@@ -26,7 +26,7 @@ function Panel:restyle()
     local c = self.eff.colors
     self:bakeBody(c.surface, c.surface2)
     if self.title and self.title ~= "" then
-        -- glyph-composed title; +50 = the padding the glyph box keeps
+        -- glyph title; +50 = glyph box padding
         local ink = math.min(self.mgr:measureText(self.eff.font.title, self.title) + 50, self.w - 40)
         local tw = ink + 56
         local th = self.mgr:textHeight(self.eff.font.title) + 22
@@ -55,7 +55,7 @@ function Panel:draw()
         local ty = math.floor(self.y)
         self:drawPiece(self._titlePill, tx, ty, 1, 1)
         local c = self.eff.colors
-        -- the text box is anchored below the pill's centre by the nudge so its glyph line sits on it
+        -- text box offset by textNudge so the glyph line sits on the pill centre
         self.mgr:drawTextEx(self.eff.font.title, self.title, tx, ty + self.mgr:textNudge(self.eff.font.title),
             c.textOnAccent, self.eff.textOutline == false and { 255, 255, 255, 0 } or U.shade(c.primary2, 0.5), 1, 1, self.w - 40, "center")
     end

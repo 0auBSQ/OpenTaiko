@@ -1,4 +1,4 @@
--- Title menu buttons.
+-- title menu buttons
 
 local slice3  = require("title_ui/slice3")
 local Config  = require("Core.Config")
@@ -16,7 +16,7 @@ local function reset(tx)
     tx:SetScale(1, 1) ; tx:SetOpacity(1) ; tx:SetColor(1, 1, 1) ; tx:SetBlendMode("Normal")
 end
 
--- common width: the longest label (white GetText textures, by menu index) plus the pill's insets
+-- widest label (GetText textures by menu index) plus the pill insets
 function M.width(labels)
     local ink = 0
     for _, lb in pairs(labels) do
@@ -34,9 +34,9 @@ local function drawLabel(lb, x, y, s, inkMid, selected)
     reset(lb)
 end
 
--- items = the menu indices shown; sel = the selected index; labels / ys = label texture and centre y
--- by index; x = the column's centre; w = M.width(labels); inkMid = the middle of the letters in a
--- label texture, from its top; t = seconds; tex = { button, exit, marker, glow }
+-- items: shown menu indices; sel: selected index; labels / ys: label texture and centre y by index
+-- x: column centre; w = M.width(labels); inkMid: letter middle from the label top; t: sec
+-- tex = { button, exit, marker, glow }
 function M.draw(items, sel, labels, ys, x, w, inkMid, t, tex)
     for _, i in ipairs(items) do
         local selected = (i == sel)

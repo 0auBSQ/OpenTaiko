@@ -1,19 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global
--- Characters.Student — the story student the player walks as (A or B) and that student's colour palette.
---
--- The chosen student is the global counter "story_student" (the one OWM's PagodaAvatar reads): 1 = B, and
--- any other value (an unset counter included) reads as A. A student's palette index is the counter its
--- character uses, ".character_palette_<folder>", so the customize tab and every story scene stay in step;
--- A and B each keep their own. A student's palettes are the character's Palettes.json followed by the palettes
--- of the copy in Student/<id>/ beside this file that the character's file does not have (matched by name), so a character
--- without palettes, or one that is not installed, still has the copy's. An index outside the list reads as the
--- default palette (0).
---
---   local Student = require("Characters.Student")
---   local id  = Student.current(save)            -- "a" | "b"
---   local idx = Student.index(save, id)           -- 0-based palette index, always valid
---   Student.withPalette(id, idx, function() tex:Draw(x, y) end)        -- a 2D draw in the palette
---   Student.registerSprite(scene, spriteId, tex, id, idx[, visitor])   -- a 3D billboard in the palette
+-- Characters.Student: the story student (A or B) and their palettes
 
 local S = {}
 
@@ -25,9 +11,7 @@ local INFO = {
     b = { folder = "03v2 - Student (B)", value = 1 },
 }
 
--- this module's own palette copies (Student/<id>/ beside this file) and the game's characters
--- (Global/Characters/, three folders above Global/Modules/Lib/Characters/), found from this file's folder so
--- skin and global callers alike read them
+-- Student/<id>/ palette copies beside this file; Global/Characters/ three folders up
 local HERE = require("Core.Here")(...)
 local OWN_DIR = HERE and (HERE .. "Student/") or nil
 local CHARA_DIR = HERE and HERE:match("^(.*/)[^/]+/[^/]+/[^/]+/$")
@@ -59,6 +43,7 @@ end
 
 function S.folder(id) return INFO[S.valid(id)].folder end
 
+-- counter story_student: 1 = B, anything else A
 function S.current(save)
     if save == nil then return "a" end
     local ok, v = pcall(function() return save:GetGlobalCounter(S.COUNTER) end)
@@ -85,7 +70,7 @@ function S.set(save, id)
     return id
 end
 
--- ── palettes ───────────────────────────────────────────────────────────────────────────────────
+-- ==== Palettes ====
 local lists = {}           -- "id:own" | "id:visitor" → { {name, plays, blend, stops|nil}, ... } (entry i = index i-1)
 local sources = {}         -- the same keys → "character" | "merged" | "copy" | "none"
 local gradients = {}       -- "source:id:idx" → LuaGradientMap | false
@@ -128,7 +113,7 @@ local function parseFile(path)
     return list
 end
 
--- the character's palettes, then the copy's that it lacks; returns the list and where it came from
+-- the character's palettes, then the copy's it lacks (by name); returns list, source
 local function merged(own, copy)
     if own == nil then return copy, copy and "copy" or "none" end
     if copy == nil then return own, "character" end
@@ -182,6 +167,7 @@ function S.entry(id, idx, visitor)
     return list[S.clamp(id, idx, visitor) + 1]
 end
 
+-- palette index counter, shared with the customize tab
 local function paletteKey(id) return ".character_palette_" .. S.folder(id) end
 
 function S.index(save, id)
@@ -203,8 +189,7 @@ function S.unlocked(save, id, idx)
     return e.plays <= 0 or S.playCount(save, id) >= e.plays
 end
 
--- stores the palette index on the student's character counter; when that character is the one the
--- save has equipped, its live palette changes too (as the customize tab does on OK)
+-- saves the palette index; also sets the live palette when that character is equipped
 function S.setIndex(save, id, idx)
     id = S.valid(id)
     idx = S.clamp(id, idx)

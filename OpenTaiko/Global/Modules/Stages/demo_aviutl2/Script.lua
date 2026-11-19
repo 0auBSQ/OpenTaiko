@@ -1,11 +1,8 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
--- demo_aviutl2 (debug stage)
--- ------------------------------------------------------------------------------------------------------
--- The AviUtl2 projects of Project/, Telop/, MovementTest/ and Camera/ in the video_player ROActivity, to try the AVIUTL2 API: a list of the
--- projects, Decide plays one, closing the player comes back to the list and Esc on the list brings My
--- Room back.
+-- demo_aviutl2: debug stage for the AVIUTL2 API in the video_player ROActivity
+-- lists the AviUtl2 projects; Decide plays one, Esc on the list exits to My Room
 
--- drawn in 1920x1080: a skin of another resolution rescales it
+-- drawn in 1920x1080, rescaled for other skin resolutions
 STAGES:SetResolution(1920, 1080)
 
 local PopUI = require("UI.Pick")()
@@ -22,7 +19,7 @@ local PROJECTS = {
 local PANEL_W, PANEL_H = 760, 556
 local ROW = 64
 
--- player_box.png holds the difficulty only: the nameplate of the box's player is drawn in the room left
+-- player_box.png holds only the difficulty; the nameplate goes in the space left
 local BOX_W, BOX_H = 520, 216
 local PLATE_X, PLATE_Y = 170, 88
 

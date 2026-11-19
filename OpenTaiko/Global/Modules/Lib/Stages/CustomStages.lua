@@ -1,15 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- Stages.CustomStages — the custom stages: every stage that declares the namespace "CStage" with
--- STAGES:SetNamespace, a list of them a menu can open, and the way back a custom stage follows.
---
---   in a custom stage, at the top of Script.lua:
---     local CS = require("Stages.CustomStages")
---     CS.declare{ title = CS.allLanguages("mystage", "title"), description = "..." }
---     function activate() back, backTransition = CS.takeReturn() end      -- "_title" when none was set
---     ... return Exit("stage", back, backTransition)
---   in a menu stage:
---     CS.open{ title = "Custom Stages" }      -- then CS.update(ts) -> nil | "cancel" | entry; CS.draw()
---     return CS.enter(entry.name, "_title")    -- the way back: "<stage>" or "<stage>|<transition>"
+-- Stages.CustomStages: custom stages (namespace "CStage"), their list and the way back
 
 local HERE = require("Core.Here")(...)
 local I18N = require("Locale.i18n")
@@ -36,16 +26,16 @@ function CS.text(id)
     return T:get(id) or FALLBACK[id] or id
 end
 
--- ── the namespace ───────────────────────────────────────────────────────────────────────────────
+-- ==== Namespace ====
 
--- declares the calling stage a custom stage; info is what the list shows: title and description, each a
--- string or a table by language code ({ en = "...", ja = "..." })
+-- marks the calling stage a custom stage
+-- info: title, description (string or { en = ..., ja = ... })
 function CS.declare(info)
     return STAGES:SetNamespace(CS.NAMESPACE, info or {})
 end
 
--- one string of the calling stage's lang/<code>/<name>.json in every language that has it, as a table by
--- language code (for declare, which runs before any language is chosen)
+-- one string of lang/<code>/<name>.json in every language: { [code] = text }
+-- for declare (runs before a language is chosen)
 function CS.allLanguages(name, id)
     local out = {}
     for _, code in ipairs(CS.LANGUAGES) do
@@ -58,8 +48,7 @@ function CS.allLanguages(name, id)
     return out
 end
 
--- a declared text: a string as it is, a table by language code in the game's language, else English,
--- else the first language that has it
+-- declared text: a string as is, a table by code (game language, then CS.LANGUAGES, then any)
 function CS.localized(v, code)
     if type(v) == "string" then return v ~= "" and v or nil end
     if type(v) ~= "table" then return nil end
@@ -95,17 +84,17 @@ function CS.list(code)
     return out
 end
 
--- ── the way back ────────────────────────────────────────────────────────────────────────────────
+-- ==== Way back ====
 
--- leaves for a custom stage (from a stage's update: return CS.enter(...)); back is where it goes back to,
--- "<stage>" or "<stage>|<transition>"
+-- leave for a custom stage: return CS.enter(...) from update
+-- back: "<stage>" or "<stage>|<transition>"
 function CS.enter(name, back, transition)
     pcall(function() SHARED:SetSharedString(CS.RETURN_KEY, back or "") end)
     return Exit("stage", name, transition)
 end
 
--- reads and clears the way back (call it on entry): the stage ("_title" when none was set) and the
--- transition (nil for the default)
+-- reads and clears the way back (call on entry)
+-- returns stage ("_title" when unset), transition (nil = default)
 function CS.takeReturn()
     local ok, s = pcall(function() return SHARED:GetSharedString(CS.RETURN_KEY) end)
     pcall(function() SHARED:SetSharedString(CS.RETURN_KEY, "") end)
@@ -115,7 +104,7 @@ function CS.takeReturn()
            (transition ~= nil and transition ~= "") and transition or nil
 end
 
--- ── the list ────────────────────────────────────────────────────────────────────────────────────
+-- ==== List ====
 
 local ROW, PANEL_W, VISIBLE = 84, 1100, 7
 local DESC_SIZE, DESC_LINES = 24, 2
@@ -132,8 +121,8 @@ function CS.close()
     ui, menu, entries, picked, closing = nil, nil, {}, nil, false
 end
 
--- o: title, ui (a UI library table or its require name; default UI.Pick), theme, sfx,
--- navPlayer (as NavInput.getPn takes it; default 0, the keyboard and the pad without the drums)
+-- o: title, theme, sfx, ui (library table or require name; default UI.Pick)
+-- navPlayer as NavInput.getPn takes it (default 0: keyboard and pad, no drums)
 function CS.open(o)
     o = o or {}
     CS.close()

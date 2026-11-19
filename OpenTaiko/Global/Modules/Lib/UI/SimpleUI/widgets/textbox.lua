@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global, lowercase-global, need-check-nil
--- SimpleUI textbox: a rounded field you click (or focus + Decide) to type into. Wraps the engine text input.
+-- SimpleUI textbox: click, or focus + Decide, to type; uses INPUT:CreateTextInput
 --   ui:textbox{ x=, y=, w=, value="", placeholder="name...", maxLen=24, onChange=fn, onSubmit=fn }
 
 local Widget = require("UI.SimpleUI.widget")
@@ -17,14 +17,14 @@ function TextBox.new(o)
     self.placeholder = o.placeholder or ""
     self.maxLen = o.maxLen or 64
     self.padX = o.padX or 24
-    self.noPop = true   -- the field stays still while typing: the text is drawn unscaled
+    self.noPop = true   -- text drawn unscaled
     return self
 end
 
 function TextBox:restyle()
     self:resolveStyle()
     local c = self.eff.colors
-    -- a slightly sunken field: face uses surface2 -> surface (inverted gives a soft inset feel)
+    -- face gradient inverted (surface2 -> surface)
     self:bakeBody(c.surface2, c.surface)
     self:bakeRing()
 end
@@ -49,7 +49,7 @@ function TextBox:onActivate()
 end
 
 function TextBox:update(ctx)
-    Widget.update(self, ctx)   -- tick scale/highlight tweens
+    Widget.update(self, ctx)   -- tweens
     if self.capturing then
         local submitted = self._ti:Update()
         local t = self._ti.Text or ""
@@ -75,7 +75,7 @@ function TextBox:drawContent(cx, cy, s)
     local sz = self.eff.font.label
     local x = math.floor(self.x + self.padX)
     local y = math.floor(self.y + self.h * 0.5 - self.mgr:textHeight(sz) * 0.5 + self.mgr:textNudge(sz))
-    -- glyph-atlas draw (bounded glyph cache + correct advances) — typing can't flood VRAM, spacing is right
+    -- glyph draw: bounded glyph cache while typing
     local textColor = self._hiCapCur > 0.01
         and U.lerpColor(c.text, c.primary2, self._hiCapCur)
         or c.text
@@ -84,11 +84,11 @@ function TextBox:drawContent(cx, cy, s)
     elseif self.value ~= nil and self.value ~= "" then str, col = self.value, textColor
     else str, col = self.placeholder, c.textDisabled end
     if str == "" then return end
-    -- left-clip: if the text is wider than the field, show the longest trailing suffix that fits
+    -- wider than the field: show the longest suffix that fits
     local avail = self.w - 2 * self.padX
     local w = self.mgr:measureText(sz, str)
     if w > avail then
-        -- clip whole UTF-8 characters from the left, never splitting a multi-byte sequence
+        -- clip whole UTF-8 characters from the left
         local chars = self.mgr:utf8chars(str)
         local i = 1
         while i < #chars and w > avail do w = w - self.mgr:measureText(sz, chars[i]); i = i + 1 end

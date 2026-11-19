@@ -1,4 +1,4 @@
--- OpenTaiko soundtrack composers, alphabetical.
+-- OpenTaiko soundtrack composers, alphabetical
 return {
     "a-m",
     "Ace of Beat",

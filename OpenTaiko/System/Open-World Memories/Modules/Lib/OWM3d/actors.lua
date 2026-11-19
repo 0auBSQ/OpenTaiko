@@ -1,2 +1,2 @@
--- moved to Global/Modules/Lib/World/OWM3d/actors.lua
+-- alias of Global/Modules/Lib/World/OWM3d/actors.lua
 return require("World.OWM3d.actors")

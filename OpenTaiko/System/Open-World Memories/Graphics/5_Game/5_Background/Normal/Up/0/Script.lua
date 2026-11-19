@@ -1,10 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Up background 0: scrolling dots + bouncing dango, with a per-player clear fade.
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
---   func:AddGraph        -> TEXTURE:CreateTextureSync into the local `tx` registry (onStart)
---   func:DrawRectGraph   -> tx[name]:DrawRect              (Repeat wrap → identical tiling)
---   func:SetScale/Opacity-> tx[name]:SetScale / SetOpacity (0-255 → 0-1)
---   prelude globals      -> the `state` table passed to update/draw; deltaTime -> fps.deltaTime
+-- up background 0
 
 local loopWidth = 1920
 local loopHeight = 288
@@ -62,14 +57,13 @@ function update(timestamp, state)
         dangoCounter = 0
     end
 
-    -- don't bother if player count is 3 or higher, use clear BG for 3P instead
+    -- 3P+ uses the clear BG
     if state.playerCount < 3 then
         updateClearFade(state)
     end
 end
 
 function draw(state)
-    -- dango effects
     local moveY = math.sin(math.min(dangoCounter, 1) * math.pi) * 30
     local moveY2 = math.sin(math.min(math.max(((dangoCounter - 1) * 4), 0), 1) * math.pi) / 12.0
     local moveY3 = 274 * moveY2
@@ -79,7 +73,6 @@ function draw(state)
     tx["Dango_Blue.png"]:SetScale(1, 1.0 - moveY2)
     tx["Dango_Clear.png"]:SetScale(1, 1.0 - moveY2)
 
-    -- draw the stuff
     if state.playerCount == 1 and state.p1IsBlue == false then
 
         tx["BG_Clear.png"]:SetOpacity(bgClearFade[1] / 255)

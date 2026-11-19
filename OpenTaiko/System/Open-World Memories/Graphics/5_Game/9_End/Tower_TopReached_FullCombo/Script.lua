@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Tower top-reached (Full Combo) clear animation. Group C end-anime (per-player via state.player).
+-- end anime: Tower_TopReached_FullCombo (group C, player via state.player)
 
 local y = { 202, 466, 0, 0, 0 }
 

@@ -34,7 +34,7 @@ function M.add(manifest)
     end
 end
 
--- the manifest entry with named fields (path, w, h, x, y, fx, fy, mirror, jump, parts), or nil
+-- manifest entry with named fields (path, w, h, x, y, fx, fy, mirror, jump, parts), or nil
 function M.meta(key)
     local m = _metas[key]
     if m ~= nil then return m end
@@ -76,7 +76,7 @@ local function each_key(keys, fn)
     end
 end
 
--- creates the listed textures not created yet; sync = true loads them at once instead of streaming
+-- creates listed textures not created yet; sync = true: load at once, no streaming
 function M.open(keys, sync)
     each_key(keys, function(key)
         if _handles[key] ~= nil then return end

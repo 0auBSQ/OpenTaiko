@@ -1,12 +1,8 @@
--- Core.Json — JSON text from Lua values and back, in plain Lua.
---   Json.encode(value)      -> string; tables with keys 1..n are arrays, other tables objects (keys sorted,
---                              so the same value always gives the same text); nil, functions and userdata
---                              are left out of objects; numbers that are whole are written without a point
---   Json.decode(text)       -> value, or nil and an error message; JSON null becomes Json.null
---   Json.null               -> the value standing for JSON null (encodes back to null)
+-- Core.Json: JSON encode/decode in plain Lua
 
 local Json = {}
 
+-- stands for JSON null (encodes back to null)
 Json.null = setmetatable({}, { __tostring = function() return "null" end })
 
 local ESC = { ['"'] = '\\"', ["\\"] = "\\\\", ["\b"] = "\\b", ["\f"] = "\\f", ["\n"] = "\\n", ["\r"] = "\\r", ["\t"] = "\\t" }
@@ -78,13 +74,15 @@ local function encodeValue(v, out, seen)
     end
 end
 
+-- tables with keys 1..n are arrays, others objects (sorted keys)
+-- objects skip nil, function and userdata values; whole numbers have no point
 function Json.encode(value)
     local out = {}
     encodeValue(value, out, {})
     return table.concat(out)
 end
 
--- ── decoding ──────────────────────────────────────────────────────────────────
+-- ==== Decoding ====
 
 local function utf8char(cp)
     if cp < 0x80 then return string.char(cp) end
@@ -186,6 +184,7 @@ decodeValue = function(s, i)
     end
 end
 
+-- returns value, or nil and an error; JSON null -> Json.null
 function Json.decode(text)
     if type(text) ~= "string" then return nil, "Json.decode: not a string" end
     local ok, v, i = pcall(decodeValue, text, 1)

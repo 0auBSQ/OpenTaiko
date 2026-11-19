@@ -1,7 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global
--- icons.lua — small procedurally-drawn icons (64×64 LuaCanvases) for the edit-mode UI: furniture,
--- flooring/paint swatches, the four category tabs, and the eraser / rotate / remove buttons. Drawn
--- with filled rects (+ a tiny disc/line helper) so the menu has real icons instead of text labels.
+-- procedural 64x64 icons for the edit-mode UI (LuaCanvas)
 
 local floor, abs, max = math.floor, math.abs, math.max
 local I = {}
@@ -18,10 +16,9 @@ local function newIcon(name, drawFn)
     local c = CANVAS:CreateCanvas(I.SZ, I.SZ); c:Clear(0, 0, 0, 0); drawFn(c); c:Upload(); I.cv[name] = c
 end
 
--- ── bespoke item / tab / button icons ──────────────────────────────────────────────────────────
+-- ==== fixed icons ====
 local function makeFixed()
     newIcon("desk", function(c)
-        -- a bare desk: the PC bits moved to the standalone "computer" icon/item
         rect(c, 8, 30, 48, 7, 150, 102, 58); rect(c, 11, 37, 6, 19, 110, 74, 42); rect(c, 47, 37, 6, 19, 110, 74, 42)
     end)
     newIcon("computer", function(c)
@@ -100,7 +97,7 @@ local function makeFixed()
     newIcon("remove", function(c) rect(c, 22, 16, 20, 6, 220, 90, 90); rect(c, 18, 22, 28, 6, 220, 90, 90); rect(c, 22, 28, 20, 26, 200, 80, 80); line(c, 28, 32, 28, 50, 120, 40, 40); line(c, 36, 32, 36, 50, 120, 40, 40) end)
 end
 
--- a flat colour swatch (for flooring / wall-paint items), cached by colour
+-- swatch for flooring and paint items, cached by key
 function I.swatch(key, r, g, b)
     local name = "sw_" .. key
     if not I.cv[name] then
@@ -115,7 +112,7 @@ end
 function I.build() makeFixed() end
 function I.get(name) return I.cv[name] end
 
--- draw an icon centred in a box (x,y,w,h)
+-- name or canvas, scaled to w x h at x, y
 function I.draw(name, x, y, w, h, opacity)
     local c = type(name) == "string" and I.cv[name] or name
     if not c then return end

@@ -1,14 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global, need-check-nil
--- SimpleUI vertical menu / list: keyboard (Up/Down) + mouse hover + wheel scroll, one shared selection
--- highlight. onChange = selection moved; onSelect = chosen (Decide / click). Off-viewport rows are culled.
--- A locked row can't be chosen unless onLockedSelect is given: choosing one then calls it instead (e.g. to
--- offer an unlock), and it plays the error sound only when that callback returns false. A locked row shows
--- a padlock at its right end, or whatever drawLocked(item, right, cy, menu) draws there (e.g. a price),
--- with lockedW pixels kept free for it.
+-- SimpleUI menu: vertical scrolling list with one selection
 --   ui:menu{ x=, y=, w=, h=, items={"One",{text="Two",value=2}}, selected=1, onChange=fn, onSelect=fn }
--- hoverSelects = false: the mouse picks a row by clicking it only (hovering moves nothing);
--- textReserve = pixels kept free at the right end of every row (for what the caller draws there);
--- scrollbar = true: a scrollbar beside the menu while its rows don't all fit.
 
 local Widget   = require("UI.SimpleUI.widget")
 local U        = require("UI.SimpleUI.util")
@@ -19,8 +11,13 @@ local Menu = setmetatable({}, { __index = Widget })
 Menu.__index = Menu
 ListBase.install(Menu)
 
-local HOVER_TICK = 0.06   -- s between two move sounds while the pointer sweeps over rows
+local HOVER_TICK = 0.06   -- min s between hover move sounds
 
+-- onChange: selection moved; onSelect: chosen (Decide or click)
+-- locked rows: onLockedSelect(i, item, menu) runs on choose (error sound when absent or false)
+-- drawLocked(item, right, cy, menu) replaces the padlock; lockedW px kept free for it
+-- hoverSelects = false: click to pick only; textReserve: px kept free at each row's right end
+-- scrollbar = true: bar beside the menu while the rows don't fit
 function Menu.new(o)
     o = o or {}
     o.w = o.w or 480; o.h = o.h or 600
@@ -30,8 +27,7 @@ function Menu.new(o)
     self.selected = o.selected or 1
     self.items = {}
     for _, it in ipairs(o.items or {}) do
-        -- mark = highlighted row (e.g. a music player's now-playing entry): gold face + gold text.
-        -- It lives on the item table so callers can flip it live without rebuilding the menu.
+        -- mark: highlighted row, read live from the item table
         if type(it) == "table" then self.items[#self.items + 1] = { text = it.text or "", value = it.value, mark = it.mark, locked = it.locked }
         else self.items[#self.items + 1] = { text = tostring(it), value = it } end
     end
@@ -61,7 +57,7 @@ function Menu:onNavUpOrPadLeft() if self.selected > 1 then self:setSelected(self
 
 function Menu:onActivate()
     local it = self.items[self.selected]
-    -- a locked row can be looked at but not chosen, unless the caller handles it
+    -- locked rows can't be chosen unless the caller handles it
     if it and it.locked then
         if self.onLockedSelect and self.onLockedSelect(self.selected, it, self) ~= false then return end
         self:playSfx("error"); return
@@ -84,7 +80,7 @@ function Menu:restyle()
     row("_row", c.surface, c.surface2, c.outline)
     row("_rowSel", c.primary, c.primary2, c.outline)
     self:_clampScroll()
-    -- a row-sized focus ring (drawn on the selected row), not a ring around the whole menu
+    -- row-sized focus ring, drawn on the selected row
     local rwid = self.eff.outlineWidth + 4
     local ir = self.eff.radiusSmall
     self:bakeShared("_ring", "menu.ring", rw + 2 * m, rh + 2 * m, function(ring)
@@ -96,7 +92,7 @@ end
 
 function Menu:update(ctx)
     Widget.update(self, ctx)
-    -- the pointer over a row previews it (unless hoverSelects = false); a click picks it
+    -- pointer previews a row (unless hoverSelects = false); a click picks it
     if self.hovered and ctx.inside and (ctx.moved or ctx.mPressed or not self._wasHovered) then
         local rel = ctx.my - self.y + self._scrollCur
         local row = math.floor(rel / self.rowHeight) + 1
@@ -113,8 +109,7 @@ function Menu:update(ctx)
     self:_updateScroll(ctx, 14)
 end
 
--- draw one baked row piece clipped to the menu viewport: fully-visible rows blit whole, edge rows are
--- sliced with a source-rect draw so nothing shows past the list box
+-- draws a row piece clipped to the viewport; edge rows use a source-rect draw
 local function drawPieceClipped(piece, rcx, rcy, vy0, vy1)
     local cv = piece.canvas
     local cw, ch = cv.Width, cv.Height
@@ -129,13 +124,12 @@ end
 function Menu:draw()
     if not self.visible then return end
     local n = self:_count()
-    local vy0, vy1 = self.y, self.y + self.h              -- the viewport every row + its text clips to
+    local vy0, vy1 = self.y, self.y + self.h              -- viewport for rows and text
     local firstVis = math.max(1, math.floor(self._scrollCur / self.rowHeight))
     local lastVis = math.min(n, math.ceil((self._scrollCur + self.h) / self.rowHeight) + 1)
     for i = firstVis, lastVis do
         local ry = self.y + (i - 1) * self.rowHeight - self._scrollCur
-        -- the row piece sits on the row's centre line; the text box is anchored below it by the nudge so
-        -- its line of glyphs lands on that same centre (the box carries the font's bottom padding)
+        -- text box offset by textNudge so the glyph line sits on the row centre
         local rcy = math.floor(ry + self.rowHeight * 0.5)
         local tcy = rcy + self.mgr:textNudge(self.eff.font.label)
         local rcx = math.floor(self.x + self.w * 0.5)
@@ -144,8 +138,7 @@ function Menu:draw()
         local marked = it and it.mark
         local locked = it and it.locked
         local piece = isSel and self._rowSel or self._row
-        -- marked (now-playing) rows: warm gold face tint on the plain row; the selected face keeps
-        -- its accent colour and signals through the gold text instead; locked rows go grey
+        -- face tint: marked (unselected) or locked rows
         if marked and not isSel then piece.canvas:SetColor(1.0, 0.88, 0.45)
         elseif locked then piece.canvas:SetColor(0.62, 0.62, 0.66)
         else piece.canvas:SetColor(1, 1, 1) end
@@ -172,14 +165,14 @@ function Menu:draw()
                     self.drawLocked(it, math.floor(self.x + self.w - 24), rcy, self)
                 end
             elseif locked then
-                -- the padlock and its chain sit at the row's right end
+                -- padlock at the row's right end
                 local isz = math.floor(self.rowHeight * 0.62)
                 self:bakeShared("_lock", "menu.lock", isz + 8, isz + 8, function(cv)
                     Shape.icon(cv, "lock", (isz + 8) * 0.5, (isz + 8) * 0.5, isz, { 236, 238, 244 })
                 end, nil, isz)
                 if self._lock then
                     self._lock.canvas:SetColor(1, 1, 1); self._lock.canvas:SetOpacity(1); self._lock.canvas:SetScale(1, 1)
-                    drawPieceClipped(self._lock, math.floor(self.x + self.w - 24 - isz * 0.5), rcy, vy0, vy1)   -- cut at the list's edges like its row
+                    drawPieceClipped(self._lock, math.floor(self.x + self.w - 24 - isz * 0.5), rcy, vy0, vy1)   -- clipped like its row
                 end
             end
         end

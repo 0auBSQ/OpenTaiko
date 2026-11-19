@@ -1,5 +1,5 @@
 ---@diagnostic disable: lowercase-global
--- SimpleUI/sfx.lua — the sound of the UI in one table; per-widget `sfx` tables override per-field.
+-- SimpleUI sounds; per-widget `sfx` tables override per field
 
 local Util = require("Core.Util")
 
@@ -16,7 +16,7 @@ Sfx.DEFAULT = {
     error  = function () pcall(function () SHARED:GetSharedSound("Error"):Play() end) end,
 }
 
--- resolve an effective sfx set = DEFAULT < manager sfx < per-widget sfx
+-- effective sfx: DEFAULT < manager sfx < per-widget sfx
 function Sfx.resolve(userSfx, sfx)
     local t = Util.merge(Sfx.DEFAULT, userSfx or {})
     if sfx then t = Util.merge(t, sfx) end

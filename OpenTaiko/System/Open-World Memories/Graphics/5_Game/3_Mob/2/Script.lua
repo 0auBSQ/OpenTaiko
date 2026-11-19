@@ -1,6 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Mob 2: a three-layer crowd that rises in when the gauge tops out (100), bobs to the BPM, then drops back out.
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
+-- mob 2: 3-layer crowd (in at gauge 100, bpm bob)
 
 local mob_x = 0
 local mob_front_y = 0
@@ -30,7 +29,7 @@ function onStart()
     tx["Mob_Front.png"] = TEXTURE:CreateTextureSync("Mob_Front.png")
     tx["Mob_Back.png"] = TEXTURE:CreateTextureSync("Mob_Back.png")
     tx["Mob_Back2.png"] = TEXTURE:CreateTextureSync("Mob_Back2.png")
-    mob_height = tx["Mob_Front.png"].Height   -- sync load → size is valid here
+    mob_height = tx["Mob_Front.png"].Height   -- valid after sync load
 end
 
 function update(timestamp, state)

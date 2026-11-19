@@ -1,6 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
 -- PillClouds: shared drawing for the pill_clouds transitions.
--- Four tilted pills rise over the screen, then a cloud bank rises over them.
 
 -- positions, sizes and colours: Config/PillClouds/layout.json; timings: Config/PillClouds/animation.json
 local HERE = require("Core.Here")(...)
@@ -106,7 +105,7 @@ function PC:drawPills(along)
 		local x, y = place(along, (i - 2.5) * PILL_STEP)
 		pill:SetColor(c[1], c[2], c[3])
 		pill:DrawAtAnchor(x, y, "center")
-		shine:DrawAtAnchor(x, y, "center")                          -- untinted gloss
+		shine:DrawAtAnchor(x, y, "center")                          -- untinted
 	end
 	for _, tex in ipairs({ pill, shine }) do tex:SetScale(1, 1); tex:SetRotation(0) end
 	pill:SetColor(1, 1, 1)
@@ -123,8 +122,8 @@ function PC:drawBody(lo, hi)
 	self.body:SetScale(1, 1); self.body:SetRotation(0)
 end
 
--- a row of puffs facing forward (front) or back; `mid` is its centre along the travel axis.
--- One long quad: the texture repeats across, and its clear top and bottom rows keep the long sides soft.
+-- edge row, front or back; `mid`: its centre along the travel axis
+-- one long quad, texture repeating across
 function PC:drawEdge(mid, front)
 	local edge = self.edge
 	if edge == nil or mid < -REACH - EDGE_H or mid > REACH + EDGE_H then return end

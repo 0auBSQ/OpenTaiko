@@ -1,9 +1,5 @@
--- Title.lua — the title and subtitle a song shows in menus, results and cards. A chart may name itself there
--- with .ALTERNATIVETITLE / .ALTERNATIVESUBTITLE headers (before any COURSE:) while its TITLE and SUBTITLE
--- stay what the play screen and the song loading show.
---   local SongTitle = require("Songs.Title")
---   SongTitle.of(node) / SongTitle.subtitleOf(node)                    -- the alternative, else node.Title / node.Subtitle
---   SongTitle.alternative(node) / SongTitle.alternativeSubtitle(node)  -- the alternative, or nil
+-- Songs.Title: a song's menu title and subtitle (.ALTERNATIVETITLE / .ALTERNATIVESUBTITLE)
+-- headers before any COURSE:; TITLE and SUBTITLE stay for the play screen
 local M = {}
 
 M.KEY = ".ALTERNATIVETITLE"
@@ -16,9 +12,11 @@ local function custom(node, key)
     return nil
 end
 
+-- the alternative, or nil
 function M.alternative(node) return custom(node, M.KEY) end
 function M.alternativeSubtitle(node) return custom(node, M.SUB_KEY) end
 
+-- the alternative, else node.Title / node.Subtitle
 function M.of(node)
     if node == nil then return nil end
     return M.alternative(node) or node.Title

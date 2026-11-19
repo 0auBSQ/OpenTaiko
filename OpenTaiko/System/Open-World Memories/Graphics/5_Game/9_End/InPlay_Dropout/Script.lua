@@ -1,9 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- End animation "InPlay_Dropout": per-player slide-in-then-fall frame animation (numbered .png frames).
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
---   init -> onStart (texture loads); per-play state arrives via the `state` table.
---   The old update(player)/draw(player) took a player index; now the host passes it as state.player.
---   playEndAnime(player) stays a top-level fn taking the index directly (host calls it to (re)start a play).
+-- end anime: InPlay_Dropout (group C, player via state.player)
 
 local y = { 218, 482, 0, 0, 0 }
 
@@ -25,7 +21,6 @@ function playEndAnime(player)
 end
 
 function onStart()
-    -- Load every frame up front (onStart runs before `state` arrives — don't gate on player count).
     for i = 0, textureCount do
         tx[tostring(i) .. ".png"] = TEXTURE:CreateTextureSync(tostring(i) .. ".png")
     end
@@ -34,7 +29,7 @@ end
 function update(timestamp, state)
     local player = state.player
 
-    -- old init() set the row layout from playerCount; per-play value lives in state now.
+    -- layout from state.playerCount (state arrives after onStart)
     if state.playerCount <= 2 then
         y = { 216, 480, 0, 0, 0 }
     elseif state.playerCount == 5 then

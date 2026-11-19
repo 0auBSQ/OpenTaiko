@@ -1,4 +1,4 @@
--- Floor-select tiles for levels 1-10; Edge wrap keeps abutting tiles seamless.
+-- floor-select tiles for levels 1-10; Edge wrap avoids gaps between tiles
 
 local M = {}
 

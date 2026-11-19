@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global, lowercase-global, need-check-nil
--- SimpleUI speech bubble: a rounded bubble with a pointer tail and an optional typewriter reveal.
+-- SimpleUI speech bubble with a tail and optional typewriter reveal
 --   ui:bubble{ x=, y=, w=, h=, text="Hi!", tail="bottom"|"top"|"left"|"right", tailPos=0.5, typewriter=true, onDone=fn }
 
 local Widget = require("UI.SimpleUI.widget")
@@ -26,8 +26,7 @@ function Bubble.new(o)
     self._shown = 0
     self._done = false
     self._draft = false
-    -- while dragged (draft), the bubble bakes into a canvas with room to grow (its size + headroom), so a
-    -- tail drag or a resize keeps reusing one GL texture; at rest the canvas fits the bubble
+    -- draft bakes into a reserve-size canvas (one GL texture while dragging); at rest it fits the bubble
     self.minW, self.minH = o.minW or 160, o.minH or 90
     self._reserveW = math.max(self.w + 360, 900)
     self._reserveH = math.max(self.h + 260, 520)
@@ -36,10 +35,10 @@ end
 
 function Bubble:setShape(s) self.shape = s; self:restyle(); self:_popIn() end
 
--- draft = true → low-poly, 1-shadow-layer bake (fast, for live dragging); false → full quality.
+-- draft = true: low-poly, 1 shadow layer bake (live dragging); false: full quality
 function Bubble:setDraft(b) self._draft = b and true or false; self:restyle() end
 
--- retarget the tail. Pass draft=true while dragging for a responsive bake; release with draft=false.
+-- retarget the tail; draft = true while dragging, false on release
 function Bubble:setTail(side, pos, size, draft)
     self.tail = side or self.tail
     self.tailPos = pos or self.tailPos
@@ -48,7 +47,7 @@ function Bubble:setTail(side, pos, size, draft)
     self:restyle()
 end
 
--- resize the bubble (drag handle), clamped to [min, reserve]
+-- resize, clamped to [min, reserve]
 function Bubble:setSize(w, h, draft)
     self.w = U.clamp(math.floor(w or self.w), self.minW, self._reserveW)
     self.h = U.clamp(math.floor(h or self.h), self.minH, self._reserveH)
@@ -68,12 +67,12 @@ end
 function Bubble:_rewrap()
     local c = self.eff.colors
     local size = self.eff.font.label
-    local maxW = self.w - 2 * self.pad - 50   -- the glyph box pads 25px per side; keep both margins equal
+    local maxW = self.w - 2 * self.pad - 50   -- glyph box pads 25 px per side
     self._size = size
     self._fg = c.text
-    self._lines = self.mgr:wrapLines(size, self.text, maxW)   -- glyph-measured wrap (no texture allocation)
+    self._lines = self.mgr:wrapLines(size, self.text, maxW)   -- glyph-measured wrap
     if self.typewriter then
-        -- per-line UTF-8 char lists so the reveal never splits a multi-byte character
+        -- per-line UTF-8 char lists (the reveal never splits a character)
         self._lineChars = {}
         self._fullLen = 0
         for i, l in ipairs(self._lines) do
@@ -93,8 +92,7 @@ function Bubble:restyle()
     self:resolveStyle()
     local c = self.eff.colors
     local sh = self.eff.shadow
-    -- the margin covers the longest tail and its shadow (tail + grow + offset can stack on one side), so a
-    -- tail-size drag never resizes the canvas
+    -- margin fits the longest tail plus shadow (tail-size drags keep the canvas size)
     local sExt = (sh.layers or 4) * (sh.grow or 3) + math.max(math.abs(sh.dx or 0), math.abs(sh.dy or 6))
     local m = math.ceil(100 + sExt + self.eff.outlineWidth + 6)
     self._m = m
@@ -105,7 +103,6 @@ function Bubble:restyle()
     local cv = self.mgr:reuseCanvas(self._body and self._body.canvas, cw, ch)
     local ox = math.floor((cw - self.w) * 0.5)
     local oy = math.floor((ch - self.h) * 0.5)
-    -- draft = fast, low-poly, 1 shadow layer (live dragging); full = crisp (on release / normal)
     Shape.bubble(cv, ox, oy, self.w, self.h, {
         shape = self.shape, radius = self:radius(),
         outline = { col = c.outline, width = self.eff.outlineWidth },
@@ -118,7 +115,7 @@ function Bubble:restyle()
     Shape.upload(cv, false)
     self._body = { canvas = cv, m = m, cap = false }
     self:_rewrap()
-    -- keep typewriter progress across re-bakes (tail/resize drag) — only setText restarts it
+    -- typewriter progress survives re-bakes; only setText restarts it
     if self.typewriter and self._done then self._shown = self._fullLen or 0 end
 end
 
@@ -141,8 +138,7 @@ function Bubble:draw()
     local fg = self._fg or self.eff.colors.text
     local lineH = math.floor(self._size * 1.32)
     if self.typewriter then
-        -- glyph draw: the revealed substring changes every frame; the glyph cache is bounded per character,
-        -- so no per-frame texture allocation. Reveal counts UTF-8 characters, never splitting a sequence.
+        -- glyph draw of the revealed substring (no per-frame textures); counts UTF-8 characters
         local rem = math.floor(self._shown)
         for i, chars in ipairs(self._lineChars or {}) do
             if rem <= 0 then break end

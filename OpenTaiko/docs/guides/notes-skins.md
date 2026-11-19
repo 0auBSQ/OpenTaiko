@@ -163,7 +163,7 @@ When the selected pack lacks a file, the game takes it from pack 1 of the same f
 
 ## Step 8: Choose a pack
 
-When a skin has at least 2 packs in one of the three folders, the Theme page of the settings shows a Notes Skins section first, with one choice for that folder and the pack's preview under it. The game loads the chosen pack at once and remembers the choice for the skin in `ThemeSettings.db3`. With a single pack the choice does not appear, and the game uses that pack.
+When a skin has at least 2 packs in one of the three folders, the Theme page of the settings shows a Notes Skins section first, with one choice for that folder and the pack's preview under it. The game loads the chosen pack at once and remembers the choice for the skin in its settings database. With a single pack the choice does not appear, and the game uses that pack.
 
 A Lua module reads a file of the selected pack with `THEME:GetNotesSkinFile(kind, file)` (see [Players and profiles](../api/players.md)). The shipped song select uses it to draw the judgement texts of its replay list:
 

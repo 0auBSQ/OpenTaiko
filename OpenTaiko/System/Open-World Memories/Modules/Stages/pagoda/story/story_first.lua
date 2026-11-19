@@ -1,4 +1,4 @@
--- Opening story of the first challenge run.
+-- opening story, first challenge run
 
 return {
     bg = "fox_village",

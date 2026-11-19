@@ -1,8 +1,8 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- pill_clouds_training: from the title into the training song select (Lib/PillClouds).
+-- pill_clouds_training: title -> training song select (Lib/PillClouds)
 
 local PC = require("PillClouds")
--- the pill colours: Config/layout.json
+-- pill colours: Config/layout.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local anim = PC.new(Config.plain(Layout.pill_colors))

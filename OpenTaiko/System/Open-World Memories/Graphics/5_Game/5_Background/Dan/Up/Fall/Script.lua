@@ -1,6 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Dan up background "Fall": dojo scene with scrolling clouds + three layers of swaying,
--- rotating, falling leaves. No per-player / clear branches in the original — kept as-is.
+-- dan up background: fall
 
 local bgWidth_1 = 1984
 local bgWidth_4 = 962
@@ -76,7 +75,7 @@ function update(timestamp, state)
     leafSway_2 = leafSway_2 + (70 * fps.deltaTime)
     leafSwayFinal_2 = 60 * math.cos((5 * leafSway_2) / 120) * math.sin((2 * leafSway_2) / 120)
     leafSway_3 = leafSway_3 + (36 * fps.deltaTime)
-    leafSwayFinal_3 = 40 * math.cos((5 * leafSway_2) / 130) * math.sin((2 * leafSway_2) / 130)  -- original uses leafSway_2 (not leafSway_3) — preserved
+    leafSwayFinal_3 = 40 * math.cos((5 * leafSway_2) / 130) * math.sin((2 * leafSway_2) / 130)  -- leafSway_2 on purpose
 end
 
 

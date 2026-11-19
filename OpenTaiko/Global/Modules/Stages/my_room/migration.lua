@@ -1,28 +1,19 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global
--- migration.lua — save-table migrations for My Room. Room:loadTable hands every RAW room table
--- (local save or network payload) through here before applying it, so version upgrades and
--- retired-id cleanups live in one place, away from the room model.
---
--- Registries:
---   M.REMAP   — removed catalog ids with a successor: placements switch id, inventory counts merge
---   M.DROPPED — retired ids with no successor: removed from placements and inventories entirely
--- Structural migrations:
---   v1 → v2   — wall-place furniture entries become wallItems; starter stock granted once
---   computer  — the PC used to be baked into the desk: spawn one on the first desk + seed a spare
---   starter   — any starter-stock id the save predates is seeded without touching player counts
---   gifts     — an item every room should have (M.GIFTS) is handed over once to a saved room that has
---               none placed and none in stock; the room remembers it (room.gifts) so it is never repeated
+-- My Room save-table migrations, run by Room:loadTable on every raw room table
+-- (local save or network payload)
 
 local floor = math.floor
 
 local M = {}
 
+-- removed ids with a successor: placements switch id, inventory counts merge
 M.REMAP = { poster = "poster_nokon", painting = "poster_bol",
             poster_meadow = "poster_nokon", poster_dunes = "poster_bol",
             painting_summit = "poster_bol" }
+-- retired ids with no successor: removed everywhere
 M.DROPPED = { shelf = true }
 
--- retired-id cleanup, in place on the raw table (runs before anything reads item ids)
+-- in place on the raw table, before anything reads item ids
 function M.remapIds(t)
     local function remapList(list)
         if list == nil then return end
@@ -44,14 +35,12 @@ function M.remapIds(t)
     end
 end
 
--- item-table application + structural migrations: fills room.furniture / room.wallItems /
--- room.inventory from the raw table (falling back to the room's current values like loadTable
--- always did). `catalog` decides what counts as a wall item; `starterStock` seeds missing ids.
+-- fills room.furniture / wallItems / inventory from the raw table, then structural migrations
+-- falls back to the room's current values; catalog decides wall items, starterStock seeds missing ids
 function M.applyItems(room, t, catalog, starterStock)
     if t.v and t.v >= 2 then
         room.inventory = t.inventory or room.inventory
-        -- v2: wallItems are authoritative; the furniture array may carry v1-readable mirrors of
-        -- legacy wall items — keep only ground entries from it.
+        -- v2: wallItems are authoritative; furniture may carry v1 mirrors of wall items, keep ground ones
         local furn = {}
         for _, it in ipairs(t.furniture or {}) do
             local cat = catalog[it.id]
@@ -65,9 +54,8 @@ function M.applyItems(room, t, catalog, starterStock)
         end
         room.wallItems = wi
     else
-        -- v1 migration: wall-place furniture entries become wallItems (clocks hang high); the fixed
-        -- phone becomes a movable wall item at its old spot; the new catalog's starter stock is
-        -- granted once (v1 ids and their counts are left untouched).
+        -- v1: wall-place furniture becomes wallItems (mount high)
+        -- starter stock granted once; v1 counts untouched
         local furn, wi = {}, {}
         for _, it in ipairs(t.furniture or room.furniture) do
             local cat = catalog[it.id]
@@ -82,10 +70,8 @@ function M.applyItems(room, t, catalog, starterStock)
         for id, n in pairs(starterStock) do if inv[id] == nil then inv[id] = n end end
         room.inventory = inv
     end
-    -- computer split-out migration (v1 AND older v2 saves): the PC used to be baked into the
-    -- desk — spawn a computer stacked on the first desk so nobody loses their PC, and seed one
-    -- spare into inventories that predate the item. Once per save, recorded in the gift ledger: on
-    -- every load it gave back each computer taken off the desk or sold
+    -- computer split (v1 and older v2): a computer on the first desk, one spare in stock
+    -- once per save (gift ledger), or every load would give back a removed computer
     if not (type(t.gifts) == "table" and t.gifts[M.COMPUTER_SPLIT] == true) then
         local hasComputer = false
         for _, it in ipairs(room.furniture) do if it.id == "computer" then hasComputer = true end end
@@ -102,18 +88,16 @@ function M.applyItems(room, t, catalog, starterStock)
         t.gifts = type(t.gifts) == "table" and t.gifts or {}
         t.gifts[M.COMPUTER_SPLIT] = true
     end
-    -- seed any NEW starter item the save predates (new furniture variants, souvenir pictures,
-    -- floorings, wall paints) so existing rooms get the new content without resetting counts
+    -- seed starter ids the save predates, without touching existing counts
     room.inventory = room.inventory or {}
     for id, n in pairs(starterStock) do if room.inventory[id] == nil then room.inventory[id] = n end end
 end
 
--- items every room gets: brand-new rooms have them placed (starter_room.json), saved rooms receive them
--- once through applyGifts
+-- placed in new rooms (starter_room.json), given once to saved rooms (applyGifts)
 M.GIFTS = { mirror = 1, backpack = 1 }
-M.COMPUTER_SPLIT = "computer_split"     -- the ledger's mark of the computer split-out (applyItems)
+M.COMPUTER_SPLIT = "computer_split"     -- ledger mark of the computer split (applyItems)
 
--- the gift ledger of a brand-new room: everything already given, the computer split-out done
+-- ledger of a new room: every gift given, computer split done
 function M.allGifts()
     local given = {}
     for id in pairs(M.GIFTS) do given[id] = true end
@@ -121,8 +105,8 @@ function M.allGifts()
     return given
 end
 
--- hands each gift the raw table `t` has not recorded yet to the room, unless one is already placed or
--- in stock; returns true when something was added to the inventory (the caller persists it)
+-- gives each unrecorded gift unless one is placed or in stock
+-- true when the inventory grew (caller persists it)
 function M.applyGifts(room, t, catalog)
     local given = {}
     if type(t.gifts) == "table" then

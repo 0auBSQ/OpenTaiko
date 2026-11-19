@@ -1,5 +1,5 @@
--- Syncs an idle cycle to the music.
--- Bar lines come from the bar index (it changes in every mode), not the chart time, which is offset in a Dan.
+-- idle cycle synced to the music
+-- bar lines from the bar index (chart time is offset in a Dan)
 
 local Config = require("Core.Config")
 local Animation = Config.load("Config/animation.json")
@@ -14,14 +14,14 @@ function Beat.new()
     return setmetatable({ bar = nil, anchored = false, fix = 0, fixLeft = 0 }, Beat)
 end
 
--- beats per cycle: the power of two nearest the cycle's length in beats
+-- beats per cycle: nearest power of two
 local function cycleBeats(period, beat)
     local n = 2 ^ math.floor(math.log(period / beat, 2) + 0.5)
     return math.max(MIN_BEATS, math.min(MAX_BEATS, n))
 end
 
--- idle seconds to run for dt real seconds. period, pos: the cycle's length and how far it is past
--- its accent (period nil: no cycle, the idle runs as is); bpm: the tempo; bar: the bar index
+-- idle seconds for dt real seconds; period, pos: cycle length, time past its accent
+-- period nil: no cycle; bar: bar index
 function Beat:step(dt, period, pos, bpm, bar)
     local crossed = self.bar ~= nil and bar ~= self.bar
     self.bar = bar

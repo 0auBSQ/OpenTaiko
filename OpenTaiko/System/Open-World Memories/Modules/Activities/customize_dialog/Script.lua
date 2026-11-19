@@ -1,100 +1,88 @@
 ---@diagnostic disable: undefined-global, undefined-field  -- globals / C# methods injected at runtime
 
--- customize_dialog/Script.lua
--- Per-player dialog (activated from the difficulty select screen) that lets a
--- player choose their Character, Puchichara, Nameplate, and Hitsounds.
---
--- Only items that are unlocked (or have no explicit unlock condition) appear in
--- the selection lists.  Changes are staged locally and applied only when the
--- player confirms with OK.  Cancel discards all changes.
+-- per-player customize dialog
+-- changes staged until OK; Cancel discards them
 
 local NavInput = require("NavInput")
 
--- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+-- layout: Config/layout.json; timings: Config/animation.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
 
--- a skin locale string (Locales/<lang>/), the English fallback when the key is missing
+-- skin locale string (Locales/<lang>/); fallback when missing
 local function tr(key, fallback)
     local ok, s = pcall(function() return THEME:GetSkinString(key) end)
     if ok and type(s) == "string" and s ~= "" and s:sub(1, 1) ~= "[" then return s end
     return fallback or key
 end
 
--- ─── State ────────────────────────────────────────────────────────────────────
+-- ==== State ====
 
 local reactive = false
 local player   = 0
 local save     = nil
 
--- Current sub-screen
--- "main" | "character" | "puchichara" | "nameplate_title" | "dan_title" | "player_name" | "hitsounds"
+-- "main" | "character" | "palette" | "puchichara" | "nameplate_title" | "dan_title" | "player_name" | "hitsounds"
 local currentScreen = "main"
 
--- Main-menu cursor (1-based).  1-7 = categories, 8 = OK, 9 = Cancel.
+-- main menu cursor: 1-7 categories, 8 OK, 9 Cancel
 local mainIdx    = 1
 local MAIN_LABELS = {}   -- filled by loadStrings
 local MAIN_COUNT  = 9   -- 7 categories + OK + Cancel
 local OK_IDX      = 8
 local CANCEL_IDX  = 9
 
--- Item lists (only available items, built on activate)
+-- available items only, built on activate
 local characterList  = {}
 local puchiList      = {}
 local nameplateList  = {}
 local danList        = {}
 local hitsoundList   = {}
 
--- Selection indices inside each list (0-based, wrapping)
+-- list cursors, 0-based, wrapping
 local charSubIdx  = 0
 local puchiSubIdx = 0
 local npSubIdx    = 0
 local danSubIdx   = 0
 local hsSubIdx    = 0
 
--- Character animation preview:
---   loadedCharaEntry   — reference to the LuaCharacterEntry (for FolderName lookup)
---   loadedCharaInst    — NEW LuaCharacter created and fully owned by this dialog;
---                        completely independent from song_select's character instances
+-- preview character; loadedCharaInst is owned here, apart from song_select's
 local loadedCharaEntry = nil
 local loadedCharaInst  = nil
 
--- Saved sub-indices (for cancel/restore on Esc in each sub-screen)
+-- restored on Esc in each sub-screen
 local savedCharSubIdx  = 0
 local savedPuchiSubIdx = 0
 local savedNpSubIdx    = 0
 local savedDanSubIdx   = 0
 local savedHsSubIdx    = 0
 
--- Player name staging
 local stagedPlayerName = ""
 local savedPlayerName  = ""
-local playerNameInput  = nil   -- LuaTextInput, alive only while "player_name" screen is open
+local playerNameInput  = nil   -- LuaTextInput, alive while the "player_name" screen is open
 
--- Puchichara sine-float animation
+-- puchichara float offset
 local sineY = 0
 
--- Hitsound preview sounds (loaded on demand, disposed on each navigation / deactivate)
+-- hitsound preview; disposed on each move and on deactivate
 local hsPreviewDon = nil
 local hsPreviewKa  = nil
 
--- Palette data for the currently previewed character
--- Each entry: { name, plays, gradient? }  (gradient is nil for the Default/no-effect palette)
+-- palettes of the preview character: { name, plays, gradient } (gradient nil: Default)
 local paletteList          = {}
 local paletteSubIdx        = 0
 local savedPaletteSubIdx   = 0
-local palFlashColor        = nil   -- nil = white; non-nil = animated red→white (same as song_select_core)
+local palFlashColor        = nil   -- nil: white; else flash colour (as in song_select_core)
 local currentPaletteFolder = ""   -- folder name the palette list was built for
 
--- Slide-in transition
 local SLIDE      = Animation.slide
 local SLIDE_DIST = SLIDE.distance_px
-local SLIDE_STEP = SLIDE.duration_s / SLIDE_DIST   -- the counter's seconds per pixel of the slide
+local SLIDE_STEP = SLIDE.duration_s / SLIDE_DIST   -- counter sec per slide px
 local bgpos  = SLIDE_DIST
 local bgtlop = 0
 
--- ─── Fonts / textures / sounds / counters ────────────────────────────────────
+-- ==== Resources ====
 
 local textSmall = nil
 local text      = nil
@@ -103,9 +91,9 @@ local tx        = {}
 local sounds    = {}
 local ctx       = {}
 
--- ─── Layout constants ─────────────────────────────────────────────────────────
+-- ==== Layout ====
 
--- Left panel
+-- left panel
 local MENU           = Layout.menu
 local MENU_CX        = MENU.cx
 local MENU_TITLE_X   = Layout.title.x
@@ -119,20 +107,20 @@ local DESC           = Layout.description
 local NAME_SCREEN    = Layout.player_name
 local TILE           = Layout.background_tile
 
--- Footer OK / Cancel (matches mod_select_dialog layout)
+-- OK / Cancel footer, as in mod_select_dialog
 local FOOTER         = Layout.footer
 local MENU_FOOTER_Y  = FOOTER.y
 local MENU_OK_X      = FOOTER.ok_x
 local MENU_CANCEL_X  = FOOTER.cancel_x
 
--- Horizontal list (character / puchichara): VISIBLE_COUNT slots around the selected one
+-- character / puchichara list: VISIBLE_COUNT slots around the selection
 local HLIST         = Layout.horizontal_list
 local ITEM_SLOT_W   = HLIST.slot_w
 local VISIBLE_COUNT = HLIST.visible_count
 local LIST_CX       = HLIST.cx
 local LIST_CY       = HLIST.cy
 
--- Vertical nameplate / hitsound list (shared layout)
+-- nameplate / hitsound list, shared layout
 local VLIST       = Layout.vertical_list
 local NP_LIST_CX  = VLIST.cx
 local NP_LIST_CY  = VLIST.cy
@@ -146,8 +134,7 @@ local HS_LIST_CY  = NP_LIST_CY
 local HS_ROW_H    = NP_ROW_H
 local HS_HALF_VIS = NP_HALF_VIS
 
--- Preview positions — character bottom and nameplate share PREVIEW_BASE_Y so the
--- nameplate appears directly under the character, matching the in-game layout.
+-- character bottom and nameplate top share PREVIEW_BASE_Y, as in game
 local PREVIEW            = Layout.preview
 local PREVIEW_BASE_Y     = PREVIEW.base_y         -- character "bottom" / nameplate top-left y
 local PREVIEW_NP_X       = PREVIEW.nameplate_x    -- nameplate left-edge x
@@ -157,14 +144,14 @@ local PREVIEW_PUCHI_BASE = PREVIEW.puchichara_y   -- puchichara centre-y
 
 local FLOAT = Animation.puchichara_float
 
--- ─── Color helpers ────────────────────────────────────────────────────────────
+-- ==== Colors ====
 
 local COL_WHITE  = Layout.colors.white_color
 local COL_YELLOW = Layout.colors.yellow_color
 
--- ─── Texts ────────────────────────────────────────────────────────────────────
+-- ==== Texts ====
 
--- the dialog's texts in the current language, read on activate
+-- current language, read on activate
 local strings = {}
 
 local function loadStrings()
@@ -191,7 +178,7 @@ local function loadStrings()
                     strings.danTitle, strings.playerName, strings.hitsounds }
 end
 
--- ─── Misc helpers ─────────────────────────────────────────────────────────────
+-- ==== Helpers ====
 
 local function modWrap(v, n) return (v % n + n) % n end
 
@@ -205,7 +192,7 @@ local function isNpAvailable(entry)
     return save:IsNameplateUnlocked(entry.Id) or not entry.UnlockCondition.HasCondition
 end
 
--- ─── List builders ────────────────────────────────────────────────────────────
+-- ==== List builders ====
 
 local function buildCharacterList()
     characterList = {}
@@ -253,20 +240,20 @@ local function buildDanList()
     end
 end
 
--- ─── Palette helpers ──────────────────────────────────────────────────────────
+-- ==== Palettes ====
 
 local function disposePaletteGradients()
     if loadedCharaInst ~= nil then loadedCharaInst:ClearPaletteGradient() end
     paletteList = {}
 end
 
--- Safe key access for JSON-parsed C# dictionaries — uses JSONLOADER:JsonGet (no throw).
+-- JSON dictionary get, no throw
 local function jsGet(dict, key, default)
     local v = JSONLOADER:JsonGet(dict, key)
     return v ~= nil and v or default
 end
 
--- Converts a JSON-parsed stops dictionary into a Lua table for character:SetPaletteGradient.
+-- JSON stops -> Lua table for character:SetPaletteGradient
 local function stopsDataToLuaTable(rawStops)
     local t = {}
     for j = 1, rawStops.Count do
@@ -287,13 +274,13 @@ local function buildPaletteList()
     currentPaletteFolder = loadedCharaInst.FolderName
 
     local rawData = JSONLOADER:JsonParseFileAny(loadedCharaInst.FullPath .. "/Palettes.json")
-    if rawData == nil then return end  -- no file → only Default
+    if rawData == nil then return end  -- no file: Default only
 
     paletteList = {}
     for i = 1, rawData.Count do
         local e        = rawData[i]
         local name     = tostring(jsGet(e, "name", "Palette " .. i))
-        -- "names" holds the name per language id
+        -- names: language id -> name
         local names    = jsGet(e, "names", nil)
         local own      = names ~= nil and JSONLOADER:JsonGet(names, LANG:GetLanguageId()) or nil
         if own ~= nil and tostring(own) ~= "" then name = tostring(own) end
@@ -320,8 +307,7 @@ local function isPaletteUnlocked(palette)
     return palette.plays <= 0 or getCharPlayCount() >= palette.plays
 end
 
--- Stores the currently selected palette gradient on the preview character so that
--- drawing code can retrieve it with character:GetPaletteGradient().
+-- read back with character:GetPaletteGradient()
 local function applyPreviewPalette()
     if loadedCharaInst == nil then return end
     local p = paletteList[paletteSubIdx + 1]
@@ -332,10 +318,8 @@ local function applyPreviewPalette()
     end
 end
 
--- ─── Character preview instance management ────────────────────────────────────
--- Each preview character is a freshly-created LuaCharacter (via CHARACTER:CreateCharacter)
--- that is fully owned and isolated from the shared instances used by song_select.
--- Only one instance is alive at any moment.
+-- ==== Preview character ====
+-- one owned instance (CHARACTER:CreateCharacter), apart from song_select's
 
 local function disposePreviewCharacter()
     if loadedCharaInst ~= nil then
@@ -350,23 +334,20 @@ local function swapPreviewCharacter(newEntry)
     if newEntry == nil then return end
     if loadedCharaEntry ~= nil and loadedCharaEntry.FolderName == newEntry.FolderName then return end
 
-    -- Create a new owned instance, load its animation
     local newInst = CHARACTER:CreateCharacter(newEntry.FolderName)
     if newInst ~= nil then
         newInst:LoadAnimation(CHARACTER.ANIM_MENU_NORMAL)
     end
 
-    -- Dispose the previous owned instance first
     disposePreviewCharacter()
 
     loadedCharaEntry = newEntry
     loadedCharaInst  = newInst
 
-    -- Rebuild palette list for the new character and restore saved selection
     buildPaletteList()
     if currentPaletteFolder ~= "" then
         local savedIdx = math.floor(save:GetGlobalCounter(".character_palette_" .. currentPaletteFolder) or 0)
-        -- an index past the list reads as the default palette, as for the character and the story sprites
+        -- index past the list: default palette (as in game and story sprites)
         paletteSubIdx = (savedIdx >= 0 and savedIdx < #paletteList) and savedIdx or 0
     else
         paletteSubIdx = 0
@@ -374,7 +355,7 @@ local function swapPreviewCharacter(newEntry)
     applyPreviewPalette()
 end
 
--- ─── Find initial sub-indices (currently equipped items) ─────────────────────
+-- ==== Equipped item indices ====
 
 local function findCharSubIdx()
     local name = save.CharacterName
@@ -418,7 +399,7 @@ local function findDanSubIdx()
     return 0
 end
 
--- ─── Apply pending changes on OK ──────────────────────────────────────────────
+-- ==== Apply on OK ====
 
 local function applyChanges()
     if #characterList  > 0 then save:ChangeCharacter(characterList[charSubIdx + 1].FolderName) end
@@ -427,13 +408,10 @@ local function applyChanges()
     if #danList        > 0 then save:ChangeDan(danList[danSubIdx + 1].Title)                    end
     if stagedPlayerName ~= "" then save:ChangeName(stagedPlayerName)                            end
     if #hitsoundList   > 0 then save.SelectedHitsounds = hitsoundList[hsSubIdx + 1].FolderName  end
-    -- Persist selected palette index for the current character
     if currentPaletteFolder ~= "" then
         save:SetGlobalCounter(".character_palette_" .. currentPaletteFolder, paletteSubIdx)
     end
-    -- Push palette into the global PaletteManager slot AND update the long-lived PlayerCharacters instance.
-    -- Using save:GetCharacter() gives the same persistent LuaCharacter(player) used everywhere else,
-    -- so _paletteEntry is refreshed for the LuaCharacter.ApplyPalette() path too.
+    -- also updates the persistent player LuaCharacter (ApplyPalette() path)
     local pBound = save:GetCharacter()
     if pBound ~= nil then
         local p = paletteList[paletteSubIdx + 1]
@@ -443,10 +421,10 @@ local function applyChanges()
             pBound:ClearPaletteGradient()
         end
     end
-    -- NOTE: .character_playcount_[folder] is incremented by the result stage at song end.
+    -- .character_playcount_<folder>: incremented by the result stage
 end
 
--- ─── Background draw ──────────────────────────────────────────────────────────
+-- ==== Background ====
 
 local function drawBg(opacity)
     tx["bgtile"]:SetOpacity((opacity * bgtlop) / 255)
@@ -457,14 +435,9 @@ local function drawBg(opacity)
     end
 end
 
--- ─── Preview draw (right panel) ───────────────────────────────────────────────
--- Layout mirrors the in-game / song_select look:
---   character bottom-anchored at (PREVIEW_CHARA_X, PREVIEW_BASE_Y)
---   nameplate at                 (PREVIEW_NP_X,    PREVIEW_BASE_Y)   ← same Y
---   puchichara floating at       (PREVIEW_PUCHI_X, PREVIEW_PUCHI_BASE + sineY)
+-- ==== Preview ====
 
--- Draws a full nameplate using all currently staged values (title, dan, name).
--- Used for the right-panel preview and list rows so every sub-screen reflects every staged change.
+-- nameplate with every staged value
 local function drawAllStagedNameplate(x, y, opacity)
     local np      = ROACTIVITY:GetROActivity("nameplate")
     local npEntry = #nameplateList > 0 and nameplateList[npSubIdx + 1] or nil
@@ -483,7 +456,6 @@ end
 local function drawPreview(alpha)
     local opacity = math.floor(alpha * 255)
 
-    -- ── Character (owned preview instance) ──
     if loadedCharaInst ~= nil and loadedCharaInst.IsValid then
         loadedCharaInst:SetScale(1, 1)
         loadedCharaInst:Update(CHARACTER.ANIM_MENU_NORMAL, true)
@@ -494,10 +466,8 @@ local function drawPreview(alpha)
         )
     end
 
-    -- ── Nameplate — always reflects all staged values regardless of sub-screen. ──
     drawAllStagedNameplate(PREVIEW_NP_X, PREVIEW_BASE_Y, opacity)
 
-    -- ── Puchichara (floating sine) ──
     if #puchiList > 0 then
         local e = puchiList[puchiSubIdx + 1]
         if e ~= nil and e.tx ~= nil and e.tx.Loaded then
@@ -513,7 +483,7 @@ local function drawPreview(alpha)
     end
 end
 
--- ─── Horizontal item-list helpers ─────────────────────────────────────────────
+-- ==== Horizontal lists ====
 
 local function drawHorizList(list, selectedIdx, alpha, itemDrawFn)
     if #list == 0 then return end
@@ -525,7 +495,7 @@ local function drawHorizList(list, selectedIdx, alpha, itemDrawFn)
     end
 end
 
--- Character: show the owned preview animation only for the centre slot.
+-- centre slot: owned preview animation
 local function drawCharItem(entry, cx, cy, isSelected, alpha)
     if entry == nil then return end
     if isSelected
@@ -534,7 +504,7 @@ local function drawCharItem(entry, cx, cy, isSelected, alpha)
         and loadedCharaEntry.FolderName == entry.FolderName
         and loadedCharaInst.IsValid
     then
-        -- Animation was already updated this frame in drawPreview; just draw again at list pos.
+        -- updated this frame in drawPreview; draw only
         loadedCharaInst:SetScale(HLIST.character_selected_scale, HLIST.character_selected_scale)
         loadedCharaInst:DrawAtAnchor(
             cx, cy, CHARACTER.ANIM_MENU_NORMAL, "bottom",
@@ -548,7 +518,7 @@ local function drawCharItem(entry, cx, cy, isSelected, alpha)
     namTx:DrawAtAnchor(cx, cy + HLIST.name_y, "top")
 end
 
--- Puchichara: show first sprite-sheet frame.
+-- first sprite-sheet frame
 local function drawPuchiItem(entry, cx, cy, isSelected, alpha)
     if entry == nil then return end
     if entry.tx ~= nil and entry.tx.Loaded then
@@ -567,9 +537,7 @@ local function drawPuchiItem(entry, cx, cy, isSelected, alpha)
     namTx:DrawAtAnchor(cx, cy + HLIST.name_y, "top")
 end
 
--- ─── Hitsound preview ────────────────────────────────────────────────────────
--- Plays Don + Ka from the currently selected hitsound set.
--- Stops and disposes any previously playing preview sounds first.
+-- ==== Hitsound preview ====
 
 local function stopHitsoundPreview()
     if hsPreviewDon ~= nil then hsPreviewDon:Stop() ; hsPreviewDon:Dispose() ; hsPreviewDon = nil end
@@ -593,7 +561,7 @@ local function playHitsoundPreview()
     end
 end
 
--- Vertical hitsound list (mirrors the nameplate list style — name text only).
+-- names only, nameplate list layout
 local function drawHitsoundList(alpha)
     if #hitsoundList == 0 then return end
     for slot = -HS_HALF_VIS, HS_HALF_VIS do
@@ -611,7 +579,7 @@ local function drawHitsoundList(alpha)
     end
 end
 
--- Vertical dan-title list — each row shows this row's dan with all other staged values.
+-- each row: its dan plus the other staged values
 local function drawDanTitleList(alpha)
     if #danList == 0 then return end
     local npEntry = #nameplateList > 0 and nameplateList[npSubIdx + 1] or nil
@@ -635,7 +603,7 @@ local function drawDanTitleList(alpha)
     end
 end
 
--- Vertical nameplate list — each row shows this row's nameplate title with all other staged values.
+-- each row: its title plus the other staged values
 local function drawNameplateList(alpha)
     if #nameplateList == 0 then return end
     local danEntry = #danList > 0 and danList[danSubIdx + 1] or nil
@@ -656,7 +624,7 @@ local function drawNameplateList(alpha)
     end
 end
 
--- ─── Counter helper ───────────────────────────────────────────────────────────
+-- ==== Counters ====
 
 local function startCounter(key, s, e, interval, mode, cb, onFinish)
     local c = COUNTER:CreateCounter(s, e, interval, onFinish)
@@ -674,7 +642,7 @@ local function updateTransitionVisuals(val)
     bgtlop = math.max(0, math.min(255, op))
 end
 
--- ─── draw() ───────────────────────────────────────────────────────────────────
+-- ==== draw ====
 
 function draw()
     drawBg(TILE.opacity)
@@ -686,16 +654,13 @@ function draw()
     if bgtlop == 0 then return end
     local alpha = bgtlop / 255
 
-    -- Preview panel (always visible while the dialog is open)
     drawPreview(alpha)
 
-    -- Title
     local titleTx = textLarge:GetText(strings.title, false, Layout.title.max_w)
     titleTx:SetOpacity(alpha)
     titleTx:Draw(MENU_TITLE_X, MENU_TITLE_Y)
 
     if currentScreen == "main" then
-        -- ── Category rows (1-4) ──
         for i = 1, #MAIN_LABELS do
             local isSel = (i == mainIdx)
             local col   = isSel and COLOR:CreateColorFromHex(COL_YELLOW) or COLOR:CreateColorFromHex(COL_WHITE)
@@ -704,7 +669,6 @@ function draw()
             item:DrawAtAnchor(MENU_CX, MENU_ORIGIN_Y + (i - 1) * MENU_SPACING_Y, "top")
         end
 
-        -- ── OK / Cancel footer (matches mod_select_dialog layout) ──
         local okCol  = (mainIdx == OK_IDX)     and COLOR:CreateColorFromHex(COL_YELLOW) or COLOR:CreateColorFromHex(COL_WHITE)
         local canCol = (mainIdx == CANCEL_IDX) and COLOR:CreateColorFromHex(COL_YELLOW) or COLOR:CreateColorFromHex(COL_WHITE)
         local okTx  = text:GetText(strings.ok,     false, FOOTER.button_max_w, okCol)
@@ -742,7 +706,6 @@ function draw()
             end
         end
 
-        -- Lock message at the bottom, below the last visible row
         if not selUnlocked then
             local lock = Layout.palette_lock
             local msgCol = palFlashColor or COLOR:CreateColorFromHex(lock.color)
@@ -816,7 +779,7 @@ function draw()
     end
 end
 
--- ─── update() ─────────────────────────────────────────────────────────────────
+-- ==== update ====
 
 function update()
     for _, c in pairs(ctx) do c:Tick() end
@@ -832,7 +795,6 @@ function update()
         end)
     end
 
-    -- ── Main menu ─────────────────────────────────────────────────────────────
     if currentScreen == "main" then
         if navPn.downOrPadRight() then
             sounds.Skip:Play()
@@ -860,7 +822,6 @@ function update()
             exitDialog(false)
         end
 
-    -- ── Character ─────────────────────────────────────────────────────────────
     elseif currentScreen == "character" then
         if navPn.right() and #characterList > 0 then
             sounds.Skip:Play()
@@ -881,7 +842,6 @@ function update()
             currentScreen = "main"
         end
 
-    -- ── Palette ───────────────────────────────────────────────────────────────
     elseif currentScreen == "palette" then
         if navPn.downOrPadRight() and #paletteList > 0 then
             sounds.Skip:Play()
@@ -910,7 +870,6 @@ function update()
             currentScreen = "main"
         end
 
-    -- ── Puchichara ────────────────────────────────────────────────────────────
     elseif currentScreen == "puchichara" then
         if navPn.right() and #puchiList > 0 then
             sounds.Skip:Play() ; puchiSubIdx = modWrap(puchiSubIdx + 1, #puchiList)
@@ -922,7 +881,6 @@ function update()
             sounds.Cancel:Play() ; puchiSubIdx = savedPuchiSubIdx ; currentScreen = "main"
         end
 
-    -- ── Nameplate title ───────────────────────────────────────────────────────
     elseif currentScreen == "nameplate_title" then
         if navPn.downOrPadRight() and #nameplateList > 0 then
             sounds.Skip:Play() ; npSubIdx = modWrap(npSubIdx + 1, #nameplateList)
@@ -934,7 +892,6 @@ function update()
             sounds.Cancel:Play() ; npSubIdx = savedNpSubIdx ; currentScreen = "main"
         end
 
-    -- ── Dan title ─────────────────────────────────────────────────────────────
     elseif currentScreen == "dan_title" then
         if navPn.downOrPadRight() and #danList > 0 then
             sounds.Skip:Play() ; danSubIdx = modWrap(danSubIdx + 1, #danList)
@@ -946,7 +903,6 @@ function update()
             sounds.Cancel:Play() ; danSubIdx = savedDanSubIdx ; currentScreen = "main"
         end
 
-    -- ── Player name ───────────────────────────────────────────────────────────
     elseif currentScreen == "player_name" then
         if playerNameInput ~= nil then
             local confirmed = playerNameInput:Update()
@@ -963,7 +919,6 @@ function update()
             end
         end
 
-    -- ── Hitsounds ─────────────────────────────────────────────────────────────
     elseif currentScreen == "hitsounds" then
         if navPn.downOrPadRight() and #hitsoundList > 0 then
             sounds.Skip:Play() ; hsSubIdx = modWrap(hsSubIdx + 1, #hitsoundList) ; playHitsoundPreview()
@@ -977,31 +932,30 @@ function update()
     end
 end
 
--- ─── activate() ───────────────────────────────────────────────────────────────
+-- ==== activate ====
 
 function activate(pl)
     player = pl or 0
     save   = GetSaveFile(player)
     loadStrings()
 
-    -- Build filtered lists (unlocked / no-condition items only)
+    -- unlocked or unconditioned items only
     buildCharacterList()
     buildPuchiList()
     buildNameplateList()
     buildDanList()
     buildHitsoundList()
 
-    -- Initialise selection at the currently equipped item
+    -- cursors on the equipped items
     charSubIdx  = findCharSubIdx()
     puchiSubIdx = findPuchiSubIdx()
     npSubIdx    = findNpSubIdx()
     danSubIdx   = findDanSubIdx()
     hsSubIdx    = findHsSubIdx()
 
-    -- Initialise staged player name
     stagedPlayerName = save.Name
 
-    -- Create a fresh, owned preview character instance (independent of song_select)
+    -- owned preview character, apart from song_select's
     loadedCharaEntry = nil
     loadedCharaInst  = nil
     if #characterList > 0 then
@@ -1014,7 +968,7 @@ function activate(pl)
         end
     end
 
-    -- Build palette list for the initial character and restore saved selection
+    -- palette list, saved index restored
     buildPaletteList()
     if currentPaletteFolder ~= "" then
         local savedIdx = math.floor(save:GetGlobalCounter(".character_palette_" .. currentPaletteFolder) or 0)
@@ -1031,43 +985,37 @@ function activate(pl)
     sounds.Decide = SHARED:GetSharedSound("Decide")
     sounds.Cancel = SHARED:GetSharedSound("Cancel")
 
-    -- Slide-in
     startCounter("enter", SLIDE_DIST, 0, -SLIDE_STEP, "none", updateTransitionVisuals, function()
         reactive = true
     end)
 
-    -- Puchichara floating animation (sine)
     startCounter("sine", 0, 360, 1 / FLOAT.speed_deg_per_s, "loop", function(val)
         sineY = math.sin(val * math.pi / 180) * FLOAT.amplitude_px
     end)
 end
 
--- ─── deactivate() ─────────────────────────────────────────────────────────────
+-- ==== deactivate ====
 
 function deactivate()
     reactive = false
 
-    -- Stop and dispose any in-progress hitsound preview
     stopHitsoundPreview()
 
-    -- Dispose the player name text input if the screen was left open
     if playerNameInput ~= nil then playerNameInput:Dispose() ; playerNameInput = nil end
 
-    -- Dispose palette gradients before the character instance (gradients reference GPU textures)
+    -- before the character: gradients use its GPU textures
     disposePaletteGradients()
     paletteSubIdx        = 0
     palFlashColor        = nil
     currentPaletteFolder = ""
 
-    -- Dispose the owned preview character instance (no effect on song_select)
     disposePreviewCharacter()
 
-    -- Stop all counters
     for k in pairs(ctx) do
         ctx[k] = COUNTER:EmptyCounter()
     end
 
-    -- Clear lists (entries are owned by the global databases, not by us)
+    -- entries owned by the global lists; no dispose
     characterList = {}
     puchiList     = {}
     nameplateList = {}
@@ -1075,7 +1023,7 @@ function deactivate()
     hitsoundList  = {}
 end
 
--- ─── onStart() / onDestroy() ──────────────────────────────────────────────────
+-- ==== onStart / onDestroy ====
 
 function onStart()
     textSmall = TEXT:Create(Layout.fonts.small_size)

@@ -1,5 +1,5 @@
--- Pagoda.Songs: the song list the pagoda draws from, and the check that the installed soundtrack covers
--- every pool entry (the pools name songs of the OpenTaiko soundtrack by unique id).
+-- Pagoda.Songs: the pagoda's song list and the pool coverage check
+-- pools name OpenTaiko soundtrack songs by unique id
 
 local Levels = require("Pagoda.Levels")
 
@@ -9,7 +9,7 @@ local _song_list_cache = nil
 
 function M.clear_cache() _song_list_cache = nil end
 
--- ── Song list ────────────────────────────────────────────────────────────────
+-- ==== song list ====
 
 function M.get_song_list()
     if _song_list_cache ~= nil then return _song_list_cache end
@@ -21,7 +21,7 @@ function M.get_song_list()
     return _song_list_cache
 end
 
--- ── Pool validation ──────────────────────────────────────────────────────────
+-- ==== pool validation ====
 
 -- how many pool entries (song + difficulty) the installed songs lack; each one is logged
 function M.count_missing_songs()

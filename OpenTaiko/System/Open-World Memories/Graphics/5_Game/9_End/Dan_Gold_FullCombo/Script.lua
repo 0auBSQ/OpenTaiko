@@ -1,7 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Dan Gold FullCombo end animation: a scroll banner rises then slides open (eased) on clear.
--- Group C clear/end script: the host passes the player index via state.player; playEndAnime(player)
--- is called directly by the host and (re)starts the per-play animation timer.
+-- end anime: Dan_Gold_FullCombo (group C, player via state.player)
 
 local width = 1920
 local height = 1080
@@ -36,7 +34,6 @@ function clearOut(player)
 end
 
 function playEndAnime(player)
-    -- per-play counters reset here (host calls this with the player index)
     animeTimer = 0
     scrollRiseTransition = 0
     scrollSlideTransition = 0
@@ -69,11 +66,9 @@ function draw(state)
     local player = state.player
 
     if scrollSlideTransition > 0 then
-        -- Draw scroll background
         tx["Scroll_Back.png"]:DrawRect(scrollSlidePos, scrollRisePos, scrollSlidePos - scrollBackWidth - scrollBackXOffset, 0, scrollBackWidth - scrollSlidePos + scrollBackXOffset, scrollHeight)
         tx["Scroll_Back_Overlay.png"]:DrawRect(scrollSlidePos, scrollRisePos, scrollSlidePos - scrollBackWidth - scrollBackXOffset, 0, scrollBackWidth - scrollSlidePos + scrollBackXOffset, scrollHeight)
     end
-    -- Draw scroll
     tx["Scroll.png"]:Draw(scrollSlidePos, scrollRisePos)
 end
 

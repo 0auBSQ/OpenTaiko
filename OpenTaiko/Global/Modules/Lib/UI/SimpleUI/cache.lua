@@ -1,13 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global
--- SimpleUI/cache.lua — the canvases SimpleUI keeps for reuse, shared by every manager of the script (they are
--- freed with the script):
---   * a pool of plain canvases by size: a canvas a widget lets go of (disposeWidgets, a restyle to another
---     size) comes back cleared to the next widget of that size, so rebuilding a screen keeps its GL textures
---     instead of deleting and allocating every one again;
---   * the baked surfaces, shared by key (see Widget:bakeShared): two widgets baking the same thing share one
---     canvas, reference counted, and a canvas nobody holds parks with its pixels, so the same screen built
---     again gets every surface back without baking or uploading.
--- Both are bounded by bytes; past the caps the oldest go first.
+-- SimpleUI canvas cache: pool by size, baked surfaces shared by key
+-- both capped in bytes, oldest freed first
 
 local Shape = require("UI.SimpleUI.shape")
 
@@ -56,8 +49,8 @@ local function unpark(key)
     end
 end
 
--- the shared canvas for `key`, baked by bake(cv) the first time; a baked canvas is uploaded once and keeps
--- no CPU copy of its pixels (it is never drawn into again)
+-- shared canvas for `key`, baked by bake(cv) on first use
+-- uploaded once with no CPU copy
 function C.bakedCanvas(key, w, h, bake)
     local e = baked[key]
     if e ~= nil then
@@ -90,7 +83,7 @@ function C.releaseBaked(key)
     end
 end
 
--- frees the parked surfaces; the ones a live widget still draws stay
+-- frees parked surfaces (live ones stay)
 function C.flushBakedCanvases()
     for k, e in pairs(baked) do
         if e.refs <= 0 then pcall(function() e.canvas:Dispose() end); baked[k] = nil end
@@ -98,8 +91,7 @@ function C.flushBakedCanvases()
     parkedKeys, parkedBytes = {}, 0
 end
 
--- a string naming everything a bake can read from a resolved theme (colours, sizes, shadow, gloss), cached
--- per theme table; the widget adds its own dimensions and colour overrides on top
+-- bake key of a resolved theme, cached per theme table
 local themeKeys = setmetatable({}, { __mode = "k" })
 local function serialize(v, out)
     local t = type(v)

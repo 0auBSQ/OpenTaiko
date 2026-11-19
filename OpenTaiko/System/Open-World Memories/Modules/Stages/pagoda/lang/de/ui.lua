@@ -1,4 +1,4 @@
--- German for the recurring names, labels and screen texts; a missing key shows the English.
+-- German UI strings; missing keys fall back to English
 
 local T = {}
 

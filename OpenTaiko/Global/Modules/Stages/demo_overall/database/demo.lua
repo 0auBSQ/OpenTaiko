@@ -1,5 +1,5 @@
--- demo_overall/database/demo.lua — a local and a global database: S adds one to the local value,
--- D takes one away, and the global value adds up the local one on every press.
+-- local and global database demo: S adds one, D takes one away
+-- the global value adds the local one on every press
 
 local D = {}
 
@@ -45,12 +45,10 @@ end
 function D.update()
 
 	if INPUT:KeyboardPressed("S") then
-		-- Increment the counter here
 		incrementValues(1)
 	end
 
 	if INPUT:KeyboardPressed("D") then
-		-- Decrement the counter here
 		incrementValues(-1)
 
 	end

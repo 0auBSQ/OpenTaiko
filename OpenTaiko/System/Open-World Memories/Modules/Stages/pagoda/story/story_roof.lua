@@ -1,4 +1,4 @@
--- Opening story for a run from the level-21 checkpoint.
+-- opening story, run from the level-21 checkpoint
 return {
     bg = "forest",
     lines = {

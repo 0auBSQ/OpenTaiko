@@ -1,4 +1,4 @@
--- Opening story once level 20 is beaten (start below the level-21 checkpoint).
+-- opening story, level 20 beaten, start below the level-21 checkpoint
 
 return {
     bg = "forest",

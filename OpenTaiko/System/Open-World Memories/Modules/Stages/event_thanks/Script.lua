@@ -1,9 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
--- event_thanks — the screen that closes an Event Mode session once its last allowed play is done.
--- It shows the goodbye picture of the exit_screen ROActivity, the one the game shows when it closes, with
--- its own short fanfare. After a few seconds (or a press of Decide) it fades to black and the title
--- screen returns, Event Mode still on for the next player. The plays counter starts over as this screen
--- leaves.
+-- event_thanks: closes an Event Mode session after its last play (exit_screen picture, own fanfare)
+-- leaves after HOLD_SEC or Decide, back to the title; Event Mode stays on
 
 local Easing = require("Easing")
 local NavInput = require("NavInput")
@@ -13,7 +10,7 @@ local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
 
-local FAREWELL = "Sounds/Thanks.ogg" -- a soft "win" fanfare on a grand piano (CC0, tools/build_event_sfx.py), 3.8 s
+local FAREWELL = "Sounds/Thanks.ogg" -- fanfare, 3.8 s
 local HOLD_SEC = Animation.hold_s              -- on screen before it leaves by itself
 local SKIP_AFTER_SEC = Animation.skip_after_s  -- Decide leaves after this
 local FADE_SEC = Animation.fade_s

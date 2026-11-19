@@ -462,7 +462,7 @@ La propriété UnlockCondition des handles d'informations de plaque de nom, des 
 La résolution du skin, les réglages du thème, les chaînes localisées propres au skin et les définitions des réglages du thème.
 
 <div class="callout warn">
-Le skin déclare les réglages du thème dans ThemeSettings.json et stocke leurs valeurs dans le ThemeSettings.db3 voisin. Les accesseurs renvoient toujours les valeurs de réglage sous forme de chaînes ; un réglage absent renvoie sa valeur par défaut déclarée, ou une chaîne vide si aucune déclaration n'existe. Les méthodes ForPlayer ramènent un joueur hors limites à 0 ou 4. Les indices de définition commencent à 0.
+Le skin déclare les réglages du thème dans ThemeSettings.json et stocke leurs valeurs dans `Global/ApplicationData/SkinSettings_<skin folder>.db3`, hors du dossier du skin, pour qu'elles survivent à une mise à jour du skin. Les accesseurs renvoient toujours les valeurs de réglage sous forme de chaînes ; un réglage absent renvoie sa valeur par défaut déclarée, ou une chaîne vide si aucune déclaration n'existe. Les méthodes ForPlayer ramènent un joueur hors limites à 0 ou 4. Les indices de définition commencent à 0.
 </div>
 
 | Méthode | Description |

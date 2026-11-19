@@ -1,64 +1,45 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global
--- jukebox.lua — the Jukebox furniture's audio player (My Room).
---
--- A two-pane PopUI window (left: BGM / Songs lists, right: now-playing panel with title, jacket,
--- transport buttons, speed slider and a clickable seek bar) driving a single LuaSound. Playback
--- OUTLIVES the menu: while the window is closed the volume follows the player's distance to the
--- jukebox (closer = louder) and the model's screen part (furniture.json emissivePart) pulses.
---
--- Songs come from the enumerated chart list (RequestSongList), grouped by genre; locked songs and
--- the whole "Secret Vault" genre are excluded. Until enumeration completes the Songs tab shows a
--- please-wait line (afterSongEnum flips the flag).
---
--- LuaSound gotchas honoured here (see song_select_core): there is NO pause — pause = remember
--- GetTimestampMs then Stop, resume = Play THEN SetTimestamp (Play always restarts at 0); always
--- Stop before re-Play (double-buffered sound would play twice); SetTimestamp takes timeline ms →
--- divide source ms by the current speed
---
--- Multiplayer: the HOST's jukebox state travels over the "jukebox" net channel as a full state
--- table (online.lua). Guests resolve the song against their OWN folders — UniqueId first, then
--- title candidates verified by chart md5, then a budgeted full-library md5 scan — and stay silent
--- when they don't have the chart. Guests never emit jukebox messages.
+-- jukebox furniture audio player: one LuaSound, playback outlives the window
 
-local UI = require("uilib")           -- the skin's UI library (UI.Pick), picked on first use
+local UI = require("uilib")
 local I18N = require("Locale.i18n")
 local SongTitle = require("Songs.Title")
 local T = I18N.texts("jukebox")   -- lang/<code>/jukebox.json
 
 local JB = {}
 
--- ── layout ─────────────────────────────────────────────────────────────────────────────────────
+-- ==== layout ====
 local PANEL = { x = 160, y = 90, w = 1600, h = 900 }
 local TAB   = { x = PANEL.x + 40, y = PANEL.y + 88, w = 220, h = 64, gap = 16 }
 local LIST  = { x = PANEL.x + 40, y = PANEL.y + 190, w = 700, h = 620, row = 64 }
 local RIGHT = { x = PANEL.x + 790, w = PANEL.w - 790 - 50 }
-local RIGHT_CX = RIGHT.x + RIGHT.w / 2          -- PopUI centers align="center" labels ON x
+local RIGHT_CX = RIGHT.x + RIGHT.w / 2          -- align="center" labels centre on x
 local JACKET_BOX = 330
 local JACKET_Y = PANEL.y + 200
 local SEEK  = { x = RIGHT.x, y = PANEL.y + 716, w = RIGHT.w, h = 22 }
 
--- ── module state ───────────────────────────────────────────────────────────────────────────────
+-- ==== module state ====
 local ctx = nil                 -- Script.lua closures (see JB.init)
-local ui = nil                  -- PopUI manager while the window is open
+local ui = nil                  -- UI manager while open
 local isOpen = false
 local tab = "bgm"               -- "bgm" | "songs"
 local navGenre = nil            -- nil = genre level; a genre entry = its song list
-local selEntry = nil            -- the list-selected entry (right pane preview before playing)
-local justOpened = false        -- eat the opening Enter edge (phone pattern)
+local selEntry = nil            -- list-selected entry, for the play button when idle
+local justOpened = false        -- skip the Enter edge that opened the window
 
-local songsReadyFlag = false    -- afterSongEnum fired (or a completed-enum build succeeded)
-local grouped = nil             -- { {genre=, songs={entry...}}, ... } — the FILTERED, listable set
+local songsReadyFlag = false    -- song enumeration done
+local grouped = nil             -- { {genre=, songs={entry...}}, ... }, filtered listable set
 local resIndex = nil            -- unfiltered resolution index (guest md5/uid matching; lazy)
 local resScan = nil             -- budgeted full-library md5 scan: { md5 = , i = , want = }
 local md5Hits = {}              -- md5 -> entry|false (guest resolution cache)
 
--- playback (survives menu close). src = { kind="bgm" } or
+-- playback, kept across window close. src = { kind="bgm" } or
 -- { kind="song", title=, genre=, audioPath=, jacket=, node=, md5=, uid= } (guest: node may be nil)
 local pb = {
     src = nil, snd = nil,
     playing = false, paused = false, pausedAt = 0,
     speed = 1.0, rep = false,
-    cell = nil,                 -- {c=,r=} of the jukebox that owns playback (distance + glow)
+    cell = nil,                 -- {c=,r=} of the playing jukebox (distance, glow)
     item = nil,                 -- the furniture entry (host side; guests only have cell)
     grace = 0,                  -- seconds to ignore IsPlaying==false after play/seek (async load)
     lastVol = -1,
@@ -66,20 +47,20 @@ local pb = {
 }
 
 -- UI widget refs (nil while closed)
-local W = {}                    -- tabs/menu/labels/buttons/slider/toggle
+local W = {}
 local jacketTex, jacketPath = nil, nil
 local seekDrag = nil            -- 0..1 while dragging the seek bar
 local prevLeftPress = false
 local netDirty, netAt, netNow = false, 0, 0
--- crossfade duck (the PC screen fades the jukebox down while its own BGM plays) + per-frame throttles:
--- the sound/scene bridge is only polled a few times a second, so playback never taxes the frame loop
+-- duck: the PC screen fades the jukebox down while its own BGM plays
+-- throttles: the sound/scene bridge is polled a few times a second
 local duck = { cur = 1, target = 1, delay = 0 }
 local volAcc, endAcc, glowAcc = 1, 0, 0
 
 local function tr(id) return T:tr(id) end
 local function clamp(v, a, b) if v < a then return a end if v > b then return b end return v end
 
--- ── song list (filtered, grouped by genre) ─────────────────────────────────────────────────────
+-- ==== song list (by genre) ====
 local function nodeEntry(n)
     local ok, e = pcall(function()
         return { kind = "song", title = SongTitle.of(n) or "?", subtitle = SongTitle.subtitleOf(n) or "", genre = n.Genre or "?",
@@ -140,7 +121,7 @@ end
 local pendingRestore = nil      -- a saved song state that arrived before enumeration finished
 function JB.onSongEnumDone()
     songsReadyFlag = true
-    grouped, resIndex, md5Hits, resScan = nil, nil, {}, nil   -- stale wrappers → rebuild lazily
+    grouped, resIndex, md5Hits, resScan = nil, nil, {}, nil   -- stale wrappers: rebuild lazily
     if isOpen then JB._rebuildList() end
     if pendingRestore then
         local t = pendingRestore; pendingRestore = nil
@@ -148,7 +129,8 @@ function JB.onSongEnumDone()
     end
 end
 
--- ── guest-side song resolution (UniqueId → title+md5 → budgeted md5 scan) ──────────────────────
+-- ==== guest song resolution ====
+-- UniqueId, then title + chart md5, then a budgeted md5 scan
 local function ensureResIndex()
     if resIndex ~= nil then return resIndex end
     resIndex = { byUid = {}, byTitle = {}, all = {} }
@@ -158,7 +140,7 @@ local function ensureResIndex()
         lsls.AppendMainRandomBox  = false
         lsls.AppendSubRandomBoxes = false
         lsls.SubBackBoxFrequency  = 0
-        lsls.IgnoreUnlockables    = true        -- playback-only: presence in the folders is what counts
+        lsls.IgnoreUnlockables    = true        -- playback only: being in the folders is enough
         local list = RequestSongList(lsls)
         if list == nil then return end
         local res = list:SearchSongsByPredicate(function(n)
@@ -188,8 +170,8 @@ local function entryMd5(e)
     return e.md5
 end
 
--- resolve a remote {md5, uid, title} to a local entry; nil = not (yet) found. Starts the budgeted
--- scan on a miss; JB.update ticks it a few charts per frame so a huge library never hitches.
+-- remote {md5, uid, title} -> local entry; nil while not found
+-- a miss starts the scan; JB.update runs a few charts per frame (no hitch on large libraries)
 local function resolveRemote(md5, uid, title)
     if md5 == nil or md5 == "" then return nil end
     local hit = md5Hits[md5]
@@ -224,7 +206,9 @@ local function tickResScan()
     if resScan and resScan.i > #idx.all then md5Hits[resScan.md5] = false; resScan = nil end
 end
 
--- ── playback engine ────────────────────────────────────────────────────────────────────────────
+-- ==== playback engine ====
+-- LuaSound has no pause: remember GetTimestampMs, then Stop; Play restarts at 0, SetTimestamp after it
+-- Stop before re-Play (double-buffered sound plays twice); SetTimestamp takes timeline ms (source ms / speed)
 local function disposeSnd()
     if pb.snd then pcall(function() pb.snd:Stop() end); pcall(function() pb.snd:Dispose() end) end
     pb.snd = nil
@@ -240,9 +224,8 @@ local function createSnd(src)
 end
 
 local function applyVolumeNow(v)
-    -- quantized to steps of 4 (inaudible): distance volume changes every step while walking, and
-    -- each distinct SetVolume reaches the BASS mixer twice (double-buffered sound) — coarse steps
-    -- keep the call rate tiny
+    -- steps of 4 (inaudible): each distinct SetVolume reaches the BASS mixer twice (double-buffered)
+    -- and the distance volume changes every step while walking
     v = math.floor(clamp(v, 0, 100) / 4 + 0.5) * 4
     if v ~= pb.lastVol and pb.snd then
         pcall(function() pb.snd:SetVolume(v) end)
@@ -264,7 +247,7 @@ end
 local function markNet(immediate)
     netDirty = true
     if immediate then netAt = 0 end
-    -- every playback op also notifies the stage so it can persist the state (leave/re-enter resume)
+    -- also tells the stage to persist the state (resume after leaving)
     if ctx and ctx.onState then pcall(ctx.onState) end
 end
 
@@ -311,8 +294,8 @@ local function pbResume()
     pcall(function()
         pb.snd:SetLoop(pb.rep)
         pb.snd:SetSpeed(pb.speed)
-        pb.snd:Play()                                             -- Play resets to 0 —
-        pb.snd:SetTimestamp(math.floor(pb.pausedAt / pb.speed))   -- — so seek AFTER it
+        pb.snd:Play()                                             -- resets to 0
+        pb.snd:SetTimestamp(math.floor(pb.pausedAt / pb.speed))   -- seek after Play
     end)
     pb.paused, pb.playing, pb.grace = false, true, 1.0
 end
@@ -348,10 +331,11 @@ local function pbSetRepeat(b)
     end
 end
 
--- ── screen glow (the GLB's emissivePart part objects; falls back to nothing on box art) ────────
-local glowItem = nil            -- the furniture entry whose screen we last touched (to restore)
+-- ==== screen glow ====
+local glowItem = nil            -- last lit jukebox, restored to idle on change
 local RAINBOW_PART = "Jukebox_Rainbow"   -- tube part, u runs along the loop
 local RAINBOW_SCROLL = 0.5              -- u per second while playing (one lap in 4 s)
+-- the GLB's emissivePart objects; no effect on box art
 local function setScreenGlow(item, r, g, b, du)
     if ctx == nil or item == nil then return end
     local inst = ctx.propInstFor(item)
@@ -366,8 +350,8 @@ local function setScreenGlow(item, r, g, b, du)
     end
 end
 
-local IDLE_GLOW = { 0.12, 0.114, 0.096 }   -- matches the build-time dim glow (emissive 1,0.95,0.8 × 0.12)
-local glowT = 0                 -- the time of the last glow update
+local IDLE_GLOW = { 0.12, 0.114, 0.096 }   -- build-time glow: emissive (1, 0.95, 0.8) x 0.12
+local glowT = 0                 -- time of the last glow update
 local function tickGlow(t)
     glowT = t
     local item = pb.item or (pb.cell and ctx and ctx.jukeboxItemAt(pb.cell.c, pb.cell.r)) or nil
@@ -386,7 +370,8 @@ local function tickGlow(t)
     end
 end
 
--- ── net state (host emits; guests apply) ───────────────────────────────────────────────────────
+-- ==== net state ====
+-- host emits; guests apply and never emit
 function JB.netState()
     if pb.src == nil then return nil end
     local s = pb.src
@@ -398,12 +383,12 @@ end
 
 local function hostEmit()
     if ctx and ctx.isHost() and ctx.isOnline() then
-        -- no source = the explicit STOP state (kind "") so guests silence too, not a skipped send
+        -- no source: send the stop state (kind "") for guests to go silent
         ctx.broadcast(JB.netState() or { kind = "" })
     end
 end
 
--- host: ensure the outgoing song state carries the content-stable md5 (computed once per play)
+-- host: chart md5 on the outgoing song state, once per play
 local function fillSrcMd5(src)
     if src.kind == "song" and (src.md5 == nil or src.md5 == "") and src.node then
         local ok, m = pcall(function() return src.node.ChartMd5 end)
@@ -417,7 +402,7 @@ function JB._guestRestart(entry)
                   audioPath = entry.audioPath, node = entry.node, jacket = entry.jacket }
     local posMs, playing, paused = keep._netPos or 0, keep._netPlaying, keep._netPaused
     pbStart(src, posMs)
-    if paused then pbPause(); pb.pausedAt = posMs end   -- the stub reads position 0; keep the NET pos
+    if paused then pbPause(); pb.pausedAt = posMs end   -- a new sound reads 0: keep the net pos
     if not playing and not paused then pbStop() end
 end
 
@@ -441,8 +426,7 @@ function JB.applyNetState(t)
             local e = resolveRemote(t.md5, t.uid, t.title)
             pb.speed = speed
             if e == nil then
-                -- not in our folders (yet): stay silent but remember the state; the budgeted scan
-                -- may still find it and _guestRestart picks it up
+                -- not in our folders yet: silent, state kept; a scan hit calls _guestRestart
                 disposeSnd()
                 pb.src = { kind = "song", title = t.title, genre = t.genre, md5 = t.md5, uid = t.uid,
                            _netPos = pos, _netPlaying = t.playing == true, _netPaused = t.paused == true }
@@ -452,14 +436,14 @@ function JB.applyNetState(t)
             pbStart({ kind = "song", title = t.title, genre = t.genre, md5 = t.md5, uid = t.uid,
                       audioPath = e.audioPath, node = e.node, jacket = e.jacket }, pos)
         end
-        if t.paused == true then pbPause(); pb.pausedAt = pos end   -- the fresh stub reports pos 0
+        if t.paused == true then pbPause(); pb.pausedAt = pos end   -- a new sound reads 0
         if t.playing ~= true and t.paused ~= true then pbStop() end
         return
     end
     -- same source: apply deltas
     if pb.missing then
         pb.src._netPos, pb.src._netPlaying, pb.src._netPaused = pos, t.playing == true, t.paused == true
-        pb.speed, pb.rep = speed, t.rep == true      -- keep for the eventual _guestRestart
+        pb.speed, pb.rep = speed, t.rep == true      -- for a later _guestRestart
         return
     end
     pbSetSpeed(speed)
@@ -473,13 +457,13 @@ function JB.applyNetState(t)
     elseif t.playing ~= true and t.paused ~= true and (pb.playing or pb.paused) then
         pbStop()
     elseif t.playing == true then
-        -- both playing: treat a large position gap as a host seek
+        -- both playing: a gap over 1.5 s is a host seek
         local here = pbPos()
         if math.abs(here - pos) > 1500 then pbSeek(pos) end
     end
 end
 
--- ── selection / play from the UI ───────────────────────────────────────────────────────────────
+-- ==== play from the UI ====
 local function playEntry(e, item)
     local src
     if e.kind == "bgm" then
@@ -495,7 +479,7 @@ local function playEntry(e, item)
     markNet(true)
 end
 
--- ── UI ─────────────────────────────────────────────────────────────────────────────────────────
+-- ==== UI ====
 local function fmtTime(ms)
     local s = math.max(0, math.floor((ms or 0) / 1000))
     return string.format("%d:%02d", math.floor(s / 60), s % 60)
@@ -512,7 +496,7 @@ local function listItems()
             items[#items + 1] = { text = string.format("%s  (%d)", g.genre, #g.songs), value = g }
         end
     else
-        -- back is the STICKY button above the list (W.backBtn), not a scrolling row
+        -- back is W.backBtn above the list, not a row
         for _, e in ipairs(navGenre.songs) do
             items[#items + 1] = { text = e.title, value = e }
         end
@@ -529,7 +513,7 @@ local function setJacket(path)
     end
 end
 
--- does a list entry correspond to what is playing right now?
+-- list entry matches the playing source
 local function entryMatchesPlaying(v)
     if pb.src == nil or type(v) ~= "table" then return false end
     if v.kind == "bgm" then return pb.src.kind == "bgm" end
@@ -540,8 +524,7 @@ local function entryMatchesPlaying(v)
     return false
 end
 
--- the now-playing row (and its genre folder) lights up gold; marks live on the menu's item tables so
--- no rebuild/rebake is needed when playback changes
+-- mark the playing row and its genre; marks live on the menu items, no rebake on change
 local function refreshListMarks()
     if not (isOpen and W.menu and W.menu.items) then return end
     for _, it in ipairs(W.menu.items) do
@@ -555,7 +538,7 @@ local function refreshListMarks()
     end
 end
 
--- the right pane always shows the PLAYING source (never the hovered row)
+-- right pane shows the playing source, never the hovered row
 local function updateRightPane()
     local e = pb.src
     if W.title then W.title:setText((e and e.title) or tr("nothing_playing")) end
@@ -575,20 +558,19 @@ local function updateRightPane()
     refreshListMarks()
 end
 
-local openItem = nil            -- the jukebox furniture entry the window was opened for
+local openItem = nil            -- jukebox entry the window is open for
 local function onListSelect(_, it)
     local v = it.value
     if tab == "songs" and navGenre == nil and type(v) == "table" and v.songs then
         navGenre = v; JB._rebuildList(); return
     end
-    -- a playable entry: selecting = play (audio player behavior)
+    -- playable entry: select plays it
     selEntry = v
     playEntry(v, openItem or pb.item)
     updateRightPane()
 end
 
--- hover/selection movement only remembers the row (for the play button when idle); the right pane
--- stays bound to what is PLAYING
+-- movement only remembers the row (play button target when idle)
 local function onListChange(_, it)
     local v = it and it.value
     if type(v) == "table" and (v.kind == "song" or v.kind == "bgm") then
@@ -599,7 +581,7 @@ end
 function JB._rebuildList()
     if not isOpen or ui == nil then return end
     if W.menu then
-        ui:remove(W.menu)          -- unregister BEFORE dispose: a disposed widget left in the manager
+        ui:remove(W.menu)          -- unregister before dispose: a disposed widget left in the manager
         W.menu:dispose()           -- would nil-index its baked canvases on the next draw
         W.menu = nil
     end
@@ -643,15 +625,14 @@ local function buildUI(itemName, playerIndex)
     W.tabSongs = ui:button{ x = TAB.x + TAB.w + TAB.gap, y = TAB.y, w = TAB.w, h = TAB.h, text = tr("tab_songs"),
                             accent = (tab == "songs"),
                             onClick = function() switchTab("songs") end }
-    -- sticky back (song level only): fixed at the top of the list column, never scrolls with it
+    -- back button (song level only), fixed above the list
     W.backBtn = ui:button{ x = LIST.x + LIST.w - 96, y = TAB.y, w = 96, h = TAB.h, icon = "back",
                            onClick = function()
                                if navGenre ~= nil then navGenre = nil; JB._rebuildList() end
                            end,
                            sfx = { click = "cancel" } }
     W.backBtn:setVisible(false)
-    -- right pane: NOW-PLAYING title/subtitle + transport (centered labels take their CENTER x;
-    -- both sit clear above the jacket box at JACKET_Y)
+    -- right pane: centered labels take their centre x, above JACKET_Y
     W.title = ui:label{ x = RIGHT_CX, y = PANEL.y + 96, w = RIGHT.w, h = 44, text = tr("nothing_playing"),
                         size = 32, align = "center", maxWidth = RIGHT.w }
     W.subtitle = ui:label{ x = RIGHT_CX, y = PANEL.y + 148, w = RIGHT.w, h = 30, text = "",
@@ -661,8 +642,7 @@ local function buildUI(itemName, playerIndex)
                           align = "center", maxWidth = LIST.w,
                           text = tr("waiting") }
     W.waiting:setVisible(false)
-    -- icon transport (language-agnostic, like a real audio player): ▶/⏸ toggles, ⏹, and 🔁 that
-    -- stays lit (accent) while repeat is on
+    -- icon transport; repeat has accent while on
     local by = PANEL.y + 550
     local bw, bh, bgap = 120, 64, 22
     local bx0 = RIGHT.x + (RIGHT.w - (bw * 3 + bgap * 2)) / 2
@@ -694,7 +674,8 @@ local function buildUI(itemName, playerIndex)
     if W.menu then ui:_setFocusIndex(1) end
 end
 
--- ── seek bar (custom: drawn + dragged by hand so it behaves like a real audio player) ──────────
+-- ==== seek bar ====
+-- drawn and dragged by hand
 local function seekHitTest(mx, my)
     return mx >= SEEK.x - 8 and mx <= SEEK.x + SEEK.w + 8 and my >= SEEK.y - 12 and my <= SEEK.y + SEEK.h + 12
 end
@@ -715,17 +696,16 @@ local function tickSeekBar()
         seekDrag = clamp((mx - SEEK.x) / SEEK.w, 0, 1)
     end
     prevLeftPress = pressing
-    -- while (or the frame) the seek bar owns the mouse, blank it for PopUI so no widget under the
-    -- cursor hovers/presses/drags in parallel (the manager's one-shot escape hatch, cleared each frame)
+    -- while the seek bar owns the mouse, hide it from the UI manager (one-shot flag, cleared each frame)
     if seekDrag ~= nil and ui then ui._suppressMouse = true end
 end
 
--- ── public API ─────────────────────────────────────────────────────────────────────────────────
+-- ==== public API ====
 -- ctx: { theme, isHost(), isOnline(), broadcast(stateTable), playerPos()->px,pz,
 --        cellToWorld(c,r)->x,z, propInstFor(item)->inst|nil, jukeboxItemAt(c,r)->item|nil,
 --        scene()->scene|nil, currentJukeboxItem()->item|nil }
 function JB.init(c) ctx = c end
--- the screen's glow put back at once on rebuilt models (they start at the idle glow)
+-- reapply the glow on rebuilt models (they start idle)
 function JB.refreshGlow() tickGlow(glowT) end
 
 function JB.isOpen() return isOpen end
@@ -743,7 +723,7 @@ end
 
 function JB.songsEnumReady() return songsReady() end
 
--- after an edit-mode commit: playback dies with its jukebox; a moved jukebox re-anchors the audio
+-- after an edit commit: stop if the jukebox is gone, else follow its cell
 function JB.onRoomEdited(roomObj)
     if pb.item == nil then return end
     local present = false
@@ -764,10 +744,8 @@ function JB.close()
     SHARED:GetSharedSound("Cancel"):Play()
 end
 
--- end-of-track probe, defined ONCE (no per-frame closure churn) and polled at 4 Hz. NOTE:
--- LuaSound.Loaded and .IsPlaying are C# PROPERTIES (field-style access) — calling them like
--- methods raises, which an early build did every frame inside this pcall (the "moving is laggy"
--- exception storm).
+-- end-of-track probe, polled at 4 Hz; one function, no per-frame closure
+-- Loaded and IsPlaying are C# properties: calling them like methods raises
 local function endCheck()
     local loaded = pb.snd.Loaded
     if loaded and not pb.snd.IsPlaying then return true end
@@ -781,13 +759,13 @@ function JB.setDuck(on, delay)
     duck.delay = delay or 0
 end
 
--- every-frame upkeep; when the window is open also runs the UI. Returns "closed" the frame the
--- window shuts (Escape/cancel) so Script can flip modes.
+-- every frame; runs the UI while open
+-- "closed" on the frame the window shuts
 local lastTimeTxt = nil
 function JB.update(dt, ts)
     dt = dt or 0
     netNow = netNow + dt
-    -- playback upkeep runs ALWAYS (audio outlives the menu)
+    -- playback upkeep, open or closed
     if pb.grace > 0 then pb.grace = math.max(0, pb.grace - dt) end
     if pb.playing and not pb.paused and pb.snd and pb.grace <= 0 and not pb.rep then
         endAcc = endAcc + dt
@@ -797,7 +775,7 @@ function JB.update(dt, ts)
             if ok and over then pbStop(); markNet(true); if isOpen then updateRightPane() end end
         end
     end
-    -- duck ramp (PC-screen crossfade): ~0.3s full fade after the optional delay
+    -- duck ramp: ~0.3 s full fade after the optional delay
     local fading = duck.cur ~= duck.target
     if duck.delay > 0 then duck.delay = math.max(0, duck.delay - dt)
     elseif fading then
@@ -806,7 +784,7 @@ function JB.update(dt, ts)
         if math.abs(d) <= step then duck.cur = duck.target
         else duck.cur = duck.cur + (d > 0 and step or -step) end
     end
-    -- distance/duck volume at 10 Hz (every frame while a fade is animating so it stays smooth)
+    -- volume at 10 Hz, every frame during a fade
     if pb.snd and (pb.playing or pb.paused) then
         volAcc = volAcc + dt
         if fading or volAcc >= 0.1 then
@@ -827,8 +805,7 @@ function JB.update(dt, ts)
         netDirty = false
     end
     if not isOpen then return nil end
-    -- UI
-    if justOpened then justOpened = false; return nil end   -- eat the opening Enter edge
+    if justOpened then justOpened = false; return nil end   -- skip the opening Enter edge
     tickSeekBar()
     local dur, pos = pbDur(), pbPos()
     if seekDrag ~= nil and dur > 0 then pos = seekDrag * dur end
@@ -838,10 +815,10 @@ function JB.update(dt, ts)
     if ui then r = ui:update(ts) end
     if r == "cancel" then
         if tab == "songs" and navGenre ~= nil then
-            navGenre = nil; JB._rebuildList()          -- Escape backs out of a genre first...
+            navGenre = nil; JB._rebuildList()          -- cancel leaves the genre first
             SHARED:GetSharedSound("Cancel"):Play()
         else
-            JB.close(); return "closed"                -- ...and closes the player from the top level
+            JB.close(); return "closed"                -- top level: close
         end
     end
     return nil
@@ -850,7 +827,7 @@ end
 function JB.draw()
     if not isOpen or ui == nil then return end
     ui:draw()
-    -- jacket (under the title, like song select's preimage)
+    -- jacket
     if jacketTex and jacketTex.Loaded then
         pcall(function()
             local w, h = jacketTex.Width, jacketTex.Height
@@ -862,7 +839,7 @@ function JB.draw()
             end
         end)
     end
-    -- seek bar: track, elapsed fill, knob
+    -- seek bar
     local dur, pos = pbDur(), pbPos()
     local frac = (dur > 0) and clamp(pos / dur, 0, 1) or 0
     if seekDrag ~= nil then frac = seekDrag end
@@ -872,10 +849,9 @@ function JB.draw()
     ui:rect(kx - 5, SEEK.y - 6, 10, SEEK.h + 12, 255, 232, 190, 255)
 end
 
--- ── persistence: the playing song survives leaving/re-entering the room ───────────────────────────
--- Script stores this table with the room in the save's my_room string on every playback op (ctx.onState) and
--- restores it in loadRoom. Songs re-resolve against the CURRENT library by uid/md5/title (the same
--- matcher guests use), so a moved/renamed chart degrades to silence instead of a broken path.
+-- ==== persistence ====
+-- stored with the room in the save's my_room string on every playback op (ctx.onState), restored in loadRoom
+-- songs re-resolve against the current library by uid/md5/title; a moved chart stays silent
 function JB.persistState()
     if pb.src == nil or (not pb.playing and not pb.paused) then return nil end
     local s = pb.src
@@ -891,7 +867,7 @@ function JB._doRestore(t)
         item = ctx.jukeboxItemAt(math.floor(tonumber(t.c) or -1), math.floor(tonumber(t.r) or -1))
         if item == nil and ctx.anyJukeboxItem then item = ctx.anyJukeboxItem() end
     end
-    if item == nil then return end                       -- no jukebox placed anymore: stay quiet
+    if item == nil then return end                       -- no jukebox placed
     pb.item = item; pb.cell = { c = item.c, r = item.r }
     pb.rep = t.rep == true
     pb.speed = clamp(tonumber(t.speed) or 1.0, 0.5, 2.0)
@@ -915,9 +891,9 @@ function JB.restoreState(t)
     JB._doRestore(t)
 end
 
--- stop + release everything (edit mode entry, room leave, stage teardown)
+-- stop and release everything
 function JB.stopAll(keepState)
-    pendingRestore = nil  -- prevent resuming playing after stop
+    pendingRestore = nil  -- no resume after stop
     pbStop()
     if not keepState then pb.src, pb.item, pb.cell = nil, nil, nil end
     if glowItem then setScreenGlow(glowItem, IDLE_GLOW[1], IDLE_GLOW[2], IDLE_GLOW[3]); glowItem = nil end

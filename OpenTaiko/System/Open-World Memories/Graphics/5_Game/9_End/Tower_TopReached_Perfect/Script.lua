@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Tower top-reached (Perfect) clear animation. Group C end-anime (per-player via state.player).
+-- end anime: Tower_TopReached_Perfect (group C, player via state.player)
 
 local x = { 499, 499, 499, 499, 499 }
 local y = { 204, 468, 0, 0, 0 }
@@ -53,7 +53,7 @@ end
 
 function draw(state)
     local player = state.player
-    -- `useExtraAnime` is never set by the host (nil), so not(useExtraAnime) is always true — preserved verbatim.
+    -- useExtraAnime is nil: always true
     if nowFrame[player + 1] <= 20 or not (useExtraAnime) then
         tx[tostring(math.min(nowFrame[player + 1], textureCount)) .. ".png"]:DrawRect(x[player + 1] - 3, y[player + 1], 0, 0, 1426, imageHeight)
     end

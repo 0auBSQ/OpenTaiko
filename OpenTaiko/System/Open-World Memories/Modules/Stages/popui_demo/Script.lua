@@ -1,9 +1,8 @@
 ---@diagnostic disable: undefined-global, lowercase-global, need-check-nil, undefined-field
--- popui_demo — a showcase for the PopUI library (Lib/PopUI). Two pages of widgets + a live theme
--- switcher that re-skins everything, driven by mouse OR keyboard/gamepad. Esc returns to the title.
+-- PopUI library demo stage (Lib/PopUI); Esc returns to the title
 
 local PopUI = require("PopUI")
--- positions, sizes and colours: Config/layout.json
+-- layout: Config/layout.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local TOP, P1L, P2L, LAB = Layout.top_bar, Layout.page1, Layout.page2, Layout.bubble_lab
@@ -14,14 +13,14 @@ local page1, page2 = {}, {}
 local clickCount = 0
 local lastTs = 0
 
--- the library copies a theme with its metatable, so it gets plain tables, not the config's
+-- PopUI copies the metatable: pass plain tables
 local function plain(t)
     local o = {}
     for k, v in pairs(t) do o[k] = v end
     return o
 end
 
--- a few original colour palettes to prove customization (no real product is referenced)
+-- demo palettes
 local THEMES = {
     { name = "Bubblegum", theme = {} },
     { name = "Aqua", theme = { colors = plain(Layout.themes.aqua) } },
@@ -30,7 +29,7 @@ local THEMES = {
 }
 local themeIdx = 1
 
--- ── Bubble Lab: drag the bubble body, its tail handle, or its resize handle, to test geometry live ──────
+-- ==== Bubble Lab ====
 local labBubble, handleCv, sizeCv
 local tailHandle = { x = 0, y = 0 }
 local sizeHandle = { x = 0, y = 0 }   -- bottom-right resize grip
@@ -43,7 +42,7 @@ local function updateSizeHandle()
     sizeHandle.x, sizeHandle.y = labBubble.x + labBubble.w, labBubble.y + labBubble.h
 end
 
-local function bubbleAnchor(b)   -- box-edge anchor + outward normal for the current tail (handle control point)
+local function bubbleAnchor(b)   -- tail anchor on the box edge + outward normal
     local pos = b.tailPos
     if b.tail == "left" then return b.x, b.y + b.h * pos, -1, 0
     elseif b.tail == "right" then return b.x + b.w, b.y + b.h * pos, 1, 0
@@ -55,7 +54,7 @@ local function updateHandle()
     local ax, ay, nx, ny = bubbleAnchor(labBubble)
     tailHandle.x, tailHandle.y = ax + nx * labBubble.tailSize, ay + ny * labBubble.tailSize
 end
-local function tailFromHandle(b, mx, my)   -- which side/pos/size the handle position implies
+local function tailFromHandle(b, mx, my)   -- handle position -> side, pos, size
     local l, rr, t, bo = b.x - mx, mx - (b.x + b.w), b.y - my, my - (b.y + b.h)
     local mv = math.max(l, rr, t, bo)
     local side, pos, size
@@ -79,7 +78,7 @@ local function applyTheme(i)
 end
 
 function onStart()
-    -- optional UI sounds: only used if the files exist (the lib no-ops on a nil/unloaded sound)
+    -- optional sounds (nil is a no-op in PopUI)
     local function sfx(name)
         local ok, s = pcall(function() return SOUND:CreateSFX(name) end)
         return ok and s or nil
@@ -92,7 +91,7 @@ function onStart()
                 toggle = sfx("Decide.ogg"), error = sfx("Cancel.ogg") },
     }
 
-    -- ── top bar (always visible) ─────────────────────────────────────────────────
+    -- ==== Top bar ====
     local B, CHIP = TOP.widgets_button, TOP.theme_chips
     ui:label{ text = "PopUI Showcase", x = TOP.title.x, y = TOP.title.y, size = TOP.title.size }
     ui:button{ text = "Widgets", x = B.x, y = B.y, w = B.w, h = B.h, accent = true, onClick = function() setPage(1) end }
@@ -106,7 +105,7 @@ function onStart()
         cx = cx + CHIP.step
     end
 
-    -- ── page 1: widgets ─────────────────────────────────────────────────────────
+    -- ==== Page 1: widgets ====
     local function P1(w) page1[#page1 + 1] = w; return w end
     local W = P1L.panel
     P1(ui:panel{ x = W.x, y = W.y, w = W.w, h = W.h, title = "Widgets" })
@@ -133,7 +132,7 @@ function onStart()
     P1(ui:textbox{ x = W.x, y = W.y, w = W.w, placeholder = "type here + Enter...", maxLen = 18,
         onSubmit = function(t) greet:setText(t ~= "" and ("Hi, " .. t .. "!") or "Hi there!") end })
 
-    -- ── page 2: chat & menu ─────────────────────────────────────────────────────
+    -- ==== Page 2: chat and menu ====
     local function P2(w) page2[#page2 + 1] = w; return w end
     local COMMENTS = {
         "A gentle opener — great for warming up your wrists!",
@@ -160,7 +159,7 @@ function onStart()
     W = P2L.drag_text
     P2(ui:label{ text = "Drag the bubble, its gold tail pin, or the blue corner grip (resize).",
         x = W.x, y = W.y, size = W.size, maxWidth = W.max_width })
-    -- show off the different bubble shapes
+    -- bubble shapes
     local SHAPES = { "round", "oval", "cloud" }
     local shapeIdx = 1
     W = P2L.shape_button
@@ -170,7 +169,7 @@ function onStart()
         b:setText("Bubble shape: " .. SHAPES[shapeIdx])
     end })
 
-    -- tail-drag handle (a gold pin drawn at the tail apex)
+    -- tail drag pin at the tail apex
     local pin = LAB.tail_pin
     handleCv = CANVAS:CreateCanvas(pin.canvas_size, pin.canvas_size)
     local mid = pin.canvas_size / 2
@@ -179,7 +178,7 @@ function onStart()
         handleCv:FillCircle(mid, mid, ring.radius, c[1], c[2], c[3], c[4])
     end
     handleCv:Upload()
-    -- resize grip (a blue rounded square drawn at the bottom-right corner)
+    -- resize grip at the bottom-right corner
     local grip = LAB.size_grip
     sizeCv = CANVAS:CreateCanvas(grip.canvas_size, grip.canvas_size)
     for _, sq in ipairs(grip.squares) do
@@ -199,15 +198,14 @@ function onDestroy() end
 
 function update(ts)
     local r = ui:update(ts)
-    -- quick page / theme hotkeys — ignored while typing in a textbox (so letters that double as
-    -- hotkeys go into the field instead of triggering a page/theme change → no softlock).
+    -- page / theme hotkeys, off while a textbox captures input
     if not ui:isCapturing() then
         if INPUT:KeyboardPressed("Q") then setPage(1) end
         if INPUT:KeyboardPressed("E") then setPage(2) end
         if INPUT:KeyboardPressed("T") then applyTheme((themeIdx % #THEMES) + 1) end
     end
-    -- Bubble Lab drag (page 2): tail pin (retarget tail), blue corner grip (resize), or body (move).
-    -- Tail/resize re-bake in DRAFT quality during the drag (fast); a crisp full bake happens on release.
+    -- Bubble Lab drag: tail pin, size grip or body
+    -- draft bakes while dragging, full bake on release
     if page == 2 and labBubble and not ui:isCapturing() then
         local mx, my = INPUT:GetMouseXY()
         if INPUT:MousePressed("Left") then
@@ -219,7 +217,7 @@ function update(ts)
             else dragMode = nil end
         end
         if not INPUT:MousePressing("Left") then
-            if dragMode == "tail" or dragMode == "resize" then labBubble:setDraft(false) end  -- crisp final bake
+            if dragMode == "tail" or dragMode == "resize" then labBubble:setDraft(false) end  -- full bake
             dragMode = nil
         end
         if dragMode == "body" then
@@ -227,13 +225,13 @@ function update(ts)
         elseif dragMode == "tail" then
             local side, pos, size = tailFromHandle(labBubble, mx, my)
             if side ~= labBubble.tail or math.abs(pos - labBubble.tailPos) > LAB.rebake_pos_step or math.abs(size - labBubble.tailSize) > LAB.rebake_px_step then
-                labBubble:setTail(side, pos, size, true)   -- draft (responsive)
+                labBubble:setTail(side, pos, size, true)   -- draft
             end
             updateHandle()
         elseif dragMode == "resize" then
             local nw, nh = mx - labBubble.x, my - labBubble.y
             if math.abs(nw - labBubble.w) > LAB.rebake_px_step or math.abs(nh - labBubble.h) > LAB.rebake_px_step then
-                labBubble:setSize(nw, nh, true)   -- draft (responsive)
+                labBubble:setSize(nw, nh, true)   -- draft
             end
             updateHandle(); updateSizeHandle()
         end
@@ -247,7 +245,7 @@ function draw()
         if sizeCv then sizeCv:DrawAtAnchor(math.floor(sizeHandle.x), math.floor(sizeHandle.y), "center") end
         if handleCv then handleCv:DrawAtAnchor(math.floor(tailHandle.x), math.floor(tailHandle.y), "center") end
     end
-    -- footer hint (glyph-atlas draw, theme text colour, correct spacing, bounded glyph cache)
+    -- footer hint
     local F = Layout.footer
     ui:drawText(F.size, "Esc: back    Q/E: pages    T: cycle theme    (page 2: drag bubble / tail pin / corner grip)",
         F.x, F.y, ui.theme.colors.text)

@@ -1,17 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
--- event_timer ROActivity
--- ------------------------------------------------------------------------------------------------------
--- Event Mode's countdown and its hud: a floating stopwatch at the top-left, its hand on the seconds left and
--- the number in the box below (black, red from ten down, a tick on each of those last seconds), and the plays
--- still allowed in a cream pill beside it. The countdown is an engine counter running from the seconds given
--- to zero. Driven by the song select and the dojo:
---   activate(seconds, kind)  seconds = the countdown, 0 or nil for none (only the plays pill shows, in the
---                            stopwatch's corner); kind = "song" or "dan", what the plays-left line counts
---   update()                 every frame; returns "expired" once, on the frame the countdown reaches zero
---   draw()                   every frame, over everything
---   restart(seconds)         a new countdown (the difficulty choice), reached through Call
---   stop()                   no countdown, the plays line stays
---   deactivate()
+-- event_timer ROActivity: Event Mode's countdown and plays-left hud.
 
 local EM = require("EventMode")
 
@@ -75,6 +63,7 @@ function onStart()
     tex.box = TEXTURE:CreateTexture("Textures/Plate.png")
 end
 
+-- new countdown (the difficulty choice), through Call
 function restart(secs)
     secs = tonumber(secs) or 0
     expiredSent = false
@@ -85,10 +74,12 @@ function restart(secs)
     lastSeconds = seconds()
 end
 
+-- no countdown; the plays line stays
 function stop()
     counter = nil
 end
 
+-- secs: the countdown (0 or nil: none, only the plays pill); what = "song" | "dan" (what the plays line counts)
 function activate(secs, what)
     kind = (what == "dan") and "dan" or "song"
     restart(secs)
@@ -98,6 +89,7 @@ function deactivate()
     counter = nil
 end
 
+-- every frame; returns "expired" once, on the frame the countdown reaches zero
 function update()
     bobT = bobT + fps.deltaTime
     if counter == nil then return nil end
@@ -114,7 +106,7 @@ function update()
     return nil
 end
 
--- the stopwatch floats; its hand ticks clockwise from 12 to the seconds left, the number in the box below
+-- hand: clockwise from 12 by the seconds left; number in the box below
 local function drawStopwatch(secs)
     local cx = WATCH.x
     local cy = WATCH.y + BOB.bob_px * math.sin(2 * math.pi * bobT / BOB.bob_s)
@@ -127,6 +119,7 @@ local function drawStopwatch(secs)
     gfontBig:Draw(tostring(secs), cx, by + nudge(gfontBig), secs <= RED_FROM and colRed or colBlack, colNone, 1, 1, WATCH.text_width, "center")
 end
 
+-- every frame, over everything
 function draw()
     local secs = seconds()
     local plays = EM.playsLeft(kind)

@@ -1,4 +1,4 @@
--- Selector carets toward the available neighbours (separate up and down art).
+-- selector carets toward available neighbours (separate up/down art)
 
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
@@ -27,7 +27,7 @@ function C.dispose()
     if _up ~= nil then _up:Dispose() ; _dn:Dispose() ; _up, _dn = nil, nil end
 end
 
--- the scale is about the png centre, so the face centre is placed through its offset from it
+-- scale is about the png centre: place the face centre via its offset
 local function draw_at(tex, m, x, y, s)
     tex:SetScale(s, s)
     tex:DrawAtAnchor(x + (m.w * 0.5 - m.cx) * s, y + (m.h * 0.5 - m.cy) * s, "center")

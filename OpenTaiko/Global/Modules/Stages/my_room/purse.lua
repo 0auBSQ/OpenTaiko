@@ -1,11 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- purse.lua — the coin purse laid over My Room's dialogues and windows: the UI library's coins widget
--- (ui:coins, drawn in the skin's look) in a manager of its own, shown and hidden as a whole. Its sounds
--- are the coins widget's own.
---   local Purse = require("purse")
---   local p = Purse.new{ x = 1560, y = 60, w = 300, h = 66 }
---   p:show(coins)  p:hide()  p:visible()  p:setPrice(n | nil)  p:setBonus(n | nil)
---   p:pay(n)  p:gain(n)  p:add(n)  p:update(dt)  p:draw()  p:drawCoin(x, y, sx, sy, opacity)  p:dispose()
+-- coin purse over My Room's dialogues and windows: ui:coins in its own manager
 
 local UI = require("uilib")
 
@@ -21,7 +15,7 @@ function Purse.new(o)
     return self
 end
 
--- the coins widget, made on first use (the UI library is known by then)
+-- made on first use (UI library known by then)
 function Purse:widget()
     if self.coins == nil then
         self.ui = UI.new{}

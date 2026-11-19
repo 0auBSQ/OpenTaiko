@@ -1,8 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- AllPerfect end animation: a 62-frame (0.png..61.png) per-player clear flourish.
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API. Group C (clear/end anim):
--- update/draw take (timestamp,state)/(state) with the player index in state.player; playEndAnime(player)
--- stays a top-level hook (the host calls it with the index) and re-seeds the per-play frame counters.
+-- end anime: AllPerfect (group C, player via state.player)
 
 local x = { 499, 499, 499, 499, 499 }
 local y = { 204, 468, 0, 0, 0 }
@@ -16,8 +13,7 @@ local textureCount = 61
 
 local tx = {}            -- name -> LuaTexture
 
--- Layout (y offsets + frame height) depends on playerCount, which the old init() read once. onStart runs
--- before state arrives, so we (re)derive it per-play from state.playerCount instead — identical result.
+-- layout from state.playerCount (state arrives after onStart)
 local function refreshLayout(state)
     imageHeight = 324
     if state.playerCount <= 2 then
@@ -42,7 +38,6 @@ function playEndAnime(player)
 end
 
 function onStart()
-    -- Load every frame up front (unconditional — onStart runs before state). The old init() forced the same sync load.
     tx["bg.png"] = TEXTURE:CreateTexture("bg.png")
     for i = 0, textureCount do
         tx[tostring(i) .. ".png"] = TEXTURE:CreateTexture(tostring(i) .. ".png")
@@ -60,8 +55,7 @@ end
 function draw(state)
     local player = state.player
 
-    -- useExtraAnime was never set by the host in the old API (a nil global), so not(useExtraAnime) is always
-    -- true here → the frame is always drawn. Preserved verbatim as a quirk.
+    -- useExtraAnime is nil: always true
     if nowFrame[player + 1] <= 20 or not (useExtraAnime) then
         --func:DrawGraph(x[player + 1] - 3, y[player + 1], tostring(math.min(nowFrame[player + 1], textureCount))..".png")
         tx[tostring(math.min(nowFrame[player + 1], textureCount)) .. ".png"]:DrawRect(x[player + 1] - 3, y[player + 1], 0, 0, 1426, imageHeight)

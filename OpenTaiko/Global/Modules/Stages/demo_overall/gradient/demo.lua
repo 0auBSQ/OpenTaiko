@@ -1,10 +1,8 @@
 ---@diagnostic disable: undefined-global, undefined-field
--- demo_overall/gradient/demo.lua
--- Shows "05v2 - Aoi" with different gradient map palettes.
--- P toggles between preview (centered) and render (top-left, scale 0.5).
--- Return / Escape exits.
+-- gradient map demo on "05v2 - Aoi"
+-- P: preview (centred) or render (top-left, scale 0.5); Return/Escape exits
 
-local NavInput = require("Input.NavInput").p[0]   -- the confirm/cancel keys only, no drums
+local NavInput = require("Input.NavInput").p[0]   -- confirm/cancel keys only, no drums
 
 local D = {}
 
@@ -44,10 +42,10 @@ local PALETTES = {
     },
 }
 
--- 5 columns evenly spaced: 1920 / 6 = 320
+-- 5 columns, 1920 / 6 = 320 apart
 local POSITIONS = { 320, 640, 960, 1280, 1600 }
 
--- ── Lifecycle ─────────────────────────────────────────────────────────────────
+-- ==== lifecycle ====
 
 function D.onStart()
     textFont  = TEXT:Create(24)
@@ -90,7 +88,7 @@ function D.onDestroy()
     end
 end
 
--- ── Update ────────────────────────────────────────────────────────────────────
+-- ==== update ====
 
 function D.update(ts)
     if NavInput.decide() or NavInput.cancel() then
@@ -109,7 +107,7 @@ function D.update(ts)
     end
 end
 
--- ── Draw ──────────────────────────────────────────────────────────────────────
+-- ==== draw ====
 
 function D.draw()
     if missing or textFont == nil then

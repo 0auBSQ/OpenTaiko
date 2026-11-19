@@ -1,2 +1,2 @@
--- moved to Global/Modules/Lib/Saves/SavePicker.lua
+-- alias of Global/Modules/Lib/Saves/SavePicker.lua
 return require("Saves.SavePicker")

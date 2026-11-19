@@ -1,4 +1,4 @@
--- The pagoda's save data (Global/Modules/Lib/Pagoda/Progress.lua) plus OWM's own parts.
+-- pagoda save data (Global/Modules/Lib/Pagoda/Progress.lua) plus OWM's parts
 
 local I18N = require("i18n")
 local Progress = require("Pagoda.Progress")
@@ -24,8 +24,7 @@ function M.set_item_spent(id, spent)
     if (sf:GetGlobalTrigger(key) == true) ~= (spent == true) then sf:SetGlobalTrigger(key, spent == true) end
 end
 
--- the bestiary (bestiary.lua): how often the player beat each monster and how often it beat the player;
--- key = its art stem (encounter/monsters.lua)
+-- bestiary (bestiary.lua): wins and losses per monster; key = art stem (encounter/monsters.lua)
 function M.monster_beaten(key)
     return math.max(0, math.floor(GetSaveFile(0):GetGlobalCounter("pagoda_beaten_" .. key)))
 end
@@ -34,7 +33,7 @@ function M.monster_wins(key)
     return math.max(0, math.floor(GetSaveFile(0):GetGlobalCounter("pagoda_monster_wins_" .. key)))
 end
 
--- a challenge floor's result for its monsters: beaten (the player cleared it) or a win of theirs
+-- beaten: the player cleared the floor; else a monster win
 function M.count_monster_result(key, beaten)
     local name = (beaten and "pagoda_beaten_" or "pagoda_monster_wins_") .. key
     local sf = GetSaveFile(0)

@@ -1,8 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global
--- myroom: My Room is the global stage my_room now (Global/Modules/Stages/my_room). This stage only
--- forwards there, for the callers that still open "myroom" (the engine's legacy "heya" exit among them).
--- A caller that named no way back returns to the title through My Room's door. Removed at the official
--- release, with my_room's reading of the rooms this stage kept in its folder (myroom/data.mdb).
+-- myroom: forwards to the global stage my_room (callers of "myroom", the engine's "heya" exit)
+-- no way back given: title through My Room's door; to remove at release with myroom/data.mdb
 
 local BACK_KEY = "my_room_return"
 

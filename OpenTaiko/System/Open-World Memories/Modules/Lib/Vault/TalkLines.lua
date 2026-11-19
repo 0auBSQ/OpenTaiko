@@ -1,8 +1,8 @@
--- Vault.TalkLines: the small talks' lines in order (lang/<code>/talk.json holds their text by key).
--- node = { g = { group, ... } }, group = { t = title, alts = { items, ... } } (one alternative is picked)
+-- vault small talk lines in order (text by key in lang/<code>/talk.json)
+-- node = { g = { group, ... } }, group = { t = title, alts = { items, ... } } (one alt picked)
 -- item: { "l", who (C Mr.Caspian, G Gris, U Gris unnamed, O Mr.Caspian unnamed, N narration), sprite, key [, "fade"] } | { "c", options } | { "a", action }
--- option: { k = label key, items = the lines it leads to (or alts = { items, ... }, one picked),
---   again = asks the same choice again without it }
+-- option: { k = label key, items (or alts = { items, ... }, one picked),
+--   again = re-ask the same choice without it }
 return {
     OFFER = { g = {
         { t = "One of", alts = {

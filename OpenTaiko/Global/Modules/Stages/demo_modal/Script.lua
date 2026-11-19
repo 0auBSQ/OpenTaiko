@@ -1,12 +1,8 @@
 ---@diagnostic disable: undefined-global, lowercase-global, need-check-nil, undefined-field
--- demo_modal — a debug stage that plays the reward and unlock modals on demand: the coin piggy
--- bank with three amounts, and the chest reveal plus item card for each of the seven rarities of
--- every item type (character, puchichara, nameplate, song, and a custom item). Each button picks the first installed
--- item of that rarity, or the first item at all when none matches, and passes the rarity name to
--- the modal so the chest and colours always follow the button; nothing is written to the save
--- file. Esc returns to My Room.
+-- demo_modal: debug stage for the reward and unlock modals
+-- each button picks the first item of that rarity (else the first item); nothing is saved
 
--- drawn in 1920x1080: a skin of another resolution rescales it
+-- drawn in 1920x1080, rescaled for other skin resolutions
 STAGES:SetResolution(1920, 1080)
 
 local PopUI = require("UI.Pick")()
@@ -53,8 +49,7 @@ local function collectSongs()
     return out
 end
 
--- the song list only exists once the enumeration is done; afterSongEnum picks it up when the stage
--- was entered before that
+-- the song list exists only after enumeration; afterSongEnum picks it up
 local function songsReady() return IsSongsEnumDone == nil or IsSongsEnumDone() end
 local function refreshSongs()
     if songsReady() then lists.song = collectSongs() end
@@ -93,7 +88,7 @@ local function showItem(kind, rarityName)
         info = pick(lists.plate, rarityName)
         if info == nil then return setStatus("No nameplate found") end
     elseif kind == 5 then
-        -- a custom item: one of My Room's shop pictures, shared while the room was open
+        -- custom item: a My Room shop picture, shared while the room was open
         modal:Activate(1, RARITY_TO_INT[rarityName], 5, "Sofa", rarityName, "myroom_thumb_sofa", "Custom item")
         return setStatus("Custom / " .. rarityName)
     else

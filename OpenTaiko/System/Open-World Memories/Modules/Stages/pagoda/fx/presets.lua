@@ -1,4 +1,4 @@
--- Named emitter presets for fx/emitter.lua, from Config/animation.json (fx.presets).
+-- emitter presets from Config/animation.json (fx.presets)
 
 local Config = require("Core.Config")
 local Animation = Config.load("Config/animation.json")
@@ -31,7 +31,7 @@ local TEX = {
 
 local presets = Config.plain(Animation.fx.presets)
 
--- a wave given in rad/s gets the Hz field the emitter reads
+-- rad/s -> Hz field for the emitter
 local function hz(w, field)
     if w ~= nil and w.rad_per_s ~= nil then w[field], w.rad_per_s = w.rad_per_s / TAU, nil end
 end

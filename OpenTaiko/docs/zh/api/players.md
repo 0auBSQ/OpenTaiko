@@ -462,7 +462,7 @@ PUCHICHARALIST 和 sf:GetPuchichara 返回这些句柄。列表拥有这些纹�
 皮肤的分辨率、主题设置、皮肤范围的本地化字符串，以及主题设置的定义。
 
 <div class="callout warn">
-皮肤在 ThemeSettings.json 中声明主题设置，并把其值存储在旁边的 ThemeSettings.db3 中。getter 始终以字符串返回设置值；缺失的设置返回其声明的默认值，没有声明时返回空字符串。ForPlayer 方法把超出范围的玩家按 0 或 4 处理。定义索引从 0 起。
+皮肤在 ThemeSettings.json 中声明主题设置，并把其值存储在皮肤文件夹之外的 `Global/ApplicationData/SkinSettings_<skin folder>.db3` 中，因此更新皮肤后这些值仍会保留。getter 始终以字符串返回设置值；缺失的设置返回其声明的默认值，没有声明时返回空字符串。ForPlayer 方法把超出范围的玩家按 0 或 4 处理。定义索引从 0 起。
 </div>
 
 | 方法 | 说明 |

@@ -1,23 +1,16 @@
 ---@diagnostic disable: undefined-global, undefined-field
--- Default transition: a black cross-fade with a "Loading..." screen + progress bar.
--- A skin can ship its own Modules/Transitions/<name>/ and select it with Exit(target, name, "<name>").
---
--- The engine (CStageTransition) calls:
---   fadeOut(t)            t 0->1, cover the outgoing stage  (1 = fully covered)
---   loading(progress, t)  draw the loading screen while the new stage activates + streams its assets
---                         (only called once a load exceeds ~0.5s, so quick switches don't blink)
---   fadeIn(t)             t 0->1, reveal the new stage       (1 = fully revealed)
--- Authored for a 1920x1080 skin; the black cover is over-scaled so it fills any resolution.
--- Positions, sizes and colours: Config/layout.json.
+-- default transition: black cross-fade, loading screen with a progress bar
+-- skins add Modules/Transitions/<name>/, picked with Exit(target, name, "<name>")
+-- layout: Config/layout.json
 
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Bar = Layout.bar
 
-local pixel = nil          -- 1x1 white texture, tinted/scaled for solid rectangles
-local loadingText = nil    -- "Loading..." (created once; never per-frame to avoid the text-texture leak)
+local pixel = nil          -- 1x1 white, tinted and scaled for rects
+local loadingText = nil    -- created once: per-frame GetText leaks
 
--- Solid black full-screen cover at the given opacity (0..1).
+-- alpha 0..1; over-scaled to fill any resolution
 local function cover(alpha)
 	if pixel == nil then return end
 	pixel:SetColor(0, 0, 0)
@@ -26,7 +19,6 @@ local function cover(alpha)
 	pixel:Draw(0, 0)
 end
 
--- A solid colored rectangle (re-using the shared pixel texture).
 local function rect(x, y, w, h, color, a)
 	if pixel == nil or w <= 0 or h <= 0 then return end
 	pixel:SetColor(color[1], color[2], color[3])
@@ -35,34 +27,35 @@ local function rect(x, y, w, h, color, a)
 	pixel:Draw(x, y)
 end
 
+-- engine (CStageTransition): t 0..1, 1 = covered
 function fadeOut(t)
 	cover(t)
 end
 
+-- t 0..1, 1 = revealed
 function fadeIn(t)
 	cover(1.0 - t)
 end
 
+-- called only once a load passes ~0.5s
 function loading(progress, elapsed)
 	cover(1.0)
 
-	-- "Loading..." text, centered above the bar.
 	if loadingText ~= nil then
 		loadingText:DrawAtAnchor(Layout.loading_text.x, Layout.loading_text.y, "center")
 	end
 
-	-- Progress bar (track + fill). The fill advances as the new stage's assets stream in, so the player
-	-- always sees motion instead of a frozen frame.
+	-- fill follows the new stage's asset streaming
 	local barW = Bar.width
 	local barH = Bar.height
 	local x = Bar.center_x - barW / 2
 	local y = Bar.y
 	local b = Bar.border
-	rect(x - b, y - b, barW + 2 * b, barH + 2 * b, Bar.border_color, Bar.border_opacity)   -- subtle border
-	rect(x, y, barW, barH, Bar.track_color, Bar.track_opacity)                             -- track
+	rect(x - b, y - b, barW + 2 * b, barH + 2 * b, Bar.border_color, Bar.border_opacity)
+	rect(x, y, barW, barH, Bar.track_color, Bar.track_opacity)
 	local p = progress
 	if p < 0 then p = 0 elseif p > 1 then p = 1 end
-	rect(x, y, barW * p, barH, Bar.fill_color, Bar.fill_opacity)                           -- fill
+	rect(x, y, barW * p, barH, Bar.fill_color, Bar.fill_opacity)
 end
 
 function onStart()

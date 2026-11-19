@@ -1,4 +1,4 @@
--- The floor's monsters on the band, placed by place.lua; the notes land on the lead's aim point.
+-- floor monsters on the band (placed by place.lua); notes land on the lead's aim point
 
 local assets   = require("encounter/assets")
 local monsters = require("encounter/monsters")
@@ -24,7 +24,7 @@ local function members(ctx)
     return monsters.forLevel(ctx.level, ctx.monster)
 end
 
--- ctx = { level, monster }; returns the texture keys of the floor's monsters
+-- ctx = { level, monster } -> floor monster texture keys
 function G.keys(ctx)
     local list, seen = {}, {}
     local function add(k)
@@ -45,7 +45,7 @@ function G.keys(ctx)
     return list
 end
 
--- call once the textures are open; aim points and idle lifts come from the manifest's foes
+-- after textures open; aim and lift from manifest foes
 function G.new(ctx)
     local foes = assets.data("foes") or {}
     local group = members(ctx)
@@ -70,8 +70,8 @@ function G:update(dt, state)
     for i = 2, #b do b[i]:update(dt) end
 end
 
--- back to front; r, g, b: band filter; eyes: 0..1 glint; shadow: contact shadows of the feet
--- that stand in the band
+-- back to front; r, g, b: band filter; eyes: 0..1 glint
+-- shadow: foot contact shadows in the band
 function G:draw(alpha, r, g, b, eyes, shadow)
     local list = self.bodies
     if shadow then
@@ -82,13 +82,13 @@ function G:draw(alpha, r, g, b, eyes, shadow)
     for i = #list, 1, -1 do list[i]:draw(alpha, r, g, b, eyes, 0, 0) end
 end
 
--- redraws at opacity a times each member's flash share; the caller sets the white gradient map
+-- opacity a * flash share; caller sets the white gradient map
 function G:drawFlash(a)
     local list = self.bodies
     for i = #list, 1, -1 do list[i]:draw(a * (list[i].m.flash or 1), 1, 1, 1, 0, 0, 0) end
 end
 
--- where the notes land: the lead's aim point this frame, kept in the rows in view
+-- note landing point: lead aim point, clamped to rows in view
 function G:centre()
     local lead = self.bodies[1]
     if lead == nil then return View.foe_x, View.foe_y end

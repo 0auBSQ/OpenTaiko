@@ -1,7 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global, need-check-nil
--- Color.lua — colour space conversions and adjustments shared between stages.
--- Every channel is a 0..1 float (hue included: 0..1 around the wheel); the engine bridge helpers at the
--- bottom convert from / to COLOR objects (bytes 0..255).
+-- Core.Color: colour space conversions and adjustments
+-- channels are 0..1 floats (hue too); the engine bridge converts COLOR bytes 0..255
 
 local Color = {}
 
@@ -10,7 +9,7 @@ local function clamp01(v)
 end
 Color.clamp01 = clamp01
 
--- ─── HSV ─────────────────────────────────────────────────────────────────────
+-- ==== HSV ====
 
 function Color.rgbToHsv(r, g, b)
     local mx, mn = math.max(r, g, b), math.min(r, g, b)
@@ -33,7 +32,7 @@ function Color.hsvToRgb(h, s, v)
     elseif i == 3 then return p, q, v elseif i == 4 then return t, p, v else return v, p, q end
 end
 
--- ─── HSL ─────────────────────────────────────────────────────────────────────
+-- ==== HSL ====
 
 function Color.rgbToHsl(r, g, b)
     local mx, mn = math.max(r, g, b), math.min(r, g, b)
@@ -63,15 +62,14 @@ function Color.hslToRgb(h, s, l)
     return hueToRgb(p, q, h + 1 / 3), hueToRgb(p, q, h), hueToRgb(p, q, h - 1 / 3)
 end
 
--- ─── Adjustments ─────────────────────────────────────────────────────────────
+-- ==== adjustments ====
 
--- linear blend from (r,g,b) to (r2,g2,b2); t = 0 keeps the first, 1 gives the second
+-- linear blend; t = 0 keeps the first colour, 1 gives the second
 function Color.mix(r, g, b, r2, g2, b2, t)
     return r + (r2 - r) * t, g + (g2 - g) * t, b + (b2 - b) * t
 end
 
--- HSL lightness moved toward 1 by `amount` of the remaining range (0 = unchanged, 1 = white); hue and
--- saturation kept, so the colour stays coloured while it brightens
+-- HSL lightness toward 1 by `amount` of the remaining range (1 = white); hue and saturation kept
 function Color.lighten(r, g, b, amount)
     local h, s, l = Color.rgbToHsl(r, g, b)
     return Color.hslToRgb(h, s, clamp01(l + (1 - l) * amount))
@@ -105,7 +103,7 @@ function Color.ramp(from, to, n)
     return out
 end
 
--- ─── Engine bridge (COLOR objects: byte channels) ────────────────────────────
+-- ==== engine bridge ====
 
 -- r, g, b, a floats from a COLOR object
 function Color.fromEngine(col)

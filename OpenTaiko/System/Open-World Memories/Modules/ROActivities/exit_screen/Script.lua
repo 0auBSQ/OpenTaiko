@@ -1,24 +1,17 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
 -- exit_screen ROActivity
--- ------------------------------------------------------------------------------------------------------
--- The goodbye picture: three turning circles around the logo, a speech bubble in the player's language
--- and one of the characters, picked at random each time. It only draws; whoever shows it decides how
--- long it stays and what follows (the game closing, or the title screen after an Event Mode session).
---   activate()    loads the pictures, picks the character and the bubble; the circles start from rest
---   update()      every frame
---   draw()        every frame
---   deactivate()  frees the pictures: nothing is held while the screen is not shown
+-- goodbye screen; draws only (the caller decides timing and what follows)
 
--- positions: Config/layout.json; the circles' turning speeds: Config/animation.json
+-- positions: Config/layout.json; circle speeds: Config/animation.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
 
 local CENTER_X, CENTER_Y = Layout.center.x, Layout.center.y
--- where each character stands (its picture's top left), one entry per Textures/Character/<n>.png
+-- character top-left, one per Textures/Character/<n>.png
 local CHARACTERS = Layout.characters
 local CIRCLE_SPEEDS = Animation.circle_speeds_deg_per_s
--- the languages that have a bubble; the others get the English one
+-- languages with a bubble (others: English)
 local SPEECH = { en = true, ja = true, fr = true, es = true, ru = true, zh = true }
 
 local background, effect, logo
@@ -40,10 +33,11 @@ end
 
 function onStart() end
 
+-- loads the pictures, picks a character and bubble; circles start from rest
 function activate()
     freeAll()
     timer = 0
-    -- loaded at once: the screen is short, and shows whole from its first frame
+    -- sync load: short screen, whole from the first frame
     background = TEXTURE:CreateTextureSync("Textures/Background.png")
     effect = TEXTURE:CreateTextureSync("Textures/Effect.png")
     logo = TEXTURE:CreateTextureSync("Textures/Logo.png")
@@ -56,6 +50,7 @@ function activate()
     speech = TEXTURE:CreateTextureSync("Textures/Speech/" .. lang .. ".png")
 end
 
+-- frees the pictures (nothing held while hidden)
 function deactivate()
     freeAll()
 end

@@ -1,13 +1,13 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local, inject-field, param-type-mismatch
-local Daily = require("Shop.Daily")       -- the day's stock, its saved state and the purchases
-local Catalog = require("Shop.Catalog")   -- the items
+local Daily = require("Shop.Daily")       -- daily stock and purchases
+local Catalog = require("Shop.Catalog")
 local PopUI = require("PopUI")
 local SavePicker = require("SavePicker")
 local NavInput = require("NavInput")
 local Magazine = require("magazine")   -- the catalog page
-local Keeper = require("keeper")       -- the shopkeeper and its speech bubble
+local Keeper = require("keeper")       -- shopkeeper and speech bubble
 local Easing = require("Easing")
--- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+-- layout: Config/layout.json; timings: Config/animation.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
@@ -15,56 +15,54 @@ local Talk = Animation.talk
 
 local save = nil
 local shop = nil               -- Shop.Daily for the chosen save
-local playerIndex = 0          -- which of the 5 local saves' shop we're browsing (chosen on entry)
-local confirmUI = nil          -- PopUI modal for the buy-confirm / reroll-confirm / player-select
+local playerIndex = 0          -- save index 0-4, chosen on entry
+local confirmUI = nil          -- PopUI modal (buy / reroll confirm, player select)
 
 local EXIT_TRANSITION = "newspaper_back"
 
--- Assets
+-- assets
 local sounds = {}
 local textures = {}
 local icons = {}
-local sharedIcon = {}   -- iconIdx -> true for shared (My Room furniture) textures we must NOT dispose
-local coinTex = nil     -- the "Coin" shared texture (registered by _boot), never disposed here
+local sharedIcon = {}   -- iconIdx -> true: shared My Room texture, not disposed here
+local coinTex = nil     -- shared "Coin" texture (from _boot), not disposed here
 
 local text = nil               -- whole-string font, for the nameplate titles
 local fonts = {}               -- glyph fonts: mast, big, mid, small, talk
 local cols = {}
 
--- Menu navigation
 local selected = "back"        -- the listing in focus: "big", "n1".."n6", "reroll" or "back"
 
--- Animation clock (seconds, advanced in draw so the page keeps moving while the stage fades out)
+-- clock, sec; advanced in draw so the page moves during the fade-out
 local now = 0
 local lastDt = 0
-local coinFrom, coinT = nil, nil      -- the coin counter rolling down after a purchase
-local browseT, browseSaid = 0, true   -- when the focus last moved, and whether the keeper commented on it
+local coinFrom, coinT = nil, nil      -- coin counter roll after a purchase
+local browseT, browseSaid = 0, true   -- last focus move time; keeper commented
 local lastBrowseLine = -100
 local idleT, idleNext = 0, Talk.first_idle_s
-local revealAt = 0                    -- when the way-in transition stops hiding the page (on this clock)
+local revealAt = 0                    -- page reveal time (this clock)
 local pendingLine = nil               -- a keeper line held until then
 
--- Confirm screen
+-- confirm screen
 local toBuyItem = nil
 local toBuyItemIcon = nil
-local toBuySlot = 0   -- 1‥6 = normal slot, SLOT_BIG = big item
+local toBuySlot = 0   -- 1..6 normal slot, SLOT_BIG big item
 local confirmIdx = 0
 
--- Current Screen
 local currentScreen = "shop"
 
 local SLOT_BIG = Daily.SLOT_BIG
 
--- ── Helpers ───────────────────────────────────────────────────────────────────
+-- ==== Helpers ====
 
--- the skin's Locales/<code>/ through THEME; the English text stays in the code as the fallback
+-- skin Locales/<code>/ string; fallback when missing
 local function tr(key, fallback)
 	local ok, s = pcall(function() return THEME:GetSkinString(key) end)
 	if ok and type(s) == "string" and s ~= "" and s:sub(1, 1) ~= "[" then return s end
 	return fallback
 end
 
--- a localized format string, falling back to the English one if the translation does not fit the values
+-- localized format string; English fallback if it does not fit the values
 local function trf(key, fallback, ...)
 	local ok, s = pcall(string.format, tr(key, fallback), ...)
 	if ok then return s end
@@ -78,11 +76,10 @@ local function entryHasicon(entry)
 	return true
 end
 
--- ── Icons ─────────────────────────────────────────────────────────────────────
+-- ==== Icons ====
 
--- an item's picture: My Room furniture shows the shared thumbnail My Room baked at onStart
--- (myroom_thumb_<id>, never disposed here; none before My Room was opened), other items
--- Textures/Icons/<code>.png
+-- My Room furniture: shared myroom_thumb_<id> (not disposed here, none before My Room opened)
+-- other items: Textures/Icons/<code>.png
 local function iconFor(item)
 	if not entryHasicon(item) then return nil, nil end
 	local fid = Catalog.furnitureId(item.Code)
@@ -102,7 +99,7 @@ local function freeIcons()
 	sharedIcon = {}
 end
 
--- the pictures of the listed items: the featured one in icon 5, the entries in 1..6
+-- featured item in icon 5, entries in 1..6
 local function refreshIcons()
 	freeIcons()
 	if shop.big then icons[5], sharedIcon[5] = iconFor(shop.big) end
@@ -111,7 +108,7 @@ local function refreshIcons()
 	end
 end
 
--- ── Draw ──────────────────────────────────────────────────────────────────────
+-- ==== Draw ====
 
 local DESK_X, DESK_Y = Layout.desk.x, Layout.desk.y
 local PLATE_X, PLATE_Y = Layout.nameplate.x, Layout.nameplate.y
@@ -126,7 +123,7 @@ local function rerollPrice()
 	return shop and shop:rerollPrice() or Daily.rerollPrice(0)
 end
 
--- draw a flat texture centered on (cx,cy), scaled to fit a boxSize square (the confirm preview)
+-- centred on (cx, cy), fit to a boxSize square (confirm preview)
 local function drawSharedIcon(tex, cx, cy, boxSize)
 	local w, h = tex.Width, tex.Height
 	if not w or w <= 0 or not h or h <= 0 then return end
@@ -143,7 +140,7 @@ local function frameDelta()
 	return d
 end
 
--- the coins on the till, rolling down to the new amount after a purchase
+-- till coins, rolling down after a purchase
 local function shownCoins()
 	local coins = save.Coins
 	if coinFrom == nil then return coins end
@@ -175,7 +172,7 @@ function draw()
 	Keeper.drawBody(now)
 	drawDesk()
 
-	-- the page; before a save is chosen only its masthead shows
+	-- masthead only until a save is chosen
 	view.ready = save ~= nil
 	view.big, view.normals, view.icons, view.selected = shop and shop.big, shop and shop.normals or {}, icons, selected
 	Magazine.draw(now, lastDt, view)
@@ -184,14 +181,13 @@ function draw()
 		local dim = Layout.dim_color
 		confirmUI:rect(0, 0, 1920, 1080, dim[1], dim[2], dim[3], dim[4])   -- dim the shop behind the modal
 		confirmUI:draw()
-		-- the item preview sits on top of the panel body (in the gap above the price line), scaled to a
-		-- fixed box so large icons (vault-key PNGs) don't spill over the panel text
+		-- preview above the price line, fit to a box so large icons stay off the text
 		if currentScreen == "confirm" and toBuyItem then
 			local px, py = CONFIRM_CX, Buy.preview_y
 			if toBuyItem.Type == "nameplate" then
 				NAMEPLATE:DrawNameplateTitleById(toBuyItem.RefInt, px + PlateOffset.x, py + PlateOffset.y, 255, text)
 			elseif toBuyItemIcon ~= nil then
-				drawSharedIcon(toBuyItemIcon, px, py, Buy.preview_size)   -- scales any texture down to the box
+				drawSharedIcon(toBuyItemIcon, px, py, Buy.preview_size)
 			end
 		end
 	end
@@ -199,7 +195,7 @@ function draw()
 	Keeper.drawBubble(now)
 end
 
--- ── Navigation ────────────────────────────────────────────────────────────────
+-- ==== Navigation ====
 
 local function slotOf(id)
 	if id == "big" then return SLOT_BIG end
@@ -218,8 +214,7 @@ local function itemOf(id)
 	return shop.normals[k], icons[k], k
 end
 
--- lay the page out for the current items (featured + 4 entries, or 6 entries); the focus stays where it was
--- when that listing still exists
+-- featured + 4 entries, or 6 entries; focus kept while its listing exists
 local function relayout(reshuffle)
 	local ids = Magazine.layout(shop.big ~= nil, reshuffle)
 	for _, id in ipairs(ids) do
@@ -228,7 +223,7 @@ local function relayout(reshuffle)
 	selected = "back"
 end
 
--- reading order: the featured item, the entries row by row, the coupon, the back note (wrapping around)
+-- reading order, wrapping: featured, entries by row, coupon, back note
 local function moveSelection(direction)
 	local ids = Magazine.ids()
 	local idx = #ids
@@ -245,7 +240,7 @@ local function focus(id)
 	browseT, browseSaid = now, false
 end
 
--- what the keeper says about the listing in focus once it stays there a moment
+-- keeper line for a listing focused a moment
 local function browseEvent(id)
 	if id == "reroll" then return "coupon" end
 	if id == "back" then return "backtab" end
@@ -259,7 +254,7 @@ local function closeConfirm()
 	if confirmUI then confirmUI:disposeWidgets(); confirmUI = nil end
 end
 
--- refresh the live "Total: N" line + gray the Buy button when the selected quantity is unaffordable
+-- "Total: N" line; Buy disabled when unaffordable
 local function updateConfirmTotals()
 	if not (confirmUI and confirmUI._item) then return end
 	local qty = (confirmUI._qty and tonumber(confirmUI._qty:value())) or 1
@@ -270,12 +265,9 @@ end
 
 local SHOP_SFX  -- set in activate() once sounds exist
 
--- the modals in the magazine's paper and ink
 local MAG_THEME = Config.plain(Confirm.theme)
 
--- confirm dialog: centred panel with the item name (title), a scaled preview (drawn in draw()), price,
--- an optional quantity stepper, total, and VERTICALLY-stacked Buy/Cancel (matches the up/down nav). Buy
--- is focused by default. BTN_W/CONFIRM_CX keep the two buttons aligned under the panel centre.
+-- Buy / Cancel stacked vertically (up/down nav); Buy focused by default
 local function buildConfirmUI(item, slot)
 	if confirmUI then confirmUI:disposeWidgets() end
 	confirmUI = PopUI.new{ theme = MAG_THEME, sfx = SHOP_SFX, navPlayer = playerIndex + 1 }
@@ -316,7 +308,7 @@ local function buildConfirmUI(item, slot)
 	confirmUI._item, confirmUI._qty = item, qtyChooser
 	confirmUI._totalLabel, confirmUI._buyBtn = totalLabel, buyBtn
 	updateConfirmTotals()
-	confirmUI:_setFocusIndex(qtyChooser and 2 or 1)   -- default focus/highlight on Buy
+	confirmUI:_setFocusIndex(qtyChooser and 2 or 1)   -- default focus: Buy
 end
 
 local function buildRefreshUI()
@@ -344,12 +336,12 @@ local function buildRefreshUI()
 	confirmUI:button{ text = tr("SHOP_UI_CANCEL", "Cancel"), x = bx, y = Reroll.cancel_y, w = BTN_W, h = BTN_H,
 		onClick = function() closeConfirm(); Keeper.say("cancel", now) end,
 		sfx = { click = "cancel" } }
-	confirmUI:_setFocusIndex(1)   -- default focus/highlight on Reroll
+	confirmUI:_setFocusIndex(1)   -- default focus: Reroll
 end
 
--- ── Update ────────────────────────────────────────────────────────────────────
+-- ==== Update ====
 
--- a keeper line said as soon as the page shows
+-- keeper line once the page shows
 local function sayOnReveal(event)
 	if now >= revealAt then
 		Keeper.say(event, now)
@@ -366,7 +358,7 @@ local function leave()
 	return Exit("title", nil, EXIT_TRANSITION)
 end
 
--- Decide on a listing: the back note leaves, the coupon asks for a reroll, an item asks to be bought
+-- back note leaves; coupon or item opens its confirm
 local function decideOn(id)
 	idleT = 0
 	if id == "back" then return leave() end
@@ -398,7 +390,7 @@ end
 function update(ts)
 	if currentScreen == "confirm" or currentScreen == "refresh" then
 		if confirmUI then
-			if confirmUI:update(ts) == "cancel" then      -- Escape: PopUI reports it; the buttons handle the rest
+			if confirmUI:update(ts) == "cancel" then      -- Escape, reported by PopUI
 				sounds.Cancel:Play(); closeConfirm()
 				Keeper.say("cancel", now)
 			end
@@ -425,7 +417,7 @@ function update(ts)
 			return decideOn(selected)
 		end
 
-		-- the mouse: hovering a listing focuses it, a click decides on it
+		-- mouse: hover focuses, click decides
 		local mx, my = INPUT:GetMouseXY()
 		local mdx, mdy = INPUT:GetMouseDelta()
 		if INPUT:IsMouseInside() then
@@ -443,7 +435,7 @@ function update(ts)
 			end
 		end
 
-		-- the keeper comments on the listing in focus, and fills a long silence
+		-- keeper comment on the focused listing or after a silence
 		if not browseSaid and now - browseT > Talk.browse_after_s then
 			browseSaid = true
 			local ev = browseEvent(selected)
@@ -461,9 +453,9 @@ function update(ts)
 	end
 end
 
--- ── Player select + per-save shop state ────────────────────────────────────────
+-- ==== Player select ====
 
--- commit to a save file: each save has its OWN daily shop (Shop.Daily)
+-- each save has its own daily shop (Shop.Daily)
 local function enterShopFor(index)
 	playerIndex = index
 	shop = Daily.open(index)
@@ -479,12 +471,12 @@ local function enterShopFor(index)
 	idleT, idleNext = 0, Talk.first_idle_s
 end
 
--- the save chosen on the title; opened without one, the first save
+-- save chosen on the title, else the first
 local function openShopForChosenSave()
 	enterShopFor(SavePicker.take() or SavePicker.first())
 end
 
--- ── Lifecycle ─────────────────────────────────────────────────────────────────
+-- ==== Lifecycle ====
 
 local TEXTURE_NAMES = {
 	"Bg", "Desk", "Bubble", "Till",
@@ -511,7 +503,7 @@ function activate()
 	coinFrom, coinT = nil, nil
 	browseT, browseSaid, lastBrowseLine = 0, true, -100
 	idleT, idleNext = 0, Talk.first_idle_s
-	-- the newspaper way in keeps the page hidden this long into its fade-in; the entrance waits for it
+	-- newspaper transition hides the page this long into its fade-in
 	revealAt = tonumber(SHARED:GetSharedString("newspaper_cover")) or 0
 	SHARED:SetSharedString("newspaper_cover", "")
 	pendingLine = nil

@@ -1,4 +1,4 @@
--- Player 1's hits as the monster takes them: on a flying note's landing, or at once when none flies.
+-- player 1 hits at the monster: on note landing, or at once when none flies
 
 local H = {}
 H.__index = H
@@ -14,7 +14,7 @@ function H.new(state)
     }, H)
 end
 
--- fn(big, judge) for each hit that reached the monster since the last poll
+-- fn(big, judge) per hit since the last poll
 function H:poll(state, fn)
     local count, ring, q = state.hitCount[P], state.hitRing, self.queue
     for n = math.max(self.seen, count - ring), count - 1 do

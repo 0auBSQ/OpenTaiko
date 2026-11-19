@@ -1,13 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- OWM3d/physics.lua — real 3D collision for the world, wrapping the engine's PhysicsWorld
--- (collide-and-slide characters vs a grid-accelerated triangle soup + raycasts).
---
--- What this layer adds over raw PHYSICS:
---   • NAMED collider groups ("inn", "door_3", …) mapped to the engine's integer groups, so triggers
---     can toggle interiors/doors solid or passable without rebuilding the soup.
---   • A build session: maps/models emit their collision between beginStatic()/endStatic().
---   • Character controllers with game feel (accel/decel toward a wish direction, jump, coyote time).
---   • cameraClearance/raycast helpers for the camera boom and interaction probes.
+-- OWM3d/physics.lua: named collider groups and characters over PhysicsWorld
 
 local Phys = {}
 Phys.__index = Phys
@@ -26,7 +18,7 @@ end
 
 function Phys:hasGeometry() return self._triCount > 0 end
 
--- ── collider groups ───────────────────────────────────────────────────────────────────────────────
+-- ==== Collider groups ====
 function Phys:groupId(name)
     if name == nil or name == "default" then return 0 end
     local id = self.groups[name]
@@ -42,7 +34,8 @@ function Phys:setGroupSolid(name, solid)
     self.w:SetGroupEnabled(self:groupId(name), solid and true or false)
 end
 
--- ── static build session ──────────────────────────────────────────────────────────────────────────
+-- ==== Static build session ====
+-- emit collision between beginStatic() and endStatic()
 function Phys:beginStatic()
     self.w:BeginStatic()
     self.groups = { default = 0 }
@@ -61,7 +54,7 @@ function Phys:addQuad(ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz)
     self.w:AddQuad(ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz)
     self._triCount = self._triCount + 2
 end
--- an axis-aligned box (6 faces) — the cheap collider for walls/furniture/doors
+-- axis-aligned box (6 faces)
 function Phys:addBox(x0, y0, z0, x1, y1, z1)
     self:addQuad(x0,y0,z0, x1,y0,z0, x1,y1,z0, x0,y1,z0)   -- -z
     self:addQuad(x1,y0,z1, x0,y0,z1, x0,y1,z1, x1,y1,z1)   -- +z
@@ -70,7 +63,7 @@ function Phys:addBox(x0, y0, z0, x1, y1, z1)
     self:addQuad(x0,y1,z0, x1,y1,z0, x1,y1,z1, x0,y1,z1)   -- top
     self:addQuad(x0,y0,z1, x1,y0,z1, x1,y0,z0, x0,y0,z0)   -- bottom
 end
--- bake a model's triangles (bind pose, placed) into the soup via the additive GltfModel.BuildCollider
+-- model triangles (bind pose, placed) via GltfModel.BuildCollider
 function Phys:addModelMesh(model, x, y, z, yaw, scale)
     if model == nil or model.BuildCollider == nil then return end
     local mc = self.w:NewMeshCollider()
@@ -90,8 +83,7 @@ function Phys:endStatic()
     self._pendingSolid = {}
 end
 
--- release the static soup NOW (map unload): unlike beginStatic's Clear, this also trims the C#
--- backing storage so a big terrain's tri list doesn't ride along into the next map
+-- map unload: unlike beginStatic, also trims the C# backing storage
 function Phys:clearGeometry()
     if self.w.ClearStatic then self.w:ClearStatic()
     else self.w:BeginStatic(); self.w:EndStatic() end
@@ -101,7 +93,7 @@ function Phys:clearGeometry()
     self._pendingSolid = {}
 end
 
--- ── queries ───────────────────────────────────────────────────────────────────────────────────────
+-- ==== Queries ====
 -- returns hit distance (or nil) + normal
 function Phys:raycast(ox, oy, oz, dx, dy, dz, maxDist)
     local hit, dist, nx, ny, nz = self.w:Raycast(ox, oy, oz, dx, dy, dz, maxDist)
@@ -115,13 +107,12 @@ function Phys:groundY(x, startY, z, reach)
     return gy
 end
 
--- ── character controller ──────────────────────────────────────────────────────────────────────────
+-- ==== Character controller ====
 local Char = {}
 Char.__index = Char
 
--- opts: radius (collider), x/y/z spawn, accel, decel, jumpVel, coyote,
---       layer ("player"|"npc"|number), dynamicCollide (default false: characters pass through
---       each other — NPCs must never body-block the player)
+-- opts: radius, x/y/z spawn, accel, decel, jumpVel, coyote,
+--       layer ("player" | "npc" | number), dynamicCollide (default false: characters pass through each other)
 local LAYERS = { player = 1, npc = 2 }
 function Phys:newCharacter(opts)
     opts = opts or {}
@@ -130,12 +121,11 @@ function Phys:newCharacter(opts)
     c.body = self.w:NewCharacter(opts.radius or 0.32)
     c.body:SetGravityEnabled(true)
     if c.body.SetSmoothContacts then
-        -- v2 character solver: gathered deepest-contact resolution (no seam catching), passive-touch
-        -- wall filtering + wall normals, and a floor-gated step-down snap that replaces legacy Snap
+        -- smooth-contact solver has its own step-down snap
         c.body:SetSmoothContacts(true)
         c.body:SetSnap(false)
     else
-        c.body:SetSnap(true)                      -- old engine: glue to descending slopes
+        c.body:SetSnap(true)                      -- fallback: snap to descending slopes
     end
     if c.body.SetCollisionMask then
         local layer = LAYERS[opts.layer] or (type(opts.layer) == "number" and opts.layer) or 1
@@ -163,8 +153,8 @@ function Char:vel() return self.body:GetVx(), self.body:GetVy(), self.body:GetVz
 function Char:onFloor() return self.body:IsOnFloor() end
 function Char:hitWall() return self.body:HitWall() end
 
--- steer toward a wish direction at targetSpeed; jump when wantJump and grounded (with coyote time).
--- The world's Step() does the actual integration + collide-and-slide.
+-- steer toward the wish direction; jump when grounded (coyote time)
+-- world Step() integrates and collides
 function Char:move(dt, wishX, wishZ, targetSpeed, wantJump)
     local b = self.body
     local vx, vy, vz = b:GetVx(), b:GetVy(), b:GetVz()
@@ -173,14 +163,8 @@ function Char:move(dt, wishX, wishZ, targetSpeed, wantJump)
     if mag > 1e-6 then
         txv, tzv = wishX / mag * targetSpeed, wishZ / mag * targetSpeed
     end
-    -- steering along touched walls: project the WISH velocity onto the wall tangent, so input
-    -- aimed diagonally into a wall glides along it instead of grinding to a sticky stop. Wall
-    -- normals are REMEMBERED for a beat — reacting only on HitWall frames made the projection
-    -- engage on alternating frames (penetrate/eject) and the sprite vibrated against walls.
-    -- TWO recent distinct normals are kept: at a convex CORNER the solver alternates between the
-    -- two faces, and projecting against only the latest one re-aimed the wish into the other face
-    -- every other frame — the corner-jitter (and the animation flicker it caused). Projecting off
-    -- both cancels the wish cleanly and the character just stops/slides, no vibration.
+    -- project the wish velocity off recent wall normals (slide along walls)
+    -- two normals kept 0.25 s: a single one jitters at convex corners
     if b.GetWallNx and b:HitWall() then
         local nx, nz = b:GetWallNx(), b:GetWallNz()
         if self._wallT and self._wallT > 0 and (nx * (self._wnx or 0) + nz * (self._wnz or 0)) < 0.9 then
@@ -204,7 +188,7 @@ function Char:move(dt, wishX, wishZ, targetSpeed, wantJump)
     local k = 1 - math.exp(-((mag > 1e-6) and self.accel or self.decel) * dt)
     vx = vx + (txv - vx) * k
     vz = vz + (tzv - vz) * k
-    -- coyote-time jump: a few frames of grace after walking off an edge
+    -- coyote time: jump grace after leaving an edge
     if b:IsOnFloor() then self._coyoteT = self.coyote else self._coyoteT = math.max(0, self._coyoteT - dt) end
     if wantJump and self._coyoteT > 0 then
         vy = self.jumpVel
@@ -220,10 +204,10 @@ function Char:remove()
     end
 end
 
--- ── camera boom helper ────────────────────────────────────────────────────────────────────────────
--- (camera.lua drives this via raycast(); kept here for stages that want a one-call probe)
+-- ==== Camera boom helper ====
+-- one-call probe for stages (camera.lua uses raycast)
 function Phys:cameraClearance(ox, oy, oz, dx, dy, dz, maxDist, pad)
-    pad = pad or 0.32                            -- matches the character radius (0.35 over-recoiled)
+    pad = pad or 0.32                            -- = character radius
     local best = maxDist
     local d = self:raycast(ox, oy, oz, dx, dy, dz, maxDist + pad)
     if d and d - pad < best then best = d - pad end

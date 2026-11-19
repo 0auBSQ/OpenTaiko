@@ -1,53 +1,45 @@
--- demo_overall/dan_plate/demo.lua
--- Visual test for the "danplate" ROActivity.
--- Displays a grid of dan plates covering all frame indices (0–8), three tint
--- colours, and title strings of varying lengths.
--- Escape / Cancel → exit back to My Room.
+-- danplate ROActivity test: frames 0-8, tints and title lengths
 
 local D = {}
 
 local danplate = nil
 local font     = nil
 
--- ─────────────────────────────────────────────────────────────────────────────
--- Test cases
--- Each entry: { tick, r, g, b, title }
--- ─────────────────────────────────────────────────────────────────────────────
+-- ==== test cases ====
+-- each entry: { tick, r, g, b, title }
 local CASES = {
-    -- Standard frames 0–5 (white tint)
+    -- frames 0-5
     { tick = 0, r = 255, g = 255, b = 255, title = "新人" },
     { tick = 1, r = 255, g = 255, b = 255, title = "五級" },
     { tick = 2, r = 255, g = 255, b = 255, title = "四段" },
     { tick = 3, r = 255, g = 255, b = 255, title = "七段" },
     { tick = 4, r = 255, g = 255, b = 255, title = "玄人" },
     { tick = 5, r = 255, g = 255, b = 255, title = "達人" },
-    -- Wrap: danTick 6–8 wraps modulo 6 → frames 0–2
+    -- danTick 6-8 wraps modulo 6 (frames 0-2)
     { tick = 6, r = 255, g = 128, b =   0, title = "初段" },
     { tick = 7, r =   0, g = 200, b = 255, title = "十段" },
     { tick = 8, r = 220, g =   0, b = 220, title = "外伝" },
-    -- Colour variations on frame 5
-    { tick = 5, r = 255, g =  80, b =  80, title = "達人" },  -- red tint
-    { tick = 5, r =  80, g = 200, b =  80, title = "達人" },  -- green tint
-    { tick = 5, r =  80, g = 120, b = 255, title = "達人" },  -- blue tint
-    -- Long titles: 3, 4, 5, 6 characters (height-capped)
+    -- tint variations on frame 5
+    { tick = 5, r = 255, g =  80, b =  80, title = "達人" },
+    { tick = 5, r =  80, g = 200, b =  80, title = "達人" },
+    { tick = 5, r =  80, g = 120, b = 255, title = "達人" },
+    -- long titles (height-capped)
     { tick = 2, r = 255, g = 255, b = 255, title = "全王者" },
     { tick = 3, r = 255, g = 255, b = 255, title = "超人達人" },
     { tick = 4, r = 255, g = 200, b =  50, title = "天下無双" },
     { tick = 0, r = 200, g = 200, b = 200, title = "真の達人" },
 }
 
--- Layout: 2 rows × 8 columns
+-- layout: 2 rows x 8 columns
 local COLS     = 8
 local CELL_W   = 240
 local CELL_H   = 560
 local ORIGIN_X = 100
 local ORIGIN_Y = 220
 
--- ─────────────────────────────────────────────────────────────────────────────
--- Lifecycle
--- ─────────────────────────────────────────────────────────────────────────────
+-- ==== lifecycle ====
 
--- no style argument, like the other demos' fonts: NLua fails on a styled call after an unstyled one
+-- no style argument: NLua fails on a styled call after an unstyled one
 function D.onStart()
     font = TEXT:Create(20)
 end
@@ -64,9 +56,7 @@ function D.deactivate()
     danplate = nil
 end
 
--- ─────────────────────────────────────────────────────────────────────────────
--- update / draw
--- ─────────────────────────────────────────────────────────────────────────────
+-- ==== update / draw ====
 
 function D.update(_ts)
     if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
@@ -75,7 +65,6 @@ function D.update(_ts)
 end
 
 function D.draw()
-    -- Title bar
     local titleTex = font:GetText("danplate ROActivity test  |  Esc = exit", false, 1600)
     titleTex:DrawAtAnchor(40, 20, "topleft")
 
@@ -85,7 +74,6 @@ function D.draw()
         return
     end
 
-    -- Draw grid
     for i, c in ipairs(CASES) do
         local col = (i - 1) % COLS
         local row = math.floor((i - 1) / COLS)

@@ -1,4 +1,4 @@
--- Floor 15 band: the checkpoint room, dark until 15 is beaten.
+-- floor 15 band: checkpoint room (dark until 15 is beaten)
 
 local assets   = require("encounter/assets")
 local reveal   = require("encounter/reveal")
@@ -61,7 +61,7 @@ function M.open(ctx)
     _box[1], _box[2], _box[3], _box[4] = hole.x, hole.y, hole.w, hole.h
     if _clear then
         _sky = Sky.new(SKY_HOUR, skybox.rule(ctx.highest) >= 1)
-        -- interior_dust spread over the arches rather than the window light
+        -- interior_dust over the arches
         _dust = emit("interior_dust", (assets.get("fx_mote")), {
             area = { hole.x + DUST_INSET, hole.y, hole.w - 2 * DUST_INSET, hole.h }, max = Look.interior_dust.max,
             rate = Move.interior_dust.rate_per_s,

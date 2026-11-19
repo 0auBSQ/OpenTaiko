@@ -1,15 +1,8 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- workbench.lua — the Workbench furniture: recolours the floorings, wall paints and furniture in the room's stock.
---
--- An item with a palette (`colors` in data/floordeco.json, data/wallpaint.json or data/furniture.json) is kept
--- per colour, as "<id>:<rrggbb>" (Room.colorKey); the plain id is its default colour, which is always one of
--- the choices. The window shows every such stack in stock as a tile (itemgrid.lua); beside it, the picked
--- stack large, its colours and how many to recolour. Picking a tile lays out only that side (the grid stays
--- where it is). After a recolour the grid takes the new stock in place and the same stack, colour and amount
--- stay picked, so the next one is a single press. Items without a palette never show here; a placed item is
--- put back in the stock first (edit mode).
+-- workbench furniture: recolours palette items in stock
+-- one stack per colour: "<id>:<rrggbb>" (Room.colorKey); the plain id is the default colour
 
-local UI = require("uilib")           -- the skin's UI library (UI.Pick), picked on first use
+local UI = require("uilib")
 local I18N = require("Locale.i18n")
 local Room = require("room")
 local A = require("assets")
@@ -20,12 +13,12 @@ local M = {}
 
 M.ID = "workbench"
 
--- ── layout ─────────────────────────────────────────────────────────────────────────────────────
-local PANEL = { w = 1560, h = 880 }  -- its height is made to fit the grid
+-- ==== layout ====
+local PANEL = { w = 1560, h = 880 }  -- h refit to the grid in build
 local GRID_COLS, GRID_ROWS = 5, 3
 local COL_GAP = 48
-local CHIP, CHIP_GAP, CHIPS_PER_ROW = 84, 14, 5    -- the colour buttons
-local VALUE_W = 90                  -- room right of the amount slider for its number
+local CHIP, CHIP_GAP, CHIPS_PER_ROW = 84, 14, 5    -- colour chips
+local VALUE_W = 90                  -- right of the slider, for its number
 local BTN_H = 76
 local GREY = { 120, 126, 150, 255 }
 
@@ -33,17 +26,17 @@ local ctx = nil                     -- Script.lua closures (see M.init)
 local ui, W, grid = nil, {}, nil
 local open, justOpened = false, false
 local stacks = {}                   -- { key, id, hex, n } for every recolourable stack in stock
-local sel = 1                       -- the picked stack
-local target = nil                  -- the colour picked: a hex, or "" for the default colour
+local sel = 1                       -- picked stack index
+local target = nil                  -- picked hex, "" for the default
 local amount = 1
-local pending = nil                 -- "side" (a stack was picked) / "done" (recoloured): laid out after the UI update
-local area = nil                    -- the side column's box { x, y, w, bottom } (laid out again on a pick)
-local side = {}                     -- the side column's widgets
+local pending = nil                 -- "side" (stack picked) | "done" (recoloured), handled after ui:update
+local area = nil                    -- side column box { x, y, w, bottom }
+local side = {}                     -- side column widgets
 
 local function tr(id) return T:tr(id) end
 local function playSfx(name) pcall(function() SHARED:GetSharedSound(name):Play() end) end
 
--- every recolourable stack in stock, by name then colour (the default colour first)
+-- recolourable stacks in stock, sorted by name then key (default colour first)
 local function collect()
     local room = ctx.room()
     local out = {}
@@ -61,7 +54,7 @@ local function collect()
     return out
 end
 
--- the colours an item can take: "" (the default) then its palette
+-- "" (default) then the palette
 local function colorsOf(id)
     local out = { "" }
     for _, hex in ipairs(Room.decoColors(id)) do out[#out + 1] = hex end
@@ -72,7 +65,7 @@ local function rgbOf(id, hex)
     return A.swatchFor(Room.colorKey(id, hex)) or Room.defaultColor(id) or { 200, 200, 200 }
 end
 
--- the amount line and whether the button can recolour, after any change of colour or amount
+-- clamp amount and enable the button, after a colour or amount change
 local function refreshAmount()
     local s = stacks[sel]
     if s == nil then return end
@@ -80,8 +73,7 @@ local function refreshAmount()
     if W.go then W.go:setEnabled(amount > 0 and target ~= nil and target ~= s.hex) end
 end
 
--- the side column for the picked stack (under its drawn picture and name): its colours (its own can't be
--- picked), how many, the button
+-- side column for the picked stack; its own colour chip is disabled
 local function buildSide()
     for _, w in ipairs(side) do ui:remove(w); pcall(function() w:dispose() end) end
     side, W.chips, W.slider, W.go = {}, {}, nil, nil
@@ -102,7 +94,7 @@ local function buildSide()
         if hex == s.hex then b:setEnabled(false) end
         W.chips[#W.chips + 1] = { b = b, hex = hex }
     end
-    -- how many (the slider's number sits right of its track, inside the column), then the button
+    -- slider (number right of its track), then the button
     local rows = math.ceil(#W.chips / CHIPS_PER_ROW)
     local ay = ry + 44 + rows * (CHIP + CHIP_GAP) + 24
     add(ui:label{ x = rx, y = ay, text = tr("amount"), size = 22, color = GREY })
@@ -114,7 +106,7 @@ local function buildSide()
     refreshAmount()
 end
 
--- the first colour the picked stack can take (Decide on the grid lands there)
+-- first enabled chip (Decide on the grid focuses it)
 local function firstChip()
     for _, c in ipairs(W.chips or {}) do if c.b.enabled then return c.b end end
     return nil
@@ -127,7 +119,7 @@ local function build()
     ui = UI.new{ theme = ctx.theme, navPlayer = ctx.playerIndex() + 1, nav = "spatial" }
     local x, y = (1920 - PANEL.w) / 2, (1080 - PANEL.h) / 2
     local panel = ui:panel{ x = x, y = y, w = PANEL.w, h = PANEL.h, pad = 30, title = Room.displayName(M.ID) }
-    -- the panel takes exactly GRID_ROWS rows of tiles under its title (the title's height is the font's)
+    -- panel fits GRID_ROWS rows of tiles under its title (title height comes from the font)
     local cx, cy, cw, ch = panel:content()
     local need = Grid.height(GRID_ROWS)
     if ch ~= need then
@@ -156,7 +148,7 @@ local function build()
     buildSide()
 end
 
--- recolour `amount` of the picked stack into the picked colour
+-- recolour `amount` of the picked stack to target
 function M.apply()
     local s = stacks[sel]
     if s == nil or target == nil or target == s.hex or amount < 1 then return end
@@ -165,11 +157,11 @@ function M.apply()
     local n = math.min(amount, have)
     if n < 1 then return end
     local to = Room.colorKey(s.id, target)
-    room.inventory[s.key] = have - n        -- kept at 0 when used up, as taking an item from stock does
+    room.inventory[s.key] = have - n        -- kept at 0, as taking from stock does
     room.inventory[to] = (room.inventory[to] or 0) + n
     playSfx("Decide")
     if ctx.onChanged then ctx.onChanged() end
-    -- the same stack stays picked while some is left (else the one now in its place), with the same colour
+    -- keep the same stack and colour picked while some is left
     local again = collect()
     local keep = nil
     for i, st in ipairs(again) do if st.key == s.key then keep = i end end
@@ -178,8 +170,8 @@ function M.apply()
     pending = "done"
 end
 
--- ── public API ─────────────────────────────────────────────────────────────────────────────────
--- ctx: { theme, playerIndex()->n, room()->Room, onChanged() (the stock changed) }
+-- ==== public API ====
+-- ctx: { theme, playerIndex() -> n, room() -> Room, onChanged() on a stock change }
 function M.init(c) ctx = c end
 
 function M.isOpen() return open end
@@ -200,7 +192,7 @@ function M.close(silent)
     if not silent then playSfx("Cancel") end
 end
 
--- returns "closed" the frame the window shuts
+-- "closed" on the frame the window shuts
 function M.update(dt, ts)
     if not open then return nil end
     if justOpened then justOpened = false; return nil end
@@ -210,18 +202,18 @@ function M.update(dt, ts)
         local why = pending
         pending = nil
         if why == "side" then
-            -- only the side column: the grid and the focus on it stay as they are
+            -- side column only; grid and focus stay
             local f = ui:focused()
             buildSide()
             if f then ui:focus(f) end
         else
-            -- the grid takes the new stock where it is; the focus stays on the button just pressed
+            -- grid updates in place; focus moves to the new button
             local again = collect()
             if grid and #again > 0 then
                 stacks = again
                 grid:setItems(stacks, sel)
                 buildSide()
-                ui:clearPrevFocus()             -- the old button is gone: the new one takes the focus quietly
+                ui:clearPrevFocus()             -- old button is gone
                 if W.go then ui:focus(W.go) end
             else
                 build()
@@ -237,7 +229,7 @@ function M.draw()
     ui:draw()
     local s = stacks[sel]
     if grid and area and s then grid:drawDetail(s.key, s.n, area.x, area.y, area.w, tr("stock")) end
-    -- a white ring around the picked colour
+    -- ring around the target chip
     for _, c in ipairs(W.chips or {}) do
         if c.hex == target then
             local b = c.b

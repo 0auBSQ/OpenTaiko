@@ -1,17 +1,8 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global
--- matrix.lua — the Placeholder Matrix furniture (My Room).
---
--- The spot: a floor emitter whose cubes float and turn (the GLB's own animation, started once the
--- room is built). Its glow part and a point light in its colour (green, or the workbench's) breathe together.
---
--- The window: Enter on it lists the debug scenes of data/placeholder_matrix.json. A scene with no
--- price is open from the start; a priced one shows its price and is unlocked once per save with
--- coins (a global trigger), asked over the list with the purse on the window's bottom edge.
--- Choosing an open scene hands its stage back to Script, which leaves the room for it. A scene whose
--- stage is not installed (Global/Modules/Stages/<stage>, beside My Room) is left out of the list.
--- A scene's name and description come from matrix.json's scenes.<stage>, the data file's as a fallback.
+-- placeholder_matrix furniture: animated emitter with a glow and a light
+-- its window lists the debug scenes of data/placeholder_matrix.json
 
-local UI = require("uilib")           -- the skin's UI library (UI.Pick), picked on first use
+local UI = require("uilib")
 local Purse = require("purse")
 local I18N = require("Locale.i18n")
 local T = I18N.texts("matrix")     -- lang/<code>/matrix.json
@@ -20,26 +11,26 @@ local M = {}
 
 M.ID = "placeholder_matrix"
 
--- ── layout ─────────────────────────────────────────────────────────────────────────────────────
+-- ==== layout ====
 local PANEL = { w = 1240, h = 760 }
 local LIST_W, ROW = 620, 64
 local DESC_SIZE, DESC_LINE, DESC_CHARS = 26, 40, 34
 local ASK = { w = 820, h = 390, row = 76 }
 local PRICE_SIZE = 30
 local COIN_GAP = 30         -- from the coin's centre to its number
-local TEXT_PAD = 25         -- a text box's side padding (the ink starts this far right of a left label's x)
-local ROW_PRICE = { size = 26, coin = 0.7, gap = 26, w = 140 }   -- a locked row's price, and the room it keeps
+local TEXT_PAD = 25         -- label side padding: ink starts this far right of x
+local ROW_PRICE = { size = 26, coin = 0.7, gap = 26, w = 140 }   -- locked row price; w: room it keeps
 local INK, OUTLINE = { 52, 58, 92 }, { 255, 255, 255, 220 }
--- the purse sits on the list window's bottom edge, at its right end
+-- purse: on the list panel's bottom edge, right end
 local PURSE_W, PURSE_H = 300, 66
 local PURSE_X = (1920 + PANEL.w) / 2 - 40 - PURSE_W
 local PURSE_Y = (1080 + PANEL.h) / 2 - 30
 
--- ── the glow ───────────────────────────────────────────────────────────────────────────────────
+-- ==== glow ====
 local GLOW = { 0.3, 1.0, 0.5 }
 local GLOW_SCALE = 0.9
 local LIGHT_INTENSITY, LIGHT_RANGE = 0.6, 3.5
--- the cubes glow in their own colours; the green ones take the matrix's colour when it has one, this much dimmer
+-- part emissive; TAKES_COLOR parts use the matrix hex, scaled by the value
 local PART_GLOW = {
     MatrixCubeGrey  = { 0.85, 0.92, 0.88 },
     MatrixCubeGreen = { 0.15, 0.85, 0.40 },
@@ -48,14 +39,14 @@ local TAKES_COLOR = { MatrixCubeGreen = 0.85 }
 
 local ctx = nil             -- Script.lua closures (see M.init)
 local clock = 0
-local lightDefs = {}        -- furniture entry → the live light def handed to daynight
+local lightDefs = {}        -- furniture entry -> live light def (daynight)
 
--- the beam: a see-through sprite standing on the pad, turned to the camera
+-- beam: billboard sprite on the pad
 local BEAM_SPRITE = 3990
 local BEAM_W, BEAM_H, BEAM_FOOT = 1.2, 1.35, 0.13
 local BEAM_ALPHA = 200
 local beams = {}            -- scene objects, one per placed matrix
-local beamScene = nil       -- the scene they and the sprite belong to
+local beamScene = nil       -- scene of the beams and the sprite
 
 local function tr(id) return T:tr(id) end
 
@@ -70,8 +61,8 @@ end
 
 local function pulse() return 0.75 + 0.25 * math.sin(clock * 2.4) end
 
--- the colour a placed matrix projects: its own (the workbench's, kept as `hex`) or the default green. Its glow
--- disc and green cubes show it too (furniture.json colorParts, applied when the model is built)
+-- the placed matrix's hex (workbench colour), else GLOW
+-- glow disc and green cubes follow it (furniture.json colorParts, at model build)
 local function colorOf(it)
     local hex = it and it.hex
     if hex == nil then return GLOW end
@@ -98,14 +89,13 @@ local function addBeam(scene, inst, col)
     scene:ObjBegin(obj)
     scene:ObjAddSprite(obj, inst.x, inst.y + BEAM_FOOT * s, inst.z, BEAM_W * s, BEAM_H * s, BEAM_SPRITE, 1, 0)
     scene:ObjSetPass(obj, 1, 1, 1, 1, BEAM_ALPHA)
-    -- the beam: its matrix's colour, paler
+    -- tint: matrix colour, 43% toward white
     local function pale(v) return math.min(1, v + (1 - v) * 0.43) end
     scene:ObjSetTint(obj, pale(col[1]), pale(col[2]), pale(col[3]))
     beams[#beams + 1] = obj
 end
 
--- a glow part's current emissive (the glow disc in the matrix's colour, the cubes in theirs), for the focus
--- highlight to keep as its base
+-- current emissive of a glow part; the focus highlight keeps it as its base
 function M.glowNow(material, it)
     local c = PART_GLOW[material]
     local k = TAKES_COLOR[material]
@@ -118,8 +108,8 @@ function M.glowNow(material, it)
     return { c[1] * p, c[2] * p, c[3] * p }
 end
 
--- the light of every placed matrix; Script.rebuild appends them to the room's lights. Their
--- animations start here too, since this runs right after the room's models are built.
+-- lights of every placed matrix, added to the room's lights by Script.rebuild
+-- also starts the animations: this runs right after the models are built
 function M.lights(world)
     local out = {}
     lightDefs = {}
@@ -141,7 +131,7 @@ function M.lights(world)
     return out
 end
 
--- every frame: the glow part, the beam and the light breathe
+-- each frame: apply pulse()
 function M.tick(dt)
     if ctx == nil then return end
     clock = clock + dt
@@ -163,10 +153,10 @@ function M.tick(dt)
     end
 end
 
--- ── the scenes ─────────────────────────────────────────────────────────────────────────────────
+-- ==== scenes ====
 local scenes = nil
 
--- a debug scene's stage is a global stage beside My Room
+-- a scene's stage is a global stage beside My Room; missing ones are left out
 function M.stageExists(stage)
     if type(stage) ~= "string" or stage == "" or stage:find("[/\\%.]") then return false end
     local ok, res = pcall(function() return TEXTURE:Exists("../" .. stage .. "/Script.lua") end)
@@ -194,8 +184,10 @@ local function loadScenes()
     return scenes
 end
 
+-- save global trigger, set by a coin unlock
 local function unlockTrigger(s) return ".matrix_unlocked_" .. s.stage end
 
+-- lang matrix.json scenes.<stage>, else the data file
 local function nameOf(s) return T:get("scenes", s.stage, "name") or s.name end
 local function descOf(s) return T:get("scenes", s.stage, "desc") or s.desc end
 
@@ -217,13 +209,13 @@ local function wrap(text, n)
     return lines
 end
 
--- ── window state ───────────────────────────────────────────────────────────────────────────────
+-- ==== window state ====
 local ui, askUi, W = nil, nil, {}
 local purse = nil           -- purse.lua, made on the first open
 local mode = nil            -- nil | "list" | "ask"
 local selected = 1
-local askDone = false       -- the unlock prompt closes after its update
-local chosen = nil          -- the stage to open, handed to Script once
+local askDone = false       -- close the unlock prompt after its update
+local chosen = nil          -- stage to open, returned once
 local justOpened = false
 
 local function playSfx(name) pcall(function() SHARED:GetSharedSound(name):Play() end) end
@@ -246,7 +238,7 @@ local function showDesc(s)
     end
 end
 
--- a price: the coin icon left of its number (a label), centred on the number's glyph line
+-- coin icon left of a price label, centred on its line
 local function drawPrice(label)
     if label == nil or not label.visible or purse == nil then return end
     local inkX = label.x + TEXT_PAD
@@ -255,7 +247,7 @@ local function drawPrice(label)
     purse:drawCoin(math.floor(inkX - COIN_GAP), math.floor(label.y + lineH * 0.5), 0.8, 0.8)
 end
 
--- a locked row's price in place of the padlock: the number ending at `right`, the coin before it
+-- locked row: price instead of the padlock, number ending at `right`
 local function drawRowPrice(it, right, cy, menu)
     local text = tostring(it.value.price)
     local mgr = menu.mgr
@@ -274,7 +266,7 @@ local function closeAsk()
     mode = "list"
 end
 
--- the unlock prompt, over the list
+-- unlock prompt over the list
 local function askUnlock(s, item)
     askDone = false
     askUi = UI.new{ theme = ctx.theme, navPlayer = ctx.playerIndex() + 1 }
@@ -283,7 +275,7 @@ local function askUnlock(s, item)
     local cx, cy, cw = panel:content()
     askUi:label{ x = cx + cw / 2, y = cy + 26, text = string.format(tr("unlock_q"), nameOf(s)), size = 28,
                  align = "center", maxWidth = cw }
-    -- shifted right so the coin and its number are centred together
+    -- shifted right: coin and number centred together
     W.askPrice = askUi:label{ x = cx + cw / 2 + (COIN_GAP + 18) / 2, y = cy + 76, text = tostring(s.price),
                               size = PRICE_SIZE, align = "center" }
     W.msg = askUi:label{ x = cx + cw / 2, y = cy + 134, text = "", size = 24, align = "center", maxWidth = cw,
@@ -333,7 +325,7 @@ local function buildList()
         W.desc[i] = ui:label{ x = dx, y = cy + 70 + (i - 1) * DESC_LINE, text = "", size = DESC_SIZE,
                               maxWidth = cw - LIST_W - 40 }
     end
-    -- the coin's left edge lines up with the description's first letter
+    -- coin left edge at the description's first letter
     W.price = ui:label{ x = dx + 18 + COIN_GAP, y = cy + 70 + 5 * DESC_LINE + 20, text = "", size = PRICE_SIZE }
     local cur = W.list.items[selected]
     showDesc(cur and cur.value or nil)
@@ -341,9 +333,9 @@ local function buildList()
     mode = "list"
 end
 
--- ── public API ─────────────────────────────────────────────────────────────────────────────────
--- ctx: { theme, playerIndex()->n, save()->save file|nil, room()->room, scene()->scene|nil,
---        propInstFor(it)->inst|nil, displayName()->string }
+-- ==== public API ====
+-- ctx: { theme, playerIndex() -> n, save() -> save file|nil, room() -> room, scene() -> scene|nil,
+--        propInstFor(it) -> inst|nil, displayName() -> string }
 function M.init(c) ctx = c end
 
 function M.isOpen() return mode ~= nil end
@@ -366,7 +358,7 @@ function M.close(silent)
     if not silent then playSfx("Cancel") end
 end
 
--- returns "closed" the frame the window shuts, or "go", stage once a scene is chosen
+-- "closed" on the frame the window shuts; "go", stage once a scene is chosen
 function M.update(dt, ts)
     if mode == nil then return nil end
     purse:update(dt)

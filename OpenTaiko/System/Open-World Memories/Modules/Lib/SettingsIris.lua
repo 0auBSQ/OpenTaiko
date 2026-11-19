@@ -1,9 +1,7 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- SettingsIris: shared drawing for settings_iris (title -> settings) and settings_iris_back.
--- The settings screen: gray, with connected L lines scrolling left and the crossed tools in the middle.
--- It opens and closes as a circle at the screen centre.
+-- SettingsIris: shared drawing for settings_iris (title -> settings) and settings_iris_back
 
--- positions and sizes: Config/SettingsIris/layout.json; timings: Config/SettingsIris/animation.json
+-- layout: Config/SettingsIris/layout.json; timings: Config/SettingsIris/animation.json
 local HERE = require("Core.Here")(...)
 local Config = require("Core.Config")
 local Layout = Config.load(HERE .. "Config/SettingsIris/layout.json")
@@ -20,11 +18,11 @@ SI.IN_SECONDS = Animation.in_s
 local SCREEN_W, SCREEN_H = 1920, 1080
 local CX, CY = SCREEN_W / 2, SCREEN_H / 2
 local R_FULL = math.sqrt(CX * CX + CY * CY) + Layout.full_radius_pad   -- past the corners, ring included
-local SCROLL = Animation.scroll_px_per_s   -- px/s the lines move left
+local SCROLL = Animation.scroll_px_per_s   -- line scroll, px/s leftward
 local TOOLS_HALF = Layout.tools_half       -- half of Tools.png
 local Ring = Layout.ring
 local RING_R = Ring.radius                 -- Ring.png: radius of its line (1024 px image)
-local EDGE_ERR = Layout.edge.max_step      -- px: largest step of the circle's edge (it is built from clipped rows)
+local EDGE_ERR = Layout.edge.max_step      -- px, max edge step (clipped rows)
 local MAX_ROW = Layout.edge.max_row
 local Tools = Animation.tools
 local TOOLS_START, TOOLS_CHANGE = Tools.start_scale, Tools.scale_change
@@ -48,7 +46,7 @@ function SI:load()
 	self.sndZoom = SOUND:CreateSFX("Sounds/Zoom.ogg")
 end
 
--- the textures live only during a trip (Lib/TransitionArt)
+-- textures live only during a trip (Lib/TransitionArt)
 function SI:loadTextures()
 	if self.pattern ~= nil then return end
 	self.pattern = TEXTURE:CreateTexture("Textures/Pattern.png")
@@ -67,7 +65,7 @@ function SI:dispose()
 	if self.sndZoom then self.sndZoom:Dispose(); self.sndZoom = nil end
 end
 
--- the screen inside one clip rectangle (the tools only where the rectangle meets them)
+-- screen inside one clip rect (tools only where it meets them)
 function SI:drawIn(x, y, w, h, toolsScale)
 	if w <= 0 or h <= 0 then return end
 	GRAPHICS:SetClip(x, y, w, h)
@@ -86,7 +84,7 @@ function SI:drawIn(x, y, w, h, toolsScale)
 	end
 end
 
--- the circle is drawn as clipped rows: thin where its edge is steep, so each step stays small
+-- circle as clipped rows, thin where the edge is steep (small steps)
 local function rowHeight(y, r)
 	local dy = math.abs(y - CY)
 	local half = math.sqrt(math.max(0, r * r - dy * dy))
@@ -101,7 +99,7 @@ end
 
 function SI:drawRing(r)
 	local ring = self.ring
-	local a = clamp01((r - Ring.fade_from) / Ring.fade_range)   -- shrunk this far the thin line would break into dots, so it fades
+	local a = clamp01((r - Ring.fade_from) / Ring.fade_range)   -- fades before the thin line breaks into dots
 	if ring == nil or not ring.Loaded or a <= 0 then return end
 	local s = r / RING_R
 	ring:SetScale(s, s); ring:SetOpacity(a)
@@ -109,7 +107,7 @@ function SI:drawRing(r)
 	ring:SetScale(1, 1); ring:SetOpacity(1)
 end
 
--- the screen inside the circle of radius r
+-- screen inside radius r
 function SI:drawDisc(r, toolsScale)
 	if r <= 0 then return end
 	if r >= R_FULL then
@@ -129,7 +127,7 @@ function SI:drawDisc(r, toolsScale)
 	self:drawRing(r)
 end
 
--- the screen outside the circle of radius r (a see-through hole in the middle)
+-- screen outside radius r (a hole in the middle)
 function SI:drawHole(r, toolsScale)
 	if r >= R_FULL then return end
 	if r <= 0 then
@@ -156,7 +154,7 @@ end
 
 local function play(snd) if snd then snd:Play() end end
 
--- a zoom sound as each circle starts moving
+-- zoom sound per circle start
 function SI:enter(phase)
 	if self.lastPhase ~= phase then
 		self.lastPhase = phase
@@ -164,7 +162,7 @@ function SI:enter(phase)
 	end
 end
 
--- way in: the screen grows as a circle over the title / way back: a hole in it shrinks over the settings
+-- in: circle grows over the title; back: hole shrinks over the settings
 function SI:fadeOut(t)
 	self.clock = self.clock + frameDt()
 	if self.lastPhase ~= "out" then self:loadTextures(); self.wait:reset() end   -- a new trip
@@ -182,7 +180,7 @@ function SI:loading()
 	GRAPHICS:ClearClip()
 end
 
--- way in: a hole grows to show the settings / way back: the screen shrinks as a circle into the title
+-- in: hole grows to show the settings; back: circle shrinks into the title
 function SI:fadeIn(t)
 	self.clock = self.clock + frameDt()
 	self:enter("in")

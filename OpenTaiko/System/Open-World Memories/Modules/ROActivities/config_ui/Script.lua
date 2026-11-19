@@ -1,14 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global, need-check-nil, undefined-field
--- config_ui — the settings menu, rendered with PopUI as a two-pane layout: a top row of category tabs, a
--- left pane of the active category's settings (per-type controls, grouped + scrollable), and a right pane
--- showing the focused setting's name + description (and the thumbnail for the skin setting).
--- The C# CStageConfig stage builds the model (a CLuaConfigModel) and hands it to activate(model); this script
--- renders it and calls the option mutators + key-config service back in C#. C# owns the config and saving.
---
--- model (via NLua): Options is a 0-based list (Options[i], Options.Count); each option exposes
--- .Category/.Section/.Kind/.Name/.Desc/.On/.Value/.Min/.Max/.Step/.Choices/.ChoiceCount/.Index/.KeyGroup/
--- .Thumbnails, :Display(), and the mutators :SetOn(b)/:SetValue(v)/:SetIndex(i)/:Activate(). model.Keys is the
--- key-config service; model.RequestExit()/model.PlaySfx(name) are callbacks.
+-- Settings menu in PopUI: tab row over a settings pane and a preview pane.
+-- C# CStageConfig builds the model (CLuaConfigModel), owns the config and saving; activate(model) renders it.
 
 local PopUI = require("PopUI")
 local NavInput = require("NavInput")
@@ -20,7 +12,7 @@ local Animation = Config.load("Config/animation.json")
 
 local SW, SH = 1920, 1080
 
--- ── layout ──────────────────────────────────────────────────────────────────────────
+-- ==== Layout ====
 local PANE = Layout.pane
 local CONTROLS = Layout.controls
 local SCROLLBAR = Layout.scrollbar
@@ -34,7 +26,7 @@ local NAME_X       = VX + PANE.name_x   -- setting-name column x
 local HEADER_X     = VX + PANE.header_x -- section header x
 local CTRL_RIGHT   = VX + VW - PANE.control_right_inset   -- every control right-aligns to this edge
 local ROW_H, HEADER_H, ROW_GAP = PANE.row_h, PANE.header_h, PANE.row_gap
-local W_SLIDER, VALUE_W, W_CHOOSER = CONTROLS.slider_w, CONTROLS.value_w, CONTROLS.chooser_w   -- value_w reserves room so slider numbers stay clear of the scrollbar
+local W_SLIDER, VALUE_W, W_CHOOSER = CONTROLS.slider_w, CONTROLS.value_w, CONTROLS.chooser_w   -- value_w: slider number room, clear of the scrollbar
 local SB_X, SB_W = VX + VW - SCROLLBAR.x_inset, SCROLLBAR.w   -- scrollbar gutter
 local NAME_MAXW    = PANE.name_max_w
 local descFont     = PREVIEW.desc_font_size   -- preview description font size
@@ -44,15 +36,15 @@ local DESC_COLOR   = PREVIEW.desc_color
 local BUTTON_H     = CONTROLS.button_h
 local BG_TOP, BG_BOTTOM = BACKGROUND.top_color, BACKGROUND.bottom_color
 
--- ── settings theme (cool slate / steel-blue) ─────────────────────────────────────────
+-- ==== Theme ====
 local THEME = Config.plain(Layout.theme)
 
--- ── module state ──────────────────────────────────────────────────────────────────
+-- ==== Module state ====
 ui   = nil   -- PopUI manager
 mode = nil   -- "main" (a category / keys-index page) | "bind" (a key-binding capture page)
 
 local M               -- the model
-local tabs            -- the category tabs + keys tab + trailing exit tab
+local tabs            -- tab list (exit tab last)
 -- tabs.n             -- #tabs
 -- tabs.idxKeysTab    -- index of the keys tab (exit is the last tab)
 -- tabs.idxActive
@@ -61,13 +53,13 @@ local pages
 -- pages.cats         -- pages.cats[catId]  = page
 -- pages.keysTab      -- the keys tab page (lists the key-config rows)
 -- pages.binds        -- pages.binds[group] = the key-binding page for a group
--- pages.current      -- the page being shown + scrolled
+-- pages.current      -- shown page
 local previewPanel
 local keysBack, keysTitle
 local bgCanvas
 local scrollTarget, scrollCur = 0, 0
 local lastTs = 0
-local lastFocusIdx = -1   -- only re-snap the scroll to the focused row when focus changes, so the wheel scrolls freely
+local lastFocusIdx = -1   -- scroll snaps to the focused row on focus change only (free wheel)
 local wasCapturing = false
 local captureBtn = nil
 local lastThumbIdx, lastThumbOpt = nil, nil
@@ -80,12 +72,10 @@ local floor, min, max = math.floor, math.min, math.max
 local function lerp(a, b, t) return a + (b - a) * t end
 local function clamp(v, lo, hi) if v < lo then return lo elseif v > hi then return hi else return v end end
 
--- ── skin locale ─────────────────────────────────────────────────────────────────────
--- option name/desc text arrives localized from C#; the menu chrome below (tabs, buttons, headers, prompts) is
--- authored here, so it is translated through the skin locale. the global THEME is the engine's LuaThemeFunc
--- (its GetSkinString reads the skin's Locales/<lang>/) — distinct from the local THEME colour table above,
--- which shadows it in this file. tr(key, fallback) returns the skin string, or the fallback when the skin has
--- no such key (GetSkinString returns a "[LOCALE NOT FOUND: key]" sentinel, which we reject).
+-- ==== Skin locale ====
+-- option texts come localized from C#; the menu chrome goes through the skin locale
+-- global THEME: the engine's LuaThemeFunc (GetSkinString); the local THEME colour table shadows it here
+-- tr(key, fallback): skin string, or fallback on the "[LOCALE NOT FOUND: key]" sentinel
 local function tr(key, fallback)
     local SL = _G.THEME
     if SL then
@@ -95,7 +85,7 @@ local function tr(key, fallback)
     return fallback
 end
 
--- ── small helpers ─────────────────────────────────────────────────────────────────
+-- ==== Helpers ====
 local function copyChoices(opt)
     local t = {}
     for i = 0, opt.ChoiceCount - 1 do t[#t + 1] = opt.Choices[i] end
@@ -124,9 +114,9 @@ function focusedOpt()
     return nil
 end
 
--- ── control factory: the widget for each option kind ──────────────────────────────
--- returns (widget, customDisplay); customDisplay = true means the int's :Display() differs from the raw number,
--- so we hide the slider value and draw :Display() ourselves.
+-- ==== Control factory ====
+-- returns (widget, customDisplay); customDisplay = true: :Display() differs from the raw int,
+-- slider value hidden and :Display() drawn here
 local function makeControl(opt)
     local kind = opt.Kind
     if kind == "Toggle" then
@@ -134,11 +124,11 @@ local function makeControl(opt)
             onChange = function(v) opt:SetOn(v) end }
         return w, false
     elseif kind == "Int" and opt.TextInput then
-        -- number-only text box (type the value), e.g. a port
+        -- number-only text box
         local maxLen = #tostring(opt.Max)
         local w = ui:textbox{ w = CONTROLS.text_input_w, h = BUTTON_H, value = tostring(opt.Value), maxLen = maxLen,
             onChange = function(t, box)
-                local digits = t:gsub("%D", "")            -- strip non-digits as you type
+                local digits = t:gsub("%D", "")            -- strip non-digits
                 if digits ~= t and box._ti then box._ti.Text = digits end
                 if digits ~= "" then opt:SetValue(tonumber(digits)) end   -- SetValue clamps to [Min,Max]
             end,
@@ -186,27 +176,26 @@ local function placeControl(ctrl, kind, entry, opt)
     ctrl.x = floor(x)
     ctrl._entry = entry
     ctrl._opt = opt
-    -- up from the first row of a category page goes to the active tab (in main mode; in bind mode it falls
-    -- through to focusPrev → the back button)
+    -- up from the first row: active tab (main mode); bind mode falls through to focusPrev (back button)
     ctrl.onNavUpOrPadLeft = function(self)
         if mode == "main" and pages.current and self == pages.current.firstCtrl then setFocusTo(activeTab()); return true end
         return false
     end
-    -- down from the last row wraps up to the tab strip (two-layer nav: tab strip <-> rows, both ways)
+    -- down from the last row wraps to the tab strip
     ctrl.onNavDownOrPadRight = function(self)
         if mode == "main" and pages.current and self == pages.current.lastCtrl then setFocusTo(activeTab()); return true end
         return false
     end
 end
 
--- ── page building ────────────────────────────────────────────────────────────────
+-- ==== Page building ====
 local function layoutPage(page)
     local y = 0
     for _, e in ipairs(page.entries) do
         if e.kind == "header" then e.h = HEADER_H; e.baseY = y; y = y + HEADER_H
         else e.h = ROW_H; e.baseY = y; y = y + ROW_H + ROW_GAP end
     end
-    page.contentH = y + PANE.bottom_padding   -- breathing room so the last row clears the pane edge
+    page.contentH = y + PANE.bottom_padding   -- last row clears the pane edge
 end
 
 local function addHeader(page, text)
@@ -305,7 +294,7 @@ local function buildBindPage(group)
     return page
 end
 
--- ── page show / tab switching ───────────────────────────────────────────────────────
+-- ==== Page show / tab switching ====
 local function hideAllPages()
     for _, p in pairs(pages.cats) do for _, w in ipairs(p.widgets) do w:setVisible(false) end end
     if pages.keysTab then for _, w in ipairs(pages.keysTab.widgets) do w:setVisible(false) end end
@@ -369,7 +358,7 @@ end
 
 function enterMain() if mode == "bind" then backToKeysTab() end end
 
--- ── scrolling + per-frame row placement ──────────────────────────────────────────
+-- ==== Scrolling and row placement ====
 local function ensureFocusedVisible()
     if not pages.current then return end
     local fw = ui.focusables[ui.focusIdx]
@@ -387,7 +376,7 @@ local function reposition(dt)
     scrollCur = scrollCur + (scrollTarget - scrollCur) * min(1, dt * Animation.scroll_follow_per_s)
     for _, e in ipairs(pages.current.entries) do
         local sy = VY + e.baseY - scrollCur
-        -- let rows scroll past the pane top/bottom (they get masked in draw for a clean cut); cull only when fully off
+        -- rows scroll past the pane edges (masked in draw); cull only when fully off
         local onscreen = (sy + e.h >= 0) and (sy <= VY + VH)
         if e.kind == "header" then
             e.label.y = onscreen and floor(sy + (HEADER_H - e.label.h) * 0.5) or -10000
@@ -413,8 +402,7 @@ local function scrollMetrics()
     return maxS, thumbY, thumbH
 end
 
--- drag/click the scrollbar to scroll. runs before ui:update so a drag can set ui._suppressMouse and stop the
--- rows underneath from hovering/clicking as the cursor moves.
+-- scrollbar drag/click; before ui:update (a drag sets ui._suppressMouse for the rows)
 local function handleScrollbar()
     local maxS, _, thumbH = scrollMetrics()
     if not maxS then sbDrag = false; return end
@@ -430,8 +418,7 @@ local function handleScrollbar()
     end
 end
 
--- focus a tab: category/keys tabs switch their page on focus; the exit tab only highlights (decide/click on it
--- exits), so cycling onto it never exits by accident
+-- focus a tab: category/keys tabs switch page; the exit tab only highlights (decide/click exits)
 local function focusTab(i, silence)
     if tabs[i]._exit then
         setFocusTo(tabs[i]); tabs.idxFocused = i
@@ -444,14 +431,13 @@ local function focusTab(i, silence)
     end
 end
 
--- horizontal arrows (or LBlue/RBlue) move between tabs, only while a tab is focused, and wrap both ways across
--- all tabs including the exit tab
+-- left/right (or LBlue/RBlue) move between tabs while one is focused, wrapping
 local function setupHandleTabKeys(tab)
     function tab:onNavRight() focusTab((tabs.idxFocused or 1) % tabs.n + 1); return true end
     function tab:onNavLeft() focusTab(((tabs.idxFocused or 1) - 2) % tabs.n + 1); return true end
 end
 
--- ── gradient background ───────────────────────────────────────────────────────────
+-- ==== Gradient background ====
 local function bakeGradient()
     if bgCanvas then return end   -- static bake; survives language reloads (freed in deactivate)
     local H = 256
@@ -469,7 +455,7 @@ local function drawGradient()
     bgCanvas:Draw(0, 0)
 end
 
--- ── preview pane (focused setting's name + description + skin thumbnail) ──────────────
+-- ==== Preview pane ====
 local function currentTitleDesc()
     local opt = focusedOpt()
     if opt then return opt.Name, opt.Desc, opt end
@@ -483,8 +469,7 @@ end
 local function drawThumb(opt, x, y, w, h)
     if opt.Thumbnails == nil or not opt.Thumbnails.Length or opt.Thumbnails.Length == 0 then return end
     local idx = opt.Index
-    -- debounce: only (re)load the thumbnail after the selection has been stable ~150 ms. each load decodes a
-    -- full image, so loading one for every skin you scroll past would spike memory.
+    -- debounce: thumbnail loads after ~150 ms of stable selection (each load decodes a full image)
     if idx ~= thumbWantIdx or opt ~= thumbWantOpt then thumbWantIdx, thumbWantOpt, thumbWantSince = idx, opt, lastTs end
     if (idx ~= lastThumbIdx or lastThumbOpt ~= opt) and (lastTs - thumbWantSince) >= 150 then
         SHARED:SetSharedTextureUsingAbsolutePath("config_skin_thumb", opt.Thumbnails[idx])
@@ -503,17 +488,14 @@ local function drawPreview()
     local pad = PREVIEW.padding
     local innerX, innerY, innerW = PX + pad, VY + pad, PW - 2 * pad
     local title, desc, opt = currentTitleDesc()
-    -- glyph-composed: no per-string textures. The title squishes per-letter into the pane width; the
-    -- description WORD-WRAPS to it (translations no longer need hand-placed line feeds) and its drawn
-    -- height positions whatever follows (the thumbnail).
+    -- glyph text: title squished to the pane width; description word-wrapped, its height places the thumbnail
     local y = innerY
     if title and title ~= "" then
         ui:drawText(nameFont, title, innerX, y, THEME.colors.primary2, 1, 1, innerW)
         y = y + ui:textHeight(nameFont) + PREVIEW.name_gap
     end
     if desc and desc ~= "" then
-        -- wrap the ink narrower than the pane (desc_wrap_inset: the glyph box pads each side), so the
-        -- visual right margin equals the left one
+        -- wrap width less desc_wrap_inset (glyph box padding): right margin equals the left
         y = y + ui:drawWrapped(descFont, desc, innerX, y, innerW - PREVIEW.desc_wrap_inset, DESC_COLOR) + PREVIEW.desc_gap
     end
     if opt and opt.Thumbnails ~= nil then drawThumb(opt, innerX, y, innerW, PREVIEW.thumb_h) end
@@ -523,9 +505,13 @@ local function drawPreview()
     end
 end
 
--- ── lifecycle ─────────────────────────────────────────────────────────────────────
+-- ==== Lifecycle ====
 function onStart() end
 
+-- model (NLua): Options is a 0-based list (Options[i], Options.Count); each option has
+-- .Category/.Section/.Kind/.Name/.Desc/.On/.Value/.Min/.Max/.Step/.Choices/.ChoiceCount/.Index/.KeyGroup/
+-- .Thumbnails, :Display() and the mutators :SetOn(b)/:SetValue(v)/:SetIndex(i)/:Activate().
+-- model.Keys: key-config service; model.RequestExit()/model.PlaySfx(name): callbacks.
 function activate(model)
     M = model
     mode = "main"; scrollTarget, scrollCur = 0, 0; lastTs = 0
@@ -536,7 +522,7 @@ function activate(model)
     ui = PopUI.new{ theme = THEME, bg = false }
     bakeGradient()
 
-    -- build the tabs first so they become the leading focusables (categories, then the keys tab)
+    -- tabs first: leading focusables (categories, then keys)
     local tabLabels = {}
     for i = 0, M.CategoryLabels.Count - 1 do tabLabels[#tabLabels + 1] = M.CategoryLabels[i] end
     tabLabels[#tabLabels + 1] = tr("SETTINGS_UI_KEYS", "Input")
@@ -562,7 +548,7 @@ function activate(model)
         tabs[i] = t
     end
     tabs.idxKeysTab = #tabs   -- the keys tab is the last category-strip entry (exit is appended after)
-    -- trailing exit tab: decide/click leaves the config; cycling onto it just highlights it
+    -- exit tab: decide/click leaves; cycling onto it only highlights
     do
         local i = #tabs + 1
         local t = ui:button{ text = tr("SETTINGS_UI_EXIT", "Exit"), y = TAB_Y, h = TAB_H, onClick = requestExit, sfx = { click = "" } }
@@ -575,7 +561,7 @@ function activate(model)
     end
     tabs.n = #tabs
 
-    -- keys-mode chrome, shown only while binding keys
+    -- bind mode chrome
     keysBack = ui:button{ text = tr("SETTINGS_UI_BACK", "< Back"), x = VX, y = TAB_Y, h = TAB_H, onClick = backToKeysTab, sfx = { click = "" } }
     keysBack:setVisible(false)
     keysTitle = ui:label{ text = "", x = floor(keysBack.x + keysBack.w + Layout.keys_title.gap), y = TAB_Y + Layout.keys_title.y, size = "title", color = THEME.colors.text }
@@ -584,15 +570,12 @@ function activate(model)
     -- right preview pane
     previewPanel = ui:panel{ x = PX, y = VY, w = PW, h = VH }
 
-    -- pages are built lazily on first view (switchTab builds a category/keys page, enterKeys builds a bind page),
-    -- so opening settings doesn't build every page's widgets up-front
-    switchTab(1)   -- builds + shows the first category only
+    -- pages are built on first view (switchTab: category/keys page, enterKeys: bind page)
+    switchTab(1)   -- builds and shows the first category
 end
 
 function reload(model)
-    -- language changed: rebuild with the new localized strings, keeping the user's place. The main font is
-    -- language-dependent, so the shared PopUI fonts must be flushed and rebuilt with the new typeface
-    -- (their old glyph textures are disposed with them — nothing stacks across switches).
+    -- language change: rebuild, keeping the place; shared PopUI fonts flushed (the main font depends on the language)
     PopUI.flushSharedFonts()
     local keepTab   = tabs.idxActive or 1
     local keepTabFocus = tabs.idxFocused or keepTab
@@ -630,12 +613,11 @@ function update(ts)
     lastTs = ts
     if dt < 0 then dt = 0 elseif dt > 0.1 then dt = 0.1 end
 
-    -- while a textbox is eating keystrokes (e.g. the port field) don't run the config-level input — the wheel,
-    -- scrollbar drag, tab arrows and delete/backspace would all fight what's being typed
+    -- no config-level input while a textbox has the keyboard
     local typing = ui:isCapturing()
 
     if not typing then
-        -- mouse wheel: read before ui:update (which drains the scroll accumulator)
+        -- mouse wheel: read before ui:update (it drains the scroll accumulator)
         local _, sdy = INPUT:GetScrollDelta()
         if sdy and sdy ~= 0 then
             local mx, my = INPUT:GetMouseXY()
@@ -643,7 +625,7 @@ function update(ts)
                 scrollTarget = scrollTarget - sdy * PANE.wheel_step
             end
         end
-        handleScrollbar()  -- before ui:update: may set ui._suppressMouse so a drag doesn't hover/click rows
+        handleScrollbar()  -- before ui:update: a drag may set ui._suppressMouse (no row hover/click)
     end
 
     local r = ui:update(ts)
@@ -668,15 +650,14 @@ function update(ts)
         return "exit", EXIT_TRANSITION
     end
 
-    -- keep number-input boxes showing the clamped model value when not being edited (click-away / esc leave the
-    -- raw typed text, so re-sync from opt.Value once editing ends)
+    -- number boxes re-sync to opt.Value once editing ends (click-away / esc leave the typed text)
     if pages.current then
         for _, e in ipairs(pages.current.entries) do
             if e.ctrl and e.ctrl._isTextInput and not e.ctrl._capturing then e.ctrl.value = tostring(e.opt.Value) end
         end
     end
 
-    -- keep the focused row in view only when focus changed, so the wheel can scroll all the way down
+    -- follow the focused row on focus change only (free wheel)
     if ui.focusIdx ~= lastFocusIdx then ensureFocusedVisible(); lastFocusIdx = ui.focusIdx end
     reposition(dt)
 
@@ -695,11 +676,10 @@ function draw()
     drawGradient()
     ui:draw()             -- tabs (bottom z) + rows (top z) + preview panel
 
-    -- header mask: cover the area above the pane top so rows that scrolled up are cut cleanly (no abrupt pop, no
-    -- overlap with the tab strip). the colour matches the gradient at y=VY for a seamless seam.
+    -- header mask above the pane top; colour = gradient at y = VY
     local mt = VY / SH
     ui:rect(0, 0, SW, VY, lerp(BG_TOP[1], BG_BOTTOM[1], mt), lerp(BG_TOP[2], BG_BOTTOM[2], mt), lerp(BG_TOP[3], BG_BOTTOM[3], mt), 255)
-    -- footer mask: same at the bottom edge. limited to the left pane's x-range so it never clips the preview shadow.
+    -- footer mask, left pane x-range only (keeps the preview shadow)
     local mb = (VY + VH) / SH
     ui:rect(0, VY + VH, VX + VW, SH - (VY + VH), lerp(BG_TOP[1], BG_BOTTOM[1], mb), lerp(BG_TOP[2], BG_BOTTOM[2], mb), lerp(BG_TOP[3], BG_BOTTOM[3], mb), 255)
     -- redraw the chrome on top of the mask

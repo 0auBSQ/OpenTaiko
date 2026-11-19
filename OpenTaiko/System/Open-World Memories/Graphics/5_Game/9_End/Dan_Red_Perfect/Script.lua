@@ -1,10 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Dan Red Perfect end animation: a scroll rises then slides open to reveal its backing.
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
---   func:AddGraph        -> TEXTURE:CreateTexture into the local `tx` registry (onStart)
---   func:DrawRectGraph   -> tx[name]:DrawRect / func:DrawGraph -> tx[name]:Draw
---   deltaTime            -> fps.deltaTime ; the host passes the player index via state.player.
--- Group C clear/end anime: playEndAnime(player) restarts the per-play counters.
+-- end anime: Dan_Red_Perfect (group C, player via state.player)
 
 local width = 1920
 local height = 1080
@@ -39,7 +34,6 @@ function clearOut(player)
 end
 
 function playEndAnime(player)
-    -- per-play reset (old init() reset all of these; keep the full reset on each play)
     animeTimer = 0
     scrollRiseTransition = 0
     scrollSlideTransition = 0
@@ -72,11 +66,9 @@ function draw(state)
     local player = state.player
 
     if scrollSlideTransition > 0 then
-        -- Draw scroll background
         tx["Scroll_Back.png"]:DrawRect(scrollSlidePos, scrollRisePos, scrollSlidePos - scrollBackWidth - scrollBackXOffset, 0, scrollBackWidth - scrollSlidePos + scrollBackXOffset, scrollHeight)
         tx["Scroll_Back_Overlay.png"]:DrawRect(scrollSlidePos, scrollRisePos, scrollSlidePos - scrollBackWidth - scrollBackXOffset, 0, scrollBackWidth - scrollSlidePos + scrollBackXOffset, scrollHeight)
     end
-    -- Draw scroll
     tx["Scroll.png"]:Draw(scrollSlidePos, scrollRisePos)
 end
 

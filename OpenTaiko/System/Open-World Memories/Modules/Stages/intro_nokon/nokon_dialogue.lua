@@ -1,12 +1,8 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- nokon_dialogue.lua — intro_nokon's dialogue chrome on top of the shared Lib/dialogue box.
--- Public API kept from the original module (init/show/draw/update/isActive) so game.lua is unchanged:
---   Dialogue.show(blocks, onDone, bgOpacity)   blocks = array of {text=string, onConfirm=function|nil}
--- Presentation: Nokon2 slides in from the right + BgTile darkening stays here; the box itself is the
--- library's PopUI panel (showbiz red velvet + gold trim, name pill "Nokon") with glyph text — fully
--- UTF-8 so the Japanese localization renders correctly. The old Dialogue.png box is deprecated.
+-- intro_nokon dialogue on top of Lib/dialogue
+-- show(blocks, onDone, bgOpacity): blocks = { {text, onConfirm|nil}, ... }
 
-local DialogueLib = require("dialogue")   -- resolves to Modules/Lib/dialogue.lua
+local DialogueLib = require("dialogue")   -- Modules/Lib/dialogue.lua
 local I18N        = require("i18n")
 local Config      = require("Core.Config")
 local Layout      = Config.load("Config/layout.json")
@@ -18,7 +14,7 @@ local M = {}
 local tx = {}
 local snd = {}
 
--- ── Layout constants ──────────────────────────────────────────────────────────
+-- ==== Layout ====
 local NOKON_Y     = Dlg.nokon_y
 local NOKON_X_IN  = Dlg.nokon_x_in
 local NOKON_X_OUT = Dlg.nokon_x_out
@@ -29,17 +25,16 @@ local BOX = Config.plain(Dlg.box)
 local CHARS_PER_SEC = Animation.dialogue.chars_per_s
 local BLIP_EVERY    = Animation.dialogue.blip_every
 local VOICES        = 4
--- marks that make no sound: wide (CJK) punctuation and spaces
+-- silent marks: CJK punctuation and spaces
 local SILENT = {}
 for _, ch in ipairs({ "、", "。", "，", "．", "！", "？", "：", "；", "…", "‥", "・", "「", "」", "『", "』", "（", "）",
     "～", "—", "–", "　", "¡", "¿", "«", "»", "“", "”", "‘", "’" }) do SILENT[ch] = true end
 
 local SCREEN_W, SCREEN_H = 1920, 1080
 
--- showbiz theme: red velvet face, gold trim, warm text
 local THEME = Config.plain(Dlg.theme)
 
--- ── State ─────────────────────────────────────────────────────────────────────
+-- ==== State ====
 local active   = false
 local subState = "idle"    -- idle | slide_in | text | slide_out
 local blocks, blockIdx, onDone, bgOpacity = {}, 0, nil, 0
@@ -49,7 +44,7 @@ local dlg = nil
 local gfont, gfontName = nil, nil
 local lastVoice = nil
 
--- the n-th letter shown of the line being typed
+-- n-th shown char of the typed line
 local function shownChar(n)
     if dlg == nil or dlg.glines == nil then return nil end
     for _, l in ipairs(dlg.glines) do
@@ -96,12 +91,12 @@ local function startBlock(idx)
     dlg:start({ { name = I18N.tr("Nokon"), text = blocks[idx].text or "" } })
 end
 
--- ── Public API ────────────────────────────────────────────────────────────────
+-- ==== Public API ====
 
 function M.init(t, s)
     tx = t
     snd = s or {}
-    -- single-arg CreateGlyphCached only (NLua params-cache pitfall — see nlua-params-cache-nre)
+    -- single-arg CreateGlyphCached only (NLua params cache)
     gfont     = TEXT:CreateGlyphCached(Dlg.fonts.text)
     gfontName = TEXT:CreateGlyphCached(Dlg.fonts.name)
     dlg = DialogueLib.new({

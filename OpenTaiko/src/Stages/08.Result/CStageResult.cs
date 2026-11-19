@@ -797,16 +797,22 @@ internal class CStageResult : CStage {
 				// the skin's results_tower draws the whole tower result
 				ResultsTower?.Activate(tTowerResultInfo(bestBefore));
 			} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-				Background = new LuaBackgroundWrapper(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.DANRESULT}"));
-				Background.Activate(_state.Refreshed());
-				// the skin's results_dan draws the rest of the dan result
+				// the skin's results_dan draws the dan result and its background
+				if (ResultsDan == null) {
+					// Graphics background, for a skin without results_dan
+					Background = new LuaBackgroundWrapper(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.DANRESULT}"));
+					Background.Activate(_state.Refreshed());
+				}
 				ResultsDan?.Activate(tDanResultInfo(bestBefore));
 			} else {
-				Background = new LuaBackgroundWrapper(CSkin.Path(OpenTaiko.ConfigIni.bAIBattleMode
-					? $@"{TextureLoader.BASE}{TextureLoader.RESULT}AIBattle"
-					: $@"{TextureLoader.BASE}{TextureLoader.RESULT}"));
-				Background.Activate(_state.Refreshed());
-				// the skin's results_regular draws the rest of the result, an AI battle's too
+				// the skin's results_regular draws the result and its background, an AI battle's too
+				if (ResultsRegular == null) {
+					// Graphics background, for a skin without results_regular
+					Background = new LuaBackgroundWrapper(CSkin.Path(OpenTaiko.ConfigIni.bAIBattleMode
+						? $@"{TextureLoader.BASE}{TextureLoader.RESULT}AIBattle"
+						: $@"{TextureLoader.BASE}{TextureLoader.RESULT}"));
+					Background.Activate(_state.Refreshed());
+				}
 				ResultsRegular?.Activate(tRegularResultInfo(bestBefore));
 			}
 		} finally {
@@ -956,9 +962,8 @@ internal class CStageResult : CStage {
 
 					if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] < (int)Difficulty.Tower
 						&& ResultsRegular is { IsActive: true } regularUI && regularUI.Call("skip") is [true, ..]) {
-						// results_regular was still animating: it jumped to the clear, and the background with it
+						// results_regular was still animating: it jumped to the clear
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
-						Background?.Call("skipAnime");
 					} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan
 							   && ResultsDan is { IsActive: true } danUI && danUI.Call("skip") is [true, ..]) {
 						// results_dan was still animating: it jumped to its end

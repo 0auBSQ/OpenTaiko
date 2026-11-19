@@ -1,15 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
--- tower_view ROActivity
--- ------------------------------------------------------------------------------------------------------
--- The tower standing in its panorama (Textures/Panorama.png, a tall sky-to-ground view), composed from the
--- pieces of the chart's tower look by Lib/TowerArt.lua, with the chart's floor count. The loading screen
--- climbs it from the ground to the sky and the tower result comes back down; both hand over the scroll:
---   activate(look, floors)   look = the chart's TowerType (nil for the default look), floors = its floor count
---   draw(scroll, opacity)    scroll 0 = the ground, 1 = the sky; opacity 0..1
---   deactivate()
---   ready()                  true once the panorama and the pieces can be drawn (song_loading waits for it)
--- The panorama and the pieces load asynchronously at activate; the view draws only once all of them are
--- ready, so it never shows half-built.
+-- tower_view ROActivity: the chart's tower in Textures/Panorama.png, built by Lib/TowerArt.lua.
 
 local TowerArt = require("TowerArt")
 
@@ -32,6 +22,7 @@ function onStart()
     res_w, res_h = res.X, res.Y
 end
 
+-- which: the chart's TowerType (nil: default look); count: its floor count
 function activate(which, count)
     deactivate()                            -- a second activation replaces the first
     art = TowerArt.load()
@@ -48,11 +39,13 @@ end
 
 function update() end
 
+-- true once the panorama and the pieces can be drawn (song_loading waits for it)
 function ready()
     if panorama == nil or art == nil then return true end
     return (not panorama.Loaded or panorama.Ready) and art:ready(look)
 end
 
+-- scroll 0 = ground, 1 = sky; opacity 0..1
 function draw(scroll, opacity)
     if panorama == nil or art == nil or not ready() then return end
     scroll = math.max(0, math.min(1, tonumber(scroll) or 0))

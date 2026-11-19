@@ -1,4 +1,4 @@
--- Spanish for story/cutscenes/; a missing key shows the English.
+-- Spanish for story/cutscenes/; missing keys fall back to English
 
 local T = {}
 

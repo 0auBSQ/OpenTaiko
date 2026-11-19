@@ -342,7 +342,7 @@ function M.sky()
     return _grey, true
 end
 
--- a mountain layer, bottom-aligned and tiled; a shake only sinks it so no sky shows under it
+-- mountain layer, bottom-aligned and tiled; a shake only sinks it (no sky under it)
 local function drawMountain(tx, off, ox, oy)
     if tx == nil or not tx.Ready then return end
     local res = THEME:GetResolution()

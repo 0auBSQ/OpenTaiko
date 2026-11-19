@@ -1,21 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, lowercase-global
--- Modal ROActivity — the unlock and reward pop-ups. Activated by the engine after a result screen
--- (one modal per queued reward) and by Lua stages (shops, the vault) with the same signature:
---
---   activate(player1to, rarity, type, info, secondary, picture, header)
---     type 0 coins:      info = amount, secondary = the balance after the reward; a negative amount is
---                        a payment (coins leave the piggy bank), secondary = the balance after paying
---     type 1 character:  info = LuaCharacter (owned: disposed when the modal closes)
---     type 2 puchichara: info = LuaPuchichara
---     type 3 nameplate:  info = LuaNameplateInfo
---     type 4 song:       info = LuaSongNode
---     type 5 custom:     anything else a stage hands over: info = its name as shown, secondary = its
---                        rarity name, picture = the key of the shared texture that shows it
---                        (SHARED:SetSharedTexture), header = the card's title
---     rarity = modal int 0..4 (common, uncommon, rare, epic, legendary); the item's own Rarity
---       string (all seven, poor to mythical) is what picks the chest and colours when it is known:
---       puchicharas, nameplates and songs carry it, characters are looked up in CHARACTERLIST.
---       For types 1..4 a rarity name in `secondary` overrides that (the debug stage uses it).
+-- Modal ROActivity: unlock and reward pop-ups, from the engine after a result screen and from Lua stages.
 
 local NavInput = require("NavInput")
 local Fx = require("modal_fx")
@@ -44,7 +28,7 @@ function A:play(name)
     if s ~= nil then pcall(function() s:Play() end) end
 end
 
--- key: one of Fx.RARITIES; each rarity has its own fanfare, growing with the tier
+-- key: one of Fx.RARITIES (one fanfare per rarity)
 function A:playFanfare(key)
     local s = self.fanfare[key] or self.fanfare.common
     if s ~= nil then pcall(function() s:Play() end) end
@@ -101,6 +85,12 @@ local function itemRarity(modal_type, info)
     return r
 end
 
+-- type 0 coins: info = amount (negative: a payment), secondary = the balance after it
+-- type 1 character: info = LuaCharacter (owned: disposed when the modal closes)
+-- type 2 puchichara: LuaPuchichara; 3 nameplate: LuaNameplateInfo; 4 song: LuaSongNode
+-- type 5 custom: info = shown name, secondary = rarity name, picture = shared texture key, header = card title
+-- rarity: modal int 0..4; the item's own Rarity string (poor to mythical) wins when known
+-- (characters via CHARACTERLIST); for types 1..4 a rarity name in secondary overrides it
 function activate(player1to, rarity, modal_type, info, secondary, picture, header)
     player = math.max(0, math.min(5, math.floor(tonumber(player1to) or 1)))
     nav = NavInput.p[player] or NavInput.p[""]
@@ -113,8 +103,7 @@ function activate(player1to, rarity, modal_type, info, secondary, picture, heade
         local key = Fx.rarityKey(rarity, itemRarity(modal_type, info))
         if type(secondary) == "string" and Fx.RARITY_COLOR[secondary:lower()] then key = secondary:lower() end
         pending = { kind = modal_type, rarity = rarity, key = key, info = info, picture = picture, header = header }
-        -- a character's menu animation loads now, so the work hides behind the reveal instead of
-        -- landing on the card's pop-in frame
+        -- character menu animation loads now (behind the reveal, not on the card's pop-in frame)
         if modal_type == 1 and info ~= nil then pcall(function() info:LoadAnimation(CHARACTER.ANIM_MENU_NORMAL) end) end
         chest:start(key)
         state = "chest"

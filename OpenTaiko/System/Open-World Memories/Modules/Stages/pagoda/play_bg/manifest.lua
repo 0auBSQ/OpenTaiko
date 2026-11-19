@@ -1,4 +1,4 @@
--- Play-screen background art (paths from the stage folder), band points, monster aim and lift.
+-- play-screen background manifest (paths from the stage folder)
 return {
     tex = {
         up_forest            = { path = "play_bg/Textures/forest.jpg", w = 1920, h = 276, x = 0, y = 0 },
@@ -24,7 +24,7 @@ return {
         m_monster8           = { path = "play_bg/Textures/monsters/monster8.png", w = 533, h = 352, fx = 266.5, fy = 612 },
         m_monster9           = { path = "play_bg/Textures/monsters/monster9.png", w = 646, h = 330, fx = 323, fy = 460 },
         m_monsterextra       = { path = "play_bg/Textures/monsters/monsterextra.png", w = 573, h = 341, fx = 286.5, fy = 383 },
-        -- the roof window, whole; the band frames its eye
+        -- whole roof window; band frames its eye
         m_document           = { path = "Textures/encounter/monsters/document_box.png", w = 554, h = 355, fx = 277, fy = 353,
                                  parts = { eye = { key = "m_document_eye", x = 276.9, y = 169.4 },
                                            pupil = { key = "m_document_pupil", x = 276.9, y = 169.4 },
@@ -46,7 +46,7 @@ return {
         m_scare3             = { path = "play_bg/Textures/monsters/scare3.png", w = 682, h = 433, fx = 341, fy = 485, jump = "m_scare3_jump" },
         m_scare3_jump        = { path = "play_bg/Textures/monsters/scare3_jump.png", w = 682, h = 433, fx = 341, fy = 485 },
     },
-    -- lo, hi: the idle's lowest and highest lift; aim_x, aim_y: the face in its art, where the notes land
+    -- lo, hi: idle lift range; aim_x, aim_y: face in the art (note landing)
     foes = {
         critter      = { lo = 0, hi = 62, aim_x = 144.6, aim_y = 110 },
         monster1     = { lo = 34, hi = 50, aim_x = 135, aim_y = 123 },

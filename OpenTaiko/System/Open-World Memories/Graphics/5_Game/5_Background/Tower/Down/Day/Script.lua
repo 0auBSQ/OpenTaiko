@@ -1,28 +1,18 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps/STORAGE/JSONLOADER injected by CLuaScript at runtime
--- Tower down background "Day": the sky, scrolling darker as the climb goes on, and the tower itself, whose
--- floors slide down under the player at every new floor.
---
--- This folder is one complete tower look. The chart picks it with TOWERTYPE:Day (a preset or a random pick
--- otherwise). The tower select, the loading screen and the result draw the same tower from a half-size copy of
--- its pieces, Modules/Lib/TowerArt/Day/: run tools/gen_tower_art.py after changing a piece or the layout.
---   Sky_Gradient.png   the sky strip, its bottom the day and its top the night
---   Base/BaseN.png     the floors, cycled every ten floors
---   Deco/DecoN.png     a decoration over each floor, cycled every floor (optional)
---   Top.png            the roof, one more floor over the last one
---   Config.json        the layout: body_x/body_y the current floor's bottom centre, deco_x/deco_y its
---                      decoration's, move_x/move_y how far a floor slides when the next one is reached
+-- tower down background: Day
+-- half-size copy in Modules/Lib/TowerArt/Day/
 
 local towerUpProgress = 0
 local lastNightNum = 0
 local skyHeight = 7434
 
-local layout = { body_x = 960, body_y = 1014, deco_x = 690, deco_y = 960, move_x = 0, move_y = 432 }
+local layout = { body_x = 960, body_y = 1014, deco_x = 690, deco_y = 960, move_x = 0, move_y = 432 }  -- Config.json overrides (move = slide per floor)
 local tx = {}
 local bases, decos, top = {}, {}, nil
 
-local lastFloor = nil   -- a new floor starts the slide
-local slide = 0         -- 0..1, the current floor sliding down as the next one comes into view
-local slideSpeed = 0    -- per second: a slide lasts two beats
+local lastFloor = nil
+local slide = 0         -- 0..1
+local slideSpeed = 0    -- per second (2 beats per slide)
 
 local function loadSequence(dir, prefix)
     local list, i = {}, 0
@@ -86,13 +76,12 @@ function update(timestamp, state)
     if slide < 1 then slide = math.min(1, slide + fps.deltaTime * slideSpeed) end
 end
 
--- the current floor (or the roof on the last one) with its decoration, then the next floor sliding in above
--- it, cut so it never reaches over the lane
+-- current floor or roof, then next floor cut at the lane
 local function drawTower(state)
     local floor, maxFloor = state.towerFloor, state.towerMaxFloor
     local dx, dy = slide * layout.move_x, slide * layout.move_y
 
-    -- the piece indexes of the first floor skip one, as the gameplay always did
+    -- floor 0 skips one index, as in gameplay
     local baseIndex, decoIndex = math.floor(floor / 10), floor
     local nextBaseIndex, nextDecoIndex = math.floor((floor + 1) / 10), floor + 1
     if floor == 0 and #decos > 1 then decoIndex = decoIndex + 1 end

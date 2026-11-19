@@ -1,2 +1,2 @@
--- moved to Global/Modules/Lib/World/OWM3d.lua
+-- alias of Global/Modules/Lib/World/OWM3d.lua
 return require("World.OWM3d")

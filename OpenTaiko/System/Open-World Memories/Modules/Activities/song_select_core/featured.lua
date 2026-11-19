@@ -1,13 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- featured.lua — the curated boxes at the top of the root list (Config/featured_boxes.json).
---
--- Each box lists songs by unique id; the ones present in the library go into a virtual box inserted before
--- the first real folder, in the file's order, and a box with none of its songs is skipped. The cursor stays
--- where the list put it (the first real folder), and sort.lua keeps these boxes first.
---
---   { "boxes": [ { "id": "beginners", "genre": "Recommended", "title_key": "SONGSELECT_BOX_BEGINNERS",
---                  "title": "Recommended songs for beginners", "uids": [ "...", ... ] } ] }
---   title_key = a skin locale key (Locales/<code>/); title = the fallback text.
+-- song_select_core featured boxes at the top of the root list (Config/featured_boxes.json).
 
 local M = {}
 local G
@@ -30,7 +22,7 @@ end
 
 function M.init(g) G = g end
 
--- the boxes read from the config: { id, genre, title, uids }
+-- returns { id, genre, title, uids }; title from title_key (skin locale), else title, else id
 function M.load()
     local boxes = {}
     local ok, err = pcall(function()
@@ -48,7 +40,7 @@ function M.load()
     return boxes
 end
 
--- inserts every box that has at least one available song; call once the song list is (re)built
+-- inserts every box with an available song at the root's start, in file order; call once the list is (re)built
 function M.insertAll()
     if G.songList == nil then return 0 end
     local root = G.songList:GetRoot()

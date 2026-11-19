@@ -1,4 +1,4 @@
--- Encounter band effects over a story background that is an encounter background.
+-- encounter band effects for VN backgrounds with a level
 
 local assets = require("encounter/assets")
 local bands  = require("encounter/bands")
@@ -7,11 +7,11 @@ local skybox = require("skybox")
 
 local M = {}
 
-local _held = {}            -- keys this module opened in encounter/assets
-local _seen = {}            -- key -> the handle a prepared band draws with (false: none)
+local _held = {}            -- keys opened here in encounter/assets
+local _seen = {}            -- key -> handle at prepare (false: none)
 local _band, _variant, _level, _ctx = nil, nil, nil, nil
 
--- band, variant and ctx of a background entry; its level as seen once beaten
+-- returns band, variant, ctx; ctx.highest = def.level (as beaten)
 local function bandOf(def)
     if def == nil or def.level == nil then return nil end
     local ctx = { highest = def.level }
@@ -19,7 +19,7 @@ local function bandOf(def)
     return band, variant, ctx
 end
 
--- opens the listed keys nobody holds, as this module's own
+-- opens unheld keys, owned here
 local function hold(keys)
     local list = {}
     for _, k in ipairs(keys) do
@@ -32,7 +32,7 @@ local function hold(keys)
     for _, k in ipairs(keys) do _seen[k] = assets.get(k) or false end
 end
 
--- starts loading a background's band textures; the scene's layer naming that asset draws the same handle
+-- starts band texture loads; a layer with the same asset key draws the same handle
 function M.prepare(def)
     local band, variant, ctx = bandOf(def)
     if band == nil then return end
@@ -46,7 +46,7 @@ local function closeBand()
     skybox.reset()
 end
 
--- a background mapping to the same band keeps it
+-- same band and level: kept open
 function M.show(def)
     local band, variant, ctx = bandOf(def)
     if band == _band and variant == _variant and (def and def.level) == _level then return end
@@ -58,7 +58,7 @@ function M.show(def)
     _band, _variant, _level, _ctx = band, variant, def.level, ctx
 end
 
--- handles another screen released are opened again and the band rebuilt on them
+-- reopens handles released by another screen, then rebuilds the band
 local function keep()
     local lost = false
     for k, h in pairs(_seen) do
@@ -100,7 +100,7 @@ function M.draw(ox, oy)
     if _band ~= nil then view.effectsOnly(drawOver, ox, oy) end
 end
 
--- closes the band and disposes every texture this module opened
+-- also drops textures opened here
 function M.close()
     closeBand()
     assets.drop(_held)

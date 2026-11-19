@@ -1,12 +1,5 @@
 ---@diagnostic disable: undefined-global, lowercase-global, need-check-nil, undefined-field
--- SimpleUI/manager.lua — the thing you actually use. `local ui = require("UI.SimpleUI").new{...}` then
--- `ui:button{...}`, `ui:update(ts)`, `ui:draw()`. It owns the widgets, routes the mouse + keyboard/gamepad
--- into one shared hover/focus highlight, caches fonts + colours, and plays optional injected SFX.
---   SimpleUI.new{ theme =, sfx =, bg = bool, navPlayer = n, nav = "spatial" }
--- A library made with SimpleUI.derive (OWM's PopUI) passes itself as M.new's second argument: its
--- Theme.DEFAULT is the base every theme resolves over, and its Coins class makes ui:coins.
--- nav = "spatial": the arrow keys move focus to the nearest widget in their direction (a grid of buttons,
--- two columns); by default Up/Down step through the widgets in the order they were made.
+-- SimpleUI manager: owns the widgets, routes mouse and nav input
 
 local U      = require("UI.SimpleUI.util")
 local Theme  = require("UI.SimpleUI.theme")
@@ -29,21 +22,17 @@ local NavInput = require("Input.NavInput")
 local SCREEN_W, SCREEN_H = 1920, 1080
 local HOLD_DELAY, HOLD_REPEAT = 0.20, 0.07
 local COLOR_CACHE_MAX = 1024
-local SQUISH_MIN = 0.85          -- text squeezed narrower than this gets smaller instead
+local SQUISH_MIN = 0.85          -- below this squish the text is scaled down
 
--- Module-shared font caches. Managers come and go (config_ui rebuilds on language change) but fonts are
--- size-keyed and theme-independent, so sharing them keeps the baked glyphs alive across rebuilds — no
--- re-rasterization lag and no orphaned font objects stacking up.
--- The main font is language-dependent (CLangManager.LangInstance.FontName): call M.flushSharedFonts() when
--- the language changes so the caches rebuild with the new typeface.
+-- shared font caches, size-keyed, kept across manager rebuilds
+-- main font follows the language: call M.flushSharedFonts() on language change
 local sharedFonts, sharedGFonts = {}, {}
 local measured, measuredCount = {}, 0   -- "size\0text" -> ink width, for the squish limit
 
 local M = {}
 M.__index = M
 
--- dispose + drop every shared font (their baked glyph textures free with them); the next text draw
--- recreates them with the current language's font
+-- disposes every shared font; the next draw recreates them
 function M.flushSharedFonts()
     for _, f in pairs(sharedFonts) do pcall(function() f:Dispose() end) end
     for _, f in pairs(sharedGFonts) do pcall(function() f:Dispose() end) end
@@ -51,7 +40,7 @@ function M.flushSharedFonts()
     measured, measuredCount = {}, 0
 end
 
--- the canvas pool and the baked-surface cache (SimpleUI/cache.lua), kept reachable from the manager
+-- canvas pool and baked-surface cache (SimpleUI/cache.lua)
 M.releaseCanvas = Cache.releaseCanvas
 M.acquireCanvas = Cache.acquireCanvas
 M.flushCanvasPool = Cache.flushCanvasPool
@@ -63,6 +52,9 @@ function M:themeKey(eff) return Cache.themeKey(eff) end
 
 local NO_STYLE = Theme.NONE
 
+-- opts: { theme, sfx, bg = bool, navPlayer = n, nav = "spatial" }
+-- lib: a SimpleUI.derive library (its Theme.DEFAULT and Coins)
+-- nav = "spatial": arrows go to the nearest widget; default: Up/Down in creation order
 function M.new(opts, lib)
     opts = opts or {}
     local self = setmetatable({}, M)
@@ -84,7 +76,7 @@ function M.new(opts, lib)
     self._focusW = nil
     self._hoverW = nil
     self._pressW = nil
-    self._captureWidget = nil   -- a textbox currently eating keystrokes
+    self._captureWidget = nil   -- textbox taking keystrokes
     self._colors = {}
     self._colorCount = 0
     self._rep = {}
@@ -98,9 +90,8 @@ function M.new(opts, lib)
     return self
 end
 
--- ── caches ───────────────────────────────────────────────────────────────────────
--- the effective theme of a widget style (default < manager theme < style); one resolved table per style,
--- so widgets with the same style share it (and its bake keys)
+-- ==== caches ====
+-- resolved theme per widget style (default < manager theme < style), shared per style
 function M:resolveTheme(style)
     local key = style or NO_STYLE
     local t = self._themes[key]
@@ -130,7 +121,7 @@ function M:color(r, g, b, a)
     local key = U.packRGBA(r, g, b, a or 255)
     local c = self._colors[key]
     if not c then
-        -- colours change every frame while they tween; past the cap the cache starts over
+        -- tweened colours: the cache resets past the cap
         if self._colorCount >= COLOR_CACHE_MAX then self._colors, self._colorCount = {}, 0 end
         c = COLOR:CreateColorFromRGBA(math.floor(r), math.floor(g), math.floor(b), math.floor(a or 255))
         self._colors[key] = c
@@ -139,7 +130,7 @@ function M:color(r, g, b, a)
     return c
 end
 
--- render (cached) text → LuaTexture. fg/bg are {r,g,b,a} colour arrays (bg = outline/shadow colour).
+-- cached text -> LuaTexture; fg/bg {r,g,b,a}, bg = outline colour
 function M:renderText(size, str, fg, bg, centered, maxWidth)
     local f = self:font(size)
     local fc = fg and self:color(fg[1], fg[2], fg[3], fg[4]) or nil
@@ -147,10 +138,8 @@ function M:renderText(size, str, fg, bg, centered, maxWidth)
     return f:GetText(tostring(str), centered or false, maxWidth or 99999, fc, bc)
 end
 
--- ── glyph-composed text (C# LuaGlyphText: bounded per-character texture cache) ─────
--- One texture per unique character; strings are composed at draw time with per-letter post-processing
--- (the maxWidth squish scales each glyph individually). UTF-8 correct (the C# side iterates code points),
--- exact font advances, and word wrap for text blocks. Dynamic strings never allocate per-frame textures.
+-- ==== glyph text ====
+-- LuaGlyphText: one texture per unique character, strings composed at draw time
 function M:gfont(size)
     local f = sharedGFonts[size]
     if not f then f = TEXT:CreateGlyphCached(size); sharedGFonts[size] = f end
@@ -175,19 +164,18 @@ local function inkWidth(self, size, str)
     return w
 end
 
--- the scale to draw str at within maxWidth: the glyph draw squeezes text that is too wide, and past
--- SQUISH_MIN the text is made smaller as well, so a long translation stays readable
+-- draw scale for str within maxWidth; past SQUISH_MIN the scale shrinks too
 function M:fitScale(size, str, scale, maxWidth)
     scale = scale or 1
     if not maxWidth or maxWidth <= 0 then return scale end
     local ink = inkWidth(self, size, str) * scale
-    local room = maxWidth - 50 * scale            -- the glyph box keeps 25 px of padding on each side
+    local room = maxWidth - 50 * scale            -- glyph box padding: 25 px per side
     if room <= 0 or ink <= room or room / ink >= SQUISH_MIN then return scale end
     return scale * maxWidth / (SQUISH_MIN * ink + 50 * scale)
 end
 
--- draw str glyph-by-glyph, top-anchored at (x,y). color = {r,g,b}. optional maxWidth applies the per-letter
--- squish. returns the end x (unsquished ink end).
+-- glyph draw, top-left at (x, y); color {r,g,b}
+-- maxWidth: per-letter squish; returns the end x (unsquished)
 function M:drawText(size, str, x, y, color, opacity, scale, maxWidth)
     str = tostring(str)
     local gf = self:gfont(size)
@@ -197,10 +185,9 @@ function M:drawText(size, str, x, y, color, opacity, scale, maxWidth)
     return x + gf:Measure(str) * scale
 end
 
--- full-control glyph draw for widget labels: fg/bg {r,g,b,a} (bg = outline; nil = none), anchor = the same
--- 9 anchor names as DrawAtAnchor, anchoring the text's box (ink + the same padding a GetText texture has).
--- Optional clipY0/clipY1 clip the text to a vertical band (pixel-exact glyph slicing) — scrolling lists
--- pass their viewport so edge rows cut cleanly instead of overflowing the list box.
+-- glyph draw for widget labels: fg/bg {r,g,b,a}, bg = outline (nil = none)
+-- anchor: a DrawAtAnchor name, on the text box (ink + GetText padding)
+-- clipY0/clipY1: vertical clip band (list viewports)
 function M:drawTextEx(size, str, x, y, fg, bg, opacity, scale, maxWidth, anchor, clipY0, clipY1)
     str = tostring(str)
     local gf = self:gfont(size)
@@ -212,7 +199,7 @@ function M:drawTextEx(size, str, x, y, fg, bg, opacity, scale, maxWidth, anchor,
     if clipY0 ~= nil then gf:SetClipY(0, 0) end
 end
 
--- the longest start of str that fits in maxWidth with an ellipsis after it (or str when it fits)
+-- longest prefix of str that fits maxWidth with an ellipsis (str when it fits)
 function M:ellipsize(size, str, maxWidth)
     str = tostring(str)
     local room = maxWidth - 50
@@ -227,7 +214,7 @@ function M:ellipsize(size, str, maxWidth)
     return table.concat(chars, "", 1, lo) .. dots
 end
 
--- word/newline wrap to <= maxWidth (UTF-8 correct, CJK-aware; no texture allocation). Returns a list of lines.
+-- word/newline wrap to <= maxWidth (UTF-8, CJK-aware); returns a list of lines
 function M:wrapLines(size, str, maxWidth)
     local arr = self:gfont(size):WrapToLines(tostring(str), maxWidth)
     local lines = {}
@@ -235,7 +222,7 @@ function M:wrapLines(size, str, maxWidth)
     return lines
 end
 
--- word-wrapped text block, left-aligned at (x,y); returns the drawn height (for stacking layout below it)
+-- wrapped text block, left-aligned at (x, y); returns the drawn height
 function M:drawWrapped(size, str, x, y, wrapWidth, color, opacity, scale, lineSpacing)
     local gf = self:gfont(size)
     local fc = color and self:color(color[1], color[2], color[3], color[4]) or self:color(255, 255, 255)
@@ -248,15 +235,15 @@ function M:measureWrapped(size, str, wrapWidth, scale, lineSpacing)
     return self:gfont(size):MeasureWrapped(tostring(str), wrapWidth, scale or 1, lineSpacing or 1)
 end
 
--- UTF-8 character list (the sandbox has no utf8.*); for suffix/prefix clipping without splitting sequences
+-- UTF-8 character list (sandbox has no utf8.*)
 function M:utf8chars(str)
     local chars = {}
     for ch in tostring(str):gmatch("[%z\1-\127\194-\244][\128-\191]*") do chars[#chars + 1] = ch end
     return chars
 end
 
--- reuse an existing canvas if the size matches (just clear it); else release the old one + take a new one.
--- LuaCanvas has no finalizer: a canvas that is never released keeps its GL texture. Pass/return the raw canvas.
+-- old when the size matches (cleared), else a pooled canvas; old is released
+-- LuaCanvas has no finalizer; takes and returns the raw canvas
 function M:reuseCanvas(old, w, h)
     w, h = math.floor(w), math.floor(h)
     if old and old.Width == w and old.Height == h then old:ClearTransparent(); return old end
@@ -266,8 +253,7 @@ end
 
 function M:playSfx(name) return Sfx.playSfx(self.sfx, name) end
 
--- Draw a solid filled rectangle in screen space (tinted). Reuses one shared 2x2 white canvas so callers
--- (scrollbars, dividers, overlays) don't each allocate. Colours are 0-255.
+-- solid rect in screen space, colours 0-255 (one shared 2x2 canvas)
 function M:rect(x, y, w, h, r, g, b, a)
     if not self._rectCv then self._rectCv = CANVAS:CreateCanvas(2, 2); self._rectCv:Clear(255, 255, 255, 255); self._rectCv:Upload() end
     local cv = self._rectCv
@@ -278,15 +264,14 @@ function M:rect(x, y, w, h, r, g, b, a)
     cv:SetColor(1, 1, 1); cv:SetOpacity(1); cv:SetScale(1, 1)
 end
 
--- Vertical-centring nudge for text: the glyph box is the ink plus the padding under it (the GetText
--- geometry), so a box anchored at its middle sits its ink half the padding too high; widgets add this to
--- their middle line to centre the ink.
+-- vertical-centring offset for text: glyph box = ink + padding below
+-- widgets add it to their middle line
 function M:textNudge(size)
     local f = self:gfont(size or 22)
     return math.floor((f.BoxHeight - math.ceil(f.LineHeight)) / 2) - 1
 end
 
--- ── widgets ────────────────────────────────────────────────────────────────────────
+-- ==== widgets ====
 local function canFocus(w) return w.focusable and w.visible and w.enabled end
 
 function M:add(w)
@@ -303,22 +288,21 @@ function M:remove(w)
     self:_rebuildFocus()
 end
 
--- drops every widget, releasing their canvases first
+-- drops every widget (canvases released first)
 function M:clear()
     self:disposeWidgets()
     self.widgets = {}; self.focusables = {}; self.focusIdx = 0; self._focusW = nil; self._hoverW = nil; self._pressW = nil; self._captureWidget = nil
 end
 
--- free every widget's baked GPU canvases (call before dropping/rebuilding the UI so re-entry doesn't leak;
--- LuaCanvas has no finalizer). GetText label textures are font-cache-owned and left untouched. Also frees the
--- lazily-created shared rect canvas (it's recreated on the next M:rect call, so this is safe to call mid-life).
+-- frees every widget's baked canvases; call before dropping or rebuilding the UI
+-- GetText textures stay (font cache); the shared rect canvas is recreated on demand
 function M:disposeWidgets()
     for _, w in ipairs(self.widgets) do if w.dispose then w:dispose() end end
     if self._rectCv then self._rectCv:Dispose(); self._rectCv = nil end
 end
 
--- rebuilds the list keys can stop on (after a widget was enabled, disabled, shown or hidden). The focused
--- widget keeps the focus; when it can't hold it any more the focus goes to the next widget that can.
+-- rebuilds focusables after enable/disable or show/hide
+-- focus stays on its widget, else moves to the next one that can hold it
 function M:_rebuildFocus()
     local was = self.focusables[self.focusIdx]
     self.focusables = {}
@@ -350,7 +334,7 @@ function M:chooser(o) return self:add(Chooser.new(o)) end
 function M:settingsList(o) return self:add(SettingsList.new(o)) end
 function M:coins(o)   return self:add(self._coinsClass.new(o)) end
 
--- ── theming ──────────────────────────────────────────────────────────────────────
+-- ==== theming ====
 function M:setTheme(t)
     self.userTheme = t or {}
     self.theme = Theme.resolve(self.userTheme, nil, self.baseTheme)
@@ -367,14 +351,14 @@ function M:setSfx(t)
     for _, w in ipairs(self.widgets) do w.sfx = self:resolveSfx(w.userSfx) end
 end
 
--- ── focus navigation ────────────────────────────────────────────────────────────
+-- ==== focus navigation ====
 function M:_setFocusIndex(i)
     if #self.focusables == 0 then self.focusIdx = 0; return end
     i = ((i - 1) % #self.focusables) + 1
     self.focusIdx = i
 end
 
---- Moves the focus to widget w; false when w can't take it (hidden, disabled, not focusable).
+--- focus widget w; false when w can't take it
 function M:focus(w)
     for i, f in ipairs(self.focusables) do
         if f == w then self.focusIdx = i; return true end
@@ -382,15 +366,14 @@ function M:focus(w)
     return false
 end
 
---- The widget holding the focus, or nil.
+--- widget holding the focus, or nil
 function M:focused() return self.focusables[self.focusIdx] end
 
 function M:clearPrevFocus() if self._focusW then self._focusW:setFocus(false); self._focusW = nil end end
--- the device used last, shared by every SimpleUI of the script: the pointer only hovers while it is the mouse
+-- last device used, per script; the pointer hovers only while it is the mouse
 local lastInputMouse = false
 
--- moves the key focus by dir (0 = stay) to the nearest widget keys may stop on: a widget made with
--- mouseOnly = true is hovered and clicked like any other, but the keys step over it
+-- moves key focus by dir (0 = stay); keys skip mouseOnly widgets
 function M:_stepFocus(dir)
     local n = #self.focusables
     local i = self.focusIdx < 1 and 1 or self.focusIdx + dir
@@ -405,14 +388,14 @@ function M:focusStay() self:_stepFocus(0) end
 function M:focusNext() self:_stepFocus(1) end
 function M:focusPrev() self:_stepFocus(-1) end
 
--- the gap between the ranges [a0, a1] and [b0, b1] (0 when they overlap)
+-- gap between [a0, a1] and [b0, b1], 0 on overlap
 local function gap(a0, a1, b0, b1)
     if b0 > a1 then return b0 - a1 elseif a0 > b1 then return a0 - b1 end
     return 0
 end
 
--- moves the focus to the nearest widget in direction dir ("left" / "right" / "up" / "down"): ahead of the
--- focused one, closest along the direction and most in line with it. Returns false when there is none.
+-- focus the nearest widget toward dir ("left"/"right"/"up"/"down")
+-- score = distance along + 3 * gap across; false when none
 function M:_moveSpatial(dir)
     local fw = self.focusables[self.focusIdx]
     if fw == nil then self:focusStay(); return true end
@@ -438,13 +421,12 @@ function M:_moveSpatial(dir)
     return false
 end
 
---- True while the mouse is the device used last (moved, scrolled or pressed after the last key or pad input).
+--- true while the mouse is the last device used
 function M:mouseActive() return lastInputMouse end
 
 function M:captureKeys(w) self._captureWidget = w end
 function M:releaseKeys(w) if self._captureWidget == w then self._captureWidget = nil end end
---- True while a widget (e.g. a textbox) is eating keystrokes. Gate stage-level hotkeys on `not ui:isCapturing()`
---- so typing a letter that's also a hotkey doesn't trigger a menu/page action.
+--- true while a widget takes keystrokes; gate stage hotkeys on `not ui:isCapturing()`
 function M:isCapturing() return self._captureWidget ~= nil end
 
 function M:_repeatKey(key, dt)
@@ -460,14 +442,12 @@ function M:_repeatKey(key, dt)
     st.held = false; st.t = 0; return false
 end
 
--- Up/Down (keyboard), or the pad's Left/Right that step through the widgets. The focused widget may use the
--- step itself (a list moving its selection) and lets it go at its ends; then the focus moves.
+-- Up/Down keys or pad Left/Right: the focused widget gets the step first, else focus moves
 local VERTICAL = {
     { key = "navDown", both = "navDownOrPadRight", own = "onNavDown", pad = "onNavRight", any = "onNavDownOrPadRight", dir = "down", step = 1 },
     { key = "navUp", both = "navUpOrPadLeft", own = "onNavUp", pad = "onNavLeft", any = "onNavUpOrPadLeft", dir = "up", step = -1 },
 }
--- Left/Right on the keyboard: the focused widget may use them (a slider, a chooser); otherwise they move
--- the focus in spatial navigation and keep it where it is in the default one
+-- Left/Right keys: focused widget first, else spatial move (default nav: focus stays)
 local HORIZONTAL = { { key = "navRight", own = "onNavRight", dir = "right" }, { key = "navLeft", own = "onNavLeft", dir = "left" } }
 
 function M:_navigate(c)
@@ -498,8 +478,7 @@ function M:_navigate(c)
             elseif not (self.spatial and self:_moveSpatial(v.dir)) then self:focusStay() end
         end
     end
-    -- Decide and Cancel go to the focused widget first (a slider leaving its edit mode); what it leaves is
-    -- handled after the focus is applied
+    -- Decide/Cancel go to the focused widget first; the rest is handled after focus is applied
     local fw = self.focusables[self.focusIdx]
     if c.decide then
         if fw and fw.onDecide and fw.onDecide(fw, false) then c.decide = false end
@@ -510,7 +489,7 @@ function M:_navigate(c)
     end
 end
 
--- ── per-frame ───────────────────────────────────────────────────────────────────
+-- ==== per-frame ====
 function M:update(ts)
     local dt = (ts - self._lastTs) / 1000.0
     self._lastTs = ts
@@ -528,10 +507,7 @@ function M:update(ts)
     c.scrollDx, c.scrollDy = INPUT:GetScrollDelta()
     local mouseUsed = c.moved or c.mPressed or c.mPressing or c.mReleased
         or (c.scrollDx or 0) ~= 0 or (c.scrollDy or 0) ~= 0
-    -- one-frame mouse suppression: a caller (e.g. a stage dragging its own scrollbar) sets self._suppressMouse
-    -- = true before ui:update so nothing under the cursor hovers/presses/clicks/scrolls/drags this frame. The
-    -- ctx mouse fields are neutralised at the source (the hover scan, the press/release block, and every
-    -- widget's own :update that reads the mouse — slider drag, list/chooser scroll). One-shot: cleared here.
+    -- one-frame mouse suppression: set self._suppressMouse = true before ui:update; cleared here
     if self._suppressMouse then
         c.mx, c.my = -100000, -100000
         c.mdx, c.mdy = 0, 0
@@ -540,7 +516,7 @@ function M:update(ts)
         c.scrollDx, c.scrollDy = 0, 0
         self._suppressMouse = false
     end
-    -- drop a stale capture if its widget was hidden/disabled (e.g. the page changed while typing)
+    -- drop a capture whose widget was hidden or disabled
     if self._captureWidget and (not self._captureWidget.visible or not self._captureWidget.enabled) then
         self._captureWidget = nil
     end
@@ -555,8 +531,8 @@ function M:update(ts)
     c.navLeft  = (not captured) and self:_repeatKey("leftKeyboard", dt) or false
     c.navRight = (not captured) and self:_repeatKey("rightKeyboard", dt) or false
 
-    -- the mouse takes over when it moves, scrolls or presses; a key or pad input takes it back. While the
-    -- keys lead, the pointer's place is ignored, so a mouse left resting on a widget does not hover it
+    -- mouse takes over on move, scroll or press; key or pad input takes it back
+    -- while keys lead, the pointer position is ignored
     if mouseUsed then lastInputMouse = true
     elseif c.decide or c.cancel or c.navDown or c.navDownOrPadRight or c.navUp or c.navUpOrPadLeft
         or c.navLeft or c.navRight then lastInputMouse = false end
@@ -584,7 +560,7 @@ function M:update(ts)
             if self._hoverW then self._hoverW:setHover(false) end
             if hoverW then hoverW:setHover(true) end
             self._hoverW = hoverW
-            -- mouse moves focus to the newly hovered widget
+            -- hover moves focus
             for i, w in ipairs(self.focusables) do if w == hoverW then self.focusIdx = i; justHoveredIdx = i; break end end
         end
         self:_navigate(c)
@@ -597,8 +573,7 @@ function M:update(ts)
         if focusW then focusW:setFocus(true, not self._focusW or justHoveredIdx == self.focusIdx) end
         self._focusW = focusW
     end
-    -- while the mouse leads, only the widget under the pointer shows the ring: the focus stays where it
-    -- was, ready for the keys
+    -- while the mouse leads, only the hovered widget is highlighted; focus stays for the keys
     if self._mouseLead ~= lastInputMouse then
         self._mouseLead = lastInputMouse
         if self._focusW then self._focusW:_refreshHighlight() end
@@ -611,17 +586,17 @@ function M:update(ts)
             local inside = self._pressW:hitTest(c.mx, c.my)
             self._pressW:release(inside); self._pressW = nil
         end
-        -- keyboard/gamepad activate (single-shot squish→boing, not a same-frame press+release that cancels it)
+        -- keyboard/gamepad activate (one keyActivate, no same-frame press+release)
         if c.decide then
             if focusW then focusW:keyActivate(); c.decide = false
             else self:focusStay()
             end
         end
-        -- cancel bubbles to the stage
+        -- cancel goes to the stage
         if c.cancel then self.cancelRequested = true end
     end
 
-    -- per-widget update (anims + widget-specific logic: drag, capture, scroll, typewriter)
+    -- per-widget update
     for _, w in ipairs(self.widgets) do if w.visible then w:update(c) end end
 
     return self.cancelRequested and "cancel" or nil

@@ -1,6 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Up background 1: scrolling layered sky (1st/3rd) with a bobbing 3rd layer + a rotated, looping "Clear_Up_3rd"
--- diagonal sweep, plus a per-player clear fade. Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
+-- up background 1
 
 local loopWidth = 492
 local loopHeight = 288

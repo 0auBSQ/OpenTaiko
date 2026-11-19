@@ -1,16 +1,6 @@
--- Lines said on the encounter screen after a floor clear (floor_result.lua).
--- Line format (story/entrance.lua):
---   { who = "ume", sprite = "clear", text = "..." }   (sprite: normal, scared, brave, clear, run, lost, fail)
---   { name = "Needle", text = "..." }                  (anybody else)
---   { who = "you", text = "..." }                      (the player)
---   { pick = pool }                                    (one option of the pool, drawn at random)
--- A floor plays its own entry, else `roof` (21+) or `default`; an entry may be a variant list as in
--- story/entrance.lua; an empty list skips the dialog.
--- Extra line fields: event = "light_up" (with wait = true) lights the level-15 room and holds the line
--- until it is lit; cheer = true makes Ume cheer; bubble = "exclaim" shows the "!" bubble.
--- `rewards`: Ume's line after a clear that left a reward (floors 1-9 and 11-19), before the pop-ups.
+-- floor clear lines (floor_result.lua); line format: story/entrance.lua
 
--- a rare line's weight, against 1 for every other line
+-- rare line weight (others: 1)
 local RARE = 0.25
 
 local CLEAR = {
@@ -41,7 +31,7 @@ local CLEAR = {
     } },
 }
 
--- a spoken choice: picking it says it, so it is not repeated as a line
+-- spoken choice: the picked label is the said line
 local function say(...)
     local choices = {}
     for i, label in ipairs({ ... }) do
@@ -50,6 +40,8 @@ local function say(...)
     return { text = "", choices = choices }
 end
 
+-- [level] entry, else roof (21+), else default; {} skips the dialog
+-- entry: line list or variant list (story/entrance.lua)
 return {
     default = {
         { pick = CLEAR },
@@ -57,11 +49,12 @@ return {
 
     roof = {},
 
+    -- after a clear with a reward (floors 1-9, 11-19), before the pop-ups
     rewards = {
         { who = "ume", sprite = "normal", react = "surprise", bubble = "exclaim", text = "Oh! The monster left something behind!" },
     },
 
-    -- shadow room: light_up on the first clear; once lit, the usual lines
+    -- first clear: light_up event (wait = true holds the line until lit)
     [15] = {
         {
             when = function(ctx) return (ctx.tower or ctx.highest or 0) < 15 end,

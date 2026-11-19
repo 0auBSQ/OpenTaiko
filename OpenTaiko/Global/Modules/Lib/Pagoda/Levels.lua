@@ -1,14 +1,13 @@
--- Pagoda.Levels: everything derived from a floor number: the song pools (pools.json next to this file),
--- the level's name / dan tick / plate colour, its three exam thresholds, and the purple-song probability.
--- Pure lookups: no screen or run state lives here.
+-- Pagoda.Levels: lookups derived from a floor number
+-- pure: no screen or run state
 
 local HERE = require("Core.Here")(...)
 
 local M = {}
 
--- ── Song pools (pools.json) ──────────────────────────────────────────────────
--- One entry per level from 1 up: { blue, green, red, purple } lists of { id (a song's unique id), diff }.
--- M.get_pool() falls back downward if a level has no dedicated pool entry.
+-- ==== Song pools (pools.json) ====
+-- per level from 1: { blue, green, red, purple } lists of { id (song unique id), diff }
+-- get_pool falls back to lower levels
 
 M.COLORS = { "blue", "green", "red", "purple" }
 
@@ -17,7 +16,7 @@ local _pools_cache = nil
 -- dropped after a song re-enumeration
 function M.clear_pools() _pools_cache = nil end
 
--- NLua cannot use pairs() on C# Dictionary objects; use GetEnumerator() instead.
+-- NLua: no pairs() on C# Dictionary; GetEnumerator instead
 local function _dict_iter(d)
     local e = d:GetEnumerator()
     return function()
@@ -29,7 +28,7 @@ function M.load_pools()
     if _pools_cache ~= nil then return _pools_cache end
     local raw = JSONLOADER:JsonParseFileAny((HERE or "") .. "pools.json")
 
-    -- Parse a single entry object { "id": "...", "diff": N }
+    -- entry { "id": ..., "diff": N }
     local function parse_entry(e_obj)
         local id, diff = nil, 0
         for k, v in _dict_iter(e_obj) do
@@ -39,12 +38,11 @@ function M.load_pools()
         return id ~= nil and { id = id, diff = diff } or nil
     end
 
-    -- Parse a pool object containing "blue", "green", "red", "purple" arrays
+    -- pool { blue, green, red, purple } arrays
     local function parse_pool(raw_pool)
         local pool = {}
         for _, color in ipairs(M.COLORS) do
             pool[color] = {}
-            -- find the color key among the pool's dictionary entries
             local raw_entries = nil
             for k, v in _dict_iter(raw_pool) do
                 if k == color then raw_entries = v ; break end
@@ -77,15 +75,15 @@ function M.get_pool(level)
         if pools[lv] ~= nil then return pools[lv] end
         lv = lv - 1
     end
-    return pools[1]  -- ultimate fallback
+    return pools[1]  -- fallback
 end
 
--- ── Level helpers ─────────────────────────────────────────────────────────────
+-- ==== Level helpers ====
 
 local KANJI_NUMS = { "一","二","三","四","五","六","七","八","九","十" }
 
--- 道一..道十 (1-10), 扉一..扉十 (11-20), then 穹天1, 穹天2, ... (21+): the same kanji in every language,
--- since they are the dan plate's and the dan's title
+-- 道一..道十 (1-10), 扉一..扉十 (11-20), 穹天1.. (21+)
+-- same kanji in every language: they are the dan plate and dan title
 function M.level_name(level)
     if level >= 1 and level <= 10 then
         return "道" .. (KANJI_NUMS[level] or tostring(level))
@@ -125,25 +123,25 @@ end
 
 function M.level_tick_color(level)
     if level <= 10 then
-        return { 139, 69, 19 }       -- brown (道)
+        return { 139, 69, 19 }       -- 道
     elseif level <= 20 then
-        -- rainbow: blue (扉一) → red (扉八) → magenta (扉九) → magenta-purple (扉十)
+        -- 扉: hue 240 (扉一) to 0 (扉八), then 325 and 290
         local d = level - 10             -- door index 1..10
         local h
         if d <= 8 then
             local t = (d - 1) / 7        -- 0.0 at 扉一, 1.0 at 扉八
-            h = 240 * (1 - t)^1.4        -- 240° (blue) → 0° (red)
+            h = 240 * (1 - t)^1.4        -- 240° to 0°
         else
-            h = 360 - (d - 8) * 35       -- 扉九 → 325° (magenta), 扉十 → 290° (magenta-purple)
+            h = 360 - (d - 8) * 35       -- 扉九 325°, 扉十 290°
         end
         local r, g, b = _hsv_to_rgb(h, 0.88, 1.0)
         return { r, g, b }
     else
-        return { 0, 0, 0 }           -- black (穹天)
+        return { 0, 0, 0 }           -- 穹天
     end
 end
 
--- EXAM 1: Gauge thresholds (red / gold), range = More (player must reach)
+-- exam 1: gauge thresholds (red / gold), range More
 function M.exam1_gauge(level)
     if level <= 5 then
         return 70, 80
@@ -157,15 +155,15 @@ function M.exam1_gauge(level)
     end
 end
 
--- EXAM 2: Accuracy % (道/扉 levels 1-20, More) or Ok count (穹天 levels 21+, Less)
--- Returns: type, red, gold, lessThan
+-- exam 2: accuracy % (levels 1-20, More) or Ok count (21+, Less)
+-- returns type, red, gold, lessThan
 function M.exam2(level)
     if level <= 20 then
         local t = {
-            -- 道 1-10 : Easy band 1-4, Normal band 5-7, Hard band 8-10 (accuracy resets at 8)
+            -- 道 1-10 (accuracy resets at 8 with the Hard band)
             [1]={78,88},  [2]={80,90},  [3]={84,92},  [4]={86,93},  [5]={88,94},
             [6]={90,95},  [7]={92,96},  [8]={70,85},  [9]={72,86},  [10]={75,87},
-            -- 扉 (doors) 11-20
+            -- 扉 11-20
             [11]={80,90}, [12]={84,92}, [13]={88,94}, [14]={90,95}, [15]={92,96},
             [16]={94,97}, [17]={95,97}, [18]={96,98}, [19]={97,98}, [20]={98,99},
         }
@@ -186,14 +184,14 @@ function M.exam2(level)
     end
 end
 
--- EXAM 3: Bad count base values (red / gold); multiply by 1.25 (floor) if purple picked
+-- exam 3: Bad count base (red / gold); x1.25 (floor) when purple is picked
 function M.exam3_base(level)
     if level <= 20 then
         local t = {
             -- 道 1-10
             [1]={32,22}, [2]={30,20}, [3]={28,19}, [4]={27,18}, [5]={26,18},
             [6]={25,18}, [7]={25,17}, [8]={24,17}, [9]={23,16}, [10]={22,16},
-            -- 扉 (doors) 11-20
+            -- 扉 11-20
             [11]={20,15}, [12]={16,12}, [13]={12,8}, [14]={10,7}, [15]={9,6},
             [16]={8,6},   [17]={7,5},   [18]={6,4},  [19]={5,3},  [20]={4,2},
         }
@@ -211,7 +209,7 @@ function M.purple_prob(level)
     elseif level == 20 then return 1.00   -- 扉十 (last door): guaranteed purple
     elseif level <= 26 then return 0.10
     else
-        -- level 27 → 0 %, level 28 → 10 %, level 29 → 20 %, …
+        -- +10% per level from 27
         return math.max(0.0, math.min(1.0, (level - 27) * 0.10))
     end
 end

@@ -1,4 +1,4 @@
--- Three-slice box: left cap, stretched middle, right cap.
+-- three-slice box: caps and a stretched middle
 
 local M = {}
 
@@ -12,13 +12,13 @@ local function prep(tx, s, r, g, b, a)
     tx:SetColor(r, g, b) ; tx:SetOpacity(a) ; tx:SetScale(s, s)
 end
 
--- total width for an inner span of `inner` px: the caps' insets added, at least both caps
+-- inner px + cap insets, at least both caps
 function M.width(p, inner)
     return math.max(2 * p.cap, math.floor(inner + 2 * p.inset + 0.5))
 end
 
--- pieces = { l, m, r } textures; (x, y) = box centre; w = width at scale 1; s = scale;
--- r, g, b = tint; a = opacity. At scale 1 the box lands on whole pixels.
+-- pieces = { l, m, r }; (x, y): box centre; w: width at scale 1; s: scale; r, g, b: tint; a: opacity
+-- scale 1 lands on whole pixels
 function M.draw(pieces, x, y, w, s, r, g, b, a)
     local l, m, rt = pieces.l, pieces.m, pieces.r
     if not (ready(l) and ready(m) and ready(rt)) then return end
@@ -28,7 +28,7 @@ function M.draw(pieces, x, y, w, s, r, g, b, a)
     local left, top = x - (lw + mid + rw) * s / 2, y - h * s / 2
     if s == 1 then left, top = math.floor(left + 0.5), math.floor(top + 0.5) end
     prep(l, s, r, g, b, a) ; prep(m, s, r, g, b, a) ; prep(rt, s, r, g, b, a)
-    -- each piece snaps to whole pixels and is stretched to span them, so a scaled box has no seam gaps
+    -- pieces snap to whole pixels and stretch to span them: no seam gaps when scaled
     local xl = math.floor(left + 0.5)
     local xm = math.floor(left + lw * s + 0.5)
     local xr = math.floor(left + (lw + mid) * s + 0.5)

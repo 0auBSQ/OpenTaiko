@@ -1,4 +1,4 @@
--- Ambience of the stone stairs (levels 6-9).
+-- ambience: stone stairs (levels 6-9)
 
 local F   = require("towerfx/field")
 local art = require("towerfx/art")
@@ -89,7 +89,7 @@ local function petals(L, t, top, W)
     F.reset(tx)
 end
 
--- the flock crosses during the first FLIGHT seconds of each gap, from a random side and height
+-- crosses in the first FLIGHT sec of each gap, random side and height
 local function birds(L, t, top, W)
     local tx = art.get("bird")
     if tx == nil then return end

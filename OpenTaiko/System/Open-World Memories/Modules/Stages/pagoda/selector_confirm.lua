@@ -1,4 +1,4 @@
--- Floor confirmation dialog, in the encounter menu's look and layout.
+-- floor confirmation dialog, encounter menu layout
 
 local Easing  = require("Easing")
 local pill    = require("encounter/ui_pill")
@@ -26,7 +26,7 @@ local _ui = nil                             -- panel, button, marker, glow
 local _white, _black = nil, nil
 local _c = nil                              -- dialog state, nil while inactive
 local _covered = nil                        -- opacity of the black left up after Yes
-local _t = 0                                -- seconds, for the hovered option's bounce
+local _t = 0                                -- sec, for the hover bounce
 
 local function _sk(key, fallback)
     local s = THEME:GetSkinString(key)
@@ -57,7 +57,7 @@ end
 
 function M.active() return _c ~= nil end
 
--- toBlack: the next screen fades in from black (the story); else it cross-fades over this one (song_loading)
+-- toBlack: next screen fades in from black (story); else cross-fades (song_loading)
 function M.enter(level, toBlack)
     _c = { level = level, t = 0, sel = 1, closing = false, close_t = 0, accepted = false, accept_t = 0,
            toBlack = toBlack == true }
@@ -140,7 +140,7 @@ local function draw_text(tx, x, y, s, maxW, alpha)
     reset(tx)
 end
 
--- one answer at (x, y) and scale `scale`; alpha fades the whole of it
+-- one answer at (x, y); alpha for the whole button
 local function draw_button(x, y, scale, label, selected, alpha)
     local s = pill.draw(_ui, x, y, scale, selected, _t, alpha)
     local t = _fonts.name:GetText(label, false, pill.BASE_W, pill.labelColor(selected), _black)

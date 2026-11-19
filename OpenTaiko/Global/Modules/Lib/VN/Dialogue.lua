@@ -1,35 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- VN.Dialogue — a reusable typewriter dialogue box (speaker name + portrait area + word-wrapped
--- typewriter text + choices), with inline command tags for flavour. Self-driven: the stage calls
--- dlg:update(dt) and dlg:draw() each frame and reads dlg.result when it reports "done".
---   local Dialogue = require("VN.Dialogue")       -- OWM's Lib/dialogue.lua is the same module
--- The box draws with the UI core's shapes and sounds (UI.SimpleUI.shape / .sfx, which PopUI shares); its
--- look is its own theme (THEME_DEFAULT below, or opts.theme), whichever UI library the skin picked.
---
--- Script = array of nodes: { name=, text=, portrait=, choices={ {label=, value=}, ... } }
---   text may contain inline tags executed as the typewriter reaches them:
---     {shake:amp,dur}  screen shake (via GLOBALCAMERA)   {pause:sec}  hold        {speed:cps}  retype speed
---     {sfx:name}       calls opts.onSfx(name)            {voice:name} calls opts.onVoice(name)
---     {expr:name}      calls opts.onExpr(name)           -- e.g. swap the speaker's expression mid-line
--- A node with `choices` shows them once the text finishes; selecting one sets dlg.result and ends.
---
--- Dialogue.new(opts): opts = {
---   fonts={name=,text=},            -- classic path: LuaText fonts (per-character byte atlas, ASCII)
---   gfont=,  gfontName=,            -- OR glyph path: LuaGlyphText objects (TEXT:CreateGlyphCached; UTF-8,
---                                   --   word wrap via WrapToLines). gfontName falls back to gfont.
---   ui="plain"|"popui",             -- box style: classic flat panel, or a rounded/shadowed box (UI shapes)
---   theme={...},                    -- popui box colours (see THEME_DEFAULT below), all optional
---   box={x=,y=,w=,h=},              -- geometry override (defaults preserved)
---   growLines=2,                    -- glyph path: the box grows upward a line for each line past this many
---   portraitSize=,                  -- 0 hides the portrait area (e.g. when big VN sprites are drawn instead)
---   mouse=true,                     -- also advance / confirm choices with left click
---   drawBox=false,                  -- skip the box/name chrome
---   advanceInput=fn,                -- extra advance predicate (e.g. the drum Decide pad)
---   cps=28,                         -- typewriter speed each node starts at (default 42; {speed:} overrides)
---   onSfx=fn, onVoice=fn, onExpr=fn, portraits={name=LuaTexture},
---   onBlip=fn, blipEvery=3,          -- VN typing blip: onBlip() every blipEvery revealed glyphs
---   opacity=1,                       -- the whole box's opacity (glyph path; dlg.opacity may change any frame)
---   caret=true }                     -- false hides the advance marker (dlg.caret may change any frame)
+-- VN.Dialogue: typewriter dialogue box with choices and inline tags
 
 local NavInput = require("Input.NavInput")
 local Util     = require("Core.Util")
@@ -44,17 +14,17 @@ local DEF_BOX_X, DEF_BOX_W = 90, 1740
 local DEF_BOX_Y, DEF_BOX_H = 770, 250
 local DEF_PORTRAIT = 210                      -- portrait square size
 local LINE_GAP = 8
-local FIT_LINES, FIT_PAD = 4, 8               -- a glyph text of this many lines or more ends FIT_PAD above the box's bottom
+local FIT_LINES, FIT_PAD = 4, 8               -- texts of FIT_LINES+ lines end FIT_PAD above the box bottom
 local DEFAULT_CPS = 42
-local GROW_RATE = 14                          -- how fast a box grows or shrinks to its text (eased)
-local GROW_CUT = 32                           -- a grown box stretches only between bands this far into its top and bottom
--- a glyph box anchored by its middle draws its ink high; centred labels move down by this much
+local GROW_RATE = 14                          -- grow/shrink ease rate (1/s)
+local GROW_CUT = 32                           -- stretch band inset from the box top and bottom (px)
+-- centred glyph labels draw high; y offset (px)
 local NAME_NUDGE, CHOICE_NUDGE = 9, 8
--- the selected choice's marker: a triangle every skin font has (they lack the small one), drawn small
+-- choice marker: U+25B6 (in every skin font), scaled down
 local CHOICE_MARK, MARK_SCALE = "\u{25B6}", 0.55
 
 local THEME_DEFAULT = {
-    face    = { 252, 248, 244, 255 },   -- box face (top of gradient; opaque — canvas bakes overwrite)
+    face    = { 252, 248, 244, 255 },   -- box face top (opaque: canvas bakes overwrite)
     face2   = { 244, 231, 233, 255 },   -- box face (bottom)
     outline = { 108, 82, 94, 255 },
     namePill  = { 233, 116, 152, 255 },
@@ -66,12 +36,12 @@ local THEME_DEFAULT = {
     choiceText = { 96, 72, 84 },
     caret     = { 222, 120, 152 },
     shadow    = { 70, 40, 55, 90 },
-    textEdge  = { 0, 0, 0, 255 },      -- the body text's outline (glyph path; alpha 0 = none)
+    textEdge  = { 0, 0, 0, 255 },      -- body text outline (glyph path; alpha 0 = none)
 }
 
 local UTF8_PAT = "[%z\1-\127\194-\244][\128-\191]*"
 
--- ── per-character glyph cache for the CLASSIC (LuaText) path — unchanged behaviour ──
+-- ==== Glyph cache (LuaText path) ====
 local function atlasFor(self, font)
     local a = self._atlas[font]
     if not a then
@@ -94,16 +64,18 @@ local function glyph(self, a, ch)
     return g
 end
 
+-- opts: fonts = {name, text} (LuaText) or gfont, gfontName (LuaGlyphText, UTF-8 wrap)
+-- ui = "popui" | "plain", theme (THEME_DEFAULT keys), box = {x, y, w, h}
+-- growLines: glyph box grows one line per line past this; portraitSize = 0 hides the portrait
+-- portraits = {name = LuaTexture}; opacity and caret may change any frame
 function Dialogue.new(opts)
     opts = opts or {}
     local self = setmetatable({}, Dialogue)
     self.fonts = opts.fonts or {}
     self.gfont = opts.gfont
     self.gfontName = opts.gfontName or opts.gfont
-    self.ui = opts.ui or "popui"   -- the rounded PopUI-style chrome is the default skin-wide look
-                                   -- (pass ui="plain" for the old flat panel)
-    -- `or {}`: Util.merge returns its second argument when it is not a table, so a caller that
-    -- omits `theme` would otherwise get a nil theme and fault on the first box draw
+    self.ui = opts.ui or "popui"   -- default; "plain" = flat panel
+    -- `or {}`: Util.merge returns a non-table second argument as is
     self.theme = Util.merge(THEME_DEFAULT, opts.theme or {})
     self.sfx = Sfx.resolve(opts.sfx)
     local box = opts.box or {}
@@ -119,13 +91,13 @@ function Dialogue.new(opts)
     self.baseBoxY, self.baseBoxH = self.boxY, self.boxH
     self.growPx, self.growTo = 0, 0
     self.mouse = opts.mouse == true
-    self.drawBox = opts.drawBox ~= false  -- false → caller draws its own box art; text/choices/caret only
-    self.advanceInput = opts.advanceInput -- optional extra advance predicate (e.g. the drum Decide pad)
-    self.cpsDefault = opts.cps            -- typewriter speed a node starts at (default 42; {speed:} overrides)
+    self.drawBox = opts.drawBox ~= false  -- false: caller draws the box art
+    self.advanceInput = opts.advanceInput -- optional extra advance predicate
+    self.cpsDefault = opts.cps            -- start cps per node (default 42)
     self.onSfx = opts.onSfx
     self.onVoice = opts.onVoice
     self.onExpr = opts.onExpr
-    self.onBlip = opts.onBlip             -- called every blipEvery revealed glyphs (VN typing blip)
+    self.onBlip = opts.onBlip             -- called every blipEvery revealed glyphs
     self.blipEvery = opts.blipEvery or 3
     self.opacity = opts.opacity or 1
     self.caret = opts.caret ~= false
@@ -148,12 +120,12 @@ function Dialogue:color(r, g, b, a)
     return c
 end
 
--- ── CLASSIC layout (LuaText path) — unchanged ─────────────────────────────────────
+-- ==== Layout (LuaText path) ====
 function Dialogue:layout(text)
     local a = atlasFor(self, self.fonts.text)
     local glyphs, cmds = {}, {}
     local x, y = 0, 0
-    local lineH = a.h - 16 + LINE_GAP                   -- the font box has ~padding; trim a little
+    local lineH = a.h - 16 + LINE_GAP                   -- trim the font box padding
     local i, n = 1, #text
     local function emit(ch)
         local g = glyph(self, a, ch)
@@ -165,7 +137,7 @@ function Dialogue:layout(text)
         if c == "{" then
             local close = text:find("}", i, true)
             if close then
-                local tag = text:sub(i + 1, close - 1)   -- e.g. "shake:8,0.3"
+                local tag = text:sub(i + 1, close - 1)
                 local name, args = tag:match("^(%w+):?(.*)$")
                 cmds[#glyphs] = cmds[#glyphs] or {}
                 table.insert(cmds[#glyphs], { name = name, args = args })   -- fire when this many glyphs shown
@@ -186,7 +158,8 @@ function Dialogue:layout(text)
     return glyphs, cmds
 end
 
--- ── GLYPH layout (LuaGlyphText path): strip tags → plain text, wrap via the engine, count UTF-8 chars ──
+-- ==== Layout (LuaGlyphText path) ====
+-- strips tags and wraps via the engine
 function Dialogue:layoutGlyph(text)
     local plain, cmds = {}, {}
     local count = 0
@@ -223,9 +196,7 @@ function Dialogue:layoutGlyph(text)
     end
     local total = 0
     for _, l in ipairs(lines) do total = total + l.n end
-    -- Realign the command keys from RAW char positions to DRAWN glyph positions: the engine
-    -- wrap drops spaces at line breaks, so without this every dropped space pushes all later
-    -- {pause:}/{sfx:} tags one glyph late (they fired after the next characters had shown).
+    -- remap command keys from raw chars to drawn glyphs (wrap drops spaces at breaks)
     local raw = {}
     for _, seq in ipairs(plain) do
         if seq ~= "\n" then raw[#raw + 1] = seq end
@@ -252,13 +223,15 @@ function Dialogue:layoutGlyph(text)
     return lines, remapped, total
 end
 
--- a grown box keeps its bottom: its top and the text move up
+-- grown box keeps its bottom
 function Dialogue:placeBox()
     self.boxY = self.baseBoxY - self.growPx
     self.boxH = self.baseBoxH + self.growPx
     self.textY = self.boxY + 64
 end
 
+-- script = array of { name, text, portrait, choices = { { label, value } } }
+-- a node with choices ends the dialogue on a pick (sets dlg.result)
 function Dialogue:start(script)
     local was = self.activeFlag
     self.script = script or {}
@@ -266,7 +239,7 @@ function Dialogue:start(script)
     self.result = nil
     self.activeFlag = true
     self:nextNode()
-    -- a box that was not up takes its size at once; one already up grows or shrinks to it
+    -- new box: size at once; open box: eases to it
     if self.growLines and not was then
         self.growPx = self.growTo
         self:placeBox()
@@ -292,7 +265,7 @@ function Dialogue:nextNode()
     self.cps = self.cpsDefault or DEFAULT_CPS
     self.pause = 0
     self.fired = {}
-    -- inline-command indices in order, so the typewriter can stop exactly on the next one
+    -- sorted command indices (typewriter stops on each)
     self._cmdIdx, self._cmdPtr = {}, 1
     for idx in pairs(self.cmds) do self._cmdIdx[#self._cmdIdx + 1] = idx end
     table.sort(self._cmdIdx)
@@ -308,7 +281,7 @@ function Dialogue:advancePressed()
         or (self.advanceInput ~= nil and self.advanceInput())
 end
 
--- a growing box eases toward its text's size (update does it; a caller revealing text itself calls it)
+-- ease the box toward its text size; update calls it
 function Dialogue:tickGrow(dt)
     if not self.growLines or self.growPx == self.growTo then return end
     self.growPx = self.growPx + (self.growTo - self.growPx) * math.min(1, (dt or 0) * GROW_RATE)
@@ -316,6 +289,7 @@ function Dialogue:tickGrow(dt)
     self:placeBox()
 end
 
+-- per frame: update(dt) then draw(); "done" when finished (read dlg.result)
 function Dialogue:update(dt)
     self:tickGrow(dt)
     if not self.activeFlag then return "done" end
@@ -337,7 +311,7 @@ function Dialogue:update(dt)
     if self.pause > 0 then self.pause = self.pause - dt
     elseif self.revealed < self.total then
         if self:advancePressed() then
-            -- skip to fully revealed: fire every remaining command first (expr swaps etc. must land)
+            -- skip: fire remaining commands, then reveal all
             for idx = 0, self.total do
                 if self.cmds[idx] and not self.fired[idx] then
                     self.fired[idx] = true
@@ -350,13 +324,11 @@ function Dialogue:update(dt)
             self._cmdPtr = #self._cmdIdx + 1
         else
             local target = self.revealed + self.cps * dt
-            -- Never step past a pending inline command in one frame: a {pause:} has to take
-            -- effect exactly where it sits, not after the next characters have already shown
-            -- (a long frame would otherwise overshoot it).
+            -- stop at the next pending command (a long frame would skip a {pause:})
             local nextCmd = self._cmdIdx[self._cmdPtr]
             if nextCmd ~= nil and target > nextCmd then target = nextCmd end
             self.revealed = math.min(self.total, target)
-            -- typing blip: one call per blipEvery glyphs actually revealed
+            -- one blip per blipEvery revealed glyphs
             if self.onBlip ~= nil and self.revealed >= self._blipAt + self.blipEvery then
                 self._blipAt = self.revealed
                 self.onBlip()
@@ -385,12 +357,13 @@ function Dialogue:update(dt)
     return "running"
 end
 
+-- tags: {shake:amp,dur} {pause:sec} {speed:cps} {sfx:name} {voice:name} {expr:name}
 function Dialogue:runCmd(cmd)
     local name, args = cmd.name, cmd.args or ""
     if name == "shake" then
         local amp, dur = args:match("([%d%.]+),?([%d%.]*)")
         amp, dur = tonumber(amp) or 12, tonumber(dur) or 0.3
-        -- 2D screens shake themselves (GLOBALCAMERA only moves the 3D view)
+        -- GLOBALCAMERA only moves the 3D view
         if self.onShake then self.onShake(amp, dur) else GLOBALCAMERA:Shake(amp, dur) end
     elseif name == "pause" then
         self.pause = tonumber(args) or 0.4
@@ -405,7 +378,7 @@ function Dialogue:runCmd(cmd)
     end
 end
 
--- bake the PopUI-style box (rounded panel + drop shadow + name pill) once per geometry
+-- bake the popui box once per geometry
 function Dialogue:bakeFancyBox()
     if self._fbox then return self._fbox end
     local Shape = require("UI.SimpleUI.shape")
@@ -420,7 +393,7 @@ function Dialogue:bakeFancyBox()
         top = t.face, bottom = t.face2, gloss = { 255, 255, 255, 40 },
     })
     cv:Upload()
-    -- name pill (drawn above the box's top-left)
+    -- name pill
     local pw, ph = 320, 54
     local pill = CANVAS:CreateCanvas(pw + 2 * m, ph + 2 * m)
     pill:ClearTransparent()
@@ -430,13 +403,13 @@ function Dialogue:bakeFancyBox()
         top = t.namePill, bottom = t.namePill2, gloss = { 255, 255, 255, 60 },
     })
     pill:Upload()
-    -- choice row (baked at full width, tinted per state at draw)
+    -- choice row (tinted per state at draw)
     local rw, rh = math.min(760, self.textW), 52
     local row = CANVAS:CreateCanvas(rw, rh)
     row:ClearTransparent()
     Shape.fillRound(row, 0, 0, rw, rh, 18, { 255, 255, 255, 255 })
     row:Upload()
-    -- portrait frame (a rounded inset panel the portrait texture sits inside)
+    -- portrait frame
     local pfr = nil
     if self.portraitSize > 0 then
         local ps = self.portraitSize + 16
@@ -453,13 +426,12 @@ function Dialogue:bakeFancyBox()
     return self._fbox
 end
 
--- the baked box at a grown height: its top and bottom bands as baked, the band between stretched
+-- grown box: top and bottom bands as baked, middle band stretched
 function Dialogue:drawGrownBox(fb)
     local cv, w, h = fb.cv, fb.cw, fb.ch
     local cut = fb.m + GROW_CUT
     local mid = h - 2 * cut
-    -- whole pixels, and the stretched band a row taller at both ends under the others: a band edge that falls
-    -- between two pixels would half cover that row, and what is behind the box would show through it
+    -- whole pixels; middle band one row taller at each end (no seams)
     local x, y = math.floor(self.boxX - fb.m + 0.5), math.floor(self.boxY - fb.m + 0.5)
     if mid <= 0 then cv:Draw(x, y); return end
     local midTo = mid + math.floor(self.growPx + 0.5)
@@ -487,17 +459,14 @@ function Dialogue:draw()
     if op <= 0 then return end
 
     if not self.drawBox then
-        -- caller renders its own box art (e.g. intro_nokon's Dialogue.png); skip the chrome
+        -- caller draws its own box art
     elseif self.ui == "popui" then
         local fb = self:bakeFancyBox()
         fb.cv:SetColor(1, 1, 1); fb.cv:SetOpacity(op); fb.cv:SetScale(1, 1)
         if self.growLines and self.growPx > 0 then self:drawGrownBox(fb)
         else fb.cv:Draw(self.boxX - fb.m, self.boxY - fb.m) end
         if node.name and node.name ~= "" then
-            -- the pill sits above the box, aligned with the TEXT column (right of the portrait
-            -- frame). At the old boxX+30 it overlapped the portrait frame's top band (the pill
-            -- spans down to boxY+24, the frame starts at boxY+14) and the frame — drawn later —
-            -- painted over the name.
+            -- pill aligned with the text column (clear of the portrait frame)
             local pillX = self.boxX + (self.portraitSize > 0 and (self.portraitSize + 34) or 30)
             fb.pill:SetColor(1, 1, 1); fb.pill:SetOpacity(op)
             fb.pill:Draw(pillX - fb.m, self.boxY - 30 - fb.m)
@@ -510,7 +479,7 @@ function Dialogue:draw()
             end
         end
     else
-        -- classic flat panel (original look, unchanged)
+        -- plain flat panel
         local dim = self._dim
         if not dim then dim = CANVAS:CreateCanvas(2, 2); dim:Clear(255, 255, 255, 255); dim:Upload(); self._dim = dim end
         dim:SetColor(0.04, 0.05, 0.08); dim:SetOpacity(0.82)
@@ -522,7 +491,7 @@ function Dialogue:draw()
         end
     end
 
-    -- portrait area — a rounded frame in popui mode, the old flat quad otherwise
+    -- portrait area (popui frame or flat quad)
     if self.portraitSize > 0 then
         if self.ui == "popui" and self._fbox and self._fbox.pfr then
             self._fbox.pfr:SetColor(1, 1, 1); self._fbox.pfr:SetOpacity(1)
@@ -545,13 +514,11 @@ function Dialogue:draw()
     local upto = floor(self.revealed)
     if self.gfont ~= nil then
         local tc = (self.ui == "popui") and self:color(t.text[1], t.text[2], t.text[3]) or self:color(255, 255, 255)
-        -- a BLACK outline keeps the body readable over any panel/background (the transparent outline
-        -- left light theme text as unreadable grey); pair with a light theme.text for white+border.
-        -- theme.textEdge replaces it (e.g. none for dark ink on a light box art)
+        -- outline colour from theme.textEdge (default black)
         local te = t.textEdge or { 0, 0, 0, 255 }
         local oc = self:color(te[1], te[2], te[3], te[4] or 255)
         local lineH = self.gfont.LineHeight + LINE_GAP
-        -- a long text moves up as far as it takes for its last line to sit inside the box
+        -- long texts move up to keep the last line inside the box
         local ty, n = self.textY, #self.glines
         if n >= FIT_LINES then
             local bottom = ty + (n - 1) * lineH + self.gfont.LineHeight
@@ -568,7 +535,7 @@ function Dialogue:draw()
             shown = shown + line.n
         end
     else
-        -- classic atlas glyphs bake white; tint them dark on the light popui panel
+        -- atlas glyphs bake white; tint to theme.text on popui
         local tr, tg, tb = 1, 1, 1
         if self.ui == "popui" then tr, tg, tb = t.text[1] / 255, t.text[2] / 255, t.text[3] / 255 end
         for i = 1, math.min(upto, self.total) do
@@ -584,7 +551,7 @@ function Dialogue:draw()
         if self.ui == "popui" and self._fbox then
             local fb = self._fbox
             local totalH = #ch * (fb.rh + 10) - 10
-            -- the rows stack above the box; with a speaker they clear the name pill (boxY - 30) too
+            -- rows stack above the box, clear of the name pill
             local named = node.name and node.name ~= ""
             local cy0 = (named and (self.boxY - 30 - 14) or (self.boxY - 26)) - totalH
             for i = 1, #ch do
@@ -594,8 +561,7 @@ function Dialogue:draw()
                 fb.row:SetColor(rc[1] / 255, rc[2] / 255, rc[3] / 255)
                 fb.row:SetOpacity((rc[4] or 255) / 255 * op)
                 fb.row:Draw(self.textX, ry)
-                -- the marker is drawn separately so the label's x and wrap width never change
-                -- between selected and unselected (otherwise the text visibly squishes)
+                -- marker drawn apart: label x and wrap width stay fixed
                 local cc = self:color(t.choiceText[1], t.choiceText[2], t.choiceText[3])
                 if self.gfont then
                     if sel then
@@ -617,7 +583,7 @@ function Dialogue:draw()
                 local sel = (i == self.choiceIdx)
                 local r, g, b = sel and 255 or 200, sel and 235 or 200, sel and 140 or 205
                 local y = cy + (i - 1) * 42
-                -- marker drawn apart from the label so selecting never shifts/resizes the text
+                -- marker drawn apart from the label
                 if self.gfont then
                     if sel then
                         self.gfont:Draw(CHOICE_MARK, self.textX + 30, y + self.gfont.BoxHeight / 2, self:color(r, g, b), self:color(0, 0, 0, 255), 1, MARK_SCALE, 0, "left")

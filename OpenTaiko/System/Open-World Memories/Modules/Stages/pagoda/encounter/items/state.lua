@@ -1,4 +1,4 @@
--- Which of Ume's items the player has and which are ready; kept in save.lua, so quitting never refills one.
+-- Ume's items owned and ready; kept in save.lua (quitting never refills one).
 
 local save = require("save")
 

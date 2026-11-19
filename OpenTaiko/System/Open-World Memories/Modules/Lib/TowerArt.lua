@@ -1,31 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- TowerArt.lua — draws a tower out of the pieces of a tower look, so the tower select, the loading screen and
--- the result show the very tower the player climbs.
---
--- Each look has its own folder next to this file, Modules/Lib/TowerArt/<look>/, named like the gameplay tower
--- background it copies (Graphics/5_Game/5_Background/Tower/Down/<look>/, which the chart's TOWERTYPE names):
---   Base/BaseN.png   the floors, cycled every ten floors
---   Deco/DecoN.png   a decoration over each floor, cycled every floor (optional)
---   Top.png          the roof, one more floor over the last one
---   Config.json      in those pieces' pixels: floor_height (how far a floor's bottom sits above the one below),
---                    deco_dx / deco_dy (the decoration's bottom centre, from its floor's bottom centre)
--- The pieces are the gameplay ones at half size; tools/gen_tower_art.py makes them. A chart without a
--- TOWERTYPE, or with one that has no folder here, gets DEFAULT_LOOK.
---
---   local TowerArt = require("TowerArt")
---   local art = TowerArt.load()             -- call it where textures may be created (activate / onStart)
---   art:resolve(look)                       -- the folder a chart's TowerType lands on (default look otherwise)
---   art:preload(look)                       -- loads a look's pieces now (behind a cover) rather than at first draw
---   art:ready(look)                         -- true once all its pieces can be drawn
---   art:draw(look, x, bottomY, scale, floors, opts)
---       bottom-centre anchored, scale 1 = the pieces' own size; opts.color a COLOR tint, opts.opacity 0..1,
---       opts.clipTop / opts.clipBottom the screen rows outside of which floors are skipped (tall towers)
---   art:height(look, scale, floors)         -- the drawn height in pixels
---   art:dispose()
---
--- Paths are relative to the calling module's folder; TowerArt.load(skinRoot) takes another root than the
--- default "../../../" of a Stages/, Transitions/ or ROActivities/ module. Textures load asynchronously, so a
--- look drawn right after preload pops in a frame or two later, unless the caller waits for art:ready(look).
+-- TowerArt: draws the gameplay tower from a look's pieces, for menus
+-- looks: Modules/Lib/TowerArt/<look>/, named as Tower/Down/<look>/ (chart TOWERTYPE); else DEFAULT_LOOK
 
 -- a look's default floor sizes: Config/TowerArt/layout.json
 local HERE = require("Core.Here")(...)
@@ -41,6 +16,7 @@ local BASES_PER_FLOOR_CYCLE = 10
 
 local function jget(node, key) return JSONLOADER:JsonGet(node, key) end
 
+-- call where textures may be created (activate / onStart); skinRoot default "../../../"
 function TowerArt.load(skinRoot)
     local self = setmetatable({}, TowerArt)
     self.dir = (skinRoot or "../../../") .. ART_DIR
@@ -85,6 +61,12 @@ local function readLayout(dir)
     return layout
 end
 
+-- pieces at half the gameplay size:
+--   Base/BaseN.png   floors, cycled every ten floors
+--   Deco/DecoN.png   optional decoration, cycled every floor
+--   Top.png          roof over the last floor
+--   Config.json      piece px: floor_height, deco_dx / deco_dy (deco bottom centre from the floor's)
+-- textures load async: wait for art:ready(look) to avoid a pop-in
 function TowerArt:preload(look)
     look = self:resolve(look)
     local pieces = self.looks[look]
@@ -124,6 +106,7 @@ local function stamp(tex, x, y, scale, color, opacity)
     tex:DrawAtAnchor(x, y, "bottom")
 end
 
+-- bottom-centre anchor, scale 1 = piece size; opts: color (COLOR), opacity 0..1, clipTop / clipBottom rows
 function TowerArt:draw(look, x, bottomY, scale, floors, opts)
     local pieces = self:preload(look)
     if pieces == nil then return end

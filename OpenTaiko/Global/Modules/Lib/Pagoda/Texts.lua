@@ -1,5 +1,4 @@
--- Pagoda.Texts: the pagoda modules' own strings, lang/<code>/pagoda.json next to this file, in the game's
--- language (English when a language lacks one).
+-- Pagoda.Texts: pagoda strings from lang/<code>/pagoda.json next to this file (English fallback)
 
 local I18N = require("Locale.i18n")
 local HERE = require("Core.Here")(...)
@@ -10,7 +9,7 @@ local M = {}
 
 local cache, cacheCode = {}, nil
 
--- the game's language, also when the calling stage never picked it up
+-- follows the game language even when the stage never detected it
 local function sync()
     if I18N.code ~= I18N.currentCode() then I18N.detect() end
     if cacheCode ~= I18N.code then cache, cacheCode = {}, I18N.code end

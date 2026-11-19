@@ -1,4 +1,4 @@
--- French for story/entrance.lua; a missing key shows the English.
+-- French for story/entrance.lua; missing keys fall back to English
 
 local T = {}
 

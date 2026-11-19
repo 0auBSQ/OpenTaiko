@@ -1,20 +1,5 @@
--- Vault.Talk: Mr.Caspian's small talks and Gris's story, shared by the secret vault (the talks over coffee and
--- Gris's scenes) and My Room's phone (Mr.Caspian's and Gris's numbers). The lines and their order are in
--- Vault.TalkLines, their text in lang/<code>/talk.json next to this file; the progress is in the save.
---
--- A conversation is a flow, run as a coroutine: Talk.flow(fn) wraps one, and each resume returns what the
--- stage has to do next, then the stage resumes it with the answer:
---   { "say", run }      run a Runner (Talk.runner): its lines, choices and menus; resume with the action
---                       name the runner stopped at ("play", "come", "gift", "unlock_gris", "unlock_song"), or nil
---                       once it is over
---   { "stage", name }   the vault's staging ("in", "out", "come", "back"); resume when it is done
---   { "play", node }    play the song (the stage leaves and comes back); resume with true when cleared
---   { "reward", r }     a reward pop-up (Vault.Chests.showReward shape, or { type = "character", entry });
---                       resume when it is closed
--- A Runner hands the stage its lines: run:step() returns "lines", nodes (the last one may carry choices:
--- answer with run:answer(i)), "action", name, or "done". A node: { who = "C" | "G" | "N", sprite, key,
--- fade = true when the screen dims around it, shown = true for a line said again under a choice,
--- choices = { { label }, ... } }.
+-- Vault.Talk: Mr.Caspian's small talks and Gris's story, for the secret vault and My Room's phone.
+-- Lines and order: Vault.TalkLines; text: lang/<code>/talk.json next to this file; progress in the save.
 
 local Lines = require("Vault.TalkLines")
 local Daily = require("Shop.Daily")
@@ -33,9 +18,8 @@ M.GIFTS = { "gris_teddy", "gris_crane", "gris_cat", "gris_flowers" }  -- by her 
 M.GIFT_RARITY = "Epic"
 
 local GRIS_FROM = 6               -- talks before Gris shows up in the vault
-local TANK_CHANCE = 0.5           -- on an odd day she swims in the tank this often, else she is away
-local OFFER_CHANCE = { 0.1, 0.2, 0.5 }   -- after the day's first chest, the chance of an offer per chest opened
-                                         -- (simple, gold, optk)
+local TANK_CHANCE = 0.5           -- odd-day chance she is in the tank, else away
+local OFFER_CHANCE = { 0.1, 0.2, 0.5 }   -- offer chance per chest opened after the day's first (simple, gold, optk)
 local OFFER_PITY = 8              -- the 8th chest opened in a row without an offer always brings one
 local E1_TALKS, E2_TALKS = 15, 20
 local MENU_SIZE, STORY_SLOTS = 3, 2
@@ -58,7 +42,7 @@ local S = {
 }
 M.KEYS = S
 
--- ── save ────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Save ====
 
 M.slot = 0                        -- the save the talks read and write (My Room's phone sets its room's)
 local function sf() return GetSaveFile(M.slot) end
@@ -85,7 +69,7 @@ function M.heard(id) return trig(S.heard .. id) end
 function M.grisTalks() return cnt(S.grisTalks) end
 function M.songState() return cnt(S.song) end
 
--- ── text ────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Text ====
 
 local function sync() if I18N.code ~= I18N.currentCode() then I18N.detect() end end
 
@@ -94,7 +78,7 @@ local function playerName()
     return (ok and type(n) == "string" and n ~= "") and n or "..."
 end
 
--- the line of key in the game's language, the player's name in it
+-- text of key in the game's language, with the player's name
 function M.text(key)
     if key == nil then return "" end
     sync()
@@ -113,7 +97,7 @@ function M.name(who)
     return ""
 end
 
--- ── lines ───────────────────────────────────────────────────────────────────────────────────────
+-- ==== Lines ====
 
 local function append(dst, src) for _, it in ipairs(src) do dst[#dst + 1] = it end; return dst end
 local function pickOne(list) return list[math.random(1, #list)] end
@@ -153,6 +137,9 @@ end
 local Runner = {}
 Runner.__index = Runner
 
+-- run:step() -> "lines", nodes | "action", name | "done"; a last node with choices: answer with run:answer(i)
+-- node: { who = "C" | "G" | "N", sprite, key, fade (screen dims), shown (line repeated under a choice),
+--   choices = { { label }, ... } }
 function M.runner(items)
     return setmetatable({ stack = { { items = items or {}, i = 1 } }, chosen = {}, removed = {} }, Runner)
 end
@@ -228,7 +215,7 @@ function Runner:picked(key)
     return false
 end
 
--- ── flows ───────────────────────────────────────────────────────────────────────────────────────
+-- ==== Flows ====
 
 local yield = coroutine.yield
 
@@ -242,12 +229,19 @@ local function say(items, onAction)
     end
 end
 
+-- coroutine; each resume returns the stage's next job, the stage resumes it with the answer:
+--   { "say", run }      run a Runner; resume with the action it stopped at ("play", "come", "gift",
+--                       "unlock_gris", "unlock_song"), or nil once over
+--   { "stage", name }   vault staging ("in", "out", "come", "back"); resume when done
+--   { "play", node }    play the song; resume with true when cleared
+--   { "reward", r }     reward pop-up (Vault.Chests.showReward shape, or { type = "character", entry });
+--                       resume when closed
 function M.flow(fn, ...)
     local args = { ... }
     return coroutine.create(function() return fn(table.unpack(args)) end)
 end
 
--- ── the vault: topics ───────────────────────────────────────────────────────────────────────────
+-- ==== Vault topics ====
 
 -- id, after this many talks, parent heard, also needs this one
 local STORY = {
@@ -314,7 +308,7 @@ function M.rollSpot()
     return nil
 end
 
--- "I want to talk to Gris." is on the menu: whenever she watches from the window and has a scene left
+-- Gris on the menu: she watches from the window and has a scene left
 function M.grisReady(spot)
     return spot == "window" and cnt(S.song) == 3 and trig(S.grisNumber) and not trig(S.trust)
         and M.grisTalks() < GRIS_SCENES
@@ -456,7 +450,7 @@ local function opener()
     return append({}, pickOne(alts))
 end
 
--- ── the vault: Gris's scenes ────────────────────────────────────────────────────────────────────
+-- ==== Gris's scenes ====
 
 -- her character (M.GRIS_FOLDER), when it is installed
 function M.grisCharacter()
@@ -506,7 +500,7 @@ function M.grisScene()
     return "GP" .. (n + 1)
 end
 
--- ── songs ───────────────────────────────────────────────────────────────────────────────────────
+-- ==== Songs ====
 
 local function songsReady()
     local ok, v = pcall(function() return IsSongsEnumDone() end)
@@ -614,13 +608,13 @@ function M.cleared()
     return ok and r == true
 end
 
--- ── the flows ───────────────────────────────────────────────────────────────────────────────────
+-- ==== Flows ====
 
 local function grisFlow(spot)
     local id = M.grisScene()
     if id == nil then return end
     if id ~= "GP1" then yield({ "stage", "come" }) end
-    local left = false              -- she went to lie down: gone from the room for the rest of the visit
+    local left = false              -- gone from the room for the rest of the visit
     local function act(a)
         if a == "come" then yield({ "stage", "come" })
         elseif a == "leave" then
@@ -673,7 +667,7 @@ local function grisFlow(spot)
             end
         end
     elseif id == "GP6" then
-        -- her trust; her character comes with it, or she feels she has known you long before
+        -- GP6 trust: group 3 with her character owned, else 2
         say(append(group("GP6", 1), group("GP6", M.grisOwned() and 3 or 2)), act)
         setTrig(S.trust, true)
         setCnt(S.grisTalks, GRIS_SCENES)
@@ -707,9 +701,9 @@ function M.vaultTalk(spot)
     yield({ "stage", "out" })
 end
 
--- ── the phone (My Room) ─────────────────────────────────────────────────────────────────────────
+-- ==== Phone (My Room) ====
 
--- the cafe behind Mr.Caspian on the phone: it comes in with his first line, then these lines set its level
+-- phone cafe ambience: starts with his first line; these lines set its level
 M.CAFE = { CP1_06 = 0.4, CP3_02 = 0.3, CALL_05 = 0, CALL_10 = 0, CALLEARLY_05 = 0, CALLEARLY_10 = 0 }
 
 -- id, kind ("story" once, "random" again), the check that opens it
@@ -733,12 +727,12 @@ local function caspianCall()
     end
     setCnt(S.casCallDay, today)
     local items = group("CALL", 1)
-    -- the first call after GP6: he brings up her trust himself, before the menu
+    -- first call after GP6: CP6 before the menu
     if trig(S.trust) and not M.heard("CP6") then
         append(items, group("CP6", 1))
         setTrig(S.heard .. "CP6", true)
     end
-    -- story topics first, so an open one is never pushed off the menu by the random ones
+    -- story topics first (random ones never push an open one off the menu)
     local menu = {}
     for _, kind in ipairs({ "story", "random" }) do
         for _, t in ipairs(CALL_TOPICS) do
@@ -755,7 +749,7 @@ local function caspianCall()
         say(group("CALL", 2))
         return
     end
-    -- one topic a day: then he gets back to work and hangs up
+    -- one topic a day, then he hangs up
     local lines = M.topic(id)
     if not M.heard(id) then
         setTrig(S.heard .. id, true)
@@ -764,8 +758,7 @@ local function caspianCall()
     say(append(append(lines, group("CALL", 4)), group("CALL", 5)))
 end
 
--- the numbers the player has, for the phone's contacts: Mr.Caspian's once he gave it, Gris's once you have it
--- (from him, or dialed yourself) until her song is yours
+-- phone contacts: Mr.Caspian's once he gave it; Gris's once known, until her song is yours
 M.CASPIAN_DISPLAY = "75EA5"
 function M.contacts()
     local out = {}
@@ -821,11 +814,11 @@ local function grisCall()
         say(append(items, group("GPhOffer", 1)), onPlay)
         if result == "missing" then say(group("GPhMissing", 1)) end
     elseif known then
-        -- the artist's script: one answer, which hangs up when her song is missing
+        -- artist's script: one answer; hangs up when her song is missing
         say(append(group("GPhC", 1), group("GPhC", node and 2 or 3)), onPlay)
         if node == nil then result = "missing" end
     else
-        -- the artist's narration: one answer, which hangs up when her song is missing
+        -- artist's narration: one answer; hangs up when her song is missing
         local id = again and "GPhA2" or "GPhA"
         local items = again and group(id, st == 2 and 2 or 1) or group(id, 1)
         items = append(items, group(id, node and (again and 3 or 2) or (again and 4 or 3)))

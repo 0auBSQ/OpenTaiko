@@ -1,7 +1,5 @@
--- PlayStrings.lua — shared strings a stage sets for the one play it mounts (a loading background, the
--- dan plate's style, ...). The stage calls stamp() right after mounting the chart and clear() once the
--- play is back; readers take a string through get() or forTitle(), which answer "" unless the chart is
--- the stamped one, so strings left by a play the stage never came back from reach no other play.
+-- Songs.PlayStrings: shared strings a stage sets for the one play it mounts
+-- stamp() after mounting, clear() once back; get/forTitle return "" for any other chart
 local M = {}
 
 local KEY = "play_strings_chart"

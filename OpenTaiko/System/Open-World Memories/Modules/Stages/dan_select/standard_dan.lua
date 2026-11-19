@@ -1,4 +1,4 @@
--- standard_dan.lua  —  Standard Dan Challenge sub-module for dan_select
+-- Standard Dan Challenge sub-module of dan_select.
 
 local NavInput       = require("NavInput")
 local EM             = require("EventMode")
@@ -12,14 +12,13 @@ local Animation      = Config.load("Config/animation.json")
 local Bars, Header, ConfirmLayout = Layout.bars, Layout.header, Layout.confirm
 local List, Player = Animation.list, Layout.player
 
--- ── Constants ────────────────────────────────────────────────────────────────
+-- ==== Constants ====
 
 local TX  = "Textures/"
 
 local DIFF_DAN = 6
 
--- one bar more than the screen holds at each end: the bar that slides in on a scroll is already
--- there, just past the edge, instead of appearing at it
+-- one bar past the screen at each end: a scrolled-in bar is already there
 local PAGE_BEFORE = Bars.visible_before
 local PAGE_AFTER  = Bars.visible_after
 local PAGE_SIZE   = PAGE_BEFORE + 1 + PAGE_AFTER
@@ -59,13 +58,13 @@ local BAR_STAGGER_SEC   = List.bar_stagger_s
 local CONTENT_SLIDE_SEC = List.content_slide_s
 local BAR_SLIDE_SEC     = List.bar_slide_s
 
--- ── State persistent across activate/deactivate ───────────────────────────────
+-- ==== State kept across activate/deactivate ====
 
 local _song_list = nil
 local _in_play   = false
 local _CB        = nil
 
--- ── Per-activation resources ──────────────────────────────────────────────────
+-- ==== Per-activation resources ====
 
 local tx_header        = nil
 local tx_content       = nil
@@ -79,18 +78,18 @@ local col_confirm, col_confirm_outline = nil, nil
 local tx_bars          = {}
 
 local danplate_ro      = nil
-local sc               = nil       -- the song select's shortcuts: help panel, auto, song speed
+local sc               = nil       -- song select shortcuts
 local modicons_ro      = nil
 local act              = {}
 local act_was_active   = {}
 local snd_move         = nil
-local snd_tick         = nil       -- Sounds/tick.ogg: a wooden tok for each bar as the list builds up
+local snd_tick         = nil       -- Sounds/tick.ogg, per bar as the list builds
 
 local font_bar_title   = nil
 local font_hdr_title   = nil
 local font_hdr_sub     = nil
 
--- ── Per-enter animation state ─────────────────────────────────────────────────
+-- ==== Per-enter animation state ====
 
 local _state                = "song_select"
 local page_nodes            = {}
@@ -120,7 +119,7 @@ local CONFIRM_BTN_GAP       = ConfirmLayout.button_gap
 local CONFIRM_TITLE_DY      = ConfirmLayout.title_dy               -- the title's line below the paper's top
 local CONFIRM_BTN_DY        = ConfirmLayout.button_dy               -- the buttons' centre below the paper's centre
 
--- ── Internals ─────────────────────────────────────────────────────────────────
+-- ==== Internals ====
 
 local function _build_dan_songs(chart)
     if chart == nil or chart.DanSongs == nil then return {} end
@@ -199,7 +198,7 @@ local function _do_scroll(dir)
     bar_y_offset_counter:Start()
 end
 
--- Returns "back" if we should return to the 3-way menu, nil otherwise
+-- "back" to return to the 3-way menu, else nil
 local function _handle_cancel()
     SHARED:GetSharedSound("Cancel"):Play()
     if _song_list == nil then return "back" end
@@ -249,8 +248,7 @@ local function _draw_content(node, y_offset)
     tx_content:DrawAtAnchor(CONTENT_X, CONTENT_Y + (y_offset or 0), "topleft")
 end
 
--- the assets stay loaded with the skin (M.init at the stage's onStart, freed in M.destroy), so entering
--- the list costs nothing but the per-entry setup below: nothing to decode or upload on the way in
+-- assets live with the skin (M.init at onStart, freed in M.destroy); entering only runs the per-entry setup
 function M.init()
     if tx_header ~= nil then return end
     tx_header        = TEXTURE:CreateTexture(TX .. "Header.png")
@@ -282,8 +280,7 @@ function M.init()
     ContentsDrawer.load()
 end
 
--- every dan's song list (folders holding dans, wherever they are), built when enumeration finishes so the first
--- entry has it ready
+-- every dan's song list, built when enumeration finishes (ready for the first entry)
 local function _build_song_list()
     local lsls = GenerateSongListSettings()
     lsls.SubBackBoxFrequency  = 5
@@ -377,16 +374,15 @@ local function _reset_anim_state()
     content_slide_y   = 0.0
 end
 
--- ── Public API ────────────────────────────────────────────────────────────────
+-- ==== Public API ====
 
 function M.is_returning_from_play()
     return _in_play
 end
 
--- Called from Script.lua's activate() when is_returning_from_play() is true,
--- or when entering standard dan from the 3-way menu.
--- is_return = true  → returning from a played dan (resume song list)
--- is_return = false → first/subsequent entry from menu
+-- called from Script.lua's activate() on return from play, or on entry from the 3-way menu
+-- is_return = true: back from a played dan (resume the song list)
+-- is_return = false: entry from the menu
 function M.enter(CB, is_return)
     _CB = CB
     _in_play   = false
@@ -401,7 +397,7 @@ function M.enter(CB, is_return)
     _start_setup_anim(true)
 end
 
--- Called when user cancels back to the 3-way menu
+-- user cancelled back to the 3-way menu
 function M.leave()
     _teardown_entry()
 end
@@ -412,8 +408,7 @@ function M.deactivate()
 end
 
 function M.afterSongEnum()
-    -- the list follows the library: rebuilt now (this runs for every stage, active or not) so the
-    -- next entry into the dojo does not build it on the spot
+    -- rebuilt on library change (runs for every stage, active or not), ready for the next entry
     _song_list = nil
     local ok, list = pcall(_build_song_list)
     if ok then _song_list = list end
@@ -503,7 +498,7 @@ function M.update(dt)
         if bar_y_offset == 0.0 then bar_y_offset_counter = nil end
     end
 
-    -- the song select's shortcuts: auto play and the song speed anywhere in the list
+    -- shortcuts: auto play and song speed anywhere in the list
     if sc ~= nil then
         if sc:pressed("auto_p1") then
             CONFIG:SetAutoStatus(0, not CONFIG:GetAutoStatus(0))
@@ -513,15 +508,14 @@ function M.update(dt)
         if sc:pressed("speed_up") then Shortcuts.stepSpeed(1) end
     end
 
-    -- ── SONG SELECT SETUP ─────────────────────────────────────────────────────
+    -- ==== Song select setup ====
     if _state == "song_select_setup" then
         bar_timer = bar_timer + dt
         local shown = 0
         for i = 1, PAGE_SIZE do
             if not bar_visible[i] and bar_timer >= (i - 1) * BAR_STAGGER_SEC then
                 bar_visible[i] = true
-                -- each bar that appears ticks (once per frame, should two land on the same frame);
-                -- an empty slot shows no bar and stays silent
+                -- tick per bar that appears (once per frame); empty slots stay silent
                 if _get_bar_tex(page_nodes[i]) ~= nil then
                     shown = shown + 1
                     if snd_tick ~= nil and shown == 1 then pcall(function() snd_tick:Play() end) end
@@ -532,7 +526,7 @@ function M.update(dt)
         return nil
     end
 
-    -- ── SONG SELECT ───────────────────────────────────────────────────────────
+    -- ==== Song select ====
 	local navPn = NavInput.p[1]
     if _state == "song_select" then
         if sc ~= nil and sc:pressed("help") then sc:open(); return nil end
@@ -581,9 +575,9 @@ function M.update(dt)
         return nil
     end
 
-    -- ── CONFIRM ───────────────────────────────────────────────────────────────
+    -- ==== Confirm ====
     if _state == "confirm" then
-        -- the scroll unrolls before it takes input, and rolls back up before the list returns
+        -- input only once unrolled; rolls up before the list returns
         if confirm_dir > 0 then
             confirm_anim = math.min(1, confirm_anim + dt / CONFIRM_OPEN_SEC)
             if confirm_anim < 1 then return nil end
@@ -744,7 +738,7 @@ function M.draw()
     end
     if modicons_ro ~= nil then modicons_ro:Draw(NP_X, NP_Y + Player.modicons_dy, 0, "menu", 255) end
 
-    -- the shortcuts line on the list, the song speed notice whenever the speed is not 1x
+    -- shortcuts line; speed notice when not 1x
     if sc ~= nil then
         local SC = Layout.shortcuts
         if _state == "song_select" or _state == "song_select_setup" then sc:drawHelper(SC.helper[1], SC.helper[2], 1) end
@@ -755,8 +749,7 @@ function M.draw()
         sc:drawSpeed(SC.speed[1], SC.speed[2], chart ~= nil and chart.BPM or nil, 1, note)
     end
 
-    -- Confirm scroll: the parchment unrolls from its middle, the options come into view as it does (each
-    -- cut at the rollers' edge), the question fades in once its line is uncovered
+    -- Confirm scroll: unrolls from its middle; options cut at the rollers' edge
     if _state == "confirm" then
         local ease = 1 - (1 - confirm_anim) * (1 - confirm_anim)
         if tx_confirm_bg ~= nil and tx_confirm_bg.Loaded then
@@ -781,8 +774,7 @@ function M.draw()
             paper:DrawRect(open_x0, cy - ph / 2, math.floor(pw / 2) - half, 0, half * 2, ph)
         end
 
-        -- the options, scaled to fit the paper, each cut to the part the scroll has uncovered; the
-        -- player's highlight frame goes under its option once the scroll is open
+        -- options scaled to the paper, cut to the uncovered part; highlight under the option once open
         local s = CONFIRM_BTN_SCALE
         local bw, bh = ConfirmLayout.button_w * s, ConfirmLayout.button_h * s
         local n = #confirm_items

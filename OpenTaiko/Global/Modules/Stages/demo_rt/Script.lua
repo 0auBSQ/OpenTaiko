@@ -1,56 +1,41 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, lowercase-global
--- demo_rt/Script.lua — Showcase for the Lua3DScene path-traced raytracer mode.
---
--- The same SCENE3D window that the voxel stage rasterizes is here switched to "raytrace"
--- mode (scene:SetMode). A progressive Monte-Carlo path tracer accumulates one sample per
--- pixel each frame: the image is grainy while you move and converges to a clean, globally
--- illuminated render when you hold still (camera / scene edits reset the accumulation).
---
--- Controls:
---   Move: WASD     Up/Down: Space / LeftCtrl     Faster: LeftShift
---   Look: hold Left-click and drag (rotating resets the accumulation, so it's opt-in)
---   Switch scene: 1 Museum  2 Materials  3 Implicit/SDF  4 Cornell  5 Voxel blocks
---                 6 Coloured lights  7 Emissive torus + diamond  8 Normal maps
---   Quit: Escape
+-- demo_rt: Lua3DScene raytrace mode demo
+-- progressive path tracer, one sample per pixel per frame; camera or scene edits reset it
 
--- ════════════════════════════════════════════════════════════════════════════════
--- Config / state
--- ════════════════════════════════════════════════════════════════════════════════
+-- ==== config / state ====
 
--- drawn in 1920x1080: a skin of another resolution rescales it
+-- drawn in 1920x1080, rescaled for other skin resolutions
 STAGES:SetResolution(1920, 1080)
 
 local SCREEN_W, SCREEN_H = 1920, 1080
-local RW, RH      = 1920, 1080        -- internal path-trace resolution (full screen: the CPU path tracer is slow at this size)
+local RW, RH      = 1920, 1080        -- path-trace resolution (the CPU fallback is slow at full size)
 local FOV         = 65.0
 local NEAR        = 0.05
 local MOUSE_SENS  = 0.14            -- deg per mouse pixel
 local MOVE_SPEED  = 4.0             -- units / sec
 local FAST_MULT   = 3.0
-local THREADS     = 8               -- CPU rasterizer threads (the CPU path tracer uses every core)
+local THREADS     = 8               -- rasterizer threads (the CPU path tracer uses every core)
 
--- procedurally-generated texture ids (built once in onStart)
+-- procedural texture ids (built once in onStart)
 local CHECKER    = 1                 -- material-scene floor
 local GRASS_TOP  = 2
 local GRASS_SIDE = 3
 local DIRT       = 4
-local TIN        = 5                 -- tin block albedo (metal)
-local BRICK_ALB  = 6                 -- brick albedo  (normal-map scene)
+local TIN        = 5                 -- tin block albedo
+local BRICK_ALB  = 6                 -- brick albedo (normal-map scene)
 local BRICK_NRM  = 7                 -- brick tangent-space normal map
 
 local sin, cos, rad, floor, rnd = math.sin, math.cos, math.rad, math.floor, math.random
 
 local scene
-local fontMid, fontSmall            -- glyph fonts: the sample count and status change every frame
+local fontMid, fontSmall            -- glyph fonts (text changes every frame)
 local colors = {}                   -- text colours by "r,g,b", made once
 local objs = {}                     -- scene-object ids of the current scene (deleted on switch)
 local sceneName = ""
 local cam = { x = 0, y = 2, z = 6, yaw = 180, pitch = -6 }
 local lastTs = 0
 
--- ════════════════════════════════════════════════════════════════════════════════
--- Helpers
--- ════════════════════════════════════════════════════════════════════════════════
+-- ==== helpers ====
 
 local function color(r, g, b)
     local key = r .. "," .. g .. "," .. b
@@ -68,7 +53,7 @@ local function clearObjs()
     objs = {}
 end
 
--- Flat (material-driven) quad from four corner tables {x,y,z}.
+-- flat quad from four corners {x,y,z}, optional material
 local function quadFlat(a, b, c, d, mat)
     local id = scene:NewObject()
     scene:ObjAddQuadFlat(id, a[1], a[2], a[3], b[1], b[2], b[3], c[1], c[2], c[3], d[1], d[2], d[3])
@@ -77,8 +62,7 @@ local function quadFlat(a, b, c, d, mat)
     return id
 end
 
--- Textured quad (gives UVs + albedo from a texture; demonstrates textured-quad RT). An optional
--- material overrides the albedo (and can add a metal/normal-map look while keeping the UVs).
+-- textured quad (UVs + albedo from tex); optional mat overrides the albedo, keeping the UVs
 local function quadTex(a, b, c, d, tex, um, vm, mat)
     local id = scene:NewObject()
     scene:ObjAddQuadTex(id, a[1], a[2], a[3], b[1], b[2], b[3], c[1], c[2], c[3], d[1], d[2], d[3],
@@ -88,8 +72,7 @@ local function quadTex(a, b, c, d, tex, um, vm, mat)
     return id
 end
 
--- A textured cube (six quads) spanning [x..x+s]^3, with per-face textures and an optional
--- material (used by the voxel-block scene for the grass cube and the metallic tin cube).
+-- textured cube over [x..x+s]^3, per-face textures, optional material
 local function texCube(x, y, z, s, topTex, sideTex, botTex, mat)
     local x1, y1, z1 = x + s, y + s, z + s
     quadTex({x,y1,z},{x1,y1,z},{x1,y1,z1},{x,y1,z1}, topTex, 1, 1, mat)   -- top  (+y)
@@ -121,12 +104,9 @@ local function applyCamera()
     scene:SetCameraAngles(cam.yaw, cam.pitch)
 end
 
--- ════════════════════════════════════════════════════════════════════════════════
--- Scenes
--- ════════════════════════════════════════════════════════════════════════════════
+-- ==== scenes ====
 
--- 1) Museum room: a box room with 4 pillars in a square, each topped by a sphere of a
---    distinct material — glass, polished aluminium, emissive yellow, and wood (normal-mapped).
+-- 1) museum room: 4 pillars, each topped by a sphere of another material
 local function buildMuseum()
     scene:ClearRaytraceModel(); clearObjs()
     sceneName = "Museum room"
@@ -137,7 +117,7 @@ local function buildMuseum()
     local mCeil  = diffuse(0.80, 0.80, 0.82)
     local mPil   = diffuse(0.62, 0.60, 0.56)
 
-    -- room (six big quads). RT treats them double-sided, so winding is irrelevant.
+    -- room: six quads, double-sided in RT (winding irrelevant)
     quadFlat({-W,0,-W},{ W,0,-W},{ W,0, W},{-W,0, W}, mFloor)            -- floor
     quadFlat({-W,H,-W},{ W,H,-W},{ W,H, W},{-W,H, W}, mCeil)             -- ceiling
     quadFlat({-W,0,-W},{ W,0,-W},{ W,H,-W},{-W,H,-W}, mWall)             -- back  (-z)
@@ -148,8 +128,8 @@ local function buildMuseum()
     local ph, pr, sr = 2.4, 0.45, 0.7
     local mGlass = glass(1.5)
     local mAlu   = metal(0.91, 0.92, 0.93, 0.04)
-    -- the yellow lamp: its glow plus the light of a strength-70 point light, spread over the sphere
-    -- (a point light of strength s matches an emissive sphere of radius r at strength s / (pi r^2))
+    -- lamp emission: 9 plus a strength-70 point light spread over the sphere
+    -- (point light strength s = emissive sphere of radius r at s / (pi r^2))
     local mEmis  = emissive(1.0, 0.84, 0.34, 9.0 + 70.0 / (math.pi * sr * sr))
     local mWood  = scene:NewMaterial()
     scene:MatSetType(mWood, "diffuse"); scene:MatSetAlbedo(mWood, 0.46, 0.28, 0.13)
@@ -164,15 +144,14 @@ local function buildMuseum()
         scene:AddSphere(cx, ph + sr, cz, sr, mat)
     end
 
-    -- lights: a soft white ceiling fill; the emissive sphere lights (and tints) the room too
+    -- ceiling fill light; the emissive sphere lights the room too
     scene:AddLight(0, H - 0.4, 0, 1.0, 0.98, 0.92, 55.0)
-    scene:SetSky(0.10, 0.11, 0.14, 0.05, 0.05, 0.06, 1.0)   -- dim studio ambient
+    scene:SetSky(0.10, 0.11, 0.14, 0.05, 0.05, 0.06, 1.0)
 
     cam = { x = 0, y = 2.4, z = W - 1.6, yaw = 180, pitch = -6 }
 end
 
--- 2) Material spheres: a row over a checker floor — diffuse, mirror metal, rough metal,
---    glass, emissive — to show the material range.
+-- 2) material spheres over a checker floor
 local function buildMaterials()
     scene:ClearRaytraceModel(); clearObjs()
     sceneName = "Material spheres"
@@ -189,18 +168,18 @@ local function buildMaterials()
 
     scene:AddLight(-3, 7, 5, 1, 1, 1, 70.0)
     scene:AddLight( 4, 6, 4, 0.4, 0.7, 1.0, 30.0)
-    scene:SetSky(0.45, 0.60, 0.95, 0.75, 0.80, 0.90, 1.0)   -- daylight
+    scene:SetSky(0.45, 0.60, 0.95, 0.75, 0.80, 0.90, 1.0)
 
     cam = { x = 0, y = 2.0, z = 7.0, yaw = 180, pitch = -8 }
 end
 
--- 3) Implicit / SDF showcase: analytic torus + ray-marched SDF presets on a plane.
+-- 3) implicit / SDF: analytic torus and SDF presets on a plane
 local function buildImplicit()
     scene:ClearRaytraceModel(); clearObjs()
     sceneName = "Implicit / SDF surfaces"
 
     scene:AddPlane(0, 0, 0, 0, 1, 0, diffuse(0.55, 0.55, 0.58))
-    scene:AddTorus(-3.2, 1.1, 0, 0.85, 0.32, 1, metal(0.95, 0.80, 0.42, 0.06))   -- gold torus
+    scene:AddTorus(-3.2, 1.1, 0, 0.85, 0.32, 1, metal(0.95, 0.80, 0.42, 0.06))
     scene:AddSphere(-1.0, 1.1, 0, 0.95, glass(1.5))
     scene:AddSDF("roundbox", 1.1, 1.0, 0, 0.75, 0.75, 0.75, metal(0.9, 0.92, 0.95, 0.12))
     scene:AddSDF("capsule",  2.9, 1.4, 0, 0.8, 0.35, 0, diffuse(0.85, 0.45, 0.20))
@@ -213,9 +192,7 @@ local function buildImplicit()
     cam = { x = 0.8, y = 2.3, z = 6.5, yaw = 180, pitch = -12 }
 end
 
--- 4) Cornell box: walls / boxes built from quads + analytic boxes, lit only by an emissive
---    ceiling panel — proves the path tracer renders the rasterizer's geometry with true GI
---    (colour bleeding from the red/green walls onto the white boxes).
+-- 4) Cornell box: quads and analytic boxes, lit by an emissive ceiling panel (GI test)
 local function buildCornell()
     scene:ClearRaytraceModel(); clearObjs()
     sceneName = "Cornell box (GI)"
@@ -230,7 +207,7 @@ local function buildCornell()
     quadFlat({-W,0,-W},{-W,0, W},{-W,H, W},{-W,H,-W}, red)              -- left
     quadFlat({ W,0,-W},{ W,0, W},{ W,H, W},{ W,H,-W}, green)            -- right
 
-    -- emissive ceiling panel (the only light source)
+    -- emissive ceiling panel
     local mLight = emissive(1.0, 0.95, 0.85, 14.0)
     local s = 1.1
     quadFlat({-s,H-0.02,-s},{ s,H-0.02,-s},{ s,H-0.02, s},{-s,H-0.02, s}, mLight)
@@ -243,9 +220,7 @@ local function buildCornell()
     cam = { x = 0, y = 3.0, z = 8.5, yaw = 180, pitch = 0 }
 end
 
--- 5) Voxel blocks: four cubes inspired by the voxel stage — a reflective tin block (tin
---    texture, metal), a glass block, a procedurally-textured grass block, and a wood block
---    with a procedural wood normal map.
+-- 5) voxel blocks
 local function buildBlocks()
     scene:ClearRaytraceModel(); clearObjs()
     sceneName = "Voxel blocks"
@@ -256,21 +231,21 @@ local function buildBlocks()
     local step = s + gap
     local x0 = -1.5 * step                                   -- leftmost block's min-x
 
-    -- grass block (procedural top/side/dirt textures, diffuse)
+    -- grass block
     texCube(x0, 0, -s / 2, s, GRASS_TOP, GRASS_SIDE, DIRT)
 
-    -- glass block (analytic box, refraction)
+    -- glass block (analytic box)
     local gx = x0 + step
     scene:AddBox(gx, 0, -s / 2, gx + s, s, s / 2, glass(1.5))
 
-    -- tin block: tin albedo texture on a shiny metal material (reflects its neighbours + sky)
+    -- tin block: tin texture on a metal material
     local mTin = scene:NewMaterial()
     scene:MatSetType(mTin, "metal"); scene:MatSetAlbedo(mTin, 0.80, 0.81, 0.84)
     scene:MatSetRoughness(mTin, 0.04); scene:MatSetTexture(mTin, TIN)
     local tx = x0 + step * 2
     texCube(tx, 0, -s / 2, s, TIN, TIN, TIN, mTin)
 
-    -- wood block: diffuse wood with the procedural wood normal map (analytic box)
+    -- wood block: wood normal map (analytic box)
     local mWood = scene:NewMaterial()
     scene:MatSetType(mWood, "diffuse"); scene:MatSetAlbedo(mWood, 0.46, 0.28, 0.13)
     scene:MatSetNormalMap(mWood, "wood")
@@ -279,13 +254,12 @@ local function buildBlocks()
 
     scene:AddLight(-2, 6, 5, 1.0, 0.98, 0.95, 80.0)
     scene:AddLight( 4, 5, 3, 0.9, 0.95, 1.0, 35.0)
-    scene:SetSky(0.45, 0.62, 0.98, 0.78, 0.83, 0.92, 1.0)   -- daylight (so the tin block reflects something)
+    scene:SetSky(0.45, 0.62, 0.98, 0.78, 0.83, 0.92, 1.0)   -- sky for the tin reflections
 
     cam = { x = 0.7, y = 1.7, z = 5.4, yaw = 180, pitch = -10 }
 end
 
--- 6) Coloured lights: red / green / blue / warm-white point lights (each shown by a small
---    emissive bulb) cast and mix coloured illumination over a white floor and white objects.
+-- 6) coloured lights: point lights with emissive bulbs
 local function buildLights()
     scene:ClearRaytraceModel(); clearObjs()
     sceneName = "Coloured lights"
@@ -293,29 +267,28 @@ local function buildLights()
     scene:AddPlane(0, 0, 0, 0, 1, 0, diffuse(0.85, 0.85, 0.85))
     quadFlat({-8,0,-5},{8,0,-5},{8,8,-5},{-8,8,-5}, diffuse(0.85, 0.85, 0.85))   -- back wall
 
-    -- white objects to catch the coloured light
+    -- diffuse objects to catch the light
     scene:AddSphere(-1.6, 1.0, 0, 1.0, diffuse(0.9, 0.9, 0.9))
     scene:AddSphere( 1.6, 1.0, 0, 1.0, diffuse(0.9, 0.9, 0.9))
     scene:AddBox(-0.7, 0, -0.7, 0.7, 1.4, 0.7, diffuse(0.9, 0.9, 0.9))
 
     local lamps = {
-        { -4.5, 4.0,  2.5, 1.0, 0.15, 0.15 },   -- red
-        {  4.5, 4.0,  2.5, 0.15, 1.0, 0.20 },   -- green
-        {  0.0, 4.2, -3.0, 0.20, 0.35, 1.0 },   -- blue
-        {  0.0, 6.0,  3.5, 1.0, 0.85, 0.55 },   -- warm white
+        { -4.5, 4.0,  2.5, 1.0, 0.15, 0.15 },
+        {  4.5, 4.0,  2.5, 0.15, 1.0, 0.20 },
+        {  0.0, 4.2, -3.0, 0.20, 0.35, 1.0 },
+        {  0.0, 6.0,  3.5, 1.0, 0.85, 0.55 },
     }
     for _, L in ipairs(lamps) do
         local x, y, z, r, g, b = L[1], L[2], L[3], L[4], L[5], L[6]
         scene:AddSphere(x, y, z, 0.18, emissive(r, g, b, 14.0))   -- visible bulb
         scene:AddLight(x, y, z, r, g, b, 90.0)
     end
-    scene:SetSky(0.02, 0.02, 0.03, 0.01, 0.01, 0.02, 1.0)   -- near-black: the lamps do the lighting
+    scene:SetSky(0.02, 0.02, 0.03, 0.01, 0.01, 0.02, 1.0)   -- the lamps do the lighting
 
     cam = { x = 0, y = 2.2, z = 6.5, yaw = 180, pitch = -10 }
 end
 
--- 7) Emissive torus: a sky-blue light-emitting torus turned to face the camera (ring in the
---    view plane) with a refractive diamond floating in its centre.
+-- 7) emissive torus facing the camera, glass gem in its centre
 local function buildTorus()
     scene:ClearRaytraceModel(); clearObjs()
     sceneName = "Emissive torus + diamond"
@@ -323,16 +296,15 @@ local function buildTorus()
     scene:AddPlane(0, 0, 0, 0, 1, 0, diffuse(0.30, 0.31, 0.34))
     local cy = 2.1
     scene:AddTorus(0, cy, 0, 1.35, 0.34, 2, emissive(0.35, 0.65, 1.0, 7.0))   -- axis Z → faces camera
-    scene:AddSDF("gem", 0, cy, 0, 1.25, 1.25, 1.25, glass(2.417))            -- brilliant-cut diamond (IOR 2.417)
+    scene:AddSDF("gem", 0, cy, 0, 1.25, 1.25, 1.25, glass(2.417))            -- diamond IOR 2.417
     scene:AddLight(0, cy, 0.6, 0.35, 0.65, 1.0, 55.0)                         -- co-located, for convergence
-    scene:AddLight(0, 5, 3, 0.8, 0.85, 1.0, 25.0)                            -- soft top fill
+    scene:AddLight(0, 5, 3, 0.8, 0.85, 1.0, 25.0)                            -- top fill
     scene:SetSky(0.05, 0.07, 0.12, 0.02, 0.03, 0.05, 1.0)
 
     cam = { x = 0, y = 2.1, z = 5.2, yaw = 180, pitch = 0 }
 end
 
--- 8) Normal maps: spheres with the procedural wood / perlin / waves presets, plus a flat panel
---    using a tangent-space normal-map *texture* (bricks).
+-- 8) normal maps: wood/perlin/waves presets and a brick normal-map texture
 local function buildNormalMaps()
     scene:ClearRaytraceModel(); clearObjs()
     sceneName = "Normal maps"
@@ -367,14 +339,12 @@ local function switchScene(n)
     applyCamera()
 end
 
--- ════════════════════════════════════════════════════════════════════════════════
--- Lifecycle
--- ════════════════════════════════════════════════════════════════════════════════
+-- ==== lifecycle ====
 
 local function clampb(v) if v < 0 then return 0 elseif v > 255 then return 255 else return floor(v) end end
 local function packrgb(r, g, b) return clampb(r) * 65536 + clampb(g) * 256 + clampb(b) end
 
--- Build every procedural texture the scenes use (called once at load).
+-- builds every procedural texture (once at load)
 local function buildTextures()
     -- checker floor (material scene)
     do
@@ -385,7 +355,7 @@ local function buildTextures()
         scene:RegisterTexture(CHECKER, t, 64, 64)
     end
 
-    -- grass top: noisy green with occasional darker blades
+    -- grass top
     do
         local t, n = {}, 0
         for _ = 0, 15 do for _ = 0, 15 do
@@ -397,7 +367,7 @@ local function buildTextures()
         scene:RegisterTexture(GRASS_TOP, t, 16, 16)
     end
 
-    -- grass side: a jagged green fringe over a dirt body
+    -- grass side: grass fringe over dirt
     do
         local fr = {}
         for x = 0, 15 do fr[x] = 4 + floor(rnd() * 3) end          -- 4..6 px of grass per column
@@ -426,7 +396,7 @@ local function buildTextures()
         scene:RegisterTexture(DIRT, t, 16, 16)
     end
 
-    -- tin: silvery base with a raised bevel (lighter top-left, darker border)
+    -- tin: bevel shading plus a dark border
     do
         local t, n = {}, 0
         for y = 0, 15 do for x = 0, 15 do
@@ -438,7 +408,7 @@ local function buildTextures()
         scene:RegisterTexture(TIN, t, 16, 16)
     end
 
-    -- brick albedo + matching tangent-space normal map (mortar grooves bevelled)
+    -- brick albedo + matching tangent-space normal map (bevelled mortar grooves)
     local function heightAt(x, y)
         local row = floor(y / 8)
         local offx = (row % 2 == 1) and 16 or 0
@@ -486,8 +456,7 @@ end
 
 function activate()
     lastTs = 0
-    -- Mouse stays unlocked: looking around is bound to holding Left-click (rotating resets the
-    -- progressive accumulation, so we don't want stray cursor motion to keep re-noising it).
+    -- mouse unlocked: look needs Left-click held (rotation resets the accumulation)
     INPUT:SetMouseLocked(false)
 end
 function deactivate() INPUT:SetMouseLocked(false) end
@@ -507,9 +476,8 @@ function update(ts)
 
     local moved = false
 
-    -- mouse look — only while Left-click is held. We read the delta EVERY frame (even when not
-    -- looking) so its baseline stays current; otherwise the motion accumulated while the button
-    -- was up would dump as one big jump on the next click.
+    -- mouse look while Left-click is held; the delta is read every frame
+    -- (else motion from while the button was up jumps in on the next click)
     local dmx, dmy = INPUT:GetMouseDelta()
     if INPUT:MousePressing("Left") and (dmx ~= 0 or dmy ~= 0) then
         cam.yaw = cam.yaw + dmx * MOUSE_SENS
@@ -535,8 +503,7 @@ function update(ts)
         moved = true
     end
 
-    -- Only push the camera (which resets accumulation) when it actually changed, so the image
-    -- can keep converging while you hold still.
+    -- push the camera only when it changed (pushing resets the accumulation)
     if moved then applyCamera() end
 
     scene:Render()
@@ -552,7 +519,7 @@ function draw()
 
     txt(fontMid, "Raytracer " .. sceneName, 24, 16, 255, 255, 255)
     txt(fontSmall, "samples: " .. scene:GetSampleCount() .. "  (hold still to converge)", 24, 52, 220, 230, 245)
-    -- backend readout: confirms GPU compute vs CPU fallback + the measured per-sample GPU cost
+    -- backend readout: GPU compute or CPU fallback, per-sample GPU cost
     txt(fontSmall, scene:GetRaytracerStatus(), 24, 80, 180, 255, 200)
     txt(fontSmall, "WASD move   Space/LCtrl up·down   Shift faster   hold L-click + drag to look   1-8 scenes   Esc quit",
         24, SCREEN_H - 40, 220, 220, 225)

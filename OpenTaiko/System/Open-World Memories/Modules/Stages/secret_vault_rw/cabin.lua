@@ -13,13 +13,13 @@ C.DESK_Y = Sea.desk_y
 local VPX, VPY = Sea.vanish_x, Sea.vanish_y
 local HALF_W, FLOOR_Y, CEIL_Y = Sea.half_w, Sea.floor_y, Sea.ceil_y
 C.FLOOR_Y = FLOOR_Y
-local KICK_Y = Sea.kick_y                      -- the height the sea's things are laid out from
-local FOOT_Y = Sea.foot_y                      -- seaweed stands on this screen row, behind the counter
+local KICK_Y = Sea.kick_y                      -- base y of the sea layout
+local FOOT_Y = Sea.foot_y                      -- seaweed base row, behind the counter
 local F = Sea.depth_px                         -- depth of z = 1 in px: world speeds along the walls are px / F
 local TABLE_X, TABLE_Y = Sea.table.x, Sea.table.y
 local FISH_KINDS = 6
 
--- seaweed out on the sea floor (Layout.sea.weeds), swaying as Animation.sea.weeds says
+-- seaweed (Layout.sea.weeds, Animation.sea.weeds)
 local WEEDS = {}
 for i, w in ipairs(Sea.weeds.list) do
     local s = SeaAnim.weeds.list[i]
@@ -59,7 +59,7 @@ local function kinds(prefix, n)
     return out
 end
 
--- a fish swimming along a wall, away from us (dir 1) or towards us (dir -1); at = how far along it already is
+-- fish along a wall: dir 1 away, -1 towards; at: progress along it
 local function spawnFish(at)
     local have = kinds("Cabin/Fish", FISH_KINDS)
     if #have == 0 then return end
@@ -67,7 +67,7 @@ local function spawnFish(at)
     local d = rnd(Fish.d[1], Fish.d[2]) * rnd(Fish.d_spread[1], Fish.d_spread[2])
     local len = rnd(Fish.len[1], Fish.len[2])
     local X = side * (HALF_W + d)
-    -- from just off the screen's edge to hidden behind the back wall's corner
+    -- from off the screen edge to behind the back wall corner
     local zNear = (HALF_W + d - len) / Fish.near_half_w
     local zFar = (HALF_W + d + len) / Fish.far_half_w
     local dir = (math.random() < 0.5) and 1 or -1
@@ -163,7 +163,7 @@ local function drawFish(f)
     local wave = 2 * math.pi * f.bobF * clock + f.ph
     local Y = f.Y + f.bob * math.sin(wave)
     local x, y = project(f.X, Y, f.z)
-    -- which way it moves on screen: where it will be a moment later
+    -- screen direction: position a moment later
     local x2, y2 = project(f.X, Y, f.z + f.dir * 0.02)
     local vx, vy = x2 - x, y2 - y
     local right = vx >= 0
@@ -215,7 +215,7 @@ local function drawBubble(b)
     Tex.place(tex, x, y, "center", k, k, op)
 end
 
--- everything behind the glass, the furthest first
+-- behind the glass, furthest first
 local function drawSea()
     local items = {}
     for i, w in ipairs(WEEDS) do items[#items + 1] = { z = w.z + w.d / F, kind = 1, i = i, o = w } end
@@ -236,7 +236,7 @@ function C.drawBack(now, dt)
     if water ~= nil and water.ok then
         water:drawUnderwater(1)
     else
-        -- the still picture of the sea, loaded the first time it is needed (freed with the stage's textures)
+        -- still sea picture, loaded on first need, freed with the stage textures
         if tex["Cabin/Water"] == nil and not triedWater then
             triedWater = true
             local path = "Textures/Cabin/Water.png"

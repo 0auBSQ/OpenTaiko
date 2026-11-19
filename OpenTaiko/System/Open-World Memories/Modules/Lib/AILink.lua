@@ -1,7 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- AILink.lua: the AI Battle transitions (ai_link, ai_link_back).
--- A chip lights up on a dark screen, traces run from its pins to the screen edges,
--- then the status box at the bottom types its line.
+-- AI Battle transitions (ai_link, ai_link_back).
 
 -- positions, sizes and colours: Config/AILink/layout.json; timings: Config/AILink/animation.json
 local HERE = require("Core.Here")(...)
@@ -24,10 +22,10 @@ local CYAN = Layout.line_color
 local TIP = Layout.tip_color
 local Out = Animation.fade_out
 local BG_IN = Out.bg_in                  -- fade-out part for the dark screen
-local CHIP_AT, CHIP_IN = Out.chip_at, Out.chip_in      -- the chip lights up here...
-local GROW_AT = Out.grow_at              -- ...then the traces grow until the box opens
+local CHIP_AT, CHIP_IN = Out.chip_at, Out.chip_in      -- chip light-up: start, duration
+local GROW_AT = Out.grow_at              -- trace growth start (until the box opens)
 local BOX_AT, BOX_OPEN = Out.box_at, Out.box_open
-local TYPE_AT, TYPE_END = Out.type_at, Out.type_end    -- the box's line types in
+local TYPE_AT, TYPE_END = Out.type_at, Out.type_end    -- box line typing: start, end
 local Box = Layout.box
 local BOX_MIN_W, BOX_PAD, BOX_H, BOX_Y = Box.min_width, Box.pad, Box.height, Box.y
 local BOX_CORNER = Box.corner
@@ -47,7 +45,7 @@ local Pins = Layout.pins
 local PINS, PIN_GAP, PIN_LEN, PIN_W = Pins.count, Pins.gap, Pins.length, Pins.width       -- per side
 local DIE = Chip.die                     -- inner square, this far inside the chip
 local Traces = Layout.traces
-local SIDE_MID, SIDE_SPREAD = Traces.side_mid, Traces.side_spread   -- left and right traces end in rows spread over the screen height
+local SIDE_MID, SIDE_SPREAD = Traces.side_mid, Traces.side_spread   -- left/right trace end rows, spread over the screen height
 local END_SPREAD = Traces.end_spread     -- top and bottom traces spread less
 local RUN_SIDE, RUN_END = Traces.run_side, Traces.run_end           -- straight part before the 45° bend
 local EDGE_OVERSHOOT = Traces.edge_overshoot
@@ -68,8 +66,8 @@ end
 -- offset of pin i from the middle of its side
 local function pinOffset(i) return (i - (PINS + 1) / 2) * PIN_GAP end
 
--- From each pin: a short straight part, a 45° bend that spreads the traces apart, then straight on
--- to the screen edge or to a via. All bends on a side start together, so the traces never cross.
+-- per pin: straight, 45° bend, then straight to the screen edge or a via
+-- bends on a side start together (no crossings)
 local function buildTraces()
 	local traces = {}
 	local function add(pts, via)

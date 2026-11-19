@@ -163,7 +163,7 @@ Cuando al paquete seleccionado le falta un archivo, el juego lo toma del paquete
 
 ## Paso 8: Elegir un paquete
 
-Cuando un skin tiene al menos 2 paquetes en una de las tres carpetas, la página del tema de los ajustes muestra primero una sección Apariencia de notas, con una opción para esa carpeta y la vista previa del paquete debajo. El juego carga al momento el paquete elegido y recuerda la elección para el skin en `ThemeSettings.db3`. Con un solo paquete la opción no aparece, y el juego usa ese paquete.
+Cuando un skin tiene al menos 2 paquetes en una de las tres carpetas, la página del tema de los ajustes muestra primero una sección Apariencia de notas, con una opción para esa carpeta y la vista previa del paquete debajo. El juego carga al momento el paquete elegido y recuerda la elección para el skin en su base de datos de ajustes. Con un solo paquete la opción no aparece, y el juego usa ese paquete.
 
 Un módulo Lua lee un archivo del paquete seleccionado con `THEME:GetNotesSkinFile(kind, file)` (consulta [Jugadores y perfiles](../api/players.md)). La selección de canciones incluida lo usa para dibujar los textos de juicio de su lista de repeticiones:
 

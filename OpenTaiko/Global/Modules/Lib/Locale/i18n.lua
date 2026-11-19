@@ -1,26 +1,14 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global
--- i18n.lua — per-stage localization (shared; each stage's Lua VM gets its own instance).
---
--- Texts live in lang/<code>/<name>.json, one file per feature (computer.json, phone.json, dialogs.json...),
--- keyed by stable ids; lang/en holds the English and is the fallback for every other language. A module
--- takes its file once, `local T = I18N.texts("phone")`, then T:tr("menu_join"), T:trf("no_answer", n),
--- T:get(path...), T:list(path...) (arrays, line by line) and T:loc(path...) (a GetString handle resolved at
--- call time). A Lib module that ships its own texts passes its folder: I18N.texts("pools", HERE) reads
--- HERE .. "lang/<code>/pools.json" (HERE from Core.Here). The current game language is
--- LANG:GetLanguageId(); call detect() in activate (it runs on
--- every entry, so a language change applies on the next visit). A reloadLanguage() global is only needed
--- by a module that stays on screen while the language changes.
---
--- Older stages keep the exact-English-key dictionary: lang/<code>.lua returns a table and M.tr(s) maps the
--- English text in the code to its translation.
+-- Locale.i18n: per-stage localization, one instance per stage Lua VM
+-- texts in lang/<code>/<name>.json by stable ids, lang/en as the fallback
 
 local M = {}
 
-M.code = "en"        -- the game's language code (the Lang/ folder name: en, ja, fr, es, de, ko, nl, ru, zh)
+M.code = "en"        -- game language code (Lang/ folder name)
 M.lang = "default"   -- the loaded dictionary's language, "default" when none is loaded
-local dict = {}      -- the legacy Lua dictionary of the loaded language
+local dict = {}      -- Lua dictionary of the loaded language
 
--- the id of the language in use; "en" when the engine does not answer (a headless harness)
+-- language id in use; "en" without an engine (headless harness)
 local function currentCode()
     local ok, res = pcall(function() return LANG:GetLanguageId() end)
     return (ok and type(res) == "string" and res ~= "") and res or "en"
@@ -28,8 +16,8 @@ end
 
 M.currentCode = currentCode
 
--- Art with baked text: "<name>_<code>.<ext>" when the stage ships that variant next to `path`
--- (the engine's rule for its own textures), else `path` itself. Relative to the stage folder.
+-- art with baked text: "<name>_<code>.<ext>" when that variant exists next to `path`, else `path`
+-- (the engine's rule for its own textures); relative to the stage folder
 function M.localizedPath(path, code)
     code = code or currentCode()
     local base, ext = path:match("^(.*)(%.[^%./\\]+)$")
@@ -40,8 +28,8 @@ function M.localizedPath(path, code)
     return path
 end
 
--- select a language (also used directly by the headless harnesses): the JSON texts follow M.code on
--- every lookup; a legacy Lua dictionary is loaded here when the stage ships one
+-- selects a language (also used by headless harnesses); JSON texts follow M.code per lookup
+-- loads the Lua dictionary when the stage ships one
 function M.load(lang)
     M.code = (lang == "default" or lang == nil) and "en" or lang
     dict = {}
@@ -54,13 +42,15 @@ function M.load(lang)
     end
 end
 
+-- call in activate (a language change applies on the next entry)
+-- a module on screen during a language change also needs a reloadLanguage() global
 function M.detect()
     M.load(currentCode())
 end
 
--- ── per-language JSON texts ─────────────────────────────────────────────────────────────────────
--- lang/<code>/<name>.json mirrors the structure of lang/en/<name>.json; every lookup tries the current
--- language first, then English. Documents are parsed once per language.
+-- ==== JSON texts ====
+-- lang/<code>/<name>.json mirrors lang/en/<name>.json; lookups try the current language, then English
+-- documents parsed once per language
 local docs = {}   -- folder .. name -> code -> document | false
 local function jsonDoc(name, code, dir)
     local key = (dir or "") .. name
@@ -122,15 +112,14 @@ function Text:list(...)
     return out
 end
 
--- a handle resolved at call time (GetString(fallback), like CLocalizationData), so a name cached at load
--- follows a later language change
+-- handle resolved at call time (GetString(fallback), like CLocalizationData), so cached names follow language changes
 function Text:loc(...)
     local path = { ... }
     local text = self
     return { GetString = function(_, fallback) return text:get(table.unpack(path)) or fallback end }
 end
 
--- the text of one id (a missing id shows the id itself, which makes the gap visible)
+-- text of one id (a missing id shows the id, making the gap visible)
 function Text:tr(id)
     if id == nil then return nil end
     return self:get(id) or id
@@ -141,7 +130,7 @@ function Text:trf(id, ...)
     return string.format(self:tr(id), ...)
 end
 
--- dir (optional): the folder holding lang/, "" or nil for the calling module's own folder
+-- dir: folder holding lang/ (Core.Here for a Lib module); "" or nil for the caller's folder
 function M.texts(name, dir)
     return setmetatable({ name = name, dir = dir }, Text)
 end
@@ -150,7 +139,7 @@ end
 M.trackMisses = false
 M._missed = {}
 
--- legacy dictionary: translate one English string (exact match; nil-safe; unknown → unchanged)
+-- Lua dictionary (lang/<code>.lua): exact English string -> translation; unknown stays unchanged
 function M.tr(s)
     if s == nil then return nil end
     local v = dict[s]

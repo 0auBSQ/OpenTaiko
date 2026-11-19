@@ -73,7 +73,7 @@ function M.open()
     add(_mid, "pollen", mote)
     add(_mid, "fireflies", mote)
     add(_mid, "forest_leaves", leafMap(), LEAF_RATE)
-    -- the mist runs on its own copy of the preset, so its second pass can switch the blend
+    -- own preset copy: the second pass switches the blend
     local mist = assets.get("fx_mist")
     if presets.mist ~= nil and mist ~= nil then
         _mistPreset = {}

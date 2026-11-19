@@ -1,11 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field
--- Online.Media: the room's song on this machine. Finds it in the song list, reads its difficulty levels,
--- puts its jacket in the shared texture "preimage" and plays its preview in the shared sound "presound"
--- at the room's speed. Draws nothing. The functions take the lobby state (Online.Lobby.net) and write
--- iLackSong, songLevels, songPlus, songSubtitle, songBpm and the preview fields into it.
---
--- The shared string "presound_path" names the audio in "presound": a song select that leaves the same
--- song playing hands the preview back to the lobby, which keeps it going instead of restarting it.
+-- Online.Media: the room's song on this machine, no drawing
+-- jacket in shared "preimage", preview in shared "presound"; writes the song fields into the lobby state
 
 local SongTitle = require("Songs.Title")
 
@@ -13,7 +8,7 @@ local floor = math.floor
 
 local M = {}
 
--- the jacket shown when the song is missing, relative to the calling stage (a missing file is ignored)
+-- jacket for a missing song, relative to the calling stage (a missing file is ignored)
 M.PLACEHOLDER = "Textures/preimage.png"
 
 -- the song list, read once per Lua state on first use
@@ -49,8 +44,8 @@ end
 local function setBorder(t) pcall(function() t:SetWrapMode("Border") end) end
 local function placeholderPreimage() pcall(function() SHARED:SetSharedTexture("preimage", M.PLACEHOLDER, setBorder) end) end
 
--- the preview at the room's speed from its demo start; when that audio is already playing (handed back by
--- the song select) it just keeps going
+-- preview at the room's speed from its demo start
+-- shared "presound_path" names the audio in "presound": the same song handed back keeps playing
 local function startPreview(st, node)
     local spd = st.song.speed and CONFIG.SONGSPEED:ToActual(st.song.speed) or 1
     st.previewSpeed = spd
@@ -78,7 +73,7 @@ function M.load(st)
     if not node then M.stopPreview(); st.iLackSong = true; placeholderPreimage(); return end
     st.iLackSong = false
     pcall(function() st.songSubtitle = SongTitle.subtitleOf(node) end)
-    -- the shared "preimage" keeps the previous jacket until the new one is loaded, then swaps
+    -- shared "preimage" keeps the old jacket until the new one loads
     pcall(function()
         if node.HasPreimage then SHARED:SetSharedTextureUsingAbsolutePath("preimage", node.PreimagePath, setBorder)
         else placeholderPreimage() end
@@ -107,8 +102,8 @@ function M.restore(st)
     pcall(function() startPreview(st, node) end)
 end
 
--- loops the preview (each frame on the lobby and results screens): replays it from the demo start when it
--- ends, with a short cooldown so one restart is not sought twice
+-- loops the preview from the demo start (each frame on the lobby and results screens)
+-- 0.5 s cooldown so one restart isn't sought twice
 function M.tick(st, dt)
     if st.iLackSong or not st.song or not st.previewLoaded then return end
     if (st.previewCool or 0) > 0 then st.previewCool = st.previewCool - dt; return end

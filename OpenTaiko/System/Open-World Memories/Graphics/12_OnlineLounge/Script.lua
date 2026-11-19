@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Online lounge screen background.
+-- online lounge background
 
 local tx = {}
 

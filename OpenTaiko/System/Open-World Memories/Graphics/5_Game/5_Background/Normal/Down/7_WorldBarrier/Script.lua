@@ -1,6 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Down background 7 (WorldBarrier): scrolling lower band + a clear-fade overlay whose scroll layer
--- rises/bounces in on clear (bgClearAnime, reset in clearIn). Ported from old ScriptBG func: API.
+-- down background 7: WorldBarrier
 
 local loopWidth = 1920
 
@@ -25,7 +24,7 @@ function onStart()
 end
 
 function update(timestamp, state)
-    -- original keys the clear fade on isClear[0] only (single value, not per-player) — preserved
+    -- isClear[0] only, on purpose
     if state.isClear[0] then
         bgClearFade = bgClearFade + (2000 * fps.deltaTime)
     else

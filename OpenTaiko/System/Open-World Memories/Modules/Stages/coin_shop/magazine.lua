@@ -1,11 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- coin_shop/magazine.lua: the shop drawn as a front-facing catalog page. The page floats and turns very slightly;
--- every listing on it (the featured item, the catalog entries, the reroll coupon and the back note) has its own
--- small tilt and sway, and reacts to being selected, bought, sold out or out of reach.
---
--- Positions are in page pixels (0..PW, 0..PH, the Page.png content); a "frame" is a placed point with a
--- rotation (degrees, counter-clockwise like SetRotation) and a scale, and children are placed in their parent's
--- frame, so the whole page moves and turns as one.
+-- coin shop drawn as a catalog page
 
 local Easing = require("Easing")
 local Config = require("Core.Config")
@@ -21,7 +15,7 @@ local SHADOW_DX, SHADOW_DY = Page.shadow_dx, Page.shadow_dy
 
 local Hero = Layout.hero
 local Grid = Layout.grid
-local COIN_PX = Layout.coin_px         -- the shared coin's drawn width at scale 1
+local COIN_PX = Layout.coin_px         -- coin width at scale 1
 local Coupon = Layout.coupon
 local Note = Layout.note
 local MAST_X, MAST_Y = Page.masthead.x, Page.masthead.y
@@ -30,11 +24,11 @@ local Cell, Tilt, Sold, PlateOffset = Layout.cell, Layout.tilt, Layout.sold, Lay
 local Listing, Pop, Stamp = Animation.listing, Animation.listing.pop, Animation.stamp
 
 local ctx = nil
-local list = {}            -- the listings in reading order: { id, kind, slot, x, y, w, h }
+local list = {}            -- reading order: { id, kind, slot, x, y, w, h }
 local byId = {}
 local st = {}              -- per listing id: animation state
 local page = { shuffleT = nil, shakeT = nil }
-local lastFrame = nil      -- the page frame of the last draw (mouse hit tests)
+local lastFrame = nil      -- last drawn page frame (mouse hit tests)
 local nudges = {}
 
 function M.init(c)
@@ -44,8 +38,10 @@ function M.init(c)
 	lastFrame = nil
 end
 
--- ── frames ───────────────────────────────────────────────────────────────────
+-- ==== Frames ====
 
+-- frame = point + rotation (deg, CCW like SetRotation) + scale, in page px (0..PW, 0..PH)
+-- children place in their parent's frame
 local function frame(x, y, rot, k)
 	local r = math.rad(rot)
 	return { x = x, y = y, rot = rot, c = math.cos(r), s = math.sin(r), k = k or 1 }
@@ -68,14 +64,14 @@ local function sprite(tex, f, sx, sy, op, r, g, b)
 	if r ~= nil then tex:SetColor(1, 1, 1) end
 end
 
--- the "Coin" shared texture, COIN_PX * k wide
+-- "Coin" shared texture, COIN_PX * k wide
 local function coin(f, k, op)
 	local tex = ctx.coin
 	if tex == nil or tex.Width <= 0 then return end
 	sprite(tex, f, k * COIN_PX / tex.Width, nil, op)
 end
 
--- the glyph box carries padding under the ink: centred text moves down by this to centre its ink
+-- glyph box pads under the ink: centring offset
 local function nudge(font)
 	local n = nudges[font]
 	if n == nil then
@@ -86,8 +82,8 @@ local function nudge(font)
 end
 M.nudge = nudge
 
--- anchor "center", "left" or "right" (vertically centred); maxInk = the widest the ink may get (0 = no limit):
--- a longer text first shrinks (down to FIT_MIN of its size), then squeezes
+-- anchor "center" | "left" | "right"; maxInk: max ink width (0 = none)
+-- too long: shrinks to FIT_MIN, then squeezes
 local FIT_MIN = Layout.text.fit_min
 local function text(font, str, f, col, scale, maxInk, anchor, op)
 	if str == nil or str == "" then return end
@@ -102,7 +98,7 @@ local function text(font, str, f, col, scale, maxInk, anchor, op)
 	font:Draw(str, x, y, col, ctx.col.clear, op or 1, s, maxW, anchor or "center", 0, f.rot)
 end
 
--- a coin and the amount next to it, centred on f
+-- coin + amount centred on f
 local function amount(font, n, f, col, scale, op)
 	local str = tostring(n)
 	scale = scale or 1
@@ -126,8 +122,8 @@ local function fitPicture(icon, f, boxW, boxH, op, dim)
 	end
 end
 
--- a title plate is drawn by the nameplate module, never scaled or turned: it sits level at its listing's point,
--- and shows once its listing has popped in
+-- title plate: drawn by the nameplate module, level and unscaled at the listing point
+-- shown once the listing has popped in
 local function plateFrame(f)
 	return frame(f.x, f.y, 0, 1)
 end
@@ -143,7 +139,7 @@ local function plate(item, pf, op, dim)
 	NAMEPLATE:DrawNameplateTitleById(item.RefInt, pf.x + PlateOffset.x, pf.y + PlateOffset.y, a, ctx.text)
 end
 
--- ── layout ───────────────────────────────────────────────────────────────────
+-- ==== Layout ====
 
 local function rnd(a, b) return a + (b - a) * math.random() end
 
@@ -174,7 +170,7 @@ local function add(id, kind, slot, x, y, w, h)
 	if st[id] == nil then st[id] = freshState(id, kind) end
 end
 
--- hasBig: the featured listing is on the page (then 4 catalog entries, else 6)
+-- hasBig: featured listing shown (4 catalog entries, else 6)
 function M.layout(hasBig, reshuffle)
 	list, byId = {}, {}
 	if reshuffle then st = {} end
@@ -200,14 +196,14 @@ end
 
 function M.entry(id) return byId[id] end
 
--- ── events ───────────────────────────────────────────────────────────────────
+-- ==== Events ====
 
 function M.select(id, now)
 	local s = st[id]
 	if s then s.selT = now end
 end
 
--- the listings pop onto the page one after the other
+-- listings pop in one by one
 function M.popAll(now)
 	for i, e in ipairs(list) do
 		local s = st[e.id]
@@ -233,14 +229,14 @@ function M.poke(id, kind, now, soldNow)
 	end
 end
 
--- ── drawing ──────────────────────────────────────────────────────────────────
+-- ==== Drawing ====
 
 local TAU = 2 * math.pi
 local sin, exp = math.sin, math.exp
 
 local PageAnim = Animation.page
 
--- the sum of the waves at this moment
+-- sum of the waves now
 local function waves(ws, now)
 	local v = 0
 	for _, w in ipairs(ws) do v = v + w.amp * sin(TAU * w.hz * now + w.phase_rad) end
@@ -271,7 +267,7 @@ local function pageFrame(now)
 	return fx, fy, r
 end
 
--- the listing's frame at this moment, plus its opacity (nil while it has not popped in yet)
+-- listing frame now and its opacity (nil before pop-in)
 local function listingFrame(pf, e, s, now, dt, selected)
 	local target = selected and 1 or 0
 	s.sel = s.sel + (target - s.sel) * math.min(1, dt * Listing.select_rate_per_s)
@@ -308,7 +304,7 @@ local function listingFrame(pf, e, s, now, dt, selected)
 	return child(pf, e.x - PW / 2 + ox, e.y - PH / 2 + oy, rot, k), op
 end
 
--- the sold-out stamp, slammed down when the item has just sold out and shaken when someone still tries
+-- sold-out stamp: slam on sell-out, shake on retry
 local function stamp(f, s, now, op)
 	local k, rot, sop = 1, 0, op
 	if s.stampT ~= nil then
@@ -340,7 +336,7 @@ local function priceColor(price)
 	return (ctx.coins() < price) and ctx.col.red or ctx.col.ink
 end
 
--- the soft shadow under a piece of a listing that is lifted off the page
+-- shadow under a lifted listing piece
 local function lift(f, w, h, s, op)
 	local Shadow = Layout.lift_shadow
 	if s.sel > 0.01 then sprite(ctx.tex.EntryShadow, child(f, Shadow.x, Shadow.y), w / Shadow.tex_w, h / Shadow.tex_h, Shadow.opacity * s.sel * op) end
@@ -353,7 +349,7 @@ local function drawBurst(f, now, op)
 	text(ctx.fonts.mid, ctx.tr("SHOP_UI_FEATURED", "Featured!"), bf, ctx.col.white, 1, Burst.max_width, "center", op)
 end
 
--- burstLast: the burst is left out, to be stuck on after the selection marker
+-- burstLast: burst drawn later (after the selection marker)
 local function drawHero(f, e, s, item, icon, now, op, burstLast)
 	lift(f, e.w, e.h, s, op)
 	sprite(ctx.tex.HeroPanel, f, 1, 1, op)
@@ -384,7 +380,7 @@ local function drawHero(f, e, s, item, icon, now, op, burstLast)
 	if sold then stamp(child(photo, 0, 0, Hero.stamp_rot_deg), s, now, op) end
 end
 
--- the pastel blob behind each catalog entry's picture
+-- blob colours behind catalog pictures
 local SPLASH = Layout.splash_colors
 
 local function drawCell(f, e, s, item, icon, now, op)
@@ -394,8 +390,7 @@ local function drawCell(f, e, s, item, icon, now, op)
 	local photo = child(f, 0, Cell.photo_y, 0)
 	local sold = item == nil or item.SoldOut
 	if item ~= nil and item.Type == "nameplate" then
-		-- a title plate is wider than the photo: it sits on the page as a cut-out, taped by its top edge; its
-		-- shadow and tape go with the plate
+		-- title plate: cut-out taped at its top (wider than the photo)
 		photo = child(f, 0, Cell.plate_y, 0)
 		local pf, pop = plateFrame(photo), plateOpacity(s, now, op)
 		lift(pf, Cell.plate_shadow.w, Cell.plate_shadow.h, s, pop)
@@ -482,7 +477,7 @@ function M.draw(now, dt, view)
 	end
 end
 
--- the listing under a screen point (the page as last drawn), or nil
+-- listing under a screen point (last drawn page), or nil
 function M.hit(mx, my)
 	local pf = lastFrame
 	if pf == nil then return nil end

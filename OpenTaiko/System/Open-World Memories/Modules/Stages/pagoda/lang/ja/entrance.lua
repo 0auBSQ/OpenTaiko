@@ -1,4 +1,4 @@
--- Japanese for story/entrance.lua; a missing key shows the English.
+-- Japanese for story/entrance.lua; missing keys fall back to English
 
 local T = {}
 

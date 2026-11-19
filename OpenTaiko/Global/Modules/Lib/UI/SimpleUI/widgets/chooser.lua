@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global, lowercase-global, need-check-nil, undefined-field
--- SimpleUI chooser: an enum stepper  [ ◀  value  ▶ ]. Left/Right (or click the arrows) cycles the options.
+-- SimpleUI chooser: enum stepper; Left/Right or the arrows cycle the options
 --   ui:chooser{ x=, y=, w=, h=, options={"A","B"}, index=1, wrap=true, onChange=function(i,opt) end }
 
 local Widget = require("UI.SimpleUI.widget")
@@ -19,7 +19,7 @@ function Chooser.new(o)
     self.options = o.options or {}
     self.index = math.max(1, math.min(o.index or 1, math.max(1, #self.options)))
     self.wrap = (o.wrap ~= false)
-    self.noPop = true   -- the body stays still; the arrows pop on their own
+    self.noPop = true   -- body doesn't scale; the arrows do
     return self
 end
 
@@ -40,15 +40,15 @@ function Chooser:setIndex(i, silent)
     self:playSfx("skip")
 end
 
--- silence click sound
+-- no click sound
 function Chooser:onActivate() end
 
 function Chooser:restyle()
     self:resolveStyle()
     local c = self.eff.colors
-    self:bakeBody()       -- rounded surface body + shadow
+    self:bakeBody()
     self:bakeRing()
-    -- baked left/right arrow caps (accent pills with a triangle), reused across restyles
+    -- left/right arrow caps, reused across restyles
     local ah = math.floor(self.h * 0.62)
     local aw = math.floor(ah)
     self._arrowH = ah; self._arrowW = aw
@@ -57,7 +57,6 @@ function Chooser:restyle()
     local function cap(field, dir)
         self:bakeShared(field, "chooser.cap", aw + 2 * m, ah + 2 * m, function(cv)
             Shape.fillRoundAA(cv, m, m, aw, ah, math.min(rs, ah * 0.5), c.primary)
-            -- triangle (left or right) in textOnAccent
             local t = c.textOnAccent
             local cx, cy = m + aw * 0.5, m + ah * 0.5
             local s = ah * 0.22
@@ -80,7 +79,7 @@ function Chooser:update(ctx)
     local capturing, silence = self.capturing, false
     local hoverThird = self._hoverThird
     if not self.focused then capturing = false; silence = true end   -- losing focus ends capture quietly
-    -- which arrow is the mouse over? (left / right third) — drives hover/press visual feedback
+    -- arrow under the mouse (left/right third)
     if not (self.hovered and ctx.inside or self.pressed) then
         hoverThird = nil
     elseif ctx.moved or not self._wasHovered or self.pressed then
@@ -114,7 +113,7 @@ function Chooser:draw()
     if self._ring and self._hiCur > 0.01 then self:drawPiece(self._ring, cx, cy, 1, self._hiCur) end
     local body, op = self:_bodyNow()
     self:drawPiece(body, cx, cy, 1, op)
-    -- arrows: idle slightly dim; brighten + pop on hover; shrink on press (per-arrow tactile feedback)
+    -- arrow scale and opacity from hover and press
     local function drawCap(cap, ax, side)
         local hot = (self._hoverThird == side)
         local pressed = (self._pressThird == side)
@@ -123,7 +122,7 @@ function Chooser:draw()
     end
     drawCap(self._capL, self.x + 6 + self._arrowW * 0.5, "left")
     drawCap(self._capR, self.x + self.w - 6 - self._arrowW * 0.5, "right")
-    -- value text (centred), glyph-composed: no per-string textures, CJK-correct, squeezed to the free width
+    -- value text, centred, squeezed to the free width
     local txt = tostring(self:value() or "")
     local sz = self.eff.font.button
     local avail = math.max(20, self.w - 2 * self._arrowW - 24)

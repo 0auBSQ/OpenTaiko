@@ -462,7 +462,7 @@ The UnlockCondition property of nameplate info handles, character list entries a
 The skin's resolution, theme settings, skin-scoped localized strings and the theme-setting definitions.
 
 <div class="callout warn">
-The skin declares theme settings in ThemeSettings.json and stores their values in ThemeSettings.db3 next to it. The getters always return setting values as strings; a missing setting returns its declared default, or an empty string if no declaration exists. The ForPlayer methods clamp an out-of-range player to 0 or 4. Definition indices are 0-based.
+The skin declares theme settings in ThemeSettings.json and stores their values in `Global/ApplicationData/SkinSettings_<skin folder>.db3`, outside the skin folder, so they survive a skin update. The getters always return setting values as strings; a missing setting returns its declared default, or an empty string if no declaration exists. The ForPlayer methods clamp an out-of-range player to 0 or 4. Definition indices are 0-based.
 </div>
 
 | Method | Description |

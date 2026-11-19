@@ -1,4 +1,4 @@
--- Story scene music; each background names its loop (story/backgrounds.lua `music`).
+-- story scene music; loop key from story/backgrounds.lua `music`
 
 local Config = require("Core.Config")
 local Layout    = Config.load("Config/layout.json")
@@ -16,7 +16,7 @@ local FADE_IN, CROSS = Fades.fade_in_s, Fades.crossfade_s
 local MIN_FADE_OUT = Fades.min_fade_out_s
 
 local _voices = {}                    -- { key, snd, vol, k = 0..1, target = 0 or 1, rate = per second }
-local _key = nil                      -- the loop that should be heard
+local _key = nil                      -- target loop key
 
 local function apply(v)
     pcall(function() v.snd:SetVolumePercent(v.vol * v.k) end)
@@ -43,13 +43,13 @@ function M.play(key)
     pcall(function() s:Play() end)
 end
 
--- fades every loop out over sec seconds
+-- all loops; sec >= MIN_FADE_OUT
 function M.fadeOut(sec)
     _key = nil
     for _, v in ipairs(_voices) do v.target, v.rate = 0, 1 / math.max(MIN_FADE_OUT, sec) end
 end
 
--- true while a loop can still be heard
+-- includes fading loops
 function M.playing() return #_voices > 0 end
 
 function M.update(dt)

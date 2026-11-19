@@ -163,7 +163,7 @@ Quand il manque un fichier au pack sélectionné, le jeu le prend dans le pack 1
 
 ## Étape 8 : Choisir un pack
 
-Quand un skin a au moins 2 packs dans l'un des trois dossiers, la page du thème des paramètres affiche en premier une section Skins des notes, avec un choix pour ce dossier et l'aperçu du pack en dessous. Le jeu charge aussitôt le pack choisi et retient le choix pour le skin dans `ThemeSettings.db3`. Avec un seul pack, le choix n'apparaît pas et le jeu utilise ce pack.
+Quand un skin a au moins 2 packs dans l'un des trois dossiers, la page du thème des paramètres affiche en premier une section Skins des notes, avec un choix pour ce dossier et l'aperçu du pack en dessous. Le jeu charge aussitôt le pack choisi et retient le choix pour le skin dans sa base de réglages. Avec un seul pack, le choix n'apparaît pas et le jeu utilise ce pack.
 
 Un module Lua lit un fichier du pack sélectionné avec `THEME:GetNotesSkinFile(kind, file)` (voir [Joueurs et profils](../api/players.md)). La sélection des chansons fournie l'utilise pour dessiner les textes de jugement de sa liste de replays :
 

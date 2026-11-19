@@ -41,7 +41,7 @@ local function drawDoor(angle, dx, dy)
 	if tx_door == nil or angle >= 1 then return end
 	local theta = angle * math.pi / 2
 	local shade = SWING.shade_base + SWING.shade_by_angle * math.cos(theta)
-	tx_door:SetScale(math.cos(theta), 1 + SWING.grow_by_angle * math.sin(theta))   -- the free edge swings toward the viewer
+	tx_door:SetScale(math.cos(theta), 1 + SWING.grow_by_angle * math.sin(theta))   -- free edge toward the viewer
 	tx_door:SetColor(shade, shade, shade)
 	tx_door:DrawAtAnchor(-OVERSCAN + dx, SCREEN_H / 2 + dy, "left")
 	tx_door:SetScale(1, 1)
@@ -64,7 +64,7 @@ function fadeOut(t)
 		if snd_close then snd_close:Play() end
 	end
 	local k = (t - SLAM_AT) / (1 - SLAM_AT)                 -- 0..1 after the slam
-	local rebound = CLOSE.rebound * math.sin(k * math.pi) * (1 - k)  -- it bounces off the frame once
+	local rebound = CLOSE.rebound * math.sin(k * math.pi) * (1 - k)  -- one rebound off the frame
 	local amp = CLOSE.shake_px * (1 - k) ^ 2
 	drawDoor(rebound, amp * math.sin(k * CLOSE.shake_freq_x), amp * math.cos(k * CLOSE.shake_freq_y))
 end

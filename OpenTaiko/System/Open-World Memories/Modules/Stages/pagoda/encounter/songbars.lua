@@ -50,7 +50,7 @@ local SFX = {
     crack2 = "Sounds/result/crack.ogg", crack3 = "Sounds/result/crack.ogg",
     shatter = "Sounds/result/shatter.ogg", ping = "Sounds/result/star_ping.ogg",
 }
-local DESTINY_SFX = { "zoom", "crack1", "crack2", "crack3", "shatter", "ping" }   -- one sound per crack so none cuts another
+local DESTINY_SFX = { "zoom", "crack1", "crack2", "crack3", "shatter", "ping" }   -- one sound per crack (none cuts another)
 
 local _fonts = nil              -- glyph fonts: name (bars), label (tier), flavor (destiny line)
 local _black = nil

@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Kusudama (giant balloon) animation: roll-in, hold, broken (petal burst) or failed. Group D.
+-- kusudama anime (group D)
 
 local kusuState = 0
 
@@ -111,10 +111,10 @@ function update(timestamp, state)
 end
 
 function draw(state)
-    tx["Kusudama_Back.png"]:SetOpacity(fadeValue)   -- old: SetOpacity(fadeValue * 255) on the 0-255 API
+    tx["Kusudama_Back.png"]:SetOpacity(fadeValue)
     tx["Kusudama_Back.png"]:DrawRect(0, 0, 0, 0, 1920, 1080)
 
-    -- Into Kusudama
+    -- state 1: in
     if kusuState == 1 then
 
         -- EaseOutBack
@@ -125,7 +125,7 @@ function draw(state)
         tx["Kusudama.png"]:Draw(kusudamaPos[1], kusudamaPos[2] - (500 * (1 - updateValue)))
         tx["Star.png"]:DrawAtAnchor(starCenterPos[1], starCenterPos[2] - (500 * (1 - updateValue)), "center")
 
-    -- Kusudama
+    -- state 2: idle
     elseif kusuState == 2 then
 
         tx["Kusudama.png"]:Draw(kusudamaPos[1], kusudamaPos[2])
@@ -136,7 +136,7 @@ function draw(state)
 
         tx["Flash.png"]:DrawAtAnchor(flashCenterPos[1], flashCenterPos[2], "center")
 
-    -- Kusudama Broken
+    -- state 3: broken
     elseif kusuState == 3 then
 
         tx["Flare.png"]:SetScale(0.9 + (0.45 * animeValue), 0.9 + (0.45 * animeValue))
@@ -147,7 +147,7 @@ function draw(state)
         for i = 1, petalCount do
             -- EaseOutCubic
             local xCurve = (1 - (1 - animeValue) ^ 3) * petals_direction[i]
-            -- EaseInSine Edited
+            -- EaseInSine (edited)
             local yCurve = (1 - math.cos((animeValue * math.pi) / 2) + (animeValue * -0.6)) * petals_fall[i]
 
             tx["Petals.png"]:SetRotation(270 * petals_rotation[i] * animeValue)
@@ -169,7 +169,7 @@ function draw(state)
         tx["Flash.png"]:DrawAtAnchor(flashCenterPos[1], flashCenterPos[2], "center")
         tx["Flash2.png"]:DrawAtAnchor(flash2CenterPos[1], flash2CenterPos[2], "center")
 
-    -- Kusudama Failed
+    -- state 4: failed
     elseif kusuState == 4 then
 
         -- EaseInBack

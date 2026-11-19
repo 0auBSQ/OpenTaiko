@@ -1,7 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- AI up background 0: a fanned arc of "Up" portrait sprites that ease in from the center,
--- over a base/frame, plus a looping bottom animation. state.battleState splits 1P vs 2P sprites.
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
+-- AI up background 0
 
 local inAnimeCounter = -20
 

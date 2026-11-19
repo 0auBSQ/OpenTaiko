@@ -1,7 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Normal-down background 3 (Space): single sprite-atlas (Assets.png) space scene — starfield + comet on the
--- normal layer, crossfading into a "clear" layer with planet/spaceship/UFO/parallax stars. 1P only (no per-player branches).
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
+-- down background 3: Space (Assets.png atlas)
 
 local time = 0
 

@@ -1,11 +1,4 @@
--- Vault.Chests: the secret vault's three chests, 1 wooden, 2 golden, 3 platinum, each opened with its own
--- key (Vault.Keys). A chest gives one reward per key from a weighted pool: nothing (the key snaps), coins,
--- the next chest's key, a nameplate (361-380, 398-416), My Room furniture, or a song of the "Secret Vault" folder.
---   Chests.enter()        -- once per visit: the first visit's free key, the song pools
---   Chests.roll(i)        -- spends a key of chest i, grants and saves the reward, returns it
---   Chests.showReward(r)  -- its pop-up through the "modal" ROActivity (false for a snap or a key)
--- A reward: { type = "snap" | "coins" (amount) | "key" (target) | "nameplate" (id, info) |
--- "furniture" (id, rarity) | "song" (node), openedChest }.
+-- Vault.Chests: the secret vault's three chests and their weighted reward pools
 
 local Keys  = require("Vault.Keys")
 local Texts = require("Vault.Texts")
@@ -22,9 +15,8 @@ M.NAMEPLATE_POOLS = {
     {376, 377, 378, 379, 380, 411, 412, 413, 414, 415, 416},                       -- OpTk
 }
 
--- My Room furniture found in each chest, with its rarity. My Room hands over what a grant counter adds
--- (.myroom_<id>) and writes how many the save owns (.myroom_held_<id>); one in stock or placed counts
--- as obtained. Furniture can come again: an owned piece keeps a fifth of its chance.
+-- furniture per chest: { id, rarity }
+-- counters: .myroom_<id> = grants for My Room, .myroom_held_<id> = owned count
 M.FURNITURE_POOLS = {
     { { "wooden_chest", "Common" }, { "barrel", "Common" }, { "coin_piles", "Uncommon" },
       { "pirate_key", "Uncommon" }, { "pirate_swords", "Uncommon" } },                       -- Simple
@@ -33,13 +25,12 @@ M.FURNITURE_POOLS = {
     { { "caspian_mug", "Rare" }, { "chalice", "Rare" }, { "crystal", "Epic" },
       { "fishtank", "Legendary" } },                                                        -- OpTk
 }
-M.NAMEPLATE_W = 15    -- the chance of a chest's nameplates (one draw among those not unlocked)
-M.OWNED_SHARE = 1 / 5 -- what is left of an owned piece's chance
+M.NAMEPLATE_W = 15    -- nameplate weight (one draw among the locked ones)
+M.OWNED_SHARE = 1 / 5 -- weight factor once owned
 
-local CHEST_FALLBACK = { "Wooden Chest", "Golden Chest", "Platinum Chest" }
+local CHEST_FALLBACK = { "Wooden Chest", "Golden Chest", "OpenTaikium Chest" }
 
--- Rarity string → modal integer (matches HRarity.RarityToModalInt in C#)
--- Poor=0, Common=0, Uncommon=1, Rare=2, Epic=3, Legendary=4, Mythical=4
+-- rarity string → modal int (as HRarity.RarityToModalInt in C#)
 local RARITY_MAP = {Poor=0, Common=0, Uncommon=1, Rare=2, Epic=3, Legendary=4, Mythical=4}
 
 local function songLevelToRarity(lv)
@@ -52,7 +43,7 @@ end
 
 local songPools = {{}, {}, {}}   -- indexed by chest (1‥3)
 
--- ── Helpers ───────────────────────────────────────────────────────────────────
+-- ==== Helpers ====
 
 local function sf()
     return GetSaveFile(0)
@@ -78,7 +69,7 @@ function M.maxChartLevel(node)
     return maxLv
 end
 
--- the songs of the vault's folder, by their highest chart level: up to 1 in chest 1, 2 in chest 2, 3+ in chest 3
+-- vault folder songs per chest by max chart level (<= 1, 2, 3+)
 function M.buildSongPools()
     songPools = {{}, {}, {}}
 
@@ -173,7 +164,7 @@ function M.chestPool(idx)
         table.insert(pool, {w = M.NAMEPLATE_W, type = "nameplate", pool = uNp})
     end
 
-    -- furniture: each piece with the chance one nameplate of the chest has, a fifth of it once owned
+    -- furniture: per-piece weight = one nameplate's, times OWNED_SHARE once owned
     local per = M.NAMEPLATE_W / #M.NAMEPLATE_POOLS[idx]
     for _, f in ipairs(M.FURNITURE_POOLS[idx]) do
         local w = furnitureOwned(f[1]) and per * M.OWNED_SHARE or per
@@ -237,9 +228,9 @@ local function processRoll(idx)
     return {type = "snap", openedChest = idx}
 end
 
--- ── API ────────────────────────────────────────────────────────────────────────
+-- ==== API ====
 
--- once per visit: the first visit gives 1 simple key (returns true then), and the song pools are built
+-- once per visit: builds the song pools; the first visit gives 1 simple key (returns true)
 function M.enter()
     local gifted = false
     local save = sf()
@@ -262,18 +253,21 @@ function M.name(idx)
     return Texts.get("chest_" .. idx, CHEST_FALLBACK[idx])
 end
 
--- what is left to get from the chest (songs, nameplates and furniture not obtained yet), and its total
+-- items left to get from the chest, and its total
 function M.stock(idx)
     local left  = #getUnobtainedSongs(idx) + #getUnobtainedNameplates(idx) + #getUnobtainedFurniture(idx)
     local total = #songPools[idx] + #M.NAMEPLATE_POOLS[idx] + #M.FURNITURE_POOLS[idx]
     return left, total
 end
 
--- opens chest idx with one of its keys (the caller checks keyCount first): the reward is saved at once
+-- spends a key of chest idx (the caller checks keyCount) and saves the reward
+-- returns { type = "snap" | "coins" (amount) | "key" (target) | "nameplate" (id, info) |
+--   "furniture" (id, rarity) | "song" (node), openedChest }
 function M.roll(idx)
     return processRoll(idx)
 end
 
+-- reward pop-up through the "modal" ROActivity; false for a snap or a key
 function M.showReward(reward)
     local modal = ROACTIVITY:GetROActivity("modal")
     if modal == nil or reward == nil then return false end
@@ -287,7 +281,7 @@ function M.showReward(reward)
         local songRarity = songLevelToRarity(M.maxChartLevel(reward.node))
         modal:Activate(0, songRarity, 4, reward.node, nil)
     elseif rtype == "furniture" then
-        -- the picture is the one My Room shares for each of its reward items
+        -- thumbnail shared by My Room
         modal:Activate(0, RARITY_MAP[reward.rarity] or 1, 5, Texts.get("furniture_" .. reward.id, reward.id), reward.rarity,
             "myroom_thumb_" .. reward.id, Texts.get("new_furniture", "New Furniture!"))
     else

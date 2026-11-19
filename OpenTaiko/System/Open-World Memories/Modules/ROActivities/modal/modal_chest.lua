@@ -1,17 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- modal_chest.lua — the reveal before an item card: the screen darkens under rolling smoke in the
--- rarity's colour with a slow wheel of light turning behind it; from rare up a cushion drops in
--- first; the rarity's chest thuds down (onto the cushion or the ground), its latches give, it
--- rattles harder and harder, squats, and pops open with a stretch, a hop and a burst of light;
--- then the screen whites out and settles to black, which is where the card takes over. Each chest
--- opens with its own sound and its own pace: the legendary one strains longest before it gives.
--- Poor is a cardboard box in a dusty attic: dust instead of smoke, motes instead of sparkles, no
--- wheel of light. Mythical's smoke and light run through the rainbow. A decide press skips
--- straight to the white-out.
---
--- chest_<rarity>.png is a horizontal strip of 512x512 frames: closed on the left, open on the
--- right. Two frames are all the opening needs, the motion carries it (the rattle, the squash, the
--- pop); any extra frames in between are shown during the wind-up.
+-- chest reveal before an item card
+-- chest_<rarity>.png: 512x512 frames, closed to open (middle ones during the wind-up)
 
 local Fx = require("modal_fx")
 local Config = require("Core.Config")
@@ -25,20 +14,20 @@ local L = Layout.chest
 local T = Animation.chest
 local CHEST_X = L.x
 local FRAME = L.frame
-local BASE_ROW, MOUTH_ROW = L.base_row, L.mouth_row   -- the chest's base and where its light pours out, inside a frame
-local CUSHION_BOTTOM = L.cushion_bottom        -- where the cushion's bottom row lands
-local CUSHION_SEAT = L.cushion_seat            -- the chest's base sits this far down the cushion (its top face)
-local GROUND_SEAT = L.ground_seat              -- where the chest's base rests without a cushion
+local BASE_ROW, MOUTH_ROW = L.base_row, L.mouth_row   -- chest base and mouth rows in a frame
+local CUSHION_BOTTOM = L.cushion_bottom        -- cushion bottom y
+local CUSHION_SEAT = L.cushion_seat            -- chest base seat down the cushion (height share)
+local GROUND_SEAT = L.ground_seat              -- chest base y without a cushion
 local DROP_FROM = T.drop_from_y
 local SMOKE_N = L.smoke.count
-local WHEEL_SPEED = T.wheel_speed_deg_per_s    -- degrees per second
+local WHEEL_SPEED = T.wheel_speed_deg_per_s    -- deg/s
 
--- timeline (seconds)
+-- timeline (s)
 local T_CUSHION, CUSHION_DROP = T.cushion_at_s, T.cushion_drop_s
 local T_CHEST, CHEST_DROP = T.chest_at_s, T.chest_drop_s
 local T_LATCH = T.latch_at_s
 local T_OPEN = T.open_at_s
--- per rarity: how long the rattle builds before the lid pops, and how long the light is admired
+-- per rarity: windup and admire times (s)
 local PACE = {}
 for _, r in ipairs(Fx.RARITIES) do PACE[r] = { windup = T.pace[r].windup_s, admire = T.pace[r].admire_s } end
 local FLASH_IN, FLASH_HOLD, FLASH_TO_BLACK, BLACK_HOLD = T.flash_in_s, T.flash_hold_s, T.flash_to_black_s, T.black_hold_s
@@ -68,7 +57,7 @@ function M.new(A)
     return self
 end
 
--- the sound cues a tier uses: the cardboard box has its own, every chest opens with its own
+-- sound cues per tier
 local function cues(key)
     if key == "poor" then return { land = "box_land", latch = "box_rustle", open = "box_open" } end
     return { land = "chest", latch = "latch", open = "open_" .. key }
@@ -91,8 +80,7 @@ function M:start(key)
     self.flashT = nil
     self.smoke:clear() ; self.smoke2:clear() ; self.dust:clear() ; self.sparks:clear() ; self.motes:clear()
 
-    -- a screen of slow puffs, the outer ones rolling in first and the centre filling last; the
-    -- attic gets a thinner, dustier haze
+    -- smoke puffs, outer ones first; thinner haze in the attic
     local farthest = SMOKE.min_dist + SMOKE.dist_range
     for i = 1, SMOKE_N do
         local a = (i / SMOKE_N) * 2 * pi + random() * SMOKE_T.angle_jitter
@@ -128,7 +116,7 @@ function M:start(key)
         self.popT, self.shakeT, self.cushionLandT = 0, 0, 0
         local mouth = self:seatY() - (BASE_ROW - MOUTH_ROW)
         if self.attic then
-            -- a cloud of dust and drifting motes instead of light
+            -- attic: dust and motes instead of light
             for _ = 1, POP_DUST.count do
                 self.dust:emit{ x = CHEST_X + (random() - 0.5) * L.pop_dust_spread_x, y = mouth + random() * L.pop_dust_spread_y, vx = (random() - 0.5) * POP_DUST.vx_range, vy = -(POP_DUST.vy_min + random() * POP_DUST.vy_range), drag = POP_DUST.drag,
                                 life = POP_DUST.life_min + random() * POP_DUST.life_range, s0 = POP_DUST.size, s1 = POP_DUST.size1, rot = random() * 360, spin = (random() - 0.5) * POP_DUST.spin_range, color = ATTIC_DUST, alpha = POP_DUST.alpha }
@@ -152,11 +140,11 @@ end
 
 local function cushionHeight(A)
     local h = A.tex.cushion and A.tex.cushion.Height or 0
-    if h <= 0 then h = L.cushion_fallback_h end   -- no cushion art: the shipped cushion's height
+    if h <= 0 then h = L.cushion_fallback_h end   -- no cushion art: default height
     return h
 end
 
--- the y the chest's base rests on: the cushion's top face, or the ground
+-- chest base y: cushion top or ground
 function M:seatY()
     if not self.withCushion then return GROUND_SEAT end
     local h = cushionHeight(self.A)
@@ -168,7 +156,7 @@ function M:color()
     return Fx.rarityColor(self.key, self.t)
 end
 
--- the attic's dust motes: a slow, steady drift up through the haze
+-- attic dust motes drifting up
 function M:driftMotes(dt)
     self.moteAcc = self.moteAcc + dt * DRIFT_T.per_s
     while self.moteAcc >= 1 do
@@ -194,14 +182,14 @@ function M:flash()
     self.A:play("flash")
 end
 
--- a decide press skips whatever is left of the reveal
+-- decide skips the rest of the reveal
 function M:skip()
     if self.flashT ~= nil then return end
     self.tl:jump(100)
     self:flash()
 end
 
--- returns true once the screen has settled to black
+-- true once settled to black
 function M:update(dt, decide)
     self.t = self.t + dt
     self.tl:advance(dt)
@@ -218,13 +206,13 @@ function M:update(dt, decide)
     return false
 end
 
--- the shadow on the ground, gathering under whatever is coming down
+-- ground shadow under a falling object
 function M:drawShadow(fade, sx, sy, groundY, height, width)
     local k = min(1, height / SHADOW.fade_height)
     Fx.draw(self.A.tex.glow, CHEST_X + sx, groundY + sy, { sx = width - SHADOW.shrink * k, sy = SHADOW.height_scale, opacity = fade * (SHADOW.opacity - SHADOW.opacity_drop * k), color = SHADOW.color })
 end
 
--- the cushion: its drop and the squash whenever something lands on it
+-- cushion drop and landing squash
 function M:drawCushion(fade, sx, sy)
     local A, t = self.A, self.tl.t
     local ck = Fx.span(t, T_CUSHION, CUSHION_DROP)
@@ -235,10 +223,10 @@ function M:drawCushion(fade, sx, sy)
     local sq = Fx.hump(Fx.span(self.cushionLandT, 0, T.cushion_squash_s)) * T.cushion_squash
     self:drawShadow(fade, sx, sy, CUSHION_BOTTOM - SHADOW.cushion_above, CUSHION_BOTTOM - bottom, SHADOW.cushion_w)
     Fx.draw(cush, CHEST_X + sx, bottom + sy, { anchor = "bottom", sx = 1 + sq * T.cushion_squash_x, sy = 1 - sq, opacity = fade })
-    return h * sq * (1 - CUSHION_SEAT)      -- how much lower the seat sits while the cushion is squashed
+    return h * sq * (1 - CUSHION_SEAT)      -- seat drop while squashed
 end
 
--- the chest: the drop, the landing squash, the latch jiggle, the rattling wind-up, the pop open
+-- chest timeline from drop to pop
 function M:drawChest(fade, sx, sy, sink)
     local A, t = self.A, self.tl.t
     local dk = Fx.span(t, T_CHEST, CHEST_DROP)
@@ -261,14 +249,14 @@ function M:drawChest(fade, sx, sy, sink)
     local frames = max(1, floor((self.chestTex.Width or 0) / FRAME))
     local frame = 0
     if t >= T_OPEN and t < self.tPop then
-        -- the wind-up: the rattle builds, the chest squats down ready to spring
+        -- wind-up: rattle builds, squat
         local k = Fx.span(t, T_OPEN, self.windup)
         dx = dx + sin(t * T.rattle_freq) * T.rattle_px * k
         rot = sin(t * T.rattle_rot_freq) * T.rattle_rot_deg * k
         scx, scy = scx * (1 + T.squat_x * k * k), scy * (1 - T.squat_y * k * k)
         if frames > 2 then frame = min(frames - 2, floor(k * (frames - 1))) end
     elseif t >= self.tPop then
-        -- the pop: open frame, a stretch that overshoots and settles, a hop and a bounce
+        -- pop: open frame with stretch and hop
         frame = frames - 1
         local p = Fx.span(self.popT, 0, T.pop_s)
         local stretch = 1 + T.pop_stretch * (1 - Fx.outBack(p, T.pop_stretch_overshoot)) * (p < 1 and 1 or 0)
@@ -279,8 +267,7 @@ function M:drawChest(fade, sx, sy, sink)
         rot = sin(self.popT * T.pop_wobble_freq) * T.pop_wobble_deg * (1 - Fx.span(self.popT, 0, T.pop_wobble_s))
     end
 
-    -- the light inside, before the chest so it spills out of the mouth as the lid lifts (the
-    -- attic only stirs up a dim haze)
+    -- inner light drawn before the chest (spills from the mouth)
     if t >= self.tPop then
         local g = Fx.outQuad(Fx.span(self.popT, 0, T.light_s))
         local flare = 1 + T.light_flare * Fx.hump(Fx.span(self.popT, 0, T.light_flare_s))
@@ -299,7 +286,7 @@ function M:draw()
     if self.attic then
         self.motes:draw(fade)
     else
-        -- the wheel of light turns through the smoke
+        -- light wheel
         local wheelCol = self.rainbow and self:color() or nil
         Fx.draw(A.tex.wheel, WHEEL.cx, WHEEL.cy, { s = WHEEL.scale, rot = self.wheelRot, opacity = WHEEL.opacity * fade, blend = "add", color = wheelCol })
         Fx.draw(A.tex.wheel, WHEEL.cx, WHEEL.cy, { s = WHEEL.inner_scale, rot = -self.wheelRot * T.wheel_inner_speed_ratio, opacity = WHEEL.inner_opacity * fade, blend = "add", color = wheelCol })

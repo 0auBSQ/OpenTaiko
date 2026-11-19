@@ -1,5 +1,5 @@
--- Encounter screen on entering a floor.
--- After update() returns "start" or "leave" it holds a black frame until release().
+-- floor entry encounter screen
+-- after "start" or "leave", holds a black frame until release()
 
 local Easing   = require("Easing")
 local skybox   = require("skybox")
@@ -36,7 +36,7 @@ local _entering = false
 local _fade = 1
 local _result = nil
 local _menuTex = nil
-local _cut, _cutScript = nil, nil       -- the visit's cutscene and its script data
+local _cut, _cutScript = nil, nil       -- visit cutscene and script data
 
 local hooks = {
     onLine = function(line)
@@ -66,7 +66,7 @@ end
 
 function M.active() return _phase ~= "idle" end
 
--- starts loading the floor's encounter art (called when the floor transition opens)
+-- start encounter art loads (on floor transition open)
 function M.preload(level, ctx)
     if _opened then return end
     ctx = ctx or {}
@@ -81,7 +81,7 @@ function M.preload(level, ctx)
     _keys, _preKey = list, key
 end
 
--- frees everything the visit created
+-- free the visit's resources
 local function teardown()
     if not _opened then return end
     _opened = false
@@ -99,9 +99,9 @@ local function setPhase(p)
     _phase, _phaseT = p, 0
 end
 
--- ctx = { startLevel, highest, tower, firstTime, playerName, monster, lostBefore, roll, runStart, reroll };
--- roll: the floor's rolled songs and speed (encounter/songbars.lua); runStart: the run's first floor;
--- tower: highest floor shown cleared; reroll(keepMystery): a new roll of the floor's songs
+-- ctx = { startLevel, highest, tower, firstTime, playerName, monster, lostBefore, roll, runStart, reroll }
+-- roll: rolled songs and speed (encounter/songbars.lua); runStart: run's first floor
+-- tower: highest floor shown cleared; reroll(keepMystery): new song roll
 function M.open(level, ctx)
     teardown()
     _level, _ctx = level, ctx or {}
@@ -129,13 +129,13 @@ function M.open(level, ctx)
     _visT, _fade, _result, _entering = 0, 1, nil, false
 end
 
--- the cast has arrived, or a cutscene's opening animation is over
+-- cast arrived or cutscene opening done
 local function arrived()
     if _cut ~= nil then return not scene.busy() or _phaseT >= CUT_OPENING_MAX end
     return _entering and cast.arrived()
 end
 
--- starts the song bars and the floor loop (a cutscene's late loop starts here at the latest)
+-- start song bars and floor loop (a cutscene's late loop at the latest)
 local function openBars()
     if not music.active() then music.start(_level) end
     songbars.start()
@@ -143,7 +143,7 @@ local function openBars()
     setPhase("bars")
 end
 
--- after the floor's dialog: the new item presentation, if any, comes first
+-- after the dialog: new item intro first
 local function afterDialog()
     if items.introPending() then
         items.startIntro()
@@ -226,8 +226,7 @@ function M.update(dt, nav)
         _fade = math.min(1, _phaseT / FADE_SEC)
         if _phaseT >= FADE_SEC then
             local r = _result
-            -- hold a black frame: the stage still draws us through its exit transition, and going idle
-            -- here would flash the scene again
+            -- hold black: idle here would flash the scene during the exit transition
             teardown()
             _phase, _fade = "held", 1
             return r
@@ -238,7 +237,7 @@ function M.update(dt, nav)
     return nil
 end
 
--- called by the stage once it has moved on from this screen
+-- called by the stage after it moved on
 function M.release()
     teardown()
     _phase = "idle"
@@ -256,7 +255,7 @@ function M.dispose()
     _phase = "idle"
 end
 
--- sky for this frame: nil when idle, otherwise grey (0..1) and whether the sky shows
+-- nil when idle, else grey (0..1) and sky visible
 function M.sky()
     if _phase == "idle" then return nil end
     if _phase == "loading" or _phase == "held" then return 0, false end

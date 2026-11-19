@@ -1,7 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Dan up background (Spring): dojo scene with a scrolling cloud layer + three layers of
--- scrolling/swaying/rotating falling flowers. No per-player / clear-fade logic.
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
+-- dan up background: spring
 
 local bgWidth_1 = 1984
 local bgWidth_4 = 962
@@ -78,7 +76,7 @@ function update(timestamp, state)
     flowerSway_2 = flowerSway_2 + (70 * fps.deltaTime)
     flowerSwayFinal_2 = 60 * math.cos((5 * flowerSway_2) / 120) * math.sin((2 * flowerSway_2) / 120)
     flowerSway_3 = flowerSway_3 + (36 * fps.deltaTime)
-    flowerSwayFinal_3 = 40 * math.cos((5 * flowerSway_2) / 130) * math.sin((2 * flowerSway_2) / 130)   -- original uses flowerSway_2 (not _3) here — preserved
+    flowerSwayFinal_3 = 40 * math.cos((5 * flowerSway_2) / 130) * math.sin((2 * flowerSway_2) / 130)   -- flowerSway_2 on purpose
 
     flowerRot1 = flowerRot1 + (28 * fps.deltaTime)
     flowerRot2 = flowerRot2 + (40 * fps.deltaTime)

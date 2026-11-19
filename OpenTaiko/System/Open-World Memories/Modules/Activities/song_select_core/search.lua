@@ -1,10 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
--- search.lua — Glue between sort_search_dialog and the song list.
---
--- The dialog hands the search parameters over through the player's save file (Lib/SongSearch.write) and
--- raises ss_search_ready. M.checkSearchReady() picks them up, runs the search (Lib/SongSearch, the same
--- predicate the dialog counts with) against the current folder, and opens a virtual folder with the
--- results. Returns true if a search was applied (callers can skip their own post-dialog logic).
+-- song_select_core search: glue between sort_search_dialog and the song list.
 
 local SongSearch = require("SongSearch")
 
@@ -15,7 +10,9 @@ function M.init(g)
     G = g
 end
 
--- Call once per frame when sort_search_dialog is inactive.
+-- picks up the dialog's parameters (Lib/SongSearch, ss_search_ready), searches the current folder
+-- and opens the results as a virtual folder
+-- once per frame while sort_search_dialog is inactive; true when a search was applied
 function M.checkSearchReady()
     if G.songList == nil then return false end
     local sav = GetSaveFile(G.highlightedPlayer)

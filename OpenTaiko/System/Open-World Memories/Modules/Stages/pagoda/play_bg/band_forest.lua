@@ -1,4 +1,4 @@
--- Floors 1-10 band: the forest, with the encounter forest's effects fitted to the band.
+-- floors 1-10 band: forest (encounter forest effects)
 
 local assets = require("encounter/assets")
 local Light  = require("fx/light")

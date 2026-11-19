@@ -31,7 +31,7 @@ local ROOF_LEVEL = 21           -- first level without Ume
 
 local START_X, EXIT_X = Look.start_x, Look.exit_x
 local RUN_SEC, SKID_SEC = Anim.run_s, Anim.skid_s
-local RUN_SETTLE = Anim.run_settle      -- share of the run's end over which the waddle settles
+local RUN_SETTLE = Anim.run_settle      -- share of the run's end for the waddle to settle
 local SKID_LEAN = Anim.skid_lean_deg    -- degrees, back (left) while braking
 local Land = Anim.land
 local LAND_Y, LAND_X, LAND_DECAY, LAND_HZ = Land.squash_y, Land.squash_x, Land.decay, Land.hz

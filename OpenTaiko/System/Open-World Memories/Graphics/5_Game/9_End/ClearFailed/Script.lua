@@ -1,7 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- End "ClearFailed" anime (Group C): per-player slide-in + fall sprite sequence (0..32.png), plus a
--- TemplateMoyai drop when every player has failed. Ported from the old ScriptBG func: API to the
--- ROActivity LuaTexture API. update/draw/playEndAnime take the player via the state table / index.
+-- end anime: ClearFailed (group C, player via state.player)
 
 local y = { 218, 482, 0, 0, 0 }
 
@@ -27,7 +25,7 @@ function playEndAnime(player)
     nowFrame[player + 1] = 0
     templateMoyai_y = -1080
 
-    -- must failed if reach here
+    -- reached only on fail
     failed[player + 1] = true
     allfailed = true
     for i = 1, 5 do
@@ -39,7 +37,6 @@ function playEndAnime(player)
 end
 
 function onStart()
-    -- Load every frame sprite (0.png .. 32.png inclusive) + the all-failed Moyai up front.
     for i = 0, textureCount do
         tx[tostring(i) .. ".png"] = TEXTURE:CreateTexture(tostring(i) .. ".png")
     end
@@ -50,7 +47,6 @@ end
 function update(timestamp, state)
     local player = state.player
 
-    -- y layout depends on player count (was seeded in the old init()); state has it here.
     if state.playerCount <= 2 then
         y = { 216, 480, 0, 0, 0 }
     elseif state.playerCount == 5 then

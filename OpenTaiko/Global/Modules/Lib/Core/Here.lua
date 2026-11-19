@@ -1,9 +1,7 @@
--- Core.Here — the folder of a file loaded with require, from the arguments require gives the file:
---   local HERE = require("Core.Here")(...)      -- e.g. "C:/Game/Global/Modules/Lib/UI/"
--- A Lib file has no folder of its own for TEXTURE, SOUND and the other loaders: they resolve against the
--- module that loaded it. A Lib file that ships its own assets loads them with the *FromAbsolutePath
--- variants and this folder. nil when the file was not loaded through require.
+-- Core.Here: folder of a file loaded with require: local HERE = require("Core.Here")(...)
+-- Lib files load their own assets with the *FromAbsolutePath loaders and this folder
 
+-- (modname, path) from require -> folder with a trailing "/", or nil outside require
 return function(_, path)
     if type(path) ~= "string" then return nil end
     local p = path:gsub("\\", "/")

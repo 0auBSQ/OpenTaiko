@@ -1,21 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- OWM3d/triggers.lua — trigger volumes + the action system that makes the world interactive:
--- streamed interiors, doors, camera rig changes, teleports, map transitions and custom callbacks.
---
---   world.triggers:add{
---       id = "innDoor", shape = "box", min = {4.6, 0, 6.6}, max = {6.4, 2.2, 8.4},
---       on = "enter" | "leave" | "interact",   once = false,
---       actions = {
---           { type = "toggleGroup", group = "inn", visible = true, solid = true },
---           { type = "rig", rig = "interior" },                   -- camera blend
---           { type = "teleport", to = {x, y, z} },
---           { type = "map", map = "hills", spawn = "fromPlaza" }, -- via world.onMapChange
---           { type = "custom", fn = function(world, trig) ... end },
---       },
---   }
---   Per frame: world.triggers:update(dt, px, py, pz). For prompts: world.triggers:interactHere(px,py,pz)
---   returns the nearest "interact" trigger the player stands in (stage draws the prompt + fires
---   :fire(trig) on the interact key).
+-- OWM3d/triggers.lua: trigger volumes and their actions
 
 local Triggers = {}
 Triggers.__index = Triggers
@@ -27,6 +11,7 @@ function Triggers.new(world)
     return self
 end
 
+-- t: id, shape, min, max, on ("enter" | "leave" | "interact"), once, actions
 function Triggers:add(t)
     t.entered = false
     t.spent = false
@@ -35,8 +20,7 @@ function Triggers:add(t)
 end
 
 function Triggers:clear()
-    -- break the action closures explicitly (they capture map/world state; a lingering reference
-    -- through a stale trigger table would pin the whole unloaded map in the Lua heap)
+    -- drop action closures: a stale trigger would keep the unloaded map alive
     for _, t in ipairs(self.list) do t.actions = nil end
     self.list = {}
 end
@@ -46,18 +30,16 @@ local function inside(t, px, py, pz)
        and py >= t.min[2] and py <= t.max[2]
        and pz >= t.min[3] and pz <= t.max[3]
 end
-Triggers.inside = inside   -- exposed for the harness
+Triggers.inside = inside   -- exposed for tests
 
--- re-seed the entered flags from a position WITHOUT firing anything — call after a spawn or
--- teleport so a player materializing inside a volume doesn't fire a phantom enter (and stepping
--- out doesn't fire a phantom leave/unfire).
+-- re-seed entered flags without firing; call after a spawn or teleport
 function Triggers:resetStates(px, py, pz)
     for _, t in ipairs(self.list) do
         t.entered = (px ~= nil) and inside(t, px, py or 0, pz or 0) or false
     end
 end
 
--- run a trigger's actions (also the entry point for "interact" triggers from the stage)
+-- run a trigger's actions (the stage calls this for "interact")
 function Triggers:fire(t)
     if t.once and t.spent then return end
     t.spent = true
@@ -76,14 +58,14 @@ function Triggers:fire(t)
         elseif kind == "map" and a.map then
             if world.onMapChange then world.onMapChange(a.map, a.spawn or "default", t) end
         elseif kind == "door" and a.door then
-            -- doors auto-open by proximity (isomap.updateDoors); action reserved for locked doors later
+            -- no-op: doors open by proximity (isomap updateDoors)
         elseif kind == "custom" and a.fn then
             a.fn(world, t)
         end
     end
 end
 
--- inverse actions on leave for stateful toggles (interiors: leaving reverses the enter toggle)
+-- on leave: reverse toggleGroup and rig actions
 function Triggers:unfire(t)
     local world = self.world
     for _, a in ipairs(t.actions or {}) do
@@ -114,7 +96,8 @@ function Triggers:update(dt, px, py, pz)
     end
 end
 
--- the "interact" trigger the player currently stands in (nil if none)
+-- the "interact" trigger the player stands in (nil if none)
+-- the stage shows the prompt and calls fire(t) on the interact key
 function Triggers:interactHere(px, py, pz)
     for _, t in ipairs(self.list) do
         if t.on == "interact" and not (t.once and t.spent) and inside(t, px, py, pz) then

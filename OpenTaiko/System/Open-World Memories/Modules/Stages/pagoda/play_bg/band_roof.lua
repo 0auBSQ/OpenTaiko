@@ -1,4 +1,4 @@
--- Roof floors (21+) band: the beanstalk over the sky at the floor select's hour.
+-- roof floors (21+) band: beanstalk over the floor select hour sky
 
 local assets = require("encounter/assets")
 local skybox = require("skybox")
@@ -24,7 +24,7 @@ local MOON_LIFT, MOON_MAX = Look.moon.lift, Look.moon.max_opacity
 local VIGNETTE_DAY, VIGNETTE_NIGHT = Look.vignette.day_opacity, Look.vignette.night_opacity
 local VIGNETTE_FROM, VIGNETTE_HOURS = Look.vignette.ramp_from_hour, Look.vignette.ramp_hours
 
--- cloud rows tiled behind the bean, bottom-aligned, far row first
+-- cloud rows behind the bean (bottom-aligned, far first)
 local CLOUDS = Look.clouds
 local CLOUD_SPEEDS = Move.cloud_speed_px_per_s
 local CLOUD_FOOT = H
@@ -32,10 +32,10 @@ local CLOUD_FOOT = H
 local _hour = 12
 local _moon = 0
 local _f = { 1, 1, 1 }
-local _t = 0                            -- the clouds' clock
+local _t = 0                            -- cloud clock (s)
 local _sky = nil
-local _behind = {}                      -- emitters under the bean, graded by the filter
-local _stars, _spores = nil, nil        -- not graded by the filter
+local _behind = {}                      -- under the bean, filtered
+local _stars, _spores = nil, nil        -- unfiltered
 
 local function sunFor(hour)
     if hour <= SUN.day.last_hour then return SUN.day end
@@ -81,7 +81,7 @@ function M.open(ctx)
     _hour = skybox.hourFor(ctx.level)
     _f = { skybox.filterFor(_hour) }
     _t = 0
-    _sky = Sky.new(_hour, false)          -- 21+ is only reached after 20 is beaten, so never greyed
+    _sky = Sky.new(_hour, false)          -- 21+ needs 20 beaten: never grey
     local l = _sky:luminance()
     local k = math.max(0, math.min(1, (MOON_DAY - l) / (MOON_DAY - MOON_NIGHT)))
     _moon = k * k * (3 - 2 * k) * math.min(MOON_MAX, l + MOON_LIFT)
@@ -104,7 +104,7 @@ end
 
 function M.filter() return _f[1], _f[2], _f[3] end
 
--- opacity of the monster's white copy
+-- monster white copy opacity
 function M.glow()
     return _moon
 end

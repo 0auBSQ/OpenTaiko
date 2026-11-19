@@ -22,14 +22,12 @@ function M.floor_center(level)
 end
 
 -- background layers
--- Layers draw at native pixel size; `rate` only scales scroll speed. Forest rows go `tile` apart and
--- draw bottom-up, so each row hides the top band of the row below. Mountains draw far to near;
--- hTotal = strip height, wyBottom = its bottom edge, kept behind the next nearer layer's solid rows.
+-- native pixel size; `rate` scales scroll speed only; forest rows `tile` apart, drawn bottom-up
+-- mountains far to near; hTotal = strip height, wyBottom = bottom edge (behind the nearer layer's solid rows)
 local BG_FOREST = { key = "bg_near", rate = Scene.forest.rate, wyTop = Scene.forest.wy_top, rows = Scene.forest.rows,
                     tile = Scene.forest.tile }
--- forest lift (px up) per camera level around the summit (level 9), sampled every `step` levels from
--- `from`, interpolated, zero outside; it keeps the treeline over summit.png's open bottom-left corner
--- (else the sky shows there between levels ~7.2 and ~8.2)
+-- forest lift (px up) per camera level near the summit (level 9): samples every `step` from `from`,
+-- interpolated, 0 outside; covers summit.png's open bottom-left corner (levels ~7.2 to ~8.2)
 local SUMMIT_LIFT = Scene.summit_lift
 local BG_FRINGE = { key = "bg_near_top", overlap = Scene.fringe.overlap }
 local BG_MTNS = {}

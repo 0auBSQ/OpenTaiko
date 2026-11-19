@@ -1,21 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- itemgrid.lua — My Room's stock grid (the recycle bin and the workbench): one widget of the UI library with
--- a tile per stack, showing its picture, its count and its name in full.
---
--- The arrow keys move the picked tile across the grid (Right past the last column and Left past the first
--- let the focus go to the widgets beside it), the drum's Ka steps through the tiles one by one, a click picks
--- a tile and the wheel or the scrollbar scrolls. The rows glide and are cut at the grid's edges. A name is
--- never cut short: it wraps on two lines, then gets smaller. An item kept in a colour shows that colour as a
--- small box in brackets after its name. Slots left free fill the rows in view, so a short stock still reads
--- as a grid.
---   local Grid = require("itemgrid")
---   local g = ui:add(Grid.new{ x =, y =, w =, h =, items = { { key =, n = }, ... }, selected = 1, scroll = 0,
---                              onSelect = function(i, item) end, onChoose = function(i, item) end })
---   Grid.width(cols)   -- the width a grid of that many columns takes
---   onSelect: a tile was picked (click, arrows); onChoose: Decide on the grid (the keys, not the mouse)
--- The helpers the other stock views share: Grid.nameOf(key), Grid.drawName(mgr, key, x, y, w, h, fg, bg, opts),
--- Grid.drawPicture(mgr, key, x, y, size); g:drawDetail(key, n, x, y, w, stockText) draws a stack's picture,
--- name and count large (the window's side column).
+-- stock grid widget for the recycle bin and the workbench: a tile per stack
 
 local UI = require("uilib")
 local Room = require("room")
@@ -25,30 +9,29 @@ local ITEMS = I18N.texts("items")       -- lang/<code>/items.json
 
 local floor, ceil, max, min = math.floor, math.ceil, math.max, math.min
 
--- the library is picked on first use (uilib), so its Widget base is looked up at run time
+-- UI.Widget looked up at run time (uilib picks on first use)
 local Grid = setmetatable({}, { __index = function(_, k) return UI.Widget[k] end })
 Grid.__index = Grid
 
 local TILE_W, TILE_H, GAP = 168, 236, 16
-local INSET = 10                        -- the room kept round the tiles inside the grid, for the ring
-local WELL = 10                         -- the picture's box: this far in from the tile's sides and top
+local INSET = 10                        -- margin around the tiles, for the ring
+local WELL = 10                         -- picture box inset from the tile's sides and top
 local WELL_SIZE = TILE_W - 2 * WELL
-local LABEL_Y, LABEL_PAD = WELL + WELL_SIZE + 4, 8     -- the name's band under the picture
+local LABEL_Y, LABEL_PAD = WELL + WELL_SIZE + 4, 8     -- name band below the picture
 local LABEL_H = TILE_H - LABEL_Y - LABEL_PAD
-local NAME_SIZES = { 18, 16, 14 }       -- the largest that fits the band on two lines is used
-local DETAIL_SIZES = { 28, 24, 20 }     -- the name in the side column
-local DIM = { 120, 126, 150 }           -- the side column's labels
+local NAME_SIZES = { 18, 16, 14 }       -- largest that fits on two lines wins
+local DETAIL_SIZES = { 28, 24, 20 }     -- side column name sizes
+local DIM = { 120, 126, 150 }           -- side column labels
 local BADGE_SIZE, BADGE_H = 17, 30
-local BAR_W, BAR_GAP = 10, 14           -- the scrollbar, right of the tiles
+local BAR_W, BAR_GAP = 10, 14           -- scrollbar, right of the tiles
 local WHEEL_ROWS = 0.5                  -- rows a wheel notch scrolls
-local EASE = 14                         -- how fast the shown position follows the target
-local PAD = 25                          -- the side padding of a glyph text box (the ink starts this far in)
-local FREE_ALPHA = 0.4                  -- a free slot's face
+local EASE = 14                         -- scroll follow rate (1/s)
+local PAD = 25                          -- glyph text box side padding (ink starts this far in)
+local FREE_ALPHA = 0.4                  -- free slot opacity
 
--- ── names ────────────────────────────────────────────────────────────────────────────────────────
--- a stock key's name and the colour it is kept in ({r,g,b} 0-255, nil for none): the colour of a key in a
--- colour, else the item's own colour (furniture.json `color`). An item in a colour takes its plain name
--- ("<id>_plain", e.g. Plaster for Plaster (Colorable)) when it has one.
+-- ==== names ====
+-- name and colour ({r,g,b} 0-255, nil for none): the key's colour, else furniture.json `color`
+-- a coloured key uses "<id>_plain" as its name when present
 function Grid.nameOf(key)
     local id, hex = Room.splitColor(key)
     local rgb = hex and A.swatchFor(key) or Room.defaultColor(id)
@@ -64,13 +47,13 @@ local function text(key)
     return (ok and type(v) == "string") and v or nil
 end
 
--- the brackets round the colour box (full-width ones in Japanese and Chinese)
+-- brackets around the colour box (full-width in ja and zh)
 local function brackets() return text("color_open") or " (", text("color_close") or ")" end
 
 local layouts, layoutCount = {}, 0
 
--- Japanese and Chinese names break between any two characters (the engine's wrap), the others at spaces
--- only, so a word is never cut; tooWide = a word is wider than the box
+-- ja/zh break between any two characters (engine wrap), others at spaces only
+-- tooWide: a word is wider than the box
 local CJK = { ja = true, zh = true }
 local function wrapName(mgr, size, name, w)
     if CJK[I18N.code] then return mgr:wrapLines(size, name, w), false end
@@ -84,7 +67,7 @@ local function wrapName(mgr, size, name, w)
     return lines, tooWide
 end
 
--- the name from where line `from` starts (a wrap drops only the spaces at its breaks)
+-- name text from line `from` on (a wrap drops only the spaces at its breaks)
 local function restOf(name, lines, from)
     local pos = 1
     for i = 1, from - 1 do
@@ -95,9 +78,8 @@ local function restOf(name, lines, from)
     return (name:sub(pos):gsub("^%s+", ""))
 end
 
--- the lines a name is drawn on within w x h: the largest of sizes whose lines fit with no word wider than
--- the box, the colour box after the last line (or on a line of its own). At the smallest size a name that
--- still does not fit puts its rest on the last line, which is squeezed
+-- lines within w x h: the largest size whose lines fit with no word wider than the box
+-- colour box after the last line or on its own; at the smallest size the rest goes on the last line, squeezed
 local function nameLayout(mgr, key, w, h, sizes)
     local ck = key .. "|" .. w .. "|" .. h .. "|" .. sizes[1] .. "|" .. I18N.code
     local L = layouts[ck]
@@ -133,8 +115,8 @@ local function nameLayout(mgr, key, w, h, sizes)
     return L
 end
 
--- draws a stock key's name in the box (x, y, w, h); fg/bg = the text and outline colours.
--- opts: sizes (largest first, NAME_SIZES by default), align = "center" | "left", valign = "center" | "top"
+-- fg/bg: text and outline colours
+-- opts: sizes (largest first, NAME_SIZES default), align "center" | "left", valign "center" | "top"
 function Grid.drawName(mgr, key, x, y, w, h, fg, bg, opts)
     opts = opts or {}
     local L = nameLayout(mgr, key, w, h, opts.sizes or NAME_SIZES)
@@ -144,7 +126,7 @@ function Grid.drawName(mgr, key, x, y, w, h, fg, bg, opts)
     for i, line in ipairs(L.lines) do
         local yy = ly + (i - 1) * L.lh
         if i == n and L.rgb then
-            -- the last line, then the colour box in its brackets
+            -- last line, then the colour box in brackets
             local head = (line == "") and L.open:gsub("^%s+", "") or (line .. L.open)
             local closeW = mgr:measureText(L.size, L.close)
             local room = w - L.box - 6 - closeW                   -- a longer head is squeezed into it
@@ -165,16 +147,16 @@ function Grid.drawName(mgr, key, x, y, w, h, fg, bg, opts)
     end
 end
 
--- ── pictures ─────────────────────────────────────────────────────────────────────────────────────
--- the thumbnail My Room bakes for every shop, reward and swatch item ("myroom_thumb_<id>")
+-- ==== pictures ====
+-- baked thumbnail "myroom_thumb_<id>"
 local function thumbOf(id)
     local ok, tex = pcall(function() return SHARED:GetSharedTexture("myroom_thumb_" .. id) end)
     if ok and tex and tex.Loaded then return tex end
     return nil
 end
 
--- a stock key's picture fitted in the square (x, y, size): a flooring or paint in a colour is tinted; an item
--- without a thumbnail shows its colour, when it has one
+-- fitted in the square (x, y, size); coloured floorings and paints are tinted
+-- no thumbnail: the colour box, when there is one
 function Grid.drawPicture(mgr, key, x, y, size)
     local id, hex = Room.splitColor(key)
     local tex = thumbOf(id)
@@ -192,13 +174,15 @@ function Grid.drawPicture(mgr, key, x, y, size)
     end
 end
 
--- ── the widget ───────────────────────────────────────────────────────────────────────────────────
+-- ==== widget ====
 function Grid.width(cols) return 2 * INSET + cols * TILE_W + (cols - 1) * GAP + BAR_GAP + BAR_W end
 function Grid.height(rows) return 2 * INSET + rows * TILE_H + (rows - 1) * GAP end
 
+-- o: x, y, w, h, items = { { key, n }, ... }, selected, scroll, onSelect(i, item), onChoose(i, item)
+-- onSelect: tile picked (click, arrows); onChoose: Decide on the grid (keys only)
 function Grid.new(o)
     o = o or {}
-    o.noPop = true                      -- the grid itself never grows or squishes
+    o.noPop = true                      -- no pop animation
     local self = UI.Widget.new(o)
     setmetatable(self, Grid)
     self.items = o.items or {}
@@ -209,12 +193,12 @@ function Grid.new(o)
     self._scrollCur = o.scroll or 0
     self._scrollTarget = self._scrollCur
     self._hoverI = nil
-    self._drag = nil                    -- the scrollbar's grab: the pointer's offset in the thumb
+    self._drag = nil                    -- scrollbar drag: pointer offset in the thumb
     return self
 end
 
 function Grid:rows() return ceil(#self.items / self.cols) end
--- the whole box takes the pointer (the rounded hit of other widgets would cut off the scrollbar's ends)
+-- full-box hit: the rounded widget hit would miss the scrollbar ends
 function Grid:hitTest(px, py) return UI.Util.pointInRect(px, py, self.x, self.y, self.w, self.h) end
 function Grid:_contentH()
     local r = self:rows()
@@ -225,13 +209,13 @@ function Grid:_maxScroll() return max(0, self:_contentH() - self.h) end
 function Grid:_clamp() self._scrollTarget = UI.Util.clamp(self._scrollTarget, 0, self:_maxScroll()) end
 function Grid:scrollPos() return self._scrollTarget end
 
--- tile i's top-left on screen at the shown scroll position
+-- tile i top-left on screen, at the shown scroll
 function Grid:tilePos(i)
     local r, c = floor((i - 1) / self.cols), (i - 1) % self.cols
     return self.x + INSET + c * (TILE_W + GAP), self.y + INSET + r * self.rowStep - self._scrollCur
 end
 
--- scrolls the least needed for tile i's row to be in view (with the ring's room round it)
+-- least scroll that brings tile i's row into view (with INSET for the ring)
 function Grid:showTile(i, instant)
     local r = floor((i - 1) / self.cols)
     local top = r * self.rowStep
@@ -242,7 +226,7 @@ function Grid:showTile(i, instant)
     if instant then self._scrollCur = self._scrollTarget end
 end
 
--- new stacks in place (after a sale or a recolour): the grid keeps its scroll, tile `selected` is picked
+-- new stacks in place: scroll kept, tile `selected` picked
 function Grid:setItems(items, selected)
     self.items = items or {}
     self.selected = max(1, min(selected or self.selected, #self.items))
@@ -260,8 +244,8 @@ function Grid:pick(i, quiet)
     return true
 end
 
--- the arrow keys move in two dimensions and keep the focus at the top and bottom rows; the drum's Ka
--- (the pad's Left/Right) steps through the tiles in order, and lets the focus go at either end
+-- arrows move in 2D and keep the focus at the top and bottom rows
+-- Ka (pad Left/Right) steps in order and lets the focus go at either end
 function Grid:onNavDown()
     local i = self.selected + self.cols
     if i > #self.items then
@@ -294,7 +278,7 @@ function Grid:onNavLeft(forPad)
     return false
 end
 
--- Decide on the grid hands the picked stack on; a click already picked it on the press
+-- Decide hands the picked stack to onChoose; a click already picked it on press
 function Grid:onActivate()
     if self.mgr and self.mgr:mouseActive() then return end
     local it = self.items[self.selected]
@@ -344,7 +328,7 @@ function Grid:dispose()
     UI.Widget.dispose(self)
 end
 
--- the count's pill, one bake per width
+-- count pill, one bake per width
 function Grid:_badge(w)
     local b = self._badges[w]
     if b then return b end
@@ -358,7 +342,7 @@ function Grid:_badge(w)
     return b
 end
 
--- the scrollbar's track and thumb (x, y, h of each); nil while every row fits
+-- -> track x, y, h, thumb y, h; nil while every row fits
 function Grid:_bar()
     local contentH = self:_contentH()
     if contentH <= self.h then return nil end
@@ -368,7 +352,7 @@ function Grid:_bar()
     return x, self.y, self.h, floor(self.y + (self.h - thumbH) * k), thumbH
 end
 
--- the tile under the pointer, or nil
+-- tile under the pointer, or nil
 function Grid:_tileAt(mx, my)
     if mx < self.x or mx >= self.x + self.viewW or my < self.y or my >= self.y + self.h then return nil end
     local lx = mx - self.x - INSET
@@ -383,7 +367,7 @@ end
 function Grid:update(ctx)
     UI.Widget.update(self, ctx)
     local mx, my = ctx.mx or -1e5, ctx.my or -1e5
-    -- the scrollbar: drag its thumb, or click its track to move a view's height
+    -- scrollbar: drag the thumb, or click the track to page
     if self._drag then
         if ctx.mPressing then
             local bx, by, bh, ty, th = self:_bar()
@@ -408,7 +392,7 @@ function Grid:update(ctx)
             if i then self:pick(i, i == self.selected) end
         end
     end
-    -- the wheel over the grid
+    -- wheel
     if self.hovered and ctx.scrollDy and ctx.scrollDy ~= 0 then
         self._scrollTarget = self._scrollTarget - ctx.scrollDy * self.rowStep * WHEEL_ROWS
         self:_clamp()
@@ -434,7 +418,7 @@ function Grid:_drawTile(i, x, y)
     piece(sel and self._tileSel or self._tile, x, y)
     piece(self._well, x + WELL, y + WELL)
     Grid.drawPicture(mgr, it.key, x + WELL + 6, y + WELL + 6, WELL_SIZE - 12)
-    -- the count, on a pill in the picture's top-right corner
+    -- count pill, top-right of the picture
     local label = "×" .. tostring(it.n)
     local ink = mgr:measureText(BADGE_SIZE, label)
     local bw = max(BADGE_H + 8, ceil((ink + 20) / 6) * 6)
@@ -444,7 +428,7 @@ function Grid:_drawTile(i, x, y)
     b.canvas:Draw(bxr - bw, y + WELL + 4)
     mgr:drawTextEx(BADGE_SIZE, label, floor(bxr - bw / 2), y + WELL + 4 + floor(BADGE_H / 2) + mgr:textNudge(BADGE_SIZE),
         { 255, 255, 255 }, { 255, 255, 255, 0 }, 1, 1, 0, "center")
-    -- the name under the picture
+    -- name below the picture
     local fg = sel and c.textOnAccent or c.text
     local bg = sel and UI.Util.shade(c.primary2, 0.5) or { 255, 255, 255, 150 }
     if self.eff.textOutline == false then bg = { 255, 255, 255, 0 } end
@@ -455,6 +439,7 @@ function Grid:draw()
     if not self.visible then return end
     local clip = GRAPHICS ~= nil and GRAPHICS.SetClip ~= nil
     if clip then GRAPHICS:SetClip(self.x, self.y, self.viewW, self.h) end
+    -- free slots fill the rows in view
     local rowsUsed = self:rows()
     local rowsInView = max(1, floor((self.h - 2 * INSET + GAP) / self.rowStep))
     local slots = max(rowsUsed, rowsInView) * self.cols
@@ -467,7 +452,7 @@ function Grid:draw()
             else piece(self._tile, x, y, FREE_ALPHA) end
         end
     end
-    -- the ring: on the picked tile while the keys lead, on the tile under the pointer while the mouse does
+    -- ring: hovered tile with the mouse, else the picked tile
     local ringI, ringA = nil, 0
     if self.mgr:mouseActive() then
         if self._hoverI then ringI, ringA = self._hoverI, 1 end
@@ -479,7 +464,7 @@ function Grid:draw()
         piece(self._ring, x, y, ringA)
     end
     if clip then GRAPHICS:ClearClip() end
-    -- the scrollbar
+    -- scrollbar
     local bx, by, bh, ty, th = self:_bar()
     if bx then
         local c = self.eff.colors
@@ -488,8 +473,7 @@ function Grid:draw()
     end
 end
 
--- a stack drawn large in the box (x, y, w): its picture in a frame, its name beside it and, under the name,
--- stockText and its count
+-- stack drawn large at (x, y, w): framed picture, with name and stock count beside it
 function Grid:drawDetail(key, n, x, y, w, stockText)
     local mgr, c = self.mgr, self.eff.colors
     piece(self._frame, x, y)
@@ -504,7 +488,7 @@ function Grid:drawDetail(key, n, x, y, w, stockText)
     mgr:drawTextEx(26, "×" .. tostring(n), tx + sw + 14 - PAD, sy, c.text, { 255, 255, 255, 150 }, 1, 1, 0, "topleft")
 end
 
--- a vertical pill of the scrollbar: the dot's two halves with its middle row stretched between them
+-- vertical pill: the dot's halves, its middle row stretched between
 function Grid:_pill(x, y, h, col, alpha)
     local cv = self._barDot.canvas
     local d = cv.Width

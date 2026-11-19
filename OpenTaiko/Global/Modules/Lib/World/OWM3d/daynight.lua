@@ -1,10 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- OWM3d/daynight.lua — the day/night cycle: animated sun (direction + colour), ambient, colour
--- grade, and the map's scheduled point lights (nightOnly lamps come on at dusk, flicker jitters
--- torches/fires). Owns the scene light list while active; drawSky (core) follows world.hour.
---
--- Hour source: world.hour when the map pins it (sky.mode "fixed"), else real local time; call
--- enableCycle(secondsPerDay) for an animated cycle that wraps 24h.
+-- OWM3d/daynight.lua: day/night cycle and scheduled point lights
 
 local sin, cos, pi, max, min = math.sin, math.cos, math.pi, math.max, math.min
 
@@ -16,21 +11,22 @@ function DayNight.new(world)
     self.world = world
     self.hour = world.hour or 12
     self.cycleSpeed = 0            -- game-hours per real second (0 = follow world.hour / clock)
-    self.lightDefs = nil           -- the current map's light definitions
+    self.lightDefs = nil           -- current map's light defs
     self._lightsDirty = true
-    self._nightF = -1              -- last applied night factor (rebuild lights when it crosses)
+    self._nightF = -1              -- last applied night factor
     self._flicker = false
     self._t = 0
     return self
 end
 
 function DayNight:setHour(h) self.hour = h % 24; self.world.hour = self.hour; self._lightsDirty = true end
+-- secondsPerDay: real seconds per 24h; 0/nil follows world.hour or the clock
 function DayNight:enableCycle(secondsPerDay)
     self.cycleSpeed = (secondsPerDay and secondsPerDay > 0) and (24 / secondsPerDay) or 0
 end
 
--- adopt a map's light list (maps.lua calls this on load; nil on unload). A def with flicker > 0 or
--- live = true (its colour is written by the owner every frame) makes the list rebuild every frame.
+-- map light list (nil on unload)
+-- flicker > 0 or live = true: rebuild every frame (live: owner writes the colour)
 function DayNight:setLights(defs)
     self.lightDefs = defs
     self._flicker = false
@@ -38,11 +34,11 @@ function DayNight:setLights(defs)
     self._lightsDirty = true
 end
 
--- 0 = full day, 1 = full night (smooth dawn/dusk ramps)
+-- 0 = day, 1 = night
 local function nightFactor(hour)
     if hour >= 6 and hour <= 19 then
         local d = sin(pi * (hour - 6) / 13)
-        return 1 - min(1, d * 3.2)          -- short ramps at the edges, 0 through the day
+        return 1 - min(1, d * 3.2)
     end
     return 1
 end
@@ -63,22 +59,21 @@ function DayNight:update(dt)
     end
     local hour = self.hour
     local scene = world.scene
-    -- optional stage overrides; colours { r, g, b }; nil = defaults
+    -- stage overrides: colours { r, g, b }, nil = defaults
     local look = self.look
 
     local daylight = 0
     if hour >= 6 and hour <= 19 then daylight = max(0, sin(pi * (hour - 6) / 13)) end
     local nightF = nightFactor(hour)
 
-    -- ── sun / moon ──
-    -- azimuth swings east→west through the day; the moon reuses the arc, dim and blue
+    -- ==== Sun and moon ====
+    -- azimuth east to west; the moon reuses the arc
     local prog = (hour >= 6 and hour <= 19) and (hour - 6) / 13 or ((hour > 19 and hour - 19 or hour + 5) / 11)
-    local yawDeg = 55 + prog * 110                       -- stays oblique so shadows keep shape
+    local yawDeg = 55 + prog * 110                       -- oblique: shadows keep their shape
     local elDeg = 14 + ((daylight > 0) and daylight or 0.35) * 48
     local yr, el = yawDeg * pi / 180, elDeg * pi / 180
     local dx, dz = sin(yr), cos(yr)
-    -- sun COLOUR from the shared palette keyframes (the same Catmull-Rom ring the sky uses), so
-    -- the light warms/cools smoothly through the whole day instead of the old binary "warm" step
+    -- sun colour from sky.paletteAt (same keys as the sky)
     local sr, sg, sb
     if daylight > 0 then
         local pal = require("World.OWM3d.sky").paletteAt(hour)
@@ -86,7 +81,7 @@ function DayNight:update(dt)
         sr, sg, sb = pal.sun[1] * dim, pal.sun[2] * dim * 0.92, pal.sun[3] * dim * 0.82
         if look and look.daySun then sr, sg, sb = sr * look.daySun[1], sg * look.daySun[2], sb * look.daySun[3] end
     else
-        sr, sg, sb = 0.13, 0.15, 0.24                    -- moonlight (keeps the shadow map alive)
+        sr, sg, sb = 0.13, 0.15, 0.24                    -- moonlight (keeps the shadow map on)
         if look and look.moon then sr, sg, sb = look.moon[1], look.moon[2], look.moon[3] end
     end
     local ca = cos(el)
@@ -96,7 +91,7 @@ function DayNight:update(dt)
     scene:SetGroundSpriteLight(dx, dz, min(world.lightInvTan, 3.2))
     if world.shadowObj then scene:ObjSetTint(world.shadowObj, 0, 0, 0) end
 
-    -- feed the procedural GPU sky (core.World:render pushes the camera-dependent uniforms)
+    -- GPU sky inputs; core sets the camera uniforms
     self.sunX, self.sunY, self.sunZ = -dx * ca, sin(el), -dz * ca
     self.dayF = min(1, daylight * 2.2)
     self.nightF = nightF
@@ -105,7 +100,7 @@ function DayNight:update(dt)
         require("World.OWM3d.sky").install(scene)
     end
 
-    -- ── ambient: tinted by the sky's zenith (bounce light follows the dome's hue) ──
+    -- ==== Ambient (tinted by sky zenith) ====
     local zen = require("World.OWM3d.sky").paletteAt(hour).zen
     local ar = (0.42 - 0.25 * nightF) * (0.85 + 0.5 * zen[1])
     local ag = (0.42 - 0.24 * nightF) * (0.85 + 0.4 * zen[2])
@@ -117,7 +112,7 @@ function DayNight:update(dt)
     end
     scene:SetAmbient(ar, ag, ab)
 
-    -- ── colour grade (dusk warmth, night blues); weather may darken it further ──
+    -- ==== Colour grade ====
     if scene.SetColorGrade then
         local duskW = 0
         if daylight > 0.03 and daylight < 0.45 then duskW = 1 - math.abs(daylight - 0.24) / 0.21 end
@@ -140,7 +135,7 @@ function DayNight:update(dt)
         scene:SetColorGrade(exp, gr, gg, gb)
     end
 
-    -- ── scheduled point lights ──
+    -- ==== Point lights ====
     local lampsOn = nightF > 0.35
     if self._lightsDirty or self._flicker or (lampsOn ~= self._lampsOn) then
         self._lightsDirty = false

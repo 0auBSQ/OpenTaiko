@@ -1,4 +1,4 @@
--- Russian for bestiary.lua; a missing key shows the English.
+-- Russian for bestiary.lua; missing keys fall back to English
 
 local T = {}
 

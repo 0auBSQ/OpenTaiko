@@ -1,9 +1,8 @@
--- lang/ja.lua — intro_nokon の日本語辞書。キーは英語原文と完全一致（Lib/i18n.lua が表示時に引く）。
--- ノコンの声：自分を「ワガハイ」（カタカナ）と呼ぶ、ちょっと気取った猫の名司会。〜である／〜なのだ調で
--- 大仰に振る舞うが、リアクションは軽薄。{Player N name} や %s/%d はそのまま残すこと（実行時に差し込まれる）。
+-- intro_nokon の日本語辞書。キーは英語原文と完全一致（Lib/i18n.lua）。
+-- {Player N name} や %s/%d は実行時に差し込まれる。
 local T = {}
 
--- ── 司会ノコン：オープニング ──────────────────────────────────────────────────────
+-- ==== 司会ノコン：オープニング ====
 T["Nokon"] = "ノコン"
 T["Welcome to today's Intro Nokon session!\nI am Nokon and we are here for an Endurance session!"] =
     "ようこそ、本日のイントロノコンへ！\nワガハイこそが司会のノコンである！今日は耐久セッションなのだ！"
@@ -18,7 +17,7 @@ T["Let me present today's challengers..."] =
 T["Who will win? We'll know it very soon...\nLet's cheer them and wish them good luck!"] =
     "勝つのは誰か？ それはすぐに分かるのだ…\n盛大な声援と幸運を送ろうではないか！"
 
--- ── 正解（曲名入り） ────────────────────────────────────────────────────────────
+-- ==== 正解（曲名入り） ====
 T["Correct, it was \"%s\"! Splendiferous!"] = "正解、「%s」であった！ 見事極まれり！"
 T["\"%s\" it was! Greeeeeeat!"] = "「%s」であったのだ！ 素晴らし〜〜〜い！"
 T["Yes, \"%s\"! Good answer!"] = "その通り、「%s」！ 良い解答である！"
@@ -31,7 +30,7 @@ T["Are you enjoying the game? Perfect, because you are here forever!"] = "ゲー
 T["You did beat my score? Wait until you reach the results first..."] = "ワガハイのスコアを超えただと？ まずはリザルト画面まで辿り着いてから言うのだな…"
 T["..."] = "………"
 
--- ── 不正解／時間切れ ────────────────────────────────────────────────────────────
+-- ==== 不正解／時間切れ ====
 T["Too bad! I guess I cannot bet on a losing horse!"] = "残念無念！ 負け馬に賭けるわけにはいかないのだ！"
 T["Come on, be for real!"] = "おいおい、真面目にやりたまえ！"
 T["So you prefer dogs? Sorry, we do not do that here!"] = "さては犬派だな？ 悪いがウチではお断りなのだ！"
@@ -40,12 +39,12 @@ T["No one found it?... Really?..."] = "誰も分からなかったのかね？�
 T["And a skewer of loosers, chief!"] = "敗者の串盛り一丁、あがったのだ！"
 T["I have no words..."] = "ワガハイ、言葉を失ったのである…"
 
--- ── VS勝利（勝者名＋曲名） ───────────────────────────────────────────────────────
+-- ==== VS勝利（勝者名＋曲名） ====
 T["And that's another W for %s! The song was \"%s\"!"] = "%sがまたも勝利なのだ！ 曲は「%s」であった！"
 T["%s takes the bag with \"%s\"! Brutal!"] = "%sが「%s」で総取りである！ 恐るべし！"
 T["I always knew %s was the best! It was \"%s\"!"] = "ワガハイは最初から%sが一番だと見抜いていたのだ！ 曲は「%s」！"
 
--- ── UI・画面テキスト ────────────────────────────────────────────────────────────
+-- ==== UI・画面テキスト ====
 T["Loading songs..."] = "楽曲を読み込み中…"
 T["Round %d / %d"] = "ラウンド %d / %d"
 T["Game Over!"] = "ゲームオーバー！"

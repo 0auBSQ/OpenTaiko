@@ -1,12 +1,10 @@
 ---@diagnostic disable: undefined-global, lowercase-global
--- UI.Pick — the UI library a module builds its screens with:
---   local UI = require("UI.Pick")(name)     -- name optional; then UI.new{...}, ui:button{...}, as with SimpleUI
--- The library is name (a require name, e.g. "PopUI") when given, else the shared string "ui_library" a skin
--- sets once (OWM's _boot sets "PopUI"), else "UI.SimpleUI". A library that does not load is replaced by
--- UI.SimpleUI, so a name another skin left in the shared string costs nothing.
+-- UI.Pick: returns the UI library a module builds its screens with
 
 local DEFAULT = "UI.SimpleUI"
 
+-- library: name, else the shared string "ui_library", else UI.SimpleUI
+-- a library that fails to load falls back to UI.SimpleUI
 return function(name)
     local want = name
     if type(want) ~= "string" or want == "" then

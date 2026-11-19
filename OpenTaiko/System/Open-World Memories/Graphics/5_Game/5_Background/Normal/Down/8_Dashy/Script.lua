@@ -1,6 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Down background 8 "Dashy": static BG with two counter-rotating gears in the bottom corners.
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
+-- down background 8: Dashy
 
 local rotation = 0.0
 

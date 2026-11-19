@@ -1,4 +1,4 @@
--- Opening story while level 20 is unbeaten.
+-- opening story, level 20 unbeaten
 
 return {
     bg = "dojo",

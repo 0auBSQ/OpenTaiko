@@ -1,8 +1,4 @@
 -- Floor-select tower effects (towerfx/*), drawn only for the slots on screen.
--- "back" draws under the tower art, "front" over it and under the corruption clouds.
--- ctx (filled by the scene each frame): t (scene clock, s), resX, resY, hour, fr/fg/fb (time-of-day filter),
--- roofLit (0..1), top(L) (screen y of slot L's top), lit(L) (0..1, door floor free of corruption), tint(L),
--- checkpoint(L) (cleared checkpoint art shown); draw() adds night (0..1).
 
 local art        = require("towerfx/art")
 local forest     = require("towerfx/forest")
@@ -30,6 +26,9 @@ end
 function M.setup() art.setup() end
 function M.dispose() art.dispose() end
 
+-- layer: "back" (under the tower art) | "front" (over it, under the corruption clouds)
+-- ctx (scene, per frame): t (s), resX, resY, hour, fr/fg/fb (time-of-day filter), roofLit (0..1),
+-- top(L) (screen y of slot L), lit(L) (0..1, door floor free of corruption), tint(L), checkpoint(L); adds night
 function M.draw(layer, Lmin, Lmax, ctx)
     ctx.night = roofs.nightOf(ctx.hour)
     for L = math.max(0, Lmin), Lmax do

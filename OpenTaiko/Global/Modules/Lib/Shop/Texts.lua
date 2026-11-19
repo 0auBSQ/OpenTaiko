@@ -1,5 +1,5 @@
--- Shop.Texts: the shop modules' own strings, lang/<code>/shop.json next to this file, in the game's
--- language (English when a language lacks one). "items" holds item names by Items.db3 code.
+-- Shop.Texts: shop strings from lang/<code>/shop.json beside this file (English fallback)
+-- "items" holds item names by Items.db3 code
 
 local I18N = require("Locale.i18n")
 local HERE = require("Core.Here")(...)

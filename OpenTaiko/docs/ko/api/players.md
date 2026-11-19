@@ -462,7 +462,7 @@ PUCHICHARALIST와 sf:GetPuchichara가 이 핸들을 반환합니다. 텍스처�
 스킨의 해상도, 테마 설정, 스킨 범위의 지역화 문자열, 테마 설정 정의입니다.
 
 <div class="callout warn">
-스킨은 테마 설정을 ThemeSettings.json에 선언하고 값은 그 옆의 ThemeSettings.db3에 저장합니다. getter는 설정 값을 항상 문자열로 반환합니다. 없는 설정은 선언된 기본값을, 선언이 없으면 빈 문자열을 반환합니다. ForPlayer 메서드는 범위를 벗어난 플레이어를 0 또는 4로 처리합니다. 정의 인덱스는 0부터 시작합니다.
+스킨은 테마 설정을 ThemeSettings.json에 선언하고 값은 스킨 폴더 밖의 `Global/ApplicationData/SkinSettings_<skin folder>.db3`에 저장하므로 스킨을 업데이트해도 유지됩니다. getter는 설정 값을 항상 문자열로 반환합니다. 없는 설정은 선언된 기본값을, 선언이 없으면 빈 문자열을 반환합니다. ForPlayer 메서드는 범위를 벗어난 플레이어를 0 또는 4로 처리합니다. 정의 인덱스는 0부터 시작합니다.
 </div>
 
 | 메서드 | 설명 |

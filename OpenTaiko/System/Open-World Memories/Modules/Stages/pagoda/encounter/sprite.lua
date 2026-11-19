@@ -1,11 +1,4 @@
 -- Draws a cropped sprite from its manifest entry (w, h and foot point fx, fy in its own px).
--- Pivots, (x, y) = the screen point the sprite is placed at:
---   "foot"   (x, y) is the foot point and the sprite turns about it
---   "center" (x, y) is the foot point while unrotated; the sprite turns about its own middle
---   "top"    (x, y) is the top-centre and the sprite turns about it
---
--- Angles are degrees, counter-clockwise like SetRotation. Mirrored: meta.mirror's baked texture, or a
--- negative x scale about the foot point.
 
 local M = {}
 
@@ -76,7 +69,11 @@ function M.drawAt(tx, cx, cy, o)
     if grad ~= nil then tx:ClearGradientMap() end
 end
 
--- a sprite placed at (x, y) through its pivot (see the top of the file)
+-- a sprite placed at (x, y) through its pivot; angles: degrees, counter-clockwise like SetRotation
+--   "foot"   (x, y) is the foot point and the sprite turns about it
+--   "center" (x, y) is the foot point while unrotated; the sprite turns about its own middle
+--   "top"    (x, y) is the top-centre and the sprite turns about it
+-- mirrored: meta.mirror's baked texture, or a negative x scale about the foot point
 function M.draw(tx, meta, x, y, o)
     if tx == nil or not tx.Ready then return end
     local cx, cy

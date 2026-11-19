@@ -1,4 +1,4 @@
--- Floor and Exit plaques, placed from the selected slot's reference top-left (rx, ry).
+-- floor and Exit plaques from the selected slot reference top-left (rx, ry)
 
 local Easing  = require("Easing")
 local Rainbow = require("Rainbow")
@@ -17,9 +17,9 @@ local Move = Animation.selectui.plaque
 
 local OFF_PLAQUE = Look.plaque_offset    -- plaque.png top-left
 local SEAL_DY    = Look.seal_dy          -- seal top from the reference
-local NUM_DY     = Look.num_dy           -- baseline of a full-size number from the reference
-local NUM_GAP    = Look.num_gap          -- least gap from the number ink to the seal and the margin
-local NUM_RIGHT  = Look.num_right        -- right margin, from the plaque right
+local NUM_DY     = Look.num_dy           -- full-size number baseline from the reference
+local NUM_GAP    = Look.num_gap          -- min gap from number ink to seal and margin
+local NUM_RIGHT  = Look.num_right        -- right margin from the plaque right
 local HEADER_DX, HEADER_DY = Look.header.dx, Look.header.dy   -- from the plaque top-left
 local STRIP_DX, STRIP_DY   = Look.strip.dx, Look.strip.dy     -- "Level N" band centre, from the plaque top-left
 local EXIT_DX, EXIT_DY     = Look.exit.dx, Look.exit.dy       -- "Exit" centre, from the plaque top-left
@@ -28,14 +28,14 @@ local HEADER_MAX_W, LEVEL_MAX_W, EXIT_MAX_W = Look.header_max_w, Look.level_max_
 local POP_SEC, POP_FROM, POP_BACK = Move.pop_s, Move.pop_from_scale, Move.pop_overshoot
 
 local TIER_SIZE = Look.tier_font_size
-local TEXT_PAD  = 25                      -- the text texture's clear margin left and right of the line
+local TEXT_PAD  = 25                      -- text texture side margin
 
 local ROOF_FROM = 21
 local RAINBOW = { cycles = Look.rainbow.cycles, speed = Move.rainbow_speed, sat = Look.rainbow.sat,
                   val = Look.rainbow.val }
 local GLITTER = { rate = Move.glitter_rate_per_s, size = Look.glitter.size, opacity = Look.glitter.opacity,
                   max = Look.glitter.max }
-local GLITTER_INSET = Look.glitter_inset  -- share of the number's ink box kept clear at its edges
+local GLITTER_INSET = Look.glitter_inset  -- ink box share kept clear at the edges
 
 local _fonts  = nil
 local _plaque = nil
@@ -71,7 +71,7 @@ function P.dispose()
     if _sparkle ~= nil then _sparkle:Dispose() ; _sparkle = nil end
 end
 
--- restarts the number's pop and glitter
+-- restart number pop and glitter
 function P.pop()
     _popT = 0
     _glit.list = nil
@@ -90,7 +90,7 @@ local function tier_name(level)
     else return sk("PAGODA_BAND_SKY", "Sky") end
 end
 
--- the number shown on the plaque counts within its tier
+-- plaque number counts within its tier
 local function tier_number(level)
     if level <= 10 then return level
     elseif level < ROOF_FROM then return level - 10
@@ -105,8 +105,8 @@ local function draw_panel(px, py)
     if _plaque ~= nil and _plaque.Ready then _plaque:Draw(px, py) end
 end
 
--- seal png left, and the number's ink centre x and fit scale, for the plaque at px. Every number
--- is centred midway between the seal and the right margin, scaled down when it cannot keep NUM_GAP
+-- seal left, number ink centre x and fit scale for the plaque at px
+-- number centred between seal and right margin, shrunk to keep NUM_GAP
 local function layout(px, text)
     local sx = px + HEADER_DX - metrics.seal.ink_l
     local left, right = sx + metrics.seal.ink_r, px + metrics.plaque.w - NUM_RIGHT
@@ -114,13 +114,13 @@ local function layout(px, text)
     return sx, (left + right) * 0.5, fit
 end
 
--- roof number glitter over the middle of its ink box
+-- roof number glitter over its ink box middle
 local function draw_glitter(bx, by, bw, bh)
     local ix, iy = bw * GLITTER_INSET, bh * GLITTER_INSET
     Rainbow.glitter(_glit, _glitDt, bx + ix, by + iy, bw - 2 * ix, bh - 2 * iy, _sparkle, GLITTER)
 end
 
--- tintFn(level) -> r, g, b for the number face (roofs take the rainbow instead)
+-- tintFn(level) -> r, g, b (roofs use the rainbow)
 function P.draw(level, header, rx, ry, tintFn)
     if _plaque == nil then return end
     local px, py = plaque_topleft(rx, ry)
@@ -128,8 +128,8 @@ function P.draw(level, header, rx, ry, tintFn)
 
     local text = tostring(tier_number(level))
     local sx, ncx, fit = layout(px, text)
-    -- tier name centred in the seal's ink box (the text texture has a pad under the line);
-    -- scaled down evenly when wider than the box
+    -- tier name centred in the seal ink box (text texture pads under the line)
+    -- scaled down evenly when wider
     local tier = _tierFont:GetText(tier_name(level), false, 99999, _grey, _clear)
     if tier ~= nil then
         local inkW = math.max(1, tier.Width - 2 * TEXT_PAD)
@@ -140,7 +140,7 @@ function P.draw(level, header, rx, ry, tintFn)
         tier:SetScale(1, 1)
     end
 
-    -- the number keeps the centre a full-size one has on the NUM_DY baseline
+    -- number keeps a full-size centre on the NUM_DY baseline
     local ncy = ry + NUM_DY - numbers.rise(text)
     local pop = POP_FROM + (1 - POP_FROM) * Easing.outBack(_popT / POP_SEC, POP_BACK)
     if level >= ROOF_FROM then
@@ -159,7 +159,7 @@ function P.draw(level, header, rx, ry, tintFn)
         if h ~= nil then h:DrawAtAnchor(px + HEADER_DX, py + HEADER_DY, "topleft") end
     end
 
-    -- centred on its capitals: the text texture carries a pad under the line
+    -- centred on capitals (text texture pads under the line)
     local lvl = _fonts.name:GetText(sk("PAGODA_LEVEL", "Level") .. " " .. tostring(level),
                                     false, LEVEL_MAX_W, _ink, _clear)
     if lvl ~= nil then lvl:DrawAtAnchor(px + STRIP_DX, py + STRIP_DY + metrics.label.nudge, "center") end

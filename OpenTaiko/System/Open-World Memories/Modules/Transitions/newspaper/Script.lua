@@ -1,14 +1,10 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- newspaper: from the title into the coin shop. Newspapers fly in from the right at different speeds and angles,
--- turning a little as they come, until they cover the screen and drift there while the shop loads; the shop's
--- name slams in over everything, is flicked away, then the papers fly off to the left. Every trip lays the pile
--- out anew. The way back is newspaper_back.
--- The shared string "newspaper_cover" holds how long (s) into the fade-in the papers hide the shop, so the shop's
--- entrance waits for it.
+-- newspaper: title -> coin shop transition; back: newspaper_back
+-- shared string "newspaper_cover": sec into the fade-in the papers hide the shop (the entrance waits)
 
 local TA = require("TransitionArt")
 
--- positions, sizes and colours: Config/layout.json; timings and flights: Config/animation.json
+-- layout: Config/layout.json; timings and flights: Config/animation.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
@@ -17,14 +13,14 @@ local TITLE_ANIM = Animation.title
 local SHADOW = Layout.shadow
 local TITLE = Layout.title
 
--- the fade-in, in seconds
-local SPIN = TITLE_ANIM.spin_s             -- the title slams in
-local LAND = TITLE_ANIM.land_s             -- it lands: a short press, and the pile under it jolts
-local LEAVE_AT, LEAVE = TITLE_ANIM.leave_at_s, TITLE_ANIM.leave_s   -- the title is flicked off to the left
-local SCATTER_AT, SCATTER = Animation.scatter_at_s, Animation.scatter_s   -- the papers fly off to the left
-local REVEAL_AT = SCATTER_AT + Animation.reveal_after_s   -- the shop starts to show between the leaving papers
+-- fade-in, sec
+local SPIN = TITLE_ANIM.spin_s             -- title in
+local LAND = TITLE_ANIM.land_s             -- title land, pile jolt
+local LEAVE_AT, LEAVE = TITLE_ANIM.leave_at_s, TITLE_ANIM.leave_s   -- title out
+local SCATTER_AT, SCATTER = Animation.scatter_at_s, Animation.scatter_s   -- papers out
+local REVEAL_AT = SCATTER_AT + Animation.reveal_after_s   -- shop starts to show
 
-FADE_OUT_SECONDS = Animation.fade_out_s  -- the papers fly in
+FADE_OUT_SECONDS = Animation.fade_out_s  -- papers in
 FADE_IN_SECONDS  = SCATTER_AT + SCATTER
 
 local SCREEN_W, SCREEN_H = Layout.screen.width, Layout.screen.height
@@ -38,7 +34,7 @@ local TITLE_KEY, TITLE_DEFAULT = "TITLE_STORE", "OpenTaiko's General Store"
 local HEAD_W, HEAD_H = TITLE.room.width, TITLE.room.height
 local BOLD = TITLE.bold
 
--- every trip moves each page a little, turns it to a random angle and picks its page picture
+-- page layout, re-rolled each trip
 local SHEETS = {}
 for i, R in ipairs(Layout.sheets.rest) do SHEETS[i] = { bx = R.bx, by = R.by, s = R.s } end
 
@@ -50,13 +46,12 @@ local nudge = 0
 local lines = {}                         -- the title: { text, y, k }
 local lastPhase = nil
 local played = {}
-local clock = 0                          -- seconds since the trip started, for the drift
+local clock = 0                          -- sec since the trip start, for the drift
 local wait = TA.new()
 
 local function clamp01(x) return x < 0 and 0 or (x > 1 and 1 or x) end
 
--- each page's place and flight for this trip: arriving in fractions of the fade-out, leaving in seconds from
--- SCATTER_AT (top first); a few land upside down
+-- arrival: fade-out fraction; leave: sec from SCATTER_AT, top first
 local function plan()
 	local r = math.random
 	local n = #SHEETS
@@ -82,7 +77,7 @@ local function plan()
 	end
 end
 
--- the textures live only during a trip (Lib/TransitionArt)
+-- textures live only during a trip (Lib/TransitionArt)
 local function loadTextures()
 	if tx_shadow ~= nil then return end
 	for i = 1, PAGES do tx_pages[i] = TEXTURE:CreateTexture("Textures/Page" .. i .. ".png") end
@@ -106,7 +101,7 @@ local function tick()
 	clock = clock + (d < 0 and 0 or (d > 0.1 and 0.1 or d))
 end
 
--- lift 0..1: how far the page is off the pile (bigger, its shadow further and lighter)
+-- lift 0..1: height off the pile
 local function drawSheet(tx, x, y, sx, sy, rot, lift)
 	if tx == nil or tx_shadow == nil then return end
 	local grow = 1 + SHADOW.lift_grow * lift
@@ -162,7 +157,7 @@ local function title()
 	return TITLE_DEFAULT
 end
 
--- one line, or two split at the space that balances them best, shrunk to the title's room
+-- one line, or two split at the most balanced space; shrunk to fit
 local function layout()
 	lines = {}
 	if font == nil then return end
@@ -185,9 +180,8 @@ local function layout()
 	end
 end
 
--- the title centred at (x, y) at its scale, rotation and opacity, in passes over all its lines: a soft drop
--- shadow, an outline in the paper's colour so it reads over any page, then three ink fills a little apart along
--- the line (bold) with no outline of their own, which would cover the fill before them
+-- centred at (x, y); shadow, paper-colour outline, then 3 offset ink fills (bold)
+-- the fills have no outline: it would cover the fill before
 local function drawTitle(x, y, scale, rot, a)
 	if font == nil or a <= 0 then return end
 	local c, s = math.cos(math.rad(rot)), math.sin(math.rad(rot))
@@ -210,7 +204,7 @@ local function drawTitle(x, y, scale, rot, a)
 	end
 end
 
--- now: seconds into the fade-in
+-- now: sec into the fade-in
 local function drawTitleAt(now)
 	if now > LEAVE_AT + LEAVE then return end
 	local x, y, k, rot, a = CX, CY, 1, TITLE_ROT, 1

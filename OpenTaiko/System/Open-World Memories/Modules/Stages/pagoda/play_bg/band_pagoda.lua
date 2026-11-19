@@ -1,5 +1,5 @@
--- Floors 11-19 (but 15) band: the pagoda room.
--- The band shows the encounter room from row 502 down; effects keep their encounter positions.
+-- floors 11-19 (but 15) band: pagoda room
+-- encounter room from row 502 down (effects at encounter positions)
 
 local assets = require("encounter/assets")
 local room   = require("encounter/bands/pagoda")
@@ -56,7 +56,7 @@ function M.open(ctx)
     _specks = emit("ceiling_specks", mote, { area = Config.plain(Look.ceiling_specks.area) })
 end
 
--- averaged flicker of the fires
+-- mean fire flicker
 local function flicker()
     if #_fires == 0 then return 1 end
     local s = 0

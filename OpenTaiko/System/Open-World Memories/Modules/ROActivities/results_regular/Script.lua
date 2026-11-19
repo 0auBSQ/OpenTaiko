@@ -1,10 +1,9 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
 -- results_regular ROActivity: the result screen of a play, an AI battle's included.
--- The result stage calls activate(info) with a LuaResultInfo, update() and draw() every frame, skip() on
--- decide (true while still animating) and deactivate().
 
 local Config = require("Core.Config")
 local SongTitle = require("Songs.Title")
+local Background = require("regular_background")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
 local GAUGE, NUMBERS, SCORE, BADGES, CLEAR = Animation.gauge, Animation.numbers, Animation.score, Animation.badges, Animation.clear
@@ -26,11 +25,10 @@ local clock = 0                 -- milliseconds since activate
 local players, drawn, layoutN, kind, is1P, is2PSide = 1, 1, 1, "2p", true, false
 local endSeg = {}               -- each player's gauge, in segments of 2 %
 local times = {}                -- the timeline, from the fullest gauge
-local randomText = 0
 local charts = {}               -- each player's chart: { level, plus }
 local vault = false             -- the song is in the Secret Vault
 
--- ── helpers ──────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Helpers ====
 
 local function load(path)
     if not STORAGE:FileExists(path) then return nil end
@@ -76,7 +74,7 @@ local function panelPlace(el, pos, ui)
     return x, y + panelDy(pos)
 end
 
--- 1.3 down to 1 over pop ms from t0, as the old screen popped its counts and pictures in
+-- scale 1.3 down to 1 over pop ms from t0
 local function popAt(t0)
     local t = clock - t0
     if t < 0 or t > NUMBERS.pop then return 1 end
@@ -228,7 +226,7 @@ local function part(t, x, y, rx, ry, rw, rh, sx, sy)
     t:SetScale(1, 1)
 end
 
--- ── the timeline ─────────────────────────────────────────────────────────────────────────────────────
+-- ==== Timeline ====
 
 local function buildTimes()
     local factor = 0
@@ -251,7 +249,7 @@ end
 
 local function gaugeEnded(p) return clock >= GAUGE.start + endSeg[p] * GAUGE.segment end
 
--- ── the gauge, as the play's result gauge drew it ────────────────────────────────────────────────────
+-- ==== Gauge ====
 
 local function drawGauge(p, pos, shift, ui)
     local G = Layout.gauge
@@ -325,7 +323,7 @@ local function drawGauge(p, pos, shift, ui)
     end
 end
 
--- ── the characters ───────────────────────────────────────────────────────────────────────────────────
+-- ==== Characters ====
 
 local function resultAnims()
     return { CHARACTER.ANIM_RESULT_NORMAL, CHARACTER.ANIM_RESULT_FAILED_IN, CHARACTER.ANIM_RESULT_FAILED, CHARACTER.ANIM_RESULT_CLEAR }
@@ -406,49 +404,22 @@ local function drawPuchichara(p, pos, x, y, k)
     t:SetScale(1, 1)
 end
 
--- ── the clear's flowers, shines and speech bubbles ───────────────────────────────────────────────────
+-- ==== Clear effects ====
 
-local function moods(p)
+-- speech mood, 0 to 5
+local function mood(p)
     local c = info:GetClearType(p)
-    if c == 4 then return 3, 5 end
-    if c == 3 then return 3, 4 end
+    if c == 4 then return 5 end
+    if c == 3 then return 4 end
     if c >= 1 then
-        if info:GetGauge(p) >= 100 then return 3, 3 end
-        return 2, 2
+        if info:GetGauge(p) >= 100 then return 3 end
+        return 2
     end
-    if info:GetGauge(p) >= 40 then return 1, 1 end
-    return 0, 0
+    if info:GetGauge(p) >= 40 then return 1 end
+    return 0
 end
 
-local function drawFlowers(pos)
-    local pop = popAt(times.clear)
-    local F = Layout.flower
-    if tex.flower ~= nil then
-        local t = tex.flower
-        t:SetScale(F.scale * pop, F.scale * pop)
-        t:DrawRectAtAnchor(F.x[pos + 1], F.y[pos + 1], 0, 0, t.Width, t.Height / 2, "center")
-        t:SetScale(1, 1)
-    end
-    local R, A = Layout.flower_rotate, Animation.flowers
-    local t = clock % A.loop
-    for i = 1, 5 do
-        local f = tex.flowerRotate[i]
-        if f ~= nil then
-            local s = A.at[i]
-            local o
-            if t < s or t > s + 2 * A.fade + A.hold then o = 0
-            elseif t >= s + A.fade and t <= s + A.hold + A.fade then o = 1
-            elseif t >= s + A.fade + A.hold then o = (A.fade - (t - s - A.hold - A.fade)) / A.fade
-            else o = (t - s) / A.fade end
-            f:SetOpacity(o)
-            f:SetScale(R.scale, R.scale)
-            f:SetRotation(math.deg((t - s) / (A.turns[i] * 360)))
-            f:DrawAtAnchor(R.x[pos + 1][i], R.y[pos + 1][i], "center")
-            f:SetRotation(0)
-            f:SetScale(1, 1)
-            f:SetOpacity(1)
-        end
-    end
+local function drawShine(pos)
     local S, AS = Layout.plate_shine, Animation.plate_shine
     local sh = tex.shine
     if sh ~= nil then
@@ -469,16 +440,12 @@ local function drawFlowers(pos)
     end
 end
 
-local function drawBubbles(p, pos)
-    local pop = popAt(times.clear)
-    local mood, moodV2 = moods(p)
-    if layoutN <= 2 then
-        local B = Layout.speech_bubble
-        sheetCell(tex.bubble[pos + 1], B.x[pos + 1], B.y[pos + 1], 4, 3, mood, randomText, B.scale * pop)
-    end
+-- 1-2P: bubble and line; 3-5P: line only
+local function drawBubble(p, pos)
+    local m = mood(p)
     local V = Layout.speech_bubble_v2
-    local b = tex.bubbleV2[(layoutN <= 2) and pos + 1 or 3]
-    if b == nil then return end
+    local b = tex.bubbleV2[pos + 1]
+    if layoutN <= 2 and b == nil then return end
     local bx, by, scale
     if kind ~= "2p" then
         bx, by = panelPlace(V, pos)
@@ -488,15 +455,15 @@ local function drawBubbles(p, pos)
     else
         bx, by, scale = V.x[pos + 1], V.y[pos + 1], V.scale_1p
     end
-    sheetCell(b, bx, by, 1, 6, 0, moodV2, V.scale * scale * pop)
-    local line = info:GetSpeechText(p, moodV2)
+    if layoutN <= 2 then sheetCell(b, bx, by, 1, 6, 0, m, V.scale * scale * popAt(times.clear)) end
+    local line = info:GetSpeechText(p, m)
     if line ~= nil and line ~= "" then
         fonts.speech:Draw(line, bx + V.text_offset[1] * scale, by + V.text_offset[2] * scale, col.speech, col.speechOutline,
             1, scale, V.text_max_width * scale, "center")
     end
 end
 
--- ── the AI battle ────────────────────────────────────────────────────────────────────────────────────
+-- ==== AI battle ====
 
 local function drawAI()
     local A = Layout.ai
@@ -545,7 +512,7 @@ local function drawAI()
     end
 end
 
--- ── a player's panel ─────────────────────────────────────────────────────────────────────────────────
+-- ==== Player panel ====
 
 local ROW_VALUE = {
     good = function(p) return info:GetGoodCount(p) end, ok = function(p) return info:GetOkCount(p) end,
@@ -604,7 +571,7 @@ local function drawPanel(i, ui)
     end
 end
 
--- the score rank or the crown: fades in shrinking from big, dips and settles
+-- score rank or crown: scale and opacity of its entrance from t0
 local function badge(t0)
     local t = clock - t0
     if t < 0 then return nil end
@@ -659,7 +626,7 @@ local function drawPlayers()
     end
 end
 
--- ── the music ────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Music ====
 
 local music = {}
 
@@ -698,7 +665,7 @@ function setMusicLevel(percent)
     for _, s in pairs(music) do s:SetVolumePercent(percent) end
 end
 
--- ── lifecycle ────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Lifecycle ====
 
 function onStart()
     W = THEME:GetResolution().X
@@ -749,11 +716,10 @@ local function loadTextures()
     tex.rank = load(RESULT .. "ScoreRankEffect.png")
     tex.crown = load(RESULT .. "CrownEffect.png")
     tex.shine = load(RESULT .. "Shine.png")
-    tex.bubble = { load(RESULT .. "Speech_Bubble.png"), load(RESULT .. "Speech_Bubble_2.png") }
-    tex.bubbleV2 = { load(RESULT .. "Speech_Bubble_V2_Left.png"), load(RESULT .. "Speech_Bubble_V2_Right.png"), load(RESULT .. "Speech_Bubble_V2_4P_5P.png") }
-    tex.flower = load(RESULT .. "Flower/Flower.png")
-    tex.flowerRotate = {}
-    for f = 1, 5 do tex.flowerRotate[f] = load(RESULT .. "Flower/Rotate_" .. f .. ".png") end
+    tex.bubbleV2 = {}
+    if layoutN <= 2 then
+        tex.bubbleV2 = { load(RESULT .. "Speech_Bubble_V2_Left.png"), load(RESULT .. "Speech_Bubble_V2_Right.png") }
+    end
     if info.IsAIBattle then
         tex.aiPanel = load(RESULT .. "AIBattle/Panel_AI.png")
         tex.batch = load(RESULT .. "AIBattle/Batch.png")
@@ -770,6 +736,8 @@ local function disposeTextures(t)
     end
 end
 
+-- result stage calls activate(result) with a LuaResultInfo, update() and draw() per frame, skip() on decide,
+-- then deactivate()
 function activate(result)
     deactivate()
     info = result
@@ -780,11 +748,11 @@ function activate(result)
     kind = (layoutN == 5) and "5p" or ((layoutN >= 3) and "4p" or "2p")
     is1P = layoutN == 1
     is2PSide = info.PlayerSide == 1
-    randomText = math.random(0, 2)
     clock, played = 0, {}
     buildTimes()
     readCharts()
     loadTextures()
+    Background.load(info, load)
     for name, path in pairs(Animation.sounds) do
         if name ~= "_note" and STORAGE:FileExists(path) then sounds[name] = SOUND:CreateSFX(path) end
     end
@@ -795,8 +763,7 @@ function activate(result)
     -- the glyphs shown later are made now, not on their first draw
     fonts.title:Draw(title, -10000, -10000, col.title, col.titleOutline)
     for p = 0, drawn - 1 do
-        local _, moodV2 = moods(p)
-        fonts.speech:Draw(info:GetSpeechText(p, moodV2), -10000, -10000, col.speech, col.speechOutline)
+        fonts.speech:Draw(info:GetSpeechText(p, mood(p)), -10000, -10000, col.speech, col.speechOutline)
     end
     active = true
 end
@@ -808,6 +775,7 @@ function deactivate()
     sounds = {}
     disposeTextures(tex)
     tex = {}
+    Background.dispose()
     disposeCharas()
     info = nil
 end
@@ -815,6 +783,7 @@ end
 function update()
     if not active then return end
     clock = clock + fps.deltaTime * 1000
+    Background.update(fps.deltaTime, clock, times.clear)
     updateMusic()
     -- the gauge's sound stops once every gauge has filled, unless they all went rainbow (it plays out then)
     if played.gauge and not played.gaugeStop then
@@ -847,6 +816,7 @@ end
 
 function draw()
     if not active then return end
+    Background.draw(clock)
     local ui = uiOffset()
     if not info.IsAIBattle and tex.header ~= nil then tex.header:Draw(0, 0) end
     for i = 0, drawn - 1 do drawPanel(i, ui) end
@@ -870,8 +840,8 @@ function draw()
         if s ~= nil then s.c:Draw(cx, cy, s.action or s.loop, flip * ck, ck) end
         drawPuchichara(p, pos, cx, cy, ck)
         if clock >= times.clear then
-            if info:GetClearType(p) >= 1 and layoutN <= 2 then drawFlowers(pos) end
-            drawBubbles(p, pos)
+            if info:GetClearType(p) >= 1 and layoutN <= 2 then drawShine(pos) end
+            drawBubble(p, pos)
         end
         if not rankUnder then drawRank(p, pos, ui) end
         drawCrown(p, pos, ui)

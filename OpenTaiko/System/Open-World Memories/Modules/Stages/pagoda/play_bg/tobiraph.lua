@@ -1,4 +1,4 @@
--- Level 20's Tobiraph on the band; the notes land on its eye.
+-- level 20 Tobiraph on the band (notes land on its eye)
 
 local assets = require("encounter/assets")
 local Glitch = require("encounter/cutscenes/glitch")
@@ -33,20 +33,20 @@ function T.new(ctx)
     }, T)
 end
 
--- its eye on screen this frame
+-- eye screen pos this frame
 function T:centre()
     return self.x + math.sin(self.t * TAU / SWAY_SEC) * SWAY_PX,
            self.y + math.sin(self.t * TAU / BOB_SEC) * BOB_PX
 end
 
--- the bob's accent is its lowest point, a quarter cycle in
+-- bob accent: lowest point, a quarter cycle in
 function T:update(dt, state)
     local pos = (self.t - BOB_SEC * 0.25) % BOB_SEC
     self.t = self.t + self.beat:step(dt, BOB_SEC, pos, state.bpm[0], state.towerFloor)
     self.glitch:update(dt)
 end
 
--- the figure's top-left on whole pixels, so the glitch's slices meet without gaps
+-- top-left on whole px (glitch slices meet without gaps)
 local function topLeft(self)
     local ex, ey = self:centre()
     local m = self.meta
@@ -60,7 +60,7 @@ function T:draw(alpha, r, g, b, eyes, shadow)
     self.glitch:drawFigure(self.tx, x, y, 1, alpha)
 end
 
--- redraws the figure at flash share a; the caller sets the white gradient map
+-- redraw at flash share a; caller sets the white gradient map
 function T:drawFlash(a)
     local tx = self.tx
     if self.meta == nil or tx == nil or not tx.Ready then return end

@@ -1,6 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- OWM3d/sky.lua — the GPU sky: a full-screen fragment shader (SetSkyShader) drawn behind the 3D pass and
--- mirrored into reflections. The colours come from the hour palette below.
+-- OWM3d/sky.lua: GPU sky shader (SetSkyShader) and hour palette
 --
 -- The clouds are adapted from opengl_sky by Silvio Henrique Ferreira (https://github.com/shff/opengl_sky):
 --
@@ -30,7 +29,7 @@
 --   [0] camera forward xyz, tan(fov/2)        [4] zenith rgb, star intensity
 --   [1] camera right xyz, aspect              [5] horizon rgb, cloud cover (0..1)
 --   [2] camera up xyz, dayF                   [6] sun tint rgb, moon phase (0..1)
---   [3] sun dir xyz (TO the sun), nightF      [7] milky-way axis xyz, band width
+--   [3] sun dir xyz (to the sun), nightF      [7] milky-way axis xyz, band width
 
 local sin, cos, pi, max, min, floor = math.sin, math.cos, math.pi, math.max, math.min, math.floor
 
@@ -212,9 +211,8 @@ void main(){
 }
 ]]
 
--- ── palette keyframes (hour → zenith rgb, horizon rgb, sun tint rgb, cloud cover, star intensity) ──
--- Catmull-Rom over the ring: hues TRAVEL through dawn purples → sunrise golds → day blues →
--- sunset oranges → dusk violets → night, instead of snapping between three fixed palettes.
+-- ==== Palette keyframes ====
+-- Catmull-Rom over the ring of stops
 local STOPS = {
     --  hour  zenith                horizon               sun tint             cover star
     {  0.0, { 0.012, 0.018, 0.060 }, { 0.050, 0.070, 0.160 }, { 0.85, 0.87, 0.95 }, 0.34, 1.00 },
@@ -260,7 +258,7 @@ function Sky.paletteAt(hour)
     return out
 end
 
--- attach the shader once; call per frame after the camera settles so the rays match the view
+-- attach the shader once; Sky.update runs per frame
 function Sky.install(scene)
     if scene.SetSkyShader then scene:SetSkyShader(Sky.SOURCE) end
 end
@@ -268,8 +266,8 @@ function Sky.detach(scene)
     if scene.SetSkyShader then scene:SetSkyShader("") end
 end
 
--- world.cam must be applied (scene camera current). dayF/nightF from daynight; sun dir TO the sun.
--- hour drives the palette; coverBoost (0..1, optional) overcasts the sky (weather).
+-- call after the camera is applied; sun dir points to the sun
+-- coverBoost: 0..1 extra cloud cover (weather)
 function Sky.update(scene, fovDeg, rw, rh, sunX, sunY, sunZ, dayF, nightF, hour, coverBoost)
     if scene.SetSkyUniform == nil then return end
     local fx, fy, fz = scene:GetCameraForward()
@@ -288,7 +286,7 @@ function Sky.update(scene, fovDeg, rw, rh, sunX, sunY, sunZ, dayF, nightF, hour,
     local yday = (os.date("*t").yday or 180)
     local phase = (yday % 29.53) / 29.53
     scene:SetSkyUniform(6, pal.sun[1], pal.sun[2], pal.sun[3], phase)
-    -- the milky-way band: a fixed tilted great circle across the dome
+    -- milky-way axis (fixed great circle), band width
     scene:SetSkyUniform(7, 0.42, 0.50, 0.76, 0.30)
 end
 

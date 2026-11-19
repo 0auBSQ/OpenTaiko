@@ -1,7 +1,4 @@
--- One fire at a base point.
--- tex = {core, puff, glow, ember[, coreMeta]}; coreMeta = the core's manifest entry (w, h, fx, fy), else
--- the base is fx.fire.base_above_bottom_px above the core's bottom centre.
--- xf maps a 1920-space point to the screen (a function, or a table with .xf).
+-- one fire at a base point
 
 local Emitter = require("fx/emitter")
 local presets = require("fx/presets")
@@ -25,7 +22,7 @@ local function glow_of(g)
 end
 local HALO        = glow_of(look.halo)
 local ROOM        = glow_of(look.room)
-local GLOW_Y      = look.glow_y_share    -- glow centre, as a fraction of the core height above the base
+local GLOW_Y      = look.glow_y_share    -- glow centre above base, share of core height
 local ADD_COPY    = look.add_copy_opacity
 local PUFFS, TONGUES, EMBERS = look.puffs, look.tongues, look.embers
 local SQX_A, SQX_W = core.squash_x.amp, core.squash_x.rad_per_s
@@ -35,6 +32,7 @@ local LEAN, LEAN_W = core.lean.deg, core.lean.rad_per_s
 
 local _o = { sx = 1, sy = 1, rot = 0, pivot = "foot" }
 
+-- xf: 1920-space point -> screen (function, or table with .xf)
 local function place(xf, x, y)
     if xf == nil then return x, y, 1 end
     local f = (type(xf) == "table") and xf.xf or xf
@@ -43,6 +41,8 @@ local function place(xf, x, y)
     return px, py, (qx - px) / 100
 end
 
+-- tex = {core, puff, glow, ember[, coreMeta]}; coreMeta: core manifest entry (w, h, fx, fy)
+-- no coreMeta: base is fx.fire.base_above_bottom_px above the core bottom centre
 function Fire.new(tex, x, y, h, seed)
     local f = setmetatable({
         core = tex.core, glow = tex.glow, meta = tex.coreMeta,

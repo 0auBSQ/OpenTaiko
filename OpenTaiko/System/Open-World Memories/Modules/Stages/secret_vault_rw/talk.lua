@@ -1,7 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local, inject-field
--- the small talks over coffee (Vault.Talk runs them): Mr.Caspian's offer after a chest, the staging (the BGM
--- fades, the light spot, the cup slides in, the jazz), the lines and menus in the vault's dialogue box, Gris in
--- the tank, at the side window or at the counter on Mr.Caspian's left, her challenge song and the rewards
+-- vault small talk staging and dialogue (flows run by Vault.Talk)
 local Talk = require("Vault.Talk")
 local Chests = require("vault")
 local Dialogue = require("dialogue")
@@ -49,7 +47,7 @@ local windowA, counterA = 1, 0
 local cupK, cupOut = 0, 0
 local fadeA, fadeTarget = 0, 0
 local boxA, boxTarget = 0, 0
-local bgmK, jazzK = 1, 0          -- the vault BGM keeps playing under the talk, ducked to bgmK
+local bgmK, jazzK = 1, 0          -- vault BGM ducked to bgmK under the talk
 local clinked = false
 
 local function play(name, volume)
@@ -61,7 +59,7 @@ end
 
 local function tex(name) return ctx.tex[name] end
 
--- ── music ───────────────────────────────────────────────────────────────────────────────────────
+-- ==== Music ====
 
 local function applyMusic()
     local bgm, jazz = ctx.snd.BGM, ctx.snd.Jazz
@@ -77,7 +75,7 @@ local function startJazz()
     jazz:Play()
 end
 
--- ── dialogue ────────────────────────────────────────────────────────────────────────────────────
+-- ==== Dialogue ====
 
 local function shownChar(n)
     if dlg == nil or dlg.glines == nil then return nil end
@@ -99,7 +97,7 @@ local function blip()
     if s then s:Play() end
 end
 
--- a line starts: its speaker's face, and the screen dims around a faded one
+-- line start: speaker face; dims the screen for a faded line
 local function onLine(tag)
     local who, sprite, flag = tag:match("^(%a)_(%w*)_?(%a*)$")
     if who == nil then return end
@@ -129,7 +127,7 @@ local function dlgNode(n)
     return node
 end
 
--- the last line stays in the box while the stage does something else
+-- keeps the last line in the box during stage actions
 local function holdLine()
     local last = dlg.node
     if last == nil then return end
@@ -138,7 +136,7 @@ local function holdLine()
     dlg.caret = false
 end
 
--- ── the flow ────────────────────────────────────────────────────────────────────────────────────
+-- ==== Flow ====
 
 local resume
 
@@ -203,7 +201,7 @@ resume = function(...)
     begin(r)
 end
 
--- ── staging ─────────────────────────────────────────────────────────────────────────────────────
+-- ==== Staging ====
 
 local function updateStage()
     local a = stageAnim
@@ -233,15 +231,15 @@ local function updateStage()
     elseif a.name == "come" or a.name == "back" then
         local k = Tex.clamp01(t / Motion.come_s)
         local toCounter = a.name == "come"
-        local away = Tex.clamp01(k * 2)           -- she fades out where she was ...
-        local here = Tex.clamp01(k * 2 - 1)        -- ... then in where she goes
+        local away = Tex.clamp01(k * 2)           -- fade out at the old spot
+        local here = Tex.clamp01(k * 2 - 1)        -- fade in at the new spot
         windowA = toCounter and (1 - away) or here
         counterA = toCounter and here or (1 - away)
         wide = toCounter and Easing.inOutQuad(k) or (1 - Easing.inOutQuad(k))
         if not toCounter and k >= 1 then grisPose = "idle" end
         done = k >= 1
     elseif a.name == "leave" then
-        -- she goes to lie down in the back room: gone from the room for the rest of the visit
+        -- back room: gone for the rest of the visit
         local k = Tex.clamp01(t / Motion.come_s)
         counterA, windowA = 1 - k, 0
         wide = 1 - Easing.inOutQuad(k)
@@ -258,7 +256,7 @@ local function updateStage()
     end
 end
 
--- ── API ─────────────────────────────────────────────────────────────────────────────────────────
+-- ==== API ====
 
 function S.init(c)
     ctx = c
@@ -295,7 +293,7 @@ function S.reset()
     if dlg then dlg.activeFlag = false end
 end
 
--- after a chest that opened (1 simple, 2 gold, 3 optk): Mr.Caspian may offer a talk
+-- chest: 1 simple, 2 gold, 3 optk; Mr.Caspian may offer a talk
 function S.offer(chest)
     Talk.slot = 0
     if not Talk.wantOffer(chest) then return false end
@@ -307,17 +305,20 @@ end
 
 function S.active() return co ~= nil or stageAnim ~= nil end
 
--- while a talk runs, it sets the music's volumes (the reward modal's ducking waits)
+-- true while a talk runs: it sets the music volumes (reward modal ducking waits)
 function S.ownsMusic() return S.active() end
 
--- "done" once the talk is over, "play" when the stage has to leave for a song (see S.mountPending)
+-- returns "done" when over, "play" to leave for a song (S.mountPending)
 function S.update(dt, now)
     clock = now
     boxA = Tex.approach(boxA, boxTarget, dt / Animation.ui_fade_s)
     fadeA = Tex.approach(fadeA, fadeTarget, dt / Motion.fade_s)
     if co == nil and stageAnim == nil then
         talking = false
-        boxTarget = 0
+        boxTarget, fadeTarget = 0, 0
+        -- box and dim fade out first (a refused offer ends with the box shown)
+        if boxA > 0 or fadeA > 0 then return nil end
+        if dlg then dlg.activeFlag = false end
         return "done"
     end
     if stageAnim then
@@ -339,7 +340,7 @@ function S.update(dt, now)
     return nil
 end
 
--- mounts the song asked for; false when it cannot be played (the talk goes on as if it failed)
+-- false when unplayable (the talk goes on as a fail)
 function S.mountPending()
     local node = pendingPlay
     pendingPlay = nil
@@ -353,7 +354,7 @@ end
 
 function S.returning() return returning end
 
--- back from the song: the talk goes on where it left, the staging as it was
+-- back from the song: talk and staging resume
 function S.afterPlay()
     returning = false
     blinkAt = nil
@@ -361,7 +362,7 @@ function S.afterPlay()
     dim, light, wide, windowA, counterA = 1, 1, 1, 0, 1
     cupK, cupOut, boxA, boxTarget = 1, 0, 0, 1
     bgmK, jazzK = 0, 1
-    -- the trip stopped the vault BGM: it plays again from the top, ducked until the talk ends
+    -- vault BGM restarts from the top, ducked until the talk ends
     local bgm = ctx.snd.BGM
     if bgm then bgm:SetLoop(true); bgm:SetVolumePercent(0); bgm:Play() end
     startJazz()
@@ -371,7 +372,7 @@ function S.afterPlay()
     resume(cleared)
 end
 
--- ── drawing ─────────────────────────────────────────────────────────────────────────────────────
+-- ==== Drawing ====
 
 local function fill(op, y0)
     local w = tex("Talk/White")
@@ -391,7 +392,7 @@ local function glow(t, x, y, sx, sy, op, color)
     t:SetBlendMode("Normal")
 end
 
--- Gris swimming in the tank, behind the glass (cabin.lua calls it with its projection)
+-- Gris in the tank, behind the glass; called by cabin.lua with its projection
 function S.drawTank(project)
     if spot ~= "tank" then return end
     local t = tex("Cabin/Gris/Tank")
@@ -406,8 +407,7 @@ function S.drawTank(project)
     t:SetColor(1, 1, 1)
 end
 
--- what stands in the room: Gris at the side window (blinking: her closed eye drawn over the open one), then the
--- dim and the light spot over Mr.Caspian
+-- Gris at the side window (closed eye drawn over the open one), then dim and light spot
 function S.drawRoom(now)
     if spot == "window" and windowA > 0 then
         local t, W = tex("Cabin/Gris/StandOpen"), Look.gris_window
@@ -445,7 +445,7 @@ function S.drawRoom(now)
     end
 end
 
--- Gris at the counter, on Mr.Caspian's left (behind the counter, like him)
+-- Gris at the counter, left of Mr.Caspian, behind it
 function S.drawCounter(now)
     if counterA <= 0 then return end
     local t = tex("Cabin/Gris/" .. (GRIS_TEX[grisPose] or "Idle"))
@@ -455,7 +455,7 @@ function S.drawCounter(now)
     Tex.place(t, G.x, G.y, "bottom", G.scale, G.scale * breath, counterA)
 end
 
--- in front of the counter: its dim, the light on it, and the cup
+-- in front of the counter, with the cup
 function S.drawFront(now)
     fill(dim * Look.dim, Look.table_dim_y)
     local g, cg = tex("Talk/Glow"), Look.counter_glow
@@ -475,7 +475,7 @@ function S.drawFront(now)
     end
 end
 
--- the dialogue box (and a faded line's dark screen, and a reward's modal)
+-- dialogue box and its overlays
 function S.drawBox()
     fill(fadeA * Look.fade)
     if dlg ~= nil and dlg.activeFlag and boxA > 0 then

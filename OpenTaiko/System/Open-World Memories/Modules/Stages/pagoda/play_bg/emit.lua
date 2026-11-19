@@ -1,9 +1,9 @@
--- Emitter on a copy of an fx/presets.lua preset with some fields replaced.
+-- emitter on a copy of an fx/presets.lua preset with fields replaced
 
 local Emitter = require("fx/emitter")
 local presets = require("fx/presets")
 
--- name: the preset; tex: a handle or a key -> handle map; over: fields to replace. nil when missing.
+-- tex: handle or key -> handle map; over: replaced fields; nil if preset missing
 return function(name, tex, over)
     local src = presets[name]
     if src == nil or tex == nil then return nil end

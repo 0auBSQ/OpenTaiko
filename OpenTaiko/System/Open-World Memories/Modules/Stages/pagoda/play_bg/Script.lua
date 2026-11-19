@@ -1,8 +1,8 @@
--- Pagoda upper background on the play screen; play_setup passes the floor and run state as shared strings.
+-- pagoda play-screen upper background (floor + run state via play_setup shared strings)
 
-local ROOT = "../"      -- the stage folder
+local ROOT = "../"      -- stage folder
 
--- the stage's modules load from the stage folder, in this background's own VM
+-- stage modules from the stage folder (own VM)
 package.searchers[#package.searchers + 1] = function(name)
     local path = ROOT .. name:gsub("%.", "/") .. ".lua"
     local src = STORAGE:ReadText(path)
@@ -10,7 +10,7 @@ package.searchers[#package.searchers + 1] = function(name)
     return assert(load(src, "@" .. path)), path
 end
 
--- every Config.load of this VM reads from the stage folder
+-- Config.load reads from the stage folder
 local Config = require("Core.Config")
 local loadConfig = Config.load
 Config.load = function(name) return loadConfig(ROOT .. name) end
@@ -69,7 +69,7 @@ local function onHit(big, judge)
     _foe:react(big)
 end
 
--- runs while the song loads; the floor's art loads synchronously here
+-- runs during song load; floor art loads sync
 function onStart()
     local ctx = {
         level = math.max(1, math.floor(tonumber(shared("pagoda_play_level") or "") or 1)),

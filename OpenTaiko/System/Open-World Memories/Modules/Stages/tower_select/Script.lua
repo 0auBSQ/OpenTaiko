@@ -5,7 +5,7 @@ local Shortcuts = require("Shortcuts")
 local OWM = require("World.OWM3d")
 local Sky3D = require("World.OWM3d.sky")
 local Terrain = require("World.OWM3d.terrain")
--- positions, sizes and colours: Config/layout.json; timings: Config/animation.json
+-- layout: Config/layout.json; timings: Config/animation.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
@@ -14,40 +14,40 @@ local ROAD, TOWERS, BLOCKS, MONO, PAPER = Layout.road, Layout.towers, Layout.blo
 local INFO, TAGS, CONF, CAMERA, TERR = Layout.info, Layout.tags, Layout.confirm, Layout.camera, Layout.terrain
 local ENTER, SIGNS = Animation.enter, Animation.signs
 local VISIBLE = TOWERS.visible_each_side
-local MAX_SCROLL = 3              -- how far (in slots) the towers may lag behind the cursor while it moves fast
-local SPAN = VISIBLE + MAX_SCROLL -- slots kept on each side: the outer ones only while they slide in or out
+local MAX_SCROLL = 3              -- max tower lag behind the cursor, slots
+local SPAN = VISIBLE + MAX_SCROLL -- slots per side; outer ones only while sliding
 local A, B = ROAD.half_width, ROAD.half_depth
 local CZ = ROAD.z0 + ROAD.half_depth
-local OX, OZ = TERR.origin[1], TERR.origin[2]   -- the camera's foot on the terrain (the terrain starts at 0, 0)
+local OX, OZ = TERR.origin[1], TERR.origin[2]   -- camera foot on the terrain (terrain starts at 0, 0)
 local Y_ROAD, Y_LINE, Y_PLAZA, Y_RIM, Y_RING = 0.02, 0.03, 0.04, 0.045, 0.05
 local GROUND_SHADE = Layout.light.ground_shade
 
 local songlist = nil
 local art = nil
-local world = nil           -- the OWM3d world: its scene, camera, sun and sky (as the pagoda draws it)
+local world = nil           -- OWM3d world (as in the pagoda)
 local scene = nil
 local clock = 0
 
--- "modes" (the two monoliths), "enter" and "leave" (the way between them), "select" (the towers)
+-- "modes" (monoliths) | "enter" | "leave" | "select" (towers)
 local state = "modes"
-local T = 0                 -- time along the enter timeline
-local focus = 1             -- the mode screen's choice: 1 and 2 the monoliths, 3 its back box
+local T = 0                 -- enter timeline clock
+local focus = 1             -- mode screen: 1, 2 monoliths; 3 back box
 local refused = -100        -- clock when Coming Soon refused
 local landShake = -100      -- clock of the last tower landing
-local scroll, scrollV = 0, 0 -- the towers' lag behind their plazas, in slots, and its speed (each move adds one)
-local backFromPlay = false  -- coming back from a tower play opens on the towers, not the monoliths
-local depth = 0             -- folders opened under the list's root
-local onBack = false        -- the cursor on the root's way back to the mode select (after the random box)
+local scroll, scrollV = 0, 0 -- tower lag behind plazas (slots) and its speed; each move adds 1
+local backFromPlay = false  -- back from a tower play: open on the towers
+local depth = 0             -- open folder depth under root
+local onBack = false        -- cursor on the root's back-to-modes entry (after the random box)
 
 local tex, obj, snd, act, fonts, col = {}, {}, {}, {}, {}, {}
 local models = {}
-local slots = {}            -- per offset -SPAN..SPAN: what stands there
-local chosen = nil          -- the chosen tower's info, nil for anything but a song
+local slots = {}            -- offset -SPAN..SPAN -> slot
+local chosen = nil          -- chosen tower info; nil unless a song
 local confirm = nil
 local chara = nil
 local grey = nil
-local modicons = nil         -- the mod icons under the nameplate (the modicons ROActivity)
-local sc = nil              -- the song select's shortcuts: help panel, auto, song speed
+local modicons = nil         -- modicons ROActivity
+local sc = nil              -- song select shortcuts
 
 local arcPhi, arcLen, perimeter, step = {}, {}, 0, ROAD.slot
 
@@ -62,9 +62,11 @@ local function smooth(v) v = clamp01(v); return v * v * (3 - 2 * v) end
 local function span(t, range) return clamp01((t - range[1]) / math.max(1e-6, range[2] - range[1])) end
 local function lerp(a, b, k) return a + (b - a) * k end
 
--- ── text: no outline, centred on the line's middle (the engine pads a glyph box under and around its ink) ──────
+-- ==== Text ====
+-- glyph box padding added by the engine
 local function pad(font) return font.BoxHeight - math.ceil(font.LineHeight) end
 
+-- no outline; y is the line's middle
 local function text(font, s, x, y, anchor, color, scale, maxW, opacity)
     if s == nil or s == "" then return end
     scale = scale or 1
@@ -73,7 +75,8 @@ local function text(font, s, x, y, anchor, color, scale, maxW, opacity)
     font:Draw(s, x, y + (math.floor(pad(font) / 2) - 1) * scale, color, col.clear, opacity or 1, scale, maxW and (maxW * scale + 2 * p) or 0, anchor)
 end
 
--- ── the road: an ellipse long front to back, its front point straight ahead ────────────────────────────────────
+-- ==== Road ====
+-- ellipse, long axis front to back; front point straight ahead
 local function buildArc()
     local n = 4096
     local px, pz = 0, ROAD.z0
@@ -88,7 +91,7 @@ local function buildArc()
     step = perimeter / math.max(1, math.floor(perimeter / ROAD.slot + 0.5))
 end
 
--- the road's middle s metres from the front point (negative: to the left) on the terrain, and its outward normal
+-- s: metres from the front point (negative: left); returns x, z, outward normal
 local function roadAt(s)
     s = s % perimeter
     local lo, hi = 1, #arcLen
@@ -105,7 +108,7 @@ end
 
 local function slotAt(pos) return roadAt(pos * step) end
 
--- ── the 3D field ──────────────────────────────────────────────────────────────────────────────────────────────
+-- ==== 3D field ====
 local TEX_IDS = { grass = 1, road = 2, pave = 3, rim = 4, rock = 6, snow = 7 }
 local SPRITE_IDS = { disc = 5, rainbow = 6, back = 7, random = 8, folder = 9 }
 local nextSprite = 32
@@ -125,7 +128,7 @@ local function registerSprite(id, path)
     scene:SetSpriteFilter(id, "linear")
 end
 
--- a tower piece (a TowerArt texture) as a sprite, registered the first time it is used
+-- TowerArt texture -> sprite id, registered on first use
 local function pieceSprite(t)
     local id = pieceSprites[t]
     if id == nil then
@@ -145,7 +148,7 @@ local function newObject(pass, lit)
     return id
 end
 
--- the ground's pieces: lit (they take the sun and the shadows), casting none, toned down under the sun
+-- lit, no shadow cast, tinted GROUND_SHADE
 local function groundObject()
     local id = newObject(0, true)
     scene:ObjSetCastShadow(id, false)
@@ -158,12 +161,12 @@ local function place(id, x, y, z, s)
     scene:ObjSetTransform16(id, s, 0, 0, x, 0, s, 0, y, 0, 0, s, z, 0, 0, 0, 1)
 end
 
--- a flat quad facing up (the engine's normal is (c1 - c0) x (c3 - c0)): x0..x1 by z0..z1
+-- up-facing quad x0..x1 by z0..z1; normal = (c1 - c0) x (c3 - c0)
 local function groundQuad(id, x0, z0, x1, z1, y, texId, tile)
     scene:ObjAddQuadTex(id, x0, y, z0, x0, y, z1, x1, y, z1, x1, y, z0, texId, (z1 - z0) / tile, (x1 - x0) / tile, 1)
 end
 
--- the terrain (Maps/field: the ground rising into the mountains inside the road), and plain grass around it
+-- terrain (Maps/field) plus a grass frame around it
 local function buildGround()
     local w = (TERR.samples - 1) * TERR.cell
     local def = { dir = TERR.dir, terrain = { heights = "height.r16", w = TERR.samples, h = TERR.samples, minY = 0, maxY = TERR.max_y,
@@ -182,7 +185,7 @@ local function buildGround()
     groundQuad(obj.ground, 0, w, w, w + f, 0, TEX_IDS.grass, ROAD.grass_tile)
 end
 
--- the road laid over `reveal` (0..1) of its length, from the front point both ways; faces up
+-- reveal: 0..1 of the length, from the front point both ways
 local function buildRoad(reveal)
     scene:ObjBegin(obj.road)
     scene:ObjBegin(obj.lines)
@@ -213,7 +216,7 @@ local function buildRoad(reveal)
     end
 end
 
--- a plaza around the origin, facing up: the paving, its stone rim, an ink line on both edges of the rim
+-- plaza at the origin: pave and rim into fill, rim edge lines into ring
 local function buildPlaza(fill, ring)
     local R, seg, tile = ROAD.plaza_radius, ROAD.plaza_segments, ROAD.pave_tile
     local ri = R - ROAD.rim
@@ -240,7 +243,7 @@ local function loadModel(path)
     return m
 end
 
--- the monoliths keep their own proportions: the stone scaled to Layout.monoliths.size, its foot centre on the ground
+-- monolith scaled to Layout.monoliths.size, foot centre on the ground
 local monoFit = nil
 
 local function buildMonoliths()
@@ -260,8 +263,8 @@ local function placeMonolith(id, x, y, z)
     scene:ObjSetTransform16(id, f.sx, 0, 0, OX + x - f.sx * f.cx, 0, f.sy, 0, y - f.sy * f.cy, 0, 0, f.sz, OZ + z - f.sz * f.cz, 0, 0, 0, 1)
 end
 
--- the signs: the model (its board on the camera's side) scaled to Layout.blocks.width, its foot centre on the plaza;
--- the board's middle and front (Layout.blocks.board, model units) in placed metres
+-- sign scaled to Layout.blocks.width, foot centre on the plaza
+-- boardY, boardZ: Layout.blocks.board (model units) in placed metres
 local signFit = nil
 
 local function fitSign()
@@ -312,7 +315,7 @@ local function buildScene()
     models.sign = loadModel("Models/sign.glb")
     fitSign()
 
-    -- per slot: its plaza (it slides with the tower), the tower, or a sign with its badge
+    -- objects per slot
     for k = -SPAN, SPAN do
         local s = {}
         s.plaza, s.ring = groundObject(), groundObject()
@@ -331,7 +334,7 @@ local function buildScene()
     end
 end
 
--- ── the slots' contents ───────────────────────────────────────────────────────────────────────────────────────
+-- ==== Slot contents ====
 local MPP = 0                -- metres per tower art pixel
 
 local function buildTower(id, look, floors)
@@ -356,7 +359,7 @@ local function buildTower(id, look, floors)
     return top
 end
 
--- the badge on a sign's board (the sign itself is posed once per slot); returns the sign's height
+-- badge on the sign board (sign posed once per slot); returns sign height
 local function buildBlock(s, kind, color)
     local f = signFit or { height = 3, boardY = 1.5, boardZ = 0 }
     local h = f.height
@@ -392,7 +395,7 @@ local function turnRainbow(s, deg)
     scene:ObjSetTint(s.disc, 1, 1, 1)
 end
 
--- a song's folder colour, lightened toward white as song select lightens its level digits ({ r, g, b }, 0-255)
+-- folder colour lightened like song select level digits; { r, g, b }, 0-255
 local function folderColor(node)
     local c = node ~= nil and node.BoxColor or nil
     if c == nil then return Config.plain(Layout.colors.no_folder) end
@@ -420,8 +423,7 @@ local function towerInfo(node)
     }
 end
 
--- the page around the cursor: the song list's nodes, and at the root the way back to the mode select right
--- after the random box (the list wraps from the random box to its first entry there)
+-- page around the cursor; at root, TO_MODES follows the random box (list wraps there)
 local TO_MODES = { toModes = true }
 
 local function atRoot() return depth == 0 end
@@ -521,7 +523,7 @@ local function preloadTowers()
     end
 end
 
--- ── the song preview, as in the song select: loaded after a short wait, faded in, looped ───────────────────────
+-- ==== Song preview ====
 local preview = { node = nil, key = "", wait = -1, vol = 0, target = 0, loaded = false, playing = false, demo = 0, speed = 1, length = nil }
 local P = Animation.preview
 
@@ -572,7 +574,7 @@ local function previewStop()
     preview.node, preview.key, preview.wait, preview.target, preview.loaded, preview.length = nil, "", -1, 0, false, nil
 end
 
--- ── sounds ────────────────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Sounds ====
 local function loadSounds()
     for k, path in pairs(Config.plain(Animation.sounds)) do
         if STORAGE:FileExists(path) then snd[k] = SOUND:CreateSFX(path) end
@@ -586,7 +588,7 @@ local function loadSounds()
             snd.lands[i] = s
         end
     end
-    -- one plank sound per confirm sign so they overlap; the big sign lands lower, each option a bit higher
+    -- one plank sfx per confirm sign, to overlap
     snd.planks = {}
     if STORAGE:FileExists(SIGNS.sound) then
         for i = 1, 5 do
@@ -600,8 +602,8 @@ end
 local function play(name) if snd[name] ~= nil then snd[name]:Play() end end
 local function shared(name) SHARED:GetSharedSound(name):Play() end
 
--- ── the enter timeline: what each part is at time t ───────────────────────────────────────────────────────────
--- how far up the monoliths are (0 on the ground, 1 out of sight): pulled up when entering, falling back when leaving
+-- ==== Enter timeline ====
+-- monolith lift: 0 on the ground, 1 out of sight
 local function monoAt(t)
     local k = span(t, ENTER.monoliths)
     if state == "leave" then return 1 - (1 - k) * (1 - k) end
@@ -613,7 +615,7 @@ local function boxAt(t) return smooth(span(t, ENTER.box)) end
 
 local function fallStart(k) return ENTER.fall_start + math.min(math.abs(k), VISIBLE + 1) * ENTER.fall_stagger end
 
--- how high a slot's tower still is (nil: not dropped yet)
+-- tower height above ground (nil: not dropped yet)
 local function liftAt(t, k)
     local u = (t - fallStart(k)) / ENTER.fall_s
     if u <= 0 then return nil end
@@ -634,7 +636,7 @@ local function enterSounds(prev, t)
     if crossed(ENTER.box[1]) then play("box") end
 end
 
--- ── the camera, the sky and the sun ───────────────────────────────────────────────────────────────────────────
+-- ==== Camera and sky ====
 local function cameraUpdate()
     local k = cameraAt(T)
     local h = lerp(CAMERA.modes.height, CAMERA.menu.height, k)
@@ -647,8 +649,8 @@ local function cameraUpdate()
     cam:setTarget(OX, h + sy + math.sin(p) * d, OZ + math.cos(p) * d)
 end
 
--- the pagoda's sky (the OWM3d sky shader, or its bands without one); the field fades into the colour the sky
--- has on the horizon; the sun comes from the camera's side, so the fronts the player sees are lit
+-- fog colour: sky horizon/zenith mix (L.horizon_mix)
+-- sun from the camera side, lights the visible fronts
 local function render()
     local L = Layout.light
     world:drawSky()
@@ -664,12 +666,12 @@ local function render()
     world:blit()
 end
 
--- ── per frame: where everything is ────────────────────────────────────────────────────────────────────────────
+-- ==== Per frame ====
 local lastReveal = -1
 
 local function slotPos(k) return k + scroll end
 
--- the scroll eases to rest as a critically damped spring (exact step): the further behind, the faster it goes
+-- critically damped spring, exact step
 local function scrollUpdate(dt)
     local w = Animation.scroll_rad_per_s
     local e = math.exp(-w * dt)
@@ -693,7 +695,6 @@ local function sceneUpdate()
     end
     local half = perimeter / 2 * reveal
 
-    -- the monoliths fly up out of sight
     local up = monoAt(T)
     for i, id in ipairs(obj.monoliths) do
         local x = (i == 1 and -MONO.x or MONO.x)
@@ -704,7 +705,6 @@ local function sceneUpdate()
         scene:ObjSetTint(id, k, k, k)
     end
 
-    -- the slots
     for k = -SPAN, SPAN do
         local s, slot = obj[k], slots[k] or { kind = "none" }
         local pos = slotPos(k)
@@ -713,7 +713,7 @@ local function sceneUpdate()
         local shown = slot.kind ~= "none" and lift ~= nil and alpha > 0
         local x, z = slotAt(pos)
         local y = lift or 0
-        -- its plaza: laid once the road reaches it, sliding with it, shrinking away past the last slot
+        -- plaza: shown once the road reaches it, shrinks past the last slot
         local pop = clamp01((half - math.abs(pos) * step) / 4 + 0.25)
         local ps = (0.4 + 0.6 * smooth(pop)) * smooth(alpha)
         local plaza = slot.kind ~= "none" and reveal > 0 and pop > 0 and ps > 0.05
@@ -744,7 +744,7 @@ local function sceneUpdate()
     end
 end
 
--- ── the papers on the monoliths ───────────────────────────────────────────────────────────────────────────────
+-- ==== Monolith papers ====
 local function intersect(a, b)
     local x0, y0 = math.max(a[1], b[1]), math.max(a[2], b[2])
     local x1, y1 = math.min(a[1] + a[3], b[1] + b[3]), math.min(a[2] + a[4], b[2] + b[4])
@@ -756,7 +756,7 @@ local function setClip(r)
     GRAPHICS:SetClip(x, y, math.max(0, math.ceil(r[1] + r[3]) - x), math.max(0, math.ceil(r[2] + r[4]) - y))
 end
 
--- the Standard Tower picture (its sky and tower baked in) and the player's character climbing it, greyed
+-- Standard Tower picture plus the climbing character, greyed
 local function drawPicture(r, shade)
     if grey ~= nil then GRADIENT:SetActive(grey) end
     local pic = tex.picture
@@ -817,7 +817,7 @@ local function drawPaper(i)
     end
 end
 
--- the mode screen's back box, at the bottom: a regular box with the back badge and its name
+-- mode screen back box (focus 3)
 local function drawModesBack(alpha)
     if alpha <= 0 then return end
     local MB = Layout.modes_back
@@ -843,7 +843,7 @@ local function drawModesBack(alpha)
     box:SetOpacity(1)
 end
 
--- ── the boxes: name tags over the slots, the chosen tower's info ──────────────────────────────────────────────
+-- ==== Tags and info box ====
 local function badgeTexture(status)
     local cell = BADGE_CELLS[status]
     if cell ~= nil then return tex.ranks, cell end
@@ -851,7 +851,7 @@ local function badgeTexture(status)
     return nil
 end
 
--- assisted: the crown's height against a rank cell's (its art fills more of its frame)
+-- assisted: crown height vs a rank cell's (crown art fills more of its frame)
 local function drawBadge(status, cx, cy, h, opacity, assisted)
     local t, cell = badgeTexture(status)
     if t == nil then return end
@@ -869,8 +869,8 @@ local function drawBadge(status, cx, cy, h, opacity, assisted)
     end
 end
 
--- a number in the song bars' level digits (their outlined base, the fill tinted over it, a "+" for a plus
--- level), its left edge at x and its middle at cy; returns its width
+-- song bar level digits: base and tinted fill, "+" for plus
+-- left edge at x, middle at cy; returns width
 local function barNumber(n, x, cy, scale, fill, plus, opacity)
     local D = Layout.digits
     local s = tostring(math.floor(n))
@@ -935,7 +935,6 @@ local function drawTags(alpha)
         local x0, y0 = e.x - w / 2, e.y - TAGS.gap * scale - h
         t:Draw(x0, y0)
         if slot.kind == "tower" then
-            -- the tower's tag: its top strip in the song's folder colour
             local strip, c = tex.tagStrip, slot.color
             strip:SetScale(scale, scale)
             strip:SetOpacity(e.a)
@@ -946,7 +945,7 @@ local function drawTags(alpha)
         local nameW = hasBadge and TAGS.name_w_badge or TAGS.name_w
         local tx = hasBadge and x0 + (TAGS.badge_x / 2 + 6) * scale or e.x
         if slot.kind == "tower" then
-            -- the chart's level on the left, the name between it and the badge
+            -- name between level and badge
             local lw = barNumber(slot.level, x0 + TAGS.level_x * scale, y0 + TAGS.level_y * scale, TAGS.level_scale * scale,
                 slot.color, slot.plus, e.a) / scale
             local left = TAGS.level_x + lw + TAGS.level_gap
@@ -972,7 +971,6 @@ local function drawInfo(alpha)
     local y0 = INFO.y - (1 - alpha) * (box.Height + 40)
     local I, D = INFO, Layout.digits
     local df = c.color
-    -- the box, its header, heart and stairs in the song's folder colour, the Sweet / Spicy pill as it is
     box:Draw(x0, y0)
     tint:SetColor(df[1] / 255, df[2] / 255, df[3] / 255)
     tint:Draw(x0, y0)
@@ -994,7 +992,7 @@ local function drawInfo(alpha)
     text(fonts.floorTotal, total, x0 + I.floor_right, y0 + I.best_total_y, "right", col.grey)
     local tw = fonts.floorTotal:Measure(total)
     text(fonts.best, tostring(math.floor(c.bestFloor)), x0 + I.floor_right - tw - 8, y0 + I.best_y, "right", col.text)
-    -- the best floor bar: the fill, then the 10 / 25 / 50 / 75 % ticks over it
+    -- best floor bar
     local bar = I.bar
     local k = c.floors > 0 and clamp01(c.bestFloor / c.floors) or 0
     if k > 0 then
@@ -1014,7 +1012,7 @@ local function drawInfo(alpha)
     drawBadge(c.status, x0 + I.badge[1], y0 + I.badge[2], I.badge[3], 1, I.assisted_scale)
 end
 
--- ── the confirm menu: wooden signs dropped on ropes, hanging under the chosen tower's info ────────────────────
+-- ==== Confirm menu ====
 local function confirmItems()
     if EM.on() then return { "back", "settings", "challenge" } end
     return { "back", "settings", "customize", "challenge" }
@@ -1036,7 +1034,7 @@ local function openConfirm()
     confirm = { items = items, pos = 1, t = 0, closing = nil, signs = signs }
 end
 
--- a sign's vertical offset from its landed place at time t: not started, falling, or bouncing on its ropes
+-- y offset from the landed place; returns dy, landed (nil: not started)
 local function signDrop(s, t)
     local u = t - s.start
     if u < 0 then return nil end
@@ -1049,7 +1047,7 @@ local function signDrop(s, t)
     return b.amplitude_px * math.sin(u * b.rad_per_s) * math.exp(-u * b.decay_per_s), true
 end
 
--- a landed sign swings from its drop (u seconds ago), the swing dying down into the idle sway
+-- u: sec since landing; swing decays into the idle sway
 local function signPose(s, t, u)
     local q, ph = s.pose, s.phase
     local settle = math.min(1, u / SIGNS.settle_s)
@@ -1086,7 +1084,7 @@ local function drawConfirm()
     pk.veil:SetOpacity(CONF.veil_opacity * math.min(1, t / SIGNS.fall_s) * (1 - k))
     pk.veil:Draw(0, 0)
 
-    -- where every sign is this frame: the options follow the title sign they hang from
+    -- poses; options follow the title sign
     local poses = {}
     for i, s in ipairs(c.signs) do
         local dy, landed = signDrop(s, t)
@@ -1105,7 +1103,7 @@ local function drawConfirm()
     local tq = poses[1]
     if tq == nil then return end
 
-    -- ropes: the title's from the top of the screen, each option's from its pair of holes along the title's bottom edge
+    -- ropes: title from the screen top, options from the title's bottom holes
     local hx0, hy = CONF.hole_x, CONF.hole_y
     local thx = title.w / 2 - hx0
     local tlx, tly = at(tq, -thx, -title.h / 2 + hy)
@@ -1126,7 +1124,7 @@ local function drawConfirm()
         end
     end
 
-    -- the option signs, the chosen one framed, then the title sign over them
+    -- option signs, then the title sign over them
     for i = 2, #c.signs do
         local s, q = c.signs[i], poses[i]
         if q ~= nil then
@@ -1169,7 +1167,7 @@ local function drawConfirm()
         end
     end
 
-    -- the question, turned with its sign
+    -- question, rotated with the sign
     local f = fonts.confirm
     local x, y = at(tq, 0, math.floor((f.BoxHeight - math.ceil(f.LineHeight)) / 2) - 1)
     f:Draw(skinString("TOWERSELECT_CONFIRM", "Challenge the Tower?"), x, y, col.sign, col.signOutline, 1, 1, title.w - CONF.title_text_inset, "center", 0, tq.angle)
@@ -1257,7 +1255,7 @@ local function updateConfirm()
     return nil
 end
 
--- ── moving and leaving ────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Moving and leaving ====
 local function move(amount)
     if songlist == nil then return end
     if atRoot() then
@@ -1301,8 +1299,7 @@ local function closeFolder()
     return success
 end
 
--- ── the player, bottom left as in the other selects: the nameplate, the character and puchichara standing on it,
--- the mod icons under it ───────────────────────────────────────────────────────────────────────────────────────
+-- ==== Player ====
 local function drawPlayer()
     local L, A = Layout.player, Animation.puchi
     NAMEPLATE:DrawPlayerNameplate(L.x, L.y, 255, 0)
@@ -1321,7 +1318,7 @@ local function drawPlayer()
     if modicons ~= nil then modicons:Draw(L.x, L.y + L.modicons_dy, 0, "menu", 255) end
 end
 
--- ── stage callbacks ───────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Stage callbacks ====
 function draw()
     if world == nil then return end
     sceneUpdate()
@@ -1344,7 +1341,7 @@ function draw()
     if sc ~= nil and state == "select" then
         local SC = Layout.shortcuts
         if confirm == nil then sc:drawHelper(SC.helper[1], SC.helper[2], a) end
-        -- a tower played at another speed than 1x keeps no record
+        -- non-1x speed: no record
         sc:drawSpeed(SC.speed[1], SC.speed[2], chosen ~= nil and chosen.bpm or nil, a, skinString("TOWERSELECT_NOT_RECORDED", "Not recorded"))
     end
     for _, d in pairs(act) do
@@ -1383,7 +1380,7 @@ local function updateModes(nav)
     end
 end
 
--- the song select's shortcuts: the help panel, auto play, the song speed (the preview follows it)
+-- song select shortcuts; true when the help panel opens
 local function shortcuts()
     if sc:pressed("help") then sc:open(); return true end
     if sc:pressed("auto_p1") then
@@ -1537,7 +1534,7 @@ end
 
 function activate()
     CONFIG.PlayerCount = 1
-    if not backFromPlay then CONFIG.SongSpeed = 20 end   -- other modes may have changed it; a tower play keeps it
+    if not backFromPlay then CONFIG.SongSpeed = 20 end   -- may be changed by other modes; kept after a tower play
 
     clock, T, focus, state, refused, landShake = 0, 0, 1, "modes", -100, -100
     if backFromPlay then state, T, backFromPlay = "select", ENTER["end"], false end
@@ -1553,7 +1550,7 @@ function activate()
     grey = GRADIENT:Create(Config.plain(Layout.colors.grey_ramp), 1)
     chara = CHARACTER:GetPlayerCharacter(0)
     if chara ~= nil then
-        -- a still pose: one update picks the first frame (none is drawn before), and none follows
+        -- still pose: one update picks the first frame, no later updates
         chara:LoadAnimation(CHARACTER.ANIM_GAME_TOWER_CLIMBING)
         chara:SetAnimationCyclesFromBPM(CHARACTER.ANIM_GAME_TOWER_CLIMBING, 120)
         chara:ResetAnimationCounter(CHARACTER.ANIM_GAME_TOWER_CLIMBING)

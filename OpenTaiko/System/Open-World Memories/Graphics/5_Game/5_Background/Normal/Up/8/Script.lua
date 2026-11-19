@@ -1,11 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Up background 8: a single BG tile + two horizontally-scrolling ribbon layers, per player row.
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
---   func:AddGraph      -> TEXTURE:CreateTextureSync into the local `tx` registry (onStart)
---   func:DrawGraph     -> tx[name]:Draw  ;  func:DrawRectGraph -> tx[name]:DrawRect
---   prelude globals    -> the `state` table passed to update/draw; deltaTime -> fps.deltaTime
--- NOTE: original init() computed maxPlayerLoop from the global playerCount; since onStart runs before
--- state is available, that player-count clamp is moved into draw() (uses state.playerCount) instead.
+-- up background 8
 
 local ribbon0LoopWidth = 1566
 local ribbon1LoopWidth = 1566
@@ -26,7 +20,7 @@ function onStart()
     tx["Ribbon0.png"] = TEXTURE:CreateTextureSync("Ribbon0.png")
     tx["Ribbon1.png"] = TEXTURE:CreateTextureSync("Ribbon1.png")
 
-    -- random values to create initial depth
+    -- start offsets
     ribbon0ScrollX = 250
     ribbon1ScrollX = 914
 end
@@ -44,7 +38,7 @@ end
 
 
 function draw(state)
-    -- avoid unnecessary draw loops for 3+ players
+    -- at most 2 rows
     local maxPlayerLoop = math.min(state.playerCount - 1, 1)
 
     for player = 0, maxPlayerLoop do

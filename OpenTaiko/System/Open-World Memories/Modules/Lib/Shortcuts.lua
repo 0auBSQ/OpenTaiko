@@ -1,6 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- Shortcuts.lua — a select screen's keyboard shortcuts as the song select shows them: the same bindings (theme
--- settings songselect_key_<id>), the "[key] - Show shortcuts" line, the help panel and the song speed notice.
+-- select screen keyboard shortcuts, as in song select (theme settings songselect_key_<id>)
 
 local HERE = require("Core.Here")(...)
 local PopUI = require("PopUI")
@@ -58,8 +57,8 @@ local function sound(name)
     if s ~= nil then s:Play() end
 end
 
--- o.ids: the shortcuts this screen offers, in the panel's order; o.nav: its player's NavInput;
--- o.disabled(id): true for a shortcut left out now (Event Mode...)
+-- o.ids: offered shortcuts, panel order; o.nav: the player's NavInput
+-- o.disabled(id): true to leave a shortcut out for now
 function Shortcuts.new(o)
     local self = setmetatable({}, Shortcuts)
     self.ids, self.nav = o.ids, o.nav
@@ -120,7 +119,7 @@ function Shortcuts.stepSpeed(step)
     return spd
 end
 
--- ── the "[key] - Show shortcuts" line: white text on a rounded dark box, pulsing ──────────────────────────────
+-- ==== Helper line ====
 function Shortcuts:drawHelper(x, y, opacity)
     local l = keyLabel(self.keys["help"])
     if l == nil or self.disabled("help") or (opacity or 1) <= 0 then return end
@@ -154,7 +153,8 @@ function Shortcuts:drawHelper(x, y, opacity)
     gf:Draw(text, x + H.pad_x - pad, y + H.pad_y, self.helperCol, self.helperOutlineCol, a, 1, 0, "topleft")
 end
 
--- ── the song speed notice, centred on x from y: its label, its value with two ▶ pulsing on the beat, a note ────
+-- ==== Song speed notice ====
+-- centred on x, from y down
 function Shortcuts:drawSpeed(x, y, bpm, opacity, note)
     local mult = CONFIG.SONGSPEED:ToActual(CONFIG.SongSpeed)
     if mult == 1 or (opacity or 1) <= 0 then return end
@@ -179,7 +179,7 @@ function Shortcuts:drawSpeed(x, y, bpm, opacity, note)
     if note ~= nil and note ~= "" then self.labelFont:Draw(note, x, vy + S.note_dy, col, nil, opacity, 1, 0, "top") end
 end
 
--- ── the help panel: every shortcut as "[key] - what it does", over a dimmed screen ───────────────────────────
+-- ==== Help panel ====
 function Shortcuts:open()
     self:reload()
     self.lines = {}

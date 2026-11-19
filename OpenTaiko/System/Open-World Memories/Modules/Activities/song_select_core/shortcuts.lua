@@ -1,13 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- shortcuts.lua — the song select's keyboard shortcuts.
---
--- Every shortcut is a theme setting of type "key" (ThemeSettings.json, ids songselect_key_<id>): one keyboard
--- key each, bound in the settings menu's Theme tab, "" = unbound. The bindings are read on every activate so
--- a change in the settings shows on the next visit. Below the "Select a Song" overlay the helper line
--- "[key] - Show shortcuts" pulses; that key opens a PopUI panel listing every shortcut as "[key] - what it does".
---
---   SC.init(G)   SC.reload()   SC.pressed(id)   SC.label(id)   SC.helperText()
---   SC.open()    SC.isOpen()   SC.update(ts)    SC.draw(opacity)   SC.dispose()
+-- song select keyboard shortcuts
 
 local PopUI = require("PopUI")
 local Config = require("Core.Config")
@@ -17,7 +9,7 @@ local P      = Layout.shortcuts
 local M = {}
 local G
 
--- id, default key, locale key of the description; the order is the help panel's order
+-- id, default key, description locale key; help panel order
 local DEFS = {
     { id = "help",             default = "Tab",         text = "SONGSELECT_SC_HELP" },
     { id = "sort",             default = "Space",       text = "SONGSELECT_SC_SORT" },
@@ -34,7 +26,7 @@ local DEFS = {
 }
 M.DEFS = DEFS
 
--- SlimDX key names that read better than their enum name; letters, digits and function keys pass through
+-- display names for SlimDX keys (others pass through)
 local KEY_NAMES = {
     LeftControl = "L-Ctrl", RightControl = "R-Ctrl", LeftShift = "L-Shift", RightShift = "R-Shift",
     LeftAlt = "L-Alt", RightAlt = "R-Alt", Return = "Enter", Escape = "Esc", Back = "Backspace",
@@ -64,30 +56,29 @@ end
 
 M.keys = {}      -- id -> key name ("" = unbound)
 
--- Event Mode leaves these out: no auto play, no favorites; sort and search stay
+-- off in Event Mode
 local EVENT_DISABLED = { favorite = true, favorites_folder = true, auto_p1 = true, auto_p2 = true }
--- the online lobby's song select picks the song for one player: no auto play, no player count or switch
+-- off in the online lobby (one player picks the song)
 local ONLINE_DISABLED = { auto_p1 = true, auto_p2 = true, player_count = true, player = true }
 
 function M.init(g) G = g end
 
--- A shortcut this song select cannot use is left out everywhere: the help panel does not list it and its key
--- does nothing. Decided from the select's set-up (G.activeConfig), never from the current player count: the
--- regular select can change its count at any time, so it keeps every player shortcut.
+-- unusable here: hidden from help, key ignored
+-- from G.activeConfig, not the live player count
 local function disabled(id)
     if G == nil then return false end
     local cfg = G.activeConfig or {}
     if ONLINE_DISABLED[id] and cfg.songOnly then return true end
     if EVENT_DISABLED[id] and G.event ~= nil and G.event.on() then return true end
     if id == "player_count" then return cfg.allowPlayerCount == false end   -- training, AI battle: the count is fixed
-    -- locked to one player (training), or P2 is the AI: nobody to switch to, no P2 auto play
+    -- one locked player or P2 = AI: no switch, no P2 auto
     if id == "player" or id == "auto_p2" then
         return cfg.mountAISlotToP2 == true or (cfg.lockedPlayerCount ~= nil and cfg.lockedPlayerCount < 2)
     end
     return false
 end
 
--- read every binding from the theme settings (a missing definition keeps the default)
+-- bindings from theme settings songselect_key_<id> ("" = unbound, missing = default)
 function M.reload()
     for _, d in ipairs(DEFS) do
         local ok, v = pcall(function() return THEME:GetThemeSetting("songselect_key_" .. d.id) end)
@@ -95,14 +86,14 @@ function M.reload()
     end
 end
 
--- A shortcut on a modifier key fires when the key is let go after a short tap, so a desktop combination
--- (Ctrl+Q closing the game, Alt+Tab...) never triggers it: the game closes or the key is held longer first.
+-- modifier shortcuts fire on release after a tap (< TAP_MS)
+-- so desktop combinations never trigger them
 local MODIFIERS = {
     LeftControl = true, RightControl = true, LeftShift = true, RightShift = true,
     LeftAlt = true, RightAlt = true, LeftWindowsKey = true, RightWindowsKey = true,
 }
 local TAP_MS = 500
-local tapStart = {}   -- id -> the time its modifier went down
+local tapStart = {}   -- id -> modifier down time
 
 function M.pressed(id)
     if disabled(id) then return false end
@@ -119,21 +110,21 @@ function M.pressed(id)
     return false
 end
 
--- "[Space]" for a bound shortcut, the unbound text otherwise
+-- "[key]" when bound, else the unbound text
 function M.label(id)
     local l = keyLabel(M.keys[id])
     if l == nil then return tr("SONGSELECT_UNBOUND", "(not bound)") end
     return "[" .. l .. "]"
 end
 
--- the helper line under the overlay; nil when the help shortcut is unbound
+-- helper line text; nil when help is unbound
 function M.helperText()
     local l = keyLabel(M.keys["help"])
     if l == nil then return nil end
     return "[" .. l .. "] - " .. tr("SONGSELECT_SHORTCUTS_HELPER", "Show shortcuts")
 end
 
--- ── the help panel ───────────────────────────────────────────────────────────
+-- ==== Help panel ====
 
 local SW, SH = 1920, 1080
 local PANEL_W, ROW_H, HEAD_H, FOOT_H = P.panel_w, P.row_h, P.head_h, P.foot_h
@@ -188,10 +179,10 @@ local function close()
 end
 M.close = close
 
--- runs instead of the song select input while the panel is up
+-- replaces song select input while open
 function M.update(ts)
     if not open then return end
-    if justOpened then justOpened = false; return end   -- the opening press never reaches the panel
+    if justOpened then justOpened = false; return end   -- skip the opening press
     local r = nil
     if ui ~= nil then r = ui:update(ts) end
     if wantClose or r == "cancel" or M.pressed("help") or G.NavInput.decide() or G.NavInput.cancel() then close() end

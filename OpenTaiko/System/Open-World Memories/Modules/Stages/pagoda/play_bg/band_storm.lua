@@ -1,4 +1,4 @@
--- Floor 20 band: the level-20 cutscene's storm (encounter/cutscenes/storm.lua, silent) behind Tobiraph.
+-- floor 20 band: storm from encounter/cutscenes/storm.lua (silent)
 
 local assets = require("encounter/assets")
 local view   = require("encounter/bands/view")
@@ -21,7 +21,7 @@ function M.keys(ctx)
 end
 
 function M.open(ctx)
-    -- the storm places through the encounter view; reset so it is settled and unshaken
+    -- storm uses the encounter view: reset to settled, no shake
     view.reset()
     view.update(SETTLED)
     view.shake(0, 0)

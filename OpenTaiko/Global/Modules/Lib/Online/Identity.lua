@@ -1,8 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field
--- Online.Identity: what a player sends about themselves when they enter a room (NET:SetLocalPlayer), and
--- how the others read it back from NET:PeersJson. The info carries the name, character, puchichara,
--- nameplate id, dan plate and character palette, so every machine can show each remote player on a
--- virtual slot.
+-- Online.Identity: join info a player sends (NET:SetLocalPlayer), parsed back from NET:PeersJson
 
 local P = require("Online.Protocol")
 
@@ -14,9 +11,8 @@ local M = {}
 -- the local player's name (save slot 0)
 function M.myName() local sf = GetSaveFile(0); local n = sf and sf.Name; if n == nil or n == "" then n = "Player" end return n end
 
--- the local player's selected character palette, as a JSON object {"b":blend,"s":[[pos,r,g,b(,a)],...]}
--- (or "null"). Read from the character's own Palettes.json by the saved selection index, so the receiver
--- does not need its own copy of that palette file.
+-- selected palette as JSON {"b":blend,"s":[[pos,r,g,b(,a)],...]} or "null"
+-- read from the character's Palettes.json: the receiver needs no copy
 function M.selfPaletteJson()
     local out = "null"
     pcall(function()
@@ -40,8 +36,8 @@ function M.selfPaletteJson()
     return out
 end
 
--- the local player's join info. npk is the nameplate id: the receiver takes title, type and rarity from its
--- own catalogue and shows no title when it lacks that id; dgold/dtype style the dan plate; pal is the palette.
+-- join info JSON; npk = nameplate id (the receiver looks it up in its own catalogue)
+-- dgold/dtype = dan plate style, pal = palette
 function M.selfInfo()
     local sf = GetSaveFile(0)
     local char, puchi, dan = "None", "None", ""

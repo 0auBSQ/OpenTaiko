@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Tower dropout (fail) animation: slide-in then fall. Group C end-anime (per-player via state.player).
+-- end anime: Tower_Dropout (group C, player via state.player)
 
 local y = { 218, 482, 0, 0, 0 }
 

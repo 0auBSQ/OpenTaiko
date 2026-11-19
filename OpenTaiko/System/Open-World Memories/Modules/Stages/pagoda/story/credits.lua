@@ -1,10 +1,11 @@
--- End credits rows, top to bottom:
---   { header = "..." }     a section title
---   { line = "..." }       a line of the section
---   { gap = true }         an empty line
---   { composers = true }   the composers (story/credits_composers.lua) in rows of three
---   { last = "..." }       the line the roll stops on, in the middle of the screen
+-- end credits
 
+-- rows, top to bottom:
+--   { header = "..." }     section title
+--   { line = "..." }       section line
+--   { gap = true }         empty line
+--   { composers = true }   story/credits_composers.lua, rows of three
+--   { last = "..." }       roll stops on it, mid-screen
 return {
     { header = "Character Concepts and planning" },
     { line = "Dashy, IID, Komi" },

@@ -462,7 +462,7 @@ De eigenschap UnlockCondition van naamplaatje-info-handles, personagelijstitems 
 De resolutie van de skin, thema-instellingen, gelokaliseerde strings op skinniveau en de definities van thema-instellingen.
 
 <div class="callout warn">
-De skin declareert thema-instellingen in ThemeSettings.json en slaat hun waarden op in de ThemeSettings.db3 ernaast. De getters geven instellingswaarden altijd als strings terug; een ontbrekende instelling geeft haar gedeclareerde standaardwaarde terug, of een lege string als er geen declaratie bestaat. De ForPlayer-methoden zetten een speler buiten bereik op 0 of 4. Definitie-indices beginnen bij 0.
+De skin declareert thema-instellingen in ThemeSettings.json en slaat hun waarden op in `Global/ApplicationData/SkinSettings_<skin folder>.db3`, buiten de skinmap, zodat ze een skin-update overleven. De getters geven instellingswaarden altijd als strings terug; een ontbrekende instelling geeft haar gedeclareerde standaardwaarde terug, of een lege string als er geen declaratie bestaat. De ForPlayer-methoden zetten een speler buiten bereik op 0 of 4. Definitie-indices beginnen bij 0.
 </div>
 
 | Methode | Beschrijving |

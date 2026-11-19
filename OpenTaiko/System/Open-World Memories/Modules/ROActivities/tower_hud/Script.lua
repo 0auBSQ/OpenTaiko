@@ -1,18 +1,8 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
--- tower_hud ROActivity
--- ------------------------------------------------------------------------------------------------------
--- The tower climb's head-up display, in the band between the top of the screen and the lane: one wooden
--- plank hanging from the top of the screen on two ropes, swaying a little. It holds three rows:
---   the "Reached floor" title
---   Floor n/k, the current floor on a small split-flap panel that flips when a floor is reached
---   Lives, a bar of one segment per life (a plain bar from a hundred lives up), blue while the lives are
---   above half, yellow above a fifth, red below (and on the last life)
--- The art is in Textures/ (the plank, the flap, a rope tile stretched to length, the knots, the bar back
--- and a white segment tinted per life); the texts come from the skin locale and centre on the plank.
--- Driven by the gameplay screen: activate(maxFloor), update() and draw() every frame, deactivate(). The
--- floor and the lives are read from PLAYSTATE.
+-- tower_hud ROActivity: tower climb HUD on a hanging plank
+-- gameplay calls activate(maxFloor), update() and draw() per frame, deactivate(); data from PLAYSTATE
 
--- positions, sizes and colours: Config/layout.json; the flip and the sway: Config/animation.json
+-- layout: Config/layout.json; flip and sway: Config/animation.json
 local Config = require("Core.Config")
 local Layout = Config.load("Config/layout.json")
 local Animation = Config.load("Config/animation.json")
@@ -24,22 +14,22 @@ local SWAY_Y = SWAY.y
 local FONT_SIZES = Layout.font_sizes
 local TITLE_SIZE, LABEL_SIZE, NUMBER_SIZE, LIVES_SIZE = FONT_SIZES.title, FONT_SIZES.label, FONT_SIZES.number, FONT_SIZES.lives
 local CENTER_X = PLANK.center_x
-local ROPE_TOP = PLANK.top    -- where the two ropes start, just above the screen
-local ROPE_LENGTH = PLANK.rope_length   -- from there down to the plank's top edge
-local HOLE_INSET_X, HOLE_INSET_Y = PLANK.hole_inset.x, PLANK.hole_inset.y   -- the rope holes, from the plank's ends and top edge
-local ROWS = PLANK.rows   -- the rows' centre heights, from the plank's top edge
+local ROPE_TOP = PLANK.top    -- rope start y, above the screen
+local ROPE_LENGTH = PLANK.rope_length   -- down to the plank top edge
+local HOLE_INSET_X, HOLE_INSET_Y = PLANK.hole_inset.x, PLANK.hole_inset.y   -- rope holes, from the plank ends and top edge
+local ROWS = PLANK.rows   -- row centre heights, from the plank top edge
 local FLIP_SECONDS = FLIP.flip_s
 local BAR_W, BAR_H = LIVES.bar_width, LIVES.bar_height
-local PLAIN_BAR_FROM = LIVES.plain_from   -- lives from which the bar has no segments
+local PLAIN_BAR_FROM = LIVES.plain_from   -- from this many lives: plain bar, no segments
 
 local fontTitle, fontLabel, fontNumber, fontLives
 local colText, colOutline
 local colLives = {}
 
-local tex = {}                 -- the textures by file name
+local tex = {}                 -- textures by file name
 local plank = nil              -- texture, w, h, cx, cy (rest position), phase, holes, the rows' heights, pose
-local strings = {}             -- the localized texts
-local layout = {}              -- the centres of the floor and lives rows' pieces, as x offsets from the plank's centre
+local strings = {}
+local layout = {}              -- floor and lives row piece centres, x from the plank centre
 local maxFloor = 0
 
 local floor, lives, maxLives = 1, 5, 5
@@ -54,10 +44,10 @@ local function tr(key, fallback)
     return fallback
 end
 
--- a glyph line anchored at its middle sits its ink high by half the box's bottom padding
+-- middle-anchored glyph line: ink sits high by half the bottom padding
 local function nudge(gf) return math.floor((gf.BoxHeight - math.ceil(gf.LineHeight)) / 2) + Layout.text_nudge end
 
--- ── layout ───────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Layout ====
 
 local function buildLayout()
     strings.title = tr("TOWER_HUD_REACHED", "Reached floor")
@@ -76,7 +66,7 @@ local function buildLayout()
     layout.flapX = left + prefixW + flapW / 2
     layout.restX = left + prefixW + flapW + floorGap + restW / 2
 
-    -- the lives row holds the label then the bar
+    -- lives row: label, then the bar
     local livesW = fontLives:Measure(strings.lives)
     local contentW = livesW + LIVES.gap + BAR_W
     layout.livesX = -contentW / 2 + livesW / 2
@@ -91,7 +81,7 @@ local function buildLayout()
               pose = { x = CENTER_X, y = cy, angle = 0, s = 0, c = 1 } }
 end
 
--- ── lifecycle ────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Lifecycle ====
 
 function onStart()
     for _, name in ipairs({ "plank", "flap", "rope", "knot", "bar_back", "bar_segment" }) do
@@ -120,7 +110,7 @@ end
 function activate(count)
     maxFloor = math.max(1, math.floor(tonumber(count) or 1))
     buildLayout()
-    -- every glyph the HUD shows is baked here, inside the song load, not on its first draw during play
+    -- bake every HUD glyph during the song load, not on first draw in play
     fontTitle:Draw(strings.title, -10000, -10000, colText, colOutline, 0)
     fontLabel:Draw(strings.prefix .. strings.rest, -10000, -10000, colText, colOutline, 0)
     fontLives:Draw(strings.lives, -10000, -10000, colText, colOutline, 0)
@@ -150,10 +140,9 @@ function update()
     end
 end
 
--- ── drawing ──────────────────────────────────────────────────────────────────────────────────────────
+-- ==== Drawing ====
 
--- the plank's swaying pose this frame (kept in the plank, nothing allocated per frame): centre, tilt in
--- degrees, and the sine and cosine of the tilt
+-- plank pose, stored in p (no per-frame allocation): centre, tilt deg, its sin and cos
 local function pose(p)
     local t = clock
     local ph = p.phase
@@ -168,8 +157,7 @@ local function pose(p)
     return q
 end
 
--- a point given in the plank's own frame (offsets from its centre, y down), on screen: the tilt is
--- counter-clockwise on screen like SetRotation
+-- plank-local (dx, dy from centre, y down) -> screen; tilt CCW like SetRotation
 local function at(p, q, dx, dy)
     return q.x + dx * q.c + dy * q.s, q.y - dx * q.s + dy * q.c
 end
@@ -223,7 +211,7 @@ local function drawBar(cx, q)
     seg:SetColor(1.0, 1.0, 1.0)
 end
 
--- the current floor on its flap: the old number folds away along the seam, the new one unfolds
+-- floor flap flip: old number folds, new one unfolds
 local function drawFloorFlap(q)
     local p = plank
     local px, py = at(p, q, layout.flapX, p.floorY)
@@ -259,7 +247,7 @@ function draw()
     local p = plank
     local q = pose(p)
 
-    -- the two ropes, from the top of the screen to the holes at the plank's top corners, then the plank
+    -- ropes to the plank's top holes, then the plank
     local hx, hy = p.hx, p.hy
     local lx, ly = at(p, q, -hx, -hy)
     local rx, ry = at(p, q, hx, -hy)
@@ -270,16 +258,14 @@ function draw()
     tex.knot:DrawAtAnchor(lx, ly, "center")
     tex.knot:DrawAtAnchor(rx, ry, "center")
 
-    -- the title
     local tx, ty = at(p, q, 0, p.titleY)
     fontTitle:Draw(strings.title, tx, ty + nudge(fontTitle), colText, colOutline, 1, 1, p.w - Layout.title.text_margin, "center", 0, q.angle)
-    -- prefix, the flap, "/k" and the suffix
+    -- prefix, flap, "/k", suffix
     local fx, fy = at(p, q, layout.prefixX, p.floorY)
     fontLabel:Draw(strings.prefix, fx, fy + nudge(fontLabel), colText, colOutline, 1, 1, 0, "center", 0, q.angle)
     drawFloorFlap(q)
     fx, fy = at(p, q, layout.restX, p.floorY)
     fontLabel:Draw(strings.rest, fx, fy + nudge(fontLabel), colText, colOutline, 1, 1, 0, "center", 0, q.angle)
-    -- the label and the bar
     local bx, by = at(p, q, layout.livesX, p.livesY)
     fontLives:Draw(strings.lives, bx, by + nudge(fontLives), colText, colOutline, 1, 1, 0, "center", 0, q.angle)
     drawBar(layout.barX, q)

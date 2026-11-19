@@ -1,12 +1,5 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
--- Saves.SavePicker — the save chosen before a stage opens: a list of the local saves, each with its nameplate
--- and a line of information the caller gives (or its coin count). The choice travels to the stage through
--- SHARED. The list is built with the skin's UI library (UI.Pick) unless the caller passes one.
---
---   local SavePicker = require("Saves.SavePicker")
---   local slot = SavePicker.open{ kind = "room" }     -- a slot at once when there is nothing to choose
---   ... SavePicker.update(ts) -> nil | "cancel" | slot;  SavePicker.draw();  SavePicker.pass(slot)
---   in the stage opened: local slot = SavePicker.take() or SavePicker.first()
+-- Saves.SavePicker: save list shown before a stage opens; the choice goes through SHARED
 
 local HERE = require("Core.Here")(...)
 local I18N = require("Locale.i18n")
@@ -23,7 +16,7 @@ local INFO_SIZE = 28
 local COINS_W = 320
 local CLEAR = { 255, 255, 255, 0 }
 
--- the titles a caller may ask for by kind, and the one shown when it gives neither a title nor a kind
+-- title ids by kind; FALLBACK.title when neither title nor kind
 local TITLES = { room = "title_room", shop = "title_shop" }
 local FALLBACK = { title = "Whose save?", title_room = "Whose room?", title_shop = "Whose shop?" }
 
@@ -76,8 +69,8 @@ function SP.close()
     ui, menu, entries, picked = nil, nil, {}, nil
 end
 
--- o: title (or kind = "room" | "shop" for this module's own title), info(slot, save) -> text|nil,
--- coins (show each save's coin count), theme, sfx, ui (a UI library table, or its require name; default UI.Pick)
+-- o: title (or kind = "room" | "shop"), info(slot, save) -> text|nil, coins (show coin counts),
+-- theme, sfx, ui (library table or require name; default UI.Pick)
 -- returns the slot at once when there is nothing to choose, else nil with the list open
 function SP.open(o)
     o = o or {}
@@ -103,7 +96,7 @@ function SP.open(o)
     ui:panel{ x = x, y = y, w = PANEL_W, h = h, title = title }
     menu = ui:menu{ x = x + 36, y = y + 100, w = PANEL_W - 72, h = #items * ROW, rowHeight = ROW, items = items,
                     onSelect = function(_, it) picked = it.value end }
-    -- each save's coins: the UI's coin counter, the number ending where the row's text ends
+    -- coin counter per save, right-aligned with the row text
     local right = menu.x + menu.w - 30
     for i, e in ipairs(entries) do
         if e.coins ~= nil then
@@ -130,7 +123,7 @@ function SP.update(ts)
     return nil
 end
 
--- the info text colours of a row: the outlined letters of a UI that outlines its text, else the theme's colours
+-- row text colours: outlined set when the UI outlines text, else theme colours
 local function rowColors(sel)
     local th = ui.theme
     if th.textOutline == false then

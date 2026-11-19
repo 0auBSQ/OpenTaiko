@@ -163,7 +163,7 @@ Wanneer het geselecteerde pakket een bestand mist, neemt het spel het uit pakket
 
 ## Stap 8: Kies een pakket
 
-Wanneer een skin minstens 2 pakketten in een van de drie mappen heeft, toont de themapagina van de instellingen eerst een sectie Noot-skins, met één keuze voor die map en de preview van het pakket eronder. Het spel laadt het gekozen pakket meteen en onthoudt de keuze voor de skin in `ThemeSettings.db3`. Met één pakket verschijnt de keuze niet, en gebruikt het spel dat pakket.
+Wanneer een skin minstens 2 pakketten in een van de drie mappen heeft, toont de themapagina van de instellingen eerst een sectie Noot-skins, met één keuze voor die map en de preview van het pakket eronder. Het spel laadt het gekozen pakket meteen en onthoudt de keuze voor de skin in diens instellingendatabase. Met één pakket verschijnt de keuze niet, en gebruikt het spel dat pakket.
 
 Een Lua-module leest een bestand van het geselecteerde pakket met `THEME:GetNotesSkinFile(kind, file)` (zie [Spelers en profielen](../api/players.md)). De meegeleverde nummerselectie gebruikt het om de beoordelingsteksten van haar replaylijst te tekenen:
 

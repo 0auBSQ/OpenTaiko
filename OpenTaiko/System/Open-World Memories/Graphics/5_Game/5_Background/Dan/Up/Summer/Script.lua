@@ -1,11 +1,10 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Dan up background "Summer": dojo skybox with scrolling clouds, a bush, and three
--- swaying/falling leaf layers. Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
+-- dan up background: summer
 
 local bgWidth_1 = 1984
 local bgWidth_4 = 962
 local bgScrollX_1 = 0
-local bgScrollX_4 = 0   -- NOTE: advanced in update but never used in draw (preserved from original)
+local bgScrollX_4 = 0   -- unused in draw
 
 local leafScrollX_1 = 0
 local leafScrollX_2 = 150
@@ -76,7 +75,7 @@ function update(timestamp, state)
     leafSway_2 = leafSway_2 + (70 * fps.deltaTime)
     leafSwayFinal_2 = 60 * math.cos((5 * leafSway_2) / 120) * math.sin((2 * leafSway_2) / 120)
     leafSway_3 = leafSway_3 + (36 * fps.deltaTime)
-    leafSwayFinal_3 = 40 * math.cos((5 * leafSway_2) / 130) * math.sin((2 * leafSway_2) / 130)   -- original uses leafSway_2 (not _3) — preserved
+    leafSwayFinal_3 = 40 * math.cos((5 * leafSway_2) / 130) * math.sin((2 * leafSway_2) / 130)   -- leafSway_2 on purpose
 
     leafRot1 = leafRot1 + (28 * fps.deltaTime)
     leafRot2 = leafRot2 + (40 * fps.deltaTime)

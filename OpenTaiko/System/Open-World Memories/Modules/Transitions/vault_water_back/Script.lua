@@ -40,7 +40,7 @@ local wait = TA.new()
 
 local function clamp01(x) return x < 0 and 0 or (x > 1 and 1 or x) end
 local function rnd(a, b) return a + (b - a) * math.random() end
--- smootherstep: from rest to rest, no jolt at either end
+-- smootherstep (zero speed at both ends)
 local function glide(u) u = clamp01(u); return u * u * u * (u * (6 * u - 15) + 10) end
 -- its speed against its fastest: 0 at both ends, 1 halfway
 local function pace(u) u = clamp01(u); return 16 * u * u * (1 - u) * (1 - u) end
@@ -88,8 +88,7 @@ local function once(key, snd)
 	if snd then snd:Play() end
 end
 
--- real seconds since the last frame, so the water keeps its pace through slow frames behind the cover (a frame
--- slower than 0.5 s counts 0.5)
+-- real seconds since the last frame, at most 0.5 (pace kept through slow frames behind the cover)
 local function tick()
 	local d
 	local ok, ms = pcall(function() return fps.ms end)

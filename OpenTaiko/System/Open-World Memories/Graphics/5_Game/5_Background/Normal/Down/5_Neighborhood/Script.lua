@@ -1,7 +1,5 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
--- Down background "Neighborhood": a static down view that fades to a starry night on clear,
--- with twinkling (sin-pulsed opacity) and slowly rocking (sin rotation) stars.
--- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
+-- down background: Neighborhood
 
 local downY = 540
 local bgClearFade = 0
@@ -24,7 +22,6 @@ function onStart()
 end
 
 function update(timestamp, state)
-    -- Clear fade
     if state.isClear[0] then
         bgClearFade = math.min(bgClearFade + (2000 * fps.deltaTime), 255)
     else
