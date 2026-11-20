@@ -1412,6 +1412,9 @@ internal class CTja : CActivity {
 							}
 					}
 				}
+				// NOTE: Fairly Ad-hoc solution for the 2-5P missing in autoplay issue, to keep an eye on
+				// re-sort: OFFSET moves music and note chips apart
+				this.listChip.Sort();
 				#endregion
 
 				#region[listlyricを時間順に並び替え。]

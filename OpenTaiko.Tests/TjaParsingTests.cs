@@ -76,6 +76,14 @@ namespace OpenTaikoTests {
 			var tja = Parse(Path.Combine(CasesDir, tjaName), difficulty, playerSide, loadChart);
 			Assert.NotNull(tja.listChip);   // the parse must at least have survived
 
+			// every loaded chart: listChip in CChip order (the hit search binary-searches it)
+			if (loadChart) {
+				var l = tja.listChip;
+				for (int k = 1; k < l.Count; k++)
+					Assert.True(l[k - 1].CompareTo(l[k]) <= 0,
+						$"{name}: chip {k} (ch{l[k].nChannelNo:X2} at {l[k].dbSoundTimems}ms) sorts before chip {k - 1} (ch{l[k - 1].nChannelNo:X2} at {l[k - 1].dbSoundTimems}ms)");
+			}
+
 			if (!root.TryGetProperty("expect", out var exp)) return;
 
 			if (exp.TryGetProperty("title", out var v))
