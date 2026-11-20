@@ -8,10 +8,10 @@ namespace OpenTaiko;
 
 static internal class CExamInfo {
 	// Includes the gauge exam, DanCert max number of exams is 6
-	public static readonly int cMaxExam = 7;
+	public const int cMaxExam = 7;
 
 	// Max number of songs for a Dan chart
-	public static readonly int cExamMaxSongs = 9;
+	public const int cExamMaxSongs = 9;
 }
 
 

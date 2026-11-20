@@ -47,34 +47,36 @@ internal class CActImplPad : CActivity {
 				this.nYCoordControlTimer = SoundManager.PlayTimer.NowTimeMs;
 				base.IsFirstDraw = false;
 			}
-			long num = SoundManager.PlayTimer.NowTimeMs;
-			if (num < this.nFlashControlTimer) {
-				this.nFlashControlTimer = num;
+			long msNow = SoundManager.PlayTimer.NowTimeMs;
+			if (msNow < this.nFlashControlTimer) {
+				this.nFlashControlTimer = msNow;
 			}
-			while ((num - this.nFlashControlTimer) >= 15) {
+			var nStepsFlash = (msNow - this.nFlashControlTimer) / 15;
+			if (nStepsFlash > 0) {
 				for (int j = 0; j < 10; j++) {
-					if (this.stPadState[j].nBrightness > 0) {
-						this.stPadState[j].nBrightness--;
-					}
+					ref int rBright = ref this.stPadState[j].nBrightness;
+					if (rBright > 0)
+						rBright = (int)Math.Max(0, rBright - nStepsFlash);
 				}
-				this.nFlashControlTimer += 15;
+				this.nFlashControlTimer += 15 * nStepsFlash;
 			}
-			long num3 = SoundManager.PlayTimer.NowTimeMs;
-			if (num3 < this.nYCoordControlTimer) {
-				this.nYCoordControlTimer = num3;
+			if (msNow < this.nYCoordControlTimer) {
+				this.nYCoordControlTimer = msNow;
 			}
-			while ((num3 - this.nYCoordControlTimer) >= 5) {
+			var nStepsY = (msNow - this.nYCoordControlTimer) / 5;
+			if (nStepsY > 0) {
 				for (int k = 0; k < 10; k++) {
-					this.stPadState[k].nYCoordOffsetdot += this.stPadState[k].nYCoordAccelerationdot;
-					if (this.stPadState[k].nYCoordOffsetdot > 15) {
-						this.stPadState[k].nYCoordOffsetdot = 15;
-						this.stPadState[k].nYCoordAccelerationdot = -1;
-					} else if (this.stPadState[k].nYCoordOffsetdot < 0) {
-						this.stPadState[k].nYCoordOffsetdot = 0;
-						this.stPadState[k].nYCoordAccelerationdot = 0;
+					ref STPadState state = ref this.stPadState[k];
+					state.nYCoordOffsetdot += (int)(state.nYCoordAccelerationdot * nStepsY);
+					if (state.nYCoordOffsetdot > 15) {
+						state.nYCoordOffsetdot = 15;
+						state.nYCoordAccelerationdot = -1;
+					} else if (state.nYCoordOffsetdot < 0) {
+						state.nYCoordOffsetdot = 0;
+						state.nYCoordAccelerationdot = 0;
 					}
 				}
-				this.nYCoordControlTimer += 5;
+				this.nYCoordControlTimer += 5 * nStepsY;
 			}
 
 

@@ -226,7 +226,6 @@ namespace OpenTaiko {
 				//   • Audio/note sync is identical to standalone play — the relationship
 				//     between the BGM chip and all note chips is left untouched.
 				double offsetDb = accum;   // anchor = time 0 (start of chart)
-				int offsetMs = (int)Math.Round(offsetDb);
 
 				// OFFSET compensation for HBSCROLL/BMSCROLL.
 				//
@@ -703,9 +702,9 @@ namespace OpenTaiko {
 			//   0xFF with n整数値=0xFF → sets isChartEnded[player] = true, then exits the chip loop (result transition)
 			// Each source TJA normally has its own pair; we stripped those (they would fire after song 0
 			// and prematurely end the entire Dan). Now we add a single pair after the last song.
-			int lastDanChipMs = (output.pDan_LastChip.Length > 0 && output.pDan_LastChip[^1] != null)
+			long lastDanChipMs = (output.pDan_LastChip.Length > 0 && output.pDan_LastChip[^1] != null)
 				? output.pDan_LastChip[^1]!.nSoundTimems
-				: (int)Math.Round(nextsongTime);
+				: (long)Math.Round(nextsongTime);
 
 			var chartEndChip = new CChip();
 			chartEndChip.tInitialize();

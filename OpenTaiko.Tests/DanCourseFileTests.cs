@@ -6,11 +6,9 @@ namespace OpenTaiko.Tests;
 
 // .optktcm / .tcm: scene_preset and level are read from .optktcm only, the dot keys (custom commands) from both
 public class DanCourseFileTests : IDisposable {
-	private readonly string dir = Path.Combine(Path.GetTempPath(), "optk-tcm-" + Guid.NewGuid().ToString("N"));
+	private readonly OpenTaikoTests.TempDir dir = new("optk-tcm-");
 
-	public DanCourseFileTests() => Directory.CreateDirectory(dir);
-
-	public void Dispose() => Directory.Delete(dir, true);
+	public void Dispose() => dir.Dispose();
 
 	private CTcm Load(string fileName, string json) {
 		string path = Path.Combine(dir, fileName);

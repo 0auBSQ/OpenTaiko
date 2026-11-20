@@ -14,20 +14,25 @@ internal class CTextConsole : CActivity {
 	}
 
 	public (int x, int y) Print(int x, int y, EFontType font, string alphanumericString)
-		=> this.Print(x, y, x, font, alphanumericString);
+		=> this.Print(x, y, x, null, font, alphanumericString);
+	public (int x, int y) Print(int x, int y, int xLineBegin, EFontType font, string alphanumericString)
+		=> this.Print(x, y, xLineBegin, null, font, alphanumericString);
 
 	/// Print text with initial cursor position at (x, y) and set cursor to xLineBegin on line wraps
 	/// Returns (x, y) of final cursor position
-	public (int x, int y) Print(int x, int y, int xLineBegin, EFontType font, string alphanumericString) {
+	public (int x, int y) Print(int x, int y, int xLineBegin, int? xLineEnd, EFontType font, string alphanumericString) {
 		if (base.IsDeActivated || string.IsNullOrEmpty(alphanumericString)) {
 			return (x, y);
 		}
 
 		foreach (var ch in alphanumericString) {
-			if (ch == '\n') {
+			bool isWrap = ch == '\n';
+			bool needWrap = isWrap || (xLineEnd.HasValue && x > xLineBegin && x + this.fontWidth > xLineEnd.Value);
+			if (needWrap) {
 				x = xLineBegin;
 				y += this.fontHeight;
-			} else {
+			}
+			if (!isWrap) {
 				int index = printableCharacters.IndexOf(ch);
 				if (index >= 0) {
 					if (this.fontTextures[(int)((int)font / (int)EFontType.WhiteSlim)] != null) {

@@ -8,7 +8,7 @@ namespace OpenTaiko;
 // chip with the same definition index, times and channel (the n-th such chip for the n-th: TCI charts define none). A
 // chip without a twin gets the next draw after the timeline's.
 internal static class ChartModDraws {
-	private readonly record struct TwinKey(int IdxDefine, int MsTimeInt, double MsTime, int Channel, int Occurrence);
+	private readonly record struct TwinKey(int IdxDefine, long MsTimeWhole, double MsTime, int Channel, int Occurrence);
 
 	// the fun mods' seed, so their draws differ from the note shuffle's of the same seed; a negative seed stays unseeded
 	internal static int FunModSeed(int seed) => (seed < 0) ? seed : seed ^ 0x2545F491;
@@ -34,7 +34,7 @@ internal static class ChartModDraws {
 
 	// each chip's twin key, in timeline order
 	private static TwinKey[] TwinKeysOf(List<CChip> chips) {
-		var occurrences = new Dictionary<(int, int, double, int), int>(chips.Count);
+		var occurrences = new Dictionary<(int, long, double, int), int>(chips.Count);
 		var keys = new TwinKey[chips.Count];
 		for (int i = 0; i < chips.Count; i++) {
 			var c = chips[i];

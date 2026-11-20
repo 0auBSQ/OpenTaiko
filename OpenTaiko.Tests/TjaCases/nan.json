@@ -1,0 +1,8 @@
+{
+	"expect": {
+		"bpm": 120,
+		"dons": 5,
+		"noteGapsMs": [ 2000, 2000, 2000, 2000 ],
+		"gapToleranceMs": 1
+	}
+}

@@ -11,13 +11,11 @@ namespace OpenTaikoTests {
 	// count as complete while a queued texture is still waiting for its upload. No GL here: uploads never run.
 	[Collection("texture streaming")]
 	public class TextureSizeTests : IDisposable {
-		private readonly string _dir = Path.Combine(Path.GetTempPath(), "ot_texsize_" + Guid.NewGuid().ToString("N"));
-
-		public TextureSizeTests() { Directory.CreateDirectory(_dir); }
+		private readonly TempDir _dir = new("ot_texsize_");
 
 		public void Dispose() {
 			CTexture.AsyncLoad = false;
-			try { Directory.Delete(_dir, true); } catch { }
+			_dir.Dispose();
 		}
 
 		private string Png(string name, int w, int h) {

@@ -11,20 +11,14 @@ namespace OpenTaikoTests {
 		public ChartVideoMetadataTests(TjaFixture _) { }
 
 		private static CTja Parse(params string[] header) {
-			string dir = Path.Combine(Path.GetTempPath(), "ot_movie_" + Guid.NewGuid().ToString("N"));
-			Directory.CreateDirectory(dir);
-			try {
-				File.WriteAllBytes(Path.Combine(dir, "clip.mp4"), new byte[] { 0 });
-				string p = Path.Combine(dir, "movie.tja");
-				var lines = new List<string> { "TITLE:movie", "BPM:120", "WAVE:none.ogg" };
-				lines.AddRange(header);
-				lines.AddRange(new[] { "COURSE:Oni", "LEVEL:5", "#START", "1000,", "#END" });
-				File.WriteAllText(p, string.Join("\n", lines));
-				var tja = new CTja();
-				tja.Activate();
-				tja.tInput(p, Difficulty.Oni, 0, false, 0);   // metadata only
-				return tja;
-			} finally { try { Directory.Delete(dir, true); } catch { } }
+			using TempDir dir = new("ot_movie_");
+			File.WriteAllBytes(Path.Combine(dir, "clip.mp4"), new byte[] { 0 });
+			string p = Path.Combine(dir, "movie.tja");
+			var lines = new List<string> { "TITLE:movie", "BPM:120", "WAVE:none.ogg" };
+			lines.AddRange(header);
+			lines.AddRange(new[] { "COURSE:Oni", "LEVEL:5", "#START", "1000,", "#END" });
+			File.WriteAllText(p, string.Join("\n", lines));
+			return TjaFixture.ParseTjaFile(p, loadChart: false); // metadata only
 		}
 
 		[Theory]

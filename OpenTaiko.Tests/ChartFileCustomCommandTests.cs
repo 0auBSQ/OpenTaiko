@@ -9,11 +9,11 @@ namespace OpenTaiko.Tests;
 // as a .tja's before its first COURSE and inside one
 [Collection("tja")]
 public class TciCustomCommandTests : IClassFixture<OpenTaikoTests.TjaFixture>, IDisposable {
-	private readonly string dir = Path.Combine(Path.GetTempPath(), "optk-tci-cmd-" + Guid.NewGuid().ToString("N"));
+	private readonly OpenTaikoTests.TempDir dir = new("optk-tci-cmd-");
 
-	public TciCustomCommandTests(OpenTaikoTests.TjaFixture _) => Directory.CreateDirectory(dir);
+	public TciCustomCommandTests(OpenTaikoTests.TjaFixture _) { }
 
-	public void Dispose() => Directory.Delete(dir, true);
+	public void Dispose() => dir.Dispose();
 
 	[Fact]
 	public void FileAndCourseScopes() {

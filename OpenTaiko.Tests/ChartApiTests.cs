@@ -48,7 +48,8 @@ namespace OpenTaikoTests {
 
 		[Fact]
 		public void Level_DecimalParsedTruncatedAndIcon() {
-			string content = string.Join("\n",
+			// loadChart=false: metadata only
+			var tja = TjaFixture.ParseTjaText("ot_deci_", "deci.tja", loadChart: false, content: string.Join("\n",
 				"TITLE:deci",
 				"BPM:120",
 				"WAVE:none.ogg",
@@ -56,27 +57,13 @@ namespace OpenTaikoTests {
 				"LEVEL:12.888",
 				"#START",
 				"1000,",
-				"#END");
-			var tja = Parse(content, Difficulty.Oni);
+				"#END"));
 			var md = tja.SongListCourseMetadata[(int)Difficulty.Oni];
 
 			Assert.Equal(12, md.LEVELtaiko);                         // truncated int kept as before
 			Assert.Equal(12.888, md.LEVELtaikoDecimal, 3);           // fraction now preserved
 			Assert.Equal(CTja.ELevelIcon.ePlus, md.LEVELtaikoIcon);  // .888 >= .5 → plus (unchanged behaviour)
 			Assert.Equal(8, LuaSongChart.FirstDecimalDigit(md.LEVELtaikoDecimal));
-		}
-
-		private static CTja Parse(string content, Difficulty difficulty) {
-			string dir = Path.Combine(Path.GetTempPath(), "ot_deci_" + Guid.NewGuid().ToString("N"));
-			Directory.CreateDirectory(dir);
-			try {
-				string p = Path.Combine(dir, "deci.tja");
-				File.WriteAllText(p, content);
-				var tja = new CTja();
-				tja.Activate();
-				tja.tInput(p, difficulty, 0, false, 0);   // loadChart=false: metadata only
-				return tja;
-			} finally { try { Directory.Delete(dir, true); } catch { } }
 		}
 	}
 
@@ -88,10 +75,8 @@ namespace OpenTaikoTests {
 		[Fact]
 		public void Tci_KeepsDecimalAndDerivesPlusMinusNone() {
 			// dir must outlive BuildSongListNode (it lazily reads the .tci FileInfo.Length)
-			string dir = Path.Combine(Path.GetTempPath(), "ot_tci_" + Guid.NewGuid().ToString("N"));
-			Directory.CreateDirectory(dir);
-			try {
-				string json = @"{
+			using TempDir dir = new("ot_tci_");
+			string json = @"{
   ""title"": ""tcitest"", ""bpm"": 120,
   ""courses"": [
     { ""difficulty"": ""oni"",    ""level"": 12.888, ""single"": ""o.osu"" },
@@ -99,27 +84,26 @@ namespace OpenTaikoTests {
     { ""difficulty"": ""normal"", ""level"": 8,      ""single"": ""n.osu"" }
   ]
 }";
-				string p = Path.Combine(dir, "chart.tci");
-				File.WriteAllText(p, json);
-				var tci = new CTci(p);
+			string p = Path.Combine(dir, "chart.tci");
+			File.WriteAllText(p, json);
+			var tci = new CTci(p);
 
-				var oni = tci.Courses.First(c => c.DifficultyIndex == (int)Difficulty.Oni);
-				Assert.Equal(12, oni.Level);
-				Assert.Equal(12.888, oni.LevelDecimal, 3);
-				Assert.Equal(CTja.ELevelIcon.ePlus, oni.LevelIcon);    // .888 ≥ .5 → +
+			var oni = tci.Courses.First(c => c.DifficultyIndex == (int)Difficulty.Oni);
+			Assert.Equal(12, oni.Level);
+			Assert.Equal(12.888, oni.LevelDecimal, 3);
+			Assert.Equal(CTja.ELevelIcon.ePlus, oni.LevelIcon);    // .888 ≥ .5 → +
 
-				var hard = tci.Courses.First(c => c.DifficultyIndex == (int)Difficulty.Hard);
-				Assert.Equal(10.3, hard.LevelDecimal, 3);
-				Assert.Equal(CTja.ELevelIcon.eMinus, hard.LevelIcon);  // 0 < .3 < .5 → − (was wrongly none)
+			var hard = tci.Courses.First(c => c.DifficultyIndex == (int)Difficulty.Hard);
+			Assert.Equal(10.3, hard.LevelDecimal, 3);
+			Assert.Equal(CTja.ELevelIcon.eMinus, hard.LevelIcon);  // 0 < .3 < .5 → − (was wrongly none)
 
-				var normal = tci.Courses.First(c => c.DifficultyIndex == (int)Difficulty.Normal);
-				Assert.Equal(8.0, normal.LevelDecimal, 3);
-				Assert.Equal(CTja.ELevelIcon.eNone, normal.LevelIcon); // whole number → no icon
+			var normal = tci.Courses.First(c => c.DifficultyIndex == (int)Difficulty.Normal);
+			Assert.Equal(8.0, normal.LevelDecimal, 3);
+			Assert.Equal(CTja.ELevelIcon.eNone, normal.LevelIcon); // whole number → no icon
 
-				var node = tci.BuildSongListNode();
-				Assert.Equal(12.888, node.dLevel[(int)Difficulty.Oni], 3);
-				Assert.Equal(10.3, node.dLevel[(int)Difficulty.Hard], 3);
-			} finally { try { Directory.Delete(dir, true); } catch { } }
+			var node = tci.BuildSongListNode();
+			Assert.Equal(12.888, node.dLevel[(int)Difficulty.Oni], 3);
+			Assert.Equal(10.3, node.dLevel[(int)Difficulty.Hard], 3);
 		}
 	}
 }

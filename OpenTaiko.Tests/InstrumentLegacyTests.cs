@@ -140,17 +140,9 @@ namespace OpenTaikoTests {
 		// the chart level on it (this exercises the real t入力 parse path).
 		[Fact]
 		public void CTja_ParsesLevel_IntoPlainField() {
-			string dir = Path.Combine(Path.GetTempPath(), "ot_tja_" + Guid.NewGuid().ToString("N"));
-			Directory.CreateDirectory(dir);
-			string p = Path.Combine(dir, "level.tja");
-			try {
-				File.WriteAllText(p,
-					"TITLE:LevelParseTest\nBPM:120\nWAVE:none.ogg\nCOURSE:Oni\nLEVEL:7\n#START\n1010,\n#END\n");
-				var tja = new CTja();
-				tja.Activate();
-				tja.tInput(p, Difficulty.Oni, 0, false, 0);
-				Assert.Equal(7, tja.LEVEL);
-			} finally { try { Directory.Delete(dir, true); } catch { } }
+			var tja = TjaFixture.ParseTjaText("ot_tja_", "level.tja", loadChart: false, content:
+				"TITLE:LevelParseTest\nBPM:120\nWAVE:none.ogg\nCOURSE:Oni\nLEVEL:7\n#START\n1010,\n#END\n");
+			Assert.Equal(7, tja.LEVEL);
 		}
 	}
 }

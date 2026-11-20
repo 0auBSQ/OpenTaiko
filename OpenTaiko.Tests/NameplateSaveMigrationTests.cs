@@ -8,19 +8,16 @@ using Xunit;
 namespace OpenTaikoTests {
 	// v0.6.1.2: nameplate ids become text, the equipped nameplate's copied title/type/rarity columns are dropped
 	public class NameplateSaveMigrationTests : IDisposable {
-		private readonly string dir = Path.Combine(Path.GetTempPath(), "np_migration_" + Guid.NewGuid().ToString("N"));
+		private readonly TempDir dir = new("np_migration_");
 		private readonly string db;
 
 		public NameplateSaveMigrationTests() {
-			Directory.CreateDirectory(dir);
 			db = Path.Combine(dir, "Saves.db3");
 			string template = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "OpenTaiko", ".init", "Saves.db3");
 			File.Copy(template, db);
 		}
 
-		public void Dispose() {
-			try { Directory.Delete(dir, true); } catch (IOException) { }
-		}
+		public void Dispose() => dir.Dispose();
 
 		private SqliteConnection Open() {
 			var connection = new SqliteConnection($"Data Source={db};Pooling=False");

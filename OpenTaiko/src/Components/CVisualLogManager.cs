@@ -26,7 +26,7 @@ class CVisualLogManager {
 
 			// Display stuff here
 			if (OpenTaiko.actTextConsole != null) {
-				y = OpenTaiko.actTextConsole.Print(0, y, CTextConsole.EFontType.Cyan, msg).y;
+				y = OpenTaiko.actTextConsole.Print(0, y, 0, GameWindowSize.Width, CTextConsole.EFontType.Cyan, msg).y;
 				y += OpenTaiko.actTextConsole.fontHeight + 24;
 			}
 			return y;

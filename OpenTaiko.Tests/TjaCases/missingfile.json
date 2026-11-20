@@ -1,0 +1,17 @@
+{
+	"tja": null,
+	"cases": [
+		{
+			"difficulty": 0,
+			"expect": {
+				"title": ""
+			}
+		},
+		{
+			"difficulty": 6,
+			"expect": {
+				"title": ""
+			}
+		}
+	]
+}

@@ -13,20 +13,6 @@ namespace OpenTaikoTests {
 
 		private static string CasesDir => Path.Combine(AppContext.BaseDirectory, "TjaCases");
 
-		private static CTja Parse(string tjaText) {
-			string dir = Path.Combine(Path.GetTempPath(), "ot_tja_" + Guid.NewGuid().ToString("N"));
-			Directory.CreateDirectory(dir);
-			try {
-				string p = Path.Combine(dir, "chart.tja");
-				File.WriteAllText(p, tjaText);
-				OpenTaiko.OpenTaiko.ConfigIni.nPlayerCount = 1;
-				var tja = new CTja();
-				tja.Activate();
-				tja.tInput(p, Difficulty.Oni, 0, true, 0);
-				return tja;
-			} finally { try { Directory.Delete(dir, true); } catch { } }
-		}
-
 		private const string Scrolls = "#START\n1111,\n#SCROLL 2\n1111,\n#BPMCHANGE 180\n#SCROLL 0.5\n11,\n#SCROLL -1\n1111,\n#BPMCHANGE 90\n1,\n#SCROLL 1\n1111,\n#END\n";
 		private const string Delays = "#START\n1111,\n#DELAY 0.5\n1111,\n#DELAY -0.25\n11,\n#BPMCHANGE 240\n#DELAY 1\n#DELAY 0.25\n1111,\n#MEASURE 3/4\n111,\n#BPMCHANGE -120\n1111,\n#BPMCHANGE 120\n#MEASURE 4/4\n1111,\n#END\n";
 		private const string Branches = "#START\n1111,\n#BRANCHSTART p,50,80\n#N\n#SCROLL 1.5\n1111,\n#BPMCHANGE 150\n1111,\n#E\n#SCROLL 2\n2222,\n2222,\n#M\n#BPMCHANGE 200\n#SCROLL 3\n3333,\n#DELAY 0.2\n3333,\n#BRANCHEND\n#SCROLL 1\n1111,\n#END\n";
@@ -64,7 +50,7 @@ namespace OpenTaikoTests {
 		[Theory]
 		[MemberData(nameof(Charts))]
 		public void BpmPointLookup_AnswersAsGetNowPBPMPoint(string name, string tjaText) {
-			var tja = Parse(tjaText);
+			var tja = TjaFixture.ParseTjaText("ot_tja_", "chart.tja", tjaText);
 			if (tja.listBPM == null || tja.listBPM.Count < 3)
 				return; // a chart without its tempo list (the malformed case) is not played
 			var lookup = new CStagePlayScreenCommon.BpmPointLookup(tja);

@@ -49,69 +49,57 @@ namespace OpenTaikoTests {
 
 		[Fact]
 		public void Tci_BuildCtjaFillsThePlayerSideLevel() {
-			string dir = Path.Combine(Path.GetTempPath(), "ot_tcilv_" + Guid.NewGuid().ToString("N"));
-			Directory.CreateDirectory(dir);
-			try {
-				File.WriteAllText(Path.Combine(dir, "o.osu"), string.Join("\n",
-					"osu file format v14",
-					"[General]",
-					"Mode: 1",
-					"[Metadata]",
-					"Creator:tester",
-					"[TimingPoints]",
-					"0,500,4,2,0,100,1,0",
-					"[HitObjects]",
-					"256,192,1000,1,0",
-					"256,192,1500,1,2"));
-				string p = Path.Combine(dir, "chart.tci");
-				File.WriteAllText(p, @"{ ""title"": ""tcilevel"", ""courses"": [ { ""difficulty"": ""oni"", ""level"": 12.888, ""single"": ""o.osu"" } ] }");
+			using TempDir dir = new("ot_tcilv_");
+			File.WriteAllText(Path.Combine(dir, "o.osu"), string.Join("\n",
+				"osu file format v14",
+				"[General]",
+				"Mode: 1",
+				"[Metadata]",
+				"Creator:tester",
+				"[TimingPoints]",
+				"0,500,4,2,0,100,1,0",
+				"[HitObjects]",
+				"256,192,1000,1,0",
+				"256,192,1500,1,2"));
+			string p = Path.Combine(dir, "chart.tci");
+			File.WriteAllText(p, @"{ ""title"": ""tcilevel"", ""courses"": [ { ""difficulty"": ""oni"", ""level"": 12.888, ""single"": ""o.osu"" } ] }");
 
-				var tja = new CTci(p).BuildCtja((int)Difficulty.Oni);
+			var tja = new CTci(p).BuildCtja((int)Difficulty.Oni);
 
-				var side = tja.PlayerSideMetadata;
-				Assert.Equal(12, side.LEVELtaiko);
-				Assert.Equal(12.888, side.LEVELtaikoDecimal, 3);
-				Assert.Equal(CTja.ELevelIcon.ePlus, side.LEVELtaikoIcon);
-				Assert.Equal(tja.SongListCourseMetadata[(int)Difficulty.Oni].LEVELtaiko, side.LEVELtaiko);
+			var side = tja.PlayerSideMetadata;
+			Assert.Equal(12, side.LEVELtaiko);
+			Assert.Equal(12.888, side.LEVELtaikoDecimal, 3);
+			Assert.Equal(CTja.ELevelIcon.ePlus, side.LEVELtaikoIcon);
+			Assert.Equal(tja.SongListCourseMetadata[(int)Difficulty.Oni].LEVELtaiko, side.LEVELtaiko);
 
-				// no branches in a .tci: every route holds all the notes, so the kill zone denominator does not move
-				Assert.Equal(2, tja.nNotesCount_Common);
-				Assert.Equal(new[] { 2, 2, 2 }, tja.nNotesCount_Branch);
-			} finally { try { Directory.Delete(dir, true); } catch { } }
+			// no branches in a .tci: every route holds all the notes, so the kill zone denominator does not move
+			Assert.Equal(2, tja.nNotesCount_Common);
+			Assert.Equal(new[] { 2, 2, 2 }, tja.nNotesCount_Branch);
 		}
 
 		[Fact]
 		public void Tja_RouteCountsIncludeTheCommonNotes() {
-			string dir = Path.Combine(Path.GetTempPath(), "ot_route_" + Guid.NewGuid().ToString("N"));
-			Directory.CreateDirectory(dir);
-			try {
-				string p = Path.Combine(dir, "route.tja");
-				File.WriteAllText(p, string.Join("\n",
-					"TITLE:route",
-					"BPM:120",
-					"WAVE:none.ogg",
-					"COURSE:Oni",
-					"LEVEL:10",
-					"#START",
-					"1010,",
-					"#BRANCHSTART p,50,90",
-					"#N",
-					"1000,",
-					"#E",
-					"1100,",
-					"#M",
-					"1110,",
-					"#BRANCHEND",
-					"1000,",
-					"#END"));
-				OpenTaiko.OpenTaiko.ConfigIni.nPlayerCount = 1;
-				var tja = new CTja();
-				tja.Activate();
-				tja.tInput(p, Difficulty.Oni, 0, true, 0);
+			var tja = TjaFixture.ParseTjaText("ot_route_", "route.tja", string.Join("\n",
+				"TITLE:route",
+				"BPM:120",
+				"WAVE:none.ogg",
+				"COURSE:Oni",
+				"LEVEL:10",
+				"#START",
+				"1010,",
+				"#BRANCHSTART p,50,90",
+				"#N",
+				"1000,",
+				"#E",
+				"1100,",
+				"#M",
+				"1110,",
+				"#BRANCHEND",
+				"1000,",
+				"#END"));
 
-				Assert.Equal(3, tja.nNotesCount_Common);                  // 2 before the branches, 1 after
-				Assert.Equal(new[] { 4, 5, 6 }, tja.nNotesCount_Branch);  // the common notes plus each route's own
-			} finally { try { Directory.Delete(dir, true); } catch { } }
+			Assert.Equal(3, tja.nNotesCount_Common);                  // 2 before the branches, 1 after
+			Assert.Equal(new[] { 4, 5, 6 }, tja.nNotesCount_Branch);  // the common notes plus each route's own
 		}
 	}
 }

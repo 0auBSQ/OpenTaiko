@@ -1,10 +1,12 @@
+using FDK.ExtensionMethods;
+
 namespace OpenTaiko;
 
 // AI battle: the timing zone rolled for a note from the AI level's odds, and the hit time picked for it. A zone is named
 // by the judge it gives without mods (JudgeWindows).
 internal static class AIHitTiming {
 	// a note a hit can reach: its chart time (whole ms and exact) and its judge rule
-	internal readonly record struct Neighbour(int MsNoteInt, double MsNote, JudgeWindows.NoteRule Rule);
+	internal readonly record struct Neighbour(long MsNoteWhole, double MsNote, JudgeWindows.NoteRule Rule);
 
 	// hit times allowed by the notes around: strictly between the two bounds, and not before the note unless early is allowed
 	internal readonly record struct HitWindow(long LoExclusive, long HiExclusive, bool AllowEarly);
@@ -22,7 +24,7 @@ internal static class AIHitTiming {
 		ReadOnlySpan<Neighbour> nearestBefore, ReadOnlySpan<Neighbour> after) {
 		if (msHit <= window.LoExclusive || msHit >= window.HiExclusive)
 			return false;
-		bool isLate = note.MsNoteInt <= msHit; // the search counts the note as past
+		bool isLate = note.MsNoteWhole <= msHit; // the search counts the note as past
 		if (!isLate && !window.AllowEarly)
 			return false;
 		var judge = JudgeWindows.JudgeAt(msHit, note.MsNote, note.Rule);
@@ -33,10 +35,10 @@ internal static class AIHitTiming {
 			if (JudgeWindows.JudgeAt(msHit, nearest.MsNote, nearest.Rule) is ENoteJudge.Miss)
 				continue;
 			// a later ADLIB or mine is found first; a Bad note gives way to an ADLIB or mine
-			if (nearest.MsNoteInt > msHit || judge is ENoteJudge.Poor)
+			if (nearest.MsNoteWhole > msHit || judge is ENoteJudge.Poor)
 				return false;
 			// an early hit goes to the nearer of the note and a past ADLIB or mine
-			if (!isLate && Math.Abs(msHit - note.MsNoteInt) >= Math.Abs(msHit - nearest.MsNoteInt))
+			if (!isLate && msHit.AbsDiffTo(note.MsNoteWhole) >= msHit.AbsDiffTo(nearest.MsNoteWhole))
 				return false;
 		}
 

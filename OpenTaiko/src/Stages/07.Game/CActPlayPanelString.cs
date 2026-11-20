@@ -119,7 +119,7 @@ internal class CActPlayPanelString : CActivity {
 		}
 	}
 
-	public void tLyricsTextureCreate(SKBitmap bmplyric) {
+	public void tLyricsTextureCreate(SKBitmap? bmplyric) {
 		OpenTaiko.tDisposeSafely(ref this.txLyricsTexture);
 		this.txLyricsTexture = OpenTaiko.tTextureCreate(bmplyric);
 	}

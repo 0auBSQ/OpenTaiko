@@ -8,19 +8,16 @@ using Xunit;
 namespace OpenTaikoTests {
 	// v0.6.1.0 and v0.6.1.1: the hitsound and save uid columns, each added in one transaction with its version update
 	public class SaveMigrationStepsTests : IDisposable {
-		private readonly string dir = Path.Combine(Path.GetTempPath(), "save_migration_" + Guid.NewGuid().ToString("N"));
+		private readonly TempDir dir = new TempDir("save_migration_");
 		private readonly string db;
 
 		public SaveMigrationStepsTests() {
-			Directory.CreateDirectory(dir);
 			db = Path.Combine(dir, "Saves.db3");
 			string template = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "OpenTaiko", ".init", "Saves.db3");
 			File.Copy(template, db);
 		}
 
-		public void Dispose() {
-			try { Directory.Delete(dir, true); } catch (IOException) { }
-		}
+		public void Dispose() => dir.Dispose();
 
 		private SqliteConnection Open() {
 			var connection = new SqliteConnection($"Data Source={db};Pooling=False");

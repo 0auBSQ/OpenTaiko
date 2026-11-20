@@ -8,13 +8,9 @@ namespace OpenTaikoTests {
 	// a skin folder counts as a skin only with its title background, its _boot and _title stages and a
 	// SkinConfig.ini version of at least CSkin.MinimumSkinVersion
 	public class SkinValidityTests : IDisposable {
-		private readonly string dir = Path.Combine(Path.GetTempPath(), "skin_valid_" + Guid.NewGuid().ToString("N"));
+		private readonly TempDir dir = new("skin_valid_");
 
-		public SkinValidityTests() => Directory.CreateDirectory(dir);
-
-		public void Dispose() {
-			try { Directory.Delete(dir, true); } catch (IOException) { }
-		}
+		public void Dispose() => dir.Dispose();
 
 		private void Add(string relative) {
 			string path = Path.Combine(dir, relative);

@@ -9,16 +9,10 @@ using Xunit;
 namespace OpenTaikoTests {
 	// nameplate packs: the shipped files, pack ids and prefixed ids, translations by key, broken packs
 	public class NameplatePackTests : IDisposable {
-		private readonly string dir = Path.Combine(Path.GetTempPath(), "np_packs_" + Guid.NewGuid().ToString("N"));
+		private readonly TempDir dir = new("np_packs_");
 		private readonly CUnlockConditionFactory factory = new();
 
-		public NameplatePackTests() {
-			Directory.CreateDirectory(dir);
-		}
-
-		public void Dispose() {
-			try { Directory.Delete(dir, true); } catch (IOException) { }
-		}
+		public void Dispose() => dir.Dispose();
 
 		private string Pack(string name, string json, Dictionary<string, string>? lang = null) {
 			string folder = Path.Combine(dir, name);

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FDK.ExtensionMethods;
 using OpenTaiko;
 using Xunit;
 using ENoteType = OpenTaiko.NotesManager.ENoteType;
@@ -52,9 +53,9 @@ namespace OpenTaikoTests {
 			}
 		}
 
-		// the judge as eGetChipJudgeAtTimeImpl and evaluateNodeJudge gave it before JudgeWindows, for a missable note
+		// the judge as 0.6.0.112's e指定時刻からChipのJUDGEを返すImpl (eGetChipJudgeAtTimeImpl) and pre-JudgeWindows 0.6.1 evaluateNodeJudge gave it, for a missable note
 		private static ENoteJudge FormerJudgeAt(long msHit, double msNote, CConfigIni.CTimingZones tz, int just, ENoteType nt) {
-			var msDelta = msHit - msNote;
+			var msDelta = msHit - (double)(int)(msNote);
 			int msAbsDelta = (int)Math.Abs(msDelta);
 			if (msAbsDelta < 0)
 				return ENoteJudge.Miss;
@@ -69,7 +70,8 @@ namespace OpenTaikoTests {
 				for (int just = 0; just <= 2; ++just) {
 					foreach (var nt in NoteTypes) {
 						var rule = JudgeWindows.NoteRule.Of(nt, tz, just);
-						foreach (double msNote in new[] { 1000.0, 1000.3, 1000.5, 1000.99, -1000.7 }) {
+						// NOTICE: 0.6.0.112's judge differs when a note's timestamp is negative with non-zero fraction
+						foreach (double msNote in new[] { 1000.0, 1000.3, 1000.5, 1000.99, 0.7, -1000 }) {
 							for (long msHit = (long)msNote - 200; msHit <= (long)msNote + 200; ++msHit)
 								Assert.Equal(FormerJudgeAt(msHit, msNote, tz, just, nt), JudgeWindows.JudgeAt(msHit, msNote, rule));
 						}
@@ -95,11 +97,11 @@ namespace OpenTaikoTests {
 		[InlineData(1000.0, 892, ENoteJudge.Poor)]
 		[InlineData(1000.0, 891, ENoteJudge.Miss)]
 		[InlineData(1000.3, 1000, ENoteJudge.Perfect)]
-		[InlineData(1000.7, 1026, ENoteJudge.Perfect)]
-		[InlineData(1000.7, 1027, ENoteJudge.Good)]
+		[InlineData(1000.7, 1025, ENoteJudge.Perfect)]
+		[InlineData(1000.7, 1026, ENoteJudge.Good)]
 		[InlineData(1000.7, 975, ENoteJudge.Perfect)]
 		[InlineData(1000.7, 974, ENoteJudge.Good)]
-		[InlineData(1000.7, 1109, ENoteJudge.Poor)]
+		[InlineData(1000.7, 1108, ENoteJudge.Poor)]
 		[InlineData(1000.7, 892, ENoteJudge.Poor)]
 		[InlineData(1000.7, 891, ENoteJudge.Miss)]
 		public void JudgeAt_Level4_TruncatesTheDistance(double msNote, long msHit, ENoteJudge expected) {
@@ -147,7 +149,7 @@ namespace OpenTaikoTests {
 				long? msHit = AIHitTiming.PickHitTime(note, zone, window, before ?? None, after ?? None, rng);
 				Assert.NotNull(msHit);
 				Assert.True(AIHitTiming.Lands(msHit.Value, note, window, before ?? None, after ?? None));
-				offsets.Add((int)(msHit.Value - note.MsNoteInt));
+				offsets.Add((int)(msHit.Value - note.MsNoteWhole));
 			}
 			return offsets;
 		}
@@ -239,7 +241,7 @@ namespace OpenTaikoTests {
 		public void Window_WithoutEarly_HitsAtOrAfterTheNote() {
 			var window = new AIHitTiming.HitWindow(long.MinValue, long.MaxValue, AllowEarly: false);
 			Assert.Equal(Range(0, 25), PickedOffsets(Note(1000.0, Config.tzLevels[4]), ENoteJudge.Perfect, window));
-			Assert.Equal(Range(0, 26), PickedOffsets(Note(1000.4, Config.tzLevels[4]), ENoteJudge.Perfect, window));
+			Assert.Equal(Range(0, 25), PickedOffsets(Note(1000.4, Config.tzLevels[4]), ENoteJudge.Perfect, window));
 		}
 
 		[Fact]
@@ -471,12 +473,12 @@ namespace OpenTaikoTests {
 
 			AssertSameChips(stream, host.Hits.Select(h => h.chip));
 			foreach (var chip in stream.SkipLast(1)) {
-				Assert.Equal((long)chip.dbSoundTimems + 39, HitTimeOf(host, chip));
+				Assert.Equal(chip.nSoundTimems + 39, HitTimeOf(host, chip));
 				Assert.Equal(ENoteJudge.Good, TimingJudgeOf(host, chip, HitTimeOf(host, chip)));
 				Assert.Equal(ENoteJudge.Poor, planner.JudgeOf(chip)); // the rolled Bad is kept
 			}
 			var last = stream[^1];
-			Assert.InRange(HitTimeOf(host, last) - (long)last.dbSoundTimems, 76, 108);
+			Assert.InRange(HitTimeOf(host, last).SaturatingSubBy(last.nSoundTimems), 76, 108);
 			Assert.Equal(ENoteJudge.Poor, planner.JudgeOf(last));
 		}
 
@@ -488,7 +490,7 @@ namespace OpenTaikoTests {
 			host.JustMode = 1;
 			Play(planner, host, 0, 6000);
 			foreach (var (chip, msHit, _, _) in host.Hits) {
-				Assert.InRange(Math.Abs(msHit - chip.dbSoundTimems), 26, 75);
+				Assert.InRange(msHit.AbsDiffTo(chip.nSoundTimems), 26u, 75u);
 				Assert.Equal(ENoteJudge.Poor, TimingJudgeOf(host, chip, msHit));
 				Assert.Equal(ENoteJudge.Poor, planner.JudgeOf(chip));
 			}

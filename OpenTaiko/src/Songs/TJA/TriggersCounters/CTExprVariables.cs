@@ -12,7 +12,7 @@
 						return _chart.PlayerSideMetadata.LEVELtaiko;
 					}
 				case "cd": {
-						return _chart.nInstanceDifficulty;
+						return _chart.nReferenceDifficulty;
 					}
 
 				// ── Play options ──────────────────────────────────────────────────────────────────────────────────────────────────

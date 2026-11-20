@@ -52,17 +52,19 @@ internal class CActImplMtaiko : CActivity {
 			base.IsFirstDraw = false;
 		}
 
-		long num = SoundManager.PlayTimer.NowTimeMs;
-		if (num < this.nFlashControlTimer) {
-			this.nFlashControlTimer = num;
+		long msNow = SoundManager.PlayTimer.NowTimeMs;
+		if (msNow < this.nFlashControlTimer) {
+			this.nFlashControlTimer = msNow;
 		}
-		while ((num - this.nFlashControlTimer) >= 20) {
+		var nSteps = (msNow - this.nFlashControlTimer) / 20;
+		if (nSteps > 0) {
 			for (int j = 0; j < 25; j++) {
-				if (this.stPadState[j / 5, j % 5].nBrightness > 0) {
-					this.stPadState[j / 5, j % 5].nBrightness--;
+				ref int refBright = ref this.stPadState[j / 5, j % 5].nBrightness;
+				if (refBright > 0) {
+					refBright = (int)Math.Max(0, refBright - nSteps);
 				}
 			}
-			this.nFlashControlTimer += 20;
+			this.nFlashControlTimer += 20 * nSteps;
 		}
 
 

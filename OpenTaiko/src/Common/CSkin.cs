@@ -186,7 +186,7 @@ internal class CSkin : IDisposable {
 			this.bNotLoadedYet = false;
 			this.bLoadedSuccessfuly = false;
 			if (string.IsNullOrEmpty(this.strFileName))
-				throw new InvalidOperationException("ファイル名が無効です。");
+				return; // silence the sound without warnings
 
 			if (!File.Exists(CSkin.Path(this.strFileName))) {
 				Trace.TraceWarning($"File not found: {this.strFileName}");
@@ -853,7 +853,10 @@ internal class CSkin : IDisposable {
 					if (cSystemSound.bCompactTarget) {
 						try {
 							cSystemSound.tLoading();
-							Trace.TraceInformation("システムサウンドを読み込みました。({0})", cSystemSound.strFileName);
+							if (cSystemSound.bLoadedSuccessfuly)
+								Trace.TraceInformation("System sound loaded. ({0})", cSystemSound.strFileName);
+							else
+								Trace.TraceInformation("System sound skipped loading for empty path. ({0})", cSystemSound.strFileName);
 						} catch (FileNotFoundException e) {
 							Trace.TraceWarning(e.ToString());
 							Trace.TraceWarning("System sound not found. ({0})", cSystemSound.strFileName);

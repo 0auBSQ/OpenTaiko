@@ -8,7 +8,7 @@ namespace OpenTaikoTests {
 	// a Lua script forces the next play's gameplay backgrounds by folder, and the gameplay backgrounds read the latest
 	// note hits from their state
 	public class PlayBackgroundTests : IDisposable {
-		private readonly string _dir = Path.Combine(Path.GetTempPath(), "ot_playbg_" + Guid.NewGuid().ToString("N"));
+		private readonly TempDir _dir = new("ot_playbg_");
 
 		public PlayBackgroundTests() {
 			Directory.CreateDirectory(Path.Combine(_dir, "bg", "up"));
@@ -20,7 +20,7 @@ namespace OpenTaikoTests {
 
 		public void Dispose() {
 			CActImplBackground.TakeForcedBackgrounds();
-			try { Directory.Delete(_dir, true); } catch { }
+			_dir.Dispose();
 		}
 
 		[Fact]

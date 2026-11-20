@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FDK.ExtensionMethods;
+using OpenTaiko;
 using Xunit;
 
 namespace OpenTaikoTests {
@@ -23,9 +25,9 @@ namespace OpenTaikoTests {
 				for (int i = 0; i < notes.Count; i++) {
 					if (hit[i] || missed[i] || notes[i].Don != inp.Don) continue;   // colour must match
 					if (notes[i].T > inp.T + BAD) break;
-					if (Math.Abs(inp.T - notes[i].T) <= BAD && (bi < 0 || notes[i].T < notes[bi].T)) bi = i;
+					if (inp.T.AbsDiffTo(notes[i].T) <= BAD && (bi < 0 || notes[i].T < notes[bi].T)) bi = i;
 				}
-				if (bi >= 0) { hit[bi] = true; if (Math.Abs(inp.T - notes[bi].T) > GOOD) late++; }
+				if (bi >= 0) { hit[bi] = true; if (inp.T.AbsDiffTo(notes[bi].T) > GOOD) late++; }
 			}
 			void Pump(double clock, bool interleave) {
 				while (cursor < inputs.Count && inputs[cursor].T <= clock) {
