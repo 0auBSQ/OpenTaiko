@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.7.0.13] - 2026-11-20 (Beta)
+
+- [Fix] Fix issue causing misses on other players autoplays
+
 ## [0.7.0.12] - 2026-11-19 (Beta)
 
 - [Fix] Move theme settings to global to prevent them being wiped on skin update
