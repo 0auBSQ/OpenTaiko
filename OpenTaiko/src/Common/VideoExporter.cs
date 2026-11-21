@@ -528,7 +528,8 @@ internal unsafe sealed class FFVideoWriter {
 	private AVPacket* _pkt;
 	private long _pts;
 
-	private static readonly string[] VideoCodecPreference = { "h264_mf", "libx264", "libopenh264", "mpeg4" };
+	// h264_mf: Windows, h264_videotoolbox: macOS (after the software encoders, so it only replaces the mpeg4 fallback)
+	private static readonly string[] VideoCodecPreference = { "h264_mf", "libx264", "libopenh264", "h264_videotoolbox", "mpeg4" };
 
 	private static void Warn(string msg) {
 		msg = $"[{nameof(VideoExporter)}] {msg}";
@@ -631,9 +632,16 @@ internal unsafe sealed class FFVideoWriter {
 				enc->gop_size = fps * 2;
 				enc->max_b_frames = 0;
 				enc->bit_rate = (long)w * h * fps * 12 / 100;        // ≈8 Mbps at 720p60, scales with size
+				// the first format sws_scale can fill: VideoToolbox lists its hardware surface format first
 				AVPixelFormat fmtTry = AVPixelFormat.AV_PIX_FMT_YUV420P;
-				if (codec->pix_fmts != null && *codec->pix_fmts != AVPixelFormat.AV_PIX_FMT_NONE)
-					fmtTry = *codec->pix_fmts;
+				if (codec->pix_fmts != null) {
+					for (AVPixelFormat* pf = codec->pix_fmts; *pf != AVPixelFormat.AV_PIX_FMT_NONE; ++pf) {
+						if ((ffmpeg.av_pix_fmt_desc_get(*pf)->flags & ffmpeg.AV_PIX_FMT_FLAG_HWACCEL) == 0) {
+							fmtTry = *pf;
+							break;
+						}
+					}
+				}
 				enc->pix_fmt = fmtTry;
 				if (wantGlobal && attempt == 0)
 					enc->flags |= ffmpeg.AV_CODEC_FLAG_GLOBAL_HEADER;

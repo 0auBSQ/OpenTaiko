@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Runtime.Loader;
 using System.Text;
 
 namespace OpenTaiko;
@@ -90,6 +91,11 @@ internal class Program {
 		if (mutexDoubleStartupPrevent.WaitOne(0, false)) {
 			string newLine = Environment.NewLine;
 
+			// The game's relative paths (Songs, .init, Config.ini) live next to the executable, but a launch
+			// from a .app bundle does not start there. Game keeps GLFW's cocoa init from changing it again.
+			if (OperatingSystem.IsMacOS())
+				Directory.SetCurrentDirectory(AppContext.BaseDirectory);
+
 			Trace.WriteLine("Current Directory: " + Environment.CurrentDirectory);
 			Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
@@ -137,11 +143,30 @@ internal class Program {
 						FFmpeg.AutoGen.ffmpeg.RootPath = AppContext.BaseDirectory + @"FFmpeg/" + osplatform + "-" + platform + "/";
 						if (OperatingSystem.IsLinux())
 							FFmpeg.AutoGen.ffmpeg.GetOrLoadLibrary = LoadFFmpegLibrary;
-						DirectoryInfo info = new DirectoryInfo(AppContext.BaseDirectory + @"Libs/" + osplatform + "-" + platform + "/");
-
-						//実行ファイルの階層にライブラリをコピー
-						foreach (FileInfo fileinfo in info.GetFiles()) {
-							fileinfo.CopyTo(AppContext.BaseDirectory + fileinfo.Name, true);
+						if (OperatingSystem.IsMacOS()) {
+							// No copy next to the executable: the packaged app must not write into its own
+							// bundle (read-only under App Translocation, and it would break any future code
+							// signature). The per-assembly resolvers below run before default probing, so a stale
+							// copy beside the executable can never win; BASS loads straight from Libs/osx-*/.
+							string libsDir = AppContext.BaseDirectory + @"Libs/" + osplatform + "-" + platform + "/";
+							DllImportResolver bassResolver = (name, assembly, searchPath) => {
+								string? file = name switch {
+									"bass" => "libbass.dylib",
+									"bass_fx" => "libbass_fx.dylib",
+									"bassmix" => "libbassmix.dylib",
+									"bassopus" => "libbassopus.dylib",
+									_ => null,
+								};
+								return file == null ? IntPtr.Zero : NativeLibrary.Load(Path.Combine(libsDir, file));
+							};
+							foreach (var bassAssembly in new[] { typeof(ManagedBass.Bass).Assembly, typeof(ManagedBass.Fx.BassFx).Assembly, typeof(ManagedBass.Mix.BassMix).Assembly })
+								NativeLibrary.SetDllImportResolver(bassAssembly, bassResolver);
+						} else {
+							//実行ファイルの階層にライブラリをコピー
+							DirectoryInfo info = new DirectoryInfo(AppContext.BaseDirectory + @"Libs/" + osplatform + "-" + platform + "/");
+							foreach (FileInfo fileinfo in info.GetFiles()) {
+								fileinfo.CopyTo(AppContext.BaseDirectory + fileinfo.Name, true);
+							}
 						}
 					}
 
