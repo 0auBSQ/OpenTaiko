@@ -697,6 +697,7 @@ internal class OpenTaiko : Game {
 			if (SoundManager.IsDeviceChangeDue && !VideoExporter.Active) {
 				lock (HitSoundOnArrival.Gate)
 					SoundManager.tCheckDeviceChange();
+				ShowWindowTitle();   // the title names the device, which may have changed or fallen back
 			}
 			Timer?.Update();
 			SoundManager.PlayTimer?.Update();

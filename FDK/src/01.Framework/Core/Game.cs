@@ -69,6 +69,8 @@ public abstract partial class Game : IDisposable {
 		ImGuiController = new ImGuiController(Gl, window, new ImGuiInputContext(context));
 		BridgeImGuiChars(context);
 		ImGuiIO = ImGui.GetIO();
+		if (context.Keyboards.Count > 0)
+			ImGuiClipboard.Attach(ImGuiIO, context.Keyboards[0]);
 		ImGui.StyleColorsDark();
 #if DEBUG
 		try {

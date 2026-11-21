@@ -111,6 +111,7 @@ internal class CStageConfig : CStage {
 			OpenTaiko.Skin.PreloadSystemSounds();
 		} else {
 			OpenTaiko.SoundManager.tInitialize(ESoundDeviceType.Bass, cfg.nBassBufferSizeMs, 0, 0, 0, cfg.bUseOSTimer);
+			OpenTaiko.app.ShowWindowTitle();
 		}
 	}
 	public override void DeActivate() {
