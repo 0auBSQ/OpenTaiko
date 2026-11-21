@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.7.0.14] - 2026-11-21 (Beta)
+
+- [Fix] Fix rare glitched text glitch due to stale memory on the text renderer
+
 ## [0.7.0.13] - 2026-11-20 (Beta)
 
 - [Fix] Fix issue causing misses on other players autoplays
