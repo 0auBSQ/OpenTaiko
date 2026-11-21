@@ -219,7 +219,9 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 	public SKBitmap DrawText(string drawstr, CFontRenderer.DrawMode drawMode, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradationBottomColor, int edge_Ratio, bool keepCenter, bool perCharacter = false) {
 		if (string.IsNullOrEmpty(drawstr)) {
 			//nullか""だったら、1x1を返す
-			return new SKBitmap(1, 1);
+			var empty = new SKBitmap(1, 1);
+			empty.Erase(SKColors.Transparent);
+			return empty;
 		}
 
 		string[] strs = drawstr.Split("\n");
@@ -247,6 +249,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 			SKBitmap bitmap = new SKBitmap(width, height, SKColorType.Rgba8888, SKAlphaType.Premul);
 			// Canvas that composites the glyph layers onto the bitmap; native, disposed via using.
 			using SKCanvas canvas = new SKCanvas(bitmap);
+			canvas.Clear(SKColors.Transparent);   // new bitmaps hold stale memory
 
 			int x_offset = 0;
 
@@ -377,6 +380,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 		// Skia rasterises premultiplied; the straight-alpha copy below is what the GL upload wants
 		using var premul = new SKBitmap(width, height, SKColorType.Rgba8888, SKAlphaType.Premul);
 		using (var canvas = new SKCanvas(premul)) {
+			canvas.Clear(SKColors.Transparent);   // new bitmaps hold stale memory
 			float baseline = -fm.Ascent;
 			if (edgeOnly) {
 				// stroking the text through a stroke-style paint is the same outline stroke as extracting the
