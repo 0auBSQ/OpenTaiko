@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.7.0.16] - 2026-11-21 (Beta)
+
+- [Fix] Attach clipboard on Linux (969)
+- [Fix] Update window title on sound device change (963)
+
 ## [0.7.0.15] - 2026-11-21 (Beta)
 
 - [Fix] Catch failure to load FFmpeg and/or lmdb libraries and allow to run the game with those disabled when it happens (at a specified tradeoff)
