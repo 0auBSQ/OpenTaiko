@@ -37,6 +37,8 @@ namespace OpenTaiko {
 		public virtual void Write(string key, string value) => BlockWrite(nameof(Write));
 
 		public string? Read(string key) {
+			// lmdb failed to load at startup: an environment that cannot be built is finalized later and its finalizer throws
+			if (!NativeLibraryCheck.LmdbAvailable) return null;
 			try {
 				using var env = new LightningEnvironment(Path);
 				env.Open();
@@ -83,6 +85,7 @@ namespace OpenTaiko {
 		public LuaDataStorage(string path) : base(path) { }
 
 		public override void Write(string key, string value) {
+			if (!NativeLibraryCheck.LmdbAvailable) return;   // see Read
 			try {
 				using var env = new LightningEnvironment(Path);
 				env.Open();

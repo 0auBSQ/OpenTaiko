@@ -118,8 +118,13 @@ public unsafe class CVideoDecoder : IDisposable {
 
 	public CVideoDecoder(string filename) : this(filename, null) { }
 
+	// set at startup when the ffmpeg libraries fail to load
+	public static bool LibraryDisabled;
+
 	public CVideoDecoder(string filename, AudioFactory? audioOut) {
 		Interlocked.Increment(ref LiveCount); // a decoder that fails to open is still finalized, which counts it down
+		if (LibraryDisabled)
+			throw new NotSupportedException("Video playback is disabled: the FFmpeg libraries failed to load.");
 		if (!File.Exists(filename))
 			throw new FileNotFoundException(filename + " not found...");
 

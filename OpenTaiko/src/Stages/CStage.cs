@@ -33,7 +33,8 @@ public class CStage : CActivity {
 		TEMPLATE,           // No effect, for template class
 		CRASH,              // Special case, for CSystemError
 		CUSTOM,             // For custom stages in the future, generic with lua
-		End
+		End,
+		LibraryCheck,       // startup prompt for a native library that failed to load (CStageLibraryCheck)
 	}
 
 	internal EPhase ePhaseID;

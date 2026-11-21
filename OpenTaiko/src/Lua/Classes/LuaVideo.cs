@@ -147,6 +147,7 @@ namespace OpenTaiko {
 
 		private LuaVideo Open(string full_path, string path, bool autoDispose, bool withAudio) {
 			LuaVideo luavid = new();
+			if (CVideoDecoder.LibraryDisabled) return luavid;   // the player was told at startup
 			if (File.Exists(full_path)) {
 				Videos.Add(luavid);
 				if (autoDispose)

@@ -706,7 +706,7 @@ internal class OpenTaiko : Game {
 
 			if (rCurrentStage != null) {
 				// set up camera before drawing main UI
-				if (!ConfigIni.bTokkunMode && rCurrentStage?.eStageID != CStage.EStage.CRASH) {
+				if (!ConfigIni.bTokkunMode && rCurrentStage?.eStageID is not (CStage.EStage.CRASH or CStage.EStage.LibraryCheck)) {
 					float screen_ratiox = OpenTaiko.Skin != null ? OpenTaiko.Skin.Resolution[0] / 1280.0f : 1.0f;
 					float screen_ratioy = OpenTaiko.Skin != null ? OpenTaiko.Skin.Resolution[1] / 720.0f : 1.0f;
 
@@ -830,6 +830,17 @@ internal class OpenTaiko : Game {
 						break;
 
 					case CStage.EStage.CRASH:
+						break;
+
+					case CStage.EStage.LibraryCheck:
+						if (this.nDrawLoopReturnValue == CStageLibraryCheck.Quit) {
+							base.Exit();
+							return;
+						}
+						if (this.nDrawLoopReturnValue == CStageLibraryCheck.Start) {
+							UnmountActivity(rCurrentStage);
+							tEnterStartupStage();
+						}
 						break;
 
 					case CStage.EStage.StartUp:
@@ -1152,6 +1163,7 @@ internal class OpenTaiko : Game {
 				if (rCurrentStage != null
 					&& rCurrentStage.eStageID != CStage.EStage.StartUp
 					&& rCurrentStage.eStageID != CStage.EStage.CRASH
+					&& rCurrentStage.eStageID != CStage.EStage.LibraryCheck
 					&& OpenTaiko.Tx.Overlay != null
 					&& !(OperatingSystem.IsIOS() || OperatingSystem.IsAndroid())) {
 					OpenTaiko.Tx.Overlay.t2DDraw(0, 0);
@@ -1799,6 +1811,23 @@ internal class OpenTaiko : Game {
 
 		#region [ Move to Startup Stage ]
 		//---------------------
+		// before any Lua runs: a stage may read lmdb or open a video right away
+		var libraryFailures = NativeLibraryCheck.Run();
+		bool canAsk = !(OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) && !StartHidden && !VideoExporter.Active;
+		if (libraryFailures.Count > 0 && canAsk) {
+			stageLibraryCheck = new CStageLibraryCheck(libraryFailures);
+			this.listTopLevelActivities.Add(stageLibraryCheck);
+			ChangeStage(stageLibraryCheck, "Library check");
+			return;
+		}
+		tEnterStartupStage();
+		//---------------------
+		#endregion
+	}
+
+	private CStageLibraryCheck? stageLibraryCheck;
+
+	private void tEnterStartupStage() {
 		// The skin's Lua modules are NOT loaded here anymore. The boot stage loads them incrementally in its
 		// own Draw loop (so the loading bar animates via the normal render loop, no manual presenting), and
 		// once done it runs NamePlate/Modal RefreshSkin + starts the song-list enum. This keeps OnLoad fast
@@ -1807,8 +1836,6 @@ internal class OpenTaiko : Game {
 		ChangeStage(stageStartup, "Startup");
 		Trace.TraceInformation("----------------------");
 		Trace.TraceInformation("■ Startup");
-		//---------------------
-		#endregion
 	}
 
 	public void ShowWindowTitle() {
