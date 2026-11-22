@@ -213,7 +213,11 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	public override void tValueInitialize(bool bPlayRecord, bool bPlayState) {
 		int iPrevTopChipMax = this.nCurrentTopChip.Max();
 		base.tValueInitialize(bPlayRecord, bPlayState);
-		for (int i = 0; i < 5; i++) { replayCursor[i] = 0; msReplayTjaTime[i] = double.NegativeInfinity; }
+		for (int i = 0; i < 5; i++) {
+			replayCursor[i] = 0;
+			msReplayTjaTime[i] = double.NegativeInfinity;
+			OpenTaiko.ReplayPlayback[i]?.replay.tResetWatchedGlobals();
+		}
 
 		if (bPlayRecord) {
 			for (int i = 0; i < OpenTaiko.MAX_PLAYERS; ++i)

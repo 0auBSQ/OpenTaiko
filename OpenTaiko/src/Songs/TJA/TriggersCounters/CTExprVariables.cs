@@ -17,6 +17,10 @@
 
 				// ── Play options ──────────────────────────────────────────────────────────────────────────────────────────────────
 				case "pc": {
+						// a watched replay reads the player count of its recorded session
+						if (expr._player >= 0 && expr._player < OpenTaiko.bReplayMode.Length && OpenTaiko.bReplayMode[expr._player]
+							&& OpenTaiko.ReplayPlayback[expr._player] is { } watched)
+							return watched.replay.PlayerCount;
 						return OpenTaiko.ConfigIni.nPlayerCount;
 					}
 				case "ss": {
@@ -116,11 +120,11 @@
 						break;
 					}
 				case "gc": {
-						if (args.Count > 0) return expr._sfref?.tGetGlobalCounter(args[0]) ?? 0;
+						if (args.Count > 0) return CSongReplay.tReadGlobalCounter(expr._player, expr._sfref, args[0]);
 						break;
 					}
 				case "gt": {
-						if (args.Count > 0) return (expr._sfref?.tGetGlobalTrigger(args[0]) ?? false) ? 1 : 0;
+						if (args.Count > 0) return CSongReplay.tReadGlobalTrigger(expr._player, expr._sfref, args[0]) ? 1 : 0;
 						break;
 					}
 			}

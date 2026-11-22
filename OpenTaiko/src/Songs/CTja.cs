@@ -663,13 +663,17 @@ internal class CTja : CActivity {
 
 		this.CutSceneOutros = new();
 	}
-	public CTja(string strFileName, ETjaCompat? compatMode = null, Difficulty difficulty = Difficulty.Easy, int nPlayerSide = 0, bool loadChart = false, int nBGMAdjust = 0)
+	// sessionSheet: the (player count, side) whose sheet is loaded, instead of this session's (a watched replay's)
+	public CTja(string strFileName, ETjaCompat? compatMode = null, Difficulty difficulty = Difficulty.Easy, int nPlayerSide = 0, bool loadChart = false, int nBGMAdjust = 0,
+		(int Count, int Side)? sessionSheet = null)
 		: this() {
 		this.Activate(loadChart);
 		if (compatMode != null)
 			this.COMPAT = compatMode.Value; // default compat mode set by song folder
+		this.sessionSheet = sessionSheet;
 		this.tInput(strFileName, difficulty, nPlayerSide, loadChart, nBGMAdjust);
 	}
+	private (int Count, int Side)? sessionSheet;
 
 
 	// メソッド
@@ -1658,8 +1662,8 @@ internal class CTja : CActivity {
 			var (strUpperHeaders, strCourse) = CDTXStyleExtractor.tSessionChart(
 				globalCourse, strSplitChart[(int)nLoadCourse],
 				nLoadCourse,
-				OpenTaiko.ConfigIni.bAIBattleMode ? 1 : OpenTaiko.ConfigIni.nPlayerCount,
-				this.nPlayerSide,
+				this.sessionSheet?.Count ?? (OpenTaiko.ConfigIni.bAIBattleMode ? 1 : OpenTaiko.ConfigIni.nPlayerCount),
+				this.sessionSheet?.Side ?? this.nPlayerSide,
 				this.strFullPath);
 
 			//ここで1行の文字数をカウント。配列にして返す。

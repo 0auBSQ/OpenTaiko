@@ -74,6 +74,9 @@
         "SONGSELECT_REPLAY_REASON_RNG": "다시 재생할 수 없는 랜덤 모드를 사용합니다",
         "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT": "다른 게임 버전의 다이내믹 비트 리플레이입니다",
         "SONGSELECT_REPLAY_REASON_UNSEEDED": "노트 셔플에 시드가 적용되기 전에 기록되었습니다",
+        "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT_MULTI": "멀티플레이에서 기록된 다이내믹 비트 리플레이입니다",
+        "SONGSELECT_REPLAY_SESSION": "%dP로 플레이 (%d인 플레이)",
+        "SONGSELECT_REPLAY_BONGO": "봉고로 플레이",
 
         // Song select: the mod select dialog
         "SONGSELECT_MODS_TITLE": "모드 선택",

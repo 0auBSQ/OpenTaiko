@@ -74,6 +74,9 @@
         "SONGSELECT_REPLAY_REASON_RNG": "Usa mods aleatorios que no se pueden reproducir",
         "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT": "Repetición de Dynamic Beat de otra versión del juego",
         "SONGSELECT_REPLAY_REASON_UNSEEDED": "Grabada antes de que la mezcla de notas tuviera semilla",
+        "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT_MULTI": "Repetición de Dynamic Beat de una partida multijugador",
+        "SONGSELECT_REPLAY_SESSION": "Jugada como %dP en una partida de %d jugadores",
+        "SONGSELECT_REPLAY_BONGO": "Jugada con bongós",
 
         // Song select: the mod select dialog
         "SONGSELECT_MODS_TITLE": "Selección de mods",

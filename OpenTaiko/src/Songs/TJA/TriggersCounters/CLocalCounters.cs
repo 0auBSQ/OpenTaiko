@@ -21,9 +21,7 @@
 			if (_player < 0) return;
 			if (OpenTaiko.ConfigIni.bAutoPlay[_player] || (OpenTaiko.ConfigIni.bAIBattleMode && _player == 1)) return;
 
-			double _val = this.Get(counterName);
-			SaveFile _sf = OpenTaiko.SaveFileInstances[_player];
-			_sf.tSetGlobalCounter(counterName, _val);
+			CSongReplay.tWriteGlobalCounter(_player, counterName, this.Get(counterName));
 		}
 
 		public double Get(string counterName) {

@@ -428,9 +428,12 @@ REPLAY:ListReplays が返す配列、またはリプレイリストハンドル�
 | `rep.GameMode  (int)` | 記録されたプレイのゲームモード。 |
 | `rep.GameVersion  (int)` | リプレイを記録したゲームバージョン。 |
 | `rep.Watchable  (bool)` | ゲームがリプレイを忠実に再生できるとき true。 |
-| `rep.UnwatchableReason  (string)` | Watchable が false のときの理由コード: `rng_mods`、`dynamic_beat_version`、`unseeded_shuffle` のいずれか。それ以外は空文字列。 |
+| `rep.UnwatchableReason  (string)` | Watchable が false のときの理由コード: `rng_mods`、`dynamic_beat_version`、`dynamic_beat_multi`、`unseeded_shuffle` のいずれか。それ以外は空文字列。 |
 | `rep.OldVersion  (bool)` | 古いゲームバージョンがリプレイを記録したとき true。 |
 | `rep.ChecksumMismatch  (bool)` | 譜面ファイルが記録時のものと一致しなくなったとき true (譜面パスを渡した場合にのみ計算されます)。 |
+| `rep.PlayerCount  (int)` | 記録時のプレイ人数 (0.7.0 より前のファイルでは 1)。 |
+| `rep.PlayerSide  (int)` | 記録したプレイヤーの番号、0 から (0.7.0 より前のファイルでは 0)。 |
+| `rep.GameType  (int)` | 記録したプレイヤーのゲームタイプ設定: 0 太鼓、1 ボンゴ。ファイルに記録がないときは -1 (0.7.0 より前)。 |
 
 ### SONGMOUNT
 

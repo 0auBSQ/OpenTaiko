@@ -27,9 +27,13 @@ class PuchiChara : CActivity {
 
 	private static readonly DBPuchichara.PuchicharaEffect NoEffect = new();
 
-	// the effects of a player's puchichara on the play; the AI battle's AI plays without any
+	// the effects of a player's puchichara on the play; the AI battle's AI plays without any, and a watched replay
+	// with the recorded ones (none for files before 700)
 	internal static DBPuchichara.PuchicharaEffect tGetEffect(int p)
-		=> AIBattleModMirror.IsAI(OpenTaiko.ConfigIni, p) ? NoEffect : OpenTaiko.Tx.Puchichara[tGetPuchiCharaIndexByName(p)].effect;
+		=> AIBattleModMirror.IsAI(OpenTaiko.ConfigIni, p) ? NoEffect
+		: (p >= 0 && p < OpenTaiko.bReplayMode.Length && OpenTaiko.bReplayMode[p] && OpenTaiko.ReplayPlayback[p] is { } watched)
+			? watched.replay.PuchiEffect ?? NoEffect
+		: OpenTaiko.Tx.Puchichara[tGetPuchiCharaIndexByName(p)].effect;
 
 	public static int tGetPuchiCharaIndexByName(int p) {
 		var _pc = CVirtualSlotManager.GetPuchicharaName(p);

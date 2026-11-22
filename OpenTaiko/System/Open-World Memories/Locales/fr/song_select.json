@@ -74,6 +74,9 @@
         "SONGSELECT_REPLAY_REASON_RNG": "Utilise des mods aléatoires impossibles à rejouer",
         "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT": "Replay Dynamic Beat enregistré sur une autre version du jeu",
         "SONGSELECT_REPLAY_REASON_UNSEEDED": "Enregistré avant que le mélange des notes ne soit seedé",
+        "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT_MULTI": "Replay Dynamic Beat enregistré en multijoueur",
+        "SONGSELECT_REPLAY_SESSION": "Joué en tant que %dP dans une partie à %d joueurs",
+        "SONGSELECT_REPLAY_BONGO": "Joué aux bongos",
 
         // Song select: the mod select dialog
         "SONGSELECT_MODS_TITLE": "Sélection des mods",

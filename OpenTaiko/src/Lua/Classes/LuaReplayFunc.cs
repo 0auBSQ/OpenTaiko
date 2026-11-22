@@ -8,6 +8,7 @@ namespace OpenTaiko {
 		// so Lua can use the proven array pattern: list.Length + list[i] (0-based). Each row exposes (read in Lua):
 		// .Score .PlayerName .ClearStatus .ScoreRank .ModFlags .Date .FilePath .Watchable .ChartDifficulty
 		// .OldVersion .ChecksumMismatch (card warnings; the mismatch is computed against chartPath's current md5)
+		// .PlayerCount .PlayerSide .GameType (session of the play; GameType -1 = not recorded)
 		public CSongReplay.ReplayHeader[] ListReplays(string songFolder, string uniqueId, int difficulty, int topN, string? chartPath) {
 			return CSongReplay.tListReplays(songFolder ?? "", uniqueId ?? "", difficulty, topN, chartPath).ToArray();
 		}
@@ -39,7 +40,7 @@ namespace OpenTaiko {
 			var rep = new CSongReplay();
 			rep.tLoadReplayFile(filepath);
 			if (rep.Inputs == null || rep.Inputs.Count == 0) return false;
-			if (!CSongReplay.tIsReplayWatchable(rep.ModFlags, rep.RandomSeed, rep.GameVersion)) return false;
+			if (!CSongReplay.tIsReplayWatchable(rep.ModFlags, rep.RandomSeed, rep.GameVersion, rep.PlayerCount)) return false;
 			rep.tEvaluateWarnings(chartPath);
 			rep.tApplyVirtualMods();              // snapshot the real mods + apply the replay's, and set ReplaySeed[0]
 			OpenTaiko.PendingReplay = new(rep, rep.GetInputPumpTjaTimes());

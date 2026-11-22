@@ -74,6 +74,9 @@
         "SONGSELECT_REPLAY_REASON_RNG": "Используются случайные моды, которые нельзя воспроизвести",
         "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT": "Повтор Dynamic Beat из другой версии игры",
         "SONGSELECT_REPLAY_REASON_UNSEEDED": "Записан до того, как перемешивание нот получило зерно",
+        "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT_MULTI": "Повтор Dynamic Beat из игры с несколькими игроками",
+        "SONGSELECT_REPLAY_SESSION": "Сыграно за %dP в игре на %d игроков",
+        "SONGSELECT_REPLAY_BONGO": "Сыграно на бонго",
 
         // Song select: the mod select dialog
         "SONGSELECT_MODS_TITLE": "Выбор модов",

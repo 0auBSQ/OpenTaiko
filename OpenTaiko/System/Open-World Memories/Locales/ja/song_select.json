@@ -74,6 +74,9 @@
         "SONGSELECT_REPLAY_REASON_RNG": "再現できないランダム系モッドを使用しています",
         "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT": "別のゲームバージョンで記録されたダイナミックビートのリプレイです",
         "SONGSELECT_REPLAY_REASON_UNSEEDED": "音符シャッフルがシード化される前に記録されました",
+        "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT_MULTI": "マルチプレイで記録されたダイナミックビートのリプレイです",
+        "SONGSELECT_REPLAY_SESSION": "%dPとしてプレイ（%d人プレイ）",
+        "SONGSELECT_REPLAY_BONGO": "ボンゴでプレイ",
 
         // Song select: the mod select dialog
         "SONGSELECT_MODS_TITLE": "オプション選択",

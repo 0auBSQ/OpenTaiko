@@ -428,9 +428,12 @@ Elemente des Arrays, das REPLAY:ListReplays oder das Result eines Replay-Listen-
 | `rep.GameMode  (int)` | Der Spielmodus des aufgezeichneten Spiels. |
 | `rep.GameVersion  (int)` | Die Spielversion, die das Replay aufgezeichnet hat. |
 | `rep.Watchable  (bool)` | True, wenn das Spiel das Replay originalgetreu wiedergeben kann. |
-| `rep.UnwatchableReason  (string)` | Ein Grundcode, wenn Watchable false ist: `rng_mods`, `dynamic_beat_version` oder `unseeded_shuffle`; sonst leer. |
+| `rep.UnwatchableReason  (string)` | Ein Grundcode, wenn Watchable false ist: `rng_mods`, `dynamic_beat_version`, `dynamic_beat_multi` oder `unseeded_shuffle`; sonst leer. |
 | `rep.OldVersion  (bool)` | True, wenn eine ältere Spielversion das Replay aufgezeichnet hat. |
 | `rep.ChecksumMismatch  (bool)` | True, wenn die Chart-Datei nicht mehr zur Aufzeichnung passt (nur berechnet, wenn Sie einen Chart-Pfad übergeben). |
+| `rep.PlayerCount  (int)` | Die Anzahl der Spieler in der aufgezeichneten Runde (1 bei Dateien vor 0.7.0). |
+| `rep.PlayerSide  (int)` | Der Spielerindex der Aufnahme, ab 0 (0 bei Dateien vor 0.7.0). |
+| `rep.GameType  (int)` | Die Spieltyp-Einstellung der Aufnahme: 0 Taiko, 1 Bongo; -1, wenn die Datei sie nicht enthält (vor 0.7.0). |
 
 ### SONGMOUNT
 

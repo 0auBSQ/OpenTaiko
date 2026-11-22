@@ -357,10 +357,13 @@ internal class CStageSongLoading : CStage {
 							}
 						}, cts.Token);
 					} else {
+						// a watched replay loads the sheet of its recorded session
+						(int, int)? watchedSheet = OpenTaiko.ReplayWatchArmed ? OpenTaiko.PendingReplay?.replay.SessionSheet : null;
 						_dtxLoadTask = Task.Run(() => {
 							for (int i = 0; i < playerCount; i++) {
 								cts.Token.ThrowIfCancellationRequested();
-								captured[i] = new CTja(str, compat, (Difficulty)chosenDiffs[i], i, loadChart: true);
+								captured[i] = new CTja(str, compat, (Difficulty)chosenDiffs[i], i, loadChart: true,
+									sessionSheet: i == 0 ? watchedSheet : null);
 							}
 						}, cts.Token);
 					}

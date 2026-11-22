@@ -9,10 +9,11 @@ class CSongReplay {
 	 * 600 = 0.6.0
 	 * 601 = 0.6.1 (adds the note-shuffle RandomSeed at the end of the file)
 	 * 602 = 0.6.1 (the special mod in ModFlags; judgement, fail and clear rules changed since 601)
-	 * 700 = 0.7.0
+	 * 700 = 0.7.0 (tagged block after RandomSeed: session, game type, puchichara effects, global reads)
 	 * 1000 = 1.0.0
 	 */
-	public const int STORED_GAME_VERSION = 602;
+	public const int STORED_GAME_VERSION = 700;
+	private const int EXTENSION_VERSION = 700;
 	public string REPLAY_FOLDER_NAME = "Replay";
 
 	/* Mod Flags
@@ -107,7 +108,14 @@ class CSongReplay {
 		}
 	}
 
-	public void tStartRegisterInput() => allInputs = new();
+	public void tStartRegisterInput() {
+		allInputs = new();
+		GlobalCounterReads.Clear();
+		GlobalTriggerReads.Clear();
+		_writtenCounters.Clear();
+		_writtenTriggers.Clear();
+		_recordingGlobals = true;
+	}
 
 	public void tRegisterInput(double timestamp, byte keypress) {
 		allInputs?.Add(Tuple.Create(timestamp, keypress));
@@ -158,66 +166,184 @@ class CSongReplay {
 		return tupleList;
 	}
 
-	public void tLoadReplayFile(string optkrFilePath) {
-		try {
-			using (FileStream fileStream = new FileStream(optkrFilePath, FileMode.Open)) {
-				using (BinaryReader reader = new BinaryReader(fileStream)) {
-					GameMode = reader.ReadByte();
-					GameVersion = reader.ReadInt32();
-					ChartChecksum = reader.ReadString();
-					PlayerName = reader.ReadString();
-					GoodCount = reader.ReadInt32();
-					OkCount = reader.ReadInt32();
-					BadCount = reader.ReadInt32();
-					RollCount = reader.ReadInt32();
-					MaxCombo = reader.ReadInt32();
-					BoomCount = reader.ReadInt32();
-					ADLibCount = reader.ReadInt32();
-					Score = reader.ReadInt32();
-					CoinValue = reader.ReadInt16();
-					ReachedFloor = reader.ReadInt32();
-					RemainingLives = reader.ReadInt32();
-					DanSongCount = reader.ReadInt32();
-					if (DanSongCount > 0) {
-						// 8 ints per song: a count the rest of the file cannot hold means a broken file
-						if ((long)DanSongCount * 32 > fileStream.Length - fileStream.Position) throw new InvalidDataException();
-						tDanRegisterSongCount(DanSongCount);
-					}
-					for (int i = 0; i < DanSongCount; i++) {
-						IndividualGoodCount![i] = reader.ReadInt32();
-						IndividualOkCount![i] = reader.ReadInt32();
-						IndividualBadCount![i] = reader.ReadInt32();
-						IndividualRollCount![i] = reader.ReadInt32();
-						IndividualMaxCombo![i] = reader.ReadInt32();
-						IndividualBoomCount![i] = reader.ReadInt32();
-						IndividualADLibCount![i] = reader.ReadInt32();
-						IndividualScore![i] = reader.ReadInt32();
-					}
-					ClearStatus = reader.ReadByte();
-					ScoreRank = reader.ReadByte();
-					ScrollSpeedValue = reader.ReadInt32();
-					SongSpeedValue = reader.ReadInt32();
-					JudgeStrictnessAdjust = reader.ReadInt32();
-					ModFlags = reader.ReadInt32();
-					GaugeType = reader.ReadByte();
-					GaugeFill = reader.ReadSingle();
-					Timestamp = reader.ReadInt64();
-					CompressedInputsSize = reader.ReadInt32();
-					CompressedInputs = reader.ReadBytes(CompressedInputsSize);
-					var uncomp = SevenZip.Compression.LZMA.SevenZipHelper.Decompress(CompressedInputs);
-					allInputs = ConvertByteArrayToTupleList(uncomp);
-					ChartUniqueID = reader.ReadString();
-					ChartDifficulty = reader.ReadByte();
-					ChartLevel = reader.ReadByte();
-					OnlineScoreID = reader.ReadInt64();
-					// note-shuffle seed (added in 601); older replays have none → -1 (not replayable if RNG mods were used)
-					RandomSeed = (GameVersion >= 601) ? reader.ReadInt32() : -1;
-				}
-			}
-		} catch (Exception) {
+	public void tLoadReplayFile(string optkrFilePath) => tRead(optkrFilePath, withInputs: true);
 
+	// one reader for the full load and the best-plays header (which skips the input log); false on a broken file
+	private bool tRead(string optkrFilePath, bool withInputs) {
+		try {
+			using var fileStream = new FileStream(optkrFilePath, FileMode.Open, FileAccess.Read);
+			using var reader = new BinaryReader(fileStream);
+			GameMode = reader.ReadByte();
+			GameVersion = reader.ReadInt32();
+			ChartChecksum = reader.ReadString();
+			PlayerName = reader.ReadString();
+			GoodCount = reader.ReadInt32();
+			OkCount = reader.ReadInt32();
+			BadCount = reader.ReadInt32();
+			RollCount = reader.ReadInt32();
+			MaxCombo = reader.ReadInt32();
+			BoomCount = reader.ReadInt32();
+			ADLibCount = reader.ReadInt32();
+			Score = reader.ReadInt32();
+			CoinValue = reader.ReadInt16();
+			ReachedFloor = reader.ReadInt32();
+			RemainingLives = reader.ReadInt32();
+			DanSongCount = reader.ReadInt32();
+			if (DanSongCount > 0) {
+				// 8 ints per song: a count the rest of the file cannot hold means a broken file
+				if ((long)DanSongCount * 32 > fileStream.Length - fileStream.Position) throw new InvalidDataException();
+				tDanRegisterSongCount(DanSongCount);
+			}
+			for (int i = 0; i < DanSongCount; i++) {
+				IndividualGoodCount![i] = reader.ReadInt32();
+				IndividualOkCount![i] = reader.ReadInt32();
+				IndividualBadCount![i] = reader.ReadInt32();
+				IndividualRollCount![i] = reader.ReadInt32();
+				IndividualMaxCombo![i] = reader.ReadInt32();
+				IndividualBoomCount![i] = reader.ReadInt32();
+				IndividualADLibCount![i] = reader.ReadInt32();
+				IndividualScore![i] = reader.ReadInt32();
+			}
+			ClearStatus = reader.ReadByte();
+			ScoreRank = reader.ReadByte();
+			ScrollSpeedValue = reader.ReadInt32();
+			SongSpeedValue = reader.ReadInt32();
+			JudgeStrictnessAdjust = reader.ReadInt32();
+			ModFlags = reader.ReadInt32();
+			GaugeType = reader.ReadByte();
+			GaugeFill = reader.ReadSingle();
+			Timestamp = reader.ReadInt64();
+			CompressedInputsSize = reader.ReadInt32();
+			if (withInputs) {
+				CompressedInputs = reader.ReadBytes(CompressedInputsSize);
+				var uncomp = SevenZip.Compression.LZMA.SevenZipHelper.Decompress(CompressedInputs);
+				allInputs = ConvertByteArrayToTupleList(uncomp);
+			} else {
+				fileStream.Seek(CompressedInputsSize, SeekOrigin.Current);
+			}
+			ChartUniqueID = reader.ReadString();
+			ChartDifficulty = reader.ReadByte();
+			ChartLevel = reader.ReadByte();
+			OnlineScoreID = reader.ReadInt64();
+			// note-shuffle seed (added in 601); older replays have none → -1 (not replayable if RNG mods were used)
+			RandomSeed = (GameVersion >= 601) ? reader.ReadInt32() : -1;
+			if (GameVersion >= EXTENSION_VERSION) tReadExtension(reader, fileStream);
+			return true;
+		} catch (Exception) {
+			return false;
 		}
 	}
+
+	#region [Tagged block (700+)]
+
+	// after RandomSeed: int32 magic, int16 tag count, then per tag int16 id, int32 length, bytes.
+	// older readers stop before it; unknown tags are skipped by their length
+	private const int EXT_MAGIC = 0x5852544F;   // "OTRX"
+	private enum EExtTag : short {
+		Session = 1,       // byte player count, byte player side, byte flags (1 = AI battle)
+		GameType = 2,      // byte, the recorder's own game type setting
+		PuchiEffect = 3,   // int16 count, then (string name, double value)
+		GlobalReads = 4,   // int32 count, then (byte 0 counter / 1 trigger, string key, double value)
+	}
+
+	// puchichara effect names, as in Effects.json
+	private const string PUCHI_ALLPURPLE = "allpurple", PUCHI_AUTOROLL = "AutoRoll", PUCHI_SHOWADLIB = "showadlib", PUCHI_SPLITLANE = "splitlane";
+
+	private static byte[] tTagBytes(Action<BinaryWriter> fill) {
+		using var ms = new MemoryStream();
+		using (var w = new BinaryWriter(ms)) fill(w);
+		return ms.ToArray();
+	}
+
+	private void tWriteExtension(BinaryWriter writer) {
+		var tags = new List<(EExtTag tag, byte[] data)> {
+			(EExtTag.Session, tTagBytes(w => { w.Write(PlayerCount); w.Write(PlayerSide); w.Write((byte)(AIBattle ? 1 : 0)); })),
+		};
+		if (GameType >= 0) tags.Add((EExtTag.GameType, tTagBytes(w => w.Write((byte)GameType))));
+		if (PuchiEffect is { } e) {
+			tags.Add((EExtTag.PuchiEffect, tTagBytes(w => {
+				w.Write((short)4);
+				w.Write(PUCHI_ALLPURPLE); w.Write(e.AllPurple ? 1.0 : 0.0);
+				w.Write(PUCHI_AUTOROLL); w.Write((double)e.Autoroll);
+				w.Write(PUCHI_SHOWADLIB); w.Write(e.ShowAdlib ? 1.0 : 0.0);
+				w.Write(PUCHI_SPLITLANE); w.Write(e.SplitLane ? 1.0 : 0.0);
+			})));
+		}
+		if (GlobalCounterReads.Count + GlobalTriggerReads.Count > 0) {
+			tags.Add((EExtTag.GlobalReads, tTagBytes(w => {
+				w.Write(GlobalCounterReads.Count + GlobalTriggerReads.Count);
+				foreach (var (key, value) in GlobalCounterReads) { w.Write((byte)0); w.Write(key); w.Write(value); }
+				foreach (var (key, value) in GlobalTriggerReads) { w.Write((byte)1); w.Write(key); w.Write(value ? 1.0 : 0.0); }
+			})));
+		}
+
+		writer.Write(EXT_MAGIC);
+		writer.Write((short)tags.Count);
+		foreach (var (tag, data) in tags) {
+			writer.Write((short)tag);
+			writer.Write(data.Length);
+			writer.Write(data);
+		}
+	}
+
+	// a broken block keeps the legacy fields and the tags read before it
+	private void tReadExtension(BinaryReader reader, Stream stream) {
+		try {
+			if (stream.Length - stream.Position < 6 || reader.ReadInt32() != EXT_MAGIC) return;
+			int count = reader.ReadInt16();
+			for (int i = 0; i < count; i++) {
+				var tag = (EExtTag)reader.ReadInt16();
+				int length = reader.ReadInt32();
+				if (length < 0 || length > stream.Length - stream.Position) return;
+				using var r = new BinaryReader(new MemoryStream(reader.ReadBytes(length)));
+				switch (tag) {
+					case EExtTag.Session: {
+							int players = r.ReadByte(), side = r.ReadByte(), flags = r.ReadByte();
+							if (players is >= 1 and <= 5 && side < players) {
+								PlayerCount = (byte)players;
+								PlayerSide = (byte)side;
+								AIBattle = (flags & 1) != 0;
+							}
+							break;
+						}
+					case EExtTag.GameType: {
+							int gt = r.ReadByte();
+							GameType = Enum.IsDefined(typeof(EGameType), gt) ? gt : -1;
+							break;
+						}
+					case EExtTag.PuchiEffect: {
+							var e = new DBPuchichara.PuchicharaEffect();
+							int n = r.ReadInt16();
+							for (int j = 0; j < n; j++) {
+								string name = r.ReadString();
+								double value = r.ReadDouble();
+								switch (name) {
+									case PUCHI_ALLPURPLE: e.AllPurple = value != 0; break;
+									case PUCHI_AUTOROLL: e.Autoroll = (int)value; break;
+									case PUCHI_SHOWADLIB: e.ShowAdlib = value != 0; break;
+									case PUCHI_SPLITLANE: e.SplitLane = value != 0; break;
+								}
+							}
+							PuchiEffect = e;
+							break;
+						}
+					case EExtTag.GlobalReads: {
+							int n = r.ReadInt32();
+							for (int j = 0; j < n; j++) {
+								byte kind = r.ReadByte();
+								string key = r.ReadString();
+								double value = r.ReadDouble();
+								if (kind == 0) GlobalCounterReads[key] = value;
+								else GlobalTriggerReads[key] = value != 0;
+							}
+							break;
+						}
+				}
+			}
+		} catch (Exception) { }
+	}
+
+	#endregion
 
 	// Lightweight metadata read by the best-plays list. Field order is coupled to tSaveReplayFile/tLoadReplayFile.
 	public sealed class ReplayHeader {
@@ -241,6 +367,10 @@ class CSongReplay {
 		// warnings surfaced on the best-plays card (tooltip + badge)
 		public bool OldVersion;         // recorded by an older game version (calculations may differ)
 		public bool ChecksumMismatch;   // chart md5 no longer matches (chart edited since the play)
+		// session and game type of the play (card tooltip); older files read as 1P solo, game type -1 (unknown)
+		public int PlayerCount = 1;
+		public int PlayerSide;
+		public int GameType = -1;
 		// human-readable play date for the list (Timestamp is DateTime.Now.Ticks)
 		public string Date {
 			get { try { return new DateTime(Timestamp).ToString("yyyy-MM-dd HH:mm"); } catch { return ""; } }
@@ -254,17 +384,20 @@ class CSongReplay {
 	private const int RNG_UNSEEDED_MODS = (int)(EModFlag.Avalanche | EModFlag.Minesweeper);
 
 	// true if the replay can be played back faithfully (no unreproducible RNG)
-	public static bool tIsReplayWatchable(int modFlags, int randomSeed, int gameVersion)
-		=> tUnwatchableReason(modFlags, randomSeed, gameVersion) == null;
+	public static bool tIsReplayWatchable(int modFlags, int randomSeed, int gameVersion, int playerCount = 1)
+		=> tUnwatchableReason(modFlags, randomSeed, gameVersion, playerCount) == null;
 
 	// null when watchable, else a reason code the skin turns into its own wording ("rng_mods",
-	// "dynamic_beat_version" or "unseeded_shuffle").
+	// "dynamic_beat_version", "dynamic_beat_multi" or "unseeded_shuffle").
 	// Dynamic Beat is deterministic given the replayed inputs (the warp factor is re-derived from the same
 	// judgements), but only while the evaluation logic matches the recorder's — so it needs the same version.
-	public static string? tUnwatchableReason(int modFlags, int randomSeed, int gameVersion) {
+	// With several players the factor also follows the other players' judgements, which the file does not hold.
+	public static string? tUnwatchableReason(int modFlags, int randomSeed, int gameVersion, int playerCount = 1) {
 		if ((modFlags & RNG_UNSEEDED_MODS) != 0) return "rng_mods";
 		if ((modFlags & (int)EModFlag.DynamicBeat) != 0 && gameVersion != STORED_GAME_VERSION)
 			return "dynamic_beat_version";
+		if ((modFlags & (int)EModFlag.DynamicBeat) != 0 && playerCount > 1)
+			return "dynamic_beat_multi";
 		if ((modFlags & RNG_SEEDABLE_MODS) != 0 && randomSeed < 0)
 			return "unseeded_shuffle";
 		return null;
@@ -272,42 +405,23 @@ class CSongReplay {
 
 	// Reads a replay's metadata without decompressing the input log (seeks past it). Returns null on failure.
 	public static ReplayHeader? tParseHeader(string optkrFilePath) {
-		try {
-			using var fs = new FileStream(optkrFilePath, FileMode.Open, FileAccess.Read);
-			using var r = new BinaryReader(fs);
-			var h = new ReplayHeader { FilePath = optkrFilePath };
-			h.GameMode = r.ReadByte();
-			h.GameVersion = r.ReadInt32();
-			h.ChartChecksum = r.ReadString();
-			h.PlayerName = r.ReadString();
-			h.Good = r.ReadInt32(); h.Ok = r.ReadInt32(); h.Bad = r.ReadInt32(); h.Roll = r.ReadInt32();
-			h.MaxCombo = r.ReadInt32(); h.Boom = r.ReadInt32(); h.ADLib = r.ReadInt32();
-			h.Score = r.ReadInt32();
-			r.ReadInt16();                               // CoinValue
-			r.ReadInt32(); r.ReadInt32();                // ReachedFloor, RemainingLives
-			int danCount = r.ReadInt32();
-			for (int i = 0; i < danCount * 8; i++) r.ReadInt32();   // per-dan-song stats (8 ints each)
-			h.ClearStatus = r.ReadByte();
-			h.ScoreRank = r.ReadByte();
-			h.ScrollSpeed = r.ReadInt32(); h.SongSpeed = r.ReadInt32(); h.JudgeStrictness = r.ReadInt32();
-			h.ModFlags = r.ReadInt32();
-			r.ReadByte();                                // GaugeType
-			r.ReadSingle();                              // GaugeFill
-			h.Timestamp = r.ReadInt64();
-			int compSize = r.ReadInt32();
-			fs.Seek(compSize, SeekOrigin.Current);       // skip the compressed input log
-			h.ChartUniqueID = r.ReadString();
-			h.ChartDifficulty = r.ReadByte();
-			r.ReadByte();                                // ChartLevel
-			r.ReadInt64();                               // OnlineScoreID
-			h.RandomSeed = (h.GameVersion >= 601) ? r.ReadInt32() : -1;
-			h.UnwatchableReason = tUnwatchableReason(h.ModFlags, h.RandomSeed, h.GameVersion) ?? "";
-			h.Watchable = h.UnwatchableReason.Length == 0;
-			h.OldVersion = h.GameVersion < STORED_GAME_VERSION;
-			return h;
-		} catch {
-			return null;
-		}
+		var rep = new CSongReplay();
+		if (!rep.tRead(optkrFilePath, withInputs: false)) return null;
+		var h = new ReplayHeader {
+			FilePath = optkrFilePath,
+			GameMode = rep.GameMode, GameVersion = rep.GameVersion, ChartChecksum = rep.ChartChecksum, PlayerName = rep.PlayerName,
+			Good = rep.GoodCount, Ok = rep.OkCount, Bad = rep.BadCount, Roll = rep.RollCount,
+			MaxCombo = rep.MaxCombo, Boom = rep.BoomCount, ADLib = rep.ADLibCount, Score = rep.Score,
+			ClearStatus = rep.ClearStatus, ScoreRank = rep.ScoreRank,
+			ScrollSpeed = rep.ScrollSpeedValue, SongSpeed = rep.SongSpeedValue, JudgeStrictness = rep.JudgeStrictnessAdjust,
+			ModFlags = rep.ModFlags, Timestamp = rep.Timestamp,
+			ChartUniqueID = rep.ChartUniqueID, ChartDifficulty = rep.ChartDifficulty, RandomSeed = rep.RandomSeed,
+			PlayerCount = rep.PlayerCount, PlayerSide = rep.PlayerSide, GameType = rep.GameType,
+		};
+		h.UnwatchableReason = tUnwatchableReason(h.ModFlags, h.RandomSeed, h.GameVersion, h.PlayerCount) ?? "";
+		h.Watchable = h.UnwatchableReason.Length == 0;
+		h.OldVersion = h.GameVersion < STORED_GAME_VERSION;
+		return h;
 	}
 
 	// Regular (GameMode 0) replays for a chart+difficulty, ranked by score (highest first), capped to topN.
@@ -408,6 +522,7 @@ class CSongReplay {
 					writer.Write(ChartLevel);
 					writer.Write(OnlineScoreID);
 					writer.Write(RandomSeed);
+					if (GameVersion >= EXTENSION_VERSION) tWriteExtension(writer);
 				}
 			}
 		} catch (Exception ex) {
@@ -523,6 +638,13 @@ class CSongReplay {
 		OnlineScoreID = 0;
 		// Note-shuffle seed used this play (so Random/Super-Random replays can be reproduced)
 		RandomSeed = OpenTaiko.ReplaySeed[storedPlayer];
+		// session: the chart sheet and the `pc` script variable depend on it
+		PlayerCount = (byte)OpenTaiko.ConfigIni.nPlayerCount;
+		PlayerSide = (byte)storedPlayer;
+		AIBattle = OpenTaiko.ConfigIni.bAIBattleMode;
+		GameType = (int)OpenTaiko.ConfigIni.nGameType[actualPlayer];
+		PuchiEffect = PuchiChara.tGetEffect(storedPlayer);
+		_recordingGlobals = false;
 		// Replay Checksum (Calculate at the end)
 		ReplayChecksum = "";
 		return true;
@@ -550,6 +672,7 @@ class CSongReplay {
 	private static EStealthMode _snapStealth;
 	private static EFunMods _snapFunMods;
 	private static ESpecialMod _snapSpecialMod;
+	private static EGameType _snapGameType;
 	private static int _snapJust, _snapScroll, _snapTimingZones, _snapSongSpeed, _snapSeed;
 	private static string? _snapName;
 
@@ -560,6 +683,7 @@ class CSongReplay {
 			_snapAuto = cfg.bAutoPlay[0]; _snapRandom = cfg.eRandom[0]; _snapStealth = cfg.eSTEALTH[0];
 			_snapFunMods = cfg.nFunMods[0]; _snapJust = cfg.bJust[0]; _snapScroll = cfg.nScrollSpeed[0];
 			_snapSpecialMod = cfg.eSpecialMod[0];
+			_snapGameType = cfg.nGameType[0];
 			_snapTimingZones = cfg.nTimingZones[0]; _snapSongSpeed = cfg.nSongSpeed; _snapSeed = OpenTaiko.ReplaySeed[0];
 			_snapName = OpenTaiko.SaveFileInstances[0].data.Name;
 			_modsSnapped = true;
@@ -593,8 +717,17 @@ class CSongReplay {
 		cfg.nTimingZones[0] = JudgeStrictnessAdjust;
 		cfg.bAutoPlay[0] = false;   // the recorded inputs do the judging, not auto (the auto icon shows via bReplayMode)
 		cfg.eSpecialMod[0] = SpecialModOf(ModFlags);   // the replay is judged under its own special mod, not the watcher's
+		cfg.nGameType[0] = PlaybackGameType;
 		OpenTaiko.ReplaySeed[0] = RandomSeed;
 	}
+
+	// files before 700 hold no game type: clap presses only count in Bongo mode
+	public EGameType PlaybackGameType
+		=> GameType >= 0 ? (EGameType)GameType
+		: Inputs.Any(i => i.Item2 == (byte)EPad.Clap) ? EGameType.Konga : EGameType.Taiko;
+
+	// the chart sheet of the recorded session (an AI battle loads the solo sheet)
+	public (int Count, int Side) SessionSheet => (AIBattle ? 1 : PlayerCount, PlayerSide);
 
 	// restore the player-0 mod state captured by tApplyVirtualMods (idempotent)
 	public static void tRestoreVirtualMods() {
@@ -603,6 +736,7 @@ class CSongReplay {
 		cfg.bAutoPlay[0] = _snapAuto; cfg.eRandom[0] = _snapRandom; cfg.eSTEALTH[0] = _snapStealth;
 		cfg.nFunMods[0] = _snapFunMods; cfg.bJust[0] = _snapJust; cfg.nScrollSpeed[0] = _snapScroll;
 		cfg.eSpecialMod[0] = _snapSpecialMod;
+		cfg.nGameType[0] = _snapGameType;
 		cfg.nTimingZones[0] = _snapTimingZones; cfg.nSongSpeed = _snapSongSpeed; OpenTaiko.ReplaySeed[0] = _snapSeed;
 		if (_snapName != null) {
 			// defensive: this also runs from the game-exit path, where nameplate/save structures may be tearing down
@@ -613,6 +747,60 @@ class CSongReplay {
 			_snapName = null;
 		}
 		_modsSnapped = false;
+	}
+
+	#endregion
+
+	#region [Global counters and triggers]
+
+	// a chart's reads and writes of the save's global counters and triggers: a play records the values it read
+	// before writing them; a watched replay reads those back and writes only to itself, never to the save
+	private readonly HashSet<string> _writtenCounters = new(), _writtenTriggers = new();
+	private readonly Dictionary<string, double> _watchCounters = new();
+	private readonly Dictionary<string, bool> _watchTriggers = new();
+	private bool _recordingGlobals;
+
+	private static CSongReplay? WatchedBy(int player)
+		=> (player >= 0 && player < OpenTaiko.bReplayMode.Length && OpenTaiko.bReplayMode[player]) ? OpenTaiko.ReplayPlayback[player]?.replay : null;
+	private static CSongReplay? RecordedBy(int player)
+		=> (player >= 0 && player < OpenTaiko.ReplayInstances.Length && OpenTaiko.ReplayInstances[player] is { _recordingGlobals: true } r) ? r : null;
+
+	// called when a watched play starts or restarts
+	public void tResetWatchedGlobals() {
+		_watchCounters.Clear();
+		_watchTriggers.Clear();
+	}
+
+	public static double tReadGlobalCounter(int player, SaveFile? save, string key) {
+		if (WatchedBy(player) is { } w) {
+			if (w._watchCounters.TryGetValue(key, out double v) || w.GlobalCounterReads.TryGetValue(key, out v)) return v;
+			return save?.tGetGlobalCounter(key) ?? 0;
+		}
+		double value = save?.tGetGlobalCounter(key) ?? 0;
+		if (RecordedBy(player) is { } r && !r._writtenCounters.Contains(key)) r.GlobalCounterReads.TryAdd(key, value);
+		return value;
+	}
+
+	public static bool tReadGlobalTrigger(int player, SaveFile? save, string key) {
+		if (WatchedBy(player) is { } w) {
+			if (w._watchTriggers.TryGetValue(key, out bool v) || w.GlobalTriggerReads.TryGetValue(key, out v)) return v;
+			return save?.tGetGlobalTrigger(key) ?? false;
+		}
+		bool value = save?.tGetGlobalTrigger(key) ?? false;
+		if (RecordedBy(player) is { } r && !r._writtenTriggers.Contains(key)) r.GlobalTriggerReads.TryAdd(key, value);
+		return value;
+	}
+
+	public static void tWriteGlobalCounter(int player, string key, double value) {
+		if (WatchedBy(player) is { } w) { w._watchCounters[key] = value; return; }
+		if (RecordedBy(player) is { } r && !r.GlobalCounterReads.ContainsKey(key)) r._writtenCounters.Add(key);
+		OpenTaiko.SaveFileInstances[player].tSetGlobalCounter(key, value);
+	}
+
+	public static void tWriteGlobalTrigger(int player, string key, bool value) {
+		if (WatchedBy(player) is { } w) { w._watchTriggers[key] = value; return; }
+		if (RecordedBy(player) is { } r && !r.GlobalTriggerReads.ContainsKey(key)) r._writtenTriggers.Add(key);
+		OpenTaiko.SaveFileInstances[player].tSetGlobalTrigger(key, value);
 	}
 
 	#endregion
@@ -771,6 +959,14 @@ class CSongReplay {
 	public long OnlineScoreID;
 	// note-shuffle seed (added in version 601); -1 = none recorded (RNG-mod replays from before this are not replayable)
 	public int RandomSeed = -1;
+	// tagged block (700+); older files read as a solo 1P play with the defaults below
+	public byte PlayerCount = 1;   // players in the session
+	public byte PlayerSide = 0;    // the recorder's player index
+	public bool AIBattle;
+	public int GameType = -1;      // the recorder's own game type setting (EGameType); -1 = not recorded
+	public DBPuchichara.PuchicharaEffect? PuchiEffect;   // null = not recorded (played back without effects)
+	public readonly Dictionary<string, double> GlobalCounterReads = new();
+	public readonly Dictionary<string, bool> GlobalTriggerReads = new();
 
 	#endregion
 

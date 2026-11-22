@@ -428,9 +428,12 @@ Métadonnées d'un replay sauvegardé.
 | `rep.GameMode  (int)` | Le mode de jeu de la partie enregistrée. |
 | `rep.GameVersion  (int)` | La version du jeu qui a enregistré le replay. |
 | `rep.Watchable  (bool)` | Vrai quand le jeu peut rejouer le replay fidèlement. |
-| `rep.UnwatchableReason  (string)` | Un code de motif quand Watchable est false : `rng_mods`, `dynamic_beat_version` ou `unseeded_shuffle` ; vide sinon. |
+| `rep.UnwatchableReason  (string)` | Un code de motif quand Watchable est false : `rng_mods`, `dynamic_beat_version`, `dynamic_beat_multi` ou `unseeded_shuffle` ; vide sinon. |
 | `rep.OldVersion  (bool)` | Vrai quand une version plus ancienne du jeu a enregistré le replay. |
 | `rep.ChecksumMismatch  (bool)` | Vrai quand le fichier de partition ne correspond plus à l'enregistrement (calculé uniquement quand vous passez un chemin de partition). |
+| `rep.PlayerCount  (int)` | Le nombre de joueurs de la partie enregistrée (1 pour les fichiers antérieurs à 0.7.0). |
+| `rep.PlayerSide  (int)` | L'indice du joueur enregistré, à partir de 0 (0 pour les fichiers antérieurs à 0.7.0). |
+| `rep.GameType  (int)` | Le type de jeu choisi par le joueur enregistré : 0 Taiko, 1 Bongo ; -1 quand le fichier ne le contient pas (avant 0.7.0). |
 
 ### SONGMOUNT
 

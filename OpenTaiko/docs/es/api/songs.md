@@ -428,9 +428,12 @@ Elementos del array devuelto por REPLAY:ListReplays o del Result de un handle de
 | `rep.GameMode  (int)` | El modo de juego de la partida grabada. |
 | `rep.GameVersion  (int)` | La versión del juego que grabó la repetición. |
 | `rep.Watchable  (bool)` | Verdadero cuando el juego puede reproducir la repetición fielmente. |
-| `rep.UnwatchableReason  (string)` | Un código de motivo cuando Watchable es false: `rng_mods`, `dynamic_beat_version` o `unseeded_shuffle`; vacío en caso contrario. |
+| `rep.UnwatchableReason  (string)` | Un código de motivo cuando Watchable es false: `rng_mods`, `dynamic_beat_version`, `dynamic_beat_multi` o `unseeded_shuffle`; vacío en caso contrario. |
 | `rep.OldVersion  (bool)` | Verdadero cuando una versión anterior del juego grabó la repetición. |
 | `rep.ChecksumMismatch  (bool)` | Verdadero cuando el archivo de chart ya no coincide con la grabación (se calcula solo cuando pasas una ruta de chart). |
+| `rep.PlayerCount  (int)` | El número de jugadores de la partida grabada (1 en archivos anteriores a 0.7.0). |
+| `rep.PlayerSide  (int)` | El índice del jugador que grabó, desde 0 (0 en archivos anteriores a 0.7.0). |
+| `rep.GameType  (int)` | El tipo de juego elegido por quien grabó: 0 Taiko, 1 Bongó; -1 cuando el archivo no lo guarda (antes de 0.7.0). |
 
 ### SONGMOUNT
 

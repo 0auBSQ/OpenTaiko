@@ -428,9 +428,12 @@ Elementen van de array die REPLAY:ListReplays teruggeeft of van de Result van ee
 | `rep.GameMode  (int)` | De spelmodus van de opgenomen spelbeurt. |
 | `rep.GameVersion  (int)` | De spelversie die de replay heeft opgenomen. |
 | `rep.Watchable  (bool)` | True wanneer het spel de replay getrouw kan afspelen. |
-| `rep.UnwatchableReason  (string)` | Een redencode wanneer Watchable false is: `rng_mods`, `dynamic_beat_version` of `unseeded_shuffle`; anders leeg. |
+| `rep.UnwatchableReason  (string)` | Een redencode wanneer Watchable false is: `rng_mods`, `dynamic_beat_version`, `dynamic_beat_multi` of `unseeded_shuffle`; anders leeg. |
 | `rep.OldVersion  (bool)` | True wanneer een oudere spelversie de replay heeft opgenomen. |
 | `rep.ChecksumMismatch  (bool)` | True wanneer het chartbestand niet meer overeenkomt met de opname (alleen berekend wanneer je een chartpad doorgeeft). |
+| `rep.PlayerCount  (int)` | Het aantal spelers in het opgenomen potje (1 voor bestanden van vóór 0.7.0). |
+| `rep.PlayerSide  (int)` | De spelerindex van de opname, vanaf 0 (0 voor bestanden van vóór 0.7.0). |
+| `rep.GameType  (int)` | De speltype-instelling van de opname: 0 Taiko, 1 Bongo; -1 wanneer het bestand die niet bevat (vóór 0.7.0). |
 
 ### SONGMOUNT
 

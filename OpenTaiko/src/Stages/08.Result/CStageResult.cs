@@ -739,7 +739,8 @@ internal class CStageResult : CStage {
 
 			#region [Set triggers for the cutscenes that will be met]
 
-			OpenTaiko.stageCutScene.RegisterMetOutros();
+			if (!OpenTaiko.bReplayMode[0])   // a watched replay meets no cutscene
+				OpenTaiko.stageCutScene.RegisterMetOutros();
 
 			#endregion
 

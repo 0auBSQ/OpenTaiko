@@ -319,6 +319,153 @@ namespace OpenTaikoTests {
 			} finally { Directory.Delete(dir, true); }
 		}
 
+		// a loadable replay with given inputs (tja ms, pad) and the tagged block fields set by `fill`
+		private static string SaveWithInputs(string tja, int version, (double ms, byte pad)[] inputs, Action<CSongReplay> fill = null) {
+			var raw = new System.Collections.Generic.List<byte>();
+			foreach (var (ms, pad) in inputs) { raw.AddRange(BitConverter.GetBytes(ms)); raw.Add(pad); }
+			var r = new CSongReplay(tja, 0) {
+				GameMode = 0, GameVersion = version, PlayerName = "Tester", Score = 100, Timestamp = 1,
+				ChartUniqueID = "uid-X", ChartDifficulty = 3, RandomSeed = 7, GaugeType = 1,
+				CompressedInputs = SevenZip.Compression.LZMA.SevenZipHelper.Compress(raw.ToArray()),
+			};
+			r.CompressedInputsSize = r.CompressedInputs.Length;
+			fill?.Invoke(r);
+			r.tSaveReplayFile();
+			return Directory.GetFiles(Path.Combine(Path.GetDirectoryName(tja), "Replay"), "Replay_*.optkr")[0];
+		}
+
+		[Fact]
+		public void TaggedBlock_RoundTripsSessionGameTypePuchiAndGlobals() {
+			var (dir, tja) = NewSong();
+			try {
+				string file = SaveWithInputs(tja, CSongReplay.STORED_GAME_VERSION, [(100, (byte)EPad.LRed)], r => {
+					r.PlayerCount = 3; r.PlayerSide = 2; r.AIBattle = false;
+					r.GameType = (int)EGameType.Konga;
+					r.PuchiEffect = new DBPuchichara.PuchicharaEffect { AllPurple = true, Autoroll = 12, ShowAdlib = false, SplitLane = true };
+					r.GlobalCounterReads["coins"] = 42.5;
+					r.GlobalTriggerReads["seen"] = true;
+				});
+
+				var rep = new CSongReplay();
+				rep.tLoadReplayFile(file);
+				Assert.Equal(7, rep.RandomSeed);
+				Assert.Equal(3, rep.PlayerCount);
+				Assert.Equal(2, rep.PlayerSide);
+				Assert.Equal((3, 2), rep.SessionSheet);
+				Assert.Equal(EGameType.Konga, rep.PlaybackGameType);
+				Assert.NotNull(rep.PuchiEffect);
+				Assert.True(rep.PuchiEffect.AllPurple);
+				Assert.Equal(12, rep.PuchiEffect.Autoroll);
+				Assert.False(rep.PuchiEffect.ShowAdlib);
+				Assert.True(rep.PuchiEffect.SplitLane);
+				Assert.Equal(42.5, rep.GlobalCounterReads["coins"]);
+				Assert.True(rep.GlobalTriggerReads["seen"]);
+				Assert.Single(rep.Inputs);
+
+				var h = CSongReplay.tParseHeader(file);
+				Assert.Equal(3, h.PlayerCount);
+				Assert.Equal(2, h.PlayerSide);
+				Assert.Equal((int)EGameType.Konga, h.GameType);
+				Assert.Equal("uid-X", h.ChartUniqueID);
+				Assert.False(h.OldVersion);
+			} finally { Directory.Delete(dir, true); }
+		}
+
+		// an AI battle loads the solo sheet
+		[Fact]
+		public void AIBattleReplay_LoadsTheSoloSheet() {
+			var (dir, tja) = NewSong();
+			try {
+				string file = SaveWithInputs(tja, CSongReplay.STORED_GAME_VERSION, [], r => { r.PlayerCount = 2; r.PlayerSide = 0; r.AIBattle = true; });
+				var rep = new CSongReplay();
+				rep.tLoadReplayFile(file);
+				Assert.Equal((1, 0), rep.SessionSheet);
+				Assert.Equal(2, rep.PlayerCount);
+			} finally { Directory.Delete(dir, true); }
+		}
+
+		// files before 700 hold no block: solo 1P, no puchichara effects, game type from the clap presses
+		[Theory]
+		[InlineData((byte)EPad.LRed, EGameType.Taiko)]
+		[InlineData((byte)EPad.Clap, EGameType.Konga)]
+		public void OldReplay_ReadsWithDefaults(byte pad, EGameType expected) {
+			var (dir, tja) = NewSong();
+			try {
+				string file = SaveWithInputs(tja, 602, [(100, pad)], r => { r.PlayerCount = 2; r.PlayerSide = 1; r.GameType = 0; });
+				var rep = new CSongReplay();
+				rep.tLoadReplayFile(file);
+				Assert.Equal(1, rep.PlayerCount);
+				Assert.Equal(0, rep.PlayerSide);
+				Assert.Equal(-1, rep.GameType);
+				Assert.Null(rep.PuchiEffect);
+				Assert.Equal(expected, rep.PlaybackGameType);
+				Assert.Equal(7, rep.RandomSeed);
+
+				var h = CSongReplay.tParseHeader(file);
+				Assert.Equal(1, h.PlayerCount);
+				Assert.Equal(-1, h.GameType);
+				Assert.True(h.OldVersion);
+			} finally { Directory.Delete(dir, true); }
+		}
+
+		// a cut tagged block keeps the legacy fields
+		[Fact]
+		public void TruncatedTaggedBlock_KeepsTheLegacyFields() {
+			var (dir, tja) = NewSong();
+			try {
+				string file = SaveWithInputs(tja, CSongReplay.STORED_GAME_VERSION, [(100, (byte)EPad.LRed)], r => {
+					r.PuchiEffect = new DBPuchichara.PuchicharaEffect { Autoroll = 5 };
+				});
+				byte[] bytes = File.ReadAllBytes(file);
+				File.WriteAllBytes(file, bytes[..^3]);
+
+				var h = CSongReplay.tParseHeader(file);
+				Assert.NotNull(h);
+				Assert.Equal("uid-X", h.ChartUniqueID);
+				Assert.Equal(7, h.RandomSeed);
+				var rep = new CSongReplay();
+				rep.tLoadReplayFile(file);
+				Assert.Equal(7, rep.RandomSeed);
+				Assert.Single(rep.Inputs);
+			} finally { Directory.Delete(dir, true); }
+		}
+
+		[Fact]
+		public void DynamicBeat_FromAMultiplayerSession_IsNotWatchable() {
+			int mods = (int)CSongReplay.EModFlag.DynamicBeat;
+			Assert.True(CSongReplay.tIsReplayWatchable(mods, -1, CSongReplay.STORED_GAME_VERSION, 1));
+			Assert.Equal("dynamic_beat_multi", CSongReplay.tUnwatchableReason(mods, -1, CSongReplay.STORED_GAME_VERSION, 2));
+			Assert.True(CSongReplay.tIsReplayWatchable((int)CSongReplay.EModFlag.Mirror, -1, CSongReplay.STORED_GAME_VERSION, 2));
+		}
+
+		// a watched replay reads the recorded global values and keeps its writes to itself
+		[Fact]
+		public void WatchedReplay_ServesRecordedGlobalsAndWritesNoSave() {
+			var rep = new CSongReplay();
+			rep.GlobalCounterReads["k"] = 5;
+			rep.GlobalTriggerReads["t"] = true;
+			bool prevMode = OpenTaiko.OpenTaiko.bReplayMode[0];
+			var prevPlayback = OpenTaiko.OpenTaiko.ReplayPlayback[0];
+			try {
+				OpenTaiko.OpenTaiko.bReplayMode[0] = true;
+				OpenTaiko.OpenTaiko.ReplayPlayback[0] = new(rep, []);
+				Assert.Equal(5, CSongReplay.tReadGlobalCounter(0, null, "k"));
+				Assert.True(CSongReplay.tReadGlobalTrigger(0, null, "t"));
+				Assert.Equal(0, CSongReplay.tReadGlobalCounter(0, null, "unread"));
+
+				CSongReplay.tWriteGlobalCounter(0, "k", 9);   // no save instance is touched while watching
+				CSongReplay.tWriteGlobalTrigger(0, "t", false);
+				Assert.Equal(9, CSongReplay.tReadGlobalCounter(0, null, "k"));
+				Assert.False(CSongReplay.tReadGlobalTrigger(0, null, "t"));
+
+				rep.tResetWatchedGlobals();   // a restart reads the recording again
+				Assert.Equal(5, CSongReplay.tReadGlobalCounter(0, null, "k"));
+			} finally {
+				OpenTaiko.OpenTaiko.bReplayMode[0] = prevMode;
+				OpenTaiko.OpenTaiko.ReplayPlayback[0] = prevPlayback;
+			}
+		}
+
 		[Fact]
 		public void ListReplays_MissingFolder_ReturnsEmpty() {
 			var list = CSongReplay.tListReplays(Path.Combine(Path.GetTempPath(), "ot_nope_" + Guid.NewGuid().ToString("N")), "x", 0, 50);

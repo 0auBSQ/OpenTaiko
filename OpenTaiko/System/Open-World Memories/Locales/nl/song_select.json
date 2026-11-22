@@ -74,6 +74,9 @@
         "SONGSELECT_REPLAY_REASON_RNG": "Gebruikt willekeurige mods die niet opnieuw afgespeeld kunnen worden",
         "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT": "Dynamic Beat-replay uit een andere versie van het spel",
         "SONGSELECT_REPLAY_REASON_UNSEEDED": "Opgenomen voordat het husselen van noten een seed kreeg",
+        "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT_MULTI": "Dynamic Beat-replay uit een multiplayerpotje",
+        "SONGSELECT_REPLAY_SESSION": "Gespeeld als %dP in een potje met %d spelers",
+        "SONGSELECT_REPLAY_BONGO": "Op bongo's gespeeld",
 
         // Song select: the mod select dialog
         "SONGSELECT_MODS_TITLE": "Modselectie",

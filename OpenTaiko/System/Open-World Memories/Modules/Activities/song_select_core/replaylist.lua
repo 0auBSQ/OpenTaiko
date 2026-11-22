@@ -72,6 +72,7 @@ local GLINT_SPOTS = R.rank_glint_spots   -- from the ink centre, sheet px (scale
 local REASONS = {
     rng_mods             = { "SONGSELECT_REPLAY_REASON_RNG",          "Uses random mods that cannot be replayed" },
     dynamic_beat_version = { "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT", "Dynamic Beat replay from a different game version" },
+    dynamic_beat_multi   = { "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT_MULTI", "Dynamic Beat replay from a multiplayer session" },
     unseeded_shuffle     = { "SONGSELECT_REPLAY_REASON_UNSEEDED",     "Recorded before the note shuffle was seeded" },
 }
 -- Textures/Replay/rank_<tier>.png (cells: replays.rank_sheet)
@@ -733,7 +734,7 @@ function M.draw()
         rect(SB_X, LIST_TOP + t * (VIEW_H - thumbH), SB_W, thumbH, RGB.sbThumb, M._sbDrag and Scrollbar.thumb_drag_alpha or Scrollbar.thumb_alpha)
     end
 
-    -- flagged block tooltip: unwatchable reason, or the caveats
+    -- unwatchable reason or warnings
     local hov = M._hover ~= nil and G.replayList ~= nil and G.replayList[M._hover] or nil
     if G.replayConfirm == nil and hov ~= nil then
         local lines = {}
@@ -748,6 +749,16 @@ function M.draw()
         else
             if hov.OldVersion then lines[#lines + 1] = tr("SONGSELECT_REPLAY_OLD_VERSION", "Recorded on an older game version") end
             if hov.ChecksumMismatch then lines[#lines + 1] = tr("SONGSELECT_REPLAY_CHART_CHANGED", "The chart was modified after this play") end
+            if #lines == 0 then accent = RGB.pinkMid end   -- play info only
+        end
+        -- session and game type (files before 0.7.0 hold neither)
+        local players = math.floor(hov.PlayerCount or 1)
+        if players > 1 then
+            lines[#lines + 1] = string.format(tr("SONGSELECT_REPLAY_SESSION", "Played as %dP in a %d-player session"),
+                math.floor(hov.PlayerSide or 0) + 1, players)
+        end
+        if math.floor(hov.GameType or -1) == 1 then   -- EGameType.Konga
+            lines[#lines + 1] = tr("SONGSELECT_REPLAY_BONGO", "Played on bongos")
         end
         if #lines > 0 then
             local w = 0
