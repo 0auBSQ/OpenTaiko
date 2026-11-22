@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.7.0.17] - 2026-11-22 (Beta)
+
+- [Fix] Fix missing dlls not included in the release zip
+
 ## [0.7.0.16] - 2026-11-21 (Beta)
 
 - [Fix] Attach clipboard on Linux (969)
