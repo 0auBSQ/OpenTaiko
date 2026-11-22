@@ -21,10 +21,11 @@
     <Content Include="Databases/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Documentation/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="docs/**" Exclude="docs/*.py;docs/__pycache__/**" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="FFmpeg/**" CopyToOutputDirectory="PreserveNewest" Condition="'$(BuildingAsLibrary)' != 'true'" />
+    <!-- ExcludeFromSingleFile: native libraries stay next to the exe (sdk 11 drops unmarked .dll content) -->
+    <Content Include="FFmpeg/**" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" Condition="'$(BuildingAsLibrary)' != 'true'" />
     <Content Include="Global/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Lang/**" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="Libs/**" CopyToOutputDirectory="PreserveNewest" Condition="'$(BuildingAsLibrary)' != 'true'" />
+    <Content Include="Libs/**" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" Condition="'$(BuildingAsLibrary)' != 'true'" />
     <Content Include="Licenses/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Songs/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="System/**" CopyToOutputDirectory="PreserveNewest" />
@@ -50,6 +51,12 @@
     <!-- GLSL sources of the 3D renderers, read through ShaderSources -->
     <EmbeddedResource Include="src/Lua/3D/Shaders/*.vert;src/Lua/3D/Shaders/*.frag;src/Lua/3D/Shaders/*.comp" LogicalName="OpenTaiko.Shaders.%(Filename)%(Extension)" />
   </ItemGroup>
+  <!-- lightningdb's targets add lmdb.dll as a plain file: same as above -->
+  <Target Name="KeepLmdbOutsideSingleFile" AfterTargets="LightningDBIncludeNativeDll">
+    <ItemGroup>
+      <None Condition="'%(Filename)%(Extension)' == 'lmdb.dll'" ExcludeFromSingleFile="true" />
+    </ItemGroup>
+  </Target>
   <ItemGroup>
     <InternalsVisibleTo Include="OpenTaiko.iOS" />
     <InternalsVisibleTo Include="OpenTaiko.Android" />
