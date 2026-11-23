@@ -244,6 +244,7 @@ SHARED:GetSharedSound("Decide"):Play()
 | `CONFIG.AreSongUnlockablesDisabled  -> bool (read-only)` | ゲームが楽曲のアンロック条件を無視するかどうか。 |
 | `CONFIG.AreLuaNetworkingConnectionsAllowed  -> bool (read-only)` | プレイヤーが設定でオンライン接続を許可しているかどうか（「LuaNetworking接続を許可」、既定はオフ）。スクリプトからは変更できません。 |
 | `CONFIG.ShowPuchiChara  -> bool (read-only)` | ぷちキャラを表示するかどうか (ぷちキャラの設定)。 |
+| `CONFIG.GlobalOffsetMs  -> int (read-only)` | 「グローバルオフセット」の設定値 (ミリ秒)。ゲームはこの値を全譜面のOFFSETに加えます。キャリブレーションでも設定されます。 |
 | `CONFIG.SongSpeed  -> int` | 曲速度 (倍率の 20 分の 1 単位): 20 が 1.0x。書き込み時に 2..200 (0.1x から 10x) に制限されます。 |
 | `CONFIG.MasterVolume  -> int` | マスター音量。書き込み時に 0..100 に制限されます。 |
 | `CONFIG.SoundEffectVolume  -> int` | 効果音の音量。書き込み時に 0..100 に制限されます。 |

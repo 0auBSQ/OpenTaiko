@@ -244,6 +244,7 @@ Eigenschaften verwenden Punktsyntax (`CONFIG.PlayerCount`), Methoden Doppelpunkt
 | `CONFIG.AreSongUnlockablesDisabled  -> bool (read-only)` | Ob das Spiel Song-Freischaltbedingungen ignoriert. |
 | `CONFIG.AreLuaNetworkingConnectionsAllowed  -> bool (read-only)` | Ob der Spieler Online-Verbindungen in den Einstellungen erlaubt hat („LuaNetworking-Verbindungen zulassen“, standardmäßig aus). Skripte können es nicht ändern. |
 | `CONFIG.ShowPuchiChara  -> bool (read-only)` | Ob die Puchicharas angezeigt werden (die Puchichara-Einstellung). |
+| `CONFIG.GlobalOffsetMs  -> int (read-only)` | Die Einstellung „Globaler Offset“ in Millisekunden: der Wert, den das Spiel zum OFFSET jedes Charts addiert. Auch die Kalibrierung setzt ihn. |
 | `CONFIG.SongSpeed  -> int` | Songgeschwindigkeit in Zwanzigsteln des Faktors: 20 ist 1,0x. Beim Schreiben auf 2..200 (0,1x bis 10x) begrenzt. |
 | `CONFIG.MasterVolume  -> int` | Gesamtlautstärke, beim Schreiben auf 0..100 begrenzt. |
 | `CONFIG.SoundEffectVolume  -> int` | Soundeffekt-Lautstärke, beim Schreiben auf 0..100 begrenzt. |

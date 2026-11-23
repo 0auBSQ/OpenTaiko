@@ -244,6 +244,7 @@ Eigenschappen gebruiken puntsyntaxis (`CONFIG.PlayerCount`), methoden gebruiken 
 | `CONFIG.AreSongUnlockablesDisabled  -> bool (read-only)` | Of het spel ontgrendelvoorwaarden van nummers negeert. |
 | `CONFIG.AreLuaNetworkingConnectionsAllowed  -> bool (read-only)` | Of de speler onlineverbindingen heeft toegestaan in de instellingen („LuaNetworking-verbindingen toestaan”, standaard uit). Scripts kunnen dit niet wijzigen. |
 | `CONFIG.ShowPuchiChara  -> bool (read-only)` | Of de puchichara's getoond worden (de puchichara-instelling). |
+| `CONFIG.GlobalOffsetMs  -> int (read-only)` | De instelling "Globale Offset" in milliseconden: de waarde die het spel bij de OFFSET van elke chart optelt. De kalibratie stelt hem ook in. |
 | `CONFIG.SongSpeed  -> int` | Nummersnelheid in twintigsten van de factor: 20 is 1,0x. Bij schrijven begrensd op 2..200 (0,1x tot 10x). |
 | `CONFIG.MasterVolume  -> int` | Hoofdvolume, bij schrijven begrensd op 0..100. |
 | `CONFIG.SoundEffectVolume  -> int` | Volume van geluidseffecten, bij schrijven begrensd op 0..100. |

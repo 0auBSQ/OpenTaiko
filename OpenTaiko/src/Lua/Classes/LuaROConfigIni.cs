@@ -97,6 +97,9 @@ namespace OpenTaiko {
 		public bool ShowPuchiChara {
 			get => OpenTaiko.ConfigIni.ShowPuchiChara;
 		}
+
+		// calibration offset, ms
+		public int GlobalOffsetMs => OpenTaiko.ConfigIni.nGlobalOffsetMs;
 		#endregion
 
 		#region [Gameplay mods]

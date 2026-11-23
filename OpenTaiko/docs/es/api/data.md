@@ -244,6 +244,7 @@ Las propiedades usan la sintaxis de punto (`CONFIG.PlayerCount`), los métodos l
 | `CONFIG.AreSongUnlockablesDisabled  -> bool (read-only)` | Si el juego ignora las condiciones de desbloqueo de canciones. |
 | `CONFIG.AreLuaNetworkingConnectionsAllowed  -> bool (read-only)` | Si el jugador permitió las conexiones en línea en los ajustes («Permitir conexiones de LuaNetworking», desactivado por defecto). Los scripts no pueden cambiarlo. |
 | `CONFIG.ShowPuchiChara  -> bool (read-only)` | Si se muestran los puchicharas (el ajuste de puchichara). |
+| `CONFIG.GlobalOffsetMs  -> int (read-only)` | El ajuste «Offset Global» en milisegundos: el valor que el juego suma al OFFSET de cada partitura. La calibración también lo fija. |
 | `CONFIG.SongSpeed  -> int` | Velocidad de la canción en veinteavos del multiplicador: 20 es 1.0x. Limitada a 2..200 (0.1x a 10x) al escribir. |
 | `CONFIG.MasterVolume  -> int` | Volumen maestro, limitado a 0..100 al escribir. |
 | `CONFIG.SoundEffectVolume  -> int` | Volumen de efectos de sonido, limitado a 0..100 al escribir. |
