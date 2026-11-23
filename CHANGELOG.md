@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.7.0.20] - 2026-11-23 (Beta)
+
+- [Feat] Add INPUT extra methods in the Lua API to get input events in the input thread
+
 ## [0.7.0.19] - 2026-11-23 (Beta)
 
 - [Feat] Add CONFIG:GlobalOffsetMs to the Lua API
