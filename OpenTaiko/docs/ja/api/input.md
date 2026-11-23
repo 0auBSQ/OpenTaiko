@@ -24,6 +24,7 @@
 | `INPUT:GetBindingCount(input)  -> int` | プレイヤーがキーコンフィグでその入力に割り当てた数 (不明な名前は 0)。 |
 | `INPUT:GetBindingDevice(input, index)  -> string` | `index` (0 から count - 1) の割り当てのデバイス: Keyboard、Gamepad、Joystick、MidiIn、Mouse のいずれか。`index` が範囲外なら空文字列。 |
 | `INPUT:GetBindingName(input, index)  -> string` | 割り当てのキーまたはボタン: `KeyboardPressed` が受け取る形のキーボードのキー名 (Return、F)、ゲームパッドやジョイスティックが報告するボタン名 (A、Start、Button3)、MIDI ノート (C4[60])、または `MousePressed` が受け取る形のマウスボタン名。`index` が範囲外なら空文字列。 |
+| `INPUT:GetEvents(part)  -> inputEvent[]` | キーコンフィグのパートに属する入力の、このフレームの押下と解放を古い順に返します。それぞれに入力スレッドが記録した時刻が付きます (ゲーム画面が判定するのと同じイベント)。`part` は "Taiko" (既定: プレイヤー 1 から 5 の太鼓、Clap キー、LeftChange、RightChange、Decide、Cancel、Training* キー) または "System" (Capture から CycleVideoDisplayMode) で、大文字小文字を区別しません。入力イベントの .NET 配列 (0 始まり、`.Length`) を返します。同じフレームでは何度呼んでもそのフレームのイベントを返します。不明なパートのとき、およびトランジションのフェードイン中でステージが入力を受け取らない間は空の配列です。複数の入力に割り当てたキーは、入力ごとに一つずつイベントを返します。既定のキー設定では、F で Decide、次に LRed が返ります。 |
 
 ### キーボード
 
@@ -33,6 +34,7 @@
 | `INPUT:KeyboardPressing(key)  -> bool` | キーが押されている間 true。 |
 | `INPUT:KeyboardReleased(key)  -> bool` | キーが離されたフレームに true。 |
 | `INPUT:KeyboardReleasing(key)  -> bool` | キーが押されていない間 true。 |
+| `INPUT:GetKeyboardEvents()  -> inputEvent[]` | このフレームのキーの押下と解放を古い順に、入力イベントの .NET 配列 (0 始まり、`.Length`) で返します。それぞれに入力スレッドが記録した時刻が付きます。トランジションのフェードイン中でステージが入力を受け取らない間は空の配列です。 |
 
 ### マウス
 
@@ -74,6 +76,33 @@ end
 | メソッド | 説明 |
 | --- | --- |
 | `INPUT:CreateTextInput(initialText, maxLength)  -> textInput` | `initialText` があらかじめ入力され、UTF-8 で `maxLength` バイト (既定 64) に制限されたテキスト入力ウィジェットを作成します。 |
+
+## 入力イベント
+
+`INPUT:GetEvents` と `INPUT:GetKeyboardEvents` が返す配列の、1 回の押下または解放です。
+
+<div class="callout warn">
+すべてのメンバーは読み取り専用です。Ms は `fps.ms` の時計の時刻で、イベントを返した呼び出しより後になることはありません。入力スレッドはミリ秒単位で記録します。サウンドデバイスができる前は入力スレッドが時刻を記録しないため、Ms は呼び出しの時刻になります。
+</div>
+
+| メソッド | 説明 |
+| --- | --- |
+| `inputEvent.Name  -> string` | `Pressed` が受け取る形の入力名 (LRed、RBlue2P、Decide、Capture ...)。キーボードのイベントでは `KeyboardPressed` が受け取る形のキー名 (Return、F)。 |
+| `inputEvent.Player  -> int` | 入力が属するプレイヤー (0 から 4)。プレイヤーに属さない入力 (Decide、Cancel、LeftChange、RightChange、Training* キーとシステムキー) とキーボードのイベントでは -1。 |
+| `inputEvent.Pressed  -> bool` | 押下なら true、解放なら false。 |
+| `inputEvent.Ms  -> number` | 入力スレッドがイベントに記録した時刻。`fps.ms` の時計での ms 単位です。 |
+
+```lua
+function update()
+    local events = INPUT:GetEvents()
+    for i = 0, events.Length - 1 do
+        local e = events[i]
+        if e.Pressed and e.Player == 0 then
+            onHit(e.Name, e.Ms)
+        end
+    end
+end
+```
 
 ## テキスト入力ハンドル
 

@@ -24,6 +24,7 @@ Namen van druminvoer zijn de namen uit de toetsconfiguratie, vergeleken zonder o
 | `INPUT:GetBindingCount(input)  -> int` | Hoeveel toewijzingen de speler de invoer in de toetsconfiguratie heeft gegeven (0 voor een onbekende naam). |
 | `INPUT:GetBindingDevice(input, index)  -> string` | Het apparaat van de toewijzing op `index` (0 tot count - 1): Keyboard, Gamepad, Joystick, MidiIn of Mouse. Een lege string wanneer `index` buiten bereik ligt. |
 | `INPUT:GetBindingName(input, index)  -> string` | De toets of knop van de toewijzing: een toetsnaam zoals `KeyboardPressed` hem neemt (Return, F), de knopnaam die de gamepad of joystick doorgeeft (A, Start, Button3), een MIDI-noot (C4[60]) of een muisknopnaam zoals `MousePressed` hem neemt. Een lege string wanneer `index` buiten bereik ligt. |
+| `INPUT:GetEvents(part)  -> inputEvent[]` | De slagen en het loslaten van dit frame van de invoer van een deel van de toetsconfiguratie, het oudste eerst, elk met de tijd die de invoerthread ervoor heeft vastgelegd (de gebeurtenissen die het speelscherm beoordeelt). `part` is "Taiko" (de standaard: de trommels van spelers 1 tot en met 5, de Clap-toetsen, LeftChange, RightChange, Decide, Cancel en de Training*-toetsen) of "System" (Capture tot en met CycleVideoDisplayMode), vergeleken zonder onderscheid tussen hoofdletters en kleine letters. Geeft een .NET-array van invoergebeurtenissen terug (indexering vanaf 0, `.Length`); elke aanroep in een frame geeft de gebeurtenissen van dat frame. Een lege array voor een onbekend deel en tijdens de fade-in van een transitie, wanneer de stage geen invoer ontvangt. Een toets die aan meerdere inputs gekoppeld is, geeft per input een event: met de standaardtoetsen geeft F eerst Decide, dan LRed. |
 
 ### Toetsenbord
 
@@ -33,6 +34,7 @@ Namen van druminvoer zijn de namen uit de toetsconfiguratie, vergeleken zonder o
 | `INPUT:KeyboardPressing(key)  -> bool` | True terwijl de toets ingedrukt wordt gehouden. |
 | `INPUT:KeyboardReleased(key)  -> bool` | True in het frame waarin de toets wordt losgelaten. |
 | `INPUT:KeyboardReleasing(key)  -> bool` | True terwijl de toets niet ingedrukt is. |
+| `INPUT:GetKeyboardEvents()  -> inputEvent[]` | De toetsaanslagen en het loslaten van toetsen van dit frame, het oudste eerst, elk met de tijd die de invoerthread ervoor heeft vastgelegd, als .NET-array van invoergebeurtenissen (indexering vanaf 0, `.Length`). Een lege array tijdens de fade-in van een transitie, wanneer de stage geen invoer ontvangt. |
 
 ### Muis
 
@@ -74,6 +76,33 @@ end
 | Methode | Beschrijving |
 | --- | --- |
 | `INPUT:CreateTextInput(initialText, maxLength)  -> textInput` | Maakt een tekstinvoerwidget, vooraf gevuld met `initialText` en beperkt tot `maxLength` bytes UTF-8 (standaard 64). |
+
+## Invoergebeurtenis
+
+Eén slag of loslaten in de arrays die `INPUT:GetEvents` en `INPUT:GetKeyboardEvents` teruggeven.
+
+<div class="callout warn">
+Alle leden zijn alleen-lezen. Ms staat op de klok van `fps.ms` en ligt nooit na de aanroep die de gebeurtenis teruggaf; de invoerthread legt de tijd tot op de milliseconde vast. Voordat het geluidsapparaat bestaat, legt de invoerthread geen tijd vast en is Ms de tijd van de aanroep.
+</div>
+
+| Methode | Beschrijving |
+| --- | --- |
+| `inputEvent.Name  -> string` | De invoernaam zoals `Pressed` hem neemt (LRed, RBlue2P, Decide, Capture ...) of, bij een toetsenbordgebeurtenis, de toetsnaam zoals `KeyboardPressed` hem neemt (Return, F). |
+| `inputEvent.Player  -> int` | De speler bij wie de invoer hoort (0 tot en met 4), of -1 voor invoer zonder speler (Decide, Cancel, LeftChange, RightChange, de Training*- en systeemtoetsen) en voor elke toetsenbordgebeurtenis. |
+| `inputEvent.Pressed  -> bool` | True voor een slag, false voor loslaten. |
+| `inputEvent.Ms  -> number` | De tijd die de invoerthread voor de gebeurtenis heeft vastgelegd, in ms op de klok van `fps.ms`. |
+
+```lua
+function update()
+    local events = INPUT:GetEvents()
+    for i = 0, events.Length - 1 do
+        local e = events[i]
+        if e.Pressed and e.Player == 0 then
+            onHit(e.Name, e.Ms)
+        end
+    end
+end
+```
 
 ## Tekstinvoer-handle
 

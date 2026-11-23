@@ -44,6 +44,81 @@ namespace OpenTaiko {
 			=> Enum.TryParse<EKeyConfigPad>(input, true, out var pad)
 				&& OpenTaiko.Pad.IsReleasing(EKeyConfigPart.Taiko, pad);
 
+		// Timed events
+
+		// each key config part's inputs in pad order (name as Pressed takes it, player or -1)
+		private static readonly (EKeyConfigPad pad, string name, int player)[][] _partPads = PartPads();
+		private static (EKeyConfigPad, string, int)[][] PartPads() {
+			var parts = new List<(EKeyConfigPad, string, int)>[(int)EKeyConfigPart.Total];
+			for (int i = 0; i < parts.Length; ++i)
+				parts[i] = new();
+			for (var pad = EKeyConfigPad.Cancel; pad < EKeyConfigPad.Max; ++pad) {
+				// drum-kit pads
+				if (pad > EKeyConfigPad.Decide && pad < EKeyConfigPad.LRed)
+					continue;
+				// values shared with drum-kit names
+				string name = pad switch {
+					EKeyConfigPad.Cancel => nameof(EKeyConfigPad.Cancel),
+					EKeyConfigPad.Decide => nameof(EKeyConfigPad.Decide),
+					_ => pad.ToString(),
+				};
+				int player = NotesManager.GetPadPlayer((EPad)pad);
+				parts[(int)CPad.ResolveKeyConfigPart(EKeyConfigPart.Taiko, pad)].Add((pad, name, player == int.MaxValue ? -1 : player));
+			}
+			return parts.Select(list => list.ToArray()).ToArray();
+		}
+
+		// a part by name, Taiko for none; -1 for an unknown name
+		private static int PartIndex(string? part) {
+			if (string.IsNullOrEmpty(part))
+				return (int)EKeyConfigPart.Taiko;
+			for (var p = (EKeyConfigPart)0; p < EKeyConfigPart.Total; ++p)
+				if (string.Equals(p.ToString(), part, StringComparison.OrdinalIgnoreCase))
+					return (int)p;
+			return -1;
+		}
+
+		private static bool IsBound(CConfigIni.CKeyAssign.STKEYASSIGN[] binds, IInputDevice device, int key) {
+			foreach (var b in binds)
+				if (b.InputDevice == device.CurrentType && b.ID == device.ID && b.Code == key)
+					return true;
+			return false;
+		}
+
+		private static double ClockMs() => System.Diagnostics.Stopwatch.GetTimestamp() * 1000.0 / System.Diagnostics.Stopwatch.Frequency;
+
+		// oldest first (ties in device order); each stamp moved onto fps.ms's clock by its age
+		private static LuaInputEvent[] Timed(List<(STInputEvent ev, string name, int player)>? found) {
+			if (found == null)
+				return [];
+			double now = ClockMs();
+			// play timer ms (whole); no stamp before the sound device: the call time
+			long? stampNow = SoundManager.PlayTimer?.msGetPreciseNowSoundTimerTime();
+			return found.OrderBy(f => f.ev.nTimeStamp)
+				.Select(f => new LuaInputEvent(f.name, f.player, f.ev.Pressed,
+					(stampNow is long s && f.ev.nTimeStamp > 0) ? now - Math.Max(0, s - f.ev.nTimeStamp) : now))
+				.ToArray();
+		}
+
+		// this frame's presses and releases of a key config part's inputs (the play screen's events)
+		public LuaInputEvent[] GetEvents(string? part = "Taiko") {
+			int p = PartIndex(part);
+			var devices = OpenTaiko.InputManager?.InputDevices;
+			if (p < 0 || Blocked || devices == null)
+				return [];
+			var binds = OpenTaiko.ConfigIni.KeyAssign[p];
+			List<(STInputEvent ev, string name, int player)>? found = null;
+			foreach (var device in devices) {
+				if (device.InputEvents is not { Count: > 0 } events)
+					continue;
+				foreach (var ev in events)
+					foreach (var (pad, name, player) in _partPads[p])
+						if (IsBound(binds[(int)pad], device, ev.nKey))
+							(found ??= new()).Add((ev, name, player));
+			}
+			return Timed(found);
+		}
+
 		// What the player bound to a general input in the key config, for showing it (in the order of the key config)
 		private static List<CConfigIni.CKeyAssign.STKEYASSIGN> Bindings(string input) {
 			var list = new List<CConfigIni.CKeyAssign.STKEYASSIGN>();
@@ -68,7 +143,7 @@ namespace OpenTaiko {
 			var k = list[index];
 			switch (k.InputDevice) {
 				case InputDeviceType.Keyboard:
-					return Enum.IsDefined(typeof(SlimDXKeys.Key), k.Code) ? ((SlimDXKeys.Key)k.Code).ToString() : k.Code.ToString();
+					return KeyName(k.Code);
 				case InputDeviceType.MidiIn:
 					return CInputMIDI.GetButtonName(k.Code);
 				case InputDeviceType.Mouse:
@@ -127,6 +202,18 @@ namespace OpenTaiko {
 				return OpenTaiko.InputManager.Keyboard.KeyReleased((int)result);
 			}
 			return false;
+		}
+
+		// a key as KeyboardPressed takes it
+		private static string KeyName(int code)
+			=> Enum.IsDefined(typeof(SlimDXKeys.Key), code) ? ((SlimDXKeys.Key)code).ToString() : code.ToString();
+
+		// this frame's key presses and releases
+		public LuaInputEvent[] GetKeyboardEvents() {
+			var events = OpenTaiko.InputManager?.Keyboard.InputEvents;
+			if (Blocked || events is not { Count: > 0 })
+				return [];
+			return Timed(events.Select(ev => (ev, KeyName(ev.nKey), -1)).ToList());
 		}
 
 		// Text input
@@ -231,6 +318,21 @@ namespace OpenTaiko {
 			var m = MouseDevice; if (m == null || Blocked) return false;
 			int idx = MouseButtonIndex(button);
 			return idx >= 0 && idx < m.ButtonStates.Length && m.KeyReleased(idx);
+		}
+	}
+
+	// a press or release; Ms on fps.ms's clock
+	public sealed class LuaInputEvent {
+		public string Name { get; }
+		public int Player { get; }
+		public bool Pressed { get; }
+		public double Ms { get; }
+
+		internal LuaInputEvent(string name, int player, bool pressed, double ms) {
+			Name = name;
+			Player = player;
+			Pressed = pressed;
+			Ms = ms;
 		}
 	}
 }

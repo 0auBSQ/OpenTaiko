@@ -24,6 +24,7 @@
 | `INPUT:GetBindingCount(input)  -> int` | 플레이어가 키 설정에서 그 입력에 지정한 개수(알 수 없는 이름은 0). |
 | `INPUT:GetBindingDevice(input, index)  -> string` | `index`(0부터 count - 1) 위치 지정의 장치: Keyboard, Gamepad, Joystick, MidiIn, Mouse 중 하나. `index`가 범위를 벗어나면 빈 문자열. |
 | `INPUT:GetBindingName(input, index)  -> string` | 지정의 키 또는 버튼: `KeyboardPressed`가 받는 형태의 키보드 키 이름(Return, F), 게임패드나 조이스틱이 알려 주는 버튼 이름(A, Start, Button3), MIDI 노트(C4[60]), 또는 `MousePressed`가 받는 형태의 마우스 버튼 이름. `index`가 범위를 벗어나면 빈 문자열. |
+| `INPUT:GetEvents(part)  -> inputEvent[]` | 키 설정 파트에 속한 입력의 이 프레임 누름과 떼기를 오래된 순서로 돌려줍니다. 각각에는 입력 스레드가 기록한 시간이 붙습니다(게임 화면이 판정하는 것과 같은 이벤트). `part`는 "Taiko"(기본값: 플레이어 1부터 5까지의 북, Clap 키, LeftChange, RightChange, Decide, Cancel, Training* 키) 또는 "System"(Capture부터 CycleVideoDisplayMode까지)이며 대소문자를 구분하지 않습니다. 입력 이벤트의 .NET 배열(0부터 인덱싱, `.Length`)을 반환하며, 한 프레임 안에서는 몇 번 호출해도 그 프레임의 이벤트를 돌려줍니다. 알 수 없는 파트일 때와 트랜지션의 페이드인 동안 스테이지가 입력을 받지 않을 때는 빈 배열입니다. 여러 입력에 할당된 키는 입력마다 이벤트를 하나씩 돌려줍니다. 기본 키 설정에서는 F가 Decide, 그다음 LRed를 돌려줍니다. |
 
 ### 키보드
 
@@ -33,6 +34,7 @@
 | `INPUT:KeyboardPressing(key)  -> bool` | 키가 눌려 있는 동안 true. |
 | `INPUT:KeyboardReleased(key)  -> bool` | 키가 떼어지는 프레임에 true. |
 | `INPUT:KeyboardReleasing(key)  -> bool` | 키가 눌려 있지 않은 동안 true. |
+| `INPUT:GetKeyboardEvents()  -> inputEvent[]` | 이 프레임의 키 누름과 떼기를 오래된 순서로, 입력 이벤트의 .NET 배열(0부터 인덱싱, `.Length`)로 돌려줍니다. 각각에는 입력 스레드가 기록한 시간이 붙습니다. 트랜지션의 페이드인 동안 스테이지가 입력을 받지 않을 때는 빈 배열입니다. |
 
 ### 마우스
 
@@ -74,6 +76,33 @@ end
 | 메서드 | 설명 |
 | --- | --- |
 | `INPUT:CreateTextInput(initialText, maxLength)  -> textInput` | `initialText`로 미리 채워지고 UTF-8 `maxLength`바이트(기본값 64)로 제한된 텍스트 입력 위젯을 만듭니다. |
+
+## 입력 이벤트
+
+`INPUT:GetEvents`와 `INPUT:GetKeyboardEvents`가 반환하는 배열의 누름 또는 떼기 하나입니다.
+
+<div class="callout warn">
+모든 멤버는 읽기 전용입니다. Ms는 `fps.ms` 시계의 시간이며 이벤트를 반환한 호출보다 늦지 않습니다. 입력 스레드는 밀리초 단위로 기록합니다. 사운드 장치가 생기기 전에는 입력 스레드가 시간을 기록하지 않으므로 Ms는 호출 시점의 시간입니다.
+</div>
+
+| 메서드 | 설명 |
+| --- | --- |
+| `inputEvent.Name  -> string` | `Pressed`가 받는 형태의 입력 이름(LRed, RBlue2P, Decide, Capture ...). 키보드 이벤트에서는 `KeyboardPressed`가 받는 형태의 키 이름(Return, F). |
+| `inputEvent.Player  -> int` | 입력이 속한 플레이어(0부터 4). 플레이어에 속하지 않는 입력(Decide, Cancel, LeftChange, RightChange, Training* 키와 시스템 키)과 모든 키보드 이벤트에서는 -1. |
+| `inputEvent.Pressed  -> bool` | 누름이면 true, 떼기면 false. |
+| `inputEvent.Ms  -> number` | 입력 스레드가 이벤트에 기록한 시간으로, `fps.ms` 시계에서의 ms 단위입니다. |
+
+```lua
+function update()
+    local events = INPUT:GetEvents()
+    for i = 0, events.Length - 1 do
+        local e = events[i]
+        if e.Pressed and e.Player == 0 then
+            onHit(e.Name, e.Ms)
+        end
+    end
+end
+```
 
 ## 텍스트 입력 핸들
 

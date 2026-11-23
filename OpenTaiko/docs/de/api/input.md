@@ -24,6 +24,7 @@ Namen der Trommel-Eingaben sind die Namen der Tastenkonfiguration, ohne Beachtun
 | `INPUT:GetBindingCount(input)  -> int` | Wie viele Belegungen der Spieler der Eingabe in der Tastenkonfiguration gegeben hat (0 bei einem unbekannten Namen). |
 | `INPUT:GetBindingDevice(input, index)  -> string` | Das Gerät der Belegung an `index` (0 bis count - 1): Keyboard, Gamepad, Joystick, MidiIn oder Mouse. Ein leerer String, wenn `index` außerhalb des Bereichs liegt. |
 | `INPUT:GetBindingName(input, index)  -> string` | Die Taste oder der Knopf der Belegung: ein Tastenname, wie `KeyboardPressed` ihn nimmt (Return, F), der Knopfname, den das Gamepad oder der Joystick meldet (A, Start, Button3), eine MIDI-Note (C4[60]) oder ein Maustastenname, wie `MousePressed` ihn nimmt. Ein leerer String, wenn `index` außerhalb des Bereichs liegt. |
+| `INPUT:GetEvents(part)  -> inputEvent[]` | Die Anschläge und das Loslassen der Eingaben eines Teils der Tastenkonfiguration in diesem Frame, das älteste zuerst, jeweils mit der Zeit, die der Eingabe-Thread dafür aufgezeichnet hat (die Ereignisse, die der Spielbildschirm bewertet). `part` ist "Taiko" (der Standard: die Trommeln der Spieler 1 bis 5, die Clap-Tasten, LeftChange, RightChange, Decide, Cancel und die Training*-Tasten) oder "System" (Capture bis CycleVideoDisplayMode), ohne Beachtung der Groß-/Kleinschreibung. Gibt ein .NET-Array von Eingabe-Ereignissen zurück (Index ab 0, `.Length`); jeder Aufruf in einem Frame gibt die Ereignisse dieses Frames zurück. Ein leeres Array bei einem unbekannten Teil und während des Einblendens einer Transition, solange die Stage keine Eingaben erhält. Eine Taste, die mehreren Eingaben zugewiesen ist, liefert für jede ein Ereignis: mit der Standardbelegung liefert F erst Decide, dann LRed. |
 
 ### Tastatur
 
@@ -33,6 +34,7 @@ Namen der Trommel-Eingaben sind die Namen der Tastenkonfiguration, ohne Beachtun
 | `INPUT:KeyboardPressing(key)  -> bool` | True, solange die Taste gehalten wird. |
 | `INPUT:KeyboardReleased(key)  -> bool` | True im Frame, in dem die Taste losgelassen wird. |
 | `INPUT:KeyboardReleasing(key)  -> bool` | True, solange die Taste nicht gehalten wird. |
+| `INPUT:GetKeyboardEvents()  -> inputEvent[]` | Die Tastenanschläge und das Loslassen von Tasten in diesem Frame, das älteste zuerst, jeweils mit der Zeit, die der Eingabe-Thread dafür aufgezeichnet hat, als .NET-Array von Eingabe-Ereignissen (Index ab 0, `.Length`). Ein leeres Array während des Einblendens einer Transition, solange die Stage keine Eingaben erhält. |
 
 ### Maus
 
@@ -74,6 +76,33 @@ end
 | Methode | Beschreibung |
 | --- | --- |
 | `INPUT:CreateTextInput(initialText, maxLength)  -> textInput` | Erzeugt ein Texteingabe-Widget, vorbelegt mit `initialText` und begrenzt auf `maxLength` Bytes UTF-8 (Standard 64). |
+
+## Eingabe-Ereignis
+
+Ein Anschlag oder ein Loslassen in den Arrays, die `INPUT:GetEvents` und `INPUT:GetKeyboardEvents` zurückgeben.
+
+<div class="callout warn">
+Alle Member sind schreibgeschützt. Ms liegt auf der Uhr von `fps.ms` und nie nach dem Aufruf, der das Ereignis zurückgab; der Eingabe-Thread zeichnet die Zeit auf die Millisekunde genau auf. Bevor das Soundgerät existiert, zeichnet der Eingabe-Thread keine Zeit auf, und Ms ist die Zeit des Aufrufs.
+</div>
+
+| Methode | Beschreibung |
+| --- | --- |
+| `inputEvent.Name  -> string` | Der Eingabename, wie `Pressed` ihn nimmt (LRed, RBlue2P, Decide, Capture ...), oder bei einem Tastatur-Ereignis der Tastenname, wie `KeyboardPressed` ihn nimmt (Return, F). |
+| `inputEvent.Player  -> int` | Der Spieler, zu dem die Eingabe gehört (0 bis 4), oder -1 für eine Eingabe ohne Spieler (Decide, Cancel, LeftChange, RightChange, die Training*- und Systemtasten) und für jedes Tastatur-Ereignis. |
+| `inputEvent.Pressed  -> bool` | True für einen Anschlag, false für ein Loslassen. |
+| `inputEvent.Ms  -> number` | Die Zeit, die der Eingabe-Thread für das Ereignis aufgezeichnet hat, in ms auf der Uhr von `fps.ms`. |
+
+```lua
+function update()
+    local events = INPUT:GetEvents()
+    for i = 0, events.Length - 1 do
+        local e = events[i]
+        if e.Pressed and e.Player == 0 then
+            onHit(e.Name, e.Ms)
+        end
+    end
+end
+```
 
 ## Texteingabe-Handle
 

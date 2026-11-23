@@ -24,6 +24,7 @@ Les noms d'entrée tambour sont les noms de la configuration des touches, compar
 | `INPUT:GetBindingCount(input)  -> int` | Le nombre d'assignations que le joueur a données à l'entrée dans la configuration des touches (0 pour un nom inconnu). |
 | `INPUT:GetBindingDevice(input, index)  -> string` | Le périphérique de l'assignation à `index` (de 0 à count - 1) : Keyboard, Gamepad, Joystick, MidiIn ou Mouse. Une chaîne vide quand `index` est hors limites. |
 | `INPUT:GetBindingName(input, index)  -> string` | La touche ou le bouton de l'assignation : un nom de touche clavier tel que `KeyboardPressed` le prend (Return, F), le nom de bouton que donne la manette ou le joystick (A, Start, Button3), une note MIDI (C4[60]) ou un nom de bouton de souris tel que `MousePressed` le prend. Une chaîne vide quand `index` est hors limites. |
+| `INPUT:GetEvents(part)  -> inputEvent[]` | Les frappes et relâchements de cette frame des entrées d'une partie de la configuration des touches, du plus ancien au plus récent, chacun avec le temps que le thread d'entrée a noté pour lui (les événements que juge l'écran de jeu). `part` vaut "Taiko" (par défaut : les tambours des joueurs 1 à 5, les touches Clap, LeftChange, RightChange, Decide, Cancel et les touches Training*) ou "System" (de Capture à CycleVideoDisplayMode), comparé sans tenir compte de la casse. Renvoie un tableau .NET d'événements d'entrée (indexation à partir de 0, `.Length`) ; chaque appel dans une frame renvoie les événements de cette frame. Un tableau vide pour une partie inconnue et pendant le fondu d'entrée d'une transition, quand le stage ne reçoit aucune entrée. Une touche liée à plusieurs entrées donne un évènement pour chacune : avec les touches par défaut, F donne Decide, puis LRed. |
 
 ### Clavier
 
@@ -33,6 +34,7 @@ Les noms d'entrée tambour sont les noms de la configuration des touches, compar
 | `INPUT:KeyboardPressing(key)  -> bool` | Vrai tant que la touche est maintenue. |
 | `INPUT:KeyboardReleased(key)  -> bool` | Vrai sur la frame où la touche est relâchée. |
 | `INPUT:KeyboardReleasing(key)  -> bool` | Vrai tant que la touche n'est pas maintenue. |
+| `INPUT:GetKeyboardEvents()  -> inputEvent[]` | Les frappes et relâchements de touches de cette frame, du plus ancien au plus récent, chacun avec le temps que le thread d'entrée a noté pour lui, sous forme de tableau .NET d'événements d'entrée (indexation à partir de 0, `.Length`). Un tableau vide pendant le fondu d'entrée d'une transition, quand le stage ne reçoit aucune entrée. |
 
 ### Souris
 
@@ -74,6 +76,33 @@ end
 | Méthode | Description |
 | --- | --- |
 | `INPUT:CreateTextInput(initialText, maxLength)  -> textInput` | Crée un champ de saisie de texte prérempli avec `initialText` et limité à `maxLength` octets d'UTF-8 (64 par défaut). |
+
+## Événement d'entrée
+
+Une frappe ou un relâchement des tableaux que renvoient `INPUT:GetEvents` et `INPUT:GetKeyboardEvents`.
+
+<div class="callout warn">
+Tous les membres sont en lecture seule. Ms est sur l'horloge de `fps.ms` et jamais après l'appel qui a renvoyé l'événement ; le thread d'entrée le note à la milliseconde près. Avant que le périphérique audio existe, le thread d'entrée ne note aucun temps et Ms est le temps de l'appel.
+</div>
+
+| Méthode | Description |
+| --- | --- |
+| `inputEvent.Name  -> string` | Le nom d'entrée tel que `Pressed` le prend (LRed, RBlue2P, Decide, Capture ...) ou, pour un événement clavier, le nom de touche tel que `KeyboardPressed` le prend (Return, F). |
+| `inputEvent.Player  -> int` | Le joueur auquel l'entrée appartient (0 à 4), ou -1 pour une entrée sans joueur (Decide, Cancel, LeftChange, RightChange, les touches Training* et système) et pour tout événement clavier. |
+| `inputEvent.Pressed  -> bool` | Vrai pour une frappe, faux pour un relâchement. |
+| `inputEvent.Ms  -> number` | Le temps que le thread d'entrée a noté pour l'événement, en ms sur l'horloge de `fps.ms`. |
+
+```lua
+function update()
+    local events = INPUT:GetEvents()
+    for i = 0, events.Length - 1 do
+        local e = events[i]
+        if e.Pressed and e.Player == 0 then
+            onHit(e.Name, e.Ms)
+        end
+    end
+end
+```
 
 ## Handle de saisie de texte
 

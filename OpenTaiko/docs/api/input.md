@@ -24,6 +24,7 @@ Drum input names are the key-config names, matched case-insensitively: LRed, RRe
 | `INPUT:GetBindingCount(input)  -> int` | How many bindings the player gave the input in the key config (0 for an unknown name). |
 | `INPUT:GetBindingDevice(input, index)  -> string` | The device of the binding at `index` (0 to count - 1): Keyboard, Gamepad, Joystick, MidiIn or Mouse. An empty string when `index` is out of range. |
 | `INPUT:GetBindingName(input, index)  -> string` | The binding's key or button: a keyboard key name as `KeyboardPressed` takes it (Return, F), the button name the gamepad or joystick reports (A, Start, Button3), a MIDI note (C4[60]) or a mouse button name as `MousePressed` takes it. An empty string when `index` is out of range. |
+| `INPUT:GetEvents(part)  -> inputEvent[]` | This frame's presses and releases of the inputs of a key-config part, oldest first, each with the time the input thread recorded for it (the events the gameplay screen judges). `part` is "Taiko" (the default: the drums of players 1 to 5, the Clap keys, LeftChange, RightChange, Decide, Cancel and the Training* keys) or "System" (Capture to CycleVideoDisplayMode), matched case-insensitively. Returns a .NET array of input events (index from 0, `.Length`); every call in a frame returns that frame's events. An empty array for an unknown part and during a transition's fade-in, when the stage receives no input. One key bound to several inputs gives one event for each of them: with the default keys, F gives Decide, then LRed. |
 
 ### Keyboard
 
@@ -33,6 +34,7 @@ Drum input names are the key-config names, matched case-insensitively: LRed, RRe
 | `INPUT:KeyboardPressing(key)  -> bool` | True while the key is held. |
 | `INPUT:KeyboardReleased(key)  -> bool` | True on the frame the key goes up. |
 | `INPUT:KeyboardReleasing(key)  -> bool` | True while the key is not held. |
+| `INPUT:GetKeyboardEvents()  -> inputEvent[]` | This frame's key presses and releases, oldest first, each with the time the input thread recorded for it, as a .NET array of input events (index from 0, `.Length`). An empty array during a transition's fade-in, when the stage receives no input. |
 
 ### Mouse
 
@@ -74,6 +76,33 @@ end
 | Method | Description |
 | --- | --- |
 | `INPUT:CreateTextInput(initialText, maxLength)  -> textInput` | Creates a text-input widget pre-filled with `initialText` and limited to `maxLength` bytes of UTF-8 (default 64). |
+
+## Input event
+
+One press or release in the arrays that `INPUT:GetEvents` and `INPUT:GetKeyboardEvents` return.
+
+<div class="callout warn">
+All members are read-only. Ms is on the clock of `fps.ms` and never later than the call that returned the event; the input thread records it to the millisecond. Before the sound device exists the input thread records no time, and Ms is the time of the call.
+</div>
+
+| Method | Description |
+| --- | --- |
+| `inputEvent.Name  -> string` | The input name as `Pressed` takes it (LRed, RBlue2P, Decide, Capture ...), or for a keyboard event the key name as `KeyboardPressed` takes it (Return, F). |
+| `inputEvent.Player  -> int` | The player the input belongs to (0 to 4), or -1 for an input of no player (Decide, Cancel, LeftChange, RightChange, the Training* and system keys) and for every keyboard event. |
+| `inputEvent.Pressed  -> bool` | True for a press, false for a release. |
+| `inputEvent.Ms  -> number` | The time the input thread recorded for the event, in ms on the clock of `fps.ms`. |
+
+```lua
+function update()
+    local events = INPUT:GetEvents()
+    for i = 0, events.Length - 1 do
+        local e = events[i]
+        if e.Pressed and e.Player == 0 then
+            onHit(e.Name, e.Ms)
+        end
+    end
+end
+```
 
 ## Text-input handle
 
