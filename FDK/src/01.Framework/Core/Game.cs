@@ -155,6 +155,12 @@ public abstract partial class Game : IDisposable {
 	private readonly object _resizeLock = new();
 	private Vector2D<int>? _pendingResize;
 
+	// macOS only: the game owns the GL context (the window is created with GLFW_NO_API) and makes it current
+	// only on the game thread. The drawable follows the view from the window thread (from _macDrawableDirty),
+	// under the same CGL lock that the game thread holds for each frame.
+	private CocoaGLContext? _cocoaContext;
+	private volatile bool _macDrawableDirty;
+
 	/// <summary>The window's input context, created on the window thread before the game thread starts.</summary>
 	protected IInputContext? WindowInput { get; private set; }
 
@@ -519,7 +525,10 @@ public abstract partial class Game : IDisposable {
 		options.WindowState = (WindowMode == 1) ? WindowState.Fullscreen : WindowState.Normal;
 		options.VSync = VSync;
 
-		if (!OperatingSystem.IsMacOS()) options.API = GraphicsAPI.None;
+		// GL is never created by the windowing backend. On macOS in particular GLFW must create the window
+		// without an NSGL context, so its cocoa callbacks (windowDidResize/windowDidMove/updateLayer) never
+		// touch a GL context from the window thread.
+		options.API = GraphicsAPI.None;
 
 		// border already invisible if window is hidden
 		// but for exporting video, this prevent the window from being shrunk to fit inside the monitor due to the window border
@@ -543,6 +552,11 @@ public abstract partial class Game : IDisposable {
 		} else {
 			Silk.NET.Windowing.Glfw.GlfwWindowing.Use();
 			_usingGlfw = true;
+			// macOS only: keep GLFW's cocoa init from chdir-ing into the bundle's Resources folder. It has to be set
+			// before GLFW initializes (Window.Create); the game's relative paths (Songs, .init, Config.ini) live
+			// next to the executable (Program sets that directory).
+			if (OperatingSystem.IsMacOS())
+				GlfwProvider.UninitializedGLFW.Value.InitHint((InitHint)0x00051001 /* GLFW_COCOA_CHDIR_RESOURCES */, false);
 			Trace.TraceInformation("GLFW selected for Windowing");
 		}
 		// SDL would create it fullscreen in the display mode nearest the window size: it goes fullscreen once
@@ -749,12 +763,21 @@ public abstract partial class Game : IDisposable {
 		// This thread keeps the window: it waits for window events (waking on input, or after 1 ms to poll the pads),
 		// and the device callbacks stamp each press as it arrives. The game runs on its own thread (GameThreadMain).
 		Window_!.Initialize();
-		if (OperatingSystem.IsMacOS())
-			Window_.GLContext?.Clear(); // made current on the game thread
+		if (OperatingSystem.IsMacOS()) {
+			// macOS only: the game owns the GL context. The window was created with GLFW_NO_API, so GLFW
+			// neither creates an NSGL context nor calls [NSOpenGLContext update] from its cocoa callbacks.
+			// Create the context here (main thread, together with setView:); it is made current and used
+			// only on the game thread started below.
+			nint cocoaWindow = Window_.Native?.Cocoa ?? 0;
+			if (cocoaWindow == 0)
+				throw new Exception("No Cocoa window available for the game's OpenGL context.");
+			_cocoaContext = new CocoaGLContext(cocoaWindow) { Source = Window_ };
+		}
 		WindowInput = Window_.CreateInput();
 
 		_gameCulture = Thread.CurrentThread.CurrentCulture;
 		_gameUICulture = Thread.CurrentThread.CurrentUICulture;
+
 		_gameThread = new Thread(this.GameThreadMain, 8 * 1024 * 1024) { Name = "GameThread" };
 		if (OperatingSystem.IsWindows())
 			_gameThread.SetApartmentState(ApartmentState.STA); // as the main thread it takes over from
@@ -777,6 +800,14 @@ public abstract partial class Game : IDisposable {
 				else
 					Thread.Sleep(1);
 				this.OnEvents();
+				if (OperatingSystem.IsMacOS() && _macDrawableDirty) {
+					// macOS only: apply the drawable change here, outside AppKit callbacks, on the main thread (AppKit
+					// objects belong to it); Update takes the CGL lock, so it waits for the game thread's current frame
+					// and never overlaps its GL work. Calling it from the game thread instead hangs the app: the
+					// game thread spins inside [NSOpenGLContext update] while AppKit's layer display waits for the lock.
+					_macDrawableDirty = false;
+					_cocoaContext?.Update();
+				}
 				if (Window_.IsClosing)
 					this._quitRequested = true;
 			}
@@ -786,6 +817,7 @@ public abstract partial class Game : IDisposable {
 			_gameThread.Join();
 		}
 		WindowInput?.Dispose();
+		_cocoaContext?.Dispose();   // macOS only: on the window thread, after the game thread is done with it
 		_gameThreadException?.Throw();
 		Window_.Reset();
 	}
@@ -796,9 +828,14 @@ public abstract partial class Game : IDisposable {
 		Thread.CurrentThread.CurrentUICulture = _gameUICulture!;
 		MainThreadID = Environment.CurrentManagedThreadId;
 		try {
-			this.InitializeGraphics();
-			this.Initialize();
-			this.LoadContent();
+			LockMacGL();
+			try {
+				this.InitializeGraphics();
+				this.Initialize();
+				this.LoadContent();
+			} finally {
+				UnlockMacGL();
+			}
 			var clock = Stopwatch.StartNew();
 			double last = 0;
 			while (!this._quitRequested) {
@@ -806,11 +843,18 @@ public abstract partial class Game : IDisposable {
 				double now = clock.Elapsed.TotalSeconds;
 				double delta = Math.Max(now - last, 1e-6);
 				last = now;
-				this.ApplyPendingResize();
-				this.Window_Update(delta);
-				if (this._quitRequested)
-					break;
-				this.Window_Render(delta);
+				// macOS only: the same CGL lock the window thread takes for its drawable update, so neither thread
+				// uses the GL-on-Metal context while the other does.
+				LockMacGL();
+				try {
+					this.ApplyPendingResize();
+					this.Window_Update(delta);
+					if (this._quitRequested)
+						break;
+					this.Window_Render(delta);
+				} finally {
+					UnlockMacGL();
+				}
 			}
 		} catch (Exception e) {
 			this._gameThreadException = ExceptionDispatchInfo.Capture(e);
@@ -824,6 +868,17 @@ public abstract partial class Game : IDisposable {
 			if (_usingGlfw)
 				GlfwProvider.GLFW.Value.PostEmptyEvent();
 		}
+	}
+
+	// macOS only: the game thread's frames and the window thread's drawable update share this CGL lock.
+	private void LockMacGL() {
+		if (OperatingSystem.IsMacOS())
+			_cocoaContext?.Lock();
+	}
+
+	private void UnlockMacGL() {
+		if (OperatingSystem.IsMacOS())
+			_cocoaContext?.Unlock();
 	}
 
 	/// <summary>
@@ -905,10 +960,6 @@ public abstract partial class Game : IDisposable {
 				SyncTaskbarIcon(w.Hwnd);
 		}
 
-		if (OperatingSystem.IsMacOS() && Window_!.GLContext == null) {
-			throw new Exception("No native OpenGL context available");
-		}
-
 		// Finalise the window mode now that the window + monitor exist (esp. Borderless, which needs the monitor
 		// bounds to size the undecorated window — WindowOptions can't query the monitor before creation).
 		ApplyWindowMode();
@@ -917,7 +968,9 @@ public abstract partial class Game : IDisposable {
 	// game thread: the GL context and the state that needs it
 	private void InitializeGraphics() {
 		if (OperatingSystem.IsMacOS()) {
-			Context = Window_!.GLContext!;
+			// macOS only: the context was created on the window thread (setView: included); from here on the
+			// game thread is its only user.
+			Context = _cocoaContext ?? throw new Exception("The Cocoa OpenGL context was not created.");
 			Context.MakeCurrent();
 		} else {
 			#region Override Platform
@@ -961,8 +1014,7 @@ public abstract partial class Game : IDisposable {
 
 		Gl.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-		if (!OperatingSystem.IsMacOS())
-			this.ApplyViewport(WindowBorderSize);
+		this.ApplyViewport(WindowBorderSize);
 
 		Context.SwapInterval(VSync ? 1 : 0);
 	}
@@ -974,13 +1026,25 @@ public abstract partial class Game : IDisposable {
 
 	// game thread, after its last frame
 	private void ShutdownGame() {
-		CTexture.Terminate();
-		DeleteRenderScaleFbo();
+		// macOS only: under the CGL lock, so the window thread's drawable update cannot use the context while its
+		// objects are deleted
+		LockMacGL();
+		try {
+			CTexture.Terminate();
+			DeleteRenderScaleFbo();
 
-		UnloadContent();
-		OnExiting();
+			UnloadContent();
+			OnExiting();
 
-		Context?.Dispose();
+			// macOS only: the NSOpenGLContext is released on the window thread after this thread joins (AppKit
+			// objects belong to the main thread); here it only stops being current.
+			if (OperatingSystem.IsMacOS())
+				_cocoaContext?.ReleaseCurrent();
+			else
+				Context?.Dispose();
+		} finally {
+			UnlockMacGL();
+		}
 	}
 
 	public void Window_Update(double deltaTime) {
@@ -1195,8 +1259,11 @@ public abstract partial class Game : IDisposable {
 
 	// window thread: the game thread applies the size at its next frame
 	public void Window_Resize(Vector2D<int> size) {
-		lock (this._resizeLock)
+		lock (this._resizeLock) {
 			this._pendingResize = size;
+			if (OperatingSystem.IsMacOS())
+				_macDrawableDirty = true;   // macOS only: applied by the window loop, under the CGL lock
+		}
 	}
 
 	private void ApplyPendingResize() {
@@ -1231,7 +1298,15 @@ public abstract partial class Game : IDisposable {
 		Gl.Viewport(ViewPortOffset.X, ViewPortOffset.Y, (uint)ViewPortSize.X, (uint)ViewPortSize.Y);
 	}
 
-	public void Window_Move(Vector2D<int> size) { }
+	public void Window_Move(Vector2D<int> size) {
+		// macOS only: applied by the window loop, under the CGL lock.
+		if (OperatingSystem.IsMacOS())
+			_macDrawableDirty = true;
+	}
 
-	public void Window_FramebufferResize(Vector2D<int> size) { }
+	public void Window_FramebufferResize(Vector2D<int> size) {
+		// macOS only: a display/backing-scale change resizes the drawable; applied by the window loop.
+		if (OperatingSystem.IsMacOS())
+			_macDrawableDirty = true;
+	}
 }

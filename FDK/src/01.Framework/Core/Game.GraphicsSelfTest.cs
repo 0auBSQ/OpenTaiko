@@ -23,7 +23,7 @@ public abstract partial class Game {
 			string ver = Gl.GetStringS(StringName.Version);
 			string rend = Gl.GetStringS(StringName.Renderer);
 			string vend = Gl.GetStringS(StringName.Vendor);
-			if (!OperatingSystem.IsMacOS()) Context.SwapBuffers();
+			Context.SwapBuffers();
 			string line = $"[checkgl] OK  version='{ver}' renderer='{rend}' vendor='{vend}' compute={ComputeShadersAvailable}";
 			Trace.TraceInformation(line);
 			Console.WriteLine(line);
