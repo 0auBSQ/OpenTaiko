@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.7.0.19] - 2026-11-23 (Beta)
+
+- [Feat] Add CONFIG:GlobalOffsetMs to the Lua API
+
 ## [0.7.0.18] - 2026-11-22 (Beta)
 
 - [Fix] Add the replay version 700 that handles multiplayer charts (Player Side) and bongos game mode

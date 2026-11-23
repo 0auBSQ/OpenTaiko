@@ -35,7 +35,7 @@
     <Content Include="README.md" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <PropertyGroup>
-    <Version>0.7.0.18</Version>
+    <Version>0.7.0.19</Version>
     <OutputType Condition="'$(BuildingAsLibrary)' != 'true'">WinExe</OutputType>
     <OutputType Condition="'$(BuildingAsLibrary)' == 'true'">Library</OutputType>
     <TargetFramework>net10.0</TargetFramework>
