@@ -397,6 +397,11 @@
 		"ONLINE_MULTIPLAYER": "在线多人（不可用）",
 
 		// Dan Dojo
+		"DAN_ST": "第{0}首",
+		"DAN_ND": "第{0}首",
+		"DAN_RD": "第{0}首",
+		"DAN_TH": "第{0}首",
+		"DAN_UNIEME": "第{0}首",
 		"DAN_CONDITION_NAME_SOUL": "魂条",
 		"DAN_CONDITION_NAME_GOOD": "“良”数",
 		"DAN_CONDITION_NAME_OK": "“可”数",
